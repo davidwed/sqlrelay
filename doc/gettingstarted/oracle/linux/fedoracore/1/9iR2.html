@@ -1,0 +1,61 @@
+install compat-gcc and compat-db
+
+The jre shipped with oracle has a bug, it requires the symbol __libc_wait which
+is supposed to be private (ie. no apps are supposed to use it), but was public
+in versions of glibc prior to the version shipped with fedora core 1.
+
+apply patch
+
+has same ins_oemagent.mk ctypefixup problem
+
+ERROR:
+cd $ORACLE_HOME/rdbms/lib
+make -f ins_rdbms.mk
+/usr/bin/ld: /u01/app/oracle/product/9.2.0/rdbms/lib/oracle: hidden symbol `__fixunssfdi' in /usr/lib/gcc-lib/i386-redhat-linux/3.3.2/libgcc.a(_fixunssfdi.oS) is referenced by DSO
+
+edit env_rdbms.mk, change gcc to gcc296, retry
+
+
+ERROR:
+cd $ORACLE_HOME/ctx/lib
+make -f ins_ctx.mk
+/usr/bin/ld: ctxhx: hidden symbol `stat' in /usr/lib/libc_nonshared.a(stat.oS) is referenced by DSO
+
+no good fix right now, click ignore, it's not a critical system?
+
+netca won't run unless patch is used instead of jre1.3.1_09
+edit netca, change:
+#JREDIR=/u01/app/oracle/product/9.2.0/JRE
+JREDIR=/usr/java/jre1.3.1_09
+#JRE=$JREDIR/bin/jre
+JRE=$JREDIR/bin/java
+
+run:
+./netca /orahome /u01/app/oracle/product/9.2.0 /instype typical /inscomp client,oraclenet,javavm,server,ano /insprtcl tcp,tcps /cfg local /authadp NO_VALUE /nodeinfo NO_VALUE /responseFile /u01/app/oracle/product/9.2.0/network/install/netca_typ.rsp
+
+dbca won't run unless patch is used instead of jre1.3.1_09
+edit dbca, change:
+#JRE_DIR=/u01/app/oracle/product/9.2.0/JRE
+JRE_DIR=/usr/java/jre1.3.1_09
+change:
+# Run DBCA
+$JRE_DIR/bin/jre -native -DORACLE_HOME=$OH -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
+else
+# Run DBCA
+$JRE_DIR/bin/jre -DORACLE_HOME=$OH -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
+fi
+to:
+# Run DBCA
+$JRE_DIR/bin/java -native -DORACLE_HOME=$OH -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
+else
+# Run DBCA
+$JRE_DIR/bin/java -DORACLE_HOME=$OH -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
+
+run:
+./dbca  -progress_only    -createDatabase -templateName General_Purpose.dbc -gdbName ora1 -sid ora1  -datafileJarLocation /u01/app/oracle/product/9.2.0/assistants/dbca/templates -datafileDestination /u01/app/oracle/oradata -responseFile NO_VALUE     -characterset WE8ISO8859P1 -passwordDialog true
+
+needs /etc/rac_on
+
+
+I wonder if I can re-symlink $ORACLE_HOME/JRE and /u01/app/oracle/jre/1.3.1
+to /usr/java/jre1.3.1_09

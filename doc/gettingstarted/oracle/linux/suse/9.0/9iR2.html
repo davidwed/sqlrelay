@@ -1,0 +1,18 @@
+need useradd -m for creating oracle user
+put environment variables in /etc/bash.bashrc.local
+
+compile, install gcc-2.95.3
+
+Error in invoking target ioracle of makefile
+/u01/app/oracle/product/9.2.0/rdbms/lib/ins_rdbms.mk
+
+edit env_rdbms.mk, change all instances of gcc to
+	/usr/local/toolchains/gcc/2.95.3/bin/gcc
+click retry
+
+Error in invoking target install of makefile
+/u01/app/oracle/product/9.2.0/ctx/lib/ins_ctx.mk
+
+no known solution...
+
+click ignore
