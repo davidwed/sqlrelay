@@ -1,6 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
+#include <rudiments/charstring.h>
 #include <mysqlconnection.h>
 #if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
 	#include <errmsg.h>
@@ -223,18 +224,19 @@ char *mysqlcursor::getErrorMessage(bool *liveconnection) {
 	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
 		if (queryresult==CR_SERVER_GONE_ERROR) {
 			*liveconnection=false;
-		}
+		} else
 	#endif
 	#ifdef HAVE_MYSQL_CR_SERVER_LOST
 		if (queryresult==CR_SERVER_LOST) {
 			*liveconnection=false;
-		}
+		} else
 	#endif
-#else
-	if (strstr(err,"mysql server has gone away")) {
+#endif
+	if (!charstring::compare(err,"") ||
+		!charstring::compareIgnoringCase(err,
+				"mysql server has gone away")) {
 		*liveconnection=false;
 	}
-#endif
 	return err;
 }
 
