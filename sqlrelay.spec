@@ -71,15 +71,6 @@ Group: Applications/Database
 Command line applications for accessing databases through SQL Relay.
 
 
-#%package clients-debug
-#Summary: Command line applications for accessing databases through SQL Relay compiled with debugging support.
-#Group: Applications/Database
-
-#%description clients-debug
-#Command line applications for accessing databases through SQL Relay compiled
-#with debugging support.
-
-
 %package client-runtime-c++
 Summary: Runtime libraries for SQL Relay clients written in C++.
 Group: Applications/Libraries
@@ -88,30 +79,12 @@ Group: Applications/Libraries
 Runtime libraries for SQL Relay clients written in C++.
 
 
-#%package client-runtime-c++-debug
-#Summary: Runtime libraries for SQL Relay clients written in C++ compiled with debugging support.
-#Group: Applications/Libraries
-
-#%description client-runtime-c++-debug
-#Runtime libraries for SQL Relay clients written in C++ compield with debugging
-#support.
-
-
 %package client-runtime-c
 Summary: Runtime libraries for SQL Relay clients written in C.
 Group: Applications/Libraries
 
 %description client-runtime-c
 Runtime libraries for SQL Relay clients written in C.
-
-
-#%package client-runtime-c-debug
-#Summary: Runtime libraries for SQL Relay clients written in C compiled with debugging support.
-#Group: Applications/Libraries
-
-#%description client-runtime-c-debug
-#Runtime libraries for SQL Relay clients written in C compiled with debugging
-#support.
 
 
 %package client-devel-c++
@@ -123,15 +96,6 @@ Header files and static libraries to use for developing programs in C++ that
 use SQL Relay.
 
 
-#%package client-devel-c++-debug
-#Summary: Development files for developing programs C++ that use SQL Relay compiled with debugging support.
-#Group: Development/Libraries
-
-#%description client-devel-c++-debug
-#Header files and static libraries to use for developing programs in C++ that
-#use SQL Relay compiled with debugging support.
-
-
 %package client-devel-c
 Summary: Development files for developing programs C that use SQL Relay.
 Group: Development/Libraries
@@ -141,13 +105,6 @@ Header files and static libraries to use for developing programs in C that
 use SQL Relay.
 
 
-#%package client-devel-c-debug
-#Summary: Development files for developing programs C that use SQL Relay compiled with debugging support.
-#Group: Development/Libraries
-
-#%description client-devel-c-debug
-#Header files and static libraries to use for developing programs in C that use SQL Relay compiled with debugging support.
-
 %package client-postgresql
 Summary: Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead.
 Group: Applications/Libraries
@@ -155,12 +112,6 @@ Group: Applications/Libraries
 %description client-postgresql
 Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead.
 
-#%package client-postgresql-debug
-#Summary: Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead, compiled with debugging support.
-#Group: Applications/Libraries
-
-#%description client-postgresql-debug
-#Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead, compiled with debugging support.
 
 %package config-gtk
 Summary: SQL Relay GUI configuration tool.
@@ -451,28 +402,14 @@ rm -rf %{buildroot}
 %{_bindir}/query
 %{_bindir}/sqlrsh
 
-#%files clients-debug
-#%defattr(-, root, root)
-#%{_bindir}/fields-debug
-#%{_bindir}/query-debug
-#%{_bindir}/sqlrsh-debug
-
 %files client-runtime-c++
 %defattr(-, root, root)
 %{_libdir}/libsqlrclient-*.so.*
 %{_localstatedir}/sqlrelay/cache
 
-#%files client-runtime-c++-debug
-#%defattr(-, root, root)
-#%{_libdir}/libsqlrclient_p-*.so.*
-
 %files client-runtime-c
 %defattr(-, root, root)
 %{_libdir}/libsqlrclientwrapper-*.so.*
-
-#%files client-runtime-c-debug
-#%defattr(-, root, root)
-#%{_libdir}/libsqlrclientwrapper_p-*.so.*
 
 %files client-devel-c++
 %defattr(-, root, root)
@@ -483,12 +420,6 @@ rm -rf %{buildroot}
 %{_libdir}/libsqlrclient.la
 %{_libdir}/libsqlrclient.so
 
-#%files client-devel-c++-debug
-#%defattr(-, root, root)
-#%{_libdir}/libsqlrclient_p.a
-#%{_libdir}/libsqlrclient_p.la
-#%{_libdir}/libsqlrclient_p.so
-
 %files client-devel-c
 %defattr(-, root, root)
 %{_bindir}/sqlrclientwrapper-config
@@ -497,23 +428,11 @@ rm -rf %{buildroot}
 %{_libdir}/libsqlrclientwrapper.la
 %{_libdir}/libsqlrclientwrapper.so
 
-#%files client-devel-c-debug
-#%defattr(-, root, root)
-#%{_libdir}/libsqlrclientwrapper_p.a
-#%{_libdir}/libsqlrclientwrapper_p.la
-#%{_libdir}/libsqlrclientwrapper_p.so
-
 %files client-postgresql
 %defattr(-, root, root)
 %{_libdir}/libpq-sqlrelay-*.so.*
 %{_libdir}/libpq-sqlrelay.a
 %{_libdir}/libpq-sqlrelay.la
-
-#%files client-postgresql-debug
-#%defattr(-, root, root)
-#%{_libdir}/libpq-sqlrelay_p-*.so.*
-#%{_libdir}/libpq-sqlrelay_p.a
-#%{_libdir}/libpq-sqlrelay_p.la
 
 %{!?_without_gtk:%files config-gtk}
 %{!?_without_gtk:%defattr(-, root, root)}

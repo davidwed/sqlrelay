@@ -1,6 +1,4 @@
 slackware package build isn't right
-if all space is used up in a filesystem, SQL Relay stops working
-if no users are defined, connections crash
 suspend/resumeResultSet doesn't appear to work if result set is done
 
 implement unique/nullable/primary key as a bitmap

@@ -43,6 +43,8 @@
 	sqlrconfigfile class doesn't cause crashes when id isn't found anymore
 	config file arguments that are less than a certain value (in most cases
 		less than 1) are set to the default value now 
+	sqlrconfigfile class uses list class now to store user/connectstring
+		lists
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

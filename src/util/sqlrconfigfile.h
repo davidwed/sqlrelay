@@ -9,6 +9,7 @@
 #include <rudiments/xmlsax.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/list.h>
+#include <rudiments/parameterstring.h>
 
 typedef enum {
 	ID_ATTRIBUTE=1,
@@ -73,9 +74,8 @@ class connectstringcontainer {
 		int			metric;
 
 		// connect string parameters
+		parameterstring	connectstring;
 		int		connectstringcount;
-		stringbuffer	**connectstringvar;
-		stringbuffer	**connectstringval;
 };
 
 typedef listnode< connectstringcontainer * >	connectstringnode;

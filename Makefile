@@ -73,9 +73,8 @@ slackware: all
 		ZOPEDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(ZOPEDIR) \
 		PHPEXTDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(PHPEXTDIR) \
 		TCLLIBSPATH=/tmp/sqlrelay-$(SQLR_VERSION)/$(TCLLIBSPATH) \
-		PREFIX=/tmp/sqlrelay-$(SQLR_VERSION)/$(PERLPREFIX) \
-		initroot=/tmp/sqlrelay-$(SQLR_VERSION) \
 		HAVE_RUBY="" \
+		initroot=/tmp/sqlrelay-$(SQLR_VERSION) \
 			install
 	if ( test -n "$(HAVE_RUBY)" ); then \
 		make DESTDIR=/tmp/sqlrelay-$(SQLR_VERSION) \

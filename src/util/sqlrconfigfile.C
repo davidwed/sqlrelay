@@ -511,12 +511,8 @@ usercontainer::usercontainer() {
 }
 
 usercontainer::~usercontainer() {
-	if (user) {
-		delete[] user;
-	}
-	if (password) {
-		delete[] password;
-	}
+	delete[] user;
+	delete[] password;
 }
 
 void usercontainer::setUser(const char *user) {
@@ -544,21 +540,11 @@ connectstringcontainer::connectstringcontainer(int connectstringcount) {
 	connectionid=NULL;
 	string=NULL;
 	metric=::atoi(DEFAULT_METRIC);
-	connectstringvar=NULL;
-	connectstringval=NULL;
 }
 
 connectstringcontainer::~connectstringcontainer() {
 	delete[] string;
 	delete[] connectionid;
-
-	// clean up connect strings
-	for (int i=0; i<connectstringcount; i++) {
-		delete connectstringvar[i];
-		delete connectstringval[i];
-	}
-	delete[] connectstringvar;
-	delete[] connectstringval;
 }
 
 void connectstringcontainer::setConnectionId(const char *connectionid) {
@@ -590,68 +576,12 @@ int connectstringcontainer::getMetric() {
 }
 
 void connectstringcontainer::parseConnectString() {
-
 	if (!connectstringcount) {
 		return;
 	}
-
-	// initialize containers for the connect string vars and vals
-	connectstringvar=new stringbuffer *[connectstringcount];
-	connectstringval=new stringbuffer *[connectstringcount];
-	for (int i=0; i<connectstringcount; i++) {
-		connectstringvar[i]=NULL;
-		connectstringval[i]=NULL;
-	}
-
-	// parse connect string of form:
-	//	 name1=value1;name2=value2;name3=value3;
-	char *ptr1=string;
-	char *ptr2=string;
-	int	current=0;
-	while (*ptr2) {
-		while (*ptr2 && *ptr2!='=') {
-			ptr2++;
-		}
-		if (!*ptr2) {
-			break;
-		}
-		connectstringvar[current]=new stringbuffer();
-		while (ptr1!=ptr2) {
-			connectstringvar[current]->append((char)*ptr1);
-			ptr1++;
-		}
-		ptr1++;
-		ptr2++;
-		while (*ptr2 && *ptr2!=';') {
-			ptr2++;
-		}
-		connectstringval[current]=new stringbuffer();
-		while (*ptr1 && ptr1!=ptr2) {
-			connectstringval[current]->append((char)*ptr1);
-			ptr1++;
-		}
-
-		if (!*ptr2) {
-			break;
-		}
-
-		current++;
-		ptr1++;
-		ptr2++;
-	}
+	connectstring.parse(string);
 }
 
 char *connectstringcontainer::getConnectStringValue(const char *variable) {
-
-	// search for the given variable, return the given value,
-	// search is case insensitive
-	for (int i=0; i<connectstringcount; i++) {
-		if (!connectstringvar[i]) {
-			break;
-		}
-		if (!strcasecmp(variable,connectstringvar[i]->getString())) {
-			return connectstringval[i]->getString();
-		}
-	}
-	return NULL;
+	return connectstring.getValue(variable);
 }
