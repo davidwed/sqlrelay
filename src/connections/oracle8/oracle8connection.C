@@ -528,7 +528,6 @@ int	oracle8cursor::inputBindGenericLob(const char *variable,
 						ub2 type) {
 
 	checkRePrepare();
-	ub4	size=valuesize;
 
 	// create a temporary lob, write the value to it
 	if (OCIDescriptorAlloc((dvoid *)oracle8conn->env,
@@ -537,13 +536,17 @@ int	oracle8cursor::inputBindGenericLob(const char *variable,
 			(size_t)0,(dvoid **)0)!=OCI_SUCCESS) {
 		return 0;
 	}
+
 	if (OCILobCreateTemporary(oracle8conn->svc,oracle8conn->err,
-			inbind_lob[inbindlobcount],(ub2)0,SQLCS_IMPLICIT,
+			inbind_lob[inbindlobcount],
+			//(ub2)0,SQLCS_IMPLICIT,
+			(ub2)OCI_DEFAULT,OCI_DEFAULT,
 			temptype,OCI_ATTR_NOCACHE,
 			OCI_DURATION_SESSION)!=OCI_SUCCESS) {
 		OCIHandleFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
 		return 0;
 	}
+
 	if (OCILobOpen(oracle8conn->svc,oracle8conn->err,
 			inbind_lob[inbindlobcount],
 			OCI_LOB_READWRITE)!=OCI_SUCCESS) {
@@ -552,9 +555,11 @@ int	oracle8cursor::inputBindGenericLob(const char *variable,
 		OCIHandleFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
 		return 0;
 	}
+
+	ub4	size=valuesize;
 	if (OCILobWrite(oracle8conn->svc,oracle8conn->err,
 			inbind_lob[inbindlobcount],&size,1,
-			(void *)value,size,
+			(void *)value,valuesize,
 			OCI_ONE_PIECE,(dvoid *)0,
 			(sb4 (*)(dvoid*,dvoid*,ub4*,ub1 *))0,
 			0,SQLCS_IMPLICIT)!=OCI_SUCCESS) {
@@ -1261,11 +1266,6 @@ void	oracle8cursor::cleanUpData() {
 	outbindlobcount=0;
 
 	// free regular bind resources
-	for (int i=0; i<MAXVAR; i++) {
-		inbindpp[i]=NULL;
-		outbindpp[i]=NULL;
-		curbindpp[i]=NULL;
-	}
 	inbindcount=0;
 	outbindcount=0;
 	curbindcount=0;
