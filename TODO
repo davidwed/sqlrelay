@@ -9,9 +9,10 @@ probably related to temp table dropping:
 	freetds connection writes an error but succeeds in dropping the table
 	sybase connection won't even start now
 
-licenses:
-	mysql replacement library
-	postgresql replacement library
+freetds-0.62/ct_param support
+idle client timeout
+perl apis -> CPAN
+
 docs:
 	mysql drop-in library
 	postgresql drop-in library
@@ -29,10 +30,6 @@ tests:
 	db2 temp tables
 	odbc temp tables
 	interbase stored procedure/output bind tests fails at isc_dsql_prepare
-
-freetds-0.62/ct_param support
-idle client timeout
-perl apis -> CPAN
 
 --------------------------------------------------------------------------------
 

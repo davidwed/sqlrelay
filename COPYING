@@ -199,6 +199,33 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 
 --------------------------------------------------------------------------------
 
+The SQLRelay PostgreSQL Drop-In API
+Copyright (c) 2003-2004 David Muse
+
+These libraries are covered by the BSD License for derivative works of
+PostgreSQL.  (attached below)
+
+--------------------------------------------------------------------------------
+
+The SQLRelay MySQL Drop-In API
+Copyright (c) 2004 David Muse
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+--------------------------------------------------------------------------------
+
 GNU GENERAL PUBLIC LICENSE
 
 Version 2, June 1991 
@@ -863,3 +890,19 @@ Definitions
        PURPOSE. 
 
                                                       The End 
+
+--------------------------------------------------------------------------------
+
+The "BSD License for derivative works of PostgreSQL"
+
+Portions Copyright (c) 1996-2002, The PostgreSQL Global Development Group
+
+Portions Copyright (c) 1994, The Regents of the University of California
+
+Portions Copyright (c) 2003-2004, David Muse
+
+Permission to use, copy, modify, and distribute this software and its documentation for any purpose, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and this paragraph and the following two paragraphs appear in all copies.
+
+IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
