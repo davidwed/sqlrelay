@@ -342,8 +342,7 @@ void	sqlrlistener::shmError(const char *id, int shmid) {
 void	sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr,"\nsqlr-listener error:\n");
 	fprintf(stderr,"	Unable to create a semaphore ");
-	fprintf(stderr,"set segment.  This is usally because ");
-	fprintf(stderr,"an \n");
+	fprintf(stderr,"set.  This is usally because an \n");
 	fprintf(stderr,"	sqlr-listener is already ");
 	fprintf(stderr,"running for the %s",id);
 	fprintf(stderr," instance.\n\n");
@@ -746,6 +745,7 @@ void	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 		if (handoffsocklist[i]->pid==processid) {
 			handoffsocklist[i]->pid=0;
 			delete handoffsocklist[i]->sock;
+			handoffsocklist[i]->sock=NULL;
 			#ifdef SERVER_DEBUG
 			debugPrint("listener",0,
 					"done de-registering handoff...");
@@ -1180,6 +1180,7 @@ int	sqlrlistener::passDescriptor() {
 			} 
 			handoffsocklist[i]->pid=0;
 			delete handoffsocklist[i]->sock;
+			handoffsocklist[i]->sock=NULL;
 			break;
 		}
 	}
