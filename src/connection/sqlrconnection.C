@@ -374,6 +374,11 @@ void	sqlrconnection::closeCursors(int destroy) {
 
 int	sqlrconnection::setUserAndGroup() {
 
+	// don't even try to change users/groups unless we're root
+	if (geteuid()) {
+		return 1;
+	}
+
 	if (!runAsGroup(cfgfl->getRunAsGroup())) {
 		fprintf(stderr,"Could not change group to %s\n",
 						cfgfl->getRunAsGroup());
@@ -735,16 +740,14 @@ int	sqlrconnection::availableDatabase() {
 		close(fd);
 
 		#ifdef SERVER_DEBUG
-		getDebugLogger()->write("connection",0,
-						"database is available");
+		getDebugLogger()->write("connection",0,"database is available");
 		#endif
 
 		return 1;
 	}
 
 	#ifdef SERVER_DEBUG
-	getDebugLogger()->write("connection",0,
-					"database is not available");
+	getDebugLogger()->write("connection",0,"database is not available");
 	#endif
 	return 0;
 }
@@ -1350,14 +1353,12 @@ void	sqlrconnection::closeSuspendedSessionSockets() {
 int	sqlrconnection::handleQuery(int reexecute, int reallyexecute) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,
-					"handling query...");
+	debugPrint("connection",1,"handling query...");
 	#endif
 
 	if (!getQueryFromClient(reexecute)) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,
-						"failed to handle query");
+		debugPrint("connection",1,"failed to handle query");
 		#endif
 		return 0;
 	}
@@ -1390,8 +1391,7 @@ int	sqlrconnection::handleQuery(int reexecute, int reallyexecute) {
 			bindpool->free();
 
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",1,
-						"handle query succeeded");
+			debugPrint("connection",1,"handle query succeeded");
 			#endif
 			return 1;
 
@@ -1446,8 +1446,7 @@ void	sqlrconnection::resumeResultSet() {
 	if (cur[currentcur]->suspendresultset) {
 
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
-					"previous result set was suspended");
+		debugPrint("connection",2,"previous result set was suspended");
 		#endif
 
 		// indicate that no error has occurred
@@ -1479,8 +1478,7 @@ void	sqlrconnection::resumeResultSet() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,
-					"done resuming result set");
+	debugPrint("connection",1,"done resuming result set");
 	#endif
 }
 
@@ -1492,8 +1490,7 @@ void	sqlrconnection::suspendSession() {
 
 	// abort all cursors that aren't already suspended
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-				"aborting busy, unsuspended cursors...");
+	debugPrint("connection",2,"aborting busy, unsuspended cursors...");
 	#endif
 	suspendedsession=1;
 	accepttimeout=cfgfl->getSessionTimeout();
@@ -1507,8 +1504,7 @@ void	sqlrconnection::suspendSession() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-				"done aborting busy, unsuspended cursors");
+	debugPrint("connection",2,"done aborting busy, unsuspended cursors");
 	#endif
 
 	// If we're passing file descriptors around, we'll have to listen on a 
@@ -1520,8 +1516,7 @@ void	sqlrconnection::suspendSession() {
 	if (cfgfl->getPassDescriptor()) {
 
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
-					"opening a socket to resume on...");
+		debugPrint("connection",2,"opening a socket to resume on...");
 		#endif
 		if (!openSockets()) {
 			// send the client a 0 sized unix port and a 0 for the
@@ -1530,13 +1525,11 @@ void	sqlrconnection::suspendSession() {
 			clientsock->write((unsigned short)0);
 		}
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
-					"done opening a socket to resume on");
+		debugPrint("connection",2,"done opening a socket to resume on");
 		#endif
 
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
-					"passing socket info to client...");
+		debugPrint("connection",2,"passing socket info to client...");
 		#endif
 		if (serversockun) {
 			unsigned short	unixsocketsize=strlen(unixsocket);
@@ -1569,8 +1562,7 @@ void	sqlrconnection::endSession() {
 
 	// abort all cursors
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"aborting all busy cursors...");
+	debugPrint("connection",2,"aborting all busy cursors...");
 	#endif
 	for (int i=0; i<cfgfl->getCursors(); i++) {
 		if (cur[i]->busy) {
@@ -1581,64 +1573,53 @@ void	sqlrconnection::endSession() {
 		}
 	}
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"done aborting all busy cursors");
+	debugPrint("connection",2,"done aborting all busy cursors");
 	#endif
 
 	// commit or rollback if necessary
 	if (isTransactional() && commitorrollback) {
 		if (cfgfl->getEndOfSessionCommit()) {
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
-							"committing...");
+			debugPrint("connection",2,"committing...");
 			#endif
 			commit();
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
-							"done committing...");
+			debugPrint("connection",2,"done committing...");
 			#endif
 		} else {
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
-							"rolling back...");
+			debugPrint("connection",2,"rolling back...");
 			#endif
 			rollback();
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
-							"done rolling back...");
+			debugPrint("connection",2,"done rolling back...");
 			#endif
 		}
 	}
 
 	// reset autocommit behavior
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-				"resetting autocommit behavior...");
+	debugPrint("connection",2,"resetting autocommit behavior...");
 	#endif
 	if (autocommit) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-					"setting autocommit on...");
+		debugPrint("connection",3,"setting autocommit on...");
 		#endif
 		autoCommitOn();
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-					"done setting autocommit on...");
+		debugPrint("connection",3,"done setting autocommit on...");
 		#endif
 	} else {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-					"setting autocommit off...");
+		debugPrint("connection",3,"setting autocommit off...");
 		#endif
 		autoCommitOff();
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-					"done setting autocommit off...");
+		debugPrint("connection",3,"done setting autocommit off...");
 		#endif
 	}
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-			"done resetting autocommit behavior...");
+	debugPrint("connection",2,"done resetting autocommit behavior...");
 	debugPrint("connection",1,"done ending session");
 	#endif
 }
@@ -1663,8 +1644,7 @@ int	sqlrconnection::handleError() {
 	// in which case, re-establish the connection
 	if (!returnError()) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-						"database is down...");
+		debugPrint("connection",3,"database is down...");
 		#endif
 		reLogIn();
 		return 0;
@@ -1837,8 +1817,7 @@ int	sqlrconnection::getInputBinds() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"done getting input binds");
+	debugPrint("connection",2,"done getting input binds");
 	#endif
 	return 1;
 }
@@ -1884,11 +1863,9 @@ int	sqlrconnection::getOutputBinds() {
 			}
 			#ifdef SERVER_DEBUG
 			if (bv->type==BLOB_BIND) {
-				debugPrint("connection",4,
-					"BLOB");
+				debugPrint("connection",4,"BLOB");
 			} else if (bv->type==CLOB_BIND) {
-				debugPrint("connection",4,
-					"CLOB");
+				debugPrint("connection",4,"CLOB");
 			}
 			#endif
 		} else if (bv->type==CURSOR_BIND) {
@@ -1905,8 +1882,7 @@ int	sqlrconnection::getOutputBinds() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"done getting output binds");
+	debugPrint("connection",2,"done getting output binds");
 	#endif
 	return 1;
 }
@@ -1983,8 +1959,7 @@ void	sqlrconnection::returnOutputBindValues() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-				"done returning output bind values");
+	debugPrint("connection",2,"done returning output bind values");
 	#endif
 }
 
@@ -2126,8 +2101,7 @@ int	sqlrconnection::getStringBind(bindvar *bv) {
 	if (clientsock->read(bv->value.stringval,
 				bv->valuesize)!=bv->valuesize) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",
-			2,"getting binds failed: bad value");
+		debugPrint("connection",2,"getting binds failed: bad value");
 		#endif
 		return 0;
 	}
@@ -2151,8 +2125,8 @@ int	sqlrconnection::getLongBind(bindvar *bv) {
 	char		negative;
 	if (clientsock->read(&negative)!=sizeof(char)) {
 		#ifdef SERVER_DEBUG
-			debugPrint("connection",
-			2,"getting binds failed: bad positive/negative");
+			debugPrint("connection",2,
+				"getting binds failed: bad positive/negative");
 		#endif
 		return 0;
 	}
@@ -2161,8 +2135,8 @@ int	sqlrconnection::getLongBind(bindvar *bv) {
 	unsigned long	value;
 	if (clientsock->read(&value)!=sizeof(unsigned long)) {
 		#ifdef SERVER_DEBUG
-			debugPrint("connection",
-				2,"getting binds failed: bad value");
+			debugPrint("connection",2,
+					"getting binds failed: bad value");
 		#endif
 		return 0;
 	}
@@ -2186,8 +2160,8 @@ int	sqlrconnection::getDoubleBind(bindvar *bv) {
 	// get the value
 	if (clientsock->read(&(bv->value.doubleval.value))!=sizeof(double)) {
 		#ifdef SERVER_DEBUG
-			debugPrint("connection",
-				2,"getting binds failed: bad value");
+			debugPrint("connection",2,
+					"getting binds failed: bad value");
 		#endif
 		return 0;
 	}
@@ -2196,8 +2170,8 @@ int	sqlrconnection::getDoubleBind(bindvar *bv) {
 	if (clientsock->read(&(bv->value.doubleval.precision))!=
 						sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-			debugPrint("connection",
-				2,"getting binds failed: bad precision");
+			debugPrint("connection",2,
+					"getting binds failed: bad precision");
 		#endif
 		return 0;
 	}
@@ -2206,8 +2180,8 @@ int	sqlrconnection::getDoubleBind(bindvar *bv) {
 	if (clientsock->read(&(bv->value.doubleval.scale))!=
 						sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-			debugPrint("connection",
-				2,"getting binds failed: bad scale");
+			debugPrint("connection",2,
+					"getting binds failed: bad scale");
 		#endif
 		return 0;
 	}
@@ -2242,8 +2216,8 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 	if (clientsock->read(bv->value.stringval,
 					bv->valuesize)!=bv->valuesize) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",
-			2,"getting binds failed: bad value");
+		debugPrint("connection",2,
+				"getting binds failed: bad value");
 		#endif
 		return 0;
 	}
@@ -2269,28 +2243,23 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 int	sqlrconnection::getSendColumnInfo() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"getting send column info...");
+	debugPrint("connection",2,"getting send column info...");
 	#endif
 
 	if (clientsock->read(&sendcolumninfo)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
-					"getting send column info failed");
+		debugPrint("connection",2,"getting send column info failed");
 		#endif
 		return 0;
 	}
 
 	#ifdef SERVER_DEBUG
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
-		debugPrint("connection",3,
-						"send column info");
+		debugPrint("connection",3,"send column info");
 	} else {
-		debugPrint("connection",3,
-						"don't send column info");
+		debugPrint("connection",3,"don't send column info");
 	}
-	debugPrint("connection",2,
-					"done getting send column info...");
+	debugPrint("connection",2,"done getting send column info...");
 	#endif
 
 	return 1;
@@ -2323,8 +2292,7 @@ int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 					reallyexecute);
 	} else {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-						"preparing/executing...");
+		debugPrint("connection",3,"preparing/executing...");
 		#endif
 		success=cur[currentcur]->prepareQuery(
 					cur[currentcur]->querybuffer,
@@ -2346,8 +2314,7 @@ int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 	if (success && checkautocommit && isTransactional() && 
 			performautocommit && commitorrollback) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-						"commit necessary...");
+		debugPrint("connection",3,"commit necessary...");
 		#endif
 		success=commit();
 		commitorrollback=0;
@@ -2355,14 +2322,11 @@ int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 
 	#ifdef SERVER_DEBUG
 	if (success) {
-		debugPrint("connection",2,
-						"processing query succeeded");
+		debugPrint("connection",2,"processing query succeeded");
 	} else {
-		debugPrint("connection",2,
-						"processing query failed");
+		debugPrint("connection",2,"processing query failed");
 	}
-	debugPrint("connection",2,
-						"done processing query");
+	debugPrint("connection",2,"done processing query");
 	#endif
 
 	return success;
@@ -2422,8 +2386,7 @@ int	sqlrconnection::returnError() {
 void	sqlrconnection::returnResultSetHeader() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"returning result set header...");
+	debugPrint("connection",2,"returning result set header...");
 	#endif
 
 
@@ -2433,8 +2396,7 @@ void	sqlrconnection::returnResultSetHeader() {
 	#endif
 	cur[currentcur]->returnRowCounts();
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,
-					"done returning row counts");
+	debugPrint("connection",3,"done returning row counts");
 	#endif
 
 
@@ -2444,37 +2406,31 @@ void	sqlrconnection::returnResultSetHeader() {
 
 	#ifdef SERVER_DEBUG
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
-		debugPrint("connection",3,
-						"column info will be sent");
+		debugPrint("connection",3,"column info will be sent");
 	} else {
-		debugPrint("connection",3,
-						"column info will not be sent");
+		debugPrint("connection",3,"column info will not be sent");
 	}
 	#endif
 
 
 	// return the column count
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,
-					"returning column counts...");
+	debugPrint("connection",3,"returning column counts...");
 	#endif
 	cur[currentcur]->returnColumnCount();
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,
-					"done returning column counts");
+	debugPrint("connection",3,"done returning column counts");
 	#endif
 
 
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
 		// return the column info
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-						"returning column info...");
+		debugPrint("connection",3,"returning column info...");
 		#endif
 		cur[currentcur]->returnColumnInfo();
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-						"done returning column info");
+		debugPrint("connection",3,"done returning column info");
 		#endif
 	}
 
@@ -2488,16 +2444,14 @@ void	sqlrconnection::returnResultSetHeader() {
 
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"done returning result set header");
+	debugPrint("connection",2,"done returning result set header");
 	#endif
 }
 
 int	sqlrconnection::returnResultSetData() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-				"returning result set data...");
+	debugPrint("connection",2,"returning result set data...");
 	#endif
 
 	// see if this result set even has any rows to return
@@ -2507,8 +2461,7 @@ int	sqlrconnection::returnResultSetData() {
 	unsigned long	skip;
 	if (clientsock->read(&skip)!=sizeof(unsigned long)) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
-					"returning result set data failed");
+		debugPrint("connection",2,"returning result set data failed");
 		#endif
 		return 0;
 	}
@@ -2517,8 +2470,7 @@ int	sqlrconnection::returnResultSetData() {
 	unsigned long	fetch;
 	if (clientsock->read(&fetch)!=sizeof(unsigned long)) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
-					"returning result set data failed");
+		debugPrint("connection",2,"returning result set data failed");
 		#endif
 		return 0;
 	}
@@ -2529,8 +2481,7 @@ int	sqlrconnection::returnResultSetData() {
 		clientsock->write((unsigned short)END_RESULT_SET);
 		cur[currentcur]->abort();
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
-					"done returning result set data");
+		debugPrint("connection",2,"done returning result set data");
 		#endif
 		return 1;
 	}
@@ -2545,8 +2496,7 @@ int	sqlrconnection::returnResultSetData() {
 		clientsock->write((unsigned short)END_RESULT_SET);
 		cur[currentcur]->abort();
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
-					"done returning result set data");
+		debugPrint("connection",2,"done returning result set data");
 		#endif
 		return 1;
 	}

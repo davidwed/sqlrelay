@@ -132,7 +132,7 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 		return 0;
 	}
 
-	if (passdescriptor) {
+	if (passdescriptor=cfgfl.getPassDescriptor()) {
 		if (!listenOnHandoffSocket(&tmpdir,cmdl->getId())) {
 			return 0;
 		}
@@ -149,6 +149,11 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 }
 
 int	sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
+
+	// don't even try to change users/groups unless we're root
+	if (geteuid()) {
+		return 1;
+	}
 
 	if (!runAsGroup(cfgfl->getRunAsGroup())) {
 		fprintf(stderr,"Could not change group to %s\n",
@@ -210,10 +215,7 @@ void	sqlrlistener::handleDynamicScaling(sqlrconfigfile *cfgfl) {
 void	sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
 
 	// get handoff method
-	char	*handoffmethod=cfgfl->getHandOff();
-	passdescriptor=0;
-	if (!strcmp(handoffmethod,"pass")) {
-		passdescriptor=1;
+	if (cfgfl->getPassDescriptor()) {
 
 		// create the list of handoff nodes
 		handoffsocklist=new handoffsocketnode *[maxconnections];
@@ -619,10 +621,6 @@ int	sqlrlistener::waitForData() {
 }
 
 void	sqlrlistener::handleClientConnection(int fd) {
-
-	// this method returns 1 or 0.  0 is not an error condition though,
-	// it just instructs the calling method that the connection has been
-	// handled
 
 	// if something connected to the handoff or derigistration 
 	// socket, it must have been a connection, handle it and

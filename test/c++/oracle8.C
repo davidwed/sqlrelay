@@ -110,9 +110,7 @@ int	main(int argc, char **argv) {
 	// instantiation
 	con=new sqlrconnection(argv[1],atoi(argv[2]), 
 					argv[3],argv[4],argv[5],0,1);
-	con->copyReferences();
 	cur=new sqlrcursor(con);
-	cur->copyReferences();
 
 	// get database type
 	printf("IDENTIFY: \n");
@@ -743,9 +741,7 @@ int	main(int argc, char **argv) {
 	secondcon=new sqlrconnection(argv[1],
 				atoi(argv[2]), 
 				argv[3],argv[4],argv[5],0,1);
-	secondcon->copyReferences();
 	secondcur=new sqlrcursor(secondcon);
-	secondcur->copyReferences();
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,0),"0");
 	checkSuccess(con->commit(),1);

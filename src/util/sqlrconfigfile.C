@@ -194,7 +194,9 @@ char	*sqlrconfigfile::getHandOff() {
 }
 
 int	sqlrconfigfile::getPassDescriptor() {
-	return passdescriptor;
+	// descriptor passing doesn't work if we're using dynamic scaling,
+	// so override it here...
+	return passdescriptor && !getDynamicScaling();
 }
 
 char	*sqlrconfigfile::getAllowedIps() {

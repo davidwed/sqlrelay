@@ -1,20 +1,11 @@
 lots of documentation fixes
 db2 startup directions are wrong, you have to run db2start/db2stop as db2as
 
-runasuser/group doesn't work
-
-need a reliable way to ping msql
-
-ruby api crashes on exit (at least for oracle)
-
-forked listeners need to close handoff file descriptors
 handoff=pass does not work with dynamic scaling
 
-use const/short/long instead of plain char *, int
-
+incorporate new spec file
 java/com/firstworks/sqlrelay needs to be removed if empty when rpm is
 	uninstalled
-incorporate new spec file
 
 Tests:
 	odbc tests
@@ -97,6 +88,7 @@ Features:
 	odbc connection should check the odbc definition
 		for connect string arguments - SQLBrowseConnect
 	solaris init script
+	use const/short/long instead of plain char *, int
 
 Availability:
 	connections should ping database server every so often to make sure
