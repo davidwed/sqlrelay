@@ -326,9 +326,7 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 }
 
 oracle8cursor::~oracle8cursor() {
-	if (errormessage) {
-		delete errormessage;
-	}
+	delete errormessage;
 }
 
 int	oracle8cursor::openCursor(int id) {
@@ -980,9 +978,7 @@ char	*oracle8cursor::getErrorMessage(int *liveconnection) {
 	}
 
 	// only return an error message if the error wasn't a dead database
-	if (errormessage) {
-		delete errormessage;
-	}
+	delete errormessage;
 	errormessage=new stringbuffer();
 	if (*liveconnection) {
 		errormessage->append((const char *)message);

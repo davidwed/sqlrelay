@@ -5,6 +5,11 @@
 prefix=@prefix@
 tmpdir=@localstatedir@/sqlrelay/tmp
 
+KILLARG=""
+if ( test -n "$2" ); then
+	KILLARG="-$2"
+fi
+
 echo "Killing the following processes:"
 
 VALID="`ps -efal 2>&1 | grep illegal | grep -v grep`"
@@ -14,14 +19,14 @@ if ( test ! -n "$VALID" ); then
 
 	for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $4}'`
 	do
-		kill $i
+		kill $KILLARG $i
 	done
 
 	sleep 1
 
 	for i in `ps -eafl | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $4}'`
 	do
-		kill $i
+		kill $KILLARG $i
 	done
 
 	if ( test -n "`ps -efal | grep sqlr- | grep ' $1' | grep -v grep | grep -v sqlr-stop`" ); then
@@ -37,14 +42,14 @@ else
 
 	for i in `ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
 	do
-		kill $i
+		kill $KILLARG $i
 	done
 
 	sleep 1
 
 	for i in `ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
 	do
-		kill $i
+		kill $KILLARG $i
 	done
 
 	if ( test -n "`ps aux | grep sqlr- | grep ' $1' | grep -v grep | grep -v sqlr-stop`" ); then

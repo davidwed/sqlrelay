@@ -384,6 +384,10 @@ void sqlrcur_inputBind(int sqlrcurref, string variable, string value)
 void sqlrcur_inputBind(int sqlrcurref, string variable, long value)
 <BR>
 void sqlrcur_inputBind(int sqlrcurref, string variable, double value, short precision, short scale)
+<BR>
+void sqlrcur_inputBindBlob(int sqlrcurref, string variable, long length)
+<BR>
+void sqlrcur_inputBindClob(int sqlrcurref, string variable, long length)
 </CODE>
 <P>
 Define an input bind variable.
@@ -394,6 +398,28 @@ void sqlrcur_defineOutputBind(int sqlrcurref, string variable, int length)
 </CODE>
 <P>
 Define an output bind variable.
+"length" bytes will be reserved to store the value.
+<P>
+<LI>
+<CODE>
+void sqlrcur_defineOutputBindBlob(int sqlrcurref, string variable)
+</CODE>
+<P>
+Define a BLOB output bind variable.
+<P>
+<LI>
+<CODE>
+void sqlrcur_defineOutputBindClob(int sqlrcurref, string variable)
+</CODE>
+<P>
+Define a CLOB output bind variable.
+<P>
+<LI>
+<CODE>
+void sqlrcur_defineOutputBindCursor(int sqlrcurref, string variable)
+</CODE>
+<P>
+Define a cursor output bind variable.
 <P>
 <LI>
 <CODE>

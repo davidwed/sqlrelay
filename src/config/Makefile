@@ -4,7 +4,7 @@ top_srcdir = ../..
 INSTALL = $(top_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../ -I../common $(RUDIMENTSINCLUDES) `$(GTKCONFIG) --cflags`
-LIBS = $(RUDIMENTSLIBS)
+LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 all: sqlr-config-gtk
 

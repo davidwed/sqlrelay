@@ -33,9 +33,8 @@ makefile:
 		mv Makefile.new Makefile; \
 	fi
 
-clean: makefile
-	$(MAKE) clean
-	$(RM) Makefile rubyincludes.h mkmf.log errors1 errors2
+clean:
+	$(RM) *.o *.so Makefile rubyincludes.h mkmf.log errors1 errors2
 
 install: all
 	$(MAKE) site-install

@@ -216,10 +216,14 @@ __END__
             # Define an input bind variable.
 
         defineOutputBind(variable,bufferlength);
-        defineOutputBindBlob(variable);
-        defineOutputBindClob(variable);
-        defineOutputBindCursor(variable);
             # Define an output bind variable.
+            # "bufferlength" bytes will be reserved to store the value.
+        defineOutputBindBlob(variable);
+            # Define a BLOB output bind variable.
+        defineOutputBindClob(variable);
+            # Define a CLOB output bind variable.
+        defineOutputBindCursor(variable);
+            # Define a cursor output bind variable.
 
         substitutions(variables,values);
             # Define an array of substitution variables.

@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+/* Use dmalloc */
+#undef DMALLOC
+
 /* Second decimal of the version of gtk */
 #undef GTK_VERSION
 

@@ -262,9 +262,35 @@
 <FONT color=#f800f8>        Define an input bind varaible.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>inputBindBlob</FONT>(self, variable, value, length):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Define a BLOB input bind varaible.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>inputBindClob</FONT>(self, variable, value, length):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Define a CLOB input bind varaible.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBind</FONT>(self, variable, length):
         &quot;&quot;&quot;
 <FONT color=#f800f8>        Define an output bind varaible.</FONT>
+<FONT color=#f800f8>        "length" bytes will be reserved to store the value.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindBlob</FONT>(self, variable):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Define a BLOB output bind varaible.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindClob</FONT>(self, variable):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Define a CLOB output bind varaible.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindCursor</FONT>(self, variable):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Define a cursor output bind varaible.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>substitutions</FONT>(self, variables, values, precisions=None, scales=None):
@@ -293,9 +319,26 @@
 <FONT color=#f800f8>        prepared and bound.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>fetchFromBindCursor</FONT>(self):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Fetch from a cursor that was returned as</FONT>
+<FONT color=#f800f8>        an output bind variable.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBind</FONT>(self, variable):
         &quot;&quot;&quot;
 <FONT color=#f800f8>        Retrieve the value of an output bind variable.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBindLength</FONT>(self, variable):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Retrieve the length of an output bind variable.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBindCursor</FONT>(self, variable):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Get the cursor associated with a previously</FONT>
+<FONT color=#f800f8>        defined output bind variable.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>openCachedResultSet</FONT>(self, filename):

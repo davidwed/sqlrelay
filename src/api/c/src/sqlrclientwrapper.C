@@ -195,7 +195,7 @@ void	sqlrcur_inputBindString(sqlrcur sqlrcurref, const char *variable,
 }
 
 void	sqlrcur_inputBindLong(sqlrcur sqlrcurref, const char *variable, 
-						unsigned long value) {
+							long value) {
 	sqlrcurref->inputBind(variable,value);
 }
 

@@ -5,7 +5,7 @@ INSTALL = $(top_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" -I./ -I../../ -I../common -I../util -I../api/c++/include $(RUDIMENTSINCLUDES)
 CONFIGFILELIBS = -L../util -lsqlrutil
-LIBS = -L../api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB)
+LIBS = -L../api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 all: query fields sqlrsh
 

@@ -56,7 +56,8 @@ int	sqlrcursor::handleBinds() {
 		} else if (inbindvars[i].type==LONG_BIND) {
 			if (!inputBindLong(inbindvars[i].variable,
 				inbindvars[i].variablesize,
-				&inbindvars[i].value.longval)) {
+				(unsigned long *)
+					&inbindvars[i].value.longval)) {
 				return 0;
 			}
 		} else if (inbindvars[i].type==DOUBLE_BIND) {
@@ -92,7 +93,7 @@ int	sqlrcursor::handleBinds() {
 			if (!outputBindString(outbindvars[i].variable,
 					outbindvars[i].variablesize,
 					outbindvars[i].value.stringval,
-					outbindvars[i].valuesize,
+					outbindvars[i].valuesize+1,
 					&outbindvars[i].isnull)) {
 				return 0;
 			}

@@ -99,6 +99,17 @@ AC_ARG_WITH(system-libtool,
 	[  --with-system-libtool   use system libtool instead of ./libtool],
 	USE_SYSTEM_LIBTOOL=$withval,
 	USE_SYSTEM_LIBTOOL="no")
+AC_ARG_ENABLE(dmalloc,
+	[  --enable-dmalloc              Use the dmalloc library],
+	DMALLOC="1"; LIBDMALLOC="-ldmalloc",
+	DMALLOC=""; LIBDMALLOC="")
+AC_DEFINE_UNQUOTED(DMALLOC,1,Use dmalloc)
+AC_SUBST(LIBDMALLOC)
+AC_ARG_ENABLE(efence,
+	[  --enable-efence               Use the efence library],
+	LIBEFENCE="-lefence",
+	LIBEFENCE="")
+AC_SUBST(LIBEFENCE)
 
 
 dnl Rewrite supplied paths.

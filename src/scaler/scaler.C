@@ -34,6 +34,8 @@ scaler::scaler() : daemonprocess() {
 	id=NULL;
 	config=NULL;
 	dbase=NULL;
+
+	debug=0;
 }
 
 scaler::~scaler() {
@@ -95,6 +97,11 @@ int	scaler::initScaler(int argc, const char **argv) {
 		return 0;
 	}
 	createPidFile(pidfile,permissions::ownerReadWrite());
+
+	// check for debug
+	if (cmdl->found("-debug")) {
+		debug=1;
+	}
 
 	// get the config file
 	char	*tmpconfig=cmdl->value("-config");
@@ -243,8 +250,9 @@ void	scaler::openMoreConnections() {
 						15+strlen(connectionid)+
 						9+strlen(config)+1];
 			sprintf(command,
-		"sqlr-connection-%s -ttl %d -id %s -connectionid %s -config %s",
-				dbase,ttl,id,connectionid,config);
+	"sqlr-connection-%s%s -ttl %d -id %s -connectionid %s -config %s",
+				dbase,((debug)?"-debug":""),
+				ttl,id,connectionid,config);
 
 			// start another connection
 			system(command);

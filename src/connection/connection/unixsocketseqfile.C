@@ -20,7 +20,7 @@ void	unixsocketseqfile::setDebugLogger(logger *dl) {
 int	unixsocketseqfile::getUnixSocket(char *tmpdir, char *unixsocketptr) {
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,"getting unix socket...");
+	dl->write("connection",0,"getting unix socket...");
 	#endif
 
 	if ((sockseq=openSequenceFile(tmpdir,unixsocketptr))==-1 ||
@@ -41,7 +41,7 @@ int	unixsocketseqfile::getUnixSocket(char *tmpdir, char *unixsocketptr) {
 	}
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,"done getting unix socket");
+	dl->write("connection",0,"done getting unix socket");
 	#endif
 
 	return 1;
@@ -56,7 +56,7 @@ int	unixsocketseqfile::openSequenceFile(char *tmpdir, char *unixsocketptr) {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[8+strlen(sockseqname)+1];
 	sprintf(string,"opening %s",sockseqname);
-	dl->write(logger::logHeader("connection"),1,string);
+	dl->write("connection",1,string);
 	delete[] string;
 	#endif
 
@@ -75,7 +75,7 @@ int	unixsocketseqfile::openSequenceFile(char *tmpdir, char *unixsocketptr) {
 		#ifdef SERVER_DEBUG
 		string=new char[14+strlen(sockseqname)+1];
 		sprintf(string,"couldn't open %s",sockseqname);
-		dl->write(logger::logHeader("connection"),1,string);
+		dl->write("connection",1,string);
 		delete[] string;
 		#endif
 	}
@@ -89,7 +89,7 @@ int	unixsocketseqfile::lockSequenceFile() {
 
 	// lock the file in a platform-independent manner
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),1,"locking...");
+	dl->write("connection",1,"locking...");
 	#endif
 
 	struct	flock fl;
@@ -114,7 +114,7 @@ int	unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[21+strlen(unixsocketptr)+1];
 	sprintf(string,"got sequence number: %s",unixsocketptr);
-	dl->write(logger::logHeader("connection"),1,string);
+	dl->write("connection",1,string);
 	delete[] string;
 	#endif
 
@@ -128,7 +128,7 @@ int	unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
 	#ifdef SERVER_DEBUG
 	string=new char[50];
 	sprintf(string,"writing new sequence number: %d",buffer);
-	dl->write(logger::logHeader("connection"),1,string);
+	dl->write("connection",1,string);
 	delete[] string;
 	#endif
 
@@ -143,7 +143,7 @@ int	unixsocketseqfile::unLockSequenceFile() {
 
 	// unlock and close the file in a platform-independent manner
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),1,"unlocking...");
+	dl->write("connection",1,"unlocking...");
 	#endif
 
 	struct	flock fl;

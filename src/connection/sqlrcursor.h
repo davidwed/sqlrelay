@@ -20,11 +20,11 @@ class bindvar {
 	friend class sqlrconnection;
 	friend class sqlrcursor;
 	private:
-		char		*variable;
-		short		variablesize;
+		char	*variable;
+		short	variablesize;
 		union {
-			char		*stringval;
-			unsigned long	longval;
+			char	*stringval;
+			long	longval;
 			struct	{
 				double		value;
 				unsigned short	precision;

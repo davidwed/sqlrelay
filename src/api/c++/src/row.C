@@ -5,6 +5,8 @@
 #include <sqlrelay/private/row.h>
 #include <stdlib.h>
 
+#include <config.h>
+
 row::row(int colcount) {
 	this->colcount=colcount;
 	if (colcount>=OPTIMISTIC_COLUMN_COUNT) {

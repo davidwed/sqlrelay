@@ -13,8 +13,7 @@ void	scalercomm::setDebugLogger(logger *dl) {
 void	scalercomm::incrementConnectionCount() {
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"incrementing connection count...");
+	dl->write("connection",0,"incrementing connection count...");
 	#endif
 
 	ipcptr->acquireConnectionCountMutex();
@@ -24,7 +23,7 @@ void	scalercomm::incrementConnectionCount() {
 	(*connectioncount)++;
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),1,(long)(*connectioncount));
+	dl->write("connection",1,(long)(*connectioncount));
 	#endif
 
 	ipcptr->signalScalerToRead();
@@ -32,16 +31,14 @@ void	scalercomm::incrementConnectionCount() {
 	ipcptr->releaseConnectionCountMutex();
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"done incrementing connection count");
+	dl->write("connection",0,"done incrementing connection count");
 	#endif
 }
 
 void	scalercomm::decrementConnectionCount() {
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"decrementing connection count...");
+	dl->write("connection",0,"decrementing connection count...");
 	#endif
 
 	ipcptr->acquireConnectionCountMutex();
@@ -51,22 +48,20 @@ void	scalercomm::decrementConnectionCount() {
 	(*connectioncount)--;
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),1,(long)(*connectioncount));
+	dl->write("connection",1,(long)(*connectioncount));
 	#endif
 
 	ipcptr->releaseConnectionCountMutex();
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"done decrementing connection count");
+	dl->write("connection",0,"done decrementing connection count");
 	#endif
 }
 
 void	scalercomm::decrementSessionCount() {
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"decrementing session count...");
+	dl->write("connection",0,"decrementing session count...");
 	#endif
 
 	ipcptr->acquireSessionCountMutex();
@@ -76,13 +71,12 @@ void	scalercomm::decrementSessionCount() {
 	(*sessioncount)--;
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),1,(long)(*sessioncount));
+	dl->write("connection",1,(long)(*sessioncount));
 	#endif
 
 	ipcptr->releaseSessionCountMutex();
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"done decrementing session count");
+	dl->write("connection",0,"done decrementing session count");
 	#endif
 }

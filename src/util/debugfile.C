@@ -61,13 +61,16 @@ void	debugfile::closeDebugFile() {
 	}
 }
 
-void	debugfile::debugPrint(const char *header,
-					int tabs, const char *string) {
+void	debugfile::debugPrint(const char *name, int tabs, const char *string) {
+	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,string);
+	delete[] header;
 }
 
-void	debugfile::debugPrint(const char *header, int tabs, long number) {
+void	debugfile::debugPrint(const char *name, int tabs, long number) {
+	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,number);
+	delete[] header;
 }
 
 void	debugfile::debugPrintBlob(const char *blob, unsigned long length) {
@@ -90,8 +93,9 @@ void	debugfile::debugPrintBlob(const char *blob, unsigned long length) {
 		}
 	}
 	debugstr->append('\n');
-	debuglogger->write(logger::logHeader("connection"),0,
-						debugstr->getString());
+	char	*header=logger::logHeader("connection");
+	debuglogger->write(header,0,debugstr->getString());
+	delete[] header;
 	delete debugstr;
 }
 
@@ -109,8 +113,9 @@ void	debugfile::debugPrintClob(const char *clob, unsigned long length) {
 		}
 	}
 	debugstr->append('\n');
-	debuglogger->write(logger::logHeader("connection"),0,
-						debugstr->getString());
+	char	*header=logger::logHeader("connection");
+	debuglogger->write(header,0,debugstr->getString());
+	delete[] header;
 	delete debugstr;
 }
 

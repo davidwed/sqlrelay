@@ -76,34 +76,32 @@ sqlrconnection::~sqlrconnection() {
 	delete tmpdir;
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"deleting authc...");
+	debugPrint("connection",0,"deleting authc...");
 	#endif
 	delete authc;
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"done deleting authc");
+	debugPrint("connection",0,"done deleting authc");
 	#endif
 
 	delete ipcptr;
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"deleting unixsocket...");
+	debugPrint("connection",0,"deleting unixsocket...");
 	#endif
 	if (unixsocket) {
 		unlink(unixsocket);
 		delete[] unixsocket;
 	}
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
-						"done deleting unixsocket");
+	debugPrint("connection",0,"done deleting unixsocket");
 	#endif
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"deleting bindpool...");
+	debugPrint("connection",0,"deleting bindpool...");
 	#endif
 	delete bindpool;
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
-						"done deleting bindpool");
+	debugPrint("connection",0,"done deleting bindpool");
 	#endif
 }
 
@@ -217,7 +215,7 @@ void	sqlrconnection::markDatabaseAvailable() {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[9+strlen(updown)+1];
 	sprintf(string,"creating %s",updown);
-	getDebugLogger()->write(logger::logHeader("connection"),4,string);
+	getDebugLogger()->write("connection",4,string);
 	delete[] string;
 	#endif
 
@@ -250,21 +248,20 @@ void	sqlrconnection::createCursorArray() {
 int	sqlrconnection::initCursors() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"initializing cursors...");
+	debugPrint("connection",0,"initializing cursors...");
 	#endif
 
 	for (int i=0; i<cfgfl->getCursors(); i++) {
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),1,(long)i);
+		debugPrint("connection",1,(long)i);
 		#endif
 
 		cur[i]=initCursor();
 		if (!cur[i]->openCursor(i)) {
 
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),1,
-						"cursor init failure...");
+			debugPrint("connection",1,"cursor init failure...");
 			#endif
 
 			logOut();
@@ -274,8 +271,7 @@ int	sqlrconnection::initCursors() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
-					"done initializing cursors");
+	debugPrint("connection",0,"done initializing cursors");
 	#endif
 
 	return 1;
@@ -284,14 +280,14 @@ int	sqlrconnection::initCursors() {
 int	sqlrconnection::getCursor() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"getting a cursor...");
+	debugPrint("connection",1,"getting a cursor...");
 	#endif
 
 	// which cursor is the client requesting?
 	unsigned short	index;
 	if (clientsock->read(&index)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 				"error: client cursor request failed");
 		#endif
 		return 0;
@@ -301,7 +297,7 @@ int	sqlrconnection::getCursor() {
 	// beyond the end of the array.
 	if (index>cfgfl->getCursors()) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 				"error: client requested an invalid cursor");
 		#endif
 		return 0;
@@ -312,10 +308,8 @@ int	sqlrconnection::getCursor() {
 	cur[index]->busy=1;
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
-					"returning requested cursor");
-	debugPrint(logger::logHeader("connection"),1,
-					"done getting a cursor");
+	debugPrint("connection",2,"returning requested cursor");
+	debugPrint("connection",1,"done getting a cursor");
 	#endif
 	return 1;
 }
@@ -326,18 +320,15 @@ int	sqlrconnection::findAvailableCursor() {
 		if (!cur[i]->busy) {
 			cur[i]->busy=1;
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),3,
-				(long)currentcur);
-			debugPrint(logger::logHeader("connection"),2,
-				"found a free cursor...");
-			debugPrint(logger::logHeader("connection"),2,
-				"done getting a cursor");
+			debugPrint("connection",3,(long)currentcur);
+			debugPrint("connection",2,"found a free cursor...");
+			debugPrint("connection",2,"done getting a cursor");
 			#endif
 			return i;
 		}
 	}
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,
+	debugPrint("connection",1,
 			"find available cursor failed: all cursors are busy");
 	#endif
 	return -1;
@@ -346,14 +337,14 @@ int	sqlrconnection::findAvailableCursor() {
 void	sqlrconnection::closeCursors() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"closing cursors...");
+	debugPrint("connection",0,"closing cursors...");
 	#endif
 
 	if (cur) {
 		for (int i=0; i<cfgfl->getCursors(); i++) {
 
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),1,(long)i);
+			debugPrint("connection",1,(long)i);
 			#endif
 
 			if (cur[i]) {
@@ -365,7 +356,7 @@ void	sqlrconnection::closeCursors() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"done closing cursors...");
+	debugPrint("connection",0,"done closing cursors...");
 	#endif
 }
 
@@ -542,17 +533,17 @@ void	sqlrconnection::blockSignals() {
 int	sqlrconnection::attemptLogIn() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"logging in...");
+	debugPrint("connection",0,"logging in...");
 	#endif
 	if (!logIn()) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),0,"log in failed");
+		debugPrint("connection",0,"log in failed");
 		#endif
 		fprintf(stderr,"Couldn't log into database.\n");
 		return 0;
 	}
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"done logging in");
+	debugPrint("connection",0,"done logging in");
 	#endif
 
 	return 1;
@@ -561,12 +552,12 @@ int	sqlrconnection::attemptLogIn() {
 void	sqlrconnection::setInitialAutoCommitBehavior() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"setting autocommit...");
+	debugPrint("connection",0,"setting autocommit...");
 	#endif
 	if (autocommit) {
 		if (!autoCommitOn()) {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),0,
+			debugPrint("connection",0,
 					"setting autocommit on failed");
 			#endif
 			fprintf(stderr,"Couldn't set autocommit on.\n");
@@ -575,7 +566,7 @@ void	sqlrconnection::setInitialAutoCommitBehavior() {
 	} else {
 		if (!autoCommitOff()) {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),0,
+			debugPrint("connection",0,
 					"setting autocommit off failed");
 			#endif
 			fprintf(stderr,"Couldn't set autocommit off.\n");
@@ -583,7 +574,7 @@ void	sqlrconnection::setInitialAutoCommitBehavior() {
 		}
 	}
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"done setting autocommit");
+	debugPrint("connection",0,"done setting autocommit");
 	#endif
 }
 
@@ -605,42 +596,42 @@ void	sqlrconnection::closeConnection() {
 
 	// try to log out
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"logging out...");
+	debugPrint("connection",0,"logging out...");
 	#endif
 	logOut();
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"done logging out");
+	debugPrint("connection",0,"done logging out");
 	#endif
 
 
 	// clear the pool
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"removing all sockets...");
+	debugPrint("connection",0,"removing all sockets...");
 	#endif
 	removeAllFileDescriptors();
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
+	debugPrint("connection",0,
 						"done removing all sockets");
 	#endif
 
 
 	// close, clean up all sockets
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"deleting unix socket...");
+	debugPrint("connection",0,"deleting unix socket...");
 	#endif
 	delete serversockun;
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
+	debugPrint("connection",0,
 						"done deleting unix socket");
 	#endif
 
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"deleting inet socket...");
+	debugPrint("connection",0,"deleting inet socket...");
 	#endif
 	delete serversockin;
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
+	debugPrint("connection",0,
 						"done deleting inet socket");
 	#endif
 }
@@ -703,7 +694,7 @@ void	sqlrconnection::listen() {
 void	sqlrconnection::waitForAvailableDatabase() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
+	debugPrint("connection",0,
 				"waiting for available database...");
 	#endif
 
@@ -713,7 +704,7 @@ void	sqlrconnection::waitForAvailableDatabase() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"database is available");
+	debugPrint("connection",0,"database is available");
 	#endif
 }
 
@@ -726,7 +717,7 @@ int	sqlrconnection::availableDatabase() {
 		close(fd);
 
 		#ifdef SERVER_DEBUG
-		getDebugLogger()->write(logger::logHeader("connection"),0,
+		getDebugLogger()->write("connection",0,
 						"database is available");
 		#endif
 
@@ -734,7 +725,7 @@ int	sqlrconnection::availableDatabase() {
 	}
 
 	#ifdef SERVER_DEBUG
-	getDebugLogger()->write(logger::logHeader("connection"),0,
+	getDebugLogger()->write("connection",0,
 					"database is not available");
 	#endif
 	return 0;
@@ -743,7 +734,7 @@ int	sqlrconnection::availableDatabase() {
 int	sqlrconnection::openSockets() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"listening on sockets...");
+	debugPrint("connection",0,"listening on sockets...");
 	#endif
 
 	// get the next available unix socket and open it
@@ -752,7 +743,7 @@ int	sqlrconnection::openSockets() {
 		#ifdef SERVER_DEBUG
 		char	*string=new char[26+strlen(unixsocket)+1];
 		sprintf(string,"listening on unix socket: %s",unixsocket);
-		debugPrint(logger::logHeader("connection"),1,string);
+		debugPrint("connection",1,string);
 		delete[] string;
 		#endif
 
@@ -780,7 +771,7 @@ int	sqlrconnection::openSockets() {
 		#ifdef SERVER_DEBUG
 		char	*string=new char[33];
 		sprintf(string,"listening on inet socket: %d",inetport);
-		debugPrint(logger::logHeader("connection"),1,string);
+		debugPrint("connection",1,string);
 		delete[] string;
 		#endif
 
@@ -803,7 +794,7 @@ int	sqlrconnection::openSockets() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
+	debugPrint("connection",0,
 					"done listening on sockets");
 	#endif
 
@@ -813,7 +804,7 @@ int	sqlrconnection::openSockets() {
 int	sqlrconnection::waitForClient() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,"waiting for client...");
+	debugPrint("connection",0,"waiting for client...");
 	#endif
 
 	// Unless we're in the middle of a suspended session, if we're passing 
@@ -827,9 +818,9 @@ int	sqlrconnection::waitForClient() {
 		if (!lsnrcom->receiveFileDescriptor(&descriptor)) {
 
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),1,
+			debugPrint("connection",1,
 						"pass failed");
-			debugPrint(logger::logHeader("connection"),0,
+			debugPrint("connection",0,
 						"done waiting for client");
 			#endif
 
@@ -838,15 +829,15 @@ int	sqlrconnection::waitForClient() {
 		clientsock=new datatransport(descriptor);
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 						"pass succeeded");
-		debugPrint(logger::logHeader("connection"),0,
+		debugPrint("connection",0,
 						"done waiting for client");
 		#endif
 
 	} else {
 
-		int	fd=waitForData(accepttimeout,0);
+		int	fd=waitForNonBlockingRead(accepttimeout,0);
 		if (fd==serversockin->getFileDescriptor()) {
 			clientsock=serversockin->acceptClientConnection();
 		} else if (fd==serversockun->getFileDescriptor()) {
@@ -855,13 +846,13 @@ int	sqlrconnection::waitForClient() {
 
 		#ifdef SERVER_DEBUG
 		if (fd>-1) {
-			debugPrint(logger::logHeader("connection"),1,
+			debugPrint("connection",1,
 							"reconnect succeeded");
 		} else {
-			debugPrint(logger::logHeader("connection"),1,
+			debugPrint("connection",1,
 							"reconnect failed");
 		}
-		debugPrint(logger::logHeader("connection"),0,
+		debugPrint("connection",0,
 						"done waiting for client");
 		#endif
 
@@ -875,7 +866,7 @@ int	sqlrconnection::waitForClient() {
 void	sqlrconnection::clientSession() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
+	debugPrint("connection",0,
 						"client session...");
 	#endif
 
@@ -965,7 +956,7 @@ void	sqlrconnection::clientSession() {
 	closeSuspendedSessionSockets();
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
+	debugPrint("connection",0,
 					"done with client session");
 	#endif
 }
@@ -973,7 +964,7 @@ void	sqlrconnection::clientSession() {
 int	sqlrconnection::authenticateCommand() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"authenticate");
+	debugPrint("connection",1,"authenticate");
 	#endif
 
 	if (!authenticate()) {
@@ -990,7 +981,7 @@ int	sqlrconnection::authenticateCommand() {
 int	sqlrconnection::authenticate() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"authenticate...");
+	debugPrint("connection",1,"authenticate...");
 	#endif
 
 	// get the user/password from the client
@@ -1006,7 +997,7 @@ int	sqlrconnection::authenticate() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,
+	debugPrint("connection",1,
 			"authentication was done on listener");
 	#endif
 	return 1;
@@ -1017,7 +1008,7 @@ int	sqlrconnection::getUserFromClient() {
 	clientsock->read(&size);
 	if (size>USERSIZE || clientsock->read(userbuffer,size)!=size) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 			"authentication failed: user size is wrong");
 		#endif
 		return 0;
@@ -1031,7 +1022,7 @@ int	sqlrconnection::getPasswordFromClient() {
 	clientsock->read(&size);
 	if (size>USERSIZE || clientsock->read(passwordbuffer,size)!=size) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 			"authentication failed: password size is wrong");
 		#endif
 		return 0;
@@ -1047,10 +1038,10 @@ int	sqlrconnection::connectionBasedAuth(const char *userbuffer,
 	int	retval=authc->authenticate(userbuffer,passwordbuffer);
 	#ifdef SERVER_DEBUG
 	if (retval) {
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 			"connection-based authentication succeeded");
 	} else {
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 			"connection-based authentication failed: invalid user/password");
 	}
 	#endif
@@ -1080,10 +1071,10 @@ int	sqlrconnection::databaseBasedAuth(const char *userbuffer,
 
 	#ifdef SERVER_DEBUG
 	if (lastauthsuccess) {
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 			"database-based authentication succeeded");
 	} else {
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 			"database-based authentication failed: invalid user/password");
 	}
 	#endif
@@ -1094,7 +1085,7 @@ int	sqlrconnection::changeUser(const char *newuser,
 					const char *newpassword) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"change user");
+	debugPrint("connection",2,"change user");
 	#endif
 
 	closeCursors();
@@ -1106,28 +1097,28 @@ int	sqlrconnection::changeUser(const char *newuser,
 
 void	sqlrconnection::suspendSessionCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"suspend session");
+	debugPrint("connection",1,"suspend session");
 	#endif
 	suspendSession();
 }
 
 void	sqlrconnection::endSessionCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"end session");
+	debugPrint("connection",1,"end session");
 	#endif
 	endSession();
 }
 
 void	sqlrconnection::pingCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"ping");
+	debugPrint("connection",1,"ping");
 	#endif
 	clientsock->write((unsigned short)ping());
 }
 
 void	sqlrconnection::identifyCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"identify");
+	debugPrint("connection",1,"identify");
 	#endif
 	char		*ident=identify();
 	unsigned short	idlen=(unsigned short)strlen(ident);
@@ -1137,18 +1128,18 @@ void	sqlrconnection::identifyCommand() {
 
 void	sqlrconnection::autoCommitCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"autocommit...");
+	debugPrint("connection",1,"autocommit...");
 	#endif
 	unsigned short	on;
 	clientsock->read(&on);
 	if (on) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,"autocommit on");
+		debugPrint("connection",2,"autocommit on");
 		#endif
 		clientsock->write(autoCommitOn());
 	} else {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,"autocommit off");
+		debugPrint("connection",2,"autocommit off");
 		#endif
 		clientsock->write(autoCommitOff());
 	}
@@ -1156,7 +1147,7 @@ void	sqlrconnection::autoCommitCommand() {
 
 void	sqlrconnection::commitCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"commit");
+	debugPrint("connection",1,"commit");
 	#endif
 	clientsock->write((unsigned short)commit());
 	commitorrollback=0;
@@ -1164,7 +1155,7 @@ void	sqlrconnection::commitCommand() {
 
 void	sqlrconnection::rollbackCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"rollback");
+	debugPrint("connection",1,"rollback");
 	#endif
 	clientsock->write((unsigned short)rollback());
 	commitorrollback=0;
@@ -1173,7 +1164,7 @@ void	sqlrconnection::rollbackCommand() {
 int	sqlrconnection::newQueryCommand() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"new query");
+	debugPrint("connection",1,"new query");
 	#endif
 
 	// find an available cursor
@@ -1207,7 +1198,7 @@ int	sqlrconnection::newQueryCommand() {
 int	sqlrconnection::reExecuteQueryCommand() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"re-execute query");
+	debugPrint("connection",1,"re-execute query");
 	#endif
 
 	// handle query will return 1 for success,
@@ -1233,7 +1224,7 @@ int	sqlrconnection::reExecuteQueryCommand() {
 int	sqlrconnection::fetchFromBindCursorCommand() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"fetch from bind cursor");
+	debugPrint("connection",1,"fetch from bind cursor");
 	#endif
 
 	// handle query will return 1 for success,
@@ -1259,7 +1250,7 @@ int	sqlrconnection::fetchFromBindCursorCommand() {
 int	sqlrconnection::fetchResultSetCommand() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"fetch result set");
+	debugPrint("connection",1,"fetch result set");
 	#endif
 	if (!returnResultSetData()) {
 		endSession();
@@ -1270,21 +1261,21 @@ int	sqlrconnection::fetchResultSetCommand() {
 
 void	sqlrconnection::abortResultSetCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"abort result set");
+	debugPrint("connection",1,"abort result set");
 	#endif
 	cur[currentcur]->abort();
 }
 
 void	sqlrconnection::suspendResultSetCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"suspend result set");
+	debugPrint("connection",1,"suspend result set");
 	#endif
 	cur[currentcur]->suspendresultset=1;
 }
 
 int	sqlrconnection::resumeResultSetCommand() {
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"resume result set");
+	debugPrint("connection",1,"resume result set");
 	#endif
 	resumeResultSet();
 	if (!returnResultSetData()) {
@@ -1308,7 +1299,7 @@ void	sqlrconnection::waitForClientClose() {
 	// that the client will get the the entire result set without
 	// requiring the client to send data back indicating so.
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,
+	debugPrint("connection",1,
 			"waiting for client to close the connection...");
 	#endif
 	unsigned short	dummy;
@@ -1316,7 +1307,7 @@ void	sqlrconnection::waitForClientClose() {
 	clientsock->close();
 	delete clientsock;
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,
+	debugPrint("connection",1,
 			"done waiting for client to close the connection...");
 	#endif
 }
@@ -1328,7 +1319,7 @@ void	sqlrconnection::closeSuspendedSessionSockets() {
 	// a suspended session, close those sockets here.
 	if (!suspendedsession && cfgfl->getPassDescriptor()) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 			"closing sockets from a previously suspended session...");
 		#endif
 		if (serversockun) {
@@ -1342,7 +1333,7 @@ void	sqlrconnection::closeSuspendedSessionSockets() {
 			serversockin=NULL;
 		}
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 			"done closing sockets from a previously suspended session...");
 		#endif
 	}
@@ -1351,13 +1342,13 @@ void	sqlrconnection::closeSuspendedSessionSockets() {
 int	sqlrconnection::handleQuery(int reexecute, int reallyexecute) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,
+	debugPrint("connection",1,
 					"handling query...");
 	#endif
 
 	if (!getQueryFromClient(reexecute)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),1,
+		debugPrint("connection",1,
 						"failed to handle query");
 		#endif
 		return 0;
@@ -1387,8 +1378,11 @@ int	sqlrconnection::handleQuery(int reexecute, int reallyexecute) {
 			// result set itself...
 			returnResultSetHeader();
 
+			// free memory used by binds
+			bindpool->free();
+
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),1,
+			debugPrint("connection",1,
 						"handle query succeeded");
 			#endif
 			return 1;
@@ -1411,7 +1405,7 @@ int	sqlrconnection::handleQuery(int reexecute, int reallyexecute) {
 
 				cur[currentcur]->abort();
 				#ifdef SERVER_DEBUG
-				debugPrint(logger::logHeader("connection"),1,
+				debugPrint("connection",1,
 					"failed to handle query: error");
 				#endif
 				return -1;
@@ -1420,7 +1414,7 @@ int	sqlrconnection::handleQuery(int reexecute, int reallyexecute) {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"done handling query");
+	debugPrint("connection",1,"done handling query");
 	#endif
 	return 1;
 }
@@ -1438,13 +1432,13 @@ int	sqlrconnection::getQueryFromClient(int reexecute) {
 void	sqlrconnection::resumeResultSet() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"resume result set...");
+	debugPrint("connection",1,"resume result set...");
 	#endif
 
 	if (cur[currentcur]->suspendresultset) {
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 					"previous result set was suspended");
 		#endif
 
@@ -1464,7 +1458,7 @@ void	sqlrconnection::resumeResultSet() {
 	} else {
 
 		#ifdef 	SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 				"previous result set was not suspended");
 		#endif
 
@@ -1477,7 +1471,7 @@ void	sqlrconnection::resumeResultSet() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,
+	debugPrint("connection",1,
 					"done resuming result set");
 	#endif
 }
@@ -1485,12 +1479,12 @@ void	sqlrconnection::resumeResultSet() {
 void	sqlrconnection::suspendSession() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"suspending session...");
+	debugPrint("connection",1,"suspending session...");
 	#endif
 
 	// abort all cursors that aren't already suspended
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 				"aborting busy, unsuspended cursors...");
 	#endif
 	suspendedsession=1;
@@ -1498,14 +1492,14 @@ void	sqlrconnection::suspendSession() {
 	for (int i=0; i<cfgfl->getCursors(); i++) {
 		if (!cur[i]->suspendresultset && cur[i]->busy) {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),3,(long)i);
+			debugPrint("connection",3,(long)i);
 			#endif
 			cur[i]->abort();
 		}
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 				"done aborting busy, unsuspended cursors");
 	#endif
 
@@ -1518,7 +1512,7 @@ void	sqlrconnection::suspendSession() {
 	if (cfgfl->getPassDescriptor()) {
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 					"opening a socket to resume on...");
 		#endif
 		if (!openSockets()) {
@@ -1528,12 +1522,12 @@ void	sqlrconnection::suspendSession() {
 			clientsock->write((unsigned short)0);
 		}
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 					"done opening a socket to resume on");
 		#endif
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 					"passing socket info to client...");
 		#endif
 		if (serversockun) {
@@ -1545,20 +1539,20 @@ void	sqlrconnection::suspendSession() {
 		}
 		clientsock->write(inetport);
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 				"done passing socket info to client...");
 		#endif
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"done suspending session");
+	debugPrint("connection",2,"done suspending session");
 	#endif
 }
 
 void	sqlrconnection::endSession() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"ending session...");
+	debugPrint("connection",2,"ending session...");
 	#endif
 
 	// must set suspendedsession to 0 here so resumed sessions won't 
@@ -1567,19 +1561,19 @@ void	sqlrconnection::endSession() {
 
 	// abort all cursors
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"aborting all busy cursors...");
 	#endif
 	for (int i=0; i<cfgfl->getCursors(); i++) {
 		if (cur[i]->busy) {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),3,(long)i);
+			debugPrint("connection",3,(long)i);
 			#endif
 			cur[i]->abort();
 		}
 	}
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"done aborting all busy cursors");
 	#endif
 
@@ -1587,22 +1581,22 @@ void	sqlrconnection::endSession() {
 	if (isTransactional() && commitorrollback) {
 		if (cfgfl->getEndOfSessionCommit()) {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),2,
+			debugPrint("connection",2,
 							"committing...");
 			#endif
 			commit();
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),2,
+			debugPrint("connection",2,
 							"done committing...");
 			#endif
 		} else {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),2,
+			debugPrint("connection",2,
 							"rolling back...");
 			#endif
 			rollback();
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),2,
+			debugPrint("connection",2,
 							"done rolling back...");
 			#endif
 		}
@@ -1610,34 +1604,34 @@ void	sqlrconnection::endSession() {
 
 	// reset autocommit behavior
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 				"resetting autocommit behavior...");
 	#endif
 	if (autocommit) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 					"setting autocommit on...");
 		#endif
 		autoCommitOn();
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 					"done setting autocommit on...");
 		#endif
 	} else {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 					"setting autocommit off...");
 		#endif
 		autoCommitOff();
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 					"done setting autocommit off...");
 		#endif
 	}
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 			"done resetting autocommit behavior...");
-	debugPrint(logger::logHeader("connection"),1,"done ending session");
+	debugPrint("connection",1,"done ending session");
 	#endif
 }
 
@@ -1654,14 +1648,14 @@ void	sqlrconnection::noAvailableCursors() {
 int	sqlrconnection::handleError() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"handling error...");
+	debugPrint("connection",2,"handling error...");
 	#endif
 
 	// return the error unless the error was a dead connection, 
 	// in which case, re-establish the connection
 	if (!returnError()) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"database is down...");
 		#endif
 		reLogIn();
@@ -1669,7 +1663,7 @@ int	sqlrconnection::handleError() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"done handling error...");
+	debugPrint("connection",2,"done handling error...");
 	#endif
 	return 1;
 }
@@ -1679,7 +1673,7 @@ void	sqlrconnection::reLogIn() {
 	markDatabaseUnavailable();
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),4,"relogging in...");
+	debugPrint("connection",4,"relogging in...");
 	#endif
 
 	// attempt to log in over and over, once every 5 seconds
@@ -1688,7 +1682,7 @@ void	sqlrconnection::reLogIn() {
 	for (;;) {
 			
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),5,"trying...");
+		debugPrint("connection",5,"trying...");
 		#endif
 
 		if (logIn()) {
@@ -1703,7 +1697,7 @@ void	sqlrconnection::reLogIn() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),4,"done relogging in");
+	debugPrint("connection",4,"done relogging in");
 	#endif
 
 	markDatabaseAvailable();
@@ -1714,7 +1708,7 @@ void	sqlrconnection::markDatabaseUnavailable() {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[10+strlen(updown)+1];
 	sprintf(string,"unlinking %s",updown);
-	getDebugLogger()->write(logger::logHeader("connection"),4,string);
+	getDebugLogger()->write("connection",4,string);
 	delete[] string;
 	#endif
 
@@ -1725,20 +1719,20 @@ void	sqlrconnection::markDatabaseUnavailable() {
 int	sqlrconnection::getCommand(unsigned short *command) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"getting command...");
+	debugPrint("connection",2,"getting command...");
 	#endif
 
 	// get the command
 	if (clientsock->read(command)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 			"getting command failed: client sent bad command");
 		#endif
 		return 0;
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"done getting command");
+	debugPrint("connection",2,"done getting command");
 	#endif
 	return 1;
 }
@@ -1746,14 +1740,14 @@ int	sqlrconnection::getCommand(unsigned short *command) {
 int	sqlrconnection::getQuery() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"getting query...");
+	debugPrint("connection",2,"getting query...");
 	#endif
 
 	// get the length of the query
 	if (clientsock->read(&cur[currentcur]->querylength)!=
 					sizeof(unsigned long)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 			"getting query failed: client sent bad query length size");
 		#endif
 		return 0;
@@ -1762,7 +1756,7 @@ int	sqlrconnection::getQuery() {
 	// bounds checking
 	if (cur[currentcur]->querylength>MAXQUERYSIZE) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 			"getting query failed: client sent bad query size");
 		#endif
 		return 0;
@@ -1773,7 +1767,7 @@ int	sqlrconnection::getQuery() {
 				cur[currentcur]->querylength)!=
 					cur[currentcur]->querylength) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 			"getting query failed: client sent short query");
 		#endif
 		return 0;
@@ -1781,11 +1775,11 @@ int	sqlrconnection::getQuery() {
 	cur[currentcur]->querybuffer[cur[currentcur]->querylength]=(char)NULL;
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),3,"query:");
-	debugPrint(logger::logHeader("connection"),0,
-					cur[currentcur]->querybuffer);
-	debugPrint(logger::logHeader("connection"),2,
-					"getting query succeeded");
+	debugPrint("connection",3,"querylength:");
+	debugPrint("connection",4,cur[currentcur]->querylength);
+	debugPrint("connection",3,"query:");
+	debugPrint("connection",0,cur[currentcur]->querybuffer);
+	debugPrint("connection",2,"getting query succeeded");
 	#endif
 
 	return 1;
@@ -1794,7 +1788,7 @@ int	sqlrconnection::getQuery() {
 int	sqlrconnection::getInputBinds() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"getting input binds...");
+	debugPrint("connection",2,"getting input binds...");
 	#endif
 
 	// get the number of input bind variable/values
@@ -1803,8 +1797,7 @@ int	sqlrconnection::getInputBinds() {
 	}
 	
 	// fill the buffers
-	for (int i=0; i<cur[currentcur]->inbindcount &&
-							i<MAXVAR; i++) {
+	for (int i=0; i<cur[currentcur]->inbindcount && i<MAXVAR; i++) {
 
 		bindvar	*bv=&(cur[currentcur]->inbindvars[i]);
 
@@ -1836,7 +1829,7 @@ int	sqlrconnection::getInputBinds() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"done getting input binds");
 	#endif
 	return 1;
@@ -1845,7 +1838,7 @@ int	sqlrconnection::getInputBinds() {
 int	sqlrconnection::getOutputBinds() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"getting output binds...");
+	debugPrint("connection",2,"getting output binds...");
 	#endif
 
 	// get the number of output bind variable/values
@@ -1874,7 +1867,7 @@ int	sqlrconnection::getOutputBinds() {
 			// for now I'm just going to go ahead and use calloc
 			bv->value.stringval=bindpool->calloc(bv->valuesize+1);
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),4,"STRING");
+			debugPrint("connection",4,"STRING");
 			#endif
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			if (!getBindSize(bv,LOBBINDVALUELENGTH)) {
@@ -1882,26 +1875,28 @@ int	sqlrconnection::getOutputBinds() {
 			}
 			#ifdef SERVER_DEBUG
 			if (bv->type==BLOB_BIND) {
-				debugPrint(logger::logHeader("connection"),4,
+				debugPrint("connection",4,
 					"BLOB");
 			} else if (bv->type==CLOB_BIND) {
-				debugPrint(logger::logHeader("connection"),4,
+				debugPrint("connection",4,
 					"CLOB");
 			}
 			#endif
 		} else if (bv->type==CURSOR_BIND) {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),4,"CURSOR");
+			debugPrint("connection",4,"CURSOR");
 			#endif
-			if ((bv->value.cursorid=findAvailableCursor())==-1) {
+			short	curs=findAvailableCursor();
+			if (curs==-1) {
 				// FIXME: set error here
 				return 0;
 			}
+			bv->value.cursorid=curs;
 		}
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"done getting output binds");
 	#endif
 	return 1;
@@ -1910,8 +1905,10 @@ int	sqlrconnection::getOutputBinds() {
 void	sqlrconnection::returnOutputBindValues() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"returning output bind values");
+	debugPrint("connection",3,
+					cur[currentcur]->outbindcount);
 	#endif
 
 	// run through the output bind values, sending them back
@@ -1957,7 +1954,7 @@ void	sqlrconnection::returnOutputBindValues() {
 			#endif
 
 			clientsock->write((unsigned short)NORMAL_DATA);
-			bv->valuesize=strlen(bv->value.stringval);
+			bv->valuesize=strlen((char *)bv->value.stringval);
 			clientsock->write(bv->valuesize);
 			clientsock->write(bv->value.stringval,bv->valuesize);
 
@@ -1973,14 +1970,13 @@ void	sqlrconnection::returnOutputBindValues() {
 		}
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
-						debugstr->getString());
+		debugPrint("connection",3,debugstr->getString());
 		delete debugstr;
 		#endif
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 				"done returning output bind values");
 	#endif
 }
@@ -1994,7 +1990,7 @@ int	sqlrconnection::getBindVarCount(unsigned short *count) {
 	// get the number of input bind variable/values
 	if (clientsock->read(count)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 			"getting binds failed: client sent bad bind count size");
 		#endif
 		return 0;
@@ -2003,7 +1999,7 @@ int	sqlrconnection::getBindVarCount(unsigned short *count) {
 	// bounds checking
 	if (*count>MAXVAR) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 			"getting binds failed: client tried to send too many binds");
 		#endif
 		return 0;
@@ -2019,7 +2015,7 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 	// get the variable name size
 	if (clientsock->read(&bindnamesize)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 			"getting binds failed: bad variable name length size");
 		#endif
 		return 0;
@@ -2028,7 +2024,7 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 	// bounds checking
 	if (bindnamesize>BINDVARLENGTH) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 			"getting binds failed: bad variable name length");
 		#endif
 		return 0;
@@ -2040,7 +2036,7 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 	bv->variable[0]=bindVariablePrefix();
 	if (clientsock->read(bv->variable+1,bindnamesize)!=bindnamesize) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 			"getting binds failed: bad variable name");
 		#endif
 		return 0;
@@ -2048,7 +2044,7 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 	bv->variable[bindnamesize+1]=(char)NULL;
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),4,bv->variable);
+	debugPrint("connection",4,bv->variable);
 	#endif
 
 	return 1;
@@ -2060,7 +2056,7 @@ int	sqlrconnection::getBindVarType(bindvar *bv) {
 	if (clientsock->read((unsigned short *)&(bv->type))!=
 					sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 				"getting binds failed: bad type size");
 		#endif
 		return 0;
@@ -2072,7 +2068,7 @@ int	sqlrconnection::getBindVarType(bindvar *bv) {
 void	sqlrconnection::getNullBind(bindvar *bv) {
 
 	#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),4,"NULL");
+		debugPrint("connection",4,"NULL");
 	#endif
 
 	bv->value.stringval=bindpool->malloc(1);
@@ -2086,7 +2082,7 @@ int	sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
 	// get the size of the value
 	if (clientsock->read(&(bv->valuesize))!=sizeof(unsigned long)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),
+		debugPrint("connection",
 			2,"getting binds failed: bad value length size");
 		#endif
 		return 0;
@@ -2095,8 +2091,9 @@ int	sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
 	// bounds checking
 	if (bv->valuesize>maxsize) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),
+		debugPrint("connection",
 			2,"getting binds failed: bad value length");
+		debugPrint("connection",3,bv->valuesize);
 		#endif
 		return 0;
 	}
@@ -2115,14 +2112,14 @@ int	sqlrconnection::getStringBind(bindvar *bv) {
 	bv->value.stringval=bindpool->malloc(bv->valuesize+1);
 
 	#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),4,"STRING");
+		debugPrint("connection",4,"STRING");
 	#endif
 
 	// get the bind value
 	if (clientsock->read(bv->value.stringval,
 				bv->valuesize)!=bv->valuesize) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),
+		debugPrint("connection",
 			2,"getting binds failed: bad value");
 		#endif
 		return 0;
@@ -2131,7 +2128,7 @@ int	sqlrconnection::getStringBind(bindvar *bv) {
 	bv->isnull=nonNullBindValue();
 
 	#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),4,
+		debugPrint("connection",4,
 						bv->value.stringval);
 	#endif
 
@@ -2141,20 +2138,34 @@ int	sqlrconnection::getStringBind(bindvar *bv) {
 int	sqlrconnection::getLongBind(bindvar *bv) {
 
 	#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),4,"LONG");
+		debugPrint("connection",4,"LONG");
 	#endif
 
-	if (clientsock->read(&(bv->value.longval))!=sizeof(unsigned long)) {
+	// get positive/negative
+	char		negative;
+	if (clientsock->read(&negative)!=sizeof(char)) {
 		#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),
+			debugPrint("connection",
+			2,"getting binds failed: bad positive/negative");
+		#endif
+		return 0;
+	}
+
+	// get the value itself
+	unsigned long	value;
+	if (clientsock->read(&value)!=sizeof(unsigned long)) {
+		#ifdef SERVER_DEBUG
+			debugPrint("connection",
 				2,"getting binds failed: bad value");
 		#endif
 		return 0;
 	}
 
+	// set the value
+	bv->value.longval=((long)value)*(negative?-1:1);
+
 	#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),4,
-			(long)bv->value.longval);
+		debugPrint("connection",4,bv->value.longval);
 	#endif
 
 	return 1;
@@ -2163,13 +2174,13 @@ int	sqlrconnection::getLongBind(bindvar *bv) {
 int	sqlrconnection::getDoubleBind(bindvar *bv) {
 
 	#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),4,"DOUBLE");
+		debugPrint("connection",4,"DOUBLE");
 	#endif
 
 	// get the value
 	if (clientsock->read(&(bv->value.doubleval.value))!=sizeof(double)) {
 		#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),
+			debugPrint("connection",
 				2,"getting binds failed: bad value");
 		#endif
 		return 0;
@@ -2179,7 +2190,7 @@ int	sqlrconnection::getDoubleBind(bindvar *bv) {
 	if (clientsock->read(&(bv->value.doubleval.precision))!=
 						sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),
+			debugPrint("connection",
 				2,"getting binds failed: bad precision");
 		#endif
 		return 0;
@@ -2189,14 +2200,14 @@ int	sqlrconnection::getDoubleBind(bindvar *bv) {
 	if (clientsock->read(&(bv->value.doubleval.scale))!=
 						sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),
+			debugPrint("connection",
 				2,"getting binds failed: bad scale");
 		#endif
 		return 0;
 	}
 
 	#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),4,
+		debugPrint("connection",4,
 					bv->value.doubleval.value);
 	#endif
 
@@ -2207,10 +2218,10 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 
 	#ifdef SERVER_DEBUG
 		if (bv->type==BLOB_BIND) {
-			debugPrint(logger::logHeader("connection"),4,"BLOB");
+			debugPrint("connection",4,"BLOB");
 		}
 		if (bv->type==CLOB_BIND) {
-			debugPrint(logger::logHeader("connection"),4,"CLOB");
+			debugPrint("connection",4,"CLOB");
 		}
 	#endif
 
@@ -2226,7 +2237,7 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 	if (clientsock->read(bv->value.stringval,
 					bv->valuesize)!=bv->valuesize) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),
+		debugPrint("connection",
 			2,"getting binds failed: bad value");
 		#endif
 		return 0;
@@ -2253,13 +2264,13 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 int	sqlrconnection::getSendColumnInfo() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"getting send column info...");
 	#endif
 
 	if (clientsock->read(&sendcolumninfo)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 					"getting send column info failed");
 		#endif
 		return 0;
@@ -2267,13 +2278,13 @@ int	sqlrconnection::getSendColumnInfo() {
 
 	#ifdef SERVER_DEBUG
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"send column info");
 	} else {
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"don't send column info");
 	}
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"done getting send column info...");
 	#endif
 
@@ -2290,7 +2301,7 @@ int	sqlrconnection::sendColumnInfo() {
 int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"processing query...");
+	debugPrint("connection",2,"processing query...");
 	#endif
 
 	// if the reexecute flag is set, the query doesn't need to be prepared 
@@ -2298,7 +2309,7 @@ int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 	int	success=0;
 	if (reexecute) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,"re-executing...");
+		debugPrint("connection",3,"re-executing...");
 		#endif
 		success=cur[currentcur]->handleBinds() && 
 			cur[currentcur]->executeQuery(
@@ -2307,7 +2318,7 @@ int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 					reallyexecute);
 	} else {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"preparing/executing...");
 		#endif
 		success=cur[currentcur]->prepareQuery(
@@ -2318,9 +2329,6 @@ int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 					cur[currentcur]->querybuffer,
 					cur[currentcur]->querylength,1);
 	}
-
-	// free memory used by binds
-	bindpool->free();
 
 	// was the query a commit or rollback?
 	commitOrRollback();
@@ -2333,7 +2341,7 @@ int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 	if (success && checkautocommit && isTransactional() && 
 			performautocommit && commitorrollback) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"commit necessary...");
 		#endif
 		success=commit();
@@ -2342,13 +2350,13 @@ int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 
 	#ifdef SERVER_DEBUG
 	if (success) {
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 						"processing query succeeded");
 	} else {
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 						"processing query failed");
 	}
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 						"done processing query");
 	#endif
 
@@ -2374,7 +2382,7 @@ int	sqlrconnection::bindValueIsNull(short isnull) {
 int	sqlrconnection::returnError() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"returning error...");
+	debugPrint("connection",2,"returning error...");
 	#endif
 
 	// get the error message from the database
@@ -2400,7 +2408,7 @@ int	sqlrconnection::returnError() {
 	}
 	
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"done returning error");
+	debugPrint("connection",2,"done returning error");
 	#endif
 
 	return liveconnection;
@@ -2409,18 +2417,18 @@ int	sqlrconnection::returnError() {
 void	sqlrconnection::returnResultSetHeader() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"returning result set header...");
 	#endif
 
 
 	// return the row counts
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),3,"returning row counts...");
+	debugPrint("connection",3,"returning row counts...");
 	#endif
 	cur[currentcur]->returnRowCounts();
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),3,
+	debugPrint("connection",3,
 					"done returning row counts");
 	#endif
 
@@ -2431,10 +2439,10 @@ void	sqlrconnection::returnResultSetHeader() {
 
 	#ifdef SERVER_DEBUG
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"column info will be sent");
 	} else {
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"column info will not be sent");
 	}
 	#endif
@@ -2442,12 +2450,12 @@ void	sqlrconnection::returnResultSetHeader() {
 
 	// return the column count
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),3,
+	debugPrint("connection",3,
 					"returning column counts...");
 	#endif
 	cur[currentcur]->returnColumnCount();
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),3,
+	debugPrint("connection",3,
 					"done returning column counts");
 	#endif
 
@@ -2455,12 +2463,12 @@ void	sqlrconnection::returnResultSetHeader() {
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
 		// return the column info
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"returning column info...");
 		#endif
 		cur[currentcur]->returnColumnInfo();
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"done returning column info");
 		#endif
 	}
@@ -2475,7 +2483,7 @@ void	sqlrconnection::returnResultSetHeader() {
 
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"done returning result set header");
 	#endif
 }
@@ -2483,7 +2491,7 @@ void	sqlrconnection::returnResultSetHeader() {
 int	sqlrconnection::returnResultSetData() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 				"returning result set data...");
 	#endif
 
@@ -2494,7 +2502,7 @@ int	sqlrconnection::returnResultSetData() {
 	unsigned long	skip;
 	if (clientsock->read(&skip)!=sizeof(unsigned long)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 					"returning result set data failed");
 		#endif
 		return 0;
@@ -2504,7 +2512,7 @@ int	sqlrconnection::returnResultSetData() {
 	unsigned long	fetch;
 	if (clientsock->read(&fetch)!=sizeof(unsigned long)) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 					"returning result set data failed");
 		#endif
 		return 0;
@@ -2516,7 +2524,7 @@ int	sqlrconnection::returnResultSetData() {
 		clientsock->write((unsigned short)END_RESULT_SET);
 		cur[currentcur]->abort();
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 					"done returning result set data");
 		#endif
 		return 1;
@@ -2532,7 +2540,7 @@ int	sqlrconnection::returnResultSetData() {
 		clientsock->write((unsigned short)END_RESULT_SET);
 		cur[currentcur]->abort();
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),2,
+		debugPrint("connection",2,
 					"done returning result set data");
 		#endif
 		return 1;
@@ -2546,7 +2554,7 @@ int	sqlrconnection::returnResultSetData() {
 			clientsock->write((unsigned short)END_RESULT_SET);
 			cur[currentcur]->abort();
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),2,
+			debugPrint("connection",2,
 					"done returning result set data");
 			#endif
 			return 1;
@@ -2557,15 +2565,15 @@ int	sqlrconnection::returnResultSetData() {
 		#endif
 		cur[currentcur]->returnRow();
 		#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),3,
-							debugstr->getString());
+			debugPrint("connection",3,debugstr->getString());
+			delete debugstr;
 		#endif
 
 		lastrow++;
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 				"done returning result set data");
 	#endif
 	return 1;
@@ -2574,20 +2582,20 @@ int	sqlrconnection::returnResultSetData() {
 int	sqlrconnection::skipRows(int rows) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 						"skipping rows...");
 	#endif
 
 	for (int i=0; i<rows; i++) {
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,"skip...");
+		debugPrint("connection",3,"skip...");
 		#endif
 
 		lastrow++;
 		if (!cur[currentcur]->skipRow()) {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),2,
+			debugPrint("connection",2,
 				"skipping rows hit the end of the result set");
 			#endif
 			return 0;
@@ -2595,7 +2603,7 @@ int	sqlrconnection::skipRows(int rows) {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"done skipping rows");
+	debugPrint("connection",2,"done skipping rows");
 	#endif
 	return 1;
 }
@@ -2603,7 +2611,7 @@ int	sqlrconnection::skipRows(int rows) {
 void	sqlrconnection::sendRowCounts(long actual, long affected) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,"sending row counts...");
+	debugPrint("connection",2,"sending row counts...");
 	#endif
 
 
@@ -2613,7 +2621,7 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 		#ifdef SERVER_DEBUG
 		char	*string=new char[30];
 		sprintf(string,"actual rows: %d",actual);
-		debugPrint(logger::logHeader("connection"),3,string);
+		debugPrint("connection",3,string);
 		delete[] string;
 		#endif
 
@@ -2622,7 +2630,7 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 	} else {
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"actual rows unknown");
 		#endif
 
@@ -2636,7 +2644,7 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 		#ifdef SERVER_DEBUG
 		char	*string=new char[46];
 		sprintf(string,"affected rows: %d",affected);
-		debugPrint(logger::logHeader("connection"),3,string);
+		debugPrint("connection",3,string);
 		delete[] string;
 		#endif
 
@@ -2646,7 +2654,7 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 	} else {
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("connection"),3,
+		debugPrint("connection",3,
 						"affected rows unknown");
 		#endif
 
@@ -2654,7 +2662,7 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"done sending row counts");
 	#endif
 }
@@ -2662,17 +2670,17 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 void	sqlrconnection::sendColumnCount(unsigned long ncols) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"sending column count...");
 	#endif
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),3,(long)ncols);
+	debugPrint("connection",3,(long)ncols);
 	#endif
 	clientsock->write(ncols);
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 						"done sending column count");
 	#endif
 }
@@ -2691,7 +2699,7 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 	debugstr->append((long)type);
 	debugstr->append(":");
 	debugstr->append((long)size);
-	debugPrint(logger::logHeader("connection"),3,debugstr->getString());
+	debugPrint("connection",3,debugstr->getString());
 	delete debugstr;
 	#endif
 
@@ -2770,7 +2778,7 @@ int	sqlrconnection::isTransactional() {
 void	sqlrconnection::initSession() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
+	debugPrint("connection",0,
 					"initializing session...");
 	#endif
 
@@ -2782,7 +2790,7 @@ void	sqlrconnection::initSession() {
 	accepttimeout=5;
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
+	debugPrint("connection",0,
 					"done initializing session...");
 	#endif
 }
@@ -2790,7 +2798,7 @@ void	sqlrconnection::initSession() {
 void	sqlrconnection::commitOrRollback() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 					"commit or rollback check...");
 	#endif
 
@@ -2798,13 +2806,13 @@ void	sqlrconnection::commitOrRollback() {
 	if (isTransactional()) {
 		if (cur[currentcur]->queryIsCommitOrRollback()) {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),3,
+			debugPrint("connection",3,
 					"commit or rollback not needed");
 			#endif
 			commitorrollback=0;
 		} else if (cur[currentcur]->queryIsNotSelect()) {
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("connection"),3,
+			debugPrint("connection",3,
 					"commit or rollback needed");
 			#endif
 			commitorrollback=1;
@@ -2812,7 +2820,7 @@ void	sqlrconnection::commitOrRollback() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),2,
+	debugPrint("connection",2,
 				"done with commit or rollback check");
 	#endif
 }
@@ -2840,7 +2848,7 @@ unsigned short	sqlrconnection::autoCommitOff() {
 int	sqlrconnection::commit() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"commit...");
+	debugPrint("connection",1,"commit...");
 	#endif
 
 	cur[currentcur]->prepareQuery("commit",6);
@@ -2850,7 +2858,7 @@ int	sqlrconnection::commit() {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[36];
 	sprintf(string,"commit result: %d",retval);
-	debugPrint(logger::logHeader("connection"),2,string);
+	debugPrint("connection",2,string);
 	delete[] string;
 	#endif
 
@@ -2860,7 +2868,7 @@ int	sqlrconnection::commit() {
 int	sqlrconnection::rollback() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,"rollback...");
+	debugPrint("connection",1,"rollback...");
 	#endif
 
 	cur[currentcur]->prepareQuery("rollback",8);
@@ -2870,7 +2878,7 @@ int	sqlrconnection::rollback() {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[38];
 	sprintf(string,"rollback result: %d",retval);
-	debugPrint(logger::logHeader("connection"),2,string);
+	debugPrint("connection",2,string);
 	delete[] string;
 	#endif
 

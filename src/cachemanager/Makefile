@@ -4,7 +4,7 @@ top_srcdir = ../..
 INSTALL = $(top_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -DCACHE_DIR=\"$(cachedir)\" -I./ -I../../ -I../common $(RUDIMENTSINCLUDES)
-LIBS = $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB)
+LIBS = $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = cachemanager.C main.C
 OBJS = cachemanager.o main.o

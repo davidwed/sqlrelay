@@ -177,9 +177,7 @@ oracle7cursor::oracle7cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 }
 
 oracle7cursor::~oracle7cursor() {
-	if (errormessage) {
-		delete errormessage;
-	}
+	delete errormessage;
 }
 
 int	oracle7cursor::openCursor(int id) {
@@ -404,9 +402,7 @@ char	*oracle7cursor::getErrorMessage(int *liveconnection) {
 	}
 
 	// only return an error message if the error wasn't a dead database
-	if (errormessage) {
-		delete errormessage;
-	}
+	delete errormessage;
 	errormessage=new stringbuffer();
 	if (*liveconnection) {
 		for (int i=0; i<n; i++) {

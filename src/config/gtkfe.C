@@ -1294,6 +1294,7 @@ void	gtkfe::handleFile(const char *filename) {
 		gtk_widget_set_sensitive(instancelistvbox,TRUE);
 
 	} else {
+printf("parse failed\n");
 
 		// if the parse failed...
 

@@ -34,6 +34,7 @@ extern "C" {
 #endif
 #include <errno.h>
 
+
 sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
 					const char *user, const char *password, 
 					int retrytime, int tries) 
@@ -974,9 +975,7 @@ sqlrcursor::~sqlrcursor() {
 	}
 
 	// deallocate copied references
-	if (copyrefs) {
-		deleteVariables();
-	}
+	deleteVariables();
 
 	// deallocate the query buffer
 	delete[] querybuffer;
@@ -1065,16 +1064,24 @@ void	sqlrcursor::initVariables() {
 void	sqlrcursor::deleteVariables() {
 
 	// if we were copying values, delete them
+	if (copyrefs) {
+		for (int i=0; i<MAXVAR; i++) {
+			delete[] inbindvars[i].variable;
+			if (inbindvars[i].type==STRING_BIND) {
+				delete[] inbindvars[i].value.stringval;
+			}
+			if (inbindvars[i].type==BLOB_BIND ||
+				inbindvars[i].type==CLOB_BIND) {
+				delete[] inbindvars[i].value.lobval;
+			}
+			delete[] outbindvars[i].variable;
+			delete[] subvars[i].variable;
+			if (subvars[i].type==STRING_BIND) {
+				delete[] subvars[i].value.stringval;
+			}
+		}
+	}
 	for (int i=0; i<MAXVAR; i++) {
-		delete[] inbindvars[i].variable;
-		if (inbindvars[i].type==STRING_BIND) {
-			delete[] inbindvars[i].value.stringval;
-		}
-		if (inbindvars[i].type==BLOB_BIND ||
-			inbindvars[i].type==CLOB_BIND) {
-			delete[] inbindvars[i].value.lobval;
-		}
-		delete[] outbindvars[i].variable;
 		if (outbindvars[i].type==STRING_BIND) {
 			delete[] outbindvars[i].value.stringval;
 		}
@@ -1082,14 +1089,21 @@ void	sqlrcursor::deleteVariables() {
 			outbindvars[i].type==CLOB_BIND) {
 			delete[] outbindvars[i].value.lobval;
 		}
-		delete[] subvars[i].variable;
-		if (subvars[i].type==STRING_BIND) {
-			delete[] subvars[i].value.stringval;
-		}
 	}
 }
 
 void	sqlrcursor::clearRows() {
+
+	// delete data in rows for long datatypes
+	int	rowbuffercount=rowcount-firstrowindex;
+	for (int i=0; i<rowbuffercount; i++) {
+		for (int j=0; j<colcount; j++) {
+			char	*data=getFieldInternal(i,j);
+			if (getColumn(j)->longdatatype) {
+				delete[] getFieldInternal(i,j);
+			}
+		}
+	}
 
 	// delete linked list storing extra result set fields
 	row	*currentrow;
@@ -1110,14 +1124,14 @@ void	sqlrcursor::clearRows() {
 
 	// delete arrays of fields and field lengths
 	if (fields) {
-		for (int i=0; i<rowcount; i++) {
+		for (int i=0; i<rowbuffercount; i++) {
 			delete[] fields[i];
 		}
 		delete[] fields;
 		fields=NULL;
 	}
 	if (fieldlengths) {
-		for (int i=0; i<rowcount; i++) {
+		for (int i=0; i<rowbuffercount; i++) {
 			delete[] fieldlengths[i];
 		}
 		delete[] fieldlengths;
@@ -1322,7 +1336,8 @@ void	sqlrcursor::cacheData() {
 	}
 
 	// write the data to the cache file
-	for (int i=0; i<rowcount-firstrowindex; i++) {
+	int	rowbuffercount=rowcount-firstrowindex;
+	for (int i=0; i<rowbuffercount; i++) {
 
 		// get the current offset in the cache destination file
 		long	position=lseek(cachedestfd,0,SEEK_CUR);
@@ -1418,10 +1433,10 @@ char	*sqlrcursor::getField(int row, int col) {
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
 		// may have to be fetched into the buffer...
-		int	whichrow=fetchRowIntoBuffer(row);
+		int	rowbufferindex=fetchRowIntoBuffer(row);
 
-		if (whichrow>-1) {
-			char	*retval=getFieldInternal(whichrow,col);
+		if (rowbufferindex>-1) {
+			char	*retval=getFieldInternal(rowbufferindex,col);
 			return retval;
 		}
 	}
@@ -1440,10 +1455,11 @@ char	*sqlrcursor::getField(int row, const char *col) {
 				// result set instead of buffering the entire 
 				// thing, the requested row may have to be 
 				// fetched into the buffer...
-				int	whichrow=fetchRowIntoBuffer(row);
+				int	rowbufferindex=fetchRowIntoBuffer(row);
 
-				if (whichrow>-1) {
-					return getFieldInternal(whichrow,i);
+				if (rowbufferindex>-1) {
+					return getFieldInternal(
+							rowbufferindex,i);
 				}
 				return NULL;
 			}
@@ -1460,10 +1476,10 @@ long	sqlrcursor::getFieldLength(int row, int col) {
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
 		// may have to be fetched into the buffer...
-		int	whichrow=fetchRowIntoBuffer(row);
+		int	rowbufferindex=fetchRowIntoBuffer(row);
 
-		if (whichrow>-1) {
-			return getFieldLengthInternal(whichrow,col);
+		if (rowbufferindex>-1) {
+			return getFieldLengthInternal(rowbufferindex,col);
 		}
 	}
 	return -1;
@@ -1482,11 +1498,11 @@ long	sqlrcursor::getFieldLength(int row, const char *col) {
 				// result set instead of buffering the entire 
 				// thing, the requested row may have to be 
 				// fetched into the buffer...
-				int	whichrow=fetchRowIntoBuffer(row);
+				int	rowbufferindex=fetchRowIntoBuffer(row);
 
-				if (whichrow>-1) {
-					return getFieldLengthInternal(whichrow,
-									i);
+				if (rowbufferindex>-1) {
+					return getFieldLengthInternal(
+							rowbufferindex,i);
 				}
 				return -1;
 			}
@@ -1502,13 +1518,13 @@ char	**sqlrcursor::getRow(int row) {
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
 		// may have to be fetched into the buffer...
-		int	whichrow=fetchRowIntoBuffer(row);
+		int	rowbufferindex=fetchRowIntoBuffer(row);
 
-		if (whichrow>-1) {
+		if (rowbufferindex>-1) {
 			if (!fields) {
 				createFields();
 			}
-			return fields[whichrow];
+			return fields[rowbufferindex];
 		}
 	}
 	return NULL;
@@ -1521,13 +1537,13 @@ long	*sqlrcursor::getRowLengths(int row) {
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
 		// may have to be fetched into the buffer...
-		int	whichrow=fetchRowIntoBuffer(row);
+		int	rowbufferindex=fetchRowIntoBuffer(row);
 
-		if (whichrow>-1) {
+		if (rowbufferindex>-1) {
 			if (!fieldlengths) {
 				createFieldLengths();
 			}
-			return (long *)fieldlengths[whichrow];
+			return (long *)fieldlengths[rowbufferindex];
 		}
 	}
 	return NULL;
@@ -1548,9 +1564,14 @@ void	sqlrcursor::createExtraRowArray() {
 }
 
 void	sqlrcursor::createFields() {
-	fields=new char **[rowcount+1];
-	fields[rowcount]=(char **)NULL;
-	for (int i=0; i<rowcount; i++) {
+	// lets say that rowcount=5 and firstrowindex=3,
+	// the fields array will contain 2 elements:
+	// 	fields[0] (corresponding to row 3) and
+	// 	fields[1] (corresponding to row 4)
+	int	rowbuffercount=rowcount-firstrowindex;
+	fields=new char **[rowbuffercount+1];
+	fields[rowbuffercount]=(char **)NULL;
+	for (int i=0; i<rowbuffercount; i++) {
 		fields[i]=new char *[colcount+1];
 		fields[i][colcount]=(char *)NULL;
 		for (int j=0; j<colcount; j++) {
@@ -1560,9 +1581,14 @@ void	sqlrcursor::createFields() {
 }
 
 void	sqlrcursor::createFieldLengths() {
-	fieldlengths=new unsigned long *[rowcount+1];
-	fieldlengths[rowcount]=(unsigned long)NULL;
-	for (int i=0; i<rowcount; i++) {
+	// lets say that rowcount=5 and firstrowindex=3,
+	// the fieldlengths array will contain 2 elements:
+	// 	fieldlengths[0] (corresponding to row 3) and
+	// 	fieldlengths[1] (corresponding to row 4)
+	int	rowbuffercount=rowcount-firstrowindex;
+	fieldlengths=new unsigned long *[rowbuffercount+1];
+	fieldlengths[rowbuffercount]=(unsigned long)NULL;
+	for (int i=0; i<rowbuffercount; i++) {
 		fieldlengths[i]=new unsigned long[colcount+1];
 		fieldlengths[i][colcount]=(unsigned long)NULL;
 		for (int j=0; j<colcount; j++) {
@@ -1755,7 +1781,7 @@ int	sqlrcursor::parseData() {
 	firstrowindex=rowcount;
 
 	// keep track of how large the buffer is
-	int	rsbuffercount=0;
+	int	rowbuffercount=0;
 
 	// get rows
 	for (;;) {
@@ -1786,12 +1812,17 @@ int	sqlrcursor::parseData() {
 		// buffer counter and total row counter
 		if (colindex==0) {
 
-			if (rowcount<OPTIMISTIC_ROW_COUNT) {
+			if (rowbuffercount<OPTIMISTIC_ROW_COUNT) {
 				if (!rows) {
 					createRowBuffers();
 				}
-				currentrow=rows[rsbuffercount];
+				currentrow=rows[rowbuffercount];
 			} else {
+				if (sqlrc->debug) {
+					sqlrc->debugPreStart();
+					sqlrc->debugPrint("Creating extra rows.\n");
+					sqlrc->debugPreEnd();
+				}
 				if (!firstextrarow) {
 					currentrow=new row(colcount);
 					firstextrarow=currentrow;
@@ -1804,7 +1835,7 @@ int	sqlrcursor::parseData() {
 				currentrow->resize(colcount);
 			}
 
-			rsbuffercount++;
+			rowbuffercount++;
 			rowcount++;
 		}
 
@@ -1910,6 +1941,9 @@ int	sqlrcursor::parseData() {
 			}
 		}
 
+		// tag the column as a long data type or not
+		currentcol->longdatatype=(type==END_LONG_DATA)?1:0;
+
 		// move to the next column, handle end of row 
 		colindex++;
 		if (colindex==colcount) {
@@ -1923,15 +1957,14 @@ int	sqlrcursor::parseData() {
 			}
 
 			// check to see if we've gotten enough rows
-			if (rsbuffersize && 
-				rsbuffercount==rsbuffersize) {
+			if (rsbuffersize && rowbuffercount==rsbuffersize) {
 				break;
 			}
 		}
 	}
 
 	// terminate the row list
-	if (rowcount>=OPTIMISTIC_ROW_COUNT && currentrow) {
+	if (rowbuffercount>=OPTIMISTIC_ROW_COUNT && currentrow) {
 		currentrow->next=NULL;
 		createExtraRowArray();
 	}
@@ -2175,7 +2208,7 @@ void	sqlrcursor::cacheOutputBinds(int count) {
 
 void	sqlrcursor::suspendCaching() {
 
-	if (!cachedestfd) {
+	if (cachedestfd==-1) {
 		return ;
 	}
 
@@ -2498,7 +2531,7 @@ void	sqlrcursor::abortResultSet() {
 	}
 
 	if (sqlrc->connected || cached) {
-		if (cachedestfd && cachedestindfd) {
+		if (cachedestfd>-1 && cachedestindfd>-1) {
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("Getting the rest of the result set, since this is a cached result set.\n");
@@ -2735,8 +2768,11 @@ void	sqlrcursor::sendInputBinds() {
 			}
 		} else if (inbindvars[i].type==LONG_BIND) {
 			// send the value
-			sqlrc->write((unsigned long)inbindvars[i].
-								value.longval);
+			char	negative=inbindvars[i].value.longval<0?1:0;
+			sqlrc->write(negative);
+			sqlrc->write((unsigned long)
+					(inbindvars[i].value.longval*
+					 		((negative)?-1:1)));
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint(":LONG)=");
@@ -2915,9 +2951,11 @@ void	sqlrcursor::clearColumns() {
 		char	*colname;
 		for (int i=0; i<colcount; i++) {
 			colname=getColumn(i)->name;
-			colstorage->free();
 		}
 	}
+
+	// reset the column storage pool
+	colstorage->free();
 
 	// reset the column count
 	previouscolcount=colcount;
@@ -3269,7 +3307,7 @@ void	sqlrcursor::inputBind(const char *variable, const char *value) {
 	}
 }
 
-void	sqlrcursor::inputBind(const char *variable, unsigned long value) {
+void	sqlrcursor::inputBind(const char *variable, long value) {
 	if (inbindcount<MAXVAR && variable && variable[0]) {
 		longVar(&inbindvars[inbindcount],variable,value);
 		inbindvars[inbindcount].send=1;
@@ -3474,23 +3512,18 @@ void	sqlrcursor::defineOutputBindGeneric(const char *variable,
 				bindtype type, unsigned long valuesize) {
 
 	if (outbindcount<MAXVAR && variable && variable[0]) {
+
+		// clean up old values
+		if (outbindvars[outbindcount].type==STRING_BIND) {
+			delete[] outbindvars[outbindcount].value.stringval;
+		} else if (outbindvars[outbindcount].type==BLOB_BIND ||
+			outbindvars[outbindcount].type==CLOB_BIND) {
+			delete[] outbindvars[outbindcount].value.lobval;
+		}
 		if (copyrefs) {
-
-			// clean up old variable
+			// clean up old variable and set new variable
 			delete[] outbindvars[outbindcount].variable;
-
-			// set new variable
 			outbindvars[outbindcount].variable=strdup(variable);
-
-			// clean up old values
-			if (outbindvars[outbindcount].type==STRING_BIND) {
-				delete[] outbindvars[outbindcount].
-							value.stringval;
-			} else if (outbindvars[outbindcount].type==BLOB_BIND ||
-				outbindvars[outbindcount].type==CLOB_BIND) {
-				delete[] outbindvars[outbindcount].
-							value.lobval;
-			}
 
 		} else {
 			outbindvars[outbindcount].variable=(char *)variable;
@@ -3741,6 +3774,10 @@ int	sqlrcursor::fetchFromBindCursor() {
 		return 0;
 	}
 
+	// FIXME: should these be here?
+	clearVariables();
+	clearResultSet();
+
 	cached=0;
 	endofresultset=0;
 
@@ -3900,6 +3937,9 @@ int	sqlrcursor::sendQueryInternal(const char *query) {
 		sqlrc->debugPrint("Sending Query:");
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPrint(query);
+		sqlrc->debugPrint("\n");
+		sqlrc->debugPrint("Length: ");
+		sqlrc->debugPrint((long)querylen);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}

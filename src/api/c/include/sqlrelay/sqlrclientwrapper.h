@@ -192,7 +192,7 @@ void	sqlrcur_clearBinds(sqlrcur sqlrcurref);
 void	sqlrcur_inputBindString(sqlrcur sqlrcurref, 
 				const char *variable, const char *value);
 void	sqlrcur_inputBindLong(sqlrcur sqlrcurref, const char *variable, 
-						unsigned long value);
+							long value);
 void	sqlrcur_inputBindDouble(sqlrcur sqlrcurref, 
 					const char *variable, double value,
 					unsigned short precision, 
@@ -204,15 +204,21 @@ void	sqlrcur_inputBindClob(sqlrcur sqlrcurref,
 					const char *variable, const char *value,
 					unsigned long size);
 			/* Define an input bind variable. */
+
 void	sqlrcur_defineOutputBind(sqlrcur sqlrcurref, const char *variable, 
 							unsigned long length);
+			/* Define an output bind variable.
+			  "length" bytes will be reserved to store the value. */
 void	sqlrcur_defineOutputBindBlob(sqlrcur sqlrcurref,
 					const char *variable);
+			/* Define a BLOB output bind variable */
 void	sqlrcur_defineOutputBindClob(sqlrcur sqlrcurref,
 					const char *variable);
+			/* Define a CLOB output bind variable */
 void	sqlrcur_defineOutputBindCursor(sqlrcur sqlrcurref,
 					const char *variable);
-			/* Define an output bind variable. */
+			/* Define a cursor output bind variable */
+
 void	sqlrcur_subStrings(sqlrcur sqlrcurref,
 				const char **variables, const char **values);
 void	sqlrcur_subLongs(sqlrcur sqlrcurref,

@@ -31,6 +31,17 @@ public class SQLRCursor {
 	public native void	dontGetColumnInfo();
 	/** Tells the server to send column info.  */
 	public native void	getColumnInfo();
+
+
+	/** Columns names are returned in the same
+	 *  case as they are defined in the database.
+	 *  This is the default. */
+	public native void	mixedCaseColumnNames();
+	/** Columns names are converted to upper case. */
+	public native void	upperCaseColumnNames();
+	/** Columns names are converted to lower case. */
+	public native void	lowerCaseColumnNames();
+
 	/** Sets query caching on.  Future queries
 	 *  will be cached to the file "filename".
 	 * 
@@ -43,16 +54,6 @@ public class SQLRCursor {
 	 *  to cacheToFile() changes which file to
 	 *  cache to or a call to cacheOff() turns off
 	 *  caching.  */
-
-	public native void	mixedCaseColumnNames();
-	/** Columns names are returned in the same
-	 *  case as they are defined in the database.
-	 *  This is the default. */
-	public native void	upperCaseColumnNames();
-	/** Columns names are converted to upper case. */
-	public native void	lowerCaseColumnNames();
-	/** Columns names are converted to lower case. */
-
 	public native void	cacheToFile(String filename);
 	/** Sets the time-to-live for cached result
 	 *  sets. The sqlr-cachemanger will remove each 

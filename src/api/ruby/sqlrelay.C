@@ -351,8 +351,7 @@ static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
 			rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
-		sqlrcur->inputBind(STR2CSTR(variable),
-					(unsigned long)NUM2INT(value));
+		sqlrcur->inputBind(STR2CSTR(variable),NUM2INT(value));
 	} else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
 		sqlrcur->inputBind(STR2CSTR(variable),NUM2DBL(value), 
 					(unsigned short)NUM2INT(precision),
@@ -489,8 +488,7 @@ static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
 			rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
-			sqlrcur->inputBind(STR2CSTR(variable),
-					(unsigned long)NUM2INT(value));
+			sqlrcur->inputBind(STR2CSTR(variable),NUM2INT(value));
 		} else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
 			sqlrcur->inputBind(STR2CSTR(variable),NUM2DBL(value), 
 					(unsigned short)NUM2INT(precision),

@@ -58,6 +58,8 @@ $con=Firstworks::SQLRConnection->new($ARGV[0],$ARGV[1],
 				$ARGV[2],$ARGV[3],$ARGV[4],0,1);
 $cur=Firstworks::SQLRCursor->new($con);
 
+for (;;) {
+
 # get database type
 print("IDENTIFY: \n");
 checkSuccessString($con->identify(),"oracle8");
@@ -763,7 +765,7 @@ print("LONG CLOB: \n");
 $cur->sendQuery("drop table testtable2");
 $cur->sendQuery("create table testtable2 (testclob clob)");
 $cur->prepareQuery("insert into testtable2 values (:clobval)");
-$clobval;
+$clobval="";
 for ($i=0; $i<70*1024; $i++) {
 	$clobval=$clobval.'C';
 }
@@ -777,6 +779,55 @@ checkSuccess($cur->executeQuery(),1);
 $clobbindvar=$cur->getOutputBind("clobbindval");
 checkSuccess($cur->getOutputBindLength("clobbindval"),70*1024);
 checkSuccess($clobval,$clobbindvar);
+$cur->sendQuery("delete from testtable2");
+print("\n");
+$cur->prepareQuery("insert into testtable2 values (:clobval)");
+$clobval="";
+for ($i=0; $i<70*1024; $i++) {
+	$clobval=$clobval.'C';
+}
+$cur->inputBindClob("clobval",$clobval,70*1024);
+checkSuccess($cur->executeQuery(),1);
+$cur->sendQuery("select testclob from testtable2");
+checkSuccess($clobval,$cur->getField(0,"testclob"));
+$cur->prepareQuery("begin select testclob into :clobbindval from testtable2; end;");
+$cur->defineOutputBindClob("clobbindval");
+checkSuccess($cur->executeQuery(),1);
+$clobbindvar=$cur->getOutputBind("clobbindval");
+checkSuccess($cur->getOutputBindLength("clobbindval"),70*1024);
+checkSuccess($clobval,$clobbindvar);
+$cur->sendQuery("drop table testtable2");
+print("\n");
+
+print("LONG OUTPUT BIND\n");
+$cur->sendQuery("drop table testtable2");
+$cur->sendQuery("create table testtable2 (testval varchar2(4000))");
+$testval="";
+$cur->prepareQuery("insert into testtable2 values (:testval)");
+for ($i=0; $i<4000; $i++) {
+	$testval=$testval.'C';
+}
+$cur->inputBind("testval",$testval);
+checkSuccess($cur->executeQuery(),1);
+$cur->sendQuery("select testval from testtable2");
+checkSuccess($testval,$cur->getField(0,"testval"));
+$query="begin :bindval:='".$testval."'; end;";
+$cur->prepareQuery($query);
+$cur->defineOutputBind("bindval",4000);
+checkSuccess($cur->executeQuery(),1);
+$bindval=$cur->getOutputBind("bindval");
+checkSuccess($cur->getOutputBindLength("bindval"),4000);
+checkSuccess($bindval,$testval);
+$cur->sendQuery("drop table testtable2");
+print("\n");
+
+print("NEGATIVE INPUT BIND\n");
+$cur->sendQuery("create table testtable2 (testval number)");
+$cur->prepareQuery("insert into testtable2 values (:testval)");
+$cur->inputBind("testval",-1);
+checkSuccess($cur->executeQuery(),1);
+$cur->sendQuery("select testval from testtable2");
+checkSuccess($cur->getField(0,"testval"),"-1");
 $cur->sendQuery("drop table testtable2");
 print("\n");
 
@@ -802,4 +853,4 @@ checkSuccess($cur->sendQuery("create table testtable"),0);
 print("\n");
 
 
-
+}

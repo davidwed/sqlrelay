@@ -196,8 +196,9 @@ class sqlrcursor {
 					unsigned short precision, 
 					unsigned short scale);
 				// Define a substitution variable.
+
 		void	inputBind(const char *variable, const char *value);
-		void	inputBind(const char *variable, unsigned long value);
+		void	inputBind(const char *variable, long value);
 		void	inputBind(const char *variable, double value, 
 					unsigned short precision, 
 					unsigned short scale);
@@ -206,12 +207,18 @@ class sqlrcursor {
 		void	inputBindClob(const char *variable, const char *value,
 						unsigned long size);
 				// Define an input bind variable.
+
 		void	defineOutputBind(const char *variable,
 					unsigned long bufferlength);
-		void	defineOutputBindBlob(const char *variable);
-		void	defineOutputBindClob(const char *variable);
-		void	defineOutputBindCursor(const char *variable);
 				// Define an output bind variable.
+				// "bufferlength" bytes will be reserved
+				// to store the value.
+		void	defineOutputBindBlob(const char *variable);
+				// Define a BLOB output bind variable.
+		void	defineOutputBindClob(const char *variable);
+				// Define a CLOB output bind variable.
+		void	defineOutputBindCursor(const char *variable);
+				// Define a cursor output bind variable.
 
 		void	substitutions(const char **variables,
 						const char **values);

@@ -1,4 +1,9 @@
-document new lago patch
+forked listeners need to close handoff file descriptors
+handoff=pass does not work with dynamic scaling
+
+docs and tests for clob/blob/cursor bind methods and upper/lower/mixed column
+	case methods for non c++/perl api's
+
 incorporate postgresql column type query
 If a connection dies mysteriously, a new one should fire up.
 maximum allowed clob bind value length should be configurable
@@ -27,8 +32,6 @@ interbase directions for using gsec don't work for me
 interbase docs aren't available at the link in gettingstarted/interbase.html
 db2 startup directions are wrong, you have to run db2start/db2stop as db2as
 sybase startup can fail because LANG is set funny - need note in docs
-document upper/lower/mixed column case methods
-document clob/blob/cursor bind methods
 fix documents to reflect java package
 
 Tests:

@@ -205,12 +205,20 @@ and will be immediately available to clients.</p>
 restarting everything with that ID.</p>
 
 <p>The <b>sqlr-stop</b> command is provided to kill running daemons.  It accepts
-a single argument, the id of the instance to kill.  Running it kills anything 
-with "sqlr-" and that id in it's name.  It uses grep, so it's not perfect. If 
-you have id's like "web" and "webster" and run "sqlr-stop web" then it will 
-kill both of them.  Running it with no arguments will kill all <b>SQL Relay</b>
-processes.</p>
+two optional arguments: the id of the instance to kill and SIGKILL.</p>
 
+<blockquote><b>sqlr-stop [id] [SIGKILL]</b></blockquote>
+
+<p>Running it kills anything with "sqlr-" and the supplied id in it's name.  It
+uses grep, so it's not perfect. If you have id's like "web" and "webster" and
+run "sqlr-stop web" then it will kill both of them.  Running it with no
+arguments will kill all <b>SQL Relay</b> processes.</p>
+
+<p>Supplying sqlr-stop with the SIGKILL option will cause it to pass the -9
+option to the kill command.  It is not possible to supply the SIGKILL option
+without supplying an id.  Note that when the SIGKILL option is used, semaphores
+and shared memory segments will be left lying around and will need to be
+cleaned up.  Use the <b>ipcs</b> and <b>ipcrm</b> commands to clean them up.</p>
 
 <a name="cmdline"></a>
 <span class="heading2">Using the Command Line Interfaces:</span><br><br>

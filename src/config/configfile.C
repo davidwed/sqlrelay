@@ -8,6 +8,7 @@
 #include <defaults.h>
 
 #include <rudiments/permissions.h>
+#include <stdio.h>
 
 configfile::configfile() {
 	doc=NULL;
@@ -289,6 +290,9 @@ instance::instance(xmldomnode *instancenode) {
 
 	next=NULL;
 	previous=NULL;
+
+	firstuser=NULL;
+	firstconnection=NULL;
 
 	// create the list of users
 	users=instancenode->getChild("users");

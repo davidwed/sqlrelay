@@ -4,7 +4,7 @@ top_srcdir = ../../..
 INSTALL = $(top_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB)
+LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 all: 
 	if ( test -n "$(ORACLELIBS)" ); then \
@@ -32,7 +32,7 @@ sqlr-connection-oracle8: oracle8connection.C oracle8connection.o main.C main.o
 	$(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ oracle8connection.o main.o $(ORACLELIBS) -L../../connection -lsqlrconnection $(LIBS)
 
 sqlr-connection-oracle8-debug: oracle8connection.C oracle8connection_debug.o main.C main_debug.o 
-	$(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ oracle8connection_debug.o main_debug.o $(ORACLELIBS) -L../../connection -lsqlrconnection_debug $(LIBS) -lefence
+	$(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ oracle8connection_debug.o main_debug.o $(ORACLELIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
 
 install:
 	$(top_srcdir)/mkinstalldirs $(bindir)

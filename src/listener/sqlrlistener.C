@@ -245,10 +245,9 @@ int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	sprintf(idfilename,"%s/%s",tmpdir->getString(),id);
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),0,
-				"creating shared memory and semaphores");
-	debugPrint(logger::logHeader("connection"),0,"id filename: ");
-	debugPrint(logger::logHeader("connection"),0,idfilename);
+	debugPrint("listener",0,"creating shared memory and semaphores");
+	debugPrint("listener",0,"id filename: ");
+	debugPrint("listener",0,idfilename);
 	#endif
 
 	// make sure that the file exists and is read/writeable
@@ -274,8 +273,7 @@ int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	// create the shared memory segment
 	// FIXME: if it already exists, attempt to remove and re-create it
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,
-					"creating shared memory...");
+	debugPrint("listener",1,"creating shared memory...");
 	#endif
 	idmemory=new sharedmemory();
 	if (!idmemory->create(key,sizeof(unsigned int)+1024+
@@ -292,8 +290,7 @@ int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	// create (or connect) to the semaphore set
 	// FIXME: if it already exists, attempt to remove and re-create it
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("connection"),1,
-					"creating semaphores...");
+	debugPrint("listener",1,"creating semaphores...");
 	#endif
 	int	vals[10]={1,1,0,0,1,1,0,0,0,1};
 	semset=new semaphoreset();
@@ -611,13 +608,11 @@ void	sqlrlistener::blockSignals() {
 int	sqlrlistener::waitForData() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-				"waiting for client connection...");
+	debugPrint("listener",0,"waiting for client connection...");
 	#endif
-	int	fd=listener::waitForData(-1,-1);
+	int	fd=listener::waitForNonBlockingRead(-1,-1);
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-				"done waiting for client connection");
+	debugPrint("listener",0,"done waiting for client connection");
 	#endif
 
 	return fd;
@@ -674,7 +669,7 @@ void	sqlrlistener::handleClientConnection(int fd) {
 void	sqlrlistener::registerHandoff(datatransport *sock) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,"registering handoff...");
+	debugPrint("listener",0,"registering handoff...");
 	#endif
 
 	// get the connection daemon's pid
@@ -696,16 +691,14 @@ void	sqlrlistener::registerHandoff(datatransport *sock) {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-				"done registering handoff...");
+	debugPrint("listener",0,"done registering handoff...");
 	#endif
 }
 
 void	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-				"de-registering handoff...");
+	debugPrint("listener",0,"de-registering handoff...");
 	#endif
 
 	// get the connection daemon's pid
@@ -718,7 +711,7 @@ void	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 			handoffsocklist[i]->pid=0;
 			delete handoffsocklist[i]->sock;
 			#ifdef SERVER_DEBUG
-			debugPrint(logger::logHeader("listener"),0,
+			debugPrint("listener",0,
 					"done de-registering handoff...");
 			#endif
 			return;
@@ -729,16 +722,14 @@ void	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 	delete clientsock;
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-				"done de-registering handoff...");
+	debugPrint("listener",0,"done de-registering handoff...");
 	#endif
 }
 
 int	sqlrlistener::deniedIp() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-				"checking for valid ip...");
+	debugPrint("listener",0,"checking for valid ip...");
 	#endif
 
 	char	*ip;
@@ -746,7 +737,7 @@ int	sqlrlistener::deniedIp() {
 			(!allowed || (allowed && !allowed->match(ip)))) {
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("listener"),0,"invalid ip...");
+		debugPrint("listener",0,"invalid ip...");
 		#endif
 
 		delete[] ip;
@@ -754,7 +745,7 @@ int	sqlrlistener::deniedIp() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,"valid ip...");
+	debugPrint("listener",0,"valid ip...");
 	#endif
 
 	delete[] ip;
@@ -794,7 +785,7 @@ void	sqlrlistener::forkChild() {
 	#ifdef SERVER_DEBUG
 	char	debugstring[16+6];
 	sprintf(debugstring,"forked a child: %d",childpid);
-	debugPrint(logger::logHeader("listener"),0,debugstring);
+	debugPrint("listener",0,debugstring);
 	#endif
 
 
@@ -835,8 +826,7 @@ void	sqlrlistener::clientSession() {
 int	sqlrlistener::getAuth() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-					"getting authentication...");
+	debugPrint("listener",0,"getting authentication...");
 	#endif
 
 	// Get the user/password. For either one, if they are too big or
@@ -846,7 +836,7 @@ int	sqlrlistener::getAuth() {
 	char		userbuffer[USERSIZE+1];
 	if (size>USERSIZE || clientsock->read(userbuffer,size)!=size) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("listener"),0,
+		debugPrint("listener",0,
 			"authentication failed: user size is wrong");
 		#endif
 		return -1;
@@ -857,7 +847,7 @@ int	sqlrlistener::getAuth() {
 	clientsock->read(&size);
 	if (size>USERSIZE || clientsock->read(passwordbuffer,size)!=size) {
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("listener"),0,
+		debugPrint("listener",0,
 			"authentication failed: password size is wrong");
 		#endif
 		return -1;
@@ -873,10 +863,10 @@ int	sqlrlistener::getAuth() {
 		int	retval=authc->authenticate(userbuffer,passwordbuffer);
 		#ifdef SERVER_DEBUG
 		if (retval) {
-			debugPrint(logger::logHeader("listener"),1,
+			debugPrint("listener",1,
 				"listener-based authentication succeeded");
 		} else {
-			debugPrint(logger::logHeader("listener"),1,
+			debugPrint("listener",1,
 				"listener-based authentication failed: invalid user/password");
 		}
 		#endif
@@ -884,8 +874,7 @@ int	sqlrlistener::getAuth() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-				"done getting authentication");
+	debugPrint("listener",0,"done getting authentication");
 	#endif
 
 	return 1;
@@ -894,8 +883,7 @@ int	sqlrlistener::getAuth() {
 void	sqlrlistener::incrementSessionCount() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-					"inrementing session count...");
+	debugPrint("listener",0,"incrementing session count...");
 	#endif
 
 	// wait for access
@@ -908,7 +896,7 @@ void	sqlrlistener::incrementSessionCount() {
 	(*sessioncount)++;
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),1,(long)(*sessioncount));
+	debugPrint("listener",1,(long)(*sessioncount));
 	#endif
 
 	if (dynamicscaling) {
@@ -923,8 +911,7 @@ void	sqlrlistener::incrementSessionCount() {
 	semset->signal(5);
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-				"done inrementing session count");
+	debugPrint("listener",0,"done incrementing session count");
 	#endif
 }
 
@@ -963,7 +950,7 @@ int	sqlrlistener::handOffClient() {
 void	sqlrlistener::getAConnection() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,"getting a connection...");
+	debugPrint("listener",0,"getting a connection...");
 	#endif
 
 	// wait on the read mutex
@@ -981,7 +968,7 @@ void	sqlrlistener::getAConnection() {
 	if (passdescriptor) {
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("listener"),1,"handoff=pass");
+		debugPrint("listener",1,"handoff=pass");
 		#endif
 
 		// get the pid
@@ -990,7 +977,7 @@ void	sqlrlistener::getAConnection() {
 	} else {
 
 		#ifdef SERVER_DEBUG
-		debugPrint(logger::logHeader("listener"),1,"handoff=reconnect");
+		debugPrint("listener",1,"handoff=reconnect");
 		#endif
 
 		// buffer to hold the port
@@ -1013,7 +1000,7 @@ void	sqlrlistener::getAConnection() {
 		#ifdef SERVER_DEBUG
 		char	debugstring[15+unixportstrlen+21];
 		sprintf(debugstring,"socket=%s  port=%d",unixportstr,inetport);
-		debugPrint(logger::logHeader("listener"),1,debugstring);
+		debugPrint("listener",1,debugstring);
 		#endif
 
 	}
@@ -1025,7 +1012,7 @@ void	sqlrlistener::getAConnection() {
 	semset->signal(1);
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),1,"done getting a connection");
+	debugPrint("listener",1,"done getting a connection");
 	#endif
 	
 }
@@ -1033,7 +1020,7 @@ void	sqlrlistener::getAConnection() {
 int	sqlrlistener::passDescriptor() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),1,"passing descriptor...");
+	debugPrint("listener",1,"passing descriptor...");
 	#endif
 
 	// Look through the list of handoff sockets for the pid of the 
@@ -1050,7 +1037,7 @@ int	sqlrlistener::passDescriptor() {
 					clientsock->getFileDescriptor())) {
 
 				#ifdef SERVER_DEBUG
-				debugPrint(logger::logHeader("listener"),0,
+				debugPrint("listener",0,
 					"done passing descriptor");
 				#endif
 				return 1;
@@ -1062,8 +1049,7 @@ int	sqlrlistener::passDescriptor() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint(logger::logHeader("listener"),0,
-					"passing descriptor failed");
+	debugPrint("listener",0,"passing descriptor failed");
 	#endif
 	return 0;
 }

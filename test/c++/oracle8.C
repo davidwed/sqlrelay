@@ -110,7 +110,9 @@ int	main(int argc, char **argv) {
 	// instantiation
 	con=new sqlrconnection(argv[1],atoi(argv[2]), 
 					argv[3],argv[4],argv[5],0,1);
+	//con->copyReferences();
 	cur=new sqlrcursor(con);
+	//cur->copyReferences();
 
 	// get database type
 	printf("IDENTIFY: \n");
@@ -725,7 +727,9 @@ int	main(int argc, char **argv) {
 	secondcon=new sqlrconnection(argv[1],
 				atoi(argv[2]), 
 				argv[3],argv[4],argv[5],0,1);
+	//secondcon->copyReferences();
 	secondcur=new sqlrcursor(secondcon);
+	//secondcur->copyReferences();
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,0),"0");
 	checkSuccess(con->commit(),1);
@@ -818,6 +822,40 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 
+	printf("LONG OUTPUT BIND\n");
+	cur->sendQuery("drop table testtable2");
+	cur->sendQuery("create table testtable2 (testval varchar2(4000))");
+	char	testval[4001];
+	testval[4000]=(char)NULL;
+	cur->prepareQuery("insert into testtable2 values (:testval)");
+	for (int i=0; i<4000; i++) {
+		testval[i]='C';
+	}
+	cur->inputBind("testval",testval);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("select testval from testtable2");
+	checkSuccess(testval,cur->getField(0,"testval"));
+	char	query[4000+25];
+	sprintf(query,"begin :bindval:='%s'; end;",testval);
+	cur->prepareQuery(query);
+	cur->defineOutputBind("bindval",4000);
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBindLength("bindval"),4000);
+	checkSuccess(cur->getOutputBind("bindval"),testval);
+	cur->sendQuery("drop table testtable2");
+	printf("\n");
+
+	printf("NEGATIVE INPUT BIND\n");
+	cur->sendQuery("create table testtable2 (testval number)");
+	cur->prepareQuery("insert into testtable2 values (:testval)");
+	cur->inputBind("testval",-1);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("select testval from testtable2");
+	checkSuccess(cur->getField(0,"testval"),"-1");
+	cur->sendQuery("drop table testtable2");
+	printf("\n");
+
+
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 
@@ -838,6 +876,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	printf("\n");
+
 
 	delete cur;
 	delete con;

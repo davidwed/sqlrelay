@@ -415,7 +415,7 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
   } else if (PyString_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value));
   } else if (PyInt_Check(value)) {
-    ((sqlrcursor *)sqlrcur)->inputBind(variable, (unsigned long)PyInt_AsLong(value));
+    ((sqlrcursor *)sqlrcur)->inputBind(variable, (long)PyInt_AsLong(value));
   } else if (PyFloat_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (double)PyFloat_AsDouble(value), (unsigned short)precision, (unsigned short)scale);
   }

@@ -17,7 +17,7 @@ enum bindtype {
 class bindvar {
 	friend class sqlrcursor;
 	private:
-		char		*variable;
+		char	*variable;
 		union {
 			char	*stringval;
 			long	longval;
@@ -27,7 +27,7 @@ class bindvar {
 				unsigned short	scale;
 			} doubleval;
 			char	*lobval;
-			short	cursorid;
+			unsigned short	cursorid;
 		} value;
 		unsigned long	valuesize;
 		bindtype	type;

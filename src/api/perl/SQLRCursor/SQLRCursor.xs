@@ -121,7 +121,7 @@ sqlrcursor::inputBind(variable,...)
 		char *variable
 	CODE:
 		if (SvIOK(ST(2))) {
-			THIS->inputBind(variable,(unsigned long)SvIV(ST(2)));
+			THIS->inputBind(variable,(long)SvIV(ST(2)));
 		} else if (SvNOK(ST(2))) {
 			THIS->inputBind(variable,(double)SvNV(ST(2)),
 						(unsigned short)SvIV(ST(3)),

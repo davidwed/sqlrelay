@@ -10,9 +10,9 @@ class debugfile {
 		void	openDebugFile(const char *name,
 					const char *localstatedir);
 		void	closeDebugFile();
-		void	debugPrint(const char *header,
-					int tabs, const char *string);
-		void	debugPrint(const char *header, int tabs, long number);
+		void	debugPrint(const char *name, int tabs,
+						const char *string);
+		void	debugPrint(const char *name, int tabs, long number);
 		void	debugPrintBlob(const char *blob, unsigned long length);
 		void	debugPrintClob(const char *clob, unsigned long length);
 		logger	*getDebugLogger();

@@ -61,6 +61,8 @@ class scaler : public daemonprocess {
 		int		currentseed;
 
 		int		init;
+
+		int		debug;
 };
 
 #endif

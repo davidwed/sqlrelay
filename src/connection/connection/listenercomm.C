@@ -27,8 +27,7 @@ void	listenercomm::announceAvailability(char *tmpdir,
 					unsigned short inetport) {
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-						"announcing availability...");
+	dl->write("connection",0,"announcing availability...");
 	#endif
 
 	// if we're passing around file descriptors, connect to listener 
@@ -53,15 +52,15 @@ void	listenercomm::announceAvailability(char *tmpdir,
 	if (passdescriptor) {
 
 		#ifdef SERVER_DEBUG
-		dl->write(logger::logHeader("connection"),1,"handoff=pass");
+		dl->write("connection",1,"handoff=pass");
 		#endif
 
 		*((unsigned long *)idmemoryptr)=(unsigned long)getpid();
+printf("connectionpid=%d\n",getpid());
 	} else {
 
 		#ifdef SERVER_DEBUG
-		dl->write(logger::logHeader("connection"),1,
-							"handoff=reconnect");
+		dl->write("connection",1,"handoff=reconnect");
 		#endif
 
 		int	unixsocketlen=strlen(unixsocket);
@@ -82,16 +81,14 @@ void	listenercomm::announceAvailability(char *tmpdir,
 	ipcptr->releaseAnnounceMutex();
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"done announcing availability...");
+	dl->write("connection",0,"done announcing availability...");
 	#endif
 }
 
 void	listenercomm::registerForHandoff(char *tmpdir) {
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"registering for handoff...");
+	dl->write("connection",0,"registering for handoff...");
 	#endif
 
 	// construct the name of the socket to connect to
@@ -102,7 +99,7 @@ void	listenercomm::registerForHandoff(char *tmpdir) {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[17+strlen(handoffsockname)+1];
 	sprintf(string,"handoffsockname: %s",handoffsockname);
-	dl->write(logger::logHeader("connection"),1,string);
+	dl->write("connection",1,string);
 	delete[] string;
 	#endif
 
@@ -112,14 +109,13 @@ void	listenercomm::registerForHandoff(char *tmpdir) {
 	while (1) {
 
 		#ifdef SERVER_DEBUG
-		dl->write(logger::logHeader("connection"),1,"trying...");
+		dl->write("connection",1,"trying...");
 		#endif
 
 		handoffsockun=new unixclientsocket();
 		handoffsockun->connectToServer(handoffsockname,1,0);
-		if (handoffsockun->write(
-				(unsigned long)getpid())==
-					sizeof(unsigned long)) {
+		if (handoffsockun->write((unsigned long)getpid())==
+						sizeof(unsigned long)) {
 			break;
 		}
 		deRegisterForHandoff(tmpdir);
@@ -130,8 +126,7 @@ void	listenercomm::registerForHandoff(char *tmpdir) {
 	delete[] handoffsockname;
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-				"done registering for handoff");
+	dl->write("connection",0,"done registering for handoff");
 	#endif
 }
 
@@ -146,8 +141,7 @@ int	listenercomm::receiveFileDescriptor(int *descriptor) {
 void	listenercomm::deRegisterForHandoff(char *tmpdir) {
 	
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"de-registering for handoff...");
+	dl->write("connection",0,"de-registering for handoff...");
 	#endif
 
 	// construct the name of the socket to connect to
@@ -159,7 +153,7 @@ void	listenercomm::deRegisterForHandoff(char *tmpdir) {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[23+strlen(removehandoffsockname)+1];
 	sprintf(string,"removehandoffsockname: %s",removehandoffsockname);
-	dl->write(logger::logHeader("connection"),1,string);
+	dl->write("connection",1,string);
 	delete[] string;
 	#endif
 
@@ -173,7 +167,6 @@ void	listenercomm::deRegisterForHandoff(char *tmpdir) {
 	delete[] removehandoffsockname;
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
-					"done de-registering for handoff");
+	dl->write("connection",0,"done de-registering for handoff");
 	#endif
 }

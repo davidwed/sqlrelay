@@ -427,7 +427,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbind) {
 		((sqlrcursor *)(*sqlrcur)->value.lval)->inputBind((*variable)->value.str.val,(*value)->value.str.val);
 	} else if (Z_TYPE_PP(value)==IS_LONG) {
 		convert_to_long_ex(value);
-		((sqlrcursor *)(*sqlrcur)->value.lval)->inputBind((*variable)->value.str.val,(unsigned long)(*value)->value.lval);
+		((sqlrcursor *)(*sqlrcur)->value.lval)->inputBind((*variable)->value.str.val,(*value)->value.lval);
 	} else if (ZEND_NUM_ARGS()==5 && Z_TYPE_PP(value)==IS_DOUBLE) {
 		convert_to_double_ex(value);
 		((sqlrcursor *)(*sqlrcur)->value.lval)->inputBind((*variable)->value.str.val,(*value)->value.dval,(unsigned short)(*precision)->value.lval,(unsigned short)(*scale)->value.lval);
@@ -583,7 +583,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbinds) {
 			((sqlrcursor *)(*sqlrcur)->value.lval)->inputBind((*var)->value.str.val,(*val)->value.str.val);
 		} else if (Z_TYPE_PP(val)==IS_LONG) {
 			convert_to_long_ex(val);
-			((sqlrcursor *)(*sqlrcur)->value.lval)->inputBind((*var)->value.str.val,(unsigned long)(*val)->value.lval);
+			((sqlrcursor *)(*sqlrcur)->value.lval)->inputBind((*var)->value.str.val,(*val)->value.lval);
 		} else if (ZEND_NUM_ARGS()==5 && Z_TYPE_PP(val)==IS_DOUBLE) {
 			zend_hash_index_find((*precisions)->value.ht,i,
 							(void **)&precision);

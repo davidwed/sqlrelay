@@ -11,6 +11,7 @@ class column {
 		unsigned short	type;
 		unsigned long	length;
 		int		longest;
+		unsigned char	longdatatype;
 };
 
 #endif

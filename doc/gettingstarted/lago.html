@@ -30,10 +30,20 @@ available from the
 OpenBSD you need the version that comes with it's own pthreads 
 implementation.</p>
 
-<p>Lago will not successfully compile with gcc 2.96 or 3.0.  You'll have to use
-gcc 2.95.</p>
+<p>Older versions of lago will not successfully compile with gcc 2.96 or 3.x.
+You'll have to use gcc 2.95.  Newer versions of lago come with a patch that
+enables them to be compiled with gcc 2.96 or 3.x.</p>
 
-<p>If your distribution does not come with gcc 2.95, you can download it from 
+<p>To install the patch, run the following commands:</p>
+
+<blockquote>
+tar xf lago-0.5.2.tar.gz
+cd lago
+patch -p1 < ../lago-0.5.2.patch
+</blockquote>
+
+<p>If you want to build an unpatched or older version of lago and your
+distribution does not come with gcc 2.95, you can download it from 
 <a href="ftp://ftp.gnu.org/pub/gcc">the GNU ftp site</a> and compile it.  I 
 usually give the gcc <i>configure</i> script the 
 <i>--prefix=/usr/local/gnu-2.95</i> parameter so that gcc will be installed 
@@ -48,9 +58,9 @@ that Lago will be installed under /usr/local/lago.  I then add
 /usr/local/lago/bin to my PATH environment variable and /usr/local/lago/lib to 
 my LD_LIBRARY_PATH environment variable.</p>
 
-<p>On some platforms lago requires a modification to compile.  If compilation
-fails with an error in scktcman.xx, change line 146 of 
-lago/conn/scktcman.cxx from</p>
+<p>On some platforms, older or unpatched versions of lago require a
+modification to compile.  If compilation fails with an error in scktcman.xx,
+change line 146 of lago/conn/scktcman.cxx from</p>
 
 <blockquote>
 fd = accept(listener, (struct sockaddr *)&amp;addr, &amp;size);
@@ -62,11 +72,11 @@ fd = accept(listener, (struct sockaddr *)&amp;addr, &amp;size);
 fd = accept(listener, (struct sockaddr *)&amp;addr, (socklen_t *)&amp;size);
 </blockquote>
 
-<p>On some platforms lago requires a different modification.  The files
-lago/querydef/qd_expr.h, lago/executor/exc_expr.cxx and 
-lago/querydef/qd_dump.cxx refer to variables named "not".  Some compilers don't
-like this.  If you get an errors in those files, change the variable to __not 
-wherever it appears.</p>
+<p>On some platforms, older or unpatched versions of lago require a different
+modification.  The files lago/querydef/qd_expr.h, lago/executor/exc_expr.cxx
+and lago/querydef/qd_dump.cxx refer to variables named "not".  Some compilers
+don't like this.  If you get an errors in those files, change the variable to
+__not wherever it appears.</p>
 
 <p>Once the software is installed, run the following command.</p>
 

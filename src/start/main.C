@@ -164,7 +164,7 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 }
 
 int	startScaler(sqlrconfigfile *cfgfile, char *id, char *config,
-						char *localstatedir) {
+				char *localstatedir, int connectiondebug) {
 
 	// don't start the scalar if unless dynamic scaling is enabled
 	if (!cfgfile->getDynamicScaling()) {
@@ -175,6 +175,9 @@ int	startScaler(sqlrconfigfile *cfgfile, char *id, char *config,
 	
 	stringbuffer	*command=new stringbuffer();
 	command->append("sqlr-scaler ")->append(" -id ")->append(id);
+	if (connectiondebug) {
+		command->append(" -debug ");
+	}
 	command->append(" -config ")->append(config);
 	if (localstatedir[0]) {
 		command->append(" -localstatedir ")->append(localstatedir);
@@ -259,7 +262,8 @@ int	main(int argc, const char **argv) {
 				localstatedir,cfgfile->getDebugListener()) &&
 			startConnections(cfgfile,strace,id,config,
 				localstatedir,cfgfile->getDebugConnection()) &&
-			startScaler(cfgfile,id,config,localstatedir) &&
+			startScaler(cfgfile,id,config,localstatedir,
+				cfgfile->getDebugConnection()) &&
 			startCacheManager(localstatedir));
 
 	// many thanks...

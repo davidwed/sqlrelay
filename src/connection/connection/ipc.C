@@ -17,19 +17,19 @@ ipc::ipc() {
 
 ipc::~ipc() {
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,"deleting idmemory...");
+	dl->write("connection",0,"deleting idmemory...");
 	#endif
 	delete idmemory;
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,"done deleting idmemory");
+	dl->write("connection",0,"done deleting idmemory");
 	#endif
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,"deleting semset...");
+	dl->write("connection",0,"deleting semset...");
 	#endif
 	delete semset;
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,"done deleting semset");
+	dl->write("connection",0,"done deleting semset");
 	#endif
 }
 
@@ -45,16 +45,15 @@ int	ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 	sprintf(idfilename,"%s/%s",tmpdir,id);
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
+	dl->write("connection",0,
 				"attaching to shared memory and semaphores");
-	dl->write(logger::logHeader("connection"),0,"id filename: ");
-	dl->write(logger::logHeader("connection"),0,idfilename);
+	dl->write("connection",0,"id filename: ");
+	dl->write("connection",0,idfilename);
 	#endif
 
 	// initialize shared memory segment for passing port
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),1,
-				"attaching to shared memory...");
+	dl->write("connection",1,"attaching to shared memory...");
 	#endif
 	idmemory=new sharedmemory();
 	if (!idmemory->attach(ftok(idfilename,0))) {
@@ -69,8 +68,7 @@ int	ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 
 	// initialize the announce semaphore
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),1,
-				"attaching to semaphores...");
+	dl->write("connection",1,"attaching to semaphores...");
 	#endif
 	semset=new semaphoreset();
 	if (!semset->attach(ftok(idfilename,0),10)) {
@@ -85,7 +83,7 @@ int	ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 	}
 
 	#ifdef SERVER_DEBUG
-	dl->write(logger::logHeader("connection"),0,
+	dl->write("connection",0,
 			"done attaching to shared memory and semaphores");
 	#endif
 
