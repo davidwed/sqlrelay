@@ -12,6 +12,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/python
 	$(MKINSTALLDIRS) $(docdir)/api/ruby
 	$(MKINSTALLDIRS) $(docdir)/api/java
+	$(MKINSTALLDIRS) $(docdir)/dropin
 	$(MKINSTALLDIRS) $(docdir)/css
 	$(MKINSTALLDIRS) $(docdir)/programming
 	$(MKINSTALLDIRS) $(docdir)/programming/zope
@@ -69,6 +70,8 @@ install:
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-tree.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/SQLRConnection.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/SQLRCursor.html $(docdir)/api/java/com/firstworks/sqlrelay
+	$(INSTALL) -m 644 dropin/mysql.html $(docdir)/dropin
+	$(INSTALL) -m 644 dropin/postgresql.html $(docdir)/dropin
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/c++.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/c.html $(docdir)/programming
