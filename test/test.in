@@ -3,6 +3,7 @@
 INITDIR=/etc/rc.d/init.d
 HTTPDINIT=$INITDIR/httpd
 PHPDIR=/var/www/html
+DB2USER=db2inst2
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@prefix@/java/com/firstworks/sqlrelay
 export CLASSPATH=$CLASSPATH:./:@prefix@/java
@@ -15,7 +16,7 @@ then
 	ARGS="localhost 8001 \"\" db2test db2test"
 	PHPARGS="host=localhost&port=8001&socket=&user=db2test&password=db2test"
 	sudo $INITDIR/db2 start
-	sudo sqlr-start -id db2test
+	sudo su -l $DB2USER -c "sqlr-start -id db2test"
 fi
 if ( test "$DB" = "freetds" )
 then
@@ -49,14 +50,14 @@ if ( test "$DB" = "mysql" )
 then
 	ARGS="localhost 8006 \"\" mysqltest mysqltest"
 	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
-	sudo $INITDIR/mysql start
+	sudo $INITDIR/mysqld start
 	sudo sqlr-start -id mysqltest
 fi
 if ( test "$DB" = "oldmysql" )
 then
 	ARGS="localhost 8006 \"\" mysqltest mysqltest"
 	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
-	sudo $INITDIR/mysql start
+	sudo $INITDIR/mysqld start
 	sudo sqlr-start -id mysqltest
 fi
 if ( test "$DB" = "oracle7" )
@@ -201,11 +202,13 @@ then
 fi
 
 
-sudo sqlr-stop
 
 if ( test "$DB" = "db2" )
 then
+	sudo su -l $DB2USER -c "sqlr-stop"
 	sudo $INITDIR/db2 stop
+else
+	sudo sqlr-stop
 fi
 if ( test "$DB" = "freetds" )
 then
@@ -225,11 +228,11 @@ then
 fi
 if ( test "$DB" = "mysql" )
 then
-	sudo $INITDIR/mysql stop
+	sudo $INITDIR/mysqld stop
 fi
 if ( test "$DB" = "oldmysql" )
 then
-	sudo $INITDIR/mysql stop
+	sudo $INITDIR/mysqld stop
 fi
 if ( test "$DB" = "oracle7" )
 then
