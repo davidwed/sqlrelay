@@ -55,6 +55,7 @@ function checkSuccess($value,$success) {
 
 	echo("BIND BY NAME: \n");
 	sqlrcur_prepareQuery($cur,"insert into testdb.testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8,:var9,:var10,:var11,:var12,:var13,:var14,:var15,:var16,:var17,:var18,NULL)");
+	checkSuccess(sqlrcur_countBindVariables($cur),18);
 	sqlrcur_inputBind($cur,"var1",5);
 	sqlrcur_inputBind($cur,"var2",5);
 	sqlrcur_inputBind($cur,"var3",5);

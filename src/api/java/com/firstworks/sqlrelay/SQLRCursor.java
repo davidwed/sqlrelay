@@ -101,6 +101,12 @@ public class SQLRCursor {
 	/** Define a substitution variable.  */
 	public native void	substitution(String variable, double value, 
 					int precision, int scale);
+
+	/** Parses the previously prepared query,
+	 *  counts the number of bind variables defined
+	 *  in it and returns that number. */
+	public native short	countBindVariables();
+
 	/** Define an input bind variable.  */
 	public native void	inputBind(String variable, String value);
 	/** Define an input bind variable.  */

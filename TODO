@@ -10,9 +10,12 @@ docs:
 	postgresql drop-in library
 	pear db driver
 	perl dbi driver bind_param_inout
+	new column flags
+	countBindVariables()
 tests:
 	mysql drop-in library
 	postgresql drop-in library
+	countBindVariables()
 freetds-0.62/ct_param support
 
 oldmysql test files for non-C++ api's

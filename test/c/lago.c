@@ -110,6 +110,7 @@ int	main(int argc, char **argv) {
 
 	printf("BIND BY NAME: \n");
 	sqlrcur_prepareQuery(cur,"insert into testtable (testsmallint, testint, testfloat, testdouble, testdecimal, testchar, testvarchar, testdate, testtime) values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8,:var9)");
+	checkSuccessInt(sqlrcur_countBindVariables(cur),9);
 	sqlrcur_inputBindLong(cur,"var1",5);
 	sqlrcur_inputBindLong(cur,"var2",5);
 	sqlrcur_inputBindDouble(cur,"var3",5.1,2,1);

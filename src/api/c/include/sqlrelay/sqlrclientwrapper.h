@@ -190,6 +190,12 @@ void	sqlrcur_subDouble(sqlrcur sqlrcurref,
 
 void	sqlrcur_clearBinds(sqlrcur sqlrcurref);
 			/* Clear all bind variables. */
+
+unsigned short	sqlrcur_countBindVariables(sqlrcur sqlrcurref);
+			/* Parses the previously prepared query,
+			   counts the number of bind variables defined
+			   in it and returns that number. */
+
 void	sqlrcur_inputBindString(sqlrcur sqlrcurref, 
 				const char *variable, const char *value);
 void	sqlrcur_inputBindLong(sqlrcur sqlrcurref, const char *variable, 

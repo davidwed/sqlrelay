@@ -128,6 +128,7 @@ int	main(int argc, char **argv) {
 
 	printf("BIND BY POSITION: \n");
 	sqlrcur_prepareQuery(cur,"insert into testtable values (@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14)");
+	checkSuccessInt(sqlrcur_countBindVariables(cur),14);
 	sqlrcur_inputBindLong(cur,"1",2);
 	sqlrcur_inputBindLong(cur,"2",2);
 	sqlrcur_inputBindLong(cur,"3",2);

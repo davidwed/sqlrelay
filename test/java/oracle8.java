@@ -112,6 +112,7 @@ class oracle8 {
 	
 		System.out.println("BIND BY POSITION: ");
 		cur.prepareQuery("insert into testtable values (:1,:2,:3,:4,:5)");
+		checkSuccess(cur.countBindVariables(),5);
 		cur.inputBind("1",2);
 		cur.inputBind("2","testchar2");
 		cur.inputBind("3","testvarchar2");

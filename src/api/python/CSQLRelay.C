@@ -403,6 +403,15 @@ static PyObject *clearBinds(PyObject *self, PyObject *args) {
   return Py_BuildValue("i", 0);
 }
 
+static PyObject *countBindVariables(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned short rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcur))
+    return NULL;
+  rc=((sqlrcursor *)sqlrcur)->countBindVariables();
+  return Py_BuildValue("i", rc);
+}
+
 static PyObject *inputBind(PyObject *self, PyObject *args) {
   char *variable;
   PyObject *value;
@@ -1200,6 +1209,7 @@ static PyMethodDef SQLRMethods[] = {
   {"substitution", substitution, METH_VARARGS},
   {"substitutions", substitutions, METH_VARARGS},
   {"clearBinds", clearBinds, METH_VARARGS},
+  {"countBindVariables", countBindVariables, METH_VARARGS},
   {"inputBind", inputBind, METH_VARARGS},
   {"inputBindBlob", inputBindBlob, METH_VARARGS},
   {"inputBindClob", inputBindClob, METH_VARARGS},

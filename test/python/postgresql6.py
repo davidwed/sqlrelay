@@ -63,6 +63,7 @@ def main():
 
 	print "BIND BY NAME: "
 	cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8)")
+	checkSuccess(cur.countBindVariables(),8)
 	cur.inputBind("var1",5)
 	cur.inputBind("var2",5.5,4,2)
 	cur.inputBind("var3",5.5,4,2)

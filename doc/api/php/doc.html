@@ -373,10 +373,19 @@ Define a substitution variable.
 <P>
 <LI>
 <CODE>
-void sqlrcur_clearBinds()
+void sqlrcur_clearBinds(int sqlrcurref)
 </CODE>
 <P>
 Clear all bind variables.
+<P>
+<LI>
+<CODE>
+void sqlrcur_countBindVariables(int sqlrcurref)
+</CODE>
+<P>
+Parses the previously prepared query,
+counts the number of bind variables defined
+in it and returns that number.
 <P>
 <LI>
 <CODE>

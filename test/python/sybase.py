@@ -62,6 +62,7 @@ def main():
 
 	print "BIND BY POSITION: "
 	cur.prepareQuery("insert into testtable values (@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14)")
+	checkSuccess(cur.countBindVariables(),14)
 	cur.inputBind("1",2)
 	cur.inputBind("2",2)
 	cur.inputBind("3",2)

@@ -353,6 +353,19 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_substitution__Lja
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    countBindVariables
+ * Signature: ()S
+ */
+JNIEXPORT jshort JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_countBindVariables
+  (JNIEnv *env, jobject self) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (jshort)cur->countBindVariables();
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    inputBind
  * Signature: (Ljava/lang/String;Ljava/lang/String;)V
  */

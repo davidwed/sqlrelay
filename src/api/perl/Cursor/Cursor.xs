@@ -120,6 +120,9 @@ sqlrcursor::substitution(variable,...)
 void
 sqlrcursor::clearBinds()
 
+unsigned short
+sqlrcursor::countBindVariables()
+
 void
 sqlrcursor::inputBind(variable,...)
 		char *variable

@@ -53,6 +53,7 @@ function checkSuccess($value,$success) {
 
 	echo("BIND BY POSITION: \n");
 	sqlrcur_prepareQuery($cur,"insert into testtable values (:1,:2,:3,:4,:5)");
+	checkSuccess(sqlrcur_countBindVariables($cur),5);
 	sqlrcur_inputBind($cur,"1",2);
 	sqlrcur_inputBind($cur,"2","testchar2");
 	sqlrcur_inputBind($cur,"3","testvarchar2");

@@ -115,6 +115,7 @@ class sqlite {
 	
 		System.out.println("BIND BY NAME: ");
 		cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4)");
+		checkSuccess(cur.countBindVariables(),4);
 		cur.inputBind("var1",5);
 		cur.inputBind("var2",5.5,4,1);
 		cur.inputBind("var3","testchar5");

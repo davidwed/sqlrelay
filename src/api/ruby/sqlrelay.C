@@ -314,6 +314,12 @@ static VALUE sqlrcur_clearBinds(VALUE self) {
 	return Qnil;
 }
 
+static VALUE sqlrcur_countBindVariables(VALUE self) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	return INT2NUM(sqlrcur->countBindVariables());
+}
+
 static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
 	sqlrcursor	*sqlrcur;
 	VALUE	variable;
@@ -991,6 +997,8 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_prepareFileQuery,2);
 	rb_define_method(csqlrcursor,"clearBinds",
 				(CAST)sqlrcur_clearBinds,0);
+	rb_define_method(csqlrcursor,"countBindVariables",
+				(CAST)sqlrcur_countBindVariables,0);
 	rb_define_method(csqlrcursor,"substitution",
 				(CAST)sqlrcur_substitution,-1);
 	rb_define_method(csqlrcursor,"inputBind",

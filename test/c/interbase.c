@@ -105,6 +105,7 @@ int	main(int argc, char **argv) {
 
 	printf("BIND BY POSITION: \n");
 	sqlrcur_prepareQuery(cur,"insert into testtable values (?,?,?,?,?,?,?,?,?,?,?)");
+	checkSuccessInt(sqlrcur_countBindVariables(cur),11);
 	sqlrcur_inputBindLong(cur,"1",2);
 	sqlrcur_inputBindLong(cur,"2",2);
 	sqlrcur_inputBindDouble(cur,"3",2.2,2,1);

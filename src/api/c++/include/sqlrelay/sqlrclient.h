@@ -191,6 +191,11 @@ class sqlrcursor {
 		void	clearBinds();
 				// Clear all bind variables.
 
+		unsigned short	countBindVariables() const;
+				// Parses the previously prepared query,
+				// counts the number of bind variables defined
+				// in it and returns that number.
+
 		void	substitution(const char *variable, const char *value);
 		void	substitution(const char *variable, long value);
 		void	substitution(const char *variable, double value, 

@@ -189,6 +189,10 @@ void	sqlrcur_clearBinds(sqlrcur sqlrcurref) {
 	sqlrcurref->clearBinds();
 }
 
+unsigned short	sqlrcur_countBindVariables(sqlrcur sqlrcurref) {
+	return sqlrcurref->countBindVariables();
+}
+
 void	sqlrcur_inputBindString(sqlrcur sqlrcurref, const char *variable,
 							const char *value) {
 	sqlrcurref->inputBind(variable,value);

@@ -30,9 +30,9 @@ int	sqlrcursor::executeQuery() {
 		// perform substitutions
 		stringbuffer	container;
 		char		*ptr=queryptr;
-		int		found=0;
-		int		inquotes=0;
-		int		inbraces=0;
+		bool		found=false;
+		bool		inquotes=false;
+		bool		inbraces=false;
 		int		len=0;
 		stringbuffer	*braces;
 
@@ -43,9 +43,9 @@ int	sqlrcursor::executeQuery() {
 			// string or not
 			if (*ptr=='\'' && *(ptr-1)!='\\') {
 				if (inquotes) {
-					inquotes=0;
+					inquotes=false;
 				} else {
-					inquotes=1;
+					inquotes=true;
 				}
 			}
 		
@@ -53,7 +53,7 @@ int	sqlrcursor::executeQuery() {
 			// sending to a new buffer
 			if (*ptr=='[' && !inbraces && !inquotes) {
 				braces=new stringbuffer();
-				inbraces=1;
+				inbraces=true;
 				ptr++;
 			}
 		
@@ -99,7 +99,7 @@ int	sqlrcursor::executeQuery() {
 					container.append(braces->getString());
 				}
 				delete braces;
-				inbraces=0;
+				inbraces=false;
 				ptr++;
 			}
 		
@@ -108,7 +108,7 @@ int	sqlrcursor::executeQuery() {
 			if ((*ptr)=='$' && (*(ptr+1))=='(') {
 		
 				// first iterate through the arrays passed in
-				found=0;
+				found=false;
 				for (int i=0; i<subcount && !found; i++) {
 		
 					// if we find a match, write the 
@@ -127,7 +127,7 @@ int	sqlrcursor::executeQuery() {
 								&container,i);
 						}
 						ptr=ptr+3+len;
-						found=1;
+						found=true;
 					}
 				}
 		

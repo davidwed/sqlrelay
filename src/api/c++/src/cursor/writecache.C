@@ -180,10 +180,15 @@ void	sqlrcursor::cacheColumnInfo() {
 			cachedest->write(whichcolumn->precision);
 			cachedest->write(whichcolumn->scale);
 
-			// write the nullable, primary key, unique flags
+			// write the flags
 			cachedest->write(whichcolumn->nullable);
 			cachedest->write(whichcolumn->primarykey);
 			cachedest->write(whichcolumn->unique);
+			cachedest->write(whichcolumn->partofkey);
+			cachedest->write(whichcolumn->unsignednumber);
+			cachedest->write(whichcolumn->zerofill);
+			cachedest->write(whichcolumn->binary);
+			cachedest->write(whichcolumn->autoincrement);
 		}
 	}
 }

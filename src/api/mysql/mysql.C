@@ -345,7 +345,19 @@ int mysql_kill(MYSQL *mysql, unsigned long pid) {
 
 char *mysql_get_client_info() {
 	// Returns a string that represents the client library version.
-	return "";
+	// FIXME: not sure these are right
+#ifdef COMPAT_MYSQL_3
+	return "3.23.58";
+#endif
+#ifdef COMPAT_MYSQL_4_0
+	return "4.0.17";
+#endif
+#ifdef COMPAT_MYSQL_4_1
+	return "4.1.1";
+#endif
+#ifdef COMPAT_MYSQL_5_0
+	return "5.0.0";
+#endif
 }
 
 unsigned long mysql_get_client_version() {
@@ -354,7 +366,18 @@ unsigned long mysql_get_client_version() {
 	// the release level, and ZZ is the version number within the release
 	// level. For example, a value of 40102 represents a client library
 	// version of 4.1.2.
-	return 40102;
+#ifdef COMPAT_MYSQL_3
+	return 32358;
+#endif
+#ifdef COMPAT_MYSQL_4_0
+	return 40017;
+#endif
+#ifdef COMPAT_MYSQL_4_1
+	return 40101;
+#endif
+#ifdef COMPAT_MYSQL_5_0
+	return 50000;
+#endif
 }
 
 char *mysql_get_host_info(MYSQL *mysql) {
@@ -370,14 +393,37 @@ unsigned int mysql_get_proto_info(MYSQL *mysql) {
 
 char *mysql_get_server_info(MYSQL *mysql) {
 	// Returns a string that represents the server version number.
-	return "";
+	// FIXME: not sure these are right
+#ifdef COMPAT_MYSQL_3
+	return "3.23.58";
+#endif
+#ifdef COMPAT_MYSQL_4_0
+	return "4.0.17";
+#endif
+#ifdef COMPAT_MYSQL_4_1
+	return "4.1.1";
+#endif
+#ifdef COMPAT_MYSQL_5_0
+	return "5.0.0";
+#endif
 }
 
 unsigned long mysql_get_server_version(MYSQL *mysql) {
 	// A number that represents the MySQL server version in format:
 	// main_version*10000 + minor_version *100 + sub_version
 	// For example, 4.1.0 is returned as 40100.
-	return 40100;
+#ifdef COMPAT_MYSQL_3
+	return 32358;
+#endif
+#ifdef COMPAT_MYSQL_4_0
+	return 40017;
+#endif
+#ifdef COMPAT_MYSQL_4_1
+	return 40101;
+#endif
+#ifdef COMPAT_MYSQL_5_0
+	return 50000;
+#endif
 }
 
 
@@ -1026,8 +1072,7 @@ int mysql_execute(MYSQL_STMT *stmt) {
 }
 
 unsigned long mysql_param_count(MYSQL_STMT *stmt) {
-	// FIXME: really need this one
-	return 0;
+	return stmt->result->sqlrcur->countBindVariables();
 }
 
 MYSQL_RES *mysql_param_result(MYSQL_STMT *stmt) {

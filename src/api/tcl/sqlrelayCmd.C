@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.6 2004-01-31 20:19:00 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.7 2004-02-02 01:12:12 mused Exp $
  */
 
 #include <strings.h>
@@ -72,6 +72,7 @@ void sqlrcurDelete(ClientData data) {
  *   $cur prepareFileQuery path filename
  *   $cur substitution variable value
  *   $cur clearBinds
+ *   $cur countBindVariables
  *   $cur inputBind
  *   $cur inputBindBlob variable value size
  *   $cur inputBindClob variable value size
@@ -164,6 +165,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "prepareFileQuery",
     "substitution",
     "clearBinds",
+    "countBindVariables",
     "inputBind",
     "inputBindBlob",
     "inputBindClob",
@@ -250,6 +252,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_prepareFileQuery,
     SQLRCUR_substitution,
     SQLRCUR_clearBinds,
+    SQLRCUR_countBindVariables,
     SQLRCUR_inputBind,
     SQLRCUR_inputBindBlob,
     SQLRCUR_inputBindClob,
@@ -546,6 +549,17 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  return TCL_ERROR;
 	}
 	cur->clearBinds();
+	break;
+      }
+    case SQLRCUR_countBindVariables:
+      {
+	long count;
+	if (objc > 2) {
+	  Tcl_WrongNumArgs(interp, 2, objv, NULL);
+	  return TCL_ERROR;
+	}
+	count=cur->countBindVariables();
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(count));
 	break;
       }
     case SQLRCUR_inputBind:

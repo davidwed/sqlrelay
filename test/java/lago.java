@@ -110,6 +110,7 @@ class lago {
 	
 		System.out.println("BIND BY NAME: ");
 		cur.prepareQuery("insert into testtable (testsmallint, testint, testfloat, testdouble, testdecimal, testchar, testvarchar, testdate, testtime) values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8,:var9)");
+		checkSuccess(cur.countBindVariables(),9);
 		cur.inputBind("var1",5);
 		cur.inputBind("var2",5);
 		cur.inputBind("var3",5.1,2,1);

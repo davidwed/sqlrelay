@@ -5,6 +5,46 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
+unsigned short sqlrcursor::countBindVariables() const {
+
+	if (!queryptr) {
+		return 0;
+	}
+
+	char	lastchar=(char)NULL;
+	bool	inquotes=false;
+
+	unsigned short	paramcount=0;
+
+	for (char *ptr=queryptr; *ptr; ptr++) {
+
+		if (*ptr=='\'' && lastchar!='\\') {
+			if (inquotes) {
+				inquotes=false;
+			} else {
+				inquotes=true;
+			}
+		}
+
+		// If we're not inside of a quoted string and we run into
+		// a ?, : (for oracle-style bind's) or a @ (for sybase-style
+		// binds) and the previous character was whitespace, or a
+		// comma, left parenthesis or equal sign then we must have
+		// found a bind variable.
+		if (!inquotes &&
+			(*ptr=='?' || *ptr==':' || *ptr=='@') &&
+			(lastchar==' ' || lastchar=='	' ||
+			lastchar=='\n' || lastchar=='\r' ||
+			lastchar=='=' || lastchar==',' || lastchar=='(')) {
+			paramcount++;
+		}
+
+		lastchar=*ptr;
+	}
+
+	return paramcount;
+}
+
 void	sqlrcursor::clearVariables() {
 
 	// setting the bind/substitution variable 

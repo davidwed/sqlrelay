@@ -49,6 +49,7 @@ function checkSuccess($value,$success) {
 
 	echo("BIND BY POSITION: \n");
 	sqlrcur_prepareQuery($cur,"insert into testtable values (?,?,?,?,?,?,?,?,?,?,NULL)");
+	checkSuccess(sqlrcur_countBindVariables($cur),10);
 	sqlrcur_inputBind($cur,"1",2);
 	sqlrcur_inputBind($cur,"2",2);
 	sqlrcur_inputBind($cur,"3",2);

@@ -409,6 +409,18 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_clearbinds) {
 	((sqlrcursor *)(*sqlrcur)->value.lval)->clearBinds();
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcur_countbindvariables) {
+	zval **sqlrcur;
+	unsigned short r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	r=((sqlrcursor *)(*sqlrcur)->value.lval)->countBindVariables();
+	RETURN_LONG(r);
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcur_inputbind) {
 	zval **sqlrcur,**variable,**value,**precision,**scale;
 	if (ZEND_NUM_ARGS() != 3 || 
@@ -1447,6 +1459,7 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcur_preparefilequery,NULL)
 	ZEND_FE(sqlrcur_substitution,NULL)
 	ZEND_FE(sqlrcur_clearbinds,NULL)
+	ZEND_FE(sqlrcur_countbindvariables,NULL)
 	ZEND_FE(sqlrcur_inputbind,NULL)
 	ZEND_FE(sqlrcur_inputbindblob,NULL)
 	ZEND_FE(sqlrcur_inputbindclob,NULL)

@@ -105,6 +105,7 @@ class db2 {
 	
 		System.out.println("BIND BY POSITION: ");
 		cur.prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,null)");
+		checkSuccess(cur.countBindVariables(),10);
 		cur.inputBind("1",2);
 		cur.inputBind("2",2);
 		cur.inputBind("3",2);

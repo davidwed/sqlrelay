@@ -103,6 +103,7 @@ int	main(int argc, char **argv) {
 
 	printf("BIND BY POSITION: \n");
 	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?)");
+	checkSuccess(cur->countBindVariables(),11);
 	cur->inputBind("1",2);
 	cur->inputBind("2",2);
 	cur->inputBind("3",2.2,2,1);

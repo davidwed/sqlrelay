@@ -299,6 +299,14 @@ class sqlrcursor:
         """
         return CSQLRelay.clearBinds(self.cursor)
 
+    def countBindVariables(self):
+	"""
+        Parses the previously prepared query,
+        counts the number of bind variables defined
+        in it and returns that number.
+	"""
+        return CSQLRelay.countBindVariables(self.cursor)
+
     def inputBind(self, variable, value, precision=0, scale=0):
         """
         Define an input bind varaible.

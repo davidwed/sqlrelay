@@ -113,6 +113,7 @@ class freetds {
 	
 		System.out.println("BIND BY POSITION: ");
 		cur.prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+		checkSuccess(cur.countBindVariables(),14);
 		cur.inputBind("1",2);
 		cur.inputBind("2",2);
 		cur.inputBind("3",2);
