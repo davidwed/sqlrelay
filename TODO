@@ -1,3 +1,5 @@
+seperate modules into standalone builds
+
 test finished-suspended-result-set's with oracle/db2/sybase/freetds
 
 db2 start/stop doesn't work
@@ -57,8 +59,12 @@ Compatibility:
 		ruby api won't build
 		postgresql won't configure
 		php api won't build
-	Solaris:
+	Solaris x86:
+		ruby api won't build
 		perl api won't build
+		mysql libtool problem, .libs appended to libmysqlclient.so path
+		postgresql drop-in won't install, tries to link against
+			libsqlrclient.a
 	openbsd/netbsd:
 		ruby module segfaults
 		python api methods that call PyArg_ParseTuple with an "O"
@@ -161,7 +167,7 @@ API's:
 		JDBC
 		ODBC
 		QT3
-		C#
+		C# - have a driver, just need to incorporate it
 		ADA
 	replacement libs for native db api libs - 
 		translate msql/mysql/postgresql calls to sqlrelay calls

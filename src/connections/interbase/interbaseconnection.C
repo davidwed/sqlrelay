@@ -614,7 +614,7 @@ int	interbasecursor::skipRow() {
 int	interbasecursor::fetchRow() {
 
 	ISC_STATUS	retcode;
-	if (retcode=isc_dsql_fetch(interbaseconn->error,&stmt,1,outsqlda)) {
+	if ((retcode=isc_dsql_fetch(interbaseconn->error,&stmt,1,outsqlda))) {
 		// if retcode is 100L, then there are no more rows,
 		// otherwise, there is an error... how do I handle this?
 		return 0;

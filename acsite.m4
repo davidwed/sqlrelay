@@ -2003,13 +2003,19 @@ fi
 
 AC_DEFUN([FW_CHECK_NEED_GLIBC_2_3_HACK],
 [
-	AC_MSG_CHECKING(for broken glibc-2.3)
-	GLIBC23HACKCODE=""
-	GLIBC23HACKINCLUDE=""
-	AC_TRY_LINK([#include <ctype.h>
+	dnl if there's no features.h then we're not using glibc (hopefully)
+	AC_CHECK_HEADER([features.h],[USING_GLIBC=yes],[USING_GLIBC=no])
+
+	if ( test "$USING_GLIBC" = "yes" )
+	then
+		AC_MSG_CHECKING(for broken glibc-2.3)
+		GLIBC23HACKCODE=""
+		GLIBC23HACKINCLUDE=""
+		AC_TRY_LINK([#include <ctype.h>
 #include <features.h>],[#if __GLIBC__==2 && __GLIBC_MINOR__==3
 	__ctype_toupper('a');
 #endif],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(NEED_GLIBC_2_3_HACK,1,Some versions of glibc-2.3 need a fixup) GLIBC23HACKINCLUDE="#include <ctype.h>"; GLIBC23HACKCODE="const unsigned short int *__ctype_b; int __ctype_toupper(int c) { return toupper(c); } int __ctype_tolower(int c) { return tolower(c); }"])
+	fi
 ])
 
 AC_DEFUN([FW_CHECK_SIGNALS],

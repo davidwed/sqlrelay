@@ -59,7 +59,13 @@ $ORACLE_HOME/bin/genclntsh.  Search for a line like
 <b>LD="ld -shared -L${ORACLE_HOME}/lib"</b> and modify it to read 
 <b>LD="/usr/local/binutils-glibc21/bin/ld -shared -L{ORACLE_HOME}/lib"</b>.
 Then run $ORACLE_HOME/bin/genclntsh manually.  When it finishes, click 
-retry.</p>
+Retry.</p>
+
+<p>If you get an error such as "Error invoking target install of makefile
+/u01/app/oracle/product8/8.1.7/ctx/lib/ins_ctx.mk", switch to another screen
+and edit the file /u01/app/oracle/product8/8.1.7/ctx/lib/env_ctx.mk.  Search
+for a line starting with INSO_LINK and append $(LDLIBFLAG)dl to the end of
+the line.  Then click Retry.</p>
 
 At the end of the installation, a Dialog will pop up<br>
 Follow the directions on the dialog then click <b>Ok</b><br><br>

@@ -2,9 +2,9 @@ include ../config.mk
 
 INSTALL = $(abs_srcdir)/install-sh -c
 
-UID = $(shell id -u)
+UID = $(shell id | grep "uid=0" )
 
-ifeq ($(UID),0)
+ifneq ($(UID),)
 initroot =
 else
 initroot = $(prefix)
