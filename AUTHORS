@@ -27,6 +27,9 @@ Florain Weps - fweps@greenmail.ch   and   Andreas Tille - tille@debian.org
 Takeshi Taguchi - taguchi@tohoku.iij.ad.jp
 	TCL API
 
+Vladimir Kouznetsov
+	interbase stored procedure/output bind support, other patches
+
 Fixes/Patches incorporated from:
 	Adrian Likins
 	Christoph Schwarz
@@ -36,6 +39,5 @@ Fixes/Patches incorporated from:
 	Dieter Maurer
 	Leonardo Rochael Almeida
 	Paolo Dotta
-	Vladimir Kouznetsov
 	Jean Coursol
 	Anatoly K. Lasareff

@@ -169,7 +169,7 @@ public class SQLRCursor {
 	public native String	getOutputBind(String variable);
 	/** Get the length of the value stored in a
 	 *  previously defined output bind variable.  */
-	public native byte[]	getOutputBindAsBytes(String variable);
+	public native byte[]	getOutputBindAsByteArray(String variable);
 	/** Get the length of the value stored in a
 	 *  previously defined output bind variable.  */
 	public native long	getOutputBindLength(String variable);
@@ -246,10 +246,10 @@ public class SQLRCursor {
 	public native String	getField(int row, String col);
 	/** Returns the length of the 
 	 *  specified row and column.  */
-	public native byte[]	getFieldAsBytes(int row, int col);
+	public native byte[]	getFieldAsByteArray(int row, int col);
 	/** Returns a pointer to the value of the 
 	 *  specified row and column.  */
-	public native byte[]	getFieldAsBytes(int row, String col);
+	public native byte[]	getFieldAsByteArray(int row, String col);
 	/** Returns the length of the 
 	 *  specified row and column.  */
 	public native long	getFieldLength(int row, int col);

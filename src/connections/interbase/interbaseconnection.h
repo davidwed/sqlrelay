@@ -38,6 +38,7 @@ static char tpb[] = {
 	isc_tpb_write,
 	isc_tpb_read_committed,
 	isc_tpb_rec_version,
+	// FIXME: vladimir changed this to isc_tpb_nowait.  why?
 	isc_tpb_wait
 };
 
@@ -92,6 +93,8 @@ class interbasecursor : public sqlrcursor {
 		stringbuffer	*errormsg;
 
 		interbaseconnection	*interbaseconn;
+
+		int		queryIsExecSP;
 };
 
 class interbaseconnection : public sqlrconnection {

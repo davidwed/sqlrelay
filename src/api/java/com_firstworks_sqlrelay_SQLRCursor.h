@@ -337,10 +337,10 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBind
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getOutputBindAsBytes
+ * Method:    getOutputBindAsByteArray
  * Signature: (Ljava/lang/String;)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindAsBytes
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindAsByteArray
   (JNIEnv *, jobject, jstring);
 
 /*
@@ -457,18 +457,18 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getField__ILja
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getFieldAsBytes
+ * Method:    getFieldAsByteArray
  * Signature: (II)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsBytes__II
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsByteArray__II
   (JNIEnv *, jobject, jint, jint);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getFieldAsBytes
+ * Method:    getFieldAsByteArray
  * Signature: (ILjava/lang/String;)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsBytes__ILjava_lang_String_2
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsByteArray__ILjava_lang_String_2
   (JNIEnv *, jobject, jint, jstring);
 
 /*

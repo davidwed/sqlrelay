@@ -530,6 +530,10 @@ then
 		fi
 	fi
 		
+	if ( test "$ORACLE_VERSION" = "8.1" -o "$ORACLE_VERSION" = "9.0" )
+	then
+		AC_DEFINE(HAVE_ORACLE_8i,1,Oracle 8i or greater)
+	fi
 	AC_SUBST(ORACLEVERSION)
 	AC_SUBST(ORACLEINCLUDES)
 	AC_SUBST(ORACLELIBS)

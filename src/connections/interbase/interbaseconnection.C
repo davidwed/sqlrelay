@@ -164,6 +164,8 @@ interbasecursor::interbasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
 
 	querytype=0;
 	stmt=NULL;
+
+	queryIsExecSP=0;
 }
 
 interbasecursor::~interbasecursor() {
@@ -175,6 +177,8 @@ interbasecursor::~interbasecursor() {
 }
 
 int	interbasecursor::prepareQuery(const char *query, long length) {
+
+	queryIsExecSP=0;
 
 	// free the old statement if it exists
 	if (stmt) {
@@ -309,26 +313,30 @@ int	interbasecursor::outputBindString(const char *variable,
 				unsigned short valuesize, 
 				short *isnull) {
 
+	// if we're doing output binds then the
+	// query must be a stored procedure
+	// FIXME: what if the procedure only has input vars?
+	queryIsExecSP=1;
 
 	// make bind vars 1 based like all other db's
 	int	index=atoi(variable+1)-1;
 	if (index<0) {
 		return 0;
 	}
-	insqlda->sqlvar[index].sqltype=SQL_TEXT+1;
-	insqlda->sqlvar[index].sqlscale=0;
-	insqlda->sqlvar[index].sqlsubtype=0;
-	insqlda->sqlvar[index].sqllen=valuesize;
-	insqlda->sqlvar[index].sqldata=value;
-	insqlda->sqlvar[index].sqlind=isnull;
-	insqlda->sqlvar[index].sqlname_length=0;
-	insqlda->sqlvar[index].sqlname[0]=(char)NULL;
-	insqlda->sqlvar[index].relname_length=0;
-	insqlda->sqlvar[index].relname[0]=(char)NULL;
-	insqlda->sqlvar[index].ownname_length=0;
-	insqlda->sqlvar[index].ownname[0]=(char)NULL;
-	insqlda->sqlvar[index].aliasname_length=0;
-	insqlda->sqlvar[index].aliasname[0]=(char)NULL;
+	outsqlda->sqlvar[index].sqltype=SQL_TEXT+1;
+	outsqlda->sqlvar[index].sqlscale=0;
+	outsqlda->sqlvar[index].sqlsubtype=0;
+	outsqlda->sqlvar[index].sqllen=valuesize;
+	outsqlda->sqlvar[index].sqldata=value;
+	outsqlda->sqlvar[index].sqlind=isnull;
+	outsqlda->sqlvar[index].sqlname_length=0;
+	outsqlda->sqlvar[index].sqlname[0]=(char)NULL;
+	outsqlda->sqlvar[index].relname_length=0;
+	outsqlda->sqlvar[index].relname[0]=(char)NULL;
+	outsqlda->sqlvar[index].ownname_length=0;
+	outsqlda->sqlvar[index].ownname[0]=(char)NULL;
+	outsqlda->sqlvar[index].aliasname_length=0;
+	outsqlda->sqlvar[index].aliasname[0]=(char)NULL;
 	return 1;
 }
 
@@ -343,6 +351,26 @@ int	interbasecursor::executeQuery(const char *query, long length,
 		return !isc_rollback_retaining(interbaseconn->error,
 							&interbaseconn->tr);
 	}
+
+	// if the query is a stored procedure then execute it as such
+	if (queryIsExecSP) {
+		if (isc_dsql_execute2(interbaseconn->error,
+					&interbaseconn->tr,
+					&stmt,1,insqlda, outsqlda)) {
+			return 0;
+		}
+
+		for (int i=0; i<outsqlda->sqld; i++) {
+			if ((outsqlda->sqlvar[i].sqltype==SQL_TEXT) ||
+				(outsqlda->sqlvar[i].sqltype==SQL_TEXT+1) ) {
+				outsqlda->sqlvar[i].
+					sqldata[outsqlda->sqlvar[i].sqllen-1]=0;
+			}
+		}
+		return 1;
+	}
+
+	// handle non-stored procedures...
 
 	// describe the cursor
 	outsqlda->sqld=0;
@@ -492,6 +520,7 @@ char	*interbasecursor::getErrorMessage(int *liveconnection) {
 	}
 
 	// get the error message
+	// FIXME: vladimir commented this out why?
 	long	sqlcode=isc_sqlcode(interbaseconn->error);
 	isc_sql_interprete(sqlcode, msg, 512);
 	errormsg->append(msg);
@@ -512,10 +541,6 @@ void	interbasecursor::returnColumnCount() {
 void	interbasecursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
-
-	// a useful variable
-	int	type;
-
 
 	// for each column...
 	for (int i=0; i<outsqlda->sqld; i++) {

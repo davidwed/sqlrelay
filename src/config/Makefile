@@ -3,6 +3,7 @@ include ../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES) `$(GTKCONFIG) --cflags`
+#CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES) -I/usr/include/gtk-2.0 -I/usr/include/glib-2.0 -I/usr/X11R6/include
 LIBS = $(RUDIMENTSLIBS) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
@@ -30,9 +31,11 @@ rebuild: clean all
 
 sqlr-config-gtk: $(SRCS) $(NLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(NLOBJS) `$(GTKCONFIG) --libs` $(LIBS)
+	#$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(NLOBJS) -lgtk-x11 $(LIBS)
 
 sqlr-config-gtk-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) `$(GTKCONFIG) --libs` $(DEBUGLIBS)
+	#$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) -lgtk-x11 $(DEBUGLIBS)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
