@@ -318,7 +318,7 @@ Man pages for SQL Relay.
 
 %define	tcldir		%(dirname `rpm -q -l %{tcldevel} | grep tclConfig.sh`)
 %define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "1.5" "1.6" "2.0" "2.1" "2.2" "2.3"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
-%define	zopedir		%(ZOPEPATH="/opt/Zope"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/opt"; do for j in "zope" "Zope"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib/python/Products"; fi; done; done; echo $ZOPEPATH)
+%define	zopedir		%(ZOPEPATH="/opt/Zope/lib/python/Proucts"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/usr/lib" "/opt"; do for j in "zope" "Zope"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib/python/Products"; fi; done; done; echo $ZOPEPATH)
 %define	phpextdir	%(php-config --extension-dir)
 %define	phppeardbdir	%(echo "`php-config --prefix`/share/pear/DB")
 %define	perl_prefix	%(eval "export `perl -V:prefix`"; echo $prefix)
@@ -353,7 +353,6 @@ Man pages for SQL Relay.
 	%{?_without_java:	--disable-java} \
 	%{?_without_tcl:	--disable-tcl} \
 	%{?_without_perl:	--disable-perl} \
-	%{!?_without_perl:	--with-perl-install-prefix=%{buildroot}%{perl_prefix}} \
 	%{?_without_php:	--disable-php} \
 	%{?_without_python:	--disable-python} \
 	%{?_without_ruby:	--disable-ruby} \
@@ -363,25 +362,9 @@ make INSTALLPREFIX=%{buildroot}
 
 %install
 rm -rf %{buildroot}
-# must install everything except ruby first because the "prefix" environment
-# variable screws up the ruby install
-make \
-	DESTDIR=%{buildroot} \
-	prefix=%{buildroot}%{_prefix} \
-	exec_prefix=%{buildroot}%{_prefix} \
-	includedir=%{buildroot}%{_includedir} \
-	libdir=%{buildroot}%{_libdir} \
-	bindir=%{buildroot}%{_bindir} \
-	localstatedir=%{buildroot}%{_localstatedir} \
-	sysconfdir=%{buildroot}%{_sysconfdir} \
-	mandir=%{buildroot}%{_mandir} \
-	docdir=%{buildroot}%{docdir} \
-	HAVE_RUBY="" \
-	install
+make DESTDIR=%{buildroot} docdir=%{buildroot}%{docdir} install
 # get rid of some garbage
 rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
-# now install ruby
-%{!?_without_ruby: cd src/api/ruby; make DESTDIR=%{buildroot} install}
 
 %pre
 # Add the "sqlrelay" user
@@ -471,8 +454,8 @@ rm -rf %{buildroot}
 %files client-mysql
 %defattr(-, root, root)
 %{_libdir}/libmysql*sqlrelay-*.so.*
-%{_libdir}/libmysql*pqsqlrelay.a
-%{_libdir}/libmysql*pqsqlrelay.la
+%{_libdir}/libmysql*sqlrelay.a
+%{_libdir}/libmysql*sqlrelay.la
 
 %{!?_without_gtk:%files config-gtk}
 %{!?_without_gtk:%defattr(-, root, root)}

@@ -194,10 +194,6 @@ AC_ARG_WITH(perl-prefix,
 	[  --with-perl-prefix            Location of Perl],
 	PERLPATH="$withval",
 	PERLPATH="")
-AC_ARG_WITH(perl-install-prefix,
-	[  --with-perl-install-prefix    Where to install perl api],
-	PERLINSTALLPREFIX="$withval",
-	PERLINSTALLPREFIX="")
 AC_ARG_ENABLE(perl,
 	[  --disable-perl                Don't build Perl api],
 	ENABLE_PERL="",
@@ -357,9 +353,6 @@ if ( test -n "$INTERBASEPATH" -a "`echo $INTERBASEPATH | cut -c-3`" = "../" ); t
 fi
 if ( test -n "$PERLPATH" -a "`echo $PERLPATH | cut -c-3`" = "../" ); then
 	PERLPATH="$PWD/$PERLPATH"
-fi
-if ( test -n "$PERLINSTALLPREFIX" -a "`echo $PERLINSTALLPREFIX | cut -c-3`" = "../" ); then
-	PERLINSTALLPREFIX="$PWD/$PERLINSTALLPREFIX"
 fi
 if ( test -n "$PYTHONPATH" -a "`echo $PYTHONPATH | cut -c-3`" = "../" ); then
 	PYTHONPATH="$PWD/$PYTHONPATH"
@@ -702,13 +695,52 @@ echo
 echo "***** Output Files ***********"
 AC_SUBST(abs_srcdir)
 AC_SUBST(abs_builddir)
-if ( test -n "$HAVE_PERL" ); then
-	if ( test ! -n "$PERLINSTALLPREFIX" )
-	then
-		perlprefix=`$PERL -V:prefix`
-		PERLINSTALLPREFIX=`eval "$perlprefix"; echo $prefix`
-	fi
-	AC_SUBST(PERLINSTALLPREFIX)
+
+
+# prepend DESTDIR where appropriate
+if ( test "`echo $ac_default_prefix | cut -c1`" = "/" )
+then
+	ac_default_prefix='${DESTDIR}'"$ac_default_prefix"
+fi
+if ( test "`echo $prefix | cut -c1`" = "/" )
+then
+	prefix='${DESTDIR}'"$prefix"
+fi
+if ( test "`echo $exec_prefix | cut -c1`" = "/" )
+then
+	exec_prefix='${DESTDIR}'"$exec_prefix"
+fi
+if ( test "`echo $includedir | cut -c1`" = "/" )
+then
+	includedir='${DESTDIR}'"$includedir"
+fi
+if ( test "`echo $libdir | cut -c1`" = "/" )
+then
+	libdir='${DESTDIR}'"$libdir"
+fi
+if ( test "`echo $libexecdir | cut -c1`" = "/" )
+then
+	libexecdir='${DESTDIR}'"$libexecdir"
+fi
+if ( test "`echo $bindir | cut -c1`" = "/" )
+then
+	bindir='${DESTDIR}'"$bindir"
+fi
+if ( test "`echo $localstatedir | cut -c1`" = "/" )
+then
+	localstatedir='${DESTDIR}'"$localstatedir"
+fi
+if ( test "`echo $sysconfdir | cut -c1`" = "/" )
+then
+	sysconfdir='${DESTDIR}'"$sysconfdir"
+fi
+if ( test "`echo $mandir | cut -c1`" = "/" )
+then
+	mandir='${DESTDIR}'"$mandir"
+fi
+if ( test "`echo $datadir | cut -c1`" = "/" )
+then
+	datadir='${DESTDIR}'"$datadir"
 fi
 
 

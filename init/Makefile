@@ -7,7 +7,7 @@ UID = $(shell id | grep "uid=0" )
 ifneq ($(UID),)
 initroot = $(DESTDIR)
 else
-initroot = $(DESTDIR)$(prefix)
+initroot = $(prefix)
 endif
 
 install:

@@ -5,7 +5,7 @@
 # chkconfig: 345 85 15
 # description: Persistent database connection system.
 
-prefix=/usr/local/firstworks
+prefix=${DESTDIR}/usr/local/firstworks
 sysconfdir=${prefix}/etc
 
 if ( test -n -r "${sysconfdir}/sqlrelay.conf" ); then

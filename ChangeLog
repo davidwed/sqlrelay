@@ -52,6 +52,7 @@
 		SQL_SUCCESS_WITH_INFO/SQL_ROW_SUCCESS_WITH_INFO
 	added support for sybase rpc commands
 	improved support for interbase stored procedures
+	DESTDIR works as expected now
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

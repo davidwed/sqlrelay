@@ -9,6 +9,8 @@ VPATH = @srcdir@
 SQLR_VERSION = @SQLR_VERSION@
 SONAME_VERSION_INFO = @SONAME_VERSION_INFO@
 
+DESTDIR =
+
 # installation directories
 prefix = @prefix@
 exec_prefix= @exec_prefix@
@@ -111,7 +113,7 @@ PYTHONUSERPATH = @PYTHONUSERPATH@
 
 # zope
 HAVE_ZOPE = @HAVE_ZOPE@
-ZOPEDIR = @ZOPEDIR@
+ZOPEDIR = $(DESTIR)@ZOPEDIR@
 
 
 # ruby
