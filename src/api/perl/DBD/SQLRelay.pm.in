@@ -6,6 +6,8 @@ $DBD::SQLRelay::VERSION='@SQLR_VERSION@';
 use SQLRelay::Connection;
 use SQLRelay::Cursor;
 
+use DBI qw(:sql_types);
+
 $err=0;			# holds error code for DBI::err
 $errstr='';		# holds error string for DBI::err
 $sqlstate='';		# holds SQL state for DBI::state
@@ -125,6 +127,10 @@ sub prepare {
 	# get parameters
 	my ($dbh, $statement, @attribs)=@_;
 
+	# Convert format of bind vars from std DBI
+	my $count = 0;
+	$statement =~ s/\?/":" . ++$count/eg;
+
 	# create a blank statement handle
 	my $sth=DBI::_new_sth($dbh,{'Statement'=>$statement});
 	
@@ -137,9 +143,16 @@ sub prepare {
 	# store statement-specific data in the statement handle
 	#$sth->STORE('driver_params',[]);
 	$sth->STORE('driver_database_handle',$dbh);
+	$sth->STORE('NUM_OF_PARAMS', $count);
 	$sth->STORE('driver_is_select',($statement=~/^\s*select/i));
 	$sth->STORE('driver_cursor',$cursor);
 
+ 
+ 	for (grep /^ext_SQLR/, keys %$dbh) {
+ 		$sth->STORE($_, $dbh->FETCH($_));
+ 	}
+ 
+ 	$cursor->getNullsAsUndefined();
 	$cursor->prepareQuery($statement);
 
 	$sth->STORE('NUM_OF_PARAMS',$cursor->countBindVariables());
@@ -209,7 +222,7 @@ sub STORE {
 	}
 
 	# handle all other cases
-	if ($attr =~ /^driver_/) {
+	if ($attr =~ /^(?:driver|ext_SQLR)_/) {
 		$dbh->{$attr}=$val;
 		return 1;
 	}
@@ -230,7 +243,7 @@ sub FETCH {
 	}
 
 	# handle all other cases
-	if ($attr =~ /^driver_/) {
+	if ($attr =~ /^(?:driver|ext_SQLR)_/) {
 		return $dbh->{$attr};
 	}
 
@@ -255,13 +268,52 @@ package DBD::SQLRelay::st;
 $DBD::SQLRelay::st::imp_data_size=0;
 
 sub bind_param {
-
 	# get parameters
 	my ($sth,$param,$val,$attr)=@_;
 
 	# bind any variables/values that were passed in
 	my $cursor=$sth->FETCH('driver_cursor');
-	$cursor->inputBind($param,$val);
+	my $dbh = $sth->{'Database'};
+
+	if ($attr) {
+	
+		if (!ref($attr)) {
+
+			if ($attr == DBD::SQLRelay::SQL_CLOB) { 
+				$cursor->inputBindClob($param, $val, length($val)); 
+				return 1; 
+			}
+			elsif ($attr == DBD::SQLRelay::SQL_BLOB) { 
+				$cursor->inputBindBlob($param, $val, length($val)); 
+				return 1; 
+			}
+			return $dbh->DBI::set_err(0,'bind_param: type '.$attr." is not supported.\n");
+
+		} elsif (ref $attr eq 'HASH' && ($attr->{type} || $attr->{Type} || $attr->{TYPE}))  {
+			my $length = $attr->{length} || length $val;
+			if ($attr->{type} eq DBD::SQLRelay::SQL_CLOB) {
+
+				$cursor->inputBindClob($param, $val, $length);	
+			} elsif ($attr->{type} eq DBD::SQLRelay::SQL_BLOB) {
+
+				$cursor->inputBindBlob($param, $val, $length);	
+			} else {
+
+		        	return $dbh->DBI::set_err(0, 'bind_param: type ' . $attr->{type} .
+							     " is not supported.\n");
+			}	
+						
+		} else {
+
+		        return $dbh->DBI::set_err(0,'when specifying binding attributes, you must specify at least \'type\'');	
+
+		}
+	} else {
+
+		# bind any variables/values that were passed in
+		$cursor->inputBind($param, $val, 0, 6);
+
+	}
 
 	return 1;
 }
@@ -293,18 +345,25 @@ sub execute {
 	my $dbh=$sth->{'Database'};
 
 	# handle binds
-	my $index=1;
-	my $bind_value;
-	foreach $bind_value (@bind_values) {
-		bind_param($sth,$index,$bind_value);
-		$index=$index+1;
+	my $cursor=$sth->FETCH('driver_cursor');
+
+	# Clear and reset binds if they are being passed to execute()
+	if (scalar(@bind_values)) {
+		$cursor->clearBinds();
+		my $index=1;
+		my $bind_value;
+		foreach $bind_value (@bind_values) {
+			bind_param($sth,$index,$bind_value);
+			$index=$index+1;
+		}
 	}
 
 	# send the query
-	my $cursor=$sth->FETCH('driver_cursor');
 	if (not $cursor->executeQuery()) {
 		$sth->STORE('driver_NUM_OF_ROWS',0);
-		$sth->STORE('NUM_OF_FIELDS',0);
+		if (!$sth->FETCH('NUM_OF_FIELDS')) {
+			$sth->STORE('NUM_OF_FIELDS',0);
+		}
 		$sth->STORE('driver_FETCHED_ROWS',0);
 		return $dbh->DBI::set_err(0,$cursor->errorMessage());
 	}
@@ -314,15 +373,18 @@ sub execute {
 	my $rowcount=$cursor->rowCount();
 	my @colnames=map {$cursor->getColumnName($_)} (0..$colcount-1);
 	my @coltypes=map {$cursor->getColumnType($_)} (0..$colcount-1);
-	$sth->STORE('driver_NUM_OF_ROWS',$rowcount);
-	$sth->STORE('NUM_OF_FIELDS',$colcount);
+ 	# With "lazy fetching", we don't have a reliable rowcocunt
+ 	# $sth->STORE('driver_NUM_OF_ROWS',$rowcount);
+ 	if (!$sth->FETCH('NUM_OF_FIELDS')) {
+ 		$sth->STORE('NUM_OF_FIELDS',$colcount);
+ 	}
 	$sth->{NAME}=\@colnames;
 	$sth->{TYPE}=\@coltypes;
 	$sth->STORE('driver_FETCHED_ROWS',0);
 
 	# get the list of output bind variables and turn it into an array
 	my $param_inout_list=$sth->FETCH('driver_param_inout_list');
-	my @param_inout_array=split(' ',$param_inout_list);
+ 	my @param_inout_array=split(' ',$param_inout_list || "");
 
 	# loop through the array of parameters, for each, get the appropriate
 	# variable and store the output bind data in the variable
@@ -348,13 +410,15 @@ sub fetchrow_arrayref {
 	my $fetched_rows=$sth->FETCH('driver_FETCHED_ROWS');
 
 	# handle end of result set
-	if ($fetched_rows==$sth->FETCH('driver_NUM_OF_ROWS')) {
-		$sth->finish();
-		return undef;
-	}
+	# With "lazy fetching", this method doesn't work; see below.
+	#if ($fetched_rows==$sth->FETCH('driver_NUM_OF_ROWS')) {
+	#	$sth->finish();
+	#	return undef;
+	#}
 
 	# get a row
-	my @row=map {$sth->FETCH('driver_cursor')->getField($fetched_rows,$_)} (0..$sth->FETCH('NUM_OF_FIELDS')-1);
+	my @row= $sth->FETCH('driver_cursor')->getRow($fetched_rows);
+	if (scalar(@row) == 0) { return undef; }
 
 	# increment the fetched row count
 	$sth->STORE('driver_FETCHED_ROWS',$fetched_rows+1);
@@ -394,6 +458,12 @@ sub STORE {
 	# get parameters
 	my ($sth,$attr,$val)=@_;
 
+	if ($attr =~ /^ext_SQLR_BufferSize$/) {
+		my $cursor = $sth->FETCH('driver_cursor');
+		$cursor->setResultSetBufferSize($val);
+		return 1;
+	}
+
 	# handle all other cases
 	if ($attr =~ /^driver_/) {
 		$sth->{$attr}=$val;
@@ -409,6 +479,11 @@ sub FETCH {
 
 	# get parameters
 	my ($sth,$attr)=@_;
+
+	if ($attr =~ /^ext_SQLR_BufferSize$/) {
+		my $cursor = $sth->FETCH('driver_cursor');
+		return $cursor->getResultSetBufferSize();
+	}
 
 	# handle all other cases
 	if ($attr =~ /^driver_/) {
@@ -449,11 +524,15 @@ Connection string consists of following parts:
 
 =item B<debug=...>     default: I<0>         --- set it to 1 if you want to get some debug messages in stdout;
 
+=head1 USAGE
+
 Once connected, DB handler works as usual (see L<DBI>). 
 
 Don't ever try to share one SQLRelay connect by multiple scripts, for example, if you use 
 Apache mod_perl. Every $dbh holds one of server connections, so call disconnect() directly
 at the end of every script and don't use Apache::DBI or SQLRelay will be deadlocked.
+
+=head2 Note for HTML::Mason Users
 
 If you use L<HTML::Mason>, your handler.pl sould look like this:
 
@@ -480,10 +559,15 @@ If you use L<HTML::Mason>, your handler.pl sould look like this:
      }
      
 
-
 =head1 AUTHOR
 
 D. E. Ovsyanko, do@mobile.ru
+
+Contributions by:
+
+Erik Hollensbe <erik@hollensbe.org>
+
+Tony Fleisher <tfleisher@musiciansfriend.com>
 
 =head1 SEE ALSO
 
