@@ -150,7 +150,10 @@ bool msqlcursor::executeQuery(const char *query, long length,bool execute) {
 char *msqlcursor::getErrorMessage(bool *liveconnection) {
 
 	*liveconnection=true;
-
+	if (!charstring::compareIgnoringCase(msqlErrMsg,
+					"msql server has gone away")) {
+		*liveconnection=false;
+	}
 	return msqlErrMsg;
 }
 
