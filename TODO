@@ -2,10 +2,7 @@ cygwin:
 	requires rudiments without ssl/pcre support
 	perl api won't build
 
-support sybase/freetds stored procedures
-
 interbase stored procedure/output bind tests fails at isc_dsql_prepare
-test sybase/freetds stored procedures
 
 fix erwin's fake binds problem
 
@@ -201,7 +198,7 @@ Packages:
 	Unixware/OpenUnix
 
 Features:
-	support output bind vars and stored procedures in sybase
+	support non-string output binds sybase stored procedures
 	could debug logs be logrotate compatible?
 	postgresql drop-in api lacks many features
 	postgresql drop-in needs to parse out ; delimited queries for db's

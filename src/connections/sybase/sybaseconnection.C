@@ -500,7 +500,6 @@ bool sybasecursor::outputBindString(const char *variable,
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
 			(CS_VOID *)NULL,0,
-			//value,valuesize,
 			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
 		return false;
 	}

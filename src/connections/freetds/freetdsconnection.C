@@ -349,6 +349,7 @@ bool freetdscursor::closeCursor() {
 }
 
 bool freetdscursor::prepareQuery(const char *query, long length) {
+printf("prepare: %s\n",query);
 
 	clean=true;
 
@@ -356,47 +357,53 @@ bool freetdscursor::prepareQuery(const char *query, long length) {
 	this->length=length;
 
 	paramindex=0;
+	outbindindex=0;
+
+	isrpcquery=false;
 
 	// This code is here in case freetds ever actually supports cursors...
+	//if (cursorquery.match(query)) {
 	if (false) {
-		if (cursorquery.match(query)) {
 
-			// initiate a cursor command
-			cmd=cursorcmd;
-			if (ct_cursor(cursorcmd,CS_CURSOR_DECLARE,
-					(CS_CHAR *)cursorname,CS_NULLTERM,
-					(CS_CHAR *)query,length,
-					CS_UNUSED)!=CS_SUCCEED) {
-					//CS_READ_ONLY)!=CS_SUCCEED) {
-				return false;
-			}
-
-		} else if (rpcquery.match(query)) {
-
-			// initiate a language command
-			cmd=languagecmd;
-			if (ct_command(languagecmd,CS_RPC_CMD,
-				(CS_CHAR *)rpcquery.getSubstringEnd(0),
-				length-rpcquery.getSubstringEndOffset(0),
+		// initiate a cursor command
+		cmd=cursorcmd;
+		if (ct_cursor(cursorcmd,CS_CURSOR_DECLARE,
+				(CS_CHAR *)cursorname,CS_NULLTERM,
+				(CS_CHAR *)query,length,
 				CS_UNUSED)!=CS_SUCCEED) {
-				return false;
-			}
+				//CS_READ_ONLY)!=CS_SUCCEED) {
+			return false;
+		}
 
-		} else {
+	//} else if (rpcquery.match(query)) {
+	} else if (false) {
 
-			// initiate a language command
-			cmd=languagecmd;
-			if (ct_command(languagecmd,CS_LANG_CMD,
-					(CS_CHAR *)query,length,
-					CS_UNUSED)!=CS_SUCCEED) {
-				return false;
-			}
+		// initiate a language command
+		cmd=languagecmd;
+		isrpcquery=true;
+		if (ct_command(languagecmd,CS_RPC_CMD,
+			(CS_CHAR *)rpcquery.getSubstringEnd(0),
+			length-rpcquery.getSubstringEndOffset(0),
+			CS_UNUSED)!=CS_SUCCEED) {
+			return false;
+		}
+
+	//} else {
+	} else if (false) {
+
+		// initiate a language command
+		cmd=languagecmd;
+		if (ct_command(languagecmd,CS_LANG_CMD,
+				(CS_CHAR *)query,length,
+				CS_UNUSED)!=CS_SUCCEED) {
+			return false;
 		}
 	} else {
 		cmd=languagecmd;
 	}
+printf("after prepare\n");
 
-	clean=false;
+	//clean=false;
 	prepared=true;
 	return true;
 }
@@ -411,14 +418,12 @@ void freetdscursor::checkRePrepare() {
 	}
 }
 
-bool freetdscursor::inputBindString(const char *variable,
+/*bool freetdscursor::inputBindString(const char *variable,
 						unsigned short variablesize,
 						const char *value,
 						unsigned short valuesize,
 						short *isnull) {
-	return false;
 
-	// this code is here in case freetds ever really supports binds...
 	checkRePrepare();
 
 	(CS_VOID)memset(&parameter[paramindex],0,
@@ -445,9 +450,7 @@ bool freetdscursor::inputBindString(const char *variable,
 bool freetdscursor::inputBindLong(const char *variable,
 						unsigned short variablesize,
 						unsigned long *value) {
-	return false;
 
-	// this code is here in case freetds ever really supports binds...
 	checkRePrepare();
 
 	(CS_VOID)memset(&parameter[paramindex],0,
@@ -476,9 +479,7 @@ bool freetdscursor::inputBindDouble(const char *variable,
 						double *value,
 						unsigned short precision,
 						unsigned short scale) {
-	return false;
 
-	// this code is here in case freetds ever really supports binds...
 	checkRePrepare();
 
 	(CS_VOID)memset(&parameter[paramindex],0,
@@ -510,9 +511,11 @@ bool freetdscursor::outputBindString(const char *variable,
 					unsigned short valuesize, 
 					short *isnull) {
 
-	// this code is here in case SQL Relay ever supports rpc commands
+	outbindvalues[outbindindex]=value;
+	outbindvaluelengths[outbindindex]=valuesize;
+	outbindindex++;
 
-	/*(CS_VOID)memset(&parameter[paramindex],0,
+	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
@@ -526,16 +529,17 @@ bool freetdscursor::outputBindString(const char *variable,
 	parameter[paramindex].status=CS_RETURN;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-			(CS_VOID *)value,valuesize,
+			(CS_VOID *)NULL,0,
 			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
 		return false;
 	}
-	paramindex++;*/
+	paramindex++;
 	return true;
-}
+}*/
 
 bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 
+printf("execute: %s\n",query);
 	// clear out any errors
 	if (freetdsconn->errorstring) {
 		freetdsconn->deadconnection=false;
@@ -546,12 +550,14 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 	// this code is here in case freetds ever supports cursors
 	if (true) {
 		stringbuffer	*newquery=fakeInputBinds(query);
+printf("before ct_command\n");
 		if (newquery) {
 			if (ct_command(cmd,CS_LANG_CMD,
 					newquery->getString(),
 					strlen(newquery->getString()),
 					CS_UNUSED)!=CS_SUCCEED) {
 				delete newquery;
+printf("failed ct_command\n");
 				return false;
 			}
 			delete newquery;
@@ -559,9 +565,12 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 			if (ct_command(cmd,CS_LANG_CMD,
 					(CS_CHAR *)query,length,
 					CS_UNUSED)!=CS_SUCCEED) {
+printf("failed ct_command\n");
 				return false;
 			}
 		}
+printf("after ct_command\n");
+		clean=false;
 	}
 
 	// initialize return values
@@ -586,11 +595,15 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 		}
 	}
 
+printf("before ct_send\n");
 	if (ct_send(cmd)!=CS_SUCCEED) {
+printf("failed ct_send\n");
 		cleanUpData(true,true);
 		return false;
 	}
+printf("after ct_send\n");
 
+printf("before ct_results\n");
 	for (;;) {
 
 		results=ct_results(cmd,&resultstype);
@@ -601,14 +614,28 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 		}
 
 		if (cmd==languagecmd) {
-			// For non-cursor commands, there should be only
-			// one result set.
-			break;
-		} else if (cmd==cursorcmd && (resultstype==CS_ROW_RESULT ||
+
+			if (isrpcquery) {
+				// For rpc commands, there should be two
+				// result sets - CS_STATUS_RESULT,
+				// maybe a CS_PARAM_RESULT and maybe a
+				// CS_ROW_RESULT, we're not guaranteed
+				// what order they'll come in though, what
+				// a pickle...
+				// For now, we care about the CS_PARAM_RESULT,
+				// presumably there will only be 1 row in it...
+				if (resultstype==CS_PARAM_RESULT) {
+					break;
+				}
+			} else {
+				// For language commands, there should be only
+				// one result set.
+				break;
+			}
+
+		} else if (resultstype==CS_ROW_RESULT ||
 					resultstype==CS_CURSOR_RESULT ||
-					resultstype==CS_COMPUTE_RESULT ||
-					resultstype==CS_PARAM_RESULT ||
-					resultstype==CS_STATUS_RESULT)) {
+					resultstype==CS_COMPUTE_RESULT) {
 			// For cursor commands, each call to ct_cursor will
 			// have generated a result set.  There will be result
 			// sets for the CS_CURSOR_DECLARE, CS_CURSOR_ROWS and
@@ -625,6 +652,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 			return false;
 		}
 	}
+printf("after ct_results\n");
 
 	checkForTempTable(query,length);
 
@@ -646,8 +674,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 	if (resultstype==CS_ROW_RESULT ||
 			resultstype==CS_CURSOR_RESULT ||
 			resultstype==CS_COMPUTE_RESULT ||
-			resultstype==CS_PARAM_RESULT ||
-			resultstype==CS_STATUS_RESULT) {
+			resultstype==CS_PARAM_RESULT) {
 
 		if (ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -731,6 +758,35 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 		return false;
 	}
 
+
+	// if we're doing an rpc query, the result set should be a single
+	// row of output parameter results, fetch it and populate the output
+	// bind variables...
+	if (isrpcquery) {
+
+		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
+				&rowsread)!=CS_SUCCEED && !rowsread) {
+			return false;
+		}
+		
+		// copy data into output bind values
+		CS_INT	maxindex=outbindindex;
+		if (ncols<outbindindex) {
+			// this shouldn't happen...
+			maxindex=ncols;
+		}
+		for (CS_INT i=0; i<maxindex; i++) {
+			CS_INT	length=outbindvaluelengths[i];
+			if (datalength[i][0]<length) {
+				length=datalength[i][0];
+			}
+			memcpy(outbindvalues[i],data[i][0],length);
+		}
+
+		discardResults();
+		ncols=0;
+	}
+
 	// return success only if no error was generated
 	if (freetdsconn->errorstring) {
 		return false;
@@ -768,9 +824,7 @@ void freetdscursor::returnColumnInfo() {
 	// unless the query was a successful select, send no header
 	if (resultstype!=CS_ROW_RESULT &&
 			resultstype!=CS_CURSOR_RESULT &&
-			resultstype!=CS_COMPUTE_RESULT &&
-			resultstype!=CS_PARAM_RESULT &&
-			resultstype!=CS_STATUS_RESULT) {
+			resultstype!=CS_COMPUTE_RESULT) {
 		return;
 	}
 
@@ -872,9 +926,7 @@ bool freetdscursor::noRowsToReturn() {
 	// unless the query was a successful select, send no data
 	return (resultstype!=CS_ROW_RESULT &&
 			resultstype!=CS_CURSOR_RESULT &&
-			resultstype!=CS_COMPUTE_RESULT &&
-			resultstype!=CS_PARAM_RESULT &&
-			resultstype!=CS_STATUS_RESULT);
+			resultstype!=CS_COMPUTE_RESULT);
 }
 
 bool freetdscursor::skipRow() {

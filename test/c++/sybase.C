@@ -106,6 +106,12 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->ping(),1);
 	printf("\n");
 
+	printf("CREATE STORED PROCEDURE: \n");
+	cur->sendQuery("drop procedure testproc");
+	//checkSuccess(cur->sendQuery("create procedure testproc @inint int, @outint int output, @instring varchar(20), @outstring varchar(20) output as select @outint=@inint select @outstring=@instring"),1);
+	checkSuccess(cur->sendQuery("create procedure testproc @instring varchar(20), @outstring varchar(20) output as select @outstring=@instring"),1);
+	printf("\n");
+
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 
@@ -250,16 +256,14 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("STORED PROCEDURE: \n");
-con->debugOn();
-	//cur->sendQuery("drop procedure testproc");
-	//checkSuccess(cur->sendQuery("create procedure testproc @invar int, @outvar int output as select @outvar=@invar"),1);
-	//cur->prepareQuery("exec testproc @invar, @outvar");
-	checkSuccess(cur->sendQuery("declare @outvar int"),1);
-	checkSuccess(cur->sendQuery("exec testproc 5, @outvar output"),1);
-	checkSuccess(cur->sendQuery("select @outvar"),1);
-	checkSuccess(cur->getField(0,0),"5");
-
-	//checkSuccess(cur->sendQuery("drop procedure testproc"),1);
+	cur->prepareQuery("exec testproc");
+	//cur->inputBind("inint","5");
+	cur->inputBind("instring","hello");
+	//cur->defineOutputBind("outint",20);
+	cur->defineOutputBind("outstring",20);
+	checkSuccess(cur->executeQuery(),1);
+	//checkSuccess(cur->getOutputBind("outint"),"5");
+	checkSuccess(cur->getOutputBind("outstring"),"hello");
 	printf("\n");
 
 	printf("SELECT: \n");

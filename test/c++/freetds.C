@@ -89,7 +89,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->ping(),1);
 	printf("\n");
 
-
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 
@@ -242,6 +241,7 @@ con->debugOn();
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");*/
+	printf("\n");
 
 	printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);

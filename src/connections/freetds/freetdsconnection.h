@@ -30,7 +30,7 @@ class freetdscursor : public sqlrcursor {
 		bool	openCursor(int id);
 		bool	closeCursor();
 		bool	prepareQuery(const char *query, long length);
-		bool	inputBindString(const char *variable,
+		/*bool	inputBindString(const char *variable,
 						unsigned short variablesize,
 						const char *value,
 						unsigned short valuesize,
@@ -47,7 +47,7 @@ class freetdscursor : public sqlrcursor {
 						unsigned short variablesize,
 						char *value, 
 						unsigned short valuesize, 
-						short *isnull);
+						short *isnull);*/
 		bool	executeQuery(const char *query,
 						long length,
 						bool execute);
@@ -86,6 +86,9 @@ class freetdscursor : public sqlrcursor {
 
 		CS_DATAFMT	parameter[MAX_BIND_VARS];
 		int		paramindex;
+		char		*outbindvalues[MAX_BIND_VARS];
+		unsigned short	outbindvaluelengths[MAX_BIND_VARS];
+		int		outbindindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
 		char		data[MAX_SELECT_LIST_SIZE]
@@ -103,6 +106,7 @@ class freetdscursor : public sqlrcursor {
 
 		regularexpression	cursorquery;
 		regularexpression	rpcquery;
+		bool			isrpcquery;
 
 		freetdsconnection	*freetdsconn;
 };
