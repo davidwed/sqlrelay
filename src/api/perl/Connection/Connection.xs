@@ -7,7 +7,7 @@
 
 typedef class sqlrconnection sqlrconnection;
 
-MODULE = Firstworks::SQLRConnection	PACKAGE = Firstworks::SQLRConnection
+MODULE = SQLRelay::Connection	PACKAGE = SQLRelay::Connection
 REQUIRE: 1.925
 
 sqlrconnection *

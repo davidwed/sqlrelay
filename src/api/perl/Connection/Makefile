@@ -27,13 +27,13 @@ endif
 .C.lo:
 	cp perlincludes1.h perlincludes.h; \
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors1; \
-	if ( test ! -r SQLRCursor.lo ); then \
+	if ( test ! -r Connection.lo ); then \
 		cp perlincludes2.h perlincludes.h; \
 		$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors2; \
-		if ( test ! -r SQLRCursor.lo ); then \
+		if ( test ! -r Connection.lo ); then \
 			cp perlincludes2.h perlincludes.h; \
 			$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors3; \
-			if ( test ! -r SQLRCursor.lo ); then \
+			if ( test ! -r Connection.lo ); then \
 				if ( test -s errors1 ); then \
 					echo "first try errors : "; cat errors1; echo; \
 				fi; \
@@ -59,7 +59,7 @@ endif
 	$(RM) errors1 errors2 errors3 perlincludes.h
 
 
-all: libSQLRCursor.la
+all: libConnection.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.C
@@ -73,58 +73,58 @@ clean:
 
 rebuild: clean all
 
-libSQLRCursor.la: SQLRCursor.xs SQLRCursor.C SQLRCursor.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ SQLRCursor.lo $(LIBS) -rpath $(PERLSITEARCH)/auto/Firstworks/SQLRCursor $(RPATH) -module
+libConnection.la: Connection.xs Connection.C Connection.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ Connection.lo $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Connection $(RPATH) -module
 
-SQLRCursor.so:
-	if ( test -r .libs/libSQLRCursor.0.0.0 ); \
+Connection.so:
+	if ( test -r .libs/libConnection.0.0.0 ); \
 	then \
-		cp .libs/libSQLRCursor.0.0.0 SQLRCursor.so; \
+		cp .libs/libConnection.0.0.0 Connection.so; \
 	fi
-	if ( test -r .libs/libSQLRCursor.0.0 ); \
+	if ( test -r .libs/libConnection.0.0 ); \
 	then \
-		cp .libs/libSQLRCursor.0.0 SQLRCursor.so; \
+		cp .libs/libConnection.0.0 Connection.so; \
 	fi
-	if ( test -r .libs/libSQLRCursor.0 ); \
+	if ( test -r .libs/libConnection.0 ); \
 	then \
-		cp .libs/libSQLRCursor.0 SQLRCursor.so; \
+		cp .libs/libConnection.0 Connection.so; \
 	fi
-	if ( test -r .libs/libSQLRCursor ); \
+	if ( test -r .libs/libConnection ); \
 	then \
-		cp .libs/libSQLRCursor SQLRCursor.so; \
+		cp .libs/libConnection Connection.so; \
 	fi
-	if ( test -r .libs/libSQLRCursor.so.0.0.0 ); \
+	if ( test -r .libs/libConnection.so.0.0.0 ); \
 	then \
-		cp .libs/libSQLRCursor.so.0.0.0 SQLRCursor.so; \
+		cp .libs/libConnection.so.0.0.0 Connection.so; \
 	fi
-	if ( test -r .libs/libSQLRCursor.so.0.0 ); \
+	if ( test -r .libs/libConnection.so.0.0 ); \
 	then \
-		cp .libs/libSQLRCursor.so.0.0 SQLRCursor.so; \
+		cp .libs/libConnection.so.0.0 Connection.so; \
 	fi
-	if ( test -r .libs/libSQLRCursor.so.0 ); \
+	if ( test -r .libs/libConnection.so.0 ); \
 	then \
-		cp .libs/libSQLRCursor.so.0 SQLRCursor.so; \
+		cp .libs/libConnection.so.0 Connection.so; \
 	fi
-	if ( test -r .libs/libSQLRCursor.so ); \
+	if ( test -r .libs/libConnection.so ); \
 	then \
-		cp .libs/libSQLRCursor.so SQLRCursor.so; \
+		cp .libs/libConnection.so Connection.so; \
 	fi
 
-install: SQLRCursor.so
-	$(MKINSTALLDIRS) $(PERLSITEARCH)/Firstworks
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 SQLRCursor.pm $(PERLSITEARCH)/Firstworks
-	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/Firstworks/SQLRCursor
-	$(LIBTOOL) --mode=install $(INSTALL) -m 755 SQLRCursor.so $(PERLSITEARCH)/auto/Firstworks/SQLRCursor
-	touch $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/SQLRCursor.bs
-	$(RM) SQLRCursor.so
-	pod2man SQLRCursor.pm > Firstworks::SQLRCursor.$(PERLMAN3EXT)
+install: Connection.so
+	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
+	$(LIBTOOL) --mode=install $(INSTALL) -m 644 Connection.pm $(PERLSITEARCH)/SQLRelay
+	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Connection
+	$(LIBTOOL) --mode=install $(INSTALL) -m 755 Connection.so $(PERLSITEARCH)/auto/SQLRelay/Connection
+	touch $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs
+	$(RM) Connection.so
+	pod2man Connection.pm > SQLRelay::Connection.$(PERLMAN3EXT)
 	$(MKINSTALLDIRS) $(PERLINSTALLMAN3DIR)
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 Firstworks::SQLRCursor.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
-	$(RM) Firstworks::SQLRCursor.$(PERLMAN3EXT)
-	echo $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/SQLRCursor.so > $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist
-	echo $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/SQLRCursor.bs > $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist
-	echo $(PERLINSTALLMAN3DIR)/Firstworks::SQLRCursor.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist
+	$(LIBTOOL) --mode=install $(INSTALL) -m 644 SQLRelay::Connection.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
+	$(RM) SQLRelay::Connection.$(PERLMAN3EXT)
+	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.so > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Connection.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) `cat $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist`
-	$(LIBTOOL) --mode=uninstall $(RM) $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist
+	$(LIBTOOL) --mode=uninstall $(RM) `cat $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist`
+	$(LIBTOOL) --mode=uninstall $(RM) $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist

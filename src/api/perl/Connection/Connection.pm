@@ -1,30 +1,30 @@
 # Copyright (c) 2000-2001  David Muse
 # See the file COPYING for more information
 
-package Firstworks::SQLRConnection;
+package SQLRelay::Connection;
 
 require DynaLoader;
 @ISA = 'DynaLoader';
 
-$VERSION = '@SQLR_VERSION@';
+$VERSION = '0.35';
 
-bootstrap Firstworks::SQLRConnection $VERSION;
+bootstrap SQLRelay::Connection $VERSION;
 
 1;
 __END__
 
 =head1 NAME
 
-    Firstworks::SQLRConnection - Perl API for SQL Relay
+    SQLRelay::Connection - Perl API for SQL Relay
 
 =head1 SYNOPSIS
 
-        use Firstworks::SQLRConnection;
-        use Firstworks::SQLRStmt;
+        use SQLRelay::Connection;
+        use SQLRelay::Cursor;
 
-        my $sc=Firstworks::SQLRConnection->new("testhost",9000,"",
+        my $sc=SQLRelay::Connection->new("testhost",9000,"",
                                           "testuser","testpassword",0,1);
-        my $ss=Firstworks::SQLRStmt->new($sc);
+        my $ss=SQLRelay::Cursor->new($sc);
 
         $ss->sendQuery("select table_name from user_tables");
         $sc->endSession();
@@ -35,7 +35,7 @@ __END__
 
 =head1 DESCRIPTION
 
-    Firstworks::SQLRConnection
+    SQLRelay::Connection
 
         new(server, port, socket, user, password, retrytime, tries);
             # Initiates a connection to "server" on "port"
