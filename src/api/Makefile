@@ -13,7 +13,7 @@ ifneq ($(HAVE_PERL),)
 	$(MAKE) -C perl/DBD -f Makefile.master all
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby -f Makefile.master all
+	$(MAKE) -C ruby
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php all
@@ -38,7 +38,7 @@ ifneq ($(HAVE_PERL),)
 	$(MAKE) -C perl/DBD -f Makefile.master clean
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby -f Makefile.master clean
+	$(MAKE) -C ruby clean
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php clean
@@ -64,7 +64,7 @@ ifneq ($(HAVE_PERL),)
 	$(MAKE) -C perl/DBD -f Makefile.master rebuild
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby -f Makefile.master rebuild
+	$(MAKE) -C ruby rebuild
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php rebuild
@@ -89,7 +89,7 @@ ifneq ($(HAVE_PERL),)
 	$(MAKE) -C perl/DBD -f Makefile.master install
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby -f Makefile.master install
+	$(MAKE) -C ruby install
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php install
@@ -117,7 +117,7 @@ ifneq ($(HAVE_PERL),)
 	$(MAKE) -C perl/DBD -f Makefile.master uninstall
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby -f Makefile.master uninstall
+	$(MAKE) -C ruby uninstall
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php uninstall

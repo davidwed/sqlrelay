@@ -1,8 +1,10 @@
+top_builddir = ../..
+
 include ../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
 
 SRCS = sqlrconnection/constructor.C \
 	sqlrconnection/destructor.C \
@@ -205,7 +207,7 @@ libsqlrconnection_debug.la: $(SRCS) $(DLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(DLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
-	$(abs_srcdir)/mkinstalldirs $(libdir)
+	$(MKINSTALLDIRS) $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrconnection.la $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrconnection_debug.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)

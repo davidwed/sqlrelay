@@ -1,9 +1,9 @@
+top_builddir = ../../..
+
 include ../../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
-LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)
@@ -86,7 +86,7 @@ sql_relay.so:
 	fi
 
 install: sql_relay.so
-	$(abs_srcdir)/mkinstalldirs $(PHPEXTDIR)
+	$(MKINSTALLDIRS) $(PHPEXTDIR)
 	$(LIBTOOL) --mode=install $(INSTALL) -s sql_relay.so $(PHPEXTDIR)
 	$(RM) sql_relay.so
 

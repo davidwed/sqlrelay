@@ -1,9 +1,9 @@
+top_builddir = ../..
+
 include ../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES) `$(GTKCONFIG) --cflags`
-#CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES) -I/usr/include/gtk-2.0 -I/usr/include/glib-2.0 -I/usr/X11R6/include
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) `$(GTKCONFIG) --cflags`
+#CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -I/usr/include/gtk-2.0 -I/usr/include/glib-2.0 -I/usr/X11R6/include
 LIBS = $(RUDIMENTSLIBS) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= configfile.C gtkfe.C
@@ -32,7 +32,7 @@ sqlr-config-gtk: $(SRCS) $(LOBJS)
 	#$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) -lgtk-x11 $(LIBS)
 
 install:
-	$(abs_srcdir)/mkinstalldirs $(bindir)
+	$(top_builddir)/mkinstalldirs $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-config-gtk $(bindir)
 
 uninstall:

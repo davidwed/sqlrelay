@@ -395,18 +395,24 @@ FW_CHECK_PS
 FW_CHECK_UNAME
 FW_CHECK_GNU_STRIP
 FW_CHECK_PIPE
+
+FW_CHECK_SO_EXT
 echo "******************************"
 
 
 dnl Checks for libtool.
 echo
 echo "***** Libtool ****************"
+AC_LIBTOOL_WIN32_DLL
+dnl Crazy, we need to set CC=g++ or libtool will use gcc to link, even if g++
+dnl is specified during the call.  So, we need a seperate libtool for gcc.
 OLDCC=$CC
 CC=$CXX
-AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
-FW_CHECK_USE_SYSTEM_LIBTOOL
 CC=$OLDCC
+sed -e "s|^CC=\"$CXX\"$|CC=\"$CC\"|" -e "s|^LTCC=\"$CXX\"$|LTCC=\"$CC\"|" libtool > libtool.gcc
+chmod 755 libtool.gcc
+FW_CHECK_USE_SYSTEM_LIBTOOL
 echo "******************************"
 
 
@@ -659,7 +665,7 @@ AC_SUBST(RPM_BUILD_DIR)
 
 
 dnl Default build variables.
-SQLR_VERSION="0.34.1"
+SQLR_VERSION="0.34.2"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
 dnl rules for CURRENT:REVISION:AGE version info:

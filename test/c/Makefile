@@ -1,12 +1,14 @@
+top_builddir = ../..
+
 include ../../config.mk
 
-CPPFLAGS = $(BASCPPFLAGS) -I$(incdir) $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I$(incdir) $(RUDIMENTSINCLUDES)
 LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) -lm $(LIBEFENCE)
 
 .SUFFIXES: .lo
 
 .c.lo:
-	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LIBTOOLGCC) --mode=compile $(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
@@ -63,43 +65,43 @@ ifneq ($(strip $(SYBASELIBS)),)
 endif
 
 db2: db2.c db2.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ db2.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ db2.lo $(LIBS)
 
 freetds: freetds.c freetds.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ freetds.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ freetds.lo $(LIBS)
 
 interbase: interbase.c interbase.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ interbase.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ interbase.lo $(LIBS)
 
 lago: lago.c lago.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ lago.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ lago.lo $(LIBS)
 
 msql: msql.c msql.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ msql.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ msql.lo $(LIBS)
 
 mysql: mysql.c mysql.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
 
 oracle7: oracle7.c oracle7.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ oracle7.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle7.lo $(LIBS)
 
 oracle8: oracle8.c oracle8.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
 
 oracle8i: oracle8i.c oracle8i.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ oracle8i.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle8i.lo $(LIBS)
 
 postgresql6: postgresql6.c postgresql6.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql6.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql6.lo $(LIBS)
 
 postgresql7: postgresql7.c postgresql7.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql7.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql7.lo $(LIBS)
 
 sqlite: sqlite.c sqlite.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ sqlite.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sqlite.lo $(LIBS)
 
 sybase: sybase.c sybase.lo
-	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ sybase.lo $(LIBS)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sybase.lo $(LIBS)
 
 
 rebuild: clean all

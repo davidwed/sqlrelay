@@ -97,15 +97,6 @@ fi
 AC_DEFUN([FW_CHECK_HEADERS_AND_LIBS],
 [
 
-eval "$7=\"\""
-eval "$8=\"\""
-eval "$9=\"\""
-eval "$10=\"\""
-if ( test -n "$11" )
-then
-	eval "$11=\"\""
-fi
-
 SEARCHPATH=$1
 NAME=$2
 HEADER=$3
@@ -119,38 +110,47 @@ LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
 
+eval "$7=\"\""
+eval "$8=\"\""
+eval "$9=\"\""
+eval "$10=\"\""
+if ( test -n "$11" )
+then
+	eval "$11=\"\""
+fi
+
 dnl first, check the specified path
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
-	FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"$SEARCHPATH/lib/lib$LIBNAME.so\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"$SEARCHPATH/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+	FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/lib$LIBNAME.$SO],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"$SEARCHPATH/lib/lib$LIBNAME.$SO\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"$SEARCHPATH/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 else
-	FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+	FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/lib$LIBNAME.$SO],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 fi
 if ( test -z "$LIBSTRING" )
 then
 	if ( test "$USEFULLLIBPATH" = "yes" )
 	then
-		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"$SEARCHPATH/lib/lib$LIBNAME.so\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"$SEARCHPATH/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/lib$LIBNAME.$SO],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"$SEARCHPATH/lib/lib$LIBNAME.$SO\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"$SEARCHPATH/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 	else
-		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/lib$LIBNAME.$SO],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 	fi
 fi
 if ( test -z "$LIBSTRING" )
 then
 	if ( test "$USEFULLLIBPATH" = "yes" )
 	then
-		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"$SEARCHPATH/lib/$NAME/lib$LIBNAME.so\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$SEARCHPATH/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"$SEARCHPATH/lib/$NAME/lib$LIBNAME.$SO\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$SEARCHPATH/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 	else
-		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 	fi
 fi
 if ( test -z "$LIBSTRING" )
 then
 	if ( test "$USEFULLLIBPATH" = "yes" )
 	then
-		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"$SEARCHPATH/lib/$NAME/lib$LIBNAME.so\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$SEARCHPATH/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"$SEARCHPATH/lib/$NAME/lib$LIBNAME.$SO\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$SEARCHPATH/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 	else
-		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 	fi
 fi
 
@@ -160,36 +160,36 @@ if ( test -z "$LIBSTRING" )
 then
 	if ( test "$USEFULLLIBPATH" = "yes" )
 	then
-		FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"/usr/lib/lib$LIBNAME.so\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"/usr/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/lib$LIBNAME.$SO],[LIBPATH=\"\"; LIBSTRING=\"/usr/lib/lib$LIBNAME.$SO\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"/usr/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 	else
-		FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/lib$LIBNAME.$SO],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 	fi
 fi
 if ( test -z "$LIBSTRING" )
 then
 	if ( test "$USEFULLLIBPATH" = "yes" )
 	then
-		FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"/usr/lib/lib$LIBNAME.so\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"/usr/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/lib$LIBNAME.$SO],[LIBPATH=\"\"; LIBSTRING=\"/usr/lib/lib$LIBNAME.$SO\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"/usr/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 	else
-		FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/lib$LIBNAME.$SO],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 	fi
 fi
 if ( test -z "$LIBSTRING" )
 then
 	if ( test "$USEFULLLIBPATH" = "yes" )
 	then
-		FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"/usr/lib/$NAME/lib$LIBNAME.so\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"/usr/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"/usr/lib/$NAME/lib$LIBNAME.$SO\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"/usr/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 	else
-		FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 	fi
 fi
 if ( test -z "$LIBSTRING" )
 then
 	if ( test "$USEFULLLIBPATH" = "yes" )
 	then
-		FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"/usr/lib/$NAME/lib$LIBNAME.so\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"/usr/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"/usr/lib/$NAME/lib$LIBNAME.$SO\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"/usr/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 	else
-		FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+		FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 	fi
 fi
 
@@ -204,35 +204,35 @@ then
 		then
 			if ( test "$USEFULLLIBPATH" = "yes" )
 			then
-				FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/lib$LIBNAME.so],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"$paths/lib/lib$LIBNAME.so\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/lib$LIBNAME.$SO],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"$paths/lib/lib$LIBNAME.$SO\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 			else
-				FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/lib$LIBNAME.so],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-L$paths/lib -l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/lib$LIBNAME.$SO],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-L$paths/lib -l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
 			if ( test -z "$LIBSTRING" )
 			then
 				if ( test "$USEFULLLIBPATH" = "yes" )
 				then
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/lib$LIBNAME.so],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"$paths/lib/lib$LIBNAME.so\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/lib$LIBNAME.$SO],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"$paths/lib/lib$LIBNAME.$SO\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 				else
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/lib$LIBNAME.so],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-L$paths/lib -l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/lib$LIBNAME.$SO],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-L$paths/lib -l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 				fi
 			fi
 			if ( test -z "$LIBSTRING" )
 			then
 				if ( test "$USEFULLLIBPATH" = "yes" )
 				then
-					FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$paths/lib/$NAME\"; LIBSTRING=\"$paths/lib/$NAME/lib$LIBNAME.so\"],[$paths/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+					FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"$paths/lib/$NAME\"; LIBSTRING=\"$paths/lib/$NAME/lib$LIBNAME.$SO\"],[$paths/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 				else
-					FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$paths/lib/$NAME\"; LIBSTRING=\"-L$paths/lib/$NAME -l$LIBNAME\"],[$paths/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+					FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"$paths/lib/$NAME\"; LIBSTRING=\"-L$paths/lib/$NAME -l$LIBNAME\"],[$paths/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 				fi
 			fi
 			if ( test -z "$LIBSTRING" )
 			then
 				if ( test "$USEFULLLIBPATH" = "yes" )
 				then
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$paths/lib/$NAME\"; LIBSTRING=\"$paths/lib/$NAME/lib$LIBNAME.so\"],[$paths/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"$paths/lib/$NAME\"; LIBSTRING=\"$paths/lib/$NAME/lib$LIBNAME.$SO\"],[$paths/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 				else
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$paths/lib/$NAME\"; LIBSTRING=\"-L$paths/lib/$NAME -l$LIBNAME\"],[$paths/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/$NAME/lib$LIBNAME.$SO],[LIBPATH=\"$paths/lib/$NAME\"; LIBSTRING=\"-L$paths/lib/$NAME -l$LIBNAME\"],[$paths/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 				fi
 			fi
 			if ( test -n "$LIBSTRING" )
@@ -266,7 +266,11 @@ AC_DEFUN([FW_CHECK_USE_SYSTEM_LIBTOOL],
 if ( test "$USE_SYSTEM_LIBTOOL" = "yes" )
 then
   LIBTOOL="libtool"
+  LIBTOOLGCC="libtool"
+else
+  LIBTOOLGCC="$LIBTOOL.gcc"
 fi
+AC_SUBST(LIBTOOLGCC)
 ])
 
 
@@ -347,6 +351,22 @@ else
 fi
 AC_SUBST(PIPE)
 ])
+
+
+
+dnl Determines what extension shared object files have
+AC_DEFUN([FW_CHECK_SO_EXT],
+[
+AC_MSG_CHECKING(for dynamic library extension)
+if ( test "`uname -s`" = "Darwin" )
+then
+	SO="dylib"
+else
+	SO="so"
+fi
+AC_MSG_RESULT($SO)
+])
+
 
 
 dnl Checks for microsoft platform.
@@ -731,7 +751,7 @@ then
 		then
 			MYSQLINCLUDES="-I$MYSQLPATH/include/mysql"
 			dnl MYSQLLIBS="-L$MYSQLPATH/lib/mysql -lmysqlclient"
-			MYSQLLIBS="$MYSQLPATH/lib/mysql/libmysqlclient.so"
+			MYSQLLIBS="$MYSQLPATH/lib/mysql/libmysqlclient.$SO"
 			MYSQLLIBSPATH="$MYSQLPATH/lib/mysql"
 		fi
 
@@ -753,8 +773,8 @@ then
 				FW_CHECK_FILE($MYSQLPATH/include/mysql.h,[MYSQLINCLUDES=\"-I$MYSQLPATH/include\"])
 				dnl FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.a,[MYSQLLIBS=\"-L$MYSQLPATH/lib/opt -lmysqlclient\"; MYSQLSTATIC=\"$STATICFLAG\"])
 				FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.a,[MYSQLLIBS=\"$MYSQLPATH/lib/libmysqlclient.a\"; MYSQLSTATIC=\"$STATICFLAG\"])
-				dnl FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.so,[MYSQLLIBSPATH=\"$MYSQLPATH/lib/opt\"; MYSQLLIBS=\"-L$MYSQLPATH/lib/opt -lmysqlclient\"])
-				FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.so,[MYSQLLIBSPATH=\"$MYSQLPATH/lib/opt\"; MYSQLLIBS=\"$MYSQLPATH/lib/opt/libmysqlclient.so\"])
+				dnl FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.$SO,[MYSQLLIBSPATH=\"$MYSQLPATH/lib/opt\"; MYSQLLIBS=\"-L$MYSQLPATH/lib/opt -lmysqlclient\"])
+				FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.$SO,[MYSQLLIBSPATH=\"$MYSQLPATH/lib/opt\"; MYSQLLIBS=\"$MYSQLPATH/lib/opt/libmysqlclient.$SO\"])
 			else
 				FW_CHECK_FILE("/cygdrive/c/mysql/include/mysql.h",[MYSQLINCLUDES=\"-I/cygdrive/c/mysql/include\"])
 				FW_CHECK_FILE("/cygdrive/c/mysql/lib/opt/libmySQL.dll",[MYSQLLIBS=\"/cygdrive/c/mysql/lib/opt/libmySQL.dll\"])
@@ -832,7 +852,7 @@ then
 		do
 			if ( test -n "$i" )
 			then
-				FW_CHECK_HEADER_LIB([$i/include/msql.h],[MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\"],[$i/lib/libmsql.so],[MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\"],[$i/lib/libmsql.a],[MSQLLIBS=\"-L$i/lib -lmsql\"])
+				FW_CHECK_HEADER_LIB([$i/include/msql.h],[MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\"],[$i/lib/libmsql.$SO],[MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\"],[$i/lib/libmsql.a],[MSQLLIBS=\"-L$i/lib -lmsql\"])
 				if ( test -n "$MSQLLIBS" )
 				then
 					break
@@ -840,7 +860,7 @@ then
 			fi
 		done
 	
-		FW_CHECK_HEADER_LIB([/usr/include/msql.h],[MSQLINCLUDES=\"\"; MSQLPATH=\"\"],[/usr/lib/libmsql.so],[MSQLLIBSPATH=\"\"; MSQLLIBS=\"-lmsql\"],[/usr/lib/libmsql.a],[MSQLLIBS=\"-lmsql\"])
+		FW_CHECK_HEADER_LIB([/usr/include/msql.h],[MSQLINCLUDES=\"\"; MSQLPATH=\"\"],[/usr/lib/libmsql.$SO],[MSQLLIBSPATH=\"\"; MSQLLIBS=\"-lmsql\"],[/usr/lib/libmsql.a],[MSQLLIBS=\"-lmsql\"])
 		
 		if ( test -z "$MSQLLIBS" )
 		then
@@ -1206,20 +1226,20 @@ then
 		
 		if ( test -n "$SYBASEPATH" )
 		then
-			FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.so],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.$SO],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 		else
 		
-			FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.so],[SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.$SO],[SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 		
-			FW_CHECK_HEADER_LIB([/opt/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/include\"],[/opt/sybase/lib/libct.so],[SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/opt/sybase/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/opt/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/include\"],[/opt/sybase/lib/libct.$SO],[SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/opt/sybase/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 	
-			FW_CHECK_HEADER_LIB([/opt/sybase-12.5/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.so],[SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/opt/sybase-12.5/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.$SO],[SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
 		
 			if ( test -z "$SYBASELIBS" )
 			then
 				for i in "11.9.2" "11.0.3.3"
 				do
-					FW_CHECK_HEADER_LIB([/opt/sybase-$i/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-$i/include\"],[/opt/sybase-$i/lib/libct.so],[SYBASELIBSPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/opt/sybase-$i/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+					FW_CHECK_HEADER_LIB([/opt/sybase-$i/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-$i/include\"],[/opt/sybase-$i/lib/libct.$SO],[SYBASELIBSPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/opt/sybase-$i/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 					if ( test -n "$SYBASELIBS" )
 					then
 						break
@@ -1409,18 +1429,18 @@ then
 		
 		if ( test -n "$DB2PATH" )
 		then
-			FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/libdb2.so],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"-L$DB2PATH/lib -ldb2\"],[$DB2PATH/lib/libdb2.a],[DB2LIBS=\"-L$DB2PATH/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/libdb2.$SO],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"-L$DB2PATH/lib -ldb2\"],[$DB2PATH/lib/libdb2.a],[DB2LIBS=\"-L$DB2PATH/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
 		
 		else
 		
 			dnl check /opt for 7.2
-			FW_CHECK_HEADER_LIB([/opt/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBMdb2/V7.1/include\"],[/opt/IBMdb2/V7.1/lib/libdb2.so],[DB2LIBSPATH=\"/opt/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"],[/opt/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/opt/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBMdb2/V7.1/include\"],[/opt/IBMdb2/V7.1/lib/libdb2.$SO],[DB2LIBSPATH=\"/opt/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"],[/opt/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
 		
 			dnl check /usr for 7.2
-			FW_CHECK_HEADER_LIB([/usr/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/usr/IBMdb2/V7.1/include\"],[/usr/IBMdb2/V7.1/lib/libdb2.so],[DB2LIBSPATH=\"/usr/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"],[/usr/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/usr/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/usr/IBMdb2/V7.1/include\"],[/usr/IBMdb2/V7.1/lib/libdb2.$SO],[DB2LIBSPATH=\"/usr/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"],[/usr/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
 		
 			dnl check /opt for 8.1
-			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V8.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V8.1/include\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.so],[DB2LIBSPATH=\"/opt/IBM/db2/V8.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"8\"])
+			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V8.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V8.1/include\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.$SO],[DB2LIBSPATH=\"/opt/IBM/db2/V8.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"8\"])
 		fi
 		
 		if ( test -z "$DB2LIBS" )
@@ -1475,17 +1495,17 @@ then
 		
 		if ( test -n "$INTERBASEPATH" )
 		then
-			FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/lib/libgds.so],[INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"],[$INTERBASEPATH/lib/libgds.a],[INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/lib/libgds.$SO],[INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"],[$INTERBASEPATH/lib/libgds.a],[INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 		
 		else
 		
 			dnl includes
-			FW_CHECK_HEADER_LIB([/usr/include/ibase.h],[INTERBASEINCLUDES=\"\"],[/usr/lib/libgds.so],[INTERBASELIBS=\"-lgds -lcrypt\"],[/usr/lib/libgds.a],[INTERBASELIBS=\"-lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/usr/include/ibase.h],[INTERBASEINCLUDES=\"\"],[/usr/lib/libgds.$SO],[INTERBASELIBS=\"-lgds -lcrypt\"],[/usr/lib/libgds.a],[INTERBASELIBS=\"-lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 		fi
 
 		if ( test -z "$INTERBASELIBS" )
 		then
-			FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.so],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.$SO],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 		fi
 		
 		LINKFAIL=""
@@ -1990,10 +2010,10 @@ then
 				done
 				if ( test -z "$TCLLIB" )
 				then
-					FW_CHECK_FILE($TCLLIBSPATH/libtcl.so,[TCLLIB=\"-L$TCLLIBSPATH -ltcl\"])
+					FW_CHECK_FILE($TCLLIBSPATH/libtcl.$SO,[TCLLIB=\"-L$TCLLIBSPATH -ltcl\"])
 					for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 					do
-						FW_CHECK_FILE($TCLLIBSPATH/libtcl$i.so,[TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\"])
+						FW_CHECK_FILE($TCLLIBSPATH/libtcl$i.$SO,[TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\"])
 					done
 				fi
 			else
@@ -2010,7 +2030,7 @@ then
 					do
 						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 						do
-							FW_CHECK_FILE($i/libtcl$j.so,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
+							FW_CHECK_FILE($i/libtcl$j.$SO,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
 						done
 					done
 				fi

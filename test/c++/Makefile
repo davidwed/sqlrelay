@@ -1,3 +1,5 @@
+top_builddir = ../..
+
 include ../../config.mk
 
 CPPFLAGS = $(BASCPPFLAGS) -I$(incdir) $(RUDIMENTSINCLUDES)

@@ -1,6 +1,6 @@
-include ../../../../config.mk
+top_builddir = ../../../..
 
-INSTALL = $(abs_srcdir)/install-sh -c
+include ../../../../config.mk
 
 all:
 

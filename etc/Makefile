@@ -1,9 +1,9 @@
+top_builddir = ..
+
 include ../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
 install:
-	$(abs_srcdir)/mkinstalldirs $(sysconfdir)
+	$(MKINSTALLDIRS) $(sysconfdir)
 	$(INSTALL) -m 644 sqlrelay.conf.example $(sysconfdir)
 	$(INSTALL) -m 644 sqlrelay.dtd $(sysconfdir)
 

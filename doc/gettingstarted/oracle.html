@@ -151,11 +151,11 @@ installation time.  Make sure that these packages are installed.</p>
 <span class="heading3">Set Up the Environment</span><br>
 
 <p>Edit /etc/profile and add the following somewhere near the top, replacing
-8.1.7 in the ORACLE_VERSION environment variable with the version of Oracle 
+9.2.0 in the ORACLE_VERSION environment variable with the version of Oracle 
 that you are installing.</p>
 
 <blockquote><b>
-export ORACLE_VERSION=8.1.7<br>
+export ORACLE_VERSION=9.2.0<br>
 export ORACLE_BASE=/u01/app/oracle<br>
 export ORACLE_HOME=$ORACLE_BASE/product/$ORACLE_VERSION<br>
 export ORACLE_SID=ora1<br>
@@ -325,7 +325,7 @@ and run on that version of Linux.</p>
 <span class="heading3">Starting the Database at Boot Time</span><br>
 
 <p>You can use the following script to start/stop the database at boot/shutdown
-time.  Replace /u01/app/oracle/product/8.1.7 with your $ORACLE_HOME</p>
+time.  Replace /u01/app/oracle/product/9.2.0 with your $ORACLE_HOME</p>
 
 <blockquote>
 <PRE>
@@ -333,12 +333,12 @@ time.  Replace /u01/app/oracle/product/8.1.7 with your $ORACLE_HOME</p>
 
 <B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
   start<B><FONT color=#a62828>)</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/8.1.7/bin/dbstart</FONT><B><FONT color=#a62828>&quot;</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/8.1.7/bin/lsnrctl start</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/9.2.0/bin/dbstart</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/9.2.0/bin/lsnrctl start</FONT><B><FONT color=#a62828>&quot;</FONT></B>
         <B><FONT color=#a62828>;;</FONT></B>
   stop<B><FONT color=#a62828>)</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/8.1.7/bin/dbshut</FONT><B><FONT color=#a62828>&quot;</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/8.1.7/bin/lsnrctl stop</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/9.2.0/bin/dbshut</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/9.2.0/bin/lsnrctl stop</FONT><B><FONT color=#a62828>&quot;</FONT></B>
         <B><FONT color=#a62828>;;</FONT></B>
   *<B><FONT color=#a62828>)</FONT></B>
         <B><FONT color=#a62828>echo</FONT></B><FONT color=#ff00ff> $</FONT><B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>Usage: </FONT><FONT color=#a620f7>$0</FONT><FONT color=#ff00ff> {start|stop}</FONT><B><FONT color=#a62828>&quot;</FONT></B>

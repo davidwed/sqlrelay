@@ -1,0 +1,105 @@
+top_builddir = ../../..
+
+include ../../../config.mk
+
+RUBYCFLAGS = $(DESTDIR)$(shell $(RUBY) getcflags.rb | $(MAKE) -s -f - )
+RUBYSITEARCHDIR = $(DESTDIR)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - )
+RUBYSITELIBDIR = $(DESTDIR)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - )
+
+CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+RPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(RUBYUSERPATH),yes)
+	RPATH = -R $(libdir)
+endif
+endif
+
+SRCS = sqlrelay.C
+LOBJS = sqlrelay.lo
+
+.SUFFIXES: .lo
+
+.C.lo:
+	cp rubyincludes1.h rubyincludes.h; \
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors1; \
+	if ( test ! -r sqlrelay.lo ); then \
+		cp rubyincludes2.h rubyincludes.h; \
+		$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors2; \
+		if ( test ! -r sqlrelay.lo ); then \
+			if ( test -s errors1 ); then \
+				echo "first try errors : "; cat errors1; echo; \
+			fi; \
+			if ( test -s errors2 ); then \
+				echo "second try errors : "; cat errors2; echo; \
+			fi; \
+		else \
+			cat errors2; \
+			if ( test "$(STRIP)" != "touch" ); then \
+				$(STRIP) -x -R .note -R .comment $@; \
+			fi; \
+		fi; \
+	else \
+		cat errors1; \
+		if ( test "$(STRIP)" != "touch" ); then \
+			$(STRIP) -x -R .note -R .comment $@; \
+		fi; \
+	fi; \
+	$(RM) errors1 errors2 rubyincludes.h
+
+all: libsqlrelay.la
+
+clean:
+	$(LIBTOOL) --mode=clean $(RM) *.la
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o	
+	$(LIBTOOL) --mode=clean $(RM) *.so
+
+rebuild: clean all
+
+libsqlrelay.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(RUBYDIR)/site-packages/SQLRelay $(RPATH) -module
+
+sqlrelay.so:
+	if ( test -r .libs/libsqlrelay.0.0.0 ); \
+	then \
+		cp .libs/libsqlrelay.0.0.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.0.0 ); \
+	then \
+		cp .libs/libsqlrelay.0.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.0 ); \
+	then \
+		cp .libs/libsqlrelay.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay ); \
+	then \
+		cp .libs/libsqlrelay sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.so.0.0.0 ); \
+	then \
+		cp .libs/libsqlrelay.so.0.0.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.so.0.0 ); \
+	then \
+		cp .libs/libsqlrelay.so.0.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.so.0 ); \
+	then \
+		cp .libs/libsqlrelay.so.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.so ); \
+	then \
+		cp .libs/libsqlrelay.so sqlrelay.so; \
+	fi
+
+install: sqlrelay.so
+	$(LIBTOOL) --mode=install $(INSTALL) sqlrelay.so $(RUBYSITEARCHDIR)
+	$(MKINSTALLDIRS) $(RUBYSITELIBDIR)/DBD/SQLRelay
+	$(LIBTOOL) --mode=install $(INSTALL) -m 644 SQLRelay.rb $(RUBYSITELIBDIR)/DBD/SQLRelay
+	$(RM) sqlrelay.so
+
+uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) $(RUBYSITEARCHDIR)/sqlrelay.so
+	$(RMTREE) $(RUBYSITELIBDIR)/DBD/SQLRelay
