@@ -3,6 +3,10 @@
 
 #include <sqlrconnection.h>
 
+#include <rudiments/passwdentry.h>
+#include <rudiments/groupentry.h>
+#include <rudiments/process.h>
+
 #include <sys/types.h>
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
@@ -107,15 +111,33 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 
 void sqlrconnection::setUserAndGroup() {
 
-	if (!runAsGroup(cfgfl->getRunAsGroup())) {
+	// get the user that we're currently running as
+	char	*currentuser=NULL;
+	passwdentry::getName(process::getEffectiveUserId(),&currentuser);
+
+	// get the group that we're currently running as
+	char	*currentgroup=NULL;
+	groupentry::getName(process::getEffectiveGroupId(),&currentgroup);
+
+	// switch groups, but only if we're not currently running as the
+	// group that we should switch to
+	if (charstring::compare(currentgroup,cfgfl->getRunAsGroup()) &&
+					!runAsGroup(cfgfl->getRunAsGroup())) {
 		fprintf(stderr,"Warning: could not change group to %s\n",
 						cfgfl->getRunAsGroup());
 	}
 
-	if (!runAsUser(cfgfl->getRunAsUser())) {
+	// switch users, but only if we're not currently running as the
+	// user that we should switch to
+	if (charstring::compare(currentuser,cfgfl->getRunAsUser()) &&
+					!runAsUser(cfgfl->getRunAsUser())) {
 		fprintf(stderr,"Warning: could not change user to %s\n",
 						cfgfl->getRunAsUser());
 	}
+
+	// clean up
+	delete[] currentuser;
+	delete[] currentgroup;
 }
 
 void sqlrconnection::setUnixSocketDirectory() {

@@ -20,6 +20,10 @@
 	sqlr-listener and sqlr-scaler refuse to start now if
 		runasuser/runasgroup can't read the config file
 	sqlr-scaler shouldn't loop up if sqlr-listener is killed now
+	fixed bug where scaler's group might not be set properly
+	processes don't try to set their user/group unless they're different
+		from the user/group that the process is currently running as,
+		should prevent "cannot switch group to nobody" messages
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

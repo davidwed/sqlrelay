@@ -39,9 +39,6 @@ metric="1"/>
 
 --------------------------------------------------------------------------------
 
-sqlr-connection running as nobody/nobody complains about trying to switch to
-	the nobody group
-
 people have been reporting freetds problems
 
 php module needs to clean itself up (close connections) if the script dies

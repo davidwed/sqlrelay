@@ -9,6 +9,9 @@
 
 #include <rudiments/permissions.h>
 #include <rudiments/file.h>
+#include <rudiments/passwdentry.h>
+#include <rudiments/groupentry.h>
+#include <rudiments/process.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -117,8 +120,40 @@ bool scaler::initScaler(int argc, const char **argv) {
 		char	*runasuser=cfgfile->getRunAsUser();
 		char	*runasgroup=cfgfile->getRunAsGroup();
 		if (runasuser[0] && runasgroup[0]) {
-			runAsUser(runasuser);
-			runAsGroup(runasgroup);
+
+			// get the user that we're currently running as
+			char	*currentuser=NULL;
+			passwdentry::getName(process::getEffectiveUserId(),
+						&currentuser);
+
+			// get the group that we're currently running as
+			char	*currentgroup=NULL;
+			groupentry::getName(process::getEffectiveGroupId(),
+						&currentgroup);
+
+			// switch groups, but only if we're not currently
+			// running as the group that we should switch to
+			if (charstring::compare(currentgroup,
+						cfgfile->getRunAsGroup()) &&
+					!runAsGroup(cfgfile->getRunAsGroup())) {
+				fprintf(stderr,"Warning: could not change ");
+				fprintf(stderr,"group to %s\n",
+						cfgfile->getRunAsGroup());
+			}
+
+			// switch users, but only if we're not currently
+			// running as the user that we should switch to
+			if (charstring::compare(currentuser,
+						cfgfile->getRunAsUser()) &&
+					!runAsUser(cfgfile->getRunAsUser())) {
+				fprintf(stderr,"Warning: could not change ");
+				fprintf(stderr,"user to %s\n",
+						cfgfile->getRunAsUser());
+			}
+
+			// clean up
+			delete[] currentuser;
+			delete[] currentgroup;
 		}
 
 		// make sure user/group can read the config file
