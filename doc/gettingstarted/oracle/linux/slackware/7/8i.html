@@ -1,19 +1,36 @@
 <html>
 
 <head>
-<title>SQL Relay - Getting Started With Oracle - Installing Oracle 8.1.7</title>
-<link rel="stylesheet" href="../../css/styles.css">
+<title>SQL Relay - Getting Started With Oracle - Installing Oracle 8.1.6 or 8.1.7</title>
+<link rel="stylesheet" href="../../../../../css/styles.css">
 </head>
 
 <body>
 
-<span class="heading1">Installing Oracle 8.1.7</span><br>
+<span class="heading1">Installing Oracle 8.1.6 or 8.1.7</span><br>
 
-<p>First, log in as the oracle user.</p>
+<p>Oracle 8.1.6 and 8.1.7 use a Java-based graphical installer.
+You should download <b>jre118_v3-glibc-2.1.3.tar.bz2</b> (not a newer version)
+from <a href="http://www.blackdown.com">blackdown</a> and execute the following
+commands as root.</p>
 
-<p>Since Oracle 8.1.7 uses a graphical installer, you need to be running X
-Windows or point the DISPLAY environment variable to an X Windows session
-running somewhere.</p>
+<blockquote><b>
+mv jre118_v3-glibc-2.1.3.tar.bz2 /usr/local<br>
+cd /usr/local<br>
+bunzip2 jre118_v3-glibc-2.1.3.tar.bz2<br>
+tar xf jre118_v3-glibc-2.1.3.tar<br>
+ln -s jre118_v3 java<br>
+rm jre118_v3-glibc-2.1.3.tar<br>
+</b></blockquote>
+
+<p>Now, log in as the oracle user.</p>
+
+<p>Since Oracle 8.1.6 and 8.1.7 use a graphical installer, you need to be
+running X Windows or point the DISPLAY environment variable to an X Windows
+session running somewhere.</p>
+
+<p>I have had problems with the graphical installer on enlightenment and
+fluxbox window managers in the past, though they may work for you.</p>
 
 <p>Installing Oracle 8.1.7 tends to be easy and painless.  If you have a CD,
 mount it and cd to the mount point.  If you have a tar.gz distribution, extract
@@ -53,7 +70,7 @@ On the <b>Summary</b> screen click <b>Install</b><br><br>
 
 The <b>Install</b> screen will show the installation progress<br><br> 
 
-<p>On Slackware, about halfway through this process, you will most likely get 
+<p>About halfway through this process, you will most likely get 
 an error.  Switch to another screen and edit the file 
 $ORACLE_HOME/bin/genclntsh.  Search for a line like 
 <b>LD="ld -shared -L${ORACLE_HOME}/lib"</b> and modify it to read 
@@ -67,8 +84,8 @@ and edit the file /u01/app/oracle/product8/8.1.7/ctx/lib/env_ctx.mk.  Search
 for a line starting with INSO_LINK and append $(LDLIBFLAG)dl to the end of
 the line.  Then click Retry.</p>
 
-At the end of the installation, a Dialog will pop up<br>
-Follow the directions on the dialog then click <b>Ok</b><br><br>
+<p>At the end of the installation, a Dialog will pop up asking you to run
+root.sh.  Just follow the directions on the dialog and click <b>Ok</b><br><br>
 
 On the <b>Configuration Tools</b> screen, the Net8 Configuration Dialog will
 pop up<br>

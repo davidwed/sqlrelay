@@ -1,0 +1,52 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With Oracle</title>
+<link rel="stylesheet" href="../../../../../css/styles.css">
+</head>
+
+<body>
+
+<a name="swap"></a>
+<span class="heading1">Upgrade Swap and Shared Memory</span><br>
+
+<p>increase swap/shm</p>
+
+<a name="env"></a>
+<span class="heading1">Set Up the Environment</span><br>
+
+<p>Add the following line to /home/oracle/.bashrc near the bottom:</p>
+
+<blockquote>
+<b>export LD_ASSUME_KERNEL=2.4.1</b>
+</blockquote>
+
+<a name="compat"></a>
+<span class="heading1">Install Compatibility Packages</span><br>
+
+<p>Some versions of Redhat 9 came with the following glibc RPM:</p>
+
+<blockquote><b>glibc-2.3.2-5.i386.rpm</b></blockquote>
+
+<p>Others came with:</p>
+
+<blockquote><b>glibc-2.3.2-11.9.i386.rpm</b></blockquote>
+
+<p>The first one works but the second one is broken.</p>
+
+<p>If you have run up2date (or apt-get upgrade if you're using apt) then it
+is likely that even if you once had a working glibc, you no longer do.<p>
+
+<p>To assure that Oracle will install and run, download and install
+<a href="http://www.firstworks.com/support/libctypefixup-1.0.tar.gz">libctypefixup</a> using the following commands (as root).</p>
+
+<blockquote>
+<b>tar xf libctypefixup-1.0.tar.gz<br>
+cd libctypefixup-1.0<br>
+make<br>
+make install<br>
+</b></blockquote>
+
+</body>
+
+</html>

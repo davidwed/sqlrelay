@@ -1,0 +1,98 @@
+need to install compat-db-3.3.11-4.i386.rpm
+
+
+Error in writing from:
+/u02/app/oracle/product/9.1.0.1/oem_webstage/emwebsite_??.html
+to file
+/u02/app/oracle/product/9.1.0.1/oem_webstage/emwebsite_??.html_instanTpFl
+Fix:
+cp /u02/app/oracle/product/9.1.0.1/oem_webstage/emwebsite_??.html /u02/app/oracle/product/9.1.0.1/oem_webstage/emwebsite_??.html_instanTpFl
+ignore
+
+?? = de,fr,ja,ko,pt_BR,zhs
+
+apparantly, it's trying to replace %OEMAPP_NAME% with something else in those
+files and then copy the new file back to the original name
+
+
+
+Error in invoking target install of makefile
+/u01/app/oracle/product/9.0.1/plsql/lib/ins_plsql.mk
+cd /u01/app/oracle/product/9.0.1/bin
+edit genclntsh
+change:
+	SYSLIBS=`cat ${ORACLE_HOME}/lib/sysliblist`" -laio -lm -lc"
+to:
+	SYSLIBS=`cat ${ORACLE_HOME}/lib/sysliblist`" -laio -lm -lc -lctypefixup"
+and change:
+	awk '{ printf (" -u %s", $3); }'
+to:
+	awk '{ printf (" -Wl,--undefined=%s", $3); }'
+and change:
+	LD="ld -shared  -L${ORACLE_HOME}/lib"          # shared library link command
+	LD_RUNTIME="-R${ORACLE_HOME}/lib"
+	LD_OPT="-Map ${MAPFILE} -h ${CLNT_LIB}"                                # name inserted into library
+	LD_OUT="-o ${LIB_DIR}/${CLNT_LIB}"             # output specification
+	LD_SELF_CONTAINED="-z defs"
+to:
+	LD="gcc -shared  -L${ORACLE_HOME}/lib"          # shared library link command
+	LD_RUNTIME="-Wl,-R${ORACLE_HOME}/lib"
+	LD_OPT="-Wl,-Map ${MAPFILE} -Wl,-soname=${CLNT_LIB}"                            # name inserted into library
+	LD_OUT="-o ${LIB_DIR}/${CLNT_LIB}"              # output specification
+	LD_SELF_CONTAINED="-Wl,--no-undefined"
+run genclntsh manually, ignore basename and cp errors
+click retry
+
+
+Error in invoking target install of makefile
+/u01/app/oracle/product/9.0.1/rdbms/lib/ins_rdbms.mk
+cd /u01/app/oracle/product/9.0.1/rdbms/lib/ins_rdbms.mk
+edit env_rdbms.mk
+change:
+	LDLIBS=$(EXPDLIBS) $(EXOSLIBS) $(SYSLIBS) $(EXSYSLIBS) $(MATHLIB) $(USRLIBS)
+to:
+	LDLIBS=$(EXPDLIBS) $(EXOSLIBS) $(SYSLIBS) $(EXSYSLIBS) $(MATHLIB) $(USRLIBS) -lctypefixup
+click retry
+
+
+Error in invoking target install of makefile
+/u01/app/oracle/product/9.0.1/ctx/lib/ins_ctx.mk
+cd /u01/app/oracle/product/9.0.1/ctx/lib/ins_ctx.mk
+edit ins_ctx.mk
+change:
+        $(LINK) $(CTXHXOBJ) $(INSO_LINK)
+to:
+        $(LINK) $(CTXHXOBJ) $(INSO_LINK) -lctypefixup
+click retry
+
+
+Error in invoking target install of makefile
+/u01/app/oracle/product/9.0.1/otrace/lib/ins_otrace.mk
+cd /u01/app/oracle/product/9.0.1/otrace/lib/ins_otrace.mk
+edit ins_otrace.mk
+change:
+	LDLIBS=$(EXPDLIBS) $(EXOSLIBS) $(SYSLIBS) $(EXSYSLIBS) $(MATHLIB) $(USRLIBS)
+
+to:
+	LDLIBS=$(EXPDLIBS) $(EXOSLIBS) $(SYSLIBS) $(EXSYSLIBS) $(MATHLIB) $(USRLIBS) -lctypefixup
+click retry
+
+if "Starting web server in non-SSL mode on port 7777" fails, install compat-db
+click retry
+
+if "Oracle Database Configuration Assistant fails", edit
+/u01/app/oracle/product/9.0.1/bin/dbca and change:
+	$JRE_DIR/bin/jre -DORACLE_HOME=$ORACLE_HOME -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
+to:
+	$JRE_DIR/bin/jre -native -DORACLE_HOME=$ORACLE_HOME -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
+don't click retry, it will fail again, run it by hand
+
+Welcome: click Next
+Select "Create a database", click Next
+Select "General Purpose", click Next
+enter ora1 for Global Database and SID, click Next
+Select "Dedicated Server", click Next
+Select "Typical", click Next
+Database Storage: click Next
+Select "Create Database", click Finish
+On Summary: click OK
