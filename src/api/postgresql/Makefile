@@ -2,6 +2,12 @@ include ../../../config.mk
 
 INSTALL = $(abs_srcdir)/install-sh -c
 
+ifeq ($(INSTALLPREFIX),)
+	INSTPREFIX = 
+else
+	INSTPREFIX = -inst-prefix-dir $(INSTALLPREFIX)
+endif
+
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS)
 ifneq ($(strip $(libdir)),)
@@ -35,11 +41,11 @@ clean:
 rebuild: clean all
 
 libpqsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -O -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libpqsqlrelay.la $(libdir)/libpqsqlrelay.la
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libpqsqlrelay.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

@@ -31,7 +31,7 @@
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.34
+Version: 0.34.1
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
@@ -331,13 +331,14 @@ Man pages for SQL Relay.
 	%{?_without_ruby:	--disable-ruby} \
 	%{?_without_zope:	--disable-zope}
 	
-make
+make INSTALLPREFIX=%{buildroot}
 
 %install
 rm -rf %{buildroot}
 # must install everything except ruby first because the "prefix" environment
 # variable screws up the ruby install
 %makeinstall \
+	DESTDIR=%{buildroot} \
 	incdir=%{buildroot}%{_includedir} \
 	docdir=%{buildroot}%{_docdir}/%{name}-%{version} \
 	PYTHONDIR=%{buildroot}%{pythondir} \
