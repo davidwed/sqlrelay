@@ -18,7 +18,7 @@ int	sqlrconnection::openSession() {
 	}
 
 	// open a connection to the listener
-	int	openresult=0;
+	int	openresult=RESULT_ERROR;
 
 	// first, try for a unix connection
 	if (listenerunixport && listenerunixport[0]) {
@@ -37,7 +37,7 @@ int	sqlrconnection::openSession() {
 	}
 
 	// then try for an inet connection
-	if (!openresult && listenerinetport) {
+	if (openresult!=RESULT_SUCCESS && listenerinetport) {
 
 		if (debug) {
 			debugPreStart();
@@ -55,7 +55,7 @@ int	sqlrconnection::openSession() {
 	}
 
 	// handle failure to connect to listener
-	if (!openresult) {
+	if (openresult!=RESULT_SUCCESS) {
 		setError("Couldn't connect to the listener.");
 		return 0;
 	}
