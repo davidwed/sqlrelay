@@ -43,6 +43,7 @@ all: makefile
 clean: makefile
 	$(MAKE) realclean
 	$(RM) Makefile.old
+	$(RM) *.lo
 	$(RM) perlincludes.h
 	$(RM) errors1
 	$(RM) errors2

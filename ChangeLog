@@ -76,6 +76,7 @@
 		member was getting referenced anyway.
 	def and def_lob's are properly initialized now in oracle8 connection
 	api uses rudiments' file class for cache files now
+	libtool is used where possible
 
 0.32 -	affectedRows and totalRows were returning 0 instead of -1 for databases
 		that don't know that value, now they return -1

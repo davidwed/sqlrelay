@@ -22,6 +22,7 @@ all: sqlr-start sqlr-start-debug
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-start
+	$(LIBTOOL) --mode=clean $(RM) sqlr-start-debug
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 

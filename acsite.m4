@@ -1,3 +1,5 @@
+
+
 AC_DEFUN([AC_CHECK_PS],
 [AC_MSG_CHECKING(whether ps -efa works)
 INVALID="`ps -efal 2>&1 | grep illegal | grep -v grep`"
@@ -9,6 +11,8 @@ else
 	AC_MSG_RESULT(yes)
 fi
 AC_SUBST(PS)])
+
+
 
 AC_DEFUN([AC_CHECK_INLINE],
 [AC_MSG_CHECKING(inline)

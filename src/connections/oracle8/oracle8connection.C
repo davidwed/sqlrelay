@@ -299,16 +299,16 @@ int	oracle8connection::rollback() {
 }
 
 int	oracle8connection::ping() {
-	int	retval=0;
 	oracle8cursor	cur(this);
 	if (cur.openCursor(-1) && 
 		cur.prepareQuery("select 1 from dual",18) && 
 		cur.executeQuery("select 1 from dual",18,1)) {
 		cur.cleanUpData();
 		cur.closeCursor();
-		retval=1;
+		return 1;
 	}
-	return retval;
+	cur.closeCursor();
+	return 0;
 }
 
 char	*oracle8connection::identify() {

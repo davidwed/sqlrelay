@@ -154,16 +154,16 @@ int	oracle7connection::rollback() {
 }
 
 int	oracle7connection::ping() {
-	int	retval=0;
 	oracle7cursor	cur(this);
 	if (cur.openCursor(-1) && 
 		cur.prepareQuery("select 1 from dual",18) && 
 		cur.executeQuery("select 1 from dual",18,1)) {
 		cur.cleanUpData();
 		cur.closeCursor();
-		retval=1;
+		return 1;
 	}
-	return retval;
+	cur.closeCursor();
+	return 0;
 }
 
 char	*oracle7connection::identify() {

@@ -277,17 +277,16 @@ void	sybaseconnection::logOut() {
 }
 
 int	sybaseconnection::ping() {
-	int	retval=0;
 	sybasecursor	cur(this);
 	if (cur.openCursor(-1) && 
 		cur.prepareQuery("select 1",8) && 
 		cur.executeQuery("select 1",8,1)) {
 		cur.cleanUpData();
 		cur.closeCursor();
-		retval=1;
+		return 1;
 	}
 	cur.closeCursor();
-	return retval;
+	return 0;
 }
 
 char	*sybaseconnection::identify() {
