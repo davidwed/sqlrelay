@@ -8,12 +8,31 @@ LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(TCLLIBS) 
 SRCS = sqlrelayCmd.C
 LOBJS = sqlrelayCmd.lo
 
-all: sqlrelay.so
+all:
+	cp tclincludes1.h tclincludes.h; \
+	$(MAKE) sqlrelay.so 2> errors1; \
+	if ( test ! -r sqlrelay.so ); then \
+		cp tclincludes2.h tclincludes.h; \
+		$(MAKE) sqlrelay.so 2> errors2; \
+	fi
+	if ( test ! -r sqlrelay.so ); then \
+		if ( test -s errors1 ); then \
+			echo "first try errors : "; cat errors1; echo; \
+		fi; \
+		if ( test -s errors2 ); then \
+			echo "second try errors : "; cat errors2; echo; \
+		fi; \
+	fi
+	$(RM) errors1
+	$(RM) errors2
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o	
+	$(LIBTOOL) --mode=clean $(RM) tclincludes.h
+	$(LIBTOOL) --mode=clean $(RM) errors1
+	$(LIBTOOL) --mode=clean $(RM) errors2
 	$(LIBTOOL) --mode=clean $(RM) sqlrelay.so
 
 rebuild: clean all

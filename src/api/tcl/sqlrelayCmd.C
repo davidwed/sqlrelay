@@ -1,12 +1,14 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.2 2003-03-26 04:24:52 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.3 2003-03-27 04:40:32 mused Exp $
  */
 
 #include <strings.h>
 #include <tcl.h>
 #include <sqlrelay/sqlrclient.h>
+
+#include "tclincludes.h"
 
 extern "C" {
 
@@ -114,7 +116,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 		  int objc, Tcl_Obj *CONST objv[]) {
   sqlrcursor *cur = (sqlrcursor *)data;
   int index;
-  static CONST char *options[] = {
+  static CONSTCHAR *options[] = {
     "eval",
     "setResultSetBufferSize",
     "getResultSetBufferSize",
@@ -239,7 +241,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     return TCL_ERROR;
   }
 
-  if (Tcl_GetIndexFromObj(interp, objv[1], (CONST char **)options, "option", 0,
+  if (Tcl_GetIndexFromObj(interp, objv[1], (CONSTCHAR **)options, "option", 0,
 			  (int *)&index) != TCL_OK) {
     return TCL_ERROR;
   }
@@ -836,7 +838,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_errorMessage:
       {
-	CONST char *msg;
+	CONSTCHAR *msg;
 	if (objc > 2) {
 	  Tcl_WrongNumArgs(interp, 2, objv, NULL);
 	  return TCL_ERROR;
@@ -1194,7 +1196,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
 		  int objc, Tcl_Obj *CONST objv[]) {
   sqlrconnection *con = (sqlrconnection *)data;
   int index;
-  static CONST char *options[] = {
+  static CONSTCHAR *options[] = {
     "free",
     "endSession",
     "suspendSession",
@@ -1230,7 +1232,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     return TCL_ERROR;
   }
 
-  if (Tcl_GetIndexFromObj(interp, objv[1], (CONST char **)options, "option", 0,
+  if (Tcl_GetIndexFromObj(interp, objv[1], (CONSTCHAR **)options, "option", 0,
 			  (int *)&index) != TCL_OK) {
     return TCL_ERROR;
   }
@@ -1388,7 +1390,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
 int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
 		  int objc, Tcl_Obj *CONST objv[]) {
   static int count = 0;
-  static CONST char *optionStrings[] = {
+  static CONSTCHAR *optionStrings[] = {
     "-server",
     "-port",
     "-socket",
@@ -1408,7 +1410,7 @@ int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
     SQLRCON_TRIES,
   };
   int i;
-  CONST char *server, *socket, *user, *password;
+  CONSTCHAR *server, *socket, *user, *password;
   int port = 9000, retrytime = 0, tries = 1;
   sqlrconnection *con = (sqlrconnection *)NULL;
   Tcl_Obj *id;
@@ -1423,7 +1425,7 @@ int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
     int index;
 
     if (Tcl_GetIndexFromObj(interp, objv[i],
-			    (CONST char **)optionStrings,
+			    (CONSTCHAR **)optionStrings,
 			    "option",
 			    0,
 			    (int *)&index) != TCL_OK) {
