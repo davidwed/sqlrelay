@@ -93,9 +93,11 @@ PGconn *allocatePGconn(const char *conninfo,
 
 	conn->error=NULL;
 
-	conn->sqlrcon=new sqlrconnection(atoi(conn->port)?conn->host:"",
-					atoi((conn->port)?conn->port:""),
-					(!atoi(conn->port))?conn->port:"",
+	int	portnumber=charstring::toLong(conn->port);
+
+	conn->sqlrcon=new sqlrconnection((portnumber)?conn->host:"",
+					portnumber,
+					(!portnumber)?conn->port:"",
 					conn->user,conn->password,0,1);
 	conn->sqlrcon->copyReferences();
 

@@ -698,7 +698,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		}
 
 		host=argv[1];
-		port=atoi(argv[2]);
+		port=charstring::toLong(argv[2]);
 		socket=argv[3];
 		user=argv[4];
 		password=argv[5];

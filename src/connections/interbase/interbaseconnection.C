@@ -39,7 +39,7 @@ void interbaseconnection::handleConnectString() {
 
 	const char	*dialectstr=connectStringValue("dialect");
 	if (dialectstr) {
-		dialect=atoi(dialectstr);
+		dialect=charstring::toLong(dialectstr);
 		if (dialect<1) {
 			dialect=1;
 		}
@@ -227,7 +227,7 @@ bool interbasecursor::inputBindString(const char *variable,
 					short *isnull) {
 
 	// make bind vars 1 based like all other db's
-	int	index=atoi(variable+1)-1;
+	int	index=charstring::toLong(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -253,7 +253,7 @@ bool interbasecursor::inputBindLong(const char *variable,
 					unsigned long *value) {
 
 	// make bind vars 1 based like all other db's
-	int	index=atoi(variable+1)-1;
+	int	index=charstring::toLong(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -281,7 +281,7 @@ bool interbasecursor::inputBindDouble(const char *variable,
 					unsigned short scale) {
 
 	// make bind vars 1 based like all other db's
-	int	index=atoi(variable+1)-1;
+	int	index=charstring::toLong(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -313,7 +313,7 @@ bool interbasecursor::outputBindString(const char *variable,
 	queryIsExecSP=true;
 
 	// make bind vars 1 based like all other db's
-	int	index=atoi(variable+1)-1;
+	int	index=charstring::toLong(variable+1)-1;
 	if (index<0) {
 		return false;
 	}

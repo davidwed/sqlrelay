@@ -17,22 +17,22 @@
 #include <defaults.h>
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
-	port=::atoi(DEFAULT_PORT);
+	port=charstring::toLong(DEFAULT_PORT);
 	listenoninet=(port)?true:false;
 	unixport=charstring::duplicate(DEFAULT_SOCKET);
 	listenonunix=(unixport[0])?true:false;
 	dbase=charstring::duplicate(DEFAULT_DBASE);
-	connections=::atoi(DEFAULT_CONNECTIONS);
-	maxconnections=::atoi(DEFAULT_MAXCONNECTIONS);
-	maxqueuelength=::atoi(DEFAULT_MAXQUEUELENGTH);
-	growby=::atoi(DEFAULT_GROWBY);
-	ttl=::atoi(DEFAULT_TTL);
+	connections=charstring::toLong(DEFAULT_CONNECTIONS);
+	maxconnections=charstring::toLong(DEFAULT_MAXCONNECTIONS);
+	maxqueuelength=charstring::toLong(DEFAULT_MAXQUEUELENGTH);
+	growby=charstring::toLong(DEFAULT_GROWBY);
+	ttl=charstring::toLong(DEFAULT_TTL);
 	endofsession=charstring::duplicate(DEFAULT_ENDOFSESSION);
 	endofsessioncommit=!charstring::compare(endofsession,"commit");
 	sessiontimeout=::atol(DEFAULT_SESSIONTIMEOUT);
 	runasuser=charstring::duplicate(DEFAULT_RUNASUSER);
 	runasgroup=charstring::duplicate(DEFAULT_RUNASGROUP);
-	cursors=::atoi(DEFAULT_CURSORS);
+	cursors=charstring::toLong(DEFAULT_CURSORS);
 	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
 	authonlistener=charstring::contains(authtier,"listener");
 	authonconnection=charstring::contains(authtier,"connection");
@@ -437,9 +437,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 
 int sqlrconfigfile::atoi(const char *value,
 				const char *defaultvalue, int minvalue) {
-	int	retval=::atoi((value)?value:defaultvalue);
+	int	retval=charstring::toLong((value)?value:defaultvalue);
 	if (retval<minvalue) {
-		retval=::atoi(defaultvalue);
+		retval=charstring::toLong(defaultvalue);
 	}
 	return retval;
 }
@@ -546,7 +546,7 @@ connectstringcontainer::connectstringcontainer(int connectstringcount) {
 	this->connectstringcount=connectstringcount;
 	connectionid=NULL;
 	string=NULL;
-	metric=::atoi(DEFAULT_METRIC);
+	metric=charstring::toLong(DEFAULT_METRIC);
 }
 
 connectstringcontainer::~connectstringcontainer() {

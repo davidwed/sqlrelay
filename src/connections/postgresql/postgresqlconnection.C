@@ -92,7 +92,8 @@ bool postgresqlconnection::logIn() {
 
 		// copy the datatype ids/names into the buffers
 		for (int i=0; i<datatypecount; i++) {
-			datatypeids[i]=atoi(PQgetvalue(result,i,0));
+			datatypeids[i]=
+				charstring::toLong(PQgetvalue(result,i,0));
 			datatypenames[i]=
 				charstring::duplicate(PQgetvalue(result,i,1));
 		}

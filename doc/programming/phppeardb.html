@@ -46,6 +46,33 @@ use.</p>
 </pre>
 </blockquote>
 
+<p>In this connect string, the following components have the following
+meanings:</p>
+
+<blockquote>
+<table>
+<tr><td align="right" valign="top"><b>testuser</b></td>
+<td>- the username to use to connect to the
+SQL Relay server, corresponds to the username in an entry in the "users"
+tag of the sqlrelay.conf file</td></tr>
+<tr><td align="right" valign="top"><b>testpassword</b></td>
+<td>- the password to use to connect to
+the SQL Relay server, corresponds to the password in an entry in the "users"
+tag of the sqlrelay.conf file</td></tr>
+<tr><td align="right" valign="top"><b>testhost</b></td>
+<td>- the hostname that the SQL Relay
+server is running on</td></tr>
+<tr><td align="right" valign="top"><b>9000</b></td>
+<td>- the port that the SQL Relay server is
+listening on</td></tr>
+<tr><td align="right" valign="top"><b>testdb</b></td>
+<td>- this parameter is ignored; the pear DB
+spec requires that a database name be included in the connect string, but
+the database that SQL Relay is connected to is defined in the sqlrelay.conf
+file</td></tr>
+</table>
+</blockquote>
+
 <p>After calling the constructor, a session is established when the first 
 execute() is run.</p>
 

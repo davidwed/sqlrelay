@@ -798,7 +798,7 @@ _get_row(sqlrcursor *sqlrcur, int row)
         PyList_SetItem(my_list, counter, Py_None);
     } else if (isNumberTypeChar(sqlrcur->getColumnType(counter))) {
       if (!strchr(row_data[counter], '.')) {
-          PyList_SetItem(my_list, counter, Py_BuildValue("i", atoi(row_data[counter])));
+          PyList_SetItem(my_list, counter, Py_BuildValue("i", charstring::toLong(row_data[counter])));
       } else {
           PyList_SetItem(my_list, counter, Py_BuildValue("f", atof(row_data[counter])));
       }
@@ -834,7 +834,7 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     name=((sqlrcursor *)sqlrcur)->getColumnName(counter);
     if (isNumberTypeChar(((sqlrcursor *)sqlrcur)->getColumnType(counter))) {
       if (!strchr(field,'.')) {
-        PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("i",atoi(field)));
+        PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("i",charstring::toLong(field)));
       } else {
         PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("f",atof(field)));
       }

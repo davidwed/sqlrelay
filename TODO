@@ -1,45 +1,20 @@
 looks like scaling + handoff="pass" is still causing problems
 
---------------------------------------------------------------------------------
-Problem #1:
+need an explicit error message when sockseq can't be read/written
 
-I am having a problem with SQL Relay hanging once it
-starts to scale
-the number of connections. I am running this on a
-large search based
-website but it just keeps locking up on me. I see it
-begin to scale
-the connections and then reduce the connections and
-etc, but after
-about 5-10 minutes my searches start timing out and
-sql relay becomes
-unresponsive. I have pasted my instance for this
-connection below. If
-someonecould please help me correct this issue it
-would be greatly
-appreciated.
-
-<instance id="db2" port="9001"
-socket="/tmp/db2.socket"
-dbase="oracle8" connections="50" maxconnections="100"
-maxqueuelength="5"
-growby="1" ttl="60" endofsession="commit"
-sessiontimeout="600"
-runasuser="nobody" runasgroup="nobody" cursors="5"
-authtier="listener"
-handoff="pass" deniedips=""
-allowedips="^192\.168\.8\.(12|16)$" debug="">
-<users>
-<user user="db2" password="db2"/>
-</users>
-<connections>
-<connection connectionid="db2"
-string="user=user;password=password;oracle_sid=oracle_sid;"
-metric="1"/>
-</connections>
-</instance>
+use large writes rather than lots of small writes, small writes appear to
+	trigger the nagle algorithm and slow down network transmission
+	materially
 
 --------------------------------------------------------------------------------
+
+people have been reporting freetds problems -
+	may be the version of freetds though
+
+bulk DML methods
+
+figure out how to get the drop-in client compiled into the mysql PHP module
+	like the mysql native client is
 
 perl apis -> CPAN
 
@@ -52,12 +27,6 @@ postgresql 8 - bind vars
 php 5
 
 call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
-
-use large writes rather than lots of small writes, small writes appear to
-	trigger the nagle algorithm and slow down network transmission
-	materially
-
-people have been reporting freetds problems
 
 --------------------------------------------------------------------------------
 

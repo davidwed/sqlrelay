@@ -146,14 +146,14 @@ bool sybaseconnection::logIn() {
 	// set packetsize
 	if (packetsize && packetsize[0] &&
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
-				(CS_VOID *)atoi(packetsize),
+				(CS_VOID *)charstring::toLong(packetsize),
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the packetsize",5);
 		return false;
 	}
 
 	// set encryption
-	if (encryption && atoi(encryption)==1) {
+	if (encryption && charstring::toLong(encryption)==1) {
 		enc=CS_TRUE;
 		if (ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 			(CS_VOID *)&enc,

@@ -150,14 +150,14 @@ bool freetdsconnection::logIn() {
 	// set packetsize
 	if (packetsize && packetsize[0] &&
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
-				(CS_VOID *)atoi(packetsize),
+				(CS_VOID *)charstring::toLong(packetsize),
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the packetsize",5);
 		return false;
 	}
 
 	// set encryption
-	if (encryption && atoi(encryption)==1) {
+	if (encryption && charstring::toLong(encryption)==1) {
 		enc=CS_TRUE;
 		if (ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 			(CS_VOID *)&enc,
@@ -272,16 +272,16 @@ freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	char	*v=charstring::findFirst(versionstring,'v');
 	if (v) {
 		*v=(char)NULL;
-		majorversion=atoi(v+1);
+		majorversion=charstring::toLong(v+1);
 		char	*firstdot=charstring::findFirst(v+1,'.');
 		if (firstdot) {
 			*firstdot=(char)NULL;
-			minorversion=atoi(firstdot+1);
+			minorversion=charstring::toLong(firstdot+1);
 			char	*seconddot=
 				charstring::findFirst(firstdot+1,'.');
 			if (seconddot) {
 				*seconddot=(char)NULL;
-				patchlevel=atoi(seconddot+1);
+				patchlevel=charstring::toLong(seconddot+1);
 			} else {
 				patchlevel=0;
 			}

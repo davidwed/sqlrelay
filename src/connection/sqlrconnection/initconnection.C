@@ -25,7 +25,7 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 		fprintf(stderr,"Warning: using default connectionid.\n");
 	}
 	// get the time to live from the command line
-	ttl=atoi(cmdl->value("-ttl"));
+	ttl=charstring::toLong(cmdl->value("-ttl"));
 
 	cfgfl=new sqlrconfigfile();
 	authc=new authenticator(cfgfl);

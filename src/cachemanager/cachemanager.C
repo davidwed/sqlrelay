@@ -37,7 +37,7 @@ cachemanager::cachemanager(int argc, const char **argv) {
 	// get the scaninterval
 	const char	*scanint=cmdl.value("-scaninterval");
 	if (scanint && scanint[0]) {
-		scaninterval=atoi(scanint);
+		scaninterval=charstring::toLong(scanint);
 	} else {
 		scaninterval=DEFAULT_INTERVAL;
 	}
