@@ -49,7 +49,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("AFFECTED ROWS: \n");
-	checkSuccess(sqlrcur_affectedRows($cur),1);
+	checkSuccess(sqlrcur_affectedRows($cur),-1);
 	echo("\n");
 
 	echo("BIND BY POSITION: \n");
@@ -830,7 +830,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	# drop existing table
-	sqlrcon_commit($con);
+	sqlrcur_sendQuery($cur,"commit tran");
 	sqlrcur_sendQuery($cur,"drop table testtable");
 
 	# invalid queries...

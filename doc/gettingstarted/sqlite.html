@@ -69,7 +69,7 @@ Database directory and file permissions dictate what permissions a user has on
 the database.</p>
 
 <blockquote>
-<b>mkdir /usr/local/sqlite/var</b><br>
+<b>mkdir -p /usr/local/sqlite/var</b><br>
 <b>chown testuser /usr/local/sqlite/var</b><br>
 <b>chmod 755 /usr/local/sqlite/var</b><br>
 </blockquote>
@@ -81,7 +81,7 @@ database file will get created the first time a user tries to access it.</p>
 database called <i>testdb</i> owned by the user <i>testuser</i>.</p>
 
 <blockquote>
-<b>mkdir /usr/local/sqlite/var/testdb</b><br>
+<b>mkdir -p /usr/local/sqlite/var/testdb</b><br>
 <b>chown testuser /usr/local/sqlite/var/testdb</b><br>
 <b>chmod 755 /usr/local/sqlite/var/testdb</b><br>
 </blockquote>

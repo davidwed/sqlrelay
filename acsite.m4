@@ -228,18 +228,20 @@ rm conftest
 ])
 
 
-dnl figures out whether to run  ps -efa  or  ps aux
+dnl figures out whether to run  ps -efal or ps aux
 dnl sets the substitution variable PS
 AC_DEFUN([FW_CHECK_PS],
 [
-AC_MSG_CHECKING(whether ps -efa works)
-INVALID="`ps -efal 2>&1 | grep illegal | grep -v grep`"
-if ( test -n "$INVALID" )
+AC_MSG_CHECKING(whether ps aux works)
+INVALID="`ps aux 2>&1 | grep illegal | grep -v grep`"
+DEPRECATED="`ps aux 2>&1 | grep deprecated | grep -v grep`"
+USAGE="`ps aux 2>&1 | grep usage | grep -v grep`"
+if ( test -n "$INVALID" -o -n "$DEPRECATED" -o -n "$USAGE" )
 then
-	PS="ps\ aux"
+	PS="ps\ \-efal"
 	AC_MSG_RESULT(no)
 else
-	PS="ps\ \-efal"
+	PS="ps\ aux"
 	AC_MSG_RESULT(yes)
 fi
 AC_SUBST(PS)

@@ -6,7 +6,13 @@
 # description: Persistent database connection system.
 
 # Source function library.
-. /etc/init.d/functions
+if [ -r "/etc/init.d/functions" ]; then
+	. /etc/init.d/functions
+else
+	if [ -r "/etc/rc.d/init.d/functions" ]; then
+		. /etc/rc.d/init.d/functions
+	fi
+fi
 
 # Get config.
 test -f /etc/sysconfig/network && . /etc/sysconfig/network

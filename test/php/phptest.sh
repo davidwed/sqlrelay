@@ -39,9 +39,13 @@ sleep 1
 #sudo cp oracle8i.php /var/www/html
 #lynx -dump "http://localhost/oracle8i.php?host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
 
-chmod 755 postgresql.php
-sudo cp postgresql.php /var/www/html
-lynx -dump "http://localhost/postgresql.php?host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+chmod 755 postgresql7.php
+sudo cp postgresql7.php /var/www/html
+lynx -dump "http://localhost/postgresql7.php?host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+
+#chmod 755 postgresql6.php
+#sudo cp postgresql6.php /var/www/html
+#lynx -dump "http://localhost/postgresql6.php?host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
 
 #chmod 755 sqlite.php
 #sudo cp sqlite.php /var/www/html

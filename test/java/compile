@@ -9,6 +9,7 @@ javac -classpath $CLASSPATH:$FWCLASSPATH mysql.java
 javac -classpath $CLASSPATH:$FWCLASSPATH oracle7.java
 javac -classpath $CLASSPATH:$FWCLASSPATH oracle8.java
 javac -classpath $CLASSPATH:$FWCLASSPATH oracle8i.java
-javac -classpath $CLASSPATH:$FWCLASSPATH postgresql.java
+javac -classpath $CLASSPATH:$FWCLASSPATH postgresql6.java
+javac -classpath $CLASSPATH:$FWCLASSPATH postgresql7.java
 javac -classpath $CLASSPATH:$FWCLASSPATH sqlite.java
 javac -classpath $CLASSPATH:$FWCLASSPATH sybase.java

@@ -108,7 +108,7 @@ class freetds {
 		System.out.println();
 	
 		System.out.println("AFFECTED ROWS: ");
-		checkSuccess(cur.affectedRows(),1);
+		checkSuccess(cur.affectedRows(),-1);
 		System.out.println();
 	
 		System.out.println("BIND BY POSITION: ");
@@ -870,7 +870,7 @@ class freetds {
 		System.out.println();
 	
 		// drop existing table
-		con.commit();
+		cur.sendQuery("commit tran");
 		cur.sendQuery("drop table testtable");
 	
 		// invalid queries...

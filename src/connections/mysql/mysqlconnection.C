@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <mysqlconnection.h>
-#if MYSQL_VERSION_ID>=32200
+#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
 	#include <errmsg.h>
 #endif
 
@@ -32,55 +32,38 @@ void	mysqlconnection::handleConnectString() {
 
 int	mysqlconnection::logIn() {
 
-
-	// handle host
-	char	*hostval;
-	if (host && host[0]) {
-		hostval=host;
-	} else {
-		hostval="";
-	}
-
-	// handle port
-	int	portval;
-	if (port && port[0]) {
-		portval=atoi(port);
-	} else {
-		portval=0;
-	}
-
-	// handle socket
-	char	*socketval;
-	if (socket && socket[0]) {
-		socketval=socket;
-	} else {
-		socketval=NULL;
-	}
-
-	// handle db
-	char	*dbval;
-	if (db && db[0]) {
-		dbval=db;
-	} else {
-		dbval="";
-	}
-	
-	// initialize database connection structure
-#if MYSQL_VERSION_ID>=32200
-	if (!mysql_init(&mysql)) {
-		return 0;
-	}
+	// Handle host.
+	// For really old versions of mysql, a NULL host indicates that the
+	// unix socket should be used.  There's no way to specify what unix
+	// socket or inet port to connect to, those values are hardcoded
+	// into the client library.
+	// For some newer versions, a NULL host causes problems, but an empty
+	// string is safe.
+#ifdef MYSQL_VERSION_ID
+	char	*hostval=(char *)((host && host[0])?host:"");
+#else
+	char	*hostval=(char *)((host && host[0])?host:NULL);
 #endif
 
+	// Handle db.
+	char	*dbval=(char *)((db && db[0])?db:"");
+	
 	// log in
 	char	*user=getUser();
 	char	*password=getPassword();
 #ifdef MYSQL_VERSION_ID
+	// Handle port and socket.
+	int	portval=(port && port[0])?atoi(port):0;
+	char	*socketval=(char *)((socket && socket[0])?socket:NULL);
 	#if MYSQL_VERSION_ID>=32200
-		if (!mysql_real_connect(&mysql,hostval,user,password,dbval,
+	// initialize database connection structure
+	if (!mysql_init(&mysql)) {
+		return 0;
+	}
+	if (!mysql_real_connect(&mysql,hostval,user,password,dbval,
 						portval,socketval,0)) {
 	#else
-		if (!mysql_real_connect(&mysql,hostval,user,password,
+	if (!mysql_real_connect(&mysql,hostval,user,password,
 						portval,socketval,0)) {
 	#endif
 #else
@@ -89,8 +72,8 @@ int	mysqlconnection::logIn() {
 		logOut();
 		return 0;
 	} else {
-#if MYSQL_VERSION_ID<32200
-		if (!mysql_select_db(&mysql,dbval)) {
+#if !defined(MYSQL_VERSION_ID) || MYSQL_VERSION_ID<32200
+		if (mysql_select_db(&mysql,dbval)) {
 			logOut();
 			return 0;
 		}
@@ -113,7 +96,7 @@ void	mysqlconnection::logOut() {
 	mysql_close(&mysql);
 }
 
-#if MYSQL_VERSION_ID>=32200
+#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
 int	mysqlconnection::ping() {
 	if (!mysql_ping(&mysql)) {
 		return 1;
@@ -216,7 +199,7 @@ char	*mysqlcursor::getErrorMessage(int *liveconnection) {
 
 	*liveconnection=1;
 	char	*err=(char *)mysql_error(&mysqlconn->mysql);
-#if MYSQL_VERSION_ID>=32200
+#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
 	if (queryresult==CR_SERVER_GONE_ERROR || queryresult==CR_SERVER_LOST) {
 		*liveconnection=0;
 	}
@@ -314,7 +297,7 @@ void	mysqlcursor::returnColumnInfo() {
 		} else if (mysqlfield->type==FIELD_TYPE_DATETIME) {
 			type=DATETIME_DATATYPE;
 			length=8;
-#if MYSQL_VERSION_ID>=32200
+#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
 		} else if (mysqlfield->type==FIELD_TYPE_YEAR) {
 			type=YEAR_DATATYPE;
 			length=1;

@@ -101,6 +101,38 @@ possibly localhost.localdomain for the database to start properly and for the
 <p>After installation, Interbase is ready to use but to do any useful work, 
 you'll have to create a database.</p>
 
+<p>At this point, you should set up your environment.  The Interbase/Firebird
+client is called </i>isql</i>.  Note that <i>unixODBC</i> and <i>Sybase</i>
+have a client called <i>isql</i> as well which could be installed in /usr/bin,
+/usr/local/bin, /opt/sybase*/bin or some other path.  If you have
+<i>unixODBC</i> or <i>Sybase</i> installed, you'll have to decide which client
+you want the <i>isql</i> command to run.  If you want it to run the
+Interbase/Firebird client, follow the instructions below.  Otherwise, you'll
+have to run the Interbase/Firebird <i>isql</i> client by it's full pathname.</p>
+
+<p>In the configuration script for your shell, add <i>/opt/interbase/bin</i> to
+your PATH environment variable as follows.</p>
+
+<p>For Bourne shells:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#008a8e>PATH</FONT>=<FONT color=#a620f7>$PATH</FONT>:/opt/interbase/bin
+<B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>PATH</FONT>
+</PRE>
+</blockquote>
+
+<p>For C-shells:</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>setenv</FONT></B> <FONT color=#6959cf>PATH</FONT> <B><FONT color=#288a51>${PATH}</FONT></B>:/opt/interbase/bin
+</PRE>
+</blockquote>
+
+<p>Now log out and log back in and you can access the database using the 
+<i>isql</i> client.</p>
+
 <p>The installation process creates a security database named <i>isc4.gdb</i> 
 containing host and user privileges and an administrative user named 
 <i>SYSDBA</i> with a password of either <i>changeme</i> or <i>masterkey</i>.</p>
@@ -124,8 +156,10 @@ possibly localhost.localdomain for the <i>gsec</i> to function.</p>
 -rw-rw-rw-    <FONT color=#ff00ff>1</FONT> root     root       <FONT color=#ff00ff>618496</FONT> Feb <FONT color=#ff00ff>18</FONT> <FONT color=#ff00ff>14</FONT>:<FONT color=#ff00ff>29</FONT> isc4.gdb
 <B><FONT color=#a62828>[</FONT></B>root@localhost interbase<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># /opt/interbase/bin/gsec</FONT>
 GSEC<B><FONT color=#a62828>&gt;</FONT></B> modify sysdba <FONT color=#6959cf>-pw</FONT> newpassword
+Warning - maximum 8 significant bytes of password used
 GSEC<B><FONT color=#a62828>&gt;</FONT></B> add testuser
 GSEC<B><FONT color=#a62828>&gt;</FONT></B> modify testuser <FONT color=#6959cf>-pw</FONT> testpassword
+Warning - maximum 8 significant bytes of password used
 GSEC<B><FONT color=#a62828>&gt;</FONT></B> quit 
 </PRE>
 </blockquote>
@@ -136,14 +170,13 @@ should update the start/stop script with the new password as well.</p>
 <p>Though you can create tables in the <i>isc4.gdb</i> database using the 
 SYSDBA user, it's not a good idea.  You should create a new database using a
 regular user.  The following sequence of commands creates a database called
-<i>/home/user/testdb.gdb</i> which is owned by <i>testuser</i>.</p>
+<i>/opt/interbase/testdb.gdb</i> which is owned by <i>testuser</i>.</p>
 
 <blockquote>
 <PRE>
-[user@localhost user]$ /opt/interbase/bin/isql -u testuser -p testpassword
+[user@localhost user]$ isql -u testuser -p testpassword
 Use CONNECT or CREATE DATABASE to specify a database
-SQL&gt; <B><FONT color=#a62828>create</FONT></B> database <FONT color=#ff00ff>'/home/user/testdb.gdb'</FONT>;
-SQL&gt; <B><FONT color=#a62828>commit</FONT></B>;
+SQL&gt; <B><FONT color=#a62828>create</FONT></B> database <FONT color=#ff00ff>'/opt/interbase/testdb.gdb'</FONT>;
 SQL&gt; quit;
 </PRE>
 </blockquote>
@@ -156,11 +189,11 @@ message like that, make sure that you enclosed the file name in single quotes
 and make sure that the database file that you're trying to create doesn't
 already exist.</p>
 
-<p>Now you can log into the <i>/home/user/testdb.gdb</i> database as 
+<p>Now you can log into the <i>/opt/interbase/testdb.gdb</i> database as 
 <i>testuser</i> with the following command.</p>
 
 <blockquote>
-<b>/opt/interbase/bin/isql -u testuser -p testpassword /home/user/testdb.gdb</b>
+<b>isql -u testuser -p testpassword /opt/interbase/testdb.gdb</b>
 </blockquote>
 
 <p>The only users that can drop a database are the user that owns the database 
@@ -169,10 +202,9 @@ using <i>isql</i> as follows.</p>
 
 <blockquote>
 <PRE>
-[user@localhost user]$ /opt/interbase/bin/isql -u testuser -p testpassword /home/user/testdb.gdb 
-Database:  /home/user/testdb.gdb, User: testuser
+[user@localhost user]$ isql -u testuser -p testpassword /opt/interbase/testdb.gdb 
+Database:  /opt/interbase/testdb.gdb, User: testuser
 SQL&gt; <B><FONT color=#a62828>drop</FONT></B> database;
-SQL&gt; <B><FONT color=#a62828>commit</FONT></B>;
 SQL&gt; quit;
 </PRE>
 </blockquote>
@@ -199,53 +231,22 @@ configurations, consult the
 <a name="accessing"></a>
 <span class="heading1">Accessing a Database</span><br>
 
-<p>The first step in accessing an Interbase/Firebird database is setting up
-your environment.  The Interbase/Firebird client is called </i>isql</i>.  Note
-that <i>unixODBC</i> and <i>Sybase</i> have a client called <i>isql</i> as well 
-which could be installed in /usr/bin, /usr/local/bin or /opt/sybase*/bin.  If 
-you have <i>unixODBC</i> or <i>Sybase</i> installed, you'll have to decide 
-which client you want the <i>isql</i> command to run.  If you want it to run 
-the Interbase/Firebird client, follow the instructions below.  Otherwise,
-you'll have to run the Interbase/Firebird <i>isql</i> client by it's full
-pathname.</p>
-
-<p>In the configuration script for your shell, add <i>/opt/interbase/bin</i> to
-your PATH environment variable as follows.</p>
-
-<p>For Bourne shells:</p>
+<p>To access a database called <i>/opt/interbase/testdb.gdb</i> on the local
+machine as the <i>testuser</i> user with password <i>testpassword</i>, use the
+following command.</p>
 
 <blockquote>
-<PRE>
-<FONT color=#008a8e>PATH</FONT>=<FONT color=#a620f7>$PATH</FONT>:/opt/interbase/bin
-<B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>PATH</FONT>
-</PRE>
-</blockquote>
-
-<p>For C-shells:</p>
-
-<blockquote>
-<PRE>
-<B><FONT color=#a62828>setenv</FONT></B> <FONT color=#6959cf>PATH</FONT> <B><FONT color=#288a51>${PATH}</FONT></B>:/opt/interbase/bin
-</PRE>
-</blockquote>
-
-<p>Now log out and log back in and you can access the database using the 
-<i>isql</i> client.  For example, to access a database called 
-<i>/home/user/testdb.gdb</i> on the local machine as the <i>testuser</i> user 
-with password <i>testpassword</i>, use the following command.</p>
-
-<blockquote>
-<b>isql -u testuser -p testpassword /home/user/testdb.gdb</b>
+<b>isql -u testuser -p testpassword /opt/interbase/testdb.gdb</b>
 </blockquote>
 
 <p>To connect to an interbase database on a remote machine, prepend the database
 filename with the remote hostname, followed by a colon.  For example, to access 
-a database called <i>/home/user/testdb.gdb</i> on the remote machine 
+a database called <i>/opt/interbase/testdb.gdb</i> on the remote machine 
 <i>testhost</i> as the <i>testuser</i> user with password <i>testpassword</i>, 
 use the following command.</p>
 
 <blockquote>
-<b>isql -u testuser -p testpassword testhost:/home/user/testdb.gdb</b>
+<b>isql -u testuser -p testpassword testhost:/opt/interbase/testdb.gdb</b>
 </blockquote>
 
 <p>Once you're connected to the database, the isql client prompts you to enter
@@ -256,8 +257,8 @@ end it with a semicolon.  To exit, type quit;.</p>
 
 <blockquote>
 <PRE>
-[user@localhost user]$ /opt/interbase/bin/isql -u testuser -p testpass /home/user/testdb.gdb
-Database:  /home/user/testdb.gdb, <FONT color=#6959cf>User</FONT>: testuser
+[user@localhost user]$ isql -u testuser -p testpass /opt/interbase/testdb.gdb
+Database:  /opt/interbase/testdb.gdb, <FONT color=#6959cf>User</FONT>: testuser
 SQL&gt; <B><FONT color=#a62828>create</FONT></B> <FONT color=#6959cf>table</FONT> testtable (
 CON&gt; col1 <B><FONT color=#288a51>char</FONT></B>(<FONT color=#ff00ff>40</FONT>),
 CON&gt; col2 integer
@@ -309,7 +310,7 @@ SQL&gt; quit;
 your <i>sqlrelay.conf</i> file for the database that you want 
 to access.  Here is an example <i>sqlrelay.conf</i> which defines an SQL Relay 
 instance called interbasetest.  This instance connects to the 
-<i>/home/user/testdb</i> database as the user <i>testuser</i> with password 
+<i>/opt/interbase/testdb</i> database as the user <i>testuser</i> with password 
 <i>testpassword</i>.</p>
 
 <PRE>
@@ -322,7 +323,7 @@ instance called interbasetest.  This instance connects to the
                         <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
-                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpassword;database=/home/user/testdb.gdb;dialect=3&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpassword;database=/opt/interbase/testdb.gdb;dialect=3&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/connections&gt;</FONT>
         <FONT color=#008a8e>&lt;/instance&gt;</FONT>
 
@@ -330,10 +331,11 @@ instance called interbasetest.  This instance connects to the
 </PRE>
 
 <p>Note that in this example, the database parameter of the string attribute in
-the connection tag references the local database <i>/home/user/testdb.gdb</i>.
+the connection tag references the local database
+<i>/opt/interbase/testdb.gdb</i>.
 If you want to access a remote database, prepend the database filename with
 the remote hostname followed by a colon.  For example: 
-<i>testhost:/home/user/testdb.gdb</i>.</p>
+<i>testhost:/opt/interbase/testdb.gdb</i>.</p>
 
 <p>Now you can start up this instance with the following command.</p>
 

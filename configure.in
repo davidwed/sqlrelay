@@ -8,8 +8,8 @@ AC_ARG_ENABLE(small-code,
 	SMALLCODE="")
 AC_ARG_ENABLE(debug,
 	[  --enable-debug                compile with -g and -pg options and don't strip binaries],
-	CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP="",
-	CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s")
+	CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-rtti -fno-exceptions -Wall"; INSTALLSTRIP="",
+	CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-rtti -fno-exceptions -Wall"; INSTALLSTRIP="-s")
 AC_SUBST(INSTALLSTRIP)
 AC_SUBST(SMALLCODE)
 AC_SUBST(CFLAGS)

@@ -37,14 +37,9 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcon_ping($con),1);
 	echo("\n");
 
-	# drop existing table
+	# clear table
 	sqlrcur_sendQuery($cur,"delete from testtable");
 	sqlrcon_commit($con);
-
-	# create a new table
-	#echo("CREATE TEMPTABLE: \n");
-	#checkSuccess(sqlrcur_sendQuery($cur,"create table testtable (testinteger integer, testsmallint smallint, testdecimal decimal(10,2), testnumeric numeric(10,2), testfloat float, testdouble double precision, testdate date, testtime time, testchar char(50), testvarchar varchar(50), testtimestamp timestamp)"),1);
-	#echo("\n");
 
 	echo("INSERT: \n");
 	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (1,1,1.1,1.1,1.1,1.1,'01-JAN-2001','01:00:00','testchar1','testvarchar1',NULL)"),1);

@@ -472,8 +472,9 @@ int	freetdscursor::executeQuery(const char *query, long length,
 
 	// For queries which return rows or parameters (output bind variables),
 	// get the column count.  For DML queries, get the affected row count.
-	// Affected row count is only supported in FreeTDS version>=0.53.
-	if (tdsversion<0.53) {
+	// Affected row count is only supported in FreeTDS version>=0.53, but
+	// it appears to be broken in 0.61 too (and possibly others).
+	if (tdsversion<0.53 && tdsversion!=0.61) {
 		affectedrows=-1;
 	} else {
 		affectedrows=0;
@@ -487,7 +488,8 @@ int	freetdscursor::executeQuery(const char *query, long length,
 			ncols=MAX_SELECT_LIST_SIZE;
 		}
 	} else if (results_type==CS_CMD_SUCCEED) {
-		if (tdsversion>0.52 && ct_res_info(cmd,CS_ROW_COUNT,
+		if (tdsversion>0.52 && tdsversion!=0.61 &&
+			ct_res_info(cmd,CS_ROW_COUNT,
 				(CS_VOID *)&affectedrows,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			return 0;

@@ -1,1 +1,1 @@
-rm -f *.o cachefile* oracle8 oracle7 mysql msql postgresql sqlite lago freetds sybase interbase db2
+rm -f *.o cachefile* oracle8 oracle8i oracle7 mysql msql postgresql sqlite lago freetds sybase interbase db2

@@ -9,10 +9,13 @@
 
 <span class="heading1">Note...</span><br>
 
-<p>I've never been able to get these instructions to work completely.  Hopefully
-I'm making some obvious mistake that you'll be able to avoid.  If you figure
-out what the problem is, let me know at
-<a href="mailto:dmuse@firstworks.com">dmuse@firstworks.com</a>.</p>
+<p>I've never been able to get these instructions to work 100%.  On Redhat 9,
+there appears to be a glibc incompatibility and asecfg won't finish
+successfully.  On Redhat 7.3, asecfg alledgedly finishes successfully but 
+doesn't appear to create the database storage files and I get license-related
+failures trying to run the server.  Hopefully I'm making some obvious mistake
+that you'll be able to avoid.  If you figure out what the problem is, let me
+know at <a href="mailto:dmuse@firstworks.com">dmuse@firstworks.com</a>.</p>
 
 <span class="heading1">Installing a license for 12.5</span><br>
 
@@ -119,8 +122,10 @@ files.  Ignore this warning and select <b>Yes</b> to proceed.</p>
 <p>A Status Output dialog will appear.  As the database is built, the dialog 
 provides feedback about the process.  When it's done, select <b>OK</b>.</p>
 
-<b>For me, this step always fails.  I've tried lots of different things to
-try to make it work, but it never does.  Hopefully it will work for you.</b>
+<b>For me, this step always fails on Redhat 9.  I've tried lots of different
+things to try to make it work, but it never does.  Hopefully it will work for
+you.  It succeeds on Redhat 7.3 but doesn't appear to actually cratate
+master.dat, sybsystemprocs.dat or sybsystemdb.dat.</b>
 
 <p>You should now be returned to the original dialog.  Click <b>Exit</b>.</p>
 
@@ -128,7 +133,7 @@ try to make it work, but it never does.  Hopefully it will work for you.</b>
 
 <p>The RPM distribution of Sybase ASE installs a script in /etc/rc.d/init.d 
 which starts the database at boot time.  For non-RPM distributions, you may 
-need to install a script like the following.  Replace <i>/opt/sybase-11.9.2</i> 
+need to install a script like the following.  Replace <i>/opt/sybase-12.5</i> 
 with whatever directory Sybase ASE is installed in.</p>
 
 <blockquote>

@@ -2,10 +2,12 @@
 #g++ -I/usr/local/firstworks/include -g -o oracle8i oracle8i.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o oracle7 oracle7.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o mysql mysql.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
+#g++ -I/usr/local/firstworks/include -g -o oldmysql oldmysql.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o msql msql.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o lago lago.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o sqlite sqlite.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
-#g++ -I/usr/local/firstworks/include -g -o postgresql postgresql.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
+#g++ -I/usr/local/firstworks/include -g -o postgresql7 postgresql7.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
+#g++ -I/usr/local/firstworks/include -g -o postgresql6 postgresql6.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
 #g++ -I/usr/local/firstworks/include -g -o freetds freetds.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o sybase sybase.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o interbase interbase.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence

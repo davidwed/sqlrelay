@@ -222,7 +222,8 @@ access a database, it must be running.</p>
 <p>This script will start the Administration Server.  During instance
 configuration, there's a check box indicating whether the instance will be
 configured to start at boot time.  If you didn't check it, to get each instance
-to start at boot time, you need to run the following command as root.</p>
+to start at boot time, you need to run the following command as root for each
+instance.</p>
 
 <blockquote>
 <b>db2iauto -on INSTANCE_USER</b>
@@ -231,7 +232,7 @@ to start at boot time, you need to run the following command as root.</p>
 <p>Where INSTANCE_USER is replaced by the username of the user associated with
 the instance you want to start at boot time.</p>
 
-<p>If you want to disable an instance from starting at boot time, you need to
+<p>If you want to disable instances from starting at boot time, you need to
 run the following command as root for each instance:</p>
 
 <blockquote>

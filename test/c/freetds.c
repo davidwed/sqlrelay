@@ -108,7 +108,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
-	checkSuccessInt(sqlrcur_affectedRows(cur),1);
+	checkSuccessInt(sqlrcur_affectedRows(cur),-1);
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
@@ -873,7 +873,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	// drop existing table
-	sqlrcon_commit(con);
+	sqlrcur_sendQuery(cur,"commit tran");
 	sqlrcur_sendQuery(cur,"drop table testtable");
 
 	// invalid queries...

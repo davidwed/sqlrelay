@@ -167,11 +167,12 @@ have to create a database.</p>
 privileges and other housekeeping information and a <i>root</i> user which has 
 no password.</p>
 
-<p>The following command gives the <i>root</i> user the password 
+<p>The following commands give the <i>root</i> user the password 
 <i>newpassword</i>.</p>
 
 <blockquote>
-<b>mysqladmin -uroot password newpassword</b>
+<b>mysql -uroot -e "update user set password=password('newpassword') where user='root'" mysql</b>
+<b>mysqladmin reload</b>
 </blockquote>
 
 <p>Though you can create tables in the <i>mysql</i> database, it's not a good 
@@ -195,8 +196,8 @@ remote host.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> user (Host,User,Password) <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'localhost'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,password(<FONT color=#ff00ff>'testpassword'</FONT>));
-<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> user (Host,User,Password) <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,password(<FONT color=#ff00ff>'testpassword'</FONT>));
+<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> user (host,user,password) <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'localhost'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,password(<FONT color=#ff00ff>'testpassword'</FONT>));
+<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> user (host,user,password) <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,password(<FONT color=#ff00ff>'testpassword'</FONT>));
 </PRE>
 </blockquote>
 

@@ -94,14 +94,9 @@ class interbase {
 		checkSuccess(con.ping(),1);
 		System.out.println();
 	
-		// drop existing table
+		// clear table
 		cur.sendQuery("delete from testtable");
 		con.commit();
-	
-		// create a new table
-		//System.out.println("CREATE TEMPTABLE: ");
-		//checkSuccess(cur.sendQuery("create table testtable (testinteger integer, testsmallint smallint, testdecimal decimal(10,2), testnumeric numeric(10,2), testfloat float, testdouble double precision, testdate date, testtime time, testchar char(50), testvarchar varchar(50), testtimestamp timestamp)"),1);
-		//System.out.println();
 	
 		System.out.println("INSERT: ");
 		checkSuccess(cur.sendQuery("insert into testtable values (1,1,1.1,1.1,1.1,1.1,'01-JAN-2001','01:00:00','testchar1','testvarchar1',null)"),1);

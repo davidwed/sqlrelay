@@ -260,6 +260,24 @@ and stop the database at will, you can use the following script.</p>
 database.  Running it with the "stop" option shuts the database down.  To
 access a database, it must be running.</p>
 
+<p>You can control which instances start at boot time using the following
+commands.  To get each instance to start at boot time, you need to run the
+following command as root for each instance:</p>
+
+<blockquote>
+<b>db2iauto -on INSTANCE_USER</b>
+</blockquote>
+
+<p>Where INSTANCE_USER is replaced by the username of the user associated with
+the instance you want to start at boot time.</p>
+
+<p>If you want to disable an instance from starting at boot time, you need to
+run the following command as root for each instance:</p>
+
+<blockquote>
+<b>db2iauto -off INSTANCE_USER</b>
+</blockquote>
+
 </body>
 
 </html>

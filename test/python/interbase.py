@@ -38,14 +38,9 @@ def main():
 	checkSuccess(con.ping(),1)
 	print
 
-	# drop existing table
+	# clear table
 	cur.sendQuery("delete from testtable")
 	con.commit()
-
-	# create a new table
-	#print "CREATE TEMPTABLE: "
-	#checkSuccess(cur.sendQuery("create table testtable (testinteger integer, testsmallint smallint, testdecimal decimal(10,2), testnumeric numeric(10,2), testfloat float, testdouble double precision, testdate date, testtime time, testchar char(50), testvarchar varchar(50), testtimestamp timestamp)"),1)
-	#print
 
 	print "INSERT: "
 	checkSuccess(cur.sendQuery("insert into testtable values (1,1,1.1,1.1,1.1,1.1,'01-JAN-2001','01:00:00','testchar1','testvarchar1',NULL)"),1)

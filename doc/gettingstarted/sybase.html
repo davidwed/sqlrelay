@@ -70,8 +70,9 @@ Mandrake 8.1 and Turbolinux 7.0.  I was not able to install them on Redhat
 5.2.</p>
 
 <p>Version 12.5 of Sybase ASE for Linux requires glibc version 2.2.4 or greater.
-I was able to install it on RedHat 7.3 and Mandrake 9.0.  I have not tried it on
-any other platform.</p>
+I've never been 100% successful in installing it, however, I have been able
+to get it to partially install on RedHat 7.3, Redhat 9 and Mandrake 9.0.  I
+have not tried it on any other platforms.</p>
 
 <span class="heading3">Version 12.5</span><br>
 
@@ -166,6 +167,13 @@ will make it work, but I have yet to determine that combination.</p>
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>
 
+<p>Some newer Linux Distributions set the LANG environment variable to a value
+that is not supported by Sybase ASE.  For example, LANG=en_US.iso885915 on
+Redhat 7.3.  Check the value of the LANG environment variable, and if necessary,
+set it to something that is defined in the locales.dat file
+(/opt/sybase-11.9.2/locales/locales.dat for sybase-11.9.2) such as en_US for
+US-english.</p>
+
 <p>The instructions for initializing each version are very different.</p>
 
 <p>See <a href="sybase/12.5.html">Initializing a 12.5 sever</a>,
@@ -175,33 +183,61 @@ will make it work, but I have yet to determine that combination.</p>
 <p>Once you have initialized the server, you should start the server.  From
 this point on, the database creation process is the same for all versions.</p>
 
+<p>At this point, you should set up your environment.  The Sybase client is
+called </i>isql</i>.  Note that <i>unixODBC</i> and <i>Interbase/Firebird</i>
+have a client called <i>isql</i> as well which could be installed in /usr/bin,
+/usr/local/bin or some other path.  If you have <i>unixODBC</i> or
+<i>Interbase/Firebird</i> installed, you'll have to decide which client you
+want the <i>isql</i> command to run.  If you want it to run the Sybase client,
+follow the instructions below.  Otherwise, you'll have to run the Sybase
+<i>isql</i> client by it's full pathname which could be
+/opt/sybase-11.9.2/bin/isql, /opt/sybase-12.5/OCS/bin/isql or some other
+path.</p>
+
+<p>In the configuration script for your shell, add the path to the Sybase isql
+client to your PATH environment variable as follows.  In these examples,
+/opt/sybase-11.9.2/bin is used, but your Sybase isql client may be installed
+elsewhere.</p>
+
+<p>For Bourne shells:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#008a8e>PATH</FONT>=<FONT color=#a620f7>$PATH</FONT>:/opt/sybase-11.9.2/bin
+<B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>PATH</FONT>
+</PRE>
+</blockquote>
+
+<p>For C-shells:</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>setenv</FONT></B> <FONT color=#6959cf>PATH</FONT> <B><FONT color=#288a51>${PATH}</FONT></B>:/opt/sybase-11.9.2/bin
+</PRE>
+</blockquote>
+
+<p>Now log out and log back in and you can access the database using the 
+<i>isql</i> client. 
+
 <p>The initialization process should have created a server named 
 <i>localhost</i> (or whatever name you assigned it) with an administrative user
 named <i>sa</i> which has no password.</p>
 
 <p>To set the administrative user's password, log into the database with the
-following command.  When it prompts you for a password, just press return.
-Note that in the following commands, the /opt/sybase-11.9.2 path is just an 
-example.  For version 11.0.3.3 you should just use /opt/sybase and for version
-12.5, you should use /opt/sybase-12.5.  On non-Linux platforms, you may even
-use a different path that that.</p>
+following command.  When it prompts you for a password, just press return.</p>
 
 <blockquote>
-<b>/opt/sybase-11.9.2/bin/isql -U sa -S localhost</b>
+<b>isql -U sa -S localhost</b>
 </blockquote>
-
-<p>(Note that some newer Linux Distributions set the LANG environment variable
-to a value that is not supported by Sybase ASE.  For example,
-LANG=en_US.iso885915 on Redhat 7.3.  If isql fails to start, and complains about
-the LANG environment variable, set it to something that is defined in
-/opt/sybase-11.9.2/locales/locales.dat such as en_US for english.)</p>
 
 <p>At the prompt, run the following stored procedure to give <i>sa</i> the
 password <i>sapassword</i>.</p>
 
 <blockquote>
-<b>sp_password null,"sapassword","sa"</b><br>
-<b>go</b>
+<pre>
+sp_password <font color="#6a5acd">null</font>,<font color="#ff00ff">&quot;sapassword&quot;</font>,<font color="#ff00ff">&quot;sa&quot;</font>
+go
+</pre>
 </blockquote>
 
 <p>Now logout.</p>
@@ -214,7 +250,7 @@ password <i>sapassword</i>.</p>
 type <i>sapassword</i>.</p>
 
 <blockquote>
-<b>/opt/sybase-11.9.2/bin/isql -U sa -S localhost</b>
+<b>isql -U sa -S localhost</b>
 </blockquote>
 
 <p>Though you could create your own tables using the <i>sa</i> user and the 
@@ -232,7 +268,7 @@ quit
 <p>Now log into the database you just created with the following command.</p>
 
 <blockquote>
-<b>/opt/sybase-11.9.2/bin/isql -U sa -S localhost -D testdb</b>
+<b>isql -U sa -S localhost -D testdb</b>
 </blockquote>
 
 <p>Creating a user is a 2 step process.  First a universal login must be 
@@ -257,7 +293,7 @@ quit
 promted for a password, enter <i>testpassword</i>.</p>
 
 <blockquote>
-<b>/opt/sybase-11.9.2/bin/isql -U testuser -S localhost -D testdb</b>
+<b>isql -U testuser -S localhost -D testdb</b>
 </blockquote>
 
 <p>A common problem when using Sybase ASE in this minimal configuration is 
@@ -273,7 +309,7 @@ being suspended until space is made available in the log.
 follows.  When it promts you for a password, type <i>sapassword</i>.</p>
 
 <blockquote>
-<b>/opt/sybase-11.9.2/bin/isql -U sa -S localhost</b>
+<b>isql -U sa -S localhost</b>
 </blockquote>
 
 <p>Once logged in, execute the following series of commands.</p>
@@ -291,6 +327,11 @@ configurations, consult the Sybase ASE documentation.</p>
 <a name="accessing"></a>
 <span class="heading1">Accessing a Database</span><br>
 
+<p>Some newer Linux Distributions set the LANG environment variable to a value
+that is not supported by Sybase ASE.  For example, LANG=en_US.iso885915 on
+Redhat 7.3.  If isql fails to start, and complains about the LANG environment variable, set it to something that is defined in the locales.dat file
+(/opt/sybase-11.9.2/locales/locales.dat for sybase-11.9.2) such as en_US for
+US-english.</p>
 
 <p>The first step in accessing a Sybase ASE database is setting up your 
 environment.  The Sybase client is called <i>isql</i>.  Note that 
@@ -358,7 +399,7 @@ localhost
 user <i>testuser</i>, run the following command.</p>
 
 <blockquote>
-<b>/opt/sybase-11.9.2/bin/isql -U testuser -S localhost -D testdb</b>
+<b>isql -U testuser -S localhost -D testdb</b>
 </blockquote>
 
 <p>Once you're connected to the database, the <i>isql</i> client prompts you

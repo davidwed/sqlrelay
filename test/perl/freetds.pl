@@ -86,7 +86,7 @@ checkSuccess($cur->sendQuery("insert into testtable values (1,1,1,1.1,1.1,1.1,1.
 print("\n");
 
 print("AFFECTED ROWS: \n");
-checkSuccess($cur->affectedRows(),1);
+checkSuccess($cur->affectedRows(),-1);
 print("\n");
 
 print("BIND BY POSITION: \n");
@@ -887,7 +887,7 @@ checkUndef($cur->getField(7,0));
 print("\n");
 
 # drop existing table
-$con->commit();
+$cur->sendQuery("commit tran");
 $cur->sendQuery("drop table testtable");
 
 # invalid queries...

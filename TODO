@@ -1,18 +1,8 @@
-sybase:
-	test finished-suspended-result-sets
-	connection crashes no matter what
-
-freetds:
-	connection gets messed up after 1 test is run if the test fails
-	test fails to drop table
+oldmysql test files for non-C++ api's
 
 db2 start/stop doesn't work for 7.2
 	db2start/db2stop works when run as a given instance owner
-
-login errors should be printed on the screen by sqlrconnection class, not by
-	individual connections
-
-seperate modules into standalone builds
+	db2 appears to need a license suddenly
 
 scaling/handoff=pass incompatibility
 	setting backlog:
@@ -105,6 +95,11 @@ Performance/Code Enhancements:
 	support batch DML in oracle8
 	for databases that can return non-strings in their result sets, 
 		send non strings to client
+	seperate modules into standalone builds
+	should be a single sqlr-connection daemon that dlopens the
+		appropriate database module 
+	login errors should be printed on the screen by sqlrconnection class,
+		not by individual connections
 
 Security:
 	address connection hijacking for handoff=reconnect

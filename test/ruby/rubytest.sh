@@ -9,7 +9,8 @@
 #./oracle7.rb localhost 8008 "" oracle7test oracle7test
 #./oracle8.rb localhost 8008 "" oracle7test oracle7test
 #./oracle8i.rb localhost 8009 "" oracle8test oracle8test
-./postgresql.rb localhost 8010 "" postgresqltest postgresqltest
+./postgresql7.rb localhost 8010 "" postgresqltest postgresqltest
+#./postgresql6.rb localhost 8010 "" postgresqltest postgresqltest
 #./sqlite.rb localhost 8011 "" sqlitetest sqlitetest
 #./sybase.rb localhost 8012 "" sybasetest sybasetest
 

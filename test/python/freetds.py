@@ -58,7 +58,7 @@ def main():
 	print
 
 	print "AFFECTED ROWS: "
-	checkSuccess(cur.affectedRows(),1)
+	checkSuccess(cur.affectedRows(),-1)
 	print
 
 	print "BIND BY POSITION: "
@@ -956,7 +956,7 @@ def main():
 
 
 	# drop existing table
-	con.commit()
+	cur.sendQuery("commit tran")
 	cur.sendQuery("drop table testtable")
 
 	# invalid queries...

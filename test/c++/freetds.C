@@ -107,7 +107,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
-	checkSuccess(cur->affectedRows(),1);
+	checkSuccess(cur->affectedRows(),-1);
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
@@ -853,8 +853,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	// drop existing table
-	con->commit();
-con->debugOn();
+	cur->sendQuery("commit tran");
 	cur->sendQuery("drop table testtable");
 
 	// invalid queries...
