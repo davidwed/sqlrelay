@@ -210,10 +210,10 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_inputBind__Ljava_
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    inputBindBlob
- * Signature: (Ljava/lang/String;Ljava/lang/String;J)V
+ * Signature: (Ljava/lang/String;[BJ)V
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_inputBindBlob
-  (JNIEnv *, jobject, jstring, jstring, jlong);
+  (JNIEnv *, jobject, jstring, jbyteArray, jlong);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
