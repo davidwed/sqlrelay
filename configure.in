@@ -189,6 +189,10 @@ AC_ARG_WITH(perl-prefix,
 	[  --with-perl-prefix            Location of Perl],
 	PERLPATH="$withval",
 	PERLPATH="")
+AC_ARG_WITH(pod2man,
+	[  --with-pod2man                Full pathname of pod2man],
+	POD2MAN="$withval",
+	POD2MAN="")
 AC_ARG_ENABLE(perl,
 	[  --disable-perl                Don't build Perl api],
 	ENABLE_PERL="",

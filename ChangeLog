@@ -61,6 +61,9 @@
 	added ifdefs to maintain sqlite<3 compatibility
 	applied Leonard Rochael Almeida's python segfault patch
 	added test for python version < 2.1 and deprecation notice
+	configure uses full path name instead of -L, -l for tclstubs library,
+		on some platforms, libtool fails to build a shared library
+		if .a files are linked into it using -L, -l
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

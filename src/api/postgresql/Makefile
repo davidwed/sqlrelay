@@ -40,7 +40,7 @@ clean:
 rebuild: clean all
 
 libpqsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ $(LOBJS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(INSTPREFIX) -O -o $@ $(LOBJS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)

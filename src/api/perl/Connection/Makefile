@@ -135,13 +135,15 @@ install: Connection.so
 	$(INSTALL) -m 755 Connection.so $(PERLSITEARCH)/auto/SQLRelay/Connection
 	touch $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs
 	$(RM) Connection.so
-	pod2man Connection.pm > SQLRelay::Connection.$(PERLMAN3EXT)
+ifneq ($(POD2MAN),)
+	$(POD2MAN) Connection.pm > SQLRelay::Connection.$(PERLMAN3EXT)
 	$(MKINSTALLDIRS) $(PERLINSTALLMAN3DIR)
 	$(INSTALL) -m 644 SQLRelay::Connection.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
 	$(RM) SQLRelay::Connection.$(PERLMAN3EXT)
+	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Connection.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+endif
 	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.so > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
-	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Connection.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 else
 install: Connection.dll
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay

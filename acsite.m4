@@ -1777,6 +1777,10 @@ then
 			HAVE_PERL="yes"
 			PERLPREFIXCMD=`$PERL -V:prefix`
 			PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
+			if ( test -n "`pod2man --help 2>&1 | grep Usage`" )
+			then
+				POD2MAN="pod2man"
+			fi
 		else
 			AC_MSG_WARN(The Perl API will not be built.)
 		fi
@@ -1786,6 +1790,7 @@ then
 	AC_SUBST(PERL)
 	AC_SUBST(PERLPREFIX)
 	AC_SUBST(PERLCYGDRIVEPREFIX)
+	AC_SUBST(POD2MAN)
 fi
 ])
 
@@ -2286,12 +2291,14 @@ then
 			then
 				if ( test -z "$MICROSOFT" )
 				then
-					FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+					dnl FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+					FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"$TCLLIBSPATH/libtclstub.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 					if ( test -z "$TCLLIB" )
 					then
 						for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 						do
-							FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+							dnl FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+							FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"$TCLLIBSPATH/libtclstub$i.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 						done
 					fi
 				fi
@@ -2313,7 +2320,8 @@ then
 					do
 						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 						do
-							FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+							dnl FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+							FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"$i/libtclstub$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 						done
 					done
 				fi

@@ -105,6 +105,7 @@ PERLLIB = -L$(PERLINSTALLARCHLIB)/CORE -lperl
 else
 PERLLIB = 
 endif
+POD2MAN = @POD2MAN@
 
 
 # python

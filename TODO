@@ -1,36 +1,28 @@
+configure needs to see if mysql requires
+
 idle client timeout
 client connect timeout
 perl apis -> CPAN
 
 netbsd-1.6.2
-	fails to build shared tcl lib
+	fails to build shared tcl lib - libtclstubs*.a is not a shared library
 		not linking against stub lib fixes the problem
+		so does linking with full path name instead of using -ltclstubs*
 
 openbsd
-	freetds defines everything as _ct_* instead of ct_*
-	need to find /usr/local/lib/libmysqlclient.so.* before
-		libmysqlclient.a, libmysqlclient.a defines everything
-		as _mysql_*
-	gtk config app doesn't compile
-	ruby binary is wrong architecture ?
+	freetds library needs libiconv or configure tests fail
 	PERLINSTALLMAN3DIR doesn't exist?
 	tcl shared library fails to build
-	strip fails with "Undefined error"
-		STRIPPROG env variable doesn't work, need to set
-		STRIP, striplib and old_striplib
 
 redhat-7.3
 	swab undefined
+	#define _XOPEN_SOURCE 600 required for redhat 7.3 to get swab, but
+		breaks strtoll on solaris 9
 
 suse-9.0
 	DESTDIR problem with ruby/python/zope?
 
 fedora-core-1 isn't set up
-
-solaris-9
-	#define _XOPEN_SOURCE 600 required for redhat 7.3 to get swab, but
-		breaks strtoll on solaris 9
-	-xO3 isn't getting removed from build script
 
 --------------------------------------------------------------------------------
 
