@@ -96,6 +96,9 @@ endif
 ifneq ($(HAVE_TCL),)
 	$(MAKE) -C tcl install
 endif
+ifneq ($(HAVE_ZOPE),)
+	$(MAKE) -C zope install
+endif
 
 uninstall:
 	$(MAKE) -C c++ uninstall
@@ -119,4 +122,7 @@ ifneq ($(HAVE_JAVA),)
 endif
 ifneq ($(HAVE_TCL),)
 	$(MAKE) -C tcl uninstall
+endif
+ifneq ($(HAVE_ZOPE),)
+	$(MAKE) -C zope uninstall
 endif

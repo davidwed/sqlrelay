@@ -2,7 +2,7 @@ package DBD::SQLRelay;
 
 use strict;
 use vars qw($err $errstr $sqlstate $drh);
-$DBD::SQLRelay::VERSION=@SQLR_VERSION@;
+$DBD::SQLRelay::VERSION='@SQLR_VERSION@';
 use Firstworks::SQLRConnection;
 use Firstworks::SQLRCursor;
 
