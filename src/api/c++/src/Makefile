@@ -25,8 +25,8 @@ SRCS = connection/constructor.C \
 	connection/clearsessionflags.C \
 	connection/opensession.C \
 	connection/closeconnection.C \
-	cursor/row.C \
-	cursor/sqlrcursor.C
+	cursor/sqlrcursor.C \
+	row/row.C
 NLOBJS = connection/constructor.n.lo \
 	connection/destructor.n.lo \
 	connection/ping.n.lo \
@@ -48,8 +48,8 @@ NLOBJS = connection/constructor.n.lo \
 	connection/clearsessionflags.n.lo \
 	connection/opensession.n.lo \
 	connection/closeconnection.n.lo \
-	cursor/row.n.lo \
-	cursor/sqlrcursor.n.lo
+	cursor/sqlrcursor.n.lo \
+	row/row.n.lo
 PLOBJS = connection/constructor.p.lo \
 	connection/destructor.p.lo \
 	connection/ping.p.lo \
@@ -71,8 +71,8 @@ PLOBJS = connection/constructor.p.lo \
 	connection/clearsessionflags.p.lo \
 	connection/opensession.p.lo \
 	connection/closeconnection.p.lo \
-	cursor/row.p.lo \
-	cursor/sqlrcursor.p.lo
+	cursor/sqlrcursor.p.lo \
+	row/row.p.lo
 
 .SUFFIXES: .n.lo .p.lo
 
