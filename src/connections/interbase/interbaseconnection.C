@@ -59,6 +59,9 @@ void	interbaseconnection::handleConnectString() {
 	setPassword(connectStringValue("password"));
 	char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
+
+	// commit ddl immediately or not?
+	commitddl=(!strcasecmp(connectStringValue("commitddl"),"yes"))?1:0;
 }
 
 int	interbaseconnection::logIn() {
@@ -108,8 +111,8 @@ int	interbaseconnection::logIn() {
 	}
 
 	// start a second transaction for ddl queries
-	if (isc_start_transaction(error,&ddltr,1,&db,
-				(unsigned short)sizeof(tpb),&tpb)) {
+	if (commitddl && isc_start_transaction(error,&ddltr,1,&db,
+					(unsigned short)sizeof(tpb),&tpb)) {
 
 		// print the error message
 		char	msg[512];
@@ -217,7 +220,8 @@ int	interbasecursor::prepareQuery(const char *query, long length) {
 	while (*qptr==' ' || *qptr=='\n' || *qptr=='	');
 
 	// prepare the cursor using the appropriate transaction
-	if (!strncasecmp(qptr,"create ",7) || !strncasecmp(qptr,"drop ",5)) {
+	if (interbaseconn->commitddl && (!strncasecmp(qptr,"create ",7) ||
+		 		!strncasecmp(qptr,"drop ",5))) {
 		if (isc_dsql_prepare(interbaseconn->error,&interbaseconn->ddltr,
 					&stmt,length,(char *)query,
 					interbaseconn->dialect,outsqlda)) {
@@ -494,7 +498,7 @@ int	interbasecursor::executeQuery(const char *query, long length,
 
 	// Execute the query, using the appropriate transaction.  
 	// Commit ddl queries immediately.
-	if (querytype==isc_info_sql_stmt_ddl) {
+	if (interbaseconn->commitddl && querytype==isc_info_sql_stmt_ddl) {
 		if (!isc_dsql_execute(interbaseconn->error,
 					&interbaseconn->ddltr,
 					&stmt,1,insqlda)) {

@@ -1,3 +1,6 @@
+does /etc/init.d/rc.sqlrelay work on slackware?  are success/failure defined?
+test interbase commitddl argument
+
 scaling/handoff=pass incompatibility
 	setting backlog:
 		linux:
@@ -163,6 +166,7 @@ Native DB Support:
 	picosql
 
 Config Tools:
+	gtk2
 	QT
 	curses
 	need keyboard shortcuts

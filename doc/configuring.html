@@ -148,7 +148,7 @@ below</li>
 <li>For <b>sybase</b> databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;encryption=ENCRYPTION;hostname=HOSTNAME;packetsize=PACKETSIZE;"  The sybase parameter is the directory containing the "interfaces" file.</li>
 <li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;" 
 <li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;" 
-<li>For <b>interbase</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;"
+<li>For <b>interbase</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;commitddl=yes/no;"  In Interbase/Firebird, CREATE/DROP statements are transactional just like INSERT/UPDATE/DELETE.  If the commitddl option is set to "yes" then the connection will emulate the behaviour of databases like Oracle/PostgreSQL, effectively rendering CREATE/DROP non-transactional.  If commitddl is set to "no" (the default) then CREATE/DROP statements remain transactional.
 </ul>
 <li><b>metric</b> - a number that influences how many of this connection should be started</li>
 </ul>

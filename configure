@@ -9224,7 +9224,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   FOUNDLIB="yes"
 fi
 
-		if ( test ! -n "$FOUNDLIB" )
+		if ( test -n "$FOUNDLIB" )
 		then
 			eval "PTHREADSLIB=\"-L$j -l$i\""
 		fi
@@ -9290,7 +9290,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   FOUNDLIB="yes"
 fi
 
-		if ( test ! -n "$FOUNDLIB" )
+		if ( test -n "$FOUNDLIB" )
 		then
 			eval "PTHREADSLIB=\"-l$i\""
 		fi
@@ -11695,7 +11695,7 @@ if test $ac_cv_file_ = yes; then
   FOUNDLIB="yes"
 fi
 
-		if ( test ! -n "$FOUNDLIB" )
+		if ( test -n "$FOUNDLIB" )
 		then
 			eval ""
 		fi
@@ -11753,7 +11753,7 @@ if test $ac_cv_file_ = yes; then
   FOUNDLIB="yes"
 fi
 
-		if ( test ! -n "$FOUNDLIB" )
+		if ( test -n "$FOUNDLIB" )
 		then
 			eval ""
 		fi
@@ -11812,7 +11812,7 @@ if test $ac_cv_file_ = yes; then
   FOUNDLIB="yes"
 fi
 
-		if ( test ! -n "$FOUNDLIB" )
+		if ( test -n "$FOUNDLIB" )
 		then
 			eval ""
 		fi
@@ -11870,7 +11870,7 @@ if test $ac_cv_file_ = yes; then
   FOUNDLIB="yes"
 fi
 
-		if ( test ! -n "$FOUNDLIB" )
+		if ( test -n "$FOUNDLIB" )
 		then
 			eval ""
 		fi
@@ -11928,7 +11928,7 @@ if test $ac_cv_file_ = yes; then
   FOUNDLIB="yes"
 fi
 
-		if ( test ! -n "$FOUNDLIB" )
+		if ( test -n "$FOUNDLIB" )
 		then
 			eval ""
 		fi
@@ -11991,7 +11991,7 @@ if test $ac_cv_file_ = yes; then
   FOUNDLIB="yes"
 fi
 
-		if ( test ! -n "$FOUNDLIB" )
+		if ( test -n "$FOUNDLIB" )
 		then
 			eval ""
 		fi
@@ -24139,7 +24139,7 @@ fi
 					done
 				fi
 			else
-				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/include" "/opt/sfw/include"
+				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
 				do
 					for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 					do
@@ -24169,7 +24169,7 @@ fi
 				done
 				if ( test -z "$TCLLIB" )
 				then
-					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/include" "/opt/sfw/include"
+					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
 					do
 						for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 						do

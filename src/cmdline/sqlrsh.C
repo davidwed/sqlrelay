@@ -21,6 +21,7 @@
 #include <time.h>
 
 
+
 #ifdef HAVE_READLINE
 	#include <rudiments/string.h>
 	// This is an interesting story...
@@ -575,9 +576,9 @@ void	sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		
 		// get the command
 		command=new stringbuffer();
-		#ifdef HAVE_READLINE
-			int	done=0;
-			while (!done) {
+		int	done=0;
+		while (!done) {
+			#ifdef HAVE_READLINE
 				stringbuffer	prmpt;
 				prmpt.append((long)promptcount);
 				prmpt.append("> ");
@@ -586,32 +587,43 @@ void	sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					string::rightTrim(cmd);
 					add_history(cmd);
 				}
-				int	len=strlen(cmd);
-				done=0;
-				for (int i=0; i<len; i++) {
-					if (i==len-1) {
-					       if (cmd[i]==';') {
-							done=1;
-						} else {
-							command->append(cmd[i]);
-						}
-					} else if (cmd[i]>=32 || 
-							cmd[i]=='	') {
+			#else
+				prompt(promptcount);
+				char	cmd[1024];
+				ssize_t	bytes=read(0,cmd,1024);
+				cmd[bytes-1]=(char)NULL;
+			#endif
+			int	len=strlen(cmd);
+			done=0;
+			for (int i=0; i<len; i++) {
+				if (i==len-1) {
+				       if (cmd[i]==';') {
+						done=1;
+					} else {
 						command->append(cmd[i]);
 					}
+				} else if (cmd[i]>=32 || 
+						cmd[i]=='	') {
+					command->append(cmd[i]);
 				}
-				if (!done) {
-					promptcount++;
-					command->append(" ");
-				}
-				delete[] cmd;
 			}
-		#else
+			if (!done) {
+				promptcount++;
+				command->append(" ");
+			}
+			#ifdef HAVE_READLINE
+				delete[] cmd;
+			#endif
+		}
+		/*#else
+			putStdioInRawMode();
+
 			prompt(promptcount);
+
 			while (1) {
-				cin.read(&buffer1,1);
+				read(0,&buffer1,1);
 				if (buffer1==';') {
-					cin.read(&buffer2,1);
+					read(0,&buffer2,1);
 					if (buffer2=='\n') {
 						break;
 					} else {
@@ -625,7 +637,9 @@ void	sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					command->append(buffer1);
 				}
 			}
-		#endif
+
+			putStdioInCookedMode();
+		#endif*/
 
 		// run the command
 		if (!runCommand(sqlrcon,sqlrcur,env,command->getString())) {	
@@ -638,7 +652,8 @@ void	sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 void	sqlrsh::prompt(int promptcount) {
 
-	printf("%s> ",promptcount);
+	printf("%d> ",promptcount);
+	fflush(stdout);
 }
 
 void	sqlrsh::error(const char *errstring) {

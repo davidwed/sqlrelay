@@ -1,10 +1,10 @@
 // Copyright (c) 2000-2001  David Muse
 // See the file COPYING for more information
 
-#ifndef DB2CCONNECTION_H
-#define DB2CCONNECTION_H
+#ifndef INTERBASECCONNECTION_H
+#define INTERBASECCONNECTION_H
 
-#define NUM_CONNECT_STRING_VARS 6
+#define NUM_CONNECT_STRING_VARS 7
 
 #include <sqlrconnection.h>
 
@@ -118,6 +118,7 @@ class interbaseconnection : public sqlrconnection {
 
 		char		*database;
 		int		dialect;
+		int		commitddl;
 
 		char		*iscuserenv;
 		char		*iscpasswordenv;

@@ -26,7 +26,7 @@ else
 	if ( test -n "$3" )
 	then
 		AC_CHECK_FILE($3, FOUNDLIB="yes")
-		if ( test ! -n "$FOUNDLIB" )
+		if ( test -n "$FOUNDLIB" )
 		then
 			eval "$4"
 		fi
@@ -1780,7 +1780,7 @@ then
 					done
 				fi
 			else
-				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/include" "/opt/sfw/include"
+				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
 				do
 					for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 					do
@@ -1789,7 +1789,7 @@ then
 				done
 				if ( test -z "$TCLLIB" )
 				then
-					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/include" "/opt/sfw/include"
+					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
 					do
 						for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 						do
