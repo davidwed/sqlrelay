@@ -103,28 +103,25 @@ socket that you got from the listener</li>
   </li>
   <li>Loop:</li>
   <ul>
-    <li>If sending a query:</li>
+    <li>If sending a new query or re-executing a previously prepared query:</li>
     <ul>
       <li>Send:
-        <table border="1">
-        <tr><td bgcolor="red">0 (sending a query)</td></tr>
-        <tr><td bgcolor="red">0 (we need a cursor)</td></tr>
-        </table>
+        <ul>
+          <li>If executing a new query:
+            <table border="1">
+            <tr><td bgcolor="red">0 (new query)</td></tr>
+            <tr><td bgcolor="yellow">length of the query</td></tr>
+            <tr><td bgcolor="green">the query string</td></tr>
+            </table>
+          </li>
+          <li>If re-executing a previously prepared query:
+            <table border="1">
+            <tr><td bgcolor="red">13 (reexecute query)</td></tr>
+            <tr><td bgcolor="red">cursor id</td></tr>
+            </table>
+          </li>
+        </ul>
       </li>
-      <ul>
-        <li>If executing a new query:
-          <table border="1">
-          <tr><td bgcolor="red">0</td></tr>
-          <tr><td bgcolor="yellow">length of the query</td></tr>
-          <tr><td bgcolor="green">the query string</td></tr>
-          </table>
-        </li>
-        <li>If re-binding/re-executing the previously sent query:
-          <table border="1">
-          <tr><td bgcolor="red">1</td></tr>
-          </table>
-        </li>
-      </ul>
       <table border="1">
       <tr><td bgcolor="red">The number of input bind variables</td></tr>
       </table>
@@ -161,6 +158,20 @@ socket that you got from the listener</li>
               <tr><td bgcolor="red">0 (indicates that this is a NULL variable)</td></tr>
               </table>
             </li>
+            <li>For a BLOB variable:
+              <table border="1">
+              <tr><td bgcolor="red">4 (indicates that this is a blob variable)</td></tr>
+              <tr><td bgcolor="yellow">the size of the bind variable value</td></tr>
+              <tr><td bgcolor="green">the bind variable value</td></tr>
+              </table>
+            </li>
+            <li>For a CLOB variable:
+              <table border="1">
+              <tr><td bgcolor="red">5 (indicates that this is a blob variable)</td></tr>
+              <tr><td bgcolor="yellow">the size of the bind variable value</td></tr>
+              <tr><td bgcolor="green">the bind variable value</td></tr>
+              </table>
+            </li>
           </ul>
         </li>
       </ul>
@@ -172,8 +183,20 @@ socket that you got from the listener</li>
           <table border="1">
           <tr><td bgcolor="red">length of the bind variable name</td></tr>
           <tr><td bgcolor="green">the bind variable name string</td></tr>
-          <tr><td bgcolor="red">the size of the bind variable value</td></tr>
           </table>
+	  <ul>
+            <li>For string/BLOB/CLOB output bind variables:
+              <table border="1">
+              <tr><td bgcolor="red">1 (indicates that this is a string/BLOB/CLOB variable)</td></tr>
+              <tr><td bgcolor="red">the size of the bind variable value</td></tr>
+              </table>
+	    </li>
+	    <li>For cursor output bind variables:
+              <table border="1">
+              <tr><td bgcolor="red">6 (indicates that this is a cursor variable)</td></tr>
+              </table>
+	    </li>
+          </ul>
         </li>
       </ul>
       <ul>
@@ -194,6 +217,33 @@ socket that you got from the listener</li>
       </table>
       Skip to <a href="#receive">"If fetching rows from a result set: Receive"</a> below...
     </ul>
+    <li>If fetching from a bind cursor
+      <ul>
+        <table border="1">
+        <tr><td bgcolor="red">14 (fetch from bind cursor)</td></tr>
+        <tr><td bgcolor="red">cursor id</td></tr>
+        <tr><td bgcolor="red">0 (number of input binds)</td></tr>
+        <tr><td bgcolor="red">0 (number of output binds)</td></tr>
+        </table>
+        <ul>
+          <li>If you want to get column info:
+            <table border="1">
+            <tr><td bgcolor="red">1</td></tr>
+            </table>
+          </li>
+          <li>If you don't want to get column info:
+            <table border="1">
+            <tr><td bgcolor="red">0</td></tr>
+            </table>
+          </li>
+        </ul>
+        <table border="1">
+        <tr><td bgcolor="yellow">The number of rows to skip</td></tr>
+        <tr><td bgcolor="yellow">The number of rows to fetch</td></tr>
+        </table>
+        Skip to <a href="#receive">"If fetching rows from a result set: Receive"</a> below...
+      </ul>
+    </li>
     <li>If sending a commit:
       <ul>
         <li>Send:
@@ -316,17 +366,49 @@ socket that you got from the listener</li>
           <table border="1">
           <tr><td bgcolor="red">whether the server is sending column info or not: 1 or 0</td></tr>
           <tr><td bgcolor="red">column count</td></tr>
+          <tr><td bgcolor="red">whether the server is sending column types as strings or predefined id's: 1 or 0</td></tr>
           </table>
           <ul>
             <li>If server is sending column info:
               <ul>
                 <li>For each column:
-                  <table border="1">
-                  <tr><td bgcolor="red">column name length</td></tr>
-                  <tr><td bgcolor="green">column name</td></tr>
-                  <tr><td bgcolor="red">column type</td></tr>
-                  <tr><td bgcolor="yellow">column length</td></tr>
-                  </table>
+		  <ul>
+		    <li>Column Name:
+                      <table border="1">
+                      <tr><td bgcolor="red">name length</td></tr>
+                      <tr><td bgcolor="green">name</td></tr>
+		      </table>
+		    </li>
+		    <li>Column Type:
+		      <ul>
+			<li>If server is sending column type id's:
+                          <table border="1">
+                          <tr><td bgcolor="red">type id</td></tr>
+		          </table>
+                        </li>
+			<li>If server is sending column types as strings:
+                          <table border="1">
+                          <tr><td bgcolor="red">type string length</td></tr>
+                          <tr><td bgcolor="green">type string</td></tr>
+		          </table>
+                        </li>
+		      </ul>
+		    </li>
+		    <li>Column Sizes:
+                      <table border="1">
+                      <tr><td bgcolor="yellow">length</td></tr>
+                      <tr><td bgcolor="yellow">precision</td></tr>
+                      <tr><td bgcolor="yellow">scale</td></tr>
+                      </table>
+		    </li>
+		    <li>Column Flags:
+                      <table border="1">
+                      <tr><td bgcolor="red">is nullable (1 or 0)</td></tr>
+                      <tr><td bgcolor="red">is primary key (1 or 0)</td></tr>
+                      <tr><td bgcolor="red">is unique (1 or 0)</td></tr>
+                      </table>
+		    </li>
+                  </ul>
                 </li>
               </ul>
             </li>
@@ -334,17 +416,40 @@ socket that you got from the listener</li>
           <ul>
             <li>Loop:
               <table border="1">
-              <tr><td bgcolor="red">output bind variable type: 0,1 or 4</td></tr>
+              <tr><td bgcolor="red">output bind variable type: 0,1,2,4 or 5</td></tr>
               </table>
               <ul>
                 <li>If type is 0 then the data is null</li>
-                <li>If type is 1
+                <li>If type is 1 then the data is a string
                   <table border="1">
                   <tr><td bgcolor="red">output bind value length</td></tr>
                   <tr><td bgcolor="green">output bind value</td></tr>
                   </table>
                 </li>
-                <li>If type is 4 then break out of loop</li>
+		<li>If type is 2 then the data is BLOB/CLOB data
+		  <ul>
+		    <li>Loop:
+                      <table border="1">
+                      <tr><td bgcolor="red">chunk type: 1 or 3</td></tr>
+                      </table>
+                      <ul>
+                        <li>If type is 1 then chunk is string data
+                          <table border="1">
+                          <tr><td bgcolor="red">chunk length</td></tr>
+                          <tr><td bgcolor="green">chunk data</td></tr>
+                          </table>
+                        </li>
+                        <li>If type is 3 then break out of the loop</li>
+                      </ul>
+		    </li>
+		  </ul>
+		</li>
+                <li>If type is 4 then the data is a cursor id
+                  <table border="1">
+                  <tr><td bgcolor="red">cursor id</td></tr>
+                  </table>
+                </li>
+                <li>If type is 5 then break out of loop</li>
               </ul>
             </li>
           </ul>
