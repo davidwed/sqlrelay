@@ -531,9 +531,13 @@ bool db2cursor::fetchRow() {
 		// SQL_ATTR_ROW_NUMBER to always be 1, running through
 		// the row status buffer appears to work.
 		int	index=0;
+		while (index<FETCH_AT_ONCE) {
+			index++;
+		}
+		index=0;
 		while (index<FETCH_AT_ONCE &&
-			(rowstat[index]==SQL_SUCCESS ||
-			rowstat[index]==SQL_SUCCESS_WITH_INFO)) {
+			(rowstat[index]==SQL_ROW_SUCCESS ||
+			rowstat[index]==SQL_ROW_SUCCESS_WITH_INFO)) {
 			index++;
 		}
 		rownumber=totalrows+index;
