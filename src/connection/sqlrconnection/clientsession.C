@@ -1,0 +1,222 @@
+// Copyright (c) 1999-2001  David Muse
+// See the file COPYING for more information
+
+#include <sqlrconnection.h>
+
+void	sqlrconnection::clientSession() {
+
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",0,"client session...");
+	#endif
+
+	// a session consists of getting a query and returning a result set
+	// over and over
+	for (;;) {
+
+		// is this a query, fetch, abort, suspend or resume...
+		unsigned short	command;
+		if (!getCommand(&command)) {
+			endSession();
+			break;
+		}
+
+		// handle some things up front
+		if (command==AUTHENTICATE) {
+			if (authenticateCommand()) {
+				continue;
+			}
+			break;
+		} else if (command==SUSPEND_SESSION) {
+			suspendSessionCommand();
+			break;
+		} else if (command==END_SESSION) {
+			endSessionCommand();
+			break;
+		} else if (command==PING) {
+			pingCommand();
+			continue;
+		} else if (command==IDENTIFY) {
+			identifyCommand();
+			continue;
+		} else if (command==AUTOCOMMIT) {
+			autoCommitCommand();
+			continue;
+		} else if (command==COMMIT) {
+			commitCommand();
+			continue;
+		} else if (command==ROLLBACK) {
+			rollbackCommand();
+			continue;
+		} else if (command==NEW_QUERY) {
+			if (newQueryCommand()) {
+				continue;
+			}
+			break;
+		}
+
+		// For the rest of the commands, the client will be requesting
+		// a cursor.  Get the cursor to work with.  Save the result of
+		// this, the client may be sending more information and we need
+		// to collect it.
+		if (!getCursor()) {
+			getQueryFromClient(0);
+			noAvailableCursors();
+			continue;
+		}
+
+		if (command==REEXECUTE_QUERY) {
+			if (!reExecuteQueryCommand()) {
+				break;
+			}
+		} else if (command==FETCH_FROM_BIND_CURSOR) {
+			if (!fetchFromBindCursorCommand()) {
+				break;
+			}
+		} else if (command==FETCH_RESULT_SET) {
+			if (!fetchResultSetCommand()) {
+				break;
+			}
+		} else if (command==ABORT_RESULT_SET) {
+			abortResultSetCommand();
+		} else if (command==SUSPEND_RESULT_SET) {
+			suspendResultSetCommand();
+		} else if (command==RESUME_RESULT_SET) {
+			if (!resumeResultSetCommand()) {
+				break;
+			}
+		} else {
+			endSession();
+			break;
+		}
+	}
+
+	waitForClientClose();
+
+	closeSuspendedSessionSockets();
+
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",0,"done with client session");
+	#endif
+}
+
+int	sqlrconnection::getCursor() {
+
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"getting a cursor...");
+	#endif
+
+	// which cursor is the client requesting?
+	unsigned short	index;
+	if (clientsock->read(&index)!=sizeof(unsigned short)) {
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",2,
+				"error: client cursor request failed");
+		#endif
+		return 0;
+	}
+
+	// don't allow the client to request a cursor 
+	// beyond the end of the array.
+	if (index>cfgfl->getCursors()) {
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",2,
+				"error: client requested an invalid cursor");
+		#endif
+		return 0;
+	}
+
+	// set the current cursor to the one they requested.
+	currentcur=index;
+	cur[index]->busy=1;
+
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",2,"returning requested cursor");
+	debugPrint("connection",1,"done getting a cursor");
+	#endif
+	return 1;
+}
+
+void	sqlrconnection::waitForClientClose() {
+
+	// Sometimes the server sends the result set and closes the socket
+	// while part of it is buffered but not yet transmitted.  This caused
+	// the client to receive a partial result set or error.  Telling the
+	// socket to linger doesn't always fix it.  Doing a read here should 
+	// guarantee that the client will close it's end of the connection 
+	// before the server closes it's end; the server will wait for data 
+	// from the client (which it will never receive) and when the client 
+	// closes it's end (which it will only do after receiving the entire
+	// result set) the read will fall through.  This should guarantee 
+	// that the client will get the the entire result set without
+	// requiring the client to send data back indicating so.
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,
+			"waiting for client to close the connection...");
+	#endif
+	unsigned short	dummy;
+	clientsock->read(&dummy);
+	clientsock->close();
+	delete clientsock;
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,
+			"done waiting for client to close the connection...");
+	#endif
+}
+
+void	sqlrconnection::closeSuspendedSessionSockets() {
+
+	// If we're no longer in a suspended session and we we're passing 
+	// around file descriptors but had to open a set of sockets to handle 
+	// a suspended session, close those sockets here.
+	if (!suspendedsession && cfgfl->getPassDescriptor()) {
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",1,
+			"closing sockets from a previously suspended session...");
+		#endif
+		if (serversockun) {
+			removeFileDescriptor(serversockun->getFileDescriptor());
+			delete serversockun;
+			serversockun=NULL;
+		}
+		if (serversockin) {
+			removeFileDescriptor(serversockin->getFileDescriptor());
+			delete serversockin;
+			serversockin=NULL;
+		}
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",1,
+			"done closing sockets from a previously suspended session...");
+		#endif
+	}
+}
+
+void	sqlrconnection::noAvailableCursors() {
+
+	// indicate that an error has occurred
+	clientsock->write((unsigned short)ERROR);
+
+	// send the error itself
+	clientsock->write((unsigned short)62);
+	clientsock->write("No server-side cursors were available to process the query.",62);
+}
+
+int	sqlrconnection::getCommand(unsigned short *command) {
+
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",2,"getting command...");
+	#endif
+
+	// get the command
+	if (clientsock->read(command)!=sizeof(unsigned short)) {
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",2,
+			"getting command failed: client sent bad command");
+		#endif
+		return 0;
+	}
+
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",2,"done getting command");
+	#endif
+	return 1;
+}
