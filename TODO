@@ -1,6 +1,3 @@
-mysql test fails column length test
-
-stored procedure test doesn't work with db2 8.1
 db2 start/stop doesn't work
 	db2start/db2stop works when run as a given instance owner
 
@@ -19,9 +16,6 @@ scaling/handoff=pass incompatibility
 		solaris:
 			/usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
 
-postgresql test program compile fails on SCO _res defined in libsocket/libresolv
-perl api won't build on SCO
-ruby api won't build on SCO
 
 handle temp tables properly:
 	oracle 8i: "create global temporary table ...
@@ -35,14 +29,6 @@ handle temp tables properly:
 		are they truncated???
 	interbase: ???
 
-document checkForTempTable()
-
-compatibility:
-	oracle 9.2
-
-lots of documentation fixes:
-	fix clientapis.html
-	oracle 9.2 installation
 
 Tests:
 	zope
@@ -54,13 +40,20 @@ Tests:
 	test upper/lower/mixed column case methods
 	need database reconnect tests
 	interbase stored procedure/output bind test
+	stored procedure test doesn't work with db2 8.1
+	mysql test fails column length test w/some versions
+	postgresql test program compile fails on SCO _res defined in
+		libsocket/libresolv
+	perl api won't build on SCO/Solaris
 
 Compatibility:
-	gtk-2
+	oracle 9.2
 	ruby module segfaults on netbsd/openbsd
 	python api methods that call PyArg_ParseTuple with an "O" argument 
 		don't work on openbsd/netbsd, not exactly sure why
 	incorporate pkg-config stuff
+	ruby api won't build on SCO
+	crypto/ssl lib tests need to look in various places for the library
 
 Documentation:
 	getting started docs for MS SQL Server
@@ -71,6 +64,9 @@ Documentation:
 	performance benchmark charts
 	HOWTO for linuxdoc.org
 	man pages for everything
+	document checkForTempTable()
+	fix clientapis.html
+	oracle 9.2 installation
 
 Performance:
 	persistent cursors - parse query, attach an id to it, make it available

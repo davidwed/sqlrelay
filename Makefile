@@ -54,6 +54,7 @@ unconfig: clean
 	$(RM) config.status
 	$(RM) config.mk
 	$(RMTREE) autom4te.cache
+	$(RMTREE) autom4te-*.cache
 	$(RM) src/api/perl/SQLRConnection/Makefile.PL
 	$(RM) src/api/perl/SQLRConnection/SQLRConnection.pm
 	$(RM) src/api/perl/SQLRCursor/Makefile.PL

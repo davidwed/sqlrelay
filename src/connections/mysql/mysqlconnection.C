@@ -195,7 +195,7 @@ int	mysqlcursor::executeQuery(const char *query, long length,
 
 		// if there was an error then return failure, otherwise
 		// the query must have been some DML or DDL
-		char	*err=mysql_error(&mysqlconn->mysql);
+		char	*err=(char *)mysql_error(&mysqlconn->mysql);
 		if (err && err[0]) {
 			return 0;
 		} else {
@@ -215,7 +215,7 @@ int	mysqlcursor::executeQuery(const char *query, long length,
 char	*mysqlcursor::getErrorMessage(int *liveconnection) {
 
 	*liveconnection=1;
-	char	*err=mysql_error(&mysqlconn->mysql);
+	char	*err=(char *)mysql_error(&mysqlconn->mysql);
 #if MYSQL_VERSION_ID>=32200
 	if (queryresult==CR_SERVER_GONE_ERROR || queryresult==CR_SERVER_LOST) {
 		*liveconnection=0;
