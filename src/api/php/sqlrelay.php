@@ -16,7 +16,7 @@
 // | Author: Stig Bakken <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.3 2004-01-12 05:09:21 mused Exp $
+// $Id: sqlrelay.php,v 1.4 2004-01-20 04:16:51 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -77,7 +77,6 @@ class DB_sqlrelay extends DB_common
     }
 
     // }}}
-
     // {{{ connect()
 
     /**
@@ -181,14 +180,14 @@ class DB_sqlrelay extends DB_common
     * @access public
     * @see execute
     */
-/*
+
     function prepare($query)
     {
         $cursor = sqlrcur_alloc($this->connection);
         sqlrcur_prepareQuery($cursor, $query);
         return new DB_sqlrelay_cursor($cursor);
     }
-*/
+
     // }}}
     // {{{ execute()
     /**
@@ -207,7 +206,7 @@ class DB_sqlrelay extends DB_common
     * @access public
     * @see prepare()
     */
-/*
+
     function &execute(&$sqlrcursor, $data = false)
     {
         sqlrcur_clearBinds($sqlrcursor->cursor);
@@ -225,7 +224,7 @@ class DB_sqlrelay extends DB_common
         }
         return $sqlrcursor;
     }
-*/
+
     // }}}
     // {{{ fetchInto()
 
@@ -275,7 +274,7 @@ class DB_sqlrelay extends DB_common
      */
     function freeResult(&$sqlrcursor)
     {
-        if (is_resource($sqlrcursor) {
+        if (is_resource($sqlrcursor)) {
             sqlrcur_free($sqlrcursor->cursor);
             return true;
         }
