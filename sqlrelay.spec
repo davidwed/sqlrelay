@@ -29,22 +29,6 @@
 # --without zope
 # --without tcl
 
-%if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
-	%define phpdevel %(echo "mod_php4-devel")
-	%define gtkdevel %(echo "gtk-devel")
-	%define rubydevel %(echo "ruby")
-	%define tcldevel %(echo "tcl-devel")
-	%define initscript /etc/init.d/sqlrelay
-	%define inittab /etc/sqlrelay
-%else
-	%define phpdevel %(echo "php-devel")
-	%define gtkdevel %(echo "gtk+-devel")
-	%define rubydevel %(echo "ruby-devel")
-	%define tcldevel %(echo "tcl")
-	%define initscript /etc/rc.d/init.d/sqlrelay
-	%define inittab /etc/sysconfig/sqlrelay
-%endif
-
 Summary: Persistent database connection system.
 Name: sqlrelay
 Version: 0.34.3
@@ -54,6 +38,25 @@ Group: System Environment/Daemons
 Source0: %{name}-%{version}.tar.gz
 URL: http://sqlrelay.sourceforge.net
 Buildroot: %{_tmppath}/%{name}-root
+
+%if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
+	%define phpdevel %(echo "mod_php4-devel")
+	%define gtkdevel %(echo "gtk-devel")
+	%define rubydevel %(echo "ruby")
+	%define tcldevel %(echo "tcl-devel")
+	%define initscript /etc/init.d/sqlrelay
+	%define inittab /etc/sqlrelay
+	%define docdir %{_docdir}/%{name}
+%else
+	%define phpdevel %(echo "php-devel")
+	%define gtkdevel %(echo "gtk+-devel")
+	%define rubydevel %(echo "ruby-devel")
+	%define tcldevel %(echo "tcl")
+	%define initscript /etc/rc.d/init.d/sqlrelay
+	%define inittab /etc/sysconfig/sqlrelay
+	%define docdir %{_docdir}/%{name}-%{version}
+%endif
+
 BuildRequires: rudiments-devel >= 0.26
 %{!?_without_gtk:BuildRequires: ,%{gtkdevel}}
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
@@ -353,14 +356,22 @@ make INSTALLPREFIX=%{buildroot}
 rm -rf %{buildroot}
 # must install everything except ruby first because the "prefix" environment
 # variable screws up the ruby install
-%makeinstall \
+make \
 	DESTDIR=%{buildroot} \
-	docdir=%{buildroot}%{_docdir}/%{name}-%{version} \
-	HAVE_RUBY=""
+	prefix=%{buildroot}%{_prefix} \
+	exec_prefix=%{buildroot}%{_prefix} \
+	includedir=%{buildroot}%{_includedir} \
+	libdir=%{buildroot}%{_libdir} \
+	bindir=%{buildroot}%{_bindir} \
+	localstatedir=%{buildroot}%{_localstatedir} \
+	sysconfdir=%{buildroot}%{_sysconfdir} \
+	mandir=%{buildroot}%{_mandir} \
+	docdir=%{buildroot}%{docdir} \
+	HAVE_RUBY="" \
+	install
 # get rid of some garbage
 rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
 # now install ruby
-HAVE_RUBY="" \
 %{!?_without_ruby: cd src/api/ruby; make DESTDIR=%{buildroot} install}
 
 %pre
@@ -534,7 +545,7 @@ rm -rf %{buildroot}
 %{!?_without_tcl:%{tcldir}/sqlrelay/*}
 
 %files doc
-%{_docdir}/%{name}-%{version}
+%{docdir}
 
 %files man
 %{_mandir}
