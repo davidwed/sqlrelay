@@ -14,6 +14,7 @@ export CLASSPATH
 #java mysql localhost 8006 "" mysqltest mysqltest
 #java oracle7 localhost 8008 "" oracle7test oracle7test
 #java oracle8 localhost 8009 "" oracle8test oracle8test
+#java oracle8i localhost 8009 "" oracle8test oracle8test
 java postgresql localhost 8010 "" postgresqltest postgresqltest
 #java sqlite localhost 8011 "" sqlitetest sqlitetest
 #java sybase localhost 8012 "" sybasetest sybasetest

@@ -1,4 +1,5 @@
 #gcc -I/usr/local/firstworks/include -g -o oracle8 oracle8.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o oracle8i oracle8i.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lm -lefence
 #gcc -I/usr/local/firstworks/include -g -o oracle7 oracle7.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
 #gcc -I/usr/local/firstworks/include -g -o mysql mysql.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
 #gcc -I/usr/local/firstworks/include -g -o msql msql.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
