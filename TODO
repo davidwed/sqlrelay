@@ -1,3 +1,9 @@
+using libtool to link a library on netbsd doesn't link in libstdc++ even when
+	using g++, maybe this is ok, but python api still won't run, complains
+	about missng __builtin_new
+
+autoconf needs to search for threads include dir too and add it with -I
+
 oldmysql test files for non-C++ api's
 
 db2 start/stop doesn't work for 7.2
@@ -59,7 +65,6 @@ Compatibility:
 	Solaris x86:
 		ruby api won't build
 	openbsd/netbsd:
-		ruby module segfaults
 		python api methods that call PyArg_ParseTuple with an "O"
 			argument don't work, not exactly sure why
 

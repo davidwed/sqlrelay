@@ -411,64 +411,73 @@ AC_DEFINE_UNQUOTED(INLINE,$INLINE,Some compliers don't support the inline keywor
 
 
 dnl checks for the pthreads library
-dnl requires:  PTHREADSPATH, RPATHFLAG, cross_compiling
-dnl sets the substitution variable PTHREADLIBS
-dnl sets the environment variable PTHREADLIBSPATH
-AC_DEFUN([FW_CHECK_PTHREADS],
+dnl requires:  PTHREADPATH, RPATHFLAG, cross_compiling
+dnl sets the substitution variable PTHREADLIB
+AC_DEFUN([FW_CHECK_PTHREAD],
 [
 
-PTHREADLIBS=""
-PTHREADLIBSPATH=""
+HAVE_PTHREAD=""
+PTHREADINCLUDES=""
+PTHREADLIB=""
 
 if ( test "$cross_compiling" = "yes" )
 then
 	
 	dnl cross compiling
 	echo "cross compiling"
-	if ( test -n "$PTHREADSPATH" )
+	if ( test -n "$PTHREADPATH" )
 	then
-		PTHREADLIBS="-L$PTHREADSPATH/lib -lpthread"
+		PTHREADINCLUDES="-I$PTHREADPATH/include"
+		PTHREADLIB="-L$PTHREADPATH/lib -lpthread"
 	else
-		PTHREADLIBS="-lpthread"
+		PTHREADLIB="-lpthread"
 	fi
+	HAVE_PTHREAD="yes"
 
 else
 
-	for i in "pthread" "pth" "c_r" "gthreads"
-	do
-		for j in "$PTHREADSPATH" "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/pthread" "/usr/local/lib/pthreads" "/usr/local/lib/pth" "/usr/local/pthread/lib" "/usr/local/pthreads/lib" "/opt/sfw/lib"
+	if ( test -n "$PTHREADLIB" )
+	then
+		HAVE_PTHREAD="yes"
+	else
+		for i in "pthread" "c_r"
 		do
-			if ( test -n "$j" )
+			FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[pthread],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
+			if ( test -n "$PTHREADLIB" )
 			then
-				FW_CHECK_LIB([$j/lib$i.so],[PTHREADLIBSPATH=\"$j\"; PTHREADLIBS=\"-L$j -l$i\"],[$j/lib$i.a],[PTHREADLIBS=\"-L$j -l$i\"])
-				if ( test -n "$PTHREADLIBS" )
+				if ( test "$i" = "c_r" )
 				then
-					break
+					PTHREADLIB="$PTHREADLIB -pthread"
 				fi
+				break
 			fi
 		done
-	
-		FW_CHECK_LIB([/usr/lib/lib$i.so],[PTHREADLIBSPATH=\"\"; PTHREADLIBS=\"-l$i\"],[/usr/lib/lib$i.a],[PTHREADLIBS=\"-l$i\"])
-		if ( test -n "$PTHREADLIBS" )
+		if ( test -n "$PTHREADLIB" )
 		then
-			if ( test "$i" = "c_r" )
-			then
-				PTHREADLIBS="-pthread $PTHREADLIBS"
-			fi
+			HAVE_PTHREAD="yes"
 			break
 		fi
-	done
+	fi
 fi
 
-FW_LIBS(pthreads,[$PTHREADLIBS])
-AC_SUBST(PTHREADLIBS)
+FW_INCLUDES(pthreads,[$PTHREADINCLUDES])
+FW_LIBS(pthreads,[$PTHREADLIB])
+
+AC_SUBST(PTHREADINCLUDES)
+AC_SUBST(PTHREADLIB)
+if ( test -z "$HAVE_PTHREAD" )
+then
+	AC_MSG_ERROR(pthread library not found.  SQL-Relay requires this package.)
+	exit
+fi
 ])
+
 
 
 dnl checks for the rudiments library
 dnl requires:  MICROSOFT, RUDIMENTSPATH, RPATHFLAG, cross_compiling
-dnl sets the substitution variables RUDIMENTSLIBS, RUDIMENTSDEBUGLIBS,
-dnl    RUDIMENTSLIBSPATH, RUDIMENTSLIBSINCLUDES
+dnl sets the substitution variables RUDIMENTSLIBS, RUDIMENTSLIBSPATH,
+dnl RUDIMENTSLIBSINCLUDES
 AC_DEFUN([FW_CHECK_RUDIMENTS],
 [
 
@@ -485,15 +494,12 @@ then
 	then
 		RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"
 		RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"
-		RUDIMENTSDEBUGLIBS="-L$RUDIMENTSPATH/lib -lrudiments_p"
 	fi
 
 else
 
 	if ( test -z "$MICROSOFT" )
 	then
-		FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[rudiments/daemonprocess.h],[rudiments_p],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSDEBUGLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC],[RUDIMENTSPATH])
-
 		FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[rudiments/daemonprocess.h],[rudiments],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC],[RUDIMENTSPATH])
 
 	else
@@ -501,7 +507,7 @@ else
 		do
 			if ( test -n "$i" )
 			then
-				FW_CHECK_HEADER_LIB([$i/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\"],[$i/lib/librudiments.dll],[RUDIMENTSLIBS=\"$i/lib/librudiments.dll\"; RUDIMENTSDEBUGLIBS=\"$i/lib/librudiments_p.dll\"])
+				FW_CHECK_HEADER_LIB([$i/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\"],[$i/lib/librudiments.dll],[RUDIMENTSLIBS=\"$i/lib/librudiments.dll\"])
 			fi
 			if ( test -n "$RUDIMENTSLIBS" )
 			then
@@ -523,7 +529,6 @@ FW_LIBS(rudiments,[$RUDIMENTSLIBS])
 AC_SUBST(RUDIMENTSPATH)
 AC_SUBST(RUDIMENTSINCLUDES)
 AC_SUBST(RUDIMENTSLIBS)
-AC_SUBST(RUDIMENTSDEBUGLIBS)
 AC_SUBST(RUDIMENTSLIBSPATH)
 ])
 

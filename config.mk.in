@@ -34,7 +34,7 @@ CXX = @CXX@
 STRIP = @STRIP@
 
 # includes and defines (-I and -D flags)
-BASECPPFLAGS = @CPPFLAGS@
+BASECPPFLAGS = @CPPFLAGS@ @PTHREADINCLUDES@
 TMPDIRCPPFLAG = -DTMP_DIR=\"$(tmpdir)\"
 DEBUGDIRCPPFLAG = -DDEBUG_DIR=\"$(debugdir)\"
 CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\"
