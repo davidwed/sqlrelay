@@ -90,11 +90,25 @@ sqlrelay.so:
 		cp .libs/libsqlrelay.so sqlrelay.so; \
 	fi
 
+sqlrelay.dll:
+	if ( test -r .libs/libsqlrelay.0.0.0 ); \
+	then \
+		cp .libs/cygsqlrelay-0.dll sqlrelay.dll; \
+	fi
+
+ifeq ($(CYGWIN),)
 install: sqlrelay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(INSTALL) $(INSTALLSTRIP) sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.so
+else
+install: sqlrelay.dll
+	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(INSTALL) $(INSTALLSTRIP) sqlrelay.dll $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(RM) sqlrelay.dll
+endif
 
 uninstall:
 	$(RMTREE) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay

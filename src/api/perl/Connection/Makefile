@@ -121,6 +121,13 @@ Connection.so:
 		cp .libs/libConnection.so Connection.so; \
 	fi
 
+Connection.dll:
+	if ( test -r .libs/cygConnection-0.dll ); \
+	then \
+		cp .libs/cygConnection-0.dll Connection.dll; \
+	fi
+
+ifeq ($(CYGWIN),)
 install: Connection.so
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
 	$(INSTALL) -m 644 Connection.pm $(PERLSITEARCH)/SQLRelay
@@ -135,6 +142,17 @@ install: Connection.so
 	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.so > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Connection.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+else
+install: Connection.dll
+	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
+	$(INSTALL) -m 644 Connection.pm $(PERLSITEARCH)/SQLRelay
+	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Connection
+	$(INSTALL) -m 755 Connection.dll $(PERLSITEARCH)/auto/SQLRelay/Connection
+	touch $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs
+	$(RM) Connection.dll
+	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.dll > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+endif
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) `cat $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist`

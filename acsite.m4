@@ -354,7 +354,7 @@ dnl Determines what extension shared object files have
 AC_DEFUN([FW_CHECK_SO_EXT],
 [
 AC_MSG_CHECKING(for dynamic library extension)
-if ( test -n "$MICROSOFT" )
+if ( test -n "$CYGWIN" )
 then
 	SOSUFFIX="dll.a"
 else
@@ -585,7 +585,7 @@ then
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$MICROSOFT" )
+		if ( test -n "$CYGWIN" )
 		then
 			for ORACLE_HOME in "`ls -d /cygdrive/c/oracle/product/*/*/OCI`"
 			do
@@ -649,7 +649,7 @@ then
 		
 		if ( test -n "$ORACLEVERSION" )
 		then
-			if ( test -n "$MICROSOFT" )
+			if ( test -n "$CYGWIN" )
 			then
 				ORACLEINCLUDES="-I$ORACLE_HOME/include"
 			else
@@ -841,7 +841,7 @@ then
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$MICROSOFT" )
+		if ( test -n "$CYGWIN" )
 		then
 			FW_CHECK_HEADER_LIB([/cygdrive/c/mysql/include/mysql.h],[MYSQLINCLUDES=\"-I/cygdrive/c/mysql/include\"],[/cygdrive/c/mysql/lib/opt/libmysql.lib],[MYSQLLIBSPATH=\"/cygdrive/c/mysql/lib/opt\"; MYSQLLIBS=\"-L/cygdrive/c/mysql/lib/opt -lmysql\"],[/cygdrive/c/mysql/lib/opt/mysqlclient.lib],[MYSQLLIBS=\"/cygdrive/c/mysql/lib/opt/mysqlclient.lib\"; MYSQLSTATIC=\"$STATICFLAG\"])
 		fi
@@ -1359,17 +1359,17 @@ then
 		
 		if ( test -n "$SYBASEPATH" )
 		then
-			if ( test -n "$MICROSOFT" )
+			if ( test -n "$CYGWIN" )
 			then
-				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.lib],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -llibblk -llibcs -llibct\"],[],[])
+				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/dll/libct.dll],[SYBASELIBSPATH=\"$SYBASEPATH/dll\"; SYBASELIBS=\"-L$SYBASEPATH/dll -llibcs -llibct\"],[],[])
 			else
 				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 			fi
 		else
 		
-			if ( test -n "$MICROSOFT" )
+			if ( test -n "$CYGWIN" )
 			then
-				FW_CHECK_HEADER_LIB([/cygdrive/c/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/cygdrive/c/sybase/OCS-12_5/include\"],[/cygdrive/c/sybase/OCS-12_5/lib/libct.lib],[SYBASELIBSPATH=\"/cygdrive/c/sybase/OCS-12_5/lib\"; SYBASELIBS=\"-L/cygdrive/c/sybase/OCS-12_5/lib -llibblk -llibct -llibcs\"],[],[])
+				FW_CHECK_HEADER_LIB([/cygdrive/c/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/cygdrive/c/sybase/OCS-12_5/include\"],[/cygdrive/c/sybase/OCS-12_5/dll/libct.dll],[SYBASELIBSPATH=\"/cygdrive/c/sybase/OCS-12_5/dll\"; SYBASELIBS=\"-L/cygdrive/c/sybase/OCS-12_5/dll -llibct -llibcs\"],[],[])
 			else
 				FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 		
@@ -1497,7 +1497,7 @@ then
 			fi
 		fi
 
-		if ( test -n "$MICROSOFT" -a -z "$ODBCLIBS" )
+		if ( test -n "$CYGWIN" -a -z "$ODBCLIBS" )
 		then
 			FW_CHECK_HEADER_LIB([/usr/include/w32api/sql.h],[],[/usr/lib/w32api/libodbc32.dll.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"],[/usr/lib/w32api/libodbc32.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"])
 		fi
@@ -1578,7 +1578,7 @@ then
 		
 		if ( test -n "$DB2PATH" )
 		then
-			if ( test -n "$MICROSOFT" )
+			if ( test -n "$CYGWIN" )
 			then
 				FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/db2cli.lib],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"$DB2PATH/lib/db2cli.lib\"],[],[])
 			else
@@ -1587,10 +1587,10 @@ then
 		
 		else
 
-			if ( test -n "$MICROSOFT" )
+			if ( test -n "$CYGWIN" )
 			then
 
-				FW_CHECK_HEADER_LIB([/cygdrive/c/Program Files/IBM/SQLLIB/include/sql.h],[DB2INCLUDES=\"-I/cygdrive/c/Program\ Files/IBM/SQLLIB/include\"; DB2VERSION=\"8\"],[/cygdrive/c/Program Files/IBM/SQLLIB/lib/db2cli.lib],[DB2LIBSPATH=\"/cygdrive/c/Program Files/IBM/SQLLIB/lib\"; DB2LIBS=\"/cygdrive/c/Program\ Files/IBM/SQLLIB/lib/db2cli.lib\"; DB2VERSION=\"8\"],[],[])
+				FW_CHECK_HEADER_LIB([/cygdrive/c/Program Files/IBM/SQLLIB/include/sql.h],[DB2INCLUDES=\"-I/cygdrive/c/Program\ Files/IBM/SQLLIB/include\"; DB2VERSION=\"8\"],[/cygdrive/c/Program Files/IBM/SQLLIB/lib/db2cli.lib],[DB2LIBSPATH=\"/cygdrive/c/Program\ Files/IBM/SQLLIB/lib\"; DB2LIBS=\"/cygdrive/c/Program\ Files/IBM/SQLLIB/lib/db2cli.lib\"; DB2VERSION=\"8\"],[],[])
 
 			else
 		
@@ -1657,9 +1657,9 @@ then
 		
 		if ( test -n "$INTERBASEPATH" )
 		then
-			if ( test -n "$MICROSOFT" )
+			if ( test -n "$CYGWIN" )
 			then
-				FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/lib/fbclient_ms.lib],[INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lfbclient_ms\"],[],[])
+				FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/bin/fbclient.dll],[INTERBASELIBSPATH=\"$INTERBASPATH/bin\"; INTERBASELIBS=\"-L$INTERBASEPATH/bin -lfbclient\"],[],[])
 			else
 				FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"],[$INTERBASEPATH/lib/libgds.a],[INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 			fi
@@ -1672,11 +1672,11 @@ then
 
 		if ( test -z "$INTERBASELIBS" )
 		then
-			if ( test -n "$MICROSOFT" )
+			if ( test -n "$CYGWIN" )
 			then
 				for dir in "`ls -d /cygdrive/c/Firebird*`"
 				do
-					FW_CHECK_HEADER_LIB([$dir/include/ibase.h],[INTERBASEINCLUDES=\"-I$dir/include\"],[$dir/lib/fbclient_ms.lib],[INTERBASELIBS=\"-L$dir/lib -lfbclient_ms\"],[],[])
+					FW_CHECK_HEADER_LIB([$dir/include/ibase.h],[INTERBASEINCLUDES=\"-I$dir/include\"],[$dir/bin/fbclient.dll],[INTERBASELIBS=\"-L$dir/bin -lfbclient\"],[],[])
 				done
 			else
 				FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
@@ -1744,6 +1744,7 @@ then
 	HAVE_PERL=""
 	PERL=""
 	PERLPREFIX=""
+	PERLCYGDRIVEPREFIX=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -1770,6 +1771,10 @@ then
 					fi
 				done
 			fi
+			if ( test -z "$PERL" -a -n "$CYGWIN" )
+			then
+				FW_CHECK_FILE("/cygdrive/c/Perl/bin/perl",[PERL=\"/cygdrive/c/Perl/bin/perl\"; PERLCYGDRIVEPREFIX=\"/cygdrive/c\"])
+			fi
 		fi
 		if ( test -n "$PERL" )
 		then
@@ -1784,6 +1789,7 @@ then
 	AC_SUBST(HAVE_PERL)
 	AC_SUBST(PERL)
 	AC_SUBST(PERLPREFIX)
+	AC_SUBST(PERLCYGDRIVEPREFIX)
 fi
 ])
 
@@ -1797,7 +1803,7 @@ then
 	HAVE_PYTHON=""
 	PYTHONINCLUDES=""
 	PYTHONDIR=""
-	PYTHONVERSION=""
+	PYTHONLIB=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -1812,22 +1818,42 @@ then
 		
 			for i in "1.5" "1.6" "2.0" "2.1" "2.2" "2.3"
 			do
-				if ( test -d "$PYTHONPATH/include/python$i" )
+				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib/python$i/config" )
 				then
 					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
-				fi
-		
-				if ( test -d "$PYTHONPATH/lib/python$i" )
-				then
 					PYTHONDIR="$PYTHONPATH/lib/python$i"
+					if ( test -n "$CYGWIN" )
+					then
+						if ( test -r "$PYTHONPATH/lib/python$i/config/libpython$i.dll.a" )
+						then
+							PYTHONDIR="$PYTHONPATH/lib/python$i"
+							PYTHONLIB="-L$PYTHONDIR/config -lpython$i"
+						fi
+					else
+						PYTHONDIR="$PYTHONPATH/lib/python$i"
+					fi
 				fi
 		
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 				then
-					PYTHONVERSION="$i"
 					break
 				fi
 			done
+
+			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
+			then
+
+				for i in "15" "16" "20" "21" "22" "23"
+				do
+
+					FW_CHECK_HEADER_LIB([$PYTHONPATH/include/Python.h],[PYTHONINCLUDES=\"-I$PYTHONPATH/include\"],[$PYTHONPATH/libs/libpython$j.lib],[PYTHONDIR=\"$PYTHONPATH/Lib\"; PYTHONLIB=\"-L$PYTHONPATH/libs -lpython$j\"],[],[])
+					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
+					then
+						break
+					fi
+
+				done
+			fi
 		
 		else
 		
@@ -1847,9 +1873,15 @@ then
 			
 				for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"
 				do
-					if ( test -d "$i" )
+					if ( test -d "$i/config" )
 					then
-						PYTHONDIR="$i"
+						if ( test -n "$CYGWIN" -a -r "$i/config/libpython$j.dll.a" )
+						then
+							PYTHONDIR="$i"
+							PYTHONLIB="-L$PYTHONDIR/config -lpython$j"
+						else
+							PYTHONDIR="$i"
+						fi
 					fi
 					if ( test -n "$PYTHONDIR" )
 					then
@@ -1858,10 +1890,22 @@ then
 				done
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 				then
-					PYTHONVERSION="$j"
 					break
 				fi
 			done
+
+			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
+			then
+
+				for j in "15" "16" "20" "21" "22" "23"
+				do
+					FW_CHECK_HEADER_LIB([/cygdrive/c/Python$j/include/Python.h],[PYTHONINCLUDES=\"-I/cygdrive/c/Python$j/include\"],[/cygdrive/c/Python$j/libs/python$j.lib],[PYTHONDIR=\"/cygdrive/c/Python$j/Lib\"; PYTHONLIB=\"-L/cygdrive/c/Python$j/libs -lpython$j\"],[],[])
+					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
+					then
+						break
+					fi
+				done
+			fi
 		
 		fi
 		
@@ -1873,13 +1917,12 @@ then
 		fi
 	fi
 
-	FW_VERSION(python,[$PYTHONVERSION])
 	FW_INCLUDES(python,[$PYTHONINCLUDES])
 
 	AC_SUBST(HAVE_PYTHON)
 	AC_SUBST(PYTHONINCLUDES)
 	AC_SUBST(PYTHONDIR)
-	AC_SUBST(PYTHONVERSION)
+	AC_SUBST(PYTHONLIB)
 fi
 ])
 
@@ -1961,6 +2004,8 @@ then
 
 	HAVE_RUBY=""
 	RUBY=""
+	RUBYCYGDRIVEPREFIX=""
+	RUBYLIB=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -1986,11 +2031,19 @@ then
 					fi
 				done
 			fi
+			if ( test -z "$RUBY" -a -n "$CYGWIN" )
+			then
+				FW_CHECK_FILE("/cygdrive/c/ruby/bin/ruby",[RUBY=\"/cygdrive/c/ruby/bin/ruby\"; RUBYCYGDRIVEPREFIX=\"/cygdrive/c\"])
+			fi
 		fi
 		
 		if ( test -n "$RUBY" )
 		then
 			HAVE_RUBY="yes"
+			if ( test -n "$CYGWIN" )
+			then
+				RUBYLIB="-lruby"
+			fi
 		else
 			HAVE_RUBY=""
 			AC_MSG_WARN(The Ruby API will not be built.)
@@ -1999,6 +2052,8 @@ then
 
 	AC_SUBST(HAVE_RUBY)
 	AC_SUBST(RUBY)
+	AC_SUBST(RUBYCYGDRIVEPREFIX)
+	AC_SUBST(RUBYLIB)
 fi
 ])
 
@@ -2060,7 +2115,7 @@ then
 		fi
 	fi
 
-	if ( test -n "$MICROSOFT" )
+	if ( test -n "$CYGWIN" )
 	then
 		JAVAINCLUDES="$JAVAINCLUDES -I$JAVAPATH/include/win32"
 		JAVALIB="-L$JAVAPATH/lib -ljni"
@@ -2095,7 +2150,7 @@ then
 
 	else
 	
-		if ( test -n "$MICROSOFT" )
+		if ( test -n "$CYGWIN" )
 		then
 			dnl Windows stuff here...
 			echo "windows..."
@@ -2267,7 +2322,7 @@ then
 							dnl instead of
 							dnl libtcl.dll.a on
 							dnl cygwin
-							if ( test -z "$TCLLIB" -a -n "$MICROSOFT" )
+							if ( test -z "$TCLLIB" -a -n "$CYGWIN" )
 							then
 								FW_CHECK_FILE($i/libtcl$j.a,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
 							fi

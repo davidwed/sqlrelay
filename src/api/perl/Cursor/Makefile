@@ -121,6 +121,13 @@ Cursor.so:
 		cp .libs/libCursor.so Cursor.so; \
 	fi
 
+Cursor.dll:
+	if ( test -r .libs/cygCursor-0.dll ); \
+	then \
+		cp .libs/cygCursor-0.dll Cursor.dll; \
+	fi
+
+ifeq ($(CYGWIN),)
 install: Cursor.so
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
 	$(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH)/SQLRelay
@@ -135,6 +142,17 @@ install: Cursor.so
 	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.so > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Cursor.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+else
+install: Cursor.dll
+	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
+	$(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH)/SQLRelay
+	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Cursor
+	$(INSTALL) -m 755 Cursor.dll $(PERLSITEARCH)/auto/SQLRelay/Cursor
+	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
+	$(RM) Cursor.dll
+	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.dll > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+endif
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) `cat $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist`

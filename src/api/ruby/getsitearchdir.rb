@@ -10,28 +10,36 @@ print "ruby_version = "
 print Config::CONFIG["ruby_version"]
 print "\n"
 print "prefix = "
-print with_destdir(CONFIG["prefix"].sub(drive, ""))
+#print with_destdir(CONFIG["prefix"].sub(drive, ""))
+print CONFIG["prefix"].sub(drive, "")
 print "\n"
 print "exec_prefix = "
-print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))
+#print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))
+print CONFIG["exec_prefix"].sub(drive, "")
 print "\n"
 print "libdir = "
-print with_destdir($libdir.sub(drive, ""))
+#print with_destdir($libdir.sub(drive, ""))
+print $libdir.sub(drive, "")
 print "\n"
 print "rubylibdir = "
-print with_destdir($rubylibdir.sub(drive, ""))
+#print with_destdir($rubylibdir.sub(drive, ""))
+print $rubylibdir.sub(drive, "")
 print "\n"
 print "archdir = "
-print with_destdir($archdir.sub(drive, ""))
+#print with_destdir($archdir.sub(drive, ""))
+print $archdir.sub(drive, "")
 print "\n"
 print "sitedir = "
-print with_destdir($sitedir.sub(drive, ""))
+#print with_destdir($sitedir.sub(drive, ""))
+print $sitedir.sub(drive, "")
 print "\n"
 print "sitelibdir = "
-print with_destdir($sitelibdir.sub(drive, ""))
+#print with_destdir($sitelibdir.sub(drive, ""))
+print $sitelibdir.sub(drive, "")
 print "\n"
 print "sitearchdir = "
-print with_destdir($sitearchdir.sub(drive, ""))
+#print with_destdir($sitearchdir.sub(drive, ""))
+print $sitearchdir.sub(drive, "")
 print "\n\n"
 print "all:\n"
 print "	echo $(sitearchdir)\n"

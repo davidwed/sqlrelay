@@ -4,23 +4,17 @@ include ../../../config.mk
 
 RUBYCFLAGS = $(shell $(RUBY) getcflags.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 
-ifeq ($(shell $(RUBY) getsitearchdir.rb | grep -c DESTDIR),0)
-RUBYSITEARCHDIR = $(DESTDIR)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-else
-RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-endif
+#ifeq ($(shell $(RUBY) getsitearchdir.rb | grep -c DESTDIR),0)
+RUBYSITEARCHDIR = $(DESTDIR)$(RUBYCYGDRIVEPREFIX)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+#else
+#RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+#endif
 
-ifeq ($(shell $(RUBY) getsitelibdir.rb | grep -c DESTDIR),0)
-RUBYSITELIBDIR = $(DESTDIR)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-else
-RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-endif
-
-ifeq ($(CYGWIN),yes)
-RUBYLIB = -lruby
-else
-RUBYLIB =
-endif
+#ifeq ($(shell $(RUBY) getsitelibdir.rb | grep -c DESTDIR),0)
+RUBYSITELIBDIR = $(DESTDIR)$(RUBYCYGDRIVEPREFIX)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+#else
+#RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+#endif
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
@@ -108,6 +102,13 @@ sqlrelay.so:
 		cp .libs/libsqlrelay.so sqlrelay.so; \
 	fi
 
+sqlrelay.dll:
+	if ( test -r .libs/cygsqlrelay-0.dll ); \
+	then \
+		cp .libs/cygsqlrelay-0.dll sqlrelay.dll; \
+	fi
+
+ifeq ($(CYGWIN),)
 install: sqlrelay.so
 	$(MKINSTALLDIRS) $(RUBYSITEARCHDIR)
 	$(INSTALL) $(INSTALLSTRIP) sqlrelay.so $(RUBYSITEARCHDIR)
@@ -118,3 +119,15 @@ install: sqlrelay.so
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(RUBYSITEARCHDIR)/sqlrelay.so
 	$(RMTREE) $(RUBYSITELIBDIR)/DBD/SQLRelay
+else
+install: sqlrelay.dll
+	$(MKINSTALLDIRS) $(RUBYSITEARCHDIR)
+	$(INSTALL) $(INSTALLSTRIP) sqlrelay.dll $(RUBYSITEARCHDIR)
+	$(MKINSTALLDIRS) $(RUBYSITELIBDIR)/DBD/SQLRelay
+	$(INSTALL) -m 644 SQLRelay.rb $(RUBYSITELIBDIR)/DBD/SQLRelay
+	$(RM) sqlrelay.dll
+
+uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) $(RUBYSITEARCHDIR)/sqlrelay.dll
+	$(RMTREE) $(RUBYSITELIBDIR)/DBD/SQLRelay
+endif

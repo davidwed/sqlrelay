@@ -1,53 +1,7 @@
 reconnect=handoff works
 reconnect=pass doesn't except when client connects using unix socket
 
-cygwin:
-
-	how to build a php extension?
-		1) need php source 
-	active state/non-cygwin python
-		-I/cygdrive/c/Python23/include
-		-L/cygdrive/c/Python23/libs -lpython23
-	python that comes with Zope
-		-L/cygdrive/c/Program Files/Zope-2.7.1/bin/libs -lpython23
-		-I/cygdrive/c/Program Files/Zope-2.7.1/bin/Include
-	non-cygwin ruby
-		-L/cygdrive/c/ruby/lib -lmsvcrt-ruby18
-		-I/cygdrive/c/ruby/lib/ruby/1.8/i386-mswin32
-	active state perl
-		-L/cygdrive/c/Perl/lib/CORE -lperl58
-		-I/Perl/lib/CORE
-	active state tcl
-		-I/Tcl/include
-		-L/cygdrive/c/Tcl/lib -ltcl84 -ltclstub84
-	zope
-		/cygdrive/c/Program Files/Zope-2.7.1/lib/python/Products
-	oracle
-		-I/cygdrive/c/oracle/product/10.1.0/db_1/OCI/include -D_int64="long long"
-		-L/cygdrive/c/oracle/product/10.1.0/db_1/OCI/lib/MSVC -loci
-	sqlite
-		.dll and .def file wherever
-	db2
-		-I/cygdrive/c/Program\ Files/IBM/SQLLIB/include
-		/cygdrive/c/Program\ Files/IBM/SQLLIB/lib/db2cli.lib
-	sybase
-		-I/cygdrive/c/sybase/OCS-12_5/include
-		-L/cygdrive/c/sybase/OCS-12_5/lib -llibblk -llibcs -llibct
-		(doesn't work though)
-	interbase
-		-I/cygdrive/c/Firebird-1.5.0.4290_win32/include
-		-L/cygdrive/c/Firebird-1.5.0.4290_win32/lib -lfbclient_ms
-		(doesn't work though)
-	msql
-		???
-	lago
-		???
-	odbc
-		add #include <windows.h>
-		add w32api before sql*.h in includes
-		-L/usr/lib/w32api -lodbc32
-
-
+need "using sqlrelay on windows doc"
 must run cygserver and set CYGWIN=server for ipc to work
 
 fix erwin's fake binds problem
@@ -117,6 +71,29 @@ Tests:
 		available_drivers
 		data_sources
 	oldmysql test files for non-C++ api's
+
+cygwin:
+	how to build a php extension?
+		1) need php source 
+	active state python
+		http://sebsauvage.net/python/mingw.html
+	non-cygwin ruby
+		creates funny CFLAGS
+	active state perl
+		PERL5LIB env var points to Oracle's perl installation
+		perl -V:prefix return C:\Perl
+	active state tcl
+		no doubt will have similar problems...
+		-I/cygdrive/Tcl/include
+		-L/cygdrive/c/Tcl/lib -ltcl84 -ltclstub84
+	zope
+		/cygdrive/c/Program Files/Zope-2.7.1/lib/python/Products
+	sqlite
+		.dll and .def file wherever
+	msql
+		won't build, need older bison
+	lago
+		???
 
 Compatibility:
 	support @,: or ? for fake bind variables

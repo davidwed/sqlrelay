@@ -67,6 +67,13 @@ CSQLRelay.so:
 		cp .libs/libCSQLRelay.so CSQLRelay.so; \
 	fi
 
+CSQLRelay.dll:
+	if ( test -r .libs/cygCSQLRelay-0.dll ); \
+	then \
+		cp .libs/cygCSQLRelay-0.dll CSQLRelay.dll; \
+	fi
+
+ifeq ($(CYGWIN),)
 install: CSQLRelay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(INSTALL) $(INSTALLSTRIP) CSQLRelay.so $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
@@ -74,6 +81,15 @@ install: CSQLRelay.so
 	$(INSTALL) -m 644 PySQLRDB.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(INSTALL) -m 644 __init__.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(RM) CSQLRelay.so
+else
+install: CSQLRelay.dll
+	$(MKINSTALLDIRS) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) $(INSTALLSTRIP) CSQLRelay.dll $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) -m 644 PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) -m 644 PySQLRDB.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) -m 644 __init__.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(RM) CSQLRelay.dll
+endif
 
 uninstall:
 	$(RM) $(bindir)/query.py

@@ -1,6 +1,10 @@
 /* Copyright (c) 2000 Roman Milner
    See the file COPYING for more information */
 
+#ifdef __CYGWIN__
+	#include <windows.h>
+#endif
+
 #include <Python.h>
 #include <sqlrelay/sqlrclient.h>
 

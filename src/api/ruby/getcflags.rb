@@ -8,16 +8,20 @@ print "ruby_version = "
 print Config::CONFIG["ruby_version"]
 print "\n"
 print "prefix = "
-print with_destdir(CONFIG["prefix"].sub(drive, ""))
+#print with_destdir(CONFIG["prefix"].sub(drive, ""))
+print CONFIG["prefix"].sub(drive, "")
 print "\n"
 print "exec_prefix = "
-print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))
+#print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))
+print CONFIG["exec_prefix"].sub(drive, "")
 print "\n"
 print "libdir = "
-print with_destdir($libdir.sub(drive, ""))
+#print with_destdir($libdir.sub(drive, ""))
+print $libdir.sub(drive, "")
 print "\n"
 print "rubylibdir = "
-print with_destdir($rubylibdir.sub(drive, ""))
+#print with_destdir($rubylibdir.sub(drive, ""))
+print $rubylibdir.sub(drive, "")
 print "\n"
 print "topdir = "
 print $topdir

@@ -2,7 +2,7 @@
 // See the file COPYING for more information.
 
 #ifdef __CYGWIN__
-	#define __int64 long long
+	#include <windows.h>
 #endif
 
 #include <sqlrelay/sqlrclient.h>
