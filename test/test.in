@@ -1,6 +1,7 @@
 #!/bin/sh
 
-HTTPDINIT=/etc/rc.d/init.d/httpd
+INITDIR=/etc/rc.d/init.d
+HTTPDINIT=$INITDIR/httpd
 PHPDIR=/var/www/html
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@prefix@/java/com/firstworks/sqlrelay
@@ -13,72 +14,99 @@ if ( test "$DB" = "db2" )
 then
 	ARGS="localhost 8001 \"\" db2test db2test"
 	PHPARGS="host=localhost&port=8001&socket=&user=db2test&password=db2test"
+	$INITDIR/db2 start
+	sqlr-start -id db2test
 fi
 if ( test "$DB" = "freetds" )
 then
 	ARGS="localhost 8002 \"\" freetdstest freetdstest"
 	PHPARGS="host=localhost&port=8002&socket=&user=freetdstest&password=freetdstest"
+	$INITDIR/sybase start
+	sqlr-start -id freetdstest
 fi
 if ( test "$DB" = "interbase" )
 then
 	ARGS="localhost 8003 \"\" interbasetest interbasetest"
 	PHPARGS="host=localhost&port=8003&socket=&user=interbasetest&password=interbasetest"
+	$INITDIR/firebird start
+	sqlr-start -id interbasetest
 fi
 if ( test "$DB" = "lago" )
 then
 	ARGS="localhost 8004 \"\" lagotest lagotest"
 	PHPARGS="host=localhost&port=8004&socket=&user=lagotest&password=lagotest"
+	$INITDIR/lago start
+	sqlr-start -id lagotest
 fi
 if ( test "$DB" = "msql" )
 then
 	ARGS="localhost 8005 \"\" msqltest msqltest"
 	PHPARGS="host=localhost&port=8005&socket=&user=msqltest&password=msqltest"
+	$INITDIR/msql start
+	sqlr-start -id msqltest
 fi
 if ( test "$DB" = "mysql" )
 then
 	ARGS="localhost 8006 \"\" mysqltest mysqltest"
 	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
+	$INITDIR/mysql start
+	sqlr-start -id mysqltest
 fi
 if ( test "$DB" = "oldmysql" )
 then
 	ARGS="localhost 8006 \"\" mysqltest mysqltest"
 	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
+	$INITDIR/mysql start
+	sqlr-start -id mysqltest
 fi
 if ( test "$DB" = "oracle7" )
 then
 	ARGS="localhost 8008 \"\" oracle7test oracle7test"
 	PHPARGS="host=localhost&port=8008&socket=&user=oracle7test&password=oracle7test"
+	$INITDIR/oracle start
+	sqlr-start -id oracle7test
 fi
 if ( test "$DB" = "oracle8" )
 then
 	ARGS="localhost 8009 \"\" oracle8test oracle8test"
 	PHPARGS="host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
+	$INITDIR/oracle start
+	sqlr-start -id oracle8test
 fi
 if ( test "$DB" = "oracle8i" )
 then
 	ARGS="localhost 8009 \"\" oracle8test oracle8test"
 	PHPARGS="host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
+	$INITDIR/oracle start
+	sqlr-start -id oracle8test
 fi
 if ( test "$DB" = "postgresql6" )
 then
 	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
 	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+	$INITDIR/postgresql start
+	sqlr-start -id postgresqltest
 fi
 if ( test "$DB" = "postgresql7" )
 then
 	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
 	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+	$INITDIR/postgresql start
+	sqlr-start -id postgresqltest
 fi
 if ( test "$DB" = "sqlite" )
 then
 	ARGS="localhost 8011 \"\" sqlitetest sqlitetest"
 	PHPARGS="host=localhost&port=8011&socket=&user=sqlitetest&password=sqlitetest"
+	sqlr-start -id sqlitetest
 fi
 if ( test "$DB" = "sybase" )
 then
 	ARGS="localhost 8012 \"\" sybasetest sybasetest"
 	PHPARGS="localhost 8012 \"\" sybasetest sybasetest"
 	PHPARGS="host=localhost&port=8012&socket=&user=sybasetest&password=sybasetest"
+	$INITDIR/sybase start
+	sqlr-start -id sybasetest
 fi
 
 
@@ -170,4 +198,63 @@ then
 		sudo rm -f /tmp/cachefile* sqlnet.log
 		cd ..
 	fi
+fi
+
+
+sqlr-stop
+
+if ( test "$DB" = "db2" )
+then
+	$INITDIR/db2 stop
+fi
+if ( test "$DB" = "freetds" )
+then
+	$INITDIR/sybase stop
+fi
+if ( test "$DB" = "interbase" )
+then
+	$INITDIR/firebird stop
+fi
+if ( test "$DB" = "lago" )
+then
+	$INITDIR/lago stop
+fi
+if ( test "$DB" = "msql" )
+then
+	$INITDIR/msql stop
+fi
+if ( test "$DB" = "mysql" )
+then
+	$INITDIR/mysql stop
+fi
+if ( test "$DB" = "oldmysql" )
+then
+	$INITDIR/mysql stop
+fi
+if ( test "$DB" = "oracle7" )
+then
+	$INITDIR/oracle stop
+fi
+if ( test "$DB" = "oracle8" )
+then
+	$INITDIR/oracle stop
+fi
+if ( test "$DB" = "oracle8i" )
+then
+	$INITDIR/oracle stop
+fi
+if ( test "$DB" = "postgresql6" )
+then
+	$INITDIR/postgresql stop
+fi
+if ( test "$DB" = "postgresql7" )
+then
+	$INITDIR/postgresql stop
+fi
+if ( test "$DB" = "sqlite" )
+then
+fi
+if ( test "$DB" = "sybase" )
+then
+	$INITDIR/sybase stop
 fi
