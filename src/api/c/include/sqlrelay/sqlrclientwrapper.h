@@ -275,7 +275,7 @@ double	sqlrcur_getOutputBindAsDouble(sqlrcur sqlrcurref,
 long	sqlrcur_getOutputBindLength(sqlrcur sqlrcurref, const char *variable);
 			/* Get the length of the value stored in a previously
 			   defined output bind variable. */
-sqlrcur	sqlrcur_getOuputBindCursor(sqlrcur sqlrcurref, const char *variable);
+sqlrcur	sqlrcur_getOutputBindCursor(sqlrcur sqlrcurref, const char *variable);
 			/* Get the cursor associated with a previously
 			   defined output bind variable. */
 
