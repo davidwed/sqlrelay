@@ -1,5 +1,3 @@
-sqlrelay-java rpm doesn't include .so files
-
 compatibility:
 	sybase 12.5
 	interbase 6.5
