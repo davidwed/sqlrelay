@@ -48,6 +48,8 @@
 		the previous query if the current query returned no rows
 	lots of fixes to sybase/freetds connections, sybase properly uses
 		cursors now
+	fixed db2 connection, had confused SQL_SUCCESS/SQL_ROW_SUCCESS and
+		SQL_SUCCESS_WITH_INFO/SQL_ROW_SUCCESS_WITH_INFO
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API
