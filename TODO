@@ -1,8 +1,4 @@
-tgz problems:
-	make prefix=... install screws up ruby install
-		because it overrides DESTDIR
-
-
+looks like if metric=1, scaling doesn't work
 postgresql test program compile fails on SCO
 can't find pthreads lib on SCO
 

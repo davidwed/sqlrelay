@@ -338,12 +338,17 @@ make
 
 %install
 rm -rf %{buildroot}
+# must install everything except ruby first because the "prefix" environment
+# variable screws up the ruby install
 %makeinstall \
 	incdir=%{buildroot}%{_includedir} \
 	PYTHONDIR=%{buildroot}%{pythondir} \
 	PHPEXTDIR=%{buildroot}%{phpextdir} \
 	PREFIX=%{buildroot}%{_prefix} \
+	HAVE_RUBY="" \
 	initroot=%{buildroot}
+# now install ruby
+%{!?_without_ruby: %makeinstall DESTDIR=%{buildroot}}
 
 %pre
 # Add the "sqlrelay" user
