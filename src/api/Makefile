@@ -20,6 +20,9 @@ endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java all
 endif
+ifneq ($(HAVE_TCL),)
+	$(MAKE) -C tcl all
+endif
 
 clean:
 	$(MAKE) -C c++ clean
@@ -40,6 +43,9 @@ ifneq ($(HAVE_PHP),)
 endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java clean
+endif
+ifneq ($(HAVE_TCL),)
+	$(MAKE) -C tcl clean
 endif
 
 
@@ -63,6 +69,9 @@ endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java rebuild
 endif
+ifneq ($(HAVE_TCL),)
+	$(MAKE) -C tcl rebuild
+endif
 
 install:
 	$(MAKE) -C c++ install
@@ -84,6 +93,9 @@ endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java install
 endif
+ifneq ($(HAVE_TCL),)
+	$(MAKE) -C tcl install
+endif
 
 uninstall:
 	$(MAKE) -C c++ uninstall
@@ -104,4 +116,7 @@ ifneq ($(HAVE_PHP),)
 endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java uninstall
+endif
+ifneq ($(HAVE_TCL),)
+	$(MAKE) -C tcl uninstall
 endif

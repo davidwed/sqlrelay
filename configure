@@ -468,7 +468,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS LDFLAGS CFLAGS CXXFLAGS DEBUGCXXFLAGS DEBUGCFLAGS LIBDMALLOC LIBEFENCE build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S ECHO RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP EGREP LIBTOOL CXX ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE AR PS UNAME MINGW32 CYGWIN UWIN PTHREADSLIB READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB SSLLIB CRYPTOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSDEBUGLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONLIBS PYTHONOBJ PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS LDFLAGS CFLAGS CXXFLAGS DEBUGCXXFLAGS DEBUGCFLAGS LIBDMALLOC LIBEFENCE build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S ECHO RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP EGREP LIBTOOL CXX ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE AR PS UNAME MINGW32 CYGWIN UWIN PTHREADSLIB READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB SSLLIB CRYPTOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSDEBUGLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONLIBS PYTHONOBJ PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1029,6 +1029,7 @@ Optional Features:
   --disable-ruby                Don't build Ruby api
   --disable-java                Don't build Java api
   --disable-php                 Don't build PHP api
+  --disable-tcl                 Don't build TCL api
   --disable-gtk                 Don't build GTK+ configuration tool
   --enable-dmalloc              Use the dmalloc library
   --enable-efence               Use the efence library
@@ -1059,6 +1060,8 @@ Optional Packages:
   --with-ruby-prefix            Location of Ruby
   --with-java-prefix            Location of Java
   --with-php-prefix             Location of PHP
+  --with-tcl-include		Location of tcl.h include file
+  --with-tcl-libraries		Location of libtcl
   --with-gtk-prefix             Location of GTK+
   --with-ptheads-prefix         Location of Pthreads
   --with-system-libtool   use system libtool instead of ./libtool
@@ -1772,6 +1775,29 @@ else
   ENABLE_PHP="yes"
 fi;
 
+# Check whether --with-tcl-include or --without-tcl-include was given.
+if test "${with_tcl_include+set}" = set; then
+  withval="$with_tcl_include"
+  TCLINCLUDEPATH=$withval
+else
+  TCLINCLUDEPATH=""
+fi;
+
+# Check whether --with-tcl-libraries or --without-tcl-libraries was given.
+if test "${with_tcl_libraries+set}" = set; then
+  withval="$with_tcl_libraries"
+  TCLLIBPATH=$withval
+else
+  TCLLIBPATH=""
+fi;
+# Check whether --enable-tcl or --disable-tcl was given.
+if test "${enable_tcl+set}" = set; then
+  enableval="$enable_tcl"
+  ENABLE_TCL=""
+else
+  ENABLE_TCL="yes"
+fi;
+
 # Check whether --with-gtk-prefix or --without-gtk-prefix was given.
 if test "${with_gtk_prefix+set}" = set; then
   withval="$with_gtk_prefix"
@@ -1885,6 +1911,12 @@ if ( test -n "$GTKPATH" -a "`echo $GTKPATH | cut -c-3`" = "../" ); then
 fi
 if ( test -n "$PTHREADSPATH" -a "`echo $PTHREADSPATH | cut -c-3`" = "../" ); then
 	PTHREADSPATH="$PWD/$PTHREADSPATH"
+fi
+if ( test -n "$TCLINCLUDEPATH" -a "`echo $TCLINCLUDEPATH | cut -c-3`" = "../" ); then
+	TCLINCLUDEPATH="$PWD/$TCLINCLUDEPATH"
+fi
+if ( test -n "$TCLLIBPATH" -a "`echo $TCLLIBPATH | cut -c-3`" = "../" ); then
+	TCLLIBPATH="$PWD/$TCLLIBPATH"
 fi
 
 
@@ -4396,7 +4428,7 @@ test "x$enable_libtool_lock" != xno && enable_libtool_lock=yes
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4399 "configure"' > conftest.$ac_ext
+  echo '#line 4431 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -4943,7 +4975,7 @@ chmod -w .
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -o out/conftest2.$ac_objext"
 compiler_c_o=no
-if { (eval echo configure:4946: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
+if { (eval echo configure:4978: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
   # The compiler can only warn and ignore the option if not recognized
   # So say no if there are warnings
   if test -s out/conftest.err; then
@@ -6784,7 +6816,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 6787 "configure"
+#line 6819 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -6882,7 +6914,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 6885 "configure"
+#line 6917 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -23682,6 +23714,268 @@ fi
 echo "******************************"
 
 
+
+echo
+echo "***** TCL ********************"
+
+if ( test "$ENABLE_TCL" = "yes" ); then
+
+		TCLINCLUDE=""
+	TCLLIB=""
+	HAVE_TCL=""
+
+	if ( test -n "$TCLINCLUDEPATH" ); then
+		as_ac_File=`echo "ac_cv_file_$TCLINCLUDEPATH/tcl.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $TCLINCLUDEPATH/tcl.h" >&5
+echo $ECHO_N "checking for $TCLINCLUDEPATH/tcl.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$TCLINCLUDEPATH/tcl.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TCLINCLUDE="-I$TCLINCLUDEPATH"
+fi
+
+	else
+		for i in "/usr/include" "$prefix/include"
+		do
+			as_ac_File=`echo "ac_cv_file_$i/tcl.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/tcl.h" >&5
+echo $ECHO_N "checking for $i/tcl.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/tcl.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TCLINCLUDE="-I$i"
+fi
+
+			for j in "tcl8.2" "tcl8.3" "tcl8.4" "tcl8.5"
+			do
+				as_ac_File=`echo "ac_cv_file_$i/$j/tcl.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/$j/tcl.h" >&5
+echo $ECHO_N "checking for $i/$j/tcl.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/$j/tcl.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TCLINCLUDE="-I$i/$j"
+fi
+
+			done
+		done
+	fi
+	if ( test -z "$TCLINCLUDE" ); then
+		{ echo "$as_me:$LINENO: WARNING: \"The TCL API will not be installed.\"" >&5
+echo "$as_me: WARNING: \"The TCL API will not be installed.\"" >&2;}
+	else
+		if ( test -n "$TCLLIBPATH" ); then
+			as_ac_File=`echo "ac_cv_file_$TCLLIBPATH/libtclstub.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $TCLLIBPATH/libtclstub.a" >&5
+echo $ECHO_N "checking for $TCLLIBPATH/libtclstub.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$TCLLIBPATH/libtclstub.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TCLLIB="-L$TCLLIBPATH -ltclstub"; TCLINCLUDE="-DUSE_TCL_STUBS $TCLINCLUDE"
+fi
+
+			for i in "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+			do
+				as_ac_File=`echo "ac_cv_file_$TCLLIBPATH/libtclstub$i.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $TCLLIBPATH/libtclstub$i.a" >&5
+echo $ECHO_N "checking for $TCLLIBPATH/libtclstub$i.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$TCLLIBPATH/libtclstub$i.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TCLLIB="-L$TCLLIBPATH -ltclstub$i"; TCLINCLUDE="-DUSE_TCL_STUBS $TCLINCLUDE"
+fi
+
+			done
+			if ( test -z "$TCLLIB" ); then
+				as_ac_File=`echo "ac_cv_file_$TCLLIBPATH/libtcl.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $TCLLIBPATH/libtcl.so" >&5
+echo $ECHO_N "checking for $TCLLIBPATH/libtcl.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$TCLLIBPATH/libtcl.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TCLLIB="-L$TCLLIBPATH -ltcl"
+fi
+
+				for i in "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+				do
+					as_ac_File=`echo "ac_cv_file_$TCLLIBPATH/libtcl$i.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $TCLLIBPATH/libtcl$i.so" >&5
+echo $ECHO_N "checking for $TCLLIBPATH/libtcl$i.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$TCLLIBPATH/libtcl$i.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TCLLIB="-L$TCLLIBPATH -ltcl$i"
+fi
+
+				done
+			fi
+		else
+			for i in "/usr/lib" "$prefix/lib"
+			do
+				for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+				do
+					as_ac_File=`echo "ac_cv_file_$i/libtclstub$j.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/libtclstub$j.a" >&5
+echo $ECHO_N "checking for $i/libtclstub$j.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/libtclstub$j.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TCLLIB="-L$i -ltclstub$j"; TCLLIBPATH="$i"; TCLINCLUDE="-DUSE_TCL_STUBS $TCLINCLUDE"
+fi
+
+				done
+			done
+			if ( test -z "$TCLLIB" ); then
+				for i in "/usr/lib" "$prefix/lib"
+				do
+					for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+					do
+						as_ac_File=`echo "ac_cv_file_$i/libtcl$j.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/libtcl$j.so" >&5
+echo $ECHO_N "checking for $i/libtcl$j.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/libtcl$j.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TCLLIB="-L$i -ltcl$j"; TCLLIBPATH="$i"
+fi
+
+					done
+				done
+			fi
+		fi
+	fi
+	if ( test -z "$TCLLIB" ); then
+		{ echo "$as_me:$LINENO: WARNING: \"The TCL API will not be installed.\"" >&5
+echo "$as_me: WARNING: \"The TCL API will not be installed.\"" >&2;}
+	else
+		HAVE_TCL="yes"
+	fi
+
+
+
+
+fi
+
+echo "******************************"
+
+
 echo
 echo "***** PHP ********************"
 
@@ -27568,6 +27862,10 @@ s,@HAVE_RUBY@,$HAVE_RUBY,;t t
 s,@HAVE_JAVA@,$HAVE_JAVA,;t t
 s,@JAVAC@,$JAVAC,;t t
 s,@JAVAINCLUDES@,$JAVAINCLUDES,;t t
+s,@HAVE_TCL@,$HAVE_TCL,;t t
+s,@TCLINCLUDE@,$TCLINCLUDE,;t t
+s,@TCLLIB@,$TCLLIB,;t t
+s,@TCLLIBPATH@,$TCLLIBPATH,;t t
 s,@PHPCONFIG@,$PHPCONFIG,;t t
 s,@HAVE_PHP@,$HAVE_PHP,;t t
 s,@PHPINCLUDES@,$PHPINCLUDES,;t t
@@ -28074,6 +28372,9 @@ if ( test -n "$HAVE_PHP" ); then
 fi
 if ( test -n "$HAVE_JAVA" ); then
 	APIS=$APIS"Java  "
+fi
+if ( test -n "$HAVE_TCL" ); then
+	APIS=$APIS"TCL "
 fi
 echo "$APIS"
 

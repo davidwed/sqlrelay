@@ -161,6 +161,18 @@ AC_ARG_ENABLE(php,
 	[  --disable-php                 Don't build PHP api],
 	ENABLE_PHP="",
 	ENABLE_PHP="yes")
+AC_ARG_WITH(tcl-include,
+	[  --with-tcl-include		Location of tcl.h include file],
+	TCLINCLUDEPATH=$withval,
+	TCLINCLUDEPATH="")
+AC_ARG_WITH(tcl-libraries,
+	[  --with-tcl-libraries		Location of libtcl],
+	TCLLIBPATH=$withval,
+	TCLLIBPATH="")
+AC_ARG_ENABLE(tcl,
+	[  --disable-tcl                 Don't build TCL api],
+	ENABLE_TCL="",
+	ENABLE_TCL="yes")
 AC_ARG_WITH(gtk-prefix,
 	[  --with-gtk-prefix             Location of GTK+],
 	GTKPATH=$withval,
@@ -251,6 +263,12 @@ if ( test -n "$GTKPATH" -a "`echo $GTKPATH | cut -c-3`" = "../" ); then
 fi
 if ( test -n "$PTHREADSPATH" -a "`echo $PTHREADSPATH | cut -c-3`" = "../" ); then
 	PTHREADSPATH="$PWD/$PTHREADSPATH"
+fi
+if ( test -n "$TCLINCLUDEPATH" -a "`echo $TCLINCLUDEPATH | cut -c-3`" = "../" ); then
+	TCLINCLUDEPATH="$PWD/$TCLINCLUDEPATH"
+fi
+if ( test -n "$TCLLIBPATH" -a "`echo $TCLLIBPATH | cut -c-3`" = "../" ); then
+	TCLLIBPATH="$PWD/$TCLLIBPATH"
 fi
 
 
@@ -473,6 +491,14 @@ dnl Checks for Java.
 echo
 echo "***** Java *******************"
 FW_CHECK_JAVA
+echo "******************************"
+
+
+
+dnl Checks for TCL.
+echo
+echo "***** TCL ********************"
+FW_CHECK_TCL
 echo "******************************"
 
 
@@ -772,6 +798,9 @@ if ( test -n "$HAVE_PHP" ); then
 fi
 if ( test -n "$HAVE_JAVA" ); then
 	APIS=$APIS"Java  "
+fi
+if ( test -n "$HAVE_TCL" ); then
+	APIS=$APIS"TCL "
 fi
 echo "$APIS"
 

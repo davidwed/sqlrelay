@@ -1485,6 +1485,75 @@ fi
 
 
 
+AC_DEFUN([FW_CHECK_TCL],
+[
+if ( test "$ENABLE_TCL" = "yes" ); then
+
+	dnl Checks for TCL.
+	TCLINCLUDE=""
+	TCLLIB=""
+	HAVE_TCL=""
+
+	if ( test -n "$TCLINCLUDEPATH" ); then
+		AC_CHECK_FILE($TCLINCLUDEPATH/tcl.h,TCLINCLUDE="-I$TCLINCLUDEPATH")
+	else
+		for i in "/usr/include" "$prefix/include"
+		do
+			AC_CHECK_FILE($i/tcl.h,TCLINCLUDE="-I$i")
+			for j in "tcl8.2" "tcl8.3" "tcl8.4" "tcl8.5"
+			do
+				AC_CHECK_FILE($i/$j/tcl.h,TCLINCLUDE="-I$i/$j")
+			done
+		done
+	fi
+	if ( test -z "$TCLINCLUDE" ); then
+		AC_MSG_WARN("The TCL API will not be installed.")
+	else
+		if ( test -n "$TCLLIBPATH" ); then
+			AC_CHECK_FILE($TCLLIBPATH/libtclstub.a,TCLLIB="-L$TCLLIBPATH -ltclstub"; TCLINCLUDE="-DUSE_TCL_STUBS $TCLINCLUDE")
+			for i in "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+			do
+				AC_CHECK_FILE($TCLLIBPATH/libtclstub$i.a, TCLLIB="-L$TCLLIBPATH -ltclstub$i"; TCLINCLUDE="-DUSE_TCL_STUBS $TCLINCLUDE")
+			done
+			if ( test -z "$TCLLIB" ); then
+				AC_CHECK_FILE($TCLLIBPATH/libtcl.so,TCLLIB="-L$TCLLIBPATH -ltcl")
+				for i in "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+				do
+					AC_CHECK_FILE($TCLLIBPATH/libtcl$i.so,TCLLIB="-L$TCLLIBPATH -ltcl$i")
+				done
+			fi
+		else
+			for i in "/usr/lib" "$prefix/lib"
+			do
+				for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+				do
+					AC_CHECK_FILE($i/libtclstub$j.a,TCLLIB="-L$i -ltclstub$j"; TCLLIBPATH="$i"; TCLINCLUDE="-DUSE_TCL_STUBS $TCLINCLUDE")
+				done
+			done
+			if ( test -z "$TCLLIB" ); then
+				for i in "/usr/lib" "$prefix/lib"
+				do
+					for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+					do
+						AC_CHECK_FILE($i/libtcl$j.so,TCLLIB="-L$i -ltcl$j"; TCLLIBPATH="$i")
+					done
+				done
+			fi
+		fi
+	fi
+	if ( test -z "$TCLLIB" ); then
+		AC_MSG_WARN("The TCL API will not be installed.")
+	else
+		HAVE_TCL="yes"
+	fi
+	AC_SUBST(HAVE_TCL)
+	AC_SUBST(TCLINCLUDE)
+	AC_SUBST(TCLLIB)
+	AC_SUBST(TCLLIBPATH)
+fi
+])
+
+
 AC_DEFUN([FW_CHECK_GTK],
 [
 if ( test "$ENABLE_GTK" = "yes" )
