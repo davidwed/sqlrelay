@@ -330,11 +330,21 @@ Group: Applications/Database
 Documentation for SQL Relay.
 
 
+%package man
+Summary: Man pages for SQL Relay.
+Group: Applications/Database
+
+%description man
+Man pages for SQL Relay.
+
+
 %define tcldir		/usr/lib/tcl
 %define pythondir	%(echo -e "import sys\\nimport string\\nout=''\\nfor i in sys.path:\\n if len(i)>0:\\n  for j in range(0,len(i)):\\n   if j<len(i)-1:\\n    out=out+i[j]\\n   else:\\n    if i[j]!='/':\\n     out=out+i[j]\\n  break\\nprint out" | python)
 %define	zopedir		/opt/Zope/lib/python/Products
 %define	phpextdir	%(php-config --extension-dir)
+%define	perl_prefix	%(eval "export `perl -V:prefix`"; echo $prefix)
 %define	perl_sitelib	%(eval "export `perl -V:sitelib`"; echo $sitelib)
+%define perl_installarchlib	%(eval "export `perl -V:installarchlib`"; echo $installarchlib)
 %define	perl_sitearch	%(eval "export `perl -V:sitearch`"; echo $sitearch)
 %define	perl_installman3dir	%(eval "export `perl -V:installman3dir`"; echo $installman3dir)
 %define	perl_man3ext	%(eval "export `perl -V:man3ext`"; echo $man3ext)
@@ -363,7 +373,7 @@ Documentation for SQL Relay.
 	%{?_without_java:	--disable-java} \
 	%{?_without_tcl:	--disable-tcl} \
 	%{?_without_perl:	--disable-perl} \
-	%{!?_without_perl:	--with-perl-install-prefix=%{buildroot}/usr} \
+	%{!?_without_perl:	--with-perl-install-prefix=%{buildroot}%{perl_prefix}} \
 	%{?_without_php:	--disable-php} \
 	%{?_without_python:	--disable-python} \
 	%{?_without_ruby:	--disable-ruby} \
@@ -385,7 +395,7 @@ rm -rf %{buildroot}
 	HAVE_RUBY="" \
 	initroot=%{buildroot}
 # now install ruby
-%{!?_without_ruby: %makeinstall DESTDIR=%{buildroot}}
+%{!?_without_ruby: cd src/api/ruby; make DESTDIR=%{buildroot} -f Makefile.master install}
 
 %pre
 # Add the "sqlrelay" user
@@ -421,16 +431,13 @@ rm -rf %{buildroot}
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
 %config(noreplace) %attr(600, root, root) /etc/sysconfig/sqlrelay
 /etc/rc.d/init.d/sqlrelay
-%{_bindir}/sqlr-cachemanager
-%{_bindir}/sqlr-listener
-%{_bindir}/sqlr-listener-debug
-%{_bindir}/sqlr-scaler
-%{_bindir}/sqlr-start
+%{_bindir}/sqlr-cachemanager*
+%{_bindir}/sqlr-listener*
+%{_bindir}/sqlr-scaler*
+%{_bindir}/sqlr-start*
 %{_bindir}/sqlr-stop
-%{_libdir}/libsqlrconnection-*.so.*
-%{_libdir}/libsqlrconnection_p-*.so.*
-%{_libdir}/libsqlrutil-*.so.*
-%{_libdir}/libsqlrutil_p-*.so.*
+%{_libdir}/libsqlrconnection*
+%{_libdir}/libsqlrutil*
 %{_localstatedir}/sqlrelay/tmp
 %{_localstatedir}/sqlrelay/debug
 
@@ -466,6 +473,7 @@ rm -rf %{buildroot}
 
 %files client-devel-c++
 %defattr(-, root, root)
+%{_bindir}/sqlrclient-config
 %{_includedir}/sqlrelay/sqlrclient.h
 %{_includedir}/sqlrelay/private
 %{_libdir}/libsqlrclient.a
@@ -480,6 +488,7 @@ rm -rf %{buildroot}
 
 %files client-devel-c
 %defattr(-, root, root)
+%{_bindir}/sqlrclientwrapper-config
 %{_includedir}/sqlrelay/sqlrclientwrapper.h
 %{_libdir}/libsqlrclientwrapper.a
 %{_libdir}/libsqlrclientwrapper.la
@@ -505,7 +514,7 @@ rm -rf %{buildroot}
 
 %{!?_without_gtk:%files config-gtk}
 %{!?_without_gtk:%defattr(-, root, root)}
-%{!?_without_gtk:%{_bindir}/sqlr-config-gtk}
+%{!?_without_gtk:%{_bindir}/sqlr-config-gtk*}
 
 %{!?_without_db2:%files db2}
 %{!?_without_db2:%defattr(-, root, root)}
@@ -589,6 +598,9 @@ rm -rf %{buildroot}
 
 %files doc
 %{_docdir}/%{name}-%{version}
+
+%files man
+%{_mandir}
 
 %changelog
 * Mon Feb 17 2003 David Muse <dmuse@firstworks.com>
