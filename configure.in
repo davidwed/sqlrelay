@@ -32,10 +32,14 @@ AC_ARG_WITH(rudiments-prefix,
 	[  --with-rudiments-prefix       Location of rudiments],
 	RUDIMENTSPATH="$withval",
 	RUDIMENTSPATH="")
-AC_ARG_WITH(ssl-prefix,
-	[  --with-ssl-prefix       Location of ssl library],
-	SSLPATH="$withval",
-	SSLPATH="")
+AC_ARG_WITH(ssl-includes,
+	[  --with-ssl-includes     SSL includes],
+	SSLINCLUDES="$withval",
+	SSLINCLUDES="")
+AC_ARG_WITH(ssl-libs,
+	[  --with-ssl-libs         SSL libraries],
+	SSLLIBS="$withval",
+	SSLLIBS="")
 AC_ARG_WITH(libgdbm-prefix,
 	[  --with-libgdbm-prefix         Location of libgdbm],
 	GDBMPATH="$withval",
@@ -473,8 +477,6 @@ AC_SUBST(DLLIB)
 AC_CHECK_LIB(aio,aioread,AIOLIB=-laio,AIOLIB="")
 AC_SUBST(AIOLIB)
 FW_CHECK_SSL
-AC_CHECK_LIB(crypto,CRYPTO_add_lock,CRYPTOLIB=-lcrypto,CRYPTOLIB="")
-AC_SUBST(CRYPTOLIB)
 
 FW_CHECK_NEED_REDHAT_9_GLIBC_2_3_2_HACK
 
@@ -485,6 +487,7 @@ dnl Checks for Rudiments.
 echo
 echo "***** Rudiments **************"
 FW_CHECK_RUDIMENTS
+FW_CHECK_RUDIMENTS_NEEDS_SSL
 echo "******************************"
 
 

@@ -253,11 +253,31 @@ $DBD::SQLRelay::st::imp_data_size=0;
 sub bind_param {
 
 	# get parameters
-	my ($sth,$pNum,$val,$attr)=@_;
+	my ($sth,$param,$val,$attr)=@_;
 
 	# bind any variables/values that were passed in
 	my $cursor=$sth->FETCH('driver_cursor');
-	$cursor->inputBind($pNum,$val);
+	$cursor->inputBind($param,$val);
+
+	return 1;
+}
+
+sub bind_param_inout {
+
+	# get parameters
+	my ($sth,$param,$variable,$attr)=@_;
+
+	# bind any variables that were passed in
+	my $cursor=$sth->FETCH('driver_cursor');
+	$cursor->defineOutputBind($param,$attr);
+
+	# store the parameter name in the list of inout parameters
+	$param_inout_list=$sth->FETCH('param_inout_list');
+	$param_inout_list=$param_inout_list . ' $param';
+	$sth->STORE('param_inout_list',$param_inout_list);
+
+	# store the variable so data can be fetched into it later
+	$sth->STORE('param_inout_$param',$variable);
 
 	return 1;
 }
@@ -269,7 +289,7 @@ sub execute {
 	my $dbh=$sth->{'Database'};
 
 	# handle binds
-	my $index=0;
+	my $index=1;
 	my $bind_value;
 	foreach $bind_value (@bind_values) {
 		bind_param($sth,$index,$bind_value);
@@ -279,9 +299,11 @@ sub execute {
 	# send the query
 	my $cursor=$sth->FETCH('driver_cursor');
 	if (not $cursor->executeQuery()) {
+		$sth->STORE('driver_NUM_OF_ROWS',0);
+		$sth->STORE('NUM_OF_FIELDS',0);
+		$sth->STORE('driver_FETCHED_ROWS',0);
 		return $dbh->DBI::set_err(0,$cursor->errorMessage());
 	}
-	$cursor->clearBinds();
 
 	# get some result set info
 	my $colcount=$cursor->colCount();
@@ -291,6 +313,17 @@ sub execute {
 	$sth->STORE('NUM_OF_FIELDS',$colcount);
 	$sth->{NAME}=\@colnames;
 	$sth->STORE('driver_FETCHED_ROWS',0);
+
+	# get the list of output bind variables and turn it into an array
+	$param_inout_list=$sth->FETCH('param_inout_list');
+	@param_inout_array=split(' ',$param_inout_list);
+
+	# loop through the array of parameters, for each, get the appropriate
+	# variable and store the output bind data in the variable
+	foreach $param(@param_inout_array) {
+		$variable=$sth->FETCH('param_inout_$param');
+		$$variable=$cursor->getOutputBind($param);
+	}
 
 	return $rowcount||'0E0';
 }

@@ -69,8 +69,8 @@ print "\n\n";
 
 
 print "BIND FUNCTIONS\n";
-my $sth=$dbh->prepare("select :0,:1,:2 from dual") or die DBI->errstr;
-$sth->execute(undef,"hello",1,5.5) or die DBI->errstr;
+my $sth=$dbh->prepare("select :1,:2,:3 from dual") or die DBI->errstr;
+$sth->execute("hello",1,5.5) or die DBI->errstr;
 print "\n\n";
 
 

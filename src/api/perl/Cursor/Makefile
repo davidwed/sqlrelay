@@ -2,16 +2,16 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-PERLCCFLAGS = $(DESTDIR)$(shell eval "export `$(PERL) -V:ccflags`"; echo $$ccflags | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend||g' -e 's| -x03||g' )
-PERLOPTIMIZE = $(DESTDIR)$(shell eval "export `$(PERL) -V:optimize`"; echo $$optimize | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend||g' -e 's| -x03||g' )
-PERLSITEARCH = $(DESTDIR)$(shell eval "export `$(PERL) -V:sitearch`"; echo $$sitearch )
-PERL_INC = $(DESTDIR)$(shell eval "export `$(PERL) -V:archlibexp`"; echo "-I$$archlibexp/CORE" )
-PERL_LIB = $(DESTDIR)$(shell eval "export `$(PERL) -V:privlibexp`"; echo $$privlibexp )
-PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "export `$(PERL) -V:installman3dir`"; echo $$installman3dir )
-PERLMAN3EXT = $(shell eval "export `$(PERL) -V:man3ext`"; echo $$man3ext )
+PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend||g' -e 's| -x03||g' -e "s|UNKNOWN||g" )
+PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend||g' -e 's| -x03||g' -e "s|UNKNOWN||g" )
+PERLSITEARCH = $(DESTDIR)$(shell eval "`$(PERL) -V:sitearch`"; export sitearch; echo $$sitearch | sed -e "s|UNKNOWN||g" )
+PERL_INC = $(DESTDIR)$(shell eval "`$(PERL) -V:archlibexp`"; export archlibexp; echo "-I$$archlibexp/CORE" | sed -e "s|UNKNOWN||g" )
+PERL_LIB = $(DESTDIR)$(shell eval "`$(PERL) -V:privlibexp`"; export privlibexp; echo $$privlibexp | sed -e "s|UNKNOWN||g" )
+PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "`$(PERL) -V:installman3dir`"; export installman3dir; echo $$installman3dir | sed -e "s|UNKNOWN||g" )
+PERLMAN3EXT = $(shell eval "`$(PERL) -V:man3ext`"; export man3ext; echo $$man3ext | sed -e "s|UNKNOWN||g" )
 
 CPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE) $(PERLCCFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(SSLINCLUDES) $(PERL_INC)
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(SSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(SSLLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PERLUSERPATH),yes)

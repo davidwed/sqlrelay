@@ -16,7 +16,7 @@
 // | Author: Stig Bakken <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.5 2004-01-21 04:01:34 mused Exp $
+// $Id: sqlrelay.php,v 1.6 2004-01-29 05:06:44 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -107,7 +107,6 @@ class DB_sqlrelay extends DB_common
 
         $this->connection = sqlrcon_alloc($host, $port, $socket,
                                             $user, $pw, $retrytime, $tries);
-        sqlrcon_debugOn($this->connection);
         return DB_OK;
     }
 
@@ -213,10 +212,10 @@ class DB_sqlrelay extends DB_common
     {
         sqlrcur_clearBinds($sqlrcursor->cursor);
         if ($data) {
-            $numElements = count($data);
-            for ($counter = 0; $counter < $numElements; $counter++) {
-                sqlrcur_inputBind($sqlrcursor->cursor, $counter,
-                                                $data[$counter]);
+            while ($element = current($data)) {
+                $index = key($data);
+                sqlrcur_inputBind($sqlrcursor->cursor, $index, $data["$index"]);
+                next($data);
             }
         }
         if (!sqlrcur_executeQuery($sqlrcursor->cursor)) {
@@ -336,9 +335,9 @@ class DB_sqlrelay extends DB_common
     function autoCommit($onoff = false)
     {
         if ($onoff == true) {
-            sqlrcur_autoCommitOn($this->connection);
+            sqlrcon_autoCommitOn($this->connection);
         } else {
-            sqlrcur_autoCommitOff($this->connection);
+            sqlrcon_autoCommitOff($this->connection);
         }
         return DB_OK;
     }
@@ -387,8 +386,7 @@ class DB_sqlrelay extends DB_common
 
     function affectedRows()
     {
-        //return $this->affectedrows;
-        return 0;
+        return $this->affectedrows;
     }
 
     // }}}

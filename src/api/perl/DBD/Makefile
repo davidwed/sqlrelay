@@ -2,12 +2,12 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-PERLCCFLAGS = $(DESTDIR)$(shell eval "export `$(PERL) -V:ccflags`"; echo $$ccflags )
-PERLOPTIMIZE = $(DESTDIR)$(shell eval "export `$(PERL) -V:optimize`"; echo $$optimize )
-PERLSITEARCH = $(DESTDIR)$(shell eval "export `$(PERL) -V:sitearch`"; echo $$sitearch )
-PERLSITELIB = $(DESTDIR)$(shell eval "export `$(PERL) -V:sitelib`"; echo $$sitelib )
-PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "export `$(PERL) -V:installman3dir`"; echo $$installman3dir )
-PERLMAN3EXT = $(shell eval "export `$(PERL) -V:man3ext`"; echo $$man3ext )
+PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e "s|UNKNOWN||g" )
+PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e "s|UNKNOWN||g" )
+PERLSITEARCH = $(DESTDIR)$(shell eval "`$(PERL) -V:sitearch`"; export sitearch; echo $$sitearch | sed -e "s|UNKNOWN||g" )
+PERLSITELIB = $(DESTDIR)$(shell eval "`$(PERL) -V:sitelib`"; export sitelib; echo $$sitelib | sed -e "s|UNKNOWN||g" )
+PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "`$(PERL) -V:installman3dir`"; export installman3dir; echo $$installman3dir )
+PERLMAN3EXT = $(shell eval "`$(PERL) -V:man3ext`"; export man3ext; echo $$man3ext | sed -e "s|UNKNOWN||g" )
 
 all:
 

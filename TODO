@@ -1,9 +1,11 @@
+sqlrclient classes shouldn't inherit from inet/unixclientsocket,
+	rather should have member variables for each
+test output binds in perl dbi driver
+use pkgconfig/rudiments-config
 ADODB and Pear DB interfaces
 Pear DB interface license
 freetds-0.62/ct_param support
-mysql replacement library
-	works with mysql 4.0
-	doesn't work with mysql 4.1, 5.0
+fully test mysql replacement library
 perl -V:optimize and perl -V:ccflags on FreeBSD 4.9 apparantly doesn't return
 	what we're expecting it to
 On Solaris, some of the other perl -V's return empty values
@@ -61,7 +63,6 @@ Tests:
 Compatibility:
 	mysql 4.1, 5.0
 	daemontools
-	crypto/ssl lib tests need to look in various places for the library
 	SCO:
 		ruby api won't build
 		postgresql won't configure
@@ -126,7 +127,7 @@ Features:
 		and isolation mode when client connects
 	sqlr-import/sqlr-export tools
 	support vector binds
-	handle output binds in Perl-DBD, Python-DB, Ruby-DBD
+	handle output binds in Python-DB, Ruby-DBD
 	datatype support:
 		handle binary data correctly in all databases
 		identical long/lob datatype support in all databases

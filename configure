@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALLSTRIP SMALLCODE CFLAGS CXXFLAGS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC PS UNAME PIPE MINGW32 CYGWIN UWIN PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB HAVE_SSL SSLINCLUDES SSLLIB CRYPTOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir PERLINSTALLPREFIX LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALLSTRIP SMALLCODE CFLAGS CXXFLAGS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC PS UNAME PIPE MINGW32 CYGWIN UWIN PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB SSLINCLUDES SSLLIBS RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir PERLINSTALLPREFIX LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1074,7 +1074,8 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-rudiments-prefix       Location of rudiments
-  --with-ssl-prefix       Location of ssl library
+  --with-ssl-includes     SSL includes
+  --with-ssl-libs         SSL libraries
   --with-libgdbm-prefix         Location of libgdbm
   --with-oracle-home            Location of Oracle
   --with-mysql-prefix           Location of MySQL
@@ -1606,12 +1607,20 @@ else
   RUDIMENTSPATH=""
 fi;
 
-# Check whether --with-ssl-prefix or --without-ssl-prefix was given.
-if test "${with_ssl_prefix+set}" = set; then
-  withval="$with_ssl_prefix"
-  SSLPATH="$withval"
+# Check whether --with-ssl-includes or --without-ssl-includes was given.
+if test "${with_ssl_includes+set}" = set; then
+  withval="$with_ssl_includes"
+  SSLINCLUDES="$withval"
 else
-  SSLPATH=""
+  SSLINCLUDES=""
+fi;
+
+# Check whether --with-ssl-libs or --without-ssl-libs was given.
+if test "${with_ssl_libs+set}" = set; then
+  withval="$with_ssl_libs"
+  SSLLIBS="$withval"
+else
+  SSLLIBS=""
 fi;
 
 # Check whether --with-libgdbm-prefix or --without-libgdbm-prefix was given.
@@ -4469,7 +4478,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4472 "configure"' > conftest.$ac_ext
+  echo '#line 4481 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5585,7 +5594,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5588:" \
+echo "$as_me:5597:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6616,11 +6625,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6619: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6628: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6623: \$? = $ac_status" >&5
+   echo "$as_me:6632: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6848,11 +6857,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6851: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6860: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6855: \$? = $ac_status" >&5
+   echo "$as_me:6864: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6915,11 +6924,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6918: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6927: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6922: \$? = $ac_status" >&5
+   echo "$as_me:6931: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9033,7 +9042,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9036 "configure"
+#line 9045 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9131,7 +9140,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9134 "configure"
+#line 9143 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11287,11 +11296,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11290: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11299: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11294: \$? = $ac_status" >&5
+   echo "$as_me:11303: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11354,11 +11363,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11357: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11366: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11361: \$? = $ac_status" >&5
+   echo "$as_me:11370: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12683,7 +12692,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12686 "configure"
+#line 12695 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12781,7 +12790,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12784 "configure"
+#line 12793 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13603,11 +13612,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13606: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13615: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13610: \$? = $ac_status" >&5
+   echo "$as_me:13619: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -13670,11 +13679,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13673: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13682: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13677: \$? = $ac_status" >&5
+   echo "$as_me:13686: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15636,11 +15645,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15639: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15648: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15643: \$? = $ac_status" >&5
+   echo "$as_me:15652: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15868,11 +15877,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15871: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15880: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15875: \$? = $ac_status" >&5
+   echo "$as_me:15884: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15935,11 +15944,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15938: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15947: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15942: \$? = $ac_status" >&5
+   echo "$as_me:15951: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18053,7 +18062,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18056 "configure"
+#line 18065 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18151,7 +18160,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18154 "configure"
+#line 18163 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19431,12 +19440,8 @@ then
 
 else
 
-	if ( test -n "$PTHREADLIBS" )
-	then
-		HAVE_PTHREAD="yes"
-	else
-		for i in "pthread" "c_r"
-		do
+	for i in "pthread" "c_r"
+	do
 
 
 SEARCHPATH=$PTHREADPATH
@@ -20506,19 +20511,18 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
-			if ( test -n "$PTHREADLIBS" )
-			then
-				if ( test "$i" = "c_r" )
-				then
-					PTHREADLIBS="$PTHREADLIBS -pthread"
-				fi
-				break
-			fi
-		done
 		if ( test -n "$PTHREADLIBS" )
 		then
-			HAVE_PTHREAD="yes"
+			if ( test "$i" = "c_r" )
+			then
+				PTHREADLIBS="$PTHREADLIBS -pthread"
+			fi
+			break
 		fi
+	done
+	if ( test -n "$PTHREADLIBS" )
+	then
+		HAVE_PTHREAD="yes"
 	fi
 fi
 
@@ -21137,32 +21141,21 @@ fi
 
 
 
-HAVE_SSL=""
-SSLINCLUDES=""
-SSLLIB=""
-
 if ( test "$cross_compiling" = "yes" )
 then
 
 		echo "cross compiling"
-	if ( test -n "$SSLPATH" )
-	then
-		SSLINCLUDES="-I$SSLPATH/include"
-		SSLLIB="-L$SSLPATH/lib -lssl"
-	else
-		SSLLIB="-lssl"
-	fi
-	HAVE_SSL="yes"
 
 else
 
-	if ( test -n "$SSLLIB" )
+	if ( test -z "$SSLLIBS" -a -z "$SSLINCLUDES" )
 	then
-		HAVE_SSL="yes"
+		SSLLIBS="`pkg-config openssl --libs`"
+		SSLINCLUDES="`pkg-config openssl --cflags`"
 	else
 
 
-SEARCHPATH=$SSLPATH
+SEARCHPATH=/usr
 NAME=ssl
 HEADER=openssl/ssl.h
 LIBNAME=ssl
@@ -21176,7 +21169,7 @@ STATIC=""
 HEADERSANDLIBSPATH=""
 
 eval "SSLINCLUDES=\"\""
-eval "SSLLIB=\"\""
+eval "SSLLIBS=\"\""
 eval "SSLLIBPATH=\"\""
 eval "SSLSTATIC=\"\""
 if ( test -n "" )
@@ -22221,7 +22214,7 @@ else
 fi
 
 eval "SSLINCLUDES=\"$INCLUDESTRING\""
-eval "SSLLIB=\"$LIBSTRING\""
+eval "SSLLIBS=\"$LIBSTRING\""
 eval "SSLLIBPATH=\"$LIBPATH\""
 eval "SSLSTATIC=\"$STATIC\""
 if ( test -n "" )
@@ -22229,10 +22222,6 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
-		if ( test -n "$SSLLIB" )
-		then
-			HAVE_SSL="yes"
-		fi
 	fi
 fi
 
@@ -22243,85 +22232,13 @@ then
 fi
 
 
-if ( test -n "$SSLLIB" )
+if ( test -n "$SSLLIBS" )
 then
-	echo "ssl libs... $SSLLIB"
+	echo "ssl libs... $SSLLIBS"
 fi
 
 
 
-
-
-
-echo "$as_me:$LINENO: checking for CRYPTO_add_lock in -lcrypto" >&5
-echo $ECHO_N "checking for CRYPTO_add_lock in -lcrypto... $ECHO_C" >&6
-if test "${ac_cv_lib_crypto_CRYPTO_add_lock+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcrypto  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char CRYPTO_add_lock ();
-int
-main ()
-{
-CRYPTO_add_lock ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_crypto_CRYPTO_add_lock=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_lib_crypto_CRYPTO_add_lock=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_CRYPTO_add_lock" >&5
-echo "${ECHO_T}$ac_cv_lib_crypto_CRYPTO_add_lock" >&6
-if test $ac_cv_lib_crypto_CRYPTO_add_lock = yes; then
-  CRYPTOLIB=-lcrypto
-else
-  CRYPTOLIB=""
-fi
 
 
 
@@ -23709,6 +23626,80 @@ fi
 
 
 
+
+
+
+	echo "$as_me:$LINENO: checking whether rudiments needs ssl" >&5
+echo $ECHO_N "checking whether rudiments needs ssl... $ECHO_C" >&6
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$RUDIMENTSINCLUDES $PTHREADINCLUDES $SSLINCLUDES"
+LIBS="$RUDIMENTSLIBS $PTHREADLIBS $SSLLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <rudiments/filedescriptor.h>
+#include <stdlib.h>
+int
+main ()
+{
+filedescriptor fd; fd.setSSL(NULL);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; RUDIMENTS_NEEDS_SSL=\"yes\"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+	if ( test -n "$RUDIMENTS_NEEDS_SSL" -a -z "$SSLLIBS" )
+	then
+		{ { echo "$as_me:$LINENO: error: No SSL library was found but Rudiments requires SSL." >&5
+echo "$as_me: error: No SSL library was found but Rudiments requires SSL." >&2;}
+   { (exit 1); exit 1; }; }
+	fi
 
 echo "******************************"
 
@@ -43883,10 +43874,8 @@ s,@XNETLIB@,$XNETLIB,;t t
 s,@NSLLIB@,$NSLLIB,;t t
 s,@DLLIB@,$DLLIB,;t t
 s,@AIOLIB@,$AIOLIB,;t t
-s,@HAVE_SSL@,$HAVE_SSL,;t t
 s,@SSLINCLUDES@,$SSLINCLUDES,;t t
-s,@SSLLIB@,$SSLLIB,;t t
-s,@CRYPTOLIB@,$CRYPTOLIB,;t t
+s,@SSLLIBS@,$SSLLIBS,;t t
 s,@RUDIMENTSPATH@,$RUDIMENTSPATH,;t t
 s,@RUDIMENTSINCLUDES@,$RUDIMENTSINCLUDES,;t t
 s,@RUDIMENTSLIBS@,$RUDIMENTSLIBS,;t t

@@ -11,6 +11,14 @@
 	fixed reversed affected rows logic for freetds 0.61
 	support mysql_change_user now in mysql connection
 	added mysql client api drop-in replacement library
+	configure script looks around for ssl library now
+	configure script doesn't look for crypto library now, instead it just
+		uses ssl library flags which should include crypto library if
+		ssl needs it
+	fixed a few things in the perl DBI driver:
+		made bind variable index 1-based for execute()
+		removed clearBinds() after execute()
+		initialized a few hash values when execute() fails
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

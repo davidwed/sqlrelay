@@ -4,7 +4,7 @@ include ../../config.mk
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) $(SSLINCLUDES) `$(GTKCONFIG) --cflags`
 #CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -I/usr/include/gtk-2.0 -I/usr/include/glib-2.0 -I/usr/X11R6/include
-LIBS = $(RUDIMENTSLIBS) $(PTHREADLIBS) $(SSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(RUDIMENTSLIBS) $(PTHREADLIBS) $(SSLLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= configfile.C gtkfe.C
 LOBJS= configfile.lo gtkfe.lo

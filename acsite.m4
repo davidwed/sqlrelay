@@ -456,26 +456,21 @@ then
 
 else
 
+	for i in "pthread" "c_r"
+	do
+		FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[pthread],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIBS],[PTHREADLIBPATH],[PTHREADSTATIC])
+		if ( test -n "$PTHREADLIBS" )
+		then
+			if ( test "$i" = "c_r" )
+			then
+				PTHREADLIBS="$PTHREADLIBS -pthread"
+			fi
+			break
+		fi
+	done
 	if ( test -n "$PTHREADLIBS" )
 	then
 		HAVE_PTHREAD="yes"
-	else
-		for i in "pthread" "c_r"
-		do
-			FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[pthread],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIBS],[PTHREADLIBPATH],[PTHREADSTATIC])
-			if ( test -n "$PTHREADLIBS" )
-			then
-				if ( test "$i" = "c_r" )
-				then
-					PTHREADLIBS="$PTHREADLIBS -pthread"
-				fi
-				break
-			fi
-		done
-		if ( test -n "$PTHREADLIBS" )
-		then
-			HAVE_PTHREAD="yes"
-		fi
 	fi
 fi
 
@@ -493,51 +488,47 @@ fi
 
 
 
-
 dnl checks for the ssl library
 dnl requires:  SSLPATH, RPATHFLAG, cross_compiling
-dnl sets the substitution variable SSLLIB
+dnl sets the substitution variable SSLLIBS
 AC_DEFUN([FW_CHECK_SSL],
 [
 
-HAVE_SSL=""
-SSLINCLUDES=""
-SSLLIB=""
-
 if ( test "$cross_compiling" = "yes" )
 then
-	
+
 	dnl cross compiling
 	echo "cross compiling"
-	if ( test -n "$SSLPATH" )
-	then
-		SSLINCLUDES="-I$SSLPATH/include"
-		SSLLIB="-L$SSLPATH/lib -lssl"
-	else
-		SSLLIB="-lssl"
-	fi
-	HAVE_SSL="yes"
 
 else
 
-	if ( test -n "$SSLLIB" )
+	if ( test -z "$SSLLIBS" -a -z "$SSLINCLUDES" )
 	then
-		HAVE_SSL="yes"
+		SSLLIBS="`pkg-config openssl --libs`"
+		SSLINCLUDES="`pkg-config openssl --cflags`"
 	else
-		FW_CHECK_HEADERS_AND_LIBS([$SSLPATH],[ssl],[openssl/ssl.h],[ssl],[""],[""],[SSLINCLUDES],[SSLLIB],[SSLLIBPATH],[SSLSTATIC])
-		if ( test -n "$SSLLIB" )
-		then
-			HAVE_SSL="yes"
-		fi
+		FW_CHECK_HEADERS_AND_LIBS([/usr],[ssl],[openssl/ssl.h],[ssl],[""],[""],[SSLINCLUDES],[SSLLIBS],[SSLLIBPATH],[SSLSTATIC])
 	fi
 fi
 
 FW_INCLUDES(ssl,[$SSLINCLUDES])
-FW_LIBS(ssl,[$SSLLIB])
+FW_LIBS(ssl,[$SSLLIBS])
 
-AC_SUBST(HAVE_SSL)
 AC_SUBST(SSLINCLUDES)
-AC_SUBST(SSLLIB)
+AC_SUBST(SSLLIBS)
+])
+
+AC_DEFUN([FW_CHECK_RUDIMENTS_NEEDS_SSL],
+[
+
+	AC_MSG_CHECKING(whether rudiments needs ssl)
+	FW_TRY_LINK([#include <rudiments/filedescriptor.h>
+#include <stdlib.h>],[filedescriptor fd; fd.setSSL(NULL);],[$RUDIMENTSINCLUDES $PTHREADINCLUDES $SSLINCLUDES],[$RUDIMENTSLIBS $PTHREADLIBS $SSLLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); RUDIMENTS_NEEDS_SSL=\"yes\"],[AC_MSG_RESULT(no)])
+
+	if ( test -n "$RUDIMENTS_NEEDS_SSL" -a -z "$SSLLIBS" )
+	then
+		AC_MSG_ERROR(No SSL library was found but Rudiments requires SSL.)
+	fi
 ])
 
 
