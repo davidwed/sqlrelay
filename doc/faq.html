@@ -775,15 +775,17 @@ connections, and I keep having to restart SQL Relay.  What gives?</span>
 
 <blockquote>
 <pre>
-dl("sql_relay.so");
+<font color="#6b59ce">&lt;?</font>
+<font color="#008a8c">dl</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sql_relay.so</font>&quot;<font color="#6b59ce">)</font>;
 
-var $con=sqlrcon_alloc(...);
-var $cur=sqlrcur_alloc($con);
+<font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#a52829"><b>=</b></font>sqlrcon_alloc<font color="#6b59ce">(</font><font color="#a52829"><b>...</b></font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#a52829"><b>=</b></font>sqlrcur_alloc<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#6b59ce">)</font>;
 
-... do some stuff ...
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> some stuff <font color="#a52829"><b>...</b></font>
 
-sqlrcur_free($cur)
-sqlrcon_free($con)
+sqlrcur_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#6b59ce">)</font>
+sqlrcon_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#6b59ce">)</font>
+<font color="#6b59ce">?&gt;</font>
 </pre>
 </blockquote>
 
@@ -800,22 +802,24 @@ register it with a call to register_shutdown_function().</p>
 
 <blockquote>
 <pre>
-dl("sql_relay.so");
+<font color="#6b59ce">&lt;?</font>
+<font color="#008a8c">dl</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sql_relay.so</font>&quot;<font color="#6b59ce">)</font>;
 
-var $con;
-var $cur;
+<font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">con</font>;
+<font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>;
 
-function shutdown() {
-	sqlrcur_free($cur);
-	sqlrcon_free($con);
-}
+<font color="#a520f7">function</font> shutdown<font color="#6b59ce">()</font> <font color="#6b59ce">{</font>
+        sqlrcur_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#6b59ce">)</font>;
+        sqlrcon_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#6b59ce">)</font>;
+<font color="#6b59ce">}</font>
 
-$con=sqlrcon_alloc(...);
-$cur=sqlrcur_alloc($con);
+<font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#a52829"><b>=</b></font>sqlrcon_alloc<font color="#6b59ce">(</font><font color="#a52829"><b>...</b></font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#a52829"><b>=</b></font>sqlrcur_alloc<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#6b59ce">)</font>;
 
-register_shutdown_function(shutdown);
+<font color="#008a8c">register_shutdown_function</font><font color="#6b59ce">(</font>shutdown<font color="#6b59ce">)</font>;
 
-... do some stuff ...
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> some stuff <font color="#a52829"><b>...</b></font>
+<font color="#6b59ce">?&gt;</font>
 </pre>
 </blockquote>
 
@@ -832,27 +836,29 @@ code is redundant but it illustrates the functionality of connection_aborted().
 
 <blockquote>
 <pre>
-dl("sql_relay.so");
+<font color="#6b59ce">&lt;?</font>
+<font color="#008a8c">dl</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sql_relay.so</font>&quot;<font color="#6b59ce">)</font>;
 
-var $con;
-var $cur;
+<font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">con</font>;
+<font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>;
 
-function shutdown() {
-	if (connection_aborted()) {
-		sqlrcur_free($cur);
-		sqlrcon_free($con);
-	}
-}
+<font color="#a520f7">function</font> shutdown<font color="#6b59ce">()</font> <font color="#6b59ce">{</font>
+        <font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font><font color="#008a8c">connection_aborted</font><font color="#6b59ce">())</font> <font color="#6b59ce">{</font>
+                sqlrcur_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#6b59ce">)</font>;
+                sqlrcon_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#6b59ce">)</font>;
+        <font color="#6b59ce">}</font>
+<font color="#6b59ce">}</font>
 
-$con=sqlrcon_alloc(...);
-$cur=sqlrcur_alloc($con);
+<font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#a52829"><b>=</b></font>sqlrcon_alloc<font color="#6b59ce">(</font><font color="#a52829"><b>...</b></font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#a52829"><b>=</b></font>sqlrcur_alloc<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#6b59ce">)</font>;
 
-register_shutdown_function(shutdown);
+<font color="#008a8c">register_shutdown_function</font><font color="#6b59ce">(</font>shutdown<font color="#6b59ce">)</font>;
 
-... do some stuff ...
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> some stuff <font color="#a52829"><b>...</b></font>
 
-sqlrcur_free($cur);
-sqlrcon_free($con);
+sqlrcur_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#6b59ce">)</font>;
+sqlrcon_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#6b59ce">)</font>;
+<font color="#6b59ce">?&gt;</font>
 </pre>
 </blockquote>
 
@@ -860,7 +866,28 @@ sqlrcon_free($con);
 ignore_user_abort() is used, then if a user clicks stop, the PHP script is not
 aborted.  Rather, the remainder of its output is just never sent to the browser.
 This solution is less efficient than using register_shutdown_function() but also
-works.<p>
+works.  For example:<p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?</font>
+<font color="#008a8c">dl</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sql_relay.so</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">con</font>;
+<font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#a52829"><b>=</b></font>sqlrcon_alloc<font color="#6b59ce">(</font><font color="#a52829"><b>...</b></font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#a52829"><b>=</b></font>sqlrcur_alloc<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#6b59ce">)</font>;
+
+<font color="#008a8c">ignore_user_abort</font><font color="#6b59ce">(</font><font color="#ff00ff">TRUE</font><font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> some stuff <font color="#a52829"><b>...</b></font>
+
+sqlrcur_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#6b59ce">)</font>;
+sqlrcon_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">con</font><font color="#6b59ce">)</font>;
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
 
 <p>SQL Relay version 0.35 should also feature an idle client timeout.  If a
 client remains connected to SQL Relay for a configurable amount of time but
