@@ -7,16 +7,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef NEED_GLIBC_2_3_HACK
-extern "C" {
-	#include <ctype.h>
-	const unsigned short int *__ctype_b;
-	int	__ctype_toupper(int c) {
-		return toupper(c);
-	}
-}
-#endif
-
 oracle8connection	*conn;
 signalhandler		*alarmhandler;
 

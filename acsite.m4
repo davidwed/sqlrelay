@@ -493,13 +493,20 @@ then
 		
 		if ( test -n "$ORACLE_HOME" )
 		then
+
 			AC_MSG_RESULT(yes)
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore3.a],[ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl -lm $AIOLIB\"])
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore4.a],[ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 -lm $AIOLIB\"])
-			WTC8=""
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libwtc8.a],[WTC8=\"-lwtc8\"])
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore8.a],[ORACLEVERSION=\"8.1\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient8 -lcommon8 -lgeneric8 -lclntsh -lcore8 -lnls8 $WTC8 -lm $AIOLIB\"])
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore9.a],[ORACLEVERSION=\"9.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient9 -lcommon9 -lgeneric9 -lclntsh -lcore9 -lnls9 -lwtc9 -lm $AIOLIB\"])
+
+			dnl use sysliblist if it's there
+			SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
+			if ( test ! -n "$SYSLIBLIST" )
+			then
+				SYSLIBLIST="-lm $AIOLIB"
+			fi
+
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore3.a],[ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore4.a],[ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore8.a],[ORACLEVERSION=\"8i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore9.a],[ORACLEVERSION=\"9i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 			if ( test -n "$ORACLEVERSION" )
 			then
 				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
@@ -613,12 +620,12 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLEINCLUD
 		fi
 	fi
 		
-	if ( test "$ORACLE_VERSION" = "8.1" -o "$ORACLE_VERSION" = "9.0" )
+	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" )
 	then
 		AC_DEFINE(HAVE_ORACLE_8i,1,Oracle 8i or greater)
 	fi
 
-	if ( test -n $"ORACLE_VERSION" )
+	if ( test -n $"ORACLEVERSION" )
 	then
 		FW_VERSION(oracle,[$ORACLEVERSION])
 		FW_INCLUDES(oracle,[$ORACLEINCLUDES])
@@ -1075,6 +1082,12 @@ then
 #include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES],[$FREETDSLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
 			AC_LANG(C)
 		fi
+	fi
+
+	FREETDSSYSTEMWARNING="no"
+	if ( test "$FREETDSLIBS" = "-lct" -a -z "$FREETDSINCLUDES" )
+	then
+		FREETDSSYSTEMWARNING="yes"
 	fi
 
 	FW_INCLUDES(freetds,[$FREETDSINCLUDES])
@@ -2011,7 +2024,7 @@ then
 fi
 ])
 
-AC_DEFUN([FW_CHECK_NEED_GLIBC_2_3_HACK],
+AC_DEFUN([FW_CHECK_NEED_REDHAT_9_GLIBC_2_3_2_HACK],
 [
 	dnl if there's no features.h then we're not using glibc (hopefully)
 	AC_CHECK_HEADER([features.h],[USING_GLIBC=yes],[USING_GLIBC=no])
@@ -2024,7 +2037,7 @@ AC_DEFUN([FW_CHECK_NEED_GLIBC_2_3_HACK],
 		AC_TRY_LINK([#include <ctype.h>
 #include <features.h>],[#if __GLIBC__==2 && __GLIBC_MINOR__==3
 	__ctype_toupper('a');
-#endif],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(NEED_GLIBC_2_3_HACK,1,Some versions of glibc-2.3 need a fixup) GLIBC23HACKINCLUDE="#include <ctype.h>"; GLIBC23HACKCODE="const unsigned short int *__ctype_b; int __ctype_toupper(int c) { return toupper(c); } int __ctype_tolower(int c) { return tolower(c); }"])
+#endif],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(NEED_REDHAT_9_GLIBC_2_3_2_HACK,1,Some versions of glibc-2.3 need a fixup) GLIBC23HACKINCLUDE="#include <ctype.h>"; GLIBC23HACKCODE=" const unsigned short int **__ctype_b() { return __ctype_b_loc(); } const __int32_t **__ctype_toupper() { return __ctype_toupper_loc(); } const __int32_t **__ctype_tolower() { return __ctype_tolower_loc(); }"])
 	fi
 ])
 

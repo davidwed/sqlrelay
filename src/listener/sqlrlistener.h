@@ -44,7 +44,7 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		void	listen();
 	private:
 		void	cleanUp();
-		int	setUserAndGroup(sqlrconfigfile *cfgfl);
+		void	setUserAndGroup(sqlrconfigfile *cfgfl);
 		int	handlePidFile(tempdir *tmpdir, const char *id);
 		void	handleDynamicScaling(sqlrconfigfile *cfgfl);
 		void	setHandoffMethod(sqlrconfigfile *cfgfl);

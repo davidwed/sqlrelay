@@ -232,7 +232,7 @@
 #undef INLINE
 
 /* Some versions of glibc-2.3 need a fixup */
-#undef NEED_GLIBC_2_3_HACK
+#undef NEED_REDHAT_9_GLIBC_2_3_2_HACK
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

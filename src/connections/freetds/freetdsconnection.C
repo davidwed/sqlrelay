@@ -44,19 +44,15 @@ void	freetdsconnection::handleConnectString() {
 int	freetdsconnection::logIn() {
 
 	// set sybase environment variable
-	if (sybase && sybase[0]) {
-		if (!env->setValue("SYBASE",sybase)) {
-			logInError("Failed to set SYBASE environment variable.",1);
-			return 0;
-		}
+	if (sybase && sybase[0] && !env->setValue("SYBASE",sybase)) {
+		logInError("Failed to set SYBASE environment variable.",1);
+		return 0;
 	}
 
 	// set dsquery environment variable
-	if (server && server[0]) {
-		if (!env->setValue("DSQUERY",server)) {
-			logInError("Failed to set DSQUERY environment variable.",2);
-			return 0;
-		}
+	if (server && server[0] && !env->setValue("DSQUERY",server)) {
+		logInError("Failed to set DSQUERY environment variable.",2);
+		return 0;
 	}
 
 	// allocate a context
@@ -103,35 +99,21 @@ int	freetdsconnection::logIn() {
 
 	// set the user to use
 	char	*user=getUser();
-	if (user && user[0]) {
-		if (ct_con_props(dbconn,CS_SET,CS_USERNAME,(CS_VOID *)user,
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the user",5);
-			return 0;
-		}
-	} else {
-		if (ct_con_props(dbconn,CS_SET,CS_USERNAME,(CS_VOID *)"",
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the user",5);
-			return 0;
-		}
+	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
+			(CS_VOID *)((user && user[0])?user:""),
+			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
+		logInError("failed to set the user",5);
+		return 0;
 	}
 
 
 	// set the password to use
 	char	*password=getPassword();
-	if (password && password[0]) {
-		if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,(CS_VOID *)password,
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the password",5);
-			return 0;
-		}
-	} else {
-		if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,(CS_VOID *)"",
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the password",5);
-			return 0;
-		}
+	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
+			(CS_VOID *)((password && password[0])?password:""),
+			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
+		logInError("failed to set the password",5);
+		return 0;
 	}
 
 	// set application name
@@ -142,22 +124,20 @@ int	freetdsconnection::logIn() {
 	}
 
 	// set hostname
-	if (hostname && hostname[0]) {
-		if (ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
+	if (hostname && hostname[0] &&
+		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
 				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the hostname",5);
-			return 0;
-		}
+		logInError("failed to set the hostname",5);
+		return 0;
 	}
 
 	// set packetsize
-	if (packetsize && packetsize[0]) {
-		if (ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
+	if (packetsize && packetsize[0] &&
+		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 				(CS_VOID *)atoi(packetsize),
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the packetsize",5);
-			return 0;
-		}
+		logInError("failed to set the packetsize",5);
+		return 0;
 	}
 
 	// set encryption
@@ -184,23 +164,21 @@ int	freetdsconnection::logIn() {
 	}
 
 	// set language
-	if (language && language[0]) {
-		if (cs_locale(context,CS_SET,locale,CS_SYB_LANG,
+	if (language && language[0] &&
+		cs_locale(context,CS_SET,locale,CS_SYB_LANG,
 			(CS_CHAR *)language,CS_NULLTERM,(CS_INT *)NULL)!=
 				CS_SUCCEED) {
-			logInError("failed to set the language",6);
-			return 0;
-		}
+		logInError("failed to set the language",6);
+		return 0;
 	}
 
 	// set charset
-	if (charset && charset[0]) {
-		if (cs_locale(context,CS_SET,locale,CS_SYB_CHARSET,
+	if (charset && charset[0] &&
+		cs_locale(context,CS_SET,locale,CS_SYB_CHARSET,
 			(CS_CHAR *)charset,CS_NULLTERM,(CS_INT *)NULL)!=
 				CS_SUCCEED) {
-			logInError("failed to set the charset",6);
-			return 0;
-		}
+		logInError("failed to set the charset",6);
+		return 0;
 	}
 
 	// set locale
@@ -219,8 +197,8 @@ int	freetdsconnection::logIn() {
 }
 
 void	freetdsconnection::logInError(const char *error, int stage) {
-	errorstring=new stringbuffer();
-	errorstring->append(error);
+
+	fprintf(stderr,"%s",error);
 
 	if (stage>5) {
 		cs_loc_drop(context,locale);

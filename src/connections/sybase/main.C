@@ -10,15 +10,19 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#ifdef NEED_GLIBC_2_3_HACK
+#ifdef NEED_REDHAT_9_GLIBC_2_3_2_HACK
 extern "C" {
 	#include <ctype.h>
-	const unsigned short int *__ctype_b;
-	int	__ctype_toupper(int c) {
-		return toupper(c);
+	const unsigned short int **__ctype_b() {
+        	return __ctype_b_loc();
 	}
-	int	__ctype_tolower(int c) {
-		return tolower(c);
+
+	const __int32_t **__ctype_toupper() {
+        	return __ctype_toupper_loc();
+	}
+
+	const __int32_t **__ctype_tolower() {
+        	return __ctype_tolower_loc();
 	}
 }
 #endif

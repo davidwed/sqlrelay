@@ -393,8 +393,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,6),"1.1");
 	checkSuccess(cur->getField(0,7),"1.0000");
 	checkSuccess(cur->getField(0,8),"1.00");
-	checkSuccess(cur->getField(0,9),"Jan  1 2001  1:00AM");
-	checkSuccess(cur->getField(0,10),"Jan  1 2001  1:00AM");
+	checkSuccess(cur->getField(0,9),"Jan 01 2001 01:00AM");
+	checkSuccess(cur->getField(0,10),"Jan 01 2001 01:00AM");
 	checkSuccess(cur->getField(0,11),"testchar1                               ");
 	checkSuccess(cur->getField(0,12),"testvarchar1");
 	checkSuccess(cur->getField(0,13),"1");
@@ -408,8 +408,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,6),"8.8");
 	checkSuccess(cur->getField(7,7),"8.0000");
 	checkSuccess(cur->getField(7,8),"8.00");
-	checkSuccess(cur->getField(7,9),"Jan  1 2008  8:00AM");
-	checkSuccess(cur->getField(7,10),"Jan  1 2008  8:00AM");
+	checkSuccess(cur->getField(7,9),"Jan 01 2008 08:00AM");
+	checkSuccess(cur->getField(7,10),"Jan 01 2008 08:00AM");
 	checkSuccess(cur->getField(7,11),"testchar8                               ");
 	checkSuccess(cur->getField(7,12),"testvarchar8");
 	checkSuccess(cur->getField(7,13),"1");
@@ -457,8 +457,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,"testnumeric"),"1.1");
 	checkSuccess(cur->getField(0,"testmoney"),"1.0000");
 	checkSuccess(cur->getField(0,"testsmallmoney"),"1.00");
-	checkSuccess(cur->getField(0,"testdatetime"),"Jan  1 2001  1:00AM");
-	checkSuccess(cur->getField(0,"testsmalldatetime"),"Jan  1 2001  1:00AM");
+	checkSuccess(cur->getField(0,"testdatetime"),"Jan 01 2001 01:00AM");
+	checkSuccess(cur->getField(0,"testsmalldatetime"),"Jan 01 2001 01:00AM");
 	checkSuccess(cur->getField(0,"testchar"),"testchar1                               ");
 	checkSuccess(cur->getField(0,"testvarchar"),"testvarchar1");
 	checkSuccess(cur->getField(0,"testbit"),"1");
@@ -472,8 +472,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,"testnumeric"),"8.8");
 	checkSuccess(cur->getField(7,"testmoney"),"8.0000");
 	checkSuccess(cur->getField(7,"testsmallmoney"),"8.00");
-	checkSuccess(cur->getField(7,"testdatetime"),"Jan  1 2008  8:00AM");
-	checkSuccess(cur->getField(7,"testsmalldatetime"),"Jan  1 2008  8:00AM");
+	checkSuccess(cur->getField(7,"testdatetime"),"Jan 01 2008 08:00AM");
+	checkSuccess(cur->getField(7,"testsmalldatetime"),"Jan 01 2008 08:00AM");
 	checkSuccess(cur->getField(7,"testchar"),"testchar8                               ");
 	checkSuccess(cur->getField(7,"testvarchar"),"testvarchar8");
 	checkSuccess(cur->getField(7,"testbit"),"1");
@@ -522,8 +522,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(fields[6],"1.1");
 	checkSuccess(fields[7],"1.0000");
 	checkSuccess(fields[8],"1.00");
-	checkSuccess(fields[9],"Jan  1 2001  1:00AM");
-	checkSuccess(fields[10],"Jan  1 2001  1:00AM");
+	checkSuccess(fields[9],"Jan 01 2001 01:00AM");
+	checkSuccess(fields[10],"Jan 01 2001 01:00AM");
 	checkSuccess(fields[11],"testchar1                               ");
 	checkSuccess(fields[12],"testvarchar1");
 	checkSuccess(fields[13],"1");
@@ -854,6 +854,7 @@ int	main(int argc, char **argv) {
 
 	// drop existing table
 	con->commit();
+con->debugOn();
 	cur->sendQuery("drop table testtable");
 
 	// invalid queries...

@@ -85,25 +85,27 @@ int	oracle8connection::logIn() {
 	}
 
 	// init OCI
-	OCIInitialize(OCI_DEFAULT,(dvoid *)0,
-			(dvoid*(*)(dvoid *,size_t))0,
-			(dvoid*(*)(dvoid *,dvoid *,size_t))0,
-			(void(*)(dvoid *,dvoid *))0);
+#ifdef HAVE_ORACLE_8i
+	OCIEnvCreate((OCIEnv **)&env,OCI_DEFAULT,(dvoid *)0,
+			(dvoid *(*)(dvoid *, size_t))0,
+			(dvoid *(*)(dvoid *, dvoid *, size_t))0,
+			(void (*)(dvoid *, dvoid *))0,
+			(size_t)0,(dvoid **)0);
+#else
+	OCIInitialize(OCI_DEFAULT,NULL,NULL,NULL,NULL);
 
 	// init the environment
-	OCIEnvInit((OCIEnv **)&env,OCI_DEFAULT,(size_t)0,(dvoid **)0); 
+	OCIEnvInit((OCIEnv **)&env,OCI_DEFAULT,0,(dvoid **)0);
+#endif
 
 	// allocate an error handle
-	OCIHandleAlloc((dvoid *)env,(dvoid **)&err,OCI_HTYPE_ERROR,
-				(size_t)0,(dvoid **)0);
+	OCIHandleAlloc((dvoid *)env,(dvoid **)&err,OCI_HTYPE_ERROR,0,NULL);
 
 	// allocate a server handle
-	OCIHandleAlloc((dvoid *)env,(dvoid **)&srv,OCI_HTYPE_SERVER,
-				(size_t)0,(dvoid **)0);
+	OCIHandleAlloc((dvoid *)env,(dvoid **)&srv,OCI_HTYPE_SERVER,0,NULL);
 
 	// allocate a service context handle
-	OCIHandleAlloc((dvoid *)env,(dvoid **)&svc,OCI_HTYPE_SVCCTX,
-				(size_t)0,(dvoid **)0);
+	OCIHandleAlloc((dvoid *)env,(dvoid **)&svc,OCI_HTYPE_SVCCTX,0,NULL);
 
 	// attach to the server
 	if (OCIServerAttach(srv,err,(text *)sid,strlen(sid),0)!=OCI_SUCCESS) {
@@ -119,8 +121,8 @@ int	oracle8connection::logIn() {
 				OCI_ATTR_SERVER,(OCIError *)err);
 
 	// allocate a session handle
-	OCIHandleAlloc((dvoid *)env,(dvoid **)&session,(ub4)OCI_HTYPE_SESSION,
-				(size_t)0,(dvoid **)0);
+	OCIHandleAlloc((dvoid *)env,(dvoid **)&session,
+				(ub4)OCI_HTYPE_SESSION,0,NULL);
 
 	// set username and password
 	char	*user=getUser();
@@ -137,14 +139,12 @@ int	oracle8connection::logIn() {
 			OCI_CRED_RDBMS,(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
 
 		// get the error message from oracle
-		text	message[512];
-		for (int i=0; i<512; i++) {
-			message[i]=(char)NULL;
-		}
+		text	message[1024];
+		memset((void *)message,0,sizeof(message));
 		sb4	errcode;
 		OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 				message,sizeof(message),OCI_HTYPE_ERROR);
-		message[511]=(char)NULL;
+		message[1023]=(char)NULL;
 		fprintf(stderr,"%s\n",message);
 
 		OCIServerDetach(srv,err,OCI_DEFAULT);
@@ -968,16 +968,14 @@ int	oracle8cursor::queryIsCommitOrRollback() {
 char	*oracle8cursor::getErrorMessage(int *liveconnection) {
 
 	// get the message from oracle
-	text	message[512];
-	for (int i=0; i<512; i++) {
-		message[i]=(char)NULL;
-	}
+	text	message[1024];
+	memset((void *)message,0,sizeof(message));
 	sb4	errcode;
 	OCIErrorGet((dvoid *)oracle8conn->err,1,
 			(text *)0,&errcode,
 			message,sizeof(message),
 			OCI_HTYPE_ERROR);
-	message[511]=(char)NULL;
+	message[1023]=(char)NULL;
 
 	// check for dead connection
 	if (errcode==3114 || errcode==3113) {

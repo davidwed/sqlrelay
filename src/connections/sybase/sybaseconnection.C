@@ -49,19 +49,15 @@ void	sybaseconnection::handleConnectString() {
 int	sybaseconnection::logIn() {
 
 	// set sybase
-	if (sybase && sybase[0]) {
-		if (!env->setValue("SYBASE",sybase)) {
-			logInError("Failed to set SYBASE environment variable.",1);
-			return 0;
-		}
+	if (sybase && sybase[0] && !env->setValue("SYBASE",sybase)) {
+		logInError("Failed to set SYBASE environment variable.",1);
+		return 0;
 	}
 
 	// set server
-	if (server && server[0]) {
-		if (!env->setValue("DSQUERY",server)) {
-			logInError("Failed to set DSQUERY environment variable.",2);
-			return 0;
-		}
+	if (server && server[0] && !env->setValue("DSQUERY",server)) {
+		logInError("Failed to set DSQUERY environment variable.",2);
+		return 0;
 	}
 
 	// allocate a context
@@ -108,35 +104,21 @@ int	sybaseconnection::logIn() {
 
 	// set the user to use
 	char	*user=getUser();
-	if (user && user[0]) {
-		if (ct_con_props(dbconn,CS_SET,CS_USERNAME,(CS_VOID *)user,
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the user",5);
-			return 0;
-		}
-	} else {
-		if (ct_con_props(dbconn,CS_SET,CS_USERNAME,(CS_VOID *)"",
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the user",5);
-			return 0;
-		}
+	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
+			(CS_VOID *)((user && user[0])?user:""),
+			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
+		logInError("failed to set the user",5);
+		return 0;
 	}
 
 
 	// set the password to use
 	char	*password=getPassword();
-	if (password && password[0]) {
-		if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,(CS_VOID *)password,
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the password",5);
-			return 0;
-		}
-	} else {
-		if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,(CS_VOID *)"",
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the password",5);
-			return 0;
-		}
+	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
+			(CS_VOID *)((password && password[0])?password:""),
+			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
+		logInError("failed to set the password",5);
+		return 0;
 	}
 
 	// set application name
@@ -147,22 +129,20 @@ int	sybaseconnection::logIn() {
 	}
 
 	// set hostname
-	if (hostname && hostname[0]) {
-		if (ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
+	if (hostname && hostname[0] &&
+		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
 				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
 			logInError("failed to set the hostname",5);
-			return 0;
-		}
+		return 0;
 	}
 
 	// set packetsize
-	if (packetsize && packetsize[0]) {
-		if (ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
+	if (packetsize && packetsize[0] &&
+		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 				(CS_VOID *)atoi(packetsize),
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the packetsize",5);
-			return 0;
-		}
+		logInError("failed to set the packetsize",5);
+		return 0;
 	}
 
 	// set encryption
@@ -189,28 +169,26 @@ int	sybaseconnection::logIn() {
 	}
 
 	// set language
-	if (language && language[0]) {
-		if (cs_locale(context,CS_SET,locale,CS_SYB_LANG,
+	if (language && language[0] &&
+		cs_locale(context,CS_SET,locale,CS_SYB_LANG,
 			(CS_CHAR *)language,CS_NULLTERM,(CS_INT *)NULL)!=
 				CS_SUCCEED) {
-			logInError("failed to set the language",6);
-			return 0;
-		}
+		logInError("failed to set the language",6);
+		return 0;
 	}
 
 	// set charset
-	if (charset && charset[0]) {
-		if (cs_locale(context,CS_SET,locale,CS_SYB_CHARSET,
+	if (charset && charset[0] &&
+		cs_locale(context,CS_SET,locale,CS_SYB_CHARSET,
 			(CS_CHAR *)charset,CS_NULLTERM,(CS_INT *)NULL)!=
 				CS_SUCCEED) {
-			logInError("failed to set the charset",6);
-			return 0;
-		}
+		logInError("failed to set the charset",6);
+		return 0;
 	}
 
 	// set locale
 	if (ct_con_props(dbconn,CS_SET,CS_LOC_PROP,(CS_VOID *)locale,
-			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
+				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the locale",6);
 		return 0;
 	}
@@ -225,8 +203,11 @@ int	sybaseconnection::logIn() {
 
 void	sybaseconnection::logInError(const char *error, int stage) {
 
-	errorstring=new stringbuffer();
-	errorstring->append(error);
+	fprintf(stderr,"%s\n",error);
+
+	if (errorstring) {
+		fprintf(stderr,"%s\n",errorstring->getString());
+	}
 
 	if (stage>5) {
 		cs_loc_drop(context,locale);
@@ -726,19 +707,25 @@ CS_RETCODE	sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 	errorstring=new stringbuffer();
 
 	errorstring->append("Client Library error:\n");
-	errorstring->append("	severity(%d)\n")->
-				append((long)CS_SEVERITY(msgp->msgnumber));
-	errorstring->append("	layer(%d)\n")->
-				append((long)CS_LAYER(msgp->msgnumber));
-	errorstring->append("	origin(%d)\n")->
-				append((long)CS_ORIGIN(msgp->msgnumber));
-	errorstring->append("	number(%d)\n")->
-				append((long)CS_NUMBER(msgp->msgnumber));
-	errorstring->append("Error:	%s\n")->append(msgp->msgstring);
+	errorstring->append("	severity(")->
+				append((long)CS_SEVERITY(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("	layer(")->
+				append((long)CS_LAYER(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("	origin(")->
+				append((long)CS_ORIGIN(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("	number(")->
+				append((long)CS_NUMBER(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("Error:	")->append(msgp->msgstring)->
+				append("\n");
 
 	if (msgp->osstringlen>0) {
 		errorstring->append("Operating System Error:\n");
-		errorstring->append("\n	%s\n")->append(msgp->osstring);
+		errorstring->append("\n	")->append(msgp->osstring)->
+							append("\n");
 	}
 
 	// for a timeout message, set deadconnection to 1
@@ -761,19 +748,25 @@ CS_RETCODE	sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 	errorstring=new stringbuffer();
 
 	errorstring->append("Client Library error:\n");
-	errorstring->append("	severity(%d)\n")->
-				append((long)CS_SEVERITY(msgp->msgnumber));
-	errorstring->append("	layer(%d)\n")->
-				append((long)CS_LAYER(msgp->msgnumber));
-	errorstring->append("	origin(%d)\n")->
-				append((long)CS_ORIGIN(msgp->msgnumber));
-	errorstring->append("	number(%d)\n")->
-				append((long)CS_NUMBER(msgp->msgnumber));
-	errorstring->append("Error:	%s\n")->append(msgp->msgstring);
+	errorstring->append("	severity(")->
+				append((long)CS_SEVERITY(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("	layer(")->
+				append((long)CS_LAYER(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("	origin(")->
+				append((long)CS_ORIGIN(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("	number(")->
+				append((long)CS_NUMBER(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("Error:	")->append(msgp->msgstring)->
+				append("\n");
 
 	if (msgp->osstringlen>0) {
 		errorstring->append("Operating System Error:\n");
-		errorstring->append("\n	%s\n")->append(msgp->osstring);
+		errorstring->append("\n	")->append(msgp->osstring)->
+							append("\n");
 	}
 
 	// for a timeout message, set deadconnection to 1
@@ -803,13 +796,27 @@ CS_RETCODE	sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	errorstring=new stringbuffer();
 
 	errorstring->append("Server message:\n");
-	errorstring->append("	severity(%d)\n")->append((long)msgp->severity);
-	errorstring->append("	number(%d)\n")->append((long)msgp->msgnumber);
-	errorstring->append("	state(%d)\n")->append((long)msgp->state);
-	errorstring->append("	line(%d)\n")->append((long)msgp->line);
-	errorstring->append("Server Name:\n%s\n")->append(msgp->svrname);
-	errorstring->append("Procedure Name:\n%s\n")->append(msgp->proc);
-	errorstring->append("Error:\n%s\n")->append(msgp->text);
+	errorstring->append("	severity(")->
+				append((long)msgp->severity)->
+				append(")\n");
+	errorstring->append("	number(")->
+				append((long)msgp->msgnumber)->
+				append(")\n");
+	errorstring->append("	state(")->
+				append((long)msgp->state)->
+				append(")\n");
+	errorstring->append("	line(")->
+				append((long)msgp->line)->
+				append(")\n");
+	errorstring->append("Server Name:\n")->
+				append(msgp->svrname)->
+				append("\n");
+	errorstring->append("Procedure Name:\n")->
+				append(msgp->proc)->
+				append("\n");
+	errorstring->append("Error:	")->
+				append(msgp->text)->
+				append("\n");
 
 	return CS_SUCCEED;
 }

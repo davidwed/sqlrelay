@@ -17,6 +17,16 @@ install:
 	$(abs_srcdir)/mkinstalldirs $(docdir)/programming/zope
 	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted
 	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/5
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/6
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/7
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/8
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/9
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/slackware
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/slackware/7
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/slackware/8
 	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/sybase
 	$(INSTALL) -m 644 clientapis.html $(docdir)
 	$(INSTALL) -m 644 configuring.html $(docdir)
@@ -89,8 +99,14 @@ install:
 	$(INSTALL) -m 644 gettingstarted/postgresql.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/sqlite.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/sybase.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/oracle/805.html $(docdir)/gettingstarted/oracle
-	$(INSTALL) -m 644 gettingstarted/oracle/817.html $(docdir)/gettingstarted/oracle
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/5/805.html $(docdir)/gettingstarted/oracle/linux/redhat/5
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/6/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/6
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/7/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/7
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/7/9i.html $(docdir)/gettingstarted/oracle/linux/redhat/7
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/9/9i.html $(docdir)/gettingstarted/oracle/linux/redhat/9/9iR2.html
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/7/8i.html $(docdir)/gettingstarted/oracle/linux/slackware/7
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/8/8i.html $(docdir)/gettingstarted/oracle/linux/slackware/8
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/8/9i.html $(docdir)/gettingstarted/oracle/linux/slackware/8
 	$(INSTALL) -m 644 gettingstarted/sybase/11.0.3.3.html $(docdir)/gettingstarted/sybase/11.0.3.3.html
 	$(INSTALL) -m 644 gettingstarted/sybase/11.9.2.html $(docdir)/gettingstarted/sybase/11.9.2.html
 

@@ -1,6 +1,14 @@
+login errors should be printed on the screen by sqlrconnection class, not by
+	individual connections
 seperate modules into standalone builds
 
-test finished-suspended-result-set's with oracle/db2/sybase/freetds
+test finished-suspended-result-set's with db2/sybase
+
+sybase/freetds libct.so collisions during build and runtime
+sybase connection crashes no matter what
+
+freetds connection gets messed up after 1 test is run if the test fails
+freetds test fails to drop table
 
 db2 start/stop doesn't work
 	db2start/db2stop works when run as a given instance owner

@@ -324,9 +324,8 @@ and run on that version of Linux.</p>
 <a name="startingatboot"></a>
 <span class="heading3">Starting the Database at Boot Time</span><br>
 
-<p>You can use the following script to start/stop the database at 
-boot/shutdown time.  Replace /u01/app/oracle/product/8.1.7 with your 
-$ORACLE_HOME</p>
+<p>You can use the following script to start/stop the database at boot/shutdown
+time.  Replace /u01/app/oracle/product/8.1.7 with your $ORACLE_HOME</p>
 
 <blockquote>
 <PRE>
@@ -359,13 +358,13 @@ access a database, it must be running.</p>
 <span class="heading1">Creating a Database</span><br>
 
 <p>During the installation, you could have chosen to create a database instance.
-If you did not create one during installation, you can do so afterward. For 
-Oracle 8.1 and higher, login as oracle, run $ORACLE_HOME/bin/dbassist and 
-following the on-screen instructions.</p>
+If you did not create one during installation, you can do so afterward. Log in
+as oracle and run $ORACLE_HOME/bin/dbassist for Oracle 8i or
+$ORACLE_HOME/bin/dbca for Oracle 9i and follow the on-screen instructions.</p>
 
-<p>The dbassist program will ask you to provide an SID; a local identifier for 
-the database.  No two databases on the same machine can have the same SID.  If 
-you are using Oracle 8i or 9i you will also be asked to provide a Global 
+<p>The dbassist/dbca program will ask you to provide an SID; a local identifier
+for the database.  No two databases on the same machine can have the same SID. 
+If you are using Oracle 8i or 9i you will also be asked to provide a Global 
 Identifier.  The Global Identifier should be unique among the Oracle databases 
 on the local network.</p>
 
@@ -425,19 +424,16 @@ create a tablespace and temporary tablespace called <i>testtablespace</i> and
 <PRE>
 <B><FONT color=#a62828>CREATE</FONT></B> TABLESPACE testtablespace
 	DATAFILE <FONT color=#ff00ff>'/u01/app/oracle/oradata/ora1/testtablespace01.dbf'</FONT> 
-	<FONT color=#6959cf>SIZE</FONT> 25K REUSE
-	AUTOEXTEND <FONT color=#6959cf>ON</FONT> NEXT 25K
+	<FONT color=#6959cf>SIZE</FONT> 1M REUSE
+	AUTOEXTEND <FONT color=#6959cf>ON</FONT> NEXT 1M
 	MAXSIZE UNLIMITED
-	NOLOGGING
-	MINIMUM EXTENT 25K;
+	NOLOGGING;
 
-<B><FONT color=#a62828>CREATE</FONT></B> TABLESPACE testtablespacetemp
-	DATAFILE <FONT color=#ff00ff>'/u01/app/oracle/oradata/ora1/testtablespacetemp01.dbf'</FONT> 
-	<FONT color=#6959cf>SIZE</FONT> 25K REUSE
-	AUTOEXTEND <FONT color=#6959cf>ON</FONT> NEXT 25K
-	MAXSIZE UNLIMITED
-	NOLOGGING
-	MINIMUM EXTENT 25K;
+<B><FONT color=#a62828>CREATE</FONT></B> TEMPORARY TABLESPACE testtablespacetemp
+	TEMPFILE <FONT color=#ff00ff>'/u01/app/oracle/oradata/ora1/testtablespacetemp01.dbf'</FONT> 
+	<FONT color=#6959cf>SIZE</FONT> 2M REUSE
+	AUTOEXTEND <FONT color=#6959cf>ON</FONT> NEXT 1M
+	MAXSIZE UNLIMITED;
 </PRE>
 </blockquote>
 
@@ -616,7 +612,7 @@ database as the user <i>testuser</i> with password <i>testpassword</i>.</p>
                         <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
-                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpassword;sid=testdb&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpassword;oracle_sid=testdb&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/connections&gt;</FONT>
         <FONT color=#008a8e>&lt;/instance&gt;</FONT>
 

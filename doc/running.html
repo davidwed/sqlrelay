@@ -265,6 +265,39 @@ rc files, even queries.</p>
 <span class="heading2">Common Problems:</span><br><br>
 
 <ul>
+<li><p>General difficulty with FreeTDS or Sybase connections.</p></li>
+<ul>
+<li><p>Sybase and FreeTDS both provide the libct.so library and the ctpublic.h
+header file.  If FreeTDS is installed from an RPM or other package, it is
+possible for it's libct.so to be installed in /usr/lib and it's header file to
+be installed in /usr/include.  This can cause the Sybase connection to be
+compiled against ctpublic.h and linked against libct.so from FreeTDS rather
+than from Sybase.</p>
+<p>Alternatively, if the Sybase header and library end up in those locations
+(ie. if they were manually copied there) then the FreeTDS connection could be
+compiled or linked against them.</p>
+<p>Generally, the solution is to install FreeTDS somewhere other than /usr
+and omit the FreeTDS and Sybase library paths from /etc/ld.so.conf and
+LD_LIBRARY_PATH.  By default, the build uses rpath's to cause the connections
+to look for libraries in the exact place that they were found at compile time,
+causing each connection to find the right library.  This option can be turned
+off though.  In that case, LD_LIBRARY_PATH should be set before running
+sqlr-start to assure that the connection dynamically links against the proper
+library.  To see which libraries the connection will link against, run
+"ldd `which sqlr-connection-freetds`" or
+"ldd `which sqlr-connection-sybase`"</p>
+<p>The configure script displays a warning that should encourage people to
+exercise care when compiling FreeTDS and Sybase connections.  However, even if
+each connection is compiled against the proper header file, it's possible for
+either connection to dynamically link against the wrong library at run time.</p>
+<p>Hopefully, one day, FreeTDS will support everything that the native Sybase
+libraries support and there will simply be an option to link the Sybase 
+connection against one or the other.</p>
+</li>
+</ul>
+</ul>
+
+<ul>
 <li><p>FreeTDS or Sybase connection fails with error: Connection refused.</p></li>
 <ul>
 <li></p>The FreeTDS and Sybase libraries try to connect to port 4000

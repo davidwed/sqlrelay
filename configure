@@ -1023,7 +1023,7 @@ Optional Features:
   --enable-server-rpath         Use -rpath when linking SQL Relay server programs against SQL Relay libraries
   --enable-static               Enable static linking
   --disable-oracle              Don't build Oracle connection
-  --enable-oracle-rpath         Use -rpath when building Oracle connection
+  --disable-oracle-rpath        Don't use -rpath when building Oracle connection
   --disable-mysql               Don't build MySQL connection
   --enable-mysql-rpath          Use -rpath when building MySQL connection
   --disable-msql                Don't build mSQL connection
@@ -1035,9 +1035,9 @@ Optional Features:
   --disable-lago                Don't build Lago connection
   --enable-lago-rpath           Use -rpath when building Lago connection
   --disable-freetds             Don't build FreeTDS connection
-  --enable-freetds-rpath        Use -rpath when building FreeTDS connection
+  --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection
   --disable-sybase              Don't build Sybase connection
-  --enable-sybase-rpath         Use -rpath when building Sybase connection
+  --disable-sybase-rpath        Don't use -rpath when building Sybase connection
   --disable-odbc                Don't build ODBC connection
   --enable-odbc-rpath           Use -rpath when building ODBC connection
   --disable-db2                 Don't build DB2 connection
@@ -1588,9 +1588,9 @@ fi;
 # Check whether --enable-oracle-rpath or --disable-oracle-rpath was given.
 if test "${enable_oracle_rpath+set}" = set; then
   enableval="$enable_oracle_rpath"
-  ORACLEUSERPATH="yes"
-else
   ORACLEUSERPATH=""
+else
+  ORACLEUSERPATH="yes"
 fi;
 
 
@@ -1726,9 +1726,9 @@ fi;
 # Check whether --enable-freetds-rpath or --disable-freetds-rpath was given.
 if test "${enable_freetds_rpath+set}" = set; then
   enableval="$enable_freetds_rpath"
-  FREETDSUSERPATH="yes"
-else
   FREETDSUSERPATH=""
+else
+  FREETDSUSERPATH="yes"
 fi;
 
 
@@ -1749,9 +1749,9 @@ fi;
 # Check whether --enable-sybase-rpath or --disable-sybase-rpath was given.
 if test "${enable_sybase_rpath+set}" = set; then
   enableval="$enable_sybase_rpath"
-  SYBASEUSERPATH="yes"
-else
   SYBASEUSERPATH=""
+else
+  SYBASEUSERPATH="yes"
 fi;
 
 
@@ -21091,9 +21091,9 @@ sed 's/^/| /' conftest.$ac_ext >&5
 echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 cat >>confdefs.h <<_ACEOF
-#define NEED_GLIBC_2_3_HACK 1
+#define NEED_REDHAT_9_GLIBC_2_3_2_HACK 1
 _ACEOF
- GLIBC23HACKINCLUDE="#include <ctype.h>"; GLIBC23HACKCODE="const unsigned short int *__ctype_b; int __ctype_toupper(int c) { return toupper(c); } int __ctype_tolower(int c) { return tolower(c); }"
+ GLIBC23HACKINCLUDE="#include <ctype.h>"; GLIBC23HACKCODE=" const unsigned short int **__ctype_b() { return __ctype_b_loc(); } const __int32_t **__ctype_toupper() { return __ctype_toupper_loc(); } const __int32_t **__ctype_tolower() { return __ctype_tolower_loc(); }"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
 	fi
@@ -22343,8 +22343,16 @@ echo $ECHO_N "checking for ORACLE_HOME... $ECHO_C" >&6
 
 		if ( test -n "$ORACLE_HOME" )
 		then
+
 			echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
+
+						SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
+			if ( test ! -n "$SYSLIBLIST" )
+			then
+				SYSLIBLIST="-lm $AIOLIB"
+			fi
+
 
 FOUNDLIB=""
 
@@ -22355,7 +22363,7 @@ fi
 
 if ( test -n "$FOUNDLIB" )
 then
-	eval "ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl -lm $AIOLIB\""
+	eval "ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl $SYSLIBLIST\""
 else
 	if ( test -n "" )
 	then
@@ -22382,35 +22390,7 @@ fi
 
 if ( test -n "$FOUNDLIB" )
 then
-	eval "ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 -lm $AIOLIB\""
-else
-	if ( test -n "" )
-	then
-
-if ( test -r "" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDLIB" )
-		then
-			eval ""
-		fi
-	fi
-fi
-
-			WTC8=""
-
-FOUNDLIB=""
-
-if ( test -r "$ORACLE_HOME/lib/libwtc8.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	eval "WTC8=\"-lwtc8\""
+	eval "ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 $SYSLIBLIST\""
 else
 	if ( test -n "" )
 	then
@@ -22437,7 +22417,7 @@ fi
 
 if ( test -n "$FOUNDLIB" )
 then
-	eval "ORACLEVERSION=\"8.1\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient8 -lcommon8 -lgeneric8 -lclntsh -lcore8 -lnls8 $WTC8 -lm $AIOLIB\""
+	eval "ORACLEVERSION=\"8i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\""
 else
 	if ( test -n "" )
 	then
@@ -22464,7 +22444,7 @@ fi
 
 if ( test -n "$FOUNDLIB" )
 then
-	eval "ORACLEVERSION=\"9.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient9 -lcommon9 -lgeneric9 -lclntsh -lcore9 -lnls9 -lwtc9 -lm $AIOLIB\""
+	eval "ORACLEVERSION=\"9i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\""
 else
 	if ( test -n "" )
 	then
@@ -23131,7 +23111,7 @@ _ACEOF
 		fi
 	fi
 
-	if ( test "$ORACLE_VERSION" = "8.1" -o "$ORACLE_VERSION" = "9.0" )
+	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" )
 	then
 
 cat >>confdefs.h <<\_ACEOF
@@ -23140,7 +23120,7 @@ _ACEOF
 
 	fi
 
-	if ( test -n $"ORACLE_VERSION" )
+	if ( test -n $"ORACLEVERSION" )
 	then
 
 if ( test -n "$ORACLEVERSION" )
@@ -28788,6 +28768,12 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 		fi
+	fi
+
+	FREETDSSYSTEMWARNING="no"
+	if ( test "$FREETDSLIBS" = "-lct" -a -z "$FREETDSINCLUDES" )
+	then
+		FREETDSSYSTEMWARNING="yes"
 	fi
 
 
@@ -36349,3 +36335,23 @@ echo "Thanks to MP3.com for sponsoring:"
 echo "	Clustered/Replicated database support."
 echo "	Perl API."
 echo
+
+if ( test "$FREETDSSYSTEMWARNING" = "yes" -a "$SYBASEBUILD" != "no     " )
+then
+	echo
+	echo "WARNING!  FreeTDS and Sybase connections will both be built"
+	echo "          but FreeTDS libraries and headers appear to have"
+	echo "          been installed in /usr/include and /usr/lib paths."
+	echo "          This will cause the Sybase connection to be compiled"
+	echo "          against the FreeTDS headers and linked against a mix"
+	echo "          of FreeTDS and Sybase libraries.  There is no good"
+	echo "          way to prevent the compiler, linker or system from"
+	echo "          searching those paths at compile, link or run time."
+	echo "          Please re-run configure, with the --disable-sybase"
+	echo "          option or, if you want to build both connections,"
+	echo "          please re-install the FreeTDS headers and libraries"
+	echo "          somewhere else.  If you are positive that the headers"
+	echo "          and libraries in /usr/include and /usr/lib are in fact"
+	echo "          from Sybase, not FreeTDS, please re-run configure with"
+	echo "          the --disable-freetds option."
+fi
