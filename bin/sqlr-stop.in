@@ -39,7 +39,7 @@ if ( test "$PS" = "ps\ aux" ); then
 else
 	ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
 
-	if ( test -z "$CYGWIN" )
+	if ( test -n "$CYGWIN" )
 	then
 
 		for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`

@@ -668,6 +668,7 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	if (fd==clientsockin) {
 
 		clientsock=clientsockin->accept();
+		clientsock->translateByteOrder();
 
 		// For inet clients, make sure that the ip address is
 		// not denied.  If the ip was denied, disconnect the

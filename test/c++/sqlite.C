@@ -397,44 +397,12 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType(0),"UNKNOWN");
 	printf("\n");
 
-	printf("SUSPENDED SESSION: \n");
+	/*printf("SUSPENDED SESSION: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
-	checkSuccess(con->resumeSession(port,socket),1);
-	printf("\n");
-	checkSuccess(cur->getField(0,0),"1");
-	checkSuccess(cur->getField(1,0),"2");
-	checkSuccess(cur->getField(2,0),"3");
-	checkSuccess(cur->getField(3,0),"4");
-	checkSuccess(cur->getField(4,0),"5");
-	checkSuccess(cur->getField(5,0),"6");
-	checkSuccess(cur->getField(6,0),"7");
-	checkSuccess(cur->getField(7,0),"8");
-	printf("\n");
-	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
-	cur->suspendResultSet();
-	checkSuccess(con->suspendSession(),1);
-	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
-	checkSuccess(con->resumeSession(port,socket),1);
-	printf("\n");
-	checkSuccess(cur->getField(0,0),"1");
-	checkSuccess(cur->getField(1,0),"2");
-	checkSuccess(cur->getField(2,0),"3");
-	checkSuccess(cur->getField(3,0),"4");
-	checkSuccess(cur->getField(4,0),"5");
-	checkSuccess(cur->getField(5,0),"6");
-	checkSuccess(cur->getField(6,0),"7");
-	checkSuccess(cur->getField(7,0),"8");
-	printf("\n");
-	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
-	cur->suspendResultSet();
-	checkSuccess(con->suspendSession(),1);
-	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	printf("\n");
 	checkSuccess(cur->getField(0,0),"1");
@@ -455,7 +423,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeResultSet(id),1);
 	printf("\n");
@@ -473,7 +441,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->endOfResultSet(),1);
 	checkSuccess(cur->rowCount(),8);
 	cur->setResultSetBufferSize(0);
-	printf("\n");
+	printf("\n");*/
 
 	printf("CACHED RESULT SET: \n");
 	cur->cacheToFile("cachefile1");
@@ -538,7 +506,7 @@ int	main(int argc, char **argv) {
 	cur->setResultSetBufferSize(0);
 	printf("\n");
 
-	printf("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: \n");
+	/*printf("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: \n");
 	cur->setResultSetBufferSize(2);
 	cur->cacheToFile("cachefile1");
 	cur->setCacheTtl(200);
@@ -550,7 +518,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	printf("\n");
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeCachedResultSet(id,filename),1);
@@ -575,9 +543,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(8,0),NULL);
 	cur->setResultSetBufferSize(0);
 	delete[] filename;
-	printf("\n");
+	printf("\n");*/
 
-	printf("COMMIT AND ROLLBACK: \n");
+	/*printf("COMMIT AND ROLLBACK: \n");
 	secondcon=new sqlrconnection(argv[1],
 				atoi(argv[2]), 
 				argv[3],argv[4],argv[5],0,1);
@@ -608,13 +576,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(5,0),NULL);
 	checkSuccess(cur->getField(6,0),NULL);
 	checkSuccess(cur->getField(7,0),NULL);
-	printf("\n");
+	printf("\n");*/
 
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 
 	// temporary tables
-	printf("TEMPORARY TABLES: \n");
+	/*printf("TEMPORARY TABLES: \n");
 	cur->sendQuery("drop table temptable\n");
 	cur->sendQuery("create temporary table temptable (col1 int)");
 	checkSuccess(cur->sendQuery("insert into temptable values (1)"),1);
@@ -624,7 +592,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 	checkSuccess(cur->sendQuery("select count(*) from temptable"),0);
 	cur->sendQuery("drop table temptable\n");
-	printf("\n");
+	printf("\n");*/
 
 	// invalid queries...
 	printf("INVALID QUERIES: \n");

@@ -566,7 +566,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_suspendResultSet(cur);
 	checkSuccessInt(sqlrcon_suspendSession(con),1);
 	port=sqlrcon_getConnectionPort(con);
-	socket=sqlrcon_getConnectionSocket(con);
+	socket=strdup(sqlrcon_getConnectionSocket(con));
 	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
 	printf("\n");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
@@ -582,7 +582,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_suspendResultSet(cur);
 	checkSuccessInt(sqlrcon_suspendSession(con),1);
 	port=sqlrcon_getConnectionPort(con);
-	socket=sqlrcon_getConnectionSocket(con);
+	socket=strdup(sqlrcon_getConnectionSocket(con));
 	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
 	printf("\n");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
@@ -598,7 +598,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_suspendResultSet(cur);
 	checkSuccessInt(sqlrcon_suspendSession(con),1);
 	port=sqlrcon_getConnectionPort(con);
-	socket=sqlrcon_getConnectionSocket(con);
+	socket=strdup(sqlrcon_getConnectionSocket(con));
 	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
 	printf("\n");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
@@ -619,7 +619,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_suspendResultSet(cur);
 	checkSuccessInt(sqlrcon_suspendSession(con),1);
 	port=sqlrcon_getConnectionPort(con);
-	socket=sqlrcon_getConnectionSocket(con);
+	socket=strdup(sqlrcon_getConnectionSocket(con));
 	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
 	checkSuccessInt(sqlrcur_resumeResultSet(cur,id),1);
 	printf("\n");
@@ -720,7 +720,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_suspendResultSet(cur);
 	checkSuccessInt(sqlrcon_suspendSession(con),1);
 	port=sqlrcon_getConnectionPort(con);
-	socket=sqlrcon_getConnectionSocket(con);
+	socket=strdup(sqlrcon_getConnectionSocket(con));
 	printf("\n");
 	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
 	checkSuccessInt(sqlrcur_resumeCachedResultSet(cur,id,filename),1);

@@ -45,6 +45,7 @@ class sqlitecursor : public sqlrcursor {
 
 		stringbuffer	*newquery;
 		char		**result;
+		char		**columnnames;
 		int		nrow;
 		int		ncolumn;
 

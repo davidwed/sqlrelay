@@ -93,6 +93,7 @@ bool sqliteconnection::rollback() {
 sqlitecursor::sqlitecursor(sqlrconnection *conn) : sqlrcursor(conn) {
 
 	result=NULL;
+	columnnames=NULL;
 	newquery=NULL;
 	nrow=0;
 	ncolumn=0;
@@ -111,11 +112,11 @@ bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
 	newquery=fakeInputBinds(query);
 
 	// execute the query
-	int	result=0;
+	int	success=0;
 #ifdef SQLITE_TRANSACTIONAL
 	for (;;) {
 
-		result=runQuery(newquery,query);
+		success=runQuery(newquery,query);
 
 		// If we get a SQLITE_SCHEMA return value, we should retry
 		// the query.
@@ -128,9 +129,9 @@ bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
 		// SQLITE_SCHEMA return value.
 		//
 		// For any other return values, jump out of the loop.
-		if (result==SQLITE_SCHEMA) {
+		if (success==SQLITE_SCHEMA) {
 			continue;
-		} else if (result==SQLITE_ERROR && sqliteconn->errmesg && 
+		} else if (success==SQLITE_ERROR && sqliteconn->errmesg && 
 			!strncmp(sqliteconn->errmesg,"no such table:",14)) {
 
 			cleanUpData(true,true);
@@ -141,7 +142,7 @@ bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
 							!=SQLITE_SCHEMA) {
 				cleanUpData(true,true);
 				newquery=fakeInputBinds(query);
-				result=runQuery(newquery,query);
+				success=runQuery(newquery,query);
 				break;
 			}
 		} else {
@@ -166,15 +167,22 @@ bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
 #endif
 		return false;
 	}
-	result=runQuery(newquery,query);
+	success=runQuery(newquery,query);
 #endif
 
 	checkForTempTable(query,length);
 
+	// cache off the columns so they can be returned later if the result
+	// set is suspended/resumed
+	columnnames=new char * [ncolumn];
+	for (int i=0; i<ncolumn; i++) {
+		columnnames[i]=strdup(result[i]);
+	}
+
 	// set the rowindex past the column names
 	rowindex=rowindex+ncolumn;
 
-	return (result==SQLITE_OK);
+	return (success==SQLITE_OK);
 }
 
 int sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
@@ -183,6 +191,15 @@ int sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
 	if (sqliteconn->errmesg) {
 		delete[] sqliteconn->errmesg;
 		sqliteconn->errmesg=NULL;
+	}
+
+	// clean up old column names
+	if (columnnames) {
+		for (int i=0; i<ncolumn; i++) {
+			delete[] columnnames[i];
+		}
+		delete[] columnnames;
+		columnnames=NULL;
 	}
 
 	// reset counters
@@ -228,7 +245,7 @@ void sqlitecursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
-	if (!result) {
+	if (!columnnames) {
 		return;
 	}
 
@@ -237,8 +254,8 @@ void sqlitecursor::returnColumnInfo() {
 	for (int i=0; i<ncolumn; i++) {
 
 		// column type and size are unknown in sqlite
-		conn->sendColumnDefinition(result[i],
-					strlen(result[i]),
+		conn->sendColumnDefinition(columnnames[i],
+					strlen(columnnames[i]),
 					UNKNOWN_DATATYPE,0,0,0,0,0,0,
 					0,0,0,0,0);
 	}

@@ -1,3 +1,6 @@
+cygwin
+	mysql connection crashes on function call
+
 need "using sqlrelay on windows doc"
 	installing packages
 	optional cygwin components
@@ -11,6 +14,9 @@ client connect timeout
 perl apis -> CPAN
 
 sqlite test segfaults after suspeneded session tests
+sqlite commit/rollback fails too
+sqlite temp tables fail
+all tests should strdup the result of getConnectionSocket?
 
 fix pythondb for python < 2.1
 

@@ -483,7 +483,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	printf("\n");
 	checkSuccess(cur->getField(0,0),"1");
@@ -499,7 +499,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	printf("\n");
 	checkSuccess(cur->getField(0,0),"1");
@@ -515,7 +515,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	printf("\n");
 	checkSuccess(cur->getField(0,0),"1");
@@ -536,7 +536,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeResultSet(id),1);
 	printf("\n");
@@ -633,7 +633,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	printf("\n");
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeCachedResultSet(id,filename),1);

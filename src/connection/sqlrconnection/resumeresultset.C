@@ -4,6 +4,7 @@
 #include <sqlrconnection.h>
 
 bool sqlrconnection::resumeResultSetCommand(sqlrcursor *cursor) {
+printf("resume result set\n");
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"resume result set");
 	#endif
