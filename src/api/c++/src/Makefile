@@ -4,9 +4,75 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c++/include -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES)
 
-SRCS = row.C sqlrclient.C
-NLOBJS = row.n.lo sqlrclient.n.lo
-PLOBJS = row.p.lo sqlrclient.p.lo
+SRCS = connection/constructor.C \
+	connection/destructor.C \
+	connection/ping.C \
+	connection/identify.C \
+	connection/endsession.C \
+	connection/suspendsession.C \
+	connection/resumesession.C \
+	connection/autocommit.C \
+	connection/commit.C \
+	connection/rollback.C \
+	connection/debug.C \
+	connection/error.C \
+	connection/getreconnect.C \
+	connection/getconnectionport.C \
+	connection/getconnectionsocket.C \
+	connection/authentication.C \
+	connection/getnewport.C \
+	connection/copyreferences.C \
+	connection/clearsessionflags.C \
+	connection/opensession.C \
+	connection/closeconnection.C \
+	cursor/row.C \
+	cursor/sqlrcursor.C
+NLOBJS = connection/constructor.n.lo \
+	connection/destructor.n.lo \
+	connection/ping.n.lo \
+	connection/identify.n.lo \
+	connection/endsession.n.lo \
+	connection/suspendsession.n.lo \
+	connection/resumesession.n.lo \
+	connection/autocommit.n.lo \
+	connection/commit.n.lo \
+	connection/rollback.n.lo \
+	connection/debug.n.lo \
+	connection/error.n.lo \
+	connection/getreconnect.n.lo \
+	connection/getconnectionport.n.lo \
+	connection/getconnectionsocket.n.lo \
+	connection/authentication.n.lo \
+	connection/getnewport.n.lo \
+	connection/copyreferences.n.lo \
+	connection/clearsessionflags.n.lo \
+	connection/opensession.n.lo \
+	connection/closeconnection.n.lo \
+	cursor/row.n.lo \
+	cursor/sqlrcursor.n.lo
+PLOBJS = connection/constructor.p.lo \
+	connection/destructor.p.lo \
+	connection/ping.p.lo \
+	connection/identify.p.lo \
+	connection/endsession.p.lo \
+	connection/suspendsession.p.lo \
+	connection/resumesession.p.lo \
+	connection/autocommit.p.lo \
+	connection/commit.p.lo \
+	connection/rollback.p.lo \
+	connection/debug.p.lo \
+	connection/error.p.lo \
+	connection/getreconnect.p.lo \
+	connection/getconnectionport.p.lo \
+	connection/getconnectionsocket.p.lo \
+	connection/authentication.p.lo \
+	connection/getnewport.p.lo \
+	connection/copyreferences.p.lo \
+	connection/clearsessionflags.p.lo \
+	connection/opensession.p.lo \
+	connection/closeconnection.p.lo \
+	cursor/row.p.lo \
+	cursor/sqlrcursor.p.lo
 
 .SUFFIXES: .n.lo .p.lo
 
@@ -22,6 +88,8 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) */*.lo
+	$(LIBTOOL) --mode=clean $(RM) */*.o
 
 rebuild: clean all
 
