@@ -128,6 +128,6 @@ __END__
 =head1 AUTHOR
 
     David Muse
-    dmuse@firstworks.com
+    david.muse@firstworks.com
 
 =cut

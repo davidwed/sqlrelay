@@ -552,7 +552,7 @@ rm -rf %{buildroot}
 %{_mandir}
 
 %changelog
-* Mon Feb 17 2003 David Muse <dmuse@firstworks.com>
+* Mon Feb 17 2003 David Muse <david.muse@firstworks.com>
 - removed the -u from useradd
 - uses init script and /etc/sysconfig/sqlrelay from the distribution
 - updated url's
