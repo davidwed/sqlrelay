@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.2 2005-01-19 06:09:49 mused Exp $
+// $Id: sqlrelay.php.in,v 1.1 2005-03-21 03:06:13 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -85,7 +85,7 @@ class DB_sqlrelay extends DB_common
 
     function connect($dsninfo, $persistent = false)
     {
-        if (!DB::assertExtension('sql_relay')) {
+        if (!@LOADEXTENSION@('sql_relay')) {
             return $this->raiseError(DB_ERROR_EXTENSION_NOT_FOUND);
         }
 
