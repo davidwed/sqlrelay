@@ -242,6 +242,14 @@ const char *mysqlcursor::getErrorMessage(bool *liveconnection) {
 		!charstring::compareIgnoringCase(err,
 				"mysql server has gone away")) {
 		*liveconnection=false;
+	} else if (!charstring::compare(err,"") ||
+		!charstring::compareIgnoringCase(err,
+				"Can't connect to local MySQL",28)) {
+		*liveconnection=false;
+	} else if (!charstring::compare(err,"") ||
+		!charstring::compareIgnoringCase(err,
+			"Lost connection to MySQL server during query")) {
+		*liveconnection=false;
 	}
 	return err;
 }
