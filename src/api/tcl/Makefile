@@ -53,9 +53,9 @@ libsqlrelay.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
-	$(abs_srcdir)/mkinstalldirs $(TCLLIBPATH)/sqlrelay
-	$(INSTALL) sqlrelay.so $(TCLLIBPATH)/sqlrelay
-	$(INSTALL) -m 644 pkgIndex.tcl $(TCLLIBPATH)/sqlrelay
+	$(abs_srcdir)/mkinstalldirs $(TCLLIBSPATH)/sqlrelay
+	$(INSTALL) sqlrelay.so $(TCLLIBSPATH)/sqlrelay
+	$(INSTALL) -m 644 pkgIndex.tcl $(TCLLIBSPATH)/sqlrelay
 
 uninstall:
-	$(RMTREE) $(TCLLIBPATH)/sqlrelay
+	$(RMTREE) $(TCLLIBSPATH)/sqlrelay

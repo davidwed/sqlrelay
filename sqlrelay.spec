@@ -31,8 +31,8 @@
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.33
-Release: fw1
+Version: 0.33.1
+Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
 Source0: %{name}-%{version}.tar.gz
@@ -320,7 +320,7 @@ Documentation for SQL Relay.
 
 %define tcldir		/usr/lib/tcl
 %define pythondir	%(echo -e "import sys\\nimport string\\nout=''\\nfor i in sys.path:\\n if len(i)>0:\\n  for j in range(0,len(i)):\\n   if j<len(i)-1:\\n    out=out+i[j]\\n   else:\\n    if i[j]!='/':\\n     out=out+i[j]\\n  break\\nprint out" | python)
-%define	zopedir		%{pythondir}/python/Products
+%define	zopedir		/opt/Zope/lib/python/Products
 %define	phpextdir	%(php-config --extension-dir)
 %define	perl_sitelib	%(eval "export `perl -V:sitelib`"; echo $sitelib)
 %define	perl_installman3dir	%(eval "export `perl -V:installman3dir`"; echo $installman3dir)
@@ -364,7 +364,9 @@ rm -rf %{buildroot}
 %makeinstall \
 	incdir=%{buildroot}%{_includedir} \
 	PYTHONDIR=%{buildroot}%{pythondir} \
+	ZOPEDIR=%{buildroot}%{zopedir} \
 	PHPEXTDIR=%{buildroot}%{phpextdir} \
+	TCLLIBSPATH=%{buildroot}%{tcldir} \
 	PREFIX=%{buildroot}%{_prefix} \
 	HAVE_RUBY="" \
 	initroot=%{buildroot}

@@ -1520,7 +1520,7 @@ then
 							then
 								break
 							fi
-							for k in "2.2" "2.3" "2.4"
+							for k in "2.2" "2.3" "2.4" "2.5" "2.6"
 							do
 								AC_CHECK_FILE("$i/$j-$k/lib/python/Products/__init__.py",HAVE_ZOPE="yes"; ZOPEDIR="$i/$j-$k/lib/python/Products")
 								if ( test -n "$ZOPEDIR" )

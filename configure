@@ -23668,7 +23668,7 @@ fi
 							then
 								break
 							fi
-							for k in "2.2" "2.3" "2.4"
+							for k in "2.2" "2.3" "2.4" "2.5" "2.6"
 							do
 								as_ac_File=`echo "ac_cv_file_"$i/$j-$k/lib/python/Products/__init__.py"" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for \"$i/$j-$k/lib/python/Products/__init__.py\"" >&5
@@ -27460,7 +27460,7 @@ RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
 
 
 
-SQLR_VERSION="0.34"
+SQLR_VERSION="0.33.1"
 
 
 cat >>confdefs.h <<_ACEOF
