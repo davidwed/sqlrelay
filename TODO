@@ -1,9 +1,3 @@
-libtool ends up using gcc instead of g++ to create libraries, consequently
-	-lstdc++ and -lgcc_s don't get linked in unless they're linked in
-	manually which causes other problems because it's difficult to know
-	which directory they're in.  This is wrong.  Use newer libtool?  Hack
-	on libtool after it's created?
-
 oldmysql test files for non-C++ api's
 
 db2 start/stop doesn't work for 7.2
