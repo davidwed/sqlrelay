@@ -538,9 +538,9 @@ rm -rf %{buildroot}
 %{!?_without_oracle:%defattr(-, root, root)}
 %{!?_without_oracle:%{_bindir}/sqlr-connection-oracle7*}
 
-%{!?_without_oracle8:%files oracle8}
-%{!?_without_oracle8:%defattr(-, root, root)}
-%{!?_without_oracle8:%{_bindir}/sqlr-connection-oracle8*}
+%{!?_without_oracle:%files oracle8}
+%{!?_without_oracle:%defattr(-, root, root)}
+%{!?_without_oracle:%{_bindir}/sqlr-connection-oracle8*}
 
 %{!?_without_postgresql:%files postgresql}
 %{!?_without_postgresql:%defattr(-, root, root)}
