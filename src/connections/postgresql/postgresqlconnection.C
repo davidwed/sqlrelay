@@ -136,10 +136,6 @@ void postgresqlconnection::logOut() {
 	}
 }
 
-bool postgresqlconnection::ping() {
-	return (PQstatus(pgconn)==CONNECTION_OK);
-}
-
 char *postgresqlconnection::identify() {
 	return "postgresql";
 }

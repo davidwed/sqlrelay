@@ -31,6 +31,8 @@
 	the default implementation of commit/rollback allocate a new cursor now
 	applied a reexecute bug patch from Tony Fleisher and Erik Hollensbe and
 		fixed a bug that it revealed
+	postgresql connection uses "select 1" for ping instead of calling
+		PQstatus (which doesn't actually check the connection status)
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

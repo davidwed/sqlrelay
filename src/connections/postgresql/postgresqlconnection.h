@@ -50,7 +50,6 @@ class postgresqlconnection : public sqlrconnection {
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		bool	ping();
 		char	*identify();
 
 		void	endSession();
