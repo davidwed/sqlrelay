@@ -12,13 +12,7 @@ clean:
 	$(RMTREE) */*/*/.pics
 	$(RMTREE) */*/*/*/.pics
 	$(RMTREE) */*/*/*/*/.pics
-	cd test/c; ./clean
-	cd test/c++; ./clean
-	cd test/java; ./clean
-	cd test/perl; ./clean
-	cd test/python; ./clean
-	cd test/ruby; ./clean
-	cd test/stress; ./clean
+	$(MAKE) -C test clean
 
 rebuild:
 	$(MAKE) -C src rebuild
@@ -62,6 +56,7 @@ unconfig: clean
 	$(RM) init/redhat/init.d/sqlrelay
 	$(RM) init/slackware/rc.d/rc.sqlrelay
 	$(RM) init/debian/init.d/sqlrelay
+	$(RM) test/test
 	$(RM) libtool
 
 distclean: unconfig
