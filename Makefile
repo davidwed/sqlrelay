@@ -56,9 +56,6 @@ unconfig: clean
 	$(RM) src/api/perl/SQLRCursor/SQLRCursor.pm
 	$(RM) src/api/perl/DBD/Makefile.PL
 	$(RM) src/api/perl/DBD/SQLRelay.pm
-	$(RM) sqlrelay.spec.in.in
-	$(RM) sqlrelay.spec.in
-	$(RM) sqlrelay.spec
 	$(RM) bin/sqlr-stop
 	$(RM) bin/sqlrclient-config
 	$(RM) bin/sqlrclientwrapper-config
@@ -69,24 +66,3 @@ unconfig: clean
 	$(RM) libtool
 
 distclean: unconfig
-
-rpm:
-ifneq ($(HAVE_PERL),)
-	$(MAKE) -C src/api/perl/SQLRConnection -f Makefile.master rpminfo
-endif
-ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C src/api/ruby -f Makefile.master rpminfo
-endif
-	./buildspec
-	rm rpminfo
-	chmod 666 sqlrelay.spec
-	cd ..; \
-	$(RM) $(RPM_BUILD_DIR)/SOURCES/sqlrelay-$(SQLR_VERSION).tar.gz; \
-	tar cf $(RPM_BUILD_DIR)/SOURCES/sqlrelay-$(SQLR_VERSION).tar sqlrelay-$(SQLR_VERSION); \
-	gzip $(RPM_BUILD_DIR)/SOURCES/sqlrelay-$(SQLR_VERSION).tar
-	rpm -ba sqlrelay.spec
-	mv $(RPM_BUILD_DIR)/SRPMS/sqlrelay-$(SQLR_VERSION)*.src.rpm packages/SRPMS
-	mv $(RPM_BUILD_DIR)/RPMS/*/sqlrelay*-$(SQLR_VERSION)*.rpm packages/RPMS
-	chmod 666 packages/RPMS/*
-	$(RMTREE) $(RPM_BUILD_DIR)/BUILD/sqlrelay-$(SQLR_VERSION)
-	$(RM) $(RPM_BUILD_DIR)/SOURCES/sqlrelay-$(SQLR_VERSION).tar.gz
