@@ -6,8 +6,8 @@ CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++
 LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 
-SRCS = connection/constructor.C \
-	connection/destructor.C \
+SRCS = connection/connectionctor.C \
+	connection/connectiondtor.C \
 	connection/copyreferences.C \
 	connection/ping.C \
 	connection/identify.C \
@@ -27,8 +27,8 @@ SRCS = connection/constructor.C \
 	connection/clearsessionflags.C \
 	connection/opensession.C \
 	connection/closeconnection.C \
-	cursor/constructor.C \
-	cursor/destructor.C \
+	cursor/cursorctor.C \
+	cursor/cursordtor.C \
 	cursor/copyreferences.C \
 	cursor/columns.C \
 	cursor/fields.C \
@@ -57,8 +57,8 @@ SRCS = connection/constructor.C \
 	cursor/skipandfetch.C \
 	cursor/abortresultset.C \
 	row/row.C
-LOBJS = connection/constructor.lo \
-	connection/destructor.lo \
+LOBJS = connection/connectionctor.lo \
+	connection/connectiondtor.lo \
 	connection/copyreferences.lo \
 	connection/ping.lo \
 	connection/identify.lo \
@@ -78,8 +78,8 @@ LOBJS = connection/constructor.lo \
 	connection/clearsessionflags.lo \
 	connection/opensession.lo \
 	connection/closeconnection.lo \
-	cursor/constructor.lo \
-	cursor/destructor.lo \
+	cursor/cursorctor.lo \
+	cursor/cursordtor.lo \
 	cursor/copyreferences.lo \
 	cursor/columns.lo \
 	cursor/fields.lo \
