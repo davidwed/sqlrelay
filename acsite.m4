@@ -424,6 +424,7 @@ AC_DEFUN([FW_CHECK_OSX],
 	if ( test "`uname -s`" = "Darwin" -a -r "INSTALL" )
 	then
 		PYTHONFRAMEWORK="-framework Python"
+		CPPFLAGS="$CPPFLAGS -Wno-long-double"
 	fi
 	AC_SUBST(PYTHONFRAMEWORK)
 ])
