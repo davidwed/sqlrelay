@@ -9,8 +9,8 @@
 #include <stdlib.h>
 
 #ifdef __GNUC__
-static	stringbuffer	*freetdsconnection::errorstring;
-static	int		freetdsconnection::deadconnection;
+stringbuffer	*freetdsconnection::errorstring;
+int		freetdsconnection::deadconnection;
 #endif
 
 freetdsconnection::freetdsconnection() {

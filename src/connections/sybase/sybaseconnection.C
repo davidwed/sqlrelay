@@ -13,8 +13,8 @@
 #include <unistd.h>
 
 #ifdef __GNUC__
-static	stringbuffer	*sybaseconnection::errorstring;
-static	int		sybaseconnection::deadconnection;
+stringbuffer	*sybaseconnection::errorstring;
+int		sybaseconnection::deadconnection;
 #endif
 
 

@@ -9184,7 +9184,7 @@ echo "***** threads ****************"
 PTHREADSLIB=""
 PTHREADSLIBPATH=""
 
-for i in "pthread" "pth" "c_r"
+for i in "pthread" "pth" "c_r" "gthreads"
 do
 	if ( test -n "$PTHREADSPATH" ); then
 		as_ac_File=`echo "ac_cv_file_$PTHREADSPATH/lib/lib$i.a" | $as_tr_sh`
@@ -14845,9 +14845,7 @@ fi
 	if ( test -n "$PERL" ); then
 		HAVE_PERL="yes"
 		PERLPREFIXCMD=`$PERL -V:prefix`
-echo $PERLPREFIXCMD
 		PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
-echo $PERLPREFIX
 	else
 		{ echo "$as_me:$LINENO: WARNING: \"The Perl API will not be built.\"" >&5
 echo "$as_me: WARNING: \"The Perl API will not be built.\"" >&2;}

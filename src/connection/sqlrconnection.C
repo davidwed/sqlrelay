@@ -11,8 +11,6 @@
 	#include <rudiments/logger.h>
 #endif
 
-#include <iomanip.h>
-
 #include <math.h>
 #include <sys/types.h>
 #include <sys/stat.h>

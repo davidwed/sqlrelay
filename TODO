@@ -1,6 +1,12 @@
 looks like if metric=1, scaling doesn't work
-postgresql test program compile fails on SCO
-can't find pthreads lib on SCO
+scaling/handoff=pass incompatibility
+investigate single-process listener, setting os-level backlog queue length
+	looks like max is 128 on linux 2.0
+	tcp_max_syn_backlog can set backlog length in linux 2.2
+	syn cookies - no max backlog
+	solaris: /usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
+postgresql test program compile fails on SCO _res defined in libsocket/libresolv
+postgresql temp table problem
 
 compatibility:
 	oracle 9.2
@@ -10,7 +16,6 @@ compatibility:
 	perl 5.8
 
 lots of documentation fixes:
-	db2 8.1 installation
 	sybase 12.5 installation (license manager stuff)
 	db2 7.1 startup directions are wrong;
 		you have to run db2start/db2shut as db2as
@@ -36,6 +41,7 @@ Compatibility:
 
 Documentation:
 	getting started docs for MS SQL Server
+	getting started docs for odbc
 	"how sqlrelay works" with diagrams and animations
 	example sqlrelay.conf's for different configurations
 	recommended settings for each db, scaling

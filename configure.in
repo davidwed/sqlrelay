@@ -425,7 +425,7 @@ echo "***** threads ****************"
 PTHREADSLIB=""
 PTHREADSLIBPATH=""
 
-for i in "pthread" "pth" "c_r"
+for i in "pthread" "pth" "c_r" "gthreads"
 do
 	if ( test -n "$PTHREADSPATH" ); then
 		AC_CHECK_FILE($PTHREADSPATH/lib/lib$i.a, PTHREADSLIB="-L$PTHREADSPATH/lib -l$i")
@@ -1624,9 +1624,7 @@ if ( test "$ENABLE_PERL" = "yes" ); then
 	if ( test -n "$PERL" ); then
 		HAVE_PERL="yes"
 		PERLPREFIXCMD=`$PERL -V:prefix`
-echo $PERLPREFIXCMD
 		PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
-echo $PERLPREFIX
 	else
 		AC_MSG_WARN("The Perl API will not be built.")
 	fi

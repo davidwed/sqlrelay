@@ -30,7 +30,7 @@
 #include <defines.h>
 
 class sqlrconnection : public daemonprocess, public listener, public debugfile {
-	friend sqlrcursor;
+	friend class sqlrcursor;
 	public:
 			sqlrconnection();
 		virtual	~sqlrconnection();

@@ -7,7 +7,6 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
 #include <sqlrconfigfile.h>
-#include <iomanip.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

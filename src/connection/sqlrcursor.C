@@ -5,7 +5,6 @@
 
 #include <sqlrconnection.h>
 
-#include <iomanip.h>
 #include <stdlib.h>
 
 #include <math.h>

@@ -7,8 +7,6 @@
 
 #include "../../src/common/datatypes.h"
 
-#include <iomanip.h>
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -340,7 +338,7 @@ int main(int argc, char **argv) {
 					// real here...
 				}
 			}
-			cout << ENDL;
+			printf("\n");
 		}
 		
 		isc_dsql_free_statement(NULL,&stmt,DSQL_drop);
