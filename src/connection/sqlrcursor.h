@@ -118,6 +118,7 @@ class sqlrcursor {
 		int	handleBinds();
 		void	performSubstitution(stringbuffer *buffer, int which);
 		void	abort();
+		char	*skipWhitespaceAndComments(const char *querybuffer);
 
 		char		querybuffer[MAXQUERYSIZE+1];
 		unsigned long	querylength;

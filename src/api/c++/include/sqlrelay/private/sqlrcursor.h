@@ -146,10 +146,10 @@
 		int		cachettl;
 		char		*cachedestname;
 		char		*cachedestindname;
-		int		cachedestfd;
-		int		cachedestindfd;
-		int		cachesourcefd;
-		int		cachesourceindfd;
+		file		*cachedest;
+		file		*cachedestind;
+		file		*cachesource;
+		file		*cachesourceind;
 
 		// error
 		char		*error;

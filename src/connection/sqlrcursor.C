@@ -327,20 +327,7 @@ void	sqlrcursor::performSubstitution(stringbuffer *buffer, int which) {
 int	sqlrcursor::queryIsNotSelect() {
 
 	// scan the query, bypassing whitespace and comments.
-	// look case insensitively for SELECT, return 0 if it's found,
-	// 1 if it's not
-	char	*ptr=querybuffer;
-	while (*ptr && 
-		(*ptr==' ' || *ptr=='\n' || *ptr=='	' || *ptr=='-')) {
-
-		// skip any comments
-		if (*ptr=='-') {
-			while (*ptr && *ptr!='\n') {
-				ptr++;
-			}
-		}
-		ptr++;
-	}
+	char	*ptr=skipWhitespaceAndComments(querybuffer);
 
 	// if the query is a select but not a select into then return false,
 	// otherwise return true
@@ -354,9 +341,19 @@ int	sqlrcursor::queryIsNotSelect() {
 int	sqlrcursor::queryIsCommitOrRollback() {
 
 	// scan the query, bypassing whitespace and comments.
-	// look case insensitively for SELECT, return 0 if it's found,
-	// 1 if it's not
-	char	*ptr=querybuffer;
+	char	*ptr=skipWhitespaceAndComments(querybuffer);
+
+	// if the query is a commit or rollback, return true
+	// otherwise return false
+	if (!strncasecmp(ptr,"commit",6) || !strncasecmp(ptr,"rollback",8)) {
+		return 1;
+	}
+	return 0;
+}
+
+char	*sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
+	// scan the query, bypassing whitespace and comments.
+	char	*ptr=(char *)querybuffer;
 	while (*ptr && 
 		(*ptr==' ' || *ptr=='\n' || *ptr=='	' || *ptr=='-')) {
 
@@ -368,13 +365,7 @@ int	sqlrcursor::queryIsCommitOrRollback() {
 		}
 		ptr++;
 	}
-
-	// if the query is a commit or rollback, return true
-	// otherwise return false
-	if (!strncasecmp(ptr,"commit",6) || !strncasecmp(ptr,"rollback",8)) {
-		return 1;
-	}
-	return 0;
+	return ptr;
 }
 
 void	sqlrcursor::cleanUpData() {

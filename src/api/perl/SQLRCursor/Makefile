@@ -10,7 +10,7 @@
 #
 #   MakeMaker Parameters:
 
-#	CC => q[g++]
+#	CC => q[c++]
 #	CCFLAGS => q[-pedantic -w -O2 -fPIC]
 #	INC => q[-I../../../.. -I../../../common -I../../c++/include -I/usr/local/firstworks/include]
 #	LD => q[ld]
@@ -32,7 +32,7 @@
 
 # They may have been overridden via Makefile.PL or on the command line
 AR = ar
-CC = g++
+CC = c++
 CCCDLFLAGS = -fPIC
 CCDLFLAGS = -rdynamic
 DLEXT = so
@@ -865,7 +865,7 @@ pm_to_blib: $(TO_INST_PM)
 #	BOOTDEP => q[]
 #	BSLOADLIBS => q[]
 #	C => [q[Av_CharPtrPtr.c], q[SQLRCursor.c]]
-#	CC => q[g++]
+#	CC => q[c++]
 #	CCCDLFLAGS => q[-fPIC]
 #	CCDLFLAGS => q[-rdynamic]
 #	CCFLAGS => q[-pedantic -w -O2 -fPIC]

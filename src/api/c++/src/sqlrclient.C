@@ -940,12 +940,12 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 	returnnulls=0;
 
 	// cache file
-	cachesourcefd=-1;
-	cachesourceindfd=-1;
+	cachesource=NULL;
+	cachesourceind=NULL;
 	cachedestname=NULL;
 	cachedestindname=NULL;
-	cachedestfd=-1;
-	cachedestindfd=-1;
+	cachedest=NULL;
+	cachedestind=NULL;
 	cacheon=0;
 
 	// options...
@@ -1136,23 +1136,27 @@ void	sqlrcursor::clearRows() {
 }
 
 void	sqlrcursor::clearCacheDest() {
-	if (cachedestfd>-1) {
-		close(cachedestfd);
-		close(cachedestindfd);
-		cachedestfd=-1;
-		cachedestindfd=-1;
+	if (cachedest) {
+		cachedest->close();
+		delete cachedest;
+		cachedest=NULL;
+		cachedestind->close();
+		delete cachedestind;
+		cachedestind=NULL;
 		cacheon=0;
 	}
 }
 
 void	sqlrcursor::clearCacheSource() {
-	if (cachesourcefd>-1) {
-		close(cachesourcefd);
-		cachesourcefd=-1;
+	if (cachesource) {
+		cachesource->close();
+		delete cachesource;
+		cachesource=NULL;
 	}
-	if (cachesourceindfd>-1) {
-		close(cachesourceindfd);
-		cachesourceindfd=-1;
+	if (cachesourceind) {
+		cachesourceind->close();
+		delete cachesourceind;
+		cachesourceind=NULL;
 	}
 }
 
@@ -1180,12 +1184,12 @@ int	sqlrcursor::fetchRowIntoBuffer(int row) {
 	// fetch more data from the connection
 	while (row>=(firstrowindex+rsbuffersize) && !endofresultset) {
 		if (sqlrc->connected || 
-				(cachesourcefd>-1 && cachesourceindfd>-1)) {
+				(cachesource && cachesourceind)) {
 			clearRows();
 
 			// if we're not fetching from a cached result set,
 			// tell the server to send one 
-			if (cachesourcefd==-1 && cachesourceindfd==-1) {
+			if (!cachesource && !cachesourceind) {
 				sqlrc->write((unsigned short)FETCH_RESULT_SET);
 				sqlrc->write(cursorid);
 			}
@@ -1324,7 +1328,7 @@ int	sqlrcursor::getLongest(const char *col) {
 
 void	sqlrcursor::cacheData() {
 
-	if (cachedestfd==-1) {
+	if (!cachedest) {
 		return;
 	}
 
@@ -1333,13 +1337,13 @@ void	sqlrcursor::cacheData() {
 	for (int i=0; i<rowbuffercount; i++) {
 
 		// get the current offset in the cache destination file
-		long	position=lseek(cachedestfd,0,SEEK_CUR);
+		long	position=cachedest->getCurrentPosition();
 
 		// seek to the right place in the index file and write the
 		// destination file offset
-		lseek(cachedestindfd,13+sizeof(long)+
-				((firstrowindex+i)*sizeof(long)),SEEK_SET);
-		write(cachedestindfd,(char *)&position,sizeof(long));
+		cachedestind->setPositionRelativeToBeginning(
+			13+sizeof(long)+((firstrowindex+i)*sizeof(long)));
+		cachedestind->write(position);
 
 		// write the row to the cache file
 		for (int j=0; j<colcount; j++) {
@@ -1349,18 +1353,14 @@ void	sqlrcursor::cacheData() {
 			if (field) {
 				type=NORMAL_DATA;
 				len=strlen(field);
-				write(cachedestfd,(void *)&type,
-							sizeof(unsigned short));
-				write(cachedestfd,(void *)&len,
-							sizeof(long));
+				cachedest->write(type);
+				cachedest->write(len);
 				if (len>0) {
-					write(cachedestfd,
-						(void *)field,strlen(field));
+					cachedest->write(field);
 				}
 			} else {
 				type=NULL_DATA;
-				write(cachedestfd,(void *)&type,
-							sizeof(unsigned short));
+				cachedest->write(type);
 			}
 		}
 	}
@@ -1635,18 +1635,15 @@ void	sqlrcursor::handleError() {
 
 	endofresultset=1;
 
-	if (resumed || cachedestfd==-1) {
+	if (resumed || !cachedest) {
 		return;
 	}
 
 	// write the number of returned rows, affected rows 
 	// and a zero to terminate the column descriptions
-	unsigned short	val=NO_ACTUAL_ROWS;
-	write(cachedestfd,(void *)&val,sizeof(unsigned short));
-	val=NO_AFFECTED_ROWS;
-	write(cachedestfd,(void *)&val,sizeof(unsigned short));
-	val=END_COLUMN_INFO;
-	write(cachedestfd,(void *)&val,sizeof(unsigned short));
+	cachedest->write((unsigned short)NO_ACTUAL_ROWS);
+	cachedest->write((unsigned short)NO_AFFECTED_ROWS);
+	cachedest->write((unsigned short)END_COLUMN_INFO);
 	finishCaching();
 }
 
@@ -1685,7 +1682,7 @@ void	sqlrcursor::fetchRows() {
 	}
 
 	// if we're reading from a cached result set, do nothing
-	if (cachesourcefd>-1 && cachesourceindfd>-1) {
+	if (cachesource && cachesourceind) {
 		return;
 	}
 
@@ -1696,7 +1693,7 @@ void	sqlrcursor::fetchRows() {
 int	sqlrcursor::skipRows(int rowtoget) {
 
 	// if we're reading from a cached result set we have to manually skip
-	if (cachesourcefd>-1 && cachesourceindfd>-1) {
+	if (cachesource && cachesourceind) {
 
 		// if rowtoget is -1 then don't skip,
 		// otherwise skip to the next block of rows
@@ -1707,26 +1704,23 @@ int	sqlrcursor::skipRows(int rowtoget) {
 		}
 
 		// get the row offset from the index
-		lseek(cachesourceindfd,
-			13+sizeof(long)+(rowcount*sizeof(long)),
-			SEEK_SET);
+		cachesourceind->setPositionRelativeToBeginning(
+				13+sizeof(long)+(rowcount*sizeof(long)));
 		long	rowoffset;
-		if (read(cachesourceindfd,&rowoffset,sizeof(long))!=
-								sizeof(long)) {
-
+		if (cachesourceind->read(&rowoffset)!=sizeof(long)) {
 			setError("The cache file index appears to be corrupt.");
 			return 0;
 		}
 
 		// skip to that offset in the cache file
-		lseek(cachesourcefd,rowoffset,SEEK_SET);
+		cachesource->setPositionRelativeToBeginning(rowoffset);
 		return 1;
 	}
 
 	// calculate how many rows to skip unless we're buffering the entire
 	// result set or caching the result set
 	unsigned long	skip=0;
-	if (rsbuffersize && cachedestfd==-1 && rowtoget>-1) {
+	if (rsbuffersize && !cachedest && rowtoget>-1) {
 		skip=(long)((rowtoget-(rowtoget%rsbuffersize))-rowcount); 
 		rowcount=rowcount+skip;
 	}
@@ -1838,7 +1832,7 @@ int	sqlrcursor::parseData() {
 			if (returnnulls) {
 				buffer=NULL;
 			} else {
-				buffer=rowstorage->malloc(1);
+				buffer=(char *)rowstorage->malloc(1);
 				buffer[0]=(char)NULL;
 			}
 			length=0;
@@ -1852,7 +1846,7 @@ int	sqlrcursor::parseData() {
 
 			// for non-long, non-NULL datatypes...
 			// get the field into a buffer
-			buffer=rowstorage->malloc(length+1);
+			buffer=(char *)rowstorage->malloc(length+1);
 			if (getString(buffer,length)!=length) {
 				return -1;
 			}
@@ -2113,46 +2107,44 @@ int	sqlrcursor::parseOutputBinds() {
 
 void	sqlrcursor::cacheNoError() {
 
-	if (resumed || cachedestfd==-1) {
+	if (resumed || !cachedest) {
 		return;
 	}
 
 	// write the number of returned rows
-	unsigned short	noerror=NO_ERROR;
-	write(cachedestfd,(char *)&noerror,sizeof(unsigned short));
+	cachedest->write((unsigned short)NO_ERROR);
 }
 
 void	sqlrcursor::cacheColumnInfo() {
 
-	if (resumed || cachedestfd==-1) {
+	if (resumed || !cachedest) {
 		return;
 	}
 
 	// write the number of returned rows
-	write(cachedestfd,(void *)&knowsactualrows,sizeof(unsigned short));
+	cachedest->write(knowsactualrows);
 	if (knowsactualrows==ACTUAL_ROWS) {
-		write(cachedestfd,(void *)&actualrows,sizeof(unsigned long));
+		cachedest->write(actualrows);
 	}
 
 	// write the number of affected rows
-	write(cachedestfd,(void *)&knowsaffectedrows,sizeof(unsigned short));
+	cachedest->write(knowsaffectedrows);
 	if (knowsaffectedrows==AFFECTED_ROWS) {
-		write(cachedestfd,(void *)&affectedrows,sizeof(unsigned long));
+		cachedest->write(affectedrows);
 	}
 
 	// write whether or not the column info is is cached
-	write(cachedestfd,(void *)&sentcolumninfo,sizeof(unsigned short));
+	cachedest->write(sentcolumninfo);
 
 	// write the column count
-	write(cachedestfd,(void *)&colcount,sizeof(unsigned long));
+	cachedest->write(colcount);
 
 	// write column descriptions to the cache file
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO) {
 
 		// write column type format
-		write(cachedestfd,(void *)&columntypeformat,
-					sizeof(unsigned short));
+		cachedest->write(columntypeformat);
 
 		// write the columns themselves
 		unsigned short	namelen;
@@ -2160,29 +2152,23 @@ void	sqlrcursor::cacheColumnInfo() {
 		for (int i=0; i<colcount; i++) {
 			whichcolumn=getColumn(i);
 			namelen=strlen(whichcolumn->name);
-			write(cachedestfd,(void *)&namelen,
-						sizeof(unsigned short));
-			write(cachedestfd,(void *)whichcolumn->name,namelen);
+			cachedest->write(namelen);
+			cachedest->write(whichcolumn->name,namelen);
 			if (columntypeformat==COLUMN_TYPE_IDS) {
-				write(cachedestfd,(void *)&whichcolumn->type,
-						sizeof(unsigned short));
+				cachedest->write(whichcolumn->type);
 			} else {
-				write(cachedestfd,
-					(void *)&whichcolumn->typestringlength,
-						sizeof(unsigned short));
-				write(cachedestfd,
-					(void *)&whichcolumn->typestring,
-					whichcolumn->typestringlength);
+				cachedest->write(whichcolumn->typestringlength);
+				cachedest->write(whichcolumn->typestring,
+						whichcolumn->typestringlength);
 			}
-			write(cachedestfd,(void *)&whichcolumn->length,
-						sizeof(unsigned long));
+			cachedest->write(whichcolumn->length);
 		}
 	}
 }
 
 void	sqlrcursor::cacheOutputBinds(int count) {
 
-	if (resumed || cachedestfd==-1) {
+	if (resumed || !cachedest) {
 		return;
 	}
 
@@ -2190,32 +2176,28 @@ void	sqlrcursor::cacheOutputBinds(int count) {
 	unsigned short	len;
 	for (int i=0; i<count; i++) {
 
-		write(cachedestfd,(void *)&outbindvars[i].type,
-						sizeof(unsigned short));
+		cachedest->write((unsigned short)outbindvars[i].type);
 
 		len=strlen(outbindvars[i].variable);
-		write(cachedestfd,(void *)&len,sizeof(unsigned short));
-		write(cachedestfd,(void *)outbindvars[i].variable,len);
+		cachedest->write(len);
+		cachedest->write(outbindvars[i].variable,len);
 
 		len=outbindvars[i].valuesize;
-		write(cachedestfd,(void *)&len,sizeof(unsigned short));
+		cachedest->write(len);
 		if (outbindvars[i].type==STRING_BIND) {
-			write(cachedestfd,(void *)&outbindvars[i].
-						value.stringval,len);
+			cachedest->write(outbindvars[i].value.stringval,len);
 		} else if (outbindvars[i].type!=NULL_BIND) {
-			write(cachedestfd,(void *)&outbindvars[i].
-						value.lobval,len);
+			cachedest->write(outbindvars[i].value.lobval,len);
 		}
 	}
 
 	// terminate the list of output binds
-	unsigned short	endbinds=END_BIND_VARS;
-	write(cachedestfd,(void *)&endbinds,sizeof(unsigned short));
+	cachedest->write((unsigned short)END_BIND_VARS);
 }
 
 void	sqlrcursor::suspendCaching() {
 
-	if (cachedestfd==-1) {
+	if (!cachedest) {
 		return ;
 	}
 
@@ -2432,7 +2414,7 @@ int	sqlrcursor::parseColumnInfo() {
 			currentcol=getColumn(i);
 	
 			// get the column name
-			currentcol->name=colstorage->malloc(length+1);
+			currentcol->name=(char *)colstorage->malloc(length+1);
 			if (getString(currentcol->name,length)!=length) {
 				return -1;
 			}
@@ -2556,7 +2538,7 @@ void	sqlrcursor::abortResultSet() {
 	}
 
 	if (sqlrc->connected || cached) {
-		if (cachedestfd>-1 && cachedestindfd>-1) {
+		if (cachedest && cachedestind) {
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("Getting the rest of the result set, since this is a cached result set.\n");
@@ -2567,7 +2549,7 @@ void	sqlrcursor::abortResultSet() {
 
 				// if we're not fetching from a cached result 
 				// set tell the server to send one 
-				if (cachesourcefd==-1 && cachesourceindfd==-1) {
+				if (!cachesource && !cachesourceind) {
 					sqlrc->write((unsigned short)
 							FETCH_RESULT_SET);
 					sqlrc->write(cursorid);
@@ -2616,21 +2598,21 @@ int	sqlrcursor::processResultSet(int rowtoget) {
 
 	// skip and fetch here if we're not reading from a cached result set
 	// this way, everything gets done in 1 round trip
-	if (cachesourcefd==-1) {
+	if (!cachesource) {
 		success=skipAndFetch(firstrowindex+rowtoget);
 	}
 
 	// get data back from the server
 	if (success>0 && (success=noError())>0 &&
-			((cachesourcefd>-1 && cachesourceindfd>-1) ||
-			((cachesourcefd==-1&& cachesourceindfd==-1)  && 
+			((cachesource && cachesourceind) ||
+			((!cachesource && !cachesourceind)  && 
 				(success=getCursorId()) && 
 				(success=getSuspended())>0)) &&
 			(success=parseColumnInfo())>0 && 
 			(success=parseOutputBinds())>0) {
 
 		// skip and fetch here if we're reading from a cached result set
-		if (cachesourcefd>-1) {
+		if (cachesource) {
 			success=skipAndFetch(firstrowindex+rowtoget);
 		}
 
@@ -2675,28 +2657,30 @@ void	sqlrcursor::startCaching() {
 
 	// create the cache file, truncate it unless we're 
 	// resuming a previous session
+	cachedest=new file();
+	cachedestind=new file();
 	if (!resumed) {
-		cachedestfd=open(cachedestname,O_RDWR|O_TRUNC|O_CREAT,
+		cachedest->open(cachedestname,O_RDWR|O_TRUNC|O_CREAT,
 					permissions::ownerReadWrite());
-		cachedestindfd=open(cachedestindname,O_RDWR|O_TRUNC|O_CREAT,
+		cachedestind->open(cachedestindname,O_RDWR|O_TRUNC|O_CREAT,
 					permissions::ownerReadWrite());
 	} else {
-		cachedestfd=open(cachedestname,O_RDWR|O_CREAT|O_APPEND);
-		cachedestindfd=open(cachedestindname,O_RDWR|O_CREAT|O_APPEND);
+		cachedest->open(cachedestname,O_RDWR|O_CREAT|O_APPEND);
+		cachedestind->open(cachedestindname,O_RDWR|O_CREAT|O_APPEND);
 	}
 
-	if (cachedestfd>-1 && cachedestindfd>-1) {
+	if (cachedest && cachedestind) {
 
 		if (!resumed) {
 
 			// write "magic" identifier to head of files
-			write(cachedestfd,"SQLRELAYCACHE",13);
-			write(cachedestindfd,"SQLRELAYCACHE",13);
+			cachedest->write("SQLRELAYCACHE",13);
+			cachedestind->write("SQLRELAYCACHE",13);
 			
 			// write ttl to files
 			long	expiration=time(NULL)+cachettl;
-			write(cachedestfd,(char *)&expiration,sizeof(long));
-			write(cachedestindfd,(char *)&expiration,sizeof(long));
+			cachedest->write(expiration);
+			cachedestind->write(expiration);
 		}
 
 	} else {
@@ -2723,8 +2707,7 @@ void	sqlrcursor::finishCaching() {
 	}
 
 	// terminate the result set
-	unsigned short	term=END_RESULT_SET;
-	write(cachedestfd,(char *)&term,sizeof(unsigned short));
+	cachedest->write((unsigned short)END_RESULT_SET);
 
 	// close the cache file and clean up
 	clearCacheDest();
@@ -2938,9 +2921,8 @@ int	sqlrcursor::getShort(unsigned short *integer) {
 
 	// if the result set is coming from a cache file, read from
 	// the file, if not, read from the server
-	if (cachesourcefd>-1 && cachesourceindfd>-1) {
-		return read(cachesourcefd,(void *)integer,
-					sizeof(unsigned short));
+	if (cachesource && cachesourceind) {
+		return cachesource->read(integer);
 	} else {
 		return sqlrc->read(integer);
 	}
@@ -2950,9 +2932,8 @@ int	sqlrcursor::getLong(unsigned long *integer) {
 
 	// if the result set is coming from a cache file, read from
 	// the file, if not, read from the server
-	if (cachesourcefd>-1 && cachesourceindfd>-1) {
-		return read(cachesourcefd,(void *)integer,
-					sizeof(unsigned long));
+	if (cachesource && cachesourceind) {
+		return cachesource->read(integer);
 	} else {
 		return sqlrc->read(integer);
 	}
@@ -2962,8 +2943,8 @@ int	sqlrcursor::getString(char *string, int size) {
 
 	// if the result set is coming from a cache file, read from
 	// the file, if not, read from the server
-	if (cachesourcefd>-1 && cachesourceindfd>-1) {
-		return read(cachesourcefd,(void *)string,size);
+	if (cachesource && cachesourceind) {
+		return cachesource->read(string,size);
 	} else {
 		return sqlrc->read(string,size);
 	}
@@ -3877,8 +3858,10 @@ int	sqlrcursor::openCachedResultSet(const char *filename) {
 	sprintf(indexfilename,"%s.ind",filename);
 
 	// open the file
-	if ((cachesourcefd=open(filename,O_RDWR|O_EXCL))>-1 &&
-		(cachesourceindfd=open(indexfilename,O_RDWR|O_EXCL))>-1) {
+	cachesource=new file();
+	cachesourceind=new file();
+	if ((cachesource->open(filename,O_RDWR|O_EXCL)) &&
+		(cachesourceind->open(indexfilename,O_RDWR|O_EXCL))) {
 
 		// don't need this anymore
 		delete[] indexfilename;

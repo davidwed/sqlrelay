@@ -5,6 +5,7 @@
 #include <rudiments/unixclientsocket.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/stringbuffer.h>
+#include <rudiments/file.h>
 
 #include <sqlrelay/private/sqlrdefines.h>
 

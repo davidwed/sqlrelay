@@ -1874,7 +1874,8 @@ int	sqlrconnection::getOutputBinds() {
 			// these aren't initialized to NULL's.  It's possible
 			// that just the first character needs to be NULL, but
 			// for now I'm just going to go ahead and use calloc
-			bv->value.stringval=bindpool->calloc(bv->valuesize+1);
+			bv->value.stringval=
+				(char *)bindpool->calloc(bv->valuesize+1);
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",4,"STRING");
 			#endif
@@ -2039,7 +2040,7 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 
 	// get the variable name
 	bv->variablesize=bindnamesize+1;
-	bv->variable=bindpool->malloc(bv->variablesize+2);
+	bv->variable=(char *)bindpool->malloc(bv->variablesize+2);
 	bv->variable[0]=bindVariablePrefix();
 	if (clientsock->read(bv->variable+1,bindnamesize)!=bindnamesize) {
 		#ifdef SERVER_DEBUG
@@ -2078,7 +2079,7 @@ void	sqlrconnection::getNullBind(bindvar *bv) {
 		debugPrint("connection",4,"NULL");
 	#endif
 
-	bv->value.stringval=bindpool->malloc(1);
+	bv->value.stringval=(char *)bindpool->malloc(1);
 	bv->value.stringval[0]=(char)NULL;
 	bv->valuesize=0;
 	bv->isnull=nullBindValue();
@@ -2116,7 +2117,7 @@ int	sqlrconnection::getStringBind(bindvar *bv) {
 	}
 
 	// allocate space to store the value
-	bv->value.stringval=bindpool->malloc(bv->valuesize+1);
+	bv->value.stringval=(char *)bindpool->malloc(bv->valuesize+1);
 
 	#ifdef SERVER_DEBUG
 		debugPrint("connection",4,"STRING");
@@ -2237,7 +2238,7 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 	}
 
 	// allocate space to store the value
-	bv->value.stringval=bindpool->malloc(bv->valuesize+1);
+	bv->value.stringval=(char *)bindpool->malloc(bv->valuesize+1);
 
 	// get the bind value
 	if (clientsock->read(bv->value.stringval,
