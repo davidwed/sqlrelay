@@ -3,6 +3,8 @@ top_builddir = ../../../..
 include ../../../../config.mk
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+
 
 SRCS = connection/constructor.C \
 	connection/destructor.C \
@@ -123,7 +125,7 @@ clean:
 rebuild: clean all
 
 libsqlrclient.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libdir)

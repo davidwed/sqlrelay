@@ -523,16 +523,19 @@ int	db2cursor::fetchRow() {
 		SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
 
 
+#if (DB2VERSION==8)
 		// An apparant bug in version 8.1 causes the SQL_ATTR_ROW_NUMBER
 		// to always be 1, running through the row status buffer appears
 		// to work.
-#if (DB2VERSION==8)
 		for (rownumber=0; rownumber<FETCH_AT_ONCE; rownumber++) {
 			if (rowstat[rownumber]!=SQL_SUCCESS && 
 				rowstat[rownumber]!=SQL_SUCCESS_WITH_INFO) {
 				break;
 			}
 		}
+
+		// FIXME: is this right?
+		rownumber=rownumber+totalrows;	// 20040225 by akaishi
 #else
 		SQLGetStmtAttr(stmt,SQL_ATTR_ROW_NUMBER,
 				(SQLPOINTER)&rownumber,0,NULL);

@@ -56,7 +56,7 @@ clean:
 rebuild: clean all
 
 libsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(RUBYDIR)/site-packages/SQLRelay $(RPATH) -module
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(RUBYDIR)/site-packages/SQLRelay $(RPATH) -module -no-undefined
 
 sqlrelay.so:
 	if ( test -r .libs/libsqlrelay.0.0.0 ); \

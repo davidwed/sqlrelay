@@ -554,45 +554,22 @@ then
 
 else
 
-	dnl if ( test -z "$MICROSOFT" )
-	dnl then
-
-		for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/pkg" "/usr/local/firstworks"
-		do
-			if ( test -n "$i" )
+	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/pkg" "/usr/local/firstworks"
+	do
+		if ( test -n "$i" )
+		then
+			RUDIMENTSCONFIG="$i/bin/rudiments-config"
+			if ( test -r "$RUDIMENTSCONFIG" )
 			then
-				RUDIMENTSCONFIG="$i/bin/rudiments-config"
-				if ( test -r "$RUDIMENTSCONFIG" )
-				then
-					RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
-					RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
-				fi
+				RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
+				RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
 			fi
-			if ( test -n "$RUDIMENTSLIBS" )
-			then
-				break
-			fi
-		done
-
-		dnl if ( test -z "$RUDIMENTSLIBS" )
-		dnl then
-			dnl FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[rudiments/daemonprocess.h],[rudiments],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC],[RUDIMENTSPATH])
-		dnl fi
-
-	dnl else
-
-		dnl for i in "$RUDIMENTSPATH" "/usr/local/firstworks"
-		dnl do
-			dnl if ( test -n "$i" )
-			dnl then
-				dnl FW_CHECK_HEADER_LIB([$i/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\"],[$i/lib/librudiments.dll],[RUDIMENTSLIBS=\"$i/lib/librudiments.dll\"])
-			dnl fi
-			dnl if ( test -n "$RUDIMENTSLIBS" )
-			dnl then
-				dnl break
-			dnl fi
-		dnl done
-	dnl fi
+		fi
+		if ( test -n "$RUDIMENTSLIBS" )
+		then
+			break
+		fi
+	done
 fi
 
 if ( test -z "$RUDIMENTSLIBS" )

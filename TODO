@@ -1,4 +1,73 @@
+check out the cursor race-condition patch
+
+check out the new db2 patch and see if it really works
+
+address Matthias Klose's concerns:
+--------------------------------------------------------------------------------
+Hi,
+
+again, I updated the Debian packages. some things:
+
+- my understanding of specifiying DESTDIR for the install target is,
+  that _all_ things are installed under this directory. Unfortunately
+  most of the modules stuff for other languages is not.
+
+- you cannot overwrite the install location of the Perl stuff
+
+- Each language module has a runtime path compiled in: the path of
+  it's installation. IMO this is nonsense. what should be searched in
+  this path?
+
+  I think we did talk about the build of loadable modules. I think
+  at least for python you should use the "python" way to build the
+  module (using distutils). I don't know the other languages good enough ...
+
+	Matthias
+
+PS: Attached the postprocessing I need to do for a "proper" DESTDIR
+installation. what I would like to do:
+
+	$(MAKE) DESTDIR=`pwd`/debian/tmp install
+
+instead of:
+
+        $(MAKE) \
+                DESTDIR=`pwd`/debian/tmp \
+                prefix=`pwd`/debian/tmp/usr/share \
+                exec_prefix=`pwd`/debian/tmp/usr \
+                includedir=`pwd`/debian/tmp/usr/include \
+                libdir=`pwd`/debian/tmp/usr/lib \
+                bindir=`pwd`/debian/tmp/usr/bin \
+                localstatedir=`pwd`/debian/tmp/var/cache \
+                mandir=`pwd`/debian/tmp/usr/share/man \
+                docdir=`pwd`/debian/tmp/usr/share/doc/sqlrelay/html \
+                sysconfdir=`pwd`/debian/tmp/etc/$(pkg) \
+                install
+
+        : # work around wrong perl installation locations
+        mkdir -p $(d)/usr/lib/perl5 $(d)/usr/share/perl5
+        eval $(shell perl -V:sitelib) \
+            mv $(d)/$$sitelib/DBD $(d)/usr/share/perl5
+        eval $(shell perl -V:sitearch) \
+            mv $(d)/$$sitearch/auto $(d)/usr/lib/perl5; \
+            mv $(d)/$$sitearch/Firstworks $(d)/usr/lib/perl5
+        : # if $(perlapi) and $(perldbdapi) are built we need
+        : # to clean up .packlist files
+        -find $(d)/usr/lib -type f -name .packlist | xargs rm -f
+
+        : # work around wrong ruby installation locations
+        mkdir -p $(d)/usr/lib/ruby
+        mv $(d)/`pwd`/$(d)/usr/share/local/lib/site_ruby/1.8 $(d)/usr/lib/ruby
+
+        : # work around wrong zope installation locations
+        mkdir -p $(d)/usr/lib/zope/lib/python/Products
+        mv $(d)/usr/lib/zope/lib/python/ZSQLRelayDA \
+                $(d)/usr/lib/zope/lib/python/Products/
+        rm -rf $(d)/usr/lib/zope/lib/python/Products/ZSQLRelayDA/SQLRelay
+--------------------------------------------------------------------------------
+
 cygwin:
+	requires rudiments without ssl/pcre support
 	perl api won't build
 
 when not using proxy credentials for user-change, oracle 8 client can't
@@ -16,6 +85,8 @@ interbase stored procedure/output bind tests fails at isc_dsql_prepare
 freetds-0.62/ct_param support
 
 VB wrapper
+
+ADODB driver
 
 stored procedures:
 	tests for mysql, sybase
@@ -208,7 +279,6 @@ backends:
 
 API's:
 	wrapper:
-		PHP ADODB
 		JDBC
 		ODBC
 		QT3

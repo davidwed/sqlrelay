@@ -52,7 +52,7 @@ clean:
 rebuild: clean all
 
 libsql_relay.la: sql_relay.C sql_relay.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -module
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -module -no-undefined
 
 sql_relay.so:
 	if ( test -r .libs/libsql_relay.0.0.0 ); \

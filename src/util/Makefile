@@ -3,6 +3,7 @@ top_builddir = ../..
 include ../../config.mk
 
 CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = cmdline.C debugfile.C tempdir.C sqlrconfigfile.C authenticator.C
 LOBJS = cmdline.lo debugfile.lo tempdir.lo sqlrconfigfile.lo authenticator.lo
@@ -23,7 +24,7 @@ clean:
 rebuild: clean all
 
 libsqlrutil.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libdir)

@@ -74,7 +74,7 @@ clean:
 rebuild: clean all
 
 libCursor.la: Cursor.xs Cursor.C Cursor.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ Cursor.lo $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Cursor $(RPATH) -module
+	$(LIBTOOL) --mode=link $(CXX) -o $@ Cursor.lo $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Cursor $(RPATH) -module -no-undefined
 
 Cursor.so:
 	if ( test -r .libs/libCursor.0.0.0 ); \

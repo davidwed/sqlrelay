@@ -54,7 +54,7 @@ rebuild: clean all
 	$(STRIPCOMMENTNOTE) $@
 
 libsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -module
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -module -no-undefined
 
 sqlrelay.so:
 	if ( test -r .libs/libsqlrelay.0.0.0 ); \

@@ -3,6 +3,7 @@ top_builddir = ../../../..
 include ../../../../config.mk
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(CUSERPATH),yes)
 	RPATH = -R $(libdir)
@@ -28,7 +29,7 @@ clean:
 rebuild: clean all
 
 libsqlrclientwrapper.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libdir)

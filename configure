@@ -22393,27 +22393,23 @@ then
 
 else
 
-
-		for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/pkg" "/usr/local/firstworks"
-		do
-			if ( test -n "$i" )
+	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/pkg" "/usr/local/firstworks"
+	do
+		if ( test -n "$i" )
+		then
+			RUDIMENTSCONFIG="$i/bin/rudiments-config"
+			if ( test -r "$RUDIMENTSCONFIG" )
 			then
-				RUDIMENTSCONFIG="$i/bin/rudiments-config"
-				if ( test -r "$RUDIMENTSCONFIG" )
-				then
-					RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
-					RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
-				fi
+				RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
+				RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
 			fi
-			if ( test -n "$RUDIMENTSLIBS" )
-			then
-				break
-			fi
-		done
-
-
-
-																																	fi
+		fi
+		if ( test -n "$RUDIMENTSLIBS" )
+		then
+			break
+		fi
+	done
+fi
 
 if ( test -z "$RUDIMENTSLIBS" )
 then
