@@ -220,7 +220,7 @@ int	sqlrsh::commandType(const char *command) {
 	// skip white space
 	char	*ptr=(char *)command;
 	while (*ptr==' ' || *ptr=='	' || *ptr=='\n') {
-		*ptr++;
+		ptr++;
 	}
 
 	// compare to known internal commands
@@ -250,7 +250,7 @@ void	sqlrsh::internalCommand(environment *env, const char *command) {
 	// skip white space
 	char	*ptr=(char *)command;
 	while (*ptr==' ' || *ptr=='	' || *ptr=='\n') {
-		*ptr++;
+		ptr++;
 	}
 
 	// compare to known internal commands
@@ -279,7 +279,7 @@ void	sqlrsh::internalCommand(environment *env, const char *command) {
 
 	// skip white space
 	while (*ptr==' ' || *ptr=='	' || *ptr=='\n') {
-		*ptr++;
+		ptr++;
 	}
 
 	// on or off?
