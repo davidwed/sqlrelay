@@ -17,6 +17,11 @@ function checkSuccess($value,$success) {
 	}
 }
 
+	$host=$_REQUEST["host"];
+	$port=$_REQUEST["port"];
+	$socket=$_REQUEST["socket"];
+	$user=$_REQUEST["user"];
+	$password=$_REQUEST["password"];
 
 	# instantiation
 	$con=sqlrcon_alloc($host,$port,$socket,$user,$password,0,1);

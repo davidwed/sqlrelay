@@ -1,9 +1,10 @@
 #!/bin/sh
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@exec_prefix@/java/com/firstworks/sqlrelay
-export CLASSPATH=$CLASSPATH:@exec_prefix@/java
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@prefix@/java/com/firstworks/sqlrelay
+export CLASSPATH=$CLASSPATH:./:@prefix@/java
 
 DB=$1
+API=$2
 
 if ( test "$DB" = "db2" )
 then
@@ -11,54 +12,67 @@ then
 	PHPARGS="host=localhost&port=8001&socket=&user=db2test&password=db2test"
 fi
 if ( test "$DB" = "freetds" )
+then
 	ARGS="localhost 8002 \"\" freetdstest freetdstest"
 	PHPARGS="host=localhost&port=8002&socket=&user=freetdstest&password=freetdstest"
 fi
 if ( test "$DB" = "interbase" )
+then
 	ARGS="localhost 8003 \"\" interbasetest interbasetest"
 	PHPARGS="host=localhost&port=8003&socket=&user=interbasetest&password=interbasetest"
 fi
 if ( test "$DB" = "lago" )
+then
 	ARGS="localhost 8004 \"\" lagotest lagotest"
 	PHPARGS="host=localhost&port=8004&socket=&user=lagotest&password=lagotest"
 fi
 if ( test "$DB" = "msql" )
+then
 	ARGS="localhost 8005 \"\" msqltest msqltest"
 	PHPARGS="host=localhost&port=8005&socket=&user=msqltest&password=msqltest"
 fi
 if ( test "$DB" = "mysql" )
+then
 	ARGS="localhost 8006 \"\" mysqltest mysqltest"
 	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
 fi
 if ( test "$DB" = "oldmysql" )
+then
 	ARGS="localhost 8006 \"\" mysqltest mysqltest"
 	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
 fi
 if ( test "$DB" = "oracle7" )
+then
 	ARGS="localhost 8008 \"\" oracle7test oracle7test"
 	PHPARGS="host=localhost&port=8008&socket=&user=oracle7test&password=oracle7test"
 fi
 if ( test "$DB" = "oracle8" )
+then
 	ARGS="localhost 8009 \"\" oracle8test oracle8test"
 	PHPARGS="host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
 fi
 if ( test "$DB" = "oracle8i" )
+then
 	ARGS="localhost 8009 \"\" oracle8test oracle8test"
 	PHPARGS="host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
 fi
 if ( test "$DB" = "postgresql6" )
+then
 	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
 	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
 fi
 if ( test "$DB" = "postgresql7" )
+then
 	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
 	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
 fi
 if ( test "$DB" = "sqlite" )
+then
 	ARGS="localhost 8011 \"\" sqlitetest sqlitetest"
 	PHPARGS="host=localhost&port=8011&socket=&user=sqlitetest&password=sqlitetest"
 fi
 if ( test "$DB" = "sybase" )
+then
 	ARGS="localhost 8012 \"\" sybasetest sybasetest"
 	PHPARGS="localhost 8012 \"\" sybasetest sybasetest"
 	PHPARGS="host=localhost&port=8012&socket=&user=sybasetest&password=sybasetest"
@@ -66,58 +80,86 @@ fi
 
 rm -f cachefile* sqlnet.log
 
-echo "C:"
-cd c
-./$DB $ARGS
-cd ..
-
-echo "C++:"
-cd c++
-./$DB $ARGS
-cd ..
-
-if ( test "@HAVE_JAVA@" = "yes" )
+if ( test "$API" = "c" -o -z "$API" )
 then
-	echo "Java:"
-	cd java
-	java $DB.class $ARGS
+	echo
+	echo "C:"
+	cd c
+	./$DB $ARGS
 	cd ..
 fi
 
-if ( test "@HAVE_PERL@" = "yes" )
+if ( test "$API" = "c++" -o -z "$API" )
 then
-	echo "Perl:"
-	cd perl
-	perl $DB.pl $ARGS
+	echo
+	echo "C++:"
+	cd c++
+	./$DB $ARGS
 	cd ..
 fi
 
-if ( test "@HAVE_PYTHON@" = "yes" )
+if ( test "$API" = "java" -o -z "$API" )
 then
-	echo "Python:"
-	cd python
-	python $DB.py $ARGS
-	cd ..
+	if ( test "@HAVE_JAVA@" = "yes" )
+	then
+		echo
+		echo "Java:"
+		cd java
+		java $DB $ARGS
+		cd ..
+	fi
 fi
 
-if ( test "@HAVE_RUBY@" = "yes" )
+if ( test "$API" = "perl" -o -z "$API" )
 then
-	echo "Ruby:"
-	cd ruby
-	ruby $DB.rb $ARGS
-	cd ..
+	if ( test "@HAVE_PERL@" = "yes" )
+	then
+		echo
+		echo "Perl:"
+		cd perl
+		perl $DB.pl $ARGS
+		cd ..
+	fi
 fi
 
-if ( test "@HAVE_PHP@" = "yes" )
+if ( test "$API" = "python" -o -z "$API" )
 then
-	echo "PHP:"
-	cd php
-	sudo /etc/rc.d/init.d/httpd start
-	sleep 1
-	chmod 755 $DB.php
-	sudo cp $DB /var/www/html
-	lynx -dump "http://localhost/$DB.php?$PHPARGS"
-	sudo /etc/rc.d/init.d/httpd stop
-	sudo rm -f /tmp/cachefile* sqlnet.log
-	cd ..
+	if ( test "@HAVE_PYTHON@" = "yes" )
+	then
+		echo
+		echo "Python:"
+		cd python
+		python $DB.py $ARGS
+		cd ..
+	fi
+fi
+
+if ( test "$API" = "ruby" -o -z "$API" )
+then
+	if ( test "@HAVE_RUBY@" = "yes" )
+	then
+		echo
+		echo "Ruby:"
+		cd ruby
+		ruby $DB.rb $ARGS
+		cd ..
+	fi
+fi
+
+if ( test "$API" = "php" -o -z "$API" )
+then
+	if ( test "@HAVE_PHP@" = "yes" )
+	then
+		echo
+		echo "PHP:"
+		cd php
+		sudo /etc/rc.d/init.d/httpd start
+		sleep 1
+		chmod 755 $DB.php
+		sudo cp $DB.php /var/www/html
+		lynx -dump "http://localhost/$DB.php?$PHPARGS"
+		sudo /etc/rc.d/init.d/httpd stop
+		sudo rm -f /tmp/cachefile* sqlnet.log
+		cd ..
+	fi
 fi
