@@ -203,13 +203,31 @@ boot/shutdown time.</p>
 
 <B><FONT color=#a62828>exit</FONT></B> <FONT color=#ff00ff>0</FONT>
 
-
-</PRE>
-</blockquote>
-
 <p>Install this script and run it with the "start" option to start up the
 database.  Running it with the "stop" option shuts the database down.  To
 access a database, it must be running.</p>
+
+<p>This script will start the Administration Server.  To get each instance to
+start at boot time, you need to run the following command as root for each
+instance:</p>
+
+<blockquote>
+db2iauto -on INSTANCE_NAME
+</blockquote>
+
+<p>Where INSTANCE_NAME is replaced by the username of the user associated with
+the instance you want to start at boot time.</p>
+
+<p>If you want to disable an instance from starting at boot time, you need to
+run the following command as root for each instance:</p>
+
+<blockquote>
+db2iauto -off INSTANCE_NAME
+</blockquote>
+
+
+</PRE>
+</blockquote>
 
 </body>
 
