@@ -1,22 +1,19 @@
 include ../config.mk
 
 all:
-	$(MAKE) -C c++ all
 	$(MAKE) -C c all
+	$(MAKE) -C c++ all
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java all
 endif
 
 clean:
-	$(MAKE) -C c++ clean
 	$(MAKE) -C c clean
-ifneq ($(HAVE_JAVA),)
+	$(MAKE) -C c++ clean
 	$(MAKE) -C java clean
-endif
+	$(MAKE) -C perl clean
+	$(MAKE) -C php clean
+	$(MAKE) -C python clean
+	$(MAKE) -C ruby clean
 
-rebuild:
-	$(MAKE) -C c++ rebuild
-	$(MAKE) -C c rebuild
-ifneq ($(HAVE_JAVA),)
-	$(MAKE) -C java rebuild
-endif
+rebuild: clean all

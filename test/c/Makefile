@@ -1,6 +1,7 @@
 include ../../config.mk
 
-LIBS=-L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lm -lefence
+CPPFLAGS = $(BASCPPFLAGS) -I$(incdir) $(RUDIMENTSINCLUDES)
+LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) -lm -lefence
 
 .SUFFIXES: .lo
 
@@ -10,19 +11,21 @@ LIBS=-L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -l
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) -f db2
-	$(LIBTOOL) --mode=clean $(RM) -f freetds
-	$(LIBTOOL) --mode=clean $(RM) -f interbase
-	$(LIBTOOL) --mode=clean $(RM) -f lago
-	$(LIBTOOL) --mode=clean $(RM) -f msql
-	$(LIBTOOL) --mode=clean $(RM) -f mysql
-	$(LIBTOOL) --mode=clean $(RM) -f oracle7
-	$(LIBTOOL) --mode=clean $(RM) -f oracle8
-	$(LIBTOOL) --mode=clean $(RM) -f oracle8i
-	$(LIBTOOL) --mode=clean $(RM) -f postgresql6
-	$(LIBTOOL) --mode=clean $(RM) -f postgresql7
-	$(LIBTOOL) --mode=clean $(RM) -f sqlite
-	$(LIBTOOL) --mode=clean $(RM) -f sybase
+	$(LIBTOOL) --mode=clean $(RM) db2
+	$(LIBTOOL) --mode=clean $(RM) freetds
+	$(LIBTOOL) --mode=clean $(RM) interbase
+	$(LIBTOOL) --mode=clean $(RM) lago
+	$(LIBTOOL) --mode=clean $(RM) msql
+	$(LIBTOOL) --mode=clean $(RM) mysql
+	$(LIBTOOL) --mode=clean $(RM) oracle7
+	$(LIBTOOL) --mode=clean $(RM) oracle8
+	$(LIBTOOL) --mode=clean $(RM) oracle8i
+	$(LIBTOOL) --mode=clean $(RM) postgresql6
+	$(LIBTOOL) --mode=clean $(RM) postgresql7
+	$(LIBTOOL) --mode=clean $(RM) sqlite
+	$(LIBTOOL) --mode=clean $(RM) sybase
+	$(LIBTOOL) --mode=clean $(RM) cachefile*
+	$(LIBTOOL) --mode=clean $(RM) sqlnet.log
 
 all:
 ifneq ($(strip $(DB2LIBS)),)

@@ -1,0 +1,116 @@
+#!/bin/sh
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@javadir@/com/firstworks/sqlrelay
+export CLASSPATH=$CLASSPATH:@javadir@
+
+DB=$1
+
+if ( test "$DB" = "db2" )
+then
+	ARGS="localhost 8001 \"\" db2test db2test"
+	PHPARGS="host=localhost&port=8001&socket=&user=db2test&password=db2test"
+fi
+if ( test "$DB" = "freetds" )
+	ARGS="localhost 8002 \"\" freetdstest freetdstest"
+	PHPARGS="host=localhost&port=8002&socket=&user=freetdstest&password=freetdstest"
+fi
+if ( test "$DB" = "interbase" )
+	ARGS="localhost 8003 \"\" interbasetest interbasetest"
+	PHPARGS="host=localhost&port=8003&socket=&user=interbasetest&password=interbasetest"
+fi
+if ( test "$DB" = "lago" )
+	ARGS="localhost 8004 \"\" lagotest lagotest"
+	PHPARGS="host=localhost&port=8004&socket=&user=lagotest&password=lagotest"
+fi
+if ( test "$DB" = "msql" )
+	ARGS="localhost 8005 \"\" msqltest msqltest"
+	PHPARGS="host=localhost&port=8005&socket=&user=msqltest&password=msqltest"
+fi
+if ( test "$DB" = "mysql" )
+	ARGS="localhost 8006 \"\" mysqltest mysqltest"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
+fi
+if ( test "$DB" = "oldmysql" )
+	ARGS="localhost 8006 \"\" mysqltest mysqltest"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
+fi
+if ( test "$DB" = "oracle7" )
+	ARGS="localhost 8008 \"\" oracle7test oracle7test"
+	PHPARGS="host=localhost&port=8008&socket=&user=oracle7test&password=oracle7test"
+fi
+if ( test "$DB" = "oracle8" )
+	ARGS="localhost 8009 \"\" oracle8test oracle8test"
+	PHPARGS="host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
+fi
+if ( test "$DB" = "oracle8i" )
+	ARGS="localhost 8009 \"\" oracle8test oracle8test"
+	PHPARGS="host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
+fi
+if ( test "$DB" = "postgresql6" )
+	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
+	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+fi
+if ( test "$DB" = "postgresql7" )
+	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
+	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+fi
+if ( test "$DB" = "sqlite" )
+	ARGS="localhost 8011 \"\" sqlitetest sqlitetest"
+	PHPARGS="host=localhost&port=8011&socket=&user=sqlitetest&password=sqlitetest"
+fi
+if ( test "$DB" = "sybase" )
+	ARGS="localhost 8012 \"\" sybasetest sybasetest"
+	PHPARGS="localhost 8012 \"\" sybasetest sybasetest"
+	PHPARGS="host=localhost&port=8012&socket=&user=sybasetest&password=sybasetest"
+fi
+
+rm -f cachefile* sqlnet.log
+
+cd c
+./$DB $ARGS
+cd ..
+
+cd c++
+./$DB $ARGS
+cd ..
+
+if ( test "@HAVE_JAVA@" = "yes" )
+then
+	cd java
+	java $DB.class $ARGS
+	cd ..
+fi
+
+if ( test "@HAVE_PERL@" = "yes" )
+then
+	cd perl
+	perl $DB.pl $ARGS
+	cd ..
+fi
+
+if ( test "@HAVE_PYTHON@" = "yes" )
+then
+	cd python
+	python $DB.py $ARGS
+	cd ..
+fi
+
+if ( test "@HAVE_RUBY@" = "yes" )
+then
+	cd ruby
+	ruby $DB.rb $ARGS
+	cd ..
+fi
+
+if ( test "@HAVE_PHP@" = "yes" )
+then
+	cd php
+	sudo /etc/rc.d/init.d/httpd start
+	sleep 1
+	chmod 755 $DB.php
+	sudo cp $DB /var/www/html
+	lynx -dump "http://localhost/$DB.php?$PHPARGS"
+	sudo /etc/rc.d/init.d/httpd stop
+	sudo rm -f /tmp/cachefile* sqlnet.log
+	cd ..
+fi

@@ -2,80 +2,82 @@ include ../../config.mk
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.class
+	$(LIBTOOL) --mode=clean $(RM) cachefile*
+	$(LIBTOOL) --mode=clean $(RM) sqlnet.log
 
 all:
 ifneq ($(strip $(DB2LIBS)),)
-	$(MAKE) db2
+	$(MAKE) db2.class
 endif
 ifneq ($(strip $(FREETDSLIBS)),)
-	$(MAKE) freetds
+	$(MAKE) freetds.class
 endif
 ifneq ($(strip $(INTERBASELIBS)),)
-	$(MAKE) interbase
+	$(MAKE) interbase.class
 endif
 ifneq ($(strip $(LAGOLIBS)),)
-	$(MAKE) lago
+	$(MAKE) lago.class
 endif
 ifneq ($(strip $(MSQLLIBS)),)
-	$(MAKE) msql
+	$(MAKE) msql.class
 endif
 ifneq ($(strip $(MYSQLLIBS)),)
-	$(MAKE) mysql
+	$(MAKE) mysql.class
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) oracle7
-	$(MAKE) oracle8
-	$(MAKE) oracle8i
+	$(MAKE) oracle7.class
+	$(MAKE) oracle8.class
+	$(MAKE) oracle8i.class
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
-	$(MAKE) postgresql6
-	$(MAKE) postgresql7
+	$(MAKE) postgresql6.class
+	$(MAKE) postgresql7.class
 endif
 ifneq ($(strip $(SQLITELIBS)),)
-	$(MAKE) sqlite
+	$(MAKE) sqlite.class
 endif
 ifneq ($(strip $(SYBASELIBS)),)
-	$(MAKE) sybase
+	$(MAKE) sybase.class
 endif
 
 db2.class: db2.java
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java db2.java
+	javac -classpath $$CLASSPATH:$(javadir) db2.java
 
-freetds.class: freetds.c freetds.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java freetds.java
+freetds.class: freetds.java
+	javac -classpath $$CLASSPATH:$(javadir) freetds.java
 
-interbase.class: interbase.c interbase.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java interbase.java
+interbase.class: interbase.java
+	javac -classpath $$CLASSPATH:$(javadir) interbase.java
 
-lago.class: lago.c lago.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java lago.java
+lago.class: lago.java
+	javac -classpath $$CLASSPATH:$(javadir) lago.java
 
-msql.class: msql.c msql.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java msql.java
+msql.class: msql.java
+	javac -classpath $$CLASSPATH:$(javadir) msql.java
 
-mysql.class: mysql.c mysql.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java mysql.java
+mysql.class: mysql.java
+	javac -classpath $$CLASSPATH:$(javadir) mysql.java
 
-oracle7.class: oracle7.c oracle7.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java oracle7.java
+oracle7.class: oracle7.java
+	javac -classpath $$CLASSPATH:$(javadir) oracle7.java
 
-oracle8.class: oracle8.c oracle8.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java oracle8.java
+oracle8.class: oracle8.java
+	javac -classpath $$CLASSPATH:$(javadir) oracle8.java
 
-oracle8i.class: oracle8i.c oracle8i.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java oracle8i.java
+oracle8i.class: oracle8i.java
+	javac -classpath $$CLASSPATH:$(javadir) oracle8i.java
 
-postgresql6.class: postgresql6.c postgresql6.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java postgresql6.java
+postgresql6.class: postgresql6.java
+	javac -classpath $$CLASSPATH:$(javadir) postgresql6.java
 
-postgresql7.class: postgresql7.c postgresql7.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java postgresql7.java
+postgresql7.class: postgresql7.java
+	javac -classpath $$CLASSPATH:$(javadir) postgresql7.java
 
-sqlite.class: sqlite.c sqlite.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java sqlite.java
+sqlite.class: sqlite.java
+	javac -classpath $$CLASSPATH:$(javadir) sqlite.java
 
-sybase.class: sybase.c sybase.lo
-	javac -classpath $$CLASSPATH:/usr/local/firstworks/java sybase.java
+sybase.class: sybase.java
+	javac -classpath $$CLASSPATH:$(javadir) sybase.java
 
 
 rebuild.class: clean all
