@@ -645,6 +645,15 @@ int	sqlrconnection::openSession() {
 
 	// first, try for a unix connection
 	if (listenerunixport && listenerunixport[0]) {
+
+		if (debug) {
+			debugPreStart();
+			debugPrint("Unix socket: ");
+			debugPrint(listenerunixport);
+			debugPrint("\n");
+			debugPreEnd();
+		}
+
 		openresult=unixclientsocket::
 				connectToServer(listenerunixport,
 						retrytime,tries);
@@ -652,6 +661,17 @@ int	sqlrconnection::openSession() {
 
 	// then try for an inet connection
 	if (!openresult && listenerinetport) {
+
+		if (debug) {
+			debugPreStart();
+			debugPrint("Inet socket: ");
+			debugPrint(server);
+			debugPrint(":");
+			debugPrint((long)listenerinetport);
+			debugPrint("\n");
+			debugPreEnd();
+		}
+
 		openresult=inetclientsocket::
 				connectToServer(server,listenerinetport,
 						retrytime,tries);

@@ -93,6 +93,7 @@ int	main(int argc, const char **argv) {
 			printf(",");
 		}
 	}
+	printf("\n");
 
 	exit(0);
 }

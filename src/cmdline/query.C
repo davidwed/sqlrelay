@@ -107,7 +107,7 @@ int	main(int argc, const char **argv) {
 		while (cols && field) {
 			for (int j=0; j<cols; j++) {
 				if (field=sqlrcur.getField(i,j)) {
-					printf("\"%s\"");
+					printf("\"%s\"",field);
 					if (j<cols-1) {
 						printf(",");
 					} else {
