@@ -1,10 +1,11 @@
+libraries aren't getting .so extension for some reason
+
 login errors should be printed on the screen by sqlrconnection class, not by
 	individual connections
 seperate modules into standalone builds
 
 test finished-suspended-result-set's with db2/sybase
 
-sybase/freetds libct.so collisions during build and runtime
 sybase connection crashes no matter what
 
 freetds connection gets messed up after 1 test is run if the test fails

@@ -51,6 +51,10 @@
 	use a struct for data in shared memory segment now, should alleviate
 		alignment problems on sparc/ppc
 	all API's are linked against appropriate thread libs now
+	revamped oracle installation docs
+	oracle 8i/9i are linked only against -lclntsh and `cat sysliblist` now
+	added freetds/sybase libcs/ctpublic.h clash warnings
+	oracle, freetds, sybase use -rpath by default now
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

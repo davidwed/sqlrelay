@@ -28841,7 +28841,7 @@ then
 fi
 
 
-if ( test -r "$SYBASEPATH/lib/libct.a" )
+if ( test -r "$SYBASEPATH/lib/libct.so" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -28851,13 +28851,13 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "SYBASEINCLUDES=\"-I$SYBASEPATH/include\""
-		eval "SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
+		eval "SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
 	fi
 else
-	if ( test -n "$SYBASEPATH/lib/libct.so" -a -n "SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	if ( test -n "$SYBASEPATH/lib/libct.a" -a -n "SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
-if ( test -r "$SYBASEPATH/lib/libct.so" )
+if ( test -r "$SYBASEPATH/lib/libct.a" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -28865,7 +28865,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I$SYBASEPATH/include\""
-			eval "SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+			eval "SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
@@ -28882,7 +28882,7 @@ then
 fi
 
 
-if ( test -r "/usr/local/sybase/lib/libct.a" )
+if ( test -r "/usr/local/sybase/lib/libct.so" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -28892,13 +28892,13 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "SYBASEINCLUDES=\"-I/usr/local/sybase/include\""
-		eval "SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
+		eval "SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
 	fi
 else
-	if ( test -n "/usr/local/sybase/lib/libct.so" -a -n "SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	if ( test -n "/usr/local/sybase/lib/libct.a" -a -n "SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
-if ( test -r "/usr/local/sybase/lib/libct.so" )
+if ( test -r "/usr/local/sybase/lib/libct.a" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -28906,7 +28906,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/usr/local/sybase/include\""
-			eval "SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+			eval "SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
@@ -28922,7 +28922,7 @@ then
 fi
 
 
-if ( test -r "/opt/sybase/lib/libct.a" )
+if ( test -r "/opt/sybase/lib/libct.so" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -28932,13 +28932,13 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "SYBASEINCLUDES=\"-I/opt/sybase/include\""
-		eval "SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
+		eval "SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
 	fi
 else
-	if ( test -n "/opt/sybase/lib/libct.so" -a -n "SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	if ( test -n "/opt/sybase/lib/libct.a" -a -n "SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
-if ( test -r "/opt/sybase/lib/libct.so" )
+if ( test -r "/opt/sybase/lib/libct.a" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -28946,7 +28946,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/opt/sybase/include\""
-			eval "SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+			eval "SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
@@ -28962,7 +28962,7 @@ then
 fi
 
 
-if ( test -r "/opt/sybase-12.5/OCS-12_5/lib/libct.a" )
+if ( test -r "/opt/sybase-12.5/OCS-12_5/lib/libct.so" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -28972,13 +28972,13 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\""
-		eval "SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\""
+		eval "SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\""
 	fi
 else
-	if ( test -n "/opt/sybase-12.5/OCS-12_5/lib/libct.so" -a -n "SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"" )
+	if ( test -n "/opt/sybase-12.5/OCS-12_5/lib/libct.a" -a -n "SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
-if ( test -r "/opt/sybase-12.5/OCS-12_5/lib/libct.so" )
+if ( test -r "/opt/sybase-12.5/OCS-12_5/lib/libct.a" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -28986,7 +28986,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\""
-			eval "SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\""
+			eval "SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
@@ -29006,7 +29006,7 @@ then
 fi
 
 
-if ( test -r "/opt/sybase-$i/lib/libct.a" )
+if ( test -r "/opt/sybase-$i/lib/libct.so" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -29016,13 +29016,13 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "SYBASEINCLUDES=\"-I/opt/sybase-$i/include\""
-		eval "SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
+		eval "SYBASELIBSPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\""
 	fi
 else
-	if ( test -n "/opt/sybase-$i/lib/libct.so" -a -n "SYBASELIBSPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	if ( test -n "/opt/sybase-$i/lib/libct.a" -a -n "SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
-if ( test -r "/opt/sybase-$i/lib/libct.so" )
+if ( test -r "/opt/sybase-$i/lib/libct.a" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -29030,7 +29030,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/opt/sybase-$i/include\""
-			eval "SYBASELIBSPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+			eval "SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
