@@ -1,9 +1,10 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.1 2003-03-21 06:35:48 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.2 2003-03-26 04:24:52 mused Exp $
  */
 
+#include <strings.h>
 #include <tcl.h>
 #include <sqlrelay/sqlrclient.h>
 
@@ -11,7 +12,7 @@ extern "C" {
 
 /*
  * getCursorID --
- *    This procedure return tcl obj for sqlrcur command name.
+ *    This procedure return tcl obj contains sqlrcur command name.
  * Results:
  *    Tcl object.
  * Side effects:
@@ -48,6 +49,7 @@ void sqlrcurDelete(ClientData data) {
  * sqlrcurObjCmd --
  *   This procedure is invoked to process the "sqlrcur" object command.
  * Synopsis:
+ *   $cur eval query
  *   $cur setResultSetBufferSize ?rows?
  *   $cur getResultSetBufferSize
  *   $cur dontGetColumnInfo
@@ -61,25 +63,17 @@ void sqlrcurDelete(ClientData data) {
  *   $cur sendFileQuery path filename
  *   $cur prepareQuery query
  *   $cur prepareFileQuery path filename
- *   $cur subString variable value
- *   $cur subLong variable value
- *   $cur subDouble variable value precision scale
+ *   $cur substitution variable value
  *   $cur clearBinds
- *   $cur inputBindString variable value
- *   $cur inputBindLong variable value
- *   $cur inputBindDouble variable value precision scale
+ *   $cur inputBind
  *   $cur inputBindBlob variable value size
  *   $cur inputBindClob variable value size
  *   $cur defineOutputBind variable value
  *   $cur defineOutputBindBlob variable
  *   $cur defineOutputBindClob variable
  *   $cur defineOutputBindCursor variable
- *   $cur subStrings {{variable value} ...}
- *   $cur subLongs {{variable value} ...}
- *   $cur subDoubles {{variable value precision scale} ...}
- *   $cur inputBindStrings {{variable value} ...}
- *   $cur inputBindLongs {{variable value} ...}
- *   $cur inputBindDoubles {{variable value precision scale} ...}
+ *   $cur substitutions {{variable value} ...}
+ *   $cur inputBinds {{variable value ?precision scale?} ...}
  *   $cur validateBinds
  *   $cur executeQuery
  *   $cur fetchFromBindCursor
@@ -135,25 +129,17 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "sendFileQuery",
     "prepareQuery",
     "prepareFileQuery",
-    "subString",
-    "subLong",
-    "subDouble",
+    "substitution",
     "clearBinds",
-    "inputBindString",
-    "inputBindLong",
-    "inputBindDouble",
+    "inputBind",
     "inputBindBlob",
     "inputBindClob",
     "defineOutputBind",
     "defineOutputBindBlob",
     "defineOutputBindClob",
     "defineOutputBindCursor",
-    "subStrings",
-    "subLongs",
-    "subDoubles",
-    "inputBindStrings",
-    "inputBindLongs",
-    "inputBindDoubles",
+    "substitution",
+    "inputBinds",
     "validateBinds",
     "executeQuery",
     "fetchFromBindCursor",
@@ -168,10 +154,6 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "firstRowIndex",
     "endOfResultSet",
     "errorMessage",
-    /*
-    "getNullsAsEmptyStrings",
-    "getNullsAsNulls",
-    */
     "getFieldByIndex",
     "getFieldByName",
     "getFieldLengthByIndex",
@@ -207,25 +189,17 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_sendFileQuery,
     SQLRCUR_prepareQuery,
     SQLRCUR_prepareFileQuery,
-    SQLRCUR_subString,
-    SQLRCUR_subLong,
-    SQLRCUR_subDouble,
+    SQLRCUR_substitution,
     SQLRCUR_clearBinds,
-    SQLRCUR_inputBindString,
-    SQLRCUR_inputBindLong,
-    SQLRCUR_inputBindDouble,
+    SQLRCUR_inputBind,
     SQLRCUR_inputBindBlob,
     SQLRCUR_inputBindClob,
     SQLRCUR_defineOutputBind,
     SQLRCUR_defineOutputBindBlob,
     SQLRCUR_defineOutputBindClob,
     SQLRCUR_defineOutputBindCursor,
-    SQLRCUR_subStrings,
-    SQLRCUR_subLongs,
-    SQLRCUR_subDoubles,
-    SQLRCUR_inputBindStrings,
-    SQLRCUR_inputBindLongs,
-    SQLRCUR_inputBindDoubles,
+    SQLRCUR_substitutions,
+    SQLRCUR_inputBinds,
     SQLRCUR_validateBinds,
     SQLRCUR_executeQuery,
     SQLRCUR_fetchFromBindCursor,
@@ -240,10 +214,6 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_firstRowIndex,
     SQLRCUR_endOfResultSet,
     SQLRCUR_errorMessage,
-    /*
-    SQLRCUR_getNullsAsEmptyStrings,
-    SQLRCUR_getNullsAsNulls,
-    */
     SQLRCUR_getFieldByIndex,
     SQLRCUR_getFieldByName,
     SQLRCUR_getFieldLengthByIndex,
@@ -269,7 +239,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     return TCL_ERROR;
   }
 
-  if (Tcl_GetIndexFromObj(interp, objv[1], (char **)options, "option", 0,
+  if (Tcl_GetIndexFromObj(interp, objv[1], (CONST char **)options, "option", 0,
 			  (int *)&index) != TCL_OK) {
     return TCL_ERROR;
   }
@@ -354,44 +324,22 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_caseColumnNames:
       {
-	int mode;
-	static CONST char *subopts[] = {
-	  "mixed",
-	  "upper",
-	  "lower",
-	};
-	enum subopts {
-	  SQLRCURSUB_MIXED,
-	  SQLRCURSUB_UPPER,
-	  SQLRCURSUB_LOWER,
-	};
-
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "mixed|upper|lower");
 	  return TCL_ERROR;
-	}
-	if (Tcl_GetIndexFromObj(interp, objv[2], (char **)subopts, "option", 0,
-				(int *)&mode) != TCL_OK) {
-	  return TCL_ERROR;
-	}
-	switch ((enum subopts)mode)
-	  {
-	  case SQLRCURSUB_MIXED:
-	    {
-	      cur->mixedCaseColumnNames();
-	      break;
-	    }
-	  case SQLRCURSUB_UPPER:
-	    {
-	      cur->upperCaseColumnNames();
-	      break;
-	    }
-	  case SQLRCURSUB_LOWER:
-	    {
-	      cur->lowerCaseColumnNames();
-	      break;
-	    }
+	} else {
+	  char *subopts = Tcl_GetString(objv[2]);
+	  if (strncasecmp(subopts, "mixed", 5) == 0) {
+	    cur->mixedCaseColumnNames();
+	  } else if (strncasecmp(subopts, "upper", 5) == 0) {
+	    cur->upperCaseColumnNames();
+	  } else if (strncasecmp(subopts, "lower", 5) == 0) {
+	    cur->lowerCaseColumnNames();
+	  } else {
+	    Tcl_AppendResult(interp, "bad option \"", subopts, "\": must be mixed, upper, or lower", (char *)NULL);
+	    return TCL_ERROR;
 	  }
+	}
 	break;
       }
     case SQLRCUR_cacheToFile:
@@ -436,27 +384,31 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_sendQuery: 
       {
+	int result = 0;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp,2, objv, "query");
 	  return TCL_ERROR;
 	}
-	if (!cur->sendQuery(Tcl_GetString(objv[2]))) {
+	if (!(result = cur->sendQuery(Tcl_GetString(objv[2])))) {
 	  Tcl_AppendResult(interp,cur->errorMessage(),(char *)NULL);
 	  return TCL_ERROR;
 	}
+	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
 	break;
       }
     case SQLRCUR_sendFileQuery:
       {
+	int result = 0;
 	if (objc != 4) {
 	  Tcl_WrongNumArgs(interp,2, objv, "path filename");
 	  return TCL_ERROR;
 	}
-	if (!cur->sendFileQuery(Tcl_GetString(objv[2]),
-				   Tcl_GetString(objv[3]))) {
+	if (!(result = cur->sendFileQuery(Tcl_GetString(objv[2]),
+				   Tcl_GetString(objv[3])))) {
 	  Tcl_AppendResult(interp,cur->errorMessage(),(char *)NULL);
 	  return TCL_ERROR;
 	}
+	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
 	break;
       }
     case SQLRCUR_prepareQuery:
@@ -477,42 +429,29 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	cur->prepareFileQuery(Tcl_GetString(objv[2]), Tcl_GetString(objv[3]));
 	break;
       }
-    case SQLRCUR_subString:
+    case SQLRCUR_substitution:
       {
-	if (objc != 4) {
-	  Tcl_WrongNumArgs(interp,2, objv, "variable value");
+	if (objc == 6) {
+	  double value;
+	  int precision, scale;
+	  if (Tcl_GetDoubleFromObj(interp, objv[3], &value) != TCL_OK ||
+	      Tcl_GetIntFromObj(interp, objv[4], &precision) != TCL_OK ||
+	      Tcl_GetIntFromObj(interp, objv[5], &scale) != TCL_OK) {
+	    return TCL_ERROR;
+	  }
+	  cur->substitution(Tcl_GetString(objv[2]), value, precision, scale);
+	} else if (objc == 4) {
+	  long value;
+	  if (Tcl_GetLongFromObj(interp, objv[3], &value) == TCL_OK ||
+	      Tcl_GetIntFromObj(interp, objv[3], (int *)&value) == TCL_OK) {
+	    cur->substitution(Tcl_GetString(objv[2]), value);
+	  } else {
+	    cur->substitution(Tcl_GetString(objv[2]), Tcl_GetString(objv[3]));
+	  }
+	} else {
+	  Tcl_WrongNumArgs(interp, 2, objv, "variable value ?precision scale?");
 	  return TCL_ERROR;
 	}
-	cur->substitution(Tcl_GetString(objv[2]), Tcl_GetString(objv[3]));
-	break;
-      }
-    case SQLRCUR_subLong:
-      {
-	long value;
-	if (objc != 4) {
-	  Tcl_WrongNumArgs(interp,2, objv, "variable value");
-	  return TCL_ERROR;
-	}
-	if (Tcl_GetLongFromObj(interp, objv[3], &value) != TCL_OK) {
-	  return TCL_ERROR;
-	}
-	cur->substitution(Tcl_GetString(objv[2]), value);
-	break;
-      }
-    case SQLRCUR_subDouble:
-      {
-	double value;
-	int precision, scale;
-	if (objc != 6) {
-	  Tcl_WrongNumArgs(interp,2, objv, "variable value precision scale");
-	  return TCL_ERROR;
-	}
-	if (Tcl_GetDoubleFromObj(interp, objv[3], &value) != TCL_OK ||
-	    Tcl_GetIntFromObj(interp, objv[4], &precision) != TCL_OK ||
-	    Tcl_GetIntFromObj(interp, objv[5], &scale) != TCL_OK) {
-	  return TCL_ERROR;
-	}
-	cur->substitution(Tcl_GetString(objv[2]), value, precision, scale);
 	break;
       }
     case SQLRCUR_clearBinds:
@@ -524,42 +463,34 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	cur->clearBinds();
 	break;
       }
-    case SQLRCUR_inputBindString:
+    case SQLRCUR_inputBind:
       {
-	if (objc != 4) {
-	  Tcl_WrongNumArgs(interp,2, objv, "variable value");
+	if (objc == 6) {
+	  double value;
+	  int precision, scale;
+	  if (Tcl_GetDoubleFromObj(interp, objv[3], &value) != TCL_OK ||
+	      Tcl_GetIntFromObj(interp, objv[4], &precision) != TCL_OK ||
+	      Tcl_GetIntFromObj(interp, objv[5], &scale) != TCL_OK) {
+	    return TCL_ERROR;
+	  }
+	  cur->inputBind(Tcl_GetString(objv[2]),
+			 value,
+			 (unsigned short)precision,
+			 (unsigned short)scale);
+	} else if (objc == 4) {
+	  long value;
+	  if (Tcl_GetLongFromObj(interp, objv[3], &value) == TCL_OK ||
+	      Tcl_GetIntFromObj(interp, objv[3], (int *)&value) == TCL_OK) {
+	    /* value is long object */
+	    cur->inputBind(Tcl_GetString(objv[2]), value);
+	  } else {
+	    /* value is not long object, so it might be string one */
+	    cur->inputBind(Tcl_GetString(objv[2]), Tcl_GetString(objv[3]));
+	  } 
+	} else {
+	  Tcl_WrongNumArgs(interp, 2, objv, "variable value ?precision scale?");
 	  return TCL_ERROR;
 	}
-	cur->inputBind(Tcl_GetString(objv[2]), Tcl_GetString(objv[3]));
-	break;
-      }
-    case SQLRCUR_inputBindLong:
-      {
-	long value;
-	if (objc != 4) {
-	  Tcl_WrongNumArgs(interp,2, objv, "variable value");
-	  return TCL_ERROR;
-	}
-	if (Tcl_GetLongFromObj(interp, objv[3], &value) != TCL_OK) {
-	  return TCL_ERROR;
-	}
-	cur->inputBind(Tcl_GetString(objv[2]), value);
-	break;
-      }
-    case SQLRCUR_inputBindDouble:
-      {
-	double value;
-	int precision, scale;
-	if (objc != 6) {
-	  Tcl_WrongNumArgs(interp,2, objv, "variable value precision scale");
-	  return TCL_ERROR;
-	}
-	if (Tcl_GetDoubleFromObj(interp, objv[3], &value) != TCL_OK ||
-	    Tcl_GetIntFromObj(interp, objv[4], &precision) != TCL_OK ||
-	    Tcl_GetIntFromObj(interp, objv[5], &scale) != TCL_OK) {
-	  return TCL_ERROR;
-	}
-	cur->inputBind(Tcl_GetString(objv[2]), value, precision, scale);
 	break;
       }
     case SQLRCUR_inputBindBlob:
@@ -632,12 +563,12 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	cur->defineOutputBindCursor(Tcl_GetString(objv[2]));
 	break;
       }
-    case SQLRCUR_subStrings:
+    case SQLRCUR_substitutions:
       {
 	int num = 0, len = 0, i = 0;
-	Tcl_Obj **argList, *variable, *value;
+	Tcl_Obj **argList, *variableObj, *valueObj, *precisionObj, *scaleObj;
 	if (objc != 3) {
-	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value} ...}");
+	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value ?presition scale?}...}");
 	  return TCL_ERROR;
 	}
 	if (Tcl_ListObjGetElements(interp, objv[2], &num, &argList) != TCL_OK) {
@@ -646,26 +577,55 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	for (i = 0; i < num; i++) {
 	  if (Tcl_ListObjLength(interp, argList[i], &len) != TCL_OK) {
 	    return TCL_ERROR;
-	  } else if (len != 2) {
-	    Tcl_AppendResult(interp, Tcl_GetString(argList[i]),
-			     "should be \"{variable value}\"");
+	  } else if (len == 4) {
+	    double value;
+	    int precision, scale;
+	    if (Tcl_ListObjIndex(interp, argList[i], 0, 
+				 &variableObj) != TCL_OK ||
+		Tcl_ListObjIndex(interp, argList[i], 1,
+				 &valueObj) != TCL_OK ||
+		Tcl_ListObjIndex(interp, argList[i], 2,
+				 &precisionObj) != TCL_OK ||
+		Tcl_ListObjIndex(interp, argList[i], 3,
+				 &scaleObj) != TCL_OK ||
+		Tcl_GetDoubleFromObj(interp, valueObj,
+				     &value) != TCL_OK ||
+		Tcl_GetIntFromObj(interp, precisionObj,
+				  &precision) != TCL_OK ||
+		Tcl_GetIntFromObj(interp, scaleObj,
+				  &scale) != TCL_OK) {
+	      return TCL_ERROR;
+	    }
+	    cur->substitution(Tcl_GetString(variableObj),
+			      value, precision, scale);
+	  } else if (len == 2) {
+	    long value;
+	    if (Tcl_ListObjIndex(interp, argList[i], 0,
+				 &variableObj) != TCL_OK ||
+		Tcl_ListObjIndex(interp, argList[i], 1,
+				 &valueObj) != TCL_OK) {
+	      return TCL_ERROR;
+	    }
+	    if ( Tcl_GetLongFromObj(interp, valueObj, &value) == TCL_OK ||
+		 Tcl_GetIntFromObj(interp, valueObj, (int *)&value) == TCL_OK ) {
+	      cur->substitution(Tcl_GetString(variableObj), value);
+	    } else {
+	      cur->substitution(Tcl_GetString(variableObj),
+				Tcl_GetString(valueObj));
+	    }
+	  } else {
+	    Tcl_WrongNumArgs(interp, 2, objv, "{{variable value ?precision scale?} ...}");
 	    return TCL_ERROR;
 	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 0, &variable) != TCL_OK ||
-	      Tcl_ListObjIndex(interp, argList[i], 1, &value) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  cur->substitution(Tcl_GetString(variable), Tcl_GetString(value));
 	}
 	break;
       }
-    case SQLRCUR_subLongs:
+    case SQLRCUR_inputBinds:
       {
 	int num = 0, len = 0, i = 0;
-	Tcl_Obj **argList, *varObj, *valObj;
-	long value;
+	Tcl_Obj **argList, *variableObj, *valueObj, *precisionObj, *scaleObj;
 	if (objc != 3) {
-	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value} ...}");
+	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value ?presition scale?}...}");
 	  return TCL_ERROR;
 	}
 	if (Tcl_ListObjGetElements(interp, objv[2], &num, &argList) != TCL_OK) {
@@ -674,157 +634,46 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	for (i = 0; i < num; i++) {
 	  if (Tcl_ListObjLength(interp, argList[i], &len) != TCL_OK) {
 	    return TCL_ERROR;
-	  } else if (len != 2) {
-	    Tcl_AppendResult(interp, Tcl_GetString(argList[i]),
-			     "should be \"{variable value}\"");
+	  } else if (len == 4) {
+	    double value;
+	    int precision, scale;
+	    if (Tcl_ListObjIndex(interp, argList[i], 0, 
+				 &variableObj) != TCL_OK ||
+		Tcl_ListObjIndex(interp, argList[i], 1,
+				 &valueObj) != TCL_OK ||
+		Tcl_ListObjIndex(interp, argList[i], 2,
+				 &precisionObj) != TCL_OK ||
+		Tcl_ListObjIndex(interp, argList[i], 3,
+				 &scaleObj) != TCL_OK ||
+		Tcl_GetDoubleFromObj(interp, valueObj,
+				     &value) != TCL_OK ||
+		Tcl_GetIntFromObj(interp, precisionObj,
+				  &precision) != TCL_OK ||
+		Tcl_GetIntFromObj(interp, scaleObj,
+				  &scale) != TCL_OK) {
+	      return TCL_ERROR;
+	    }
+	    cur->inputBind(Tcl_GetString(variableObj),
+			   value, precision, scale);
+	  } else if (len == 2) {
+	    long value;
+	    if (Tcl_ListObjIndex(interp, argList[i], 0,
+				 &variableObj) != TCL_OK ||
+		Tcl_ListObjIndex(interp, argList[i], 1,
+				 &valueObj) != TCL_OK) {
+	      return TCL_ERROR;
+	    }
+	    if ( Tcl_GetLongFromObj(interp, valueObj, &value) == TCL_OK ||
+		 Tcl_GetIntFromObj(interp, valueObj, (int *)&value) == TCL_OK ) {
+	      cur->inputBind(Tcl_GetString(variableObj), value);
+	    } else {
+	      cur->inputBind(Tcl_GetString(variableObj),
+			     Tcl_GetString(valueObj));
+	    }
+	  } else {
+	    Tcl_WrongNumArgs(interp, 2, objv, "{{variable value ?precision scale?} ...}");
 	    return TCL_ERROR;
 	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 0, &varObj) != TCL_OK ||
-	      Tcl_ListObjIndex(interp, argList[i], 1, &valObj) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_GetLongFromObj(interp, valObj, &value) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  cur->substitution(Tcl_GetString(varObj), value);
-	}
-	break;
-      }
-    case SQLRCUR_subDoubles:
-      {
-	int num = 0, len = 0, i = 0;
-	Tcl_Obj **argList, *varObj, *valObj, *tmpObj;
-	double value;
-	unsigned short precision, scale;
-	if (objc != 3) {
-	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value precision scale} ...}");
-	  return TCL_ERROR;
-	}
-	if (Tcl_ListObjGetElements(interp, objv[2], &num, &argList) != TCL_OK) {
-	  return TCL_ERROR;
-	}
-	for (i = 0; i < num; i++) {
-	  if (Tcl_ListObjLength(interp, argList[i], &len) != TCL_OK) {
-	    return TCL_ERROR;
-	  } else if (len != 4) {
-	    Tcl_AppendResult(interp, Tcl_GetString(argList[i]),
-			     "should be \"{variable value precision scale}\"");
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 0, &varObj) != TCL_OK ||
-	      Tcl_ListObjIndex(interp, argList[i], 1, &valObj) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_GetDoubleFromObj(interp, valObj, &value) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 2, &tmpObj) != TCL_OK ||
-	      Tcl_GetIntFromObj(interp, tmpObj, (int *)&precision) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 3, &tmpObj) != TCL_OK ||
-	      Tcl_GetIntFromObj(interp, tmpObj, (int *)&scale) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  cur->substitution(Tcl_GetString(varObj), value, precision, scale);
-	}
-	break;
-      }
-    case SQLRCUR_inputBindStrings:
-      {
-	int num = 0, len = 0, i = 0;
-	Tcl_Obj **argList, *variable, *value;
-	if (objc != 3) {
-	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value} ...}");
-	  return TCL_ERROR;
-	}
-	if (Tcl_ListObjGetElements(interp, objv[2], &num, &argList) != TCL_OK) {
-	  return TCL_ERROR;
-	}
-	for (i = 0; i < num; i++) {
-	  if (Tcl_ListObjLength(interp, argList[i], &len) != TCL_OK) {
-	    return TCL_ERROR;
-	  } else if (len != 2) {
-	    Tcl_AppendResult(interp, Tcl_GetString(argList[i]),
-			     "should be \"{variable value}\"");
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 0, &variable) != TCL_OK ||
-	      Tcl_ListObjIndex(interp, argList[i], 1, &value) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  cur->inputBind(Tcl_GetString(variable), Tcl_GetString(value));
-	}
-	break;
-      }
-    case SQLRCUR_inputBindLongs:
-      {
-	int num = 0, len = 0, i = 0;
-	Tcl_Obj **argList, *varObj, *valObj;
-	long value;
-	if (objc != 3) {
-	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value} ...}");
-	  return TCL_ERROR;
-	}
-	if (Tcl_ListObjGetElements(interp, objv[2], &num, &argList) != TCL_OK) {
-	  return TCL_ERROR;
-	}
-	for (i = 0; i < num; i++) {
-	  if (Tcl_ListObjLength(interp, argList[i], &len) != TCL_OK) {
-	    return TCL_ERROR;
-	  } else if (len != 2) {
-	    Tcl_AppendResult(interp, Tcl_GetString(argList[i]),
-			     "should be \"{variable value}\"");
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 0, &varObj) != TCL_OK ||
-	      Tcl_ListObjIndex(interp, argList[i], 1, &valObj) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_GetLongFromObj(interp, valObj, &value) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  cur->inputBind(Tcl_GetString(varObj), value);
-	}
-	break;
-      }
-    case SQLRCUR_inputBindDoubles:
-      {
-	int num = 0, len = 0, i = 0;
-	Tcl_Obj **argList, *varObj, *valObj, *tmpObj;
-	double value;
-	unsigned short precision, scale;
-	if (objc != 3) {
-	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value precision scale} ...}");
-	  return TCL_ERROR;
-	}
-	if (Tcl_ListObjGetElements(interp, objv[2], &num, &argList) != TCL_OK) {
-	  return TCL_ERROR;
-	}
-	for (i = 0; i < num; i++) {
-	  if (Tcl_ListObjLength(interp, argList[i], &len) != TCL_OK) {
-	    return TCL_ERROR;
-	  } else if (len != 4) {
-	    Tcl_AppendResult(interp, Tcl_GetString(argList[i]),
-			     "should be \"{variable value precision scale}\"");
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 0, &varObj) != TCL_OK ||
-	      Tcl_ListObjIndex(interp, argList[i], 1, &valObj) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_GetDoubleFromObj(interp, valObj, &value) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 2, &tmpObj) != TCL_OK ||
-	      Tcl_GetIntFromObj(interp, tmpObj, (int *)&precision) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  if (Tcl_ListObjIndex(interp, argList[i], 3, &tmpObj) != TCL_OK ||
-	      Tcl_GetIntFromObj(interp, tmpObj, (int *)&scale) != TCL_OK) {
-	    return TCL_ERROR;
-	  }
-	  cur->inputBind(Tcl_GetString(varObj), value, precision, scale);
 	}
 	break;
       }
@@ -839,14 +688,16 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_executeQuery:
       {
+	int result = 0;
 	if (objc > 2) {
 	  Tcl_WrongNumArgs(interp, 2, objv, NULL);
 	  return TCL_ERROR;
 	}
-	if (!cur->executeQuery()) {
+	if (!(result = cur->executeQuery())) {
 	  Tcl_AppendResult(interp,cur->errorMessage(),(char *)NULL);
 	  return TCL_ERROR;
 	}
+	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
 	break;
       }
     case SQLRCUR_fetchFromBindCursor:
@@ -1379,7 +1230,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     return TCL_ERROR;
   }
 
-  if (Tcl_GetIndexFromObj(interp, objv[1], (char **)options, "option", 0,
+  if (Tcl_GetIndexFromObj(interp, objv[1], (CONST char **)options, "option", 0,
 			  (int *)&index) != TCL_OK) {
     return TCL_ERROR;
   }
@@ -1530,9 +1381,9 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
  * sqlrconCmd --
  *   the sqlrcon command itselfs.
  * Synopsis:
- *   set con [sqlrcon -server server -port port -user user -password password]
+ *   set con [sqlrcon -server server -port port -user user -password password ?-retrytime time -tries count?]
  * OR
- *   set con [sqlrcon -socket socket -user user -password password]
+ *   set con [sqlrcon -socket socket -user user -password password ?-retrytime time -tries count?]
  */
 int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
 		  int objc, Tcl_Obj *CONST objv[]) {
@@ -1571,7 +1422,10 @@ int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
   for (i = 1; objc > i; i += 2) {
     int index;
 
-    if (Tcl_GetIndexFromObj(interp, objv[i], (char **)optionStrings, "option", 0,
+    if (Tcl_GetIndexFromObj(interp, objv[i],
+			    (CONST char **)optionStrings,
+			    "option",
+			    0,
 			    (int *)&index) != TCL_OK) {
       return TCL_ERROR;
     }
@@ -1645,7 +1499,7 @@ int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
 
 DLLEXPORT int Sqlrelay_Init(Tcl_Interp *interp) {
 #ifdef USE_TCL_STUBS
-  Tcl_InitStubs(interp, "8.4", 0);
+  Tcl_InitStubs(interp, "8.2", 0);
 #endif
   Tcl_CreateObjCommand(interp, "sqlrcon", sqlrconCmd,
 		       (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);

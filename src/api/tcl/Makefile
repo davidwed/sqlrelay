@@ -1,12 +1,6 @@
 include ../../../config.mk
 
 INSTALL = $(abs_srcdir)/install-sh -c
-#--
-#TCLINCLUDES = -I/usr/local/include/tcl8.5
-#TCLLIBS = -L/usr/local/lib -ltcl85
-TCLINCLUDES =
-TCLLIBS = -ltcl8.3
-#--
 
 CXXFLAGS = -DHAVE_CONFIG $(BASECXXFLAGS) $(TCLINCLUDES) -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES) -fPIC
 LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(TCLLIBS) $(SSLLIB) $(CRYPTOLIB) $(LIBDMALLOC) $(LIBEFENCE)
@@ -43,3 +37,6 @@ install:
 	$(abs_srcdir)/mkinstalldirs /usr/local/lib/sqlrelay
 	$(INSTALL) sqlrelay.so /usr/local/lib/sqlrelay
 	$(INSTALL) -m 644 pkgIndex.tcl
+
+uninstall:
+	$(RMTREE) $(TCLLIBPATH)/sqlrelay
