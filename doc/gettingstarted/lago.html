@@ -89,6 +89,9 @@ and lago/querydef/qd_dump.cxx refer to variables named "not".  Some compilers
 don't like this.  If you get an errors in those files, change the variable to
 __not wherever it appears.</p>
 
+<p>If your build fails on newer FreeBSD systems (at least 5.1 or newer),
+comment out line 136 of common/contrib/getopt.h and run make again.</p>
+
 <p>Once the software is installed, log in as lago and run the following
 command.</p>
 
