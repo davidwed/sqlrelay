@@ -73,35 +73,44 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		int	getAuth();
 		void	incrementSessionCount();
 		bool	handOffClient();
-		void	getAConnection();
-		bool	findMatchingSocket();
-		bool	requestFixup();
+		void	getAConnection(unsigned long *connectionpid,
+					unsigned short *inetport,
+					char *unixportstr,
+					unsigned short *unixportstrlen);
+		bool	findMatchingSocket(unsigned long connectionpid,
+						unixsocket *connectionsock);
+		bool	requestFixup(unsigned long connectionpid,
+					unixsocket *connectionsock);
 		bool	connectionIsUp(const char *connectionid);
-		void	pingDatabase();
-		datatransport	*connectToConnection();
+		void	pingDatabase(unsigned long connectionpid,
+					const char *unixportstr,
+					unsigned short inetport);
+		datatransport	*connectToConnection(
+						unsigned long connectionpid,
+						const char *unixportstr,
+						unsigned short inetport);
 		void	disconnectFromConnection(datatransport *connsock);
-		bool	passClientFileDescriptorToConnection();
+		bool	passClientFileDescriptorToConnection(
+						unixsocket *connectionsock);
 		void	waitForClientClose(int authstatus, bool passstatus);
 
-		char		*pidfile;
-
-		int		passdescriptor;
+		bool		passdescriptor;
 
 		int		maxconnections;
-		int		dynamicscaling;
+		bool		dynamicscaling;
 
 		char		*unixport;
-		unsigned short	inetport;
+		char		*pidfile;
 
 		authenticator	*authc;
 
-		char		unixportstr[MAXPATHLEN+1];
-		unsigned short	unixportstrlen;
-
+		// FIXME: these shouldn't have to be pointers, right, but
+		// it appears that they do have to be or their destructors don't
+		// get called.
 		semaphoreset	*semset;
 		sharedmemory	*idmemory;
 
-		int		init;
+		bool		init;
 
 		unixserversocket	*clientsockun;
 		inetserversocket	*clientsockin;
@@ -109,17 +118,12 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		unixserversocket	*removehandoffsockun;
 		unixserversocket	*fixupsockun;
 		char			*fixupsockname;
-		unixsocket		fixupserversockun;
 		datatransport		*clientsock;
 
 		handoffsocketnode	**handoffsocklist;
-		datatransport		*availableconnectionsock;
-		unsigned long		*availableconnectionpid;
 
 		regularexpression	*allowed;
 		regularexpression	*denied;
-
-		unsigned long		connectionpid;
 
 		cmdline			*cmdl;
 };

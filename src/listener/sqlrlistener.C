@@ -28,17 +28,15 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 
 	cmdl=NULL;
 
-	init=0;
+	init=false;
+
+	authc=NULL;
 
 	semset=NULL;
 	idmemory=NULL;
 
-	pidfile=NULL;
-
-	authc=NULL;
-
-	inetport=0;
 	unixport=NULL;
+	pidfile=NULL;
 
 	clientsockin=NULL;
 	clientsockun=NULL;
@@ -54,6 +52,9 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 }
 
 sqlrlistener::~sqlrlistener() {
+printf("~sqlrlistener\n");
+	delete semset;
+	delete idmemory;
 	if (unixport) {
 		unlink(unixport);
 	}
@@ -66,12 +67,9 @@ sqlrlistener::~sqlrlistener() {
 	delete cmdl;
 }
 
-void	sqlrlistener::cleanUp() {
+void sqlrlistener::cleanUp() {
 
 	delete authc;
-	delete[] pidfile;
-	delete semset;
-	delete idmemory;
 	delete[] unixport;
 	delete clientsockun;
 	delete clientsockin;
@@ -96,9 +94,9 @@ void	sqlrlistener::cleanUp() {
 	#endif
 }
 
-bool	sqlrlistener::initListener(int argc, const char **argv) {
+bool sqlrlistener::initListener(int argc, const char **argv) {
 
-	init=1;
+	init=true;
 
 	cmdl=new cmdline(argc,argv);
 
@@ -156,7 +154,7 @@ bool	sqlrlistener::initListener(int argc, const char **argv) {
 	return true;
 }
 
-void	sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
+void sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
 
 	if (!runAsGroup(cfgfl->getRunAsGroup())) {
 		fprintf(stderr,"Warning: could not change group to %s\n",
@@ -169,7 +167,7 @@ void	sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
 	} 
 }
 
-bool	sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
+bool sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
 
 	// check/set pid file
 	pidfile=new char[tmpdir->getLength()+15+strlen(id)+1];
@@ -196,22 +194,16 @@ bool	sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
 	return true;
 }
 
-void	sqlrlistener::handleDynamicScaling(sqlrconfigfile *cfgfl) {
+void sqlrlistener::handleDynamicScaling(sqlrconfigfile *cfgfl) {
 
 	// get the dynamic connection scaling parameters
 	maxconnections=cfgfl->getMaxConnections();
 
 	// if dynamic scaling isn't going to be used, disable it
-	dynamicscaling=0;
-	if (cfgfl->getMaxQueueLength()>=0 &&
-			maxconnections>cfgfl->getConnections()>0 &&
-			cfgfl->getGrowBy()>0 &&
-			cfgfl->getTtl()>0) {
-		dynamicscaling=1;
-	}
+	dynamicscaling=cfgfl->getDynamicScaling();
 }
 
-void	sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
+void sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
 
 	// get handoff method
 	if (cfgfl->getPassDescriptor()) {
@@ -225,7 +217,7 @@ void	sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
 	}
 }
 
-void	sqlrlistener::setIpPermissions(sqlrconfigfile *cfgfl) {
+void sqlrlistener::setIpPermissions(sqlrconfigfile *cfgfl) {
 
 	// get denied and allowed ip's and compile the expressions
 	char	*deniedips=cfgfl->getDeniedIps();
@@ -238,7 +230,7 @@ void	sqlrlistener::setIpPermissions(sqlrconfigfile *cfgfl) {
 	}
 }
 
-bool	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
+bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 							const char *id) {
 
 	// initialize the ipc filename
@@ -277,13 +269,12 @@ bool	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	debugPrint("listener",1,"creating shared memory...");
 	#endif
 
-	idmemory=new sharedmemory();
+	idmemory=new sharedmemory;
 	if (!idmemory->create(key,sizeof(shmdata),
 					permissions::ownerReadWrite())) {
 		idmemory->attach(key);
 		shmError(id,idmemory->getId());
 		delete[] idfilename;
-		delete idmemory;
 		return false;
 	}
 
@@ -299,28 +290,26 @@ bool	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 		semset->attach(key,11);
 		semError(id,semset->getId());
 		delete[] idfilename;
-		delete idmemory;
-		delete semset;
 		return false;
 	}
 
 	return true;
 }
 
-void	sqlrlistener::ipcFileError(const char *idfilename) {
+void sqlrlistener::ipcFileError(const char *idfilename) {
 	fprintf(stderr,"Could not open: %s\n",idfilename);
 	fprintf(stderr,"Make sure that the file and directory are ");
 	fprintf(stderr,"readable and writable.\n\n");
 }
 
-void	sqlrlistener::ftokError(const char *idfilename) {
+void sqlrlistener::ftokError(const char *idfilename) {
 	fprintf(stderr,"\nsqlr-listener error:\n");
 	fprintf(stderr,"	Unable to generate a key from ");
 	fprintf(stderr,"%s\n",idfilename);
 	fprintf(stderr,"	Error was: %s\n\n",strerror(errno));
 }
 
-void	sqlrlistener::shmError(const char *id, int shmid) {
+void sqlrlistener::shmError(const char *id, int shmid) {
 	fprintf(stderr,"\nsqlr-listener error:\n");
 	fprintf(stderr,"	Unable to create a shared memory ");
 	fprintf(stderr,"segment.  This is usally because an \n");
@@ -336,7 +325,7 @@ void	sqlrlistener::shmError(const char *id, int shmid) {
 	fprintf(stderr,"	Error was: %s\n\n",strerror(errno));
 }
 
-void	sqlrlistener::semError(const char *id, int semid) {
+void sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr,"\nsqlr-listener error:\n");
 	fprintf(stderr,"	Unable to create a semaphore ");
 	fprintf(stderr,"set.  This is usally because an \n");
@@ -356,7 +345,7 @@ void	sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr,"	Error was: %s\n\n",strerror(errno));
 }
 
-bool	sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
+bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 
 	// get inet and unix ports to listen on
 	unsigned short	port=cfgfl->getPort();
@@ -414,7 +403,7 @@ bool	sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 	return listening;
 }
 
-bool	sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
+bool sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
 
 	// the handoff socket
 	char	*handoffsockname=new char[tmpdir->getLength()+1+strlen(id)+8+1];
@@ -437,7 +426,7 @@ bool	sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
 	return success;
 }
 
-bool	sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
+bool sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 							const char *id) {
 
 	// the deregistration socket
@@ -464,7 +453,7 @@ bool	sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 	return success;
 }
 
-bool	sqlrlistener::listenOnFixupSocket(tempdir *tmpdir, const char *id) {
+bool sqlrlistener::listenOnFixupSocket(tempdir *tmpdir, const char *id) {
 
 	// the fixup socket
 	fixupsockname=new char[tmpdir->getLength()+1+strlen(id)+6+1];
@@ -486,7 +475,7 @@ bool	sqlrlistener::listenOnFixupSocket(tempdir *tmpdir, const char *id) {
 	return success;
 }
 
-void	sqlrlistener::listen() {
+void sqlrlistener::listen() {
 	blockSignals();
 	for(;;) {
 		// FIXME: this can return true/false, should we do anything
@@ -495,7 +484,7 @@ void	sqlrlistener::listen() {
 	}
 }
 
-void	sqlrlistener::blockSignals() {
+void sqlrlistener::blockSignals() {
 
 	// the daemon class handles SIGTERM's and SIGINT's and SIGCHLDS
 	// so we're going to block all other signals 
@@ -629,7 +618,7 @@ void	sqlrlistener::blockSignals() {
 	signalmanager::ignoreSignals(set.getSignalSet());
 }
 
-int	sqlrlistener::waitForData() {
+int sqlrlistener::waitForData() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"waiting for client connection...");
@@ -653,7 +642,7 @@ int	sqlrlistener::waitForData() {
 	return fd;
 }
 
-bool	sqlrlistener::handleClientConnection(int fd) {
+bool sqlrlistener::handleClientConnection(int fd) {
 
 	// If something connected to the handoff or derigistration 
 	// socket, it must have been a connection.
@@ -730,7 +719,7 @@ bool	sqlrlistener::handleClientConnection(int fd) {
 }
 
 
-bool	sqlrlistener::registerHandoff(datatransport *sock) {
+bool sqlrlistener::registerHandoff(datatransport *sock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"registering handoff...");
@@ -766,7 +755,7 @@ bool	sqlrlistener::registerHandoff(datatransport *sock) {
 	return true;
 }
 
-bool	sqlrlistener::deRegisterHandoff(datatransport *sock) {
+bool sqlrlistener::deRegisterHandoff(datatransport *sock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"de-registering handoff...");
@@ -801,7 +790,7 @@ bool	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 	return true;
 }
 
-bool	sqlrlistener::fixup(datatransport *sock) {
+bool sqlrlistener::fixup(datatransport *sock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,
@@ -848,7 +837,7 @@ bool	sqlrlistener::fixup(datatransport *sock) {
 	return retval;
 }
 
-bool	sqlrlistener::deniedIp() {
+bool sqlrlistener::deniedIp() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"checking for valid ip...");
@@ -874,13 +863,13 @@ bool	sqlrlistener::deniedIp() {
 	return false;
 }
 
-void	sqlrlistener::disconnectClient() {
+void sqlrlistener::disconnectClient() {
 	clientsock->close();
 	delete clientsock;
 	clientsock=NULL;
 }
 
-void	sqlrlistener::forkChild() {
+void sqlrlistener::forkChild() {
 
 	// if the client connected to one of the non-handoff
 	// sockets, fork a child to handle it
@@ -916,7 +905,7 @@ void	sqlrlistener::forkChild() {
 	delete clientsock;
 }
 
-void	sqlrlistener::clientSession() {
+void sqlrlistener::clientSession() {
 
 	bool	passstatus=false;
 
@@ -945,7 +934,7 @@ void	sqlrlistener::clientSession() {
 	disconnectClient();
 }
 
-int	sqlrlistener::getAuth() {
+int sqlrlistener::getAuth() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"getting authentication...");
@@ -1004,7 +993,7 @@ int	sqlrlistener::getAuth() {
 	return 1;
 }
 
-void	sqlrlistener::incrementSessionCount() {
+void sqlrlistener::incrementSessionCount() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"incrementing session count...");
@@ -1040,9 +1029,14 @@ void	sqlrlistener::incrementSessionCount() {
 }
 
 
-bool	sqlrlistener::handOffClient() {
+bool sqlrlistener::handOffClient() {
 
-	getAConnection();
+	unsigned long	connectionpid;
+	unsigned short	inetport;
+	char 		unixportstr[MAXPATHLEN+1];
+	unsigned short	unixportstrlen;
+
+	getAConnection(&connectionpid,&inetport,unixportstr,&unixportstrlen);
 	clientsock->write((unsigned short)NO_ERROR);
 
 	// if we're passing file descriptors around,
@@ -1057,8 +1051,11 @@ bool	sqlrlistener::handOffClient() {
 		// connection and pass the client to the connection.  If any
 		// of this fails, we can still write to the client, send it an
 		// error message.
-		if (!findMatchingSocket() ||
-				!passClientFileDescriptorToConnection()) {
+		unixsocket	connectionsock;
+		if (!findMatchingSocket(connectionpid,&connectionsock) ||
+			!passClientFileDescriptorToConnection(
+							&connectionsock)) {
+
 			clientsock->write((unsigned short)ERROR);
 			clientsock->write((unsigned short)70);
 			clientsock->write("The listener failed to hand the client off to the database connection.");
@@ -1074,7 +1071,10 @@ bool	sqlrlistener::handOffClient() {
 	return true;
 }
 
-void	sqlrlistener::getAConnection() {
+void sqlrlistener::getAConnection(unsigned long *connectionpid,
+					unsigned short *inetport,
+					char *unixportstr,
+					unsigned short *unixportstrlen) {
 
 	for (;;) {
 
@@ -1102,7 +1102,7 @@ void	sqlrlistener::getAConnection() {
 			#endif
 
 			// get the pid
-			connectionpid=ptr->connectioninfo.connectionpid;
+			*connectionpid=ptr->connectioninfo.connectionpid;
 
 		} else {
 
@@ -1111,18 +1111,18 @@ void	sqlrlistener::getAConnection() {
 			#endif
 
 			// get the inet port
-			inetport=ptr->connectioninfo.sockets.inetport;
+			*inetport=ptr->connectioninfo.sockets.inetport;
 
 			// get the unix port
 			strncpy(unixportstr,
 				ptr->connectioninfo.sockets.unixsocket,
 				MAXPATHLEN);
-			unixportstrlen=strlen(unixportstr);
+			*unixportstrlen=strlen(unixportstr);
 
 			#ifdef SERVER_DEBUG
-			char	*debugstring=new char[15+unixportstrlen+21];
+			char	*debugstring=new char[15+*unixportstrlen+21];
 			sprintf(debugstring,"socket=%s  port=%d",
-						unixportstr,inetport);
+						unixportstr,*inetport);
 			debugPrint("listener",1,debugstring);
 			delete[] debugstring;
 			#endif
@@ -1143,7 +1143,7 @@ void	sqlrlistener::getAConnection() {
 		if (connectionIsUp(ptr->connectionid)) {
 			break;
 		} else {
-			pingDatabase();
+			pingDatabase(*connectionpid,unixportstr,*inetport);
 			semset->signal(10);
 		}
 
@@ -1154,7 +1154,7 @@ void	sqlrlistener::getAConnection() {
 	
 }
 
-bool	sqlrlistener::connectionIsUp(const char *connectionid) {
+bool sqlrlistener::connectionIsUp(const char *connectionid) {
 
 	// initialize the database up/down filename
 	char	*updown=new char[strlen(TMP_DIR)+1+strlen(cmdl->getId())+1+
@@ -1165,7 +1165,9 @@ bool	sqlrlistener::connectionIsUp(const char *connectionid) {
 	return retval;
 }
 
-void	sqlrlistener::pingDatabase() {
+void sqlrlistener::pingDatabase(unsigned long connectionpid,
+					const char *unixportstr,
+					unsigned short inetport) {
 
 	// fork off and cause the connection to ping the database, this should
 	// cause it to reconnect
@@ -1173,7 +1175,9 @@ void	sqlrlistener::pingDatabase() {
 	if (!(childpid=fork())) {
 
 		// connect to the database connection
-		datatransport	*connsock=connectToConnection();
+		datatransport	*connsock=connectToConnection(connectionpid,
+								unixportstr,
+								inetport);
 		if (connsock) {
 
 			// send it a ping command
@@ -1200,15 +1204,20 @@ void	sqlrlistener::pingDatabase() {
 	}
 }
 
-datatransport	*sqlrlistener::connectToConnection() {
+datatransport *sqlrlistener::connectToConnection(unsigned long connectionpid,
+						const char *unixportstr,
+						unsigned short inetport) {
 
 	if (passdescriptor) {
+
 		for (int i=0; i<maxconnections; i++) {
 			if (handoffsocklist[i]->pid==connectionpid) {
 				return handoffsocklist[i]->sock;
 			}
 		}
+
 	} else {
+
 		int connected=0;
 
 		// first, try for the unix port
@@ -1235,14 +1244,15 @@ datatransport	*sqlrlistener::connectToConnection() {
 	return NULL;
 }
 
-void	sqlrlistener::disconnectFromConnection(datatransport *connsock) {
+void sqlrlistener::disconnectFromConnection(datatransport *connsock) {
 	connsock->close();
 	if (!passdescriptor) {
 		delete connsock;
 	}
 }
 
-bool	sqlrlistener::passClientFileDescriptorToConnection() {
+bool sqlrlistener::passClientFileDescriptorToConnection(
+						unixsocket *connectionsock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",1,"passing descriptor...");
@@ -1251,7 +1261,7 @@ bool	sqlrlistener::passClientFileDescriptorToConnection() {
 	// pass the file descriptor of the connected client over to the
 	// available connection
 	bool	retval=false;
-	if (availableconnectionsock->passFileDescriptor(
+	if (connectionsock->passFileDescriptor(
 					clientsock->getFileDescriptor())) {
 
 		retval=true;
@@ -1275,14 +1285,15 @@ bool	sqlrlistener::passClientFileDescriptorToConnection() {
 		// FIXME: What if a client gets forked off and runs into the
 		// bad connection?  The bad connection is still in the parent
 		// process's list.
-		delete availableconnectionsock;
+		/*delete availableconnectionsock;
 		availableconnectionsock=NULL;
-		*availableconnectionpid=0;
+		*availableconnectionpid=0;*/
 	}
 	return retval;
 }
 
-bool	sqlrlistener::findMatchingSocket() {
+bool sqlrlistener::findMatchingSocket(unsigned long connectionpid,
+						unixsocket *connectionsock) {
 
 	// Look through the list of handoff sockets for the pid of the 
 	// connection that we got during the call to getAConnection().
@@ -1290,8 +1301,8 @@ bool	sqlrlistener::findMatchingSocket() {
 	// connection over the handoff socket associated with that node.
 	for (int i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i]->pid==connectionpid) {
-			availableconnectionsock=handoffsocklist[i]->sock;
-			availableconnectionpid=&handoffsocklist[i]->pid;
+			connectionsock->setFileDescriptor(handoffsocklist[i]->
+						sock->getFileDescriptor());
 			return true;
 		}
 	}
@@ -1299,10 +1310,11 @@ bool	sqlrlistener::findMatchingSocket() {
 	// if the available connection wasn't in our list then it must have
 	// fired up after we forked, so we'll need to connect back to the main
 	// listener process and ask it for the pid
-	return requestFixup();
+	return requestFixup(connectionpid,connectionsock);
 }
 
-bool	sqlrlistener::requestFixup() {
+bool sqlrlistener::requestFixup(unsigned long connectionpid,
+					unixsocket *connectionsock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,
@@ -1335,8 +1347,7 @@ bool	sqlrlistener::requestFixup() {
 		#endif
 		return false;
 	}
-	fixupserversockun.setFileDescriptor(fd);
-	availableconnectionsock=&fixupserversockun;
+	connectionsock->setFileDescriptor(fd);
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,
@@ -1345,7 +1356,7 @@ bool	sqlrlistener::requestFixup() {
 	return true;
 }
 
-void	sqlrlistener::waitForClientClose(int authstatus, bool passstatus) {
+void sqlrlistener::waitForClientClose(int authstatus, bool passstatus) {
 
 	// Sometimes the listener sends the ports and closes
 	// the socket while they are still buffered but not

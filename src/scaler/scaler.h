@@ -20,7 +20,7 @@ class scaler : public daemonprocess {
 	public:
 			scaler();
 			~scaler();
-		int	initScaler(int argc, const char **argv);
+		bool	initScaler(int argc, const char **argv);
 		void	loop();
 
 	private:
@@ -28,7 +28,7 @@ class scaler : public daemonprocess {
 
 		void	openMoreConnections();
 		void	getRandomConnectionId();
-		int	availableDatabase();
+		bool	availableDatabase();
 		int	countSessions();
 		int	countConnections();
 
@@ -40,7 +40,8 @@ class scaler : public daemonprocess {
 		char		*config;
 		char		*dbase;
 
-		int		connections;
+		sqlrconfigfile	*cfgfile;
+
 		int		maxconnections;
 		int		maxqueuelength;
 		int		growby;
@@ -52,16 +53,13 @@ class scaler : public daemonprocess {
 
 		sharedmemory	*idmemory;
 
-		sqlrconfigfile		*cfgfile;
-
 		linkedlist< connectstringcontainer * >	*connectstringlist;
 		char			*connectionid;
 		int			metrictotal;
 
-		randomnumber	*randnum;
 		int		currentseed;
 
-		int		init;
+		bool		init;
 
 		int		debug;
 };

@@ -25,7 +25,7 @@
 scaler::scaler() : daemonprocess() {
 
 	tmpdirlen=strlen(TMP_DIR);
-	init=0;
+	init=false;
 
 	pidfile=NULL;
 	semset=NULL;
@@ -45,9 +45,9 @@ scaler::~scaler() {
 	}
 }
 
-int	scaler::initScaler(int argc, const char **argv) {
+bool scaler::initScaler(int argc, const char **argv) {
 
-	init=1;
+	init=true;
 
 	// read the commandline
 	commandline	cmdl(argc,argv);
@@ -73,7 +73,7 @@ int	scaler::initScaler(int argc, const char **argv) {
 		fprintf(stderr,"	The sqlr-listener must be running ");
 		fprintf(stderr,"for the sqlr-scaler to start.\n\n");
 		delete[] listenerpidfile;
-		return 0;
+		return false;
 	}
 	delete[] listenerpidfile;
 
@@ -92,9 +92,8 @@ int	scaler::initScaler(int argc, const char **argv) {
 		fprintf(stderr,"the file and restart.\n");
 		delete[] pidfile;
 		pidfile=NULL;
-		return 0;
+		return false;
 	}
-	createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// check for debug
 	if (cmdl.found("-debug")) {
@@ -110,11 +109,13 @@ int	scaler::initScaler(int argc, const char **argv) {
 	strcpy(config,tmpconfig);
 
 	// parse the config file
-	cfgfile=new sqlrconfigfile();
-
-	
-	// parse the system-wide config file, then the user's personal file
+	cfgfile=new sqlrconfigfile;
 	if (cfgfile->parse(config,id)) {
+
+		// don't even start if we're not using dynamic scaling
+		if (!cfgfile->getDynamicScaling()) {
+			return false;
+		}
 
 		// run as user/group specified in the config file
 		char	*runasuser=cfgfile->getRunAsUser();
@@ -125,7 +126,6 @@ int	scaler::initScaler(int argc, const char **argv) {
 		}
 
 		// get the dynamic connection scaling parameters
-		connections=cfgfile->getConnections();
 		maxconnections=cfgfile->getMaxConnections();
 		maxqueuelength=cfgfile->getMaxQueueLength();
 		growby=cfgfile->getGrowBy();
@@ -141,6 +141,8 @@ int	scaler::initScaler(int argc, const char **argv) {
 		metrictotal=cfgfile->getMetricTotal();
 	}
 
+	// create the pid file
+	createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// initialize the shared memory segment filename
 	idfilename=new char[tmpdirlen+1+strlen(id)+1];
@@ -148,11 +150,11 @@ int	scaler::initScaler(int argc, const char **argv) {
 	key_t	key=ftok(idfilename,0);
 
 	// connect to the semaphore set
-	semset=new semaphoreset();
+	semset=new semaphoreset;
 	semset->attach(key,11);
 
 	// connect to the shared memory segment
-	idmemory=new sharedmemory();
+	idmemory=new sharedmemory;
 	idmemory->attach(key);
 
 	// set up random number generator
@@ -161,57 +163,32 @@ int	scaler::initScaler(int argc, const char **argv) {
 	// detach from the controlling tty
 	detach();
 
-	return 1;
+	return true;
 }
 
-void	scaler::cleanUp() {
+void scaler::cleanUp() {
 
 	delete[] idfilename;
 
-	if (semset) {
-		delete semset;
-	}
-
-	if (idmemory) {
-		delete idmemory;
-	}
-
-	if (id) {
-		delete[] id;
-	}
+	delete semset;
+	delete idmemory;
+	delete cfgfile;
+	delete[] id;
 
 	if (pidfile) {
 		unlink(pidfile);
 		delete[] pidfile;
 	}
 
-	if (config) {
-		delete[] config;
-	}
-
-	if (dbase) {
-		delete[] dbase;
-	}
-
-	if (cfgfile) {
-		delete cfgfile;
-	}
+	delete[] config;
+	delete[] dbase;
 }
 
 
-void	scaler::openMoreConnections() {
+void scaler::openMoreConnections() {
 
 	// wait for a new listener to fire up and increment the listener count
 	semset->wait(6);
-
-	// maxqueuelength<0, maxconnections<=connections, growby<=0 or ttl<=0
-	// would disable this whole feature (or cause problems) so
-	// catch them up front
-	if (maxqueuelength<0 || maxconnections<=connections || 
-		growby<=0 || ttl<=0) {
-		semset->signal(7);
-		return;
-	}
 
 	int	sessions=countSessions();
 	int	connections=countConnections();
@@ -231,7 +208,7 @@ void	scaler::openMoreConnections() {
 		for (int i=0; i<growby; i++) {
 
 			// loop until a connection is successfully started
-			int	success=0;
+			bool	success=false;
 			while (!success) {
 
 				getRandomConnectionId();
@@ -257,7 +234,7 @@ void	scaler::openMoreConnections() {
 					ttl,id,connectionid,config);
 
 				// start another connection
-				success=(system(command)==0);
+				success=!system(command);
 
 				// clean up
 				delete[] command;
@@ -271,7 +248,7 @@ void	scaler::openMoreConnections() {
 	}
 }
 
-void	scaler::getRandomConnectionId() {
+void scaler::getRandomConnectionId() {
 
 	// get a scaled random number
 	currentseed=randomnumber::generateNumber(currentseed);
@@ -291,18 +268,18 @@ void	scaler::getRandomConnectionId() {
 	}
 }
 
-int	scaler::availableDatabase() {
+bool scaler::availableDatabase() {
 	
 	// initialize the database up/down filename
 	char	*updown=new char[tmpdirlen+1+strlen(id)+1+
 					strlen(connectionid)+1];
 	sprintf(updown,"%s/%s-%s",TMP_DIR,id,connectionid);
-	int	retval=file::exists(updown);
+	bool	retval=file::exists(updown);
 	delete[] updown;
 	return retval;
 }
 
-int	scaler::countSessions() {
+int scaler::countSessions() {
 
 	// get the number of open connections
 	unsigned int	*sessions=(unsigned int *)((long)idmemory->getPointer()+
@@ -311,7 +288,7 @@ int	scaler::countSessions() {
 	return (int)(*sessions);
 }
 
-int	scaler::countConnections() {
+int scaler::countConnections() {
 
 	// wait for access to the connection counter
 	semset->wait(4);
@@ -325,7 +302,7 @@ int	scaler::countConnections() {
 	return (int)(*connections);
 }
 
-void	scaler::loop() {
+void scaler::loop() {
 
 	for (;;) {
 		// open more connections if necessary
