@@ -17,6 +17,9 @@
 #include <config.h>
 
 extern "C" {
+	#ifdef __CYGWIN__
+		#define _int64 long long
+	#endif
 	#ifdef HAVE_OCI_H
 		#include <oci.h>
 	#else
