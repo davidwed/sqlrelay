@@ -2,8 +2,8 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(SSLINCLUDES) $(PHPINCLUDES)
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(SSLLIBS)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)
@@ -92,6 +92,9 @@ install: sql_relay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
 	$(INSTALL) $(INSTALLSTRIP) sql_relay.so $(DESTDIR)$(PHPEXTDIR)
 	$(RM) sql_relay.so
+	$(MKINSTALLDIRS) $(DESTDIR)$(PHPPEARDBDIR)
+	$(INSTALL) sqlrelay.php $(DESTDIR)$(PHPPEARDBDIR)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.so
+	$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(PHPPEARDBDIR)/sqlrelay.php

@@ -74,6 +74,21 @@ $sth->execute("hello",1,5.5) or die DBI->errstr;
 print "\n\n";
 
 
+print "OUTPUT BIND FUNCTIONS\n";
+my $numvar;
+my $stringvar;
+my $floatvar;
+my $sth=$dbh->prepare("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;") or die DBI->errstr;
+$sth->bind_param_inout('numvar',\$numvar,100);
+$sth->bind_param_inout('stringvar',\$stringvar,100);
+$sth->bind_param_inout('floatvar',\$floatvar,100);
+$sth->execute() or die DBI->errstr;
+print "numvar: $numvar\n";
+print "stringvar: $stringvar\n";
+print "floatvar: $floatvar\n";
+print "\n\n";
+
+
 
 print "DISCONNECT\n";
 $dbh->disconnect;

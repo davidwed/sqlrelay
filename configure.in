@@ -257,6 +257,10 @@ AC_ARG_ENABLE(php-rpath,
 	PHPUSERPATH="yes",
 	PHPUSERPATH="")
 AC_SUBST(PHPUSERPATH)
+AC_ARG_WITH(pear-db-dir,
+	[  --with-pear-db-dir            Path to install PHP Pear DB driver],
+	PHPPEARDBDIR="$withval",
+	PHPPEARDBDIR="")
 AC_ARG_WITH(tcl-include,
 	[  --with-tcl-include		 Location of tcl.h include file],
 	TCLINCLUDEPATH="$withval",
@@ -629,6 +633,7 @@ dnl Checks for PHP.
 echo
 echo "***** PHP ********************"
 FW_CHECK_PHP
+FW_CHECK_PHP_PEAR_DB
 echo "******************************"
 
 

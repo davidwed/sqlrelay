@@ -550,17 +550,46 @@ then
 	echo "cross compiling"
 	if ( test -n "$RUDIMENTSPATH" )
 	then
-		RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"
-		RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"
+		RUDIMENTSCONFIG="$RUDIMENTSPATH/bin/rudiments-config"
+		if ( test -r "$RUDIMENTSCONFIG" )
+		then
+			RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
+			RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
+		else
+			RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"
+			RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"
+		fi
 	fi
 
 else
 
 	if ( test -z "$MICROSOFT" )
 	then
-		FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[rudiments/daemonprocess.h],[rudiments],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC],[RUDIMENTSPATH])
+
+		for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/pkg" "/usr/local/firstworks"
+		do
+			if ( test -n "$i" )
+			then
+				RUDIMENTSCONFIG="$i/bin/rudiments-config"
+				if ( test -r "$RUDIMENTSCONFIG" )
+				then
+					RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
+					RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
+				fi
+			fi
+			if ( test -n "$RUDIMENTSLIBS" )
+			then
+				break
+			fi
+		done
+
+		dnl if ( test -z "$RUDIMENTSLIBS" )
+		dnl then
+			dnl FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[rudiments/daemonprocess.h],[rudiments],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC],[RUDIMENTSPATH])
+		dnl fi
 
 	else
+
 		for i in "$RUDIMENTSPATH" "/usr/local/firstworks"
 		do
 			if ( test -n "$i" )
@@ -2056,6 +2085,42 @@ then
 fi
 ])
 
+AC_DEFUN([FW_CHECK_PHP_PEAR_DB],
+[
+
+	if ( test -z "$PHPPEARDBDIR" )
+	then
+
+		for i in "/usr" "/usr/local" "/usr/pkg" "/opt/sfw"
+		do
+			for j in "pear/DB" "pear/bootstrap/DB"
+			do
+				if ( test -d "$i/$j" -a -r "$i/$j/common.php" )
+				then
+					PHPPEARDBDIR="$i/$j"
+					break
+				fi
+			done
+			if ( test -n "$PHPPEARDBDIR" )
+			then
+				break
+			fi
+		done
+
+	fi
+
+	if ( test -z "$PHPPEARDBDIR" -a "$HAVE_PHP" )
+	then
+		PHPPEARDBDIR="$PHPPREFIX/share/pear/DB"
+	fi
+
+	if ( test -z "$PHPPEARDBDIR" )
+	then
+		PHPPEARDBDIR="\${datadir}/pear/DB"
+	fi
+
+	AC_SUBST(PHPPEARDBDIR)
+])
 
 
 AC_DEFUN([FW_CHECK_TCL],

@@ -272,12 +272,12 @@ sub bind_param_inout {
 	$cursor->defineOutputBind($param,$attr);
 
 	# store the parameter name in the list of inout parameters
-	$param_inout_list=$sth->FETCH('param_inout_list');
-	$param_inout_list=$param_inout_list . ' $param';
-	$sth->STORE('param_inout_list',$param_inout_list);
+	my $param_inout_list=$sth->FETCH('driver_param_inout_list');
+	$param_inout_list=$param_inout_list . " $param";
+	$sth->STORE('driver_param_inout_list',$param_inout_list);
 
 	# store the variable so data can be fetched into it later
-	$sth->STORE('param_inout_$param',$variable);
+	$sth->STORE("driver_param_inout_$param",$variable);
 
 	return 1;
 }
@@ -315,13 +315,14 @@ sub execute {
 	$sth->STORE('driver_FETCHED_ROWS',0);
 
 	# get the list of output bind variables and turn it into an array
-	$param_inout_list=$sth->FETCH('param_inout_list');
-	@param_inout_array=split(' ',$param_inout_list);
+	my $param_inout_list=$sth->FETCH('driver_param_inout_list');
+	my @param_inout_array=split(' ',$param_inout_list);
 
 	# loop through the array of parameters, for each, get the appropriate
 	# variable and store the output bind data in the variable
+	my $param;
 	foreach $param(@param_inout_array) {
-		$variable=$sth->FETCH('param_inout_$param');
+		my $variable=$sth->FETCH("driver_param_inout_$param");
 		$$variable=$cursor->getOutputBind($param);
 	}
 

@@ -1,14 +1,10 @@
 sqlrclient classes shouldn't inherit from inet/unixclientsocket,
 	rather should have member variables for each
-test output binds in perl dbi driver
 use pkgconfig/rudiments-config
-ADODB and Pear DB interfaces
-Pear DB interface license
+ADODB interface
+Pear DB interface and mysql replacement library license
 freetds-0.62/ct_param support
 fully test mysql replacement library
-perl -V:optimize and perl -V:ccflags on FreeBSD 4.9 apparantly doesn't return
-	what we're expecting it to
-On Solaris, some of the other perl -V's return empty values
 
 oldmysql test files for non-C++ api's
 
