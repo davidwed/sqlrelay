@@ -1244,6 +1244,11 @@ then
 			dnl includes
 			FW_CHECK_HEADER_LIB([/usr/include/ibase.h],[INTERBASEINCLUDES=\"\"],[/usr/lib/libgds.so],[INTERBASELIBS=\"-lgds -lcrypt\"],[/usr/lib/libgds.a],[INTERBASELIBS=\"-lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 		fi
+
+		if ( test -z "$INTERBASELIBS" )
+		then
+			FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.so],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+		fi
 		
 		LINKFAIL=""
 		if ( test -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )

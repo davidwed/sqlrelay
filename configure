@@ -22978,6 +22978,94 @@ fi
 
 		fi
 
+		if ( test -z "$INTERBASELIBS" )
+		then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+echo "$as_me:$LINENO: checking for /usr/local/firebird/include/ibase.h" >&5
+echo $ECHO_N "checking for /usr/local/firebird/include/ibase.h... $ECHO_C" >&6
+if test "${ac_cv_file__usr_local_firebird_include_ibase_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/local/firebird/include/ibase.h"; then
+  ac_cv_file__usr_local_firebird_include_ibase_h=yes
+else
+  ac_cv_file__usr_local_firebird_include_ibase_h=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_firebird_include_ibase_h" >&5
+echo "${ECHO_T}$ac_cv_file__usr_local_firebird_include_ibase_h" >&6
+if test $ac_cv_file__usr_local_firebird_include_ibase_h = yes; then
+  FOUNDHEADER="yes"
+fi
+
+echo "$as_me:$LINENO: checking for /usr/local/firebird/lib/libgds.so" >&5
+echo $ECHO_N "checking for /usr/local/firebird/lib/libgds.so... $ECHO_C" >&6
+if test "${ac_cv_file__usr_local_firebird_lib_libgds_so+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/local/firebird/lib/libgds.so"; then
+  ac_cv_file__usr_local_firebird_lib_libgds_so=yes
+else
+  ac_cv_file__usr_local_firebird_lib_libgds_so=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_firebird_lib_libgds_so" >&5
+echo "${ECHO_T}$ac_cv_file__usr_local_firebird_lib_libgds_so" >&6
+if test $ac_cv_file__usr_local_firebird_lib_libgds_so = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INTERBASEINCLUDES=\"-I/usr/local/firebird/include\""
+		eval "INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\""
+	fi
+else
+	if ( test -n "/usr/local/firebird/lib/libgds.a" -a -n "INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"" )
+	then
+		echo "$as_me:$LINENO: checking for /usr/local/firebird/lib/libgds.a" >&5
+echo $ECHO_N "checking for /usr/local/firebird/lib/libgds.a... $ECHO_C" >&6
+if test "${ac_cv_file__usr_local_firebird_lib_libgds_a+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/local/firebird/lib/libgds.a"; then
+  ac_cv_file__usr_local_firebird_lib_libgds_a=yes
+else
+  ac_cv_file__usr_local_firebird_lib_libgds_a=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_firebird_lib_libgds_a" >&5
+echo "${ECHO_T}$ac_cv_file__usr_local_firebird_lib_libgds_a" >&6
+if test $ac_cv_file__usr_local_firebird_lib_libgds_a = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INTERBASEINCLUDES=\"-I/usr/local/firebird/include\""
+			eval "INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\""
+		fi
+	fi
+fi
+
+		fi
+
 		LINKFAIL=""
 		if ( test -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
 		then
