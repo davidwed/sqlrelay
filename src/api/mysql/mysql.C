@@ -1,4 +1,8 @@
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/charstring.h>
+
+#define NEED_DATATYPESTRING 1
+#include <datatypes.h>
 
 extern "C" {
 
@@ -31,7 +35,6 @@ enum enum_field_types { MYSQL_TYPE_DECIMAL, MYSQL_TYPE_TINY,
 			MYSQL_TYPE_VAR_STRING=253,
 			MYSQL_TYPE_STRING=254,
 			MYSQL_TYPE_GEOMETRY=255
-
 };
 
 #ifdef COMPAT_MYSQL_3
@@ -652,13 +655,239 @@ MYSQL_STMT *mysql_prepare(MYSQL *mysql, const char *query,
 }
 
 my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
-	// FIXME:
-	return false;
+
+	unsigned long	paramcount=mysql_param_count(stmt);
+	for (unsigned long i=0; i<paramcount; i++) {
+
+		char		*variable=charstring::parseNumber((long)i);
+		sqlrcursor	*cursor=stmt->result->sqlrcur;
+		switch (bind[i].buffer_type) {
+			case MYSQL_TYPE_NULL: {
+				cursor->inputBind(variable,(char *)NULL);
+				break;
+			}
+			case MYSQL_TYPE_VAR_STRING:
+			case MYSQL_TYPE_STRING:
+			case MYSQL_TYPE_TIMESTAMP:
+			case MYSQL_TYPE_DATE:
+			case MYSQL_TYPE_TIME:
+			case MYSQL_TYPE_DATETIME:
+			case MYSQL_TYPE_NEWDATE: {
+				char	*value=(char *)bind[i].buffer;
+				cursor->inputBind(variable,value);
+				break;
+			}
+			case MYSQL_TYPE_DECIMAL:
+			case MYSQL_TYPE_FLOAT:
+			case MYSQL_TYPE_DOUBLE: {
+				double	value=*((double *)bind[i].buffer);
+				// FIXME: precision/scale???
+				cursor->inputBind(variable,value,0,0);
+				break;
+			}
+			case MYSQL_TYPE_TINY:
+			case MYSQL_TYPE_SHORT:
+			case MYSQL_TYPE_LONG:
+			case MYSQL_TYPE_YEAR: {
+				long	value=*((long *)bind[i].buffer);
+				cursor->inputBind(variable,value);
+				break;
+			}
+			case MYSQL_TYPE_LONGLONG:
+			case MYSQL_TYPE_INT24: {
+				// FIXME: what should I do here?
+				break;
+			}
+			case MYSQL_TYPE_TINY_BLOB:
+			case MYSQL_TYPE_MEDIUM_BLOB:
+			case MYSQL_TYPE_LONG_BLOB:
+			case MYSQL_TYPE_BLOB: {
+				char		*value=(char *)bind[i].buffer;
+				unsigned long	size=*(bind[i].length);
+				cursor->inputBindBlob(variable,value,size);
+				break;
+			}
+			case MYSQL_TYPE_ENUM:
+			case MYSQL_TYPE_SET:
+			case MYSQL_TYPE_GEOMETRY: {
+				// FIXME: what should I do here?
+				break;
+			}
+			default: {
+				// FIXME: what should I do here?
+			}
+		}
+	}
+	return true;
 }
 
 my_bool mysql_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 	// FIXME:
 	return false;
+}
+
+static enum enum_field_types	mysqltypemap[]={
+	// "UNKNOWN"
+	MYSQL_TYPE_NULL,
+	// addded by freetds
+	// "CHAR"
+	MYSQL_TYPE_STRING,
+	// "INT"
+	MYSQL_TYPE_LONG,
+	// "SMALLINT"
+	MYSQL_TYPE_SHORT,
+	// "TINYINT"
+	MYSQL_TYPE_TINY,
+	// "MONEY"
+	MYSQL_TYPE_DECIMAL,
+	// "DATETIME"
+	MYSQL_TYPE_DATETIME,
+	// "NUMERIC"
+	MYSQL_TYPE_DECIMAL,
+	// "DECIMAL"
+	MYSQL_TYPE_DECIMAL,
+	// "SMALLDATETIME"
+	MYSQL_TYPE_DATETIME,
+	// "SMALLMONEY"
+	MYSQL_TYPE_DECIMAL,
+	// "IMAGE"
+	MYSQL_TYPE_BLOB,
+	// "BINARY"
+	MYSQL_TYPE_BLOB,
+	// "BIT"
+	MYSQL_TYPE_TINY,
+	// "REAL"
+	MYSQL_TYPE_DECIMAL,
+	// "FLOAT"
+	MYSQL_TYPE_FLOAT,
+	// "TEXT"
+	MYSQL_TYPE_STRING,
+	// "VARCHAR"
+	MYSQL_TYPE_VAR_STRING,
+	// "VARBINARY"
+	MYSQL_TYPE_BLOB,
+	// "LONGCHAR"
+	MYSQL_TYPE_BLOB,
+	// "LONGBINARY"
+	MYSQL_TYPE_BLOB,
+	// "LONG"
+	MYSQL_TYPE_BLOB,
+	// "ILLEGAL"
+	MYSQL_TYPE_NULL,
+	// "SENSITIVITY"
+	MYSQL_TYPE_STRING,
+	// "BOUNDARY"
+	MYSQL_TYPE_STRING,
+	// "VOID"
+	MYSQL_TYPE_NULL,
+	// "USHORT"
+	MYSQL_TYPE_SHORT,
+	// added by lago
+	// "UNDEFINED"
+	MYSQL_TYPE_NULL,
+	// "DOUBLE"
+	MYSQL_TYPE_DOUBLE,
+	// "DATE"
+	MYSQL_TYPE_DATETIME,
+	// "TIME"
+	MYSQL_TYPE_DATETIME,
+	// "TIMESTAMP"
+	MYSQL_TYPE_DATETIME,
+	// added by msql
+	// "UINT"
+	MYSQL_TYPE_LONG,
+	// "LASTREAL"
+	MYSQL_TYPE_DECIMAL,
+	// added by mysql
+	// "STRING"
+	MYSQL_TYPE_STRING,
+	// "VARSTRING"
+	MYSQL_TYPE_VAR_STRING,
+	// "LONGLONG"
+	MYSQL_TYPE_LONGLONG,
+	// "MEDIUMINT"
+	MYSQL_TYPE_INT24,
+	// "YEAR"
+	MYSQL_TYPE_YEAR,
+	// "NEWDATE"
+	MYSQL_TYPE_NEWDATE,
+	// "NULL"
+	MYSQL_TYPE_NULL,
+	// "ENUM"
+	MYSQL_TYPE_ENUM,
+	// "SET"
+	MYSQL_TYPE_SET,
+	// "TINYBLOB"
+	MYSQL_TYPE_TINY_BLOB,
+	// "MEDIUMBLOB"
+	MYSQL_TYPE_MEDIUM_BLOB,
+	// "LONGBLOB"
+	MYSQL_TYPE_LONG_BLOB,
+	// "BLOB"
+	MYSQL_TYPE_BLOB,
+	// added by oracle
+	// "VARCHAR2"
+	MYSQL_TYPE_VAR_STRING,
+	// "NUMBER"
+	MYSQL_TYPE_DECIMAL,
+	// "ROWID"
+	MYSQL_TYPE_LONGLONG,
+	// "RAW"
+	MYSQL_TYPE_BLOB,
+	// "LONG_RAW"
+	MYSQL_TYPE_BLOB,
+	// "MLSLABEL"
+	MYSQL_TYPE_BLOB,
+	// "CLOB"
+	MYSQL_TYPE_BLOB,
+	// "BFILE"
+	MYSQL_TYPE_BLOB,
+	// added by odbc
+	// "BIGINT"
+	MYSQL_TYPE_LONGLONG,
+	// "INTEGER"
+	MYSQL_TYPE_LONG,
+	// "LONGVARBINARY"
+	MYSQL_TYPE_BLOB,
+	// "LONGVARCHAR"
+	MYSQL_TYPE_BLOB,
+	// added by db2
+	// "GRAPHIC"
+	MYSQL_TYPE_BLOB,
+	// "VARGRAPHIC"
+	MYSQL_TYPE_BLOB,
+	// "LONGVARGRAPHIC"
+	MYSQL_TYPE_BLOB,
+	// "DBCLOB"
+	MYSQL_TYPE_BLOB,
+	// "DATALINK"
+	MYSQL_TYPE_STRING,
+	// "USER_DEFINED_TYPE"
+	MYSQL_TYPE_STRING,
+	// "SHORT_DATATYPE"
+	MYSQL_TYPE_SHORT,
+	// "TINY_DATATYPE"
+	MYSQL_TYPE_TINY,
+	// added by interbase
+	// "D_FLOAT"
+	MYSQL_TYPE_DOUBLE,
+	// "ARRAY"
+	MYSQL_TYPE_SET,
+	// "QUAD"
+	MYSQL_TYPE_SET,
+	// "INT64"
+	MYSQL_TYPE_LONGLONG,
+	// "DOUBLE PRECISION"
+	MYSQL_TYPE_DOUBLE
+};
+
+enum enum_field_types map_col_type(const char *columntype) {
+	for (int index=0; datatypestring[index]; index++) {
+		if (!strcmp(datatypestring[index],columntype)) {
+			return mysqltypemap[index];
+		}
+	}
+	return MYSQL_TYPE_NULL;
 }
 
 int mysql_execute(MYSQL_STMT *stmt) {
@@ -701,8 +930,7 @@ int mysql_execute(MYSQL_STMT *stmt) {
 			fields[i].charsetnr=0;
 			#endif
 			#endif
-			// FIXME: need field type map here
-			fields[i].type=MYSQL_TYPE_STRING;
+			fields[i].type=map_col_type(sqlrcur->getColumnType(i));
 			fields[i].length=sqlrcur->getColumnLength(i);
 			fields[i].max_length=sqlrcur->getLongest(i);
 // FIXME: there is probably some way to figure out flags
@@ -732,9 +960,8 @@ int mysql_execute(MYSQL_STMT *stmt) {
 	return retval;
 }
 
-
-
 unsigned long mysql_param_count(MYSQL_STMT *stmt) {
+	// FIXME: really need this one
 	return 0;
 }
 
