@@ -1223,7 +1223,8 @@ datatransport *sqlrlistener::connectToConnection(unsigned long connectionpid,
 		if (unixportstr && unixportstr[0]) {
 			unixclientsocket	*unixsock=
 							new unixclientsocket();
-			connected=unixsock->connectToServer(unixportstr,0,1);
+			connected=unixsock->connectToServer(unixportstr,
+								-1,-1,0,1);
 			if (connected) {
 				return unixsock;
 			}
@@ -1234,7 +1235,8 @@ datatransport *sqlrlistener::connectToConnection(unsigned long connectionpid,
 			inetclientsocket	*inetsock=
 							new inetclientsocket();
 			connected=inetsock->connectToServer("127.0.0.1",
-								inetport,0,1);
+								inetport,
+								-1,-1,0,1);
 			if (connected) {
 				return inetsock;
 			}
@@ -1322,7 +1324,7 @@ bool sqlrlistener::requestFixup(unsigned long connectionpid,
 
 	// connect to the fixup socket of the parent listener
 	unixclientsocket	fixupclientsockun;
-	if (!fixupclientsockun.connectToServer(fixupsockname,0,1)) {
+	if (!fixupclientsockun.connectToServer(fixupsockname,-1,-1,0,1)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"failed to connect to parent listener process");

@@ -222,6 +222,11 @@ __END__
         clearBinds();
             # Clear all bind variables.
 
+        countBindVariables();
+            # Parses the previously prepared query,
+            # counts the number of bind variables defined
+            # in it and returns that number.
+
         inputBind(variable,value);
         inputBindBlob(variable,value,size);
         inputBindClob(variable,value,size);

@@ -30,6 +30,9 @@ Takeshi Taguchi - taguchi@tohoku.iij.ad.jp
 Vladimir Kouznetsov
 	interbase stored procedure/output bind support, other patches
 
+dolphpower
+	pkgconfig scripts
+
 Fixes/Patches incorporated from:
 	Adrian Likins
 	Christoph Schwarz

@@ -132,6 +132,14 @@ Group: Applications/Libraries
 Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead.
 
 
+%package client-mysql
+Summary: Drop in replacement library allowing MySQL clients to use SQL Relay instead.
+Group: Applications/Libraries
+
+%description client-mysql
+Drop in replacement library allowing MySQL clients to use SQL Relay instead.
+
+
 %package config-gtk
 Summary: SQL Relay GUI configuration tool.
 Group: Applications/Databases
@@ -458,6 +466,12 @@ rm -rf %{buildroot}
 %{_libdir}/libpqsqlrelay-*.so.*
 %{_libdir}/libpqsqlrelay.a
 %{_libdir}/libpqsqlrelay.la
+
+%files client-mysql
+%defattr(-, root, root)
+%{_libdir}/libmysql*sqlrelay-*.so.*
+%{_libdir}/libmysql*pqsqlrelay.a
+%{_libdir}/libmysql*pqsqlrelay.la
 
 %{!?_without_gtk:%files config-gtk}
 %{!?_without_gtk:%defattr(-, root, root)}

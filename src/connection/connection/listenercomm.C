@@ -123,7 +123,7 @@ void	listenercomm::registerForHandoff(char *tmpdir) {
 		#endif
 
 		handoffsockun=new unixclientsocket();
-		handoffsockun->connectToServer(handoffsockname,1,0);
+		handoffsockun->connectToServer(handoffsockname,-1,-1,1,0);
 		if (handoffsockun->write((unsigned long)getpid())==
 						sizeof(unsigned long)) {
 			break;
@@ -170,7 +170,7 @@ void	listenercomm::deRegisterForHandoff(char *tmpdir) {
 
 	// attach to the socket and write the process id
 	unixclientsocket	*removehandoffsockun=new unixclientsocket();
-	removehandoffsockun->connectToServer(removehandoffsockname,0,1);
+	removehandoffsockun->connectToServer(removehandoffsockname,-1,-1,0,1);
 	removehandoffsockun->write((unsigned long)getpid());
 
 	// clean up

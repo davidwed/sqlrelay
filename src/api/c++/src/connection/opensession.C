@@ -33,7 +33,7 @@ int	sqlrconnection::openSession() {
 
 		openresult=unixclientsocket::
 				connectToServer(listenerunixport,
-						retrytime,tries);
+						-1,-1,retrytime,tries);
 	}
 
 	// then try for an inet connection
@@ -51,7 +51,7 @@ int	sqlrconnection::openSession() {
 
 		openresult=inetclientsocket::
 				connectToServer(server,listenerinetport,
-						retrytime,tries);
+						-1,-1,retrytime,tries);
 	}
 
 	// handle failure to connect to listener
@@ -125,7 +125,7 @@ int	sqlrconnection::openSession() {
 					connectionunixport) {
 			connected=unixclientsocket::
 					connectToServer(connectionunixport,
-							retrytime,tries);
+							-1,-1,retrytime,tries);
 			if (debug && !connected) {
 				debugPreStart();
 				debugPrint("ERROR:\n");
@@ -141,7 +141,7 @@ int	sqlrconnection::openSession() {
 			connected=inetclientsocket::
 					connectToServer(server,
 							connectioninetport,
-							retrytime,tries);
+							-1,-1,retrytime,tries);
 			if (debug && !connected) {
 				debugPreStart();
 				debugPrint("ERROR:\n");

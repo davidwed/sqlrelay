@@ -1,6 +1,11 @@
+support @,: or ? for fake bind variables
+rewrite queries with ?'s or @'s for oracle, rewrite queries with ?'s or :'s for
+	sybase
+
 sqlrclient classes shouldn't inherit from inet/unixclientsocket,
 	rather should have member variables for each
 ADODB interface
+VB wrapper
 FIXME's in mysql drop-in library
 licenses:
 	Pear DB driver
@@ -15,8 +20,10 @@ docs:
 tests:
 	mysql drop-in library
 	postgresql drop-in library
-	countBindVariables()
 freetds-0.62/ct_param support
+idle client timeout
+perl apis -> CPAN
+add pear db driver RPM
 
 oldmysql test files for non-C++ api's
 
