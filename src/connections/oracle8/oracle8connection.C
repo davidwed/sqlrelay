@@ -270,8 +270,10 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	errormessage=NULL;
 	oracle8conn=(oracle8connection *)conn;
 	fetchatonce=FETCH_AT_ONCE;
+#ifdef HAVE_ORACLE_8i
 	inbindlobcount=0;
 	outbindlobcount=0;
+#endif
 	inbindcount=0;
 	outbindcount=0;
 	curbindcount=0;
@@ -1161,7 +1163,8 @@ void	oracle8cursor::returnRow() {
 				conn->endSendingLong();
 			}
 
-			// if the lob temporary, deallocate it
+#ifdef HAVE_ORACLE_8i
+			// if the lob is temporary, deallocate it
 			boolean	templob;
 			if (OCILobIsTemporary(oracle8conn->env,
 						oracle8conn->err,
@@ -1174,6 +1177,7 @@ void	oracle8cursor::returnRow() {
 							oracle8conn->err,
 							def_lob[col][row]);
 			}
+#endif
 			continue;
 		}
 
@@ -1211,6 +1215,7 @@ void	oracle8cursor::cleanUpData() {
 	}
 
 	// free lob bind resources
+#ifdef HAVE_ORACLE_8i
 	for (i=0; i<inbindlobcount; i++) {
 		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
 						inbind_lob[i]);
@@ -1228,6 +1233,7 @@ void	oracle8cursor::cleanUpData() {
 	}
 	inbindlobcount=0;
 	outbindlobcount=0;
+#endif
 
 	// free regular bind resources
 	inbindcount=0;

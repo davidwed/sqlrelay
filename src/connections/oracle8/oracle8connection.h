@@ -147,10 +147,12 @@ class oracle8cursor : public sqlrcursor {
 		int		outbindcount;
 		int		curbindcount;
 
+#ifdef HAVE_ORACLE_8i
 		OCILobLocator	*inbind_lob[MAXVAR];
 		OCILobLocator	*outbind_lob[MAXVAR];
 		int		inbindlobcount;
 		int		outbindlobcount;
+#endif
 
 		int		row;
 		int		maxrow;
