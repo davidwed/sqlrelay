@@ -6,6 +6,15 @@
 # description: Persistent database connection system.
 
 # Source function library.
+success() {
+	echo success
+}
+failure() {
+	echo failure
+}
+passed() {
+	echo passed
+}
 if [ -r "/etc/init.d/functions" ]; then
 	. /etc/init.d/functions
 else
