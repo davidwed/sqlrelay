@@ -39,7 +39,7 @@ enables them to be compiled with gcc 2.96 or 3.x.</p>
 <blockquote>
 tar xf lago-0.5.2.tar.gz
 cd lago
-patch -p1 < ../lago-0.5.2.patch
+patch -p1 < ../lago-0.5.2-gcc3.patch
 </blockquote>
 
 <p>If you want to build an unpatched or older version of lago and your
@@ -78,7 +78,8 @@ and lago/querydef/qd_dump.cxx refer to variables named "not".  Some compilers
 don't like this.  If you get an errors in those files, change the variable to
 __not wherever it appears.</p>
 
-<p>Once the software is installed, run the following command.</p>
+<p>Once the software is installed, log in as lago and run the following
+command.</p>
 
 <blockquote>
 <b>/usr/local/lago/bin/lago --bootstrap</b>
@@ -99,7 +100,7 @@ time.</p>
 
 <B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
         start<B><FONT color=#a62828>)</FONT></B>
-                /usr/local/lago/bin/lago <B><FONT color=#a62828>&gt;</FONT></B> /dev/null <B><FONT color=#a62828>&amp;</FONT></B>
+                su - lago -c <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/usr/local/lago/bin/lago &gt; /dev/null &amp;</FONT><B><FONT color=#a62828>&quot;</FONT></B>
                 <B><FONT color=#a62828>;;</FONT></B>
         stop<B><FONT color=#a62828>)</FONT></B>
                 <B><FONT color=#a62828>kill</FONT></B> <FONT color=#6959cf>`ps </FONT><FONT color=#6959cf>-efa</FONT><FONT color=#6959cf> </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> grep lago </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> grep </FONT><FONT color=#6959cf>-v</FONT><FONT color=#6959cf> grep </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> awk </FONT><B><FONT color=#a62828>'</FONT></B><FONT color=#ff00ff>{print $2}</FONT><B><FONT color=#a62828>'</FONT></B><FONT color=#6959cf>`</FONT>
