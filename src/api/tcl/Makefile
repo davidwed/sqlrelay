@@ -20,17 +20,21 @@ all:
 	if ( test ! -r libsqlrelay.la ); then \
 		cp tclincludes2.h tclincludes.h; \
 		$(MAKE) libsqlrelay.la 2> errors2; \
-	fi
-	if ( test ! -r libsqlrelay.la ); then \
-		if ( test -s errors1 ); then \
-			echo "first try errors : "; cat errors1; echo; \
+		if ( test ! -r libsqlrelay.la ); then \
+			if ( test -s errors1 ); then \
+				echo "first try errors : "; cat errors1; echo; \
+			fi; \
+			if ( test -s errors2 ); then \
+				echo "second try errors : "; cat errors2; echo; \
+			fi; \
+			exit 1; \
+		else \
+			cat errors2; \
 		fi; \
-		if ( test -s errors2 ); then \
-			echo "second try errors : "; cat errors2; echo; \
-		fi; \
+	else \
+		cat errors1; \
 	fi
-	$(RM) errors1
-	$(RM) errors2
+	$(RM) errors1 errors2 tclincludes.h
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -47,9 +51,7 @@ rebuild: clean all
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	if ( test "$(STRIP)" != "touch" ); then \
-		$(STRIP) -x -R .note -R .comment $@; \
-	fi
+	$(STRIPCOMMENTNOTE) $@
 
 libsqlrelay.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -module
@@ -89,10 +91,10 @@ sqlrelay.so:
 	fi
 
 install: sqlrelay.so
-	$(MKINSTALLDIRS) $(TCLLIBSPATH)/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) -s sqlrelay.so $(TCLLIBSPATH)/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 pkgIndex.tcl $(TCLLIBSPATH)/sqlrelay
+	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(LIBTOOL) --mode=install $(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.so
 
 uninstall:
-	$(RMTREE) $(TCLLIBSPATH)/sqlrelay
+	$(RMTREE) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay

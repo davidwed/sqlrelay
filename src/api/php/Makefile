@@ -15,9 +15,7 @@ endif
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPILE_DL=1 -c $< -o $@
-	if ( test "$(STRIP)" != "touch" ); then \
-		$(STRIP) -x -R .note -R .comment $@; \
-	fi
+	$(STRIPCOMMENTNOTE) $@
 
 all:
 	cp phpincludes1.h phpincludes.h; \
@@ -25,14 +23,19 @@ all:
 	if ( test ! -r libsql_relay.la ); then \
 		cp phpincludes2.h phpincludes.h; \
 		$(MAKE) libsql_relay.la 2> errors2; \
-	fi
-	if ( test ! -r libsql_relay.la ); then \
-		if ( test -s errors1 ); then \
-			echo "first try errors : "; cat errors1; echo; \
+		if ( test ! -r libsql_relay.la ); then \
+			if ( test -s errors1 ); then \
+				echo "first try errors : "; cat errors1; echo; \
+			fi; \
+			if ( test -s errors2 ); then \
+				echo "second try errors : "; cat errors2; echo; \
+			fi; \
+			exit 1; \
+		else \
+			cat errors2; \
 		fi; \
-		if ( test -s errors2 ); then \
-			echo "second try errors : "; cat errors2; echo; \
-		fi; \
+	else \
+		cat errors1; \
 	fi
 	$(RM) errors1
 	$(RM) errors2
@@ -86,9 +89,9 @@ sql_relay.so:
 	fi
 
 install: sql_relay.so
-	$(MKINSTALLDIRS) $(PHPEXTDIR)
-	$(LIBTOOL) --mode=install $(INSTALL) -s sql_relay.so $(PHPEXTDIR)
+	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sql_relay.so $(DESTDIR)$(PHPEXTDIR)
 	$(RM) sql_relay.so
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(PHPEXTDIR)/sql_relay.so
+	$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.so

@@ -16,7 +16,6 @@
 <li><a href="#rpm">Install RPM</a></li>
 <li><a href="#env">PATH Environment Variable</a></li>
 <li><a href="#db2">DB2 Installation</a></li>
-<li><a href="#odbc">Restore unixODBC if Necessary</a></li>
 </ul>
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
@@ -95,22 +94,6 @@ Follow the links below for the version of DB2 that you are installing.</p>
 
 <p><a href="db2/72.html">Installing IBM DB2 V7.2</a><br>
 <a href="db2/81.html">Installing IBM DB2 V8.1</a></p>
-
-<a name="odbc"></a>
-<span class="heading2">Restore unixODBC if Necessary</span><br>
-
-<p>The DB2 installation creates symbolic links from include files in 
-it's base directory to /usr/include.  If you had a unixODBC-devel RPM 
-installed prior to installing DB2, the include files provided by the 
-unixODBC-devel RPM will have been overwritten by these symbolic links.  You 
-should probably reinstall the unixODBC-devel RPM.  SQL Relay looks in 
-the DB2 installation directory for DB2 includes, so not having them in
-/usr/include won't hurt, but not having the proper unixODBC includes in
-/usr/include will cause the ODBC database connection build to fail.</p>
-
-<p>This should be enough you get you started.  To set up more complex 
-configurations, consult the documentation that came with your DB2
-distribution.</p>
 
 <a name="creating"></a>
 <span class="heading2">Creating a Database</span><br>

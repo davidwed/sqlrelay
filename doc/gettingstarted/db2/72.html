@@ -126,6 +126,22 @@ To view the documentation, point your browser at
 <a href="file://usr/IBMdb2/V7.1/doc/en_US/html">
 /usr/IBMdb2/V7.1/doc/en_US/html</a>.</p>
 
+<a name="odbc"></a>
+<span class="heading2">Restore unixODBC if Necessary</span><br>
+
+<p>The DB2 installation creates symbolic links from include files in 
+it's base directory to /usr/include.  If you had a unixODBC-devel RPM 
+installed prior to installing DB2, the include files provided by the 
+unixODBC-devel RPM will have been overwritten by these symbolic links.  You 
+should probably reinstall the unixODBC-devel RPM.  SQL Relay looks in 
+the DB2 installation directory for DB2 includes, so not having them in
+/usr/include won't hurt, but not having the proper unixODBC includes in
+/usr/include will cause the ODBC database connection build to fail.</p>
+
+<p>This should be enough you get you started.  To set up more complex 
+configurations, consult the documentation that came with your DB2
+distribution.</p>
+
 <span class="heading2">Creating an Instance</span><br>
 
 <p>IBM DB2 is installed under either /opt/IBMdb2/V7.1, /usr/IBMdb2/V7.1 

@@ -59,5 +59,6 @@ unconfig: clean
 	$(RM) test/test
 	$(RM) libtool
 	$(RM) libtool.gcc
+	$(RM) strip-comment-note
 
 distclean: unconfig

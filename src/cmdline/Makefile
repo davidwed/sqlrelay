@@ -17,9 +17,7 @@ endif
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	if ( test "$(STRIP)" != "touch" ); then \
-		$(STRIP) -x -R .note -R .comment $@; \
-	fi
+	$(STRIPCOMMENTNOTE) $@
 
 all: query fields sqlrsh
 

@@ -26,15 +26,11 @@ DLOBJS= interbaseconnection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	if ( test "$(STRIP)" != "touch" ); then \
-		$(STRIP) -x -R .note -R .comment $@; \
-	fi
+	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	if ( test "$(STRIP)" != "touch" ); then \
-		$(STRIP) -x -R .note -R .comment $@; \
-	fi
+	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-interbase sqlr-connection-interbase-debug
 

@@ -172,13 +172,13 @@ access a database, it must be running.</p>
 <p>It's necessary to perform administrative tasks as the <i>postgres</i> 
 user.  Assigning it a password makes this easier.</p>
 
+<p>Once you have assigned the <i>postgres</i> user a password, log in as
+<i>postgres</i>.</p>
+
 <p>Many distributions of PostgreSQL are fairly insecure by default;  any
 user on the local machine can connect to the database without supplying a
 password.  Some distributions of PostgreSQL are secured using socket
 credentials by default.</p>
-
-<p>To determine what kind of distribution you have, log in as the
-<i>postgres</i> user.</p>
 
 <p>View the file <i>pg_hba.conf</i> (usually found in <i>/var/lib/pgsql</i>,
 <i>/var/lib/pgsql/data</i> or <i>/usr/local/pgsql/var/data</i>) and look for a
@@ -238,19 +238,20 @@ Thus, clients running on the local machine can connect to the database, but
 clients running on remote hosts cannot.</p>
 
 <p>Look for a file called postgresql.conf in the same directory as pg_hba.conf.
-Edit the file and look for a line like the following:</b>
+Edit the file and look for a line like one of the following lines:</b>
 
 <blockquote><b><pre>
-tcpip_socket = false
+tcpip_socket = false<br><br>
+#tcpip_socket = false
 </pre></b></blockquote>
 
-<p>Change it to read:</b>
+<p>Change the line to read:</b>
 
 <blockquote><b><pre>
 tcpip_socket = true
 </pre></b></blockquote>
 
-<p>If the file has no line like this, then the line.</p>
+<p>If the file has no line like this, then add the line.</p>
 
 <p>If your distribution has no postgresql.conf file, you will have to modify
 the pg_ctl script and add the -i option to the postmaster startup command.
@@ -266,6 +267,8 @@ authentication.</p>
 <blockquote><b><pre>
 host         all         192.168.2.0   255.255.255.0       password
 </pre></b></blockquote>
+
+<p>After making these changes, log in as root and restart the database.</p>
 
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>

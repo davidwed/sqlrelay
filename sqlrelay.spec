@@ -31,24 +31,43 @@
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.34.1
+Version: 0.34.3
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
 Source0: %{name}-%{version}.tar.gz
 URL: http://sqlrelay.sourceforge.net
 Buildroot: %{_tmppath}/%{name}-root
+
+%if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
+	%define phpdevel %(echo "mod_php4-devel")
+	%define gtkdevel %(echo "gtk-devel")
+	%define rubydevel %(echo "ruby")
+	%define tcldevel %(echo "tcl-devel")
+	%define initscript /etc/init.d/sqlrelay
+	%define inittab /etc/sqlrelay
+	%define docdir %{_docdir}/%{name}
+%else
+	%define phpdevel %(echo "php-devel")
+	%define gtkdevel %(echo "gtk+-devel")
+	%define rubydevel %(echo "ruby-devel")
+	%define tcldevel %(echo "tcl")
+	%define initscript /etc/rc.d/init.d/sqlrelay
+	%define inittab /etc/sysconfig/sqlrelay
+	%define docdir %{_docdir}/%{name}-%{version}
+%endif
+
 BuildRequires: rudiments-devel >= 0.26
-%{!?_without_gtk:BuildRequires: ,gtk+-devel}
+%{!?_without_gtk:BuildRequires: ,%{gtkdevel}}
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}
 %{!?_without_postgresql:BuildRequires: ,postgresql-devel}
 %{!?_without_perl:BuildRequires: ,perl}
-%{!?_without_php:BuildRequires: ,php-devel}
+%{!?_without_php:BuildRequires: ,%{phpdevel}}
 %{!?_without_python:BuildRequires: ,python-devel}
-%{!?_without_ruby:BuildRequires: ,ruby-devel}
+%{!?_without_ruby:BuildRequires: ,%{rubydevel}}
 %{!?_without_zope:BuildRequires: ,python-devel}
-%{!?_without_tcl:BuildRequires: ,tcl}
+%{!?_without_tcl:BuildRequires: ,%{tcldevel}}
 
 %description
 SQL Relay is a persistent database connection pooling, proxying and load 
@@ -289,21 +308,21 @@ Group: Applications/Database
 Man pages for SQL Relay.
 
 
-%define tcldir		/usr/lib/tcl
-%define pythondir	%(echo -e "import sys\\nimport string\\nout=''\\nfor i in sys.path:\\n if len(i)>0:\\n  for j in range(0,len(i)):\\n   if j<len(i)-1:\\n    out=out+i[j]\\n   else:\\n    if i[j]!='/':\\n     out=out+i[j]\\n  break\\nprint out" | python)
-%define	zopedir		/opt/Zope/lib/python/Products
+%define	tcldir		%(dirname `rpm -q -l %{tcldevel} | grep tclConfig.sh`)
+%define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "1.5" "1.6" "2.0" "2.1" "2.2" "2.3"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
+%define	zopedir		%(ZOPEPATH="/opt/Zope"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/opt"; do for j in "zope" "Zope"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib/python/Products"; fi; done; done; echo $ZOPEPATH)
 %define	phpextdir	%(php-config --extension-dir)
 %define	perl_prefix	%(eval "export `perl -V:prefix`"; echo $prefix)
 %define	perl_sitelib	%(eval "export `perl -V:sitelib`"; echo $sitelib)
-%define perl_installarchlib	%(eval "export `perl -V:installarchlib`"; echo $installarchlib)
-%define perl_installsitearch	%(eval "export `perl -V:installsitearch`"; echo $installsitearch)
+%define	perl_installarchlib	%(eval "export `perl -V:installarchlib`"; echo $installarchlib)
+%define	perl_installsitearch	%(eval "export `perl -V:installsitearch`"; echo $installsitearch)
 %define	perl_sitearch	%(eval "export `perl -V:sitearch`"; echo $sitearch)
 %define	perl_installman3dir	%(eval "export `perl -V:installman3dir`"; echo $installman3dir)
 %define	perl_man3ext	%(eval "export `perl -V:man3ext`"; echo $man3ext)
 
-%define ruby_sitelibdir	%(ruby -e 'require "mkmf"' -e 'drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/' -e 'print "arch = "' -e 'print CONFIG["arch"]' -e 'print "\\n"' -e 'print "ruby_version = "' -e 'print Config::CONFIG["ruby_version"]' -e 'print "\\n"' -e 'print "prefix = "' -e 'print with_destdir CONFIG["prefix"].sub(drive, "")' -e 'print "\\n"' -e 'print "exec_prefix = "' -e 'print with_destdir CONFIG["exec_prefix"].sub(drive, "")' -e 'print "\\n"' -e 'print "libdir = "' -e 'print with_destdir $libdir.sub(drive, "")' -e 'print "\\n"' -e 'print "rubylibdir = "' -e 'print with_destdir $rubylibdir.sub(drive, "")' -e 'print "\\n"' -e 'print "archdir = "' -e 'print with_destdir $archdir.sub(drive, "")' -e 'print "\\n"' -e 'print "sitedir = "' -e 'print with_destdir $sitedir.sub(drive, "")' -e 'print "\\n"' -e 'print "sitelibdir = "' -e 'print with_destdir $sitelibdir.sub(drive, "")' -e 'print "\\n\\n"' -e 'print "all:\\n"' -e 'print "	echo $(sitelibdir)\\n"' | make -s -f - )
+%define	ruby_sitelibdir	%(ruby -e 'require "mkmf"' -e 'drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/' -e 'print "arch = "' -e 'print CONFIG["arch"]' -e 'print "\\n"' -e 'print "ruby_version = "' -e 'print Config::CONFIG["ruby_version"]' -e 'print "\\n"' -e 'print "prefix = "' -e 'print with_destdir(CONFIG["prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "exec_prefix = "' -e 'print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "libdir = "' -e 'print with_destdir($libdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "rubylibdir = "' -e 'print with_destdir($rubylibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "archdir = "' -e 'print with_destdir($archdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitedir = "' -e 'print with_destdir($sitedir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitelibdir = "' -e 'print with_destdir($sitelibdir.sub(drive, ""))' -e 'print "\\n\\n"' -e 'print "all:\\n"' -e 'print "	echo $(sitelibdir)\\n"' | make -s -f - )
 
-%define ruby_sitearchdir	%(ruby -e 'require "mkmf"' -e 'drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/' -e 'print "arch = "' -e 'print CONFIG["arch"]' -e 'print "\\n"' -e 'print "sitearch ="' -e 'print CONFIG["sitearch"]' -e '"\\n"' -e 'print "ruby_version = "' -e 'print Config::CONFIG["ruby_version"]' -e 'print "\\n"' -e 'print "prefix = "' -e 'print with_destdir CONFIG["prefix"].sub(drive, "")' -e 'print "\\n"' -e 'print "exec_prefix = "' -e 'print with_destdir CONFIG["exec_prefix"].sub(drive, "")' -e 'print "\\n"' -e 'print "libdir = "' -e 'print with_destdir $libdir.sub(drive, "")' -e 'print "\\n"' -e 'print "rubylibdir = "' -e 'print with_destdir $rubylibdir.sub(drive, "")' -e 'print "\\n"' -e 'print "archdir = "' -e 'print with_destdir $archdir.sub(drive, "")' -e 'print "\\n"' -e 'print "sitedir = "' -e 'print with_destdir $sitedir.sub(drive, "")' -e 'print "\\n"' -e 'print "sitelibdir = "' -e 'print with_destdir $sitelibdir.sub(drive, "")' -e 'print "\\n"' -e 'print "sitearchdir = "' -e 'print with_destdir $sitearchdir.sub(drive, "")' -e 'print "\\n\\n"' -e 'print "all:\\n"' -e 'print "	echo $(sitearchdir)\\n"' | make -s -f - )
+%define	ruby_sitearchdir	%(ruby -e 'require "mkmf"' -e 'drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/' -e 'print "arch = "' -e 'print CONFIG["arch"]' -e 'print "\\n"' -e 'print "sitearch = "' -e 'print CONFIG["sitearch"]' -e 'print "\\n"' -e 'print "ruby_version = "' -e 'print Config::CONFIG["ruby_version"]' -e 'print "\\n"' -e 'print "prefix = "' -e 'print with_destdir(CONFIG["prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "exec_prefix = "' -e 'print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "libdir = "' -e 'print with_destdir($libdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "rubylibdir = "' -e 'print with_destdir($rubylibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "archdir = "' -e 'print with_destdir($archdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitedir = "' -e 'print with_destdir($sitedir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitelibdir = "' -e 'print with_destdir($sitelibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitearchdir = "' -e 'print with_destdir($sitearchdir.sub(drive, ""))' -e 'print "\\n\\n"' -e 'print "all:\\n"' -e 'print "	echo $(sitearchdir)\\n"' | make -s -f - )
 
 %prep
 %setup -q
@@ -337,16 +356,19 @@ make INSTALLPREFIX=%{buildroot}
 rm -rf %{buildroot}
 # must install everything except ruby first because the "prefix" environment
 # variable screws up the ruby install
-%makeinstall \
+make \
 	DESTDIR=%{buildroot} \
-	incdir=%{buildroot}%{_includedir} \
-	docdir=%{buildroot}%{_docdir}/%{name}-%{version} \
-	PYTHONDIR=%{buildroot}%{pythondir} \
-	ZOPEDIR=%{buildroot}%{zopedir} \
-	PHPEXTDIR=%{buildroot}%{phpextdir} \
-	TCLLIBSPATH=%{buildroot}%{tcldir} \
+	prefix=%{buildroot}%{_prefix} \
+	exec_prefix=%{buildroot}%{_prefix} \
+	includedir=%{buildroot}%{_includedir} \
+	libdir=%{buildroot}%{_libdir} \
+	bindir=%{buildroot}%{_bindir} \
+	localstatedir=%{buildroot}%{_localstatedir} \
+	sysconfdir=%{buildroot}%{_sysconfdir} \
+	mandir=%{buildroot}%{_mandir} \
+	docdir=%{buildroot}%{docdir} \
 	HAVE_RUBY="" \
-	initroot=%{buildroot}
+	install
 # get rid of some garbage
 rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
 # now install ruby
@@ -384,8 +406,8 @@ rm -rf %{buildroot}
 %defattr(-, root, root)
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.conf.example
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
-%config(noreplace) %attr(600, root, root) /etc/sysconfig/sqlrelay
-/etc/rc.d/init.d/sqlrelay
+%config(noreplace) %attr(600, root, root) %{inittab}
+%{initscript}
 %{_bindir}/sqlr-cachemanager*
 %{_bindir}/sqlr-listener*
 %{_bindir}/sqlr-scaler*
@@ -494,11 +516,11 @@ rm -rf %{buildroot}
 %{!?_without_perl:%files perl}
 %{!?_without_perl:%defattr(-, root, root)}
 %{!?_without_perl:%{perl_sitelib}/DBD/SQLRelay.pm}
+%{!?_without_perl:%{perl_sitearch}/auto/DBD/SQLRelay}
 %{!?_without_perl:%{perl_sitearch}/Firstworks/SQLRConnection.pm}
 %{!?_without_perl:%{perl_sitearch}/Firstworks/SQLRCursor.pm}
 %{!?_without_perl:%{perl_sitearch}/auto/Firstworks/SQLRConnection}
 %{!?_without_perl:%{perl_sitearch}/auto/Firstworks/SQLRCursor}
-%{!?_without_perl:%{perl_sitearch}/auto/DBD/SQLRelay}
 %{!?_without_perl:%{perl_installman3dir}/*.%{perl_man3ext}*}
 
 %{!?_without_php:%files php}
@@ -523,7 +545,7 @@ rm -rf %{buildroot}
 %{!?_without_tcl:%{tcldir}/sqlrelay/*}
 
 %files doc
-%{_docdir}/%{name}-%{version}
+%{docdir}
 
 %files man
 %{_mandir}

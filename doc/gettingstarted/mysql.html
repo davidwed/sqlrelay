@@ -171,8 +171,8 @@ no password.</p>
 <i>newpassword</i>.</p>
 
 <blockquote>
-<b>mysql -uroot -e "update user set password=password('newpassword') where user='root'" mysql</b>
-<b>mysqladmin reload</b>
+<b>mysql -uroot -e "update user set password=password('newpassword') where user='root'" mysql</b><br>
+<b>mysqladmin -uroot reload</b>
 </blockquote>
 
 <p>Though you can create tables in the <i>mysql</i> database, it's not a good 

@@ -5,9 +5,9 @@ include ../config.mk
 UID = $(shell id | grep "uid=0" )
 
 ifneq ($(UID),)
-initroot =
+initroot = $(DESTDIR)
 else
-initroot = $(prefix)
+initroot = $(DESTDIR)$(prefix)
 endif
 
 install:

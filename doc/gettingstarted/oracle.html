@@ -17,6 +17,7 @@
 <li><a href="#linux">Linux</a></li>
 <ul>
 <li><a href="#users">Create Users, Groups and Directories</a></li>
+<li><a href="#memory">Make Sure You Have Enough Memory</a></li>
 <li><a href="#kernel">Configure the Kernel</a></li>
 <li><a href="#development">Install the Development Software</a></li>
 <li><a href="#env">Set Up the Environment</a></li>
@@ -131,13 +132,43 @@ chmod 775 /u01<br>
 umask 022
 </b></blockquote>
 
+<a name="memory"></a>
+<span class="heading3">Make Sure You Have Enough Memory</span><br>
+
+<p>The number one reason that Oracle installations have failed for me is 
+because I ran out of ram and swap.  Oracle 9i really needs about 725mb of
+total ram/swap.  If your system has less than that, you can add 725mb of swap
+as follows.</p>
+
+<blockquote>
+<b>dd if=/dev/zero of=/extraswap bs=1k count=742400<br>
+chmod 600 /extraswap<br>
+/sbin/mkswap /extraswap<br>
+/sbin/swapon /extraswap</b>
+</blockquote>
+
+<p>Oracle 9i doesn't appear to need that much ram/swap to run, so after the
+installation is finished, you can remove it as follows:</p>
+
+<blockquote>
+<b>/sbin/swapoff /extraswap<br>
+rm /extraswap</b>
+</blockquote>
+
 <a name="kernel"></a>
 <span class="heading3">Configure the Kernel</span><br>
 
 <p>Oracle recommends that you configure your kernel to support more and larger
-shared memory segments and semaphores.  With few exceptions, I haven't needed
-to do this to get the installation to complete or to run a small development
-database.  For production systems however, I recommend following Oracle's
+shared memory segments and semaphores.  Oracle 9i requires that you at least
+temporarily increase the maximum shared memory segment size for installation.
+To temporarily increase the maximum shared memory segment size, follow these
+instructions:</p>
+
+<blockquote>
+<b>echo `expr 1024 \* 1024 \* 1024` > /proc/sys/kernel/shmmax</b>
+</blockquote>
+
+<p>For production systems I recommend following Oracle's kernel configuration
 recommendations.</p>
 
 <a name="development"></a>

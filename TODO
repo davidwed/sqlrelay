@@ -1,9 +1,6 @@
-abs_srcdir and abs_builddir aren't getting set properly
-
 ADODB - have a driver, just need to incorporate it
 scaling/handoff=pass incompatibility
 OS X compatibility
-
 
 oldmysql test files for non-C++ api's
 

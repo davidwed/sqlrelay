@@ -1,3 +1,14 @@
+0.34.3 - updated spec file for suse 9.0
+	applied a patch to fix a typo in C API
+	spec file searches for zope and python paths
+	uses includedir instead of incdir now
+	doc's are installed in ${datadir}/doc/sqlrelay now instead of
+		${prefix}/doc/sqlrelay
+
+0.34.2 - updates for fedora core 1 compatibility
+	Mac OS 10.2 compatibility improvements
+	A few documentation updates
+
 0.34.1 - fixed rpm build by upgrading to libtool 1.5 and using -inst-prefix-dir
 		for postgresql client api drop-in replacement library
 		

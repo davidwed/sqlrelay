@@ -7,11 +7,6 @@
 
 <body>
 
-<a name="swap"></a>
-<span class="heading1">Upgrade Swap and Shared Memory</span><br>
-
-<p>increase swap/shm</p>
-
 <a name="env"></a>
 <span class="heading1">Set Up the Environment</span><br>
 
@@ -23,6 +18,15 @@
 
 <a name="compat"></a>
 <span class="heading1">Install Compatibility Packages</span><br>
+
+<p>The Apache web server that comes with Oracle 9i requires Berkeley DB version
+3.  Redhat 9 comes with Berkeley DB version 4.  However, there is a
+compatibility RPM available:</p>
+
+<blockquote><b>compat-db-3.3.11-4.i386.rpm</b></blockquote>
+
+<p>You can download it from <a href="http://rpmfind.net">rpmfind</a> and install
+it using <i>rpm -i</i> as root.
 
 <p>Some versions of Redhat 9 came with the following glibc RPM:</p>
 
@@ -57,8 +61,15 @@ running somewhere.</p>
 fluxbox window managers in the past, though they may work for you.</p>
 
 <p>If you have a CD, mount it and cd to the mount point.  If you have a cpio
-distribution, extract all three files using <i>cpio ????</i> and cd to the
-Disk1 directory created by the extraction.</p>
+distribution, extract all three files using:<p>
+
+<blockquote><b>
+cpio -idmv &lt; lnx_920_disk1.cpio<br>
+cpio -idmv &lt; lnx_920_disk2.cpio<br>
+cpio -idmv &lt; lnx_920_disk3.cpio<br>
+</b></blockquote>
+
+Change directories to the Disk1 directory.<br><br>
 
 Type <b>./runInstaller</b><br><br>
 
