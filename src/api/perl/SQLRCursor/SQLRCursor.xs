@@ -9,6 +9,10 @@
 	#define na PL_na
 #endif
 
+#ifndef sv_undef
+	#define sv_undef PL_sv_undef
+#endif
+
 typedef class sqlrcursor sqlrcursor;
 
 MODULE = Firstworks::SQLRCursor		PACKAGE = Firstworks::SQLRCursor
@@ -180,7 +184,7 @@ sqlrcursor::getOutputBind(variable)
 		if (value) {
 			sv_setpvn(ST(0),value,length);
 		} else {
-			ST(0)=&PL_sv_undef;
+			ST(0)=&sv_undef;
 		}
 
 long
@@ -275,7 +279,7 @@ sqlrcursor::getField(row,...)
 		if (field) {
 			sv_setpvn(ST(0),field,length);
 		} else {
-			ST(0)=&PL_sv_undef;
+			ST(0)=&sv_undef;
 		}
 
 long
