@@ -4,8 +4,8 @@
 # See the file COPYING for more information.
 
 
-use Firstworks::SQLRConnection;
-use Firstworks::SQLRCursor;
+use SQLRelay::Connection;
+use SQLRelay::Cursor;
 
 
 sub checkUndef {
@@ -54,9 +54,9 @@ if ($#ARGV+1<5) {
 
 
 # instantiation
-$con=Firstworks::SQLRConnection->new($ARGV[0],$ARGV[1],
+$con=SQLRelay::Connection->new($ARGV[0],$ARGV[1],
 		$ARGV[2],$ARGV[3],$ARGV[4],0,1);
-$cur=Firstworks::SQLRCursor->new($con);
+$cur=SQLRelay::Cursor->new($con);
 
 # get database type
 print("IDENTIFY: \n");

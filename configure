@@ -41292,7 +41292,7 @@ if ( test -n "$HAVE_PERL" ); then
 fi
 
 
-MAKELIST="config.mk strip-comment-note src/api/perl/SQLRConnection/Makefile.PL src/api/perl/SQLRCursor/Makefile.PL src/api/perl/SQLRConnection/SQLRConnection.pm src/api/perl/SQLRCursor/SQLRCursor.pm src/api/perl/DBD/Makefile.PL src/api/perl/DBD/SQLRelay.pm bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay test/test"
+MAKELIST="config.mk strip-comment-note src/api/perl/Connection/Connection.pm src/api/perl/Cursor/Cursor.pm src/api/perl/DBD/SQLRelay.pm bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay test/test"
           ac_config_files="$ac_config_files $MAKELIST"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure

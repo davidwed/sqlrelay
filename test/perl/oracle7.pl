@@ -4,8 +4,8 @@
 # See the file COPYING for more information.
 
 
-use Firstworks::SQLRConnection;
-use Firstworks::SQLRCursor;
+use SQLRelay::Connection;
+use SQLRelay::Cursor;
 
 sub checkUndef {
 
@@ -55,9 +55,9 @@ if ($#ARGV+1<5) {
 
 
 # instantiation
-$con=Firstworks::SQLRConnection->new($ARGV[0],$ARGV[1], 
+$con=SQLRelay::Connection->new($ARGV[0],$ARGV[1], 
 				$ARGV[2],$ARGV[3],$ARGV[4],0,1);
-$cur=Firstworks::SQLRCursor->new($con);
+$cur=SQLRelay::Cursor->new($con);
 
 # get database type
 print("IDENTIFY: \n");
@@ -637,9 +637,9 @@ $cur->setResultSetBufferSize(0);
 print("\n");
 
 print("COMMIT AND ROLLBACK: \n");
-$secondcon=Firstworks::SQLRConnection->new($ARGV[0],
+$secondcon=SQLRelay::Connection->new($ARGV[0],
 			$ARGV[1],$ARGV[2],$ARGV[3],$ARGV[4],0,1);
-$secondcur=Firstworks::SQLRCursor->new($secondcon);
+$secondcur=SQLRelay::Cursor->new($secondcon);
 checkSuccess($secondcur->sendQuery("select count(*) from testtable"),1);
 checkSuccessString($secondcur->getField(0,0),"0");
 checkSuccess($con->commit(),1);

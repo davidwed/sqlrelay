@@ -30,10 +30,10 @@ use.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 
         ... execute some queries ...
 </PRE>
@@ -58,11 +58,11 @@ session with no commit or rollback.  Program accordingly.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_table</FONT><FONT color=#ff00ff>&quot;</FONT>);
 
@@ -92,7 +92,7 @@ between them.</p>
 <span class="heading2">Commits and Rollbacks</span><br><br>
 
 <p>If you need to execute a commit or rollback, you should use the commit()
-and rollback() methods of the Firstworks::SQLRConnection class rather than 
+and rollback() methods of the SQLRelay::Connection class rather than 
 sending a "commit" or "rollback" query.  There are two reasons for this.  
 First, it's much more efficient to call the methods.  Second, if you're writing 
 code that can run on transactional or non-transactional databases, some 
@@ -105,7 +105,7 @@ throws no error.  This is especially important when using SQL Relay with
 ODBC.</p>
 
 <p>You can also turn Autocommit on or off with the autoCommitOn() and
-autoCommitOff() methods of the Firstworks::SQLRConnection class.  When 
+autoCommitOff() methods of the SQLRelay::Connection class.  When 
 Autocommit is on, the database performs a commit after each successful DML or 
 DDL query.  When Autocommit is off, the database commits when the client 
 instructs it to, or (by default) when a client disconnects.  For databases that
@@ -119,11 +119,11 @@ You can find out why by calling errorMessage().</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <B><FONT color=#a52a2a>if</FONT></B> (!<FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_nonexistant_table</FONT><FONT color=#ff00ff>&quot;</FONT>)) {
         <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#008b8b>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;errorMessage());
@@ -152,11 +152,11 @@ substitution(), inputBind() and executeQuery().</p>
 	select * from mytable $(whereclause)
 
 Program code:<br>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;prepareFileQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>/usr/local/myprogram/sql</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>myquery.sql</FONT><FONT color=#ff00ff>&quot;</FONT>);
 <FONT color=#008b8b>$cur</FONT>-&gt;substitution(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>whereclause</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>where col1=:value1</FONT><FONT color=#ff00ff>&quot;</FONT>);
@@ -184,11 +184,11 @@ l_cursor types.cursorType;
 <br>
 Program code:
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;prepareQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>begin  :result:=addTwoNumbers(:num1,:num2);  end;</FONT><FONT color=#ff00ff>&quot;</FONT>);
 <FONT color=#008b8b>$cur</FONT>-&gt;inputBind(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>num1</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>10</FONT>);
@@ -216,11 +216,11 @@ and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
 
 <blockquote>
 <pre>
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRConnection;
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRCursor;
+<font color="#a02828"><b>use </b></font>SQLRelay::Connection;
+<font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=Firstworks::SQLRConnection::<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
-<font color="#008888">$cur</font>=Firstworks::SQLRCursor::<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection::<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$cur</font>=SQLRelay::Cursor::<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
 <font color="#008888">$cur</font>-&gt;executeQuery(<font color="#f800f8">&quot;</font><font color="#f800f8">create table images (image blob, description clob)</font><font color="#f800f8">&quot;</font>);
 
@@ -249,11 +249,11 @@ getOutputBindLength().</p>
 
 <blockquote>
 <pre>
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRConnection;
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRCursor;
+<font color="#a02828"><b>use </b></font>SQLRelay::Connection;
+<font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=Firstworks::SQLRConnection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
-<font color="#008888">$cur</font>=Firstworks::SQLRCursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
 <font color="#008888">$cur</font>-&gt;prepareQuery(<font color="#f800f8">&quot;</font><font color="#f800f8">begin  select image into :image from images;  select description into :desc from images;  end;</font><font color="#f800f8">&quot;</font>);
 <font color="#008888">$cur</font>-&gt;defineOutputBindBlob(<font color="#f800f8">&quot;</font><font color="#f800f8">image</font><font color="#f800f8">&quot;</font>);
@@ -292,11 +292,11 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
 <pre>
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRConnection;
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRCursor;
+<font color="#a02828"><b>use </b></font>SQLRelay::Connection;
+<font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=Firstworks::SQLRConnection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
-<font color="#008888">$cur</font>=Firstworks::SQLRCursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
 <font color="#008888">$cur</font>-&gt;prepareQuery(<font color="#f800f8">&quot;</font><font color="#f800f8">select * from mytable where mycolumn&gt;:value</font><font color="#f800f8">&quot;</font>);
 <font color="#008888">$cur</font>-&gt;inputBind(<font color="#f800f8">&quot;</font><font color="#f800f8">value</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">1</font>);
@@ -326,11 +326,11 @@ result sets.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_table</FONT><FONT color=#ff00ff>&quot;</FONT>);
 <FONT color=#008b8b>$con</FONT>-&gt;endSession();
@@ -352,11 +352,11 @@ a long or double, you can use getFieldAsLong() and getFieldAsDouble().</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_table</FONT><FONT color=#ff00ff>&quot;</FONT>);
 <FONT color=#008b8b>$con</FONT>-&gt;endSession();
@@ -413,11 +413,11 @@ index of the first row of the currently buffered chunk.
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;setResultSetBufferSize(<FONT color=#ff00ff>5</FONT>);
 
@@ -463,12 +463,12 @@ iterate through it's result set, inserting rows into another table, using only
 
 <blockquote>
 <pre>
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRConnection;
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRCursor;
+<font color="#a02828"><b>use </b></font>SQLRelay::Connection;
+<font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=Firstworks::SQLRConnection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
-<font color="#008888">$cursor1</font>=Firstworks::SQLRCursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
-<font color="#008888">$cursor2</font>=Firstworks::SQLRCursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$cursor1</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
+<font color="#008888">$cursor2</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
 <font color="#008888">$cursor1</font>-&gt;setResultSetBufferSize(<font color="#f800f8">10</font>);
 <font color="#008888">$cursor1</font>-&gt;sendQuery(<font color="#f800f8">&quot;</font><font color="#f800f8">select * from my_huge_table</font><font color="#f800f8">&quot;</font>);
@@ -495,11 +495,11 @@ getOutputBindCursor() and fetchFromOutputBindCursor().</p>
 
 <blockquote>
 <pre>
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRConnection;
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRCursor;
+<font color="#a02828"><b>use </b></font>SQLRelay::Connection;
+<font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=Firstworks::SQLRConnection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
-<font color="#008888">$cur</font>=Firstworks::SQLRCursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
 <font color="#008888">$cur</font>-&gt;prepareQuery(<font color="#f800f8">&quot;</font><font color="#f800f8">begin  :curs:=sp_mytable; end;</font><font color="#f800f8">&quot;</font>);
 <font color="#008888">$cur</font>-&gt;defineOutputBindCursor(<font color="#f800f8">&quot;</font><font color="#f800f8">curs</font><font color="#f800f8">&quot;</font>);
@@ -532,11 +532,11 @@ whether a column is nullable, the primary key or unique.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_table</FONT><FONT color=#ff00ff>&quot;</FONT>);
 <FONT color=#008b8b>$con</FONT>-&gt;endSession();
@@ -566,11 +566,11 @@ database.</p>
 
 <blockquote>
 <pre>
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRConnection;
-<font color="#a02828"><b>use </b></font>Firstworks::SQLRCursor;
+<font color="#a02828"><b>use </b></font>SQLRelay::Connection;
+<font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=Firstworks::SQLRConnection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
-<font color="#008888">$cur</font>=Firstworks::SQLRCursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
 <font color="#0000f8"># column names will be forced to upper case</font>
 <font color="#008888">$cur</font>-&gt;upperCaseColumnNames();
@@ -615,11 +615,11 @@ just open the file for each page of the report.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 	... generate a unique file name ...
 
@@ -637,15 +637,15 @@ just open the file for each page of the report.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
         ... get the filename from the previous page ...
 
         ... get the page to display from the previous page ...
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;openCachedResultSet(filename);
 <FONT color=#008b8b>$con</FONT>-&gt;endSession();
@@ -671,11 +671,11 @@ is possible.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT><FONT color=#ff00ff>&quot;</FONT>);
 <FONT color=#008b8b>$port</FONT>=<FONT color=#0008b8b>$cur</FONT>-&gt;getConnectionPort();
@@ -692,13 +692,13 @@ is possible.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
-<B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
+<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
         ... get rs, port <B><FONT color=#a52a2a>and</FONT></B> <B><FONT color=#a52a2a>socket</FONT></B> from previous page ...
 
-<FONT color=#008b8b>$con</FONT>=Firstworks::SQLRConnection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=Firstworks::SQLRCursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$con</FONT>-&gt;resumeSession(port,<FONT color=#a52a2a>$socket</FONT>);
 <FONT color=#008b8b>$cur</FONT>-&gt;resumeResultSet(<FONT color=#a52a2a>$rs</FONT>);
