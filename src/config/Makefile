@@ -3,8 +3,8 @@ include ../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES) `$(GTKCONFIG) --cflags`
-LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(RUDIMENTSLIBS) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= configfile.C gtkfe.C
 NLOBJS= configfile.n.lo gtkfe.n.lo
