@@ -1,4 +1,7 @@
-check out the cursor race-condition patch
+in sqlrconnection, currentcur should be passed around instead of being
+	global.
+
+fix the fake binds problem that erwin has
 
 check out the new db2 patch and see if it really works
 

@@ -17,9 +17,18 @@ int	sqlrconnection::commit() {
 	debugPrint("connection",1,"commit...");
 	#endif
 
-	cur[currentcur]->prepareQuery("commit",6);
-	int	retval=cur[currentcur]->executeQuery("commit",6,1);
-	cur[currentcur]->abort();
+	sqlrcursor	*commitcur=initCursor();
+	char	*commitquery="commit";
+	int	commitquerylen=6;
+	int	retval=0;
+	if (commitcur->openCursor(-1) &&
+		commitcur->prepareQuery(commitquery,commitquerylen) &&
+		commitcur->executeQuery(commitquery,commitquerylen,1)) {
+		commitcur->cleanUpData(true,true,true);
+		retval=1;
+	}
+	commitcur->closeCursor();
+	delete commitcur;
 
 	#ifdef SERVER_DEBUG
 	char	string[36];

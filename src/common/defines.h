@@ -32,6 +32,9 @@
 #define DONT_RECONNECT 0
 #define RECONNECT 1
 
+#define NEED_NEW_CURSOR 0
+#define DONT_NEED_NEW_CURSOR 1
+
 #define END_COLUMN_INFO 0
 #define END_RESULT_SET 3
 

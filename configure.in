@@ -8,8 +8,8 @@ AC_ARG_ENABLE(small-code,
 	SMALLCODE="")
 AC_ARG_ENABLE(debug,
 	[  --enable-debug                compile with -g and -pg options and don't strip binaries],
-	CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP="",
-	CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s")
+	CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP=""; DEBUGSTRIP="touch",
+	CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s"; DEBUGSTRIP="")
 AC_SUBST(INSTALLSTRIP)
 AC_SUBST(SMALLCODE)
 AC_SUBST(CFLAGS)
@@ -425,6 +425,13 @@ AC_SUBST(AR)
 FW_CHECK_LD_RPATH
 FW_CHECK_PS
 FW_CHECK_UNAME
+
+if ( test -n "$DEBUGSTRIP" )
+then
+	STRIP="$DEBUGSTRIP"
+	AC_SUBST(STRIP)
+fi
+
 FW_CHECK_GNU_STRIP
 FW_CHECK_PIPE
 

@@ -1400,6 +1400,7 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 		// number of bytes that could be sent.
 
 		unsigned int	counter=0;
+		sock->useNonBlockingMode();
 		while (sock->read(&dummy)>0 && counter<
 				// sending auth
 				(sizeof(short)+
@@ -1430,5 +1431,6 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 				)/2) {
 			counter++;
 		}
+		sock->useBlockingMode();
 	}
 }

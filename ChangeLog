@@ -26,6 +26,11 @@
 	added support for temp tables for all databases that support them
 	added tests for drop-in api's
 	applied a db2 version-8 specific patch from Masanori Akaishi
+	added search for libgthreads to configure for SCO
+	configure uses -pthread on cygwin now
+	the default implementation of commit/rollback allocate a new cursor now
+	applied a reexecute bug patch from Tony Fleisher and Erik Hollensbe and
+		fixed a bug that it revealed
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

@@ -1571,9 +1571,9 @@ fi;
 # Check whether --enable-debug or --disable-debug was given.
 if test "${enable_debug+set}" = set; then
   enableval="$enable_debug"
-  CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP=""
+  CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP=""; DEBUGSTRIP="touch"
 else
-  CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s"
+  CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s"; DEBUGSTRIP=""
 fi;
 
 
@@ -19270,6 +19270,13 @@ UNAME=`uname -s`
 
 
 
+if ( test -n "$DEBUGSTRIP" )
+then
+	STRIP="$DEBUGSTRIP"
+
+fi
+
+
 GNUSTRIP=`$STRIP --version 2> /dev/null | grep "GNU strip"`
 echo "$as_me:$LINENO: checking for GNU strip" >&5
 echo $ECHO_N "checking for GNU strip... $ECHO_C" >&6
@@ -19456,7 +19463,7 @@ then
 
 else
 
-	for i in "pthread" "c_r"
+	for i in "pthread" "c_r" "gthreads"
 	do
 
 

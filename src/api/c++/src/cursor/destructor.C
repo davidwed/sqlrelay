@@ -7,9 +7,7 @@
 sqlrcursor::~sqlrcursor() {
 
 	// abort result set if necessary
-	if (!endofresultset && sqlrc &&
-			!sqlrc->endsessionsent && 
-			!sqlrc->suspendsessionsent) {
+	if (sqlrc && !sqlrc->endsessionsent && !sqlrc->suspendsessionsent) {
 		abortResultSet();
 	}
 

@@ -34,7 +34,6 @@ int	sqlrconnection::returnResultSetData() {
 	// for some queries, there are no rows to return, 
 	if (norows) {
 		clientsock->write((unsigned short)END_RESULT_SET);
-		cur[currentcur]->abort();
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done returning result set data");
 		#endif
@@ -49,7 +48,6 @@ int	sqlrconnection::returnResultSetData() {
 	// skip the specified number of rows
 	if (!skipRows(skip)) {
 		clientsock->write((unsigned short)END_RESULT_SET);
-		cur[currentcur]->abort();
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done returning result set data");
 		#endif
@@ -71,7 +69,6 @@ int	sqlrconnection::returnResultSetData() {
 
 		if (!cur[currentcur]->fetchRow()) {
 			clientsock->write((unsigned short)END_RESULT_SET);
-			cur[currentcur]->abort();
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"done returning result set data");

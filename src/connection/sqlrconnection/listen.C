@@ -8,13 +8,9 @@ void	sqlrconnection::listen() {
 
 bool	firsttime=true;
 	for (;;) {
-printf("%d: 	loop 1\n",getpid());
 
-printf("%d: waitForAvailableDatabase()\n",getpid());
 		waitForAvailableDatabase();
-printf("%d: initSession()\n",getpid());
 		initSession();
-printf("%d: announceAvailability()\n",getpid());
 		lsnrcom->announceAvailability(tmpdir->getString(),
 						cfgfl->getPassDescriptor(),
 						unixsocket,
@@ -23,21 +19,12 @@ printf("%d: announceAvailability()\n",getpid());
 
 		// loop to handle suspended sessions
 		for (;;) {
-printf("%d: 	loop 2\n",getpid());
-if (!firsttime) {
-	char	ch;
-	while (lsnrcom->handoffsockun->read(&ch)==0) { printf("looping\n"); }
-} else {
-	firsttime=false;
-}
-printf("%d: 	waitForClient()\n",getpid());
 			int	success=waitForClient();
 			if (success==1) {
 
 				suspendedsession=0;
 
 				// have a session with the client
-printf("%d: 	clientSession()\n",getpid());
 				clientSession();
 
 				// break out of the loop unless the client
@@ -65,14 +52,11 @@ printf("%d: 	clientSession()\n",getpid());
 					suspendedsession=0;
 				}
 			}
-printf("%d: 	end of loop 2\n",getpid());
 		}
 
-printf("%d:	decrementSessionCount()\n",getpid());
 		if (cfgfl->getDynamicScaling()) {
 			sclrcom->decrementSessionCount();
 		}
-printf("%d: 	end of loop 1\n",getpid());
 	}
 }
 
@@ -141,7 +125,6 @@ int	sqlrconnection::waitForClient() {
 		// descriptor, delete the socket and return failure
 		int	descriptor;
 		if (!lsnrcom->receiveFileDescriptor(&descriptor)) {
-printf("pass failed\n");
 
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",1,"pass failed");

@@ -96,7 +96,6 @@ void	listenercomm::announceAvailability(char *tmpdir,
 }
 
 void	listenercomm::registerForHandoff(char *tmpdir) {
-printf("registering for handoff...\n");
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"registering for handoff...");

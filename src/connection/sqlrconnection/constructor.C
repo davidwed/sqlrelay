@@ -33,6 +33,8 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 	checkautocommit=0;
 	performautocommit=0;
 
+	currentcur=0;
+
 	// maybe someday these parameters will be configurable
 	bindpool=new memorypool(512,128,100);
 }

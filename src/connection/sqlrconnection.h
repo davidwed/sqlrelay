@@ -123,7 +123,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	setUserAndGroup();
 		void	createCursorArray();
 		int	initCursors(int create);
-		int	getCursor();
+		int	getCursor(unsigned short command);
 		int	findAvailableCursor();
 		void	closeCursors(int destroy);
 		void	setUnixSocketDirectory();
@@ -169,7 +169,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	truncateTempTables(stringlist *tablelist);
 		void	truncateTempTable(const char *tablename);
 		int	getCommand(unsigned short *command);
-		void	noAvailableCursors();
+		void	noAvailableCursors(unsigned short command);
 		int	getQuery();
 		int	getInputBinds();
 		int	getOutputBinds();

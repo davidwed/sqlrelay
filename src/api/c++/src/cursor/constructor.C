@@ -77,6 +77,7 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 
 	// cursor id
 	cursorid=0;
+	havecursorid=false;
 
 	initVariables();
 }

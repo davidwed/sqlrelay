@@ -47,24 +47,23 @@ void	sqlrconnection::clientSession() {
 		} else if (command==ROLLBACK) {
 			rollbackCommand();
 			continue;
-		} else if (command==NEW_QUERY) {
-			if (newQueryCommand()) {
-				continue;
-			}
-			break;
 		}
 
 		// For the rest of the commands, the client will be requesting
 		// a cursor.  Get the cursor to work with.  Save the result of
 		// this, the client may be sending more information and we need
 		// to collect it.
-		if (!getCursor()) {
-			getQueryFromClient(0,0);
-			noAvailableCursors();
+		if (!getCursor(command)) {
+			noAvailableCursors(command);
 			continue;
 		}
 
-		if (command==REEXECUTE_QUERY) {
+		if (command==NEW_QUERY) {
+			if (newQueryCommand()) {
+				continue;
+			}
+			break;
+		} else if (command==REEXECUTE_QUERY) {
 			if (!reExecuteQueryCommand()) {
 				break;
 			}
@@ -99,41 +98,84 @@ void	sqlrconnection::clientSession() {
 	#endif
 }
 
-int	sqlrconnection::getCursor() {
+int	sqlrconnection::getCursor(unsigned short command) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"getting a cursor...");
 	#endif
 
-	// which cursor is the client requesting?
-	unsigned short	index;
-	if (clientsock->read(&index)!=sizeof(unsigned short)) {
+	// does the client need a cursor or does it already have one
+	unsigned short	neednewcursor=DONT_NEED_NEW_CURSOR;
+	if (command==NEW_QUERY &&
+		clientsock->read(&neednewcursor)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
-				"error: client cursor request failed");
+			"error: client cursor request failed, need new cursor stage");
 		#endif
 		return 0;
 	}
 
-	// don't allow the client to request a cursor 
-	// beyond the end of the array.
-	if (index>cfgfl->getCursors()) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+	if (neednewcursor==DONT_NEED_NEW_CURSOR) {
+
+		// which cursor is the client requesting?
+		unsigned short	index;
+		if (clientsock->read(&index)!=sizeof(unsigned short)) {
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",2,
+				"error: client cursor request failed, cursor index stage");
+			#endif
+			return 0;
+		}
+
+		// don't allow the client to request a cursor 
+		// beyond the end of the array.
+		if (index>cfgfl->getCursors()) {
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",2,
 				"error: client requested an invalid cursor");
-		#endif
-		return 0;
+			#endif
+			return 0;
+		}
+
+		// set the current cursor to the one they requested.
+		currentcur=index;
+
+	} else {
+
+		// find an available cursor
+		currentcur=findAvailableCursor();
+		if (currentcur==-1) {
+			return 0;
+		}
 	}
 
-	// set the current cursor to the one they requested.
-	currentcur=index;
-	cur[index]->busy=1;
+	cur[currentcur]->busy=1;
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning requested cursor");
 	debugPrint("connection",1,"done getting a cursor");
 	#endif
 	return 1;
+}
+
+int	sqlrconnection::findAvailableCursor() {
+
+	for (int i=0; i<cfgfl->getCursors(); i++) {
+		if (!cur[i]->busy) {
+			cur[i]->busy=1;
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",3,(long)currentcur);
+			debugPrint("connection",2,"found a free cursor...");
+			debugPrint("connection",2,"done getting a cursor");
+			#endif
+			return i;
+		}
+	}
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,
+			"find available cursor failed: all cursors are busy");
+	#endif
+	return -1;
 }
 
 void	sqlrconnection::waitForClientClose() {
@@ -190,7 +232,36 @@ void	sqlrconnection::closeSuspendedSessionSockets() {
 	}
 }
 
-void	sqlrconnection::noAvailableCursors() {
+void	sqlrconnection::noAvailableCursors(unsigned short command) {
+
+	// If no cursor was available, the client
+	// cound send an entire query and bind vars
+	// before it reads the error and closes the
+	// socket.  We have to absorb all of that
+	// data.  We shouldn't just loop forever
+	// though, that would provide a point of entry
+	// for a DOS attack.  We'll read the maximum
+	// number of bytes that could be sent.
+	unsigned int	size=(
+				// query size and query
+				sizeof(long)+MAXQUERYSIZE+
+				// input bind var count
+				sizeof(short)+
+				// input bind vars
+				MAXVAR*(2*sizeof(short)+BINDVARLENGTH)+
+				// output bind var count
+				sizeof(short)+
+				// output bind vars
+				MAXVAR*(2*sizeof(short)+BINDVARLENGTH)+
+				// get column info
+				sizeof(short)+
+				// skip/fetch
+				2*sizeof(long));
+
+	clientsock->useNonBlockingMode();
+	unsigned char	dummy[size];
+	clientsock->read(dummy,size);
+	clientsock->useBlockingMode();
 
 	// indicate that an error has occurred
 	clientsock->write((unsigned short)ERROR);

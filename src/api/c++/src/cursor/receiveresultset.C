@@ -98,6 +98,7 @@ int	sqlrcursor::getCursorId() {
 	if (sqlrc->read(&cursorid)!=sizeof(unsigned short)) {
 		return 0;
 	}
+	havecursorid=true;
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Cursor ID: ");

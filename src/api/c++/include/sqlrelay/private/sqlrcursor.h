@@ -166,6 +166,7 @@
 
 		// cursor id
 		unsigned short	cursorid;
+		bool		havecursorid;
 
 	public:
 		void		copyReferences();

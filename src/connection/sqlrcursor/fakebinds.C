@@ -113,11 +113,6 @@ void	sqlrcursor::performSubstitution(stringbuffer *buffer, int which) {
 	} else if (inbindvars[which].type==LONG_BIND) {
 		buffer->append((long)inbindvars[which].value.longval);
 	} else if (inbindvars[which].type==DOUBLE_BIND) {
-		/**buffer << setprecision(inbindvars[which].
-					value.doubleval.precision);
-		*buffer << floor(inbindvars[which].value.doubleval.value*
-			pow(10,inbindvars[which].value.doubleval.scale))/
-			pow(10,inbindvars[which].value.doubleval.scale);*/
 		buffer->append(inbindvars[which].value.doubleval.value,
 				inbindvars[which].value.doubleval.precision,
 				inbindvars[which].value.doubleval.scale);

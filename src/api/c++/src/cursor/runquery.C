@@ -59,6 +59,34 @@ int	sqlrcursor::sendQueryInternal(const char *query) {
 		// tell the server we're sending a query
 		sqlrc->write((unsigned short)NEW_QUERY);
 
+		if (havecursorid) {
+
+			// tell the server we already have a cursor
+			sqlrc->write((unsigned short)DONT_NEED_NEW_CURSOR);
+
+			// send the cursor id to the server
+			sqlrc->write((unsigned short)cursorid);
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("Requesting Cursor: ");
+				sqlrc->debugPrint((long)cursorid);
+				sqlrc->debugPrint("\n");
+				sqlrc->debugPreEnd();
+			}
+
+		} else {
+
+			// tell the server we need a cursor
+			sqlrc->write((unsigned short)NEED_NEW_CURSOR);
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("Requesting a new cursor.\n");
+				sqlrc->debugPreEnd();
+			}
+		}
+
 		// send the query
 		sqlrc->write((unsigned long)querylen);
 		sqlrc->write(query,querylen);
