@@ -543,7 +543,7 @@ int	oracle8cursor::inputBindGenericLob(const char *variable,
 			(ub2)OCI_DEFAULT,OCI_DEFAULT,
 			temptype,OCI_ATTR_NOCACHE,
 			OCI_DURATION_SESSION)!=OCI_SUCCESS) {
-		OCIHandleFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
+		OCIDescriptorFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
 		return 0;
 	}
 
@@ -552,7 +552,7 @@ int	oracle8cursor::inputBindGenericLob(const char *variable,
 			OCI_LOB_READWRITE)!=OCI_SUCCESS) {
 		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
 					inbind_lob[inbindlobcount]);
-		OCIHandleFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
+		OCIDescriptorFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
 		return 0;
 	}
 
@@ -568,7 +568,7 @@ int	oracle8cursor::inputBindGenericLob(const char *variable,
 					inbind_lob[inbindlobcount]);
 		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
 					inbind_lob[inbindlobcount]);
-		OCIHandleFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
+		OCIDescriptorFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
 		return 0;
 	}
 
@@ -1238,7 +1238,7 @@ void	oracle8cursor::cleanUpData() {
 	for (int i=0; i<ncols; i++) {
 		for (int j=0; j<FETCH_AT_ONCE; j++) {
 			if (def_lob[i][j]) {
-				OCIHandleFree(def_lob[i][j],OCI_DTYPE_LOB);
+				OCIDescriptorFree(def_lob[i][j],OCI_DTYPE_LOB);
 			}
 		}
 		if (def[i]) {
@@ -1251,7 +1251,7 @@ void	oracle8cursor::cleanUpData() {
 		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
 						inbind_lob[i]);
 		OCILobClose(oracle8conn->svc,oracle8conn->err,inbind_lob[i]);
-		OCIHandleFree(inbind_lob[i],OCI_DTYPE_LOB);
+		OCIDescriptorFree(inbind_lob[i],OCI_DTYPE_LOB);
 	}
 	for (i=0; i<outbindlobcount; i++) {
 		if (outbind_lob[i]) {
@@ -1259,7 +1259,7 @@ void	oracle8cursor::cleanUpData() {
 						outbind_lob[i]);
 			OCILobClose(oracle8conn->svc,oracle8conn->err,
 						outbind_lob[i]);
-			OCIHandleFree(outbind_lob[i],OCI_DTYPE_LOB);
+			OCIDescriptorFree(outbind_lob[i],OCI_DTYPE_LOB);
 		}
 	}
 	inbindlobcount=0;
