@@ -63,11 +63,19 @@
 	updated mysql/lago/postgresql/sybase/db2/interbase docs a bit
 	added oracle8i/9i-specific tests
 	better ps aux/-efal detection
-	-fomit-frame-pointer -fno-exceptions -fno-rtti are used now, debugging
-		build just uses -fno-exceptions -fno-rtti
+	-fomit-frame-pointer -fno-exceptions are used now, debugging
+		build just uses -fno-exceptions
 	freetds connection disables affected rows for freetds-0.61
 	freetds tests use sendQuery("commit tran") instead of commit(), for
 		some reason that's necessary with freetds
+	libmysqlclient.so is referred to directly instead of using
+		-LPATH -llib because libtool likes to append .libs to paths
+		that don't end in "lib" on some platforms (notably Solaris x86)
+		and libmysqlclient.so is almost always installed in
+		$(somepath)/lib/mysql instead of $(somepath)/lib
+	don't link directly against -lstdc++ any more, instead, set up libtool
+		to use g++ to link everything
+	added more verbose logIn error reporting to oracle8 connection
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

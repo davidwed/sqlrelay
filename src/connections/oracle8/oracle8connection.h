@@ -179,6 +179,7 @@ class oracle8connection : public sqlrconnection {
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		int	logIn();
+		void	logInError(const char *errmsg);
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();

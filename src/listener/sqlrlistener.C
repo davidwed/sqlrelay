@@ -871,7 +871,8 @@ int	sqlrlistener::getAuth() {
 
 	char		passwordbuffer[(unsigned long)USERSIZE+1];
 	clientsock->read(&size);
-	if (size>(unsigned long)USERSIZE || (unsigned long)(clientsock->read(passwordbuffer,size))!=size) {
+	if (size>(unsigned long)USERSIZE ||
+		(unsigned long)(clientsock->read(passwordbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: password size is wrong");

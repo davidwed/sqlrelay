@@ -83,7 +83,7 @@ int	interbaseconnection::logIn() {
 		return 0;
 	}
 
-	// start a transaction for non-ddl queries
+	// start a transaction
 	if (isc_start_transaction(error,&tr,1,&db,
 				(unsigned short)sizeof(tpb),&tpb)) {
 
@@ -489,7 +489,6 @@ int	interbasecursor::executeQuery(const char *query, long length,
 	}
 
 	// Execute the query, using the appropriate transaction.  
-	// Commit ddl queries immediately.
 	return !isc_dsql_execute(interbaseconn->error,&interbaseconn->tr,
 							&stmt,1,insqlda);
 }

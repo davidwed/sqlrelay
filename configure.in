@@ -8,8 +8,8 @@ AC_ARG_ENABLE(small-code,
 	SMALLCODE="")
 AC_ARG_ENABLE(debug,
 	[  --enable-debug                compile with -g and -pg options and don't strip binaries],
-	CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-rtti -fno-exceptions -Wall"; INSTALLSTRIP="",
-	CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-rtti -fno-exceptions -Wall"; INSTALLSTRIP="-s")
+	CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP="",
+	CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s")
 AC_SUBST(INSTALLSTRIP)
 AC_SUBST(SMALLCODE)
 AC_SUBST(CFLAGS)
@@ -374,26 +374,16 @@ if ( test -n "$TCLLIBSPATH" -a "`echo $TCLLIBSPATH | cut -c-3`" = "../" ); then
 fi
 
 
-dnl Checks for libtool.
-echo
-echo "***** Libtool ****************"
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
-FW_CHECK_USE_SYSTEM_LIBTOOL
-echo "******************************"
-
-
 dnl Checks for programs.
 echo
 echo "***** Programs ***************"
-CC=gcc
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-#AC_LANG(C++)
+AC_LANG(C++)
 
 dnl have to set ar here because libtool (currently) fails
 dnl to use the correct one when cross-compiling
@@ -408,8 +398,19 @@ FW_CHECK_PIPE
 echo "******************************"
 
 
+dnl Checks for libtool.
+echo
+echo "***** Libtool ****************"
+OLDCC=$CC
+CC=$CXX
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+FW_CHECK_USE_SYSTEM_LIBTOOL
+CC=$OLDCC
+echo "******************************"
+
+
 FW_CHECK_MICROSOFT
-FW_CHECK_STDCPP
 
 dnl Checks for inline keyword
 echo
