@@ -1,0 +1,199 @@
+<html>
+<head>
+<title>firstworks   Using the SQL Relay drop-in replacement library for PostgreSQL</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Using the SQL Relay drop-in replacement library for PostgreSQL</span><br><br>
+
+<ul>
+<li><a href="#whatis">What is a drop-in replacement library?</a></li>
+<li><a href="#commandline">Using the drop-in replacement library with command-line programs</a></li>
+<li><a href="#daemons">Using the drop-in replacement library with daemons</a></li>
+<li><a href="#inetd">Using the drop-in replacement library with inetd/xinetd helper programs</a></li>
+<li><a href="#modules">Using the drop-in replacement library with modules</a></li>
+</ul>
+
+<br>
+<a name="whatis"></a>
+<span class="heading2">What is a drop-in replacement library?</span><br>
+
+<p>The SQL Relay drop-in replacement library for PostgreSQL clients allows you
+to run an application that was written using the native PostgreSQL client API
+against SQL Relay without rewriting the application.</p>
+
+<p>The drop-in replacement library is a shared object library that implements
+PostgreSQL client library functions as calls to similar SQL Relay API functions
+which then map the results back into native PostgreSQL client data
+structures.</p>
+
+<p>There are a variety of reasons that you might want to use the SQL Relay
+drop-in replacement library for PostgreSQL clients.  An application written for
+PostgreSQL could, for instance, be made to run queries against an Oracle or
+Microsoft SQL Server database without modification.  Or you could simply put
+SQL Relay between an application and the PostgreSQL database that it normally
+runs against to take advantage of SQL Relay's persistence, load balancing or
+throttling facilities.</p>
+
+<br>
+<a name="commandline"></a>
+<span class="heading2">Using the drop-in replacement library with command-line programs</span><br>
+
+<p>You can use the SQL Relay drop-in replacement library for PostgreSQL clients
+by loading the drop-in library and running your program as follows.  In this
+example, we're running the "psql" program against an instance of SQL Relay
+running on the localhost, port 8009 against an Oracle database.  This instance
+of SQL Relay is configured with a username/password of
+oracle8user/oracle8pass.</p>
+
+<p>For sh-based shells:</p>
+
+<blockquote><pre><b>
+LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
+export LD_PRELOAD
+psql -h localhost -p 8009 -U oracle8user -W
+Password: oracle8pass
+</b></pre></blockquote>
+
+<p>For csh-based shells:</p>
+
+<blockquote><pre><b>
+setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so
+psql -h localhost -p 8009 -U oracle8user -W
+Password: oracle8pass
+</b></pre></blockquote>
+
+<p>The LD_PRELOAD environment variable instructs the dynamic loader to load
+libpqsqlrelay.so before loading any other libraries for any programs.
+The psql client program will still load the native PostgreSQL client library,
+but since it loaded the SQL Relay drop-in replacement library first, function
+calls that would normally be fulfilled by the native PostgreSQL client library
+are fulfilled by the SQL Relay drop-in replacement library instead.</p>
+
+<p>Below is a sample session using the psql command line client against an
+Oracle database through SQL Relay.</p>
+
+<blockquote>
+</blockquote>
+
+<br>
+<a name="daemons"></a>
+<span class="heading2">Using the drop-in replacement library with daemons</span><br>
+
+<p>Using the SQL Relay drop-in replacement library for PostgreSQL with daemons
+is simlar to using it on the command line.  You just need to add the LD_PRELOAD
+command to the startup script for the daemon before the command that starts the
+daemon itself.</p>
+
+<br>
+<a name="inetd"></a>
+<span class="heading2">Using the drop-in replacement library with inetd/xinetd helper programs</span><br>
+
+<p>Inetd and xinetd are daemons that listen on ports and run helper programs to
+service requests on those ports.  The helper programs die off after the request
+is serviced.</p>
+
+<p>The easist way to get an inetd helper program to use the SQL Relay drop-in
+replacement library for PostgreSQL is to add the LD_PRELOAD command to the
+startup script for inetd/xinetd.  Any command that inetd/xinetd runs will also
+preload the library.</p>
+
+<p>However, if some of the helper programs need to actually run against
+PostgreSQL and not against SQL Relay, then you will have to do something
+different.  The easiest thing to do is create a script for each helper program
+that needs to run against SQL Relay that runs the LD_PRELOAD command and then
+runs the actual helper program, passing it all the necessary command line
+arguments.</p>
+
+<p>For example, lets say you have a pop3 server called pop3d that uses
+PostgreSQL for user identification and you wanted to use SQL Relay instead of
+PostgreSQL.  The inetd.conf entry might look like this:</p>
+
+<blockquote><pre>
+pop3 stream tcp nowait root /usr/local/bin/pop3d
+</pre></blockquote>
+
+<p>An /etc/xinetd.d entry might look like this:
+
+<blockquote><pre>
+service pop3
+{
+	socket_type	= stream
+	wait		= no
+	user		= root
+	server		= /usr/local/bin/pop3d
+}
+</pre></blockquote>
+
+<p>You could write the a script called /usr/local/bin/pop3d-sqlrelay as
+follows:</p>
+
+<blockquote>
+<pre>
+<font color="#0000ff">#!/bin/sh</font>
+<font color="#008a8c">LD_PRELOAD</font>=/usr/local/firstworks/lib/libpqsqlrelay.so
+<font color="#a52829"><b>export </b></font><font color="#008a8c">LD_PRELOAD</font>
+/usr/local/bin/pop3d <font color="#a520f7">$@</font>
+</pre>
+</blockquote>
+
+<p>And modify the entries to call the script instead of pop3d as follows:</p>
+
+<blockquote><pre>
+pop3 stream tcp nowait root /usr/local/bin/pop3d-sqlrelay
+</pre></blockquote>
+
+<p>Or for xinetd:</p>
+
+<blockquote><pre>
+service pop3
+{
+	socket_type	= stream
+	wait		= no
+	user		= root
+	server		= /usr/local/bin/pop3d-sqlrelay
+}
+</pre></blockquote>
+
+<br>
+<a name="modules"></a>
+<span class="heading2">Using the drop-in replacement library with modules</span><br>
+
+<p>You may want to use the SQL Relay drop-in replacement library for PostgreSQL
+clients with a program that isn't compiled against the native PostgreSQL client
+library but rather loads it as a module such as a program that uses ODBC or
+Perl DBI, or an Apache/PHP application.</p>
+
+<p>Using the SQL Relay drop-in replacement library with programs that load
+the native PostgreSQL client library as a module is simlar to using it on the
+command line.  You just need to make sure that the LD_PRELOAD command is run
+before the program starts.</p>
+
+<p>If the program is a command line program, then run the LD_PRELOAD command
+before running your program.  Even though the program ultimately loads the
+native PostgreSQL client library, all of it's functions will be overriden by the
+SQL Relay drop-in replacement library.</p>
+
+<p>If the program is a daemon then add the LD_PRELOAD command to the startup
+script for the daemon.</p>
+
+<p>If the program runs in the address space of a daemon, such as a PHP
+application running under Apache's mod_php, then add the LD_PRELOAD command to
+the startup script for the daemon.  The caveat here is that all applications
+running in the address space of the daemon will use the drop-in replacement
+library instead of the native PostgreSQL library.  It is not possible, for
+example for a web server to run one PHP application directly against PostgreSQL
+and another PHP application against SQL Relay using the drop-in replacement
+library; if the drop-in replacement library is loaded, both applications will
+end up using it.</p>
+
+<p>If the program is spawned by a daemon, such as a cgi spawned by a web-server
+or an inetd/xinetd helper program, then you can either add the LD_PRELOAD
+command to the daemon's startup script or write a script to run the LD_PRELOAD
+command and pass along the command line arguments (see the section
+<a href="#inetd">Using the drop-in replacement library with inetd/xinetd helper
+programs above)</a>).</p>
+
+</body>
+</html>
