@@ -1574,20 +1574,20 @@ fi;
 # Check whether --enable-debug or --disable-debug was given.
 if test "${enable_debug+set}" = set; then
   enableval="$enable_debug"
-  CFLAGS="$CFLAGS -g -Wall"; CXXFLAGS="$CXXFLAGS -g -Wall"
+  CFLAGS="$CFLAGS -g"; CXXFLAGS="$CXXFLAGS -g"
 else
-  CFLAGS="$CFLAGS -Wall"; CXXFLAGS="$CXXFLAGS -Wall"
+  CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS"
 fi;
 # Check whether --enable-profiling or --disable-profiling was given.
 if test "${enable_profiling+set}" = set; then
   enableval="$enable_profiling"
-  CFLAGS="$CFLAGS -pg -Wall"; CXXFLAGS="$CXXFLAGS -pg -Wall"
+  CFLAGS="$CFLAGS -pg"; CXXFLAGS="$CXXFLAGS -pg"
 else
-  CFLAGS="$CFLAGS -Wall"; CXXFLAGS="$CXXFLAGS -Wall"
+  CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS"
 fi;
 
-CFLAGS="$SMALLCODE $CFLAGS"
-CXXFLAGS="$SMALLCODE $CXXFLAGS"
+CFLAGS="$SMALLCODE $CFLAGS -Wall"
+CXXFLAGS="$SMALLCODE $CXXFLAGS -Wall"
 
 
 
