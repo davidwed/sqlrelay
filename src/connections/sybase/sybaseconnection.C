@@ -273,7 +273,8 @@ bool sybasecursor::openCursor(int id) {
 		int	len=strlen(sybaseconn->db)+4;
 		char	*query=new char[len+1];
 		sprintf(query,"use %s",sybaseconn->db);
-		if (!(prepareQuery(query,len) && executeQuery(query,len,1))) {
+		if (!(prepareQuery(query,len) &&
+				executeQuery(query,len,true))) {
 			bool	live;
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=false;
@@ -435,8 +436,7 @@ bool sybasecursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool sybasecursor::executeQuery(const char *query, long length,
-						unsigned short execute) {
+bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
 
 	// clear out any errors
 	if (sybaseconn->errorstring) {

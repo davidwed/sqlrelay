@@ -2,14 +2,14 @@
 // See the file COPYING for more information.
 
 	private:
-		int	openSession();
+		bool	openSession();
 		void	closeConnection();
 
-		int	authenticateWithListener();
-		int	authenticateWithConnection();
-		int	genericAuthentication();
-		void	getReconnect();
-		int	getNewPort();
+		bool	authenticateWithListener();
+		bool	authenticateWithConnection();
+		bool	genericAuthentication();
+		bool	getReconnect();
+		bool	getNewPort();
 
 		void	clearSessionFlags();
 
@@ -22,15 +22,15 @@
 		void	debugPrintBlob(const char *blob, unsigned long length);
 		void	debugPrintClob(const char *clob, unsigned long length);
 
-		int	autoCommit(bool on);
+		bool	autoCommit(bool on);
 
 		void	clearError();
 		void	setError(const char *err);
 
 		// session state
-		unsigned short	endsessionsent;
-		unsigned short	suspendsessionsent;
-		int		connected;
+		bool	endsessionsent;
+		bool	suspendsessionsent;
+		bool	connected;
 
 		// connection
 		char			*server;
@@ -47,7 +47,7 @@
 		int		userlen;
 		char		*password;
 		int		passwordlen;
-		int		reconnect;
+		bool		reconnect;
 
 		// error
 		char		*error;
@@ -56,12 +56,12 @@
 		char		*id;
 
 		// debug
-		int		debug;
+		bool		debug;
 		int		webdebug;
 		int		(*printfunction)(const char *,...);
 
 		// copy references flag
-		int		copyrefs;
+		bool		copyrefs;
 
 		// cursor list
 		sqlrcursor	*firstcursor;

@@ -5,15 +5,15 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
 
-int sqlrcursor::executeQuery() {
+bool sqlrcursor::executeQuery() {
 
 	if (!queryptr) {
 		setError("No query to execute.");
-		return 0;
+		return false;
 	}
 
 	// a useful variable
-	int	retval=0;
+	bool	retval=false;
 
 	if (!subcount) {
 
@@ -166,7 +166,7 @@ int sqlrcursor::executeQuery() {
 
 	// set up to re-execute the same query if executeQuery is called
 	// again before calling prepareQuery
-	reexecute=1;
+	reexecute=true;
 
 	return retval;
 }
@@ -177,7 +177,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 	char	*ptr;
 	char	*start;
 	char	*after;
-	int	found;
+	bool	found;
 	int	len;
 	int	count;
 
@@ -191,7 +191,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 			continue;
 		}
 
-		found=0;
+		found=false;
 		start=((char *)query)+1;
 
 		// there may be more than 1 match for the variable name as in
@@ -208,7 +208,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 				!(*(after)>='a' && *(after)<='z') &&
 				!(*(after)>='A' && *(after)<='Z') &&
 				!(*(after)>='0' && *(after)<='9')) {
-				found=1;
+				found=true;
 				break;
 			} else {
 				// jump past this instance to look for the
@@ -233,7 +233,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 			continue;
 		}
 
-		found=0;
+		found=false;
 		start=((char *)query)+1;
 
 		// there may be more than 1 match for the variable name as in
@@ -249,7 +249,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 				!(*(after)>='a' && *(after)<='z') &&
 				!(*(after)>='A' && *(after)<='Z') &&
 				!(*(after)>='0' && *(after)<='9')) {
-				found=1;
+				found=true;
 				break;
 			} else {
 				// jump past this instance to look for the

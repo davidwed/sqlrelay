@@ -26,8 +26,8 @@ void	sqlrcon_free(sqlrcon sqlrconref) {
 	delete (sqlrconnection *)sqlrconref;
 }
 
-int	sqlrcon_endSession(sqlrcon sqlrconref) {
-	return sqlrconref->endSession();
+void	sqlrcon_endSession(sqlrcon sqlrconref) {
+	sqlrconref->endSession();
 }
 
 int	sqlrcon_suspendSession(sqlrcon sqlrconref) {

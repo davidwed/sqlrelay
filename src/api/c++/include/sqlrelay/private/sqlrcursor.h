@@ -14,7 +14,7 @@
 		void	deleteVariables();
 
 		void	initQueryBuffer();
-		int	sendQueryInternal(const char *query);
+		bool	sendQueryInternal(const char *query);
 		void	validateBindsInternal(const char *query);
 		void	sendInputBinds();
 		void	sendOutputBinds();
@@ -33,27 +33,27 @@
 					bindtype type);
 		void	initVar(bindvar *var, const char *variable);
 		void	performSubstitution(stringbuffer *buffer, int which);
-		int	runQuery(const char *query);
+		bool	runQuery(const char *query);
 		void	abortResultSet();
-		int	processResultSet(int rowtoget);
+		bool	processResultSet(int rowtoget);
 
 		int	getString(char *string, int size);
 		int	getShort(unsigned short *integer);
 		int	getLong(unsigned long *integer);
 
-		int	noError();
-		int	getCursorId();
-		int	getSuspended();
-		int	parseColumnInfo();
-		int	parseOutputBinds();
-		int	parseData();
+		bool	noError();
+		bool	getCursorId();
+		bool	getSuspended();
+		bool	parseColumnInfo();
+		bool	parseOutputBinds();
+		bool	parseData();
 		void	setError(const char *err);
 		void	getErrorFromServer();
 		void	handleError();
 
-		int	skipAndFetch(int rowtoget);
+		bool	skipAndFetch(int rowtoget);
 		void	fetchRows();
-		int	skipRows(int rowtoget);
+		bool	skipRows(int rowtoget);
 
 		void	startCaching();
 		void	cacheError();
@@ -82,15 +82,15 @@
 		void	createColumnBuffers();
 
 
-		int		resumed;
-		int		cached;
+		bool		resumed;
+		bool		cached;
 
 		// query
 		char		*querybuffer;
 		char		*queryptr;
 		int		querylen;
 		char		*fullpath;
-		int		reexecute;
+		bool		reexecute;
 
 		// substitution variables
 		bindvar		subvars[MAXVAR];
@@ -109,7 +109,7 @@
 		unsigned short	sentcolumninfo;
 
 		unsigned short	suspendresultsetsent;
-		unsigned short	endofresultset;
+		bool		endofresultset;
 
 		unsigned short	columntypeformat;
 		unsigned long	colcount;
@@ -139,10 +139,10 @@
 		char		***fields;
 		unsigned long	**fieldlengths;
 
-		int		returnnulls;
+		bool		returnnulls;
 
 		// result set caching
-		int		cacheon;
+		bool		cacheon;
 		int		cachettl;
 		char		*cachedestname;
 		char		*cachedestindname;
@@ -155,7 +155,7 @@
 		char		*error;
 
 		// copy references flag
-		int		copyrefs;
+		bool		copyrefs;
 
 		// parent connection
 		sqlrconnection	*sqlrc;

@@ -20,9 +20,9 @@ int sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
 		return 0;
 	}
 
-	cached=0;
-	resumed=1;
-	endofresultset=0;
+	cached=false;
+	resumed=true;
+	endofresultset=false;
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();

@@ -7,7 +7,7 @@
 #include <defines.h>
 #include <datatypes.h>
 
-int sqlrcursor::processResultSet(int rowtoget) {
+bool sqlrcursor::processResultSet(int rowtoget) {
 
 	// start caching the result set
 	if (cacheon) {
@@ -15,7 +15,7 @@ int sqlrcursor::processResultSet(int rowtoget) {
 	}
 
 	// parse the columninfo and data
-	int	success=1;
+	bool	success=true;
 
 	// skip and fetch here if we're not reading from a cached result set
 	// this way, everything gets done in 1 round trip
@@ -23,14 +23,19 @@ int sqlrcursor::processResultSet(int rowtoget) {
 		success=skipAndFetch(firstrowindex+rowtoget);
 	}
 
+	// check for an error
+	if (success && !noError()) {
+		getErrorFromServer();
+		return false;
+	}
+
 	// get data back from the server
-	if (success>0 && (success=noError())>0 &&
-			((cachesource && cachesourceind) ||
+	if (success && ((cachesource && cachesourceind) ||
 			((!cachesource && !cachesourceind)  && 
 				(success=getCursorId()) && 
-				(success=getSuspended())>0)) &&
-			(success=parseColumnInfo())>0 && 
-			(success=parseOutputBinds())>0) {
+				(success=getSuspended()))) &&
+			(success=parseColumnInfo()) && 
+			(success=parseOutputBinds())) {
 
 		// skip and fetch here if we're reading from a cached result set
 		if (cachesource) {
@@ -38,25 +43,21 @@ int sqlrcursor::processResultSet(int rowtoget) {
 		}
 
 		// parse the data
-		if (success>-1) {
+		if (success) {
 			success=parseData();
 		}
 	}
 
-	// handle error responses
-	if (success==0) {
-		getErrorFromServer();
-		return 0;
-	} else if (success==-1) {
+	// if success is false, then some kind of network error occurred,
+	// end the session
+	if (!success) {
 		clearResultSet();
-		setError("Failed to execute the query and/or process the result set.\n A query, bind variable or bind value could be too large, there could be too \n many bind variables, or a network error may have ocurred.");
 		sqlrc->endSession();
-		return 0;
 	}
-	return 1;
+	return success;
 }
 
-int sqlrcursor::noError() {
+bool sqlrcursor::noError() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -67,8 +68,10 @@ int sqlrcursor::noError() {
 	// get a flag indicating whether there's been an error or not
 	unsigned short	success;
 	if (getShort(&success)!=sizeof(unsigned short)) {
-		return -1;
+		setError("Failed to determine whether an error occurred or not.\n A network error may have ocurred.");
+		return false;
 	}
+
 	if (success==NO_ERROR) {
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
@@ -76,19 +79,18 @@ int sqlrcursor::noError() {
 			sqlrc->debugPreEnd();
 		}
 		cacheNoError();
-		return 1;
-	} else if (success==ERROR) {
-		if (sqlrc->debug) {
-			sqlrc->debugPreStart();
-			sqlrc->debugPrint("error!!!\n");
-			sqlrc->debugPreEnd();
-		}
-		return 0;
+		return true;
 	}
-	return -1;
+
+	if (sqlrc->debug) {
+		sqlrc->debugPreStart();
+		sqlrc->debugPrint("error!!!\n");
+		sqlrc->debugPreEnd();
+	}
+	return false;
 }
 
-int sqlrcursor::getCursorId() {
+bool sqlrcursor::getCursorId() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -96,7 +98,8 @@ int sqlrcursor::getCursorId() {
 		sqlrc->debugPreEnd();
 	}
 	if (sqlrc->read(&cursorid)!=sizeof(unsigned short)) {
-		return 0;
+		setError("Failed to get a cursor id.\n A network error may have ocurred.");
+		return false;
 	}
 	havecursorid=true;
 	if (sqlrc->debug) {
@@ -106,15 +109,16 @@ int sqlrcursor::getCursorId() {
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
-	return 1;
+	return true;
 }
 
-int sqlrcursor::getSuspended() {
+bool sqlrcursor::getSuspended() {
 
 	// see if the result set of that cursor is actually suspended
 	unsigned short	suspendedresultset;
 	if (sqlrc->read(&suspendedresultset)!=sizeof(unsigned short)) {
-		return -1;
+		setError("Failed to determine whether the session was suspended or not.\n A network error may have ocurred.");
+		return false;
 	}
 
 	if (suspendedresultset==SUSPENDED_RESULT_SET) {
@@ -122,7 +126,10 @@ int sqlrcursor::getSuspended() {
 		// If it was suspended the server will send the index of the 
 		// last row from the previous result set.
 		// Initialize firstrowindex and rowcount from this index.
-		sqlrc->read(&firstrowindex);
+		if (sqlrc->read(&firstrowindex)!=sizeof(unsigned long)) {
+			setError("Failed to get the index of the last row of a previously suspended result set.\n A network error may have ocurred.");
+			return false;
+		}
 		rowcount=firstrowindex+1;
 	
 		if (sqlrc->debug) {
@@ -133,9 +140,8 @@ int sqlrcursor::getSuspended() {
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
-		return 1;
 
-	} else if (suspendedresultset==NO_SUSPENDED_RESULT_SET) {
+	} else {
 
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
@@ -143,10 +149,8 @@ int sqlrcursor::getSuspended() {
 	       		sqlrc->debugPrint("not suspended.\n");
 			sqlrc->debugPreEnd();
 		}
-		return 1;
-
 	}
-	return 0;
+	return true;
 }
 
 void sqlrcursor::getErrorFromServer() {
@@ -192,7 +196,7 @@ void sqlrcursor::handleError() {
 		sqlrc->debugPreEnd();
 	}
 
-	endofresultset=1;
+	endofresultset=true;
 
 	cacheError();
 	finishCaching();

@@ -4,7 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-int sqlrcursor::skipAndFetch(int rowtoget) {
+bool sqlrcursor::skipAndFetch(int rowtoget) {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -20,12 +20,12 @@ int sqlrcursor::skipAndFetch(int rowtoget) {
 	// if we're stepping through the result set, we can possibly 
 	// skip a big chunk of it...
 	if (!skipRows(rowtoget)) {
-		return -1;
+		return false;
 	}
 
 	// tell the connection how many rows to send
 	fetchRows();
-	return 1;
+	return true;
 }
 
 void sqlrcursor::fetchRows() {
@@ -47,7 +47,7 @@ void sqlrcursor::fetchRows() {
 	sqlrc->write((unsigned long)rsbuffersize);
 }
 
-int sqlrcursor::skipRows(int rowtoget) {
+bool sqlrcursor::skipRows(int rowtoget) {
 
 	// if we're reading from a cached result set we have to manually skip
 	if (cachesource && cachesourceind) {
@@ -55,7 +55,7 @@ int sqlrcursor::skipRows(int rowtoget) {
 		// if rowtoget is -1 then don't skip,
 		// otherwise skip to the next block of rows
 		if (rowtoget==-1) {
-			return 1;
+			return true;
 		} else {
 			rowcount=rowtoget-(rowtoget%rsbuffersize);
 		}
@@ -66,12 +66,12 @@ int sqlrcursor::skipRows(int rowtoget) {
 		long	rowoffset;
 		if (cachesourceind->read(&rowoffset)!=sizeof(long)) {
 			setError("The cache file index appears to be corrupt.");
-			return 0;
+			return false;
 		}
 
 		// skip to that offset in the cache file
 		cachesource->setPositionRelativeToBeginning(rowoffset);
-		return 1;
+		return true;
 	}
 
 	// calculate how many rows to skip unless we're buffering the entire
@@ -92,5 +92,5 @@ int sqlrcursor::skipRows(int rowtoget) {
 	// if we're reading from a connection, send the connection the 
 	// number of rows to skip
 	sqlrc->write(skip);
-	return 1;
+	return true;
 }

@@ -4,10 +4,10 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrconnection::rollback() {
+bool sqlrconnection::rollback() {
 
 	if (!openSession()) {
-		return 0;
+		return false;
 	}
 
 	if (debug) {
@@ -22,7 +22,7 @@ int sqlrconnection::rollback() {
 	bool	response;
 	if (read(&response)!=sizeof(bool)) {
 		setError("Failed to get rollback status.\n A network error may have ocurred.");
-		return -1;
+		return false;
 	}
-	return (response)?1:0;
+	return response;
 }

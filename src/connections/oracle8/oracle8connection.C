@@ -910,8 +910,7 @@ void oracle8cursor::checkForTempTable(const char *query,
 }
 #endif
 
-bool oracle8cursor::executeQuery(const char *query, long length,
-						unsigned short execute) {
+bool oracle8cursor::executeQuery(const char *query, long length, bool execute) {
 
 	// initialize the column count
 	ncols=0;

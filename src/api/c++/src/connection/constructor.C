@@ -25,24 +25,24 @@ sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
 	this->password=(char *)password;
 	userlen=strlen(user);
 	passwordlen=strlen(password);
-	reconnect=0;
+	reconnect=false;
 
 	// database id
 	id=NULL;
 
 	// session state
-	connected=0;
+	connected=false;
 	clearSessionFlags();
 
 	// debug print function
 	printfunction=NULL;
 
 	// debug off
-	debug=0;
+	debug=false;
 	webdebug=-1;
 
 	// copy references, delete cursors flags
-	copyrefs=0;
+	copyrefs=false;
 
 	// error string
 	error=NULL;

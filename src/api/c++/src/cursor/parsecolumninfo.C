@@ -8,29 +8,26 @@
 #define NEED_DATATYPESTRING
 #include <datatypes.h>
 
-int sqlrcursor::parseColumnInfo() {
+bool sqlrcursor::parseColumnInfo() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Parsing Column Info\n");
-		sqlrc->debugPreEnd();
-	}
-
-	if (sqlrc->debug) {
-		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Actual row count: ");
 		sqlrc->debugPreEnd();
 	}
 
 	// first get whether the server knows the total number of rows or not
 	if (getShort(&knowsactualrows)!=sizeof(unsigned short)) {
-		return -1;
+		setError("Failed to get whether the server knows the number actual rows or not.\n A network error may have occurred.");
+		return false;
 	}
 
 	// get the number of rows returned by the query
 	if (knowsactualrows==ACTUAL_ROWS) {
 		if (getLong(&actualrows)!=sizeof(unsigned long)) {
-			return -1;
+			setError("Failed to get the number of actual rows.\n A network error may have occurred.");
+			return false;
 		}
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
@@ -54,13 +51,15 @@ int sqlrcursor::parseColumnInfo() {
 
 	// get whether the server knows the number of affected rows or not
 	if (getShort(&knowsaffectedrows)!=sizeof(unsigned short)) {
-		return -1;
+		setError("Failed to get whether the server knows the number of affected rows or not.\n A network error may have occurred.");
+		return false;
 	}
 
 	// get the number of rows affected by the query
 	if (knowsaffectedrows==AFFECTED_ROWS) {
 		if (getLong(&affectedrows)!=sizeof(unsigned long)) {
-			return -1;
+			setError("Failed to get the number of affected rows.\n A network error may have occurred.");
+			return false;
 		}
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
@@ -83,12 +82,14 @@ int sqlrcursor::parseColumnInfo() {
 
 	// get whether the server is sending column info or not
 	if (getShort(&sentcolumninfo)!=sizeof(unsigned short)) {
-		return -1;
+		setError("Failed to get whether the server is sending column info or not.\n A network error may have occurred.");
+		return false;
 	}
 
 	// get column count
 	if (getLong(&colcount)!=sizeof(unsigned long)) {
-		return -1;
+		setError("Failed to get the column count.\n A network error may have occurred.");
+		return false;
 	}
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -108,7 +109,8 @@ int sqlrcursor::parseColumnInfo() {
 
 		// get whether column types will be predefined id's or strings
 		if (getShort(&columntypeformat)!=sizeof(unsigned short)) {
-			return -1;
+			setError("Failed to whether column types will be predefined id's or strings.\n A network error may have occurred.");
+			return false;
 		}
 
 		// some useful variables
@@ -120,7 +122,8 @@ int sqlrcursor::parseColumnInfo() {
 	
 			// get the column name length
 			if (getShort(&length)!=sizeof(unsigned short)) {
-				return -1;
+				setError("Failed to get the column name length.\n A network error may have occurred.");
+				return false;
 			}
 	
 			// which column to use
@@ -129,7 +132,8 @@ int sqlrcursor::parseColumnInfo() {
 			// get the column name
 			currentcol->name=(char *)colstorage->malloc(length+1);
 			if (getString(currentcol->name,length)!=length) {
-				return -1;
+				setError("Failed to get the column name.\n A network error may have occurred.");
+				return false;
 			}
 			currentcol->name[length]=(char)NULL;
 
@@ -145,7 +149,8 @@ int sqlrcursor::parseColumnInfo() {
 				// get the column type
 				if (getShort(&currentcol->type)!=
 						sizeof(unsigned short)) {
-					return -1;
+					setError("Failed to get the column type.\n A network error may have occurred.");
+					return false;
 				}
 
 			} else {
@@ -153,7 +158,8 @@ int sqlrcursor::parseColumnInfo() {
 				// get the column type length
 				if (getShort(&currentcol->typestringlength)!=
 						sizeof(unsigned short)) {
-					return -1;
+					setError("Failed to get the column type length.\n A network error may have occurred.");
+					return false;
 				}
 
 				// get the column type
@@ -165,74 +171,46 @@ int sqlrcursor::parseColumnInfo() {
 				if (getString(currentcol->typestring,
 						currentcol->typestringlength)!=
 						currentcol->typestringlength) {
-					return -1;
+					setError("Failed to get the column type.\n A network error may have occurred.");
+					return false;
 				}
 			}
 
 			// get the column length
-			if (getLong(&currentcol->length)!=
-						sizeof(unsigned long)) {
-				return -1;
-			}
-
 			// get the column precision
-			if (getLong(&currentcol->precision)!=
-						sizeof(unsigned long)) {
-				return -1;
-			}
-
 			// get the column scale
-			if (getLong(&currentcol->scale)!=
-						sizeof(unsigned long)) {
-				return -1;
-			}
-
 			// get whether the column is nullable
-			if (getShort(&currentcol->nullable)!=
-						sizeof(unsigned short)) {
-				return -1;
-			}
-
 			// get whether the column is a primary key
-			if (getShort(&currentcol->primarykey)!=
-						sizeof(unsigned short)) {
-				return -1;
-			}
-
 			// get whether the column is unique
-			if (getShort(&currentcol->unique)!=
-						sizeof(unsigned short)) {
-				return -1;
-			}
-
 			// get whether the column is part of a key
-			if (getShort(&currentcol->partofkey)!=
-						sizeof(unsigned short)) {
-				return -1;
-			}
-
 			// get whether the column is unsigned
-			if (getShort(&currentcol->unsignednumber)!=
-						sizeof(unsigned short)) {
-				return -1;
-			}
-
 			// get whether the column is zero-filled
-			if (getShort(&currentcol->zerofill)!=
-						sizeof(unsigned short)) {
-				return -1;
-			}
-
 			// get whether the column is binary
-			if (getShort(&currentcol->binary)!=
-						sizeof(unsigned short)) {
-				return -1;
-			}
-
 			// get whether the column is auto-incremented
-			if (getShort(&currentcol->autoincrement)!=
+			if (getLong(&currentcol->length)!=
+						sizeof(unsigned long) ||
+				getLong(&currentcol->precision)!=
+						sizeof(unsigned long) ||
+				getLong(&currentcol->scale)!=
+						sizeof(unsigned long) ||
+				getShort(&currentcol->nullable)!=
+						sizeof(unsigned short) ||
+				getShort(&currentcol->primarykey)!=
+						sizeof(unsigned short) ||
+				getShort(&currentcol->unique)!=
+						sizeof(unsigned short) ||
+				getShort(&currentcol->partofkey)!=
+						sizeof(unsigned short) ||
+				getShort(&currentcol->unsignednumber)!=
+						sizeof(unsigned short) ||
+				getShort(&currentcol->zerofill)!=
+						sizeof(unsigned short) ||
+				getShort(&currentcol->binary)!=
+						sizeof(unsigned short) ||
+				getShort(&currentcol->autoincrement)!=
 						sizeof(unsigned short)) {
-				return -1;
+				setError("Failed to get column info.\n A network error may have occurred.");
+				return false;
 			}
 
 			// initialize the longest value
@@ -292,7 +270,7 @@ int sqlrcursor::parseColumnInfo() {
 	// cache the column definitions
 	cacheColumnInfo();
 
-	return 1;
+	return true;
 }
 
 void sqlrcursor::createColumnBuffers() {

@@ -9,7 +9,7 @@ int sqlrcursor::firstRowIndex() {
 	return firstrowindex;
 }
 
-int sqlrcursor::endOfResultSet() {
+bool sqlrcursor::endOfResultSet() {
 	return endofresultset;
 }
 

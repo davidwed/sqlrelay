@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrconnection::endSession() {
+void sqlrconnection::endSession() {
 
 	if (debug) {
 		debugPreStart();
@@ -22,13 +22,9 @@ int sqlrconnection::endSession() {
 	}
 
 	// write an END_SESSION to the connection
-	int	retval=1;
 	if (connected) {
-		retval=0;
 		write((unsigned short)END_SESSION);
-		endsessionsent=1;
-		retval=1;
+		endsessionsent=true;
 		closeConnection();
 	}
-	return retval;
 }

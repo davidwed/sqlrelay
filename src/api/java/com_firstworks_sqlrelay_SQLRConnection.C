@@ -67,14 +67,14 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_delete
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    endSession
- * Signature: ()I
+ * Signature: ()V
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_endSession
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_endSession
   (JNIEnv *env, jobject self) {
 	jclass		cls=env->GetObjectClass(self);
 	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
 				env->GetFieldID(cls,"connection","I"));
-	return (jint)con->endSession();
+	con->endSession();
 }
 
 /*

@@ -7,7 +7,7 @@ void sqlrconnection::pingCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"ping");
 	#endif
-	clientsock->write((unsigned short)ping());
+	clientsock->write(ping());
 }
 
 bool sqlrconnection::ping() {
@@ -16,7 +16,7 @@ bool sqlrconnection::ping() {
 	int	pingquerylen=strlen(pingQuery());
 	if (pingcur->openCursor(-1) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
-		pingcur->executeQuery(pingquery,pingquerylen,1)) {
+		pingcur->executeQuery(pingquery,pingquerylen,true)) {
 		pingcur->cleanUpData(true,true,false);
 		pingcur->closeCursor();
 		delete pingcur;

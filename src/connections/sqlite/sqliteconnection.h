@@ -22,31 +22,33 @@ class sqliteconnection;
 class sqlitecursor : public sqlrcursor {
 	friend class sqliteconnection;
 	private:
-				sqlitecursor(sqlrconnection *conn);
-				~sqlitecursor();
-			bool	executeQuery(const char *query, long length,
-						unsigned short execute);
-			int	runQuery(stringbuffer *newquery,
-						const char *query);
-			char	*getErrorMessage(bool *liveconnection);
-			void	returnRowCounts();
-			void	returnColumnCount();
-			void	returnColumnInfo();
-			bool	noRowsToReturn();
-			bool	skipRow();
-			bool	fetchRow();
-			void	returnRow();
-			void	cleanUpData(bool freerows, bool freecols,
-								bool freebinds);
+			sqlitecursor(sqlrconnection *conn);
+			~sqlitecursor();
+		bool	executeQuery(const char *query,
+					long length,
+					bool execute);
+		int	runQuery(stringbuffer *newquery,
+					const char *query);
+		char	*getErrorMessage(bool *liveconnection);
+		void	returnRowCounts();
+		void	returnColumnCount();
+		void	returnColumnInfo();
+		bool	noRowsToReturn();
+		bool	skipRow();
+		bool	fetchRow();
+		void	returnRow();
+		void	cleanUpData(bool freerows,
+					bool freecols,
+					bool freebinds);
 
-			stringbuffer	*newquery;
-			char		**result;
-			int		nrow;
-			int		ncolumn;
+		stringbuffer	*newquery;
+		char		**result;
+		int		nrow;
+		int		ncolumn;
 
-			int		rowindex;
+		int		rowindex;
 
-			sqliteconnection	*sqliteconn;
+		sqliteconnection	*sqliteconn;
 };
 
 class sqliteconnection : public sqlrconnection {

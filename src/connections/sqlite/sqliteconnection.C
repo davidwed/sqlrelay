@@ -89,8 +89,7 @@ sqlitecursor::~sqlitecursor() {
 	cleanUpData(true,true,true);
 }
 
-bool sqlitecursor::executeQuery(const char *query, long length,
-						unsigned short execute) {
+bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
 
 	// fake binds
 	newquery=fakeInputBinds(query);

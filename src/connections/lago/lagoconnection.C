@@ -116,8 +116,7 @@ lagocursor::lagocursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	lagoconn=(lagoconnection *)conn;
 }
 
-bool lagocursor::executeQuery(const char *query, long length,
-					unsigned short execute) {
+bool lagocursor::executeQuery(const char *query, long length, bool execute) {
 
 	// initialize return values
 	ncols=0;

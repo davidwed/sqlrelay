@@ -333,7 +333,7 @@ bool interbasecursor::outputBindString(const char *variable,
 }
 
 bool interbasecursor::executeQuery(const char *query, long length,
-						unsigned short execute) {
+							bool execute) {
 
 	// for commit or rollback, execute the API call and return
 	if (querytype==isc_info_sql_stmt_commit) {

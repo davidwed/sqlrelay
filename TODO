@@ -1,3 +1,7 @@
+ping shouldn't wait for db to come back up
+
+use bool in java/perl api's
+
 socket for file descriptor passing is apparantly getting closed or something,
 	recvmesg fails when a client hits the connection for the second time
 

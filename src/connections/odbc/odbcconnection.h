@@ -69,8 +69,9 @@ class odbccursor : public sqlrcursor {
 		short	nonNullBindValue();
 		short	nullBindValue();
 		bool	bindValueIsNull(short isnull);
-		bool	executeQuery(const char *query, long length,
-					unsigned short execute);
+		bool	executeQuery(const char *query,
+					long length,
+					bool execute);
 		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();

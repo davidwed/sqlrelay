@@ -10,7 +10,7 @@
 
 void sqlrcursor::cacheToFile(const char *filename) {
 
-	cacheon=1;
+	cacheon=true;
 	cachettl=600;
 	if (copyrefs) {
 		delete[] cachedestname;
@@ -34,7 +34,7 @@ char *sqlrcursor::getCacheFileName() {
 }
 
 void sqlrcursor::cacheOff() {
-	cacheon=0;
+	cacheon=false;
 }
 
 void sqlrcursor::startCaching() {
@@ -295,6 +295,6 @@ void sqlrcursor::clearCacheDest() {
 		cachedestind->close();
 		delete cachedestind;
 		cachedestind=NULL;
-		cacheon=0;
+		cacheon=false;
 	}
 }

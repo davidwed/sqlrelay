@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrconnection::authenticateWithListener() {
+bool sqlrconnection::authenticateWithListener() {
 	if (debug) {
 		debugPreStart();
 		debugPrint("Authenticating with listener : ");
@@ -12,7 +12,7 @@ int sqlrconnection::authenticateWithListener() {
 	return genericAuthentication();
 }
 
-int sqlrconnection::authenticateWithConnection() {
+bool sqlrconnection::authenticateWithConnection() {
 
 	write((unsigned short)AUTHENTICATE);
 	if (debug) {
@@ -22,7 +22,7 @@ int sqlrconnection::authenticateWithConnection() {
 	return genericAuthentication();
 }
 
-int sqlrconnection::genericAuthentication() {
+bool sqlrconnection::genericAuthentication() {
 
 	if (debug) {
 		debugPrint(user);
@@ -42,7 +42,7 @@ int sqlrconnection::genericAuthentication() {
 	unsigned short	authsuccess;
 	if (read(&authsuccess)!=sizeof(unsigned short)) {
 		setError("Failed to authenticate.\n A network error may have ocurred.");
-		return -1;
+		return false;
 	}
 	if (authsuccess==ERROR) {
 		
@@ -54,12 +54,12 @@ int sqlrconnection::genericAuthentication() {
 		}
 
 		setError("Authentication Error.");
-		return 0;
+		return false;
 	}
 	if (debug) {
 		debugPreStart();
 		debugPrint("No authentication error.\n");
 		debugPreEnd();
 	}
-	return 1;
+	return true;
 }

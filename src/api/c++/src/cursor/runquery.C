@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrcursor::runQuery(const char *query) {
+bool sqlrcursor::runQuery(const char *query) {
 
 	// send the query
 	if (sendQueryInternal(query)) {
@@ -15,13 +15,13 @@ int sqlrcursor::runQuery(const char *query) {
 		sendGetColumnInfo();
 
 		if (processResultSet(rsbuffersize-1)) {
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
-int sqlrcursor::sendQueryInternal(const char *query) {
+bool sqlrcursor::sendQueryInternal(const char *query) {
 
 	// if the first 8 characters of the query are "-- debug" followed
 	// by a return, then set debugging on
@@ -35,11 +35,11 @@ int sqlrcursor::sendQueryInternal(const char *query) {
 	clearResultSet();
 
 	if (!sqlrc->openSession()) {
-		return 0;
+		return false;
 	}
 
-	cached=0;
-	endofresultset=0;
+	cached=false;
+	endofresultset=false;
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -111,7 +111,7 @@ int sqlrcursor::sendQueryInternal(const char *query) {
 		sqlrc->write((unsigned short)cursorid);
 	}
 
-	return 1;
+	return false;
 }
 
 void sqlrcursor::sendInputBinds() {

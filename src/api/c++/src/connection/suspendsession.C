@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrconnection::suspendSession() {
+bool sqlrconnection::suspendSession() {
 
 	if (!openSession()) {
 		return 0;
@@ -17,10 +17,10 @@ int sqlrconnection::suspendSession() {
 	}
 
 	// suspend the session
-	int	retval=0;
+	bool	retval=false;
 	write((unsigned short)SUSPEND_SESSION);
-	suspendsessionsent=1;
-	retval=1;
+	suspendsessionsent=true;
+	retval=true;
 
 	// If the server is passing around file descriptors to handoff clients
 	// from listener to connection, then it will have to open a socket and

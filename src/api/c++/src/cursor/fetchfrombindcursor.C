@@ -5,18 +5,18 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrcursor::fetchFromBindCursor() {
+bool sqlrcursor::fetchFromBindCursor() {
 
 	if (!endofresultset || !sqlrc->connected) {
-		return 0;
+		return false;
 	}
 
 	// FIXME: should these be here?
 	clearVariables();
 	clearResultSet();
 
-	cached=0;
-	endofresultset=0;
+	cached=false;
+	endofresultset=false;
 
 	// tell the server we're fetching from a bind cursor
 	sqlrc->write((unsigned short)FETCH_FROM_BIND_CURSOR);
@@ -26,8 +26,5 @@ int sqlrcursor::fetchFromBindCursor() {
 
 	sendGetColumnInfo();
 
-	if (processResultSet(rsbuffersize-1)) {
-		return 1;
-	}
-	return 0;
+	return processResultSet(rsbuffersize-1);
 }

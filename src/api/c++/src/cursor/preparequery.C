@@ -9,9 +9,9 @@ void sqlrcursor::prepareQuery(const char *query) {
 }
 
 void sqlrcursor::prepareQuery(const char *query, int length) {
-	reexecute=0;
+	reexecute=false;
 	validatebinds=0;
-	resumed=0;
+	resumed=false;
 	clearVariables();
 	if (copyrefs) {
 		initQueryBuffer();
@@ -25,12 +25,12 @@ void sqlrcursor::prepareQuery(const char *query, int length) {
 	}
 }
 
-int sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
+bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 
 	// init some variables
-	reexecute=0;
+	reexecute=false;
 	validatebinds=0;
-	resumed=0;
+	resumed=false;
 	clearVariables();
 
 	// init the fullpath buffer
@@ -119,7 +119,7 @@ int sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 		// anything with it in the event that it gets called
 		queryptr=NULL;
 
-		return 0;
+		return false;
 	}
 
 	initQueryBuffer();
@@ -139,7 +139,7 @@ int sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 
 	queryfile.close();
 
-	return 1;
+	return true;
 }
 
 void sqlrcursor::initQueryBuffer() {
@@ -151,6 +151,6 @@ void sqlrcursor::initQueryBuffer() {
 
 void sqlrcursor::attachToBindCursor(short bindcursorid) {
 	prepareQuery("");
-	reexecute=1;
+	reexecute=true;
 	cursorid=bindcursorid;
 }

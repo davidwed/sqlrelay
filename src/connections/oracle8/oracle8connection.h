@@ -114,8 +114,9 @@ class oracle8cursor : public sqlrcursor {
 		void	returnOutputBindClob(int index);
 		void	returnOutputBindGenericLob(int index);
 #endif
-		bool	executeQuery(const char *query, long length,
-					unsigned short execute);
+		bool	executeQuery(const char *query,
+					long length,
+					bool execute);
 #ifdef HAVE_ORACLE_8i
 		void	checkForTempTable(const char *query,
 						unsigned long length);

@@ -4,10 +4,10 @@
 #include <sqlrelay/sqlrclient.h>
 #include <errno.h>
 
-int sqlrconnection::openSession() {
+bool sqlrconnection::openSession() {
 
 	if (connected) {
-		return 1;
+		return true;
 	}
 
 	if (debug) {
@@ -57,54 +57,44 @@ int sqlrconnection::openSession() {
 	// handle failure to connect to listener
 	if (openresult!=RESULT_SUCCESS) {
 		setError("Couldn't connect to the listener.");
-		return 0;
+		return false;
 	}
 
 	// authenticate with the listner
-	if (authenticateWithListener()<1) {
+	if (!authenticateWithListener()) {
 		closeConnection();
-		return 0;
+		return false;
 	}
 
 	// do we need to reconnect to the connection daemon
-	getReconnect();
-
-
-	if (reconnect==-1) {
-
-		// if an error ocurred, set the error and close the connection
-		setError("Failed to get whether we need to reconnect.\n A network error may have ocurred.");
+	if (!getReconnect()) {
 		closeConnection();
-		return 0;
+		return false;
+	}
 
-	} else if (!reconnect) {
+
+	if (!reconnect) {
 
 		// if we don't need to reconnect, just authenticate with the
 		// connection daemon
 		if (!authenticateWithConnection()) {
 			closeConnection();
-			return 0;
+			return false;
 		}
-		connected=1;
+		connected=true;
 
-	} else if (reconnect==1) {
+	} else {
 
 		// if we do need to reconnect, get which port(s) to reconnect
 		// to and reconnect
-
-		// try to get the connection daemon ports
-		int	success=getNewPort();
+		bool	success=getNewPort();
 
 		// close the connection to the listener
 		closeConnection();
 
-		// If getNewPort() returns -1 or 0 then an error ocurred.
-		// If it returns 0, the error is already set.
-		if (success<1) {
-			if (success==-1) {
-				setError("Failed to get connection ports.\n A network error may have ocurred.");
-			}
-			return 0;
+		// handle an error
+		if (!success) {
+			return false;
 		}
 
 		// first, try for the unix port
@@ -179,7 +169,7 @@ int sqlrconnection::openSession() {
 			clearSessionFlags();
 
 			if (!authenticateWithConnection()) {
-				return 0;
+				return false;
 			}
 
 		} else {
@@ -199,7 +189,7 @@ int sqlrconnection::openSession() {
 			}
 			errstr.append("\n");
 			setError(errstr.getString());
-			return 0;
+			return false;
 		}
 	}
 
@@ -207,5 +197,5 @@ int sqlrconnection::openSession() {
 	// authentication succeeded and we either didn't have to reconnect or
 	// we sucessfully reconnected and sucessfully authenticated with the 
 	// connection daemon
-	return 1;
+	return true;
 }

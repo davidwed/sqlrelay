@@ -16,8 +16,9 @@ class postgresqlcursor : public sqlrcursor {
 	friend class postgresqlconnection;
 	private:
 			postgresqlcursor(sqlrconnection *conn);
-		bool	executeQuery(const char *query, long length,
-						unsigned short execute);
+		bool	executeQuery(const char *query,
+					long length,
+					bool execute);
 		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();

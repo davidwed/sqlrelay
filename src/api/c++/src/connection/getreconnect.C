@@ -4,27 +4,23 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-void sqlrconnection::getReconnect() {
+bool sqlrconnection::getReconnect() {
 
 	unsigned short	recon;
 	if (read(&recon)!=sizeof(unsigned short)) {
-		reconnect=-1;
-		return;
+		setError("Failed to get whether we need to reconnect.\n A network error may have ocurred.");
+		return false;
 	}
 
-	if (recon==DONT_RECONNECT) {
-		if (debug) {
-			debugPreStart();
-			debugPrint("Must Not Reconnect.\n");
-			debugPreEnd();
-		}
-		reconnect=0;
-		return;
-	}
+	reconnect=(recon==RECONNECT);
 	if (debug) {
 		debugPreStart();
-		debugPrint("Must Reconnect.\n");
+		if (reconnect) {
+			debugPrint("Must Reconnect.\n");
+		} else {
+			debugPrint("Must Not Reconnect.\n");
+		}
 		debugPreEnd();
 	}
-	reconnect=1;
+	return true;
 }

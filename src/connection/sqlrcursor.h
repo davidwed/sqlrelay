@@ -95,8 +95,9 @@ class sqlrcursor {
 		virtual	void	returnOutputBindCursor(int index);
 		virtual void	checkForTempTable(const char *query,
 							unsigned long length);
-		virtual	bool	executeQuery(const char *query, long length,
-						unsigned short execute)=0;
+		virtual	bool	executeQuery(const char *query,
+							long length,
+							bool execute)=0;
 		virtual	bool	queryIsNotSelect();
 		virtual	bool	queryIsCommitOrRollback();
 		virtual	char	*getErrorMessage(bool *liveconnection)=0;

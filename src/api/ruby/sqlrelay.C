@@ -36,7 +36,7 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 static VALUE sqlrcon_endSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->endSession());
+	sqlrcon->endSession();
 }
 
 static VALUE sqlrcon_suspendSession(VALUE self) {

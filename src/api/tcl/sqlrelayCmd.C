@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.7 2004-02-02 01:12:12 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.8 2004-04-01 16:06:00 mused Exp $
  */
 
 #include <strings.h>
@@ -1682,7 +1682,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       Tcl_WrongNumArgs(interp, 2, objv, NULL);
       return TCL_ERROR;
     }
-    Tcl_SetObjResult(interp, Tcl_NewIntObj(con->endSession()));
+    con->endSession();
     break;
   }
   case SQLR_SUSPENDSESSION: {

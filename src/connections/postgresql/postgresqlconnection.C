@@ -152,7 +152,7 @@ postgresqlcursor::postgresqlcursor(sqlrconnection *conn) :
 }
 
 bool postgresqlcursor::executeQuery(const char *query, long length,
-						unsigned short execute) {
+							bool execute) {
 
 	// initialize the counts
 	ncols=0;

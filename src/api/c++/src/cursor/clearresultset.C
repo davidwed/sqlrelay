@@ -25,7 +25,7 @@ void sqlrcursor::clearResultSet() {
 	rowcount=0;
 	actualrows=0;
 	affectedrows=0;
-	endofresultset=1;
+	endofresultset=true;
 	suspendresultsetsent=0;
 	getrowcount=0;
 }

@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrconnection::ping() {
+bool sqlrconnection::ping() {
 
 	if (!openSession()) {
 		return 0;
@@ -20,10 +20,10 @@ int sqlrconnection::ping() {
 	write((unsigned short)PING);
 
 	// get the ping result
-	unsigned short	result;
-	if (read(&result)!=sizeof(unsigned short)) {
+	bool	result;
+	if (read(&result)!=sizeof(bool)) {
 		setError("Failed to ping.\n A network error may have ocurred.");
-		result=0;
+		return false;
 	}
-	return (int)result;
+	return result;
 }

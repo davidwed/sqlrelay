@@ -31,9 +31,9 @@ class sqlrconnection : public inetclientsocket, public unixclientsocket {
 				// Disconnects and ends the session if
 				// it hasn't been ended already.
 
-		int	endSession();
+		void	endSession();
 				// Ends the session.
-		int	suspendSession();
+		bool	suspendSession();
 				// Disconnects this connection from the current
 				// session but leaves the session open so 
 				// that another connection can connect to it 
@@ -48,31 +48,31 @@ class sqlrconnection : public inetclientsocket, public unixclientsocket {
 				// is communicating over. This parameter may be 
 				// passed to another connection for use in
 				// the resumeSession() method.
-		int	resumeSession(int port, const char *socket);
+		bool	resumeSession(int port, const char *socket);
 				// Resumes a session previously left open 
 				// using suspendSession().
-				// Returns 1 on success and 0 on failure.
+				// Returns true on success and false on failure.
 
 
-		int	ping();
-				// Returns 1 if the database is up and 0
+		bool	ping();
+				// Returns true if the database is up and false
 				// if it's down.
 		char	*identify();
 				// Returns the type of database: 
 				//   oracle7, oracle8, postgresql, mysql, etc.
 
 
-		int	autoCommitOn();
+		bool	autoCommitOn();
 				// Instructs the database to perform a commit
 				// after every successful query.
-		int	autoCommitOff();
+		bool	autoCommitOff();
 				// Instructs the database to wait for the 
 				// client to tell it when to commit.
-		int	commit();
+		bool	commit();
 				// Issues a commit.  Returns 1 if the commit
 				// succeeded, 0 if it failed and -1 if an
 				// error occurred.
-		int	rollback();
+		bool	rollback();
 				// Issues a rollback.  Returns 1 if the rollback
 				// succeeded, 0 if it failed and -1 if an
 				// error occurred.
@@ -84,9 +84,9 @@ class sqlrconnection : public inetclientsocket, public unixclientsocket {
 				// this is to start a query with "-- debug\n".
 		void	debugOff();
 				// Turns debugging off.
-		int	getDebug();
-				// Returns 0 if debugging is off and 1 if 
-				// debugging is on.
+		bool	getDebug();
+				// Returns false if debugging is off and true
+				// if debugging is on.
 
 
 		void	debugPrintFunction(int (*printfunction)
@@ -161,13 +161,13 @@ class sqlrcursor {
 
 		// If you don't need to use substitution or bind variables
 		// in your queries, use these two methods.
-		int	sendQuery(const char *query);
+		bool	sendQuery(const char *query);
 				// Sends "query" and gets a result set.
-		int	sendQuery(const char *query, int length);
+		bool	sendQuery(const char *query, int length);
 				// Sends "query" with length "length" and gets
 				// a result set. This method must be used if
 				// the query contains binary data.
-		int	sendFileQuery(const char *path, const char *filename); 
+		bool	sendFileQuery(const char *path, const char *filename); 
 				// Sends the query in file "path"/"filename" 
 				// and gets a result set.
 
@@ -182,10 +182,10 @@ class sqlrcursor {
 				// Prepare to execute "query" with length 
 				// "length".  This method must be used if the
 				// query contains binary data.
-		int	prepareFileQuery(const char *path,
+		bool	prepareFileQuery(const char *path,
 						const char *filename);
 				// Prepare to execute the contents 
-				// of "path"/"filename".  Returns 0 if the
+				// of "path"/"filename".  Returns false if the
 				// file couldn't be opened.
 
 		void	clearBinds();
@@ -252,11 +252,11 @@ class sqlrcursor {
 				// query.  There is a performance penalty for
 				// calling this method.
 
-		int	executeQuery();
+		bool	executeQuery();
 				// Execute the query that was previously 
 				// prepared and bound.
 
-		int	fetchFromBindCursor();
+		bool	fetchFromBindCursor();
 				// Fetch from a cursor that was returned as
 				// an output bind variable.
 
@@ -279,9 +279,9 @@ class sqlrcursor {
 				// defined output bind variable.
 
 		
-		int	openCachedResultSet(const char *filename);
+		bool	openCachedResultSet(const char *filename);
 				// Opens a cached result set.
-				// Returns 1 on success and 0 on failure.
+				// Returns true on success and false on failure.
 
 		int	colCount();
 				// Returns the number of columns in the current
@@ -310,12 +310,12 @@ class sqlrcursor {
 				// Returns the index of the first buffered row.
 				// This is useful when buffering only part of
 				// the result set at a time.
-		int	endOfResultSet();
-				// Returns 0 if part of the result set is still
-				// pending on the server and 1 if not.  This
-				// method can only return 0 if 
+		bool	endOfResultSet();
+				// Returns false if part of the result set is
+				// still pending on the server and true if not.
+				// This method can only return false if 
 				// setResultSetBufferSize() has been called
-				// with a parameter other than 0.
+				// with a parameter other than false.
 		
 		
 		char	*errorMessage();

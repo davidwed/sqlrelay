@@ -278,7 +278,7 @@ bool freetdscursor::openCursor(int id) {
 		char	*query=new char[len+1];
 		sprintf(query,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) &&
-				executeQuery(query,len,1))) {
+				executeQuery(query,len,true))) {
 			bool	live;
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=false;
@@ -441,8 +441,7 @@ bool freetdscursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool freetdscursor::executeQuery(const char *query, long length,
-						unsigned short execute) {
+bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 
 	// clear out any errors
 	if (freetdsconn->errorstring) {

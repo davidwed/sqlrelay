@@ -4,14 +4,14 @@
 #include <sqlrelay/sqlrclient.h>
 
 void sqlrconnection::debugOn() {
-	debug=1;
+	debug=true;
 }
 
 void sqlrconnection::debugOff() {
-	debug=0;
+	debug=false;
 }
 
-int sqlrconnection::getDebug() {
+bool sqlrconnection::getDebug() {
 	return debug;
 }
 

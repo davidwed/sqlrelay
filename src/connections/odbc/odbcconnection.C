@@ -296,8 +296,7 @@ bool odbccursor::bindValueIsNull(short isnull) {
 	return (isnull==SQL_NULL_DATA);
 }
 
-bool odbccursor::executeQuery(const char *query, long length,
-						unsigned short execute) {
+bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 
 	// initialize counts
 	ncols=0;

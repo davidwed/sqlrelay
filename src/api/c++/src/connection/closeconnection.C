@@ -5,5 +5,5 @@
 
 void sqlrconnection::closeConnection() {
 	close();
-	connected=0;
+	connected=false;
 }

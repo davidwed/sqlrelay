@@ -6,5 +6,5 @@
 
 void sqlrcursor::copyReferences() {
 	// set the flag
-	copyrefs=1;
+	copyrefs=true;
 }

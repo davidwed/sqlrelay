@@ -260,8 +260,7 @@ bool db2cursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool db2cursor::executeQuery(const char *query, long length,
-					unsigned short execute) {
+bool db2cursor::executeQuery(const char *query, long length, bool execute) {
 
 	// initialize counts
 	ncols=0;

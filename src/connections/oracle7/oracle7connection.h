@@ -90,8 +90,9 @@ class oracle7cursor : public sqlrcursor {
 					char *value,
 					unsigned short valuesize,
 					short *isnull);
-		bool	executeQuery(const char *query, long length,
-						unsigned short execute);
+		bool	executeQuery(const char *query,
+					long length,
+					bool execute);
 		bool	queryIsNotSelect();
 		bool	queryIsCommitOrRollback();
 		char	*getErrorMessage(bool *liveconnection);

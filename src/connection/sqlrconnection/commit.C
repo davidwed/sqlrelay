@@ -23,7 +23,7 @@ bool sqlrconnection::commit() {
 	bool	retval=false;
 	if (commitcur->openCursor(-1) &&
 		commitcur->prepareQuery(commitquery,commitquerylen) &&
-		commitcur->executeQuery(commitquery,commitquerylen,1)) {
+		commitcur->executeQuery(commitquery,commitquerylen,true)) {
 		commitcur->cleanUpData(false,false,false);
 		retval=true;
 	}

@@ -31,7 +31,7 @@ sqlrconnection::new(server,port,socket,user,password,retrytime,tries)
 void
 sqlrconnection::DESTROY()
 
-int
+void
 sqlrconnection::endSession()
 
 int

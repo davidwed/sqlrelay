@@ -5,9 +5,9 @@
 #include <sqlrelay/sqlrclient.h>
 
 void sqlrcursor::getNullsAsEmptyStrings() {
-	returnnulls=0;
+	returnnulls=false;
 }
 
 void sqlrcursor::getNullsAsNulls() {
-	returnnulls=1;
+	returnnulls=true;
 }

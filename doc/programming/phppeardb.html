@@ -1,0 +1,876 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay using the PHP Pear DB API</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Programming with SQL Relay using the PHP Pear DB API</span><br><br>
+
+<ul>
+<li><a href="#session">Establishing a Sessions</a></li>
+<li><a href="#query">Executing Queries</a></li>
+<li><a href="#commit">Commits and Rollbacks</a></li>
+<li><a href="#temptables">Temporary Tables</a></li>
+<li><a href="#errors">Catching Errors</a></li>
+<li><a href="#bindvars">Bind Variables</a></li>
+<li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
+<li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#cursors">Cursors</a></li>
+<li><a href="#columns">Getting Column Information</a></li>
+</ul>
+
+<a name="session"></a>
+<span class="heading2">Establishing a Session</span><br><br>
+
+<p>To use SQL Relay, you have to identify the connection that you intend to 
+use.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>...</b></font> execute some queries <font color="#a52829"><b>...</b></font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>After calling the constructor, a session is established when the first 
+execute() is run.</p>
+
+<p>For the duration of the session, the client stays connected to a database
+connection daemon.  While one client is connected, no other client can connect.
+Care should be taken to minimize the length of a session.</p>
+
+<p>If you're using a transactional database, ending a session has a catch.
+Database connection daemons can be configured to send either a commit or
+rollback at the end of a session if DML queries were executed during the
+session with no commit or rollback.  Program accordingly.</p>
+
+<a name="query"></a>
+<span class="heading2">Executing Queries</span><br><br>
+
+<p>Call query() to run a query.  query() will return DB_OK for successful
+DML or DDL queries or a result set for select queries.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long)</font>&quot;<font color="#6b59ce">)</font><font color="#a52829"><b>==</b></font>DB_OK<font color="#6b59ce">)</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')</font>&quot;<font color="#6b59ce">)</font><font color="#a52829"><b>!=</b></font>DB_OK<font color="#6b59ce">)</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>...</b></font> process the result set <font color="#a52829"><b>...</b></font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<a name="commit"></a>
+<span class="heading2">Commits and Rollbacks</span><br><br>
+
+<p>If you need to execute a commit or rollback, you should use the 
+commit() and rollback() functions rather than sending a 
+"commit" or "rollback" query.  There are two reasons for this.  First, it's 
+much more efficient to call the functions.  Second, if you're writing code that 
+can run on transactional or non-transactional databases, some non-transactional
+databases will throw errors if they receive a "commit" or "rollback" query, 
+but by calling the commit() and rollback() functions you 
+instruct the database connection daemon to call the commit and rollback API 
+functions for that database rather than issuing them as queries.  If the API's 
+have no commit or rollback functions, the calls do nothing and the database 
+throws no error.  This is especially important when using SQL Relay with 
+ODBC.</p>
+
+<p>You can also turn Autocommit on or off by passing true or false to the
+autoCommit() function.</p>
+
+<p>The following command turns Autocommit on.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>autoCommit<font color="#6b59ce">(</font><font color="#ff00ff">true</font><font color="#6b59ce">)</font>;
+</pre>
+</blockquote>
+
+<p>The following command turns Autocommit off.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>autoCommit<font color="#6b59ce">(</font><font color="#ff00ff">false</font><font color="#6b59ce">)</font>;
+</pre>
+</blockquote>
+
+<p>When Autocommit is on, the database performs a commit after each successful
+DML or DDL query.  When Autocommit is off, the database commits when the client
+instructs it to, or (by default) when a client disconnects.  For databases that
+don't support Autocommit, autoCommit() has no effect.</p>
+
+<a name="temptables"></a>
+<span class="heading2">Temporary Tables</span><br><br>
+
+<p>Some databases support temporary tables.  That is, tables which are
+automatically dropped or truncated when an application closes it's connection
+to the database or when a transaction is committed or rolled back.</p>
+
+<p>For databases which drop or truncate tables when a transaction is committed
+or rolled back, temporary tables work naturally.</p>
+
+<p>However, for databases which drop or truncate tables when an application
+closes it's connection to the database, there is an issue.  Since SQL Relay
+maintains persistent database connections, when an application disconnects from
+SQL Relay, the connection between SQL Relay and the database remains, so
+the database does not know to drop or truncate the table.  To remedy this
+situation, SQL Relay parses each query to see if it created a temporary table,
+keeps a list of temporary tables and drops (or truncates them) when the
+application disconnects from SQL Relay.  Since each database has slightly
+different syntax for creating a temporary table, SQL Relay parses each query
+according to the rules for that database.</p>
+
+<p>In effect, temporary tables should work when an application connects to
+SQL Relay in the same manner that they would work if the application connected
+directly to the database.</p>
+
+<a name="errors"></a>
+<span class="heading2">Catching Errors</span><br><br>
+
+<p>For most functions, you can find out if an error occurred by calling
+DB::isError() on the result.</p>
+
+<p>When running DML or DDL queries, the query() function should return DB_OK.
+If it returns anything else, then that also indicates that an error has
+occurred.  When running a select, query() returns a result set and DB::isError()
+must be used to determine if an error has occurred.</p>
+
+<p>After determining that an error has occurred you can find out why by
+calling getMessage().</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long)</font>&quot;<font color="#6b59ce">)</font><font color="#a52829"><b>!=</b></font>DB_OK<font color="#6b59ce">)</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')</font>&quot;<font color="#6b59ce">)</font><font color="#a52829"><b>!=</b></font>DB_OK<font color="#6b59ce">)</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>...</b></font> process the result set <font color="#a52829"><b>...</b></font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<a name="bindvars"></a>
+<span class="heading2">Bind Variables</span><br><br>
+
+<p>Programs rarely execute fixed queries.  More often than not, some part
+of the query is dynamically generated.  The Pear DB API provides means for
+using bind variables in those queries.</p>
+
+<p>For a detailed discussion of substitutions and binds, see
+<a href="binds.html">this document</a>.
+
+<p>Here is an example where an associative array is used to bind a set of values
+to a set of variables.  The values in the array are the values that will be
+substituted in place of the bind variables.  The keys in the array may refer to
+either the name or (1-based) position of the bind variable.  The query must be
+run by calling prepare() and execute().  The array is passed as the second
+parameter of the call to execute().</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into testtable values (:var1,:var2,:var3,:var4,:var5)</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">2</font>,
+                &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar2</font>&quot;,
+                &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar2</font>&quot;,
+                &quot;<font color="#ff00ff">4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2002</font>&quot;,
+                &quot;<font color="#ff00ff">5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong2</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<a name="rebinding"></a>
+<span class="heading2">Re-Binding and Re-Execution</span><br><br>
+
+<p>Another feature of the prepare/bind/execute paradigm is the ability to 
+prepare, bind and execute a query once, then re-bind and re-execute the query 
+over and over without re-preparing it.  If your backend database natively 
+supports this paradigm, you can reap a substantial performance improvement.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into testtable values (:var1,:var2,:var3,:var4,:var5)</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">2</font>,
+                &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar2</font>&quot;,
+                &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar2</font>&quot;,
+                &quot;<font color="#ff00ff">4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2002</font>&quot;,
+                &quot;<font color="#ff00ff">5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong2</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">var1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">3</font>,
+                &quot;<font color="#ff00ff">var2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar3</font>&quot;,
+                &quot;<font color="#ff00ff">var3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar3</font>&quot;,
+                &quot;<font color="#ff00ff">var4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2003</font>&quot;,
+                &quot;<font color="#ff00ff">var5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong3</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">4</font>,
+                &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar4</font>&quot;,
+                &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar4</font>&quot;,
+                &quot;<font color="#ff00ff">4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2004</font>&quot;,
+                &quot;<font color="#ff00ff">5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong4</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">var1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">5</font>,
+                &quot;<font color="#ff00ff">var2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar5</font>&quot;,
+                &quot;<font color="#ff00ff">var3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar5</font>&quot;,
+                &quot;<font color="#ff00ff">var4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2005</font>&quot;,
+                &quot;<font color="#ff00ff">var5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong5</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<a name="fields"></a>
+<span class="heading2">Accessing Fields in the Result Set</span><br><br>
+
+<p>The fetchRow() and fetchInto() methods are useful for processing result
+sets.  fetchRow() returns a row and fetchInto() populates a pre-allocated row.
+Both can be used to return ordered or associative arrays.  The parameter
+to determine whether the array is ordered or associative may be passed directly
+into the call or (when using fetchRow()) may be set previously using
+setFetchMode().</p>
+
+<p>Here is an example using fetchRow() to return an ordered array.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#0000ff"># fetch the next row using ordered mode</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>setFetchMode<font color="#6b59ce">(</font>DB_FETCHMODE_ORDERED<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">4</font><font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#0000ff"># fetch the next row passing ordered mode into fetchRow()</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">(</font>DB_FETCHMODE_ORDERED<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">4</font><font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#0000ff"># fetch row 7 using ordered mode</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">(</font>DB_FETCHMODE_ORDERED,<font color="#ff00ff">7</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">4</font><font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>Here is an example using fetchRow() to return an associative array.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#0000ff"># fetch the next row using ordered mode</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>setFetchMode<font color="#6b59ce">(</font>DB_FETCHMODE_ASSOC<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTLONG</font>'<font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#0000ff"># fetch the next row passing ordered mode into fetchRow()</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">(</font>DB_FETCHMODE_ASSOC<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTLONG</font>'<font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#0000ff"># fetch row 7 using ordered mode</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">(</font>DB_FETCHMODE_ASSOC,<font color="#ff00ff">7</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTLONG</font>'<font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>Here is an example using fetchInto() to populate an ordered array.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#0000ff"># fetch the next row passing ordered mode into fetchInto()</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchInto<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font>,DB_FETCHMODE_ASSOC<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">4</font><font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#0000ff"># fetch row 7 using ordered mode</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchInto<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font>,DB_FETCHMODE_ASSOC,<font color="#ff00ff">7</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">4</font><font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>Here is an example using fetchInto() to populate an associative array.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>query<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#0000ff"># fetch the next row passing ordered mode into fetchInto()</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchInto<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font>,DB_FETCHMODE_ASSOC<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTLONG</font>'<font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#0000ff"># fetch row 7 using ordered mode</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchInto<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font>,DB_FETCHMODE_ASSOC,<font color="#ff00ff">7</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field0</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field4</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTLONG</font>'<font color="#6b59ce">]</font>;
+
+<font color="#a52829"><b>...</b></font> <font color="#a52829"><b>do</b></font> something with the fields <font color="#a52829"><b>...</b></font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>The Pear DB API also provides convenience functions for fetching an entire
+result set, single row, single column or single value from a query, all in one
+step.  setFetchMode() applies to some of these functions as well.</p>
+
+<p>getAll() runs a query and fetches the entire result set, all in one step.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#0000ff"># get an ordered array using getAll</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>setFetchMode<font color="#6b59ce">(</font>DB_FETCHMODE_ORDERED<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">rows</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getAll<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">row 0:</font><font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font><font color="#ff00ff">3</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>...</b></font> etc <font color="#a52829"><b>...</b></font>
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">row 1:</font><font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font><font color="#ff00ff">3</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>...</b></font> etc <font color="#a52829"><b>...</b></font>
+
+
+<font color="#0000ff"># get an associative array using getAll</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>setFetchMode<font color="#6b59ce">(</font>DB_FETCHMODE_ASSOC<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">rows</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getAll<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">row 0:</font><font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>...</b></font> etc <font color="#a52829"><b>...</b></font>
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">row 1:</font><font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>...</b></font> etc <font color="#a52829"><b>...</b></font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>getRow() runs a query and fetches the first row of the result set, all in
+one step.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#0000ff"># get an ordered array using getRow</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>setFetchMode<font color="#6b59ce">(</font>DB_FETCHMODE_ORDERED<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getRow<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+
+
+<font color="#0000ff"># get an associative array using getRow</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>setFetchMode<font color="#6b59ce">(</font>DB_FETCHMODE_ASSOC<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getRow<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>getCol() runs a query and fetches one entire column of the result set, all
+in one step.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">col</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getCol<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">col</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">col</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">col</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#ff00ff"> </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">col</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>getOne() runs a query and fetches the first column of the first row, all
+in one step.</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">field</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getOne<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select count(*) from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">field</font><font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<a name="cursors"></a>
+<span class="heading2">Cursors</span><br><br>
+
+<p>Cursors make it possible to execute queries while processing the result
+set of another query.  You can select rows from a table in one query, then 
+iterate through it's result set, inserting rows into another table, using only 
+1 database connection for both operations.</p>
+
+<p>For example:</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">query</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from my_first_table</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>for</b></font> <font color="#6b59ce">(</font><font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>=</b></font><font color="#ff00ff">0</font>; <font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>&lt;</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res1</font><font color="#298a52"><b>-&gt;</b></font>numRows<font color="#6b59ce">()</font>; <font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>+</b></font><font color="#ff00ff">1</font><font color="#6b59ce">)</font> <font color="#6b59ce">{</font>
+        <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res1</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
+        <font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>,
+                                &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>,
+                                &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">])</font>;
+        <font color="#a52829"><b>$</b></font><font color="#008a8c">res2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into my_second_table values (:var1,:var2,:var3)</font>&quot;<font color="#6b59ce">)</font>;
+        execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res2</font>,bindvars<font color="#6b59ce">)</font>;
+        <font color="#a52829"><b>$</b></font><font color="#008a8c">res2</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res1</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<a name="columns"></a>
+<span class="heading2">Getting Column Information</span><br><br>
+
+<p>After executing a query, the column count may be retrieved using numCols().
+Column data, including column name, type and length are available in the
+associative array returned from tableInfo().  tableInfo() takes a parameter
+indicating what values to populate the array with.  This parameter may be
+empty, DB_TABLEINFO_ORDER, DB_TABLEINFO_ORDERTABLE or both values or'ed
+together.</p>
+
+<p>An example calling numCols():</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">query</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">column count: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>numCols<font color="#6b59ce">()</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>An example calling tableInfo():</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">query</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>tableInfo<font color="#6b59ce">()</font>;
+<font color="#008a8c">echo</font> &quot;<font color="#ff00ff">column 1:</font><font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">name: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font>'<font color="#ff00ff">name</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">type: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font>'<font color="#ff00ff">type</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">len:  </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">][</font>'<font color="#ff00ff">len</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font> &quot;<font color="#ff00ff">column 2:</font><font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">name: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font>'<font color="#ff00ff">name</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">type: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font>'<font color="#ff00ff">type</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">len:  </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">][</font>'<font color="#ff00ff">len</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font> &quot;<font color="#ff00ff">column 3:</font><font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">name: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">][</font>'<font color="#ff00ff">name</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">type: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">][</font>'<font color="#ff00ff">type</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">len:  </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">][</font>'<font color="#ff00ff">len</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font> &quot;<font color="#ff00ff">column 4:</font><font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">name: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">][</font>'<font color="#ff00ff">name</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">type: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">][</font>'<font color="#ff00ff">type</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">len:  </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">3</font><font color="#6b59ce">][</font>'<font color="#ff00ff">len</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font> &quot;<font color="#ff00ff">column 5:</font><font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">name: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">4</font><font color="#6b59ce">][</font>'<font color="#ff00ff">name</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">type: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">4</font><font color="#6b59ce">][</font>'<font color="#ff00ff">type</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">len:  </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font><font color="#ff00ff">4</font><font color="#6b59ce">][</font>'<font color="#ff00ff">len</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font><font color="#ff00ff">4</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>An example calling tableInfo(DB_TABLEINFO_ORDER):</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">query</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>tableInfo<font color="#6b59ce">(</font>DB_TABLEINFO_ORDER<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">num_fields: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">num_fields</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testnumber is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testchar is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testvarchar is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testdate is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testlong is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTLONG</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>An example calling tableInfo(DB_TABLEINFO_ORDERTABLE):</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">query</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>tableInfo<font color="#6b59ce">(</font>DB_TABLEINFO_ORDERTABLE<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testnumber is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testchar is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testvarchar is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testdate is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testlong is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTLONG</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>An example calling tableInfo(DB_TABLEINFO_ORDER|DB_TABLEINFO_ORDERTABLE):</p>
+
+<blockquote>
+<pre>
+<font color="#6b59ce">&lt;?php</font>
+
+<font color="#a520f7">require_once</font> '<font color="#ff00ff">DB.php</font>';
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font> <font color="#a52829"><b>=</b></font> DB<font color="#a52829"><b>::</b></font>connect<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">sqlrelay://testuser:testpassword@testhost:9000/testdb</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>if</b></font> <font color="#6b59ce">(</font>DB<font color="#a52829"><b>::</b></font>isError<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#6b59ce">))</font> <font color="#6b59ce">{</font>
+        <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
+<font color="#6b59ce">}</font>
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">query</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testtable</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">num_fields: </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">num_fields</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testnumber is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testchar is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testvarchar is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testdate is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testlong is field # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">order</font>'<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTLONG</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testnumber is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTNUMBER</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testchar is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testvarchar is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTVARCHAR</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testdate is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTDATE</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#008a8c">echo</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">testlong is column # </font>&quot; <font color="#a52829"><b>.</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">tableinfo</font><font color="#6b59ce">[</font>'<font color="#ff00ff">ordertable</font>'<font color="#6b59ce">][</font>''<font color="#6b59ce">][</font>'<font color="#ff00ff">TESTLONG</font>'<font color="#6b59ce">]</font> <font color="#a52829"><b>.</b></font> &quot;<font color="#6b59ce">\n</font>&quot;<font color="#6b59ce">)</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
+
+<font color="#6b59ce">?&gt;</font>
+</pre>
+</blockquote>
+
+</body>
+</html>

@@ -6,7 +6,7 @@
 #include <defines.h>
 #include <datatypes.h>
 
-int sqlrcursor::parseData() {
+bool sqlrcursor::parseData() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -21,7 +21,7 @@ int sqlrcursor::parseData() {
 			sqlrc->debugPrint("Already at the end of the result set\n");
 			sqlrc->debugPreEnd();
 		}
-		return 1;
+		return true;
 	}
 
 	// useful variables
@@ -43,7 +43,8 @@ int sqlrcursor::parseData() {
 
 		// get the type of the field
 		if (getShort(&type)!=sizeof(unsigned short)) {
-			return -1;
+			setError("Failed to get the field type.\n A network error may have occurred");
+			return false;
 		}
 
 		// check for the end of the result set
@@ -54,7 +55,7 @@ int sqlrcursor::parseData() {
 				sqlrc->debugPrint("Got end of result set.\n");
 				sqlrc->debugPreEnd();
 			}
-			endofresultset=1;
+			endofresultset=true;
 
 			// if we were stepping through a cached result set
 			// then we need to close the file
@@ -109,14 +110,16 @@ int sqlrcursor::parseData() {
 		
 			// handle non-null data
 			if (getLong(&length)!=sizeof(unsigned long)) {
-				return -1;
+				setError("Failed to get the field length.\n A network error may have occurred");
+				return false;
 			}
 
 			// for non-long, non-NULL datatypes...
 			// get the field into a buffer
 			buffer=(char *)rowstorage->malloc(length+1);
 			if ((unsigned long)getString(buffer,length)!=length) {
-				return -1;
+				setError("Failed to get the field data.\n A network error may have occurred");
+				return false;
 			}
 			buffer[length]=(char)NULL;
 
@@ -129,7 +132,8 @@ int sqlrcursor::parseData() {
 
 				// get the type of the chunk
 				if (getShort(&type)!=sizeof(unsigned short)) {
-					return -1;
+					setError("Failed to get chunk type.\n A network error may have occurred");
+					return false;
 				}
 
 				// check to see if we're done
@@ -140,9 +144,11 @@ int sqlrcursor::parseData() {
 				// get the length of the chunk
 				if (getLong(&length)!=sizeof(unsigned long)) {
 					delete[] buffer;
-					return -1;
+					setError("Failed to get chunk length.\n A network error may have occurred");
+					return false;
 				}
 
+				// create a buffer to hold the chunk
 				buffer=new char[totallength+length+1];
 				if (totallength) {
 					memcpy(buffer,oldbuffer,totallength);
@@ -154,10 +160,12 @@ int sqlrcursor::parseData() {
 				}
 				totallength=totallength+length;
 
+				// get the chunk of data
 				if ((unsigned long)getString(buffer,length)!=
 								length) {
 					delete[] buffer;
-					return -1;
+					setError("Failed to get chunk data.\n A network error may have occurred");
+					return false;
 				}
 
 				// NULL terminate the buffer.  This makes 
@@ -231,7 +239,7 @@ int sqlrcursor::parseData() {
 	// cache the rows
 	cacheData();
 
-	return 1;
+	return true;
 }
 
 void sqlrcursor::createRowBuffers() {

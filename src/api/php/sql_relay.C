@@ -50,14 +50,12 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_free) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_endsession) {
 	zval **sqlrcon;
-	int r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
 	convert_to_long_ex(sqlrcon);
-	r=((sqlrconnection *)(*sqlrcon)->value.lval)->endSession();
-	RETURN_LONG(r);
+	((sqlrconnection *)(*sqlrcon)->value.lval)->endSession();
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_suspendsession) {

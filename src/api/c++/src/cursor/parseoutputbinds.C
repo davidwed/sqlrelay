@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrcursor::parseOutputBinds() {
+bool sqlrcursor::parseOutputBinds() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -23,7 +23,9 @@ int sqlrcursor::parseOutputBinds() {
 
 		// get the data type
 		if (getShort(&type)!=sizeof(unsigned short)) {
-			return -1;
+			setError("Failed to get data type.\n A network error may have occurred.");
+
+			return false;
 		}
 
 		// check for end of bind values
@@ -46,22 +48,28 @@ int sqlrcursor::parseOutputBinds() {
 
 			// get the value length
 			if (getLong(&length)!=sizeof(unsigned long)) {
-				return -1;
+				setError("Failed to get string value length.\n A network error may have occurred.");
+				return false;
 			}
 			outbindvars[count].valuesize=length;
 			outbindvars[count].value.stringval=new char[length+1];
+
+			// get the value
 			if ((unsigned long)getString(outbindvars[count].value.
 						stringval,length)!=length) {
-				return -1;
+				setError("Failed to get string value.\n A network error may have occurred.");
+				return false;
 			}
 			outbindvars[count].value.stringval[length]=(char)NULL;
 
 		} else if (type==CURSOR_DATA) {
 
+			// get the cursor id
 			if (getShort((unsigned short *)
 					&(outbindvars[count].value.cursorid))!=
 						sizeof(unsigned short)) {
-				return -1;
+				setError("Failed to get cursor id.\n A network error may have occurred.");
+				return false;
 			}
 
 		} else {
@@ -70,12 +78,13 @@ int sqlrcursor::parseOutputBinds() {
 			char	*oldbuffer=NULL;
 			unsigned long	totallength=0;
 			unsigned long	length;
-			while (1) {
+			for (;;) {
 
 				// get the type of the chunk
 				if (getShort(&type)!=
 						sizeof(unsigned short)) {
-					return -1;
+					setError("Failed to get chunk type.\n A network error may have occurred.");
+					return false;
 				}
 
 				// check to see if we're done
@@ -86,9 +95,11 @@ int sqlrcursor::parseOutputBinds() {
 				// get the length of the chunk
 				if (getLong(&length)!=sizeof(unsigned long)) {
 					delete[] buffer;
-					return -1;
+					setError("Failed to get chunk length.\n A network error may have occurred.");
+					return false;
 				}
 
+				// create a buffer to hold the chunk
 				buffer=new char[totallength+length+1];
 				if (totallength) {
 					memcpy(buffer,oldbuffer,totallength);
@@ -100,10 +111,12 @@ int sqlrcursor::parseOutputBinds() {
 				}
 				totallength=totallength+length;
 
+				// get the chunk of data
 				if ((unsigned long)getString(buffer,length)!=
 								length) {
 					delete[] buffer;
-					return -1;
+					setError("Failed to get chunk data.\n A network error may have occurred.");
+					return false;
 				}
 
 				// NULL terminate the buffer.  This makes 
@@ -146,5 +159,5 @@ int sqlrcursor::parseOutputBinds() {
 	// cache the output binds
 	cacheOutputBinds(count);
 
-	return 1;
+	return true;
 }

@@ -6,6 +6,6 @@
 void sqlrconnection::clearSessionFlags() {
 
 	// indicate that the session hasn't been suspended or ended
-	endsessionsent=0;
-	suspendsessionsent=0;
+	endsessionsent=false;
+	suspendsessionsent=false;
 }

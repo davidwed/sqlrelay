@@ -260,8 +260,7 @@ bool oracle7cursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool oracle7cursor::executeQuery(const char *query, long length,
-						unsigned short execute) {
+bool oracle7cursor::executeQuery(const char *query, long length, bool execute) {
 
 	// initialize the column count
 	ncols=0;

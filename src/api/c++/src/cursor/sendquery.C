@@ -4,16 +4,16 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-int sqlrcursor::sendQuery(const char *query) {
+bool sqlrcursor::sendQuery(const char *query) {
 	prepareQuery(query);
 	return executeQuery();
 }
 
-int sqlrcursor::sendQuery(const char *query, int length) {
+bool sqlrcursor::sendQuery(const char *query, int length) {
 	prepareQuery(query,length);
 	return executeQuery();
 }
 
-int sqlrcursor::sendFileQuery(const char *path, const char *filename) {
+bool sqlrcursor::sendFileQuery(const char *path, const char *filename) {
 	return prepareFileQuery(path,filename) && executeQuery();
 }

@@ -29,7 +29,7 @@ void	sqlrcon_free(sqlrcon sqlrconref);
 			/* Disconnects and ends the session if
 			   it hasn't been terminated already. */
 
-int	sqlrcon_endSession(sqlrcon sqlrconref); 
+void	sqlrcon_endSession(sqlrcon sqlrconref); 
 			/* Ends the session. */
 int	sqlrcon_suspendSession(sqlrcon sqlrconref);
 			/* Disconnects this connection from the current

@@ -102,8 +102,7 @@ msqlcursor::msqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	msqlresult=NULL;
 }
 
-bool msqlcursor::executeQuery(const char *query, long length,
-					unsigned short execute) {
+bool msqlcursor::executeQuery(const char *query, long length,bool execute) {
 
 	// initialize return values
 	ncols=0;

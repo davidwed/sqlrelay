@@ -142,8 +142,7 @@ mysqlcursor::mysqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	mysqlresult=NULL;
 }
 
-bool mysqlcursor::executeQuery(const char *query, long length,
-						unsigned short execute) {
+bool mysqlcursor::executeQuery(const char *query, long length, bool execute) {
 
 	// initialize counts
 	ncols=0;

@@ -18,9 +18,9 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_delete
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    endSession
- * Signature: ()I
+ * Signature: ()V
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_endSession
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_endSession
   (JNIEnv *, jobject);
 
 /*

@@ -8,7 +8,7 @@
 sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 
 	// copy references
-	copyrefs=0;
+	copyrefs=false;
 
 	this->sqlrc=sqlrc;
 
@@ -24,7 +24,7 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 	next=NULL;
 
 	// session state
-	cached=0;
+	cached=false;
 
 	// query
 	querybuffer=NULL;
@@ -38,7 +38,7 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 	previousrowcount=0;
 	actualrows=0;
 	affectedrows=0;
-	endofresultset=1;
+	endofresultset=true;
 
 	error=NULL;
 
@@ -60,7 +60,7 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 			OPTIMISTIC_COLUMN_DATA_SIZE/OPTIMISTIC_COLUMN_COUNT,5);
 	columnnamearray=NULL;
 
-	returnnulls=0;
+	returnnulls=false;
 
 	// cache file
 	cachesource=NULL;
@@ -69,7 +69,7 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 	cachedestindname=NULL;
 	cachedest=NULL;
 	cachedestind=NULL;
-	cacheon=0;
+	cacheon=false;
 
 	// options...
 	sendcolumninfo=SEND_COLUMN_INFO;

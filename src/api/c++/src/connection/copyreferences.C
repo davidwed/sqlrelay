@@ -6,7 +6,7 @@
 void sqlrconnection::copyReferences() {
 
 	// set the flag
-	copyrefs=1;
+	copyrefs=true;
 
 	// make copies of some specific things
 	if (server) {

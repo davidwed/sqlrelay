@@ -50,8 +50,8 @@ Public Sub free(ByVal sqlrcon As Long)
 Call sqlrcon_free(sqlrcon)
 End Sub
 
-Public Function endSession(ByVal sqlrcon As Long) As Long
-endSession = sqlrcon_endSession(sqlrcon)
+Public Function endSession(ByVal sqlrcon As Long)
+Call sqlrcon_endSession(sqlrcon)
 End Function
 
 Public Function suspendSession(ByVal sqlrcon As Long) As Long

@@ -36,7 +36,7 @@ public class SQLRConnection {
 
 
 	/** Ends the session. */
-	public native int	endSession();
+	public native void	endSession();
 
 	/** Disconnects this connection from the current
 	 *  session but leaves the session open so 

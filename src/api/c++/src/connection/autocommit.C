@@ -4,18 +4,18 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrconnection::autoCommitOn() {
+bool sqlrconnection::autoCommitOn() {
 	return autoCommit(true);
 }
 
-int sqlrconnection::autoCommitOff() {
+bool sqlrconnection::autoCommitOff() {
 	return autoCommit(false);
 }
 
-int sqlrconnection::autoCommit(bool on) {
+bool sqlrconnection::autoCommit(bool on) {
 
 	if (!openSession()) {
-		return 0;
+		return false;
 	}
 
 	if (debug) {
@@ -35,8 +35,21 @@ int sqlrconnection::autoCommit(bool on) {
 
 	bool	response;
 	if (read(&response)!=sizeof(bool)) {
-		setError("Failed to get autocommit status.\n A network error may have ocurred.");
-		return -1;
+		if (!on) {
+			setError("Failed to set autocommit off.\n A network error may have ocurred.");
+		} else {
+			setError("Failed to set autocommit on.\n A network error may have ocurred.");
+		}
+		return false;
 	}
-	return (response)?1:0;
+
+	if (!response) {
+		if (!on) {
+			setError("Failed to set autocommit off.");
+		} else {
+			setError("Failed to set autocommit on.");
+		}
+	}
+
+	return response;
 }
