@@ -8,7 +8,9 @@ DEBUGLIBS = $(LAGOLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la 
 ifeq ($(strip $(LAGOLIBSPATH)),)
 	RPATH =
 else
+ifeq ($(LAGOUSERPATH),yes)
 	RPATH = -rpath $(LAGOLIBSPATH)
+endif
 endif
 
 SRCS= lagoconnection.C main.C

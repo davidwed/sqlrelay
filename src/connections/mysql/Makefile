@@ -8,7 +8,9 @@ DEBUGLIBS = $(MYSQLLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la
 ifeq ($(strip $(MYSQLLIBSPATH)),)
 	RPATH =
 else
+ifeq ($(MYSQLUSERPATH),yes)
 	RPATH = -rpath $(MYSQLLIBSPATH)
+endif
 endif
 
 SRCS= mysqlconnection.C main.C

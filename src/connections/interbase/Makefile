@@ -8,7 +8,9 @@ DEBUGLIBS = $(INTERBASELIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debu
 ifeq ($(strip $(INTERBASELIBSPATH)),)
 	RPATH =
 else
+ifeq ($(INTERBASEUSERPATH),yes)
 	RPATH = -rpath $(INTERBASELIBSPATH)
+endif
 endif
 
 SRCS= interbaseconnection.C main.C

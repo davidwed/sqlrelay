@@ -468,7 +468,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALLSTRIP CFLAGS CXXFLAGS LIBDMALLOC LIBEFENCE build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S ECHO RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP EGREP LIBTOOL CXX ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE AR PS UNAME MINGW32 CYGWIN UWIN STDCPPLIB PTHREADSLIB READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB SSLLIB CRYPTOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSDEBUGLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONLIBS PYTHONOBJ PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir PERLINSTALLPREFIX LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALLSTRIP CFLAGS CXXFLAGS ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH LIBDMALLOC LIBEFENCE build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S ECHO RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP EGREP LIBTOOL CXX ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE AR PS UNAME MINGW32 CYGWIN UWIN STDCPPLIB PTHREADSLIB READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB SSLLIB CRYPTOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSDEBUGLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONLIBS PYTHONOBJ PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir PERLINSTALLPREFIX LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1014,16 +1014,27 @@ Optional Features:
   --enable-debug          compile with -g and -pg options and don't strip binaries
   --enable-static               Enable static linking
   --disable-oracle              Don't build Oracle connection
+  --enable-oracle-rpath         Use -rpath when building Oracle connection
   --disable-mysql               Don't build MySQL connection
+  --enable-mysql-rpath          Use -rpath when building MySQL connection
   --disable-msql                Don't build mSQL connection
+  --enable-msql-rpath           Use -rpath when building mSQL connection
   --disable-postgresql          Don't build PostgreSQL connection
+  --enable-postgresql-rpath     Use -rpath when building PostgreSQL connection
   --disable-sqlite              Don't build SQLite connection
+  --enable-sqlite-rpath         Use -rpath when building SQLite connection
   --disable-lago                Don't build Lago connection
+  --enable-lago-rpath           Use -rpath when building Lago connection
   --disable-freetds             Don't build FreeTDS connection
+  --enable-freetds-rpath        Use -rpath when building FreeTDS connection
   --disable-sybase              Don't build Sybase connection
+  --enable-sybase-rpath         Use -rpath when building Sybase connection
   --disable-odbc                Don't build ODBC connection
+  --enable-odbc-rpath           Use -rpath when building ODBC connection
   --disable-db2                 Don't build DB2 connection
+  --enable-db2-rpath            Use -rpath when building DB2 connection
   --disable-interbase           Don't build Interbase connection
+  --enable-interbase-rpath      Use -rpath when building Interbase connection
   --disable-perl                Don't build Perl api
   --disable-python              Don't build Python api
   --disable-zope                Don't build Zope api
@@ -1534,6 +1545,14 @@ if test "${enable_oracle+set}" = set; then
 else
   ENABLE_ORACLE="yes"
 fi;
+# Check whether --enable-oracle-rpath or --disable-oracle-rpath was given.
+if test "${enable_oracle_rpath+set}" = set; then
+  enableval="$enable_oracle_rpath"
+  ORACLEUSERPATH="yes"
+else
+  ORACLEUSERPATH=""
+fi;
+
 
 # Check whether --with-mysql-prefix or --without-mysql-prefix was given.
 if test "${with_mysql_prefix+set}" = set; then
@@ -1549,6 +1568,14 @@ if test "${enable_mysql+set}" = set; then
 else
   ENABLE_MYSQL="yes"
 fi;
+# Check whether --enable-mysql-rpath or --disable-mysql-rpath was given.
+if test "${enable_mysql_rpath+set}" = set; then
+  enableval="$enable_mysql_rpath"
+  MYSQLUSERPATH="yes"
+else
+  MYSQLUSERPATH=""
+fi;
+
 
 # Check whether --with-msql-prefix or --without-msql-prefix was given.
 if test "${with_msql_prefix+set}" = set; then
@@ -1564,6 +1591,14 @@ if test "${enable_msql+set}" = set; then
 else
   ENABLE_MSQL="yes"
 fi;
+# Check whether --enable-msql-rpath or --disable-msql-rpath was given.
+if test "${enable_msql_rpath+set}" = set; then
+  enableval="$enable_msql_rpath"
+  MSQLUSERPATH="yes"
+else
+  MSQLUSERPATH=""
+fi;
+
 
 # Check whether --with-postgresql-prefix or --without-postgresql-prefix was given.
 if test "${with_postgresql_prefix+set}" = set; then
@@ -1579,6 +1614,14 @@ if test "${enable_postgresql+set}" = set; then
 else
   ENABLE_POSTGRESQL="yes"
 fi;
+# Check whether --enable-postgresql-rpath or --disable-postgresql-rpath was given.
+if test "${enable_postgresql_rpath+set}" = set; then
+  enableval="$enable_postgresql_rpath"
+  POSTGRESQLUSERPATH="yes"
+else
+  POSTGRESQLUSERPATH=""
+fi;
+
 
 # Check whether --with-sqlite-prefix or --without-sqlite-prefix was given.
 if test "${with_sqlite_prefix+set}" = set; then
@@ -1594,6 +1637,14 @@ if test "${enable_sqlite+set}" = set; then
 else
   ENABLE_SQLITE="yes"
 fi;
+# Check whether --enable-sqlite-rpath or --disable-sqlite-rpath was given.
+if test "${enable_sqlite_rpath+set}" = set; then
+  enableval="$enable_sqlite_rpath"
+  SQLITEUSERPATH="yes"
+else
+  SQLITEUSERPATH=""
+fi;
+
 
 # Check whether --with-lago-prefix or --without-lago-prefix was given.
 if test "${with_lago_prefix+set}" = set; then
@@ -1609,6 +1660,14 @@ if test "${enable_lago+set}" = set; then
 else
   ENABLE_LAGO="yes"
 fi;
+# Check whether --enable-lago-rpath or --disable-lago-rpath was given.
+if test "${enable_lago_rpath+set}" = set; then
+  enableval="$enable_lago_rpath"
+  LAGOUSERPATH="yes"
+else
+  LAGOUSERPATH=""
+fi;
+
 
 # Check whether --with-freetds-prefix or --without-freetds-prefix was given.
 if test "${with_freetds_prefix+set}" = set; then
@@ -1624,6 +1683,14 @@ if test "${enable_freetds+set}" = set; then
 else
   ENABLE_FREETDS="yes"
 fi;
+# Check whether --enable-freetds-rpath or --disable-freetds-rpath was given.
+if test "${enable_freetds_rpath+set}" = set; then
+  enableval="$enable_freetds_rpath"
+  FREETDSUSERPATH="yes"
+else
+  FREETDSUSERPATH=""
+fi;
+
 
 # Check whether --with-sybase-prefix or --without-sybase-prefix was given.
 if test "${with_sybase_prefix+set}" = set; then
@@ -1639,6 +1706,14 @@ if test "${enable_sybase+set}" = set; then
 else
   ENABLE_SYBASE="yes"
 fi;
+# Check whether --enable-sybase-rpath or --disable-sybase-rpath was given.
+if test "${enable_sybase_rpath+set}" = set; then
+  enableval="$enable_sybase_rpath"
+  SYBASEUSERPATH="yes"
+else
+  SYBASEUSERPATH=""
+fi;
+
 
 # Check whether --with-odbc-prefix or --without-odbc-prefix was given.
 if test "${with_odbc_prefix+set}" = set; then
@@ -1654,6 +1729,14 @@ if test "${enable_odbc+set}" = set; then
 else
   ENABLE_ODBC="yes"
 fi;
+# Check whether --enable-odbc-rpath or --disable-odbc-rpath was given.
+if test "${enable_odbc_rpath+set}" = set; then
+  enableval="$enable_odbc_rpath"
+  ODBCUSERPATH="yes"
+else
+  ODBCUSERPATH=""
+fi;
+
 
 # Check whether --with-db2-prefix or --without-db2-prefix was given.
 if test "${with_db2_prefix+set}" = set; then
@@ -1669,6 +1752,14 @@ if test "${enable_db2+set}" = set; then
 else
   ENABLE_DB2="yes"
 fi;
+# Check whether --enable-db2-rpath or --disable-db2-rpath was given.
+if test "${enable_db2_rpath+set}" = set; then
+  enableval="$enable_db2_rpath"
+  DB2USERPATH="yes"
+else
+  DB2USERPATH=""
+fi;
+
 
 # Check whether --with-interbase-prefix or --without-interbase-prefix was given.
 if test "${with_interbase_prefix+set}" = set; then
@@ -1684,6 +1775,14 @@ if test "${enable_interbase+set}" = set; then
 else
   ENABLE_INTERBASE="yes"
 fi;
+# Check whether --enable-interbase-rpath or --disable-interbase-rpath was given.
+if test "${enable_interbase_rpath+set}" = set; then
+  enableval="$enable_interbase_rpath"
+  INTERBASEUSERPATH="yes"
+else
+  INTERBASEUSERPATH=""
+fi;
+
 
 # Check whether --with-perl-prefix or --without-perl-prefix was given.
 if test "${with_perl_prefix+set}" = set; then
@@ -4531,7 +4630,7 @@ test "x$enable_libtool_lock" != xno && enable_libtool_lock=yes
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4534 "configure"' > conftest.$ac_ext
+  echo '#line 4633 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5074,7 +5173,7 @@ chmod -w .
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -o out/conftest2.$ac_objext"
 compiler_c_o=no
-if { (eval echo configure:5077: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
+if { (eval echo configure:5176: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
   # The compiler can only warn and ignore the option if not recognized
   # So say no if there are warnings
   if test -s out/conftest.err; then
@@ -6282,7 +6381,7 @@ linux-gnu*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*)
-    echo '#line 6285 "configure"' > conftest.$ac_ext
+    echo '#line 6384 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -6968,7 +7067,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 6971 "configure"
+#line 7070 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -7066,7 +7165,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 7069 "configure"
+#line 7168 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -24506,6 +24605,17 @@ s,@LIBS@,$LIBS,;t t
 s,@INSTALLSTRIP@,$INSTALLSTRIP,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@CXXFLAGS@,$CXXFLAGS,;t t
+s,@ORACLEUSERPATH@,$ORACLEUSERPATH,;t t
+s,@MYSQLUSERPATH@,$MYSQLUSERPATH,;t t
+s,@MSQLUSERPATH@,$MSQLUSERPATH,;t t
+s,@POSTGRESQLUSERPATH@,$POSTGRESQLUSERPATH,;t t
+s,@SQLITEUSERPATH@,$SQLITEUSERPATH,;t t
+s,@LAGOUSERPATH@,$LAGOUSERPATH,;t t
+s,@FREETDSUSERPATH@,$FREETDSUSERPATH,;t t
+s,@SYBASEUSERPATH@,$SYBASEUSERPATH,;t t
+s,@ODBCUSERPATH@,$ODBCUSERPATH,;t t
+s,@DB2USERPATH@,$DB2USERPATH,;t t
+s,@INTERBASEUSERPATH@,$INTERBASEUSERPATH,;t t
 s,@LIBDMALLOC@,$LIBDMALLOC,;t t
 s,@LIBEFENCE@,$LIBEFENCE,;t t
 s,@build@,$build,;t t

@@ -8,7 +8,9 @@ DEBUGLIBS = $(ODBCLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la 
 ifeq ($(strip $(ODBCLIBSPATH)),)
 	RPATH =
 else
+ifeq ($(ODBCUSERPATH),yes)
 	RPATH = -rpath $(ODBCLIBSPATH)
+endif
 endif
 
 SRCS= odbcconnection.C main.C

@@ -8,7 +8,9 @@ DEBUGLIBS = $(SQLITELIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.l
 ifeq ($(strip $(SQLITELIBSPATH)),)
 	RPATH =
 else
+ifeq ($(SQLITEUSERPATH),yes)
 	RPATH = -rpath $(SQLITELIBSPATH)
+endif
 endif
 
 SRCS= sqliteconnection.C main.C

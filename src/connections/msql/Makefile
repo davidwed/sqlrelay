@@ -8,7 +8,9 @@ DEBUGLIBS = $(MSQLLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la 
 ifeq ($(strip $(MSQLLIBSPATH)),)
 	RPATH =
 else
+ifeq ($(MSQLUSERPATH),yes)
 	RPATH = -rpath $(MSQLLIBSPATH)
+endif
 endif
 
 SRCS= msqlconnection.C main.C

@@ -28,6 +28,11 @@ AC_ARG_ENABLE(oracle,
 	[  --disable-oracle              Don't build Oracle connection],
 	ENABLE_ORACLE="",
 	ENABLE_ORACLE="yes")
+AC_ARG_ENABLE(oracle-rpath,
+	[  --enable-oracle-rpath         Use -rpath when building Oracle connection],
+	ORACLEUSERPATH="yes",
+	ORACLEUSERPATH="")
+AC_SUBST(ORACLEUSERPATH)
 AC_ARG_WITH(mysql-prefix,
 	[  --with-mysql-prefix           Location of MySQL],
 	MYSQLPATH="$withval",
@@ -36,6 +41,11 @@ AC_ARG_ENABLE(mysql,
 	[  --disable-mysql               Don't build MySQL connection],
 	ENABLE_MYSQL="",
 	ENABLE_MYSQL="yes")
+AC_ARG_ENABLE(mysql-rpath,
+	[  --enable-mysql-rpath          Use -rpath when building MySQL connection],
+	MYSQLUSERPATH="yes",
+	MYSQLUSERPATH="")
+AC_SUBST(MYSQLUSERPATH)
 AC_ARG_WITH(msql-prefix,
 	[  --with-msql-prefix            Location of mSQL],
 	MSQLPATH="$withval",
@@ -44,6 +54,11 @@ AC_ARG_ENABLE(msql,
 	[  --disable-msql                Don't build mSQL connection],
 	ENABLE_MSQL="",
 	ENABLE_MSQL="yes")
+AC_ARG_ENABLE(msql-rpath,
+	[  --enable-msql-rpath           Use -rpath when building mSQL connection],
+	MSQLUSERPATH="yes",
+	MSQLUSERPATH="")
+AC_SUBST(MSQLUSERPATH)
 AC_ARG_WITH(postgresql-prefix,
 	[  --with-postgresql-prefix      Location of PostgreSQL],
 	POSTGRESQLPATH="$withval",
@@ -52,6 +67,11 @@ AC_ARG_ENABLE(postgresql,
 	[  --disable-postgresql          Don't build PostgreSQL connection],
 	ENABLE_POSTGRESQL="",
 	ENABLE_POSTGRESQL="yes")
+AC_ARG_ENABLE(postgresql-rpath,
+	[  --enable-postgresql-rpath     Use -rpath when building PostgreSQL connection],
+	POSTGRESQLUSERPATH="yes",
+	POSTGRESQLUSERPATH="")
+AC_SUBST(POSTGRESQLUSERPATH)
 AC_ARG_WITH(sqlite-prefix,
 	[  --with-sqlite-prefix          Location of SQLite],
 	SQLITEPATH="$withval",
@@ -60,6 +80,11 @@ AC_ARG_ENABLE(sqlite,
 	[  --disable-sqlite              Don't build SQLite connection],
 	ENABLE_SQLITE="",
 	ENABLE_SQLITE="yes")
+AC_ARG_ENABLE(sqlite-rpath,
+	[  --enable-sqlite-rpath         Use -rpath when building SQLite connection],
+	SQLITEUSERPATH="yes",
+	SQLITEUSERPATH="")
+AC_SUBST(SQLITEUSERPATH)
 AC_ARG_WITH(lago-prefix,
 	[  --with-lago-prefix            Location of Lago],
 	LAGOPATH="$withval",
@@ -68,6 +93,11 @@ AC_ARG_ENABLE(lago,
 	[  --disable-lago                Don't build Lago connection],
 	ENABLE_LAGO="",
 	ENABLE_LAGO="yes")
+AC_ARG_ENABLE(lago-rpath,
+	[  --enable-lago-rpath           Use -rpath when building Lago connection],
+	LAGOUSERPATH="yes",
+	LAGOUSERPATH="")
+AC_SUBST(LAGOUSERPATH)
 AC_ARG_WITH(freetds-prefix,
 	[  --with-freetds-prefix         Location of FreeTDS],
 	FREETDSPATH="$withval",
@@ -76,6 +106,11 @@ AC_ARG_ENABLE(freetds,
 	[  --disable-freetds             Don't build FreeTDS connection],
 	ENABLE_FREETDS="",
 	ENABLE_FREETDS="yes")
+AC_ARG_ENABLE(freetds-rpath,
+	[  --enable-freetds-rpath        Use -rpath when building FreeTDS connection],
+	FREETDSUSERPATH="yes",
+	FREETDSUSERPATH="")
+AC_SUBST(FREETDSUSERPATH)
 AC_ARG_WITH(sybase-prefix,
 	[  --with-sybase-prefix          Location of Sybase],
 	SYBASEPATH="$withval",
@@ -84,6 +119,11 @@ AC_ARG_ENABLE(sybase,
 	[  --disable-sybase              Don't build Sybase connection],
 	ENABLE_SYBASE="",
 	ENABLE_SYBASE="yes")
+AC_ARG_ENABLE(sybase-rpath,
+	[  --enable-sybase-rpath         Use -rpath when building Sybase connection],
+	SYBASEUSERPATH="yes",
+	SYBASEUSERPATH="")
+AC_SUBST(SYBASEUSERPATH)
 AC_ARG_WITH(odbc-prefix,
 	[  --with-odbc-prefix            Location of ODBC],
 	ODBCPATH="$withval",
@@ -92,6 +132,11 @@ AC_ARG_ENABLE(odbc,
 	[  --disable-odbc                Don't build ODBC connection],
 	ENABLE_ODBC="",
 	ENABLE_ODBC="yes")
+AC_ARG_ENABLE(odbc-rpath,
+	[  --enable-odbc-rpath           Use -rpath when building ODBC connection],
+	ODBCUSERPATH="yes",
+	ODBCUSERPATH="")
+AC_SUBST(ODBCUSERPATH)
 AC_ARG_WITH(db2-prefix,
 	[  --with-db2-prefix             Location of DB2],
 	DB2PATH="$withval",
@@ -100,6 +145,11 @@ AC_ARG_ENABLE(db2,
 	[  --disable-db2                 Don't build DB2 connection],
 	ENABLE_DB2="",
 	ENABLE_DB2="yes")
+AC_ARG_ENABLE(db2-rpath,
+	[  --enable-db2-rpath            Use -rpath when building DB2 connection],
+	DB2USERPATH="yes",
+	DB2USERPATH="")
+AC_SUBST(DB2USERPATH)
 AC_ARG_WITH(interbase-prefix,
 	[  --with-interbase-prefix       Location of Interbase],
 	INTERBASEPATH="$withval",
@@ -108,6 +158,11 @@ AC_ARG_ENABLE(interbase,
 	[  --disable-interbase           Don't build Interbase connection],
 	ENABLE_INTERBASE="",
 	ENABLE_INTERBASE="yes")
+AC_ARG_ENABLE(interbase-rpath,
+	[  --enable-interbase-rpath      Use -rpath when building Interbase connection],
+	INTERBASEUSERPATH="yes",
+	INTERBASEUSERPATH="")
+AC_SUBST(INTERBASEUSERPATH)
 AC_ARG_WITH(perl-prefix,
 	[  --with-perl-prefix            Location of Perl],
 	PERLPATH="$withval",

@@ -8,7 +8,9 @@ DEBUGLIBS = $(POSTGRESQLLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_deb
 ifeq ($(strip $(POSTGRESQLLIBSPATH)),)
 	RPATH =
 else
+ifeq ($(POSTGRESQLUSERPATH),yes)
 	RPATH = -rpath $(POSTGRESQLLIBSPATH)
+endif
 endif
 
 SRCS= postgresqlconnection.C main.C

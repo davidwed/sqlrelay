@@ -8,7 +8,9 @@ DEBUGLIBS = $(FREETDSLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.
 ifeq ($(strip $(FREETDSLIBSPATH)),)
 	RPATH =
 else
+ifeq ($(FREETDSUSERPATH),yes)
 	RPATH = -rpath $(FREETDSLIBSPATH)
+endif
 endif
 
 SRCS= freetdsconnection.C main.C

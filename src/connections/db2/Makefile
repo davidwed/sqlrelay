@@ -8,7 +8,9 @@ DEBUGLIBS = $(DB2LIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la $
 ifeq ($(strip $(DB2LIBSPATH)),)
 	RPATH =
 else
+ifeq ($(DB2USERPATH),yes)
 	RPATH = -rpath $(DB2LIBSPATH)
+endif
 endif
 
 SRCS= db2connection.C main.C

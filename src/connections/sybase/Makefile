@@ -8,7 +8,9 @@ DEBUGLIBS = $(SYBASELIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.l
 ifeq ($(strip $(SYBASELIBSPATH)),)
 	RPATH =
 else
+ifeq ($(SYBASEUSERPATH),yes)
 	RPATH = -rpath $(SYBASELIBSPATH)
+endif
 endif
 
 SRCS= sybaseconnection.C main.C
