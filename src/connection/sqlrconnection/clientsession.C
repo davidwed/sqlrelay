@@ -174,12 +174,12 @@ void	sqlrconnection::closeSuspendedSessionSockets() {
 			"closing sockets from a previously suspended session...");
 		#endif
 		if (serversockun) {
-			removeFileDescriptor(serversockun->getFileDescriptor());
+			removeFileDescriptor(serversockun);
 			delete serversockun;
 			serversockun=NULL;
 		}
 		if (serversockin) {
-			removeFileDescriptor(serversockin->getFileDescriptor());
+			removeFileDescriptor(serversockin);
 			delete serversockin;
 			serversockin=NULL;
 		}

@@ -27,14 +27,12 @@ class listenercomm {
 					char *connectionid);
 		int	receiveFileDescriptor(int *descriptor);
 		void	deRegisterForHandoff(char *tmpdir);
-
+		unixclientsocket	*handoffsockun;
 	private:
 		void	registerForHandoff(char *tmpdir);
 
 		ipc			*ipcptr;
 		connectioncmdline	*cmdlineptr;
-
-		unixclientsocket	*handoffsockun;
 
 		#ifdef SERVER_DEBUG
 		logger *dl;

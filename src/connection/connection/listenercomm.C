@@ -96,6 +96,7 @@ void	listenercomm::announceAvailability(char *tmpdir,
 }
 
 void	listenercomm::registerForHandoff(char *tmpdir) {
+printf("registering for handoff...\n");
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"registering for handoff...");
@@ -116,7 +117,7 @@ void	listenercomm::registerForHandoff(char *tmpdir) {
 	// Try to connect over and over forever on 1 second intervals.
 	// If the connect succeeds but the write fails, loop back and
 	// try again.
-	while (1) {
+	for (;;) {
 
 		#ifdef SERVER_DEBUG
 		dl->write("connection",1,"trying...");

@@ -22,8 +22,7 @@ int	sqlrconnection::openSockets() {
 		if (!serversockun) {
 			serversockun=new unixserversocket();
 			if (serversockun->listenOnSocket(unixsocket,0000,5)) {
-				addFileDescriptor(
-					serversockun->getFileDescriptor());
+				addFileDescriptor(serversockun);
 			} else {
 				fprintf(stderr,"Could not listen on ");
 				fprintf(stderr,"unix socket: ");
@@ -52,8 +51,7 @@ int	sqlrconnection::openSockets() {
 				if (inetport==0) {
 					inetport=serversockin->getPort();
 				}
-				addFileDescriptor(
-					serversockin->getFileDescriptor());
+				addFileDescriptor(serversockin);
 			} else {
 				fprintf(stderr,"Could not listen on ");
 				fprintf(stderr,"inet socket: ");
