@@ -155,7 +155,7 @@ function checkSuccess($value,$success) {
 	sqlrcur_inputBind($cur,"var9",8.00,3,2);
 	sqlrcur_inputBind($cur,"var10","01-Jan-2008 08:00:00");
 	sqlrcur_inputBind($cur,"var11","01-Jan-2008 08:00:00");
-	sqlrcur_inputBind($cur,"var12","testchar8");
+	sqlrcur_inputBind($cur,"var12","testchar8                               ");
 	sqlrcur_inputBind($cur,"var13","testvarchar8");
 	sqlrcur_inputBind($cur,"var14",1);
 	sqlrcur_inputBind($cur,"var15","junkvalue");
@@ -288,8 +288,8 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getLongest($cur,"testdatetime"),19);
 	checkSuccess(sqlrcur_getLongest($cur,10),19);
 	checkSuccess(sqlrcur_getLongest($cur,"testsmalldatetime"),19);
-	checkSuccess(sqlrcur_getLongest($cur,11),9);
-	checkSuccess(sqlrcur_getLongest($cur,"testchar"),9);
+	checkSuccess(sqlrcur_getLongest($cur,11),40);
+	checkSuccess(sqlrcur_getLongest($cur,"testchar"),40);
 	checkSuccess(sqlrcur_getLongest($cur,12),12);
 	checkSuccess(sqlrcur_getLongest($cur,"testvarchar"),12);
 	checkSuccess(sqlrcur_getLongest($cur,13),1);
@@ -322,9 +322,9 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,6),"1.1");
 	checkSuccess(sqlrcur_getField($cur,0,7),"1.0000");
 	checkSuccess(sqlrcur_getField($cur,0,8),"1.00");
-	checkSuccess(sqlrcur_getField($cur,0,9),"Jan 01 2001 01:00AM");
-	checkSuccess(sqlrcur_getField($cur,0,10),"Jan 01 2001 01:00AM");
-	checkSuccess(sqlrcur_getField($cur,0,11),"testchar1");
+	checkSuccess(sqlrcur_getField($cur,0,9),"Jan  1 2001  1:00AM");
+	checkSuccess(sqlrcur_getField($cur,0,10),"Jan  1 2001  1:00AM");
+	checkSuccess(sqlrcur_getField($cur,0,11),"testchar1                               ");
 	checkSuccess(sqlrcur_getField($cur,0,12),"testvarchar1");
 	checkSuccess(sqlrcur_getField($cur,0,13),"1");
 	echo("\n");
@@ -337,9 +337,9 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,7,6),"8.8");
 	checkSuccess(sqlrcur_getField($cur,7,7),"8.0000");
 	checkSuccess(sqlrcur_getField($cur,7,8),"8.00");
-	checkSuccess(sqlrcur_getField($cur,7,9),"Jan 01 2008 08:00AM");
-	checkSuccess(sqlrcur_getField($cur,7,10),"Jan 01 2008 08:00AM");
-	checkSuccess(sqlrcur_getField($cur,7,11),"testchar8");
+	checkSuccess(sqlrcur_getField($cur,7,9),"Jan  1 2008  8:00AM");
+	checkSuccess(sqlrcur_getField($cur,7,10),"Jan  1 2008  8:00AM");
+	checkSuccess(sqlrcur_getField($cur,7,11),"testchar8                               ");
 	checkSuccess(sqlrcur_getField($cur,7,12),"testvarchar8");
 	checkSuccess(sqlrcur_getField($cur,7,13),"1");
 	echo("\n");
@@ -356,7 +356,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,0,8),4);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,9),19);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,10),19);
-	checkSuccess(sqlrcur_getFieldLength($cur,0,11),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,11),40);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,12),12);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,13),1);
 	echo("\n");
@@ -371,7 +371,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,7,8),4);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,9),19);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,10),19);
-	checkSuccess(sqlrcur_getFieldLength($cur,7,11),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,11),40);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,12),12);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,13),1);
 	echo("\n");
@@ -386,9 +386,9 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,"testnumeric"),"1.1");
 	checkSuccess(sqlrcur_getField($cur,0,"testmoney"),"1.0000");
 	checkSuccess(sqlrcur_getField($cur,0,"testsmallmoney"),"1.00");
-	checkSuccess(sqlrcur_getField($cur,0,"testdatetime"),"Jan 01 2001 01:00AM");
-	checkSuccess(sqlrcur_getField($cur,0,"testsmalldatetime"),"Jan 01 2001 01:00AM");
-	checkSuccess(sqlrcur_getField($cur,0,"testchar"),"testchar1");
+	checkSuccess(sqlrcur_getField($cur,0,"testdatetime"),"Jan  1 2001  1:00AM");
+	checkSuccess(sqlrcur_getField($cur,0,"testsmalldatetime"),"Jan  1 2001  1:00AM");
+	checkSuccess(sqlrcur_getField($cur,0,"testchar"),"testchar1                               ");
 	checkSuccess(sqlrcur_getField($cur,0,"testvarchar"),"testvarchar1");
 	checkSuccess(sqlrcur_getField($cur,0,"testbit"),"1");
 	echo("\n");
@@ -401,9 +401,9 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,7,"testnumeric"),"8.8");
 	checkSuccess(sqlrcur_getField($cur,7,"testmoney"),"8.0000");
 	checkSuccess(sqlrcur_getField($cur,7,"testsmallmoney"),"8.00");
-	checkSuccess(sqlrcur_getField($cur,7,"testdatetime"),"Jan 01 2008 08:00AM");
-	checkSuccess(sqlrcur_getField($cur,7,"testsmalldatetime"),"Jan 01 2008 08:00AM");
-	checkSuccess(sqlrcur_getField($cur,7,"testchar"),"testchar8");
+	checkSuccess(sqlrcur_getField($cur,7,"testdatetime"),"Jan  1 2008  8:00AM");
+	checkSuccess(sqlrcur_getField($cur,7,"testsmalldatetime"),"Jan  1 2008  8:00AM");
+	checkSuccess(sqlrcur_getField($cur,7,"testchar"),"testchar8                               ");
 	checkSuccess(sqlrcur_getField($cur,7,"testvarchar"),"testvarchar8");
 	checkSuccess(sqlrcur_getField($cur,7,"testbit"),"1");
 	echo("\n");
@@ -420,7 +420,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"testsmallmoney"),4);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"testdatetime"),19);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"testsmalldatetime"),19);
-	checkSuccess(sqlrcur_getFieldLength($cur,0,"testchar"),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,"testchar"),40);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"testvarchar"),12);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"testbit"),1);
 	echo("\n");
@@ -435,7 +435,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testsmallmoney"),4);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testdatetime"),19);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testsmalldatetime"),19);
-	checkSuccess(sqlrcur_getFieldLength($cur,7,"testchar"),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,"testchar"),40);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testvarchar"),12);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testbit"),1);
 	echo("\n");
@@ -451,9 +451,9 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields[6],"1.1");
 	checkSuccess($fields[7],"1.0000");
 	checkSuccess($fields[8],"1.00");
-	checkSuccess($fields[9],"Jan 01 2001 01:00AM");
-	checkSuccess($fields[10],"Jan 01 2001 01:00AM");
-	checkSuccess($fields[11],"testchar1");
+	checkSuccess($fields[9],"Jan  1 2001  1:00AM");
+	checkSuccess($fields[10],"Jan  1 2001  1:00AM");
+	checkSuccess($fields[11],"testchar1                               ");
 	checkSuccess($fields[12],"testvarchar1");
 	checkSuccess($fields[13],"1");
 	echo("\n");
@@ -471,7 +471,7 @@ function checkSuccess($value,$success) {
 	checkSuccess($fieldlens[8],4);
 	checkSuccess($fieldlens[9],19);
 	checkSuccess($fieldlens[10],19);
-	checkSuccess($fieldlens[11],9);
+	checkSuccess($fieldlens[11],40);
 	checkSuccess($fieldlens[12],12);
 	checkSuccess($fieldlens[13],1);
 	echo("\n");
@@ -489,9 +489,9 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields["testnumeric"],"1.1");
 	checkSuccess($fields["testmoney"],"1.0000");
 	checkSuccess($fields["testsmallmoney"],"1.00");
-	checkSuccess($fields["testdatetime"],"Jan 01 2001 01:00AM");
-	checkSuccess($fields["testsmalldatetime"],"Jan 01 2001 01:00AM");
-	checkSuccess($fields["testchar"],"testchar1");
+	checkSuccess($fields["testdatetime"],"Jan  1 2001  1:00AM");
+	checkSuccess($fields["testsmalldatetime"],"Jan  1 2001  1:00AM");
+	checkSuccess($fields["testchar"],"testchar1                               ");
 	checkSuccess($fields["testvarchar"],"testvarchar1");
 	checkSuccess($fields["testbit"],"1");
 	echo("\n");
@@ -505,9 +505,9 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields["testnumeric"],"8.8");
 	checkSuccess($fields["testmoney"],"8.0000");
 	checkSuccess($fields["testsmallmoney"],"8.00");
-	checkSuccess($fields["testdatetime"],"Jan 01 2008 08:00AM");
-	checkSuccess($fields["testsmalldatetime"],"Jan 01 2008 08:00AM");
-	checkSuccess($fields["testchar"],"testchar8");
+	checkSuccess($fields["testdatetime"],"Jan  1 2008  8:00AM");
+	checkSuccess($fields["testsmalldatetime"],"Jan  1 2008  8:00AM");
+	checkSuccess($fields["testchar"],"testchar8                               ");
 	checkSuccess($fields["testvarchar"],"testvarchar8");
 	checkSuccess($fields["testbit"],"1");
 	echo("\n");
@@ -525,7 +525,7 @@ function checkSuccess($value,$success) {
 	checkSuccess($fieldlengths["testsmallmoney"],4);
 	checkSuccess($fieldlengths["testdatetime"],19);
 	checkSuccess($fieldlengths["testsmalldatetime"],19);
-	checkSuccess($fieldlengths["testchar"],9);
+	checkSuccess($fieldlengths["testchar"],40);
 	checkSuccess($fieldlengths["testvarchar"],12);
 	checkSuccess($fieldlengths["testbit"],1);
 	echo("\n");
@@ -541,7 +541,7 @@ function checkSuccess($value,$success) {
 	checkSuccess($fieldlengths["testsmallmoney"],4);
 	checkSuccess($fieldlengths["testdatetime"],19);
 	checkSuccess($fieldlengths["testsmalldatetime"],19);
-	checkSuccess($fieldlengths["testchar"],9);
+	checkSuccess($fieldlengths["testchar"],40);
 	checkSuccess($fieldlengths["testvarchar"],12);
 	checkSuccess($fieldlengths["testbit"],1);
 	echo("\n");
@@ -829,6 +829,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	# drop existing table
+	sqlrcon_commit($con);
 	sqlrcur_sendQuery($cur,"drop table testtable");
 
 	# invalid queries...

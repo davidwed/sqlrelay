@@ -295,7 +295,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,4),20);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,5),12);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,6),22);
-	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,7),5);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,7),4);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,8),10);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,9),8);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,10),19);
@@ -314,7 +314,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testbigint"),20);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testfloat"),12);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testreal"),22);
-	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdecimal"),5);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdecimal"),4);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdate"),10);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtime"),8);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdatetime"),19);
@@ -600,7 +600,7 @@ int	main(int argc, char **argv) {
 	printf("FIELDS: \n");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"hello");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"10.555600");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"10.5556");
 	printf("\n");
 
 	printf("ARRAY SUBSTITUTIONS: \n");
@@ -634,9 +634,9 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("FIELDS: \n");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"10.5500");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"10.55600");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"10.555600");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"10.55");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"10.556");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"10.5556");
 	printf("\n");
 
 	printf("NULLS as Nulls: \n");

@@ -1,4 +1,6 @@
-mysql appears to add 00's to the end of floating point numbers why?
+sybase connection doesn't report an error when it can't log in
+
+need a reliable way to ping msql
 
 query/fields cmdline tools need a timeout option.
 
@@ -28,7 +30,6 @@ non-c++/perl clob/blob/cursor bind tests
 interbase directions for using gsec don't work for me
 interbase docs aren't available at the link in gettingstarted/interbase.html
 db2 startup directions are wrong, you have to run db2start/db2stop as db2as
-sybase startup can fail because LANG is set funny - need note in docs
 fix documents to reflect java package
 
 better transaction handling for postgresql

@@ -1,5 +1,3 @@
-
-
 // Copyright (c) 2001  David Muse
 // See the file COPYING for more information.
 
@@ -296,7 +294,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength(4),20);
 	checkSuccess(cur->getColumnLength(5),12);
 	checkSuccess(cur->getColumnLength(6),22);
-	checkSuccess(cur->getColumnLength(7),5);
+	checkSuccess(cur->getColumnLength(7),4);
 	checkSuccess(cur->getColumnLength(8),10);
 	checkSuccess(cur->getColumnLength(9),8);
 	checkSuccess(cur->getColumnLength(10),19);
@@ -315,7 +313,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testbigint"),20);
 	checkSuccess(cur->getColumnLength("testfloat"),12);
 	checkSuccess(cur->getColumnLength("testreal"),22);
-	checkSuccess(cur->getColumnLength("testdecimal"),5);
+	checkSuccess(cur->getColumnLength("testdecimal"),4);
 	checkSuccess(cur->getColumnLength("testdate"),10);
 	checkSuccess(cur->getColumnLength("testtime"),8);
 	checkSuccess(cur->getColumnLength("testdatetime"),19);
@@ -601,7 +599,7 @@ int	main(int argc, char **argv) {
 	printf("FIELDS: \n");
 	checkSuccess(cur->getField(0,0),"1");
 	checkSuccess(cur->getField(0,1),"hello");
-	checkSuccess(cur->getField(0,2),"10.555600");
+	checkSuccess(cur->getField(0,2),"10.5556");
 	printf("\n");
 
 	printf("ARRAY SUBSTITUTIONS: \n");
@@ -635,9 +633,9 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("FIELDS: \n");
-	checkSuccess(cur->getField(0,0),"10.5500");
-	checkSuccess(cur->getField(0,1),"10.55600");
-	checkSuccess(cur->getField(0,2),"10.555600");
+	checkSuccess(cur->getField(0,0),"10.55");
+	checkSuccess(cur->getField(0,1),"10.556");
+	checkSuccess(cur->getField(0,2),"10.5556");
 	printf("\n");
 
 	printf("NULLS as Nulls: \n");

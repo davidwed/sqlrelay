@@ -283,10 +283,14 @@ char	freetdsconnection::bindVariablePrefix() {
 freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	freetdsconn=(freetdsconnection *)conn;
 	cmd=NULL;
-	#ifndef VERSION_NO
-		tdsversion=0;
-	#else
+	#ifdef VERSION_NO
 		tdsversion=atof(VERSION_NO+9);
+	#else
+		#ifdef TDS_VERSION_NO
+			tdsversion=atof(TDS_VERSION_NO+9);
+		#else
+			tdsversion=0;
+		#endif
 	#endif
 }
 
@@ -781,19 +785,25 @@ CS_RETCODE	freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt,
 	errorstring=new stringbuffer();
 
 	errorstring->append("Client Library error:\n");
-	errorstring->append("	severity(%d)\n")->
-				append((long)CS_SEVERITY(msgp->msgnumber));
-	errorstring->append("	layer(%d)\n")->
-				append((long)CS_LAYER(msgp->msgnumber));
-	errorstring->append("	origin(%d)\n")->
-				append((long)CS_ORIGIN(msgp->msgnumber));
-	errorstring->append("	number(%d)\n")->
-				append((long)CS_NUMBER(msgp->msgnumber));
-	errorstring->append("Error:	%s\n")->append(msgp->msgstring);
+	errorstring->append("	severity(")->
+			append((long)CS_SEVERITY(msgp->msgnumber))->
+			append(")\n");
+	errorstring->append("	layer(")->
+			append((long)CS_LAYER(msgp->msgnumber))->
+			append(")\n");
+	errorstring->append("	origin(")->
+			append((long)CS_ORIGIN(msgp->msgnumber))->
+			append(")\n");
+	errorstring->append("	number(")->
+			append((long)CS_NUMBER(msgp->msgnumber))->
+			append(")\n");
+	errorstring->append("Error:	")->
+			append(msgp->msgstring)->
+			append("\n");
 
 	if (msgp->osstringlen>0) {
-		errorstring->append("Operating System Error:\n");
-		errorstring->append("\n	%s\n")->append(msgp->osstring);
+		errorstring->append("Operating System Error:\n\n ");
+		errorstring->append(msgp->osstring)->append("\n");
 	}
 
 	// for a timeout message, set deadconnection to 1
@@ -816,19 +826,25 @@ CS_RETCODE	freetdsconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 	errorstring=new stringbuffer();
 
 	errorstring->append("Client Library error:\n");
-	errorstring->append("	severity(%d)\n")->
-				append((long)CS_SEVERITY(msgp->msgnumber));
-	errorstring->append("	layer(%d)\n")->
-				append((long)CS_LAYER(msgp->msgnumber));
-	errorstring->append("	origin(%d)\n")->
-				append((long)CS_ORIGIN(msgp->msgnumber));
-	errorstring->append("	number(%d)\n")->
-				append((long)CS_NUMBER(msgp->msgnumber));
-	errorstring->append("Error:	%s\n")->append(msgp->msgstring);
+	errorstring->append("	severity(")->
+			append((long)CS_SEVERITY(msgp->msgnumber))->
+			append(")\n");
+	errorstring->append("	layer(")->
+			append((long)CS_LAYER(msgp->msgnumber))->
+			append(")\n");
+	errorstring->append("	origin(")->
+			append((long)CS_ORIGIN(msgp->msgnumber))->
+			append(")\n");
+	errorstring->append("	number(")->
+			append((long)CS_NUMBER(msgp->msgnumber))->
+			append(")\n");
+	errorstring->append("Error:	")->
+			append(msgp->msgstring)->
+			append("\n");
 
 	if (msgp->osstringlen>0) {
-		errorstring->append("Operating System Error:\n");
-		errorstring->append("\n	%s\n")->append(msgp->osstring);
+		errorstring->append("Operating System Error:\n\n ");
+		errorstring->append(msgp->osstring)->append("\n");
 	}
 
 	// for a timeout message, set deadconnection to 1
@@ -848,7 +864,8 @@ CS_RETCODE	freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	// This is a special case, for some reason, "use db" queries
 	// throw a warning, ignore them.
-	if (msgp->msgnumber==5701 && msgp->severity==10) {
+	if (msgp->msgnumber==5701 &&
+			(msgp->severity==10 || msgp->severity==0)) {
 		return CS_SUCCEED;
 	}
 
@@ -858,13 +875,20 @@ CS_RETCODE	freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	errorstring=new stringbuffer();
 
 	errorstring->append("Server message:\n");
-	errorstring->append("	severity(%d)\n")->append((long)msgp->severity);
-	errorstring->append("	number(%d)\n")->append((long)msgp->msgnumber);
-	errorstring->append("	state(%d)\n")->append((long)msgp->state);
-	errorstring->append("	line(%d)\n")->append((long)msgp->line);
-	errorstring->append("Server Name:\n%s\n")->append(msgp->svrname);
-	errorstring->append("Procedure Name:\n%s\n")->append(msgp->proc);
-	errorstring->append("Error:\n%s\n")->append(msgp->text);
+	errorstring->append("	severity(")->
+			append((long)msgp->severity)->append(")\n");
+	errorstring->append("	number(")->
+			append((long)msgp->msgnumber)->append(")\n");
+	errorstring->append("	state(")->
+			append((long)msgp->state)->append(")\n");
+	errorstring->append("	line(")->
+			append((long)msgp->line)->append(")\n");
+	errorstring->append("Server Name:	")->
+			append(msgp->svrname)->append("\n");
+	errorstring->append("Procedure Name:	")->
+			append(msgp->proc)->append("\n");
+	errorstring->append("Error:	")->
+			append(msgp->text)->append("\n");
 
 	return CS_SUCCEED;
 }

@@ -57,13 +57,13 @@ function checkSuccess($value,$success) {
 	echo("BIND BY NAME: \n");
 	sqlrcur_prepareQuery($cur,"insert into testtable values (:var1,:var2,:var3,:var4)");
 	sqlrcur_inputBind($cur,"var1",5);
-	sqlrcur_inputBind($cur,"var2",5.5,4,2);
+	sqlrcur_inputBind($cur,"var2",5.5,4,1);
 	sqlrcur_inputBind($cur,"var3","testchar5");
 	sqlrcur_inputBind($cur,"var4","testvarchar5");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	sqlrcur_clearBinds($cur);
 	sqlrcur_inputBind($cur,"var1",6);
-	sqlrcur_inputBind($cur,"var2",6.6,4,2);
+	sqlrcur_inputBind($cur,"var2",6.6,4,1);
 	sqlrcur_inputBind($cur,"var3","testchar6");
 	sqlrcur_inputBind($cur,"var4","testvarchar6");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
@@ -82,7 +82,7 @@ function checkSuccess($value,$success) {
 	echo("BIND BY NAME WITH VALIDATION: \n");
 	sqlrcur_clearBinds($cur);
 	sqlrcur_inputBind($cur,"var1",8);
-	sqlrcur_inputBind($cur,"var2",8.8,4,2);
+	sqlrcur_inputBind($cur,"var2",8.8,4,1);
 	sqlrcur_inputBind($cur,"var3","testchar8");
 	sqlrcur_inputBind($cur,"var4","testvarchar8");
 	sqlrcur_validateBinds($cur);

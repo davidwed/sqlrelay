@@ -66,13 +66,13 @@ print "\n"
 print "BIND BY NAME: \n"
 cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4)")
 cur.inputBind("var1",5)
-cur.inputBind("var2",5.5,4,2)
+cur.inputBind("var2",5.5,4,1)
 cur.inputBind("var3","testchar5")
 cur.inputBind("var4","testvarchar5")
 checkSuccess(cur.executeQuery(),1)
 cur.clearBinds()
 cur.inputBind("var1",6)
-cur.inputBind("var2",6.6,4,2)
+cur.inputBind("var2",6.6,4,1)
 cur.inputBind("var3","testchar6")
 cur.inputBind("var4","testvarchar6")
 checkSuccess(cur.executeQuery(),1)
@@ -81,14 +81,14 @@ print "\n"
 print "ARRAY OF BINDS BY NAME: \n"
 cur.clearBinds()
 cur.inputBinds(["var1","var2","var3","var4"],
-		[7,7.7,"testchar7","testvarchar7"],[0,4,0,0],[0,2,0,0])
+		[7,7.7,"testchar7","testvarchar7"],[0,4,0,0],[0,1,0,0])
 checkSuccess(cur.executeQuery(),1)
 print "\n"
 
 print "BIND BY NAME WITH VALIDATION: \n"
 cur.clearBinds()
 cur.inputBind("var1",8)
-cur.inputBind("var2",8.8,4,2)
+cur.inputBind("var2",8.8,4,1)
 cur.inputBind("var3","testchar8")
 cur.inputBind("var4","testvarchar8")
 cur.validateBinds()

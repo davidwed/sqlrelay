@@ -60,13 +60,13 @@ void	msqlconnection::logOut() {
 int	msqlconnection::ping() {
 	// if we don't redirect stdout/stderr, 
 	// msqlGetServerStats will spew out data
-	if (devnull==-2 && (devnull=open("/dev/null",O_RDONLY))>0) {
+	/*if (devnull==-2 && (devnull=open("/dev/null",O_RDONLY))>0) {
 		dup2(devnull,STDOUT_FILENO);
 		dup2(devnull,STDERR_FILENO);
 	}
 	if (msqlGetServerStats(msql)==-1) {
 		return 0;
-	}
+	}*/
 	return 1;
 }
 

@@ -200,6 +200,12 @@ platforms, you may even use a different path that that.</p>
 <b>/opt/sybase-11.9.2/bin/isql -U sa -S localhost</b>
 </blockquote>
 
+<p>(Note that some newer Linux Distributions set the LANG environment variable
+to a value that is not supported by Sybase ASE.  For example,
+LANG=en_US.iso885915 on Redhat 7.3.  If isql fails to start, and complains about
+the LANG environment variable, set it to something that is defined in
+/opt/sybase-11.9.2/locales/locales.dat such as en_US for english.)</p>
+
 <p>At the prompt, run the following stored procedure to give <i>sa</i> the
 password <i>sapassword</i>.</p>
 
@@ -492,6 +498,12 @@ password <i>testpassword</i>.</p>
 <blockquote>
 <b>sqlr-start -id sybasetest</b>
 </blockquote>
+
+<p>(Note that some newer Linux Distributions set the LANG environment variable
+to a value that is not supported by Sybase ASE.  For example,
+LANG=en_US.iso885915 on Redhat 7.3.  If SQL Relay fails to start, try setting
+LANG to something that is defined in /opt/sybase-11.9.2/locales/locales.dat
+such as en_US for english.)</p>
 
 <p>To connect to the instance and run queries, use the following command.</p>
 

@@ -360,8 +360,8 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testdatetime"),19);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,10),19);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testsmalldatetime"),19);
-	checkSuccessInt(sqlrcur_getLongestByIndex(cur,11),9);
-	checkSuccessInt(sqlrcur_getLongestByName(cur,"testchar"),9);
+	checkSuccessInt(sqlrcur_getLongestByIndex(cur,11),40);
+	checkSuccessInt(sqlrcur_getLongestByName(cur,"testchar"),40);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,12),12);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testvarchar"),12);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,13),1);
@@ -394,9 +394,9 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,6),"1.1");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,7),"1.0000");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,8),"1.00");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,9),"Jan 01 2001 01:00AM");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,10),"Jan 01 2001 01:00AM");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,11),"testchar1");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,9),"Jan  1 2001  1:00AM");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,10),"Jan  1 2001  1:00AM");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,11),"testchar1                               ");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,12),"testvarchar1");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,13),"1");
 	printf("\n");
@@ -409,9 +409,9 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,6),"8.8");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,7),"8.0000");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,8),"8.00");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,9),"Jan 01 2008 08:00AM");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,10),"Jan 01 2008 08:00AM");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,11),"testchar8");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,9),"Jan  1 2008  8:00AM");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,10),"Jan  1 2008  8:00AM");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,11),"testchar8                               ");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,12),"testvarchar8");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,13),"1");
 	printf("\n");
@@ -428,7 +428,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,8),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,9),19);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,10),19);
-	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,11),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,11),40);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,12),12);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,13),1);
 	printf("\n");
@@ -443,7 +443,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,8),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,9),19);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,10),19);
-	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,11),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,11),40);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,12),12);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,13),1);
 	printf("\n");
@@ -458,9 +458,9 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testnumeric"),"1.1");
 	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testmoney"),"1.0000");
 	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testsmallmoney"),"1.00");
-	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testdatetime"),"Jan 01 2001 01:00AM");
-	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testsmalldatetime"),"Jan 01 2001 01:00AM");
-	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testchar"),"testchar1");
+	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testdatetime"),"Jan  1 2001  1:00AM");
+	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testsmalldatetime"),"Jan  1 2001  1:00AM");
+	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testchar"),"testchar1                               ");
 	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testvarchar"),"testvarchar1");
 	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testbit"),"1");
 	printf("\n");
@@ -473,9 +473,9 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testnumeric"),"8.8");
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testmoney"),"8.0000");
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testsmallmoney"),"8.00");
-	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testdatetime"),"Jan 01 2008 08:00AM");
-	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testsmalldatetime"),"Jan 01 2008 08:00AM");
-	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testchar"),"testchar8");
+	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testdatetime"),"Jan  1 2008  8:00AM");
+	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testsmalldatetime"),"Jan  1 2008  8:00AM");
+	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testchar"),"testchar8                               ");
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testvarchar"),"testvarchar8");
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testbit"),"1");
 	printf("\n");
@@ -492,7 +492,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testsmallmoney"),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testdatetime"),19);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testsmalldatetime"),19);
-	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testchar"),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testchar"),40);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testvarchar"),12);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testbit"),1);
 	printf("\n");
@@ -507,7 +507,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testsmallmoney"),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testdatetime"),19);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testsmalldatetime"),19);
-	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testchar"),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testchar"),40);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testvarchar"),12);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testbit"),1);
 	printf("\n");
@@ -523,9 +523,9 @@ int	main(int argc, char **argv) {
 	checkSuccessString(fields[6],"1.1");
 	checkSuccessString(fields[7],"1.0000");
 	checkSuccessString(fields[8],"1.00");
-	checkSuccessString(fields[9],"Jan 01 2001 01:00AM");
-	checkSuccessString(fields[10],"Jan 01 2001 01:00AM");
-	checkSuccessString(fields[11],"testchar1");
+	checkSuccessString(fields[9],"Jan  1 2001  1:00AM");
+	checkSuccessString(fields[10],"Jan  1 2001  1:00AM");
+	checkSuccessString(fields[11],"testchar1                               ");
 	checkSuccessString(fields[12],"testvarchar1");
 	checkSuccessString(fields[13],"1");
 	printf("\n");
@@ -543,7 +543,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(fieldlens[8],4);
 	checkSuccessInt(fieldlens[9],19);
 	checkSuccessInt(fieldlens[10],19);
-	checkSuccessInt(fieldlens[11],9);
+	checkSuccessInt(fieldlens[11],40);
 	checkSuccessInt(fieldlens[12],12);
 	checkSuccessInt(fieldlens[13],1);
 	printf("\n");
@@ -853,6 +853,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	// drop existing table
+	sqlrcon_commit(con);
 	sqlrcur_sendQuery(cur,"drop table testtable");
 
 	// invalid queries...

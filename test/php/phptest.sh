@@ -7,9 +7,9 @@ sleep 1
 #cp db2.php /usr/local/web
 #lynx -dump "http://localhost/db2.php?host=localhost&port=8001&socket=&user=db2test&password=db2test"
 
-#chmod 755 freetds.php
-#cp freetds.php /usr/local/web
-#lynx -dump "http://localhost/freetds.php?host=localhost&port=8002&socket=&user=freetdstest&password=freetdstest"
+chmod 755 freetds.php
+cp freetds.php /usr/local/web
+lynx -dump "http://localhost/freetds.php?host=localhost&port=8002&socket=&user=freetdstest&password=freetdstest"
 
 #chmod 755 interbase.php
 #cp interbase.php /usr/local/web
@@ -35,9 +35,9 @@ sleep 1
 #cp oracle8.php /usr/local/web
 #lynx -dump "http://localhost/oracle8.php?host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
 
-chmod 755 postgresql.php
-cp postgresql.php /usr/local/web
-lynx -dump "http://localhost/postgresql.php?host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+#chmod 755 postgresql.php
+#cp postgresql.php /usr/local/web
+#lynx -dump "http://localhost/postgresql.php?host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
 
 #chmod 755 sqlite.php
 #cp sqlite.php /usr/local/web

@@ -222,7 +222,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnLength($cur,4),20);
 	checkSuccess(sqlrcur_getColumnLength($cur,5),12);
 	checkSuccess(sqlrcur_getColumnLength($cur,6),22);
-	checkSuccess(sqlrcur_getColumnLength($cur,7),5);
+	checkSuccess(sqlrcur_getColumnLength($cur,7),4);
 	checkSuccess(sqlrcur_getColumnLength($cur,8),10);
 	checkSuccess(sqlrcur_getColumnLength($cur,9),8);
 	checkSuccess(sqlrcur_getColumnLength($cur,10),19);
@@ -241,7 +241,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnLength($cur,"testbigint"),20);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testfloat"),12);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testreal"),22);
-	checkSuccess(sqlrcur_getColumnLength($cur,"testdecimal"),5);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testdecimal"),4);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testdate"),10);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testtime"),8);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testdatetime"),19);
