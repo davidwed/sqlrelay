@@ -7,7 +7,7 @@ install:
 		$(RMTREE) $(DESTDIR)$(ZOPEDIR)/ZSQLRelayDA; \
 		$(MKINSTALLDIRS) $(DESTDIR)$(ZOPEDIR); \
 		cp -r ZSQLRelayDA $(DESTDIR)$(ZOPEDIR); \
-		cp -r $(PYTHONDIR)/site-packages/SQLRelay $(DESTDIR)$(ZOPEDIR)/ZSQLRelayDA; \
+		cp -r $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay $(DESTDIR)$(ZOPEDIR)/ZSQLRelayDA; \
 	else \
 		cat install.Makefile; \
 	fi
