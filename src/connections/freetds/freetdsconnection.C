@@ -304,6 +304,33 @@ bool freetdscursor::prepareQuery(const char *query, long length) {
 
 	// FreeTDS version 0.62 and greater support bind variables
 	if (tdsversion>=0.62) {
+
+		// prepare...
+		/*if (ct_dynamic(cmd,CS_PREPARE,"id",CS_NULLTERM,
+				(CS_CHAR *)query,length)!=CS_SUCCEED) {
+			return false;
+		}
+		if (ct_send(cmd)!=CS_SUCCEED) {
+			return false;
+		}
+		CS_RETCODE	result;
+		while (ct_results(cmd,&result)==CS_SUCCEED);
+
+		// describe...
+		if (ct_dynamic(cmd,CS_DESCRIBE_INPUT,"ID",CS_NULLTERM,
+						NULL,CS_UNUSED)!=CS_SUCCEED) {
+			return false;
+		}
+		ct_send(cmd);
+		while (ct_results(cmd,&result)==CS_SUCCEED);
+
+		// execute (won't really be executed until
+		// 			ct_send() is called later)...
+		if (ct_dynamic(cmd,CS_EXECUTE,"id",CS_NULLTERM,
+					NULL,CS_UNUSED)!=CS_SUCCEED) {
+			return false;
+		}*/
+
 		if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)query,length,
 						CS_UNUSED)!=CS_SUCCEED) {
 			return false;

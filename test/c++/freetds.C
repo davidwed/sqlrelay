@@ -111,8 +111,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
-con->debugOn();
 	//cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+con->debugOn();
 	cur->prepareQuery("insert into testtable values (@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14)");
 	checkSuccess(cur->countBindVariables(),14);
 	cur->inputBind("1",2);
@@ -164,6 +164,10 @@ con->debugOn();
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
+	/*checkSuccess(cur->sendQuery("insert into testtable values (5,5,5,5.5,5.5,5.5,5.5,5.00,5.00,'05-Jan-2005 05:00:00','05-Jan-2005 05:00:00','testchar5','testvarchar5',1)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (6,6,6,6.6,6.6,6.6,6.6,6.00,6.00,'06-Jan-2006 06:00:00','06-Jan-2006 06:00:00','testchar6','testvarchar6',1)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (7,7,7,7.7,7.7,7.7,7.7,7.00,7.00,'07-Jan-2007 07:00:00','07-Jan-2007 07:00:00','testchar7','testvarchar7',1)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (8,8,8,8.8,8.8,8.8,8.8,8.00,8.00,'08-Jan-2008 08:00:00','08-Jan-2008 08:00:00','testchar8','testvarchar8',1)"),1);*/
 	printf("BIND BY NAME: \n");
 	cur->clearBinds();
 	cur->prepareQuery("insert into testtable values (@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14)");

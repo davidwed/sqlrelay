@@ -4,15 +4,20 @@ cygwin:
 
 interbase stored procedure/output bind tests fails at isc_dsql_prepare
 
-freetds-0.62/ct_param support
-
-check out the new db2 patch and see if it really works
+ct_param problem:
+	try using TDS version 5 - already using version 5
+	try using ct_dynamic - not supported by ct_param yet
+	try using sp_executesql:
+		query is translated into:
+			"execute sp_executesql N'...query...',
+					@var1 = ...value1...,
+					@var2 = ...value2...,
+					@var3 = ...value3...,
+					..."
 
 fix erwin's fake binds problem
 
 VB wrapper
-
-ADODB driver
 
 stored procedures:
 	tests for mysql, sybase
@@ -93,10 +98,6 @@ instead of:
         rm -rf $(d)/usr/lib/zope/lib/python/Products/ZSQLRelayDA/SQLRelay
 
 --------------------------------------------------------------------------------
-
-db2 start/stop doesn't work for 7.2
-	db2start/db2stop works when run as a given instance owner
-	db2 appears to need a license suddenly
 
 setting backlog:
 	linux:
@@ -216,6 +217,7 @@ Packages:
 	Unixware/OpenUnix
 
 Features:
+	freetds-0.62/ct_param support
 	support output bind vars and stored procedures in sybase
 	could debug logs be logrotate compatible?
 	postgresql drop-in api lacks many features
@@ -273,6 +275,8 @@ API's:
 	Eiffel
 	gnome-db
 	D
+	dbstep
+	ADODB driver
 		
 
 Native DB Support:

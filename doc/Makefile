@@ -105,8 +105,6 @@ install:
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/5/805.html $(docdir)/gettingstarted/oracle/linux/redhat/5
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/6/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/6
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/7/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/7
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/7/9i.html $(docdir)/gettingstarted/oracle/linux/redhat/7
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/9/9i.html $(docdir)/gettingstarted/oracle/linux/redhat/9/9iR2.html
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/7/8i.html $(docdir)/gettingstarted/oracle/linux/slackware/7
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/8/8i.html $(docdir)/gettingstarted/oracle/linux/slackware/8
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/8/9i.html $(docdir)/gettingstarted/oracle/linux/slackware/8
