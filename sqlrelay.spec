@@ -114,38 +114,38 @@ Runtime libraries for SQL Relay clients written in C compiled with debugging
 support.
 
 
-%package devel-c++
+%package client-devel-c++
 Summary: Development files for developing programs C++ that use SQL Relay.
 Group: Development/Libraries
 
-%description devel-c++
+%description client-devel-c++
 Header files and static libraries to use for developing programs in C++ that
 use SQL Relay.
 
 
-%package devel-c++-debug
+%package client-devel-c++-debug
 Summary: Development files for developing programs C++ that use SQL Relay compiled with debugging support.
 Group: Development/Libraries
 
-%description devel-c++-debug
+%description client-devel-c++-debug
 Header files and static libraries to use for developing programs in C++ that
 use SQL Relay compiled with debugging support.
 
 
-%package devel-c
+%package client-devel-c
 Summary: Development files for developing programs C that use SQL Relay.
 Group: Development/Libraries
 
-%description devel-c
+%description client-devel-c
 Header files and static libraries to use for developing programs in C that
 use SQL Relay.
 
 
-%package devel-c-debug
+%package client-devel-c-debug
 Summary: Development files for developing programs C that use SQL Relay compiled with debugging support.
 Group: Development/Libraries
 
-%description devel-c-debug
+%description client-devel-c-debug
 Header files and static libraries to use for developing programs in C that
 use SQL Relay compiled with debugging support.
 
@@ -457,7 +457,7 @@ fi
 %defattr(-, root, root)
 %{_libdir}/libsqlrclientwrapper_p-*.so.*
 
-%files devel-c++
+%files client-devel-c++
 %defattr(-, root, root)
 %{_includedir}/sqlrelay/sqlrclient.h
 %{_includedir}/sqlrelay/private
@@ -465,20 +465,20 @@ fi
 %{_libdir}/libsqlrclient.la
 %{_libdir}/libsqlrclient.so
 
-%files devel-c++-debug
+%files client-devel-c++-debug
 %defattr(-, root, root)
 %{_libdir}/libsqlrclient_p.a
 %{_libdir}/libsqlrclient_p.la
 %{_libdir}/libsqlrclient_p.so
 
-%files devel-c
+%files client-devel-c
 %defattr(-, root, root)
 %{_includedir}/sqlrelay/sqlrclientwrapper.h
 %{_libdir}/libsqlrclientwrapper.a
 %{_libdir}/libsqlrclientwrapper.la
 %{_libdir}/libsqlrclientwrapper.so
 
-%files devel-c-debug
+%files client-devel-c-debug
 %defattr(-, root, root)
 %{_libdir}/libsqlrclientwrapper_p.a
 %{_libdir}/libsqlrclientwrapper_p.la
