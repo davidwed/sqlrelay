@@ -281,6 +281,7 @@ Native DB Support:
 	picosql
 	shsql
 	does clip provide an odbc driver for accessing x-base files?
+	daffodildb/one$db
 
 Config Tools:
 	gtk2

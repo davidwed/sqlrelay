@@ -3,6 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/rawbuffer.h>
 #include <defines.h>
 
 bool sqlrcursor::parseOutputBinds() {
@@ -102,7 +103,8 @@ bool sqlrcursor::parseOutputBinds() {
 				// create a buffer to hold the chunk
 				buffer=new char[totallength+length+1];
 				if (totallength) {
-					memcpy(buffer,oldbuffer,totallength);
+					rawbuffer::copy(buffer,oldbuffer,
+								totallength);
 					delete[] oldbuffer;
 					oldbuffer=buffer;
 					buffer=buffer+totallength;

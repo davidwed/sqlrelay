@@ -12,6 +12,7 @@
 
 #include <rudiments/stringbuffer.h>
 #include <rudiments/charstring.h>
+#include <rudiments/rawbuffer.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -442,8 +443,8 @@ void freetdscursor::checkRePrepare() {
 
 	checkRePrepare();
 
-	(CS_VOID)memset(&parameter[paramindex],0,
-			sizeof(parameter[paramindex]));
+	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
@@ -469,8 +470,8 @@ bool freetdscursor::inputBindLong(const char *variable,
 
 	checkRePrepare();
 
-	(CS_VOID)memset(&parameter[paramindex],0,
-			sizeof(parameter[paramindex]));
+	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
@@ -498,8 +499,8 @@ bool freetdscursor::inputBindDouble(const char *variable,
 
 	checkRePrepare();
 
-	(CS_VOID)memset(&parameter[paramindex],0,
-			sizeof(parameter[paramindex]));
+	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
@@ -531,8 +532,8 @@ bool freetdscursor::outputBindString(const char *variable,
 	outbindvaluelengths[outbindindex]=valuesize;
 	outbindindex++;
 
-	(CS_VOID)memset(&parameter[paramindex],0,
-			sizeof(parameter[paramindex]));
+	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
@@ -793,7 +794,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 			if (datalength[i][0]<length) {
 				length=datalength[i][0];
 			}
-			memcpy(outbindvalues[i],data[i][0],length);
+			rawbuffer::copy(outbindvalues[i],data[i][0],length);
 		}
 
 		discardResults();

@@ -357,9 +357,9 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 					col[i].name,MAX_ITEM_BUFFER_SIZE,
 					(SQLSMALLINT *)&(col[i].namelength),
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
-					NULL
-					#else
 					(SQLLEN *)NULL
+					#else
+					NULL
 					#endif
 					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {

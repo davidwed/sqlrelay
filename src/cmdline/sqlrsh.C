@@ -7,6 +7,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
 #include <rudiments/file.h>
+#include <rudiments/filedescriptor.h>
 #include <sqlrconfigfile.h>
 
 // for clock()
@@ -57,6 +58,9 @@ environment::environment() {
 
 class	sqlrsh {
 	public:
+#ifndef HAVE_READLINE
+			sqlrsh();
+#endif
 		void	execute(int argc, const char **argv);
 	private:
 		void	startupMessage(environment *env,
@@ -106,7 +110,15 @@ class	sqlrsh {
 		void	magenta(environment *env);
 		void	cyan(environment *env);
 		void	white(environment *env);
+
+#ifndef HAVE_READLINE
+		filedescriptor	standardin;
+#endif
 };
+
+sqlrsh::sqlrsh() {
+	standardin.setFileDescriptor(0);
+}
 
 void sqlrsh::systemRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 						environment *env) {
@@ -619,7 +631,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			#else
 				prompt(promptcount);
 				char	cmd[1024];
-				ssize_t	bytes=read(0,cmd,1024);
+				ssize_t	bytes=standardin.read(cmd,1024);
 				cmd[bytes-1]=(char)NULL;
 			#endif
 			int	len=charstring::length(cmd);

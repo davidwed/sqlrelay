@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <interbaseconnection.h>
+#include <rudiments/rawbuffer.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -675,7 +676,8 @@ void interbasecursor::returnRow() {
 			// the first 2 bytes are the length in 
 			// an SQL_VARYING field
 			short	size;
-			memcpy((void *)&size,(void *)field[col].textbuffer,
+			rawbuffer::copy((void *)&size,
+					(void *)field[col].textbuffer,
 					sizeof(short));
 			conn->sendField(field[col].textbuffer+sizeof(short),
 					size);

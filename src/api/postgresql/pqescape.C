@@ -14,6 +14,7 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 
 #include <pqdefinitions.h>
 #include <rudiments/charstring.h>
+#include <rudiments/character.h>
 #include <stdlib.h>
 
 extern "C" {
@@ -179,7 +180,7 @@ unsigned char *PQunescapeBytea(unsigned char *strtext, size_t *retbuflen) {
 					buflen--;
 					state=0;
 				} else {
-					if (isdigit(*sp)) {
+					if (character::isDigit(*sp)) {
 						state=2;
 					} else {
 						state=0;
@@ -188,7 +189,7 @@ unsigned char *PQunescapeBytea(unsigned char *strtext, size_t *retbuflen) {
 				}
 				break;
 			case 2:
-				if (isdigit(*sp)) {
+				if (character::isDigit(*sp)) {
 					state=3;
 				} else {
 					state=0;
@@ -196,7 +197,7 @@ unsigned char *PQunescapeBytea(unsigned char *strtext, size_t *retbuflen) {
 				*bp=*sp;
 				break;
 			case 3:
-				if (isdigit(*sp)) {
+				if (character::isDigit(*sp)) {
 					// state=4
 					int	v;
 					bp-=3;

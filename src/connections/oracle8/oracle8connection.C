@@ -3,6 +3,7 @@
 
 #include <oracle8connection.h>
 #include <rudiments/charstring.h>
+#include <rudiments/rawbuffer.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -259,7 +260,7 @@ void oracle8connection::logInError(const char *errmsg) {
 
 	// get the error message from oracle
 	text	message[1024];
-	memset((void *)message,0,sizeof(message));
+	rawbuffer::zero((void *)message,sizeof(message));
 	sb4	errcode;
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 			message,sizeof(message),OCI_HTYPE_ERROR);
@@ -1121,7 +1122,7 @@ const char *oracle8cursor::getErrorMessage(bool *liveconnection) {
 
 	// get the message from oracle
 	text	message[1024];
-	memset((void *)message,0,sizeof(message));
+	rawbuffer::zero((void *)message,sizeof(message));
 	sb4	errcode;
 	OCIErrorGet((dvoid *)oracle8conn->err,1,
 			(text *)0,&errcode,

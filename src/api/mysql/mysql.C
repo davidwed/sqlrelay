@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
+#include <rudiments/rawbuffer.h>
 
 #define NEED_DATATYPESTRING 1
 #define NEED_IS_NUMBER_TYPE_CHAR 1
@@ -542,7 +543,7 @@ unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 					unsigned long length) {
 
 	if (mysql && strcmp(mysql->sqlrcon->identify(),"mysql")) {
-		memcpy(to,from,length);
+		rawbuffer::copy(to,from,length);
 		to[length]=(char)NULL;
 		return length;
 	}
@@ -1213,7 +1214,8 @@ int mysql_fetch(MYSQL_STMT *stmt) {
 			*(stmt->resultbinds[i].is_null)=true;
 		} else {
 			*(stmt->resultbinds[i].is_null)=false;
-			memcpy(stmt->resultbinds[i].buffer,row[i],lengths[i]);
+			rawbuffer::copy(stmt->resultbinds[i].buffer,
+							row[i],lengths[i]);
 		}
 		stmt->resultbinds[i].buffer[lengths[i]]=(char)NULL;
 

@@ -3,6 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/rawbuffer.h>
 #include <defines.h>
 
 unsigned short sqlrcursor::countBindVariables() const {
@@ -306,7 +307,7 @@ void sqlrcursor::lobVar(bindvar *var, const char *variable,
 	if (value && size>0) {
 		if (copyrefs) {
 			var->value.lobval=new char[size];
-			memcpy(var->value.lobval,value,size);
+			rawbuffer::copy(var->value.lobval,value,size);
 		} else {
 			var->value.lobval=(char *)value;
 		}
