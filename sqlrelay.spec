@@ -80,36 +80,36 @@ Command line applications for accessing databases through SQL Relay compiled
 with debugging support.
 
 
-%package client-c++
+%package runtime-c++
 Summary: Runtime libraries for SQL Relay clients written in C++.
 Group: Applications/Libraries
 
-%description client-c++
+%description runtime-c++
 Runtime libraries for SQL Relay clients written in C++.
 
 
-%package client-c++-debug
+%package runtime-c++-debug
 Summary: Runtime libraries for SQL Relay clients written in C++ compiled with debugging support.
 Group: Applications/Libraries
 
-%description client-c++-debug
+%description runtime-c++-debug
 Runtime libraries for SQL Relay clients written in C++ compield with debugging
 support.
 
 
-%package client-c
+%package runtime-c
 Summary: Runtime libraries for SQL Relay clients written in C.
 Group: Applications/Libraries
 
-%description client-c
+%description runtime-c
 Runtime libraries for SQL Relay clients written in C.
 
 
-%package client-c-debug
+%package runtime-c-debug
 Summary: Runtime libraries for SQL Relay clients written in C compiled with debugging support.
 Group: Applications/Libraries
 
-%description client-c-debug
+%description runtime-c-debug
 Runtime libraries for SQL Relay clients written in C compiled with debugging
 support.
 
@@ -440,20 +440,20 @@ fi
 %{_bindir}/query-debug
 %{_bindir}/sqlrsh-debug
 
-%files client-c++
+%files runtime-c++
 %defattr(-, root, root)
 %{_libdir}/libsqlrclient-*.so.*
 %{_localstatedir}/sqlrelay/cache
 
-%files client-c++-debug
+%files runtime-c++-debug
 %defattr(-, root, root)
 %{_libdir}/libsqlrclient_p-*.so.*
 
-%files client-c
+%files runtime-c
 %defattr(-, root, root)
 %{_libdir}/libsqlrclientwrapper-*.so.*
 
-%files client-c-debug
+%files runtime-c-debug
 %defattr(-, root, root)
 %{_libdir}/libsqlrclientwrapper_p-*.so.*
 
