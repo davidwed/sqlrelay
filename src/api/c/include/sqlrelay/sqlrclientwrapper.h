@@ -14,9 +14,10 @@ sqlrcon	sqlrcon_alloc(const char *server, int port, const char *socket,
 			   or to the unix "socket" on the local machine
 			   and authenticates with "user" and "password".
 			   Failed connections will be retried for 
-			   "tries" times on interval "retrytime"
-			   or on for a default number of times on
-			   a default interval if left unspecified.
+			   "tries" times on interval "retrytime".
+			   If "tries" is 0 then retries will continue
+			   forever.  If "retrytime" is 0 then retries
+			   will be attempted on a default interval.
 
 			   If the "socket" parameter is nether 
 			   NULL nor "" then an attempt will be made to 

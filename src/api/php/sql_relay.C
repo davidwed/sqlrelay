@@ -692,7 +692,6 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindlength) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindcursor) {
 	zval **sqlrcur,**variable;
-	long r;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1197,7 +1196,6 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getresultsetid) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_suspendresultset) {
 	zval **sqlrcur;
-	int r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;

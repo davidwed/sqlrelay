@@ -13,7 +13,9 @@ class sqlrconnection:
         """ 
         Opens a connection to the sqlrelay server and authenticates with
         user and password.  Failed connections are retried for tries times
-        at retrytime interval.  
+        at retrytime interval.  If tries is 0 then retries will continue
+        forever.  If retrytime is 0 then retries will be attempted on a
+        default interval.
         """
         self.connection = CSQLRelay.sqlrcon_alloc(host, port, socket, user, password, retrytime, tries)
 
