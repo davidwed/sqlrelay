@@ -744,17 +744,17 @@ bind to "1" and "2", your query would have to look like this:</p>
 </PRE>
 </blockquote>
 
-<p>Oracle 8,8i and 9i support OCI 7 and OCI 8.  If you have an Oracle 8,8i or 
-9i database, you can connect to it using the Oracle7 connection provided that
-you are not using Oracle MTS (Multi-Threaded Server).  Oracle 8, 8i and 9i 
-support LOB datatypes though, which are not supported by Oracle 7.  The
+<p>Oracle 8,8i,9i and 10g support OCI 7 and OCI 8.  If you have an Oracle 8,8i,
+9i or 10g database, you can connect to it using the Oracle7 connection provided
+that you are not using Oracle MTS (Multi-Threaded Server).  Oracle 8, 8i, 9i and
+10g support LOB datatypes though, which are not supported by Oracle 7.  The
 Oracle7 connection will retun empty strings and UNKNOWN datatypes for LOB
 fields.</p>
 
 <p>Oracle is attempting to phase out OCI 7, but has mostly maintained 
-compatibility.  The libraries and headers that come with Oracle 8, 8i and 9i
+compatibility.  The libraries and headers that come with Oracle 8,8i,9i and 10g
 contain OCI 7 and OCI 8 functions.  If you compile SQL Relay against Oracle 8,
-8i or 9i, both connections will be built.  If you compile SQL Relay against
+8i,9i or 10g both connections will be built.  If you compile SQL Relay against
 Oracle 7, only the Oracle7 connection will be built.<p>
 
 <p>Since Oracle is phasing out OCI 7, you may run into some inconsistencies.
@@ -1014,14 +1014,24 @@ support for all other databases was added in 0.35.</p>
 
 <p>The reason temporary tables are an issue is because normally temporary tables
 are either dropped or truncated when an application closes it's connection to
-the database or commits/rolls-back a transaction.   Transaction-scope
-tables work naturally with SQL Relay.  But, since SQL Relay never logs out of
-the database, the database doesn't know to drop or truncate tables when an
+the database or commits/rolls-back a transaction.   Transaction-scope tables
+work naturally with SQL Relay.  But, since SQL Relay never logs out of the
+database, the database doesn't know to drop or truncate tables when an
 application closes it's connection to SQL Relay.  To remedy this, SQL Relay
 parses each query according to the rules for creating a temporary table for
 the database that it is connected to and keeps a list of temporary tables.
-Then, when the application closes it's connection, SQL Relay dropps or
-truncates the tables.</p>
+Then, when the application closes it's connection, SQL Relay drops or
+truncates the tables as appropriate.</p>
+
+<p>In Oracle, temporary tables are never dropped when the session or
+transaction ends, only truncated.  Transaction-scope tables are handled
+naturally by the database, but session-scope tables must be handled by
+SQL Relay.  In other databases, a create table query would have to have been
+issued but not with Oracle.  SQL Relay only knows to truncate the table if a
+create table query was issued.  So, when using session-scope tables in Oracle,
+you should issue a create table query, even if you know the table already
+exists.  The query will fail, but SQL Relay will know to truncate the table
+when the session ends.</p>
 
 <a name="threadsafe"></a>
 <span class="heading3">Is the SQL Relay API thread-safe?</span>

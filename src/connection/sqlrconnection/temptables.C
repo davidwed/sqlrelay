@@ -20,7 +20,7 @@ void sqlrconnection::dropTempTable(sqlrcursor *cursor, const char *tablename) {
 	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
 		cursor->executeQuery(dropquery.getString(),
-					dropquery.getStringLength(),1);
+					dropquery.getStringLength(),true);
 	}
 	cursor->cleanUpData(true,true);
 }
@@ -44,7 +44,7 @@ void sqlrconnection::truncateTempTable(sqlrcursor *cursor,
 	if (cursor->prepareQuery(truncatequery.getString(),
 					truncatequery.getStringLength())) {
 		cursor->executeQuery(truncatequery.getString(),
-					truncatequery.getStringLength(),1);
+					truncatequery.getStringLength(),true);
 	}
 	cursor->cleanUpData(true,true);
 }

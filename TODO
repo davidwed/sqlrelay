@@ -6,8 +6,6 @@ fix erwin's fake binds problem
 
 VB wrapper
 
-oracle temp table test fails
-
 idle client timeout
 client connect timeout
 perl apis -> CPAN

@@ -937,6 +937,11 @@ bool oracle8cursor::executeQuery(const char *query, long length, bool execute) {
 			OCI_ATTR_STMT_TYPE,oracle8conn->err)!=OCI_SUCCESS) {
 		return false;
 	}
+#ifdef HAVE_ORACLE_8i
+	if (stmttype==OCI_STMT_CREATE) {
+		checkForTempTable(query,length);
+	}
+#endif
 
 	// set up how many times to iterate;
 	// 0 for selects, 1 for non-selects
@@ -1096,10 +1101,6 @@ bool oracle8cursor::executeQuery(const char *query, long length, bool execute) {
 				}
 			}
 		}
-#ifdef HAVE_ORACLE_8i
-	} else if (stmttype==OCI_STMT_CREATE) {
-		checkForTempTable(query,length);
-#endif
 	}
 
 	return true;
