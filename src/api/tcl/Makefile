@@ -51,9 +51,42 @@ rebuild: clean all
 libsqlrelay.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -module
 
-install:
+sqlrelay.so:
+	if ( test -r .libs/libsqlrelay.0.0.0 ); \
+	then \
+		cp .libs/libsqlrelay.0.0.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.0.0 ); \
+	then \
+		cp .libs/libsqlrelay.0.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.0 ); \
+	then \
+		cp .libs/libsqlrelay.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay ); \
+	then \
+		cp .libs/libsqlrelay sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.so.0.0.0 ); \
+	then \
+		cp .libs/libsqlrelay.so.0.0.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.so.0.0 ); \
+	then \
+		cp .libs/libsqlrelay.so.0.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.so.0 ); \
+	then \
+		cp .libs/libsqlrelay.so.0 sqlrelay.so; \
+	fi
+	if ( test -r .libs/libsqlrelay.so ); \
+	then \
+		cp .libs/libsqlrelay.so sqlrelay.so; \
+	fi
+
+install: sqlrelay.so
 	$(abs_srcdir)/mkinstalldirs $(TCLLIBSPATH)/sqlrelay
-	cp .libs/libsqlrelay.so sqlrelay.so
 	$(LIBTOOL) --mode=install $(INSTALL) -s sqlrelay.so $(TCLLIBSPATH)/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) -m 644 pkgIndex.tcl $(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.so

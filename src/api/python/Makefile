@@ -32,10 +32,42 @@ rebuild: clean all
 libCSQLRelay.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(PYTHONDIR)/site-packages/SQLRelay $(RPATH) -module
 
+CSQLRelay.so:
+	if ( test -r .libs/libCSQLRelay.0.0.0 ); \
+	then \
+		cp .libs/libCSQLRelay.0.0.0 CSQLRelay.so; \
+	fi
+	if ( test -r .libs/libCSQLRelay.0.0 ); \
+	then \
+		cp .libs/libCSQLRelay.0.0 CSQLRelay.so; \
+	fi
+	if ( test -r .libs/libCSQLRelay.0 ); \
+	then \
+		cp .libs/libCSQLRelay.0 CSQLRelay.so; \
+	fi
+	if ( test -r .libs/libCSQLRelay ); \
+	then \
+		cp .libs/libCSQLRelay CSQLRelay.so; \
+	fi
+	if ( test -r .libs/libCSQLRelay.so.0.0.0 ); \
+	then \
+		cp .libs/libCSQLRelay.so.0.0.0 CSQLRelay.so; \
+	fi
+	if ( test -r .libs/libCSQLRelay.so.0.0 ); \
+	then \
+		cp .libs/libCSQLRelay.so.0.0 CSQLRelay.so; \
+	fi
+	if ( test -r .libs/libCSQLRelay.so.0 ); \
+	then \
+		cp .libs/libCSQLRelay.so.0 CSQLRelay.so; \
+	fi
+	if ( test -r .libs/libCSQLRelay.so ); \
+	then \
+		cp .libs/libCSQLRelay.so CSQLRelay.so; \
+	fi
 
-install:
+install: CSQLRelay.so
 	$(abs_srcdir)/mkinstalldirs $(PYTHONDIR)/site-packages/SQLRelay
-	cp .libs/libCSQLRelay.so CSQLRelay.so
 	$(LIBTOOL) --mode=install $(INSTALL) CSQLRelay.so $(PYTHONDIR)/site-packages/SQLRelay
 	$(LIBTOOL) --mode=install $(INSTALL) -m 644 PySQLRClient.py $(PYTHONDIR)/site-packages/SQLRelay
 	$(LIBTOOL) --mode=install $(INSTALL) -m 644 PySQLRDB.py $(PYTHONDIR)/site-packages/SQLRelay

@@ -35,9 +35,75 @@ libSQLRConnection.la: com_firstworks_sqlrelay_SQLRConnection.C com_firstworks_sq
 libSQLRCursor.la: com_firstworks_sqlrelay_SQLRCursor.C com_firstworks_sqlrelay_SQLRCursor.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRCursor.lo -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(STDCPPLIB) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) -module
 
-install:
-	cp .libs/libSQLRConnection.so .
-	cp .libs/libSQLRCursor.so .
+libSQLRConnection.so:
+	if ( test -r .libs/libSQLRConnection.0.0.0 ); \
+	then \
+		cp .libs/libSQLRConnection.0.0.0 libSQLRConnection.so; \
+	fi
+	if ( test -r .libs/libSQLRConnection.0.0 ); \
+	then \
+		cp .libs/libSQLRConnection.0.0 libSQLRConnection.so; \
+	fi
+	if ( test -r .libs/libSQLRConnection.0 ); \
+	then \
+		cp .libs/libSQLRConnection.0 libSQLRConnection.so; \
+	fi
+	if ( test -r .libs/libSQLRConnection ); \
+	then \
+		cp .libs/libSQLRConnection libSQLRConnection.so; \
+	fi
+	if ( test -r .libs/libSQLRConnection.so.0.0.0 ); \
+	then \
+		cp .libs/libSQLRConnection.so.0.0.0 libSQLRConnection.so; \
+	fi
+	if ( test -r .libs/libSQLRConnection.so.0.0 ); \
+	then \
+		cp .libs/libSQLRConnection.so.0.0 libSQLRConnection.so; \
+	fi
+	if ( test -r .libs/libSQLRConnection.so.0 ); \
+	then \
+		cp .libs/libSQLRConnection.so.0 libSQLRConnection.so; \
+	fi
+	if ( test -r .libs/libSQLRConnection.so ); \
+	then \
+		cp .libs/libSQLRConnection.so libSQLRConnection.so; \
+	fi
+
+libSQLRCursor.so:
+	if ( test -r .libs/libSQLRCursor.0.0.0 ); \
+	then \
+		cp .libs/libSQLRCursor.0.0.0 libSQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.0.0 ); \
+	then \
+		cp .libs/libSQLRCursor.0.0 libSQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.0 ); \
+	then \
+		cp .libs/libSQLRCursor.0 libSQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor ); \
+	then \
+		cp .libs/libSQLRCursor libSQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.so.0.0.0 ); \
+	then \
+		cp .libs/libSQLRCursor.so.0.0.0 libSQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.so.0.0 ); \
+	then \
+		cp .libs/libSQLRCursor.so.0.0 libSQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.so.0 ); \
+	then \
+		cp .libs/libSQLRCursor.so.0 libSQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.so ); \
+	then \
+		cp .libs/libSQLRCursor.so libSQLRCursor.so; \
+	fi
+
+install: libSQLRConnection.so libSQLRCursor.so
 	$(abs_srcdir)/mkinstalldirs $(javadir)/com/firstworks/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) -s libSQLRConnection.so $(javadir)/com/firstworks/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) -s libSQLRCursor.so $(javadir)/com/firstworks/sqlrelay

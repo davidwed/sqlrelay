@@ -18,12 +18,12 @@ endif
 
 all:
 	cp phpincludes1.h phpincludes.h; \
-	$(MAKE) sql_relay.la 2> errors1; \
-	if ( test ! -r sql_relay.la ); then \
+	$(MAKE) libsql_relay.la 2> errors1; \
+	if ( test ! -r libsql_relay.la ); then \
 		cp phpincludes2.h phpincludes.h; \
-		$(MAKE) sql_relay.la 2> errors2; \
+		$(MAKE) libsql_relay.la 2> errors2; \
 	fi
-	if ( test ! -r sql_relay.la ); then \
+	if ( test ! -r libsql_relay.la ); then \
 		if ( test -s errors1 ); then \
 			echo "first try errors : "; cat errors1; echo; \
 		fi; \
@@ -48,8 +48,41 @@ rebuild: clean all
 libsql_relay.la: sql_relay.C sql_relay.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -module
 
-install:
-	cp .libs/libsql_relay.so sql_relay.so
+sql_relay.so:
+	if ( test -r .libs/libsql_relay.0.0.0 ); \
+	then \
+		cp .libs/libsql_relay.0.0.0 sql_relay.so; \
+	fi
+	if ( test -r .libs/libsql_relay.0.0 ); \
+	then \
+		cp .libs/libsql_relay.0.0 sql_relay.so; \
+	fi
+	if ( test -r .libs/libsql_relay.0 ); \
+	then \
+		cp .libs/libsql_relay.0 sql_relay.so; \
+	fi
+	if ( test -r .libs/libsql_relay ); \
+	then \
+		cp .libs/libsql_relay sql_relay.so; \
+	fi
+	if ( test -r .libs/libsql_relay.so.0.0.0 ); \
+	then \
+		cp .libs/libsql_relay.so.0.0.0 sql_relay.so; \
+	fi
+	if ( test -r .libs/libsql_relay.so.0.0 ); \
+	then \
+		cp .libs/libsql_relay.so.0.0 sql_relay.so; \
+	fi
+	if ( test -r .libs/libsql_relay.so.0 ); \
+	then \
+		cp .libs/libsql_relay.so.0 sql_relay.so; \
+	fi
+	if ( test -r .libs/libsql_relay.so ); \
+	then \
+		cp .libs/libsql_relay.so sql_relay.so; \
+	fi
+
+install: sql_relay.so
 	$(abs_srcdir)/mkinstalldirs $(PHPEXTDIR)
 	$(LIBTOOL) --mode=install $(INSTALL) -s sql_relay.so $(PHPEXTDIR)
 	$(RM) sql_relay.so
