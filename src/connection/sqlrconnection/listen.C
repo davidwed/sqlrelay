@@ -141,7 +141,22 @@ int	sqlrconnection::waitForClient() {
 
 	} else {
 
-		int	fd=waitForNonBlockingRead(accepttimeout,0);
+		if (waitForNonBlockingRead(accepttimeout,0)<1) {
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",0,"wait for non blocking read failed");
+			#endif
+			return -1;
+		}
+
+		// get the first socket that had data available...
+		int	fd;
+		if (!getReadyList()->getDataByIndex(0,&fd)) {
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",0,"ready list was empty");
+			#endif
+			return -1;
+		}
+
 		if (fd==serversockin->getFileDescriptor()) {
 			clientsock=serversockin->acceptClientConnection();
 		} else if (fd==serversockun->getFileDescriptor()) {

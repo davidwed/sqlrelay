@@ -428,6 +428,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,1),"");
 	checkSuccess(sqlrcur_getField($cur,0,2),"");
 	checkSuccess(sqlrcur_sendQuery($cur,"drop table testtable1"),1);
+	sqlrcur_getNullsAsNulls($cur);
 	echo("\n");
 
 	echo("RESULT SET BUFFER SIZE: \n");

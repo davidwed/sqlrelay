@@ -470,6 +470,7 @@ class db2 {
 		checkSuccess(cur.getField(0,1),"");
 		checkSuccess(cur.getField(0,2),"");
 		cur.sendQuery("drop table testtable1");
+		cur.getNullsAsNulls();
 		System.out.println();
 		
 		System.out.println("RESULT SET BUFFER SIZE: ");

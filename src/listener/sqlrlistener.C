@@ -614,7 +614,18 @@ int	sqlrlistener::waitForData() {
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"waiting for client connection...");
 	#endif
-	int	fd=listener::waitForNonBlockingRead(-1,-1);
+
+	// wait for data on one of the sockets...
+	// if something bad happened, return an invalid file descriptor
+	if (listener::waitForNonBlockingRead(-1,-1)<1) {
+		return -1;
+	}
+
+	// return first file descriptor that had data available or an invalid
+	// file descriptor on error
+	int	fd=-1;
+	listener::getReadyList()->getDataByIndex(0,&fd);
+
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"done waiting for client connection");
 	#endif

@@ -404,6 +404,7 @@ checkSuccess(cur.sendQuery("select NULL,1,NULL"),1)
 checkSuccess(cur.getField(0,0),"")
 checkSuccess(cur.getField(0,1),"1")
 checkSuccess(cur.getField(0,2),"")
+cur.getNullsAsNils()
 print "\n"
 
 print "RESULT SET BUFFER SIZE: \n"

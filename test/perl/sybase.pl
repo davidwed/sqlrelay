@@ -626,6 +626,7 @@ checkSuccess($cur->sendQuery("select NULL,1,NULL"),1);
 checkSuccessString($cur->getField(0,0),"");
 checkSuccessString($cur->getField(0,1),"1");
 checkSuccessString($cur->getField(0,2),"");
+$cur->getNullsAsUndefined();
 print("\n");
 
 print("RESULT SET BUFFER SIZE: \n");
@@ -879,10 +880,10 @@ $port=$con->getConnectionPort();
 $socket=$con->getConnectionSocket();
 checkSuccess($con->resumeSession($port,$socket),1);
 checkSuccess($cur->resumeResultSet($id),1);
-checkSuccessString($cur->getField(4,0),NULL);
-checkSuccessString($cur->getField(5,0),NULL);
-checkSuccessString($cur->getField(6,0),NULL);
-checkSuccessString($cur->getField(7,0),NULL);
+checkUndef($cur->getField(4,0));
+checkUndef($cur->getField(5,0));
+checkUndef($cur->getField(6,0));
+checkUndef($cur->getField(7,0));
 print("\n");
 
 # drop existing table

@@ -54,7 +54,7 @@ class scaler : public daemonprocess {
 
 		sqlrconfigfile		*cfgfile;
 
-		list< connectstringcontainer * >	*connectstringlist;
+		linkedlist< connectstringcontainer * >	*connectstringlist;
 		char			*connectionid;
 		int			metrictotal;
 

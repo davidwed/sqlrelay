@@ -31,6 +31,7 @@ install:
 	$(INSTALL) -m 644 css/styles.css $(docdir)/css
 	$(INSTALL) -m 644 api/c/sqlrclientwrapper.h.html $(docdir)/api/c
 	$(INSTALL) -m 644 api/c++/sqlrclient.h.html $(docdir)/api/c++
+	$(INSTALL) -m 644 api/perl/perl.html $(docdir)/api/perl
 	$(INSTALL) -m 644 api/perl/SQLRConnection.html $(docdir)/api/perl
 	$(INSTALL) -m 644 api/perl/SQLRCursor.html $(docdir)/api/perl
 	$(INSTALL) -m 644 api/perl/SQLRelay.html $(docdir)/api/perl

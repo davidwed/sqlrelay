@@ -650,6 +650,7 @@ class mysql {
 		checkSuccess(cur.getField(0,0),"");
 		checkSuccess(cur.getField(0,1),"1");
 		checkSuccess(cur.getField(0,2),"");
+		cur.getNullsAsNulls();
 		System.out.println();
 	
 		System.out.println("RESULT SET BUFFER SIZE: ");

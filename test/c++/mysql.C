@@ -651,6 +651,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,0),"");
 	checkSuccess(cur->getField(0,1),"1");
 	checkSuccess(cur->getField(0,2),"");
+	cur->getNullsAsNulls();
 	printf("\n");
 
 	printf("RESULT SET BUFFER SIZE: \n");

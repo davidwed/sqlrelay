@@ -433,6 +433,7 @@ def main():
 	checkSuccess(cur.getField(0,1),"")
 	checkSuccess(cur.getField(0,2),"")
 	checkSuccess(cur.sendQuery("drop table testtable1"),1)
+	cur.getNullsAsNone()
 	print
 
 	print "RESULT SET BUFFER SIZE: "

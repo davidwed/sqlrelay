@@ -98,7 +98,7 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 				int connectiondebug) {
 
 	// get the connection count and total metric
-	list< connectstringcontainer *>	*connectionlist=
+	linkedlist< connectstringcontainer *>	*connectionlist=
 						cfgfile->getConnectStringList();
 
 	// if the metrictotal was 0, start no connections

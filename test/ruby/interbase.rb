@@ -453,6 +453,7 @@ checkSuccess(cur.sendQuery("select 1,NULL,NULL from rdb$database"),1)
 checkSuccess(cur.getField(0,0),"1")
 checkSuccess(cur.getField(0,1),"")
 checkSuccess(cur.getField(0,2),"")
+cur.getNullsAsNils()
 print "\n"
 
 print "RESULT SET BUFFER SIZE: \n"

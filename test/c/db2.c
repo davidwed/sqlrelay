@@ -470,6 +470,7 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"");
 	checkSuccessInt(sqlrcur_sendQuery(cur,"drop table testtable1"),1);
+	sqlrcur_getNullsAsNulls(cur);
 	printf("\n");
 	
 	printf("RESULT SET BUFFER SIZE: \n");

@@ -1,10 +1,6 @@
 memory leak in getFieldByIndex?
-SCO ruby install (relink) doesn't work
-postgresql drop in api won't install on openbsd
-postgresql test program compile fails on SCO _res defined in libsocket/libresolv
 
 test finished-suspended-result-set's with oracle/db2/sybase/freetds
-slackware package build isn't right
 
 db2 start/stop doesn't work
 	db2start/db2stop works when run as a given instance owner
@@ -57,14 +53,21 @@ Tests:
 	interbase stored procedures
 
 Compatibility:
-	perl api won't build on SCO/Solaris
 	oracle 9.2
-	ruby module segfaults on netbsd/openbsd
-	python api methods that call PyArg_ParseTuple with an "O" argument 
-		don't work on openbsd/netbsd, not exactly sure why
 	incorporate pkg-config stuff
-	ruby api won't build on SCO
 	crypto/ssl lib tests need to look in various places for the library
+	SCO:
+		ruby api won't build
+		postgresql won't configure
+		php api won't build
+	Solaris:
+		perl api won't build
+	openbsd/netbsd:
+		ruby module segfaults
+		python api methods that call PyArg_ParseTuple with an "O"
+			argument don't work, not exactly sure why
+	openbsd:
+		postgresql drop-in library won't install
 
 Documentation:
 	getting started docs for MS SQL Server
@@ -80,9 +83,8 @@ Documentation:
 Performance/Code Enhancements:
 	make some methods that return int return bool
 	implement unique/nullable/primary key as a bitmap
-	use connectstring class to parse/store connectstrings
-	persistent cursors - parse query, attach an id to it, make it available
-			to other sessions
+	persistent cursors - parse query, attach an id to it,
+				make it available to other sessions
 	client-side persistence/socket handoff daemon
 	connection daemons could put buffers in shared memory and
 		clients could send queries, access buffers using 
@@ -137,14 +139,13 @@ Features:
 	odbc connection should check the odbc definition
 		for connect string arguments - SQLBrowseConnect
 	solaris init script
-	use const/short/long instead of plain char *, int
 
 Availability:
 	connections should ping database server every so often to make sure
 		it's up, if it's not, relogin
 	master, fallback databases, where connection only goes to the fallback
 		if the master is overloaded or down
-		statistics, stat monitoring interface
+	statistics, stat monitoring interface
 	if a connection dies mysteriously, a new one should fire up
 
 backends:

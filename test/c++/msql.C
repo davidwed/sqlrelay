@@ -443,6 +443,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,1),"");
 	checkSuccess(cur->getField(0,2),"");
 	checkSuccess(cur->sendQuery("drop table testtable1"),1);
+	cur->getNullsAsNulls();
 	printf("\n");
 
 	printf("RESULT SET BUFFER SIZE: \n");

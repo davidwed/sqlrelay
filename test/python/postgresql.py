@@ -403,6 +403,7 @@ def main():
 	checkSuccess(cur.getField(0,0),"")
 	checkSuccess(cur.getField(0,1),"1")
 	checkSuccess(cur.getField(0,2),"")
+	cur.getNullsAsNone()
 	print
 
 	print "RESULT SET BUFFER SIZE: "

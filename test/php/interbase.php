@@ -455,6 +455,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,0),"1");
 	checkSuccess(sqlrcur_getField($cur,0,1),"");
 	checkSuccess(sqlrcur_getField($cur,0,2),"");
+	sqlrcur_getNullsAsNulls($cur);
 	echo("\n");
 
 	echo("RESULT SET BUFFER SIZE: \n");

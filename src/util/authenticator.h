@@ -14,8 +14,8 @@ class authenticator {
 		int	authenticate(const char *user, const char *password);
 
 	private:
-		list< usercontainer * >	userlist;
-		unsigned long		usercount;
+		linkedlist< usercontainer * >	userlist;
+		unsigned long			usercount;
 		char			**users;
 		char			**passwords;
 };

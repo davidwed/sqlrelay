@@ -8,7 +8,7 @@
 
 #include <rudiments/xmlsax.h>
 #include <rudiments/stringbuffer.h>
-#include <rudiments/list.h>
+#include <rudiments/linkedlist.h>
 #include <rudiments/parameterstring.h>
 
 typedef enum {
@@ -53,7 +53,7 @@ class usercontainer {
 		char		*password;
 };
 
-typedef listnode< usercontainer * >	usernode;
+typedef linkedlistnode< usercontainer * >	usernode;
 
 class connectstringcontainer {
 	public:
@@ -78,7 +78,7 @@ class connectstringcontainer {
 		int		connectstringcount;
 };
 
-typedef listnode< connectstringcontainer * >	connectstringnode;
+typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
 
 class sqlrconfigfile : public xmlsax {
 	public:
@@ -116,8 +116,8 @@ class sqlrconfigfile : public xmlsax {
 		int	getDebugListener();
 		int	getDebugConnection();
 
-		list< usercontainer * >	*getUserList();
-		list< connectstringcontainer * >
+		linkedlist< usercontainer * >	*getUserList();
+		linkedlist< connectstringcontainer * >
 					*getConnectStringList();
 		connectstringcontainer	*getConnectString(
 						const char *connectionid);
@@ -175,8 +175,8 @@ class sqlrconfigfile : public xmlsax {
 
 		int	connectstringcount;
 
-		list< connectstringcontainer * >	connectstringlist;
-		list< usercontainer * >			userlist;
+		linkedlist< connectstringcontainer * >	connectstringlist;
+		linkedlist< usercontainer * >		userlist;
 };
 
 #endif

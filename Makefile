@@ -65,21 +65,3 @@ unconfig: clean
 	$(RM) libtool
 
 distclean: unconfig
-
-slackware: all
-	mkdir /tmp/sqlrelay-$(SQLR_VERSION)
-	make prefix=/tmp/sqlrelay-$(SQLR_VERSION)/$(prefix) \
-		PYTHONDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(PYTHONDIR) \
-		ZOPEDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(ZOPEDIR) \
-		PHPEXTDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(PHPEXTDIR) \
-		TCLLIBSPATH=/tmp/sqlrelay-$(SQLR_VERSION)/$(TCLLIBSPATH) \
-		HAVE_RUBY="" \
-		initroot=/tmp/sqlrelay-$(SQLR_VERSION) \
-			install
-	if ( test -n "$(HAVE_RUBY)" ); then \
-		make DESTDIR=/tmp/sqlrelay-$(SQLR_VERSION) \
-			-C src/api/ruby -f Makefile.install install; \
-	fi
-	cd /tmp/sqlrelay-$(SQLR_VERSION); makepkg sqlrelay-$(SQLR_VERSION).tgz
-	mv /tmp/sqlrelay-$(SQLR_VERSION)/sqlrelay-$(SQLR_VERSION).tgz $(PWD)
-	$(RMTREE) /tmp/sqlrelay-$(SQLR_VERSION)

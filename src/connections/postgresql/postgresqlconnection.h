@@ -7,7 +7,6 @@
 #define NUM_CONNECT_STRING_VARS 8
 
 #include <sqlrconnection.h>
-#include <rudiments/list.h>
 
 #include <libpq-fe.h>
 

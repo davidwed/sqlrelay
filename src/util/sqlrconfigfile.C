@@ -218,7 +218,7 @@ int sqlrconfigfile::getDebugConnection() {
 	return debugconnection;
 }
 
-list< usercontainer * > *sqlrconfigfile::getUserList() {
+linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	// if there are no users in the list, add a default user/password
 	if (!userlist.getLength()) {
 		currentuser=new usercontainer();
@@ -229,7 +229,7 @@ list< usercontainer * > *sqlrconfigfile::getUserList() {
 	return &userlist;
 }
 
-list< connectstringcontainer * > *sqlrconfigfile::getConnectStringList() {
+linkedlist< connectstringcontainer * > *sqlrconfigfile::getConnectStringList() {
 	return &connectstringlist;
 }
 

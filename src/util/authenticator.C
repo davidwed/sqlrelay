@@ -15,7 +15,7 @@
 authenticator::authenticator(sqlrconfigfile *cfgfile) {
 
 	// get the list of users from the config file
-	list< usercontainer * >	*userlist=cfgfile->getUserList();
+	linkedlist< usercontainer * >	*userlist=cfgfile->getUserList();
 	usercount=userlist->getLength();
 
 	// create an array of users and passwords and store the
