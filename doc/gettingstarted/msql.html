@@ -74,7 +74,7 @@ script like the following to start the database at boot time.</p>
 
 <B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
         start<B><FONT color=#a62828>)</FONT></B>
-		su <FONT color=#6959cf>-l</FONT> msql - <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/usr/local/Hughes/bin/msql2d &gt; /dev/null 2&gt; /dev/null &amp;</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+		su <FONT color=#6959cf>-</FONT> msql -c <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/usr/local/Hughes/bin/msql2d &gt; /dev/null 2&gt; /dev/null &amp;</FONT><B><FONT color=#a62828>&quot;</FONT></B>
                 <B><FONT color=#a62828>;;</FONT></B>
         stop<B><FONT color=#a62828>)</FONT></B>
                 <B><FONT color=#a62828>kill</FONT></B> <FONT color=#6959cf>`ps </FONT><FONT color=#6959cf>-efa</FONT><FONT color=#6959cf> </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> </FONT><B><FONT color=#a62828>grep</FONT></B><FONT color=#6959cf> msql2d </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> </FONT><B><FONT color=#a62828>grep</FONT></B><FONT color=#6959cf> </FONT><FONT color=#6959cf>-v</FONT><FONT color=#6959cf> </FONT><B><FONT color=#a62828>grep</FONT></B><FONT color=#6959cf> </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> awk </FONT><B><FONT color=#a62828>'</FONT></B><FONT color=#ff00ff>{print $2}</FONT><B><FONT color=#a62828>'</FONT></B><FONT color=#6959cf>`</FONT>
