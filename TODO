@@ -37,7 +37,6 @@ compatibility:
 	oracle 9.2
 
 lots of documentation fixes:
-	add sybase 12.5 installation instructions to sybase.html
 	fix clientapis.html
 	oracle 9.2 installation
 
