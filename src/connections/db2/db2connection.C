@@ -275,6 +275,8 @@ int	db2cursor::executeQuery(const char *query, long length,
 		return 0;
 	}
 
+	checkForTempTable(query,length);
+
 	// get the column count
 	erg=SQLNumResultCols(stmt,&ncols);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {

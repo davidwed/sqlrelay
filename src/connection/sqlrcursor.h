@@ -110,6 +110,9 @@ class sqlrcursor {
 		virtual	void	cleanUpData(bool freerows, bool freecols,
 								bool freebinds);
 
+		regularexpression	createtemplower;
+		regularexpression	createtempupper;
+
 	public:
 		// methods/variables used by derived classes
 		stringbuffer	*fakeInputBinds(const char *query);

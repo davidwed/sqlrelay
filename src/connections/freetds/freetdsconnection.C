@@ -256,6 +256,11 @@ freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 			tdsversion=0;
 		#endif
 	#endif
+
+	// replace the regular expressions used to detect creation of a
+	// temporary table
+	createtemplower.compile("create[ \\t\\r\\n]+table[ \\t\\r\\n]+#");
+	createtempupper.compile("CREATE[ \\t\\r\\n]+TABLE[ \\t\\r\\n]+#");
 }
 
 freetdscursor::~freetdscursor() {
@@ -494,6 +499,8 @@ int	freetdscursor::executeQuery(const char *query, long length,
 		ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
 		return 0;
 	}
+
+	checkForTempTable(query,length);
 
 	// For queries which return rows or parameters (output bind variables),
 	// get the column count.  For DML queries, get the affected row count.

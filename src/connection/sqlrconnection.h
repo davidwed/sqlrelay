@@ -14,6 +14,7 @@
 #include <rudiments/unixclientsocket.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/stringbuffer.h>
+#include <rudiments/regularexpression.h>
 #include <authenticator.h>
 
 #include <debugfile.h>

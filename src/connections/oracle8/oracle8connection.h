@@ -178,9 +178,6 @@ class oracle8cursor : public sqlrcursor {
 		oracle8connection	*oracle8conn;
 
 #ifdef HAVE_ORACLE_8i
-		regularexpression	createtemplower;
-		regularexpression	createtempupper;
-
 		regularexpression	preserverowslower;
 		regularexpression	preserverowsupper;
 #endif

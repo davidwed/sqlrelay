@@ -1,13 +1,10 @@
 probably related to temp table dropping...
 	postgresql test causes connection to crash on 2nd run
 	mysql test causes connection to crash on 2nd run
+	freetds connection writes an error but succeeds in dropping the table
+	sybase connection won't even start now
 
-temp tables:
-	sybase: not dropped when session is over
-			unless the name begins with a # sign
-		are they truncated???
-	db2: (create|declare) global temporary table - dropped when session ends
-	odbc: ???
+odbc temp tables ???
 
 VB wrapper
 FIXME's in mysql drop-in library

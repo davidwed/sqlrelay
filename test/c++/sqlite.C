@@ -93,19 +93,6 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable");
 	con->commit();
 
-	// temporary tables
-	printf("TEMPORARY TABLES: \n");
-	cur->sendQuery("drop table temptable\n");
-	cur->sendQuery("create temporary table temptable (col1 int)");
-	checkSuccess(cur->sendQuery("insert into temptable values (1)"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptable"),1);
-	checkSuccess(cur->getField(0,0),"1");
-	con->endSession();
-	printf("\n");
-	checkSuccess(cur->sendQuery("select count(*) from temptable"),0);
-	cur->sendQuery("drop table temptable\n");
-	printf("\n");
-
 	// create a new table
 	printf("CREATE TEMPTABLE: \n");
 	cur->sendQuery("begin transaction");
@@ -625,6 +612,19 @@ int	main(int argc, char **argv) {
 
 	// drop existing table
 	cur->sendQuery("drop table testtable");
+
+	// temporary tables
+	printf("TEMPORARY TABLES: \n");
+	cur->sendQuery("drop table temptable\n");
+	cur->sendQuery("create temporary table temptable (col1 int)");
+	checkSuccess(cur->sendQuery("insert into temptable values (1)"),1);
+	checkSuccess(cur->sendQuery("select count(*) from temptable"),1);
+	checkSuccess(cur->getField(0,0),"1");
+	con->endSession();
+	printf("\n");
+	checkSuccess(cur->sendQuery("select count(*) from temptable"),0);
+	cur->sendQuery("drop table temptable\n");
+	printf("\n");
 
 	// invalid queries...
 	printf("INVALID QUERIES: \n");

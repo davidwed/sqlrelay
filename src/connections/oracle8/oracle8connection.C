@@ -911,9 +911,6 @@ void	oracle8cursor::checkForTempTable(const char *query,
 
 int	oracle8cursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
-#ifdef HAVE_ORACLE_8i
-	checkForTempTable(query,length);
-#endif
 
 	// initialize the column count
 	ncols=0;
@@ -1074,7 +1071,12 @@ int	oracle8cursor::executeQuery(const char *query, long length,
 				}
 			}
 		}
+#ifdef HAVE_ORACLE_8i
+	} else if (stmttype==OCI_STMT_CREATE) {
+		checkForTempTable(query,length);
+#endif
 	}
+
 	return 1;
 }
 

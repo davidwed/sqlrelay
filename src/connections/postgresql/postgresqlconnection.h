@@ -7,7 +7,6 @@
 #define NUM_CONNECT_STRING_VARS 8
 
 #include <sqlrconnection.h>
-#include <rudiments/regularexpression.h>
 
 #include <libpq-fe.h>
 
@@ -17,9 +16,6 @@ class postgresqlcursor : public sqlrcursor {
 	friend class postgresqlconnection;
 	private:
 			postgresqlcursor(sqlrconnection *conn);
-
-		void	checkForTempTable(const char *query,
-						unsigned long length);
 		int	executeQuery(const char *query, long length,
 						unsigned short execute);
 		char	*getErrorMessage(int *liveconnection);
@@ -42,9 +38,6 @@ class postgresqlcursor : public sqlrcursor {
 		int		currentrow;
 
 		postgresqlconnection	*postgresqlconn;
-
-		regularexpression	createtemplower;
-		regularexpression	createtempupper;
 };
 
 class postgresqlconnection : public sqlrconnection {

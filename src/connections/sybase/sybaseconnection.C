@@ -252,6 +252,11 @@ sybasecursor::sybasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	prepared=0;
 	sybaseconn=(sybaseconnection *)conn;
 	cmd=NULL;
+
+	// replace the regular expressions used to detect creation of a
+	// temporary table
+	createtemplower.compile("create[ \\t\\r\\n]+table[ \\t\\r\\n]+#");
+	createtempupper.compile("CREATE[ \\t\\r\\n]+TABLE[ \\t\\r\\n]+#");
 }
 
 sybasecursor::~sybasecursor() {
@@ -459,6 +464,8 @@ int	sybasecursor::executeQuery(const char *query, long length,
 		sybaseconn->deadconnection=1;
 		return 0;
 	}
+
+	checkForTempTable(query,length);
 
 	// handle a failed command
 	if ((int)results_type==CS_CMD_FAIL) {
