@@ -659,10 +659,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("begin testproc(:in1,:in2,:in3); end;")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,2,1)
-cur.inputBind("in3","hello")
+cur.prepareQuery(&quot;<font color="#ff00ff">begin testproc(:in1,:in2,:in3); end;</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 </pre>
 </blockquote>
@@ -692,10 +692,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("exec testproc")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,2,1)
-cur.inputBind("in3","hello")
+cur.prepareQuery(&quot;<font color="#ff00ff">exec testproc</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 </pre>
 </blockquote>
@@ -727,10 +727,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("execute procedure testproc ?, ?, ?")
-cur.inputBind("1",1)
-cur.inputBind("2",1.1,2,1)
-cur.inputBind("3","hello")
+cur.prepareQuery(&quot;<font color="#ff00ff">execute procedure testproc ?, ?, ?</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 </pre>
 </blockquote>
@@ -761,10 +761,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("call testproc(?,?,?)")
-cur.inputBind("1",1)
-cur.inputBind("2",1.1,2,1)
-cur.inputBind("3","hello")
+cur.prepareQuery(&quot;<font color="#ff00ff">call testproc(?,?,?)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 </pre>
 </blockquote>
@@ -796,10 +796,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("select testproc(:in1,:in2,:in3)")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,2,1)
-cur.inputBind("in3","hello")
+cur.prepareQuery(&quot;<font color="#ff00ff">select testproc(:in1,:in2,:in3)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 </pre>
 </blockquote>
@@ -845,10 +845,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("select testproc(:in1,:in2,:in3) from dual")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,2,1)
-cur.inputBind("in3","hello")
+cur.prepareQuery(&quot;<font color="#ff00ff">select testproc(:in1,:in2,:in3) from dual</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 result=cur.getField(0,0)
 </pre>
@@ -881,13 +881,13 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("begin testproc(:in1,:in2,:in3,:out1); end;")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,2,1)
-cur.inputBind("in3","hello")
-cur.defineOutputBind("out1",20)
+cur.prepareQuery(&quot;<font color="#ff00ff">begin testproc(:in1,:in2,:in3,:out1); end;</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.defineOutputBind(&quot;<font color="#ff00ff">out1</font>&quot;,20)
 cur.executeQuery()
-result=cur.getOutputBind("out1")
+result=cur.getOutputBind(&quot;<font color="#ff00ff">out1</font>&quot;)
 </pre>
 </blockquote>
 
@@ -920,13 +920,13 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("exec testproc")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,2,1)
-cur.inputBind("in3","hello")
-cur.defineOutputBind("out1",20)
+cur.prepareQuery(&quot;<font color="#ff00ff">exec testproc</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.defineOutputBind(&quot;<font color="#ff00ff">out1</font>&quot;,20)
 cur.executeQuery()
-result=cur.getOutputBind("out1")
+result=cur.getOutputBind(&quot;<font color="#ff00ff">out1</font>&quot;)
 </pre>
 </blockquote>
 
@@ -958,10 +958,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("select * from testproc(?,?,?)")
-cur.inputBind("1",1)
-cur.inputBind("2",1.1,2,1)
-cur.inputBind("3","hello")
+cur.prepareQuery(&quot;<font color="#ff00ff">select * from testproc(?,?,?)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 result=cur.getField(0,0)
 </pre>
@@ -975,13 +975,13 @@ variables.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("execute procedure testproc ?, ?, ?")
-cur.inputBind("1",1)
-cur.inputBind("2",1.1,2,1)
-cur.inputBind("3","hello")
-cur.defineOutputBind("1",20)
+cur.prepareQuery(&quot;<font color="#ff00ff">execute procedure testproc ?, ?, ?</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.defineOutputBind(&quot;<font color="#ff00ff">1</font>&quot;,20)
 cur.executeQuery()
-result=cur.getOutputBind("1")
+result=cur.getOutputBind(&quot;<font color="#ff00ff">1</font>&quot;)
 </pre>
 </blockquote>
 
@@ -1015,13 +1015,13 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("call testproc(?,?,?,?)")
-cur.inputBind("1",1)
-cur.inputBind("2",1.1,2,1)
-cur.inputBind("3","hello")
-cur.defineOutputBind("4",25)
+cur.prepareQuery(&quot;<font color="#ff00ff">call testproc(?,?,?,?)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.defineOutputBind(&quot;<font color="#ff00ff">4</font>&quot;,25)
 cur.executeQuery()
-result=cur.getOutputBind("4")
+result=cur.getOutputBind(&quot;<font color="#ff00ff">4</font>&quot;)
 </pre>
 </blockquote>
 
@@ -1058,10 +1058,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("select * from testfunc(:in1,:in2,:in3)")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,4,2)
-cur.inputBind("in3","hello")
+cur.prepareQuery(&quot;<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,4,2)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 result=cur.getField(0,0)
 </pre>
@@ -1108,17 +1108,17 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,2,1)
-cur.inputBind("in3","hello")
-cur.defineOutputBind("out1",20)
-cur.defineOutputBind("out2",20)
-cur.defineOutputBind("out3",20)
+cur.prepareQuery(&quot;<font color="#ff00ff">begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.defineOutputBind(&quot;<font color="#ff00ff">out1</font>&quot;,20)
+cur.defineOutputBind(&quot;<font color="#ff00ff">out2</font>&quot;,20)
+cur.defineOutputBind(&quot;<font color="#ff00ff">out3</font>&quot;,20)
 cur.executeQuery()
-out1=cur.getOutputBind("out1")
-out2=cur.getOutputBind("out2")
-out3=cur.getOutputBind("out3")
+out1=cur.getOutputBind(&quot;<font color="#ff00ff">out1</font>&quot;)
+out2=cur.getOutputBind(&quot;<font color="#ff00ff">out2</font>&quot;)
+out3=cur.getOutputBind(&quot;<font color="#ff00ff">out3</font>&quot;)
 </pre>
 </blockquote>
 
@@ -1149,17 +1149,17 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("exec testproc")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,2,1)
-cur.inputBind("in3","hello")
-cur.defineOutputBind("out1",20)
-cur.defineOutputBind("out2",20)
-cur.defineOutputBind("out3",20)
+cur.prepareQuery(&quot;<font color="#ff00ff">exec testproc</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.defineOutputBind(&quot;<font color="#ff00ff">out1</font>&quot;,20)
+cur.defineOutputBind(&quot;<font color="#ff00ff">out2</font>&quot;,20)
+cur.defineOutputBind(&quot;<font color="#ff00ff">out3</font>&quot;,20)
 cur.executeQuery()
-out1=cur.getOutputBind("out1")
-out2=cur.getOutputBind("out2")
-out3=cur.getOutputBind("out3")
+out1=cur.getOutputBind(&quot;<font color="#ff00ff">out1</font>&quot;)
+out2=cur.getOutputBind(&quot;<font color="#ff00ff">out2</font>&quot;)
+out3=cur.getOutputBind(&quot;<font color="#ff00ff">out3</font>&quot;)
 </pre>
 </blockquote>
 
@@ -1193,17 +1193,17 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("execute procedure testproc ?, ?, ?, ?, ?, ?")
-cur.inputBind("1",1)
-cur.inputBind("2",1.1,2,1)
-cur.inputBind("3","hello")
-cur.defineOutputBind("1",20)
-cur.defineOutputBind("2",20)
-cur.defineOutputBind("3",20)
+cur.prepareQuery(&quot;<font color="#ff00ff">execute procedure testproc ?, ?, ?, ?, ?, ?</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.defineOutputBind(&quot;<font color="#ff00ff">1</font>&quot;,20)
+cur.defineOutputBind(&quot;<font color="#ff00ff">2</font>&quot;,20)
+cur.defineOutputBind(&quot;<font color="#ff00ff">3</font>&quot;,20)
 cur.executeQuery()
-out1=cur.getOutputBind("1")
-out2=cur.getOutputBind("2")
-out3=cur.getOutputBind("3")
+out1=cur.getOutputBind(&quot;<font color="#ff00ff">1</font>&quot;)
+out2=cur.getOutputBind(&quot;<font color="#ff00ff">2</font>&quot;)
+out3=cur.getOutputBind(&quot;<font color="#ff00ff">3</font>&quot;)
 </pre>
 </blockquote>
 
@@ -1236,17 +1236,17 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("call testproc(?,?,?,?,?,?)")
-cur.inputBind("1",1)
-cur.inputBind("2",1.1,2,1)
-cur.inputBind("3","hello")
-cur.defineOutputBind("4",25)
-cur.defineOutputBind("5",25)
-cur.defineOutputBind("6",25)
+cur.prepareQuery(&quot;<font color="#ff00ff">call testproc(?,?,?,?,?,?)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.defineOutputBind(&quot;<font color="#ff00ff">4</font>&quot;,25)
+cur.defineOutputBind(&quot;<font color="#ff00ff">5</font>&quot;,25)
+cur.defineOutputBind(&quot;<font color="#ff00ff">6</font>&quot;,25)
 cur.executeQuery()
-out1=cur.getOutputBind("4")
-out2=cur.getOutputBind("5")
-out3=cur.getOutputBind("6")
+out1=cur.getOutputBind(&quot;<font color="#ff00ff">4</font>&quot;)
+out2=cur.getOutputBind(&quot;<font color="#ff00ff">5</font>&quot;)
+out3=cur.getOutputBind(&quot;<font color="#ff00ff">6</font>&quot;)
 </pre>
 </blockquote>
 
@@ -1281,10 +1281,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))")
-cur.inputBind("in1",1)
-cur.inputBind("in2",1.1,4,2)
-cur.inputBind("in3","hello")
+cur.prepareQuery(&quot;<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,4,2)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 out1=cur.getField(0,0)
 out2=cur.getField(0,1)
@@ -1332,10 +1332,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("begin  :curs:=testproc; end;")
-cur.defineOutputBindCursor("curs")
+cur.prepareQuery(&quot;<font color="#ff00ff">begin  :curs:=testproc; end;</font>&quot;)
+cur.defineOutputBindCursor(&quot;<font color="#ff00ff">curs</font>&quot;)
 cur.executeQuery()
-bindcur=cur.getOutputBindCursor("curs")
+bindcur=cur.getOutputBindCursor(&quot;<font color="#ff00ff">curs</font>&quot;)
 bindcur.fetchFromBindCursor()
 field00=bindcur.getField(0,0)
 field01=bindcur.getField(0,1)
@@ -1400,7 +1400,7 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.sendQuery("select * from testfunc() as (testint int, testfloat float, testchar char(40))")
+cur.sendQuery(&quot;<font color="#ff00ff">select * from testfunc() as (testint int, testfloat float, testchar char(40))</font>&quot;)
 field00=cur.getField(0,0)
 field01=cur.getField(0,1)
 field02=cur.getField(0,2)
