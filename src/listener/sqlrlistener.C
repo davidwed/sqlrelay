@@ -673,7 +673,7 @@ void	sqlrlistener::handleClientConnection(int fd) {
 	// there would need to be another sqlr-listener out there.  In that
 	// case getValue(10) would return something greater than 0 and we would
 	// have forked anyway.
-	if (semset->getValue(10) || !semset->getValue(2)) {
+	if (dynamicscaling || semset->getValue(10) || !semset->getValue(2)) {
 
 		// increment the number of "forked, busy listeners"
 		semset->signal(10);
