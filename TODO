@@ -1,7 +1,3 @@
-postgresql perl/python tests fail
-
-
-
 query/fields cmdline tools need a timeout option.
 
 ruby api crashes on exit

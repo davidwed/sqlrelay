@@ -201,7 +201,16 @@ int isNumberTypeChar(const char *type) {
 		!strcmp(type,"INTEGER") || !strcmp(type,"D_FLOAT") ||
 		!strcmp(type,"DECIMAL") || !strcmp(type,"INT64") ||
 		!strcmp(type,"MONEY") || !strcmp(type,"SMALLMONEY") ||
-		!strcmp(type,"DOUBLE PRECISION")) {
+		!strcmp(type,"DOUBLE PRECISION") ||
+		!strcmp(type,"int2") || !strcmp(type,"_int2") ||
+		!strcmp(type,"int4") || !strcmp(type,"_int4") ||
+		!strcmp(type,"int8") || !strcmp(type,"_int8") ||
+		!strcmp(type,"oid") || !strcmp(type,"_oid") ||
+		!strcmp(type,"tid") || !strcmp(type,"_tid") ||
+		!strcmp(type,"xid") || !strcmp(type,"_xid") ||
+		!strcmp(type,"cid") || !strcmp(type,"_cid") ||
+		!strcmp(type,"float4") || !strcmp(type,"_float4") ||
+		!strcmp(type,"float8") || !strcmp(type,"_float8")) {
 		return 1;
 	}
 	return 0;

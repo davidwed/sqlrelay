@@ -291,7 +291,6 @@ void	postgresqlcursor::returnColumnInfo() {
 }
 
 int	postgresqlcursor::noRowsToReturn() {
-
 	if (!nrows) {
 		return 1;
 	}
