@@ -1,2 +1,3 @@
 TYPEMAP
 sqlrconnection *	O_OBJECT
+const char *		T_PV

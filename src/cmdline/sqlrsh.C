@@ -258,7 +258,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"final",5) ||
 		!charstring::compareIgnoringCase(ptr,"help",4) ||
 		!charstring::compareIgnoringCase(ptr,"ping",4) ||
-		!charstring::compareIgnoringCase(ptr,"run",3)) {
+		!charstring::compareIgnoringCase(ptr,"run",3) ||
+		!charstring::compareIgnoringCase(ptr,"@",1)) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -309,6 +310,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"run",3)) {	
 		ptr=ptr+3;
 		cmdtype=6;
+	} else if (!charstring::compareIgnoringCase(ptr,"@",1)) {	
+		ptr=ptr+1;
+		cmdtype=6;
 	} else {
 		return;
 	}
@@ -320,7 +324,8 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 	// handle scripts
 	if (cmdtype==6) {
-		runScript(sqlrcon,sqlrcur,env,ptr,true,true);
+		//runScript(sqlrcon,sqlrcur,env,ptr,true,true);
+		runScript(sqlrcon,sqlrcur,env,ptr,true,false);
 		return;
 	}
 
@@ -415,7 +420,7 @@ void sqlrsh::initStats(environment *env) {
 void sqlrsh::displayError(sqlrcursor *sqlrcur, environment *env) {
 
 	cyan(env);
-	printf("%s\n",sqlrcur->errorMessage());
+	printf("%s\n\n",sqlrcur->errorMessage());
 	white(env);
 }
 
@@ -431,6 +436,10 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, environment *env) {
 	const char	*name;
 	int		namelen;
 	int		longest;
+
+	if (!colcount) {
+		return;
+	}
 
 	// iterate through columns
 	for (int i=0; i<sqlrcur->colCount(); i++) {
@@ -481,6 +490,10 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, environment *env) {
 	int	colcount=sqlrcur->colCount();
 	int	namelen;
 	int	longest;
+
+	if (!colcount) {
+		return;
+	}
 
 	int		i=0;
 	const char	*field="";
@@ -548,6 +561,7 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, environment *env) {
 	magenta(env);
 	printf("%ld\n",clock());
 	white(env);
+	printf("\n");
 }
 
 void sqlrsh::ping(sqlrconnection *sqlrcon, environment *env) {
@@ -689,7 +703,7 @@ void sqlrsh::prompt(unsigned long promptcount) {
 void sqlrsh::error(const char *errstring) {
 
 	// print the error
-	printf("%s\n",errstring);
+	printf("%s\n\n",errstring);
 }
 
 void sqlrsh::execute(int argc, const char **argv) {

@@ -70,7 +70,7 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 		bool	registerHandoff(filedescriptor *sock);
 		bool	deRegisterHandoff(filedescriptor *sock);
 		bool	fixup(filedescriptor *sock);
-		bool	deniedIp();
+		bool	deniedIp(filedescriptor *clientsock);
 		void	forkChild(filedescriptor *clientsock);
 		void	clientSession(filedescriptor *clientsock);
 		int	getAuth(filedescriptor *clientsock);

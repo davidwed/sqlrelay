@@ -91,6 +91,7 @@ void cachemanager::scan() {
 						erase(currentdir->dirname,name);
 					}
 					delete[] name;
+					index++;
 				}
 
 				// close the directory

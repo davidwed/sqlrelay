@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLPREFIX PERLCYGDRIVEPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB PYTHON_HAVE_WEAKREF HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYCYGDRIVEPREFIX RUBYLIB HAVE_JAVA JAVAC JAVAINCLUDES JAVALIB HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPLIB PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLPREFIX PERLCYGDRIVEPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB PYTHON_HAVE_WEAKREF HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYCYGDRIVEPREFIX RUBYLIB HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPLIB PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -19582,7 +19582,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -21580,7 +21580,7 @@ else
 
 	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/usr/sfw" "/usr/pkg" "/sw" "/usr/local/firstworks"
 	do
-		if ( test -n "$i" )
+		if ( test -n "$i" -a -d "$i" )
 		then
 			RUDIMENTSCONFIG="$i/bin/rudiments-config"
 			if ( test -r "$RUDIMENTSCONFIG" )
@@ -22773,11 +22773,14 @@ fi
 		then
 			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/sw/bin"
 			do
-				MYSQLINCLUDES=`$i/mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
-				MYSQLLIBS=`$i/mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
-				if ( test -n "$MYSQLLIBS" )
+				if ( test -d "$i" )
 				then
-					break
+					MYSQLINCLUDES=`$i/mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
+					MYSQLLIBS=`$i/mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
+					if ( test -n "$MYSQLLIBS" )
+					then
+						break
+					fi
 				fi
 			done
 		fi
@@ -22811,7 +22814,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -25230,7 +25233,7 @@ then
 
 		for i in "$MSQLPATH" "/usr/local/Hughes"
 		do
-			if ( test -n "$i" )
+			if ( test -n "$i" -a -d "$i" )
 			then
 
 FOUNDHEADER=""
@@ -25399,7 +25402,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -26657,7 +26660,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -27916,7 +27919,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -29714,7 +29717,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -31006,7 +31009,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -32263,7 +32266,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -33682,7 +33685,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -35063,7 +35066,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -36386,7 +36389,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -38553,7 +38556,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -39813,7 +39816,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -42065,6 +42068,49 @@ fi
 			fi
 		fi
 
+		if ( test -z "$INTERBASELIBS" -a -z "$CYGWIN" )
+		then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/Library/Frameworks/Firebird.framework/Versions/Current/Headers/ibase.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/Library/Frameworks/Firebird.framework/Versions/Current/Firebird" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INTERBASEINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\""
+		eval "INTERBASELIBSPATH=\"/Library/Frameworks/Firebird.framework/Versions/Current\"; INTERBASELIBS=\"/Library/Frameworks/Firebird.framework/Versions/Current/Firebird\""
+	fi
+else
+	if ( test -n "" -a -n "" )
+	then
+
+if ( test -r "" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INTERBASEINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\""
+			eval ""
+		fi
+	fi
+fi
+
+		fi
+
 		LINKFAIL=""
 		if ( test -n "$DLLIB" -a -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
 		then
@@ -42423,7 +42469,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -43730,7 +43776,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -44985,7 +45031,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -46387,6 +46433,8 @@ fi
 			then
 				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
 				do
+					if ( test -d "$i" )
+					then
 
 if ( test -r ""$i/perl5"" )
 then
@@ -46399,9 +46447,10 @@ then
 	eval "PERL=\"$i/perl\""
 fi
 
-					if ( test -n "$PERL" )
-					then
-						break
+						if ( test -n "$PERL" )
+						then
+							break
+						fi
 					fi
 				done
 			fi
@@ -46546,20 +46595,20 @@ fi
 
 			for j in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
 			do
-				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/sw/include/python$j"
+				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j"
 				do
 					if ( test -d "$i" )
 					then
 						PYTHONINCLUDES="-I$i"
-					fi
-					if ( test -n "$PYTHONINCLUDES" )
-					then
-						PYTHONVERSION=`echo $j | sed -e "s|\.||"`
-						break
+						if ( test -n "$PYTHONINCLUDES" )
+						then
+							PYTHONVERSION=`echo $j | sed -e "s|\.||"`
+							break
+						fi
 					fi
 				done
 
-				for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j"
+				for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j"
 				do
 					if ( test -d "$i/config" )
 					then
@@ -46570,10 +46619,10 @@ fi
 						else
 							PYTHONDIR="$i"
 						fi
-					fi
-					if ( test -n "$PYTHONDIR" )
-					then
-						break
+						if ( test -n "$PYTHONDIR" )
+						then
+							break
+						fi
 					fi
 				done
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
@@ -46771,17 +46820,25 @@ then
 
 	else
 
-		if ( test -n "$RUBYPATH" )
-		then
+		for ruby in "ruby" "ruby16" "ruby18"
+		do
 
-if ( test -r ""$RUBYPATH/bin/ruby"" )
+			HAVE_RUBY=""
+			RUBY=""
+			RUBYCYGDRIVEPREFIX=""
+			RUBYLIB=""
+
+			if ( test -n "$RUBYPATH" )
+			then
+
+if ( test -r ""$RUBYPATH/bin/$ruby"" )
 then
-	eval "RUBY=\"$RUBYPATH/bin/ruby\""
+	eval "RUBY=\"$RUBYPATH/bin/$ruby\""
 fi
 
-		else
-			# Extract the first word of ""ruby"", so it can be a program name with args.
-set dummy "ruby"; ac_word=$2
+			else
+				# Extract the first word of ""$ruby"", so it can be a program name with args.
+set dummy "$ruby"; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_RUBY+set}" = set; then
@@ -46797,7 +46854,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_RUBY=""ruby""
+    ac_cv_prog_RUBY=""$ruby""
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -46815,45 +46872,49 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-			if ( test -z "$RUBY" )
-			then
-				for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
-				do
+				if ( test -z "$RUBY" )
+				then
+					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
+					do
 
-if ( test -r ""$i/ruby"" )
+if ( test -r ""$i/$ruby"" )
 then
-	eval "RUBY=\"$i/ruby\""
+	eval "RUBY=\"$i/$ruby\""
 fi
 
-					if ( test -n "$RUBY" )
-					then
-						break
-					fi
-				done
-			fi
-			if ( test -z "$RUBY" -a -n "$CYGWIN" )
-			then
+						if ( test -n "$RUBY" )
+						then
+							break
+						fi
+					done
+				fi
+				if ( test -z "$RUBY" -a -n "$CYGWIN" )
+				then
 
-if ( test -r ""/cygdrive/c/ruby/bin/ruby"" )
+if ( test -r ""/cygdrive/c/ruby/bin/$ruby"" )
 then
-	eval "RUBY=\"/cygdrive/c/ruby/bin/ruby\"; RUBYCYGDRIVEPREFIX=\"/cygdrive/c\""
+	eval "RUBY=\"/cygdrive/c/ruby/bin/$ruby\"; RUBYCYGDRIVEPREFIX=\"/cygdrive/c\""
 fi
 
+				fi
 			fi
-		fi
 
-		if ( test -n "$RUBY" )
-		then
-			HAVE_RUBY="yes"
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$RUBY" )
 			then
-				RUBYLIB="-lruby"
+				HAVE_RUBY="yes"
+				if ( test -n "$CYGWIN" )
+				then
+					RUBYLIB="-lruby"
+				fi
+				break
 			fi
-		else
-			HAVE_RUBY=""
-			{ echo "$as_me:$LINENO: WARNING: The Ruby API will not be built." >&5
+		done
+	fi
+
+	if ( test -z "$HAVE_RUBY" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: The Ruby API will not be built." >&5
 echo "$as_me: WARNING: The Ruby API will not be built." >&2;}
-		fi
 	fi
 
 
@@ -46875,7 +46936,6 @@ then
 	HAVE_JAVA=""
 	JAVAC=""
 	JAVAINCLUDES=""
-	JAVALIB=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -46886,12 +46946,18 @@ then
 
 		if ( test -z "$JAVAPATH" )
 		then
-			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /cygdrive/c/jdk* /cygdrive/c/j2sdk* 2>/dev/null`
+			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /cygdrive/c/jdk* /cygdrive/c/j2sdk* 2>/dev/null /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK`
 			do
 				if ( test -z "$JAVAPATH" )
 				then
 
 if ( test -r ""$i/include/jni.h"" )
+then
+	eval "JAVAPATH=\"$i\""
+fi
+
+
+if ( test -r ""$i/Headers/jni.h"" )
 then
 	eval "JAVAPATH=\"$i\""
 fi
@@ -46911,14 +46977,26 @@ then
 fi
 
 
+if ( test -r ""$JAVAPATH/Commands/javac$EXE"" )
+then
+	eval "JAVAC=\"$JAVAPATH/Commands/javac$EXE\""
+fi
+
+
 if ( test -r ""$JAVAPATH/include/jni.h"" )
 then
 	eval "JAVAINCLUDES=\"-I$JAVAPATH/include\""
 fi
 
+
+if ( test -r ""$JAVAPATH/Headers/jni.h"" )
+then
+	eval "JAVAINCLUDES=\"-I$JAVAPATH/Headers\""
+fi
+
 			if ( test -n "$JAVAINCLUDES" )
 			then
-				for i in `ls -d $JAVAPATH/include/*`
+				for i in `ls -d $JAVAPATH/include/* $JAVAPATH/Headers/* 2> /dev/null`
 				do
 					if ( test -d "$i" )
 					then
@@ -46938,24 +47016,11 @@ echo "$as_me: WARNING: The Java API will not be built." >&2;}
 		fi
 	fi
 
-	if ( test -n "$CYGWIN" )
-	then
-		JAVAINCLUDES="$JAVAINCLUDES -I$JAVAPATH/include/win32"
-		JAVALIB="-L$JAVAPATH/lib -ljni"
-	fi
-
 
 if ( test -n "$JAVAINCLUDES" )
 then
 	echo "java includes... $JAVAINCLUDES"
 fi
-
-
-if ( test -n "$JAVALIB" )
-then
-	echo "java libs... $JAVALIB"
-fi
-
 
 
 
@@ -51490,7 +51555,6 @@ s,@RUBYLIB@,$RUBYLIB,;t t
 s,@HAVE_JAVA@,$HAVE_JAVA,;t t
 s,@JAVAC@,$JAVAC,;t t
 s,@JAVAINCLUDES@,$JAVAINCLUDES,;t t
-s,@JAVALIB@,$JAVALIB,;t t
 s,@HAVE_TCL@,$HAVE_TCL,;t t
 s,@TCLINCLUDE@,$TCLINCLUDE,;t t
 s,@TCLLIB@,$TCLLIB,;t t

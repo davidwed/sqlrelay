@@ -1,9 +1,3 @@
-configure didn't find ruby on freebsd 5.3
-python dll doesn't get built under cygwin
-perl on redhat 5.2, 6.2, 7.3 wants const char * in the typemap file
-can't find python on Mac OS 10.3
-
-
 need a "relay ping" method that tries to connect to the SQL Relay server and
 	returns true/false if that was possible or not
 

@@ -123,7 +123,7 @@ fi
 
 for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks" 
 do
-	if ( test -n "$paths" )
+	if ( test -n "$paths" -a -d "$paths" )
 	then
 
 		if ( test "$paths" = "/" )
@@ -607,7 +607,7 @@ else
 
 	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/usr/sfw" "/usr/pkg" "/sw" "/usr/local/firstworks"
 	do
-		if ( test -n "$i" )
+		if ( test -n "$i" -a -d "$i" )
 		then
 			RUDIMENTSCONFIG="$i/bin/rudiments-config"
 			if ( test -r "$RUDIMENTSCONFIG" )
@@ -937,11 +937,14 @@ then
 		then
 			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/sw/bin"
 			do
-				MYSQLINCLUDES=`$i/mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
-				MYSQLLIBS=`$i/mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
-				if ( test -n "$MYSQLLIBS" )
+				if ( test -d "$i" )
 				then
-					break
+					MYSQLINCLUDES=`$i/mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
+					MYSQLLIBS=`$i/mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
+					if ( test -n "$MYSQLLIBS" )
+					then
+						break
+					fi
 				fi
 			done
 		fi
@@ -1083,7 +1086,7 @@ then
 		
 		for i in "$MSQLPATH" "/usr/local/Hughes"
 		do
-			if ( test -n "$i" )
+			if ( test -n "$i" -a -d "$i" )
 			then
 				FW_CHECK_HEADER_LIB([$i/include/msql.h],[MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\"],[$i/lib/libmsql.$SOSUFFIX],[MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\"],[$i/lib/libmsql.a],[MSQLLIBS=\"-L$i/lib -lmsql\"])
 				if ( test -n "$MSQLLIBS" )
@@ -1896,6 +1899,11 @@ then
 				FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 			fi
 		fi
+
+		if ( test -z "$INTERBASELIBS" -a -z "$CYGWIN" )
+		then
+			FW_CHECK_HEADER_LIB([/Library/Frameworks/Firebird.framework/Versions/Current/Headers/ibase.h],[INTERBASEINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\"],[/Library/Frameworks/Firebird.framework/Versions/Current/Firebird],[INTERBASELIBSPATH=\"/Library/Frameworks/Firebird.framework/Versions/Current\"; INTERBASELIBS=\"/Library/Frameworks/Firebird.framework/Versions/Current/Firebird\"],[],[])
+		fi
 		
 		LINKFAIL=""
 		if ( test -n "$DLLIB" -a -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
@@ -2044,11 +2052,14 @@ then
 			then
 				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
 				do
-					FW_CHECK_FILE("$i/perl5",[PERL=\"$i/perl5\"])
-					FW_CHECK_FILE("$i/perl",[PERL=\"$i/perl\"])
-					if ( test -n "$PERL" )
+					if ( test -d "$i" )
 					then
-						break
+						FW_CHECK_FILE("$i/perl5",[PERL=\"$i/perl5\"])
+						FW_CHECK_FILE("$i/perl",[PERL=\"$i/perl\"])
+						if ( test -n "$PERL" )
+						then
+							break
+						fi
 					fi
 				done
 			fi
@@ -2148,20 +2159,20 @@ then
 		
 			for j in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
 			do
-				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/sw/include/python$j"
+				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j"
 				do
 					if ( test -d "$i" )
 					then
 						PYTHONINCLUDES="-I$i"
-					fi
-					if ( test -n "$PYTHONINCLUDES" )
-					then
-						PYTHONVERSION=`echo $j | sed -e "s|\.||"`
-						break
+						if ( test -n "$PYTHONINCLUDES" )
+						then
+							PYTHONVERSION=`echo $j | sed -e "s|\.||"`
+							break
+						fi
 					fi
 				done
 			
-				for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j"
+				for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j"
 				do
 					if ( test -d "$i/config" )
 					then
@@ -2172,10 +2183,10 @@ then
 						else
 							PYTHONDIR="$i"
 						fi
-					fi
-					if ( test -n "$PYTHONDIR" )
-					then
-						break
+						if ( test -n "$PYTHONDIR" )
+						then
+							break
+						fi
 					fi
 				done
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
@@ -2314,39 +2325,51 @@ then
 
 	else
 	
-		if ( test -n "$RUBYPATH" )
-		then
-			FW_CHECK_FILE("$RUBYPATH/bin/ruby",[RUBY=\"$RUBYPATH/bin/ruby\"])
-		else
-			AC_CHECK_PROG(RUBY,"ruby","ruby")
-			if ( test -z "$RUBY" )
-			then
-				for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
-				do
-					FW_CHECK_FILE("$i/ruby",[RUBY=\"$i/ruby\"])
-					if ( test -n "$RUBY" )
-					then
-						break
-					fi
-				done
-			fi
-			if ( test -z "$RUBY" -a -n "$CYGWIN" )
-			then
-				FW_CHECK_FILE("/cygdrive/c/ruby/bin/ruby",[RUBY=\"/cygdrive/c/ruby/bin/ruby\"; RUBYCYGDRIVEPREFIX=\"/cygdrive/c\"])
-			fi
-		fi
-		
-		if ( test -n "$RUBY" )
-		then
-			HAVE_RUBY="yes"
-			if ( test -n "$CYGWIN" )
-			then
-				RUBYLIB="-lruby"
-			fi
-		else
+		for ruby in "ruby" "ruby16" "ruby18"
+		do
+
 			HAVE_RUBY=""
-			AC_MSG_WARN(The Ruby API will not be built.)
-		fi
+			RUBY=""
+			RUBYCYGDRIVEPREFIX=""
+			RUBYLIB=""
+
+			if ( test -n "$RUBYPATH" )
+			then
+				FW_CHECK_FILE("$RUBYPATH/bin/$ruby",[RUBY=\"$RUBYPATH/bin/$ruby\"])
+			else
+				AC_CHECK_PROG(RUBY,"$ruby","$ruby")
+				if ( test -z "$RUBY" )
+				then
+					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
+					do
+						FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
+						if ( test -n "$RUBY" )
+						then
+							break
+						fi
+					done
+				fi
+				if ( test -z "$RUBY" -a -n "$CYGWIN" )
+				then
+					FW_CHECK_FILE("/cygdrive/c/ruby/bin/$ruby",[RUBY=\"/cygdrive/c/ruby/bin/$ruby\"; RUBYCYGDRIVEPREFIX=\"/cygdrive/c\"])
+				fi
+			fi
+
+			if ( test -n "$RUBY" )
+			then
+				HAVE_RUBY="yes"
+				if ( test -n "$CYGWIN" )
+				then
+					RUBYLIB="-lruby"
+				fi
+				break
+			fi
+		done
+	fi
+
+	if ( test -z "$HAVE_RUBY" )
+	then
+		AC_MSG_WARN(The Ruby API will not be built.)
 	fi
 
 	AC_SUBST(HAVE_RUBY)
@@ -2366,7 +2389,6 @@ then
 	HAVE_JAVA=""
 	JAVAC=""
 	JAVAINCLUDES=""
-	JAVALIB=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -2378,11 +2400,12 @@ then
 		
 		if ( test -z "$JAVAPATH" )
 		then
-			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /cygdrive/c/jdk* /cygdrive/c/j2sdk* 2>/dev/null`
+			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /cygdrive/c/jdk* /cygdrive/c/j2sdk* 2>/dev/null /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK`
 			do
 				if ( test -z "$JAVAPATH" )
 				then
 					FW_CHECK_FILE("$i/include/jni.h",[JAVAPATH=\"$i\"])
+					FW_CHECK_FILE("$i/Headers/jni.h",[JAVAPATH=\"$i\"])
 				else
 					break
 				fi
@@ -2392,10 +2415,12 @@ then
 		if ( test -n "$JAVAPATH" )
 		then
 			FW_CHECK_FILE("$JAVAPATH/bin/javac$EXE",[JAVAC=\"$JAVAPATH/bin/javac$EXE\"])
+			FW_CHECK_FILE("$JAVAPATH/Commands/javac$EXE",[JAVAC=\"$JAVAPATH/Commands/javac$EXE\"])
 			FW_CHECK_FILE("$JAVAPATH/include/jni.h",[JAVAINCLUDES=\"-I$JAVAPATH/include\"])
+			FW_CHECK_FILE("$JAVAPATH/Headers/jni.h",[JAVAINCLUDES=\"-I$JAVAPATH/Headers\"])
 			if ( test -n "$JAVAINCLUDES" )
 			then
-				for i in `ls -d $JAVAPATH/include/*`
+				for i in `ls -d $JAVAPATH/include/* $JAVAPATH/Headers/* 2> /dev/null`
 				do
 					if ( test -d "$i" )
 					then
@@ -2414,19 +2439,11 @@ then
 		fi
 	fi
 
-	if ( test -n "$CYGWIN" )
-	then
-		JAVAINCLUDES="$JAVAINCLUDES -I$JAVAPATH/include/win32"
-		JAVALIB="-L$JAVAPATH/lib -ljni"
-	fi
-
 	FW_INCLUDES(java,[$JAVAINCLUDES])
-	FW_LIBS(java,[$JAVALIB])
 		
 	AC_SUBST(HAVE_JAVA)
 	AC_SUBST(JAVAC)
 	AC_SUBST(JAVAINCLUDES)
-	AC_SUBST(JAVALIB)
 fi
 ])
 

@@ -785,7 +785,7 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 		// For inet clients, make sure that the ip address is
 		// not denied.  If the ip was denied, disconnect the
 		// socket and loop back.
-		if (denied && deniedIp()) {
+		if (denied && deniedIp(clientsock)) {
 			delete clientsock;
 			return true;
 		}
@@ -973,14 +973,14 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 	return retval;
 }
 
-bool sqlrlistener::deniedIp() {
+bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"checking for valid ip...");
 	#endif
 
-	char	*ip;
-	if ((ip=clientsockin->getClientAddress()) && denied->match(ip) && 
+	char	*ip=clientsock->getPeerAddress();
+	if (ip && denied->match(ip) && 
 			(!allowed || (allowed && !allowed->match(ip)))) {
 
 		#ifdef SERVER_DEBUG

@@ -45,6 +45,8 @@
 	uses rudiments error class
 	added /sw to configure script's search paths
 	added -Wno-long-double if system supports it
+	several macosx-related configure script changes
+	fixed denied/allowed ip's
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch
