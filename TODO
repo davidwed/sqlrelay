@@ -1,3 +1,7 @@
+apparantly freetds 0.61 defines it's functions
+postgresql test program compile fails on SCO
+can't find pthreads lib on SCO
+
 compatibility:
 	sybase 12.5
 	interbase 6.5

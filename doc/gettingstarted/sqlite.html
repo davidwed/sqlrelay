@@ -20,7 +20,7 @@
 <span class="heading1">Installation</span><br>
 
 <p>I've successfully installed SQLite on Linux, FreeBSD, NetBSD, OpenBSD, SCO
-OpenServer and Solaris.  On all platforms, I've had to compile it from 
+OpenServer and Solaris.  On most platforms, I've had to compile it from 
 source.  SQLite is available from the 
 <a href="http://www.hwaci.com/sw/sqlite/">SQLite home page</a>.  I usually give 
 the <i>configure</i> script the <i>--prefix=/usr/local/sqlite</i> parameter so 
@@ -43,6 +43,18 @@ generates, search for a line like:</p>
 </blockquote>
 
 <p>Compiling sqlite with this modification will make it work.</p>
+
+<span class="heading2">RPM Based Linux</span><br>
+
+<p>To install SQLite on an RPM-based Linux distribution like RedHat, 
+Mandrake or TurboLinux, acquire the sqlite RPM from the
+<a href="http://www.hwaci.com/sw/sqlite/">SQLite home page</a> and install it
+using <i>rpm -i</i>.</p>
+
+<span class="heading2">Slackware Linux</span><br>
+
+<p>The sqlite package is (or at least was once) available from 
+<a href="http://www.infa.abo.fi/~patrik/slackpacks/">http://www.infa.abo.fi/~patrik/slackpacks/</a>.  You can install it using <i>installpkg</i>.</p>
 
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>

@@ -70,3 +70,10 @@ unconfig: clean
 	$(RM) libtool
 
 distclean: unconfig
+
+tgz: all
+	mkdir /tmp/sqlrelay-$(SQLR_VERSION)
+	make prefix=/tmp/sqlrelay-$(SQLR_VERSION)/$(prefix) install
+	cd /tmp/sqlrelay-$(SQLR_VERSION); makepkg sqlrelay-$(SQLR_VERSION).tgz
+	mv /tmp/sqlrelay-$(SQLR_VERSION)/sqlrelay-$(SQLR_VERSION).tgz $(PWD)
+	$(RMTREE) /tmp/sqlrelay-$(SQLR_VERSION)
