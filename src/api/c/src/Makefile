@@ -17,7 +17,8 @@ PLOBJS = sqlrclientwrapper.p.lo
 .C.p.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrclientwrapper.la libsqlrclientwrapper_p.la
+#all: libsqlrclientwrapper.la libsqlrclientwrapper_p.la
+all: libsqlrclientwrapper.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -35,7 +36,7 @@ libsqlrclientwrapper_p.la: $(SRCS) $(PLOBJS)
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
-	$(LIBTOOL) --mode=install $(INSTALL) libsqlrclientwrapper_p.la $(libdir)/libsqlrclientwrapper_p.la
+	#$(LIBTOOL) --mode=install $(INSTALL) libsqlrclientwrapper_p.la $(libdir)/libsqlrclientwrapper_p.la
 	$(abs_srcdir)/mkinstalldirs $(cachedir)
 	chmod 777 $(cachedir)
 

@@ -19,7 +19,8 @@ PLOBJS= configfile.p.lo gtkfe.p.lo
 .C.p.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-config-gtk sqlr-config-gtk-debug
+#all: sqlr-config-gtk sqlr-config-gtk-debug
+all: sqlr-config-gtk
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-config-gtk
@@ -40,7 +41,7 @@ sqlr-config-gtk-debug: $(SRCS) $(PLOBJS)
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-config-gtk $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) sqlr-config-gtk-debug $(bindir)
+	#$(LIBTOOL) --mode=install $(INSTALL) sqlr-config-gtk-debug $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-config-gtk

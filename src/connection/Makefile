@@ -181,7 +181,8 @@ PLOBJS = sqlrconnection/constructor.p.lo \
 .C.p.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrconnection.la libsqlrconnection_p.la
+#all: libsqlrconnection.la libsqlrconnection_p.la
+all: libsqlrconnection.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -202,7 +203,7 @@ libsqlrconnection_p.la: $(SRCS) $(PLOBJS)
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrconnection.la $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) libsqlrconnection_p.la $(libdir)
+	#$(LIBTOOL) --mode=install $(INSTALL) libsqlrconnection_p.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

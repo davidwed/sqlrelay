@@ -18,7 +18,8 @@ PLOBJS = scaler.p.lo main.p.lo
 .C.p.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-scaler sqlr-scaler-debug
+#all: sqlr-scaler sqlr-scaler-debug
+all: sqlr-scaler
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-scaler
@@ -37,7 +38,7 @@ sqlr-scaler-debug: $(SRCS) $(PLOBJS)
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-scaler $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) sqlr-scaler-debug $(bindir)
+	#$(LIBTOOL) --mode=install $(INSTALL) sqlr-scaler-debug $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler

@@ -14,7 +14,8 @@ DEBUGLIBS = $(abs_srcdir)/src/util/libsqlrutil_p.la $(abs_srcdir)/src/api/c++/sr
 .C.p.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: query query-debug fields fields-debug sqlrsh sqlrsh-debug
+#all: query query-debug fields fields-debug sqlrsh sqlrsh-debug
+all: query fields sqlrsh
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
@@ -49,11 +50,11 @@ sqlrsh-debug: sqlrsh.C sqlrsh.p.lo
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s query $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) query-debug $(bindir)
+	#$(LIBTOOL) --mode=install $(INSTALL) query-debug $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s fields $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) fields-debug $(bindir)
+	#$(LIBTOOL) --mode=install $(INSTALL) fields-debug $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s sqlrsh $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) sqlrsh-debug $(bindir)
+	#$(LIBTOOL) --mode=install $(INSTALL) sqlrsh-debug $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query

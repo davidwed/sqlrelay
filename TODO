@@ -1,8 +1,3 @@
-RPM build errors:
-    Installed (but unpackaged) file(s) found:
-   /usr/lib/perl5/site_perl/5.8.0/i386-linux-thread-multi/perllocal.pod
-	(should I do a vendor install???)
-
 perl api's don't get installed right when building a slackware package
 if all space is used up in a filesystem, SQL Relay stops working
 zero-cursor bug

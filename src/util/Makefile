@@ -16,7 +16,8 @@ PLOBJS = cmdline.p.lo debugfile.p.lo tempdir.p.lo sqlrconfigfile.p.lo authentica
 .C.p.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrutil.la libsqlrutil_p.la
+#all: libsqlrutil.la libsqlrutil_p.la
+all: libsqlrutil.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -34,7 +35,7 @@ libsqlrutil_p.la: $(SRCS) $(PLOBJS)
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrutil.la $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) libsqlrutil_p.la $(libdir)
+	#$(LIBTOOL) --mode=install $(INSTALL) libsqlrutil_p.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

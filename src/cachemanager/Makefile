@@ -18,11 +18,12 @@ PLOBJS = cachemanager.p.lo main.p.lo
 .C.p.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-cachemanager sqlr-cachemanager-debug
+#all: sqlr-cachemanager sqlr-cachemanager-debug
+all: sqlr-cachemanager
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-cachemanager
-	$(LIBTOOL) --mode=clean $(RM) sqlr-cachemanager-debug
+	#$(LIBTOOL) --mode=clean $(RM) sqlr-cachemanager-debug
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 
@@ -37,7 +38,7 @@ sqlr-cachemanager-debug: $(SRCS) $(PLOBJS)
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-cachemanager $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) sqlr-cachemanager-debug $(bindir)
+	#$(LIBTOOL) --mode=install $(INSTALL) sqlr-cachemanager-debug $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-cachemanager

@@ -18,7 +18,8 @@ PLOBJS = main.p.lo
 .C.p.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-start sqlr-start-debug
+#all: sqlr-start sqlr-start-debug
+all: sqlr-start
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-start
@@ -37,7 +38,7 @@ sqlr-start-debug: $(SRCS) $(PLOBJS)
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-start $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) sqlr-start-debug $(bindir)
+	#$(LIBTOOL) --mode=install $(INSTALL) sqlr-start-debug $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-start
