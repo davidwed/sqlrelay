@@ -12,8 +12,18 @@
 
 #include <datatypes.h>
 
+#ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
+postgresqlconnection::postgresqlconnection() {
+	devnull=-1;
+}
+
+postgresqlconnection::~postgresqlconnection() {
+	close(devnull);
+}
+#else
 static void	nullNoticeProcessor(void *arg, const char *message) {
 }
+#endif
 
 int	postgresqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
@@ -56,8 +66,15 @@ int	postgresqlconnection::logIn() {
 		return 0;
 	}
 
+#ifdef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	// make sure that no messages get sent to the console
 	PQsetNoticeProcessor(pgconn,nullNoticeProcessor,NULL);
+#else
+	if ((devnull=open("/dev/null",O_RDONLY))>0) {
+		dup2(devnull,STDOUT_FILENO);
+		dup2(devnull,STDERR_FILENO);
+	}
+#endif
 
 	// get the datatypes
 	if (typemangling==2) {
@@ -94,6 +111,11 @@ void	postgresqlconnection::deleteCursor(sqlrcursor *curs) {
 }
 
 void	postgresqlconnection::logOut() {
+
+#ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
+	close(devnull);
+	devnull=-1;
+#endif
 
 	PQfinish(pgconn);
 
@@ -284,9 +306,11 @@ void	postgresqlcursor::returnColumnInfo() {
 		// send column definition
 		name=PQfname(pgresult,i);
 		size=PQfsize(pgresult,i);
+#ifdef HAVE_POSTGRESQL_PQFMOD
 		if (size<0) {
 			size=PQfmod(pgresult,i);
 		}
+#endif
 		if (size<0) {
 			size=0;
 		}

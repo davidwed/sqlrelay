@@ -864,6 +864,16 @@ then
 		fi
 	fi
 
+	if ( test -n "$POSTGRESQLLIBS" )
+	then
+		AC_MSG_CHECKING(if PostgreSQL has PQfmod)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQfmod(NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQFMOD,1,Some versions of postgresql have PQfmod)],[AC_MSG_RESULT(no)])
+		AC_MSG_CHECKING(if PostgreSQL has PQsetNoticeProcessor)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQsetNoticeProcessor(NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR,1,Some versions of postgresql have PQsetNoticeProcessor)],[AC_MSG_RESULT(no)])
+	fi
+
 	FW_INCLUDES(postgresql,[$POSTGRESQLINCLUDES])
 	FW_LIBS(postgresql,[$POSTGRESQLLIBS])
 		

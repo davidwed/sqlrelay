@@ -69,6 +69,14 @@ class postgresqlconnection : public sqlrconnection {
 		char	*tty;
 		char	*db;
 		int	typemangling;
+
+#ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
+	public:
+			postgresqlconnection();
+			~postgresqlconnection();
+	private:
+		int	devnull;
+#endif
 };
 
 #endif

@@ -40,6 +40,12 @@
 /* Oracle 8i or greater */
 #undef HAVE_ORACLE_8i
 
+/* Some versions of postgresql have PQfmod */
+#undef HAVE_POSTGRESQL_PQFMOD
+
+/* Some versions of postgresql have PQsetNoticeProcessor */
+#undef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
+
 /* Define to 1 if you have the `putenv' function. */
 #undef HAVE_PUTENV
 
