@@ -200,9 +200,11 @@ void	gtkfe::buildMainWindow() {
 	gtk_window_set_title(GTK_WINDOW(window),"SQL Relay");
 
 	gtk_signal_connect(GTK_OBJECT(window),"delete_event",
-				GTK_SIGNAL_FUNC(quit),NULL);
+				GTK_SIGNAL_FUNC(quit),
+				(gpointer)NULL);
 	gtk_signal_connect(GTK_OBJECT(window),"destroy",
-				GTK_SIGNAL_FUNC(quit),NULL);
+				GTK_SIGNAL_FUNC(quit),
+				(gpointer)NULL);
 
 
 	// vertical box
@@ -223,25 +225,31 @@ void	gtkfe::buildMenuBar() {
 	filemenu=gtk_menu_new();
 	newitem=gtk_menu_item_new_with_label("New");
 	gtk_signal_connect(GTK_OBJECT(newitem),"activate",
-				GTK_SIGNAL_FUNC(newFile),NULL);
+				GTK_SIGNAL_FUNC(newFile),
+				(gpointer)NULL);
 	openitem=gtk_menu_item_new_with_label("Open...");
 	gtk_signal_connect(GTK_OBJECT(openitem),"activate",
-				GTK_SIGNAL_FUNC(openFile),NULL);
+				GTK_SIGNAL_FUNC(openFile),
+				(gpointer)NULL);
 	closeitem=gtk_menu_item_new_with_label("Close");
 	gtk_widget_set_sensitive(closeitem,FALSE);
 	gtk_signal_connect(GTK_OBJECT(closeitem),"activate",
-				GTK_SIGNAL_FUNC(closeFile),NULL);
+				GTK_SIGNAL_FUNC(closeFile),
+				(gpointer)NULL);
 	saveitem=gtk_menu_item_new_with_label("Save");
 	gtk_widget_set_sensitive(saveitem,FALSE);
 	gtk_signal_connect(GTK_OBJECT(saveitem),"activate",
-				GTK_SIGNAL_FUNC(saveFile),NULL);
+				GTK_SIGNAL_FUNC(saveFile),
+				(gpointer)NULL);
 	saveasitem=gtk_menu_item_new_with_label("Save As...");
 	gtk_widget_set_sensitive(saveasitem,FALSE);
 	gtk_signal_connect(GTK_OBJECT(saveasitem),"activate",
-				GTK_SIGNAL_FUNC(saveFileAs),NULL);
+				GTK_SIGNAL_FUNC(saveFileAs),
+				(gpointer)NULL);
 	quititem=gtk_menu_item_new_with_label("Quit");
 	gtk_signal_connect(GTK_OBJECT(quititem),"activate",
-				GTK_SIGNAL_FUNC(quit),NULL);
+				GTK_SIGNAL_FUNC(quit),
+				(gpointer)NULL);
 
 	gtk_menu_append(GTK_MENU(filemenu),newitem);
 	gtk_menu_append(GTK_MENU(filemenu),openitem);
@@ -281,7 +289,8 @@ void	gtkfe::buildInstanceList() {
 	gtk_widget_show(instancelistvbox);
 
 	// instance list scrolling window
-	instancelistscroll=gtk_scrolled_window_new(NULL,NULL);
+	instancelistscroll=gtk_scrolled_window_new((GtkAdjustment *)NULL,
+							(GtkAdjustment *)NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(instancelistscroll),
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
@@ -292,7 +301,8 @@ void	gtkfe::buildInstanceList() {
 	// instance list
 	instancelist=gtk_clist_new(1);
 	gtk_signal_connect(GTK_OBJECT(instancelist),"select_row",
-				GTK_SIGNAL_FUNC(instanceListSelect),NULL);
+				GTK_SIGNAL_FUNC(instanceListSelect),
+				(gpointer)NULL);
 	gtk_clist_set_column_title(GTK_CLIST(instancelist),0,"Instances");
 	gtk_clist_column_titles_passive(GTK_CLIST(instancelist));
 	gtk_clist_column_titles_show(GTK_CLIST(instancelist));
@@ -307,14 +317,16 @@ void	gtkfe::buildInstanceList() {
 	gtk_box_pack_start(GTK_BOX(instancelistvbox),
 				newinstancebutton,FALSE,FALSE,0);
 	gtk_signal_connect(GTK_OBJECT(newinstancebutton),"clicked",
-				GTK_SIGNAL_FUNC(newInstance),NULL);
+				GTK_SIGNAL_FUNC(newInstance),
+				(gpointer)NULL);
 	gtk_widget_show(newinstancebutton);
 
 	deleteinstancebutton=gtk_button_new_with_label("Delete");
 	gtk_box_pack_start(GTK_BOX(instancelistvbox),
 				deleteinstancebutton,FALSE,FALSE,0);
 	gtk_signal_connect(GTK_OBJECT(deleteinstancebutton),"clicked",
-				GTK_SIGNAL_FUNC(deleteInstance),NULL);
+				GTK_SIGNAL_FUNC(deleteInstance),
+				(gpointer)NULL);
 	gtk_widget_set_sensitive(deleteinstancebutton,FALSE);
 	gtk_widget_show(deleteinstancebutton);
 }
@@ -341,14 +353,16 @@ void	gtkfe::buildNotebookFrame() {
 	// instance buttons
 	saveinstancebutton=gtk_button_new_with_label("Save");
 	gtk_signal_connect(GTK_OBJECT(saveinstancebutton),"clicked",
-				GTK_SIGNAL_FUNC(instanceParametersSave),NULL);
+				GTK_SIGNAL_FUNC(instanceParametersSave),
+				(gpointer)NULL);
 	gtk_widget_show(saveinstancebutton);
 	gtk_box_pack_start(GTK_BOX(instancebuttonhbox),
 				saveinstancebutton,TRUE,FALSE,0);
 
 	cancelinstancebutton=gtk_button_new_with_label("Cancel");
 	gtk_signal_connect(GTK_OBJECT(cancelinstancebutton),"clicked",
-				GTK_SIGNAL_FUNC(instanceParametersCancel),NULL);
+				GTK_SIGNAL_FUNC(instanceParametersCancel),
+				(gpointer)NULL);
 	gtk_widget_show(cancelinstancebutton);
 	gtk_box_pack_start(GTK_BOX(instancebuttonhbox),
 				cancelinstancebutton,TRUE,FALSE,0);
@@ -364,7 +378,7 @@ void	gtkfe::buildInstancePage() {
 	gtk_widget_show(propertiestab);
 
 	// properties frame
-	propertiesframe=gtk_frame_new(NULL);
+	propertiesframe=gtk_frame_new((gchar *)NULL);
 	gtk_widget_show(propertiesframe);
 
 	// properties vertical box
@@ -565,9 +579,11 @@ void	gtkfe::buildInstancePage() {
 	gtk_table_attach_defaults(GTK_TABLE(propertiestable),ttlentry,
 					1,3,8,9);
 
-	commitbutton=gtk_radio_button_new_with_label(NULL,"commit");
+	commitbutton=gtk_radio_button_new_with_label((GSList *)NULL,
+							"commit");
 	gtk_signal_connect(GTK_OBJECT(commitbutton),"clicked",
-				GTK_SIGNAL_FUNC(toggleCommit),NULL);
+				GTK_SIGNAL_FUNC(toggleCommit),
+				(gpointer)NULL);
 	gtk_widget_show(commitbutton);
 	gtk_table_attach_defaults(GTK_TABLE(propertiestable),commitbutton,
 					1,2,9,10);
@@ -674,7 +690,7 @@ void	gtkfe::buildConnectionsPage() {
 	gtk_widget_show(connectionstab);
 
 	// connections frame
-	connectionsframe=gtk_frame_new(NULL);
+	connectionsframe=gtk_frame_new((gchar *)NULL);
 	gtk_widget_show(connectionsframe);
 
 	// connections horizontal box
@@ -689,7 +705,8 @@ void	gtkfe::buildConnectionsPage() {
 	gtk_widget_show(connectionlistvbox);
 
 	// connection list scrolling window
-	connectionlistscroll=gtk_scrolled_window_new(NULL,NULL);
+	connectionlistscroll=gtk_scrolled_window_new((GtkAdjustment *)NULL,
+							(GtkAdjustment *)NULL);
 	gtk_scrolled_window_set_policy(
 				GTK_SCROLLED_WINDOW(connectionlistscroll),
 				GTK_POLICY_AUTOMATIC,
@@ -701,7 +718,8 @@ void	gtkfe::buildConnectionsPage() {
 	// connection list
 	connectionlist=gtk_clist_new(1);
 	gtk_signal_connect(GTK_OBJECT(connectionlist),"select_row",
-				GTK_SIGNAL_FUNC(connectionListSelect),NULL);
+				GTK_SIGNAL_FUNC(connectionListSelect),
+				(gpointer)NULL);
 	gtk_clist_set_column_title(GTK_CLIST(connectionlist),0,"Connections");
 	gtk_clist_column_titles_passive(GTK_CLIST(connectionlist));
 	gtk_clist_column_titles_show(GTK_CLIST(connectionlist));
@@ -716,14 +734,16 @@ void	gtkfe::buildConnectionsPage() {
 	gtk_box_pack_start(GTK_BOX(connectionlistvbox),
 				newconnectionbutton,FALSE,FALSE,0);
 	gtk_signal_connect(GTK_OBJECT(newconnectionbutton),"clicked",
-				GTK_SIGNAL_FUNC(newConnection),NULL);
+				GTK_SIGNAL_FUNC(newConnection),
+				(gpointer)NULL);
 	gtk_widget_show(newconnectionbutton);
 
 	deleteconnectionbutton=gtk_button_new_with_label("Delete");
 	gtk_box_pack_start(GTK_BOX(connectionlistvbox),
 				deleteconnectionbutton,FALSE,FALSE,0);
 	gtk_signal_connect(GTK_OBJECT(deleteconnectionbutton),"clicked",
-				GTK_SIGNAL_FUNC(deleteConnection),NULL);
+				GTK_SIGNAL_FUNC(deleteConnection),
+				(gpointer)NULL);
 	gtk_widget_set_sensitive(deleteconnectionbutton,FALSE);
 	gtk_widget_show(deleteconnectionbutton);
 
@@ -789,13 +809,15 @@ void	gtkfe::buildConnectionsPage() {
 	// connection buttons
 	saveconnectionbutton=gtk_button_new_with_label("Save");
 	gtk_signal_connect(GTK_OBJECT(saveconnectionbutton),"clicked",
-			GTK_SIGNAL_FUNC(connectionParametersSave),NULL);
+			GTK_SIGNAL_FUNC(connectionParametersSave),
+			(gpointer)NULL);
 	gtk_widget_show(saveconnectionbutton);
 	gtk_box_pack_start(GTK_BOX(connectionbuttonhbox),
 				saveconnectionbutton,TRUE,FALSE,0);
 	cancelconnectionbutton=gtk_button_new_with_label("Cancel");
 	gtk_signal_connect(GTK_OBJECT(cancelconnectionbutton),"clicked",
-			GTK_SIGNAL_FUNC(connectionParametersCancel),NULL);
+			GTK_SIGNAL_FUNC(connectionParametersCancel),
+			(gpointer)NULL);
 	gtk_widget_show(cancelconnectionbutton);
 	gtk_box_pack_start(GTK_BOX(connectionbuttonhbox),
 				cancelconnectionbutton,TRUE,FALSE,0);
@@ -812,7 +834,7 @@ void	gtkfe::buildUsersPage() {
 	gtk_widget_show(userstab);
 
 	// users frame
-	usersframe=gtk_frame_new(NULL);
+	usersframe=gtk_frame_new((gchar *)NULL);
 	gtk_widget_show(usersframe);
 
 	// users horizontal box
@@ -827,7 +849,8 @@ void	gtkfe::buildUsersPage() {
 	gtk_widget_show(userlistvbox);
 
 	// user list scrolling window
-	userlistscroll=gtk_scrolled_window_new(NULL,NULL);
+	userlistscroll=gtk_scrolled_window_new((GtkAdjustment *)NULL,
+							(GtkAdjustment *)NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(userlistscroll),
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
@@ -837,7 +860,8 @@ void	gtkfe::buildUsersPage() {
 	// user list
 	userlist=gtk_clist_new(1);
 	gtk_signal_connect(GTK_OBJECT(userlist),"select_row",
-				GTK_SIGNAL_FUNC(userListSelect),NULL);
+				GTK_SIGNAL_FUNC(userListSelect),
+				(gpointer)NULL);
 	gtk_clist_set_column_title(GTK_CLIST(userlist),0,"Users");
 	gtk_clist_column_titles_passive(GTK_CLIST(userlist));
 	gtk_clist_column_titles_show(GTK_CLIST(userlist));
@@ -852,14 +876,16 @@ void	gtkfe::buildUsersPage() {
 	gtk_box_pack_start(GTK_BOX(userlistvbox),
 				newuserbutton,FALSE,FALSE,0);
 	gtk_signal_connect(GTK_OBJECT(newuserbutton),"clicked",
-				GTK_SIGNAL_FUNC(newUser),NULL);
+				GTK_SIGNAL_FUNC(newUser),
+				(gpointer)NULL);
 	gtk_widget_show(newuserbutton);
 
 	deleteuserbutton=gtk_button_new_with_label("Delete");
 	gtk_box_pack_start(GTK_BOX(userlistvbox),
 				deleteuserbutton,FALSE,FALSE,0);
 	gtk_signal_connect(GTK_OBJECT(deleteuserbutton),"clicked",
-				GTK_SIGNAL_FUNC(deleteUser),NULL);
+				GTK_SIGNAL_FUNC(deleteUser),
+				(gpointer)NULL);
 	gtk_widget_set_sensitive(deleteuserbutton,FALSE);
 	gtk_widget_show(deleteuserbutton);
 
@@ -914,13 +940,15 @@ void	gtkfe::buildUsersPage() {
 	// user buttons
 	saveuserbutton=gtk_button_new_with_label("Save");
 	gtk_signal_connect(GTK_OBJECT(saveuserbutton),"clicked",
-				GTK_SIGNAL_FUNC(userParametersSave),NULL);
+				GTK_SIGNAL_FUNC(userParametersSave),
+				(gpointer)NULL);
 	gtk_widget_show(saveuserbutton);
 	gtk_box_pack_start(GTK_BOX(userbuttonhbox),
 				saveuserbutton,TRUE,FALSE,0);
 	canceluserbutton=gtk_button_new_with_label("Cancel");
 	gtk_signal_connect(GTK_OBJECT(canceluserbutton),"clicked",
-				GTK_SIGNAL_FUNC(userParametersCancel),NULL);
+				GTK_SIGNAL_FUNC(userParametersCancel),
+				(gpointer)NULL);
 	gtk_widget_show(canceluserbutton);
 	gtk_box_pack_start(GTK_BOX(userbuttonhbox),
 				canceluserbutton,TRUE,FALSE,0);
@@ -1179,10 +1207,12 @@ void	gtkfe::openFile(GtkWidget *widget, gpointer data) {
 	fileselector=gtk_file_selection_new("Open");
 	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(fileselector)->
 				ok_button),"clicked",
-				GTK_SIGNAL_FUNC(openFileOk),NULL);
+				GTK_SIGNAL_FUNC(openFileOk),
+				(gpointer)NULL);
 	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(fileselector)->
 				cancel_button),"clicked",
-				GTK_SIGNAL_FUNC(fileCancel),NULL);
+				GTK_SIGNAL_FUNC(fileCancel),
+				(gpointer)NULL);
 
 	// make the dialog modal
 	gtk_grab_add(fileselector);
@@ -1239,10 +1269,12 @@ void	gtkfe::saveFileAs(GtkWidget *widget, gpointer data) {
 	fileselector=gtk_file_selection_new("Save As...");
 	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(fileselector)->
 				ok_button),"clicked",
-				GTK_SIGNAL_FUNC(saveFileAsOk),NULL);
+				GTK_SIGNAL_FUNC(saveFileAsOk),
+				(gpointer)NULL);
 	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(fileselector)->
 				cancel_button),"clicked",
-				GTK_SIGNAL_FUNC(fileCancel),NULL);
+				GTK_SIGNAL_FUNC(fileCancel),
+				(gpointer)NULL);
 
 	// make the dialog modal
 	gtk_grab_add(fileselector);
@@ -1667,7 +1699,8 @@ void	gtkfe::okDialog(const char *message) {
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(okdialog)->action_area),
 				okdialogbutton,TRUE,TRUE,0);
 	gtk_signal_connect(GTK_OBJECT(okdialogbutton),"clicked",
-					GTK_SIGNAL_FUNC(dialogOk),NULL);
+					GTK_SIGNAL_FUNC(dialogOk),
+					(gpointer)NULL);
 	gtk_widget_show(okdialogbutton);
 
 
