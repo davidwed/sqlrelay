@@ -626,7 +626,7 @@ filedescriptor *sqlrlistener::waitForData() {
 	// wait for data on one of the sockets...
 	// if something bad happened, return an invalid file descriptor
 	if (listener::waitForNonBlockingRead(-1,-1)<1) {
-		return -1;
+		return NULL;
 	}
 
 	// return first file descriptor that had data available or an invalid
@@ -642,6 +642,10 @@ filedescriptor *sqlrlistener::waitForData() {
 }
 
 bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
+
+	if (!fd) {
+		return false;
+	}
 
 	// If something connected to the handoff or derigistration 
 	// socket, it must have been a connection.
