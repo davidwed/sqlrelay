@@ -94,12 +94,13 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcon_ping(con),1);
 	printf("\n");
 
-	// drop existing table
-	sqlrcur_sendQuery(cur,"drop table testtable");
+	// clean up table
+	sqlrcur_sendQuery(cur,"delete from testtable");
+	sqlrcon_commit(con);
 
 	// create a new table
-	printf("CREATE TEMPTABLE: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable (testinteger integer, testsmallint smallint, testdecimal decimal(10,2), testnumeric numeric(10,2), testfloat float, testdouble double precision, testdate date, testtime time, testchar char(50), testvarchar varchar(50), testtimestamp timestamp)"),1);
+	//printf("CREATE TEMPTABLE: \n");
+	//checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable (testinteger integer, testsmallint smallint, testdecimal decimal(10,2), testnumeric numeric(10,2), testfloat float, testdouble double precision, testdate date, testtime time, testchar char(50), testvarchar varchar(50), testtimestamp timestamp)"),1);
 	// blob
 	printf("\n");
 
@@ -728,22 +729,23 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcon_autoCommitOff(con),1);
 	printf("\n");
 
-	// drop existing table
+	// clean up table
 	sqlrcon_commit(con);
-	sqlrcur_sendQuery(cur,"drop table testtable");
+	sqlrcur_sendQuery(cur,"delete from testtable");
+	sqlrcon_commit(con);
 	printf("\n");
 
 	// invalid queries...
 	printf("INVALID QUERIES: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testinteger"),0);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testinteger"),0);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testinteger"),0);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testinteger"),0);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable1 order by testinteger"),0);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable1 order by testinteger"),0);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable1 order by testinteger"),0);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable1 order by testinteger"),0);
 	printf("\n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (1,2,3,4)"),0);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (1,2,3,4)"),0);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (1,2,3,4)"),0);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (1,2,3,4)"),0);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable1 values (1,2,3,4)"),0);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable1 values (1,2,3,4)"),0);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable1 values (1,2,3,4)"),0);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable1 values (1,2,3,4)"),0);
 	printf("\n");
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);

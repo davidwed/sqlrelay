@@ -38,13 +38,13 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	# drop existing table
-	sqlrcur_sendQuery($cur,"drop table testtable");
+	sqlrcur_sendQuery($cur,"delete from testtable");
+	sqlrcon_commit($con);
 
 	# create a new table
-	echo("CREATE TEMPTABLE: \n");
-	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable (testinteger integer, testsmallint smallint, testdecimal decimal(10,2), testnumeric numeric(10,2), testfloat float, testdouble double precision, testdate date, testtime time, testchar char(50), testvarchar varchar(50), testtimestamp timestamp)"),1);
-	# blob
-	echo("\n");
+	#echo("CREATE TEMPTABLE: \n");
+	#checkSuccess(sqlrcur_sendQuery($cur,"create table testtable (testinteger integer, testsmallint smallint, testdecimal decimal(10,2), testnumeric numeric(10,2), testfloat float, testdouble double precision, testdate date, testtime time, testchar char(50), testvarchar varchar(50), testtimestamp timestamp)"),1);
+	#echo("\n");
 
 	echo("INSERT: \n");
 	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (1,1,1.1,1.1,1.1,1.1,'01-JAN-2001','01:00:00','testchar1','testvarchar1',NULL)"),1);
@@ -709,20 +709,21 @@ function checkSuccess($value,$success) {
 
 	# drop existing table
 	sqlrcon_commit($con);
-	sqlrcur_sendQuery($cur,"drop table testtable");
+	sqlrcur_sendQuery($cur,"delete from testtable");
+	sqlrcon_commit($con);
 	echo("\n");
 
 	# invalid queries...
 	echo("INVALID QUERIES: \n");
-	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testinteger"),0);
-	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testinteger"),0);
-	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testinteger"),0);
-	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testinteger"),0);
+	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable1 order by testinteger"),0);
+	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable1 order by testinteger"),0);
+	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable1 order by testinteger"),0);
+	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable1 order by testinteger"),0);
 	echo("\n");
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (1,2,3,4)"),0);
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (1,2,3,4)"),0);
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (1,2,3,4)"),0);
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (1,2,3,4)"),0);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable1 values (1,2,3,4)"),0);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable1 values (1,2,3,4)"),0);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable1 values (1,2,3,4)"),0);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable1 values (1,2,3,4)"),0);
 	echo("\n");
 	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable"),0);
 	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable"),0);

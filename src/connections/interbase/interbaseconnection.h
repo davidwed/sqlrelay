@@ -4,7 +4,7 @@
 #ifndef INTERBASECCONNECTION_H
 #define INTERBASECCONNECTION_H
 
-#define NUM_CONNECT_STRING_VARS 7
+#define NUM_CONNECT_STRING_VARS 6
 
 #include <sqlrconnection.h>
 
@@ -114,11 +114,9 @@ class interbaseconnection : public sqlrconnection {
 		short		dpblength;
 		isc_db_handle	db;
 		isc_tr_handle	tr;
-		isc_tr_handle	ddltr;
 
 		char		*database;
 		int		dialect;
-		int		commitddl;
 
 		char		*iscuserenv;
 		char		*iscpasswordenv;

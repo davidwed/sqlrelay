@@ -68,13 +68,13 @@ checkSuccess($con->ping(),1);
 print("\n");
 
 # drop existing table
-$cur->sendQuery("drop table testtable");
+$cur->sendQuery("delete from testtable");
+$con->commit();
 
 # create a new table
-print("CREATE TEMPTABLE: \n");
-checkSuccess($cur->sendQuery("create table testtable (testinteger integer, testsmallint smallint, testdecimal decimal(10,2), testnumeric numeric(10,2), testfloat float, testdouble double precision, testdate date, testtime time, testchar char(50), testvarchar varchar(50), testtimestamp timestamp)"),1);
-# blob
-print("\n");
+#print("CREATE TEMPTABLE: \n");
+#checkSuccess($cur->sendQuery("create table testtable (testinteger integer, testsmallint smallint, testdecimal decimal(10,2), testnumeric numeric(10,2), testfloat float, testdouble double precision, testdate date, testtime time, testchar char(50), testvarchar varchar(50), testtimestamp timestamp)"),1);
+#print("\n");
 
 print("INSERT: \n");
 checkSuccess($cur->sendQuery("insert into testtable values (1,1,1.1,1.1,1.1,1.1,'01-JAN-2001','01:00:00','testchar1','testvarchar1',NULL)"),1);
@@ -737,20 +737,21 @@ print("\n");
 
 # drop existing table
 $con->commit();
-$cur->sendQuery("drop table testtable");
+$cur->sendQuery("delete from testtable");
+$con->commit();
 print("\n");
 
 # invalid queries...
 print("INVALID QUERIES: \n");
-checkSuccess($cur->sendQuery("select * from testtable order by testinteger"),0);
-checkSuccess($cur->sendQuery("select * from testtable order by testinteger"),0);
-checkSuccess($cur->sendQuery("select * from testtable order by testinteger"),0);
-checkSuccess($cur->sendQuery("select * from testtable order by testinteger"),0);
+checkSuccess($cur->sendQuery("select * from testtable1 order by testinteger"),0);
+checkSuccess($cur->sendQuery("select * from testtable1 order by testinteger"),0);
+checkSuccess($cur->sendQuery("select * from testtable1 order by testinteger"),0);
+checkSuccess($cur->sendQuery("select * from testtable1 order by testinteger"),0);
 print("\n");
-checkSuccess($cur->sendQuery("insert into testtable values (1,2,3,4)"),0);
-checkSuccess($cur->sendQuery("insert into testtable values (1,2,3,4)"),0);
-checkSuccess($cur->sendQuery("insert into testtable values (1,2,3,4)"),0);
-checkSuccess($cur->sendQuery("insert into testtable values (1,2,3,4)"),0);
+checkSuccess($cur->sendQuery("insert into testtable1 values (1,2,3,4)"),0);
+checkSuccess($cur->sendQuery("insert into testtable1 values (1,2,3,4)"),0);
+checkSuccess($cur->sendQuery("insert into testtable1 values (1,2,3,4)"),0);
+checkSuccess($cur->sendQuery("insert into testtable1 values (1,2,3,4)"),0);
 print("\n");
 checkSuccess($cur->sendQuery("create table testtable"),0);
 checkSuccess($cur->sendQuery("create table testtable"),0);

@@ -59,9 +59,6 @@ void	interbaseconnection::handleConnectString() {
 	setPassword(connectStringValue("password"));
 	char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
-
-	// commit ddl immediately or not?
-	commitddl=(!strcasecmp(connectStringValue("commitddl"),"yes"))?1:0;
 }
 
 int	interbaseconnection::logIn() {
@@ -99,20 +96,6 @@ int	interbaseconnection::logIn() {
 	// start a transaction for non-ddl queries
 	if (isc_start_transaction(error,&tr,1,&db,
 				(unsigned short)sizeof(tpb),&tpb)) {
-
-		// print the error message
-		char	msg[512];
-		long	*err=error;
-		while (isc_interprete(msg,&err)) {
-			fprintf(stderr,"%s\n",msg);
-		}
-		fprintf(stderr,"\n");
-		return 0;
-	}
-
-	// start a second transaction for ddl queries
-	if (commitddl && isc_start_transaction(error,&ddltr,1,&db,
-					(unsigned short)sizeof(tpb),&tpb)) {
 
 		// print the error message
 		char	msg[512];
@@ -220,19 +203,10 @@ int	interbasecursor::prepareQuery(const char *query, long length) {
 	while (*qptr==' ' || *qptr=='\n' || *qptr=='	');
 
 	// prepare the cursor using the appropriate transaction
-	if (interbaseconn->commitddl && (!strncasecmp(qptr,"create ",7) ||
-		 		!strncasecmp(qptr,"drop ",5))) {
-		if (isc_dsql_prepare(interbaseconn->error,&interbaseconn->ddltr,
+	if (isc_dsql_prepare(interbaseconn->error,&interbaseconn->tr,
 					&stmt,length,(char *)query,
 					interbaseconn->dialect,outsqlda)) {
-			return 0;
-		}
-	} else {
-		if (isc_dsql_prepare(interbaseconn->error,&interbaseconn->tr,
-					&stmt,length,(char *)query,
-					interbaseconn->dialect,outsqlda)) {
-			return 0;
-		}
+		return 0;
 	}
 
 	// get the cursor type
@@ -498,15 +472,6 @@ int	interbasecursor::executeQuery(const char *query, long length,
 
 	// Execute the query, using the appropriate transaction.  
 	// Commit ddl queries immediately.
-	if (interbaseconn->commitddl && querytype==isc_info_sql_stmt_ddl) {
-		if (!isc_dsql_execute(interbaseconn->error,
-					&interbaseconn->ddltr,
-					&stmt,1,insqlda)) {
-			return !isc_commit_retaining(interbaseconn->error,
-							&interbaseconn->ddltr);
-		}
-		return 0;
-	}
 	return !isc_dsql_execute(interbaseconn->error,&interbaseconn->tr,
 							&stmt,1,insqlda);
 }

@@ -295,7 +295,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,4),20);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,5),12);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,6),22);
-	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,7),4);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,7),5);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,8),10);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,9),8);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,10),19);
@@ -314,7 +314,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testbigint"),20);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testfloat"),12);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testreal"),22);
-	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdecimal"),4);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdecimal"),5);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdate"),10);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtime"),8);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdatetime"),19);

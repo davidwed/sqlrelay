@@ -27,6 +27,7 @@
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
 <li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+<li><a href="#quirks">PostgreSQL Quirks</a></li>
 </ul>
 
 <a name="installation"></a>
@@ -589,6 +590,18 @@ database running on the remote server <i>testhost</i> as the user
 <blockquote>
 <b>sqlr-stop postgresqltest</b>
 </blockquote>
+
+<a name="quirks"></a>
+<span class="heading1">PostgreSQL Quirks</span><br>
+
+<p>PostgreSQL transactions must be explicitly started.  When you log into
+a PostgreSQL database, the session is in autocommit mode.  If you run an
+insert, update or delete query, it will be committed immediately.  The session
+is in autocommit mode until a "begin" query is run to begin a transaction.
+After beginning a transaction, inserts, updates and deletes are performed
+within the context of the transaction.  A commit or rollback must be run to
+end the transaction.  After a commit or rollback is run, the session goes back
+into autocommit mode.</p>
 
 </body>
 

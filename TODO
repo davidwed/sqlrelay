@@ -1,4 +1,5 @@
-test interbase commitddl argument
+trouble with db2
+db2 init script needs db2start for each instance
 
 scaling/handoff=pass incompatibility
 	setting backlog:

@@ -295,7 +295,7 @@ class mysql {
 		checkSuccess(cur.getColumnLength(4),20);
 		checkSuccess(cur.getColumnLength(5),12);
 		checkSuccess(cur.getColumnLength(6),22);
-		checkSuccess(cur.getColumnLength(7),4);
+		checkSuccess(cur.getColumnLength(7),5);
 		checkSuccess(cur.getColumnLength(8),10);
 		checkSuccess(cur.getColumnLength(9),8);
 		checkSuccess(cur.getColumnLength(10),19);
@@ -314,7 +314,7 @@ class mysql {
 		checkSuccess(cur.getColumnLength("testbigint"),20);
 		checkSuccess(cur.getColumnLength("testfloat"),12);
 		checkSuccess(cur.getColumnLength("testreal"),22);
-		checkSuccess(cur.getColumnLength("testdecimal"),4);
+		checkSuccess(cur.getColumnLength("testdecimal"),5);
 		checkSuccess(cur.getColumnLength("testdate"),10);
 		checkSuccess(cur.getColumnLength("testtime"),8);
 		checkSuccess(cur.getColumnLength("testdatetime"),19);

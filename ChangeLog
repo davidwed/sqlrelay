@@ -89,7 +89,6 @@
 	remove unnecessary -pedantic from CXXFLAGS
 	modularized configure script
 	incorporated Takeshi Taguchi's TCL API
-	added option to interbase connection to commit ddl immediately or not
 
 0.32 -	affectedRows and totalRows were returning 0 instead of -1 for databases
 		that don't know that value, now they return -1

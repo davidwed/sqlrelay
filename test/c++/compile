@@ -1,4 +1,4 @@
-g++ -I/usr/local/firstworks/include -g -o oracle8 oracle8.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
+#g++ -I/usr/local/firstworks/include -g -o oracle8 oracle8.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
 #g++ -I/usr/local/firstworks/include -g -o oracle7 oracle7.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
 #g++ -I/usr/local/firstworks/include -g -o mysql mysql.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
 #g++ -I/usr/local/firstworks/include -g -o msql msql.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
@@ -7,5 +7,5 @@ g++ -I/usr/local/firstworks/include -g -o oracle8 oracle8.C -L/usr/local/firstwo
 #g++ -I/usr/local/firstworks/include -g -o postgresql postgresql.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
 #g++ -I/usr/local/firstworks/include -g -o freetds freetds.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
 #g++ -I/usr/local/firstworks/include -g -o sybase sybase.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
-#g++ -I/usr/local/firstworks/include -g -o interbase interbase.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
+g++ -I/usr/local/firstworks/include -g -o interbase interbase.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence
 #g++ -I/usr/local/firstworks/include -g -o db2 db2.C -L/usr/local/firstworks/lib -lsqlrclient_p -lrudiments_p -lefence

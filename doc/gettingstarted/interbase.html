@@ -17,6 +17,7 @@
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
 <li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+<li><a href="#quirks">Interbase Quirks</a></li>
 </ul>
 
 <a name="installation"></a>
@@ -351,6 +352,18 @@ the remote hostname followed by a colon.  For example:
 <blockquote>
 <b>sqlr-stop interbasetest</b>
 </blockquote>
+
+<a name="quirks"></a>
+<span class="heading1">Interbase Quirks</span><br>
+
+<p>In most databases, you can create, alter or drop databse objects such as
+tables, indices or stored procedures at will.  In Interbase/Firebird, you
+should create, alter or drop databse objects when you have exclusive access
+to the databse.</p>
+
+<p>Basically, you should shut down SQL Relay or any other clients,
+use isql to create, alter or drop the objects, then start SQL Relay again.
+If you don't do this, you'll get confusing results.</p>
 
 </body>
 
