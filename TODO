@@ -1,3 +1,5 @@
+python doesn't build on netbsd
+
 scaling/handoff=pass incompatibility
 	setting backlog:
 		linux:

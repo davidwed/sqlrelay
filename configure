@@ -7614,11 +7614,13 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 # Prevent multiple expansion
 
 
-echo "******************************"
 
-if ( test "$USE_SYSTEM_LIBTOOL" = "yes" ); then
+if ( test "$USE_SYSTEM_LIBTOOL" = "yes" )
+then
   LIBTOOL="libtool"
 fi
+
+echo "******************************"
 
 
 echo
@@ -9000,26 +9002,13 @@ fi
 
 
 
-echo "$as_me:$LINENO: checking whether ld -G works" >&5
-echo $ECHO_N "checking whether ld -G works... $ECHO_C" >&6
-ld -G 2> conftest
-INVALID="`grep invalid conftest`"
-if ( test -n "$INVALID" ); then
-	SHAREDFLAG="-shared"
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-else
-	SHAREDFLAG="-G"
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-fi
-rm conftest
 
 echo "$as_me:$LINENO: checking whether ld -rpath works" >&5
 echo $ECHO_N "checking whether ld -rpath works... $ECHO_C" >&6
 ld -rpath /usr/lib 2> conftest
 INVALID="`grep 'no input files' conftest`"
-if ( test -n "$INVALID" ); then
+if ( test -n "$INVALID" )
+then
 	RPATHFLAG="yes"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
@@ -9030,10 +9019,12 @@ echo "${ECHO_T}no" >&6
 fi
 rm conftest
 
+
 echo "$as_me:$LINENO: checking whether ps -efa works" >&5
 echo $ECHO_N "checking whether ps -efa works... $ECHO_C" >&6
 INVALID="`ps -efal 2>&1 | grep illegal | grep -v grep`"
-if ( test -n "$INVALID" ); then
+if ( test -n "$INVALID" )
+then
 	PS="ps\ aux"
 	echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
@@ -9044,13 +9035,16 @@ echo "${ECHO_T}yes" >&6
 fi
 
 
+
 UNAME=`uname -s`
+
 
 
 GNUSTRIP=`$STRIP --version 2> /dev/null | grep "GNU strip"`
 echo "$as_me:$LINENO: checking for GNU strip" >&5
 echo $ECHO_N "checking for GNU strip... $ECHO_C" >&6
-if ( test -n "$GNUSTRIP" ); then
+if ( test -n "$GNUSTRIP" )
+then
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
@@ -9059,7 +9053,9 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+
 echo "******************************"
+
 
 
 CYGWIN=""
@@ -9075,8 +9071,10 @@ esac
 
 
 MICROSOFT=""
-if ( test "$UWIN" = "yes" -o "$MINGW32" = "yes" -o "$CYGWIN" = "yes" ); then
-	if ( test -r "INSTALL" ); then
+if ( test "$UWIN" = "yes" -o "$MINGW32" = "yes" -o "$CYGWIN" = "yes" )
+then
+	if ( test -r "INSTALL" )
+	then
 		mv INSTALL INSTALL.txt
 	fi
 	MICROSOFT="yes"
@@ -9085,21 +9083,22 @@ fi
 
 echo
 echo "***** Inline Functions *******"
+
 echo "$as_me:$LINENO: checking inline" >&5
 echo $ECHO_N "checking inline... $ECHO_C" >&6
 INLINE="inline"
-# intel optimizing compiler doesn't have inlines, assume that CC doesn't either
-# even though it might, this test needs to be more robust
-if ( test "$CXX" = "icc" -o "$CXX" = "CC" ); then
+if ( test "$CXX" = "icc" -o "$CXX" = "CC" )
+then
 	INLINE=""
 else
-	# redhat's gcc 2.96 has problems with inlines
-	CXX_VERSION=`$CXX --version`
-	if ( test "$CXX_VERSION" = "2.96" ); then
+		CXX_VERSION=`$CXX --version`
+	if ( test "$CXX_VERSION" = "2.96" )
+	then
 		INLINE=""
 	fi
 fi
-if ( test "$INLINE" = "inline" ); then
+if ( test "$INLINE" = "inline" )
+then
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
@@ -9111,18 +9110,24 @@ cat >>confdefs.h <<_ACEOF
 #define INLINE $INLINE
 _ACEOF
 
+
 echo "******************************"
 
 
 echo
 echo "***** threads ****************"
+
 PTHREADSLIB=""
 PTHREADSLIBPATH=""
 
-for i in "pthread" "pth" "c_r" "gthreads"
-do
-	if ( test -n "$PTHREADSPATH" ); then
-		as_ac_File=`echo "ac_cv_file_$PTHREADSPATH/lib/lib$i.a" | $as_tr_sh`
+if ( test "$cross_compiling" = "no" )
+then
+
+	for i in "pthread" "pth" "c_r" "gthreads"
+	do
+		if ( test -n "$PTHREADSPATH" )
+		then
+			as_ac_File=`echo "ac_cv_file_$PTHREADSPATH/lib/lib$i.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $PTHREADSPATH/lib/lib$i.a" >&5
 echo $ECHO_N "checking for $PTHREADSPATH/lib/lib$i.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9144,7 +9149,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   PTHREADSLIB="-L$PTHREADSPATH/lib -l$i"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$PTHREADSPATH/lib/lib$i.so" | $as_tr_sh`
+			as_ac_File=`echo "ac_cv_file_$PTHREADSPATH/lib/lib$i.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $PTHREADSPATH/lib/lib$i.so" >&5
 echo $ECHO_N "checking for $PTHREADSPATH/lib/lib$i.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9166,10 +9171,10 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   PTHREADSLIBPATH="$PTHREADSPATH/lib"; PTHREADSLIB="-L$PTHREADSPATH/lib -l$i"
 fi
 
-	else
-		for j in "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/pthread" "/usr/local/lib/pthreads" "/usr/local/lib/pth" "/usr/local/pthread/lib" "/usr/local/pthreads/lib" "/opt/sfw/lib"
-		do
-			as_ac_File=`echo "ac_cv_file_$j/lib$i.a" | $as_tr_sh`
+		else
+			for j in "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/pthread" "/usr/local/lib/pthreads" "/usr/local/lib/pth" "/usr/local/pthread/lib" "/usr/local/pthreads/lib" "/opt/sfw/lib"
+			do
+				as_ac_File=`echo "ac_cv_file_$j/lib$i.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $j/lib$i.a" >&5
 echo $ECHO_N "checking for $j/lib$i.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9191,7 +9196,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   PTHREADSLIB="-L$j -l$i"
 fi
 
-			as_ac_File=`echo "ac_cv_file_$j/lib$i.so" | $as_tr_sh`
+				as_ac_File=`echo "ac_cv_file_$j/lib$i.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $j/lib$i.so" >&5
 echo $ECHO_N "checking for $j/lib$i.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9213,12 +9218,13 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   PTHREADSLIBPATH="$j"; PTHREADSLIB="-L$j -l$i"
 fi
 
-			if ( test -n "$PTHREADSLIB" ); then
-				break
-			fi
-		done
+				if ( test -n "$PTHREADSLIB" )
+				then
+					break
+				fi
+			done
 
-		as_ac_File=`echo "ac_cv_file_/usr/lib/lib$i.a" | $as_tr_sh`
+			as_ac_File=`echo "ac_cv_file_/usr/lib/lib$i.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for /usr/lib/lib$i.a" >&5
 echo $ECHO_N "checking for /usr/lib/lib$i.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9240,7 +9246,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   PTHREADSLIB="-l$i"
 fi
 
-		as_ac_File=`echo "ac_cv_file_/usr/lib/lib$i.so" | $as_tr_sh`
+			as_ac_File=`echo "ac_cv_file_/usr/lib/lib$i.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for /usr/lib/lib$i.so" >&5
 echo $ECHO_N "checking for /usr/lib/lib$i.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9262,162 +9268,52 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   PTHREADSLIBPATH=""; PTHREADSLIB="-l$i"
 fi
 
-	fi
-	if ( test -n "$PTHREADSLIB" ); then
-		break
-	fi
-done
+		fi
+		if ( test -n "$PTHREADSLIB" )
+		then
+			break
+		fi
+	done
 
-if ( test -n "$RPATHFLAG" -a -n "$PTHREADSLIBPATH" ); then
-	PTHREADSLIB="-Wl,-rpath $PTHREADSLIBPATH $PTHREADSLIB"
+	if ( test -n "$RPATHFLAG" -a -n "$PTHREADSLIBPATH" )
+	then
+		PTHREADSLIB="-Wl,-rpath $PTHREADSLIBPATH $PTHREADSLIB"
+	fi
+
+else
+		if ( test -n "$PTHREADSPATH" )
+	then
+		if ( test -n "$RPATHFLAG" )
+		then
+			PTHREADSLIB="-Wl,-rpath $PTHREADSPATH/lib -lpthread"
+		else
+			PTHREADSLIB="-L$PTHREADSPATH/lib -lpthread"
+		fi
+	else
+		PTHREADSLIB="-lpthread"
+	fi
 fi
+
 
 echo "******************************"
 
 
 echo
 echo "***** Libraries **************"
+
 RUDIMENTSLIBS=""
 RUDIMENTSLIBSPATH=""
 RUDIMENTSINCLUDES=""
-if ( test -z "$MICROSOFT" ); then
-	if ( test -n "$RUDIMENTSPATH" ); then
-		as_ac_File=`echo "ac_cv_file_$RUDIMENTSPATH/lib/librudiments.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $RUDIMENTSPATH/lib/librudiments.a" >&5
-echo $ECHO_N "checking for $RUDIMENTSPATH/lib/librudiments.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$RUDIMENTSPATH/lib/librudiments.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"; RUDIMENTSDEBUGLIBS="-L$RUDIMENTSPATH/lib -lrudiments_p"
-fi
-
-		as_ac_File=`echo "ac_cv_file_$RUDIMENTSPATH/lib/librudiments.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $RUDIMENTSPATH/lib/librudiments.so" >&5
-echo $ECHO_N "checking for $RUDIMENTSPATH/lib/librudiments.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$RUDIMENTSPATH/lib/librudiments.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  RUDIMENTSLIBSPATH="$RUDIMENTSPATH/lib"; RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"; RUDIMENTSDEBUGLIBS="-L$RUDIMENTSPATH/lib -lrudiments_p"
-fi
-
-		as_ac_File=`echo "ac_cv_file_$RUDIMENTSPATH/include/rudiments/daemonprocess.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $RUDIMENTSPATH/include/rudiments/daemonprocess.h" >&5
-echo $ECHO_N "checking for $RUDIMENTSPATH/include/rudiments/daemonprocess.h... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$RUDIMENTSPATH/include/rudiments/daemonprocess.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"
-fi
-
-		as_ac_File=`echo "ac_cv_file_$RUDIMENTSPATH/include/firstworks/rudiments/daemonprocess.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $RUDIMENTSPATH/include/firstworks/rudiments/daemonprocess.h" >&5
-echo $ECHO_N "checking for $RUDIMENTSPATH/include/firstworks/rudiments/daemonprocess.h... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$RUDIMENTSPATH/include/firstworks/rudiments/daemonprocess.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include/firstworks"
-fi
-
-	else
-		for i in "/usr/local/firstworks" "/usr" "/usr/local" "/usr/pkg" "/opt/sfw"
+if ( test "$cross_compiling" = "no" )
+then
+	if ( test -z "$MICROSOFT" )
+	then
+		for i in "$RUDIMENTSPATH" "/usr/local/firstworks" "/usr" "/usr/local" "/usr/pkg" "/opt/sfw"
 		do
-			as_ac_File=`echo "ac_cv_file_$i/lib/librudiments.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/lib/librudiments.a" >&5
-echo $ECHO_N "checking for $i/lib/librudiments.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/lib/librudiments.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  RUDIMENTSLIBS="-L$i/lib -lrudiments"; RUDIMENTSPATH="$i"; RUDIMENTSDEBUGLIBS="-L$RUDIMENTSPATH/lib -lrudiments_p"
-fi
 
-			as_ac_File=`echo "ac_cv_file_$i/lib/librudiments.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/lib/librudiments.so" >&5
-echo $ECHO_N "checking for $i/lib/librudiments.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/lib/librudiments.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  RUDIMENTSLIBSPATH="$i/lib"; RUDIMENTSLIBS="-L$i/lib -lrudiments"; RUDIMENTSPATH="$i"; RUDIMENTSDEBUGLIBS="-L$RUDIMENTSPATH/lib -lrudiments_p"
-fi
-
-			as_ac_File=`echo "ac_cv_file_$i/include/rudiments/daemonprocess.h" | $as_tr_sh`
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/rudiments/daemonprocess.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/include/rudiments/daemonprocess.h" >&5
 echo $ECHO_N "checking for $i/include/rudiments/daemonprocess.h... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9436,19 +9332,12 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  RUDIMENTSINCLUDES="-I$i/include"; RUDIMENTSPATH="$i"
+  FOUNDHEADER="yes"
 fi
 
-			if ( test -n "$RUDIMENTSLIBS" ); then
-				break;
-			fi
-		done
-	fi
-else
-	if ( test -n "$RUDIMENTSPATH" ); then
-		as_ac_File=`echo "ac_cv_file_$RUDIMENTSPATH/lib/librudiments.dll" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $RUDIMENTSPATH/lib/librudiments.dll" >&5
-echo $ECHO_N "checking for $RUDIMENTSPATH/lib/librudiments.dll... $ECHO_C" >&6
+as_ac_File=`echo "ac_cv_file_$i/lib/librudiments.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/librudiments.a" >&5
+echo $ECHO_N "checking for $i/lib/librudiments.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -9456,7 +9345,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$RUDIMENTSPATH/lib/librudiments.dll"; then
+if test -r "$i/lib/librudiments.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -9465,44 +9354,190 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  RUDIMENTSLIBS="$RUDIMENTSPATH/lib/librudiments.dll"; RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"; RUDIMENTSDEBUGLIBS="$RUDIMENTSPATH/lib/librudiments_p.dll"
+  FOUNDLIB="yes"
 fi
 
-	else
-		echo "$as_me:$LINENO: checking for /usr/local/firstworks/lib/librudiments.dll" >&5
-echo $ECHO_N "checking for /usr/local/firstworks/lib/librudiments.dll... $ECHO_C" >&6
-if test "${ac_cv_file__usr_local_firstworks_lib_librudiments_dll+set}" = set; then
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\""
+		eval "RUDIMENTSLIBSPATH=\"$i/lib\"; RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\""
+	fi
+else
+	if ( test -n "$i/lib/librudiments.so" -a -n "RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/librudiments.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/librudiments.so" >&5
+echo $ECHO_N "checking for $i/lib/librudiments.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   test "$cross_compiling" = yes &&
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "/usr/local/firstworks/lib/librudiments.dll"; then
-  ac_cv_file__usr_local_firstworks_lib_librudiments_dll=yes
+if test -r "$i/lib/librudiments.so"; then
+  eval "$as_ac_File=yes"
 else
-  ac_cv_file__usr_local_firstworks_lib_librudiments_dll=no
+  eval "$as_ac_File=no"
 fi
 fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_firstworks_lib_librudiments_dll" >&5
-echo "${ECHO_T}$ac_cv_file__usr_local_firstworks_lib_librudiments_dll" >&6
-if test $ac_cv_file__usr_local_firstworks_lib_librudiments_dll = yes; then
-  RUDIMENTSLIBS="/usr/local/firstworks/lib/librudiments.dll"; RUDIMENTSINCLUDES="-I/usr/local/firstworks/include"; RUDIMENTSDEBUGLIBS="$RUDIMENTSPATH/lib/librudiments_p.dll"
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
 fi
 
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\""
+			eval "RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\""
+		fi
 	fi
 fi
 
-if ( test -z "$RUDIMENTSINCLUDES" -o -z "$RUDIMENTSLIBS"); then
-	{ { echo "$as_me:$LINENO: error: \"Rudiments not found.  SQL-Relay requires this package.\"" >&5
-echo "$as_me: error: \"Rudiments not found.  SQL-Relay requires this package.\"" >&2;}
+			if ( test -n "$RUDIMENTSLIBS" )
+			then
+				break;
+			fi
+		done
+	else
+		for i in "$RUDIMENTSPATH" "/usr/local/firstworks"
+		do
+			if ( test -n "$i" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/rudiments/daemonprocess.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/rudiments/daemonprocess.h" >&5
+echo $ECHO_N "checking for $i/include/rudiments/daemonprocess.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/rudiments/daemonprocess.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/librudiments.dll" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/librudiments.dll" >&5
+echo $ECHO_N "checking for $i/lib/librudiments.dll... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/librudiments.dll"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\""
+		eval "RUDIMENTSLIBS=\"$i/lib/librudiments.dll\"; RUDIMENTSDEBUGLIBS=\"$i/lib/librudiments_p.dll\""
+	fi
+else
+	if ( test -n "" -a -n "" )
+	then
+		echo "$as_me:$LINENO: checking for " >&5
+echo $ECHO_N "checking for ... $ECHO_C" >&6
+if test "${ac_cv_file_+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r ""; then
+  ac_cv_file_=yes
+else
+  ac_cv_file_=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file_" >&5
+echo "${ECHO_T}$ac_cv_file_" >&6
+if test $ac_cv_file_ = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\""
+			eval ""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -n "$RUDIMENTSLIBS" )
+			then
+				break
+			fi
+		done
+	fi
+
+else
+		if ( test -n "$RUDIMENTSPATH" )
+	then
+		RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"
+		if ( test -n "$RPATHFLAG" )
+		then
+			RUDIMENTSLIBS="-Wl,-rpath $RUDIMENTSPATH/lib -L$RUDIMENTSPATH/lib -lrudiments"
+		else
+			RUDIMENTSLIBS="-L$PTHREADSPATH/lib -lrudiments"
+			RUDIMENTSDEBUGLIBS="-L$PTHREADSPATH/lib -lrudiments_p"
+		fi
+	else
+		RUDIMENTSINCLUDES="-I/usr/local/firstworks/include"
+		if ( test -n "$RPATHFLAG" )
+		then
+			RUDIMENTSLIBS="-Wl,-rpath /usr/local/firstworks/lib -L/usr/local/firstworks/lib -lrudiments"
+		else
+			RUDIMENTSLIBS="-L/usr/local/firstworks/lib -lrudiments"
+			RUDIMENTSDEBUGLIBS="-L/usr/local/firstworks/lib -lrudiments_p"
+		fi
+	fi
+fi
+
+if ( test -z "$RUDIMENTSINCLUDES" -o -z "$RUDIMENTSLIBS" )
+then
+	{ { echo "$as_me:$LINENO: error: Rudiments not found.  SQL-Relay requires this package." >&5
+echo "$as_me: error: Rudiments not found.  SQL-Relay requires this package." >&2;}
    { (exit 1); exit 1; }; }
 	exit
 fi
 
-if ( test -n "$RPATHFLAG" -a -n "$RUDIMENTSPATH" ); then
+if ( test -n "$RPATHFLAG" -a -n "$RUDIMENTSPATH" )
+then
 	RUDIMENTSLIB="-Wl,-rpath $RUDIMENTSPATH $RUDIMENTSLIB"
 fi
+
+
 
 
 
@@ -10138,23 +10173,27 @@ fi
 echo "******************************"
 
 
-if ( test "$ENABLE_ORACLE" = "yes" ); then
+echo
+echo "***** Oracle *****************"
 
-		echo
-	echo "***** Oracle *****************"
+if ( test "$ENABLE_ORACLE" = "yes" )
+then
+
 	ORACLEVERSION=""
 	ORACLEINCLUDES=""
 	ORACLELIBS=""
 	ORACLELIBSPATH=""
 	ORACLESTATIC=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 	echo "$as_me:$LINENO: checking for ORACLE_HOME" >&5
 echo $ECHO_N "checking for ORACLE_HOME... $ECHO_C" >&6
 
-	if ( test -n "$ORACLE_HOME" ); then
+	if ( test -n "$ORACLE_HOME" )
+	then
 		echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 		as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libcore3.a" | $as_tr_sh`
@@ -10290,7 +10329,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   ORACLEVERSION="9.0"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient9 -lcommon9 -lgeneric9 -lclntsh -lcore9 -lnls9 -lwtc9 -lm $AIOLIB"
 fi
 
-		if ( test -n "$ORACLEVERSION" ); then
+		if ( test -n "$ORACLEVERSION" )
+		then
 			ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
 			echo "hmmm, looks like Oracle$ORACLEVERSION..."
 		fi
@@ -10319,22 +10359,27 @@ fi
 	else
 		echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
-		{ echo "$as_me:$LINENO: WARNING: \"The ORACLE_HOME environment variable is not set.  Oracle support will not be built.\"" >&5
-echo "$as_me: WARNING: \"The ORACLE_HOME environment variable is not set.  Oracle support will not be built.\"" >&2;}
+		{ echo "$as_me:$LINENO: WARNING: The ORACLE_HOME environment variable is not set.  Oracle support will not be built." >&5
+echo "$as_me: WARNING: The ORACLE_HOME environment variable is not set.  Oracle support will not be built." >&2;}
 	fi
 
 
 	OCI_H=""
-	if ( test -n "$ORACLELIBS" ); then
+	if ( test -n "$ORACLELIBS" )
+	then
 		echo "$as_me:$LINENO: checking if Oracle has oci.h" >&5
 echo $ECHO_N "checking if Oracle has oci.h... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
-		LIBS="$ORACLELIBS $SOCKETLIB"
-		if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" ); then
-			LIBS="-Wl,-rpath $ORACLELIBSPATH $LIBS"
-		fi
-		cat >conftest.$ac_ext <<_ACEOF
+		if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" )
+		then
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
+LIBS="-Wl,-rpath $ORACLELIBSPATH $ORACLELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -10342,11 +10387,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
-		#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
-exit(0);
+exit(0)
   ;
   return 0;
 }
@@ -10373,20 +10418,84 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		else
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
+LIBS="$ORACLELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <oci.h>
+#include <stdlib.h>
+int
+main ()
+{
+exit(0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; OCI_H="yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		fi
 	fi
 
 
 	LINKFAIL=""
-	if ( test -n "$ORACLESTATIC" -a -n "$ORACLELIBS" ); then
+	if ( test -n "$ORACLESTATIC" -a -n "$ORACLELIBS" )
+	then
 		echo "$as_me:$LINENO: checking if Oracle can be statically linked without $DLLIB" >&5
 echo $ECHO_N "checking if Oracle can be statically linked without $DLLIB... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
-		LIBS="$ORACLELIBS $SOCKETLIB"
-		if ( test -n "$OCI_H" ); then
-			cat >conftest.$ac_ext <<_ACEOF
+		if ( test -n "$OCI_H" )
+		then
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
+LIBS="$ORACLELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -10394,7 +10503,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -10425,8 +10534,21 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		else
-			cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
+LIBS="$ORACLELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -10434,7 +10556,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ociapr.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -10465,17 +10587,27 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		fi
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+		if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
+		then
 			echo "$as_me:$LINENO: checking if Oracle can be statically linked with $DLLIB" >&5
 echo $ECHO_N "checking if Oracle can be statically linked with $DLLIB... $ECHO_C" >&6
-			TEMPCPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
-			LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
-			if ( test -n "$OCI_H" ); then
-				cat >conftest.$ac_ext <<_ACEOF
+			if ( test -n "$OCI_H" )
+			then
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
+LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -10483,7 +10615,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
-				#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -10514,8 +10646,22 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; ORACLESTATIC=""; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 			else
-				cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES,$ORACLELIBS $SOCKETLIB $DLLIB"
+LIBS="$LD_LIBRARY_PATH"
+LD_LIBRARY_PATH="echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL="""
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -10523,7 +10669,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ociapr.h>
-				#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -10544,33 +10690,42 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; ORACLESTATIC=""; LINKFAIL="yes"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; ORACLESTATIC=""; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 			fi
-			LIBS=""
-			CPPFLAGS="$TEMPCPPFLAGS"
 		fi
 	fi
 
-	if ( test -z "$ORACLESTATIC" -a -n "$ORACLELIBS" ); then
-		if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" ); then
+	if ( test -z "$ORACLESTATIC" -a -n "$ORACLELIBS" )
+	then
+		if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" )
+		then
 			ORACLELIBS="-Wl,-rpath $ORACLELIBSPATH $ORACLELIBS"
 		fi
 		echo "$as_me:$LINENO: checking if Oracle can be dynamically linked without $DLLIB" >&5
 echo $ECHO_N "checking if Oracle can be dynamically linked without $DLLIB... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$ORACLEINCLUDES"
-		LIBS="$ORACLELIBS $SOCKETLIB"
-		if ( test -n "$OCI_H" ); then
-			cat >conftest.$ac_ext <<_ACEOF
+		if ( test -n "$OCI_H" )
+		then
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLEINCLUDES"
+LIBS="$ORACLELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -10578,7 +10733,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -10609,8 +10764,21 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		else
-			cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLEINCLUDES"
+LIBS="$ORACLELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -10618,7 +10786,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ociapr.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -10649,17 +10817,27 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		fi
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+		if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
+		then
 			echo "$as_me:$LINENO: checking if Oracle can be dynamically linked with $DLLIB" >&5
 echo $ECHO_N "checking if Oracle can be dynamically linked with $DLLIB... $ECHO_C" >&6
-			TEMPCPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$ORACLEINCLUDES"
-			LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
-			if ( test -n "$OCI_H" ); then
-				cat >conftest.$ac_ext <<_ACEOF
+			if ( test -n "$OCI_H" )
+			then
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLEINCLUDES"
+LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -10667,7 +10845,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
-				#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -10698,8 +10876,21 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 			else
-				cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ORACLEINCLUDES"
+LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -10707,7 +10898,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ociapr.h>
-				#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -10738,22 +10929,27 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 			fi
-			LIBS=""
-			CPPFLAGS="$TEMPCPPFLAGS"
 		fi
 	fi
 
-	if ( test -n "$LINKFAIL" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"No Oracle link configuration could be found.\"" >&5
-echo "$as_me: WARNING: \"No Oracle link configuration could be found.\"" >&2;}
+	if ( test -n "$LINKFAIL" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: No Oracle link configuration could be found." >&5
+echo "$as_me: WARNING: No Oracle link configuration could be found." >&2;}
 		ORACLEVERSION=""
 		ORACLEINCLUDES=""
 		ORACLELIBS=""
 		ORACLESTATIC=""
 	fi
 
-	if ( test -n "$OCI_H" ); then
+	if ( test -n "$OCI_H" )
+	then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_OCI_H 1
@@ -10765,27 +10961,32 @@ _ACEOF
 
 
 
-
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_MYSQL" = "yes" ); then
 
-		echo
-	echo "***** MySQL ******************"
+echo
+echo "***** MySQL ******************"
+
+if ( test "$ENABLE_MYSQL" = "yes" )
+then
+
 	MYSQLINCLUDES=""
 	MYSQLLIBS=""
 	MYSQLLIBSPATH=""
 	MYSQLSTATIC=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -z "$MICROSOFT" ); then
-		if ( test -n "$MYSQLPATH" ); then
+	if ( test -z "$MICROSOFT" )
+	then
+		if ( test -n "$MYSQLPATH" )
+		then
 			as_ac_File=`echo "ac_cv_file_$MYSQLPATH/include/mysql/mysql.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $MYSQLPATH/include/mysql/mysql.h" >&5
 echo $ECHO_N "checking for $MYSQLPATH/include/mysql/mysql.h... $ECHO_C" >&6
@@ -10943,7 +11144,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   MYSQLINCLUDES="-I$i"
 fi
 
-				if ( test -n "$MYSQLINCLUDES" ); then
+				if ( test -n "$MYSQLINCLUDES" )
+				then
 					break
 				fi
 			done
@@ -10994,7 +11196,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   MYSQLLIBSPATH="$i"; MYSQLLIBS="-L$i -lmysqlclient"
 fi
 
-				if ( test -n "$MYSQLLIBS" ); then
+				if ( test -n "$MYSQLLIBS" )
+				then
 					break
 				fi
 			done
@@ -11042,7 +11245,8 @@ fi
 
 		fi
 	else
-		if ( test -n "$MYSQLPATH" ); then
+		if ( test -n "$MYSQLPATH" )
+		then
 			as_ac_File=`echo "ac_cv_file_$MYSQLPATH/include/mysql.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $MYSQLPATH/include/mysql.h" >&5
 echo $ECHO_N "checking for $MYSQLPATH/include/mysql.h... $ECHO_C" >&6
@@ -11155,14 +11359,20 @@ fi
 		fi
 	fi
 
-	if ( test -n "$MYSQLLIBS" ); then
+	if ( test -n "$MYSQLLIBS" )
+	then
 
 		echo "$as_me:$LINENO: checking if MySQL requires -lz" >&5
 echo $ECHO_N "checking if MySQL requires -lz... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-		LIBS="$MYSQLLIBS $SOCKETLIB"
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
+LIBS="$MYSQLLIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -11170,7 +11380,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <mysql.h>
-		#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -11201,11 +11411,15 @@ echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; MYSQLLIBS="$MYSQLLIBS -lz"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 
 		NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
-		if ( test -n "$NEEDSLIBZ" ); then
+		if ( test -n "$NEEDSLIBZ" )
+		then
 
 echo "$as_me:$LINENO: checking for gzopen in -lz" >&5
 echo $ECHO_N "checking for gzopen in -lz... $ECHO_C" >&6
@@ -11269,51 +11483,63 @@ _ACEOF
   LIBS="-lz $LIBS"
 
 else
-  MYSQLINCLUDES=""; MYSQLLIBS=""; { echo "$as_me:$LINENO: WARNING: \"MySQL requires libz but libz was not found.\"" >&5
-echo "$as_me: WARNING: \"MySQL requires libz but libz was not found.\"" >&2;}
+  MYSQLINCLUDES=""; MYSQLLIBS=""; { echo "$as_me:$LINENO: WARNING: MySQL requires libz but libz was not found." >&5
+echo "$as_me: WARNING: MySQL requires libz but libz was not found." >&2;}
 fi
 
 		fi
 	fi
 
-	if ( test "$MYSQLINCLUDES" = "-I/usr/include" ); then
+	if ( test "$MYSQLINCLUDES" = "-I/usr/include" )
+	then
 		MYSQLINCLUDES=""
 	fi
 
-	if ( test -n "$RPATHFLAG" -a -n "$MYSQLLIBSPATH" ); then
+	if ( test -n "$RPATHFLAG" -a -n "$MYSQLLIBSPATH" )
+	then
 		MYSQLLIBS="-Wl,-rpath $MYSQLLIBSPATH $MYSQLLIBS"
 	fi
 
 
 
 
-	if ( test -z "$MYSQLLIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"MySQL support will not be built.\"" >&5
-echo "$as_me: WARNING: \"MySQL support will not be built.\"" >&2;}
+	if ( test -z "$MYSQLLIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: MySQL support will not be built." >&5
+echo "$as_me: WARNING: MySQL support will not be built." >&2;}
 	fi
-
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_MSQL" = "yes" ); then
 
-		echo
-	echo "***** mSQL *******************"
+echo
+echo "***** mSQL *******************"
+
+if ( test "$ENABLE_MSQL" = "yes" )
+then
+
 	MSQLINCLUDES=""
 	MSQLLIBS=""
 	MSQLLIBSPATH=""
 	MSQLSTATIC=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -n "$MSQLPATH" ); then
-		as_ac_File=`echo "ac_cv_file_$MSQLPATH/include/msql.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $MSQLPATH/include/msql.h" >&5
-echo $ECHO_N "checking for $MSQLPATH/include/msql.h... $ECHO_C" >&6
+	for i in "$MSQLPATH" "/usr/local/Hughes"
+	do
+		if ( test -n "$i" )
+		then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/msql.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/msql.h" >&5
+echo $ECHO_N "checking for $i/include/msql.h... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -11321,7 +11547,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$MSQLPATH/include/msql.h"; then
+if test -r "$i/include/msql.h"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -11330,12 +11556,12 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  MSQLINCLUDES="-I$MSQLPATH/include"
+  FOUNDHEADER="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$MSQLPATH/lib/libmsql.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $MSQLPATH/lib/libmsql.a" >&5
-echo $ECHO_N "checking for $MSQLPATH/lib/libmsql.a... $ECHO_C" >&6
+as_ac_File=`echo "ac_cv_file_$i/lib/libmsql.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libmsql.a" >&5
+echo $ECHO_N "checking for $i/lib/libmsql.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -11343,7 +11569,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$MSQLPATH/lib/libmsql.a"; then
+if test -r "$i/lib/libmsql.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -11352,98 +11578,58 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  MSQLLIBS="-L$MSQLPATH/lib -lmsql"; MSQLSTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$MSQLPATH/lib/libmsql.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $MSQLPATH/lib/libmsql.so" >&5
-echo $ECHO_N "checking for $MSQLPATH/lib/libmsql.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$MSQLPATH/lib/libmsql.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  MSQLLIBSPATH="$MSQLPATH/lib"; MSQLLIBS="-L$MSQLPATH/lib -lmsql"
-fi
-
-	else
-		echo "$as_me:$LINENO: checking for /usr/local/Hughes/include/msql.h" >&5
-echo $ECHO_N "checking for /usr/local/Hughes/include/msql.h... $ECHO_C" >&6
-if test "${ac_cv_file__usr_local_Hughes_include_msql_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/local/Hughes/include/msql.h"; then
-  ac_cv_file__usr_local_Hughes_include_msql_h=yes
-else
-  ac_cv_file__usr_local_Hughes_include_msql_h=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_Hughes_include_msql_h" >&5
-echo "${ECHO_T}$ac_cv_file__usr_local_Hughes_include_msql_h" >&6
-if test $ac_cv_file__usr_local_Hughes_include_msql_h = yes; then
-  MSQLINCLUDES="-I/usr/local/Hughes/include"
-fi
-
-		echo "$as_me:$LINENO: checking for /usr/local/Hughes/lib/libmsql.a" >&5
-echo $ECHO_N "checking for /usr/local/Hughes/lib/libmsql.a... $ECHO_C" >&6
-if test "${ac_cv_file__usr_local_Hughes_lib_libmsql_a+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/local/Hughes/lib/libmsql.a"; then
-  ac_cv_file__usr_local_Hughes_lib_libmsql_a=yes
-else
-  ac_cv_file__usr_local_Hughes_lib_libmsql_a=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_Hughes_lib_libmsql_a" >&5
-echo "${ECHO_T}$ac_cv_file__usr_local_Hughes_lib_libmsql_a" >&6
-if test $ac_cv_file__usr_local_Hughes_lib_libmsql_a = yes; then
-  MSQLLIBS="-L/usr/local/Hughes/lib -lmsql"; MSQLSTATIC="$STATICFLAG"
-fi
-
-		echo "$as_me:$LINENO: checking for /usr/local/Hughes/lib/libmsql.so" >&5
-echo $ECHO_N "checking for /usr/local/Hughes/lib/libmsql.so... $ECHO_C" >&6
-if test "${ac_cv_file__usr_local_Hughes_lib_libmsql_so+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/local/Hughes/lib/libmsql.so"; then
-  ac_cv_file__usr_local_Hughes_lib_libmsql_so=yes
-else
-  ac_cv_file__usr_local_Hughes_lib_libmsql_so=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_Hughes_lib_libmsql_so" >&5
-echo "${ECHO_T}$ac_cv_file__usr_local_Hughes_lib_libmsql_so" >&6
-if test $ac_cv_file__usr_local_Hughes_lib_libmsql_so = yes; then
-  MSQLLIBSPATH="/usr/local/Hughes/lib"; MSQLLIBS="-L/usr/local/Hughes/lib -lmsql"
-fi
-
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\""
+		eval "MSQLLIBS=\"-L$i/lib -lmsql\""
 	fi
+else
+	if ( test -n "$i/lib/libmsql.so" -a -n "MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/libmsql.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libmsql.so" >&5
+echo $ECHO_N "checking for $i/lib/libmsql.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/libmsql.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
 
-	if ( test -n "$RPATHFLAG" -a -n "$MSQLLIBSPATH" ); then
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\""
+			eval "MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\""
+		fi
+	fi
+fi
+
+		fi
+		if ( test -n "$MSQLLIBS" )
+		then
+			break
+		fi
+	done
+
+	if ( test -n "$RPATHFLAG" -a -n "$MSQLLIBSPATH" )
+	then
 		MSQLLIBS="-Wl,-rpath $MSQLLIBSPATH $MSQLLIBS"
 	fi
 
@@ -11451,30 +11637,34 @@ fi
 
 
 
-	if ( test -z "$MSQLLIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"mSQL support will not be built.\"" >&5
-echo "$as_me: WARNING: \"mSQL support will not be built.\"" >&2;}
+	if ( test -z "$MSQLLIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: mSQL support will not be built." >&5
+echo "$as_me: WARNING: mSQL support will not be built." >&2;}
 	fi
-
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_POSTGRESQL" = "yes" ); then
+echo
+echo "***** PostgreSQL *************"
 
-		echo
-	echo "***** PostgreSQL *************"
+if ( test "$ENABLE_POSTGRESQL" = "yes" )
+then
+
 	POSTGRESQLINCLUDES=""
 	POSTGRESQLLIBS=""
 	POSTGRESQLSTATIC=""
 	POSTGRESQLLIBPATH=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -n "$POSTGRESQLPATH" ); then
+	if ( test -n "$POSTGRESQLPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_$POSTGRESQLPATH/include/libpq-fe.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $POSTGRESQLPATH/include/libpq-fe.h" >&5
 echo $ECHO_N "checking for $POSTGRESQLPATH/include/libpq-fe.h... $ECHO_C" >&6
@@ -11566,7 +11756,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   POSTGRESQLINCLUDES="-I$i"
 fi
 
-			if ( test -n "$POSTGRESQLINCLUDES" ); then
+			if ( test -n "$POSTGRESQLINCLUDES" )
+			then
 				break
 			fi
 		done
@@ -11617,7 +11808,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   POSTGRESQLLIBPATH="$i"; POSTGRESQLLIBS="-L$i -lpq"
 fi
 
-			if ( test -n "$POSTGRESQLLIBS" ); then
+			if ( test -n "$POSTGRESQLLIBS" )
+			then
 				break
 			fi
 		done
@@ -11667,13 +11859,19 @@ fi
 	fi
 
 	LINKFAIL=""
-	if ( test -n "$POSTGRESQLSTATIC" -a -n "$POSTGRESQLLIBS" ); then
+	if ( test -n "$POSTGRESQLSTATIC" -a -n "$POSTGRESQLLIBS" )
+	then
 		echo "$as_me:$LINENO: checking if PostgreSQL can be statically linked without -lcrypt" >&5
 echo $ECHO_N "checking if PostgreSQL can be statically linked without -lcrypt... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$POSTGRESQLSTATIC $POSTGRESQLINCLUDES"
-		LIBS="$POSTGRESQLLIBS $SOCKETLIB"
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$POSTGRESQLSTATIC $POSTGRESQLINCLUDES"
+LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -11681,7 +11879,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <libpq-fe.h>
-		#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -11712,15 +11910,24 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		if ( test -n "$LINKFAIL" ); then
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		if ( test -n "$LINKFAIL" )
+		then
 			echo "$as_me:$LINENO: checking if PostgreSQL can be statically linked with -lcrypt" >&5
 echo $ECHO_N "checking if PostgreSQL can be statically linked with -lcrypt... $ECHO_C" >&6
-			TEMPCPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$POSTGRESQLSTATIC $POSTGRESQLINCLUDES"
-			LIBS="$POSTGRESQLLIBS $SOCKETLIB -lcrypt"
-			cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$POSTGRESQLSTATIC $POSTGRESQLINCLUDES"
+LIBS="$POSTGRESQLLIBS $SOCKETLIB -lcrypt"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -11728,7 +11935,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <libpq-fe.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -11759,21 +11966,31 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; POSTGRESQLSTATIC=""; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-			LIBS=""
-			CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		fi
 	fi
 
-	if ( test -z "$POSTGRESQLSTATIC" -a -n "$POSTGRESQLLIBS" ); then
-		if ( test -n "$RPATHFLAG" -a -n "$POSTGRESQLLIBPATH" ); then
+	if ( test -z "$POSTGRESQLSTATIC" -a -n "$POSTGRESQLLIBS" )
+	then
+		if ( test -n "$RPATHFLAG" -a -n "$POSTGRESQLLIBPATH" )
+		then
 			POSTGRESQLLIBS="-Wl,-rpath $POSTGRESQLLIBPATH $POSTGRESQLLIBS"
 		fi
 		echo "$as_me:$LINENO: checking if PostgreSQL can be dynamically linked without -lcrypt" >&5
 echo $ECHO_N "checking if PostgreSQL can be dynamically linked without -lcrypt... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$POSTGRESQLINCLUDES"
-		LIBS="$POSTGRESQLLIBS $SOCKETLIB"
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$POSTGRESQLINCLUDES"
+LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -11781,7 +11998,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <libpq-fe.h>
-		#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -11812,18 +12029,24 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		if ( test -n "$LINKFAIL" ); then
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		if ( test -n "$LINKFAIL" )
+		then
 			echo "$as_me:$LINENO: checking if PostgreSQL can be dynamically linked with -lcrypt" >&5
 echo $ECHO_N "checking if PostgreSQL can be dynamically linked with -lcrypt... $ECHO_C" >&6
-			TEMPCPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$POSTGRESQLINCLUDES"
-			LIBS="$POSTGRESQLLIBS $SOCKETLIB -lcrypt"
-			OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-			LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBPATH"
-			export LD_LIBRARY_PATH
-			cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$POSTGRESQLINCLUDES"
+LIBS="$POSTGRESQLLIBS $SOCKETLIB -lcrypt"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBPATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -11831,7 +12054,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <libpq-fe.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -11862,22 +12085,25 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-			LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
-			export LD_LIBRARY_PATH
-			LIBS=""
-			CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		fi
 	fi
 
-	if ( test -n "$LINKFAIL" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"No PostgreSQL link configuration could be found.\"" >&5
-echo "$as_me: WARNING: \"No PostgreSQL link configuration could be found.\"" >&2;}
+	if ( test -n "$LINKFAIL" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: No PostgreSQL link configuration could be found." >&5
+echo "$as_me: WARNING: No PostgreSQL link configuration could be found." >&2;}
 		POSTGRESQLINCLUDES=""
 		POSTGRESQLLIBS=""
 		POSTGRESQLSTATIC=""
 	fi
 
-	if ( test "$POSTGRESQLINCLUDES" = "-I/usr/include" ); then
+	if ( test "$POSTGRESQLINCLUDES" = "-I/usr/include" )
+	then
 		POSTGRESQLINCLUDES=""
 	fi
 
@@ -11885,32 +12111,41 @@ echo "$as_me: WARNING: \"No PostgreSQL link configuration could be found.\"" >&2
 
 
 
-	if ( test -z "$POSTGRESQLLIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"PostgreSQL support will not be built.\"" >&5
-echo "$as_me: WARNING: \"PostgreSQL support will not be built.\"" >&2;}
+	if ( test -z "$POSTGRESQLLIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: PostgreSQL support will not be built." >&5
+echo "$as_me: WARNING: PostgreSQL support will not be built." >&2;}
 	fi
-
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_SQLITE" = "yes" ); then
 
-		echo
-	echo "***** SQLite *******************"
+echo
+echo "***** SQLite *****************"
+
+if ( test "$ENABLE_SQLITE" = "yes" )
+then
+
 	SQLITESTATIC=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 
 	GDBMLIBS=""
-	GDBMLIBSPATH=""
-	if ( test -n "$LIBGDBMPATH" ); then
-		as_ac_File=`echo "ac_cv_file_$LIBGDBMPATH/lib/libgdbm.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $LIBGDBMPATH/lib/libgdbm.a" >&5
-echo $ECHO_N "checking for $LIBGDBMPATH/lib/libgdbm.a... $ECHO_C" >&6
+	for i in "$LIBGDBMPATH" "/usr/local" "/usr/pkg" "/usr/local/libgdbm" "/opt/sfw"
+	do
+		if ( test -n "$i" )
+		then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/gdbm.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/gdbm.h" >&5
+echo $ECHO_N "checking for $i/include/gdbm.h... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -11918,7 +12153,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$LIBGDBMPATH/lib/libgdbm.a"; then
+if test -r "$i/include/gdbm.h"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -11927,12 +12162,12 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  GDBMLIBS="-L$LIBGDBMPATH/lib -lgdbm"
+  FOUNDHEADER="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$LIBGDBMPATH/lib/libgdbm.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $LIBGDBMPATH/lib/libgdbm.so" >&5
-echo $ECHO_N "checking for $LIBGDBMPATH/lib/libgdbm.so... $ECHO_C" >&6
+as_ac_File=`echo "ac_cv_file_$i/lib/libgdbm.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libgdbm.a" >&5
+echo $ECHO_N "checking for $i/lib/libgdbm.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -11940,7 +12175,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$LIBGDBMPATH/lib/libgdbm.so"; then
+if test -r "$i/lib/libgdbm.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -11949,15 +12184,22 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  GDBMLIBSPATH="$LIBGDBMPATH/lib"; GDBMLIBS="-L$LIBGDBMPATH/lib -lgdbm"
+  FOUNDLIB="yes"
 fi
 
-	else
-		for i in "/usr/local/lib" "/usr/pkg/lib" "/usr/local/libgdbm" "/opt/sfw/lib"
-		do
-			as_ac_File=`echo "ac_cv_file_$i/libgdbm.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libgdbm.a" >&5
-echo $ECHO_N "checking for $i/libgdbm.a... $ECHO_C" >&6
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "GDBMLIBS=\"-L$i/lib -lgdbm\""
+	fi
+else
+	if ( test -n "$i/lib/libgdbm.so" -a -n "GDBMLIBS=\"-L$i/lib -lgdbm\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/libgdbm.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libgdbm.so" >&5
+echo $ECHO_N "checking for $i/lib/libgdbm.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -11965,7 +12207,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$i/libgdbm.a"; then
+if test -r "$i/lib/libgdbm.so"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -11974,37 +12216,49 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  GDBMLIBS="-L$i -lgdbm"
+  FOUNDLIB="yes"
 fi
 
-			as_ac_File=`echo "ac_cv_file_$i/libgdbm.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libgdbm.so" >&5
-echo $ECHO_N "checking for $i/libgdbm.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "GDBMLIBS=\"-L$i/lib -lgdbm\""
+		fi
+	fi
+fi
+
+		fi
+		if ( test -n "$GDBMLIBS" )
+		then
+			break
+		fi
+	done
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+echo "$as_me:$LINENO: checking for /usr/include/gdbm.h" >&5
+echo $ECHO_N "checking for /usr/include/gdbm.h... $ECHO_C" >&6
+if test "${ac_cv_file__usr_include_gdbm_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   test "$cross_compiling" = yes &&
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$i/libgdbm.so"; then
-  eval "$as_ac_File=yes"
+if test -r "/usr/include/gdbm.h"; then
+  ac_cv_file__usr_include_gdbm_h=yes
 else
-  eval "$as_ac_File=no"
+  ac_cv_file__usr_include_gdbm_h=no
 fi
 fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  GDBMLIBSPATH="$i"; GDBMLIBS="-L$i -lgdbm"
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_include_gdbm_h" >&5
+echo "${ECHO_T}$ac_cv_file__usr_include_gdbm_h" >&6
+if test $ac_cv_file__usr_include_gdbm_h = yes; then
+  FOUNDHEADER="yes"
 fi
 
-			if ( test -n "$GDBMLIBS" ); then
-				break
-			fi
-		done
-
-		echo "$as_me:$LINENO: checking for /usr/lib/libgdbm.a" >&5
+echo "$as_me:$LINENO: checking for /usr/lib/libgdbm.a" >&5
 echo $ECHO_N "checking for /usr/lib/libgdbm.a... $ECHO_C" >&6
 if test "${ac_cv_file__usr_lib_libgdbm_a+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -12022,9 +12276,19 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libgdbm_a" >&5
 echo "${ECHO_T}$ac_cv_file__usr_lib_libgdbm_a" >&6
 if test $ac_cv_file__usr_lib_libgdbm_a = yes; then
-  GDBMLIBS="-lgdbm"
+  FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "GDBMLIBS=\"-lgdbm\""
+	fi
+else
+	if ( test -n "/usr/lib/libgdbm.so" -a -n "GDBMLIBS=\"-lgdbm\"" )
+	then
 		echo "$as_me:$LINENO: checking for /usr/lib/libgdbm.so" >&5
 echo $ECHO_N "checking for /usr/lib/libgdbm.so... $ECHO_C" >&6
 if test "${ac_cv_file__usr_lib_libgdbm_so+set}" = set; then
@@ -12043,18 +12307,28 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libgdbm_so" >&5
 echo "${ECHO_T}$ac_cv_file__usr_lib_libgdbm_so" >&6
 if test $ac_cv_file__usr_lib_libgdbm_so = yes; then
-  GDBMLIBSPATH=""; GDBMLIBS="-lgdbm"
+  FOUNDLIB="yes"
 fi
 
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "GDBMLIBS=\"-lgdbm\""
+		fi
 	fi
+fi
+
+
 
 
 	SQLITEINCLUDES=""
 	SQLITELIBS=""
 	SQLITELIBPATH=""
 
-	if ( test -n "$PTHREADSLIB" ); then
-		if ( test -n "$SQLITEPATH" ); then
+	if ( test -n "$PTHREADSLIB" )
+	then
+		if ( test -n "$SQLITEPATH" )
+		then
 			as_ac_File=`echo "ac_cv_file_$SQLITEPATH/include/sqlite.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $SQLITEPATH/include/sqlite.h" >&5
 echo $ECHO_N "checking for $SQLITEPATH/include/sqlite.h... $ECHO_C" >&6
@@ -12146,7 +12420,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   SQLITEINCLUDES="-I$i"
 fi
 
-				if ( test -n "$SQLITEINCLUDES" ); then
+				if ( test -n "$SQLITEINCLUDES" )
+				then
 					break
 				fi
 			done
@@ -12196,7 +12471,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   SQLITELIBPATH="$i"; SQLITELIBS="-L$i -lsqlite"
 fi
 
-				if ( test -n "$SQLITELIBS" ); then
+				if ( test -n "$SQLITELIBS" )
+				then
 					break
 				fi
 			done
@@ -12245,31 +12521,36 @@ fi
 
 		fi
 
-		if ( test "$SQLITEINCLUDES" = "-I/usr/include" ); then
+		if ( test "$SQLITEINCLUDES" = "-I/usr/include" )
+		then
 			SQLITEINCLUDES=""
 		fi
 	else
-		{ echo "$as_me:$LINENO: WARNING: \"pthreads was not found.\"" >&5
-echo "$as_me: WARNING: \"pthreads was not found.\"" >&2;}
+		{ echo "$as_me:$LINENO: WARNING: pthreads was not found." >&5
+echo "$as_me: WARNING: pthreads was not found." >&2;}
 	fi
 
-	if ( test -z "$SQLITELIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"SQLite support will not be built.\"" >&5
-echo "$as_me: WARNING: \"SQLite support will not be built.\"" >&2;}
+	if ( test -z "$SQLITELIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: SQLite support will not be built." >&5
+echo "$as_me: WARNING: SQLite support will not be built." >&2;}
 	else
-		if ( test -n "$RPATHFLAG" -a -n "$SQLITELIBSPATH" ); then
+		if ( test -n "$RPATHFLAG" -a -n "$SQLITELIBSPATH" )
+		then
 			SQLITELIBS="-Wl,-rpath $SQLITELIBSPATH $SQLITELIBS"
 		fi
 		echo "$as_me:$LINENO: checking if SQLite needs gdbm" >&5
 echo $ECHO_N "checking if SQLite needs gdbm... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$SQLITESTATIC $SQLITEINCLUDES"
-		LIBS="$SQLITELIBS $SOCKETLIB"
-		OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-		LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SQLITELIBPATH"
-		export LD_LIBRARY_PATH
 		SQLITENEEDGDBM=""
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$SQLITESTATIC $SQLITEINCLUDES"
+LIBS="$SQLITELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SQLITELIBPATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -12307,15 +12588,18 @@ echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; SQLITENEEDGDBM="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
-		export LD_LIBRARY_PATH
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
 
-		if ( test -n "$SQLITENEEDGDBM" ); then
-			if ( test -z "$GDBMLIBS" ); then
-				{ echo "$as_me:$LINENO: WARNING: \"SQLite needs GDBM but GDBM was not found. SQLite support will not be built.\"" >&5
-echo "$as_me: WARNING: \"SQLite needs GDBM but GDBM was not found. SQLite support will not be built.\"" >&2;}
+
+		if ( test -n "$SQLITENEEDGDBM" )
+		then
+			if ( test -z "$GDBMLIBS" )
+			then
+				{ echo "$as_me:$LINENO: WARNING: SQLite needs GDBM but GDBM was not found. SQLite support will not be built." >&5
+echo "$as_me: WARNING: SQLite needs GDBM but GDBM was not found. SQLite support will not be built." >&2;}
 				SQLITELIBS=""
 				SQLITEINCLUDES=""
 				SQLITESTATIC=""
@@ -12335,26 +12619,30 @@ _ACEOF
 
 
 
-
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_LAGO" = "yes" ); then
 
-		echo
-	echo "***** Lago *********************"
+echo
+echo "***** Lago *******************"
+
+if ( test "$ENABLE_LAGO" = "yes" )
+then
+
 	LAGOINCLUDES=""
 	LAGOLIBS=""
 	LAGOSTATIC=""
 	LAGOLIBPATH=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -n "$LAGOPATH" ); then
+	if ( test -n "$LAGOPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_$LAGOPATH/include/lago.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $LAGOPATH/include/lago.h" >&5
 echo $ECHO_N "checking for $LAGOPATH/include/lago.h... $ECHO_C" >&6
@@ -12446,7 +12734,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   LAGOINCLUDES="-I$i"
 fi
 
-			if ( test -n "$LAGOINCLUDES" ); then
+			if ( test -n "$LAGOINCLUDES" )
+			then
 				break
 			fi
 		done
@@ -12496,7 +12785,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   LAGOLIBPATH="$i"; LAGOLIBS="-L$i -llago"
 fi
 
-			if ( test -n "$LAGOLIBS" ); then
+			if ( test -n "$LAGOLIBS" )
+			then
 				break
 			fi
 		done
@@ -12545,22 +12835,26 @@ fi
 
 	fi
 
-	if ( test -z "$LAGOLIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"Lago support will not be built.\"" >&5
-echo "$as_me: WARNING: \"Lago support will not be built.\"" >&2;}
+	if ( test -z "$LAGOLIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: Lago support will not be built." >&5
+echo "$as_me: WARNING: Lago support will not be built." >&2;}
 	else
-		if ( test -n "$RPATHFLAG" -a -n "$LAGOLIBSPATH" ); then
+		if ( test -n "$RPATHFLAG" -a -n "$LAGOLIBSPATH" )
+		then
 			LAGOLIBS="-Wl,-rpath $LAGOLIBSPATH $LAGOLIBS"
 		fi
 		echo "$as_me:$LINENO: checking if Lago needs threads" >&5
 echo $ECHO_N "checking if Lago needs threads... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$LAGOSTATIC $LAGOINCLUDES"
-		LIBS="$LAGOLIBS $SOCKETLIB"
-		OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-		LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LAGOLIBPATH"
-		export LD_LIBRARY_PATH
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$LAGOSTATIC $LAGOINCLUDES"
+LIBS="$LAGOLIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LAGOLIBPATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -12598,39 +12892,46 @@ echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; LAGOLIBS="$LAGOLIBS $PTHREADSLIB"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
-		export LD_LIBRARY_PATH
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 	fi
 
-	if ( test "$LAGOINCLUDES" = "-I/usr/include" ); then
+	if ( test "$LAGOINCLUDES" = "-I/usr/include" )
+	then
 		LAGOINCLUDES=""
 	fi
 
 
 
 
-
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_FREETDS" = "yes" ); then
 
-		echo
-	echo "***** FreeTDS ******************"
+echo
+echo "***** FreeTDS ******************"
+
+
+if ( test "$ENABLE_FREETDS" = "yes" )
+then
+
 	FREETDSINCLUDES=""
 	FREETDSLIBS=""
 	FREETDSLIBSPATH=""
 	FREETDSSTATIC=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -n "$FREETDSPATH" ); then
+	if ( test -n "$FREETDSPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_$FREETDSPATH/include/ctpublic.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $FREETDSPATH/include/ctpublic.h" >&5
 echo $ECHO_N "checking for $FREETDSPATH/include/ctpublic.h... $ECHO_C" >&6
@@ -12722,7 +13023,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   FREETDSINCLUDES="-I$i"
 fi
 
-			if ( test -n "$FREETDSINCLUDES" ); then
+			if ( test -n "$FREETDSINCLUDES" )
+			then
 				break
 			fi
 		done
@@ -12773,7 +13075,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   FREETDSLIBSPATH="$i"; FREETDSLIBS="-L$i -lct"
 fi
 
-			if ( test -n "$FREETDSLIBS" ); then
+			if ( test -n "$FREETDSLIBS" )
+			then
 				break
 			fi
 		done
@@ -12822,11 +13125,13 @@ fi
 
 	fi
 
-	if ( test "$FREETDSINCLUDES" = "-I/usr/include" ); then
+	if ( test "$FREETDSINCLUDES" = "-I/usr/include" )
+	then
 		FREETDSINCLUDES=""
 	fi
 
-	if ( test -n "$RPATHFLAG" -a -n "$FREETDSLIBSPATH" ); then
+	if ( test -n "$RPATHFLAG" -a -n "$FREETDSLIBSPATH" )
+	then
 		FREETDSLIBS="-Wl,-rpath $FREETDSLIBSPATH $FREETDSLIBS"
 	fi
 
@@ -12834,9 +13139,10 @@ fi
 
 
 
-	if ( test -z "$FREETDSLIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"FreeTDS support will not be built.\"" >&5
-echo "$as_me: WARNING: \"FreeTDS support will not be built.\"" >&2;}
+	if ( test -z "$FREETDSLIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: FreeTDS support will not be built." >&5
+echo "$as_me: WARNING: FreeTDS support will not be built." >&2;}
 	else
 		ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -12846,9 +13152,14 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 		echo "$as_me:$LINENO: checking whether ctpublic.h contains function definitions" >&5
 echo $ECHO_N "checking whether ctpublic.h contains function definitions... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$FREETDSINCLUDES"
 
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$FREETDSINCLUDES"
+LIBS="$FREETDSLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -12857,7 +13168,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ctpublic.h>
-		#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -12866,13 +13177,13 @@ CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);
   return 0;
 }
 _ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
+         { ac_try='test -s conftest$ac_exeext'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -12891,8 +13202,12 @@ sed 's/^/| /' conftest.$ac_ext >&5
 echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-		CPPFLAGS="$TEMPCPPFLAGS"
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -12900,25 +13215,30 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 	fi
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_SYBASE" = "yes" ); then
 
-		echo
-	echo "***** Sybase *****************"
+echo
+echo "***** Sybase *****************"
+
+if ( test "$ENABLE_SYBASE" = "yes" )
+then
+
 	SYBASEINCLUDES=""
 	SYBASELIBS=""
 	SYBASESTATIC=""
 	SYBASELIBPATH=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -n "$SYBASEPATH" ); then
+	if ( test -n "$SYBASEPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_$SYBASEPATH/include/ctpublic.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $SYBASEPATH/include/ctpublic.h" >&5
 echo $ECHO_N "checking for $SYBASEPATH/include/ctpublic.h... $ECHO_C" >&6
@@ -13179,7 +13499,8 @@ if test $ac_cv_file__opt_sybase_12_5_OCS_12_5_lib_libct_so = yes; then
 fi
 
 
-		if ( test -z "$SYBASELIBS" ); then
+		if ( test -z "$SYBASELIBS" )
+		then
 			for i in "11.9.2" "11.0.3.3"
 			do
 				as_ac_File=`echo "ac_cv_file_/opt/sybase-$i/include/ctpublic.h" | $as_tr_sh`
@@ -13248,25 +13569,33 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   SYBASELIBPATH="/opt/sybase-$i/lib"; SYBASELIBS="-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck"
 fi
 
-				if ( test -n "$SYBASELIBS" ); then
+				if ( test -n "$SYBASELIBS" )
+				then
 					break
 				fi
 			done
 		fi
 	fi
 
-	if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBPATH" ); then
+	if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBPATH" )
+	then
 		SYBASELIBS="-Wl,-rpath $SYBASELIBPATH $SYBASELIBS"
 	fi
 
 	LINKFAIL=""
-	if ( test -n "$SYBASESTATIC" -a -n "$SYBASELIBS" ); then
+	if ( test -n "$SYBASESTATIC" -a -n "$SYBASELIBS" )
+	then
 		echo "$as_me:$LINENO: checking if Sybase can be statically linked without $DLLIB" >&5
 echo $ECHO_N "checking if Sybase can be statically linked without $DLLIB... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$SYBASESTATIC $SYBASEINCLUDES"
-		LIBS="$SYBASELIBS $SOCKETLIB"
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$SYBASESTATIC $SYBASEINCLUDES"
+LIBS="$SYBASELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -13274,7 +13603,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ctpublic.h>
-		#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -13305,15 +13634,24 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
+		then
 			echo "$as_me:$LINENO: checking if Sybase can be statically linked with $DLLIB" >&5
 echo $ECHO_N "checking if Sybase can be statically linked with $DLLIB... $ECHO_C" >&6
-			TEMPCPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$SYBASESTATIC $SYBASEINCLUDES"
-			LIBS="$SYBASELIBS $SOCKETLIB $DLLIB"
-			cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$SYBASESTATIC $SYBASEINCLUDES"
+LIBS="$SYBASELIBS $SOCKETLIB $DLLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -13321,7 +13659,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ctpublic.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -13352,24 +13690,31 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; SYBASESTATIC=""
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-			LIBS=""
-			CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		fi
 	fi
 
-	if ( test -z "$SYBASESTATIC" -a -n "$SYBASELIBS" ); then
-		if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBSPATH" ); then
+	if ( test -z "$SYBASESTATIC" -a -n "$SYBASELIBS" )
+	then
+		if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBSPATH" )
+		then
 			SYBASELIBS="-Wl,-rpath $SYBASELIBSPATH $SYBASELIBS"
 		fi
 		echo "$as_me:$LINENO: checking if Sybase can be dynamically linked without $DLLIB" >&5
 echo $ECHO_N "checking if Sybase can be dynamically linked without $DLLIB... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$SYBASEINCLUDES"
-		LIBS="$SYBASELIBS $SOCKETLIB"
-		OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-		LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBPATH"
-		export LD_LIBRARY_PATH
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$SYBASEINCLUDES"
+LIBS="$SYBASELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBPATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -13377,7 +13722,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ctpublic.h>
-		#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -13408,15 +13753,24 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
+		then
 			echo "$as_me:$LINENO: checking if Sybase can be dynamically linked with $DLLIB" >&5
 echo $ECHO_N "checking if Sybase can be dynamically linked with $DLLIB... $ECHO_C" >&6
-			TEMPCPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$SYBASEINCLUDES"
-			LIBS="$SYBASELIBS $SOCKETLIB $DLLIB"
-			cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$SYBASEINCLUDES"
+LIBS="$SYBASELIBS $SOCKETLIB $DLLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBPATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -13424,7 +13778,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ctpublic.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -13455,16 +13809,18 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-			LIBS=""
-			CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		fi
-		LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
-		export LD_LIBRARY_PATH
 	fi
 
-	if ( test -n "$LINKFAIL" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"No Sybase link configuration could be found.\"" >&5
-echo "$as_me: WARNING: \"No Sybase link configuration could be found.\"" >&2;}
+	if ( test -n "$LINKFAIL" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: No Sybase link configuration could be found." >&5
+echo "$as_me: WARNING: No Sybase link configuration could be found." >&2;}
 		SYBASEINCLUDES=""
 		SYBASELIBS=""
 		SYBASESTATIC=""
@@ -13474,20 +13830,23 @@ echo "$as_me: WARNING: \"No Sybase link configuration could be found.\"" >&2;}
 
 
 
-	if ( test -z "$SYBASELIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"Sybase support will not be built.\"" >&5
-echo "$as_me: WARNING: \"Sybase support will not be built.\"" >&2;}
+	if ( test -z "$SYBASELIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: Sybase support will not be built." >&5
+echo "$as_me: WARNING: Sybase support will not be built." >&2;}
 	fi
-
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_ODBC" = "yes" ); then
 
-		echo
-	echo "***** ODBC *********************"
+echo
+echo "***** ODBC *********************"
+
+if ( test "$ENABLE_ODBC" = "yes" )
+then
+
 	ODBCINCLUDES=""
 	ODBCLIBS=""
 	ODBCSTATIC=""
@@ -13495,13 +13854,15 @@ if ( test "$ENABLE_ODBC" = "yes" ); then
 	UNIXODBCSTATIC=""
 	ODBCLIBPATH=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 	HAVE_IODBC=""
 	HAVE_UNIXODBC=""
 
-	if ( test -n "$ODBCPATH" ); then
+	if ( test -n "$ODBCPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_$ODBCPATH/include/sql.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ODBCPATH/include/sql.h" >&5
 echo $ECHO_N "checking for $ODBCPATH/include/sql.h... $ECHO_C" >&6
@@ -13525,8 +13886,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
 fi
 
 
-		# iodbc
-		as_ac_File=`echo "ac_cv_file_$ODBCPATH/lib/libiodbc.a" | $as_tr_sh`
+				as_ac_File=`echo "ac_cv_file_$ODBCPATH/lib/libiodbc.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ODBCPATH/lib/libiodbc.a" >&5
 echo $ECHO_N "checking for $ODBCPATH/lib/libiodbc.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -13571,8 +13931,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
 fi
 
 
-		# unixodbc
-		as_ac_File=`echo "ac_cv_file_$ODBCPATH/lib/libodbc.a" | $as_tr_sh`
+				as_ac_File=`echo "ac_cv_file_$ODBCPATH/lib/libodbc.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ODBCPATH/lib/libodbc.a" >&5
 echo $ECHO_N "checking for $ODBCPATH/lib/libodbc.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -13619,8 +13978,7 @@ fi
 
 	else
 
-		# headers
-		for i in "/usr/include" "/usr/local/unixodbc/include" "/usr/local/iodbc/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
+				for i in "/usr/include" "/usr/local/unixodbc/include" "/usr/local/iodbc/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
 		do
 			as_ac_File=`echo "ac_cv_file_$i/sql.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/sql.h" >&5
@@ -13644,13 +14002,13 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   ODBCINCLUDES="-I$i"
 fi
 
-			if ( test -n "$ODBCINCLUDES" ); then
+			if ( test -n "$ODBCINCLUDES" )
+			then
 				break
 			fi
 		done
 
-		# iodbc
-		for i in "/usr/local/iodbc/lib" "/usr/local/lib" "/usr/local/lib/iodbc" "/usr/pkg/lib" "/opt/sfw/lib"
+				for i in "/usr/local/iodbc/lib" "/usr/local/lib" "/usr/local/lib/iodbc" "/usr/pkg/lib" "/opt/sfw/lib"
 		do
 			as_ac_File=`echo "ac_cv_file_$i/libiodbc.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/libiodbc.a" >&5
@@ -13696,7 +14054,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   ODBCLIBPATH="$i"; ODBCLIBS="-L$i -liodbc"; HAVE_IODBC="yes"
 fi
 
-			if ( test -n "$ODBCLIBS" ); then
+			if ( test -n "$ODBCLIBS" )
+			then
 				break
 			fi
 		done
@@ -13744,8 +14103,7 @@ if test $ac_cv_file__usr_lib_libiodbc_so = yes; then
 fi
 
 
-		# unixodbc
-		for i in "/usr/local/unixodbc/lib" "/usr/local/lib" "/usr/local/lib/unixodbc" "/usr/pkg/lib" "/opt/sfw/lib"
+				for i in "/usr/local/unixodbc/lib" "/usr/local/lib" "/usr/local/lib/unixodbc" "/usr/pkg/lib" "/opt/sfw/lib"
 		do
 			as_ac_File=`echo "ac_cv_file_$i/libodbc.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/libodbc.a" >&5
@@ -13791,7 +14149,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   ODBCLIBPATH="$i"; ODBCLIBS="-L$i -lodbc"; HAVE_UNIXODBC="yes"
 fi
 
-			if ( test -n "$ODBCLIBS" ); then
+			if ( test -n "$ODBCLIBS" )
+			then
 				break
 			fi
 		done
@@ -13840,24 +14199,28 @@ fi
 
 	fi
 
-	if ( test "$ODBCINCLUDES" = "-I/usr/include" ); then
+	if ( test "$ODBCINCLUDES" = "-I/usr/include" )
+	then
 		ODBCINCLUDES=""
 	fi
 
 
 
-	if ( test -n "`echo $ODBCLIBS | grep iodbc`" ); then
+	if ( test -n "`echo $ODBCLIBS | grep iodbc`" )
+	then
 		ODBCSTATIC="$IODBCSTATIC"
 	else
 		ODBCSTATIC="$UNIXODBCSTATIC"
 	fi
 
 
-	if ( test -n "$RPATHFLAG" -a -n "$ODBCLIBSPATH" ); then
+	if ( test -n "$RPATHFLAG" -a -n "$ODBCLIBSPATH" )
+	then
 		ODBCLIBS="-Wl,-rpath $ODBCLIBPATH $ODBCLIBS"
 	fi
 
-	if ( test -n "$HAVE_UNIXODBC" ); then
+	if ( test -n "$HAVE_UNIXODBC" )
+	then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_UNIXODBC 1
@@ -13865,13 +14228,16 @@ _ACEOF
 
 		echo "$as_me:$LINENO: checking if UnixODBC needs threads" >&5
 echo $ECHO_N "checking if UnixODBC needs threads... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
-		LIBS="$ODBCLIBS $SOCKETLIB"
-		OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-		LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBPATH"
-		export LD_LIBRARY_PATH
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES,$ODBCLIBS $SOCKETLIB"
+LIBS="$LD_LIBRARY_PATH:$ODBCLIBPATH"
+LD_LIBRARY_PATH="echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -13879,9 +14245,9 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <sql.h>
-	#include <sqlext.h>
-	#include <sqltypes.h>
-	#include <stdlib.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -13902,22 +14268,22 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; ODBCLIBS="$ODBCLIBS $PTHREADSLIB"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; ODBCLIBS="$ODBCLIBS $PTHREADSLIB"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
-		export LD_LIBRARY_PATH
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 	fi
-	if ( test -n "$HAVE_IODBC" ); then
+	if ( test -n "$HAVE_IODBC" )
+	then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_IODBC 1
@@ -13925,13 +14291,16 @@ _ACEOF
 
 		echo "$as_me:$LINENO: checking if iODBC needs threads" >&5
 echo $ECHO_N "checking if iODBC needs threads... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
-		LIBS="$ODBCLIBS $SOCKETLIB"
-		OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-		LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBPATH"
-		export LD_LIBRARY_PATH
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES, $ODBCLIBS $SOCKETLIB"
+LIBS="$LD_LIBRARY_PATH:$ODBCLIBPATH"
+LD_LIBRARY_PATH="echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -13939,9 +14308,9 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <sql.h>
-	#include <sqlext.h>
-	#include <sqltypes.h>
-	#include <stdlib.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -13962,46 +14331,50 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; ODBCLIBS="$ODBCLIBS $PTHREADSLIB"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; ODBCLIBS="$ODBCLIBS $PTHREADSLIB"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
-		export LD_LIBRARY_PATH
-	fi
-	if ( test -z "$ODBCLIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"ODBC support will not be built.\"" >&5
-echo "$as_me: WARNING: \"ODBC support will not be built.\"" >&2;}
-	fi
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
 
-	echo "******************************"
+	fi
+	if ( test -z "$ODBCLIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: ODBC support will not be built." >&5
+echo "$as_me: WARNING: ODBC support will not be built." >&2;}
+	fi
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_DB2" = "yes" ); then
 
-		echo
-	echo "***** DB2 **********************"
+echo
+echo "***** DB2 **********************"
+
+if ( test "$ENABLE_DB2" = "yes" )
+then
+
 	DB2INCLUDES=""
 	DB2LIBS=""
 	DB2LIBSPATH=""
 	DB2STATIC=""
 	DB2VERSION="7"
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -n "$DB2PATH" ); then
+	if ( test -n "$DB2PATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_$DB2PATH/include/sql.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $DB2PATH/include/sql.h" >&5
 echo $ECHO_N "checking for $DB2PATH/include/sql.h... $ECHO_C" >&6
@@ -14071,8 +14444,7 @@ fi
 
 	else
 
-		# check /opt for 7.2
-		echo "$as_me:$LINENO: checking for /opt/IBMdb2/V7.1/include/sql.h" >&5
+				echo "$as_me:$LINENO: checking for /opt/IBMdb2/V7.1/include/sql.h" >&5
 echo $ECHO_N "checking for /opt/IBMdb2/V7.1/include/sql.h... $ECHO_C" >&6
 if test "${ac_cv_file__opt_IBMdb2_V7_1_include_sql_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -14136,8 +14508,7 @@ if test $ac_cv_file__opt_IBMdb2_V7_1_lib_libdb2_so = yes; then
 fi
 
 
-		# check /usr for 7.2
-		echo "$as_me:$LINENO: checking for /usr/IBMdb2/V7.1/include/sql.h" >&5
+				echo "$as_me:$LINENO: checking for /usr/IBMdb2/V7.1/include/sql.h" >&5
 echo $ECHO_N "checking for /usr/IBMdb2/V7.1/include/sql.h... $ECHO_C" >&6
 if test "${ac_cv_file__usr_IBMdb2_V7_1_include_sql_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -14201,8 +14572,7 @@ if test $ac_cv_file__usr_IBMdb2_V7_1_lib_libdb2_so = yes; then
 fi
 
 
-		# check /opt for 8.1
-		echo "$as_me:$LINENO: checking for /opt/IBM/db2/V8.1/include/sql.h" >&5
+				echo "$as_me:$LINENO: checking for /opt/IBM/db2/V8.1/include/sql.h" >&5
 echo $ECHO_N "checking for /opt/IBM/db2/V8.1/include/sql.h... $ECHO_C" >&6
 if test "${ac_cv_file__opt_IBM_db2_V8_1_include_sql_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -14267,7 +14637,8 @@ fi
 
 	fi
 
-	if ( test -n "$RPATHFLAG" -a -n "$DB2LIBSPATH" ); then
+	if ( test -n "$RPATHFLAG" -a -n "$DB2LIBSPATH" )
+	then
 		DB2LIBS="-Wl,-rpath $DB2LIBSPATH $DB2LIBS"
 	fi
 
@@ -14280,30 +14651,35 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-	if ( test -z "$DB2LIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"DB2 support will not be built.\"" >&5
-echo "$as_me: WARNING: \"DB2 support will not be built.\"" >&2;}
+	if ( test -z "$DB2LIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: DB2 support will not be built." >&5
+echo "$as_me: WARNING: DB2 support will not be built." >&2;}
 	fi
-
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_INTERBASE" = "yes" ); then
 
-		echo
-	echo "***** Interbase **************"
+echo
+echo "***** Interbase **************"
+
+if ( test "$ENABLE_INTERBASE" = "yes" )
+then
+
 	INTERBASEINCLUDES=""
 	INTERBASELIBS=""
 	INTERBASELIBSPATH=""
 	INTERBASESTATIC=""
 	STATICFLAG=""
-	if ( test -n "$STATICLINK" ); then
+	if ( test -n "$STATICLINK" )
+	then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -n "$INTERBASEPATH" ); then
+	if ( test -n "$INTERBASEPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_$INTERBASEPATH/include/ibase.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $INTERBASEPATH/include/ibase.h" >&5
 echo $ECHO_N "checking for $INTERBASEPATH/include/ibase.h... $ECHO_C" >&6
@@ -14373,8 +14749,7 @@ fi
 
 	else
 
-		# includes
-		echo "$as_me:$LINENO: checking for /usr/include/ibase.h" >&5
+				echo "$as_me:$LINENO: checking for /usr/include/ibase.h" >&5
 echo $ECHO_N "checking for /usr/include/ibase.h... $ECHO_C" >&6
 if test "${ac_cv_file__usr_include_ibase_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -14440,13 +14815,19 @@ fi
 	fi
 
 	LINKFAIL=""
-	if ( test -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" ); then
+	if ( test -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
+	then
 		echo "$as_me:$LINENO: checking if Interbase can be statically linked without $DLLIB" >&5
 echo $ECHO_N "checking if Interbase can be statically linked without $DLLIB... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$INTERBASESTATIC $INTERBASEINCLUDES"
-		LIBS="$INTERBASELIBS $SOCKETLIB"
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$INTERBASESTATIC $INTERBASEINCLUDES"
+LIBS="$INTERBASELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -14454,7 +14835,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ibase.h>
-		#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -14485,15 +14866,24 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
+		then
 			echo "$as_me:$LINENO: checking if Interbase can be statically linked with $DLLIB" >&5
 echo $ECHO_N "checking if Interbase can be statically linked with $DLLIB... $ECHO_C" >&6
-			TEMPCPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$INTERBASESTATIC $INTERBASEINCLUDES"
-			LIBS="$INTERBASELIBS $SOCKETLIB $DLLIB"
-			cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$INTERBASESTATIC $INTERBASEINCLUDES"
+LIBS="$INTERBASELIBS $SOCKETLIB $DLLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -14501,7 +14891,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ibase.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -14532,21 +14922,31 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; INTERBASESTATIC=""
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-			LIBS=""
-			CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		fi
 	fi
 
-	if ( test -z "$INTERBASESTATIC" -a -n "$INTERBASELIBS" ); then
-		if ( test -n "$RPATHFLAG" -a -n "$INTERBASELIBSPATH" ); then
+	if ( test -z "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
+	then
+		if ( test -n "$RPATHFLAG" -a -n "$INTERBASELIBSPATH" )
+		then
 			INTERBASELIBS="-Wl,-rpath $INTERBASELIBSPATH $INTERBASELIBS"
 		fi
 		echo "$as_me:$LINENO: checking if Interbase can be dynamically linked without $DLLIB" >&5
 echo $ECHO_N "checking if Interbase can be dynamically linked without $DLLIB... $ECHO_C" >&6
-		TEMPCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$INTERBASEINCLUDES"
-		LIBS="$INTERBASELIBS $SOCKETLIB"
-		cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$INTERBASEINCLUDES"
+LIBS="$INTERBASELIBS $SOCKETLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -14554,7 +14954,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ibase.h>
-		#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -14585,15 +14985,24 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; LINKFAIL="yes"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-		LIBS=""
-		CPPFLAGS="$TEMPCPPFLAGS"
-		if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
+		then
 			echo "$as_me:$LINENO: checking if Interbase can be dynamically linked with $DLLIB" >&5
 echo $ECHO_N "checking if Interbase can be dynamically linked with $DLLIB... $ECHO_C" >&6
-			TEMPCPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$INTERBASEINCLUDES"
-			LIBS="$INTERBASELIBS $SOCKETLIB $DLLIB"
-			cat >conftest.$ac_ext <<_ACEOF
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$INTERBASEINCLUDES"
+LIBS="$INTERBASELIBS $SOCKETLIB $DLLIB"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
@@ -14601,7 +15010,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ibase.h>
-			#include <stdlib.h>
+#include <stdlib.h>
 int
 main ()
 {
@@ -14632,14 +15041,18 @@ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-			LIBS=""
-			CPPFLAGS="$TEMPCPPFLAGS"
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		fi
 	fi
 
-	if ( test -n "$LINKFAIL" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"No Interbase link configuration could be found.\"" >&5
-echo "$as_me: WARNING: \"No Interbase link configuration could be found.\"" >&2;}
+	if ( test -n "$LINKFAIL" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: No Interbase link configuration could be found." >&5
+echo "$as_me: WARNING: No Interbase link configuration could be found." >&2;}
 		INTERBASEINCLUDES=""
 		INTERBASELIBS=""
 		INTERBASESTATIC=""
@@ -14649,23 +15062,27 @@ echo "$as_me: WARNING: \"No Interbase link configuration could be found.\"" >&2;
 
 
 
-	if ( test -z "$INTERBASELIBS" ); then
-		{ echo "$as_me:$LINENO: WARNING: \"Interbase support will not be built.\"" >&5
-echo "$as_me: WARNING: \"Interbase support will not be built.\"" >&2;}
+	if ( test -z "$INTERBASELIBS" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: Interbase support will not be built." >&5
+echo "$as_me: WARNING: Interbase support will not be built." >&2;}
 	fi
-
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_PERL" = "yes" ); then
 
-		echo
-	echo "***** Perl *******************"
+echo
+echo "***** Perl *******************"
+
+if ( test "$ENABLE_PERL" = "yes" )
+then
+
 	HAVE_PERL=""
 	PERL=""
-	if ( test -n "$PERLPATH" ); then
+	if ( test -n "$PERLPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_"$PERLPATH/bin/perl"" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for \"$PERLPATH/bin/perl\"" >&5
 echo $ECHO_N "checking for \"$PERLPATH/bin/perl\"... $ECHO_C" >&6
@@ -14724,7 +15141,8 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-		if ( test -z "$PERL" ); then
+		if ( test -z "$PERL" )
+		then
 			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin"
 			do
 				as_ac_File=`echo "ac_cv_file_"$i/perl5"" | $as_tr_sh`
@@ -14771,32 +15189,37 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   PERL="$i/perl"
 fi
 
-				if ( test -n "$PERL" ); then
+				if ( test -n "$PERL" )
+				then
 					break
 				fi
 			done
 		fi
 	fi
-	if ( test -n "$PERL" ); then
+	if ( test -n "$PERL" )
+	then
 		HAVE_PERL="yes"
 		PERLPREFIXCMD=`$PERL -V:prefix`
 		PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
 	else
-		{ echo "$as_me:$LINENO: WARNING: \"The Perl API will not be built.\"" >&5
-echo "$as_me: WARNING: \"The Perl API will not be built.\"" >&2;}
+		{ echo "$as_me:$LINENO: WARNING: The Perl API will not be built." >&5
+echo "$as_me: WARNING: The Perl API will not be built." >&2;}
 	fi
 
 
 
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_PYTHON" = "yes" ); then
 
-		echo
-	echo "***** Python *****************"
+echo
+echo "***** Python *****************"
+
+if ( test "$ENABLE_PYTHON" = "yes" )
+then
+
 	HAVE_PYTHON=""
 	PYTHONINCLUDES=""
 	PYTHONLIBS=""
@@ -14806,30 +15229,36 @@ if ( test "$ENABLE_PYTHON" = "yes" ); then
 	echo "$as_me:$LINENO: checking for Python" >&5
 echo $ECHO_N "checking for Python... $ECHO_C" >&6
 
-	if ( test -n "$PYTHONPATH" ); then
+	if ( test -n "$PYTHONPATH" )
+	then
 
 		for i in "1.5" "1.6" "2.0" "2.1" "2.2"
 		do
-			if ( test -d "$PYTHONPATH/include/python$i" ); then
+			if ( test -d "$PYTHONPATH/include/python$i" )
+			then
 				PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
 			fi
 
-			if ( test -r "$PYTHONPATH/lib/python$i/config/python.o" -a -r "$PYTHONPATH/lib/python$i/config/libpython$i.a"); then
+			if ( test -r "$PYTHONPATH/lib/python$i/config/python.o" -a -r "$PYTHONPATH/lib/python$i/config/libpython$i.a" )
+			then
 				PYTHONLIBS="-L$PYTHONPATH/lib/python$i/config -lpython$i"
 				PYTHONOBJ="$PYTHONPATH/lib/python$i/config/python.o"
 
 			else
-				if ( test -r "$PYTHONPATH/lib/python$i/config/ccpython.o" -a -r "$PYTHONPATH/lib/python$i/config/libpython$i.a"); then
+				if ( test -r "$PYTHONPATH/lib/python$i/config/ccpython.o" -a -r "$PYTHONPATH/lib/python$i/config/libpython$i.a" )
+				then
 				PYTHONLIBS="-L$PYTHONPATH/lib/python$i/config -lpython$i"
 				PYTHONOBJ="$PYTHONPATH/lib/python$i/config/ccpython.o"
 				fi
 			fi
 
-			if ( test -d "$PYTHONPATH/lib/python$i"); then
+			if ( test -d "$PYTHONPATH/lib/python$i" )
+			then
 				PYTHONDIR="$PYTHONPATH/lib/python$i"
 			fi
 
-			if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONDIR" ); then
+			if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONDIR" )
+			then
 				PYTHONVERSION="$i"
 				break
 			fi
@@ -14841,40 +15270,48 @@ echo $ECHO_N "checking for Python... $ECHO_C" >&6
 		do
 			for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"
 			do
-				if ( test -d "$i" ); then
+				if ( test -d "$i" )
+				then
 					PYTHONINCLUDES="-I$i"
 				fi
-				if ( test -n "$PYTHONINCLUDES" ); then
+				if ( test -n "$PYTHONINCLUDES" )
+				then
 					break
 				fi
 			done
 
 			for i in "/usr/lib/python$j/config" "/usr/local/lib/python$j/config" "/usr/pkg/lib/python$j/config" "/usr/local/python$j/lib/python$j/config" "/opt/sfw/lib/python$j/config"
 			do
-				if ( test -r "$i/python.o" -a -r "$i/libpython$j.a"); then
+				if ( test -r "$i/python.o" -a -r "$i/libpython$j.a" )
+				then
 					PYTHONLIBS="-L$i -lpython$j"
 					PYTHONOBJ="$i/python.o"
 				else
-					if ( test -r "$i/ccpython.o" -a -r "$i/libpython$j.a"); then
+					if ( test -r "$i/ccpython.o" -a -r "$i/libpython$j.a" )
+					then
 						PYTHONLIBS="-L$i/config -lpython$j"
 						PYTHONOBJ="$i/config/ccpython.o"
 					fi
 				fi
-				if ( test -n "$PYTHONLIBS" ); then
+				if ( test -n "$PYTHONLIBS" )
+				then
 					break
 				fi
 			done
 
 			for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"
 			do
-				if ( test -d "$i"); then
+				if ( test -d "$i" )
+				then
 					PYTHONDIR="$i"
 				fi
-				if ( test -n "$PYTHONDIR" ); then
+				if ( test -n "$PYTHONDIR" )
+				then
 					break
 				fi
 			done
-			if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONDIR" ); then
+			if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONDIR" )
+			then
 				PYTHONVERSION="$j"
 				break
 			fi
@@ -14882,13 +15319,14 @@ echo $ECHO_N "checking for Python... $ECHO_C" >&6
 
 	fi
 
-	if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONOBJ" -a -n "$PYTHONDIR"); then
+	if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONOBJ" -a -n "$PYTHONDIR" )
+	then
 		HAVE_PYTHON="yes"
 		echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	else
-		{ echo "$as_me:$LINENO: WARNING: \"The Python API will not be built.\"" >&5
-echo "$as_me: WARNING: \"The Python API will not be built.\"" >&2;}
+		{ echo "$as_me:$LINENO: WARNING: The Python API will not be built." >&5
+echo "$as_me: WARNING: The Python API will not be built." >&2;}
 		echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 	fi
@@ -14899,23 +15337,29 @@ echo "${ECHO_T}no" >&6
 
 
 
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_ZOPE" = "yes" ); then
 
-		echo
-	echo "***** Zope *******************"
+echo
+echo "***** Zope *******************"
+
+if ( test "$ENABLE_ZOPE" = "yes" )
+then
+
 	HAVE_ZOPE=""
 
-	if ( test -n "$HAVE_PYTHON"); then
-		if ( test -n "$ZOPEPATH"); then
+	if ( test -n "$HAVE_PYTHON" )
+	then
+		if ( test -n "$ZOPEPATH" )
+		then
 			ZOPEDIR="$ZOPEPATH/lib/python/Products"
 		else
 
-			if ( test -z "$ZOPEDIR" ); then
+			if ( test -z "$ZOPEDIR" )
+			then
 				for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/opt"
 				do
 					for j in "zope" "Zope"
@@ -14942,7 +15386,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   HAVE_ZOPE="yes"; ZOPEDIR="$i/$j/lib/python/Products"
 fi
 
-						if ( test -n "$ZOPEDIR" ); then
+						if ( test -n "$ZOPEDIR" )
+						then
 							break
 						fi
 						for k in "2.2" "2.3" "2.4"
@@ -14969,12 +15414,14 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   HAVE_ZOPE="yes"; ZOPEDIR="$i/$j-$k/lib/python/Products"
 fi
 
-							if ( test -n "$ZOPEDIR" ); then
+							if ( test -n "$ZOPEDIR" )
+							then
 								break
 							fi
 						done
 					done
-					if ( test -n "$ZOPEDIR" ); then
+					if ( test -n "$ZOPEDIR" )
+					then
 						break
 					fi
 				done
@@ -14982,25 +15429,30 @@ fi
 		fi
 	fi
 
-	if ( test -z "$HAVE_ZOPE"); then
-		{ echo "$as_me:$LINENO: WARNING: \"The Zope API will not be installed.\"" >&5
-echo "$as_me: WARNING: \"The Zope API will not be installed.\"" >&2;}
+	if ( test -z "$HAVE_ZOPE" )
+	then
+		{ echo "$as_me:$LINENO: WARNING: The Zope API will not be installed." >&5
+echo "$as_me: WARNING: The Zope API will not be installed." >&2;}
 	fi
 
 
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_RUBY" = "yes" ); then
 
-		echo
-	echo "***** Ruby *******************"
+echo
+echo "***** Ruby *******************"
+
+if ( test "$ENABLE_RUBY" = "yes" )
+then
+
 	HAVE_RUBY=""
 	RUBY=""
 
-	if ( test -n "$RUBYPATH"); then
+	if ( test -n "$RUBYPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_"$RUBYPATH/bin/ruby"" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for \"$RUBYPATH/bin/ruby\"" >&5
 echo $ECHO_N "checking for \"$RUBYPATH/bin/ruby\"... $ECHO_C" >&6
@@ -15059,7 +15511,8 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-		if ( test -z "$RUBY"); then
+		if ( test -z "$RUBY" )
+		then
 			for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
 			do
 				as_ac_File=`echo "ac_cv_file_"$i/ruby"" | $as_tr_sh`
@@ -15084,40 +15537,47 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   RUBY="$i/ruby"
 fi
 
-				if ( test -n "$RUBY" ); then
+				if ( test -n "$RUBY" )
+				then
 					break
 				fi
 			done
 		fi
 	fi
 
-	if ( test -n "$RUBY"); then
+	if ( test -n "$RUBY" )
+	then
 		HAVE_RUBY="yes"
 	else
 		HAVE_RUBY=""
-		{ echo "$as_me:$LINENO: WARNING: \"The Ruby API will not be built.\"" >&5
-echo "$as_me: WARNING: \"The Ruby API will not be built.\"" >&2;}
+		{ echo "$as_me:$LINENO: WARNING: The Ruby API will not be built." >&5
+echo "$as_me: WARNING: The Ruby API will not be built." >&2;}
 	fi
 
 
 
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_JAVA" = "yes" ); then
 
-		echo
-	echo "***** Java *******************"
+echo
+echo "***** Java *******************"
+
+if ( test "$ENABLE_JAVA" = "yes" )
+then
+
 	HAVE_JAVA=""
 	JAVAC=""
 	JAVAINCLUDES=""
 
-	if ( test -z "$JAVAPATH"); then
+	if ( test -z "$JAVAPATH" )
+	then
 		for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/local/java 2>/dev/null`
 		do
-			if ( test -z "$JAVAPATH"); then
+			if ( test -z "$JAVAPATH" )
+			then
 				as_ac_File=`echo "ac_cv_file_"$i/include/jni.h"" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for \"$i/include/jni.h\"" >&5
 echo $ECHO_N "checking for \"$i/include/jni.h\"... $ECHO_C" >&6
@@ -15146,7 +15606,8 @@ fi
 		done
 	fi
 
-	if ( test -z "$JAVAPATH"); then
+	if ( test -z "$JAVAPATH" )
+	then
 		echo "$as_me:$LINENO: checking for \"/usr/local/java/include/jni.h\"" >&5
 echo $ECHO_N "checking for \"/usr/local/java/include/jni.h\"... $ECHO_C" >&6
 if test "${ac_cv_file___usr_local_java_include_jni_h_+set}" = set; then
@@ -15170,7 +15631,8 @@ fi
 
 	fi
 
-	if ( test -z "$JAVAPATH"); then
+	if ( test -z "$JAVAPATH" )
+	then
 		echo "$as_me:$LINENO: checking for \"/usr/java/include/jni.h\"" >&5
 echo $ECHO_N "checking for \"/usr/java/include/jni.h\"... $ECHO_C" >&6
 if test "${ac_cv_file___usr_java_include_jni_h_+set}" = set; then
@@ -15194,7 +15656,8 @@ fi
 
 	fi
 
-	if ( test -n "$JAVAPATH"); then
+	if ( test -n "$JAVAPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_"$JAVAPATH/bin/javac"" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for \"$JAVAPATH/bin/javac\"" >&5
 echo $ECHO_N "checking for \"$JAVAPATH/bin/javac\"... $ECHO_C" >&6
@@ -15239,37 +15702,46 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   JAVAINCLUDES="-I$JAVAPATH/include"
 fi
 
-		if ( test -n "$JAVAINCLUDES"); then
-			for i in `ls -l $JAVAPATH/include | grep drw | awk '{print $9}'`
+		if ( test -n "$JAVAINCLUDES" )
+		then
+			for i in `ls -d $JAVAPATH/include/*`
 			do
-				JAVAINCLUDES="$JAVAINCLUDES -I$JAVAPATH/include/$i"
+				if ( test -d "$i" )
+				then
+					JAVAINCLUDES="$JAVAINCLUDES -I$i"
+				fi
 			done
 		fi
 	fi
 
-	if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES"); then
+	if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES" )
+	then
 		HAVE_JAVA="yes"
 	else
 		HAVE_JAVA=""
-		{ echo "$as_me:$LINENO: WARNING: \"The Java API will not be built.\"" >&5
-echo "$as_me: WARNING: \"The Java API will not be built.\"" >&2;}
+		{ echo "$as_me:$LINENO: WARNING: The Java API will not be built." >&5
+echo "$as_me: WARNING: The Java API will not be built." >&2;}
 	fi
 
 
 
 
-	echo "******************************"
 fi
 
+echo "******************************"
 
-if ( test "$ENABLE_PHP" = "yes" ); then
 
-		echo
-	echo "***** PHP ********************"
+echo
+echo "***** PHP ********************"
+
+if ( test "$ENABLE_PHP" = "yes" )
+then
+
 	HAVE_PHP=""
 	PHPCONFIG=""
 
-	if ( test -n "$PHPPATH"); then
+	if ( test -n "$PHPPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_"$PHPPATH/bin/php-config"" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for \"$PHPPATH/bin/php-config\"" >&5
 echo $ECHO_N "checking for \"$PHPPATH/bin/php-config\"... $ECHO_C" >&6
@@ -15328,7 +15800,8 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-		if ( test -z "$PHPCONFIG"); then
+		if ( test -z "$PHPCONFIG" )
+		then
 			for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
 			do
 				as_ac_File=`echo "ac_cv_file_"$i/php-config"" | $as_tr_sh`
@@ -15353,44 +15826,47 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   PHPCONFIG="$i/php-config"
 fi
 
-				if ( test -n "$PHPCONFIG" ); then
+				if ( test -n "$PHPCONFIG" )
+				then
 					break
 				fi
 			done
 		fi
 	fi
 
-	if ( test -n "$PHPCONFIG"); then
+	if ( test -n "$PHPCONFIG" )
+	then
 		HAVE_PHP="yes"
 		PHPPREFIX=`$PHPCONFIG --prefix`
-		# some php's fail to replace ${prefix} with their prefix when you
-		# run php-config --includes, but php-config --prefix usually works
-		# so we fake it here
-		PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
+								PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
 		PHPEXTDIR=`$PHPCONFIG --extension-dir`
 	else
 		HAVE_PHP=""
-		{ echo "$as_me:$LINENO: WARNING: \"The PHP API will not be built.\"" >&5
-echo "$as_me: WARNING: \"The PHP API will not be built.\"" >&2;}
+		{ echo "$as_me:$LINENO: WARNING: The PHP API will not be built." >&5
+echo "$as_me: WARNING: The PHP API will not be built." >&2;}
 	fi
 
 
 
 
-	echo "******************************"
 fi
 
+echo "******************************"
 
 
-if ( test "$ENABLE_GTK" = "yes" ); then
 
-		echo
-	echo "***** GTK+ *******************"
+echo
+echo "***** GTK+ *******************"
+
+if ( test "$ENABLE_GTK" = "yes" )
+then
+
 	HAVE_GTK=""
 	GTKVER=""
 	GTKCONFIG=""
 
-	if ( test -n "$GTKPATH"); then
+	if ( test -n "$GTKPATH" )
+	then
 		as_ac_File=`echo "ac_cv_file_"$GTKPATH/bin/gtk-config"" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for \"$GTKPATH/bin/gtk-config\"" >&5
 echo $ECHO_N "checking for \"$GTKPATH/bin/gtk-config\"... $ECHO_C" >&6
@@ -15449,7 +15925,8 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-		if ( test -z "$GTKCONFIG"); then
+		if ( test -z "$GTKCONFIG" )
+		then
 			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/gtk/bin" "/usr/local/gtk+/bin" "/opt/sfw/bin"
 			do
 				for j in "gtk-config" "gtk12-config" "gtk10-config"
@@ -15476,7 +15953,8 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   GTKCONFIG="$i/$j"
 fi
 
-					if ( test -n "$GTKCONFIG" ); then
+					if ( test -n "$GTKCONFIG" )
+					then
 						break
 					fi
 				done
@@ -15484,13 +15962,14 @@ fi
 		fi
 	fi
 
-	if ( test -n "$GTKCONFIG"); then
+	if ( test -n "$GTKCONFIG" )
+	then
 		GTKVER=`$GTKCONFIG --version | cut -d'.' -f2`
 		HAVE_GTK="yes"
 	else
 		HAVE_GTK=""
-		{ echo "$as_me:$LINENO: WARNING: \"GTK config tool will not be built.\"" >&5
-echo "$as_me: WARNING: \"GTK config tool will not be built.\"" >&2;}
+		{ echo "$as_me:$LINENO: WARNING: GTK config tool will not be built." >&5
+echo "$as_me: WARNING: GTK config tool will not be built." >&2;}
 	fi
 
 
@@ -15500,8 +15979,9 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-	echo "******************************"
 fi
+
+echo "******************************"
 
 
 
