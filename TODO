@@ -1,10 +1,19 @@
 sqlrclient classes shouldn't inherit from inet/unixclientsocket,
 	rather should have member variables for each
-use pkgconfig/rudiments-config
 ADODB interface
-Pear DB interface and mysql replacement library license
+FIXME's in mysql drop-in library
+licenses:
+	Pear DB driver
+	mysql replacement library
+docs:
+	mysql drop-in library
+	postgresql drop-in library
+	pear db driver
+	perl dbi driver bind_param_inout
+tests:
+	mysql drop-in library
+	postgresql drop-in library
 freetds-0.62/ct_param support
-fully test mysql replacement library
 
 oldmysql test files for non-C++ api's
 
@@ -81,7 +90,7 @@ Documentation:
 
 Performance/Code Enhancements:
 	make some methods that return int return bool
-	implement unique/nullable/primary key as a bitmap
+	implement column flags as a bitmap
 	persistent cursors - parse query, attach an id to it,
 				make it available to other sessions
 	client-side persistence/socket handoff daemon

@@ -233,7 +233,8 @@ void	msqlcursor::returnColumnInfo() {
 					type,msqlfield->length,
 					precision,scale,
 					!(IS_NOT_NULL(msqlfield->flags)),
-					0,IS_UNIQUE(msqlfield->flags));
+					0,IS_UNIQUE(msqlfield->flags),
+					0,0,0,0,0);
 	}
 }
 

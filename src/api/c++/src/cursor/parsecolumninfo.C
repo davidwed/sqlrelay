@@ -199,8 +199,38 @@ int	sqlrcursor::parseColumnInfo() {
 				return -1;
 			}
 
-			// get whether the column is a unique
+			// get whether the column is unique
 			if (getShort(&currentcol->unique)!=
+						sizeof(unsigned short)) {
+				return -1;
+			}
+
+			// get whether the column is part of a key
+			if (getShort(&currentcol->partofkey)!=
+						sizeof(unsigned short)) {
+				return -1;
+			}
+
+			// get whether the column is unsigned
+			if (getShort(&currentcol->unsignednumber)!=
+						sizeof(unsigned short)) {
+				return -1;
+			}
+
+			// get whether the column is zero-filled
+			if (getShort(&currentcol->zerofill)!=
+						sizeof(unsigned short)) {
+				return -1;
+			}
+
+			// get whether the column is binary
+			if (getShort(&currentcol->binary)!=
+						sizeof(unsigned short)) {
+				return -1;
+			}
+
+			// get whether the column is auto-incremented
+			if (getShort(&currentcol->autoincrement)!=
 						sizeof(unsigned short)) {
 				return -1;
 			}
@@ -234,8 +264,23 @@ int	sqlrcursor::parseColumnInfo() {
 				if ((long)currentcol->primarykey) {
 					sqlrc->debugPrint("Primary Key ");
 				}
-				if ((long)currentcol->primarykey) {
-					sqlrc->debugPrint("Unique");
+				if ((long)currentcol->unique) {
+					sqlrc->debugPrint("Unique ");
+				}
+				if ((long)currentcol->partofkey) {
+					sqlrc->debugPrint("Part of a Key ");
+				}
+				if ((long)currentcol->unsignednumber) {
+					sqlrc->debugPrint("Unsigned ");
+				}
+				if ((long)currentcol->zerofill) {
+					sqlrc->debugPrint("Zero Filled ");
+				}
+				if ((long)currentcol->binary) {
+					sqlrc->debugPrint("Binary ");
+				}
+				if ((long)currentcol->autoincrement) {
+					sqlrc->debugPrint("Auto-Increment ");
 				}
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();

@@ -57,7 +57,12 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 						unsigned long scale,
 						unsigned short nullable,
 						unsigned short primarykey,
-						unsigned short unique) {
+						unsigned short unique,
+						unsigned short partofkey,
+						unsigned short unsignednumber,
+						unsigned short zerofill,
+						unsigned short binary,
+						unsigned short autoincrement) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -95,6 +100,11 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 	clientsock->write(nullable);
 	clientsock->write(primarykey);
 	clientsock->write(unique);
+	clientsock->write(partofkey);
+	clientsock->write(unsignednumber);
+	clientsock->write(zerofill);
+	clientsock->write(binary);
+	clientsock->write(autoincrement);
 }
 
 void	sqlrconnection::sendColumnDefinitionString(const char *name,
@@ -106,7 +116,12 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 						unsigned long scale,
 						unsigned short nullable,
 						unsigned short primarykey,
-						unsigned short unique) {
+						unsigned short unique,
+						unsigned short partofkey,
+						unsigned short unsignednumber,
+						unsigned short zerofill,
+						unsigned short binary,
+						unsigned short autoincrement) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -147,4 +162,9 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 	clientsock->write(nullable);
 	clientsock->write(primarykey);
 	clientsock->write(unique);
+	clientsock->write(partofkey);
+	clientsock->write(unsignednumber);
+	clientsock->write(zerofill);
+	clientsock->write(binary);
+	clientsock->write(autoincrement);
 }

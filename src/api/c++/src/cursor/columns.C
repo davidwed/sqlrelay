@@ -116,6 +116,32 @@ unsigned short	sqlrcursor::getColumnIsUnique(int col) {
 	return (whichcol)?whichcol->unique:0;
 }
 
+unsigned short	sqlrcursor::getColumnIsPartOfKey(int col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->partofkey:0;
+}
+
+unsigned short	sqlrcursor::getColumnIsUnsigned(int col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->unsignednumber:0;
+}
+
+unsigned short	sqlrcursor::getColumnIsZeroFilled(int col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->zerofill:0;
+}
+
+unsigned short	sqlrcursor::getColumnIsBinary(int col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->binary:0;
+}
+
+unsigned short	sqlrcursor::getColumnIsAutoIncrement(int col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->autoincrement:0;
+}
+
+
 int	sqlrcursor::getLongest(int col) {
 	column	*whichcol=getColumn(col);
 	return (whichcol)?whichcol->longest:0;
@@ -162,6 +188,32 @@ unsigned short	sqlrcursor::getColumnIsUnique(const char *col) {
 	column	*whichcol=getColumn(col);
 	return (whichcol)?whichcol->unique:0;
 }
+
+unsigned short	sqlrcursor::getColumnIsPartOfKey(const char *col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->partofkey:0;
+}
+
+unsigned short	sqlrcursor::getColumnIsUnsigned(const char *col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->unsignednumber:0;
+}
+
+unsigned short	sqlrcursor::getColumnIsZeroFilled(const char *col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->zerofill:0;
+}
+
+unsigned short	sqlrcursor::getColumnIsBinary(const char *col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->binary:0;
+}
+
+unsigned short	sqlrcursor::getColumnIsAutoIncrement(const char *col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->autoincrement:0;
+}
+
 
 int	sqlrcursor::getLongest(const char *col) {
 	column	*whichcol=getColumn(col);

@@ -402,6 +402,45 @@ unsigned short	sqlrcur_getColumnIsPrimaryKeyByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns 1 if the specified column is a
 			   primary key and 0 otherwise. */
+unsigned short	sqlrcur_getColumnIsUniqueByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned short	sqlrcur_getColumnIsUniqueByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns 1 if the specified column is
+			   unique and 0 otherwise. */
+unsigned short	sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned short	sqlrcur_getColumnIsPartOfKeyByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns 1 if the specified column is
+			   part of a composite key and 0 otherwise. */
+unsigned short	sqlrcur_getColumnIsUnsignedByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned short	sqlrcur_getColumnIsUnsignedByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns 1 if the specified column is
+			   an unsigned number and 0 otherwise. */
+unsigned short	sqlrcur_getColumnIsZeroFilledByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned short	sqlrcur_getColumnIsZeroFilledByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns 1 if the specified column was
+			   created with the zero-fill flag and 0
+			   otherwise. */
+unsigned short	sqlrcur_getColumnIsBinaryByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned short	sqlrcur_getColumnIsBinaryByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns 1 if the specified column
+			   contains binary data and 0
+			   otherwise. */
+unsigned short	sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned short	sqlrcur_getColumnIsAutoIncrementByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns 1 if the specified column
+			   auto-increments and 0 otherwise. */
+
 int	sqlrcur_getLongestByIndex(sqlrcur sqlrcurref, int col);
 int	sqlrcur_getLongestByName(sqlrcur sqlrcurref, const char *col);
 			/* Returns the length of the longest field in the

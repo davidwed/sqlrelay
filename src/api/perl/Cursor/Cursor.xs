@@ -409,6 +409,77 @@ sqlrcursor::getColumnIsPrimaryKey(...)
 	OUTPUT:
 		RETVAL
 
+unsigned short
+sqlrcursor::getColumnIsUnique(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnIsUnique((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnIsUnique(SvPV(ST(1),na));
+		}
+	OUTPUT:
+		RETVAL
+
+unsigned short
+sqlrcursor::getColumnIsPartOfKey(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnIsPartOfKey((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnIsPartOfKey(SvPV(ST(1),na));
+		}
+	OUTPUT:
+		RETVAL
+
+unsigned short
+sqlrcursor::getColumnIsUnsigned(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnIsUnsigned((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnIsUnsigned(SvPV(ST(1),na));
+		}
+	OUTPUT:
+		RETVAL
+
+unsigned short
+sqlrcursor::getColumnIsZeroFilled(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnIsZeroFilled((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnIsZeroFilled(SvPV(ST(1),na));
+		}
+	OUTPUT:
+		RETVAL
+
+unsigned short
+sqlrcursor::getColumnIsBinary(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnIsBinary((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnIsBinary(SvPV(ST(1),na));
+		}
+	OUTPUT:
+		RETVAL
+
+unsigned short
+sqlrcursor::getColumnIsAutoIncrement(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnIsAutoIncrement((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnIsAutoIncrement(SvPV(ST(1),na));
+		}
+	OUTPUT:
+
 int
 sqlrcursor::getLongest(...)
 	CODE:

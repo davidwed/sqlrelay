@@ -1164,6 +1164,114 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisprimarykey) {
 	RETURN_LONG(r);
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisunique) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsUnique((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsUnique((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnispartofkey) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsPartOfKey((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsPartOfKey((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisunsigned) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsUnsigned((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsUnsigned((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumniszerofilled) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsZeroFilled((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsZeroFilled((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisbinary) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsBinary((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsBinary((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisautoincrement) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsAutoIncrement((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsAutoIncrement((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcur_getlongest) {
 	zval **sqlrcur,**col;
 	int r=0;
@@ -1374,6 +1482,16 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcur_getcolumnname,NULL)
 	ZEND_FE(sqlrcur_getcolumntype,NULL)
 	ZEND_FE(sqlrcur_getcolumnlength,NULL)
+	ZEND_FE(sqlrcur_getcolumnprecision,NULL)
+	ZEND_FE(sqlrcur_getcolumnscale,NULL)
+	ZEND_FE(sqlrcur_getcolumnisnullable,NULL)
+	ZEND_FE(sqlrcur_getcolumnisprimarykey,NULL)
+	ZEND_FE(sqlrcur_getcolumnisunique,NULL)
+	ZEND_FE(sqlrcur_getcolumnispartofkey,NULL)
+	ZEND_FE(sqlrcur_getcolumnisunsigned,NULL)
+	ZEND_FE(sqlrcur_getcolumniszerofilled,NULL)
+	ZEND_FE(sqlrcur_getcolumnisbinary,NULL)
+	ZEND_FE(sqlrcur_getcolumnisautoincrement,NULL)
 	ZEND_FE(sqlrcur_getlongest,NULL)
 	ZEND_FE(sqlrcur_getresultsetid,NULL)
 	ZEND_FE(sqlrcur_suspendresultset,NULL)

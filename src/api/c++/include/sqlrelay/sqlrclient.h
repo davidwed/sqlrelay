@@ -390,6 +390,28 @@ class sqlrcursor {
 		unsigned short	getColumnIsUnique(const char *col);
 				// Returns 1 if the specified column is
 				// unique and 0 otherwise.
+		unsigned short	getColumnIsPartOfKey(int col);
+		unsigned short	getColumnIsPartOfKey(const char *col);
+				// Returns 1 if the specified column is
+				// part of a composite key and 0 otherwise.
+		unsigned short	getColumnIsUnsigned(int col);
+		unsigned short	getColumnIsUnsigned(const char *col);
+				// Returns 1 if the specified column is
+				// an unsigned number and 0 otherwise.
+		unsigned short	getColumnIsZeroFilled(int col);
+		unsigned short	getColumnIsZeroFilled(const char *col);
+				// Returns 1 if the specified column was
+				// created with the zero-fill flag and 0
+				// otherwise.
+		unsigned short	getColumnIsBinary(int col);
+		unsigned short	getColumnIsBinary(const char *col);
+				// Returns 1 if the specified column
+				// contains binary data and 0
+				// otherwise.
+		unsigned short	getColumnIsAutoIncrement(int col);
+		unsigned short	getColumnIsAutoIncrement(const char *col);
+				// Returns 1 if the specified column
+				// auto-increments and 0 otherwise.
 		int	getLongest(int col);
 		int	getLongest(const char *col);
 				// Returns the length of the longest field

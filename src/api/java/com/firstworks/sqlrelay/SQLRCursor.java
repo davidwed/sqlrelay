@@ -323,6 +323,46 @@ public class SQLRCursor {
 	/** Returns true if the specified column is a
 	 * primary key and false otherwise. */
 	public native boolean	getColumnIsPrimaryKey(String col);
+	/** Returns true if the specified column is
+	 * unique and false otherwise. */
+	public native boolean	getColumnIsUnique(int col);
+	/** Returns true if the specified column is
+	 * unique and false otherwise. */
+	public native boolean	getColumnIsUnique(String col);
+	/** Returns true if the specified column is
+	 * part of a composite key and false otherwise. */
+	public native boolean	getColumnIsPartOfKey(int col);
+	/** Returns true if the specified column is
+	 * part of a composite key and false otherwise. */
+	public native boolean	getColumnIsPartOfKey(String col);
+	/** Returns true if the specified column is
+	 * an unsigned number and false otherwise. */
+	public native boolean	getColumnIsUnsigned(int col);
+	/** Returns true if the specified column is
+	 * an unsigned number and false otherwise. */
+	public native boolean	getColumnIsUnsigned(String col);
+	/** Returns true if the specified column was
+	 * created with the zero-fill flag and false
+	 * otherwise. */
+	public native boolean	getColumnIsZeroFilled(int col);
+	/** Returns true if the specified column was
+	 * created with the zero-fill flag and false
+	 * otherwise. */
+	public native boolean	getColumnIsZeroFilled(String col);
+	/** Returns true if the specified column
+	 * contains binary data and false
+	 * otherwise. */
+	public native boolean	getColumnIsBinary(int col);
+	/** Returns true if the specified column
+	 * contains binary data and false
+	 * otherwise. */
+	public native boolean	getColumnIsBinary(String col);
+	/** Returns true if the specified column
+	 * auto-increments and false otherwise. */
+	public native boolean	getColumnIsAutoIncrement(int col);
+	/** Returns true if the specified column
+	 * auto-increments and false otherwise. */
+	public native boolean	getColumnIsAutoIncrement(String col);
 	/** Returns the length of the specified column.  */
 	public native int	getColumnLength(int col);
 	/** Returns the length of the specified column.  */

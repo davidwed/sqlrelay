@@ -379,7 +379,13 @@ void	mysqlcursor::returnColumnInfo() {
 					mysqlfield->length,
 					mysqlfield->decimals,
 					!(IS_NOT_NULL(mysqlfield->flags)),
-					IS_PRI_KEY(mysqlfield->flags),0);
+					IS_PRI_KEY(mysqlfield->flags),
+					mysqlfield->flags&UNIQUE_KEY_FLAG,
+					mysqlfield->flags&MULTIPLE_KEY_FLAG,
+					mysqlfield->flags&UNSIGNED_FLAG,
+					mysqlfield->flags&ZEROFILL_FLAG,
+					mysqlfield->flags&BINARY_FLAG,
+					mysqlfield->flags&AUTO_INCREMENT_FLAG);
 	}
 }
 

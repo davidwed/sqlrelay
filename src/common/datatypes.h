@@ -182,7 +182,7 @@ static char	*datatypestring[] = {
 
 #ifdef NEED_IS_NUMBER_TYPE_CHAR
 static int isNumberTypeChar(const char *type) { 
-	if (!strcmp(type,"NUMBER") || !strcmp(type,"INT") ||
+	return (!strcmp(type,"NUMBER") || !strcmp(type,"INT") ||
 		!strcmp(type,"SMALLINT") || !strcmp(type,"TINYINT") ||
 		!strcmp(type,"NUMERIC") || !strcmp(type,"BIT") ||
 		!strcmp(type,"REAL") || !strcmp(type,"FLOAT") ||
@@ -203,16 +203,44 @@ static int isNumberTypeChar(const char *type) {
 		!strcmp(type,"xid") || !strcmp(type,"_xid") ||
 		!strcmp(type,"cid") || !strcmp(type,"_cid") ||
 		!strcmp(type,"float4") || !strcmp(type,"_float4") ||
-		!strcmp(type,"float8") || !strcmp(type,"_float8")) {
-		return 1;
-	}
-	return 0;
+		!strcmp(type,"float8") || !strcmp(type,"_float8"));
+}
+#endif
+
+#ifdef NEED_IS_BLOB_TYPE_CHAR
+static int isBlobTypeChar(const char *type) { 
+	return (!strcmp(type,"IMAGE") || !strcmp(type,"BINARY") ||
+		!strcmp(type,"VARBINARY") || !strcmp(type,"LONGCHAR") ||
+		!strcmp(type,"LONGBINARY") || !strcmp(type,"LONG") ||
+		!strcmp(type,"TINYBLOB") || !strcmp(type,"MEDIUMBLOB") ||
+		!strcmp(type,"LONGBLOB") || !strcmp(type,"BLOB") ||
+		!strcmp(type,"RAW") || !strcmp(type,"LONG_RAW") ||
+		!strcmp(type,"CLOB") || !strcmp(type,"BFILE") ||
+		!strcmp(type,"DBCLOB"));
+}
+#endif
+
+#ifdef NEED_IS_UNSIGNED_TYPE_CHAR
+static int isUnsignedTypeChar(const char *type) { 
+	return (!strcmp(type,"USHORT") || !strcmp(type,"UINT"));
+}
+#endif
+
+#ifdef NEED_IS_BINARY_TYPE_CHAR
+static int isBinaryTypeChar(const char *type) { 
+	return (!strcmp(type,"IMAGE") || !strcmp(type,"BINARY") ||
+		!strcmp(type,"VARBINARY") || !strcmp(type,"LONGBINARY") ||
+		!strcmp(type,"TINYBLOB") || !strcmp(type,"MEDIUMBLOB") ||
+		!strcmp(type,"LONGBLOB") || !strcmp(type,"BLOB") ||
+		!strcmp(type,"BFILE") || !strcmp(type,"LONGVARBINARY") ||
+		!strcmp(type,"GRAPHIC") || !strcmp(type,"VARGRAPHIC") ||
+		!strcmp(type,"LONGVARGRAPHIC"));
 }
 #endif
 
 #ifdef NEED_IS_NUMBER_TYPE_INT
 static int isNumberTypeInt(int type) {
-	if (type==NUMBER_DATATYPE || type==INT_DATATYPE ||
+	return (type==NUMBER_DATATYPE || type==INT_DATATYPE ||
 		type==SMALLINT_DATATYPE || type==TINYINT_DATATYPE ||
 		type==NUMERIC_DATATYPE || type==BIT_DATATYPE ||
 		type==REAL_DATATYPE || type==FLOAT_DATATYPE ||
@@ -224,10 +252,7 @@ static int isNumberTypeInt(int type) {
 		type==INTEGER_DATATYPE || type==D_FLOAT_DATATYPE || 
 		type==DECIMAL_DATATYPE || type==INT64_DATATYPE ||
 		type==MONEY_DATATYPE || type==SMALLMONEY_DATATYPE ||
-		type==DOUBLE_PRECISION_DATATYPE) {
-		return 1;
-	}
-	return 0;
+		type==DOUBLE_PRECISION_DATATYPE);
 }
 #endif
 

@@ -852,6 +852,68 @@ static VALUE sqlrcur_getColumnIsPrimaryKey(VALUE self, VALUE col) {
 	}
 }
 
+static VALUE sqlrcur_getColumnIsUnique(VALUE self, VALUE col) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+		return INT2NUM(sqlrcur->getColumnIsUnique(STR2CSTR(col)));
+	} else {
+		return INT2NUM(sqlrcur->getColumnIsUnique(NUM2INT(col)));
+	}
+}
+
+static VALUE sqlrcur_getColumnIsPartOfKey(VALUE self, VALUE col) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+		return INT2NUM(sqlrcur->getColumnIsPartOfKey(STR2CSTR(col)));
+	} else {
+		return INT2NUM(sqlrcur->getColumnIsPartOfKey(NUM2INT(col)));
+	}
+}
+
+static VALUE sqlrcur_getColumnIsUnsigned(VALUE self, VALUE col) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+		return INT2NUM(sqlrcur->getColumnIsUnsigned(STR2CSTR(col)));
+	} else {
+		return INT2NUM(sqlrcur->getColumnIsUnsigned(NUM2INT(col)));
+	}
+}
+
+static VALUE sqlrcur_getColumnIsZeroFilled(VALUE self, VALUE col) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+		return INT2NUM(sqlrcur->getColumnIsZeroFilled(STR2CSTR(col)));
+	} else {
+		return INT2NUM(sqlrcur->getColumnIsZeroFilled(NUM2INT(col)));
+	}
+}
+
+static VALUE sqlrcur_getColumnIsBinary(VALUE self, VALUE col) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+		return INT2NUM(sqlrcur->getColumnIsBinary(STR2CSTR(col)));
+	} else {
+		return INT2NUM(sqlrcur->getColumnIsBinary(NUM2INT(col)));
+	}
+}
+
+static VALUE sqlrcur_getColumnIsAutoIncrement(VALUE self, VALUE col) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+		return INT2NUM(
+			sqlrcur->getColumnIsAutoIncrement(STR2CSTR(col)));
+	} else {
+		return INT2NUM(
+			sqlrcur->getColumnIsAutoIncrement(NUM2INT(col)));
+	}
+}
+
 static VALUE sqlrcur_getLongest(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1017,6 +1079,18 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_getColumnIsNullable,1);
 	rb_define_method(csqlrcursor,"getColumnIsPrimaryKey",
 				(CAST)sqlrcur_getColumnIsPrimaryKey,1);
+	rb_define_method(csqlrcursor,"getColumnIsUnique",
+				(CAST)sqlrcur_getColumnIsUnique,1);
+	rb_define_method(csqlrcursor,"getColumnIsPartOfKey",
+				(CAST)sqlrcur_getColumnIsPartOfKey,1);
+	rb_define_method(csqlrcursor,"getColumnIsUnsigned",
+				(CAST)sqlrcur_getColumnIsUnsigned,1);
+	rb_define_method(csqlrcursor,"getColumnIsZeroFilled",
+				(CAST)sqlrcur_getColumnIsZeroFilled,1);
+	rb_define_method(csqlrcursor,"getColumnIsBinary",
+				(CAST)sqlrcur_getColumnIsBinary,1);
+	rb_define_method(csqlrcursor,"getColumnIsAutoIncrement",
+				(CAST)sqlrcur_getColumnIsAutoIncrement,1);
 	rb_define_method(csqlrcursor,"getLongest",
 				(CAST)sqlrcur_getLongest,1);
 	rb_define_method(csqlrcursor,"getResultSetId",

@@ -19,6 +19,11 @@ class column {
 		unsigned short	nullable;
 		unsigned short	primarykey;
 		unsigned short	unique;
+		unsigned short	partofkey;
+		unsigned short	unsignednumber;
+		unsigned short	zerofill;
+		unsigned short	binary;
+		unsigned short	autoincrement;
 };
 
 #endif

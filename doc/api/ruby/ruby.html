@@ -347,6 +347,54 @@
 <FONT color=#f800f8>        Returns the length of the specified column.  col may</FONT>
 <FONT color=#f800f8>        be a name or number.</FONT>
 
+    <FONT color=#008888>getColumnPrecision</FONT>(col)
+<FONT color=#f800f8>        Returns the precision of the specified
+column.</FONT>
+<FONT color=#f800f8>        Precision is the total number of digits in</FONT>
+<FONT color=#f800f8>        a number.  eg: 123.45 has a precision of 5.</FONT>
+<FONT color=#f800f8>        For non-numeric types, it's the number of</FONT>
+<FONT color=#f800f8>        characters in the string.</FONT>
+
+    <FONT color=#008888>getColumnScale</FONT>(col)
+<FONT color=#f800f8>        Returns the scale of the specified column.</FONT>
+<FONT color=#f800f8>        Scale is the total number of digits to the</FONT>
+<FONT color=#f800f8>        right of the decimal point in a number.</FONT>
+<FONT color=#f800f8>        eg: 123.45 has a scale of 2.</FONT>
+
+    <FONT color=#008888>getColumnIsNullable</FONT>(col)
+<FONT color=#f800f8>        Returns 1 if the specified column can</FONT>
+<FONT color=#f800f8>        contain nulls and 0 otherwise.</FONT>
+
+    <FONT color=#008888>getColumnIsPrimaryKey</FONT>(col)
+<FONT color=#f800f8>        Returns 1 if the specified column is a</FONT>
+<FONT color=#f800f8>        primary key and 0 otherwise.</FONT>
+
+    <FONT color=#008888>getColumnIsUnique</FONT>(col)
+<FONT color=#f800f8>        Returns 1 if the specified column is</FONT>
+<FONT color=#f800f8>        unique and 0 otherwise.</FONT>
+
+    <FONT color=#008888>getColumnIsPartOfKey</FONT>(col)
+<FONT color=#f800f8>        Returns 1 if the specified column is</FONT>
+<FONT color=#f800f8>        part of a composite key and 0 otherwise.</FONT>
+
+    <FONT color=#008888>getColumnIsUnsigned</FONT>(col)
+<FONT color=#f800f8>        Returns 1 if the specified column is</FONT>
+<FONT color=#f800f8>        an unsigned number and 0 otherwise.</FONT>
+
+    <FONT color=#008888>getColumnIsZeroFilled</FONT>(col)
+<FONT color=#f800f8>        Returns 1 if the specified column was</FONT>
+<FONT color=#f800f8>        created with the zero-fill flag and 0</FONT>
+<FONT color=#f800f8>        otherwise.</FONT>
+
+    <FONT color=#008888>getColumnIsBinary</FONT>(col)
+<FONT color=#f800f8>        Returns 1 if the specified column</FONT>
+<FONT color=#f800f8>        contains binary data and 0</FONT>
+<FONT color=#f800f8>        otherwise.</FONT>
+
+    <FONT color=#008888>getColumnIsAutoIncrement</FONT>(col)
+<FONT color=#f800f8>        Returns 1 if the specified column</FONT>
+<FONT color=#f800f8>        auto-increments and 0 otherwise.</FONT>
+
     <FONT color=#008888>getLongest</FONT>(col)
 <FONT color=#f800f8>        Returns the length of the specified column.  col may</FONT>
 <FONT color=#f800f8>        be a name or number.</FONT>

@@ -2,6 +2,9 @@
 #include <rudiments/charstring.h>
 
 #define NEED_DATATYPESTRING 1
+#define NEED_IS_NUMBER_TYPE_CHAR 1
+#define NEED_IS_UNSIGNED_TYPE_CHAR 1
+#define NEED_IS_BINARY_TYPE_CHAR 1
 #include <datatypes.h>
 
 extern "C" {
@@ -696,6 +699,7 @@ my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_LONGLONG:
 			case MYSQL_TYPE_INT24: {
 				// FIXME: what should I do here?
+				return false;
 				break;
 			}
 			case MYSQL_TYPE_TINY_BLOB:
@@ -711,10 +715,12 @@ my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_SET:
 			case MYSQL_TYPE_GEOMETRY: {
 				// FIXME: what should I do here?
+				return false;
 				break;
 			}
 			default: {
 				// FIXME: what should I do here?
+				return false;
 			}
 		}
 	}
@@ -792,7 +798,7 @@ static enum enum_field_types	mysqltypemap[]={
 	// "TIME"
 	MYSQL_TYPE_DATETIME,
 	// "TIMESTAMP"
-	MYSQL_TYPE_DATETIME,
+	MYSQL_TYPE_TIMESTAMP,
 	// added by msql
 	// "UINT"
 	MYSQL_TYPE_LONG,
@@ -907,9 +913,11 @@ int mysql_execute(MYSQL_STMT *stmt) {
 		stmt->result->fields=fields;
 
 		for (int i=0; i<colcount; i++) {
+
 			fields[i].name=sqlrcur->getColumnName(i);
 			fields[i].table="";
 			fields[i].def="";
+
 			#if defined(COMPAT_MYSQL_4_0) || \
 				defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0)
@@ -930,27 +938,84 @@ int mysql_execute(MYSQL_STMT *stmt) {
 			fields[i].charsetnr=0;
 			#endif
 			#endif
-			fields[i].type=map_col_type(sqlrcur->getColumnType(i));
+
+			// figure out the column type
+			char	*columntypestring=sqlrcur->getColumnType(i);
+			enum enum_field_types	columntype=
+					map_col_type(columntypestring);
+			fields[i].type=columntype;
+
 			fields[i].length=sqlrcur->getColumnLength(i);
 			fields[i].max_length=sqlrcur->getLongest(i);
-// FIXME: there is probably some way to figure out flags
-//#define NOT_NULL_FLAG	1		/* Field can't be NULL */
-//#define PRI_KEY_FLAG	2		/* Field is part of a primary key */
-//#define UNIQUE_KEY_FLAG 4		/* Field is part of a unique key */
-//#define MULTIPLE_KEY_FLAG 8		/* Field is part of a key */
-//#define BLOB_FLAG	16		/* Field is a blob */
-//#define UNSIGNED_FLAG	32		/* Field is unsigned */
-//#define ZEROFILL_FLAG	64		/* Field is zerofill */
-//#define BINARY_FLAG	128
-//#define ENUM_FLAG	256		/* field is an enum */
-//#define AUTO_INCREMENT_FLAG 512		/* field is a autoincrement field */
-//#define TIMESTAMP_FLAG	1024		/* Field is a timestamp */
-//#define SET_FLAG	2048		/* field is a set */
-//#define NUM_FLAG	32768		/* Field is num (for clients) */
-//#define PART_KEY_FLAG	16384		/* Intern; Part of some key */
-//#define GROUP_FLAG	32768		/* Intern: Group field */
-//#define UNIQUE_FLAG	65536		/* Intern: Used by sql_yacc */
-			fields[i].flags=0;
+
+			// figure out the flags
+			unsigned int	flags=0;
+			if (sqlrcur->getColumnIsNullable(i)) {
+				#define NOT_NULL_FLAG	1
+				flags|=NOT_NULL_FLAG;
+			}
+			if (sqlrcur->getColumnIsPrimaryKey(i)) {
+				#define PRI_KEY_FLAG	2
+				flags|=PRI_KEY_FLAG;
+			}
+			if (sqlrcur->getColumnIsUnique(i)) {
+				#define UNIQUE_KEY_FLAG 4
+				flags|=UNIQUE_KEY_FLAG;
+			}
+			if (sqlrcur->getColumnIsPartOfKey(i)) {
+				#define MULTIPLE_KEY_FLAG 8
+				flags|=MULTIPLE_KEY_FLAG;
+			}
+			if (columntype==MYSQL_TYPE_TINY_BLOB ||
+				columntype==MYSQL_TYPE_MEDIUM_BLOB ||
+				columntype==MYSQL_TYPE_LONG_BLOB ||
+				columntype==MYSQL_TYPE_BLOB) {
+				#define BLOB_FLAG	16
+				flags|=BLOB_FLAG;
+			}
+			if (sqlrcur->getColumnIsUnsigned(i) ||
+				isUnsignedTypeChar(columntypestring)) {
+				#define UNSIGNED_FLAG	32
+				flags|=UNSIGNED_FLAG;
+			}
+			if (sqlrcur->getColumnIsZeroFilled(i)) {
+				#define ZEROFILL_FLAG	64
+				flags|=ZEROFILL_FLAG;
+			}
+			if (sqlrcur->getColumnIsBinary(i) ||
+				isBinaryTypeChar(columntypestring)) {
+				#define BINARY_FLAG	128
+				flags|=BINARY_FLAG;
+			}
+			if (columntype==MYSQL_TYPE_ENUM) {
+				#define ENUM_FLAG	256
+				flags|=ENUM_FLAG;
+			}
+			if (sqlrcur->getColumnIsAutoIncrement(i)) {
+				#define AUTO_INCREMENT_FLAG 512
+				flags|=AUTO_INCREMENT_FLAG;
+			}
+			if (columntype==MYSQL_TYPE_TIMESTAMP) {
+				#define TIMESTAMP_FLAG	1024
+				flags|=TIMESTAMP_FLAG;
+			}
+			if (columntype==MYSQL_TYPE_SET) {
+				#define SET_FLAG	2048
+				flags|=SET_FLAG;
+			}
+			if (isNumberTypeChar(columntypestring)) {
+				#define NUM_FLAG	32768
+				flags|=NUM_FLAG;
+			}
+			// Presumably these don't matter...
+			// Intern; Part of some key
+			//#define PART_KEY_FLAG	16384
+			// Intern: Group field
+			//#define GROUP_FLAG	32768
+			// Intern: Used by sql_yacc
+			//#define UNIQUE_FLAG	65536
+			fields[i].flags=flags;
+
 			fields[i].decimals=sqlrcur->getColumnPrecision(i);
 		}
 	} else {

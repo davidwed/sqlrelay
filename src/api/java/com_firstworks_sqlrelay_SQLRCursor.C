@@ -1309,6 +1309,180 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsPr
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsUnique
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsUnique__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (cur->getColumnIsUnique((int)col))?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsUnique
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsUnique__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	unsigned short	retval=cur->getColumnIsUnique(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return (retval)?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsPartOfKey
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsPartOfKey__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (cur->getColumnIsUnique((int)col))?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsPartOfKey
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsPartOfKey__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	unsigned short	retval=cur->getColumnIsPartOfKey(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return (retval)?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsUnsigned
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsUnsigned__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (cur->getColumnIsUnique((int)col))?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsUnsigned
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsUnsigned__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	unsigned short	retval=cur->getColumnIsUnsigned(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return (retval)?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsZeroFilled
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsZeroFilled__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (cur->getColumnIsUnique((int)col))?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsZeroFilled
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsZeroFilled__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	unsigned short	retval=cur->getColumnIsZeroFilled(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return (retval)?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsBinary
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsBinary__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (cur->getColumnIsUnique((int)col))?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsBinary
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsBinary__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	unsigned short	retval=cur->getColumnIsBinary(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return (retval)?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsAutoIncrement
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsAutoIncrement__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (cur->getColumnIsUnique((int)col))?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsAutoIncrement
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsAutoIncrement__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	unsigned short	retval=cur->getColumnIsAutoIncrement(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return (retval)?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getColumnLength
  * Signature: (I)I
  */

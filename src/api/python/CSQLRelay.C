@@ -1006,6 +1006,90 @@ static PyObject *getColumnIsPrimaryKey(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", rc);
 }
 
+static PyObject *getColumnIsUnique(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned short rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsUnique(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsUnique(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("h", rc);
+}
+
+static PyObject *getColumnIsPartOfKey(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned short rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsPartOfKey(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsPartOfKey(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("h", rc);
+}
+
+static PyObject *getColumnIsUnsigned(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned short rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsUnsigned(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsUnsigned(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("h", rc);
+}
+
+static PyObject *getColumnIsZeroFilled(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned short rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsZeroFilled(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsZeroFilled(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("h", rc);
+}
+
+static PyObject *getColumnIsBinary(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned short rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsBinary(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsBinary(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("h", rc);
+}
+
+static PyObject *getColumnIsAutoIncrement(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned short rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsAutoIncrement(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsAutoIncrement(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("h", rc);
+}
+
 static PyObject *getLongest(PyObject *self, PyObject *args) {
   long sqlrcur;
   int rc;
@@ -1159,6 +1243,12 @@ static PyMethodDef SQLRMethods[] = {
   {"getColumnScale", getColumnScale, METH_VARARGS},
   {"getColumnIsNullable", getColumnIsNullable, METH_VARARGS},
   {"getColumnIsPrimaryKey", getColumnIsPrimaryKey, METH_VARARGS},
+  {"getColumnIsUnique", getColumnIsUnique, METH_VARARGS},
+  {"getColumnIsPartOfKey", getColumnIsPartOfKey, METH_VARARGS},
+  {"getColumnIsUnsigned", getColumnIsUnsigned, METH_VARARGS},
+  {"getColumnIsZeroFilled", getColumnIsZeroFilled, METH_VARARGS},
+  {"getColumnIsBinary", getColumnIsBinary, METH_VARARGS},
+  {"getColumnIsAutoIncrement", getColumnIsAutoIncrement, METH_VARARGS},
   {"getLongest", getLongest, METH_VARARGS},
   {"getResultSetId", getResultSetId, METH_VARARGS},
   {"suspendResultSet", suspendResultSet, METH_VARARGS},

@@ -453,7 +453,8 @@ void	db2cursor::returnColumnInfo() {
 		// send column definition
 		conn->sendColumnDefinition(col[i].name,col[i].namelength,type,
 					col[i].length,col[i].precision,
-					col[i].scale,col[i].nullable,0,0);
+					col[i].scale,col[i].nullable,0,0,
+					0,0,0,0,0);
 	}
 }
 

@@ -453,6 +453,66 @@ unsigned short	sqlrcur_getColumnIsPrimaryKeyByName(sqlrcur sqlrcurref,
 	return sqlrcurref->getColumnIsPrimaryKey(col);
 }
 
+unsigned short	sqlrcur_getColumnIsUniqueByIndex(sqlrcur sqlrcurref,
+							int col) {
+	return sqlrcurref->getColumnIsUnique(col);
+}
+
+unsigned short	sqlrcur_getColumnIsUniqueByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnIsUnique(col);
+}
+
+unsigned short	sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcur sqlrcurref,
+							int col) {
+	return sqlrcurref->getColumnIsPartOfKey(col);
+}
+
+unsigned short	sqlrcur_getColumnIsPartOfKeyByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnIsPartOfKey(col);
+}
+
+unsigned short	sqlrcur_getColumnIsUnsignedByIndex(sqlrcur sqlrcurref,
+							int col) {
+	return sqlrcurref->getColumnIsUnsigned(col);
+}
+
+unsigned short	sqlrcur_getColumnIsUnsignedByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnIsUnsigned(col);
+}
+
+unsigned short	sqlrcur_getColumnIsZeroFilledByIndex(sqlrcur sqlrcurref,
+							int col) {
+	return sqlrcurref->getColumnIsZeroFilled(col);
+}
+
+unsigned short	sqlrcur_getColumnIsZeroFilledByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnIsZeroFilled(col);
+}
+
+unsigned short	sqlrcur_getColumnIsBinaryByIndex(sqlrcur sqlrcurref,
+							int col) {
+	return sqlrcurref->getColumnIsBinary(col);
+}
+
+unsigned short	sqlrcur_getColumnIsBinaryByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnIsBinary(col);
+}
+
+unsigned short	sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcur sqlrcurref,
+							int col) {
+	return sqlrcurref->getColumnIsAutoIncrement(col);
+}
+
+unsigned short	sqlrcur_getColumnIsAutoIncrementByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnIsAutoIncrement(col);
+}
+
 int	sqlrcur_getLongestByName(sqlrcur sqlrcurref, const char *col) {
 	return sqlrcurref->getLongest(col);
 }

@@ -644,6 +644,114 @@ returns the length of the specified column.
 <P>
 <LI>
 <CODE>
+int sqlrcur_getColumnPrecision(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnPrecision(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns the precision of the specified
+column.
+Precision is the total number of digits in
+a number.  eg: 123.45 has a precision of 5.
+For non-numeric types, it's the number of
+characters in the string.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnScale(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnScale(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns the scale of the specified column.
+Scale is the total number of digits to the
+right of the decimal point in a number.
+eg: 123.45 has a scale of 2.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnIsNullable(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnIsNullable(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns 1 if the specified column can
+contain nulls and 0 otherwise.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnIsPrimaryKey(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnIsPrimaryKey(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns 1 if the specified column is a
+primary key and 0 otherwise.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnIsUnique(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnIsUnique(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns 1 if the specified column is
+unique and 0 otherwise.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnIsPartOfKey(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnIsPartOfKey(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns 1 if the specified column is
+part of a composite key and 0 otherwise.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnIsUnsigned(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnIsUnsigned(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns 1 if the specified column is
+an unsigned number and 0 otherwise.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnIsZeroFilled(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnIsZeroFilled(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns 1 if the specified column was
+created with the zero-fill flag and 0
+otherwise.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnIsBinary(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnIsBinary(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns 1 if the specified column
+contains binary data and 0
+otherwise.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnIsAutoIncrement(int sqlrcurref, string col);
+<BR>
+int sqlrcur_getColumnIsAutoIncrement(int sqlrcurref, int col);
+</CODE>
+<P>
+Returns 1 if the specified column
+auto-increments and 0 otherwise.
+<P>
+<LI>
+<CODE>
 int sqlrcur_getLongest(int sqlrcurref, string col)
 <BR>
 int sqlrcur_getLongest(int sqlrcurref, int col)

@@ -377,6 +377,54 @@ __END__
         getColumnLength(col);
             # Returns the length of the specified column.
 
+        getColumnPrecision(col);
+            # Returns the precision of the specified
+            # column.
+            # Precision is the total number of digits in
+            # a number.  eg: 123.45 has a precision of 5.
+            # For non-numeric types, it's the number of
+            # characters in the string.
+
+        getColumnScale(col);
+            # Returns the scale of the specified column.
+            # Scale is the total number of digits to the
+            # right of the decimal point in a number.
+            # eg: 123.45 has a scale of 2.
+
+        getColumnIsNullable(col);
+            # Returns 1 if the specified column can
+            # contain nulls and 0 otherwise.
+
+        getColumnIsPrimaryKey(col);
+            # Returns 1 if the specified column is a
+            # primary key and 0 otherwise.
+
+        getColumnIsUnique(col);
+            # Returns 1 if the specified column is
+            # unique and 0 otherwise.
+
+        getColumnIsPartOfKey(col);
+            # Returns 1 if the specified column is
+            # part of a composite key and 0 otherwise.
+
+        getColumnIsUnsigned(col);
+            # Returns 1 if the specified column is
+            # an unsigned number and 0 otherwise.
+
+        getColumnIsZeroFilled(col);
+            # Returns 1 if the specified column was
+            # created with the zero-fill flag and 0
+            # otherwise.
+
+        getColumnIsBinary(col);
+            # Returns 1 if the specified column
+            # contains binary data and 0
+            # otherwise.
+
+        getColumnIsAutoIncrement(col);
+            # Returns 1 if the specified column
+            # auto-increments and 0 otherwise.
+
         getLongest(col);
             # Returns the length of the longest field
             # in the specified column.

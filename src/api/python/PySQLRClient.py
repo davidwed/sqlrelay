@@ -624,6 +624,48 @@ class sqlrcursor:
         """
         return CSQLRelay.getColumnIsPrimaryKey(self.cursor, col)
 
+    def getColumnIsUnique(self, col):
+        """
+        Returns 1 if the specified column is unique and
+        0 otherwise.
+        """
+        return CSQLRelay.getColumnIsUnique(self.cursor, col)
+
+    def getColumnIsPartOfKey(self, col):
+        """
+        Returns 1 if the specified column is part of a composite
+        key and 0 otherwise.
+        """
+        return CSQLRelay.getColumnIsPartOfKey(self.cursor, col)
+
+    def getColumnIsUnsigned(self, col):
+        """
+        Returns 1 if the specified column is an unsigned number
+        and 0 otherwise.
+        """
+        return CSQLRelay.getColumnIsUnsigned(self.cursor, col)
+
+    def getColumnIsZeroFilled(self, col):
+        """
+        Returns 1 if the specified column was created with the
+        zero-fill flag and 0 otherwise.
+        """
+        return CSQLRelay.getColumnIsZeroFilled(self.cursor, col)
+
+    def getColumnIsBinary(self, col):
+        """
+        Returns 1 if the specified column contains binary data
+        and 0 otherwise.
+        """
+        return CSQLRelay.getColumnIsBinary(self.cursor, col)
+
+    def getColumnIsAutoIncrement(self, col):
+        """
+        Returns 1 if the specified column auto-increments and
+        0 otherwise.
+        """
+        return CSQLRelay.getColumnIsAutoIncrement(self.cursor, col)
+
     def getLongest(self, col):
         """
         Returns the length of the specified column.  col may
