@@ -37,8 +37,11 @@ install:
 	$(INSTALL) -m 644 introduction.html $(docdir)
 	$(INSTALL) -m 644 introtowebdb.html $(docdir)
 	$(INSTALL) -m 644 invisible.gif $(docdir)
-	$(INSTALL) -m 644 running.html $(docdir)
 	$(INSTALL) -m 644 oraclentier.html $(docdir)
+	$(INSTALL) -m 644 running.html $(docdir)
+	$(INSTALL) -m 644 tuning.html $(docdir)
+	$(INSTALL) -m 644 faq.html $(docdir)
+	$(INSTALL) -m 644 windows.html $(docdir)
 	$(INSTALL) -m 644 css/styles.css $(docdir)/css
 	$(INSTALL) -m 644 api/c/sqlrclientwrapper.h.html $(docdir)/api/c
 	$(INSTALL) -m 644 api/c++/sqlrclient.h.html $(docdir)/api/c++

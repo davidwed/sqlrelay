@@ -349,7 +349,6 @@ bool freetdscursor::closeCursor() {
 }
 
 bool freetdscursor::prepareQuery(const char *query, long length) {
-printf("prepare: %s\n",query);
 
 	clean=true;
 
@@ -401,7 +400,6 @@ printf("prepare: %s\n",query);
 	} else {
 		cmd=languagecmd;
 	}
-printf("after prepare\n");
 
 	//clean=false;
 	prepared=true;
@@ -539,7 +537,6 @@ bool freetdscursor::outputBindString(const char *variable,
 
 bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 
-printf("execute: %s\n",query);
 	// clear out any errors
 	if (freetdsconn->errorstring) {
 		freetdsconn->deadconnection=false;
@@ -550,14 +547,12 @@ printf("execute: %s\n",query);
 	// this code is here in case freetds ever supports cursors
 	if (true) {
 		stringbuffer	*newquery=fakeInputBinds(query);
-printf("before ct_command\n");
 		if (newquery) {
 			if (ct_command(cmd,CS_LANG_CMD,
 					newquery->getString(),
 					strlen(newquery->getString()),
 					CS_UNUSED)!=CS_SUCCEED) {
 				delete newquery;
-printf("failed ct_command\n");
 				return false;
 			}
 			delete newquery;
@@ -565,11 +560,9 @@ printf("failed ct_command\n");
 			if (ct_command(cmd,CS_LANG_CMD,
 					(CS_CHAR *)query,length,
 					CS_UNUSED)!=CS_SUCCEED) {
-printf("failed ct_command\n");
 				return false;
 			}
 		}
-printf("after ct_command\n");
 		clean=false;
 	}
 
@@ -595,15 +588,11 @@ printf("after ct_command\n");
 		}
 	}
 
-printf("before ct_send\n");
 	if (ct_send(cmd)!=CS_SUCCEED) {
-printf("failed ct_send\n");
 		cleanUpData(true,true);
 		return false;
 	}
-printf("after ct_send\n");
 
-printf("before ct_results\n");
 	for (;;) {
 
 		results=ct_results(cmd,&resultstype);
@@ -652,7 +641,6 @@ printf("before ct_results\n");
 			return false;
 		}
 	}
-printf("after ct_results\n");
 
 	checkForTempTable(query,length);
 

@@ -1,16 +1,17 @@
-reconnect=handoff works
-reconnect=pass doesn't except when client connects using unix socket
-
 need "using sqlrelay on windows doc"
-must run cygserver and set CYGWIN=server for ipc to work
-
-fix erwin's fake binds problem
+	installing packages
+	optional cygwin components
+	cygserver installation
+		must run cygserver and set CYGWIN=server for ipc to work
+	running sqlrelay clients
 
 VB wrapper
 
 idle client timeout
 client connect timeout
 perl apis -> CPAN
+
+incorporate sqlite3 patches
 
 document how to use new features of Tony/Erik's perl dbi patch
 update "Tuning SQL Relay" document - unix sockets for all db's

@@ -10,8 +10,10 @@ sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
 
 	// initialize...
 
+
 	// retry reads if they get interrupted by signals
 	ucs.retryInterruptedReads();
+	ucs.translateByteOrder();
 	ics.retryInterruptedReads();
 	cs=&ucs;
 

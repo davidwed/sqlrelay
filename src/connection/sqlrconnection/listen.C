@@ -140,6 +140,7 @@ int sqlrconnection::waitForClient() {
 		}
 
 		clientsock=new filedescriptor;
+		clientsock->translateByteOrder();
 		clientsock->setFileDescriptor(descriptor);
 
 		#ifdef SERVER_DEBUG

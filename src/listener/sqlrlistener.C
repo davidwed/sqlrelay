@@ -679,6 +679,7 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 
 	} else if (fd==clientsockun) {
 		clientsock=clientsockun->accept();
+		clientsock->translateByteOrder();
 	} else {
 		return true;
 	}
