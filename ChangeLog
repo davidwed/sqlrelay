@@ -50,6 +50,7 @@
 	rearranged data in shared memory segment a bit, simplified code
 	use a struct for data in shared memory segment now, should alleviate
 		alignment problems on sparc/ppc
+	all API's are linked against appropriate thread libs now
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3
