@@ -1,12 +1,10 @@
 perl apis -> CPAN
 
-openbsd
-	freetds library needs libiconv or configure tests fail
-
 suse-9.0
-	DESTDIR problem with ruby/python/zope?
+	DESTDIR problem with ruby
 
 fedora-core-1 isn't set up
+suse-9.1 isn't set up
 
 --------------------------------------------------------------------------------
 
@@ -102,16 +100,12 @@ Compatibility:
 	rewrite queries with ?'s or @'s for oracle, rewrite
 				queries with ?'s or :'s for
 	mysql 4.1, 5.0
+	support libmysqlclient_r
 	daemontools
 	SCO:
 		ruby api won't build
 		postgresql won't configure
 		php api won't build
-	Solaris x86:
-		ruby api won't build
-	openbsd/netbsd:
-		python api methods that call PyArg_ParseTuple with an "O"
-			argument don't work, not exactly sure why
 
 Documentation:
 	how to use new features of Tony/Erik's perl dbi patch
@@ -130,7 +124,6 @@ Documentation:
 Performance/Code Enhancements:
 	idle client timeout
 	client connect timeout
-	support libmysqlclient_r
 	store passwords in encrypted form in the config file
 	use python distutils to build python
 	call endSession() from perl DBD finish method

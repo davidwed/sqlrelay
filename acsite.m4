@@ -890,7 +890,7 @@ AC_DEFUN([FW_CHECK_MYSQL_FUNCTIONS],
 [
 	AC_MSG_CHECKING(for mysql_real_connect)
 	FW_TRY_LINK([#include <mysql.h>
-#include <stdlib.h>],[mysql_real_connect(NULL,NULL,NULL,NULL,NULL,NULL,NULL,0);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_REAL_CONNECT_FOR_SURE,1,MySQL supports mysql_real_connect)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[mysql_real_connect(NULL,NULL,NULL,NULL,NULL,0,NULL,0);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_REAL_CONNECT_FOR_SURE,1,MySQL supports mysql_real_connect)],[AC_MSG_RESULT(no)])
 
 	AC_MSG_CHECKING(for mysql_select_db)
 	FW_TRY_LINK([#include <mysql.h>
@@ -1312,15 +1312,53 @@ then
 	
 		FW_CHECK_HEADERS_AND_LIBS([$FREETDSPATH],[freetds],[ctpublic.h],[ct],[$STATICFLAG],[$RPATHFLAG],[FREETDSINCLUDES],[FREETDSLIBS],[FREETDSLIBPATH],[FREETDSSTATIC])
 		
+		if ( test -n "$FREETDSLIBS" )
+		then
+
+			dnl some versions of freetds need libiconv, see if
+			dnl a simple test will link
+			LINKFAILED=""
+			FW_TRY_LINK([],[],[$FREETDSINCLUDES],[$FREETDSLIBS],[$LD_LIBRARY_PATH],[],[LINKFAILED="yes"])
+
+			dnl if not, search for iconv
+			if ( test -n "$LINKFAILED" )
+			then
+
+				FW_CHECK_HEADERS_AND_LIBS([/usr],[iconv],[iconv.h],[iconv],[$STATICFLAG],[$RPATHFLAG],[ICONVINCLUDES],[ICONVLIBS],[ICONVLIBPATH],[ICONVSTATIC])
+
+				dnl if iconv was found, try the test again,
+				dnl using it
+				dnl if it was not found, then freetds just
+				dnl doesn't work
+				if ( test -n "$ICONVLIBS" )
+				then
+					AC_MSG_CHECKING(whether freetds requires libiconv)
+
+					FW_TRY_LINK([],[],[$FREETDSINCLUDES $ICONVINCLUDES],[$FREETDSLIBS $ICONVLIBS],[$LD_LIBRARY_PATH],[FREETDSINCLUDES="$FREETDSINCLUDES $ICONVINCLUDES"; FREETDSLIBS="$FREETDSLIBS $ICONVLIBS"; AC_MSG_RESULT(yes)],[FREETDSLIBS=""; FREETDSINCLUDES=""; AC_MSG_RESULT(no)])
+				else
+					FREETDSLIBS=""
+					FREETDSINCLUDES=""
+				fi
+			fi
+
+			dnl if we've figured out how to link a simple freetds
+			dnl program, then try using c++ to see if we need
+			dnl function definitions or not
+			if ( test -n "$FREETDSLIBS" )
+			then
+				AC_LANG(C++)
+				AC_MSG_CHECKING(whether ctpublic.h contains function definitions)
+				FW_TRY_LINK([#include <ctpublic.h>
+#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES],[$FREETDSLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
+				AC_LANG(C)
+			fi
+		fi
+
+		dnl if FREETDSLIBS isn't defined at this point, then freetds
+		dnl isn't installed or doesn't work
 		if ( test -z "$FREETDSLIBS" )
 		then
 			AC_MSG_WARN(FreeTDS support will not be built.)
-		else
-			AC_LANG(C++)
-			AC_MSG_CHECKING(whether ctpublic.h contains function definitions)
-			FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES],[$FREETDSLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
-			AC_LANG(C)
 		fi
 	fi
 
