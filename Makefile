@@ -72,11 +72,13 @@ unconfig: clean
 
 distclean: unconfig
 
-tgz: all
+slackware: all
 	mkdir /tmp/sqlrelay-$(SQLR_VERSION)
 	make prefix=/tmp/sqlrelay-$(SQLR_VERSION)/$(prefix) \
 		PYTHONDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(PYTHONDIR) \
+		ZOPEDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(ZOPEDIR) \
 		PHPEXTDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(PHPEXTDIR) \
+		TCLLIBSPATH=/tmp/sqlrelay-$(SQLR_VERSION)/$(TCLLIBSPATH) \
 		PREFIX=/tmp/sqlrelay-$(SQLR_VERSION)/$(PERLPREFIX) \
 		initroot=/tmp/sqlrelay-$(SQLR_VERSION) \
 		HAVE_RUBY="" \
