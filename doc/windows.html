@@ -1,0 +1,104 @@
+<html>
+<head>
+<title>firstworks   Using SQL Relay on Windows</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Using SQL Relay on Windows</span><br><br>
+
+<ul>
+<li><a href="#packages">Installing SQL Relay Packages</a></li>
+<li><a href="#building">Building SQL Relay</a></li>
+<li><a href="#server">Running the SQL Relay Server</a></li>
+
+</ul>
+
+<a name="packages"></a>
+<span class="heading2">Installing SQL Relay Packages</span><br><br>
+
+<p>SQL Relay requires <a href="http://www.cygwin.com">Cygwin</a>, so the first
+step in installing SQL Relay is to download and install Cygwin.</p>
+
+<p>...</p>
+
+<a name="building"></a>
+<span class="heading2">Building SQL Relay</span><br><br>
+
+<p>If you would rather build SQL Relay yourself, than install a prebuilt
+package, you may.  Again, SQL Relay requires
+<a href="http://www.cygwin.com">Cygwin</a>, so the first step in building SQL
+Relay is to download and install Cygwin.</p>
+
+<p>Cygwin comes with many optional components.  I recommend installing the
+complete Cygwin environment to make sure that you have all of the necessary
+components.  However, you will need at least the following components to
+build SQL Relay.</p>
+
+<blockquote>
+...
+</blockquote>
+
+
+<p>Now, download and install whatever languages or databases you need SQL Relay
+to support.  Many languages and a few databases come with Cygwin.  SQL Relay
+supports many non-Cygwin databases and a few non-Cygwin languages.  Consult the
+following tables for the support status of various databases and languages.</p>
+
+<table>
+<tr><td valign="top">
+<table border="1">
+<tr><th>Supported</th><th>Not Supported</th></tr>
+<tr><td>Oracle</td><td>SQLite</td></tr>
+<tr><td>Sybase</td><td>Lago</td></tr>
+<tr><td>MySQL</td><td>mSQL</td></tr>
+<tr><td>PostgreSQL</td><td>FreeTDS</td></tr>
+<tr><td>Firebird</td><td></td></tr>
+<tr><td>DB2</td><td></td></tr>
+<tr><td>ODBC</td><td></td></tr>
+</table>
+</td><td>
+<table border="1">
+<tr><th>Supported</th>
+<th>Not Supported</th></tr>
+<tr><td>GNU C</td>
+<td>MSVC++</td></tr>
+<tr><td>GNU C++</td>
+<td><a href="http://www.activestate.com">ActiveState Perl</a></td></tr>
+<tr><td><a href="http://java.sun.com">Java</a></td>
+<td><a href="http://www.activestate.com">ActiveState Python</a></td></tr>
+<tr><td>Cygwin Perl</td>
+<td><a href="http://www.activestate.com">ActiveState TCL</a></td></tr>
+<tr><td>Cygwin Python</td>
+<td>Zope</td></tr>
+<tr><td>Cygwin Ruby</td>
+<td></td></tr>
+<tr><td><a href="http://rubyinstaller.rubyforge.org/wiki/wiki.pl">Non-Cygwin
+Ruby</a></td>
+<td></td></tr>
+<tr><td>Cygwin TCL</td>
+<td></td></tr>
+</table>
+</td></tr>
+</table>
+
+<p>Now, download SQL Relay and follow the <a href="installation.html">standard
+instructions</a> for building and installing it.  Use the Cygwin shell rather
+than the Windows Command Line or DOS shell to build and install SQL Relay.</p>
+
+<a name="server"></a>
+<span class="heading2">Running the SQL Relay Server</span><br><br>
+
+<p>SQL Relay makes extensive use of shared memory and semaphores.  The Cygwin
+IPC server simulates these facilities on Windows.  Install the server as a
+service and start it up following the instructions
+<a href="http://cygwin.com/cygwin-ug-net/using-cygserver.html">here</a>.
+
+<p>Once the IPC server is running, start up the database and follow the
+<a href="running.html">standard instructions</a> for running SQL Relay.</p>
+
+<p>Currently, there is no facility for installing SQL Relay as a service, so
+it must be restarted manually upon reboot.</p>
+
+</body>
+</html>
