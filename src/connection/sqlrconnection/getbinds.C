@@ -75,7 +75,7 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 
 		// get the size of the value
 		if (bv->type==STRING_BIND) {
-			if (!getBindSize(bv,STRINGBINDVALUELENGTH)) {
+			if (!getBindSize(bv,stringbindvaluelength)) {
 				return false;
 			}
 			// This must be a calloc because oracle8 get's angry if
@@ -88,7 +88,7 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 			debugPrint("connection",4,"STRING");
 			#endif
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
-			if (!getBindSize(bv,LOBBINDVALUELENGTH)) {
+			if (!getBindSize(bv,lobbindvaluelength)) {
 				return false;
 			}
 			#ifdef SERVER_DEBUG
@@ -237,7 +237,7 @@ void sqlrconnection::getNullBind(bindvar *bv) {
 bool sqlrconnection::getStringBind(bindvar *bv) {
 
 	// get the size of the value
-	if (!getBindSize(bv,STRINGBINDVALUELENGTH)) {
+	if (!getBindSize(bv,stringbindvaluelength)) {
 		return false;
 	}
 
@@ -356,7 +356,7 @@ bool sqlrconnection::getLobBind(bindvar *bv) {
 	#endif
 
 	// get the size of the value
-	if (!getBindSize(bv,LOBBINDVALUELENGTH)) {
+	if (!getBindSize(bv,lobbindvaluelength)) {
 		return false;
 	}
 

@@ -303,6 +303,10 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		sharedmemory	*idmemory;
 
 	protected:
+
+		unsigned long	stringbindvaluelength;
+		unsigned long	lobbindvaluelength;
+
 #ifdef SERVER_DEBUG
 		stringbuffer	*debugstr;
 #endif

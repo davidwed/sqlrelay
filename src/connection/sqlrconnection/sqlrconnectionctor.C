@@ -29,6 +29,9 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 	checkautocommit=0;
 	performautocommit=0;
 
+	stringbindvaluelength=STRINGBINDVALUELENGTH;
+	lobbindvaluelength=LOBBINDVALUELENGTH;
+
 	connected=false;
 
 	// maybe someday these parameters will be configurable
