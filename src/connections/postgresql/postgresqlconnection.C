@@ -32,50 +32,9 @@ void	postgresqlconnection::handleConnectString() {
 }
 
 int	postgresqlconnection::logIn() {
-
-	char	*connectstring=new char[(host?8+strlen(host):0)+
-				(port?8+strlen(port):0)+
-				(options?11+strlen(options):0)+
-				(tty?7+strlen(tty):0)+
-				(db?10+strlen(db):0)+
-				(getUser()?8+strlen(getUser()):0)+
-				(getPassword()?11+strlen(getPassword()):0)+1];
-	if (host) {
-		sprintf(connectstring,"host='%s' ",host);
-	}
-	if (port) {
-		sprintf(connectstring,"%sport='%s' ",
-					connectstring,port);
-	}
-	if (options) {
-		sprintf(connectstring,"%soptions='%s' ",
-					connectstring,options);
-	}
-	if (tty) {
-		sprintf(connectstring,"%stty='%s' ",
-					connectstring,tty);
-	}
-	if (db) {
-		sprintf(connectstring,"%sdbname='%s' ",
-					connectstring,db);
-	}
-	if (getUser()) {
-		sprintf(connectstring,"%suser='%s' ",
-					connectstring,getUser());
-	}
-	if (getPassword()) {
-		sprintf(connectstring,"%spassword='%s' ",
-					connectstring,getPassword());
-	}
-
-	printf("login start... %s\n",connectstring);
 			
-
 	// log in
-printf("before login\n");
-	//pgconn=PQsetdbLogin(host,port,options,tty,db,getUser(),getPassword());
-	pgconn=PQconnectdb(connectstring);
-printf("after login\n");
+	pgconn=PQsetdbLogin(host,port,options,tty,db,getUser(),getPassword());
 
 	// check the status of the login
 	if (PQstatus(pgconn)==CONNECTION_BAD) {
@@ -83,12 +42,11 @@ printf("after login\n");
 		return 0;
 	}
 
-	/*int	devnull;
+	int	devnull;
 	if ((devnull=open("/dev/null",O_RDONLY))>0) {
 		dup2(devnull,STDOUT_FILENO);
 		dup2(devnull,STDERR_FILENO);
-	}*/
-printf("login done...\n");
+	}
 	return 1;
 }
 
@@ -101,9 +59,7 @@ void	postgresqlconnection::deleteCursor(sqlrcursor *curs) {
 }
 
 void	postgresqlconnection::logOut() {
-printf("logout start...\n");
 	PQfinish(pgconn);
-printf("logout done...\n");
 }
 
 int	postgresqlconnection::commit() {
@@ -187,7 +143,7 @@ int	postgresqlcursor::executeQuery(const char *query, long length,
 }
 
 char	*postgresqlcursor::getErrorMessage(int *liveconnection) {
-	*liveconnection=1;
+	*liveconnection=(PQstatus(postgresqlconn->pgconn)==CONNECTION_OK);
 	return PQerrorMessage(postgresqlconn->pgconn);
 }
 

@@ -835,7 +835,7 @@ int	sqlrconnection::waitForClient() {
 
 			return -1;
 		}
-		clientsock=new transport(descriptor);
+		clientsock=new datatransport(descriptor);
 
 		#ifdef SERVER_DEBUG
 		debugPrint(logger::logHeader("connection"),1,
@@ -890,10 +890,8 @@ void	sqlrconnection::clientSession() {
 			break;
 		}
 
-printf("command: %d\n",command);
 		// handle some things up front
 		if (command==AUTHENTICATE) {
-printf("authenticate\n");
 			if (authenticateCommand()) {
 				continue;
 			}
@@ -990,7 +988,6 @@ int	sqlrconnection::authenticateCommand() {
 }
 
 int	sqlrconnection::authenticate() {
-printf("authenticate...\n");
 
 	#ifdef SERVER_DEBUG
 	debugPrint(logger::logHeader("connection"),1,"authenticate...");
@@ -1062,7 +1059,6 @@ int	sqlrconnection::connectionBasedAuth(const char *userbuffer,
 
 int	sqlrconnection::databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
-printf("database based auth...\n");
 
 	// if the user we want to change to is different from the
 	// user that's currently proxied, try to change to that user
@@ -1096,7 +1092,6 @@ printf("database based auth...\n");
 
 int	sqlrconnection::changeUser(const char *newuser,
 					const char *newpassword) {
-printf("change user...\n");
 
 	#ifdef SERVER_DEBUG
 	debugPrint(logger::logHeader("connection"),2,"change user");

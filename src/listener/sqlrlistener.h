@@ -11,7 +11,7 @@
 #include <rudiments/listener.h>
 #include <rudiments/unixserversocket.h>
 #include <rudiments/inetserversocket.h>
-#include <rudiments/transport.h>
+#include <rudiments/datatransport.h>
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
 #include <authenticator.h>
@@ -33,7 +33,7 @@ class handoffsocketnode {
 	friend class sqlrlistener;
 	private:
 		unsigned long		pid;
-		transport		*sock;
+		datatransport		*sock;
 };
 
 class sqlrlistener : public daemonprocess, public listener, public debugfile {
@@ -62,8 +62,8 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		void	blockSignals();
 		int	waitForData();
 		void	handleClientConnection(int fd);
-		void	registerHandoff(transport *sock);
-		void	deRegisterHandoff(transport *sock);
+		void	registerHandoff(datatransport *sock);
+		void	deRegisterHandoff(datatransport *sock);
 		int	deniedIp();
 		void	disconnectClient();
 		void	forkChild();
@@ -99,7 +99,7 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		inetserversocket	*clientsockin;
 		unixserversocket	*handoffsockun;
 		unixserversocket	*removehandoffsockun;
-		transport		*clientsock;
+		datatransport		*clientsock;
 
 		handoffsocketnode	**handoffsocklist;
 

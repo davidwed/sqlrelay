@@ -671,7 +671,7 @@ void	sqlrlistener::handleClientConnection(int fd) {
 }
 
 
-void	sqlrlistener::registerHandoff(transport *sock) {
+void	sqlrlistener::registerHandoff(datatransport *sock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint(logger::logHeader("listener"),0,"registering handoff...");
@@ -701,7 +701,7 @@ void	sqlrlistener::registerHandoff(transport *sock) {
 	#endif
 }
 
-void	sqlrlistener::deRegisterHandoff(transport *sock) {
+void	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint(logger::logHeader("listener"),0,

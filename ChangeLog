@@ -60,6 +60,8 @@
 		compiled against uclibc (for all connections that can also
 		be compiled against uclibc)
 	added error message if ftok fails in listener
+	added Paolo Dotta's liveconnection=PQstatus fix to the postgres
+		connection
 
 0.32 -	affectedRows and totalRows were returning 0 instead of -1 for databases
 		that don't know that value, now they return -1

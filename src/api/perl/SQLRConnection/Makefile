@@ -118,8 +118,7 @@ LINKTYPE = dynamic
 XS_FILES= SQLRConnection.xs
 C_FILES = SQLRConnection.c
 O_FILES = SQLRConnection.o
-H_FILES = perlincludes.h \
-	perlincludes1.h \
+H_FILES = perlincludes1.h \
 	perlincludes2.h \
 	perlincludes3.h
 HTMLLIBPODS    = 
@@ -282,10 +281,10 @@ MPOLLUTE =
 # Firstworks::SQLRConnection might depend on some other libraries:
 # See ExtUtils::Liblist for details
 #
-EXTRALIBS = -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc
-LDLOADLIBS = -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc
+EXTRALIBS = -L/usr/local/src/sqlrelay/src/api/perl/SQLRConnection/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc
+LDLOADLIBS = -L/usr/local/src/sqlrelay/src/api/perl/SQLRConnection/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc
 BSLOADLIBS = 
-LD_RUN_PATH = /usr/local/firstworks/lib:/usr/lib:/lib
+LD_RUN_PATH = /usr/local/src/sqlrelay/src/api/perl/SQLRConnection/../../c++/src/.libs:/usr/local/firstworks/lib:/usr/lib:/lib
 
 
 # --- MakeMaker const_cccmd section:
@@ -880,12 +879,12 @@ pm_to_blib: $(TO_INST_PM)
 #	DLEXT => q[so]
 #	DLSRC => q[dl_dlopen.xs]
 #	EXE_EXT => q[]
-#	EXTRALIBS => q[-L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc]
+#	EXTRALIBS => q[-L/usr/local/src/sqlrelay/src/api/perl/SQLRConnection/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc]
 #	FIRST_MAKEFILE => q[Makefile]
 #	FULLEXT => q[Firstworks/SQLRConnection]
 #	FULLPERL => q[/usr/bin/perl]
 #	FULL_AR => q[/usr/bin/ar]
-#	H => [q[perlincludes.h], q[perlincludes1.h], q[perlincludes2.h], q[perlincludes3.h]]
+#	H => [q[perlincludes1.h], q[perlincludes2.h], q[perlincludes3.h]]
 #	HAS_LINK_CODE => q[1]
 #	HTMLEXT => q[html]
 #	HTMLLIBPODS => {  }
@@ -930,8 +929,8 @@ pm_to_blib: $(TO_INST_PM)
 #	LDDLFLAGS => q[-G]
 #	LDFLAGS => q[ -L/usr/local/lib]
 #	LDFROM => q[$(OBJECT)]
-#	LDLOADLIBS => q[-L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc]
-#	LD_RUN_PATH => q[/usr/local/firstworks/lib:/usr/lib:/lib]
+#	LDLOADLIBS => q[-L/usr/local/src/sqlrelay/src/api/perl/SQLRConnection/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc]
+#	LD_RUN_PATH => q[/usr/local/src/sqlrelay/src/api/perl/SQLRConnection/../../c++/src/.libs:/usr/local/firstworks/lib:/usr/lib:/lib]
 #	LIBC => q[/lib/libc-2.2.5.so]
 #	LIBPERL_A => q[libperl.a]
 #	LIBS => [q[-L../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments  -lstdc++-3-libc6.2-2-2.10.0 -lc]]

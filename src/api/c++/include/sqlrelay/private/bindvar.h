@@ -29,7 +29,7 @@ class bindvar {
 			char	*lobval;
 			short	cursorid;
 		} value;
-		unsigned short	valuesize;
+		unsigned long	valuesize;
 		bindtype	type;
 		unsigned short	send;
 		

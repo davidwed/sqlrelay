@@ -222,7 +222,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 		inetserversocket	*serversockin;
 		unixserversocket	*serversockun;
-		transport		*clientsock;
+		datatransport		*clientsock;
 
 		sqlrcursor	**cur;
 		unsigned short	currentcur;
