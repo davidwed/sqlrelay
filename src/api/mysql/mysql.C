@@ -11,6 +11,7 @@ extern "C" {
 
 #define CR_UNKNOWN_ERROR	2000
 #define MYSQL_NO_DATA		100
+#define REFRESH_GRANT		1
 
 typedef unsigned long long	my_ulonglong;
 typedef bool			my_bool;
@@ -144,6 +145,7 @@ struct MYSQL {
 };
 
 
+unsigned int mysql_thread_safe();
 MYSQL *mysql_init(MYSQL *mysql);
 int mysql_set_server_option(MYSQL *mysql, enum enum_mysql_set_option option);
 int mysql_options(MYSQL *mysql, enum mysql_option option, const char *arg);
@@ -161,6 +163,7 @@ int mysql_ping(MYSQL *mysql);
 char *mysql_stat(MYSQL *mysql);
 int mysql_shutdown(MYSQL *mysql);
 int mysql_reload(MYSQL *mysql);
+int mysql_refresh(MYSQL *mysql, unsigned int refresh_options);
 unsigned long mysql_thread_id(MYSQL *mysql);
 MYSQL_RES *mysql_list_processes(MYSQL *mysql);
 int mysql_kill(MYSQL *mysql, unsigned long pid);
@@ -182,7 +185,18 @@ MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild);
 MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild);
 unsigned long mysql_escape_string(char *to, const char *from,
 					unsigned long length);
+char *mysql_odbc_escape_string(MYSQL *mysql, char *to,
+				unsigned long to_length,
+				const char *from,
+				unsigned long from_length,
+				void *param,
+				char *(*extend_buffer)
+					(void *, char *to,
+					unsigned long *length));
+void myodbc_remove_escape(MYSQL *mysql, char *name);
 int mysql_query(MYSQL *mysql, const char *query);
+int mysql_send_query(MYSQL *mysql, const char *query, unsigned int length);
+int mysql_read_query_result(MYSQL *mysql);
 unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 					const char *from,
 					unsigned long length);
@@ -251,6 +265,9 @@ my_bool mysql_stmt_reset(MYSQL_STMT *stmt);
 
 
 
+unsigned int mysql_thread_safe() {
+	return 1;
+}
 
 MYSQL *mysql_init(MYSQL *mysql) {
 	if (mysql) {
@@ -321,6 +338,10 @@ int mysql_shutdown(MYSQL *mysql) {
 	return 1;
 }
 
+int mysql_refresh(MYSQL *mysql, unsigned int refresh_options) {
+	return (refresh_options==REFRESH_GRANT)?mysql_reload(mysql):0;
+}
+
 int mysql_reload(MYSQL *mysql) {
 	if (!strcmp(mysql->sqlrcon->identify(),"mysql")) {
 		sqlrcursor	sqlrcur(mysql->sqlrcon);
@@ -345,7 +366,6 @@ int mysql_kill(MYSQL *mysql, unsigned long pid) {
 
 char *mysql_get_client_info() {
 	// Returns a string that represents the client library version.
-	// FIXME: not sure these are right
 	#ifdef COMPAT_MYSQL_3
 		return "3.23.58";
 	#endif
@@ -393,7 +413,6 @@ unsigned int mysql_get_proto_info(MYSQL *mysql) {
 
 char *mysql_get_server_info(MYSQL *mysql) {
 	// Returns a string that represents the server version number.
-	// FIXME: not sure these are right
 	#ifdef COMPAT_MYSQL_3
 		return "3.23.58";
 	#endif
@@ -441,7 +460,7 @@ my_bool	mysql_change_user(MYSQL *mysql, const char *user,
 }
 
 const char *mysql_character_set_name(MYSQL *mysql) {
-	return "UTF-8";
+	return "latin1";
 }
 
 
@@ -482,9 +501,36 @@ unsigned long mysql_escape_string(char *to, const char *from,
 					unsigned long length) {
 	return mysql_real_escape_string(NULL,to,from,length);
 }
+char *mysql_odbc_escape_string(MYSQL *mysql, char *to,
+				unsigned long to_length,
+				const char *from,
+				unsigned long from_length,
+				void *param,
+				char *(*extend_buffer)
+					(void *, char *to,
+					unsigned long *length)) {
+	// FIXME: implement this
+	return NULL;
+}
+
+void myodbc_remove_escape(MYSQL *mysql, char *name) {
+	// FIXME: implement this
+}
 
 int mysql_query(MYSQL *mysql, const char *query) {
 	return mysql_real_query(mysql,query,strlen(query));
+}
+
+int mysql_send_query(MYSQL *mysql, const char *query, unsigned int length) {
+	// FIXME: looks like this sends a query in the background then returns
+	// so we can do something else in the foreground.
+	return mysql_real_query(mysql,query,length);
+}
+
+int mysql_read_query_result(MYSQL *mysql) {
+	// FIXME: looks like this checks to see if a query sent with
+	// mysql_send_query has finished or not
+	return 0;
 }
 
 unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
@@ -631,6 +677,7 @@ MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result, MYSQL_ROW_OFFSET offset) {
 	return oldrow;
 }
 
+// FIXME: this should return MYSQL_ROWS * for mysql-3
 MYSQL_ROW_OFFSET mysql_row_tell(MYSQL_RES *result) {
 	return result->currentrow;
 }
@@ -1092,27 +1139,26 @@ int mysql_fetch(MYSQL_STMT *stmt) {
 	unsigned long	*lengths=mysql_fetch_lengths(stmt->result);
 
 	for (int i=0; i<stmt->result->sqlrcur->colCount(); i++) {
-			*(stmt->resultbinds[i].length)=lengths[i];
-			if (!row[i]) {
-				*(stmt->resultbinds[i].is_null)=true;
-			} else {
-				*(stmt->resultbinds[i].is_null)=false;
-				memcpy(stmt->resultbinds[i].buffer,
-						row[i],lengths[i]);
-			}
-			stmt->resultbinds[i].buffer[lengths[i]]=(char)NULL;
+		*(stmt->resultbinds[i].length)=lengths[i];
+		if (!row[i]) {
+			*(stmt->resultbinds[i].is_null)=true;
+		} else {
+			*(stmt->resultbinds[i].is_null)=false;
+			memcpy(stmt->resultbinds[i].buffer,row[i],lengths[i]);
+		}
+		stmt->resultbinds[i].buffer[lengths[i]]=(char)NULL;
 
-			// FIXME: I think I'm supposed to convert to
-			// some other type based on the column type...
-			stmt->resultbinds[i].buffer_type=MYSQL_TYPE_STRING,
-			stmt->resultbinds[i].buffer_length=lengths[i];
+		// FIXME: I think I'm supposed to convert to
+		// some other type based on the column type...
+		stmt->resultbinds[i].buffer_type=MYSQL_TYPE_STRING,
+		stmt->resultbinds[i].buffer_length=lengths[i];
 	}
 	return 0;
 }
 
 int mysql_fetch_column(MYSQL_STMT *stmt, MYSQL_BIND *bind,
 			unsigned int column, unsigned long offset) {
-	// FIXME: The MySQL docs don't even explain this one
+	// FIXME: The MySQL docs don't even explain this one.
 	return 0;
 }
 
