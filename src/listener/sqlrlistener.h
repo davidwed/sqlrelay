@@ -71,10 +71,9 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		bool	deRegisterHandoff(filedescriptor *sock);
 		bool	fixup(filedescriptor *sock);
 		bool	deniedIp();
-		void	disconnectClient(filedescriptor *sock);
-		void	forkChild(filedescriptor *sock);
-		void	clientSession(filedescriptor *sock);
-		int	getAuth(filedescriptor *sock);
+		void	forkChild(filedescriptor *clientsock);
+		void	clientSession(filedescriptor *clientsock);
+		int	getAuth(filedescriptor *clientsock);
 		void	incrementSessionCount();
 		bool	handOffClient(filedescriptor *sock);
 		void	getAConnection(unsigned long *connectionpid,
@@ -98,7 +97,7 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 					filedescriptor *connectionsock,
 					int fd);
 		void	waitForClientClose(int authstatus, bool passstatus,
-						filedescriptor *sock);
+						filedescriptor *clientsock);
 
 		bool		passdescriptor;
 
@@ -125,7 +124,7 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		unixserversocket	*fixupsockun;
 		char			*fixupsockname;
 
-		handoffsocketnode	**handoffsocklist;
+		handoffsocketnode	*handoffsocklist;
 
 		regularexpression	*allowed;
 		regularexpression	*denied;

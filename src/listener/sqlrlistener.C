@@ -85,8 +85,7 @@ void sqlrlistener::cleanUp() {
 
 	if (handoffsocklist) {
 		for (int i=0; i<maxconnections; i++) {
-			delete handoffsocklist[i]->sock;
-			delete handoffsocklist[i];
+			delete handoffsocklist[i].sock;
 		}
 		delete[] handoffsocklist;
 	}
@@ -280,10 +279,9 @@ void sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
 	if (cfgfl->getPassDescriptor()) {
 
 		// create the list of handoff nodes
-		handoffsocklist=new handoffsocketnode *[maxconnections];
+		handoffsocklist=new handoffsocketnode[maxconnections];
 		for (int i=0; i<maxconnections; i++) {
-			handoffsocklist[i]=new handoffsocketnode;
-			handoffsocklist[i]->pid=0;
+			handoffsocklist[i].pid=0;
 		}
 	}
 }
@@ -786,7 +784,7 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 		// not denied.  If the ip was denied, disconnect the
 		// socket and loop back.
 		if (denied && deniedIp()) {
-			disconnectClient(clientsock);
+			delete clientsock;
 			return true;
 		}
 
@@ -852,15 +850,36 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	// find a free node in the list, if we find another node with the
 	// same pid, then the old connection must have died off mysteriously,
 	// replace it
+	bool	inserted=false;
 	for (int i=0; i<maxconnections; i++) {
-		if (!handoffsocklist[i]->pid) {
-			handoffsocklist[i]->pid=processid;
-			handoffsocklist[i]->sock=sock;
+		if (!handoffsocklist[i].pid) {
+			handoffsocklist[i].pid=processid;
+			handoffsocklist[i].sock=sock;
+			inserted=true;
 			break;
-		} else if (handoffsocklist[i]->pid==processid) {
-			handoffsocklist[i]->sock=sock;
+		} else if (handoffsocklist[i].pid==processid) {
+			handoffsocklist[i].sock=sock;
+			inserted=true;
 			break;
 		}
+	}
+
+	// if for some reason the scaler started more connections than
+	// "maxconnections" or if someone manually started one and the number
+	// of connections exceeded maxconnections, then the new connection won't
+	// fit in our list, grow the list to accommodate it...
+	if (inserted==false) {
+		handoffsocketnode	*newhandoffsocklist=
+				new handoffsocketnode[maxconnections+1];
+		for (int i=0; i<maxconnections; i++) {
+			newhandoffsocklist[i].pid=handoffsocklist[i].pid;
+			newhandoffsocklist[i].sock=handoffsocklist[i].sock;
+		}
+		delete[] handoffsocklist;
+		newhandoffsocklist[maxconnections].pid=processid;
+		newhandoffsocklist[maxconnections].sock=sock;
+		maxconnections++;
+		handoffsocklist=newhandoffsocklist;
 	}
 
 	#ifdef SERVER_DEBUG
@@ -887,10 +906,10 @@ bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 
 	// remove the matching socket from the list
 	for (int i=0; i<maxconnections; i++) {
-		if (handoffsocklist[i]->pid==processid) {
-			handoffsocklist[i]->pid=0;
-			delete handoffsocklist[i]->sock;
-			handoffsocklist[i]->sock=NULL;
+		if (handoffsocklist[i].pid==processid) {
+			handoffsocklist[i].pid=0;
+			delete handoffsocklist[i].sock;
+			handoffsocklist[i].sock=NULL;
 			break;
 		}
 	}
@@ -924,8 +943,8 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 	// look through the handoffsocklist for the pid
 	bool	retval=false;
 	for (int i=0; i<maxconnections; i++) {
-		if (handoffsocklist[i]->pid==processid) {
-			retval=sock->passFileDescriptor(handoffsocklist[i]->
+		if (handoffsocklist[i].pid==processid) {
+			retval=sock->passFileDescriptor(handoffsocklist[i].
 						sock->getFileDescriptor());
 			#ifdef SERVER_DEBUG
 			debugPrint("listener",1,
@@ -937,6 +956,7 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 				debugPrint("listener",1,"failed to pass it");
 			}
 			#endif
+			break;
 		}
 	}
 
@@ -977,12 +997,7 @@ bool sqlrlistener::deniedIp() {
 	return false;
 }
 
-void sqlrlistener::disconnectClient(filedescriptor *sock) {
-	sock->close();
-	delete sock;
-}
-
-void sqlrlistener::forkChild(filedescriptor *sock) {
+void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 	// if the client connected to one of the non-handoff
 	// sockets, fork a child to handle it
@@ -994,7 +1009,7 @@ void sqlrlistener::forkChild(filedescriptor *sock) {
 		openDebugFile("listener",cmdl->getLocalStateDir());
 		#endif
 
-		clientSession(sock);
+		clientSession(clientsock);
 
 		// since this is the forked off listener, we don't
 		// want to actually remove the semaphore set or shared
@@ -1015,15 +1030,15 @@ void sqlrlistener::forkChild(filedescriptor *sock) {
 
 	// the main process doesn't need to stay connected 
 	// to the client, only the forked process
-	delete sock;
+	delete clientsock;
 }
 
-void sqlrlistener::clientSession(filedescriptor *sock) {
+void sqlrlistener::clientSession(filedescriptor *clientsock) {
 
 	bool	passstatus=false;
 
 	// handle authentication
-	int	authstatus=getAuth(sock);
+	int	authstatus=getAuth(clientsock);
 
 	// 3 possible outcomes: 1=pass 0=fail -1=bad data
 	if (authstatus==1) {
@@ -1031,7 +1046,7 @@ void sqlrlistener::clientSession(filedescriptor *sock) {
 		if (dynamicscaling) {
 			incrementSessionCount();
 		}
-		passstatus=handOffClient(sock);
+		passstatus=handOffClient(clientsock);
 
 	} else if (authstatus==0) {
 
@@ -1039,15 +1054,15 @@ void sqlrlistener::clientSession(filedescriptor *sock) {
 		// authentication error to discourage
 		// brute-force password attacks
 		rudiments::sleep::macrosleep(2);
-		sock->write((unsigned short)ERROR);
+		clientsock->write((unsigned short)ERROR);
 		rudiments::sleep::macrosleep(2);
 	}
 
-	waitForClientClose(authstatus,passstatus,sock);
-	disconnectClient(sock);
+	waitForClientClose(authstatus,passstatus,clientsock);
+	delete clientsock;
 }
 
-int sqlrlistener::getAuth(filedescriptor *sock) {
+int sqlrlistener::getAuth(filedescriptor *clientsock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"getting authentication...");
@@ -1056,10 +1071,10 @@ int sqlrlistener::getAuth(filedescriptor *sock) {
 	// Get the user/password. For either one, if they are too big or
 	// if there's a read error, just exit with an error code
 	unsigned long	size;
-	sock->read(&size);
+	clientsock->read(&size);
 	char		userbuffer[(unsigned long)USERSIZE+1];
 	if (size>(unsigned long)USERSIZE ||
-	    (unsigned long)(sock->read(userbuffer,size))!=size) {
+	    (unsigned long)(clientsock->read(userbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: user size is wrong");
@@ -1069,9 +1084,9 @@ int sqlrlistener::getAuth(filedescriptor *sock) {
 	userbuffer[size]=(char)NULL;
 
 	char		passwordbuffer[(unsigned long)USERSIZE+1];
-	sock->read(&size);
+	clientsock->read(&size);
 	if (size>(unsigned long)USERSIZE ||
-		(unsigned long)(sock->read(passwordbuffer,size))!=size) {
+		(unsigned long)(clientsock->read(passwordbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: password size is wrong");
@@ -1408,32 +1423,32 @@ filedescriptor *sqlrlistener::connectToConnection(unsigned long connectionpid,
 	if (passdescriptor) {
 
 		for (int i=0; i<maxconnections; i++) {
-			if (handoffsocklist[i]->pid==connectionpid) {
-				return handoffsocklist[i]->sock;
+			if (handoffsocklist[i].pid==connectionpid) {
+				return handoffsocklist[i].sock;
 			}
 		}
 
 	} else {
 
-		int connected=0;
+		int connected=RESULT_ERROR;
 
 		// first, try for the unix port
 		if (unixportstr && unixportstr[0]) {
 			unixclientsocket	*unixsock=
 							new unixclientsocket();
 			connected=unixsock->connect(unixportstr,-1,-1,0,1);
-			if (connected) {
+			if (connected==RESULT_SUCCESS) {
 				return unixsock;
 			}
 		}
 
 		// then try for the inet port
-		if (!connected) {
+		if (connected!=RESULT_SUCCESS) {
 			inetclientsocket	*inetsock=
 							new inetclientsocket();
 			connected=inetsock->connect("127.0.0.1",inetport,
 								-1,-1,0,1);
-			if (connected) {
+			if (connected==RESULT_SUCCESS) {
 				return inetsock;
 			}
 		}
@@ -1496,8 +1511,8 @@ bool sqlrlistener::findMatchingSocket(unsigned long connectionpid,
 	// When we find it, send the descriptor of the clientsock to the 
 	// connection over the handoff socket associated with that node.
 	for (int i=0; i<maxconnections; i++) {
-		if (handoffsocklist[i]->pid==connectionpid) {
-			connectionsock->setFileDescriptor(handoffsocklist[i]->
+		if (handoffsocklist[i].pid==connectionpid) {
+			connectionsock->setFileDescriptor(handoffsocklist[i].
 						sock->getFileDescriptor());
 			return true;
 		}
@@ -1519,7 +1534,8 @@ bool sqlrlistener::requestFixup(unsigned long connectionpid,
 
 	// connect to the fixup socket of the parent listener
 	unixclientsocket	fixupclientsockun;
-	if (!fixupclientsockun.connect(fixupsockname,-1,-1,0,1)) {
+	if (fixupclientsockun.connect(fixupsockname,-1,-1,0,1)
+						!=RESULT_SUCCESS) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"failed to connect to parent listener process");
@@ -1553,7 +1569,7 @@ bool sqlrlistener::requestFixup(unsigned long connectionpid,
 }
 
 void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
-							filedescriptor *sock) {
+						filedescriptor *clientsock) {
 
 	// Sometimes the listener sends the ports and closes
 	// the socket while they are still buffered but not
@@ -1576,7 +1592,7 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 		// we are but authentication failed, the client
 		// shouldn't be sending any data, so a single
 		// read should suffice.
-		sock->read(&dummy);
+		clientsock->read(&dummy);
 
 	} else if (!passstatus) {
 
@@ -1590,8 +1606,8 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 		// number of bytes that could be sent.
 
 		unsigned int	counter=0;
-		sock->useNonBlockingMode();
-		while (sock->read(&dummy)>0 && counter<
+		clientsock->useNonBlockingMode();
+		while (clientsock->read(&dummy)>0 && counter<
 				// sending auth
 				(sizeof(short)+
 				// user/password
@@ -1621,6 +1637,6 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 				)/2) {
 			counter++;
 		}
-		sock->useBlockingMode();
+		clientsock->useBlockingMode();
 	}
 }

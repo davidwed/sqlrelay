@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
+#include <rudiments/sleep.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -123,20 +124,23 @@ void sqlrconnection::registerForHandoff(const char *tmpdir) {
 	// Try to connect over and over forever on 1 second intervals.
 	// If the connect succeeds but the write fails, loop back and
 	// try again.
+	connected=false;
 	for (;;) {
 
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",1,"trying...");
 		#endif
 
-		handoffsockun.connect(handoffsockname,-1,-1,1,0);
-		if (handoffsockun.write((unsigned long)getpid())==
-						sizeof(unsigned long)) {
-			connected=true;
-			break;
+		if (handoffsockun.connect(handoffsockname,-1,-1,1,0)==
+							RESULT_SUCCESS) {
+			if (handoffsockun.write((unsigned long)getpid())==
+							sizeof(unsigned long)) {
+				connected=true;
+				break;
+			}
+			deRegisterForHandoff(tmpdir);
 		}
-		deRegisterForHandoff(tmpdir);
-		connected=false;
+		rudiments::sleep::macrosleep(1);
 	}
 
 	#ifdef SERVER_DEBUG
