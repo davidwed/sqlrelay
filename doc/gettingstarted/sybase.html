@@ -12,10 +12,17 @@
 <ul>
 <li><a href="#installation">Installation</a></li>
 <ul>
+<li><a href="#rpmversions">RPM-based Installations</a>
+<ul>
 <li><a href="#debian">Debian Linux</a></li>
 <li><a href="#slackware">Slackware Linux</a></li>
 <li><a href="#rpm">RPM-based Linux</a></li>
+</ul>
+<li><a href="#nonrpmversions">Non RPM-based Installations</a>
+<ul>
+<li><a href="#linux">Linux</a></li>
 <li><a href="#freebsd">FreeBSD</a></li>
+</ul>
 </ul>
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
@@ -26,22 +33,28 @@
 <span class="heading1">Installation</span><br>
 
 <p>I've successfully installed and used Sybase Adaptive Server Enterprise 
-versions 11.9.2 and 11.0.3.3 on Linux.  I've installed Sybase ASE version 
-11.0.3.3 on FreeBSD but could never get it to work properly.  Likewise, I have
-been able to install 12.5 on Linux, but was never able to get the database
-to build properly.  I've never had access to any other version of Sybase ASE
-for Linux or FreeBSD or any version of Sybase ASE for other platforms.</p>
+versions 12.5.1, 11.9.2 and 11.0.3.3 on Linux.  I've installed Sybase ASE
+version 11.0.3.3 on FreeBSD but could never get it to work properly.  Likewise,
+I have been able to install 12.5 on Linux, but was never able to get the
+database to build properly.  I've never had access to any other version of
+Sybase ASE for Linux or FreeBSD or any version of Sybase ASE for other
+platforms.</p>
 
 <p>You can download Sybase ASE from the 
 <a href="http://www.sybase.com/downloads">downloads section</a> of the Sybase 
-site.  It comes as a set of RPM's for Linux and a tarball for FreeBSD.</p>
+site.</p>
+
+<a name="rpmversions"></a>
+<span class="heading2">RPM-based Installations</span><br>
+
+<p>Versions 12.5, 11.9.2 and 11.0.3.3 come as a set of RPM's for Linux.</p>
 
 <a name="debian"></a>
-<span class="heading2">Debian Linux</span><br>
+<span class="heading3">Debian Linux</span><br>
 
-<p>The easiest way to install Sybase ASE on Debian Linux is to install RPM and 
-then use it to install the RPM's.  On newer Debian releases, if you have 
-configured <i>apt</i> as illustrated in 
+<p>The easiest way to install RPM-based versions of Sybase ASE on Debian Linux
+is to install RPM and then use it to install the RPM's.  On newer Debian
+releases, if you have configured <i>apt</i> as illustrated in 
 <a href="http://www.debian.org/doc/manuals/apt-howto/index.en.html">the 
 APT-HOWTO</a>, run <i>apt-get install rpm</i>.  If your distribution came with 
 RPM, you may be prompted to enter a CD.  If not, it will be downloaded from the 
@@ -51,18 +64,18 @@ The only difference is that you must use <i>rpm -i --nodeps</i> instead of
 <i>rpm -i</i> to install the RPM's.</p>
 
 <a name="slackware"></a>
-<span class="heading2">Slackware Linux</span><br>
+<span class="heading3">Slackware Linux</span><br>
 
-<p>The easiest way to install Sybase ASE on Slackware Linux is to install RPM 
-and then use it to install the RPM's.  The RPM package is available from 
-<a href="ftp://ftp.slackware.com">ftp.slackware.com</a>.  You can install it 
-using <i>installpkg</i>.  Once RPM is installed, log in as root and run 
-<i>rpm --initdb</i> as root.  Then, you can follow the directions below for 
-installing on RPM Based Linux.  The only difference is that you must use 
+<p>The easiest way to install RPM-based versions Sybase ASE on Slackware Linux
+is to install RPM and then use it to install the RPM's.  The RPM package is
+available from <a href="ftp://ftp.slackware.com">ftp.slackware.com</a>.  You
+can install it using <i>installpkg</i>.  Once RPM is installed, log in as root
+and run <i>rpm --initdb</i> as root.  Then, you can follow the directions below
+for installing on RPM Based Linux.  The only difference is that you must use 
 <i>rpm -i --nodeps</i> instead of <i>rpm -i</i> to install the RPM's.</p>
 
 <a name="rpm"></a>
-<span class="heading2">RPM-based Linux</span><br>
+<span class="heading3">RPM-based Linux</span><br>
 
 <p>Versions 11.9.2 and 11.0.3.3 of Sybase ASE for Linux require glibc version
 2.1.2 or greater.  I was able to install them both on RedHat 6.2, 7.3 and 9,
@@ -74,7 +87,7 @@ I've never been 100% successful in installing it, however, I have been able
 to get it to partially install on RedHat 7.3, Redhat 9 and Mandrake 9.0.  I
 have not tried it on any other platforms.</p>
 
-<span class="heading3">Version 12.5</span><br>
+<span class="heading4">Version 12.5</span><br>
 
 <p>To install version 12.5 on RPM Based Linux, you should download the
 following RPMS (at minimum) and install them using <i>rpm -i</i>.  Note that
@@ -94,7 +107,7 @@ languages.</p>
 <p>During RPM installation, a sybase user will be created.  You should give
 this user a password.</p>
 
-<span class="heading3">Version 11.9.2</span><br>
+<span class="heading4">Version 11.9.2</span><br>
 
 <p>To install version 11.9.2 on RPM Based Linux, you should download the
 following RPMS (at minimum) and install them using <i>rpm -i</i>.  Note that
@@ -114,7 +127,7 @@ languages.</p>
 <p>During RPM installation, a sybase user will be created.  You should give
 this user a password.</p>
 
-<span class="heading3">Version 11.0.3.3</span><br>
+<span class="heading4">Version 11.0.3.3</span><br>
 
 <p>To install version 11.0.3.3 on RPM Based Linux, you should download the
 following RPMS (at minimum) and install them using <i>rpm -i</i>.</p>
@@ -138,13 +151,28 @@ export SYBASE=/opt/sybase<br>
 <p>Answer Yes or y to all questions.  The script will create a sybase user and 
 prompt you for a password.</p>
 
-<a name="freebsd"></a>
-<span class="heading2">FreeBSD</span><br>
+<a name="nonrpmversions"></a>
+<span class="heading2">Non RPM-based Installations</span><br>
 
-<p>Sybase also provides tarballs for FreeBSD which must be untarred in 
-/usr/local.  The FreeBSD version is actually a set of Linux binaries with 
-FreeBSD-native development libraries.  To run the FreeBSD version, you must 
-have Linux Binary Compatibility and the RPM package installed.</p>
+<p>Version 12.5.1 comes as a tarball for Linux.  Version 11.0.3.3 comes as a
+tarball for FreeBSD.</p>
+
+<a name="linux"></a>
+<span class="heading3">Linux</span><br>
+
+<p>Sybase provides a tarball for version 12.5.1 for Linux.  In version 12.5.1,
+installation and database creation are done in a single step.  For instructions
+for installing version 12.5.1, see the instructions below for creating a
+database.</p>
+
+<a name="freebsd"></a>
+<span class="heading3">FreeBSD</span><br>
+
+<p>Sybase provides tarballs for version 11.0.3.3 for FreeBSD which must be
+untarred in /usr/local.  The FreeBSD version is actually a set of Linux
+binaries with FreeBSD-native development libraries.  To run the FreeBSD
+version, you must have Linux Binary Compatibility and the RPM package
+installed.</p>
 
 <p>The install/sybinstall.sh doesn't work out of the box.  I modified it as
 follows:</p>
@@ -176,8 +204,9 @@ US-english.</p>
 
 <p>The instructions for initializing each version are very different.</p>
 
-<p>See <a href="sybase/12.5.html">Initializing a 12.5 sever</a>,
-<a href="sybase/11.9.2.html">Initializing an 11.9.2 sever</a> and
+<p>See <a href="sybase/12.5.1.html">Initializing a 12.5.1 server</a>,
+<a href="sybase/12.5.html">Initializing a 12.5 server</a>,
+<a href="sybase/11.9.2.html">Initializing an 11.9.2 server</a> and
 <a href="sybase/11.0.3.3.html">Initializing an 11.0.3.3 server</a>.
 
 <p>Once you have initialized the server, you should start the server.  From
