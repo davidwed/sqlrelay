@@ -17,9 +17,9 @@ bool sqlrconnection::getNewPort() {
 		// if size is too big, return an error
 		stringbuffer	errstr;
 		errstr.append("The pathname of the unix port was too long: ");
-		errstr.append((long)size);
+		errstr.append(size);
 		errstr.append(" bytes.  The maximum size is ");
-		errstr.append((long)MAXPATHLEN);
+		errstr.append((unsigned short)MAXPATHLEN);
 		errstr.append(" bytes.");
 		setError(errstr.getString());
 		return false;

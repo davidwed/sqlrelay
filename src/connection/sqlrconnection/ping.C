@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <string.h>
 
 void sqlrconnection::pingCommand() {
 	#ifdef SERVER_DEBUG
@@ -14,7 +13,7 @@ void sqlrconnection::pingCommand() {
 bool sqlrconnection::ping() {
 	sqlrcursor	*pingcur=initCursor();
 	char	*pingquery=pingQuery();
-	int	pingquerylen=strlen(pingQuery());
+	int	pingquerylen=charstring::length(pingQuery());
 	if (pingcur->openCursor(-1) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
 		pingcur->executeQuery(pingquery,pingquerylen,true)) {

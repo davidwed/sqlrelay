@@ -48,16 +48,7 @@ install:
 	$(MKINSTALLDIRS) $(bindir)
 	$(INSTALL) sqlr-connection-msql$(EXE) $(bindir)
 	$(INSTALL) sqlr-connection-msql-debug$(EXE) $(bindir)
-	$(MKINSTALLDIRS) $(tmpdir)
-	chmod 777 $(tmpdir)
-	$(MKINSTALLDIRS) $(tmpdir)/sockets
-	chmod 777 $(tmpdir)/sockets
-	$(MKINSTALLDIRS) $(debugdir)
-	chmod 777 $(debugdir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-msql$(EXE)
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-msql-debug$(EXE)
-	$(RMTREE) $(tmpdir)
-	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
-	$(RMTREE) $(debugdir)

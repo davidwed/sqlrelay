@@ -2,8 +2,9 @@
 // See the file COPYING for more information
 
 #include <cachemanager.h>
+
+#include <rudiments/charstring.h>
 #include <stdio.h>
-#include <string.h>
 
 cachemanager	*cacheman;
 

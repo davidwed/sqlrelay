@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <string.h>
 
 bool sqlrconnection::handleError(sqlrcursor *cursor) {
 
@@ -44,9 +43,9 @@ bool sqlrconnection::returnError(sqlrcursor *cursor) {
 		clientsock->write((unsigned short)ERROR);
 
 		// send the error itself
-		int	errorlen=strlen(error);
+		int	errorlen=charstring::length(error);
 		clientsock->write((unsigned short)(errorlen+
-				strlen(cursor->querybuffer)+18));
+				charstring::length(cursor->querybuffer)+18));
 		clientsock->write(error,errorlen);
 
 		// send the attempted query back too

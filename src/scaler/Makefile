@@ -34,6 +34,12 @@ sqlr-scaler: $(SRCS) $(LOBJS)
 install:
 	$(MKINSTALLDIRS) $(bindir)
 	$(INSTALL) sqlr-scaler$(EXE) $(bindir)
+	$(MKINSTALLDIRS) $(tmpdir)
+	chmod 777 $(tmpdir)
+	$(MKINSTALLDIRS) $(tmpdir)/pids
+	chmod 777 $(tmpdir)/pids
+	$(MKINSTALLDIRS) $(tmpdir)/ipc
+	chmod 777 $(tmpdir)/ipc
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler$(EXE)

@@ -25,7 +25,8 @@ void db2connection::handleConnectString() {
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
 	char	*autocom=connectStringValue("autocommit");
-	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
+	setAutoCommitBehavior((autocom &&
+		!charstring::compareIgnoringCase(autocom,"yes")));
 }
 
 bool db2connection::logIn() {

@@ -3,10 +3,9 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
-#include <string.h>
 
 void sqlrcursor::prepareQuery(const char *query) {
-	prepareQuery(query,strlen(query));
+	prepareQuery(query,charstring::length(query));
 }
 
 void sqlrcursor::prepareQuery(const char *query, int length) {
@@ -16,7 +15,7 @@ void sqlrcursor::prepareQuery(const char *query, int length) {
 	clearVariables();
 	if (copyrefs) {
 		initQueryBuffer();
-		strcpy(queryptr,query);
+		charstring::compare(queryptr,query);
 	} else {
 		queryptr=(char *)query;
 	}
@@ -104,10 +103,10 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	if (!queryfile.open(fullpath,O_RDONLY)) {
 
 		// set the error
-		char	err[32+strlen(fullpath)];
-		strcpy(err,"The file ");
-		strcat(err,fullpath);
-		strcat(err," could not be opened.\n");
+		char	err[32+charstring::length(fullpath)];
+		charstring::compare(err,"The file ");
+		charstring::append(err,fullpath);
+		charstring::append(err," could not be opened.\n");
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint(err);

@@ -4,7 +4,6 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
-#include <string.h>
 
 bool sqlrcursor::runQuery(const char *query) {
 
@@ -26,7 +25,7 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 
 	// if the first 8 characters of the query are "-- debug" followed
 	// by a return, then set debugging on
-	if (!strncmp(query,"-- debug\n",9)) {
+	if (!charstring::compare(query,"-- debug\n",9)) {
 		sqlrc->debugOn();
 	}
 
@@ -138,7 +137,8 @@ void sqlrcursor::sendInputBinds() {
 		}
 
 		// send the variable
-		size=(unsigned long)strlen(inbindvars[i].variable);
+		size=(unsigned long)charstring::length(
+					inbindvars[i].variable);
 		sqlrc->cs->write((unsigned short)size);
 		sqlrc->cs->write(inbindvars[i].variable,(size_t)size);
 		if (sqlrc->debug) {
@@ -275,7 +275,8 @@ void sqlrcursor::sendOutputBinds() {
 		}
 
 		// send the variable, type and size that the buffer needs to be
-		size=(unsigned short)strlen(outbindvars[i].variable);
+		size=(unsigned short)charstring::length(
+					outbindvars[i].variable);
 		sqlrc->cs->write((unsigned short)size);
 		sqlrc->cs->write(outbindvars[i].variable,(size_t)size);
 		sqlrc->cs->write((unsigned short)outbindvars[i].type);

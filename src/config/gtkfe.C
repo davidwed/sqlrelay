@@ -6,7 +6,6 @@
 #include <gtkfe.h>
 #include <dblist.h>
 
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1005,7 +1004,7 @@ void gtkfe::populateInstanceParameters(instance *inst) {
 				inst->getMaxQueueLength());
 	gtk_entry_set_text(GTK_ENTRY(growbyentry),inst->getGrowby());
 	gtk_entry_set_text(GTK_ENTRY(ttlentry),inst->getTtl());
-	if (!strcmp(inst->getEndOfSession(),"commit")) {
+	if (!charstring::compare(inst->getEndOfSession(),"commit")) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(commitbutton),
 						TRUE);
 	} else {
@@ -1330,7 +1329,7 @@ void gtkfe::handleFile(const char *filename) {
 		// if the parse failed...
 
 		// show a "bad file" dialog
-		char	message[strlen(filename)+1+31+1];
+		char	message[charstring::length(filename)+1+31+1];
 		sprintf(message,
 			"%s\nis not an SQL Relay config file.",filename);
 		okDialog(message);

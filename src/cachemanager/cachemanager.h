@@ -20,7 +20,6 @@
 #elif defined(HAVE_SYS_NDIR_H)
 	#include <sys/ndir.h>
 #endif
-#include <string.h>
 
 class dirnode {
 	friend class cachemanager;

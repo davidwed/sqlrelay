@@ -3,6 +3,8 @@
 
 #include <cachemanager.h>
 #include <rudiments/commandline.h>
+#include <rudiments/sleep.h>
+#include <rudiments/charstring.h>
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -13,20 +15,12 @@
 #include <config.h>
 
 dirnode::dirnode(const char *dirname) {
-	this->dirname=strdup(dirname);
+	this->dirname=charstring::duplicate(dirname);
 	next=NULL;
 }
 
 dirnode::dirnode(const char *start, const char *end) {
-	dirname=new char[end-start+1];
-	char	*ptr=(char *)start;
-	int	index=0;
-	while (ptr<end) {
-		dirname[index]=*ptr;
-		index++;
-		ptr++;
-	}
-	dirname[index]=(char)NULL;
+	dirname=charstring::duplicate(start,end-start);
 	next=NULL;
 }
 
@@ -89,8 +83,10 @@ void cachemanager::scan() {
 
 				// loop through directory, erasing
 				while ((current=readdir(dir))) {
-					if (strcmp(current->d_name,".") &&
-						strcmp(current->d_name,"..")) {
+					if (charstring::compare(
+							current->d_name,".") &&
+						charstring::compare(
+							current->d_name,"..")) {
 						erase(currentdir->dirname,
 							current->d_name);
 					}
@@ -105,7 +101,7 @@ void cachemanager::scan() {
 		}
 
 		// wait...
-		sleep(scaninterval);
+		sleep::macrosleep(scaninterval);
 	}
 
 }
@@ -113,7 +109,8 @@ void cachemanager::scan() {
 void cachemanager::erase(const char *dirname, const char *filename) {
 
 	// derive the full pathname
-	char	fullpathname[strlen(dirname)+1+strlen(filename)+1];
+	char	fullpathname[charstring::length(dirname)+1+
+				charstring::length(filename)+1];
 	sprintf(fullpathname,"%s/%s",dirname,filename);
 
 	// open the file
@@ -123,7 +120,7 @@ void cachemanager::erase(const char *dirname, const char *filename) {
 		// get the "magic" identifier
 		char	magicid[13];
 		read(file,(void *)magicid,13);
-		if (!strncmp(magicid,"SQLRELAYCACHE",13)) {
+		if (!charstring::compare(magicid,"SQLRELAYCACHE",13)) {
 
 			// get the ttl
 			long ttl;

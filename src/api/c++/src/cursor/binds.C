@@ -4,7 +4,6 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
-#include <string.h>
 
 unsigned short sqlrcursor::countBindVariables() const {
 
@@ -269,11 +268,11 @@ void sqlrcursor::stringVar(bindvar *var, const char *variable,
 	// store the value, handle NULL values too
 	if (value) {
 		if (copyrefs) {
-			var->value.stringval=strdup(value);
+			var->value.stringval=charstring::duplicate(value);
 		} else {
 			var->value.stringval=(char *)value;
 		}
-		var->valuesize=strlen(value);
+		var->valuesize=charstring::length(value);
 		var->type=STRING_BIND;
 	} else {
 		var->type=NULL_BIND;
@@ -325,7 +324,7 @@ void sqlrcursor::initVar(bindvar *var, const char *variable) {
 	// variable
 	if (copyrefs) {
 		delete[] var->variable;
-		var->variable=strdup(variable);
+		var->variable=charstring::duplicate(variable);
 
 		if (var->type==STRING_BIND &&
 				var->value.stringval) {
@@ -372,7 +371,8 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 		if (copyrefs) {
 			// clean up old variable and set new variable
 			delete[] outbindvars[outbindcount].variable;
-			outbindvars[outbindcount].variable=strdup(variable);
+			outbindvars[outbindcount].variable=
+					charstring::duplicate(variable);
 
 		} else {
 			outbindvars[outbindcount].variable=(char *)variable;
@@ -390,7 +390,8 @@ char *sqlrcursor::getOutputBind(const char *variable) {
 
 	if (variable) {
 		for (int i=0; i<outbindcount; i++) {
-			if (!strcmp(outbindvars[i].variable,variable)) {
+			if (!charstring::compare(outbindvars[i].variable,
+								variable)) {
 				if (outbindvars[i].type==STRING_BIND) {
 					return outbindvars[i].value.stringval;
 				} else {
@@ -416,7 +417,8 @@ long sqlrcursor::getOutputBindLength(const char *variable) {
 
 	if (variable) {
 		for (int i=0; i<outbindcount; i++) {
-			if (!strcmp(outbindvars[i].variable,variable)) {
+			if (!charstring::compare(outbindvars[i].variable,
+								variable)) {
 				return outbindvars[i].valuesize;
 			}
 		}
@@ -440,7 +442,8 @@ short sqlrcursor::getOutputBindCursorId(const char *variable) {
 
 	if (variable) {
 		for (int i=0; i<outbindcount; i++) {
-			if (!strcmp(outbindvars[i].variable,variable)) {
+			if (!charstring::compare(outbindvars[i].variable,
+								variable)) {
 				return outbindvars[i].value.cursorid;
 			}
 		}

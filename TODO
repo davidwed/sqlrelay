@@ -22,6 +22,10 @@ does setResultSetBufferSize prevent PythonDB, Perl DBI, etc. from fetching more
 mysql 4.1, 5.0 - bind vars
 postgresql 8 - bind vars
 
+double free errors on exit
+
+people have been reporting freetds problems
+
 --------------------------------------------------------------------------------
 
 setting backlog:

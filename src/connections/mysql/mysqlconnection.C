@@ -12,7 +12,6 @@
 #include <config.h>
 
 #include <stdlib.h>
-#include <string.h>
 
 mysqlconnection::mysqlconnection() {
 	connected=0;
@@ -181,8 +180,8 @@ bool mysqlcursor::executeQuery(const char *query, long length, bool execute) {
 	// execute the query
 	if (newquery) {
 		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
-					newquery->getString(),
-					strlen(newquery->getString())))) {
+				newquery->getString(),
+				charstring::length(newquery->getString())))) {
 			delete newquery;
 			return false;
 		}
@@ -394,7 +393,7 @@ void mysqlcursor::returnColumnInfo() {
 		// send column definition
 		// for mysql, length is actually precision
 		conn->sendColumnDefinition(mysqlfield->name,
-				strlen(mysqlfield->name),
+				charstring::length(mysqlfield->name),
 				type,length,
 				mysqlfield->length,
 				mysqlfield->decimals,
@@ -436,7 +435,8 @@ void mysqlcursor::returnRow() {
 	for (int col=0; col<ncols; col++) {
 
 		if (mysqlrow[col]) {
-			conn->sendField(mysqlrow[col],strlen(mysqlrow[col]));
+			conn->sendField(mysqlrow[col],
+					charstring::length(mysqlrow[col]));
 		} else {
 			conn->sendNullField();
 		}

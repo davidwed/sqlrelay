@@ -5,11 +5,6 @@
 
 #include <sqlrconnection.h>
 
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
-
 stringbuffer *sqlrcursor::fakeInputBinds(const char *query) {
 
 	// return null if there aren't any input binds
@@ -65,7 +60,8 @@ stringbuffer *sqlrcursor::fakeInputBinds(const char *query) {
 
 					||
 
-					(!strncmp(ptr,inbindvars[i].variable,
+					(!charstring::compare(ptr,
+						inbindvars[i].variable,
 						inbindvars[i].variablesize) 
 					 		&&
 					(*(ptr+inbindvars[i].variablesize)==
@@ -111,7 +107,7 @@ void sqlrcursor::performSubstitution(stringbuffer *buffer, int index) {
 		buffer->append(inbindvars[index].value.stringval);
 		buffer->append("'");
 	} else if (inbindvars[index].type==LONG_BIND) {
-		buffer->append((long)inbindvars[index].value.longval);
+		buffer->append(inbindvars[index].value.longval);
 	} else if (inbindvars[index].type==DOUBLE_BIND) {
 		buffer->append(inbindvars[index].value.doubleval.value,
 				inbindvars[index].value.doubleval.precision,

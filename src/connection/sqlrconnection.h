@@ -132,23 +132,26 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();
 		void	decrementSessionCount();
-		void	announceAvailability(char *tmpdir,
+		void	announceAvailability(const char *tmpdir,
 					bool passdescriptor,
-					char *unixsocket,
+					const char *unixsocket,
 					unsigned short inetport,
-					char *connectionid);
-		void	registerForHandoff(char *tmpdir);
+					const char *connectionid);
+		void	registerForHandoff(const char *tmpdir);
 		bool	receiveFileDescriptor(int *descriptor);
-		void	deRegisterForHandoff(char *tmpdir);
-		bool	getUnixSocket(char *tmpdir, char *unixsocketptr);
-		int	openSequenceFile(char *tmpdir, char *unixsocketptr);
+		void	deRegisterForHandoff(const char *tmpdir);
+		bool	getUnixSocket(const char *tmpdir,
+						char *unixsocketptr);
+		int	openSequenceFile(const char *tmpdir,
+						char *unixsocketptr);
 		bool	lockSequenceFile();
 		bool	getAndIncrementSequenceNumber(char *unixsocketptr);
 		bool	unLockSequenceFile();
 
 
-		bool		createSharedMemoryAndSemaphores(char *tmpdir,
-								char *id);
+		bool		createSharedMemoryAndSemaphores(
+							const char *tmpdir,
+							const char *id);
 		void		acquireAnnounceMutex();
 		shmdata		*getAnnounceBuffer();
 		void		signalListenerToRead();

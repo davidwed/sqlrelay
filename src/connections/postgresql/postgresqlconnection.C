@@ -40,7 +40,7 @@ void postgresqlconnection::handleConnectString() {
 	char	*typemang=connectStringValue("typemangling");
 	typemangling=0;
 	if (typemang) {
-		if (!strcasecmp(typemang,"yes")) {
+		if (!charstring::compareIgnoringCase(typemang,"yes")) {
 			typemangling=1;
 		} else {
 			typemangling=2;
@@ -93,7 +93,8 @@ bool postgresqlconnection::logIn() {
 		// copy the datatype ids/names into the buffers
 		for (int i=0; i<datatypecount; i++) {
 			datatypeids[i]=atoi(PQgetvalue(result,i,0));
-			datatypenames[i]=strdup(PQgetvalue(result,i,1));
+			datatypenames[i]=
+				charstring::duplicate(PQgetvalue(result,i,1));
 		}
 	
 		// clean up
@@ -296,14 +297,18 @@ void postgresqlcursor::returnColumnInfo() {
 		}
 
 		if (postgresqlconn->typemangling==1) {
-			conn->sendColumnDefinition(name,strlen(name),
-							type,size,0,0,0,0,0,
-							0,0,0,binary,0);
+			conn->sendColumnDefinition(name,
+						charstring::length(name),
+						type,size,0,0,0,0,0,
+						0,0,0,binary,0);
 		} else {
-			conn->sendColumnDefinitionString(name,strlen(name),
-					typestring,strlen(typestring),size,
-							0,0,0,0,0,
-							0,0,0,binary,0);
+			conn->sendColumnDefinitionString(name,
+						charstring::length(name),
+						typestring,
+						charstring::length(typestring),
+						size,
+						0,0,0,0,0,
+						0,0,0,binary,0);
 		}
 	}
 }

@@ -7,11 +7,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
-
 bool sqlrconnection::authenticateCommand() {
 
 	#ifdef SERVER_DEBUG
@@ -107,8 +102,8 @@ bool sqlrconnection::databaseBasedAuth(const char *userbuffer,
 	// user that's currently proxied, try to change to that user
 	bool	authsuccess;
 	if ((!lastuserbuffer[0] && !lastpasswordbuffer[0]) || 
-		strcmp(lastuserbuffer,userbuffer) ||
-		strcmp(lastpasswordbuffer,passwordbuffer)) {
+		charstring::compare(lastuserbuffer,userbuffer) ||
+		charstring::compare(lastpasswordbuffer,passwordbuffer)) {
 
 		// change authentication 
 		authsuccess=changeUser(userbuffer,passwordbuffer);
@@ -116,8 +111,8 @@ bool sqlrconnection::databaseBasedAuth(const char *userbuffer,
 		// keep a record of which user we're changing to
 		// and whether that user was successful in 
 		// authenticating
-		strcpy(lastuserbuffer,userbuffer);
-		strcpy(lastpasswordbuffer,passwordbuffer);
+		charstring::copy(lastuserbuffer,userbuffer);
+		charstring::copy(lastpasswordbuffer,passwordbuffer);
 		lastauthsuccess=authsuccess;
 	}
 

@@ -8,6 +8,7 @@
 #include <rudiments/permissions.h>
 #include <rudiments/unixclientsocket.h>
 #include <rudiments/inetclientsocket.h>
+#include <rudiments/sleep.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -15,7 +16,6 @@
 #include <sys/ipc.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
 #endif
@@ -169,13 +169,12 @@ void sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
 bool sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
 
 	// check/set pid file
-	pidfile=new char[tmpdir->getLength()+15+strlen(id)+1];
-	sprintf(pidfile,"%s/sqlr-listener-%s",tmpdir->getString(),id);
+	pidfile=new char[tmpdir->getLength()+20+charstring::length(id)+1];
+	sprintf(pidfile,"%s/pids/sqlr-listener-%s",tmpdir->getString(),id);
 
 	if (checkForPidFile(pidfile)!=-1) {
 		fprintf(stderr,"\nsqlr-listener error:\n");
-		fprintf(stderr,"	The pid file %s",tmpdir->getString());
-		fprintf(stderr,"/sqlr-listener-%s",id);
+		fprintf(stderr,"	The pid file %s",pidfile);
 		fprintf(stderr," exists.\n");
 		fprintf(stderr,"	This usually means that the ");
 		fprintf(stderr,"sqlr-listener is already running for ");
@@ -233,8 +232,8 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 							const char *id) {
 
 	// initialize the ipc filename
-	char	idfilename[tmpdir->getLength()+1+strlen(id)+1];
-	sprintf(idfilename,"%s/%s",tmpdir->getString(),id);
+	char	idfilename[tmpdir->getLength()+5+charstring::length(id)+1];
+	sprintf(idfilename,"%s/ipc/%s",tmpdir->getString(),id);
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"creating shared memory and semaphores");
@@ -346,7 +345,7 @@ bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 	unsigned short	port=cfgfl->getPort();
 	char		*uport=cfgfl->getUnixPort();
 	if (uport && uport[0]) {
-		unixport=strdup(uport);
+		unixport=charstring::duplicate(uport);
 	}
 
 	// if neither port nor unixport are specified, set up to 
@@ -401,7 +400,8 @@ bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 bool sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
 
 	// the handoff socket
-	char	handoffsockname[tmpdir->getLength()+9+strlen(id)+8+1];
+	char	handoffsockname[tmpdir->getLength()+9+
+				charstring::length(id)+8+1];
 	sprintf(handoffsockname,"%s/sockets/%s-handoff",tmpdir->getString(),id);
 
 	handoffsockun=new unixserversocket();
@@ -424,7 +424,8 @@ bool sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 							const char *id) {
 
 	// the deregistration socket
-	char	removehandoffsockname[tmpdir->getLength()+9+strlen(id)+14+1];
+	char	removehandoffsockname[tmpdir->getLength()+9+
+					charstring::length(id)+14+1];
 	sprintf(removehandoffsockname,"%s/sockets/%s-removehandoff",
 						tmpdir->getString(),id);
 
@@ -448,7 +449,8 @@ bool sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 bool sqlrlistener::listenOnFixupSocket(tempdir *tmpdir, const char *id) {
 
 	// the fixup socket
-	fixupsockname=new char[tmpdir->getLength()+9+strlen(id)+6+1];
+	fixupsockname=new char[tmpdir->getLength()+9+
+					charstring::length(id)+6+1];
 	sprintf(fixupsockname,"%s/sockets/%s-fixup",tmpdir->getString(),id);
 
 	fixupsockun=new unixserversocket();
@@ -662,7 +664,6 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 			return fixup(clientsock);
 		}
 	}
-
 
 	// handle connections to the client sockets
 	if (fd==clientsockin) {
@@ -923,9 +924,9 @@ void sqlrlistener::clientSession(filedescriptor *sock) {
 		// sleep before and after returning an
 		// authentication error to discourage
 		// brute-force password attacks
-		sleep(2);
+		sleep::macrosleep(2);
 		sock->write((unsigned short)ERROR);
-		sleep(2);
+		sleep::macrosleep(2);
 	}
 
 	waitForClientClose(authstatus,passstatus,sock);
@@ -1083,6 +1084,9 @@ void sqlrlistener::getAConnection(unsigned long *connectionpid,
 					char *unixportstr,
 					unsigned short *unixportstrlen) {
 
+	// get a pointer to the shared memory segment
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+
 	for (;;) {
 
 		#ifdef SERVER_DEBUG
@@ -1110,9 +1114,6 @@ void sqlrlistener::getAConnection(unsigned long *connectionpid,
 				"done waiting for an available connection");
 		#endif
 
-		// get a pointer to the shared memory segment
-		shmdata	*ptr=(shmdata *)idmemory->getPointer();
-
 		// if we're passing descriptors around, the connection will
 		// pass it's pid to us, otherwise it will pass it's inet and
 		// unix ports
@@ -1135,10 +1136,10 @@ void sqlrlistener::getAConnection(unsigned long *connectionpid,
 			*inetport=ptr->connectioninfo.sockets.inetport;
 
 			// get the unix port
-			strncpy(unixportstr,
+			charstring::copy(unixportstr,
 				ptr->connectioninfo.sockets.unixsocket,
 				MAXPATHLEN);
-			*unixportstrlen=strlen(unixportstr);
+			*unixportstrlen=charstring::length(unixportstr);
 
 			#ifdef SERVER_DEBUG
 			char	debugstring[15+*unixportstrlen+21];
@@ -1199,9 +1200,10 @@ void sqlrlistener::getAConnection(unsigned long *connectionpid,
 bool sqlrlistener::connectionIsUp(const char *connectionid) {
 
 	// initialize the database up/down filename
-	char	updown[strlen(TMP_DIR)+1+strlen(cmdl->getId())+1+
-						strlen(connectionid)+1];
-	sprintf(updown,"%s/%s-%s",TMP_DIR,cmdl->getId(),connectionid);
+	char	updown[charstring::length(TMP_DIR)+5+
+			charstring::length(cmdl->getId())+1+
+			charstring::length(connectionid)+1];
+	sprintf(updown,"%s/ipc/%s-%s",TMP_DIR,cmdl->getId(),connectionid);
 	bool	retval=file::exists(updown);
 	return retval;
 }

@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
-#include <string.h>
 
 sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
 					const char *user, const char *password, 
@@ -27,8 +26,8 @@ sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
 	// authentication
 	this->user=(char *)user;
 	this->password=(char *)password;
-	userlen=strlen(user);
-	passwordlen=strlen(password);
+	userlen=charstring::length(user);
+	passwordlen=charstring::length(password);
 	reconnect=false;
 
 	// database id

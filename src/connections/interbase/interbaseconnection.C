@@ -52,7 +52,8 @@ void interbaseconnection::handleConnectString() {
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
 	char	*autocom=connectStringValue("autocommit");
-	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
+	setAutoCommitBehavior((autocom &&
+		!charstring::compareIgnoringCase(autocom,"yes")));
 }
 
 bool interbaseconnection::logIn() {
@@ -76,7 +77,8 @@ bool interbaseconnection::logIn() {
 	}
 
 	// attach to the database
-	if (isc_attach_database(error,strlen(database),database,&db,
+	if (isc_attach_database(error,charstring::length(database),
+							database,&db,
 							//dpblength,dpb)) {
 							0,NULL)) {
 		db=0L;
@@ -587,7 +589,8 @@ void interbasecursor::returnColumnInfo() {
 		// send column definition
 		// (oddly, scale is given as a negative number)
 		conn->sendColumnDefinition(outsqlda->sqlvar[i].sqlname,
-					strlen(outsqlda->sqlvar[i].sqlname),
+					charstring::length(
+						outsqlda->sqlvar[i].sqlname),
 					field[i].sqlrtype,
 					outsqlda->sqlvar[i].sqllen,
 					precision,
@@ -634,7 +637,8 @@ void interbasecursor::returnRow() {
 		if (outsqlda->sqlvar[col].sqltype==SQL_TEXT ||
 				outsqlda->sqlvar[col].sqltype==SQL_TEXT+1) {
 			int	maxlen=outsqlda->sqlvar[col].sqllen;
-			int	reallen=strlen(field[col].textbuffer);
+			int	reallen=charstring::length(field[col].
+								textbuffer);
 			if (reallen>maxlen) {
 				reallen=maxlen;
 			}
@@ -644,9 +648,9 @@ void interbasecursor::returnRow() {
 				outsqlda->sqlvar[col].
 					sqltype==SQL_SHORT+1) {
 			stringbuffer	buffer;
-			buffer.append((long)field[col].shortbuffer);
+			buffer.append(field[col].shortbuffer);
 			conn->sendField(buffer.getString(),
-					strlen(buffer.getString()));
+					charstring::length(buffer.getString()));
 		} else if (outsqlda->sqlvar[col].
 					sqltype==SQL_FLOAT ||
 				outsqlda->sqlvar[col].
@@ -654,7 +658,7 @@ void interbasecursor::returnRow() {
 			stringbuffer	buffer;
 			buffer.append((double)field[col].floatbuffer);
 			conn->sendField(buffer.getString(),
-					strlen(buffer.getString()));
+					charstring::length(buffer.getString()));
 		} else if (outsqlda->sqlvar[col].
 					sqltype==SQL_DOUBLE ||
 				outsqlda->sqlvar[col].
@@ -666,7 +670,7 @@ void interbasecursor::returnRow() {
 			stringbuffer	buffer;
 			buffer.append((double)field[col].doublebuffer);
 			conn->sendField(buffer.getString(),
-					strlen(buffer.getString()));
+					charstring::length(buffer.getString()));
 		} else if (outsqlda->sqlvar[col].
 					sqltype==SQL_VARYING ||
 				outsqlda->sqlvar[col].
@@ -689,9 +693,9 @@ void interbasecursor::returnRow() {
 					sqltype==SQL_LONG+1) &&
 				!outsqlda->sqlvar[col].sqlscale) {
 			stringbuffer	buffer;
-			buffer.append((long)field[col].longbuffer);
+			buffer.append(field[col].longbuffer);
 			conn->sendField(buffer.getString(),
-					strlen(buffer.getString()));
+					charstring::length(buffer.getString()));
 		} else if (
 		#ifdef SQL_INT64
 				(outsqlda->sqlvar[col].
@@ -710,24 +714,25 @@ void interbasecursor::returnRow() {
 			stringbuffer	buffer;
 			if (outsqlda->sqlvar[col].sqlscale) {
 
-				buffer.append((long)field[col].int64buffer/(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale))->append(".");
+				buffer.append(field[col].int64buffer/(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale))->append(".");
 
 				stringbuffer	decimal;
-				decimal.append((long)field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale));
+				decimal.append(field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale));
 			
 				// gotta get the right number
 				// of decimal places
-				for (int i=strlen(decimal.getString());
+				for (int i=charstring::length(
+						decimal.getString());
 					i<-outsqlda->sqlvar[col].sqlscale;
 					i++) {
 					decimal.append("0");
 				}
 				buffer.append(decimal.getString());
 			} else {
-				buffer.append((long)field[col].int64buffer);
+				buffer.append(field[col].int64buffer);
 			}
 			conn->sendField(buffer.getString(),
-						strlen(buffer.getString()));
+					charstring::length(buffer.getString()));
 		} else if (outsqlda->sqlvar[col].sqltype==SQL_ARRAY ||
 			outsqlda->sqlvar[col].sqltype==SQL_ARRAY+1 ||
 			outsqlda->sqlvar[col].sqltype==SQL_QUAD ||

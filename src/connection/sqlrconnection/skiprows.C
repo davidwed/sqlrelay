@@ -8,7 +8,7 @@ bool sqlrconnection::skipRows(sqlrcursor *cursor, unsigned long rows) {
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
 	debugstr->append("skipping ");
-	debugstr->append((long)rows);
+	debugstr->append(rows);
 	debugstr->append(" rows...");
 	debugPrint("connection",2,debugstr->getString());
 	delete debugstr;

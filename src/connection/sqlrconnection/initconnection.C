@@ -7,7 +7,6 @@
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
 #endif
-#include <string.h>
 
 bool sqlrconnection::initConnection(int argc, const char **argv,
 						bool detachbeforeloggingin) {
@@ -128,15 +127,15 @@ void sqlrconnection::setUnixSocketDirectory() {
 bool sqlrconnection::handlePidFile() {
 
 	// check for pid file
-	char	pidfile[tmpdir->getLength()+15+strlen(cmdl->getId())+1];
-	sprintf(pidfile,"%s/sqlr-listener-%s",
+	char	pidfile[tmpdir->getLength()+20+
+				charstring::length(cmdl->getId())+1];
+	sprintf(pidfile,"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),cmdl->getId());
 
 	bool	retval=true;
 	if (checkForPidFile(pidfile)==-1) {
 		printf("\nsqlr-connection error:\n");
-		printf("	The file %s",tmpdir->getString());
-		printf("/sqlr-listener-%s",cmdl->getId());
+		printf("	The pid file %s",pidfile);
 		printf(" was not found.\n");
 		printf("	This usually means that the sqlr-listener \n");
 		printf("is not running.\n");
@@ -151,10 +150,10 @@ bool sqlrconnection::handlePidFile() {
 void sqlrconnection::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
-	updown=new char[strlen(tmpdir->getString())+1+
-					strlen(cmdl->getId())+1+
-					strlen(connectionid)+1];
-	sprintf(updown,"%s/%s-%s",tmpdir->getString(),cmdl->getId(),
+	updown=new char[charstring::length(tmpdir->getString())+5+
+					charstring::length(cmdl->getId())+1+
+					charstring::length(connectionid)+1];
+	sprintf(updown,"%s/ipc/%s-%s",tmpdir->getString(),cmdl->getId(),
 							connectionid);
 }
 

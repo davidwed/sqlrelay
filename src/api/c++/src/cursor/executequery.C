@@ -4,7 +4,6 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
-#include <string.h>
 
 bool sqlrcursor::executeQuery() {
 
@@ -88,7 +87,9 @@ bool sqlrcursor::executeQuery() {
 					// with "is NULL" otherwise, just write
 					// out the contents of the buffer
 					if (!bptr || 
-						(bptr && !strcmp(bptr,"''"))) {
+						(bptr &&
+						!charstring::compare(bptr,
+								"''"))) {
 						container.append(" is NULL ");
 					} else {
 						container.append(
@@ -115,8 +116,9 @@ bool sqlrcursor::executeQuery() {
 					// if we find a match, write the 
 					// value to the container and skip 
 					// past the $(variable)
-					len=strlen(subvars[i].variable);
-					if (!strncmp((ptr+2),
+					len=charstring::length(
+							subvars[i].variable);
+					if (!charstring::compare((ptr+2),
 						subvars[i].variable,len) &&
 						(*(ptr+2+len))==')') {
 		
@@ -161,7 +163,7 @@ bool sqlrcursor::executeQuery() {
 		}
 
 		// run the query
-		querylen=strlen(container.getString());
+		querylen=charstring::length(container.getString());
 		retval=runQuery(container.getString());
 	}
 
@@ -187,7 +189,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 	for (unsigned short i=0; i<count; i++) {
 
 		// don't check bind-by-position variables
-		len=strlen(inbindvars[i].variable);
+		len=charstring::length(inbindvars[i].variable);
 		if (charstring::isInteger(inbindvars[i].variable,len)) {
 			continue;
 		}
@@ -199,7 +201,8 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 		// "select * from table where table_name=:table_name", both
 		// table_name's would match, but only the second is a bind
 		// variable
-		while ((ptr=strstr(start,inbindvars[i].variable))) {
+		while ((ptr=charstring::findFirst(start,
+					inbindvars[i].variable))) {
 
 			// for a match to be a bind variable, it must be 
 			// preceded by a colon and can't be followed by an
@@ -229,7 +232,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 	for (unsigned short i=0; i<count; i++) {
 
 		// don't check bind-by-position variables
-		len=strlen(outbindvars[i].variable);
+		len=charstring::length(outbindvars[i].variable);
 		if (charstring::isInteger(outbindvars[i].variable,len)) {
 			continue;
 		}
@@ -240,7 +243,8 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 		// there may be more than 1 match for the variable name as in
 		// "select * from table where table_name=:table_name", both
 		// table_name's would match, but only 1 is correct
-		while ((ptr=strstr(start,outbindvars[i].variable))) {
+		while ((ptr=charstring::findFirst(start,
+					outbindvars[i].variable))) {
 
 			// for a match to be a bind variable, it must be 
 			// preceded by a colon and can't be followed by an

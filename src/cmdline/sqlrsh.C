@@ -14,10 +14,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
 #include <time.h>
 
 
@@ -90,7 +86,7 @@ class	sqlrsh {
 		void	displayHelp(environment *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env);
-		void	prompt(int promptcount);
+		void	prompt(unsigned long promptcount);
 		void	error(const char *errstring);
 		void	addLineToCommand(stringbuffer *command,
 						stringbuffer *line,
@@ -122,7 +118,7 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	}
 
 	// build rcfilename
-	char	userrcfile[strlen(home)+10+1];
+	char	userrcfile[charstring::length(home)+10+1];
 	sprintf(userrcfile,"%s/.sqlrshrc",home);
 
 	// process the file
@@ -221,20 +217,20 @@ int sqlrsh::commandType(const char *command) {
 	}
 
 	// compare to known internal commands
-	if (!strncasecmp(ptr,"color",5) ||
-		!strncasecmp(ptr,"headers",7) ||
-		!strncasecmp(ptr,"stats",5) ||
-		!strncasecmp(ptr,"debug",5) ||
-		!strncasecmp(ptr,"final",5) ||
-		!strncasecmp(ptr,"help",4)) {
+	if (!charstring::compareIgnoringCase(ptr,"color",5) ||
+		!charstring::compareIgnoringCase(ptr,"headers",7) ||
+		!charstring::compareIgnoringCase(ptr,"stats",5) ||
+		!charstring::compareIgnoringCase(ptr,"debug",5) ||
+		!charstring::compareIgnoringCase(ptr,"final",5) ||
+		!charstring::compareIgnoringCase(ptr,"help",4)) {
 
 		// return value of 1 is internal command
 		return 1;
 	}
 
 	// look for an exit command
-	if (!strncasecmp(ptr,"quit",4) ||
-		!strncasecmp(ptr,"exit",4)) {
+	if (!charstring::compareIgnoringCase(ptr,"quit",4) ||
+		!charstring::compareIgnoringCase(ptr,"exit",4)) {
 		return -1;
 	}
 
@@ -252,22 +248,22 @@ void sqlrsh::internalCommand(environment *env, const char *command) {
 
 	// compare to known internal commands
 	int	cmdtype=0;
-	if (!strncasecmp(ptr,"color",5)) {
+	if (!charstring::compareIgnoringCase(ptr,"color",5)) {
 		ptr=ptr+5;
 		cmdtype=1;
-	} else if (!strncasecmp(ptr,"headers",7)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"headers",7)) {
 		ptr=ptr+7;
 		cmdtype=2;
-	} else if (!strncasecmp(ptr,"stats",5)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"stats",5)) {	
 		ptr=ptr+5;
 		cmdtype=3;
-	} else if (!strncasecmp(ptr,"debug",5)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"debug",5)) {	
 		ptr=ptr+5;
 		cmdtype=4;
-	} else if (!strncasecmp(ptr,"final",5)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"final",5)) {	
 		ptr=ptr+5;
 		cmdtype=5;
-	} else if (!strncasecmp(ptr,"help",4)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"help",4)) {	
 		displayHelp(env);
 		return;
 	} else {
@@ -281,9 +277,9 @@ void sqlrsh::internalCommand(environment *env, const char *command) {
 
 	// on or off?
 	int	toggle;
-	if (!strncasecmp(ptr,"on",2)) {
+	if (!charstring::compareIgnoringCase(ptr,"on",2)) {
 		toggle=1;
-	} else if (!strncasecmp(ptr,"off",3)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"off",3)) {
 		toggle=0;
 	} else {
 		return;
@@ -316,11 +312,11 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	}
 
 	// handle a commit/rollback
-	if (!strncasecmp(command,"commit",6)) {
+	if (!charstring::compareIgnoringCase(command,"commit",6)) {
 
 		sqlrcon->commit();
 
-	} else if (!strncasecmp(command,"rollback",8)) {
+	} else if (!charstring::compareIgnoringCase(command,"rollback",8)) {
 
 		sqlrcon->rollback();
 
@@ -401,7 +397,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, environment *env) {
 		white(env);
 
 		// which is longer, field name or longest field
-		namelen=strlen(name);
+		namelen=charstring::length(name);
 		longest=sqlrcur->getLongest(i);
 		if (namelen>longest) {
 			longest=namelen;
@@ -458,14 +454,15 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, environment *env) {
 			// which is longer, field name or longest field
 			longest=sqlrcur->getLongest(j);
 			if (env->headers) {
-				namelen=strlen(sqlrcur->getColumnName(j));
+				namelen=charstring::length(
+					sqlrcur->getColumnName(j));
 				if (namelen>longest) {
 					longest=namelen;
 				}
 			}
 
 			// pad after the name with spaces
-			for (int k=strlen(sqlrcur->getField(i,j)); 
+			for (int k=charstring::length(sqlrcur->getField(i,j)); 
 						k<longest; k++) {
 				printf(" ");
 			}
@@ -562,7 +559,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	// init some variables
 	stringbuffer	*command;
 	int		exitprogram=0;
-	int		promptcount;
+	unsigned long	promptcount;
 
 	while (!exitprogram) {
 
@@ -575,7 +572,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		while (!done) {
 			#ifdef HAVE_READLINE
 				stringbuffer	prmpt;
-				prmpt.append((long)promptcount);
+				prmpt.append(promptcount);
 				prmpt.append("> ");
 				char	*cmd=readline(prmpt.getString());
 				if (cmd[0]) {
@@ -588,7 +585,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				ssize_t	bytes=read(0,cmd,1024);
 				cmd[bytes-1]=(char)NULL;
 			#endif
-			int	len=strlen(cmd);
+			int	len=charstring::length(cmd);
 			done=0;
 			for (int i=0; i<len; i++) {
 				if (i==len-1) {
@@ -645,9 +642,9 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	}
 }
 
-void sqlrsh::prompt(int promptcount) {
+void sqlrsh::prompt(unsigned long promptcount) {
 
-	printf("%d> ",promptcount);
+	printf("%ld> ",promptcount);
 	fflush(stdout);
 }
 
@@ -740,7 +737,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		char	*filename;
 		char	*home=getenv("HOME");
 		if (home && home[0]) {
-			filename=new char[strlen(home)+16+1];
+			filename=new char[charstring::length(home)+16+1];
 			sprintf(filename,"%s/.sqlrsh_history",home);
 
 			// create the history file if it doesn't exist now

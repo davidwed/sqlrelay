@@ -3,10 +3,6 @@
 
 #include <scaler.h>
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
 scaler	*s;
 
 void cleanUp() {

@@ -151,7 +151,8 @@ void mdbtoolscursor::returnColumnInfo() {
 			g_ptr_array_index(mdbsql.columns,i);
 
 		// send the column definition
-		conn->sendColumnDefinition(col->name,strlen(col->name),
+		conn->sendColumnDefinition(col->name,
+					charstring::length(col->name),
 					UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
 	}
 }

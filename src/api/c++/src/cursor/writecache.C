@@ -14,14 +14,14 @@ void sqlrcursor::cacheToFile(const char *filename) {
 	cachettl=600;
 	if (copyrefs) {
 		delete[] cachedestname;
-		cachedestname=strdup(filename);
+		cachedestname=charstring::duplicate(filename);
 	} else {
 		cachedestname=(char *)filename;
 	}
 
 	// create the index name
 	delete[] cachedestindname;
-	cachedestindname=new char[strlen(filename)+5];
+	cachedestindname=new char[charstring::length(filename)+5];
 	sprintf(cachedestindname,"%s.ind",filename);
 }
 
@@ -162,7 +162,7 @@ void sqlrcursor::cacheColumnInfo() {
 			whichcolumn=getColumnInternal(i);
 
 			// write the name
-			namelen=strlen(whichcolumn->name);
+			namelen=charstring::length(whichcolumn->name);
 			cachedest->write(namelen);
 			cachedest->write(whichcolumn->name,namelen);
 
@@ -205,7 +205,7 @@ void sqlrcursor::cacheOutputBinds(int count) {
 
 		cachedest->write((unsigned short)outbindvars[i].type);
 
-		len=strlen(outbindvars[i].variable);
+		len=charstring::length(outbindvars[i].variable);
 		cachedest->write(len);
 		cachedest->write(outbindvars[i].variable,len);
 
@@ -248,7 +248,7 @@ void sqlrcursor::cacheData() {
 			char	*field=getFieldInternal(i,j);
 			if (field) {
 				type=NORMAL_DATA;
-				len=strlen(field);
+				len=charstring::length(field);
 				cachedest->write(type);
 				cachedest->write(len);
 				if (len>0) {

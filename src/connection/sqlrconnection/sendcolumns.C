@@ -70,13 +70,13 @@ void sqlrconnection::sendColumnDefinition(const char *name,
 		debugstr->append(name[i]);
 	}
 	debugstr->append(":");
-	debugstr->append((long)type);
+	debugstr->append(type);
 	debugstr->append(":");
-	debugstr->append((long)size);
+	debugstr->append(size);
 	debugstr->append(" (");
-	debugstr->append((long)precision);
+	debugstr->append(precision);
 	debugstr->append(",");
-	debugstr->append((long)scale);
+	debugstr->append(scale);
 	debugstr->append(") ");
 	if (!nullable) {
 		debugstr->append("NOT NULL ");
@@ -133,11 +133,11 @@ void sqlrconnection::sendColumnDefinitionString(const char *name,
 		debugstr->append(type[i]);
 	}
 	debugstr->append(":");
-	debugstr->append((long)size);
+	debugstr->append(size);
 	debugstr->append(" (");
-	debugstr->append((long)precision);
+	debugstr->append(precision);
 	debugstr->append(",");
-	debugstr->append((long)scale);
+	debugstr->append(scale);
 	debugstr->append(") ");
 	if (!nullable) {
 		debugstr->append("NOT NULL ");

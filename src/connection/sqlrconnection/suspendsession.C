@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <string.h>
 
 void sqlrconnection::suspendSessionCommand() {
 	#ifdef SERVER_DEBUG
@@ -68,7 +67,8 @@ void sqlrconnection::suspendSession() {
 		debugPrint("connection",2,"passing socket info to client...");
 		#endif
 		if (serversockun) {
-			unsigned short	unixsocketsize=strlen(unixsocket);
+			unsigned short	unixsocketsize=
+					charstring::length(unixsocket);
 			clientsock->write(unixsocketsize);
 			clientsock->write(unixsocket,unixsocketsize);
 		} else {

@@ -9,10 +9,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
 
 oracle7connection::oracle7connection() {
 	env=new environment();
@@ -32,7 +28,8 @@ void oracle7connection::handleConnectString() {
 	sid=connectStringValue("oracle_sid");
 	home=connectStringValue("oracle_home");
 	char	*autocom=connectStringValue("autocommit");
-	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
+	setAutoCommitBehavior((autocom &&
+		!charstring::compareIgnoringCase(autocom,"yes")));
 }
 
 bool oracle7connection::logIn() {
@@ -339,8 +336,8 @@ char *oracle7cursor::getErrorMessage(bool *liveconnection) {
 				cda.rc,message,(sword)sizeof(message));
 
 	// check for dead connection
-	if (!strncmp((char *)message,"ORA-03114",9) || 
-		!strncmp((char *)message,"ORA-03113",9)) {
+	if (!charstring::compare((char *)message,"ORA-03114",9) || 
+		!charstring::compare((char *)message,"ORA-03113",9)) {
 		*liveconnection=false;
 	} else {
 		*liveconnection=true;

@@ -3,8 +3,6 @@
 
 #include <configfile.h>
 
-#include <string.h>
-
 #include <defaults.h>
 
 #include <rudiments/permissions.h>
@@ -92,7 +90,8 @@ int configfile::parse(const char *filename) {
 			currentnode=instances->getChild(i);
 			if (currentnode->isNullNode() || 
 				currentnode->getType()!=TAG_XMLDOMNODETYPE ||
-				strcmp(currentnode->getName(),"instance")) {
+				charstring::compare(currentnode->getName(),
+								"instance")) {
 				continue;
 			}
 
@@ -265,7 +264,7 @@ instance *configfile::findInstance(const char *id) {
 
 	while (currentinstance) {
 		currentid=currentinstance->getId();
-		if (currentid && !strcmp(id,currentid)) {
+		if (currentid && !charstring::compare(id,currentid)) {
 			delete currentid;
 			return currentinstance;
 		} else {
@@ -303,7 +302,7 @@ instance::instance(xmldomnode *instancenode) {
 		xmldomnode	*currentnode=users->getChild(i);
 		if (currentnode->isNullNode() || 
 			currentnode->getType()!=TAG_XMLDOMNODETYPE ||
-			strcmp(currentnode->getName(),"user")) {
+			charstring::compare(currentnode->getName(),"user")) {
 			continue;
 		}
 
@@ -329,7 +328,8 @@ instance::instance(xmldomnode *instancenode) {
 		xmldomnode	*currentnode=connections->getChild(i);
 		if (currentnode->isNullNode() || 
 			currentnode->getType()!=TAG_XMLDOMNODETYPE ||
-			strcmp(currentnode->getName(),"connection")) {
+			charstring::compare(currentnode->getName(),
+							"connection")) {
 			continue;
 		}
 
@@ -673,7 +673,8 @@ user	*instance::findUser(const char *userid) {
 
 	while (currentuser) {
 		currentuserid=currentuser->getUser();
-		if (currentuserid && !strcmp(userid,currentuserid)) {
+		if (currentuserid &&
+			!charstring::compare(userid,currentuserid)) {
 			delete currentuserid;
 			return currentuser;
 		} else {
@@ -796,7 +797,8 @@ connection	*instance::findConnection(const char *connectionnode) {
 
 	while (currentconnection) {
 		currentconnid=currentconnection->getConnectionId();
-		if (currentconnid && !strcmp(connectionnode,currentconnid)) {
+		if (currentconnid &&
+			!charstring::compare(connectionnode,currentconnid)) {
 			delete currentconnid;
 			return currentconnection;
 		} else {

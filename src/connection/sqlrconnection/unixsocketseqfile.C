@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <string.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -14,7 +13,7 @@
 
 #include <config.h>
 
-bool sqlrconnection::getUnixSocket(char *tmpdir, char *unixsocketptr) {
+bool sqlrconnection::getUnixSocket(const char *tmpdir, char *unixsocketptr) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"getting unix socket...");
@@ -44,14 +43,14 @@ bool sqlrconnection::getUnixSocket(char *tmpdir, char *unixsocketptr) {
 	return true;
 }
 
-int sqlrconnection::openSequenceFile(char *tmpdir, char *unixsocketptr) {
+int sqlrconnection::openSequenceFile(const char *tmpdir, char *unixsocketptr) {
 
 	// open the sequence file and get the current port number
-	char	*sockseqname=new char[strlen(tmpdir)+9];
+	char	*sockseqname=new char[charstring::length(tmpdir)+9];
 	sprintf(sockseqname,"%s/sockseq",tmpdir);
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[8+strlen(sockseqname)+1];
+	char	*string=new char[8+charstring::length(sockseqname)+1];
 	sprintf(string,"opening %s",sockseqname);
 	debugPrint("connection",1,string);
 	delete[] string;
@@ -70,7 +69,7 @@ int sqlrconnection::openSequenceFile(char *tmpdir, char *unixsocketptr) {
 		unixsocketptr[0]=(char)NULL;
 
 		#ifdef SERVER_DEBUG
-		string=new char[14+strlen(sockseqname)+1];
+		string=new char[14+charstring::length(sockseqname)+1];
 		sprintf(string,"couldn't open %s",sockseqname);
 		debugPrint("connection",1,string);
 		delete[] string;
@@ -109,7 +108,7 @@ bool sqlrconnection::getAndIncrementSequenceNumber(char *unixsocketptr) {
 	sprintf(unixsocketptr,"%ld",buffer);
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[21+strlen(unixsocketptr)+1];
+	char	*string=new char[21+charstring::length(unixsocketptr)+1];
 	sprintf(string,"got sequence number: %s",unixsocketptr);
 	debugPrint("connection",1,string);
 	delete[] string;

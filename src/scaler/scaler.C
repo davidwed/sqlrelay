@@ -4,6 +4,7 @@
 #include <config.h>
 #include <defaults.h>
 #include <rudiments/commandline.h>
+#include <rudiments/sleep.h>
 #include <scaler.h>
 
 #include <rudiments/permissions.h>
@@ -16,7 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <string.h>
 
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
@@ -24,7 +24,7 @@
 
 scaler::scaler() : daemonprocess() {
 
-	tmpdirlen=strlen(TMP_DIR);
+	tmpdirlen=charstring::length(TMP_DIR);
 	init=false;
 
 	pidfile=NULL;
@@ -58,11 +58,11 @@ bool scaler::initScaler(int argc, const char **argv) {
 		tmpid=DEFAULT_ID;
 		fprintf(stderr,"Warning! using default id.\n");
 	}
-	id=strdup(tmpid);
+	id=charstring::duplicate(tmpid);
 
 	// check for listener's pid file
-	char	listenerpidfile[tmpdirlen+15+strlen(id)+1];
-	sprintf(listenerpidfile,"%s/sqlr-listener-%s",TMP_DIR,id);
+	char	listenerpidfile[tmpdirlen+20+charstring::length(id)+1];
+	sprintf(listenerpidfile,"%s/pids/sqlr-listener-%s",TMP_DIR,id);
 	if (checkForPidFile(listenerpidfile)==-1) {
 		fprintf(stderr,"\nsqlr-scaler error: \n");
 		fprintf(stderr,"	The file %s",TMP_DIR);
@@ -76,8 +76,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	}
 
 	// check/set pid file
-	pidfile=new char[tmpdirlen+13+strlen(id)+1];
-	sprintf(pidfile,"%s/sqlr-scaler-%s",TMP_DIR,id);
+	pidfile=new char[tmpdirlen+18+charstring::length(id)+1];
+	sprintf(pidfile,"%s/pids/sqlr-scaler-%s",TMP_DIR,id);
 	if (checkForPidFile(pidfile)!=-1) {
 		fprintf(stderr,"\nsqlr-scaler error:\n");
 		fprintf(stderr,"	The pid file %s",TMP_DIR);
@@ -103,8 +103,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	if (!(tmpconfig && tmpconfig[0])) {
 		tmpconfig=DEFAULT_CONFIG_FILE;
 	}
-	config=new char[strlen(tmpconfig)+1];
-	strcpy(config,tmpconfig);
+	config=new char[charstring::length(tmpconfig)+1];
+	charstring::copy(config,tmpconfig);
 
 	// parse the config file
 	cfgfile=new sqlrconfigfile;
@@ -130,7 +130,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 		ttl=cfgfile->getTtl();
 
 		// get the database type
-		dbase=strdup(cfgfile->getDbase());
+		dbase=charstring::duplicate(cfgfile->getDbase());
 
 		// get the list of connect strings
 		connectstringlist=cfgfile->getConnectStringList();
@@ -143,8 +143,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// initialize the shared memory segment filename
-	idfilename=new char[tmpdirlen+1+strlen(id)+1];
-	sprintf(idfilename,"%s/%s",TMP_DIR,id);
+	idfilename=new char[tmpdirlen+5+charstring::length(id)+1];
+	sprintf(idfilename,"%s/ipc/%s",TMP_DIR,id);
 	key_t	key=ftok(idfilename,0);
 
 	// connect to the semaphore set
@@ -216,17 +216,18 @@ void scaler::openMoreConnections() {
 				// currently unavailable, loop back and get
 				// another one
 				if (!availableDatabase()) {
-					sleep(1);
+					sleep::macrosleep(1);
 					continue;
 				}
 
 				// build the command to start a connection
-				char	command[16+strlen(dbase)+
-							6+20+
-							5+strlen(id)+
-							15+strlen(connectionid)+
-							9+strlen(config)+
-							2+1];
+				char	command[16+charstring::length(dbase)+
+						6+20+
+						5+charstring::length(id)+
+						15+charstring::length(
+								connectionid)+
+						9+charstring::length(config)+
+						2+1];
 				sprintf(command,
 	"sqlr-connection-%s%s -ttl %d -id %s -connectionid %s -config %s %s",
 					dbase,((debug)?"-debug":""),
@@ -268,8 +269,8 @@ void scaler::getRandomConnectionId() {
 bool scaler::availableDatabase() {
 	
 	// initialize the database up/down filename
-	char	updown[tmpdirlen+1+strlen(id)+1+
-					strlen(connectionid)+1];
+	char	updown[tmpdirlen+1+charstring::length(id)+1+
+					charstring::length(connectionid)+1];
 	sprintf(updown,"%s/%s-%s",TMP_DIR,id,connectionid);
 	bool	retval=file::exists(updown);
 	return retval;

@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <string.h>
 
 bool sqlrconnection::openSockets() {
 
@@ -18,7 +17,8 @@ bool sqlrconnection::openSockets() {
 			if (serversockun->listen(unixsocket,0000,5)) {
 
 				#ifdef SERVER_DEBUG
-				char	string[26+strlen(unixsocket)+1];
+				char	string[26+
+					charstring::length(unixsocket)+1];
 				sprintf(string,"listening on unix socket: %s",
 								unixsocket);
 				debugPrint("connection",1,string);

@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
-#include <string.h>
 
 void sqlrconnection::clearError() {
 	delete[] error;
@@ -17,8 +16,7 @@ void sqlrconnection::setError(const char *err) {
 		debugPreEnd();
 	}
 
-	error=new char[strlen(err)+1];
-	strcpy(error,err);
+	error=charstring::duplicate(err);
 
 	if (debug) {
 		debugPreStart();

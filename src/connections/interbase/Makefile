@@ -48,16 +48,7 @@ install:
 	$(MKINSTALLDIRS) $(bindir)
 	$(INSTALL) sqlr-connection-interbase$(EXE) $(bindir)
 	$(INSTALL) sqlr-connection-interbase-debug$(EXE) $(bindir)
-	$(MKINSTALLDIRS) $(tmpdir)
-	chmod 777 $(tmpdir)
-	$(MKINSTALLDIRS) $(tmpdir)/sockets
-	chmod 777 $(tmpdir)/sockets
-	$(MKINSTALLDIRS) $(debugdir)
-	chmod 777 $(debugdir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-interbase$(EXE)
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-interbase-debug$(EXE)
-	$(RMTREE) $(tmpdir)
-	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
-	$(RMTREE) $(debugdir)

@@ -201,8 +201,21 @@ install:
 	$(INSTALL) libsqlrconnection.la $(libdir)
 	$(INSTALL) libsqlrconnection_debug.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(tmpdir)
+	chmod 777 $(tmpdir)
+	$(MKINSTALLDIRS) $(tmpdir)/sockets
+	chmod 777 $(tmpdir)/sockets
+	$(MKINSTALLDIRS) $(tmpdir)/pids
+	chmod 777 $(tmpdir)/pids
+	$(MKINSTALLDIRS) $(tmpdir)/ipc
+	chmod 777 $(tmpdir)/ipc
+	$(MKINSTALLDIRS) $(debugdir)
+	chmod 777 $(debugdir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection_debug.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection_p.la
+	$(RMTREE) $(tmpdir)
+	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
+	$(RMTREE) $(debugdir)

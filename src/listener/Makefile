@@ -43,6 +43,14 @@ install:
 	$(MKINSTALLDIRS) $(bindir)
 	$(INSTALL) sqlr-listener$(EXE) $(bindir)
 	$(INSTALL) sqlr-listener-debug$(EXE) $(bindir)
+	$(MKINSTALLDIRS) $(tmpdir)
+	chmod 777 $(tmpdir)
+	$(MKINSTALLDIRS) $(tmpdir)/sockets
+	chmod 777 $(tmpdir)/sockets
+	$(MKINSTALLDIRS) $(tmpdir)/pids
+	chmod 777 $(tmpdir)/pids
+	$(MKINSTALLDIRS) $(tmpdir)/ipc
+	chmod 777 $(tmpdir)/ipc
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener$(EXE)

@@ -7,10 +7,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -23,31 +19,31 @@
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	port=::atoi(DEFAULT_PORT);
 	listenoninet=(port)?true:false;
-	unixport=strdup(DEFAULT_SOCKET);
+	unixport=charstring::duplicate(DEFAULT_SOCKET);
 	listenonunix=(unixport[0])?true:false;
-	dbase=strdup(DEFAULT_DBASE);
+	dbase=charstring::duplicate(DEFAULT_DBASE);
 	connections=::atoi(DEFAULT_CONNECTIONS);
 	maxconnections=::atoi(DEFAULT_MAXCONNECTIONS);
 	maxqueuelength=::atoi(DEFAULT_MAXQUEUELENGTH);
 	growby=::atoi(DEFAULT_GROWBY);
 	ttl=::atoi(DEFAULT_TTL);
-	endofsession=strdup(DEFAULT_ENDOFSESSION);
-	endofsessioncommit=!strcmp(endofsession,"commit");
+	endofsession=charstring::duplicate(DEFAULT_ENDOFSESSION);
+	endofsessioncommit=!charstring::compare(endofsession,"commit");
 	sessiontimeout=::atol(DEFAULT_SESSIONTIMEOUT);
-	runasuser=strdup(DEFAULT_RUNASUSER);
-	runasgroup=strdup(DEFAULT_RUNASGROUP);
+	runasuser=charstring::duplicate(DEFAULT_RUNASUSER);
+	runasgroup=charstring::duplicate(DEFAULT_RUNASGROUP);
 	cursors=::atoi(DEFAULT_CURSORS);
-	authtier=strdup(DEFAULT_AUTHTIER);
-	authonlistener=(strstr(authtier,"listener"))?true:false;
-	authonconnection=(strstr(authtier,"connection"))?true:false;
-	authondatabase=!strcmp(authtier,"database");
-	handoff=strdup(DEFAULT_HANDOFF);
-	passdescriptor=!strcmp(handoff,"pass");
-	allowedips=strdup(DEFAULT_DENIEDIPS);
-	deniedips=strdup(DEFAULT_DENIEDIPS);
-	debug=strdup(DEFAULT_DEBUG);
-	debuglistener=(strstr(debug,"listener"))?true:false;
-	debugconnection=(strstr(debug,"connection"))?true:false;
+	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
+	authonlistener=charstring::contains(authtier,"listener");
+	authonconnection=charstring::contains(authtier,"connection");
+	authondatabase=!charstring::compare(authtier,"database");
+	handoff=charstring::duplicate(DEFAULT_HANDOFF);
+	passdescriptor=!charstring::compare(handoff,"pass");
+	allowedips=charstring::duplicate(DEFAULT_DENIEDIPS);
+	deniedips=charstring::duplicate(DEFAULT_DENIEDIPS);
+	debug=charstring::duplicate(DEFAULT_DEBUG);
+	debuglistener=charstring::contains(debug,"listener");
+	debugconnection=charstring::contains(debug,"connection");
 	currentuser=NULL;
 	firstconnect=NULL;
 	currentconnect=NULL;
@@ -235,7 +231,8 @@ connectstringcontainer *sqlrconfigfile::getConnectString(
 						const char *connectionid) {
 	connectstringnode	*csn=connectstringlist.getNodeByIndex(0);
 	while (csn) {
-		if (!strcmp(connectionid,csn->getData()->getConnectionId())) {
+		if (!charstring::compare(connectionid,
+					csn->getData()->getConnectionId())) {
 			return csn->getData();
 		}
 		csn=csn->getNext();
@@ -272,10 +269,10 @@ bool sqlrconfigfile::tagStart(char *name) {
 	}
 
 	// set the current tag
-	if (!strcmp(name,"user")) {
+	if (!charstring::compare(name,"user")) {
 		currentuser=new usercontainer();
 		userlist.append(currentuser);
-	} else if (!strcmp(name,"connection")) {
+	} else if (!charstring::compare(name,"connection")) {
 		currentconnect=new connectstringcontainer(connectstringcount);
 		connectstringlist.append(currentconnect);
 	}
@@ -291,53 +288,55 @@ bool sqlrconfigfile::attributeName(char *name) {
 	}
 
 	// set the current attribute
-	if (!strcmp(name,"id")) {
+	if (!charstring::compare(name,"id")) {
 		currentattribute=ID_ATTRIBUTE;
-	} else if (!strcmp(name,"port")) {
+	} else if (!charstring::compare(name,"port")) {
 		currentattribute=PORT_ATTRIBUTE;
-	} else if (!strcmp(name,"socket") || !strcmp(name,"unixport")) {
+	} else if (!charstring::compare(name,"socket") ||
+			!charstring::compare(name,"unixport")) {
 		currentattribute=SOCKET_ATTRIBUTE;
-	} else if (!strcmp(name,"dbase")) {
+	} else if (!charstring::compare(name,"dbase")) {
 		currentattribute=DBASE_ATTRIBUTE;
-	} else if (!strcmp(name,"connections")) {
+	} else if (!charstring::compare(name,"connections")) {
 		currentattribute=CONNECTIONS_ATTRIBUTE;
-	} else if (!strcmp(name,"maxconnections")) {
+	} else if (!charstring::compare(name,"maxconnections")) {
 		currentattribute=MAXCONNECTIONS_ATTRIBUTE;
-	} else if (!strcmp(name,"maxqueuelength")) {
+	} else if (!charstring::compare(name,"maxqueuelength")) {
 		currentattribute=MAXQUEUELENGTH_ATTRIBUTE;
-	} else if (!strcmp(name,"growby")) {
+	} else if (!charstring::compare(name,"growby")) {
 		currentattribute=GROWBY_ATTRIBUTE;
-	} else if (!strcmp(name,"ttl")) {
+	} else if (!charstring::compare(name,"ttl")) {
 		currentattribute=TTL_ATTRIBUTE;
-	} else if (!strcmp(name,"endofsession")) {
+	} else if (!charstring::compare(name,"endofsession")) {
 		currentattribute=ENDOFSESSION_ATTRIBUTE;
-	} else if (!strcmp(name,"sessiontimeout")) {
+	} else if (!charstring::compare(name,"sessiontimeout")) {
 		currentattribute=SESSIONTIMEOUT_ATTRIBUTE;
-	} else if (!strcmp(name,"runasuser")) {
+	} else if (!charstring::compare(name,"runasuser")) {
 		currentattribute=RUNASUSER_ATTRIBUTE;
-	} else if (!strcmp(name,"runasgroup")) {
+	} else if (!charstring::compare(name,"runasgroup")) {
 		currentattribute=RUNASGROUP_ATTRIBUTE;
-	} else if (!strcmp(name,"cursors")) {
+	} else if (!charstring::compare(name,"cursors")) {
 		currentattribute=CURSORS_ATTRIBUTE;
-	} else if (!strcmp(name,"authtier") || !strcmp(name,"authentication")) {
+	} else if (!charstring::compare(name,"authtier") ||
+			!charstring::compare(name,"authentication")) {
 		currentattribute=AUTHTIER_ATTRIBUTE;
-	} else if (!strcmp(name,"handoff")) {
+	} else if (!charstring::compare(name,"handoff")) {
 		currentattribute=HANDOFF_ATTRIBUTE;
-	} else if (!strcmp(name,"deniedips")) {
+	} else if (!charstring::compare(name,"deniedips")) {
 		currentattribute=DENIEDIPS_ATTRIBUTE;
-	} else if (!strcmp(name,"allowedips")) {
+	} else if (!charstring::compare(name,"allowedips")) {
 		currentattribute=ALLOWEDIPS_ATTRIBUTE;
-	} else if (!strcmp(name,"debug")) {
+	} else if (!charstring::compare(name,"debug")) {
 		currentattribute=DEBUG_ATTRIBUTE;
-	} else if (!strcmp(name,"user")) {
+	} else if (!charstring::compare(name,"user")) {
 		currentattribute=USER_ATTRIBUTE;
-	} else if (!strcmp(name,"password")) {
+	} else if (!charstring::compare(name,"password")) {
 		currentattribute=PASSWORD_ATTRIBUTE;
-	} else if (!strcmp(name,"connectionid")) {
+	} else if (!charstring::compare(name,"connectionid")) {
 		currentattribute=CONNECTIONID_ATTRIBUTE;
-	} else if (!strcmp(name,"string")) {
+	} else if (!charstring::compare(name,"string")) {
 		currentattribute=STRING_ATTRIBUTE;
-	} else if (!strcmp(name,"metric")) {
+	} else if (!charstring::compare(name,"metric")) {
 		currentattribute=METRIC_ATTRIBUTE;
 	}
 	return true;
@@ -354,7 +353,7 @@ bool sqlrconfigfile::attributeValue(char *value) {
 
 		// if we haven't found the correct id yet, check for it
 		if (currentattribute==ID_ATTRIBUTE) {
-			if (value && !strcmp(value,id)) {
+			if (value && !charstring::compare(value,id)) {
 				correctid=true;
 			}
 		}
@@ -367,11 +366,13 @@ bool sqlrconfigfile::attributeValue(char *value) {
 			listenoninet=true;
 		} else if (currentattribute==SOCKET_ATTRIBUTE) {
 			delete[] unixport;
-			unixport=strdup((value)?value:DEFAULT_SOCKET);
+			unixport=charstring::duplicate((value)?value:
+							DEFAULT_SOCKET);
 			listenonunix=(unixport[0]!=(char)NULL);
 		} else if (currentattribute==DBASE_ATTRIBUTE) {
 			delete[] dbase;
-			dbase=strdup((value)?value:DEFAULT_DBASE);
+			dbase=charstring::duplicate((value)?value:
+							DEFAULT_DBASE);
 		} else if (currentattribute==CONNECTIONS_ATTRIBUTE) {
 			connections=atoi(value,DEFAULT_CONNECTIONS,1);
 		} else if (currentattribute==MAXCONNECTIONS_ATTRIBUTE) {
@@ -384,48 +385,60 @@ bool sqlrconfigfile::attributeValue(char *value) {
 			ttl=atoi(value,DEFAULT_TTL,1);
 		} else if (currentattribute==ENDOFSESSION_ATTRIBUTE) {
 			delete[] endofsession;
-			endofsession=strdup((value)?value:DEFAULT_ENDOFSESSION);
-			endofsessioncommit=!strcmp(endofsession,"commit");
+			endofsession=charstring::duplicate((value)?value:
+							DEFAULT_ENDOFSESSION);
+			endofsessioncommit=
+				!charstring::compare(endofsession,"commit");
 		} else if (currentattribute==SESSIONTIMEOUT_ATTRIBUTE) {
 			sessiontimeout=atol(value,DEFAULT_SESSIONTIMEOUT,1);
 		} else if (currentattribute==RUNASUSER_ATTRIBUTE) {
 			delete[] runasuser;
-			runasuser=strdup((value)?value:DEFAULT_RUNASUSER);
+			runasuser=charstring::duplicate((value)?value:
+							DEFAULT_RUNASUSER);
 		} else if (currentattribute==RUNASGROUP_ATTRIBUTE) {
 			delete[] runasgroup;
-			runasgroup=strdup((value)?value:DEFAULT_RUNASGROUP);
+			runasgroup=charstring::duplicate((value)?value:
+							DEFAULT_RUNASGROUP);
 		} else if (currentattribute==CURSORS_ATTRIBUTE) {
 			cursors=atoi(value,DEFAULT_CURSORS,1);
 		} else if (currentattribute==AUTHTIER_ATTRIBUTE) {
 			delete[] authtier;
-			authtier=strdup((value)?value:DEFAULT_AUTHTIER);
-			authonlistener=(strstr(authtier,"listener"))?
-								true:false;
-			authonconnection=(strstr(authtier,"connection"))?
-								true:false;
-			authondatabase=!strcmp(authtier,"database");
+			authtier=charstring::duplicate((value)?value:
+							DEFAULT_AUTHTIER);
+			authonlistener=charstring::contains(authtier,
+								"listener");
+			authonconnection=charstring::contains(authtier,
+								"connection");
+			authondatabase=
+				!charstring::compare(authtier,"database");
 		} else if (currentattribute==HANDOFF_ATTRIBUTE) {
 			delete[] handoff;
-			handoff=strdup((value)?value:DEFAULT_HANDOFF);
-			passdescriptor=!strcmp(handoff,"pass");
+			handoff=charstring::duplicate((value)?value:
+							DEFAULT_HANDOFF);
+			passdescriptor=!charstring::compare(handoff,"pass");
 		} else if (currentattribute==DENIEDIPS_ATTRIBUTE) {
 			delete[] deniedips;
-			deniedips=strdup((value)?value:DEFAULT_DENIEDIPS);
+			deniedips=charstring::duplicate((value)?value:
+							DEFAULT_DENIEDIPS);
 		} else if (currentattribute==ALLOWEDIPS_ATTRIBUTE) {
 			delete[] allowedips;
-			allowedips=strdup((value)?value:DEFAULT_DENIEDIPS);
+			allowedips=charstring::duplicate((value)?value:
+							DEFAULT_DENIEDIPS);
 		} else if (currentattribute==DEBUG_ATTRIBUTE) {
 			delete[] debug;
-			debug=strdup((value)?value:DEFAULT_DEBUG);
-			debuglistener=(strstr(debug,"listener"))?true:false;
-			debugconnection=(strstr(debug,"connection"))?true:false;
+			debug=charstring::duplicate((value)?value:
+							DEFAULT_DEBUG);
+			debuglistener=charstring::contains(debug,
+							"listener");
+			debugconnection=charstring::contains(debug,
+							"connection");
 		} else if (currentattribute==USER_ATTRIBUTE) {
 			currentuser->setUser((value)?value:DEFAULT_USER);
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {
 			currentuser->setPassword((value)?value:
 							DEFAULT_PASSWORD);
 		} else if (currentattribute==CONNECTIONID_ATTRIBUTE) {
-			if (strlen(value)>MAXCONNECTIONIDLEN) {
+			if (charstring::length(value)>MAXCONNECTIONIDLEN) {
 				fprintf(stderr,"error: connectionid \"%s\" is too long, must be %d characters or fewer.\n",value,MAXCONNECTIONIDLEN);
 				return false;
 			}
@@ -469,7 +482,7 @@ bool sqlrconfigfile::tagEnd(char *name) {
 	}
 
 	// we're done if we've found the right instance at this point
-	if (correctid && !strcmp((char *)name,"instance")) {
+	if (correctid && !charstring::compare((char *)name,"instance")) {
 		done=true;
 	}
 	return true;
@@ -499,10 +512,10 @@ int sqlrconfigfile::parse(const char *config, char *id,
 	char *filename;
 	char *homedir=getenv("HOME");
 	if (homedir && homedir[0]) {
-		filename=new char[strlen(homedir)+15+1];
+		filename=new char[charstring::length(homedir)+15+1];
 		sprintf(filename,"%s/.sqlrelay.conf",homedir);
 	} else {
-		filename=strdup("~/.sqlrelay.conf");
+		filename=charstring::duplicate("~/.sqlrelay.conf");
 	}
 
 	// see if the file exists before trying to parse it, don't worry about
@@ -531,13 +544,13 @@ usercontainer::~usercontainer() {
 
 void usercontainer::setUser(const char *user) {
 	if (user) {
-		this->user=strdup(user);
+		this->user=charstring::duplicate(user);
 	}
 }
 
 void usercontainer::setPassword(const char *password) {
 	if (password) {
-		this->password=strdup(password);
+		this->password=charstring::duplicate(password);
 	}
 }
 
@@ -563,13 +576,13 @@ connectstringcontainer::~connectstringcontainer() {
 
 void connectstringcontainer::setConnectionId(const char *connectionid) {
 	if (connectionid) {
-		this->connectionid=strdup(connectionid);
+		this->connectionid=charstring::duplicate(connectionid);
 	}
 }
 
 void connectstringcontainer::setString(const char *string) {
 	if (string) {
-		this->string=strdup(string);
+		this->string=charstring::duplicate(string);
 	}
 }
 

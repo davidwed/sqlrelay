@@ -297,7 +297,7 @@ bool sybasecursor::openCursor(int id) {
 	// switch to the correct database
 	bool	retval=true;
 	if (sybaseconn->db && sybaseconn->db[0]) {
-		int	len=strlen(sybaseconn->db)+4;
+		int	len=charstring::length(sybaseconn->db)+4;
 		char	query[len+1];
 		sprintf(query,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) &&
@@ -400,7 +400,7 @@ bool sybasecursor::inputBindString(const char *variable,
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
-		strcpy(parameter[paramindex].name,variable);
+		charstring::copy(parameter[paramindex].name,variable);
 		parameter[paramindex].namelen=variablesize;
 	}
 	parameter[paramindex].datatype=CS_CHAR_TYPE;
@@ -427,7 +427,7 @@ bool sybasecursor::inputBindLong(const char *variable,
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
-		strcpy(parameter[paramindex].name,variable);
+		charstring::copy(parameter[paramindex].name,variable);
 		parameter[paramindex].namelen=variablesize;
 	}
 	parameter[paramindex].datatype=CS_INT_TYPE;
@@ -456,7 +456,7 @@ bool sybasecursor::inputBindDouble(const char *variable,
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
-		strcpy(parameter[paramindex].name,variable);
+		charstring::copy(parameter[paramindex].name,variable);
 		parameter[paramindex].namelen=variablesize;
 	}
 	parameter[paramindex].datatype=CS_FLOAT_TYPE;
@@ -491,7 +491,7 @@ bool sybasecursor::outputBindString(const char *variable,
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
-		strcpy(parameter[paramindex].name,variable);
+		charstring::copy(parameter[paramindex].name,variable);
 		parameter[paramindex].namelen=variablesize;
 	}
 	parameter[paramindex].datatype=CS_CHAR_TYPE;
@@ -792,7 +792,7 @@ void sybasecursor::returnColumnInfo() {
 
 		// send the column definition
 		conn->sendColumnDefinition(column[i].name,
-					strlen(column[i].name),
+					charstring::length(column[i].name),
 					type,
 					column[i].maxlength,
 					column[i].precision,
@@ -1025,26 +1025,19 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	errorstring->append("Server message:\n");
 	errorstring->append("	severity(")->
-				append((long)msgp->severity)->
-				append(")\n");
+				append((long)msgp->severity)->append(")\n");
 	errorstring->append("	number(")->
-				append((long)msgp->msgnumber)->
-				append(")\n");
+				append((long)msgp->msgnumber)->append(")\n");
 	errorstring->append("	state(")->
-				append((long)msgp->state)->
-				append(")\n");
+				append((long)msgp->state)->append(")\n");
 	errorstring->append("	line(")->
-				append((long)msgp->line)->
-				append(")\n");
+				append((long)msgp->line)->append(")\n");
 	errorstring->append("Server Name:\n")->
-				append(msgp->svrname)->
-				append("\n");
+				append(msgp->svrname)->append("\n");
 	errorstring->append("Procedure Name:\n")->
-				append(msgp->proc)->
-				append("\n");
+				append(msgp->proc)->append("\n");
 	errorstring->append("Error:	")->
-				append(msgp->text)->
-				append("\n");
+				append(msgp->text)->append("\n");
 
 	//printf("serverMessageCallback:\n%s\n",errorstring->getString());
 

@@ -237,7 +237,7 @@ void lagocursor::returnColumnInfo() {
 		}
 
 		// send the column definition
-		conn->sendColumnDefinition(name,strlen(name),type,
+		conn->sendColumnDefinition(name,charstring::length(name),type,
 						length,precision,scale,
 						nullable,0,0,
 						0,0,0,0,0);
@@ -275,10 +275,10 @@ void lagocursor::returnRow() {
 		// types, Lgetasstr will be null if the field is null, but for
 		// character types it's the string "null".  Weird.  I guess you
 		// can't store "null" in a character field in lago.
-		if (!field || (field && !strcmp(field,"null"))) {
+		if (!field || (field && !charstring::compare(field,"null"))) {
 			conn->sendNullField();
 		} else {
-			conn->sendField(field,strlen(field));
+			conn->sendField(field,charstring::length(field));
 		}
 	}
 }

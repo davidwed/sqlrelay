@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
-#include <string.h>
 
 void sqlrconnection::copyReferences() {
 
@@ -11,19 +10,20 @@ void sqlrconnection::copyReferences() {
 
 	// make copies of some specific things
 	if (server) {
-		char	*tempserver=strdup(server);
+		char	*tempserver=charstring::duplicate(server);
 		server=tempserver;
 	}
 	if (listenerunixport) {
-		char	*templistenerunixport=strdup(listenerunixport);
+		char	*templistenerunixport=
+				charstring::duplicate(listenerunixport);
 		listenerunixport=templistenerunixport;
 	}
 	if (user) {
-		char	*tempuser=strdup(user);
+		char	*tempuser=charstring::duplicate(user);
 		user=tempuser;
 	}
 	if (password) {
-		char	*temppassword=strdup(password);
+		char	*temppassword=charstring::duplicate(password);
 		password=temppassword;
 	}
 }

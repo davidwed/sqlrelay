@@ -9,10 +9,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
 
 oracle8connection::oracle8connection() {
 	stringbindvaluelength=MAX_STRING_BIND_VALUE_SIZE;
@@ -37,7 +33,8 @@ void oracle8connection::handleConnectString() {
 	sid=connectStringValue("oracle_sid");
 	home=connectStringValue("oracle_home");
 	char	*autocom=connectStringValue("autocommit");
-	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
+	setAutoCommitBehavior((autocom &&
+		!charstring::compareIgnoringCase(autocom,"yes")));
 }
 
 bool oracle8connection::logIn() {
@@ -129,7 +126,8 @@ bool oracle8connection::logIn() {
 	}
 
 	// attach to the server
-	if (OCIServerAttach(srv,err,(text *)sid,strlen(sid),0)!=OCI_SUCCESS) {
+	if (OCIServerAttach(srv,err,(text *)sid,
+				charstring::length(sid),0)!=OCI_SUCCESS) {
 		logInError("OCIServerAttach() failed.\n");
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
@@ -162,7 +160,8 @@ bool oracle8connection::logIn() {
 	char	*user=getUser();
 	char	*password=getPassword();
 	if (OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
-				(dvoid *)user,(ub4)strlen(user),
+				(dvoid *)user,
+				(ub4)charstring::length(user),
 				(ub4)OCI_ATTR_USERNAME,err)!=OCI_SUCCESS) {
 		logInError("Set username failed.\n");
 		OCIServerDetach(srv,err,OCI_DEFAULT);
@@ -173,7 +172,8 @@ bool oracle8connection::logIn() {
 		return false;
 	}
 	if (OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
-				(dvoid *)password,(ub4)strlen(password),
+				(dvoid *)password,
+				(ub4)charstring::length(password),
 				(ub4)OCI_ATTR_PASSWORD,err)!=OCI_SUCCESS) {
 		logInError("Set password failed.\n");
 		OCIServerDetach(srv,err,OCI_DEFAULT);
@@ -244,9 +244,9 @@ bool oracle8connection::logIn() {
 	if (OCIServerVersion((dvoid *)svc,err,
 				(text *)versionbuf,sizeof(versionbuf),
 				OCI_HTYPE_SVCCTX)==OCI_SUCCESS &&
-			(!strncmp(versionbuf,"Oracle8i ",9) ||
-			!strncmp(versionbuf,"Oracle9i ",9) ||
-			!strncmp(versionbuf,"Oracle10g ",10))) {
+			(!charstring::compare(versionbuf,"Oracle8i ",9) ||
+			!charstring::compare(versionbuf,"Oracle9i ",9) ||
+			!charstring::compare(versionbuf,"Oracle10g ",10))) {
 		supportsproxycredentials=true;
 	}
 #endif
@@ -321,7 +321,8 @@ bool oracle8connection::changeUser(const char *newuser,
 
 	// set the user name
 	OCIAttrSet((dvoid *)newsession,(ub4)OCI_HTYPE_SESSION,
-				(dvoid *)newuser,(ub4)strlen(newuser),
+				(dvoid *)newuser,
+				(ub4)charstring::length(newuser),
 				(ub4)OCI_ATTR_USERNAME,err);
 
 	// don't set the password, use the proxy

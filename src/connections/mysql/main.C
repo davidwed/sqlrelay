@@ -6,7 +6,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 mysqlconnection	*conn;
 signalhandler	*alarmhandler;

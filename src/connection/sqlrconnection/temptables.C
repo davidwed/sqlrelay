@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <string.h>
 
 void sqlrconnection::dropTempTables(sqlrcursor *cursor, stringlist *tablelist) {
 
@@ -51,17 +50,17 @@ void sqlrconnection::truncateTempTable(sqlrcursor *cursor,
 }
 
 void sqlrconnection::addSessionTempTableForDrop(const char *table) {
-	sessiontemptablesfordrop.append(strdup(table));
+	sessiontemptablesfordrop.append(charstring::duplicate(table));
 }
 
 void sqlrconnection::addTransactionTempTableForDrop(const char *table) {
-	transtemptablesfordrop.append(strdup(table));
+	transtemptablesfordrop.append(charstring::duplicate(table));
 }
 
 void sqlrconnection::addSessionTempTableForTrunc(const char *table) {
-	sessiontemptablesfortrunc.append(strdup(table));
+	sessiontemptablesfortrunc.append(charstring::duplicate(table));
 }
 
 void sqlrconnection::addTransactionTempTableForTrunc(const char *table) {
-	transtemptablesfortrunc.append(strdup(table));
+	transtemptablesfortrunc.append(charstring::duplicate(table));
 }

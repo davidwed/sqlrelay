@@ -3,7 +3,6 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
-#include <string.h>
 
 bool sqlrcursor::openCachedResultSet(const char *filename) {
 
@@ -24,7 +23,7 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 	endofresultset=false;
 
 	// create the index file name
-	char	indexfilename[strlen(filename)+5];
+	char	indexfilename[charstring::length(filename)+5];
 	sprintf(indexfilename,"%s.ind",filename);
 
 	// open the file
@@ -41,7 +40,7 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 		char		magicid[13];
 		unsigned long	longvar;
 		if (getString(magicid,13)==13 &&
-			!strncmp(magicid,"SQLRELAYCACHE",13) &&
+			!charstring::compare(magicid,"SQLRELAYCACHE",13) &&
 			getLong(&longvar)==sizeof(unsigned long)) {
 
 			// process the result set

@@ -262,22 +262,23 @@ char freetdsconnection::bindVariablePrefix() {
 freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 
 	#if defined(VERSION_NO)
-	char	*versionstring=strdup(VERSION_NO);
+	char	*versionstring=charstring::duplicate(VERSION_NO);
 	#elif defined(TDS_VERSION_NO)
-	char	*versionstring=strdup(TDS_VERSION_NO);
+	char	*versionstring=charstring::duplicate(TDS_VERSION_NO);
 	#else
-	char	*versionstring=strdup("freetds v0.00.0");
+	char	*versionstring=charstring::duplicate("freetds v0.00.0");
 	#endif
 
-	char	*v=strchr(versionstring,'v');
+	char	*v=charstring::findFirst(versionstring,'v');
 	if (v) {
 		*v=(char)NULL;
 		majorversion=atoi(v+1);
-		char	*firstdot=strchr(v+1,'.');
+		char	*firstdot=charstring::findFirst(v+1,'.');
 		if (firstdot) {
 			*firstdot=(char)NULL;
 			minorversion=atoi(firstdot+1);
-			char	*seconddot=strchr(firstdot+1,'.');
+			char	*seconddot=
+				charstring::findFirst(firstdot+1,'.');
 			if (seconddot) {
 				*seconddot=(char)NULL;
 				patchlevel=atoi(seconddot+1);
@@ -335,7 +336,7 @@ bool freetdscursor::openCursor(int id) {
 	// switch to the correct database
 	bool	retval=true;
 	if (freetdsconn->db && freetdsconn->db[0]) {
-		int	len=strlen(freetdsconn->db)+4;
+		int	len=charstring::length(freetdsconn->db)+4;
 		char	query[len+1];
 		sprintf(query,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) &&
@@ -448,7 +449,7 @@ void freetdscursor::checkRePrepare() {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
-		strcpy(parameter[paramindex].name,variable);
+		charstring::copy(parameter[paramindex].name,variable);
 		parameter[paramindex].namelen=variablesize;
 	}
 	parameter[paramindex].datatype=CS_CHAR_TYPE;
@@ -475,7 +476,7 @@ bool freetdscursor::inputBindLong(const char *variable,
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
-		strcpy(parameter[paramindex].name,variable);
+		charstring::copy(parameter[paramindex].name,variable);
 		parameter[paramindex].namelen=variablesize;
 	}
 	parameter[paramindex].datatype=CS_INT_TYPE;
@@ -504,7 +505,7 @@ bool freetdscursor::inputBindDouble(const char *variable,
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
-		strcpy(parameter[paramindex].name,variable);
+		charstring::copy(parameter[paramindex].name,variable);
 		parameter[paramindex].namelen=variablesize;
 	}
 	parameter[paramindex].datatype=CS_FLOAT_TYPE;
@@ -537,7 +538,7 @@ bool freetdscursor::outputBindString(const char *variable,
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
-		strcpy(parameter[paramindex].name,variable);
+		charstring::copy(parameter[paramindex].name,variable);
 		parameter[paramindex].namelen=variablesize;
 	}
 	parameter[paramindex].datatype=CS_CHAR_TYPE;
@@ -568,7 +569,8 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 		if (newquery) {
 			if (ct_command(cmd,CS_LANG_CMD,
 					newquery->getString(),
-					strlen(newquery->getString()),
+					charstring::length(
+						newquery->getString()),
 					CS_UNUSED)!=CS_SUCCEED) {
 				delete newquery;
 				return false;
@@ -919,7 +921,7 @@ void freetdscursor::returnColumnInfo() {
 
 		// send the column definition
 		conn->sendColumnDefinition(column[i].name,
-					strlen(column[i].name),
+					charstring::length(column[i].name),
 					type,
 					column[i].maxlength,
 					column[i].precision,
@@ -1155,26 +1157,19 @@ CS_RETCODE freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	errorstring->append("Server message:\n");
 	errorstring->append("	severity(")->
-				append((long)msgp->severity)->
-				append(")\n");
+				append((long)msgp->severity)->append(")\n");
 	errorstring->append("	number(")->
-				append((long)msgp->msgnumber)->
-				append(")\n");
+				append((long)msgp->msgnumber)->append(")\n");
 	errorstring->append("	state(")->
-				append((long)msgp->state)->
-				append(")\n");
+				append((long)msgp->state)->append(")\n");
 	errorstring->append("	line(")->
-				append((long)msgp->line)->
-				append(")\n");
+				append((long)msgp->line)->append(")\n");
 	errorstring->append("Server Name:\n")->
-				append(msgp->svrname)->
-				append("\n");
+				append(msgp->svrname)->append("\n");
 	errorstring->append("Procedure Name:\n")->
-				append(msgp->proc)->
-				append("\n");
+				append(msgp->proc)->append("\n");
 	errorstring->append("Error:	")->
-				append(msgp->text)->
-				append("\n");
+				append(msgp->text)->append("\n");
 
 	//printf("serverMessageCallback:\n%s\n",errorstring->getString());
 

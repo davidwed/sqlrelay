@@ -3,11 +3,6 @@
 
 #include <sqlrlistener.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-
 sqlrlistener	*lsnr;
 
 RETSIGTYPE	shutDown() {

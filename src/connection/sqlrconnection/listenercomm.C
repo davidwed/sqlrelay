@@ -6,17 +6,16 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <string.h>
 #include <stdio.h>
 #include <netinet/in.h>
 
 #include <defines.h>
 
-void sqlrconnection::announceAvailability(char *tmpdir,
+void sqlrconnection::announceAvailability(const char *tmpdir,
 					bool passdescriptor,
-					char *unixsocket,
+					const char *unixsocket,
 					unsigned short inetport,
-					char *connectionid) {
+					const char *connectionid) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"announcing availability...");
@@ -40,7 +39,8 @@ void sqlrconnection::announceAvailability(char *tmpdir,
 	shmdata	*idmemoryptr=getAnnounceBuffer();
 
 	// first, write the connectionid into the segment
-	strncpy(idmemoryptr->connectionid,connectionid,MAXCONNECTIONIDLEN);
+	charstring::copy(idmemoryptr->connectionid,
+				connectionid,MAXCONNECTIONIDLEN);
 
 	// if we're passing descriptors around, write the 
 	// pid to the segment otherwise write ports
@@ -66,7 +66,8 @@ void sqlrconnection::announceAvailability(char *tmpdir,
 
 		// write the unix socket name into the segment
 		if (unixsocket && unixsocket[0]) {
-			strncpy(idmemoryptr->connectioninfo.sockets.unixsocket,
+			charstring::copy(idmemoryptr->connectioninfo.
+							sockets.unixsocket,
 							unixsocket,MAXPATHLEN);
 		}
 	}
@@ -82,18 +83,19 @@ void sqlrconnection::announceAvailability(char *tmpdir,
 	#endif
 }
 
-void sqlrconnection::registerForHandoff(char *tmpdir) {
+void sqlrconnection::registerForHandoff(const char *tmpdir) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"registering for handoff...");
 	#endif
 
 	// construct the name of the socket to connect to
-	char	handoffsockname[strlen(tmpdir)+9+strlen(cmdl->getId())+8+1];
+	char	handoffsockname[charstring::length(tmpdir)+9+
+				charstring::length(cmdl->getId())+8+1];
 	sprintf(handoffsockname,"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
-	char	string[17+strlen(handoffsockname)+1];
+	char	string[17+charstring::length(handoffsockname)+1];
 	sprintf(string,"handoffsockname: %s",handoffsockname);
 	debugPrint("connection",1,string);
 	#endif
@@ -131,20 +133,20 @@ bool sqlrconnection::receiveFileDescriptor(int *descriptor) {
 	return retval;
 }
 
-void sqlrconnection::deRegisterForHandoff(char *tmpdir) {
+void sqlrconnection::deRegisterForHandoff(const char *tmpdir) {
 	
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"de-registering for handoff...");
 	#endif
 
 	// construct the name of the socket to connect to
-	char	removehandoffsockname[strlen(tmpdir)+9+
-					strlen(cmdl->getId())+14+1];
+	char	removehandoffsockname[charstring::length(tmpdir)+9+
+					charstring::length(cmdl->getId())+14+1];
 	sprintf(removehandoffsockname,"%s/sockets/%s-removehandoff",
 					tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
-	char	string[23+strlen(removehandoffsockname)+1];
+	char	string[23+charstring::length(removehandoffsockname)+1];
 	sprintf(string,"removehandoffsockname: %s",removehandoffsockname);
 	debugPrint("connection",1,string);
 	#endif

@@ -3,7 +3,6 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <errno.h>
-#include <string.h>
 
 bool sqlrconnection::openSession() {
 
@@ -190,11 +189,11 @@ bool sqlrconnection::openSession() {
 			errstr.append("connection daemon.\n");
 			if (connectionunixport) {
 				errstr.append("Tried unix port ");
-				errstr.append((long)connectionunixport);
+				errstr.append(connectionunixport);
 			}
 			if (connectioninetport) {
 				errstr.append("Tried inet port ");
-				errstr.append((long)connectioninetport);
+				errstr.append(connectioninetport);
 			}
 			errstr.append("\n");
 			setError(errstr.getString());

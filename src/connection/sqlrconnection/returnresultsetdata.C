@@ -55,7 +55,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
 	debugstr->append("fetching ");
-	debugstr->append((long)fetch);
+	debugstr->append(fetch);
 	debugstr->append(" rows...");
 	debugPrint("connection",2,debugstr->getString());
 	delete debugstr;

@@ -41,7 +41,7 @@ bool sqliteconnection::logIn() {
 		return true;
 	}
 #ifdef SQLITE3
-	errmesg=strdup(sqlite3_errmsg(sqliteptr));
+	errmesg=charstring::duplicate(sqlite3_errmsg(sqliteptr));
 #endif
 	if (errmesg) {
 		fprintf(stderr,"%s\n",errmesg);
@@ -132,7 +132,8 @@ bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
 		if (success==SQLITE_SCHEMA) {
 			continue;
 		} else if (success==SQLITE_ERROR && sqliteconn->errmesg && 
-			!strncmp(sqliteconn->errmesg,"no such table:",14)) {
+				!charstring::compare(sqliteconn->errmesg,
+							"no such table:",14)) {
 
 			cleanUpData(true,true);
 			// If for some reason, querying sqlite_master doesn't
@@ -159,7 +160,8 @@ bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
 #ifdef SQLITE3
 	if (sqlite3_open(sqliteconn->db,&(sqliteconn->sqliteptr))!=SQLITE_OK) {
 		sqliteconn->errmesg=
-			strdup(sqlite3_errmsg(sqliteconn->sqliteptr));
+			charstring::duplicate(
+				sqlite3_errmsg(sqliteconn->sqliteptr));
 #else
 	if (!(sqliteconn->sqliteptr=
 			sqlite_open(sqliteconn->db,666,
@@ -176,7 +178,7 @@ bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
 	// set is suspended/resumed
 	columnnames=new char * [ncolumn];
 	for (int i=0; i<ncolumn; i++) {
-		columnnames[i]=strdup(result[i]);
+		columnnames[i]=charstring::duplicate(result[i]);
 	}
 
 	// set the rowindex past the column names
@@ -224,8 +226,10 @@ int sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
 char *sqlitecursor::getErrorMessage(bool *liveconnection) {
 	*liveconnection=true;
 	if (sqliteconn->errmesg &&
-		(!strncmp(sqliteconn->errmesg,"access permission denied",24) ||
-		!strncmp(sqliteconn->errmesg,"not a directory",15))) {
+		(!charstring::compare(sqliteconn->errmesg,
+					"access permission denied",24) ||
+		!charstring::compare(sqliteconn->errmesg,
+					"not a directory",15))) {
 		*liveconnection=false;
 	}
 	return sqliteconn->errmesg;
@@ -255,7 +259,7 @@ void sqlitecursor::returnColumnInfo() {
 
 		// column type and size are unknown in sqlite
 		conn->sendColumnDefinition(columnnames[i],
-					strlen(columnnames[i]),
+					charstring::length(columnnames[i]),
 					UNKNOWN_DATATYPE,0,0,0,0,0,0,
 					0,0,0,0,0);
 	}
@@ -289,7 +293,7 @@ void sqlitecursor::returnRow() {
 	for (int i=0; i<ncolumn; i++) {
 		if (result[rowindex]) {
 			conn->sendField(result[rowindex],
-					strlen(result[rowindex]));
+					charstring::length(result[rowindex]));
 		} else {
 			conn->sendNullField();
 		}

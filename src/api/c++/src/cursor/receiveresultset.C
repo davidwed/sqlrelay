@@ -166,7 +166,7 @@ void sqlrcursor::getErrorFromServer() {
 	unsigned short	length;
 	if (getShort(&length)!=sizeof(unsigned short)) {
 		error=new char[77];
-		strcpy(error,"There was an error, but the connection died trying to retrieve it.  Sorry.");
+		charstring::copy(error,"There was an error, but the connection died trying to retrieve it.  Sorry.");
 	} else {
 		// get the error string
 		error=new char[length+1];
@@ -184,7 +184,7 @@ void sqlrcursor::setError(const char *err) {
 		sqlrc->debugPrint("Setting Error\n");
 		sqlrc->debugPreEnd();
 	}
-	error=strdup(err);
+	error=charstring::duplicate(err);
 	handleError();
 }
 

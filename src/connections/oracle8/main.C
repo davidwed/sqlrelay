@@ -6,7 +6,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 oracle8connection	*conn;
 signalhandler		*alarmhandler;

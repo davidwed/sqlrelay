@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <string.h>
 
 void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 
@@ -12,13 +11,13 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 	#endif
 
 	// run through the output bind values, sending them back
-	for (int i=0; i<cursor->outbindcount; i++) {
+	for (unsigned short i=0; i<cursor->outbindcount; i++) {
 
 		bindvar	*bv=&(cursor->outbindvars[i]);
 
 		#ifdef SERVER_DEBUG
 		debugstr=new stringbuffer();
-		debugstr->append((long)i);
+		debugstr->append(i);
 		debugstr->append(":");
 		#endif
 
@@ -54,7 +53,8 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 			#endif
 
 			clientsock->write((unsigned short)NORMAL_DATA);
-			bv->valuesize=strlen((char *)bv->value.stringval);
+			bv->valuesize=charstring::length(
+						(char *)bv->value.stringval);
 			clientsock->write(bv->valuesize);
 			clientsock->write(bv->value.stringval,bv->valuesize);
 
@@ -62,7 +62,7 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 
 			#ifdef SERVER_DEBUG
 			debugstr->append("CURSOR:\n");
-			debugstr->append((long)bv->value.cursorid);
+			debugstr->append(bv->value.cursorid);
 			#endif
 
 			clientsock->write((unsigned short)CURSOR_DATA);

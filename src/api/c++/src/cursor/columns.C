@@ -6,10 +6,6 @@
 #include <defines.h>
 #define NEED_DATATYPESTRING
 #include <datatypes.h>
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
 
 int sqlrcursor::colCount() {
 	return colcount;
@@ -30,7 +26,8 @@ column *sqlrcursor::getColumn(const char *name) {
 		column	*whichcolumn;
 		for (unsigned long i=0; i<colcount; i++) {
 			whichcolumn=getColumnInternal(i);
-			if (!strcasecmp(whichcolumn->name,name)) {
+			if (!charstring::compareIgnoringCase(
+						whichcolumn->name,name)) {
 				return whichcolumn;
 			}
 		}

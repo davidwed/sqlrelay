@@ -5,10 +5,6 @@
 #include <sqlrelay/sqlrclient.h>
 #include <stdlib.h>
 #include <defines.h>
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
 
 char *sqlrcursor::getFieldInternal(int row, int col) {
 	if (row<OPTIMISTIC_ROW_COUNT) {
@@ -58,7 +54,8 @@ char *sqlrcursor::getField(int row, const char *col) {
 			sentcolumninfo==SEND_COLUMN_INFO &&
 			rowcount && row>=0 && row>=(int)firstrowindex) {
 		for (unsigned long i=0; i<colcount; i++) {
-			if (!strcasecmp(getColumnInternal(i)->name,col)) {
+			if (!charstring::compareIgnoringCase(
+					getColumnInternal(i)->name,col)) {
 
 				// in the event that we're stepping through the
 				// result set instead of buffering the entire 
@@ -111,7 +108,8 @@ long sqlrcursor::getFieldLength(int row, const char *col) {
 			rowcount && row>=0 && row>=(int)firstrowindex) {
 
 		for (unsigned long i=0; i<colcount; i++) {
-			if (!strcasecmp(getColumnInternal(i)->name,col)) {
+			if (!charstring::compareIgnoringCase(
+					getColumnInternal(i)->name,col)) {
 
 				// in the event that we're stepping through the
 				// result set instead of buffering the entire 

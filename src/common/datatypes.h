@@ -3,7 +3,7 @@
 
 #ifndef DATATYPES_H
 #define DATATYPES_H
-#include <string.h>
+#include <rudiments/charstring.h>
 
 extern "C" {
 
@@ -381,64 +381,104 @@ static char	*datatypestring[] = {
 
 #ifdef NEED_IS_NUMBER_TYPE_CHAR
 static int isNumberTypeChar(const char *type) { 
-	return (!strcmp(type,"NUMBER") || !strcmp(type,"INT") ||
-		!strcmp(type,"SMALLINT") || !strcmp(type,"TINYINT") ||
-		!strcmp(type,"NUMERIC") || !strcmp(type,"BIT") ||
-		!strcmp(type,"REAL") || !strcmp(type,"FLOAT") ||
-		!strcmp(type,"USHORT") || !strcmp(type,"DOUBLE") ||
-		!strcmp(type,"UINT") || !strcmp(type,"LASTREAL") ||
-		!strcmp(type,"TINY") || !strcmp(type,"SHORT") ||
-		!strcmp(type,"LONGLONG") || !strcmp(type,"MEDIUMINT") ||
-		!strcmp(type,"YEAR") || !strcmp(type,"BIGINT") ||
-		!strcmp(type,"INTEGER") || !strcmp(type,"D_FLOAT") ||
-		!strcmp(type,"DECIMAL") || !strcmp(type,"INT64") ||
-		!strcmp(type,"MONEY") || !strcmp(type,"SMALLMONEY") ||
-		!strcmp(type,"DOUBLE PRECISION") || !strcasecmp(type,"INT8") ||
-		!strcasecmp(type,"INT2") || !strcasecmp(type,"INT4") ||
-		!strcasecmp(type,"OID") || !strcasecmp(type,"TID") ||
-		!strcasecmp(type,"XID") || !strcasecmp(type,"CID") ||
-		!strcasecmp(type,"FLOAT4") || !strcasecmp(type,"FLOAT8") ||
-		!strcasecmp(type,"TINTERVAL") || !strcasecmp(type,"_MONEY") ||
-		!strcasecmp(type,"_INT2") || !strcasecmp(type,"_INT4") ||
-		!strcasecmp(type,"_oid") || !strcasecmp(type,"_TID") ||
-		!strcasecmp(type,"_XID") || !strcasecmp(type,"_CID") ||
-		!strcasecmp(type,"_INT8") || !strcasecmp(type,"_FLOAT4") ||
-		!strcasecmp(type,"_FLOAT8") || !strcasecmp(type,"_TINTERVAL") ||
-		!strcasecmp(type,"INTERVAL") || !strcasecmp(type,"_INTERVAL") ||
-		!strcasecmp(type,"_NUMERIC"));
+	return (!charstring::compare(type,"NUMBER") ||
+		!charstring::compare(type,"INT") ||
+		!charstring::compare(type,"SMALLINT") ||
+		!charstring::compare(type,"TINYINT") ||
+		!charstring::compare(type,"NUMERIC") ||
+		!charstring::compare(type,"BIT") ||
+		!charstring::compare(type,"REAL") ||
+		!charstring::compare(type,"FLOAT") ||
+		!charstring::compare(type,"USHORT") ||
+		!charstring::compare(type,"DOUBLE") ||
+		!charstring::compare(type,"UINT") ||
+		!charstring::compare(type,"LASTREAL") ||
+		!charstring::compare(type,"TINY") ||
+		!charstring::compare(type,"SHORT") ||
+		!charstring::compare(type,"LONGLONG") ||
+		!charstring::compare(type,"MEDIUMINT") ||
+		!charstring::compare(type,"YEAR") ||
+		!charstring::compare(type,"BIGINT") ||
+		!charstring::compare(type,"INTEGER") ||
+		!charstring::compare(type,"D_FLOAT") ||
+		!charstring::compare(type,"DECIMAL") ||
+		!charstring::compare(type,"INT64") ||
+		!charstring::compare(type,"MONEY") ||
+		!charstring::compare(type,"SMALLMONEY") ||
+		!charstring::compare(type,"DOUBLE PRECISION") ||
+		!charstring::compareIgnoringCase(type,"INT8") ||
+		!charstring::compareIgnoringCase(type,"INT2") ||
+		!charstring::compareIgnoringCase(type,"INT4") ||
+		!charstring::compareIgnoringCase(type,"OID") ||
+		!charstring::compareIgnoringCase(type,"TID") ||
+		!charstring::compareIgnoringCase(type,"XID") ||
+		!charstring::compareIgnoringCase(type,"CID") ||
+		!charstring::compareIgnoringCase(type,"FLOAT4") ||
+		!charstring::compareIgnoringCase(type,"FLOAT8") ||
+		!charstring::compareIgnoringCase(type,"TINTERVAL") ||
+		!charstring::compareIgnoringCase(type,"_MONEY") ||
+		!charstring::compareIgnoringCase(type,"_INT2") ||
+		!charstring::compareIgnoringCase(type,"_INT4") ||
+		!charstring::compareIgnoringCase(type,"_oid") ||
+		!charstring::compareIgnoringCase(type,"_TID") ||
+		!charstring::compareIgnoringCase(type,"_XID") ||
+		!charstring::compareIgnoringCase(type,"_CID") ||
+		!charstring::compareIgnoringCase(type,"_INT8") ||
+		!charstring::compareIgnoringCase(type,"_FLOAT4") ||
+		!charstring::compareIgnoringCase(type,"_FLOAT8") ||
+		!charstring::compareIgnoringCase(type,"_TINTERVAL") ||
+		!charstring::compareIgnoringCase(type,"INTERVAL") ||
+		!charstring::compareIgnoringCase(type,"_INTERVAL") ||
+		!charstring::compareIgnoringCase(type,"_NUMERIC"));
 }
 #endif
 
 #ifdef NEED_IS_BLOB_TYPE_CHAR
 static int isBlobTypeChar(const char *type) { 
-	return (!strcmp(type,"IMAGE") || !strcmp(type,"BINARY") ||
-		!strcmp(type,"VARBINARY") || !strcmp(type,"LONGCHAR") ||
-		!strcmp(type,"LONGBINARY") || !strcmp(type,"LONG") ||
-		!strcmp(type,"TINYBLOB") || !strcmp(type,"MEDIUMBLOB") ||
-		!strcmp(type,"LONGBLOB") || !strcmp(type,"BLOB") ||
-		!strcmp(type,"RAW") || !strcmp(type,"LONG_RAW") ||
-		!strcmp(type,"CLOB") || !strcmp(type,"BFILE") ||
-		!strcmp(type,"DBCLOB"));
+	return (!charstring::compare(type,"IMAGE") ||
+		!charstring::compare(type,"BINARY") ||
+		!charstring::compare(type,"VARBINARY") ||
+		!charstring::compare(type,"LONGCHAR") ||
+		!charstring::compare(type,"LONGBINARY") ||
+		!charstring::compare(type,"LONG") ||
+		!charstring::compare(type,"TINYBLOB") ||
+		!charstring::compare(type,"MEDIUMBLOB") ||
+		!charstring::compare(type,"LONGBLOB") ||
+		!charstring::compare(type,"BLOB") ||
+		!charstring::compare(type,"RAW") ||
+		!charstring::compare(type,"LONG_RAW") ||
+		!charstring::compare(type,"CLOB") ||
+		!charstring::compare(type,"BFILE") ||
+		!charstring::compare(type,"DBCLOB"));
 }
 #endif
 
 #ifdef NEED_IS_UNSIGNED_TYPE_CHAR
 static int isUnsignedTypeChar(const char *type) { 
-	return (!strcmp(type,"USHORT") || !strcmp(type,"UINT"));
+	return (!charstring::compare(type,"USHORT") ||
+		!charstring::compare(type,"UINT"));
 }
 #endif
 
 #ifdef NEED_IS_BINARY_TYPE_CHAR
 static int isBinaryTypeChar(const char *type) { 
-	return (!strcmp(type,"IMAGE") || !strcmp(type,"BINARY") ||
-		!strcmp(type,"VARBINARY") || !strcmp(type,"LONGBINARY") ||
-		!strcmp(type,"TINYBLOB") || !strcmp(type,"MEDIUMBLOB") ||
-		!strcmp(type,"LONGBLOB") || !strcmp(type,"BLOB") ||
-		!strcmp(type,"BFILE") || !strcmp(type,"LONGVARBINARY") ||
-		!strcmp(type,"GRAPHIC") || !strcmp(type,"VARGRAPHIC") ||
-		!strcmp(type,"LONGVARGRAPHIC") ||
-		!strcmp(type,"OID") || !strcmp(type,"_OID") ||
-		!strcmp(type,"OIDVECTOR") || !strcmp(type,"_BYTEA"));
+	return (!charstring::compare(type,"IMAGE") ||
+		!charstring::compare(type,"BINARY") ||
+		!charstring::compare(type,"VARBINARY") ||
+		!charstring::compare(type,"LONGBINARY") ||
+		!charstring::compare(type,"TINYBLOB") ||
+		!charstring::compare(type,"MEDIUMBLOB") ||
+		!charstring::compare(type,"LONGBLOB") ||
+		!charstring::compare(type,"BLOB") ||
+		!charstring::compare(type,"BFILE") ||
+		!charstring::compare(type,"LONGVARBINARY") ||
+		!charstring::compare(type,"GRAPHIC") ||
+		!charstring::compare(type,"VARGRAPHIC") ||
+		!charstring::compare(type,"LONGVARGRAPHIC") ||
+		!charstring::compare(type,"OID") ||
+		!charstring::compare(type,"_OID") ||
+		!charstring::compare(type,"OIDVECTOR") ||
+		!charstring::compare(type,"_BYTEA"));
 }
 #endif
 

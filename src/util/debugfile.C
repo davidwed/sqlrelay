@@ -4,7 +4,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <string.h>
 #include <rudiments/stringbuffer.h>
 #include <config.h>
 
@@ -22,12 +21,13 @@ void debugfile::openDebugFile(const char *name, const char *localstatedir) {
 	// set the debug file name
 	char	*dbgfilename;
 	if (localstatedir[0]) {
-		dbgfilename=new char[strlen(localstatedir)+
-					16+5+strlen(name)+20+1];
+		dbgfilename=new char[charstring::length(localstatedir)+
+					16+5+charstring::length(name)+20+1];
 		sprintf(dbgfilename,"%s/sqlrelay/debug/sqlr-%s.%d",
 					localstatedir,name,getpid());
 	} else {
-		dbgfilename=new char[strlen(DEBUG_DIR)+5+strlen(name)+20+1];
+		dbgfilename=new char[charstring::length(DEBUG_DIR)+5+
+					charstring::length(name)+20+1];
 		sprintf(dbgfilename,"%s/sqlr-%s.%d",DEBUG_DIR,name,getpid());
 	}
 
@@ -57,6 +57,7 @@ void debugfile::closeDebugFile() {
 	if (dbgfile) {
 		dbgfile->close();
 		delete dbgfile;
+		dbgfile=NULL;
 		delete debuglogger;
 	}
 }

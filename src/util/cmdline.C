@@ -1,7 +1,6 @@
 #include <defaults.h>
 #include <cmdline.h>
 #include <stdlib.h>
-#include <string.h>
 #include <config.h>
 #include <stdio.h>
 

@@ -10,7 +10,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 int main(int argc, const char **argv) {
 
@@ -51,7 +50,7 @@ int main(int argc, const char **argv) {
 		user=(char *)argv[4];
 		password=(char *)argv[5];
 		query=(char *)argv[6];
-		if (argv[7] && !strcmp(argv[7],"debug")) {
+		if (argv[7] && !charstring::compare(argv[7],"debug")) {
 			debug=1;
 		}
 
@@ -79,7 +78,7 @@ int main(int argc, const char **argv) {
 					i++;
 					continue;
 				}
-				if (!strcmp(argv[i],"debug")) {
+				if (!charstring::compare(argv[i],"debug")) {
 					continue;
 				}
 				query=(char *)argv[i];

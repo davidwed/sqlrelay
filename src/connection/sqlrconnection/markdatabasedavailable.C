@@ -9,12 +9,11 @@
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
 #endif
-#include <string.h>
 
 void sqlrconnection::markDatabaseAvailable() {
 
 	#ifdef SERVER_DEBUG
-	char	string[9+strlen(updown)+1];
+	char	string[9+charstring::length(updown)+1];
 	sprintf(string,"creating %s",updown);
 	getDebugLogger()->write("connection",4,string);
 	#endif
@@ -28,7 +27,7 @@ void sqlrconnection::markDatabaseAvailable() {
 void sqlrconnection::markDatabaseUnavailable() {
 
 	#ifdef SERVER_DEBUG
-	char	string[10+strlen(updown)+1];
+	char	string[10+charstring::length(updown)+1];
 	sprintf(string,"unlinking %s",updown);
 	getDebugLogger()->write("connection",4,string);
 	#endif

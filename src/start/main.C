@@ -5,11 +5,9 @@
 #include <defaults.h>
 #include <sqlrconfigfile.h>
 #include <cmdline.h>
+#include <rudiments/sleep.h>
 
 #include <math.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
 
 int getConnections(sqlrconfigfile *cfgfile) {
@@ -50,7 +48,7 @@ bool startListener(const char *id, const char *config,
 		printf("\nsqlr-listener failed to start.\n");
 	}
 
-	sleep(1);
+	sleep::macrosleep(1);
 
 	return success;
 }
@@ -156,7 +154,7 @@ bool startConnections(sqlrconfigfile *cfgfile, int strace,
 					config,localstatedir,connectiondebug)) {
 				return false;
 			}
-			sleep(1);
+			sleep::macrosleep(1);
 		}
 
 		// have we started enough connections?
@@ -220,7 +218,7 @@ bool startCacheManager(char *localstatedir) {
 	pclose(cmd);
 	
 	// if the cachemanger isn't running, start it
-	if (!strlen(contents.getString())) {
+	if (!charstring::length(contents.getString())) {
 	
 		printf("\nStarting cache manager:\n");
 	

@@ -231,7 +231,7 @@ void msqlcursor::returnColumnInfo() {
 
 		// send the column definition
 		conn->sendColumnDefinition(msqlfield->name,
-					strlen(msqlfield->name),
+					charstring::length(msqlfield->name),
 					type,msqlfield->length,
 					precision,scale,
 					!(IS_NOT_NULL(msqlfield->flags)),
@@ -258,7 +258,8 @@ void msqlcursor::returnRow() {
 	for (int col=0; col<ncols; col++) {
 
 		if (msqlrow[col]) {
-			conn->sendField(msqlrow[col],strlen(msqlrow[col]));
+			conn->sendField(msqlrow[col],
+					charstring::length(msqlrow[col]));
 		} else {
 			conn->sendNullField();
 		}

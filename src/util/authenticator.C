@@ -8,8 +8,6 @@
 
 #include <sqlrconfigfile.h>
 
-#include <string.h>
-
 #include <authenticator.h>
 
 authenticator::authenticator(sqlrconfigfile *cfgfile) {
@@ -25,8 +23,10 @@ authenticator::authenticator(sqlrconfigfile *cfgfile) {
 
 	usernode	*current=userlist->getNodeByIndex(0);
 	for (unsigned long i=0; i<usercount; i++) {
-		users[i]=strdup(current->getData()->getUser());
-		passwords[i]=strdup(current->getData()->getPassword());
+		users[i]=charstring::duplicate(current->
+						getData()->getUser());
+		passwords[i]=charstring::duplicate(current->
+						getData()->getPassword());
 		current=current->getNext();
 	}
 }
@@ -45,7 +45,8 @@ bool authenticator::authenticate(const char *user, const char *password) {
 	// Return true if what the client sent matches one of the 
 	// user/password sets and false if no match is found.
 	for (unsigned long i=0; i<usercount; i++) {
-		if (!strcmp(user,users[i]) && !strcmp(password,passwords[i])) {
+		if (!charstring::compare(user,users[i]) &&
+			!charstring::compare(password,passwords[i])) {
 			return true;
 		}
 	}

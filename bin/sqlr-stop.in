@@ -79,8 +79,12 @@ fi
 
 # clean up tmp files
 if ( test -n "$1" ); then
-	rm -f ${tmpdir}/$1
-	rm -f ${tmpdir}/$1-*
+	rm -f ${tmpdir}/pids/$1
+	rm -f ${tmpdir}/sockets/$1
+	rm -f ${tmpdir}/ipc/$1-*
+	rm -f ${tmpdir}/ipc/$1
 else
-	rm -f ${tmpdir}/*
+	rm -f ${tmpdir}/pids/*
+	rm -f ${tmpdir}/sockets/*
+	rm -f ${tmpdir}/ipc/*
 fi

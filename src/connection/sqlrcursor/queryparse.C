@@ -5,11 +5,6 @@
 
 #include <sqlrconnection.h>
 
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
-
 #include <unistd.h>
 
 bool sqlrcursor::queryIsNotSelect() {
@@ -19,8 +14,8 @@ bool sqlrcursor::queryIsNotSelect() {
 
 	// if the query is a select but not a select into then return false,
 	// otherwise return true
-	if (!strncasecmp(ptr,"select",6) && 
-			strncasecmp(ptr,"select into ",12)) {
+	if (!charstring::compareIgnoringCase(ptr,"select",6) && 
+		charstring::compareIgnoringCase(ptr,"select into ",12)) {
 		return 0;
 	}
 	return 1;
@@ -33,8 +28,8 @@ bool sqlrcursor::queryIsCommitOrRollback() {
 
 	// if the query is a commit or rollback, return true
 	// otherwise return false
-	return (!strncasecmp(ptr,"commit",6) ||
-			!strncasecmp(ptr,"rollback",8));
+	return (!charstring::compareIgnoringCase(ptr,"commit",6) ||
+			!charstring::compareIgnoringCase(ptr,"rollback",8));
 }
 
 char *sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
@@ -85,7 +80,7 @@ void sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
 }
 
 bool sqlrcursor::skipComment(char **ptr, const char *endptr) {
-	while (*ptr<endptr && !strncmp(*ptr,"--",2)) {
+	while (*ptr<endptr && !charstring::compare(*ptr,"--",2)) {
 		while (**ptr && **ptr!='\n') {
 			(*ptr)++;
 		}

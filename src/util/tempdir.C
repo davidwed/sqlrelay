@@ -1,15 +1,15 @@
 #include <tempdir.h>
 #include <stdio.h>
-#include <string.h>
 
 tempdir::tempdir(cmdline *cmdl) {
 	if (cmdl->getLocalStateDir()[0]) {
-		tmpdir=new char[strlen(cmdl->getLocalStateDir())+14];
+		tmpdirlen=charstring::length(cmdl->getLocalStateDir())+13;
+		tmpdir=new char[tmpdirlen+1];
 		sprintf(tmpdir,"%s/sqlrelay/tmp",cmdl->getLocalStateDir());
 	} else {
-		tmpdir=strdup(TMP_DIR);
+		tmpdir=charstring::duplicate(TMP_DIR);
+		tmpdirlen=charstring::length(tmpdir);
 	}
-	tmpdirlen=strlen(tmpdir);
 }
 
 tempdir::~tempdir() {

@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
-#include <string.h>
 
 bool sqlrconnection::resumeSession(int port, const char *socket) {
 
@@ -13,8 +12,8 @@ bool sqlrconnection::resumeSession(int port, const char *socket) {
 
 	// set the connectionunixport and connectioninetport values
 	if (copyrefs) {
-		if (strlen(socket)<=MAXPATHLEN) {
-			strcpy(connectionunixportbuffer,socket);
+		if (charstring::length(socket)<=MAXPATHLEN) {
+			charstring::copy(connectionunixportbuffer,socket);
 			connectionunixport=connectionunixportbuffer;
 		} else {
 			connectionunixport="";

@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <string.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -10,10 +9,12 @@
 
 #include <config.h>
 
-bool sqlrconnection::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
+bool sqlrconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
+							const char *id) {
 
-	char	*idfilename=new char[strlen(tmpdir)+1+strlen(id)+1];
-	sprintf(idfilename,"%s/%s",tmpdir,id);
+	char	*idfilename=new char[charstring::length(tmpdir)+5+
+						charstring::length(id)+1];
+	sprintf(idfilename,"%s/ipc/%s",tmpdir,id);
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"attaching to shared memory and semaphores");
