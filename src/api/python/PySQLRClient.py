@@ -17,7 +17,7 @@ class sqlrconnection:
         """
         self.connection = CSQLRelay.sqlrcon_alloc(host, port, socket, user, password, retrytime, tries)
 
-	
+
     def __del__(self):
         CSQLRelay.sqlrcon_free(self.connection)
 
@@ -108,21 +108,21 @@ class sqlrconnection:
 
     def debugOn(self):
         """
-	Turn verbose debugging on.
+        Turn verbose debugging on.
         """
-        return CSQLRelay.debugOn(self.connection);
+        return CSQLRelay.debugOn(self.connection)
 
     def debugOff(self):
         """
-	Turn verbose debugging off.
+        Turn verbose debugging off.
         """
-        return CSQLRelay.debugOff(self.connection);
+        return CSQLRelay.debugOff(self.connection)
 
     def getDebug(self):
         """
-	Returns 1 if debugging is turned on and 0 if debugging is turned off.
+        Returns 1 if debugging is turned on and 0 if debugging is turned off.
         """
-        return CSQLRelay.getDebug(self.connection);
+        return CSQLRelay.getDebug(self.connection)
 
 
 
@@ -135,6 +135,7 @@ class sqlrcursor:
     """
 
     def __init__(self, sqlrcon):
+        self.connection = sqlrcon
         self.cursor = CSQLRelay.sqlrcur_alloc(sqlrcon.connection)
 
     def __del__(self):
@@ -193,20 +194,20 @@ class sqlrcursor:
 
     def cacheToFile(self, filename):
         """
-	Sets query caching on.  Future queries
-	will be cached to the file "filename".
-	The full pathname of the file can be
-	retrieved using getCacheFileName().
-	
-	A default time-to-live of 10 minutes is
-	also set.
-	
-	Note that once cacheToFile() is called,
-	the result sets of all future queries will
-	be cached to that file until another call 
-	to cacheToFile() changes which file to
-	cache to or a call to cacheOff() turns off
-	caching.
+        Sets query caching on.  Future queries
+        will be cached to the file "filename".
+        The full pathname of the file can be
+        retrieved using getCacheFileName().
+        
+        A default time-to-live of 10 minutes is
+        also set.
+        
+        Note that once cacheToFile() is called,
+        the result sets of all future queries will
+        be cached to that file until another call 
+        to cacheToFile() changes which file to
+        cache to or a call to cacheOff() turns off
+        caching.
         """
         return CSQLRelay.cacheToFile(self.cursor,filename)
 
@@ -221,8 +222,8 @@ class sqlrcursor:
 
     def getCacheFileName(self):
         """
-	Returns the name of the file containing the most
-	recently cached result set.
+        Returns the name of the file containing the most
+        recently cached result set.
         """
         return CSQLRelay.getCacheFileName(self.cursor)
 
@@ -288,7 +289,7 @@ class sqlrcursor:
         """
         Define a substitution variable.
         """
-	return CSQLRelay.substitution(self.cursor,variable,value,precision,scale)
+        return CSQLRelay.substitution(self.cursor,variable,value,precision,scale)
 
     def clearBinds(self):
         """
@@ -342,13 +343,13 @@ class sqlrcursor:
         """
         Define substitution variables.
         """
-	return CSQLRelay.substitutions(self.cursor,variables,values,precisions,scales)
+        return CSQLRelay.substitutions(self.cursor,variables,values,precisions,scales)
 
     def inputBinds(self, variables, values, precisions=None, scales=None):
         """
         Define input bind variables.
         """
-	return CSQLRelay.inputBinds(self.cursor,variables,values,precisions,scales)
+        return CSQLRelay.inputBinds(self.cursor,variables,values,precisions,scales)
         
 
     def validateBinds(self):
@@ -392,7 +393,12 @@ class sqlrcursor:
         Get the cursor associated with a previously
         defined output bind variable.
         """
-        return CSQLRelay.getOutputBindCursor(self.cursor, variable)
+        bindcursorid=CSQLRelay.getOutputBindCursorId(self.cursor, variable)
+        if bindcursorid==-1:
+                return None
+        bindcursor=sqlrcursor(self.connection)
+        CSQLRelay.attachToBindCursor(bindcursor.cursor, bindcursorid)
+        return bindcursor
 
     def openCachedResultSet(self, filename):
         """
@@ -466,14 +472,14 @@ class sqlrcursor:
         bind variables as empty strings.
         This is the default.
         """
-	return CSQLRelay.getNullsAsEmptyStrings(self.cursor)
+        return CSQLRelay.getNullsAsEmptyStrings(self.cursor)
 
     def getNullsAsNone(self):
         """
         Tells the cursor to return NULL fields and output
         bind variables as NULL's.
         """
-	return CSQLRelay.getNullsAsNone(self.cursor)
+        return CSQLRelay.getNullsAsNone(self.cursor)
 
     def getField(self, row, col):
         """
@@ -498,7 +504,7 @@ class sqlrcursor:
     def getRowDictionary(self, row):
         """
         Returns the requested row as values in a dictionary
-	with column names for keys.
+        with column names for keys.
         """
         return CSQLRelay.getRowDictionary(self.cursor, row)
 
@@ -518,7 +524,7 @@ class sqlrcursor:
     def getRowLengthsDictionary(self, row):
         """
         Returns the requested row lengths as values in a dictionary
-	with column names for keys.
+        with column names for keys.
         """
         return CSQLRelay.getRowLengthsDictionary(self.cursor, row)
 

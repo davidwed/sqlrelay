@@ -171,6 +171,8 @@ void Init_SQLRConnection() {
 
 
 // sqlrcursor methods
+VALUE csqlrcursor;
+
 static void sqlrcur_free(void *sqlrcur) {
 	delete (sqlrcursor *)sqlrcur;
 }
@@ -366,8 +368,12 @@ static VALUE sqlrcur_inputBindBlob(VALUE self, VALUE variable,
 					VALUE value, VALUE size) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->inputBindBlob(STR2CSTR(variable),
+	if (value==Qnil) {
+		sqlrcur->inputBindBlob(STR2CSTR(variable),NULL,NUM2INT(size));
+	} else {
+		sqlrcur->inputBindBlob(STR2CSTR(variable),
 				STR2CSTR(value),NUM2INT(size));
+	}
 	return Qnil;
 }
 
@@ -375,8 +381,12 @@ static VALUE sqlrcur_inputBindClob(VALUE self, VALUE variable,
 					VALUE value, VALUE size) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->inputBindClob(STR2CSTR(variable),
+	if (value==Qnil) {
+		sqlrcur->inputBindClob(STR2CSTR(variable),NULL,NUM2INT(size));
+	} else {
+		sqlrcur->inputBindClob(STR2CSTR(variable),
 				STR2CSTR(value),NUM2INT(size));
+	}
 	return Qnil;
 }
 
@@ -541,8 +551,9 @@ static VALUE sqlrcur_getOutputBindCursor(VALUE self, VALUE variable) {
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	sqlrcursor	*returnsqlrcur=sqlrcur->getOutputBindCursor(
 							STR2CSTR(variable));
-	sqlrcur->copyReferences();
-	return Data_Wrap_Struct(self,0,sqlrcur_free,(void *)returnsqlrcur);
+	returnsqlrcur->copyReferences();
+	return Data_Wrap_Struct(csqlrcursor,0,sqlrcon_free,
+					(void *)returnsqlrcur);
 }
 
 static VALUE sqlrcur_openCachedResultSet(VALUE self, VALUE filename) {
@@ -794,8 +805,6 @@ static VALUE sqlrcur_resumeCachedResultSet(VALUE self,
 							STR2CSTR(filename)));
 }
 
-VALUE csqlrcursor;
-
 void Init_SQLRCursor() {
 	csqlrcursor=rb_define_class("SQLRCursor", rb_cObject);
 	rb_define_singleton_method(csqlrcursor,"new",
@@ -841,17 +850,17 @@ void Init_SQLRCursor() {
 	rb_define_method(csqlrcursor,"inputBind",
 				(CAST)sqlrcur_inputBind,-1);
 	rb_define_method(csqlrcursor,"inputBindBlob",
-				(CAST)sqlrcur_inputBindBlob,-1);
+				(CAST)sqlrcur_inputBindBlob,3);
 	rb_define_method(csqlrcursor,"inputBindClob",
-				(CAST)sqlrcur_inputBindClob,-1);
+				(CAST)sqlrcur_inputBindClob,3);
 	rb_define_method(csqlrcursor,"defineOutputBind",
 				(CAST)sqlrcur_defineOutputBind,2);
 	rb_define_method(csqlrcursor,"defineOutputBindBlob",
-				(CAST)sqlrcur_defineOutputBindBlob,2);
+				(CAST)sqlrcur_defineOutputBindBlob,1);
 	rb_define_method(csqlrcursor,"defineOutputBindClob",
-				(CAST)sqlrcur_defineOutputBindClob,2);
+				(CAST)sqlrcur_defineOutputBindClob,1);
 	rb_define_method(csqlrcursor,"defineOutputBindCursor",
-				(CAST)sqlrcur_defineOutputBindCursor,2);
+				(CAST)sqlrcur_defineOutputBindCursor,1);
 	rb_define_method(csqlrcursor,"substitutions",
 				(CAST)sqlrcur_substitutions,-1);
 	rb_define_method(csqlrcursor,"inputBinds",

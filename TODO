@@ -1,9 +1,11 @@
+ruby api crashes on exit
+
 forked listeners need to close handoff file descriptors
 handoff=pass does not work with dynamic scaling
 
 If a connection dies mysteriously, a new one should fire up.
 maximum allowed clob bind value length should be configurable
-many of methods should be const methods
+use const/short/long instead of plain char *, int
 solaris init script
 odbc connection should check the odbc definition
 	for connect string arguments - SQLBrowseConnect

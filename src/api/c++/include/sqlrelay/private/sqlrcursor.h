@@ -79,8 +79,6 @@
 		char	*getColStorage(int length);
 		void	createColumnBuffers();
 
-		short		getOutputBindCursorId(const char *variable);
-		void		attachToBindCursor(short bindcursorid);
 
 		int		resumed;
 		int		cached;
@@ -169,5 +167,7 @@
 
 	public:
 		void		copyReferences();
+		short		getOutputBindCursorId(const char *variable);
+		void		attachToBindCursor(short bindcursorid);
 
 	friend class sqlrconnection;

@@ -44,11 +44,11 @@ def main():
 	cur.sendQuery("drop table testtable")
 
 	print "CREATE TEMPTABLE: "
-	checkSuccess(cur.sendQuery("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long)"),1)
+	checkSuccess(cur.sendQuery("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long, testclob clob, testblob blob)"),1)
 	print
 
 	print "INSERT: "
-	checkSuccess(cur.sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())"),1)
 	print
 
 	print "AFFECTED ROWS: "
@@ -56,12 +56,14 @@ def main():
 	print
 
 	print "BIND BY POSITION: "
-	cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)")
+	cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)")
 	cur.inputBind("1",2)
 	cur.inputBind("2","testchar2")
 	cur.inputBind("3","testvarchar2")
 	cur.inputBind("4","01-JAN-2002")
 	cur.inputBind("5","testlong2")
+	cur.inputBindClob("6","testclob2",9)
+	cur.inputBindBlob("7","testblob2",9)
 	checkSuccess(cur.executeQuery(),1)
 	cur.clearBinds()
 	cur.inputBind("1",3)
@@ -69,6 +71,8 @@ def main():
 	cur.inputBind("3","testvarchar3")
 	cur.inputBind("4","01-JAN-2003")
 	cur.inputBind("5","testlong3")
+	cur.inputBindClob("6","testclob3",9)
+	cur.inputBindBlob("7","testblob3",9)
 	checkSuccess(cur.executeQuery(),1)
 	print
 
@@ -77,16 +81,20 @@ def main():
 	cur.inputBinds(["1","2","3","4","5"],
 		[4,"testchar4","testvarchar4",
 			"01-JAN-2004","testlong4"])
+	cur.inputBindClob("6","testclob7",9)
+	cur.inputBindBlob("7","testblob7",9)
 	checkSuccess(cur.executeQuery(),1)
 	print
 
 	print "BIND BY NAME: "
-	cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)")
+	cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)")
 	cur.inputBind("var1",5)
 	cur.inputBind("var2","testchar5")
 	cur.inputBind("var3","testvarchar5")
 	cur.inputBind("var4","01-JAN-2005")
 	cur.inputBind("var5","testlong5")
+	cur.inputBindClob("var6","testclob5",9)
+	cur.inputBindBlob("var7","testblob5",9)
 	checkSuccess(cur.executeQuery(),1)
 	cur.clearBinds()
 	cur.inputBind("var1",6)
@@ -94,6 +102,8 @@ def main():
 	cur.inputBind("var3","testvarchar6")
 	cur.inputBind("var4","01-JAN-2006")
 	cur.inputBind("var5","testlong6")
+	cur.inputBindClob("var6","testclob6",9)
+	cur.inputBindBlob("var7","testblob6",9)
 	checkSuccess(cur.executeQuery(),1)
 	print
 
@@ -102,6 +112,8 @@ def main():
 	cur.inputBinds(["var1","var2","var3","var4","var5"],
 		[7,"testchar7","testvarchar7",
 			"01-JAN-2007","testlong7"])
+	cur.inputBindClob("var6","testclob7",9)
+	cur.inputBindBlob("var7","testblob7",9)
 	checkSuccess(cur.executeQuery(),1)
 	print
 
@@ -112,7 +124,9 @@ def main():
 	cur.inputBind("var3","testvarchar8")
 	cur.inputBind("var4","01-JAN-2008")
 	cur.inputBind("var5","testlong8")
-	cur.inputBind("var6","junkvalue")
+	cur.inputBindClob("var6","testclob8",9)
+	cur.inputBindBlob("var7","testblob8",9)
+	cur.inputBind("var9","junkvalue")
 	cur.validateBinds()
 	checkSuccess(cur.executeQuery(),1)
 	print
@@ -166,7 +180,7 @@ def main():
 	print
 
 	print "COLUMN COUNT: "
-	checkSuccess(cur.colCount(),5)
+	checkSuccess(cur.colCount(),7)
 	print
 
 	print "COLUMN NAMES: "
@@ -175,12 +189,16 @@ def main():
 	checkSuccess(cur.getColumnName(2),"TESTVARCHAR")
 	checkSuccess(cur.getColumnName(3),"TESTDATE")
 	checkSuccess(cur.getColumnName(4),"TESTLONG")
+	checkSuccess(cur.getColumnName(5),"TESTCLOB")
+	checkSuccess(cur.getColumnName(6),"TESTBLOB")
 	cols=cur.getColumnNames()
 	checkSuccess(cols[0],"TESTNUMBER")
 	checkSuccess(cols[1],"TESTCHAR")
 	checkSuccess(cols[2],"TESTVARCHAR")
 	checkSuccess(cols[3],"TESTDATE")
 	checkSuccess(cols[4],"TESTLONG")
+	checkSuccess(cols[5],"TESTCLOB")
+	checkSuccess(cols[6],"TESTBLOB")
 	print
 
 	print "COLUMN TYPES: "
@@ -194,6 +212,10 @@ def main():
 	checkSuccess(cur.getColumnType('testdate'),"DATE")
 	checkSuccess(cur.getColumnType(4),"LONG")
 	checkSuccess(cur.getColumnType('testlong'),"LONG")
+	checkSuccess(cur.getColumnType(5),"CLOB")
+	checkSuccess(cur.getColumnType('testclob'),"CLOB")
+	checkSuccess(cur.getColumnType(6),"BLOB")
+	checkSuccess(cur.getColumnType('testblob'),"BLOB")
 	print
 
 	print "COLUMN LENGTH: "
@@ -207,6 +229,10 @@ def main():
 	checkSuccess(cur.getColumnLength('testdate'),7)
 	checkSuccess(cur.getColumnLength(4),0)
 	checkSuccess(cur.getColumnLength('testlong'),0)
+	checkSuccess(cur.getColumnLength(5),0)
+	checkSuccess(cur.getColumnLength('testclob'),0)
+	checkSuccess(cur.getColumnLength(6),0)
+	checkSuccess(cur.getColumnLength('testblob'),0)
 	print
 
 	print "LONGEST COLUMN: "
@@ -220,6 +246,10 @@ def main():
 	checkSuccess(cur.getLongest('testdate'),9)
 	checkSuccess(cur.getLongest(4),9)
 	checkSuccess(cur.getLongest('testlong'),9)
+	checkSuccess(cur.getLongest(5),9)
+	checkSuccess(cur.getLongest('testclob'),9)
+	checkSuccess(cur.getLongest(6),9)
+	checkSuccess(cur.getLongest('testblob'),9)
 	print
 
 	print "ROW COUNT: "
@@ -244,12 +274,16 @@ def main():
 	checkSuccess(cur.getField(0,2),"testvarchar1")
 	checkSuccess(cur.getField(0,3),"01-JAN-01")
 	checkSuccess(cur.getField(0,4),"testlong1")
+	checkSuccess(cur.getField(0,5),"testclob1")
+	checkSuccess(cur.getField(0,6),"")
 	print
 	checkSuccess(cur.getField(7,0),"8")
 	checkSuccess(cur.getField(7,1),"testchar8                               ")
 	checkSuccess(cur.getField(7,2),"testvarchar8")
 	checkSuccess(cur.getField(7,3),"01-JAN-08")
 	checkSuccess(cur.getField(7,4),"testlong8")
+	checkSuccess(cur.getField(7,5),"testclob8")
+	checkSuccess(cur.getField(7,6),"testblob8")
 	print
 
 	print "FIELD LENGTHS BY INDEX: "
@@ -258,12 +292,16 @@ def main():
 	checkSuccess(cur.getFieldLength(0,2),12)
 	checkSuccess(cur.getFieldLength(0,3),9)
 	checkSuccess(cur.getFieldLength(0,4),9)
+	checkSuccess(cur.getFieldLength(0,5),9)
+	checkSuccess(cur.getFieldLength(0,6),0)
 	print
 	checkSuccess(cur.getFieldLength(7,0),1)
 	checkSuccess(cur.getFieldLength(7,1),40)
 	checkSuccess(cur.getFieldLength(7,2),12)
 	checkSuccess(cur.getFieldLength(7,3),9)
 	checkSuccess(cur.getFieldLength(7,4),9)
+	checkSuccess(cur.getFieldLength(7,5),9)
+	checkSuccess(cur.getFieldLength(7,6),9)
 	print
 
 	print "FIELDS BY NAME: "
@@ -272,12 +310,16 @@ def main():
 	checkSuccess(cur.getField(0,"testvarchar"),"testvarchar1")
 	checkSuccess(cur.getField(0,"testdate"),"01-JAN-01")
 	checkSuccess(cur.getField(0,"testlong"),"testlong1")
+	checkSuccess(cur.getField(0,"testclob"),"testclob1")
+	checkSuccess(cur.getField(0,"testblob"),"")
 	print
 	checkSuccess(cur.getField(7,"testnumber"),"8")
 	checkSuccess(cur.getField(7,"testchar"),"testchar8                               ")
 	checkSuccess(cur.getField(7,"testvarchar"),"testvarchar8")
 	checkSuccess(cur.getField(7,"testdate"),"01-JAN-08")
 	checkSuccess(cur.getField(7,"testlong"),"testlong8")
+	checkSuccess(cur.getField(7,"testclob"),"testclob8")
+	checkSuccess(cur.getField(7,"testblob"),"testblob8")
 	print
 
 	print "FIELD LENGTHS BY NAME: "
@@ -286,12 +328,16 @@ def main():
 	checkSuccess(cur.getFieldLength(0,"testvarchar"),12)
 	checkSuccess(cur.getFieldLength(0,"testdate"),9)
 	checkSuccess(cur.getFieldLength(0,"testlong"),9)
+	checkSuccess(cur.getFieldLength(0,"testclob"),9)
+	checkSuccess(cur.getFieldLength(0,"testblob"),0)
 	print
 	checkSuccess(cur.getFieldLength(7,"testnumber"),1)
 	checkSuccess(cur.getFieldLength(7,"testchar"),40)
 	checkSuccess(cur.getFieldLength(7,"testvarchar"),12)
 	checkSuccess(cur.getFieldLength(7,"testdate"),9)
 	checkSuccess(cur.getFieldLength(7,"testlong"),9)
+	checkSuccess(cur.getFieldLength(7,"testclob"),9)
+	checkSuccess(cur.getFieldLength(7,"testblob"),9)
 	print
 
 	print "FIELDS BY ARRAY: "
@@ -301,15 +347,20 @@ def main():
 	checkSuccess(fields[2],"testvarchar1")
 	checkSuccess(fields[3],"01-JAN-01")
 	checkSuccess(fields[4],"testlong1")
+	checkSuccess(fields[5],"testclob1")
+	checkSuccess(fields[6],"")
 	print
 
 	print "FIELD LENGTHS BY ARRAY: "
 	fieldlens=cur.getRowLengths(0)
+	print fieldlens
 	checkSuccess(fieldlens[0],1)
 	checkSuccess(fieldlens[1],40)
 	checkSuccess(fieldlens[2],12)
 	checkSuccess(fieldlens[3],9)
 	checkSuccess(fieldlens[4],9)
+	checkSuccess(fieldlens[5],9)
+	checkSuccess(fieldlens[6],None)
 	print
 
 	print "FIELDS BY DICTIONARY: "
@@ -319,6 +370,8 @@ def main():
 	checkSuccess(fields["TESTVARCHAR"],"testvarchar1")
 	checkSuccess(fields["TESTDATE"],"01-JAN-01")
 	checkSuccess(fields["TESTLONG"],"testlong1")
+	checkSuccess(fields["TESTCLOB"],"testclob1")
+	checkSuccess(fields["TESTBLOB"],"")
 	print
 	fields=cur.getRowDictionary(7)
 	checkSuccess(fields["TESTNUMBER"],8)
@@ -326,6 +379,8 @@ def main():
 	checkSuccess(fields["TESTVARCHAR"],"testvarchar8")
 	checkSuccess(fields["TESTDATE"],"01-JAN-08")
 	checkSuccess(fields["TESTLONG"],"testlong8")
+	checkSuccess(fields["TESTCLOB"],"testclob8")
+	checkSuccess(fields["TESTBLOB"],"testblob8")
 	print
 
 	print "FIELD LENGTHS BY DICTIONARY: "
@@ -335,6 +390,8 @@ def main():
 	checkSuccess(fieldlengths["TESTVARCHAR"],12)
 	checkSuccess(fieldlengths["TESTDATE"],9)
 	checkSuccess(fieldlengths["TESTLONG"],9)
+	checkSuccess(fieldlengths["TESTCLOB"],9)
+	checkSuccess(fieldlengths["TESTBLOB"],0)
 	print
 	fieldlengths=cur.getRowLengthsDictionary(7)
 	checkSuccess(fieldlengths["TESTNUMBER"],1)
@@ -342,6 +399,8 @@ def main():
 	checkSuccess(fieldlengths["TESTVARCHAR"],12)
 	checkSuccess(fieldlengths["TESTDATE"],9)
 	checkSuccess(fieldlengths["TESTLONG"],9)
+	checkSuccess(fieldlengths["TESTCLOB"],9)
+	checkSuccess(fieldlengths["TESTBLOB"],9)
 	print
 	
 	print "INDIVIDUAL SUBSTITUTIONS: "
@@ -523,7 +582,7 @@ def main():
 	print
 
 	print "COLUMN COUNT FOR CACHED RESULT SET: "
-	checkSuccess(cur.colCount(),5)
+	checkSuccess(cur.colCount(),7)
 	print
 
 	print "COLUMN NAMES FOR CACHED RESULT SET: "
@@ -532,12 +591,16 @@ def main():
 	checkSuccess(cur.getColumnName(2),"TESTVARCHAR")
 	checkSuccess(cur.getColumnName(3),"TESTDATE")
 	checkSuccess(cur.getColumnName(4),"TESTLONG")
+	checkSuccess(cur.getColumnName(5),"TESTCLOB")
+	checkSuccess(cur.getColumnName(6),"TESTBLOB")
 	cols=cur.getColumnNames()
 	checkSuccess(cols[0],"TESTNUMBER")
 	checkSuccess(cols[1],"TESTCHAR")
 	checkSuccess(cols[2],"TESTVARCHAR")
 	checkSuccess(cols[3],"TESTDATE")
 	checkSuccess(cols[4],"TESTLONG")
+	checkSuccess(cols[5],"TESTCLOB")
+	checkSuccess(cols[6],"TESTBLOB")
 	print
 
 	print "CACHED RESULT SET WITH RESULT SET BUFFER SIZE: "
@@ -623,7 +686,7 @@ def main():
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),"8")
 	checkSuccess(con.autoCommitOn(),1)
-	checkSuccess(cur.sendQuery("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10')"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10','testclob10',empty_blob())"),1)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),"9")
 	checkSuccess(con.autoCommitOff(),1)

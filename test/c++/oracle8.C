@@ -269,12 +269,16 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnName(2),"TESTVARCHAR");
 	checkSuccess(cur->getColumnName(3),"TESTDATE");
 	checkSuccess(cur->getColumnName(4),"TESTLONG");
+	checkSuccess(cur->getColumnName(5),"TESTCLOB");
+	checkSuccess(cur->getColumnName(6),"TESTBLOB");
 	cols=cur->getColumnNames();
 	checkSuccess(cols[0],"TESTNUMBER");
 	checkSuccess(cols[1],"TESTCHAR");
 	checkSuccess(cols[2],"TESTVARCHAR");
 	checkSuccess(cols[3],"TESTDATE");
 	checkSuccess(cols[4],"TESTLONG");
+	checkSuccess(cols[5],"TESTCLOB");
+	checkSuccess(cols[6],"TESTBLOB");
 	printf("\n");
 
 	printf("COLUMN TYPES: \n");
@@ -288,6 +292,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testdate"),"DATE");
 	checkSuccess(cur->getColumnType(4),"LONG");
 	checkSuccess(cur->getColumnType("testlong"),"LONG");
+	checkSuccess(cur->getColumnType(5),"CLOB");
+	checkSuccess(cur->getColumnType("testclob"),"CLOB");
+	checkSuccess(cur->getColumnType(6),"BLOB");
+	checkSuccess(cur->getColumnType("testblob"),"BLOB");
 	printf("\n");
 
 	printf("COLUMN LENGTH: \n");
@@ -301,6 +309,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testdate"),7);
 	checkSuccess(cur->getColumnLength(4),0);
 	checkSuccess(cur->getColumnLength("testlong"),0);
+	checkSuccess(cur->getColumnLength(5),0);
+	checkSuccess(cur->getColumnLength("testclob"),0);
+	checkSuccess(cur->getColumnLength(6),0);
+	checkSuccess(cur->getColumnLength("testblob"),0);
 	printf("\n");
 
 	printf("LONGEST COLUMN: \n");
@@ -314,6 +326,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getLongest("testdate"),9);
 	checkSuccess(cur->getLongest(4),9);
 	checkSuccess(cur->getLongest("testlong"),9);
+	checkSuccess(cur->getLongest(5),9);
+	checkSuccess(cur->getLongest("testclob"),9);
+	checkSuccess(cur->getLongest(6),9);
+	checkSuccess(cur->getLongest("testblob"),9);
 	printf("\n");
 
 	printf("ROW COUNT: \n");

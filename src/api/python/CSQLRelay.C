@@ -563,16 +563,6 @@ static PyObject *getOutputBindLength(PyObject *self, PyObject *args) {
   return Py_BuildValue("l", rc);
 }
 
-static PyObject *getOutputBindCursor(PyObject *self, PyObject *args) {
-  char *variable;
-  long sqlrcur;
-  sqlrcursor *rc;
-  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
-    return NULL;
-  rc=((sqlrcursor *)sqlrcur)->getOutputBindCursor(variable);
-  return Py_BuildValue("l", rc);
-}
-
 static PyObject *openCachedResultSet(PyObject *self, PyObject *args) {
   long sqlrcur;
   int rc;
@@ -958,6 +948,25 @@ static PyObject *resumeCachedResultSet(PyObject *self, PyObject *args) {
   return Py_BuildValue("i", rc);
 }
 
+static PyObject *getOutputBindCursorId(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  short rc;
+  char *variable;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
+    return NULL;
+  rc=((sqlrcursor *)sqlrcur)->getOutputBindCursorId(variable);
+  return Py_BuildValue("i", rc);
+}
+
+static PyObject *attachToBindCursor(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  int bindcursorid;
+  if (!PyArg_ParseTuple(args, "li", &sqlrcur, &bindcursorid))
+    return NULL;
+  ((sqlrcursor *)sqlrcur)->attachToBindCursor(bindcursorid);
+  return Py_BuildValue("i", 0);
+}
+
 static PyMethodDef SQLRMethods[] = {
   {"sqlrcon_alloc",  sqlrcon_alloc, METH_VARARGS},
   {"sqlrcon_free", sqlrcon_free, METH_VARARGS},
@@ -1010,7 +1019,6 @@ static PyMethodDef SQLRMethods[] = {
   {"fetchFromBindCursor", fetchFromBindCursor, METH_VARARGS},
   {"getOutputBind", getOutputBind, METH_VARARGS},
   {"getOutputBindLength", getOutputBindLength, METH_VARARGS},
-  {"getOutputBindCursor", getOutputBindCursor, METH_VARARGS},
   {"openCachedResultSet", openCachedResultSet, METH_VARARGS},
   {"colCount", colCount, METH_VARARGS},
   {"rowCount", rowCount, METH_VARARGS},
@@ -1038,6 +1046,8 @@ static PyMethodDef SQLRMethods[] = {
   {"suspendResultSet", suspendResultSet, METH_VARARGS},
   {"resumeResultSet", resumeResultSet, METH_VARARGS},
   {"resumeCachedResultSet", resumeCachedResultSet, METH_VARARGS},
+  {"getOutputBindCursorId", getOutputBindCursorId, METH_VARARGS},
+  {"attachToBindCursor", attachToBindCursor, METH_VARARGS},
   {NULL,      NULL}        /* Sentinel */
 };
 

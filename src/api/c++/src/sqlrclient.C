@@ -550,7 +550,7 @@ void	sqlrconnection::debugPrint(const char *string) {
 	if (printfunction) {
 		(*printfunction)("%s",string);
 	} else {
-		cout << string;
+		printf("%s",string);
 	}
 }
 
@@ -558,7 +558,7 @@ void	sqlrconnection::debugPrint(long number) {
 	if (printfunction) {
 		(*printfunction)("%d",number);
 	} else {
-		cout << number;
+		printf("%d",number);
 	}
 }
 
@@ -566,7 +566,7 @@ void	sqlrconnection::debugPrint(double number) {
 	if (printfunction) {
 		(*printfunction)("%f",number);
 	} else {
-		cout << number;
+		printf("%f",number);
 	}
 }
 
@@ -574,7 +574,7 @@ void	sqlrconnection::debugPrint(char character) {
 	if (printfunction) {
 		(*printfunction)("%c",character);
 	} else {
-		cout << character;
+		printf("%c",character);
 	}
 }
 

@@ -1,5 +1,6 @@
-<html><pre><?
+<html><pre><?php
 
+		echo("during\n");
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
 
@@ -36,11 +37,11 @@ function checkSuccess($value,$success) {
 	sqlrcur_sendQuery($cur,"drop table testtable");
 
 	echo("CREATE TEMPTABLE: \n");
-	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long)"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long, testclob clob, testblob blob)"),1);
 	echo("\n");
 
 	echo("INSERT: \n");
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())"),1);
 	echo("\n");
 
 	echo("AFFECTED ROWS: \n");
@@ -48,12 +49,14 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("BIND BY POSITION: \n");
-	sqlrcur_prepareQuery($cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	sqlrcur_prepareQuery($cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)");
 	sqlrcur_inputBind($cur,"1",2);
 	sqlrcur_inputBind($cur,"2","testchar2");
 	sqlrcur_inputBind($cur,"3","testvarchar2");
 	sqlrcur_inputBind($cur,"4","01-JAN-2002");
 	sqlrcur_inputBind($cur,"5","testlong2");
+	sqlrcur_inputBindClob($cur,"6","testclob2",9);
+	sqlrcur_inputBindBlob($cur,"7","testblob2",9);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	sqlrcur_clearBinds($cur);
 	sqlrcur_inputBind($cur,"1",3);
@@ -61,6 +64,8 @@ function checkSuccess($value,$success) {
 	sqlrcur_inputBind($cur,"3","testvarchar3");
 	sqlrcur_inputBind($cur,"4","01-JAN-2003");
 	sqlrcur_inputBind($cur,"5","testlong3");
+	sqlrcur_inputBindClob($cur,"6","testclob3",9);
+	sqlrcur_inputBindBlob($cur,"7","testblob3",9);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");
 
@@ -69,16 +74,20 @@ function checkSuccess($value,$success) {
 	$bindvars=array("1","2","3","4","5");
 	$bindvals=array("4","testchar4","testvarchar4","01-JAN-2004","testlong4");
 	sqlrcur_inputBinds($cur,$bindvars,$bindvals);
+	sqlrcur_inputBindClob($cur,"6","testclob4",9);
+	sqlrcur_inputBindBlob($cur,"7","testblob4",9);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");
 
 	echo("BIND BY NAME: \n");
-	sqlrcur_prepareQuery($cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	sqlrcur_prepareQuery($cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)");
 	sqlrcur_inputBind($cur,"var1",5);
 	sqlrcur_inputBind($cur,"var2","testchar5");
 	sqlrcur_inputBind($cur,"var3","testvarchar5");
 	sqlrcur_inputBind($cur,"var4","01-JAN-2005");
 	sqlrcur_inputBind($cur,"var5","testlong5");
+	sqlrcur_inputBindClob($cur,"6","testclob5",9);
+	sqlrcur_inputBindBlob($cur,"7","testblob5",9);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	sqlrcur_clearBinds($cur);
 	sqlrcur_inputBind($cur,"var1",6);
@@ -86,6 +95,8 @@ function checkSuccess($value,$success) {
 	sqlrcur_inputBind($cur,"var3","testvarchar6");
 	sqlrcur_inputBind($cur,"var4","01-JAN-2006");
 	sqlrcur_inputBind($cur,"var5","testlong6");
+	sqlrcur_inputBindClob($cur,"6","testclob6",9);
+	sqlrcur_inputBindBlob($cur,"7","testblob6",9);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");
 
@@ -94,6 +105,8 @@ function checkSuccess($value,$success) {
 	$arraybindvars=array("var1","var2","var3","var4","var5");
 	$arraybindvals=array("7","testchar7","testvarchar7","01-JAN-2007","testlong7");
 	sqlrcur_inputBinds($cur,$arraybindvars,$arraybindvals);
+	sqlrcur_inputBindClob($cur,"var6","testclob7",9);
+	sqlrcur_inputBindBlob($cur,"var7","testblob7",9);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");
 
@@ -104,7 +117,9 @@ function checkSuccess($value,$success) {
 	sqlrcur_inputBind($cur,"var3","testvarchar8");
 	sqlrcur_inputBind($cur,"var4","01-JAN-2008");
 	sqlrcur_inputBind($cur,"var5","testlong8");
-	sqlrcur_inputBind($cur,"var6","junkvalue");
+	sqlrcur_inputBindClob($cur,"var6","testclob8",9);
+	sqlrcur_inputBindBlob($cur,"var7","testblob8",9);
+	sqlrcur_inputBind($cur,"var9","junkvalue");
 	sqlrcur_validateBinds($cur);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");
@@ -158,7 +173,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("COLUMN COUNT: \n");
-	checkSuccess(sqlrcur_colCount($cur),5);
+	checkSuccess(sqlrcur_colCount($cur),7);
 	echo("\n");
 
 	echo("COLUMN NAMES: \n");
@@ -167,12 +182,16 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnName($cur,2),"TESTVARCHAR");
 	checkSuccess(sqlrcur_getColumnName($cur,3),"TESTDATE");
 	checkSuccess(sqlrcur_getColumnName($cur,4),"TESTLONG");
+	checkSuccess(sqlrcur_getColumnName($cur,5),"TESTCLOB");
+	checkSuccess(sqlrcur_getColumnName($cur,6),"TESTBLOB");
 	$cols=sqlrcur_getColumnNames($cur);
 	checkSuccess($cols[0],"TESTNUMBER");
 	checkSuccess($cols[1],"TESTCHAR");
 	checkSuccess($cols[2],"TESTVARCHAR");
 	checkSuccess($cols[3],"TESTDATE");
 	checkSuccess($cols[4],"TESTLONG");
+	checkSuccess($cols[5],"TESTCLOB");
+	checkSuccess($cols[6],"TESTBLOB");
 	echo("\n");
 
 	echo("COLUMN TYPES: \n");
@@ -186,6 +205,10 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnType($cur,"testdate"),"DATE");
 	checkSuccess(sqlrcur_getColumnType($cur,4),"LONG");
 	checkSuccess(sqlrcur_getColumnType($cur,"testlong"),"LONG");
+	checkSuccess(sqlrcur_getColumnType($cur,5),"CLOB");
+	checkSuccess(sqlrcur_getColumnType($cur,"testclob"),"CLOB");
+	checkSuccess(sqlrcur_getColumnType($cur,6),"BLOB");
+	checkSuccess(sqlrcur_getColumnType($cur,"testblob"),"BLOB");
 	echo("\n");
 
 	echo("COLUMN LENGTH: \n");
@@ -199,6 +222,10 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnLength($cur,"testdate"),7);
 	checkSuccess(sqlrcur_getColumnLength($cur,4),0);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testlong"),0);
+	checkSuccess(sqlrcur_getColumnLength($cur,5),0);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testclob"),0);
+	checkSuccess(sqlrcur_getColumnLength($cur,6),0);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testblob"),0);
 	echo("\n");
 
 	echo("LONGEST COLUMN: \n");
@@ -212,6 +239,10 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getLongest($cur,"testdate"),9);
 	checkSuccess(sqlrcur_getLongest($cur,4),9);
 	checkSuccess(sqlrcur_getLongest($cur,"testlong"),9);
+	checkSuccess(sqlrcur_getLongest($cur,5),9);
+	checkSuccess(sqlrcur_getLongest($cur,"testclob"),9);
+	checkSuccess(sqlrcur_getLongest($cur,6),9);
+	checkSuccess(sqlrcur_getLongest($cur,"testblob"),9);
 	echo("\n");
 
 	echo("ROW COUNT: \n");
@@ -236,12 +267,16 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,2),"testvarchar1");
 	checkSuccess(sqlrcur_getField($cur,0,3),"01-JAN-01");
 	checkSuccess(sqlrcur_getField($cur,0,4),"testlong1");
+	checkSuccess(sqlrcur_getField($cur,0,5),"testclob1");
+	checkSuccess(sqlrcur_getField($cur,0,6),"");
 	echo("\n");
 	checkSuccess(sqlrcur_getField($cur,7,0),"8");
 	checkSuccess(sqlrcur_getField($cur,7,1),"testchar8                               ");
 	checkSuccess(sqlrcur_getField($cur,7,2),"testvarchar8");
 	checkSuccess(sqlrcur_getField($cur,7,3),"01-JAN-08");
 	checkSuccess(sqlrcur_getField($cur,7,4),"testlong8");
+	checkSuccess(sqlrcur_getField($cur,7,5),"testclob8");
+	checkSuccess(sqlrcur_getField($cur,7,6),"testblob8");
 	echo("\n");
 
 	echo("FIELD LENGTHS BY INDEX: \n");
@@ -250,12 +285,16 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,0,2),12);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,3),9);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,4),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,5),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,6),0);
 	echo("\n");
 	checkSuccess(sqlrcur_getFieldLength($cur,7,0),1);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,1),40);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,2),12);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,3),9);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,4),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,5),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,6),9);
 	echo("\n");
 
 	echo("FIELDS BY NAME: \n");
@@ -264,12 +303,16 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,"testvarchar"),"testvarchar1");
 	checkSuccess(sqlrcur_getField($cur,0,"testdate"),"01-JAN-01");
 	checkSuccess(sqlrcur_getField($cur,0,"testlong"),"testlong1");
+	checkSuccess(sqlrcur_getField($cur,0,"testclob"),"testclob1");
+	checkSuccess(sqlrcur_getField($cur,0,"testblob"),"");
 	echo("\n");
 	checkSuccess(sqlrcur_getField($cur,7,"testnumber"),"8");
 	checkSuccess(sqlrcur_getField($cur,7,"testchar"),"testchar8                               ");
 	checkSuccess(sqlrcur_getField($cur,7,"testvarchar"),"testvarchar8");
 	checkSuccess(sqlrcur_getField($cur,7,"testdate"),"01-JAN-08");
 	checkSuccess(sqlrcur_getField($cur,7,"testlong"),"testlong8");
+	checkSuccess(sqlrcur_getField($cur,7,"testclob"),"testclob8");
+	checkSuccess(sqlrcur_getField($cur,7,"testblob"),"testblob8");
 	echo("\n");
 
 	echo("FIELD LENGTHS BY NAME: \n");
@@ -278,12 +321,16 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"testvarchar"),12);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"testdate"),9);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"testlong"),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,"testclob"),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,"testblob"),0);
 	echo("\n");
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testnumber"),1);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testchar"),40);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testvarchar"),12);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testdate"),9);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"testlong"),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,"testclob"),9);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,"testblob"),9);
 	echo("\n");
 
 	echo("FIELDS BY ARRAY: \n");
@@ -293,6 +340,8 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields[2],"testvarchar1");
 	checkSuccess($fields[3],"01-JAN-01");
 	checkSuccess($fields[4],"testlong1");
+	checkSuccess($fields[5],"testclob1");
+	checkSuccess($fields[6],"");
 	echo("\n");
 
 	echo("FIELD LENGTHS BY ARRAY: \n");
@@ -302,6 +351,8 @@ function checkSuccess($value,$success) {
 	checkSuccess($fieldlens[2],12);
 	checkSuccess($fieldlens[3],9);
 	checkSuccess($fieldlens[4],9);
+	checkSuccess($fieldlens[5],9);
+	checkSuccess($fieldlens[6],0);
 	echo("\n");
 
 	echo("FIELDS BY ASSOCIATIVE ARRAY: \n");
@@ -311,6 +362,8 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields["TESTVARCHAR"],"testvarchar1");
 	checkSuccess($fields["TESTDATE"],"01-JAN-01");
 	checkSuccess($fields["TESTLONG"],"testlong1");
+	checkSuccess($fields["TESTCLOB"],"testclob1");
+	checkSuccess($fields["TESTBLOB"],"");
 	echo("\n");
 	$fields=sqlrcur_getRowAssoc($cur,7);
 	checkSuccess($fields["TESTNUMBER"],8);
@@ -318,6 +371,8 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields["TESTVARCHAR"],"testvarchar8");
 	checkSuccess($fields["TESTDATE"],"01-JAN-08");
 	checkSuccess($fields["TESTLONG"],"testlong8");
+	checkSuccess($fields["TESTCLOB"],"testclob8");
+	checkSuccess($fields["TESTBLOB"],"testblob8");
 	echo("\n");
 
 	echo("FIELD LENGTHS BY ASSOCIATIVE ARRAY: \n");
@@ -326,12 +381,18 @@ function checkSuccess($value,$success) {
 	checkSuccess($fieldlengths["TESTCHAR"],40);
 	checkSuccess($fieldlengths["TESTVARCHAR"],12);
 	checkSuccess($fieldlengths["TESTDATE"],9);
+	checkSuccess($fieldlengths["TESTLONG"],9);
+	checkSuccess($fieldlengths["TESTCLOB"],9);
+	checkSuccess($fieldlengths["TESTBLOB"],0);
 	echo("\n");
 	$fieldlengths=sqlrcur_getRowLengthsAssoc($cur,7);
 	checkSuccess($fieldlengths["TESTNUMBER"],1);
 	checkSuccess($fieldlengths["TESTCHAR"],40);
 	checkSuccess($fieldlengths["TESTVARCHAR"],12);
 	checkSuccess($fieldlengths["TESTDATE"],9);
+	checkSuccess($fieldlengths["TESTLONG"],9);
+	checkSuccess($fieldlengths["TESTCLOB"],9);
+	checkSuccess($fieldlengths["TESTBLOB"],9);
 	echo("\n");
 
 	echo("INDIVIDUAL SUBSTITUTIONS: \n");
@@ -516,7 +577,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("COLUMN COUNT FOR CACHED RESULT SET: \n");
-	checkSuccess(sqlrcur_colCount($cur),5);
+	checkSuccess(sqlrcur_colCount($cur),7);
 	echo("\n");
 
 	echo("COLUMN NAMES FOR CACHED RESULT SET: \n");
@@ -525,12 +586,16 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnName($cur,2),"TESTVARCHAR");
 	checkSuccess(sqlrcur_getColumnName($cur,3),"TESTDATE");
 	checkSuccess(sqlrcur_getColumnName($cur,4),"TESTLONG");
+	checkSuccess(sqlrcur_getColumnName($cur,5),"TESTCLOB");
+	checkSuccess(sqlrcur_getColumnName($cur,6),"TESTBLOB");
 	$cols=sqlrcur_getColumnNames($cur);
 	checkSuccess($cols[0],"TESTNUMBER");
 	checkSuccess($cols[1],"TESTCHAR");
 	checkSuccess($cols[2],"TESTVARCHAR");
 	checkSuccess($cols[3],"TESTDATE");
 	checkSuccess($cols[4],"TESTLONG");
+	checkSuccess($cols[5],"TESTCLOB");
+	checkSuccess($cols[6],"TESTBLOB");
 	echo("\n");
 
 	echo("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: \n");
@@ -614,11 +679,123 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
 	checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
 	checkSuccess(sqlrcon_autoCommitOn($con),1);
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10')"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10','testclob10',empty_blob())"),1);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
 	checkSuccess(sqlrcur_getField($secondcur,0,0),"9");
 	checkSuccess(sqlrcon_autoCommitOff($con),1);
 	echo("\n");
+
+
+	echo("CLOB AND BLOB OUTPUT BIND: \n");
+	sqlrcur_sendQuery($cur,"drop table testtable1");
+	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable1 (testclob clob, testblob blob)"),1);
+	sqlrcur_prepareQuery($cur,"insert into testtable1 values ('hello',:var1)");
+	sqlrcur_inputBindBlob($cur,"var1","hello",5);
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	sqlrcur_prepareQuery($cur,"begin select testclob into :clobvar from testtable1;  select testblob into :blobvar from testtable1; end;");
+	sqlrcur_defineOutputBindClob($cur,"clobvar");
+	sqlrcur_defineOutputBindBlob($cur,"blobvar");
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	$clobvar=sqlrcur_getOutputBind($cur,"clobvar");
+	$clobvarlength=sqlrcur_getOutputBindLength($cur,"clobvar");
+	$blobvar=sqlrcur_getOutputBind($cur,"blobvar");
+	$blobvarlength=sqlrcur_getOutputBindLength($cur,"blobvar");
+	checkSuccess($clobvar,"hello");
+	checkSuccess($clobvarlength,5);
+	checkSuccess($blobvar,"hello",5);
+	checkSuccess($blobvarlength,5);
+	sqlrcur_sendQuery($cur,"drop table testtable1");
+	echo("\n");
+
+	echo("NULL AND EMPTY CLOBS AND CLOBS: \n");
+	sqlrcur_getNullsAsUndefined($cur);
+	sqlrcur_sendQuery($cur,"create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)");
+	sqlrcur_prepareQuery($cur,"insert into testtable1 values (:var1,:var2,:var3,:var4)");
+	sqlrcur_inputBindClob($cur,"var1","",0);
+	sqlrcur_inputBindClob($cur,"var2",NULL,0);
+	sqlrcur_inputBindBlob($cur,"var3","",0);
+	sqlrcur_inputBindBlob($cur,"var4",NULL,0);
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	sqlrcur_sendQuery($cur,"select * from testtable1");
+	checkSuccess(sqlrcur_getField($cur,0,0),NULL);
+	checkSuccess(sqlrcur_getField($cur,0,1),NULL);
+	checkSuccess(sqlrcur_getField($cur,0,2),NULL);
+	checkSuccess(sqlrcur_getField($cur,0,3),NULL);
+	sqlrcur_sendQuery($cur,"drop table testtable1");
+	echo("\n");
+
+	echo("CURSOR BINDS: \n");
+	checkSuccess(sqlrcur_sendQuery($cur,"create or replace package types as type cursorType is ref cursor; end;"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"create or replace function sp_testtable return types.cursortype as l_cursor    types.cursorType; begin open l_cursor for select * from testtable; return l_cursor; end;"),1);
+	sqlrcur_prepareQuery($cur,"begin  :curs:=sp_testtable; end;");
+	sqlrcur_defineOutputBindCursor($cur,"curs");
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	$bindcur=sqlrcur_getOutputBindCursor($cur,"curs");
+	checkSuccess(sqlrcur_fetchFromBindCursor($bindcur),1);
+	checkSuccess(sqlrcur_getField($bindcur,0,0),"1");
+	checkSuccess(sqlrcur_getField($bindcur,1,0),"2");
+	checkSuccess(sqlrcur_getField($bindcur,2,0),"3");
+	checkSuccess(sqlrcur_getField($bindcur,3,0),"4");
+	checkSuccess(sqlrcur_getField($bindcur,4,0),"5");
+	checkSuccess(sqlrcur_getField($bindcur,5,0),"6");
+	checkSuccess(sqlrcur_getField($bindcur,6,0),"7");
+	checkSuccess(sqlrcur_getField($bindcur,7,0),"8");
+	sqlrcur_free($bindcur);
+	echo("\n");
+
+	echo("LONG CLOB: \n");
+	sqlrcur_sendQuery($cur,"drop table testtable2");
+	sqlrcur_sendQuery($cur,"create table testtable2 (testclob clob)");
+	sqlrcur_prepareQuery($cur,"insert into testtable2 values (:clobval)");
+	$clobval="";
+	for ($i=0; $i<8*1024; $i++) {
+		$clobval=$clobval.'C';
+	}
+	sqlrcur_inputBindClob($cur,"clobval",$clobval,8*1024);
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	sqlrcur_sendQuery($cur,"select testclob from testtable2");
+	checkSuccess($clobval,sqlrcur_getField($cur,0,"testclob"));
+	sqlrcur_prepareQuery($cur,"begin select testclob into :clobbindval from testtable2; end;");
+	sqlrcur_defineOutputBindClob($cur,"clobbindval");
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	$clobbindvar=sqlrcur_getOutputBind($cur,"clobbindval");
+	checkSuccess(sqlrcur_getOutputBindLength($cur,"clobbindval"),8*1024);
+	checkSuccess($clobval,$clobbindvar);
+	sqlrcur_sendQuery($cur,"drop table testtable2");
+	echo("\n");
+
+
+	echo("LONG OUTPUT BIND\n");
+	sqlrcur_sendQuery($cur,"drop table testtable2");
+	sqlrcur_sendQuery($cur,"create table testtable2 (testval varchar2(4000))");
+	sqlrcur_prepareQuery($cur,"insert into testtable2 values (:testval)");
+	$testval="";
+	for ($i=0; $i<4000; $i++) {
+		$testval=$testval."C";
+	}
+	sqlrcur_inputBind($cur,"testval",$testval);
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	sqlrcur_sendQuery($cur,"select testval from testtable2");
+	checkSuccess($testval,sqlrcur_getField($cur,0,"testval"));
+	$query="begin :bindval:='".$testval."'; end;";
+	sqlrcur_prepareQuery($cur,$query);
+	sqlrcur_defineOutputBind($cur,"bindval",4000);
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	checkSuccess(sqlrcur_getOutputBindLength($cur,"bindval"),4000);
+	checkSuccess(sqlrcur_getOutputBind($cur,"bindval"),$testval);
+	sqlrcur_sendQuery($cur,"drop table testtable2");
+	echo("\n");
+
+	echo("NEGATIVE INPUT BIND\n");
+	sqlrcur_sendQuery($cur,"create table testtable2 (testval number)");
+	sqlrcur_prepareQuery($cur,"insert into testtable2 values (:testval)");
+	sqlrcur_inputBind($cur,"testval",-1);
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	sqlrcur_sendQuery($cur,"select testval from testtable2");
+	checkSuccess(sqlrcur_getField($cur,0,"testval"),"-1");
+	sqlrcur_sendQuery($cur,"drop table testtable2");
+	echo("\n");
+
 
 	# drop existing table
 	sqlrcur_sendQuery($cur,"drop table testtable");

@@ -1,11 +1,11 @@
-gcc -I/usr/local/firstworks/include -g -o oracle8 oracle8.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o oracle7 oracle7.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o mysql mysql.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o msql msql.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o postgresql postgresql.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o sqlite sqlite.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o lago lago.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o freetds freetds.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o sybase sybase.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o interbase interbase.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o db2 db2.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+gcc -I/usr/local/firstworks/include -g -o oracle8 oracle8.c -L/usr/local/firstworks/lib -lsqlrclientwrapper_p -lsqlrclient_p -lrudiments_p -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o oracle7 oracle7.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o mysql mysql.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o msql msql.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o postgresql postgresql.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o sqlite sqlite.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o lago lago.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o freetds freetds.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o sybase sybase.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o interbase interbase.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o db2 db2.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence

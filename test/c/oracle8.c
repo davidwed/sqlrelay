@@ -9,6 +9,7 @@
 
 sqlrcon	con;
 sqlrcur	cur;
+sqlrcur	bindcur;
 sqlrcon	secondcon;
 sqlrcur	secondcur;
 
@@ -27,6 +28,30 @@ void checkSuccessString(char *value, char *success) {
 	}
 
 	if (!strcmp(value,success)) {
+		printf("success ");
+	} else {
+		printf("failure ");
+		sqlrcur_free(cur);
+		sqlrcon_free(con);
+		exit(0);
+	}
+}
+
+void checkSuccessStringWithLength(char *value, char *success, int length) {
+
+	if (!success) {
+		if (!value) {
+			printf("success ");
+			return;
+		} else {
+			printf("failure ");
+			sqlrcur_free(cur);
+			sqlrcon_free(con);
+			exit(0);
+		}
+	}
+
+	if (!strncmp(value,success,length)) {
 		printf("success ");
 	} else {
 		printf("failure ");
@@ -60,6 +85,11 @@ int	main(int argc, char **argv) {
 	unsigned short	precs[3]={4,5,6};
 	unsigned short	scales[3]={2,3,4};
 	char	*numvar;
+	char	*clobvar;
+	char	clobval[8*1024+1];
+	long	clobvarlength;
+	char	*blobvar;
+	long	blobvarlength;
 	char	*stringvar;
 	char	*floatvar;
 	char	**cols;
@@ -71,6 +101,10 @@ int	main(int argc, char **argv) {
 	char	*arraybindvars[6]={"var1","var2","var3","var4","var5",NULL};
 	char	*arraybindvals[5]={"7","testchar7","testvarchar7","01-JAN-2007","testlong7"};
 	long	*fieldlens;
+	char	testval[4001];
+	int	i;
+	char	query[4000+25];
+	char	*clobbindvar;
 
 
 	// usage...
@@ -99,11 +133,11 @@ int	main(int argc, char **argv) {
 	sqlrcur_sendQuery(cur,"drop table testtable");
 
 	printf("CREATE TEMPTABLE: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long, testclob clob, testblob blob)"),1);
 	printf("\n");
 
 	printf("INSERT: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())"),1);
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
@@ -111,12 +145,14 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
-	sqlrcur_prepareQuery(cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	sqlrcur_prepareQuery(cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)");
 	sqlrcur_inputBindLong(cur,"1",2);
 	sqlrcur_inputBindString(cur,"2","testchar2");
 	sqlrcur_inputBindString(cur,"3","testvarchar2");
 	sqlrcur_inputBindString(cur,"4","01-JAN-2002");
 	sqlrcur_inputBindString(cur,"5","testlong2");
+	sqlrcur_inputBindClob(cur,"6","testclob2",9);
+	sqlrcur_inputBindBlob(cur,"7","testblob2",9);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	sqlrcur_clearBinds(cur);
 	sqlrcur_inputBindLong(cur,"1",3);
@@ -124,22 +160,28 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindString(cur,"3","testvarchar3");
 	sqlrcur_inputBindString(cur,"4","01-JAN-2003");
 	sqlrcur_inputBindString(cur,"5","testlong3");
+	sqlrcur_inputBindClob(cur,"6","testclob3",9);
+	sqlrcur_inputBindBlob(cur,"7","testblob3",9);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");
 
 	printf("ARRAY OF BINDS BY POSITION: \n");
 	sqlrcur_clearBinds(cur);
 	sqlrcur_inputBindStrings(cur,bindvars,bindvals);
+	sqlrcur_inputBindClob(cur,"6","testclob4",9);
+	sqlrcur_inputBindBlob(cur,"7","testblob4",9);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");
 
 	printf("BIND BY NAME: \n");
-	sqlrcur_prepareQuery(cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	sqlrcur_prepareQuery(cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)");
 	sqlrcur_inputBindLong(cur,"var1",5);
 	sqlrcur_inputBindString(cur,"var2","testchar5");
 	sqlrcur_inputBindString(cur,"var3","testvarchar5");
 	sqlrcur_inputBindString(cur,"var4","01-JAN-2005");
 	sqlrcur_inputBindString(cur,"var5","testlong5");
+	sqlrcur_inputBindClob(cur,"var6","testclob5",9);
+	sqlrcur_inputBindBlob(cur,"var7","testblob5",9);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	sqlrcur_clearBinds(cur);
 	sqlrcur_inputBindLong(cur,"var1",6);
@@ -147,12 +189,16 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindString(cur,"var3","testvarchar6");
 	sqlrcur_inputBindString(cur,"var4","01-JAN-2006");
 	sqlrcur_inputBindString(cur,"var5","testlong6");
+	sqlrcur_inputBindClob(cur,"var6","testclob6",9);
+	sqlrcur_inputBindBlob(cur,"var7","testblob6",9);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");
 
 	printf("ARRAY OF BINDS BY NAME: \n");
 	sqlrcur_clearBinds(cur);
 	sqlrcur_inputBindStrings(cur,arraybindvars,arraybindvals);
+	sqlrcur_inputBindClob(cur,"var6","testclob7",9);
+	sqlrcur_inputBindBlob(cur,"var7","testblob7",9);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");
 
@@ -163,7 +209,9 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindString(cur,"var3","testvarchar8");
 	sqlrcur_inputBindString(cur,"var4","01-JAN-2008");
 	sqlrcur_inputBindString(cur,"var5","testlong8");
-	sqlrcur_inputBindString(cur,"var6","junkvalue");
+	sqlrcur_inputBindClob(cur,"var6","testclob8",9);
+	sqlrcur_inputBindBlob(cur,"var7","testblob8",9);
+	sqlrcur_inputBindString(cur,"var9","junkvalue");
 	sqlrcur_validateBinds(cur);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");
@@ -217,7 +265,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT: \n");
-	checkSuccessInt(sqlrcur_colCount(cur),5);
+	checkSuccessInt(sqlrcur_colCount(cur),7);
 	printf("\n");
 
 	printf("COLUMN NAMES: \n");
@@ -226,12 +274,16 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnName(cur,2),"TESTVARCHAR");
 	checkSuccessString(sqlrcur_getColumnName(cur,3),"TESTDATE");
 	checkSuccessString(sqlrcur_getColumnName(cur,4),"TESTLONG");
+	checkSuccessString(sqlrcur_getColumnName(cur,5),"TESTCLOB");
+	checkSuccessString(sqlrcur_getColumnName(cur,6),"TESTBLOB");
 	cols=sqlrcur_getColumnNames(cur);
 	checkSuccessString(cols[0],"TESTNUMBER");
 	checkSuccessString(cols[1],"TESTCHAR");
 	checkSuccessString(cols[2],"TESTVARCHAR");
 	checkSuccessString(cols[3],"TESTDATE");
 	checkSuccessString(cols[4],"TESTLONG");
+	checkSuccessString(cols[5],"TESTCLOB");
+	checkSuccessString(cols[6],"TESTBLOB");
 	printf("\n");
 
 	printf("COLUMN TYPES: \n");
@@ -245,6 +297,10 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testdate"),"DATE");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,4),"LONG");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testlong"),"LONG");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,5),"CLOB");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testclob"),"CLOB");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,6),"BLOB");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testblob"),"BLOB");
 	printf("\n");
 
 	printf("COLUMN LENGTH: \n");
@@ -258,6 +314,10 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdate"),7);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,4),0);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testlong"),0);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,5),0);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testclob"),0);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,6),0);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testblob"),0);
 	printf("\n");
 
 	printf("LONGEST COLUMN: \n");
@@ -271,6 +331,10 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testdate"),9);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,4),9);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testlong"),9);
+	checkSuccessInt(sqlrcur_getLongestByIndex(cur,5),9);
+	checkSuccessInt(sqlrcur_getLongestByName(cur,"testclob"),9);
+	checkSuccessInt(sqlrcur_getLongestByIndex(cur,6),9);
+	checkSuccessInt(sqlrcur_getLongestByName(cur,"testblob"),9);
 	printf("\n");
 
 	printf("ROW COUNT: \n");
@@ -295,12 +359,16 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"testvarchar1");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,3),"01-JAN-01");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,4),"testlong1");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,5),"testclob1");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,6),"");
 	printf("\n");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,0),"8");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,1),"testchar8                               ");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,2),"testvarchar8");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,3),"01-JAN-08");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,4),"testlong8");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,5),"testclob8");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,6),"testblob8");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY INDEX: \n");
@@ -309,12 +377,16 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,2),12);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,3),9);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,4),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,5),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,6),0);
 	printf("\n");
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,0),1);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,1),40);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,2),12);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,3),9);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,4),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,5),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,6),9);
 	printf("\n");
 
 	printf("FIELDS BY NAME: \n");
@@ -323,12 +395,16 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testvarchar"),"testvarchar1");
 	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testdate"),"01-JAN-01");
 	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testlong"),"testlong1");
+	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testclob"),"testclob1");
+	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testblob"),"");
 	printf("\n");
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testnumber"),"8");
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testchar"),"testchar8                               ");
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testvarchar"),"testvarchar8");
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testdate"),"01-JAN-08");
 	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testlong"),"testlong8");
+	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testclob"),"testclob8");
+	checkSuccessString(sqlrcur_getFieldByName(cur,7,"testblob"),"testblob8");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY NAME: \n");
@@ -337,12 +413,16 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testvarchar"),12);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testdate"),9);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testlong"),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testclob"),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testblob"),0);
 	printf("\n");
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testnumber"),1);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testchar"),40);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testvarchar"),12);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testdate"),9);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testlong"),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testclob"),9);
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testblob"),9);
 	printf("\n");
 
 	printf("FIELDS BY ARRAY: \n");
@@ -352,6 +432,8 @@ int	main(int argc, char **argv) {
 	checkSuccessString(fields[2],"testvarchar1");
 	checkSuccessString(fields[3],"01-JAN-01");
 	checkSuccessString(fields[4],"testlong1");
+	checkSuccessString(fields[5],"testclob1");
+	checkSuccessString(fields[6],"");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY ARRAY: \n");
@@ -361,6 +443,8 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(fieldlens[2],12);
 	checkSuccessInt(fieldlens[3],9);
 	checkSuccessInt(fieldlens[4],9);
+	checkSuccessInt(fieldlens[5],9);
+	checkSuccessInt(fieldlens[6],0);
 	printf("\n");
 
 	printf("INDIVIDUAL SUBSTITUTIONS: \n");
@@ -566,7 +650,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT FOR CACHED RESULT SET: \n");
-	checkSuccessInt(sqlrcur_colCount(cur),5);
+	checkSuccessInt(sqlrcur_colCount(cur),7);
 	printf("\n");
 
 	printf("COLUMN NAMES FOR CACHED RESULT SET: \n");
@@ -575,12 +659,16 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnName(cur,2),"TESTVARCHAR");
 	checkSuccessString(sqlrcur_getColumnName(cur,3),"TESTDATE");
 	checkSuccessString(sqlrcur_getColumnName(cur,4),"TESTLONG");
+	checkSuccessString(sqlrcur_getColumnName(cur,5),"TESTCLOB");
+	checkSuccessString(sqlrcur_getColumnName(cur,6),"TESTBLOB");
 	cols=sqlrcur_getColumnNames(cur);
 	checkSuccessString(cols[0],"TESTNUMBER");
 	checkSuccessString(cols[1],"TESTCHAR");
 	checkSuccessString(cols[2],"TESTVARCHAR");
 	checkSuccessString(cols[3],"TESTDATE");
 	checkSuccessString(cols[4],"TESTLONG");
+	checkSuccessString(cols[5],"TESTCLOB");
+	checkSuccessString(cols[6],"TESTBLOB");
 	printf("\n");
 
 	printf("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: \n");
@@ -624,7 +712,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_setCacheTtl(cur,200);
 	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testnumber"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,2,0),"3");
-	filename=sqlrcur_getCacheFileName(cur);
+	filename=strdup(sqlrcur_getCacheFileName(cur));
 	checkSuccessString(filename,"cachefile1");
 	id=sqlrcur_getResultSetId(cur);
 	sqlrcur_suspendResultSet(cur);
@@ -668,10 +756,120 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"8");
 	checkSuccessInt(sqlrcon_autoCommitOn(con),1);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10')"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10','testclob10',NULL)"),1);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"9");
 	checkSuccessInt(sqlrcon_autoCommitOff(con),1);
+	printf("\n");
+
+	printf("CLOB AND BLOB OUTPUT BIND: \n");
+	sqlrcur_sendQuery(cur,"drop table testtable1");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable1 (testclob clob, testblob blob)"),1);
+	sqlrcur_prepareQuery(cur,"insert into testtable1 values ('hello',:var1)");
+	sqlrcur_inputBindBlob(cur,"var1","hello",5);
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	sqlrcur_prepareQuery(cur,"begin select testclob into :clobvar from testtable1;  select testblob into :blobvar from testtable1; end;");
+	sqlrcur_defineOutputBindClob(cur,"clobvar");
+	sqlrcur_defineOutputBindBlob(cur,"blobvar");
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	clobvar=sqlrcur_getOutputBind(cur,"clobvar");
+	clobvarlength=sqlrcur_getOutputBindLength(cur,"clobvar");
+	blobvar=sqlrcur_getOutputBind(cur,"blobvar");
+	blobvarlength=sqlrcur_getOutputBindLength(cur,"blobvar");
+	checkSuccessStringWithLength(clobvar,"hello",5);
+	checkSuccessInt(clobvarlength,5);
+	checkSuccessStringWithLength(blobvar,"hello",5);
+	checkSuccessInt(blobvarlength,5);
+	sqlrcur_sendQuery(cur,"drop table testtable1");
+	printf("\n");
+
+	printf("NULL AND EMPTY CLOBS AND CLOBS: \n");
+	sqlrcur_getNullsAsNulls(cur);
+	sqlrcur_sendQuery(cur,"create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)");
+	sqlrcur_prepareQuery(cur,"insert into testtable1 values (:var1,:var2,:var3,:var4)");
+	sqlrcur_inputBindClob(cur,"var1","",0);
+	sqlrcur_inputBindClob(cur,"var2",NULL,0);
+	sqlrcur_inputBindBlob(cur,"var3","",0);
+	sqlrcur_inputBindBlob(cur,"var4",NULL,0);
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	sqlrcur_sendQuery(cur,"select * from testtable1");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,3),NULL);
+	sqlrcur_sendQuery(cur,"drop table testtable1");
+	printf("\n");
+
+	printf("CURSOR BINDS: \n");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create or replace package types as type cursorType is ref cursor; end;"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create or replace function sp_testtable return types.cursortype as l_cursor    types.cursorType; begin open l_cursor for select * from testtable; return l_cursor; end;"),1);
+	sqlrcur_prepareQuery(cur,"begin  :curs:=sp_testtable; end;");
+	sqlrcur_defineOutputBindCursor(cur,"curs");
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	bindcur=sqlrcur_getOutputBindCursor(cur,"curs");
+	checkSuccessInt(sqlrcur_fetchFromBindCursor(bindcur),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(bindcur,0,0),"1");
+	checkSuccessString(sqlrcur_getFieldByIndex(bindcur,1,0),"2");
+	checkSuccessString(sqlrcur_getFieldByIndex(bindcur,2,0),"3");
+	checkSuccessString(sqlrcur_getFieldByIndex(bindcur,3,0),"4");
+	checkSuccessString(sqlrcur_getFieldByIndex(bindcur,4,0),"5");
+	checkSuccessString(sqlrcur_getFieldByIndex(bindcur,5,0),"6");
+	checkSuccessString(sqlrcur_getFieldByIndex(bindcur,6,0),"7");
+	checkSuccessString(sqlrcur_getFieldByIndex(bindcur,7,0),"8");
+	sqlrcur_free(bindcur);
+	printf("\n");
+
+	printf("LONG CLOB: \n");
+	sqlrcur_sendQuery(cur,"drop table testtable2");
+	sqlrcur_sendQuery(cur,"create table testtable2 (testclob clob)");
+	sqlrcur_prepareQuery(cur,"insert into testtable2 values (:clobval)");
+	for (i=0; i<8*1024; i++) {
+		clobval[i]='C';
+	}
+	clobval[8*1024]=(char)NULL;
+	sqlrcur_inputBindClob(cur,"clobval",clobval,8*1024);
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	sqlrcur_sendQuery(cur,"select testclob from testtable2");
+	checkSuccessString(clobval,sqlrcur_getFieldByName(cur,0,"testclob"));
+	sqlrcur_prepareQuery(cur,"begin select testclob into :clobbindval from testtable2; end;");
+	sqlrcur_defineOutputBindClob(cur,"clobbindval");
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	clobbindvar=sqlrcur_getOutputBind(cur,"clobbindval");
+	checkSuccessInt(sqlrcur_getOutputBindLength(cur,"clobbindval"),8*1024);
+	checkSuccessString(clobval,clobbindvar);
+	sqlrcur_sendQuery(cur,"drop table testtable2");
+	printf("\n");
+
+
+	printf("LONG OUTPUT BIND\n");
+	sqlrcur_sendQuery(cur,"drop table testtable2");
+	sqlrcur_sendQuery(cur,"create table testtable2 (testval varchar2(4000))");
+	testval[4000]=(char)NULL;
+	sqlrcur_prepareQuery(cur,"insert into testtable2 values (:testval)");
+	for (i=0; i<4000; i++) {
+		testval[i]='C';
+	}
+	sqlrcur_inputBindString(cur,"testval",testval);
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	sqlrcur_sendQuery(cur,"select testval from testtable2");
+	checkSuccessString(testval,sqlrcur_getFieldByName(cur,0,"testval"));
+	sprintf(query,"begin :bindval:='%s'; end;",testval);
+	sqlrcur_prepareQuery(cur,query);
+	sqlrcur_defineOutputBind(cur,"bindval",4000);
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	checkSuccessInt(sqlrcur_getOutputBindLength(cur,"bindval"),4000);
+	checkSuccessString(sqlrcur_getOutputBind(cur,"bindval"),testval);
+	sqlrcur_sendQuery(cur,"drop table testtable2");
+	printf("\n");
+
+	printf("NEGATIVE INPUT BIND\n");
+	sqlrcur_sendQuery(cur,"create table testtable2 (testval number)");
+	sqlrcur_prepareQuery(cur,"insert into testtable2 values (:testval)");
+	sqlrcur_inputBindLong(cur,"testval",-1);
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	sqlrcur_sendQuery(cur,"select testval from testtable2");
+	checkSuccessString(sqlrcur_getFieldByName(cur,0,"testval"),"-1");
+	sqlrcur_sendQuery(cur,"drop table testtable2");
 	printf("\n");
 
 	// drop existing table
