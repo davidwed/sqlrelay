@@ -15,13 +15,13 @@
 #include <rudiments/memorypool.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/sharedmemory.h>
+#include <rudiments/semaphoreset.h>
 #include <authenticator.h>
 
 #include <debugfile.h>
 #include <tempdir.h>
 
-#include <connection/ipc.h>
-#include <connection/unixsocketseqfile.h>
 #include <sqlrcursor.h>
 
 #include <cmdline.h>
