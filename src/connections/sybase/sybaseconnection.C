@@ -276,19 +276,6 @@ void	sybaseconnection::logOut() {
 	dsqueryenv=NULL;
 }
 
-int	sybaseconnection::ping() {
-	sybasecursor	cur(this);
-	if (cur.openCursor(-1) && 
-		cur.prepareQuery("select 1",8) && 
-		cur.executeQuery("select 1",8,1)) {
-		cur.cleanUpData();
-		cur.closeCursor();
-		return 1;
-	}
-	cur.closeCursor();
-	return 0;
-}
-
 char	*sybaseconnection::identify() {
 	return "sybase";
 }

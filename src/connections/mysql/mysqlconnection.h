@@ -51,7 +51,9 @@ class mysqlconnection : public sqlrconnection {
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
 		int	isTransactional();
+#if MYSQL_VERSION_ID>=32200
 		int	ping();
+#endif
 		char	*identify();
 		unsigned short	autoCommitOn();
 		unsigned short	autoCommitOff();

@@ -153,17 +153,8 @@ int	oracle7connection::rollback() {
 	return !orol(&lda);
 }
 
-int	oracle7connection::ping() {
-	oracle7cursor	cur(this);
-	if (cur.openCursor(-1) && 
-		cur.prepareQuery("select 1 from dual",18) && 
-		cur.executeQuery("select 1 from dual",18,1)) {
-		cur.cleanUpData();
-		cur.closeCursor();
-		return 1;
-	}
-	cur.closeCursor();
-	return 0;
+char	*oracle7connection::pingQuery() {
+	return "select 1 from dual";
 }
 
 char	*oracle7connection::identify() {

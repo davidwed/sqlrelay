@@ -101,7 +101,6 @@ class sybaseconnection : public sqlrconnection {
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		int	ping();
 		char	*identify();
 		char	bindVariablePrefix();
 

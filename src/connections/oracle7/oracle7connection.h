@@ -140,7 +140,7 @@ class oracle7connection : public sqlrconnection {
 		unsigned short	autoCommitOff();
 		int	commit();
 		int	rollback();
-		int	ping();
+		char	*pingQuery();
 		char	*identify();
 
 		Lda_Def		lda;

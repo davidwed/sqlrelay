@@ -7,6 +7,9 @@
 #include <sqlrconnection.h>
 
 #include <rudiments/permissions.h>
+#ifdef SERVER_DEBUG
+	#include <rudiments/logger.h>
+#endif
 
 #include <iomanip.h>
 
@@ -158,7 +161,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 	#ifndef SERVER_DEBUG
 		if (detachbeforeloggingin) {
 			// detach from the controlling tty
-			//detach();
+			detach();
 		}
 	#endif
 
@@ -171,7 +174,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 	#ifndef SERVER_DEBUG
 		if (!detachbeforeloggingin) {
 			// detach from the controlling tty
-			//detach();
+			detach();
 		}
 	#endif
 
@@ -2909,8 +2912,25 @@ int	sqlrconnection::rollback() {
 	return retval;
 }
 
+char	*sqlrconnection::pingQuery() {
+	return "select 1";
+}
+
 int	sqlrconnection::ping() {
-	return 1;
+	sqlrcursor	*pingcur=initCursor();
+	char	*pingquery=pingQuery();
+	int	pingquerylen=strlen(pingQuery());
+	if (pingcur->openCursor(-1) &&
+		pingcur->prepareQuery(pingquery,pingquerylen) &&
+		pingcur->executeQuery(pingquery,pingquerylen,1)) {
+		pingcur->cleanUpData();
+		pingcur->closeCursor();
+		delete pingcur;
+		return 1;
+	}
+	pingcur->closeCursor();
+	delete pingcur;
+	return 0;
 }
 
 void	sqlrconnection::setUser(const char *user) {

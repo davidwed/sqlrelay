@@ -181,7 +181,7 @@ class oracle8connection : public sqlrconnection {
 		unsigned short	autoCommitOff();
 		int	commit();
 		int	rollback();
-		int	ping();
+		char	*pingQuery();
 		char	*identify();
 
 		ub4		statementmode;

@@ -271,19 +271,6 @@ void	freetdsconnection::logOut() {
 	dsqueryenv=NULL;
 }
 
-int	freetdsconnection::ping() {
-	freetdscursor	cur(this);
-	if (cur.openCursor(-1) && 
-		cur.prepareQuery("select 1",8) && 
-		cur.executeQuery("select 1",8,1)) {
-		cur.cleanUpData();
-		cur.closeCursor();
-		return 1;
-	}
-	cur.closeCursor();
-	return 0;
-}
-
 char	*freetdsconnection::identify() {
 	return "freetds";
 }

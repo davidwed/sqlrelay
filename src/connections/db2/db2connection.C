@@ -105,17 +105,8 @@ int	db2connection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
-int	db2connection::ping() {
-	db2cursor	cur(this);
-	if (cur.openCursor(-1) && 
-		cur.prepareQuery("values 1",8) && 
-		cur.executeQuery("values 1",8,1)) {
-		cur.cleanUpData();
-		cur.closeCursor();
-		return 1;
-	}
-	cur.closeCursor();
-	return 0;
+char	*db2connection::pingQuery() {
+	return "values 1";
 }
 
 char	*db2connection::identify() {

@@ -1,133 +1,146 @@
-/* config.h.in.  Generated automatically from configure.in by autoheader.  */
-
-/* Define to `int' if <sys/types.h> doesn't define.  */
-#undef mode_t
-
-/* Define as the return type of signal handlers (int or void).  */
-#undef RETSIGTYPE
-
-/* Define if you have the ANSI C header files.  */
-#undef STDC_HEADERS
-
-/* Define if you have the mkfifo function.  */
-#undef HAVE_MKFIFO
-
-/* Define if you have the mknod function.  */
-#undef HAVE_MKNOD
-
-/* Define if you have the putenv function.  */
-#undef HAVE_PUTENV
-
-/* Define if you have the setenv function.  */
-#undef HAVE_SETENV
-
-/* Define if you have the <dirent.h> header file.  */
-#undef HAVE_DIRENT_H
-
-/* Define if you have the <dlfcn.h> header file.  */
-#undef HAVE_DLFCN_H
-
-/* Define if you have the <ndir.h> header file.  */
-#undef HAVE_NDIR_H
-
-/* Define if you have the <strings.h> header file.  */
-#undef HAVE_STRINGS_H
-
-/* Define if you have the <sys/dir.h> header file.  */
-#undef HAVE_SYS_DIR_H
-
-/* Define if you have the <sys/ndir.h> header file.  */
-#undef HAVE_SYS_NDIR_H
-
-/* Define if you have the <unistd.h> header file.  */
-#undef HAVE_UNISTD_H
-
-/* Define if you have the z library (-lz).  */
-#undef HAVE_LIBZ
+/* config.h.in.  Generated from configure.in by autoheader.  */
 
 /* Use dmalloc */
 #undef DMALLOC
 
-/* Some compliers don't support the inline keyword */
-#undef INLINE
+/* Second decimal of the version of gtk */
+#undef GTK_VERSION
 
-/* Do we have readline */
-#undef HAVE_READLINE
+/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_DIRENT_H
 
-/* oci.h */
-#undef HAVE_OCI_H
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
 
-/* Some versions of sqlite are transactional */
-#undef SQLITE_TRANSACTIONAL
-
-/* UnixODBC */
-#undef HAVE_UNIXODBC
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
 
 /* iODBC */
 #undef HAVE_IODBC
 
-/* Second decimal of the version of gtk */
-#undef GTK_VERSION
+/* Define to 1 if you have the `z' library (-lz). */
+#undef HAVE_LIBZ
 
-/* Do we have SIGHUP */
-#undef HAVE_SIGHUP
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
 
-/* Do we have SIGINT */
-#undef HAVE_SIGINT
+/* Define to 1 if you have the `mkfifo' function. */
+#undef HAVE_MKFIFO
 
-/* Do we have SIGQUIT */
-#undef HAVE_SIGQUIT
+/* Define to 1 if you have the `mknod' function. */
+#undef HAVE_MKNOD
 
-/* Do we have SIGILL */
-#undef HAVE_SIGILL
+/* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
+#undef HAVE_NDIR_H
 
-/* Do we have SIGTRAP */
-#undef HAVE_SIGTRAP
+/* oci.h */
+#undef HAVE_OCI_H
+
+/* Define to 1 if you have the `putenv' function. */
+#undef HAVE_PUTENV
+
+/* Do we have readline */
+#undef HAVE_READLINE
+
+/* Define to 1 if you have the `setenv' function. */
+#undef HAVE_SETENV
 
 /* Do we have SIGABRT */
 #undef HAVE_SIGABRT
 
-/* Do we have SIGIOT */
-#undef HAVE_SIGIOT
+/* Do we have SIGALRM */
+#undef HAVE_SIGALRM
 
 /* Do we have SIGBUS */
 #undef HAVE_SIGBUS
 
-/* Do we have SIGFPE */
-#undef HAVE_SIGFPE
-
-/* Do we have SIGKILL */
-#undef HAVE_SIGKILL
-
-/* Do we have SIGUSR1 */
-#undef HAVE_SIGUSR1
-
-/* Do we have SIGSEGV */
-#undef HAVE_SIGSEGV
-
-/* Do we have SIGUSR2 */
-#undef HAVE_SIGUSR2
-
-/* Do we have SIGPIPE */
-#undef HAVE_SIGPIPE
-
-/* Do we have SIGALRM */
-#undef HAVE_SIGALRM
-
-/* Do we have SIGTERM */
-#undef HAVE_SIGTERM
-
-/* Do we have SIGSTKFLT */
-#undef HAVE_SIGSTKFLT
+/* Do we have SIGCANCEL */
+#undef HAVE_SIGCANCEL
 
 /* Do we have SIGCHLD */
 #undef HAVE_SIGCHLD
 
+/* Do we have SIGCLD */
+#undef HAVE_SIGCLD
+
 /* Do we have SIGCONT */
 #undef HAVE_SIGCONT
 
+/* Do we have SIGEMT */
+#undef HAVE_SIGEMT
+
+/* Do we have SIGFPE */
+#undef HAVE_SIGFPE
+
+/* Do we have SIGFREEZE */
+#undef HAVE_SIGFREEZE
+
+/* Do we have SIGHUP */
+#undef HAVE_SIGHUP
+
+/* Do we have SIGILL */
+#undef HAVE_SIGILL
+
+/* Do we have SIGINT */
+#undef HAVE_SIGINT
+
+/* Do we have SIGIO */
+#undef HAVE_SIGIO
+
+/* Do we have SIGIOT */
+#undef HAVE_SIGIOT
+
+/* Do we have SIGKILL */
+#undef HAVE_SIGKILL
+
+/* Do we have SIGLOST */
+#undef HAVE_SIGLOST
+
+/* Do we have SIGLWP */
+#undef HAVE_SIGLWP
+
+/* Do we have SIGPIPE */
+#undef HAVE_SIGPIPE
+
+/* Do we have SIGPOLL */
+#undef HAVE_SIGPOLL
+
+/* Do we have SIGPROF */
+#undef HAVE_SIGPROF
+
+/* Do we have SIGPWR */
+#undef HAVE_SIGPWR
+
+/* Do we have SIGQUIT */
+#undef HAVE_SIGQUIT
+
+/* Do we have SIGRTMAX */
+#undef HAVE_SIGRTMAX
+
+/* Do we have SIGRTMIN */
+#undef HAVE_SIGRTMIN
+
+/* Do we have SIGSEGV */
+#undef HAVE_SIGSEGV
+
+/* Do we have SIGSTKFLT */
+#undef HAVE_SIGSTKFLT
+
 /* Do we have SIGSTOP */
 #undef HAVE_SIGSTOP
+
+/* Do we have SIGSYS */
+#undef HAVE_SIGSYS
+
+/* Do we have SIGTERM */
+#undef HAVE_SIGTERM
+
+/* Do we have SIGTHAW */
+#undef HAVE_SIGTHAW
+
+/* Do we have SIGTRAP */
+#undef HAVE_SIGTRAP
 
 /* Do we have SIGTSTP */
 #undef HAVE_SIGTSTP
@@ -138,8 +151,26 @@
 /* Do we have SIGTTOU */
 #undef HAVE_SIGTTOU
 
+/* Do we have SIGUNUSED */
+#undef HAVE_SIGUNUSED
+
 /* Do we have SIGURG */
 #undef HAVE_SIGURG
+
+/* Do we have SIGUSR1 */
+#undef HAVE_SIGUSR1
+
+/* Do we have SIGUSR2 */
+#undef HAVE_SIGUSR2
+
+/* Do we have SIGVTALRM */
+#undef HAVE_SIGVTALRM
+
+/* Do we have SIGWAITING */
+#undef HAVE_SIGWAITING
+
+/* Do we have SIGWINCH */
+#undef HAVE_SIGWINCH
 
 /* Do we have SIGXCPU */
 #undef HAVE_SIGXCPU
@@ -147,66 +178,73 @@
 /* Do we have SIGXFSZ */
 #undef HAVE_SIGXFSZ
 
-/* Do we have SIGVTALRM */
-#undef HAVE_SIGVTALRM
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
 
-/* Do we have SIGPROF */
-#undef HAVE_SIGPROF
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
 
-/* Do we have SIGWINCH */
-#undef HAVE_SIGWINCH
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
 
-/* Do we have SIGIO */
-#undef HAVE_SIGIO
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
 
-/* Do we have SIGPOLL */
-#undef HAVE_SIGPOLL
+/* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_SYS_DIR_H
 
-/* Do we have SIGPWR */
-#undef HAVE_SIGPWR
+/* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_SYS_NDIR_H
 
-/* Do we have SIGUNUSED */
-#undef HAVE_SIGUNUSED
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
 
-/* Do we have SIGEMT */
-#undef HAVE_SIGEMT
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
 
-/* Do we have SIGSYS */
-#undef HAVE_SIGSYS
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
 
-/* Do we have SIGCLD */
-#undef HAVE_SIGCLD
-
-/* Do we have SIGWAITING */
-#undef HAVE_SIGWAITING
-
-/* Do we have SIGLWP */
-#undef HAVE_SIGLWP
-
-/* Do we have SIGFREEZE */
-#undef HAVE_SIGFREEZE
-
-/* Do we have SIGTHAW */
-#undef HAVE_SIGTHAW
-
-/* Do we have SIGCANCEL */
-#undef HAVE_SIGCANCEL
-
-/* Do we have SIGLOST */
-#undef HAVE_SIGLOST
-
-/* Do we have _SIGRTMIN */
-#undef HAVE__SIGRTMIN
+/* UnixODBC */
+#undef HAVE_UNIXODBC
 
 /* Do we have _SIGRTMAX */
 #undef HAVE__SIGRTMAX
 
-/* Do we have SIGRTMIN */
-#undef HAVE_SIGRTMIN
+/* Do we have _SIGRTMIN */
+#undef HAVE__SIGRTMIN
 
-/* Do we have SIGRTMAX */
-#undef HAVE_SIGRTMAX
+/* Some compliers don't support the inline keyword */
+#undef INLINE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define as the return type of signal handlers (`int' or `void'). */
+#undef RETSIGTYPE
+
+/* Some versions of sqlite are transactional */
+#undef SQLITE_TRANSACTIONAL
 
 /* Version */
 #undef SQLR_VERSION
 
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to `int' if <sys/types.h> does not define. */
+#undef mode_t

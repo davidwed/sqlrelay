@@ -10,10 +10,10 @@
 #
 #   MakeMaker Parameters:
 
-#	CC => q[c++]
+#	CC => q[g++]
 #	CCFLAGS => q[-pedantic]
 #	INC => q[-I../../../.. -I../../../common -I../../c++/include -I/usr/local/firstworks/include]
-#	LD => q[c++]
+#	LD => q[g++]
 #	LIBS => [q[-L../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments]]
 #	NAME => q[Firstworks::SQLRConnection]
 #	TYPEMAPS => [q[perlobject.map]]
@@ -31,12 +31,12 @@
 
 # They may have been overridden via Makefile.PL or on the command line
 AR = ar
-CC = c++
+CC = g++
 CCCDLFLAGS = -fPIC
 CCDLFLAGS = -rdynamic
 DLEXT = so
 DLSRC = dl_dlopen.xs
-LD = c++
+LD = g++
 LDDLFLAGS = -shared -L/usr/local/lib
 LDFLAGS =  -L/usr/local/lib
 LIBC = /lib/libc-2.2.5.so
@@ -197,7 +197,7 @@ XSUBPPARGS = -C++ -typemap $(XSUBPPDIR)/typemap -typemap perlobject.map -typemap
 SHELL = /bin/sh
 CHMOD = chmod
 CP = cp
-LD = c++
+LD = g++
 MV = mv
 NOOP = $(SHELL) -c true
 RM_F = rm -f
@@ -861,7 +861,7 @@ pm_to_blib: $(TO_INST_PM)
 #	BOOTDEP => q[]
 #	BSLOADLIBS => q[]
 #	C => [q[SQLRConnection.c]]
-#	CC => q[c++]
+#	CC => q[g++]
 #	CCCDLFLAGS => q[-fPIC]
 #	CCDLFLAGS => q[-rdynamic]
 #	CCFLAGS => q[-pedantic]
@@ -924,7 +924,7 @@ pm_to_blib: $(TO_INST_PM)
 #	INST_MAN1DIR => q[blib/man1]
 #	INST_MAN3DIR => q[blib/man3]
 #	INST_SCRIPT => q[blib/script]
-#	LD => q[c++]
+#	LD => q[g++]
 #	LDDLFLAGS => q[-shared -L/usr/local/lib]
 #	LDFLAGS => q[ -L/usr/local/lib]
 #	LDFROM => q[$(OBJECT)]

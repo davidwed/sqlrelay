@@ -4,7 +4,7 @@ top_srcdir = ../../..
 INSTALL = $(top_srcdir)/install-sh -c
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I../c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L../c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) $(PYTHONLIBS) $(PYTHONOBJ) $(LIBSTDCPP) $(SSLLIB) $(CRYPTOLIB) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = -L../c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) $(PYTHONLIBS) $(PYTHONOBJ) $(SSLLIB) $(CRYPTOLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = CSQLRelay.C
 OBJS = CSQLRelay.o

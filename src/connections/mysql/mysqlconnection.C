@@ -113,25 +113,14 @@ void	mysqlconnection::logOut() {
 	mysql_close(&mysql);
 }
 
-int	mysqlconnection::ping() {
 #if MYSQL_VERSION_ID>=32200
+int	mysqlconnection::ping() {
 	if (!mysql_ping(&mysql)) {
 		return 1;
 	}
 	return 0;
-#else
-	mysqlcursor	cur(this);
-	if (cur.openCursor(-1) && 
-		cur.prepareQuery("select 1",8) && 
-		cur.executeQuery("select 1",8,1)) 
-		cur.cleanUpData();
-		cur.closeCursor();
-		return 1;
-	}
-	cur.closeCursor();
-	return 0;
-#endif
 }
+#endif
 
 char	*mysqlconnection::identify() {
 	return "mysql";

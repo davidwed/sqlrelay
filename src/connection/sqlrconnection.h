@@ -16,10 +16,6 @@
 #include <rudiments/stringbuffer.h>
 #include <authenticator.h>
 
-#ifdef SERVER_DEBUG
-	#include <rudiments/logger.h>
-#endif
-
 #include <debugfile.h>
 #include <tempdir.h>
 
@@ -57,6 +53,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual unsigned short	autoCommitOff();
 		virtual int	commit();
 		virtual int	rollback();
+		virtual char	*pingQuery();
 		virtual int	ping();
 		virtual char	*identify()=0;
 		virtual sqlrcursor	*initCursor()=0;

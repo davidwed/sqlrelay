@@ -298,19 +298,8 @@ int	oracle8connection::rollback() {
 	return (OCITransRollback(svc,err,OCI_DEFAULT)==OCI_SUCCESS);
 }
 
-int	oracle8connection::ping() {
-	oracle8cursor	pingcur(this);
-	pingcur.openCursor(-1);
-	/*if (pingcur.openCursor(-1) && 
-		pingcur.prepareQuery("select 1 from dual",18) && 
-		pingcur.executeQuery("select 1 from dual",18,1)) {
-		pingcur.cleanUpData();
-		pingcur.closeCursor();
-		return 1;
-	}
-	pingcur.closeCursor();
-	return 0;*/
-	return 1;
+char	*oracle8connection::pingQuery() {
+	return "select 1 from dual";
 }
 
 char	*oracle8connection::identify() {

@@ -12,10 +12,6 @@ AC_ARG_WITH(rudiments-prefix,
 	[  --with-rudiments-prefix       Location of rudiments],
 	RUDIMENTSPATH=$withval,
 	RUDIMENTSPATH="")
-AC_ARG_WITH(libstdcpp-path,
-	[  --with-libstdcpp-path         Location of libstdc++],
-	STDCPPPATH=$withval,
-	STDCPPPATH="/lib /usr/lib /usr/local/lib")
 AC_ARG_WITH(libgdbm-prefix,
 	[  --with-libgdbm-prefix         Location of libgdbm],
 	GDBMPATH=$withval,
@@ -116,9 +112,6 @@ dnl Rewrite supplied paths.
 PWD=`pwd`
 if ( test -n "$RUDIMENTSPATH"  -a "`echo $RUDIMENTSPATH | cut -c-3`" = "../" ); then
 	RUDIMENTSPATH="$PWD/$RUDIMENTSPATH"
-fi
-if ( test -n "$STDCPPPATH" -a "`echo $STDCPPPATH | cut -c-3`" = "../" ); then
-	STDCPPPATH="$PWD/$STDCPPPATH"
 fi
 if ( test -n "$GDBMPATH" -a "`echo $GDBMPATH | cut -c-3`" = "../" ); then
 	GDBMPATH="$PWD/$GDBMPATH"
@@ -245,25 +238,18 @@ fi
 
 
 dnl Check for microsoft platform.
-echo
-echo "***** Microsoft **************"
-
-AC_MSG_CHECKING(for UWIN environment)
-UNAME=`uname | cut -f1 -d"-"`
-UWIN="no"
-if ( test "$UNAME" = "UWIN" ); then
-	UWIN="yes"
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-AC_SUBST(UWIN)
-
-AC_MINGW32
+CYGWIN=""
+MINGW32=""
+UWIN=""
+dnl AC_CANONICAL_HOST gets called when AC_PROG_LIBTOOL is called above
+case $host_os in
+	*cygwin* ) CYGWIN="yes";;
+	*mingw32* ) MINGW32="yes";;
+	*uwin* ) UWIN="yes";;
+esac
 AC_SUBST(MINGW32)
- 
-AC_CYGWIN
 AC_SUBST(CYGWIN)
+AC_SUBST(UWIN)
 
 dnl Hack so "make install" will work on windows.
 MICROSOFT=""
@@ -273,7 +259,6 @@ if ( test "$UWIN" = "yes" -o "$MINGW32" = "yes" -o "$CYGWIN" = "yes" ); then
 	fi
 	MICROSOFT="yes"
 fi
-echo "******************************"
 
 
 dnl Checks for inline keyword
@@ -326,22 +311,6 @@ then
 		DYNAMICAR="ld $SHAREDFLAG -o"
 		PERLLD="ld"
 		PERLLDFLAGS="$SHAREDFLAG"
-
-		AC_MSG_CHECKING(for libg++)
-		if (test -r "/usr/lib/libg++.so"); then
-			LIBSTDCPP="$LIBSTDCPP -lg++"
-			AC_MSG_RESULT(yes)
-		else
-			AC_MSG_RESULT(no)
-		fi
-
-		AC_MSG_CHECKING(for libgcc)
-		if (test -r "/usr/lib/libgcc.so"); then
-			LIBSTDCPP="$LIBSTDCPP -lgcc"
-			AC_MSG_RESULT(yes)
-		else
-			AC_MSG_RESULT(no)
-		fi
 	else
 		AC_MSG_RESULT($LIBSTDCPPA)
 		LIBSTDCPP=""
@@ -349,7 +318,6 @@ then
 		PERLLD="$CXX"
 		PERLLDFLAGS="-Wl,$SHAREDFLAG"
 	fi
-	AC_SUBST(LIBSTDCPP)
 	AC_SUBST(DYNAMICAR)
 	AC_SUBST(PERLLD)
 	AC_SUBST(PERLLDFLAGS)
