@@ -12,29 +12,30 @@ typedef unsigned int		MYSQL_FIELD_OFFSET;
 enum enum_mysql_set_option { MYSQL_SET_OPTION_UNKNOWN_OPTION };
 enum mysql_option { MYSQL_OPTION_UNKNOWN_OPTION };
 
-// taken directly from mysql_com.h
-enum enum_field_types { FIELD_TYPE_DECIMAL, FIELD_TYPE_TINY,
-			FIELD_TYPE_SHORT,  FIELD_TYPE_LONG,
-			FIELD_TYPE_FLOAT,  FIELD_TYPE_DOUBLE,
-			FIELD_TYPE_NULL,   FIELD_TYPE_TIMESTAMP,
-			FIELD_TYPE_LONGLONG,FIELD_TYPE_INT24,
-			FIELD_TYPE_DATE,   FIELD_TYPE_TIME,
-			FIELD_TYPE_DATETIME, FIELD_TYPE_YEAR,
-			FIELD_TYPE_NEWDATE,
-			FIELD_TYPE_ENUM=247,
-			FIELD_TYPE_SET=248,
-			FIELD_TYPE_TINY_BLOB=249,
-			FIELD_TYPE_MEDIUM_BLOB=250,
-			FIELD_TYPE_LONG_BLOB=251,
-			FIELD_TYPE_BLOB=252,
-			FIELD_TYPE_VAR_STRING=253,
-			FIELD_TYPE_STRING=254
+// Taken directly from mysql_com.h version 5.0.0-alpha
+// Back-compatible with all previous versions.
+enum enum_field_types { MYSQL_TYPE_DECIMAL, MYSQL_TYPE_TINY,
+			MYSQL_TYPE_SHORT,  MYSQL_TYPE_LONG,
+			MYSQL_TYPE_FLOAT,  MYSQL_TYPE_DOUBLE,
+			MYSQL_TYPE_NULL,   MYSQL_TYPE_TIMESTAMP,
+			MYSQL_TYPE_LONGLONG,MYSQL_TYPE_INT24,
+			MYSQL_TYPE_DATE,   MYSQL_TYPE_TIME,
+			MYSQL_TYPE_DATETIME, MYSQL_TYPE_YEAR,
+			MYSQL_TYPE_NEWDATE,
+			MYSQL_TYPE_ENUM=247,
+			MYSQL_TYPE_SET=248,
+			MYSQL_TYPE_TINY_BLOB=249,
+			MYSQL_TYPE_MEDIUM_BLOB=250,
+			MYSQL_TYPE_LONG_BLOB=251,
+			MYSQL_TYPE_BLOB=252,
+			MYSQL_TYPE_VAR_STRING=253,
+			MYSQL_TYPE_STRING=254,
+			MYSQL_TYPE_GEOMETRY=255
+
 };
 
-#define FIELD_TYPE_CHAR FIELD_TYPE_TINY		/* For compability */
-#define FIELD_TYPE_INTERVAL FIELD_TYPE_ENUM	/* For compability */
-
-// taken directly from mysql.h
+#ifdef COMPAT_MYSQL_3
+// taken directly from mysql.h - 3.23.58
 struct MYSQL_FIELD {
   char *name;			/* Name of column */
   char *table;			/* Table of column if column was a field */
@@ -45,7 +46,51 @@ struct MYSQL_FIELD {
   unsigned int flags;		/* Div flags */
   unsigned int decimals;	/* Number of decimals in field */
 };
+#endif
 
+#ifdef COMPAT_MYSQL_4_0
+// taken directly from mysql.h - 4.0.17
+struct MYSQL_FIELD {
+  char *name;			/* Name of column */
+  char *table;			/* Table of column if column was a field */
+  char *org_table;		/* Org table name if table was an alias */
+  char *db;			/* Database for table */
+  char *def;			/* Default value (set by mysql_list_fields) */
+  unsigned long length;		/* Width of column */
+  unsigned long max_length;	/* Max width of selected set */
+  unsigned int flags;		/* Div flags */
+  unsigned int decimals;	/* Number of decimals in field */
+  enum enum_field_types type;	/* Type of field. Se mysql_com.h for types */
+};
+#endif
+
+#if defined(COMPAT_MYSQL_4_1) || defined(COMPAT_MYSQL_5_0)
+// taken directly from mysql.h - 4.1.1-alpha (5.0.0-alpha is the same)
+struct MYSQL_FIELD {
+  char *name;                 /* Name of column */
+  char *org_name;             /* Original column name, if an alias */ 
+  char *table;                /* Table of column if column was a field */
+  char *org_table;            /* Org table name, if table was an alias */
+  char *db;                   /* Database for table */
+  char *catalog;	      /* Catalog for table */
+  char *def;                  /* Default value (set by mysql_list_fields) */
+  unsigned long length;       /* Width of column */
+  unsigned long max_length;   /* Max width of selected set */
+  unsigned int name_length;
+  unsigned int org_name_length;
+  unsigned int table_length;
+  unsigned int org_table_length;
+  unsigned int db_length;
+  unsigned int catalog_length;
+  unsigned int def_length;
+  unsigned int flags;         /* Div flags */
+  unsigned int decimals;      /* Number of decimals in field */
+  unsigned int charsetnr;     /* Character set */
+  enum enum_field_types type; /* Type of field. Se mysql_com.h for types */
+};
+#endif
+
+// This is the same for all versions of mysql that I've ever seen
 typedef char **MYSQL_ROW;
 
 struct MYSQL_RES {
@@ -69,8 +114,25 @@ struct MYSQL {
 	bool		deleteonclose;
 };
 
+// taken directly from mysql.h - 5.0
 struct MYSQL_BIND {
-	// FIXME:
+  unsigned long	*length;          /* output length pointer */
+  my_bool       *is_null;	  /* Pointer to null indicators */
+  char		*buffer;	  /* buffer to get/put data */
+  enum enum_field_types buffer_type;	/* buffer type */
+  unsigned long buffer_length;    /* buffer length, must be set for str/binary */  
+
+  /* Following are for internal use. Set by mysql_bind_param */
+  unsigned char *inter_buffer;    /* for the current data position */
+  unsigned long offset;           /* offset position for char/binary fetch */
+  unsigned long	internal_length;  /* Used if length is 0 */
+  unsigned int	param_number;	  /* For null count and error messages */
+  my_bool	long_data_used;	  /* If used with mysql_send_long_data */
+  my_bool       binary_data;      /* data buffer is binary */
+  my_bool       null_field;       /* NULL data cache flag */
+  my_bool	internal_is_null; /* Used if is_null is 0 */
+  void (*store_param_func);/*(NET *net, struct MYSQL_BIND *param);*/
+  void (*fetch_result);/*(struct MYSQL_BIND *, unsigned char **row);*/
 };
 
 
@@ -223,8 +285,6 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 	mysql->port=port;
 	mysql->unix_socket=unix_socket;
 
-printf("host=%s port=%d unix_socket=%s user=%s passwd=%s\n",
-				host,port,unix_socket,user,passwd);
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
 						user,passwd,0,1);
 	mysql->sqlrcon->copyReferences();
@@ -378,10 +438,37 @@ int mysql_query(MYSQL *mysql, const char *query) {
 unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 					const char *from,
 					unsigned long length) {
-	// FIXME: really need to implement this, but for now, just
-	// copy to into from and return the length.
-	strncpy(to,from,length);
-	return strlen(from);
+
+	if (strcmp(mysql->sqlrcon->identify(),"mysql")) {
+		memcpy(to,from,length);
+		return length;
+	}
+	
+	unsigned long	fromindex=0;
+	unsigned long	toindex=0;
+	while (fromindex<length) {
+		if (from[fromindex]=='\'') {
+			to[toindex++]='\\';
+			to[toindex]='\'';
+		} else if (from[fromindex]=='\"') {
+			to[toindex++]='\\';
+			to[toindex]='"';
+		} else if (from[fromindex]=='\n') {
+			to[toindex++]='\\';
+			to[toindex]='n';
+		} else if (from[fromindex]=='\r') {
+			to[toindex++]='\\';
+			to[toindex]='r';
+		} else if (from[fromindex]=='\\') {
+			to[toindex++]='\\';
+			to[toindex]='\\';
+		} else if (from[fromindex]!=';') {
+			to[toindex]=from[fromindex];
+		}
+		toindex++;
+		fromindex++;
+	}
+	return fromindex;
 }
 
 int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length) {
@@ -399,10 +486,9 @@ my_ulonglong mysql_insert_id(MYSQL *mysql) {
 
 
 MYSQL_RES *mysql_store_result(MYSQL *mysql) {
-	/*MYSQL_RES	*currentresult=mysql->currentstmt->result;
+	MYSQL_RES	*retval=mysql->currentstmt->result;
 	mysql->currentstmt->result=NULL;
-	return currentresult;*/
-	return mysql->currentstmt->result;
+	return retval;
 }
 
 MYSQL_RES *mysql_use_result(MYSQL *mysql) {
@@ -437,7 +523,8 @@ unsigned int mysql_num_fields(MYSQL_RES *result) {
 }
 
 MYSQL_FIELD *mysql_fetch_field(MYSQL_RES *result) {
-	if (result->currentfield>=result->sqlrcur->colCount()) {
+	if (result->currentfield>=
+		(MYSQL_FIELD_OFFSET)result->sqlrcur->colCount()) {
 		return NULL;
 	}
 	return &result->fields[result->currentfield++];
@@ -449,7 +536,7 @@ MYSQL_FIELD *mysql_fetch_fields(MYSQL_RES *result) {
 }
 
 MYSQL_FIELD *mysql_fetch_field_direct(MYSQL_RES *result, unsigned int fieldnr) {
-	if (fieldnr>result->sqlrcur->colCount()) {
+	if (fieldnr>(unsigned int)result->sqlrcur->colCount()) {
 		return NULL;
 	}
 	// FIXME: it's possible that we shouldn't increment the fieldnr here
@@ -594,8 +681,28 @@ int mysql_execute(MYSQL_STMT *stmt) {
 			fields[i].name=sqlrcur->getColumnName(i);
 			fields[i].table="";
 			fields[i].def="";
+			#if defined(COMPAT_MYSQL_4_0) || \
+				defined(COMPAT_MYSQL_4_1) || \
+				defined(COMPAT_MYSQL_5_0)
+  			fields[i].org_table="";
+  			fields[i].db="";
+			#if defined(COMPAT_MYSQL_4_1) || \
+				defined(COMPAT_MYSQL_5_0)
+  			fields[i].catalog="";
+  			fields[i].org_name=sqlrcur->getColumnName(i);
+			fields[i].name_length=strlen(fields[i].name);
+			fields[i].org_name_length=strlen(fields[i].org_name);
+			fields[i].table_length=strlen(fields[i].table);
+			fields[i].org_table_length=strlen(fields[i].org_table);
+			fields[i].db_length=strlen(fields[i].db);
+			fields[i].catalog_length=strlen(fields[i].catalog);
+			fields[i].def_length=strlen(fields[i].def);
+			// FIXME: need a character set number here
+			fields[i].charsetnr=0;
+			#endif
+			#endif
 			// FIXME: need field type map here
-			fields[i].type=FIELD_TYPE_STRING;
+			fields[i].type=MYSQL_TYPE_STRING;
 			fields[i].length=sqlrcur->getColumnLength(i);
 			fields[i].max_length=sqlrcur->getLongest(i);
 // FIXME: there is probably some way to figure out flags

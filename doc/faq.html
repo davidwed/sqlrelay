@@ -276,14 +276,15 @@ using the same user for every session?</span>
 file to "database".  See <a href="configuring.html">Configuring SQL Relay</a>
 for more information.</p>
 
-<p>SQL Relay does it very efficiently when used with Oracle8i/9i.  But, 
-the database must be configured properly.  See
-<a href="oraclentier.html">this document</a> for step-by-step instructions.</p>
+<p>SQL Relay does it very efficiently when used with Oracle8i/9i and MySQL
+version 3.23.3 or greater.  For Oracle 8i/9i, the database must be configured
+properly.  See <a href="oraclentier.html">this document</a> for step-by-step
+instructions.</p>
 
-<p>Oracle 8i/9i allows a process that is connected to the database to switch
-users without disconnecting from the database.  When used with other databases,
-SQL Relay logs out and logs back in to the database whenever it needs to switch
-users.</p>
+<p>Oracle 8i/9i and MySQL version 3.23.3 or greater allow a process that is
+connected to the database to switch users without disconnecting from the
+database.  When used with other databases, SQL Relay logs out and logs back in
+to the database whenever it needs to switch users.</p>
 
 
 <span class="heading3">API Comparison Questions</span><br><br>

@@ -48,11 +48,15 @@ class mysqlconnection : public sqlrconnection {
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		int	logIn();
+#ifdef HAVE_MYSQL_CHANGE_USER
+		int	changeUser(const char *newuser,
+					const char *newpassword);
+#endif
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
 		int	isTransactional();
-#if MYSQL_VERSION_ID>=32200
+#ifdef HAVE_MYSQL_PING
 		int	ping();
 #endif
 		char	*identify();

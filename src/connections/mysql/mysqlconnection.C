@@ -39,7 +39,7 @@ int	mysqlconnection::logIn() {
 	// into the client library.
 	// For some newer versions, a NULL host causes problems, but an empty
 	// string is safe.
-#ifdef MYSQL_VERSION_ID
+#ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	char	*hostval=(char *)((host && host[0])?host:"");
 #else
 	char	*hostval=(char *)((host && host[0])?host:NULL);
@@ -51,7 +51,7 @@ int	mysqlconnection::logIn() {
 	// log in
 	char	*user=getUser();
 	char	*password=getPassword();
-#ifdef MYSQL_VERSION_ID
+#ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	// Handle port and socket.
 	int	portval=(port && port[0])?atoi(port):0;
 	char	*socketval=(char *)((socket && socket[0])?socket:NULL);
@@ -72,7 +72,7 @@ int	mysqlconnection::logIn() {
 		logOut();
 		return 0;
 	} else {
-#if !defined(MYSQL_VERSION_ID) || MYSQL_VERSION_ID<32200
+#ifdef MYSQL_SELECT_DB
 		if (mysql_select_db(&mysql,dbval)) {
 			logOut();
 			return 0;
@@ -82,6 +82,14 @@ int	mysqlconnection::logIn() {
 		return 1;
 	}
 }
+
+#ifdef HAVE_MYSQL_CHANGE_USER
+int	mysqlconnection::changeUser(const char *newuser,
+					const char *newpassword) {
+	return !mysql_change_user(&mysql,newuser,newpassword,
+					(char *)((db && db[0])?db:""));
+}
+#endif
 
 sqlrcursor	*mysqlconnection::initCursor() {
 	return (sqlrcursor *)new mysqlcursor((sqlrconnection *)this);
@@ -96,7 +104,7 @@ void	mysqlconnection::logOut() {
 	mysql_close(&mysql);
 }
 
-#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
+#ifdef HAVE_MYSQL_PING
 int	mysqlconnection::ping() {
 	if (!mysql_ping(&mysql)) {
 		return 1;
@@ -199,10 +207,18 @@ char	*mysqlcursor::getErrorMessage(int *liveconnection) {
 
 	*liveconnection=1;
 	char	*err=(char *)mysql_error(&mysqlconn->mysql);
-#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
-	if (queryresult==CR_SERVER_GONE_ERROR || queryresult==CR_SERVER_LOST) {
-		*liveconnection=0;
-	}
+#if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
+		defined(HAVE_MYSQL_CR_SERVER_LOST) 
+	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
+		if (queryresult==CR_SERVER_GONE_ERROR) {
+			*liveconnection=0;
+		}
+	#endif
+	#ifdef HAVE_MYSQL_CR_SERVER_LOST
+		if (queryresult==CR_SERVER_LOST) {
+			*liveconnection=0;
+		}
+	#endif
 #else
 	if (strstr(err,"mysql server has gone away")) {
 		*liveconnection=0;
@@ -297,22 +313,26 @@ void	mysqlcursor::returnColumnInfo() {
 		} else if (mysqlfield->type==FIELD_TYPE_DATETIME) {
 			type=DATETIME_DATATYPE;
 			length=8;
-#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
+#ifdef HAVE_MYSQL_FIELD_TYPE_YEAR
 		} else if (mysqlfield->type==FIELD_TYPE_YEAR) {
 			type=YEAR_DATATYPE;
 			length=1;
+#endif
+#ifdef HAVE_MYSQL_FIELD_TYPE_NEWDATE
 		} else if (mysqlfield->type==FIELD_TYPE_NEWDATE) {
 			type=NEWDATE_DATATYPE;
 			length=1;
 #endif
 		} else if (mysqlfield->type==FIELD_TYPE_NULL) {
 			type=NULL_DATATYPE;
-#ifdef MYSQL_VERSION_ID
+#ifdef HAVE_MYSQL_FIELD_TYPE_ENUM
 		} else if (mysqlfield->type==FIELD_TYPE_ENUM) {
 			type=ENUM_DATATYPE;
 			// 1 or 2 bytes delepending on the # of enum values
 			// (65535 max)
 			length=2;
+#endif
+#ifdef HAVE_MYSQL_FIELD_TYPE_SET
 		} else if (mysqlfield->type==FIELD_TYPE_SET) {
 			type=SET_DATATYPE;
 			// 1,2,3,4 or 8 bytes delepending on the # of members

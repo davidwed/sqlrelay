@@ -37,11 +37,35 @@
 /* MySQL supports mysql_commit */
 #undef HAVE_MYSQL_COMMIT
 
+/* MySQL supports CR_SERVER_GONE_ERROR */
+#undef HAVE_MYSQL_CR_SERVER_GONE_ERROR
+
+/* MySQL supports CR_SERVER_LOST */
+#undef HAVE_MYSQL_CR_SERVER_LOST
+
+/* MySQL supports FIELD_TYPE_ENUM */
+#undef HAVE_MYSQL_FIELD_TYPE_ENUM
+
+/* MySQL supports FIELD_TYPE_NEWDATE */
+#undef HAVE_MYSQL_FIELD_TYPE_NEWDATE
+
+/* MySQL supports FIELD_TYPE_SET */
+#undef HAVE_MYSQL_FIELD_TYPE_SET
+
+/* MySQL supports FIELD_TYPE_YEAR */
+#undef HAVE_MYSQL_FIELD_TYPE_YEAR
+
 /* MySQL supports mysql_ping */
 #undef HAVE_MYSQL_PING
 
 /* MySQL supports mysql_prepare */
 #undef HAVE_MYSQL_PREPARE
+
+/* MySQL supports mysql_real_connect */
+#undef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
+
+/* MySQL supports mysql_select_db */
+#undef HAVE_MYSQL_SELECT_DB
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 #undef HAVE_NDIR_H

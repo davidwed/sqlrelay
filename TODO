@@ -1,13 +1,12 @@
 ADODB and Pear DB interfaces
 Pear DB interface license
-scaling/handoff=pass incompatibility
 freetds-0.62/ct_param support
-full mysql4 support/docs
-	configure should look for:
-		mysql_select_db
-		mysql_ping
-	mysql4.0 - mysql_change_user
 mysql replacement library
+	works with mysql 4.0
+	doesn't work with mysql 4.1, 5.0
+perl -V:optimize and perl -V:ccflags on FreeBSD 4.9 apparantly doesn't return
+	what we're expecting it to
+On Solaris, some of the other perl -V's return empty values
 
 oldmysql test files for non-C++ api's
 
@@ -60,8 +59,8 @@ Tests:
 	interbase stored procedures
 
 Compatibility:
+	mysql 4.1, 5.0
 	daemontools
-	incorporate pkg-config stuff
 	crypto/ssl lib tests need to look in various places for the library
 	SCO:
 		ruby api won't build

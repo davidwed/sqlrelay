@@ -16,7 +16,7 @@
 // | Author: Stig Bakken <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.4 2004-01-20 04:16:51 mused Exp $
+// $Id: sqlrelay.php,v 1.5 2004-01-21 04:01:34 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -147,22 +147,24 @@ class DB_sqlrelay extends DB_common
 
         $cursor = sqlrcur_alloc($this->connection);
         if (!sqlrcur_sendQuery($cursor, $query)) {
+            $this->affectedrows = 0;
             $error = sqlrcur_errorMessage($cursor);
             sqlrcur_free($cursor);
             return $this->raiseError(DB_ERROR, null, null, null, $error);
         }
 
-        $affectedrows = sqlrcur_affectedRows($cursor);
+        $this->affectedrows = sqlrcur_affectedRows($cursor);
 
         /* If the query was a select, return a cursor, otherwise return DB_OK.
         If there are any affected rows, then the query was definitely not a
         select, otherwise there's no good way to know what kind of query it was
         except by parsing it. */
-        if ($affectedrows==0 &&
+        if ($this->affectedrows == 0 &&
                 preg_match('/^\s*\(?\s*SELECT\s+/si', $query) &&
                     !preg_match('/^\s*\(?\s*SELECT\s+INTO\s/si', $query)) {
             return new DB_sqlrelay_cursor($cursor);
         }
+
         sqlrcur_free($cursor);
         return DB_OK;
     }
@@ -219,7 +221,7 @@ class DB_sqlrelay extends DB_common
         }
         if (!sqlrcur_executeQuery($sqlrcursor->cursor)) {
             $error = sqlrcur_errorMessage($sqlrcursor->cursor);
-            freeResult($sqlrcursor);
+            $this->freeResult($sqlrcursor);
             return $this->raiseError(DB_ERROR, null, null, null, $error);
         }
         return $sqlrcursor;
@@ -385,7 +387,8 @@ class DB_sqlrelay extends DB_common
 
     function affectedRows()
     {
-        return $affectedrows;
+        //return $this->affectedrows;
+        return 0;
     }
 
     // }}}

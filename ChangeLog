@@ -9,6 +9,8 @@
 	switched a few methods that return int to return bool in listener
 	did some code cleanup to listener, scaler, sqlrconfigfile
 	fixed reversed affected rows logic for freetds 0.61
+	support mysql_change_user now in mysql connection
+	added mysql client api drop-in replacement library
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API
