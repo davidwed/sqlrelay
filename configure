@@ -22060,6 +22060,25 @@ fi
 
 		if ( test -z "$MYSQLLIBS" )
 		then
+			MYSQLINCLUDES=`mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
+			MYSQLLIBS=`mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
+		fi
+
+		if ( test -z "$MYSQLLIBS" )
+		then
+			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin"
+			do
+				MYSQLINCLUDES=`$i/mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
+				MYSQLLIBS=`$i/mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
+				if ( test -n "$MYSQLLIBS" )
+				then
+					break
+				fi
+			done
+		fi
+
+		if ( test -z "$MYSQLLIBS" )
+		then
 
 
 SEARCHPATH=$MYSQLPATH
@@ -22710,12 +22729,11 @@ then
 	eval "dummy=\"$HEADERSANDLIBSPATH\""
 fi
 
-		fi
 
-		if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
-		then
+			if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
+			then
 
-			echo "$as_me:$LINENO: checking if MySQL requires -lz" >&5
+				echo "$as_me:$LINENO: checking if MySQL requires -lz" >&5
 echo $ECHO_N "checking if MySQL requires -lz... $ECHO_C" >&6
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -22780,9 +22798,9 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-			NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
-			if ( test -n "$NEEDSLIBZ" )
-			then
+				NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
+				if ( test -n "$NEEDSLIBZ" )
+				then
 
 echo "$as_me:$LINENO: checking for gzopen in -lz" >&5
 echo $ECHO_N "checking for gzopen in -lz... $ECHO_C" >&6
@@ -22860,6 +22878,7 @@ else
 echo "$as_me: WARNING: MySQL requires libz but libz was not found." >&2;}
 fi
 
+				fi
 			fi
 		fi
 

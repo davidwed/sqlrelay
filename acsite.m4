@@ -827,20 +827,39 @@ then
 
 		if ( test -z "$MYSQLLIBS" )
 		then
-			FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mysql],[mysql.h],[mysqlclient],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC],[dummy],[yes])
+			MYSQLINCLUDES=`mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
+			MYSQLLIBS=`mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
 		fi
-	
-		if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
+
+		if ( test -z "$MYSQLLIBS" )
 		then
+			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin"
+			do
+				MYSQLINCLUDES=`$i/mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
+				MYSQLLIBS=`$i/mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
+				if ( test -n "$MYSQLLIBS" )
+				then
+					break
+				fi
+			done
+		fi
+
+		if ( test -z "$MYSQLLIBS" )
+		then
+			FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mysql],[mysql.h],[mysqlclient],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC],[dummy],[yes])
+
+			if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
+			then
 		
-			AC_MSG_CHECKING(if MySQL requires -lz)
-			FW_TRY_LINK([#include <mysql.h>
+				AC_MSG_CHECKING(if MySQL requires -lz)
+				FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[mysql_real_connect(NULL,NULL,NULL,NULL,NULL,0,NULL,0); mysql_real_query(NULL,NULL,0); mysql_store_result(NULL); mysql_num_fields(NULL); mysql_fetch_row(NULL); mysql_free_result(NULL); mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); MYSQLLIBS="$MYSQLLIBS -lz"])
 		
-			NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
-			if ( test -n "$NEEDSLIBZ" )
-			then
-				AC_CHECK_LIB(z,gzopen,,MYSQLINCLUDES=""; MYSQLLIBS=""; AC_MSG_WARN(MySQL requires libz but libz was not found.))
+				NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
+				if ( test -n "$NEEDSLIBZ" )
+				then
+					AC_CHECK_LIB(z,gzopen,,MYSQLINCLUDES=""; MYSQLLIBS=""; AC_MSG_WARN(MySQL requires libz but libz was not found.))
+				fi
 			fi
 		fi
 		

@@ -1,23 +1,7 @@
-configure needs to see if mysql requires
-
-idle client timeout
-client connect timeout
 perl apis -> CPAN
-
-netbsd-1.6.2
-	fails to build shared tcl lib - libtclstubs*.a is not a shared library
-		not linking against stub lib fixes the problem
-		so does linking with full path name instead of using -ltclstubs*
 
 openbsd
 	freetds library needs libiconv or configure tests fail
-	PERLINSTALLMAN3DIR doesn't exist?
-	tcl shared library fails to build
-
-redhat-7.3
-	swab undefined
-	#define _XOPEN_SOURCE 600 required for redhat 7.3 to get swab, but
-		breaks strtoll on solaris 9
 
 suse-9.0
 	DESTDIR problem with ruby/python/zope?
@@ -144,6 +128,10 @@ Documentation:
 	man pages for everything
 
 Performance/Code Enhancements:
+	idle client timeout
+	client connect timeout
+	support libmysqlclient_r
+	store passwords in encrypted form in the config file
 	use python distutils to build python
 	call endSession() from perl DBD finish method
 	sqlrclient classes shouldn't inherit from inet/unixclientsocket,
