@@ -28,6 +28,7 @@ class scaler : public daemonprocess {
 
 		void	openMoreConnections();
 		void	getRandomConnectionId();
+		int	availableDatabase();
 		int	countSessions();
 		int	countConnections();
 

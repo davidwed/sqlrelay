@@ -24,7 +24,8 @@ void	listenercomm::setDebugLogger(logger *dl) {
 void	listenercomm::announceAvailability(char *tmpdir,
 					int passdescriptor,
 					char *unixsocket,
-					unsigned short inetport) {
+					unsigned short inetport,
+					char *connectionid) {
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"announcing availability...");
@@ -47,6 +48,10 @@ void	listenercomm::announceAvailability(char *tmpdir,
 	// get a pointer to the shared memory segment
 	unsigned char	*idmemoryptr=ipcptr->getAnnounceBuffer();
 
+	// first, write the connectionid into the segment
+	strcpy((char *)idmemoryptr,connectionid);
+	idmemoryptr=idmemoryptr+strlen(connectionid)+1;
+
 	// if we're passing descriptors around, write the 
 	// pid to the segment otherwise write ports
 	if (passdescriptor) {
@@ -56,6 +61,7 @@ void	listenercomm::announceAvailability(char *tmpdir,
 		#endif
 
 		*((unsigned long *)idmemoryptr)=(unsigned long)getpid();
+
 	} else {
 
 		#ifdef SERVER_DEBUG

@@ -72,6 +72,10 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		void	incrementSessionCount();
 		int	handOffClient();
 		void	getAConnection();
+		int	connectionIsUp(char *connectionid);
+		void	pingDatabase();
+		datatransport	*connectToConnection();
+		int	disconnectFromConnection(datatransport *connsock);
 		int	passDescriptor();
 		void	waitForClientClose(int authstatus, int passstatus);
 

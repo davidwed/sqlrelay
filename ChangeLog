@@ -1,4 +1,7 @@
 0.34 - sqlrelay.conf parameters weren't getting defaulted properly
+	scaler checks to see if a DB is marked as down before it tries to	
+		log into it, if it is marked as down, then it tries a
+		different DB
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

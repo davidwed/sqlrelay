@@ -6,6 +6,8 @@
 #include <sqlrlistener.h>
 
 #include <rudiments/permissions.h>
+#include <rudiments/unixclientsocket.h>
+#include <rudiments/inetclientsocket.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -973,76 +975,198 @@ int	sqlrlistener::handOffClient() {
 
 void	sqlrlistener::getAConnection() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("listener",0,"getting a connection...");
-	#endif
+printf("getAConnection\n");
+	for (;;) {
 
-	// wait for exclusive access to the shared memory among listeners
-	semset->wait(1);
-
-	// wait for an available connection
-	semset->wait(2);
-
-	// get a pointer to the shared memory segment
-	char	*ptr=(char *)((long)idmemory->getPointer()+
-					(2*sizeof(unsigned int)));
-
-	// if we're passing descriptors around, the connection will pass it's
-	// pid to us, otherwise it will pass it's inet and unix ports
-	if (passdescriptor) {
-
+printf("looping\n");
 		#ifdef SERVER_DEBUG
-		debugPrint("listener",1,"handoff=pass");
+		debugPrint("listener",0,"getting a connection...");
 		#endif
 
-		// get the pid
-		connectionpid=*((unsigned long *)ptr);
+		// wait for exclusive access to the
+		// shared memory among listeners
+printf("wait 1\n");
+		semset->wait(1);
 
-	} else {
+		// wait for an available connection
+printf("wait 2\n");
+		semset->wait(2);
 
-		#ifdef SERVER_DEBUG
-		debugPrint("listener",1,"handoff=reconnect");
-		#endif
+printf("after wait 2\n");
+		// get a pointer to the shared memory segment
+		char	*ptr=(char *)((long)idmemory->getPointer()+
+						(2*sizeof(unsigned int)));
 
-		// buffer to hold the port
-		unsigned short	connectionport;
+		// get the connection id
+		char	*nullptr=strchr(ptr,0);
+		int	connidlen=nullptr-ptr;
+		char	*connectionid=new char[connidlen+1];
+		connectionid[connidlen]=(char)NULL;
+		strncpy(connectionid,ptr,connidlen);
+		ptr=ptr+connidlen+1;
 
-		// get the unix port
-		unixportstrlen=0;
-		while (*ptr!=':' && unixportstrlen<MAXPATHLEN) {
-			unixportstr[unixportstrlen]=*ptr;
-			unixportstrlen++;
+		// if we're passing descriptors around, the connection will
+		// pass it's pid to us, otherwise it will pass it's inet and
+		// unix ports
+		if (passdescriptor) {
+
+			#ifdef SERVER_DEBUG
+			debugPrint("listener",1,"handoff=pass");
+			#endif
+
+			// get the pid
+			connectionpid=*((unsigned long *)ptr);
+
+		} else {
+
+			#ifdef SERVER_DEBUG
+			debugPrint("listener",1,"handoff=reconnect");
+			#endif
+
+			// buffer to hold the port
+			unsigned short	connectionport;
+
+			// get the unix port
+			unixportstrlen=0;
+			while (*ptr!=':' && unixportstrlen<MAXPATHLEN) {
+				unixportstr[unixportstrlen]=*ptr;
+				unixportstrlen++;
+				ptr++;
+			}
+			unixportstr[unixportstrlen]=(char)NULL;
 			ptr++;
-		}
-		unixportstr[unixportstrlen]=(char)NULL;
-		ptr++;
 
-		// get the inet port (it will be right-aligned)
-		inetport=*((unsigned char *)ptr) | 
-				(*((unsigned char *)(ptr+1)) << 8);
+			// get the inet port (it will be right-aligned)
+			inetport=*((unsigned char *)ptr) | 
+					(*((unsigned char *)(ptr+1)) << 8);
+
+			#ifdef SERVER_DEBUG
+			char	*debugstring=new char[15+unixportstrlen+21];
+			sprintf(debugstring,"socket=%s  port=%d",
+						unixportstr,inetport);
+			debugPrint("listener",1,debugstring);
+			delete[] debugstring;
+			#endif
+
+		}
+
+		// tell the connection that we've gotten it's data
+		semset->signal(3);
+
+		// allow other listeners access to the shared memory
+		semset->signal(1);
+
+		// decerment the number of "forked, busy listeners"
+printf("wait 10\n");
+		semset->wait(10);
+printf("after\n");
+
+		// make sure the connection is actually up, if not, fork a child
+		// to jog it, spin back and get another connection
+		if (connectionIsUp(connectionid)) {
+printf("breaking\n");
+			break;
+		} else {
+			pingDatabase();
+			semset->signal(10);
+		}
+		delete[] connectionid;
 
 		#ifdef SERVER_DEBUG
-		char	*debugstring=new char[15+unixportstrlen+21];
-		sprintf(debugstring,"socket=%s  port=%d",unixportstr,inetport);
-		debugPrint("listener",1,debugstring);
-		delete[] debugstring;
+		debugPrint("listener",1,"done getting a connection");
 		#endif
-
 	}
-
-	// tell the connection that we've gotten it's data
-	semset->signal(3);
-
-	// allow other listeners access to the shared memory
-	semset->signal(1);
-
-	// decerment the number of "forked, busy listeners"
-	semset->wait(10);
-
-	#ifdef SERVER_DEBUG
-	debugPrint("listener",1,"done getting a connection");
-	#endif
 	
+}
+
+int	sqlrlistener::connectionIsUp(char *connectionid) {
+
+	// initialize the database up/down filename
+	char	*updown=new char[strlen(TMP_DIR)+1+strlen(cmdl->getId())+1+
+						strlen(connectionid)+1];
+	sprintf(updown,"%s/%s-%s",TMP_DIR,cmdl->getId(),connectionid);
+	int	retval=file::exists(updown);
+	delete[] updown;
+	return retval;
+}
+
+void	sqlrlistener::pingDatabase() {
+
+	// fork off and cause the connection to ping the database, this should
+	// cause it to reconnect
+	long	childpid;
+	if (!(childpid=fork())) {
+
+		// connect to the database connection
+		// FIXME: what if the connect fails?
+		datatransport	*connsock=connectToConnection();
+
+		// send it a ping command
+		connsock->write((unsigned short)PING);
+
+		// get the ping result
+		// FIXME: what if the ping fails?
+		unsigned short	result=1;
+		if (connsock->read(&result)!=sizeof(unsigned short)) {
+			result=0;
+		}
+
+		// disconnect
+		disconnectFromConnection(connsock);
+
+		// since this is the forked off listener, we don't
+		// want to actually remove the semaphore set or shared
+		// memory segment
+		idmemory->dontRemove();
+		semset->dontRemove();
+
+		cleanUp();
+		_exit(0);
+	}
+}
+
+datatransport	*sqlrlistener::connectToConnection() {
+
+	if (passdescriptor) {
+		for (int i=0; i<maxconnections; i++) {
+			if (handoffsocklist[i]->pid==connectionpid) {
+				return handoffsocklist[i]->sock;
+			}
+		}
+	} else {
+		int connected=0;
+
+		// first, try for the unix port
+		if (unixportstr && unixportstr[0]) {
+			unixclientsocket	*unixsock=
+					new unixclientsocket();
+			connected=unixsock->connectToServer(unixportstr,0,1);
+			if (connected) {
+				return unixsock;
+			}
+		}
+
+		// then try for the inet port
+		if (!connected) {
+			inetclientsocket	*inetsock=
+					new inetclientsocket();
+			// FIXME: if sqlrelay isn't bound to 127.0.0.1, this
+			// won't work
+			connected=inetsock->connectToServer("localhost",
+								inetport,0,1);
+			if (connected) {
+				return inetsock;
+			}
+		}
+	}
+	return NULL;
+}
+
+int	sqlrlistener::disconnectFromConnection(datatransport *connsock) {
+	connsock->close();
+	if (!passdescriptor) {
+		delete connsock;
+	}
 }
 
 int	sqlrlistener::passDescriptor() {

@@ -7,6 +7,7 @@
 #include <scaler.h>
 
 #include <rudiments/permissions.h>
+#include <rudiments/file.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -234,27 +235,43 @@ void	scaler::openMoreConnections() {
 		// open "growby" connections
 		for (int i=0; i<growby; i++) {
 
-			getRandomConnectionId();
+			// loop until a connection is successfully started
+			int	success=0;
+			while (!success) {
 
-			// build the command to start a connection
-			char	*command=new char[16+strlen(dbase)+
-						6+20+
-						5+strlen(id)+
-						15+strlen(connectionid)+
-						9+strlen(config)+1];
-			sprintf(command,
+				getRandomConnectionId();
+
+				// if the database associated with the
+				// connection id that was randomly chosen is
+				// currently unavailable, loop back and get
+				// another one
+				if (!availableDatabase()) {
+					sleep(1);
+					continue;
+				}
+
+				// build the command to start a connection
+				char	*command=new char[16+strlen(dbase)+
+							6+20+
+							5+strlen(id)+
+							15+strlen(connectionid)+
+							9+strlen(config)+1];
+				sprintf(command,
 	"sqlr-connection-%s%s -ttl %d -id %s -connectionid %s -config %s",
-				dbase,((debug)?"-debug":""),
-				ttl,id,connectionid,config);
+					dbase,((debug)?"-debug":""),
+					ttl,id,connectionid,config);
 
-			// start another connection
-			system(command);
+				// start another connection
+				success=(system(command)==0);
 
-			// clean up
-			delete[] command;
+				// clean up
+				delete[] command;
 
-			// wait for the connection count to increase
-			semset->wait(8);
+				// wait for the connection count to increase
+				if (success) {
+					semset->wait(8);
+				}
+			}
 		}
 	}
 }
@@ -276,6 +293,17 @@ void	scaler::getRandomConnectionId() {
 		}
 		currentnode=currentnode->getNext();
 	}
+}
+
+int	scaler::availableDatabase() {
+	
+	// initialize the database up/down filename
+	char	*updown=new char[tmpdirlen+1+strlen(id)+1+
+					strlen(connectionid)+1];
+	sprintf(updown,"%s/%s-%s",TMP_DIR,id,connectionid);
+	int	retval=file::exists(updown);
+	delete[] updown;
+	return retval;
 }
 
 int	scaler::countSessions() {

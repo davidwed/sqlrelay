@@ -667,7 +667,8 @@ void	sqlrconnection::listen() {
 		lsnrcom->announceAvailability(tmpdir->getString(),
 						cfgfl->getPassDescriptor(),
 						unixsocket,
-						inetport);
+						inetport,
+						cmdl->getConnectionId());
 
 		// loop to handle suspended sessions
 		for (;;) {
@@ -731,23 +732,18 @@ void	sqlrconnection::waitForAvailableDatabase() {
 
 int	sqlrconnection::availableDatabase() {
 
-	// if the file is there, return, otherwise reconnect to the database
-	int	fd=open(updown,0,permissions::ownerReadWrite());
-	if (fd>-1) {
-
-		close(fd);
-
-		#ifdef SERVER_DEBUG
-		getDebugLogger()->write("connection",0,"database is available");
-		#endif
-
-		return 1;
-	}
-
+	// return whether the file "updown" is there or not
 	#ifdef SERVER_DEBUG
-	getDebugLogger()->write("connection",0,"database is not available");
+		if (!file::exists(updown)) {
+			getDebugLogger()->write("connection",0,"database is not available");
+			return 0;
+		} else {
+			getDebugLogger()->write("connection",0,"database is available");
+			return 1;
+		}
+	#else
+		return file::exists(updown);
 	#endif
-	return 0;
 }
 
 int	sqlrconnection::openSockets() {

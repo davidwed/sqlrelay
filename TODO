@@ -1,3 +1,9 @@
+listener should know not to hand off to a connection if it's db is down
+
+looks like Oracle 8.0 doesn't support temp-LOB's
+
+sybase configure problem __ctype_tolower undefined?
+
 is there a zero-cursor bug?
 
 db2 start/stop doesn't work

@@ -23,7 +23,8 @@ class listenercomm {
 		void	announceAvailability(char *tmpdir,
 					int passdescriptor,
 					char *unixsocket,
-					unsigned short inetport);
+					unsigned short inetport,
+					char *connectionid);
 		int	receiveFileDescriptor(int *descriptor);
 		void	deRegisterForHandoff(char *tmpdir);
 
