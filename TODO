@@ -2,6 +2,34 @@ idle client timeout
 client connect timeout
 perl apis -> CPAN
 
+netbsd-1.6.2
+	fails to build shared tcl lib
+		not linking against stub lib fixes the problem
+
+openbsd
+	freetds defines everything as _ct_* instead of ct_*
+	need to find /usr/local/lib/libmysqlclient.so.* before
+		libmysqlclient.a, libmysqlclient.a defines everything
+		as _mysql_*
+	gtk config app doesn't compile
+	ruby binary is wrong architecture ?
+	PERLINSTALLMAN3DIR doesn't exist?
+	tcl shared library fails to build
+	strip fails with "Undefined error"
+		STRIPPROG env variable doesn't work, need to set
+		STRIP, striplib and old_striplib
+
+redhat-7.3
+	swab undefined
+
+suse-9.0
+	DESTDIR problem with ruby/python/zope?
+
+solaris-9
+	#define _XOPEN_SOURCE 600 required for redhat 7.3 to get swab, but
+		breaks strtoll on solaris 9
+	-xO3 isn't getting removed from build script
+
 --------------------------------------------------------------------------------
 
 setting backlog:

@@ -395,8 +395,17 @@ void mysqlcursor::returnColumnInfo() {
 				mysqlfield->flags&MULTIPLE_KEY_FLAG,
 				mysqlfield->flags&UNSIGNED_FLAG,
 				mysqlfield->flags&ZEROFILL_FLAG,
+#ifdef BINARY_FLAG
 				mysqlfield->flags&BINARY_FLAG,
-				mysqlfield->flags&AUTO_INCREMENT_FLAG);
+#else
+				0,
+#endif
+#ifdef AUTO_INCREMENT_FLAG
+				mysqlfield->flags&AUTO_INCREMENT_FLAG
+#else
+				0
+#endif
+				);
 	}
 }
 

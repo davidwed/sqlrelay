@@ -94,6 +94,7 @@ fi
 ])
 
 
+
 AC_DEFUN([FW_CHECK_HEADERS_AND_LIBS],
 [
 
@@ -119,21 +120,32 @@ then
 	eval "$11=\"\""
 fi
 
-for paths in "$SEARCHPATH" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/local/firstworks"
+
+for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/local/firstworks"
 do
 	if ( test -n "$paths" )
 	then
+
+		if ( test "$paths" = "/" )
+		then
+			dnl look in /usr/include and /lib
+			if ( test "$USEFULLLIBPATH" = "yes" )
+			then
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib\"; LIBSTRING=\"/lib/lib$LIBNAME.$SOSUFFIX\"],[/lib/lib$LIBNAME.a],[LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+			else
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\"],[/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+			fi
+
+			dnl set paths to "" so we won't get //'s from here on
+			paths=""
+		fi
+
 		dnl look in $path/include and $path/lib
 		if ( test "$USEFULLLIBPATH" = "yes" )
 		then
 			FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"$paths/lib/lib$LIBNAME.$SOSUFFIX\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 		else
-			if ( test "$paths" = "/usr" )
-			then
-				FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-			else
-				FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-L$paths/lib -l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-			fi
+			FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-L$paths/lib -l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 		fi
 
 		dnl look in $path/include/$NAME and $path/lib
@@ -143,12 +155,7 @@ do
 			then
 				FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"$paths/lib/lib$LIBNAME.$SOSUFFIX\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"$paths/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 			else
-				if ( test "$paths" = "/usr" )
-				then
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				else
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-L$paths/lib -l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				fi
+				FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/lib\"; LIBSTRING=\"-L$paths/lib -l$LIBNAME\"],[$paths/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
 		fi
 
@@ -203,6 +210,10 @@ do
 	fi
 done
 
+dnl remove -I/usr/include, -L/lib and -L/usr/lib
+INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
+LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
+
 eval "$7=\"$INCLUDESTRING\""
 eval "$8=\"$LIBSTRING\""
 eval "$9=\"$LIBPATH\""
@@ -212,7 +223,6 @@ then
 	eval "$11=\"$HEADERSANDLIBSPATH\""
 fi
 ])
-
 
 
 dnl override libtool if so desired

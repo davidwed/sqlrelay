@@ -55,6 +55,12 @@
 	DESTDIR works as expected now
 	applied perl dbi patch from Tony Fleisher and Erik Hollensbe
 	fixed bug where SEEK_END was used instead of SEEK_SET to lock sockseq
+	lots of minor cygwin-related build fixes
+	applied Srinivas Devarakonda's fake binds patch
+	applied Jason Hihn's patch for sqlite3
+	added ifdefs to maintain sqlite<3 compatibility
+	applied Leonard Rochael Almeida's python segfault patch
+	added test for python version < 2.1 and deprecation notice
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

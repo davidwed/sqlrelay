@@ -5,6 +5,9 @@
 #include <tdsver.h>
 
 #include <config.h>
+#ifndef HAVE_FREETDS_FUNCTION_DEFINITIONS
+	#include <ctfunctions.h>
+#endif
 #include <datatypes.h>
 
 #include <rudiments/stringbuffer.h>
@@ -362,6 +365,7 @@ bool freetdscursor::prepareQuery(const char *query, long length) {
 
 	// This code is here in case freetds ever actually supports cursors...
 	//if (cursorquery.match(query)) {
+#ifdef CS_CURSOR_DECLARE
 	if (false) {
 
 		// initiate a cursor command
@@ -375,7 +379,9 @@ bool freetdscursor::prepareQuery(const char *query, long length) {
 		}
 
 	//} else if (rpcquery.match(query)) {
-	} else if (false) {
+	} else
+#endif
+	if (false) {
 
 		// initiate a language command
 		cmd=languagecmd;
@@ -573,6 +579,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 	maxrow=0;
 	totalrows=0;
 
+#ifdef CS_CURSOR_DECLARE
 	if (cmd==cursorcmd) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
@@ -587,6 +594,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 			return false;
 		}
 	}
+#endif
 
 	if (ct_send(cmd)!=CS_SUCCEED) {
 		cleanUpData(true,true);
@@ -623,7 +631,9 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 			}
 
 		} else if (resultstype==CS_ROW_RESULT ||
+#ifdef CS_CURSOR_DECLARE
 					resultstype==CS_CURSOR_RESULT ||
+#endif
 					resultstype==CS_COMPUTE_RESULT) {
 			// For cursor commands, each call to ct_cursor will
 			// have generated a result set.  There will be result
@@ -660,7 +670,9 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 
 	bool	moneycolumn=false;
 	if (resultstype==CS_ROW_RESULT ||
+#ifdef CS_CURSOR_DECLARE
 			resultstype==CS_CURSOR_RESULT ||
+#endif
 			resultstype==CS_COMPUTE_RESULT ||
 			resultstype==CS_PARAM_RESULT) {
 
@@ -811,7 +823,9 @@ void freetdscursor::returnColumnInfo() {
 
 	// unless the query was a successful select, send no header
 	if (resultstype!=CS_ROW_RESULT &&
+#ifdef CS_CURSOR_DECLARE
 			resultstype!=CS_CURSOR_RESULT &&
+#endif
 			resultstype!=CS_COMPUTE_RESULT) {
 		return;
 	}
@@ -913,7 +927,9 @@ void freetdscursor::returnColumnInfo() {
 bool freetdscursor::noRowsToReturn() {
 	// unless the query was a successful select, send no data
 	return (resultstype!=CS_ROW_RESULT &&
+#ifdef CS_CURSOR_DECLARE
 			resultstype!=CS_CURSOR_RESULT &&
+#endif
 			resultstype!=CS_COMPUTE_RESULT);
 }
 
@@ -997,6 +1013,7 @@ void freetdscursor::discardResults() {
 
 void freetdscursor::discardCursor() {
 
+#ifdef CS_CURSOR_DECLARE
 	if (cmd==cursorcmd) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
 				NULL,CS_UNUSED,CS_DEALLOC)==CS_SUCCEED) {
@@ -1006,6 +1023,7 @@ void freetdscursor::discardCursor() {
 			}
 		}
 	}
+#endif
 }
 
 CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt, 

@@ -462,6 +462,7 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 			// binary
 
 			// autoincrement
+#ifdef SQL_DESC_AUTO_UNIQUE_VALUE
 			erg=SQLColAttributes(stmt,i+1,
 					SQL_COLUMN_AUTO_UNIQUE_VALUE,
 					NULL,0,NULL,
@@ -469,6 +470,9 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
+#else
+			col[i].autoincrement=0;
+#endif
 #endif
 		}
 
