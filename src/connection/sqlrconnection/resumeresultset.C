@@ -3,25 +3,25 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::resumeResultSetCommand() {
+bool sqlrconnection::resumeResultSetCommand(sqlrcursor *cursor) {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"resume result set");
 	#endif
-	resumeResultSet();
-	if (!returnResultSetData()) {
+	resumeResultSet(cursor);
+	if (!returnResultSetData(cursor)) {
 		endSession();
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-void	sqlrconnection::resumeResultSet() {
+void sqlrconnection::resumeResultSet(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"resume result set...");
 	#endif
 
-	if (cur[currentcur]->suspendresultset) {
+	if (cursor->suspendresultset) {
 
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"previous result set was suspended");
@@ -32,14 +32,14 @@ void	sqlrconnection::resumeResultSet() {
 
 		// send the client the id of the 
 		// cursor that it's going to use
-		clientsock->write((unsigned short)(currentcur));
+		clientsock->write((unsigned short)cursor->id);
 		clientsock->write((unsigned short)SUSPENDED_RESULT_SET);
 
 		// if the requested cursor really had a suspended
 		// result set, send the lastrow of it to the client
 		// then send the result set header
 		clientsock->write((unsigned long)lastrow);
-		returnResultSetHeader();
+		returnResultSetHeader(cursor);
 
 	} else {
 

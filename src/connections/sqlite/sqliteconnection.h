@@ -24,17 +24,17 @@ class sqlitecursor : public sqlrcursor {
 	private:
 				sqlitecursor(sqlrconnection *conn);
 				~sqlitecursor();
-			int	executeQuery(const char *query, long length,
+			bool	executeQuery(const char *query, long length,
 						unsigned short execute);
 			int	runQuery(stringbuffer *newquery,
 						const char *query);
-			char	*getErrorMessage(int *liveconnection);
+			char	*getErrorMessage(bool *liveconnection);
 			void	returnRowCounts();
 			void	returnColumnCount();
 			void	returnColumnInfo();
-			int	noRowsToReturn();
-			int	skipRow();
-			int	fetchRow();
+			bool	noRowsToReturn();
+			bool	skipRow();
+			bool	fetchRow();
 			void	returnRow();
 			void	cleanUpData(bool freerows, bool freecols,
 								bool freebinds);
@@ -56,16 +56,16 @@ class sqliteconnection : public sqlrconnection {
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
-		int	logIn();
+		bool	logIn();
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		int	ping();
+		bool	ping();
 		char	*identify();
 #ifndef SQLITE_TRANSACTIONAL
-		int	isTransactional();
-		int	commit();
-		int	rollback();
+		bool	isTransactional();
+		bool	commit();
+		bool	rollback();
 #endif
 
 		char	*db;

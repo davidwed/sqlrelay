@@ -40,14 +40,14 @@ authenticator::~authenticator() {
 	delete[] passwords;
 }
 
-int	authenticator::authenticate(const char *user, const char *password) {
+bool authenticator::authenticate(const char *user, const char *password) {
 
-	// Return 1 if what the client sent matches one of the 
-	// user/password sets and 0 if no match is found.
+	// Return true if what the client sent matches one of the 
+	// user/password sets and false if no match is found.
 	for (unsigned long i=0; i<usercount; i++) {
 		if (!strcmp(user,users[i]) && !strcmp(password,passwords[i])) {
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }

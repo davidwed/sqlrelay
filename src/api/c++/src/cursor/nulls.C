@@ -4,10 +4,10 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-void	sqlrcursor::getNullsAsEmptyStrings() {
+void sqlrcursor::getNullsAsEmptyStrings() {
 	returnnulls=0;
 }
 
-void	sqlrcursor::getNullsAsNulls() {
+void sqlrcursor::getNullsAsNulls() {
 	returnnulls=1;
 }

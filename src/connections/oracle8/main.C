@@ -10,18 +10,18 @@
 oracle8connection	*conn;
 signalhandler		*alarmhandler;
 
-void	cleanUp() {
+void cleanUp() {
 	conn->closeConnection();
 	delete conn;
 	delete alarmhandler;
 }
 
-void	shutDown() {
+void shutDown() {
 	cleanUp();
 	exit(0);
 }
 
-int	main(int argc, const char **argv) {
+int main(int argc, const char **argv) {
 
 	#include <version.h>
 

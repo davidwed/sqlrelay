@@ -14,16 +14,16 @@ msqlconnection::msqlconnection() {
 	devnull=-2;
 }
 
-int	msqlconnection::getNumberOfConnectStringVars() {
+int msqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	msqlconnection::handleConnectString() {
+void msqlconnection::handleConnectString() {
 	host=connectStringValue("host");
 	db=connectStringValue("db");
 }
 
-int	msqlconnection::logIn() {
+bool msqlconnection::logIn() {
 
 	// handle db
 	char	*dbval;
@@ -34,30 +34,29 @@ int	msqlconnection::logIn() {
 	}
 
 	if ((msql=msqlConnect(host))==-1) {
-		return 0;
+		return false;
 	}
 
 	if (msqlSelectDB(msql,dbval)==-1) {
 		logOut();
-		return 0;
-	} else {
-		return 1;
+		return false;
 	}
+	return true;
 }
 
-sqlrcursor	*msqlconnection::initCursor() {
+sqlrcursor *msqlconnection::initCursor() {
 	return (sqlrcursor *)new msqlcursor((sqlrconnection *)this);
 }
 
-void	msqlconnection::deleteCursor(sqlrcursor *curs) {
+void msqlconnection::deleteCursor(sqlrcursor *curs) {
 	delete (msqlcursor *)curs;
 }
 
-void	msqlconnection::logOut() {
+void msqlconnection::logOut() {
 	msqlClose(msql);
 }
 
-int	msqlconnection::ping() {
+bool msqlconnection::ping() {
 	// if we don't redirect stdout/stderr, 
 	// msqlGetServerStats will spew out data
 	/*if (devnull==-2 && (devnull=open("/dev/null",O_RDONLY))>0) {
@@ -65,37 +64,37 @@ int	msqlconnection::ping() {
 		dup2(devnull,STDERR_FILENO);
 	}
 	if (msqlGetServerStats(msql)==-1) {
-		return 0;
+		return false;
 	}*/
-	return 1;
+	return true;
 }
 
-char	*msqlconnection::identify() {
+char *msqlconnection::identify() {
 	return "msql";
 }
 
-int	msqlconnection::isTransactional() {
-	return 0;
+bool msqlconnection::isTransactional() {
+	return false;
 }
 
-unsigned short	msqlconnection::autoCommitOn() {
+bool msqlconnection::autoCommitOn() {
 	// do nothing
-	return 1;
+	return true;
 }
 
-unsigned short	msqlconnection::autoCommitOff() {
+bool msqlconnection::autoCommitOff() {
 	// do nothing
-	return 1;
+	return true;
 }
 
-int	msqlconnection::commit() {
+bool msqlconnection::commit() {
 	// do nothing
-	return 1;
+	return true;
 }
 
-int	msqlconnection::rollback() {
+bool msqlconnection::rollback() {
 	// do nothing
-	return 1;
+	return true;
 }
 
 msqlcursor::msqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
@@ -103,7 +102,7 @@ msqlcursor::msqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	msqlresult=NULL;
 }
 
-int	msqlcursor::executeQuery(const char *query, long length,
+bool msqlcursor::executeQuery(const char *query, long length,
 					unsigned short execute) {
 
 	// initialize return values
@@ -118,12 +117,12 @@ int	msqlcursor::executeQuery(const char *query, long length,
 	if (newquery) {
 		if (msqlQuery(msqlconn->msql,newquery->getString())==-1) {
 			delete newquery;
-			return 0;
+			return false;
 		}
 		delete newquery;
 	} else {
 		if (msqlQuery(msqlconn->msql,(char *)query)==-1) {
-			return 0;
+			return false;
 		}
 	}
 
@@ -134,9 +133,9 @@ int	msqlcursor::executeQuery(const char *query, long length,
 		// must have been some DDL or DML, have to check
 		// the 0'th array element here, it's kinda weird
 		if (msqlErrMsg[0]) {
-			return 0;
+			return false;
 		} else {
-			return 1;
+			return true;
 		}
 	}
 
@@ -146,27 +145,27 @@ int	msqlcursor::executeQuery(const char *query, long length,
 	// get the row count
 	nrows=msqlNumRows(msqlresult);
 
-	return 1;
+	return true;
 }
 
-char	*msqlcursor::getErrorMessage(int *liveconnection) {
+char *msqlcursor::getErrorMessage(bool *liveconnection) {
 
-	*liveconnection=1;
+	*liveconnection=true;
 
 	return msqlErrMsg;
 }
 
-void	msqlcursor::returnRowCounts() {
+void msqlcursor::returnRowCounts() {
 
 	// send row counts (affected row count unknown in msql)
 	conn->sendRowCounts((long)nrows,(long)-1);
 }
 
-void	msqlcursor::returnColumnCount() {
+void msqlcursor::returnColumnCount() {
 	conn->sendColumnCount(ncols);
 }
 
-void	msqlcursor::returnColumnInfo() {
+void msqlcursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
@@ -210,8 +209,9 @@ void	msqlcursor::returnColumnInfo() {
 			type=MONEY_DATATYPE;
 			precision=12;
 			scale=2;
-		// For some reason, msql reports time datatypes as "lastreal"
-		// yet lastreal is not a valid msql datatype.  Strange.
+		// For some reason, msql reports time datatypes as
+		// "lastreal" yet lastreal is not a valid msql datatype.
+		// Strange.
 		} else if (msqlfield->type==LAST_REAL_TYPE) {
 			type=TIME_DATATYPE;
 			precision=8;
@@ -238,24 +238,20 @@ void	msqlcursor::returnColumnInfo() {
 	}
 }
 
-int	msqlcursor::noRowsToReturn() {
-
+bool msqlcursor::noRowsToReturn() {
 	// for dml/ddl queries, return no data
-	if (!msqlresult) {
-		return 1;
-	}
-	return 0;
+	return (!msqlresult);
 }
 
-int	msqlcursor::skipRow() {
+bool msqlcursor::skipRow() {
 	return fetchRow();
 }
 
-int	msqlcursor::fetchRow() {
-	return (msqlrow=msqlFetchRow(msqlresult))!=NULL;
+bool msqlcursor::fetchRow() {
+	return ((msqlrow=msqlFetchRow(msqlresult))!=NULL);
 }
 
-void	msqlcursor::returnRow() {
+void msqlcursor::returnRow() {
 
 	for (int col=0; col<ncols; col++) {
 
@@ -267,8 +263,7 @@ void	msqlcursor::returnRow() {
 	}
 }
 
-
-void	msqlcursor::cleanUpData(bool freerows, bool freecols,
+void msqlcursor::cleanUpData(bool freerows, bool freecols,
 							bool freebinds) {
 
 	if (freerows && msqlresult) {

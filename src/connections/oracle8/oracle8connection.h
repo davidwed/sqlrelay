@@ -55,80 +55,80 @@ class oracle8cursor : public sqlrcursor {
 	private:
 			oracle8cursor(sqlrconnection *conn);
 			~oracle8cursor();
-		int	openCursor(int id);
-		int	closeCursor();
-		int	prepareQuery(const char *query, long length);
-		int	inputBindString(const char *variable, 
+		bool	openCursor(int id);
+		bool	closeCursor();
+		bool	prepareQuery(const char *query, long length);
+		bool	inputBindString(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned short valuesize,
 					short *isnull);
-		int	inputBindLong(const char *variable, 
+		bool	inputBindLong(const char *variable, 
 					unsigned short variablesize,
 					unsigned long *value);
-		int	inputBindDouble(const char *variable, 
+		bool	inputBindDouble(const char *variable, 
 					unsigned short variablesize,
 					double *value,
 					unsigned short precision,
 					unsigned short scale);
-		int	outputBindString(const char *variable, 
+		bool	outputBindString(const char *variable, 
 					unsigned short variablesize,
 					char *value,
 					unsigned short valuesize,
 					short *isnull);
 #ifdef HAVE_ORACLE_8i
-		int	inputBindBlob(const char *variable, 
+		bool	inputBindBlob(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned long valuesize,
 					short *isnull);
-		int	inputBindClob(const char *variable, 
+		bool	inputBindClob(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned long valuesize,
 					short *isnull);
-		int	inputBindGenericLob(const char *variable, 
+		bool	inputBindGenericLob(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned long valuesize,
 					short *isnull,
 					ub1 temptype,
 					ub2 type);
-		int	outputBindBlob(const char *variable, 
+		bool	outputBindBlob(const char *variable, 
 					unsigned short variablesize,
 					int index,
 					short *isnull);
-		int	outputBindClob(const char *variable, 
+		bool	outputBindClob(const char *variable, 
 					unsigned short variablesize,
 					int index,
 					short *isnull);
-		int	outputBindGenericLob(const char *variable, 
+		bool	outputBindGenericLob(const char *variable, 
 					unsigned short variablesize,
 					int index,
 					short *isnull,
 					ub2 type);
-		int	outputBindCursor(const char *variable,
+		bool	outputBindCursor(const char *variable,
 					unsigned short variablesize,
 					sqlrcursor *cursor);
 		void	returnOutputBindBlob(int index);
 		void	returnOutputBindClob(int index);
 		void	returnOutputBindGenericLob(int index);
 #endif
-		int	executeQuery(const char *query, long length,
+		bool	executeQuery(const char *query, long length,
 					unsigned short execute);
 #ifdef HAVE_ORACLE_8i
 		void	checkForTempTable(const char *query,
 						unsigned long length);
 #endif
-		int	queryIsNotSelect();
-		int	queryIsCommitOrRollback();
-		char	*getErrorMessage(int *liveconnection);
+		bool	queryIsNotSelect();
+		bool	queryIsCommitOrRollback();
+		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();
 		void	returnColumnInfo();
-		int	noRowsToReturn();
-		int	skipRow();
-		int	fetchRow();
+		bool	noRowsToReturn();
+		bool	skipRow();
+		bool	fetchRow();
 		void	returnRow();
 		void	cleanUpData(bool freerows, bool freecols,
 							bool freebinds);
@@ -191,19 +191,19 @@ class oracle8connection : public sqlrconnection {
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
-		int	logIn();
+		bool	logIn();
 		void	logInError(const char *errmsg);
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
-		int	changeUser(const char *newuser,
+		bool	changeUser(const char *newuser,
 						const char *newpassword);
 #endif
-		unsigned short	autoCommitOn();
-		unsigned short	autoCommitOff();
-		int	commit();
-		int	rollback();
+		bool	autoCommitOn();
+		bool	autoCommitOff();
+		bool	commit();
+		bool	rollback();
 		char	*pingQuery();
 		char	*identify();
 
@@ -222,7 +222,6 @@ class oracle8connection : public sqlrconnection {
 
 		char		*home;
 		char		*sid;
-		int		autocommit;
 
 		environment	*environ;
 };

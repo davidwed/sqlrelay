@@ -24,11 +24,11 @@ interbaseconnection::~interbaseconnection() {
 	delete env;
 }
 
-int	interbaseconnection::getNumberOfConnectStringVars() {
+int interbaseconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	interbaseconnection::handleConnectString() {
+void interbaseconnection::handleConnectString() {
 
 	// override legacy "database" parameter with modern "db" parameter
 	database=connectStringValue("database");
@@ -55,7 +55,7 @@ void	interbaseconnection::handleConnectString() {
 	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
 }
 
-int	interbaseconnection::logIn() {
+bool interbaseconnection::logIn() {
 
 	// initialize a dpb
 	char	*dpbptr=dpb;
@@ -80,7 +80,7 @@ int	interbaseconnection::logIn() {
 							//dpblength,dpb)) {
 							0,NULL)) {
 		db=0L;
-		return 0;
+		return false;
 	}
 
 	// start a transaction
@@ -94,32 +94,32 @@ int	interbaseconnection::logIn() {
 			fprintf(stderr,"%s\n",msg);
 		}
 		fprintf(stderr,"\n");
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-sqlrcursor	*interbaseconnection::initCursor() {
+sqlrcursor *interbaseconnection::initCursor() {
 	return (sqlrcursor *)new interbasecursor((sqlrconnection *)this);
 }
 
-void	interbaseconnection::deleteCursor(sqlrcursor *curs) {
+void interbaseconnection::deleteCursor(sqlrcursor *curs) {
 	delete (interbasecursor *)curs;
 }
 
-void	interbaseconnection::logOut() {
+void interbaseconnection::logOut() {
 	isc_detach_database(error,&db);
 }
 
-int	interbaseconnection::commit() {
+bool interbaseconnection::commit() {
 	return (!isc_commit_retaining(error,&tr));
 }
 
-int	interbaseconnection::rollback() {
+bool interbaseconnection::rollback() {
 	return (!isc_rollback_retaining(error,&tr));
 }
 
-int	interbaseconnection::ping() {
+bool interbaseconnection::ping() {
 
 	// call isc_database_info to get page_size and num_buffers,
 	// this should always be available unless the db is down
@@ -137,7 +137,7 @@ int	interbaseconnection::ping() {
 	return !(status[0]==1 && status[1]);
 }
 
-char	*interbaseconnection::identify() {
+char *interbaseconnection::identify() {
 	return "interbase";
 }
 
@@ -145,7 +145,8 @@ interbasecursor::interbasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	interbaseconn=(interbaseconnection *)conn;
 	errormsg=NULL;
 
-	outsqlda=(XSQLDA ISC_FAR *)malloc(XSQLDA_LENGTH(MAX_SELECT_LIST_SIZE));
+	outsqlda=(XSQLDA ISC_FAR *)malloc(
+			XSQLDA_LENGTH(MAX_SELECT_LIST_SIZE));
 	outsqlda->version=SQLDA_VERSION1;
 	outsqlda->sqln=MAX_SELECT_LIST_SIZE;
 
@@ -156,7 +157,7 @@ interbasecursor::interbasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	querytype=0;
 	stmt=NULL;
 
-	queryIsExecSP=0;
+	queryIsExecSP=false;
 }
 
 interbasecursor::~interbasecursor() {
@@ -167,20 +168,21 @@ interbasecursor::~interbasecursor() {
 	free(insqlda);
 }
 
-int	interbasecursor::prepareQuery(const char *query, long length) {
+bool interbasecursor::prepareQuery(const char *query, long length) {
 
-	queryIsExecSP=0;
+	queryIsExecSP=false;
 
 	// free the old statement if it exists
 	if (stmt) {
-		isc_dsql_free_statement(interbaseconn->error,&stmt,DSQL_drop);
+		isc_dsql_free_statement(interbaseconn->error,
+						&stmt,DSQL_drop);
 	}
 
 	// allocate a cursor handle
 	stmt=NULL;
 	if (isc_dsql_allocate_statement(interbaseconn->error,
 					&interbaseconn->db,&stmt)) {
-		return 0;
+		return false;
 	}
 
 	// skip whitespace
@@ -191,7 +193,7 @@ int	interbasecursor::prepareQuery(const char *query, long length) {
 	if (isc_dsql_prepare(interbaseconn->error,&interbaseconn->tr,
 					&stmt,length,(char *)query,
 					interbaseconn->dialect,outsqlda)) {
-		return 0;
+		return false;
 	}
 
 	// get the cursor type
@@ -200,7 +202,7 @@ int	interbasecursor::prepareQuery(const char *query, long length) {
 	if (isc_dsql_sql_info(interbaseconn->error,&stmt,
 				sizeof(typeitem),typeitem,
 				1024,resbuffer)) {
-		return 0;
+		return false;
 	}
 
 	int	len=isc_vax_integer(resbuffer+1,2);
@@ -209,14 +211,14 @@ int	interbasecursor::prepareQuery(const char *query, long length) {
 	// find bind parameters, if any
 	insqlda->sqld=0;
 	if (isc_dsql_describe_bind(interbaseconn->error,&stmt,1,insqlda)) {
-		return 0;
+		return false;
 	}
 	insqlda->sqln=insqlda->sqld;
 
-	return 1;
+	return true;
 }
 
-int	interbasecursor::inputBindString(const char *variable,
+bool interbasecursor::inputBindString(const char *variable,
 					unsigned short variablesize,
 					const char *value,
 					unsigned short valuesize,
@@ -225,7 +227,7 @@ int	interbasecursor::inputBindString(const char *variable,
 	// make bind vars 1 based like all other db's
 	int	index=atoi(variable+1)-1;
 	if (index<0) {
-		return 0;
+		return false;
 	}
 	insqlda->sqlvar[index].sqltype=SQL_TEXT+1;
 	insqlda->sqlvar[index].sqlscale=0;
@@ -241,17 +243,17 @@ int	interbasecursor::inputBindString(const char *variable,
 	insqlda->sqlvar[index].ownname[0]=(char)NULL;
 	insqlda->sqlvar[index].aliasname_length=0;
 	insqlda->sqlvar[index].aliasname[0]=(char)NULL;
-	return 1;
+	return true;
 }
 
-int	interbasecursor::inputBindLong(const char *variable,
+bool interbasecursor::inputBindLong(const char *variable,
 					unsigned short variablesize,
 					unsigned long *value) {
 
 	// make bind vars 1 based like all other db's
 	int	index=atoi(variable+1)-1;
 	if (index<0) {
-		return 0;
+		return false;
 	}
 	insqlda->sqlvar[index].sqltype=SQL_LONG;
 	insqlda->sqlvar[index].sqlscale=0;
@@ -267,10 +269,10 @@ int	interbasecursor::inputBindLong(const char *variable,
 	insqlda->sqlvar[index].ownname[0]=(char)NULL;
 	insqlda->sqlvar[index].aliasname_length=0;
 	insqlda->sqlvar[index].aliasname[0]=(char)NULL;
-	return 1;
+	return true;
 }
 
-int	interbasecursor::inputBindDouble(const char *variable,
+bool interbasecursor::inputBindDouble(const char *variable,
 					unsigned short variablesize,
 					double *value,
 					unsigned short precision,
@@ -279,7 +281,7 @@ int	interbasecursor::inputBindDouble(const char *variable,
 	// make bind vars 1 based like all other db's
 	int	index=atoi(variable+1)-1;
 	if (index<0) {
-		return 0;
+		return false;
 	}
 	insqlda->sqlvar[index].sqltype=SQL_DOUBLE;
 	insqlda->sqlvar[index].sqlscale=scale;
@@ -295,10 +297,10 @@ int	interbasecursor::inputBindDouble(const char *variable,
 	insqlda->sqlvar[index].ownname[0]=(char)NULL;
 	insqlda->sqlvar[index].aliasname_length=0;
 	insqlda->sqlvar[index].aliasname[0]=(char)NULL;
-	return 1;
+	return true;
 }
 
-int	interbasecursor::outputBindString(const char *variable, 
+bool interbasecursor::outputBindString(const char *variable, 
 				unsigned short variablesize,
 				char *value, 
 				unsigned short valuesize, 
@@ -306,12 +308,12 @@ int	interbasecursor::outputBindString(const char *variable,
 
 	// if we're doing output binds then the
 	// query must be a stored procedure
-	queryIsExecSP=1;
+	queryIsExecSP=true;
 
 	// make bind vars 1 based like all other db's
 	int	index=atoi(variable+1)-1;
 	if (index<0) {
-		return 0;
+		return false;
 	}
 	outsqlda->sqlvar[index].sqltype=SQL_TEXT+1;
 	outsqlda->sqlvar[index].sqlscale=0;
@@ -327,10 +329,10 @@ int	interbasecursor::outputBindString(const char *variable,
 	outsqlda->sqlvar[index].ownname[0]=(char)NULL;
 	outsqlda->sqlvar[index].aliasname_length=0;
 	outsqlda->sqlvar[index].aliasname[0]=(char)NULL;
-	return 1;
+	return true;
 }
 
-int	interbasecursor::executeQuery(const char *query, long length,
+bool interbasecursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
 
 	// for commit or rollback, execute the API call and return
@@ -347,17 +349,18 @@ int	interbasecursor::executeQuery(const char *query, long length,
 		if (isc_dsql_execute2(interbaseconn->error,
 					&interbaseconn->tr,
 					&stmt,1,insqlda,outsqlda)) {
-			return 0;
+			return false;
 		}
 
 		for (int i=0; i<outsqlda->sqld; i++) {
 			if ((outsqlda->sqlvar[i].sqltype==SQL_TEXT) ||
-				(outsqlda->sqlvar[i].sqltype==SQL_TEXT+1) ) {
-				outsqlda->sqlvar[i].
-					sqldata[outsqlda->sqlvar[i].sqllen-1]=0;
+				(outsqlda->sqlvar[i].sqltype==
+							SQL_TEXT+1) ) {
+				outsqlda->sqlvar[i].sqldata[
+					outsqlda->sqlvar[i].sqllen-1]=0;
 			}
 		}
-		return 1;
+		return true;
 	}
 
 	// handle non-stored procedures...
@@ -365,7 +368,7 @@ int	interbasecursor::executeQuery(const char *query, long length,
 	// describe the cursor
 	outsqlda->sqld=0;
 	if (isc_dsql_describe(interbaseconn->error,&stmt,1,outsqlda)) {
-		return 0;
+		return false;
 	}
 	if (outsqlda->sqld>MAX_SELECT_LIST_SIZE) {
 		outsqlda->sqld=MAX_SELECT_LIST_SIZE;
@@ -385,7 +388,8 @@ int	interbasecursor::executeQuery(const char *query, long length,
 			outsqlda->sqlvar[i].sqldata=field[i].textbuffer;
 			field[i].sqlrtype=CHAR_DATATYPE;
 		} else if (outsqlda->sqlvar[i].sqltype==SQL_VARYING ||
-				outsqlda->sqlvar[i].sqltype==SQL_VARYING+1) {
+				outsqlda->sqlvar[i].
+					sqltype==SQL_VARYING+1) {
 			outsqlda->sqlvar[i].sqldata=field[i].textbuffer;
 			field[i].sqlrtype=VARCHAR_DATATYPE;
 		} else if (outsqlda->sqlvar[i].sqltype==SQL_SHORT ||
@@ -400,7 +404,7 @@ int	interbasecursor::executeQuery(const char *query, long length,
 		// an sqlscale as INT64's.
 		} else if ((outsqlda->sqlvar[i].sqltype==SQL_LONG ||
 				outsqlda->sqlvar[i].sqltype==SQL_LONG+1) &&
-				outsqlda->sqlvar[i].sqlscale==0) {
+				!outsqlda->sqlvar[i].sqlscale) {
 			outsqlda->sqlvar[i].sqldata=
 					(char *)&field[i].longbuffer;
 			field[i].sqlrtype=INTEGER_DATATYPE;
@@ -446,7 +450,8 @@ int	interbasecursor::executeQuery(const char *query, long length,
 			field[i].sqlrtype=QUAD_DATATYPE;
 		#ifdef SQL_TIMESTAMP
 		} else if (outsqlda->sqlvar[i].sqltype==SQL_TIMESTAMP || 
-				outsqlda->sqlvar[i].sqltype==SQL_TIMESTAMP+1) {
+				outsqlda->sqlvar[i].
+					sqltype==SQL_TIMESTAMP+1) {
 		#else
 		} else if (outsqlda->sqlvar[i].sqltype==SQL_DATE || 
 				outsqlda->sqlvar[i].sqltype==SQL_DATE+1) {
@@ -456,12 +461,14 @@ int	interbasecursor::executeQuery(const char *query, long length,
 			field[i].sqlrtype=TIMESTAMP_DATATYPE;
 		#ifdef SQL_TIMESTAMP
 		} else if (outsqlda->sqlvar[i].sqltype==SQL_TYPE_TIME || 
-				outsqlda->sqlvar[i].sqltype==SQL_TYPE_TIME+1) {
+				outsqlda->sqlvar[i].
+					sqltype==SQL_TYPE_TIME+1) {
 			outsqlda->sqlvar[i].sqldata=
 					(char *)&field[i].timebuffer;
 			field[i].sqlrtype=TIME_DATATYPE;
 		} else if (outsqlda->sqlvar[i].sqltype==SQL_TYPE_DATE || 
-				outsqlda->sqlvar[i].sqltype==SQL_TYPE_DATE+1) {
+				outsqlda->sqlvar[i].
+					sqltype==SQL_TYPE_DATE+1) {
 			outsqlda->sqlvar[i].sqldata=
 					(char *)&field[i].datebuffer;
 			field[i].sqlrtype=DATE_DATATYPE;
@@ -483,16 +490,16 @@ int	interbasecursor::executeQuery(const char *query, long length,
 							&stmt,1,insqlda);
 }
 
-int	interbasecursor::queryIsNotSelect() {
+bool interbasecursor::queryIsNotSelect() {
 	return !(querytype==isc_info_sql_stmt_select);
 }
 
-int	interbasecursor::queryIsCommitOrRollback() {
+bool interbasecursor::queryIsCommitOrRollback() {
 	return (querytype==isc_info_sql_stmt_commit ||
 		querytype==isc_info_sql_stmt_rollback);
 }
 
-char	*interbasecursor::getErrorMessage(int *liveconnection) {
+char *interbasecursor::getErrorMessage(bool *liveconnection) {
 
 	char	msg[512];
 	long	*pvector=interbaseconn->error;
@@ -514,20 +521,20 @@ char	*interbasecursor::getErrorMessage(int *liveconnection) {
 	isc_sql_interprete(sqlcode, msg, 512);
 	errormsg->append(msg);
 
-	*liveconnection=1;
+	*liveconnection=true;
 
 	return errormsg->getString();
 }
 
-void	interbasecursor::returnRowCounts() {
+void interbasecursor::returnRowCounts() {
 	conn->sendRowCounts((long)-1,(long)-1);
 }
 
-void	interbasecursor::returnColumnCount() {
+void interbasecursor::returnColumnCount() {
 	conn->sendColumnCount(outsqlda->sqld);
 }
 
-void	interbasecursor::returnColumnInfo() {
+void interbasecursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
@@ -589,26 +596,27 @@ void	interbasecursor::returnColumnInfo() {
 	}
 }
 
-int	interbasecursor::noRowsToReturn() {
-	return (outsqlda->sqld==0);
+bool interbasecursor::noRowsToReturn() {
+	return (!outsqlda->sqld);
 }
 
-int	interbasecursor::skipRow() {
+bool interbasecursor::skipRow() {
 	return fetchRow();
 }
 
-int	interbasecursor::fetchRow() {
+bool interbasecursor::fetchRow() {
 
 	ISC_STATUS	retcode;
-	if ((retcode=isc_dsql_fetch(interbaseconn->error,&stmt,1,outsqlda))) {
+	if ((retcode=isc_dsql_fetch(interbaseconn->error,
+					&stmt,1,outsqlda))) {
 		// if retcode is 100L, then there are no more rows,
 		// otherwise, there is an error... how do I handle this?
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-void	interbasecursor::returnRow() {
+void interbasecursor::returnRow() {
 
 	for (int col=0; col<outsqlda->sqld; col++) {
 
@@ -629,28 +637,38 @@ void	interbasecursor::returnRow() {
 				reallen=maxlen;
 			}
 			conn->sendField(field[col].textbuffer,reallen);
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_SHORT ||
-				outsqlda->sqlvar[col].sqltype==SQL_SHORT+1) {
+		} else if (outsqlda->sqlvar[col].
+					sqltype==SQL_SHORT ||
+				outsqlda->sqlvar[col].
+					sqltype==SQL_SHORT+1) {
 			stringbuffer	buffer;
 			buffer.append((long)field[col].shortbuffer);
 			conn->sendField(buffer.getString(),
 					strlen(buffer.getString()));
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_FLOAT ||
-				outsqlda->sqlvar[col].sqltype==SQL_FLOAT+1) {
+		} else if (outsqlda->sqlvar[col].
+					sqltype==SQL_FLOAT ||
+				outsqlda->sqlvar[col].
+					sqltype==SQL_FLOAT+1) {
 			stringbuffer	buffer;
 			buffer.append((double)field[col].floatbuffer);
 			conn->sendField(buffer.getString(),
 					strlen(buffer.getString()));
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_DOUBLE ||
-				outsqlda->sqlvar[col].sqltype==SQL_DOUBLE+1 ||
-				outsqlda->sqlvar[col].sqltype==SQL_D_FLOAT ||
-				outsqlda->sqlvar[col].sqltype==SQL_D_FLOAT+1) {
+		} else if (outsqlda->sqlvar[col].
+					sqltype==SQL_DOUBLE ||
+				outsqlda->sqlvar[col].
+					sqltype==SQL_DOUBLE+1 ||
+				outsqlda->sqlvar[col].
+					sqltype==SQL_D_FLOAT ||
+				outsqlda->sqlvar[col].
+					sqltype==SQL_D_FLOAT+1) {
 			stringbuffer	buffer;
 			buffer.append((double)field[col].doublebuffer);
 			conn->sendField(buffer.getString(),
 					strlen(buffer.getString()));
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_VARYING ||
-				outsqlda->sqlvar[col].sqltype==SQL_VARYING+1) {
+		} else if (outsqlda->sqlvar[col].
+					sqltype==SQL_VARYING ||
+				outsqlda->sqlvar[col].
+					sqltype==SQL_VARYING+1) {
 			// the first 2 bytes are the length in 
 			// an SQL_VARYING field
 			short	size;
@@ -663,20 +681,26 @@ void	interbasecursor::returnRow() {
 		// SQL_LONG type.  These can be identified because
 		// the sqlscale gets set too.  Treat SQL_LONG's with
 		// an sqlscale as INT64's.
-		} else if ((outsqlda->sqlvar[col].sqltype==SQL_LONG ||
-				outsqlda->sqlvar[col].sqltype==SQL_LONG+1) &&
-				outsqlda->sqlvar[col].sqlscale==0) {
+		} else if ((outsqlda->sqlvar[col].
+					sqltype==SQL_LONG ||
+				outsqlda->sqlvar[col].
+					sqltype==SQL_LONG+1) &&
+				!outsqlda->sqlvar[col].sqlscale) {
 			stringbuffer	buffer;
 			buffer.append((long)field[col].longbuffer);
 			conn->sendField(buffer.getString(),
 					strlen(buffer.getString()));
 		} else if (
 		#ifdef SQL_INT64
-				(outsqlda->sqlvar[col].sqltype==SQL_INT64 ||
-				outsqlda->sqlvar[col].sqltype==SQL_INT64+1) ||
+				(outsqlda->sqlvar[col].
+					sqltype==SQL_INT64 ||
+				outsqlda->sqlvar[col].
+					sqltype==SQL_INT64+1) ||
 		#endif
-				((outsqlda->sqlvar[col].sqltype==SQL_LONG ||
-				outsqlda->sqlvar[col].sqltype==SQL_LONG+1) &&
+				((outsqlda->sqlvar[col].
+					sqltype==SQL_LONG ||
+				outsqlda->sqlvar[col].
+					sqltype==SQL_LONG+1) &&
 				outsqlda->sqlvar[col].sqlscale)) {
 			// int64's are weird.  To the left of the decimal
 			// point is the value/10^scale, to the right is
@@ -689,7 +713,8 @@ void	interbasecursor::returnRow() {
 				stringbuffer	decimal;
 				decimal.append((long)field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale));
 			
-				// gotta get the right number of decimal places
+				// gotta get the right number
+				// of decimal places
 				for (int i=strlen(decimal.getString());
 					i<-outsqlda->sqlvar[col].sqlscale;
 					i++) {

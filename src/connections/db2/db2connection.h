@@ -39,34 +39,34 @@ class db2cursor : public sqlrcursor {
 			db2cursor(sqlrconnection *conn);
 			~db2cursor();
 	private:
-		int	prepareQuery(const char *query, long length);
-		int	inputBindString(const char *variable, 
+		bool	prepareQuery(const char *query, long length);
+		bool	inputBindString(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned short valuesize,
 					short *isnull);
-		int	inputBindLong(const char *variable, 
+		bool	inputBindLong(const char *variable, 
 					unsigned short variablesize,
 					unsigned long *value);
-		int	inputBindDouble(const char *variable, 
+		bool	inputBindDouble(const char *variable, 
 					unsigned short variablesize,
 					double *value, 
 					unsigned short precision,
 					unsigned short scale);
-		int	outputBindString(const char *variable, 
+		bool	outputBindString(const char *variable, 
 					unsigned short variablesize,
 					char *value, 
 					unsigned short valuesize,
 					short *isnull);
-		int	executeQuery(const char *query, long length,
+		bool	executeQuery(const char *query, long length,
 					unsigned short execute);
-		char	*getErrorMessage(int *liveconnection);
+		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();
 		void	returnColumnInfo();
-		int	noRowsToReturn();
-		int	skipRow();
-		int	fetchRow();
+		bool	noRowsToReturn();
+		bool	skipRow();
+		bool	fetchRow();
 		void	returnRow();
 
 		long		erg;
@@ -99,16 +99,16 @@ class db2connection : public sqlrconnection {
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
-		int	logIn();
+		bool	logIn();
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
 		short	nullBindValue();
-		int	bindValueIsNull(short isnull);
-		unsigned short	autoCommitOn();
-		unsigned short	autoCommitOff();
-		int	commit();
-		int	rollback();
+		bool	bindValueIsNull(short isnull);
+		bool	autoCommitOn();
+		bool	autoCommitOff();
+		bool	commit();
+		bool	rollback();
 		char	*pingQuery();
 		char	*identify();
 
@@ -117,7 +117,6 @@ class db2connection : public sqlrconnection {
 		SQLHDBC		dbc;
 
 		char		*server;
-		int		autocommit;
 };
 
 #endif

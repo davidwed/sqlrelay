@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::handleError() {
+bool sqlrconnection::handleError(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"handling error...");
@@ -11,21 +11,21 @@ int	sqlrconnection::handleError() {
 
 	// return the error unless the error was a dead connection, 
 	// in which case, re-establish the connection
-	if (!returnError()) {
+	if (!returnError(cursor)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"database is down...");
 		#endif
 		reLogIn();
-		return 0;
+		return false;
 	}
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done handling error...");
 	#endif
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::returnError() {
+bool sqlrconnection::returnError(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning error...");
@@ -33,8 +33,8 @@ int	sqlrconnection::returnError() {
 
 	// get the error message from the database
 	// return value: 1 if database connection is still alive, 0 if not
-	int	liveconnection;
-	char	*error=cur[currentcur]->getErrorMessage(&liveconnection);
+	bool	liveconnection;
+	char	*error=cursor->getErrorMessage(&liveconnection);
 
 	// only return an error message if the error wasn't a dead database
 	if (liveconnection) {
@@ -45,12 +45,12 @@ int	sqlrconnection::returnError() {
 		// send the error itself
 		int	errorlen=strlen(error);
 		clientsock->write((unsigned short)(errorlen+
-				strlen(cur[currentcur]->querybuffer)+18));
+				strlen(cursor->querybuffer)+18));
 		clientsock->write(error,errorlen);
 
 		// send the attempted query back too
 		clientsock->write("\nAttempted Query:\n");
-		clientsock->write(cur[currentcur]->querybuffer);
+		clientsock->write(cursor->querybuffer);
 	}
 	
 	#ifdef SERVER_DEBUG

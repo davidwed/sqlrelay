@@ -4,11 +4,11 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-void	sqlrcursor::prepareQuery(const char *query) {
+void sqlrcursor::prepareQuery(const char *query) {
 	prepareQuery(query,strlen(query));
 }
 
-void	sqlrcursor::prepareQuery(const char *query, int length) {
+void sqlrcursor::prepareQuery(const char *query, int length) {
 	reexecute=0;
 	validatebinds=0;
 	resumed=0;
@@ -25,7 +25,7 @@ void	sqlrcursor::prepareQuery(const char *query, int length) {
 	}
 }
 
-int	sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
+int sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 
 	// init some variables
 	reexecute=0;
@@ -142,14 +142,14 @@ int	sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	return 1;
 }
 
-void	sqlrcursor::initQueryBuffer() {
+void sqlrcursor::initQueryBuffer() {
 	if (!querybuffer) {
 		querybuffer=new char[MAXQUERYSIZE+1];
 		queryptr=querybuffer;
 	}
 }
 
-void	sqlrcursor::attachToBindCursor(short bindcursorid) {
+void sqlrcursor::attachToBindCursor(short bindcursorid) {
 	prepareQuery("");
 	reexecute=1;
 	cursorid=bindcursorid;

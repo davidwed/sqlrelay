@@ -33,7 +33,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	ttl=::atoi(DEFAULT_TTL);
 	endofsession=strdup(DEFAULT_ENDOFSESSION);
 	endofsessioncommit=!strcmp(endofsession,"commit");
-	sessiontimeout=::atoi(DEFAULT_SESSIONTIMEOUT);
+	sessiontimeout=::atol(DEFAULT_SESSIONTIMEOUT);
 	runasuser=strdup(DEFAULT_RUNASUSER);
 	runasgroup=strdup(DEFAULT_RUNASGROUP);
 	cursors=::atoi(DEFAULT_CURSORS);
@@ -156,7 +156,7 @@ bool sqlrconfigfile::getEndOfSessionCommit() {
 	return endofsessioncommit;
 }
 
-int sqlrconfigfile::getSessionTimeout() {
+long sqlrconfigfile::getSessionTimeout() {
 	return sessiontimeout;
 }
 
@@ -387,7 +387,7 @@ bool sqlrconfigfile::attributeValue(char *value) {
 			endofsession=strdup((value)?value:DEFAULT_ENDOFSESSION);
 			endofsessioncommit=!strcmp(endofsession,"commit");
 		} else if (currentattribute==SESSIONTIMEOUT_ATTRIBUTE) {
-			sessiontimeout=atoi(value,DEFAULT_SESSIONTIMEOUT,1);
+			sessiontimeout=atol(value,DEFAULT_SESSIONTIMEOUT,1);
 		} else if (currentattribute==RUNASUSER_ATTRIBUTE) {
 			delete[] runasuser;
 			runasuser=strdup((value)?value:DEFAULT_RUNASUSER);
@@ -447,6 +447,15 @@ int sqlrconfigfile::atoi(const char *value,
 	int	retval=::atoi((value)?value:defaultvalue);
 	if (retval<minvalue) {
 		retval=::atoi(defaultvalue);
+	}
+	return retval;
+}
+
+long sqlrconfigfile::atol(const char *value,
+				const char *defaultvalue, long minvalue) {
+	long	retval=::atol((value)?value:defaultvalue);
+	if (retval<minvalue) {
+		retval=::atol(defaultvalue);
 	}
 	return retval;
 }

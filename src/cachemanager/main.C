@@ -6,12 +6,12 @@
 
 cachemanager	*cacheman;
 
-void	shutDown() {
+void shutDown() {
 	delete cacheman;
 	exit(0);
 }
 
-int	main(int argc, const char **argv) {
+int main(int argc, const char **argv) {
 
 	#include <version.h>
 

@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-int	sqlrconnection::resumeSession(int port, const char *socket) {
+int sqlrconnection::resumeSession(int port, const char *socket) {
 
 	// if already connected, end the session
 	if (connected) {
@@ -45,7 +45,7 @@ int	sqlrconnection::resumeSession(int port, const char *socket) {
 		if (debug) {
 			debugPreStart();
 			debugPrint("success");
-		       	debugPrint("\n");
+			debugPrint("\n");
 			debugPreEnd();
 		}
 		clearSessionFlags();

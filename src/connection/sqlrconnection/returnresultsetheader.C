@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::returnResultSetHeader() {
+void sqlrconnection::returnResultSetHeader(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning result set header...");
@@ -14,7 +14,7 @@ void	sqlrconnection::returnResultSetHeader() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"returning row counts...");
 	#endif
-	cur[currentcur]->returnRowCounts();
+	cursor->returnRowCounts();
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"done returning row counts");
 	#endif
@@ -37,7 +37,7 @@ void	sqlrconnection::returnResultSetHeader() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"returning column counts...");
 	#endif
-	cur[currentcur]->returnColumnCount();
+	cursor->returnColumnCount();
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"done returning column counts");
 	#endif
@@ -48,7 +48,7 @@ void	sqlrconnection::returnResultSetHeader() {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"returning column info...");
 		#endif
-		cur[currentcur]->returnColumnInfo();
+		cursor->returnColumnInfo();
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"done returning column info");
 		#endif
@@ -56,7 +56,7 @@ void	sqlrconnection::returnResultSetHeader() {
 
 
 	// return the output bind vars
-	returnOutputBindValues();
+	returnOutputBindValues(cursor);
 
 
 	// terminate the bind vars

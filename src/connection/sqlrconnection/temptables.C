@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::dropTempTables(stringlist *tablelist) {
+void sqlrconnection::dropTempTables(stringlist *tablelist) {
 
 	// run through the temp table list, dropping tables
 	for (stringlistnode *sln=tablelist->getNodeByIndex(0);
@@ -14,7 +14,7 @@ void	sqlrconnection::dropTempTables(stringlist *tablelist) {
 	tablelist->clear();
 }
 
-void	sqlrconnection::dropTempTable(const char *tablename) {
+void sqlrconnection::dropTempTable(const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table ")->append(tablename);
 	sqlrcursor	*dropcur=initCursor();
@@ -29,7 +29,7 @@ void	sqlrconnection::dropTempTable(const char *tablename) {
 	delete dropcur;
 }
 
-void	sqlrconnection::truncateTempTables(stringlist *tablelist) {
+void sqlrconnection::truncateTempTables(stringlist *tablelist) {
 
 	// run through the temp table list, truncateing tables
 	for (stringlistnode *sln=tablelist->getNodeByIndex(0);
@@ -40,7 +40,7 @@ void	sqlrconnection::truncateTempTables(stringlist *tablelist) {
 	tablelist->clear();
 }
 
-void	sqlrconnection::truncateTempTable(const char *tablename) {
+void sqlrconnection::truncateTempTable(const char *tablename) {
 	stringbuffer	truncatequery;
 	truncatequery.append("delete from ")->append(tablename);
 	sqlrcursor	*truncatecur=initCursor();
@@ -55,18 +55,18 @@ void	sqlrconnection::truncateTempTable(const char *tablename) {
 	delete truncatecur;
 }
 
-void	sqlrconnection::addSessionTempTableForDrop(const char *table) {
+void sqlrconnection::addSessionTempTableForDrop(const char *table) {
 	sessiontemptablesfordrop.append(strdup(table));
 }
 
-void	sqlrconnection::addTransactionTempTableForDrop(const char *table) {
+void sqlrconnection::addTransactionTempTableForDrop(const char *table) {
 	transtemptablesfordrop.append(strdup(table));
 }
 
-void	sqlrconnection::addSessionTempTableForTrunc(const char *table) {
+void sqlrconnection::addSessionTempTableForTrunc(const char *table) {
 	sessiontemptablesfortrunc.append(strdup(table));
 }
 
-void	sqlrconnection::addTransactionTempTableForTrunc(const char *table) {
+void sqlrconnection::addTransactionTempTableForTrunc(const char *table) {
 	transtemptablesfortrunc.append(strdup(table));
 }

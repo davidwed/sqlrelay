@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::getSendColumnInfo() {
+bool sqlrconnection::getSendColumnInfo() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"getting send column info...");
@@ -13,7 +13,7 @@ int	sqlrconnection::getSendColumnInfo() {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"getting send column info failed");
 		#endif
-		return 0;
+		return false;
 	}
 
 	#ifdef SERVER_DEBUG
@@ -25,5 +25,5 @@ int	sqlrconnection::getSendColumnInfo() {
 	debugPrint("connection",2,"done getting send column info...");
 	#endif
 
-	return 1;
+	return true;
 }

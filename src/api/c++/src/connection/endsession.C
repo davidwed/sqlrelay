@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int	sqlrconnection::endSession() {
+int sqlrconnection::endSession() {
 
 	if (debug) {
 		debugPreStart();

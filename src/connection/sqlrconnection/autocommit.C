@@ -3,19 +3,19 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::setAutoCommitBehavior(int ac) {
+void sqlrconnection::setAutoCommitBehavior(bool ac) {
 	autocommit=ac;
 }
 
-int	sqlrconnection::getAutoCommitBehavior() {
+bool sqlrconnection::getAutoCommitBehavior() {
 	return autocommit;
 }
 
-void	sqlrconnection::autoCommitCommand() {
+void sqlrconnection::autoCommitCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"autocommit...");
 	#endif
-	unsigned short	on;
+	bool	on;
 	clientsock->read(&on);
 	if (on) {
 		#ifdef SERVER_DEBUG
@@ -30,14 +30,14 @@ void	sqlrconnection::autoCommitCommand() {
 	}
 }
 
-unsigned short	sqlrconnection::autoCommitOn() {
-	checkautocommit=1;
-	performautocommit=1;
-	return 1;
+bool sqlrconnection::autoCommitOn() {
+	checkautocommit=true;
+	performautocommit=true;
+	return true;
 }
 
-unsigned short	sqlrconnection::autoCommitOff() {
-	checkautocommit=1;
-	performautocommit=0;
-	return 1;
+bool sqlrconnection::autoCommitOff() {
+	checkautocommit=true;
+	performautocommit=false;
+	return true;
 }

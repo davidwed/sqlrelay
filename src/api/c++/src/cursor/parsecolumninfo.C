@@ -8,7 +8,7 @@
 #define NEED_DATATYPESTRING
 #include <datatypes.h>
 
-int	sqlrcursor::parseColumnInfo() {
+int sqlrcursor::parseColumnInfo() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -295,7 +295,7 @@ int	sqlrcursor::parseColumnInfo() {
 	return 1;
 }
 
-void	sqlrcursor::createColumnBuffers() {
+void sqlrcursor::createColumnBuffers() {
 
 	// we could get really sophisticated here and keep stats on the number
 	// of columns that previous queries returned and adjust the size of

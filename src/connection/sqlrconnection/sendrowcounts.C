@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::sendRowCounts(long actual, long affected) {
+void sqlrconnection::sendRowCounts(long actual, long affected) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"sending row counts...");

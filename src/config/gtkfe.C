@@ -164,7 +164,7 @@ gtkfe::~gtkfe() {
 	}
 }
 
-void	gtkfe::run(int argc, char **argv) {
+void gtkfe::run(int argc, char **argv) {
 
 	// init gtk and build the interface
 	gtk_init(&argc, &argv);
@@ -179,7 +179,7 @@ void	gtkfe::run(int argc, char **argv) {
 	gtk_main();
 }
 
-void	gtkfe::buildInterface() {
+void gtkfe::buildInterface() {
 
 	buildMainWindow();
 	buildMenuBar();
@@ -192,7 +192,7 @@ void	gtkfe::buildInterface() {
 }
 
 
-void	gtkfe::buildMainWindow() {
+void gtkfe::buildMainWindow() {
 
 	// main window
 	window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -219,7 +219,7 @@ void	gtkfe::buildMainWindow() {
 }
 
 
-void	gtkfe::buildMenuBar() {
+void gtkfe::buildMenuBar() {
 
 	// file menu
 	filemenu=gtk_menu_new();
@@ -280,7 +280,7 @@ void	gtkfe::buildMenuBar() {
 }
 
 
-void	gtkfe::buildInstanceList() {
+void gtkfe::buildInstanceList() {
 
 	// instance list vertical box
 	instancelistvbox=gtk_vbox_new(FALSE,0);
@@ -332,7 +332,7 @@ void	gtkfe::buildInstanceList() {
 }
 
 
-void	gtkfe::buildNotebookFrame() {
+void gtkfe::buildNotebookFrame() {
 
 	// instance list vertical box
 	instanceframevbox=gtk_vbox_new(FALSE,0);
@@ -371,7 +371,7 @@ void	gtkfe::buildNotebookFrame() {
 	gtk_widget_show(instanceframevbox);
 }
 
-void	gtkfe::buildInstancePage() {
+void gtkfe::buildInstancePage() {
 
 	// properties tab
 	propertiestab=gtk_label_new("Properties");
@@ -683,7 +683,7 @@ void	gtkfe::buildInstancePage() {
 }
 
 
-void	gtkfe::buildConnectionsPage() {
+void gtkfe::buildConnectionsPage() {
 
 	// connections tab
 	connectionstab=gtk_label_new("Connections");
@@ -827,7 +827,7 @@ void	gtkfe::buildConnectionsPage() {
 }
 
 
-void	gtkfe::buildUsersPage() {
+void gtkfe::buildUsersPage() {
 
 	// users tab
 	userstab=gtk_label_new("Users");
@@ -958,14 +958,14 @@ void	gtkfe::buildUsersPage() {
 }
 
 
-void	gtkfe::showMainWindow() {
+void gtkfe::showMainWindow() {
 
 	// show the main window
 	gtk_widget_show(window);
 }
 
 
-void	gtkfe::populateInstanceList() {
+void gtkfe::populateInstanceList() {
 
 	// freeze the list
 	gtk_clist_freeze(GTK_CLIST(instancelist));
@@ -989,7 +989,7 @@ void	gtkfe::populateInstanceList() {
 	gtk_clist_thaw(GTK_CLIST(instancelist));
 }
 
-void	gtkfe::populateInstanceParameters(instance *inst) {
+void gtkfe::populateInstanceParameters(instance *inst) {
 
 	// set the entries' text to the value from the DOM tree
 	gtk_entry_set_text(GTK_ENTRY(identry),inst->getId());
@@ -1027,7 +1027,7 @@ void	gtkfe::populateInstanceParameters(instance *inst) {
 				inst->getDebug());
 }
 
-void	gtkfe::clearInstanceParameters() {
+void gtkfe::clearInstanceParameters() {
 
 	// set the entries' text to ""
 	gtk_entry_set_text(GTK_ENTRY(identry),"");
@@ -1051,7 +1051,7 @@ void	gtkfe::clearInstanceParameters() {
 	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(debugcombo)->entry),"");
 }
 
-void	gtkfe::defaultInstanceParameters() {
+void gtkfe::defaultInstanceParameters() {
 
 	// set the entries' text to default values
 	gtk_entry_set_text(GTK_ENTRY(identry),"");
@@ -1082,7 +1082,7 @@ void	gtkfe::defaultInstanceParameters() {
 							DEFAULT_DEBUG);
 }
 
-void	gtkfe::populateUserList(instance *inst) {
+void gtkfe::populateUserList(instance *inst) {
 
 	// freeze the list
 	gtk_clist_freeze(GTK_CLIST(userlist));
@@ -1106,21 +1106,21 @@ void	gtkfe::populateUserList(instance *inst) {
 	gtk_clist_thaw(GTK_CLIST(userlist));
 }
 
-void	gtkfe::populateUserParameters(user *usr) {
+void gtkfe::populateUserParameters(user *usr) {
 
 	// set the entries' text to the value from the DOM tree
 	gtk_entry_set_text(GTK_ENTRY(userentry),usr->getUser());
 	gtk_entry_set_text(GTK_ENTRY(passwordentry),usr->getPassword());
 }
 
-void	gtkfe::clearUserParameters() {
+void gtkfe::clearUserParameters() {
 
 	// set the entries' text to ""
 	gtk_entry_set_text(GTK_ENTRY(userentry),"");
 	gtk_entry_set_text(GTK_ENTRY(passwordentry),"");
 }
 
-void	gtkfe::populateConnectionList(instance *inst) {
+void gtkfe::populateConnectionList(instance *inst) {
 
 	// freeze the list
 	gtk_clist_freeze(GTK_CLIST(connectionlist));
@@ -1144,7 +1144,7 @@ void	gtkfe::populateConnectionList(instance *inst) {
 	gtk_clist_thaw(GTK_CLIST(connectionlist));
 }
 
-void	gtkfe::populateConnectionParameters(connection *conn) {
+void gtkfe::populateConnectionParameters(connection *conn) {
 
 	// set the entries' text to the value from the DOM tree
 	gtk_entry_set_text(GTK_ENTRY(connectionidentry),
@@ -1153,7 +1153,7 @@ void	gtkfe::populateConnectionParameters(connection *conn) {
 	gtk_entry_set_text(GTK_ENTRY(metricentry),conn->getMetric());
 }
 
-void	gtkfe::clearConnectionParameters() {
+void gtkfe::clearConnectionParameters() {
 
 	// set the entries' text to ""
 	gtk_entry_set_text(GTK_ENTRY(connectionidentry),"");
@@ -1161,7 +1161,7 @@ void	gtkfe::clearConnectionParameters() {
 	gtk_entry_set_text(GTK_ENTRY(metricentry),"");
 }
 
-void	gtkfe::defaultConnectionParameters() {
+void gtkfe::defaultConnectionParameters() {
 
 	// set the entries' text to ""
 	gtk_entry_set_text(GTK_ENTRY(connectionidentry),"");
@@ -1169,7 +1169,7 @@ void	gtkfe::defaultConnectionParameters() {
 	gtk_entry_set_text(GTK_ENTRY(metricentry),DEFAULT_METRIC);
 }
 
-void	gtkfe::newFile(GtkWidget *widget, gpointer data) {
+void gtkfe::newFile(GtkWidget *widget, gpointer data) {
 
 	// create a blank conffile
 	if (conffile) {
@@ -1201,7 +1201,7 @@ void	gtkfe::newFile(GtkWidget *widget, gpointer data) {
 	gtk_widget_set_sensitive(closeitem,TRUE);
 }
 
-void	gtkfe::openFile(GtkWidget *widget, gpointer data) {
+void gtkfe::openFile(GtkWidget *widget, gpointer data) {
 
 	// create a file dialog, attach callbacks to it's buttons
 	fileselector=gtk_file_selection_new("Open");
@@ -1221,7 +1221,7 @@ void	gtkfe::openFile(GtkWidget *widget, gpointer data) {
 	gtk_widget_show(fileselector);
 }
 
-void	gtkfe::closeFile(GtkWidget *widget, gpointer data) {
+void gtkfe::closeFile(GtkWidget *widget, gpointer data) {
 
 	// close the conffile
 	if (conffile) {
@@ -1250,7 +1250,7 @@ void	gtkfe::closeFile(GtkWidget *widget, gpointer data) {
 	gtk_widget_set_sensitive(closeitem,FALSE);
 }
 
-void	gtkfe::saveFile(GtkWidget *widget, gpointer data) {
+void gtkfe::saveFile(GtkWidget *widget, gpointer data) {
 
 	if (conffile->currentFile()) {
 		// write the current DOM tree to the currently open file
@@ -1263,7 +1263,7 @@ void	gtkfe::saveFile(GtkWidget *widget, gpointer data) {
 	}
 }
 
-void	gtkfe::saveFileAs(GtkWidget *widget, gpointer data) {
+void gtkfe::saveFileAs(GtkWidget *widget, gpointer data) {
 
 	// create a file dialog, attach callbacks to it's buttons
 	fileselector=gtk_file_selection_new("Save As...");
@@ -1283,7 +1283,7 @@ void	gtkfe::saveFileAs(GtkWidget *widget, gpointer data) {
 	gtk_widget_show(fileselector);
 }
 
-void	gtkfe::quit(GtkWidget *widget, gpointer data) {
+void gtkfe::quit(GtkWidget *widget, gpointer data) {
 
 	// clean up
 	if (conffile) {
@@ -1295,7 +1295,7 @@ void	gtkfe::quit(GtkWidget *widget, gpointer data) {
 	gtk_main_quit();
 }
 
-void	gtkfe::openFileOk(GtkWidget *widget, gpointer data) {
+void gtkfe::openFileOk(GtkWidget *widget, gpointer data) {
 
 	// get the filename from the dialog
 	handleFile(gtk_file_selection_get_filename(
@@ -1306,7 +1306,7 @@ void	gtkfe::openFileOk(GtkWidget *widget, gpointer data) {
 	gtk_widget_destroy(fileselector);
 }
 
-void	gtkfe::handleFile(const char *filename) {
+void gtkfe::handleFile(const char *filename) {
 
 	// create an instance of configfile
 	if (conffile) {
@@ -1343,7 +1343,7 @@ void	gtkfe::handleFile(const char *filename) {
 	gtk_widget_set_sensitive(closeitem,TRUE);
 }
 
-void	gtkfe::saveFileAsOk(GtkWidget *widget, gpointer data) {
+void gtkfe::saveFileAsOk(GtkWidget *widget, gpointer data) {
 
 	// write the file to the file name from the dialog
 	if (conffile->write(gtk_file_selection_get_filename(
@@ -1357,14 +1357,14 @@ void	gtkfe::saveFileAsOk(GtkWidget *widget, gpointer data) {
 	}
 }
 
-void	gtkfe::fileCancel(GtkWidget *widget, gpointer data) {
+void gtkfe::fileCancel(GtkWidget *widget, gpointer data) {
 
 	// de-modalize and destroy the dialog
 	gtk_grab_remove(fileselector);
 	gtk_widget_destroy(fileselector);
 }
 
-void	gtkfe::instanceListSelect(GtkWidget *widget, gint row, gint column,
+void gtkfe::instanceListSelect(GtkWidget *widget, gint row, gint column,
 				GdkEventButton *event, gpointer data) {
 
 	// if we were adding a new one already, delete it
@@ -1394,7 +1394,7 @@ void	gtkfe::instanceListSelect(GtkWidget *widget, gint row, gint column,
 	gtk_widget_set_sensitive(instanceframevbox,TRUE);
 }
 
-void	gtkfe::userListSelect(GtkWidget *widget, gint row, gint column,
+void gtkfe::userListSelect(GtkWidget *widget, gint row, gint column,
 				GdkEventButton *event, gpointer data) {
 
 	// if we were adding a new one already, delete it
@@ -1417,7 +1417,7 @@ void	gtkfe::userListSelect(GtkWidget *widget, gint row, gint column,
 	gtk_widget_set_sensitive(usersvbox,TRUE);
 }
 
-void	gtkfe::connectionListSelect(GtkWidget *widget, gint row, gint column,
+void gtkfe::connectionListSelect(GtkWidget *widget, gint row, gint column,
 					GdkEventButton *event, gpointer data) {
 
 	// if we were adding a new one already, delete it
@@ -1441,7 +1441,7 @@ void	gtkfe::connectionListSelect(GtkWidget *widget, gint row, gint column,
 	gtk_widget_set_sensitive(connectionsvbox,TRUE);
 }
 
-void	gtkfe::instanceParametersSave(GtkWidget *widget, gpointer data) {
+void gtkfe::instanceParametersSave(GtkWidget *widget, gpointer data) {
 
 	char	*id=gtk_entry_get_text(GTK_ENTRY(identry));
 
@@ -1519,7 +1519,7 @@ void	gtkfe::instanceParametersSave(GtkWidget *widget, gpointer data) {
 	clearAllInstanceData();
 }
 
-void	gtkfe::instanceParametersCancel(GtkWidget *widget, gpointer data) {
+void gtkfe::instanceParametersCancel(GtkWidget *widget, gpointer data) {
 
 	if (currentinstanceindex==-1) {
 		// if it was a new instance, delete it
@@ -1534,7 +1534,7 @@ void	gtkfe::instanceParametersCancel(GtkWidget *widget, gpointer data) {
 	clearAllInstanceData();
 }
 
-void	gtkfe::clearAllInstanceData() {
+void gtkfe::clearAllInstanceData() {
 
 	// clear all instance-related data
 	clearInstanceParameters();
@@ -1561,7 +1561,7 @@ void	gtkfe::clearAllInstanceData() {
 	gtk_widget_set_sensitive(instanceframevbox,FALSE);
 }
 
-void	gtkfe::connectionParametersSave(GtkWidget *widget, gpointer data) {
+void gtkfe::connectionParametersSave(GtkWidget *widget, gpointer data) {
 
 	char	*conn=gtk_entry_get_text(GTK_ENTRY(connectionidentry));
 
@@ -1597,7 +1597,7 @@ void	gtkfe::connectionParametersSave(GtkWidget *widget, gpointer data) {
 	clearAllConnectionData();
 }
 
-void	gtkfe::connectionParametersCancel(GtkWidget *widget, gpointer data) {
+void gtkfe::connectionParametersCancel(GtkWidget *widget, gpointer data) {
 
 	if (currentconnectionindex==-1) {
 		// if it was a new connection, delete it
@@ -1612,7 +1612,7 @@ void	gtkfe::connectionParametersCancel(GtkWidget *widget, gpointer data) {
 	clearAllConnectionData();
 }
 
-void	gtkfe::clearAllConnectionData() {
+void gtkfe::clearAllConnectionData() {
 
 	// clear all connection-related data
 	clearConnectionParameters();
@@ -1624,7 +1624,7 @@ void	gtkfe::clearAllConnectionData() {
 	gtk_widget_set_sensitive(connectionsvbox,FALSE);
 }
 
-void	gtkfe::userParametersSave(GtkWidget *widget, gpointer data) {
+void gtkfe::userParametersSave(GtkWidget *widget, gpointer data) {
 
 	char	*usr=gtk_entry_get_text(GTK_ENTRY(userentry));
 
@@ -1655,7 +1655,7 @@ void	gtkfe::userParametersSave(GtkWidget *widget, gpointer data) {
 	clearAllUserData();
 }
 
-void	gtkfe::userParametersCancel(GtkWidget *widget, gpointer data) {
+void gtkfe::userParametersCancel(GtkWidget *widget, gpointer data) {
 
 	if (currentuserindex==-1) {
 		// if it was a new user, delete it
@@ -1669,7 +1669,7 @@ void	gtkfe::userParametersCancel(GtkWidget *widget, gpointer data) {
 	clearAllUserData();
 }
 
-void	gtkfe::clearAllUserData() {
+void gtkfe::clearAllUserData() {
 
 	// clear all user-related data
 	clearUserParameters();
@@ -1681,7 +1681,7 @@ void	gtkfe::clearAllUserData() {
 	gtk_widget_set_sensitive(usersvbox,FALSE);
 }
 
-void	gtkfe::okDialog(const char *message) {
+void gtkfe::okDialog(const char *message) {
 
 	// create a dialog
 	okdialog=gtk_dialog_new();
@@ -1711,14 +1711,14 @@ void	gtkfe::okDialog(const char *message) {
 	gtk_widget_show(okdialog);
 }
 
-void	gtkfe::dialogOk(GtkWidget *widget, gpointer data) {
+void gtkfe::dialogOk(GtkWidget *widget, gpointer data) {
 
 	// de-modalize and destroy the dialog
 	gtk_grab_remove(okdialog);
 	gtk_widget_destroy(okdialog);
 }
 
-void	gtkfe::newInstance(GtkWidget *widget, gpointer data) {
+void gtkfe::newInstance(GtkWidget *widget, gpointer data) {
 
 	// if we were adding a new one already, delete it
 	if (currentinstance && currentinstanceindex==-1) {
@@ -1763,7 +1763,7 @@ void	gtkfe::newInstance(GtkWidget *widget, gpointer data) {
 	gtk_widget_set_sensitive(instanceframevbox,TRUE);
 }
 
-void	gtkfe::deleteInstance(GtkWidget *widget, gpointer data) {
+void gtkfe::deleteInstance(GtkWidget *widget, gpointer data) {
 
 	// unselect the selected instance
 	gtk_clist_unselect_row(GTK_CLIST(instancelist),currentinstanceindex,0);
@@ -1776,7 +1776,7 @@ void	gtkfe::deleteInstance(GtkWidget *widget, gpointer data) {
 	clearAllInstanceData();
 }
 
-void	gtkfe::newConnection(GtkWidget *widget, gpointer data) {
+void gtkfe::newConnection(GtkWidget *widget, gpointer data) {
 
 	// if we were adding a new one already, delete it
 	if (currentconnectionindex==-1) {
@@ -1803,7 +1803,7 @@ void	gtkfe::newConnection(GtkWidget *widget, gpointer data) {
 	gtk_widget_set_sensitive(connectionsvbox,TRUE);
 }
 
-void	gtkfe::deleteConnection(GtkWidget *widget, gpointer data) {
+void gtkfe::deleteConnection(GtkWidget *widget, gpointer data) {
 
 	// unselect the selected instance
 	gtk_clist_unselect_row(GTK_CLIST(connectionlist),
@@ -1817,7 +1817,7 @@ void	gtkfe::deleteConnection(GtkWidget *widget, gpointer data) {
 	clearAllConnectionData();
 }
 
-void	gtkfe::newUser(GtkWidget *widget, gpointer data) {
+void gtkfe::newUser(GtkWidget *widget, gpointer data) {
 
 	// if we were adding a new one already, delete it
 	if (currentuser && currentuserindex==-1) {
@@ -1842,7 +1842,7 @@ void	gtkfe::newUser(GtkWidget *widget, gpointer data) {
 	gtk_widget_set_sensitive(usersvbox,TRUE);
 }
 
-void	gtkfe::deleteUser(GtkWidget *widget, gpointer data) {
+void gtkfe::deleteUser(GtkWidget *widget, gpointer data) {
 
 	// unselect the selected instance
 	gtk_clist_unselect_row(GTK_CLIST(userlist),currentuserindex,0);
@@ -1855,7 +1855,7 @@ void	gtkfe::deleteUser(GtkWidget *widget, gpointer data) {
 	clearAllUserData();
 }
 
-void	gtkfe::toggleCommit(GtkWidget *widget, gpointer data) {
+void gtkfe::toggleCommit(GtkWidget *widget, gpointer data) {
 	if (GTK_TOGGLE_BUTTON(widget)->active) {
 		commit=1;
 	} else {

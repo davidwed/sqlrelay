@@ -3,15 +3,16 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::handleQuery(int reexecute, int bindcursor,
-							int reallyexecute) {
+int sqlrconnection::handleQuery(sqlrcursor *cursor,
+					bool reexecute, bool bindcursor,
+					bool reallyexecute) {
 
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"handling query...");
 	#endif
 
-	if (!getQueryFromClient(reexecute,bindcursor)) {
+	if (!getQueryFromClient(cursor,reexecute,bindcursor)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",1,"failed to handle query");
 		#endif
@@ -22,25 +23,25 @@ int	sqlrconnection::handleQuery(int reexecute, int bindcursor,
 	for (;;) {
 
 		// process the query
-		if (processQuery(reexecute,bindcursor,reallyexecute)) {
+		if (processQuery(cursor,reexecute,bindcursor,reallyexecute)) {
 
 			// indicate that no error has occurred
 			clientsock->write((unsigned short)NO_ERROR);
 
 			// send the client the id of the 
 			// cursor that it's going to use
-			clientsock->write((unsigned short)currentcur);
+			clientsock->write((unsigned short)cursor->id);
 
 			// tell the client that this is not a
 			// suspended result set
-			clientsock->write(
-				(unsigned short)NO_SUSPENDED_RESULT_SET);
+			clientsock->write((unsigned short)
+						NO_SUSPENDED_RESULT_SET);
 
 			// if the query processed 
 			// ok then return a result set
 			// header and loop back to send the
 			// result set itself...
-			returnResultSetHeader();
+			returnResultSetHeader(cursor);
 
 			// free memory used by binds
 			bindpool->free();
@@ -54,10 +55,10 @@ int	sqlrconnection::handleQuery(int reexecute, int bindcursor,
 
 			// If the query didn't process ok,
 			// handle the error.
-			// If handleError returns a 0 then the error 
+			// If handleError returns false then the error 
 			// was a down database that has presumably
 			// come back up by now.  Loop back...
-			if (handleError()) {
+			if (handleError(cursor)) {
 
 				// client will be sending skip/fetch,
 				// better get it even though we're not gonna
@@ -66,7 +67,7 @@ int	sqlrconnection::handleQuery(int reexecute, int bindcursor,
 				clientsock->read(&skipfetch);
 				clientsock->read(&skipfetch);
 
-				cur[currentcur]->abort();
+				cursor->abort();
 				#ifdef SERVER_DEBUG
 				debugPrint("connection",1,
 					"failed to handle query: error");
@@ -82,67 +83,69 @@ int	sqlrconnection::handleQuery(int reexecute, int bindcursor,
 	return 1;
 }
 
-int	sqlrconnection::getQueryFromClient(int reexecute, int bindcursor) {
+bool sqlrconnection::getQueryFromClient(sqlrcursor *cursor,
+					bool reexecute, bool bindcursor) {
 
 	// if we're not reexecuting and not using a bound cursor, get the query,
 	// if we're not using a bound cursor, get the input/output binds,
 	// get whether to send column info or not
-	return (((reexecute || bindcursor)?1:getQuery()) &&
-		((bindcursor)?1:(getInputBinds() && getOutputBinds())) &&
+	return (((reexecute || bindcursor)?true:getQuery(cursor)) &&
+		((bindcursor)?true:
+		(getInputBinds(cursor) && getOutputBinds(cursor))) &&
 		getSendColumnInfo());
 }
 
-int	sqlrconnection::getQuery() {
+bool sqlrconnection::getQuery(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"getting query...");
 	#endif
 
 	// get the length of the query
-	if (clientsock->read(&cur[currentcur]->querylength)!=
+	if (clientsock->read(&cursor->querylength)!=
 					sizeof(unsigned long)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting query failed: client sent bad query length size");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// bounds checking
-	if (cur[currentcur]->querylength>MAXQUERYSIZE) {
+	if (cursor->querylength>MAXQUERYSIZE) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting query failed: client sent bad query size");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// read the query into the buffer
-	if ((unsigned long)(clientsock->read(cur[currentcur]->querybuffer,
-				cur[currentcur]->querylength))!=
-					(unsigned long)(cur[currentcur]->
-								querylength)) {
+	if ((unsigned long)(clientsock->read(cursor->querybuffer,
+						cursor->querylength))!=
+					(unsigned long)(cursor->querylength)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting query failed: client sent short query");
 		#endif
-		return 0;
+		return false;
 	}
-	cur[currentcur]->querybuffer[cur[currentcur]->querylength]=(char)NULL;
+	cursor->querybuffer[cursor->querylength]=(char)NULL;
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"querylength:");
-	debugPrint("connection",4,(long)cur[currentcur]->querylength);
+	debugPrint("connection",4,(long)cursor->querylength);
 	debugPrint("connection",3,"query:");
-	debugPrint("connection",0,cur[currentcur]->querybuffer);
+	debugPrint("connection",0,cursor->querybuffer);
 	debugPrint("connection",2,"getting query succeeded");
 	#endif
 
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::processQuery(int reexecute, int bindcursor,
-							int reallyexecute) {
+bool sqlrconnection::processQuery(sqlrcursor *cursor,
+					bool reexecute, bool bindcursor,
+					bool reallyexecute) {
 
 	// Very important...
 	// Clean up data here instead of when aborting a result set, this
@@ -150,9 +153,9 @@ int	sqlrconnection::processQuery(int reexecute, int bindcursor,
 	// result set was fetched to still be able to return column data
 	// when resumed.
 	if (bindcursor) {
-		cur[currentcur]->cleanUpData(false,false,true);
+		cursor->cleanUpData(false,false,true);
 	} else {
-		cur[currentcur]->cleanUpData(true,true,true);
+		cursor->cleanUpData(true,true,true);
 	}
 
 	#ifdef SERVER_DEBUG
@@ -161,39 +164,35 @@ int	sqlrconnection::processQuery(int reexecute, int bindcursor,
 
 	// if the reexecute flag is set, the query doesn't need to be prepared 
 	// again.
-	int	success=0;
+	bool	success=false;
 	if (reexecute) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"re-executing...");
 		#endif
-		success=cur[currentcur]->handleBinds() && 
-			cur[currentcur]->executeQuery(
-					cur[currentcur]->querybuffer,
-					cur[currentcur]->querylength,
-					reallyexecute);
+		success=cursor->handleBinds() && 
+			cursor->executeQuery(cursor->querybuffer,
+						cursor->querylength,
+						reallyexecute);
 	} else if (bindcursor) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"bind cursor...");
 		#endif
-		success=cur[currentcur]->executeQuery(
-					cur[currentcur]->querybuffer,
-					cur[currentcur]->querylength,
-					reallyexecute);
+		success=cursor->executeQuery(cursor->querybuffer,
+						cursor->querylength,
+						reallyexecute);
 	} else {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"preparing/executing...");
 		#endif
-		success=cur[currentcur]->prepareQuery(
-					cur[currentcur]->querybuffer,
-					cur[currentcur]->querylength) && 
-			cur[currentcur]->handleBinds() && 
-			cur[currentcur]->executeQuery(
-					cur[currentcur]->querybuffer,
-					cur[currentcur]->querylength,1);
+		success=(cursor->prepareQuery(cursor->querybuffer,
+						cursor->querylength) && 
+			cursor->handleBinds() && 
+			cursor->executeQuery(cursor->querybuffer,
+						cursor->querylength,1));
 	}
 
 	// was the query a commit or rollback?
-	commitOrRollback();
+	commitOrRollback(cursor);
 
 	// On success, autocommit if necessary.
 	// Connection classes could override autoCommitOn() and autoCommitOff()
@@ -206,7 +205,7 @@ int	sqlrconnection::processQuery(int reexecute, int bindcursor,
 		debugPrint("connection",3,"commit necessary...");
 		#endif
 		success=commit();
-		commitorrollback=0;
+		commitorrollback=false;
 	}
 
 	#ifdef SERVER_DEBUG
@@ -221,7 +220,7 @@ int	sqlrconnection::processQuery(int reexecute, int bindcursor,
 	return success;
 }
 
-void	sqlrconnection::commitOrRollback() {
+void sqlrconnection::commitOrRollback(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"commit or rollback check...");
@@ -229,18 +228,18 @@ void	sqlrconnection::commitOrRollback() {
 
 	// if the query was a commit or rollback, set a flag indicating so
 	if (isTransactional()) {
-		if (cur[currentcur]->queryIsCommitOrRollback()) {
+		if (cursor->queryIsCommitOrRollback()) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",3,
 					"commit or rollback not needed");
 			#endif
-			commitorrollback=0;
-		} else if (cur[currentcur]->queryIsNotSelect()) {
+			commitorrollback=false;
+		} else if (cursor->queryIsNotSelect()) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",3,
 					"commit or rollback needed");
 			#endif
-			commitorrollback=1;
+			commitorrollback=true;
 		}
 	}
 

@@ -3,6 +3,6 @@
 
 #include <sqlrconnection.h>
 
-char	*sqlrconnection::getUser() {
+char *sqlrconnection::getUser() {
 	return user;
 }

@@ -4,7 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-int	sqlrcursor::skipAndFetch(int rowtoget) {
+int sqlrcursor::skipAndFetch(int rowtoget) {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -28,7 +28,7 @@ int	sqlrcursor::skipAndFetch(int rowtoget) {
 	return 1;
 }
 
-void	sqlrcursor::fetchRows() {
+void sqlrcursor::fetchRows() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -47,7 +47,7 @@ void	sqlrcursor::fetchRows() {
 	sqlrc->write((unsigned long)rsbuffersize);
 }
 
-int	sqlrcursor::skipRows(int rowtoget) {
+int sqlrcursor::skipRows(int rowtoget) {
 
 	// if we're reading from a cached result set we have to manually skip
 	if (cachesource && cachesourceind) {

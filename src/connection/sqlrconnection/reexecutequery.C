@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::reExecuteQueryCommand() {
+bool sqlrconnection::reExecuteQueryCommand(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"re-execute query");
@@ -11,21 +11,21 @@ int	sqlrconnection::reExecuteQueryCommand() {
 
 	// handle query will return 1 for success,
 	// 0 for network error and -1 for a bad query
-	int	querystatus=handleQuery(1,0,1);
+	int	querystatus=handleQuery(cursor,true,false,true);
 	if (querystatus==1) {
 
 		// reinit lastrow
 		lastrow=-1;
-		if (!returnResultSetData()) {
+		if (!returnResultSetData(cursor)) {
 			endSession();
-			return 0;
+			return false;
 		}
-		return 1;
+		return true;
 
-	} else if (querystatus==-1) {
-		return 1;
-	} else {
+	} else if (!querystatus) {
 		endSession();
-		return 0;
+		return false;
+	} else {
+		return true;
 	}
 }

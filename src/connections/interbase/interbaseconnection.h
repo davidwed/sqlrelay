@@ -49,36 +49,36 @@ class interbasecursor : public sqlrcursor {
 	private:
 			interbasecursor(sqlrconnection *conn);
 			~interbasecursor();
-		int	prepareQuery(const char *query, long length);
-		int	inputBindString(const char *variable, 
+		bool	prepareQuery(const char *query, long length);
+		bool	inputBindString(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned short valuesize,
 					short *isnull);
-		int	inputBindLong(const char *variable, 
+		bool	inputBindLong(const char *variable, 
 					unsigned short variablesize,
 					unsigned long *value);
-		int	inputBindDouble(const char *variable, 
+		bool	inputBindDouble(const char *variable, 
 					unsigned short variablesize,
 					double *value, 
 					unsigned short precision,
 					unsigned short scale);
-		int	outputBindString(const char *variable, 
+		bool	outputBindString(const char *variable, 
 					unsigned short variablesize,
 					char *value, 
 					unsigned short valuesize,
 					short *isnull);
-		int	executeQuery(const char *query, long length,
+		bool	executeQuery(const char *query, long length,
 					unsigned short execute);
-		int	queryIsNotSelect();
-		int	queryIsCommitOrRollback();
-		char	*getErrorMessage(int *liveconnection);
+		bool	queryIsNotSelect();
+		bool	queryIsCommitOrRollback();
+		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();
 		void	returnColumnInfo();
-		int	noRowsToReturn();
-		int	skipRow();
-		int	fetchRow();
+		bool	noRowsToReturn();
+		bool	skipRow();
+		bool	fetchRow();
 		void	returnRow();
 
 		isc_stmt_handle	stmt;
@@ -94,7 +94,7 @@ class interbasecursor : public sqlrcursor {
 
 		interbaseconnection	*interbaseconn;
 
-		int		queryIsExecSP;
+		bool		queryIsExecSP;
 };
 
 class interbaseconnection : public sqlrconnection {
@@ -105,13 +105,13 @@ class interbaseconnection : public sqlrconnection {
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
-		int	logIn();
+		bool	logIn();
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		int	commit();
-		int	rollback();
-		int	ping();
+		bool	commit();
+		bool	rollback();
+		bool	ping();
 		char	*identify();
 
 		char		dpb[256];

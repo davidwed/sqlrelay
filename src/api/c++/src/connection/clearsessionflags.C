@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-void	sqlrconnection::clearSessionFlags() {
+void sqlrconnection::clearSessionFlags() {
 
 	// indicate that the session hasn't been suspended or ended
 	endsessionsent=0;

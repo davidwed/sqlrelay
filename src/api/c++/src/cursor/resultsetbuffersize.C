@@ -4,7 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-void	sqlrcursor::setResultSetBufferSize(int rows) {
+void sqlrcursor::setResultSetBufferSize(int rows) {
 	rsbuffersize=rows;
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -15,6 +15,6 @@ void	sqlrcursor::setResultSetBufferSize(int rows) {
 	}
 }
 
-int	sqlrcursor::getResultSetBufferSize() {
+int sqlrcursor::getResultSetBufferSize() {
 	return rsbuffersize;
 }

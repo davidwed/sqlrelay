@@ -4,15 +4,15 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int	sqlrconnection::autoCommitOn() {
-	return autoCommit(1);
+int sqlrconnection::autoCommitOn() {
+	return autoCommit(true);
 }
 
-int	sqlrconnection::autoCommitOff() {
-	return autoCommit(0);
+int sqlrconnection::autoCommitOff() {
+	return autoCommit(false);
 }
 
-int	sqlrconnection::autoCommit(unsigned short on) {
+int sqlrconnection::autoCommit(bool on) {
 
 	if (!openSession()) {
 		return 0;
@@ -33,10 +33,10 @@ int	sqlrconnection::autoCommit(unsigned short on) {
 	write((unsigned short)AUTOCOMMIT);
 	write(on);
 
-	unsigned short	response;
-	if (read(&response)!=sizeof(unsigned short)) {
+	bool	response;
+	if (read(&response)!=sizeof(bool)) {
 		setError("Failed to get autocommit status.\n A network error may have ocurred.");
 		return -1;
 	}
-	return (int)response;
+	return (response)?1:0;
 }

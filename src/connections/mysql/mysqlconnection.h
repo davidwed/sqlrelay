@@ -16,15 +16,15 @@ class mysqlcursor : public sqlrcursor {
 	friend class mysqlconnection;
 	private:
 			mysqlcursor(sqlrconnection *conn);
-		int	executeQuery(const char *query, long length,
+		bool	executeQuery(const char *query, long length,
 						unsigned short execute);
-		char	*getErrorMessage(int *liveconnection);
+		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();
 		void	returnColumnInfo();
-		int	noRowsToReturn();
-		int	skipRow();
-		int	fetchRow();
+		bool	noRowsToReturn();
+		bool	skipRow();
+		bool	fetchRow();
 		void	returnRow();
 		void	cleanUpData(bool freerows, bool freecols,
 							bool freebinds);
@@ -47,23 +47,23 @@ class mysqlconnection : public sqlrconnection {
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
-		int	logIn();
+		bool	logIn();
 #ifdef HAVE_MYSQL_CHANGE_USER
-		int	changeUser(const char *newuser,
+		bool	changeUser(const char *newuser,
 					const char *newpassword);
 #endif
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		int	isTransactional();
+		bool	isTransactional();
 #ifdef HAVE_MYSQL_PING
-		int	ping();
+		bool	ping();
 #endif
 		char	*identify();
-		unsigned short	autoCommitOn();
-		unsigned short	autoCommitOff();
-		int	commit();
-		int	rollback();
+		bool	autoCommitOn();
+		bool	autoCommitOff();
+		bool	commit();
+		bool	rollback();
 
 		MYSQL	mysql;
 		int	connected;

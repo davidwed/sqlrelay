@@ -16,15 +16,15 @@ class lagocursor : public sqlrcursor {
 	friend class lagoconnection;
 	private:
 			lagocursor(sqlrconnection *conn);
-		int	executeQuery(const char *query, long length,
+		bool	executeQuery(const char *query, long length,
 					unsigned short execute);
-		char	*getErrorMessage(int *liveconnection);
+		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();
 		void	returnColumnInfo();
-		int	noRowsToReturn();
-		int	skipRow();
-		int	fetchRow();
+		bool	noRowsToReturn();
+		bool	skipRow();
+		bool	fetchRow();
 		void	returnRow();
 		void	cleanUpData(bool freerows, bool freecols,
 							bool freebinds);
@@ -42,17 +42,17 @@ class lagoconnection : public sqlrconnection {
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
-		int	logIn();
+		bool	logIn();
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		int	ping();
+		bool	ping();
 		char	*identify();
-		int	isTransactional();
-		unsigned short	autoCommitOn();
-		unsigned short	autoCommitOff();
-		int	commit();
-		int	rollback();
+		bool	isTransactional();
+		bool	autoCommitOn();
+		bool	autoCommitOff();
+		bool	commit();
+		bool	rollback();
 
 		LCTX	lagocontext;
 

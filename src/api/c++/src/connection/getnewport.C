@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-int	sqlrconnection::getNewPort() {
+int sqlrconnection::getNewPort() {
 
 	// get the size of the unix port string
 	unsigned short	size;

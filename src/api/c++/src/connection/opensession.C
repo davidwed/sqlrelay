@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <errno.h>
 
-int	sqlrconnection::openSession() {
+int sqlrconnection::openSession() {
 
 	if (connected) {
 		return 1;
@@ -107,25 +107,24 @@ int	sqlrconnection::openSession() {
 			return 0;
 		}
 
-		if (debug) {
-			debugPreStart();
-			debugPrint("Reconnecting to ");
-			debugPrint("\n");
-			debugPrint("	unix port: ");
-			debugPrint(connectionunixport);
-			debugPrint("\n");
-			debugPrint("	inet port: ");
-			debugPrint((long)connectioninetport);
-			debugPrint("\n");
-			debugPreEnd();
-		}
-
 		// first, try for the unix port
 		if (listenerunixport && listenerunixport[0] &&
-					connectionunixport) {
-			connected=unixclientsocket::
+			connectionunixport && connectionunixport[0]) {
+
+			if (debug) {
+				debugPreStart();
+				debugPrint("Reconnecting to \n");
+				debugPrint("	unix port: ");
+				debugPrint(connectionunixport);
+				debugPrint("\n");
+				debugPreEnd();
+			}
+
+			connected=(unixclientsocket::
 					connectToServer(connectionunixport,
-							-1,-1,retrytime,tries);
+						-1,-1,retrytime,tries)==
+						RESULT_SUCCESS);
+
 			if (debug && !connected) {
 				debugPreStart();
 				debugPrint("ERROR:\n");
@@ -138,10 +137,25 @@ int	sqlrconnection::openSession() {
 
 		// then try for the inet port
 		if (!connected && connectioninetport) {
-			connected=inetclientsocket::
+
+			if (debug) {
+				debugPreStart();
+				debugPrint("Reconnecting to \n");
+				debugPrint("	server: ");
+				debugPrint(server);
+				debugPrint("\n");
+				debugPrint("	inet port: ");
+				debugPrint((long)connectioninetport);
+				debugPrint("\n");
+				debugPreEnd();
+			}
+
+			connected=(inetclientsocket::
 					connectToServer(server,
-							connectioninetport,
-							-1,-1,retrytime,tries);
+						connectioninetport,
+						-1,-1,retrytime,tries)==
+						RESULT_SUCCESS);
+
 			if (debug && !connected) {
 				debugPreStart();
 				debugPrint("ERROR:\n");

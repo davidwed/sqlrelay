@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int	sqlrcursor::parseOutputBinds() {
+int sqlrcursor::parseOutputBinds() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();

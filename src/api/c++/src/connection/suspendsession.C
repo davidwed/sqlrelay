@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int	sqlrconnection::suspendSession() {
+int sqlrconnection::suspendSession() {
 
 	if (!openSession()) {
 		return 0;

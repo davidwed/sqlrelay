@@ -9,11 +9,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int	lagoconnection::getNumberOfConnectStringVars() {
+int lagoconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	lagoconnection::handleConnectString() {
+void lagoconnection::handleConnectString() {
 	host=connectStringValue("host");
 	port=connectStringValue("port");
 	db=connectStringValue("db");
@@ -21,7 +21,7 @@ void	lagoconnection::handleConnectString() {
 	setPassword(connectStringValue("password"));
 }
 
-int	lagoconnection::logIn() {
+bool lagoconnection::logIn() {
 
 	lagocontext=Lnewctx();
 
@@ -41,7 +41,7 @@ int	lagoconnection::logIn() {
 	if (!(db && db[0])) {
 		printf("No db was specified in the connect string.\n");
 		Ldelctx(lagocontext);
-		return 0;
+		return false;
 	}
 
 	// handle user
@@ -49,7 +49,7 @@ int	lagoconnection::logIn() {
 	if (!(user && user[0])) {
 		printf("No user was specified in the connect string.\n");
 		Ldelctx(lagocontext);
-		return 0;
+		return false;
 	}
 
 	// handle password
@@ -57,66 +57,66 @@ int	lagoconnection::logIn() {
 	if (!(password && password[0])) {
 		printf("No password was specified in the connect string.\n");
 		Ldelctx(lagocontext);
-		return 0;
+		return false;
 	}
 
 	if (Lconnect(lagocontext,hostval,portval,db,user,password)==-1) {
 		Ldelctx(lagocontext);
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-sqlrcursor	*lagoconnection::initCursor() {
+sqlrcursor *lagoconnection::initCursor() {
 	return (sqlrcursor *)new lagocursor((sqlrconnection *)this);
 }
 
-void	lagoconnection::deleteCursor(sqlrcursor *curs) {
+void lagoconnection::deleteCursor(sqlrcursor *curs) {
 	delete (lagocursor *)curs;
 }
 
-void	lagoconnection::logOut() {
+void lagoconnection::logOut() {
 	Ldisconnect(lagocontext);
 	Ldelctx(lagocontext);
 }
 
-int	lagoconnection::ping() {
-	return Lisconnected(lagocontext);
+bool lagoconnection::ping() {
+	return (Lisconnected(lagocontext))?true:false;
 }
 
-char	*lagoconnection::identify() {
+char *lagoconnection::identify() {
 	return "lago";
 }
 
-int	lagoconnection::isTransactional() {
-	return 0;
+bool lagoconnection::isTransactional() {
+	return false;
 }
 
-unsigned short	lagoconnection::autoCommitOn() {
+bool lagoconnection::autoCommitOn() {
 	// do nothing
-	return 1;
+	return true;
 }
 
-unsigned short	lagoconnection::autoCommitOff() {
+bool lagoconnection::autoCommitOff() {
 	// do nothing
-	return 1;
+	return true;
 }
 
-int	lagoconnection::commit() {
+bool lagoconnection::commit() {
 	// do nothing
-	return 1;
+	return true;
 }
 
-int	lagoconnection::rollback() {
+bool lagoconnection::rollback() {
 	// do nothing
-	return 1;
+	return true;
 }
 
 lagocursor::lagocursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	lagoconn=(lagoconnection *)conn;
 }
 
-int	lagocursor::executeQuery(const char *query, long length,
+bool lagocursor::executeQuery(const char *query, long length,
 					unsigned short execute) {
 
 	// initialize return values
@@ -128,20 +128,21 @@ int	lagocursor::executeQuery(const char *query, long length,
 
 	// execute the query
 	if (newquery) {
-		lagoresult=Lquery(lagoconn->lagocontext,newquery->getString());
+		lagoresult=Lquery(lagoconn->lagocontext,
+					newquery->getString());
 		delete newquery;
 	} else {
 		lagoresult=Lquery(lagoconn->lagocontext,query);
 	}
 	if (!lagoresult) {
-		return 0;
+		return false;
 	}
 
 	// workaround, lagoresult doesn't necessarily get set to 0 for
 	// every error such as a select on a non-existant table
 	char	*err=(char *)Lgeterrmsg(lagoconn->lagocontext);
 	if (err && err[0]) {
-		return 0;
+		return false;
 	}
 
 	// get the column count
@@ -150,13 +151,13 @@ int	lagocursor::executeQuery(const char *query, long length,
 	// get the row count
 	nrows=Lgetnrows(lagoresult);
 
-	return 1;
+	return true;
 }
 
-char	*lagocursor::getErrorMessage(int *liveconnection) {
+char *lagocursor::getErrorMessage(bool *liveconnection) {
 
 	// only return an error message of the error wasn't a dead database
-	*liveconnection=Lisconnected(lagoconn->lagocontext);
+	*liveconnection=(Lisconnected(lagoconn->lagocontext))?true:false;
 	if (*liveconnection) {
 		return (char *)Lgeterrmsg(lagoconn->lagocontext);
 	} else {
@@ -164,17 +165,17 @@ char	*lagocursor::getErrorMessage(int *liveconnection) {
 	}
 }
 
-void	lagocursor::returnRowCounts() {
+void lagocursor::returnRowCounts() {
 
 	// send row counts (affected row count unknown in Lago)
 	conn->sendRowCounts((long)nrows,(long)-1);
 }
 
-void	lagocursor::returnColumnCount() {
+void lagocursor::returnColumnCount() {
 	conn->sendColumnCount(ncols);
 }
 
-void	lagocursor::returnColumnInfo() {
+void lagocursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
@@ -244,26 +245,23 @@ void	lagocursor::returnColumnInfo() {
 	}
 }
 
-int	lagocursor::noRowsToReturn() {
+bool lagocursor::noRowsToReturn() {
 
 	// for queries which returned nothing, such as DML or blank selects,
-	// abort early, unfortunately, Lgetnrows doesn't always work correctly,
-	// hope that gets fixed some day
-	if (!Lgetnrows(lagoresult)) {
-		return 1;
-	}
-	return 0;
+	// abort early, unfortunately, Lgetnrows doesn't always work
+	// correctly hope that gets fixed some day
+	return (!Lgetnrows(lagoresult));
 }
 
-int	lagocursor::skipRow() {
+bool lagocursor::skipRow() {
 	return fetchRow();
 }
 
-int	lagocursor::fetchRow() {
-	return Lfetch(lagoresult)!=LFETCH_END;
+bool lagocursor::fetchRow() {
+	return (Lfetch(lagoresult)!=LFETCH_END);
 }
 
-void	lagocursor::returnRow() {
+void lagocursor::returnRow() {
 
 	// a useful variable
 	char	*field;
@@ -286,7 +284,7 @@ void	lagocursor::returnRow() {
 	}
 }
 
-void	lagocursor::cleanUpData(bool freerows, bool freecols,
+void lagocursor::cleanUpData(bool freerows, bool freecols,
 							bool freebinds) {
 	// should I call Lclear here?
 }

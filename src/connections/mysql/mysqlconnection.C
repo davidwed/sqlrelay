@@ -17,11 +17,11 @@ mysqlconnection::mysqlconnection() {
 	connected=0;
 }
 
-int	mysqlconnection::getNumberOfConnectStringVars() {
+int mysqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	mysqlconnection::handleConnectString() {
+void mysqlconnection::handleConnectString() {
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
 	db=connectStringValue("db");
@@ -30,7 +30,7 @@ void	mysqlconnection::handleConnectString() {
 	socket=connectStringValue("socket");
 }
 
-int	mysqlconnection::logIn() {
+bool mysqlconnection::logIn() {
 
 	// Handle host.
 	// For really old versions of mysql, a NULL host indicates that the
@@ -58,7 +58,7 @@ int	mysqlconnection::logIn() {
 	#if MYSQL_VERSION_ID>=32200
 	// initialize database connection structure
 	if (!mysql_init(&mysql)) {
-		return 0;
+		return false;
 	}
 	if (!mysql_real_connect(&mysql,hostval,user,password,dbval,
 						portval,socketval,0)) {
@@ -70,72 +70,71 @@ int	mysqlconnection::logIn() {
 	if (!mysql_connect(&mysql,hostval,user,password)) {
 #endif
 		logOut();
-		return 0;
-	} else {
-#ifdef MYSQL_SELECT_DB
-		if (mysql_select_db(&mysql,dbval)) {
-			logOut();
-			return 0;
-		}
-#endif
-		connected=1;
-		return 1;
+		return false;
 	}
+#ifdef MYSQL_SELECT_DB
+	if (mysql_select_db(&mysql,dbval)) {
+		logOut();
+		return false;
+	}
+#endif
+	connected=1;
+	return true;
 }
 
 #ifdef HAVE_MYSQL_CHANGE_USER
-int	mysqlconnection::changeUser(const char *newuser,
+bool mysqlconnection::changeUser(const char *newuser,
 					const char *newpassword) {
 	return !mysql_change_user(&mysql,newuser,newpassword,
 					(char *)((db && db[0])?db:""));
 }
 #endif
 
-sqlrcursor	*mysqlconnection::initCursor() {
+sqlrcursor *mysqlconnection::initCursor() {
 	return (sqlrcursor *)new mysqlcursor((sqlrconnection *)this);
 }
 
-void	mysqlconnection::deleteCursor(sqlrcursor *curs) {
+void mysqlconnection::deleteCursor(sqlrcursor *curs) {
 	delete (mysqlcursor *)curs;
 }
 
-void	mysqlconnection::logOut() {
+void mysqlconnection::logOut() {
 	connected=0;
 	mysql_close(&mysql);
 }
 
 #ifdef HAVE_MYSQL_PING
-int	mysqlconnection::ping() {
-	return (!mysql_ping(&mysql))?1:0;
+bool mysqlconnection::ping() {
+	return (!mysql_ping(&mysql))?true:false;
 }
 #endif
 
-char	*mysqlconnection::identify() {
+char *mysqlconnection::identify() {
 	return "mysql";
 }
 
-int	mysqlconnection::isTransactional() {
-	return 0;
+bool mysqlconnection::isTransactional() {
+	return false;
 }
 
-unsigned short	mysqlconnection::autoCommitOn() {
+bool mysqlconnection::autoCommitOn() {
 	// do nothing
-	return 1;
+	return true;
 }
 
-unsigned short	mysqlconnection::autoCommitOff() {
+bool mysqlconnection::autoCommitOff() {
 	// do nothing
-	return 1;
+	return true;
 }
 
-int	mysqlconnection::commit() {
+bool mysqlconnection::commit() {
 	// do nothing
-	return 1;
+	return true;
 }
 
-int	mysqlconnection::rollback() {
+bool mysqlconnection::rollback() {
 	// do nothing
-	return 1;
+	return true;
 }
 
 mysqlcursor::mysqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
@@ -143,7 +142,7 @@ mysqlcursor::mysqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	mysqlresult=NULL;
 }
 
-int	mysqlcursor::executeQuery(const char *query, long length,
+bool mysqlcursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
 
 	// initialize counts
@@ -162,13 +161,13 @@ int	mysqlcursor::executeQuery(const char *query, long length,
 					newquery->getString(),
 					strlen(newquery->getString())))) {
 			delete newquery;
-			return 0;
+			return false;
 		}
 		delete newquery;
 	} else {
 		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
 							query,length))) {
-			return 0;
+			return false;
 		}
 	}
 
@@ -185,9 +184,9 @@ int	mysqlcursor::executeQuery(const char *query, long length,
 		// the query must have been some DML or DDL
 		char	*err=(char *)mysql_error(&mysqlconn->mysql);
 		if (err && err[0]) {
-			return 0;
+			return false;
 		} else {
-			return 1;
+			return true;
 		}
 	}
 
@@ -197,44 +196,44 @@ int	mysqlcursor::executeQuery(const char *query, long length,
 	// get the row count
 	nrows=mysql_num_rows(mysqlresult);
 
-	return 1;
+	return true;
 }
 
-char	*mysqlcursor::getErrorMessage(int *liveconnection) {
+char *mysqlcursor::getErrorMessage(bool *liveconnection) {
 
-	*liveconnection=1;
+	*liveconnection=true;
 	char	*err=(char *)mysql_error(&mysqlconn->mysql);
 #if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
 		defined(HAVE_MYSQL_CR_SERVER_LOST) 
 	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
 		if (queryresult==CR_SERVER_GONE_ERROR) {
-			*liveconnection=0;
+			*liveconnection=false;
 		}
 	#endif
 	#ifdef HAVE_MYSQL_CR_SERVER_LOST
 		if (queryresult==CR_SERVER_LOST) {
-			*liveconnection=0;
+			*liveconnection=false;
 		}
 	#endif
 #else
 	if (strstr(err,"mysql server has gone away")) {
-		*liveconnection=0;
+		*liveconnection=false;
 	}
 #endif
 	return err;
 }
 
-void	mysqlcursor::returnColumnCount() {
+void mysqlcursor::returnColumnCount() {
 	conn->sendColumnCount(ncols);
 }
 
-void	mysqlcursor::returnRowCounts() {
+void mysqlcursor::returnRowCounts() {
 
 	// send row counts
 	conn->sendRowCounts((long)nrows,(long)affectedrows);
 }
 
-void	mysqlcursor::returnColumnInfo() {
+void mysqlcursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
@@ -332,8 +331,8 @@ void	mysqlcursor::returnColumnInfo() {
 #ifdef HAVE_MYSQL_FIELD_TYPE_SET
 		} else if (mysqlfield->type==FIELD_TYPE_SET) {
 			type=SET_DATATYPE;
-			// 1,2,3,4 or 8 bytes delepending on the # of members
-			// (64 max)
+			// 1,2,3,4 or 8 bytes depending on the # of
+			// members (64 max)
 			length=8;
 #endif
 		// For some reason, tinyblobs, mediumblobs and longblobs
@@ -343,9 +342,9 @@ void	mysqlcursor::returnColumnInfo() {
 		// and long blobs both have the same length though.  Go
 		// figure.  Also, the word TEXT and BLOB appear to be
 		// interchangable.  We'll use BLOB because it appears to be
-		// more standard than TEXT.  I wonder if this will be changed
-		// in a future incarnation of mysql.  I also wonder what
-		// happens on a 64 bit machine.
+		// more standard than TEXT.  I wonder if this will be
+		// changed in a future incarnation of mysql.  I also wonder
+		// what happens on a 64 bit machine.
 		} else if (mysqlfield->type==FIELD_TYPE_TINY_BLOB) {
 			type=TINY_BLOB_DATATYPE;
 			length=(int)mysqlfield->length+2;
@@ -371,40 +370,35 @@ void	mysqlcursor::returnColumnInfo() {
 		// send column definition
 		// for mysql, length is actually precision
 		conn->sendColumnDefinition(mysqlfield->name,
-					strlen(mysqlfield->name),
-					type,length,
-					mysqlfield->length,
-					mysqlfield->decimals,
-					!(IS_NOT_NULL(mysqlfield->flags)),
-					IS_PRI_KEY(mysqlfield->flags),
-					mysqlfield->flags&UNIQUE_KEY_FLAG,
-					mysqlfield->flags&MULTIPLE_KEY_FLAG,
-					mysqlfield->flags&UNSIGNED_FLAG,
-					mysqlfield->flags&ZEROFILL_FLAG,
-					mysqlfield->flags&BINARY_FLAG,
-					mysqlfield->flags&AUTO_INCREMENT_FLAG);
+				strlen(mysqlfield->name),
+				type,length,
+				mysqlfield->length,
+				mysqlfield->decimals,
+				!(IS_NOT_NULL(mysqlfield->flags)),
+				IS_PRI_KEY(mysqlfield->flags),
+				mysqlfield->flags&UNIQUE_KEY_FLAG,
+				mysqlfield->flags&MULTIPLE_KEY_FLAG,
+				mysqlfield->flags&UNSIGNED_FLAG,
+				mysqlfield->flags&ZEROFILL_FLAG,
+				mysqlfield->flags&BINARY_FLAG,
+				mysqlfield->flags&AUTO_INCREMENT_FLAG);
 	}
 }
 
-int	mysqlcursor::noRowsToReturn() {
-
+bool mysqlcursor::noRowsToReturn() {
 	// for DML or DDL queries, return no data
-	if (!mysqlresult) {
-		return 1;
-	}
-	return 0;
+	return (!mysqlresult);
 }
 
-int	mysqlcursor::skipRow() {
+bool mysqlcursor::skipRow() {
 	return fetchRow();
 }
 
-int	mysqlcursor::fetchRow() {
-
+bool mysqlcursor::fetchRow() {
 	return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL);
 }
 
-void	mysqlcursor::returnRow() {
+void mysqlcursor::returnRow() {
 
 	for (int col=0; col<ncols; col++) {
 
@@ -416,7 +410,7 @@ void	mysqlcursor::returnRow() {
 	}
 }
 
-void	mysqlcursor::cleanUpData(bool freerows, bool freecols,
+void mysqlcursor::cleanUpData(bool freerows, bool freecols,
 							bool freebinds) {
 	if (freerows && mysqlresult!=(MYSQL_RES *)NULL) {
 		mysql_free_result(mysqlresult);

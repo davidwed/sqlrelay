@@ -3,14 +3,14 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::pingCommand() {
+void sqlrconnection::pingCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"ping");
 	#endif
 	clientsock->write((unsigned short)ping());
 }
 
-int	sqlrconnection::ping() {
+bool sqlrconnection::ping() {
 	sqlrcursor	*pingcur=initCursor();
 	char	*pingquery=pingQuery();
 	int	pingquerylen=strlen(pingQuery());
@@ -20,13 +20,13 @@ int	sqlrconnection::ping() {
 		pingcur->cleanUpData(true,true,false);
 		pingcur->closeCursor();
 		delete pingcur;
-		return 1;
+		return true;
 	}
 	pingcur->closeCursor();
 	delete pingcur;
-	return 0;
+	return false;
 }
 
-char	*sqlrconnection::pingQuery() {
+char *sqlrconnection::pingQuery() {
 	return "select 1";
 }

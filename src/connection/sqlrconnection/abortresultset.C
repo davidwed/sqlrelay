@@ -3,9 +3,9 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::abortResultSetCommand() {
+void sqlrconnection::abortResultSetCommand(sqlrcursor *cursor) {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"abort result set");
 	#endif
-	cur[currentcur]->abort();
+	cursor->abort();
 }

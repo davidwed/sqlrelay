@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::sendField(const char *data, unsigned long size) {
+void sqlrconnection::sendField(const char *data, unsigned long size) {
 
 	#ifdef SERVER_DEBUG
 	debugstr->append("\"");
@@ -18,7 +18,7 @@ void	sqlrconnection::sendField(const char *data, unsigned long size) {
 	clientsock->write(data,size);
 }
 
-void	sqlrconnection::sendNullField() {
+void sqlrconnection::sendNullField() {
 
 	#ifdef SERVER_DEBUG
 	debugstr->append("NULL");
@@ -27,11 +27,11 @@ void	sqlrconnection::sendNullField() {
 	clientsock->write((unsigned short)NULL_DATA);
 }
 
-void	sqlrconnection::startSendingLong() {
+void sqlrconnection::startSendingLong() {
 	clientsock->write((unsigned short)START_LONG_DATA);
 }
 
-void	sqlrconnection::sendLongSegment(const char *data, unsigned long size) {
+void sqlrconnection::sendLongSegment(const char *data, unsigned long size) {
 
 	#ifdef SERVER_DEBUG
 	for (unsigned long i=0; i<size; i++) {
@@ -44,7 +44,7 @@ void	sqlrconnection::sendLongSegment(const char *data, unsigned long size) {
 	clientsock->write(data,size);
 }
 
-void	sqlrconnection::endSendingLong() {
+void sqlrconnection::endSendingLong() {
 
 	#ifdef SERVER_DEBUG
 	debugstr->append(",");

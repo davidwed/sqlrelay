@@ -8,10 +8,8 @@
 	#include <unistd.h>
 #endif
 
-int	sqlrconnection::initConnection(int argc, const char **argv,
-						int detachbeforeloggingin) {
-
-	init=1;
+bool sqlrconnection::initConnection(int argc, const char **argv,
+						bool detachbeforeloggingin) {
 
 	cmdl=new connectioncmdline(argc,argv);
 	cfgfl=new sqlrconfigfile();
@@ -24,7 +22,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 
 	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId(),
 					getNumberOfConnectStringVars())) {
-		return 0;
+		return false;
 	}
 
 	setUserAndGroup();
@@ -45,7 +43,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 
 	// handle the pid file
 	if (!handlePidFile()) {
-		return 0;
+		return false;
 	}
 
 	createCursorArray();
@@ -57,7 +55,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 
 	if (cfgfl->getListenOnUnix() &&
 		!ussf->getUnixSocket(tmpdir->getString(),unixsocketptr)) {
-		return 0;
+		return false;
 	}
 
 	#ifndef SERVER_DEBUG
@@ -70,7 +68,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 	blockSignals();
 
 	if (!attemptLogIn()) {
-		return 0;
+		return false;
 	}
 
 	#ifndef SERVER_DEBUG
@@ -82,13 +80,13 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 
 	setInitialAutoCommitBehavior();
 
-	if (!initCursors(1)) {
-		return 0;
+	if (!initCursors(true)) {
+		return false;
 	}
 
 	if (!ipcptr->createSharedMemoryAndSemaphores(tmpdir->getString(),
 							cmdl->getId())) {
-		return 0;
+		return false;
 	}
 
 	// increment connection counter
@@ -104,10 +102,10 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 		return openSockets();
 	}
 
-	return 1;
+	return true;
 }
 
-void	sqlrconnection::setUserAndGroup() {
+void sqlrconnection::setUserAndGroup() {
 
 	if (!runAsGroup(cfgfl->getRunAsGroup())) {
 		fprintf(stderr,"Warning: could not change group to %s\n",
@@ -120,13 +118,13 @@ void	sqlrconnection::setUserAndGroup() {
 	}
 }
 
-void	sqlrconnection::setUnixSocketDirectory() {
+void sqlrconnection::setUnixSocketDirectory() {
 	unixsocket=new char[tmpdir->getLength()+23];
 	sprintf(unixsocket,"%s/",tmpdir->getString());
 	unixsocketptr=unixsocket+tmpdir->getLength()+1;
 }
 
-int	sqlrconnection::handlePidFile() {
+bool sqlrconnection::handlePidFile() {
 
 	// check for pid file
 	char	*pidfile=new char[tmpdir->getLength()+
@@ -134,7 +132,7 @@ int	sqlrconnection::handlePidFile() {
 	sprintf(pidfile,"%s/sqlr-listener-%s",
 				tmpdir->getString(),cmdl->getId());
 
-	int	retval=1;
+	bool	retval=true;
 	if (checkForPidFile(pidfile)==-1) {
 		printf("\nsqlr-connection error:\n");
 		printf("	The file %s",tmpdir->getString());
@@ -144,14 +142,14 @@ int	sqlrconnection::handlePidFile() {
 		printf("is not running.\n");
 		printf("	The sqlr-listener must be running ");
 		printf("for the sqlr-connection to start.\n\n");
-		retval=0;
+		retval=false;
 	}
 
 	delete[] pidfile;
 	return retval;
 }
 
-void	sqlrconnection::createCursorArray() {
+void sqlrconnection::createCursorArray() {
 
 	// how many cursors should we use, create an array for them
 	int	cursorcount=cfgfl->getCursors();
@@ -161,7 +159,7 @@ void	sqlrconnection::createCursorArray() {
 	}
 }
 
-void	sqlrconnection::initDatabaseAvailableFileName() {
+void sqlrconnection::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
 	updown=new char[strlen(tmpdir->getString())+1+strlen(cmdl->getId())+1+
@@ -170,7 +168,7 @@ void	sqlrconnection::initDatabaseAvailableFileName() {
 						cmdl->getConnectionId());
 }
 
-void	sqlrconnection::blockSignals() {
+void sqlrconnection::blockSignals() {
 
 	// the daemon class handles SIGTERM's and SIGINT's
 	// and we need to handle SIGALRMS so dynamically spawned daemons
@@ -308,7 +306,7 @@ void	sqlrconnection::blockSignals() {
 	signalmanager::ignoreSignals(set.getSignalSet());
 }
 
-int	sqlrconnection::attemptLogIn() {
+bool sqlrconnection::attemptLogIn() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"logging in...");
@@ -318,16 +316,16 @@ int	sqlrconnection::attemptLogIn() {
 		debugPrint("connection",0,"log in failed");
 		#endif
 		fprintf(stderr,"Couldn't log into database.\n");
-		return 0;
+		return false;
 	}
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done logging in");
 	#endif
 
-	return 1;
+	return true;
 }
 
-void	sqlrconnection::setInitialAutoCommitBehavior() {
+void sqlrconnection::setInitialAutoCommitBehavior() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"setting autocommit...");
@@ -356,7 +354,7 @@ void	sqlrconnection::setInitialAutoCommitBehavior() {
 	#endif
 }
 
-int	sqlrconnection::initCursors(int create) {
+bool sqlrconnection::initCursors(bool create) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"initializing cursors...");
@@ -379,7 +377,7 @@ int	sqlrconnection::initCursors(int create) {
 
 			logOut();
 			fprintf(stderr,"Couldn't create cursors.\n");
-			return 0;
+			return false;
 		}
 	}
 
@@ -387,5 +385,5 @@ int	sqlrconnection::initCursors(int create) {
 	debugPrint("connection",0,"done initializing cursors");
 	#endif
 
-	return 1;
+	return true;
 }

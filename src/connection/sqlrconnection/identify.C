@@ -3,10 +3,12 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::identifyCommand() {
+void sqlrconnection::identifyCommand() {
+
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"identify");
 	#endif
+
 	char		*ident=identify();
 	unsigned short	idlen=(unsigned short)strlen(ident);
 	clientsock->write(idlen);

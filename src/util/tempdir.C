@@ -16,10 +16,10 @@ tempdir::~tempdir() {
 	delete[] tmpdir;
 }
 
-char	*tempdir::getString() {
+char *tempdir::getString() {
 	return tmpdir;
 }
 
-int	tempdir::getLength() {
+int tempdir::getLength() {
 	return tmpdirlen;
 }

@@ -9,11 +9,11 @@
 
 #include <stdlib.h>
 
-int	db2connection::getNumberOfConnectStringVars() {
+int db2connection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	db2connection::handleConnectString() {
+void db2connection::handleConnectString() {
 
 	// override legacy "server" parameter with modern "db" parameter
 	server=connectStringValue("server");
@@ -28,13 +28,13 @@ void	db2connection::handleConnectString() {
 	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
 }
 
-int	db2connection::logIn() {
+bool db2connection::logIn() {
 
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
-		return 0;
+		return false;
 	}
 
 	// allocate connection handle
@@ -42,7 +42,7 @@ int	db2connection::logIn() {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
-		return 0;
+		return false;
 	}
 
 	// set the connect timeout
@@ -55,61 +55,61 @@ int	db2connection::logIn() {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-sqlrcursor	*db2connection::initCursor() {
+sqlrcursor *db2connection::initCursor() {
 	return (sqlrcursor *)new db2cursor((sqlrconnection *)this);
 }
 
-void	db2connection::deleteCursor(sqlrcursor *curs) {
+void db2connection::deleteCursor(sqlrcursor *curs) {
 	delete (db2cursor *)curs;
 }
 
-void	db2connection::logOut() {
+void db2connection::logOut() {
 	SQLDisconnect(dbc);
 	SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 	SQLFreeHandle(SQL_HANDLE_ENV,env);
 }
 
-short	db2connection::nullBindValue() {
+short db2connection::nullBindValue() {
 	return SQL_NULL_DATA;
 }
 
-int	db2connection::bindValueIsNull(short isnull) {
+bool db2connection::bindValueIsNull(short isnull) {
 	if (isnull==SQL_NULL_DATA) {
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-unsigned short	db2connection::autoCommitOn() {
-	return (unsigned short)(SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
+bool db2connection::autoCommitOn() {
+	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_ON,
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
 }
 
-unsigned short	db2connection::autoCommitOff() {
-	return (unsigned short)(SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
+bool db2connection::autoCommitOff() {
+	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_OFF,
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
 }
 
-int	db2connection::commit() {
+bool db2connection::commit() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_COMMIT)==SQL_SUCCESS);
 }
 
-int	db2connection::rollback() {
+bool db2connection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
-char	*db2connection::pingQuery() {
+char *db2connection::pingQuery() {
 	return "values 1";
 }
 
-char	*db2connection::identify() {
+char *db2connection::identify() {
 	return "db2";
 }
 
@@ -125,7 +125,7 @@ db2cursor::~db2cursor() {
 	}
 }
 
-int	db2cursor::prepareQuery(const char *query, long length) {
+bool db2cursor::prepareQuery(const char *query, long length) {
 
 	if (stmt) {
 		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
@@ -134,14 +134,14 @@ int	db2cursor::prepareQuery(const char *query, long length) {
 	// allocate the cursor
 	erg=SQLAllocHandle(SQL_HANDLE_STMT,db2conn->dbc,&stmt);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 
 	// set the row array size
 	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
 				(SQLPOINTER)FETCH_AT_ONCE,0);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 
 #if (DB2VERSION==8)
@@ -149,19 +149,19 @@ int	db2cursor::prepareQuery(const char *query, long length) {
 	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
 				(SQLPOINTER)rowstat,0);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 #endif
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-int	db2cursor::inputBindString(const char *variable,
+bool db2cursor::inputBindString(const char *variable,
 					unsigned short variablesize,
 					const char *value,
 					unsigned short valuesize,
@@ -191,12 +191,12 @@ int	db2cursor::inputBindString(const char *variable,
 				(SQLINTEGER *)NULL);
 	}
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-int	db2cursor::inputBindLong(const char *variable,
+bool db2cursor::inputBindLong(const char *variable,
 					unsigned short variablesize,
 					unsigned long *value) {
 
@@ -211,12 +211,12 @@ int	db2cursor::inputBindLong(const char *variable,
 				sizeof(long),
 				(SQLINTEGER *)NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-int	db2cursor::inputBindDouble(const char *variable,
+bool db2cursor::inputBindDouble(const char *variable,
 					unsigned short variablesize,
 					double *value,
 					unsigned short precision,
@@ -233,12 +233,12 @@ int	db2cursor::inputBindDouble(const char *variable,
 				sizeof(double),
 				(SQLINTEGER *)NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-int	db2cursor::outputBindString(const char *variable, 
+bool db2cursor::outputBindString(const char *variable, 
 					unsigned short variablesize,
 					char *value, 
 					unsigned short valuesize, 
@@ -255,12 +255,12 @@ int	db2cursor::outputBindString(const char *variable,
 				valuesize,
 				(SQLINTEGER *)isnull);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-int	db2cursor::executeQuery(const char *query, long length,
+bool db2cursor::executeQuery(const char *query, long length,
 					unsigned short execute) {
 
 	// initialize counts
@@ -272,7 +272,7 @@ int	db2cursor::executeQuery(const char *query, long length,
 	// execute the query
 	erg=SQLExecute(stmt);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 
 	checkForTempTable(query,length);
@@ -280,7 +280,7 @@ int	db2cursor::executeQuery(const char *query, long length,
 	// get the column count
 	erg=SQLNumResultCols(stmt,&ncols);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 	if (ncols>MAX_SELECT_LIST_SIZE) {
 		ncols=MAX_SELECT_LIST_SIZE;
@@ -297,42 +297,42 @@ int	db2cursor::executeQuery(const char *query, long length,
 					(SQLSMALLINT *)&(col[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column length
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LENGTH,
 					NULL,0,NULL,&(col[i].length));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column type
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_TYPE,
 					NULL,0,NULL,&(col[i].type));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column precision
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_PRECISION,
 					NULL,0,NULL,&(col[i].precision));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column scale
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_SCALE,
 					NULL,0,NULL,&(col[i].scale));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column nullable
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_NULLABLE,
 					NULL,0,NULL,&(col[i].nullable));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// primary key
@@ -345,7 +345,7 @@ int	db2cursor::executeQuery(const char *query, long length,
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_UNSIGNED,
 					NULL,0,NULL,&(col[i].unsignednumber));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// zero fill
@@ -357,7 +357,7 @@ int	db2cursor::executeQuery(const char *query, long length,
 					SQL_COLUMN_AUTO_INCREMENT,
 					NULL,0,NULL,&(col[i].autoincrement));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 		}
 
@@ -367,19 +367,19 @@ int	db2cursor::executeQuery(const char *query, long length,
 				//indicator[i]);
 				(SQLINTEGER *)&indicator[i]);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return 0;
+			return false;
 		}
 	}
 
 	// get the row count
 	erg=SQLRowCount(stmt,&affectedrows);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-char	*db2cursor::getErrorMessage(int *liveconnection) {
+char *db2cursor::getErrorMessage(bool *liveconnection) {
 
 	SQLCHAR		error[501];
 	SQLCHAR		state[10];
@@ -395,20 +395,20 @@ char	*db2cursor::getErrorMessage(int *liveconnection) {
 	errormsg=new stringbuffer();
 	errormsg->append((const char *)error);
 
-	*liveconnection=1;
+	*liveconnection=true;
 
 	return errormsg->getString();
 }
 
-void	db2cursor::returnRowCounts() {
+void db2cursor::returnRowCounts() {
 	conn->sendRowCounts((long)-1,(long)affectedrows);
 }
 
-void	db2cursor::returnColumnCount() {
+void db2cursor::returnColumnCount() {
 	conn->sendColumnCount(ncols);
 }
 
-void	db2cursor::returnColumnInfo() {
+void db2cursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
@@ -494,39 +494,35 @@ void	db2cursor::returnColumnInfo() {
 	}
 }
 
-int	db2cursor::noRowsToReturn() {
-
+bool db2cursor::noRowsToReturn() {
 	// if there are no columns, then there can't be any rows either
-	if (ncols) {
-		return 0;
-	}
-	return 1;
+	return (ncols)?false:true;
 }
 
-int	db2cursor::skipRow() {
+bool db2cursor::skipRow() {
 	if (fetchRow()) {
 		row++;
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-int	db2cursor::fetchRow() {
+bool db2cursor::fetchRow() {
 
 	if (row==FETCH_AT_ONCE) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
-		return 0;
+		return false;
 	}
-	if (row==0) {
+	if (!row) {
 		SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
 
 
 #if (DB2VERSION==8)
-		// An apparant bug in version 8.1 causes the SQL_ATTR_ROW_NUMBER
-		// to always be 1, running through the row status buffer appears
-		// to work.
+		// An apparant bug in version 8.1 causes the
+		// SQL_ATTR_ROW_NUMBER to always be 1, running through the row
+		// status buffer appears to work.
 		for (rownumber=0; rownumber<FETCH_AT_ONCE; rownumber++) {
 			if (rowstat[rownumber]!=SQL_SUCCESS && 
 				rowstat[rownumber]!=SQL_SUCCESS_WITH_INFO) {
@@ -542,15 +538,15 @@ int	db2cursor::fetchRow() {
 #endif
 
 		if (rownumber==totalrows) {
-			return 0;
+			return false;
 		}
 		maxrow=rownumber-totalrows;
 		totalrows=rownumber;
 	}
-	return 1;
+	return true;
 }
 
-void	db2cursor::returnRow() {
+void db2cursor::returnRow() {
 
 	for (int index=0; index<ncols; index++) {
 

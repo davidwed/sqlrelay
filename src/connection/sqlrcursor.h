@@ -48,46 +48,46 @@ class sqlrcursor {
 
 	protected:
 		// interface definition
-		virtual	int	openCursor(int id);
-		virtual	int	closeCursor();
-		virtual	int	prepareQuery(const char *query, long length);
-		virtual	int	inputBindString(const char *variable, 
+		virtual	bool	openCursor(int id);
+		virtual	bool	closeCursor();
+		virtual	bool	prepareQuery(const char *query, long length);
+		virtual	bool	inputBindString(const char *variable, 
 						unsigned short variablesize,
 						const char *value, 
 						unsigned short valuesize,
 						short *isnull);
-		virtual	int	inputBindLong(const char *variable, 
+		virtual	bool	inputBindLong(const char *variable, 
 						unsigned short variablesize,
 						unsigned long *value);
-		virtual	int	inputBindDouble(const char *variable, 
+		virtual	bool	inputBindDouble(const char *variable, 
 						unsigned short variablesize,
 						double *value,
 						unsigned short precision,
 						unsigned short scale);
-		virtual	int	inputBindBlob(const char *variable, 
+		virtual	bool	inputBindBlob(const char *variable, 
 						unsigned short variablesize,
 						const char *value, 
 						unsigned long valuesize,
 						short *isnull);
-		virtual	int	inputBindClob(const char *variable, 
+		virtual	bool	inputBindClob(const char *variable, 
 						unsigned short variablesize,
 						const char *value, 
 						unsigned long valuesize,
 						short *isnull);
-		virtual	int	outputBindString(const char *variable, 
+		virtual	bool	outputBindString(const char *variable, 
 						unsigned short variablesize,
 						char *value,
 						unsigned short valuesize,
 						short *isnull);
-		virtual	int	outputBindBlob(const char *variable, 
+		virtual	bool	outputBindBlob(const char *variable, 
 						unsigned short variablesize,
 						int index,
 						short *isnull);
-		virtual	int	outputBindClob(const char *variable, 
+		virtual	bool	outputBindClob(const char *variable, 
 						unsigned short variablesize,
 						int index,
 						short *isnull);
-		virtual	int	outputBindCursor(const char *variable,
+		virtual	bool	outputBindCursor(const char *variable,
 						unsigned short variablesize,
 						sqlrcursor *cursor);
 		virtual	void	returnOutputBindBlob(int index);
@@ -95,17 +95,17 @@ class sqlrcursor {
 		virtual	void	returnOutputBindCursor(int index);
 		virtual void	checkForTempTable(const char *query,
 							unsigned long length);
-		virtual	int	executeQuery(const char *query, long length,
+		virtual	bool	executeQuery(const char *query, long length,
 						unsigned short execute)=0;
-		virtual	int	queryIsNotSelect();
-		virtual	int	queryIsCommitOrRollback();
-		virtual	char	*getErrorMessage(int *liveconnection)=0;
+		virtual	bool	queryIsNotSelect();
+		virtual	bool	queryIsCommitOrRollback();
+		virtual	char	*getErrorMessage(bool *liveconnection)=0;
 		virtual	void	returnRowCounts()=0;
 		virtual	void	returnColumnCount()=0;
 		virtual	void	returnColumnInfo()=0;
-		virtual	int	noRowsToReturn()=0;
-		virtual	int	skipRow()=0;
-		virtual	int	fetchRow()=0;
+		virtual	bool	noRowsToReturn()=0;
+		virtual	bool	skipRow()=0;
+		virtual	bool	fetchRow()=0;
 		virtual	void	returnRow()=0;
 		virtual	void	cleanUpData(bool freerows, bool freecols,
 								bool freebinds);
@@ -117,17 +117,17 @@ class sqlrcursor {
 		// methods/variables used by derived classes
 		stringbuffer	*fakeInputBinds(const char *query);
 
-		int	skipComment(char **ptr, const char *endptr);
-		int	skipWhitespace(char **ptr, const char *endptr);
-		int	advance(char **ptr, const char *endptr,
+		bool	skipComment(char **ptr, const char *endptr);
+		bool	skipWhitespace(char **ptr, const char *endptr);
+		bool	advance(char **ptr, const char *endptr,
 						unsigned short steps);
 
 		sqlrconnection	*conn;
 
 	private:
 		// methods used internally
-		int	handleBinds();
-		void	performSubstitution(stringbuffer *buffer, int which);
+		bool	handleBinds();
+		void	performSubstitution(stringbuffer *buffer, int index);
 		void	abort();
 		char	*skipWhitespaceAndComments(const char *querybuffer);
 
@@ -139,8 +139,9 @@ class sqlrcursor {
 		bindvar		outbindvars[MAXVAR];
 		unsigned short	outbindcount;
 
-		int		suspendresultset;
-		int		busy;
+		bool		suspendresultset;
+		bool		busy;
+		int		id;
 };
 
 #endif

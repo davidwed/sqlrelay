@@ -10,7 +10,7 @@
 	#include <strings.h>
 #endif
 
-int	sqlrcursor::queryIsNotSelect() {
+bool sqlrcursor::queryIsNotSelect() {
 
 	// scan the query, bypassing whitespace and comments.
 	char	*ptr=skipWhitespaceAndComments(querybuffer);
@@ -24,20 +24,18 @@ int	sqlrcursor::queryIsNotSelect() {
 	return 1;
 }
 
-int	sqlrcursor::queryIsCommitOrRollback() {
+bool sqlrcursor::queryIsCommitOrRollback() {
 
 	// scan the query, bypassing whitespace and comments.
 	char	*ptr=skipWhitespaceAndComments(querybuffer);
 
 	// if the query is a commit or rollback, return true
 	// otherwise return false
-	if (!strncasecmp(ptr,"commit",6) || !strncasecmp(ptr,"rollback",8)) {
-		return 1;
-	}
-	return 0;
+	return (!strncasecmp(ptr,"commit",6) ||
+			!strncasecmp(ptr,"rollback",8));
 }
 
-char	*sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
+char *sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
 	// scan the query, bypassing whitespace and comments.
 	char	*ptr=(char *)querybuffer;
 	while (*ptr && 
@@ -54,7 +52,7 @@ char	*sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
 	return ptr;
 }
 
-void	sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
+void sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
 
 	char	*ptr=(char *)query;
 	char	*endptr=(char *)query+length;
@@ -86,7 +84,7 @@ void	sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
 	conn->addSessionTempTableForDrop(tablename.getString());
 }
 
-int	sqlrcursor::skipComment(char **ptr, const char *endptr) {
+bool sqlrcursor::skipComment(char **ptr, const char *endptr) {
 	while (*ptr<endptr && !strncmp(*ptr,"--",2)) {
 		while (**ptr && **ptr!='\n') {
 			(*ptr)++;
@@ -95,14 +93,14 @@ int	sqlrcursor::skipComment(char **ptr, const char *endptr) {
 	return *ptr!=endptr;
 }
 
-int	sqlrcursor::skipWhitespace(char **ptr, const char *endptr) {
+bool sqlrcursor::skipWhitespace(char **ptr, const char *endptr) {
 	while ((**ptr==' ' || **ptr=='\n' || **ptr=='	') && *ptr<endptr) {
 		(*ptr)++;
 	}
 	return *ptr!=endptr;
 }
 
-int	sqlrcursor::advance(char **ptr, const char *endptr,
+bool sqlrcursor::advance(char **ptr, const char *endptr,
 						unsigned short steps) {
 	for (unsigned short i=0; i<steps && *ptr<endptr; i++) {
 		(*ptr)++;

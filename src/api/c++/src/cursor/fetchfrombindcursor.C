@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int	sqlrcursor::fetchFromBindCursor() {
+int sqlrcursor::fetchFromBindCursor() {
 
 	if (!endofresultset || !sqlrc->connected) {
 		return 0;

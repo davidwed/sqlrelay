@@ -4,7 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-int	sqlrcursor::openCachedResultSet(const char *filename) {
+int sqlrcursor::openCachedResultSet(const char *filename) {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -79,7 +79,7 @@ int	sqlrcursor::openCachedResultSet(const char *filename) {
 	return 0;
 }
 
-void	sqlrcursor::clearCacheSource() {
+void sqlrcursor::clearCacheSource() {
 	if (cachesource) {
 		cachesource->close();
 		delete cachesource;

@@ -100,7 +100,7 @@ class sqlrconfigfile : public xmlsax {
 		bool	getDynamicScaling();
 		char	*getEndOfSession();
 		bool	getEndOfSessionCommit();
-		int	getSessionTimeout();
+		long	getSessionTimeout();
 		char	*getRunAsUser();
 		char	*getRunAsGroup();
 		int	getCursors();
@@ -132,6 +132,9 @@ class sqlrconfigfile : public xmlsax {
 		int	atoi(const char *value,
 					const char *defaultvalue,
 					int minvalue);
+		long	atol(const char *value,
+					const char *defaultvalue,
+					long minvalue);
 
 		bool	tagStart(char *name);
 		bool	attributeName(char *name);
@@ -150,7 +153,7 @@ class sqlrconfigfile : public xmlsax {
 		int	ttl;
 		char	*endofsession;
 		bool	endofsessioncommit;
-		int	sessiontimeout;
+		long	sessiontimeout;
 		char	*runasuser;
 		char	*runasgroup;
 		int	cursors;

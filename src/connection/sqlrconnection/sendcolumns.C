@@ -5,14 +5,14 @@
 
 #include <datatypes.h>
 
-int	sqlrconnection::sendColumnInfo() {
+bool sqlrconnection::sendColumnInfo() {
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-void	sqlrconnection::sendColumnCount(unsigned long ncols) {
+void sqlrconnection::sendColumnCount(unsigned long ncols) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"sending column count...");
@@ -28,7 +28,7 @@ void	sqlrconnection::sendColumnCount(unsigned long ncols) {
 	#endif
 }
 
-void	sqlrconnection::sendColumnTypeFormat(unsigned short format) {
+void sqlrconnection::sendColumnTypeFormat(unsigned short format) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"sending column type format...");
@@ -49,7 +49,7 @@ void	sqlrconnection::sendColumnTypeFormat(unsigned short format) {
 	#endif
 }
 
-void	sqlrconnection::sendColumnDefinition(const char *name,
+void sqlrconnection::sendColumnDefinition(const char *name,
 						unsigned short namelen,
 						unsigned short type, 
 						unsigned long size,
@@ -107,7 +107,7 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 	clientsock->write(autoincrement);
 }
 
-void	sqlrconnection::sendColumnDefinitionString(const char *name,
+void sqlrconnection::sendColumnDefinitionString(const char *name,
 						unsigned short namelen,
 						const char *type, 
 						unsigned short typelen,

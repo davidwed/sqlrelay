@@ -64,7 +64,7 @@ cachemanager::~cachemanager() {
 	}
 }
 
-void	cachemanager::scan() {
+void cachemanager::scan() {
 
 	// detach from the controlling tty
 	detach();
@@ -110,7 +110,7 @@ void	cachemanager::scan() {
 
 }
 
-void	cachemanager::erase(const char *dirname, const char *filename) {
+void cachemanager::erase(const char *dirname, const char *filename) {
 
 	// derive the full pathname
 	char	*fullpathname=new char[strlen(dirname)+1+strlen(filename)+1];
@@ -145,7 +145,7 @@ void	cachemanager::erase(const char *dirname, const char *filename) {
 	delete[] fullpathname;
 }
 
-void	cachemanager::parseCacheDirs(const char *cachedirs) {
+void cachemanager::parseCacheDirs(const char *cachedirs) {
 
 	if (cachedirs && cachedirs[0]) {
 

@@ -9,11 +9,11 @@
 
 #include <stdlib.h>
 
-int	odbcconnection::getNumberOfConnectStringVars() {
+int odbcconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	odbcconnection::handleConnectString() {
+void odbcconnection::handleConnectString() {
 	dsn=connectStringValue("dsn");
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
@@ -21,14 +21,14 @@ void	odbcconnection::handleConnectString() {
 	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
 }
 
-int	odbcconnection::logIn() {
+bool odbcconnection::logIn() {
 
 	// allocate environment handle
 #if (ODBCVER >= 0x0300)
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
-		return 0;
+		return false;
 	}
 	erg=SQLSetEnvAttr(env,SQL_ATTR_ODBC_VERSION,
 				(void *)SQL_OV_ODBC3,0);
@@ -41,7 +41,7 @@ int	odbcconnection::logIn() {
 #else
 		SQLFreeEnv(env);
 #endif
-		return 0;
+		return false;
 	}
 
 	// allocate connection handle
@@ -58,7 +58,7 @@ int	odbcconnection::logIn() {
 		SQLFreeConnect(dbc);
 		SQLFreeEnv(env);
 #endif
-		return 0;
+		return false;
 	}
 
 	// set the connect timeout
@@ -78,20 +78,20 @@ int	odbcconnection::logIn() {
 		SQLFreeConnect(dbc);
 		SQLFreeEnv(env);
 #endif
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-sqlrcursor	*odbcconnection::initCursor() {
+sqlrcursor *odbcconnection::initCursor() {
 	return (sqlrcursor *)new odbccursor((sqlrconnection *)this);
 }
 
-void	odbcconnection::deleteCursor(sqlrcursor *curs) {
+void odbcconnection::deleteCursor(sqlrcursor *curs) {
 	delete (odbccursor *)curs;
 }
 
-void	odbcconnection::logOut() {
+void odbcconnection::logOut() {
 	SQLDisconnect(dbc);
 #if (ODBCVER >= 0x0300)
 	SQLFreeHandle(SQL_HANDLE_DBC,dbc);
@@ -102,32 +102,32 @@ void	odbcconnection::logOut() {
 #endif
 }
 
-int	odbcconnection::ping() {
-	return 1;
+bool odbcconnection::ping() {
+	return true;
 }
 
-char	*odbcconnection::identify() {
+char *odbcconnection::identify() {
 	return "odbc";
 }
 
 #if (ODBCVER >= 0x0300)
-unsigned short	odbcconnection::autoCommitOn() {
-	return (unsigned short)(SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
+bool odbcconnection::autoCommitOn() {
+	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_ON,
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
 }
 
-unsigned short	odbcconnection::autoCommitOff() {
-	return (unsigned short)(SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
+bool odbcconnection::autoCommitOff() {
+	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_OFF,
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
 }
 
-int	odbcconnection::commit() {
+bool odbcconnection::commit() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_COMMIT)==SQL_SUCCESS);
 }
 
-int	odbcconnection::rollback() {
+bool odbcconnection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 #endif
@@ -144,7 +144,7 @@ odbccursor::~odbccursor() {
 	}
 }
 
-int	odbccursor::prepareQuery(const char *query, long length) {
+bool odbccursor::prepareQuery(const char *query, long length) {
 
 	if (stmt) {
 #if (ODBCVER >= 0x0300)
@@ -161,7 +161,7 @@ int	odbccursor::prepareQuery(const char *query, long length) {
 	erg=SQLAllocStmt(odbcconn->dbc,&stmt);
 #endif
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 
 // this code is here in case unixodbc or iodbc ever 
@@ -172,20 +172,20 @@ int	odbccursor::prepareQuery(const char *query, long length) {
 	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
 				(SQLPOINTER)FETCH_AT_ONCE,0);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 #endif*/
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }
 
-int	odbccursor::inputBindString(const char *variable,
+bool odbccursor::inputBindString(const char *variable,
 					unsigned short variablesize,
 					const char *value,
 					unsigned short valuesize,
@@ -215,12 +215,12 @@ int	odbccursor::inputBindString(const char *variable,
 				(SQLINTEGER *)NULL);
 	}
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-int	odbccursor::inputBindLong(const char *variable,
+bool odbccursor::inputBindLong(const char *variable,
 					unsigned short variablesize,
 					unsigned long *value) {
 
@@ -235,12 +235,12 @@ int	odbccursor::inputBindLong(const char *variable,
 				sizeof(long),
 				(SQLINTEGER *)NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-int	odbccursor::inputBindDouble(const char *variable,
+bool odbccursor::inputBindDouble(const char *variable,
 					unsigned short variablesize,
 					double *value,
 					unsigned short precision,
@@ -257,12 +257,12 @@ int	odbccursor::inputBindDouble(const char *variable,
 				sizeof(double),
 				(SQLINTEGER *)NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-int	odbccursor::outputBindString(const char *variable, 
+bool odbccursor::outputBindString(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned short valuesize, 
@@ -279,27 +279,24 @@ int	odbccursor::outputBindString(const char *variable,
 				valuesize,
 				(SQLINTEGER *)isnull);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-short	odbccursor::nonNullBindValue() {
+short odbccursor::nonNullBindValue() {
 	return 0;
 }
 
-short	odbccursor::nullBindValue() {
+short odbccursor::nullBindValue() {
 	return SQL_NULL_DATA;
 }
 
-int	odbccursor::bindValueIsNull(short isnull) {
-	if (isnull==SQL_NULL_DATA) {
-		return 1;
-	}
-	return 0;
+bool odbccursor::bindValueIsNull(short isnull) {
+	return (isnull==SQL_NULL_DATA);
 }
 
-int	odbccursor::executeQuery(const char *query, long length,
+bool odbccursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
 
 	// initialize counts
@@ -311,7 +308,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 	// execute the query
 	erg=SQLExecute(stmt);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 
 	checkForTempTable(query,length);
@@ -319,7 +316,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 	// get the column count
 	erg=SQLNumResultCols(stmt,&ncols);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
 	if (ncols>MAX_SELECT_LIST_SIZE) {
 		ncols=MAX_SELECT_LIST_SIZE;
@@ -336,42 +333,42 @@ int	odbccursor::executeQuery(const char *query, long length,
 					(SQLSMALLINT *)&(col[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column length
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
 					NULL,0,NULL,&(col[i].length));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 	
 			// column type
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TYPE,
 					NULL,0,NULL,&(col[i].type));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column precision
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_PRECISION,
 					NULL,0,NULL,&(col[i].precision));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column scale
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_SCALE,
 					NULL,0,NULL,&(col[i].scale));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column nullable
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_NULLABLE,
 					NULL,0,NULL,&(col[i].nullable));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// primary key
@@ -384,7 +381,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_UNSIGNED,
 					NULL,0,NULL,&(col[i].unsignednumber));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// zero fill
@@ -395,7 +392,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_AUTO_UNIQUE_VALUE,
 					NULL,0,NULL,&(col[i].autoincrement));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 #else
 			// column name
@@ -404,7 +401,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 					(SQLSMALLINT *)&(col[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column length
@@ -412,7 +409,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 					NULL,0,NULL,
 					(SQLINTEGER *)&(col[i].length));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column type
@@ -420,7 +417,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 					NULL,0,NULL,
 					(SQLINTEGER *)&(col[i].type));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column precision
@@ -428,7 +425,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 					NULL,0,NULL,
 					(SQLINTEGER *)&(col[i].precision));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column scale
@@ -436,7 +433,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 					NULL,0,NULL,
 					(SQLINTEGER *)&(col[i].scale));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// column nullable
@@ -444,7 +441,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 					NULL,0,NULL,
 					(SQLINTEGER *)&(col[i].nullable));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// primary key
@@ -458,7 +455,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 					NULL,0,NULL,
 					(SQLINTEGER *)&(col[i].unsignednumber));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 
 			// zero fill
@@ -471,7 +468,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 					NULL,0,NULL,
 					(SQLINTEGER *)&(col[i].autoincrement));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return 0;
+				return false;
 			}
 #endif
 		}
@@ -482,20 +479,19 @@ int	odbccursor::executeQuery(const char *query, long length,
 				field[i],MAX_ITEM_BUFFER_SIZE,
 				(SQLINTEGER *)&indicator[i]);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return 0;
+			return false;
 		}
 	}
 
 	// get the row count
 	erg=SQLRowCount(stmt,&affectedrows);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-
-	return 1;
+	return true;
 }
 
-char	*odbccursor::getErrorMessage(int *liveconnection) {
+char *odbccursor::getErrorMessage(bool *liveconnection) {
 
 	SQLCHAR		error[501];
 	SQLCHAR		state[10];
@@ -511,22 +507,22 @@ char	*odbccursor::getErrorMessage(int *liveconnection) {
 	errormsg=new stringbuffer();
 	errormsg->append((const char *)error);
 
-	*liveconnection=1;
+	*liveconnection=true;
 
 	return errormsg->getString();
 }
 
-void	odbccursor::returnRowCounts() {
+void odbccursor::returnRowCounts() {
 
 	// send row counts
 	conn->sendRowCounts((long)-1,(long)affectedrows);
 }
 
-void	odbccursor::returnColumnCount() {
+void odbccursor::returnColumnCount() {
 	conn->sendColumnCount(ncols);
 }
 
-void	odbccursor::returnColumnInfo() {
+void odbccursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
@@ -592,20 +588,16 @@ void	odbccursor::returnColumnInfo() {
 	}
 }
 
-int	odbccursor::noRowsToReturn() {
-
+bool odbccursor::noRowsToReturn() {
 	// if there are no columns, then there can't be any rows either
-	if (ncols==0) {
-		return 1;
-	}
-	return 0;
+	return (!ncols);
 }
 
-int	odbccursor::skipRow() {
+bool odbccursor::skipRow() {
 	return fetchRow();
 }
 
-int	odbccursor::fetchRow() {
+bool odbccursor::fetchRow() {
 
 // this code is here in case unixodbc ever 
 // successfully supports array fetches
@@ -615,29 +607,29 @@ int	odbccursor::fetchRow() {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
-		return 0;
+		return false;
 	}
-	if (row==0) {
+	if (!row) {
 		SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
 		SQLGetStmtAttr(stmt,SQL_ATTR_ROW_NUMBER,
 				(SQLPOINTER)&rownumber,0,NULL);
 		if (rownumber==totalrows) {
-			return 0;
+			return false;
 		}
 		maxrow=rownumber-totalrows;
 		totalrows=rownumber;
 	}
-	return 1;
+	return true;
 #else*/
 	erg=SQLFetch(stmt);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 //#endif
 }
 
-void	odbccursor::returnRow() {
+void odbccursor::returnRow() {
 
 // this code is here in case unixodbc ever 
 // successfully supports array fetches

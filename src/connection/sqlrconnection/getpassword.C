@@ -3,6 +3,6 @@
 
 #include <sqlrconnection.h>
 
-char	*sqlrconnection::getPassword() {
+char *sqlrconnection::getPassword() {
 	return password;
 }

@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-char	*sqlrconnection::identify() {
+char *sqlrconnection::identify() {
 
 	if (!openSession()) {
 		return 0;

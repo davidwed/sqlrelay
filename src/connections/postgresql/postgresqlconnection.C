@@ -21,15 +21,15 @@ postgresqlconnection::~postgresqlconnection() {
 	close(devnull);
 }
 #else
-static void	nullNoticeProcessor(void *arg, const char *message) {
+static void nullNoticeProcessor(void *arg, const char *message) {
 }
 #endif
 
-int	postgresqlconnection::getNumberOfConnectStringVars() {
+int postgresqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	postgresqlconnection::handleConnectString() {
+void postgresqlconnection::handleConnectString() {
 	host=connectStringValue("host");
 	port=connectStringValue("port");
 	options=connectStringValue("options");
@@ -48,7 +48,7 @@ void	postgresqlconnection::handleConnectString() {
 	}
 }
 
-int	postgresqlconnection::logIn() {
+bool postgresqlconnection::logIn() {
 
 	// initialize the datatype storage buffers
 	if (typemangling==2) {
@@ -58,12 +58,13 @@ int	postgresqlconnection::logIn() {
 	}
 			
 	// log in
-	pgconn=PQsetdbLogin(host,port,options,tty,db,getUser(),getPassword());
+	pgconn=PQsetdbLogin(host,port,options,tty,db,
+				getUser(),getPassword());
 
 	// check the status of the login
 	if (PQstatus(pgconn)==CONNECTION_BAD) {
 		logOut();
-		return 0;
+		return false;
 	}
 
 #ifdef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
@@ -81,7 +82,7 @@ int	postgresqlconnection::logIn() {
 		PGresult	*result=PQexec(pgconn,
 					"select oid,typname from pg_type");
 		if (result==(PGresult *)NULL) {
-			return 0;
+			return false;
 		}
 
 		// create the datatype storage buffers
@@ -99,18 +100,18 @@ int	postgresqlconnection::logIn() {
 		PQclear(result);
 	}
 
-	return 1;
+	return true;
 }
 
-sqlrcursor	*postgresqlconnection::initCursor() {
+sqlrcursor *postgresqlconnection::initCursor() {
 	return (sqlrcursor *)new postgresqlcursor((sqlrconnection *)this);
 }
 
-void	postgresqlconnection::deleteCursor(sqlrcursor *curs) {
+void postgresqlconnection::deleteCursor(sqlrcursor *curs) {
 	delete (postgresqlcursor *)curs;
 }
 
-void	postgresqlconnection::logOut() {
+void postgresqlconnection::logOut() {
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	close(devnull);
@@ -135,22 +136,22 @@ void	postgresqlconnection::logOut() {
 	}
 }
 
-int	postgresqlconnection::ping() {
+bool postgresqlconnection::ping() {
 	return (PQstatus(pgconn)==CONNECTION_OK);
 }
 
-char	*postgresqlconnection::identify() {
+char *postgresqlconnection::identify() {
 	return "postgresql";
 }
 
-postgresqlcursor::postgresqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
-
+postgresqlcursor::postgresqlcursor(sqlrconnection *conn) :
+						sqlrcursor(conn) {
 	postgresqlconn=(postgresqlconnection *)conn;
 	ddlquery=0;
 	pgresult=(PGresult *)NULL;
 }
 
-int	postgresqlcursor::executeQuery(const char *query, long length,
+bool postgresqlcursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
 
 	// initialize the counts
@@ -173,15 +174,16 @@ int	postgresqlcursor::executeQuery(const char *query, long length,
 
 	// handle a failed query
 	if (pgresult==(PGresult *)NULL) {
-		return 0;
+		return false;
 	}
 
 	// handle errors
 	ExecStatusType	pgstatus=PQresultStatus(pgresult);
-	if (pgstatus==PGRES_BAD_RESPONSE || pgstatus==PGRES_NONFATAL_ERROR ||
+	if (pgstatus==PGRES_BAD_RESPONSE ||
+		pgstatus==PGRES_NONFATAL_ERROR ||
 		pgstatus==PGRES_FATAL_ERROR) {
 		// FIXME: do I need to do a PQclear here?
-		return 0;
+		return false;
 	}
 
 	checkForTempTable(query,length);
@@ -199,25 +201,24 @@ int	postgresqlcursor::executeQuery(const char *query, long length,
 		affectedrows=atol(affrows);
 	}
 
-	return 1;
+	return true;
 }
 
-char	*postgresqlcursor::getErrorMessage(int *liveconnection) {
+char *postgresqlcursor::getErrorMessage(bool *liveconnection) {
 	*liveconnection=(PQstatus(postgresqlconn->pgconn)==CONNECTION_OK);
 	return PQerrorMessage(postgresqlconn->pgconn);
 }
 
-void	postgresqlcursor::returnRowCounts() {
-
+void postgresqlcursor::returnRowCounts() {
 	// send row counts (affected rows unknown in postgresql)
 	conn->sendRowCounts((long)nrows,(long)affectedrows);
 }
 
-void	postgresqlcursor::returnColumnCount() {
+void postgresqlcursor::returnColumnCount() {
 	conn->sendColumnCount(ncols);
 }
 
-void	postgresqlcursor::returnColumnInfo() {
+void postgresqlcursor::returnColumnInfo() {
 
 	if (postgresqlconn->typemangling==1) {
 		conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
@@ -235,7 +236,8 @@ void	postgresqlcursor::returnColumnInfo() {
 	char		*name;
 	int		size;
 
-	// is this binary data (all columns will contain binary data if it is)
+	// is this binary data (all columns will contain
+	// binary data if it is)
 	int	binary=PQbinaryTuples(pgresult);
 
 	// for each column...
@@ -245,8 +247,8 @@ void	postgresqlcursor::returnColumnInfo() {
 		// types, only internal numbers that correspond to 
 		// types which are defined in a database table 
 		// somewhere.
-		// If typemangling is turned on, translate to standard types, 
-		// otherwise return the type number.
+		// If typemangling is turned on, translate to standard
+		// types, otherwise return the type number.
 		pgfieldtype=PQftype(pgresult,i);
 		if (!postgresqlconn->typemangling) {
 			sprintf(typestring,"%d",(int)pgfieldtype);
@@ -310,29 +312,23 @@ void	postgresqlcursor::returnColumnInfo() {
 	}
 }
 
-int	postgresqlcursor::noRowsToReturn() {
-	if (!nrows) {
-		return 1;
-	}
-	return 0;
+bool postgresqlcursor::noRowsToReturn() {
+	return (!nrows);
 }
 
-int	postgresqlcursor::skipRow() {
-	if (fetchRow()) {
-		return 1;
-	}
-	return 0;
+bool postgresqlcursor::skipRow() {
+	return fetchRow();
 }
 
-int	postgresqlcursor::fetchRow() {
+bool postgresqlcursor::fetchRow() {
 	if (currentrow<nrows-1) {
 		currentrow++;
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-void	postgresqlcursor::returnRow() {
+void postgresqlcursor::returnRow() {
 
 	// send the row back
 	for (int col=0; col<ncols; col++) {
@@ -348,7 +344,7 @@ void	postgresqlcursor::returnRow() {
 }
 
 
-void	postgresqlcursor::cleanUpData(bool freerows, bool freecols,
+void postgresqlcursor::cleanUpData(bool freerows, bool freecols,
 							bool freebinds) {
 	if (freerows && pgresult) {
 		PQclear(pgresult);

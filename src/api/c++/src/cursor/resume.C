@@ -5,11 +5,11 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int	sqlrcursor::resumeResultSet(int id) {
+int sqlrcursor::resumeResultSet(int id) {
 	return resumeCachedResultSet(id,NULL);
 }
 
-int	sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
+int sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
 
 	if (!endofresultset && !suspendresultsetsent) {
 		abortResultSet();

@@ -9,16 +9,16 @@
 
 scaler	*s;
 
-void	cleanUp() {
+void cleanUp() {
 	delete s;
 }
 
-RETSIGTYPE	shutDown() {
+RETSIGTYPE shutDown() {
 	cleanUp();
 	exit(0);
 }
 
-int	main(int argc, const char **argv) {
+int main(int argc, const char **argv) {
 
 	#include <version.h>
 

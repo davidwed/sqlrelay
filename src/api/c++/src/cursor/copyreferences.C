@@ -4,8 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-void	sqlrcursor::copyReferences() {
-
+void sqlrcursor::copyReferences() {
 	// set the flag
 	copyrefs=1;
 }

@@ -24,7 +24,7 @@ row::~row() {
 	delete[] extrafieldlengths;
 }
 
-void	row::resize(int colcount) {
+void row::resize(int colcount) {
 	if (colcount>=OPTIMISTIC_COLUMN_COUNT) {
 		delete[] extrafields;
 		delete[] extrafieldlengths;
@@ -34,7 +34,7 @@ void	row::resize(int colcount) {
 	}
 }
 
-void	row::addField(int column, const char *buffer, unsigned long length) {
+void row::addField(int column, const char *buffer, unsigned long length) {
 	if (column<OPTIMISTIC_COLUMN_COUNT) {
 		fields[column]=(char *)buffer;
 		fieldlengths[column]=length;
@@ -44,7 +44,7 @@ void	row::addField(int column, const char *buffer, unsigned long length) {
 	}
 }
 
-char	*row::getField(int column) const {
+char *row::getField(int column) const {
 	if (column<OPTIMISTIC_COLUMN_COUNT) {
 		return fields[column];
 	} else {
@@ -52,7 +52,7 @@ char	*row::getField(int column) const {
 	}
 }
 
-unsigned long	row::getFieldLength(int column) const {
+unsigned long row::getFieldLength(int column) const {
 	if (column<OPTIMISTIC_COLUMN_COUNT) {
 		return fieldlengths[column];
 	} else {

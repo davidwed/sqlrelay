@@ -4,9 +4,8 @@
 #include <sqlrconnection.h>
 #include <unistd.h>
 
-void	sqlrconnection::listen() {
+void sqlrconnection::listen() {
 
-bool	firsttime=true;
 	for (;;) {
 
 		waitForAvailableDatabase();
@@ -22,7 +21,7 @@ bool	firsttime=true;
 			int	success=waitForClient();
 			if (success==1) {
 
-				suspendedsession=0;
+				suspendedsession=false;
 
 				// have a session with the client
 				clientSession();
@@ -49,7 +48,7 @@ bool	firsttime=true;
 					if (isTransactional()) {
 						rollback();
 					}
-					suspendedsession=0;
+					suspendedsession=false;
 				}
 			}
 		}
@@ -60,7 +59,7 @@ bool	firsttime=true;
 	}
 }
 
-void	sqlrconnection::waitForAvailableDatabase() {
+void sqlrconnection::waitForAvailableDatabase() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"waiting for available database...");
@@ -76,32 +75,32 @@ void	sqlrconnection::waitForAvailableDatabase() {
 	#endif
 }
 
-int	sqlrconnection::availableDatabase() {
+bool sqlrconnection::availableDatabase() {
 
 	// return whether the file "updown" is there or not
 	#ifdef SERVER_DEBUG
-		if (!file::exists(updown)) {
-			getDebugLogger()->write("connection",0,"database is not available");
-			return 0;
-		} else {
+		if (file::exists(updown)) {
 			getDebugLogger()->write("connection",0,"database is available");
-			return 1;
+			return true;
+		} else {
+			getDebugLogger()->write("connection",0,"database is not available");
+			return false;
 		}
 	#else
 		return file::exists(updown);
 	#endif
 }
 
-void	sqlrconnection::initSession() {
+void sqlrconnection::initSession() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"initializing session...");
 	#endif
 
-	commitorrollback=0;
-	suspendedsession=0;
+	commitorrollback=false;
+	suspendedsession=false;
 	for (int i=0; i<cfgfl->getCursors(); i++) {
-		cur[i]->suspendresultset=0;
+		cur[i]->suspendresultset=false;
 	}
 	accepttimeout=5;
 
@@ -110,11 +109,15 @@ void	sqlrconnection::initSession() {
 	#endif
 }
 
-int	sqlrconnection::waitForClient() {
+int sqlrconnection::waitForClient() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"waiting for client...");
 	#endif
+
+	// FIXME: listen() checks for 1,-1 or 0 from this method, but this
+	// method only returns 1 or -1????  0 should indicate that a suspended
+	// session timed out...
 
 	// Unless we're in the middle of a suspended session, if we're passing 
 	// file descriptors around, wait for one to be passed to us, otherwise,

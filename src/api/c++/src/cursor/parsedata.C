@@ -6,7 +6,7 @@
 #include <defines.h>
 #include <datatypes.h>
 
-int	sqlrcursor::parseData() {
+int sqlrcursor::parseData() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -234,7 +234,7 @@ int	sqlrcursor::parseData() {
 	return 1;
 }
 
-void	sqlrcursor::createRowBuffers() {
+void sqlrcursor::createRowBuffers() {
 
 	// rows will hang around from now until the cursor is deleted,
 	// getting reused with each query
@@ -244,7 +244,7 @@ void	sqlrcursor::createRowBuffers() {
 	}
 }
 
-void	sqlrcursor::createExtraRowArray() {
+void sqlrcursor::createExtraRowArray() {
 
 	// create the arrays
 	int	howmany=rowcount-firstrowindex-OPTIMISTIC_ROW_COUNT;

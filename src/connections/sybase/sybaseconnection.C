@@ -15,7 +15,7 @@
 
 #ifdef __GNUC__
 stringbuffer	*sybaseconnection::errorstring;
-int		sybaseconnection::deadconnection;
+bool		sybaseconnection::deadconnection;
 #endif
 
 
@@ -29,11 +29,11 @@ sybaseconnection::~sybaseconnection() {
 	delete env;
 }
 
-int	sybaseconnection::getNumberOfConnectStringVars() {
+int sybaseconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	sybaseconnection::handleConnectString() {
+void sybaseconnection::handleConnectString() {
 	sybase=connectStringValue("sybase");
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
@@ -46,30 +46,30 @@ void	sybaseconnection::handleConnectString() {
 	packetsize=connectStringValue("packetsize");
 }
 
-int	sybaseconnection::logIn() {
+bool sybaseconnection::logIn() {
 
 	// set sybase
 	if (sybase && sybase[0] && !env->setValue("SYBASE",sybase)) {
 		logInError("Failed to set SYBASE environment variable.",1);
-		return 0;
+		return false;
 	}
 
 	// set server
 	if (server && server[0] && !env->setValue("DSQUERY",server)) {
 		logInError("Failed to set DSQUERY environment variable.",2);
-		return 0;
+		return false;
 	}
 
 	// allocate a context
 	context=(CS_CONTEXT *)NULL;
 	if (cs_ctx_alloc(CS_VERSION_100,&context)!=CS_SUCCEED) {
 		logInError("failed to allocate a context structure",2);
-		return 0;
+		return false;
 	}
 	// init the context
 	if (ct_init(context,CS_VERSION_100)!=CS_SUCCEED) {
 		logInError("failed to initialize a context structure",3);
-		return 0;
+		return false;
 	}
 
 
@@ -79,26 +79,26 @@ int	sybaseconnection::logIn() {
 			(CS_INT *)NULL)
 			!=CS_SUCCEED) {
 		logInError("failed to set a cslib error message callback",4);
-		return 0;
+		return false;
 	}
 	if (ct_callback(context,NULL,CS_SET,CS_CLIENTMSG_CB,
 		(CS_VOID *)sybaseconnection::clientMessageCallback)
 			!=CS_SUCCEED) {
 		logInError("failed to set a client error message callback",4);
-		return 0;
+		return false;
 	}
 	if (ct_callback(context,NULL,CS_SET,CS_SERVERMSG_CB,
 		(CS_VOID *)sybaseconnection::serverMessageCallback)
 			!=CS_SUCCEED) {
 		logInError("failed to set a server error message callback",4);
-		return 0;
+		return false;
 	}
 
 
 	// allocate a connection
 	if (ct_con_alloc(context,&dbconn)!=CS_SUCCEED) {
 		logInError("failed to allocate a connection structure",4);
-		return 0;
+		return false;
 	}
 
 
@@ -108,7 +108,7 @@ int	sybaseconnection::logIn() {
 			(CS_VOID *)((user && user[0])?user:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the user",5);
-		return 0;
+		return false;
 	}
 
 
@@ -118,14 +118,14 @@ int	sybaseconnection::logIn() {
 			(CS_VOID *)((password && password[0])?password:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the password",5);
-		return 0;
+		return false;
 	}
 
 	// set application name
 	if (ct_con_props(dbconn,CS_SET,CS_APPNAME,(CS_VOID *)"sqlrelay",
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the application name",5);
-		return 0;
+		return false;
 	}
 
 	// set hostname
@@ -133,7 +133,7 @@ int	sybaseconnection::logIn() {
 		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
 				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
 			logInError("failed to set the hostname",5);
-		return 0;
+		return false;
 	}
 
 	// set packetsize
@@ -142,7 +142,7 @@ int	sybaseconnection::logIn() {
 				(CS_VOID *)atoi(packetsize),
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the packetsize",5);
-		return 0;
+		return false;
 	}
 
 	// set encryption
@@ -152,7 +152,7 @@ int	sybaseconnection::logIn() {
 			(CS_VOID *)&enc,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			logInError("failed to set the encryption",5);
-			return 0;
+			return false;
 		}
 	}
 
@@ -160,12 +160,12 @@ int	sybaseconnection::logIn() {
 	locale=NULL;
 	if (cs_loc_alloc(context,&locale)!=CS_SUCCEED) {
 		logInError("failed to allocate a locale structure",5);
-		return 0;
+		return false;
 	}
 	if (cs_locale(context,CS_SET,locale,CS_LC_ALL,(CS_CHAR *)NULL,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to initialize a locale structure",6);
-		return 0;
+		return false;
 	}
 
 	// set language
@@ -174,7 +174,7 @@ int	sybaseconnection::logIn() {
 			(CS_CHAR *)language,CS_NULLTERM,(CS_INT *)NULL)!=
 				CS_SUCCEED) {
 		logInError("failed to set the language",6);
-		return 0;
+		return false;
 	}
 
 	// set charset
@@ -183,25 +183,25 @@ int	sybaseconnection::logIn() {
 			(CS_CHAR *)charset,CS_NULLTERM,(CS_INT *)NULL)!=
 				CS_SUCCEED) {
 		logInError("failed to set the charset",6);
-		return 0;
+		return false;
 	}
 
 	// set locale
 	if (ct_con_props(dbconn,CS_SET,CS_LOC_PROP,(CS_VOID *)locale,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the locale",6);
-		return 0;
+		return false;
 	}
 
 	// connect to the database
 	if (ct_connect(dbconn,(CS_CHAR *)NULL,(CS_INT)0)!=CS_SUCCEED) {
 		logInError("failed to connect to the database",6);
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-void	sybaseconnection::logInError(const char *error, int stage) {
+void sybaseconnection::logInError(const char *error, int stage) {
 
 	fprintf(stderr,"%s\n",error);
 
@@ -223,15 +223,15 @@ void	sybaseconnection::logInError(const char *error, int stage) {
 	}
 }
 
-sqlrcursor	*sybaseconnection::initCursor() {
+sqlrcursor *sybaseconnection::initCursor() {
 	return (sqlrcursor *)new sybasecursor((sqlrconnection *)this);
 }
 
-void	sybaseconnection::deleteCursor(sqlrcursor *curs) {
+void sybaseconnection::deleteCursor(sqlrcursor *curs) {
 	delete (sybasecursor *)curs;
 }
 
-void	sybaseconnection::logOut() {
+void sybaseconnection::logOut() {
 
 	cs_loc_drop(context,locale);
 	ct_close(dbconn,CS_UNUSED);
@@ -240,11 +240,11 @@ void	sybaseconnection::logOut() {
 	cs_ctx_drop(context);
 }
 
-char	*sybaseconnection::identify() {
+char *sybaseconnection::identify() {
 	return "sybase";
 }
 
-char	sybaseconnection::bindVariablePrefix() {
+char sybaseconnection::bindVariablePrefix() {
 	return '@';
 }
 
@@ -265,26 +265,26 @@ sybasecursor::~sybasecursor() {
 	}
 }
 
-int	sybasecursor::openCursor(int id) {
+bool sybasecursor::openCursor(int id) {
 
 	// switch to the correct database
-	int	retval=1;
+	bool	retval=true;
 	if (sybaseconn->db && sybaseconn->db[0]) {
 		int	len=strlen(sybaseconn->db)+4;
 		char	*query=new char[len+1];
 		sprintf(query,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len,1))) {
-			int	live;
+			bool	live;
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
-			retval=0;
+			retval=false;
 		}
 		delete[] query;
 		cleanUpData(true,true,true);
 	}
-	return retval;
+	return (retval && sqlrcursor::openCursor(id));
 }
 
-int	sybasecursor::prepareQuery(const char *query, long length) {
+bool sybasecursor::prepareQuery(const char *query, long length) {
 
 	this->query=(char *)query;
 	this->length=length;
@@ -295,20 +295,20 @@ int	sybasecursor::prepareQuery(const char *query, long length) {
 		ct_cmd_drop(cmd);
 	}
 	if (ct_cmd_alloc(sybaseconn->dbconn,&cmd)!=CS_SUCCEED) {
-		return 0;
+		return false;
 	}
 
 	// initiate a language command
 	if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)query,
 				length,CS_UNUSED)!=CS_SUCCEED) {
-		return 0;
+		return false;
 	}
 
 	prepared=1;
-	return 1;
+	return true;
 }
 
-void	sybasecursor::checkRePrepare() {
+void sybasecursor::checkRePrepare() {
 
 	// Sybase doesn't allow you to rebind and re-execute when using 
 	// ct_command.  You have to re-prepare too.  I'll make this transparent
@@ -318,7 +318,7 @@ void	sybasecursor::checkRePrepare() {
 	}
 }
 
-int	sybasecursor::inputBindString(const char *variable,
+bool sybasecursor::inputBindString(const char *variable,
 						unsigned short variablesize,
 						const char *value,
 						unsigned short valuesize,
@@ -341,13 +341,13 @@ int	sybasecursor::inputBindString(const char *variable,
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
 		(CS_VOID *)value,valuesize,0)!=CS_SUCCEED) {
-		return 0;
+		return false;
 	}
 	paramindex++;
-	return 1;
+	return true;
 }
 
-int	sybasecursor::inputBindLong(const char *variable,
+bool sybasecursor::inputBindLong(const char *variable,
 						unsigned short variablesize,
 						unsigned long *value) {
 
@@ -368,13 +368,13 @@ int	sybasecursor::inputBindLong(const char *variable,
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
 		(CS_VOID *)value,sizeof(long),0)!=CS_SUCCEED) {
-		return 0;
+		return false;
 	}
 	paramindex++;
-	return 1;
+	return true;
 }
 
-int	sybasecursor::inputBindDouble(const char *variable,
+bool sybasecursor::inputBindDouble(const char *variable,
 						unsigned short variablesize,
 						double *value,
 						unsigned short precision,
@@ -399,13 +399,13 @@ int	sybasecursor::inputBindDouble(const char *variable,
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
 		(CS_VOID *)value,sizeof(double),0)!=CS_SUCCEED) {
-		return 0;
+		return false;
 	}
 	paramindex++;
-	return 1;
+	return true;
 }
 
-int	sybasecursor::outputBindString(const char *variable, 
+bool sybasecursor::outputBindString(const char *variable, 
 					unsigned short variablesize,
 					char *value, 
 					unsigned short valuesize, 
@@ -429,18 +429,18 @@ int	sybasecursor::outputBindString(const char *variable,
 	if (ct_param(cmd,&parameter[paramindex],
 			(CS_VOID *)value,valuesize,
 			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
-		return 0;
+		return false;
 	}
 	paramindex++;*/
-	return 1;
+	return true;
 }
 
-int	sybasecursor::executeQuery(const char *query, long length,
+bool sybasecursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
 
 	// clear out any errors
 	if (sybaseconn->errorstring) {
-		sybaseconn->deadconnection=0;
+		sybaseconn->deadconnection=false;
 		delete sybaseconn->errorstring;
 		sybaseconn->errorstring=NULL;
 	}
@@ -453,7 +453,7 @@ int	sybasecursor::executeQuery(const char *query, long length,
 	totalrows=0;
 
 	if (ct_send(cmd)!=CS_SUCCEED) {
-		return 0;
+		return false;
 	}
 
 	// Get the results. Sybase is weird... A query can return multiple
@@ -461,8 +461,8 @@ int	sybasecursor::executeQuery(const char *query, long length,
 	// be cancelled.  Return a dead database on failure
 	if (ct_results(cmd,&results_type)==CS_FAIL) {
 		ct_cancel(sybaseconn->dbconn,NULL,CS_CANCEL_ALL);
-		sybaseconn->deadconnection=1;
-		return 0;
+		sybaseconn->deadconnection=true;
+		return false;
 	}
 
 	checkForTempTable(query,length);
@@ -470,7 +470,7 @@ int	sybasecursor::executeQuery(const char *query, long length,
 	// handle a failed command
 	if ((int)results_type==CS_CMD_FAIL) {
 		ct_cancel(sybaseconn->dbconn,NULL,CS_CANCEL_ALL);
-		return 0;
+		return false;
 	}
 
 	// reset the prepared flag
@@ -483,7 +483,7 @@ int	sybasecursor::executeQuery(const char *query, long length,
 	if (results_type==CS_ROW_RESULT) {
 		if (ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			return 0;
+			return false;
 		}
 		if (ncols>MAX_SELECT_LIST_SIZE) {
 			ncols=MAX_SELECT_LIST_SIZE;
@@ -491,7 +491,7 @@ int	sybasecursor::executeQuery(const char *query, long length,
 	} else if (results_type==CS_CMD_SUCCEED) {
 		if (ct_res_info(cmd,CS_ROW_COUNT,(CS_VOID *)&affectedrows,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			return 0;
+			return false;
 		} 
 	}
 
@@ -522,16 +522,16 @@ int	sybasecursor::executeQuery(const char *query, long length,
 
 	// return success only if no error was generated
 	if (sybaseconn->errorstring) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-char	*sybasecursor::getErrorMessage(int *liveconnection) {
+char *sybasecursor::getErrorMessage(bool *liveconnection) {
 	if (sybaseconn->deadconnection) {
-		*liveconnection=0;
+		*liveconnection=false;
 	} else {
-		*liveconnection=1;
+		*liveconnection=true;
 	}
 	if (sybaseconn->errorstring) {
 		return sybaseconn->errorstring->getString();
@@ -540,17 +540,17 @@ char	*sybasecursor::getErrorMessage(int *liveconnection) {
 	}
 }
 
-void	sybasecursor::returnRowCounts() {
+void sybasecursor::returnRowCounts() {
 
 	// send row counts (actual row count unknown in sybase)
 	conn->sendRowCounts((long)-1,(long)affectedrows);
 }
 
-void	sybasecursor::returnColumnCount() {
+void sybasecursor::returnColumnCount() {
 	conn->sendColumnCount(ncols);
 }
 
-void	sybasecursor::returnColumnInfo() {
+void sybasecursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
@@ -653,42 +653,38 @@ void	sybasecursor::returnColumnInfo() {
 	}
 }
 
-int	sybasecursor::noRowsToReturn() {
-
+bool sybasecursor::noRowsToReturn() {
 	// unless the query was a successful select, send no data
-	if (results_type!=CS_ROW_RESULT) {
-		return 1;
-	}
-	return 0;
+	return (results_type!=CS_ROW_RESULT);
 }
 
-int	sybasecursor::skipRow() {
+bool sybasecursor::skipRow() {
 	if (fetchRow()) {
 		row++;
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-int	sybasecursor::fetchRow() {
+bool sybasecursor::fetchRow() {
 	if (row==FETCH_AT_ONCE) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
-		return 0;
+		return false;
 	}
-	if (row==0) {
+	if (!row) {
 		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
-				&rowsread)!=CS_SUCCEED && rowsread==0) {
-			return 0;
+				&rowsread)!=CS_SUCCEED && !rowsread) {
+			return false;
 		}
 		maxrow=rowsread;
 		totalrows=totalrows+rowsread;
 	}
-	return 1;
+	return true;
 }
 
-void	sybasecursor::returnRow() {
+void sybasecursor::returnRow() {
 
 	// send each row back
 	for (int col=0; col<(int)ncols; col++) {
@@ -702,7 +698,7 @@ void	sybasecursor::returnRow() {
 }
 
 
-void	sybasecursor::cleanUpData(bool freerows, bool freecols,
+void sybasecursor::cleanUpData(bool freerows, bool freecols,
 							bool freebinds) {
 
 	// cancel the rest of the result sets
@@ -721,7 +717,7 @@ void	sybasecursor::cleanUpData(bool freerows, bool freecols,
 	}
 }
 
-CS_RETCODE	sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt, 
+CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CLIENTMSG *msgp) {
 	if (errorstring) {
 		delete errorstring;
@@ -761,7 +757,7 @@ CS_RETCODE	sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-CS_RETCODE	sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt, 
+CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CONNECTION *cnn,
 						CS_CLIENTMSG *msgp) {
 	if (errorstring) {
@@ -802,7 +798,7 @@ CS_RETCODE	sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-CS_RETCODE	sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt, 
+CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CONNECTION *cnn,
 						CS_SERVERMSG *msgp) {
 

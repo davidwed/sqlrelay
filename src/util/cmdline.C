@@ -11,7 +11,7 @@ cmdline::cmdline(int argc, const char **argv) : commandline(argc,argv) {
 	setLocalStateDir();
 }
 
-void	cmdline::setId() {
+void cmdline::setId() {
 
 	// get the id from the command line
 	id=value("-id");
@@ -21,7 +21,7 @@ void	cmdline::setId() {
 	}
 }
 
-void	cmdline::setConfig() {
+void cmdline::setConfig() {
 
 	// get the config file from the command line
 	config=value("-config");
@@ -30,7 +30,7 @@ void	cmdline::setConfig() {
 	}
 }
 
-void	cmdline::setLocalStateDir() {
+void cmdline::setLocalStateDir() {
 
 	// get the localstatedir from the command line
 	localstatedir=value("-localstatedir");

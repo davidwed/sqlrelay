@@ -7,7 +7,7 @@
 #include <defines.h>
 #include <datatypes.h>
 
-int	sqlrcursor::processResultSet(int rowtoget) {
+int sqlrcursor::processResultSet(int rowtoget) {
 
 	// start caching the result set
 	if (cacheon) {
@@ -56,7 +56,7 @@ int	sqlrcursor::processResultSet(int rowtoget) {
 	return 1;
 }
 
-int	sqlrcursor::noError() {
+int sqlrcursor::noError() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -88,7 +88,7 @@ int	sqlrcursor::noError() {
 	return -1;
 }
 
-int	sqlrcursor::getCursorId() {
+int sqlrcursor::getCursorId() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -109,7 +109,7 @@ int	sqlrcursor::getCursorId() {
 	return 1;
 }
 
-int	sqlrcursor::getSuspended() {
+int sqlrcursor::getSuspended() {
 
 	// see if the result set of that cursor is actually suspended
 	unsigned short	suspendedresultset;
@@ -149,7 +149,7 @@ int	sqlrcursor::getSuspended() {
 	return 0;
 }
 
-void	sqlrcursor::getErrorFromServer() {
+void sqlrcursor::getErrorFromServer() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -172,7 +172,7 @@ void	sqlrcursor::getErrorFromServer() {
 	handleError();
 }
 
-void	sqlrcursor::setError(const char *err) {
+void sqlrcursor::setError(const char *err) {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -183,7 +183,7 @@ void	sqlrcursor::setError(const char *err) {
 	handleError();
 }
 
-void	sqlrcursor::handleError() {
+void sqlrcursor::handleError() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -198,7 +198,7 @@ void	sqlrcursor::handleError() {
 	finishCaching();
 }
 
-int	sqlrcursor::fetchRowIntoBuffer(int row) {
+int sqlrcursor::fetchRowIntoBuffer(int row) {
 
 	// if we getting the entire result set at once, then the result set 
 	// buffer index is the requested row-firstrowindex
@@ -242,7 +242,7 @@ int	sqlrcursor::fetchRowIntoBuffer(int row) {
 	return -1;
 }
 
-int	sqlrcursor::getShort(unsigned short *integer) {
+int sqlrcursor::getShort(unsigned short *integer) {
 
 	// if the result set is coming from a cache file, read from
 	// the file, if not, read from the server
@@ -253,7 +253,7 @@ int	sqlrcursor::getShort(unsigned short *integer) {
 	}
 }
 
-int	sqlrcursor::getLong(unsigned long *integer) {
+int sqlrcursor::getLong(unsigned long *integer) {
 
 	// if the result set is coming from a cache file, read from
 	// the file, if not, read from the server
@@ -264,7 +264,7 @@ int	sqlrcursor::getLong(unsigned long *integer) {
 	}
 }
 
-int	sqlrcursor::getString(char *string, int size) {
+int sqlrcursor::getString(char *string, int size) {
 
 	// if the result set is coming from a cache file, read from
 	// the file, if not, read from the server

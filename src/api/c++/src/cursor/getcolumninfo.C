@@ -5,10 +5,10 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-void	sqlrcursor::dontGetColumnInfo() {
+void sqlrcursor::dontGetColumnInfo() {
 	sendcolumninfo=DONT_SEND_COLUMN_INFO;
 }
 
-void	sqlrcursor::getColumnInfo() {
+void sqlrcursor::getColumnInfo() {
 	sendcolumninfo=SEND_COLUMN_INFO;
 }

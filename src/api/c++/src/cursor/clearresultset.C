@@ -6,7 +6,7 @@
 #include <defines.h>
 #include <datatypes.h>
 
-void	sqlrcursor::clearResultSet() {
+void sqlrcursor::clearResultSet() {
 
 	clearCacheDest();
 	clearCacheSource();
@@ -30,7 +30,7 @@ void	sqlrcursor::clearResultSet() {
 	getrowcount=0;
 }
 
-void	sqlrcursor::clearError() {
+void sqlrcursor::clearError() {
 	delete[] error;
 	error=NULL;
 	if (sqlrc) {
@@ -38,7 +38,7 @@ void	sqlrcursor::clearError() {
 	}
 }
 
-void	sqlrcursor::clearRows() {
+void sqlrcursor::clearRows() {
 
 	// delete data in rows for long datatypes
 	unsigned long	rowbuffercount=rowcount-firstrowindex;
@@ -87,7 +87,7 @@ void	sqlrcursor::clearRows() {
 	rowstorage->free();
 }
 
-void	sqlrcursor::clearColumns() {
+void sqlrcursor::clearColumns() {
 
 	// delete the column type strings (if necessary)
 	if (sentcolumninfo==SEND_COLUMN_INFO &&

@@ -36,8 +36,8 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 			sqlrconnection();
 		virtual	~sqlrconnection();
 
-		int	initConnection(int argc, const char **argv,
-						int detachbeforeloggingin);
+		bool	initConnection(int argc, const char **argv,
+						bool detachbeforeloggingin);
 		void	listen();
 		void	closeConnection();
 
@@ -46,25 +46,26 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		// interface definition
 		virtual	int	getNumberOfConnectStringVars()=0;
 		virtual	void	handleConnectString()=0;
-		virtual	int	logIn()=0;
+		virtual	bool	logIn()=0;
 		virtual	void	logOut()=0;
-		virtual	int	changeUser(const char *newuser,
+		virtual	bool	changeUser(const char *newuser,
 						const char *newpassword);
-		virtual unsigned short	autoCommitOn();
-		virtual unsigned short	autoCommitOff();
-		virtual int	commit();
-		virtual int	rollback();
+		virtual bool	autoCommitOn();
+		virtual bool	autoCommitOff();
+		virtual bool	commit();
+		virtual bool	rollback();
 		virtual char	*pingQuery();
-		virtual int	ping();
+		virtual bool	ping();
 		virtual char	*identify()=0;
 		virtual sqlrcursor	*initCursor()=0;
 		virtual void	deleteCursor(sqlrcursor *curs)=0;
 		virtual	short	nonNullBindValue();
 		virtual	short	nullBindValue();
 		virtual char	bindVariablePrefix();
-		virtual int	bindValueIsNull(short isnull);
-		virtual	int	skipRows(int rows);
-		virtual int	isTransactional();
+		virtual bool	bindValueIsNull(short isnull);
+		virtual	bool	skipRows(sqlrcursor *cursor,
+						unsigned long rows);
+		virtual bool	isTransactional();
 		virtual void	setUser(const char *user);
 		virtual void	setPassword(const char *password);
 		virtual char	*getUser();
@@ -73,9 +74,9 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 	public:
 		// methods used by derived classes
 		char	*connectStringValue(const char *variable);
-		void	setAutoCommitBehavior(int ac);
-		int	getAutoCommitBehavior();
-		int	sendColumnInfo();
+		void	setAutoCommitBehavior(bool ac);
+		bool	getAutoCommitBehavior();
+		bool	sendColumnInfo();
 		void	sendRowCounts(long actual, long affected);
 		void	sendColumnCount(unsigned long ncols);
 		void	sendColumnTypeFormat(unsigned short format);
@@ -122,19 +123,17 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		// methods used internally
 		void	setUserAndGroup();
 		void	createCursorArray();
-		int	initCursors(int create);
-		int	getCursor(unsigned short command);
-		int	findAvailableCursor();
-		void	closeCursors(int destroy);
+		bool	initCursors(bool create);
+		sqlrcursor	*getCursor(unsigned short command);
+		sqlrcursor	*findAvailableCursor();
+		void	closeCursors(bool destroy);
 		void	setUnixSocketDirectory();
-		int	handlePidFile();
-		void	initSharedMemoryAndSemaphoreFileName();
-		int	createSharedMemoryAndSemaphores();
+		bool	handlePidFile();
 		void	reLogIn();
 		void	initSession();
 		int	waitForClient();
 		void	clientSession();
-		int	authenticateCommand();
+		bool	authenticateCommand();
 		void	suspendSessionCommand();
 		void	endSessionCommand();
 		void	pingCommand();
@@ -142,71 +141,76 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	autoCommitCommand();
 		void	commitCommand();
 		void	rollbackCommand();
-		int	newQueryCommand();
-		int	reExecuteQueryCommand();
-		int	fetchFromBindCursorCommand();
-		int	fetchResultSetCommand();
-		void	abortResultSetCommand();
-		void	suspendResultSetCommand();
-		int	resumeResultSetCommand();
+		bool	newQueryCommand(sqlrcursor *cursor);
+		bool	reExecuteQueryCommand(sqlrcursor *cursor);
+		bool	fetchFromBindCursorCommand(sqlrcursor *cursor);
+		bool	fetchResultSetCommand(sqlrcursor *cursor);
+		void	abortResultSetCommand(sqlrcursor *cursor);
+		void	suspendResultSetCommand(sqlrcursor *cursor);
+		bool	resumeResultSetCommand(sqlrcursor *cursor);
 		void	waitForClientClose();
 		void	closeSuspendedSessionSockets();
-		int	authenticate();
-		int	getUserFromClient();
-		int	getPasswordFromClient();
-		int	connectionBasedAuth(const char *userbuffer,
+		bool	authenticate();
+		bool	getUserFromClient();
+		bool	getPasswordFromClient();
+		bool	connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-		int	databaseBasedAuth(const char *userbuffer,
+		bool	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-		int	handleQuery(int reexecute, int bindcursor,
-							int reallyexecute);
-		int	getQueryFromClient(int reexecute, int bindcursor);
-		void	resumeResultSet();
+		int	handleQuery(sqlrcursor *cursor,
+					bool reexecute,
+					bool bindcursor,
+					bool reallyexecute);
+		bool	getQueryFromClient(sqlrcursor *cursor,
+						bool reexecute,
+						bool bindcursor);
+		void	resumeResultSet(sqlrcursor *cursor);
 		void	suspendSession();
 		void	endSession();
 		void	dropTempTables(stringlist *tablelist);
 		void	dropTempTable(const char *tablename);
 		void	truncateTempTables(stringlist *tablelist);
 		void	truncateTempTable(const char *tablename);
-		int	getCommand(unsigned short *command);
+		bool	getCommand(unsigned short *command);
 		void	noAvailableCursors(unsigned short command);
-		int	getQuery();
-		int	getInputBinds();
-		int	getOutputBinds();
-		int	getBindVarCount(unsigned short *count);
-		int	getBindVarName(bindvar *bv);
-		int	getBindVarType(bindvar *bv);
+		bool	getQuery(sqlrcursor *cursor);
+		bool	getInputBinds(sqlrcursor *cursor);
+		bool	getOutputBinds(sqlrcursor *cursor);
+		bool	getBindVarCount(unsigned short *count);
+		bool	getBindVarName(bindvar *bv);
+		bool	getBindVarType(bindvar *bv);
 		void	getNullBind(bindvar *bv);
-		int	getBindSize(bindvar *bv, unsigned long maxsize);
-		int	getStringBind(bindvar *bv);
-		int	getLongBind(bindvar *bv);
-		int	getDoubleBind(bindvar *bv);
-		int	getLobBind(bindvar *bv);
-		int	getSendColumnInfo();
-		int	processQuery(int reexecute, int bindcursor,
-							int reallyexecute);
-		int	handleBinds();
-		void	commitOrRollback();
-		int	handleError();
-		int	returnError();
+		bool	getBindSize(bindvar *bv, unsigned long maxsize);
+		bool	getStringBind(bindvar *bv);
+		bool	getLongBind(bindvar *bv);
+		bool	getDoubleBind(bindvar *bv);
+		bool	getLobBind(bindvar *bv);
+		bool	getSendColumnInfo();
+		bool	processQuery(sqlrcursor *cursor,
+						bool reexecute,
+						bool bindcursor,
+						bool reallyexecute);
+		void	commitOrRollback(sqlrcursor *cursor);
+		bool	handleError(sqlrcursor *cursor);
+		bool	returnError(sqlrcursor *cursor);
 		void	returnResultSet();
-		void	returnOutputBindValues();
-		void	returnResultSetHeader();
-		int	returnResultSetData();
+		void	returnOutputBindValues(sqlrcursor *cursor);
+		void	returnResultSetHeader(sqlrcursor *cursor);
+		bool	returnResultSetData(sqlrcursor *cursor);
 
 		long	rowsToFetch();
 		long	rowsToSkip();
 
 		void	initDatabaseAvailableFileName();
 		void	waitForAvailableDatabase();
-		int	availableDatabase();
+		bool	availableDatabase();
 		void	markDatabaseUnavailable();
 		void	markDatabaseAvailable();
 
 		void	blockSignals();
-		int	attemptLogIn();
+		bool	attemptLogIn();
 		void	setInitialAutoCommitBehavior();
-		int	openSockets();
+		bool	openSockets();
 
 		connectioncmdline	*cmdl;
 		sqlrconfigfile		*cfgfl;
@@ -230,8 +234,6 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 		unsigned short	sendcolumninfo;
 
-		int		init;
-
 		authenticator	*authc;
 
 		char		userbuffer[USERSIZE+1];
@@ -239,14 +241,14 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 		char		lastuserbuffer[USERSIZE+1];
 		char		lastpasswordbuffer[USERSIZE+1];
-		int		lastauthsuccess;
+		bool		lastauthsuccess;
 
-		int		commitorrollback;
-		int		autocommit;
-		int		checkautocommit;
-		int		performautocommit;
-		int		accepttimeout;
-		int		suspendedsession;
+		bool		commitorrollback;
+		bool		autocommit;
+		bool		checkautocommit;
+		bool		performautocommit;
+		long		accepttimeout;
+		bool		suspendedsession;
 		long		lastrow;
 
 		inetserversocket	*serversockin;
@@ -256,7 +258,6 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		memorypool	*bindpool;
 
 		sqlrcursor	**cur;
-		short		currentcur;
 
 		stringlist	sessiontemptablesfordrop;
 		stringlist	sessiontemptablesfortrunc;

@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int	sqlrconnection::commit() {
+int sqlrconnection::commit() {
 
 	if (!openSession()) {
 		return 0;
@@ -19,10 +19,10 @@ int	sqlrconnection::commit() {
 
 	write((unsigned short)COMMIT);
 
-	unsigned short	response;
-	if (read(&response)!=sizeof(unsigned short)) {
+	bool	response;
+	if (read(&response)!=sizeof(bool)) {
 		setError("Failed to get commit status.\n A network error may have ocurred.");
 		return -1;
 	}
-	return (int)response;
+	return (response)?1:0;
 }

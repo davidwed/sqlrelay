@@ -3,19 +3,19 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-void	sqlrconnection::debugOn() {
+void sqlrconnection::debugOn() {
 	debug=1;
 }
 
-void	sqlrconnection::debugOff() {
+void sqlrconnection::debugOff() {
 	debug=0;
 }
 
-int	sqlrconnection::getDebug() {
+int sqlrconnection::getDebug() {
 	return debug;
 }
 
-void	sqlrconnection::debugPreStart() {
+void sqlrconnection::debugPreStart() {
 	if (webdebug==-1) {
 		char	*docroot=getenv("DOCUMENT_ROOT");
 		if (docroot && docroot[0]) {
@@ -29,18 +29,18 @@ void	sqlrconnection::debugPreStart() {
 	}
 }
 
-void	sqlrconnection::debugPreEnd() {
+void sqlrconnection::debugPreEnd() {
 	if (webdebug==1) {
 		debugPrint("</pre>\n");
 	}
 }
 
-void	sqlrconnection::debugPrintFunction(
+void sqlrconnection::debugPrintFunction(
 				int (*printfunction)(const char *,...)) {
 	this->printfunction=printfunction;
 }
 
-void	sqlrconnection::debugPrint(const char *string) {
+void sqlrconnection::debugPrint(const char *string) {
 	if (printfunction) {
 		(*printfunction)("%s",string);
 	} else {
@@ -48,7 +48,7 @@ void	sqlrconnection::debugPrint(const char *string) {
 	}
 }
 
-void	sqlrconnection::debugPrint(long number) {
+void sqlrconnection::debugPrint(long number) {
 	if (printfunction) {
 		(*printfunction)("%ld",number);
 	} else {
@@ -56,7 +56,7 @@ void	sqlrconnection::debugPrint(long number) {
 	}
 }
 
-void	sqlrconnection::debugPrint(double number) {
+void sqlrconnection::debugPrint(double number) {
 	if (printfunction) {
 		(*printfunction)("%f",number);
 	} else {
@@ -64,7 +64,7 @@ void	sqlrconnection::debugPrint(double number) {
 	}
 }
 
-void	sqlrconnection::debugPrint(char character) {
+void sqlrconnection::debugPrint(char character) {
 	if (printfunction) {
 		(*printfunction)("%c",character);
 	} else {
@@ -72,7 +72,7 @@ void	sqlrconnection::debugPrint(char character) {
 	}
 }
 
-void	sqlrconnection::debugPrintBlob(const char *blob, unsigned long length) {
+void sqlrconnection::debugPrintBlob(const char *blob, unsigned long length) {
 	debugPrint('\n');
 	int	column=0;
 	for (unsigned long i=0; i<length; i++) {
@@ -90,7 +90,7 @@ void	sqlrconnection::debugPrintBlob(const char *blob, unsigned long length) {
 	debugPrint('\n');
 }
 
-void	sqlrconnection::debugPrintClob(const char *clob, unsigned long length) {
+void sqlrconnection::debugPrintClob(const char *clob, unsigned long length) {
 	debugPrint('\n');
 	for (unsigned long i=0; i<length; i++) {
 		if (clob[i]==(char)NULL) {

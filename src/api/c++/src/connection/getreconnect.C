@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-void	sqlrconnection::getReconnect() {
+void sqlrconnection::getReconnect() {
 
 	unsigned short	recon;
 	if (read(&recon)!=sizeof(unsigned short)) {

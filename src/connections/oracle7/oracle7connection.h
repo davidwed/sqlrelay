@@ -69,38 +69,38 @@ class oracle7cursor : public sqlrcursor {
 	private:
 			oracle7cursor(sqlrconnection *conn);
 			~oracle7cursor();
-		int	openCursor(int id);
-		int	closeCursor();
-		int	prepareQuery(const char *query, long length);
-		int	inputBindString(const char *variable, 
+		bool	openCursor(int id);
+		bool	closeCursor();
+		bool	prepareQuery(const char *query, long length);
+		bool	inputBindString(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned short valuesize,
 					short *isnull);
-		int	inputBindLong(const char *variable, 
+		bool	inputBindLong(const char *variable, 
 					unsigned short variablesize,
 					unsigned long *value);
-		int	inputBindDouble(const char *variable, 
+		bool	inputBindDouble(const char *variable, 
 					unsigned short variablesize,
 					double *value,
 					unsigned short precision,
 					unsigned short scale);
-		int	outputBindString(const char *variable, 
+		bool	outputBindString(const char *variable, 
 					unsigned short variablesize,
 					char *value,
 					unsigned short valuesize,
 					short *isnull);
-		int	executeQuery(const char *query, long length,
+		bool	executeQuery(const char *query, long length,
 						unsigned short execute);
-		int	queryIsNotSelect();
-		int	queryIsCommitOrRollback();
-		char	*getErrorMessage(int *liveconnection);
+		bool	queryIsNotSelect();
+		bool	queryIsCommitOrRollback();
+		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();
 		void	returnColumnInfo();
-		int	noRowsToReturn();
-		int	skipRow();
-		int	fetchRow();
+		bool	noRowsToReturn();
+		bool	skipRow();
+		bool	fetchRow();
 		void	returnRow();
 		void	cleanUpData(bool freerows, bool freecols,
 							bool freebinds);
@@ -135,14 +135,14 @@ class oracle7connection : public sqlrconnection {
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
-		int	logIn();
+		bool	logIn();
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		unsigned short	autoCommitOn();
-		unsigned short	autoCommitOff();
-		int	commit();
-		int	rollback();
+		bool	autoCommitOn();
+		bool	autoCommitOff();
+		bool	commit();
+		bool	rollback();
 		char	*pingQuery();
 		char	*identify();
 
@@ -151,7 +151,6 @@ class oracle7connection : public sqlrconnection {
 
 		char		*home;
 		char		*sid;
-		int		autocommit;
 
 		environment	*env;
 };

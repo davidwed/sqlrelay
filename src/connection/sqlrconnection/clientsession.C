@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::clientSession() {
+void sqlrconnection::clientSession() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"client session...");
@@ -53,34 +53,35 @@ void	sqlrconnection::clientSession() {
 		// a cursor.  Get the cursor to work with.  Save the result of
 		// this, the client may be sending more information and we need
 		// to collect it.
-		if (!getCursor(command)) {
+		sqlrcursor	*cursor=getCursor(command);
+		if (!cursor) {
 			noAvailableCursors(command);
 			continue;
 		}
 
 		if (command==NEW_QUERY) {
-			if (newQueryCommand()) {
+			if (newQueryCommand(cursor)) {
 				continue;
 			}
 			break;
 		} else if (command==REEXECUTE_QUERY) {
-			if (!reExecuteQueryCommand()) {
+			if (!reExecuteQueryCommand(cursor)) {
 				break;
 			}
 		} else if (command==FETCH_FROM_BIND_CURSOR) {
-			if (!fetchFromBindCursorCommand()) {
+			if (!fetchFromBindCursorCommand(cursor)) {
 				break;
 			}
 		} else if (command==FETCH_RESULT_SET) {
-			if (!fetchResultSetCommand()) {
+			if (!fetchResultSetCommand(cursor)) {
 				break;
 			}
 		} else if (command==ABORT_RESULT_SET) {
-			abortResultSetCommand();
+			abortResultSetCommand(cursor);
 		} else if (command==SUSPEND_RESULT_SET) {
-			suspendResultSetCommand();
+			suspendResultSetCommand(cursor);
 		} else if (command==RESUME_RESULT_SET) {
-			if (!resumeResultSetCommand()) {
+			if (!resumeResultSetCommand(cursor)) {
 				break;
 			}
 		} else {
@@ -98,7 +99,7 @@ void	sqlrconnection::clientSession() {
 	#endif
 }
 
-int	sqlrconnection::getCursor(unsigned short command) {
+sqlrcursor *sqlrconnection::getCursor(unsigned short command) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"getting a cursor...");
@@ -112,8 +113,10 @@ int	sqlrconnection::getCursor(unsigned short command) {
 		debugPrint("connection",2,
 			"error: client cursor request failed, need new cursor stage");
 		#endif
-		return 0;
+		return NULL;
 	}
+
+	sqlrcursor	*cursor=NULL;
 
 	if (neednewcursor==DONT_NEED_NEW_CURSOR) {
 
@@ -124,7 +127,7 @@ int	sqlrconnection::getCursor(unsigned short command) {
 			debugPrint("connection",2,
 				"error: client cursor request failed, cursor index stage");
 			#endif
-			return 0;
+			return NULL;
 		}
 
 		// don't allow the client to request a cursor 
@@ -134,51 +137,48 @@ int	sqlrconnection::getCursor(unsigned short command) {
 			debugPrint("connection",2,
 				"error: client requested an invalid cursor");
 			#endif
-			return 0;
+			return NULL;
 		}
 
 		// set the current cursor to the one they requested.
-		currentcur=index;
+		cursor=cur[index];
 
 	} else {
 
 		// find an available cursor
-		currentcur=findAvailableCursor();
-		if (currentcur==-1) {
-			return 0;
-		}
+		cursor=findAvailableCursor();
 	}
 
-	cur[currentcur]->busy=1;
+	cursor->busy=true;
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning requested cursor");
 	debugPrint("connection",1,"done getting a cursor");
 	#endif
-	return 1;
+	return cursor;
 }
 
-int	sqlrconnection::findAvailableCursor() {
+sqlrcursor *sqlrconnection::findAvailableCursor() {
 
 	for (int i=0; i<cfgfl->getCursors(); i++) {
 		if (!cur[i]->busy) {
-			cur[i]->busy=1;
+			cur[i]->busy=true;
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",3,(long)currentcur);
+			debugPrint("connection",3,(long)i);
 			debugPrint("connection",2,"found a free cursor...");
 			debugPrint("connection",2,"done getting a cursor");
 			#endif
-			return i;
+			return cur[i];
 		}
 	}
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,
 			"find available cursor failed: all cursors are busy");
 	#endif
-	return -1;
+	return NULL;
 }
 
-void	sqlrconnection::waitForClientClose() {
+void sqlrconnection::waitForClientClose() {
 
 	// Sometimes the server sends the result set and closes the socket
 	// while part of it is buffered but not yet transmitted.  This caused
@@ -205,7 +205,7 @@ void	sqlrconnection::waitForClientClose() {
 	#endif
 }
 
-void	sqlrconnection::closeSuspendedSessionSockets() {
+void sqlrconnection::closeSuspendedSessionSockets() {
 
 	// If we're no longer in a suspended session and we we're passing 
 	// around file descriptors but had to open a set of sockets to handle 
@@ -232,7 +232,7 @@ void	sqlrconnection::closeSuspendedSessionSockets() {
 	}
 }
 
-void	sqlrconnection::noAvailableCursors(unsigned short command) {
+void sqlrconnection::noAvailableCursors(unsigned short command) {
 
 	// If no cursor was available, the client
 	// cound send an entire query and bind vars
@@ -271,7 +271,7 @@ void	sqlrconnection::noAvailableCursors(unsigned short command) {
 	clientsock->write("No server-side cursors were available to process the query.",62);
 }
 
-int	sqlrconnection::getCommand(unsigned short *command) {
+bool sqlrconnection::getCommand(unsigned short *command) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"getting command...");
@@ -283,11 +283,11 @@ int	sqlrconnection::getCommand(unsigned short *command) {
 		debugPrint("connection",2,
 			"getting command failed: client sent bad command");
 		#endif
-		return 0;
+		return false;
 	}
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done getting command");
 	#endif
-	return 1;
+	return true;
 }

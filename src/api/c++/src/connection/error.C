@@ -3,12 +3,12 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-void	sqlrconnection::clearError() {
+void sqlrconnection::clearError() {
 	delete[] error;
 	error=NULL;
 }
 
-void	sqlrconnection::setError(const char *err) {
+void sqlrconnection::setError(const char *err) {
 
 	if (debug) {
 		debugPreStart();

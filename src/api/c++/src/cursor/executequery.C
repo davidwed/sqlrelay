@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
 
-int	sqlrcursor::executeQuery() {
+int sqlrcursor::executeQuery() {
 
 	if (!queryptr) {
 		setError("No query to execute.");
@@ -171,7 +171,7 @@ int	sqlrcursor::executeQuery() {
 	return retval;
 }
 
-void	sqlrcursor::validateBindsInternal(const char *query) {
+void sqlrcursor::validateBindsInternal(const char *query) {
 
 	// some useful variables
 	char	*ptr;
@@ -265,7 +265,7 @@ void	sqlrcursor::validateBindsInternal(const char *query) {
 	}
 }
 
-void	sqlrcursor::performSubstitution(stringbuffer *buffer, int which) {
+void sqlrcursor::performSubstitution(stringbuffer *buffer, int which) {
 
 	if (subvars[which].type==STRING_BIND) {
 		buffer->append(subvars[which].value.stringval);

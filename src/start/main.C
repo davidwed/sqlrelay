@@ -14,7 +14,7 @@
 
 int getConnections(sqlrconfigfile *cfgfile) {
 	int	connections=cfgfile->getConnections();
-	if (connections==0) {
+	if (!connections) {
 		connections=1;
 	}
 	if (connections>MAX_CONNECTIONS) {
@@ -245,7 +245,7 @@ bool startCacheManager(char *localstatedir) {
 	return true;
 }
 
-int	main(int argc, const char **argv) {
+int main(int argc, const char **argv) {
 
 	#include <version.h>
 

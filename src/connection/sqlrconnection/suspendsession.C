@@ -3,14 +3,14 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::suspendSessionCommand() {
+void sqlrconnection::suspendSessionCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"suspend session");
 	#endif
 	suspendSession();
 }
 
-void	sqlrconnection::suspendSession() {
+void sqlrconnection::suspendSession() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"suspending session...");
@@ -20,7 +20,7 @@ void	sqlrconnection::suspendSession() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"aborting busy, unsuspended cursors...");
 	#endif
-	suspendedsession=1;
+	suspendedsession=true;
 	accepttimeout=cfgfl->getSessionTimeout();
 	for (int i=0; i<cfgfl->getCursors(); i++) {
 		if (!cur[i]->suspendresultset && cur[i]->busy) {

@@ -47,37 +47,37 @@ class odbccursor : public sqlrcursor {
 	private:
 			odbccursor(sqlrconnection *conn);
 			~odbccursor();
-		int	prepareQuery(const char *query, long length);
-		int	inputBindString(const char *variable, 
+		bool	prepareQuery(const char *query, long length);
+		bool	inputBindString(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned short valuesize,
 					short *isnull);
-		int	inputBindLong(const char *variable, 
+		bool	inputBindLong(const char *variable, 
 					unsigned short variablesize,
 					unsigned long *value);
-		int	inputBindDouble(const char *variable, 
+		bool	inputBindDouble(const char *variable, 
 					unsigned short variablesize,
 					double *value, 
 					unsigned short precision,
 					unsigned short scale);
-		int	outputBindString(const char *variable, 
+		bool	outputBindString(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
 					unsigned short valuesize,
 					short *isnull);
 		short	nonNullBindValue();
 		short	nullBindValue();
-		int	bindValueIsNull(short isnull);
-		int	executeQuery(const char *query, long length,
+		bool	bindValueIsNull(short isnull);
+		bool	executeQuery(const char *query, long length,
 					unsigned short execute);
-		char	*getErrorMessage(int *liveconnection);
+		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();
 		void	returnColumnInfo();
-		int	noRowsToReturn();
-		int	skipRow();
-		int	fetchRow();
+		bool	noRowsToReturn();
+		bool	skipRow();
+		bool	fetchRow();
 		void	returnRow();
 
 
@@ -118,17 +118,17 @@ class odbcconnection : public sqlrconnection {
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
-		int	logIn();
+		bool	logIn();
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
 #if (ODBCVER>=0x0300)
-		unsigned short	autoCommitOn();
-		unsigned short	autoCommitOff();
-		int	commit();
-		int	rollback();
+		bool	autoCommitOn();
+		bool	autoCommitOff();
+		bool	commit();
+		bool	rollback();
 #endif
-		int	ping();
+		bool	ping();
 		char	*identify();
 
 		long	erg;
@@ -136,7 +136,6 @@ class odbcconnection : public sqlrconnection {
 		SQLHDBC	dbc;
 
 		char	*dsn;
-		int	autocommit;
 };
 
 #endif

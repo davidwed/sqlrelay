@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::closeConnection() {
+void sqlrconnection::closeConnection() {
 
 	// decrement the connection counter
 	if (cfgfl->getDynamicScaling() && ipcptr->initialized()) {
@@ -16,7 +16,7 @@ void	sqlrconnection::closeConnection() {
 	}
 
 	// close the cursors
-	closeCursors(1);
+	closeCursors(true);
 
 
 	// try to log out

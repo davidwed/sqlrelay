@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-void	sqlrcursor::suspendResultSet() {
+void sqlrcursor::suspendResultSet() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();

@@ -16,8 +16,6 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 
 	tmpdir=NULL;
 
-	init=0;
-
 	unixsocket=NULL;
 	unixsocketptr=NULL;
 	serversockun=NULL;
@@ -27,13 +25,11 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 	authc=NULL;
 	lastuserbuffer[0]=(char)NULL;
 	lastpasswordbuffer[0]=(char)NULL;
-	lastauthsuccess=0;
+	lastauthsuccess=false;
 
 	autocommit=0;
 	checkautocommit=0;
 	performautocommit=0;
-
-	currentcur=0;
 
 	// maybe someday these parameters will be configurable
 	bindpool=new memorypool(512,128,100);

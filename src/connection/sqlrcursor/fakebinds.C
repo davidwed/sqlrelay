@@ -10,7 +10,7 @@
 	#include <strings.h>
 #endif
 
-stringbuffer	*sqlrcursor::fakeInputBinds(const char *query) {
+stringbuffer *sqlrcursor::fakeInputBinds(const char *query) {
 
 	// return null if there aren't any input binds
 	if (!inbindcount) {
@@ -23,15 +23,15 @@ stringbuffer	*sqlrcursor::fakeInputBinds(const char *query) {
 	char	prefix=inbindvars[0].variable[0];
 	char	*ptr=(char *)query;
 	int	index=1;
-	int	inquotes=0;
+	bool	inquotes=false;
 	while (*ptr) {
 
 		// are we inside of quotes ?
 		if (*ptr=='\'') {
 			if (inquotes) {
-				inquotes=0;
+				inquotes=false;
 			} else {
-				inquotes=1;
+				inquotes=true;
 			}
 		}
 
@@ -105,18 +105,18 @@ stringbuffer	*sqlrcursor::fakeInputBinds(const char *query) {
 	return outputquery;
 }
 
-void	sqlrcursor::performSubstitution(stringbuffer *buffer, int which) {
-	if (inbindvars[which].type==STRING_BIND) {
+void sqlrcursor::performSubstitution(stringbuffer *buffer, int index) {
+	if (inbindvars[index].type==STRING_BIND) {
 		buffer->append("'");
-		buffer->append(inbindvars[which].value.stringval);
+		buffer->append(inbindvars[index].value.stringval);
 		buffer->append("'");
-	} else if (inbindvars[which].type==LONG_BIND) {
-		buffer->append((long)inbindvars[which].value.longval);
-	} else if (inbindvars[which].type==DOUBLE_BIND) {
-		buffer->append(inbindvars[which].value.doubleval.value,
-				inbindvars[which].value.doubleval.precision,
-				inbindvars[which].value.doubleval.scale);
-	} else if (inbindvars[which].type==NULL_BIND) {
+	} else if (inbindvars[index].type==LONG_BIND) {
+		buffer->append((long)inbindvars[index].value.longval);
+	} else if (inbindvars[index].type==DOUBLE_BIND) {
+		buffer->append(inbindvars[index].value.doubleval.value,
+				inbindvars[index].value.doubleval.precision,
+				inbindvars[index].value.doubleval.scale);
+	} else if (inbindvars[index].type==NULL_BIND) {
 		buffer->append("NULL");
 	}
 }

@@ -3,17 +3,17 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::returnOutputBindValues() {
+void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning output bind values");
-	debugPrint("connection",3,(long)cur[currentcur]->outbindcount);
+	debugPrint("connection",3,(long)cursor->outbindcount);
 	#endif
 
 	// run through the output bind values, sending them back
-	for (int i=0; i<cur[currentcur]->outbindcount; i++) {
+	for (int i=0; i<cursor->outbindcount; i++) {
 
-		bindvar	*bv=&(cur[currentcur]->outbindvars[i]);
+		bindvar	*bv=&(cursor->outbindvars[i]);
 
 		#ifdef SERVER_DEBUG
 		debugstr=new stringbuffer();
@@ -35,7 +35,7 @@ void	sqlrconnection::returnOutputBindValues() {
 			debugstr->append("BLOB:\n");
 			#endif
 
-			cur[currentcur]->returnOutputBindBlob(i);
+			cursor->returnOutputBindBlob(i);
 
 		} else if (bv->type==CLOB_BIND) {
 
@@ -43,7 +43,7 @@ void	sqlrconnection::returnOutputBindValues() {
 			debugstr->append("CLOB:\n");
 			#endif
 
-			cur[currentcur]->returnOutputBindClob(i);
+			cursor->returnOutputBindClob(i);
 
 		} else if (bv->type==STRING_BIND) {
 

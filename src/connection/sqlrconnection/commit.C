@@ -3,15 +3,15 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::commitCommand() {
+void sqlrconnection::commitCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"commit");
 	#endif
-	clientsock->write((unsigned short)commit());
-	commitorrollback=0;
+	clientsock->write(commit());
+	commitorrollback=false;
 }
 
-int	sqlrconnection::commit() {
+bool sqlrconnection::commit() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"commit...");
@@ -20,12 +20,12 @@ int	sqlrconnection::commit() {
 	sqlrcursor	*commitcur=initCursor();
 	char	*commitquery="commit";
 	int	commitquerylen=6;
-	int	retval=0;
+	bool	retval=false;
 	if (commitcur->openCursor(-1) &&
 		commitcur->prepareQuery(commitquery,commitquerylen) &&
 		commitcur->executeQuery(commitquery,commitquerylen,1)) {
 		commitcur->cleanUpData(false,false,false);
-		retval=1;
+		retval=true;
 	}
 	commitcur->closeCursor();
 	delete commitcur;

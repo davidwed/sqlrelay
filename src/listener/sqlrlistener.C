@@ -976,7 +976,7 @@ int sqlrlistener::getAuth(datatransport *sock) {
 
 		// Return 1 if what the client sent matches one of the 
 		// user/password sets and 0 if no match is found.
-		int	retval=authc->authenticate(userbuffer,passwordbuffer);
+		bool	retval=authc->authenticate(userbuffer,passwordbuffer);
 		#ifdef SERVER_DEBUG
 		if (retval) {
 			debugPrint("listener",1,
@@ -986,7 +986,7 @@ int sqlrlistener::getAuth(datatransport *sock) {
 				"listener-based authentication failed: invalid user/password");
 		}
 		#endif
-		return retval;
+		return (retval)?1:0;
 	}
 
 	#ifdef SERVER_DEBUG

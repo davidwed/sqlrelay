@@ -12,7 +12,7 @@
 	#include <strings.h>
 #endif
 
-int	sqlrconnection::authenticateCommand() {
+bool sqlrconnection::authenticateCommand() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"authenticate");
@@ -22,14 +22,14 @@ int	sqlrconnection::authenticateCommand() {
 		// indicate that an error has occurred
 		clientsock->write((unsigned short)ERROR);
 		endSession();
-		return 0;
+		return false;
 	}
 	// indicate that no error has occurred
 	clientsock->write((unsigned short)NO_ERROR);
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::authenticate() {
+bool sqlrconnection::authenticate() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"authenticate...");
@@ -37,7 +37,7 @@ int	sqlrconnection::authenticate() {
 
 	// get the user/password from the client
 	if (!getUserFromClient() || !getPasswordFromClient()) {
-		return 0;
+		return false;
 	}
 
 	// authenticate on the approprite tier
@@ -50,40 +50,40 @@ int	sqlrconnection::authenticate() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"authentication was done on listener");
 	#endif
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::getUserFromClient() {
+bool sqlrconnection::getUserFromClient() {
 	unsigned long size=0;
-	clientsock->read(&size);
-	if (size>(unsigned long)USERSIZE ||
-		(unsigned long)(clientsock->read(userbuffer,size))!=size) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,
-			"authentication failed: user size is wrong");
-		#endif
-		return 0;
+	if (clientsock->read(&size)==sizeof(unsigned long) &&
+		size<=(unsigned long)USERSIZE &&
+		(unsigned long)(clientsock->read(userbuffer,size))==size) {
+		userbuffer[size]=(char)NULL;
+		return true;
 	}
-	userbuffer[size]=(char)NULL;
-	return 1;
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,
+		"authentication failed: user size is wrong");
+	#endif
+	return false;
 }
 
-int	sqlrconnection::getPasswordFromClient() {
+bool sqlrconnection::getPasswordFromClient() {
 	unsigned long size=0;
-	clientsock->read(&size);
-	if (size>(unsigned long)USERSIZE ||
-		(unsigned long)(clientsock->read(passwordbuffer,size))!=size) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,
-			"authentication failed: password size is wrong");
-		#endif
-		return 0;
+	if (clientsock->read(&size)==sizeof(unsigned long) &&
+		size<=(unsigned long)USERSIZE &&
+		(unsigned long)(clientsock->read(passwordbuffer,size))==size) {
+		passwordbuffer[size]=(char)NULL;
+		return true;
 	}
-	passwordbuffer[size]=(char)NULL;
-	return 1;
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,
+		"authentication failed: password size is wrong");
+	#endif
+	return false;
 }
 
-int	sqlrconnection::connectionBasedAuth(const char *userbuffer,
+bool sqlrconnection::connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	// handle connection-based authentication
@@ -100,12 +100,12 @@ int	sqlrconnection::connectionBasedAuth(const char *userbuffer,
 	return retval;
 }
 
-int	sqlrconnection::databaseBasedAuth(const char *userbuffer,
+bool sqlrconnection::databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	// if the user we want to change to is different from the
 	// user that's currently proxied, try to change to that user
-	int	authsuccess;
+	bool	authsuccess;
 	if ((!lastuserbuffer[0] && !lastpasswordbuffer[0]) || 
 		strcmp(lastuserbuffer,userbuffer) ||
 		strcmp(lastpasswordbuffer,passwordbuffer)) {

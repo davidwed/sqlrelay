@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-void	sqlrconnection::closeConnection() {
+void sqlrconnection::closeConnection() {
 	close();
 	connected=0;
 }

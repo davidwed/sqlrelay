@@ -3,25 +3,25 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::getInputBinds() {
+bool sqlrconnection::getInputBinds(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"getting input binds...");
 	#endif
 
 	// get the number of input bind variable/values
-	if (!getBindVarCount(&(cur[currentcur]->inbindcount))) {
-		return 0;
+	if (!getBindVarCount(&(cursor->inbindcount))) {
+		return false;
 	}
 	
 	// fill the buffers
-	for (int i=0; i<cur[currentcur]->inbindcount && i<MAXVAR; i++) {
+	for (int i=0; i<cursor->inbindcount && i<MAXVAR; i++) {
 
-		bindvar	*bv=&(cur[currentcur]->inbindvars[i]);
+		bindvar	*bv=&(cursor->inbindvars[i]);
 
 		// get the variable name and type
 		if (!(getBindVarName(bv) && getBindVarType(bv))) {
-			return 0;
+			return false;
 		}
 
 		// get the value
@@ -29,19 +29,19 @@ int	sqlrconnection::getInputBinds() {
 			getNullBind(bv);
 		} else if (bv->type==STRING_BIND) {
 			if (!getStringBind(bv)) {
-				return 0;
+				return false;
 			}
 		} else if (bv->type==LONG_BIND) {
 			if (!getLongBind(bv)) {
-				return 0;
+				return false;
 			}
 		} else if (bv->type==DOUBLE_BIND) {
 			if (!getDoubleBind(bv)) {
-				return 0;
+				return false;
 			}
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			if (!getLobBind(bv)) {
-				return 0;
+				return false;
 			}
 		}		  
 	}
@@ -49,34 +49,34 @@ int	sqlrconnection::getInputBinds() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done getting input binds");
 	#endif
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::getOutputBinds() {
+bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"getting output binds...");
 	#endif
 
 	// get the number of output bind variable/values
-	if (!getBindVarCount(&(cur[currentcur]->outbindcount))) {
-		return 0;
+	if (!getBindVarCount(&(cursor->outbindcount))) {
+		return false;
 	}
 
 	// fill the buffers
-	for (int i=0; i<cur[currentcur]->outbindcount && i<MAXVAR; i++) {
+	for (int i=0; i<cursor->outbindcount && i<MAXVAR; i++) {
 
-		bindvar	*bv=&(cur[currentcur]->outbindvars[i]);
+		bindvar	*bv=&(cursor->outbindvars[i]);
 
 		// get the variable name and type
 		if (!(getBindVarName(bv) && getBindVarType(bv))) {
-			return 0;
+			return false;
 		}
 
 		// get the size of the value
 		if (bv->type==STRING_BIND) {
 			if (!getBindSize(bv,STRINGBINDVALUELENGTH)) {
-				return 0;
+				return false;
 			}
 			// This must be a calloc because oracle8 get's angry if
 			// these aren't initialized to NULL's.  It's possible
@@ -89,7 +89,7 @@ int	sqlrconnection::getOutputBinds() {
 			#endif
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			if (!getBindSize(bv,LOBBINDVALUELENGTH)) {
-				return 0;
+				return false;
 			}
 			#ifdef SERVER_DEBUG
 			if (bv->type==BLOB_BIND) {
@@ -102,22 +102,22 @@ int	sqlrconnection::getOutputBinds() {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",4,"CURSOR");
 			#endif
-			short	curs=findAvailableCursor();
-			if (curs==-1) {
+			sqlrcursor	*curs=findAvailableCursor();
+			if (!curs) {
 				// FIXME: set error here
-				return 0;
+				return false;
 			}
-			bv->value.cursorid=curs;
+			bv->value.cursorid=curs->id;
 		}
 	}
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done getting output binds");
 	#endif
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::getBindVarCount(unsigned short *count) {
+bool sqlrconnection::getBindVarCount(unsigned short *count) {
 
 	// get the number of input bind variable/values
 	if (clientsock->read(count)!=sizeof(unsigned short)) {
@@ -125,7 +125,7 @@ int	sqlrconnection::getBindVarCount(unsigned short *count) {
 		debugPrint("connection",2,
 			"getting binds failed: client sent bad bind count size");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// bounds checking
@@ -134,13 +134,13 @@ int	sqlrconnection::getBindVarCount(unsigned short *count) {
 		debugPrint("connection",2,
 			"getting binds failed: client tried to send too many binds");
 		#endif
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::getBindVarName(bindvar *bv) {
+bool sqlrconnection::getBindVarName(bindvar *bv) {
 
 	unsigned short	bindnamesize;
 
@@ -150,7 +150,7 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 		debugPrint("connection",2,
 			"getting binds failed: bad variable name length size");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// bounds checking
@@ -159,7 +159,7 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 		debugPrint("connection",2,
 			"getting binds failed: bad variable name length");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// get the variable name
@@ -171,7 +171,7 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 		debugPrint("connection",2,
 			"getting binds failed: bad variable name");
 		#endif
-		return 0;
+		return false;
 	}
 	bv->variable[bindnamesize+1]=(char)NULL;
 
@@ -179,10 +179,10 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 	debugPrint("connection",4,bv->variable);
 	#endif
 
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::getBindVarType(bindvar *bv) {
+bool sqlrconnection::getBindVarType(bindvar *bv) {
 
 	// get the type
         unsigned short type;
@@ -191,14 +191,14 @@ int	sqlrconnection::getBindVarType(bindvar *bv) {
 		debugPrint("connection",2,
 				"getting binds failed: bad type size");
 		#endif
-		return 0;
+		return false;
 	}
 	bv->type=(bindtype)type;
 	
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
+bool sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
 
 	// get the size of the value
 	if (clientsock->read(&(bv->valuesize))!=sizeof(unsigned long)) {
@@ -206,7 +206,7 @@ int	sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
 		debugPrint("connection",
 			2,"getting binds failed: bad value length size");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// bounds checking
@@ -216,13 +216,13 @@ int	sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
 				"getting binds failed: bad value length");
 		debugPrint("connection",3,(long)bv->valuesize);
 		#endif
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }
 
-void	sqlrconnection::getNullBind(bindvar *bv) {
+void sqlrconnection::getNullBind(bindvar *bv) {
 
 	#ifdef SERVER_DEBUG
 		debugPrint("connection",4,"NULL");
@@ -234,11 +234,11 @@ void	sqlrconnection::getNullBind(bindvar *bv) {
 	bv->isnull=nullBindValue();
 }
 
-int	sqlrconnection::getStringBind(bindvar *bv) {
+bool sqlrconnection::getStringBind(bindvar *bv) {
 
 	// get the size of the value
 	if (!getBindSize(bv,STRINGBINDVALUELENGTH)) {
-		return 0;
+		return false;
 	}
 
 	// allocate space to store the value
@@ -254,7 +254,7 @@ int	sqlrconnection::getStringBind(bindvar *bv) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"getting binds failed: bad value");
 		#endif
-		return 0;
+		return false;
 	}
 	bv->value.stringval[bv->valuesize]=(char)NULL;
 	bv->isnull=nonNullBindValue();
@@ -263,23 +263,23 @@ int	sqlrconnection::getStringBind(bindvar *bv) {
 		debugPrint("connection",4,bv->value.stringval);
 	#endif
 
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::getLongBind(bindvar *bv) {
+bool sqlrconnection::getLongBind(bindvar *bv) {
 
 	#ifdef SERVER_DEBUG
 		debugPrint("connection",4,"LONG");
 	#endif
 
 	// get positive/negative
-	char		negative;
+	char	negative;
 	if (clientsock->read(&negative)!=sizeof(char)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 				"getting binds failed: bad positive/negative");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// get the value itself
@@ -289,7 +289,7 @@ int	sqlrconnection::getLongBind(bindvar *bv) {
 			debugPrint("connection",2,
 					"getting binds failed: bad value");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// set the value
@@ -299,10 +299,10 @@ int	sqlrconnection::getLongBind(bindvar *bv) {
 		debugPrint("connection",4,bv->value.longval);
 	#endif
 
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::getDoubleBind(bindvar *bv) {
+bool sqlrconnection::getDoubleBind(bindvar *bv) {
 
 	#ifdef SERVER_DEBUG
 		debugPrint("connection",4,"DOUBLE");
@@ -314,7 +314,7 @@ int	sqlrconnection::getDoubleBind(bindvar *bv) {
 			debugPrint("connection",2,
 					"getting binds failed: bad value");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// get the precision
@@ -324,7 +324,7 @@ int	sqlrconnection::getDoubleBind(bindvar *bv) {
 			debugPrint("connection",2,
 					"getting binds failed: bad precision");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// get the scale
@@ -334,17 +334,17 @@ int	sqlrconnection::getDoubleBind(bindvar *bv) {
 			debugPrint("connection",2,
 					"getting binds failed: bad scale");
 		#endif
-		return 0;
+		return false;
 	}
 
 	#ifdef SERVER_DEBUG
 		debugPrint("connection",4,bv->value.doubleval.value);
 	#endif
 
-	return 1;
+	return true;
 }
 
-int	sqlrconnection::getLobBind(bindvar *bv) {
+bool sqlrconnection::getLobBind(bindvar *bv) {
 
 	#ifdef SERVER_DEBUG
 		if (bv->type==BLOB_BIND) {
@@ -357,7 +357,7 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 
 	// get the size of the value
 	if (!getBindSize(bv,LOBBINDVALUELENGTH)) {
-		return 0;
+		return false;
 	}
 
 	// allocate space to store the value
@@ -370,7 +370,7 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 		debugPrint("connection",2,
 				"getting binds failed: bad value");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// It shouldn't hurt to NULL-terminate the lob because the actual size
@@ -388,5 +388,5 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 		}
 	#endif
 
-	return 1;
+	return true;
 }

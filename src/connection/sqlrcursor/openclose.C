@@ -3,12 +3,12 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrcursor::openCursor(int id) {
-	// by default do nothing
-	return 1;
+bool sqlrcursor::openCursor(int id) {
+	this->id=id;
+	return true;
 }
 
-int	sqlrcursor::closeCursor() {
+bool sqlrcursor::closeCursor() {
 	// by default do nothing
-	return 1;
+	return true;
 }

@@ -3,14 +3,14 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::returnResultSetData() {
+bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning result set data...");
 	#endif
 
 	// see if this result set even has any rows to return
-	int	norows=cur[currentcur]->noRowsToReturn();
+	int	norows=cursor->noRowsToReturn();
 
 	// get the number of rows to skip
 	unsigned long	skip;
@@ -18,7 +18,7 @@ int	sqlrconnection::returnResultSetData() {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"returning result set data failed");
 		#endif
-		return 0;
+		return false;
 	}
 
 	// get the number of rows to fetch
@@ -27,7 +27,7 @@ int	sqlrconnection::returnResultSetData() {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"returning result set data failed");
 		#endif
-		return 0;
+		return false;
 	}
 
 
@@ -37,21 +37,21 @@ int	sqlrconnection::returnResultSetData() {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done returning result set data");
 		#endif
-		return 1;
+		return true;
 	}
 
 
 	// reinit suspendresultset
-	cur[currentcur]->suspendresultset=0;
+	cursor->suspendresultset=false;
 
 
 	// skip the specified number of rows
-	if (!skipRows(skip)) {
+	if (!skipRows(cursor,skip)) {
 		clientsock->write((unsigned short)END_RESULT_SET);
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done returning result set data");
 		#endif
-		return 1;
+		return true;
 	}
 
 
@@ -67,19 +67,19 @@ int	sqlrconnection::returnResultSetData() {
 	// send the specified number of rows back
 	for (unsigned long i=0; (!fetch || i<fetch); i++) {
 
-		if (!cur[currentcur]->fetchRow()) {
+		if (!cursor->fetchRow()) {
 			clientsock->write((unsigned short)END_RESULT_SET);
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"done returning result set data");
 			#endif
-			return 1;
+			return true;
 		}
 
 		#ifdef SERVER_DEBUG
 		debugstr=new stringbuffer();
 		#endif
-		cur[currentcur]->returnRow();
+		cursor->returnRow();
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,debugstr->getString());
 		delete debugstr;
@@ -91,5 +91,5 @@ int	sqlrconnection::returnResultSetData() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done returning result set data");
 	#endif
-	return 1;
+	return true;
 }

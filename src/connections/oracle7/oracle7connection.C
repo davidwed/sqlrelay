@@ -22,11 +22,11 @@ oracle7connection::~oracle7connection() {
 	delete env;
 }
 
-int	oracle7connection::getNumberOfConnectStringVars() {
+int oracle7connection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	oracle7connection::handleConnectString() {
+void oracle7connection::handleConnectString() {
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
 	sid=connectStringValue("oracle_sid");
@@ -35,18 +35,18 @@ void	oracle7connection::handleConnectString() {
 	setAutoCommitBehavior((autocom && !strcasecmp(autocom,"yes")));
 }
 
-int	oracle7connection::logIn() {
+bool oracle7connection::logIn() {
 
 	// handle ORACLE_HOME
 	if (home) {
 		if (!env->setValue("ORACLE_HOME",home)) {
 			fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
-			return 0;
+			return false;
 		}
 	} else {
 		if (!env->getValue("ORACLE_HOME")) {
 			fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
-			return 0;
+			return false;
 		}
 	}
 
@@ -54,12 +54,12 @@ int	oracle7connection::logIn() {
 	if (sid) {
 		if (!env->setValue("ORACLE_SID",sid)) {
 			fprintf(stderr,"Failed to set ORACLE_SID environment variable.\n");
-			return 0;
+			return false;
 		}
 	} else {
 		if (!env->getValue("ORACLE_SID")) {
 			fprintf(stderr,"No ORACLE_SID environment variable set or specified in connect string.\n");
-			return 0;
+			return false;
 		}
 	}
 
@@ -67,12 +67,12 @@ int	oracle7connection::logIn() {
 	if (sid) {
 		if (!env->setValue("TWO_TASK",sid)) {
 			fprintf(stderr,"Failed to set TWO_TASK environment variable.\n");
-			return 0;
+			return false;
 		}
 	} else {
 		if (!env->getValue("TWO_TASK")) {
 			fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
-			return 0;
+			return false;
 		}
 	}
 
@@ -84,47 +84,48 @@ int	oracle7connection::logIn() {
 
 		// display the error message
 		text	message[512];
-		sword	n=oerhms(&lda,lda.rc,message,(sword)sizeof(message));
+		sword	n=oerhms(&lda,lda.rc,message,
+				(sword)sizeof(message));
 		message[n]=(text)NULL;
 		fprintf(stderr,"%s\n",message);
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-sqlrcursor	*oracle7connection::initCursor() {
+sqlrcursor *oracle7connection::initCursor() {
 	return (sqlrcursor *)new oracle7cursor((sqlrconnection *)this);
 }
 
-void	oracle7connection::deleteCursor(sqlrcursor *curs) {
+void oracle7connection::deleteCursor(sqlrcursor *curs) {
 	delete (oracle7cursor *)curs;
 }
 
-void	oracle7connection::logOut() {
+void oracle7connection::logOut() {
 	ologof(&lda);
 }
 
-unsigned short	oracle7connection::autoCommitOn() {
-	return (unsigned short)!ocon(&lda);
+bool oracle7connection::autoCommitOn() {
+	return (!ocon(&lda));
 }
 
-unsigned short	oracle7connection::autoCommitOff() {
-	return (unsigned short)!ocof(&lda);
+bool oracle7connection::autoCommitOff() {
+	return (!ocof(&lda));
 }
 
-int	oracle7connection::commit() {
-	return !ocom(&lda);
+bool oracle7connection::commit() {
+	return (!ocom(&lda));
 }
 
-int	oracle7connection::rollback() {
-	return !orol(&lda);
+bool oracle7connection::rollback() {
+	return (!orol(&lda));
 }
 
-char	*oracle7connection::pingQuery() {
+char *oracle7connection::pingQuery() {
 	return "select 1 from dual";
 }
 
-char	*oracle7connection::identify() {
+char *oracle7connection::identify() {
 	return "oracle7";
 }
 
@@ -137,25 +138,23 @@ oracle7cursor::~oracle7cursor() {
 	delete errormessage;
 }
 
-int	oracle7cursor::openCursor(int id) {
-	return !oopen(&cda,&oracle7conn->lda,(text *)0,-1,-1,(text *)0,-1);
+bool oracle7cursor::openCursor(int id) {
+	return (!oopen(&cda,&oracle7conn->lda,
+			(text *)0,-1,-1,(text *)0,-1) &&
+			sqlrcursor::openCursor(id));
 }
 
-int	oracle7cursor::closeCursor() {
+bool oracle7cursor::closeCursor() {
 	return !oclose(&cda);
 }
 
-int	oracle7cursor::prepareQuery(const char *query, long length) {
-
+bool oracle7cursor::prepareQuery(const char *query, long length) {
 	// parse the query
-	if (oparse(&cda,(text *)query,(sb4)length,
-		(sword)PARSE_DEFER,(ub4)PARSE_V7_LNG)) {
-		return 0;
-	}
-	return 1;
+	return (!oparse(&cda,(text *)query,(sb4)length,
+			(sword)PARSE_DEFER,(ub4)PARSE_V7_LNG));
 }
 
-int	oracle7cursor::inputBindString(const char *variable, 
+bool oracle7cursor::inputBindString(const char *variable, 
 						unsigned short variablesize,
 						const char *value, 
 						unsigned short valuesize,
@@ -164,48 +163,50 @@ int	oracle7cursor::inputBindString(const char *variable,
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
-			return 0;
+			return false;
 		}
 		if (obndrn(&cda,(sword)atoi(variable+1),
-			(ub1 *)value,(sword)valuesize+1,NULL_TERMINATED_STRING,
+			(ub1 *)value,(sword)valuesize+1,
+			NULL_TERMINATED_STRING,
 			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
-			return 0;
+			return false;
 		}
 	} else {
 		if (obndrv(&cda,(text *)variable,(sword)variablesize,
-			(ub1 *)value,(sword)valuesize+1,NULL_TERMINATED_STRING,
+			(ub1 *)value,(sword)valuesize+1,
+			NULL_TERMINATED_STRING,
 			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
-			return 0;
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
-int	oracle7cursor::inputBindLong(const char *variable, 
+bool oracle7cursor::inputBindLong(const char *variable, 
 						unsigned short variablesize,
 						unsigned long *value) {
 	
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
-			return 0;
+			return false;
 		}
 		if (obndrn(&cda,(sword)atoi(variable+1),
 			(ub1 *)value,(sword)sizeof(long),LONG_BIND_TYPE,
 			-1,(sb2 *)0,(text *)0,-1,-1)) {
-			return 0;
+			return false;
 		}
 	} else {
 		if (obndrv(&cda,(text *)variable,(sword)variablesize,
 			(ub1 *)value,(sword)sizeof(long),LONG_BIND_TYPE,
 			-1,(sb2 *)0,(text *)0,-1,-1)) {
-			return 0;
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
-int	oracle7cursor::inputBindDouble(const char *variable, 
+bool oracle7cursor::inputBindDouble(const char *variable, 
 						unsigned short variablesize,
 						double *value,
 						unsigned short precision,
@@ -214,24 +215,24 @@ int	oracle7cursor::inputBindDouble(const char *variable,
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
-			return 0;
+			return false;
 		}
 		if (obndrn(&cda,(sword)atoi(variable+1),
 			(ub1 *)value,(sword)sizeof(double),DOUBLE_BIND_TYPE,
 			(sword)scale,(sb2 *)0,(text *)0,-1,-1)) {
-			return 0;
+			return false;
 		}
 	} else {
 		if (obndrv(&cda,(text *)variable,(sword)variablesize,
 			(ub1 *)value,(sword)sizeof(double),DOUBLE_BIND_TYPE,
 			(sword)scale,(sb2 *)0,(text *)0,-1,-1)) {
-			return 0;
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
-int	oracle7cursor::outputBindString(const char *variable, 
+bool oracle7cursor::outputBindString(const char *variable, 
 					unsigned short variablesize,
 					char *value, 
 					unsigned short valuesize, 
@@ -240,26 +241,26 @@ int	oracle7cursor::outputBindString(const char *variable,
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
-			return 0;
+			return false;
 		}
 		if (obndrn(&cda,(sword)atoi(variable+1),
 			(ub1 *)value,(sword)valuesize,
 			NULL_TERMINATED_STRING,
 			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
-			return 0;
+			return false;
 		}
 	} else {
 		if (obndrv(&cda,(text *)variable,(sword)variablesize,
 			(ub1 *)value,(sword)valuesize,
 			NULL_TERMINATED_STRING,
 			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
-			return 0;
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
-int	oracle7cursor::executeQuery(const char *query, long length,
+bool oracle7cursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
 
 	// initialize the column count
@@ -269,7 +270,7 @@ int	oracle7cursor::executeQuery(const char *query, long length,
 	if (cda.ft==SELECT_QUERY) {
 
 		// run through the columns...
-		while (1) {
+		for (;;) {
 
 			// init the column name size
 			desc[ncols].buflen=MAX_ITEM_BUFFER_SIZE;
@@ -297,7 +298,7 @@ int	oracle7cursor::executeQuery(const char *query, long length,
 						-1,
 						def_col_retlen[ncols],
 						def_col_retcode[ncols])) {
-					return 0;
+					return false;
 				}
 
 			} else {
@@ -306,7 +307,7 @@ int	oracle7cursor::executeQuery(const char *query, long length,
 				if (cda.rc==NOT_IN_LIST) {
 					break;
 				} else {
-					return 0;
+					return false;
 				}
 			}
 	
@@ -320,30 +321,18 @@ int	oracle7cursor::executeQuery(const char *query, long length,
 	totalrows=0;
 
 	// execute the query
-	if (oexec(&cda)) {
-		return 0;
-	}
-
-	return 1;
+	return (!oexec(&cda));
 }
 
-int	oracle7cursor::queryIsNotSelect() {
-
-	if (cda.ft==SELECT_QUERY) {
-		return 0;
-	}
-	return 1;
+bool oracle7cursor::queryIsNotSelect() {
+	return (cda.ft!=SELECT_QUERY);
 }
 
-int	oracle7cursor::queryIsCommitOrRollback() {
-
-	if (cda.ft==COMMIT_QUERY || cda.ft==ROLLBACK_QUERY) {
-		return 1;
-	}
-	return 0;
+bool oracle7cursor::queryIsCommitOrRollback() {
+	return (cda.ft==COMMIT_QUERY || cda.ft==ROLLBACK_QUERY);
 }
 
-char	*oracle7cursor::getErrorMessage(int *liveconnection) {
+char *oracle7cursor::getErrorMessage(bool *liveconnection) {
 
 	// get the message from oracle
 	text	message[512];
@@ -353,9 +342,9 @@ char	*oracle7cursor::getErrorMessage(int *liveconnection) {
 	// check for dead connection
 	if (!strncmp((char *)message,"ORA-03114",9) || 
 		!strncmp((char *)message,"ORA-03113",9)) {
-		*liveconnection=0;
+		*liveconnection=false;
 	} else {
-		*liveconnection=1;
+		*liveconnection=true;
 	}
 
 	// only return an error message if the error wasn't a dead database
@@ -370,17 +359,16 @@ char	*oracle7cursor::getErrorMessage(int *liveconnection) {
 	return errormessage->getString();
 }
 
-void	oracle7cursor::returnRowCounts() {
-
+void oracle7cursor::returnRowCounts() {
 	// send row counts (actual row count unknown in oracle)
 	oracle7conn->sendRowCounts((long)-1,(long)cda.rpc);
 }
 
-void	oracle7cursor::returnColumnCount() {
+void oracle7cursor::returnColumnCount() {
 	oracle7conn->sendColumnCount(ncols);
 }
 
-void	oracle7cursor::returnColumnInfo() {
+void oracle7cursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
@@ -427,39 +415,36 @@ void	oracle7cursor::returnColumnInfo() {
 	}
 }
 
-int	oracle7cursor::noRowsToReturn() {
-	if (cda.ft!=SELECT_QUERY) {
-		return 1;
-	}
-	return 0;
+bool oracle7cursor::noRowsToReturn() {
+	return (cda.ft!=SELECT_QUERY);
 }
 
-int	oracle7cursor::skipRow() {
+bool oracle7cursor::skipRow() {
 	if (fetchRow()) {
 		row++;
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-int	oracle7cursor::fetchRow() {
+bool oracle7cursor::fetchRow() {
 	if (row==FETCH_AT_ONCE) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
-		return 0;
+		return false;
 	}
-	if (row==0) {
+	if (!row) {
 		if (ofen(&cda,FETCH_AT_ONCE) && cda.rpc==totalrows) {
-			return 0;
+			return false;
 		}
 		maxrow=cda.rpc-totalrows;
 		totalrows=cda.rpc;
 	}
-	return 1;
+	return true;
 }
 
-void	oracle7cursor::returnRow() {
+void oracle7cursor::returnRow() {
 
 	for (sword col=0; col<ncols; col++) {
 
@@ -507,7 +492,7 @@ void	oracle7cursor::returnRow() {
 	row++;
 }
 
-void	oracle7cursor::cleanUpData(bool freerows, bool freecols,
+void oracle7cursor::cleanUpData(bool freerows, bool freecols,
 							bool freebinds) {
 	if (freerows) {
 		ocan(&cda);

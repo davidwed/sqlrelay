@@ -8,7 +8,7 @@
 	#include <unistd.h>
 #endif
 
-void	sqlrconnection::reLogIn() {
+void sqlrconnection::reLogIn() {
 
 	markDatabaseUnavailable();
 
@@ -17,7 +17,7 @@ void	sqlrconnection::reLogIn() {
 	#endif
 
 	// attempt to log in over and over, once every 5 seconds
-	closeCursors(0);
+	closeCursors(false);
 	logOut();
 	for (;;) {
 			
@@ -26,8 +26,8 @@ void	sqlrconnection::reLogIn() {
 		#endif
 
 		if (logIn()) {
-			if (!initCursors(0)) {
-				closeCursors(0);
+			if (!initCursors(false)) {
+				closeCursors(false);
 				logOut();
 			} else {
 				break;

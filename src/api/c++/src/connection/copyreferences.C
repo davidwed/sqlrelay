@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-void	sqlrconnection::copyReferences() {
+void sqlrconnection::copyReferences() {
 
 	// set the flag
 	copyrefs=1;

@@ -25,35 +25,35 @@ class sybasecursor : public sqlrcursor {
 	private:
 			sybasecursor(sqlrconnection *conn);
 			~sybasecursor();
-		int	openCursor(int id);
-		int	prepareQuery(const char *query, long length);
-		int	inputBindString(const char *variable,
+		bool	openCursor(int id);
+		bool	prepareQuery(const char *query, long length);
+		bool	inputBindString(const char *variable,
 						unsigned short variablesize,
 						const char *value,
 						unsigned short valuesize,
 						short *isnull);
-		int	inputBindLong(const char *variable,
+		bool	inputBindLong(const char *variable,
 						unsigned short variablesize,
 						unsigned long *value);
-		int	inputBindDouble(const char *variable,
+		bool	inputBindDouble(const char *variable,
 						unsigned short variablesize,
 						double *value,
 						unsigned short precision,
 						unsigned short scale);
-		int	outputBindString(const char *variable, 
+		bool	outputBindString(const char *variable, 
 						unsigned short variablesize,
 						char *value, 
 						unsigned short valuesize, 
 						short *isnull);
-		int	executeQuery(const char *query, long length,
+		bool	executeQuery(const char *query, long length,
 						unsigned short execute);
-		char	*getErrorMessage(int *liveconnection);
+		char	*getErrorMessage(bool *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();
 		void	returnColumnInfo();
-		int	noRowsToReturn();
-		int	skipRow();
-		int	fetchRow();
+		bool	noRowsToReturn();
+		bool	skipRow();
+		bool	fetchRow();
 		void	returnRow();
 		void	cleanUpData(bool freerows, bool freecols,
 							bool freebinds);
@@ -98,7 +98,7 @@ class sybaseconnection : public sqlrconnection {
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
-		int	logIn();
+		bool	logIn();
 		void	logInError(const char *error, int stage);
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
@@ -122,7 +122,7 @@ class sybaseconnection : public sqlrconnection {
 
 		environment	*env;
 
-		static	int		deadconnection;
+		static	bool		deadconnection;
 
 		static	stringbuffer	*errorstring;
 

@@ -3,14 +3,14 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::fetchResultSetCommand() {
+bool sqlrconnection::fetchResultSetCommand(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"fetch result set");
 	#endif
-	if (!returnResultSetData()) {
+	if (!returnResultSetData(cursor)) {
 		endSession();
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }

@@ -3,15 +3,15 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::rollbackCommand() {
+void sqlrconnection::rollbackCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"rollback");
 	#endif
-	clientsock->write((unsigned short)rollback());
-	commitorrollback=0;
+	clientsock->write(rollback());
+	commitorrollback=false;
 }
 
-int	sqlrconnection::rollback() {
+bool sqlrconnection::rollback() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"rollback...");
@@ -20,12 +20,12 @@ int	sqlrconnection::rollback() {
 	sqlrcursor	*rollbackcur=initCursor();
 	char	*rollbackquery="rollback";
 	int	rollbackquerylen=8;
-	int	retval=0;
+	bool	retval=false;
 	if (rollbackcur->openCursor(-1) &&
 		rollbackcur->prepareQuery(rollbackquery,rollbackquerylen) &&
 		rollbackcur->executeQuery(rollbackquery,rollbackquerylen,1)) {
 		rollbackcur->cleanUpData(false,false,false);
-		retval=1;
+		retval=true;
 	}
 	rollbackcur->closeCursor();
 	delete rollbackcur;

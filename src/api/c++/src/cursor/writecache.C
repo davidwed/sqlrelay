@@ -8,7 +8,7 @@
 #include <defines.h>
 #include <datatypes.h>
 
-void	sqlrcursor::cacheToFile(const char *filename) {
+void sqlrcursor::cacheToFile(const char *filename) {
 
 	cacheon=1;
 	cachettl=600;
@@ -25,19 +25,19 @@ void	sqlrcursor::cacheToFile(const char *filename) {
 	sprintf(cachedestindname,"%s.ind",filename);
 }
 
-void	sqlrcursor::setCacheTtl(int ttl) {
+void sqlrcursor::setCacheTtl(int ttl) {
 	cachettl=ttl;
 }
 
-char	*sqlrcursor::getCacheFileName() {
+char *sqlrcursor::getCacheFileName() {
 	return cachedestname;
 }
 
-void	sqlrcursor::cacheOff() {
+void sqlrcursor::cacheOff() {
 	cacheon=0;
 }
 
-void	sqlrcursor::startCaching() {
+void sqlrcursor::startCaching() {
 
 	if (!resumed) {
 		if (sqlrc->debug) {
@@ -100,7 +100,7 @@ void	sqlrcursor::startCaching() {
 	}
 }
 
-void	sqlrcursor::cacheError() {
+void sqlrcursor::cacheError() {
 
 	if (resumed || !cachedest) {
 		return;
@@ -113,7 +113,7 @@ void	sqlrcursor::cacheError() {
 	cachedest->write((unsigned short)END_COLUMN_INFO);
 }
 
-void	sqlrcursor::cacheNoError() {
+void sqlrcursor::cacheNoError() {
 
 	if (resumed || !cachedest) {
 		return;
@@ -122,7 +122,7 @@ void	sqlrcursor::cacheNoError() {
 	cachedest->write((unsigned short)NO_ERROR);
 }
 
-void	sqlrcursor::cacheColumnInfo() {
+void sqlrcursor::cacheColumnInfo() {
 
 	if (resumed || !cachedest) {
 		return;
@@ -193,7 +193,7 @@ void	sqlrcursor::cacheColumnInfo() {
 	}
 }
 
-void	sqlrcursor::cacheOutputBinds(int count) {
+void sqlrcursor::cacheOutputBinds(int count) {
 
 	if (resumed || !cachedest) {
 		return;
@@ -222,7 +222,7 @@ void	sqlrcursor::cacheOutputBinds(int count) {
 	cachedest->write((unsigned short)END_BIND_VARS);
 }
 
-void	sqlrcursor::cacheData() {
+void sqlrcursor::cacheData() {
 
 	if (!cachedest) {
 		return;
@@ -266,7 +266,7 @@ void	sqlrcursor::cacheData() {
 	}
 }
 
-void	sqlrcursor::finishCaching() {
+void sqlrcursor::finishCaching() {
 
 	if (!cachedest) {
 		return;
@@ -285,7 +285,7 @@ void	sqlrcursor::finishCaching() {
 	clearCacheDest();
 }
 
-void	sqlrcursor::clearCacheDest() {
+void sqlrcursor::clearCacheDest() {
 
 	// close the cache file and clean up
 	if (cachedest) {

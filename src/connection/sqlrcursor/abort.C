@@ -3,12 +3,12 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrcursor::abort() {
-	suspendresultset=0;
-	busy=0;
+void sqlrcursor::abort() {
+	suspendresultset=false;
+	busy=false;
 }
 
-void	sqlrcursor::cleanUpData(bool freerows, bool freecols, bool freebinds) {
+void sqlrcursor::cleanUpData(bool freerows, bool freecols, bool freebinds) {
 	// by default, do nothing...
 	return;
 }

@@ -5,11 +5,12 @@
 #include <sqlrconnection.h>
 
 #include <rudiments/permissions.h>
+#include <rudiments/file.h>
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
 #endif
 
-void	sqlrconnection::markDatabaseAvailable() {
+void sqlrconnection::markDatabaseAvailable() {
 
 	#ifdef SERVER_DEBUG
 	char	*string=new char[9+strlen(updown)+1];
@@ -20,11 +21,11 @@ void	sqlrconnection::markDatabaseAvailable() {
 
 	// the database is up if the file is there, 
 	// opening and closing it will create it
-	int	fd=creat(updown,permissions::ownerReadWrite());
-	close(fd);
+	file	fd;
+	fd.create(updown,permissions::ownerReadWrite());
 }
 
-void	sqlrconnection::markDatabaseUnavailable() {
+void sqlrconnection::markDatabaseUnavailable() {
 
 	#ifdef SERVER_DEBUG
 	char	*string=new char[10+strlen(updown)+1];

@@ -3,24 +3,24 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::changeUser(const char *newuser,
+bool sqlrconnection::changeUser(const char *newuser,
 					const char *newpassword) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"change user");
 	#endif
 
-	closeCursors(1);
+	closeCursors(true);
 	logOut();
 	setUser(newuser);
 	setPassword(newpassword);
-	return (initCursors(1) && logIn());
+	return (initCursors(true) && logIn());
 }
 
-void	sqlrconnection::setUser(const char *user) {
+void sqlrconnection::setUser(const char *user) {
 	this->user=(char *)user;
 }
 
-void	sqlrconnection::setPassword(const char *password) {
+void sqlrconnection::setPassword(const char *password) {
 	this->password=(char *)password;
 }

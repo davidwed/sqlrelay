@@ -22,7 +22,7 @@
 		void	debugPrintBlob(const char *blob, unsigned long length);
 		void	debugPrintClob(const char *clob, unsigned long length);
 
-		int	autoCommit(unsigned short on);
+		int	autoCommit(bool on);
 
 		void	clearError();
 		void	setError(const char *err);

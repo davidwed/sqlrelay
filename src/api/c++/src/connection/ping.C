@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int	sqlrconnection::ping() {
+int sqlrconnection::ping() {
 
 	if (!openSession()) {
 		return 0;

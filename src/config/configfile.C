@@ -21,7 +21,7 @@ configfile::~configfile() {
 	close();
 }
 
-void	configfile::blank() {
+void configfile::blank() {
 
 	currentfile=NULL;
 
@@ -56,7 +56,7 @@ void	configfile::blank() {
 	root->insertText("\n",root->getChildCount());
 }
 
-int	configfile::parse(const char *filename) {
+int configfile::parse(const char *filename) {
 
 	currentfile=(char *)filename;
 
@@ -113,15 +113,15 @@ int	configfile::parse(const char *filename) {
 	return 0;
 }
 
-int	configfile::write() {
+int configfile::write() {
 	return doc->writeFile(currentfile,permissions::ownerReadWrite());
 }
 
-int	configfile::write(const char *filename) {
+int configfile::write(const char *filename) {
 	return doc->writeFile(filename,permissions::ownerReadWrite());
 }
 
-void	configfile::close() {
+void configfile::close() {
 
 	// delete the instance list
 	if (firstinstance) {
@@ -143,11 +143,11 @@ void	configfile::close() {
 	currentfile=NULL;
 }
 
-char	*configfile::currentFile() {
+char *configfile::currentFile() {
 	return currentfile;
 }
 
-instance	*configfile::addInstance(const char *id,
+instance *configfile::addInstance(const char *id,
 				const char *port, 
 				const char *unixport,
 				const char *dbase,
@@ -240,7 +240,7 @@ instance	*configfile::addInstance(const char *id,
 	return lastinstance;
 }
 
-void	configfile::deleteInstance(instance *instanceptr) {
+void configfile::deleteInstance(instance *instanceptr) {
 
 	if (instanceptr==firstinstance) {
 		firstinstance=instanceptr->next;
@@ -257,7 +257,7 @@ void	configfile::deleteInstance(instance *instanceptr) {
 	delete instanceptr;
 }
 
-instance	*configfile::findInstance(const char *id) {
+instance *configfile::findInstance(const char *id) {
 
 	char	*currentid;
 
@@ -280,7 +280,7 @@ instance	*configfile::findInstance(const char *id) {
 	return NULL;
 }
 
-instance	*configfile::firstInstance() {
+instance *configfile::firstInstance() {
 	return firstinstance;
 }
 

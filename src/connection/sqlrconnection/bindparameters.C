@@ -5,18 +5,18 @@
 
 #include <stdlib.h>
 
-short	sqlrconnection::nonNullBindValue() {
+short sqlrconnection::nonNullBindValue() {
 	return 0;
 }
 
-short	sqlrconnection::nullBindValue() {
+short sqlrconnection::nullBindValue() {
 	return -1;
 }
 
-char	sqlrconnection::bindVariablePrefix() {
+char sqlrconnection::bindVariablePrefix() {
 	return ':';
 }
 
-int	sqlrconnection::bindValueIsNull(short isnull) {
-	return abs(isnull);
+bool sqlrconnection::bindValueIsNull(short isnull) {
+	return (isnull==nullBindValue());
 }

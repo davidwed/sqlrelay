@@ -3,14 +3,14 @@
 
 #include <sqlrconnection.h>
 
-void	sqlrconnection::endSessionCommand() {
+void sqlrconnection::endSessionCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"end session");
 	#endif
 	endSession();
 }
 
-void	sqlrconnection::endSession() {
+void sqlrconnection::endSession() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"ending session...");
@@ -19,9 +19,9 @@ void	sqlrconnection::endSession() {
 	truncateTempTables(&sessiontemptablesfortrunc);
 	dropTempTables(&sessiontemptablesfordrop);
 
-	// must set suspendedsession to 0 here so resumed sessions won't 
+	// must set suspendedsession to false here so resumed sessions won't 
 	// automatically re-suspend
-	suspendedsession=0;
+	suspendedsession=false;
 
 	// abort all cursors
 	#ifdef SERVER_DEBUG

@@ -11,7 +11,7 @@ class authenticator {
 	public:
 			authenticator(sqlrconfigfile *cfgfile);
 			~authenticator();
-		int	authenticate(const char *user, const char *password);
+		bool	authenticate(const char *user, const char *password);
 
 	private:
 		linkedlist< usercontainer * >	userlist;

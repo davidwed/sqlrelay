@@ -1,6 +1,3 @@
-in sqlrconnection, currentcur should be passed around instead of being
-	global.
-
 socket for file descriptor passing is apparantly getting closed or something,
 	recvmesg fails when a client hits the connection for the second time
 

@@ -10,21 +10,21 @@
 	#include <strings.h>
 #endif
 
-char	*sqlrcursor::getFieldInternal(int row, int col) {
+char *sqlrcursor::getFieldInternal(int row, int col) {
 	if (row<OPTIMISTIC_ROW_COUNT) {
 		return rows[row]->getField(col);
 	}
 	return extrarows[row-OPTIMISTIC_ROW_COUNT]->getField(col);
 }
 
-unsigned long	sqlrcursor::getFieldLengthInternal(int row, int col) {
+unsigned long sqlrcursor::getFieldLengthInternal(int row, int col) {
 	if (row<OPTIMISTIC_ROW_COUNT) {
 		return rows[row]->getFieldLength(col);
 	}
 	return extrarows[row-OPTIMISTIC_ROW_COUNT]->getFieldLength(col);
 }
 
-char	*sqlrcursor::getField(int row, int col) {
+char *sqlrcursor::getField(int row, int col) {
 
 	if (rowcount && row>=0 && row>=(int)firstrowindex && 
 					col>=0 && col<(int)colcount) {
@@ -42,17 +42,17 @@ char	*sqlrcursor::getField(int row, int col) {
 	return NULL;
 }
 
-long	sqlrcursor::getFieldAsLong(int row, int col) {
+long sqlrcursor::getFieldAsLong(int row, int col) {
 	char	*field=getField(row,col);
 	return (field)?atol(field):0;
 }
 
-double	sqlrcursor::getFieldAsDouble(int row, int col) {
+double sqlrcursor::getFieldAsDouble(int row, int col) {
 	char	*field=getField(row,col);
 	return (field)?atof(field):0.0;
 }
 
-char	*sqlrcursor::getField(int row, const char *col) {
+char *sqlrcursor::getField(int row, const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
@@ -77,17 +77,17 @@ char	*sqlrcursor::getField(int row, const char *col) {
 	return NULL;
 }
 
-long	sqlrcursor::getFieldAsLong(int row, const char *col) {
+long sqlrcursor::getFieldAsLong(int row, const char *col) {
 	char	*field=getField(row,col);
 	return (field)?atol(field):0;
 }
 
-double	sqlrcursor::getFieldAsDouble(int row, const char *col) {
+double sqlrcursor::getFieldAsDouble(int row, const char *col) {
 	char	*field=getField(row,col);
 	return (field)?atof(field):0.0;
 }
 
-long	sqlrcursor::getFieldLength(int row, int col) {
+long sqlrcursor::getFieldLength(int row, int col) {
 
 	if (rowcount && row>=0 && row>=(int)firstrowindex && 
 					col>=0 && col<(int)colcount) {
@@ -104,7 +104,7 @@ long	sqlrcursor::getFieldLength(int row, int col) {
 	return -1;
 }
 
-long	sqlrcursor::getFieldLength(int row, const char *col) {
+long sqlrcursor::getFieldLength(int row, const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
@@ -149,7 +149,7 @@ char	**sqlrcursor::getRow(int row) {
 	return NULL;
 }
 
-void	sqlrcursor::createFields() {
+void sqlrcursor::createFields() {
 	// lets say that rowcount=5 and firstrowindex=3,
 	// the fields array will contain 2 elements:
 	// 	fields[0] (corresponding to row 3) and
@@ -166,7 +166,7 @@ void	sqlrcursor::createFields() {
 	}
 }
 
-long	*sqlrcursor::getRowLengths(int row) {
+long *sqlrcursor::getRowLengths(int row) {
 
 	if (rowcount && row>=0 && row>=(int)firstrowindex) {
 
@@ -185,7 +185,7 @@ long	*sqlrcursor::getRowLengths(int row) {
 	return NULL;
 }
 
-void	sqlrcursor::createFieldLengths() {
+void sqlrcursor::createFieldLengths() {
 	// lets say that rowcount=5 and firstrowindex=3,
 	// the fieldlengths array will contain 2 elements:
 	// 	fieldlengths[0] (corresponding to row 3) and

@@ -14,37 +14,37 @@ sqliteconnection::sqliteconnection() : sqlrconnection() {
 	errmesg=NULL;
 }
 
-int	sqliteconnection::getNumberOfConnectStringVars() {
+int sqliteconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void	sqliteconnection::handleConnectString() {
+void sqliteconnection::handleConnectString() {
 	db=connectStringValue("db");
 }
 
-int	sqliteconnection::logIn() {
+bool sqliteconnection::logIn() {
 #ifdef SQLITE_TRANSACTIONAL
 	if ((sqliteptr=sqlite_open(db,666,&errmesg))) {
-		return 1;
+		return true;
 	}
 	if (errmesg) {
 		fprintf(stderr,"%s\n",errmesg);
 	}
-	return 0;
+	return false;
 #else
-	return 1;
+	return true;
 #endif
 }
 
-sqlrcursor	*sqliteconnection::initCursor() {
+sqlrcursor *sqliteconnection::initCursor() {
 	return (sqlrcursor *)new sqlitecursor((sqlrconnection *)this);
 }
 
-void	sqliteconnection::deleteCursor(sqlrcursor *curs) {
+void sqliteconnection::deleteCursor(sqlrcursor *curs) {
 	delete (sqlitecursor *)curs;
 }
 
-void	sqliteconnection::logOut() {
+void sqliteconnection::logOut() {
 #ifdef SQLITE_TRANSACTIONAL
 	if (sqliteptr) {
 		sqlite_close(sqliteptr);
@@ -52,25 +52,25 @@ void	sqliteconnection::logOut() {
 #endif
 }
 
-int	sqliteconnection::ping() {
-	return 1;
+bool sqliteconnection::ping() {
+	return true;
 }
 
-char	*sqliteconnection::identify() {
+char *sqliteconnection::identify() {
 	return "sqlite";
 }
 
 #ifndef SQLITE_TRANSACTIONAL
-int	sqliteconnection::isTransactional() {
-	return 0;
+bool sqliteconnection::isTransactional() {
+	return false;
 }
 
-int	sqliteconnection::commit() {
-	return 1;
+bool sqliteconnection::commit() {
+	return true;
 }
 
-int	sqliteconnection::rollback() {
-	return 1;
+bool sqliteconnection::rollback() {
+	return true;
 }
 #endif
 
@@ -89,18 +89,18 @@ sqlitecursor::~sqlitecursor() {
 	cleanUpData(true,true,true);
 }
 
-int	sqlitecursor::executeQuery(const char *query, long length,
+bool sqlitecursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
 
 	// fake binds
 	newquery=fakeInputBinds(query);
 
 	// execute the query
-	int retval=0;
+	int	result=0;
 #ifdef SQLITE_TRANSACTIONAL
 	for (;;) {
 
-		retval=runQuery(newquery,query);
+		result=runQuery(newquery,query);
 
 		// If we get a SQLITE_SCHEMA return value, we should retry
 		// the query.
@@ -113,9 +113,9 @@ int	sqlitecursor::executeQuery(const char *query, long length,
 		// SQLITE_SCHEMA return value.
 		//
 		// For any other return values, jump out of the loop.
-		if (retval==SQLITE_SCHEMA) {
+		if (result==SQLITE_SCHEMA) {
 			continue;
-		} else if (retval==SQLITE_ERROR && sqliteconn->errmesg && 
+		} else if (result==SQLITE_ERROR && sqliteconn->errmesg && 
 			!strncmp(sqliteconn->errmesg,"no such table:",14)) {
 
 			cleanUpData(true,true,true);
@@ -126,7 +126,7 @@ int	sqlitecursor::executeQuery(const char *query, long length,
 							!=SQLITE_SCHEMA) {
 				cleanUpData(true,true,true);
 				newquery=fakeInputBinds(query);
-				retval=runQuery(newquery,query);
+				result=runQuery(newquery,query);
 				break;
 			}
 		} else {
@@ -143,9 +143,9 @@ int	sqlitecursor::executeQuery(const char *query, long length,
 	if (!(sqliteconn->sqliteptr=
 			sqlite_open(sqliteconn->db,666,
 						&sqliteconn->errmesg))) {
-		return 0;
+		return false;
 	}
-	retval=runQuery(newquery,query);
+	result=runQuery(newquery,query);
 #endif
 
 	checkForTempTable(query,length);
@@ -153,10 +153,10 @@ int	sqlitecursor::executeQuery(const char *query, long length,
 	// set the rowindex past the column names
 	rowindex=rowindex+ncolumn;
 
-	return (retval==SQLITE_OK);
+	return (result==SQLITE_OK);
 }
 
-int	sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
+int sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
 
 	// clear any errors
 	if (sqliteconn->errmesg) {
@@ -172,38 +172,38 @@ int	sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
 	// run the appropriate query
 	if (newquery) {
 		return sqlite_get_table(sqliteconn->sqliteptr,
-				newquery->getString(),
-				&result,&nrow,&ncolumn,
-				&sqliteconn->errmesg);
+					newquery->getString(),
+					&result,&nrow,&ncolumn,
+					&sqliteconn->errmesg);
 	} else {
 		return sqlite_get_table(sqliteconn->sqliteptr,
-				query,
-				&result,&nrow,&ncolumn,
-				&sqliteconn->errmesg);
+					query,
+					&result,&nrow,&ncolumn,
+					&sqliteconn->errmesg);
 	}
 }
 
-char	*sqlitecursor::getErrorMessage(int *liveconnection) {
-	*liveconnection=1;
+char *sqlitecursor::getErrorMessage(bool *liveconnection) {
+	*liveconnection=true;
 	if (sqliteconn->errmesg &&
 		(!strncmp(sqliteconn->errmesg,"access permission denied",24) ||
 		!strncmp(sqliteconn->errmesg,"not a directory",15))) {
-		*liveconnection=0;
+		*liveconnection=false;
 	}
 	return sqliteconn->errmesg;
 }
 
-void	sqlitecursor::returnRowCounts() {
+void sqlitecursor::returnRowCounts() {
 
 	// affected row counts are unknown in sqlite
 	conn->sendRowCounts((long)nrow,(long)-1);
 }
 
-void	sqlitecursor::returnColumnCount() {
+void sqlitecursor::returnColumnCount() {
 	conn->sendColumnCount(ncolumn);
 }
 
-void	sqlitecursor::returnColumnInfo() {
+void sqlitecursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
@@ -223,22 +223,22 @@ void	sqlitecursor::returnColumnInfo() {
 	}
 }
 
-int	sqlitecursor::noRowsToReturn() {
-	return (nrow==0);
+bool sqlitecursor::noRowsToReturn() {
+	return (!nrow);
 }
 
-int	sqlitecursor::skipRow() {
+bool sqlitecursor::skipRow() {
 	rowindex=rowindex+ncolumn;
-	return 1;
+	return true;
 }
 
-int	sqlitecursor::fetchRow() {
+bool sqlitecursor::fetchRow() {
 	// have to check for nrow+1 because the 
 	// first row is actually the column names
-	return rowindex<(ncolumn*(nrow+1));
+	return (rowindex<(ncolumn*(nrow+1)));
 }
 
-void	sqlitecursor::returnRow() {
+void sqlitecursor::returnRow() {
 
 	if (!result) {
 		return;
@@ -259,8 +259,7 @@ void	sqlitecursor::returnRow() {
 	}
 }
 
-void	sqlitecursor::cleanUpData(bool freerows, bool freecols,
-							bool freebinds) {
+void sqlitecursor::cleanUpData(bool freerows, bool freecols, bool freebinds) {
 	if (newquery) {
 		delete newquery;
 		newquery=NULL;

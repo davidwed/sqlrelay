@@ -17,7 +17,7 @@ debugfile::~debugfile() {
 	closeDebugFile();
 }
 
-void	debugfile::openDebugFile(const char *name, const char *localstatedir) {
+void debugfile::openDebugFile(const char *name, const char *localstatedir) {
 
 	// set the debug file name
 	char	*dbgfilename;
@@ -53,7 +53,7 @@ void	debugfile::openDebugFile(const char *name, const char *localstatedir) {
 	delete[] dbgfilename;
 }
 
-void	debugfile::closeDebugFile() {
+void debugfile::closeDebugFile() {
 	if (dbgfile) {
 		dbgfile->close();
 		delete dbgfile;
@@ -61,25 +61,25 @@ void	debugfile::closeDebugFile() {
 	}
 }
 
-void	debugfile::debugPrint(const char *name, int tabs, const char *string) {
+void debugfile::debugPrint(const char *name, int tabs, const char *string) {
 	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,string);
 	delete[] header;
 }
 
-void	debugfile::debugPrint(const char *name, int tabs, long number) {
+void debugfile::debugPrint(const char *name, int tabs, long number) {
 	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,number);
 	delete[] header;
 }
 
-void	debugfile::debugPrint(const char *name, int tabs, double number) {
+void debugfile::debugPrint(const char *name, int tabs, double number) {
 	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,number);
 	delete[] header;
 }
 
-void	debugfile::debugPrintBlob(const char *blob, unsigned long length) {
+void debugfile::debugPrintBlob(const char *blob, unsigned long length) {
 
 	// write printable characters from the blob, for all other characters,
 	// print a period instead, also print a carriage return every 80 columns
@@ -105,7 +105,7 @@ void	debugfile::debugPrintBlob(const char *blob, unsigned long length) {
 	delete debugstr;
 }
 
-void	debugfile::debugPrintClob(const char *clob, unsigned long length) {
+void debugfile::debugPrintClob(const char *clob, unsigned long length) {
 
 	// write printable characters from the clob, for NULl characters,
 	// print a \0 instead
@@ -125,6 +125,6 @@ void	debugfile::debugPrintClob(const char *clob, unsigned long length) {
 	delete debugstr;
 }
 
-logger	*debugfile::getDebugLogger() {
+logger *debugfile::getDebugLogger() {
 	return debuglogger;
 }
