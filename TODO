@@ -1,3 +1,5 @@
+use connectstring class to parse/store connectstring
+
 test,document Java "getXXXAsByteArray" methods
 document oracle 8.0/8i temp-blob compile flag
 tests need to check blob/lobs with binary data in them

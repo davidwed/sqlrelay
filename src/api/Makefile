@@ -3,6 +3,7 @@ include ../../config.mk
 all:
 	$(MAKE) -C c++ all
 	$(MAKE) -C c all
+	$(MAKE) -C postgresql all
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python all
 endif
@@ -27,6 +28,7 @@ endif
 clean:
 	$(MAKE) -C c++ clean
 	$(MAKE) -C c clean
+	$(MAKE) -C postgresql clean
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python clean
 endif
@@ -52,6 +54,7 @@ endif
 rebuild:
 	$(MAKE) -C c++ rebuild
 	$(MAKE) -C c rebuild
+	$(MAKE) -C postgresql rebuild
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python rebuild
 endif
@@ -76,6 +79,7 @@ endif
 install:
 	$(MAKE) -C c++ install
 	$(MAKE) -C c install
+	$(MAKE) -C postgresql install
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python install
 endif
@@ -103,6 +107,7 @@ endif
 uninstall:
 	$(MAKE) -C c++ uninstall
 	$(MAKE) -C c uninstall
+	$(MAKE) -C postgresql uninstall
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python uninstall
 endif

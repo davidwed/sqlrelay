@@ -149,7 +149,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 
 	createCursorArray();
 
-	connectstring=cfgfl->getConnectString(cmdl->getConnectionId());
+	constr=cfgfl->getConnectString(cmdl->getConnectionId());
 	handleConnectString();
 
 	initDatabaseAvailableFileName();
@@ -236,7 +236,7 @@ void	sqlrconnection::setUnixSocketDirectory() {
 }
 
 char	*sqlrconnection::connectStringValue(const char *variable) {
-	return connectstring->getConnectStringValue(variable);
+	return constr->getConnectStringValue(variable);
 }
 
 void	sqlrconnection::createCursorArray() {

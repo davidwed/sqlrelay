@@ -53,6 +53,7 @@ int	postgresqlconnection::logIn() {
 		return 0;
 	}
 
+	// FIXME: can use PQsetNoticeProcessor to do this
 	int	devnull;
 	if ((devnull=open("/dev/null",O_RDONLY))>0) {
 		dup2(devnull,STDOUT_FILENO);
@@ -176,6 +177,7 @@ int	postgresqlcursor::executeQuery(const char *query, long length,
 	ExecStatusType	pgstatus=PQresultStatus(pgresult);
 	if (pgstatus==PGRES_BAD_RESPONSE || pgstatus==PGRES_NONFATAL_ERROR ||
 		pgstatus==PGRES_FATAL_ERROR) {
+		// FIXME: do I need to do a PQclear here?
 		return 0;
 	}
 

@@ -30,7 +30,8 @@ int main(int argc, char **argv) {
 	for (int count=0; count<iterations; count++) {
 
 		// log in
-		pgconn=PQsetdbLogin(NULL,NULL,NULL,NULL,db,NULL,NULL);
+		//pgconn=PQsetdbLogin(NULL,NULL,NULL,NULL,db,NULL,NULL);
+		pgconn=PQsetdbLogin(NULL,NULL,NULL,NULL,db,"testuser","testpassword");
 
 		// execute the query
 		pgresult=PQexec(pgconn,query);

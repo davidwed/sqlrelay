@@ -1,8 +1,15 @@
+#include <rudiments/connectstring.h>
 #include <sqlrelay/sqlrclient.h>
+
+extern "C" {
+
+#define TRUE	1
+#define FALSE	0
 
 typedef unsigned int Oid;
 typedef struct pg_conn PGconn;
 typedef struct pg_result PGresult;
+typedef void (*PQnoticeProcessor) (void *arg, const char *message);
 
 typedef enum {
 	PGRES_EMPTY_QUERY = 0,
@@ -15,23 +22,64 @@ typedef enum {
 	PGRES_FATAL_ERROR
 } ExecStatusType;
 
-struct pg_conn {
-
-	sqlrconnection	*sqlrcon;
-
-	char	*host;
-	char	*port;
-	char	*options;
-	char	*tty;
-	char	*db;
-	char	*user;
-	char	*password;
-
-	int	socket;
-};
+struct pg_conn;
 
 struct pg_result {
 	sqlrcursor	*sqlrcur;
 
 	ExecStatusType	execstatus;
+
+	pg_conn		*parent;
+
+	int		previousnonblockingmode;
+
+	int		queryisnotselect;
 };
+
+struct pg_conn {
+
+	sqlrconnection	*sqlrcon;
+
+	connectstring	*connstr;
+
+	char		*conninfo;
+
+	char		*host;
+	char		*port;
+	char		*options;
+	char		*tty;
+	char		*db;
+	char		*user;
+	char		*password;
+
+	int		clientencoding;
+
+	pg_result	*currentresult;
+	int		nonblockingmode;
+
+	PQnoticeProcessor	noticeprocessor;
+	void			*noticeprocessorarg;
+
+	char		*error;
+};
+
+// encodings
+#define	PG_UTF8		6
+
+// object id's
+#define InvalidOid	0
+
+// functions
+PGconn		*allocatePGconn(const char *conninfo,
+				const char *host, const char *port,
+				const char *options, const char *tty,
+				const char *db, const char *user,
+				const char *password);
+void		freePGconn(PGconn *conn);
+int		translateEncoding(const char *encoding);
+
+PGconn		*PQconnectdb(const char *conninfo);
+void		PQfinish(PGconn *conn);
+PGresult	*PQexec(PGconn *conn, const char *query);
+
+}

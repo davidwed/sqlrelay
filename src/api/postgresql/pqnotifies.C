@@ -8,9 +8,12 @@ typedef struct pgNotify {
 } PGnotify;
 
 PGnotify *PQnotifies(PGconn *conn) {
+	//printf("PQnotifies\n");
+	return NULL;
 }
 
 void PQfreeNotify(PGnotify *notify) {
+	//printf("PQfreeNotify\n");
 }
 
 

@@ -195,7 +195,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 		tempdir			*tmpdir;
 
-		connectstringnode	*connectstring;
+		connectstringnode	*constr;
 
 		char		*updown;
 

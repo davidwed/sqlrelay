@@ -16,15 +16,18 @@ typedef struct _PQprintOpt {
 } PQprintOpt;
 
 void PQprint(FILE *fout, const PGresult *res, const PQprintOpt *ps) {
+	printf("PQprint unimplemented\n");
 }
 
 void PQdisplayTuples(const PGresult *res, FILE *fp, int fillAlign,
 				const char *fieldSep, int printHeader,
 				int quiet) {
+	printf("PQdisplayTuples unimplemented\n");
 }
 
 void PQprintTuples(const PGresult *res, FILE *fout, int printAttName,
 			  int terseOutput, int width) {
+	printf("PQprintTuples unimplemented\n");
 }
 
 }
