@@ -8,7 +8,7 @@ clean:
 
 rebuild: clean all
 
-install: sql_relay.so
+install:
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPPEARDBDIR)
 	$(INSTALL) sqlrelay.php $(DESTDIR)$(PHPPEARDBDIR)
 
