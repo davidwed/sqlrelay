@@ -106,12 +106,14 @@ class sybaseconnection : public sqlrconnection {
 		void	logOut();
 		char	*identify();
 		char	bindVariablePrefix();
+		void	dropTempTable(const char *tablename);
 
 		CS_CONTEXT	*context;
 		CS_LOCALE	*locale;
 		CS_CONNECTION	*dbconn;
 
 		char		*sybase;
+		char		*lang;
 		char		*server;
 		char		*db;
 		char		*charset;
@@ -123,9 +125,10 @@ class sybaseconnection : public sqlrconnection {
 
 		environment	*env;
 
+		static	stringbuffer	*errorstring;
 		static	bool		deadconnection;
 
-		static	stringbuffer	*errorstring;
+		sqlrcursor	*dropcursor;
 
 		static	CS_RETCODE	csMessageCallback(CS_CONTEXT *ctxt,
 						CS_CLIENTMSG *msgp);

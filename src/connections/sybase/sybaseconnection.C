@@ -22,9 +22,14 @@ bool		sybaseconnection::deadconnection;
 sybaseconnection::sybaseconnection() {
 	errorstring=NULL;
 	env=new environment();
+	dropcursor=NULL;
 }
 
 sybaseconnection::~sybaseconnection() {
+	if (dropcursor) {
+		dropcursor->closeCursor();
+		delete dropcursor;
+	}
 	delete errorstring;
 	delete env;
 }
@@ -35,6 +40,7 @@ int sybaseconnection::getNumberOfConnectStringVars() {
 
 void sybaseconnection::handleConnectString() {
 	sybase=connectStringValue("sybase");
+	lang=connectStringValue("lang");
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
 	server=connectStringValue("server");
@@ -51,6 +57,12 @@ bool sybaseconnection::logIn() {
 	// set sybase
 	if (sybase && sybase[0] && !env->setValue("SYBASE",sybase)) {
 		logInError("Failed to set SYBASE environment variable.",1);
+		return false;
+	}
+
+	// set lang
+	if (lang && lang[0] && !env->setValue("LANG",lang)) {
+		logInError("Failed to set LANG environment variable.",1);
 		return false;
 	}
 
@@ -196,6 +208,14 @@ bool sybaseconnection::logIn() {
 	// connect to the database
 	if (ct_connect(dbconn,(CS_CHAR *)NULL,(CS_INT)0)!=CS_SUCCEED) {
 		logInError("failed to connect to the database",6);
+		return false;
+	}
+
+	// create a cursor that will be used to drop temp tables
+	dropcursor=initCursor();
+	if (!dropcursor->openCursor(-1)) {
+		dropcursor->closeCursor();
+		delete dropcursor;
 		return false;
 	}
 	return true;
@@ -705,7 +725,7 @@ void sybasecursor::cleanUpData(bool freerows, bool freecols,
 		CS_INT	return_code;
 		while ((return_code=ct_results(cmd,&results_type))==
 								CS_SUCCEED) {
-			ct_cancel(sybaseconn->dbconn,cmd,CS_CANCEL_CURRENT);
+			ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
 		}
 
 		// return a dead database on absolute failre
@@ -744,6 +764,7 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 		errorstring->append("\n	")->append(msgp->osstring)->
 							append("\n");
 	}
+printf("csMessageCallback:\n%s\n",errorstring->getString());
 
 	// for a timeout message, set deadconnection to 1
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
@@ -785,6 +806,7 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 		errorstring->append("\n	")->append(msgp->osstring)->
 							append("\n");
 	}
+printf("clientMessageCallback:\n%s\n",errorstring->getString());
 
 	// for a timeout message, set deadconnection to 1
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
@@ -834,6 +856,19 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	errorstring->append("Error:	")->
 				append(msgp->text)->
 				append("\n");
+printf("serverMessageCallback:\n%s\n",errorstring->getString());
 
 	return CS_SUCCEED;
+}
+
+
+void sybaseconnection::dropTempTable(const char *tablename) {
+	stringbuffer	dropquery;
+	dropquery.append("drop table #")->append(tablename);
+	if (dropcursor->prepareQuery(dropquery.getString(),
+					dropquery.getStringLength())) {
+		dropcursor->executeQuery(dropquery.getString(),
+					dropquery.getStringLength(),1);
+	}
+	dropcursor->cleanUpData(true,true,true);
 }
