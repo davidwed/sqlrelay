@@ -34,8 +34,8 @@ sqlr-scaler: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-scaler $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-scaler$(EXE) $(bindir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler-debug$(EXE)

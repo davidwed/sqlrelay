@@ -34,8 +34,8 @@ sqlr-cachemanager: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-cachemanager $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-cachemanager$(EXE) $(bindir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-cachemanager
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-cachemanager-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-cachemanager$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-cachemanager-debug$(EXE)

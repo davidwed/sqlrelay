@@ -43,9 +43,9 @@ sqlr-listener-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-listener $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-listener-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-listener$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-listener-debug$(EXE) $(bindir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener-debug$(EXE)

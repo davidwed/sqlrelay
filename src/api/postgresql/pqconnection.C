@@ -96,6 +96,8 @@ PGconn *allocatePGconn(const char *conninfo,
 					conn->user,conn->password,0,1);
 	conn->sqlrcon->copyReferences();
 
+	conn->removetrailingsemicolons=-1;
+
 	return conn;
 }
 

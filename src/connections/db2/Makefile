@@ -48,16 +48,16 @@ sqlr-connection-db2-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2 $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-db2
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-db2-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-db2$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-db2-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -42,14 +42,14 @@ sqlrsh: sqlrsh.C sqlrsh.lo
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) query $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) fields $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlrsh $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) query$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) fields$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlrsh$(EXE) $(bindir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query-debug
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/fields
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/fields-debug
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlrsh
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlrsh-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query-debug$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/fields$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/fields-debug$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlrsh$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlrsh-debug$(EXE)

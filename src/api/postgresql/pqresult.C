@@ -77,9 +77,30 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 	conn->error=NULL;
 
 	if (query && query[0]) {
+
 		result->sqlrcur=new sqlrcursor(conn->sqlrcon);
 		result->sqlrcur->copyReferences();
-		if (result->sqlrcur->sendQuery(query)) {
+
+		if (conn->removetrailingsemicolons==-1) {
+			char	*dbtype=conn->sqlrcon->identify();
+			// FIXME: it's possible that other non-postgresql
+			// databases allow trailing semicolons
+			conn->removetrailingsemicolons=
+					(!strcmp(dbtype,"postgresql"))?0:1;
+		}
+
+		int	length=strlen(query);
+		if (conn->removetrailingsemicolons==1) {
+			while (query[length-1]==' ' ||
+				query[length-1]=='	' ||
+				query[length-1]=='\n' ||
+				query[length-1]=='\r' ||
+				query[length-1]==';') {
+				length--;
+			}
+		}
+
+		if (result->sqlrcur->sendQuery(query,length)) {
 			if (queryIsNotSelect(query)) {
 				result->execstatus=PGRES_COMMAND_OK;
 			} else {
@@ -92,8 +113,9 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 			sprintf(conn->error,"%s\n",
 				result->sqlrcur->errorMessage());
 			PQclear(result);
-			return NULL;
+			result=NULL;
 		}
+
 	} else {
 		result->sqlrcur=NULL;
 		result->execstatus=PGRES_EMPTY_QUERY;

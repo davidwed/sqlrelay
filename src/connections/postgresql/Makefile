@@ -48,16 +48,16 @@ sqlr-connection-postgresql-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -244,3 +244,6 @@ LIBDMALLOC = @LIBDMALLOC@
 
 # ElectricFence stuff
 LIBEFENCE = @LIBEFENCE@
+
+# Microsoft-specific stuff
+EXE = @EXE@

@@ -61,6 +61,8 @@ struct pg_conn {
 	void			*noticeprocessorarg;
 
 	char		*error;
+
+	int		removetrailingsemicolons;
 };
 
 // encodings

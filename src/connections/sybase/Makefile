@@ -48,16 +48,16 @@ sqlr-connection-sybase-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sybase $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sybase-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sybase$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sybase-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sybase
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sybase-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sybase$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sybase-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

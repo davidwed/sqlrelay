@@ -384,12 +384,14 @@ case $host_os in
 	*mingw32* ) MINGW32="yes";;
 	*uwin* ) UWIN="yes";;
 esac
+EXE=""
 AC_SUBST(MINGW32)
 AC_SUBST(CYGWIN)
 AC_SUBST(UWIN)
 
 dnl Hack so "make install" will work on windows.
 MICROSOFT=""
+EXE=""
 if ( test "$UWIN" = "yes" -o "$MINGW32" = "yes" -o "$CYGWIN" = "yes" )
 then
 	if ( test -r "INSTALL" )
@@ -397,7 +399,9 @@ then
 		mv INSTALL INSTALL.txt
 	fi
 	MICROSOFT="yes"
+	EXE=".exe"
 fi
+AC_SUBST(EXE)
 ])
 
 
@@ -518,19 +522,6 @@ AC_SUBST(SSLINCLUDES)
 AC_SUBST(SSLLIBS)
 ])
 
-AC_DEFUN([FW_CHECK_RUDIMENTS_NEEDS_SSL],
-[
-
-	AC_MSG_CHECKING(whether rudiments needs ssl)
-	FW_TRY_LINK([#include <rudiments/filedescriptor.h>
-#include <stdlib.h>],[filedescriptor fd; fd.setSSL(NULL);],[$RUDIMENTSINCLUDES $PTHREADINCLUDES $SSLINCLUDES],[$RUDIMENTSLIBS $PTHREADLIBS $SSLLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); RUDIMENTS_NEEDS_SSL=\"yes\"],[AC_MSG_RESULT(no)])
-
-	if ( test -n "$RUDIMENTS_NEEDS_SSL" -a -z "$SSLLIBS" )
-	then
-		AC_MSG_ERROR(No SSL library was found but Rudiments requires SSL.)
-	fi
-])
-
 
 dnl checks for the rudiments library
 dnl requires:  MICROSOFT, RUDIMENTSPATH, RPATHFLAG, cross_compiling
@@ -563,8 +554,8 @@ then
 
 else
 
-	if ( test -z "$MICROSOFT" )
-	then
+	dnl if ( test -z "$MICROSOFT" )
+	dnl then
 
 		for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/pkg" "/usr/local/firstworks"
 		do
@@ -588,20 +579,20 @@ else
 			dnl FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[rudiments/daemonprocess.h],[rudiments],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC],[RUDIMENTSPATH])
 		dnl fi
 
-	else
+	dnl else
 
-		for i in "$RUDIMENTSPATH" "/usr/local/firstworks"
-		do
-			if ( test -n "$i" )
-			then
-				FW_CHECK_HEADER_LIB([$i/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\"],[$i/lib/librudiments.dll],[RUDIMENTSLIBS=\"$i/lib/librudiments.dll\"])
-			fi
-			if ( test -n "$RUDIMENTSLIBS" )
-			then
-				break
-			fi
-		done
-	fi
+		dnl for i in "$RUDIMENTSPATH" "/usr/local/firstworks"
+		dnl do
+			dnl if ( test -n "$i" )
+			dnl then
+				dnl FW_CHECK_HEADER_LIB([$i/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\"],[$i/lib/librudiments.dll],[RUDIMENTSLIBS=\"$i/lib/librudiments.dll\"])
+			dnl fi
+			dnl if ( test -n "$RUDIMENTSLIBS" )
+			dnl then
+				dnl break
+			dnl fi
+		dnl done
+	dnl fi
 fi
 
 if ( test -z "$RUDIMENTSLIBS" )

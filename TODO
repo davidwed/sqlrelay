@@ -1,7 +1,25 @@
+cygwin:
+	perl api won't build
+
+when not using proxy credentials for user-change, oracle 8 client can't
+	recreate cursors when logging back in
+
+oracle 8 client needs to check to see what version of the database it's
+	connected to and not use proxy credentials to switch users if the
+	version < 8.1... Use OCIServerVersion and parse the result
+
 socket for file descriptor passing is apparantly getting closed or something,
 	recvmesg fails when a client hits the connection for the second time
 
+interbase stored procedure/output bind tests fails at isc_dsql_prepare
+
+freetds-0.62/ct_param support
+
 VB wrapper
+
+stored procedures:
+	tests for mysql, sybase
+	stored procedure examples in faq
 
 probably related to temp table dropping:
 	postgresql test causes connection to crash on 2nd run
@@ -9,27 +27,11 @@ probably related to temp table dropping:
 	freetds connection writes an error but succeeds in dropping the table
 	sybase connection won't even start now
 
-freetds-0.62/ct_param support
 idle client timeout
 perl apis -> CPAN
 
-docs:
-	mysql drop-in library
-	postgresql drop-in library
-	pear db driver
-	how to use pear db driver with adodb
-	perl dbi driver bind_param_inout
-	new column flags
-	countBindVariables()
-	temporary table handling
-	instructions for adding procedural language support to postgresql
-	update faq, indicating that stored procedures are supported for more
-		databases than just oracle
-tests:
-	adodb test
-	db2 temp tables
-	odbc temp tables
-	interbase stored procedure/output bind tests fails at isc_dsql_prepare
+psql doesn't work 100% with drop-in library
+mysql client segfaults at exit with drop-in library
 
 --------------------------------------------------------------------------------
 
@@ -53,6 +55,9 @@ setting backlog:
 
 
 Tests:
+	adodb using peardb driver
+	db2 temp tables
+	odbc temp tables
 	zope
 	tcl
 	odbc tests
@@ -104,6 +109,7 @@ Compatibility:
 			argument don't work, not exactly sure why
 
 Documentation:
+	how to use pear db driver with adodb
 	getting started docs for MS SQL Server
 	getting started docs for odbc
 	"how sqlrelay works" with diagrams and animations

@@ -48,16 +48,16 @@ sqlr-connection-freetds-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-freetds
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-freetds-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-freetds$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-freetds-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -34,8 +34,8 @@ sqlr-start: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-start $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-start$(EXE) $(bindir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-start
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-start-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-start$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-start-debug$(EXE)

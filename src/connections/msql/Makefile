@@ -48,16 +48,16 @@ sqlr-connection-msql-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-msql
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-msql-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-msql$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-msql-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -492,7 +492,6 @@ dnl Checks for Rudiments.
 echo
 echo "***** Rudiments **************"
 FW_CHECK_RUDIMENTS
-FW_CHECK_RUDIMENTS_NEEDS_SSL
 echo "******************************"
 
 
@@ -665,13 +664,6 @@ AC_TYPE_SIGNAL
 FW_CHECK_SIGNALS
 echo "******************************"
 
-
-
-dnl Checks for library functions.
-echo
-echo "***** Functions **************"
-AC_CHECK_FUNCS(putenv setenv)
-echo "******************************"
 
 
 dnl Checks for rpm build directory.

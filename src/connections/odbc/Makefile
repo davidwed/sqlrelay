@@ -48,16 +48,16 @@ sqlr-connection-odbc-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-odbc $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-odbc-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-odbc$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-odbc-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

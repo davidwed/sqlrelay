@@ -48,16 +48,16 @@ sqlr-connection-lago-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-lago
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-lago-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-lago$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-lago-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -48,16 +48,16 @@ sqlr-connection-interbase-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-interbase $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-interbase-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-interbase$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-interbase-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-interbase
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-interbase-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-interbase$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-interbase-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -48,16 +48,16 @@ sqlr-connection-oracle8-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle8 $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle8-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle8$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle8-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-oracle8
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-oracle8-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-oracle8$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-oracle8-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -1,3 +1,6 @@
+// Copyright (c) 2004  David Muse
+// See the file COPYING for more information
+
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
 
@@ -410,7 +413,18 @@ char *mysql_get_host_info(MYSQL *mysql) {
 
 unsigned int mysql_get_proto_info(MYSQL *mysql) {
 	// Returns the protocol version used by current connection.
-	return 0;
+	#ifdef COMPAT_MYSQL_3
+		return 10;
+	#endif
+	#ifdef COMPAT_MYSQL_4_0
+		return 12;
+	#endif
+	#ifdef COMPAT_MYSQL_4_1
+		return 14;
+	#endif
+	#ifdef COMPAT_MYSQL_5_0
+		return 14;
+	#endif
 }
 
 char *mysql_get_server_info(MYSQL *mysql) {

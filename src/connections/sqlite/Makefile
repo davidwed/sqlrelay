@@ -48,16 +48,16 @@ sqlr-connection-sqlite-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite$(EXE) $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite-debug$(EXE)
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

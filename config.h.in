@@ -82,14 +82,8 @@
 /* Some versions of postgresql have PQsetNoticeProcessor */
 #undef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 
-/* Define to 1 if you have the `putenv' function. */
-#undef HAVE_PUTENV
-
 /* Do we have readline */
 #undef HAVE_READLINE
-
-/* Define to 1 if you have the `setenv' function. */
-#undef HAVE_SETENV
 
 /* Do we have SIGABRT */
 #undef HAVE_SIGABRT
