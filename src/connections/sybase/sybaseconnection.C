@@ -278,16 +278,15 @@ void	sybaseconnection::logOut() {
 
 int	sybaseconnection::ping() {
 	int	retval=0;
-	sybasecursor	*cur=new sybasecursor(this);
-	if (cur->openCursor(-1) && 
-		cur->prepareQuery("select 1",8) && 
-		cur->executeQuery("select 1",8,1)) {
-		cur->cleanUpData();
-		cur->closeCursor();
+	sybasecursor	cur(this);
+	if (cur.openCursor(-1) && 
+		cur.prepareQuery("select 1",8) && 
+		cur.executeQuery("select 1",8,1)) {
+		cur.cleanUpData();
+		cur.closeCursor();
 		retval=1;
 	}
-	cur->closeCursor();
-	delete cur;
+	cur.closeCursor();
 	return retval;
 }
 

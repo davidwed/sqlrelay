@@ -300,15 +300,14 @@ int	oracle8connection::rollback() {
 
 int	oracle8connection::ping() {
 	int	retval=0;
-	oracle8cursor	*cur=new oracle8cursor(this);
-	if (cur->openCursor(-1) && 
-		cur->prepareQuery("select 1 from dual",18) && 
-		cur->executeQuery("select 1 from dual",18,1)) {
-		cur->cleanUpData();
-		cur->closeCursor();
+	oracle8cursor	cur(this);
+	if (cur.openCursor(-1) && 
+		cur.prepareQuery("select 1 from dual",18) && 
+		cur.executeQuery("select 1 from dual",18,1)) {
+		cur.cleanUpData();
+		cur.closeCursor();
 		retval=1;
 	}
-	delete cur;
 	return retval;
 }
 

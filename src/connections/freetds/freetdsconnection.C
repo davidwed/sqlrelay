@@ -273,15 +273,14 @@ void	freetdsconnection::logOut() {
 
 int	freetdsconnection::ping() {
 	int	retval=0;
-	freetdscursor	*cur=new freetdscursor(this);
-	if (cur->openCursor(-1) && 
-		cur->prepareQuery("select 1",8) && 
-		cur->executeQuery("select 1",8,1)) {
-		cur->cleanUpData();
-		cur->closeCursor();
+	freetdscursor	cur(this);
+	if (cur.openCursor(-1) && 
+		cur.prepareQuery("select 1",8) && 
+		cur.executeQuery("select 1",8,1)) {
+		cur.cleanUpData();
+		cur.closeCursor();
 		retval=1;
 	}
-	delete cur;
 	return retval;
 }
 

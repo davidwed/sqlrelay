@@ -16,10 +16,10 @@ int	main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	sqlrconfigfile	*cfgfile=NULL;
+	sqlrconfigfile	cfgfile;
 	usernode	*currentnode=NULL;
 
-	commandline	*cmdline=new commandline(argc,argv);
+	commandline	cmdline(argc,argv);
 	char		*host;
 	int		port;
 	char		*socket;
@@ -29,11 +29,11 @@ int	main(int argc, const char **argv) {
 	int		debug=0;
 	int		exitval=0;
 
-	char	*config=cmdline->value("-config");
+	char	*config=cmdline.value("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
-	char	*id=cmdline->value("-id");
+	char	*id=cmdline.value("-id");
 	if (!(id && id[0])) {
 
 
@@ -57,19 +57,18 @@ int	main(int argc, const char **argv) {
 
 	} else {
 
-		cfgfile=new sqlrconfigfile();
-		if (cfgfile->parse(config,id)) {
+		if (cfgfile.parse(config,id)) {
 
 			// get the host/port/socket/username/password
 			host="localhost";
-			port=cfgfile->getPort();
-			socket=cfgfile->getUnixPort();
-			currentnode=cfgfile->getUsers();
+			port=cfgfile.getPort();
+			socket=cfgfile.getUnixPort();
+			currentnode=cfgfile.getUsers();
 			user=currentnode->getUser();
 			password=currentnode->getPassword();
 
 			// find the query and optional debug
-			if (cmdline->found("debug")) {
+			if (cmdline.found("debug")) {
 				debug=1;
 			}
 
@@ -86,30 +85,28 @@ int	main(int argc, const char **argv) {
 				break;
 			}
 		} else {
-			delete cfgfile;
-			delete cmdline;
 			exit(1);
 		}
 	}
 
 
 
-	sqlrconnection	*sqlrcon=new sqlrconnection(host,port,
-						socket,user,password,0,1);
+	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
+	sqlrcursor	sqlrcur(&sqlrcon);
+
 	if (debug) {
-		sqlrcon->debugOn();
+		sqlrcon.debugOn();
 	}
 
-	sqlrcursor	*sqlrcur=new sqlrcursor(sqlrcon);
-	sqlrcur->dontGetColumnInfo();
-	sqlrcur->setResultSetBufferSize(100);
-	if (sqlrcur->sendQuery(query)) {
+	sqlrcur.dontGetColumnInfo();
+	sqlrcur.setResultSetBufferSize(100);
+	if (sqlrcur.sendQuery(query)) {
 		int	i=0;
-		int	cols=sqlrcur->colCount();
+		int	cols=sqlrcur.colCount();
 		char	*field="";
 		while (cols && field) {
 			for (int j=0; j<cols; j++) {
-				if (field=sqlrcur->getField(i,j)) {
+				if (field=sqlrcur.getField(i,j)) {
 					printf("\"%s\"");
 					if (j<cols-1) {
 						printf(",");
@@ -121,17 +118,10 @@ int	main(int argc, const char **argv) {
 			i++;
 		}
 	} else {
-		printf("%s\n",sqlrcur->errorMessage());
+		printf("%s\n",sqlrcur.errorMessage());
 		exitval=1;
 	}
-	sqlrcon->endSession();
-
-	if (cfgfile) {
-		delete cfgfile;
-	}
-	delete cmdline;
-	delete sqlrcur;
-	delete sqlrcon;
+	sqlrcon.endSession();
 
 	exit(exitval);
 }

@@ -776,10 +776,9 @@ int	sqlrconnection::openSockets() {
 	if (cfgfl->getListenOnInet()) {
 
 		#ifdef SERVER_DEBUG
-		char	*string=new char[33];
+		char	string[33];
 		sprintf(string,"listening on inet socket: %d",inetport);
 		debugPrint("connection",1,string);
-		delete[] string;
 		#endif
 
 		if (!serversockin) {
@@ -2626,10 +2625,9 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 	if (actual>-1) {
 
 		#ifdef SERVER_DEBUG
-		char	*string=new char[30];
+		char	string[30];
 		sprintf(string,"actual rows: %d",actual);
 		debugPrint("connection",3,string);
-		delete[] string;
 		#endif
 
 		clientsock->write((unsigned short)ACTUAL_ROWS);
@@ -2648,10 +2646,9 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 	if (affected>-1) {
 
 		#ifdef SERVER_DEBUG
-		char	*string=new char[46];
+		char	string[46];
 		sprintf(string,"affected rows: %d",affected);
 		debugPrint("connection",3,string);
-		delete[] string;
 		#endif
 
 		clientsock->write((unsigned short)AFFECTED_ROWS);
@@ -2907,10 +2904,9 @@ int	sqlrconnection::commit() {
 	cur[currentcur]->abort();
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[36];
+	char	string[36];
 	sprintf(string,"commit result: %d",retval);
 	debugPrint("connection",2,string);
-	delete[] string;
 	#endif
 
 	return retval;
@@ -2927,10 +2923,9 @@ int	sqlrconnection::rollback() {
 	cur[currentcur]->abort();
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[38];
+	char	string[38];
 	sprintf(string,"rollback result: %d",retval);
 	debugPrint("connection",2,string);
-	delete[] string;
 	#endif
 
 	return retval;

@@ -38,10 +38,10 @@ dirnode::~dirnode() {
 cachemanager::cachemanager(int argc, const char **argv) {
 
 	// read the commandline
-	commandline	*cmdl=new commandline(argc,argv);
+	commandline	cmdl(argc,argv);
 
 	// get the scaninterval
-	char	*scanint=cmdl->value("-scaninterval");
+	char	*scanint=cmdl.value("-scaninterval");
 	if (scanint && scanint[0]) {
 		scaninterval=atoi(scanint);
 	} else {
@@ -49,10 +49,8 @@ cachemanager::cachemanager(int argc, const char **argv) {
 	}
 
 	// get the directories to scan
-	char	*cachedirs=cmdl->value("-cachedirs");
+	char	*cachedirs=cmdl.value("-cachedirs");
 	parseCacheDirs(cachedirs);
-
-	delete cmdl;
 }
 
 cachemanager::~cachemanager() {

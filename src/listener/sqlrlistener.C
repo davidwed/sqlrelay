@@ -95,58 +95,46 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 
 	cmdl=new cmdline(argc,argv);
 
-	tempdir		*tmpdir=new tempdir(cmdl);
-	sqlrconfigfile	*cfgfl=new sqlrconfigfile();
+	tempdir		tmpdir(cmdl);
+	sqlrconfigfile	cfgfl;
 
-	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId())) {
-		delete tmpdir;
-		delete cfgfl;
+	if (!cfgfl.parse(cmdl->getConfig(),cmdl->getId())) {
 		return 0;
 	}
 
-	setUserAndGroup(cfgfl);
+	setUserAndGroup(&cfgfl);
 
 	#ifdef SERVER_DEBUG
 	openDebugFile("listener",cmdl->getLocalStateDir());
 	#endif
 
-	if (!handlePidFile(tmpdir,cmdl->getId())) {
-		delete tmpdir;
-		delete cfgfl;
+	if (!handlePidFile(&tmpdir,cmdl->getId())) {
 		return 0;
 	}
 
-	handleDynamicScaling(cfgfl);
+	handleDynamicScaling(&cfgfl);
 
-	setHandoffMethod(cfgfl);
+	setHandoffMethod(&cfgfl);
 
-	if (cfgfl->getAuthOnListener()) {
-		authc=new authenticator(cfgfl);
+	if (cfgfl.getAuthOnListener()) {
+		authc=new authenticator(&cfgfl);
 	}
 
-	setIpPermissions(cfgfl);
+	setIpPermissions(&cfgfl);
 
-	if (!createSharedMemoryAndSemaphores(tmpdir,cmdl->getId())) {
-		delete tmpdir;
-		delete cfgfl;
+	if (!createSharedMemoryAndSemaphores(&tmpdir,cmdl->getId())) {
 		return 0;
 	}
 
-	if (!listenOnClientSockets(cfgfl)) {
-		delete tmpdir;
-		delete cfgfl;
+	if (!listenOnClientSockets(&cfgfl)) {
 		return 0;
 	}
 
 	if (passdescriptor) {
-		if (!listenOnHandoffSocket(tmpdir,cmdl->getId())) {
-			delete tmpdir;
-			delete cfgfl;
+		if (!listenOnHandoffSocket(&tmpdir,cmdl->getId())) {
 			return 0;
 		}
-		if (!listenOnDeregistrationSocket(tmpdir,cmdl->getId())) {
-			delete tmpdir;
-			delete cfgfl;
+		if (!listenOnDeregistrationSocket(&tmpdir,cmdl->getId())) {
 			return 0;
 		}
 	}
@@ -155,8 +143,6 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 	detach();
 	#endif
 
-	delete tmpdir;
-	delete cfgfl;
 	return 1;
 }
 

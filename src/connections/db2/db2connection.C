@@ -107,15 +107,14 @@ int	db2connection::rollback() {
 
 int	db2connection::ping() {
 	int	retval=0;
-	db2cursor	*cur=new db2cursor(this);
-	if (cur->openCursor(-1) && 
-		cur->prepareQuery("values 1",8) && 
-		cur->executeQuery("values 1",8,1)) {
-		cur->cleanUpData();
-		cur->closeCursor();
+	db2cursor	cur(this);
+	if (cur.openCursor(-1) && 
+		cur.prepareQuery("values 1",8) && 
+		cur.executeQuery("values 1",8,1)) {
+		cur.cleanUpData();
+		cur.closeCursor();
 		retval=1;
 	}
-	delete cur;
 	return retval;
 }
 

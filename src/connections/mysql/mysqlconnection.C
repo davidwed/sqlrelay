@@ -121,15 +121,14 @@ int	mysqlconnection::ping() {
 	return 0;
 #else
 	int	retval=0;
-	mysqlcursor	*cur=new mysqlcursor(this);
-	if (cur->openCursor(-1) && 
-		cur->prepareQuery("select 1",8) && 
-		cur->executeQuery("select 1",8,1)) 
-		cur->cleanUpData();
-		cur->closeCursor();
+	mysqlcursor	cur(this);
+	if (cur.openCursor(-1) && 
+		cur.prepareQuery("select 1",8) && 
+		cur.executeQuery("select 1",8,1)) 
+		cur.cleanUpData();
+		cur.closeCursor();
 		retval=1;
 	}
-	delete cur;
 	return retval;
 #endif
 }

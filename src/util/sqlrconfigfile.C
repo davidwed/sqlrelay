@@ -374,16 +374,14 @@ int	sqlrconfigfile::attributeValue(char *value) {
 			listenoninet=1;
 		} else if (currentattribute==SOCKET_ATTRIBUTE) {
 			if (value) {
-				unixport=new char[strlen(value)+1];
-				strcpy(unixport,value);
+				unixport=strdup(value);
 			} else {
 				unixport=DEFAULT_SOCKET;
 			}
 			listenonunix=(unixport[0]!=(char)NULL);
 		} else if (currentattribute==DBASE_ATTRIBUTE) {
 			if (value) {
-				dbase=new char[strlen(value)+1];
-				strcpy(dbase,value);
+				dbase=strdup(value);
 			} else {
 				dbase=DEFAULT_DBASE;
 			}
@@ -419,8 +417,7 @@ int	sqlrconfigfile::attributeValue(char *value) {
 			}
 		} else if (currentattribute==ENDOFSESSION_ATTRIBUTE) {
 			if (value) {
-				endofsession=new char[strlen(value)+1];
-				strcpy(endofsession,value);
+				endofsession=strdup(value);
 			} else {
 				endofsession=DEFAULT_ENDOFSESSION;
 			}
@@ -433,15 +430,13 @@ int	sqlrconfigfile::attributeValue(char *value) {
 			}
 		} else if (currentattribute==RUNASUSER_ATTRIBUTE) {
 			if (value) {
-				runasuser=new char[strlen(value)+1];
-				strcpy(runasuser,value);
+				runasuser=strdup(value);
 			} else {
 				runasuser=DEFAULT_RUNASUSER;
 			}
 		} else if (currentattribute==RUNASGROUP_ATTRIBUTE) {
 			if (value) {
-				runasgroup=new char[strlen(value)+1];
-				strcpy(runasgroup,value);
+				runasgroup=strdup(value);
 			} else {
 				runasgroup=DEFAULT_RUNASGROUP;
 			}
@@ -453,8 +448,7 @@ int	sqlrconfigfile::attributeValue(char *value) {
 			}
 		} else if (currentattribute==AUTHTIER_ATTRIBUTE) {
 			if (value) {
-				authtier=new char[strlen(value)+1];
-				strcpy(authtier,value);
+				authtier=strdup(value);
 			} else {
 				authtier=DEFAULT_AUTHTIER;
 			}
@@ -472,30 +466,26 @@ int	sqlrconfigfile::attributeValue(char *value) {
 			}
 		} else if (currentattribute==HANDOFF_ATTRIBUTE) {
 			if (value) {
-				handoff=new char[strlen(value)+1];
-				strcpy(handoff,value);
+				handoff=strdup(value);
 			} else {
 				handoff=DEFAULT_HANDOFF;
 			}
 			passdescriptor=strcmp(handoff,"pass")==0;
 		} else if (currentattribute==DENIEDIPS_ATTRIBUTE) {
 			if (value) {
-				deniedips=new char[strlen(value)+1];
-				strcpy(deniedips,value);
+				deniedips=strdup(value);
 			} else {
 				deniedips=DEFAULT_DENIEDIPS;
 			}
 		} else if (currentattribute==ALLOWEDIPS_ATTRIBUTE) {
 			if (value) {
-				allowedips=new char[strlen(value)+1];
-				strcpy(allowedips,value);
+				allowedips=strdup(value);
 			} else {
 				allowedips=DEFAULT_DENIEDIPS;
 			}
 		} else if (currentattribute==DEBUG_ATTRIBUTE) {
 			if (value) {
-				debug=new char[strlen(value)+1];
-				strcpy(debug,value);
+				debug=strdup(value);
 			} else {
 				debug=DEFAULT_DEBUG;
 			}
@@ -592,8 +582,7 @@ int	sqlrconfigfile::parse(const char *config, char *id,
 		filename=new char[strlen(homedir)+15+1];
 		sprintf(filename,"%s/.sqlrelay.conf",homedir);
 	} else {
-		filename=new char[16+1];
-		sprintf(filename,"~/.sqlrelay.conf");
+		filename=strdup("~/.sqlrelay.conf");
 	}
 
 	// see if the file exists before trying to parse it, don't worry about
@@ -627,15 +616,13 @@ usernode::~usernode() {
 
 void	usernode::setUser(const char *user) {
 	if (user) {
-		this->user=new char[strlen(user)+1];
-		strcpy(this->user,user);
+		this->user=strdup(user);
 	}
 }
 
 void	usernode::setPassword(const char *password) {
 	if (password) {
-		this->password=new char[strlen(password)+1];
-		strcpy(this->password,password);
+		this->password=strdup(password);
 	}
 }
 
@@ -676,15 +663,13 @@ connectstringnode::~connectstringnode() {
 
 void	connectstringnode::setConnectionId(const char *connectionid) {
 	if (connectionid) {
-		this->connectionid=new char[strlen(connectionid)+1];
-		strcpy(this->connectionid,connectionid);
+		this->connectionid=strdup(connectionid);
 	}
 }
 
 void	connectstringnode::setString(const char *string) {
 	if (string) {
-		this->string=new char[strlen(string)+1];
-		strcpy(this->string,string);
+		this->string=strdup(string);
 	}
 }
 

@@ -6,6 +6,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
+#include <rudiments/stringbuffer.h>
 #include <sqlrconfigfile.h>
 
 #include <stdio.h>
@@ -16,8 +17,8 @@ int	main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	commandline	*cmdline=new commandline(argc,argv);
-	sqlrconfigfile	*cfgfile=NULL;
+	commandline	cmdline(argc,argv);
+	sqlrconfigfile	cfgfile;
 	usernode	*currentnode=NULL;
 	char		*host;
 	int		port;
@@ -26,11 +27,11 @@ int	main(int argc, const char **argv) {
 	char		*password;
 	char		*table="";
 
-	char	*config=cmdline->value("-config");
+	char	*config=cmdline.value("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
-	char	*id=id=cmdline->value("-id");
+	char	*id=id=cmdline.value("-id");
 
 	if (!(id && id[0])) {
 
@@ -51,14 +52,13 @@ int	main(int argc, const char **argv) {
 
 	} else {
 
-		cfgfile=new sqlrconfigfile();
-		if (cfgfile->parse(config,id)) {
+		if (cfgfile.parse(config,id)) {
 
 			// get the host/port/socket/username/password
 			host="localhost";
-			port=cfgfile->getPort();
-			socket=cfgfile->getUnixPort();
-			currentnode=cfgfile->getUsers();
+			port=cfgfile.getPort();
+			socket=cfgfile.getUnixPort();
+			currentnode=cfgfile.getUsers();
 			user=currentnode->getUser();
 			password=currentnode->getPassword();
 
@@ -72,36 +72,27 @@ int	main(int argc, const char **argv) {
 				break;
 			}
 		} else {
-			delete cfgfile;
-			delete cmdline;
 			exit(1);
 		}
 	}
 
-	sqlrconnection	*sqlrcon=new sqlrconnection(host,port,socket,
-						user,password,0,1);
-	sqlrcursor	*sqlrcur=new sqlrcursor(sqlrcon);
-	char	*query=new char[14+strlen(table)+15+1];
-	sprintf(query,"select * from %s where rownum=1",table);
-	sqlrcur->sendQuery(query);
-	sqlrcon->endSession();
-	delete[] query;
+	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
+	sqlrcursor	sqlrcur(&sqlrcon);
 
-	for (int j=0; j<sqlrcur->colCount(); j++) {
-		printf("%s",sqlrcur->getColumnName(j));
-		if (j<sqlrcur->colCount()-1) {
+	stringbuffer	query;
+	query.append("select * from ");
+	query.append(table);
+	query.append(" where rownum=1");
+
+	sqlrcur.sendQuery(query.getString());
+	sqlrcon.endSession();
+
+	for (int j=0; j<sqlrcur.colCount(); j++) {
+		printf("%s",sqlrcur.getColumnName(j));
+		if (j<sqlrcur.colCount()-1) {
 			printf(",");
 		}
 	}
-
-	if (cfgfile) {
-		delete cfgfile;
-	}
-	if (cmdline) {
-		delete cmdline;
-	}
-	delete sqlrcur;
-	delete sqlrcon;
 
 	exit(0);
 }

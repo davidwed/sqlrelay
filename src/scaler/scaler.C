@@ -49,16 +49,15 @@ int	scaler::initScaler(int argc, const char **argv) {
 	init=1;
 
 	// read the commandline
-	commandline	*cmdl=new commandline(argc,argv);
+	commandline	cmdl(argc,argv);
 
 	// get the id
-	char	*tmpid=cmdl->value("-id");
+	char	*tmpid=cmdl.value("-id");
 	if (!(tmpid && tmpid[0])) {
 		tmpid=DEFAULT_ID;
 		fprintf(stderr,"Warning! using default id.\n");
 	}
-	id=new char[strlen(tmpid)+1];
-	strcpy(id,tmpid);
+	id=strdup(tmpid);
 
 	// check for listener's pid file
 	char	*listenerpidfile=new char[tmpdirlen+15+strlen(id)+1];
@@ -72,7 +71,6 @@ int	scaler::initScaler(int argc, const char **argv) {
 		fprintf(stderr,"sqlr-listener is not running.\n");
 		fprintf(stderr,"	The sqlr-listener must be running ");
 		fprintf(stderr,"for the sqlr-scaler to start.\n\n");
-		delete cmdl;
 		delete[] listenerpidfile;
 		return 0;
 	}
@@ -93,18 +91,17 @@ int	scaler::initScaler(int argc, const char **argv) {
 		fprintf(stderr,"the file and restart.\n");
 		delete[] pidfile;
 		pidfile=NULL;
-		delete cmdl;
 		return 0;
 	}
 	createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// check for debug
-	if (cmdl->found("-debug")) {
+	if (cmdl.found("-debug")) {
 		debug=1;
 	}
 
 	// get the config file
-	char	*tmpconfig=cmdl->value("-config");
+	char	*tmpconfig=cmdl.value("-config");
 	if (!(tmpconfig && tmpconfig[0])) {
 		tmpconfig=DEFAULT_CONFIG_FILE;
 	}
@@ -134,8 +131,7 @@ int	scaler::initScaler(int argc, const char **argv) {
 		ttl=cfgfile->getTtl();
 
 		// get the database type
-		dbase=new char[strlen(cfgfile->getDbase())+1];
-		strcpy(dbase,cfgfile->getDbase());
+		dbase=strdup(cfgfile->getDbase());
 
 		// get the list of connect strings
 		connectstringlist=cfgfile->getConnectStrings();
@@ -165,9 +161,6 @@ int	scaler::initScaler(int argc, const char **argv) {
 
 	// set up random number generator
 	currentseed=time(NULL);
-
-	// clean up
-	delete cmdl;
 
 	// detach from the controlling tty
 	detach();

@@ -235,7 +235,7 @@ int	interbasecursor::prepareQuery(const char *query, long length) {
 
 	// get the cursor type
 	char	typeitem[]={isc_info_sql_stmt_type};
-	char	*resbuffer=new char[1024];
+	char	resbuffer[1024];
 	if (isc_dsql_sql_info(interbaseconn->error,&stmt,
 				sizeof(typeitem),typeitem,
 				1024,resbuffer)) {

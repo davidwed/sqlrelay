@@ -109,23 +109,14 @@ class	sqlrsh {
 
 void	sqlrsh::systemRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 						environment *env) {
-
-	// build file name
-	char	*systemrcfile=new char[strlen(SYSTEM_SQLRSHRC)+1];
-	sprintf(systemrcfile,"%s",SYSTEM_SQLRSHRC);
-
-	// process the file
-	runScript(sqlrcon,sqlrcur,env,systemrcfile,0);
-
-	// clean up
-	delete[] systemrcfile;
+	runScript(sqlrcon,sqlrcur,env,SYSTEM_SQLRSHRC,0);
 }
 
 void	sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 						environment *env) {
 
 	// get user's home directory
-	char	*home=home=getenv("HOME");
+	char	*home=getenv("HOME");
 	if (!home) {
 		home="~";
 	}
@@ -151,16 +142,13 @@ void	sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		while (1) {
 		
 			// get a command
-			stringbuffer	*command=new stringbuffer();
-			if (!getCommandFromFile(scriptfile,command)) {
+			stringbuffer	command;
+			if (!getCommandFromFile(scriptfile,&command)) {
 				break;
 			}
 
 			// run the command
-			runCommand(sqlrcon,sqlrcur,env,command->getString());
-
-			// clean up
-			delete command;
+			runCommand(sqlrcon,sqlrcur,env,command.getString());
 		}
 
 		// close the file
@@ -169,10 +157,9 @@ void	sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 		// error message
 		if (returnerror) {
-			char	*errmesg=new char[20+strlen(file)+1];
-			sprintf(errmesg,"Couldn't open file: %s",file);
-			error(errmesg);
-			delete[] errmesg;
+			stringbuffer	errmesg;
+			errmesg.append("Couldn't open file: ")->append(file);
+			error(errmesg.getString());
 		}
 	}
 }
@@ -592,10 +579,10 @@ void	sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		#ifdef HAVE_READLINE
 			int	done=0;
 			while (!done) {
-				stringbuffer	*prmpt=new stringbuffer();
-				prmpt->append((long)promptcount);
-				prmpt->append("> ");
-				char	*cmd=readline(prmpt->getString());
+				stringbuffer	prmpt;
+				prmpt.append((long)promptcount);
+				prmpt.append("> ");
+				char	*cmd=readline(prmpt.getString());
 				if (cmd[0]) {
 					text::rightTrim(cmd);
 					add_history(cmd);
@@ -619,7 +606,6 @@ void	sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					command->append(" ");
 				}
 				delete[] cmd;
-				delete prmpt;
 			}
 		#else
 			prompt(promptcount);
@@ -665,8 +651,8 @@ void	sqlrsh::error(const char *errstring) {
 void	sqlrsh::execute(int argc, const char **argv) {
 
 
-	commandline	*cmdline=new commandline(argc,argv);
-	sqlrconfigfile	*cfgfile=NULL;
+	commandline	cmdline(argc,argv);
+	sqlrconfigfile	cfgfile;
 	usernode	*currentnode=NULL;
 	char		*host;
 	int		port;
@@ -675,11 +661,11 @@ void	sqlrsh::execute(int argc, const char **argv) {
 	char		*password;
 	char		*script=NULL;
 
-	char	*config=cmdline->value("-config");
+	char	*config=cmdline.value("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
-	char	*id=cmdline->value("-id");
+	char	*id=cmdline.value("-id");
 
 	if (!(id && id[0])) {
 
@@ -702,19 +688,16 @@ void	sqlrsh::execute(int argc, const char **argv) {
 
 	} else {
 
-		cfgfile=new sqlrconfigfile();
-		if (cfgfile->parse(config,id)) {
+		if (cfgfile.parse(config,id)) {
 
 			// get the host/port/socket/username/password
 			host="localhost";
-			port=cfgfile->getPort();
-			socket=cfgfile->getUnixPort();
-			currentnode=cfgfile->getUsers();
+			port=cfgfile.getPort();
+			socket=cfgfile.getUnixPort();
+			currentnode=cfgfile.getUsers();
 			user=currentnode->getUser();
 			password=currentnode->getPassword();
 		} else {
-			delete cfgfile;
-			delete cmdline;
 			return;
 		}
 
@@ -730,16 +713,15 @@ void	sqlrsh::execute(int argc, const char **argv) {
 	}
 
 	// connect to sql relay
-	sqlrconnection	*sqlrcon=new sqlrconnection(host,port,socket,
-							user,password,0,1);
-	sqlrcursor	*sqlrcur=new sqlrcursor(sqlrcon);
+	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
+	sqlrcursor	sqlrcur(&sqlrcon);
 
 	// set up an environment
-	environment	*env=new environment();
+	environment	env;
 
 	// process RC files
-	systemRcFile(sqlrcon,sqlrcur,env);
-	userRcFile(sqlrcon,sqlrcur,env);
+	systemRcFile(&sqlrcon,&sqlrcur,&env);
+	userRcFile(&sqlrcon,&sqlrcur,&env);
 
 
 	#ifdef HAVE_READLINE
@@ -761,10 +743,10 @@ void	sqlrsh::execute(int argc, const char **argv) {
 
 	// if a script was specified, run it otherwise go into interactive mode
 	if (script) {
-		runScript(sqlrcon,sqlrcur,env,script,1);
+		runScript(&sqlrcon,&sqlrcur,&env,script,1);
 	} else {
-		startupMessage(env,host,port,user);
-		interactWithUser(sqlrcon,sqlrcur,env);
+		startupMessage(&env,host,port,user);
+		interactWithUser(&sqlrcon,&sqlrcur,&env);
 	}
 
 	// clean up
@@ -775,17 +757,6 @@ void	sqlrsh::execute(int argc, const char **argv) {
 			delete[] filename;
 		}
 	#endif
-
-
-	if (cfgfile) {
-		delete cfgfile;
-	}
-	if (cmdline) {
-		delete cmdline;
-	}
-	delete sqlrcur;
-	delete sqlrcon;
-	delete env;
 }
 
 void	sqlrsh::setColor(environment *env, int value) {

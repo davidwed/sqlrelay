@@ -155,15 +155,14 @@ int	oracle7connection::rollback() {
 
 int	oracle7connection::ping() {
 	int	retval=0;
-	oracle7cursor	*cur=new oracle7cursor(this);
-	if (cur->openCursor(-1) && 
-		cur->prepareQuery("select 1 from dual",18) && 
-		cur->executeQuery("select 1 from dual",18,1)) {
-		cur->cleanUpData();
-		cur->closeCursor();
+	oracle7cursor	cur(this);
+	if (cur.openCursor(-1) && 
+		cur.prepareQuery("select 1 from dual",18) && 
+		cur.executeQuery("select 1 from dual",18,1)) {
+		cur.cleanUpData();
+		cur.closeCursor();
 		retval=1;
 	}
-	delete cur;
 	return retval;
 }
 

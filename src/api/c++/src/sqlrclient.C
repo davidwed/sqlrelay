@@ -311,14 +311,13 @@ int	sqlrconnection::getNewPort() {
 	} else {
 
 		// if size is too big, return an error
-		stringbuffer	*errstr=new stringbuffer();
-		errstr->append("The pathname of the unix port was too long: ");
-		errstr->append((long)size);
-		errstr->append(" bytes.  The maximum size is ");
-		errstr->append((long)MAXPATHLEN);
-		errstr->append(" bytes.");
-		setError(errstr->getString());
-		delete errstr;
+		stringbuffer	errstr;
+		errstr.append("The pathname of the unix port was too long: ");
+		errstr.append((long)size);
+		errstr.append(" bytes.  The maximum size is ");
+		errstr.append((long)MAXPATHLEN);
+		errstr.append(" bytes.");
+		setError(errstr.getString());
 		return 0;
 
 	}
@@ -784,20 +783,19 @@ int	sqlrconnection::openSession() {
 
 			// handle failure to connect to database 
 			// connection daemon
-			stringbuffer	*errstr=new stringbuffer();
-			errstr->append("Couldn't connect to the database");
-			errstr->append("connection daemon.\n");
+			stringbuffer	errstr;
+			errstr.append("Couldn't connect to the database");
+			errstr.append("connection daemon.\n");
 			if (connectionunixport) {
-				errstr->append("Tried unix port ");
-				errstr->append((long)connectionunixport);
+				errstr.append("Tried unix port ");
+				errstr.append((long)connectionunixport);
 			}
 			if (connectioninetport) {
-				errstr->append("Tried inet port ");
-				errstr->append((long)connectioninetport);
+				errstr.append("Tried inet port ");
+				errstr.append((long)connectioninetport);
 			}
-			errstr->append("\n");
-			setError(errstr->getString());
-			delete errstr;
+			errstr.append("\n");
+			setError(errstr.getString());
 			return 0;
 		}
 	}
@@ -3620,7 +3618,7 @@ int	sqlrcursor::executeQuery() {
 	} else {
 
 		// perform substitutions
-		stringbuffer	*container=new stringbuffer();
+		stringbuffer	container;
 		char		*ptr=queryptr;
 		int		found=0;
 		int		inquotes=0;
@@ -3680,15 +3678,15 @@ int	sqlrcursor::executeQuery() {
 					// out the contents of the buffer
 					if (!bptr || 
 						(bptr && !strcmp(bptr,"''"))) {
-						container->append(" is NULL ");
+						container.append(" is NULL ");
 					} else {
-						container->append(
+						container.append(
 							braces->getString());
 					}
 				} else {
 					// if we don't find an equals sign, 
 					// then write the contents out directly
-					container->append(braces->getString());
+					container.append(braces->getString());
 				}
 				delete braces;
 				inbraces=0;
@@ -3716,7 +3714,7 @@ int	sqlrcursor::executeQuery() {
 								braces,i);
 						} else {
 							performSubstitution(
-								container,i);
+								&container,i);
 						}
 						ptr=ptr+3+len;
 						found=1;
@@ -3729,7 +3727,7 @@ int	sqlrcursor::executeQuery() {
 					if (inbraces) {
 						braces->append("$(");
 					} else {
-						container->append("$(");
+						container.append("$(");
 					}
 					ptr=ptr+2;
 				}
@@ -3740,7 +3738,7 @@ int	sqlrcursor::executeQuery() {
 				if (inbraces) {
 					braces->append(*ptr);
 				} else {
-					container->append(*ptr);
+					container.append(*ptr);
 				}
 				ptr++;
 			}
@@ -3748,15 +3746,12 @@ int	sqlrcursor::executeQuery() {
 
 		// validate the bind variables
 		if (validatebinds) {
-			validateBindsInternal(container->getString());
+			validateBindsInternal(container.getString());
 		}
 
 		// run the query
-		querylen=strlen(container->getString());
-		retval=runQuery(container->getString());
-
-		// clean up
-		delete container;
+		querylen=strlen(container.getString());
+		retval=runQuery(container.getString());
 	}
 
 	// set up to re-execute the same query if executeQuery is called
@@ -3883,25 +3878,23 @@ int	sqlrcursor::openCachedResultSet(const char *filename) {
 
 			// if the test above failed, the file is either not
 			// a cache file or is corrupt
-			stringbuffer	*errstr=new stringbuffer();
-			errstr->append("File ");
-			errstr->append(filename);
-			errstr->append(" is either corrupt");
-			errstr->append(" or not a cache file.");
-			setError(errstr->getString());
-			delete errstr;
+			stringbuffer	errstr;
+			errstr.append("File ");
+			errstr.append(filename);
+			errstr.append(" is either corrupt");
+			errstr.append(" or not a cache file.");
+			setError(errstr.getString());
 		}
 
 	} else {
 
 		// if we couldn't open the file, set the error message
-		stringbuffer	*errstr=new stringbuffer();
-		errstr->append("Couldn't open ");
-		errstr->append(filename);
-		errstr->append(" and ");
-		errstr->append(indexfilename);
-		setError(errstr->getString());
-		delete errstr;
+		stringbuffer	errstr;
+		errstr.append("Couldn't open ");
+		errstr.append(filename);
+		errstr.append(" and ");
+		errstr.append(indexfilename);
+		setError(errstr.getString());
 	}
 
 	// don't need this anymore
