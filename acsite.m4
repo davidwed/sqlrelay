@@ -1506,8 +1506,6 @@ then
 
 	HAVE_PYTHON=""
 	PYTHONINCLUDES=""
-	PYTHONLIBS=""
-	PYTHONOBJ=""
 	PYTHONDIR=""
 	PYTHONVERSION=""
 
@@ -1529,25 +1527,12 @@ then
 					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
 				fi
 		
-				if ( test -r "$PYTHONPATH/lib/python$i/config/python.o" -a -r "$PYTHONPATH/lib/python$i/config/libpython$i.a" )
-				then
-					PYTHONLIBS="-L$PYTHONPATH/lib/python$i/config -lpython$i"
-					PYTHONOBJ="$PYTHONPATH/lib/python$i/config/python.o"
-		
-				else
-					if ( test -r "$PYTHONPATH/lib/python$i/config/ccpython.o" -a -r "$PYTHONPATH/lib/python$i/config/libpython$i.a" )
-					then
-					PYTHONLIBS="-L$PYTHONPATH/lib/python$i/config -lpython$i"
-					PYTHONOBJ="$PYTHONPATH/lib/python$i/config/ccpython.o"
-					fi
-				fi
-			
 				if ( test -d "$PYTHONPATH/lib/python$i" )
 				then
 					PYTHONDIR="$PYTHONPATH/lib/python$i"
 				fi
 		
-				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONDIR" )
+				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 				then
 					PYTHONVERSION="$i"
 					break
@@ -1570,25 +1555,6 @@ then
 					fi
 				done
 			
-				for i in "/usr/lib/python$j/config" "/usr/local/lib/python$j/config" "/usr/pkg/lib/python$j/config" "/usr/local/python$j/lib/python$j/config" "/opt/sfw/lib/python$j/config"
-				do
-					if ( test -r "$i/python.o" -a -r "$i/libpython$j.a" )
-					then
-						PYTHONLIBS="-L$i -lpython$j"
-						PYTHONOBJ="$i/python.o"
-					else
-						if ( test -r "$i/ccpython.o" -a -r "$i/libpython$j.a" )
-						then
-							PYTHONLIBS="-L$i/config -lpython$j"
-							PYTHONOBJ="$i/config/ccpython.o"
-						fi
-					fi
-					if ( test -n "$PYTHONLIBS" )
-					then
-						break
-					fi
-				done
-			
 				for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"
 				do
 					if ( test -d "$i" )
@@ -1600,7 +1566,7 @@ then
 						break
 					fi
 				done
-				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONDIR" )
+				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 				then
 					PYTHONVERSION="$j"
 					break
@@ -1609,7 +1575,7 @@ then
 		
 		fi
 		
-		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONOBJ" -a -n "$PYTHONDIR" )
+		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 		then
 			HAVE_PYTHON="yes"
 		else
@@ -1619,12 +1585,9 @@ then
 
 	FW_VERSION(python,[$PYTHONVERSION])
 	FW_INCLUDES(python,[$PYTHONINCLUDES])
-	FW_LIBS(python,[$PYTHONLIBS])
 
 	AC_SUBST(HAVE_PYTHON)
 	AC_SUBST(PYTHONINCLUDES)
-	AC_SUBST(PYTHONLIBS)
-	AC_SUBST(PYTHONOBJ)
 	AC_SUBST(PYTHONDIR)
 	AC_SUBST(PYTHONVERSION)
 fi
