@@ -222,6 +222,10 @@ run on a different machine than it's clients, "pass" is substantially faster
 than "reconnect" and more lightweight in any case.  It should be used if
 possible.</p>
 
+<p><b>Note:</b> Due to design constraints, if an instance is configured with
+maxconnections &gt; connections and growby is &gt; zero then the handoff
+method is forced to be "reconnect" even if it's configured to be "pass".</p>
+
 <span class="heading2">Debug</span><br><br>
 
 <p>If the debug attribute is not set to "none", when <b>sqlr-start</b> is run,
