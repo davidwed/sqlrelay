@@ -19,6 +19,9 @@
 #endif
 
 extern "C" {
+	#ifdef __CYGWIN__
+		#define _int64 long long
+	#endif
 	#include <oci.h>
 
 	#define VARCHAR2_TYPE 1
