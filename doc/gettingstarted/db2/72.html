@@ -63,6 +63,18 @@ comment out the line:</p>
 <b>rpm -qa | grep rpm 1>/dev/null 2>/dev/null</b>
 </blockquote>
 
+<p>If you're installing on a computer that gets moved around a lot (such as a
+laptop) and gets assigned more than 1 hostname, you should set the hostname
+to localhost now using the following command:</p>
+
+<blockquote>
+<b>hostname localhost</b>
+</blockquote>
+
+<p>The installer will name the database after whatever hostname your computer
+currently has.  This will cause the database to be inaccessible when that
+hostname doesn't resolve or resolves to a computer other than yours.</p>
+
 <p>Run the db2_install script.</p>
 
 <p>When prompted to specify a keyword, type DB2.EENT and press return.</p>
