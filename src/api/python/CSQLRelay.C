@@ -33,7 +33,9 @@ static PyObject *sqlrcon_free(PyObject *self, PyObject *args) {
   long sqlrcon;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   delete ((sqlrconnection *)sqlrcon);
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", 0);
 }
 
@@ -41,7 +43,9 @@ static PyObject *endSession(PyObject *self, PyObject *args) {
   long sqlrcon;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   ((sqlrconnection *)sqlrcon)->endSession();
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", 0);
 }
 
@@ -50,7 +54,9 @@ static PyObject *suspendSession(PyObject *self, PyObject *args) {
   int rc;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->suspendSession();
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", rc);
 }
 
@@ -79,7 +85,9 @@ static PyObject *resumeSession(PyObject *self, PyObject *args) {
   int rc;
   if (!PyArg_ParseTuple(args, "lis", &sqlrcon, &port, &socket))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->resumeSession(port,socket);
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", rc);
 }
 
@@ -186,7 +194,9 @@ static PyObject *sqlrcur_free(PyObject *self, PyObject *args) {
   long sqlrcur;
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   delete ((sqlrcursor *)sqlrcur);
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", 0);
 }
 
@@ -347,7 +357,9 @@ static PyObject *prepareFileQuery(PyObject *self, PyObject *args) {
   int rc;
   if (!PyArg_ParseTuple(args, "lss", &sqlrcur, &path, &file))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->prepareFileQuery(path, file);
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", rc);
 }
 
@@ -555,7 +567,9 @@ static PyObject *fetchFromBindCursor(PyObject *self, PyObject *args) {
   int rc;
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->fetchFromBindCursor();
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", rc);
 }
 
@@ -698,6 +712,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
   PyObject *col;
   if (!PyArg_ParseTuple(args, "liO", &sqlrcur, &row, &col))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getField(row, PyString_AsString(col));
     rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyString_AsString(col));
@@ -705,6 +720,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
     rc=((sqlrcursor *)sqlrcur)->getField(row, PyInt_AsLong(col));
     rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyInt_AsLong(col));
   }
+  Py_END_ALLOW_THREADS
   if (!rc) {
     return Py_None;
   }
@@ -718,11 +734,13 @@ static PyObject *getFieldAsLong(PyObject *self, PyObject *args) {
   PyObject *col;
   if (!PyArg_ParseTuple(args, "liO", &sqlrcur, &row, &col))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getFieldAsLong(row, PyString_AsString(col));
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getFieldAsLong(row, PyInt_AsLong(col));
   }
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("l", rc);
 }
 
@@ -733,11 +751,13 @@ static PyObject *getFieldAsDouble(PyObject *self, PyObject *args) {
   PyObject *col;
   if (!PyArg_ParseTuple(args, "liO", &sqlrcur, &row, &col))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getFieldAsDouble(row, PyString_AsString(col));
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getFieldAsDouble(row, PyInt_AsLong(col));
   }
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("d", rc);
 }
 
@@ -748,11 +768,13 @@ static PyObject *getFieldLength(PyObject *self, PyObject *args) {
   PyObject *col;
   if (!PyArg_ParseTuple(args, "liO", &sqlrcur, &row, &col))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyString_AsString(col));
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyInt_AsLong(col));
   }
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("l", rc);
 }
 
@@ -765,7 +787,9 @@ _get_row(sqlrcursor *sqlrcur, int row)
   PyObject *my_list;
   num_cols=sqlrcur->colCount();
   my_list =  PyList_New(num_cols);
+  Py_BEGIN_ALLOW_THREADS
   row_data=sqlrcur->getRow(row);
+  Py_END_ALLOW_THREADS
   if (!row_data) {
     return Py_None;
   }
@@ -804,7 +828,9 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     return NULL;
   my_dictionary=PyDict_New();
   for (counter=0; counter<((sqlrcursor *)sqlrcur)->colCount(); counter++) {
+    Py_BEGIN_ALLOW_THREADS
     field=((sqlrcursor *)sqlrcur)->getField(row,counter);
+    Py_END_ALLOW_THREADS
     name=((sqlrcursor *)sqlrcur)->getColumnName(counter);
     if (isNumberTypeChar(((sqlrcursor *)sqlrcur)->getColumnType(counter))) {
       if (!strchr(field,'.')) {
@@ -851,7 +877,9 @@ _get_row_lengths(sqlrcursor *sqlrcur, int row)
   PyObject *my_list;
   num_cols=sqlrcur->colCount();
   my_list =  PyList_New(num_cols);
+  Py_BEGIN_ALLOW_THREADS
   row_data=sqlrcur->getRowLengths(row);
+  Py_END_ALLOW_THREADS
   if (!row_data) {
     return Py_None;
   }
@@ -881,9 +909,11 @@ static PyObject *getRowLengthsDictionary(PyObject *self, PyObject *args) {
     return NULL;
   my_dictionary=PyDict_New();
   for (int counter=0; counter<((sqlrcursor *)sqlrcur)->colCount(); counter++) {
+    Py_BEGIN_ALLOW_THREADS
     PyDict_SetItem(my_dictionary,
         Py_BuildValue("s",((sqlrcursor *)sqlrcur)->getColumnName(counter)),
         Py_BuildValue("i",((sqlrcursor *)sqlrcur)->getFieldLength(row,counter)));
+    Py_END_ALLOW_THREADS
   }
   return my_dictionary;
 }
@@ -1132,7 +1162,9 @@ static PyObject *suspendResultSet(PyObject *self, PyObject *args) {
   long sqlrcur;
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   ((sqlrcursor *)sqlrcur)->suspendResultSet();
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", 0);
 }
 
@@ -1142,7 +1174,9 @@ static PyObject *resumeResultSet(PyObject *self, PyObject *args) {
   int id;
   if (!PyArg_ParseTuple(args, "li", &sqlrcur, &id))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->resumeResultSet(id);
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", rc);
 }
 
@@ -1153,7 +1187,9 @@ static PyObject *resumeCachedResultSet(PyObject *self, PyObject *args) {
   char *filename;
   if (!PyArg_ParseTuple(args, "lis", &sqlrcur, &id, &filename))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->resumeCachedResultSet(id,filename);
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", rc);
 }
 
@@ -1163,7 +1199,9 @@ static PyObject *getOutputBindCursorId(PyObject *self, PyObject *args) {
   char *variable;
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->getOutputBindCursorId(variable);
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", rc);
 }
 
@@ -1172,7 +1210,9 @@ static PyObject *attachToBindCursor(PyObject *self, PyObject *args) {
   int bindcursorid;
   if (!PyArg_ParseTuple(args, "li", &sqlrcur, &bindcursorid))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   ((sqlrcursor *)sqlrcur)->attachToBindCursor(bindcursorid);
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", 0);
 }
 

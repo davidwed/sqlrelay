@@ -2,6 +2,8 @@
 	configure script detects various odbc function paramters, uses them to
 		build odbc connection
 	applied Matthias Klose's freetds patchlevel patch
+	added Py_BEGIN_ALLOW_THREADS/Py_END_ALLOW_THREADS in various places
+		in CSQLRelay.C
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch
