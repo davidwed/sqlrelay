@@ -66,11 +66,11 @@ sqlrcursor::getCacheFileName()
 void
 sqlrcursor::cacheOff()
 
-int
+bool
 sqlrcursor::sendQuery(query)
 		char *query
 
-int
+bool
 sqlrcursor::sendQueryWithLength(query,length)
 		char *query
 		int length
@@ -79,7 +79,7 @@ sqlrcursor::sendQueryWithLength(query,length)
 	OUTPUT:
 		RETVAL
 
-int
+bool
 sqlrcursor::sendFileQuery(path,file)
 		char *path
 		char *file
@@ -96,7 +96,7 @@ sqlrcursor::prepareQueryWithLength(query,length)
 		THIS->prepareQuery(query,length);
 		
 
-int
+bool
 sqlrcursor::prepareFileQuery(path,file)
 		char *path
 		char *file
@@ -154,10 +154,10 @@ sqlrcursor::inputBindClob(variable,value,size)
 void
 sqlrcursor::validateBinds()
 
-int
+bool
 sqlrcursor::executeQuery()
 
-int
+bool
 sqlrcursor::fetchFromBindCursor()
 
 void
@@ -221,7 +221,7 @@ sqlrcursor::getOutputBindCursor(variable)
 	OUTPUT:
 		RETVAL
 
-int
+bool
 sqlrcursor::openCachedResultSet(filename)
 	char	*filename
 
@@ -240,7 +240,7 @@ sqlrcursor::affectedRows()
 int
 sqlrcursor::firstRowIndex()
 
-int
+bool
 sqlrcursor::endOfResultSet()
 
 char *
@@ -501,11 +501,11 @@ sqlrcursor::getResultSetId()
 void
 sqlrcursor::suspendResultSet()
 
-int
+bool
 sqlrcursor::resumeResultSet(id)
 		int id
 
-int
+bool
 sqlrcursor::resumeCachedResultSet(id,filename)
 		int id
 		char *filename

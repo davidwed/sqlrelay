@@ -281,7 +281,7 @@ __END__
         openCachedResultSet(filename);
             # Opens a cached result set as if a query that
             # would have generated it had been executed.
-            # Returns 1 on success and 0 on failure.
+            # Returns true on success and false on failure.
 
 
 
@@ -316,9 +316,9 @@ __END__
             # result set at a time.
 
         endOfResultSet();
-            # Returns 0 if part of the result set is still
-            # pending on the server and 1 if not.  This
-            # method can only return 0 if 
+            # Returns false if part of the result set is still
+            # pending on the server and true if not.  This
+            # method can only return false if 
             # setResultSetBufferSize() has been called
             # with a parameter other than 0.
 
@@ -450,13 +450,13 @@ __END__
         resumeResultSet(int id);
             # Resumes a result set previously left open 
             # using suspendSession().
-            # Returns 1 on success and 0 on failure.
+            # Returns true on success and false on failure.
 
         resumeCachedResultSet(int id, char *filename);
             # Resumes a result set previously left open
             # using suspendSession() and continues caching
             # the result set to "filename".
-            # Returns 1 on success and 0 on failure.
+            # Returns true on success and false on failure.
 
 =head1 AUTHOR
 

@@ -48,6 +48,18 @@ class db2 {
 		}
 	}
 	
+	private static void checkSuccess(boolean value, int success) {
+	
+		if (((value)?1:0)==success) {
+			System.out.println("success ");
+		} else {
+			System.out.println("failure ");
+			
+			
+			System.exit(0);
+		}
+	}
+	
 	public static void	main(String[] args) {
 	
 		String	dbtype;

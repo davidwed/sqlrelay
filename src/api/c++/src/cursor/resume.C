@@ -5,11 +5,11 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-int sqlrcursor::resumeResultSet(int id) {
+bool sqlrcursor::resumeResultSet(int id) {
 	return resumeCachedResultSet(id,NULL);
 }
 
-int sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
+bool sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
 
 	if (!endofresultset && !suspendresultsetsent) {
 		abortResultSet();
@@ -17,7 +17,7 @@ int sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
 	clearResultSet();
 
 	if (!sqlrc->connected) {
-		return 0;
+		return false;
 	}
 
 	cached=false;
@@ -45,12 +45,12 @@ int sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
 	}
 	if (rsbuffersize) {
 		if (processResultSet(firstrowindex+rsbuffersize-1)) {
-			return 1;
+			return true;
 		}
 	} else {
 		if (processResultSet(-1)) {
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }

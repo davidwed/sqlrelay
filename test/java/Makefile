@@ -2,11 +2,6 @@ top_builddir = ../..
 
 include ../../config.mk
 
-clean:
-	$(LIBTOOL) --mode=clean $(RM) *.class
-	$(LIBTOOL) --mode=clean $(RM) cachefile*
-	$(LIBTOOL) --mode=clean $(RM) sqlnet.log
-
 all:
 ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) db2.class
@@ -41,6 +36,11 @@ endif
 ifneq ($(strip $(SYBASELIBS)),)
 	$(MAKE) sybase.class
 endif
+
+clean:
+	$(LIBTOOL) --mode=clean $(RM) *.class
+	$(LIBTOOL) --mode=clean $(RM) cachefile*
+	$(LIBTOOL) --mode=clean $(RM) sqlnet.log
 
 db2.class: db2.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir) db2.java

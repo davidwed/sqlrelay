@@ -106,25 +106,25 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_cacheOff
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    sendQuery
- * Signature: (Ljava/lang/String;)I
+ * Signature: (Ljava/lang/String;)Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_sendQuery__Ljava_lang_String_2
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_sendQuery__Ljava_lang_String_2
   (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    sendQuery
- * Signature: (Ljava/lang/String;I)I
+ * Signature: (Ljava/lang/String;I)Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_sendQuery__Ljava_lang_String_2I
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_sendQuery__Ljava_lang_String_2I
   (JNIEnv *, jobject, jstring, jint);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    sendFileQuery
- * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_sendFileQuery
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_sendFileQuery
   (JNIEnv *, jobject, jstring, jstring);
 
 /*
@@ -146,9 +146,9 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_prepareQuery__Lja
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    prepareFileQuery
- * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_prepareFileQuery
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_prepareFileQuery
   (JNIEnv *, jobject, jstring, jstring);
 
 /*
@@ -322,17 +322,17 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_validateBinds
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    executeQuery
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_executeQuery
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_executeQuery
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    fetchFromBindCursor
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_fetchFromBindCursor
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_fetchFromBindCursor
   (JNIEnv *, jobject);
 
 /*
@@ -378,9 +378,9 @@ JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindLen
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    openCachedResultSet
- * Signature: (Ljava/lang/String;)I
+ * Signature: (Ljava/lang/String;)Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_openCachedResultSet
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_openCachedResultSet
   (JNIEnv *, jobject, jstring);
 
 /*
@@ -426,9 +426,9 @@ JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_firstRowIndex
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    endOfResultSet
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_endOfResultSet
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_endOfResultSet
   (JNIEnv *, jobject);
 
 /*
@@ -794,17 +794,17 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_suspendResultSet
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    resumeResultSet
- * Signature: (I)I
+ * Signature: (I)Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_resumeResultSet
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_resumeResultSet
   (JNIEnv *, jobject, jint);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    resumeCachedResultSet
- * Signature: (ILjava/lang/String;)I
+ * Signature: (ILjava/lang/String;)Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_resumeCachedResultSet
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_resumeCachedResultSet
   (JNIEnv *, jobject, jint, jstring);
 
 /*

@@ -26,9 +26,9 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_endSession
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    suspendSession
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_suspendSession
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_suspendSession
   (JNIEnv *, jobject);
 
 /*
@@ -50,17 +50,17 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnect
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    resumeSession
- * Signature: (ILjava/lang/String;)I
+ * Signature: (ILjava/lang/String;)Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_resumeSession
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_resumeSession
   (JNIEnv *, jobject, jint, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    ping
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_ping
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_ping
   (JNIEnv *, jobject);
 
 /*
@@ -74,33 +74,33 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_identify
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    autoCommitOn
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_autoCommitOn
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_autoCommitOn
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    autoCommitOff
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_autoCommitOff
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_autoCommitOff
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    commit
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_commit
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_commit
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    rollback
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_rollback
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_rollback
   (JNIEnv *, jobject);
 
 /*
@@ -122,9 +122,9 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_debugOff
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    getDebug
- * Signature: ()I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getDebug
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getDebug
   (JNIEnv *, jobject);
 
 /*

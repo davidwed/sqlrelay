@@ -34,7 +34,7 @@ sqlrconnection::DESTROY()
 void
 sqlrconnection::endSession()
 
-int
+bool
 sqlrconnection::suspendSession()
 
 int
@@ -43,24 +43,24 @@ sqlrconnection::getConnectionPort()
 char *
 sqlrconnection::getConnectionSocket()
 
-int
+bool
 sqlrconnection::resumeSession(port,socket)
 		int	port
 		char	*socket
 
-int
+bool
 sqlrconnection::ping()
 
-int
+bool
 sqlrconnection::autoCommitOn()
 
-int
+bool
 sqlrconnection::autoCommitOff()
 
-int
+bool
 sqlrconnection::commit()
 
-int
+bool
 sqlrconnection::rollback()
 
 char *
@@ -72,5 +72,5 @@ sqlrconnection::debugOn()
 void
 sqlrconnection::debugOff()
 
-int
+bool
 sqlrconnection::getDebug()

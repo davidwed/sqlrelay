@@ -6,7 +6,7 @@
 	added fixup socket to listener so forked clients can retrieve the
 		handoff socket from a newly spawned database connection, this
 		makes it possible to use scaling and handoff=pass
-	switched a few methods that return int to return bool in listener
+	switched many int arguments and return values to bool
 	did some code cleanup to listener, scaler, sqlrconfigfile
 	fixed reversed affected rows logic for freetds 0.61
 	support mysql_change_user now in mysql connection

@@ -434,15 +434,15 @@ class sqlrcursor {
 				// suspendSession() so that another connection 
 				// can connect to it using resumeResultSet() 
 				// after it calls resumeSession().
-		int	resumeResultSet(int id);
+		bool	resumeResultSet(int id);
 				// Resumes a result set previously left open 
 				// using suspendSession().
-				// Returns 1 on success and 0 on failure.
-		int	resumeCachedResultSet(int id, const char *filename);
+				// Returns true on success and false on failure.
+		bool	resumeCachedResultSet(int id, const char *filename);
 				// Resumes a result set previously left open
 				// using suspendSession() and continues caching
 				// the result set to "filename".
-				// Returns 1 on success and 0 on failure.
+				// Returns true on success and false on failure.
 
 	#include <sqlrelay/private/sqlrcursor.h>
 };

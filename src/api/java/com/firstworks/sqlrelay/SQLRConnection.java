@@ -42,7 +42,7 @@ public class SQLRConnection {
 	 *  session but leaves the session open so 
 	 *  that another connection can connect to it 
 	 *  using resumeSession().  */
-	public native int	suspendSession();
+	public native boolean	suspendSession();
 
 	/** Returns the inet port that the connection is 
 	 *  communicating over. This parameter may be 
@@ -59,12 +59,12 @@ public class SQLRConnection {
 	/** Resumes a session previously left open 
 	 *  using suspendSession().
 	 *  Returns 1 on success and 0 on failure. */
-	public native int	resumeSession(int port, String socket);
+	public native boolean	resumeSession(int port, String socket);
 
 
 	/** Returns 1 if the database is up and 0
 	 *  if it's down.  */
-	public native int	ping();
+	public native boolean	ping();
 	/** Returns the type of database: 
 	 *    oracle7, oracle8, postgresql, mysql, etc.  */
 	public native String	identify();
@@ -72,16 +72,16 @@ public class SQLRConnection {
 
 	/** Instructs the database to perform a commit
 	 *  after every successful query. */
-	public native int	autoCommitOn();
+	public native boolean	autoCommitOn();
 	/** Instructs the database to wait for the 
 	 *  client to tell it when to commit. */
-	public native int	autoCommitOff();
+	public native boolean	autoCommitOff();
 	/** Issues a commit. Returns 1 if the commit succeeded, 0 if it
 	 *  failed and -1 if an error occurred. */
-	public native int	commit();
+	public native boolean	commit();
 	/** Issues a rollback. Returns 1 if the rollback succeeded, 0 if it
 	 *  failed and -1 if an error occurred. */
-	public native int	rollback();
+	public native boolean	rollback();
 
 
 	/** Causes verbose debugging information to be 
@@ -94,7 +94,7 @@ public class SQLRConnection {
 
 	/** Returns 0 if debugging is off and 1 if 
 	 *  debugging is on. */
-	public native int	getDebug();
+	public native boolean	getDebug();
 
 
 	/** connection is used internally, it's just

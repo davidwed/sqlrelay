@@ -80,11 +80,11 @@ __END__
         resumeSession(port,socket);
             # Resumes a session previously left open 
             # using suspendSession().
-            # Returns 1 on success and 0 on failure.
+            # Returns true on success and false on failure.
 
 
         ping();
-            # Returns 1 if the database is up and 0
+            # Returns true if the database is up and false
             # if it's down.
 
         identify();
@@ -95,24 +95,22 @@ __END__
         autoCommitOn();
             # Instructs the database to perform a commit
             # after every successful query.
-            # Returns 1 if setting autocommit on succeeded
-            # and 0 if it failed.
+            # Returns true if setting autocommit on succeeded
+            # and false if it failed.
 
         autoCommitOff();
             # Instructs the database to wait for the 
             # client to tell it when to commit.
-            # Returns 1 if setting autocommit off succeeded
-            # and 0 if it failed.
+            # Returns true if setting autocommit off succeeded
+            # and false if it failed.
 
         commit();
-            # Issues a commit.  Returns 1 if the commit
-            # succeeded, 0 if it failed and -1 if an
-            # error occurred.
+            # Issues a commit.  Returns true if the commit
+            # succeeded, false if it failed.
 
         rollback();
-            # Issues a rollback.  Returns 1 if the rollback
-            # succeeded, 0 if it failed and -1 if an
-            # error occurred.
+            # Issues a rollback.  Returns true if the rollback
+            # succeeded, false if it failed.
 
 
         debugOn();
@@ -124,7 +122,7 @@ __END__
             # Turns debugging off.
 
         getDebug();
-            # Returns 1 if debugging is currently on and 0
+            # Returns true if debugging is currently on and false
             # if debugging is currently off.
 
 =head1 AUTHOR

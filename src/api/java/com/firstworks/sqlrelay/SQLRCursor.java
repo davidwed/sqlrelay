@@ -70,14 +70,14 @@ public class SQLRCursor {
 
 
 	/** Sends "query" and gets a result set.  */
-	public native int	sendQuery(String query);
+	public native boolean	sendQuery(String query);
 	/** Sends the query in file "path"/"filename" 
 	 *  and gets a result set.  */
-	public native int	sendQuery(String query, int length);
+	public native boolean	sendQuery(String query, int length);
 	/** Sends "query" with length "length" and gets
 	*  a result set. This method must be used if
 	*  the query contains binary data. */
-	public native int	sendFileQuery(String path, String filename); 
+	public native boolean	sendFileQuery(String path, String filename); 
 
 
 	/** Prepare to execute "query".  */
@@ -89,7 +89,7 @@ public class SQLRCursor {
 	/** Prepare to execute "query" with length 
 	 * "length".  This method must be used if the
 	 * query contains binary data. */
-	public native int	prepareFileQuery(String path, String filename);
+	public native boolean	prepareFileQuery(String path, String filename);
 
 	/** Clear all bind variables.  */
 	public native void	clearBinds();
@@ -164,11 +164,11 @@ public class SQLRCursor {
 
 	/** Execute the query that was previously 
 	 *  prepared and bound.  */
-	public native int	executeQuery();
+	public native boolean	executeQuery();
 
 	/** Fetch from a cursor that was returned as
 	 *  an output bind variable.  */
-	public native int	fetchFromBindCursor();
+	public native boolean	fetchFromBindCursor();
 
 	/** Get the value stored in a previously
 	 *  defined output bind variable.  */
@@ -198,7 +198,7 @@ public class SQLRCursor {
 
 	/** Opens a cached result set.
 	 *  Returns 1 on success and 0 on failure.  */
-	public native int	openCachedResultSet(String filename);
+	public native boolean	openCachedResultSet(String filename);
 
 	/** Returns the number of columns in the current
 	 *  result set.  */
@@ -232,7 +232,7 @@ public class SQLRCursor {
 	 *  method can only return 0 if 
 	 *  setResultSetBufferSize() has been called
 	 *  with a parameter other than 0.  */
-	public native int	endOfResultSet();
+	public native boolean	endOfResultSet();
 
 
 	/** If a query failed and generated an error, 
@@ -395,12 +395,12 @@ public class SQLRCursor {
 	/** Resumes a result set previously left open 
 	 *  using suspendSession().
 	 *  Returns 1 on success and 0 on failure.  */
-	public native int	resumeResultSet(int id);
+	public native boolean	resumeResultSet(int id);
 	/** Resumes a result set previously left open
 	 *  using suspendSession() and continues caching
 	 *  the result set to "filename".
 	 *  Returns 1 on success and 0 on failure.  */
-	public native int	resumeCachedResultSet(int id, String filename);
+	public native boolean	resumeCachedResultSet(int id, String filename);
 
 
 	/** cursor and connection are used internally, they're just
