@@ -64,10 +64,12 @@ all: libSQLRCursor.la
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.C
 	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.lo*
 	$(LIBTOOL) --mode=clean $(RM) *.o	
 	$(LIBTOOL) --mode=clean $(RM) *.so
 	$(LIBTOOL) --mode=clean $(RM) *.$(PERLMAN3EXT)
+	$(LIBTOOL) --mode=clean $(RM) errors*
+	$(LIBTOOL) --mode=clean $(RM) perlincludes.h
 
 rebuild: clean all
 
