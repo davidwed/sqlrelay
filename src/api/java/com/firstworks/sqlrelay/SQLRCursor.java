@@ -9,7 +9,8 @@ public class SQLRCursor {
 	}
 
 	public SQLRCursor(SQLRConnection con) {
-		cursor=sqlrcur_alloc(con.connection);
+		connection=con;
+		cursor=alloc(con.connection);
 	}
 	public native void	delete();
 
@@ -107,9 +108,21 @@ public class SQLRCursor {
 	/** Define an input bind variable.  */
 	public native void	inputBind(String variable, double value, 
 					int precision, int scale);
+	/** Define an input bind variable.  */
+	public native void	inputBindBlob(String variable, String value, 
+								long size);
+	/** Define an input bind variable.  */
+	public native void	inputBindClob(String variable, String value, 
+								long size);
 	/** Define an output bind variable.  */
 	public native void	defineOutputBind(String variable, 
 							int bufferlength);
+	/** Define an output bind variable.  */
+	public native void	defineOutputBindBlob(String variable);
+	/** Define an output bind variable.  */
+	public native void	defineOutputBindClob(String variable);
+	/** Define an output bind variable.  */
+	public native void	defineOutputBindCursor(String variable);
 
 	/** Define an array of substitution variables.  */
 	public native void	substitutions(String[] variables, 
@@ -147,9 +160,23 @@ public class SQLRCursor {
 	 *  prepared and bound.  */
 	public native int	executeQuery();
 
+	/** Fetch from a cursor that was returned as
+	 *  an output bind variable.  */
+	public native int	fetchFromBindCursor();
+
 	/** Get the value stored in a previously
 	 *  defined output bind variable.  */
 	public native String	getOutputBind(String variable);
+	/** Get the length of the value stored in a
+	 *  previously defined output bind variable.  */
+	public native long	getOutputBindLength(String variable);
+	/** Get the cursor associated with a
+	 *  previously defined output bind variable.  */
+	public SQLRCursor	getOutputBindCursor(String variable) {
+		SQLRCursor	bindcur=new SQLRCursor(connection);
+		bindcur.cursor=getOutputBindCursorInternal(variable);
+		return bindcur;
+	}
 
 
 	/** Opens a cached result set.
@@ -269,8 +296,10 @@ public class SQLRCursor {
 	public native int	resumeCachedResultSet(int id, String filename);
 
 
-	/** cursor is used internally, it's just
+	/** cursor and connection are used internally, they're just
 	 *  public to make the JNI wrapper work faster.  */
-	public int	cursor;
-	private native int	sqlrcur_alloc(int con);
+	public int		cursor;
+	public SQLRConnection	connection;
+	private native int	alloc(int con);
+	private native int	getOutputBindCursorInternal(String variable);
 }

@@ -44,7 +44,3 @@ install: all
 uninstall: makefile
 	$(MAKE) -f Makefile.uninstall uninstall
 	$(RM) Makefile mkmf.log
-
-rpminfo: makefile
-	$(MAKE) -f Makefile.rpminfo rpminfo
-	$(RM) Makefile mkmf.log

@@ -19,8 +19,6 @@ clean:
 	$(RMTREE) */*/*/.pics
 	$(RMTREE) */*/*/*/.pics
 	$(RMTREE) */*/*/*/*/.pics
-	$(RM) packages/RPMS/*.rpm
-	$(RM) packages/SRPMS/*.rpm
 
 rebuild:
 	$(MAKE) -C src rebuild

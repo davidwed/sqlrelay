@@ -6,6 +6,8 @@ lots of documentation fixes:
 	describe ping() vs. pingQuery() methods in connections.html
 	describe sendColumnTypeFormat() in connections.html
 
+fix rpm build instructions in INSTALL.txt
+
 does zope stuff work?
 
 incorporate new spec file

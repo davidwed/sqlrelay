@@ -26,7 +26,7 @@ public class SQLRConnection {
 	public SQLRConnection(String server, int port, String socket,
 						String user, String password,
 						int retrytime, int tries) {
-		connection=sqlrcon_alloc(server,port,socket,
+		connection=alloc(server,port,socket,
 						user,password,retrytime,tries);
 	}
 	/** Disconnects and ends the session if
@@ -99,7 +99,7 @@ public class SQLRConnection {
 	/** connection is used internally, it's just
 	 *  public to make the JNI wrapper work faster.  */
 	public int	connection;
-	private native int	sqlrcon_alloc(String server, int port, 
+	private native int	alloc(String server, int port, 
 						String socket, String user, 
 						String password, 
 						int retrytime, int tries);
