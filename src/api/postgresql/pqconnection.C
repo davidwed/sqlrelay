@@ -110,7 +110,6 @@ void freePGconn(PGconn *conn) {
 	conn=NULL;
 }
 
-// connect to the database using paramaters
 PGconn *PQsetdbLogin(const char *host, const char *port,
 			 const char *options, const char *tty,
 			 const char *db,
@@ -118,31 +117,26 @@ PGconn *PQsetdbLogin(const char *host, const char *port,
 	return allocatePGconn(NULL,host,port,options,tty,db,user,password);
 }
 
-// older, simpler connection function that didn't have user, password
 PGconn *PQsetdb(const char *host, const char *port,
 			 const char *options, const char *tty,
 			 const char *db) {
 	return PQsetdbLogin(host,port,options,tty,db,NULL,NULL);
 }
 
-// connect to the database using a conninfo string
 PGconn *PQconnectdb(const char *conninfo) {
 	return allocatePGconn(conninfo,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 }
 
-// close the current connection
 void PQfinish(PGconn *conn) {
 	freePGconn(conn);
 }
 
-// close and re-open the connection
 void PQreset(PGconn *conn) {
 	PQfinish(conn);
 	PQsetdbLogin(conn->host,conn->port,conn->options,
 			conn->tty,conn->db,conn->user,conn->password);
 }
 
-// accessor functions for PGconn objects
 char *PQdb(const PGconn *conn) {
 	return conn->db;
 }

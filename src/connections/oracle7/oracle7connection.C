@@ -415,7 +415,9 @@ void	oracle7cursor::returnColumnInfo() {
 		// send the column definition
 		conn->sendColumnDefinition((char *)desc[i].buf,
 					(short)desc[i].buflen,type,
-					(int)desc[i].dbsize);
+					(int)desc[i].dbsize,
+					(unsigned short)desc[i].precision,
+					(unsigned short)desc[i].scale);
 	}
 }
 

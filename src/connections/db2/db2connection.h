@@ -19,6 +19,8 @@ struct column {
 	int	namelength;
 	int	type;
 	int	length;
+	int	precision;
+	int	scale;
 };
 
 class db2connection;

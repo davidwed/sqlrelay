@@ -346,6 +346,22 @@ class sqlrcursor {
 		int	getColumnLength(int col);
 		int	getColumnLength(const char *col);
 				// Returns the length of the specified column.
+				// (This may be different than precision because
+				// some databases return the number of bytes
+				// required to store the data for numeric types
+				// rather than number of digits)
+		unsigned short	getColumnPrecision(int col);
+		unsigned short	getColumnPrecision(const char *col);
+				// Returns the precision of the specified
+				// column.
+				// (Precision is the total number of digits in
+				// a number.  eg: 123.45 has a precision of 5)
+		unsigned short	getColumnScale(int col);
+		unsigned short	getColumnScale(const char *col);
+				// Returns the scale of the specified column.
+				// (Scale is the total number of digits to the
+				// right of the decimal point in a number.
+				// eg: 123.45 has a scale of 2)
 		int	getLongest(int col);
 		int	getLongest(const char *col);
 				// Returns the length of the longest field

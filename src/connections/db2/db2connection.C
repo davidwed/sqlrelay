@@ -311,6 +311,20 @@ int	db2cursor::executeQuery(const char *query, long length,
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
+
+			// column precision
+			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_PRECISION,
+					NULL,0,NULL,&(col[i].precision));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
+
+			// column scale
+			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_SCALE,
+					NULL,0,NULL,&(col[i].scale));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
 		}
 
 		// bind the column to a buffer
@@ -430,8 +444,9 @@ void	db2cursor::returnColumnInfo() {
 		}
 
 		// send column definition
-		conn->sendColumnDefinition(col[i].name,col[i].namelength,
-					type,col[i].length);
+		conn->sendColumnDefinition(col[i].name,col[i].namelength,type,
+					col[i].length,col[i].precision,
+					col[i].scale);
 	}
 }
 

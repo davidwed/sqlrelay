@@ -212,10 +212,12 @@ void	msqlcursor::returnColumnInfo() {
 			type=UNKNOWN_DATATYPE;
 		}
 
+		// FIXME: is msqlfield->flags a precision or scale???
+
 		// send the column definition
 		conn->sendColumnDefinition(msqlfield->name,
 					strlen(msqlfield->name),
-					type,msqlfield->length);
+					type,msqlfield->length,0,0);
 	}
 }
 

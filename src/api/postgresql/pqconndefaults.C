@@ -13,12 +13,10 @@ typedef struct _PQconninfoOption {
 } PQconninfoOption;
 
 PQconninfoOption *PQconndefaults(void) {
-	printf("PQconndefaults unimplemented\n");
 	return NULL;
 }
 
 void PQconninfoFree(PQconninfoOption *connOptions) {
-	printf("PQconninfoFree\n");
 }
 
 }

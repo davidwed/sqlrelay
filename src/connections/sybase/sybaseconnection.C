@@ -647,7 +647,9 @@ void	sybasecursor::returnColumnInfo() {
 		conn->sendColumnDefinition(column[i].name,
 					strlen(column[i].name),
 					type,
-					column[i].maxlength);
+					column[i].maxlength,
+					column[i].precision,
+					column[i].scale);
 	}
 }
 

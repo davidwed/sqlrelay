@@ -22,6 +22,9 @@
 	netbsd init script is fixed now
 	applied lots of patches from Takeshi Taguchi for typo's and compiler
 		warnings
+	added postgresql drop-in api
+	added support for column precision/scale to core classes and all DB's
+		that support it (except interbase and mysql)
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

@@ -6,7 +6,6 @@
 extern "C" {
 
 int translateEncoding(const char *encoding) {
-	// translate "encoding" into an encoding id
 	if (encoding) {
 		if (!strcmp(encoding,"UTF8")) {
 			return PG_UTF8;
@@ -21,8 +20,6 @@ int PQmblen(const unsigned char *s, int encoding) {
 }
 
 int PQenv2encoding(void) {
-	// get value of PGCLIENTENCODING environment variable
-	// and translate it to an encoding ID
 	environment	env;
 	return translateEncoding(env.getValue("PGCLIENTENCODING"));
 }

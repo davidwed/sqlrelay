@@ -1278,6 +1278,26 @@ int	sqlrcursor::getColumnLength(int col) {
 	return 0;
 }
 
+unsigned short	sqlrcursor::getColumnPrecision(int col) {
+
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO &&
+			colcount && col>=0 && col<(int)colcount) {
+		return getColumn(col)->precision;
+	}
+	return 0;
+}
+
+unsigned short	sqlrcursor::getColumnScale(int col) {
+
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO &&
+			colcount && col>=0 && col<(int)colcount) {
+		return getColumn(col)->scale;
+	}
+	return 0;
+}
+
 int	sqlrcursor::getLongest(int col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
@@ -1315,6 +1335,36 @@ int	sqlrcursor::getColumnLength(const char *col) {
 			whichcolumn=getColumn(i);
 			if (!strcasecmp(whichcolumn->name,col)) {
 				return whichcolumn->length;
+			}
+		}
+	}
+	return 0;
+}
+
+unsigned short	sqlrcursor::getColumnPrecision(const char *col) {
+
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO) {
+		column	*whichcolumn;
+		for (unsigned long i=0; i<colcount; i++) {
+			whichcolumn=getColumn(i);
+			if (!strcasecmp(whichcolumn->name,col)) {
+				return whichcolumn->precision;
+			}
+		}
+	}
+	return 0;
+}
+
+unsigned short	sqlrcursor::getColumnScale(const char *col) {
+
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO) {
+		column	*whichcolumn;
+		for (unsigned long i=0; i<colcount; i++) {
+			whichcolumn=getColumn(i);
+			if (!strcasecmp(whichcolumn->name,col)) {
+				return whichcolumn->scale;
 			}
 		}
 	}
@@ -2172,6 +2222,8 @@ void	sqlrcursor::cacheColumnInfo() {
 						whichcolumn->typestringlength);
 			}
 			cachedest->write(whichcolumn->length);
+			cachedest->write(whichcolumn->precision);
+			cachedest->write(whichcolumn->scale);
 		}
 	}
 }
@@ -2472,6 +2524,18 @@ int	sqlrcursor::parseColumnInfo() {
 				return -1;
 			}
 
+			// get the column precision
+			if (getShort(&currentcol->precision)!=
+						sizeof(unsigned short)) {
+				return -1;
+			}
+
+			// get the column scale
+			if (getShort(&currentcol->scale)!=
+						sizeof(unsigned short)) {
+				return -1;
+			}
+
 			// initialize the longest value
 			currentcol->longest=0;
 	
@@ -2488,11 +2552,13 @@ int	sqlrcursor::parseColumnInfo() {
 					sqlrc->debugPrint(datatypestring[
 							currentcol->type]);
 				}
-				sqlrc->debugPrint("\",");
-				sqlrc->debugPrint("\"");
+				sqlrc->debugPrint("\", ");
 				sqlrc->debugPrint((long)currentcol->length);
-				sqlrc->debugPrint("\"");
-				sqlrc->debugPrint("\n");
+				sqlrc->debugPrint(" (");
+				sqlrc->debugPrint((long)currentcol->precision);
+				sqlrc->debugPrint(",");
+				sqlrc->debugPrint((long)currentcol->scale);
+				sqlrc->debugPrint(")\n");
 				sqlrc->debugPreEnd();
 			}
 

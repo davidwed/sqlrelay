@@ -2710,7 +2710,9 @@ void	sqlrconnection::sendColumnTypeFormat(unsigned short format) {
 void	sqlrconnection::sendColumnDefinition(const char *name,
 						unsigned short namelen,
 						unsigned short type, 
-						unsigned long size) {
+						unsigned long size,
+						unsigned short precision,
+						unsigned short scale) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -2721,6 +2723,11 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 	debugstr->append((long)type);
 	debugstr->append(":");
 	debugstr->append((long)size);
+	debugstr->append(" (");
+	debugstr->append((long)precision);
+	debugstr->append(",");
+	debugstr->append((long)scale);
+	debugstr->append(")");
 	debugPrint("connection",3,debugstr->getString());
 	delete debugstr;
 	#endif
@@ -2729,13 +2736,17 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 	clientsock->write(name,namelen);
 	clientsock->write(type);
 	clientsock->write(size);
+	clientsock->write(precision);
+	clientsock->write(scale);
 }
 
 void	sqlrconnection::sendColumnDefinitionString(const char *name,
-							unsigned short namelen,
-							const char *type, 
-							unsigned short typelen,
-							unsigned long size) {
+						unsigned short namelen,
+						const char *type, 
+						unsigned short typelen,
+						unsigned long size,
+						unsigned short precision,
+						unsigned short scale) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -2748,6 +2759,11 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 	}
 	debugstr->append(":");
 	debugstr->append((long)size);
+	debugstr->append(" (");
+	debugstr->append((long)precision);
+	debugstr->append(",");
+	debugstr->append((long)scale);
+	debugstr->append(")");
 	debugPrint("connection",3,debugstr->getString());
 	delete debugstr;
 	#endif
@@ -2757,6 +2773,8 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 	clientsock->write(typelen);
 	clientsock->write(type,typelen);
 	clientsock->write(size);
+	clientsock->write(precision);
+	clientsock->write(scale);
 }
 
 void	sqlrconnection::sendField(const char *data, unsigned long size) {

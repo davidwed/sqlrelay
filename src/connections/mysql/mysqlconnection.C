@@ -328,10 +328,15 @@ void	mysqlcursor::returnColumnInfo() {
 			type=UNKNOWN_DATATYPE;
 		}
 
+		// FIXME: is mysqlfield->max_length the precision???
+		// what is flags?
+
 		// send column definition
 		conn->sendColumnDefinition(mysqlfield->name,
 					strlen(mysqlfield->name),
-					type,(int)mysqlfield->length);
+					type,(int)mysqlfield->length,
+					0,
+					mysqlfield->decimals);
 	}
 }
 

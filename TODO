@@ -1,4 +1,13 @@
-use connectstring class to parse/store connectstring
+precision, scale in interbase connection
+precision in mysql connection
+
+add column precision/scale to protocol doc
+
+for non-root users, initroot should be set to $(prefix)
+
+postgresql drop-in api lacks many features
+
+use connectstring class to parse/store connectstrings
 
 test,document Java "getXXXAsByteArray" methods
 document oracle 8.0/8i temp-blob compile flag

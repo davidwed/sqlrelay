@@ -227,8 +227,8 @@ void	postgresqlcursor::returnColumnInfo() {
 	if (!postgresqlconn->typemangling) {
 		typestring=new char[6];
 	}
-	char	*name;
-	int	size;
+	char		*name;
+	int		size;
 
 	// for each column...
 	for (int i=0; i<ncols; i++) {
@@ -285,11 +285,16 @@ void	postgresqlcursor::returnColumnInfo() {
 			size=0;
 		}
 
+		// I thought maybe fmod returned the scale but maybe not
+		//scale=PQfmod(pgresult,i);
+
 		if (postgresqlconn->typemangling==1) {
-			conn->sendColumnDefinition(name,strlen(name),type,size);
+			conn->sendColumnDefinition(name,strlen(name),
+							type,size,0,0);
 		} else {
 			conn->sendColumnDefinitionString(name,strlen(name),
-					typestring,strlen(typestring),size);
+					typestring,strlen(typestring),size,
+								0,0);
 		}
 	}
 }

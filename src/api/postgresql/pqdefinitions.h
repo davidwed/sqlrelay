@@ -82,4 +82,13 @@ PGconn		*PQconnectdb(const char *conninfo);
 void		PQfinish(PGconn *conn);
 PGresult	*PQexec(PGconn *conn, const char *query);
 
+int	PQnfields(const PGresult *res);
+int	PQntuples(const PGresult *res);
+char	*PQfname(const PGresult *res, int field_num);
+int	PQgetlength(const PGresult *res, int tup_num, int field_num);
+char	*PQgetvalue(const PGresult *res, int tup_num, int field_num);
+int	PQmblen(const unsigned char *s, int encoding);
+int	PQclientEncoding(const PGconn *conn);
+
+
 }

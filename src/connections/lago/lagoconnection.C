@@ -180,6 +180,8 @@ void	lagocursor::returnColumnInfo() {
 
 	// gonna need this later
 	int	length;
+	int	precision;
+	int	scale;
 	int	type;
 	char	*name;
 
@@ -222,18 +224,24 @@ void	lagocursor::returnColumnInfo() {
 			type=UNKNOWN_DATATYPE;
 		}
 
-		// append ","column size" to the header
+		// get name, precision and scale
+		name=(char *)Lgetcolname(lagoresult,i);
+		precision=Lgetcolprec(lagoresult,i);
+		scale=Lgetcolscale(lagoresult,i);
+
+		// if the length wasn't determined already, determine it based
+		// on precision, scale
 		if (!length) {
-			length=Lgetcolprec(lagoresult,i);
-			if (Lgetcolscale(lagoresult,i)) {
+			length=precision;
+			if (scale) {
 				// make sure to add 1 for the decimal point
-				length=length+Lgetcolprec(lagoresult,i)+1;
+				length=precision+1;
 			}
 		}
 
 		// send the column definition
-		name=(char *)Lgetcolname(lagoresult,i);
-		conn->sendColumnDefinition(name,strlen(name),type,length);
+		conn->sendColumnDefinition(name,strlen(name),type,
+						length,precision,scale);
 	}
 }
 

@@ -40,6 +40,8 @@ struct describe {
 	sb2		dbtype;
 	text		*buf;
 	sb4		buflen;
+	ub1		precision;
+	ub1		scale;
 };
 
 class oracle8connection;

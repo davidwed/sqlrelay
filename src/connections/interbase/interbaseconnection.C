@@ -549,7 +549,7 @@ void	interbasecursor::returnColumnInfo() {
 		conn->sendColumnDefinition(outsqlda->sqlvar[i].sqlname,
 					strlen(outsqlda->sqlvar[i].sqlname),
 					field[i].sqlrtype,
-					outsqlda->sqlvar[i].sqllen);
+					outsqlda->sqlvar[i].sqllen,0,0);
 	}
 }
 
