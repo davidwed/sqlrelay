@@ -1,6 +1,29 @@
 cygwin:
 	how to build a php extension?
 		1) need php source 
+	non-cygwin python
+		GnuWin32 - C:\Program Files\GnuWin32
+	non-cygwin ruby
+		GnuWin32 - C:\Program Files\GnuWin32
+	non-cygwin perl
+		GnuWin32 - C:\Program Files\GnuWin32
+	zope
+		C:\Program Files\Zope-2.7.1\lib\python\Products
+	oracle
+		C:\oracle\product\10.1.0\...
+	sqlite
+		.dll and .def file wherever
+	db2
+		???
+	sybase
+		???
+	interbase
+		???
+	msql
+		???
+	lago
+		???
+
 
 must run cygserver and set CYGWIN=server for ipc to work
 
