@@ -87,10 +87,10 @@ sqlrelay.so:
 	fi
 
 install: sqlrelay.so
-	$(MKINSTALLDIRS) $(TCLLIBSPATH)/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) -s sqlrelay.so $(TCLLIBSPATH)/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 pkgIndex.tcl $(TCLLIBSPATH)/sqlrelay
+	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(LIBTOOL) --mode=install $(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.so
 
 uninstall:
-	$(RMTREE) $(TCLLIBSPATH)/sqlrelay
+	$(RMTREE) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay

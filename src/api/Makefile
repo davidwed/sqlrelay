@@ -8,9 +8,9 @@ ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python all
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/SQLRConnection -f Makefile.master all
-	$(MAKE) -C perl/SQLRCursor -f Makefile.master all
-	$(MAKE) -C perl/DBD -f Makefile.master all
+	$(MAKE) -C perl/SQLRConnection -f Makefile.test all
+	$(MAKE) -C perl/SQLRCursor -f Makefile.test all
+	$(MAKE) -C perl/DBD -f Makefile.test all
 endif
 ifneq ($(HAVE_RUBY),)
 	$(MAKE) -C ruby all
@@ -33,9 +33,9 @@ ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python clean
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/SQLRConnection -f Makefile.master clean
-	$(MAKE) -C perl/SQLRCursor -f Makefile.master clean
-	$(MAKE) -C perl/DBD -f Makefile.master clean
+	$(MAKE) -C perl/SQLRConnection -f Makefile.test clean
+	$(MAKE) -C perl/SQLRCursor -f Makefile.test clean
+	$(MAKE) -C perl/DBD -f Makefile.test clean
 endif
 ifneq ($(HAVE_RUBY),)
 	$(MAKE) -C ruby clean
@@ -59,9 +59,9 @@ ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python rebuild
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/SQLRConnection -f Makefile.master rebuild
-	$(MAKE) -C perl/SQLRCursor -f Makefile.master rebuild
-	$(MAKE) -C perl/DBD -f Makefile.master rebuild
+	$(MAKE) -C perl/SQLRConnection -f Makefile.test rebuild
+	$(MAKE) -C perl/SQLRCursor -f Makefile.test rebuild
+	$(MAKE) -C perl/DBD -f Makefile.test rebuild
 endif
 ifneq ($(HAVE_RUBY),)
 	$(MAKE) -C ruby rebuild
@@ -84,9 +84,9 @@ ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python install
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/SQLRConnection -f Makefile.master install
-	$(MAKE) -C perl/SQLRCursor -f Makefile.master install
-	$(MAKE) -C perl/DBD -f Makefile.master install
+	$(MAKE) -C perl/SQLRConnection -f Makefile.test install
+	$(MAKE) -C perl/SQLRCursor -f Makefile.test install
+	$(MAKE) -C perl/DBD -f Makefile.test install
 endif
 ifneq ($(HAVE_RUBY),)
 	$(MAKE) -C ruby install
@@ -112,9 +112,9 @@ ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python uninstall
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/SQLRConnection -f Makefile.master uninstall
-	$(MAKE) -C perl/SQLRCursor -f Makefile.master uninstall
-	$(MAKE) -C perl/DBD -f Makefile.master uninstall
+	$(MAKE) -C perl/SQLRConnection -f Makefile.test uninstall
+	$(MAKE) -C perl/SQLRCursor -f Makefile.test uninstall
+	$(MAKE) -C perl/DBD -f Makefile.test uninstall
 endif
 ifneq ($(HAVE_RUBY),)
 	$(MAKE) -C ruby uninstall

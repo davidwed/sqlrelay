@@ -1,0 +1,127 @@
+top_builddir = ../../../..
+
+include ../../../../config.mk
+
+PERLCCFLAGS = $(DESTDIR)$(shell eval "export `$(PERL) -V:ccflags`"; echo $$ccflags | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend|g' -e 's| -x03||g' )
+PERLOPTIMIZE = $(DESTDIR)$(shell eval "export `$(PERL) -V:optimize`"; echo $$optimize | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend|g' -e 's| -x03||g' )
+PERLSITEARCH = $(DESTDIR)$(shell eval "export `$(PERL) -V:sitearch`"; echo $$sitearch )
+PERL_INC = $(DESTDIR)$(shell eval "export `$(PERL) -V:archlibexp`"; echo "-I$$archlibexp/CORE" )
+PERL_LIB = $(DESTDIR)$(shell eval "export `$(PERL) -V:privlibexp`"; echo $$privlibexp )
+PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "export `$(PERL) -V:installman3dir`"; echo $$installman3dir )
+PERLMAN3EXT = $(shell eval "export `$(PERL) -V:man3ext`"; echo $$man3ext )
+
+CPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE) $(PERLCCFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PERL_INC)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+RPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(PERLUSERPATH),yes)
+	RPATH = -R $(libdir)
+endif
+endif
+
+.SUFFIXES: .lo .xs
+
+.xs.C:
+	$(PERL) $(PERL_LIB)/ExtUtils/xsubpp -noprototypes -C++ -typemap $(PERL_LIB)/ExtUtils/typemap -typemap perlobject.map -typemap typemap $< > $<c && mv $<c $@
+
+.C.lo:
+	cp perlincludes1.h perlincludes.h; \
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors1; \
+	if ( test ! -r SQLRCursor.lo ); then \
+		cp perlincludes2.h perlincludes.h; \
+		$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors2; \
+		if ( test ! -r SQLRCursor.lo ); then \
+			cp perlincludes2.h perlincludes.h; \
+			$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors3; \
+			if ( test ! -r SQLRCursor.lo ); then \
+				if ( test -s errors1 ); then \
+					echo "first try errors : "; cat errors1; echo; \
+				fi; \
+				if ( test -s errors2 ); then \
+					echo "second try errors : "; cat errors2; echo; \
+				fi; \
+				if ( test -s errors3 ); then \
+					echo "third try errors : "; cat errors3; echo; \
+				fi; \
+				exit 1; \
+			else \
+				cat errors3; \
+				$(STRIPCOMMENTNOTE) $@; \
+			fi; \
+		else \
+			cat errors2; \
+			$(STRIPCOMMENTNOTE) $@; \
+		fi; \
+	else \
+		cat errors1; \
+		$(STRIPCOMMENTNOTE) $@; \
+	fi; \
+	$(RM) errors1 errors2 errors3 perlincludes.h
+
+
+all: libSQLRCursor.la
+
+clean:
+	$(LIBTOOL) --mode=clean $(RM) *.la
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o	
+	$(LIBTOOL) --mode=clean $(RM) *.so
+	$(LIBTOOL) --mode=clean $(RM) *.$(PERLMAN3EXT)
+
+rebuild: clean all
+
+libSQLRCursor.la: SQLRCursor.xs SQLRCursor.C SQLRCursor.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ SQLRCursor.lo $(LIBS) -rpath $(PERLSITEARCH)/auto/Firstworks/SQLRCursor $(RPATH) -module
+
+SQLRCursor.so:
+	if ( test -r .libs/libSQLRCursor.0.0.0 ); \
+	then \
+		cp .libs/libSQLRCursor.0.0.0 SQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.0.0 ); \
+	then \
+		cp .libs/libSQLRCursor.0.0 SQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.0 ); \
+	then \
+		cp .libs/libSQLRCursor.0 SQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor ); \
+	then \
+		cp .libs/libSQLRCursor SQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.so.0.0.0 ); \
+	then \
+		cp .libs/libSQLRCursor.so.0.0.0 SQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.so.0.0 ); \
+	then \
+		cp .libs/libSQLRCursor.so.0.0 SQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.so.0 ); \
+	then \
+		cp .libs/libSQLRCursor.so.0 SQLRCursor.so; \
+	fi
+	if ( test -r .libs/libSQLRCursor.so ); \
+	then \
+		cp .libs/libSQLRCursor.so SQLRCursor.so; \
+	fi
+
+install: SQLRCursor.so
+	$(LIBTOOL) --mode=install $(INSTALL) SQLRCursor.so $(PERLSITEARCH)
+	$(MKINSTALLDIRS) $(PERLSITEARCH)/Firstworks
+	$(LIBTOOL) --mode=install $(INSTALL) -m 644 SQLRCursor.pm $(PERLSITEARCH)/Firstworks
+	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/Firstworks/SQLRCursor
+	$(LIBTOOL) --mode=install $(INSTALL) -m 755 SQLRCursor.so $(PERLSITEARCH)/auto/Firstworks/SQLRCursor
+	touch $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/SQLRCursor.bs
+	$(RM) SQLRCursor.so
+	pod2man SQLRCursor.pm > Firstworks::SQLRCursor.$(PERLMAN3EXT)
+	$(LIBTOOL) --mode=install $(INSTALL) -m 644 Firstworks::SQLRCursor.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
+	$(RM) Firstworks::SQLRCursor.$(PERLMAN3EXT)
+	echo $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/SQLRCursor.so > $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist
+	echo $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/SQLRCursor.bs > $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist
+	echo $(PERLINSTALLMAN3DIR)/Firstworks::SQLRCursor.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist
+
+uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) `cat $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist`
+	$(LIBTOOL) --mode=uninstall $(RM) $(PERLSITEARCH)/auto/Firstworks/SQLRCursor/.packlist

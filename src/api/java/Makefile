@@ -105,13 +105,13 @@ libSQLRCursor.so:
 	fi
 
 install: libSQLRConnection.so libSQLRCursor.so
-	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) -s libSQLRConnection.so $(javadir)/com/firstworks/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) -s libSQLRCursor.so $(javadir)/com/firstworks/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay
+	$(MKINSTALLDIRS) $(DESTDIR)$(javadir)/com/firstworks/sqlrelay
+	$(LIBTOOL) --mode=install $(INSTALL) -s libSQLRConnection.so $(DESTDIR)$(javadir)/com/firstworks/sqlrelay
+	$(LIBTOOL) --mode=install $(INSTALL) -s libSQLRCursor.so $(DESTDIR)$(javadir)/com/firstworks/sqlrelay
+	$(LIBTOOL) --mode=install $(INSTALL) com/firstworks/sqlrelay/SQLRConnection.class $(DESTDIR)$(javadir)/com/firstworks/sqlrelay
+	$(LIBTOOL) --mode=install $(INSTALL) com/firstworks/sqlrelay/SQLRCursor.class $(DESTDIR)$(javadir)/com/firstworks/sqlrelay
 	$(RM) libSQLRConnection.so
 	$(RM) libSQLRCursor.so
 
 uninstall:
-	$(RMTREE) $(javadir)/com/firstworks/sqlrelay
+	$(RMTREE) $(DESTDIR)$(javadir)/com/firstworks/sqlrelay
