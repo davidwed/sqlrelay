@@ -1,7 +1,6 @@
 // Copyright (c) 1999-2001  David Muse
 // See the COPYING file for more information.
 
-#define MAXQUERYSIZE 32768
 #define MAXVAR 256
 
 #ifndef MAXPATHLEN

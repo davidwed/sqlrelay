@@ -279,6 +279,48 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",1,"creating semaphores...");
 	#endif
+
+	// semaphores are:
+	//
+	// "connection count" - number of open database connections
+	// "session count" - number of clients currently connected
+	//
+	// 9 - UNUSED???
+	//
+	// 0 - connection: connection registration mutex
+	// 1 - listener:   connection registration mutex
+	//
+	// connection/listener registration interlocks:
+	// 2 - connection/listener: ensures that it's safe for a listener to
+	//                          read a registration
+	//       listener waits for a connection to register itself
+	//       connection signals when it's done registering
+	// 3 - connection/listener: ensures that it's safe for a connection to
+	//                          register itself
+	//       connection waits for the listener to read its registration
+	//       listener signals when it's done reading a registration
+	//
+	// connection/lisetner/scaler interlocks:
+	// 6 - scaler/listener: used to decide whether to scale or not
+	//       listener signals after incrementing session count
+	//       scaler waits before counting sessions/connections
+	// 4 - connection/scaler: connection count mutex
+	//       connection increases/decreases connection count
+	//       scalar reads connection count
+	// 5 - connection/listener: session count mutex
+        //       listener increases session count when a client connects
+	//       connection decreases session count when a client disconnects
+	// 7 - scaler/listener: used to decide whether to scale or not
+	//       scaler signals after counting sessions/connections
+	//       listener waits for scaler to count sessions/connections
+	// 8 - scaler/connection:
+	//       scaler waits for the connection count to increase
+	//                 (in effect, waiting for a new connection to fire up)
+	//       connection signals after increasing connection count
+	//
+	// main listenter process/listener children:
+	// 10 - listener: number of busy listeners
+	//
 	int	vals[11]={1,1,0,0,1,1,0,0,0,1,0};
 	semset=new semaphoreset();
 	if (!semset->create(key,permissions::ownerReadWrite(),11,vals)) {
@@ -687,30 +729,33 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 		return true;
 	}
 
-	// The logic here is that if there are no other forked, busy listeners
-	// and there are available connections, then we don't need to fork a
-	// child, otherwise we do.
+	// Don't fork unless we have to.
 	//
-	// It's entirely possible that a connection will become available
-	// immediately after this call to getValue(2), but in that case, the
-	// worst thing that happens is that we forked a child.  While less
-	// efficient, it is safe to do.
+	// If there are no busy listeners and there are available connections,
+	// then we don't need to fork a child, otherwise we do.
+	//
+	// It's possible that getValue(2) will be 0, indicating no connections
+	// are available, but one will become available immediately after this
+	// call to getValue(2).  In that case, the worst thing that happens is
+	// that we forked.  While less efficient, it is safe to do.
 	//
 	// It is not possible that a connection will immediately become
 	// UNavailable after this call to getValue(2).  For that to happen,
-	// there would need to be another sqlr-listener out there.  In that
-	// case getValue(10) would return something greater than 0 and we would
-	// have forked anyway.
+	// there would need to be another main sqlr-listener process out there.
+	// This should never happen, the listener would have to have the same
+	// id as this one and that is checked at startup.  However, if it did
+	// happen, getValue(10) would return something greater than 0 and we
+	// would have forked anyway.
 	if (dynamicscaling || semset->getValue(10) || !semset->getValue(2)) {
 
-		// increment the number of "forked, busy listeners"
+		// increment the number of "busy listeners"
 		semset->signal(10);
 
 		forkChild(clientsock);
 
 	} else {
 
-		// increment the number of "forked, busy listeners"
+		// increment the number of "busy listeners"
 		semset->signal(10);
 
 		clientSession(clientsock);
@@ -1000,7 +1045,13 @@ void sqlrlistener::incrementSessionCount() {
 	#endif
 
 	// wait for access
-	semset->wait(5);
+	#ifdef SERVER_DEBUG
+	debugPrint("listener",1,"waiting for exclusive access...");
+	#endif
+	semset->waitWithUndo(5);
+	#ifdef SERVER_DEBUG
+	debugPrint("listener",1,"done waiting for exclusive access...");
+	#endif
 
 	// increment the counter
 	unsigned int	*sessioncount=
@@ -1017,11 +1068,17 @@ void sqlrlistener::incrementSessionCount() {
 		semset->signal(6);
 
 		// wait for the scaler
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",1,"waiting for the scaler...");
+		#endif
 		semset->wait(7);
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",1,"done waiting for the scaler...");
+		#endif
 	}
 
 	// signal that others may have access
-	semset->signal(5);
+	semset->signalWithUndo(5);
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"done incrementing session count");
@@ -1035,49 +1092,83 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 	unsigned short	inetport;
 	char 		unixportstr[MAXPATHLEN+1];
 	unsigned short	unixportstrlen;
+	bool		retval=false;
 
-	getAConnection(&connectionpid,&inetport,unixportstr,&unixportstrlen);
-	sock->write((unsigned short)NO_ERROR);
+	// loop in case client doesn't get handed off successfully
+	for (;;) {
 
-	// if we're passing file descriptors around,
-	// tell the client not to reconnect and pass
-	// the descriptor to the appropriate database
-	// connection daemon, otherwise tell the client
-	// to reconnect and which ports to do it on
-	if (passdescriptor) {
+		getAConnection(&connectionpid,&inetport,
+				unixportstr,&unixportstrlen);
 
-		sock->write((unsigned short)DONT_RECONNECT);
+		// if we're passing file descriptors around,
+		// tell the client not to reconnect and pass
+		// the descriptor to the appropriate database
+		// connection daemon, otherwise tell the client
+		// to reconnect and which ports to do it on
+		if (passdescriptor) {
 
-		// Get the socket associated with the pid of the available
-		// connection and pass the client to the connection.  If any
-		// of this fails, we can still write to the client, send it an
-		// error message.
-		filedescriptor	connectionsock;
-		if (!findMatchingSocket(connectionpid,&connectionsock) ||
-			!passClientFileDescriptorToConnection(
+			// Get the socket associated with the pid of the
+			// available connection and pass the client to the
+			// connection.  If any of this fails, the connection
+			// may have crashed or been killed.  Loop back and get
+			// another connection.
+			filedescriptor	connectionsock;
+			if (!findMatchingSocket(connectionpid,
+						&connectionsock) ||
+				!passClientFileDescriptorToConnection(
 						&connectionsock,
 						sock->getFileDescriptor())) {
 
-			sock->write((unsigned short)ERROR);
-			sock->write((unsigned short)70);
-			sock->write("The listener failed to hand the client off to the database connection.");
-			return false;
+				// FIXME: should there be a limit to the number
+				// of times we retry?  If so, should we return
+				// this error
+				/*sock->write((unsigned short)ERROR);
+				sock->write((unsigned short)70);
+				sock->write("The listener failed to hand the client off to the database connection.");
+				retval=false;
+				break;*/
+				continue;
+			}
+
+			// Set the file descriptor to -1 here, otherwise it
+			// will get closed when connectionsock is freed.  If
+			// the file descriptor gets closed, the next time we
+			// try to pass a file descriptor to the same connection,
+			// it will fail.
+			connectionsock.setFileDescriptor(-1);
+
+			// if we got this far, everything has worked,
+			// inform the client...
+			sock->write((unsigned short)NO_ERROR);
+			sock->write((unsigned short)DONT_RECONNECT);
+			retval=true;
+			break;
+
+		} else {
+
+			// FIXME: if we're not passing around file descriptors,
+			// how can we deterimine if a connection has crashed
+			// or been killed?
+			sock->write((unsigned short)NO_ERROR);
+			sock->write((unsigned short)RECONNECT);
+			sock->write(unixportstrlen);
+			sock->write(unixportstr);
+			sock->write((unsigned short)inetport);
+			retval=true;
+			break;
 		}
-
-		// Set the file descriptor to -1 here, otherwise it will get
-		// closed when connectionsock is freed.  If the file descriptor
-		// gets closed, the next time we try to pass a file descriptor
-		// to the same connection, it will fail.
-		connectionsock.setFileDescriptor(-1);
-
-	} else {
-		sock->write((unsigned short)RECONNECT);
-		sock->write(unixportstrlen);
-		sock->write(unixportstr);
-		sock->write((unsigned short)inetport);
 	}
 
-	return true;
+	// decrement the number of "busy listeners"
+	#ifdef SERVER_DEBUG
+	debugPrint("listener",0,"decrementing busy listeners");
+	#endif
+	semset->wait(10);
+	#ifdef SERVER_DEBUG
+	debugPrint("listener",0,"done decrementing busy listeners");
+	#endif
+
+	return retval;
 }
 
 void sqlrlistener::getAConnection(unsigned long *connectionpid,
@@ -1099,7 +1190,7 @@ void sqlrlistener::getAConnection(unsigned long *connectionpid,
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"acquiring exclusive shm access");
 		#endif
-		semset->wait(1);
+		semset->waitWithUndo(1);
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"done acquiring exclusive shm access");
 		#endif
@@ -1166,34 +1257,28 @@ void sqlrlistener::getAConnection(unsigned long *connectionpid,
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"releasing exclusive shm access");
 		#endif
-		semset->signal(1);
+		semset->signalWithUndo(1);
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"done releasing exclusive shm access");
 		#endif
 
-		// decrement the number of "forked, busy listeners"
-		#ifdef SERVER_DEBUG
-		debugPrint("listener",0,
-				"decrementing forked, busy listeners");
-		#endif
-		semset->wait(10);
-		#ifdef SERVER_DEBUG
-		debugPrint("listener",0,
-				"done decrementing forked, busy listeners");
-		#endif
-
-		// make sure the connection is actually up, if not, fork a child
-		// to jog it, spin back and get another connection
+		// make sure the connection is actually up, if not,
+		// fork a child to jog it, spin back and get another connection
 		if (connectionIsUp(ptr->connectionid)) {
-			break;
-		} else {
-			pingDatabase(*connectionpid,unixportstr,*inetport);
-			semset->signal(10);
-		}
 
-		#ifdef SERVER_DEBUG
-		debugPrint("listener",1,"done getting a connection");
-		#endif
+			#ifdef SERVER_DEBUG
+			debugPrint("listener",1,"done getting a connection");
+			#endif
+			break;
+
+		} else {
+
+			#ifdef SERVER_DEBUG
+			debugPrint("listener",1,"connection was down");
+			#endif
+
+			pingDatabase(*connectionpid,unixportstr,*inetport);
+		}
 	}
 	
 }

@@ -1693,7 +1693,7 @@ main() {
 
         cur-&gt;sendQuery(<FONT color=#ff00ff>&quot;insert into my_table values (1,2,3)&quot;</FONT>);
         <B><FONT color=#2e8b57>int</FONT></B>     port=cur-&gt;getConnectionPort();
-        <B><FONT color=#2e8b57>char</FONT></B>    *socket=cur-&gt;getConnectionPort();
+        <B><FONT color=#2e8b57>char</FONT></B>    *socket=cur-&gt;getConnectionSocket();
         <B><FONT color=#2e8b57>int</FONT></B>     rs=cur-&gt;getResultSetId();
         cur-&gt;suspendResultSet();
         con-&gt;suspendSession();

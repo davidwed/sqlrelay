@@ -1,6 +1,13 @@
-perl apis -> CPAN
+document installing MSDE from http://www.microsoft.com/sql/msde/default.asp
 
-connections with a ttl don't appear to die off
+need to support queries larger than 32768
+
+scaler can loop up listener is killed, see FIXME
+
+connections should print a warning if the runasuser/runasgroup can't read
+	sqlrelay.conf
+
+perl apis -> CPAN
 
 php module needs to clean itself up (close connections) if the script dies
 
@@ -17,6 +24,8 @@ mysql 4.1, 5.0 - bind vars
 postgresql 8 - bind vars
 
 people have been reporting freetds problems
+
+call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
 
 --------------------------------------------------------------------------------
 

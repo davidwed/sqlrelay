@@ -63,11 +63,22 @@ bool sqlrconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	return true;
 }
 
+void sqlrconnection::waitForListenerToRequireAConnection() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"waiting for the listener to require a connection");
+	#endif
+	semset->wait(11);
+	//semset->waitWithUndo(11);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done waiting for the listener to require a connection");
+	#endif
+}
+
 void sqlrconnection::acquireAnnounceMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"acquiring announce mutex");
 	#endif
-	semset->wait(0);
+	semset->waitWithUndo(0);
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"done acquiring announce mutex");
 	#endif
@@ -81,7 +92,7 @@ void sqlrconnection::releaseAnnounceMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"releasing announce mutex");
 	#endif
-	semset->signal(0);
+	semset->signalWithUndo(0);
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"done releasing announce mutex");
 	#endif
@@ -111,7 +122,7 @@ void sqlrconnection::acquireConnectionCountMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"acquiring connection count mutex");
 	#endif
-	semset->wait(4);
+	semset->waitWithUndo(4);
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"done acquiring connection count mutex");
 	#endif
@@ -125,7 +136,7 @@ void sqlrconnection::releaseConnectionCountMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"releasing connection count mutex");
 	#endif
-	semset->signal(4);
+	semset->signalWithUndo(4);
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"done releasing connection count mutex");
 	#endif
@@ -136,6 +147,7 @@ void sqlrconnection::acquireSessionCountMutex() {
 	debugPrint("connection",1,"acquiring session count mutex");
 	#endif
 	semset->wait(5);
+	//semset->waitWithUndo(5);
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"done acquiring session count mutex");
 	#endif

@@ -33,6 +33,26 @@ void sqlrconnection::announceAvailability(const char *tmpdir,
 	acquireAnnounceMutex();
 
 	// cancel time-to-live alarm
+	//
+	// It's important to cancel the alarm here.
+	//
+	// Connections which successfully announce themselves to the listener
+	// cannot then die off.
+	//
+	// If handoff=pass, the listener can handle it if a connection dies off,
+	// but not if handoff=reconnect, there's no way for it to know the
+	// connection is gone.
+	//
+	// But, if the connection signals the listener to read the registration
+	// and dies off before it receives a return signal from the listener
+	// indicating that the listener has read it, then it can cause
+	// problems.  And we can't simply call waitWithUndo() and
+	// signalWithUndo().  Not only could the undo counter could overflow,
+	// but we really only want to undo the signal() if the connection shuts
+	// down before doing the wait() and there's no way to optionally
+	// undo a semaphore.
+	//
+	// What a mess.
 	alarm(0);
 
 	// get a pointer to the shared memory segment

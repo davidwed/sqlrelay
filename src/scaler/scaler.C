@@ -291,19 +291,23 @@ int scaler::countSessions() {
 int scaler::countConnections() {
 
 	// wait for access to the connection counter
-	semset->wait(4);
+	semset->waitWithUndo(4);
 
 	// get the number of connections
 	unsigned int	*connections=(unsigned int *)idmemory->getPointer();
 
 	// signal that the connection counter may be accessed by someone else
-	semset->signal(4);
+	semset->signalWithUndo(4);
 
 	return (int)(*connections);
 }
 
 void scaler::loop() {
 
+	// FIXME: if the listener dies before the scaler does, the wait() inside
+	// openMoreConnections() will fall through every time, the session count
+	// will be -1, connections will always be greater than that,
+	// openMoreConnections() will return, and just loop up forever...
 	for (;;) {
 		// open more connections if necessary
 		openMoreConnections();

@@ -1549,7 +1549,7 @@ is possible.</p>
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT><FONT color=#ff00ff>&quot;</FONT>);
 <FONT color=#008b8b>$port</FONT>=<FONT color=#0008b8b>$cur</FONT>-&gt;getConnectionPort();
-<FONT color=#008b8b>$curocket</FONT>=<FONT color=#0008b8b>$cur</FONT>-&gt;getConnectionPort();
+<FONT color=#008b8b>$curocket</FONT>=<FONT color=#0008b8b>$cur</FONT>-&gt;getConnectionSocket();
 <FONT color=#008b8b>$rs</FONT>=<FONT color=#0008b8b>$cur</FONT>-&gt;getResultSetId();
 <FONT color=#008b8b>$cur</FONT>-&gt;suspendResultSet();
 <FONT color=#008b8b>$con</FONT>-&gt;suspendSession();

@@ -1511,7 +1511,7 @@ cur=PySQLRClient.sqlrcursor(con)
 
 cur.sendQuery('<FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT>')
 port=getConnectionPort()
-socket=getConnectionPort()
+socket=getConnectionSocket()
 rs=getResultSetId()
 cur.suspendResultSet()
 con.suspendSession()

@@ -152,6 +152,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		bool		createSharedMemoryAndSemaphores(
 							const char *tmpdir,
 							const char *id);
+		void		waitForListenerToRequireAConnection();
 		void		acquireAnnounceMutex();
 		shmdata		*getAnnounceBuffer();
 		void		signalListenerToRead();

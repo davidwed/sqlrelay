@@ -1730,7 +1730,7 @@ main() {
 
         sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;insert into my_table values (1,2,3)&quot;</FONT>);
         port=getConnectionPort(cur);
-        socket=getConnectionPort(cur);
+        socket=getConnectionSocket(cur);
 	rs=sqlrcur_getResultSetId(cur);
 	sqlrcur_suspendResultSet(cur);
         sqlrcon_suspendSession(con);

@@ -1667,7 +1667,7 @@ is possible.</p>
 
      sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>port</FONT><B><FONT color=#a52a2a>=</FONT></B>getConnectionPort<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>socket</FONT><B><FONT color=#a52a2a>=</FONT></B>getConnectionPort<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>socket</FONT><B><FONT color=#a52a2a>=</FONT></B>getConnectionSocket<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>rs</FONT><B><FONT color=#a52a2a>=</FONT></B>getResultSetId<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
      sqlrcur_suspendResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
      sqlrcon_suspendSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
