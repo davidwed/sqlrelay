@@ -7,7 +7,16 @@
 
 <body>
 
-<a name="env"></a>
+<span class="heading1">Configure the Kernel</span><br>
+
+<p>Oracle 9i requires that you at least temporarily increase the maximum shared
+memory segment size for installation.  To temporarily increase the maximum
+shared memory segment size, follow these instructions (as root):</p>
+
+<blockquote>
+<b>echo "1073741824" > /proc/sys/kernel/shmmax</b>
+</blockquote>
+
 <span class="heading1">Set Up the Environment</span><br>
 
 <p>Add the following line to /home/oracle/.bashrc near the bottom:</p>
@@ -16,7 +25,6 @@
 <b>export LD_ASSUME_KERNEL=2.4.1</b>
 </blockquote>
 
-<a name="compat"></a>
 <span class="heading1">Install Compatibility Packages</span><br>
 
 <p>The Apache web server that comes with Oracle 9i requires Berkeley DB version
@@ -50,6 +58,8 @@ cd libctypefixup-1.0<br>
 make<br>
 make install<br>
 </b></blockquote>
+
+<span class="heading1">Install Oracle</span><br>
 
 <p>Now, log in as the oracle user.</p>
 
