@@ -19,6 +19,13 @@ clean:
 	$(RMTREE) */*/*/.pics
 	$(RMTREE) */*/*/*/.pics
 	$(RMTREE) */*/*/*/*/.pics
+	cd test/c; ./clean
+	cd test/c++; ./clean
+	cd test/java; ./clean
+	cd test/perl; ./clean
+	cd test/python; ./clean
+	cd test/ruby; ./clean
+	cd test/stress; ./clean
 
 rebuild:
 	$(MAKE) -C src rebuild

@@ -1,0 +1,221 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With IBM DB2 - Installing DB2 Version 7.2</title>
+<link rel="stylesheet" href="../../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Installing IBM DB2 Version 7.2</span><br>
+
+<br><br>
+
+<span class="heading2">Install libncurses.so.4</span><br>
+
+<p>DB2 7.2 requires libncurses.so.4.  Many older distributions come with 
+libncurses.so.4.  Many newer distributions come with libncurses.so.5 (or newer).
+Some distributions come with both.  If your distribution does NOT have 
+libncurses.so.4, create a symbolic link to the newer library as follows.</p>
+
+<p>(These instructions assume that your system has ncurses version 5.2 and that
+libncurses.so.5.2 resides in /usr/lib.  If your system has a different version 
+of ncurses or if it resides somewhere else (for example, in /lib) then modify 
+the instructions accordingly)</p>
+
+<blockquote>
+<b>cd /usr/lib<br>
+ln -s libncurses.so.5.2 libncurses.so.4</b>
+</blockquote>
+
+<span class="heading2">Install Compatibility Packages</span><br>
+
+<p>DB2 V7.2 for Linux requires glibc 2.1.  Many newer Linux distributions come with glibc 2.2.  On these distributions it is necessary to install some 
+compatibility packages.</p>
+
+<p>Distributions that come with glibc 2.1 include RedHat 6, Debian 2.2, 
+Mandrake 7 and Slackware 7.  Newer distributions come with newer versions of
+glibc.</p>
+
+<p>RedHat provides compatability RPM's for RedHat 7 that can actually be used
+on any Linux distribution.  These RPM's can be downloaded from
+<a href="http://rpmfind.net">rpmfind</a>.  You'll need the following RPM's.
+</p>
+
+<ul>
+<li><b>compat-glibc-6.2-2.1.3.2.i386.rpm</b> for RedHat Linux 7.2</li>
+<li><b>compat-egcs-6.2-1.1.2.16.i386.rpm</b> for RedHat Linux 7.2</li>
+</ul>
+
+<p>You can install the compatibility RPM's using <i>rpm -i</i>.</p>
+
+<span class="heading2">DB2 Installation</span><br>
+
+<p>IBM DB2 V7.2 is available from 
+<a href="http://www-3.ibm.com/software/data/db2/linux/">the IBM website</a> as
+a tarball.  Extracting the tarball using <i>tar xf</i> creates a directory
+called 018_EEE_LNX_NLV.  Change directories into that directory.</p>
+
+<p>On Debian Linux and Slackware Linux, edit the db2_install script and
+comment out the line:</p>
+
+<blockquote>
+<b>rpm -qa | grep rpm 1>/dev/null 2>/dev/null</b>
+</blockquote>
+
+<p>Run the db2_install script.</p>
+
+<p>When prompted to specify a keyword, type DB2.EENT and press return.</p>
+
+<p>When the script completes, run <i>rpm -qa</i> and verify that the following 
+RPM's were installed:</p>
+
+<blockquote><b>
+db2cnvc71-7.1.0-40<br>
+db2gs71-7.1.0-40<br>
+db2cucs71-7.1.0-40<br>
+db2engn71-7.1.0-40<br>
+db2cdrd71-7.1.0-40<br>
+db2dj71-7.1.0-40<br>
+db2pext71-7.1.0-40<br>
+db2cliv71-7.1.0-40<br>
+db2rte71-7.1.0-40<br>
+db2wcc71-7.1.0-40<br>
+db2hten71-7.1.0-40<br>
+db2cnvk71-7.1.0-40<br>
+db2cj71-7.1.0-40<br>
+db2conn71-7.1.0-40<br>
+db2smpl71-7.1.0-40<br>
+db2xlic71-7.1.0-40<br>
+db2cnvj71-7.1.0-40<br>
+db2crte71-7.1.0-40<br>
+db2cdb71-7.1.0-40<br>
+db2das71-7.1.0-40<br>
+db2cnvt71-7.1.0-40<br>
+db2repl71-7.1.0-40<br>
+db2adts71-7.1.0-40<br>
+db2jdbc71-7.1.0-40<br>
+db2adt71-7.1.0-40<br>
+</b></blockquote>
+
+<span class="heading2">Ignore the Misinformation</span><br>
+
+<p>There are many, many instances where the DB2 Version 7.2 distribution
+identifies itself as version 7.1 instead of 7.2.  For example, the RPM's have a
+7.1.0 version number.  These clues might lead one to think that he or she has
+accidentally installed version 7.1 instead of version 7.2, but this is not the
+case.</p>
+
+<span class="heading2">Install the Documentation</span><br>
+
+<p>For version 7.2, once the RPM's are installed, you can install the
+documentation by running <i>/usr/IBMdb2/V7.1/doc/db2insthtml en_US</i>.
+To view the documentation, point your browser at
+<a href="file://usr/IBMdb2/V7.1/doc/en_US/html">
+/usr/IBMdb2/V7.1/doc/en_US/html</a>.</p>
+
+<span class="heading2">Creating an Instance</span><br>
+
+<p>IBM DB2 is installed under either /opt/IBMdb2/V7.1, /usr/IBMdb2/V7.1 
+That directory will be referred to as <i>BASE_DIR</i> in this document.</p>
+
+<p>A DB2 installation consists of an administration server and one or more
+instances.  Each instance contains one or more databases.  The administration 
+server coordinates the instances.  The administration server is owned by an 
+OS-level user.  Each instance is owned by a seperate OS-level user as well.</p>
+
+<p>To create an instance and an administration server, run 
+<i>BAS_DIR/install/db2setup</i>, a text-based installation program.</p>
+
+<blockquote>
+Select <b>[ Create... ]</b><br>
+Select <b>Create a DB2 Instance</b><br>
+Accept the default user name (db2inst1).<br>
+Accept the default UID.<br>
+Accept the default group name (db2iadm1).<br>
+Accept the default GID.<br>
+Pick a password.<br>
+Select <b>[ OK ]</b><br>
+<br>
+A screen for creating the Fenced User (the user that will run user defined
+functions and stored procedures) will now appear.<br>
+<br>
+Accept the default user name (db2fenc1).<br>
+Accept the default UID.<br>
+Accept the default group name (db2fadm1).<br>
+Accept the default GID.<br>
+Pick a password.<br>
+Select <b>[ OK ]</b> This will return you to <b>Create DB2 Services</b>
+screen.<br>
+<br>
+Select <b>Create the Administration Server</b><br>
+Accept the default user name (db2as).<br>
+Accept the default UID.<br>
+Accept the default group name (db2asgrp).<br>
+Accept the default GID.<br>
+Pick a password.<br>
+Select <b>[ OK ]</b><br>
+If you get a <b>DB2SYSTEM will be set to ...</b> dialog, select 
+<b>[ OK ]</b>.<br>
+<br>
+On the <b>Create DB2 Services</b> screen, select <b>[ OK ]</b><br>
+Select <b>[ Continue ]</b><br>
+Select <b>[ OK ]</b> in the <b>This is your last chance to stop</b> 
+dialog.<br>
+<br>
+Now the instance and administration server will be created.<br>
+If all went well, you'll get a <b>Completed Sucessfully.</b> notice.<br>
+To exit,<br>
+Select <b>[ OK ]</b><br>
+Select <b>[ OK ]</b><br>
+Select <b>[ Close ]</b><br>
+Select <b>[ OK ]</b>
+</blockquote>
+
+<p>Should you need to create additional DB2 instances, follow this procedure 
+again using a different user name and skipping the steps pertaining
+to the Administration Server.  The <i>BASE_DIR/instance/db2ilist</i> 
+command lists all of the DB2 instances on the local computer.</p>
+
+<p>If you need to drop an instance, run 
+<i>BASE_DIR/instance/db2idrop instancename</i>, substituting the name of
+the instance you want to drop for instancename.</p>
+
+<p>The <i>BASE_DIR/instance/dasilist</i> command lists all of the DB2 
+administration servers on the local computer.</p>
+
+<p>If you need to drop an administration server, run 
+<i>BASE_DIR/instance/dasidrop servername</i>, substituting the name of
+the administration server you want to drop for servername.</p>
+
+<span class="heading2">Enable Remote Access</span><br>
+
+<p>By default, a DB2 instance only accept connections from clients running on 
+the local machine.  To enable connections from clients running on a remote 
+machine over TCP, execute commands like the following.  These commands set 
+up the <i>db2inst1</i> instance on port 50000.</p>
+
+<blockquote>
+log in as root<br>
+view <i>/etc/services</i> and look for a line like:<br>
+<blockquote><b>
+db2cdb2inst1     50000/tcp  # Connection port for DB2 instance db2inst1<br>
+</b></blockquote>
+if no such line exists, add it
+<br>
+log in as db2as<br>
+run the following commands:<br>
+<blockquote><b>
+. /home/db2inst1/sqllib/db2profile<br>
+db2 "update database manager configuration using svcename db2inst1"<br>
+db2stop<br>
+db2start<br>
+</b></blockquote>
+</blockquote>
+
+<p>Now the <i>db2inst1</i> instance should be accessible to remote clients on 
+port 50000.</p>
+
+</body>
+
+</html>
