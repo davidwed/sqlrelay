@@ -5,8 +5,8 @@ include ../../config.mk
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
 LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
-SRCS = sqlrconnection/constructor.C \
-	sqlrconnection/destructor.C \
+SRCS = sqlrconnection/sqlrconnectionctor.C \
+	sqlrconnection/sqlrconnectiondtor.C \
 	sqlrconnection/initconnection.C \
 	sqlrconnection/ipc.C \
 	sqlrconnection/opensockets.C \
@@ -52,16 +52,16 @@ SRCS = sqlrconnection/constructor.C \
 	sqlrconnection/istransactional.C \
 	sqlrconnection/bindparameters.C \
 	sqlrconnection/unixsocketseqfile.C \
-	sqlrcursor/constructor.C \
-	sqlrcursor/destructor.C \
+	sqlrcursor/sqlrcursorctor.C \
+	sqlrcursor/sqlrcursordtor.C \
 	sqlrcursor/openclose.C \
 	sqlrcursor/preparequery.C \
 	sqlrcursor/queryparse.C \
 	sqlrcursor/binds.C \
 	sqlrcursor/fakebinds.C \
 	sqlrcursor/abort.C
-LOBJS = sqlrconnection/constructor.lo \
-	sqlrconnection/destructor.lo \
+LOBJS = sqlrconnection/sqlrconnectionctor.lo \
+	sqlrconnection/sqlrconnectiondtor.lo \
 	sqlrconnection/initconnection.lo \
 	sqlrconnection/ipc.lo \
 	sqlrconnection/opensockets.lo \
@@ -107,16 +107,16 @@ LOBJS = sqlrconnection/constructor.lo \
 	sqlrconnection/istransactional.lo \
 	sqlrconnection/bindparameters.lo \
 	sqlrconnection/unixsocketseqfile.lo \
-	sqlrcursor/constructor.lo \
-	sqlrcursor/destructor.lo \
+	sqlrcursor/sqlrcursorctor.lo \
+	sqlrcursor/sqlrcursordtor.lo \
 	sqlrcursor/openclose.lo \
 	sqlrcursor/preparequery.lo \
 	sqlrcursor/queryparse.lo \
 	sqlrcursor/binds.lo \
 	sqlrcursor/fakebinds.lo \
 	sqlrcursor/abort.lo
-DLOBJS = sqlrconnection/constructor.d.lo \
-	sqlrconnection/destructor.d.lo \
+DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
+	sqlrconnection/sqlrconnectiondtor.d.lo \
 	sqlrconnection/initconnection.d.lo \
 	sqlrconnection/ipc.d.lo \
 	sqlrconnection/opensockets.d.lo \
@@ -162,8 +162,8 @@ DLOBJS = sqlrconnection/constructor.d.lo \
 	sqlrconnection/istransactional.d.lo \
 	sqlrconnection/bindparameters.d.lo \
 	sqlrconnection/unixsocketseqfile.d.lo \
-	sqlrcursor/constructor.d.lo \
-	sqlrcursor/destructor.d.lo \
+	sqlrcursor/sqlrcursorctor.d.lo \
+	sqlrcursor/sqlrcursordtor.d.lo \
 	sqlrcursor/openclose.d.lo \
 	sqlrcursor/preparequery.d.lo \
 	sqlrcursor/queryparse.d.lo \
