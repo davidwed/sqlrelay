@@ -3,9 +3,9 @@
 sudo /etc/rc.d/init.d/httpd start
 sleep 1
 
-chmod 755 db2.php
-cp db2.php /usr/local/web
-lynx -dump "http://localhost/db2.php?host=localhost&port=8001&socket=&user=db2test&password=db2test"
+#chmod 755 db2.php
+#cp db2.php /usr/local/web
+#lynx -dump "http://localhost/db2.php?host=localhost&port=8001&socket=&user=db2test&password=db2test"
 
 #chmod 755 freetds.php
 #cp freetds.php /usr/local/web
@@ -31,9 +31,9 @@ lynx -dump "http://localhost/db2.php?host=localhost&port=8001&socket=&user=db2te
 #cp oracle7.php /usr/local/web
 #lynx -dump "http://localhost/oracle7.php?host=localhost&port=8008&socket=&user=oracle7test&password=oracle7test"
 
-#chmod 755 oracle8.php
-#cp oracle8.php /usr/local/web
-#lynx -dump "http://localhost/oracle8.php?host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
+chmod 755 oracle8.php
+cp oracle8.php /usr/local/web
+lynx -dump "http://localhost/oracle8.php?host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
 
 #chmod 755 postgresql.php
 #cp postgresql.php /usr/local/web
