@@ -22,13 +22,11 @@ bool sqlrconnection::rollback() {
 	int	rollbackquerylen=8;
 	bool	retval=false;
 	if (rollbackcur->openCursor(-1) &&
-		rollbackcur->prepareQuery(rollbackquery,
-						rollbackquerylen) &&
-		rollbackcur->executeQuery(rollbackquery,
-						rollbackquerylen,true)) {
-		rollbackcur->cleanUpData(false,false,false);
-		retval=true;
+		rollbackcur->prepareQuery(rollbackquery,rollbackquerylen)) {
+		retval=rollbackcur->executeQuery(rollbackquery,
+						rollbackquerylen,true);
 	}
+	rollbackcur->cleanUpData(false,false,false);
 	rollbackcur->closeCursor();
 	delete rollbackcur;
 

@@ -282,7 +282,7 @@ freetdscursor::~freetdscursor() {
 	if (cmd) {
 		ct_cmd_drop(cmd);
 	}
-	delete cursorname;
+	delete[] cursorname;
 }
 
 bool freetdscursor::openCursor(int id) {

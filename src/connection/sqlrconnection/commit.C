@@ -22,11 +22,10 @@ bool sqlrconnection::commit() {
 	int	commitquerylen=6;
 	bool	retval=false;
 	if (commitcur->openCursor(-1) &&
-		commitcur->prepareQuery(commitquery,commitquerylen) &&
-		commitcur->executeQuery(commitquery,commitquerylen,true)) {
-		commitcur->cleanUpData(false,false,false);
-		retval=true;
+		commitcur->prepareQuery(commitquery,commitquerylen)) {
+		retval=commitcur->executeQuery(commitquery,commitquerylen,true);
 	}
+	commitcur->cleanUpData(false,false,false);
 	commitcur->closeCursor();
 	delete commitcur;
 

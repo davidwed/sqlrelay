@@ -20,23 +20,23 @@ rebuild:
 	$(MAKE) -C src rebuild
 
 install:
-	$(MAKE) -C bin install
-	$(MAKE) -C doc install
-	$(MAKE) -C man install
-	$(MAKE) -C etc install
 	$(MAKE) -C src install
+	$(MAKE) -C bin install
+	$(MAKE) -C etc install
 	$(MAKE) -C init install
+	$(MAKE) -C man install
+	$(MAKE) -C doc install
 	$(MKINSTALLDIRS) $(libdir)/pkgconfig
 	$(INSTALL) -m 0644 sqlrelay-c.pc $(libdir)/pkgconfig/sqlrelay-c.pc
 	$(INSTALL) -m 0644 sqlrelay-c++.pc $(libdir)/pkgconfig/sqlrelay-c++.pc
 
 uninstall:
-	$(MAKE) -C bin uninstall
-	$(MAKE) -C doc uninstall
-	$(MAKE) -C man uninstall
-	$(MAKE) -C etc uninstall
 	$(MAKE) -C src uninstall
+	$(MAKE) -C bin uninstall
+	$(MAKE) -C etc uninstall
 	$(MAKE) -C init uninstall
+	$(MAKE) -C man uninstall
+	$(MAKE) -C doc uninstall
 	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc
 	$(RM) $(libdir)/pkgconfig/sqlrelay-c++.pc
 

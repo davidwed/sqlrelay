@@ -26,6 +26,7 @@ class sybasecursor : public sqlrcursor {
 			sybasecursor(sqlrconnection *conn);
 			~sybasecursor();
 		bool	openCursor(int id);
+		bool	closeCursor();
 		bool	prepareQuery(const char *query, long length);
 		bool	inputBindString(const char *variable,
 						unsigned short variablesize,
@@ -58,11 +59,18 @@ class sybasecursor : public sqlrcursor {
 		void	returnRow();
 		void	cleanUpData(bool freerows, bool freecols,
 							bool freebinds);
+		void	discardResults();
+		void	discardCursor();
+
+		char	*cursorname;
 
 		void	checkRePrepare();
 
+		CS_COMMAND	*languagecmd;
+		CS_COMMAND	*cursorcmd;
 		CS_COMMAND	*cmd;
-		CS_INT		results_type;
+		CS_INT		results;
+		CS_INT		resultstype;
 		CS_INT		ncols;
 		CS_INT		affectedrows;
 
@@ -85,7 +93,11 @@ class sybasecursor : public sqlrcursor {
 
 		char		*query;
 		int		length;
-		int		prepared;
+		bool		prepared;
+		bool		clean;
+
+		regularexpression	cursorquerylower;
+		regularexpression	cursorqueryupper;
 
 		sybaseconnection	*sybaseconn;
 };

@@ -27,6 +27,7 @@ stored procedure examples in faq
 sybase connection won't even start now
 
 idle client timeout
+client connect timeout
 perl apis -> CPAN
 
 address Matthias Klose's concerns:

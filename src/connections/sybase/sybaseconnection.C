@@ -269,23 +269,40 @@ char sybaseconnection::bindVariablePrefix() {
 }
 
 sybasecursor::sybasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
-	prepared=0;
+	prepared=false;
 	sybaseconn=(sybaseconnection *)conn;
 	cmd=NULL;
+	languagecmd=NULL;
+	cursorcmd=NULL;
+	cursorname=NULL;
 
 	// replace the regular expressions used to detect creation of a
 	// temporary table
 	createtemplower.compile("create[ \\t\\r\\n]+table[ \\t\\r\\n]+#");
 	createtempupper.compile("CREATE[ \\t\\r\\n]+TABLE[ \\t\\r\\n]+#");
+
+	cursorquerylower.compile("(select|execute)[ \\t\\r\\n]+");
+	cursorqueryupper.compile("(SELECT|EXECUTE)[ \\t\\r\\n]+");
 }
 
 sybasecursor::~sybasecursor() {
-	if (cmd) {
-		ct_cmd_drop(cmd);
-	}
+	closeCursor();
+	delete[] cursorname;
 }
 
 bool sybasecursor::openCursor(int id) {
+
+	clean=true;
+
+	cursorname=charstring::parseNumber((long)id);
+
+	if (ct_cmd_alloc(sybaseconn->dbconn,&languagecmd)!=CS_SUCCEED) {
+		return false;
+	}
+	if (ct_cmd_alloc(sybaseconn->dbconn,&cursorcmd)!=CS_SUCCEED) {
+		return false;
+	}
+	cmd=NULL;
 
 	// switch to the correct database
 	bool	retval=true;
@@ -304,27 +321,53 @@ bool sybasecursor::openCursor(int id) {
 	return (retval && sqlrcursor::openCursor(id));
 }
 
+bool sybasecursor::closeCursor() {
+	bool	retval=true;
+	if (languagecmd) {
+		retval=(ct_cmd_drop(languagecmd)==CS_SUCCEED);
+		languagecmd=NULL;
+	}
+	if (cursorcmd) {
+		retval=(retval && (ct_cmd_drop(cursorcmd)==CS_SUCCEED));
+		cursorcmd=NULL;
+	}
+	cmd=NULL;
+	return retval;
+}
+
 bool sybasecursor::prepareQuery(const char *query, long length) {
+
+	clean=true;
 
 	this->query=(char *)query;
 	this->length=length;
 
 	paramindex=0;
 
-	if (cmd) {
-		ct_cmd_drop(cmd);
-	}
-	if (ct_cmd_alloc(sybaseconn->dbconn,&cmd)!=CS_SUCCEED) {
-		return false;
+	if (cursorquerylower.match(query) || cursorqueryupper.match(query)) {
+
+		// initiate a cursor command
+		cmd=cursorcmd;
+		if (ct_cursor(cursorcmd,CS_CURSOR_DECLARE,
+					(CS_CHAR *)cursorname,CS_NULLTERM,
+					(CS_CHAR *)query,length,
+					CS_READ_ONLY)!=CS_SUCCEED) {
+			return false;
+		}
+
+	} else {
+
+		// initiate a language command
+		cmd=languagecmd;
+		if (ct_command(languagecmd,CS_LANG_CMD,
+					(CS_CHAR *)query,length,
+					CS_UNUSED)!=CS_SUCCEED) {
+			return false;
+		}
 	}
 
-	// initiate a language command
-	if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)query,
-				length,CS_UNUSED)!=CS_SUCCEED) {
-		return false;
-	}
-
-	prepared=1;
+	clean=false;
+	prepared=true;
 	return true;
 }
 
@@ -471,72 +514,113 @@ bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
 	maxrow=0;
 	totalrows=0;
 
+	if (cmd==cursorcmd) {
+		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
+					NULL,CS_UNUSED,
+					NULL,CS_UNUSED,
+					(CS_INT)FETCH_AT_ONCE)!=CS_SUCCEED) {
+			return false;
+		}
+		if (ct_cursor(cursorcmd,CS_CURSOR_OPEN,
+					NULL,CS_UNUSED,
+					NULL,CS_UNUSED,
+					CS_UNUSED)!=CS_SUCCEED) {
+			return false;
+		}
+	}
+
 	if (ct_send(cmd)!=CS_SUCCEED) {
+		cleanUpData(true,true,true);
 		return false;
 	}
 
-	// Get the results. Sybase is weird... A query can return multiple
-	// result sets.  We're only interested in the first one, the rest will 
-	// be cancelled.  Return a dead database on failure
-	if (ct_results(cmd,&results_type)==CS_FAIL) {
-		ct_cancel(sybaseconn->dbconn,NULL,CS_CANCEL_ALL);
-		sybaseconn->deadconnection=true;
-		return false;
+	for (;;) {
+
+		results=ct_results(cmd,&resultstype);
+
+		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
+			cleanUpData(true,true,true);
+			return false;
+		}
+
+		if (cmd==languagecmd) {
+			// For non-cursor commands, there should be only
+			// one result set.
+			break;
+		} else if (cmd==cursorcmd && (resultstype==CS_ROW_RESULT ||
+					resultstype==CS_CURSOR_RESULT ||
+					resultstype==CS_COMPUTE_RESULT ||
+					resultstype==CS_PARAM_RESULT ||
+					resultstype==CS_STATUS_RESULT)) {
+			// For cursor commands, each call to ct_cursor will
+			// have generated a result set.  There will be result
+			// sets for the CS_CURSOR_DECLARE, CS_CURSOR_ROWS and
+			// CS_CURSOR_OPEN calls.  We need to skip past the
+			// first 2, unless they failed.  If they failed, it
+			// will be caught above.
+			break;
+		}
+
+		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
+			sybaseconn->deadconnection=1;
+			// FIXME: call ct_close(CS_FORCE_CLOSE)
+			// maybe return false
+			return false;
+		}
 	}
 
 	checkForTempTable(query,length);
 
-	// handle a failed command
-	if ((int)results_type==CS_CMD_FAIL) {
-		ct_cancel(sybaseconn->dbconn,NULL,CS_CANCEL_ALL);
-		return false;
-	}
-
 	// reset the prepared flag
-	prepared=0;
-
+	prepared=false;
 
 	// For queries which return rows or parameters (output bind variables),
-	// get the column count.  For DML queries, get the affected row count.
+	// get the column count and bind columns.  For DML queries, get the
+	// affected row count.
 	affectedrows=0;
-	if (results_type==CS_ROW_RESULT) {
+	if (resultstype==CS_ROW_RESULT ||
+			resultstype==CS_CURSOR_RESULT ||
+			resultstype==CS_COMPUTE_RESULT ||
+			resultstype==CS_PARAM_RESULT ||
+			resultstype==CS_STATUS_RESULT) {
+
 		if (ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			return false;
 		}
+
 		if (ncols>MAX_SELECT_LIST_SIZE) {
 			ncols=MAX_SELECT_LIST_SIZE;
 		}
-	} else if (results_type==CS_CMD_SUCCEED) {
-		if (ct_res_info(cmd,CS_ROW_COUNT,(CS_VOID *)&affectedrows,
-				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			return false;
-		} 
-	}
 
-	// bind columns
-	for (int i=0; i<(int)ncols; i++) {
+		// bind columns
+		for (int i=0; i<(int)ncols; i++) {
 
-		// get the field as a null terminated character string
-		// no longer than MAX_ITEM_BUFFER_SIZE, override some other
-		// values that might have been set also
-		column[i].datatype=CS_CHAR_TYPE;
-		column[i].format=CS_FMT_NULLTERM;
-		column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
-		column[i].scale=CS_UNUSED;
-		column[i].precision=CS_UNUSED;
-		column[i].status=CS_UNUSED;
-		column[i].count=FETCH_AT_ONCE;
-		column[i].usertype=CS_UNUSED;
-		column[i].locale=NULL;
-
-		// bind the columns for the fetches
-		if (results_type==CS_ROW_RESULT) {
+			// get the field as a null terminated character string
+			// no longer than MAX_ITEM_BUFFER_SIZE, override some
+			// other values that might have been set also
+			column[i].datatype=CS_CHAR_TYPE;
+			column[i].format=CS_FMT_NULLTERM;
+			column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
+			column[i].scale=CS_UNUSED;
+			column[i].precision=CS_UNUSED;
+			column[i].status=CS_UNUSED;
+			column[i].count=FETCH_AT_ONCE;
+			column[i].usertype=CS_UNUSED;
+			column[i].locale=NULL;
+	
+			// bind the columns for the fetches
 			if (ct_bind(cmd,i+1,&column[i],(CS_VOID *)data[i],
 				datalength[i],nullindicator[i])!=CS_SUCCEED) {
 				break;
 			}
 		}
+
+	} else if (resultstype==CS_CMD_SUCCEED) {
+		if (ct_res_info(cmd,CS_ROW_COUNT,(CS_VOID *)&affectedrows,
+				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
+			return false;
+		} 
 	}
 
 	// return success only if no error was generated
@@ -574,7 +658,11 @@ void sybasecursor::returnColumnInfo() {
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// unless the query was a successful select, send no header
-	if (results_type!=CS_ROW_RESULT) {
+	if (resultstype!=CS_ROW_RESULT &&
+			resultstype!=CS_CURSOR_RESULT &&
+			resultstype!=CS_COMPUTE_RESULT &&
+			resultstype!=CS_PARAM_RESULT &&
+			resultstype!=CS_STATUS_RESULT) {
 		return;
 	}
 
@@ -674,7 +762,11 @@ void sybasecursor::returnColumnInfo() {
 
 bool sybasecursor::noRowsToReturn() {
 	// unless the query was a successful select, send no data
-	return (results_type!=CS_ROW_RESULT);
+	return (resultstype!=CS_ROW_RESULT &&
+			resultstype!=CS_CURSOR_RESULT &&
+			resultstype!=CS_COMPUTE_RESULT &&
+			resultstype!=CS_PARAM_RESULT &&
+			resultstype!=CS_STATUS_RESULT);
 }
 
 bool sybasecursor::skipRow() {
@@ -717,21 +809,51 @@ void sybasecursor::returnRow() {
 }
 
 
-void sybasecursor::cleanUpData(bool freerows, bool freecols,
-							bool freebinds) {
+void sybasecursor::cleanUpData(bool freerows, bool freecols, bool freebinds) {
 
-	// cancel the rest of the result sets
-	if (freerows) {
-		CS_INT	return_code;
-		while ((return_code=ct_results(cmd,&results_type))==
-								CS_SUCCEED) {
-			ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
-		}
+	if (clean) {
+		return;
+	}
 
-		// return a dead database on absolute failre
-		if (return_code==CS_FAIL) {
-			ct_cancel(NULL,cmd,CS_CANCEL_ALL);
+	discardResults();
+	discardCursor();
+
+	clean=true;
+}
+
+void sybasecursor::discardResults() {
+
+	// if there are any unprocessed result sets, process them
+	if (results==CS_SUCCEED) {
+		do {
+			if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
+				sybaseconn->deadconnection=1;
+				// FIXME: call ct_close(CS_FORCE_CLOSE)
+				// maybe return false
+			}
+			results=ct_results(cmd,&resultstype);
+		} while (results==CS_SUCCEED);
+	}
+
+	if (results==CS_FAIL) {
+		if (ct_cancel(NULL,cmd,CS_CANCEL_ALL)==CS_FAIL) {
 			sybaseconn->deadconnection=1;
+			// FIXME: call ct_close(CS_FORCE_CLOSE)
+			// maybe return false
+		}
+	}
+}
+
+
+void sybasecursor::discardCursor() {
+
+	if (cmd==cursorcmd) {
+		if (ct_cursor(cursorcmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
+				NULL,CS_UNUSED,CS_DEALLOC)==CS_SUCCEED) {
+			if (ct_send(cursorcmd)==CS_SUCCEED) {
+				results=ct_results(cmd,&resultstype);
+				discardResults();
+			}
 		}
 	}
 }
@@ -739,7 +861,7 @@ void sybasecursor::cleanUpData(bool freerows, bool freecols,
 CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CLIENTMSG *msgp) {
 	if (errorstring) {
-		delete errorstring;
+		return CS_SUCCEED;
 	}
 	errorstring=new stringbuffer();
 
@@ -764,7 +886,8 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 		errorstring->append("\n	")->append(msgp->osstring)->
 							append("\n");
 	}
-printf("csMessageCallback:\n%s\n",errorstring->getString());
+
+	//printf("csMessageCallback:\n%s\n",errorstring->getString());
 
 	// for a timeout message, set deadconnection to 1
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
@@ -781,7 +904,7 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 						CS_CONNECTION *cnn,
 						CS_CLIENTMSG *msgp) {
 	if (errorstring) {
-		delete errorstring;
+		return CS_SUCCEED;
 	}
 	errorstring=new stringbuffer();
 
@@ -806,7 +929,8 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 		errorstring->append("\n	")->append(msgp->osstring)->
 							append("\n");
 	}
-printf("clientMessageCallback:\n%s\n",errorstring->getString());
+
+	//printf("clientMessageCallback:\n%s\n",errorstring->getString());
 
 	// for a timeout message, set deadconnection to 1
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
@@ -830,7 +954,7 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	}
 
 	if (errorstring) {
-		delete errorstring;
+		return CS_SUCCEED;
 	}
 	errorstring=new stringbuffer();
 
@@ -856,7 +980,8 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	errorstring->append("Error:	")->
 				append(msgp->text)->
 				append("\n");
-printf("serverMessageCallback:\n%s\n",errorstring->getString());
+
+	//printf("serverMessageCallback:\n%s\n",errorstring->getString());
 
 	return CS_SUCCEED;
 }
