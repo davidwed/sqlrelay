@@ -61,18 +61,18 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 								const char *id);
 		bool	listenOnFixupSocket(tempdir *tmpdir, const char *id);
 		void	blockSignals();
-		int	waitForData();
-		bool	handleClientConnection(int fd);
+		filedescriptor	*waitForData();
+		bool	handleClientConnection(filedescriptor *fd);
 		bool	registerHandoff(datatransport *sock);
 		bool	deRegisterHandoff(datatransport *sock);
 		bool	fixup(datatransport *sock);
 		bool	deniedIp();
-		void	disconnectClient();
-		void	forkChild();
-		void	clientSession();
-		int	getAuth();
+		void	disconnectClient(datatransport *sock);
+		void	forkChild(datatransport *sock);
+		void	clientSession(datatransport *sock);
+		int	getAuth(datatransport *sock);
 		void	incrementSessionCount();
-		bool	handOffClient();
+		bool	handOffClient(datatransport *sock);
 		void	getAConnection(unsigned long *connectionpid,
 					unsigned short *inetport,
 					char *unixportstr,
@@ -89,10 +89,12 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 						unsigned long connectionpid,
 						const char *unixportstr,
 						unsigned short inetport);
-		void	disconnectFromConnection(datatransport *connsock);
+		void	disconnectFromConnection(datatransport *sock);
 		bool	passClientFileDescriptorToConnection(
-						unixsocket *connectionsock);
-		void	waitForClientClose(int authstatus, bool passstatus);
+						unixsocket *connectionsock,
+						int fd);
+		void	waitForClientClose(int authstatus, bool passstatus,
+						datatransport *sock);
 
 		bool		passdescriptor;
 
