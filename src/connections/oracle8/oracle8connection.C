@@ -454,6 +454,44 @@ int	oracle8cursor::inputBindDouble(const char *variable,
 	return 1;
 }
 
+int	oracle8cursor::outputBindString(const char *variable,
+						unsigned short variablesize,
+						char *value,
+						unsigned short valuesize,
+						short *isnull) {
+	checkRePrepare();
+
+	if (isNumber(variable+1,variablesize-1)) {
+		if (!atoi(variable+1)) {
+			return 0;
+		}
+		if (OCIBindByPos(stmt,&outbindpp[outbindcount],
+				oracle8conn->err,
+				(ub4)atoi(variable+1),
+				(dvoid *)value,
+				(sb4)valuesize,
+				SQLT_STR,
+				(dvoid *)isnull,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return 0;
+		}
+	} else {
+		if (OCIBindByName(stmt,&outbindpp[outbindcount],
+				oracle8conn->err,
+				(text *)variable,(sb4)variablesize,
+				(dvoid *)value,
+				(sb4)valuesize,
+				SQLT_STR,
+				(dvoid *)isnull,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return 0;
+		}
+	}
+	outbindcount++;
+	return 1;
+}
+
+#ifdef HAVE_ORACLE_8i
 int	oracle8cursor::inputBindBlob(const char *variable,
 						unsigned short variablesize,
 						const char *value,
@@ -554,43 +592,6 @@ int	oracle8cursor::inputBindGenericLob(const char *variable,
 	}
 	inbindlobcount++;
 	inbindcount++;
-	return 1;
-}
-
-int	oracle8cursor::outputBindString(const char *variable,
-						unsigned short variablesize,
-						char *value,
-						unsigned short valuesize,
-						short *isnull) {
-	checkRePrepare();
-
-	if (isNumber(variable+1,variablesize-1)) {
-		if (!atoi(variable+1)) {
-			return 0;
-		}
-		if (OCIBindByPos(stmt,&outbindpp[outbindcount],
-				oracle8conn->err,
-				(ub4)atoi(variable+1),
-				(dvoid *)value,
-				(sb4)valuesize,
-				SQLT_STR,
-				(dvoid *)isnull,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
-				OCI_DEFAULT)!=OCI_SUCCESS) {
-			return 0;
-		}
-	} else {
-		if (OCIBindByName(stmt,&outbindpp[outbindcount],
-				oracle8conn->err,
-				(text *)variable,(sb4)variablesize,
-				(dvoid *)value,
-				(sb4)valuesize,
-				SQLT_STR,
-				(dvoid *)isnull,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
-				OCI_DEFAULT)!=OCI_SUCCESS) {
-			return 0;
-		}
-	}
-	outbindcount++;
 	return 1;
 }
 
@@ -775,6 +776,7 @@ void    oracle8cursor::returnOutputBindGenericLob(int index) {
 		conn->endSendingLong();
 	}
 }
+#endif
 
 int	oracle8cursor::executeQuery(const char *query, long length,
 						unsigned short execute) {

@@ -65,6 +65,12 @@ class oracle8cursor : public sqlrcursor {
 					double *value,
 					unsigned short precision,
 					unsigned short scale);
+		int	outputBindString(const char *variable, 
+					unsigned short variablesize,
+					char *value,
+					unsigned short valuesize,
+					short *isnull);
+#ifdef HAVE_ORACLE_8i
 		int	inputBindBlob(const char *variable, 
 					unsigned short variablesize,
 					const char *value, 
@@ -82,11 +88,6 @@ class oracle8cursor : public sqlrcursor {
 					short *isnull,
 					ub1 temptype,
 					ub2 type);
-		int	outputBindString(const char *variable, 
-					unsigned short variablesize,
-					char *value,
-					unsigned short valuesize,
-					short *isnull);
 		int	outputBindBlob(const char *variable, 
 					unsigned short variablesize,
 					int index,
@@ -106,6 +107,7 @@ class oracle8cursor : public sqlrcursor {
 		void	returnOutputBindBlob(int index);
 		void	returnOutputBindClob(int index);
 		void	returnOutputBindGenericLob(int index);
+#endif
 		int	executeQuery(const char *query, long length,
 					unsigned short execute);
 		int	queryIsNotSelect();
