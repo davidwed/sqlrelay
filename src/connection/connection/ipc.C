@@ -99,8 +99,8 @@ void	ipc::acquireAnnounceMutex() {
 	semset->wait(0);
 }
 
-unsigned char	*ipc::getAnnounceBuffer() {
-	return (unsigned char *)idmemory->getPointer()+(2*sizeof(unsigned int));
+shmdata	*ipc::getAnnounceBuffer() {
+	return (shmdata *)idmemory->getPointer();
 }
 
 void	ipc::releaseAnnounceMutex() {

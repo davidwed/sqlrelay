@@ -1,3 +1,4 @@
+memory leak in getFieldByIndex?
 SCO ruby install (relink) doesn't work
 postgresql drop in api won't install on openbsd
 postgresql test program compile fails on SCO _res defined in libsocket/libresolv

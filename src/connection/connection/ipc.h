@@ -6,6 +6,7 @@
 #ifdef SERVER_DEBUG
 	#include <rudiments/logger.h>
 #endif
+#include <defines.h>
 
 class ipc {
 	public:
@@ -22,7 +23,7 @@ class ipc {
 								char *id);
 
 		void		acquireAnnounceMutex();
-		unsigned char	*getAnnounceBuffer();
+		shmdata		*getAnnounceBuffer();
 		void		signalListenerToRead();
 		void		waitForListenerToFinishReading();
 		void		releaseAnnounceMutex();

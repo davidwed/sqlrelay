@@ -47,6 +47,9 @@
 		lists
 	updated config.guess, config.sub, ltmain.sh
 	rpath is optional for everything now
+	rearranged data in shared memory segment a bit, simplified code
+	use a struct for data in shared memory segment now, should alleviate
+		alignment problems on sparc/ppc
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

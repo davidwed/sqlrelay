@@ -1,9 +1,13 @@
 #include <connection/listenercomm.h>
 
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <netinet/in.h>
+
+#include <defines.h>
 
 listenercomm::listenercomm(ipc *ipcptr, connectioncmdline *cmdlineptr) {
 	this->ipcptr=ipcptr;
@@ -46,11 +50,10 @@ void	listenercomm::announceAvailability(char *tmpdir,
 	alarm(0);
 
 	// get a pointer to the shared memory segment
-	unsigned char	*idmemoryptr=ipcptr->getAnnounceBuffer();
+	shmdata	*idmemoryptr=ipcptr->getAnnounceBuffer();
 
 	// first, write the connectionid into the segment
-	strcpy((char *)idmemoryptr,connectionid);
-	idmemoryptr=idmemoryptr+strlen(connectionid)+1;
+	strncpy(idmemoryptr->connectionid,connectionid,MAXCONNECTIONIDLEN);
 
 	// if we're passing descriptors around, write the 
 	// pid to the segment otherwise write ports
@@ -60,7 +63,9 @@ void	listenercomm::announceAvailability(char *tmpdir,
 		dl->write("connection",1,"handoff=pass");
 		#endif
 
-		*((unsigned long *)idmemoryptr)=(unsigned long)getpid();
+		// write the pid into the segment
+		idmemoryptr->connectioninfo.connectionpid=
+						(unsigned long)getpid();
 
 	} else {
 
@@ -68,15 +73,15 @@ void	listenercomm::announceAvailability(char *tmpdir,
 		dl->write("connection",1,"handoff=reconnect");
 		#endif
 
-		int	unixsocketlen=strlen(unixsocket);
-		memcpy((void *)idmemoryptr,(void *)unixsocket,unixsocketlen);
-		idmemoryptr=idmemoryptr+unixsocketlen;
-		*((char *)idmemoryptr)=':';
-		idmemoryptr=idmemoryptr+1;
+		// convert the port to network byte order and write it into
+		// the segment.
+		idmemoryptr->connectioninfo.sockets.inetport=inetport;
 
-		// right-align the inet port
-		*((unsigned short *)idmemoryptr)=inetport & 0xff;
-		*((unsigned short *)(idmemoryptr+1))=inetport >> 8;
+		// write the unix socket name into the segment
+		if (unixsocket && unixsocket[0]) {
+			strncpy(idmemoryptr->connectioninfo.sockets.unixsocket,
+							unixsocket,MAXPATHLEN);
+		}
 	}
 
 	ipcptr->signalListenerToRead();

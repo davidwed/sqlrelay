@@ -17,6 +17,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <defines.h>
 #include <defaults.h>
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
@@ -424,6 +425,10 @@ bool sqlrconfigfile::attributeValue(char *value) {
 			currentuser->setPassword((value)?value:
 							DEFAULT_PASSWORD);
 		} else if (currentattribute==CONNECTIONID_ATTRIBUTE) {
+			if (strlen(value)>MAXCONNECTIONIDLEN) {
+				fprintf(stderr,"error: connectionid \"%s\" is too long, must be %d characters or fewer.\n",value,MAXCONNECTIONIDLEN);
+				return false;
+			}
 			currentconnect->setConnectionId((value)?value:
 							DEFAULT_CONNECTIONID);
 		} else if (currentattribute==STRING_ATTRIBUTE) {

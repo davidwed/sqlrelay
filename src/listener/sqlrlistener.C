@@ -280,11 +280,10 @@ int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",1,"creating shared memory...");
 	#endif
-	idmemory=new sharedmemory();
-	if (!idmemory->create(key,sizeof(unsigned int)+1024+
-				(2*sizeof(unsigned short)),
-				permissions::ownerReadWrite())) {
 
+	idmemory=new sharedmemory();
+	if (!idmemory->create(key,sizeof(shmdata),
+					permissions::ownerReadWrite())) {
 		idmemory->attach(key);
 		shmError(id,idmemory->getId());
 		delete[] idfilename;
@@ -990,16 +989,7 @@ void	sqlrlistener::getAConnection() {
 		semset->wait(2);
 
 		// get a pointer to the shared memory segment
-		char	*ptr=(char *)((long)idmemory->getPointer()+
-						(2*sizeof(unsigned int)));
-
-		// get the connection id
-		char	*nullptr=strchr(ptr,0);
-		int	connidlen=nullptr-ptr;
-		char	*connectionid=new char[connidlen+1];
-		connectionid[connidlen]=(char)NULL;
-		strncpy(connectionid,ptr,connidlen);
-		ptr=ptr+connidlen+1;
+		shmdata	*ptr=(shmdata *)idmemory->getPointer();
 
 		// if we're passing descriptors around, the connection will
 		// pass it's pid to us, otherwise it will pass it's inet and
@@ -1011,7 +1001,7 @@ void	sqlrlistener::getAConnection() {
 			#endif
 
 			// get the pid
-			connectionpid=*((unsigned long *)ptr);
+			connectionpid=ptr->connectioninfo.connectionpid;
 
 		} else {
 
@@ -1019,19 +1009,14 @@ void	sqlrlistener::getAConnection() {
 			debugPrint("listener",1,"handoff=reconnect");
 			#endif
 
-			// get the unix port
-			unixportstrlen=0;
-			while (*ptr!=':' && unixportstrlen<MAXPATHLEN) {
-				unixportstr[unixportstrlen]=*ptr;
-				unixportstrlen++;
-				ptr++;
-			}
-			unixportstr[unixportstrlen]=(char)NULL;
-			ptr++;
+			// get the inet port
+			inetport=ptr->connectioninfo.sockets.inetport;
 
-			// get the inet port (it will be right-aligned)
-			inetport=*((unsigned char *)ptr) | 
-					(*((unsigned char *)(ptr+1)) << 8);
+			// get the unix port
+			strncpy(unixportstr,
+				ptr->connectioninfo.sockets.unixsocket,
+				MAXPATHLEN);
+			unixportstrlen=strlen(unixportstr);
 
 			#ifdef SERVER_DEBUG
 			char	*debugstring=new char[15+unixportstrlen+21];
@@ -1054,13 +1039,12 @@ void	sqlrlistener::getAConnection() {
 
 		// make sure the connection is actually up, if not, fork a child
 		// to jog it, spin back and get another connection
-		if (connectionIsUp(connectionid)) {
+		if (connectionIsUp(ptr->connectionid)) {
 			break;
 		} else {
 			pingDatabase();
 			semset->signal(10);
 		}
-		delete[] connectionid;
 
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",1,"done getting a connection");

@@ -10,7 +10,7 @@ int	sqlrconnection::openSockets() {
 	#endif
 
 	// get the next available unix socket and open it
-	if (cfgfl->getListenOnUnix() && unixsocketptr[0]) {
+	if (cfgfl->getListenOnUnix() && unixsocketptr && unixsocketptr[0]) {
 
 		#ifdef SERVER_DEBUG
 		char	*string=new char[26+strlen(unixsocket)+1];

@@ -41,7 +41,9 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 	#endif
 
 	// handle the unix socket directory
-	setUnixSocketDirectory();
+	if (cfgfl->getListenOnUnix()) {
+		setUnixSocketDirectory();
+	}
 
 	// handle the pid file
 	if (!handlePidFile()) {
@@ -55,7 +57,8 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 
 	initDatabaseAvailableFileName();
 
-	if (!ussf->getUnixSocket(tmpdir->getString(),unixsocketptr)) {
+	if (cfgfl->getListenOnUnix() &&
+		!ussf->getUnixSocket(tmpdir->getString(),unixsocketptr)) {
 		return 0;
 	}
 

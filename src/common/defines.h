@@ -68,4 +68,22 @@
 #define MAXQUERYSIZE 32768
 #define MAXVAR 256
 
+#define MAXCONNECTIONIDLEN 1024
+
+// This structure is used to pass data in shared memory between the listener
+// and connection daemons.  A struct is used instead of just stepping a pointer
+// through the shared memory segment to avoid alignment issues.
+struct shmdata {
+	unsigned int	totalconnections;
+	unsigned int	connectionsinuse;
+	char		connectionid[MAXCONNECTIONIDLEN];
+	union {
+		struct {
+			unsigned short	inetport;
+			char		unixsocket[MAXPATHLEN];
+		} sockets;
+		unsigned long	connectionpid;
+	} connectioninfo;
+};
+
 #endif
