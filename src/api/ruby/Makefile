@@ -4,17 +4,17 @@ include ../../../config.mk
 
 RUBYCFLAGS = $(shell $(RUBY) getcflags.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 
-#ifeq ($(shell $(RUBY) getsitearchdir.rb | grep -c DESTDIR),0)
+ifeq ($(shell $(RUBY) getsitearchdir.rb | grep -c DESTDIR),0)
 RUBYSITEARCHDIR = $(DESTDIR)$(RUBYCYGDRIVEPREFIX)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-#else
-#RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-#endif
+else
+RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+endif
 
-#ifeq ($(shell $(RUBY) getsitelibdir.rb | grep -c DESTDIR),0)
+ifeq ($(shell $(RUBY) getsitelibdir.rb | grep -c DESTDIR),0)
 RUBYSITELIBDIR = $(DESTDIR)$(RUBYCYGDRIVEPREFIX)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-#else
-#RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-#endif
+else
+RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+endif
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
