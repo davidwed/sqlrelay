@@ -41,6 +41,8 @@ install:
 	$(INSTALL) -m 644 api/ruby/ruby.html $(docdir)/api/ruby
 	$(INSTALL) -m 644 api/ruby/rubydbi.html $(docdir)/api/ruby
 	$(INSTALL) -m 644 api/java/allclasses-frame.html $(docdir)/api/java
+	$(INSTALL) -m 644 api/java/allclasses-noframe.html $(docdir)/api/java
+	$(INSTALL) -m 644 api/java/constant-values.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/deprecated-list.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/help-doc.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/index-all.html $(docdir)/api/java
@@ -48,10 +50,15 @@ install:
 	$(INSTALL) -m 644 api/java/overview-tree.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/package-list $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/packages.html $(docdir)/api/java
-	$(INSTALL) -m 644 api/java/serialized-form.html $(docdir)/api/java
-	$(INSTALL) -m 644 api/java/SQLRConnection.html $(docdir)/api/java
-	$(INSTALL) -m 644 api/java/SQLRCursor.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/stylesheet.css $(docdir)/api/java
+	$(top_srcdir)/mkinstalldirs $(docdir)/api/java/com
+	$(top_srcdir)/mkinstalldirs $(docdir)/api/java/com/firstworks
+	$(top_srcdir)/mkinstalldirs $(docdir)/api/java/com/firstworks/sqlrelay
+	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-frame.html $(docdir)/api/java/com/firstworks/sqlrelay
+	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-summary.html $(docdir)/api/java/com/firstworks/sqlrelay
+	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-tree.html $(docdir)/api/java/com/firstworks/sqlrelay
+	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/SQLRConnection.html $(docdir)/api/java/com/firstworks/sqlrelay
+	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/SQLRCursor.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/c++.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/c.html $(docdir)/programming
