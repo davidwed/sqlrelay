@@ -498,11 +498,13 @@ compile time and defaults to 5.</p>
 <a name="columns"></a>
 <span class="heading2">Getting Column Information</span><br><br>
 
-<p>The name, type, length, precision, scale and length of the longest field of
-each column are available.  Determining whether the column is nullable, the
-primary key or unique is also available.  All databases support name, type and
-length, but not all databases support scale or precision, or determining
-whether a column is nullable, the primary key or unique.</p>
+<p>For each column, the API supports getting the name, type and length of each
+field.  All databases support these attributes.  The API also supports
+getting the precision, scale, length of the longest field, and whether the
+column is nullable, the primary key, unique, part of a key, unsigned,
+zero-filled, binary, or an auto-incrementing field.  However, not all databases
+support these attributes.  If a database doesn't support an attribute, it is
+always returned as false.</p>
 
 <blockquote>
 <PRE>
@@ -524,6 +526,11 @@ con.endSession()
         print '<FONT color=#ff00ff>Nullable:      </FONT>', cur.getColumnIsNullable(i)
         print '<FONT color=#ff00ff>Primary Key:   </FONT>', cur.getColumnIsPrimaryKey(i)
         print '<FONT color=#ff00ff>Unique:        </FONT>', cur.getColumnIsUnique(i)
+        print '<FONT color=#ff00ff>Part Of Key:   </FONT>', cur.getColumnIsParyOfKey(i)
+        print '<FONT color=#ff00ff>Unsigned:      </FONT>', cur.getColumnIsUnsigned(i)
+        print '<FONT color=#ff00ff>Zero Filled:   </FONT>', cur.getColumnIsZeroFilled(i)
+        print '<FONT color=#ff00ff>Binary:        </FONT>', cur.getColumnIsBinary(i)
+        print '<FONT color=#ff00ff>Auto Increment:</FONT>', cur.getColumnIsAutoIncrement(i)
 </PRE>
 </blockquote>
 
