@@ -193,10 +193,10 @@ clean:
 rebuild: clean all
 
 libsqlrconnection.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath /lib -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 libsqlrconnection_debug.la: $(SRCS) $(DLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(DLOBJS) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(DLOBJS) -rpath /lib -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)
