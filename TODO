@@ -2,17 +2,21 @@ libraries aren't getting .so extension for some reason
 
 login errors should be printed on the screen by sqlrconnection class, not by
 	individual connections
+
 seperate modules into standalone builds
 
-test finished-suspended-result-set's with db2/sybase
+sybase:
+	test finished-suspended-result-sets
+	connection crashes no matter what
 
-sybase connection crashes no matter what
+freetds:
+	connection gets messed up after 1 test is run if the test fails
+	test fails to drop table
 
-freetds connection gets messed up after 1 test is run if the test fails
-freetds test fails to drop table
-
-db2 start/stop doesn't work
+db2 start/stop doesn't work for 7.2
 	db2start/db2stop works when run as a given instance owner
+
+
 
 scaling/handoff=pass incompatibility
 	setting backlog:
@@ -52,7 +56,6 @@ Tests:
 	test upper/lower/mixed column case methods
 	need database reconnect tests
 	interbase stored procedure/output bind test
-	stored procedure test doesn't work with db2 8.1
 	column flags
 	getFieldAsXXX
 	getOutputBindAsXXX
@@ -61,7 +64,6 @@ Tests:
 	interbase stored procedures
 
 Compatibility:
-	oracle 9.2
 	incorporate pkg-config stuff
 	crypto/ssl lib tests need to look in various places for the library
 	SCO:
@@ -88,7 +90,6 @@ Documentation:
 	performance benchmark charts
 	HOWTO for linuxdoc.org
 	man pages for everything
-	oracle 9.2 installation
 	mysql 4 installation
 
 Performance/Code Enhancements:

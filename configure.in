@@ -161,9 +161,9 @@ AC_ARG_ENABLE(db2,
 	ENABLE_DB2="",
 	ENABLE_DB2="yes")
 AC_ARG_ENABLE(db2-rpath,
-	[  --enable-db2-rpath            Use -rpath when building DB2 connection],
-	DB2USERPATH="yes",
-	DB2USERPATH="")
+	[  --disable-db2-rpath            Use -rpath when building DB2 connection],
+	DB2USERPATH="",
+	DB2USERPATH="yes")
 AC_SUBST(DB2USERPATH)
 AC_ARG_WITH(interbase-prefix,
 	[  --with-interbase-prefix       Location of Interbase],

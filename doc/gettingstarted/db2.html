@@ -433,6 +433,16 @@ user's .bashrc as well.</p>
 <b>export LD_ASSUME_KERNEL=2.2.5</b>
 </blockquote>
 
+<p>If you are running a kernel with Native Posix Threading Library support
+(such as on Redhat 9) then you need to add this line instead:</p>
+
+<blockquote>
+<b>export LD_ASSUME_KERNEL=2.4.1</b>
+</blockquote>
+
+<p>This may be necessary on other systems too.  It is definitely necessary on
+Redhat 9.</p>
+
 <p>To run the Information Center or Control Center, you first have to run the
 DB2 Java Server and give it a port number as follows.</p>
 
@@ -478,7 +488,7 @@ example, the <i>db2inst1</i> user owns the <i>db2inst1</i> instance where the
                         <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;testuser&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;testpassword&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
-                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;db2test&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;db=db2inst1&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;db2test&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;db=testdb&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/connections&gt;</FONT>
         <FONT color=#008a8e>&lt;/instance&gt;</FONT>
 

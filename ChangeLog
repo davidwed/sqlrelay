@@ -54,7 +54,12 @@
 	revamped oracle installation docs
 	oracle 8i/9i are linked only against -lclntsh and `cat sysliblist` now
 	added freetds/sybase libcs/ctpublic.h clash warnings
-	oracle, freetds, sybase use -rpath by default now
+	db2, oracle, freetds, sybase use -rpath by default now
+	gcc uses -pipe option if available
+	configure has --enable-small code option
+	.o files are stripped of .note and .comment if possible
+	added LD_ASSUME_KERNEL=2.4.1 note to db2 install docs
+	fixed db2inst1 -> testdb typo in db2 install docs
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

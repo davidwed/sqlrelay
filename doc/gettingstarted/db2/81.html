@@ -99,6 +99,16 @@ instances.  Each instance contains one or more databases.  The administration
 server coordinates the instances.  The administration server is owned by an 
 OS-level user.  Each instance is owned by a seperate OS-level user as well.</p>
 
+<p>If you are running a kernel with Native Posix Threading Library support
+(such as on Redhat 9) then you need to run the following command:</p>
+
+<blockquote>
+<b>export LD_ASSUME_KERNEL=2.4.1</b>
+</blockquote>
+
+<p>This may be necessary on other systems too.  It is definitely necessary on
+Redhat 9.</p>
+
 <p>To create an instance and an administration server, run 
 <i>/opt/IBM/db2/V8.1/instance/db2isetup</i>, a java-based installation
 program.</p>

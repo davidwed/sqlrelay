@@ -1,7 +1,7 @@
 #!/bin/sh
 
-#./db2 localhost 8001 "" db2test db2test
-./freetds localhost 8002 "" freetdstest freetdstest
+./db2 localhost 8001 "" db2test db2test
+#./freetds localhost 8002 "" freetdstest freetdstest
 #./interbase localhost 8003 "" interbasetest interbasetest
 #./lago localhost 8004 "" lagotest lagotest
 #./msql localhost 8005 "" msqltest msqltest

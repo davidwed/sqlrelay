@@ -1042,7 +1042,7 @@ Optional Features:
   --disable-odbc                Don't build ODBC connection
   --enable-odbc-rpath           Use -rpath when building ODBC connection
   --disable-db2                 Don't build DB2 connection
-  --enable-db2-rpath            Use -rpath when building DB2 connection
+  --disable-db2-rpath            Use -rpath when building DB2 connection
   --disable-interbase           Don't build Interbase connection
   --enable-interbase-rpath      Use -rpath when building Interbase connection
   --disable-perl                Don't build Perl api
@@ -1804,9 +1804,9 @@ fi;
 # Check whether --enable-db2-rpath or --disable-db2-rpath was given.
 if test "${enable_db2_rpath+set}" = set; then
   enableval="$enable_db2_rpath"
-  DB2USERPATH="yes"
-else
   DB2USERPATH=""
+else
+  DB2USERPATH="yes"
 fi;
 
 
