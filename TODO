@@ -1,7 +1,12 @@
-lots of documentation fixes
-db2 startup directions are wrong, you have to run db2start/db2stop as db2as
+lots of documentation fixes:
+	db2 8.1 installation procedure
+	db2 startup directions are wrong;
+		you have to run db2start/db2stop as db2as
+	fix clientapis.html
+	describe ping() vs. pingQuery() methods in connections.html
+	describe sendColumnTypeFormat() in connections.html
 
-handoff=pass does not work with dynamic scaling
+does zope stuff work?
 
 incorporate new spec file
 java/com/firstworks/sqlrelay needs to be removed if empty when rpm is
