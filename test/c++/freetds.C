@@ -875,7 +875,6 @@ con->debugOn();
 	con->endSession();
 	printf("\n");
 	checkSuccess(cur->sendQuery("select count(*) from #temptable"),0);
-printf("error: %s\n",cur->errorMessage());
 	cur->sendQuery("drop table #temptable\n");
 	printf("\n");
 

@@ -157,9 +157,9 @@ bool sqlrconnection::processQuery(sqlrcursor *cursor,
 	// result set was fetched to still be able to return column data
 	// when resumed.
 	if (bindcursor) {
-		cursor->cleanUpData(false,false,true);
+		cursor->cleanUpData(false,true);
 	} else {
-		cursor->cleanUpData(true,true,true);
+		cursor->cleanUpData(true,true);
 	}
 
 	#ifdef SERVER_DEBUG

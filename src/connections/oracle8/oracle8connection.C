@@ -454,7 +454,7 @@ void oracle8cursor::checkRePrepare() {
 	// selects, but not with DML, it has to be re-prepared.
 	// What a drag.
 	if (!prepared && stmttype && stmttype!=OCI_STMT_SELECT) {
-		cleanUpData(true,true,true);
+		cleanUpData(true,true);
 		prepareQuery(query,length);
 		prepared=1;
 	}
@@ -1375,18 +1375,17 @@ void oracle8cursor::returnRow() {
 	row++;
 }
 
-void oracle8cursor::cleanUpData(bool freerows, bool freecols,
-							bool freebinds) {
+void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	// OCI8 version of ocan(), but since it uses OCIStmtFetch we
 	// only want to run it if the statement was a select
-	if (freerows && stmttype==OCI_STMT_SELECT) {
+	if (freeresult && stmttype==OCI_STMT_SELECT) {
 		OCIStmtFetch(stmt,oracle8conn->err,0,
 				OCI_FETCH_NEXT,OCI_DEFAULT);
 	}
 
 	// free row/column resources
-	if (freecols) {
+	if (freeresult) {
 		for (int i=0; i<ncols; i++) {
 			if (freerows) {
 				for (int j=0; j<FETCH_AT_ONCE; j++) {

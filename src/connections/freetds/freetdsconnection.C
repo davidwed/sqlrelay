@@ -2,11 +2,15 @@
 // See the file COPYING for more information
 
 #include <freetdsconnection.h>
-#include <rudiments/charstring.h>
+#include <tdsver.h>
 
 #include <config.h>
 #include <datatypes.h>
 
+#include <rudiments/stringbuffer.h>
+#include <rudiments/charstring.h>
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -15,17 +19,13 @@ stringbuffer	*freetdsconnection::errorstring;
 bool		freetdsconnection::deadconnection;
 #endif
 
+
 freetdsconnection::freetdsconnection() {
 	errorstring=NULL;
 	env=new environment();
-	dropcursor=NULL;
 }
 
 freetdsconnection::~freetdsconnection() {
-	if (dropcursor) {
-		dropcursor->closeCursor();
-		delete dropcursor;
-	}
 	delete errorstring;
 	delete env;
 }
@@ -36,6 +36,7 @@ int freetdsconnection::getNumberOfConnectStringVars() {
 
 void freetdsconnection::handleConnectString() {
 	sybase=connectStringValue("sybase");
+	lang=connectStringValue("lang");
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
 	server=connectStringValue("server");
@@ -49,13 +50,19 @@ void freetdsconnection::handleConnectString() {
 
 bool freetdsconnection::logIn() {
 
-	// set sybase environment variable
+	// set sybase
 	if (sybase && sybase[0] && !env->setValue("SYBASE",sybase)) {
 		logInError("Failed to set SYBASE environment variable.",1);
 		return false;
 	}
 
-	// set dsquery environment variable
+	// set lang
+	if (lang && lang[0] && !env->setValue("LANG",lang)) {
+		logInError("Failed to set LANG environment variable.",1);
+		return false;
+	}
+
+	// set server
 	if (server && server[0] && !env->setValue("DSQUERY",server)) {
 		logInError("Failed to set DSQUERY environment variable.",2);
 		return false;
@@ -133,7 +140,7 @@ bool freetdsconnection::logIn() {
 	if (hostname && hostname[0] &&
 		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
 				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the hostname",5);
+			logInError("failed to set the hostname",5);
 		return false;
 	}
 
@@ -189,7 +196,7 @@ bool freetdsconnection::logIn() {
 
 	// set locale
 	if (ct_con_props(dbconn,CS_SET,CS_LOC_PROP,(CS_VOID *)locale,
-			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
+				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the locale",6);
 		return false;
 	}
@@ -197,14 +204,6 @@ bool freetdsconnection::logIn() {
 	// connect to the database
 	if (ct_connect(dbconn,(CS_CHAR *)NULL,(CS_INT)0)!=CS_SUCCEED) {
 		logInError("failed to connect to the database",6);
-		return false;
-	}
-
-	// create a cursor that will be used to drop temp tables
-	dropcursor=initCursor();
-	if (!dropcursor->openCursor(-1)) {
-		dropcursor->closeCursor();
-		delete dropcursor;
 		return false;
 	}
 	return true;
@@ -257,90 +256,146 @@ char freetdsconnection::bindVariablePrefix() {
 	return '@';
 }
 
-
 freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
+
+	#if defined(VERSION_NO)
+	char	*versionstring=strdup(VERSION_NO);
+	#elif defined(TDS_VERSION_NO)
+	char	*versionstring=strdup(TDS_VERSION_NO);
+	#else
+	char	*versionstring=strdup("freetds v0.00.0");
+	#endif
+
+	char	*v=strchr(versionstring,'v');
+	*v=(char)NULL;
+	majorversion=atoi(v+1);
+
+	char	*firstdot=strchr(v+1,'.');
+	*firstdot=(char)NULL;
+	minorversion=atoi(firstdot+1);
+
+	char	*seconddot=strchr(firstdot+1,'.');
+	*seconddot=(char)NULL;
+	patchlevel=atoi(seconddot+1);
+
+
+	prepared=false;
 	freetdsconn=(freetdsconnection *)conn;
 	cmd=NULL;
+	languagecmd=NULL;
+	cursorcmd=NULL;
 	cursorname=NULL;
-	#ifdef VERSION_NO
-		tdsversion=atof(VERSION_NO+9);
-	#else
-		#ifdef TDS_VERSION_NO
-			tdsversion=atof(TDS_VERSION_NO+9);
-		#else
-			tdsversion=0;
-		#endif
-	#endif
 
 	// replace the regular expressions used to detect creation of a
 	// temporary table
 	createtemplower.compile("create[ \\t\\r\\n]+table[ \\t\\r\\n]+#");
 	createtempupper.compile("CREATE[ \\t\\r\\n]+TABLE[ \\t\\r\\n]+#");
+
+	cursorquerylower.compile("(select|execute)[ \\t\\r\\n]+");
+	cursorqueryupper.compile("(SELECT|EXECUTE)[ \\t\\r\\n]+");
 }
 
 freetdscursor::~freetdscursor() {
-	if (cmd) {
-		ct_cmd_drop(cmd);
-	}
+	closeCursor();
 	delete[] cursorname;
 }
 
 bool freetdscursor::openCursor(int id) {
 
+	clean=true;
+
 	cursorname=charstring::parseNumber((long)id);
 
+	if (ct_cmd_alloc(freetdsconn->dbconn,&languagecmd)!=CS_SUCCEED) {
+		return false;
+	}
+	if (ct_cmd_alloc(freetdsconn->dbconn,&cursorcmd)!=CS_SUCCEED) {
+		return false;
+	}
+	cmd=NULL;
+
 	// switch to the correct database
-	/*bool	retval=true;
+	bool	retval=true;
 	if (freetdsconn->db && freetdsconn->db[0]) {
 		int	len=strlen(freetdsconn->db)+4;
 		char	query[len+1];
 		sprintf(query,"use %s",freetdsconn->db);
-		if (!(prepareQuery(query,len)) ||
-				!(executeQuery(query,len,true))) {
+		if (!(prepareQuery(query,len) &&
+				executeQuery(query,len,true))) {
 			bool	live;
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=false;
 		}
-		cleanUpData(true,true,true);
+		cleanUpData(true,true);
 	}
-	return (retval && sqlrcursor::openCursor(id));*/
-	return true;
+	return (retval && sqlrcursor::openCursor(id));
+}
+
+bool freetdscursor::closeCursor() {
+	bool	retval=true;
+	if (languagecmd) {
+		retval=(ct_cmd_drop(languagecmd)==CS_SUCCEED);
+		languagecmd=NULL;
+	}
+	if (cursorcmd) {
+		retval=(retval && (ct_cmd_drop(cursorcmd)==CS_SUCCEED));
+		cursorcmd=NULL;
+	}
+	cmd=NULL;
+	return retval;
 }
 
 bool freetdscursor::prepareQuery(const char *query, long length) {
 
-	// FreeTDS version 0.62 and greater support bind variables
-	if (tdsversion>=0.62) {
-		paramindex=0;
-	}
+	clean=true;
 
-	if (cmd) {
-		ct_cmd_drop(cmd);
-	}
-	if (ct_cmd_alloc(freetdsconn->dbconn,&cmd)!=CS_SUCCEED) {
-		return false;
-	}
+	this->query=(char *)query;
+	this->length=length;
 
-	// FreeTDS version 0.62 and greater support bind variables
-	if (tdsversion>=0.62) {
+	paramindex=0;
 
-		/*if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)query,length,
-						CS_UNUSED)!=CS_SUCCEED) {
-			return false;
-		}*/
-		if (ct_cursor(cmd,CS_CURSOR_DECLARE,cursorname,CS_NULLTERM,
+	// This code is here in case freetds ever actually supports cursors...
+	if (false) {
+		if (cursorquerylower.match(query) ||
+			cursorqueryupper.match(query)) {
+
+			// initiate a cursor command
+			cmd=cursorcmd;
+			if (ct_cursor(cursorcmd,CS_CURSOR_DECLARE,
+					(CS_CHAR *)cursorname,CS_NULLTERM,
 					(CS_CHAR *)query,length,
-					CS_UNUSED)!=CS_SUCCEED ||
-			ct_cursor(cmd,CS_CURSOR_OPEN,NULL,CS_UNUSED,
-					NULL,CS_UNUSED,
-					CS_UNUSED)!=CS_SUCCEED ||
-			ct_cursor(cmd,CS_CURSOR_ROWS,NULL,CS_UNUSED,
-					NULL,CS_UNUSED,
-					(CS_INT)1)!=CS_SUCCEED) {
-			return false;
+					CS_UNUSED)!=CS_SUCCEED) {
+					//CS_READ_ONLY)!=CS_SUCCEED) {
+				return false;
+			}
+
+		} else {
+
+			// initiate a language command
+			cmd=languagecmd;
+			if (ct_command(languagecmd,CS_LANG_CMD,
+					(CS_CHAR *)query,length,
+					CS_UNUSED)!=CS_SUCCEED) {
+				return false;
+			}
 		}
+	} else {
+		cmd=languagecmd;
 	}
+
+	clean=false;
+	prepared=true;
 	return true;
+}
+
+void freetdscursor::checkRePrepare() {
+
+	// Sybase doesn't allow you to rebind and re-execute when using 
+	// ct_command.  You have to re-prepare too.  I'll make this transparent
+	// to the user.
+	if (!prepared) {
+		prepareQuery(query,length);
+	}
 }
 
 bool freetdscursor::inputBindString(const char *variable,
@@ -348,11 +403,10 @@ bool freetdscursor::inputBindString(const char *variable,
 						const char *value,
 						unsigned short valuesize,
 						short *isnull) {
+	return false;
 
-	// FreeTDS version 0.62 and greater support bind variables
-	if (tdsversion<0.62) {
-		return true;
-	}
+	// this code is here in case freetds ever really supports binds...
+	checkRePrepare();
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
@@ -367,11 +421,8 @@ bool freetdscursor::inputBindString(const char *variable,
 	parameter[paramindex].maxlength=CS_UNUSED;
 	parameter[paramindex].status=CS_INPUTVALUE;
 	parameter[paramindex].locale=NULL;
-
-	// don't need to use isnull with sybase because if value is NULL
-	// and valuesize==0, then the same thing is achieved
 	if (ct_param(cmd,&parameter[paramindex],
-			(CS_VOID *)value,valuesize,0)!=CS_SUCCEED) {
+		(CS_VOID *)value,valuesize,0)!=CS_SUCCEED) {
 		return false;
 	}
 	paramindex++;
@@ -381,11 +432,10 @@ bool freetdscursor::inputBindString(const char *variable,
 bool freetdscursor::inputBindLong(const char *variable,
 						unsigned short variablesize,
 						unsigned long *value) {
+	return false;
 
-	// FreeTDS version 0.62 and greater support bind variables
-	if (tdsversion<0.62) {
-		return true;
-	}
+	// this code is here in case freetds ever really supports binds...
+	checkRePrepare();
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
@@ -401,7 +451,7 @@ bool freetdscursor::inputBindLong(const char *variable,
 	parameter[paramindex].status=CS_INPUTVALUE;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-			(CS_VOID *)value,sizeof(long),0)!=CS_SUCCEED) {
+		(CS_VOID *)value,sizeof(long),0)!=CS_SUCCEED) {
 		return false;
 	}
 	paramindex++;
@@ -413,11 +463,10 @@ bool freetdscursor::inputBindDouble(const char *variable,
 						double *value,
 						unsigned short precision,
 						unsigned short scale) {
+	return false;
 
-	// FreeTDS version 0.62 and greater support bind variables
-	if (tdsversion<0.62) {
-		return true;
-	}
+	// this code is here in case freetds ever really supports binds...
+	checkRePrepare();
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
@@ -435,7 +484,7 @@ bool freetdscursor::inputBindDouble(const char *variable,
 	parameter[paramindex].scale=scale;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-			(CS_VOID *)value,sizeof(double),0)!=CS_SUCCEED) {
+		(CS_VOID *)value,sizeof(double),0)!=CS_SUCCEED) {
 		return false;
 	}
 	paramindex++;
@@ -443,10 +492,10 @@ bool freetdscursor::inputBindDouble(const char *variable,
 }
 
 bool freetdscursor::outputBindString(const char *variable, 
-						unsigned short variablesize,
-						char *value, 
-						unsigned short valuesize, 
-						short *isnull) {
+					unsigned short variablesize,
+					char *value, 
+					unsigned short valuesize, 
+					short *isnull) {
 
 	// this code is here in case SQL Relay ever supports rpc commands
 
@@ -464,16 +513,15 @@ bool freetdscursor::outputBindString(const char *variable,
 	parameter[paramindex].status=CS_RETURN;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-			(CS_VOID *)value,valuesize,0)!=CS_SUCCEED) {
-		return 0;
+			(CS_VOID *)value,valuesize,
+			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
+		return false;
 	}
 	paramindex++;*/
 	return true;
 }
 
 bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
-
-printf("%d: executeQuery(%s)\n",getpid(),query);
 
 	// clear out any errors
 	if (freetdsconn->errorstring) {
@@ -482,11 +530,9 @@ printf("%d: executeQuery(%s)\n",getpid(),query);
 		freetdsconn->errorstring=NULL;
 	}
 
-	// FreeTDS version 0.62 and greater support bind variables
-	if (tdsversion<0.62) {
+	// this code is here in case freetds ever supports cursors
+	if (true) {
 		stringbuffer	*newquery=fakeInputBinds(query);
-
-		// initiate a language command
 		if (newquery) {
 			if (ct_command(cmd,CS_LANG_CMD,
 					newquery->getString(),
@@ -512,117 +558,164 @@ printf("%d: executeQuery(%s)\n",getpid(),query);
 	maxrow=0;
 	totalrows=0;
 
-	// send the command
+	if (cmd==cursorcmd) {
+		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
+					NULL,CS_UNUSED,
+					NULL,CS_UNUSED,
+					(CS_INT)FETCH_AT_ONCE)!=CS_SUCCEED) {
+			return false;
+		}
+		if (ct_cursor(cursorcmd,CS_CURSOR_OPEN,
+					NULL,CS_UNUSED,
+					NULL,CS_UNUSED,
+					CS_UNUSED)!=CS_SUCCEED) {
+			return false;
+		}
+	}
+
 	if (ct_send(cmd)!=CS_SUCCEED) {
+		cleanUpData(true,true);
 		return false;
 	}
 
-	// Get the results. Sybase is weird... A query can return multiple
-	// result sets?  We're only interested in the first one,
-	// the rest will be cancelled.  Return a dead database on failure
-	if (ct_results(cmd,&results_type)==CS_FAIL) {
-		//ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
-		ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
-					NULL,CS_UNUSED,CS_DEALLOC);
-		freetdsconn->deadconnection=true;
-		return false;
-	}
+	for (;;) {
 
+		results=ct_results(cmd,&resultstype);
 
-	// handle a failed command
-	if ((int)results_type==CS_CMD_FAIL) {
-		//ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
-		ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
-					NULL,CS_UNUSED,CS_DEALLOC);
-		return false;
+		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
+			cleanUpData(true,true);
+			return false;
+		}
+
+		if (cmd==languagecmd) {
+			// For non-cursor commands, there should be only
+			// one result set.
+			break;
+		} else if (cmd==cursorcmd && (resultstype==CS_ROW_RESULT ||
+					resultstype==CS_CURSOR_RESULT ||
+					resultstype==CS_COMPUTE_RESULT ||
+					resultstype==CS_PARAM_RESULT ||
+					resultstype==CS_STATUS_RESULT)) {
+			// For cursor commands, each call to ct_cursor will
+			// have generated a result set.  There will be result
+			// sets for the CS_CURSOR_DECLARE, CS_CURSOR_ROWS and
+			// CS_CURSOR_OPEN calls.  We need to skip past the
+			// first 2, unless they failed.  If they failed, it
+			// will be caught above.
+			break;
+		}
+
+		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
+			freetdsconn->deadconnection=1;
+			// FIXME: call ct_close(CS_FORCE_CLOSE)
+			// maybe return false
+			return false;
+		}
 	}
 
 	checkForTempTable(query,length);
 
+	// reset the prepared flag
+	prepared=false;
+
 	// For queries which return rows or parameters (output bind variables),
-	// get the column count.  For DML queries, get the affected row count.
-	// Affected row count is only supported in FreeTDS version>=0.53, but
-	// it appears to be broken in 0.61 too (and possibly others).
-	if (tdsversion<0.53 && tdsversion!=0.61) {
-		affectedrows=0;
-	} else {
+	// get the column count and bind columns.  For DML queries, get the
+	// affected row count.
+	// Affected row count is only supported in versio>=0.53 but appears
+	// to be broken in 0.61 as well
+	if (majorversion==0 && (minorversion<53 || minorversion==61)) {
 		affectedrows=-1;
+	} else {
+		affectedrows=0;
 	}
-	if (results_type==CS_ROW_RESULT) {
+
+	bool	moneycolumn=false;
+	if (resultstype==CS_ROW_RESULT ||
+			resultstype==CS_CURSOR_RESULT ||
+			resultstype==CS_COMPUTE_RESULT ||
+			resultstype==CS_PARAM_RESULT ||
+			resultstype==CS_STATUS_RESULT) {
+
 		if (ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			return false;
 		}
+
 		if (ncols>MAX_SELECT_LIST_SIZE) {
 			ncols=MAX_SELECT_LIST_SIZE;
 		}
-	} else if (results_type==CS_CMD_SUCCEED) {
-		if (tdsversion>0.52 && tdsversion!=0.61 &&
-			ct_res_info(cmd,CS_ROW_COUNT,
-				(CS_VOID *)&affectedrows,
-				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
+
+		// bind columns
+		for (int i=0; i<(int)ncols; i++) {
+
+			// dealing with money columns cause freetds < 0.53 to
+			// crash, take care of that here...
+			if (majorversion==0 && minorversion<53
+							&& !moneycolumn) {
+				CS_DATAFMT	moneytest;
+				ct_describe(cmd,i+1,&moneytest);
+				if (moneytest.datatype==CS_MONEY_TYPE ||
+					moneytest.datatype==CS_MONEY4_TYPE) {
+					moneycolumn=true;
+					if (freetdsconn->errorstring) {
+						delete freetdsconn->errorstring;
+					}
+					freetdsconn->errorstring=
+						new stringbuffer();
+					freetdsconn->errorstring->append(
+						"FreeTDS versions prior to ");
+					freetdsconn->errorstring->append( 
+						"0.53 do not support MONEY ");
+					freetdsconn->errorstring->append( 
+						"or SMALLMONEY datatypes. ");
+					freetdsconn->errorstring->append( 
+						"Please upgrade SQL Relay to ");
+					freetdsconn->errorstring->append( 
+						"a version compiled against ");
+					freetdsconn->errorstring->append( 
+						"FreeTDS >= 0.53 ");
+				}
+			}
+	
+			// get the field as a null terminated character string
+			// no longer than MAX_ITEM_BUFFER_SIZE, override some
+			// other values that might have been set also
+			column[i].datatype=CS_CHAR_TYPE;
+			column[i].format=CS_FMT_NULLTERM;
+			column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
+			column[i].scale=CS_UNUSED;
+			column[i].precision=CS_UNUSED;
+			column[i].status=CS_UNUSED;
+			column[i].count=FETCH_AT_ONCE;
+			column[i].usertype=CS_UNUSED;
+			column[i].locale=NULL;
+	
+			// bind the columns for the fetches
+			if (ct_bind(cmd,i+1,&column[i],(CS_VOID *)data[i],
+				datalength[i],nullindicator[i])!=CS_SUCCEED) {
+				break;
+			}
+		}
+
+	} else if (resultstype==CS_CMD_SUCCEED) {
+		if (majorversion==0 && (minorversion>52 && minorversion!=61) &&
+			ct_res_info(cmd,CS_ROW_COUNT,(CS_VOID *)&affectedrows,
+					CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			return false;
 		} 
 	}
 
-	// bind the columns
-	int	moneycolumn=0;
-	for (int i=0; i<(int)ncols; i++) {
-
-		// dealing with money columns cause freetds < 0.53 to
-		// crash, take care of that here...
-		if (tdsversion<0.53 && !moneycolumn) {
-			CS_DATAFMT	moneytest;
-			ct_describe(cmd,i+1,&moneytest);
-			if (moneytest.datatype==CS_MONEY_TYPE ||
-				moneytest.datatype==CS_MONEY4_TYPE) {
-				moneycolumn=1;
-				if (freetdsconn->errorstring) {
-					delete freetdsconn->errorstring;
-				}
-				freetdsconn->errorstring=new stringbuffer();
-				freetdsconn->errorstring->append(
-					"FreeTDS versions prior to ");
-				freetdsconn->errorstring->append( 
-					"0.53 do not support MONEY ");
-				freetdsconn->errorstring->append( 
-					"or SMALLMONEY datatypes. ");
-				freetdsconn->errorstring->append( 
-					"Please upgrade SQL Relay to ");
-				freetdsconn->errorstring->append( 
-					"a version compiled against ");
-				freetdsconn->errorstring->append( 
-					"FreeTDS >= 0.53 ");
-			}
-		}
-
-		// get the field as a null terminated character string
-		// no longer than MAX_ITEM_BUFFER_SIZE, override some other
-		// values that might have been set also
-		column[i].datatype=CS_CHAR_TYPE;
-		column[i].format=CS_FMT_NULLTERM;
-		column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
-		column[i].scale=CS_UNUSED;
-		column[i].precision=CS_UNUSED;
-		column[i].status=CS_UNUSED;
-		column[i].count=FETCH_AT_ONCE;
-		column[i].usertype=CS_UNUSED;
-		column[i].locale=NULL;
-
-		// bind the columns for the fetches
-		if (ct_bind(cmd,i+1,&column[i],(CS_VOID *)data[i],
-				datalength[i],nullindicator[i])!=CS_SUCCEED) {
-			break;
-		}
-	}
-
-	// If we got a moneycolumn (and tdsversion<0.53) then cancel the
+	// If we got a moneycolumn (and version<0.53) then cancel the
 	// result set.  Otherwise FreeTDS will spew "unknown marker"
 	// errors to the screen when cleanUpData() is called.
 	if (moneycolumn) {
-		//ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
-		ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
-					NULL,CS_UNUSED,CS_DEALLOC);
+		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
+			freetdsconn->deadconnection=1;
+			// FIXME: call ct_close(CS_FORCE_CLOSE)
+			// maybe return false
+			return false;
+		}
+		return false;
 	}
 
 	// return success only if no error was generated
@@ -647,7 +740,7 @@ char *freetdscursor::getErrorMessage(bool *liveconnection) {
 
 void freetdscursor::returnRowCounts() {
 
-	// send row counts (actual row count unknown in freetds)
+	// send row counts (actual row count unknown in sybase)
 	conn->sendRowCounts((long)-1,(long)affectedrows);
 }
 
@@ -660,7 +753,11 @@ void freetdscursor::returnColumnInfo() {
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// unless the query was a successful select, send no header
-	if (results_type!=CS_ROW_RESULT) {
+	if (resultstype!=CS_ROW_RESULT &&
+			resultstype!=CS_CURSOR_RESULT &&
+			resultstype!=CS_COMPUTE_RESULT &&
+			resultstype!=CS_PARAM_RESULT &&
+			resultstype!=CS_STATUS_RESULT) {
 		return;
 	}
 
@@ -702,7 +799,6 @@ void freetdscursor::returnColumnInfo() {
 			binary=1;
 		} else if (column[i].datatype==CS_BINARY_TYPE) {
 			type=BINARY_DATATYPE;
-			binary=1;
 		} else if (column[i].datatype==CS_BIT_TYPE) {
 			type=BIT_DATATYPE;
 		} else if (column[i].datatype==CS_REAL_TYPE) {
@@ -715,12 +811,10 @@ void freetdscursor::returnColumnInfo() {
 			type=VARCHAR_DATATYPE;
 		} else if (column[i].datatype==CS_VARBINARY_TYPE) {
 			type=VARBINARY_DATATYPE;
-			binary=1;
 		} else if (column[i].datatype==CS_LONGCHAR_TYPE) {
 			type=LONGCHAR_DATATYPE;
 		} else if (column[i].datatype==CS_LONGBINARY_TYPE) {
 			type=LONGBINARY_DATATYPE;
-			binary=1;
 		} else if (column[i].datatype==CS_LONG_TYPE) {
 			type=LONG_DATATYPE;
 		} else if (column[i].datatype==CS_ILLEGAL_TYPE) {
@@ -763,7 +857,11 @@ void freetdscursor::returnColumnInfo() {
 
 bool freetdscursor::noRowsToReturn() {
 	// unless the query was a successful select, send no data
-	return (results_type!=CS_ROW_RESULT);
+	return (resultstype!=CS_ROW_RESULT &&
+			resultstype!=CS_CURSOR_RESULT &&
+			resultstype!=CS_COMPUTE_RESULT &&
+			resultstype!=CS_PARAM_RESULT &&
+			resultstype!=CS_STATUS_RESULT);
 }
 
 bool freetdscursor::skipRow() {
@@ -775,8 +873,6 @@ bool freetdscursor::skipRow() {
 }
 
 bool freetdscursor::fetchRow() {
-
-	// this code is here just in case freetds ever supports array fetches
 	if (row==FETCH_AT_ONCE) {
 		row=0;
 	}
@@ -784,10 +880,8 @@ bool freetdscursor::fetchRow() {
 		return false;
 	}
 	if (!row) {
-		int result;
-		if ((result=ct_fetch(cmd,
-				CS_UNUSED,CS_UNUSED,CS_UNUSED,
-				&rowsread))!=CS_SUCCEED && !rowsread) {
+		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
+				&rowsread)!=CS_SUCCEED && !rowsread) {
 			return false;
 		}
 		maxrow=rowsread;
@@ -801,8 +895,7 @@ void freetdscursor::returnRow() {
 	// send each row back
 	for (int col=0; col<(int)ncols; col++) {
 		if (nullindicator[col][row]>-1 && datalength[col][row]) {
-			conn->sendField(data[col][row],
-					datalength[col][row]-1);
+			conn->sendField(data[col][row],datalength[col][row]-1);
 		} else {
 			conn->sendNullField();
 		}
@@ -811,57 +904,94 @@ void freetdscursor::returnRow() {
 }
 
 
-void freetdscursor::cleanUpData(bool freerows, bool freecols,
-							bool freebinds) {
-printf("%d: cleanUpData()\n",getpid());
+void freetdscursor::cleanUpData(bool freeresult, bool freebinds) {
 
-	// Cancel the rest of the result sets.
-	// FreeTDS gets pissed off if you try to step through the result
-	// sets, cancelling each one if you didn't ct_describe it earlier,
-	// or if you didn't fetch all of the rows.  It doesn't seem to mind
-	// if you cancel all the result sets at once though.
-	if (freerows && cmd) {
-		//ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
-		ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
-					NULL,CS_UNUSED,CS_DEALLOC);
+	if (clean) {
+		return;
+	}
+
+	if (freeresult) {
+		discardResults();
+		discardCursor();
+	}
+
+	clean=true;
+}
+
+void freetdscursor::discardResults() {
+
+	// if there are any unprocessed result sets, process them
+	if (results==CS_SUCCEED) {
+		do {
+			if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
+				freetdsconn->deadconnection=1;
+				// FIXME: call ct_close(CS_FORCE_CLOSE)
+				// maybe return false
+			}
+			results=ct_results(cmd,&resultstype);
+		} while (results==CS_SUCCEED);
+	}
+
+	if (results==CS_FAIL) {
+		if (ct_cancel(NULL,cmd,CS_CANCEL_ALL)==CS_FAIL) {
+			freetdsconn->deadconnection=1;
+			// FIXME: call ct_close(CS_FORCE_CLOSE)
+			// maybe return false
+		}
+	}
+}
+
+
+void freetdscursor::discardCursor() {
+
+	if (cmd==cursorcmd) {
+		if (ct_cursor(cursorcmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
+				NULL,CS_UNUSED,CS_DEALLOC)==CS_SUCCEED) {
+			if (ct_send(cursorcmd)==CS_SUCCEED) {
+				results=ct_results(cmd,&resultstype);
+				discardResults();
+			}
+		}
 	}
 }
 
 CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CLIENTMSG *msgp) {
 	if (errorstring) {
-		delete errorstring;
+		return CS_SUCCEED;
 	}
 	errorstring=new stringbuffer();
 
 	errorstring->append("Client Library error:\n");
 	errorstring->append("	severity(")->
-			append((long)CS_SEVERITY(msgp->msgnumber))->
-			append(")\n");
+				append((long)CS_SEVERITY(msgp->msgnumber))->
+				append(")\n");
 	errorstring->append("	layer(")->
-			append((long)CS_LAYER(msgp->msgnumber))->
-			append(")\n");
+				append((long)CS_LAYER(msgp->msgnumber))->
+				append(")\n");
 	errorstring->append("	origin(")->
-			append((long)CS_ORIGIN(msgp->msgnumber))->
-			append(")\n");
+				append((long)CS_ORIGIN(msgp->msgnumber))->
+				append(")\n");
 	errorstring->append("	number(")->
-			append((long)CS_NUMBER(msgp->msgnumber))->
-			append(")\n");
-	errorstring->append("Error:	")->
-			append(msgp->msgstring)->
-			append("\n");
+				append((long)CS_NUMBER(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("Error:	")->append(msgp->msgstring)->
+				append("\n");
 
 	if (msgp->osstringlen>0) {
-		errorstring->append("Operating System Error:\n\n ");
-		errorstring->append(msgp->osstring)->append("\n");
+		errorstring->append("Operating System Error:\n");
+		errorstring->append("\n	")->append(msgp->osstring)->
+							append("\n");
 	}
 
-	// for a timeout message, set deadconnection to true
+	//printf("csMessageCallback:\n%s\n",errorstring->getString());
+
+	// for a timeout message, set deadconnection to 1
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
 		CS_LAYER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_NUMBER(msgp->msgnumber)==63) {
-		deadconnection=true;
+		deadconnection=1;
 	}
 
 	return CS_SUCCEED;
@@ -871,38 +1001,40 @@ CS_RETCODE freetdsconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 						CS_CONNECTION *cnn,
 						CS_CLIENTMSG *msgp) {
 	if (errorstring) {
-		delete errorstring;
+		return CS_SUCCEED;
 	}
 	errorstring=new stringbuffer();
 
 	errorstring->append("Client Library error:\n");
 	errorstring->append("	severity(")->
-			append((long)CS_SEVERITY(msgp->msgnumber))->
-			append(")\n");
+				append((long)CS_SEVERITY(msgp->msgnumber))->
+				append(")\n");
 	errorstring->append("	layer(")->
-			append((long)CS_LAYER(msgp->msgnumber))->
-			append(")\n");
+				append((long)CS_LAYER(msgp->msgnumber))->
+				append(")\n");
 	errorstring->append("	origin(")->
-			append((long)CS_ORIGIN(msgp->msgnumber))->
-			append(")\n");
+				append((long)CS_ORIGIN(msgp->msgnumber))->
+				append(")\n");
 	errorstring->append("	number(")->
-			append((long)CS_NUMBER(msgp->msgnumber))->
-			append(")\n");
-	errorstring->append("Error:	")->
-			append(msgp->msgstring)->
-			append("\n");
+				append((long)CS_NUMBER(msgp->msgnumber))->
+				append(")\n");
+	errorstring->append("Error:	")->append(msgp->msgstring)->
+				append("\n");
 
 	if (msgp->osstringlen>0) {
-		errorstring->append("Operating System Error:\n\n ");
-		errorstring->append(msgp->osstring)->append("\n");
+		errorstring->append("Operating System Error:\n");
+		errorstring->append("\n	")->append(msgp->osstring)->
+							append("\n");
 	}
 
-	// for a timeout message, set deadconnection to true
+	//printf("clientMessageCallback:\n%s\n",errorstring->getString());
+
+	// for a timeout message, set deadconnection to 1
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
 		CS_NUMBER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_LAYER(msgp->msgnumber)==63) {
-		deadconnection=true;
+		deadconnection=1;
 	}
 
 	return CS_SUCCEED;
@@ -920,36 +1052,47 @@ CS_RETCODE freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	}
 
 	if (errorstring) {
-		delete errorstring;
+		return CS_SUCCEED;
 	}
 	errorstring=new stringbuffer();
 
 	errorstring->append("Server message:\n");
 	errorstring->append("	severity(")->
-			append((long)msgp->severity)->append(")\n");
+				append((long)msgp->severity)->
+				append(")\n");
 	errorstring->append("	number(")->
-			append((long)msgp->msgnumber)->append(")\n");
+				append((long)msgp->msgnumber)->
+				append(")\n");
 	errorstring->append("	state(")->
-			append((long)msgp->state)->append(")\n");
+				append((long)msgp->state)->
+				append(")\n");
 	errorstring->append("	line(")->
-			append((long)msgp->line)->append(")\n");
-	errorstring->append("Server Name:	")->
-			append(msgp->svrname)->append("\n");
-	errorstring->append("Procedure Name:	")->
-			append(msgp->proc)->append("\n");
+				append((long)msgp->line)->
+				append(")\n");
+	errorstring->append("Server Name:\n")->
+				append(msgp->svrname)->
+				append("\n");
+	errorstring->append("Procedure Name:\n")->
+				append(msgp->proc)->
+				append("\n");
 	errorstring->append("Error:	")->
-			append(msgp->text)->append("\n");
+				append(msgp->text)->
+				append("\n");
+
+	//printf("serverMessageCallback:\n%s\n",errorstring->getString());
 
 	return CS_SUCCEED;
 }
 
-void freetdsconnection::dropTempTable(const char *tablename) {
+
+void freetdsconnection::dropTempTable(sqlrcursor *cursor,
+					const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table #")->append(tablename);
-	if (dropcursor->prepareQuery(dropquery.getString(),
+	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
-		dropcursor->executeQuery(dropquery.getString(),
+		cursor->executeQuery(dropquery.getString(),
 					dropquery.getStringLength(),1);
 	}
-	dropcursor->cleanUpData(true,true,true);
+	cursor->cleanUpData(true,true);
 }

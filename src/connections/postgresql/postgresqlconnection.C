@@ -340,9 +340,8 @@ void postgresqlcursor::returnRow() {
 }
 
 
-void postgresqlcursor::cleanUpData(bool freerows, bool freecols,
-							bool freebinds) {
-	if (freerows && pgresult) {
+void postgresqlcursor::cleanUpData(bool freeresult, bool freebinds) {
+	if (freeresult && pgresult) {
 		PQclear(pgresult);
 		pgresult=(PGresult *)NULL;
 	}

@@ -283,7 +283,6 @@ void lagocursor::returnRow() {
 	}
 }
 
-void lagocursor::cleanUpData(bool freerows, bool freecols,
-							bool freebinds) {
+void lagocursor::cleanUpData(bool freeresult, bool freebinds) {
 	// should I call Lclear here?
 }

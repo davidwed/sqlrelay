@@ -262,10 +262,9 @@ void msqlcursor::returnRow() {
 	}
 }
 
-void msqlcursor::cleanUpData(bool freerows, bool freecols,
-							bool freebinds) {
+void msqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 
-	if (freerows && msqlresult) {
+	if (freeresult && msqlresult) {
 		msqlFreeResult(msqlresult);
 		msqlresult=NULL;
 	}

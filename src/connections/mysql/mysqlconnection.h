@@ -27,9 +27,7 @@ class mysqlcursor : public sqlrcursor {
 		bool	skipRow();
 		bool	fetchRow();
 		void	returnRow();
-		void	cleanUpData(bool freerows,
-					bool freecols,
-					bool freebinds);
+		void	cleanUpData(bool freeresult, bool freebinds);
 
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	*mysqlfield;

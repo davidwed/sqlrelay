@@ -26,7 +26,7 @@ bool sqlrconnection::rollback() {
 		retval=rollbackcur->executeQuery(rollbackquery,
 						rollbackquerylen,true);
 	}
-	rollbackcur->cleanUpData(false,false,false);
+	rollbackcur->cleanUpData(true,true);
 	rollbackcur->closeCursor();
 	delete rollbackcur;
 

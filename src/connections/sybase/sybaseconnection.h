@@ -57,8 +57,7 @@ class sybasecursor : public sqlrcursor {
 		bool	skipRow();
 		bool	fetchRow();
 		void	returnRow();
-		void	cleanUpData(bool freerows, bool freecols,
-							bool freebinds);
+		void	cleanUpData(bool freeresult, bool freebinds);
 		void	discardResults();
 		void	discardCursor();
 
@@ -118,7 +117,8 @@ class sybaseconnection : public sqlrconnection {
 		void	logOut();
 		char	*identify();
 		char	bindVariablePrefix();
-		void	dropTempTable(const char *tablename);
+		void	dropTempTable(sqlrcursor *cursor,
+					const char *tablename);
 
 		CS_CONTEXT	*context;
 		CS_LOCALE	*locale;
@@ -139,8 +139,6 @@ class sybaseconnection : public sqlrconnection {
 
 		static	stringbuffer	*errorstring;
 		static	bool		deadconnection;
-
-		sqlrcursor	*dropcursor;
 
 		static	CS_RETCODE	csMessageCallback(CS_CONTEXT *ctxt,
 						CS_CLIENTMSG *msgp);

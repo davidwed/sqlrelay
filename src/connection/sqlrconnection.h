@@ -68,10 +68,14 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual void	setPassword(const char *password);
 		virtual char	*getUser();
 		virtual char	*getPassword();
-		virtual void	dropTempTables(stringlist *tablelist);
-		virtual void	dropTempTable(const char *tablename);
-		virtual void	truncateTempTables(stringlist *tablelist);
-		virtual void	truncateTempTable(const char *tablename);
+		virtual void	dropTempTables(sqlrcursor *cursor,
+						stringlist *tablelist);
+		virtual void	dropTempTable(sqlrcursor *cursor,
+						const char *tablename);
+		virtual void	truncateTempTables(sqlrcursor *cursor,
+						stringlist *tablelist);
+		virtual void	truncateTempTable(sqlrcursor *cursor,
+						const char *tablename);
 
 	public:
 		// methods used by derived classes

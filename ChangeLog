@@ -46,6 +46,8 @@
 	applied a patch so varchars in oracle8 can be up to 32768 bytes long
 	fixed a bug where db2 connections would return the result set of
 		the previous query if the current query returned no rows
+	lots of fixes to sybase/freetds connections, sybase properly uses
+		cursors now
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

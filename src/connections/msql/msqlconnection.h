@@ -27,9 +27,7 @@ class msqlcursor : public sqlrcursor {
 		bool	skipRow();
 		bool	fetchRow();
 		void	returnRow();
-		void	cleanUpData(bool freerows,
-					bool freecols,
-					bool freebinds);
+		void	cleanUpData(bool freeresult, bool freebinds);
 
 		m_result	*msqlresult;
 		m_field		*msqlfield;

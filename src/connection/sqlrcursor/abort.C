@@ -12,7 +12,7 @@ void sqlrcursor::abort() {
 	busy=false;
 }
 
-void sqlrcursor::cleanUpData(bool freerows, bool freecols, bool freebinds) {
+void sqlrcursor::cleanUpData(bool freeresult, bool freebinds) {
 	// by default, do nothing...
 	return;
 }

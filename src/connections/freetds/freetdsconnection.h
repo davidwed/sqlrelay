@@ -1,27 +1,23 @@
 // Copyright (c) 2000-2001  David Muse
 // See the file COPYING for more information
 
-#ifndef FREETDSCONNECTION_H
-#define FREETDSCONNECTION_H
+#ifndef SYBASECONNECTION_H
+#define SYBASECONNECTION_H
 
-// FETCH_AT_ONCE must be 1 until freetds supports array fetches
+// this is here in case freetds ever supports array fetches
+//#define FETCH_AT_ONCE		10
 #define FETCH_AT_ONCE		1
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	4096
-
-// this code is here in case freetds ever supports bind vars
 #define MAX_BIND_VARS		512
 
-#define NUM_CONNECT_STRING_VARS 10
+#define NUM_CONNECT_STRING_VARS 11
 
 #include <rudiments/environment.h>
 #include <sqlrconnection.h>
 
 extern "C" {
 	#include <ctpublic.h>
-	#ifndef HAVE_FREETDS_FUNCTION_DEFINITIONS
-		#include <ctfunctions.h>
-	#endif
 }
 
 class freetdsconnection;
@@ -32,9 +28,8 @@ class freetdscursor : public sqlrcursor {
 			freetdscursor(sqlrconnection *conn);
 			~freetdscursor();
 		bool	openCursor(int id);
+		bool	closeCursor();
 		bool	prepareQuery(const char *query, long length);
-
-		// this code is here in case freetds ever supports bind vars
 		bool	inputBindString(const char *variable,
 						unsigned short variablesize,
 						const char *value,
@@ -64,16 +59,23 @@ class freetdscursor : public sqlrcursor {
 		bool	skipRow();
 		bool	fetchRow();
 		void	returnRow();
-		void	cleanUpData(bool freerows, bool freecols,
-							bool freebinds);
+		void	cleanUpData(bool freeresult, bool freebinds);
+		void	discardResults();
+		void	discardCursor();
 
-		char		*cursorname;
+		char	*cursorname;
 
-		double		tdsversion;
-		int		returnedcolumns;
+		void	checkRePrepare();
 
+		long	majorversion;
+		long	minorversion;
+		long	patchlevel;
+
+		CS_COMMAND	*languagecmd;
+		CS_COMMAND	*cursorcmd;
 		CS_COMMAND	*cmd;
-		CS_INT		results_type;
+		CS_INT		results;
+		CS_INT		resultstype;
 		CS_INT		ncols;
 		CS_INT		affectedrows;
 
@@ -82,7 +84,6 @@ class freetdscursor : public sqlrcursor {
 		int		maxrow;
 		int		totalrows;
 
-		// this code is here in case freetds ever supports bind vars
 		CS_DATAFMT	parameter[MAX_BIND_VARS];
 		int		paramindex;
 
@@ -95,8 +96,17 @@ class freetdscursor : public sqlrcursor {
 		CS_SMALLINT	nullindicator[MAX_SELECT_LIST_SIZE]
 					[FETCH_AT_ONCE];
 
+		char		*query;
+		int		length;
+		bool		prepared;
+		bool		clean;
+
+		regularexpression	cursorquerylower;
+		regularexpression	cursorqueryupper;
+
 		freetdsconnection	*freetdsconn;
 };
+
 
 class freetdsconnection : public sqlrconnection {
 	friend class freetdscursor;
@@ -113,13 +123,15 @@ class freetdsconnection : public sqlrconnection {
 		void	logOut();
 		char	*identify();
 		char	bindVariablePrefix();
-		void	dropTempTable(const char *tablename);
+		void	dropTempTable(sqlrcursor *cursor,
+					const char *tablename);
 
 		CS_CONTEXT	*context;
 		CS_LOCALE	*locale;
 		CS_CONNECTION	*dbconn;
 
 		char		*sybase;
+		char		*lang;
 		char		*server;
 		char		*db;
 		char		*charset;
@@ -133,8 +145,6 @@ class freetdsconnection : public sqlrconnection {
 
 		static	stringbuffer	*errorstring;
 		static	bool		deadconnection;
-
-		sqlrcursor	*dropcursor;
 
 		static	CS_RETCODE	csMessageCallback(CS_CONTEXT *ctxt,
 						CS_CLIENTMSG *msgp);

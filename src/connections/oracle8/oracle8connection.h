@@ -133,8 +133,7 @@ class oracle8cursor : public sqlrcursor {
 		bool	skipRow();
 		bool	fetchRow();
 		void	returnRow();
-		void	cleanUpData(bool freerows, bool freecols,
-							bool freebinds);
+		void	cleanUpData(bool freeresult, bool freebinds);
 
 		void	checkRePrepare();
 

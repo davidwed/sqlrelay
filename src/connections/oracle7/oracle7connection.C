@@ -491,9 +491,8 @@ void oracle7cursor::returnRow() {
 	row++;
 }
 
-void oracle7cursor::cleanUpData(bool freerows, bool freecols,
-							bool freebinds) {
-	if (freerows) {
+void oracle7cursor::cleanUpData(bool freeresult, bool freebinds) {
+	if (freeresult) {
 		ocan(&cda);
 	}
 }

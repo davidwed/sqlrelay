@@ -27,8 +27,7 @@ class postgresqlcursor : public sqlrcursor {
 		bool	skipRow();
 		bool	fetchRow();
 		void	returnRow();
-		void	cleanUpData(bool freerows, bool freecols,
-							bool freebinds);
+		void	cleanUpData(bool freeresult, bool freebinds);
 
 		int		ddlquery;
 		PGresult	*pgresult;

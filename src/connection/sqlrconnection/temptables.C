@@ -3,58 +3,50 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::dropTempTables(stringlist *tablelist) {
+void sqlrconnection::dropTempTables(sqlrcursor *cursor, stringlist *tablelist) {
 
 	// run through the temp table list, dropping tables
 	for (stringlistnode *sln=tablelist->getNodeByIndex(0);
 			sln; sln=(stringlistnode *)sln->getNext()) {
-		dropTempTable(sln->getData());
+		dropTempTable(cursor,sln->getData());
 		delete[] sln->getData();
 	}
 	tablelist->clear();
 }
 
-void sqlrconnection::dropTempTable(const char *tablename) {
+void sqlrconnection::dropTempTable(sqlrcursor *cursor, const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table ")->append(tablename);
-	sqlrcursor	*dropcur=initCursor();
-	if (dropcur->openCursor(-1)) {
-		if (dropcur->prepareQuery(dropquery.getString(),
+	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
-			dropcur->executeQuery(dropquery.getString(),
+		cursor->executeQuery(dropquery.getString(),
 					dropquery.getStringLength(),1);
-		}
-		dropcur->cleanUpData(true,true,true);
 	}
-	dropcur->closeCursor();
-	delete dropcur;
+	cursor->cleanUpData(true,true);
 }
 
-void sqlrconnection::truncateTempTables(stringlist *tablelist) {
+void sqlrconnection::truncateTempTables(sqlrcursor *cursor,
+						stringlist *tablelist) {
 
 	// run through the temp table list, truncateing tables
 	for (stringlistnode *sln=tablelist->getNodeByIndex(0);
 			sln; sln=(stringlistnode *)sln->getNext()) {
-		truncateTempTable(sln->getData());
+		truncateTempTable(cursor,sln->getData());
 		delete[] sln->getData();
 	}
 	tablelist->clear();
 }
 
-void sqlrconnection::truncateTempTable(const char *tablename) {
+void sqlrconnection::truncateTempTable(sqlrcursor *cursor,
+						const char *tablename) {
 	stringbuffer	truncatequery;
 	truncatequery.append("delete from ")->append(tablename);
-	sqlrcursor	*truncatecur=initCursor();
-	if (truncatecur->openCursor(-1)) {
-		if (truncatecur->prepareQuery(truncatequery.getString(),
+	if (cursor->prepareQuery(truncatequery.getString(),
 					truncatequery.getStringLength())) {
-			truncatecur->executeQuery(truncatequery.getString(),
+		cursor->executeQuery(truncatequery.getString(),
 					truncatequery.getStringLength(),1);
-		}
-		truncatecur->cleanUpData(true,true,true);
 	}
-	truncatecur->closeCursor();
-	delete truncatecur;
+	cursor->cleanUpData(true,true);
 }
 
 void sqlrconnection::addSessionTempTableForDrop(const char *table) {

@@ -107,8 +107,7 @@ class sqlrcursor {
 		virtual	bool	skipRow()=0;
 		virtual	bool	fetchRow()=0;
 		virtual	void	returnRow()=0;
-		virtual	void	cleanUpData(bool freerows, bool freecols,
-								bool freebinds);
+		virtual	void	cleanUpData(bool freeresult, bool freebinds);
 
 	protected:
 		regularexpression	createtemplower;

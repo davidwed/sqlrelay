@@ -22,14 +22,9 @@ bool		sybaseconnection::deadconnection;
 sybaseconnection::sybaseconnection() {
 	errorstring=NULL;
 	env=new environment();
-	dropcursor=NULL;
 }
 
 sybaseconnection::~sybaseconnection() {
-	if (dropcursor) {
-		dropcursor->closeCursor();
-		delete dropcursor;
-	}
 	delete errorstring;
 	delete env;
 }
@@ -210,14 +205,6 @@ bool sybaseconnection::logIn() {
 		logInError("failed to connect to the database",6);
 		return false;
 	}
-
-	// create a cursor that will be used to drop temp tables
-	dropcursor=initCursor();
-	if (!dropcursor->openCursor(-1)) {
-		dropcursor->closeCursor();
-		delete dropcursor;
-		return false;
-	}
 	return true;
 }
 
@@ -316,7 +303,7 @@ bool sybasecursor::openCursor(int id) {
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=false;
 		}
-		cleanUpData(true,true,true);
+		cleanUpData(true,true);
 	}
 	return (retval && sqlrcursor::openCursor(id));
 }
@@ -530,7 +517,7 @@ bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
 	}
 
 	if (ct_send(cmd)!=CS_SUCCEED) {
-		cleanUpData(true,true,true);
+		cleanUpData(true,true);
 		return false;
 	}
 
@@ -539,7 +526,7 @@ bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
 		results=ct_results(cmd,&resultstype);
 
 		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
-			cleanUpData(true,true,true);
+			cleanUpData(true,true);
 			return false;
 		}
 
@@ -809,14 +796,16 @@ void sybasecursor::returnRow() {
 }
 
 
-void sybasecursor::cleanUpData(bool freerows, bool freecols, bool freebinds) {
+void sybasecursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	if (clean) {
 		return;
 	}
 
-	discardResults();
-	discardCursor();
+	if (freeresult) {
+		discardResults();
+		discardCursor();
+	}
 
 	clean=true;
 }
@@ -987,13 +976,14 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 }
 
 
-void sybaseconnection::dropTempTable(const char *tablename) {
+void sybaseconnection::dropTempTable(sqlrcursor *cursor,
+					const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table #")->append(tablename);
-	if (dropcursor->prepareQuery(dropquery.getString(),
+	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
-		dropcursor->executeQuery(dropquery.getString(),
+		cursor->executeQuery(dropquery.getString(),
 					dropquery.getStringLength(),1);
 	}
-	dropcursor->cleanUpData(true,true,true);
+	cursor->cleanUpData(true,true);
 }

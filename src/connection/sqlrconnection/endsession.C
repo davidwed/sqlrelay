@@ -31,11 +31,12 @@ void sqlrconnection::endSession() {
 			debugPrint("connection",3,(long)i);
 			#endif
 
-			// Very important...
-			// Do not cleanUpData() here, otherwise result sets
-			// that were suspended after the entire result set was
-			// fetched won't be able to return column data when
-			// resumed.
+			// It's ok to call cleanUpData() here, ordinarily we
+			// wouldn't so that result sets that were suspended
+			// after the entire result set was fetched would be
+			// able to return column data when resumed, but since
+			// we're ending the session, we don't care...
+			cur[i]->cleanUpData(true,true);
 			cur[i]->abort();
 		}
 	}
@@ -44,8 +45,8 @@ void sqlrconnection::endSession() {
 	#endif
 
 	// truncate/drop temp tables
-	truncateTempTables(&sessiontemptablesfortrunc);
-	dropTempTables(&sessiontemptablesfordrop);
+	truncateTempTables(cur[0],&sessiontemptablesfortrunc);
+	dropTempTables(cur[0],&sessiontemptablesfordrop);
 
 	// commit or rollback if necessary
 	if (isTransactional() && commitorrollback) {
