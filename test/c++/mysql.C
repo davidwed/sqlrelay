@@ -601,7 +601,7 @@ int	main(int argc, char **argv) {
 	printf("FIELDS: \n");
 	checkSuccess(cur->getField(0,0),"1");
 	checkSuccess(cur->getField(0,1),"hello");
-	checkSuccess(cur->getField(0,2),"10.5556");
+	checkSuccess(cur->getField(0,2),"10.555600");
 	printf("\n");
 
 	printf("ARRAY SUBSTITUTIONS: \n");
@@ -635,9 +635,9 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("FIELDS: \n");
-	checkSuccess(cur->getField(0,0),"10.55");
-	checkSuccess(cur->getField(0,1),"10.556");
-	checkSuccess(cur->getField(0,2),"10.5556");
+	checkSuccess(cur->getField(0,0),"10.5500");
+	checkSuccess(cur->getField(0,1),"10.55600");
+	checkSuccess(cur->getField(0,2),"10.555600");
 	printf("\n");
 
 	printf("NULLS as Nulls: \n");

@@ -600,7 +600,7 @@ int	main(int argc, char **argv) {
 	printf("FIELDS: \n");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"hello");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"10.5556");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"10.555600");
 	printf("\n");
 
 	printf("ARRAY SUBSTITUTIONS: \n");
@@ -634,9 +634,9 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("FIELDS: \n");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"10.55");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"10.556");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"10.5556");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"10.5500");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"10.55600");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"10.555600");
 	printf("\n");
 
 	printf("NULLS as Nulls: \n");

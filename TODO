@@ -1,3 +1,5 @@
+mysql appears to add 00's to the end of floating point numbers why?
+
 query/fields cmdline tools need a timeout option.
 
 ruby api crashes on exit
