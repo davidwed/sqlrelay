@@ -1,5 +1,3 @@
-need to support queries larger than 32768
-
 --------------------------------------------------------------------------------
 Problem #1:
 
@@ -84,12 +82,11 @@ does run as nobody.
 sqlr-connection running as nobody/nobody complains about trying to switch to
 	the nobody group
 
+scaler can loop up listener is killed, see FIXME
 scaler loops up if the connections can't read the sqlrelay.conf file (or can't
 	start for whatever reason)
 
 document installing MSDE from http://www.microsoft.com/sql/msde/default.asp
-
-scaler can loop up listener is killed, see FIXME
 
 connections should print a warning if the runasuser/runasgroup can't read
 	sqlrelay.conf

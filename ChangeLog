@@ -13,6 +13,10 @@
 	ctrl-D doesn't crash sqlrsh now
 	connections=0 is valid now, will start no connections
 		and dynamically scale from there
+	upped MAXQUERYLENGTH to 65536
+	removed MAXQUERYLENGTH from sqlrdefines.h
+	fixed bug where query length > MAXQUERYLENGTH could cause segfault when
+		copying references
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch
