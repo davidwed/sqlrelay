@@ -27,10 +27,9 @@ PGconn *PQsetdbLogin(const char *pghost, const char *pgport,
 	pgconn->db=(char *)dbName;
 	pgconn->user=(char *)login;
 	pgconn->password=(char *)pwd;
-	pgconn->socket=0;
 
 	pgconn->sqlrcon=new sqlrconnection(pghost,atoi(pgport),"",
-						login,pwd,0,1);
+							login,pwd,0,1);
 }
 
 // older, simpler connection function that didn't have login, password
@@ -109,7 +108,7 @@ char *PQerrorMessage(const PGconn *conn) {
 }
 
 int PQsocket(const PGconn *conn) {
-	return conn->socket;
+	return -1;
 }
 
 int PQbackendPID(const PGconn *conn) {
@@ -123,15 +122,6 @@ int PQclientEncoding(const PGconn *conn) {
 int PQsetClientEncoding(PGconn *conn, const char *encoding) {
 	return -1;
 }
-
-
-#ifdef USE_SSL
-// get the SSL structure associated with a connection
-SSL *PQgetssl(PGconn *conn) {
-	return conn->ssl;
-}
-
-#endif
 
 
 }
