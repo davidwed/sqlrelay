@@ -1,6 +1,93 @@
-document installing MSDE from http://www.microsoft.com/sql/msde/default.asp
-
 need to support queries larger than 32768
+
+--------------------------------------------------------------------------------
+Problem #1:
+
+I am having a problem with SQL Relay hanging once it
+starts to scale
+the number of connections. I am running this on a
+large search based
+website but it just keeps locking up on me. I see it
+begin to scale
+the connections and then reduce the connections and
+etc, but after
+about 5-10 minutes my searches start timing out and
+sql relay becomes
+unresponsive. I have pasted my instance for this
+connection below. If
+someonecould please help me correct this issue it
+would be greatly
+appreciated.
+
+<instance id="db2" port="9001"
+socket="/tmp/db2.socket"
+dbase="oracle8" connections="50" maxconnections="100"
+maxqueuelength="5"
+growby="1" ttl="60" endofsession="commit"
+sessiontimeout="600"
+runasuser="nobody" runasgroup="nobody" cursors="5"
+authtier="listener"
+handoff="pass" deniedips=""
+allowedips="^192\.168\.8\.(12|16)$" debug="">
+<users>
+<user user="db2" password="db2"/>
+</users>
+<connections>
+<connection connectionid="db2"
+string="user=user;password=password;oracle_sid=oracle_sid;"
+metric="1"/>
+</connections>
+</instance>
+
+
+
+Problem #2:
+
+I got it to become somewhat stable for a few hours by
+upping the
+starting connections to 30 and maxconnection to 100...
+it scaled up to
+about 35 at times and didnt hang or become
+unresponsive at all. But
+then when i went to switch the application back to
+direct db access
+and then stopped sql relay a few minutes after, it
+locked up my entire
+server and was unable to log back in to see what
+happened.
+
+BTW: I forgot to put this in my earlier post... this
+machine runs
+nothing but SQL Relay on it and the Oracle client
+required to access
+the db. The machine was never taxed out running sql
+realy or anything
+but it blew up and died when i tried to stop sql
+relay..
+
+
+
+Problem #3:
+
+I am still having the problem with sql relay hanging
+and/or crashing
+the server. But now i have discovered a new problem...
+
+When it goes to scale more connections, i get this
+"Warning: could not
+change group to nobody". I have a nobody user and a
+nobody group on
+the server. I also started sql relay as root and it
+does run as nobody.
+--------------------------------------------------------------------------------
+
+sqlr-connection running as nobody/nobody complains about trying to switch to
+	the nobody group
+
+scaler loops up if the connections can't read the sqlrelay.conf file (or can't
+	start for whatever reason)
+
+document installing MSDE from http://www.microsoft.com/sql/msde/default.asp
 
 scaler can loop up listener is killed, see FIXME
 

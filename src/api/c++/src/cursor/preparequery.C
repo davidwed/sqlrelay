@@ -14,15 +14,25 @@ void sqlrcursor::prepareQuery(const char *query, int length) {
 	validatebinds=0;
 	resumed=false;
 	clearVariables();
-	if (copyrefs) {
-		initQueryBuffer();
-		charstring::compare(queryptr,query);
-	} else {
-		queryptr=(char *)query;
-	}
 	querylen=length;
 	if (querylen>MAXQUERYSIZE) {
 		querylen=MAXQUERYSIZE;
+		if (sqlrc->debug) {
+			sqlrc->debugPreStart();
+			sqlrc->debugPrint("The query is too large.  ");
+			sqlrc->debugPrint("MAXQUERYSIZE is ");
+			sqlrc->debugPrint((long)MAXQUERYSIZE);
+			sqlrc->debugPrint("\n");
+			sqlrc->debugPreEnd();
+		}
+	}
+	if (copyrefs) {
+		initQueryBuffer();
+		charstring::copy(queryptr,query,querylen);
+		// just in case querylen>MAXQUERYSIZE
+		queryptr[querylen]=(char)NULL;
+	} else {
+		queryptr=(char *)query;
 	}
 }
 
@@ -105,7 +115,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 
 		// set the error
 		char	err[32+charstring::length(fullpath)];
-		charstring::compare(err,"The file ");
+		charstring::append(err,"The file ");
 		charstring::append(err,fullpath);
 		charstring::append(err," could not be opened.\n");
 		if (sqlrc->debug) {
@@ -126,16 +136,21 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 
 	// read the file into the query buffer
 	querylen=queryfile.getSize();
-	if (querylen<MAXQUERYSIZE) {
-		queryfile.read((unsigned char *)querybuffer,querylen);
-		querybuffer[querylen]=(char)NULL;
-	} else {
-		sqlrc->debugPreStart();
-		sqlrc->debugPrint("The query in ");
-		sqlrc->debugPrint(fullpath);
-		sqlrc->debugPrint(" is too large.\n");
-		sqlrc->debugPreEnd();
+	if (querylen>MAXQUERYSIZE) {
+		querylen=MAXQUERYSIZE;
+		if (sqlrc->debug) {
+			sqlrc->debugPreStart();
+			sqlrc->debugPrint("The query in ");
+			sqlrc->debugPrint(fullpath);
+			sqlrc->debugPrint(" is too large. ");
+			sqlrc->debugPrint("MAXQUERYSIZE is ");
+			sqlrc->debugPrint((long)MAXQUERYSIZE);
+			sqlrc->debugPrint("\n");
+			sqlrc->debugPreEnd();
+		}
 	}
+	queryfile.read((unsigned char *)querybuffer,querylen);
+	querybuffer[querylen]=(char)NULL;
 
 	queryfile.close();
 

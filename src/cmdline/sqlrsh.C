@@ -39,19 +39,19 @@
 class	environment {
 	public:
 			environment();
-		int	color;
-		int	headers;
-		int	stats;
-		int	debug;
-		int	final;
+		bool	color;
+		bool	headers;
+		bool	stats;
+		bool	debug;
+		bool	final;
 };
 
 environment::environment() {
-	color=0;
-	headers=1;
-	stats=1;
-	debug=0;
-	final=0;
+	color=false;
+	headers=true;
+	stats=true;
+	debug=false;
+	final=false;
 }
 
 class	sqlrsh {
@@ -305,11 +305,11 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	}
 
 	// on or off?
-	int	toggle;
+	bool	toggle;
 	if (!charstring::compareIgnoringCase(ptr,"on",2)) {
-		toggle=1;
+		toggle=true;
 	} else if (!charstring::compareIgnoringCase(ptr,"off",3)) {
-		toggle=0;
+		toggle=false;
 	} else {
 		return;
 	}
