@@ -99,7 +99,8 @@ int	oracle8connection::logIn() {
 		logInError("OCIInitialize() failed.\n");
 		return 0;
 	}
-	if (OCIEnvInit((OCIEnv **)&env,OCI_DEFAULT,0,(dvoid **)!=OCI_SUCCESS)) {
+	if (OCIEnvInit((OCIEnv **)&env,OCI_DEFAULT,
+					0,(dvoid **)0)!=OCI_SUCCESS) {
 		logInError("OCIEnvInit() failed.\n");
 		return 0;
 	}
