@@ -5,10 +5,6 @@ perl apis -> CPAN
 move socket files into their own directory so they can't collide with other
 	stuff in tmp directory
 
-document that snippets from tnsnames.ora can be used as ORACLE_SID
-
-look at npgsql for .net data provider example
-
 if connections=0 and maxconnections>0 then one connection does get started,
 	sometimes connections with a ttl don't die off
 
@@ -16,9 +12,15 @@ php module needs to clean itself up (close connections) if the script dies
 
 api needs to expose integer column types
 
+numeric output bind variables
+
 CFLAGS="-framework Python" to get python API to compile on OS X
 
-does setResultSetBufferSize prevent PythonDB from fetching more than 100 rows?
+does setResultSetBufferSize prevent PythonDB, Perl DBI, etc. from fetching more
+	than 100 rows?
+
+mysql 4.1, 5.0 - bind vars
+postgresql 8 - bind vars
 
 --------------------------------------------------------------------------------
 
@@ -115,8 +117,6 @@ Compatibility:
 	support @,: or ? for fake bind variables
 	rewrite queries with ?'s or @'s for oracle, rewrite
 				queries with ?'s or :'s for
-	mysql 4.1, 5.0 - bind vars
-	postgresql 8 - bind vars
 	support libmysqlclient_r
 	daemontools
 	SCO:
@@ -125,6 +125,7 @@ Compatibility:
 		php api won't build
 
 Documentation:
+	snippets from tnsnames.ora can be used as ORACLE_SID
 	how to use new features of Tony/Erik's perl dbi patch
 	issue with sqlrelay.conf permissions and runasuser="nobody"
 	getting started with odbc
@@ -261,6 +262,7 @@ API's:
 	ODBC
 	QT3
 	C# - have a driver, just need to incorporate it
+		look at npgsql for .net data provider example
 	ADA
 	Eiffel
 	gnome-db

@@ -120,9 +120,9 @@ void sqlrconnection::setUserAndGroup() {
 }
 
 void sqlrconnection::setUnixSocketDirectory() {
-	unixsocket=new char[tmpdir->getLength()+23];
-	sprintf(unixsocket,"%s/",tmpdir->getString());
-	unixsocketptr=unixsocket+tmpdir->getLength()+1;
+	unixsocket=new char[tmpdir->getLength()+31];
+	sprintf(unixsocket,"%s/sockets/",tmpdir->getString());
+	unixsocketptr=unixsocket+tmpdir->getLength()+8+1;
 }
 
 bool sqlrconnection::handlePidFile() {

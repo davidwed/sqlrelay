@@ -1,0 +1,135 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With Microsoft Access</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Getting Started With Microsoft Access</span><br>
+
+<ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#creating">Creating a Database</a></li>
+<li><a href="#accessing">Accessing a Database</a></li>
+<li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+</ul>
+
+<a name="installation"></a>
+<span class="heading1">Installation</span><br>
+
+<p><a href="http://mdbtools.sourceforge.net.">MDB Tools</a> provides a gui for
+browsing Microsoft Access database files, command line tools and a library for
+working with the tables directly, a library for running SQL queries and an ODBC
+driver which uses the SQL library.  Currently, the SQL library, and consequently
+the ODBC driver, are very limited, you can only run SELECT queries and you
+cannot do joins.</p>
+
+<p>To install MDB Tools, download it from the
+<a href="http://mdbtools.sourceforge.net.">MDB Tools</a> site and compile it.
+I usually give the <i>configure</i> script the
+<i>--prefix=/usr/local/mdbtools</i> parameter so that the entire MDB Tools suite
+will be installed under /usr/local/mdbtools, then I add /usr/local/mdbtools/bin
+to my PATH environment variable and /usr/local/mdbtools/lib to my
+LD_LIBRARY_PATH environment variable.</p>
+
+<p>I have successfully built, installed and used MDB Tools on Linux but have
+not yet tried it on any other platform.</p>
+
+<a name="creating"></a>
+<span class="heading1">Creating a Database</span><br>
+
+<p>For now, I honestly don't know how to create a database using MDB Tools.  I
+haven't spent much time using the tools.  You can probably create a database
+from a set of csv files using mdb-import, but that's really just a guess.</p>
+
+<p>You can, of course create a database file using Microsoft Access.  You
+can either store the database on a non-Windows server and provide Windows
+clients access to it using Samba or store the database on a Windows server
+and provide Linux clients access to it using an SMB mount.</p>
+
+</blockquote>
+
+<a name="accessing"></a>
+<span class="heading1">Accessing a Database</span><br>
+
+<p>To access a Microsoft Access database, su to a user that has access to the
+file and use any of the following MDB Tools to access it.</p>
+
+<ul>
+<li>gmdb2</li>
+<li>mdb-array</li>
+<li>mdb-export</li>
+<li>mdb-header</li>
+<li>mdb-hexdump</li>
+<li>mdb-import</li>
+<li>mdb-parsecsv</li>
+<li>mdb-prop</li>
+<li>mdb-schema</li>
+<li>mdb-sql</li>
+<li>mdb-tables</li>
+<li>mdb-ver</li>
+<li>prcat</li>
+<li>prdata</li>
+<li>prdump</li>
+<li>prindex</li>
+<li>prkkd</li>
+<li>prole</li>
+<li>prtable</li>
+<li>unittest</li>
+<li>updrow</li>
+</ul>
+
+<p>I honestly don't know what they all do or how to use them, but gmdb2 is a
+very nice graphical browser.</p>
+
+<a name="sqlrelay"></a>
+<span class="heading1">Accessing a Database With SQL Relay</span><br>
+
+<p>Accessing SQLite from SQL Relay requires an instance entry in your 
+<i>sqlrelay.conf</i> file for the database that you want 
+to access.  Here is an example <i>sqlrelay.conf</i> which defines an SQL Relay 
+instance called mdbtoolstest.  This instance connects to the 
+<i>/usr/local/mdbtools/var/testdb.mdb</i> database.  Note how the runasuser and 
+runasgroup attributes of the instance tag are set to the owner of the 
+database.</p>
+
+<PRE>
+<FONT color=#0000ff>&lt;?</FONT><B><FONT color=#288a51>xml version=</FONT></B><FONT color=#ff00ff>&quot;1.0&quot;</FONT><FONT color=#0000ff>?&gt;</FONT>
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>DOCTYPE</FONT></B> instances <B><FONT color=#a62828>SYSTEM</FONT></B> <FONT color=#ff00ff>&quot;sqlrelay.dtd&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+<FONT color=#008a8e>&lt;instances&gt;</FONT>
+
+        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;mdbtoolstest&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/mdbtoolstest.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;mdbtools&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;0&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;testuser&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;testuser&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> authtier=</FONT><FONT color=#ff00ff>&quot;listener&quot;</FONT><FONT color=#008a8e> handoff=</FONT><FONT color=#ff00ff>&quot;pass&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+                <FONT color=#008a8e>&lt;users&gt;</FONT>
+                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;mdbtoolstest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;mdbtoolstest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/users&gt;</FONT>
+                <FONT color=#008a8e>&lt;connections&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;mdbtoolstest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;db=/usr/local/mdbtools/var/testdb.mdb&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/connections&gt;</FONT>
+        <FONT color=#008a8e>&lt;/instance&gt;</FONT>
+
+<FONT color=#008a8e>&lt;/instances&gt;</FONT>
+</PRE>
+
+<p>Now you can start up this instance with the following command.</p>
+
+<blockquote>
+<b>sqlr-start -id mdbtoolstest</b>
+</blockquote>
+
+<p>To connect to the instance and run queries, use the following command.</p>
+
+<blockquote>
+<b>sqlrsh -id mdbtoolstest</b>
+</blockquote>
+
+<p>The following command shuts down the SQL Relay instance.</p>
+
+<blockquote>
+<b>sqlr-stop mdbtoolstest</b>
+</blockquote>
+
+</body>
+
+</html>

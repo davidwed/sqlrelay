@@ -50,6 +50,8 @@ install:
 	$(INSTALL) sqlr-connection-mysql-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
+	$(MKINSTALLDIRS) $(tmpdir)/sockets
+	chmod 777 $(tmpdir)/sockets
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 

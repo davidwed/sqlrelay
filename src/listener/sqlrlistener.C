@@ -401,8 +401,8 @@ bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 bool sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
 
 	// the handoff socket
-	char	handoffsockname[tmpdir->getLength()+1+strlen(id)+8+1];
-	sprintf(handoffsockname,"%s/%s-handoff",tmpdir->getString(),id);
+	char	handoffsockname[tmpdir->getLength()+9+strlen(id)+8+1];
+	sprintf(handoffsockname,"%s/sockets/%s-handoff",tmpdir->getString(),id);
 
 	handoffsockun=new unixserversocket();
 	bool	success=handoffsockun->listen(handoffsockname,0066,15);
@@ -424,8 +424,8 @@ bool sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 							const char *id) {
 
 	// the deregistration socket
-	char	removehandoffsockname[tmpdir->getLength()+1+strlen(id)+14+1];
-	sprintf(removehandoffsockname,"%s/%s-removehandoff",
+	char	removehandoffsockname[tmpdir->getLength()+9+strlen(id)+14+1];
+	sprintf(removehandoffsockname,"%s/sockets/%s-removehandoff",
 						tmpdir->getString(),id);
 
 	removehandoffsockun=new unixserversocket();
@@ -448,8 +448,8 @@ bool sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 bool sqlrlistener::listenOnFixupSocket(tempdir *tmpdir, const char *id) {
 
 	// the fixup socket
-	fixupsockname=new char[tmpdir->getLength()+1+strlen(id)+6+1];
-	sprintf(fixupsockname,"%s/%s-fixup",tmpdir->getString(),id);
+	fixupsockname=new char[tmpdir->getLength()+9+strlen(id)+6+1];
+	sprintf(fixupsockname,"%s/sockets/%s-fixup",tmpdir->getString(),id);
 
 	fixupsockun=new unixserversocket();
 	bool	success=fixupsockun->listen(fixupsockname,0066,15);

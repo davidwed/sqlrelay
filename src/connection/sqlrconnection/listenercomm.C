@@ -89,8 +89,8 @@ void sqlrconnection::registerForHandoff(char *tmpdir) {
 	#endif
 
 	// construct the name of the socket to connect to
-	char	handoffsockname[strlen(tmpdir)+1+strlen(cmdl->getId())+8+1];
-	sprintf(handoffsockname,"%s/%s-handoff",tmpdir,cmdl->getId());
+	char	handoffsockname[strlen(tmpdir)+9+strlen(cmdl->getId())+8+1];
+	sprintf(handoffsockname,"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
 	char	string[17+strlen(handoffsockname)+1];
@@ -138,9 +138,9 @@ void sqlrconnection::deRegisterForHandoff(char *tmpdir) {
 	#endif
 
 	// construct the name of the socket to connect to
-	char	removehandoffsockname[strlen(tmpdir)+1+
+	char	removehandoffsockname[strlen(tmpdir)+9+
 					strlen(cmdl->getId())+14+1];
-	sprintf(removehandoffsockname,"%s/%s-removehandoff",
+	sprintf(removehandoffsockname,"%s/sockets/%s-removehandoff",
 					tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
