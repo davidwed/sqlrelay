@@ -418,6 +418,9 @@ dnl to use the correct one when cross-compiling
 AC_CHECK_PROG(AR,$host_alias-ar,$host_alias-ar,ar)
 AC_SUBST(AR)
 
+FW_CHECK_MICROSOFT
+FW_CHECK_SO_EXT
+
 FW_CHECK_LD_RPATH
 FW_CHECK_PS
 FW_CHECK_UNAME
@@ -430,9 +433,6 @@ fi
 
 FW_CHECK_GNU_STRIP
 FW_CHECK_PIPE
-
-FW_CHECK_MICROSOFT
-FW_CHECK_SO_EXT
 
 echo "******************************"
 

@@ -91,7 +91,7 @@ bool sqlrconnection::lockSequenceFile() {
 
 	struct	flock fl;
 	fl.l_type=F_WRLCK;
-	fl.l_whence=SEEK_END;
+	fl.l_whence=SEEK_SET;
 	fl.l_start=0;
 	fl.l_len=0;
 	return (fcntl(sockseq,F_SETLKW,&fl)!=-1);
@@ -145,7 +145,7 @@ bool sqlrconnection::unLockSequenceFile() {
 
 	struct	flock fl;
 	fl.l_type=F_UNLCK;
-	fl.l_whence=SEEK_END;
+	fl.l_whence=SEEK_SET;
 	fl.l_start=0;
 	fl.l_len=0;
 	return (fcntl(sockseq,F_SETLKW,&fl)!=-1);

@@ -3,7 +3,9 @@ need "using sqlrelay on windows doc"
 	optional cygwin components
 	cygserver installation
 		must run cygserver and set CYGWIN=server for ipc to work
+		http://cygwin.com/cygwin-ug-net/using-cygserver.html
 	running sqlrelay clients
+	add path to mysql dll to PATH
 
 VB wrapper
 
@@ -74,6 +76,7 @@ Tests:
 	oldmysql test files for non-C++ api's
 
 cygwin:
+	how to install as a service?
 	how to build a php extension?
 		1) need php source 
 	active state python

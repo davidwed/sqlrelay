@@ -12,6 +12,7 @@ fi
 
 echo "Killing the following processes:"
 
+CYGWIN="@CYGWIN@"
 PS="@PS@"
 if ( test "$PS" = "ps\ aux" ); then
 
@@ -38,17 +39,34 @@ if ( test "$PS" = "ps\ aux" ); then
 else
 	ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
 
-	for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $4}'`
-	do
-		kill $KILLARG $i
-	done
+	if ( test -z "$CYGWIN" )
+	then
 
-	sleep 1
+		for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
+		do
+			kill $KILLARG $i
+		done
+	
+		sleep 1
+	
+		for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
+		do
+			kill $KILLARG $i
+		done
+	else
 
-	for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $4}'`
-	do
-		kill $KILLARG $i
-	done
+		for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $4}'`
+		do
+			kill $KILLARG $i
+		done
+	
+		sleep 1
+	
+		for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $4}'`
+		do
+			kill $KILLARG $i
+		done
+	fi
 
 	if ( test -n "`ps -efal | grep sqlr- | grep ' $1' | grep -v grep | grep -v sqlr-stop`" ); then
 		echo "Processes still alive:"
