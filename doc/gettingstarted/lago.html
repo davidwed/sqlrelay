@@ -27,8 +27,7 @@ Solaris.  On all platforms, I've had to compile it from source.  I've gotten it
 to compile on OpenBSD and NetBSD, but never got it to run correctly.  Lago is 
 available from the 
 <a href="http://lago.sourceforge.net">Lago home page</a>.  For NetBSD and 
-OpenBSD you need the version that comes with it's own pthreads 
-implementation.</p>
+you need the version that comes with it's own pthreads implementation.</p>
 
 <p>Older versions of lago will not successfully compile with gcc 2.96 or 3.x.
 You'll have to use gcc 2.95.  Newer versions of lago come with a patch that
@@ -57,6 +56,18 @@ lago <i>configure</i> script the <i>--prefix=/usr/local/lago</i> parameter so
 that Lago will be installed under /usr/local/lago.  I then add 
 /usr/local/lago/bin to my PATH environment variable and /usr/local/lago/lib to 
 my LD_LIBRARY_PATH environment variable.</p>
+
+<p>On OpenBSD, you have to edit lago/Makefile and change the line:</p>
+
+<blockquote>
+LIBS = -L../pth
+</blockquote>
+
+<p>to:</p>
+
+<blockquote>
+LIBS = -pthread -lc_r
+</blockquote>
 
 <p>On some platforms, older or unpatched versions of lago require a
 modification to compile.  If compilation fails with an error in scktcman.xx,
