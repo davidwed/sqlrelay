@@ -10,6 +10,19 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#ifdef NEED_GLIBC_2_3_FIXUP
+extern "C" {
+	#include <ctype.h>
+	const unsigned short int *__ctype_b;
+	int	__ctype_toupper(int c) {
+		return toupper(c);
+	}
+	int	__ctype_tolower(int c) {
+		return tolower(c);
+	}
+}
+#endif
+
 
 sybaseconnection	*conn;
 signalhandler		*alarmhandler;

@@ -9891,6 +9891,55 @@ fi
 
 
 
+
+	echo "$as_me:$LINENO: checking for broken glibc-2.3" >&5
+echo $ECHO_N "checking for broken glibc-2.3... $ECHO_C" >&6
+	GLIBC23FIXUPCODE=""
+	GLIBC23FIXUPINCLUDE=""
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <ctype.h>
+int
+main ()
+{
+__ctype_toupper('a');
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+cat >>confdefs.h <<_ACEOF
+#define NEED_GLIBC_2_3_FIXUP 1
+_ACEOF
+ GLIBC23FIXUPINCLUDE="#include <ctype.h>"; GLIBC23FIXUPCODE="const unsigned short int *__ctype_b; int __ctype_toupper(int c) { return toupper(c); } int __ctype_tolower(int c) { return tolower(c); }"
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+
+
 echo "******************************"
 
 
@@ -10932,7 +10981,7 @@ fi
 fi
 
 			if ( test -n "$ORACLEVERSION" )
-		then
+			then
 				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
 				echo "hmmm, looks like Oracle$ORACLEVERSION..."
 			fi
@@ -10995,6 +11044,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -11048,6 +11099,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -11111,6 +11164,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -11164,6 +11219,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ociapr.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -11223,6 +11280,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -11277,6 +11336,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ociapr.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -11337,6 +11398,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -11390,6 +11453,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ociapr.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -11449,6 +11514,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <oci.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -11502,6 +11569,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ociapr.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -16022,6 +16091,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ctpublic.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -16078,6 +16149,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ctpublic.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -16137,6 +16210,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ctpublic.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {
@@ -16193,6 +16268,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <ctpublic.h>
 #include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE
 int
 main ()
 {

@@ -475,7 +475,7 @@ then
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore8.a],[ORACLEVERSION=\"8.1\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient8 -lcommon8 -lgeneric8 -lclntsh -lcore8 -lnls8 $WTC8 -lm $AIOLIB\"])
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore9.a],[ORACLEVERSION=\"9.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient9 -lcommon9 -lgeneric9 -lclntsh -lcore9 -lnls9 -lwtc9 -lm $AIOLIB\"])
 			if ( test -n "$ORACLEVERSION" )
-		then
+			then
 				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
 				echo "hmmm, looks like Oracle$ORACLEVERSION..."
 			fi
@@ -493,10 +493,14 @@ then
 			if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" )
 			then
 				FW_TRY_LINK([#include <oci.h>
-#include <stdlib.h>],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
 			else
 			FW_TRY_LINK([#include <oci.h>
-#include <stdlib.h>],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
 			fi
 		fi
 		
@@ -508,10 +512,14 @@ then
 			if ( test -n "$OCI_H" )
 			then
 				FW_TRY_LINK([#include <oci.h>
-#include <stdlib.h>],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			else
 				FW_TRY_LINK([#include <ociapr.h>
-#include <stdlib.h>],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			fi
 			if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
 			then
@@ -519,10 +527,14 @@ then
 				if ( test -n "$OCI_H" )
 				then
 					FW_TRY_LINK([#include <oci.h>
-#include <stdlib.h>],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); ORACLESTATIC=""; LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); ORACLESTATIC=""; LINKFAIL="yes"])
 				else
 					FW_TRY_LINK([#include <ociapr.h>
-#include <stdlib.h>],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES,$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); ORACLESTATIC=""; LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES,$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); ORACLESTATIC=""; LINKFAIL="yes"])
 				fi
 			fi
 		fi
@@ -533,10 +545,14 @@ then
 			if ( test -n "$OCI_H" )
 			then
 				FW_TRY_LINK([#include <oci.h>
-#include <stdlib.h>],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			else
 				FW_TRY_LINK([#include <ociapr.h>
-#include <stdlib.h>],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			fi
 			if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
 			then
@@ -544,10 +560,14 @@ then
 				if ( test -n "$OCI_H" )
 				then
 					FW_TRY_LINK([#include <oci.h>
-#include <stdlib.h>],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 				else
 					FW_TRY_LINK([#include <ociapr.h>
-#include <stdlib.h>],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 				fi
 			fi
 		fi
@@ -1092,12 +1112,16 @@ then
 		then
 			AC_MSG_CHECKING(if Sybase can be statically linked without $DLLIB)
 			FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASESTATIC $SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASESTATIC $SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
 			then
 				AC_MSG_CHECKING(if Sybase can be statically linked with $DLLIB)
 				FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASESTATIC $SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); SYBASELIBS="$SYBASELIBS $DLLIB"; LINKFAIL="";],[AC_MSG_RESULT(no); SYBASESTATIC=""])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASESTATIC $SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); SYBASELIBS="$SYBASELIBS $DLLIB"; LINKFAIL="";],[AC_MSG_RESULT(no); SYBASESTATIC=""])
 			fi
 		fi
 		
@@ -1105,12 +1129,16 @@ then
 		then
 			AC_MSG_CHECKING(if Sybase can be dynamically linked without $DLLIB)
 			FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$SYBASELIBSPATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$SYBASELIBSPATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
 			then
 				AC_MSG_CHECKING(if Sybase can be dynamically linked with $DLLIB)
 				FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH:$SYBASELIBSPATH],[AC_MSG_RESULT(yes); SYBASELIBS="$SYBASELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no)])
+#include <stdlib.h>
+$GLIBC23FIXUPINCLUDE
+$GLIBC23FIXUPCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH:$SYBASELIBSPATH],[AC_MSG_RESULT(yes); SYBASELIBS="$SYBASELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no)])
 			fi
 		fi
 	
@@ -1975,4 +2003,12 @@ then
 	AC_DEFINE_UNQUOTED(GTK_VERSION,$GTKVER,Second decimal of the version of gtk)
 	AC_SUBST(GTKCONFIG)
 fi
+])
+
+AC_DEFUN([FW_CHECK_NEED_GLIBC_2_3_FIXUP],
+[
+	AC_MSG_CHECKING(for broken glibc-2.3)
+	GLIBC23FIXUPCODE=""
+	GLIBC23FIXUPINCLUDE=""
+	AC_TRY_LINK([#include <ctype.h>],[__ctype_toupper('a');],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(NEED_GLIBC_2_3_FIXUP,1,Some versions of glibc-2.3 need a fixup) GLIBC23FIXUPINCLUDE="#include <ctype.h>"; GLIBC23FIXUPCODE="const unsigned short int *__ctype_b; int __ctype_toupper(int c) { return toupper(c); } int __ctype_tolower(int c) { return tolower(c); }"])
 ])
