@@ -754,7 +754,7 @@ static PyObject *getFieldLength(PyObject *self, PyObject *args) {
   return Py_BuildValue("l", rc);
 }
 
-PyObject *
+static PyObject *
 _get_row(sqlrcursor *sqlrcur, int row)
 {
   int num_cols;
@@ -840,7 +840,7 @@ static PyObject *getRowRange(PyObject *self, PyObject *args) {
   return my_list;
 }
 
-PyObject *
+static PyObject *
 _get_row_lengths(sqlrcursor *sqlrcur, int row)
 {
   int num_cols;

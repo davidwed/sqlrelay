@@ -5,8 +5,8 @@
 
 import sys
 from time import localtime, time, mktime
-import string
 import exceptions
+import weakref
 from SQLRelay import CSQLRelay
 
 apilevel='2.0'
@@ -55,13 +55,18 @@ class SQLRConnection:
 
     def __init__(self, host, port, socket, user, password, retrytime, tries):
         self.connection=CSQLRelay.sqlrcon_alloc(host, port, socket, user, password, retrytime, tries)
+        self._cursors=weakref.WeakValueDictionary()
 
     def __del__(self):
 	self.close()
 
     def close(self):
-	if self.connection is not None:
-        	CSQLRelay.sqlrcon_free(self.connection)
+        if self.connection is not None:
+                # first we close any remaining cursors to avoid segfaults
+                for cursor in self._cursors.values():
+               	        cursor.close()
+                # then we close the connection
+                CSQLRelay.sqlrcon_free(self.connection)
                 del self.connection
 
     def commit(self):
@@ -73,7 +78,9 @@ class SQLRConnection:
         return CSQLRelay.rollback(self.connection)
 
     def cursor(self):
-	return SQLRCursor(self.connection)
+        cursor=SQLRCursor(self.connection)
+        self._cursors[id(cursor)]=cursor;
+        return cursor
 
 
 class SQLRCursor:
@@ -82,7 +89,7 @@ class SQLRCursor:
 
     def __init__(self, con):
         self.cursor=CSQLRelay.sqlrcur_alloc(con)
-	CSQLRelay.sqlrcur_setResultSetBufferSize(self.cursor,100)
+	CSQLRelay.setResultSetBufferSize(self.cursor,100)
         self.arraysize=1
 
     def __del__(self):

@@ -1,9 +1,6 @@
 need "using sqlrelay on windows doc"
 	installing packages
 	optional cygwin components
-	cygserver installation
-		must run cygserver and set CYGWIN=server for ipc to work
-		http://cygwin.com/cygwin-ug-net/using-cygserver.html
 	running sqlrelay clients
 	add path to mysql dll to PATH
 
@@ -15,9 +12,7 @@ perl apis -> CPAN
 
 incorporate sqlite3 patches
 
-document how to use new features of Tony/Erik's perl dbi patch
-update "Tuning SQL Relay" document - unix sockets for all db's
-document issue with sqlrelay.conf permissions and runasuser="nobody"
+fix pythondb for python < 2.1
 
 --------------------------------------------------------------------------------
 
@@ -116,6 +111,9 @@ Compatibility:
 			argument don't work, not exactly sure why
 
 Documentation:
+	how to use new features of Tony/Erik's perl dbi patch
+	issue with sqlrelay.conf permissions and runasuser="nobody"
+	getting started with odbc
 	how to use pear db driver with adodb
 	getting started docs for MS SQL Server
 	getting started docs for odbc

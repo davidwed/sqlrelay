@@ -78,7 +78,14 @@ def main():
 
 		cur.close()
 		con.close()
-	
+		del cur
+		del con
+
+		# make sure we don't get a segfault
+		try :
+			cur.execute("select 1 from dual");
+		except UnboundLocalError, e:
+			print e
 	
 if __name__ == '__main__':
 	main()

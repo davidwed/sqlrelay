@@ -54,6 +54,7 @@
 	improved support for interbase stored procedures
 	DESTDIR works as expected now
 	applied perl dbi patch from Tony Fleisher and Erik Hollensbe
+	fixed bug where SEEK_END was used instead of SEEK_SET to lock sockseq
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API
