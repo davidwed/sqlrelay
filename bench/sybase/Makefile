@@ -8,4 +8,4 @@ clean:
 rebuild: clean all
 
 sybasetest: sybasetest.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) -I./ $(SYBASEINCLUDES) $? -s -o $@ $(SYBASELIBS) $(EXTRALIBS) $(SOCKETLIBS)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) -I./ $(SYBASEINCLUDES) $(RUDIMENTSINCLUDES) $? -s -o $@ $(SYBASELIBS) $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIBS)

@@ -3,10 +3,15 @@
 
 #include "../../config.h"
 
+#include <rudiments/environment.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
@@ -56,8 +61,8 @@ int		row;
 
 int main(int argc, char **argv) {
 
-	if (argc<6) {
-		printf("usage: ora7test user password sid query iterations\n");
+	if (argc<7) {
+		printf("usage: ora7test user password sid query iterations queriesperiteration\n");
 		exit(0);
 	}
 
@@ -66,20 +71,11 @@ int main(int argc, char **argv) {
 	char	*sid=argv[3];
 	char	*query=argv[4];
 	int	iterations=atoi(argv[5]);
+	int	queriesperiteration=atoi(argv[6]);
 
-	#if defined(HAVE_PUTENV)
-		char	*sidstr=new char[strlen(sid)+12];
-		sprintf(sidstr,"ORACLE_SID=%s",sid);
-		putenv(sidstr);
-		delete[] sidstr;
-		sidstr=new char[strlen(sid)+10];
-		sprintf(sidstr,"TWO_TASK=%s",sid);
-		putenv(sidstr);
-		delete[] sidstr;
-	#elif defined(HAVE_SETENV)
-		setenv("ORACLE_SID",sid,1);
-		setenv("TWO_TATK",sid,1);
-	#endif
+	environment	env;
+	env.setValue("ORACLE_SID",sid);
+	env.setValue("TWO_TASK",sid);
 
 	// init the timer
 	time_t	starttime=time(NULL);
@@ -92,33 +88,39 @@ int main(int argc, char **argv) {
 		olog(&lda,(ub1 *)hda,(text *)user,-1,(text *)password,-1,
 			(text *)0,-1,OCI_LM_DEF);
 
-		// allocate a cursor
-		oopen(&cda,&lda,(text *)0,-1,-1,(text *)0,-1);
+		for (int qcount=0; qcount<queriesperiteration; qcount++) {
 
-		// parse the query
-		oparse(&cda,(text *)query,
-			(sb4)-1,(sword)PARSE_DEFER,(ub4)PARSE_V7_LNG);
+			// allocate a cursor
+			oopen(&cda,&lda,(text *)0,-1,-1,(text *)0,-1);
 
-		// describe/define the query
-		ncols=0;
-		if (cda.ft==FT_SELECT) {
+			// parse the query
+			oparse(&cda,(text *)query,
+				(sb4)-1,(sword)PARSE_DEFER,(ub4)PARSE_V7_LNG);
 
-			sword	col=0;
+			// describe/define the query
+			ncols=0;
+			if (cda.ft==FT_SELECT) {
 
-			// run through the columns...
-			while (1) {
+				sword	col=0;
 
-				desc[col].buflen=MAX_ITEM_BUFFER_SIZE;
+				// run through the columns...
+				for (;;) {
 
-				// describe the column
-				if (!odescr(&cda,col+1,
-					&desc[col].dbsize, &desc[col].dbtype,
-					&desc[col].buf[0], &desc[col].buflen,
-					&desc[col].dsize, &desc[col].precision,
-					&desc[col].scale, &desc[col].nullok)) {
+					desc[col].buflen=MAX_ITEM_BUFFER_SIZE;
+
+					// describe the column
+					if (!odescr(&cda,col+1,
+						&desc[col].dbsize,
+						&desc[col].dbtype,
+						&desc[col].buf[0],
+						&desc[col].buflen,
+						&desc[col].dsize,
+						&desc[col].precision,
+						&desc[col].scale,
+						&desc[col].nullok)) {
 	
-					// define the column
-					odefin(&cda,col+1,
+						// define the column
+						odefin(&cda,col+1,
 							*def_buf[col],
 							MAX_ITEM_BUFFER_SIZE,
 							NULL_TERMINATED_STRING,
@@ -129,35 +131,37 @@ int main(int argc, char **argv) {
 							-1,
 							def_col_retlen[col],
 							def_col_retcode[col]);
-				} else {
-					ncols=col;
+					} else {
+						ncols=col;
+						break;
+					}
+					col++;
+				}
+			}
+
+			// execute the query
+			oexec(&cda);
+
+			// go fetch all rows and columns
+			int	oldrpc=0;
+			for (;;) {
+				ofen(&cda,FETCH_AT_ONCE);
+				if (cda.rpc==oldrpc) {
 					break;
 				}
-				col++;
-			}
-		}
-
-		// execute the query
-		oexec(&cda);
-
-		// go fetch all rows and columns
-		int	oldrpc=0;
-		for (;;) {
-			ofen(&cda,FETCH_AT_ONCE);
-			if (cda.rpc==oldrpc) {
-				break;
-			}
-			for (int j=0; j<cda.rpc-oldrpc; j++) {
-				for (int i=0; i<ncols; i++) {
-					printf("\"%s\",",def_buf[i][j]);
+				for (int j=0; j<cda.rpc-oldrpc; j++) {
+					for (int i=0; i<ncols; i++) {
+						//printf("\"%s\",",def_buf[i][j]);
+					}
+					//printf("\n");
 				}
-				printf("\n");
+				oldrpc=cda.rpc;
 			}
-			oldrpc=cda.rpc;
+
+			oclose(&cda);
 		}
 	
 		// log off
-		oclose(&cda);
 		ologof(&lda);
 	}
 

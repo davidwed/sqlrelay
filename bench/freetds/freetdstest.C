@@ -4,7 +4,12 @@
 #include "../../config.h"
 
 #include <stdlib.h>
+#include <rudiments/environment.h>
 #include <time.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 extern "C" {
 	#include <ctpublic.h>
@@ -33,8 +38,8 @@ CS_INT		rowcount;
 
 int main(int argc, char **argv) {
 
-	if (argc<4) {
-		printf("usage: freetdstest server port user password query iterations\n");
+	if (argc<8) {
+		printf("usage: freetdstest server port user password query iterations queriesperiteration\n");
 		exit(0);
 	}
 
@@ -44,35 +49,18 @@ int main(int argc, char **argv) {
 	char	*password=argv[4];
 	char	*query=argv[5];
 	int	iterations=atoi(argv[6]);
+	int	queriesperiteration=atoi(argv[7]);
 
-	#if defined(HAVE_PUTENV)
-		char	*serverstr=new char[strlen(server)+9];
-		sprintf(serverstr,"DSQUERY=%s",server);
-		putenv(serverstr);
-		delete[] serverstr;
-
-		char	*portstr=new char[strlen(port)+9];
-		sprintf(portstr,"TDSPORT=%s",port);
-		putenv(portstr);
-		delete[] portstr;
-
-		char	*dslibstr=new char[strlen(port)+12];
-		sprintf(dslibstr,"DSLIB_PORT=%s",port);
-		putenv(dslibstr);
-		delete[] dslibstr;
-	#elif defined(HAVE_SETENV)
-		setenv("DSQUERY",server,1);
-		setenv("TDSPORT",port,1);
-		setenv("DSLIB_PORT",port,1);
-	#endif
+	environment	env;
+	env.setValue("DSQUERY",server);
+	env.setValue("TDSPORT",port);
+	env.setValue("DSLIB_PORT",port);
 
 	// init the timer
 	time_t	starttime=time(NULL);
 	clock();
 
 	for (int count=0; count<iterations; count++) {
-
-		
 
 		// allocate a context
 		context=(CS_CONTEXT *)NULL;
@@ -96,76 +84,84 @@ int main(int argc, char **argv) {
 			exit(0);
 		}
 
-		// allocate a command structure
-		ct_cmd_alloc(conn,&cmd);
+		for (int qcount=0; qcount<queriesperiteration; qcount++) {
 
-		// initialize number of columns
-		ncols=0;
+			// allocate a command structure
+			ct_cmd_alloc(conn,&cmd);
 
-		// initiate a language command
-		ct_command(cmd,CS_LANG_CMD,query,CS_NULLTERM,CS_UNUSED);
+			// initialize number of columns
+			ncols=0;
 
-		// send the command
-		ct_send(cmd);
+			// initiate a language command
+			ct_command(cmd,CS_LANG_CMD,query,CS_NULLTERM,CS_UNUSED);
 
-		// get the results, sybase is weird, a query can return 
-		// multiple result sets.  We're only interested in the first 
-		// one though, the rest will be cancelled
-		ct_results(cmd,&results_type);
+			// send the command
+			ct_send(cmd);
 
-		// get the number of columns
-		ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
-				CS_UNUSED,(CS_INT *)NULL);
+			// get the results, sybase is weird, a query can return 
+			// multiple result sets.  We're only interested in the
+			// first one though, the rest will be cancelled
+			ct_results(cmd,&results_type);
 
-		// for each column...
-		for (int i=0; i<(int)ncols; i++) {
+			// get the number of columns
+			ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
+					CS_UNUSED,(CS_INT *)NULL);
+
+			// for each column...
+			for (int i=0; i<(int)ncols; i++) {
 	
-			// get the column description
-			ct_describe(cmd,i+1,&column[i]);
+				// get the column description
+				ct_describe(cmd,i+1,&column[i]);
 	
-			column[i].datatype=CS_CHAR_TYPE;
-			column[i].format=CS_FMT_NULLTERM;
-			column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
-			column[i].scale=CS_UNUSED;
-			column[i].precision=CS_UNUSED;
-			column[i].status=CS_UNUSED;
-			column[i].count=FETCH_AT_ONCE;
-			column[i].usertype=CS_UNUSED;
-			column[i].locale=NULL;
+				column[i].datatype=CS_CHAR_TYPE;
+				column[i].format=CS_FMT_NULLTERM;
+				column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
+				column[i].scale=CS_UNUSED;
+				column[i].precision=CS_UNUSED;
+				column[i].status=CS_UNUSED;
+				column[i].count=FETCH_AT_ONCE;
+				column[i].usertype=CS_UNUSED;
+				column[i].locale=NULL;
 
-			// bind the column for the fetches
-			ct_bind(cmd,i+1,&column[i],(CS_VOID *)data[i],
-					datalength[i],nullindicator[i]);
-		}
-	
-		// go fetch all rows and columns
-		for (;;) {
-			ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,&rowcount);
-			if (rowcount==0) {
-				break;
+				// bind the column for the fetches
+				ct_bind(cmd,i+1,&column[i],(CS_VOID *)data[i],
+						datalength[i],nullindicator[i]);
 			}
-
-			// print row
-			for (int row=0; row<(int)rowcount; row++) {
-				for (int col=0; col<(int)ncols; col++) {
-					if (nullindicator[col][row]>-1 && 
-							datalength[col][row]) {
-						printf("%s,",data[col][row]);
-					} else {
-						printf("NULL,");
-					}
+	
+			// go fetch all rows and columns
+			for (;;) {
+				ct_fetch(cmd,CS_UNUSED,CS_UNUSED,
+						CS_UNUSED,&rowcount);
+				if (rowcount==0) {
+					break;
 				}
-				printf("\n");
+
+				// print row
+				for (int row=0; row<(int)rowcount; row++) {
+					for (int col=0; col<(int)ncols; col++) {
+						if (nullindicator[col][row]>-1
+							&& 
+							datalength[col][row]) {
+							printf("%s,",
+								data[col][row]);
+						} else {
+							printf("NULL,");
+						}
+					}
+					printf("\n");
+				}
 			}
+
+
+			// cancel any extra result sets
+			ct_cancel(NULL,cmd,CS_CANCEL_ALL);
+
+			// clean up
+			ct_cmd_drop(cmd);
+			cs_loc_drop(context,locale);
 		}
-
-
-		// cancel any extra result sets
-		ct_cancel(NULL,cmd,CS_CANCEL_ALL);
 
 		// clean up
-		ct_cmd_drop(cmd);
-		cs_loc_drop(context,locale);
 		ct_close(conn,CS_UNUSED);
 		ct_con_drop(conn);
 		ct_exit(context,CS_UNUSED);

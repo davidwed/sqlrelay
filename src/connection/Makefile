@@ -7,6 +7,7 @@ LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LI
 
 SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/sqlrconnectiondtor.C \
+	sqlrconnection/flushwritebuffer.C \
 	sqlrconnection/initconnection.C \
 	sqlrconnection/ipc.C \
 	sqlrconnection/opensockets.C \
@@ -62,6 +63,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrcursor/abort.C
 LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/sqlrconnectiondtor.lo \
+	sqlrconnection/flushwritebuffer.lo \
 	sqlrconnection/initconnection.lo \
 	sqlrconnection/ipc.lo \
 	sqlrconnection/opensockets.lo \
@@ -117,6 +119,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrcursor/abort.lo
 DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
 	sqlrconnection/sqlrconnectiondtor.d.lo \
+	sqlrconnection/flushwritebuffer.d.lo \
 	sqlrconnection/initconnection.d.lo \
 	sqlrconnection/ipc.d.lo \
 	sqlrconnection/opensockets.d.lo \

@@ -38,6 +38,8 @@ bool sqlrconnection::genericAuthentication() {
 	cs->write((unsigned long)passwordlen);
 	cs->write(password,passwordlen);
 
+	flushWriteBuffer();
+
 	// check whether authentication was successful or not
 	unsigned short	authsuccess;
 	if (cs->read(&authsuccess)!=sizeof(unsigned short)) {

@@ -14,6 +14,8 @@ bool sqlrcursor::runQuery(const char *query) {
 		sendOutputBinds();
 		sendGetColumnInfo();
 
+		sqlrc->flushWriteBuffer();
+
 		if (processResultSet(rsbuffersize-1)) {
 			return true;
 		}

@@ -77,12 +77,12 @@ int main(int argc, char **argv) {
 
 					if (indicator[col][row]==
 							SQL_NULL_DATA) {
-						printf("NULL,");
+						//printf("NULL,");
 					} else {
-						printf("%s,",field[col][row]);
+						//printf("%s,",field[col][row]);
 					}
 				}
-				printf("\n");
+				//printf("\n");
 			}
 			oldrow=rownumber;
 		}

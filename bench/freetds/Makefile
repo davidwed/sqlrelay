@@ -8,4 +8,4 @@ clean:
 rebuild: clean all
 
 freetdstest: freetdstest.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) -I./ $(FREETDSINCLUDES) $? -s -o $@ $(FREETDSLIBS) $(EXTRALIBS) $(SOCKETLIBS)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) -I./ $(FREETDSINCLUDES) $(RUDIMENTSINCLUDES) $? -s -o $@ $(FREETDSLIBS) $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIBS)

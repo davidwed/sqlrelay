@@ -44,11 +44,12 @@ int main(int argc, char **argv) {
 		int	cols=Lgetncols(lagoresult);
 		while(Lfetch(lagoresult)!=LFETCH_END) {
 			for (int i=1; i<cols+1; i++) {
-				printf("\"");
-				printf("%d",Lgetasstr(lagoresult,i));
-				printf("\",");
+				//printf("\"");
+				//printf("%d",Lgetasstr(lagoresult,i));
+				Lgetasstr(lagoresult,i);
+				//printf("\",");
 			}
-			printf("\n");
+			//printf("\n");
 		}
 
 		// log off

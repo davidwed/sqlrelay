@@ -10,8 +10,8 @@
 
 int main(int argc, char **argv) {
 
-	if (argc<6) {
-		printf("usage: sqlrtest host port socket user password query iterations\n");
+	if (argc<7) {
+		printf("usage: sqlrtest host port socket user password query iterations queriesperiteration\n");
 		exit(0);
 	}
 
@@ -22,26 +22,28 @@ int main(int argc, char **argv) {
 	char	*password=argv[5];
 	char	*query=argv[6];
 	int	iterations=atoi(argv[7]);
+	int	queriesperiteration=atoi(argv[8]);
 
 	time_t	starttime=time(NULL);
 	printf("sqlrtest running, please wait...\n");
 	clock();
 
-	sqlrconnection	*sqlrcon=new sqlrconnection(host,atoi(port),
-						socket,user,password,0,1);
-	sqlrcursor	*sqlrcur=new sqlrcursor(sqlrcon);
 	for (int count=0; count<iterations; count++) {
-		sqlrcur->sendQuery(query);
-		for (int i=0; i<sqlrcur->rowCount(); i++) {
-			for (int j=0; j<sqlrcur->colCount(); j++) {
-				printf("\"%s\"",sqlrcur->getField(i,j));
+		sqlrconnection	sqlrcon(host,atoi(port),
+						socket,user,password,0,1);
+		sqlrcursor	sqlrcur(&sqlrcon);
+		for (int qcount=0; qcount<queriesperiteration; qcount++) {
+			sqlrcur.sendQuery(query);
+			for (int i=0; i<sqlrcur.rowCount(); i++) {
+				for (int j=0; j<sqlrcur.colCount(); j++) {
+					//printf("%s,",sqlrcur.getField(i,j));
+					sqlrcur.getField(i,j);
+				}
+				//printf("\n");
 			}
-			printf("\n");
 		}
+		sqlrcon.endSession();
 	}
-	sqlrcon->endSession();
-	delete sqlrcur;
-	delete sqlrcon;
 
 	printf("total system time used : %d\n",clock());
 	printf("total real time : %d\n",time(NULL)-starttime);

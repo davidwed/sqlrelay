@@ -19,6 +19,7 @@ SRCS = connection/connectionctor.C \
 	connection/rollback.C \
 	connection/debug.C \
 	connection/error.C \
+	connection/flushwritebuffer.C \
 	connection/getreconnect.C \
 	connection/getconnectionport.C \
 	connection/getconnectionsocket.C \
@@ -70,6 +71,7 @@ LOBJS = connection/connectionctor.lo \
 	connection/rollback.lo \
 	connection/debug.lo \
 	connection/error.lo \
+	connection/flushwritebuffer.lo \
 	connection/getreconnect.lo \
 	connection/getconnectionport.lo \
 	connection/getconnectionsocket.lo \

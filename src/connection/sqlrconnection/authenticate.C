@@ -16,11 +16,13 @@ bool sqlrconnection::authenticateCommand() {
 	if (!authenticate()) {
 		// indicate that an error has occurred
 		clientsock->write((unsigned short)ERROR);
+		flushWriteBuffer();
 		endSession();
 		return false;
 	}
 	// indicate that no error has occurred
 	clientsock->write((unsigned short)NO_ERROR);
+	flushWriteBuffer();
 	return true;
 }
 

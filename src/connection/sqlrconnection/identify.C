@@ -13,4 +13,5 @@ void sqlrconnection::identifyCommand() {
 	unsigned short	idlen=(unsigned short)charstring::length(ident);
 	clientsock->write(idlen);
 	clientsock->write(ident,idlen);
+	flushWriteBuffer();
 }

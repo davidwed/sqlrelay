@@ -8,6 +8,7 @@ void sqlrconnection::commitCommand() {
 	debugPrint("connection",1,"commit");
 	#endif
 	clientsock->write(commit());
+	flushWriteBuffer();
 	commitorrollback=false;
 }
 

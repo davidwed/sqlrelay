@@ -267,6 +267,7 @@ void sqlrconnection::noAvailableCursors(unsigned short command) {
 	// send the error itself
 	clientsock->write((unsigned short)62);
 	clientsock->write("No server-side cursors were available to process the query.",62);
+	flushWriteBuffer();
 }
 
 bool sqlrconnection::getCommand(unsigned short *command) {

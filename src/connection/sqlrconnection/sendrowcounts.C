@@ -9,7 +9,6 @@ void sqlrconnection::sendRowCounts(long actual, long affected) {
 	debugPrint("connection",2,"sending row counts...");
 	#endif
 
-
 	// send actual rows, if that is known
 	if (actual>-1) {
 

@@ -28,6 +28,7 @@ void sqlrconnection::autoCommitCommand() {
 		#endif
 		clientsock->write(autoCommitOff());
 	}
+	flushWriteBuffer();
 }
 
 bool sqlrconnection::autoCommitOn() {

@@ -25,6 +25,8 @@ bool sqlrcursor::skipAndFetch(int rowtoget) {
 
 	// tell the connection how many rows to send
 	fetchRows();
+
+	sqlrc->flushWriteBuffer();
 	return true;
 }
 

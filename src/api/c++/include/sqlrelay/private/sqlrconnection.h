@@ -27,6 +27,8 @@
 		void	clearError();
 		void	setError(const char *err);
 
+		void	flushWriteBuffer();
+
 		// clients
 		inetclientsocket	ics;
 		unixclientsocket	ucs;

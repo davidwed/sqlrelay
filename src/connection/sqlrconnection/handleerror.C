@@ -51,6 +51,8 @@ bool sqlrconnection::returnError(sqlrcursor *cursor) {
 		// send the attempted query back too
 		clientsock->write("\nAttempted Query:\n");
 		clientsock->write(cursor->querybuffer);
+
+		flushWriteBuffer();
 	}
 	
 	#ifdef SERVER_DEBUG

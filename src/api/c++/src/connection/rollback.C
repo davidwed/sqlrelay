@@ -18,6 +18,7 @@ bool sqlrconnection::rollback() {
 	}
 
 	cs->write((unsigned short)ROLLBACK);
+	flushWriteBuffer();
 
 	bool	response;
 	if (cs->read(&response)!=sizeof(bool)) {

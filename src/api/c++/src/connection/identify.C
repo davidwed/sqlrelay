@@ -18,6 +18,7 @@ const char *sqlrconnection::identify() {
 	}
 
 	cs->write((unsigned short)IDENTIFY);
+	flushWriteBuffer();
 
 	// get the id
 	unsigned short	size;

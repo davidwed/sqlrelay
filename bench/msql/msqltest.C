@@ -15,14 +15,16 @@ m_row		msqlrow;
 
 int main(int argc, char **argv) {
 
-	if (argc<4) {
-		printf("usage: msqltest db query iterations\n");
+	if (argc<6) {
+		printf("usage: msqltest host db query iterations queriesperiteration\n");
 		exit(0);
 	}
 
-	char	*db=argv[1];
-	char	*query=argv[2];
-	int	iterations=atoi(argv[3]);
+	char	*host=(argv[1][0])?argv[1]:NULL;
+	char	*db=argv[2];
+	char	*query=argv[3];
+	int	iterations=atoi(argv[4]);
+	int	queriesperiteration=atoi(argv[5]);
 
 	// init the timer
 	time_t	starttime=time(NULL);
@@ -31,26 +33,29 @@ int main(int argc, char **argv) {
 	for (int count=0; count<iterations; count++) {
 
 		// log in
-		msql=msqlConnect((char *)NULL);
+		msql=msqlConnect((char *)host);
 		msqlSelectDB(msql,db);
 
-		// execute the query
-		msqlQuery(msql,query);
+		for (int qcount=0; qcount<queriesperiteration; qcount++) {
 
-		// get the result set
-		msqlresult=msqlStoreResult();
+			// execute the query
+			msqlQuery(msql,query);
 
-		// run through the rows
-		int	cols=msqlNumFields(msqlresult);
-		while(msqlrow=msqlFetchRow(msqlresult)) {
-			for (int i=0; i<cols; i++) {
-				printf("\"%s\",",msqlrow[i]);
+			// get the result set
+			msqlresult=msqlStoreResult();
+
+			// run through the rows
+			int	cols=msqlNumFields(msqlresult);
+			while(msqlrow=msqlFetchRow(msqlresult)) {
+				for (int i=0; i<cols; i++) {
+					//printf("\"%s\",",msqlrow[i]);
+				}
+				//printf("\n");
 			}
-			printf("\n");
-		}
 
 			// free the result set
-		msqlFreeResult(msqlresult);
+			msqlFreeResult(msqlresult);
+		}
 
 		// log off
 		msqlClose(msql);

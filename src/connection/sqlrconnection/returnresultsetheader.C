@@ -9,7 +9,6 @@ void sqlrconnection::returnResultSetHeader(sqlrcursor *cursor) {
 	debugPrint("connection",2,"returning result set header...");
 	#endif
 
-
 	// return the row counts
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"returning row counts...");
@@ -62,6 +61,7 @@ void sqlrconnection::returnResultSetHeader(sqlrcursor *cursor) {
 	// terminate the bind vars
 	clientsock->write((unsigned short)END_BIND_VARS);
 
+	flushWriteBuffer();
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done returning result set header");

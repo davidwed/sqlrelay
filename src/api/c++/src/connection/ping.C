@@ -18,6 +18,7 @@ bool sqlrconnection::ping() {
 	}
 
 	cs->write((unsigned short)PING);
+	flushWriteBuffer();
 
 	// get the ping result
 	bool	result;

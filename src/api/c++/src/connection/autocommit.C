@@ -33,6 +33,8 @@ bool sqlrconnection::autoCommit(bool on) {
 	cs->write((unsigned short)AUTOCOMMIT);
 	cs->write(on);
 
+	flushWriteBuffer();
+
 	bool	response;
 	if (cs->read(&response)!=sizeof(bool)) {
 		if (!on) {

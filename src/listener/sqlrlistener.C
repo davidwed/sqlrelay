@@ -1224,6 +1224,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 			// inform the client...
 			sock->write((unsigned short)NO_ERROR);
 			sock->write((unsigned short)DONT_RECONNECT);
+			flushWriteBuffer(sock);
 			retval=true;
 			break;
 
@@ -1237,6 +1238,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 			sock->write(unixportstrlen);
 			sock->write(unixportstr);
 			sock->write((unsigned short)inetport);
+			flushWriteBuffer(sock);
 			retval=true;
 			break;
 		}
@@ -1394,6 +1396,7 @@ void sqlrlistener::pingDatabase(unsigned long connectionpid,
 
 			// send it a ping command
 			connsock->write((unsigned short)PING);
+			flushWriteBuffer(connsock);
 
 			// get the ping result
 			unsigned short	result=1;
@@ -1639,4 +1642,9 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 		}
 		clientsock->useBlockingMode();
 	}
+}
+
+void sqlrlistener::flushWriteBuffer(filedescriptor *fd) {
+	fd->dontBufferWrites();
+	fd->bufferWrites();
 }

@@ -11,29 +11,39 @@ extern "C" {
 	#include <sqlite.h>
 }
 
+#ifndef SQLITE3
+	#define	sqlite3_open		sqlite_open
+	#define	sqlite3_close		sqlite_close
+	#define	sqlite3_get_table	sqlite_get_table
+	#define	sqlite3_errmsg		sqlite_errmsg
+	#define	sqlite3_free_table	sqlite_free_table
+	sqlite		*sqliteptr;
+#else
+	sqlite3		*sqliteptr;
+#endif
 
-sqlite		*sqliteptr;
 char		*errmesg;
 
 int	handleRow(void *parg, int argc, char **argv, char **columnnames) {
 
 	for (int i=0; i<argc; i++) {
-		printf("\"%s\",",argv[i]);
+		//printf("\"%s\",",argv[i]);
 	}
-	printf("\n");
+	//printf("\n");
 	return 0;
 }
 
 int main(int argc, char **argv) {
 
-	if (argc<4) {
-		printf("usage: sqlitetest db query iterations\n");
+	if (argc<5) {
+		printf("usage: sqlitetest db query iterations queriesperiteration\n");
 		exit(0);
 	}
 
 	char	*db=argv[1];
 	char	*query=argv[2];
 	int	iterations=atoi(argv[3]);
+	int	queriesperiteration=atoi(argv[4]);
 
 	// init the timer
 	time_t	starttime=time(NULL);
@@ -42,13 +52,21 @@ int main(int argc, char **argv) {
 	for (int count=0; count<iterations; count++) {
 
 		// log in
-		sqliteptr=sqlite_open(db,666,&errmesg);
+		#ifdef SQLITE3
+		sqlite3_open(db,&sqliteptr);
+		#else
+		sqliteptr=sqlite3_open(db,666,&errmesg);
+		#endif
 
-		// execute the query
-		sqlite_exec(sqliteptr,query,handleRow,NULL,&errmesg);
+		for (int qcount=0; qcount<queriesperiteration; qcount++) {
+
+			// execute the query
+			sqlite3_exec(sqliteptr,query,handleRow,NULL,&errmesg);
+
+		}
 
 		// log off
-		sqlite_close(sqliteptr);
+		sqlite3_close(sqliteptr);
 	}
 
 	printf("total system time used: %d\n",clock());

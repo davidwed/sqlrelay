@@ -26,5 +26,7 @@ bool sqlrcursor::fetchFromBindCursor() {
 
 	sendGetColumnInfo();
 
+	sqlrc->flushWriteBuffer();
+
 	return processResultSet(rsbuffersize-1);
 }

@@ -37,6 +37,9 @@
 		database doesn't support affected rows)
 	added -framework Python to compile python stuff on Darwin/Mac OS X
 	added connectstring descriptions to PHP Pear DB docs
+	added code which toggles TCP_NODELAY to flush data written to either
+		side of the connection here and there rather than wait on the
+		Nagle delay, improved performance over a network substantially
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

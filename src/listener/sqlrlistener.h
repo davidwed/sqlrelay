@@ -98,6 +98,7 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 					int fd);
 		void	waitForClientClose(int authstatus, bool passstatus,
 						filedescriptor *clientsock);
+		void	flushWriteBuffer(filedescriptor *fd);
 
 		bool		passdescriptor;
 

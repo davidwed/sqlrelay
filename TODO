@@ -1,16 +1,10 @@
-looks like scaling + handoff="pass" is still causing problems:
-	if scaling occurs, then a connection dies off, when you try to connect
-	again, everything hangs up (semaphore problem?)
-
 sockseq is becoming a socket on freebsd
 
 looks like more than maxconnections can be started -
 	scaler can apparantly loop back and start another connection before
 	the first connection increments the connection count
 
-use large writes rather than lots of small writes, small writes appear to
-	trigger the nagle algorithm and slow down network transmission
-	materially
+do some benchmarking/profiling
 
 --------------------------------------------------------------------------------
 
@@ -238,7 +232,7 @@ Features:
 		handle blobs, quads in interbase
 		handle timestamps
 		handle enum types in mysql
-	replication
+	front end replication
 	query filtering
 	quotas
 	logging

@@ -15,16 +15,20 @@ MYSQL_ROW	mysqlrow;
 
 int main(int argc, char **argv) {
 
-	if (argc<4) {
-		printf("usage: mysqltest host user password query iterations\n");
+	if (argc<10) {
+		printf("usage: mysqltest host port socket db user password query iterations queriesperiteration\n");
 		exit(0);
 	}
 
 	char	*host=argv[1];
-	char	*user=argv[2];
-	char	*password=argv[3];
-	char	*query=argv[4];
-	int	iterations=atoi(argv[5]);
+	int	port=atoi(argv[2]);
+	char	*socket=(argv[3][0])?argv[3]:NULL;
+	char	*db=argv[4];
+	char	*user=argv[5];
+	char	*password=argv[6];
+	char	*query=argv[7];
+	int	iterations=atoi(argv[8]);
+	int	queriesperiteration=atoi(argv[9]);
 
 	// init the timer
 	time_t	starttime=time(NULL);
@@ -38,31 +42,37 @@ int main(int argc, char **argv) {
 		mysql_init(&mysql);
 	
 		// log in
-		mysql_real_connect(&mysql,host,user,password,"",0,NULL,0);
+		mysql_real_connect(&mysql,host,user,password,db,port,socket,0);
 	#else
-		mysql_real_connect(&mysql,host,user,password,0,NULL,0);
+		mysql_real_connect(&mysql,host,user,password,port,socket,0);
 	#endif
 #else
 		mysql_connect(&mysql,host,user,password);
 #endif
+#ifdef HAVE_MYSQL_SELECT_DB
+		mysql_select_db(&mysql,db);
+#endif
 
-		// execute the query
-		mysql_real_query(&mysql,query,strlen(query));
+		for (int qcount=0; qcount<queriesperiteration; qcount++) {
 
-		// get the result set
-		mysqlresult=mysql_store_result(&mysql);
+			// execute the query
+			mysql_real_query(&mysql,query,strlen(query));
 
-		// run through the rows
-		int	cols=mysql_num_fields(mysqlresult);
-		while(mysqlrow=mysql_fetch_row(mysqlresult)) {
-			for (int i=0; i<cols; i++) {
-				printf("\"%s\",",mysqlrow[i]);
+			// get the result set
+			mysqlresult=mysql_store_result(&mysql);
+
+			// run through the rows
+			int	cols=mysql_num_fields(mysqlresult);
+			while(mysqlrow=mysql_fetch_row(mysqlresult)) {
+				for (int i=0; i<cols; i++) {
+					//printf("\"%s\",",mysqlrow[i]);
+				}
+				//printf("\n");
 			}
-			printf("\n");
-		}
 
 			// free the result set
-		mysql_free_result(mysqlresult);
+			mysql_free_result(mysqlresult);
+		}
 
 		// log off
 		mysql_close(&mysql);

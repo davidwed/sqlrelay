@@ -31,6 +31,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	// for some queries, there are no rows to return, 
 	if (cursor->noRowsToReturn()) {
 		clientsock->write((unsigned short)END_RESULT_SET);
+		flushWriteBuffer();
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done returning result set data");
 		#endif
@@ -45,6 +46,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	// skip the specified number of rows
 	if (!skipRows(cursor,skip)) {
 		clientsock->write((unsigned short)END_RESULT_SET);
+		flushWriteBuffer();
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done returning result set data");
 		#endif
@@ -66,6 +68,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 
 		if (!cursor->fetchRow()) {
 			clientsock->write((unsigned short)END_RESULT_SET);
+			flushWriteBuffer();
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"done returning result set data");
@@ -84,6 +87,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 
 		lastrow++;
 	}
+	flushWriteBuffer();
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done returning result set data");

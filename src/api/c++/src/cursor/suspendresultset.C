@@ -12,10 +12,15 @@ void sqlrcursor::suspendResultSet() {
 		sqlrc->debugPrint("Suspending Result Set\n");
 		sqlrc->debugPreEnd();
 	}
+
 	if (sqlrc->connected && !cached) {
+
 		sqlrc->cs->write((unsigned short)SUSPEND_RESULT_SET);
 		sqlrc->cs->write(cursorid);
+
+		sqlrc->flushWriteBuffer();
 	}
+
 	clearCacheDest();
 	suspendresultsetsent=1;
 }

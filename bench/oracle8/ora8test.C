@@ -2,10 +2,15 @@
 // See the file COPYING for more information
 
 #include "../../config.h"
+#include <rudiments/environment.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 #define FETCH_AT_ONCE		10
 #define MAX_ITEM_BUFFER_SIZE	2048
@@ -54,8 +59,8 @@ int		fetchatonce=FETCH_AT_ONCE;
 
 int main(int argc, char **argv) {
 
-	if (argc<6) {
-		printf("usage: ora8test user password sid query iterations\n");
+	if (argc<7) {
+		printf("usage: ora8test user password sid query iterations queriesperiteration\n");
 		exit(0);
 	}
 
@@ -64,20 +69,11 @@ int main(int argc, char **argv) {
 	char	*sid=argv[3];
 	char	*query=argv[4];
 	int	iterations=atoi(argv[5]);
+	int	queriesperiteration=atoi(argv[6]);
 
-	#if defined(HAVE_PUTENV)
-		char	*sidstr=new char[strlen(sid)+12];
-		sprintf(sidstr,"ORACLE_SID=%s",sid);
-		putenv(sidstr);
-		delete[] sidstr;
-		sidstr=new char[strlen(sid)+10];
-		sprintf(sidstr,"TWO_TASK=%s",sid);
-		putenv(sidstr);
-		delete[] sidstr;
-	#elif defined(HAVE_SETENV)
-		setenv("ORACLE_SID",sid,1);
-		setenv("TWO_TATK",sid,1);
-	#endif
+	environment	envr;
+	envr.setValue("ORACLE_SID",sid);
+	envr.setValue("TWO_TASK",sid);
 
 	// init the timer
 	time_t	starttime=time(NULL);
@@ -146,113 +142,102 @@ int main(int argc, char **argv) {
 				(dvoid *)trans,(ub4)0,
 				(ub4)OCI_ATTR_TRANS,err);
 
-		// initialize the column count
-		ncols=0;
+		for (int qcount=0; qcount<queriesperiteration; qcount++) {
 
-		// allocate a statement handle
-		OCIHandleAlloc((dvoid *)env,(dvoid **)&stmt,OCI_HTYPE_STMT,
+			// initialize the column count
+			ncols=0;
+
+			// allocate a statement handle
+			OCIHandleAlloc((dvoid *)env,(dvoid **)&stmt,
+					OCI_HTYPE_STMT,
 					(size_t)0,(dvoid **)0);
 
-		// set the number of rows to prefetch
-		OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
-				(dvoid *)&fetchatonce,(ub4)0,
-				OCI_ATTR_PREFETCH_ROWS,(OCIError *)err);
+			// set the number of rows to prefetch
+			OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
+					(dvoid *)&fetchatonce,(ub4)0,
+					OCI_ATTR_PREFETCH_ROWS,(OCIError *)err);
 
-		// prepare the query
-		OCIStmtPrepare(stmt,err,(text *)query,(ub4)strlen(query),
-					(ub4)OCI_NTV_SYNTAX,(ub4)OCI_DEFAULT);
+			// prepare the query
+			OCIStmtPrepare(stmt,err,(text *)query,
+					(ub4)strlen(query),
+					(ub4)OCI_NTV_SYNTAX,
+					(ub4)OCI_DEFAULT);
 
-		// execute the query
-		OCIStmtExecute(svc,stmt,err,0,(ub4)0,NULL,NULL,
-						OCI_DEFAULT);
+			// execute the query
+			OCIStmtExecute(svc,stmt,err,0,(ub4)0,NULL,NULL,
+							OCI_DEFAULT);
 
 
-		OCIAttrGet((dvoid *)stmt,OCI_HTYPE_STMT,
-				(dvoid *)&ncols,(ub4 *)0,
-				OCI_ATTR_PARAM_COUNT,err);
+			OCIAttrGet((dvoid *)stmt,OCI_HTYPE_STMT,
+					(dvoid *)&ncols,(ub4 *)0,
+					OCI_ATTR_PARAM_COUNT,err);
 
-		// run through the columns...
-		for (int i=0; i<ncols; i++) {
+			// run through the columns...
+			for (int i=0; i<ncols; i++) {
 
-			// get the entire column definition
-			OCIParamGet(stmt,OCI_HTYPE_STMT,err,
-				(dvoid **)&desc[i].paramd,i+1);
+				// get the entire column definition
+				OCIParamGet(stmt,OCI_HTYPE_STMT,err,
+					(dvoid **)&desc[i].paramd,i+1);
 
-			// get the column name
-			OCIAttrGet((dvoid *)desc[i].paramd,OCI_DTYPE_PARAM,
-				(dvoid **)&desc[i].buf,
-				(ub4 *)&desc[i].buflen,
-				(ub4)OCI_ATTR_NAME,err);
+				// get the column name
+				OCIAttrGet((dvoid *)desc[i].paramd,
+					OCI_DTYPE_PARAM,
+					(dvoid **)&desc[i].buf,
+					(ub4 *)&desc[i].buflen,
+					(ub4)OCI_ATTR_NAME,err);
 
-			// get the column type
-			OCIAttrGet((dvoid *)desc[i].paramd,OCI_DTYPE_PARAM,
-				(dvoid *)&desc[i].dbtype,(ub4 *)0,
-				(ub4)OCI_ATTR_DATA_TYPE,err);
+				// get the column type
+				OCIAttrGet((dvoid *)desc[i].paramd,
+					OCI_DTYPE_PARAM,
+					(dvoid *)&desc[i].dbtype,(ub4 *)0,
+					(ub4)OCI_ATTR_DATA_TYPE,err);
 
-			// get the column size
-			OCIAttrGet((dvoid *)desc[i].paramd,
-				OCI_DTYPE_PARAM,
-				(dvoid *)&desc[i].dbsize,(ub4 *)0,
-				(ub4)OCI_ATTR_DATA_SIZE,err);
+				// get the column size
+				OCIAttrGet((dvoid *)desc[i].paramd,
+					OCI_DTYPE_PARAM,
+					(dvoid *)&desc[i].dbsize,(ub4 *)0,
+					(ub4)OCI_ATTR_DATA_SIZE,err);
 
 				// translate to a NULL terminated string
-			/*OCIDefineByPos(stmt,&def[i].def,err,
-				i+1,
-				(dvoid *)&def[i].buf,
-				(sb4)MAX_ITEM_BUFFER_SIZE,
-				SQLT_STR,
-				(dvoid *)&def[i].indp,
-				&def[i].col_retlen,
-				&def[i].col_retcode,
-				OCI_DEFAULT);*/
-			OCIDefineByPos(stmt,&def[i],err,
-				i+1,
-				(dvoid *)def_buf[i],
-				(sb4)MAX_ITEM_BUFFER_SIZE,
-				SQLT_STR,
-				(dvoid *)def_indp[i],
-				(ub2 *)def_col_retlen[i],
-				def_col_retcode[i],
-				OCI_DEFAULT);
+				OCIDefineByPos(stmt,&def[i],err,
+					i+1,
+					(dvoid *)def_buf[i],
+					(sb4)MAX_ITEM_BUFFER_SIZE,
+					SQLT_STR,
+					(dvoid *)def_indp[i],
+					(ub2 *)def_col_retlen[i],
+					def_col_retcode[i],
+					OCI_DEFAULT);
 
-		}
+			}
 
-		// go fetch all rows and columns
-		/*while (OCIStmtFetch(stmt,err,1,
-				OCI_FETCH_NEXT,OCI_DEFAULT)==OCI_SUCCESS) {
-			for (int i=0; i<ncols; i++) {
-				printf("\"%s\n,",def_buf[i][j]);
-			}
-			printf("\n");
-		}*/
-		ub4	newpos;
-		int	oldpos=0;
-		for (;;) {
-			OCIStmtFetch(stmt,err,fetchatonce,
-				OCI_FETCH_NEXT,OCI_DEFAULT);
-			OCIAttrGet(stmt,OCI_HTYPE_STMT,
-					(dvoid *)&newpos,(ub4 *)0,
-					OCI_ATTR_ROW_COUNT,err);
-			if (newpos==oldpos) {
-				break;
-			}
-			for (int j=0; j<newpos-oldpos; j++) {
-				for (int i=0; i<ncols; i++) {
-					printf("\"%s\",",def_buf[i][j]);
+			// go fetch all rows and columns
+			ub4	newpos;
+			int	oldpos=0;
+			for (;;) {
+				OCIStmtFetch(stmt,err,fetchatonce,
+					OCI_FETCH_NEXT,OCI_DEFAULT);
+				OCIAttrGet(stmt,OCI_HTYPE_STMT,
+						(dvoid *)&newpos,(ub4 *)0,
+						OCI_ATTR_ROW_COUNT,err);
+				if (newpos==oldpos) {
+					break;
 				}
-				printf("\n");
+				for (int j=0; j<newpos-oldpos; j++) {
+					for (int i=0; i<ncols; i++) {
+						//printf("\"%s\",",def_buf[i][j]);
+					}
+					//printf("\n");
+				}
+				oldpos=newpos;
 			}
-			oldpos=newpos;
-		}
 
-		// free resources
-		OCIHandleFree(stmt,OCI_HTYPE_STMT);
-		for (int i=0; i<ncols; i++) {
-			/*if (def[i].def) {
-				OCIHandleFree(def[i].def,OCI_HTYPE_DEFINE);
-			}*/
-			if (def[i]) {
-				OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
+			// free resources
+			OCIHandleFree(stmt,OCI_HTYPE_STMT);
+			for (int i=0; i<ncols; i++) {
+				if (def[i]) {
+					OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
+				}
 			}
 		}
 	

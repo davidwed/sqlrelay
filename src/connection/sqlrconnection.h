@@ -260,6 +260,8 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	setInitialAutoCommitBehavior();
 		bool	openSockets();
 
+		void	flushWriteBuffer();
+
 		cmdline			*cmdl;
 		sqlrconfigfile		*cfgfl;
 
@@ -314,7 +316,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		const char	*connectionid;
 		int		ttl;
 
-		int	sockseq;
+		int		sockseq;
 
 		semaphoreset	*semset;
 		sharedmemory	*idmemory;
