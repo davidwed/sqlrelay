@@ -173,6 +173,15 @@ sqlrcursor::defineOutputBindCursor(variable)
 char *
 sqlrcursor::getOutputBind(variable)
 		char *variable
+	CODE:
+		char	*value=THIS->getOutputBind(variable);
+		long	length=THIS->getOutputBindLength(variable);
+		ST(0)=sv_newmortal();
+		if (value) {
+			sv_setpvn(ST(0),value,length);
+		} else {
+			ST(0)=&PL_sv_undef;
+		}
 
 long
 sqlrcursor::getOutputBindLength(variable)
@@ -222,24 +231,42 @@ sqlrcursor::getNullsAsUndefined()
 	CODE:
 		THIS->getNullsAsNulls();
 
+int
+sqlrcursor::validRow(row)
+		int	row
+	CODE:
+		RETVAL=1;
+		if (!THIS->getRow(row)) {
+			RETVAL=0;
+		}
+	OUTPUT:
+		RETVAL
+
 char *
 sqlrcursor::getField(row,...)
 		int	row
 	CODE:
-		RETVAL=NULL;
+		char	*field;
+		long	length;
+		ST(0)=sv_newmortal();
 		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
-			RETVAL=THIS->getField(row,(int)SvIV(ST(2)));
+			field=THIS->getField(row,(int)SvIV(ST(2)));
+			length=THIS->getFieldLength(row,(int)SvIV(ST(2)));
 		} else if (SvPOK(ST(2))) {
-			RETVAL=THIS->getField(row,SvPV(ST(2),na));
+			field=THIS->getField(row,SvPV(ST(2),na));
+			length=THIS->getFieldLength(row,SvPV(ST(2),na));
+		} 
+		if (field) {
+			sv_setpvn(ST(0),field,length);
+		} else {
+			ST(0)=&PL_sv_undef;
 		}
-	OUTPUT:
-		RETVAL
 
 long
 sqlrcursor::getFieldLength(row,...)
 		int	row
 	CODE:
-		RETVAL=NULL;
+		RETVAL=0;
 		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
 			RETVAL=THIS->getFieldLength(row,(int)SvIV(ST(2)));
 		} else if (SvPOK(ST(2))) {
@@ -279,7 +306,7 @@ sqlrcursor::getColumnType(...)
 int
 sqlrcursor::getColumnLength(...)
 	CODE:
-		RETVAL=NULL;
+		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
 			RETVAL=THIS->getColumnLength((int)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
@@ -291,7 +318,7 @@ sqlrcursor::getColumnLength(...)
 int
 sqlrcursor::getLongest(...)
 	CODE:
-		RETVAL=NULL;
+		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
 			RETVAL=THIS->getLongest((int)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {

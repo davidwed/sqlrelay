@@ -14,6 +14,12 @@
 	ruby api uses rb_str_new() instead of rb_str_new2() for getField and
 		getOutputBind now
 	incorporated Vladimir Kouznetsov's code for interbase stored procedures
+	perl API is binary safe now
+	perl API returns empty lists for get*Row*() methods now if the row is
+		beyond the end of the result set
+	perl API returns undef for getField() and getOutputBind() for NULL
+		values now
+	netbsd init script is fixed now
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

@@ -12,6 +12,9 @@ bootstrap Firstworks::SQLRCursor $VERSION;
 
 sub getRowLengths {
 	($this,$row)=@_;
+	if (validRow($this,$row)==0) {
+		return ();
+	}
 	my @lengths;
 	for (my $col=0; $col<colCount($this); $col++) {
 		$lengths[$col]=getFieldLength($this,$row,$col);
@@ -21,6 +24,9 @@ sub getRowLengths {
 
 sub getRowLengthsHash {
 	($this,$row)=@_;
+	if (validRow($this,$row)==0) {
+		return ();
+	}
 	my %hash;
 	for (my $col=0; $col<colCount($this); $col++) {
 		$hash{getColumnName($this,$col)}=
@@ -31,6 +37,9 @@ sub getRowLengthsHash {
 
 sub getRow {
 	($this,$row)=@_;
+	if (validRow($this,$row)==0) {
+		return ();
+	}
 	my @fields;
 	for (my $col=0; $col<colCount($this); $col++) {
 		$fields[$col]=getField($this,$row,$col);
@@ -40,6 +49,9 @@ sub getRow {
 
 sub getRowHash {
         ($this,$row)=@_;
+	if (validRow($this,$row)==0) {
+		return ();
+	}
         my %hash;
         for (my $col=0; $col<colCount($this); $col++) {
 		$hash{getColumnName($this,$col)}=getField($this,$row,$col);
@@ -329,20 +341,28 @@ __END__
             # specified row and column.
 
         getRow(row);
-            # Returns a null terminated array of the 
-            # values of the specified row.
+            # Returns an array of the values of the
+            # specified row or an empty list if the
+            # requested row is past the end of the
+            # result set.
 
         getRowHash(row);
             # Returns the requested row as values in a
-            # hash with column names for keys.
+            # hash with column names for keys or an
+            # empty list if the requested row is past
+            # the end of the result set.
 
         getRowLengths(row);
             # Returns a null terminated array of the 
-            # lengths of the specified row.
+            # lengths of the specified row or an empty
+            # list if the requested row is past the end
+            # of the result set.
 
         getRowLengthsHash(row);
             # Returns the requested row lengths as values 
-            # in a hash with column names for keys.
+            # in a hash with column names for keys or an
+            # empty list if the requested row is past
+            # the end of the result set.
 
         getColumnNames();
             # Returns a null terminated array of the 

@@ -1,11 +1,15 @@
+perl api still has NULL problems
+
 test,document Java "getXXXAsByteArray" methods
-test,document oracle 8.0/8i temp-blob compile flag
+document oracle 8.0/8i temp-blob compile flag
 tests need to check blob/lobs with binary data in them
+interbase stored procedures don't work unless there's an output bind var
 test interbase stored procedures
+
+tcl-8.0.3 (redhat 5.2) compatibility
 
 if all space is used up in a filesystem, SQL Relay stops working
 is there a zero-cursor bug?
-perl api appears to turn NULLs into ""'s
 suspend/resumeResultSet doesn't appear to work if result set is done
 
 java inputBindBlob() method probably needs to take a byte array instead of a

@@ -48,7 +48,7 @@ recommend meeting these requirements prior to installation.</p>
 <a name="solaris"></a>
 <span class="heading2">Solaris</span><br>
 
-<p>Oracle versions 8.1.5-9.0.1 for Solaris have been or are currently available
+<p>Oracle versions 8.1.5-9.2.0 for Solaris have been or are currently available
 for download from <a href="http://technet.oracle.com">technet.oracle.com</a> 
 or on CD.  Installation appears to be as simple as following the directions.  
 Note that for Solaris, these versions of Oracle will fail to create a database 
@@ -109,8 +109,8 @@ have been or are currently available from
 <a href="http://technet.oracle.com">technet.oracle.com</a> and have been 
 available on CD from various sources as well.</p>
 
-<p>I've successfully installed Oracle 8.0.5 on RedHat 5.2,  Oracle 8.1.6-8.1.7
-on RedHat 6.2-7.2, and Oracle 8.1.7 on Mandrake 8.2, Debian 2.2r5 and Slackware
+<p>I've successfully installed Oracle 8.0.5 on RedHat 5.2,  Oracle 8.1.6-9.2.0
+on RedHat 6.2-7.3, and Oracle 8.1.7 on Mandrake 8.2, Debian 2.2r5 and Slackware
 8.  I've never been able to get any version to install on TurboLinux 7.  I was 
 once able to shoehorn Oracle 8.1.5 onto RedHat 6.1 (I think) but I have not 
 been able to get it to install on any version since.  I haven't tried any other
@@ -184,18 +184,26 @@ rm jre118_v3-glibc-2.1.3.tar<br>
 I've shoehorned it on to other platforms, but it was so hideous and worked so 
 minimally that I dare not publish the process.</p>
 
-<p>Oracle 8.1.x for Linux requires glibc 2.1.  Many newer Linux 
-distributions come with glibc 2.2.  On these distributions it is necessary to 
-install some compatibility packages.</p>
+<p>Oracle 8.1.x and 9.0.x for Linux requires glibc 2.1.  Many newer Linux 
+distributions come with glibc 2.2 or glibc 2.3.  On distributions that come with
+glibc 2.2 it is necessary to install some compatibility packages.  I have not
+yet figured out how to get Oracle 8.1.x/9.x to install on a distribution that
+comes with glibc 2.3.</p>
+
+<p>Oracle 9.2.x for Linux requires glibc 2.2.  I have not yet figured out how
+to get Oracle 9.2.x to install on a distribution that comes with glibc 2.3.</p>
 
 <p>Distributions that come with glibc 2.1 include RedHat 6, Debian 2.2, 
 Mandrake 7 and Slackware 7.  Distributions that come with glibc 
-2.2 include RedHat 7, Mandrake 8 and Slackware 8.</p>
+2.2 include RedHat 7, Mandrake 8 and Slackware 8.  Distributions that come with
+glibc 2.3 include RedHat 8 and 9.</p>
 
 <p>RedHat provides compatability RPM's for RedHat 7 that can actually be used
 on any Linux that comes with glibc 2.2.  These RPM's can be downloaded
-from <a href="http://rpmfind.net">rpmfind</a>.  Even if you're installing on
-a non-RPM-based Linux distribution, you'll need the following RPM's.</p>
+from <a href="http://rpmfind.net">rpmfind</a>.  If you're installing Oracle 
+8.1.x or 9.x, and you have a glibc 2.2 based distribution, even if you're
+installing on a non-RPM-based Linux distribution, you'll need the following
+RPM's.</p>
 
 <ul>
 <li><b>compat-glibc-6.2-2.1.3.2.i386.rpm</b> for RedHat Linux 7.2</li>
@@ -247,7 +255,8 @@ against the glibc-2.1 provided by the compat RPM's.</p>
 <a name="env"></a>
 <span class="heading3">Set Up the Environment</span><br>
 
-<p>Edit /home/oracle/.bashrc and add the following command near the bottom.</p>
+<p>If you're installing Oracle 8.1.x or 9.x on a glibc 2.2 based distribution,
+edit /home/oracle/.bashrc and add the following command near the bottom.</p>
 
 <blockquote>
 <b>. /usr/i386-glibc21-linux/bin/i386-glibc21-linux-env.sh</b>
