@@ -254,6 +254,21 @@ if ( test -n "$PTHREADSPATH" -a "`echo $PTHREADSPATH | cut -c-3`" = "../" ); the
 fi
 
 
+dnl Checks for libtool.
+echo
+echo "***** Libtool ****************"
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+echo "******************************"
+
+dnl override libtool if so desired
+dnl a bit crude, but AC_PROG_LIBTOOL sets vital
+dnl environment variables, it seems
+if ( test "$USE_SYSTEM_LIBTOOL" = "yes" ); then
+  LIBTOOL="libtool"
+fi
+
+
 dnl Checks for programs.
 echo
 echo "***** Programs ***************"
@@ -301,22 +316,16 @@ AC_CHECK_PS
 UNAME=`uname -s`
 AC_SUBST(UNAME)
 
-echo "******************************"
-
-
-dnl Checks for libtool.
-echo
-echo "***** Libtool ****************"
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
-echo "******************************"
-
-dnl override libtool if so desired
-dnl a bit crude, but AC_PROG_LIBTOOL sets vital
-dnl environment variables, it seems
-if ( test "$USE_SYSTEM_LIBTOOL" = "yes" ); then
-  LIBTOOL="libtool"
+GNUSTRIP=`$STRIP --version 2> /dev/null | grep "GNU strip"`
+AC_MSG_CHECKING(for GNU strip)
+if ( test -n "$GNUSTRIP" ); then
+	AC_MSG_RESULT(yes)
+else
+	STRIP="touch"
+	AC_MSG_RESULT(no)
 fi
+AC_SUBST(STRIP)
+echo "******************************"
 
 
 dnl Check for microsoft platform.
