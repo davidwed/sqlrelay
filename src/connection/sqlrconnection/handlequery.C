@@ -3,13 +3,15 @@
 
 #include <sqlrconnection.h>
 
-int	sqlrconnection::handleQuery(int reexecute, int reallyexecute) {
+int	sqlrconnection::handleQuery(int reexecute, int bindcursor,
+							int reallyexecute) {
+
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"handling query...");
 	#endif
 
-	if (!getQueryFromClient(reexecute)) {
+	if (!getQueryFromClient(reexecute,bindcursor)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",1,"failed to handle query");
 		#endif
@@ -20,7 +22,7 @@ int	sqlrconnection::handleQuery(int reexecute, int reallyexecute) {
 	for (;;) {
 
 		// process the query
-		if (processQuery(reexecute,reallyexecute)) {
+		if (processQuery(reexecute,bindcursor,reallyexecute)) {
 
 			// indicate that no error has occurred
 			clientsock->write((unsigned short)NO_ERROR);
@@ -80,14 +82,14 @@ int	sqlrconnection::handleQuery(int reexecute, int reallyexecute) {
 	return 1;
 }
 
-int	sqlrconnection::getQueryFromClient(int reexecute) {
+int	sqlrconnection::getQueryFromClient(int reexecute, int bindcursor) {
 
-	// get the query unless we're re-executing,
-	// get the binds, column flag from the client
-	return ((reexecute)?1:getQuery()) &&
-			getInputBinds() && 
-			getOutputBinds() &&
-			getSendColumnInfo();
+	// if we're not reexecuting and not using a bound cursor, get the query,
+	// if we're not using a bound cursor, get the input/output binds,
+	// get whether to send column info or not
+	return (((reexecute || bindcursor)?1:getQuery()) &&
+		((bindcursor)?1:(getInputBinds() && getOutputBinds())) &&
+		getSendColumnInfo());
 }
 
 int	sqlrconnection::getQuery() {
@@ -139,14 +141,19 @@ int	sqlrconnection::getQuery() {
 	return 1;
 }
 
-int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
+int	sqlrconnection::processQuery(int reexecute, int bindcursor,
+							int reallyexecute) {
 
 	// Very important...
 	// Clean up data here instead of when aborting a result set, this
 	// allows for result sets that were suspended after the entire
 	// result set was fetched to still be able to return column data
 	// when resumed.
-	cur[currentcur]->cleanUpData();
+	if (bindcursor) {
+		cur[currentcur]->cleanUpData(false,false,true);
+	} else {
+		cur[currentcur]->cleanUpData(true,true,true);
+	}
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"processing query...");
@@ -161,6 +168,14 @@ int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 		#endif
 		success=cur[currentcur]->handleBinds() && 
 			cur[currentcur]->executeQuery(
+					cur[currentcur]->querybuffer,
+					cur[currentcur]->querylength,
+					reallyexecute);
+	} else if (bindcursor) {
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",3,"bind cursor...");
+		#endif
+		success=cur[currentcur]->executeQuery(
 					cur[currentcur]->querybuffer,
 					cur[currentcur]->querylength,
 					reallyexecute);

@@ -1,8 +1,6 @@
-using libtool to link a library on netbsd doesn't link in libstdc++ even when
-	using g++, maybe this is ok, but python api still won't run, complains
-	about missng __builtin_new
+cleanUpData is cleaning up too much for cursor binds
 
-autoconf needs to search for threads include dir too and add it with -I
+php identify fails
 
 oldmysql test files for non-C++ api's
 

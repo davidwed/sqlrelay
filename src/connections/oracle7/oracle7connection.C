@@ -503,6 +503,9 @@ void	oracle7cursor::returnRow() {
 	row++;
 }
 
-void	oracle7cursor::cleanUpData() {
-	ocan(&cda);
+void	oracle7cursor::cleanUpData(bool freerows, bool freecols,
+							bool freebinds) {
+	if (freerows) {
+		ocan(&cda);
+	}
 }

@@ -430,7 +430,7 @@ void	oracle8cursor::checkRePrepare() {
 	// You can prepare, bind, execute, rebind, re-execute, etc. with
 	// selects, but not with DML, it has to be re-prepared.  What a drag.
 	if (!prepared && stmttype && stmttype!=OCI_STMT_SELECT) {
-		cleanUpData();
+		cleanUpData(true,true,true);
 		prepareQuery(query,length);
 		prepared=1;
 	}
@@ -1301,53 +1301,62 @@ void	oracle8cursor::returnRow() {
 	row++;
 }
 
-void	oracle8cursor::cleanUpData() {
+void	oracle8cursor::cleanUpData(bool freerows, bool freecols,
+							bool freebinds) {
 
 	// OCI8 version of ocan(), but since it uses OCIStmtFetch we
 	// only want to run it if the statement was a select
-	if (stmttype==OCI_STMT_SELECT) {
+	if (freerows && stmttype==OCI_STMT_SELECT) {
 		OCIStmtFetch(stmt,oracle8conn->err,0,
 				OCI_FETCH_NEXT,OCI_DEFAULT);
 	}
 
 	// free row/column resources
-	int	i;
-	for (i=0; i<ncols; i++) {
-		for (int j=0; j<FETCH_AT_ONCE; j++) {
-			if (def_lob[i][j]) {
-				OCIDescriptorFree(def_lob[i][j],OCI_DTYPE_LOB);
-				def_lob[i][j]=NULL;
+	if (freecols) {
+		for (int i=0; i<ncols; i++) {
+			if (freerows) {
+				for (int j=0; j<FETCH_AT_ONCE; j++) {
+					if (def_lob[i][j]) {
+						OCIDescriptorFree(def_lob[i][j],
+								OCI_DTYPE_LOB);
+						def_lob[i][j]=NULL;
+					}
+				}
+			}
+			if (def[i]) {
+				OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
+				def[i]=NULL;
 			}
 		}
-		if (def[i]) {
-			OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
-			def[i]=NULL;
-		}
 	}
 
-	// free lob bind resources
+	if (freebinds) {
+		// free lob bind resources
 #ifdef HAVE_ORACLE_8i
-	for (i=0; i<inbindlobcount; i++) {
-		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
-						inbind_lob[i]);
-		OCILobClose(oracle8conn->svc,oracle8conn->err,inbind_lob[i]);
-		OCIDescriptorFree(inbind_lob[i],OCI_DTYPE_LOB);
-	}
-	for (i=0; i<outbindlobcount; i++) {
-		if (outbind_lob[i]) {
+		for (int i=0; i<inbindlobcount; i++) {
 			OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
-						outbind_lob[i]);
+							inbind_lob[i]);
 			OCILobClose(oracle8conn->svc,oracle8conn->err,
-						outbind_lob[i]);
-			OCIDescriptorFree(outbind_lob[i],OCI_DTYPE_LOB);
+							inbind_lob[i]);
+			OCIDescriptorFree(inbind_lob[i],OCI_DTYPE_LOB);
 		}
-	}
-	inbindlobcount=0;
-	outbindlobcount=0;
+		for (int i=0; i<outbindlobcount; i++) {
+			if (outbind_lob[i]) {
+				OCILobFreeTemporary(oracle8conn->svc,
+							oracle8conn->err,
+							outbind_lob[i]);
+				OCILobClose(oracle8conn->svc,oracle8conn->err,
+							outbind_lob[i]);
+				OCIDescriptorFree(outbind_lob[i],OCI_DTYPE_LOB);
+			}
+		}
+		inbindlobcount=0;
+		outbindlobcount=0;
 #endif
 
-	// free regular bind resources
-	inbindcount=0;
-	outbindcount=0;
-	curbindcount=0;
+		// free regular bind resources
+		inbindcount=0;
+		outbindcount=0;
+		curbindcount=0;
+	}
 }

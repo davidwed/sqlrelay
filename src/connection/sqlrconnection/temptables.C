@@ -24,7 +24,7 @@ void	sqlrconnection::dropTempTable(const char *tablename) {
 					dropquery.getStringLength()) &&
 		dropcur->executeQuery(dropquery.getString(),
 					dropquery.getStringLength(),1)) {
-		dropcur->cleanUpData();
+		dropcur->cleanUpData(true,true,true);
 	}
 	dropcur->closeCursor();
 	delete dropcur;
@@ -51,7 +51,7 @@ void	sqlrconnection::truncateTempTable(const char *tablename) {
 					truncatequery.getStringLength()) &&
 		truncatecur->executeQuery(truncatequery.getString(),
 					truncatequery.getStringLength(),1)) {
-		truncatecur->cleanUpData();
+		truncatecur->cleanUpData(true,true,true);
 	}
 	truncatecur->closeCursor();
 	delete truncatecur;

@@ -37,7 +37,8 @@ class sqlitecursor : public sqlrcursor {
 			int	skipRow();
 			int	fetchRow();
 			void	returnRow();
-			void	cleanUpData();
+			void	cleanUpData(bool freerows, bool freecols,
+								bool freebinds);
 
 			stringbuffer	*newquery;
 			char		**result;

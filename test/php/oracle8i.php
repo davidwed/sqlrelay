@@ -10,6 +10,7 @@ function checkSuccess($value,$success) {
 		echo("success ");
 	} else {
 		echo("failure ");
+		printf("%s!=%s\n",$value,$success);
 		sqlrcur_free($cur);
 		sqlrcon_free($con);
 		exit(0);

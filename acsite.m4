@@ -412,13 +412,13 @@ AC_DEFINE_UNQUOTED(INLINE,$INLINE,Some compliers don't support the inline keywor
 
 dnl checks for the pthreads library
 dnl requires:  PTHREADPATH, RPATHFLAG, cross_compiling
-dnl sets the substitution variable PTHREADLIB
+dnl sets the substitution variable PTHREADLIBS
 AC_DEFUN([FW_CHECK_PTHREAD],
 [
 
 HAVE_PTHREAD=""
 PTHREADINCLUDES=""
-PTHREADLIB=""
+PTHREADLIBS=""
 
 if ( test "$cross_compiling" = "yes" )
 then
@@ -428,31 +428,31 @@ then
 	if ( test -n "$PTHREADPATH" )
 	then
 		PTHREADINCLUDES="-I$PTHREADPATH/include"
-		PTHREADLIB="-L$PTHREADPATH/lib -lpthread"
+		PTHREADLIBS="-L$PTHREADPATH/lib -lpthread"
 	else
-		PTHREADLIB="-lpthread"
+		PTHREADLIBS="-lpthread"
 	fi
 	HAVE_PTHREAD="yes"
 
 else
 
-	if ( test -n "$PTHREADLIB" )
+	if ( test -n "$PTHREADLIBS" )
 	then
 		HAVE_PTHREAD="yes"
 	else
 		for i in "pthread" "c_r"
 		do
-			FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[pthread],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
-			if ( test -n "$PTHREADLIB" )
+			FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[pthread],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIBS],[PTHREADLIBPATH],[PTHREADSTATIC])
+			if ( test -n "$PTHREADLIBS" )
 			then
 				if ( test "$i" = "c_r" )
 				then
-					PTHREADLIB="$PTHREADLIB -pthread"
+					PTHREADLIBS="$PTHREADLIBS -pthread"
 				fi
 				break
 			fi
 		done
-		if ( test -n "$PTHREADLIB" )
+		if ( test -n "$PTHREADLIBS" )
 		then
 			HAVE_PTHREAD="yes"
 			break
@@ -461,10 +461,10 @@ else
 fi
 
 FW_INCLUDES(pthreads,[$PTHREADINCLUDES])
-FW_LIBS(pthreads,[$PTHREADLIB])
+FW_LIBS(pthreads,[$PTHREADLIBS])
 
 AC_SUBST(PTHREADINCLUDES)
-AC_SUBST(PTHREADLIB)
+AC_SUBST(PTHREADLIBS)
 if ( test -z "$HAVE_PTHREAD" )
 then
 	AC_MSG_ERROR(pthread library not found.  SQL-Relay requires this package.)

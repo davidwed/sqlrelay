@@ -76,6 +76,8 @@
 	don't link directly against -lstdc++ any more, instead, set up libtool
 		to use g++ to link everything
 	added more verbose logIn error reporting to oracle8 connection
+	0's for bind var counts aren't sent when fetching from a bind cursor now
+	fixed bind cursor fetch problems
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

@@ -145,8 +145,9 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 						const char *passwordbuffer);
 		int	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-		int	handleQuery(int reexecute, int reallyexecute);
-		int	getQueryFromClient(int reexecute);
+		int	handleQuery(int reexecute, int bindcursor,
+							int reallyexecute);
+		int	getQueryFromClient(int reexecute, int bindcursor);
 		void	resumeResultSet();
 		void	suspendSession();
 		void	endSession();
@@ -169,7 +170,8 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		int	getDoubleBind(bindvar *bv);
 		int	getLobBind(bindvar *bv);
 		int	getSendColumnInfo();
-		int	processQuery(int reexecute, int reallyexecute);
+		int	processQuery(int reexecute, int bindcursor,
+							int reallyexecute);
 		int	handleBinds();
 		void	commitOrRollback();
 		int	handleError();

@@ -411,12 +411,16 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_inputBindBlob
 	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
 				env->GetFieldID(cls,"cursor","I"));
 	char	*variablestring=curGetStringUTFChars(env,variable,0);
-	jbyte	*valuebytes=new jbyte[size];
-	env->GetByteArrayRegion(value,0,size,valuebytes);
-	cur->inputBindBlob(variablestring,(char *)valuebytes,
+	if (size) {
+		jbyte	*valuebytes=new jbyte[size];
+		env->GetByteArrayRegion(value,0,size,valuebytes);
+		cur->inputBindBlob(variablestring,(char *)valuebytes,
 						(unsigned long)size);
+		delete[] valuebytes;
+	} else {
+		cur->inputBindBlob(variablestring,NULL,0);
+	}
 	curReleaseStringUTFChars(env,variable,variablestring);
-	delete[] valuebytes;
 }
 
 /*

@@ -4,7 +4,6 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
-/*#include <datatypes.h>*/
 
 int	sqlrcursor::fetchFromBindCursor() {
 
@@ -24,10 +23,6 @@ int	sqlrcursor::fetchFromBindCursor() {
 
 	// send the cursor id to the server
 	sqlrc->write((unsigned short)cursorid);
-
-	// 0 input binds and 0 output binds
-	sqlrc->write((unsigned short)0);
-	sqlrc->write((unsigned short)0);
 
 	sendGetColumnInfo();
 

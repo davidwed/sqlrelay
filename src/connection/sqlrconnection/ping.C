@@ -17,7 +17,7 @@ int	sqlrconnection::ping() {
 	if (pingcur->openCursor(-1) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
 		pingcur->executeQuery(pingquery,pingquerylen,1)) {
-		pingcur->cleanUpData();
+		pingcur->cleanUpData(true,true,true);
 		pingcur->closeCursor();
 		delete pingcur;
 		return 1;

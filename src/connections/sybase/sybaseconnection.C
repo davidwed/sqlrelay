@@ -274,7 +274,7 @@ int	sybasecursor::openCursor(int id) {
 			retval=0;
 		}
 		delete[] query;
-		cleanUpData();
+		cleanUpData(true,true,true);
 	}
 	return retval;
 }
@@ -684,18 +684,22 @@ void	sybasecursor::returnRow() {
 }
 
 
-void	sybasecursor::cleanUpData() {
+void	sybasecursor::cleanUpData(bool freerows, bool freecols,
+							bool freebinds) {
 
 	// cancel the rest of the result sets
-	CS_INT	return_code;
-	while ((return_code=ct_results(cmd,&results_type))==CS_SUCCEED) {
-		ct_cancel(sybaseconn->dbconn,cmd,CS_CANCEL_CURRENT);
-	}
+	if (freerows) {
+		CS_INT	return_code;
+		while ((return_code=ct_results(cmd,&results_type))==
+								CS_SUCCEED) {
+			ct_cancel(sybaseconn->dbconn,cmd,CS_CANCEL_CURRENT);
+		}
 
-	// return a dead database on absolute failre
-	if (return_code==CS_FAIL) {
-		ct_cancel(NULL,cmd,CS_CANCEL_ALL);
-		sybaseconn->deadconnection=1;
+		// return a dead database on absolute failre
+		if (return_code==CS_FAIL) {
+			ct_cancel(NULL,cmd,CS_CANCEL_ALL);
+			sybaseconn->deadconnection=1;
+		}
 	}
 }
 

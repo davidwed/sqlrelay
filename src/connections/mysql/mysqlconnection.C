@@ -393,8 +393,9 @@ void	mysqlcursor::returnRow() {
 	}
 }
 
-void	mysqlcursor::cleanUpData() {
-	if (mysqlresult!=(MYSQL_RES *)NULL) {
+void	mysqlcursor::cleanUpData(bool freerows, bool freecols,
+							bool freebinds) {
+	if (freerows && mysqlresult!=(MYSQL_RES *)NULL) {
 		mysql_free_result(mysqlresult);
 		mysqlresult=NULL;
 	}

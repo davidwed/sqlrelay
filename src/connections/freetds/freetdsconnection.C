@@ -274,7 +274,7 @@ int	freetdscursor::openCursor(int id) {
 			retval=0;
 		}
 		delete[] query;
-		cleanUpData();
+		cleanUpData(true,true,true);
 	}
 	return retval;
 }
@@ -731,14 +731,17 @@ void	freetdscursor::returnRow() {
 }
 
 
-void	freetdscursor::cleanUpData() {
+void	freetdscursor::cleanUpData(bool freerows, bool freecols,
+							bool freebinds) {
 
 	// Cancel the rest of the result sets.
 	// FreeTDS gets pissed off if you try to step through the result sets,
 	// cancelling each one if you didn't ct_describe it earlier, or if you
 	// didn't fetch all of the rows.  It doesn't seem to mind if you cancel
 	// all the result sets at once though.
-	ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+	if (freerows) {
+		ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+	}
 }
 
 CS_RETCODE	freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt, 

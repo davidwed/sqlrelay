@@ -11,14 +11,14 @@ int	sqlrconnection::newQueryCommand() {
 
 	// find an available cursor
 	if ((currentcur=findAvailableCursor())==-1) {
-		getQueryFromClient(0);
+		getQueryFromClient(0,0);
 		noAvailableCursors();
 		return 1;
 	}
 
 	// handle query will return 1 for success,
 	// 0 for network error and -1 for a bad query
-	int	querystatus=handleQuery(0,1);
+	int	querystatus=handleQuery(0,0,1);
 	if (querystatus==1) {
 
 		// reinit lastrow

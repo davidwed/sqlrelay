@@ -623,7 +623,7 @@ checkSuccess(con.autoCommitOff(),1)
 print "\n"
 
 print "FINISHED SUSPENDED SESSION: \n"
-checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
+checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 checkSuccess(cur.getField(4,0),"5")
 checkSuccess(cur.getField(5,0),"6")
 checkSuccess(cur.getField(6,0),"7")

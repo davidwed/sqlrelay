@@ -86,7 +86,7 @@ sqlitecursor::sqlitecursor(sqlrconnection *conn) : sqlrcursor(conn) {
 }
 
 sqlitecursor::~sqlitecursor() {
-	cleanUpData();
+	cleanUpData(true,true,true);
 }
 
 int	sqlitecursor::executeQuery(const char *query, long length,
@@ -118,13 +118,13 @@ int	sqlitecursor::executeQuery(const char *query, long length,
 		} else if (retval==SQLITE_ERROR && sqliteconn->errmesg && 
 			!strncmp(sqliteconn->errmesg,"no such table:",14)) {
 
-			cleanUpData();
+			cleanUpData(true,true,true);
 			// If for some reason, querying sqlite_master doesn't
 			// return SQLITE_SCHEMA, rerun the original query and
 			// jump out of the loop.
 			if (runQuery(NULL,"select * from sqlite_master")
 							!=SQLITE_SCHEMA) {
-				cleanUpData();
+				cleanUpData(true,true,true);
 				newquery=fakeInputBinds(query);
 				retval=runQuery(newquery,query);
 				break;
@@ -256,12 +256,13 @@ void	sqlitecursor::returnRow() {
 	}
 }
 
-void	sqlitecursor::cleanUpData() {
+void	sqlitecursor::cleanUpData(bool freerows, bool freecols,
+							bool freebinds) {
 	if (newquery) {
 		delete newquery;
 		newquery=NULL;
 	}
-	if (result) {
+	if (freerows && result) {
 		sqlite_free_table(result);
 		result=NULL;
 	}

@@ -59,7 +59,7 @@ void	sqlrconnection::clientSession() {
 		// this, the client may be sending more information and we need
 		// to collect it.
 		if (!getCursor()) {
-			getQueryFromClient(0);
+			getQueryFromClient(0,0);
 			noAvailableCursors();
 			continue;
 		}

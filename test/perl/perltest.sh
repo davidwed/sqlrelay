@@ -8,8 +8,8 @@
 #./mysql.pl localhost 8006 "" mysqltest mysqltest
 #./oracle7.pl localhost 8008 "" oracle7test oracle7test
 #./oracle8.pl localhost 8009 "/tmp/sqlrelay.socket" oracle8test oracle8test
-#./oracle8i.pl localhost 8009 "/tmp/sqlrelay.socket" oracle8test oracle8test
-./postgresql7.pl localhost 8010 "" postgresqltest postgresqltest
+./oracle8i.pl localhost 8009 "/tmp/sqlrelay.socket" oracle8test oracle8test
+#./postgresql7.pl localhost 8010 "" postgresqltest postgresqltest
 #./postgresql6.pl localhost 8010 "" postgresqltest postgresqltest
 #./sqlite.pl localhost 8011 "" sqlitetest sqlitetest
 #./sybase.pl localhost 8012 "" sybasetest sybasetest

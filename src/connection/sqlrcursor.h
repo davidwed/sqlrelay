@@ -107,7 +107,8 @@ class sqlrcursor {
 		virtual	int	skipRow()=0;
 		virtual	int	fetchRow()=0;
 		virtual	void	returnRow()=0;
-		virtual	void	cleanUpData();
+		virtual	void	cleanUpData(bool freerows, bool freecols,
+								bool freebinds);
 
 	public:
 		// methods/variables used by derived classes
