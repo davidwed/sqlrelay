@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.10 2005-02-24 02:52:18 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.11 2005-02-25 05:47:40 mused Exp $
  */
 
 #include <tcl.h>
@@ -957,7 +957,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_errorMessage:
       {
-	CONSTCHAR *msg;
+	const char *msg;
 	if (objc > 2) {
 	  Tcl_WrongNumArgs(interp, 2, objv, NULL);
 	  return TCL_ERROR;
