@@ -17,7 +17,7 @@ LOBJS = sqlrclientwrapper.lo
 .SUFFIXES: .lo
 
 .C.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: libsqlrclientwrapper.la
 
