@@ -279,9 +279,12 @@ freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	minorversion=atoi(firstdot+1);
 
 	char	*seconddot=strchr(firstdot+1,'.');
-	*seconddot=(char)NULL;
-	patchlevel=atoi(seconddot+1);
-
+	if (seconddot) {
+		*seconddot=(char)NULL;
+		patchlevel=atoi(seconddot+1);
+	} else {
+		patchlevel=0;
+	}
 
 	prepared=false;
 	freetdsconn=(freetdsconnection *)conn;

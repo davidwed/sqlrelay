@@ -1,6 +1,7 @@
 0.36 - configure script defaults db2 version to 8
 	configure script detects various odbc function paramters, uses them to
 		build odbc connection
+	applied Matthias Klose's freetds patchlevel patch
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

@@ -22,10 +22,6 @@ CFLAGS="-framework Python" to get python API to compile on OS X
 
 HFS is case insensitive but case preserving, need INSTALL.txt hack for OS X
 
-compile problem with ODBC 3.52
-
-Matthias's freetds version patch
-
 python DB stops other threads
 
 --------------------------------------------------------------------------------
