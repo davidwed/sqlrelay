@@ -10,6 +10,10 @@
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 postgresqlconnection::postgresqlconnection() {
+	datatypecount=0;
+	datatypeids=NULL;
+	datatypenames=NULL;
+	pgconn=(PGconn *)NULL;
 }
 
 postgresqlconnection::~postgresqlconnection() {
@@ -114,7 +118,10 @@ void postgresqlconnection::logOut() {
 	devnull.close();
 #endif
 
-	PQfinish(pgconn);
+	if (pgconn) {
+		PQfinish(pgconn);
+		pgconn=NULL;
+	}
 
 	if (typemangling==2) {
 
@@ -140,7 +147,7 @@ postgresqlcursor::postgresqlcursor(sqlrconnection *conn) :
 						sqlrcursor(conn) {
 	postgresqlconn=(postgresqlconnection *)conn;
 	ddlquery=0;
-	pgresult=(PGresult *)NULL;
+	pgresult=NULL;
 }
 
 bool postgresqlcursor::executeQuery(const char *query, long length,
