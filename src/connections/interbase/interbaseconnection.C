@@ -356,7 +356,7 @@ int	interbasecursor::executeQuery(const char *query, long length,
 	if (queryIsExecSP) {
 		if (isc_dsql_execute2(interbaseconn->error,
 					&interbaseconn->tr,
-					&stmt,1,insqlda, outsqlda)) {
+					&stmt,1,insqlda,outsqlda)) {
 			return 0;
 		}
 
@@ -542,14 +542,60 @@ void	interbasecursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
+	long	precision;
+
 	// for each column...
 	for (int i=0; i<outsqlda->sqld; i++) {
 
+		if (field[i].sqlrtype==CHAR_DATATYPE) {
+			precision=outsqlda->sqlvar[i].sqllen;
+		} else if (field[i].sqlrtype==VARCHAR_DATATYPE) {
+			precision=outsqlda->sqlvar[i].sqllen;
+		} else if (field[i].sqlrtype==SMALLINT_DATATYPE) {
+			precision=5;
+		} else if (field[i].sqlrtype==INTEGER_DATATYPE) {
+			precision=11;
+		} else if (field[i].sqlrtype==NUMERIC_DATATYPE) {
+			// FIXME: can be from 1 to 18
+			// (oddly, scale is given as a negative number)
+			precision=18+outsqlda->sqlvar[i].sqlscale;
+		} else if (field[i].sqlrtype==DECIMAL_DATATYPE) {
+			// FIXME: can be from 1 to 18
+			// (oddly, scale is given as a negative number)
+			precision=18+outsqlda->sqlvar[i].sqlscale;
+		} else if (field[i].sqlrtype==FLOAT_DATATYPE) {
+			precision=0;
+		} else if (field[i].sqlrtype==DOUBLE_PRECISION_DATATYPE) {
+			precision=0;
+		} else if (field[i].sqlrtype==D_FLOAT_DATATYPE) {
+			precision=0;
+		} else if (field[i].sqlrtype==ARRAY_DATATYPE) {
+			// not sure
+			precision=0;
+		} else if (field[i].sqlrtype==QUAD_DATATYPE) {
+			// not sure
+			precision=0;
+		} else if (field[i].sqlrtype==TIMESTAMP_DATATYPE) {
+			// not sure
+			precision=0;
+		} else if (field[i].sqlrtype==TIME_DATATYPE) {
+			precision=8;
+		} else if (field[i].sqlrtype==DATE_DATATYPE) {
+			precision=10;
+		} else if (field[i].sqlrtype==BLOB_DATATYPE) {
+			precision=outsqlda->sqlvar[i].sqllen;
+		} else if (field[i].sqlrtype==UNKNOWN_DATATYPE) {
+			precision=outsqlda->sqlvar[i].sqllen;
+		}
+
 		// send column definition
+		// (oddly, scale is given as a negative number)
 		conn->sendColumnDefinition(outsqlda->sqlvar[i].sqlname,
 					strlen(outsqlda->sqlvar[i].sqlname),
 					field[i].sqlrtype,
-					outsqlda->sqlvar[i].sqllen,0,0);
+					outsqlda->sqlvar[i].sqllen,
+					precision,
+					-outsqlda->sqlvar[i].sqlscale);
 	}
 }
 

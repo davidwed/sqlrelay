@@ -24,7 +24,9 @@
 		warnings
 	added postgresql drop-in api
 	added support for column precision/scale to core classes and all DB's
-		that support it (except interbase and mysql)
+		that support it
+	all databases return the number of bytes required to store the column
+		on the server for getColumnLength now
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

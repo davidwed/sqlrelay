@@ -179,22 +179,25 @@ void	lagocursor::returnColumnInfo() {
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// gonna need this later
-	int	length;
+	char	*name;
 	int	precision;
 	int	scale;
+	int	length;
 	int	type;
-	char	*name;
 
 	// for each column...
 	for (int i=1; i<ncols+1; i++) {
 
-		// initialize length
-		length=0;
+		// get name, precision and scale
+		name=(char *)Lgetcolname(lagoresult,i);
+		precision=Lgetcolprec(lagoresult,i);
+		scale=Lgetcolscale(lagoresult,i);
 
 		// set column type
 		LType	coltype=Lgetcoltype(lagoresult,i);
 		if (coltype==LSQL_UNDEFINED) {
 			type=UNDEFINED_DATATYPE;
+			length=precision;
 		} else if (coltype==LSQL_SMALLINT) {
 			type=SMALLINT_DATATYPE;
 			length=2;
@@ -209,8 +212,10 @@ void	lagocursor::returnColumnInfo() {
 			length=8;
 		} else if (coltype==LSQL_CHAR) {
 			type=CHAR_DATATYPE;
+			length=precision;
 		} else if (coltype==LSQL_VARCHAR) {
 			type=VARCHAR_DATATYPE;
+			length=precision;
 		} else if (coltype==LSQL_DATE) {
 			type=DATE_DATATYPE;
 			length=4;
@@ -219,24 +224,10 @@ void	lagocursor::returnColumnInfo() {
 			length=4;
 		} else if (coltype==LSQL_TIMESTAMP) {
 			type=TIMESTAMP_DATATYPE;
-			length=8;
+			length=4;
 		} else {
 			type=UNKNOWN_DATATYPE;
-		}
-
-		// get name, precision and scale
-		name=(char *)Lgetcolname(lagoresult,i);
-		precision=Lgetcolprec(lagoresult,i);
-		scale=Lgetcolscale(lagoresult,i);
-
-		// if the length wasn't determined already, determine it based
-		// on precision, scale
-		if (!length) {
 			length=precision;
-			if (scale) {
-				// make sure to add 1 for the decimal point
-				length=precision+1;
-			}
 		}
 
 		// send the column definition

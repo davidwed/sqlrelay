@@ -175,8 +175,10 @@ void	msqlcursor::returnColumnInfo() {
 		return;
 	}
 
-	// a useful variable
+	// some useful variables
 	int	type;
+	int	precision;
+	int	scale;
 
 	// position ourselves on the first field
 	msqlFieldSeek(msqlresult,0);
@@ -187,37 +189,49 @@ void	msqlcursor::returnColumnInfo() {
 		// fetch the field
 		msqlfield=msqlFetchField(msqlresult);
 
+		// initialize precision
+		precision=0;
+		scale=0;
+
 		// append column type to the header
 		if (msqlfield->type==CHAR_TYPE) {
 			type=CHAR_DATATYPE;
+			precision=msqlfield->length;
 		} else if (msqlfield->type==TEXT_TYPE) {
 			type=TEXT_DATATYPE;
+			precision=msqlfield->length;
 		} else if (msqlfield->type==INT_TYPE) {
 			type=INT_DATATYPE;
+			precision=10;
 		} else if (msqlfield->type==UINT_TYPE) {
 			type=UINT_DATATYPE;
+			precision=10;
 		} else if (msqlfield->type==MONEY_TYPE) {
 			type=MONEY_DATATYPE;
+			precision=12;
+			scale=2;
 		// For some reason, msql reports time datatypes as "lastreal"
 		// yet lastreal is not a valid msql datatype.  Strange.
 		} else if (msqlfield->type==LAST_REAL_TYPE) {
 			type=TIME_DATATYPE;
+			precision=8;
 		} else if (msqlfield->type==REAL_TYPE) {
 			type=REAL_DATATYPE;
 		} else if (msqlfield->type==DATE_TYPE) {
 			type=DATE_DATATYPE;
+			precision=11;
 		} else if (msqlfield->type==TIME_TYPE) {
 			type=TIME_DATATYPE;
+			precision=8;
 		} else {
 			type=UNKNOWN_DATATYPE;
 		}
 
-		// FIXME: is msqlfield->flags a precision or scale???
-
 		// send the column definition
 		conn->sendColumnDefinition(msqlfield->name,
 					strlen(msqlfield->name),
-					type,msqlfield->length,0,0);
+					type,msqlfield->length,
+					precision,scale);
 	}
 }
 

@@ -15,8 +15,8 @@ class column {
 		unsigned long	length;
 		int		longest;
 		unsigned char	longdatatype;
-		unsigned short	precision;
-		unsigned short	scale;
+		unsigned long	precision;
+		unsigned long	scale;
 };
 
 #endif

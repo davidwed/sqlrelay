@@ -1278,7 +1278,7 @@ int	sqlrcursor::getColumnLength(int col) {
 	return 0;
 }
 
-unsigned short	sqlrcursor::getColumnPrecision(int col) {
+unsigned long	sqlrcursor::getColumnPrecision(int col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
@@ -1288,7 +1288,7 @@ unsigned short	sqlrcursor::getColumnPrecision(int col) {
 	return 0;
 }
 
-unsigned short	sqlrcursor::getColumnScale(int col) {
+unsigned long	sqlrcursor::getColumnScale(int col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
@@ -1341,7 +1341,7 @@ int	sqlrcursor::getColumnLength(const char *col) {
 	return 0;
 }
 
-unsigned short	sqlrcursor::getColumnPrecision(const char *col) {
+unsigned long	sqlrcursor::getColumnPrecision(const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO) {
@@ -1356,7 +1356,7 @@ unsigned short	sqlrcursor::getColumnPrecision(const char *col) {
 	return 0;
 }
 
-unsigned short	sqlrcursor::getColumnScale(const char *col) {
+unsigned long	sqlrcursor::getColumnScale(const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO) {
@@ -2525,14 +2525,14 @@ int	sqlrcursor::parseColumnInfo() {
 			}
 
 			// get the column precision
-			if (getShort(&currentcol->precision)!=
-						sizeof(unsigned short)) {
+			if (getLong(&currentcol->precision)!=
+						sizeof(unsigned long)) {
 				return -1;
 			}
 
 			// get the column scale
-			if (getShort(&currentcol->scale)!=
-						sizeof(unsigned short)) {
+			if (getLong(&currentcol->scale)!=
+						sizeof(unsigned long)) {
 				return -1;
 			}
 

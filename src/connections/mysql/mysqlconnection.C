@@ -247,8 +247,9 @@ void	mysqlcursor::returnColumnInfo() {
 		return;
 	}
 
-	// a useful variable
+	// some useful variables
 	int	type;
+	int	length;
 
 	// position ourselves at the first field
 	mysql_field_seek(mysqlresult,0);
@@ -262,45 +263,78 @@ void	mysqlcursor::returnColumnInfo() {
 		// append column type to the header
 		if (mysqlfield->type==FIELD_TYPE_STRING) {
 			type=STRING_DATATYPE;
+			length=(int)mysqlfield->length;
 		} else if (mysqlfield->type==FIELD_TYPE_VAR_STRING) {
 			type=CHAR_DATATYPE;
+			length=(int)mysqlfield->length+1;
 		} else if (mysqlfield->type==FIELD_TYPE_DECIMAL) {
 			type=DECIMAL_DATATYPE;
+			if (mysqlfield->decimals>0) {
+				length=(int)mysqlfield->length+2;
+			} else if (mysqlfield->decimals==0) {
+				length=(int)mysqlfield->length+1;
+			}
+			if (mysqlfield->length<mysqlfield->decimals) {
+				length=(int)mysqlfield->decimals+2;
+			}
 		} else if (mysqlfield->type==FIELD_TYPE_TINY) {
 			type=TINYINT_DATATYPE;
+			length=1;
 		} else if (mysqlfield->type==FIELD_TYPE_SHORT) {
 			type=SMALLINT_DATATYPE;
+			length=2;
 		} else if (mysqlfield->type==FIELD_TYPE_LONG) {
 			type=INT_DATATYPE;
+			length=4;
 		} else if (mysqlfield->type==FIELD_TYPE_FLOAT) {
 			type=FLOAT_DATATYPE;
+			if (mysqlfield->length<=24) {
+				length=4;
+			} else {
+				length=8;
+			}
 		} else if (mysqlfield->type==FIELD_TYPE_DOUBLE) {
 			type=REAL_DATATYPE;
+			length=8;
 		} else if (mysqlfield->type==FIELD_TYPE_LONGLONG) {
 			type=BIGINT_DATATYPE;
+			length=8;
 		} else if (mysqlfield->type==FIELD_TYPE_INT24) {
 			type=MEDIUMINT_DATATYPE;
+			length=3;
 		} else if (mysqlfield->type==FIELD_TYPE_TIMESTAMP) {
 			type=TIMESTAMP_DATATYPE;
+			length=4;
 		} else if (mysqlfield->type==FIELD_TYPE_DATE) {
 			type=DATE_DATATYPE;
+			length=3;
 		} else if (mysqlfield->type==FIELD_TYPE_TIME) {
 			type=TIME_DATATYPE;
+			length=3;
 		} else if (mysqlfield->type==FIELD_TYPE_DATETIME) {
 			type=DATETIME_DATATYPE;
+			length=8;
 #if MYSQL_VERSION_ID>=32200
 		} else if (mysqlfield->type==FIELD_TYPE_YEAR) {
 			type=YEAR_DATATYPE;
+			length=1;
 		} else if (mysqlfield->type==FIELD_TYPE_NEWDATE) {
 			type=NEWDATE_DATATYPE;
+			length=1;
 #endif
 		} else if (mysqlfield->type==FIELD_TYPE_NULL) {
 			type=NULL_DATATYPE;
 #ifdef MYSQL_VERSION_ID
 		} else if (mysqlfield->type==FIELD_TYPE_ENUM) {
 			type=ENUM_DATATYPE;
+			// 1 or 2 bytes delepending on the # of enum values
+			// (65535 max)
+			length=2;
 		} else if (mysqlfield->type==FIELD_TYPE_SET) {
 			type=SET_DATATYPE;
+			// 1,2,3,4 or 8 bytes delepending on the # of members
+			// (64 max)
+			length=8;
 #endif
 		// For some reason, tinyblobs, mediumblobs and longblobs
 		// all show up as FIELD_TYPE_BLOB despite field types being
@@ -314,28 +348,32 @@ void	mysqlcursor::returnColumnInfo() {
 		// happens on a 64 bit machine.
 		} else if (mysqlfield->type==FIELD_TYPE_TINY_BLOB) {
 			type=TINY_BLOB_DATATYPE;
+			length=(int)mysqlfield->length+2;
 		} else if (mysqlfield->type==FIELD_TYPE_MEDIUM_BLOB) {
 			type=MEDIUM_BLOB_DATATYPE;
+			length=(int)mysqlfield->length+3;
 		} else if (mysqlfield->type==FIELD_TYPE_LONG_BLOB) {
 			type=LONG_BLOB_DATATYPE;
+			length=(int)mysqlfield->length+4;
 		} else if (mysqlfield->type==FIELD_TYPE_BLOB) {
 			if ((int)mysqlfield->length==255) {
 				type=TINY_BLOB_DATATYPE;
+				length=(int)mysqlfield->length+2;
 			} else {
 				type=BLOB_DATATYPE;
+				length=(int)mysqlfield->length+3;
 			}
 		} else {
 			type=UNKNOWN_DATATYPE;
+			length=(int)mysqlfield->length;
 		}
 
-		// FIXME: is mysqlfield->max_length the precision???
-		// what is flags?
-
 		// send column definition
+		// for mysql, length is actually precision
 		conn->sendColumnDefinition(mysqlfield->name,
 					strlen(mysqlfield->name),
-					type,(int)mysqlfield->length,
-					0,
+					type,length,
+					mysqlfield->length,
 					mysqlfield->decimals);
 	}
 }

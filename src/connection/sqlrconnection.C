@@ -2711,8 +2711,8 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 						unsigned short namelen,
 						unsigned short type, 
 						unsigned long size,
-						unsigned short precision,
-						unsigned short scale) {
+						unsigned long precision,
+						unsigned long scale) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -2745,8 +2745,8 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 						const char *type, 
 						unsigned short typelen,
 						unsigned long size,
-						unsigned short precision,
-						unsigned short scale) {
+						unsigned long precision,
+						unsigned long scale) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();

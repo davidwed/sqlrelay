@@ -82,15 +82,15 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 						unsigned short namelen, 
 						unsigned short type, 
 						unsigned long size,
-						unsigned short precision,
-						unsigned short scale);
+						unsigned long precision,
+						unsigned long scale);
 		void	sendColumnDefinitionString(const char *name, 
 						unsigned short namelen, 
 						const char *type, 
 						unsigned short typelen, 
 						unsigned long size,
-						unsigned short precision,
-						unsigned short scale);
+						unsigned long precision,
+						unsigned long scale);
 		void	sendField(const char *data, unsigned long size);
 		void	sendNullField();
 		void	startSendingLong();

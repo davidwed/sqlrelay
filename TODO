@@ -1,5 +1,4 @@
-precision, scale in interbase connection
-precision in mysql connection
+is there a better way to get a column's precision in interbase
 
 add column precision/scale to protocol doc
 
@@ -138,8 +137,9 @@ Features:
 		identical long/lob datatype support in all databases
 		more advanced long/lob datatype support
 		support for array datatypes
-		handle blobs in interbase
+		handle blobs, quads in interbase
 		handle timestamps
+		handle enum types in mysql
 	replication
 	query filtering
 	quotas
