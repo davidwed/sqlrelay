@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(src/connection/sqlrconnection.C)
+AC_INIT(src/listener/sqlrlistener.C)
 
 LDFLAGS=""
 AC_SUBST(LDFLAGS)

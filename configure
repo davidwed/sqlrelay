@@ -429,7 +429,7 @@ PACKAGE_VERSION=
 PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
-ac_unique_file="src/connection/sqlrconnection.C"
+ac_unique_file="src/listener/sqlrlistener.C"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

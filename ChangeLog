@@ -33,6 +33,7 @@
 		a crash
 	fixed a bug where NULL binds weren't being faked at all
 	added a hack for broken glibc-2.3's
+	split up sqlrconnection.C and sqlrcursor.C in connection base classes
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

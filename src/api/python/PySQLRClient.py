@@ -378,9 +378,26 @@ class sqlrcursor:
 
     def getOutputBind(self, variable):
         """
-        Retrieve the value of an output bind variable.
+        Get the value stored in a previously
+        defined output bind variable.
         """
         return CSQLRelay.getOutputBind(self.cursor, variable)
+
+    def getOutputBindAsLong(self, variable):
+        """
+        Get the value stored in a previously
+        defined output bind variable as a long
+        integer.
+        """
+        return CSQLRelay.getOutputBindAsLong(self.cursor, variable)
+
+    def getOutputBindAsDouble(self, variable):
+        """
+        Get the value stored in a previously
+        defined output bind variable as a double
+        precision floating point number.
+        """
+        return CSQLRelay.getOutputBindAsDouble(self.cursor, variable)
 
     def getOutputBindLength(self, variable):
         """
@@ -488,6 +505,19 @@ class sqlrcursor:
         """
         return CSQLRelay.getField(self.cursor, row, col)
 
+    def getFieldAsLong(self, row, col):
+        """
+        Returns the specified field as a long integer.
+        """
+        return CSQLRelay.getFieldAsLong(self.cursor, row, col)
+
+    def getFieldAsDouble(self, row, col):
+        """
+        Returns the specified field as a double precision
+        floating point number.
+        """
+        return CSQLRelay.getFieldAsDouble(self.cursor, row, col)
+
     def getFieldLength(self, row, col):
         """
         Returns the length of the specified row and
@@ -560,6 +590,37 @@ class sqlrcursor:
         be a name or number.
         """
         return CSQLRelay.getColumnLength(self.cursor, col)
+
+    def getColumnPrecision(self, col):
+        """
+        Returns the precision of the specified column.
+        Precision is the total number of digits in a number.
+        eg: 123.45 has a precision of 5.  For non-numeric
+        types, it's the number of characters in the string.
+        """
+        return CSQLRelay.getColumnPrecision(self.cursor, col)
+
+    def getColumnScale(self, col):
+        """
+        Returns the scale of the specified column.  Scale is
+        the total number of digits to the right of the decimal
+        point in a number.  eg: 123.45 has a scale of 2.
+        """
+        return CSQLRelay.getColumnScale(self.cursor, col)
+
+    def getColumnIsNullable(self, col):
+        """
+        Returns 1 if the specified column can contain nulls and
+        0 otherwise.
+        """
+        return CSQLRelay.getColumnIsNullable(self.cursor, col)
+
+    def getColumnIsPrimaryKey(self, col):
+        """
+        Returns 1 if the specified column is a primary key and
+        0 otherwise.
+        """
+        return CSQLRelay.getColumnIsPrimaryKey(self.cursor, col)
 
     def getLongest(self, col):
         """

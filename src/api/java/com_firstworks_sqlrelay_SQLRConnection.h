@@ -4,17 +4,9 @@
 
 #ifndef _Included_com_firstworks_sqlrelay_SQLRConnection
 #define _Included_com_firstworks_sqlrelay_SQLRConnection
-//#ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-//#endif
-/*
- * Class:     com_firstworks_sqlrelay_SQLRConnection
- * Method:    alloc
- * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I
- */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc
-  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jstring, jint, jint);
-
+#endif
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    delete
@@ -73,6 +65,14 @@ JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_ping
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    identify
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_identify
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    autoCommitOn
  * Signature: ()I
  */
@@ -105,14 +105,6 @@ JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_rollback
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
- * Method:    identify
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_identify
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    debugOn
  * Signature: ()V
  */
@@ -135,7 +127,15 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_debugOff
 JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getDebug
   (JNIEnv *, jobject);
 
-//#ifdef __cplusplus
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    alloc
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I
+ */
+JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc
+  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jstring, jint, jint);
+
+#ifdef __cplusplus
 }
-//#endif
+#endif
 #endif

@@ -555,6 +555,28 @@ static PyObject *getOutputBind(PyObject *self, PyObject *args) {
   return Py_BuildValue("s#", rc, rl);
 }
 
+static PyObject *getOutputBindAsLong(PyObject *self, PyObject *args) {
+  char *variable;
+  long sqlrcur;
+  long rc;
+  int rl;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
+    return NULL;
+  rc=((sqlrcursor *)sqlrcur)->getOutputBindAsLong(variable);
+  return Py_BuildValue("l", rc);
+}
+
+static PyObject *getOutputBindAsDouble(PyObject *self, PyObject *args) {
+  char *variable;
+  long sqlrcur;
+  double rc;
+  int rl;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
+    return NULL;
+  rc=((sqlrcursor *)sqlrcur)->getOutputBindAsDouble(variable);
+  return Py_BuildValue("d", rc);
+}
+
 static PyObject *getOutputBindLength(PyObject *self, PyObject *args) {
   char *variable;
   long sqlrcur;
@@ -673,6 +695,36 @@ static PyObject *getField(PyObject *self, PyObject *args) {
     return Py_None;
   }
   return Py_BuildValue("s#", rc, rl);
+}
+
+static PyObject *getFieldAsLong(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  long rc;
+  int row;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "liO", &sqlrcur, &row, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getFieldAsLong(row, PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getFieldAsLong(row, PyInt_AsLong(col));
+  }
+  return Py_BuildValue("l", rc);
+}
+
+static PyObject *getFieldAsDouble(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  double rc;
+  int row;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "liO", &sqlrcur, &row, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getFieldAsDouble(row, PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getFieldAsDouble(row, PyInt_AsLong(col));
+  }
+  return Py_BuildValue("d", rc);
 }
 
 static PyObject *getFieldLength(PyObject *self, PyObject *args) {
@@ -901,6 +953,62 @@ static PyObject *getColumnLength(PyObject *self, PyObject *args) {
   return Py_BuildValue("i", rc);
 }
 
+static PyObject *getColumnPrecision(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned long rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnPrecision(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnPrecision(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("l", rc);
+}
+
+static PyObject *getColumnScale(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned long rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnScale(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnScale(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("l", rc);
+}
+
+static PyObject *getColumnIsNullable(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned short rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsNullable(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsNullable(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("h", rc);
+}
+
+static PyObject *getColumnIsPrimaryKey(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  unsigned short rc;
+  PyObject *col;
+  if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
+    return NULL;
+  if (PyString_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsPrimaryKey(PyString_AsString(col));
+  } else if (PyInt_Check(col)) {
+    rc=((sqlrcursor *)sqlrcur)->getColumnIsPrimaryKey(PyInt_AsLong(col));
+  }
+  return Py_BuildValue("h", rc);
+}
+
 static PyObject *getLongest(PyObject *self, PyObject *args) {
   long sqlrcur;
   int rc;
@@ -1023,6 +1131,8 @@ static PyMethodDef SQLRMethods[] = {
   {"executeQuery", executeQuery, METH_VARARGS},
   {"fetchFromBindCursor", fetchFromBindCursor, METH_VARARGS},
   {"getOutputBind", getOutputBind, METH_VARARGS},
+  {"getOutputBindAsLong", getOutputBindAsLong, METH_VARARGS},
+  {"getOutputBindAsDouble", getOutputBindAsDouble, METH_VARARGS},
   {"getOutputBindLength", getOutputBindLength, METH_VARARGS},
   {"openCachedResultSet", openCachedResultSet, METH_VARARGS},
   {"colCount", colCount, METH_VARARGS},
@@ -1035,6 +1145,8 @@ static PyMethodDef SQLRMethods[] = {
   {"getNullsAsEmptyStrings", getNullsAsEmptyStrings, METH_VARARGS},
   {"getNullsAsNone", getNullsAsNone, METH_VARARGS},
   {"getField", getField, METH_VARARGS},
+  {"getFieldAsLong", getFieldAsLong, METH_VARARGS},
+  {"getFieldAsDouble", getFieldAsDouble, METH_VARARGS},
   {"getFieldLength", getFieldLength, METH_VARARGS},
   {"getRow", getRow, METH_VARARGS},
   {"getRowDictionary", getRowDictionary, METH_VARARGS},
@@ -1046,6 +1158,10 @@ static PyMethodDef SQLRMethods[] = {
   {"getColumnNames", getColumnNames, METH_VARARGS},
   {"getColumnType", getColumnType, METH_VARARGS},
   {"getColumnLength", getColumnLength, METH_VARARGS},
+  {"getColumnPrecision", getColumnPrecision, METH_VARARGS},
+  {"getColumnScale", getColumnScale, METH_VARARGS},
+  {"getColumnIsNullable", getColumnIsNullable, METH_VARARGS},
+  {"getColumnIsPrimaryKey", getColumnIsPrimaryKey, METH_VARARGS},
   {"getLongest", getLongest, METH_VARARGS},
   {"getResultSetId", getResultSetId, METH_VARARGS},
   {"suspendResultSet", suspendResultSet, METH_VARARGS},

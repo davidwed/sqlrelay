@@ -705,6 +705,38 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBind
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getOutputBindAsLong
+ * Signature: (Ljava/lang/String;)J;
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindAsLong
+  (JNIEnv *env, jobject self, jstring variable) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*variablestring=curGetStringUTFChars(env,variable,0);
+	jlong	retval=(jlong)cur->getOutputBindAsLong(variablestring);
+	curReleaseStringUTFChars(env,variable,variablestring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getOutputBindAsDouble
+ * Signature: (Ljava/lang/String;)J;
+ */
+JNIEXPORT jdouble JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindAsDouble
+  (JNIEnv *env, jobject self, jstring variable) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*variablestring=curGetStringUTFChars(env,variable,0);
+	jdouble	retval=(jdouble)cur->getOutputBindAsDouble(variablestring);
+	curReleaseStringUTFChars(env,variable,variablestring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getOutputBindAsByteArray
  * Signature: (Ljava/lang/String;)[B
  */
@@ -918,6 +950,64 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getField__ILja
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getFieldAsLong
+ * Signature: (II)J
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsLong__II
+  (JNIEnv *env, jobject self, jint row, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (jlong)cur->getFieldAsLong((int)row,(int)col);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getFieldAsLong
+ * Signature: (ILjava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsLong__ILjava_lang_String_2
+  (JNIEnv *env, jobject self, jint row, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	jlong	retval=(jlong)cur->getFieldAsLong((int)row,colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getFieldAsDouble
+ * Signature: (II)D
+ */
+JNIEXPORT jdouble JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsDouble__II
+  (JNIEnv *env, jobject self, jint row, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (jdouble)cur->getFieldAsDouble((int)row,(int)col);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getFieldAsDouble
+ * Signature: (ILjava/lang/String;)D
+ */
+JNIEXPORT jdouble JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsDouble__ILjava_lang_String_2
+  (JNIEnv *env, jobject self, jint row, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	jdouble	retval=(jlong)cur->getFieldAsDouble((int)row,colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getFieldAsByteArray
  * Signature: (II)[B
  */
@@ -1093,6 +1183,122 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnType_
 	jstring	retval=env->NewStringUTF(cur->getColumnType(colstring));
 	curReleaseStringUTFChars(env,col,colstring);
 	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnPrecision
+ * Signature: (I)J
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnPrecision__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (jlong)cur->getColumnPrecision((int)col);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnPrecision
+ * Signature: (Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnPrecision__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	jlong	retval=(jlong)cur->getColumnPrecision(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnScale
+ * Signature: (I)J
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnScale__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (jlong)cur->getColumnScale((int)col);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnScale
+ * Signature: (Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnScale__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	jlong	retval=(jlong)cur->getColumnScale(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsNullable
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsNullable__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (cur->getColumnIsNullable((int)col))?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsNullable
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsNullable__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	unsigned short	retval=cur->getColumnIsNullable(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return (retval)?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsPrimaryKey
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsPrimaryKey__I
+  (JNIEnv *env, jobject self, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	return (cur->getColumnIsPrimaryKey((int)col))?JNI_TRUE:JNI_FALSE;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnIsPrimaryKey
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnIsPrimaryKey__Ljava_lang_String_2
+  (JNIEnv *env, jobject self, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	unsigned short	retval=cur->getColumnIsPrimaryKey(colstring);
+	curReleaseStringUTFChars(env,col,colstring);
+	return (retval)?JNI_TRUE:JNI_FALSE;
 }
 
 /*

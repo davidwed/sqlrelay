@@ -1,15 +1,12 @@
 libpq-sqlrelay.a fails to install when building RPM
 perl api's don't get installed right when building an RPM
 
-does "=NULL" have to be translated to "is NULL" in fake binds?
-
 implement unique flag like nullable, primary key, precision, scale
 nullable,primary key isn't implemented for many connections
 implement unique/nullable/primary key as a bitmap
 
-implement nullable, primary key, precision, scale in non c++ api's
-implement getFieldAsXXX and getOutputBindAsXXX for non-c++ api's
-	(c is done)
+docs, tests for nullable, primary key, precision, scale, getfieldAsXXX and
+	getOutputBindAsXXX
 
 is there a better way to get a column's precision in interbase
 precision/scale in postgresql

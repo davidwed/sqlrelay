@@ -651,6 +651,32 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbind) {
 	RETURN_STRINGL(r,rl,1);
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindaslong) {
+	zval **sqlrcur,**variable;
+	long r;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	convert_to_string_ex(variable);
+	r=((sqlrcursor *)(*sqlrcur)->value.lval)->getOutputBindAsLong((*variable)->value.str.val);
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindasdouble) {
+	zval **sqlrcur,**variable;
+	double r;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	convert_to_string_ex(variable);
+	r=((sqlrcursor *)(*sqlrcur)->value.lval)->getOutputBindAsDouble((*variable)->value.str.val);
+	RETURN_DOUBLE(r);
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindlength) {
 	zval **sqlrcur,**variable;
 	long r;
@@ -821,6 +847,44 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 		RETURN_NULL();
 	}
 	RETURN_STRINGL(r,rl,1);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldaslong) {
+	zval **sqlrcur,**row,**col;
+	long r=0;
+	if (ZEND_NUM_ARGS() != 3 || 
+		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	convert_to_long_ex(row);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getFieldAsLong((*row)->value.lval,(*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getFieldAsLong((*row)->value.lval,(*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldasdouble) {
+	zval **sqlrcur,**row,**col;
+	double r=0.0;
+	if (ZEND_NUM_ARGS() != 3 || 
+		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	convert_to_long_ex(row);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getFieldAsDouble((*row)->value.lval,(*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getFieldAsDouble((*row)->value.lval,(*col)->value.str.val);
+	}
+	RETURN_DOUBLE(r);
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldlength) {
@@ -1025,6 +1089,78 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnlength) {
 	} else if (Z_TYPE_PP(col)==IS_STRING) {
 		convert_to_string_ex(col);
 		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnLength((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnprecision) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnPrecision((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnPrecision((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnscale) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnScale((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnScale((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisnullable) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsNullable((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsNullable((*col)->value.str.val);
+	}
+	RETURN_LONG(r);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisprimarykey) {
+	zval **sqlrcur,**col;
+	int r=0;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(sqlrcur);
+	if (Z_TYPE_PP(col)==IS_LONG) {
+		convert_to_long_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsPrimaryKey((*col)->value.lval);
+	} else if (Z_TYPE_PP(col)==IS_STRING) {
+		convert_to_string_ex(col);
+		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getColumnIsPrimaryKey((*col)->value.str.val);
 	}
 	RETURN_LONG(r);
 }

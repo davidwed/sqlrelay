@@ -184,6 +184,22 @@ sqlrcursor::getOutputBind(variable)
 		}
 
 long
+sqlrcursor::getOutputBindAsLong(variable)
+		char *variable
+	CODE:
+		long	value=THIS->getOutputBindAsLong(variable);
+		ST(0)=sv_newmortal();
+		sv_setiv(ST(0),value);
+
+double
+sqlrcursor::getOutputBindAsDouble(variable)
+		char *variable
+	CODE:
+		double	value=THIS->getOutputBindAsDouble(variable);
+		ST(0)=sv_newmortal();
+		sv_setnv(ST(0),value);
+
+long
 sqlrcursor::getOutputBindLength(variable)
 		char *variable
 
@@ -263,6 +279,32 @@ sqlrcursor::getField(row,...)
 		}
 
 long
+sqlrcursor::getFieldAsLong(row,...)
+		int	row
+	CODE:
+		long	field;
+		ST(0)=sv_newmortal();
+		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
+			field=THIS->getFieldAsLong(row,(int)SvIV(ST(2)));
+		} else if (SvPOK(ST(2))) {
+			field=THIS->getFieldAsLong(row,SvPV(ST(2),na));
+		} 
+		sv_setiv(ST(0),field);
+
+double
+sqlrcursor::getFieldAsDouble(row,...)
+		int	row
+	CODE:
+		double	field;
+		ST(0)=sv_newmortal();
+		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
+			field=THIS->getFieldAsDouble(row,(int)SvIV(ST(2)));
+		} else if (SvPOK(ST(2))) {
+			field=THIS->getFieldAsDouble(row,SvPV(ST(2),na));
+		} 
+		sv_setnv(ST(0),field);
+
+long
 sqlrcursor::getFieldLength(row,...)
 		int	row
 	CODE:
@@ -311,6 +353,54 @@ sqlrcursor::getColumnLength(...)
 			RETVAL=THIS->getColumnLength((int)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnLength(SvPV(ST(1),na));
+		}
+	OUTPUT:
+		RETVAL
+
+unsigned long
+sqlrcursor::getColumnPrecision(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnPrecision((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnPrecision(SvPV(ST(1),na));
+		}
+	OUTPUT:
+		RETVAL
+
+unsigned long
+sqlrcursor::getColumnScale(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnScale((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnScale(SvPV(ST(1),na));
+		}
+	OUTPUT:
+		RETVAL
+
+unsigned short
+sqlrcursor::getColumnIsNullable(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnIsNullable((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnIsNullable(SvPV(ST(1),na));
+		}
+	OUTPUT:
+		RETVAL
+
+unsigned short
+sqlrcursor::getColumnIsPrimaryKey(...)
+	CODE:
+		RETVAL=0;
+		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
+			RETVAL=THIS->getColumnIsPrimaryKey((int)SvIV(ST(1)));
+		} else if (SvPOK(ST(1))) {
+			RETVAL=THIS->getColumnIsPrimaryKey(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL

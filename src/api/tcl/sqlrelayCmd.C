@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.3 2003-03-27 04:40:32 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.4 2003-07-22 00:46:26 mused Exp $
  */
 
 #include <strings.h>
@@ -80,6 +80,8 @@ void sqlrcurDelete(ClientData data) {
  *   $cur executeQuery
  *   $cur fetchFromBindCursor
  *   $cur getOutputBind variable
+ *   $cur getOutputBindAsLong variable
+ *   $cur getOutputBindAsDouble variable
  *   $cur getOutputBindLength variable
  *   $cur getOutputBindCursor variable
  *   $cur openCacheResultSet variable
@@ -92,6 +94,10 @@ void sqlrcurDelete(ClientData data) {
  *   $cur errorMessage
  *   $cur getFieldByIndex row col
  *   $cur getFieldByName row col
+ *   $cur getFieldAsLongByIndex row col
+ *   $cur getFieldAsLongByName row col
+ *   $cur getFieldAsDoubleByIndex row col
+ *   $cur getFieldAsDoubleByName row col
  *   $cur getFieldLengthByIndex row col
  *   $cur getFieldLengthByName row col
  *   $cur getRow row
@@ -102,6 +108,14 @@ void sqlrcurDelete(ClientData data) {
  *   $cur getColumnTypeByName col
  *   $cur getColumnLengthByIndex col
  *   $cur getColumnLengthByName col
+ *   $cur getColumnPrecisionByIndex col
+ *   $cur getColumnPrecisionByName col
+ *   $cur getColumnScaleByIndex col
+ *   $cur getColumnScaleByName col
+ *   $cur getColumnIsNullableByIndex col
+ *   $cur getColumnIsNullableByName col
+ *   $cur getColumnIsPrimaryKeyByIndex col
+ *   $cur getColumnIsPrimaryKeyByName col
  *   $cur getLongestByIndex col
  *   $cur getLongestByName col
  *   $cur getResultSetId
@@ -146,6 +160,8 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "executeQuery",
     "fetchFromBindCursor",
     "getOutputBind",
+    "getOutputBindAsLong",
+    "getOutputBindAsDouble",
     "getOutputBindLength",
     "getOutputBindCursor",
     "openCacheResultSet",
@@ -158,6 +174,10 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "errorMessage",
     "getFieldByIndex",
     "getFieldByName",
+    "getFieldAsLongByIndex",
+    "getFieldAsLongByName",
+    "getFieldAsDoubleByIndex",
+    "getFieldAsDoubleByName",
     "getFieldLengthByIndex",
     "getFieldLengthByName",
     "getRow",
@@ -168,6 +188,14 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "getColumnTypeByName",
     "getColumnLengthByIndex",
     "getColumnLengthByName",
+    "getColumnPrecisionByIndex",
+    "getColumnPrecisionByName",
+    "getColumnScaleByIndex",
+    "getColumnScaleByName",
+    "getColumnIsNullableByIndex",
+    "getColumnIsNullableByName",
+    "getColumnIsPrimaryKeyByIndex",
+    "getColumnIsPrimaryKeyByName",
     "getLongestByIndex",
     "getLongestByName",
     "getResultSetId",
@@ -206,6 +234,8 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_executeQuery,
     SQLRCUR_fetchFromBindCursor,
     SQLRCUR_getOutputBind,
+    SQLRCUR_getOutputBindAsLong,
+    SQLRCUR_getOutputBindAsDouble,
     SQLRCUR_getOutputBindLength,
     SQLRCUR_getOutputBindCursor,
     SQLRCUR_openCacheResultSet,
@@ -218,6 +248,10 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_errorMessage,
     SQLRCUR_getFieldByIndex,
     SQLRCUR_getFieldByName,
+    SQLRCUR_getFieldAsLongByIndex,
+    SQLRCUR_getFieldAsLongByName,
+    SQLRCUR_getFieldAsDoubleByIndex,
+    SQLRCUR_getFieldAsDoubleByName,
     SQLRCUR_getFieldLengthByIndex,
     SQLRCUR_getFieldLengthByName,
     SQLRCUR_getRow,
@@ -228,6 +262,14 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_getColumnTypeByName,
     SQLRCUR_getColumnLengthByIndex,
     SQLRCUR_getColumnLengthByName,
+    SQLRCUR_getColumnPrecisionByIndex,
+    SQLRCUR_getColumnPrecisionByName,
+    SQLRCUR_getColumnScaleByIndex,
+    SQLRCUR_getColumnScaleByName,
+    SQLRCUR_getColumnIsNullableByIndex,
+    SQLRCUR_getColumnIsNullableByName,
+    SQLRCUR_getColumnIsPrimaryKeyByIndex,
+    SQLRCUR_getColumnIsPrimaryKeyByName,
     SQLRCUR_getLongestByIndex,
     SQLRCUR_getLongestByName,
     SQLRCUR_getResultSetId,
@@ -725,6 +767,28 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	Tcl_SetObjResult(interp, result);
 	break;
       }
+    case SQLRCUR_getOutputBindAsLong:
+      {
+	Tcl_Obj *result;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
+	  return TCL_ERROR;
+	}
+	result = Tcl_NewLongObj(cur->getOutputBindAsLong(Tcl_GetString(objv[2])));
+	Tcl_SetObjResult(interp, result);
+	break;
+      }
+    case SQLRCUR_getOutputBindAsDouble:
+      {
+	Tcl_Obj *result;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
+	  return TCL_ERROR;
+	}
+	result = Tcl_NewDoubleObj(cur->getOutputBindAsDouble(Tcl_GetString(objv[2])));
+	Tcl_SetObjResult(interp, result);
+	break;
+      }
     case SQLRCUR_getOutputBindLength:
       {
 	Tcl_Obj *result;
@@ -886,6 +950,64 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  field = "";
 	}
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(field, -1));
+	break;
+      }
+    case SQLRCUR_getFieldAsLongByIndex:
+      {
+	int row, col;
+	long field = 0;
+	if (objc != 4) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "row col");
+	  return TCL_ERROR;
+	}
+	if (Tcl_GetIntFromObj(interp, objv[2], &row) != TCL_OK ||
+	    Tcl_GetIntFromObj(interp, objv[3], &col) != TCL_OK) {
+	  return TCL_ERROR;
+	}
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(cur->getFieldAsLong(row, col)));
+	break;
+      }
+    case SQLRCUR_getFieldAsLongByName:
+      {
+	int row;
+	long field = 0;
+	if (objc != 4) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "row col");
+	  return TCL_ERROR;
+	}
+	if (Tcl_GetIntFromObj(interp, objv[2], &row) != TCL_OK) {
+	  return TCL_ERROR;
+	}
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(cur->getFieldAsLong(row, Tcl_GetString(objv[3]))));
+	break;
+      }
+    case SQLRCUR_getFieldAsDoubleByIndex:
+      {
+	int row, col;
+	double field = 0;
+	if (objc != 4) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "row col");
+	  return TCL_ERROR;
+	}
+	if (Tcl_GetIntFromObj(interp, objv[2], &row) != TCL_OK ||
+	    Tcl_GetIntFromObj(interp, objv[3], &col) != TCL_OK) {
+	  return TCL_ERROR;
+	}
+	Tcl_SetObjResult(interp, Tcl_NewDoubleObj(cur->getFieldAsDouble(row, col)));
+	break;
+      }
+    case SQLRCUR_getFieldAsDoubleByName:
+      {
+	int row;
+	long field = 0;
+	if (objc != 4) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "row col");
+	  return TCL_ERROR;
+	}
+	if (Tcl_GetIntFromObj(interp, objv[2], &row) != TCL_OK) {
+	  return TCL_ERROR;
+	}
+	Tcl_SetObjResult(interp, Tcl_NewDoubleObj(cur->getFieldAsDouble(row, Tcl_GetString(objv[3]))));
 	break;
       }
     case SQLRCUR_getFieldLengthByIndex:
@@ -1057,6 +1179,114 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	}
 	len = cur->getColumnLength(Tcl_GetString(objv[2]));
 	Tcl_SetObjResult(interp, Tcl_NewIntObj(len));
+	break;
+      }
+    case SQLRCUR_getColumnPrecisionByIndex:
+      {
+	int col;
+	unsigned long precision;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "col");
+	  return TCL_ERROR;
+	}
+	if (Tcl_GetIntFromObj(interp, objv[2], &col) != TCL_OK) {
+	  return TCL_ERROR;
+	}
+	precision = cur->getColumnPrecision(col);
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(precision));
+	break;
+      }
+    case SQLRCUR_getColumnPrecisionByName:
+      {
+	int col;
+	unsigned long precision;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "col");
+	  return TCL_ERROR;
+	}
+	precision = cur->getColumnPrecision(Tcl_GetString(objv[2]));
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(precision));
+	break;
+      }
+    case SQLRCUR_getColumnScaleByIndex:
+      {
+	int col;
+	unsigned long scale;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "col");
+	  return TCL_ERROR;
+	}
+	if (Tcl_GetIntFromObj(interp, objv[2], &col) != TCL_OK) {
+	  return TCL_ERROR;
+	}
+	scale = cur->getColumnScale(col);
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(scale));
+	break;
+      }
+    case SQLRCUR_getColumnScaleByName:
+      {
+	int col;
+	unsigned long scale;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "col");
+	  return TCL_ERROR;
+	}
+	scale = cur->getColumnScale(Tcl_GetString(objv[2]));
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(scale));
+	break;
+      }
+    case SQLRCUR_getColumnIsNullableByIndex:
+      {
+	int col;
+	unsigned short isnullable;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "col");
+	  return TCL_ERROR;
+	}
+	if (Tcl_GetIntFromObj(interp, objv[2], &col) != TCL_OK) {
+	  return TCL_ERROR;
+	}
+	isnullable = cur->getColumnIsNullable(col);
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(isnullable));
+	break;
+      }
+    case SQLRCUR_getColumnIsNullableByName:
+      {
+	int col;
+	unsigned short isnullable;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "col");
+	  return TCL_ERROR;
+	}
+	isnullable = cur->getColumnIsNullable(Tcl_GetString(objv[2]));
+	Tcl_SetObjResult(interp, Tcl_NewIntObj(isnullable));
+	break;
+      }
+    case SQLRCUR_getColumnIsPrimaryKeyByIndex:
+      {
+	int col;
+	unsigned short isprimarykey;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "col");
+	  return TCL_ERROR;
+	}
+	if (Tcl_GetIntFromObj(interp, objv[2], &col) != TCL_OK) {
+	  return TCL_ERROR;
+	}
+	isprimarykey = cur->getColumnIsPrimaryKey(col);
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(isprimarykey));
+	break;
+      }
+    case SQLRCUR_getColumnIsPrimaryKeyByName:
+      {
+	int col;
+	unsigned short isprimarykey;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "col");
+	  return TCL_ERROR;
+	}
+	isprimarykey = cur->getColumnIsPrimaryKey(Tcl_GetString(objv[2]));
+	Tcl_SetObjResult(interp, Tcl_NewIntObj(isprimarykey));
 	break;
       }
     case SQLRCUR_getLongestByIndex:

@@ -170,6 +170,14 @@ public class SQLRCursor {
 	/** Get the length of the value stored in a
 	 *  previously defined output bind variable.  */
 	public native byte[]	getOutputBindAsByteArray(String variable);
+	/** Get the value stored in a previously
+	 *  defined output bind variable as a long
+	 *  integer. */
+	public native long	getOutputBindAsLong(String variable);
+	/** Get the value stored in a previously
+	 *  defined output bind variable as a double
+	 *  precision floating point number. */
+	public native double	getOutputBindAsDouble(String variable);
 	/** Get the length of the value stored in a
 	 *  previously defined output bind variable.  */
 	public native long	getOutputBindLength(String variable);
@@ -244,10 +252,18 @@ public class SQLRCursor {
 	/** Returns a pointer to the value of the 
 	 *  specified row and column.  */
 	public native String	getField(int row, String col);
-	/** Returns the length of the 
+	/** Returns the specified field as a long integer */
+	public native long	getFieldAsLong(int row, int col);
+	/** Returns the specified field as a long integer */
+	public native long	getFieldAsLong(int row, String col);
+	/** Returns the specified field as a double floating point number */
+	public native double	getFieldAsDouble(int row, int col);
+	/** Returns the specified field as a double floating point number */
+	public native double	getFieldAsDouble(int row, String col);
+	/** Returns a pointer to the value of the 
 	 *  specified row and column.  */
 	public native byte[]	getFieldAsByteArray(int row, int col);
-	/** Returns a pointer to the value of the 
+	/** Returns the length of the 
 	 *  specified row and column.  */
 	public native byte[]	getFieldAsByteArray(int row, String col);
 	/** Returns the length of the 
@@ -271,6 +287,42 @@ public class SQLRCursor {
 	public native String	getColumnType(int col);
 	/** Returns the type of the specified column.  */
 	public native String	getColumnType(String col);
+	/** Returns the precision of the specified
+	 *  column.
+	 *  Precision is the total number of digits in
+	 *  a number.  eg: 123.45 has a precision of 5.
+	 *  For non-numeric types, it's the number of
+	 *  characters in the string. */
+	public native long	getColumnPrecision(int col);
+	/** Returns the precision of the specified
+	 *  column.
+	 *  Precision is the total number of digits in
+	 *  a number.  eg: 123.45 has a precision of 5.
+	 *  For non-numeric types, it's the number of
+	 *  characters in the string. */
+	public native long	getColumnPrecision(String col);
+	/** Returns the scale of the specified column.
+	 *  Scale is the total number of digits to the
+	 *  right of the decimal point in a number.
+	 *  eg: 123.45 has a scale of 2. */
+	public native long	getColumnScale(int col);
+	/** Returns the scale of the specified column.
+	 *  Scale is the total number of digits to the
+	 *  right of the decimal point in a number.
+	 *  eg: 123.45 has a scale of 2. */
+	public native long	getColumnScale(String col);
+	/** Returns true if the specified column can
+	 *  contain nulls and false otherwise. */
+	public native boolean	getColumnIsNullable(int col);
+	/** Returns true if the specified column can
+	 *  contain nulls and false otherwise. */
+	public native boolean	getColumnIsNullable(String col);
+	/** Returns true if the specified column is a
+	 * primary key and false otherwise. */
+	public native boolean	getColumnIsPrimaryKey(int col);
+	/** Returns true if the specified column is a
+	 * primary key and false otherwise. */
+	public native boolean	getColumnIsPrimaryKey(String col);
 	/** Returns the length of the specified column.  */
 	public native int	getColumnLength(int col);
 	/** Returns the length of the specified column.  */
