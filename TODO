@@ -1,3 +1,7 @@
+interbase hang on select??
+sybase hang on create table??
+test interbase/sybase dead database relogin
+
 perl apis -> CPAN
 
 fedora-core-2 isn't set up
@@ -93,6 +97,8 @@ cygwin:
 		add path to mysql dll to PATH
 
 Compatibility:
+	db2 dead-db/relogin doesn't work, query just hangs when db is down
+	implement interbase dead-db/relogin
 	support @,: or ? for fake bind variables
 	rewrite queries with ?'s or @'s for oracle, rewrite
 				queries with ?'s or :'s for

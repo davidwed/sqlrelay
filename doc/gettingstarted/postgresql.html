@@ -97,7 +97,18 @@ is installed, you should run the following commands:</p>
 
 <p>The postgresql and postgresql-clients packages are available from
 <a href="ftp://ftp.netbsd.org">ftp.netbsd.org</a> or on CD's that came with 
-your distribution . You can install them using <i>pkg_add</i>.</p>
+your distribution. You can install it using <i>pkg_add</i>.  Once the package 
+is installed, you should run the following commands:</p>
+
+<blockquote>
+<b>useradd -m postgres</b><br>
+<b>passwd postgres</b> (assign the new user a password)<br>
+<b>mkdir /usr/local/pgsql /usr/local/pgsql/var</b><br>
+<b>chown -R postgres:users /usr/local/pgsql</b><br>
+<b>su postgres</b><br>
+<b>initdb -D /usr/local/pgsql/var</b><br>
+<b>exit</b>
+</blockquote>
 
 <a name="openserver"></a>
 <span class="heading2">SCO OpenServer</span><br>
