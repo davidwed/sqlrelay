@@ -56,7 +56,6 @@ void	listenercomm::announceAvailability(char *tmpdir,
 		#endif
 
 		*((unsigned long *)idmemoryptr)=(unsigned long)getpid();
-printf("connectionpid=%d\n",getpid());
 	} else {
 
 		#ifdef SERVER_DEBUG

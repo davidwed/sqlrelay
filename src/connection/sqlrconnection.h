@@ -99,10 +99,10 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 			// methods used internally
 			void	setUserAndGroup();
 			void	createCursorArray();
-			int	initCursors();
+			int	initCursors(int create);
 			int	getCursor();
 			int	findAvailableCursor();
-			void	closeCursors();
+			void	closeCursors(int destroy);
 			void	setUnixSocketDirectory();
 			int	handlePidFile();
 			void	initSharedMemoryAndSemaphoreFileName();

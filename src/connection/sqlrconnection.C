@@ -176,7 +176,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 
 	setInitialAutoCommitBehavior();
 
-	if (!initCursors()) {
+	if (!initCursors(1)) {
 		return 0;
 	}
 
@@ -245,7 +245,7 @@ void	sqlrconnection::createCursorArray() {
 	}
 }
 
-int	sqlrconnection::initCursors() {
+int	sqlrconnection::initCursors(int create) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"initializing cursors...");
@@ -257,7 +257,9 @@ int	sqlrconnection::initCursors() {
 		debugPrint("connection",1,(long)i);
 		#endif
 
-		cur[i]=initCursor();
+		if (create) {
+			cur[i]=initCursor();
+		}
 		if (!cur[i]->openCursor(i)) {
 
 			#ifdef SERVER_DEBUG
@@ -334,7 +336,7 @@ int	sqlrconnection::findAvailableCursor() {
 	return -1;
 }
 
-void	sqlrconnection::closeCursors() {
+void	sqlrconnection::closeCursors(int destroy) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"closing cursors...");
@@ -349,10 +351,14 @@ void	sqlrconnection::closeCursors() {
 
 			if (cur[i]) {
 				cur[i]->closeCursor();
-				deleteCursor(cur[i]);
+				if (destroy) {
+					deleteCursor(cur[i]);
+				}
 			}
 		}
-		delete[] cur;
+		if (destroy) {
+			delete[] cur;
+		}
 	}
 
 	#ifdef SERVER_DEBUG
@@ -591,7 +597,7 @@ void	sqlrconnection::closeConnection() {
 	}
 
 	// close the cursors
-	closeCursors();
+	closeCursors(1);
 
 
 	// try to log out
@@ -1088,11 +1094,11 @@ int	sqlrconnection::changeUser(const char *newuser,
 	debugPrint("connection",2,"change user");
 	#endif
 
-	closeCursors();
+	closeCursors(1);
 	logOut();
 	setUser(newuser);
 	setPassword(newpassword);
-	return (initCursors() && logIn());
+	return (initCursors(1) && logIn());
 }
 
 void	sqlrconnection::suspendSessionCommand() {
@@ -1677,7 +1683,7 @@ void	sqlrconnection::reLogIn() {
 	#endif
 
 	// attempt to log in over and over, once every 5 seconds
-	closeCursors();
+	closeCursors(0);
 	logOut();
 	for (;;) {
 			
@@ -1686,8 +1692,8 @@ void	sqlrconnection::reLogIn() {
 		#endif
 
 		if (logIn()) {
-			if (!initCursors()) {
-				closeCursors();
+			if (!initCursors(0)) {
+				closeCursors(0);
 				logOut();
 			} else {
 				break;
