@@ -155,7 +155,7 @@ char		*gtkfe::clisttext[1][1];
 #endif
 
 gtkfe::gtkfe() {
-	conffile=NULL;
+	conffile=(configfile *)NULL;
 }
 
 gtkfe::~gtkfe() {
@@ -526,7 +526,7 @@ void	gtkfe::buildInstancePage() {
 
 	dbasecombo=gtk_combo_new();
 	gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(dbasecombo)->entry),FALSE);
-	dblist=NULL;
+	dblist=(GList *)NULL;
 	int	index=0;
 	while (databaselist[index]) {
 		dblist=g_list_append(dblist,databaselist[index]);
@@ -610,7 +610,7 @@ void	gtkfe::buildInstancePage() {
 	authtiercombo=gtk_combo_new();
 	gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(authtiercombo)->entry),
 				FALSE);
-	authlist=NULL;
+	authlist=(GList *)NULL;
 	authlist=g_list_append(authlist,(void *)"none");
 	authlist=g_list_append(authlist,(void *)"listener");
 	authlist=g_list_append(authlist,(void *)"connection");
@@ -626,7 +626,7 @@ void	gtkfe::buildInstancePage() {
 	handoffcombo=gtk_combo_new();
 	gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(handoffcombo)->entry),
 				FALSE);
-	handofflist=NULL;
+	handofflist=(GList *)NULL;
 	handofflist=g_list_append(handofflist,(void *)"reconnect");
 	handofflist=g_list_append(handofflist,(void *)"pass");
 	gtk_combo_set_popdown_strings(GTK_COMBO(handoffcombo),handofflist);
@@ -650,7 +650,7 @@ void	gtkfe::buildInstancePage() {
 
 	debugcombo=gtk_combo_new();
 	gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(debugcombo)->entry),FALSE);
-	debuglist=NULL;
+	debuglist=(GList *)NULL;
 	debuglist=g_list_append(debuglist,(void *)"none");
 	debuglist=g_list_append(debuglist,(void *)"listener only");
 	debuglist=g_list_append(debuglist,(void *)"connections only");
@@ -1196,7 +1196,7 @@ void	gtkfe::closeFile(GtkWidget *widget, gpointer data) {
 	// close the conffile
 	if (conffile) {
 		delete conffile;
-		conffile=NULL;
+		conffile=(configfile *)NULL;
 	}
 
 	// clear the entries and lists
@@ -1256,7 +1256,7 @@ void	gtkfe::quit(GtkWidget *widget, gpointer data) {
 	// clean up
 	if (conffile) {
 		delete conffile;
-		conffile=NULL;
+		conffile=(configfile *)NULL;
 	}
 
 	// quit
@@ -1506,18 +1506,18 @@ void	gtkfe::clearAllInstanceData() {
 
 	// clear all instance-related data
 	clearInstanceParameters();
-	currentinstance=NULL;
+	currentinstance=(instance *)NULL;
 	currentinstanceindex=-2;
 
 	// clear all connection-related data
 	clearConnectionParameters();
-	currentconnection=NULL;
+	currentconnection=(connection *)NULL;
 	currentconnectionindex=-2;
 	gtk_clist_clear(GTK_CLIST(connectionlist));
 
 	// clear all user-related data
 	clearUserParameters();
-	currentuser=NULL;
+	currentuser=(user *)NULL;
 	currentuserindex=-2;
 	gtk_clist_clear(GTK_CLIST(userlist));
 
@@ -1584,7 +1584,7 @@ void	gtkfe::clearAllConnectionData() {
 
 	// clear all connection-related data
 	clearConnectionParameters();
-	currentconnection=NULL;
+	currentconnection=(connection *)NULL;
 	currentconnectionindex=-2;
 
 	// desensitize the interface
@@ -1641,7 +1641,7 @@ void	gtkfe::clearAllUserData() {
 
 	// clear all user-related data
 	clearUserParameters();
-	currentuser=NULL;
+	currentuser=(user *)NULL;
 	currentuserindex=-2;
 
 	// desensitize the interface
