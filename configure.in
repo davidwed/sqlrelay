@@ -306,7 +306,6 @@ echo "******************************"
 dnl Checks for libraries.
 echo
 echo "***** Libraries **************"
-FW_CHECK_RUDIMENTS
 
 PRELIBS=$LIBS
 LIBS="-lhistory -ltermcap"
@@ -341,6 +340,13 @@ AC_SUBST(SSLLIB)
 AC_CHECK_LIB(crypto,CRYPTO_add_lock,CRYPTOLIB=-lcrypto,CRYPTOLIB="")
 AC_SUBST(CRYPTOLIB)
 
+echo "******************************"
+
+
+dnl Checks for Rudiments.
+echo
+echo "***** Rudiments **************"
+FW_CHECK_RUDIMENTS
 echo "******************************"
 
 

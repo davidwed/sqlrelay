@@ -82,25 +82,37 @@ LIBPATH=""
 STATIC=""
 
 FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+if ( test -z "$LIBSTRING" )
+then
+	FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+fi
+if ( test -z "$LIBSTRING" )
+then
+	FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+fi
+if ( test -z "$LIBSTRING" )
+then
+	FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+fi
 
 if ( test -z "$LIBSTRING" )
 then
 
-	for i in "$SEARCHPATH" "/usr/local/firstworks" "/usr/local/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw"
+	for i in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$i" ); then
 			FW_CHECK_HEADER_LIB([$i/include/$HEADER],[INCLUDESTRING=\"-I$i\"],[$i/lib/lib$LIBNAME.so],[LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\"],[$i/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			if ( test -z "$LIBSTRING" )
 			then
-				FW_CHECK_HEADER_LIB([$i/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$i/$NAME\"],[$i/lib/lib$LIBNAME.so],[LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\"],[$i/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([$i/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$i/include/$NAME\"],[$i/lib/lib$LIBNAME.so],[LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\"],[$i/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
 			if ( test -z "$LIBSTRING" )
 			then
-				FW_CHECK_HEADER_LIB([$i/include/$HEADER],[INCLUDESTRING=\"-I$i\"],[$i/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"],[$i/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([$i/include/$HEADER],[INCLUDESTRING=\"-I$i\"],[$i/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"],[$i/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
 			if ( test -z "$LIBSTRING" )
 			then
-				FW_CHECK_HEADER_LIB([$i/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$i/$NAME\"],[$i/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"],[$i/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([$i/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$i/include/$NAME\"],[$i/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"],[$i/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
@@ -334,19 +346,9 @@ if ( test "$cross_compiling" = "no" )
 then
 	if ( test -z "$MICROSOFT" )
 	then
-		for i in "$RUDIMENTSPATH" "/usr/local/firstworks" "/usr/local" "/usr/pkg" "/opt/sfw"
-		do
-			if ( test -n "$i" )
-			then
-				FW_CHECK_HEADER_LIB([$i/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\"],[$i/lib/librudiments.so],[RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\"],[$i/lib/librudiments.a],[RUDIMENTSLIBSPATH=\"$i/lib\"; RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\"])
-				if ( test -n "$RUDIMENTSLIBS" )
-				then
-					break;
-				fi
-			fi
-		done
 
-		FW_CHECK_HEADER_LIB([/usr/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"\"; RUDIMENTSPATH=\"/usr\"],[/usr/lib/librudiments.so],[RUDIMENTSLIBS=\"-lrudiments\"; RUDIMENTSDEBUGLIBS=\"-lrudiments_p\"],[/usr/lib/librudiments.a],[RUDIMENTSLIBSPATH=\"\"; RUDIMENTSLIBS=\"-lrudiments\"; RUDIMENTSDEBUGLIBS=\"-lrudiments_p\"])
+		FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[daemonprocess.h],[rudiments],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC])
+
 	else
 		for i in "$RUDIMENTSPATH" "/usr/local/firstworks"
 		do
@@ -553,36 +555,9 @@ then
 	
 	if ( test -z "$MICROSOFT" )
 	then
-		if ( test -n "$MYSQLPATH" )
-		then
-			AC_CHECK_FILE($MYSQLPATH/include/mysql/mysql.h,MYSQLINCLUDES="-I$MYSQLPATH/include/mysql")
-			AC_CHECK_FILE($MYSQLPATH/include/mysql.h,MYSQLINCLUDES="-I$MYSQLPATH/include")
-			AC_CHECK_FILE($MYSQLPATH/lib/mysql/libmysqlclient.a,MYSQLLIBS="-L$MYSQLPATH/lib/mysql -lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
-			AC_CHECK_FILE($MYSQLPATH/lib/mysql/libmysqlclient.so,MYSQLLIBSPATH="$MYSQLPATH/lib/mysql"; MYSQLLIBS="-L$MYSQLPATH/lib/mysql -lmysqlclient")
-			AC_CHECK_FILE($MYSQLPATH/lib/libmysqlclient.a,MYSQLLIBS="-L$MYSQLPATH/lib -lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
-			AC_CHECK_FILE($MYSQLPATH/lib/libmysqlclient.so,MYSQLLIBSPATH="$MYSQLPATH/lib"; MYSQLLIBS="-L$MYSQLPATH/lib -lmysqlclient")
-		else
-			for i in "/usr/include/mysql" "/usr/include" "/usr/local/mysql/include/mysql" "/usr/local/mysql/include" "/usr/local/include/mysql" "/usr/pkg/include/mysql" "/usr/pkg/include" "/opt/sfw/include"
-			do
-				AC_CHECK_FILE($i/mysql.h,MYSQLINCLUDES="-I$i")
-				if ( test -n "$MYSQLINCLUDES" )
-				then
-					break
-				fi
-			done
-	
-			for i in "/usr/lib/mysql" "/usr/local/mysql/lib/mysql" "/usr/local/mysql/lib" "/usr/local/lib/mysql" "/usr/pkg/lib/mysql" "/usr/pkg/lib" "/opt/sfw/lib"
-			do
-				AC_CHECK_FILE($i/libmysqlclient.a,MYSQLLIBS="-L$i -lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
-				AC_CHECK_FILE($i/libmysqlclient.so,MYSQLLIBSPATH="$i"; MYSQLLIBS="-L$i -lmysqlclient")
-				if ( test -n "$MYSQLLIBS" )
-				then
-					break
-				fi
-			done
-			AC_CHECK_FILE(/usr/lib/libmysqlclient.a,MYSQLLIBS="-lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
-			AC_CHECK_FILE(/usr/lib/libmysqlclient.so,MYSQLLIBSPATH=""; MYSQLLIBS="-lmysqlclient")
-		fi
+
+		FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mysql],[mysql.h],[mysqlclient],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC])
+
 	else
 		if ( test -n "$MYSQLPATH" )
 		then
@@ -683,43 +658,22 @@ AC_DEFUN([FW_CHECK_POSTGRESQL],
 if ( test "$ENABLE_POSTGRESQL" = "yes" )
 then
 
-	POSTGRESQLINCLUDES=""
-	POSTGRESQLLIBS=""
-	POSTGRESQLSTATIC=""
-	POSTGRESQLLIBPATH=""
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
 	then
 		STATICFLAG="-static"
 	fi
-	
-	if ( test -n "$POSTGRESQLPATH" )
+
+	FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[pgsql],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBPATH],[POSTGRESQLSTATIC])
+
+	if ( test -z "$POSTGRESQLLIBS" )
 	then
-		AC_CHECK_FILE($POSTGRESQLPATH/include/libpq-fe.h,POSTGRESQLINCLUDES="-I$POSTGRESQLPATH/include")
-		AC_CHECK_FILE($POSTGRESQLPATH/lib/libpq.a,POSTGRESQLLIBS="-L$POSTGRESQLPATH/lib -lpq"; POSTGRESQLSTATIC="$STATICFLAG")
-		AC_CHECK_FILE($POSTGRESQLPATH/lib/libpq.so,POSTGRESQLLIBPATH="$POSTGRESQLPATH/lib"; POSTGRESQLLIBS="-L$POSTGRESQLPATH/lib -lpq")
-	else
-		for i in "/usr/include" "/usr/local/pgsql/include" "/usr/local/include" "/usr/local/include/pgsql" "/usr/pkg/include" "/usr/pkg/include/pgsql" "/usr/pkg/pgsql/include" "/usr/include/pgsql" "/usr/local/postgresql/include" "/usr/local/include/postgresql" "/usr/pkg/postgresql/include" "/usr/pkg/include/postgresql" "/usr/include/postgresql" "/opt/sfw/include"
-		do
-			AC_CHECK_FILE($i/libpq-fe.h,POSTGRESQLINCLUDES="-I$i")
-			if ( test -n "$POSTGRESQLINCLUDES" )
-			then
-				break
-			fi
-		done
-	
-		for i in "/usr/local/pgsql/lib" "/usr/local/lib" "/usr/local/lib/pgsql" "/usr/pkg/lib" "/usr/pkg/lib/pgsql" "/usr/pkg/pgsql/lib" "/usr/lib/pgsql" "/usr/local/postgresql/lib" "/usr/local/lib/postgresql" "/usr/pkg/postgresql/lib" "/usr/pkg/lib/postgresql" "/usr/lib/postgresql"  "/opt/sfw/lib"
-		do
-			AC_CHECK_FILE($i/libpq.a,POSTGRESQLLIBS="-L$i -lpq"; POSTGRESQLSTATIC="$STATICFLAG")
-			AC_CHECK_FILE($i/libpq.so,POSTGRESQLLIBPATH="$i"; POSTGRESQLLIBS="-L$i -lpq")
-			if ( test -n "$POSTGRESQLLIBS" )
-			then
-				break
-			fi
-		done
-	
-		AC_CHECK_FILE(/usr/lib/libpq.a,POSTGRESQLLIBS="-lpq"; POSTGRESQLSTATIC="$STATICFLAG")
-		AC_CHECK_FILE(/usr/lib/libpq.so,POSTGRESQLLIBPATH=""; POSTGRESQLLIBS="-lpq")
+		FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[postgresql],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBPATH],[POSTGRESQLSTATIC])
+	fi
+
+	if ( test -z "$POSTGRESQLLIBS" )
+	then
+		FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[postgres],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBPATH],[POSTGRESQLSTATIC])
 	fi
 	
 	LINKFAIL=""
@@ -1010,11 +964,7 @@ AC_DEFUN([FW_CHECK_ODBC],
 if ( test "$ENABLE_ODBC" = "yes" )
 then
 
-	ODBCINCLUDES=""
-	ODBCLIBS=""
 	ODBCSTATIC=""
-	IODBCSTATIC=""
-	UNIXODBCSTATIC=""
 	ODBCLIBPATH=""
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
@@ -1023,41 +973,23 @@ then
 	fi
 	HAVE_IODBC=""
 	HAVE_UNIXODBC=""
-	
-	dnl headers
-	for i in "$ODBCPATH" "/usr/local" "/usr/local/unixodbc" "/usr/local/iodbc" "/usr/local" "/usr/pkg" "/opt/sfw"
-	do
-		if ( test -n "$i" )
-		then
-			FW_CHECK_HEADER_LIB([$i/include/sql.h],[ODBCINCLUDES=\"-I$ODBCPATH/include\"],[$i/lib/libiodbc.a],[ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[$i/lib/libiodbc.so],[ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"])
-			FW_CHECK_HEADER_LIB([$i/include/sql.h],[ODBCINCLUDES=\"-I$i/include\"],[$i/lib/libodbc.a],[ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\"],[$i/lib/libodbc.so],[ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"])
-			if ( test -z "$ODBCLIBS" )
-			then
-				FW_CHECK_HEADER_LIB([$i/include/iodbc/sql.h],[ODBCINCLUDES=\"-I$ODBCPATH/include/iodbc\"],[$i/lib/libiodbc.a],[ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[$i/lib/libiodbc.so],[ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"])
-				FW_CHECK_HEADER_LIB([$i/include/unixodbc/sql.h],[ODBCINCLUDES=\"-I$i/include/unixodbc\"],[$i/lib/libodbc.a],[ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\"],[$i/lib/libodbc.so],[ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"])
-			fi
-			if ( test -z "$ODBCLIBS" )
-			then
-				FW_CHECK_HEADER_LIB([$i/include/sql.h],[ODBCINCLUDES=\"-I$ODBCPATH/include\"],[$i/lib/iodbc/libiodbc.a],[ODBCLIBS=\"-L$i/iodbc/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[$i/lib/iodbc/libiodbc.so],[ODBCLIBPATH=\"$i/lib/iodbc\"; ODBCLIBS=\"-L$i/lib/iodbc -liodbc\"; HAVE_IODBC=\"yes\"])
-				FW_CHECK_HEADER_LIB([$i/include/sql.h],[ODBCINCLUDES=\"-I$i/include\"],[$i/lib/unixodbc/libodbc.a],[ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\"],[$i/lib/unixodbc/libodbc.so],[ODBCLIBPATH=\"$i/lib/unixodbc\"; ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"])
-			fi
-			if ( test -z "$ODBCLIBS" )
-			then
-				FW_CHECK_HEADER_LIB([$i/include/iodbc/sql.h],[ODBCINCLUDES=\"-I$ODBCPATH/include/iodbc\"],[$i/lib/iodbc/libiodbc.a],[ODBCLIBS=\"-L$i/iodbc/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[$i/lib/iodbc/libiodbc.so],[ODBCLIBPATH=\"$i/lib/iodbc\"; ODBCLIBS=\"-L$i/lib/iodbc -liodbc\"; HAVE_IODBC=\"yes\"])
-				FW_CHECK_HEADER_LIB([$i/include/unixodbc/sql.h],[ODBCINCLUDES=\"-I$i/include/unixodbc\"],[$i/lib/unixodbc/libodbc.a],[ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\"],[$i/lib/unixodbc/libodbc.so],[ODBCLIBPATH=\"$i/lib/unixodbc\"; ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"])
-			fi
-			if ( test -n "$ODBCLIBS" )
-			then
-				break
-			fi
-		fi
-	done
 
-	FW_CHECK_HEADER_LIB([/usr/include/sql.h],[ODBCINCLUDES=\"\"],[/usr/lib/libiodbc.a],[ODBCLIBS=\"-liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[/usr/lib/libiodbc.so],[ODBCLIBPATH=\"\"; ODBCLIBS=\"-liodbc\"; HAVE_IODBC=\"yes\"])
-	FW_CHECK_HEADER_LIB([/usr/include/sql.h],[ODBCINCLUDES=\"\"],[/usr/lib/libodbc.a],[ODBCLIBS=\"-lodbc\"; HAVE_ODBC=\"yes\"; ODBCSTATIC=\"$STATICFLAG\"],[/usr/lib/libodbc.so],[ODBCLIBPATH=\"\"; ODBCLIBS=\"-lodbc\"; HAVE_ODBC=\"yes\"])
+	FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[ODBCINCLUDES],[ODBCLIBS],[ODBCLIBPATH],[UNIXODBCSTATIC])
+
+	if ( test -n "$ODBCLIBS" )
+	then
+		HAVE_UNIXODBC="yes"
+	else
+		FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[iodbc],[sql.h],[iodbc],[$STATICFLAG],[$RPATHFLAG],[ODBCINCLUDES],[ODBCLIBS],[ODBCLIBPATH],[IODBCSTATIC])
+		if ( test -n "$ODBCLIBS" )
+		then
+			HAVE_IODBC="yes"
+		fi
+	fi
 	
 	AC_SUBST(ODBCINCLUDES)
 	AC_SUBST(ODBCLIBS)
+
 	if ( test -n "`echo $ODBCLIBS | grep iodbc`" )
 	then
 		ODBCSTATIC="$IODBCSTATIC"
@@ -1078,7 +1010,7 @@ then
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES,$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADSLIB"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADSLIB"])
 	fi
 	if ( test -n "$HAVE_IODBC" )
 	then
@@ -1087,7 +1019,7 @@ then
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES, $ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADSLIB"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS=\"$ODBCLIBS $PTHREADSLIB\"])
 	fi
 	if ( test -z "$ODBCLIBS" )
 	then
@@ -1116,26 +1048,18 @@ then
 	
 	if ( test -n "$DB2PATH" )
 	then
-		AC_CHECK_FILE($DB2PATH/include/sql.h,DB2INCLUDES="-I$DB2PATH/include")
-		AC_CHECK_FILE($DB2PATH/lib/libdb2.a,DB2LIBS="-L$DB2PATH/lib -ldb2"; DB2STATIC="$STATICFLAG")
-		AC_CHECK_FILE($DB2PATH/lib/libdb2.so,DB2LIBSPATH="$DB2PATH/lib"; DB2LIBS="-L$DB2PATH/lib -ldb2")
+		FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/libdb2.so],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"-L$DB2PATH/lib -ldb2\"],[$DB2PATH/lib/libdb2.a],[DB2LIBS=\"-L$DB2PATH/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
 	
 	else
 	
 		dnl check /opt for 7.2
-		AC_CHECK_FILE(/opt/IBMdb2/V7.1/include/sql.h,DB2INCLUDES="-I/opt/IBMdb2/V7.1/include")
-		AC_CHECK_FILE(/opt/IBMdb2/V7.1/lib/libdb2.a,DB2LIBS="-L/opt/IBMdb2/V7.1/lib -ldb2"; DB2STATIC="$STATICFLAG")
-		AC_CHECK_FILE(/opt/IBMdb2/V7.1/lib/libdb2.so,DB2LIBSPATH="/opt/IBMdb2/V7.1/lib"; DB2LIBS="-L/opt/IBMdb2/V7.1/lib -ldb2")
+		FW_CHECK_HEADER_LIB([/opt/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBMdb2/V7.1/include\"],[/opt/IBMdb2/V7.1/lib/libdb2.so],[DB2LIBSPATH=\"/opt/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"],[/opt/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
 	
 		dnl check /usr for 7.2
-		AC_CHECK_FILE(/usr/IBMdb2/V7.1/include/sql.h,DB2INCLUDES="-I/usr/IBMdb2/V7.1/include")
-		AC_CHECK_FILE(/usr/IBMdb2/V7.1/lib/libdb2.a,DB2LIBS="-L/usr/IBMdb2/V7.1/lib -ldb2"; DB2STATIC="$STATICFLAG")
-		AC_CHECK_FILE(/usr/IBMdb2/V7.1/lib/libdb2.so,DB2LIBSPATH="/usr/IBMdb2/V7.1/lib"; DB2LIBS="-L/usr/IBMdb2/V7.1/lib -ldb2")
+		FW_CHECK_HEADER_LIB([/usr/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/usr/IBMdb2/V7.1/include\"],[/usr/IBMdb2/V7.1/lib/libdb2.so],[DB2LIBSPATH=\"/usr/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"],[/usr/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
 	
 		dnl check /opt for 8.1
-		AC_CHECK_FILE(/opt/IBM/db2/V8.1/include/sql.h,DB2INCLUDES="-I/opt/IBM/db2/V8.1/include"; DB2VERSION="8")
-		AC_CHECK_FILE(/opt/IBM/db2/V8.1/lib/libdb2.a,DB2LIBS="-L/opt/IBM/db2/V8.1/lib -ldb2"; DB2STATIC="$STATICFLAG"; DB2VERSION="8")
-		AC_CHECK_FILE(/opt/IBM/db2/V8.1/lib/libdb2.so,DB2LIBSPATH="/opt/IBM/db2/V8.1/lib"; DB2LIBS="-L/opt/IBM/db2/V8.1/lib -ldb2"; DB2VERSION="8")
+		FW_CHECK_HEADER_LIB([/opt/IBM/db2/V8.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V8.1/include\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.so],[DB2LIBSPATH=\"/opt/IBM/db2/V8.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"8\"])
 	fi
 	
 	if ( test -n "$RPATHFLAG" -a -n "$DB2LIBSPATH" )
@@ -1174,16 +1098,12 @@ then
 	
 	if ( test -n "$INTERBASEPATH" )
 	then
-		AC_CHECK_FILE($INTERBASEPATH/include/ibase.h,INTERBASEINCLUDES="-I$INTERBASEPATH/include")
-		AC_CHECK_FILE($INTERBASEPATH/lib/libgds.a,INTERBASELIBS="-L$INTERBASEPATH/lib -lgds -lcrypt"; INTERBASESTATIC="$STATICFLAG")
-		AC_CHECK_FILE($INTERBASEPATH/lib/libgds.so,INTERBASELIBSPATH="$INTERBASPATH/lib"; INTERBASELIBS="-L$INTERBASEPATH/lib -lgds -lcrypt")
+		FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/lib/libgds.so],[INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"],[$INTERBASEPATH/lib/libgds.a],[INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 	
 	else
 	
 		dnl includes
-		AC_CHECK_FILE(/usr/include/ibase.h,INTERBASEINCLUDES="")
-		AC_CHECK_FILE(/usr/lib/libgds.a,INTERBASELIBS="-lgds -lcrypt"; INTERBASESTATIC="$STATICFLAG")
-		AC_CHECK_FILE(/usr/lib/libgds.so,INTERBASELIBS="-lgds -lcrypt")
+		FW_CHECK_HEADER_LIB([/usr/include/ibase.h],[INTERBASEINCLUDES=\"\"],[/usr/lib/libgds.so],[INTERBASELIBS=\"-lgds -lcrypt\"],[/usr/lib/libgds.a],[INTERBASELIBS=\"-lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 	fi
 	
 	LINKFAIL=""
