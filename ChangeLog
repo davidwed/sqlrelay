@@ -81,6 +81,12 @@
 		now
 	builds tgz's for Slackware now
 	supports freetds-0.61
+	connection daemon drops temporary tables when a client session is ended
+		for postgresql and mysql
+	libtool is used to make php, python modules now
+	applied Vladimir Kouznetsov's PHP api patches to fix null behaviour
+	perl, php api builds are quieter now
+	remove unnecessary -pedantic from CXXFLAGS
 
 0.32 -	affectedRows and totalRows were returning 0 instead of -1 for databases
 		that don't know that value, now they return -1

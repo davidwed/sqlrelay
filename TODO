@@ -1,18 +1,36 @@
-looks like if metric=1, scaling doesn't work
 scaling/handoff=pass incompatibility
-investigate single-process listener, setting os-level backlog queue length
-	looks like max is 128 on linux 2.0
-	tcp_max_syn_backlog can set backlog length in linux 2.2
-	syn cookies - no max backlog
-	solaris: /usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
+	setting backlog:
+		linux:
+			looks like max is 128 on linux 2.0
+			2.2/2.4 - /proc/sys/net/ipv4/tcp_max_syn_backlog
+				Default is 1024 for systems with more than 128Mb
+				of memory, and 128 for low memory machines.
+				If you make it greater than 1024, change
+				TCP_SYNQ_HSIZE in include/net/tcp.h to keep
+				TCP_SYNQ_HSIZE*16<=tcp_max_syn_backlog
+				and recompile kernel.
+			syn cookies - no max backlog
+		solaris:
+			/usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
+
 postgresql test program compile fails on SCO _res defined in libsocket/libresolv
-postgresql temp table problem
+
+handle temp tables properly:
+	oracle 8i: "create global temporary table ...
+				[on commit preserve rows] (session specific)
+				[on commit delete rows] (transaction specific)"
+			temporary tables are not dropped when the session ends
+			session tables are truncated when sessions end
+			transacation tables are truncated on commit/rollback
+	sybase: not dropped when session is over
+			unless the name begins with a # sign
+		are they truncated???
+	interbase: ???
+
+document checkForTempTable()
 
 compatibility:
 	oracle 9.2
-	sybase 12.5
-	interbase 6.5
-	interbase 7
 	perl 5.8
 
 lots of documentation fixes:

@@ -94,6 +94,8 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	startSendingLong();
 		void	sendLongSegment(const char *data, unsigned long size);
 		void	endSendingLong();
+		void	addSessionTempTable(const char *tablename);
+		void	addTransactionTempTable(const char *tablename);
 
 	private:
 		// methods used internally
@@ -140,6 +142,10 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	resumeResultSet();
 		void	suspendSession();
 		void	endSession();
+		void	dropTempTables(stringlist *tablelist);
+		void	dropTempTable(const char *tablename);
+		void	truncateTempTables(stringlist *tablelist);
+		void	truncateTempTable(const char *tablename);
 		int	getCommand(unsigned short *command);
 		void	noAvailableCursors();
 		int	getQuery();
@@ -224,13 +230,16 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		unixserversocket	*serversockun;
 		datatransport		*clientsock;
 
+		memorypool	*bindpool;
+
 		sqlrcursor	**cur;
 		short		currentcur;
 
-		memorypool	*bindpool;
+		stringlist	sessiontemptables;
+		stringlist	transtemptables;
 
-#ifdef SERVER_DEBUG
 	protected:
+#ifdef SERVER_DEBUG
 		stringbuffer	*debugstr;
 #endif
 };

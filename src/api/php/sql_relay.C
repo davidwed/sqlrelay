@@ -644,7 +644,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbind) {
 	convert_to_string_ex(variable);
 	r=((sqlrcursor *)(*sqlrcur)->value.lval)->getOutputBind((*variable)->value.str.val);
 	if (!r) {
-		RETURN_FALSE;
+		RETURN_NULL();
 	}
 	RETURN_STRING(r,1);
 }
@@ -771,7 +771,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_errormessage) {
 	convert_to_long_ex(sqlrcur);
 	r=((sqlrcursor *)(*sqlrcur)->value.lval)->errorMessage();
 	if (!r) {
-		RETURN_FALSE;
+		RETURN_NULL();
 	}
 	RETURN_STRING(r,1);
 }
@@ -786,7 +786,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getnullsasemptystrings) {
 	((sqlrcursor *)(*sqlrcur)->value.lval)->getNullsAsEmptyStrings();
 }
 
-DLEXPORT ZEND_FUNCTION(sqlrcur_getnullsasundefined) {
+DLEXPORT ZEND_FUNCTION(sqlrcur_getnullsasnulls) {
 	zval **sqlrcur;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
@@ -813,7 +813,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getField((*row)->value.lval,(*col)->value.str.val);
 	}
 	if (!r) {
-		RETURN_FALSE;
+		RETURN_NULL();
 	}
 	RETURN_STRING(r,1);
 }
@@ -855,7 +855,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 		RETURN_FALSE;
 	}
 	for (i=0; i<((sqlrcursor *)(*sqlrcur)->value.lval)->colCount(); i++) {
-		add_next_index_string(return_value,r[i],1);
+		if (!r[i]) {
+			add_next_index_null(return_value);
+		} else {
+			add_next_index_string(return_value,r[i],1);
+		}
 	}
 }
 
@@ -884,7 +888,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 		RETURN_FALSE;
 	}
 	for (i=0; i<((sqlrcursor *)(*sqlrcur)->value.lval)->colCount(); i++) {
-		add_assoc_string(return_value,rC[i],r[i],1);
+		if (!r[i]) {
+			add_assoc_null(return_value,rC[i]);
+		} else {
+			add_assoc_string(return_value,rC[i],r[i],1);
+		}
 	}
 }
 
@@ -1215,7 +1223,7 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcur_endofresultset,NULL)
 	ZEND_FE(sqlrcur_errormessage,NULL)
 	ZEND_FE(sqlrcur_getnullsasemptystrings,NULL)
-	ZEND_FE(sqlrcur_getnullsasundefined,NULL)
+	ZEND_FE(sqlrcur_getnullsasnulls,NULL)
 	ZEND_FE(sqlrcur_getfield,NULL)
 	ZEND_FE(sqlrcur_getfieldlength,NULL)
 	ZEND_FE(sqlrcur_getrow,NULL)

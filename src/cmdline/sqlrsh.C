@@ -22,7 +22,7 @@
 
 
 #ifdef HAVE_READLINE
-	#include <rudiments/text.h>
+	#include <rudiments/string.h>
 	// This is an interesting story...
 	// readline 2's include files don't list any parameters for any of
 	// the functions.  This is fine for C, but not C++, at least not with
@@ -583,7 +583,7 @@ void	sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				prmpt.append("> ");
 				char	*cmd=readline(prmpt.getString());
 				if (cmd[0]) {
-					text::rightTrim(cmd);
+					string::rightTrim(cmd);
 					add_history(cmd);
 				}
 				int	len=strlen(cmd);

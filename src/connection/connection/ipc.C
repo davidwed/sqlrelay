@@ -45,8 +45,7 @@ int	ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 	sprintf(idfilename,"%s/%s",tmpdir,id);
 
 	#ifdef SERVER_DEBUG
-	dl->write("connection",0,
-				"attaching to shared memory and semaphores");
+	dl->write("connection",0,"attaching to shared memory and semaphores");
 	dl->write("connection",0,"id filename: ");
 	dl->write("connection",0,idfilename);
 	#endif
@@ -71,7 +70,7 @@ int	ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 	dl->write("connection",1,"attaching to semaphores...");
 	#endif
 	semset=new semaphoreset();
-	if (!semset->attach(ftok(idfilename,0),10)) {
+	if (!semset->attach(ftok(idfilename,0),11)) {
 		fprintf(stderr,"Couldn't attach to semaphore set: ");
 		fprintf(stderr,"%s\n",strerror(errno));
 		delete semset;

@@ -1,44 +1,29 @@
-top_builddir = ../../../..
-include $(top_builddir)/config.mk
+include ../../../../config.mk
 
 all: makefile
+	cp perlincludes1.h perlincludes.h; \
+	$(MAKE) 2> errors1; \
 	if ( test ! -r blib/arch/auto/Firstworks/SQLRConnection/SQLRConnection.so ); then \
-		cp perlincludes1.h perlincludes.h; \
-		$(MAKE) 2> errors1; \
+		cp perlincludes2.h perlincludes.h; \
+		$(MAKE) 2> errors2; \
 		if ( test ! -r blib/arch/auto/Firstworks/SQLRConnection/SQLRConnection.so ); then \
-			echo; \
-			echo; \
-			echo "	Hmm, looks like that didn't work."; \
-			echo "	Let's try something different..."; \
-			echo; \
-			echo; \
-			cp perlincludes2.h perlincludes.h; \
-			$(MAKE) 2> errors2; \
-			if ( test ! -r blib/arch/auto/Firstworks/SQLRConnection/SQLRConnection.so ); then \
-				echo; \
-				echo; \
-				echo "	Looks like that didn't work either."; \
-				echo "	Let's try one more time..."; \
-				echo; \
-				echo; \
-				cp perlincludes3.h perlincludes.h; \
-				$(MAKE) 2> errors3; \
-				if ( test ! -r blib/arch/auto/Firstworks/SQLRConnection/SQLRConnection.so ); then \
-					echo "first try errors : "; \
-					cat errors1; \
-					echo; \
-					echo "second try errors : "; \
-					cat errors2; \
-					echo; \
-					echo "third try errors : "; \
-					cat errors3; \
-					echo; \
-				fi \
-			fi \
+			cp perlincludes3.h perlincludes.h; \
+			$(MAKE) 2> errors3; \
 		fi \
-	fi; \
-	$(RM) errors1; \
-	$(RM) errors2; \
+	fi
+	if ( test ! -r blib/arch/auto/Firstworks/SQLRConnection/SQLRConnection.so ); then \
+		if ( test -s errors1 ); then \
+			echo "first try errors : "; cat errors1; echo; \
+		fi; \
+		if ( test -s errors2 ); then \
+			echo "second try errors : "; cat errors2; echo; \
+		fi; \
+		if ( test -s errors3 ); then \
+			echo "third try errors : "; cat errors3; echo; \
+		fi; \
+	fi
+	$(RM) errors1
+	$(RM) errors2
 	$(RM) errors3
 
 clean: makefile

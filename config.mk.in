@@ -42,19 +42,13 @@ DEBUGLDFLAGS = $(LDFLAGS)
 STATICLINK = @STATICLINK@
 
 # debug and optimization flags (-g, -O2, etc.)
-CXXFLAGS = -pedantic @CXXFLAGS@
-CFLAGS = -pedantic @CFLAGS@
+CXXFLAGS = @CXXFLAGS@
+CFLAGS = @CFLAGS@
 DEBUGCXXFLAGS = $(CXXFLAGS) @DEBUGCXXFLAGS@ -DSERVER_DEBUG
 DEBUGCFLAGS = $(CFLAGS) @DEBUGCFLAGS@ -DSERVER_DEBUG
 
 # libtool command
 LIBTOOL = @LIBTOOL@
-
-# command to build a shared object library
-DYNAMICAR = @DYNAMICAR@
-
-# command to build a static library
-STATICAR = ar cr
 
 # commands to erase files and directories
 RM = rm -f
@@ -62,9 +56,6 @@ RMTREE = rm -rf
 
 # command to create a symbolic link
 SYMLINK = ln -s
-
-# command to create a blank file
-TOUCH = touch
 
 # ps command
 PSDEFINE = -DPS=\"@PS@\"

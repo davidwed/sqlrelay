@@ -93,6 +93,8 @@ class sqlrcursor {
 		virtual	void	returnOutputBindBlob(int index);
 		virtual	void	returnOutputBindClob(int index);
 		virtual	void	returnOutputBindCursor(int index);
+		virtual void	checkForTempTable(const char *query,
+							unsigned long length);
 		virtual	int	executeQuery(const char *query, long length,
 						unsigned short execute)=0;
 		virtual	int	queryIsNotSelect();
@@ -110,6 +112,11 @@ class sqlrcursor {
 	public:
 		// methods/variables used by derived classes
 		stringbuffer	*fakeInputBinds(const char *query);
+
+		int	skipComment(char **ptr, const char *endptr);
+		int	skipWhitespace(char **ptr, const char *endptr);
+		int	advance(char **ptr, const char *endptr,
+						unsigned short steps);
 
 		sqlrconnection	*conn;
 

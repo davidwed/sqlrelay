@@ -158,6 +158,8 @@ mysqlcursor::mysqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 int	mysqlcursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
 
+	checkForTempTable(query,length);
+
 	// initialize counts
 	ncols=0;
 	nrows=0;

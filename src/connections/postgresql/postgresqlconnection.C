@@ -147,6 +147,8 @@ postgresqlcursor::postgresqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 int	postgresqlcursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
 
+	checkForTempTable(query,length);
+
 	// initialize the counts
 	ncols=0;
 	nrows=0;

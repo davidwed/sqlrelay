@@ -3,23 +3,39 @@ include ../../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) $(PYTHONLIBS) $(PYTHONOBJ) $(SSLLIB) $(CRYPTOLIB) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PYTHONLIBS) $(SSLLIB) $(CRYPTOLIB) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = CSQLRelay.C
-OBJS = CSQLRelay.o
+LOBJS = CSQLRelay.lo python.lo
+
+.SUFFIXES: .lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: CSQLRelay.so
 
 clean:
-	$(RM) *.o *~ *.so
+	$(LIBTOOL) --mode=clean $(RM) *.la
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o	
+	$(LIBTOOL) --mode=clean $(RM) CSQLRelay.so
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+python.lo:
+	cp $(PYTHONOBJ) $@
 
-CSQLRelay.so: $(SRCS) $(OBJS)
-	$(DYNAMICAR) $@ $(OBJS) $(LIBS)
+CSQLRelay.so: libCSQLRelay.la
+	for i in `find .libs -name "libCSQLRelay*so*"`; \
+	do \
+		cp -L $$i CSQLRelay.so; \
+	done
+	$(LIBTOOL) --mode=clean $(RM) *.la
+
+libCSQLRelay.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(PYTHONDIR)/site-packages/SQLRelay

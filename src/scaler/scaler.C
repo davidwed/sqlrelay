@@ -153,7 +153,7 @@ int	scaler::initScaler(int argc, const char **argv) {
 
 	// connect to the semaphore set
 	semset=new semaphoreset();
-	semset->attach(key,10);
+	semset->attach(key,11);
 
 	// connect to the shared memory segment
 	idmemory=new sharedmemory();

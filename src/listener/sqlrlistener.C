@@ -294,11 +294,11 @@ int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",1,"creating semaphores...");
 	#endif
-	int	vals[10]={1,1,0,0,1,1,0,0,0,1};
+	int	vals[11]={1,1,0,0,1,1,0,0,0,1,0};
 	semset=new semaphoreset();
-	if (!semset->create(key,permissions::ownerReadWrite(),10,vals)) {
+	if (!semset->create(key,permissions::ownerReadWrite(),11,vals)) {
 
-		semset->attach(key,10);
+		semset->attach(key,11);
 		semError(id,semset->getId());
 		delete[] idfilename;
 		delete idmemory;
@@ -653,13 +653,38 @@ void	sqlrlistener::handleClientConnection(int fd) {
 			return;
 		}
 
-		forkChild();
-		return;
-
 	} else if (fd==clientsockun->getFileDescriptor()) {
 		clientsock=clientsockun->acceptClientConnection();
-		forkChild();
+	} else {
 		return;
+	}
+
+	// The logic here is that if there are no other forked, busy listeners
+	// and there are available connections, then we don't need to fork a
+	// child, otherwise we do.
+	//
+	// It's entirely possible that a connection will become available
+	// immediately after this call to getValue(2), but in that case, the
+	// worst thing that happens is that we forked a child.  While less
+	// efficient, it is safe to do.
+	//
+	// It is not possible that a connection will immediately become
+	// UNavailable after this call to getValue(2).  For that to happen,
+	// there would need to be another sqlr-listener out there.  In that
+	// case getValue(10) would return something greater than 0 and we would
+	// have forked anyway.
+	if (semset->getValue(10) || !semset->getValue(2)) {
+
+		// increment the number of "forked, busy listeners"
+		semset->signal(10);
+
+		forkChild();
+	} else {
+
+		// increment the number of "forked, busy listeners"
+		semset->signal(10);
+
+		clientSession();
 	}
 }
 
@@ -951,10 +976,10 @@ void	sqlrlistener::getAConnection() {
 	debugPrint("listener",0,"getting a connection...");
 	#endif
 
-	// wait on the read mutex
+	// wait for exclusive access to the shared memory among listeners
 	semset->wait(1);
 
-	// wait on a writer
+	// wait for an available connection
 	semset->wait(2);
 
 	// get a pointer to the shared memory segment
@@ -1004,11 +1029,14 @@ void	sqlrlistener::getAConnection() {
 
 	}
 
-	// done reading
+	// tell the connection that we've gotten it's data
 	semset->signal(3);
 
-	// signal on the read mutex
+	// allow other listeners access to the shared memory
 	semset->signal(1);
+
+	// decerment the number of "forked, busy listeners"
+	semset->wait(10);
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",1,"done getting a connection");

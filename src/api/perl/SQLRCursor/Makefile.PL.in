@@ -4,18 +4,13 @@ require Config;
 $Verbose = 1;
 
 WriteMakefile(
-	#'PREFIX'	=> "@prefix@",
 	'NAME'		=> "Firstworks::SQLRCursor",
 	'VERSION_FROM'	=> "SQLRCursor.pm",
 	'CC'		=> "@CXX@",
-	'CCFLAGS'	=> "-pedantic -w -O2 -fPIC",
 	'INC'		=> "-I../../../.. -I../../../common -I../../c++/include @RUDIMENTSINCLUDES@",
-	'LIBS'		=> ["-L../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @SOCKETLIB@ @LIBDMALLOC@"],
+	'LIBS'		=> ["-L../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @SOCKETLIB@ @LIBDMALLOC@ @LIBEFENCE@"],
 	'XSPROTOARG'	=> "-noprototypes",
-	#'LD'		=> "@PERLLD@",
 	'LD'		=> "@CXX@",
-	#'LDDLFLAGS'	=> "@PERLLDFLAGS@",
-	#'OBJECT'	=> '$(O_FILES)',
 	'TYPEMAPS'	=> ["perlobject.map"],
 	'realclean'	=> {'FILES' => 'perl'},
 	'XSOPT'		=> '-C++',

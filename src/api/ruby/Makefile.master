@@ -1,36 +1,27 @@
-top_srcdir = ../../..
-include $(top_srcdir)/config.mk
+include ../../../config.mk
 
 all: makefile
+	cp rubyincludes1.h rubyincludes.h; \
+	$(MAKE) 2> errors1; \
 	if ( test ! -r sqlrelay.o ); then \
-		cp rubyincludes1.h rubyincludes.h; \
-		$(MAKE) 2> errors1; \
-		if ( test ! -r sqlrelay.o ); then \
-			echo; \
-			echo; \
-			echo "	Hmm, looks like that didn't work."; \
-			echo "	Let's try something different..."; \
-			echo; \
-			echo; \
-			cp rubyincludes2.h rubyincludes.h; \
-			$(MAKE) 2> errors2; \
-			if ( test ! -r sqlrelay.o ); then \
-				echo "first try errors : "; \
-				cat errors1; \
-				echo; \
-				echo "second try errors : "; \
-				cat errors2; \
-				echo; \
-			fi \
-		fi \
-	fi; \
+		cp rubyincludes2.h rubyincludes.h; \
+		$(MAKE) 2> errors2; \
+	fi
+	if ( test ! -r sqlrelay.o ); then \
+		if ( test -s errors1 ); then \
+			echo "first try errors : "; cat errors1; echo; \
+		fi; \
+		if ( test -s errors2 ); then \
+			echo "second try errors : "; cat errors2; echo; \
+		fi; \
+	fi
 	$(RM) errors1 errors2 mkmf.log
 			
 
 makefile:
 	if ( test ! -r "Makefile" ); then \
-		$(RUBY) extconf.rb --with-sqlrclient-dir=$(top_srcdir)/src/api/c++ --with-rudiments-dir=$(RUDIMENTSPATH); \
-		sed -e "s/ gcc/ $(CXX)/g" -e "s/ cc/ $(CXX)/g" -e "s| ruby| $(RUBY)|g" -e "s/^CPPFLAGS = /CPPFLAGS = -I\.\.\/c++\/include /g" -e "s/-lsqlrclient/-L\.\.\/c++\/lib -lsqlrclient/g" Makefile > Makefile.new; \
+		$(RUBY) extconf.rb --with-rudiments-dir=$(RUDIMENTSPATH); \
+		sed -e "s/ gcc/ $(CXX)/g" -e "s/ cc/ $(CXX)/g" -e "s| ruby| $(RUBY)|g" -e "s/^CPPFLAGS = /CPPFLAGS = -I\.\.\/c++\/include /g" -e "s/-lsqlrclient/-L\.\.\/c++\/src\/\.libs -lsqlrclient/g" Makefile > Makefile.new; \
 		mv Makefile.new Makefile; \
 	fi
 

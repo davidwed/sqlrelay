@@ -7,6 +7,7 @@
 #define NUM_CONNECT_STRING_VARS 8
 
 #include <sqlrconnection.h>
+#include <rudiments/list.h>
 
 #include <libpq-fe.h>
 
@@ -53,6 +54,9 @@ class postgresqlconnection : public sqlrconnection {
 		int	rollback();
 		int	ping();
 		char	*identify();
+
+		void	endSession();
+		void	dropTable(const char *table);
 
 		int	datatypecount;
 		long	*datatypeids;

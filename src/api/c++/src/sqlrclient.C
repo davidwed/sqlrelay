@@ -6,7 +6,7 @@
 #include <datatypes.h>
 #include <defines.h>
 #include <sqlrelay/sqlrclient.h>
-#include <rudiments/text.h>
+#include <rudiments/string.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/permissions.h>
 
@@ -2418,9 +2418,9 @@ int	sqlrcursor::parseColumnInfo() {
 
 			// upper/lowercase column name if necessary
 			if (colcase==UPPER_CASE) {
-				text::upper(currentcol->name);
+				string::upper(currentcol->name);
 			} else if (colcase==LOWER_CASE) {
-				text::lower(currentcol->name);
+				string::lower(currentcol->name);
 			}
 
 			if (columntypeformat==COLUMN_TYPE_IDS) {
@@ -3196,10 +3196,8 @@ int	sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	}
 
 	// open the file
-	int	queryfile=open(fullpath,O_RDONLY);
-
-	// handle a file we couldn't open
-	if (queryfile==-1) {
+	file	queryfile;
+	if (!queryfile.open(fullpath,O_RDONLY)) {
 
 		// set the error
 		char	*err=new char[32+strlen(fullpath)];
@@ -3224,26 +3222,19 @@ int	sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	initQueryBuffer();
 
 	// read the file into the query buffer
-	index=0;
-	for (;;) {
-		if (index==MAXQUERYSIZE) {
-			sqlrc->debugPreStart();
-			sqlrc->debugPrint("The query in ");
-			sqlrc->debugPrint(fullpath);
-			sqlrc->debugPrint(" is too large.");
-			sqlrc->debugPrint("\n");
-			sqlrc->debugPreEnd();
-			break;
-		}
-		read(queryfile,(void *)&querybuffer[index],sizeof(char));
-		if (querybuffer[index]<=0) {
-			break;
-		}
-		index++;
+	querylen=queryfile.getSize();
+	if (querylen<MAXQUERYSIZE) {
+		queryfile.read((unsigned char *)querybuffer,querylen);
+		querybuffer[querylen]=(char)NULL;
+	} else {
+		sqlrc->debugPreStart();
+		sqlrc->debugPrint("The query in ");
+		sqlrc->debugPrint(fullpath);
+		sqlrc->debugPrint(" is too large.\n");
+		sqlrc->debugPreEnd();
 	}
-	querybuffer[index]=0;
 
-	close(queryfile);
+	queryfile.close();
 
 	return 1;
 }

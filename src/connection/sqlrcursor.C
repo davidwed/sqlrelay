@@ -37,6 +37,98 @@ int	sqlrcursor::prepareQuery(const char *query, long querylength) {
 	return 1;
 }
 
+void	sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
+
+	char	*ptr=(char *)query;
+	char	*endptr=(char *)query+length;
+
+	// skip any leading comments
+	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
+		!skipWhitespace(&ptr,endptr)) {
+		return;
+	}
+
+	// look for "create [local|global] temporary"
+	if (!strncasecmp(ptr,"create",6)) {
+		if (!advance(&ptr,endptr,6) ||
+					!skipWhitespace(&ptr,endptr)) {
+			return;
+		}
+		if (!strncasecmp(ptr,"local",5)) {
+			if (!advance(&ptr,endptr,5) ||
+					!skipWhitespace(&ptr,endptr)) {
+				return;
+			}
+		} else if (!strncasecmp(ptr,"global",6)) {
+			if (!advance(&ptr,endptr,6) ||
+					!skipWhitespace(&ptr,endptr)) {
+				return;
+			}
+		}
+		if (!strncasecmp(ptr,"temporary",9)) {
+			if (!advance(&ptr,endptr,9) ||
+					!skipWhitespace(&ptr,endptr)) {
+				return;
+			}
+		} else if (!strncasecmp(ptr,"temp",4)) {
+			if (!advance(&ptr,endptr,4) ||
+					!skipWhitespace(&ptr,endptr)) {
+				return;
+			}
+		} else {
+			// not a temp table
+			return;
+		}
+	} else {
+		// not a temp table
+		return;
+	}
+
+	// check for the word table
+	if (!skipWhitespace(&ptr,endptr) || strncasecmp(ptr,"table",5)) {
+		return;
+	}
+
+	// skip any whitespace before the table name
+	if (!advance(&ptr,endptr,5) || !skipWhitespace(&ptr,endptr)) {
+		return;
+	}
+
+	// get the table name
+	stringbuffer	tablename;
+	while (*ptr!=' ' && *ptr!='\n' && *ptr!='	' && ptr<endptr) {
+		tablename.append(*ptr);
+		ptr++;
+	}
+
+	// append to list of temp tables
+	conn->addSessionTempTable(tablename.getString());
+}
+
+int	sqlrcursor::skipComment(char **ptr, const char *endptr) {
+	while (*ptr<endptr && !strncmp(*ptr,"--",2)) {
+		while (**ptr && **ptr!='\n') {
+			(*ptr)++;
+		}
+	}
+	return *ptr!=endptr;
+}
+
+int	sqlrcursor::skipWhitespace(char **ptr, const char *endptr) {
+	while ((**ptr==' ' || **ptr=='\n' || **ptr=='	') && *ptr<endptr) {
+		(*ptr)++;
+	}
+	return *ptr!=endptr;
+}
+
+int	sqlrcursor::advance(char **ptr, const char *endptr,
+						unsigned short steps) {
+	for (unsigned short i=0; i<steps && *ptr<endptr; i++) {
+		(*ptr)++;
+	}
+	return *ptr!=endptr;
+}
+
 int	sqlrcursor::handleBinds() {
 	
 	// iterate through the arrays, binding values to variables

@@ -1,5 +1,4 @@
-top_builddir = ../../../..
-include $(top_builddir)/config.mk
+include ../../../../config.mk
 
 
 all: makefile

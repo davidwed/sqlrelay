@@ -359,66 +359,6 @@ AC_CHECK_INLINE
 echo "******************************"
 
 
-dnl Checks for libstdc++.
-echo
-echo "***** C++ Libraries **********"
-
-LIBSTDCPPSO=""
-for i in $STDCPPPATH
-do
-	CHECKLIB=$i/libstdc++*.so*
-	for j in `ls $CHECKLIB 2> /dev/null`
-	do
-		if (test -n $j); then
-			LIBSTDCPPSO=-l`echo $j | sed -e "s|$i/lib||" | sed -e "s|\.so.*||"`
-		fi
-	done
-
-	CHECKLIB=$i/libstdc++-2*.so*
-	for j in `ls $CHECKLIB 2> /dev/null`
-	do
-		if (test -n $j); then
-			LIBSTDCPPSO=-l`echo $j | sed -e "s|$i/lib||" | sed -e "s|\.so.*||"`
-		fi
-	done
-
-	CHECKLIB=$i/libstdc++-3*.so*
-	for j in `ls $CHECKLIB 2> /dev/null`
-	do
-		if (test -n $j); then
-			LIBSTDCPPSO=-l`echo $j | sed -e "s|$i/lib||" | sed -e "s|\.so.*||"`
-		fi
-	done
-done
-
-LIBSTDCPPA=`$CXX --print-file-name=libstdc++.a`
-
-AC_MSG_CHECKING(for libstdc++)
-if (test -n "$LIBSTDCPPSO" -o "$LIBSTDCPPA" != "libstdc++.a")
-then
-	if (test -n "$LIBSTDCPPSO"); then
-		AC_MSG_RESULT($LIBSTDCPPSO)
-		LIBSTDCPP="$LIBSTDCPPSO -lc"
-		DYNAMICAR="ld $SHAREDFLAG -o"
-		PERLLD="ld"
-		PERLLDFLAGS="$SHAREDFLAG"
-	else
-		AC_MSG_RESULT($LIBSTDCPPA)
-		LIBSTDCPP=""
-		DYNAMICAR="$CXX -Wl,$SHAREDFLAG -o"
-		PERLLD="$CXX"
-		PERLLDFLAGS="-Wl,$SHAREDFLAG"
-	fi
-	AC_SUBST(DYNAMICAR)
-	AC_SUBST(PERLLD)
-	AC_SUBST(PERLLDFLAGS)
-else
-	AC_MSG_RESULT(no)
-	AC_MSG_ERROR("libstdc++ not found.  SQL-Relay requires this library.")
-fi
-echo "******************************"
-
-
 dnl Checks for thread library.
 echo
 echo "***** threads ****************"
