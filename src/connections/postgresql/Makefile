@@ -23,16 +23,16 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(POSTGRESQLINCLUDES) -c $<
 
 postgresqlconnection_debug.o: postgresqlconnection.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(POSTGRESQLINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(POSTGRESQLINCLUDES) -c $< -o $@
 
 main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(POSTGRESQLINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(POSTGRESQLINCLUDES) -c $< -o $@
 
 sqlr-connection-postgresql: postgresqlconnection.o main.C main.o 
 	$(CXX) $(POSTGRESQLSTATIC) $(LDFLAGS) -o $@ postgresqlconnection.o main.o $(POSTGRESQLLIBS) -L../../connection -lsqlrconnection $(LIBS)
 
 sqlr-connection-postgresql-debug: postgresqlconnection_debug.o main.C main_debug.o 
-	$(CXX) $(POSTGRESQLSTATIC) $(LDFLAGS) -o $@ postgresqlconnection_debug.o main_debug.o $(POSTGRESQLLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+	$(CXX) $(POSTGRESQLSTATIC) $(DEBUGLDFLAGS) -o $@ postgresqlconnection_debug.o main_debug.o $(POSTGRESQLLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
 
 install:
 	$(top_srcdir)/mkinstalldirs $(bindir)

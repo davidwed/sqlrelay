@@ -6,7 +6,7 @@
 
 extern "C" {
 
-extern isNumberTypeChar(char *type);
+extern int isNumberTypeChar(char *type);
 
 static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
   sqlrconnection *sqlrcon;
@@ -424,23 +424,31 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
 
 static PyObject *inputBindBlob(PyObject *self, PyObject *args) {
   char *variable;
-  char *value;
+  PyObject *value;
   long size;
   long sqlrcur;
-  if (!PyArg_ParseTuple(args, "lsil", &sqlrcur, &variable, &value, &size))
+  if (!PyArg_ParseTuple(args, "lsOl", &sqlrcur, &variable, &value, &size))
     return NULL;
-  ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, value, size);
+  if (value==Py_None) {
+    ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, NULL, size);
+  } else if (PyString_Check(value)) {
+    ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, PyString_AsString(value), size);
+  }
   return Py_BuildValue("i", 0);
 }
 
 static PyObject *inputBindClob(PyObject *self, PyObject *args) {
   char *variable;
-  char *value;
+  PyObject *value;
   long size;
   long sqlrcur;
-  if (!PyArg_ParseTuple(args, "lsil", &sqlrcur, &variable, &value, &size))
+  if (!PyArg_ParseTuple(args, "lsOl", &sqlrcur, &variable, &value, &size))
     return NULL;
-  ((sqlrcursor *)sqlrcur)->inputBindClob(variable, value, size);
+  if (value==Py_None) {
+    ((sqlrcursor *)sqlrcur)->inputBindClob(variable, NULL, size);
+  } else if (PyString_Check(value)) {
+    ((sqlrcursor *)sqlrcur)->inputBindClob(variable, PyString_AsString(value), size);
+  }
   return Py_BuildValue("i", 0);
 }
 
@@ -562,7 +570,7 @@ static PyObject *getOutputBindCursor(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getOutputBindCursor(variable);
-  return Py_BuildValue("l", sqlrcur);
+  return Py_BuildValue("l", rc);
 }
 
 static PyObject *openCachedResultSet(PyObject *self, PyObject *args) {

@@ -184,7 +184,7 @@ int	sqlrsh::getCommandFromFile(int file, stringbuffer *cmdbuffer) {
 	while (1) {
 
 		// get a character from the file
-		read(file,(void *)character,sizeof(char));
+		read(file,(void *)&character,sizeof(char));
 
 		// look for end of file
 		if (character==-1) {
@@ -193,9 +193,9 @@ int	sqlrsh::getCommandFromFile(int file, stringbuffer *cmdbuffer) {
 
 		// look for an escape character
 		if (character=='\\') {
-			read(file,(void *)character,sizeof(char));
+			read(file,(void *)&character,sizeof(char));
 			cmdbuffer->append(character);
-			read(file,(void *)character,sizeof(char));
+			read(file,(void *)&character,sizeof(char));
 		}
 
 		// look for an end of command delimiter

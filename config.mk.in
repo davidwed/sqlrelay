@@ -30,13 +30,14 @@ BASECPPFLAGS = @CPPFLAGS@ -DTMP_DIR=\"$(tmpdir)\" -DDEBUG_DIR=\"$(debugdir)\" -D
 
 # link flags (-s, -static, -melf, -belf, etc.)
 LDFLAGS = @LDFLAGS@
+DEBUGLDFLAGS = @DEBUGLDFLAGS@
 STATICLINK = @STATICLINK@
 
 # debug and optimization flags (-g, -O2, etc.)
-CXXFLAGS = -pedantic -w @CXXFLAGS@
-CFLAGS = -pedantic -w @CFLAGS@
-DEBUGCXXFLAGS = -pedantic -w @DEBUGCXXFLAGS@
-DEBUGCFLAGS = -pedantic -w @DEBUGCFLAGS@
+CXXFLAGS = -pedantic @CXXFLAGS@
+CFLAGS = -pedantic @CFLAGS@
+DEBUGCXXFLAGS = -pedantic @DEBUGCXXFLAGS@
+DEBUGCFLAGS = -pedantic @DEBUGCFLAGS@
 
 # libtool command
 LIBTOOL = @LIBTOOL@

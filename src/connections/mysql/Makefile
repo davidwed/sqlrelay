@@ -23,16 +23,16 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(MYSQLINCLUDES) -c $<
 
 mysqlconnection_debug.o: mysqlconnection.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(MYSQLINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(MYSQLINCLUDES) -c $< -o $@
 
 main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(MYSQLINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(MYSQLINCLUDES) -c $< -o $@
 
 sqlr-connection-mysql: mysqlconnection.C mysqlconnection.o main.C main.o 
 	$(CXX) $(MYSQLSTATIC) $(LDFLAGS) -o $@ mysqlconnection.o main.o $(MYSQLLIBS) -L../../connection -lsqlrconnection $(LIBS)
 
 sqlr-connection-mysql-debug: mysqlconnection.C mysqlconnection_debug.o main.C main_debug.o 
-	$(CXX) $(MYSQLSTATIC) $(LDFLAGS) -o $@ mysqlconnection_debug.o main_debug.o $(MYSQLLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+	$(CXX) $(MYSQLSTATIC) $(DEBUGLDFLAGS) -o $@ mysqlconnection_debug.o main_debug.o $(MYSQLLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
 
 install:
 	$(top_srcdir)/mkinstalldirs $(bindir)

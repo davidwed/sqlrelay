@@ -58,8 +58,6 @@ $con=Firstworks::SQLRConnection->new($ARGV[0],$ARGV[1],
 				$ARGV[2],$ARGV[3],$ARGV[4],0,1);
 $cur=Firstworks::SQLRCursor->new($con);
 
-for (;;) {
-
 # get database type
 print("IDENTIFY: \n");
 checkSuccessString($con->identify(),"oracle8");
@@ -851,6 +849,3 @@ checkSuccess($cur->sendQuery("create table testtable"),0);
 checkSuccess($cur->sendQuery("create table testtable"),0);
 checkSuccess($cur->sendQuery("create table testtable"),0);
 print("\n");
-
-
-}

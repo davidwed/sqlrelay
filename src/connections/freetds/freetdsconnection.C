@@ -316,13 +316,14 @@ int	freetdscursor::openCursor(int id) {
 	int	retval=1;
 	if (freetdsconn->db && freetdsconn->db[0]) {
 		int	len=strlen(freetdsconn->db)+4;
-		char	query[len+1];
+		char	*query=new char[len+1];
 		sprintf(query,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len,1))) {
 			int	live;
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=0;
 		}
+		delete[] query;
 		cleanUpData();
 	}
 	return retval;

@@ -18,13 +18,14 @@ class ipc {
 		void	setDebugLogger(logger *dl);
 		#endif
 
-		int	createSharedMemoryAndSemaphores(char *tmpdir, char *id);
+		int		createSharedMemoryAndSemaphores(char *tmpdir,
+								char *id);
 
-		void	acquireAnnounceMutex();
-		void	*getAnnounceBuffer();
-		void	signalListenerToRead();
-		void	waitForListenerToFinishReading();
-		void	releaseAnnounceMutex();
+		void		acquireAnnounceMutex();
+		unsigned char	*getAnnounceBuffer();
+		void		signalListenerToRead();
+		void		waitForListenerToFinishReading();
+		void		releaseAnnounceMutex();
 
 		void		acquireConnectionCountMutex();
 		unsigned int	*getConnectionCountBuffer();

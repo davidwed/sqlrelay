@@ -73,6 +73,12 @@ void	debugfile::debugPrint(const char *name, int tabs, long number) {
 	delete[] header;
 }
 
+void	debugfile::debugPrint(const char *name, int tabs, double number) {
+	char	*header=debuglogger->logHeader(name);
+	debuglogger->write(header,tabs,number);
+	delete[] header;
+}
+
 void	debugfile::debugPrintBlob(const char *blob, unsigned long length) {
 
 	// write printable characters from the blob, for all other characters,

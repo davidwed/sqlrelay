@@ -226,6 +226,7 @@ int	sqlitecursor::noRowsToReturn() {
 
 int	sqlitecursor::skipRow() {
 	rowindex=rowindex+ncolumn;
+	return 1;
 }
 
 int	sqlitecursor::fetchRow() {

@@ -1219,6 +1219,7 @@ int	sqlrconnection::reExecuteQueryCommand() {
 			endSession();
 			return 0;
 		}
+		return 1;
 
 	} else if (querystatus==-1) {
 		return 1;
@@ -1245,6 +1246,7 @@ int	sqlrconnection::fetchFromBindCursorCommand() {
 			endSession();
 			return 0;
 		}
+		return 1;
 
 	} else if (querystatus==-1) {
 		return 1;
@@ -1783,7 +1785,7 @@ int	sqlrconnection::getQuery() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"querylength:");
-	debugPrint("connection",4,cur[currentcur]->querylength);
+	debugPrint("connection",4,(long)cur[currentcur]->querylength);
 	debugPrint("connection",3,"query:");
 	debugPrint("connection",0,cur[currentcur]->querybuffer);
 	debugPrint("connection",2,"getting query succeeded");
@@ -1912,10 +1914,8 @@ int	sqlrconnection::getOutputBinds() {
 void	sqlrconnection::returnOutputBindValues() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"returning output bind values");
-	debugPrint("connection",3,
-					cur[currentcur]->outbindcount);
+	debugPrint("connection",2,"returning output bind values");
+	debugPrint("connection",3,(long)cur[currentcur]->outbindcount);
 	#endif
 
 	// run through the output bind values, sending them back
@@ -2098,9 +2098,9 @@ int	sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
 	// bounds checking
 	if (bv->valuesize>maxsize) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",
-			2,"getting binds failed: bad value length");
-		debugPrint("connection",3,bv->valuesize);
+		debugPrint("connection",2,
+				"getting binds failed: bad value length");
+		debugPrint("connection",3,(long)bv->valuesize);
 		#endif
 		return 0;
 	}
@@ -2214,8 +2214,7 @@ int	sqlrconnection::getDoubleBind(bindvar *bv) {
 	}
 
 	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,
-					bv->value.doubleval.value);
+		debugPrint("connection",4,bv->value.doubleval.value);
 	#endif
 
 	return 1;

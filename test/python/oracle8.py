@@ -633,37 +633,37 @@ def main():
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	print
 	rows=cur.getRowRange(0,5)
-	checkSuccess(rows[0][0],1);
+	checkSuccess(rows[0][0],1)
 	checkSuccess(rows[0][1],"testchar1                               ")
 	checkSuccess(rows[0][2],"testvarchar1")
 	checkSuccess(rows[0][3],"01-JAN-01")
 	checkSuccess(rows[0][4],"testlong1")
 	print
-	checkSuccess(rows[1][0],2);
+	checkSuccess(rows[1][0],2)
 	checkSuccess(rows[1][1],"testchar2                               ")
 	checkSuccess(rows[1][2],"testvarchar2")
 	checkSuccess(rows[1][3],"01-JAN-02")
 	checkSuccess(rows[1][4],"testlong2")
 	print
-	checkSuccess(rows[2][0],3);
+	checkSuccess(rows[2][0],3)
 	checkSuccess(rows[2][1],"testchar3                               ")
 	checkSuccess(rows[2][2],"testvarchar3")
 	checkSuccess(rows[2][3],"01-JAN-03")
 	checkSuccess(rows[2][4],"testlong3")
 	print
-	checkSuccess(rows[3][0],4);
+	checkSuccess(rows[3][0],4)
 	checkSuccess(rows[3][1],"testchar4                               ")
 	checkSuccess(rows[3][2],"testvarchar4")
 	checkSuccess(rows[3][3],"01-JAN-04")
 	checkSuccess(rows[3][4],"testlong4")
 	print
-	checkSuccess(rows[4][0],5);
+	checkSuccess(rows[4][0],5)
 	checkSuccess(rows[4][1],"testchar5                               ")
 	checkSuccess(rows[4][2],"testvarchar5")
 	checkSuccess(rows[4][3],"01-JAN-05")
 	checkSuccess(rows[4][4],"testlong5")
 	print
-	checkSuccess(rows[5][0],6);
+	checkSuccess(rows[5][0],6)
 	checkSuccess(rows[5][1],"testchar6                               ")
 	checkSuccess(rows[5][2],"testvarchar6")
 	checkSuccess(rows[5][3],"01-JAN-06")
@@ -671,82 +671,80 @@ def main():
 	print
 
 
-	print "CLOB AND BLOB OUTPUT BIND: \n");
-	cur.sendQuery("drop table testtable1");
-	checkSuccess(cur.sendQuery("create table testtable1 (testclob clob, testblob blob)"),1);
-	cur.prepareQuery("insert into testtable1 values ('hello',:var1)");
-	cur.inputBindBlob("var1","hello",5);
-	checkSuccess(cur.executeQuery(),1);
-	cur.prepareQuery("begin select testclob into :clobvar from testtable1;  select testblob into :blobvar from testtable1; end;");
-	cur.defineOutputBindClob("clobvar");
-	cur.defineOutputBindBlob("blobvar");
-	checkSuccess(cur.executeQuery(),1);
-	clobvar=cur.getOutputBind("clobvar");
-	clobvarlength=cur.getOutputBindLength("clobvar");
-	blobvar=cur.getOutputBind("blobvar");
-	blobvarlength=cur.getOutputBindLength("blobvar");
-	checkSuccess(clobvar,"hello",5);
-	checkSuccess(clobvarlength,5);
-	checkSuccess(blobvar,"hello",5);
-	checkSuccess(blobvarlength,5);
-	cur.sendQuery("drop table testtable1");
+	print "CLOB AND BLOB OUTPUT BIND: "
+	cur.sendQuery("drop table testtable1")
+	checkSuccess(cur.sendQuery("create table testtable1 (testclob clob, testblob blob)"),1)
+	cur.prepareQuery("insert into testtable1 values ('hello',:var1)")
+	cur.inputBindBlob("var1","hello",5)
+	checkSuccess(cur.executeQuery(),1)
+	cur.prepareQuery("begin select testclob into :clobvar from testtable1;  select testblob into :blobvar from testtable1; end;")
+	cur.defineOutputBindClob("clobvar")
+	cur.defineOutputBindBlob("blobvar")
+	checkSuccess(cur.executeQuery(),1)
+	clobvar=cur.getOutputBind("clobvar")
+	clobvarlength=cur.getOutputBindLength("clobvar")
+	blobvar=cur.getOutputBind("blobvar")
+	blobvarlength=cur.getOutputBindLength("blobvar")
+	checkSuccess(clobvar,"hello")
+	checkSuccess(clobvarlength,5)
+	checkSuccess(blobvar,"hello")
+	checkSuccess(blobvarlength,5)
+	cur.sendQuery("drop table testtable1")
 	print
 
-	print "NULL AND EMPTY CLOBS AND CLOBS: \n");
-	cur.getNullsAsNulls();
-	cur.sendQuery("create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)");
-	cur.prepareQuery("insert into testtable1 values (:var1,:var2,:var3,:var4)");
-	cur.inputBindClob("var1","",0);
-	cur.inputBindClob("var2",None,0);
-	cur.inputBindBlob("var3","",0);
-	cur.inputBindBlob("var4",None,0);
-	checkSuccess(cur.executeQuery(),1);
-	cur.sendQuery("select * from testtable1");
-	checkSuccess(cur.getField(0,0),None);
-	checkSuccess(cur.getField(0,1),None);
-	checkSuccess(cur.getField(0,2),None);
-	checkSuccess(cur.getField(0,3),None);
-	cur.sendQuery("drop table testtable1");
+	print "NULL AND EMPTY CLOBS AND CLOBS: "
+	cur.getNullsAsNone()
+	cur.sendQuery("create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)")
+	cur.prepareQuery("insert into testtable1 values (:var1,:var2,:var3,:var4)")
+	cur.inputBindClob("var1","",0)
+	cur.inputBindClob("var2",None,0)
+	cur.inputBindBlob("var3","",0)
+	cur.inputBindBlob("var4",None,0)
+	checkSuccess(cur.executeQuery(),1)
+	cur.sendQuery("select * from testtable1")
+	checkSuccess(cur.getField(0,0),None)
+	checkSuccess(cur.getField(0,1),None)
+	checkSuccess(cur.getField(0,2),None)
+	checkSuccess(cur.getField(0,3),None)
+	cur.sendQuery("drop table testtable1")
 	print
 
-	print "CURSOR BINDS: \n");
-	checkSuccess(cur.sendQuery("create or replace package types as type cursorType is ref cursor; end;"),1);
-	checkSuccess(cur.sendQuery("create or replace function sp_testtable return types.cursortype as l_cursor    types.cursorType; begin open l_cursor for select * from testtable; return l_cursor; end;"),1);
-	cur.prepareQuery("begin  :curs:=sp_testtable; end;");
-	cur.defineOutputBindCursor("curs");
-	checkSuccess(cur.executeQuery(),1);
-	sqlrcursor	*bindcur=cur.getOutputBindCursor("curs");
-	checkSuccess(bindcur.fetchFromBindCursor(),1);
-	checkSuccess(bindcur.getField(0,0),"1");
-	checkSuccess(bindcur.getField(1,0),"2");
-	checkSuccess(bindcur.getField(2,0),"3");
-	checkSuccess(bindcur.getField(3,0),"4");
-	checkSuccess(bindcur.getField(4,0),"5");
-	checkSuccess(bindcur.getField(5,0),"6");
-	checkSuccess(bindcur.getField(6,0),"7");
-	checkSuccess(bindcur.getField(7,0),"8");
+	print "CURSOR BINDS: "
+	checkSuccess(cur.sendQuery("create or replace package types as type cursorType is ref cursor; end;"),1)
+	checkSuccess(cur.sendQuery("create or replace function sp_testtable return types.cursortype as l_cursor    types.cursorType; begin open l_cursor for select * from testtable; return l_cursor; end;"),1)
+	cur.prepareQuery("begin  :curs:=sp_testtable; end;")
+	cur.defineOutputBindCursor("curs")
+	checkSuccess(cur.executeQuery(),1)
+	bindcur=cur.getOutputBindCursor("curs")
+	checkSuccess(bindcur.fetchFromBindCursor(),1)
+	checkSuccess(bindcur.getField(0,0),"1")
+	checkSuccess(bindcur.getField(1,0),"2")
+	checkSuccess(bindcur.getField(2,0),"3")
+	checkSuccess(bindcur.getField(3,0),"4")
+	checkSuccess(bindcur.getField(4,0),"5")
+	checkSuccess(bindcur.getField(5,0),"6")
+	checkSuccess(bindcur.getField(6,0),"7")
+	checkSuccess(bindcur.getField(7,0),"8")
 	print
 
-	print "LONG CLOB: \n");
-	cur.sendQuery("drop table testtable2");
-	cur.sendQuery("create table testtable2 (testclob clob)");
-	cur.prepareQuery("insert into testtable2 values (:clobval)");
-	char	clobval[8*1024+1];
-	for (int i=0; i<8*1024; i++) {
-		clobval[i]='C';
-	}
-	clobval[8*1024]=(char)NULL;
-	cur.inputBindClob("clobval",clobval,8*1024);
-	checkSuccess(cur.executeQuery(),1);
-	cur.sendQuery("select testclob from testtable2");
-	checkSuccess(clobval,cur.getField(0,"testclob"));
-	cur.prepareQuery("begin select testclob into :clobbindval from testtable2; end;");
-	cur.defineOutputBindClob("clobbindval");
-	checkSuccess(cur.executeQuery(),1);
-	char	*clobbindvar=cur.getOutputBind("clobbindval");
-	checkSuccess(cur.getOutputBindLength("clobbindval"),8*1024);
-	checkSuccess(clobval,clobbindvar);
-	cur.sendQuery("drop table testtable2");
+	print "LONG CLOB: "
+	cur.sendQuery("drop table testtable2")
+	cur.sendQuery("create table testtable2 (testclob clob)")
+	cur.prepareQuery("insert into testtable2 values (:clobval)")
+	clobval=""
+	for i in range(0,8*1024):
+		clobval=clobval+'C'
+	cur.inputBindClob("clobval",clobval,8*1024)
+	checkSuccess(cur.executeQuery(),1)
+	cur.sendQuery("select testclob from testtable2")
+	checkSuccess(clobval,cur.getField(0,"testclob"))
+	cur.prepareQuery("begin select testclob into :clobbindval from testtable2; end;")
+	cur.defineOutputBindClob("clobbindval")
+	checkSuccess(cur.executeQuery(),1)
+	clobbindvar=cur.getOutputBind("clobbindval")
+	checkSuccess(cur.getOutputBindLength("clobbindval"),8*1024)
+	checkSuccess(clobval,clobbindvar)
+	cur.sendQuery("drop table testtable2")
 	print
 
 

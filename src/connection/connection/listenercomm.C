@@ -45,7 +45,7 @@ void	listenercomm::announceAvailability(char *tmpdir,
 	alarm(0);
 
 	// get a pointer to the shared memory segment
-	void	*idmemoryptr=ipcptr->getAnnounceBuffer();
+	unsigned char	*idmemoryptr=ipcptr->getAnnounceBuffer();
 
 	// if we're passing descriptors around, write the 
 	// pid to the segment otherwise write ports
@@ -64,9 +64,9 @@ void	listenercomm::announceAvailability(char *tmpdir,
 
 		int	unixsocketlen=strlen(unixsocket);
 		memcpy((void *)idmemoryptr,(void *)unixsocket,unixsocketlen);
-		idmemoryptr=(void *)((long)idmemoryptr+unixsocketlen);
+		idmemoryptr=idmemoryptr+unixsocketlen;
 		*((char *)idmemoryptr)=':';
-		idmemoryptr=(void *)((long)idmemoryptr+1);
+		idmemoryptr=idmemoryptr+1;
 
 		// right-align the inet port
 		*((unsigned short *)idmemoryptr)=inetport & 0xff;
@@ -135,6 +135,7 @@ int	listenercomm::receiveFileDescriptor(int *descriptor) {
 		delete handoffsockun;
 		handoffsockun=NULL;
 	}
+	return retval;
 }
 
 void	listenercomm::deRegisterForHandoff(char *tmpdir) {

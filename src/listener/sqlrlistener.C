@@ -998,9 +998,10 @@ void	sqlrlistener::getAConnection() {
 				(*((unsigned char *)(ptr+1)) << 8);
 
 		#ifdef SERVER_DEBUG
-		char	debugstring[15+unixportstrlen+21];
+		char	*debugstring=new char[15+unixportstrlen+21];
 		sprintf(debugstring,"socket=%s  port=%d",unixportstr,inetport);
 		debugPrint("listener",1,debugstring);
+		delete[] debugstring;
 		#endif
 
 	}

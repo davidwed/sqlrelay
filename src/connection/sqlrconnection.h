@@ -231,7 +231,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		datatransport		*clientsock;
 
 		sqlrcursor	**cur;
-		unsigned short	currentcur;
+		short		currentcur;
 
 		memorypool	*bindpool;
 

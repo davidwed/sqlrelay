@@ -23,16 +23,16 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(SQLITEINCLUDES) -c $<
 
 sqliteconnection_debug.o: sqliteconnection.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(SQLITEINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(SQLITEINCLUDES) -c $< -o $@
 
 main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(SQLITEINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(SQLITEINCLUDES) -c $< -o $@
 
 sqlr-connection-sqlite: sqliteconnection.C sqliteconnection.o main.C main.o 
 	$(CXX) $(SQLITESTATIC) $(LDFLAGS) -o $@ sqliteconnection.o main.o $(SQLITELIBS) $(PTHREADLIBS) -L../../connection -lsqlrconnection $(LIBS)
 
 sqlr-connection-sqlite-debug: sqliteconnection.C sqliteconnection_debug.o main.C main_debug.o 
-	$(CXX) $(SQLITESTATIC) $(LDFLAGS) -o $@ sqliteconnection_debug.o main_debug.o $(SQLITELIBS) $(PTHREADLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+	$(CXX) $(SQLITESTATIC) $(DEBUGLDFLAGS) -o $@ sqliteconnection_debug.o main_debug.o $(SQLITELIBS) $(PTHREADLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
 
 install:
 	$(top_srcdir)/mkinstalldirs $(bindir)

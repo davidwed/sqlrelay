@@ -317,13 +317,14 @@ int	sybasecursor::openCursor(int id) {
 	int	retval=1;
 	if (sybaseconn->db && sybaseconn->db[0]) {
 		int	len=strlen(sybaseconn->db)+4;
-		char	query[len+1];
+		char	*query=new char[len+1];
 		sprintf(query,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len,1))) {
 			int	live;
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=0;
 		}
+		delete[] query;
 		cleanUpData();
 	}
 	return retval;

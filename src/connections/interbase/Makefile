@@ -23,16 +23,16 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INTERBASEINCLUDES) -c $<
 
 interbaseconnection_debug.o: interbaseconnection.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(INTERBASEINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(INTERBASEINCLUDES) -c $< -o $@
 
 main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(INTERBASEINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(INTERBASEINCLUDES) -c $< -o $@
 
 sqlr-connection-interbase: interbaseconnection.C interbaseconnection.o main.C main.o 
 	$(CXX) $(INTERBASESTATIC) $(LDFLAGS) -o $@ interbaseconnection.o main.o $(INTERBASELIBS) -L../../connection -lsqlrconnection $(LIBS)
 
 sqlr-connection-interbase-debug: interbaseconnection.C interbaseconnection_debug.o main.C main_debug.o 
-	$(CXX) $(INTERBASESTATIC) $(LDFLAGS) -o $@ interbaseconnection_debug.o main_debug.o $(INTERBASELIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+	$(CXX) $(INTERBASESTATIC) $(DEBUGLDFLAGS) -o $@ interbaseconnection_debug.o main_debug.o $(INTERBASELIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
 
 install:
 	$(top_srcdir)/mkinstalldirs $(bindir)

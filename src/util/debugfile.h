@@ -13,6 +13,7 @@ class debugfile {
 		void	debugPrint(const char *name, int tabs,
 						const char *string);
 		void	debugPrint(const char *name, int tabs, long number);
+		void	debugPrint(const char *name, int tabs, double number);
 		void	debugPrintBlob(const char *blob, unsigned long length);
 		void	debugPrintClob(const char *clob, unsigned long length);
 		logger	*getDebugLogger();

@@ -29,25 +29,25 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 sqlrconnection_debug.o: sqlrconnection.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 connection/connectioncmdline_debug.o: connection/connectioncmdline.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 connection/ipc_debug.o: connection/ipc.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 connection/listenercomm_debug.o: connection/listenercomm.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 connection/scalercomm_debug.o: connection/scalercomm.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 connection/unixsocketseqfile_debug.o: connection/unixsocketseqfile.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 sqlrcursor_debug.o: sqlrcursor.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 libsqlrconnection.a: $(SRCS) $(OBJS)
 	$(STATICAR) $@ $(OBJS)

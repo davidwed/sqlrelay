@@ -23,16 +23,16 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(FREETDSINCLUDES) -c $<
 
 freetdsconnection_debug.o: freetdsconnection.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(FREETDSINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(FREETDSINCLUDES) -c $< -o $@
 
 main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(FREETDSINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(FREETDSINCLUDES) -c $< -o $@
 
 sqlr-connection-freetds: freetdsconnection.C freetdsconnection.o main.C main.o 
 	$(CXX) $(FREETDSSTATIC) $(LDFLAGS) -o $@ freetdsconnection.o main.o $(FREETDSLIBS) -L../../connection -lsqlrconnection $(LIBS)
 
 sqlr-connection-freetds-debug: freetdsconnection.C freetdsconnection_debug.o main.C main_debug.o 
-	$(CXX) $(FREETDSSTATIC) $(LDFLAGS) -o $@ freetdsconnection_debug.o main_debug.o $(FREETDSLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+	$(CXX) $(FREETDSSTATIC) $(DEBUGLDFLAGS) -o $@ freetdsconnection_debug.o main_debug.o $(FREETDSLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
 
 install:
 	$(top_srcdir)/mkinstalldirs $(bindir)

@@ -331,6 +331,12 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
 	}
+	for (int i=0; i<MAX_SELECT_LIST_SIZE; i++) {
+		for (int j=0; j<FETCH_AT_ONCE; j++) {
+			def_lob[i][j]=NULL;
+		}
+		def[i]=NULL;
+	}
 }
 
 oracle8cursor::~oracle8cursor() {
@@ -643,14 +649,16 @@ int	oracle8cursor::outputBindBlob(const char *variable,
 						unsigned short variablesize,
 						int index,
 						short *isnull) {
-	outputBindGenericLob(variable,variablesize,index,isnull,SQLT_BLOB);
+	return outputBindGenericLob(variable,variablesize,index,
+						isnull,SQLT_BLOB);
 }
 
 int	oracle8cursor::outputBindClob(const char *variable,
 						unsigned short variablesize,
 						int index,
 						short *isnull) {
-	outputBindGenericLob(variable,variablesize,index,isnull,SQLT_CLOB);
+	return outputBindGenericLob(variable,variablesize,index,
+						isnull,SQLT_CLOB);
 }
 
 int	oracle8cursor::outputBindGenericLob(const char *variable,
@@ -1237,14 +1245,17 @@ void	oracle8cursor::cleanUpData() {
 	}
 
 	// free row/column resources
-	for (int i=0; i<ncols; i++) {
+	int	i;
+	for (i=0; i<ncols; i++) {
 		for (int j=0; j<FETCH_AT_ONCE; j++) {
 			if (def_lob[i][j]) {
 				OCIDescriptorFree(def_lob[i][j],OCI_DTYPE_LOB);
+				def_lob[i][j]=NULL;
 			}
 		}
 		if (def[i]) {
 			OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
+			def[i]=NULL;
 		}
 	}
 

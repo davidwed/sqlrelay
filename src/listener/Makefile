@@ -23,10 +23,10 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 sqlrlistener_debug.o: sqlrlistener.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 sqlr-listener: $(SRCS) $(OBJS)
 	$(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)

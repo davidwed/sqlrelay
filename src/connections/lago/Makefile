@@ -23,16 +23,16 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LAGOINCLUDES) -c $<
 
 lagoconnection_debug.o: lagoconnection.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(LAGOINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(LAGOINCLUDES) -c $< -o $@
 
 main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(LAGOINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(LAGOINCLUDES) -c $< -o $@
 
 sqlr-connection-lago: lagoconnection.C lagoconnection.o main.C main.o 
 	$(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ lagoconnection.o main.o $(LAGOLIBS) -L../../connection -lsqlrconnection $(LIBS)
 
 sqlr-connection-lago-debug: lagoconnection.C lagoconnection_debug.o main.C main_debug.o 
-	$(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ lagoconnection_debug.o main_debug.o $(LAGOLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+	$(CXX) $(LAGOSTATIC) $(DEBUGLDFLAGS) -o $@ lagoconnection_debug.o main_debug.o $(LAGOLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
 
 install:
 	$(top_srcdir)/mkinstalldirs $(bindir)

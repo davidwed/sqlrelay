@@ -616,24 +616,19 @@ void	sqlrconnection::copyReferences() {
 
 	// make copies of some specific things
 	if (server) {
-		char	*tempserver=new char[strlen(server)+1];
-		strcpy(tempserver,server);
+		char	*tempserver=strdup(server);
 		server=tempserver;
 	}
 	if (listenerunixport) {
-		char	*templistenerunixport=
-				new char[strlen(listenerunixport)+1];
-		strcpy(templistenerunixport,listenerunixport);
+		char	*templistenerunixport=strdup(listenerunixport);
 		listenerunixport=templistenerunixport;
 	}
 	if (user) {
-		char	*tempuser=new char[strlen(user)+1];
-		strcpy(tempuser,user);
+		char	*tempuser=strdup(user);
 		user=tempuser;
 	}
 	if (password) {
-		char	*temppassword=new char[strlen(password)+1];
-		strcpy(temppassword,password);
+		char	*temppassword=strdup(password);
 		password=temppassword;
 	}
 }
@@ -2168,7 +2163,7 @@ void	sqlrcursor::cacheColumnInfo() {
 			write(cachedestfd,(void *)&namelen,
 						sizeof(unsigned short));
 			write(cachedestfd,(void *)whichcolumn->name,namelen);
-			if (columntypeformat!=COLUMN_TYPE_IDS) {
+			if (columntypeformat==COLUMN_TYPE_IDS) {
 				write(cachedestfd,(void *)&whichcolumn->type,
 						sizeof(unsigned short));
 			} else {
@@ -2985,17 +2980,6 @@ void	sqlrcursor::clearColumns() {
 		}
 	}
 
-	// clear column name strings
-	if (columns && sentcolumninfo==SEND_COLUMN_INFO) {
-		char	*colname;
-		for (int i=0; i<colcount; i++) {
-			colname=getColumn(i)->name;
-			// FIXME: should there be a delete here???
-			// or should this whole block not be here because
-			// of the free() done next???
-		}
-	}
-
 	// reset the column storage pool
 	colstorage->free();
 
@@ -3274,7 +3258,7 @@ int	sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 			sqlrc->debugPreEnd();
 			break;
 		}
-		read(queryfile,(void *)querybuffer[index],sizeof(char));
+		read(queryfile,(void *)&querybuffer[index],sizeof(char));
 		if (querybuffer[index]<=0) {
 			break;
 		}

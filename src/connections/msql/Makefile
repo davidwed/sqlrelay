@@ -23,16 +23,16 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(MSQLINCLUDES) -c $<
 
 msqlconnection_debug.o: msqlconnection.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(MSQLINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(MSQLINCLUDES) -c $< -o $@
 
 main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(MSQLINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(MSQLINCLUDES) -c $< -o $@
 
 sqlr-connection-msql: msqlconnection.C msqlconnection.o main.C main.o 
 	$(CXX) $(MSQLSTATIC) $(LDFLAGS) -o $@ msqlconnection.o main.o $(MSQLLIBS) -L../../connection -lsqlrconnection $(LIBS)
 
 sqlr-connection-msql-debug: msqlconnection.C msqlconnection_debug.o main.C main_debug.o 
-	$(CXX) $(MSQLSTATIC) $(LDFLAGS) -o $@ msqlconnection_debug.o main_debug.o $(MSQLLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+	$(CXX) $(MSQLSTATIC) $(DEBUGLDFLAGS) -o $@ msqlconnection_debug.o main_debug.o $(MSQLLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
 
 install:
 	$(top_srcdir)/mkinstalldirs $(bindir)

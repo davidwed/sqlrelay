@@ -302,13 +302,13 @@ class sqlrcursor:
         """
         return CSQLRelay.inputBind(self.cursor, variable, value, precision, scale)
 
-    def inputBindBlob(self, variable, value, length)
+    def inputBindBlob(self, variable, value, length):
         """
         Define an input bind varaible.
         """
         return CSQLRelay.inputBindBlob(self.cursor, variable, value, length)
 
-    def inputBindClob(self, variable, value, length)
+    def inputBindClob(self, variable, value, length):
         """
         Define an input bind varaible.
         """

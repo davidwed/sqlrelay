@@ -106,7 +106,7 @@ int	oracle7connection::logIn() {
 		// display the error message
 		text	message[512];
 		sword	n=oerhms(&lda,lda.rc,message,(sword)sizeof(message));
-		message[n]=NULL;
+		message[n]=(text)NULL;
 		fprintf(stderr,"%s\n",message);
 		delete[] oraclehomeenv;
 		oraclehomeenv=NULL;

@@ -23,16 +23,16 @@ rebuild: clean all
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(ORACLEINCLUDES) -c $<
 
 oracle8connection_debug.o: oracle8connection.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(ORACLEINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(ORACLEINCLUDES) -c $< -o $@
 
 main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(CXXFLAGS) $(CPPFLAGS) $(ORACLEINCLUDES) -c $< -o $@
+	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(ORACLEINCLUDES) -c $< -o $@
 
 sqlr-connection-oracle8: oracle8connection.C oracle8connection.o main.C main.o 
 	$(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ oracle8connection.o main.o $(ORACLELIBS) -L../../connection -lsqlrconnection $(LIBS)
 
 sqlr-connection-oracle8-debug: oracle8connection.C oracle8connection_debug.o main.C main_debug.o 
-	$(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ oracle8connection_debug.o main_debug.o $(ORACLELIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+	$(CXX) $(ORACLESTATIC) $(DEBUGLDFLAGS) -o $@ oracle8connection_debug.o main_debug.o $(ORACLELIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
 
 install:
 	$(top_srcdir)/mkinstalldirs $(bindir)
