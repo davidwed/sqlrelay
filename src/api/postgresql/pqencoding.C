@@ -1,3 +1,5 @@
+#include <pqdefinitions.h>
+
 extern "C" {
 
 // determine length of multibyte encoded char at *s

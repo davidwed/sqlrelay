@@ -1,3 +1,5 @@
+#include <pqdefinitions.h>
+
 extern "C" {
 
 int PQgetline(PGconn *conn, char *string, int length) {

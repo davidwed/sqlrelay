@@ -1,3 +1,5 @@
+#include <pqdefinitions.h>
+
 extern "C" {
 
 size_t PQescapeString(char *to, const char *from, size_t length) {

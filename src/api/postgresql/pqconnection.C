@@ -1,3 +1,6 @@
+#include <pqdefinitions.h>
+#include <stdlib.h>
+
 extern "C" {
 
 typedef enum {
@@ -10,29 +13,24 @@ typedef enum {
 	CONNECTION_SETENV
 } ConnStatusType;
 
-// connect to the database using a conninfo string
-PGconn *PQconnectdb(const char *conninfo) {
-
-	char	*host="";
-	char	*port="";
-	char	*user="";
-	char	*password="";
-
-	// FIXME: extract host, hostaddr, port,
-	// user, password, use them below...
-
-	sqlrconnection	*sqlrconn=new sqlrconnection(host,atoi(port),"",
-							user,password,0,1);
-}
-
 // connect to the database using paramaters
 PGconn *PQsetdbLogin(const char *pghost, const char *pgport,
 			 const char *pgoptions, const char *pgtty,
 			 const char *dbName,
 			 const char *login, const char *pwd) {
 
-	sqlrconnection	*sqlrconn=new sqlrconnection(pghost,pgport,"",
-							login,pwd,0,1);
+	PGconn	*pgconn=new PGconn;
+	pgconn->host=(char *)pghost;
+	pgconn->port=(char *)pgport;
+	pgconn->options=(char *)pgoptions;
+	pgconn->tty=(char *)pgtty;
+	pgconn->db=(char *)dbName;
+	pgconn->user=(char *)login;
+	pgconn->password=(char *)pwd;
+	pgconn->socket=0;
+
+	pgconn->sqlrcon=new sqlrconnection(pghost,atoi(pgport),"",
+						login,pwd,0,1);
 }
 
 // older, simpler connection function that didn't have login, password
@@ -42,68 +40,88 @@ PGconn *PQsetdb(const char *pghost, const char *pgport,
 	return PQsetdbLogin(pghost,pgport,pgoptions,pgtty,dbName,NULL,NULL);
 }
 
+// connect to the database using a conninfo string
+PGconn *PQconnectdb(const char *conninfo) {
+
+	char	*host="";
+	char	*port="";
+	char	*options="";
+	char	*tty="";
+	char	*db="";
+	char	*user="";
+	char	*password="";
+
+	// FIXME: extract host, hostaddr, port,
+	// user, password, use them below...
+
+	return PQsetdbLogin(host,port,options,tty,db,user,password);
+}
+
 // close the current connection
 void PQfinish(PGconn *conn) {
-	delete sqlrconn;
+	delete conn->sqlrcon;
+	delete conn;
 }
 
 // close and re-open the connection
 void PQreset(PGconn *conn) {
-	PQfinish();
-	PQconnectDB(conninfo);
+	PQfinish(conn);
+	PQsetdbLogin(conn->host,conn->port,conn->options,
+			conn->tty,conn->db,conn->user,conn->password);
 }
 
 // accessor functions for PGconn objects
 char *PQdb(const PGconn *conn) {
-	return conn->dbName;
+	return conn->db;
 }
 
 char *PQuser(const PGconn *conn) {
-	return conn->pguser;
+	return conn->user;
 }
 
 char *PQpass(const PGconn *conn) {
-	return conn->pgpass;
+	return conn->password;
 }
 
 char *PQhost(const PGconn *conn) {
-	return conn->pghost;
+	return conn->host;
 }
 
 char *PQport(const PGconn *conn) {
-	return conn->pgport;
+	return conn->port;
 }
 
 char *PQtty(const PGconn *conn) {
-	return conn->pgtty;
+	return conn->tty;
 }
 
 char *PQoptions(const PGconn *conn) {
-	return conn->pgoptions;
+	return conn->options;
 }
 
 ConnStatusType PQstatus(const PGconn *conn) {
-	return conn->status;
+	return CONNECTION_OK;
 }
 
 char *PQerrorMessage(const PGconn *conn) {
 	// FIXME: SQL Relay's error messages are cursor-specific
+	return NULL;
 }
 
 int PQsocket(const PGconn *conn) {
-	return conn->pgunixsocket;
+	return conn->socket;
 }
 
 int PQbackendPID(const PGconn *conn) {
-	// FIXME
+	return -1;
 }
 
 int PQclientEncoding(const PGconn *conn) {
-	return conn->client_encoding;
+	return -1;
 }
 
 int PQsetClientEncoding(PGconn *conn, const char *encoding) {
-	// FIXME
+	return -1;
 }
 
 

@@ -1,3 +1,5 @@
+#include <pqdefinitions.h>
+
 extern "C" {
 
 typedef struct pgNotify {

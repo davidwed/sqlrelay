@@ -1,3 +1,5 @@
+#include <pqdefinitions.h>
+
 extern "C" {
 
 int lo_open(PGconn *conn, Oid lobjId, int mode) {
