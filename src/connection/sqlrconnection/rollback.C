@@ -24,7 +24,7 @@ int	sqlrconnection::rollback() {
 	if (rollbackcur->openCursor(-1) &&
 		rollbackcur->prepareQuery(rollbackquery,rollbackquerylen) &&
 		rollbackcur->executeQuery(rollbackquery,rollbackquerylen,1)) {
-		rollbackcur->cleanUpData(true,true,true);
+		rollbackcur->cleanUpData(false,false,false);
 		retval=1;
 	}
 	rollbackcur->closeCursor();

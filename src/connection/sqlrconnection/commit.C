@@ -24,7 +24,7 @@ int	sqlrconnection::commit() {
 	if (commitcur->openCursor(-1) &&
 		commitcur->prepareQuery(commitquery,commitquerylen) &&
 		commitcur->executeQuery(commitquery,commitquerylen,1)) {
-		commitcur->cleanUpData(true,true,true);
+		commitcur->cleanUpData(false,false,false);
 		retval=1;
 	}
 	commitcur->closeCursor();

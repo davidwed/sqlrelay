@@ -1,7 +1,10 @@
 in sqlrconnection, currentcur should be passed around instead of being
 	global.
 
-fix the fake binds problem that erwin has
+socket for file descriptor passing is apparantly getting closed or something,
+	recvmesg fails when a client hits the connection for the second time
+
+fix erwin's fake binds problem
 
 check out the new db2 patch and see if it really works
 
@@ -79,9 +82,6 @@ when not using proxy credentials for user-change, oracle 8 client can't
 oracle 8 client needs to check to see what version of the database it's
 	connected to and not use proxy credentials to switch users if the
 	version < 8.1... Use OCIServerVersion and parse the result
-
-socket for file descriptor passing is apparantly getting closed or something,
-	recvmesg fails when a client hits the connection for the second time
 
 interbase stored procedure/output bind tests fails at isc_dsql_prepare
 

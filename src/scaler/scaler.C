@@ -227,11 +227,13 @@ void scaler::openMoreConnections() {
 							6+20+
 							5+strlen(id)+
 							15+strlen(connectionid)+
-							9+strlen(config)+1];
+							9+strlen(config)+
+							2+1];
 				sprintf(command,
-	"sqlr-connection-%s%s -ttl %d -id %s -connectionid %s -config %s",
+	"sqlr-connection-%s%s -ttl %d -id %s -connectionid %s -config %s %s",
 					dbase,((debug)?"-debug":""),
-					ttl,id,connectionid,config);
+					ttl,id,connectionid,config,
+					((debug)?"&":""));
 
 				// start another connection
 				success=!system(command);
