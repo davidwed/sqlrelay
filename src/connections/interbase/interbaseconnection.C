@@ -595,7 +595,7 @@ void	interbasecursor::returnColumnInfo() {
 					field[i].sqlrtype,
 					outsqlda->sqlvar[i].sqllen,
 					precision,
-					-outsqlda->sqlvar[i].sqlscale,0,0);
+					-outsqlda->sqlvar[i].sqlscale,0,0,0);
 	}
 }
 

@@ -20,22 +20,22 @@ AC_ARG_ENABLE(static,
 	STATICLINK="")
 AC_ARG_WITH(rudiments-prefix,
 	[  --with-rudiments-prefix       Location of rudiments],
-	RUDIMENTSPATH=$withval,
+	RUDIMENTSPATH="$withval",
 	RUDIMENTSPATH="")
 AC_ARG_WITH(libgdbm-prefix,
 	[  --with-libgdbm-prefix         Location of libgdbm],
-	GDBMPATH=$withval,
+	GDBMPATH="$withval",
 	GDBMPATH="")
 AC_ARG_WITH(oracle-home,
 	[  --with-oracle-home            Location of Oracle],
-	ORACLE_HOME=$withval)
+	ORACLE_HOME="$withval")
 AC_ARG_ENABLE(oracle,
 	[  --disable-oracle              Don't build Oracle connection],
 	ENABLE_ORACLE="",
 	ENABLE_ORACLE="yes")
 AC_ARG_WITH(mysql-prefix,
 	[  --with-mysql-prefix           Location of MySQL],
-	MYSQLPATH=$withval,
+	MYSQLPATH="$withval",
 	MYSQLPATH="")
 AC_ARG_ENABLE(mysql,
 	[  --disable-mysql               Don't build MySQL connection],
@@ -43,7 +43,7 @@ AC_ARG_ENABLE(mysql,
 	ENABLE_MYSQL="yes")
 AC_ARG_WITH(msql-prefix,
 	[  --with-msql-prefix            Location of mSQL],
-	MSQLPATH=$withval,
+	MSQLPATH="$withval",
 	MSQLPATH="")
 AC_ARG_ENABLE(msql,
 	[  --disable-msql                Don't build mSQL connection],
@@ -51,7 +51,7 @@ AC_ARG_ENABLE(msql,
 	ENABLE_MSQL="yes")
 AC_ARG_WITH(postgresql-prefix,
 	[  --with-postgresql-prefix      Location of PostgreSQL],
-	POSTGRESQLPATH=$withval,
+	POSTGRESQLPATH="$withval",
 	POSTGRESQLPATH="")
 AC_ARG_ENABLE(postgresql,
 	[  --disable-postgresql          Don't build PostgreSQL connection],
@@ -59,7 +59,7 @@ AC_ARG_ENABLE(postgresql,
 	ENABLE_POSTGRESQL="yes")
 AC_ARG_WITH(sqlite-prefix,
 	[  --with-sqlite-prefix          Location of SQLite],
-	SQLITEPATH=$withval,
+	SQLITEPATH="$withval",
 	SQLITEPATH="")
 AC_ARG_ENABLE(sqlite,
 	[  --disable-sqlite              Don't build SQLite connection],
@@ -67,7 +67,7 @@ AC_ARG_ENABLE(sqlite,
 	ENABLE_SQLITE="yes")
 AC_ARG_WITH(lago-prefix,
 	[  --with-lago-prefix            Location of Lago],
-	LAGOPATH=$withval,
+	LAGOPATH="$withval",
 	LAGOPATH="")
 AC_ARG_ENABLE(lago,
 	[  --disable-lago                Don't build Lago connection],
@@ -75,7 +75,7 @@ AC_ARG_ENABLE(lago,
 	ENABLE_LAGO="yes")
 AC_ARG_WITH(freetds-prefix,
 	[  --with-freetds-prefix         Location of FreeTDS],
-	FREETDSPATH=$withval,
+	FREETDSPATH="$withval",
 	FREETDSPATH="")
 AC_ARG_ENABLE(freetds,
 	[  --disable-freetds             Don't build FreeTDS connection],
@@ -83,7 +83,7 @@ AC_ARG_ENABLE(freetds,
 	ENABLE_FREETDS="yes")
 AC_ARG_WITH(sybase-prefix,
 	[  --with-sybase-prefix          Location of Sybase],
-	SYBASEPATH=$withval,
+	SYBASEPATH="$withval",
 	SYBASEPATH="")
 AC_ARG_ENABLE(sybase,
 	[  --disable-sybase              Don't build Sybase connection],
@@ -91,7 +91,7 @@ AC_ARG_ENABLE(sybase,
 	ENABLE_SYBASE="yes")
 AC_ARG_WITH(odbc-prefix,
 	[  --with-odbc-prefix            Location of ODBC],
-	ODBCPATH=$withval,
+	ODBCPATH="$withval",
 	ODBCPATH="")
 AC_ARG_ENABLE(odbc,
 	[  --disable-odbc                Don't build ODBC connection],
@@ -99,7 +99,7 @@ AC_ARG_ENABLE(odbc,
 	ENABLE_ODBC="yes")
 AC_ARG_WITH(db2-prefix,
 	[  --with-db2-prefix             Location of DB2],
-	DB2PATH=$withval,
+	DB2PATH="$withval",
 	DB2PATH="")
 AC_ARG_ENABLE(db2,
 	[  --disable-db2                 Don't build DB2 connection],
@@ -107,7 +107,7 @@ AC_ARG_ENABLE(db2,
 	ENABLE_DB2="yes")
 AC_ARG_WITH(interbase-prefix,
 	[  --with-interbase-prefix       Location of Interbase],
-	INTERBASEPATH=$withval,
+	INTERBASEPATH="$withval",
 	INTERBASEPATH="")
 AC_ARG_ENABLE(interbase,
 	[  --disable-interbase           Don't build Interbase connection],
@@ -115,15 +115,19 @@ AC_ARG_ENABLE(interbase,
 	ENABLE_INTERBASE="yes")
 AC_ARG_WITH(perl-prefix,
 	[  --with-perl-prefix            Location of Perl],
-	PERLPATH=$withval,
+	PERLPATH="$withval",
 	PERLPATH="")
+AC_ARG_WITH(perl-install-prefix,
+	[  --with-perl-install-prefix    Where to install perl api],
+	PERLINSTALLPREFIX="$withval",
+	PERLINSTALLPREFIX="")
 AC_ARG_ENABLE(perl,
 	[  --disable-perl                Don't build Perl api],
 	ENABLE_PERL="",
 	ENABLE_PERL="yes")
 AC_ARG_WITH(python-prefix,
 	[  --with-python-prefix          Location of Python],
-	PYTHONPATH=$withval,
+	PYTHONPATH="$withval",
 	PYTHONPATH="")
 AC_ARG_ENABLE(python,
 	[  --disable-python              Don't build Python api],
@@ -131,7 +135,7 @@ AC_ARG_ENABLE(python,
 	ENABLE_PYTHON="yes")
 AC_ARG_WITH(zope-prefix,
 	[  --with-zope-prefix            Location of Zope],
-	ZOPEPATH=$withval,
+	ZOPEPATH="$withval",
 	ZOPEPATH="")
 AC_ARG_ENABLE(zope,
 	[  --disable-zope                Don't build Zope api],
@@ -139,7 +143,7 @@ AC_ARG_ENABLE(zope,
 	ENABLE_ZOPE="yes")
 AC_ARG_WITH(ruby-prefix,
 	[  --with-ruby-prefix            Location of Ruby],
-	RUBYPATH=$withval,
+	RUBYPATH="$withval",
 	RUBYPATH="")
 AC_ARG_ENABLE(ruby,
 	[  --disable-ruby                Don't build Ruby api],
@@ -147,7 +151,7 @@ AC_ARG_ENABLE(ruby,
 	ENABLE_RUBY="yes")
 AC_ARG_WITH(java-prefix,
 	[  --with-java-prefix            Location of Java],
-	JAVAPATH=$withval,
+	JAVAPATH="$withval",
 	JAVAPATH="")
 AC_ARG_ENABLE(java,
 	[  --disable-java                Don't build Java api],
@@ -155,7 +159,7 @@ AC_ARG_ENABLE(java,
 	ENABLE_JAVA="yes")
 AC_ARG_WITH(php-prefix,
 	[  --with-php-prefix             Location of PHP],
-	PHPPATH=$withval,
+	PHPPATH="$withval",
 	PHPPATH="")
 AC_ARG_ENABLE(php,
 	[  --disable-php                 Don't build PHP api],
@@ -163,11 +167,11 @@ AC_ARG_ENABLE(php,
 	ENABLE_PHP="yes")
 AC_ARG_WITH(tcl-include,
 	[  --with-tcl-include		Location of tcl.h include file],
-	TCLINCLUDEPATH=$withval,
+	TCLINCLUDEPATH="$withval",
 	TCLINCLUDEPATH="")
 AC_ARG_WITH(tcl-libraries,
 	[  --with-tcl-libraries		Location of libtcl],
-	TCLLIBSPATH=$withval,
+	TCLLIBSPATH="$withval",
 	TCLLIBSPATH="")
 AC_ARG_ENABLE(tcl,
 	[  --disable-tcl                 Don't build TCL api],
@@ -175,7 +179,7 @@ AC_ARG_ENABLE(tcl,
 	ENABLE_TCL="yes")
 AC_ARG_WITH(gtk-prefix,
 	[  --with-gtk-prefix             Location of GTK+],
-	GTKPATH=$withval,
+	GTKPATH="$withval",
 	GTKPATH="")
 AC_ARG_ENABLE(gtk,
 	[  --disable-gtk                 Don't build GTK+ configuration tool],
@@ -183,11 +187,11 @@ AC_ARG_ENABLE(gtk,
 	ENABLE_GTK="yes")
 AC_ARG_WITH(ptheads-prefix,
 	[  --with-ptheads-prefix         Location of Pthreads],
-	PTHREADSPATH=$withval,
+	PTHREADSPATH="$withval",
 	PTHREADSPATH="")
 AC_ARG_WITH(system-libtool,
 	[  --with-system-libtool   use system libtool instead of ./libtool],
-	USE_SYSTEM_LIBTOOL=$withval,
+	USE_SYSTEM_LIBTOOL="$withval",
 	USE_SYSTEM_LIBTOOL="no")
 AC_ARG_ENABLE(dmalloc,
 	[  --enable-dmalloc              Use the dmalloc library],
@@ -242,6 +246,9 @@ if ( test -n "$INTERBASEPATH" -a "`echo $INTERBASEPATH | cut -c-3`" = "../" ); t
 fi
 if ( test -n "$PERLPATH" -a "`echo $PERLPATH | cut -c-3`" = "../" ); then
 	PERLPATH="$PWD/$PERLPATH"
+fi
+if ( test -n "$PERLINSTALLPREFIX" -a "`echo $PERLINSTALLPREFIX | cut -c-3`" = "../" ); then
+	PERLINSTALLPREFIX="$PWD/$PERLINSTALLPREFIX"
 fi
 if ( test -n "$PYTHONPATH" -a "`echo $PYTHONPATH | cut -c-3`" = "../" ); then
 	PYTHONPATH="$PWD/$PYTHONPATH"
@@ -536,191 +543,7 @@ echo
 echo "***** Structures *************"
 AC_TYPE_MODE_T
 AC_TYPE_SIGNAL
-AC_MSG_CHECKING(for SIGHUP)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGHUP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGHUP,1,Do we have SIGHUP),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGINT)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGINT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGINT,1,Do we have SIGINT),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGQUIT)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGQUIT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGQUIT,1,Do we have SIGQUIT),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGILL)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGILL);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGILL,1,Do we have SIGILL),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGTRAP)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTRAP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTRAP,1,Do we have SIGTRAP),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGABRT)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGABRT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGABRT,1,Do we have SIGABRT),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGIOT)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGIOT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGIOT,1,Do we have SIGIOT),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGBUS)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGBUS);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGBUS,1,Do we have SIGBUS),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGFPE)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGFPE);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGFPE,1,Do we have SIGFPE),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGKILL)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGKILL);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGKILL,1,Do we have SIGKILL),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGUSR1)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGUSR1);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGUSR1,1,Do we have SIGUSR1),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGSEGV)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGSEGV);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGSEGV,1,Do we have SIGSEGV),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGUSR2)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGUSR2);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGUSR2,1,Do we have SIGUSR2),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGPIPE)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGPIPE);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGPIPE,1,Do we have SIGPIPE),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGALRM)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGALRM);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGALRM,1,Do we have SIGALRM),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGTERM)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTERM);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTERM,1,Do we have SIGTERM),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGSTKFLT)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGSTKFLT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGSTKFLT,1,Do we have SIGSTKFLT),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGCHLD)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGCHLD);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGCHLD,1,Do we have SIGCHLD),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGCONT)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGCONT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGCONT,1,Do we have SIGCONT),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGSTOP)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGSTOP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGSTOP,1,Do we have SIGSTOP),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGTSTP)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTSTP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTSTP,1,Do we have SIGTSTP),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGTTIN)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTTIN);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTTIN,1,Do we have SIGTTIN),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGTTOU)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTTOU);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTTOU,1,Do we have SIGTTOU),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGURG)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGURG);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGURG,1,Do we have SIGURG),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGXCPU)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGXCPU);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGXCPU,1,Do we have SIGXCPU),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGXFSZ)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGXFSZ);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGXFSZ,1,Do we have SIGXFSZ),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGVTALRM)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGVTALRM);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGVTALRM,1,Do we have SIGVTALRM),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGPROF)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGPROF);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGPROF,1,Do we have SIGPROF),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGWINCH)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGWINCH);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGWINCH,1,Do we have SIGWINCH),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGIO)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGIO);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGIO,1,Do we have SIGIO),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGPOLL)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGPOLL);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGPOLL,1,Do we have SIGPOLL),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGPWR)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGPWR);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGPWR,1,Do we have SIGPWR),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGUNUSED)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGUNUSED);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGUNUSED,1,Do we have SIGUNUSED),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGEMT)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGEMT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGEMT,1,Do we have SIGEMT),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGSYS)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGSYS);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGSYS,1,Do we have SIGSYS),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGCLD)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGCLD);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGCLD,1,Do we have SIGCLD),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGWAITING)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGWAITING);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGWAITING,1,Do we have SIGWAITING),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGLWP)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGLWP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGLWP,1,Do we have SIGLWP),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGFREEZE)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGFREEZE);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGFREEZE,1,Do we have SIGFREEZE),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGTHAW)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTHAW);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTHAW,1,Do we have SIGTHAW),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGCANCEL)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGCANCEL);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGCANCEL,1,Do we have SIGCANCEL),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGLOST)
-AC_TRY_LINK([#include <signal.h>
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGLOST);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGLOST,1,Do we have SIGLOST),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for _SIGRTMIN)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,_SIGRTMIN);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE__SIGRTMIN,1,Do we have _SIGRTMIN),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for _SIGRTMAX)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,_SIGRTMAX);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE__SIGRTMAX,1,Do we have _SIGRTMAX),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGRTMIN)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGRTMIN);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGRTMIN,1,Do we have SIGRTMIN),AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for SIGRTMAX)
-AC_TRY_LINK([#include <signal.h> 
-#include <stdlib.h>],
-sigset_t set; sigemptyset(&set); sigaddset(&set,SIGRTMAX);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGRTMAX,1,Do we have SIGRTMAX),AC_MSG_RESULT(no))
-
+FW_CHECK_SIGNALS
 echo "******************************"
 
 
@@ -728,7 +551,7 @@ echo "******************************"
 dnl Checks for library functions.
 echo
 echo "***** Functions **************"
-AC_CHECK_FUNCS(mkfifo mknod putenv setenv)
+AC_CHECK_FUNCS(putenv setenv)
 echo "******************************"
 
 
@@ -761,6 +584,14 @@ echo
 echo "***** Output Files ***********"
 AC_SUBST(abs_srcdir)
 AC_SUBST(abs_builddir)
+if ( test -n "$HAVE_PERL" ); then
+	if ( test ! -n "$PERLINSTALLPREFIX" )
+	then
+		perlprefix=`$PERL -V:prefix`
+		PERLINSTALLPREFIX=`eval "$perlprefix"; echo $prefix`
+	fi
+	AC_SUBST(PERLINSTALLPREFIX)
+fi
 
 
 MAKELIST="config.mk src/api/perl/SQLRConnection/Makefile.PL src/api/perl/SQLRCursor/Makefile.PL src/api/perl/SQLRConnection/SQLRConnection.pm src/api/perl/SQLRCursor/SQLRCursor.pm src/api/perl/DBD/Makefile.PL src/api/perl/DBD/SQLRelay.pm bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay"

@@ -31,12 +31,6 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define to 1 if you have the `mkfifo' function. */
-#undef HAVE_MKFIFO
-
-/* Define to 1 if you have the `mknod' function. */
-#undef HAVE_MKNOD
-
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 #undef HAVE_NDIR_H
 
@@ -212,6 +206,9 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
+
+/* Some versions of TCL don't have Tcl_GetString */
+#undef HAVE_TCL_GETSTRING
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

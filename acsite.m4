@@ -1869,7 +1869,7 @@ then
 	HAVE_TCL=""
 	TCLINCLUDE=""
 	TCLLIB=""
-	TCLLIBSPATH=""
+	HAVETCLGETSTRING=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -1887,7 +1887,7 @@ then
 			for i in "/usr/include" "$prefix/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
 			do
 				FW_CHECK_FILE($i/tcl.h,[TCLINCLUDE=\"-I$i\"])
-				for j in "tcl8.2" "tcl8.3" "tcl8.4" "tcl8.5"
+				for j in "tcl8.0" "tcl8.1" "tcl8.2" "tcl8.3" "tcl8.4" "tcl8.5"
 				do
 					FW_CHECK_FILE($i/$j/tcl.h,[TCLINCLUDE=\"-I$i/$j\"])
 				done
@@ -1900,14 +1900,14 @@ then
 			if ( test -n "$TCLLIBSPATH" )
 			then
 				FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-				for i in "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+				for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 				do
 					FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 				done
 				if ( test -z "$TCLLIB" )
 				then
 					FW_CHECK_FILE($TCLLIBSPATH/libtcl.so,[TCLLIB=\"-L$TCLLIBSPATH -ltcl\"])
-					for i in "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+					for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 					do
 						FW_CHECK_FILE($TCLLIBSPATH/libtcl$i.so,[TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\"])
 					done
@@ -1915,7 +1915,7 @@ then
 			else
 				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
 				do
-					for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+					for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 					do
 						FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 					done
@@ -1924,7 +1924,7 @@ then
 				then
 					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
 					do
-						for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
+						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 						do
 							FW_CHECK_FILE($i/libtcl$j.so,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
 						done
@@ -1937,7 +1937,14 @@ then
 			AC_MSG_WARN("The TCL API will not be installed.")
 		else
 			HAVE_TCL="yes"
+			AC_MSG_CHECKING(for Tcl_GetString)
+			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetString(NULL);],[$TCLINCLUDE],[$TCLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); HAVETCLGETSTRING="yes"],[AC_MSG_RESULT(no)])
 		fi
+	fi
+
+	if ( test -n "$HAVETCLGETSTRING" )
+	then
+		AC_DEFINE_UNQUOTED(HAVE_TCL_GETSTRING,1,Some versions of TCL don't have Tcl_GetString)
 	fi
 
 	FW_INCLUDES(tcl,[$TCLINCLUDE])
@@ -2010,5 +2017,157 @@ AC_DEFUN([FW_CHECK_NEED_GLIBC_2_3_HACK],
 	AC_MSG_CHECKING(for broken glibc-2.3)
 	GLIBC23HACKCODE=""
 	GLIBC23HACKINCLUDE=""
-	AC_TRY_LINK([#include <ctype.h>],[__ctype_toupper('a');],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(NEED_GLIBC_2_3_HACK,1,Some versions of glibc-2.3 need a fixup) GLIBC23HACKINCLUDE="#include <ctype.h>"; GLIBC23HACKCODE="const unsigned short int *__ctype_b; int __ctype_toupper(int c) { return toupper(c); } int __ctype_tolower(int c) { return tolower(c); }"])
+	AC_TRY_LINK([#include <ctype.h>
+#include <features.h>],[#if __GLIBC__==2 && __GLIBC_MINOR__==3
+	__ctype_toupper('a');
+#endif],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(NEED_GLIBC_2_3_HACK,1,Some versions of glibc-2.3 need a fixup) GLIBC23HACKINCLUDE="#include <ctype.h>"; GLIBC23HACKCODE="const unsigned short int *__ctype_b; int __ctype_toupper(int c) { return toupper(c); } int __ctype_tolower(int c) { return tolower(c); }"])
+])
+
+AC_DEFUN([FW_CHECK_SIGNALS],
+[
+AC_MSG_CHECKING(for unsupported signals)
+UNSUPPORTEDSIGNALS=""
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGHUP;, AC_DEFINE(HAVE_SIGHUP,1,Do we have SIGHUP), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGHUP")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGINT;, AC_DEFINE(HAVE_SIGINT,1,Do we have SIGINT), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGINT")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGQUIT;, AC_DEFINE(HAVE_SIGQUIT,1,Do we have SIGQUIT), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGQUIT")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGILL;, AC_DEFINE(HAVE_SIGILL,1,Do we have SIGILL), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGILL")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGTRAP;, AC_DEFINE(HAVE_SIGTRAP,1,Do we have SIGTRAP), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGTRAP")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGABRT;, AC_DEFINE(HAVE_SIGABRT,1,Do we have SIGABRT), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGABRT")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGIOT;, AC_DEFINE(HAVE_SIGIOT,1,Do we have SIGIOT), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGIOT")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGBUS;, AC_DEFINE(HAVE_SIGBUS,1,Do we have SIGBUS), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGBUS")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGFPE;, AC_DEFINE(HAVE_SIGFPE,1,Do we have SIGFPE), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGFPE")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGKILL;, AC_DEFINE(HAVE_SIGKILL,1,Do we have SIGKILL), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGKILL")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGUSR1;, AC_DEFINE(HAVE_SIGUSR1,1,Do we have SIGUSR1), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGUSR1")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGSEGV;, AC_DEFINE(HAVE_SIGSEGV,1,Do we have SIGSEGV), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGSEGV")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGUSR2;, AC_DEFINE(HAVE_SIGUSR2,1,Do we have SIGUSR2), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGUSR2")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGPIPE;, AC_DEFINE(HAVE_SIGPIPE,1,Do we have SIGPIPE), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGPIPE")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGALRM;, AC_DEFINE(HAVE_SIGALRM,1,Do we have SIGALRM), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGALRM")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGTERM;, AC_DEFINE(HAVE_SIGTERM,1,Do we have SIGTERM), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGTERM")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGSTKFLT;, AC_DEFINE(HAVE_SIGSTKFLT,1,Do we have SIGSTKFLT), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGSTKFLT")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGCHLD;, AC_DEFINE(HAVE_SIGCHLD,1,Do we have SIGCHLD), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGCHLD")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGCONT;, AC_DEFINE(HAVE_SIGCONT,1,Do we have SIGCONT), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGCONT")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGSTOP;, AC_DEFINE(HAVE_SIGSTOP,1,Do we have SIGSTOP), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGSTOP")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGTSTP;, AC_DEFINE(HAVE_SIGTSTP,1,Do we have SIGTSTP), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGTSTP")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGTTIN;, AC_DEFINE(HAVE_SIGTTIN,1,Do we have SIGTTIN), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGTTIN")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGTTOU;, AC_DEFINE(HAVE_SIGTTOU,1,Do we have SIGTTOU), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGTTOU")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGURG;, AC_DEFINE(HAVE_SIGURG,1,Do we have SIGURG), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGURG")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGXCPU;, AC_DEFINE(HAVE_SIGXCPU,1,Do we have SIGXCPU), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGXCPU")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGXFSZ;, AC_DEFINE(HAVE_SIGXFSZ,1,Do we have SIGXFSZ), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGXFSZ")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGVTALRM;, AC_DEFINE(HAVE_SIGVTALRM,1,Do we have SIGVTALRM), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGVTALRM")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGPROF;, AC_DEFINE(HAVE_SIGPROF,1,Do we have SIGPROF), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGPROF")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGWINCH;, AC_DEFINE(HAVE_SIGWINCH,1,Do we have SIGWINCH), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGWINCH")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGIO;, AC_DEFINE(HAVE_SIGIO,1,Do we have SIGIO), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGIO")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGPOLL;, AC_DEFINE(HAVE_SIGPOLL,1,Do we have SIGPOLL), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGPOLL")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGPWR;, AC_DEFINE(HAVE_SIGPWR,1,Do we have SIGPWR), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGPWR")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGUNUSED;, AC_DEFINE(HAVE_SIGUNUSED,1,Do we have SIGUNUSED), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGUNUSED")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGEMT;, AC_DEFINE(HAVE_SIGEMT,1,Do we have SIGEMT), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGEMT")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGSYS;, AC_DEFINE(HAVE_SIGSYS,1,Do we have SIGSYS), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGSYS")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGCLD;, AC_DEFINE(HAVE_SIGCLD,1,Do we have SIGCLD), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGCLD")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGWAITING;, AC_DEFINE(HAVE_SIGWAITING,1,Do we have SIGWAITING), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGWAITING")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGLWP;, AC_DEFINE(HAVE_SIGLWP,1,Do we have SIGLWP), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGLWP")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGFREEZE;, AC_DEFINE(HAVE_SIGFREEZE,1,Do we have SIGFREEZE), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGFREEZE")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGTHAW;, AC_DEFINE(HAVE_SIGTHAW,1,Do we have SIGTHAW), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGTHAW")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGCANCEL;, AC_DEFINE(HAVE_SIGCANCEL,1,Do we have SIGCANCEL), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGCANCEL")
+AC_TRY_COMPILE([#include <signal.h>
+#include <stdlib.h>],
+int a=SIGLOST;, AC_DEFINE(HAVE_SIGLOST,1,Do we have SIGLOST), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGLOST")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=_SIGRTMIN;, AC_DEFINE(HAVE__SIGRTMIN,1,Do we have _SIGRTMIN), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGRTMIN")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=_SIGRTMAX;, AC_DEFINE(HAVE__SIGRTMAX,1,Do we have _SIGRTMAX), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGRTMAX")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGRTMIN;, AC_DEFINE(HAVE_SIGRTMIN,1,Do we have SIGRTMIN), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGTMIN")
+AC_TRY_COMPILE([#include <signal.h> 
+#include <stdlib.h>],
+int a=SIGRTMAX;, AC_DEFINE(HAVE_SIGRTMAX,1,Do we have SIGRTMAX), UNSUPPORTEDSIGNALS="$UNSUPPORTEDSIGNALS SIGTMAX")
+
+if ( test -n "$UNSUPPORTEDSIGNALS" )
+then
+	AC_MSG_RESULT($UNSUPPORTEDSIGNALS)
+fi
 ])

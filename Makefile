@@ -3,12 +3,6 @@ include config.mk
 all:
 	$(MAKE) -C src all
 
-clients:
-	$(MAKE) -C src clients
-
-servers:
-	$(MAKE) -C src servers
-
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C bench clean

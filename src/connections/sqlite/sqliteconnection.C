@@ -216,7 +216,7 @@ void	sqlitecursor::returnColumnInfo() {
 		// column type and size are unknown in sqlite
 		conn->sendColumnDefinition(result[i],
 					strlen(result[i]),
-					UNKNOWN_DATATYPE,0,0,0,0,0);
+					UNKNOWN_DATATYPE,0,0,0,0,0,0);
 	}
 }
 

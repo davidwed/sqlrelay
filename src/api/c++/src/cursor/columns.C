@@ -106,6 +106,11 @@ unsigned short	sqlrcursor::getColumnIsPrimaryKey(int col) {
 	return (whichcol)?whichcol->primarykey:0;
 }
 
+unsigned short	sqlrcursor::getColumnIsUnique(int col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->unique:0;
+}
+
 int	sqlrcursor::getLongest(int col) {
 	column	*whichcol=getColumn(col);
 	return (whichcol)?whichcol->longest:0;
@@ -146,6 +151,11 @@ unsigned short	sqlrcursor::getColumnIsNullable(const char *col) {
 unsigned short	sqlrcursor::getColumnIsPrimaryKey(const char *col) {
 	column	*whichcol=getColumn(col);
 	return (whichcol)?whichcol->primarykey:0;
+}
+
+unsigned short	sqlrcursor::getColumnIsUnique(const char *col) {
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->unique:0;
 }
 
 int	sqlrcursor::getLongest(const char *col) {

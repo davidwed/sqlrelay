@@ -363,6 +363,7 @@ Documentation for SQL Relay.
 	%{?_without_java:	--disable-java} \
 	%{?_without_tcl:	--disable-tcl} \
 	%{?_without_perl:	--disable-perl} \
+	%{!?_without_perl:	--with-perl-install-prefix=%{buildroot}/usr} \
 	%{?_without_php:	--disable-php} \
 	%{?_without_python:	--disable-python} \
 	%{?_without_ruby:	--disable-ruby} \
@@ -381,7 +382,6 @@ rm -rf %{buildroot}
 	ZOPEDIR=%{buildroot}%{zopedir} \
 	PHPEXTDIR=%{buildroot}%{phpextdir} \
 	TCLLIBSPATH=%{buildroot}%{tcldir} \
-	PREFIX=%{buildroot}%{_prefix} \
 	HAVE_RUBY="" \
 	initroot=%{buildroot}
 # now install ruby

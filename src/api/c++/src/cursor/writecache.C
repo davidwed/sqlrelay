@@ -180,9 +180,10 @@ void	sqlrcursor::cacheColumnInfo() {
 			cachedest->write(whichcolumn->precision);
 			cachedest->write(whichcolumn->scale);
 
-			// write the nullable, primary key flags
+			// write the nullable, primary key, unique flags
 			cachedest->write(whichcolumn->nullable);
 			cachedest->write(whichcolumn->primarykey);
+			cachedest->write(whichcolumn->unique);
 		}
 	}
 }

@@ -34,6 +34,11 @@
 	fixed a bug where NULL binds weren't being faked at all
 	added a hack for broken glibc-2.3's
 	split up sqlrconnection.C and sqlrcursor.C in connection base classes
+	added support for tcl < 8.2
+	inputBindBlob in java api takes a byte array now instead of a String
+	postgresql connection uses PQfmod if PQfsize returns -1
+	updated libtool scripts
+	cleaned up and sped up unsupported signal checks in configure script
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

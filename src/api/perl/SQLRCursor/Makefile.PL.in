@@ -14,4 +14,5 @@ WriteMakefile(
 	'TYPEMAPS'	=> ["perlobject.map"],
 	'realclean'	=> {'FILES' => 'perl'},
 	'XSOPT'		=> '-C++',
+	'PREFIX'	=> '@PERLINSTALLPREFIX@',
 );

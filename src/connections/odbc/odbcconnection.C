@@ -528,7 +528,7 @@ void	odbccursor::returnColumnInfo() {
 		// send column definition
 		conn->sendColumnDefinition(col[i].name,col[i].namelength,type,
 						col[i].length,col[i].precision,
-						col[i].scale,0,0);
+						col[i].scale,0,0,0);
 	}
 }
 

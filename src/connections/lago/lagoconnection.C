@@ -239,7 +239,7 @@ void	lagocursor::returnColumnInfo() {
 		// send the column definition
 		conn->sendColumnDefinition(name,strlen(name),type,
 						length,precision,scale,
-						nullable,0);
+						nullable,0,0);
 	}
 }
 

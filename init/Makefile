@@ -2,7 +2,13 @@ include ../config.mk
 
 INSTALL = $(abs_srcdir)/install-sh -c
 
+UID = $(shell id -u)
+
+ifeq ($(UID),0)
 initroot =
+else
+initroot = $(prefix)
+endif
 
 install:
 ifeq ($(UNAME),Linux)

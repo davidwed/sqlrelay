@@ -198,6 +198,12 @@ int	sqlrcursor::parseColumnInfo() {
 				return -1;
 			}
 
+			// get whether the column is a unique
+			if (getShort(&currentcol->unique)!=
+						sizeof(unsigned short)) {
+				return -1;
+			}
+
 			// initialize the longest value
 			currentcol->longest=0;
 	

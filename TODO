@@ -1,39 +1,20 @@
-libpq-sqlrelay.a fails to install when building RPM
 perl api's don't get installed right when building an RPM
-
-implement unique flag like nullable, primary key, precision, scale
-nullable,primary key isn't implemented for many connections
-implement unique/nullable/primary key as a bitmap
-
-docs, tests for nullable, primary key, precision, scale, getfieldAsXXX and
-	getOutputBindAsXXX
-
-is there a better way to get a column's precision in interbase
-precision/scale in postgresql
-
-add column precision/scale/flags to protocol doc
-
-for non-root users, initroot should be set to $(prefix)
-
-postgresql drop-in api lacks many features
-
-use connectstring class to parse/store connectstrings
-
-test,document Java "getXXXAsByteArray" methods
-document oracle 8.0/8i temp-blob compile flag
-tests need to check blob/lobs with binary data in them
-test interbase stored procedures
-
-tcl-8.0.3 (redhat 5.2) compatibility
-
 if all space is used up in a filesystem, SQL Relay stops working
-is there a zero-cursor bug?
+zero-cursor bug
+if no users are defined, connections crash
 suspend/resumeResultSet doesn't appear to work if result set is done
 
-java inputBindBlob() method probably needs to take a byte array instead of a
-	string
+implement unique/nullable/primary key as a bitmap
+use connectstring class to parse/store connectstrings
 
-could debug logs be logrotate compatible?
+document that for non-root users, initscripts are installed under $(prefix)
+document column flags, getFieldAsXXX, getOutputBindAsXXX
+document oracle 8.0/8i temp-blob compile flag
+
+test column flags, getFieldAsXXX, getOutputBindAsXXX
+test,document Java "getXXXAsByteArray" methods
+tests need to check blob/lobs with binary data in them
+test interbase stored procedures
 
 db2 start/stop doesn't work
 	db2start/db2stop works when run as a given instance owner
@@ -134,10 +115,12 @@ Packages:
 	Unixware/OpenUnix
 
 Features:
+	support output bind vars and stored procedures in sybase
+	could debug logs be logrotate compatible?
+	postgresql drop-in api lacks many features
 	sybase/freetds (possibly others) need options for setting chained mode 
 		and isolation mode when client connects
 	sqlr-import/sqlr-export tools
-	support output bind vars and stored procedures in sybase
 	support vector binds
 	handle output binds in Perl-DBD, Python-DB, Ruby-DBD
 	datatype support:

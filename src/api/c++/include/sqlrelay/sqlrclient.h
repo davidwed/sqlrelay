@@ -385,6 +385,10 @@ class sqlrcursor {
 		unsigned short	getColumnIsPrimaryKey(const char *col);
 				// Returns 1 if the specified column is a
 				// primary key and 0 otherwise.
+		unsigned short	getColumnIsUnique(int col);
+		unsigned short	getColumnIsUnique(const char *col);
+				// Returns 1 if the specified column is
+				// unique and 0 otherwise.
 		int	getLongest(int col);
 		int	getLongest(const char *col);
 				// Returns the length of the longest field

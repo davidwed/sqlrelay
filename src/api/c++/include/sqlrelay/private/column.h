@@ -19,6 +19,7 @@ class column {
 		unsigned long	scale;
 		unsigned short	nullable;
 		unsigned short	primarykey;
+		unsigned short	unique;
 };
 
 #endif

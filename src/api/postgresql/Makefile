@@ -4,7 +4,7 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c++/include -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES)
 LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB)
-DEBUGLIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient_p $(RUDIMENTSDEBUGLIBS) $(STDCPPLIB) -lefence
+DEBUGLIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient_p $(RUDIMENTSDEBUGLIBS) $(STDCPPLIB) $(LIBEFENCE)
 
 SRCS = pqasync.C pqconndefaults.C pqconnection.C pqcopy.C \
 	pqencoding.C pqescape.C pqfastpath.C pqlob.C \

@@ -419,7 +419,7 @@ void	oracle7cursor::returnColumnInfo() {
 					(int)desc[i].dbsize,
 					(unsigned short)desc[i].precision,
 					(unsigned short)desc[i].scale,
-					(unsigned short)desc[i].nullok,0);
+					(unsigned short)desc[i].nullok,0,0);
 	}
 }
 

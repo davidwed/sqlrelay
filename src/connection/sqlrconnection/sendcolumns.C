@@ -56,7 +56,8 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 						unsigned long precision,
 						unsigned long scale,
 						unsigned short nullable,
-						unsigned short primarykey) {
+						unsigned short primarykey,
+						unsigned short unique) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -76,7 +77,10 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 		debugstr->append("NOT NULL ");
 	}
 	if (primarykey) {
-		debugstr->append("Primary key");
+		debugstr->append("Primary key ");
+	}
+	if (unique) {
+		debugstr->append("Unique");
 	}
 	debugPrint("connection",3,debugstr->getString());
 	delete debugstr;
@@ -90,6 +94,7 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 	clientsock->write(scale);
 	clientsock->write(nullable);
 	clientsock->write(primarykey);
+	clientsock->write(unique);
 }
 
 void	sqlrconnection::sendColumnDefinitionString(const char *name,
@@ -100,7 +105,8 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 						unsigned long precision,
 						unsigned long scale,
 						unsigned short nullable,
-						unsigned short primarykey) {
+						unsigned short primarykey,
+						unsigned short unique) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -122,7 +128,10 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 		debugstr->append("NOT NULL ");
 	}
 	if (primarykey) {
-		debugstr->append("Primary key");
+		debugstr->append("Primary key ");
+	}
+	if (unique) {
+		debugstr->append("Unique");
 	}
 	debugPrint("connection",3,debugstr->getString());
 	delete debugstr;
@@ -137,4 +146,5 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 	clientsock->write(scale);
 	clientsock->write(nullable);
 	clientsock->write(primarykey);
+	clientsock->write(unique);
 }

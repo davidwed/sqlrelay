@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.4 2003-07-22 00:46:26 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.5 2003-07-27 16:17:57 mused Exp $
  */
 
 #include <strings.h>
@@ -9,6 +9,11 @@
 #include <sqlrelay/sqlrclient.h>
 
 #include "tclincludes.h"
+
+#include <config.h>
+#ifndef HAVE_TCL_GETSTRING
+	#define Tcl_GetString(a) Tcl_GetStringFromObj(a,NULL)
+#endif
 
 extern "C" {
 
