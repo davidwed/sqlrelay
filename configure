@@ -9125,78 +9125,12 @@ then
 
 	for i in "pthread" "pth" "c_r" "gthreads"
 	do
-		if ( test -n "$PTHREADSPATH" )
-		then
-			as_ac_File=`echo "ac_cv_file_$PTHREADSPATH/lib/lib$i.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $PTHREADSPATH/lib/lib$i.a" >&5
-echo $ECHO_N "checking for $PTHREADSPATH/lib/lib$i.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$PTHREADSPATH/lib/lib$i.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  PTHREADSLIB="-L$PTHREADSPATH/lib -l$i"
-fi
+		for j in "$PTHREADSPATH" "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/pthread" "/usr/local/lib/pthreads" "/usr/local/lib/pth" "/usr/local/pthread/lib" "/usr/local/pthreads/lib" "/opt/sfw/lib"
+		do
+			if ( test -n "$j" ); then
 
-			as_ac_File=`echo "ac_cv_file_$PTHREADSPATH/lib/lib$i.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $PTHREADSPATH/lib/lib$i.so" >&5
-echo $ECHO_N "checking for $PTHREADSPATH/lib/lib$i.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$PTHREADSPATH/lib/lib$i.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  PTHREADSLIBPATH="$PTHREADSPATH/lib"; PTHREADSLIB="-L$PTHREADSPATH/lib -l$i"
-fi
-
-		else
-			for j in "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/pthread" "/usr/local/lib/pthreads" "/usr/local/lib/pth" "/usr/local/pthread/lib" "/usr/local/pthreads/lib" "/opt/sfw/lib"
-			do
-				as_ac_File=`echo "ac_cv_file_$j/lib$i.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $j/lib$i.a" >&5
-echo $ECHO_N "checking for $j/lib$i.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$j/lib$i.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  PTHREADSLIB="-L$j -l$i"
-fi
-
-				as_ac_File=`echo "ac_cv_file_$j/lib$i.so" | $as_tr_sh`
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$j/lib$i.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $j/lib$i.so" >&5
 echo $ECHO_N "checking for $j/lib$i.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9215,18 +9149,18 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  PTHREADSLIBPATH="$j"; PTHREADSLIB="-L$j -l$i"
+  FOUNDLIB="yes"
 fi
 
-				if ( test -n "$PTHREADSLIB" )
-				then
-					break
-				fi
-			done
-
-			as_ac_File=`echo "ac_cv_file_/usr/lib/lib$i.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for /usr/lib/lib$i.a" >&5
-echo $ECHO_N "checking for /usr/lib/lib$i.a... $ECHO_C" >&6
+if ( test -n "$FOUNDLIB" )
+then
+	eval "PTHREADSLIBPATH=\"$j\"; PTHREADSLIB=\"-L$j -l$i\""
+else
+	if ( test -n "$j/lib$i.a" )
+	then
+		as_ac_File=`echo "ac_cv_file_$j/lib$i.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $j/lib$i.a" >&5
+echo $ECHO_N "checking for $j/lib$i.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -9234,7 +9168,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "/usr/lib/lib$i.a"; then
+if test -r "$j/lib$i.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -9243,10 +9177,26 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  PTHREADSLIB="-l$i"
+  FOUNDLIB="yes"
 fi
 
-			as_ac_File=`echo "ac_cv_file_/usr/lib/lib$i.so" | $as_tr_sh`
+		if ( test ! -n "$FOUNDLIB" )
+		then
+			eval "PTHREADSLIB=\"-L$j -l$i\""
+		fi
+	fi
+fi
+
+				if ( test -n "$PTHREADSLIB" )
+				then
+					break
+				fi
+			fi
+		done
+
+
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/usr/lib/lib$i.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for /usr/lib/lib$i.so" >&5
 echo $ECHO_N "checking for /usr/lib/lib$i.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9265,10 +9215,44 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  PTHREADSLIBPATH=""; PTHREADSLIB="-l$i"
+  FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	eval "PTHREADSLIBPATH=\"\"; PTHREADSLIB=\"-l$i\""
+else
+	if ( test -n "/usr/lib/lib$i.a" )
+	then
+		as_ac_File=`echo "ac_cv_file_/usr/lib/lib$i.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$i.a" >&5
+echo $ECHO_N "checking for /usr/lib/lib$i.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$i.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test ! -n "$FOUNDLIB" )
+		then
+			eval "PTHREADSLIB=\"-l$i\""
 		fi
+	fi
+fi
+
 		if ( test -n "$PTHREADSLIB" )
 		then
 			break
@@ -9308,8 +9292,10 @@ if ( test "$cross_compiling" = "no" )
 then
 	if ( test -z "$MICROSOFT" )
 	then
-		for i in "$RUDIMENTSPATH" "/usr/local/firstworks" "/usr" "/usr/local" "/usr/pkg" "/opt/sfw"
+		for i in "$RUDIMENTSPATH" "/usr/local/firstworks" "/usr/local" "/usr/pkg" "/opt/sfw"
 		do
+			if ( test -n "$i" )
+			then
 
 FOUNDHEADER=""
 FOUNDLIB=""
@@ -9335,39 +9321,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   FOUNDHEADER="yes"
 fi
 
-as_ac_File=`echo "ac_cv_file_$i/lib/librudiments.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/lib/librudiments.a" >&5
-echo $ECHO_N "checking for $i/lib/librudiments.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/lib/librudiments.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FOUNDLIB="yes"
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\""
-		eval "RUDIMENTSLIBSPATH=\"$i/lib\"; RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\""
-	fi
-else
-	if ( test -n "$i/lib/librudiments.so" -a -n "RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\"" )
-	then
-		as_ac_File=`echo "ac_cv_file_$i/lib/librudiments.so" | $as_tr_sh`
+as_ac_File=`echo "ac_cv_file_$i/lib/librudiments.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/librudiments.so" >&5
 echo $ECHO_N "checking for $i/lib/librudiments.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -9389,19 +9343,137 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\""
+		eval "RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\""
+	fi
+else
+	if ( test -n "$i/lib/librudiments.a" -a -n "RUDIMENTSLIBSPATH=\"$i/lib\"; RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/librudiments.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/librudiments.a" >&5
+echo $ECHO_N "checking for $i/lib/librudiments.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/librudiments.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\""
-			eval "RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\""
+			eval "RUDIMENTSLIBSPATH=\"$i/lib\"; RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\""
 		fi
 	fi
 fi
 
-			if ( test -n "$RUDIMENTSLIBS" )
-			then
-				break;
+				if ( test -n "$RUDIMENTSLIBS" )
+				then
+					break;
+				fi
 			fi
 		done
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+echo "$as_me:$LINENO: checking for /usr/include/rudiments/daemonprocess.h" >&5
+echo $ECHO_N "checking for /usr/include/rudiments/daemonprocess.h... $ECHO_C" >&6
+if test "${ac_cv_file__usr_include_rudiments_daemonprocess_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/rudiments/daemonprocess.h"; then
+  ac_cv_file__usr_include_rudiments_daemonprocess_h=yes
+else
+  ac_cv_file__usr_include_rudiments_daemonprocess_h=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_include_rudiments_daemonprocess_h" >&5
+echo "${ECHO_T}$ac_cv_file__usr_include_rudiments_daemonprocess_h" >&6
+if test $ac_cv_file__usr_include_rudiments_daemonprocess_h = yes; then
+  FOUNDHEADER="yes"
+fi
+
+echo "$as_me:$LINENO: checking for /usr/lib/librudiments.so" >&5
+echo $ECHO_N "checking for /usr/lib/librudiments.so... $ECHO_C" >&6
+if test "${ac_cv_file__usr_lib_librudiments_so+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/librudiments.so"; then
+  ac_cv_file__usr_lib_librudiments_so=yes
+else
+  ac_cv_file__usr_lib_librudiments_so=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_librudiments_so" >&5
+echo "${ECHO_T}$ac_cv_file__usr_lib_librudiments_so" >&6
+if test $ac_cv_file__usr_lib_librudiments_so = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "RUDIMENTSINCLUDES=\"\"; RUDIMENTSPATH=\"/usr\""
+		eval "RUDIMENTSLIBS=\"-lrudiments\"; RUDIMENTSDEBUGLIBS=\"-lrudiments_p\""
+	fi
+else
+	if ( test -n "/usr/lib/librudiments.a" -a -n "RUDIMENTSLIBSPATH=\"\"; RUDIMENTSLIBS=\"-lrudiments\"; RUDIMENTSDEBUGLIBS=\"-lrudiments_p\"" )
+	then
+		echo "$as_me:$LINENO: checking for /usr/lib/librudiments.a" >&5
+echo $ECHO_N "checking for /usr/lib/librudiments.a... $ECHO_C" >&6
+if test "${ac_cv_file__usr_lib_librudiments_a+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/librudiments.a"; then
+  ac_cv_file__usr_lib_librudiments_a=yes
+else
+  ac_cv_file__usr_lib_librudiments_a=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_librudiments_a" >&5
+echo "${ECHO_T}$ac_cv_file__usr_lib_librudiments_a" >&6
+if test $ac_cv_file__usr_lib_librudiments_a = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "RUDIMENTSINCLUDES=\"\"; RUDIMENTSPATH=\"/usr\""
+			eval "RUDIMENTSLIBSPATH=\"\"; RUDIMENTSLIBS=\"-lrudiments\"; RUDIMENTSDEBUGLIBS=\"-lrudiments_p\""
+		fi
+	fi
+fi
+
 	else
 		for i in "$RUDIMENTSPATH" "/usr/local/firstworks"
 		do
@@ -9524,7 +9596,7 @@ else
 	fi
 fi
 
-if ( test -z "$RUDIMENTSINCLUDES" -o -z "$RUDIMENTSLIBS" )
+if ( test -z "$RUDIMENTSLIBS" )
 then
 	{ { echo "$as_me:$LINENO: error: Rudiments not found.  SQL-Relay requires this package." >&5
 echo "$as_me: error: Rudiments not found.  SQL-Relay requires this package." >&2;}
@@ -10196,7 +10268,9 @@ echo $ECHO_N "checking for ORACLE_HOME... $ECHO_C" >&6
 	then
 		echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-		as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libcore3.a" | $as_tr_sh`
+
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libcore3.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ORACLE_HOME/lib/libcore3.a" >&5
 echo $ECHO_N "checking for $ORACLE_HOME/lib/libcore3.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -10215,10 +10289,46 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ORACLEVERSION="7"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl -lm $AIOLIB"
+  FOUNDLIB="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libcore4.a" | $as_tr_sh`
+if ( test -n "$FOUNDLIB" )
+then
+	eval "ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl -lm $AIOLIB\""
+else
+	if ( test -n "" )
+	then
+		echo "$as_me:$LINENO: checking for " >&5
+echo $ECHO_N "checking for ... $ECHO_C" >&6
+if test "${ac_cv_file_+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r ""; then
+  ac_cv_file_=yes
+else
+  ac_cv_file_=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file_" >&5
+echo "${ECHO_T}$ac_cv_file_" >&6
+if test $ac_cv_file_ = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test ! -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
+fi
+
+
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libcore4.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ORACLE_HOME/lib/libcore4.a" >&5
 echo $ECHO_N "checking for $ORACLE_HOME/lib/libcore4.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -10237,33 +10347,47 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ORACLEVERSION="8.0"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 -lm $AIOLIB"
+  FOUNDLIB="yes"
 fi
 
-		WTC8=""
-		as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libwtc8.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ORACLE_HOME/lib/libwtc8.so" >&5
-echo $ECHO_N "checking for $ORACLE_HOME/lib/libwtc8.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
+if ( test -n "$FOUNDLIB" )
+then
+	eval "ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 -lm $AIOLIB\""
+else
+	if ( test -n "" )
+	then
+		echo "$as_me:$LINENO: checking for " >&5
+echo $ECHO_N "checking for ... $ECHO_C" >&6
+if test "${ac_cv_file_+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   test "$cross_compiling" = yes &&
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$ORACLE_HOME/lib/libwtc8.so"; then
-  eval "$as_ac_File=yes"
+if test -r ""; then
+  ac_cv_file_=yes
 else
-  eval "$as_ac_File=no"
+  ac_cv_file_=no
 fi
 fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  WTC8="-lwtc8"
+echo "$as_me:$LINENO: result: $ac_cv_file_" >&5
+echo "${ECHO_T}$ac_cv_file_" >&6
+if test $ac_cv_file_ = yes; then
+  FOUNDLIB="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libwtc8.a" | $as_tr_sh`
+		if ( test ! -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
+fi
+
+		WTC8=""
+
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libwtc8.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ORACLE_HOME/lib/libwtc8.a" >&5
 echo $ECHO_N "checking for $ORACLE_HOME/lib/libwtc8.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -10282,10 +10406,46 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  WTC8="-lwtc8"
+  FOUNDLIB="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libcore8.a" | $as_tr_sh`
+if ( test -n "$FOUNDLIB" )
+then
+	eval "WTC8=\"-lwtc8\""
+else
+	if ( test -n "" )
+	then
+		echo "$as_me:$LINENO: checking for " >&5
+echo $ECHO_N "checking for ... $ECHO_C" >&6
+if test "${ac_cv_file_+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r ""; then
+  ac_cv_file_=yes
+else
+  ac_cv_file_=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file_" >&5
+echo "${ECHO_T}$ac_cv_file_" >&6
+if test $ac_cv_file_ = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test ! -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
+fi
+
+
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libcore8.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ORACLE_HOME/lib/libcore8.a" >&5
 echo $ECHO_N "checking for $ORACLE_HOME/lib/libcore8.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -10304,10 +10464,46 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ORACLEVERSION="8.1"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient8 -lcommon8 -lgeneric8 -lclntsh -lcore8 -lnls8 $WTC8 -lm $AIOLIB"
+  FOUNDLIB="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libcore9.a" | $as_tr_sh`
+if ( test -n "$FOUNDLIB" )
+then
+	eval "ORACLEVERSION=\"8.1\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient8 -lcommon8 -lgeneric8 -lclntsh -lcore8 -lnls8 $WTC8 -lm $AIOLIB\""
+else
+	if ( test -n "" )
+	then
+		echo "$as_me:$LINENO: checking for " >&5
+echo $ECHO_N "checking for ... $ECHO_C" >&6
+if test "${ac_cv_file_+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r ""; then
+  ac_cv_file_=yes
+else
+  ac_cv_file_=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file_" >&5
+echo "${ECHO_T}$ac_cv_file_" >&6
+if test $ac_cv_file_ = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test ! -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
+fi
+
+
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libcore9.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ORACLE_HOME/lib/libcore9.a" >&5
 echo $ECHO_N "checking for $ORACLE_HOME/lib/libcore9.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -10326,7 +10522,41 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ORACLEVERSION="9.0"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient9 -lcommon9 -lgeneric9 -lclntsh -lcore9 -lnls9 -lwtc9 -lm $AIOLIB"
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	eval "ORACLEVERSION=\"9.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient9 -lcommon9 -lgeneric9 -lclntsh -lcore9 -lnls9 -lwtc9 -lm $AIOLIB\""
+else
+	if ( test -n "" )
+	then
+		echo "$as_me:$LINENO: checking for " >&5
+echo $ECHO_N "checking for ... $ECHO_C" >&6
+if test "${ac_cv_file_+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r ""; then
+  ac_cv_file_=yes
+else
+  ac_cv_file_=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file_" >&5
+echo "${ECHO_T}$ac_cv_file_" >&6
+if test $ac_cv_file_ = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test ! -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
 fi
 
 		if ( test -n "$ORACLEVERSION" )
@@ -10334,7 +10564,9 @@ fi
 			ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
 			echo "hmmm, looks like Oracle$ORACLEVERSION..."
 		fi
-		as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libclntsh.a" | $as_tr_sh`
+
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$ORACLE_HOME/lib/libclntsh.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ORACLE_HOME/lib/libclntsh.a" >&5
 echo $ECHO_N "checking for $ORACLE_HOME/lib/libclntsh.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -10353,7 +10585,41 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ORACLESTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	eval "ORACLESTATIC=\"$STATICFLAG\""
+else
+	if ( test -n "" )
+	then
+		echo "$as_me:$LINENO: checking for " >&5
+echo $ECHO_N "checking for ... $ECHO_C" >&6
+if test "${ac_cv_file_+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r ""; then
+  ac_cv_file_=yes
+else
+  ac_cv_file_=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file_" >&5
+echo "${ECHO_T}$ac_cv_file_" >&6
+if test $ac_cv_file_ = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test ! -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
 fi
 
 	else
@@ -10409,7 +10675,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; OCI_H="yes"
+echo "${ECHO_T}yes" >&6; OCI_H=\"yes\"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
@@ -10462,7 +10728,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; OCI_H="yes"
+echo "${ECHO_T}yes" >&6; OCI_H=\"yes\"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
@@ -11559,39 +11825,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   FOUNDHEADER="yes"
 fi
 
-as_ac_File=`echo "ac_cv_file_$i/lib/libmsql.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/lib/libmsql.a" >&5
-echo $ECHO_N "checking for $i/lib/libmsql.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/lib/libmsql.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FOUNDLIB="yes"
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\""
-		eval "MSQLLIBS=\"-L$i/lib -lmsql\""
-	fi
-else
-	if ( test -n "$i/lib/libmsql.so" -a -n "MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\"" )
-	then
-		as_ac_File=`echo "ac_cv_file_$i/lib/libmsql.so" | $as_tr_sh`
+as_ac_File=`echo "ac_cv_file_$i/lib/libmsql.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/libmsql.so" >&5
 echo $ECHO_N "checking for $i/lib/libmsql.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -11613,20 +11847,137 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
   FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\""
+		eval "MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\""
+	fi
+else
+	if ( test -n "$i/lib/libmsql.a" -a -n "MSQLLIBS=\"-L$i/lib -lmsql\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/libmsql.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libmsql.a" >&5
+echo $ECHO_N "checking for $i/lib/libmsql.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/libmsql.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\""
-			eval "MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\""
+			eval "MSQLLIBS=\"-L$i/lib -lmsql\""
 		fi
 	fi
 fi
 
-		fi
-		if ( test -n "$MSQLLIBS" )
-		then
-			break
+			if ( test -n "$MSQLLIBS" )
+			then
+				break
+			fi
 		fi
 	done
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+echo "$as_me:$LINENO: checking for /usr/include/msql.h" >&5
+echo $ECHO_N "checking for /usr/include/msql.h... $ECHO_C" >&6
+if test "${ac_cv_file__usr_include_msql_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/msql.h"; then
+  ac_cv_file__usr_include_msql_h=yes
+else
+  ac_cv_file__usr_include_msql_h=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_include_msql_h" >&5
+echo "${ECHO_T}$ac_cv_file__usr_include_msql_h" >&6
+if test $ac_cv_file__usr_include_msql_h = yes; then
+  FOUNDHEADER="yes"
+fi
+
+echo "$as_me:$LINENO: checking for /usr/lib/libmsql.so" >&5
+echo $ECHO_N "checking for /usr/lib/libmsql.so... $ECHO_C" >&6
+if test "${ac_cv_file__usr_lib_libmsql_so+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/libmsql.so"; then
+  ac_cv_file__usr_lib_libmsql_so=yes
+else
+  ac_cv_file__usr_lib_libmsql_so=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libmsql_so" >&5
+echo "${ECHO_T}$ac_cv_file__usr_lib_libmsql_so" >&6
+if test $ac_cv_file__usr_lib_libmsql_so = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "MSQLINCLUDES=\"\"; MSQLPATH=\"\""
+		eval "MSQLLIBSPATH=\"\"; MSQLLIBS=\"-lmsql\""
+	fi
+else
+	if ( test -n "/usr/lib/libmsql.a" -a -n "MSQLLIBS=\"-lmsql\"" )
+	then
+		echo "$as_me:$LINENO: checking for /usr/lib/libmsql.a" >&5
+echo $ECHO_N "checking for /usr/lib/libmsql.a... $ECHO_C" >&6
+if test "${ac_cv_file__usr_lib_libmsql_a+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/libmsql.a"; then
+  ac_cv_file__usr_lib_libmsql_a=yes
+else
+  ac_cv_file__usr_lib_libmsql_a=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libmsql_a" >&5
+echo "${ECHO_T}$ac_cv_file__usr_lib_libmsql_a" >&6
+if test $ac_cv_file__usr_lib_libmsql_a = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "MSQLINCLUDES=\"\"; MSQLPATH=\"\""
+			eval "MSQLLIBS=\"-lmsql\""
+		fi
+	fi
+fi
+
 
 	if ( test -n "$RPATHFLAG" -a -n "$MSQLLIBSPATH" )
 	then
@@ -12128,403 +12479,998 @@ echo "***** SQLite *****************"
 if ( test "$ENABLE_SQLITE" = "yes" )
 then
 
-	SQLITESTATIC=""
+
+
+
+eval "GDBMINCLUDES=\"\""
+eval "GDBMLIBS=\"\""
+eval "GDBMLIBSPATH=\"\""
+eval "GDBMSTATIC=\"\""
+
+SEARCHPATH=$LIBGDBMPATH
+NAME=gdbm
+HEADER=gdbm.h
+LIBNAME=gdbm
+LINKSTATIC=$STATICFLAG
+LINKRPATH=$RPATHFLAG
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/usr/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/include/$HEADER" >&5
+echo $ECHO_N "checking for /usr/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"\""
+		eval "LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/usr/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"\""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+	for i in "$SEARCHPATH" "/usr/local/firstworks" "/usr/local/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw"
+	do
+		if ( test -n "$i" ); then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i\""
+		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i\""
+			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/$NAME\""
+		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/$NAME\""
+			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i\""
+		eval "LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i\""
+			eval "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/$NAME\""
+		eval "LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/$NAME\""
+			eval "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -n "$LIBSTRING" )
+			then
+				break
+			fi
+		fi
+	done
+fi
+
+if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
+then
+	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+fi
+
+eval "GDBMINCLUDES=\"$INCLUDESTRING\""
+eval "GDBMLIBS=\"$LIBSTRING\""
+eval "GDBMLIBSPATH=\"$LIBPATH\""
+eval "GDBMSTATIC=\"$STATIC\""
+
+
+
+
+
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
 	then
 		STATICFLAG="-static"
 	fi
 
-	GDBMLIBS=""
-	for i in "$LIBGDBMPATH" "/usr/local" "/usr/pkg" "/usr/local/libgdbm" "/opt/sfw"
-	do
-		if ( test -n "$i" )
-		then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-as_ac_File=`echo "ac_cv_file_$i/include/gdbm.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/include/gdbm.h" >&5
-echo $ECHO_N "checking for $i/include/gdbm.h... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/include/gdbm.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FOUNDHEADER="yes"
-fi
-
-as_ac_File=`echo "ac_cv_file_$i/lib/libgdbm.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/lib/libgdbm.a" >&5
-echo $ECHO_N "checking for $i/lib/libgdbm.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/lib/libgdbm.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FOUNDLIB="yes"
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "GDBMLIBS=\"-L$i/lib -lgdbm\""
-	fi
-else
-	if ( test -n "$i/lib/libgdbm.so" -a -n "GDBMLIBS=\"-L$i/lib -lgdbm\"" )
-	then
-		as_ac_File=`echo "ac_cv_file_$i/lib/libgdbm.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/lib/libgdbm.so" >&5
-echo $ECHO_N "checking for $i/lib/libgdbm.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/lib/libgdbm.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FOUNDLIB="yes"
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "GDBMLIBS=\"-L$i/lib -lgdbm\""
-		fi
-	fi
-fi
-
-		fi
-		if ( test -n "$GDBMLIBS" )
-		then
-			break
-		fi
-	done
-
-
-FOUNDHEADER=""
-FOUNDLIB=""
-echo "$as_me:$LINENO: checking for /usr/include/gdbm.h" >&5
-echo $ECHO_N "checking for /usr/include/gdbm.h... $ECHO_C" >&6
-if test "${ac_cv_file__usr_include_gdbm_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/include/gdbm.h"; then
-  ac_cv_file__usr_include_gdbm_h=yes
-else
-  ac_cv_file__usr_include_gdbm_h=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_include_gdbm_h" >&5
-echo "${ECHO_T}$ac_cv_file__usr_include_gdbm_h" >&6
-if test $ac_cv_file__usr_include_gdbm_h = yes; then
-  FOUNDHEADER="yes"
-fi
-
-echo "$as_me:$LINENO: checking for /usr/lib/libgdbm.a" >&5
-echo $ECHO_N "checking for /usr/lib/libgdbm.a... $ECHO_C" >&6
-if test "${ac_cv_file__usr_lib_libgdbm_a+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/lib/libgdbm.a"; then
-  ac_cv_file__usr_lib_libgdbm_a=yes
-else
-  ac_cv_file__usr_lib_libgdbm_a=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libgdbm_a" >&5
-echo "${ECHO_T}$ac_cv_file__usr_lib_libgdbm_a" >&6
-if test $ac_cv_file__usr_lib_libgdbm_a = yes; then
-  FOUNDLIB="yes"
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "GDBMLIBS=\"-lgdbm\""
-	fi
-else
-	if ( test -n "/usr/lib/libgdbm.so" -a -n "GDBMLIBS=\"-lgdbm\"" )
-	then
-		echo "$as_me:$LINENO: checking for /usr/lib/libgdbm.so" >&5
-echo $ECHO_N "checking for /usr/lib/libgdbm.so... $ECHO_C" >&6
-if test "${ac_cv_file__usr_lib_libgdbm_so+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/lib/libgdbm.so"; then
-  ac_cv_file__usr_lib_libgdbm_so=yes
-else
-  ac_cv_file__usr_lib_libgdbm_so=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libgdbm_so" >&5
-echo "${ECHO_T}$ac_cv_file__usr_lib_libgdbm_so" >&6
-if test $ac_cv_file__usr_lib_libgdbm_so = yes; then
-  FOUNDLIB="yes"
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "GDBMLIBS=\"-lgdbm\""
-		fi
-	fi
-fi
-
-
-
-
 	SQLITEINCLUDES=""
 	SQLITELIBS=""
 	SQLITELIBPATH=""
+	SQLITESTATIC=""
 
 	if ( test -n "$PTHREADSLIB" )
 	then
-		if ( test -n "$SQLITEPATH" )
+
+
+eval "SQLITEINCLUDES=\"\""
+eval "SQLITELIBS=\"\""
+eval "SQLITELIBPATH=\"\""
+eval "SQLITESTATIC=\"\""
+
+SEARCHPATH=$SQLITEPATH
+NAME=sqlite
+HEADER=sqlite.h
+LIBNAME=sqlite
+LINKSTATIC=$STATICFLAG
+LINKRPATH=$RPATHFLAG
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/usr/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/include/$HEADER" >&5
+echo $ECHO_N "checking for /usr/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"\""
+		eval "LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/usr/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			as_ac_File=`echo "ac_cv_file_$SQLITEPATH/include/sqlite.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $SQLITEPATH/include/sqlite.h" >&5
-echo $ECHO_N "checking for $SQLITEPATH/include/sqlite.h... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$SQLITEPATH/include/sqlite.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SQLITEINCLUDES="-I$SQLITEPATH/include"
-fi
-
-			as_ac_File=`echo "ac_cv_file_$SQLITEPATH/lib/libsqlite.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $SQLITEPATH/lib/libsqlite.a" >&5
-echo $ECHO_N "checking for $SQLITEPATH/lib/libsqlite.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$SQLITEPATH/lib/libsqlite.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SQLITELIBS="-L$SQLITEPATH/lib -lsqlite"
-fi
-
-			as_ac_File=`echo "ac_cv_file_$SQLITEPATH/lib/libsqlite.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $SQLITEPATH/lib/libsqlite.so" >&5
-echo $ECHO_N "checking for $SQLITEPATH/lib/libsqlite.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$SQLITEPATH/lib/libsqlite.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SQLITELIBPATH="$SQLIBEPATH/lib"; SQLITELIBS="-L$SQLITEPATH/lib -lsqlite"
-fi
-
-		else
-			for i in "/usr/include" "/usr/local/sqlite/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
-			do
-				as_ac_File=`echo "ac_cv_file_$i/sqlite.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/sqlite.h" >&5
-echo $ECHO_N "checking for $i/sqlite.h... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/sqlite.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SQLITEINCLUDES="-I$i"
-fi
-
-				if ( test -n "$SQLITEINCLUDES" )
-				then
-					break
-				fi
-			done
-			for i in "/usr/local/sqlite/lib" "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/sqlite" "/opt/sfw/lib"
-			do
-				as_ac_File=`echo "ac_cv_file_$i/libsqlite.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libsqlite.a" >&5
-echo $ECHO_N "checking for $i/libsqlite.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/libsqlite.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SQLITELIBS="-L$i -lsqlite"; SQLITESTATIC="$STATICFLAG"
-fi
-
-				as_ac_File=`echo "ac_cv_file_$i/libsqlite.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libsqlite.so" >&5
-echo $ECHO_N "checking for $i/libsqlite.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/libsqlite.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SQLITELIBPATH="$i"; SQLITELIBS="-L$i -lsqlite"
-fi
-
-				if ( test -n "$SQLITELIBS" )
-				then
-					break
-				fi
-			done
-
-			echo "$as_me:$LINENO: checking for /usr/lib/libsqlite.a" >&5
-echo $ECHO_N "checking for /usr/lib/libsqlite.a... $ECHO_C" >&6
-if test "${ac_cv_file__usr_lib_libsqlite_a+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/lib/libsqlite.a"; then
-  ac_cv_file__usr_lib_libsqlite_a=yes
-else
-  ac_cv_file__usr_lib_libsqlite_a=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libsqlite_a" >&5
-echo "${ECHO_T}$ac_cv_file__usr_lib_libsqlite_a" >&6
-if test $ac_cv_file__usr_lib_libsqlite_a = yes; then
-  SQLITELIBS="-lsqlite"; SQLITESTATIC="$STATICFLAG"
-fi
-
-			echo "$as_me:$LINENO: checking for /usr/lib/libsqlite.so" >&5
-echo $ECHO_N "checking for /usr/lib/libsqlite.so... $ECHO_C" >&6
-if test "${ac_cv_file__usr_lib_libsqlite_so+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/lib/libsqlite.so"; then
-  ac_cv_file__usr_lib_libsqlite_so=yes
-else
-  ac_cv_file__usr_lib_libsqlite_so=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libsqlite_so" >&5
-echo "${ECHO_T}$ac_cv_file__usr_lib_libsqlite_so" >&6
-if test $ac_cv_file__usr_lib_libsqlite_so = yes; then
-  SQLITELIBPATH=""; SQLITELIBS="-lsqlite"
-fi
-
+			eval "INCLUDESTRING=\"\""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
+	fi
+fi
 
-		if ( test "$SQLITEINCLUDES" = "-I/usr/include" )
+
+if ( test -z "$LIBSTRING" )
+then
+
+	for i in "$SEARCHPATH" "/usr/local/firstworks" "/usr/local/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw"
+	do
+		if ( test -n "$i" ); then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i\""
+		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			SQLITEINCLUDES=""
+			eval "INCLUDESTRING=\"-I$i\""
+			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
+	fi
+fi
+
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/$NAME\""
+		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/$NAME\""
+			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i\""
+		eval "LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i\""
+			eval "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/$NAME\""
+		eval "LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/$NAME\""
+			eval "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -n "$LIBSTRING" )
+			then
+				break
+			fi
+		fi
+	done
+fi
+
+if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
+then
+	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+fi
+
+eval "SQLITEINCLUDES=\"$INCLUDESTRING\""
+eval "SQLITELIBS=\"$LIBSTRING\""
+eval "SQLITELIBPATH=\"$LIBPATH\""
+eval "SQLITESTATIC=\"$STATIC\""
+
 	else
 		{ echo "$as_me:$LINENO: WARNING: pthreads was not found." >&5
 echo "$as_me: WARNING: pthreads was not found." >&2;}
@@ -12535,10 +13481,6 @@ echo "$as_me: WARNING: pthreads was not found." >&2;}
 		{ echo "$as_me:$LINENO: WARNING: SQLite support will not be built." >&5
 echo "$as_me: WARNING: SQLite support will not be built." >&2;}
 	else
-		if ( test -n "$RPATHFLAG" -a -n "$SQLITELIBSPATH" )
-		then
-			SQLITELIBS="-Wl,-rpath $SQLITELIBSPATH $SQLITELIBS"
-		fi
 		echo "$as_me:$LINENO: checking if SQLite needs gdbm" >&5
 echo $ECHO_N "checking if SQLite needs gdbm... $ECHO_C" >&6
 		SQLITENEEDGDBM=""
@@ -12631,219 +13573,505 @@ echo "***** Lago *******************"
 if ( test "$ENABLE_LAGO" = "yes" )
 then
 
-	LAGOINCLUDES=""
-	LAGOLIBS=""
-	LAGOSTATIC=""
-	LAGOLIBPATH=""
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
 	then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -n "$LAGOPATH" )
+
+
+eval "LAGOINCLUDES=\"\""
+eval "LAGOLIBS=\"\""
+eval "LAGOLIBPATH=\"\""
+eval "LAGOSTATIC=\"\""
+
+SEARCHPATH=$LAGOPATH
+NAME=lago
+HEADER=lago.h
+LIBNAME=lago
+LINKSTATIC=$STATICFLAG
+LINKRPATH=$RPATHFLAG
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/usr/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/include/$HEADER" >&5
+echo $ECHO_N "checking for /usr/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		as_ac_File=`echo "ac_cv_file_$LAGOPATH/include/lago.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $LAGOPATH/include/lago.h" >&5
-echo $ECHO_N "checking for $LAGOPATH/include/lago.h... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$LAGOPATH/include/lago.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  LAGOINCLUDES="-I$LAGOPATH/include"
-fi
-
-		as_ac_File=`echo "ac_cv_file_$LAGOPATH/lib/liblago.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $LAGOPATH/lib/liblago.a" >&5
-echo $ECHO_N "checking for $LAGOPATH/lib/liblago.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$LAGOPATH/lib/liblago.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  LAGOLIBS="-L$LAGOPATH/lib -llago"; LAGOSTATIC="$STATICFLAG"
-fi
-
-		as_ac_File=`echo "ac_cv_file_$LAGOPATH/lib/liblago.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $LAGOPATH/lib/liblago.so" >&5
-echo $ECHO_N "checking for $LAGOPATH/lib/liblago.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$LAGOPATH/lib/liblago.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  LAGOLIBPATH="$LAGOPATH/lib"; LAGOLIBS="-L$LAGOPATH/lib -llago"
-fi
-
-	else
-		for i in "/usr/include" "/usr/local/lago/include" "/usr/pkg/include" "/usr/local/include" "/opt/sfw/include"
-		do
-			as_ac_File=`echo "ac_cv_file_$i/lago.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/lago.h" >&5
-echo $ECHO_N "checking for $i/lago.h... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/lago.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  LAGOINCLUDES="-I$i"
-fi
-
-			if ( test -n "$LAGOINCLUDES" )
-			then
-				break
-			fi
-		done
-		for i in "/usr/local/lago/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib/lago" "/opt/sfw/lib"
-		do
-			as_ac_File=`echo "ac_cv_file_$i/liblago.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/liblago.a" >&5
-echo $ECHO_N "checking for $i/liblago.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/liblago.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  LAGOLIBS="-L$i -llago"; LAGOSTATIC="$STATICFLAG"
-fi
-
-			as_ac_File=`echo "ac_cv_file_$i/liblago.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/liblago.so" >&5
-echo $ECHO_N "checking for $i/liblago.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/liblago.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  LAGOLIBPATH="$i"; LAGOLIBS="-L$i -llago"
-fi
-
-			if ( test -n "$LAGOLIBS" )
-			then
-				break
-			fi
-		done
-
-		echo "$as_me:$LINENO: checking for /usr/lib/liblago.a" >&5
-echo $ECHO_N "checking for /usr/lib/liblago.a... $ECHO_C" >&6
-if test "${ac_cv_file__usr_lib_liblago_a+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/lib/liblago.a"; then
-  ac_cv_file__usr_lib_liblago_a=yes
-else
-  ac_cv_file__usr_lib_liblago_a=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_liblago_a" >&5
-echo "${ECHO_T}$ac_cv_file__usr_lib_liblago_a" >&6
-if test $ac_cv_file__usr_lib_liblago_a = yes; then
-  LAGOLIBS="-llago"; LAGOSTATIC="$STATICFLAG"
-fi
-
-		echo "$as_me:$LINENO: checking for /usr/lib/liblago.so" >&5
-echo $ECHO_N "checking for /usr/lib/liblago.so... $ECHO_C" >&6
-if test "${ac_cv_file__usr_lib_liblago_so+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/lib/liblago.so"; then
-  ac_cv_file__usr_lib_liblago_so=yes
-else
-  ac_cv_file__usr_lib_liblago_so=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_liblago_so" >&5
-echo "${ECHO_T}$ac_cv_file__usr_lib_liblago_so" >&6
-if test $ac_cv_file__usr_lib_liblago_so = yes; then
-  LAGOLIBPATH=""; LAGOLIBS="-llago"
-fi
-
+		eval "INCLUDESTRING=\"\""
+		eval "LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\""
 	fi
+else
+	if ( test -n "/usr/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"\""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+	for i in "$SEARCHPATH" "/usr/local/firstworks" "/usr/local/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw"
+	do
+		if ( test -n "$i" ); then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i\""
+		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i\""
+			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/$NAME\""
+		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/$NAME\""
+			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i\""
+		eval "LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i\""
+			eval "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/$NAME\""
+		eval "LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/$NAME\""
+			eval "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -n "$LIBSTRING" )
+			then
+				break
+			fi
+		fi
+	done
+fi
+
+if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
+then
+	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+fi
+
+eval "LAGOINCLUDES=\"$INCLUDESTRING\""
+eval "LAGOLIBS=\"$LIBSTRING\""
+eval "LAGOLIBPATH=\"$LIBPATH\""
+eval "LAGOSTATIC=\"$STATIC\""
+
 
 	if ( test -z "$LAGOLIBS" )
 	then
 		{ echo "$as_me:$LINENO: WARNING: Lago support will not be built." >&5
 echo "$as_me: WARNING: Lago support will not be built." >&2;}
 	else
-		if ( test -n "$RPATHFLAG" -a -n "$LAGOLIBSPATH" )
-		then
-			LAGOLIBS="-Wl,-rpath $LAGOLIBSPATH $LAGOLIBS"
-		fi
 		echo "$as_me:$LINENO: checking if Lago needs threads" >&5
 echo $ECHO_N "checking if Lago needs threads... $ECHO_C" >&6
 
@@ -12899,11 +14127,6 @@ export LD_LIBRARY_PATH
 
 	fi
 
-	if ( test "$LAGOINCLUDES" = "-I/usr/include" )
-	then
-		LAGOINCLUDES=""
-	fi
-
 
 
 
@@ -12930,11 +14153,84 @@ then
 		STATICFLAG="-static"
 	fi
 
-	if ( test -n "$FREETDSPATH" )
+
+
+eval "FREETDSINCLUDES=\"\""
+eval "FREETDSLIBS=\"\""
+eval "FREETDSLIBPATH=\"\""
+eval "FREETDSSTATIC=\"\""
+
+SEARCHPATH=$FREETDSPATH
+NAME=freetds
+HEADER=ctpublic.h
+LIBNAME=ct
+LINKSTATIC=$STATICFLAG
+LINKRPATH=$RPATHFLAG
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/usr/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/include/$HEADER" >&5
+echo $ECHO_N "checking for /usr/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		as_ac_File=`echo "ac_cv_file_$FREETDSPATH/include/ctpublic.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $FREETDSPATH/include/ctpublic.h" >&5
-echo $ECHO_N "checking for $FREETDSPATH/include/ctpublic.h... $ECHO_C" >&6
+		eval "INCLUDESTRING=\"\""
+		eval "LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/usr/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -12942,7 +14238,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$FREETDSPATH/include/ctpublic.h"; then
+if test -r "/usr/lib/lib$LIBNAME.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -12951,12 +14247,30 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FREETDSINCLUDES="-I$FREETDSPATH/include"
+  FOUNDLIB="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$FREETDSPATH/lib/libct.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $FREETDSPATH/lib/libct.a" >&5
-echo $ECHO_N "checking for $FREETDSPATH/lib/libct.a... $ECHO_C" >&6
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"\""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+	for i in "$SEARCHPATH" "/usr/local/firstworks" "/usr/local/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw"
+	do
+		if ( test -n "$i" ); then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -12964,7 +14278,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$FREETDSPATH/lib/libct.a"; then
+if test -r "$i/include/$HEADER"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -12973,12 +14287,12 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FREETDSLIBS="-L$FREETDSPATH/lib -lct"; FREETDSSTATIC="$STATICFLAG"
+  FOUNDHEADER="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$FREETDSPATH/lib/libct.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $FREETDSPATH/lib/libct.so" >&5
-echo $ECHO_N "checking for $FREETDSPATH/lib/libct.so... $ECHO_C" >&6
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -12986,7 +14300,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$FREETDSPATH/lib/libct.so"; then
+if test -r "$i/lib/lib$LIBNAME.so"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -12995,15 +14309,22 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FREETDSLIBSPATH="$FREETDSPATH/lib"; FREETDSLIBS="-L$FREETDSPATH/lib -lct"
+  FOUNDLIB="yes"
 fi
 
-	else
-		for i in "/usr/include" "/usr/local/freetds/include" "/usr/include/freetds" "/usr/local/include" "/usr/local/include/freetds" "/usr/pkg/include" "/usr/pkg/include/freetds" "/usr/pkg/freetds/include" "/opt/sfw/includ"
-		do
-			as_ac_File=`echo "ac_cv_file_$i/ctpublic.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/ctpublic.h" >&5
-echo $ECHO_N "checking for $i/ctpublic.h... $ECHO_C" >&6
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i\""
+		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -13011,7 +14332,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$i/ctpublic.h"; then
+if test -r "$i/lib/lib$LIBNAME.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -13020,120 +14341,305 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FREETDSINCLUDES="-I$i"
+  FOUNDLIB="yes"
 fi
 
-			if ( test -n "$FREETDSINCLUDES" )
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i\""
+			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/$NAME\""
+		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/$NAME\""
+			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i\""
+		eval "LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i\""
+			eval "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/$NAME\""
+		eval "LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/$NAME\""
+			eval "LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -n "$LIBSTRING" )
 			then
 				break
 			fi
-		done
-
-		for i in "/usr/local/freetds/lib" "/usr/local/lib" "/usr/local/lib/freetds" "/usr/pkg/lib" "/usr/pkg/freetds/lib" "/opt/sfw/lib"
-		do
-			as_ac_File=`echo "ac_cv_file_$i/libct.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libct.a" >&5
-echo $ECHO_N "checking for $i/libct.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/libct.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FREETDSLIBS="-L$i -lct"; FREETDSSTATIC="$STATICFLAG"
+		fi
+	done
 fi
 
-			as_ac_File=`echo "ac_cv_file_$i/libct.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libct.so" >&5
-echo $ECHO_N "checking for $i/libct.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/libct.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  FREETDSLIBSPATH="$i"; FREETDSLIBS="-L$i -lct"
+if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
+then
+	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
 fi
 
-			if ( test -n "$FREETDSLIBS" )
-			then
-				break
-			fi
-		done
+eval "FREETDSINCLUDES=\"$INCLUDESTRING\""
+eval "FREETDSLIBS=\"$LIBSTRING\""
+eval "FREETDSLIBPATH=\"$LIBPATH\""
+eval "FREETDSSTATIC=\"$STATIC\""
 
-		echo "$as_me:$LINENO: checking for /usr/lib/libct.a" >&5
-echo $ECHO_N "checking for /usr/lib/libct.a... $ECHO_C" >&6
-if test "${ac_cv_file__usr_lib_libct_a+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/lib/libct.a"; then
-  ac_cv_file__usr_lib_libct_a=yes
-else
-  ac_cv_file__usr_lib_libct_a=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libct_a" >&5
-echo "${ECHO_T}$ac_cv_file__usr_lib_libct_a" >&6
-if test $ac_cv_file__usr_lib_libct_a = yes; then
-  FREETDSLIBS="-lct"; FREETDSSTATIC="$STATICFLAG"
-fi
-
-		echo "$as_me:$LINENO: checking for /usr/lib/libct.so" >&5
-echo $ECHO_N "checking for /usr/lib/libct.so... $ECHO_C" >&6
-if test "${ac_cv_file__usr_lib_libct_so+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/lib/libct.so"; then
-  ac_cv_file__usr_lib_libct_so=yes
-else
-  ac_cv_file__usr_lib_libct_so=no
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libct_so" >&5
-echo "${ECHO_T}$ac_cv_file__usr_lib_libct_so" >&6
-if test $ac_cv_file__usr_lib_libct_so = yes; then
-  FREETDSLIBSPATH=""; FREETDSLIBS="-lct"
-fi
-
-	fi
-
-	if ( test "$FREETDSINCLUDES" = "-I/usr/include" )
-	then
-		FREETDSINCLUDES=""
-	fi
-
-	if ( test -n "$RPATHFLAG" -a -n "$FREETDSLIBSPATH" )
-	then
-		FREETDSLIBS="-Wl,-rpath $FREETDSLIBSPATH $FREETDSLIBS"
-	fi
 
 
 
@@ -13239,7 +14745,10 @@ then
 
 	if ( test -n "$SYBASEPATH" )
 	then
-		as_ac_File=`echo "ac_cv_file_$SYBASEPATH/include/ctpublic.h" | $as_tr_sh`
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$SYBASEPATH/include/ctpublic.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $SYBASEPATH/include/ctpublic.h" >&5
 echo $ECHO_N "checking for $SYBASEPATH/include/ctpublic.h... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -13258,10 +14767,10 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SYBASEINCLUDES="-I$SYBASEPATH/include"
+  FOUNDHEADER="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$SYBASEPATH/lib/libct.a" | $as_tr_sh`
+as_ac_File=`echo "ac_cv_file_$SYBASEPATH/lib/libct.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $SYBASEPATH/lib/libct.a" >&5
 echo $ECHO_N "checking for $SYBASEPATH/lib/libct.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -13280,9 +14789,19 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SYBASELIBS="-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "SYBASEINCLUDES=\"-I$SYBASEPATH/include\""
+		eval "SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "$SYBASEPATH/lib/libct.so" -a -n "SYBASELIBPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	then
 		as_ac_File=`echo "ac_cv_file_$SYBASEPATH/lib/libct.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $SYBASEPATH/lib/libct.so" >&5
 echo $ECHO_N "checking for $SYBASEPATH/lib/libct.so... $ECHO_C" >&6
@@ -13302,12 +14821,23 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SYBASELIBPATH="$SYBASEPATH/lib"; SYBASELIBS="-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck"
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "SYBASEINCLUDES=\"-I$SYBASEPATH/include\""
+			eval "SYBASELIBPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+		fi
+	fi
 fi
 
 	else
 
-		echo "$as_me:$LINENO: checking for /usr/local/sybase/include/ctpublic.h" >&5
+
+FOUNDHEADER=""
+FOUNDLIB=""
+echo "$as_me:$LINENO: checking for /usr/local/sybase/include/ctpublic.h" >&5
 echo $ECHO_N "checking for /usr/local/sybase/include/ctpublic.h... $ECHO_C" >&6
 if test "${ac_cv_file__usr_local_sybase_include_ctpublic_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -13325,10 +14855,10 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_sybase_include_ctpublic_h" >&5
 echo "${ECHO_T}$ac_cv_file__usr_local_sybase_include_ctpublic_h" >&6
 if test $ac_cv_file__usr_local_sybase_include_ctpublic_h = yes; then
-  SYBASEINCLUDES="-I/usr/local/sybase/include"
+  FOUNDHEADER="yes"
 fi
 
-		echo "$as_me:$LINENO: checking for /usr/local/sybase/lib/libct.a" >&5
+echo "$as_me:$LINENO: checking for /usr/local/sybase/lib/libct.a" >&5
 echo $ECHO_N "checking for /usr/local/sybase/lib/libct.a... $ECHO_C" >&6
 if test "${ac_cv_file__usr_local_sybase_lib_libct_a+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -13346,9 +14876,19 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_sybase_lib_libct_a" >&5
 echo "${ECHO_T}$ac_cv_file__usr_local_sybase_lib_libct_a" >&6
 if test $ac_cv_file__usr_local_sybase_lib_libct_a = yes; then
-  SYBASELIBS="-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "SYBASEINCLUDES=\"-I/usr/local/sybase/include\""
+		eval "SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "/usr/local/sybase/lib/libct.so" -a -n "SYBASELIBPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	then
 		echo "$as_me:$LINENO: checking for /usr/local/sybase/lib/libct.so" >&5
 echo $ECHO_N "checking for /usr/local/sybase/lib/libct.so... $ECHO_C" >&6
 if test "${ac_cv_file__usr_local_sybase_lib_libct_so+set}" = set; then
@@ -13367,11 +14907,22 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__usr_local_sybase_lib_libct_so" >&5
 echo "${ECHO_T}$ac_cv_file__usr_local_sybase_lib_libct_so" >&6
 if test $ac_cv_file__usr_local_sybase_lib_libct_so = yes; then
-  SYBASELIBPATH="/usr/local/sybase/lib"; SYBASELIBS="-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck"
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "SYBASEINCLUDES=\"-I/usr/local/sybase/include\""
+			eval "SYBASELIBPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+		fi
+	fi
 fi
 
 
-		echo "$as_me:$LINENO: checking for /opt/sybase/include/ctpublic.h" >&5
+
+FOUNDHEADER=""
+FOUNDLIB=""
+echo "$as_me:$LINENO: checking for /opt/sybase/include/ctpublic.h" >&5
 echo $ECHO_N "checking for /opt/sybase/include/ctpublic.h... $ECHO_C" >&6
 if test "${ac_cv_file__opt_sybase_include_ctpublic_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -13389,10 +14940,10 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__opt_sybase_include_ctpublic_h" >&5
 echo "${ECHO_T}$ac_cv_file__opt_sybase_include_ctpublic_h" >&6
 if test $ac_cv_file__opt_sybase_include_ctpublic_h = yes; then
-  SYBASEINCLUDES="-I/opt/sybase/include"
+  FOUNDHEADER="yes"
 fi
 
-		echo "$as_me:$LINENO: checking for /opt/sybase/lib/libct.a" >&5
+echo "$as_me:$LINENO: checking for /opt/sybase/lib/libct.a" >&5
 echo $ECHO_N "checking for /opt/sybase/lib/libct.a... $ECHO_C" >&6
 if test "${ac_cv_file__opt_sybase_lib_libct_a+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -13410,9 +14961,19 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__opt_sybase_lib_libct_a" >&5
 echo "${ECHO_T}$ac_cv_file__opt_sybase_lib_libct_a" >&6
 if test $ac_cv_file__opt_sybase_lib_libct_a = yes; then
-  SYBASELIBS="-L/opt/sybase/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "SYBASEINCLUDES=\"-I/opt/sybase/include\""
+		eval "SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "/opt/sybase/lib/libct.so" -a -n "SYBASELIBPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	then
 		echo "$as_me:$LINENO: checking for /opt/sybase/lib/libct.so" >&5
 echo $ECHO_N "checking for /opt/sybase/lib/libct.so... $ECHO_C" >&6
 if test "${ac_cv_file__opt_sybase_lib_libct_so+set}" = set; then
@@ -13431,11 +14992,22 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__opt_sybase_lib_libct_so" >&5
 echo "${ECHO_T}$ac_cv_file__opt_sybase_lib_libct_so" >&6
 if test $ac_cv_file__opt_sybase_lib_libct_so = yes; then
-  SYBASELIBPATH="/opt/sybase/lib"; SYBASELIBS="-L/opt/sybase/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck"
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "SYBASEINCLUDES=\"-I/opt/sybase/include\""
+			eval "SYBASELIBPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+		fi
+	fi
 fi
 
 
-		echo "$as_me:$LINENO: checking for /opt/sybase-12.5/OCS-12_5/include/ctpublic.h" >&5
+
+FOUNDHEADER=""
+FOUNDLIB=""
+echo "$as_me:$LINENO: checking for /opt/sybase-12.5/OCS-12_5/include/ctpublic.h" >&5
 echo $ECHO_N "checking for /opt/sybase-12.5/OCS-12_5/include/ctpublic.h... $ECHO_C" >&6
 if test "${ac_cv_file__opt_sybase_12_5_OCS_12_5_include_ctpublic_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -13453,10 +15025,10 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__opt_sybase_12_5_OCS_12_5_include_ctpublic_h" >&5
 echo "${ECHO_T}$ac_cv_file__opt_sybase_12_5_OCS_12_5_include_ctpublic_h" >&6
 if test $ac_cv_file__opt_sybase_12_5_OCS_12_5_include_ctpublic_h = yes; then
-  SYBASEINCLUDES="-I/opt/sybase-12.5/OCS-12_5/include"
+  FOUNDHEADER="yes"
 fi
 
-		echo "$as_me:$LINENO: checking for /opt/sybase-12.5/OCS-12_5/lib/libct.a" >&5
+echo "$as_me:$LINENO: checking for /opt/sybase-12.5/OCS-12_5/lib/libct.a" >&5
 echo $ECHO_N "checking for /opt/sybase-12.5/OCS-12_5/lib/libct.a... $ECHO_C" >&6
 if test "${ac_cv_file__opt_sybase_12_5_OCS_12_5_lib_libct_a+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -13474,9 +15046,19 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__opt_sybase_12_5_OCS_12_5_lib_libct_a" >&5
 echo "${ECHO_T}$ac_cv_file__opt_sybase_12_5_OCS_12_5_lib_libct_a" >&6
 if test $ac_cv_file__opt_sybase_12_5_OCS_12_5_lib_libct_a = yes; then
-  SYBASELIBS="-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl"; SYBASESTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\""
+		eval "SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "/opt/sybase-12.5/OCS-12_5/lib/libct.so" -a -n "SYBASELIBPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"" )
+	then
 		echo "$as_me:$LINENO: checking for /opt/sybase-12.5/OCS-12_5/lib/libct.so" >&5
 echo $ECHO_N "checking for /opt/sybase-12.5/OCS-12_5/lib/libct.so... $ECHO_C" >&6
 if test "${ac_cv_file__opt_sybase_12_5_OCS_12_5_lib_libct_so+set}" = set; then
@@ -13495,7 +15077,15 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__opt_sybase_12_5_OCS_12_5_lib_libct_so" >&5
 echo "${ECHO_T}$ac_cv_file__opt_sybase_12_5_OCS_12_5_lib_libct_so" >&6
 if test $ac_cv_file__opt_sybase_12_5_OCS_12_5_lib_libct_so = yes; then
-  SYBASELIBS="-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl"; SYBASESTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\""
+			eval "SYBASELIBPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\""
+		fi
+	fi
 fi
 
 
@@ -13503,7 +15093,10 @@ fi
 		then
 			for i in "11.9.2" "11.0.3.3"
 			do
-				as_ac_File=`echo "ac_cv_file_/opt/sybase-$i/include/ctpublic.h" | $as_tr_sh`
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/opt/sybase-$i/include/ctpublic.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for /opt/sybase-$i/include/ctpublic.h" >&5
 echo $ECHO_N "checking for /opt/sybase-$i/include/ctpublic.h... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -13522,10 +15115,10 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SYBASEINCLUDES="-I/opt/sybase-$i/include"
+  FOUNDHEADER="yes"
 fi
 
-				as_ac_File=`echo "ac_cv_file_/opt/sybase-$i/lib/libct.a" | $as_tr_sh`
+as_ac_File=`echo "ac_cv_file_/opt/sybase-$i/lib/libct.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for /opt/sybase-$i/lib/libct.a" >&5
 echo $ECHO_N "checking for /opt/sybase-$i/lib/libct.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -13544,10 +15137,20 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SYBASELIBS="-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
 fi
 
-				as_ac_File=`echo "ac_cv_file_/opt/sybase-$i/lib/libct.so" | $as_tr_sh`
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "SYBASEINCLUDES=\"-I/opt/sybase-$i/include\""
+		eval "SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "/opt/sybase-$i/lib/libct.so" -a -n "SYBASELIBPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_/opt/sybase-$i/lib/libct.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for /opt/sybase-$i/lib/libct.so" >&5
 echo $ECHO_N "checking for /opt/sybase-$i/lib/libct.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
@@ -13566,7 +15169,15 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  SYBASELIBPATH="/opt/sybase-$i/lib"; SYBASELIBS="-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck"
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "SYBASEINCLUDES=\"-I/opt/sybase-$i/include\""
+			eval "SYBASELIBPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+		fi
+	fi
 fi
 
 				if ( test -n "$SYBASELIBS" )
@@ -13861,11 +15472,70 @@ then
 	HAVE_IODBC=""
 	HAVE_UNIXODBC=""
 
-	if ( test -n "$ODBCPATH" )
+		for i in "$ODBCPATH" "/usr/local" "/usr/local/unixodbc" "/usr/local/iodbc" "/usr/local" "/usr/pkg" "/opt/sfw"
+	do
+		if ( test -n "$i" )
+		then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/sql.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/sql.h" >&5
+echo $ECHO_N "checking for $i/include/sql.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/sql.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/libiodbc.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libiodbc.a" >&5
+echo $ECHO_N "checking for $i/lib/libiodbc.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/libiodbc.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		as_ac_File=`echo "ac_cv_file_$ODBCPATH/include/sql.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ODBCPATH/include/sql.h" >&5
-echo $ECHO_N "checking for $ODBCPATH/include/sql.h... $ECHO_C" >&6
+		eval "ODBCINCLUDES=\"-I$ODBCPATH/include\""
+		eval "ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "$i/lib/libiodbc.so" -a -n "ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/libiodbc.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libiodbc.so" >&5
+echo $ECHO_N "checking for $i/lib/libiodbc.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -13873,7 +15543,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$ODBCPATH/include/sql.h"; then
+if test -r "$i/lib/libiodbc.so"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -13882,13 +15552,23 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCINCLUDES="-I$ODBCPATH/include"
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"-I$ODBCPATH/include\""
+			eval "ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\""
+		fi
+	fi
 fi
 
 
-				as_ac_File=`echo "ac_cv_file_$ODBCPATH/lib/libiodbc.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ODBCPATH/lib/libiodbc.a" >&5
-echo $ECHO_N "checking for $ODBCPATH/lib/libiodbc.a... $ECHO_C" >&6
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/sql.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/sql.h" >&5
+echo $ECHO_N "checking for $i/include/sql.h... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -13896,7 +15576,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$ODBCPATH/lib/libiodbc.a"; then
+if test -r "$i/include/sql.h"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -13905,12 +15585,12 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCLIBS="-L$ODBCPATH/lib -liodbc"; HAVE_IODBC="yes"; IODBCSTATIC="$STATICFLAG"
+  FOUNDHEADER="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$ODBCPATH/lib/libiodbc.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ODBCPATH/lib/libiodbc.so" >&5
-echo $ECHO_N "checking for $ODBCPATH/lib/libiodbc.so... $ECHO_C" >&6
+as_ac_File=`echo "ac_cv_file_$i/lib/libodbc.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libodbc.a" >&5
+echo $ECHO_N "checking for $i/lib/libodbc.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -13918,7 +15598,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$ODBCPATH/lib/libiodbc.so"; then
+if test -r "$i/lib/libodbc.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -13927,13 +15607,22 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCLIBPATH="$ODBCPATH/lib"; ODBCLIBS="-L$ODBCPATH/lib -liodbc"; HAVE_IODBC="yes"
+  FOUNDLIB="yes"
 fi
 
-
-				as_ac_File=`echo "ac_cv_file_$ODBCPATH/lib/libodbc.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ODBCPATH/lib/libodbc.a" >&5
-echo $ECHO_N "checking for $ODBCPATH/lib/libodbc.a... $ECHO_C" >&6
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "ODBCINCLUDES=\"-I$i/include\""
+		eval "ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "$i/lib/libodbc.so" -a -n "ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/libodbc.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libodbc.so" >&5
+echo $ECHO_N "checking for $i/lib/libodbc.so... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -13941,7 +15630,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$ODBCPATH/lib/libodbc.a"; then
+if test -r "$i/lib/libodbc.so"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -13950,69 +15639,202 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCLIBS="-L$ODBCPATH/lib -lodbc"; HAVE_UNIXODBC="yes"; UNIXODBCSTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
 fi
 
-		as_ac_File=`echo "ac_cv_file_$ODBCPATH/lib/libodbc.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ODBCPATH/lib/libodbc.so" >&5
-echo $ECHO_N "checking for $ODBCPATH/lib/libodbc.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$ODBCPATH/lib/libodbc.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCLIBPATH="$ODBCPATH/lib"; ODBCLIBS="-L$ODBCPATH/lib -lodbc"; HAVE_UNIXODBC="yes"
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"-I$i/include\""
+			eval "ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\""
+		fi
+	fi
 fi
 
-
-	else
-
-				for i in "/usr/include" "/usr/local/unixodbc/include" "/usr/local/iodbc/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
-		do
-			as_ac_File=`echo "ac_cv_file_$i/sql.h" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/sql.h" >&5
-echo $ECHO_N "checking for $i/sql.h... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/sql.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCINCLUDES="-I$i"
-fi
-
-			if ( test -n "$ODBCINCLUDES" )
+			if ( test -z "$ODBCLIBS" )
 			then
-				break
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/iodbc/sql.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/iodbc/sql.h" >&5
+echo $ECHO_N "checking for $i/include/iodbc/sql.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/iodbc/sql.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/libiodbc.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libiodbc.a" >&5
+echo $ECHO_N "checking for $i/lib/libiodbc.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/libiodbc.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "ODBCINCLUDES=\"-I$ODBCPATH/include/iodbc\""
+		eval "ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "$i/lib/libiodbc.so" -a -n "ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/libiodbc.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libiodbc.so" >&5
+echo $ECHO_N "checking for $i/lib/libiodbc.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/libiodbc.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"-I$ODBCPATH/include/iodbc\""
+			eval "ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/unixodbc/sql.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/unixodbc/sql.h" >&5
+echo $ECHO_N "checking for $i/include/unixodbc/sql.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/unixodbc/sql.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/libodbc.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libodbc.a" >&5
+echo $ECHO_N "checking for $i/lib/libodbc.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/libodbc.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "ODBCINCLUDES=\"-I$i/include/unixodbc\""
+		eval "ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "$i/lib/libodbc.so" -a -n "ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/libodbc.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/libodbc.so" >&5
+echo $ECHO_N "checking for $i/lib/libodbc.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/libodbc.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"-I$i/include/unixodbc\""
+			eval "ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\""
+		fi
+	fi
+fi
+
 			fi
-		done
+			if ( test -z "$ODBCLIBS" )
+			then
 
-				for i in "/usr/local/iodbc/lib" "/usr/local/lib" "/usr/local/lib/iodbc" "/usr/pkg/lib" "/opt/sfw/lib"
-		do
-			as_ac_File=`echo "ac_cv_file_$i/libiodbc.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libiodbc.a" >&5
-echo $ECHO_N "checking for $i/libiodbc.a... $ECHO_C" >&6
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/sql.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/sql.h" >&5
+echo $ECHO_N "checking for $i/include/sql.h... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -14020,7 +15842,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$i/libiodbc.a"; then
+if test -r "$i/include/sql.h"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -14029,12 +15851,12 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCLIBS="-L$i -liodbc"; HAVE_IODBC="yes"; IODBCSTATIC="$STATICFLAG"
+  FOUNDHEADER="yes"
 fi
 
-			as_ac_File=`echo "ac_cv_file_$i/libiodbc.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libiodbc.so" >&5
-echo $ECHO_N "checking for $i/libiodbc.so... $ECHO_C" >&6
+as_ac_File=`echo "ac_cv_file_$i/lib/iodbc/libiodbc.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/iodbc/libiodbc.a" >&5
+echo $ECHO_N "checking for $i/lib/iodbc/libiodbc.a... $ECHO_C" >&6
 if eval "test \"\${$as_ac_File+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -14042,7 +15864,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$i/libiodbc.so"; then
+if test -r "$i/lib/iodbc/libiodbc.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -14051,16 +15873,346 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCLIBPATH="$i"; ODBCLIBS="-L$i -liodbc"; HAVE_IODBC="yes"
+  FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "ODBCINCLUDES=\"-I$ODBCPATH/include\""
+		eval "ODBCLIBS=\"-L$i/iodbc/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "$i/lib/iodbc/libiodbc.so" -a -n "ODBCLIBPATH=\"$i/lib/iodbc\"; ODBCLIBS=\"-L$i/lib/iodbc -liodbc\"; HAVE_IODBC=\"yes\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/iodbc/libiodbc.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/iodbc/libiodbc.so" >&5
+echo $ECHO_N "checking for $i/lib/iodbc/libiodbc.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/iodbc/libiodbc.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"-I$ODBCPATH/include\""
+			eval "ODBCLIBPATH=\"$i/lib/iodbc\"; ODBCLIBS=\"-L$i/lib/iodbc -liodbc\"; HAVE_IODBC=\"yes\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/sql.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/sql.h" >&5
+echo $ECHO_N "checking for $i/include/sql.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/sql.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/unixodbc/libodbc.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/unixodbc/libodbc.a" >&5
+echo $ECHO_N "checking for $i/lib/unixodbc/libodbc.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/unixodbc/libodbc.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "ODBCINCLUDES=\"-I$i/include\""
+		eval "ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "$i/lib/unixodbc/libodbc.so" -a -n "ODBCLIBPATH=\"$i/lib/unixodbc\"; ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/unixodbc/libodbc.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/unixodbc/libodbc.so" >&5
+echo $ECHO_N "checking for $i/lib/unixodbc/libodbc.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/unixodbc/libodbc.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"-I$i/include\""
+			eval "ODBCLIBPATH=\"$i/lib/unixodbc\"; ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$ODBCLIBS" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/iodbc/sql.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/iodbc/sql.h" >&5
+echo $ECHO_N "checking for $i/include/iodbc/sql.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/iodbc/sql.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/iodbc/libiodbc.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/iodbc/libiodbc.a" >&5
+echo $ECHO_N "checking for $i/lib/iodbc/libiodbc.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/iodbc/libiodbc.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "ODBCINCLUDES=\"-I$ODBCPATH/include/iodbc\""
+		eval "ODBCLIBS=\"-L$i/iodbc/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "$i/lib/iodbc/libiodbc.so" -a -n "ODBCLIBPATH=\"$i/lib/iodbc\"; ODBCLIBS=\"-L$i/lib/iodbc -liodbc\"; HAVE_IODBC=\"yes\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/iodbc/libiodbc.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/iodbc/libiodbc.so" >&5
+echo $ECHO_N "checking for $i/lib/iodbc/libiodbc.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/iodbc/libiodbc.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"-I$ODBCPATH/include/iodbc\""
+			eval "ODBCLIBPATH=\"$i/lib/iodbc\"; ODBCLIBS=\"-L$i/lib/iodbc -liodbc\"; HAVE_IODBC=\"yes\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/unixodbc/sql.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/unixodbc/sql.h" >&5
+echo $ECHO_N "checking for $i/include/unixodbc/sql.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/unixodbc/sql.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/unixodbc/libodbc.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/unixodbc/libodbc.a" >&5
+echo $ECHO_N "checking for $i/lib/unixodbc/libodbc.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/unixodbc/libodbc.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "ODBCINCLUDES=\"-I$i/include/unixodbc\""
+		eval "ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "$i/lib/unixodbc/libodbc.so" -a -n "ODBCLIBPATH=\"$i/lib/unixodbc\"; ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/unixodbc/libodbc.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/unixodbc/libodbc.so" >&5
+echo $ECHO_N "checking for $i/lib/unixodbc/libodbc.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/unixodbc/libodbc.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"-I$i/include/unixodbc\""
+			eval "ODBCLIBPATH=\"$i/lib/unixodbc\"; ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\""
+		fi
+	fi
+fi
+
+			fi
 			if ( test -n "$ODBCLIBS" )
 			then
 				break
 			fi
-		done
+		fi
+	done
 
-		echo "$as_me:$LINENO: checking for /usr/lib/libiodbc.a" >&5
+
+FOUNDHEADER=""
+FOUNDLIB=""
+echo "$as_me:$LINENO: checking for /usr/include/sql.h" >&5
+echo $ECHO_N "checking for /usr/include/sql.h... $ECHO_C" >&6
+if test "${ac_cv_file__usr_include_sql_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/sql.h"; then
+  ac_cv_file__usr_include_sql_h=yes
+else
+  ac_cv_file__usr_include_sql_h=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_include_sql_h" >&5
+echo "${ECHO_T}$ac_cv_file__usr_include_sql_h" >&6
+if test $ac_cv_file__usr_include_sql_h = yes; then
+  FOUNDHEADER="yes"
+fi
+
+echo "$as_me:$LINENO: checking for /usr/lib/libiodbc.a" >&5
 echo $ECHO_N "checking for /usr/lib/libiodbc.a... $ECHO_C" >&6
 if test "${ac_cv_file__usr_lib_libiodbc_a+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -14078,9 +16230,19 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libiodbc_a" >&5
 echo "${ECHO_T}$ac_cv_file__usr_lib_libiodbc_a" >&6
 if test $ac_cv_file__usr_lib_libiodbc_a = yes; then
-  ODBCLIBS="-liodbc"; HAVE_IODBC="yes"; IODBCSTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "ODBCINCLUDES=\"\""
+		eval "ODBCLIBS=\"-liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "/usr/lib/libiodbc.so" -a -n "ODBCLIBPATH=\"\"; ODBCLIBS=\"-liodbc\"; HAVE_IODBC=\"yes\"" )
+	then
 		echo "$as_me:$LINENO: checking for /usr/lib/libiodbc.so" >&5
 echo $ECHO_N "checking for /usr/lib/libiodbc.so... $ECHO_C" >&6
 if test "${ac_cv_file__usr_lib_libiodbc_so+set}" = set; then
@@ -14099,63 +16261,42 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libiodbc_so" >&5
 echo "${ECHO_T}$ac_cv_file__usr_lib_libiodbc_so" >&6
 if test $ac_cv_file__usr_lib_libiodbc_so = yes; then
-  ODBCLIBPATH=""; ODBCLIBS="-liodbc"; HAVE_IODBC="yes"
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"\""
+			eval "ODBCLIBPATH=\"\"; ODBCLIBS=\"-liodbc\"; HAVE_IODBC=\"yes\""
+		fi
+	fi
 fi
 
 
-				for i in "/usr/local/unixodbc/lib" "/usr/local/lib" "/usr/local/lib/unixodbc" "/usr/pkg/lib" "/opt/sfw/lib"
-		do
-			as_ac_File=`echo "ac_cv_file_$i/libodbc.a" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libodbc.a" >&5
-echo $ECHO_N "checking for $i/libodbc.a... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
+FOUNDHEADER=""
+FOUNDLIB=""
+echo "$as_me:$LINENO: checking for /usr/include/sql.h" >&5
+echo $ECHO_N "checking for /usr/include/sql.h... $ECHO_C" >&6
+if test "${ac_cv_file__usr_include_sql_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   test "$cross_compiling" = yes &&
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$i/libodbc.a"; then
-  eval "$as_ac_File=yes"
+if test -r "/usr/include/sql.h"; then
+  ac_cv_file__usr_include_sql_h=yes
 else
-  eval "$as_ac_File=no"
+  ac_cv_file__usr_include_sql_h=no
 fi
 fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCLIBS="-L$i -lodbc"; HAVE_UNIXODBC="yes"; UNIXODBCSTATIC="$STATICFLAG"
+echo "$as_me:$LINENO: result: $ac_cv_file__usr_include_sql_h" >&5
+echo "${ECHO_T}$ac_cv_file__usr_include_sql_h" >&6
+if test $ac_cv_file__usr_include_sql_h = yes; then
+  FOUNDHEADER="yes"
 fi
 
-			as_ac_File=`echo "ac_cv_file_$i/libodbc.so" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $i/libodbc.so" >&5
-echo $ECHO_N "checking for $i/libodbc.so... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$i/libodbc.so"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  ODBCLIBPATH="$i"; ODBCLIBS="-L$i -lodbc"; HAVE_UNIXODBC="yes"
-fi
-
-			if ( test -n "$ODBCLIBS" )
-			then
-				break
-			fi
-		done
-
-		echo "$as_me:$LINENO: checking for /usr/lib/libodbc.a" >&5
+echo "$as_me:$LINENO: checking for /usr/lib/libodbc.a" >&5
 echo $ECHO_N "checking for /usr/lib/libodbc.a... $ECHO_C" >&6
 if test "${ac_cv_file__usr_lib_libodbc_a+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -14173,9 +16314,19 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libodbc_a" >&5
 echo "${ECHO_T}$ac_cv_file__usr_lib_libodbc_a" >&6
 if test $ac_cv_file__usr_lib_libodbc_a = yes; then
-  ODBCLIBS="-lodbc"; HAVE_UNIXODBC="yes"; UNIXODBCSTATIC="$STATICFLAG"
+  FOUNDLIB="yes"
 fi
 
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "ODBCINCLUDES=\"\""
+		eval "ODBCLIBS=\"-lodbc\"; HAVE_ODBC=\"yes\"; ODBCSTATIC=\"$STATICFLAG\""
+	fi
+else
+	if ( test -n "/usr/lib/libodbc.so" -a -n "ODBCLIBPATH=\"\"; ODBCLIBS=\"-lodbc\"; HAVE_ODBC=\"yes\"" )
+	then
 		echo "$as_me:$LINENO: checking for /usr/lib/libodbc.so" >&5
 echo $ECHO_N "checking for /usr/lib/libodbc.so... $ECHO_C" >&6
 if test "${ac_cv_file__usr_lib_libodbc_so+set}" = set; then
@@ -14194,15 +16345,17 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_file__usr_lib_libodbc_so" >&5
 echo "${ECHO_T}$ac_cv_file__usr_lib_libodbc_so" >&6
 if test $ac_cv_file__usr_lib_libodbc_so = yes; then
-  ODBCLIBPATH=""; ODBCLIBS="-lodbc"; HAVE_UNIXODBC="yes"
+  FOUNDLIB="yes"
 fi
 
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "ODBCINCLUDES=\"\""
+			eval "ODBCLIBPATH=\"\"; ODBCLIBS=\"-lodbc\"; HAVE_ODBC=\"yes\""
+		fi
 	fi
+fi
 
-	if ( test "$ODBCINCLUDES" = "-I/usr/include" )
-	then
-		ODBCINCLUDES=""
-	fi
 
 
 

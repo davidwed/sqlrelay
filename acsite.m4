@@ -15,6 +15,25 @@ export LD_LIBRARY_PATH
 ])
 
 
+AC_DEFUN([FW_CHECK_LIB],
+[
+FOUNDLIB=""
+AC_CHECK_FILE($1, FOUNDLIB="yes")
+if ( test -n "$FOUNDLIB" )
+then
+	eval "$2"
+else
+	if ( test -n "$3" )
+	then
+		AC_CHECK_FILE($3, FOUNDLIB="yes")
+		if ( test ! -n "$FOUNDLIB" )
+		then
+			eval "$4"
+		fi
+	fi
+fi
+])
+
 
 AC_DEFUN([FW_CHECK_HEADER_LIB],
 [
@@ -40,6 +59,66 @@ else
 		fi
 	fi
 fi
+])
+
+
+AC_DEFUN([FW_CHECK_HEADERS_AND_LIBS],
+[
+
+eval "$7=\"\""
+eval "$8=\"\""
+eval "$9=\"\""
+eval "$10=\"\""
+
+SEARCHPATH=$1
+NAME=$2
+HEADER=$3
+LIBNAME=$4
+LINKSTATIC=$5
+LINKRPATH=$6
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+
+FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+
+if ( test -z "$LIBSTRING" )
+then
+
+	for i in "$SEARCHPATH" "/usr/local/firstworks" "/usr/local/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw"
+	do
+		if ( test -n "$i" ); then
+			FW_CHECK_HEADER_LIB([$i/include/$HEADER],[INCLUDESTRING=\"-I$i\"],[$i/lib/lib$LIBNAME.so],[LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\"],[$i/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+			if ( test -z "$LIBSTRING" )
+			then
+				FW_CHECK_HEADER_LIB([$i/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$i/$NAME\"],[$i/lib/lib$LIBNAME.so],[LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\"],[$i/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+				FW_CHECK_HEADER_LIB([$i/include/$HEADER],[INCLUDESTRING=\"-I$i\"],[$i/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"],[$i/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+				FW_CHECK_HEADER_LIB([$i/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$i/$NAME\"],[$i/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$i/$NAME\"; LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"],[$i/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$i/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+			fi
+			if ( test -n "$LIBSTRING" )
+			then
+				break
+			fi
+		fi
+	done
+fi
+
+if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
+then
+	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+fi
+
+eval "$7=\"$INCLUDESTRING\""
+eval "$8=\"$LIBSTRING\""
+eval "$9=\"$LIBPATH\""
+eval "$10=\"$STATIC\""
 ])
 
 
@@ -193,24 +272,18 @@ then
 
 	for i in "pthread" "pth" "c_r" "gthreads"
 	do
-		if ( test -n "$PTHREADSPATH" )
-		then
-			AC_CHECK_FILE($PTHREADSPATH/lib/lib$i.a, PTHREADSLIB="-L$PTHREADSPATH/lib -l$i")
-			AC_CHECK_FILE($PTHREADSPATH/lib/lib$i.so, PTHREADSLIBPATH="$PTHREADSPATH/lib"; PTHREADSLIB="-L$PTHREADSPATH/lib -l$i")
-		else
-			for j in "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/pthread" "/usr/local/lib/pthreads" "/usr/local/lib/pth" "/usr/local/pthread/lib" "/usr/local/pthreads/lib" "/opt/sfw/lib"
-			do
-				AC_CHECK_FILE($j/lib$i.a,PTHREADSLIB="-L$j -l$i")
-				AC_CHECK_FILE($j/lib$i.so,PTHREADSLIBPATH="$j"; PTHREADSLIB="-L$j -l$i")
+		for j in "$PTHREADSPATH" "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/pthread" "/usr/local/lib/pthreads" "/usr/local/lib/pth" "/usr/local/pthread/lib" "/usr/local/pthreads/lib" "/opt/sfw/lib"
+		do
+			if ( test -n "$j" ); then
+				FW_CHECK_LIB([$j/lib$i.so],[PTHREADSLIBPATH=\"$j\"; PTHREADSLIB=\"-L$j -l$i\"],[$j/lib$i.a],[PTHREADSLIB=\"-L$j -l$i\"])
 				if ( test -n "$PTHREADSLIB" )
 				then
 					break
 				fi
-			done
+			fi
+		done
 	
-			AC_CHECK_FILE(/usr/lib/lib$i.a,PTHREADSLIB="-l$i")
-			AC_CHECK_FILE(/usr/lib/lib$i.so,PTHREADSLIBPATH=""; PTHREADSLIB="-l$i")
-		fi
+		FW_CHECK_LIB([/usr/lib/lib$i.so],[PTHREADSLIBPATH=\"\"; PTHREADSLIB=\"-l$i\"],[/usr/lib/lib$i.a],[PTHREADSLIB=\"-l$i\"])
 		if ( test -n "$PTHREADSLIB" )
 		then
 			break
@@ -261,14 +334,19 @@ if ( test "$cross_compiling" = "no" )
 then
 	if ( test -z "$MICROSOFT" )
 	then
-		for i in "$RUDIMENTSPATH" "/usr/local/firstworks" "/usr" "/usr/local" "/usr/pkg" "/opt/sfw"
+		for i in "$RUDIMENTSPATH" "/usr/local/firstworks" "/usr/local" "/usr/pkg" "/opt/sfw"
 		do
-			FW_CHECK_HEADER_LIB([$i/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\"],[$i/lib/librudiments.a],[RUDIMENTSLIBSPATH=\"$i/lib\"; RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\"],[$i/lib/librudiments.so],[RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\"])
-			if ( test -n "$RUDIMENTSLIBS" )
+			if ( test -n "$i" )
 			then
-				break;
+				FW_CHECK_HEADER_LIB([$i/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"-I$i/include\"; RUDIMENTSPATH=\"$i\"],[$i/lib/librudiments.so],[RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\"],[$i/lib/librudiments.a],[RUDIMENTSLIBSPATH=\"$i/lib\"; RUDIMENTSLIBS=\"-L$i/lib -lrudiments\"; RUDIMENTSDEBUGLIBS=\"-L$i/lib -lrudiments_p\"])
+				if ( test -n "$RUDIMENTSLIBS" )
+				then
+					break;
+				fi
 			fi
 		done
+
+		FW_CHECK_HEADER_LIB([/usr/include/rudiments/daemonprocess.h],[RUDIMENTSINCLUDES=\"\"; RUDIMENTSPATH=\"/usr\"],[/usr/lib/librudiments.so],[RUDIMENTSLIBS=\"-lrudiments\"; RUDIMENTSDEBUGLIBS=\"-lrudiments_p\"],[/usr/lib/librudiments.a],[RUDIMENTSLIBSPATH=\"\"; RUDIMENTSLIBS=\"-lrudiments\"; RUDIMENTSDEBUGLIBS=\"-lrudiments_p\"])
 	else
 		for i in "$RUDIMENTSPATH" "/usr/local/firstworks"
 		do
@@ -307,7 +385,7 @@ else
 	fi
 fi
 
-if ( test -z "$RUDIMENTSINCLUDES" -o -z "$RUDIMENTSLIBS" )
+if ( test -z "$RUDIMENTSLIBS" )
 then
 	AC_MSG_ERROR(Rudiments not found.  SQL-Relay requires this package.)
 	exit
@@ -347,19 +425,18 @@ then
 	if ( test -n "$ORACLE_HOME" )
 	then
 		AC_MSG_RESULT(yes)
-		AC_CHECK_FILE($ORACLE_HOME/lib/libcore3.a,ORACLEVERSION="7"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl -lm $AIOLIB")
-		AC_CHECK_FILE($ORACLE_HOME/lib/libcore4.a,ORACLEVERSION="8.0"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 -lm $AIOLIB")
+		FW_CHECK_LIB([$ORACLE_HOME/lib/libcore3.a],[ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl -lm $AIOLIB\"])
+		FW_CHECK_LIB([$ORACLE_HOME/lib/libcore4.a],[ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 -lm $AIOLIB\"])
 		WTC8=""
-		AC_CHECK_FILE($ORACLE_HOME/lib/libwtc8.so,WTC8="-lwtc8")
-		AC_CHECK_FILE($ORACLE_HOME/lib/libwtc8.a,WTC8="-lwtc8")
-		AC_CHECK_FILE($ORACLE_HOME/lib/libcore8.a,ORACLEVERSION="8.1"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient8 -lcommon8 -lgeneric8 -lclntsh -lcore8 -lnls8 $WTC8 -lm $AIOLIB")
-		AC_CHECK_FILE($ORACLE_HOME/lib/libcore9.a,ORACLEVERSION="9.0"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient9 -lcommon9 -lgeneric9 -lclntsh -lcore9 -lnls9 -lwtc9 -lm $AIOLIB")
+		FW_CHECK_LIB([$ORACLE_HOME/lib/libwtc8.a],[WTC8=\"-lwtc8\"])
+		FW_CHECK_LIB([$ORACLE_HOME/lib/libcore8.a],[ORACLEVERSION=\"8.1\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient8 -lcommon8 -lgeneric8 -lclntsh -lcore8 -lnls8 $WTC8 -lm $AIOLIB\"])
+		FW_CHECK_LIB([$ORACLE_HOME/lib/libcore9.a],[ORACLEVERSION=\"9.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient9 -lcommon9 -lgeneric9 -lclntsh -lcore9 -lnls9 -lwtc9 -lm $AIOLIB\"])
 		if ( test -n "$ORACLEVERSION" )
 		then
 			ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
 			echo "hmmm, looks like Oracle$ORACLEVERSION..."
 		fi
-		AC_CHECK_FILE($ORACLE_HOME/lib/libclntsh.a,ORACLESTATIC="$STATICFLAG")
+		FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
 	else
 		AC_MSG_RESULT(no)
 		AC_MSG_WARN(The ORACLE_HOME environment variable is not set.  Oracle support will not be built.)
@@ -373,10 +450,10 @@ then
 		if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" )
 		then
 			FW_TRY_LINK([#include <oci.h>
-#include <stdlib.h>],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[-Wl,-rpath $ORACLELIBSPATH $ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H="yes"],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[-Wl,-rpath $ORACLELIBSPATH $ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
 		else
 			FW_TRY_LINK([#include <oci.h>
-#include <stdlib.h>],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H="yes"],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
 		fi
 	fi
 	
@@ -573,13 +650,15 @@ then
 	do
 		if ( test -n "$i" )
 		then
-			FW_CHECK_HEADER_LIB([$i/include/msql.h],[MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\"],[$i/lib/libmsql.a],[MSQLLIBS=\"-L$i/lib -lmsql\"],[$i/lib/libmsql.so],[MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\"])
-		fi
-		if ( test -n "$MSQLLIBS" )
-		then
-			break
+			FW_CHECK_HEADER_LIB([$i/include/msql.h],[MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\"],[$i/lib/libmsql.so],[MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\"],[$i/lib/libmsql.a],[MSQLLIBS=\"-L$i/lib -lmsql\"])
+			if ( test -n "$MSQLLIBS" )
+			then
+				break
+			fi
 		fi
 	done
+
+	FW_CHECK_HEADER_LIB([/usr/include/msql.h],[MSQLINCLUDES=\"\"; MSQLPATH=\"\"],[/usr/lib/libmsql.so],[MSQLLIBSPATH=\"\"; MSQLLIBS=\"-lmsql\"],[/usr/lib/libmsql.a],[MSQLLIBS=\"-lmsql\"])
 	
 	if ( test -n "$RPATHFLAG" -a -n "$MSQLLIBSPATH" )
 	then
@@ -699,74 +778,35 @@ fi
 ])
 
 
+AC_DEFUN([FW_CHECK_GDBM],
+[
+
+FW_CHECK_HEADERS_AND_LIBS([$LIBGDBMPATH],[gdbm],[gdbm.h],[gdbm],[$STATICFLAG],[$RPATHFLAG],[GDBMINCLUDES],[GDBMLIBS],[GDBMLIBSPATH],[GDBMSTATIC])
+
+AC_SUBST(GDBMLIBS)
+])
+
 
 AC_DEFUN([FW_CHECK_SQLITE],
 [
 if ( test "$ENABLE_SQLITE" = "yes" )
 then
+	FW_CHECK_GDBM
 
-	SQLITESTATIC=""
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
 	then
 		STATICFLAG="-static"
 	fi
 	
-	GDBMLIBS=""
-	for i in "$LIBGDBMPATH" "/usr/local" "/usr/pkg" "/usr/local/libgdbm" "/opt/sfw"
-	do
-		if ( test -n "$i" )
-		then
-			FW_CHECK_HEADER_LIB([$i/include/gdbm.h],[],[$i/lib/libgdbm.a],[GDBMLIBS=\"-L$i/lib -lgdbm\"],[$i/lib/libgdbm.so],[GDBMLIBS=\"-L$i/lib -lgdbm\"])
-		fi
-		if ( test -n "$GDBMLIBS" )
-		then
-			break
-		fi
-	done
-	
-	FW_CHECK_HEADER_LIB([/usr/include/gdbm.h],[],[/usr/lib/libgdbm.a],[GDBMLIBS=\"-lgdbm\"],[/usr/lib/libgdbm.so],[GDBMLIBS=\"-lgdbm\"])
-
-	AC_SUBST(GDBMLIBS)
-	
 	SQLITEINCLUDES=""
 	SQLITELIBS=""
 	SQLITELIBPATH=""
+	SQLITESTATIC=""
 	
 	if ( test -n "$PTHREADSLIB" )
 	then
-		if ( test -n "$SQLITEPATH" )
-		then
-			AC_CHECK_FILE($SQLITEPATH/include/sqlite.h,SQLITEINCLUDES="-I$SQLITEPATH/include")
-			AC_CHECK_FILE($SQLITEPATH/lib/libsqlite.a,SQLITELIBS="-L$SQLITEPATH/lib -lsqlite")
-			AC_CHECK_FILE($SQLITEPATH/lib/libsqlite.so,SQLITELIBPATH="$SQLIBEPATH/lib"; SQLITELIBS="-L$SQLITEPATH/lib -lsqlite")
-		else
-			for i in "/usr/include" "/usr/local/sqlite/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
-			do
-				AC_CHECK_FILE($i/sqlite.h,SQLITEINCLUDES="-I$i")
-				if ( test -n "$SQLITEINCLUDES" )
-				then
-					break
-				fi
-			done
-			for i in "/usr/local/sqlite/lib" "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/sqlite" "/opt/sfw/lib"
-			do
-				AC_CHECK_FILE($i/libsqlite.a,SQLITELIBS="-L$i -lsqlite"; SQLITESTATIC="$STATICFLAG")
-				AC_CHECK_FILE($i/libsqlite.so,SQLITELIBPATH="$i"; SQLITELIBS="-L$i -lsqlite")
-				if ( test -n "$SQLITELIBS" )
-				then
-					break
-				fi
-			done
-	
-			AC_CHECK_FILE(/usr/lib/libsqlite.a,SQLITELIBS="-lsqlite"; SQLITESTATIC="$STATICFLAG")
-			AC_CHECK_FILE(/usr/lib/libsqlite.so,SQLITELIBPATH=""; SQLITELIBS="-lsqlite")
-		fi
-		
-		if ( test "$SQLITEINCLUDES" = "-I/usr/include" )
-		then
-			SQLITEINCLUDES=""
-		fi
+		FW_CHECK_HEADERS_AND_LIBS([$SQLITEPATH],[sqlite],[sqlite.h],[sqlite],[$STATICFLAG],[$RPATHFLAG],[SQLITEINCLUDES],[SQLITELIBS],[SQLITELIBPATH],[SQLITESTATIC])
 	else
 		AC_MSG_WARN(pthreads was not found.)
 	fi
@@ -775,10 +815,6 @@ then
 	then
 		AC_MSG_WARN(SQLite support will not be built.)
 	else
-		if ( test -n "$RPATHFLAG" -a -n "$SQLITELIBSPATH" )
-		then
-			SQLITELIBS="-Wl,-rpath $SQLITELIBSPATH $SQLITELIBS"
-		fi
 		AC_MSG_CHECKING(if SQLite needs gdbm)
 		SQLITENEEDGDBM=""
 		FW_TRY_LINK([#include <sqlite.h>],[sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$SQLITELIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes"])
@@ -813,59 +849,20 @@ AC_DEFUN([FW_CHECK_LAGO],
 if ( test "$ENABLE_LAGO" = "yes" )
 then
 
-	LAGOINCLUDES=""
-	LAGOLIBS=""
-	LAGOSTATIC=""
-	LAGOLIBPATH=""
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
 	then
 		STATICFLAG="-static"
 	fi
-	
-	if ( test -n "$LAGOPATH" )
-	then
-		AC_CHECK_FILE($LAGOPATH/include/lago.h,LAGOINCLUDES="-I$LAGOPATH/include")
-		AC_CHECK_FILE($LAGOPATH/lib/liblago.a,LAGOLIBS="-L$LAGOPATH/lib -llago"; LAGOSTATIC="$STATICFLAG")
-		AC_CHECK_FILE($LAGOPATH/lib/liblago.so,LAGOLIBPATH="$LAGOPATH/lib"; LAGOLIBS="-L$LAGOPATH/lib -llago")
-	else
-		for i in "/usr/include" "/usr/local/lago/include" "/usr/pkg/include" "/usr/local/include" "/opt/sfw/include"
-		do
-			AC_CHECK_FILE($i/lago.h,LAGOINCLUDES="-I$i")
-			if ( test -n "$LAGOINCLUDES" )
-			then
-				break
-			fi
-		done
-		for i in "/usr/local/lago/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib/lago" "/opt/sfw/lib"
-		do
-			AC_CHECK_FILE($i/liblago.a,LAGOLIBS="-L$i -llago"; LAGOSTATIC="$STATICFLAG")
-			AC_CHECK_FILE($i/liblago.so,LAGOLIBPATH="$i"; LAGOLIBS="-L$i -llago")
-			if ( test -n "$LAGOLIBS" )
-			then
-				break
-			fi
-		done
-	
-		AC_CHECK_FILE(/usr/lib/liblago.a,LAGOLIBS="-llago"; LAGOSTATIC="$STATICFLAG")
-		AC_CHECK_FILE(/usr/lib/liblago.so,LAGOLIBPATH=""; LAGOLIBS="-llago")
-	fi
+
+	FW_CHECK_HEADERS_AND_LIBS([$LAGOPATH],[lago],[lago.h],[lago],[$STATICFLAG],[$RPATHFLAG],[LAGOINCLUDES],[LAGOLIBS],[LAGOLIBPATH],[LAGOSTATIC])
 	
 	if ( test -z "$LAGOLIBS" )
 	then
 		AC_MSG_WARN(Lago support will not be built.)
 	else
-		if ( test -n "$RPATHFLAG" -a -n "$LAGOLIBSPATH" )
-		then
-			LAGOLIBS="-Wl,-rpath $LAGOLIBSPATH $LAGOLIBS"
-		fi
 		AC_MSG_CHECKING(if Lago needs threads)
 		FW_TRY_LINK([#include <lago.h>],[LCTX lctx; lctx=Lnewctx(); Ldelctx(lctx);],[$LAGOSTATIC $LAGOINCLUDES],[$LAGOLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$LAGOLIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); LAGOLIBS="$LAGOLIBS $PTHREADSLIB"])
-	fi
-	
-	if ( test "$LAGOINCLUDES" = "-I/usr/include" )
-	then
-		LAGOINCLUDES=""
 	fi
 	
 	AC_SUBST(LAGOINCLUDES)
@@ -890,45 +887,8 @@ then
 	then
 		STATICFLAG="-static"
 	fi
-	
-	if ( test -n "$FREETDSPATH" )
-	then
-		AC_CHECK_FILE($FREETDSPATH/include/ctpublic.h,FREETDSINCLUDES="-I$FREETDSPATH/include")
-		AC_CHECK_FILE($FREETDSPATH/lib/libct.a,FREETDSLIBS="-L$FREETDSPATH/lib -lct"; FREETDSSTATIC="$STATICFLAG")
-		AC_CHECK_FILE($FREETDSPATH/lib/libct.so,FREETDSLIBSPATH="$FREETDSPATH/lib"; FREETDSLIBS="-L$FREETDSPATH/lib -lct")
-	else
-		for i in "/usr/include" "/usr/local/freetds/include" "/usr/include/freetds" "/usr/local/include" "/usr/local/include/freetds" "/usr/pkg/include" "/usr/pkg/include/freetds" "/usr/pkg/freetds/include" "/opt/sfw/includ"
-		do
-			AC_CHECK_FILE($i/ctpublic.h,FREETDSINCLUDES="-I$i")
-			if ( test -n "$FREETDSINCLUDES" )
-			then
-				break
-			fi
-		done
-	
-		for i in "/usr/local/freetds/lib" "/usr/local/lib" "/usr/local/lib/freetds" "/usr/pkg/lib" "/usr/pkg/freetds/lib" "/opt/sfw/lib"
-		do
-			AC_CHECK_FILE($i/libct.a,FREETDSLIBS="-L$i -lct"; FREETDSSTATIC="$STATICFLAG")
-			AC_CHECK_FILE($i/libct.so,FREETDSLIBSPATH="$i"; FREETDSLIBS="-L$i -lct")
-			if ( test -n "$FREETDSLIBS" )
-			then
-				break
-			fi
-		done
-	
-		AC_CHECK_FILE(/usr/lib/libct.a,FREETDSLIBS="-lct"; FREETDSSTATIC="$STATICFLAG")
-		AC_CHECK_FILE(/usr/lib/libct.so,FREETDSLIBSPATH=""; FREETDSLIBS="-lct")
-	fi
-	
-	if ( test "$FREETDSINCLUDES" = "-I/usr/include" )
-	then
-		FREETDSINCLUDES=""
-	fi
-	
-	if ( test -n "$RPATHFLAG" -a -n "$FREETDSLIBSPATH" )
-	then
-		FREETDSLIBS="-Wl,-rpath $FREETDSLIBSPATH $FREETDSLIBS"
-	fi
+
+	FW_CHECK_HEADERS_AND_LIBS([$FREETDSPATH],[freetds],[ctpublic.h],[ct],[$STATICFLAG],[$RPATHFLAG],[FREETDSINCLUDES],[FREETDSLIBS],[FREETDSLIBPATH],[FREETDSSTATIC])
 	
 	AC_SUBST(FREETDSINCLUDES)
 	AC_SUBST(FREETDSLIBS)
@@ -966,30 +926,20 @@ then
 	
 	if ( test -n "$SYBASEPATH" )
 	then
-		AC_CHECK_FILE($SYBASEPATH/include/ctpublic.h,SYBASEINCLUDES="-I$SYBASEPATH/include")
-		AC_CHECK_FILE($SYBASEPATH/lib/libct.a,SYBASELIBS="-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG")
-		AC_CHECK_FILE($SYBASEPATH/lib/libct.so,SYBASELIBPATH="$SYBASEPATH/lib"; SYBASELIBS="-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck")
+		FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[$SYBASEPATH/lib/libct.so],[SYBASELIBPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
 	else
 	
-		AC_CHECK_FILE(/usr/local/sybase/include/ctpublic.h,SYBASEINCLUDES="-I/usr/local/sybase/include")
-		AC_CHECK_FILE(/usr/local/sybase/lib/libct.a,SYBASELIBS="-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG")
-		AC_CHECK_FILE(/usr/local/sybase/lib/libct.so,SYBASELIBPATH="/usr/local/sybase/lib"; SYBASELIBS="-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck")
+		FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[/usr/local/sybase/lib/libct.so],[SYBASELIBPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
 	
-		AC_CHECK_FILE(/opt/sybase/include/ctpublic.h,SYBASEINCLUDES="-I/opt/sybase/include")
-		AC_CHECK_FILE(/opt/sybase/lib/libct.a,SYBASELIBS="-L/opt/sybase/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG")
-		AC_CHECK_FILE(/opt/sybase/lib/libct.so,SYBASELIBPATH="/opt/sybase/lib"; SYBASELIBS="-L/opt/sybase/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck")
-	
-		AC_CHECK_FILE(/opt/sybase-12.5/OCS-12_5/include/ctpublic.h,SYBASEINCLUDES="-I/opt/sybase-12.5/OCS-12_5/include")
-		AC_CHECK_FILE(/opt/sybase-12.5/OCS-12_5/lib/libct.a,SYBASELIBS="-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl"; SYBASESTATIC="$STATICFLAG")
-		AC_CHECK_FILE(/opt/sybase-12.5/OCS-12_5/lib/libct.so,SYBASELIBS="-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl"; SYBASESTATIC="$STATICFLAG")
+		FW_CHECK_HEADER_LIB([/opt/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/include\"],[/opt/sybase/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[/opt/sybase/lib/libct.so],[SYBASELIBPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
+
+		FW_CHECK_HEADER_LIB([/opt/sybase-12.5/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.so],[SYBASELIBPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"])
 	
 		if ( test -z "$SYBASELIBS" )
 		then
 			for i in "11.9.2" "11.0.3.3"
 			do
-				AC_CHECK_FILE(/opt/sybase-$i/include/ctpublic.h,SYBASEINCLUDES="-I/opt/sybase-$i/include")
-				AC_CHECK_FILE(/opt/sybase-$i/lib/libct.a,SYBASELIBS="-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG")
-				AC_CHECK_FILE(/opt/sybase-$i/lib/libct.so,SYBASELIBPATH="/opt/sybase-$i/lib"; SYBASELIBS="-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck")
+				FW_CHECK_HEADER_LIB([/opt/sybase-$i/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-$i/include\"],[/opt/sybase-$i/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[/opt/sybase-$i/lib/libct.so],[SYBASELIBPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
 				if ( test -n "$SYBASELIBS" )
 				then
 					break
@@ -1074,63 +1024,37 @@ then
 	HAVE_IODBC=""
 	HAVE_UNIXODBC=""
 	
-	if ( test -n "$ODBCPATH" )
-	then
-		AC_CHECK_FILE($ODBCPATH/include/sql.h,ODBCINCLUDES="-I$ODBCPATH/include")
-	
-		dnl iodbc
-		AC_CHECK_FILE($ODBCPATH/lib/libiodbc.a,ODBCLIBS="-L$ODBCPATH/lib -liodbc"; HAVE_IODBC="yes"; IODBCSTATIC="$STATICFLAG")
-		AC_CHECK_FILE($ODBCPATH/lib/libiodbc.so,ODBCLIBPATH="$ODBCPATH/lib"; ODBCLIBS="-L$ODBCPATH/lib -liodbc"; HAVE_IODBC="yes")
-	
-		dnl unixodbc
-		AC_CHECK_FILE($ODBCPATH/lib/libodbc.a,ODBCLIBS="-L$ODBCPATH/lib -lodbc"; HAVE_UNIXODBC="yes"; UNIXODBCSTATIC="$STATICFLAG")
-		AC_CHECK_FILE($ODBCPATH/lib/libodbc.so,ODBCLIBPATH="$ODBCPATH/lib"; ODBCLIBS="-L$ODBCPATH/lib -lodbc"; HAVE_UNIXODBC="yes")
-	
-	else
-	
-		dnl headers
-		for i in "/usr/include" "/usr/local/unixodbc/include" "/usr/local/iodbc/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
-		do
-			AC_CHECK_FILE($i/sql.h,ODBCINCLUDES="-I$i")
-			if ( test -n "$ODBCINCLUDES" )
+	dnl headers
+	for i in "$ODBCPATH" "/usr/local" "/usr/local/unixodbc" "/usr/local/iodbc" "/usr/local" "/usr/pkg" "/opt/sfw"
+	do
+		if ( test -n "$i" )
+		then
+			FW_CHECK_HEADER_LIB([$i/include/sql.h],[ODBCINCLUDES=\"-I$ODBCPATH/include\"],[$i/lib/libiodbc.a],[ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[$i/lib/libiodbc.so],[ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"])
+			FW_CHECK_HEADER_LIB([$i/include/sql.h],[ODBCINCLUDES=\"-I$i/include\"],[$i/lib/libodbc.a],[ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\"],[$i/lib/libodbc.so],[ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"])
+			if ( test -z "$ODBCLIBS" )
 			then
-				break
+				FW_CHECK_HEADER_LIB([$i/include/iodbc/sql.h],[ODBCINCLUDES=\"-I$ODBCPATH/include/iodbc\"],[$i/lib/libiodbc.a],[ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[$i/lib/libiodbc.so],[ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -liodbc\"; HAVE_IODBC=\"yes\"])
+				FW_CHECK_HEADER_LIB([$i/include/unixodbc/sql.h],[ODBCINCLUDES=\"-I$i/include/unixodbc\"],[$i/lib/libodbc.a],[ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\"],[$i/lib/libodbc.so],[ODBCLIBPATH=\"$i/lib\"; ODBCLIBS=\"-L$i/lib -lodbc\"; HAVE_UNIXODBC=\"yes\"])
 			fi
-		done
-	
-		dnl iodbc
-		for i in "/usr/local/iodbc/lib" "/usr/local/lib" "/usr/local/lib/iodbc" "/usr/pkg/lib" "/opt/sfw/lib"
-		do
-			AC_CHECK_FILE($i/libiodbc.a,ODBCLIBS="-L$i -liodbc"; HAVE_IODBC="yes"; IODBCSTATIC="$STATICFLAG")
-			AC_CHECK_FILE($i/libiodbc.so,ODBCLIBPATH="$i"; ODBCLIBS="-L$i -liodbc"; HAVE_IODBC="yes")
+			if ( test -z "$ODBCLIBS" )
+			then
+				FW_CHECK_HEADER_LIB([$i/include/sql.h],[ODBCINCLUDES=\"-I$ODBCPATH/include\"],[$i/lib/iodbc/libiodbc.a],[ODBCLIBS=\"-L$i/iodbc/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[$i/lib/iodbc/libiodbc.so],[ODBCLIBPATH=\"$i/lib/iodbc\"; ODBCLIBS=\"-L$i/lib/iodbc -liodbc\"; HAVE_IODBC=\"yes\"])
+				FW_CHECK_HEADER_LIB([$i/include/sql.h],[ODBCINCLUDES=\"-I$i/include\"],[$i/lib/unixodbc/libodbc.a],[ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\"],[$i/lib/unixodbc/libodbc.so],[ODBCLIBPATH=\"$i/lib/unixodbc\"; ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"])
+			fi
+			if ( test -z "$ODBCLIBS" )
+			then
+				FW_CHECK_HEADER_LIB([$i/include/iodbc/sql.h],[ODBCINCLUDES=\"-I$ODBCPATH/include/iodbc\"],[$i/lib/iodbc/libiodbc.a],[ODBCLIBS=\"-L$i/iodbc/lib -liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[$i/lib/iodbc/libiodbc.so],[ODBCLIBPATH=\"$i/lib/iodbc\"; ODBCLIBS=\"-L$i/lib/iodbc -liodbc\"; HAVE_IODBC=\"yes\"])
+				FW_CHECK_HEADER_LIB([$i/include/unixodbc/sql.h],[ODBCINCLUDES=\"-I$i/include/unixodbc\"],[$i/lib/unixodbc/libodbc.a],[ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"; UNIXODBCSTATIC=\"$STATICFLAG\"],[$i/lib/unixodbc/libodbc.so],[ODBCLIBPATH=\"$i/lib/unixodbc\"; ODBCLIBS=\"-L$i/lib/unixodbc -lodbc\"; HAVE_UNIXODBC=\"yes\"])
+			fi
 			if ( test -n "$ODBCLIBS" )
 			then
 				break
 			fi
-		done
-	
-		AC_CHECK_FILE(/usr/lib/libiodbc.a,ODBCLIBS="-liodbc"; HAVE_IODBC="yes"; IODBCSTATIC="$STATICFLAG")
-		AC_CHECK_FILE(/usr/lib/libiodbc.so,ODBCLIBPATH=""; ODBCLIBS="-liodbc"; HAVE_IODBC="yes")
-	
-		dnl unixodbc
-		for i in "/usr/local/unixodbc/lib" "/usr/local/lib" "/usr/local/lib/unixodbc" "/usr/pkg/lib" "/opt/sfw/lib"
-		do
-			AC_CHECK_FILE($i/libodbc.a,ODBCLIBS="-L$i -lodbc"; HAVE_UNIXODBC="yes"; UNIXODBCSTATIC="$STATICFLAG")
-			AC_CHECK_FILE($i/libodbc.so,ODBCLIBPATH="$i"; ODBCLIBS="-L$i -lodbc"; HAVE_UNIXODBC="yes")
-			if ( test -n "$ODBCLIBS" )
-			then
-				break
-			fi
-		done
-	
-		AC_CHECK_FILE(/usr/lib/libodbc.a,ODBCLIBS="-lodbc"; HAVE_UNIXODBC="yes"; UNIXODBCSTATIC="$STATICFLAG")
-		AC_CHECK_FILE(/usr/lib/libodbc.so,ODBCLIBPATH=""; ODBCLIBS="-lodbc"; HAVE_UNIXODBC="yes")
-	fi
-	
-	if ( test "$ODBCINCLUDES" = "-I/usr/include" )
-	then
-		ODBCINCLUDES=""
-	fi
+		fi
+	done
+
+	FW_CHECK_HEADER_LIB([/usr/include/sql.h],[ODBCINCLUDES=\"\"],[/usr/lib/libiodbc.a],[ODBCLIBS=\"-liodbc\"; HAVE_IODBC=\"yes\"; IODBCSTATIC=\"$STATICFLAG\"],[/usr/lib/libiodbc.so],[ODBCLIBPATH=\"\"; ODBCLIBS=\"-liodbc\"; HAVE_IODBC=\"yes\"])
+	FW_CHECK_HEADER_LIB([/usr/include/sql.h],[ODBCINCLUDES=\"\"],[/usr/lib/libodbc.a],[ODBCLIBS=\"-lodbc\"; HAVE_ODBC=\"yes\"; ODBCSTATIC=\"$STATICFLAG\"],[/usr/lib/libodbc.so],[ODBCLIBPATH=\"\"; ODBCLIBS=\"-lodbc\"; HAVE_ODBC=\"yes\"])
 	
 	AC_SUBST(ODBCINCLUDES)
 	AC_SUBST(ODBCLIBS)
