@@ -1105,8 +1105,7 @@ void	sqlrcursor::clearRows() {
 	unsigned long	rowbuffercount=rowcount-firstrowindex;
 	for (unsigned long i=0; i<rowbuffercount; i++) {
 	        for (unsigned long j=0; j<colcount; j++) {
-		        // char	*data=getFieldInternal(i,j);
-			if (getColumn(j)->longdatatype) {
+			if (getColumnInternal(j)->longdatatype) {
 				delete[] getFieldInternal(i,j);
 			}
 		}
@@ -1242,7 +1241,7 @@ char	**sqlrcursor::getColumnNames() {
 		columnnamearray=new char *[colcount+1];
 		columnnamearray[colcount]=NULL;
 		for (unsigned long i=0; i<colcount; i++) {
-			columnnamearray[i]=getColumn(i)->name;
+			columnnamearray[i]=getColumnInternal(i)->name;
 		}
 	}
 	return columnnamearray;
@@ -1452,7 +1451,7 @@ char	*sqlrcursor::getField(int row, const char *col) {
 			sentcolumninfo==SEND_COLUMN_INFO &&
 			rowcount && row>=0 && row>=(int)firstrowindex) {
 		for (unsigned long i=0; i<colcount; i++) {
-			if (!strcasecmp(getColumn(i)->name,col)) {
+			if (!strcasecmp(getColumnInternal(i)->name,col)) {
 
 				// in the event that we're stepping through the
 				// result set instead of buffering the entire 
@@ -1495,7 +1494,7 @@ long	sqlrcursor::getFieldLength(int row, const char *col) {
 			rowcount && row>=0 && row>=(int)firstrowindex) {
 
 		for (unsigned long i=0; i<colcount; i++) {
-			if (!strcasecmp(getColumn(i)->name,col)) {
+			if (!strcasecmp(getColumnInternal(i)->name,col)) {
 
 				// in the event that we're stepping through the
 				// result set instead of buffering the entire 
@@ -1931,12 +1930,15 @@ int	sqlrcursor::parseData() {
 		}
 
 		// tag the column as a long data type or not
-		currentcol=getColumn(colindex);
+		currentcol=getColumnInternal(colindex);
+
+		// set whether this column is a "long type" or not
 		currentcol->longdatatype=(type==END_LONG_DATA)?1:0;
 
-		// keep track of the longest field
 		if (sendcolumninfo==SEND_COLUMN_INFO && 
 				sentcolumninfo==SEND_COLUMN_INFO) {
+
+			// keep track of the longest field
 			if (length>(unsigned long)(currentcol->longest)) {
 				currentcol->longest=length;
 			}
@@ -2162,7 +2164,7 @@ void	sqlrcursor::cacheColumnInfo() {
 		unsigned short	namelen;
 		column	*whichcolumn;
 		for (unsigned long i=0; i<colcount; i++) {
-			whichcolumn=getColumn(i);
+			whichcolumn=getColumnInternal(i);
 			namelen=strlen(whichcolumn->name);
 			cachedest->write(namelen);
 			cachedest->write(whichcolumn->name,namelen);
@@ -2427,7 +2429,7 @@ int	sqlrcursor::parseColumnInfo() {
 			}
 	
 			// which column to use
-			currentcol=getColumn(i);
+			currentcol=getColumnInternal(i);
 	
 			// get the column name
 			currentcol->name=(char *)colstorage->malloc(length+1);
@@ -2569,10 +2571,7 @@ column	*sqlrcursor::getColumn(int index) {
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
 			colcount && index>=0 && index<(int)colcount) {
-		if (index<OPTIMISTIC_COLUMN_COUNT) {
-			return &columns[index];
-		}
-		return &extracolumns[index-OPTIMISTIC_COLUMN_COUNT];
+		return getColumnInternal(index);
 	}
 	return NULL;
 }
@@ -2582,13 +2581,20 @@ column	*sqlrcursor::getColumn(const char *name) {
 			sentcolumninfo==SEND_COLUMN_INFO) {
 		column	*whichcolumn;
 		for (unsigned long i=0; i<colcount; i++) {
-			whichcolumn=getColumn(i);
+			whichcolumn=getColumnInternal(i);
 			if (!strcasecmp(whichcolumn->name,name)) {
 				return whichcolumn;
 			}
 		}
 	}
 	return NULL;
+}
+
+column	*sqlrcursor::getColumnInternal(int index) {
+	if (index<OPTIMISTIC_COLUMN_COUNT) {
+		return &columns[index];
+	}
+	return &extracolumns[index-OPTIMISTIC_COLUMN_COUNT];
 }
 
 void	sqlrcursor::abortResultSet() {
@@ -3025,7 +3031,7 @@ void	sqlrcursor::clearColumns() {
 			sentcolumninfo==SEND_COLUMN_INFO &&
 				columntypeformat!=COLUMN_TYPE_IDS) {
 		for (unsigned long i=0; i<colcount; i++) {
-			delete[] getColumn(i)->typestring;
+			delete[] getColumnInternal(i)->typestring;
 		}
 	}
 
