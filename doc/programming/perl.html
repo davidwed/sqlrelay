@@ -137,7 +137,7 @@ You can find out why by calling errorMessage().</p>
 <p>Programs rarely execute fixed queries.  More often than not, some part
 of the query is dynamically generated.  It's convenient to store queries in 
 files so they can be changed by a non-Perl programmer.  The SQL Relay API 
-provides functions for making substitutions and binds in those queries.</p>
+provides methods for making substitutions and binds in those queries.</p>
 
 <p>For a detailed discussion of substitutions and binds, see
 <a href="binds.html">this document</a>.
@@ -202,10 +202,14 @@ Program code:
 </PRE>
 </blockquote>
 
-<p>The getOutputBind() function returns a NULL value as an empty string.  
+<p>The getOutputBind() method returns a NULL value as an empty string.  
 If you would it to come back as undefined instead, you can call the 
 getNullsAsUndefined() method.  To revert to the default behavior, you can
 call getNullsAsEmptyStrings().</p>
+
+<p>The getOutputBind() method returns a string, if you would like to get the
+value as a long or double, you can use getOutputBindAsLong() or
+getOutputBindAsDouble().</p>
 
 <p>If you are using Oracle 8 or higher, you can insert data into BLOB
 and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
@@ -339,6 +343,9 @@ result sets.</p>
 }
 </PRE>
 </blockquote>
+
+<p>The getField() method returns a string.  If you would like to get a field as
+a long or double, you can use getFieldAsLong() and getFieldAsDouble().</p>
 
 <p>You can also use getRow() or getRowHash() to get the entire row.</p>
 

@@ -1,66 +1,43 @@
 BASIC INSTALL:
 
-	To compile sqlrelay type:
+	To compile SQL Relay, make sure your ORACLE_HOME environment variable is
+	set if you want to include support for Oracle and type:
 
 		configure
 		make
 
-	To install sqlrelay become superuser and type:
+	The configure script takes lots of command line options, most of which
+	tell it where to find prerequisite software in case any of it is
+	installed in non-standard locations.  It also takes the --prefix option
+	in case you want to install SQL Relay somewhere other than
+	/usr/local/firstworks.  You can run "configure --help" to get a list of
+	command line options.  For example:
 
-		make install
-
-	Libraries are installed in /usr/local/firstworks/lib
-	Includes are installed in /usr/local/firstworks/include
-	Binaries and scripts are installed in /usr/local/firstworks/bin
-
-	To uninstall sqlrelay become superuser and type:
-
-		make uninstall
-
-
-
-CUSTOM INSTALL:
-
-	Some defaults settings can be modified by editing the file defaults.h
-	The file contains descriptions of each modifyable parameter.
-
-	The default installation prefix is /usr/local/firstworks.
-	The libraries are installed in /usr/local/firstworks/lib,
-	the header files in /usr/local/firstworks/include and
-	the binaries and scripts are installed in /usr/local/firstworks/bin.
-
-	The /usr/local/firstworks part of these paths may be changed to any 
-	other directory by invoking configure with the --prefix option.
-
-		For example:
-			configure --prefix=/usr/local
+		configure --prefix=/usr/local
 
 	This invocation would cause the libraries to be installed in
-	/usr/local/lib, the header files in /usr/local/include and
-	the binaries and scripts to be installed in /usr/local/bin.
+	/usr/local/lib, the header files in /usr/local/include, the binaries
+	and scripts to be installed in /usr/local/bin, etc.
 
-
-
-	To compile sqlrelay, first type:
-
-		configure
-
-	This will generate a file called config.mk containing some
-	compile time options.  Edit this file to your liking.  If you
-	run configure again, you will have to edit the file again.
-
-	Then type:
-
-		make
-
-	To install sqlrelay become superuser and type:
+	To install SQL Relay become superuser and type:
 
 		make install
 
-	To uninstall sqlrelay become superuser and type:
+	Libraries are installed in /usr/local/firstworks/lib.  Include files
+	are installed in /usr/local/firstworks/include.  Binaries and scripts
+	are installed in /usr/local/firstworks/bin.  An example config file is
+	installed in /usr/local/firstworks/etc.  Java libraries are installed
+	in /usr/local/firstworks/java.  Python, Perl, PHP, Ruby and TCL files
+	are installed in the appropriate language-specific directories.
+	
+	If you install SQL Relay as root, init scripts and files will be
+	installed in the appropriate places under /etc for your system.  If you
+	install SQL Relay as a non-root user, the init scripts and files will
+	be installed in similar places under /usr/local/firstworks/etc.
+
+	To uninstall SQL Relay become superuser and type:
 
 		make uninstall
-
 
 RPM INSTALL:
 
@@ -89,6 +66,8 @@ RPM INSTALL:
 		-without perl
 		-without python
 		-without php
+		-without ruby
+		-without tcl
 		-without java
 		-without zope
 
@@ -105,11 +84,11 @@ RPM INSTALL:
 	changing directories into that directory and executing the following
 	command as root:
 
-		rpm -i sqlrelay-*
+		rpm -i --nodeps sqlrelay-*
 
 SLACKWARE INSTALL:
 
-	If you are a Slackware user, you can build a tgz of sqlrelay by
+	If you are a Slackware user, you can build a tgz of SQL Relay by
 	running the following command as root:
 
 		make tgz

@@ -242,8 +242,8 @@ main() {
 
 <p>If you're using a database with an embedded procedural language, you may
 want to retrieve data from a call to one of it's functions.  To facilitate
-this, SQL Relay provides the sqlrcur_defineOutputBind() and sqlrcur_getOutputBind()
-methods.</p>
+this, SQL Relay provides the sqlrcur_defineOutputBind() and
+sqlrcur_getOutputBind() methods.</p>
 
 <blockquote>
 PL/SQL Procedure:<br>
@@ -284,10 +284,14 @@ main() {
 </PRE>
 </blockquote>
 
-<p>The sqlrcur_getOutputBind() function returns a NULL value as an empty string.  
-If you would it to come back as a NULL instead, you can call the 
+<p>The sqlrcur_getOutputBind() function returns a NULL value as an empty
+string.  If you would it to come back as a NULL instead, you can call the 
 sqlrcur_getNullsAsNulls() method.  To revert to the default behavior, you can
 call sqlrcur_getNullsAsEmptyStrings().</p>
+
+<p>The sqlrcur_getOutputBind() function returns a string, if you would like to
+get the value as a long or double, you can use sqlrcur_getOutputBindAsLong() or
+sqlrcur_getOutputBindAsDouble().</p>
 
 <p>If you are using Oracle 8 or higher, you can insert data into BLOB
 and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
@@ -416,8 +420,8 @@ main() {
 <a name="fields"></a>
 <span class="heading2">Accessing Fields in the Result Set</span><br><br>
 
-<p>The sqlrcur_rowCount(), sqlrcur_colCount() and sqlrcur_getFieldByIndex() methods 
-are useful for processing result sets.</p>
+<p>The sqlrcur_rowCount(), sqlrcur_colCount(), sqlrcur_getFieldByName() and
+sqlrcur_getFieldByIndex() functions are useful for processing result sets.</p>
 
 <blockquote>
 <PRE>
@@ -447,8 +451,13 @@ main() {
 </PRE>
 </blockquote>
 
-<p>You can also use sqlrcur_getRow() which returns a NULL-terminated array of the
-fields in the row.</p>
+<p>The sqlrcur_getFieldByName() and sqlrcur_getFieldByIndex() functions return
+strings.  If you would like to get a field as a long or double, you can use
+sqlrcur_getFieldAsLongByName()/sqlrcur_getFieldAsLongByIndex() and
+sqlrcur_getFieldAsDoubleByName()/sqlrcur_getFieldAsDoubleByIndex().</p>
+
+<p>You can also use sqlrcur_getRow() which returns a NULL-terminated array of
+the fields in the row.</p>
 
 <blockquote>
 <PRE>

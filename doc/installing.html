@@ -36,7 +36,7 @@ from <a target="_top" href="http://www.firstworks.com">www.firstworks.com</a>
 
 <p>To build the database connection daemons, you'll need one or more of
 <a target="_top" href="http://www.oracle.com">Oracle</a>
-(Version 7.3.x, 8.0.x or 8.1.x),
+(Version 7.3.x, 8.x or 9.x),
 <a target="_top" href="http://web.mysql.com">MySQL</a>, 
 <a target="_top" href="http://www.Hughes.com.au">mSQL</a>, 
 <a target="_top" href="http://www.postgresql.org">PostgreSQL</a>, 
@@ -66,10 +66,10 @@ from <a href="http://www.firstworks.com">www.firstworks.com</a>.</p>
 <p>To unpack the distribution, copy the file to a location on your machine
 that you have access to and execute the following commands:</p>
 
-<ul>
-<li>gunzip sqlrelay-X.XX.tar.gz</li>
-<li>tar xf sqlrelay-X.XX.tar</li>
-</ul>
+<blockquote><b>
+gunzip sqlrelay-X.XX.tar.gz<br>
+tar xf sqlrelay-X.XX.tar
+</b></blockquote>
 
 <p>This will create a sqlrelay-X.XX directory. Change directories into that 
 directory.</p>
@@ -77,117 +77,110 @@ directory.</p>
 <a name="compiling"></a>
 <span class="heading2">Compiling SQL Relay:</span><br><br>
 
-<p>To compile <b>SQL Relay</b>, read the INSTALL file, 
-make sure your ORACLE_HOME environment variable is set if you are going to 
-compile with Oracle support, then execute the following commands:</p>
 
-<ul>
-<li>configure</li>
-<li>make</li>
-</ul>
+<p>To compile <b>SQL Relay</b>, make sure your ORACLE_HOME environment variable
+is set if you want to include support for Oracle and type:</p>
 
-<p>The configure command takes lots of command line options, most of which tell
-it where to find prerequisite software in case any of it is installed in
-non-standard locations.  It also takes the --prefix option in case you want
-to install <b>SQL Relay</b> somewhere other than /usr/local/firstworks.  You
-can run "configure --help" to get a list of command line options.</p>
+<blockquote><b>
+configure<br>
+make
+</b></blockquote>
 
-<p>If you want to rebuild <b>SQL Relay</b> for any reason, type:</p>
+<p>The configure script takes lots of command line options, most of which
+tell it where to find prerequisite software in case any of it is
+installed in non-standard locations.  It also takes the --prefix option
+in case you want to install <b>SQL Relay</b> somewhere other than
+/usr/local/firstworks.  You can run "configure --help" to get a list of
+command line options. For example:</p>
 
-<ul>
-<li>make clean</li>
-<li>make</li>
-</ul>
+<blockquote><b>
+configure --prefix=/usr/local
+</b></blockquote>
 
-<p>If you want to re-configure <b>SQL Relay</b> type:</p>
-
-<ul>
-<li>make clean</li>
-<li>make unconfig</li>
-<li>configure</li>
-<li>make</li>
-</ul>
-
-<p><b>SQL Relay</b> should compile and function on unix-based systems
-using the GNU development system.  Other compilers may work too but have not
-been tested on the current version.</p>
-
-<p>The -pedantic flag must be used with newer GNU compilers.  This flag is
-turned on by default, don't disable it.</p>
-
-<p>After a complete, sucessful compilation, the lib directory should 
-contain:</p>
-
-<ul>
-<li>libsqlrclient.a
-<li>libsqlrclient.so
-</ul>
-
-<p>The bin directory should contain:</p>
-
-<ul>
-<li>sqlr-listener
-<li>sqlr-cachemanager
-<li>sqlr-start
-<li>sqlr-stop
-<li>query
-<li>fields
-<li>backupschema  
-<li>sqlrsh
-<li>sqlr-config-gtk
-<li>and one or more of...
-<ul>
-<li>sqlr-connection-oracle7  (does not support LOB's)
-<li>sqlr-connection-oracle8  (does support LOB's)
-<li>sqlr-connection-mysql
-<li>sqlr-connection-msql
-<li>sqlr-connection-postgresql
-<li>sqlr-connection-sqlite
-<li>sqlr-connection-lago
-<li>sqlr-connection-freetds
-<li>sqlr-connection-sybase
-<li>sqlr-connection-odbc
-<li>sqlr-connection-db2
-<li>sqlr-connection-interbase
-</ul>
-</ul>
+<p>This invocation would cause the libraries to be installed in
+/usr/local/lib, the header files in /usr/local/include, the binaries
+and scripts to be installed in /usr/local/bin, etc.</p>
 
 <a name="installing"></a>
 <span class="heading2">Installing SQL Relay:</span><br><br>
 
-<p>To install <b>SQL Relay</b>, become root and type:</p>
+<p>To install <b>SQL Relay</b> become superuser and type:</p>
 
-<ul>
-<li>make install</li>
-</ul>
+<blockquote><b>
+make install
+</b></blockquote>
 
-<p>By default, everything is installed under /usr/local/firstworks.</p>
+<p>Libraries are installed in /usr/local/firstworks/lib.  Include files
+are installed in /usr/local/firstworks/include.  Binaries and scripts
+are installed in /usr/local/firstworks/bin.  An example config file is
+installed in /usr/local/firstworks/etc.  Java libraries are installed
+in /usr/local/firstworks/java.  Python, Perl, PHP, Ruby and TCL files
+are installed in the appropriate language-specific directories.</p>
+	
+<p>If you install <b>SQL Relay</b> as root, init scripts and files will be
+installed in the appropriate places under /etc for your system.  If you
+install <b>SQL Relay</b> as a non-root user, the init scripts and files will
+be installed in similar places under /usr/local/firstworks/etc.</p>
 
-<p>To uninstall <b>SQL Relay</b>, become root and type:</p>
+<p>To uninstall <b>SQL Relay</b> become superuser and type:</p>
 
-<ul>
-<li>make uninstall</li>
-</ul>
+<blockquote><b>
+make uninstall
+</b></blockquote>
 
 
 <a name="rpms"></a>
 <span class="heading2">Installing SQL Relay RPMS:</span><br><br>
 
-<p>If your platform supports RedHat Package Manager RPM's, you can build
-them after running configure and make by running the following command as 
-root:</p>
+<p>If your system supports RedHat Package Manager RPM version 4.0.3 or
+greater then you can build RPMS by running the following command
+against the distribution tarball:</p>
 
-<ul>
-<li>make rpm</li>
-</ul>
+<blockquote><b>
+<p>rpm -ta sqlrelay-xxx.tar.gz</p>
+<p>(where xxx is replaced with the version number)</p>
+</b></blockquote>
 
-<p>This will generate RPM's in the packages/RPMS directory.  You can install 
-them by changing directories into packages/RPMS and executing the following 
+<p>You can instruct the build process not to build certain modules by
+giving it one of the following flags:</p>
+
+<blockquote><b>
+-without db2<br>
+-without freetds<br>
+-without interbase<br>
+-without lago<br>
+-without msql<br>
+-without mysql<br>
+-without odbc<br>
+-without oracle<br>
+-without postgresql<br>
+-without sqlite<br>
+-without sybase<br>
+-without perl<br>
+-without python<br>
+-without php<br>
+-without tcl<br>
+-without java<br>
+-without zope<br>
+</b></blockquote>
+
+<p>For example, if you want to build everything but the oracle and zope
+modules, then you would run the following command:</p>
+
+<blockquote><b>
+<p>rpm -ta -without oracle -without zope sqlrelay-xxx.tar.gz</p>
+<p>(where xxx is replaced with the version number)</p>
+</b></blockquote>
+
+<p>This will generate RPM's in the system-wide RPM directory (usually
+/usr/src/redhat/RPMS or /usr/local/rpm/RPMS) under the subdirectory
+corresponding to your system architecture.  You can install them by
+changing directories into that directory and executing the following
 command as root:</p>
 
-<ul>
-<li>rpm -i *</li>
-</ul>
+<blockquote><b>
+rpm -i --nodeps sqlrelay-*
+</b><blockquote>
 
 </body>
 </html>

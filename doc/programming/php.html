@@ -109,13 +109,13 @@ the session open between them.</p>
 <p>If you need to execute a commit or rollback, you should use the 
 sqlrcon_commit() and sqlrcon_rollback() functions rather than sending a 
 "commit" or "rollback" query.  There are two reasons for this.  First, it's 
-much more efficient to call the methods.  Second, if you're writing code that 
+much more efficient to call the functions.  Second, if you're writing code that 
 can run on transactional or non-transactional databases, some non-transactional
 databases will throw errors if they receive a "commit" or "rollback" query, 
 but by calling the sqlrcon_commit() and sqlrcon_rollback() functions you 
 instruct the database connection daemon to call the commit and rollback API 
-methods for that database rather than issuing them as queries.  If the API's 
-have no commit or rollback methods, the calls do nothing and the database 
+functions for that database rather than issuing them as queries.  If the API's 
+have no commit or rollback functions, the calls do nothing and the database 
 throws no error.  This is especially important when using SQL Relay with 
 ODBC.</p>
 
@@ -194,8 +194,8 @@ Program code:<br>
 
 <p>If you're using a database with an embedded procedural language, you may
 want to retrieve data from a call to one of it's functions.  To facilitate
-this, SQL Relay provides the sqlrcur_defineOutputBind() and sqlrcur_getOutputBind()
-methods.</p>
+this, SQL Relay provides the sqlrcur_defineOutputBind() and
+sqlrcur_getOutputBind() functions.</p>
 
 <blockquote>
 PL/SQL Procedure:<br>
@@ -234,11 +234,11 @@ Program code:
 
 <p>The sqlrcur_getOutputBind() function returns a NULL value as an empty string.  
 If you would it to come back as NULL instead, you can call the 
-sqlrcur_getNullsAsNulls() method.  To revert to the default behavior, you can
+sqlrcur_getNullsAsNulls() function.  To revert to the default behavior, you can
 call sqlrcur_getNullsAsEmptyStrings().</p>
 
 <p>If you are using Oracle 8 or higher, you can insert data into BLOB
-and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
+and CLOB columns using the inputBindBlob(), inputBindClob() functions.</p>
 
 <blockquote>
 <pre>
@@ -359,8 +359,8 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 <a name="fields"></a>
 <span class="heading2">Accessing Fields in the Result Set</span><br><br>
 
-<p>The sqlrcur_rowCount(), sqlrcur_colCount() and sqlrcur_getField() methods are 
-useful for processing result sets.</p>
+<p>The sqlrcur_rowCount(), sqlrcur_colCount() and sqlrcur_getField() functions
+are useful for processing result sets.</p>
 
 <blockquote>
 <PRE>
@@ -386,6 +386,10 @@ useful for processing result sets.</p>
 <FONT color=#6a5acd>?&gt;</FONT>
 </PRE>
 </blockquote>
+
+<p>The sqlrcur_getField() function returns a string.  If you would like to get
+a field as a long or double, you can use sqlrcur_getFieldAsLong() and
+sqlrcur_getFieldAsDouble().</p>
 
 <p>You can also use sqlrcur_getRow() or sqlrcur_getRowAssoc() to get the entire 
 row.</p>
@@ -417,15 +421,15 @@ row.</p>
 </PRE>
 </blockquote>
 
-<p>The sqlrcur_getField(), sqlrcur_getRow() and sqlrcur_getRowAssoc() methods 
+<p>The sqlrcur_getField(), sqlrcur_getRow() and sqlrcur_getRowAssoc() functions
 return NULL fields as empty strings.  If you would like them to come back as 
-NULL's instead, you can call the sqlrcur_getNullsAsNulls() method.  To revert 
+NULL's instead, you can call the sqlrcur_getNullsAsNulls() function.  To revert 
 to the default behavior, you can call sqlrcur_getNullsAsEmptyStrings().</p>
 
 <p>If you want to access the result set, but don't care about the
 column information (column names, types or sizes) and don't mind getting
 fields by their numeric index instead of by name,  you can call the
-sqlrcur_dontGetColumnInfo() method prior to executing your query.  This can 
+sqlrcur_dontGetColumnInfo() function prior to executing your query.  This can 
 result in a performance improvement, especially when many queries with small
 result sets are executed in rapid succession.  You can call 
 sqlrcur_getColumnInfo() again later to turn off this feature.</p>
@@ -453,9 +457,9 @@ you're done with the result set.</p>
 <p>If you call sqlrcur_setResultSetBufferSize() and forget what you set it to, 
 you can always call sqlrcur_getResultSetBufferSize().</p>
 
-<p>When buffering a result set in chunks, the sqlrcur_rowCount() method returns
-the number of rows returned so far.  The sqlrcur_firstRowIndex() method returns 
-the index of the first row of the currently buffered chunk.
+<p>When buffering a result set in chunks, the sqlrcur_rowCount() function
+returns the number of rows returned so far.  The sqlrcur_firstRowIndex()
+function returns the index of the first row of the currently buffered chunk.
 
 <blockquote>
 <PRE>
