@@ -3,7 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
-#include <rudiments/string.h>
+#include <rudiments/charstring.h>
 #include <defines.h>
 #include <datatypes.h>
 

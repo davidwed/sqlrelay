@@ -3,7 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
-#include <rudiments/string.h>
+#include <rudiments/charstring.h>
 #include <defines.h>
 #define NEED_DATATYPESTRING
 #include <datatypes.h>
@@ -135,9 +135,9 @@ int	sqlrcursor::parseColumnInfo() {
 
 			// upper/lowercase column name if necessary
 			if (colcase==UPPER_CASE) {
-				string::upper(currentcol->name);
+				charstring::upper(currentcol->name);
 			} else if (colcase==LOWER_CASE) {
-				string::lower(currentcol->name);
+				charstring::lower(currentcol->name);
 			}
 
 			if (columntypeformat==COLUMN_TYPE_IDS) {

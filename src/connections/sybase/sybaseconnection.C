@@ -7,7 +7,7 @@
 #include <datatypes.h>
 
 #include <rudiments/stringbuffer.h>
-#include <rudiments/string.h>
+#include <rudiments/charstring.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -342,7 +342,7 @@ int	sybasecursor::inputBindString(const char *variable,
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
@@ -369,7 +369,7 @@ int	sybasecursor::inputBindLong(const char *variable,
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
@@ -398,7 +398,7 @@ int	sybasecursor::inputBindDouble(const char *variable,
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
@@ -429,7 +429,7 @@ int	sybasecursor::outputBindString(const char *variable,
 
 	/*(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {

@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <oracle8connection.h>
-#include <rudiments/string.h>
+#include <rudiments/charstring.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -359,7 +359,7 @@ int	oracle8cursor::inputBindString(const char *variable,
 	checkRePrepare();
 
 	// the size of the value must include the terminating NULL
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
@@ -393,7 +393,7 @@ int	oracle8cursor::inputBindLong(const char *variable,
 						unsigned long *value) {
 	checkRePrepare();
 
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
@@ -429,7 +429,7 @@ int	oracle8cursor::inputBindDouble(const char *variable,
 						unsigned short scale) {
 	checkRePrepare();
 
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
@@ -464,7 +464,7 @@ int	oracle8cursor::outputBindString(const char *variable,
 						short *isnull) {
 	checkRePrepare();
 
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
@@ -569,7 +569,7 @@ int	oracle8cursor::inputBindGenericLob(const char *variable,
 	}
 
 	// bind the temporary lob
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
@@ -631,7 +631,7 @@ int	oracle8cursor::outputBindGenericLob(const char *variable,
 	outbindlobcount=index+1;
 
 	// bind the lob descriptor
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
@@ -665,7 +665,7 @@ int	oracle8cursor::outputBindCursor(const char *variable,
 
 	checkRePrepare();
 
-	if (string::isInteger(variable+1,variablesize-1)) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}

@@ -90,8 +90,7 @@ void	sqlrcursor::clearRows() {
 void	sqlrcursor::clearColumns() {
 
 	// delete the column type strings (if necessary)
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO &&
+	if (sentcolumninfo==SEND_COLUMN_INFO &&
 				columntypeformat!=COLUMN_TYPE_IDS) {
 		for (unsigned long i=0; i<colcount; i++) {
 			delete[] getColumnInternal(i)->typestring;

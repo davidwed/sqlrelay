@@ -4,7 +4,7 @@
 #ifdef HAVE_STRINGS_H
 	#include <strings.h>
 #endif
-#include <rudiments/string.h>
+#include <rudiments/charstring.h>
 
 extern "C" {
 
@@ -181,7 +181,7 @@ Oid PQoidValue(const PGresult *res) {
 }
 
 char *PQcmdTuples(PGresult *res) {
-	return string::parseNumber((long)res->sqlrcur->affectedRows());
+	return charstring::parseNumber((long)res->sqlrcur->affectedRows());
 }
 
 char *PQgetvalue(const PGresult *res, int tup_num, int field_num) {

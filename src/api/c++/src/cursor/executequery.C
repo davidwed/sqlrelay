@@ -3,7 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
-#include <rudiments/string.h>
+#include <rudiments/charstring.h>
 
 int	sqlrcursor::executeQuery() {
 
@@ -187,7 +187,7 @@ void	sqlrcursor::validateBindsInternal(const char *query) {
 
 		// don't check bind-by-position variables
 		len=strlen(inbindvars[i].variable);
-		if (string::isInteger(inbindvars[i].variable,len)) {
+		if (charstring::isInteger(inbindvars[i].variable,len)) {
 			continue;
 		}
 
@@ -229,7 +229,7 @@ void	sqlrcursor::validateBindsInternal(const char *query) {
 
 		// don't check bind-by-position variables
 		len=strlen(outbindvars[i].variable);
-		if (string::isInteger(outbindvars[i].variable,len)) {
+		if (charstring::isInteger(outbindvars[i].variable,len)) {
 			continue;
 		}
 
