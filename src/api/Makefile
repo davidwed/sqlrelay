@@ -13,7 +13,7 @@ ifneq ($(HAVE_PERL),)
 	$(MAKE) -C perl/DBD -f Makefile.master all
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby
+	$(MAKE) -C ruby all
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php all

@@ -10,6 +10,9 @@ print "\n"
 print "prefix = "
 print with_destdir(CONFIG["prefix"].sub(drive, ""))
 print "\n"
+print "exec_prefix = "
+print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))
+print "\n"
 print "libdir = "
 print with_destdir($libdir.sub(drive, ""))
 print "\n"

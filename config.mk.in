@@ -31,6 +31,7 @@ CXX = @CXX@
 
 # strip command
 STRIP = @STRIP@
+STRIPCOMMENTNOTE = $(top_builddir)/strip-comment-note
 
 # includes and defines (-I and -D flags)
 BASECPPFLAGS = @CPPFLAGS@ @PTHREADINCLUDES@

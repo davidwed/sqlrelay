@@ -15,9 +15,7 @@ endif
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPILE_DL=1 -c $< -o $@
-	if ( test "$(STRIP)" != "touch" ); then \
-		$(STRIP) -x -R .note -R .comment $@; \
-	fi
+	$(STRIPCOMMENTNOTE) $@
 
 all:
 	cp phpincludes1.h phpincludes.h; \

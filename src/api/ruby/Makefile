@@ -2,9 +2,9 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-RUBYCFLAGS = $(DESTDIR)$(shell $(RUBY) getcflags.rb | $(MAKE) -s -f - )
-RUBYSITEARCHDIR = $(DESTDIR)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - )
-RUBYSITELIBDIR = $(DESTDIR)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - )
+RUBYCFLAGS = $(DESTDIR)$(shell $(RUBY) getcflags.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYSITEARCHDIR = $(DESTDIR)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYSITELIBDIR = $(DESTDIR)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
@@ -35,17 +35,14 @@ LOBJS = sqlrelay.lo
 			fi; \
 		else \
 			cat errors2; \
-			if ( test "$(STRIP)" != "touch" ); then \
-				$(STRIP) -x -R .note -R .comment $@; \
-			fi; \
+			$(STRIPCOMMENTNOTE) $@; \
 		fi; \
 	else \
 		cat errors1; \
-		if ( test "$(STRIP)" != "touch" ); then \
-			$(STRIP) -x -R .note -R .comment $@; \
-		fi; \
+		$(STRIPCOMMENTNOTE) $@; \
 	fi; \
 	$(RM) errors1 errors2 rubyincludes.h
+
 
 all: libsqlrelay.la
 
