@@ -33,7 +33,7 @@
 Summary: Persistent database connection system.
 Name: sqlrelay
 Version: 0.36
-Release: 1
+Release: 2
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
 Source0: %{name}-%{version}.tar.gz
@@ -58,7 +58,7 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define docdir %{_docdir}/%{name}-%{version}
 %endif
 
-BuildRequires: rudiments-devel >= 0.26
+BuildRequires: rudiments-devel >= 0.28.1
 %{!?_without_gtk:BuildRequires: ,%{gtkdevel}}
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}
