@@ -12,7 +12,6 @@ clean:
 	$(MAKE) -C c++ clean
 	$(MAKE) -C java clean
 	$(MAKE) -C perl clean
-	$(MAKE) -C php clean
 	$(MAKE) -C python clean
 	$(MAKE) -C ruby clean
 

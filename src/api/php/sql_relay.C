@@ -1300,6 +1300,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_identify) {
 	}
 	convert_to_long_ex(sqlrcon);
 	r=((sqlrconnection *)(*sqlrcon)->value.lval)->identify();
+printf("identify: \"%s\"\n",r);
 	if (!r) {
 		RETURN_FALSE;
 	}

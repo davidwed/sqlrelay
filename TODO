@@ -1,7 +1,3 @@
-cleanUpData is cleaning up too much for cursor binds
-
-php identify fails
-
 oldmysql test files for non-C++ api's
 
 db2 start/stop doesn't work for 7.2
