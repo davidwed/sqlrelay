@@ -5,7 +5,7 @@ dnl Compile time options.
 AC_ARG_ENABLE(debug,
 	[  --enable-debug          compile with -g and -pg options and don't strip binaries],
 	CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP="",
-	CFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s")
+	CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s")
 AC_SUBST(INSTALLSTRIP)
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)

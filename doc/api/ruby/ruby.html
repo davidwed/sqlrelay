@@ -15,6 +15,14 @@
 <FONT color=#f800f8>        Opens a connection to the sqlrelay server and authenticates with</FONT>
 <FONT color=#f800f8>        user and password.  Failed connections are retried for tries times</FONT>
 <FONT color=#f800f8>        at retrytime interval.  </FONT>
+<FONT color=#f800f8>        Initiates a connection to "server" on "port"</FONT>
+<FONT color=#f800f8>        or to the unix "socket" on the local machine</FONT>
+<FONT color=#f800f8>        and authenticates with "user" and "password".</FONT>
+<FONT color=#f800f8>        Failed connections will be retried for</FONT>
+<FONT color=#f800f8>        "tries" times on interval "retrytime".</FONT>
+<FONT color=#f800f8>        If "tries" is 0 then retries will continue</FONT>
+<FONT color=#f800f8>        forever.  If "retrytime" is 0 then retries</FONT>
+<FONT color=#f800f8>        will be attempted on a default interval.</FONT>
         
     <FONT color=#008888>endSession</FONT>()
 <FONT color=#f800f8>        Ends the current session.</FONT>

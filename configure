@@ -1512,7 +1512,7 @@ if test "${enable_debug+set}" = set; then
   enableval="$enable_debug"
   CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP=""
 else
-  CFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s"
+  CFLAGS="-fomit-frame-pointer -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s"
 fi;
 
 

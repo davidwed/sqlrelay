@@ -22,9 +22,10 @@ sqlrcon sqlrcon_alloc(<font color="#2e8b57"><b>const</b></font> <font color="#2e
 <font color="#0000ff">                           or to the unix &quot;socket&quot; on the local machine</font>
 <font color="#0000ff">                           and authenticates with &quot;user&quot; and &quot;password&quot;.</font>
 <font color="#0000ff">                           Failed connections will be retried for </font>
-<font color="#0000ff">                           &quot;tries&quot; times on interval &quot;retrytime&quot;</font>
-<font color="#0000ff">                           or on for a default number of times on</font>
-<font color="#0000ff">                           a default interval if left unspecified.</font>
+<font color="#0000ff">                           &quot;tries&quot; times on interval &quot;retrytime&quot;.</font>
+<font color="#0000ff">                           If &quot;tries&quot; is 0 then retries will continue</font>
+<font color="#0000ff">                           forever.  If &quot;retrytime&quot; is 0 then retries</font>
+<font color="#0000ff">                           will be attempted on a default interval.</font>
 
 <font color="#0000ff">                           If the &quot;socket&quot; parameter is nether </font>
 <font color="#0000ff">                           NULL nor &quot;&quot; then an attempt will be made to </font>

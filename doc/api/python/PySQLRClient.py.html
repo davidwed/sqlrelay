@@ -19,7 +19,9 @@
         &quot;&quot;&quot;<FONT color=#f800f8> </FONT>
 <FONT color=#f800f8>        Opens a connection to the sqlrelay server and authenticates with</FONT>
 <FONT color=#f800f8>        user and password.  Failed connections are retried for tries times</FONT>
-<FONT color=#f800f8>        at retrytime interval.  </FONT>
+<FONT color=#f800f8>        at retrytime interval.  If tries is 0 then retries will continue</FONT>
+<FONT color=#f800f8>        forever.  If retrytime is 0 then retries will be attempted on a</FONT>
+<FONT color=#f800f8>        default interval.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
         
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>endSession</FONT>(self):

@@ -1,3 +1,7 @@
+SCO ruby install (relink) doesn't work
+postgresql drop in api won't install on openbsd
+postgresql test program compile fails on SCO _res defined in libsocket/libresolv
+
 test finished-suspended-result-set's with oracle/db2/sybase/freetds
 slackware package build isn't right
 
@@ -44,9 +48,6 @@ Tests:
 	need database reconnect tests
 	interbase stored procedure/output bind test
 	stored procedure test doesn't work with db2 8.1
-	mysql test fails column length test w/some versions
-	postgresql test program compile fails on SCO _res defined in
-		libsocket/libresolv
 	column flags
 	getFieldAsXXX
 	getOutputBindAsXXX
