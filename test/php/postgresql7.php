@@ -691,4 +691,10 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable"),0);
 	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable"),0);
 	echo("\n");
+
+	sqlrcur_free($secondcur);
+	sqlrcon_free($secondcon);
+
+	sqlrcur_free($cur);
+	sqlrcon_free($con);
 ?></pre></html>

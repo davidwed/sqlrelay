@@ -1842,10 +1842,14 @@ AC_DEFUN([FW_CHECK_MDBTOOLS],
 if ( test "$ENABLE_MDBTOOLS" = "yes" )
 then
 	FW_CHECK_GLIB
+
+	MDBTOOLSINCLUDES=""
+	MDBTOOLSLIBS=""
+	MDBTOOLSLIBSPATH=""
+	MDBTOOLSSTATIC=""
+
 	if ( test -n "$GLIBINCLUDES" -a -n "$GLIBLIBS" )
 	then
-
-		MDBTOOLSSTATIC=""
 
 		if ( test "$cross_compiling" = "yes" )
 		then
@@ -1870,28 +1874,31 @@ then
 			FW_CHECK_HEADERS_AND_LIBS([$MDBTOOLSPATH],[mdbsql],[mdbsql.h],[mdbsql],[$STATICFLAG],[$RPATHFLAG],[MDBSQLINCLUDES],[MDBSQLLIBS],[MDBSQLLIBSPATH],[MDBSQLSTATIC])
 			FW_CHECK_HEADERS_AND_LIBS([$MDBTOOLSPATH],[mdb],[mdbtools.h],[mdb],[$STATICFLAG],[$RPATHFLAG],[MDBINCLUDES],[MDBLIBS],[MDBTOOLSLIBSPATH],[MDBTOOLSSTATIC])
 
-			if ( test -n "$MDBSQLINCLUDES" -a -n "$MDBSQLLIBS" -a -n "$MDBINCLUDES" -a -n "$MDBLIBS" )
+			if ( test -n "$MDBSQLINCLUDES" -o -n "$MDBSQLLIBS" -o -n "$MDBINCLUDES" -o -n "$MDBLIBS" )
 			then
+				LINKFAIL=""
 				MDBTOOLSINCLUDES="$MDBINCLUDES $MDBSQLINCLUDES $GLIBINCLUDES"
 				MDBTOOLSLIBS="$MDBSQLLIBS $MDBLIBS $GLIBLIBS"
+				AC_MSG_CHECKING(if MDB Tools has mdb_run_query)
+				FW_TRY_LINK([#include <mdbsql.h>
+#include <stdlib.h>],[mdb_run_query(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_RUN_QUERY,1,Some versions of mdbtools define mdb_run_query)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			fi
-	
-			AC_SUBST(MDBTOOLSINCLUDES)
-			AC_SUBST(MDBTOOLSLIBS)
-			AC_SUBST(MDBTOOLSLIBSPATH)
-			AC_SUBST(MDBTOOLSSTATIC)
 		
-			if ( test -z "$MDBTOOLSLIBS" )
-			then
-				AC_MSG_WARN(MDB Tools support will not be built.)
-			fi
-
 		fi
 
+		if ( test -z "$MDBTOOLSLIBS" -o -n "$LINKFAIL" )
+		then
+			AC_MSG_WARN(MDB Tools support will not be built.)
+		fi
 	fi
 
 	FW_INCLUDES(mdbtools,[$MDBTOOLSINCLUDES])
 	FW_LIBS(mdbtools,[$MDBTOOLSLIBS])
+
+	AC_SUBST(MDBTOOLSINCLUDES)
+	AC_SUBST(MDBTOOLSLIBS)
+	AC_SUBST(MDBTOOLSLIBSPATH)
+	AC_SUBST(MDBTOOLSSTATIC)
 fi
 ])
 

@@ -39,9 +39,9 @@ metric="1"/>
 
 --------------------------------------------------------------------------------
 
-people have been reporting freetds problems
+valgrind returns memory errors
 
-php module needs to clean itself up (close connections) if the script dies
+people have been reporting freetds problems
 
 CFLAGS="-framework Python" to get python API to compile on OS X
 
@@ -51,15 +51,16 @@ api needs to expose integer column types
 
 numeric output bind variables
 
-does setResultSetBufferSize prevent PythonDB, Perl DBI, etc. from fetching more
-	than 100 rows?
-
 mysql 4.1, 5.0 - bind vars
 postgresql 8 - bind vars
 
 call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
 
 document installing MSDE from http://www.microsoft.com/sql/msde/default.asp
+
+use large writes rather than lots of small writes, small writes appear to
+	trigger the nagle algorithm and slow down network transmission
+	materially
 
 --------------------------------------------------------------------------------
 

@@ -24,6 +24,14 @@
 	processes don't try to set their user/group unless they're different
 		from the user/group that the process is currently running as,
 		should prevent "cannot switch group to nobody" messages
+	per Matthias Klose's bug reports:
+		set manpage section to 8 for sqlr-ipclean, sqlr-start, sqlr-stop
+		fixed MDBTOOLS detection to handle includes/libs installed in
+			/usr/include, /usr/lib
+		fixed another odbc SQLLEN/SQLINTEGER bug
+	updated config.guess
+	fixed PHP api to use resource lists - cleans up itself now with no need
+		to use sqlrcon/cur_free
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

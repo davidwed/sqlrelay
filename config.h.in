@@ -28,6 +28,9 @@
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
 
+/* Some versions of mdbtools define mdb_run_query */
+#undef HAVE_MDB_RUN_QUERY
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 

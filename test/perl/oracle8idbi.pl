@@ -387,6 +387,23 @@ checkSuccess($row[0],8);
 $dbh->{AutoCommit}=0;
 print("\n");
 
+# lots of rows
+print("LOTS OF ROWS: \n");
+$dbh->do("delete from testtable");
+for ($i=0; $i<200; $i++) {
+	$dbh->do("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001')");
+}
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+for ($i=0; $i<200; $i++) {
+	@fields=$sth->fetchrow_array;
+	if ($fields[0]!=1) {
+		break;
+	}
+}
+checkSuccess($i,200);
+print("\n");
+
 # drop existing table
 $dbh->do("drop table testtable");
 

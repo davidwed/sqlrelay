@@ -553,7 +553,12 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 		// bind the column to a buffer
 		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 				field[i],MAX_ITEM_BUFFER_SIZE,
-				(SQLINTEGER *)&indicator[i]);
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)&indicator[i]
+				#else
+				(SQLINTEGER *)&indicator[i]
+				#endif
+				);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}

@@ -11,81 +11,86 @@ import string
 def main():
 
 	# usage...
-	if len(sys.argv) < 7:
-		print "usage: pythondb.py host port socket user password query iterations"
+	if len(sys.argv) < 5:
+		print "usage: pythondb.py host port socket user password"
 		sys.exit(0)
 
 
-	for loop in range(0,int(sys.argv[7])):
-
-		# instantiation
-		print "INSTANTIATION"
-		con=PySQLRDB.connect(sys.argv[1],string.atoi(sys.argv[2]),
-					sys.argv[3],sys.argv[4],sys.argv[5],0,1)
-		cur=con.cursor()
-		print
-		print
+	# instantiation
+	print "INSTANTIATION"
+	con=PySQLRDB.connect(sys.argv[1],string.atoi(sys.argv[2]),
+				sys.argv[3],sys.argv[4],sys.argv[5],0,1)
+	cur=con.cursor()
+	print
+	print
 
 
-		# query functions
-		print "QUERY FUNCTIONS"
-		cur.execute(sys.argv[6])
-		print "Fetch One"
-		print cur.fetchone()
-		print
-		print "Fetch Many"
-		print cur.fetchmany(3)
-		print
-		print "Fetch All"
-		print cur.fetchall()
-		print
-		print
+	# bind functions
+	print "BIND FUNCTIONS"
+	cur.execute("select :var1,:var2,:var3 from dual",{'var1':1,'var2':'hello','var3':1.1})
+	print cur.fetchone()
+	print
+	print
 
-
-		# bind functions
-		print "BIND FUNCTIONS"
-		cur.execute("select :var1,:var2,:var3 from dual",{'var1':1,'var2':'hello','var3':1.1})
-		print cur.fetchone()
-		print
-		print
 	
-	
-		# executemany
-		print "BIND FUNCTIONS"
-	
-		try:
-			cur.execute("drop table temptable")
-		except PySQLRDB.DatabaseError, e:
-			print e
+	# executemany
+	print "BIND FUNCTIONS"
 
-		cur.execute("create table temptable (col1 number, col2 char(10), col3 number(2,1))")
-
-		cur.executemany("insert into temptable values (:var1,:var2,:var3)",[{'var1':1,'var2':'hello','var3':1.1},{'var1':2,'var2':'hi','var3':2.2},{'var1':3,'var2':'bye','var3':3.3}])
-		#cur.executemany("select :var1,:var2,:var3 from dual",[{'var1':1,'var2':'hello','var3':1.1},{'var1':2,'var2':'hi','var3':2.2},{'var1':3,'var2':'bye','var3':3.3}])
-		cur.execute("select * from temptable")
-		print cur.fetchall()
+	try:
 		cur.execute("drop table temptable")
-		print
-		print
-	
-	
-		# callproc
-		print "CALLPROC"
-		cur.callproc("select :var1,:var2,:var3 from dual",{'var1':1,'var2':'hello','var3':1.1})
-		print cur.fetchone()
-		print
-		print
+	except PySQLRDB.DatabaseError, e:
+		print e
 
-		cur.close()
-		con.close()
-		del cur
-		del con
+	cur.execute("create table temptable (col1 number, col2 char(10), col3 number(2,1))")
 
-		# make sure we don't get a segfault
-		try :
-			cur.execute("select 1 from dual");
-		except UnboundLocalError, e:
-			print e
-	
+	cur.executemany("insert into temptable values (:var1,:var2,:var3)",[{'var1':1,'var2':'hello','var3':1.1},{'var1':2,'var2':'hi','var3':2.2},{'var1':3,'var2':'bye','var3':3.3}])
+	#cur.executemany("select :var1,:var2,:var3 from dual",[{'var1':1,'var2':'hello','var3':1.1},{'var1':2,'var2':'hi','var3':2.2},{'var1':3,'var2':'bye','var3':3.3}])
+	cur.execute("select * from temptable")
+	print cur.fetchall()
+	cur.execute("drop table temptable")
+	print
+	print
+
+	# lots of rows
+	print "LOTS OF ROWS"
+	cur.execute("create table temptable (col1 number)")
+
+	counter=0
+	for counter in range(0,200):
+		cur.execute("insert into temptable values (1)")
+
+	cur.execute("select * from temptable")
+	counter=0
+	for counter in range(0,200):
+		if cur.fetchone() == 0:
+			break
+
+	if counter == 199:
+		print "success"
+	else:
+		print "failed counter = "
+		print counter
+
+	# clean up
+	cur.execute("drop table temptable")
+
+	# callproc
+	print "CALLPROC"
+	cur.callproc("select :var1,:var2,:var3 from dual",{'var1':1,'var2':'hello','var3':1.1})
+	print cur.fetchone()
+	print
+	print
+
+	cur.close()
+	con.close()
+	del cur
+	del con
+
+	# make sure we don't get a segfault
+	try :
+		cur.execute("select 1 from dual");
+	except UnboundLocalError, e:
+		print e
+
 if __name__ == '__main__':
 	main()

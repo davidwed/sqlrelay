@@ -3,6 +3,8 @@
 
 #include <mdbtoolsconnection.h>
 
+#include <config.h>
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -10,9 +12,14 @@
 
 #include <datatypes.h>
 
-// it's called mdb_sql_run_query in the .h file,
-// but mdb_run_query in the library
-extern "C" int mdb_run_query(MdbSQL *sql, char *query);
+#ifdef HAVE_MDB_RUN_QUERY
+	// it's called mdb_sql_run_query in the .h file,
+	// but mdb_run_query in the library
+	extern "C" int mdb_run_query(MdbSQL *sql, char *query);
+#else
+	extern "C" MdbSQL * _mdb_sql(MdbSQL *sql);
+	extern "C" int yyparse();
+#endif
 
 mdbtoolsconnection::mdbtoolsconnection() {
 }
@@ -111,6 +118,7 @@ bool mdbtoolscursor::executeQuery(const char *query,
 
 	// execute the query
 	mdb_sql_reset(&mdbsql);
+#ifdef HAVE_MDB_RUN_QUERY
 	if (newquery) {
 		if (!mdb_run_query(&mdbsql,newquery->getString())) {
 			delete newquery;
@@ -121,6 +129,22 @@ bool mdbtoolscursor::executeQuery(const char *query,
 			return false;
 		}
 	}
+#else
+	if (newquery) {
+		g_input_ptr=newquery->getString();
+		_mdb_sql(&mdbsql);
+		if (yyparse()) {
+			delete newquery;
+			return false;
+		}
+	} else {
+		g_input_ptr=(char *)query;
+		_mdb_sql(&mdbsql);
+		if (yyparse()) {
+			return false;
+		}
+	}
+#endif
 
 	return true;
 }
