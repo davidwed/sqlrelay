@@ -125,7 +125,7 @@ get configured to listen for connections to the ora1 database.  Take a look
 at /u01/app/oracle/product/10.1.0/network/admin/listener.ora and make sure
 that there is an entry like the following:</p>
 
-<blockquote>
+<blockquote><pre>
 <font color="#298a52"><b>SID_LIST_LISTENER</b></font> =
   (<font color="#298a52"><b>SID_LIST</b></font> =
     (<font color="#298a52"><b>SID_DESC</b></font> =
@@ -138,7 +138,7 @@ that there is an entry like the following:</p>
       (<font color="#a52829"><b>ORACLE_HOME</b></font> = /u01/app/<font color="#008a8c">oracle</font>/product/10.1.0)
     )
   )
-</blockquote>
+</pre></blockquote>
 
 <p>The second SID_DESC section may be missing from your listener.ora file.  If
 it is, update your listener.ora file, adding the necessary section.</p>
