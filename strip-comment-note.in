@@ -10,7 +10,7 @@ STRIP=@STRIP@
 
 if ( test "$STRIP" != "touch" )
 then
-	if ( test -n "`file $1 | grep ASCII`" )
+	if ( test -n "`file $1 | grep ASCII`" -o -n "`file $1 | grep text`" )
 	then
 		. ./$1
 		if ( test -n "$pic_object" )
