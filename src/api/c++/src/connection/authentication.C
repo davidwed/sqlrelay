@@ -14,7 +14,7 @@ bool sqlrconnection::authenticateWithListener() {
 
 bool sqlrconnection::authenticateWithConnection() {
 
-	write((unsigned short)AUTHENTICATE);
+	cs->write((unsigned short)AUTHENTICATE);
 	if (debug) {
 		debugPreStart();
 		debugPrint("Authenticating with connection : ");
@@ -32,15 +32,15 @@ bool sqlrconnection::genericAuthentication() {
 		debugPreEnd();
 	}
 
-	write((unsigned long)userlen);
-	write(user,userlen);
+	cs->write((unsigned long)userlen);
+	cs->write(user,userlen);
 
-	write((unsigned long)passwordlen);
-	write(password,passwordlen);
+	cs->write((unsigned long)passwordlen);
+	cs->write(password,passwordlen);
 
 	// check whether authentication was successful or not
 	unsigned short	authsuccess;
-	if (read(&authsuccess)!=sizeof(unsigned short)) {
+	if (cs->read(&authsuccess)!=sizeof(unsigned short)) {
 		setError("Failed to authenticate.\n A network error may have ocurred.");
 		return false;
 	}

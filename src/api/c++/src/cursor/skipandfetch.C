@@ -44,7 +44,7 @@ void sqlrcursor::fetchRows() {
 	}
 
 	// otherwise, send to the connection the number of rows to send back
-	sqlrc->write((unsigned long)rsbuffersize);
+	sqlrc->cs->write((unsigned long)rsbuffersize);
 }
 
 bool sqlrcursor::skipRows(int rowtoget) {
@@ -91,6 +91,6 @@ bool sqlrcursor::skipRows(int rowtoget) {
 
 	// if we're reading from a connection, send the connection the 
 	// number of rows to skip
-	sqlrc->write(skip);
+	sqlrc->cs->write(skip);
 	return true;
 }

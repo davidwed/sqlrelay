@@ -98,7 +98,7 @@ bool sqlrcursor::getCursorId() {
 		sqlrc->debugPrint("Getting Cursor ID...\n");
 		sqlrc->debugPreEnd();
 	}
-	if (sqlrc->read(&cursorid)!=sizeof(unsigned short)) {
+	if (sqlrc->cs->read(&cursorid)!=sizeof(unsigned short)) {
 		setError("Failed to get a cursor id.\n A network error may have ocurred.");
 		return false;
 	}
@@ -117,7 +117,7 @@ bool sqlrcursor::getSuspended() {
 
 	// see if the result set of that cursor is actually suspended
 	unsigned short	suspendedresultset;
-	if (sqlrc->read(&suspendedresultset)!=sizeof(unsigned short)) {
+	if (sqlrc->cs->read(&suspendedresultset)!=sizeof(unsigned short)) {
 		setError("Failed to determine whether the session was suspended or not.\n A network error may have ocurred.");
 		return false;
 	}
@@ -127,7 +127,7 @@ bool sqlrcursor::getSuspended() {
 		// If it was suspended the server will send the index of the 
 		// last row from the previous result set.
 		// Initialize firstrowindex and rowcount from this index.
-		if (sqlrc->read(&firstrowindex)!=sizeof(unsigned long)) {
+		if (sqlrc->cs->read(&firstrowindex)!=sizeof(unsigned long)) {
 			setError("Failed to get the index of the last row of a previously suspended result set.\n A network error may have ocurred.");
 			return false;
 		}
@@ -170,7 +170,7 @@ void sqlrcursor::getErrorFromServer() {
 	} else {
 		// get the error string
 		error=new char[length+1];
-		sqlrc->read(error,length);
+		sqlrc->cs->read(error,length);
 		error[length]=(char)NULL;
 	}
 	
@@ -226,8 +226,9 @@ int sqlrcursor::fetchRowIntoBuffer(int row) {
 			// if we're not fetching from a cached result set,
 			// tell the server to send one 
 			if (!cachesource && !cachesourceind) {
-				sqlrc->write((unsigned short)FETCH_RESULT_SET);
-				sqlrc->write(cursorid);
+				sqlrc->cs->write((unsigned short)
+							FETCH_RESULT_SET);
+				sqlrc->cs->write(cursorid);
 			}
 
 			if (skipAndFetch(row)==-1 || parseData()==-1) {
@@ -254,7 +255,7 @@ int sqlrcursor::getShort(unsigned short *integer) {
 	if (cachesource && cachesourceind) {
 		return cachesource->read(integer);
 	} else {
-		return sqlrc->read(integer);
+		return sqlrc->cs->read(integer);
 	}
 }
 
@@ -265,7 +266,7 @@ int sqlrcursor::getLong(unsigned long *integer) {
 	if (cachesource && cachesourceind) {
 		return cachesource->read(integer);
 	} else {
-		return sqlrc->read(integer);
+		return sqlrc->cs->read(integer);
 	}
 }
 
@@ -276,6 +277,6 @@ int sqlrcursor::getString(char *string, int size) {
 	if (cachesource && cachesourceind) {
 		return cachesource->read(string,size);
 	} else {
-		return sqlrc->read(string,size);
+		return sqlrc->cs->read(string,size);
 	}
 }

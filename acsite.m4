@@ -71,8 +71,8 @@ AC_DEFUN([FW_CHECK_HEADER_LIB],
 [
 FOUNDHEADER=""
 FOUNDLIB=""
-FW_CHECK_FILE($1,[FOUNDHEADER=\"yes\"])
-FW_CHECK_FILE($3,[FOUNDLIB=\"yes\"])
+FW_CHECK_FILE([$1],[FOUNDHEADER=\"yes\"])
+FW_CHECK_FILE([$3],[FOUNDLIB=\"yes\"])
 if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
@@ -83,7 +83,7 @@ then
 else
 	if ( test -n "$5" -a -n "$6" )
 	then
-		FW_CHECK_FILE($5,[FOUNDLIB=\"yes\"])
+		FW_CHECK_FILE([$5],[FOUNDLIB=\"yes\"])
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "$2"
@@ -318,6 +318,7 @@ dnl sets the enviroment variable MICROSOFT
 AC_DEFUN([FW_CHECK_MICROSOFT],
 [
 CYGWIN=""
+CYGWINDEFINES=""
 MINGW32=""
 UWIN=""
 dnl AC_CANONICAL_HOST gets called when AC_PROG_LIBTOOL is called
@@ -583,36 +584,79 @@ then
 		then
 			STATICFLAG="-static"
 		fi
-		AC_MSG_CHECKING(for ORACLE_HOME)
-		
-		if ( test -n "$ORACLE_HOME" )
+
+		if ( test -n "$MICROSOFT" )
 		then
-
-			AC_MSG_RESULT(yes)
-
-			dnl use sysliblist if it's there
-			SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
-			if ( test ! -n "$SYSLIBLIST" )
-			then
-				SYSLIBLIST="-lm $AIOLIB"
-			fi
-
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore3.a],[ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl $SYSLIBLIST\"])
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore4.a],[ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 $SYSLIBLIST\"])
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore8.a],[ORACLEVERSION=\"8i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore9.a],[ORACLEVERSION=\"9i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore10.a],[ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
-			if ( test -n "$ORACLEVERSION" )
-			then
-				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
-				echo "hmmm, looks like Oracle$ORACLEVERSION..."
-			fi
-			FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
+			for ORACLE_HOME in "`ls -d /cygdrive/c/oracle/product/*/*/OCI`"
+			do
+				instance=`dirname $ORACLE_HOME`
+				home=`dirname $instance`
+				version=`basename $home | cut -f1 -d'.'`
+				if ( test "$version" = "10" )
+				then
+					ORACLEVERSION="10g"
+				fi
+				if ( test "$version" = "9" )
+				then
+					ORACLEVERSION="9i"
+				fi
+				if ( test -n "`echo $version | grep 8.1`" )
+				then
+					ORACLEVERSION="8i"
+				fi
+				if ( test -n "`echo $version | grep 8.0`" )
+				then
+					ORACLEVERSION="8"
+				fi
+				if ( test "$version" = "7" )
+				then
+					ORACLEVERSION="7"
+				fi
+				FW_CHECK_LIB([$ORACLE_HOME/lib/MSVC/oci.lib],[ORACLELIBSPATH=\"$ORACLE_HOME/lib/MSVC\"; ORACLELIBS=\"-L$ORACLE_HOME/lib/MSVC -loci\"])
+				if ( test -n "$ORACLELIBS" )
+				then
+					break
+				fi
+			done
 		else
-			AC_MSG_RESULT(no)
-			AC_MSG_WARN(The ORACLE_HOME environment variable is not set.  Oracle support will not be built.)
+
+			AC_MSG_CHECKING(for ORACLE_HOME)
+		
+			if ( test -n "$ORACLE_HOME" )
+			then
+
+				AC_MSG_RESULT(yes)
+
+				dnl use sysliblist if it's there
+				SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
+				if ( test ! -n "$SYSLIBLIST" )
+				then
+					SYSLIBLIST="-lm $AIOLIB"
+				fi
+	
+				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore3.a],[ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl $SYSLIBLIST\"])
+				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore4.a],[ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 $SYSLIBLIST\"])
+				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore8.a],[ORACLEVERSION=\"8i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore9.a],[ORACLEVERSION=\"9i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore10.a],[ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+				FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
+			else
+				AC_MSG_RESULT(no)
+				AC_MSG_WARN(The ORACLE_HOME environment variable is not set.  Oracle support will not be built.)
+			fi
+
 		fi
 		
+		if ( test -n "$ORACLEVERSION" )
+		then
+			if ( test -n "$MICROSOFT" )
+			then
+				ORACLEINCLUDES="-I$ORACLE_HOME/include"
+			else
+				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
+			fi
+			echo "hmmm, looks like Oracle$ORACLEVERSION..."
+		fi
 		
 		OCI_H=""
 		if ( test -n "$ORACLELIBS" )
@@ -620,12 +664,18 @@ then
 			AC_MSG_CHECKING(if Oracle has oci.h)
 			if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" )
 			then
-				FW_TRY_LINK([#include <oci.h>
+				FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
 			else
-			FW_TRY_LINK([#include <oci.h>
+				FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
@@ -639,12 +689,18 @@ $GLIBC23HACKCODE],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKET
 			AC_MSG_CHECKING(if Oracle can be statically linked without $DLLIB)
 			if ( test -n "$OCI_H" )
 			then
-				FW_TRY_LINK([#include <oci.h>
+				FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			else
-				FW_TRY_LINK([#include <ociapr.h>
+				FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <ociapr.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
@@ -654,12 +710,18 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC
 				AC_MSG_CHECKING(if Oracle can be statically linked with $DLLIB)
 				if ( test -n "$OCI_H" )
 				then
-					FW_TRY_LINK([#include <oci.h>
+					FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); ORACLESTATIC=""; LINKFAIL="yes"])
 				else
-					FW_TRY_LINK([#include <ociapr.h>
+					FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <ociapr.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC $ORACLEINCLUDES,$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); ORACLESTATIC=""; LINKFAIL="yes"])
@@ -672,12 +734,18 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC
 			AC_MSG_CHECKING(if Oracle can be dynamically linked without $DLLIB)
 			if ( test -n "$OCI_H" )
 			then
-				FW_TRY_LINK([#include <oci.h>
+				FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			else
-				FW_TRY_LINK([#include <ociapr.h>
+				FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <ociapr.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
@@ -687,12 +755,18 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 				AC_MSG_CHECKING(if Oracle can be dynamically linked with $DLLIB)
 				if ( test -n "$OCI_H" )
 				then
-					FW_TRY_LINK([#include <oci.h>
+					FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 				else
-					FW_TRY_LINK([#include <ociapr.h>
+					FW_TRY_LINK([#ifdef __CYGWIN__
+	#define _int64 long long
+#endif
+#include <ociapr.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
 $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no); LINKFAIL="yes"])
@@ -1285,16 +1359,26 @@ then
 		
 		if ( test -n "$SYBASEPATH" )
 		then
-			FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+			if ( test -n "$MICROSOFT" )
+			then
+				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.lib],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -llibblk -llibcs -llibct\"],[],[])
+			else
+				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+			fi
 		else
 		
-			FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+			if ( test -n "$MICROSOFT" )
+			then
+				FW_CHECK_HEADER_LIB([/cygdrive/c/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/cygdrive/c/sybase/OCS-12_5/include\"],[/cygdrive/c/sybase/OCS-12_5/lib/libct.lib],[SYBASELIBSPATH=\"/cygdrive/c/sybase/OCS-12_5/lib\"; SYBASELIBS=\"-L/cygdrive/c/sybase/OCS-12_5/lib -llibblk -llibct -llibcs\"],[],[])
+			else
+				FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 		
-			FW_CHECK_HEADER_LIB([/opt/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/include\"],[/opt/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/opt/sybase/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+				FW_CHECK_HEADER_LIB([/opt/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/include\"],[/opt/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/opt/sybase/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 	
-			FW_CHECK_HEADER_LIB([/opt/sybase-12.5/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
+				FW_CHECK_HEADER_LIB([/opt/sybase-12.5/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
 	
-			FW_CHECK_HEADER_LIB([/opt/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/OCS-12_5/include\"],[/opt/sybase/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
+				FW_CHECK_HEADER_LIB([/opt/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/OCS-12_5/include\"],[/opt/sybase/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
+			fi
 		
 			if ( test -z "$SYBASELIBS" )
 			then
@@ -1310,7 +1394,7 @@ then
 		fi
 		
 		LINKFAIL=""
-		if ( test -n "$SYBASESTATIC" -a -n "$SYBASELIBS" )
+		if ( test -n "$DLLIB" -a -n "$SYBASESTATIC" -a -n "$SYBASELIBS" )
 		then
 			AC_MSG_CHECKING(if Sybase can be statically linked without $DLLIB)
 			FW_TRY_LINK([#include <ctpublic.h>
@@ -1327,7 +1411,7 @@ $GLIBC23HACKCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],
 			fi
 		fi
 		
-		if ( test -z "$SYBASESTATIC" -a -n "$SYBASELIBS" )
+		if ( test -n "$DLLIB" -a -z "$SYBASESTATIC" -a -n "$SYBASELIBS" )
 		then
 			AC_MSG_CHECKING(if Sybase can be dynamically linked without $DLLIB)
 			FW_TRY_LINK([#include <ctpublic.h>
@@ -1412,6 +1496,11 @@ then
 				HAVE_IODBC="yes"
 			fi
 		fi
+
+		if ( test -n "$MICROSOFT" -a -z "$ODBCLIBS" )
+		then
+			FW_CHECK_HEADER_LIB([/usr/include/w32api/sql.h],[],[/usr/lib/w32api/libodbc32.dll.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"],[/usr/lib/w32api/libodbc32.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"])
+		fi
 		
 		AC_SUBST(ODBCINCLUDES)
 		AC_SUBST(ODBCLIBS)
@@ -1489,18 +1578,31 @@ then
 		
 		if ( test -n "$DB2PATH" )
 		then
-			FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"-L$DB2PATH/lib -ldb2\"],[$DB2PATH/lib/libdb2.a],[DB2LIBS=\"-L$DB2PATH/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
+			if ( test -n "$MICROSOFT" )
+			then
+				FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/db2cli.lib],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"$DB2PATH/lib/db2cli.lib\"],[],[])
+			else
+				FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"-L$DB2PATH/lib -ldb2\"],[$DB2PATH/lib/libdb2.a],[DB2LIBS=\"-L$DB2PATH/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
+			fi
 		
 		else
+
+			if ( test -n "$MICROSOFT" )
+			then
+
+				FW_CHECK_HEADER_LIB([/cygdrive/c/Program Files/IBM/SQLLIB/include/sql.h],[DB2INCLUDES=\"-I/cygdrive/c/Program\ Files/IBM/SQLLIB/include\"; DB2VERSION=\"8\"],[/cygdrive/c/Program Files/IBM/SQLLIB/lib/db2cli.lib],[DB2LIBSPATH=\"/cygdrive/c/Program Files/IBM/SQLLIB/lib\"; DB2LIBS=\"/cygdrive/c/Program\ Files/IBM/SQLLIB/lib/db2cli.lib\"; DB2VERSION=\"8\"],[],[])
+
+			else
 		
-			dnl check /opt for 7.2
-			FW_CHECK_HEADER_LIB([/opt/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBMdb2/V7.1/include\"],[/opt/IBMdb2/V7.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"],[/opt/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
+				dnl check /opt for 7.2
+				FW_CHECK_HEADER_LIB([/opt/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBMdb2/V7.1/include\"; DB2VERSION=\"7\"],[/opt/IBMdb2/V7.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2VERSION=\"7\"],[/opt/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"7\"])
 		
-			dnl check /usr for 7.2
-			FW_CHECK_HEADER_LIB([/usr/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/usr/IBMdb2/V7.1/include\"],[/usr/IBMdb2/V7.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/usr/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"],[/usr/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
+				dnl check /usr for 7.2
+				FW_CHECK_HEADER_LIB([/usr/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/usr/IBMdb2/V7.1/include\"; DB2VERSION=\"7\"],[/usr/IBMdb2/V7.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/usr/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2VERSION=\"7\"],[/usr/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"7\"])
 		
-			dnl check /opt for 8.1
-			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V8.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V8.1/include\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V8.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"8\"])
+				dnl check /opt for 8.1
+				FW_CHECK_HEADER_LIB([/opt/IBM/db2/V8.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V8.1/include\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V8.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"8\"])
+			fi
 		fi
 		
 		if ( test -z "$DB2LIBS" )
@@ -1555,21 +1657,34 @@ then
 		
 		if ( test -n "$INTERBASEPATH" )
 		then
-			FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"],[$INTERBASEPATH/lib/libgds.a],[INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
-		
+			if ( test -n "$MICROSOFT" )
+			then
+				FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/lib/fbclient_ms.lib],[INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lfbclient_ms\"],[],[])
+			else
+				FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"],[$INTERBASEPATH/lib/libgds.a],[INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+			fi
 		else
-		
-			dnl includes
-			FW_CHECK_HEADER_LIB([/usr/include/ibase.h],[INTERBASEINCLUDES=\"\"],[/usr/lib/libgds.$SOSUFFIX],[INTERBASELIBS=\"-lgds -lcrypt\"],[/usr/lib/libgds.a],[INTERBASELIBS=\"-lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+			if ( test -z "$MICROSOFT" )
+			then
+				FW_CHECK_HEADER_LIB([/usr/include/ibase.h],[INTERBASEINCLUDES=\"\"],[/usr/lib/libgds.$SOSUFFIX],[INTERBASELIBS=\"-lgds -lcrypt\"],[/usr/lib/libgds.a],[INTERBASELIBS=\"-lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+			fi
 		fi
 
 		if ( test -z "$INTERBASELIBS" )
 		then
-			FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+			if ( test -n "$MICROSOFT" )
+			then
+				for dir in "`ls -d /cygdrive/c/Firebird*`"
+				do
+					FW_CHECK_HEADER_LIB([$dir/include/ibase.h],[INTERBASEINCLUDES=\"-I$dir/include\"],[$dir/lib/fbclient_ms.lib],[INTERBASELIBS=\"-L$dir/lib -lfbclient_ms\"],[],[])
+				done
+			else
+				FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+			fi
 		fi
 		
 		LINKFAIL=""
-		if ( test -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
+		if ( test -n "$DLLIB" -a -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
 		then
 			AC_MSG_CHECKING(if Interbase can be statically linked without $DLLIB)
 			FW_TRY_LINK([#include <ibase.h>
@@ -1582,7 +1697,7 @@ then
 			fi
 		fi
 		
-		if ( test -z "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
+		if ( test -n "$DLLIB" -a -z "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
 		then
 			AC_MSG_CHECKING(if Interbase can be dynamically linked without $DLLIB)
 			FW_TRY_LINK([#include <ibase.h>
@@ -1948,10 +2063,6 @@ then
 	if ( test -n "$MICROSOFT" )
 	then
 		JAVAINCLUDES="$JAVAINCLUDES -I$JAVAPATH/include/win32"
-		if ( test -n "$CYGWIN" )
-		then
-			JAVAINCLUDES="$JAVAINCLUDES -D__int64=\"long long\""
-		fi
 		JAVALIB="-L$JAVAPATH/lib -ljni"
 	fi
 

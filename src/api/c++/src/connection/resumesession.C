@@ -26,14 +26,16 @@ bool sqlrconnection::resumeSession(int port, const char *socket) {
 
 	// first, try for the unix port
 	if (socket && socket[0]) {
-		connected=unixclientsocket::connectToServer(socket,
-							-1,-1,retrytime,tries);
+		if (connected=ucs.connect(socket,-1,-1,retrytime,tries)) {
+			cs=&ucs;
+		}
 	}
 
 	// then try for the inet port
 	if (!connected) {
-		connected=inetclientsocket::connectToServer(server,port,
-							-1,-1,retrytime,tries);
+		if (connected=ics.connect(server,port,-1,-1,retrytime,tries)) {
+			cs=&ics;
+		}
 	}
 
 	if (debug) {

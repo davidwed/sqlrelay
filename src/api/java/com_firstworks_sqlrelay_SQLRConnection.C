@@ -1,6 +1,10 @@
 // Copyright (c) 2001  David Muse
 // See the file COPYING for more information.
 
+#ifdef __CYGWIN__
+	#define __int64 long long
+#endif
+
 #include <sqlrelay/sqlrclient.h>
 #include <com_firstworks_sqlrelay_SQLRConnection.h>
 

@@ -23,7 +23,7 @@ void sqlrconnection::endSession() {
 
 	// write an END_SESSION to the connection
 	if (connected) {
-		write((unsigned short)END_SESSION);
+		cs->write((unsigned short)END_SESSION);
 		endsessionsent=true;
 		closeConnection();
 	}

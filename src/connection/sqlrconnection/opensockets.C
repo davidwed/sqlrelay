@@ -15,7 +15,7 @@ bool sqlrconnection::openSockets() {
 
 		if (!serversockun) {
 			serversockun=new unixserversocket();
-			if (serversockun->listenOnSocket(unixsocket,0000,5)) {
+			if (serversockun->listen(unixsocket,0000,5)) {
 
 				#ifdef SERVER_DEBUG
 				char	string[26+strlen(unixsocket)+1];
@@ -44,7 +44,7 @@ bool sqlrconnection::openSockets() {
 
 		if (!serversockin) {
 			serversockin=new inetserversocket();
-			if (serversockin->listenOnSocket(NULL,inetport,5)) {
+			if (serversockin->listen(NULL,inetport,5)) {
 
 				if (!inetport) {
 					inetport=serversockin->getPort();

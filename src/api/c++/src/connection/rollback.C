@@ -17,10 +17,10 @@ bool sqlrconnection::rollback() {
 		debugPreEnd();
 	}
 
-	write((unsigned short)ROLLBACK);
+	cs->write((unsigned short)ROLLBACK);
 
 	bool	response;
-	if (read(&response)!=sizeof(bool)) {
+	if (cs->read(&response)!=sizeof(bool)) {
 		setError("Failed to get rollback status.\n A network error may have ocurred.");
 		return false;
 	}

@@ -27,6 +27,11 @@
 		void	clearError();
 		void	setError(const char *err);
 
+		// clients
+		inetclientsocket	ics;
+		unixclientsocket	ucs;
+		clientsocket		*cs;
+
 		// session state
 		bool	endsessionsent;
 		bool	suspendsessionsent;

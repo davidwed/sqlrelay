@@ -30,11 +30,11 @@ bool sqlrconnection::autoCommit(bool on) {
 		debugPreEnd();
 	}
 
-	write((unsigned short)AUTOCOMMIT);
-	write(on);
+	cs->write((unsigned short)AUTOCOMMIT);
+	cs->write(on);
 
 	bool	response;
-	if (read(&response)!=sizeof(bool)) {
+	if (cs->read(&response)!=sizeof(bool)) {
 		if (!on) {
 			setError("Failed to set autocommit off.\n A network error may have ocurred.");
 		} else {

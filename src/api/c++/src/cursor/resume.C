@@ -33,11 +33,11 @@ bool sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
 	}
 
 	// tell the server we want to resume the result set
-	sqlrc->write((unsigned short)RESUME_RESULT_SET);
+	sqlrc->cs->write((unsigned short)RESUME_RESULT_SET);
 
 	// send the id of the cursor we want to 
 	// resume the result set of to the server
-	sqlrc->write((unsigned short)id);
+	sqlrc->cs->write((unsigned short)id);
 
 	// process the result set
 	if (filename && filename[0]) {

@@ -1,28 +1,51 @@
+reconnect=handoff works
+reconnect=pass doesn't except when client connects using unix socket
+
 cygwin:
+
 	how to build a php extension?
 		1) need php source 
-	non-cygwin python
-		GnuWin32 - C:\Program Files\GnuWin32
+	active state/non-cygwin python
+		-I/cygdrive/c/Python23/include
+		-L/cygdrive/c/Python23/libs -lpython23
+	python that comes with Zope
+		-L/cygdrive/c/Program Files/Zope-2.7.1/bin/libs -lpython23
+		-I/cygdrive/c/Program Files/Zope-2.7.1/bin/Include
 	non-cygwin ruby
-		GnuWin32 - C:\Program Files\GnuWin32
-	non-cygwin perl
-		GnuWin32 - C:\Program Files\GnuWin32
+		-L/cygdrive/c/ruby/lib -lmsvcrt-ruby18
+		-I/cygdrive/c/ruby/lib/ruby/1.8/i386-mswin32
+	active state perl
+		-L/cygdrive/c/Perl/lib/CORE -lperl58
+		-I/Perl/lib/CORE
+	active state tcl
+		-I/Tcl/include
+		-L/cygdrive/c/Tcl/lib -ltcl84 -ltclstub84
 	zope
-		C:\Program Files\Zope-2.7.1\lib\python\Products
+		/cygdrive/c/Program Files/Zope-2.7.1/lib/python/Products
 	oracle
-		C:\oracle\product\10.1.0\...
+		-I/cygdrive/c/oracle/product/10.1.0/db_1/OCI/include -D_int64="long long"
+		-L/cygdrive/c/oracle/product/10.1.0/db_1/OCI/lib/MSVC -loci
 	sqlite
 		.dll and .def file wherever
 	db2
-		???
+		-I/cygdrive/c/Program\ Files/IBM/SQLLIB/include
+		/cygdrive/c/Program\ Files/IBM/SQLLIB/lib/db2cli.lib
 	sybase
-		???
+		-I/cygdrive/c/sybase/OCS-12_5/include
+		-L/cygdrive/c/sybase/OCS-12_5/lib -llibblk -llibcs -llibct
+		(doesn't work though)
 	interbase
-		???
+		-I/cygdrive/c/Firebird-1.5.0.4290_win32/include
+		-L/cygdrive/c/Firebird-1.5.0.4290_win32/lib -lfbclient_ms
+		(doesn't work though)
 	msql
 		???
 	lago
 		???
+	odbc
+		add #include <windows.h>
+		add w32api before sql*.h in includes
+		-L/usr/lib/w32api -lodbc32
 
 
 must run cygserver and set CYGWIN=server for ipc to work

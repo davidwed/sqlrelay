@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrincludes.h>
 
-class sqlrconnection : public inetclientsocket, public unixclientsocket {
+class sqlrconnection {
 	public:
 			sqlrconnection(const char *server, int port,
 					const char *socket,

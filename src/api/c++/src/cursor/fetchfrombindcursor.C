@@ -19,10 +19,10 @@ bool sqlrcursor::fetchFromBindCursor() {
 	endofresultset=false;
 
 	// tell the server we're fetching from a bind cursor
-	sqlrc->write((unsigned short)FETCH_FROM_BIND_CURSOR);
+	sqlrc->cs->write((unsigned short)FETCH_FROM_BIND_CURSOR);
 
 	// send the cursor id to the server
-	sqlrc->write((unsigned short)cursorid);
+	sqlrc->cs->write((unsigned short)cursorid);
 
 	sendGetColumnInfo();
 

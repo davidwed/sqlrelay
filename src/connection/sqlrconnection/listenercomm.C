@@ -107,7 +107,7 @@ void sqlrconnection::registerForHandoff(char *tmpdir) {
 		debugPrint("connection",1,"trying...");
 		#endif
 
-		handoffsockun.connectToServer(handoffsockname,-1,-1,1,0);
+		handoffsockun.connect(handoffsockname,-1,-1,1,0);
 		if (handoffsockun.write((unsigned long)getpid())==
 						sizeof(unsigned long)) {
 			connected=true;
@@ -151,7 +151,7 @@ void sqlrconnection::deRegisterForHandoff(char *tmpdir) {
 
 	// attach to the socket and write the process id
 	unixclientsocket	removehandoffsockun;
-	removehandoffsockun.connectToServer(removehandoffsockname,-1,-1,0,1);
+	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
 	removehandoffsockun.write((unsigned long)getpid());
 
 	#ifdef SERVER_DEBUG

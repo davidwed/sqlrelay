@@ -17,25 +17,25 @@ then
 		then
 			if ( test -r "$pic_object" )
 			then
-        			$STRIP -x -R .note -R .comment $pic_object
+        			$STRIP -x -R .note -R .comment -R .note.ABI-tag $pic_object
 			fi
 			if ( test -r "`basename $1`/$pic_object" )
 			then
-        			$STRIP -x -R .note -R .comment `basename $1`/$pic_object
+        			$STRIP -x -R .note -R .comment -R .note.ABI-tag `basename $1`/$pic_object
 			fi
 		fi
 		if ( test -n "$non_pic_object" )
 		then
 			if ( test -r "$non_pic_object" )
 			then
-        			$STRIP -x -R .note -R .comment $non_pic_object
+        			$STRIP -x -R .note -R .comment -R .note.ABI-tag $non_pic_object
 			fi
 			if ( test -r "`basename $1`/$non_pic_object" )
 			then
-        			$STRIP -x -R .note -R .comment `basename $1`/$non_pic_object
+        			$STRIP -x -R .note -R .comment -R .note.ABI-tag `basename $1`/$non_pic_object
 			fi
 		fi
 	else
-        	$STRIP -x -R .note -R .comment $1
+        	$STRIP -x -R .note -R .comment -R .note.ABI-tag $1
 	fi
 fi

@@ -6,13 +6,14 @@
 
 sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
 					const char *user, const char *password, 
-					int retrytime, int tries) 
-: inetclientsocket(), unixclientsocket() {
+					int retrytime, int tries) {
 
 	// initialize...
 
 	// retry reads if they get interrupted by signals
-	retryInterruptedReads();
+	ucs.retryInterruptedReads();
+	ics.retryInterruptedReads();
+	cs=&ucs;
 
 	// connection
 	this->server=(char *)server;

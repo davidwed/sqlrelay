@@ -18,7 +18,7 @@ bool sqlrconnection::suspendSession() {
 
 	// suspend the session
 	bool	retval=false;
-	write((unsigned short)SUSPEND_SESSION);
+	cs->write((unsigned short)SUSPEND_SESSION);
 	suspendsessionsent=true;
 	retval=true;
 

@@ -32,9 +32,11 @@ bool sqlrconnection::openSession() {
 			debugPreEnd();
 		}
 
-		openresult=unixclientsocket::
-				connectToServer(listenerunixport,
+		openresult=ucs.connect(listenerunixport,
 						-1,-1,retrytime,tries);
+		if (openresult==RESULT_SUCCESS) {
+			cs=&ucs;
+		}
 	}
 
 	// then try for an inet connection
@@ -50,9 +52,11 @@ bool sqlrconnection::openSession() {
 			debugPreEnd();
 		}
 
-		openresult=inetclientsocket::
-				connectToServer(server,listenerinetport,
+		openresult=ics.connect(server,listenerinetport,
 						-1,-1,retrytime,tries);
+		if (openresult==RESULT_SUCCESS) {
+			cs=&ics;
+		}
 	}
 
 	// handle failure to connect to listener
@@ -111,10 +115,12 @@ bool sqlrconnection::openSession() {
 				debugPreEnd();
 			}
 
-			connected=(unixclientsocket::
-					connectToServer(connectionunixport,
+			connected=(ucs.connect(connectionunixport,
 						-1,-1,retrytime,tries)==
 						RESULT_SUCCESS);
+			if (connected) {
+				cs=&ucs;
+			}
 
 			if (debug && !connected) {
 				debugPreStart();
@@ -141,11 +147,13 @@ bool sqlrconnection::openSession() {
 				debugPreEnd();
 			}
 
-			connected=(inetclientsocket::
-					connectToServer(server,
+			connected=(ics.connect(server,
 						connectioninetport,
 						-1,-1,retrytime,tries)==
 						RESULT_SUCCESS);
+			if (connected) {
+				cs=&ics;
+			}
 
 			if (debug && !connected) {
 				debugPreStart();

@@ -139,7 +139,8 @@ int sqlrconnection::waitForClient() {
 			return -1;
 		}
 
-		clientsock=new datatransport(descriptor);
+		clientsock=new filedescriptor;
+		clientsock->setFileDescriptor(descriptor);
 
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",1,"pass succeeded");
@@ -165,9 +166,9 @@ int sqlrconnection::waitForClient() {
 		}
 
 		if (fd==serversockin) {
-			clientsock=serversockin->acceptClientConnection();
+			clientsock=serversockin->accept();
 		} else if (fd==serversockun) {
-			clientsock=serversockun->acceptClientConnection();
+			clientsock=serversockun->accept();
 		}
 
 		#ifdef SERVER_DEBUG

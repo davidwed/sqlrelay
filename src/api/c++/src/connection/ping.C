@@ -17,11 +17,11 @@ bool sqlrconnection::ping() {
 		debugPreEnd();
 	}
 
-	write((unsigned short)PING);
+	cs->write((unsigned short)PING);
 
 	// get the ping result
 	bool	result;
-	if (read(&result)!=sizeof(bool)) {
+	if (cs->read(&result)!=sizeof(bool)) {
 		setError("Failed to ping.\n A network error may have ocurred.");
 		return false;
 	}

@@ -4,14 +4,17 @@ AC_INIT(src/listener/sqlrlistener.C)
 dnl Compile time options.
 AC_ARG_ENABLE(small-code,
 	[  --enable-small-code           optimize for small code size],
-	SMALLCODE="-O -Os",
+	SMALLCODE="-O -Os -fno-exceptions",
 	SMALLCODE="")
 AC_ARG_ENABLE(debug,
 	[  --enable-debug                compile with -g and -pg options and don't strip binaries],
-	CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP=""; DEBUGSTRIP="touch",
-	CFLAGS="-Wall"; CXXFLAGS="-fno-exceptions -Wall"; INSTALLSTRIP="-s"; DEBUGSTRIP="")
+	CFLAGS="$CFLAGS -g -pg -Wall"; CXXFLAGS="$CXXFLAGS -g -pg -Wall"; INSTALLSTRIP=""; DEBUGSTRIP="touch",
+	CFLAGS="$CFLAGS -Wall"; CXXFLAGS="$CXXFLAGS -Wall"; INSTALLSTRIP="-s"; DEBUGSTRIP="")
+
+CFLAGS="$SMALLCODE $CFLAGS"
+CXXFLAGS="$SMALLCODE $CXXFLAGS"
+
 AC_SUBST(INSTALLSTRIP)
-AC_SUBST(SMALLCODE)
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_ARG_ENABLE(client-rpath,

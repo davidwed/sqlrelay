@@ -4,6 +4,6 @@
 #include <sqlrelay/sqlrclient.h>
 
 void sqlrconnection::closeConnection() {
-	close();
+	cs->close();
 	connected=false;
 }

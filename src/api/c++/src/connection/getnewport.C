@@ -7,7 +7,7 @@ bool sqlrconnection::getNewPort() {
 
 	// get the size of the unix port string
 	unsigned short	size;
-	if (read(&size)!=sizeof(unsigned short)) {
+	if (cs->read(&size)!=sizeof(unsigned short)) {
 		setError("Failed to get the size of the unix connection port.\n A network error may have ocurred.");
 		return false;
 	}
@@ -26,7 +26,7 @@ bool sqlrconnection::getNewPort() {
 	}
 
 	// get the unix port string
-	if (size && read(connectionunixportbuffer,size)!=size) {
+	if (size && cs->read(connectionunixportbuffer,size)!=size) {
 		setError("Failed to get the unix connection port.\n A network error may have ocurred.");
 		return false;
 	}
@@ -34,7 +34,7 @@ bool sqlrconnection::getNewPort() {
 	connectionunixport=connectionunixportbuffer;
 
 	// get the inet port
-	if (read(&connectioninetport)!=sizeof(unsigned short)) {
+	if (cs->read(&connectioninetport)!=sizeof(unsigned short)) {
 		setError("Failed to get the inet connection port.\n A network error may have ocurred.");
 		return false;
 	}

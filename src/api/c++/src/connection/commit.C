@@ -17,10 +17,10 @@ bool sqlrconnection::commit() {
 		debugPreEnd();
 	}
 
-	write((unsigned short)COMMIT);
+	cs->write((unsigned short)COMMIT);
 
 	bool	response;
-	if (read(&response)!=sizeof(bool)) {
+	if (cs->read(&response)!=sizeof(bool)) {
 		setError("Failed to get commit status.\n A network error may have ocurred.");
 		return false;
 	}

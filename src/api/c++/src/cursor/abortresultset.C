@@ -32,9 +32,9 @@ void sqlrcursor::abortResultSet() {
 				// if we're not fetching from a cached result 
 				// set tell the server to send one 
 				if (!cachesource && !cachesourceind) {
-					sqlrc->write((unsigned short)
+					sqlrc->cs->write((unsigned short)
 							FETCH_RESULT_SET);
-					sqlrc->write(cursorid);
+					sqlrc->cs->write(cursorid);
 				}
 
 				// parseData should call finishCaching when
@@ -47,8 +47,8 @@ void sqlrcursor::abortResultSet() {
 				}
 			}
 		} else {
-			sqlrc->write((unsigned short)ABORT_RESULT_SET);
-			sqlrc->write(cursorid);
+			sqlrc->cs->write((unsigned short)ABORT_RESULT_SET);
+			sqlrc->cs->write(cursorid);
 		}
 	}
 }

@@ -284,7 +284,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 		inetserversocket	*serversockin;
 		unixserversocket	*serversockun;
-		datatransport		*clientsock;
+		filedescriptor		*clientsock;
 
 		memorypool	*bindpool;
 

@@ -13,8 +13,8 @@ void sqlrcursor::suspendResultSet() {
 		sqlrc->debugPreEnd();
 	}
 	if (sqlrc->connected && !cached) {
-		sqlrc->write((unsigned short)SUSPEND_RESULT_SET);
-		sqlrc->write(cursorid);
+		sqlrc->cs->write((unsigned short)SUSPEND_RESULT_SET);
+		sqlrc->cs->write(cursorid);
 	}
 	clearCacheDest();
 	suspendresultsetsent=1;

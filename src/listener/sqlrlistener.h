@@ -11,7 +11,7 @@
 #include <rudiments/listener.h>
 #include <rudiments/unixserversocket.h>
 #include <rudiments/inetserversocket.h>
-#include <rudiments/datatransport.h>
+#include <rudiments/filedescriptor.h>
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
 #include <authenticator.h>
@@ -33,7 +33,7 @@ class handoffsocketnode {
 	friend class sqlrlistener;
 	private:
 		unsigned long		pid;
-		datatransport		*sock;
+		filedescriptor		*sock;
 };
 
 class sqlrlistener : public daemonprocess, public listener, public debugfile {
@@ -63,38 +63,38 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		void	blockSignals();
 		filedescriptor	*waitForData();
 		bool	handleClientConnection(filedescriptor *fd);
-		bool	registerHandoff(datatransport *sock);
-		bool	deRegisterHandoff(datatransport *sock);
-		bool	fixup(datatransport *sock);
+		bool	registerHandoff(filedescriptor *sock);
+		bool	deRegisterHandoff(filedescriptor *sock);
+		bool	fixup(filedescriptor *sock);
 		bool	deniedIp();
-		void	disconnectClient(datatransport *sock);
-		void	forkChild(datatransport *sock);
-		void	clientSession(datatransport *sock);
-		int	getAuth(datatransport *sock);
+		void	disconnectClient(filedescriptor *sock);
+		void	forkChild(filedescriptor *sock);
+		void	clientSession(filedescriptor *sock);
+		int	getAuth(filedescriptor *sock);
 		void	incrementSessionCount();
-		bool	handOffClient(datatransport *sock);
+		bool	handOffClient(filedescriptor *sock);
 		void	getAConnection(unsigned long *connectionpid,
 					unsigned short *inetport,
 					char *unixportstr,
 					unsigned short *unixportstrlen);
 		bool	findMatchingSocket(unsigned long connectionpid,
-						unixsocket *connectionsock);
+					filedescriptor *connectionsock);
 		bool	requestFixup(unsigned long connectionpid,
-					unixsocket *connectionsock);
+					filedescriptor *connectionsock);
 		bool	connectionIsUp(const char *connectionid);
 		void	pingDatabase(unsigned long connectionpid,
 					const char *unixportstr,
 					unsigned short inetport);
-		datatransport	*connectToConnection(
+		filedescriptor	*connectToConnection(
 						unsigned long connectionpid,
 						const char *unixportstr,
 						unsigned short inetport);
-		void	disconnectFromConnection(datatransport *sock);
+		void	disconnectFromConnection(filedescriptor *sock);
 		bool	passClientFileDescriptorToConnection(
-						unixsocket *connectionsock,
-						int fd);
+					filedescriptor *connectionsock,
+					int fd);
 		void	waitForClientClose(int authstatus, bool passstatus,
-						datatransport *sock);
+						filedescriptor *sock);
 
 		bool		passdescriptor;
 
