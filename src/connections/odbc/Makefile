@@ -49,8 +49,8 @@ sqlr-connection-odbc-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-odbc$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-odbc-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-odbc$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-odbc-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc$(EXE)

@@ -44,8 +44,8 @@ sqlr-listener-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-listener$(EXE) $(bindir)
-	$(INSTALL) sqlr-listener-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-listener-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(tmpdir)/sockets

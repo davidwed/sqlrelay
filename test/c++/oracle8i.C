@@ -892,6 +892,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("NEGATIVE INPUT BIND\n");
+	cur->sendQuery("drop table testtable2");
 	cur->sendQuery("create table testtable2 (testval number)");
 	cur->prepareQuery("insert into testtable2 values (:testval)");
 	cur->inputBind("testval",-1);

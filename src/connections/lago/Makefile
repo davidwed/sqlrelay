@@ -49,8 +49,8 @@ sqlr-connection-lago-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-lago$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-lago-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-lago$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-lago-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-lago$(EXE)

@@ -49,8 +49,8 @@ sqlr-connection-oracle8-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-oracle8$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-oracle8-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-oracle8$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-oracle8-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-oracle8$(EXE)

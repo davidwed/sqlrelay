@@ -49,8 +49,8 @@ sqlr-connection-sqlite-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-sqlite$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-sqlite-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-sqlite$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-sqlite-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite$(EXE)

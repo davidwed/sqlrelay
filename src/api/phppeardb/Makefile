@@ -22,4 +22,4 @@ install:
 	$(INSTALL) sqlrelay.php $(DESTDIR)$(PHPPEARDBDIR)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(PHPPEARDBDIR)/sqlrelay.php
+	$(RM) $(DESTDIR)$(PHPPEARDBDIR)/sqlrelay.php

@@ -112,7 +112,7 @@ sqlrelay.dll:
 ifeq ($(CYGWIN),)
 install: sqlrelay.so
 	$(MKINSTALLDIRS) $(RUBYSITEARCHDIR)
-	$(INSTALL) sqlrelay.so $(RUBYSITEARCHDIR)
+	$(LTINSTALL) sqlrelay.so $(RUBYSITEARCHDIR)
 	$(MKINSTALLDIRS) $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(INSTALL) -m 644 SQLRelay.rb $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(RM) sqlrelay.so
@@ -123,7 +123,7 @@ uninstall:
 else
 install: sqlrelay.dll
 	$(MKINSTALLDIRS) $(RUBYSITEARCHDIR)
-	$(INSTALL) sqlrelay.dll $(RUBYSITEARCHDIR)
+	$(LTINSTALL) sqlrelay.dll $(RUBYSITEARCHDIR)
 	$(MKINSTALLDIRS) $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(INSTALL) -m 644 SQLRelay.rb $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(RM) sqlrelay.dll

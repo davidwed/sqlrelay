@@ -49,8 +49,8 @@ sqlr-connection-freetds-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-freetds$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-freetds-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-freetds$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-freetds-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-freetds$(EXE)

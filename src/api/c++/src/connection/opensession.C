@@ -58,15 +58,15 @@ bool sqlrconnection::openSession() {
 		}
 	}
 
-	// use 8k read and write buffers
-	cs->setReadBufferSize(8192);
-	cs->setWriteBufferSize(8192);
-
 	// handle failure to connect to listener
 	if (openresult!=RESULT_SUCCESS) {
 		setError("Couldn't connect to the listener.");
 		return false;
 	}
+
+	// use 8k read and write buffers
+	cs->setReadBufferSize(8192);
+	cs->setWriteBufferSize(8192);
 
 	// authenticate with the listner
 	if (!authenticateWithListener()) {

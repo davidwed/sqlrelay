@@ -43,9 +43,9 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o	
 	$(LIBTOOL) --mode=clean $(RM) *.so
-	$(LIBTOOL) --mode=clean $(RM) tclincludes.h
-	$(LIBTOOL) --mode=clean $(RM) errors1
-	$(LIBTOOL) --mode=clean $(RM) errors2
+	$(RM) tclincludes.h
+	$(RM) errors1
+	$(RM) errors2
 	$(RMTREE) .libs
 
 rebuild: clean all
@@ -101,13 +101,13 @@ sqlrelay.dll:
 ifeq ($(CYGWIN),)
 install: sqlrelay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(INSTALL) sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(LTINSTALL) sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.so
 else
 install: sqlrelay.dll
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(INSTALL) sqlrelay.dll $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(LTINSTALL) sqlrelay.dll $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.dll
 endif

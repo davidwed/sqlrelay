@@ -31,15 +31,17 @@
 <a name="installation"></a>
 <span class="heading1">Installation</span><br>
 
-<p>I've sucessfully installed DB2 7.2 and 8.1 on Linux.  I've never had access
-to any other version of DB2 for Linux or any version of DB2 for other
+<p>I've sucessfully installed DB2 Enterprise Edition versions 7.2 and 8.1 on
+Linux and DB2 Personal Edition version 8.2 on Linux.  I've never had access to
+any other version of DB2 for Linux or any version of DB2 for other
 platforms.</p>
 
 <a name="pdksh"></a>
 <span class="heading2">Install pdksh</span><br>
 
-<p>First and foremost, you need pdksh (Public Domain Korn Shell).  If it did
-not come with your distribution, you'll need to download and install it.</p>
+<p>If you're installing version 7.2, first and foremost, you need pdksh
+(Public Domain Korn Shell).  If it did not come with your distribution, you'll
+need to download and install it.</p>
 
 <p>For RPM based distributions, look for pdksh at 
 <a href="http://rpmfind.net">rpmfind</a> and install it using <i>rpm -i</i>.</p>
@@ -82,9 +84,9 @@ follows.</p>
 <a name="env"></a>
 <span class="heading2">PATH Environment Variable</span><br>
 
-<p>The DB2 installer tries to run some command line programs that are found in
-/sbin and /usr/sbin.  Make sure that these directories are in the root user's
-PATH.</p>
+<p>For versions 7.2 and 8.1, the DB2 installer tries to run some command line
+programs that are found in /sbin and /usr/sbin.  Make sure that these
+directories are in the root user's PATH.</p>
 
 <a name="db2"></a>
 <span class="heading2">DB2 Installation</span><br>
@@ -92,8 +94,9 @@ PATH.</p>
 <p>Each version of DB2 has a slightly different installation procedure.
 Follow the links below for the version of DB2 that you are installing.</p>
 
-<p><a href="db2/72.html">Installing IBM DB2 V7.2</a><br>
-<a href="db2/81.html">Installing IBM DB2 V8.1</a></p>
+<p><a href="db2/72.html">Installing IBM DB2 Enterprise V7.2</a><br>
+<a href="db2/81.html">Installing IBM DB2 Enterprise V8.1</a><br>
+<a href="db2/82.html">Installing IBM DB2 Personal V8.2</a></p>
 
 <a name="creating"></a>
 <span class="heading2">Creating a Database</span><br>

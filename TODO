@@ -1,3 +1,10 @@
+db2 start/stop script works, but isn't right, should be able to use
+	db2start, db2stop
+
+--------------------------------------------------------------------------------
+
+rename interbase stuff firebird
+
 need a "relay ping" method that tries to connect to the SQL Relay server and
 	returns true/false if that was possible or not
 

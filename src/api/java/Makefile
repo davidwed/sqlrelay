@@ -24,7 +24,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) *.so
-	$(LIBTOOL) --mode=clean $(RM) com/firstworks/sqlrelay/*.class
+	$(RM) com/firstworks/sqlrelay/*.class
 	$(RMTREE) .libs
 
 rebuild: clean all
@@ -121,8 +121,8 @@ SQLRCursor.dll:
 ifeq ($(CYGWIN),)
 install: libSQLRConnection.so libSQLRCursor.so
 	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) libSQLRConnection.so $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) libSQLRCursor.so $(javadir)/com/firstworks/sqlrelay
+	$(LTINSTALL) libSQLRConnection.so $(javadir)/com/firstworks/sqlrelay
+	$(LTINSTALL) libSQLRCursor.so $(javadir)/com/firstworks/sqlrelay
 	$(INSTALL) com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay
 	$(INSTALL) com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay
 	$(RM) libSQLRConnection.so
@@ -130,8 +130,8 @@ install: libSQLRConnection.so libSQLRCursor.so
 else
 install: SQLRConnection.dll SQLRCursor.dll
 	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) SQLRConnection.dll $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) SQLRCursor.dll $(javadir)/com/firstworks/sqlrelay
+	$(LTINSTALL) SQLRConnection.dll $(javadir)/com/firstworks/sqlrelay
+	$(LTINSTALL) SQLRCursor.dll $(javadir)/com/firstworks/sqlrelay
 	$(INSTALL) com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay
 	$(INSTALL) com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay
 	$(RM) SQLRConnection.dll

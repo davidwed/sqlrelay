@@ -44,6 +44,11 @@ bool sqlrconnection::resumeSession(int port, const char *socket) {
 	}
 
 	if (connected) {
+
+		// use 8k read and write buffers
+		cs->setReadBufferSize(8192);
+		cs->setWriteBufferSize(8192);
+
 		if (debug) {
 			debugPreStart();
 			debugPrint("success");

@@ -11,9 +11,7 @@ void sqlrconnection::identifyCommand() {
 
 	const char	*ident=identify();
 	unsigned short	idlen=(unsigned short)charstring::length(ident);
-printf("idlen=%d\n",idlen);
 	clientsock->write(idlen);
-printf("ident=%s\n",ident);
 	clientsock->write(ident,idlen);
 	flushWriteBuffer();
 }

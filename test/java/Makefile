@@ -40,9 +40,9 @@ ifneq ($(strip $(SYBASELIBS)),)
 endif
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.class
-	$(LIBTOOL) --mode=clean $(RM) cachefile*
-	$(LIBTOOL) --mode=clean $(RM) sqlnet.log
+	$(RM) *.class
+	$(RM) cachefile*
+	$(RM) sqlnet.log
 
 db2.class: db2.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir) db2.java

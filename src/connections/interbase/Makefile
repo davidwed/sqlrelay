@@ -49,8 +49,8 @@ sqlr-connection-interbase-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-interbase$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-interbase-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-interbase$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-interbase-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-interbase$(EXE)

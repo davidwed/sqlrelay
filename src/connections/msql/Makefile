@@ -49,8 +49,8 @@ sqlr-connection-msql-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-msql$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-msql-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-msql$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-msql-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-msql$(EXE)

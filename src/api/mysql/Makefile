@@ -56,10 +56,10 @@ libmysql50sqlrelay.la: mysql.C mysql50.lo
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(INSTALL) libmysql3sqlrelay.la $(libdir)
-	$(INSTALL) libmysql40sqlrelay.la $(libdir)
-	$(INSTALL) libmysql41sqlrelay.la $(libdir)
-	$(INSTALL) libmysql50sqlrelay.la $(libdir)
+	$(LTINSTALL) libmysql3sqlrelay.la $(libdir)
+	$(LTINSTALL) libmysql40sqlrelay.la $(libdir)
+	$(LTINSTALL) libmysql41sqlrelay.la $(libdir)
+	$(LTINSTALL) libmysql50sqlrelay.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

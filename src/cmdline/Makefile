@@ -44,9 +44,9 @@ sqlrsh: sqlrsh.C sqlrsh.lo
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) query$(EXE) $(bindir)
-	$(INSTALL) fields$(EXE) $(bindir)
-	$(INSTALL) sqlrsh$(EXE) $(bindir)
+	$(LTINSTALL) query$(EXE) $(bindir)
+	$(LTINSTALL) fields$(EXE) $(bindir)
+	$(LTINSTALL) sqlrsh$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query$(EXE)

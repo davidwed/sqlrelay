@@ -102,8 +102,8 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) postgresql7
 	$(LIBTOOL) --mode=clean $(RM) sqlite
 	$(LIBTOOL) --mode=clean $(RM) sybase
-	$(LIBTOOL) --mode=clean $(RM) cachefile*
-	$(LIBTOOL) --mode=clean $(RM) sqlnet.log
+	$(RM) cachefile*
+	$(RM) sqlnet.log
 	$(RMTREE) .libs
 
 rebuild: clean all

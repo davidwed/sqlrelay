@@ -49,8 +49,8 @@ sqlr-connection-postgresql-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-postgresql$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-postgresql-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-postgresql$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-postgresql-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql$(EXE)

@@ -4,8 +4,8 @@ include ../../../../config.mk
 
 .PHONY: all clean rebuild install uninstall
 
-PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
-PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
+PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|-xildoff||" -e "s|-xspace||" -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
+PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|-xildoff||" -e "s|-xspace||" -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
 PERLINSTALLARCHLIB = $(DESTDIR)$(shell eval "`$(PERL) -V:installarchlib`"; export installarchlib; echo $$installarchlib | sed -e "s|UNKNOWN||g" )
 PERLSITEARCH = $(DESTDIR)$(shell eval "`$(PERL) -V:sitearch`"; export sitearch; echo $$sitearch | sed -e "s|UNKNOWN||g" )
 PERL_INC = $(DESTDIR)$(shell eval "`$(PERL) -V:archlibexp`"; export archlibexp; echo "-I$$archlibexp/CORE" | sed -e "s|UNKNOWN||g" )
@@ -131,7 +131,7 @@ install: Cursor.so
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
 	$(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH)/SQLRelay
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Cursor
-	$(INSTALL) -m 755 Cursor.so $(PERLSITEARCH)/auto/SQLRelay/Cursor
+	$(LTINSTALL) -m 755 Cursor.so $(PERLSITEARCH)/auto/SQLRelay/Cursor
 	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
 	$(RM) Cursor.so
 ifneq ($(POD2MAN),)
@@ -150,7 +150,7 @@ install: Cursor.dll
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
 	$(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH)/SQLRelay
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Cursor
-	$(INSTALL) -m 755 Cursor.dll $(PERLSITEARCH)/auto/SQLRelay/Cursor
+	$(LTINSTALL) -m 755 Cursor.dll $(PERLSITEARCH)/auto/SQLRelay/Cursor
 	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
 	$(RM) Cursor.dll
 	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.dll > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
@@ -158,5 +158,5 @@ install: Cursor.dll
 endif
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) `cat $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist`
-	$(LIBTOOL) --mode=uninstall $(RM) $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+	$(RM) `cat $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist`
+	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist

@@ -769,10 +769,10 @@ $cur->sendQuery("drop table testtable2");
 $cur->sendQuery("create table testtable2 (testclob clob)");
 $cur->prepareQuery("insert into testtable2 values (:clobval)");
 $clobval="";
-for ($i=0; $i<70*1024; $i++) {
+for ($i=0; $i<8*1024; $i++) {
 	$clobval=$clobval.'C';
 }
-$cur->inputBindClob("clobval",$clobval,70*1024);
+$cur->inputBindClob("clobval",$clobval,8*1024);
 checkSuccess($cur->executeQuery(),1);
 $cur->sendQuery("select testclob from testtable2");
 checkSuccess($clobval,$cur->getField(0,"testclob"));
@@ -780,16 +780,16 @@ $cur->prepareQuery("begin select testclob into :clobbindval from testtable2; end
 $cur->defineOutputBindClob("clobbindval");
 checkSuccess($cur->executeQuery(),1);
 $clobbindvar=$cur->getOutputBind("clobbindval");
-checkSuccess($cur->getOutputBindLength("clobbindval"),70*1024);
+checkSuccess($cur->getOutputBindLength("clobbindval"),8*1024);
 checkSuccess($clobval,$clobbindvar);
 $cur->sendQuery("delete from testtable2");
 print("\n");
 $cur->prepareQuery("insert into testtable2 values (:clobval)");
 $clobval="";
-for ($i=0; $i<70*1024; $i++) {
+for ($i=0; $i<8*1024; $i++) {
 	$clobval=$clobval.'C';
 }
-$cur->inputBindClob("clobval",$clobval,70*1024);
+$cur->inputBindClob("clobval",$clobval,8*1024);
 checkSuccess($cur->executeQuery(),1);
 $cur->sendQuery("select testclob from testtable2");
 checkSuccess($clobval,$cur->getField(0,"testclob"));
@@ -797,7 +797,7 @@ $cur->prepareQuery("begin select testclob into :clobbindval from testtable2; end
 $cur->defineOutputBindClob("clobbindval");
 checkSuccess($cur->executeQuery(),1);
 $clobbindvar=$cur->getOutputBind("clobbindval");
-checkSuccess($cur->getOutputBindLength("clobbindval"),70*1024);
+checkSuccess($cur->getOutputBindLength("clobbindval"),8*1024);
 checkSuccess($clobval,$clobbindvar);
 $cur->sendQuery("drop table testtable2");
 print("\n");

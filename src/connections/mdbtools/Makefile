@@ -49,8 +49,8 @@ sqlr-connection-mdbtools-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-mdbtools$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-mdbtools-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-mdbtools$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-mdbtools-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-mdbtools$(EXE)

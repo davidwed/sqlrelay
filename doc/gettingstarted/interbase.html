@@ -23,8 +23,9 @@
 <a name="installation"></a>
 <span class="heading1">Installation</span><br>
 
-<p>I've successfully installed Interbase 6.0.1 and Firebird 1.0.0, 1.0.2, 1.0.3
-and 1.5 on Linux.  I've never tried to install them on any other platform.</p>
+<p>I've successfully installed Interbase 6.0.1 and Firebird 1.0.0, 1.0.2,
+1.0.3, 1.5 and 1.5.2 on Linux.  I've never tried to install them on any other
+platform.</p>
 
 <p>There are 2 versions of Interbase/Firebird: Classic Server (CS) and
 Super Server (SS).  Classic Server only allows a single connection while Super
@@ -219,8 +220,8 @@ possibly localhost.localdomain for the <i>gsec</i> to function.</p>
 <blockquote>
 <PRE>
 <B><FONT color=#a62828>[</FONT></B>root@localhost root<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># cd /opt/firebird</FONT>
-<B><FONT color=#a62828>[</FONT></B>root@localhost firebird<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># ls -l isc4.gdb</FONT>
--rw-rw-rw-    <FONT color=#ff00ff>1</FONT> root     root       <FONT color=#ff00ff>618496</FONT> Feb <FONT color=#ff00ff>18</FONT> <FONT color=#ff00ff>14</FONT>:<FONT color=#ff00ff>29</FONT> isc4.gdb
+<B><FONT color=#a62828>[</FONT></B>root@localhost firebird<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># ls -l security.fdb</FONT>
+-rw-rw-rw-    <FONT color=#ff00ff>1</FONT> root     root       <FONT color=#ff00ff>618496</FONT> Feb <FONT color=#ff00ff>18</FONT> <FONT color=#ff00ff>14</FONT>:<FONT color=#ff00ff>29</FONT> security.fdb
 <B><FONT color=#a62828>[</FONT></B>root@localhost firebird<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># /opt/firebird/bin/gsec</FONT>
 GSEC<B><FONT color=#a62828>&gt;</FONT></B> modify sysdba <FONT color=#6959cf>-pw</FONT> newpassword
 Warning - maximum 8 significant bytes of password used

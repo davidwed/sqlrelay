@@ -41,5 +41,5 @@ endif
 endif
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) `cat $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist`
-	$(LIBTOOL) --mode=uninstall $(RM) $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist
+	$(RM) `cat $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist`
+	$(RM) $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist

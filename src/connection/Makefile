@@ -205,8 +205,8 @@ libsqlrconnection_debug.la: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(INSTALL) libsqlrconnection.la $(libdir)
-	$(INSTALL) libsqlrconnection_debug.la $(libdir)
+	$(LTINSTALL) libsqlrconnection.la $(libdir)
+	$(LTINSTALL) libsqlrconnection_debug.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)

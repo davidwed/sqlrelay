@@ -49,8 +49,8 @@ sqlr-connection-sybase-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlr-connection-sybase$(EXE) $(bindir)
-	$(INSTALL) sqlr-connection-sybase-debug$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-sybase$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-sybase-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sybase$(EXE)
