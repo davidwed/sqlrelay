@@ -98,6 +98,7 @@ def main():
 	print
 
 	print "STORED PROCEDURE: "
+	cur.sendQuery("drop procedure testproc");
 	checkSuccess(cur.sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1)
 	cur.prepareQuery("call testproc(?,?)")
 	cur.inputBind("1",5)
@@ -438,7 +439,7 @@ def main():
 	cur.getNullsAsNone()
 	cur.sendQuery("drop table testtable1")
 	checkSuccess(cur.sendQuery("create table testtable1 (col1 char(1), col2 char(1), col3 char(1))"),1)
-	checkSuccess(cur.sendQuery("insert into testtable1 values (1,NULL,NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable1 values ('1',NULL,NULL)"),1)
 	checkSuccess(cur.sendQuery("select * from testtable1"),1)
 	checkSuccess(cur.getField(0,0),"1")
 	checkSuccess(cur.getField(0,1),None)

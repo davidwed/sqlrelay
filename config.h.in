@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+/* Version of DB2 */
+#undef DB2VERSION
+
 /* Use dmalloc */
 #undef DMALLOC
 

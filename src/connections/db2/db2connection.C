@@ -116,7 +116,7 @@ char	*db2connection::identify() {
 db2cursor::db2cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	db2conn=(db2connection *)conn;
 	errormsg=NULL;
-	stmt=NULL;
+	stmt=0;
 }
 
 db2cursor::~db2cursor() {
@@ -143,6 +143,15 @@ int	db2cursor::prepareQuery(const char *query, long length) {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return 0;
 	}
+
+#if (DB2VERSION==8)
+	// set the row status ptr
+	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
+				(SQLPOINTER)rowstat,0);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return 0;
+	}
+#endif
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -307,7 +316,8 @@ int	db2cursor::executeQuery(const char *query, long length,
 		// bind the column to a buffer
 		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 				field[i],MAX_ITEM_BUFFER_SIZE,
-				indicator[i]);
+				//indicator[i]);
+				(SQLINTEGER *)&indicator[i]);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return 0;
 		}
@@ -452,8 +462,23 @@ int	db2cursor::fetchRow() {
 	}
 	if (row==0) {
 		SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
+
+
+		// An apparant bug in version 8.1 causes the SQL_ATTR_ROW_NUMBER
+		// to always be 1, running through the row status buffer appears
+		// to work.
+#if (DB2VERSION==8)
+		for (rownumber=0; rownumber<FETCH_AT_ONCE; rownumber++) {
+			if (rowstat[rownumber]!=SQL_SUCCESS && 
+				rowstat[rownumber]!=SQL_SUCCESS_WITH_INFO) {
+				break;
+			}
+		}
+#else
 		SQLGetStmtAttr(stmt,SQL_ATTR_ROW_NUMBER,
 				(SQLPOINTER)&rownumber,0,NULL);
+#endif
+
 		if (rownumber==totalrows) {
 			return 0;
 		}

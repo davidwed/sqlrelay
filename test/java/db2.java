@@ -148,6 +148,7 @@ class db2 {
 		System.out.println();
 
 	    System.out.println("STORED PROCEDURE: ");
+	    cur.sendQuery("drop procedure testproc");
 	    checkSuccess(cur.sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 	    cur.prepareQuery("call testproc(?,?)");
 	    cur.inputBind("1",5);

@@ -102,7 +102,9 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 		return 0;
 	}
 
-	setUserAndGroup(&cfgfl);
+	if (!setUserAndGroup(&cfgfl)) {
+		return 0;
+	}
 
 	#ifdef SERVER_DEBUG
 	openDebugFile("listener",cmdl->getLocalStateDir());
@@ -146,9 +148,21 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 	return 1;
 }
 
-void	sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
-	runAsUser(cfgfl->getRunAsUser());
-	runAsGroup(cfgfl->getRunAsGroup());
+int	sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
+
+	if (!runAsUser(cfgfl->getRunAsUser())) {
+		fprintf(stderr,"Could not change user to %s\n",
+						cfgfl->getRunAsUser());
+		return 0;
+	} 
+
+	if (!runAsGroup(cfgfl->getRunAsGroup())) {
+		fprintf(stderr,"Could not change group to %s\n",
+						cfgfl->getRunAsGroup());
+		return 0;
+	}
+
+	return 1;
 }
 
 int	sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {

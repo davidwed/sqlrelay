@@ -128,7 +128,9 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 		return 0;
 	}
 
-	setUserAndGroup();
+	if (!setUserAndGroup()) {
+		return 0;
+	}
 
 	#ifdef SERVER_DEBUG
 		// set loggers here...
@@ -370,11 +372,21 @@ void	sqlrconnection::closeCursors(int destroy) {
 	#endif
 }
 
-void	sqlrconnection::setUserAndGroup() {
+int	sqlrconnection::setUserAndGroup() {
 
-	// run as user/group specified in the config file
-	runAsUser(cfgfl->getRunAsUser());
-	runAsGroup(cfgfl->getRunAsGroup());
+	if (!runAsUser(cfgfl->getRunAsUser())) {
+		fprintf(stderr,"Could not change user to %s\n",
+						cfgfl->getRunAsUser());
+		return 0;
+	}
+
+	if (!runAsGroup(cfgfl->getRunAsGroup())) {
+		fprintf(stderr,"Could not change group to %s\n",
+						cfgfl->getRunAsGroup());
+		return 0;
+	}
+
+	return 1;
 }
 
 int	sqlrconnection::handlePidFile() {

@@ -46,6 +46,10 @@ int	startListener(const char *id, const char *config,
 
 	int	success=(system(command.getString())==0);
 
+	if (!success) {
+		printf("\nsqlr-listener failed to start.\n");
+	}
+
 	sleep(1);
 
 	return success;
@@ -80,6 +84,10 @@ int	startConnection(int strace, const char *dbase,
 	printf("  %s\n",command.getString());
 
 	int	success=(system(command.getString())==0);
+
+	if (!success) {
+		printf("\nsqlr-connection-%s failed to start.\n",dbase);
+	}
 
 	return success;
 }
@@ -182,7 +190,13 @@ int	startScaler(sqlrconfigfile *cfgfile, char *id, char *config,
 	}
 	printf("  %s\n",command.getString());
 
-	return (system(command.getString())==0);
+	int	success=(system(command.getString())==0);
+
+	if (!success) {
+		printf("\nsqlr-scaler failed to start.\n");
+	}
+
+	return success;
 }
 
 int	startCacheManager(char *localstatedir) {
@@ -218,6 +232,7 @@ int	startCacheManager(char *localstatedir) {
 		int	success=(system(command.getString())==0);
 
 		if (!success) {
+			printf("\nsqlr-cachemanager failed to start.\n");
 			return 0;
 		}
 	

@@ -148,6 +148,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("STORED PROCEDURE: \n");
+	sqlrcur_sendQuery(cur,"drop procedure testproc");
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 	sqlrcur_prepareQuery(cur,"call testproc(?,?)");
 	sqlrcur_inputBindLong(cur,"1",5);

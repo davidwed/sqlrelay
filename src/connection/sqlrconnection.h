@@ -97,7 +97,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 	private:
 		// methods used internally
-		void	setUserAndGroup();
+		int	setUserAndGroup();
 		void	createCursorArray();
 		int	initCursors(int create);
 		int	getCursor();

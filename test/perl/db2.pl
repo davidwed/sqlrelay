@@ -127,6 +127,7 @@ checkSuccess($cur->affectedRows(),1);
 print("\n");
 
 print("STORED PROCEDURE: \n");
+$cur->sendQuery("drop procedure testproc");
 checkSuccess($cur->sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 $cur->prepareQuery("call testproc(?,?)");
 $cur->inputBind("1",5);

@@ -89,6 +89,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("STORED PROCEDURE: \n");
+	sqlrcur_sendQuery($cur,"drop procedure testproc");
 	checkSuccess(sqlrcur_sendQuery($cur,"create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 	sqlrcur_prepareQuery($cur,"call testproc(?,?)");
 	sqlrcur_inputBind($cur,"1",5);

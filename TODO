@@ -1,3 +1,5 @@
+sqlr-stop doesn't work on FreeBSD
+
 need a reliable way to ping msql
 
 query/fields cmdline tools need a timeout option.

@@ -12829,6 +12829,7 @@ DB2INCLUDES=""
 DB2LIBS=""
 DB2LIBSPATH=""
 DB2STATIC=""
+DB2VERSION="7"
 STATICFLAG=""
 if ( test -n "$STATICLINK" ); then
 	STATICFLAG="-static"
@@ -12904,7 +12905,7 @@ fi
 
 else
 
-	# check /opt
+	# check /opt for 7.2
 	echo "$as_me:$LINENO: checking for /opt/IBMdb2/V7.1/include/sql.h" >&5
 echo $ECHO_N "checking for /opt/IBMdb2/V7.1/include/sql.h... $ECHO_C" >&6
 if test "${ac_cv_file__opt_IBMdb2_V7_1_include_sql_h+set}" = set; then
@@ -12969,7 +12970,7 @@ if test $ac_cv_file__opt_IBMdb2_V7_1_lib_libdb2_so = yes; then
 fi
 
 
-	# check /usr
+	# check /usr for 7.2
 	echo "$as_me:$LINENO: checking for /usr/IBMdb2/V7.1/include/sql.h" >&5
 echo $ECHO_N "checking for /usr/IBMdb2/V7.1/include/sql.h... $ECHO_C" >&6
 if test "${ac_cv_file__usr_IBMdb2_V7_1_include_sql_h+set}" = set; then
@@ -13033,6 +13034,71 @@ if test $ac_cv_file__usr_IBMdb2_V7_1_lib_libdb2_so = yes; then
   DB2LIBSPATH="/usr/IBMdb2/V7.1/lib"; DB2LIBS="-L/usr/IBMdb2/V7.1/lib -ldb2"
 fi
 
+
+	# check /opt for 8.1
+	echo "$as_me:$LINENO: checking for /opt/IBM/db2/V8.1/include/sql.h" >&5
+echo $ECHO_N "checking for /opt/IBM/db2/V8.1/include/sql.h... $ECHO_C" >&6
+if test "${ac_cv_file__opt_IBM_db2_V8_1_include_sql_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/opt/IBM/db2/V8.1/include/sql.h"; then
+  ac_cv_file__opt_IBM_db2_V8_1_include_sql_h=yes
+else
+  ac_cv_file__opt_IBM_db2_V8_1_include_sql_h=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__opt_IBM_db2_V8_1_include_sql_h" >&5
+echo "${ECHO_T}$ac_cv_file__opt_IBM_db2_V8_1_include_sql_h" >&6
+if test $ac_cv_file__opt_IBM_db2_V8_1_include_sql_h = yes; then
+  DB2INCLUDES="-I/opt/IBM/db2/V8.1/include"; DB2VERSION="8"
+fi
+
+	echo "$as_me:$LINENO: checking for /opt/IBM/db2/V8.1/lib/libdb2.a" >&5
+echo $ECHO_N "checking for /opt/IBM/db2/V8.1/lib/libdb2.a... $ECHO_C" >&6
+if test "${ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_a+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/opt/IBM/db2/V8.1/lib/libdb2.a"; then
+  ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_a=yes
+else
+  ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_a=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_a" >&5
+echo "${ECHO_T}$ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_a" >&6
+if test $ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_a = yes; then
+  DB2LIBS="-L/opt/IBM/db2/V8.1/lib -ldb2"; DB2STATIC="$STATICFLAG"; DB2VERSION="8"
+fi
+
+	echo "$as_me:$LINENO: checking for /opt/IBM/db2/V8.1/lib/libdb2.so" >&5
+echo $ECHO_N "checking for /opt/IBM/db2/V8.1/lib/libdb2.so... $ECHO_C" >&6
+if test "${ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_so+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/opt/IBM/db2/V8.1/lib/libdb2.so"; then
+  ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_so=yes
+else
+  ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_so=no
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_so" >&5
+echo "${ECHO_T}$ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_so" >&6
+if test $ac_cv_file__opt_IBM_db2_V8_1_lib_libdb2_so = yes; then
+  DB2LIBSPATH="/opt/IBM/db2/V8.1/lib"; DB2LIBS="-L/opt/IBM/db2/V8.1/lib -ldb2"; DB2VERSION="8"
+fi
+
 fi
 
 if ( test -n "$RPATHFLAG" -a -n "$DB2LIBSPATH" ); then
@@ -13041,6 +13107,11 @@ fi
 
 
 
+
+
+cat >>confdefs.h <<_ACEOF
+#define DB2VERSION $DB2VERSION
+_ACEOF
 
 
 if ( test -z "$DB2LIBS" ); then

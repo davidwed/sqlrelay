@@ -1321,6 +1321,7 @@ DB2INCLUDES=""
 DB2LIBS=""
 DB2LIBSPATH=""
 DB2STATIC=""
+DB2VERSION="7"
 STATICFLAG=""
 if ( test -n "$STATICLINK" ); then
 	STATICFLAG="-static"
@@ -1333,15 +1334,20 @@ if ( test -n "$DB2PATH" ); then
 
 else
 
-	# check /opt
+	# check /opt for 7.2
 	AC_CHECK_FILE(/opt/IBMdb2/V7.1/include/sql.h,DB2INCLUDES="-I/opt/IBMdb2/V7.1/include")
 	AC_CHECK_FILE(/opt/IBMdb2/V7.1/lib/libdb2.a,DB2LIBS="-L/opt/IBMdb2/V7.1/lib -ldb2"; DB2STATIC="$STATICFLAG")
 	AC_CHECK_FILE(/opt/IBMdb2/V7.1/lib/libdb2.so,DB2LIBSPATH="/opt/IBMdb2/V7.1/lib"; DB2LIBS="-L/opt/IBMdb2/V7.1/lib -ldb2")
 
-	# check /usr
+	# check /usr for 7.2
 	AC_CHECK_FILE(/usr/IBMdb2/V7.1/include/sql.h,DB2INCLUDES="-I/usr/IBMdb2/V7.1/include")
 	AC_CHECK_FILE(/usr/IBMdb2/V7.1/lib/libdb2.a,DB2LIBS="-L/usr/IBMdb2/V7.1/lib -ldb2"; DB2STATIC="$STATICFLAG")
 	AC_CHECK_FILE(/usr/IBMdb2/V7.1/lib/libdb2.so,DB2LIBSPATH="/usr/IBMdb2/V7.1/lib"; DB2LIBS="-L/usr/IBMdb2/V7.1/lib -ldb2")
+
+	# check /opt for 8.1
+	AC_CHECK_FILE(/opt/IBM/db2/V8.1/include/sql.h,DB2INCLUDES="-I/opt/IBM/db2/V8.1/include"; DB2VERSION="8")
+	AC_CHECK_FILE(/opt/IBM/db2/V8.1/lib/libdb2.a,DB2LIBS="-L/opt/IBM/db2/V8.1/lib -ldb2"; DB2STATIC="$STATICFLAG"; DB2VERSION="8")
+	AC_CHECK_FILE(/opt/IBM/db2/V8.1/lib/libdb2.so,DB2LIBSPATH="/opt/IBM/db2/V8.1/lib"; DB2LIBS="-L/opt/IBM/db2/V8.1/lib -ldb2"; DB2VERSION="8")
 fi
 
 if ( test -n "$RPATHFLAG" -a -n "$DB2LIBSPATH" ); then
@@ -1351,6 +1357,7 @@ fi
 AC_SUBST(DB2INCLUDES)
 AC_SUBST(DB2LIBS)
 AC_SUBST(DB2STATIC)
+AC_DEFINE_UNQUOTED(DB2VERSION,$DB2VERSION,Version of DB2)
 
 if ( test -z "$DB2LIBS" ); then
 	AC_MSG_WARN("DB2 support will not be built.")

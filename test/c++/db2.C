@@ -147,6 +147,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("STORED PROCEDURE: \n");
+	cur->sendQuery("drop procedure testproc");
 	checkSuccess(cur->sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 	cur->prepareQuery("call testproc(?,?)");
 	cur->inputBind("1",5);
