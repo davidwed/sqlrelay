@@ -1,6 +1,16 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/connection/sqlrconnection.C)
 
+LDFLAGS=""
+AC_SUBST(LDFLAGS)
+CFLAGS=""
+AC_SUBST(CFLAGS)
+CXXFLAGS=""
+AC_SUBST(CXXFLAGS)
+DEBUGCXXFLAGS="-g -pg"
+AC_SUBST(DEBUGCXXFLAGS)
+DEBUGCFLAGS="-g -pg"
+AC_SUBST(DEBUGCFLAGS)
 
 
 dnl Compile time options.
@@ -2165,18 +2175,6 @@ dnl if interfaces added,                      c:r:a -> c:r:a+1
 dnl if interfaces removed,                    c:r:a -> c:r:0
 SONAME_VERSION_INFO="1:0:0"
 AC_SUBST(SONAME_VERSION_INFO)
-LDFLAGS=""
-AC_SUBST(LDFLAGS)
-DEBUGLDFLAGS=""
-AC_SUBST(DEBUGLDFLAGS)
-CFLAGS=""
-AC_SUBST(CFLAGS)
-CXXFLAGS=""
-AC_SUBST(CXXFLAGS)
-DEBUGCXXFLAGS="-g -pg"
-AC_SUBST(DEBUGCXXFLAGS)
-DEBUGCFLAGS="-g -pg"
-AC_SUBST(DEBUGCFLAGS)
 AC_SUBST(STATICLINK)
 AC_PREFIX_DEFAULT(/usr/local/firstworks)
 AC_CONFIG_HEADER(config.h)
@@ -2186,6 +2184,8 @@ AC_CONFIG_HEADER(config.h)
 dnl Search for Makefile.in's and output Makefiles from them.
 echo
 echo "***** Output Files ***********"
+AC_SUBST(abs_srcdir)
+AC_SUBST(abs_builddir)
 
 
 MAKELIST="config.mk src/api/perl/SQLRConnection/Makefile.PL src/api/perl/SQLRCursor/Makefile.PL src/api/perl/SQLRConnection/SQLRConnection.pm src/api/perl/SQLRCursor/SQLRCursor.pm src/api/perl/DBD/Makefile.PL src/api/perl/DBD/SQLRelay.pm bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay"

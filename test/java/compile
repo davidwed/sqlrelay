@@ -1,11 +1,13 @@
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java db2.java
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java freetds.java
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java interbase.java
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java lago.java
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java msql.java
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java mysql.java
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java oracle7.java
-javac -classpath $CLASSPATH:/usr/local/firstworks/java oracle8.java
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java postgresql.java
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java sqlite.java
-#javac -classpath $CLASSPATH:/usr/local/firstworks/java sybase.java
+export FWCLASSPATH=/usr/java
+#export FWCLASSPATH=/usr/local/firstworks/java
+#javac -classpath $CLASSPATH:$FWCLASSPATH db2.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH freetds.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH interbase.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH lago.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH msql.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH mysql.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH oracle7.java
+javac -classpath $CLASSPATH:$FWCLASSPATH oracle8.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH postgresql.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH sqlite.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH sybase.java

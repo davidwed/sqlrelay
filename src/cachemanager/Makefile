@@ -1,9 +1,8 @@
 include ../../config.mk
 
-top_builddir = ../..
-INSTALL = $(top_builddir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -DCACHE_DIR=\"$(cachedir)\" -I./ -I../../ -I../common $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -DCACHE_DIR=\"$(cachedir)\" -I./ -I$(abs_srcdir) -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES)
 LIBS = $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
@@ -36,7 +35,7 @@ sqlr-cachemanager-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_builddir)/mkinstalldirs $(bindir)
+	$(abs_srcdir)/mkinstalldirs $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-cachemanager $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) sqlr-cachemanager-debug $(bindir)
 

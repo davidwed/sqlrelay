@@ -1,11 +1,10 @@
 include ../../../config.mk
 
-top_builddir = ../../..
-INSTALL = $(top_builddir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(SQLITEINCLUDES)
-LIBS = $(SQLITELIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(SQLITELIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(SQLITEINCLUDES)
+LIBS = $(SQLITELIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(SQLITELIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection_p -L$(abs_srcdir)/src/util -lsqlrutil_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= sqliteconnection.C main.C
 NLOBJS= sqliteconnection.n.lo main.n.lo
@@ -36,12 +35,12 @@ sqlr-connection-sqlite-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(SQLITESTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_builddir)/mkinstalldirs $(bindir)
+	$(abs_srcdir)/mkinstalldirs $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-sqlite $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-sqlite-debug $(bindir)
-	$(top_builddir)/mkinstalldirs $(tmpdir)
+	$(abs_srcdir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_builddir)/mkinstalldirs $(debugdir)
+	$(abs_srcdir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:

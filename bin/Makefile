@@ -1,10 +1,9 @@
 include ../config.mk
 
-top_srcdir = ..
-INSTALL = $(top_srcdir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
+	$(abs_srcdir)/mkinstalldirs $(bindir)
 	$(INSTALL) backupschema $(bindir)
 	$(INSTALL) sqlr-stop $(bindir)
 	$(INSTALL) sqlrclient-config $(bindir)

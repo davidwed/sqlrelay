@@ -1,5 +1,4 @@
 include config.mk
-top_srcdir = .
 
 all:
 	$(MAKE) -C src all

@@ -1,9 +1,9 @@
 include ../../../../config.mk
 
-top_builddir = ../../../..
-INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../../ -I../include -I../../c++/include $(RUDIMENTSINCLUDES)
+INSTALL = $(abs_srcdir)/install-sh -c
+
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c/include -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 
 SRCS = sqlrclientwrapper.C
 NLOBJS = sqlrclientwrapper.n.lo
@@ -27,16 +27,16 @@ clean:
 rebuild: clean all
 
 libsqlrclientwrapper.la: $(SRCS) $(NLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) -L$(abs_srcdir)/src/api/c++/src -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 libsqlrclientwrapper_p.la: $(SRCS) $(PLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -L$(abs_srcdir)/src/api/c++/src -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient_p $(RUDIMENTSDEBUGLIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
-	$(top_builddir)/mkinstalldirs $(libdir)
+	$(abs_srcdir)/mkinstalldirs $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
 	$(LIBTOOL) --mode=install $(INSTALL) libsqlrclientwrapper_p.la $(libdir)/libsqlrclientwrapper_p.la
-	$(top_builddir)/mkinstalldirs $(cachedir)
+	$(abs_srcdir)/mkinstalldirs $(cachedir)
 	chmod 777 $(cachedir)
 
 uninstall:

@@ -1,9 +1,8 @@
 include ../../config.mk
 
-top_builddir = ../..
-INSTALL = $(top_builddir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../ -I../common -I../util $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util $(RUDIMENTSINCLUDES)
 
 SRCS = sqlrconnection.C connection/connectioncmdline.C connection/ipc.C connection/listenercomm.C connection/scalercomm.C connection/unixsocketseqfile.C sqlrcursor.C
 NLOBJS = sqlrconnection.n.lo connection/connectioncmdline.n.lo connection/ipc.n.lo connection/listenercomm.n.lo connection/scalercomm.n.lo connection/unixsocketseqfile.n.lo sqlrcursor.n.lo
@@ -36,7 +35,7 @@ libsqlrconnection_p.la: $(SRCS) $(PLOBJS)
 
 
 install:
-	$(top_builddir)/mkinstalldirs $(libdir)
+	$(abs_srcdir)/mkinstalldirs $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrconnection.la $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) libsqlrconnection_p.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)

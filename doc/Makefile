@@ -1,24 +1,23 @@
 include ../config.mk
 
-top_srcdir = ..
-INSTALL = $(top_srcdir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
 install:
-	$(top_srcdir)/mkinstalldirs $(docdir)
-	$(top_srcdir)/mkinstalldirs $(docdir)/api
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/c
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/c++
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/perl
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/php
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/python
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/ruby
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/java
-	$(top_srcdir)/mkinstalldirs $(docdir)/css
-	$(top_srcdir)/mkinstalldirs $(docdir)/programming
-	$(top_srcdir)/mkinstalldirs $(docdir)/programming/zope
-	$(top_srcdir)/mkinstalldirs $(docdir)/gettingstarted
-	$(top_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle
-	$(top_srcdir)/mkinstalldirs $(docdir)/gettingstarted/sybase
+	$(abs_srcdir)/mkinstalldirs $(docdir)
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/c
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/c++
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/perl
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/php
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/python
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/ruby
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/java
+	$(abs_srcdir)/mkinstalldirs $(docdir)/css
+	$(abs_srcdir)/mkinstalldirs $(docdir)/programming
+	$(abs_srcdir)/mkinstalldirs $(docdir)/programming/zope
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle
+	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/sybase
 	$(INSTALL) -m 644 clientapis.html $(docdir)
 	$(INSTALL) -m 644 configuring.html $(docdir)
 	$(INSTALL) -m 644 connections.html $(docdir)
@@ -51,9 +50,9 @@ install:
 	$(INSTALL) -m 644 api/java/package-list $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/packages.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/stylesheet.css $(docdir)/api/java
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/java/com
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/java/com/firstworks
-	$(top_srcdir)/mkinstalldirs $(docdir)/api/java/com/firstworks/sqlrelay
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/java/com
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/java/com/firstworks
+	$(abs_srcdir)/mkinstalldirs $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-frame.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-summary.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-tree.html $(docdir)/api/java/com/firstworks/sqlrelay

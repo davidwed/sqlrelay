@@ -1,11 +1,10 @@
 include ../../config.mk
 
-top_builddir = ../..
-INSTALL = $(top_builddir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" -I./ -I../../ -I../common -I../util -I../api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L../util -lsqlrutil -L../api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = -L../util -lsqlrutil_p -L../api/c++/src -lsqlrclient_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+LIBS = -L$(abs_srcdir)/src/util -lsqlrutil -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = -L$(abs_srcdir)/src/util -lsqlrutil_p -L$(abs_srcdir)/src/api/c++/src -lsqlrclient_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 .SUFFIXES: .n.lo .p.lo
 
@@ -48,7 +47,7 @@ sqlrsh-debug: sqlrsh.C sqlrsh.p.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.p.lo $(DEBUGLIBS) $(READLINELIB)
 
 install:
-	$(top_builddir)/mkinstalldirs $(bindir)
+	$(abs_srcdir)/mkinstalldirs $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s query $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) query-debug $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s fields $(bindir)

@@ -1,7 +1,6 @@
 include ../../../../config.mk
 
-top_srcdir = ../../../..
-INSTALL = $(top_srcdir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
 all:
 

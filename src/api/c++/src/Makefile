@@ -1,9 +1,8 @@
 include ../../../../config.mk
 
-top_builddir = ../../../..
-INSTALL = $(top_builddir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../../ -I../include -I../../../common $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c++/include -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES)
 
 SRCS = row.C sqlrclient.C
 NLOBJS = row.n.lo sqlrclient.n.lo
@@ -33,11 +32,11 @@ libsqlrclient_p.la: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
-	$(top_builddir)/mkinstalldirs $(libdir)
+	$(abs_srcdir)/mkinstalldirs $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrclient.la $(libdir)/libsqlrclient.la
 	$(LIBTOOL) --mode=install $(INSTALL) libsqlrclient_p.la $(libdir)/libsqlrclient_p.la
 	$(LIBTOOL) --mode=finish $(libdir)
-	$(top_builddir)/mkinstalldirs $(cachedir)
+	$(abs_srcdir)/mkinstalldirs $(cachedir)
 	chmod 777 $(cachedir)
 
 uninstall:

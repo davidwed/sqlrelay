@@ -1,4 +1,5 @@
-include ../../../config.mk
+top_srcdir = ../../..
+include $(top_srcdir)/config.mk
 
 all: makefile
 	if ( test ! -r sqlrelay.o ); then \
@@ -28,7 +29,7 @@ all: makefile
 
 makefile:
 	if ( test ! -r "Makefile" ); then \
-		$(RUBY) extconf.rb --with-sqlrclient-dir=../c++ --with-rudiments-dir=$(RUDIMENTSPATH); \
+		$(RUBY) extconf.rb --with-sqlrclient-dir=$(top_srcdir)/src/api/c++ --with-rudiments-dir=$(RUDIMENTSPATH); \
 		sed -e "s/ gcc/ $(CXX)/g" -e "s/ cc/ $(CXX)/g" -e "s| ruby| $(RUBY)|g" -e "s/^CPPFLAGS = /CPPFLAGS = -I\.\.\/c++\/include /g" -e "s/-lsqlrclient/-L\.\.\/c++\/lib -lsqlrclient/g" Makefile > Makefile.new; \
 		mv Makefile.new Makefile; \
 	fi

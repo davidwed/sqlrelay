@@ -1,6 +1,11 @@
 SHELL = /bin/sh
 VPATH = @srcdir@
 
+abs_srcdir = @abs_srcdir@
+top_srcdir = $(abs_srcdir)
+abs_builddir = @abs_builddir@
+top_builddir = $(abs_builddir)
+
 SQLR_VERSION = @SQLR_VERSION@
 SONAME_VERSION_INFO = @SONAME_VERSION_INFO@
 
@@ -33,14 +38,14 @@ CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\"
 
 # link flags (-s, -static, -melf, -belf, etc.)
 LDFLAGS = @LDFLAGS@
-DEBUGLDFLAGS = @DEBUGLDFLAGS@
+DEBUGLDFLAGS = $(LDFLAGS)
 STATICLINK = @STATICLINK@
 
 # debug and optimization flags (-g, -O2, etc.)
 CXXFLAGS = -pedantic @CXXFLAGS@
 CFLAGS = -pedantic @CFLAGS@
-DEBUGCXXFLAGS = -pedantic @DEBUGCXXFLAGS@ -DSERVER_DEBUG
-DEBUGCFLAGS = -pedantic @DEBUGCFLAGS@ -DSERVER_DEBUG
+DEBUGCXXFLAGS = $(CXXFLAGS) @DEBUGCXXFLAGS@ -DSERVER_DEBUG
+DEBUGCFLAGS = $(CFLAGS) @DEBUGCFLAGS@ -DSERVER_DEBUG
 
 # libtool command
 LIBTOOL = @LIBTOOL@

@@ -1,9 +1,8 @@
 include ../../../config.mk
 
-top_builddir = ../../..
-INSTALL = $(top_builddir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
 
 .SUFFIXES: .o
 
@@ -46,10 +45,10 @@ clean:
 rebuild: clean all
 
 sql_relay.so: sql_relay.C sql_relay.o
-	$(DYNAMICAR) $@ sql_relay.o -L../c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS)
+	$(DYNAMICAR) $@ sql_relay.o -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS)
 
 install:
-	$(top_builddir)/mkinstalldirs $(PHPEXTDIR)
+	$(abs_srcdir)/mkinstalldirs $(PHPEXTDIR)
 	$(INSTALL) -s sql_relay.so $(PHPEXTDIR)
 
 uninstall:

@@ -1,12 +1,11 @@
 include ../config.mk
 
-top_srcdir = ..
-INSTALL = $(top_srcdir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
 install:
-	$(top_srcdir)/mkinstalldirs $(mandir)
-	$(top_srcdir)/mkinstalldirs $(mandir)/man1
-	$(top_srcdir)/mkinstalldirs $(mandir)/man8
+	$(abs_srcdir)/mkinstalldirs $(mandir)
+	$(abs_srcdir)/mkinstalldirs $(mandir)/man1
+	$(abs_srcdir)/mkinstalldirs $(mandir)/man8
 	$(INSTALL) -m 644 man1/fields.1 $(mandir)/man1
 	$(INSTALL) -m 644 man1/query.1 $(mandir)/man1
 	$(INSTALL) -m 644 man1/query.py.1 $(mandir)/man1

@@ -1,13 +1,12 @@
 include ../../../../config.mk
 
-top_builddir = ../../../..
-INSTALL = $(top_builddir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
 all:
 
 install:
-	$(top_builddir)/mkinstalldirs $(incdir)/sqlrelay
-	$(top_builddir)/mkinstalldirs $(incdir)/sqlrelay/private
+	$(abs_srcdir)/mkinstalldirs $(incdir)/sqlrelay
+	$(abs_srcdir)/mkinstalldirs $(incdir)/sqlrelay/private
 	$(INSTALL) -m 644 sqlrelay/sqlrclient.h $(incdir)/sqlrelay
 	$(INSTALL) -m 644 sqlrelay/private/bindvar.h $(incdir)/sqlrelay/private
 	$(INSTALL) -m 644 sqlrelay/private/column.h $(incdir)/sqlrelay/private

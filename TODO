@@ -1,4 +1,4 @@
-fix spec file
+sqlrelay-java rpm doesn't include .so files
 
 compatibility:
 	sybase 12.5

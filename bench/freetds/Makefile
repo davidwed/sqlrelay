@@ -1,7 +1,5 @@
 include ../../config.mk
 
-top_srcdir = ../..
-
 all: freetdstest
 
 clean:

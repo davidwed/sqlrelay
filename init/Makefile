@@ -1,41 +1,40 @@
 include ../config.mk
 
-top_builddir = ..
-INSTALL = $(top_builddir)/install-sh -c
+INSTALL = $(abs_srcdir)/install-sh -c
 
 initroot =
 
 install:
 ifeq ($(UNAME),Linux)
 	if ( test -d "/etc/rc.d/init.d" -a -d "/etc/sysconfig" -a -d "/var/lock/subsys" ); then \
-		$(top_builddir)/mkinstalldirs $(initroot)/etc/rc.d/init.d; \
-		$(top_builddir)/mkinstalldirs $(initroot)/etc/sysconfig; \
+		$(abs_srcdir)/mkinstalldirs $(initroot)/etc/rc.d/init.d; \
+		$(abs_srcdir)/mkinstalldirs $(initroot)/etc/sysconfig; \
 		$(INSTALL) -m 755 redhat/init.d/sqlrelay $(initroot)/etc/rc.d/init.d; \
 		$(INSTALL) -m 644 redhat/sysconfig/sqlrelay $(initroot)/etc/sysconfig; \
 	fi; \
 	if ( test -r "/etc/rc.d/rc.inet2" -a -d "/etc/rc.d" -a -d "/var/lock/subsys" ); then \
-		$(top_builddir)/mkinstalldirs $(initroot)/etc/rc.d; \
+		$(abs_srcdir)/mkinstalldirs $(initroot)/etc/rc.d; \
 		$(INSTALL) -m 755 slackware/rc.d/rc.sqlrelay $(initroot)/etc/rc.d; \
 		$(INSTALL) -m 644 slackware/sqlrelay $(initroot)/etc; \
 	fi; \
 	if ( test -r "/etc/init.d" -a -d "/var/lock" ); then \
-		$(top_builddir)/mkinstalldirs $(initroot)/etc/init.d; \
+		$(abs_srcdir)/mkinstalldirs $(initroot)/etc/init.d; \
 		$(INSTALL) -m 755 debian/init.d/sqlrelay $(initroot)/etc/init.d; \
 		$(INSTALL) -m 644 debian/sqlrelay $(initroot)/etc; \
 	fi
 endif
 ifeq ($(UNAME),NetBSD)
-	$(top_builddir)/mkinstalldirs $(initroot)/etc/rc.d
+	$(abs_srcdir)/mkinstalldirs $(initroot)/etc/rc.d
 	$(INSTALL) -m 755 netbsd/rc.d/sqlrelay $(initroot)/etc/rc.d
 	$(INSTALL) -m 644 netbsd/sqlrelay $(initroot)/etc
 endif
 ifeq ($(UNAME),FreeBSD)
-	$(top_builddir)/mkinstalldirs $(initroot)/usr/local/etc/rc.d
+	$(abs_srcdir)/mkinstalldirs $(initroot)/usr/local/etc/rc.d
 	$(INSTALL) -m 755 freebsd/rc.d/sqlrelay $(initroot)/usr/local/etc/rc.d
 	$(INSTALL) -m 644 freebsd/sqlrelay $(initroot)/etc
 endif
 ifeq ($(UNAME),SCO_SV)
-	$(top_builddir)/mkinstalldirs $(initroot)/etc/init.d
+	$(abs_srcdir)/mkinstalldirs $(initroot)/etc/init.d
 	$(INSTALL) -m 755 openserver/init.d/sqlrelay $(initroot)/etc/init.d
 	$(INSTALL) -m 644 openserver/sqlrelay $(initroot)/etc
 endif

@@ -1,4 +1,5 @@
-include ../../../../config.mk
+top_builddir = ../../../..
+include $(top_builddir)/config.mk
 
 all: makefile
 	if ( test ! -r blib/arch/auto/Firstworks/SQLRCursor/SQLRCursor.so ); then \

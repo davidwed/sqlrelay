@@ -1,11 +1,9 @@
 include ../../../config.mk
 
-top_srcdir=../../..
-
 install:
 	if ( test -n "$(HAVE_ZOPE)" -a -n "$(HAVE_PYTHON)" ); then \
 		$(RMTREE) $(ZOPEDIR)/ZSQLRelayDA; \
-		$(top_srcdir)/mkinstalldirs $(ZOPEDIR); \
+		$(abs_srcdir)/mkinstalldirs $(ZOPEDIR); \
 		cp -r ZSQLRelayDA $(ZOPEDIR); \
 		cp -r $(PYTHONDIR)/site-packages/SQLRelay $(ZOPEDIR)/ZSQLRelayDA; \
 	else \

@@ -1,4 +1,6 @@
-include ../../../../config.mk
+top_builddir = ../../../..
+include $(top_builddir)/config.mk
+
 
 all: makefile
 	if ( test ! -r blib/lib/DBD/SQLRelay.pm ); then \

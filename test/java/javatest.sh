@@ -1,8 +1,10 @@
 #!/bin/sh
 
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/firstworks/java/com/firstworks/sqlrelay
+#LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/firstworks/java/com/firstworks/sqlrelay
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/java/com/firstworks/sqlrelay
 export LD_LIBRARY_PATH
-CLASSPATH=$CLASSPATH:/usr/local/firstworks/java:./
+#CLASSPATH=$CLASSPATH:/usr/local/firstworks/java:./
+CLASSPATH=$CLASSPATH:/usr/java:./
 export CLASSPATH
 #java db2 localhost 8001 "" db2test db2test
 #java freetds localhost 8002 "" freetdstest freetdstest
