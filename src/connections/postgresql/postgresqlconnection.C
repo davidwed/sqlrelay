@@ -189,6 +189,8 @@ void	postgresqlcursor::returnColumnInfo() {
 				type=CHAR_DATATYPE;
 			} else if ((int)pgfieldtype==1043) {
 				type=VARCHAR_DATATYPE;
+			} else if ((int)pgfieldtype==25) {
+				type=TEXT_DATATYPE;
 			} else if ((int)pgfieldtype==1082) {
 				type=DATE_DATATYPE;
 			} else if ((int)pgfieldtype==1083) {
