@@ -35,7 +35,7 @@ class freetdscursor : public sqlrcursor {
 		int	prepareQuery(const char *query, long length);
 
 		// this code is here in case freetds ever supports bind vars
-		/*int	inputBindString(const char *variable,
+		int	inputBindString(const char *variable,
 						unsigned short variablesize,
 						const char *value,
 						unsigned short valuesize,
@@ -52,7 +52,7 @@ class freetdscursor : public sqlrcursor {
 						unsigned short variablesize,
 						char *value, 
 						unsigned short valuesize, 
-						short *isnull);*/
+						short *isnull);
 
 		int	executeQuery(const char *query, long length,
 					unsigned short execute);
@@ -81,8 +81,8 @@ class freetdscursor : public sqlrcursor {
 		int		totalrows;
 
 		// this code is here in case freetds ever supports bind vars
-		/*CS_DATAFMT	parameter[MAX_BIND_VARS];
-		int		paramindex;*/
+		CS_DATAFMT	parameter[MAX_BIND_VARS];
+		int		paramindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
 		char		data[MAX_SELECT_LIST_SIZE]

@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int	getConnections(sqlrconfigfile *cfgfile) {
+int getConnections(sqlrconfigfile *cfgfile) {
 	int	connections=cfgfile->getConnections();
 	if (connections==0) {
 		connections=1;
@@ -23,7 +23,7 @@ int	getConnections(sqlrconfigfile *cfgfile) {
 	return connections;
 }
 
-int	startListener(const char *id, const char *config,
+bool startListener(const char *id, const char *config,
 			const char *localstatedir, int listenerdebug) {
 
 	// start the listener
@@ -44,7 +44,7 @@ int	startListener(const char *id, const char *config,
 	}
 	printf("  %s\n",command.getString());
 
-	int	success=(system(command.getString())==0);
+	bool	success=!system(command.getString());
 
 	if (!success) {
 		printf("\nsqlr-listener failed to start.\n");
@@ -56,7 +56,7 @@ int	startListener(const char *id, const char *config,
 }
 
 
-int	startConnection(int strace, const char *dbase,
+bool startConnection(int strace, const char *dbase,
 				const char *id, const char *connectionid,
 				const char *config, const char *localstatedir,
 				int connectiondebug) {
@@ -83,7 +83,7 @@ int	startConnection(int strace, const char *dbase,
 
 	printf("  %s\n",command.getString());
 
-	int	success=(system(command.getString())==0);
+	bool	success=!system(command.getString());
 
 	if (!success) {
 		printf("\nsqlr-connection-%s failed to start.\n",dbase);
@@ -92,7 +92,7 @@ int	startConnection(int strace, const char *dbase,
 	return success;
 }
 
-int	startConnections(sqlrconfigfile *cfgfile, int strace,
+bool startConnections(sqlrconfigfile *cfgfile, int strace,
 				const char *id, const char *config,
 				const char *localstatedir,
 				int connectiondebug) {
@@ -103,7 +103,7 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 
 	// if the metrictotal was 0, start no connections
 	if (!cfgfile->getMetricTotal()) {
-		return 1;
+		return true;
 	}
 
 	// if no connections were defined in the config file,
@@ -122,7 +122,7 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 	int	metric=0;
 	int	startup=0;
 	int	totalstarted=0;
-	int	done=0;
+	bool	done=false;
 	while (!done) {
 
 		// get the appropriate connection
@@ -143,7 +143,7 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 		// keep from starting too many connections
 		if (totalstarted+startup>connections) {
 			startup=connections-totalstarted;
-			done=1;
+			done=true;
 		}
 
 		printf("\nStarting %d connections to ",startup);
@@ -154,7 +154,7 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 			if (!startConnection(strace,cfgfile->getDbase(),
 					id,csc->getConnectionId(),
 					config,localstatedir,connectiondebug)) {
-				return 0;
+				return false;
 			}
 			sleep(1);
 		}
@@ -162,21 +162,21 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 		// have we started enough connections?
 		totalstarted=totalstarted+startup;
 		if (totalstarted==connections) {
-			done=1;
+			done=true;
 		}
 
 		// next...
 		csn=csn->getNext();
 	}
-	return 1;
+	return true;
 }
 
-int	startScaler(sqlrconfigfile *cfgfile, char *id, char *config,
+bool startScaler(sqlrconfigfile *cfgfile, char *id, char *config,
 				char *localstatedir, int connectiondebug) {
 
 	// don't start the scalar if unless dynamic scaling is enabled
 	if (!cfgfile->getDynamicScaling()) {
-		return 1;
+		return true;
 	}
 
 	printf("\nStarting scaler:\n");
@@ -192,7 +192,7 @@ int	startScaler(sqlrconfigfile *cfgfile, char *id, char *config,
 	}
 	printf("  %s\n",command.getString());
 
-	int	success=(system(command.getString())==0);
+	bool	success=!system(command.getString());
 
 	if (!success) {
 		printf("\nsqlr-scaler failed to start.\n");
@@ -201,7 +201,7 @@ int	startScaler(sqlrconfigfile *cfgfile, char *id, char *config,
 	return success;
 }
 
-int	startCacheManager(char *localstatedir) {
+bool startCacheManager(char *localstatedir) {
 
 	// create a ps command that will detect if the cachemanager is running
 	stringbuffer	command;
@@ -231,18 +231,18 @@ int	startCacheManager(char *localstatedir) {
 		}
 		printf("  %s\n",command.getString());
 
-		int	success=(system(command.getString())==0);
+		bool	success=!system(command.getString());
 
 		if (!success) {
 			printf("\nsqlr-cachemanager failed to start.\n");
-			return 0;
+			return false;
 		}
 	
 	} else {
 		printf("\ncache manager already running.\n");
 	}
 
-	return 1;
+	return true;
 }
 
 int	main(int argc, const char **argv) {

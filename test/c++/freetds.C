@@ -107,11 +107,13 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
-	checkSuccess(cur->affectedRows(),-1);
+	checkSuccess(cur->affectedRows(),1);
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
-	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+con->debugOn();
+	//cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+	cur->prepareQuery("insert into testtable values (@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14)");
 	cur->inputBind("1",2);
 	cur->inputBind("2",2);
 	cur->inputBind("3",2);

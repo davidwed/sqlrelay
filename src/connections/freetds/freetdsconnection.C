@@ -198,7 +198,11 @@ int	freetdsconnection::logIn() {
 
 void	freetdsconnection::logInError(const char *error, int stage) {
 
-	fprintf(stderr,"%s",error);
+	fprintf(stderr,"%s\n",error);
+
+	if (errorstring) {
+		fprintf(stderr,"%s\n",errorstring->getString());
+	}
 
 	if (stage>5) {
 		cs_loc_drop(context,locale);
@@ -281,8 +285,10 @@ int	freetdscursor::openCursor(int id) {
 
 int	freetdscursor::prepareQuery(const char *query, long length) {
 
-	// this code is here just in case freetds ever supports bind vars
-	//paramindex=0;
+	// FreeTDS version 0.62 and greater support bind variables
+	if (tdsversion>=0.62) {
+		paramindex=0;
+	}
 
 	if (cmd) {
 		ct_cmd_drop(cmd);
@@ -290,18 +296,27 @@ int	freetdscursor::prepareQuery(const char *query, long length) {
 	if (ct_cmd_alloc(freetdsconn->dbconn,&cmd)!=CS_SUCCEED) {
 		return 0;
 	}
-	return 1;
 
-	// if freetds ever supports bind vars, the ct_command 
-	// call needs to be moved here
+	// FreeTDS version 0.62 and greater support bind variables
+	if (tdsversion>=0.62) {
+		if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)query,length,
+						CS_UNUSED)!=CS_SUCCEED) {
+			return 0;
+		}
+	}
+	return 1;
 }
 
-// this code is here just in case freetds ever supports bind vars
-/*int	freetdscursor::inputBindString(const char *variable,
+int	freetdscursor::inputBindString(const char *variable,
 						unsigned short variablesize,
 						const char *value,
 						unsigned short valuesize,
 						short *isnull) {
+
+	// FreeTDS version 0.62 and greater support bind variables
+	if (tdsversion<0.62) {
+		return 1;
+	}
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
@@ -331,6 +346,11 @@ int	freetdscursor::inputBindLong(const char *variable,
 						unsigned short variablesize,
 						unsigned long *value) {
 
+	// FreeTDS version 0.62 and greater support bind variables
+	if (tdsversion<0.62) {
+		return 1;
+	}
+
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -358,6 +378,11 @@ int	freetdscursor::inputBindDouble(const char *variable,
 						unsigned short precision,
 						unsigned short scale) {
 
+	// FreeTDS version 0.62 and greater support bind variables
+	if (tdsversion<0.62) {
+		return 1;
+	}
+
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -381,7 +406,7 @@ int	freetdscursor::inputBindDouble(const char *variable,
 	return 1;
 }
 
-int	freetdsconnection::outputBindString(const char *variable, 
+int	freetdscursor::outputBindString(const char *variable, 
 						unsigned short variablesize,
 						char *value, 
 						unsigned short valuesize, 
@@ -389,7 +414,7 @@ int	freetdsconnection::outputBindString(const char *variable,
 
 	// this code is here in case SQL Relay ever supports rpc commands
 
-	(CS_VOID)memset(&parameter[paramindex],0,
+	/*(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
@@ -406,14 +431,12 @@ int	freetdsconnection::outputBindString(const char *variable,
 			(CS_VOID *)value,valuesize,0)!=CS_SUCCEED) {
 		return 0;
 	}
-	paramindex++;
+	paramindex++;*/
 	return 1;
-}*/
+}
 
 int	freetdscursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
-
-	returnedcolumns=0;
 
 	// clear out any errors
 	if (freetdsconn->errorstring) {
@@ -422,24 +445,26 @@ int	freetdscursor::executeQuery(const char *query, long length,
 		freetdsconn->errorstring=NULL;
 	}
 
-	// if freetds ever supports bind vars, the ct_command call
-	// needs to be moved up into prepareQuery()
-	
-	// since freetds doesn't currently support bind vars, fake them
-	stringbuffer	*newquery=fakeInputBinds(query);
+	// FreeTDS version 0.62 and greater support bind variables
+	if (tdsversion<0.62) {
+		stringbuffer	*newquery=fakeInputBinds(query);
 
-	// initiate a language command
-	if (newquery) {
-		if (ct_command(cmd,CS_LANG_CMD,newquery->getString(),
-			strlen(newquery->getString()),CS_UNUSED)!=CS_SUCCEED) {
+		// initiate a language command
+		if (newquery) {
+			if (ct_command(cmd,CS_LANG_CMD,
+					newquery->getString(),
+					strlen(newquery->getString()),
+					CS_UNUSED)!=CS_SUCCEED) {
+				delete newquery;
+				return 0;
+			}
 			delete newquery;
-			return 0;
-		}
-		delete newquery;
-	} else {
-		if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)query,length,
-						CS_UNUSED)!=CS_SUCCEED) {
-			return 0;
+		} else {
+			if (ct_command(cmd,CS_LANG_CMD,
+					(CS_CHAR *)query,length,
+					CS_UNUSED)!=CS_SUCCEED) {
+				return 0;
+			}
 		}
 	}
 
@@ -475,9 +500,9 @@ int	freetdscursor::executeQuery(const char *query, long length,
 	// Affected row count is only supported in FreeTDS version>=0.53, but
 	// it appears to be broken in 0.61 too (and possibly others).
 	if (tdsversion<0.53 && tdsversion!=0.61) {
-		affectedrows=-1;
-	} else {
 		affectedrows=0;
+	} else {
+		affectedrows=-1;
 	}
 	if (results_type==CS_ROW_RESULT) {
 		if (ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
@@ -587,8 +612,6 @@ void	freetdscursor::returnColumnCount() {
 void	freetdscursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
-
-	returnedcolumns=1;
 
 	// unless the query was a successful select, send no header
 	if (results_type!=CS_ROW_RESULT) {

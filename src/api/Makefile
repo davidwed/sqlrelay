@@ -4,6 +4,7 @@ all:
 	$(MAKE) -C c++ all
 	$(MAKE) -C c all
 	$(MAKE) -C postgresql all
+	$(MAKE) -C mysql all
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python all
 endif
@@ -29,6 +30,7 @@ clean:
 	$(MAKE) -C c++ clean
 	$(MAKE) -C c clean
 	$(MAKE) -C postgresql clean
+	$(MAKE) -C mysql clean
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python clean
 endif
@@ -55,6 +57,7 @@ rebuild:
 	$(MAKE) -C c++ rebuild
 	$(MAKE) -C c rebuild
 	$(MAKE) -C postgresql rebuild
+	$(MAKE) -C mysql rebuild
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python rebuild
 endif
@@ -80,6 +83,7 @@ install:
 	$(MAKE) -C c++ install
 	$(MAKE) -C c install
 	$(MAKE) -C postgresql install
+	$(MAKE) -C mysql install
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python install
 endif
@@ -108,6 +112,7 @@ uninstall:
 	$(MAKE) -C c++ uninstall
 	$(MAKE) -C c uninstall
 	$(MAKE) -C postgresql uninstall
+	$(MAKE) -C mysql uninstall
 ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python uninstall
 endif
