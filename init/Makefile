@@ -2,6 +2,8 @@ top_builddir = ..
 
 include ../config.mk
 
+.PHONY: install uninstall
+
 UID = $(shell id | grep "uid=0" )
 
 ifneq ($(UID),)

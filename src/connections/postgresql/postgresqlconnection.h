@@ -8,6 +8,10 @@
 
 #include <sqlrconnection.h>
 
+#ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
+	#include <rudiments/file.h>
+#endif
+
 #include <libpq-fe.h>
 
 class postgresqlconnection;
@@ -72,7 +76,7 @@ class postgresqlconnection : public sqlrconnection {
 			postgresqlconnection();
 			~postgresqlconnection();
 	private:
-		int	devnull;
+		file	devnull;
 #endif
 };
 

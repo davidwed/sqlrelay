@@ -2,6 +2,8 @@ top_builddir = ..
 
 include ../config.mk
 
+.PHONY: install uninstall
+
 install:
 	$(MKINSTALLDIRS) $(bindir)
 	$(INSTALL) backupschema $(bindir)

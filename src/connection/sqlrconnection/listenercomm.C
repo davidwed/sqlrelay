@@ -3,12 +3,15 @@
 
 #include <sqlrconnection.h>
 #include <rudiments/sleep.h>
+#include <rudiments/process.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+// for sprintf
 #include <stdio.h>
-#include <netinet/in.h>
+
+// for alarm
+#ifdef HAVE_UNISTD_H
+	#include <unistd.h>
+#endif
 
 #include <defines.h>
 
@@ -73,7 +76,7 @@ void sqlrconnection::announceAvailability(const char *tmpdir,
 
 		// write the pid into the segment
 		idmemoryptr->connectioninfo.connectionpid=
-						(unsigned long)getpid();
+					(unsigned long)process::getProcessId();
 
 	} else {
 
@@ -133,7 +136,8 @@ void sqlrconnection::registerForHandoff(const char *tmpdir) {
 
 		if (handoffsockun.connect(handoffsockname,-1,-1,1,0)==
 							RESULT_SUCCESS) {
-			if (handoffsockun.write((unsigned long)getpid())==
+			if (handoffsockun.write(
+				(unsigned long)process::getProcessId())==
 							sizeof(unsigned long)) {
 				connected=true;
 				break;
@@ -178,7 +182,7 @@ void sqlrconnection::deRegisterForHandoff(const char *tmpdir) {
 	// attach to the socket and write the process id
 	unixclientsocket	removehandoffsockun;
 	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
-	removehandoffsockun.write((unsigned long)getpid());
+	removehandoffsockun.write((unsigned long)process::getProcessId());
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done de-registering for handoff");

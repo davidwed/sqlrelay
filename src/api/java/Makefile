@@ -2,6 +2,8 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
+.PHONY: all clean java rebuild install uninstall
+
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
 RPATH =
 ifneq ($(strip $(libdir)),)

@@ -6,8 +6,6 @@
 
 #define NUM_CONNECT_STRING_VARS 1
 
-#include <pthread.h>
-
 #include <sqlrconnection.h>
 
 extern "C" {

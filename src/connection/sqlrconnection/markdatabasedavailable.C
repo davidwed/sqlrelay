@@ -6,9 +6,6 @@
 
 #include <rudiments/permissions.h>
 #include <rudiments/file.h>
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
 
 void sqlrconnection::markDatabaseAvailable() {
 
@@ -33,5 +30,5 @@ void sqlrconnection::markDatabaseUnavailable() {
 	#endif
 
 	// the database is down if the file isn't there
-	unlink(updown);
+	file::remove(updown);
 }

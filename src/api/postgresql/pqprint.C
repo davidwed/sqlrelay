@@ -13,25 +13,14 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 */
 
 #include <pqdefinitions.h>
-
-#include <signal.h>
+#include <rudiments/charstring.h>
 
 #ifdef WIN32
 #include "win32.h"
 #else
+// for isatty()
 #include <unistd.h>
-#include <sys/ioctl.h>
 #endif
-
-//#ifdef HAVE_TERMIOS_H
-#include <termios.h>
-//#else
-#ifndef WIN32
-#include <sys/termios.h>
-#endif
-//#endif
-
-#include <string.h>
 
 extern "C" {
 
@@ -123,7 +112,7 @@ PQprint(FILE *fout,
 		const char **fieldNames;
 		int			fieldMaxLen = 0;
 		int			numFieldName;
-		int			fs_len = strlen(po->fieldSep);
+		int			fs_len = charstring::length(po->fieldSep);
 		int			total_line_length = 0;
 		int			usePipe = 0;
 		//pqsigfunc	oldsigpipehandler = NULL;
@@ -167,7 +156,7 @@ PQprint(FILE *fout,
 			po->fieldName[j] : PQfname(res, j);
 
 			fieldNames[j] = s;
-			len = s ? strlen(s) : 0;
+			len = s ? charstring::length(s) : 0;
 			fieldMax[j] = len;
 			len += fs_len;
 			if (len > fieldMaxLen)
@@ -175,7 +164,7 @@ PQprint(FILE *fout,
 			total_line_length += len;
 		}
 
-		total_line_length += nFields * strlen(po->fieldSep) + 1;
+		total_line_length += nFields * charstring::length(po->fieldSep) + 1;
 
 		if (fout == NULL)
 			fout = stdout;
@@ -191,7 +180,7 @@ PQprint(FILE *fout,
 			 * If we think there'll be more than one screen of output, try
 			 * to pipe to the pager program.
 			 */
-#ifdef TIOCGWINSZ
+/*#ifdef TIOCGWINSZ
 			if (ioctl(fileno(stdout), TIOCGWINSZ, &screen_size) == -1 ||
 				screen_size.ws_col == 0 ||
 				screen_size.ws_row == 0)
@@ -199,10 +188,10 @@ PQprint(FILE *fout,
 				screen_size.ws_row = 24;
 				screen_size.ws_col = 80;
 			}
-#else
+#else*/
 			screen_size.ws_row = 24;
 			screen_size.ws_col = 80;
-#endif
+//#endif
 			pagerenv = getenv("PAGER");
 			if (pagerenv != NULL &&
 				pagerenv[0] != '\0' &&
@@ -261,7 +250,7 @@ PQprint(FILE *fout,
 					const char *s = fieldNames[j];
 
 					fputs(s, fout);
-					len += strlen(s) + fs_len;
+					len += charstring::length(s) + fs_len;
 					if ((j + 1) < nFields)
 						fputs(po->fieldSep, fout);
 				}
@@ -422,7 +411,7 @@ do_field(const PQprintOpt *po, const PGresult *res,
 				perror("malloc");
 				exit(1);
 			}
-			strcpy(fields[i * nFields + j], pval);
+			charstring::copy(fields[i * nFields + j], pval);
 		}
 		else
 		{
@@ -531,7 +520,7 @@ do_header(FILE *fout, const PQprintOpt *po, const int nFields, int *fieldMax,
 		}
 		else
 		{
-			int			n = strlen(s);
+			int			n = charstring::length(s);
 
 			if (n > fieldMax[j])
 				fieldMax[j] = n;
@@ -633,7 +622,7 @@ PQdisplayTuples(const PGresult *res,
 		fLength = (int *) malloc(nFields * sizeof(int));
 		for (j = 0; j < nFields; j++)
 		{
-			fLength[j] = strlen(PQfname(res, j));
+			fLength[j] = charstring::length(PQfname(res, j));
 			for (i = 0; i < nTuples; i++)
 			{
 				int			flen = PQgetlength(res, i, j);
@@ -651,7 +640,7 @@ PQdisplayTuples(const PGresult *res,
 		{
 			fputs(PQfname(res, i), fp);
 			if (fillAlign)
-				fill(strlen(PQfname(res, i)), fLength[i], ' ', fp);
+				fill(charstring::length(PQfname(res, i)), fLength[i], ' ', fp);
 			fputs(fieldSep, fp);
 		}
 		fprintf(fp, "\n");
@@ -673,7 +662,7 @@ PQdisplayTuples(const PGresult *res,
 		{
 			fprintf(fp, "%s", PQgetvalue(res, i, j));
 			if (fillAlign)
-				fill(strlen(PQgetvalue(res, i, j)), fLength[j], ' ', fp);
+				fill(charstring::length(PQgetvalue(res, i, j)), fLength[j], ' ', fp);
 			fputs(fieldSep, fp);
 		}
 		fprintf(fp, "\n");

@@ -5,13 +5,15 @@
 #include <rudiments/commandline.h>
 #include <rudiments/sleep.h>
 #include <rudiments/charstring.h>
+#include <rudiments/datetime.h>
+#include <rudiments/file.h>
+#include <rudiments/directory.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-
 #include <config.h>
 
 dirnode::dirnode(const char *dirname) {
@@ -63,13 +65,7 @@ void cachemanager::scan() {
 	// detach from the controlling tty
 	detach();
 
-	// some useful vars
-	DIR	*dir;
-	#ifdef HAVE_DIRENT_H
-		dirent	*current;
-	#else
-		direct	*current;
-	#endif
+	directory	dir;
 
 	for (;;) {
 
@@ -79,21 +75,26 @@ void cachemanager::scan() {
 		while (currentdir) {
 
 			// open directory
-			if ((dir=opendir(currentdir->dirname))) {
+			if (dir.open(currentdir->dirname)) {
 
 				// loop through directory, erasing
-				while ((current=readdir(dir))) {
-					if (charstring::compare(
-							current->d_name,".") &&
-						charstring::compare(
-							current->d_name,"..")) {
-						erase(currentdir->dirname,
-							current->d_name);
+				unsigned long	index=0;
+				for (;;) {
+					char	*name=dir.getChildName(index);
+					if (!name) {
+						break;
 					}
+					if (charstring::compare(
+							name,".") &&
+						charstring::compare(
+							name,"..")) {
+						erase(currentdir->dirname,name);
+					}
+					delete[] name;
 				}
 
 				// close the directory
-				closedir(dir);
+				dir.close();
 			}
 
 			// move to the next dir in the list
@@ -101,7 +102,7 @@ void cachemanager::scan() {
 		}
 
 		// wait...
-		rudiments::sleep::macrosleep(scaninterval);
+		sleep::macrosleep(scaninterval);
 	}
 
 }
@@ -114,26 +115,28 @@ void cachemanager::erase(const char *dirname, const char *filename) {
 	sprintf(fullpathname,"%s/%s",dirname,filename);
 
 	// open the file
-	int	file=open(fullpathname,O_RDONLY);
-	if (file>-1) {
+	file	fl;
+	if (fl.open(fullpathname,O_RDONLY)) {
 
 		// get the "magic" identifier
 		char	magicid[13];
-		read(file,(void *)magicid,13);
+		fl.read(magicid,13);
 		if (!charstring::compare(magicid,"SQLRELAYCACHE",13)) {
 
 			// get the ttl
 			long ttl;
-			read(file,(void *)&ttl,sizeof(long));
+			fl.read(&ttl);
 	
-			close(file);
+			fl.close();
 	
 			// delete the file if the ttl has expired
-			if (ttl<time(NULL)) {
-				unlink(fullpathname);
+			datetime	dt;
+			dt.getSystemDateAndTime();
+			if (ttl<dt.getEpoch()) {
+				file::remove(fullpathname);
 			}
 		} else {
-			close(file);
+			fl.close();
 		}
 
 	}

@@ -1,18 +1,15 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sys/types.h>
-#include <unistd.h>
-
 #include <interbaseconnection.h>
 
 #include <config.h>
 #include <datatypes.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+// for pow()
 #include <math.h>
-#include <time.h>
+
+#include <stdlib.h>
 
 interbaseconnection::interbaseconnection() {
 	db=0L;

@@ -5,8 +5,6 @@
 
 #include <sqlrconnection.h>
 
-#include <unistd.h>
-
 bool sqlrcursor::queryIsNotSelect() {
 
 	// scan the query, bypassing whitespace and comments.

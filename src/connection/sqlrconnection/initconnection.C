@@ -7,11 +7,6 @@
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
 
-#include <sys/types.h>
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
-
 bool sqlrconnection::initConnection(int argc, const char **argv,
 						bool detachbeforeloggingin) {
 

@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
-#include <errno.h>
+#include <rudiments/error.h>
 
 bool sqlrconnection::openSession() {
 
@@ -125,7 +125,7 @@ bool sqlrconnection::openSession() {
 				debugPreStart();
 				debugPrint("ERROR:\n");
 				debugPrint("connection to unix port failed: ");
-				debugPrint(strerror(errno));
+				debugPrint(error::getErrorString());
 				debugPrint("\n");
 				debugPreEnd();
 			}
@@ -158,7 +158,7 @@ bool sqlrconnection::openSession() {
 				debugPreStart();
 				debugPrint("ERROR:\n");
 				debugPrint("connection to inet port failed: ");
-				debugPrint(strerror(errno));
+				debugPrint(error::getErrorString());
 				debugPrint("\n");
 				debugPreEnd();
 			}

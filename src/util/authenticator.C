@@ -1,8 +1,5 @@
-// Copyright (c) 2001  David Muse
+// Copyright (c) 2000-2005  David Muse
 // See the file COPYING for more information
-
-#include <sys/types.h>
-#include <unistd.h>
 
 #include <defaults.h>
 

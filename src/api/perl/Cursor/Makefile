@@ -2,6 +2,8 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
+.PHONY: all clean rebuild install uninstall
+
 PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
 PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
 PERLINSTALLARCHLIB = $(DESTDIR)$(shell eval "`$(PERL) -V:installarchlib`"; export installarchlib; echo $$installarchlib | sed -e "s|UNKNOWN||g" )

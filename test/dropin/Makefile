@@ -2,6 +2,8 @@ top_builddir = ../..
 
 include ../../config.mk
 
+.PHONY: all clean rebuild
+
 .SUFFIXES: .lo
 
 all:

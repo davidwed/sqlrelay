@@ -2,6 +2,8 @@ top_builddir = ..
 
 include ../config.mk
 
+.PHONY: install uninstall
+
 install:
 	$(MKINSTALLDIRS) $(sysconfdir)
 	$(INSTALL) -m 644 sqlrelay.conf.example $(sysconfdir)

@@ -1,17 +1,11 @@
-// Copyright (c) 2000-2001  David Muse
+// Copyright (c) 2000-2005  David Muse
 // See the file COPYING for more information
 
 #include <config.h>
 #include <sqlrconfigfile.h>
 #include <rudiments/stringbuffer.h>
 
-#include <stdio.h>
 #include <stdlib.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 #include <defines.h>
 #include <defaults.h>

@@ -8,19 +8,6 @@
 #include <defaults.h>
 #include <rudiments/daemonprocess.h>
 
-#include <time.h>
-#include <stdlib.h>
-#include <unistd.h>
-#if defined(HAVE_DIRENT_H)
-	#include <dirent.h>
-#elif defined(HAVE_DIR_H)
-	#include <dir.h>
-#elif defined(HAVE_NDIR_H)
-	#include <ndir.h>
-#elif defined(HAVE_SYS_NDIR_H)
-	#include <sys/ndir.h>
-#endif
-
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif

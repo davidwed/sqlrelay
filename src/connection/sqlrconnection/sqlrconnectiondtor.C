@@ -3,10 +3,7 @@
 
 #include <config.h>
 #include <sqlrconnection.h>
-
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
+#include <rudiments/file.h>
 
 sqlrconnection::~sqlrconnection() {
 
@@ -45,7 +42,7 @@ sqlrconnection::~sqlrconnection() {
 	debugPrint("connection",0,"deleting unixsocket...");
 	#endif
 	if (unixsocket) {
-		unlink(unixsocket);
+		file::remove(unixsocket);
 		delete[] unixsocket;
 	}
 	#ifdef SERVER_DEBUG

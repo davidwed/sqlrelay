@@ -1,7 +1,11 @@
+// Copyright (c) 2000-2005  David Muse
+// See the file COPYING for more information
+
 #include <defaults.h>
 #include <cmdline.h>
-#include <stdlib.h>
 #include <config.h>
+
+// for fprintf()
 #include <stdio.h>
 
 cmdline::cmdline(int argc, const char **argv) : commandline(argc,argv) {

@@ -4,6 +4,11 @@
 #include <cachemanager.h>
 
 #include <rudiments/charstring.h>
+
+// for exit()
+#include <stdlib.h>
+
+// for printf() in version.h
 #include <stdio.h>
 
 cachemanager	*cacheman;

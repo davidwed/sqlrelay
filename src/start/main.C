@@ -7,7 +7,9 @@
 #include <cmdline.h>
 #include <rudiments/sleep.h>
 
+// for ceil()
 #include <math.h>
+
 #include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE

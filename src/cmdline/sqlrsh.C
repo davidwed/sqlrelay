@@ -8,14 +8,12 @@
 #include <rudiments/commandline.h>
 #include <rudiments/file.h>
 #include <sqlrconfigfile.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+// for clock()
 #include <time.h>
+
+// for printf, fflush
+#include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;

@@ -1,12 +1,12 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.9 2005-01-19 06:09:51 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.10 2005-02-24 02:52:18 mused Exp $
  */
 
-#include <strings.h>
 #include <tcl.h>
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/charstring.h>
 
 #include "tclincludes.h"
 
@@ -417,11 +417,11 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  return TCL_ERROR;
 	} else {
 	  char *subopts = Tcl_GetString(objv[2]);
-	  if (strncasecmp(subopts, "mixed", 5) == 0) {
+	  if (charstring::compareIgnoringCase(subopts, "mixed", 5) == 0) {
 	    cur->mixedCaseColumnNames();
-	  } else if (strncasecmp(subopts, "upper", 5) == 0) {
+	  } else if (charstring::compareIgnoringCase(subopts, "upper", 5) == 0) {
 	    cur->upperCaseColumnNames();
-	  } else if (strncasecmp(subopts, "lower", 5) == 0) {
+	  } else if (charstring::compareIgnoringCase(subopts, "lower", 5) == 0) {
 	    cur->lowerCaseColumnNames();
 	  } else {
 	    Tcl_AppendResult(interp, "bad option \"", subopts, "\": must be mixed, upper, or lower", (char *)NULL);
@@ -1898,16 +1898,16 @@ int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
     }
   }
 
-  if (strncmp("",server,1) == 0 && strncmp("", socket, 1) == 0) {
+  if (charstring::compare("",server,1) == 0 && charstring::compare("", socket, 1) == 0) {
     Tcl_AppendResult(interp, 
 		     "-server name or -socket name required", (char *)NULL);
     return TCL_ERROR;
   }
-  if (strncmp("", user, 1) == 0) {
+  if (charstring::compare("", user, 1) == 0) {
     Tcl_AppendResult(interp, "-user username required", (char *)NULL);
     return TCL_ERROR;
   }
-  if (strncmp("", password, 1) == 0) {
+  if (charstring::compare("", password, 1) == 0) {
     Tcl_AppendResult(interp, "-password password required", (char *)NULL);
     return TCL_ERROR;
   }

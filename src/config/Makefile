@@ -2,6 +2,8 @@ top_builddir = ../..
 
 include ../../config.mk
 
+.PHONY: all clean rebuild install uninstall
+
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) `$(GTKCONFIG) --cflags`
 #CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -I/usr/include/gtk-2.0 -I/usr/include/glib-2.0 -I/usr/X11R6/include
 LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)

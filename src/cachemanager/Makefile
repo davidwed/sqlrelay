@@ -2,6 +2,8 @@ top_builddir = ../..
 
 include ../../config.mk
 
+.PHONY: all clean rebuild install uninstall
+
 CPPFLAGS = $(BASECPPFLAGS) -DCACHE_DIR=\"$(cachedir)\" -I./ -I$(top_builddir) -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 LIBS = $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =

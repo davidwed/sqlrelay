@@ -12,17 +12,10 @@
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
+#include <rudiments/datetime.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/ipc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
 #endif
 
 scaler::scaler() : daemonprocess() {
@@ -232,7 +225,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 	idmemory->attach(key);
 
 	// set up random number generator
-	currentseed=time(NULL);
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	currentseed=dt.getEpoch();
 
 	// detach from the controlling tty
 	detach();
@@ -250,7 +245,7 @@ void scaler::cleanUp() {
 	delete[] id;
 
 	if (pidfile) {
-		unlink(pidfile);
+		file::remove(pidfile);
 		delete[] pidfile;
 	}
 
@@ -302,7 +297,7 @@ bool scaler::openMoreConnections() {
 				// in to it yet, so in that case, don't even
 				// test to see if the database is up or down
 				if (connections && !availableDatabase()) {
-					rudiments::sleep::macrosleep(1);
+					sleep::macrosleep(1);
 					continue;
 				}
 

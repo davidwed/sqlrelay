@@ -4,9 +4,6 @@
 #include <config.h>
 #include <sqlrconnection.h>
 
-#include <sys/types.h>
-#include <unistd.h>
-
 bool sqlrconnection::authenticateCommand() {
 
 	#ifdef SERVER_DEBUG

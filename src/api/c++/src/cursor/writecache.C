@@ -4,7 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/permissions.h>
-#include <time.h>
+#include <rudiments/datetime.h>
 #include <defines.h>
 #include <datatypes.h>
 
@@ -80,7 +80,9 @@ void sqlrcursor::startCaching() {
 			cachedestind->write("SQLRELAYCACHE",13);
 			
 			// write ttl to files
-			long	expiration=time(NULL)+cachettl;
+			datetime	dt;
+			dt.getSystemDateAndTime();
+			long	expiration=dt.getEpoch()+cachettl;
 			cachedest->write(expiration);
 			cachedestind->write(expiration);
 		}

@@ -2,6 +2,8 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
+.PHONY: all clean rebuild install uninstall
+
 RUBYCFLAGS = $(shell $(RUBY) getcflags.rb | sed -e "s|-mtune=pentium4||g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 
 ifeq ($(shell $(RUBY) getsitearchdir.rb | grep -c DESTDIR),0)

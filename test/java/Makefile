@@ -2,6 +2,8 @@ top_builddir = ../..
 
 include ../../config.mk
 
+.PHONY: all clean rebuild.class
+
 all:
 ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) db2.class

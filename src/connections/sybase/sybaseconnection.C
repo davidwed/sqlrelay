@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #ifdef __GNUC__
 stringbuffer	*sybaseconnection::errorstring;

@@ -2,6 +2,8 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
+.PHONY: all clean rebuild install uninstall
+
 PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e "s|UNKNOWN||g" )
 PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e "s|UNKNOWN||g" )
 PERLSITEARCH = $(DESTDIR)$(shell eval "`$(PERL) -V:sitearch`"; export sitearch; echo $$sitearch | sed -e "s|UNKNOWN||g" )

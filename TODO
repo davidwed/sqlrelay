@@ -1,3 +1,7 @@
+fix src/connection/sqlrconnection/unixsocketseqfile.C to use file class
+
+--------------------------------------------------------------------------------
+
 don't just toggle TCP_NODELAY to flush write buffer, redesign protocol so it
 	doesn't do so many write()'s or read()'s
 

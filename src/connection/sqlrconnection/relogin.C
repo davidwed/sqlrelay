@@ -3,11 +3,7 @@
 
 #include <config.h>
 #include <sqlrconnection.h>
-//#include <rudiments/sleep.h>
-
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
+#include <rudiments/sleep.h>
 
 void sqlrconnection::reLogIn() {
 
@@ -34,8 +30,7 @@ void sqlrconnection::reLogIn() {
 				break;
 			}
 		}
-		//sleep::macrosleep(5);
-		sleep(5);
+		sleep::macrosleep(5);
 	}
 
 	#ifdef SERVER_DEBUG

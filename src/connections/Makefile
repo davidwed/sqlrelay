@@ -1,5 +1,7 @@
 include ../../config.mk
 
+.PHONY: all clean rebuild install uninstall
+
 all:
 ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) -C db2 all

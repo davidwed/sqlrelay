@@ -1,5 +1,7 @@
 include ../../config.mk
 
+.PHONY: all clean rebuild
+
 all: lagotest
 
 clean:

@@ -1,3 +1,6 @@
+// Copyright (c) 2000-2005  David Muse
+// See the file COPYING for more information
+
 #include <tempdir.h>
 #include <stdio.h>
 

@@ -3,22 +3,17 @@
 
 #include <postgresqlconnection.h>
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <datatypes.h>
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 postgresqlconnection::postgresqlconnection() {
-	devnull=-1;
 }
 
 postgresqlconnection::~postgresqlconnection() {
-	close(devnull);
+	devnull.close();
 }
 #else
 static void nullNoticeProcessor(void *arg, const char *message) {
@@ -71,9 +66,9 @@ bool postgresqlconnection::logIn() {
 	// make sure that no messages get sent to the console
 	PQsetNoticeProcessor(pgconn,nullNoticeProcessor,NULL);
 #else
-	if ((devnull=open("/dev/null",O_RDONLY))>0) {
-		dup2(devnull,STDOUT_FILENO);
-		dup2(devnull,STDERR_FILENO);
+	if (devnull.open("/dev/null",O_RDONLY)) {
+		devnull.duplicate(STDOUT_FILENO);
+		devnull.duplicate(STDERR_FILENO);
 	}
 #endif
 
@@ -116,8 +111,7 @@ void postgresqlconnection::deleteCursor(sqlrcursor *curs) {
 void postgresqlconnection::logOut() {
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
-	close(devnull);
-	devnull=-1;
+	devnull.close();
 #endif
 
 	PQfinish(pgconn);

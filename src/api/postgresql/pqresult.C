@@ -14,10 +14,6 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 
 #include <pqdefinitions.h>
 #include <stdlib.h>
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
 #include <rudiments/charstring.h>
 
 #define NEED_DATATYPESTRING	1
@@ -51,8 +47,8 @@ int	queryIsNotSelect(const char *querybuffer) {
 
 	// if the query is a select but not a select into then return false,
 	// otherwise return true
-	if (!strncasecmp(ptr,"select",6) && 
-			strncasecmp(ptr,"select into ",12)) {
+	if (!charstring::compareIgnoringCase(ptr,"select",6) && 
+		charstring::compareIgnoringCase(ptr,"select into ",12)) {
 		return 0;
 	}
 	return 1;
@@ -86,7 +82,7 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 			const char	*dbtype=conn->sqlrcon->identify();
 			if (!dbtype) {
 				conn->error=new char[
-					strlen(result->sqlrcur->
+					charstring::length(result->sqlrcur->
 							errorMessage())+2];
 				sprintf(conn->error,"%s\n",
 					result->sqlrcur->errorMessage());
@@ -97,10 +93,10 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 			// FIXME: it's possible that other non-postgresql
 			// databases allow trailing semicolons
 			conn->removetrailingsemicolons=
-					(!strcmp(dbtype,"postgresql"))?0:1;
+				(!charstring::compare(dbtype,"postgresql"))?0:1;
 		}
 
-		int	length=strlen(query);
+		int	length=charstring::length(query);
 		if (conn->removetrailingsemicolons==1) {
 			while (query[length-1]==' ' ||
 				query[length-1]=='	' ||
@@ -120,7 +116,8 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 			}
 		} else {
 			conn->error=new char[
-				strlen(result->sqlrcur->errorMessage())+2];
+				charstring::length(result->
+						sqlrcur->errorMessage())+2];
 			sprintf(conn->error,"%s\n",
 				result->sqlrcur->errorMessage());
 			PQclear(result);
@@ -190,7 +187,8 @@ char *PQfname(const PGresult *res, int field_num) {
 
 int PQfnumber(const PGresult *res, const char *field_name) {
 	for (int i=0; i<res->sqlrcur->colCount(); i++) {
-		if (!strcmp(field_name,res->sqlrcur->getColumnName(i))) {
+		if (!charstring::compare(field_name,
+					res->sqlrcur->getColumnName(i))) {
 			return i;
 		}
 	}
@@ -563,7 +561,8 @@ Oid PQftype(const PGresult *res, int field_num) {
 	// if the type is not numeric, then we need to translate to a type
 	// number
 	for (int index=0; datatypestring[index]; index++) {
-		if (!strcasecmp(datatypestring[index],columntype)) {
+		if (!charstring::compareIgnoringCase(datatypestring[index],
+								columntype)) {
 			return postgresqltypemap[index];
 		}
 	}

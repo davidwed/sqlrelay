@@ -151,11 +151,13 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	deRegisterForHandoff(const char *tmpdir);
 		bool	getUnixSocket(const char *tmpdir,
 						char *unixsocketptr);
-		int	openSequenceFile(const char *tmpdir,
+		bool	openSequenceFile(file *sockseq,
+						const char *tmpdir,
 						char *unixsocketptr);
-		bool	lockSequenceFile();
-		bool	getAndIncrementSequenceNumber(char *unixsocketptr);
-		bool	unLockSequenceFile();
+		bool	lockSequenceFile(file *sockseq);
+		bool	getAndIncrementSequenceNumber(file *sockseq,
+							char *unixsocketptr);
+		bool	unLockSequenceFile(file *sockseq);
 
 
 		bool		createSharedMemoryAndSemaphores(
@@ -315,8 +317,6 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 		const char	*connectionid;
 		int		ttl;
-
-		int		sockseq;
 
 		semaphoreset	*semset;
 		sharedmemory	*idmemory;

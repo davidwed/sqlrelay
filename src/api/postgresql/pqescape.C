@@ -13,8 +13,8 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 */
 
 #include <pqdefinitions.h>
-#include <ctype.h>
-#include <string.h>
+#include <rudiments/charstring.h>
+#include <stdlib.h>
 
 extern "C" {
 
@@ -148,7 +148,7 @@ unsigned char *PQunescapeBytea(unsigned char *strtext, size_t *retbuflen) {
 	}
 
 	// will shrink, also we discover if strtext isn't NULL terminated
-	buflen=strlen((char *)strtext);
+	buflen=charstring::length((char *)strtext);
 	buffer=(unsigned char *)malloc(buflen);
 
 	if (buffer==NULL) {

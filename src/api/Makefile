@@ -1,5 +1,7 @@
 include ../../config.mk
 
+.PHONY: all clean rebuild install uninstall
+
 all:
 	$(MAKE) -C c++ all
 	$(MAKE) -C c all

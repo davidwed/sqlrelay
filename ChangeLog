@@ -40,6 +40,9 @@
 	added code which toggles TCP_NODELAY to flush data written to either
 		side of the connection here and there rather than wait on the
 		Nagle delay, improved performance over a network substantially
+	added .PHONY makefile flag, removed INSTALL -> INSTALL.txt hack
+	added /usr/sfw to configure script's search paths
+	uses rudiments error class
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

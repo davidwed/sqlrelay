@@ -3,8 +3,6 @@
 
 #include <sqlrconnection.h>
 
-#include <stdlib.h>
-
 short sqlrconnection::nonNullBindValue() {
 	return 0;
 }

@@ -1,5 +1,7 @@
 include ../config.mk
 
+.PHONY: all clean rebuild
+
 all: 
 ifneq ($(ORACLELIBS),)
 	$(MAKE) -C oracle7 all

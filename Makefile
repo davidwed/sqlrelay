@@ -2,6 +2,8 @@ top_builddir = .
 
 include config.mk
 
+.PHONY: all clean rebuild install uninstall unconfig distclean
+
 all:
 	$(MAKE) -C src all
 

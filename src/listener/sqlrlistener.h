@@ -38,7 +38,7 @@ class handoffsocketnode {
 		filedescriptor		*sock;
 };
 
-class sqlrlistener : public daemonprocess, public listener, public debugfile {
+class sqlrlistener : public daemonprocess, public listener, private debugfile {
 	public:
 			sqlrlistener();
 			~sqlrlistener();

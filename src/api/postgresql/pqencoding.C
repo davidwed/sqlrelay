@@ -13,8 +13,8 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 */
 
 #include <rudiments/environment.h>
+#include <rudiments/charstring.h>
 #include <pqdefinitions.h>
-#include <string.h>
 
 // FIXME: support encodings other than UTF8
 
@@ -22,7 +22,7 @@ extern "C" {
 
 int translateEncoding(const char *encoding) {
 	if (encoding) {
-		if (!strcmp(encoding,"UTF8")) {
+		if (!charstring::compare(encoding,"UTF8")) {
 			return PG_UTF8;
 		}
 	}

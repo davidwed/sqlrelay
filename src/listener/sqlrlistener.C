@@ -14,6 +14,7 @@
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
+#include <rudiments/error.h>
 
 // for ftok
 #include <sys/types.h>
@@ -27,11 +28,12 @@
 	#include <unistd.h>
 #endif
 
-// for errno
-#include <errno.h>
-
 #include <defines.h>
 #include <defaults.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 
@@ -409,7 +411,7 @@ void sqlrlistener::ftokError(const char *idfilename) {
 	fprintf(stderr,"\nsqlr-listener error:\n");
 	fprintf(stderr,"	Unable to generate a key from ");
 	fprintf(stderr,"%s\n",idfilename);
-	fprintf(stderr,"	Error was: %s\n\n",strerror(errno));
+	fprintf(stderr,"	Error was: %s\n\n",error::getErrorString());
 }
 
 void sqlrlistener::shmError(const char *id, int shmid) {
@@ -425,7 +427,7 @@ void sqlrlistener::shmError(const char *id, int shmid) {
 	fprintf(stderr,"	segments and the ipcrm command to ");
 	fprintf(stderr,"remove the shared memory segment with ");
 	fprintf(stderr,"\n	id %d.\n\n",shmid);
-	fprintf(stderr,"	Error was: %s\n\n",strerror(errno));
+	fprintf(stderr,"	Error was: %s\n\n",error::getErrorString());
 }
 
 void sqlrlistener::semError(const char *id, int semid) {
@@ -445,7 +447,7 @@ void sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr,"command to remove the semaphore set ");
 	fprintf(stderr,"with \n");
 	fprintf(stderr,"	id %d.\n\n",semid);
-	fprintf(stderr,"	Error was: %s\n\n",strerror(errno));
+	fprintf(stderr,"	Error was: %s\n\n",error::getErrorString());
 }
 
 bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {

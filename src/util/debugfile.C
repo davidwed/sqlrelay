@@ -1,10 +1,9 @@
+// Copyright (c) 2000-2005  David Muse
+// See the file COPYING for more information
+
 #include <debugfile.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <rudiments/stringbuffer.h>
+#include <rudiments/process.h>
 #include <config.h>
 
 debugfile::debugfile() {
@@ -24,11 +23,13 @@ void debugfile::openDebugFile(const char *name, const char *localstatedir) {
 		dbgfilename=new char[charstring::length(localstatedir)+
 					16+5+charstring::length(name)+20+1];
 		sprintf(dbgfilename,"%s/sqlrelay/debug/sqlr-%s.%d",
-					localstatedir,name,getpid());
+						localstatedir,name,
+						process::getProcessId());
 	} else {
 		dbgfilename=new char[charstring::length(DEBUG_DIR)+5+
 					charstring::length(name)+20+1];
-		sprintf(dbgfilename,"%s/sqlr-%s.%d",DEBUG_DIR,name,getpid());
+		sprintf(dbgfilename,"%s/sqlr-%s.%d",DEBUG_DIR,name,
+						process::getProcessId());
 	}
 
 	// create the debug file

@@ -6,8 +6,6 @@
 #include <datatypes.h>
 
 #include <stdio.h>
-#include <sys/ipc.h>
-#include <sys/stat.h>
 
 #ifndef SQLITE3
 	#define	sqlite3_open		sqlite_open

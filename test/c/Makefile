@@ -2,6 +2,8 @@ top_builddir = ../..
 
 include ../../config.mk
 
+.PHONY: all clean rebuild
+
 CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
 LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) -lm $(LIBEFENCE)
 
