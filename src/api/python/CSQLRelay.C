@@ -110,7 +110,7 @@ static PyObject *identify(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->identify();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("s", strdup(rc));
+  return Py_BuildValue("s", charstring::duplicate(rc));
 }
 
 static PyObject *autoCommitOn(PyObject *self, PyObject *args) {
@@ -797,7 +797,7 @@ _get_row(sqlrcursor *sqlrcur, int row)
     if (!row_data[counter]) {
         PyList_SetItem(my_list, counter, Py_None);
     } else if (isNumberTypeChar(sqlrcur->getColumnType(counter))) {
-      if (!strchr(row_data[counter], '.')) {
+      if (!charstring::contains(row_data[counter], '.')) {
           PyList_SetItem(my_list, counter, Py_BuildValue("i", charstring::toLong(row_data[counter])));
       } else {
           PyList_SetItem(my_list, counter, Py_BuildValue("f", atof(row_data[counter])));
@@ -833,7 +833,7 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     Py_END_ALLOW_THREADS
     name=((sqlrcursor *)sqlrcur)->getColumnName(counter);
     if (isNumberTypeChar(((sqlrcursor *)sqlrcur)->getColumnType(counter))) {
-      if (!strchr(field,'.')) {
+      if (!charstring::contains(field,'.')) {
         PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("i",charstring::toLong(field)));
       } else {
         PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("f",atof(field)));

@@ -351,7 +351,7 @@ int mysql_refresh(MYSQL *mysql, unsigned int refresh_options) {
 }
 
 int mysql_reload(MYSQL *mysql) {
-	if (!strcmp(mysql->sqlrcon->identify(),"mysql")) {
+	if (!charstring::compare(mysql->sqlrcon->identify(),"mysql")) {
 		sqlrcursor	sqlrcur(mysql->sqlrcon);
 		return !sqlrcur.sendQuery("FLUSH PRIVILEGES");
 	}
@@ -542,7 +542,7 @@ unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 					const char *from,
 					unsigned long length) {
 
-	if (mysql && strcmp(mysql->sqlrcon->identify(),"mysql")) {
+	if (mysql && charstring::compare(mysql->sqlrcon->identify(),"mysql")) {
 		rawbuffer::copy(to,from,length);
 		to[length]=(char)NULL;
 		return length;
@@ -579,7 +579,7 @@ unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 }
 
 int mysql_query(MYSQL *mysql, const char *query) {
-	return mysql_real_query(mysql,query,strlen(query));
+	return mysql_real_query(mysql,query,charstring::length(query));
 }
 
 int mysql_send_query(MYSQL *mysql, const char *query, unsigned int length) {
@@ -1048,7 +1048,7 @@ static enum enum_field_types	mysqltypemap[]={
 
 enum enum_field_types map_col_type(const char *columntype) {
 	for (int index=0; datatypestring[index]; index++) {
-		if (!strcmp(datatypestring[index],columntype)) {
+		if (!charstring::compare(datatypestring[index],columntype)) {
 			return mysqltypemap[index];
 		}
 	}
@@ -1089,13 +1089,20 @@ int mysql_execute(MYSQL_STMT *stmt) {
   			fields[i].catalog="";
   			fields[i].org_name=const_cast<char *>(
 						sqlrcur->getColumnName(i));
-			fields[i].name_length=strlen(fields[i].name);
-			fields[i].org_name_length=strlen(fields[i].org_name);
-			fields[i].table_length=strlen(fields[i].table);
-			fields[i].org_table_length=strlen(fields[i].org_table);
-			fields[i].db_length=strlen(fields[i].db);
-			fields[i].catalog_length=strlen(fields[i].catalog);
-			fields[i].def_length=strlen(fields[i].def);
+			fields[i].name_length=
+				charstring::length(fields[i].name);
+			fields[i].org_name_length=
+				charstring::length(fields[i].org_name);
+			fields[i].table_length=
+				charstring::length(fields[i].table);
+			fields[i].org_table_length=
+				charstring::length(fields[i].org_table);
+			fields[i].db_length=
+				charstring::length(fields[i].db);
+			fields[i].catalog_length=
+				charstring::length(fields[i].catalog);
+			fields[i].def_length=
+				charstring::length(fields[i].def);
 			// FIXME: need a character set number here
 			fields[i].charsetnr=0;
 			#endif
