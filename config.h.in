@@ -31,6 +31,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* MySQL supports mysql_autocommit */
+#undef HAVE_MYSQL_AUTOCOMMIT
+
 /* MySQL supports mysql_change_user */
 #undef HAVE_MYSQL_CHANGE_USER
 
@@ -63,6 +66,9 @@
 
 /* MySQL supports mysql_real_connect */
 #undef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
+
+/* MySQL supports mysql_rollback */
+#undef HAVE_MYSQL_ROLLBACK
 
 /* MySQL supports mysql_select_db */
 #undef HAVE_MYSQL_SELECT_DB

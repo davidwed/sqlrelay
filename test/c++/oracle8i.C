@@ -908,6 +908,7 @@ int	main(int argc, char **argv) {
 
 	// temporary tables
 	printf("TEMPORARY TABLES: \n");
+con->debugOn();
 	cur->sendQuery("drop table temptabledelete\n");
 	cur->sendQuery("create global temporary table temptabledelete (col1 number) on commit delete rows");
 	checkSuccess(cur->sendQuery("insert into temptabledelete values (1)"),1);
@@ -932,6 +933,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,0),"0");
 	cur->sendQuery("drop table temptablepreserve\n");
 	printf("\n");
+con->debugOff();
 
 
 	// stored procedures

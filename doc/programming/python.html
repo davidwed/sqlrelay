@@ -1040,7 +1040,7 @@ result=cur.getOutputBind(&quot;<font color="#ff00ff">4</font>&quot;)
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns void <font color="#6b59ce">as</font> '
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns int <font color="#6b59ce">as</font> '
 declare
         in1 int;
         in2 <font color="#298a52"><b>float</b></font>;
@@ -1193,7 +1193,26 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery(&quot;<font color="#ff00ff">execute procedure testproc ?, ?, ?, ?, ?, ?</font>&quot;)
+cur.prepareQuery(&quot;<font color="#ff00ff">select * from testproc(?,?,?)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.executeQuery()
+out1=cur.getField(0,0)
+out2=cur.getField(0,1)
+out3=cur.getField(0,2)
+</pre>
+</blockquote>
+
+<p>Alternatively, you can run a query like the following and receive the result
+using a output bind variables.  Note that in Interbase/Firebird, input and
+output bind variable indices are distict from one another.  The index of the
+first output bind variable is 1 rather than 4, even though there were 3 input
+bind variables.</p>
+
+<blockquote>
+<pre>
+cur.prepareQuery(&quot;<font color="#ff00ff">execute procedure testproc ?, ?, ?</font>&quot;)
 cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
 cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
 cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
@@ -1288,7 +1307,7 @@ cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#f
 cur.executeQuery()
 out1=cur.getField(0,0)
 out2=cur.getField(0,1)
-out3=cur.getField(0,3)
+out3=cur.getField(0,2)
 </pre>
 </blockquote>
 

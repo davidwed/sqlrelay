@@ -118,23 +118,39 @@ bool mysqlconnection::isTransactional() {
 }
 
 bool mysqlconnection::autoCommitOn() {
+#ifdef HAVE_MYSQL_AUTOCOMMIT
+	return !mysql_autocommit(&mysql,true);
+#else
 	// do nothing
 	return true;
+#endif
 }
 
 bool mysqlconnection::autoCommitOff() {
+#ifdef HAVE_MYSQL_AUTOCOMMIT
+	return !mysql_autocommit(&mysql,false);
+#else
 	// do nothing
 	return true;
+#endif
 }
 
 bool mysqlconnection::commit() {
+#ifdef HAVE_MYSQL_COMMIT
+	return !mysql_commit(&mysql);
+#else
 	// do nothing
 	return true;
+#endif
 }
 
 bool mysqlconnection::rollback() {
+#ifdef HAVE_MYSQL_ROLLBACK
+	return !mysql_rollback(&mysql);
+#else
 	// do nothing
 	return true;
+#endif
 }
 
 mysqlcursor::mysqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {

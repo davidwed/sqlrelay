@@ -81,6 +81,7 @@ work?</a></li>
 <span class="heading2">Administration Questions</span><br><br>
 <ol>
 <li><a href="#tweaks">What system parameters can I tweak to get better performance out of SQL Relay</a></li>
+<li><a href="#firewall">If I leave SQL Relay idle for a long time, then come back and try to use it, I get a low level TCP error from the database.  What does that mean?</a></li>
 </ol>
 
 
@@ -1114,6 +1115,29 @@ boot time.</p>
 
 <p>I'm not sure what the default port range is or how to change it on other
 operating systems.</p>
+
+<li><a href="#firewall">If I leave SQL Relay idle for a long time, then come back and try to use it, my program gets hung or I get a low level TCP error from the database.  What does that mean?</a></li>
+
+<p>If you are running SQL Relay on one machine and the database on a seperate
+machine, and there is a firewall between the two machines, and no queries have
+been run in a while, the firewall may "close" the connection between SQL Relay
+and the database by discarding any packets that it receives from either.
+The firewall does not send "close packets" to either SQL Relay or the database,
+so SQL Relay thinks it's still connected to the database, but when it sends a
+query, the firewall discards it.</p>
+
+<p>Some database client API's catch this condition and return an obscure
+error but many do not, they just hang silently forever.</p>
+
+<p>Cisco PIX firewalls are known to cause this problem.  Others may as well.</p>
+
+<p>Allegedly, an IOS upgrade will solve the problem for Cisco PIX firewalls,
+but I don't know what version you have to upgrade to.</p>
+
+<p>Another solution is to turn off the time out.</p>
+
+<p>Yet another solution is to set up a cron job that runs a query periodically
+and keeps the connection from timing out.</p>
 
 </body>
 </html>
