@@ -8,17 +8,22 @@
 #include <rudiments/permissions.h>
 #include <rudiments/unixclientsocket.h>
 #include <rudiments/inetclientsocket.h>
+#include <rudiments/rawbuffer.h>
 #include <rudiments/sleep.h>
 
+// for ftok
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <sys/ipc.h>
+
+// for printf
 #include <stdio.h>
-#include <stdlib.h>
+
+// for _exit
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
 #endif
+
+// for errno
 #include <errno.h>
 
 #include <defines.h>
@@ -55,10 +60,10 @@ sqlrlistener::~sqlrlistener() {
 	delete semset;
 	delete idmemory;
 	if (unixport) {
-		unlink(unixport);
+		file::remove(unixport);
 	}
 	if (pidfile) {
-		unlink(pidfile);
+		file::remove(pidfile);
 	}
 	if (init) {
 		cleanUp();
@@ -242,15 +247,10 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	#endif
 
 	// make sure that the file exists and is read/writeable
-	int	idfd=open(idfilename,O_CREAT|O_RDWR,
-					permissions::ownerReadWrite());
-	if (idfd==-1) {
+	if (!file::createFile(idfilename,permissions::ownerReadWrite())) {
 		ipcFileError(idfilename);
 		return false;
-	} else {
-		close(idfd);
 	}
-
 
 	// get the ipc key
 	key_t	key=ftok(idfilename,0);
@@ -272,6 +272,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 		shmError(id,idmemory->getId());
 		return false;
 	}
+	rawbuffer::zero(idmemory->getPointer(),sizeof(shmdata));
 
 	// create (or connect) to the semaphore set
 	// FIXME: if it already exists, attempt to remove and re-create it

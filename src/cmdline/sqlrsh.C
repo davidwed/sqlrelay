@@ -6,6 +6,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
+#include <rudiments/file.h>
 #include <sqlrconfigfile.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -68,13 +69,16 @@ class	sqlrsh {
 					environment *env);
 		void	runScript(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env, 
-					const char *file, int returnerror);
-		int	getCommandFromFile(int file, stringbuffer *cmdbuffer);
-		int	runCommand(sqlrconnection *sqlrcon, 
+					const char *filename, bool returnerror,
+					bool displaycommand);
+		bool	getCommandFromFile(file *fl, stringbuffer *cmdbuffer);
+		bool	runCommand(sqlrconnection *sqlrcon, 
 					sqlrcursor *sqlrcur, 
 					environment *env, const char *command);
 		int	commandType(const char *command);
-		void	internalCommand(environment *env, const char *command);
+		void	internalCommand(sqlrconnection *sqlrcon,
+					sqlrcursor *sqlrcur, environment *env,
+					const char *command);
 		void	externalCommand(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env, 
 					const char *command);
@@ -105,7 +109,7 @@ class	sqlrsh {
 
 void sqlrsh::systemRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 						environment *env) {
-	runScript(sqlrcon,sqlrcur,env,SYSTEM_SQLRSHRC,0);
+	runScript(sqlrcon,sqlrcur,env,SYSTEM_SQLRSHRC,false,false);
 }
 
 void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
@@ -122,22 +126,32 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	sprintf(userrcfile,"%s/.sqlrshrc",home);
 
 	// process the file
-	runScript(sqlrcon,sqlrcur,env,userrcfile,0);
+	runScript(sqlrcon,sqlrcur,env,userrcfile,false,false);
 }
 
 void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
-			environment *env, const char *file, int returnerror) {
+			environment *env, const char *filename,
+			bool returnerror, bool displaycommand) {
+
+	char	*trimmedfilename=charstring::duplicate(filename);
+	charstring::bothTrim(trimmedfilename);
 
 	// open the file
-	int scriptfile=open(file,O_RDONLY);
-	if (scriptfile>-1) {
+	file	scriptfile;
+	if (scriptfile.open(trimmedfilename,O_RDONLY)) {
 
-		while (1) {
+		for (;;) {
 		
 			// get a command
 			stringbuffer	command;
-			if (!getCommandFromFile(scriptfile,&command)) {
+			if (!getCommandFromFile(&scriptfile,&command)) {
 				break;
+			}
+
+			if (displaycommand) {
+				cyan(env);
+				printf("%s\n",command.getString());
+				white(env);
 			}
 
 			// run the command
@@ -145,42 +159,46 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		}
 
 		// close the file
-		close(scriptfile);
+		scriptfile.close();
 	} else {
 
 		// error message
 		if (returnerror) {
 			stringbuffer	errmesg;
-			errmesg.append("Couldn't open file: ")->append(file);
+			errmesg.append("Couldn't open file: ");
+			errmesg.append(trimmedfilename);
 			error(errmesg.getString());
 		}
 	}
+
+	delete[] trimmedfilename;
 }
 
-int sqlrsh::getCommandFromFile(int file, stringbuffer *cmdbuffer) {
+bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer) {
 
 	char	character;
 	
-	while (1) {
+	for (;;) {
 
 		// get a character from the file
-		read(file,(void *)&character,sizeof(char));
-
-		// look for end of file
-		if (character==-1) {
-			return 0;
+		if (fl->read(&character)!=sizeof(character)) {
+			return false;
 		}
 
 		// look for an escape character
 		if (character=='\\') {
-			read(file,(void *)&character,sizeof(char));
+			if (fl->read(&character)!=sizeof(character)) {
+				return false;
+			}
 			cmdbuffer->append(character);
-			read(file,(void *)&character,sizeof(char));
+			if (fl->read(&character)!=sizeof(character)) {
+				return false;
+			}
 		}
 
 		// look for an end of command delimiter
 		if (character==';') {
-			return 1;
+			return true;
 		}
 
 		// write character to buffer and move on
@@ -189,22 +207,22 @@ int sqlrsh::getCommandFromFile(int file, stringbuffer *cmdbuffer) {
 		
 }
 
-int sqlrsh::runCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
+bool sqlrsh::runCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 					environment *env, const char *command) {
 
 	int	cmdtype=commandType(command);
 
 	if (cmdtype>0) {
 		// if the command an internal command, run it as one
-		internalCommand(env,command);
-		return 1;
+		internalCommand(sqlrcon,sqlrcur,env,command);
+		return true;
 	} else if (cmdtype==0) {
 		// if the command is not an internal command, 
 		// execute it as a query and display the result set
 		externalCommand(sqlrcon,sqlrcur,env,command);
-		return 1;
+		return true;
 	} else {
-		return 0;
+		return false;
 	}
 }
 
@@ -222,7 +240,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"stats",5) ||
 		!charstring::compareIgnoringCase(ptr,"debug",5) ||
 		!charstring::compareIgnoringCase(ptr,"final",5) ||
-		!charstring::compareIgnoringCase(ptr,"help",4)) {
+		!charstring::compareIgnoringCase(ptr,"help",4) ||
+		!charstring::compareIgnoringCase(ptr,"run",3)) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -238,7 +257,8 @@ int sqlrsh::commandType(const char *command) {
 	return 0;
 }
 
-void sqlrsh::internalCommand(environment *env, const char *command) {
+void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
+					environment *env, const char *command) {
 
 	// skip white space
 	char	*ptr=(char *)command;
@@ -266,6 +286,9 @@ void sqlrsh::internalCommand(environment *env, const char *command) {
 	} else if (!charstring::compareIgnoringCase(ptr,"help",4)) {	
 		displayHelp(env);
 		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"run",3)) {	
+		ptr=ptr+3;
+		cmdtype=6;
 	} else {
 		return;
 	}
@@ -273,6 +296,12 @@ void sqlrsh::internalCommand(environment *env, const char *command) {
 	// skip white space
 	while (*ptr==' ' || *ptr=='	' || *ptr=='\n') {
 		ptr++;
+	}
+
+	// handle scripts
+	if (cmdtype==6) {
+		runScript(sqlrcon,sqlrcur,env,ptr,true,true);
+		return;
 	}
 
 	// on or off?
@@ -509,6 +538,10 @@ void sqlrsh::displayHelp(environment *env) {
 	printf("	followed by a semicolon.  Queries may be \n");
 	printf("	split over multiple lines.\n\n");
 	cyan(env);
+	printf("		run script	- ");
+	green(env);
+	printf("runs commands contained in file \"script\"\n");
+	cyan(env);
 	printf("		color on/off	- ");
 	green(env);
 	printf("toggles colorizing\n");
@@ -557,7 +590,8 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 							environment *env) {
 
 	// init some variables
-	stringbuffer	*command;
+	stringbuffer	command;
+	stringbuffer	prmpt;
 	int		exitprogram=0;
 	unsigned long	promptcount;
 
@@ -567,17 +601,18 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		promptcount=0;
 		
 		// get the command
-		command=new stringbuffer();
-		int	done=0;
+		bool	done=false;
 		while (!done) {
 			#ifdef HAVE_READLINE
-				stringbuffer	prmpt;
 				prmpt.append(promptcount);
 				prmpt.append("> ");
 				char	*cmd=readline(prmpt.getString());
-				if (cmd[0]) {
+				prmpt.clear();
+				if (cmd && cmd[0]) {
 					charstring::rightTrim(cmd);
 					add_history(cmd);
+				} else {
+					printf("\n");
 				}
 			#else
 				prompt(promptcount);
@@ -586,59 +621,34 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				cmd[bytes-1]=(char)NULL;
 			#endif
 			int	len=charstring::length(cmd);
-			done=0;
+			done=false;
 			for (int i=0; i<len; i++) {
 				if (i==len-1) {
 				       if (cmd[i]==';') {
-						done=1;
+						done=true;
 					} else {
-						command->append(cmd[i]);
+						command.append(cmd[i]);
 					}
 				} else if (cmd[i]>=32 || 
 						cmd[i]=='	') {
-					command->append(cmd[i]);
+					command.append(cmd[i]);
 				}
 			}
 			if (!done) {
 				promptcount++;
-				command->append(" ");
+				command.append(" ");
 			}
 			#ifdef HAVE_READLINE
 				delete[] cmd;
 			#endif
 		}
-		/*#else
-			putStdioInRawMode();
-
-			prompt(promptcount);
-
-			while (1) {
-				read(0,&buffer1,1);
-				if (buffer1==';') {
-					read(0,&buffer2,1);
-					if (buffer2=='\n') {
-						break;
-					} else {
-						command->append(buffer1);
-					}
-				} else if (buffer1=='\n') {
-					promptcount++;
-					command->append(" ");
-					prompt(promptcount);
-				} else if (buffer1>=32 || buffer1=='	') {
-					command->append(buffer1);
-				}
-			}
-
-			putStdioInCookedMode();
-		#endif*/
 
 		// run the command
-		if (!runCommand(sqlrcon,sqlrcur,env,command->getString())) {	
+		if (!runCommand(sqlrcon,sqlrcur,env,command.getString())) {	
 			exitprogram=1;
 		}
 
-		delete command;
+		command.clear();
 	}
 }
 
@@ -750,7 +760,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	// if a script was specified, run it otherwise go into interactive mode
 	if (script) {
-		runScript(&sqlrcon,&sqlrcur,&env,script,1);
+		runScript(&sqlrcon,&sqlrcur,&env,script,true,false);
 	} else {
 		startupMessage(&env,host,port,user);
 		interactWithUser(&sqlrcon,&sqlrcur,&env);
@@ -806,7 +816,7 @@ void sqlrsh::white(environment *env) {
 
 
 
-int	main(int argc, const char **argv) {
+int main(int argc, const char **argv) {
 
 	#include <version.h>
 

@@ -65,8 +65,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	sprintf(listenerpidfile,"%s/pids/sqlr-listener-%s",TMP_DIR,id);
 	if (checkForPidFile(listenerpidfile)==-1) {
 		fprintf(stderr,"\nsqlr-scaler error: \n");
-		fprintf(stderr,"	The file %s",TMP_DIR);
-		fprintf(stderr,"/sqlr-listener-%s",id);
+		fprintf(stderr,"	The file %s",listenerpidfile);
 		fprintf(stderr," was not found.\n");
 		fprintf(stderr,"	This usually means that the ");
 		fprintf(stderr,"sqlr-listener is not running.\n");
@@ -80,8 +79,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	sprintf(pidfile,"%s/pids/sqlr-scaler-%s",TMP_DIR,id);
 	if (checkForPidFile(pidfile)!=-1) {
 		fprintf(stderr,"\nsqlr-scaler error:\n");
-		fprintf(stderr,"	The pid file %s",TMP_DIR);
-		fprintf(stderr,"/sqlr-scaler-%s",id);
+		fprintf(stderr,"	The pid file %s",pidfile);
 		fprintf(stderr," exists.\n");
 		fprintf(stderr,"	This usually means that the ");
 		fprintf(stderr,"sqlr-scaler is already running for the \n");
@@ -215,7 +213,12 @@ void scaler::openMoreConnections() {
 				// connection id that was randomly chosen is
 				// currently unavailable, loop back and get
 				// another one
-				if (!availableDatabase()) {
+				// if no connections are currently open then
+				// we won't know if the database is up or down
+				// because no connections have tried to log
+				// in to it yet, so in that case, don't even
+				// test to see if the database is up or down
+				if (connections && !availableDatabase()) {
 					sleep::macrosleep(1);
 					continue;
 				}
@@ -269,9 +272,9 @@ void scaler::getRandomConnectionId() {
 bool scaler::availableDatabase() {
 	
 	// initialize the database up/down filename
-	char	updown[tmpdirlen+1+charstring::length(id)+1+
+	char	updown[tmpdirlen+5+charstring::length(id)+1+
 					charstring::length(connectionid)+1];
-	sprintf(updown,"%s/%s-%s",TMP_DIR,id,connectionid);
+	sprintf(updown,"%s/ipc/%s-%s",TMP_DIR,id,connectionid);
 	bool	retval=file::exists(updown);
 	return retval;
 }

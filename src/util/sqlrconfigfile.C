@@ -374,7 +374,8 @@ bool sqlrconfigfile::attributeValue(char *value) {
 			dbase=charstring::duplicate((value)?value:
 							DEFAULT_DBASE);
 		} else if (currentattribute==CONNECTIONS_ATTRIBUTE) {
-			connections=atoi(value,DEFAULT_CONNECTIONS,1);
+			//connections=atoi(value,DEFAULT_CONNECTIONS,1);
+			connections=atoi(value,DEFAULT_CONNECTIONS,0);
 		} else if (currentattribute==MAXCONNECTIONS_ATTRIBUTE) {
 			maxconnections=atoi(value,DEFAULT_MAXCONNECTIONS,1);
 		} else if (currentattribute==MAXQUEUELENGTH_ATTRIBUTE) {

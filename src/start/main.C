@@ -12,9 +12,6 @@
 
 int getConnections(sqlrconfigfile *cfgfile) {
 	int	connections=cfgfile->getConnections();
-	if (!connections) {
-		connections=1;
-	}
 	if (connections>MAX_CONNECTIONS) {
 		connections=MAX_CONNECTIONS;
 	}

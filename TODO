@@ -1,12 +1,6 @@
-sqlrsh crashes if you hit ctrl-D
-
 perl apis -> CPAN
 
-move socket files into their own directory so they can't collide with other
-	stuff in tmp directory
-
-if connections=0 and maxconnections>0 then one connection does get started,
-	sometimes connections with a ttl don't die off
+connections with a ttl don't appear to die off
 
 php module needs to clean itself up (close connections) if the script dies
 
@@ -21,8 +15,6 @@ does setResultSetBufferSize prevent PythonDB, Perl DBI, etc. from fetching more
 
 mysql 4.1, 5.0 - bind vars
 postgresql 8 - bind vars
-
-double free errors on exit
 
 people have been reporting freetds problems
 
@@ -283,6 +275,7 @@ Native DB Support:
 	ThinkSQL
 	picosql
 	shsql
+	does clip provide an odbc driver for accessing x-base files?
 
 Config Tools:
 	gtk2
