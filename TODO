@@ -1,32 +1,20 @@
-sqlr-stop doesn't work on FreeBSD
+lots of documentation fixes
+db2 startup directions are wrong, you have to run db2start/db2stop as db2as
+
+runasuser/group doesn't work
 
 need a reliable way to ping msql
 
-query/fields cmdline tools need a timeout option.
-
-ruby api crashes on exit
+ruby api crashes on exit (at least for oracle)
 
 forked listeners need to close handoff file descriptors
 handoff=pass does not work with dynamic scaling
 
-If a connection dies mysteriously, a new one should fire up.
-maximum allowed clob bind value length should be configurable
 use const/short/long instead of plain char *, int
-solaris init script
-odbc connection should check the odbc definition
-	for connect string arguments - SQLBrowseConnect
+
 java/com/firstworks/sqlrelay needs to be removed if empty when rpm is
 	uninstalled
-should sqlr-start kill the listner if no connections start?
-
-incorporate pkg-config stuff
-incorporate ADODB driver
 incorporate new spec file
-
-db2 startup directions are wrong, you have to run db2start/db2stop as db2as
-fix documents to reflect java package
-
-better transaction handling for postgresql
 
 Tests:
 	odbc tests
@@ -38,12 +26,12 @@ Tests:
 
 Compatibility:
 	sybase 12.5
-	ibm db2 8
 	interbase 6.5/7
 	gtk-2
 	ruby module segfaults on netbsd/openbsd
 	python api methods that call PyArg_ParseTuple with an "O" argument 
 		don't work on openbsd/netbsd, not exactly sure why
+	incorporate pkg-config stuff
 
 Documentation:
 	getting started docs for MS SQL Server
@@ -52,7 +40,7 @@ Documentation:
 	recommended settings for each db, scaling
 	performance benchmark charts
 	HOWTO for linuxdoc.org
-	man pages
+	man pages for everything
 
 Performance:
 	persistent cursors - parse query, attach an id to it, make it available
@@ -103,6 +91,12 @@ Features:
 	logging
 	handle commit/rollback for named transactions
 	implement API's that handle errors with exceptions
+	better transaction handling for postgresql
+	query/fields cmdline tools need a timeout option
+	maximum allowed clob bind value length should be configurable
+	odbc connection should check the odbc definition
+		for connect string arguments - SQLBrowseConnect
+	solaris init script
 
 Availability:
 	connections should ping database server every so often to make sure
@@ -111,17 +105,18 @@ Availability:
 	master, fallback databases, where connection only goes to the fallback
 		if the master is overloaded or down
 		statistics, stat monitoring interface
+	if a connection dies mysteriously, a new one should fire up
 
 openldap backend
 
 API's:
 	wrapper:
-		PHP - ADODB?
+		ADODB - have a driver, just need to incorporate it
 		JDBC
 		ODBC
 		QT3
 		TCL
-		C# (mono?)
+		C#
 		ADA
 	replacement libs for native db api libs - 
 		translate msql/mysql/postgresql calls to sqlrelay calls

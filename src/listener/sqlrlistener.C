@@ -150,17 +150,17 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 
 int	sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
 
-	if (!runAsUser(cfgfl->getRunAsUser())) {
-		fprintf(stderr,"Could not change user to %s\n",
-						cfgfl->getRunAsUser());
-		return 0;
-	} 
-
 	if (!runAsGroup(cfgfl->getRunAsGroup())) {
 		fprintf(stderr,"Could not change group to %s\n",
 						cfgfl->getRunAsGroup());
 		return 0;
 	}
+
+	if (!runAsUser(cfgfl->getRunAsUser())) {
+		fprintf(stderr,"Could not change user to %s\n",
+						cfgfl->getRunAsUser());
+		return 0;
+	} 
 
 	return 1;
 }

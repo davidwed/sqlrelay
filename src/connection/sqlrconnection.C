@@ -374,15 +374,15 @@ void	sqlrconnection::closeCursors(int destroy) {
 
 int	sqlrconnection::setUserAndGroup() {
 
-	if (!runAsUser(cfgfl->getRunAsUser())) {
-		fprintf(stderr,"Could not change user to %s\n",
-						cfgfl->getRunAsUser());
-		return 0;
-	}
-
 	if (!runAsGroup(cfgfl->getRunAsGroup())) {
 		fprintf(stderr,"Could not change group to %s\n",
 						cfgfl->getRunAsGroup());
+		return 0;
+	}
+
+	if (!runAsUser(cfgfl->getRunAsUser())) {
+		fprintf(stderr,"Could not change user to %s\n",
+						cfgfl->getRunAsUser());
 		return 0;
 	}
 
