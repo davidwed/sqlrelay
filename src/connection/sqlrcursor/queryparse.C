@@ -55,71 +55,7 @@ char	*sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
 }
 
 void	sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
-
-	char	*ptr=(char *)query;
-	char	*endptr=(char *)query+length;
-
-	// skip any leading comments
-	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
-		!skipWhitespace(&ptr,endptr)) {
-		return;
-	}
-
-	// look for "create [local|global] temporary"
-	if (!strncasecmp(ptr,"create",6)) {
-		if (!advance(&ptr,endptr,6) ||
-					!skipWhitespace(&ptr,endptr)) {
-			return;
-		}
-		if (!strncasecmp(ptr,"local",5)) {
-			if (!advance(&ptr,endptr,5) ||
-					!skipWhitespace(&ptr,endptr)) {
-				return;
-			}
-		} else if (!strncasecmp(ptr,"global",6)) {
-			if (!advance(&ptr,endptr,6) ||
-					!skipWhitespace(&ptr,endptr)) {
-				return;
-			}
-		}
-		if (!strncasecmp(ptr,"temporary",9)) {
-			if (!advance(&ptr,endptr,9) ||
-					!skipWhitespace(&ptr,endptr)) {
-				return;
-			}
-		} else if (!strncasecmp(ptr,"temp",4)) {
-			if (!advance(&ptr,endptr,4) ||
-					!skipWhitespace(&ptr,endptr)) {
-				return;
-			}
-		} else {
-			// not a temp table
-			return;
-		}
-	} else {
-		// not a temp table
-		return;
-	}
-
-	// check for the word table
-	if (!skipWhitespace(&ptr,endptr) || strncasecmp(ptr,"table",5)) {
-		return;
-	}
-
-	// skip any whitespace before the table name
-	if (!advance(&ptr,endptr,5) || !skipWhitespace(&ptr,endptr)) {
-		return;
-	}
-
-	// get the table name
-	stringbuffer	tablename;
-	while (*ptr!=' ' && *ptr!='\n' && *ptr!='	' && ptr<endptr) {
-		tablename.append(*ptr);
-		ptr++;
-	}
-
-	// append to list of temp tables
-	conn->addSessionTempTable(tablename.getString());
+	// by default, do nothing
 }
 
 int	sqlrcursor::skipComment(char **ptr, const char *endptr) {

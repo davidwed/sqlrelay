@@ -1,14 +1,16 @@
-support @,: or ? for fake bind variables
-rewrite queries with ?'s or @'s for oracle, rewrite queries with ?'s or :'s for
-	sybase
+probably related to temp table dropping...
+	postgresql test causes connection to crash on 2nd run
+	mysql test causes connection to crash on 2nd run
 
-sqlrclient classes shouldn't inherit from inet/unixclientsocket,
-	rather should have member variables for each
-ADODB interface
+temp tables:
+	sybase: not dropped when session is over
+			unless the name begins with a # sign
+		are they truncated???
+	db2: (create|declare) global temporary table - dropped when session ends
+	odbc: ???
+
 VB wrapper
 FIXME's in mysql drop-in library
-column flags for non-mysql databases
-call endSession() from perl DBD finish method
 licenses:
 	Pear DB driver
 	mysql replacement library
@@ -16,30 +18,14 @@ docs:
 	mysql drop-in library
 	postgresql drop-in library
 	pear db driver
+	how to use pear db driver with adodb
 	perl dbi driver bind_param_inout
 	new column flags
 	countBindVariables()
 tests:
 	mysql drop-in library
 	postgresql drop-in library
-	perl dbi driver
-		execute_array
-		bind_param_array
-		selectall_arrayref with attr/binds
-		selectall_hashref with attr/binds
-		selectcol_arrayref with attr/binds
-		selectrow_array with attr/binds
-		selectrow_arrayref with attr/binds
-		selectrow_hashref with attr/binds
-		prepare_cached
-		fetchall_arrayref with slice
-		quote
-		err
-		errstr
-		state
-		begin_work
-		available_drivers
-		data_sources
+	adodb test
 freetds-0.62/ct_param support
 idle client timeout
 perl apis -> CPAN
@@ -65,18 +51,6 @@ setting backlog:
 		/usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
 
 
-handle temp tables properly:
-	oracle 8i: "create global temporary table ...
-				[on commit preserve rows] (session specific)
-				[on commit delete rows] (transaction specific)"
-			temporary tables are not dropped when the session ends
-			session tables are truncated when sessions end
-			transacation tables are truncated on commit/rollback
-	sybase: not dropped when session is over
-			unless the name begins with a # sign
-		are they truncated???
-	interbase: ???
-
 Tests:
 	zope
 	tcl
@@ -93,8 +67,30 @@ Tests:
 	Java "getXXXAsByteArray" methods
 	check blob/lobs with binary data in them
 	interbase stored procedures
+	perl dbi driver
+		execute_array
+		bind_param_array
+		selectall_arrayref with attr/binds
+		selectall_hashref with attr/binds
+		selectcol_arrayref with attr/binds
+		selectrow_array with attr/binds
+		selectrow_arrayref with attr/binds
+		selectrow_hashref with attr/binds
+		prepare_cached
+		fetchall_arrayref with slice
+		quote
+		err
+		errstr
+		state
+		begin_work
+		available_drivers
+		data_sources
 
 Compatibility:
+	support @,: or ? for fake bind variables
+	rewrite queries with ?'s or @'s for oracle, rewrite
+				queries with ?'s or :'s for
+	sybase
 	mysql 4.1, 5.0
 	daemontools
 	SCO:
@@ -118,6 +114,9 @@ Documentation:
 	man pages for everything
 
 Performance/Code Enhancements:
+	call endSession() from perl DBD finish method
+	sqlrclient classes shouldn't inherit from inet/unixclientsocket,
+		rather should have member variables for each
 	make some methods that return int return bool
 	implement column flags as a bitmap
 	persistent cursors - parse query, attach an id to it,
@@ -202,6 +201,7 @@ backends:
 
 API's:
 	wrapper:
+		PHP ADODB
 		JDBC
 		ODBC
 		QT3

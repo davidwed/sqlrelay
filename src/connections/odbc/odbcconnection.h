@@ -31,6 +31,13 @@ struct column {
 	int	precision;
 	int	scale;
 	int	nullable;
+	int	primarykey;
+	int	unique;
+	int	partofkey;
+	int	unsignednumber;
+	int	zerofill;
+	int	binary;
+	int	autoincrement;
 };
 
 class odbcconnection;

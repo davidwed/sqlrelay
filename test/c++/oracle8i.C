@@ -892,6 +892,35 @@ int	main(int argc, char **argv) {
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 
+
+	// temporary tables
+	printf("TEMPORARY TABLES: \n");
+	cur->sendQuery("drop table temptabledelete\n");
+	cur->sendQuery("create global temporary table temptabledelete (col1 number) on commit delete rows");
+	checkSuccess(cur->sendQuery("insert into temptabledelete values (1)"),1);
+	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
+	checkSuccess(cur->getField(0,0),"1");
+	checkSuccess(con->commit(),1);
+	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
+	checkSuccess(cur->getField(0,0),"0");
+	cur->sendQuery("drop table temptabledelete\n");
+	printf("\n");
+	cur->sendQuery("drop table temptablepreserve\n");
+	cur->sendQuery("create global temporary table temptablepreserve (col1 number) on commit preserve rows");
+	checkSuccess(cur->sendQuery("insert into temptablepreserve values (1)"),1);
+	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
+	checkSuccess(cur->getField(0,0),"1");
+	checkSuccess(con->commit(),1);
+	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
+	checkSuccess(cur->getField(0,0),"1");
+	con->endSession();
+	printf("\n");
+	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
+	checkSuccess(cur->getField(0,0),"0");
+	cur->sendQuery("drop table temptablepreserve\n");
+	printf("\n");
+
+
 	// invalid queries...
 	printf("INVALID QUERIES: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testnumber"),0);

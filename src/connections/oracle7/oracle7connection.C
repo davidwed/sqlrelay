@@ -391,6 +391,7 @@ void	oracle7cursor::returnColumnInfo() {
 	for (int i=0; i<ncols; i++) {
 
 		// set column type
+		unsigned short	binary=0;
 		if (desc[i].dbtype==VARCHAR2_TYPE) {
 			type=VARCHAR2_DATATYPE;
 		} else if (desc[i].dbtype==NUMBER_TYPE) {
@@ -403,8 +404,10 @@ void	oracle7cursor::returnColumnInfo() {
 			type=DATE_DATATYPE;
 		} else if (desc[i].dbtype==RAW_TYPE) {
 			type=RAW_DATATYPE;
+			binary=1;
 		} else if (desc[i].dbtype==LONG_RAW_TYPE) {
 			type=LONG_RAW_DATATYPE;
+			binary=1;
 		} else if (desc[i].dbtype==CHAR_TYPE) {
 			type=CHAR_DATATYPE;
 		} else if (desc[i].dbtype==MLSLABEL_TYPE) {
@@ -420,7 +423,7 @@ void	oracle7cursor::returnColumnInfo() {
 					(unsigned short)desc[i].precision,
 					(unsigned short)desc[i].scale,
 					(unsigned short)desc[i].nullok,0,0,
-					0,0,0,0,0);
+					0,0,0,binary,0);
 	}
 }
 

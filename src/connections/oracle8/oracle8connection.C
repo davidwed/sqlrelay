@@ -375,6 +375,12 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 		}
 		def[i]=NULL;
 	}
+#ifdef HAVE_ORACLE_8i
+	createtemplower.compile("create[ \\t\\n\\r]+global[ \\t\\n\\r]+temporary[ \\t\\n\\r]+table[ \\t\\n\\r]+");
+	createtempupper.compile("CREATE[ \\t\\n\\r]+GLOBAL[ \\t\\n\\r]+TEMPORARY[ \\t\\n\\r]+table[ \\t\\n\\r]+");
+	preserverowslower.compile("on[ \\t\\n\\r]+commit[ \\t\\n\\r]+preserve[ \\t\\n\\r]+rows");
+	preserverowsupper.compile("on[ \\t\\n\\r]+commit[ \\t\\n\\r]+preserve[ \\t\\n\\r]+rows");
+#endif
 }
 
 oracle8cursor::~oracle8cursor() {
@@ -865,10 +871,49 @@ void    oracle8cursor::returnOutputBindGenericLob(int index) {
 		conn->endSendingLong();
 	}
 }
+
+void	oracle8cursor::checkForTempTable(const char *query,
+						unsigned long length) {
+
+	char	*ptr=(char *)query;
+	char	*endptr=(char *)query+length;
+
+	// skip any leading comments
+	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
+		!skipWhitespace(&ptr,endptr)) {
+		return;
+	}
+
+	// look for "create global temporary table "
+	if (createtemplower.match(ptr)) {
+		ptr=createtemplower.getSubstringEnd(0);
+	} else if (createtempupper.match(ptr)) {
+		ptr=createtempupper.getSubstringEnd(0);
+	} else {
+		return;
+	}
+
+	// get the table name
+	stringbuffer	tablename;
+	while (*ptr!=' ' && *ptr!='\n' && *ptr!='	' && ptr<endptr) {
+		tablename.append(*ptr);
+		ptr++;
+	}
+
+	// append to list of temp tables
+	// check for "on commit preserve rows" otherwise assume
+	// "on commit delete rows"
+	if (preserverowslower.match(ptr) || preserverowsupper.match(ptr)) {
+		conn->addSessionTempTableForTrunc(tablename.getString());
+	}
+}
 #endif
 
 int	oracle8cursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
+#ifdef HAVE_ORACLE_8i
+	checkForTempTable(query,length);
+#endif
 
 	// initialize the column count
 	ncols=0;
@@ -1107,6 +1152,7 @@ void	oracle8cursor::returnColumnInfo() {
 	for (int i=0; i<ncols; i++) {
 
 		// set column type
+		unsigned short	binary=0;
 		if (desc[i].dbtype==VARCHAR2_TYPE) {
 			type=VARCHAR2_DATATYPE;
 		} else if (desc[i].dbtype==NUMBER_TYPE) {
@@ -1119,18 +1165,22 @@ void	oracle8cursor::returnColumnInfo() {
 			type=DATE_DATATYPE;
 		} else if (desc[i].dbtype==RAW_TYPE) {
 			type=RAW_DATATYPE;
+			binary=1;
 		} else if (desc[i].dbtype==LONG_RAW_TYPE) {
 			type=LONG_RAW_DATATYPE;
+			binary=1;
 		} else if (desc[i].dbtype==CHAR_TYPE) {
 			type=CHAR_DATATYPE;
 		} else if (desc[i].dbtype==MLSLABEL_TYPE) {
 			type=MLSLABEL_DATATYPE;
 		} else if (desc[i].dbtype==BLOB_TYPE) {
 			type=BLOB_DATATYPE;
+			binary=1;
 		} else if (desc[i].dbtype==CLOB_TYPE) {
 			type=CLOB_DATATYPE;
 		} else if (desc[i].dbtype==BFILE_TYPE) {
 			type=BFILE_DATATYPE;
+			binary=1;
 		} else {
 			type=UNKNOWN_DATATYPE;
 		}
@@ -1143,7 +1193,7 @@ void	oracle8cursor::returnColumnInfo() {
 					(unsigned short)desc[i].precision,
 					(unsigned short)desc[i].scale,
 					(unsigned short)desc[i].nullok,0,0,
-					0,0,0,0,0);
+					0,0,0,binary,0);
 	}
 }
 

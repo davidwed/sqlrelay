@@ -371,6 +371,30 @@ int	odbccursor::executeQuery(const char *query, long length,
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
+
+			// primary key
+
+			// unique
+
+			// part of key
+
+			// unsigned number
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_UNSIGNED,
+					NULL,0,NULL,&(col[i].unsignednumber));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
+
+			// zero fill
+
+			// binary
+
+			// autoincrement
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_AUTO_UNIQUE_VALUE,
+					NULL,0,NULL,&(col[i].autoincrement));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
 #else
 			// column name
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_LABEL,
@@ -417,6 +441,33 @@ int	odbccursor::executeQuery(const char *query, long length,
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_NULLABLE,
 					NULL,0,NULL,
 					(SQLINTEGER *)&(col[i].nullable));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
+
+			// primary key
+
+			// unique
+
+			// part of key
+
+			// unsigned number
+			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_UNSIGNED,
+					NULL,0,NULL,
+					(SQLINTEGER *)&(col[i].unsignednumber));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
+
+			// zero fill
+
+			// binary
+
+			// autoincrement
+			erg=SQLColAttributes(stmt,i+1,
+					SQL_COLUMN_AUTO_UNIQUE_VALUE,
+					NULL,0,NULL,
+					(SQLINTEGER *)&(col[i].autoincrement));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
@@ -483,10 +534,12 @@ void	odbccursor::returnColumnInfo() {
 	// for each column...
 	for (int i=0; i<ncols; i++) {
 
+		unsigned short	binary=0;
 		if (col[i].type==SQL_BIGINT) {
 			type=BIGINT_DATATYPE;
 		} else if (col[i].type==SQL_BINARY) {
 			type=BINARY_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_BIT) {
 			type=BIT_DATATYPE;
 		} else if (col[i].type==SQL_CHAR) {
@@ -503,6 +556,7 @@ void	odbccursor::returnColumnInfo() {
 			type=INTEGER_DATATYPE;
 		} else if (col[i].type==SQL_LONGVARBINARY) {
 			type=LONGVARBINARY_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_LONGVARCHAR) {
 			type=LONGVARCHAR_DATATYPE;
 		} else if (col[i].type==SQL_NUMERIC) {
@@ -519,6 +573,7 @@ void	odbccursor::returnColumnInfo() {
 			type=TINYINT_DATATYPE;
 		} else if (col[i].type==SQL_VARBINARY) {
 			type=VARBINARY_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_VARCHAR) {
 			type=VARCHAR_DATATYPE;
 		} else {
@@ -528,8 +583,10 @@ void	odbccursor::returnColumnInfo() {
 		// send column definition
 		conn->sendColumnDefinition(col[i].name,col[i].namelength,type,
 						col[i].length,col[i].precision,
-						col[i].scale,0,0,0,
-						0,0,0,0,0);
+						col[i].scale,col[i].nullable,
+						0,0,0,
+						col[i].unsignednumber,0,binary,
+						col[i].autoincrement);
 	}
 }
 

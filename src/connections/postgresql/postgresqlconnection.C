@@ -161,18 +161,49 @@ char	*postgresqlconnection::identify() {
 }
 
 postgresqlcursor::postgresqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
+
 	postgresqlconn=(postgresqlconnection *)conn;
 	ddlquery=0;
 	pgresult=(PGresult *)NULL;
+
+	createtemplower.compile("create[ \\t\\r\\n]+(local)?[ \\t\\r\\n]+temp(orary)?[ \\t\\r\\n]+table[ \\t\\r\\n]+");
+	createtempupper.compile("CREATE[ \\t\\r\\n]+(LOCAL)?[ \\t\\r\\n]+TEMP(ORARY)?[ \\t\\r\\n]+TABLE[ \\t\\r\\n]+");
+}
+
+void	postgresqlcursor::checkForTempTable(const char *query,
+						unsigned long length) {
+
+	char	*ptr=(char *)query;
+	char	*endptr=(char *)query+length;
+
+	// skip any leading comments
+	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
+		!skipWhitespace(&ptr,endptr)) {
+		return;
+	}
+
+	// look for "create [local] temp[orary] table "
+	if (createtemplower.match(ptr)) {
+		ptr=createtemplower.getSubstringEnd(0);
+	} else if (createtempupper.match(ptr)) {
+		ptr=createtempupper.getSubstringEnd(0);
+	} else {
+		return;
+	}
+
+	// get the table name
+	stringbuffer	tablename;
+	while (*ptr!=' ' && *ptr!='\n' && *ptr!='	' && ptr<endptr) {
+		tablename.append(*ptr);
+		ptr++;
+	}
+
+	// append to list of temp tables
+	conn->addSessionTempTableForDrop(tablename.getString());
 }
 
 int	postgresqlcursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
-	// testing this code here
-	/*if (pgresult) {
-		PQclear(pgresult);
-		pgresult=(PGresult *)NULL;
-	}*/
 
 	checkForTempTable(query,length);
 
@@ -256,6 +287,9 @@ void	postgresqlcursor::returnColumnInfo() {
 	char		*name;
 	int		size;
 
+	// is this binary data (all columns will contain binary data if it is)
+	int	binary=PQbinaryTuples(pgresult);
+
 	// for each column...
 	for (int i=0; i<ncols; i++) {
 
@@ -318,12 +352,12 @@ void	postgresqlcursor::returnColumnInfo() {
 		if (postgresqlconn->typemangling==1) {
 			conn->sendColumnDefinition(name,strlen(name),
 							type,size,0,0,0,0,0,
-							0,0,0,0,0);
+							0,0,0,binary,0);
 		} else {
 			conn->sendColumnDefinitionString(name,strlen(name),
 					typestring,strlen(typestring),size,
 							0,0,0,0,0,
-							0,0,0,0,0);
+							0,0,0,binary,0);
 		}
 	}
 }

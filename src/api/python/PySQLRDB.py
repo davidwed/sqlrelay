@@ -82,6 +82,7 @@ class SQLRCursor:
 
     def __init__(self, con):
         self.cursor=CSQLRelay.sqlrcur_alloc(con)
+	CSQLRelay.sqlrcur_setResultSetBufferSize(self.cursor,100)
         self.arraysize=1
 
     def __del__(self):

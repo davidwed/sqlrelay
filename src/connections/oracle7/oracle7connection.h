@@ -91,7 +91,7 @@ class oracle7cursor : public sqlrcursor {
 					unsigned short valuesize,
 					short *isnull);
 		int	executeQuery(const char *query, long length,
-					unsigned short execute);
+						unsigned short execute);
 		int	queryIsNotSelect();
 		int	queryIsCommitOrRollback();
 		char	*getErrorMessage(int *liveconnection);

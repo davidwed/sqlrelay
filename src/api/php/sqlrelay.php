@@ -16,7 +16,7 @@
 // | Author: Stig Bakken <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.6 2004-01-29 05:06:44 mused Exp $
+// $Id: sqlrelay.php,v 1.7 2004-02-15 17:59:45 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -145,6 +145,7 @@ class DB_sqlrelay extends DB_common
     {
 
         $cursor = sqlrcur_alloc($this->connection);
+        sqlrcur_setResultSetBufferSize($cursor,100);
         if (!sqlrcur_sendQuery($cursor, $query)) {
             $this->affectedrows = 0;
             $error = sqlrcur_errorMessage($cursor);
@@ -185,6 +186,7 @@ class DB_sqlrelay extends DB_common
     function prepare($query)
     {
         $cursor = sqlrcur_alloc($this->connection);
+        sqlrcur_setResultSetBufferSize($cursor,100);
         sqlrcur_prepareQuery($cursor, $query);
         return new DB_sqlrelay_cursor($cursor);
     }

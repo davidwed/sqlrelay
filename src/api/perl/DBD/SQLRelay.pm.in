@@ -131,6 +131,9 @@ sub prepare {
 	# create an Cursor
 	my $cursor=SQLRelay::Cursor->new($dbh->FETCH('driver_connection'));
 
+	# set result set buffer size
+	$cursor->setResultSetBufferSize(100);
+
 	# store statement-specific data in the statement handle
 	#$sth->STORE('driver_params',[]);
 	$sth->STORE('driver_database_handle',$dbh);

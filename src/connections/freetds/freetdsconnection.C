@@ -630,6 +630,7 @@ void	freetdscursor::returnColumnInfo() {
 		}
 	
 		// set the datatype
+		unsigned short	binary=0;
 		if (column[i].datatype==CS_CHAR_TYPE) {
 			type=CHAR_DATATYPE;
 		} else if (column[i].datatype==CS_INT_TYPE) {
@@ -652,8 +653,10 @@ void	freetdscursor::returnColumnInfo() {
 			type=SMALLMONEY_DATATYPE;
 		} else if (column[i].datatype==CS_IMAGE_TYPE) {
 			type=IMAGE_DATATYPE;
+			binary=1;
 		} else if (column[i].datatype==CS_BINARY_TYPE) {
 			type=BINARY_DATATYPE;
+			binary=1;
 		} else if (column[i].datatype==CS_BIT_TYPE) {
 			type=BIT_DATATYPE;
 		} else if (column[i].datatype==CS_REAL_TYPE) {
@@ -666,10 +669,12 @@ void	freetdscursor::returnColumnInfo() {
 			type=VARCHAR_DATATYPE;
 		} else if (column[i].datatype==CS_VARBINARY_TYPE) {
 			type=VARBINARY_DATATYPE;
+			binary=1;
 		} else if (column[i].datatype==CS_LONGCHAR_TYPE) {
 			type=LONGCHAR_DATATYPE;
 		} else if (column[i].datatype==CS_LONGBINARY_TYPE) {
 			type=LONGBINARY_DATATYPE;
+			binary=1;
 		} else if (column[i].datatype==CS_LONG_TYPE) {
 			type=LONG_DATATYPE;
 		} else if (column[i].datatype==CS_ILLEGAL_TYPE) {
@@ -697,8 +702,16 @@ void	freetdscursor::returnColumnInfo() {
 					type,
 					column[i].maxlength,
 					column[i].precision,
-					column[i].scale,0,0,0,
-					0,0,0,0,0);
+					column[i].scale,
+					(column[i].status&CS_CANBENULL),
+					0,
+					0,
+					(column[i].status&
+						(CS_KEY|CS_VERSION_KEY)),
+					(type==USHORT_DATATYPE),
+					0,
+					binary,
+					(column[i].status&CS_IDENTITY));
 	}
 }
 

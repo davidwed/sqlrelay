@@ -144,6 +144,41 @@ int	mysqlconnection::rollback() {
 mysqlcursor::mysqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
+
+	createtemplower.compile("create[ \\t\\r\\n]+temporary[ \\t\\r\\n]+table[ \\t\\r\\n]+");
+	createtempupper.compile("CREATE[ \\t\\r\\n]+TEMPORARY[ \\t\\r\\n]+TABLE[ \\t\\r\\n]+");
+}
+
+void	mysqlcursor::checkForTempTable(const char *query,
+						unsigned long length) {
+
+	char	*ptr=(char *)query;
+	char	*endptr=(char *)query+length;
+
+	// skip any leading comments
+	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
+		!skipWhitespace(&ptr,endptr)) {
+		return;
+	}
+
+	// look for "create temporary table "
+	if (createtemplower.match(ptr)) {
+		ptr=createtemplower.getSubstringEnd(0);
+	} else if (createtempupper.match(ptr)) {
+		ptr=createtempupper.getSubstringEnd(0);
+	} else {
+		return;
+	}
+
+	// get the table name
+	stringbuffer	tablename;
+	while (*ptr!=' ' && *ptr!='\n' && *ptr!='	' && ptr<endptr) {
+		tablename.append(*ptr);
+		ptr++;
+	}
+
+	// append to list of temp tables
+	conn->addSessionTempTableForDrop(tablename.getString());
 }
 
 int	mysqlcursor::executeQuery(const char *query, long length,

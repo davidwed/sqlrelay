@@ -332,6 +332,31 @@ int	db2cursor::executeQuery(const char *query, long length,
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
+
+			// primary key
+
+			// unique
+
+			// part of key
+
+			// unsigned number
+			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_UNSIGNED,
+					NULL,0,NULL,&(col[i].unsignednumber));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
+
+			// zero fill
+
+			// binary
+
+			// autoincrement
+			erg=SQLColAttribute(stmt,i+1,
+					SQL_COLUMN_AUTO_INCREMENT,
+					NULL,0,NULL,&(col[i].autoincrement));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
 		}
 
 		// bind the column to a buffer
@@ -391,10 +416,12 @@ void	db2cursor::returnColumnInfo() {
 	// for each column...
 	for (int i=0; i<ncols; i++) {
 
+		unsigned short	binary=0;
 		if (col[i].type==SQL_BIGINT) {
 			type=BIGINT_DATATYPE;
 		} else if (col[i].type==SQL_BINARY) {
 			type=BINARY_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_BIT) {
 			type=BIT_DATATYPE;
 		} else if (col[i].type==SQL_CHAR) {
@@ -411,6 +438,7 @@ void	db2cursor::returnColumnInfo() {
 			type=INTEGER_DATATYPE;
 		} else if (col[i].type==SQL_LONGVARBINARY) {
 			type=LONGVARBINARY_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_LONGVARCHAR) {
 			type=LONGVARCHAR_DATATYPE;
 		} else if (col[i].type==SQL_NUMERIC) {
@@ -427,17 +455,22 @@ void	db2cursor::returnColumnInfo() {
 			type=TINYINT_DATATYPE;
 		} else if (col[i].type==SQL_VARBINARY) {
 			type=VARBINARY_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_VARCHAR) {
 			type=VARCHAR_DATATYPE;
 		// DB2 has more datatypes than ODBC...
 		} else if (col[i].type==SQL_GRAPHIC) {
 			type=GRAPHIC_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_VARGRAPHIC) {
 			type=VARGRAPHIC_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_LONGVARGRAPHIC) {
 			type=LONGVARGRAPHIC_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_BLOB) {
 			type=BLOB_DATATYPE;
+			binary=1;
 		} else if (col[i].type==SQL_CLOB) {
 			type=CLOB_DATATYPE;
 		} else if (col[i].type==SQL_DBCLOB) {
@@ -454,7 +487,8 @@ void	db2cursor::returnColumnInfo() {
 		conn->sendColumnDefinition(col[i].name,col[i].namelength,type,
 					col[i].length,col[i].precision,
 					col[i].scale,col[i].nullable,0,0,
-					0,0,0,0,0);
+					0,col[i].unsignednumber,0,binary,
+					col[i].autoincrement);
 	}
 }
 

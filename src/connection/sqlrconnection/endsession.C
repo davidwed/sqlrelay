@@ -16,7 +16,8 @@ void	sqlrconnection::endSession() {
 	debugPrint("connection",2,"ending session...");
 	#endif
 
-	dropTempTables(&sessiontemptables);
+	truncateTempTables(&sessiontemptablesfortrunc);
+	dropTempTables(&sessiontemptablesfordrop);
 
 	// must set suspendedsession to 0 here so resumed sessions won't 
 	// automatically re-suspend

@@ -12,6 +12,9 @@
 
 #include <rudiments/environment.h>
 #include <sqlrconnection.h>
+#ifdef HAVE_ORACLE_8i
+	#include <rudiments/regularexpression.h>
+#endif
 
 extern "C" {
 	#include <oci.h>
@@ -113,6 +116,10 @@ class oracle8cursor : public sqlrcursor {
 #endif
 		int	executeQuery(const char *query, long length,
 					unsigned short execute);
+#ifdef HAVE_ORACLE_8i
+		void	checkForTempTable(const char *query,
+						unsigned long length);
+#endif
 		int	queryIsNotSelect();
 		int	queryIsCommitOrRollback();
 		char	*getErrorMessage(int *liveconnection);
@@ -169,6 +176,14 @@ class oracle8cursor : public sqlrcursor {
 		int		prepared;
 
 		oracle8connection	*oracle8conn;
+
+#ifdef HAVE_ORACLE_8i
+		regularexpression	createtemplower;
+		regularexpression	createtempupper;
+
+		regularexpression	preserverowslower;
+		regularexpression	preserverowsupper;
+#endif
 };
 	
 class oracle8connection : public sqlrconnection {

@@ -10,25 +10,6 @@ LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) -lm $(LIBEF
 .c.lo:
 	$(LIBTOOLGCC) --mode=compile $(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
-clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) db2
-	$(LIBTOOL) --mode=clean $(RM) freetds
-	$(LIBTOOL) --mode=clean $(RM) interbase
-	$(LIBTOOL) --mode=clean $(RM) lago
-	$(LIBTOOL) --mode=clean $(RM) msql
-	$(LIBTOOL) --mode=clean $(RM) mysql
-	$(LIBTOOL) --mode=clean $(RM) oracle7
-	$(LIBTOOL) --mode=clean $(RM) oracle8
-	$(LIBTOOL) --mode=clean $(RM) oracle8i
-	$(LIBTOOL) --mode=clean $(RM) postgresql6
-	$(LIBTOOL) --mode=clean $(RM) postgresql7
-	$(LIBTOOL) --mode=clean $(RM) sqlite
-	$(LIBTOOL) --mode=clean $(RM) sybase
-	$(LIBTOOL) --mode=clean $(RM) cachefile*
-	$(LIBTOOL) --mode=clean $(RM) sqlnet.log
-
 all:
 ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) db2
@@ -103,5 +84,23 @@ sqlite: sqlite.c sqlite.lo
 sybase: sybase.c sybase.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sybase.lo $(LIBS)
 
+clean:
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) db2
+	$(LIBTOOL) --mode=clean $(RM) freetds
+	$(LIBTOOL) --mode=clean $(RM) interbase
+	$(LIBTOOL) --mode=clean $(RM) lago
+	$(LIBTOOL) --mode=clean $(RM) msql
+	$(LIBTOOL) --mode=clean $(RM) mysql
+	$(LIBTOOL) --mode=clean $(RM) oracle7
+	$(LIBTOOL) --mode=clean $(RM) oracle8
+	$(LIBTOOL) --mode=clean $(RM) oracle8i
+	$(LIBTOOL) --mode=clean $(RM) postgresql6
+	$(LIBTOOL) --mode=clean $(RM) postgresql7
+	$(LIBTOOL) --mode=clean $(RM) sqlite
+	$(LIBTOOL) --mode=clean $(RM) sybase
+	$(LIBTOOL) --mode=clean $(RM) cachefile*
+	$(LIBTOOL) --mode=clean $(RM) sqlnet.log
 
 rebuild: clean all

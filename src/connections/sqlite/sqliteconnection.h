@@ -9,7 +9,7 @@
 #include <pthread.h>
 
 #include <sqlrconnection.h>
-#include <rudiments/semaphoreset.h>
+#include <rudiments/regularexpression.h>
 
 extern "C" {
 	#include <sqlite.h>
@@ -25,6 +25,8 @@ class sqlitecursor : public sqlrcursor {
 	private:
 				sqlitecursor(sqlrconnection *conn);
 				~sqlitecursor();
+			void	checkForTempTable(const char *query,
+						unsigned long length);
 			int	executeQuery(const char *query, long length,
 						unsigned short execute);
 			int	runQuery(stringbuffer *newquery,
@@ -49,6 +51,8 @@ class sqlitecursor : public sqlrcursor {
 
 			sqliteconnection	*sqliteconn;
 
+			regularexpression	createtemplower;
+			regularexpression	createtempupper;
 };
 
 class sqliteconnection : public sqlrconnection {

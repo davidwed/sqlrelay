@@ -7,6 +7,7 @@
 #define NUM_CONNECT_STRING_VARS 6
 
 #include <sqlrconnection.h>
+#include <rudiments/regularexpression.h>
 
 #include <mysql.h>
 
@@ -16,8 +17,10 @@ class mysqlcursor : public sqlrcursor {
 	friend class mysqlconnection;
 	private:
 			mysqlcursor(sqlrconnection *conn);
+		void	checkForTempTable(const char *query,
+						unsigned long length);
 		int	executeQuery(const char *query, long length,
-					unsigned short execute);
+						unsigned short execute);
 		char	*getErrorMessage(int *liveconnection);
 		void	returnRowCounts();
 		void	returnColumnCount();
@@ -38,6 +41,9 @@ class mysqlcursor : public sqlrcursor {
 		int		queryresult;
 
 		mysqlconnection	*mysqlconn;
+
+		regularexpression	createtemplower;
+		regularexpression	createtempupper;
 };
 
 class mysqlconnection : public sqlrconnection {

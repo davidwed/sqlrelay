@@ -49,8 +49,10 @@ void checkSuccess(int value, int success) {
 
 int	main(int argc, char **argv) {
 	char	*dbtype;
-	const char	*bindvars[6]={"1","2","3","4","5",NULL};
-	const char	*bindvals[5]={"4","testchar4","testvarchar4","01-JAN-2004","testlong4"};
+	//const char	*bindvars[6]={"1","2","3","4","5",NULL};
+	//const char	*bindvals[5]={"4","testchar4","testvarchar4","01-JAN-2004","testlong4"};
+	const char	*bindvars[6]={"1","2","3","4",NULL};
+	const char	*bindvals[5]={"4","testchar4","testvarchar4","01-JAN-2004"};
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
 	long	subvallongs[3]={1,2,3};
@@ -66,8 +68,10 @@ int	main(int argc, char **argv) {
 	char	*socket;
 	int	id;
 	char	*filename;
-	const char	*arraybindvars[6]={"var1","var2","var3","var4","var5",NULL};
-	const char	*arraybindvals[5]={"7","testchar7","testvarchar7","01-JAN-2007","testlong7"};
+	//const char	*arraybindvars[6]={"var1","var2","var3","var4","var5",NULL};
+	//const char	*arraybindvals[5]={"7","testchar7","testvarchar7","01-JAN-2007","testlong7"};
+	const char	*arraybindvars[6]={"var1","var2","var3","var4",NULL};
+	const char	*arraybindvals[5]={"7","testchar7","testvarchar7","01-JAN-2007"};
 	long	*fieldlens;
 
 
@@ -109,59 +113,65 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
-	cur->prepareQuery("insert into testtable values (:1,:2,:3,:4,:5)");
-	checkSuccess(cur->countBindVariables(),5);
+	//cur->prepareQuery("insert into testtable values (:1,:2,:3,:4,:5)");
+	cur->prepareQuery("insert into testtable values (:1,:2,:3,:4,NULL)");
+	//checkSuccess(cur->countBindVariables(),5);
+	checkSuccess(cur->countBindVariables(),4);
 	cur->inputBind("1",2);
 	cur->inputBind("2","testchar2");
 	cur->inputBind("3","testvarchar2");
 	cur->inputBind("4","01-JAN-2002");
-	cur->inputBind("5","testlong2");
+	//cur->inputBind("5","testlong2");
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",3);
 	cur->inputBind("2","testchar3");
 	cur->inputBind("3","testvarchar3");
 	cur->inputBind("4","01-JAN-2003");
-	cur->inputBind("5","testlong3");
+	//cur->inputBind("5","testlong3");
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
 	printf("ARRAY OF BINDS BY POSITION: \n");
-	cur->prepareQuery("insert into testtable values (:1,:2,:3,:4,:5)");
+	//cur->prepareQuery("insert into testtable values (:1,:2,:3,:4,:5)");
+	cur->prepareQuery("insert into testtable values (:1,:2,:3,:4,NULL)");
 	cur->inputBinds(bindvars,bindvals);
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
 	printf("BIND BY NAME: \n");
-	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	//cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,NULL)");
 	cur->inputBind("var1",5);
 	cur->inputBind("var2","testchar5");
 	cur->inputBind("var3","testvarchar5");
 	cur->inputBind("var4","01-JAN-2005");
-	cur->inputBind("var5","testlong5");
+	//cur->inputBind("var5","testlong5");
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("var1",6);
 	cur->inputBind("var2","testchar6");
 	cur->inputBind("var3","testvarchar6");
 	cur->inputBind("var4","01-JAN-2006");
-	cur->inputBind("var5","testlong6");
+	//cur->inputBind("var5","testlong6");
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
 	printf("ARRAY OF BINDS BY NAME: \n");
-	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	//cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,NULL)");
 	cur->inputBinds(arraybindvars,arraybindvals);
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
 	printf("BIND BY NAME WITH VALIDATION: \n");
-	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	//cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,NULL)");
 	cur->inputBind("var1",8);
 	cur->inputBind("var2","testchar8");
 	cur->inputBind("var3","testvarchar8");
 	cur->inputBind("var4","01-JAN-2008");
-	cur->inputBind("var5","testlong8");
+	//cur->inputBind("var5","testlong8");
 	cur->inputBind("var6","junkvalue");
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
@@ -291,13 +301,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,1),"testchar1                               ");
 	checkSuccess(cur->getField(0,2),"testvarchar1");
 	checkSuccess(cur->getField(0,3),"01-JAN-01");
-	checkSuccess(cur->getField(0,4),"testlong1");
+	//checkSuccess(cur->getField(0,4),"testlong1");
 	printf("\n");
 	checkSuccess(cur->getField(7,0),"8");
 	checkSuccess(cur->getField(7,1),"testchar8                               ");
 	checkSuccess(cur->getField(7,2),"testvarchar8");
 	checkSuccess(cur->getField(7,3),"01-JAN-08");
-	checkSuccess(cur->getField(7,4),"testlong8");
+	//checkSuccess(cur->getField(7,4),"testlong8");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY INDEX: \n");
@@ -317,13 +327,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,"testchar"),"testchar1                               ");
 	checkSuccess(cur->getField(0,"testvarchar"),"testvarchar1");
 	checkSuccess(cur->getField(0,"testdate"),"01-JAN-01");
-	checkSuccess(cur->getField(0,"testlong"),"testlong1");
+	//checkSuccess(cur->getField(0,"testlong"),"testlong1");
 	printf("\n");
 	checkSuccess(cur->getField(7,"testnumber"),"8");
 	checkSuccess(cur->getField(7,"testchar"),"testchar8                               ");
 	checkSuccess(cur->getField(7,"testvarchar"),"testvarchar8");
 	checkSuccess(cur->getField(7,"testdate"),"01-JAN-08");
-	checkSuccess(cur->getField(7,"testlong"),"testlong8");
+	//checkSuccess(cur->getField(7,"testlong"),"testlong8");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY NAME: \n");
@@ -344,7 +354,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(fields[1],"testchar1                               ");
 	checkSuccess(fields[2],"testvarchar1");
 	checkSuccess(fields[3],"01-JAN-01");
-	checkSuccess(fields[4],"testlong1");
+	//checkSuccess(fields[4],"testlong1");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY ARRAY: \n");
@@ -707,4 +717,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	printf("\n");
 
+	delete cur;
+	delete con;
 }
