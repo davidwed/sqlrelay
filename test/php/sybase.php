@@ -590,7 +590,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("NULLS as Nulls: \n");
-	sqlrcur_getNullsAsUndefined($cur);
+	sqlrcur_getNullsAsNulls($cur);
 	checkSuccess(sqlrcur_sendQuery($cur,"select NULL,1,NULL"),1);
 	checkSuccess(sqlrcur_getField($cur,0,0),NULL);
 	checkSuccess(sqlrcur_getField($cur,0,1),"1");

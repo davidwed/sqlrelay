@@ -291,7 +291,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("NULLS as Nulls: \n");
-	sqlrcur_getNullsAsUndefined($cur);
+	sqlrcur_getNullsAsNulls($cur);
 	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable1 values (1,NULL,NULL)"),1);
 	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable1"),1);
 	checkSuccess(sqlrcur_getField($cur,0,0),"1");

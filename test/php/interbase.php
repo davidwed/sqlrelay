@@ -445,7 +445,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("NULLS as Nulls: \n");
-	sqlrcur_getNullsAsUndefined($cur);
+	sqlrcur_getNullsAsNulls($cur);
 	checkSuccess(sqlrcur_sendQuery($cur,"select 1,NULL,NULL from rdb\$database"),1);
 	checkSuccess(sqlrcur_getField($cur,0,0),"1");
 	checkSuccess(sqlrcur_getField($cur,0,1),NULL);

@@ -416,7 +416,7 @@ function checkSuccess($value,$success) {
 	echo("NULLS as Nulls: \n");
 	sqlrcur_sendQuery($cur,"drop table testtable1");
 	sqlrcur_sendQuery($cur,"create table testtable1 (col1 char(1), col2 char(1), col3 char(1))");
-	sqlrcur_getNullsAsUndefined($cur);
+	sqlrcur_getNullsAsNulls($cur);
 	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable1 (col1, col2, col3) values ('1',NULL,NULL)"),1);
 	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable1"),1);
 	checkSuccess(sqlrcur_getField($cur,0,0),"1");

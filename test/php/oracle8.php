@@ -431,7 +431,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("NULLS as Nulls: \n");
-	sqlrcur_getNullsAsUndefined($cur);
+	sqlrcur_getNullsAsNulls($cur);
 	checkSuccess(sqlrcur_sendQuery($cur,"select NULL,1,NULL from dual"),1);
 	checkSuccess(sqlrcur_getField($cur,0,0),NULL);
 	checkSuccess(sqlrcur_getField($cur,0,1),"1");
@@ -706,7 +706,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("NULL AND EMPTY CLOBS AND CLOBS: \n");
-	sqlrcur_getNullsAsUndefined($cur);
+	sqlrcur_getNullsAsNulls($cur);
 	sqlrcur_sendQuery($cur,"create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)");
 	sqlrcur_prepareQuery($cur,"insert into testtable1 values (:var1,:var2,:var3,:var4)");
 	sqlrcur_inputBindClob($cur,"var1","",0);
