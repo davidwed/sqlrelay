@@ -573,20 +573,39 @@ class sqlite {
 		cur.setResultSetBufferSize(0);
 		System.out.println();
 
-	    System.out.println("COMMIT AND ROLLBACK: \n");
-	    SQLRConnection secondcon=new SQLRConnection(args[0],
-				    Integer.parseInt(args[1]), 
-				    args[2],args[3],args[4],0,1);
-	    SQLRCursor secondcur=new SQLRCursor(secondcon);
-	    checkSuccess(secondcur.sendQuery("select count(*) from testtable"),0);
-	    checkSuccess(con.commit(),1);
-	    checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
-	    checkSuccess(secondcur.getField(0,0),"8");
-	    checkSuccess(cur.sendQuery("insert into testtable values (10,10.1,'testchar10','testvarchar10')"),1);
-	    checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
-	    checkSuccess(secondcur.getField(0,0),"9");
+	    	System.out.println("COMMIT AND ROLLBACK: \n");
+	    	SQLRConnection secondcon=new SQLRConnection(args[0],
+				    	Integer.parseInt(args[1]), 
+				    	args[2],args[3],args[4],0,1);
+	    	SQLRCursor secondcur=new SQLRCursor(secondcon);
+	    	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),0);
+	    	checkSuccess(con.commit(),1);
+	    	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
+	    	checkSuccess(secondcur.getField(0,0),"8");
+	    	checkSuccess(cur.sendQuery("insert into testtable values (10,10.1,'testchar10','testvarchar10')"),1);
+	    	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
+	    	checkSuccess(secondcur.getField(0,0),"9");
 		System.out.println();
-	    
+
+
+		System.out.println("FINISHED SUSPENDED SESSION: ");
+		checkSuccess(cur.sendQuery("select * from testtable order by testint"),1);
+		checkSuccess(cur.getField(4,0),"5");
+		checkSuccess(cur.getField(5,0),"6");
+		checkSuccess(cur.getField(6,0),"7");
+		checkSuccess(cur.getField(7,0),"8");
+		id=cur.getResultSetId();
+		cur.suspendResultSet();
+		checkSuccess(con.suspendSession(),1);
+		port=con.getConnectionPort();
+		socket=con.getConnectionSocket();
+		checkSuccess(con.resumeSession(port,socket),1);
+		checkSuccess(cur.resumeResultSet(id),1);
+		checkSuccess(cur.getField(4,0),null);
+		checkSuccess(cur.getField(5,0),null);
+		checkSuccess(cur.getField(6,0),null);
+		checkSuccess(cur.getField(7,0),null);
+		System.out.println();
     	
 		// drop existing table
 		cur.sendQuery("drop table testtable");

@@ -40,6 +40,7 @@ void	sqlrconnection::resumeResultSet() {
 		// then send the result set header
 		clientsock->write((unsigned long)lastrow);
 		returnResultSetHeader();
+
 	} else {
 
 		#ifdef 	SERVER_DEBUG

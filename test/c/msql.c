@@ -690,6 +690,25 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcon_autoCommitOff(con),1);
 	printf("\n");
 
+	printf("FINISHED SUSPENDED SESSION: \n");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testint"),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,4,2),"5");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,5,2),"6");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,6,2),"7");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,2),"8");
+	id=sqlrcur_getResultSetId(cur);
+	sqlrcur_suspendResultSet(cur);
+	checkSuccessInt(sqlrcon_suspendSession(con),1);
+	port=sqlrcon_getConnectionPort(con);
+	socket=strdup(sqlrcon_getConnectionSocket(con));
+	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
+	checkSuccessInt(sqlrcur_resumeResultSet(cur,id),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,4,2),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,5,2),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,6,2),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,2),NULL);
+	printf("\n");
+
 	// drop existing table
 	sqlrcur_sendQuery(cur,"drop table testtable");
 

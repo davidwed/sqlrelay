@@ -725,6 +725,25 @@ class interbase {
 		checkSuccess(secondcur.getField(0,0),"9");
 		checkSuccess(con.autoCommitOff(),1);
 		System.out.println();
+
+		System.out.println("FINISHED SUSPENDED SESSION: ");
+		checkSuccess(cur.sendQuery("select * from testtable order by testinteger"),1);
+		checkSuccess(cur.getField(4,0),"5");
+		checkSuccess(cur.getField(5,0),"6");
+		checkSuccess(cur.getField(6,0),"7");
+		checkSuccess(cur.getField(7,0),"8");
+		id=cur.getResultSetId();
+		cur.suspendResultSet();
+		checkSuccess(con.suspendSession(),1);
+		port=con.getConnectionPort();
+		socket=con.getConnectionSocket();
+		checkSuccess(con.resumeSession(port,socket),1);
+		checkSuccess(cur.resumeResultSet(id),1);
+		checkSuccess(cur.getField(4,0),null);
+		checkSuccess(cur.getField(5,0),null);
+		checkSuccess(cur.getField(6,0),null);
+		checkSuccess(cur.getField(7,0),null);
+		System.out.println();
 	
 		// drop existing table
 		con.commit();

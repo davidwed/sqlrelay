@@ -4,7 +4,6 @@
 #include <sqlrconnection.h>
 
 void	sqlrcursor::abort() {
-	cleanUpData();
 	suspendresultset=0;
 	busy=0;
 }

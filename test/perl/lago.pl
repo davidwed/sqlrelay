@@ -212,8 +212,8 @@ checkSuccess($cur->getColumnLength(7),4);
 checkSuccess($cur->getColumnLength('testdate'),4);
 checkSuccess($cur->getColumnLength(8),4);
 checkSuccess($cur->getColumnLength('testtime'),4);
-checkSuccess($cur->getColumnLength(9),8);
-checkSuccess($cur->getColumnLength('testtimestamp'),8);
+checkSuccess($cur->getColumnLength(9),4);
+checkSuccess($cur->getColumnLength('testtimestamp'),4);
 print("\n");
 
 print("LONGEST COLUMN: \n");
@@ -712,6 +712,25 @@ checkSuccess($cur->sendQuery("insert into testtable (testsmallint, testint, test
 checkSuccess($secondcur->sendQuery("select * from testtable"),1);
 checkSuccessString($secondcur->getField(8,0),"10");
 checkSuccess($con->autoCommitOff(),1);
+print("\n");
+
+print("FINISHED SUSPENDED SESSION: \n");
+checkSuccess($cur->sendQuery("select * from testtable"),1);
+checkSuccessString($cur->getField(4,0),"5");
+checkSuccessString($cur->getField(5,0),"6");
+checkSuccessString($cur->getField(6,0),"7");
+checkSuccessString($cur->getField(7,0),"8");
+$id=$cur->getResultSetId();
+$cur->suspendResultSet();
+checkSuccess($con->suspendSession(),1);
+$port=$con->getConnectionPort();
+$socket=$con->getConnectionSocket();
+checkSuccess($con->resumeSession($port,$socket),1);
+checkSuccess($cur->resumeResultSet($id),1);
+checkSuccessString($cur->getField(4,0),NULL);
+checkSuccessString($cur->getField(5,0),NULL);
+checkSuccessString($cur->getField(6,0),NULL);
+checkSuccessString($cur->getField(7,0),NULL);
 print("\n");
 
 # drop existing table

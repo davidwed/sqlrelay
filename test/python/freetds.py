@@ -934,6 +934,25 @@ def main():
 	checkSuccess(rows[5][13],1)
 	print
 
+	print "FINISHED SUSPENDED SESSION: "
+	checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
+	checkSuccess(cur.getField(4,0),"5")
+	checkSuccess(cur.getField(5,0),"6")
+	checkSuccess(cur.getField(6,0),"7")
+	checkSuccess(cur.getField(7,0),"8")
+	id=cur.getResultSetId()
+	cur.suspendResultSet()
+	checkSuccess(con.suspendSession(),1)
+	port=con.getConnectionPort()
+	socket=con.getConnectionSocket()
+	checkSuccess(con.resumeSession(port,socket),1)
+	checkSuccess(cur.resumeResultSet(id),1)
+	checkSuccess(cur.getField(4,0),None)
+	checkSuccess(cur.getField(5,0),None)
+	checkSuccess(cur.getField(6,0),None)
+	checkSuccess(cur.getField(7,0),None)
+	print
+
 
 	# drop existing table
 	con.commit()

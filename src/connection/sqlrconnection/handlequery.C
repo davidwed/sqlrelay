@@ -141,6 +141,13 @@ int	sqlrconnection::getQuery() {
 
 int	sqlrconnection::processQuery(int reexecute, int reallyexecute) {
 
+	// Very important...
+	// Clean up data here instead of when aborting a result set, this
+	// allows for result sets that were suspended after the entire
+	// result set was fetched to still be able to return column data
+	// when resumed.
+	cur[currentcur]->cleanUpData();
+
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"processing query...");
 	#endif

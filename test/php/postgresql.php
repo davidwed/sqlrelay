@@ -160,10 +160,10 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnLength($cur,"testreal"),4);
 	checkSuccess(sqlrcur_getColumnLength($cur,3),2);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testsmallint"),2);
-	checkSuccess(sqlrcur_getColumnLength($cur,4),0);
-	checkSuccess(sqlrcur_getColumnLength($cur,"testchar"),0);
-	checkSuccess(sqlrcur_getColumnLength($cur,5),0);
-	checkSuccess(sqlrcur_getColumnLength($cur,"testvarchar"),0);
+	checkSuccess(sqlrcur_getColumnLength($cur,4),44);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testchar"),44);
+	checkSuccess(sqlrcur_getColumnLength($cur,5),44);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testvarchar"),44);
 	checkSuccess(sqlrcur_getColumnLength($cur,6),4);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testdate"),4);
 	checkSuccess(sqlrcur_getColumnLength($cur,7),8);

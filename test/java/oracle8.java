@@ -142,7 +142,7 @@ class oracle8 {
 		cur.inputBind("4","01-JAN-2002");
 		cur.inputBind("5","testlong2");
 		cur.inputBindClob("6","testclob2",9);
-		cur.inputBindBlob("7","testblob2",9);
+		cur.inputBindBlob("7",(new String("testblob2")).getBytes(),9);
 		checkSuccess(cur.executeQuery(),1);
 		cur.clearBinds();
 		cur.inputBind("1",3);
@@ -151,7 +151,7 @@ class oracle8 {
 		cur.inputBind("4","01-JAN-2003");
 		cur.inputBind("5","testlong3");
 		cur.inputBindClob("6","testclob3",9);
-		cur.inputBindBlob("7","testblob3",9);
+		cur.inputBindBlob("7",(new String("testblob3")).getBytes(),9);
 		checkSuccess(cur.executeQuery(),1);
 		System.out.println();
 	
@@ -159,7 +159,8 @@ class oracle8 {
 		cur.clearBinds();
 		cur.inputBinds(bindvars,bindvals);
 		cur.inputBindClob("var6","testclob4",9);
-		cur.inputBindBlob("var7","testblob4",9);
+		cur.inputBindBlob("var7",
+				(new String("testblob4")).getBytes(),9);
 		checkSuccess(cur.executeQuery(),1);
 		System.out.println();
 	
@@ -171,7 +172,8 @@ class oracle8 {
 		cur.inputBind("var4","01-JAN-2005");
 		cur.inputBind("var5","testlong5");
 		cur.inputBindClob("var6","testclob5",9);
-		cur.inputBindBlob("var7","testblob5",9);
+		cur.inputBindBlob("var7",
+				(new String("testblob5")).getBytes(),9);
 		checkSuccess(cur.executeQuery(),1);
 		cur.clearBinds();
 		cur.inputBind("var1",6);
@@ -180,7 +182,8 @@ class oracle8 {
 		cur.inputBind("var4","01-JAN-2006");
 		cur.inputBind("var5","testlong6");
 		cur.inputBindClob("var6","testclob6",9);
-		cur.inputBindBlob("var7","testblob6",9);
+		cur.inputBindBlob("var7",
+				(new String("testblob6")).getBytes(),9);
 		checkSuccess(cur.executeQuery(),1);
 		System.out.println();
 	
@@ -188,7 +191,8 @@ class oracle8 {
 		cur.clearBinds();
 		cur.inputBinds(arraybindvars,arraybindvals);
 		cur.inputBindClob("var6","testclob7",9);
-		cur.inputBindBlob("var7","testblob7",9);
+		cur.inputBindBlob("var7",
+				(new String("testblob7")).getBytes(),9);
 		checkSuccess(cur.executeQuery(),1);
 		System.out.println();
 	
@@ -200,7 +204,8 @@ class oracle8 {
 		cur.inputBind("var4","01-JAN-2008");
 		cur.inputBind("var5","testlong8");
 		cur.inputBindClob("var6","testclob8",9);
-		cur.inputBindBlob("var7","testblob8",9);
+		cur.inputBindBlob("var7",
+				(new String("testblob8")).getBytes(),9);
 		cur.inputBind("var9","junkvalue");
 		cur.validateBinds();
 		checkSuccess(cur.executeQuery(),1);
@@ -754,7 +759,7 @@ class oracle8 {
 		cur.sendQuery("drop table testtable1");
 		checkSuccess(cur.sendQuery("create table testtable1 (testclob clob, testblob blob)"),1);
 		cur.prepareQuery("insert into testtable1 values ('hello',:var1)");
-		cur.inputBindBlob("var1","hello",5);
+		cur.inputBindBlob("var1",(new String("hello")).getBytes(),5);
 		checkSuccess(cur.executeQuery(),1);
 		cur.prepareQuery("begin select testclob into :clobvar from testtable1;  select testblob into :blobvar from testtable1; end;");
 		cur.defineOutputBindClob("clobvar");
@@ -777,7 +782,7 @@ class oracle8 {
 		cur.prepareQuery("insert into testtable1 values (:var1,:var2,:var3,:var4)");
 		cur.inputBindClob("var1","",0);
 		cur.inputBindClob("var2",null,0);
-		cur.inputBindBlob("var3","",0);
+		cur.inputBindBlob("var3",(new String("")).getBytes(),0);
 		cur.inputBindBlob("var4",null,0);
 		checkSuccess(cur.executeQuery(),1);
 		cur.sendQuery("select * from testtable1");
@@ -860,6 +865,25 @@ class oracle8 {
 		cur.sendQuery("select testval from testtable2");
 		checkSuccess(cur.getField(0,"testval"),"-1");
 		cur.sendQuery("drop table testtable2");
+		System.out.println();
+
+		System.out.println("FINISHED SUSPENDED SESSION: ");
+		checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1);
+		checkSuccess(cur.getField(4,0),"5");
+		checkSuccess(cur.getField(5,0),"6");
+		checkSuccess(cur.getField(6,0),"7");
+		checkSuccess(cur.getField(7,0),"8");
+		id=cur.getResultSetId();
+		cur.suspendResultSet();
+		checkSuccess(con.suspendSession(),1);
+		port=con.getConnectionPort();
+		socket=con.getConnectionSocket();
+		checkSuccess(con.resumeSession(port,socket),1);
+		checkSuccess(cur.resumeResultSet(id),1);
+		checkSuccess(cur.getField(4,0),null);
+		checkSuccess(cur.getField(5,0),null);
+		checkSuccess(cur.getField(6,0),null);
+		checkSuccess(cur.getField(7,0),null);
 		System.out.println();
 
 		// drop existing table

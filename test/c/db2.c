@@ -708,6 +708,25 @@ int	main(int argc, char **argv) {
 	free(filename);
 	printf("\n");
 
+	printf("FINISHED SUSPENDED SESSION: \n");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testint"),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,4,0),"5");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,5,0),"6");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,6,0),"7");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,0),"8");
+	id=sqlrcur_getResultSetId(cur);
+	sqlrcur_suspendResultSet(cur);
+	checkSuccessInt(sqlrcon_suspendSession(con),1);
+	port=sqlrcon_getConnectionPort(con);
+	socket=strdup(sqlrcon_getConnectionSocket(con));
+	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
+	checkSuccessInt(sqlrcur_resumeResultSet(cur,id),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,4,0),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,5,0),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,6,0),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,0),NULL);
+	printf("\n");
+
 	// drop existing table
 	sqlrcon_commit(con);
 	sqlrcur_sendQuery(cur,"drop table testtable");

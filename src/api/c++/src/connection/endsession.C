@@ -21,7 +21,7 @@ int	sqlrconnection::endSession() {
 		currentcursor=currentcursor->next;
 	}
 
-	// write a ~ to the connection
+	// write an END_SESSION to the connection
 	int	retval=1;
 	if (connected) {
 		retval=0;

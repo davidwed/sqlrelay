@@ -1518,7 +1518,7 @@ then
 		if ( test -n "$PYTHONPATH" )
 		then
 		
-			for i in "1.5" "1.6" "2.0" "2.1" "2.2"
+			for i in "1.5" "1.6" "2.0" "2.1" "2.2" "2.3"
 			do
 				if ( test -d "$PYTHONPATH/include/python$i" )
 				then
@@ -1552,7 +1552,7 @@ then
 		
 		else
 		
-			for j in "1.5" "1.6" "2.0" "2.1" "2.2"
+			for j in "1.5" "1.6" "2.0" "2.1" "2.2" "2.3"
 			do
 				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"
 				do

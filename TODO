@@ -1,5 +1,6 @@
+make some methods that return int return bool
+test finished-suspended-result-set's with oracle/db2/sybase/freetds
 slackware package build isn't right
-suspend/resumeResultSet doesn't appear to work if result set is done
 
 implement unique/nullable/primary key as a bitmap
 use connectstring class to parse/store connectstrings

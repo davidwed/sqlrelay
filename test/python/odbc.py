@@ -49,6 +49,25 @@ def main():
 	print "INSERT: "
 	checkSuccess(cur.sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001')"),1)
 
+	print "FINISHED SUSPENDED SESSION: "
+	checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
+	checkSuccess(cur.getField(4,0),"5")
+	checkSuccess(cur.getField(5,0),"6")
+	checkSuccess(cur.getField(6,0),"7")
+	checkSuccess(cur.getField(7,0),"8")
+	id=cur.getResultSetId()
+	cur.suspendResultSet()
+	checkSuccess(con.suspendSession(),1)
+	port=con.getConnectionPort()
+	socket=con.getConnectionSocket()
+	checkSuccess(con.resumeSession(port,socket),1)
+	checkSuccess(cur.resumeResultSet(id),1)
+	checkSuccess(cur.getField(4,0),None)
+	checkSuccess(cur.getField(5,0),None)
+	checkSuccess(cur.getField(6,0),None)
+	checkSuccess(cur.getField(7,0),None)
+	print
+
 	# drop existing table
 	cur.sendQuery("drop table testtable")
 

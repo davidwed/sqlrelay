@@ -218,10 +218,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testreal"),4);
 	checkSuccess(cur->getColumnLength(3),2);
 	checkSuccess(cur->getColumnLength("testsmallint"),2);
-	checkSuccess(cur->getColumnLength(4),0);
-	checkSuccess(cur->getColumnLength("testchar"),0);
-	checkSuccess(cur->getColumnLength(5),0);
-	checkSuccess(cur->getColumnLength("testvarchar"),0);
+	checkSuccess(cur->getColumnLength(4),44);
+	checkSuccess(cur->getColumnLength("testchar"),44);
+	checkSuccess(cur->getColumnLength(5),44);
+	checkSuccess(cur->getColumnLength("testvarchar"),44);
 	checkSuccess(cur->getColumnLength(6),4);
 	checkSuccess(cur->getColumnLength("testdate"),4);
 	checkSuccess(cur->getColumnLength(7),8);
@@ -479,7 +479,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	printf("\n");
 	checkSuccess(cur->getField(0,0),"1");
@@ -495,7 +495,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	printf("\n");
 	checkSuccess(cur->getField(0,0),"1");
@@ -511,7 +511,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	printf("\n");
 	checkSuccess(cur->getField(0,0),"1");
@@ -532,7 +532,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeResultSet(id),1);
 	printf("\n");
@@ -637,7 +637,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=con->getConnectionSocket();
+	socket=strdup(con->getConnectionSocket());
 	printf("\n");
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeCachedResultSet(id,filename),1);
@@ -679,6 +679,25 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,0),"9");
 	//checkSuccess(con->autoCommitOff(),1);
+	printf("\n");
+
+	printf("FINISHED SUSPENDED SESSION: \n");
+	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
+	checkSuccess(cur->getField(4,0),"5");
+	checkSuccess(cur->getField(5,0),"6");
+	checkSuccess(cur->getField(6,0),"7");
+	checkSuccess(cur->getField(7,0),"8");
+	id=cur->getResultSetId();
+	cur->suspendResultSet();
+	checkSuccess(con->suspendSession(),1);
+	port=con->getConnectionPort();
+	socket=strdup(con->getConnectionSocket());
+	checkSuccess(con->resumeSession(port,socket),1);
+	checkSuccess(cur->resumeResultSet(id),1);
+	checkSuccess(cur->getField(4,0),NULL);
+	checkSuccess(cur->getField(5,0),NULL);
+	checkSuccess(cur->getField(6,0),NULL);
+	checkSuccess(cur->getField(7,0),NULL);
 	printf("\n");
 
 	// drop existing table

@@ -707,6 +707,25 @@ def main():
 	checkSuccess(rows[5][7],6)
 	print
 
+	print "FINISHED SUSPENDED SESSION: "
+	checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
+	checkSuccess(cur.getField(4,2),"5")
+	checkSuccess(cur.getField(5,2),"6")
+	checkSuccess(cur.getField(6,2),"7")
+	checkSuccess(cur.getField(7,2),"8")
+	id=cur.getResultSetId()
+	cur.suspendResultSet()
+	checkSuccess(con.suspendSession(),1)
+	port=con.getConnectionPort()
+	socket=con.getConnectionSocket()
+	checkSuccess(con.resumeSession(port,socket),1)
+	checkSuccess(cur.resumeResultSet(id),1)
+	checkSuccess(cur.getField(4,2),None)
+	checkSuccess(cur.getField(5,2),None)
+	checkSuccess(cur.getField(6,2),None)
+	checkSuccess(cur.getField(7,2),None)
+	print
+
 	# drop existing table
 	cur.sendQuery("drop table testtable")
 

@@ -57,6 +57,15 @@ int	sqlrconnection::returnResultSetData() {
 	}
 
 
+	#ifdef SERVER_DEBUG
+	debugstr=new stringbuffer();
+	debugstr->append("fetching ");
+	debugstr->append((long)fetch);
+	debugstr->append(" rows...");
+	debugPrint("connection",2,debugstr->getString());
+	delete debugstr;
+	#endif
+
 	// send the specified number of rows back
 	for (unsigned long i=0; (!fetch || i<fetch); i++) {
 
@@ -71,12 +80,12 @@ int	sqlrconnection::returnResultSetData() {
 		}
 
 		#ifdef SERVER_DEBUG
-			debugstr=new stringbuffer();
+		debugstr=new stringbuffer();
 		#endif
 		cur[currentcur]->returnRow();
 		#ifdef SERVER_DEBUG
-			debugPrint("connection",3,debugstr->getString());
-			delete debugstr;
+		debugPrint("connection",3,debugstr->getString());
+		delete debugstr;
 		#endif
 
 		lastrow++;

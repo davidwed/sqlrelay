@@ -173,8 +173,8 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnLength($cur,"testdate"),4);
 	checkSuccess(sqlrcur_getColumnLength($cur,8),4);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testtime"),4);
-	checkSuccess(sqlrcur_getColumnLength($cur,9),8);
-	checkSuccess(sqlrcur_getColumnLength($cur,"testtimestamp"),8);
+	checkSuccess(sqlrcur_getColumnLength($cur,9),4);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testtimestamp"),4);
 	echo("\n");
 
 	echo("LONGEST COLUMN: \n");

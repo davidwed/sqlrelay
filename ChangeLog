@@ -45,6 +45,7 @@
 		less than 1) are set to the default value now 
 	sqlrconfigfile class uses list class now to store user/connectstring
 		lists
+	updated config.guess, config.sub, ltmain.sh
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

@@ -146,6 +146,11 @@ postgresqlcursor::postgresqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 
 int	postgresqlcursor::executeQuery(const char *query, long length,
 						unsigned short execute) {
+	// testing this code here
+	/*if (pgresult) {
+		PQclear(pgresult);
+		pgresult=(PGresult *)NULL;
+	}*/
 
 	checkForTempTable(query,length);
 
@@ -232,7 +237,6 @@ void	postgresqlcursor::returnColumnInfo() {
 	// for each column...
 	for (int i=0; i<ncols; i++) {
 
-
 		// Types are strange in POSTGRESQL, there are no actual
 		// types, only internal numbers that correspond to 
 		// types which are defined in a database table 
@@ -313,11 +317,11 @@ int	postgresqlcursor::skipRow() {
 }
 
 int	postgresqlcursor::fetchRow() {
-	currentrow++;
-	if (currentrow==nrows) {
-		return 0;
+	if (currentrow<nrows-1) {
+		currentrow++;
+		return 1;
 	}
-	return 1;
+	return 0;
 }
 
 void	postgresqlcursor::returnRow() {

@@ -170,10 +170,10 @@ def main():
 	checkSuccess(cur.getColumnLength('testreal'),4)
 	checkSuccess(cur.getColumnLength(3),2)
 	checkSuccess(cur.getColumnLength('testsmallint'),2)
-	checkSuccess(cur.getColumnLength(4),0)
-	checkSuccess(cur.getColumnLength('testchar'),0)
-	checkSuccess(cur.getColumnLength(5),0)
-	checkSuccess(cur.getColumnLength('testvarchar'),0)
+	checkSuccess(cur.getColumnLength(4),44)
+	checkSuccess(cur.getColumnLength('testchar'),44)
+	checkSuccess(cur.getColumnLength(5),44)
+	checkSuccess(cur.getColumnLength('testvarchar'),44)
 	checkSuccess(cur.getColumnLength(6),4)
 	checkSuccess(cur.getColumnLength('testdate'),4)
 	checkSuccess(cur.getColumnLength(7),8)
@@ -708,6 +708,25 @@ def main():
 	checkSuccess(rows[5][5],"testvarchar6")
 	checkSuccess(rows[5][6],"2006-01-01")
 	checkSuccess(rows[5][7],"06:00:00")
+	print
+
+	print "FINISHED SUSPENDED SESSION: "
+	checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
+	checkSuccess(cur.getField(4,0),"5")
+	checkSuccess(cur.getField(5,0),"6")
+	checkSuccess(cur.getField(6,0),"7")
+	checkSuccess(cur.getField(7,0),"8")
+	id=cur.getResultSetId()
+	cur.suspendResultSet()
+	checkSuccess(con.suspendSession(),1)
+	port=con.getConnectionPort()
+	socket=con.getConnectionSocket()
+	checkSuccess(con.resumeSession(port,socket),1)
+	checkSuccess(cur.resumeResultSet(id),1)
+	checkSuccess(cur.getField(4,0),None)
+	checkSuccess(cur.getField(5,0),None)
+	checkSuccess(cur.getField(6,0),None)
+	checkSuccess(cur.getField(7,0),None)
 	print
 
 	# drop existing table

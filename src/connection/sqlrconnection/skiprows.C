@@ -6,7 +6,12 @@
 int	sqlrconnection::skipRows(int rows) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"skipping rows...");
+	debugstr=new stringbuffer();
+	debugstr->append("skipping ");
+	debugstr->append((long)rows);
+	debugstr->append(" rows...");
+	debugPrint("connection",2,debugstr->getString());
+	delete debugstr;
 	#endif
 
 	for (int i=0; i<rows; i++) {

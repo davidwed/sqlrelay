@@ -707,6 +707,25 @@ int	main(int argc, char **argv) {
 	delete[] filename;
 	printf("\n");
 
+	printf("FINISHED SUSPENDED SESSION: \n");
+	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
+	checkSuccess(cur->getField(4,0),"5");
+	checkSuccess(cur->getField(5,0),"6");
+	checkSuccess(cur->getField(6,0),"7");
+	checkSuccess(cur->getField(7,0),"8");
+	id=cur->getResultSetId();
+	cur->suspendResultSet();
+	checkSuccess(con->suspendSession(),1);
+	port=con->getConnectionPort();
+	socket=strdup(con->getConnectionSocket());
+	checkSuccess(con->resumeSession(port,socket),1);
+	checkSuccess(cur->resumeResultSet(id),1);
+	checkSuccess(cur->getField(4,0),NULL);
+	checkSuccess(cur->getField(5,0),NULL);
+	checkSuccess(cur->getField(6,0),NULL);
+	checkSuccess(cur->getField(7,0),NULL);
+	printf("\n");
+
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 	printf("\n");

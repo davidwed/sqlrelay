@@ -12,6 +12,7 @@ sqlrconnection	*secondcon;
 sqlrcursor	*secondcur;
 
 void checkSuccess(char *value, char *success) {
+	//printf("\"%s\"=\"%s\"\n",value,success);
 
 	if (!success) {
 		if (!value) {
@@ -36,6 +37,7 @@ void checkSuccess(char *value, char *success) {
 }
 
 void checkSuccess(int value, int success) {
+	//printf("\"%d\"=\"%d\"\n",value,success);
 
 	if (value==success) {
 		printf("success ");
@@ -233,8 +235,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testdate"),4);
 	checkSuccess(cur->getColumnLength(8),4);
 	checkSuccess(cur->getColumnLength("testtime"),4);
-	checkSuccess(cur->getColumnLength(9),8);
-	checkSuccess(cur->getColumnLength("testtimestamp"),8);
+	checkSuccess(cur->getColumnLength(9),4);
+	checkSuccess(cur->getColumnLength("testtimestamp"),4);
 	printf("\n");
 
 	printf("LONGEST COLUMN: \n");
@@ -717,6 +719,25 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcur->sendQuery("select * from testtable"),1);
 	checkSuccess(secondcur->getField(8,0),"10");
 	checkSuccess(con->autoCommitOff(),1);
+	printf("\n");
+
+	printf("FINISHED SUSPENDED SESSION: \n");
+	checkSuccess(cur->sendQuery("select * from testtable"),1);
+	checkSuccess(cur->getField(4,0),"5");
+	checkSuccess(cur->getField(5,0),"6");
+	checkSuccess(cur->getField(6,0),"7");
+	checkSuccess(cur->getField(7,0),"8");
+	id=cur->getResultSetId();
+	cur->suspendResultSet();
+	checkSuccess(con->suspendSession(),1);
+	port=con->getConnectionPort();
+	socket=strdup(con->getConnectionSocket());
+	checkSuccess(con->resumeSession(port,socket),1);
+	checkSuccess(cur->resumeResultSet(id),1);
+	checkSuccess(cur->getField(4,0),NULL);
+	checkSuccess(cur->getField(5,0),NULL);
+	checkSuccess(cur->getField(6,0),NULL);
+	checkSuccess(cur->getField(7,0),NULL);
 	printf("\n");
 
 	// drop existing table

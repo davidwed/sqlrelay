@@ -649,6 +649,25 @@ checkSuccess(secondcur.getField(8,0),"char10")
 checkSuccess(con.autoCommitOff(),1)
 print "\n"
 
+print "FINISHED SUSPENDED SESSION: \n"
+checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
+checkSuccess(cur.getField(4,2),"5")
+checkSuccess(cur.getField(5,2),"6")
+checkSuccess(cur.getField(6,2),"7")
+checkSuccess(cur.getField(7,2),"8")
+id=cur.getResultSetId()
+cur.suspendResultSet()
+checkSuccess(con.suspendSession(),1)
+port=con.getConnectionPort()
+socket=con.getConnectionSocket()
+checkSuccess(con.resumeSession(port,socket),1)
+checkSuccess(cur.resumeResultSet(id),1)
+checkSuccess(cur.getField(4,2),nil)
+checkSuccess(cur.getField(5,2),nil)
+checkSuccess(cur.getField(6,2),nil)
+checkSuccess(cur.getField(7,2),nil)
+print "\n"
+
 # drop existing table
 cur.sendQuery("drop table testtable")
 

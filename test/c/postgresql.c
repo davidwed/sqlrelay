@@ -219,10 +219,10 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testreal"),4);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,3),2);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testsmallint"),2);
-	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,4),0);
-	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testchar"),0);
-	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,5),0);
-	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testvarchar"),0);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,4),44);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testchar"),44);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,5),44);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testvarchar"),44);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,6),4);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdate"),4);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,7),8);
@@ -680,6 +680,25 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"9");
 	//checkSuccessInt(sqlrcon_autoCommitOff(con),1);
+	printf("\n");
+
+	printf("FINISHED SUSPENDED SESSION: \n");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testint"),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,4,0),"5");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,5,0),"6");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,6,0),"7");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,0),"8");
+	id=sqlrcur_getResultSetId(cur);
+	sqlrcur_suspendResultSet(cur);
+	checkSuccessInt(sqlrcon_suspendSession(con),1);
+	port=sqlrcon_getConnectionPort(con);
+	socket=strdup(sqlrcon_getConnectionSocket(con));
+	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
+	checkSuccessInt(sqlrcur_resumeResultSet(cur,id),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,4,0),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,5,0),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,6,0),NULL);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,0),NULL);
 	printf("\n");
 
 	// drop existing table
