@@ -7,6 +7,36 @@
 
 <body>
 
+<span class="heading1">Installing a license for 12.5</span><br>
+
+<p>Unlike previous versions of Sybase ASE, version 12.5 needs to be licensed
+before it can be installed.  If you downloaded Sybase ASE, you should have
+received an email from sybase with a license code in it.  Follow these
+instructions to license Sybase ASE.</p>
+
+<blockquote>
+<p>Log in as the sybase user.</p>
+<p>Start the license server by running startd.sh $SYBASE/$SYBASE_SYSAM</p>
+<p>Make sure lmgrd is running by running "ps -efa | grep lmgrd",
+sometimes it doesn't start.</p>
+<p>The license manager client is a Java program.  Sybase ASE ships with 
+java version 1.2.2 but I've never been able to get the program to run properly
+under that version.  I have been able to get it working with Sun's JDK 1.3.1.
+If you have Sun's JDK 1.3.1 installed, edit /opt/sybase-12.5/SYSAM/bin/lmgr and
+change JAVA_HOME=$SYBASE/shared-1_0/jre-1.2.2 to
+JAVA_HOME=/usr/java/jdk1.3.1_07.</p>
+<p>Run lmgr.  A graphical license manager application should pop up.</p>
+<p>Leave the radio button for Ase checked and click Next.</p>
+<p>When the "Do you have a Sybase Software Asset Management Certificate to
+register?" dialog pops up, click Yes.</p>
+<p>On the screen titled "Enter the information provided on your Sybase License
+Certificate"</b>, enter the Order Number, Feature Name, Feature Count, Software
+Version and Authorization Code from the email you received from Sybase when you
+downloaded the software.  Click Done.</p>
+</blockquote>
+
+<p>Now that the software has been licensed, it can be initialized.</p>
+
 <span class="heading1">Initializing an 12.5 Server</span><br>
 
 
@@ -38,8 +68,8 @@ select <b>OK</b><br>
 and <b>Sybsystemprocs</b> device files, and device and database sizes for each.
 
 <blockquote>
-enter <i>/opt/sybase-12.5/master.dat</i> for the <b>Master</b> device file<br>
-enter <i>/opt/sybase-12.5/sybsystemprocs.dat</i> for the <b>Sybsystemprocs</b>
+enter <i>/opt/sybase-12.5/ASE/master.dat</i> for the <b>Master</b> device file<br>
+enter <i>/opt/sybase-12.5/ASE/sybsystemprocs.dat</i> for the <b>Sybsystemprocs</b>
 device file<br>
 Select <b>Edit Advanced Adaptive Server Attributes</b><br>
 </blockquote>
@@ -48,7 +78,7 @@ Select <b>Edit Advanced Adaptive Server Attributes</b><br>
 <b>Sybsystemdb</b> device file, size and database sizes.</p>
 
 <blockquote>
-enter <i>/opt/sybase-12.5/sybsystemdb.dat</i> for the <b>Sybsystemdb</b> 
+enter <i>/opt/sybase-12.5/ASE/sybsystemdb.dat</i> for the <b>Sybsystemdb</b> 
 device file<br>
 Select <b>Go Back</b><br>
 </blockquote>
