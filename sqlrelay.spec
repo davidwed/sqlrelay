@@ -430,9 +430,9 @@ rm -rf %{buildroot}
 
 %files client-postgresql
 %defattr(-, root, root)
-%{_libdir}/libpq-sqlrelay-*.so.*
-%{_libdir}/libpq-sqlrelay.a
-%{_libdir}/libpq-sqlrelay.la
+%{_libdir}/libpqsqlrelay-*.so.*
+%{_libdir}/libpqsqlrelay.a
+%{_libdir}/libpqsqlrelay.la
 
 %{!?_without_gtk:%files config-gtk}
 %{!?_without_gtk:%defattr(-, root, root)}

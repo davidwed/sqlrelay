@@ -23,7 +23,7 @@ LOBJS = pqasync.lo pqconndefaults.lo pqconnection.lo pqcopy.lo \
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libpq-sqlrelay.la
+all: libpqsqlrelay.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -32,14 +32,14 @@ clean:
 
 rebuild: clean all
 
-libpq-sqlrelay.la: $(SRCS) $(LOBJS)
+libpqsqlrelay.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libpq-sqlrelay.la $(libdir)/libpq-sqlrelay.la
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libpqsqlrelay.la $(libdir)/libpqsqlrelay.la
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libpq-sqlrelay.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libpq-sqlrelay_p.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libpqsqlrelay.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libpqsqlrelay_p.la
