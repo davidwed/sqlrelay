@@ -69,6 +69,10 @@ eval "$7=\"\""
 eval "$8=\"\""
 eval "$9=\"\""
 eval "$10=\"\""
+if ( test -n "$11" )
+then
+	eval "$11=\"\""
+fi
 
 SEARCHPATH=$1
 NAME=$2
@@ -80,6 +84,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 if ( test -z "$LIBSTRING" )
@@ -101,14 +106,14 @@ then
 	for i in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$i" ); then
-			FW_CHECK_HEADER_LIB([$i/include/$HEADER],[INCLUDESTRING=\"-I$i\"],[$i/lib/lib$LIBNAME.so],[LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\"],[$i/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+			FW_CHECK_HEADER_LIB([$i/include/$HEADER],[INCLUDESTRING=\"-I$i/include\"],[$i/lib/lib$LIBNAME.so],[LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\"],[$i/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			if ( test -z "$LIBSTRING" )
 			then
-				FW_CHECK_HEADER_LIB([$i/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$i/include/$NAME\"],[$i/lib/lib$LIBNAME.so],[LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\"],[$i/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([$i/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$i/include/$NAME\"],[$i/lib/lib$LIBNAME.so],[LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\"],[$i/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
 			if ( test -z "$LIBSTRING" )
 			then
-				FW_CHECK_HEADER_LIB([$i/include/$HEADER],[INCLUDESTRING=\"-I$i\"],[$i/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"],[$i/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([$i/include/$HEADER],[INCLUDESTRING=\"-I$i/include\"],[$i/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"],[$i/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
 			if ( test -z "$LIBSTRING" )
 			then
@@ -116,21 +121,23 @@ then
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "$7=\"$INCLUDESTRING\""
 eval "$8=\"$LIBSTRING\""
 eval "$9=\"$LIBPATH\""
 eval "$10=\"$STATIC\""
+if ( test -n "$11" )
+then
+	eval "$11=\"$HEADERSANDLIBSPATH\""
+fi
 ])
 
 
@@ -302,21 +309,11 @@ then
 		fi
 	done
 	
-	if ( test -n "$RPATHFLAG" -a -n "$PTHREADSLIBPATH" )
-	then
-		PTHREADSLIB="-Wl,-rpath $PTHREADSLIBPATH $PTHREADSLIB"
-	fi
-
 else
 	dnl cross compiling
 	if ( test -n "$PTHREADSPATH" )
 	then
-		if ( test -n "$RPATHFLAG" )
-		then
-			PTHREADSLIB="-Wl,-rpath $PTHREADSPATH/lib -lpthread"
-		else
-			PTHREADSLIB="-L$PTHREADSPATH/lib -lpthread"
-		fi
+		PTHREADSLIB="-L$PTHREADSPATH/lib -lpthread"
 	else
 		PTHREADSLIB="-lpthread"
 	fi
@@ -346,8 +343,9 @@ if ( test "$cross_compiling" = "no" )
 then
 	if ( test -z "$MICROSOFT" )
 	then
+		FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[rudiments/daemonprocess.h],[rudiments_p],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSDEBUGLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC],[RUDIMENTSPATH])
 
-		FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[daemonprocess.h],[rudiments],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC])
+		FW_CHECK_HEADERS_AND_LIBS([$RUDIMENTSPATH],[rudiments],[rudiments/daemonprocess.h],[rudiments],[$STATICFLAG],[$RPATHFLAG],[RUDIMENTSINCLUDES],[RUDIMENTSLIBS],[RUDIMENTSLIBSPATH],[RUDIMENTSSTATIC],[RUDIMENTSPATH])
 
 	else
 		for i in "$RUDIMENTSPATH" "/usr/local/firstworks"
@@ -368,22 +366,12 @@ else
 	if ( test -n "$RUDIMENTSPATH" )
 	then
 		RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"
-		if ( test -n "$RPATHFLAG" )
-		then
-			RUDIMENTSLIBS="-Wl,-rpath $RUDIMENTSPATH/lib -L$RUDIMENTSPATH/lib -lrudiments"
-		else
-			RUDIMENTSLIBS="-L$PTHREADSPATH/lib -lrudiments"
-			RUDIMENTSDEBUGLIBS="-L$PTHREADSPATH/lib -lrudiments_p"
-		fi
+		RUDIMENTSLIBS="-L$PTHREADSPATH/lib -lrudiments"
+		RUDIMENTSDEBUGLIBS="-L$PTHREADSPATH/lib -lrudiments_p"
 	else
 		RUDIMENTSINCLUDES="-I/usr/local/firstworks/include"
-		if ( test -n "$RPATHFLAG" )
-		then
-			RUDIMENTSLIBS="-Wl,-rpath /usr/local/firstworks/lib -L/usr/local/firstworks/lib -lrudiments"
-		else
-			RUDIMENTSLIBS="-L/usr/local/firstworks/lib -lrudiments"
-			RUDIMENTSDEBUGLIBS="-L/usr/local/firstworks/lib -lrudiments_p"
-		fi
+		RUDIMENTSLIBS="-L/usr/local/firstworks/lib -lrudiments"
+		RUDIMENTSDEBUGLIBS="-L/usr/local/firstworks/lib -lrudiments_p"
 	fi
 fi
 
@@ -393,15 +381,11 @@ then
 	exit
 fi
 
-if ( test -n "$RPATHFLAG" -a -n "$RUDIMENTSPATH" )
-then
-	RUDIMENTSLIB="-Wl,-rpath $RUDIMENTSPATH $RUDIMENTSLIB"
-fi
-
 AC_SUBST(RUDIMENTSPATH)
 AC_SUBST(RUDIMENTSINCLUDES)
 AC_SUBST(RUDIMENTSLIBS)
 AC_SUBST(RUDIMENTSDEBUGLIBS)
+AC_SUBST(RUDIMENTSLIBSPATH)
 ])
 
 
@@ -452,7 +436,7 @@ then
 		if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" )
 		then
 			FW_TRY_LINK([#include <oci.h>
-#include <stdlib.h>],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[-Wl,-rpath $ORACLELIBSPATH $ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
 		else
 			FW_TRY_LINK([#include <oci.h>
 #include <stdlib.h>],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); OCI_H=\"yes\"],[AC_MSG_RESULT(no)])
@@ -488,10 +472,6 @@ then
 	
 	if ( test -z "$ORACLESTATIC" -a -n "$ORACLELIBS" )
 	then
-		if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" )
-		then
-			ORACLELIBS="-Wl,-rpath $ORACLELIBSPATH $ORACLELIBS"
-		fi
 		AC_MSG_CHECKING(if Oracle can be dynamically linked without $DLLIB)
 		if ( test -n "$OCI_H" )
 		then
@@ -532,6 +512,7 @@ then
 	AC_SUBST(ORACLEVERSION)
 	AC_SUBST(ORACLEINCLUDES)
 	AC_SUBST(ORACLELIBS)
+	AC_SUBST(ORACLELIBSPATH)
 	AC_SUBST(ORACLESTATIC)
 fi
 ])
@@ -589,12 +570,9 @@ then
 		MYSQLINCLUDES=""
 	fi
 	
-	if ( test -n "$RPATHFLAG" -a -n "$MYSQLLIBSPATH" )
-	then
-		MYSQLLIBS="-Wl,-rpath $MYSQLLIBSPATH $MYSQLLIBS"
-	fi
 	AC_SUBST(MYSQLINCLUDES)
 	AC_SUBST(MYSQLLIBS)
+	AC_SUBST(MYSQLLIBSPATH)
 	AC_SUBST(MYSQLSTATIC)
 
 	if ( test -z "$MYSQLLIBS" )
@@ -635,13 +613,9 @@ then
 
 	FW_CHECK_HEADER_LIB([/usr/include/msql.h],[MSQLINCLUDES=\"\"; MSQLPATH=\"\"],[/usr/lib/libmsql.so],[MSQLLIBSPATH=\"\"; MSQLLIBS=\"-lmsql\"],[/usr/lib/libmsql.a],[MSQLLIBS=\"-lmsql\"])
 	
-	if ( test -n "$RPATHFLAG" -a -n "$MSQLLIBSPATH" )
-	then
-		MSQLLIBS="-Wl,-rpath $MSQLLIBSPATH $MSQLLIBS"
-	fi
-	
 	AC_SUBST(MSQLINCLUDES)
 	AC_SUBST(MSQLLIBS)
+	AC_SUBST(MSQLLIBSPATH)
 	AC_SUBST(MSQLSTATIC)
 	
 	if ( test -z "$MSQLLIBS" )
@@ -664,16 +638,16 @@ then
 		STATICFLAG="-static"
 	fi
 
-	FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[pgsql],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBPATH],[POSTGRESQLSTATIC])
+	FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[pgsql],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBSPATH],[POSTGRESQLSTATIC])
 
 	if ( test -z "$POSTGRESQLLIBS" )
 	then
-		FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[postgresql],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBPATH],[POSTGRESQLSTATIC])
+		FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[postgresql],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBSPATH],[POSTGRESQLSTATIC])
 	fi
 
 	if ( test -z "$POSTGRESQLLIBS" )
 	then
-		FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[postgres],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBPATH],[POSTGRESQLSTATIC])
+		FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[postgres],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBSPATH],[POSTGRESQLSTATIC])
 	fi
 	
 	LINKFAIL=""
@@ -692,10 +666,6 @@ then
 	
 	if ( test -z "$POSTGRESQLSTATIC" -a -n "$POSTGRESQLLIBS" )
 	then
-		if ( test -n "$RPATHFLAG" -a -n "$POSTGRESQLLIBPATH" )
-		then
-			POSTGRESQLLIBS="-Wl,-rpath $POSTGRESQLLIBPATH $POSTGRESQLLIBS"
-		fi
 		AC_MSG_CHECKING(if PostgreSQL can be dynamically linked without -lcrypt)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQsetdbLogin(NULL,NULL,NULL,NULL,NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
@@ -703,7 +673,7 @@ then
 		then
 			AC_MSG_CHECKING(if PostgreSQL can be dynamically linked with -lcrypt)
 			FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQsetdbLogin(NULL,NULL,NULL,NULL,NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB -lcrypt],[$LD_LIBRARY_PATH:$POSTGRESQLLIBPATH],[AC_MSG_RESULT(yes); POSTGRESQLLIBS="$POSTGRESQLLIBS -lcrypt"; LINKFAIL=""],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>],[PQsetdbLogin(NULL,NULL,NULL,NULL,NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB -lcrypt],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); POSTGRESQLLIBS="$POSTGRESQLLIBS -lcrypt"; LINKFAIL=""],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 		fi
 	fi
 	
@@ -722,6 +692,7 @@ then
 	
 	AC_SUBST(POSTGRESQLINCLUDES)
 	AC_SUBST(POSTGRESQLLIBS)
+	AC_SUBST(POSTGRESQLLIBSPATH)
 	AC_SUBST(POSTGRESQLSTATIC)
 
 	if ( test -z "$POSTGRESQLLIBS" )
@@ -755,12 +726,12 @@ then
 	
 	SQLITEINCLUDES=""
 	SQLITELIBS=""
-	SQLITELIBPATH=""
+	SQLITELIBSPATH=""
 	SQLITESTATIC=""
 	
 	if ( test -n "$PTHREADSLIB" )
 	then
-		FW_CHECK_HEADERS_AND_LIBS([$SQLITEPATH],[sqlite],[sqlite.h],[sqlite],[$STATICFLAG],[$RPATHFLAG],[SQLITEINCLUDES],[SQLITELIBS],[SQLITELIBPATH],[SQLITESTATIC])
+		FW_CHECK_HEADERS_AND_LIBS([$SQLITEPATH],[sqlite],[sqlite.h],[sqlite],[$STATICFLAG],[$RPATHFLAG],[SQLITEINCLUDES],[SQLITELIBS],[SQLITELIBSPATH],[SQLITESTATIC])
 	else
 		AC_MSG_WARN(pthreads was not found.)
 	fi
@@ -771,7 +742,7 @@ then
 	else
 		AC_MSG_CHECKING(if SQLite needs gdbm)
 		SQLITENEEDGDBM=""
-		FW_TRY_LINK([#include <sqlite.h>],[sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$SQLITELIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes"])
+		FW_TRY_LINK([#include <sqlite.h>],[sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$SQLITELIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes"])
 	
 		if ( test -n "$SQLITENEEDGDBM" )
 		then
@@ -779,6 +750,7 @@ then
 			then
 				AC_MSG_WARN(SQLite needs GDBM but GDBM was not found. SQLite support will not be built.)
 				SQLITELIBS=""
+				SQLITELIBSPATH=""
 				SQLITEINCLUDES=""
 				SQLITESTATIC=""
 			else 
@@ -792,6 +764,7 @@ then
 	
 	AC_SUBST(SQLITEINCLUDES)
 	AC_SUBST(SQLITELIBS)
+	AC_SUBST(SQLITELIBSPATH)
 	AC_SUBST(SQLITESTATIC)
 fi
 ])
@@ -809,18 +782,19 @@ then
 		STATICFLAG="-static"
 	fi
 
-	FW_CHECK_HEADERS_AND_LIBS([$LAGOPATH],[lago],[lago.h],[lago],[$STATICFLAG],[$RPATHFLAG],[LAGOINCLUDES],[LAGOLIBS],[LAGOLIBPATH],[LAGOSTATIC])
+	FW_CHECK_HEADERS_AND_LIBS([$LAGOPATH],[lago],[lago.h],[lago],[$STATICFLAG],[$RPATHFLAG],[LAGOINCLUDES],[LAGOLIBS],[LAGOLIBSPATH],[LAGOSTATIC])
 	
 	if ( test -z "$LAGOLIBS" )
 	then
 		AC_MSG_WARN(Lago support will not be built.)
 	else
 		AC_MSG_CHECKING(if Lago needs threads)
-		FW_TRY_LINK([#include <lago.h>],[LCTX lctx; lctx=Lnewctx(); Ldelctx(lctx);],[$LAGOSTATIC $LAGOINCLUDES],[$LAGOLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$LAGOLIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); LAGOLIBS="$LAGOLIBS $PTHREADSLIB"])
+		FW_TRY_LINK([#include <lago.h>],[LCTX lctx; lctx=Lnewctx(); Ldelctx(lctx);],[$LAGOSTATIC $LAGOINCLUDES],[$LAGOLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$LAGOLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); LAGOLIBS="$LAGOLIBS $PTHREADSLIB"])
 	fi
 	
 	AC_SUBST(LAGOINCLUDES)
 	AC_SUBST(LAGOLIBS)
+	AC_SUBST(LAGOLIBSPATH)
 	AC_SUBST(LAGOSTATIC)
 fi
 ])
@@ -846,6 +820,7 @@ then
 	
 	AC_SUBST(FREETDSINCLUDES)
 	AC_SUBST(FREETDSLIBS)
+	AC_SUBST(FREETDSLIBSPATH)
 	AC_SUBST(FREETDSSTATIC)
 	
 	if ( test -z "$FREETDSLIBS" )
@@ -871,7 +846,7 @@ then
 	SYBASEINCLUDES=""
 	SYBASELIBS=""
 	SYBASESTATIC=""
-	SYBASELIBPATH=""
+	SYBASELIBSPATH=""
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
 	then
@@ -880,31 +855,26 @@ then
 	
 	if ( test -n "$SYBASEPATH" )
 	then
-		FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[$SYBASEPATH/lib/libct.so],[SYBASELIBPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
+		FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[$SYBASEPATH/lib/libct.so],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
 	else
 	
-		FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[/usr/local/sybase/lib/libct.so],[SYBASELIBPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
+		FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[/usr/local/sybase/lib/libct.so],[SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
 	
-		FW_CHECK_HEADER_LIB([/opt/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/include\"],[/opt/sybase/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[/opt/sybase/lib/libct.so],[SYBASELIBPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
+		FW_CHECK_HEADER_LIB([/opt/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/include\"],[/opt/sybase/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[/opt/sybase/lib/libct.so],[SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
 
-		FW_CHECK_HEADER_LIB([/opt/sybase-12.5/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.so],[SYBASELIBPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"])
+		FW_CHECK_HEADER_LIB([/opt/sybase-12.5/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.so],[SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"])
 	
 		if ( test -z "$SYBASELIBS" )
 		then
 			for i in "11.9.2" "11.0.3.3"
 			do
-				FW_CHECK_HEADER_LIB([/opt/sybase-$i/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-$i/include\"],[/opt/sybase-$i/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[/opt/sybase-$i/lib/libct.so],[SYBASELIBPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
+				FW_CHECK_HEADER_LIB([/opt/sybase-$i/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-$i/include\"],[/opt/sybase-$i/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"],[/opt/sybase-$i/lib/libct.so],[SYBASELIBSPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"])
 				if ( test -n "$SYBASELIBS" )
 				then
 					break
 				fi
 			done
 		fi
-	fi
-	
-	if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBPATH" )
-	then
-		SYBASELIBS="-Wl,-rpath $SYBASELIBPATH $SYBASELIBS"
 	fi
 	
 	LINKFAIL=""
@@ -923,18 +893,14 @@ then
 	
 	if ( test -z "$SYBASESTATIC" -a -n "$SYBASELIBS" )
 	then
-		if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBSPATH" )
-		then
-			SYBASELIBS="-Wl,-rpath $SYBASELIBSPATH $SYBASELIBS"
-		fi
 		AC_MSG_CHECKING(if Sybase can be dynamically linked without $DLLIB)
 		FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$SYBASELIBPATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$SYBASELIBSPATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 		if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
 		then
 			AC_MSG_CHECKING(if Sybase can be dynamically linked with $DLLIB)
 			FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH:$SYBASELIBPATH],[AC_MSG_RESULT(yes); SYBASELIBS="$SYBASELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$SYBASEINCLUDES],[$SYBASELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH:$SYBASELIBSPATH],[AC_MSG_RESULT(yes); SYBASELIBS="$SYBASELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no)])
 		fi
 	fi
 	
@@ -943,11 +909,13 @@ then
 		AC_MSG_WARN(No Sybase link configuration could be found.)
 		SYBASEINCLUDES=""
 		SYBASELIBS=""
+		SYBASELIBSPATH=""
 		SYBASESTATIC=""
 	fi
 	
 	AC_SUBST(SYBASEINCLUDES)
 	AC_SUBST(SYBASELIBS)
+	AC_SUBST(SYBASELIBSPATH)
 	AC_SUBST(SYBASESTATIC)
 	
 	if ( test -z "$SYBASELIBS" )
@@ -965,7 +933,7 @@ if ( test "$ENABLE_ODBC" = "yes" )
 then
 
 	ODBCSTATIC=""
-	ODBCLIBPATH=""
+	ODBCLIBSPATH=""
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
 	then
@@ -974,13 +942,13 @@ then
 	HAVE_IODBC=""
 	HAVE_UNIXODBC=""
 
-	FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[ODBCINCLUDES],[ODBCLIBS],[ODBCLIBPATH],[UNIXODBCSTATIC])
+	FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[ODBCINCLUDES],[ODBCLIBS],[ODBCLIBSPATH],[UNIXODBCSTATIC])
 
 	if ( test -n "$ODBCLIBS" )
 	then
 		HAVE_UNIXODBC="yes"
 	else
-		FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[iodbc],[sql.h],[iodbc],[$STATICFLAG],[$RPATHFLAG],[ODBCINCLUDES],[ODBCLIBS],[ODBCLIBPATH],[IODBCSTATIC])
+		FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[iodbc],[sql.h],[iodbc],[$STATICFLAG],[$RPATHFLAG],[ODBCINCLUDES],[ODBCLIBS],[ODBCLIBSPATH],[IODBCSTATIC])
 		if ( test -n "$ODBCLIBS" )
 		then
 			HAVE_IODBC="yes"
@@ -989,6 +957,7 @@ then
 	
 	AC_SUBST(ODBCINCLUDES)
 	AC_SUBST(ODBCLIBS)
+	AC_SUBST(ODBCLIBSPATH)
 
 	if ( test -n "`echo $ODBCLIBS | grep iodbc`" )
 	then
@@ -998,11 +967,6 @@ then
 	fi
 	AC_SUBST(ODBCSTATIC)
 	
-	if ( test -n "$RPATHFLAG" -a -n "$ODBCLIBSPATH" )
-	then
-		ODBCLIBS="-Wl,-rpath $ODBCLIBPATH $ODBCLIBS"
-	fi
-	
 	if ( test -n "$HAVE_UNIXODBC" )
 	then
 		AC_DEFINE(HAVE_UNIXODBC,1,UnixODBC)
@@ -1010,7 +974,7 @@ then
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADSLIB"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADSLIB"])
 	fi
 	if ( test -n "$HAVE_IODBC" )
 	then
@@ -1019,7 +983,7 @@ then
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS=\"$ODBCLIBS $PTHREADSLIB\"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS=\"$ODBCLIBS $PTHREADSLIB\"])
 	fi
 	if ( test -z "$ODBCLIBS" )
 	then
@@ -1062,13 +1026,9 @@ then
 		FW_CHECK_HEADER_LIB([/opt/IBM/db2/V8.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V8.1/include\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.so],[DB2LIBSPATH=\"/opt/IBM/db2/V8.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"8\"])
 	fi
 	
-	if ( test -n "$RPATHFLAG" -a -n "$DB2LIBSPATH" )
-	then
-		DB2LIBS="-Wl,-rpath $DB2LIBSPATH $DB2LIBS"
-	fi
-	
 	AC_SUBST(DB2INCLUDES)
 	AC_SUBST(DB2LIBS)
+	AC_SUBST(DB2LIBSPATH)
 	AC_SUBST(DB2STATIC)
 	AC_DEFINE_UNQUOTED(DB2VERSION,$DB2VERSION,Version of DB2)
 	
@@ -1122,10 +1082,6 @@ then
 	
 	if ( test -z "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
 	then
-		if ( test -n "$RPATHFLAG" -a -n "$INTERBASELIBSPATH" )
-		then
-			INTERBASELIBS="-Wl,-rpath $INTERBASELIBSPATH $INTERBASELIBS"
-		fi
 		AC_MSG_CHECKING(if Interbase can be dynamically linked without $DLLIB)
 		FW_TRY_LINK([#include <ibase.h>
 #include <stdlib.h>],[isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);],[$INTERBASEINCLUDES],[$INTERBASELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
@@ -1147,6 +1103,7 @@ then
 	
 	AC_SUBST(INTERBASEINCLUDES)
 	AC_SUBST(INTERBASELIBS)
+	AC_SUBST(INTERBASELIBSPATH)
 	AC_SUBST(INTERBASESTATIC)
 	
 	if ( test -z "$INTERBASELIBS" )

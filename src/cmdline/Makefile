@@ -29,22 +29,22 @@ clean:
 rebuild: clean all
 
 query: query.C query.n.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.n.lo $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.n.lo $(LIBS) -rpath $(libdir)
 
 query-debug: query.C query.p.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.p.lo $(DEBUGLIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.p.lo $(DEBUGLIBS) -rpath $(libdir)
 
 fields: fields.C fields.n.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.n.lo $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.n.lo $(LIBS) -rpath $(libdir)
 
 fields-debug: fields.C fields.p.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.p.lo $(DEBUGLIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.p.lo $(DEBUGLIBS) -rpath $(libdir)
 
 sqlrsh: sqlrsh.C sqlrsh.n.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.n.lo $(LIBS) $(READLINELIB)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.n.lo $(LIBS) $(READLINELIB) -rpath $(libdir)
 
 sqlrsh-debug: sqlrsh.C sqlrsh.p.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.p.lo $(DEBUGLIBS) $(READLINELIB)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.p.lo $(DEBUGLIBS) $(READLINELIB) -rpath $(libdir)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)

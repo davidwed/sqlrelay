@@ -468,7 +468,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS LDFLAGS CFLAGS CXXFLAGS DEBUGCXXFLAGS DEBUGCFLAGS LIBDMALLOC LIBEFENCE build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S ECHO RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP EGREP LIBTOOL CXX ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE AR PS UNAME MINGW32 CYGWIN UWIN PTHREADSLIB READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB SSLLIB CRYPTOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSDEBUGLIBS ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCSTATIC DB2INCLUDES DB2LIBS DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONLIBS PYTHONOBJ PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS LDFLAGS CFLAGS CXXFLAGS DEBUGCXXFLAGS DEBUGCFLAGS LIBDMALLOC LIBEFENCE build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S ECHO RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP EGREP LIBTOOL CXX ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE AR PS UNAME MINGW32 CYGWIN UWIN PTHREADSLIB READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB SSLLIB CRYPTOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSDEBUGLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONLIBS PYTHONOBJ PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -9259,20 +9259,10 @@ fi
 		fi
 	done
 
-	if ( test -n "$RPATHFLAG" -a -n "$PTHREADSLIBPATH" )
-	then
-		PTHREADSLIB="-Wl,-rpath $PTHREADSLIBPATH $PTHREADSLIB"
-	fi
-
 else
 		if ( test -n "$PTHREADSPATH" )
 	then
-		if ( test -n "$RPATHFLAG" )
-		then
-			PTHREADSLIB="-Wl,-rpath $PTHREADSPATH/lib -lpthread"
-		else
-			PTHREADSLIB="-L$PTHREADSPATH/lib -lpthread"
-		fi
+		PTHREADSLIB="-L$PTHREADSPATH/lib -lpthread"
 	else
 		PTHREADSLIB="-lpthread"
 	fi
@@ -9927,22 +9917,26 @@ then
 	then
 
 
-
 eval "RUDIMENTSINCLUDES=\"\""
-eval "RUDIMENTSLIBS=\"\""
+eval "RUDIMENTSDEBUGLIBS=\"\""
 eval "RUDIMENTSLIBSPATH=\"\""
 eval "RUDIMENTSSTATIC=\"\""
+if ( test -n "RUDIMENTSPATH" )
+then
+	eval "RUDIMENTSPATH=\"\""
+fi
 
 SEARCHPATH=$RUDIMENTSPATH
 NAME=rudiments
-HEADER=daemonprocess.h
-LIBNAME=rudiments
+HEADER=rudiments/daemonprocess.h
+LIBNAME=rudiments_p
 LINKSTATIC=$STATICFLAG
 LINKRPATH=$RPATHFLAG
 INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -10359,11 +10353,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -10389,8 +10383,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -10449,10 +10443,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -10479,7 +10473,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -10538,7 +10532,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -10568,7 +10562,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -10667,21 +10661,788 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
+eval "RUDIMENTSINCLUDES=\"$INCLUDESTRING\""
+eval "RUDIMENTSDEBUGLIBS=\"$LIBSTRING\""
+eval "RUDIMENTSLIBSPATH=\"$LIBPATH\""
+eval "RUDIMENTSSTATIC=\"$STATIC\""
+if ( test -n "RUDIMENTSPATH" )
 then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+	eval "RUDIMENTSPATH=\"$HEADERSANDLIBSPATH\""
+fi
+
+
+
+
+eval "RUDIMENTSINCLUDES=\"\""
+eval "RUDIMENTSLIBS=\"\""
+eval "RUDIMENTSLIBSPATH=\"\""
+eval "RUDIMENTSSTATIC=\"\""
+if ( test -n "RUDIMENTSPATH" )
+then
+	eval "RUDIMENTSPATH=\"\""
+fi
+
+SEARCHPATH=$RUDIMENTSPATH
+NAME=rudiments
+HEADER=rudiments/daemonprocess.h
+LIBNAME=rudiments
+LINKSTATIC=$STATICFLAG
+LINKRPATH=$RPATHFLAG
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+HEADERSANDLIBSPATH=""
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/usr/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/include/$HEADER" >&5
+echo $ECHO_N "checking for /usr/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"\""
+		eval "LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/usr/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"\""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/usr/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for /usr/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I/usr/include/$NAME\""
+		eval "LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/usr/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_/usr/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for /usr/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I/usr/include/$NAME\""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/usr/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/include/$HEADER" >&5
+echo $ECHO_N "checking for /usr/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_/usr/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for /usr/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"\""
+		eval "LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "/usr/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_/usr/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for /usr/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"\""
+			eval "LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_/usr/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for /usr/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_/usr/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for /usr/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I/usr/include/$NAME\""
+		eval "LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "/usr/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_/usr/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for /usr/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for /usr/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "/usr/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I/usr/include/$NAME\""
+			eval "LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+	for i in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	do
+		if ( test -n "$i" ); then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -z "$LIBSTRING" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+as_ac_File=`echo "ac_cv_file_$i/include/$NAME/$HEADER" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/include/$NAME/$HEADER" >&5
+echo $ECHO_N "checking for $i/include/$NAME/$HEADER... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/include/$NAME/$HEADER"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDHEADER="yes"
+fi
+
+as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.so" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.so" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.so... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
+		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$i/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+		as_ac_File=`echo "ac_cv_file_$i/lib/$NAME/lib$LIBNAME.a" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $i/lib/$NAME/lib$LIBNAME.a" >&5
+echo $ECHO_N "checking for $i/lib/$NAME/lib$LIBNAME.a... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$i/lib/$NAME/lib$LIBNAME.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  FOUNDLIB="yes"
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
+			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+			if ( test -n "$LIBSTRING" )
+			then
+				HEADERSANDLIBSPATH="$i"
+				break
+			fi
+		fi
+	done
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "RUDIMENTSINCLUDES=\"$INCLUDESTRING\""
 eval "RUDIMENTSLIBS=\"$LIBSTRING\""
 eval "RUDIMENTSLIBSPATH=\"$LIBPATH\""
 eval "RUDIMENTSSTATIC=\"$STATIC\""
+if ( test -n "RUDIMENTSPATH" )
+then
+	eval "RUDIMENTSPATH=\"$HEADERSANDLIBSPATH\""
+fi
 
 
 	else
@@ -10787,22 +11548,12 @@ else
 		if ( test -n "$RUDIMENTSPATH" )
 	then
 		RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"
-		if ( test -n "$RPATHFLAG" )
-		then
-			RUDIMENTSLIBS="-Wl,-rpath $RUDIMENTSPATH/lib -L$RUDIMENTSPATH/lib -lrudiments"
-		else
-			RUDIMENTSLIBS="-L$PTHREADSPATH/lib -lrudiments"
-			RUDIMENTSDEBUGLIBS="-L$PTHREADSPATH/lib -lrudiments_p"
-		fi
+		RUDIMENTSLIBS="-L$PTHREADSPATH/lib -lrudiments"
+		RUDIMENTSDEBUGLIBS="-L$PTHREADSPATH/lib -lrudiments_p"
 	else
 		RUDIMENTSINCLUDES="-I/usr/local/firstworks/include"
-		if ( test -n "$RPATHFLAG" )
-		then
-			RUDIMENTSLIBS="-Wl,-rpath /usr/local/firstworks/lib -L/usr/local/firstworks/lib -lrudiments"
-		else
-			RUDIMENTSLIBS="-L/usr/local/firstworks/lib -lrudiments"
-			RUDIMENTSDEBUGLIBS="-L/usr/local/firstworks/lib -lrudiments_p"
-		fi
+		RUDIMENTSLIBS="-L/usr/local/firstworks/lib -lrudiments"
+		RUDIMENTSDEBUGLIBS="-L/usr/local/firstworks/lib -lrudiments_p"
 	fi
 fi
 
@@ -10814,10 +11565,6 @@ echo "$as_me: error: Rudiments not found.  SQL-Relay requires this package." >&2
 	exit
 fi
 
-if ( test -n "$RPATHFLAG" -a -n "$RUDIMENTSPATH" )
-then
-	RUDIMENTSLIB="-Wl,-rpath $RUDIMENTSPATH $RUDIMENTSLIB"
-fi
 
 
 
@@ -11224,7 +11971,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
-LIBS="-Wl,-rpath $ORACLELIBSPATH $ORACLELIBS $SOCKETLIB"
+LIBS="$ORACLELIBS $SOCKETLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
@@ -11557,10 +12304,6 @@ export LD_LIBRARY_PATH
 
 	if ( test -z "$ORACLESTATIC" -a -n "$ORACLELIBS" )
 	then
-		if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" )
-		then
-			ORACLELIBS="-Wl,-rpath $ORACLELIBSPATH $ORACLELIBS"
-		fi
 		echo "$as_me:$LINENO: checking if Oracle can be dynamically linked without $DLLIB" >&5
 echo $ECHO_N "checking if Oracle can be dynamically linked without $DLLIB... $ECHO_C" >&6
 		if ( test -n "$OCI_H" )
@@ -11809,6 +12552,7 @@ _ACEOF
 
 
 
+
 fi
 
 echo "******************************"
@@ -11840,6 +12584,10 @@ eval "MYSQLINCLUDES=\"\""
 eval "MYSQLLIBS=\"\""
 eval "MYSQLLIBSPATH=\"\""
 eval "MYSQLSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$MYSQLPATH
 NAME=mysql
@@ -11851,6 +12599,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -12267,11 +13016,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -12297,8 +13046,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -12357,10 +13106,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -12387,7 +13136,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -12446,7 +13195,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -12476,7 +13225,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -12575,21 +13324,23 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "MYSQLINCLUDES=\"$INCLUDESTRING\""
 eval "MYSQLLIBS=\"$LIBSTRING\""
 eval "MYSQLLIBSPATH=\"$LIBPATH\""
 eval "MYSQLSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
 
 
 	else
@@ -12843,10 +13594,7 @@ fi
 		MYSQLINCLUDES=""
 	fi
 
-	if ( test -n "$RPATHFLAG" -a -n "$MYSQLLIBSPATH" )
-	then
-		MYSQLLIBS="-Wl,-rpath $MYSQLLIBSPATH $MYSQLLIBS"
-	fi
+
 
 
 
@@ -13061,10 +13809,6 @@ fi
 fi
 
 
-	if ( test -n "$RPATHFLAG" -a -n "$MSQLLIBSPATH" )
-	then
-		MSQLLIBS="-Wl,-rpath $MSQLLIBSPATH $MSQLLIBS"
-	fi
 
 
 
@@ -13096,8 +13840,12 @@ then
 
 eval "POSTGRESQLINCLUDES=\"\""
 eval "POSTGRESQLLIBS=\"\""
-eval "POSTGRESQLLIBPATH=\"\""
+eval "POSTGRESQLLIBSPATH=\"\""
 eval "POSTGRESQLSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$POSTGRESQLPATH
 NAME=pgsql
@@ -13109,6 +13857,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -13525,11 +14274,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -13555,8 +14304,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -13615,10 +14364,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -13645,7 +14394,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -13704,7 +14453,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -13734,7 +14483,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -13833,21 +14582,23 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "POSTGRESQLINCLUDES=\"$INCLUDESTRING\""
 eval "POSTGRESQLLIBS=\"$LIBSTRING\""
-eval "POSTGRESQLLIBPATH=\"$LIBPATH\""
+eval "POSTGRESQLLIBSPATH=\"$LIBPATH\""
 eval "POSTGRESQLSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
 
 
 	if ( test -z "$POSTGRESQLLIBS" )
@@ -13856,8 +14607,12 @@ eval "POSTGRESQLSTATIC=\"$STATIC\""
 
 eval "POSTGRESQLINCLUDES=\"\""
 eval "POSTGRESQLLIBS=\"\""
-eval "POSTGRESQLLIBPATH=\"\""
+eval "POSTGRESQLLIBSPATH=\"\""
 eval "POSTGRESQLSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$POSTGRESQLPATH
 NAME=postgresql
@@ -13869,6 +14624,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -14285,11 +15041,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -14315,8 +15071,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -14375,10 +15131,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -14405,7 +15161,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -14464,7 +15220,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -14494,7 +15250,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -14593,21 +15349,23 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "POSTGRESQLINCLUDES=\"$INCLUDESTRING\""
 eval "POSTGRESQLLIBS=\"$LIBSTRING\""
-eval "POSTGRESQLLIBPATH=\"$LIBPATH\""
+eval "POSTGRESQLLIBSPATH=\"$LIBPATH\""
 eval "POSTGRESQLSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
 
 	fi
 
@@ -14617,8 +15375,12 @@ eval "POSTGRESQLSTATIC=\"$STATIC\""
 
 eval "POSTGRESQLINCLUDES=\"\""
 eval "POSTGRESQLLIBS=\"\""
-eval "POSTGRESQLLIBPATH=\"\""
+eval "POSTGRESQLLIBSPATH=\"\""
 eval "POSTGRESQLSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$POSTGRESQLPATH
 NAME=postgres
@@ -14630,6 +15392,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -15046,11 +15809,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -15076,8 +15839,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -15136,10 +15899,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -15166,7 +15929,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -15225,7 +15988,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -15255,7 +16018,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -15354,21 +16117,23 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "POSTGRESQLINCLUDES=\"$INCLUDESTRING\""
 eval "POSTGRESQLLIBS=\"$LIBSTRING\""
-eval "POSTGRESQLLIBPATH=\"$LIBPATH\""
+eval "POSTGRESQLLIBSPATH=\"$LIBPATH\""
 eval "POSTGRESQLSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
 
 	fi
 
@@ -15490,10 +16255,6 @@ export LD_LIBRARY_PATH
 
 	if ( test -z "$POSTGRESQLSTATIC" -a -n "$POSTGRESQLLIBS" )
 	then
-		if ( test -n "$RPATHFLAG" -a -n "$POSTGRESQLLIBPATH" )
-		then
-			POSTGRESQLLIBS="-Wl,-rpath $POSTGRESQLLIBPATH $POSTGRESQLLIBS"
-		fi
 		echo "$as_me:$LINENO: checking if PostgreSQL can be dynamically linked without -lcrypt" >&5
 echo $ECHO_N "checking if PostgreSQL can be dynamically linked without -lcrypt... $ECHO_C" >&6
 
@@ -15558,7 +16319,7 @@ SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
 LIBS="$POSTGRESQLLIBS $SOCKETLIB -lcrypt"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBPATH"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -15625,6 +16386,7 @@ echo "$as_me: WARNING: No PostgreSQL link configuration could be found." >&2;}
 
 
 
+
 	if ( test -z "$POSTGRESQLLIBS" )
 	then
 		{ echo "$as_me:$LINENO: WARNING: PostgreSQL support will not be built." >&5
@@ -15649,6 +16411,10 @@ eval "GDBMINCLUDES=\"\""
 eval "GDBMLIBS=\"\""
 eval "GDBMLIBSPATH=\"\""
 eval "GDBMSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$LIBGDBMPATH
 NAME=gdbm
@@ -15660,6 +16426,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -16076,11 +16843,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -16106,8 +16873,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -16166,10 +16933,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -16196,7 +16963,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -16255,7 +17022,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -16285,7 +17052,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -16384,21 +17151,23 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "GDBMINCLUDES=\"$INCLUDESTRING\""
 eval "GDBMLIBS=\"$LIBSTRING\""
 eval "GDBMLIBSPATH=\"$LIBPATH\""
 eval "GDBMSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
 
 
 
@@ -16412,7 +17181,7 @@ eval "GDBMSTATIC=\"$STATIC\""
 
 	SQLITEINCLUDES=""
 	SQLITELIBS=""
-	SQLITELIBPATH=""
+	SQLITELIBSPATH=""
 	SQLITESTATIC=""
 
 	if ( test -n "$PTHREADSLIB" )
@@ -16421,8 +17190,12 @@ eval "GDBMSTATIC=\"$STATIC\""
 
 eval "SQLITEINCLUDES=\"\""
 eval "SQLITELIBS=\"\""
-eval "SQLITELIBPATH=\"\""
+eval "SQLITELIBSPATH=\"\""
 eval "SQLITESTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$SQLITEPATH
 NAME=sqlite
@@ -16434,6 +17207,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -16850,11 +17624,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -16880,8 +17654,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -16940,10 +17714,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -16970,7 +17744,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -17029,7 +17803,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -17059,7 +17833,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -17158,21 +17932,23 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "SQLITEINCLUDES=\"$INCLUDESTRING\""
 eval "SQLITELIBS=\"$LIBSTRING\""
-eval "SQLITELIBPATH=\"$LIBPATH\""
+eval "SQLITELIBSPATH=\"$LIBPATH\""
 eval "SQLITESTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
 
 	else
 		{ echo "$as_me:$LINENO: WARNING: pthreads was not found." >&5
@@ -17193,7 +17969,7 @@ SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$SQLITESTATIC $SQLITEINCLUDES"
 LIBS="$SQLITELIBS $SOCKETLIB"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SQLITELIBPATH"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SQLITELIBSPATH"
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -17246,6 +18022,7 @@ export LD_LIBRARY_PATH
 				{ echo "$as_me:$LINENO: WARNING: SQLite needs GDBM but GDBM was not found. SQLite support will not be built." >&5
 echo "$as_me: WARNING: SQLite needs GDBM but GDBM was not found. SQLite support will not be built." >&2;}
 				SQLITELIBS=""
+				SQLITELIBSPATH=""
 				SQLITEINCLUDES=""
 				SQLITESTATIC=""
 			else
@@ -17260,6 +18037,7 @@ _ACEOF
 		fi
 
 	fi
+
 
 
 
@@ -17286,8 +18064,12 @@ then
 
 eval "LAGOINCLUDES=\"\""
 eval "LAGOLIBS=\"\""
-eval "LAGOLIBPATH=\"\""
+eval "LAGOLIBSPATH=\"\""
 eval "LAGOSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$LAGOPATH
 NAME=lago
@@ -17299,6 +18081,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -17715,11 +18498,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -17745,8 +18528,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -17805,10 +18588,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -17835,7 +18618,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -17894,7 +18677,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -17924,7 +18707,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -18023,21 +18806,23 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "LAGOINCLUDES=\"$INCLUDESTRING\""
 eval "LAGOLIBS=\"$LIBSTRING\""
-eval "LAGOLIBPATH=\"$LIBPATH\""
+eval "LAGOLIBSPATH=\"$LIBPATH\""
 eval "LAGOSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
 
 
 	if ( test -z "$LAGOLIBS" )
@@ -18053,7 +18838,7 @@ SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$LAGOSTATIC $LAGOINCLUDES"
 LIBS="$LAGOLIBS $SOCKETLIB"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LAGOLIBPATH"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LAGOLIBSPATH"
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -18103,6 +18888,7 @@ export LD_LIBRARY_PATH
 
 
 
+
 fi
 
 echo "******************************"
@@ -18132,6 +18918,10 @@ eval "FREETDSINCLUDES=\"\""
 eval "FREETDSLIBS=\"\""
 eval "FREETDSLIBPATH=\"\""
 eval "FREETDSSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$FREETDSPATH
 NAME=freetds
@@ -18143,6 +18933,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -18559,11 +19350,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -18589,8 +19380,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -18649,10 +19440,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -18679,7 +19470,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -18738,7 +19529,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -18768,7 +19559,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -18867,21 +19658,24 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "FREETDSINCLUDES=\"$INCLUDESTRING\""
 eval "FREETDSLIBS=\"$LIBSTRING\""
 eval "FREETDSLIBPATH=\"$LIBPATH\""
 eval "FREETDSSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
+
 
 
 
@@ -18979,7 +19773,7 @@ then
 	SYBASEINCLUDES=""
 	SYBASELIBS=""
 	SYBASESTATIC=""
-	SYBASELIBPATH=""
+	SYBASELIBSPATH=""
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
 	then
@@ -19043,7 +19837,7 @@ then
 		eval "SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
 	fi
 else
-	if ( test -n "$SYBASEPATH/lib/libct.so" -a -n "SYBASELIBPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	if ( test -n "$SYBASEPATH/lib/libct.so" -a -n "SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$SYBASEPATH/lib/libct.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $SYBASEPATH/lib/libct.so" >&5
@@ -19070,7 +19864,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I$SYBASEPATH/include\""
-			eval "SYBASELIBPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+			eval "SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
 		fi
 	fi
 fi
@@ -19130,7 +19924,7 @@ then
 		eval "SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
 	fi
 else
-	if ( test -n "/usr/local/sybase/lib/libct.so" -a -n "SYBASELIBPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	if ( test -n "/usr/local/sybase/lib/libct.so" -a -n "SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
 	then
 		echo "$as_me:$LINENO: checking for /usr/local/sybase/lib/libct.so" >&5
 echo $ECHO_N "checking for /usr/local/sybase/lib/libct.so... $ECHO_C" >&6
@@ -19156,7 +19950,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/usr/local/sybase/include\""
-			eval "SYBASELIBPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+			eval "SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
 		fi
 	fi
 fi
@@ -19215,7 +20009,7 @@ then
 		eval "SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
 	fi
 else
-	if ( test -n "/opt/sybase/lib/libct.so" -a -n "SYBASELIBPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	if ( test -n "/opt/sybase/lib/libct.so" -a -n "SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
 	then
 		echo "$as_me:$LINENO: checking for /opt/sybase/lib/libct.so" >&5
 echo $ECHO_N "checking for /opt/sybase/lib/libct.so... $ECHO_C" >&6
@@ -19241,7 +20035,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/opt/sybase/include\""
-			eval "SYBASELIBPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+			eval "SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\""
 		fi
 	fi
 fi
@@ -19300,7 +20094,7 @@ then
 		eval "SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\""
 	fi
 else
-	if ( test -n "/opt/sybase-12.5/OCS-12_5/lib/libct.so" -a -n "SYBASELIBPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"" )
+	if ( test -n "/opt/sybase-12.5/OCS-12_5/lib/libct.so" -a -n "SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"" )
 	then
 		echo "$as_me:$LINENO: checking for /opt/sybase-12.5/OCS-12_5/lib/libct.so" >&5
 echo $ECHO_N "checking for /opt/sybase-12.5/OCS-12_5/lib/libct.so... $ECHO_C" >&6
@@ -19326,7 +20120,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\""
-			eval "SYBASELIBPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\""
+			eval "SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\""
 		fi
 	fi
 fi
@@ -19391,7 +20185,7 @@ then
 		eval "SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\""
 	fi
 else
-	if ( test -n "/opt/sybase-$i/lib/libct.so" -a -n "SYBASELIBPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
+	if ( test -n "/opt/sybase-$i/lib/libct.so" -a -n "SYBASELIBSPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_/opt/sybase-$i/lib/libct.so" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for /opt/sybase-$i/lib/libct.so" >&5
@@ -19418,7 +20212,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/opt/sybase-$i/include\""
-			eval "SYBASELIBPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\""
+			eval "SYBASELIBSPATH=\"/opt/sybase-$i/lib\"; SYBASELIBS=\"-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck\""
 		fi
 	fi
 fi
@@ -19429,11 +20223,6 @@ fi
 				fi
 			done
 		fi
-	fi
-
-	if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBPATH" )
-	then
-		SYBASELIBS="-Wl,-rpath $SYBASELIBPATH $SYBASELIBS"
 	fi
 
 	LINKFAIL=""
@@ -19554,10 +20343,6 @@ export LD_LIBRARY_PATH
 
 	if ( test -z "$SYBASESTATIC" -a -n "$SYBASELIBS" )
 	then
-		if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBSPATH" )
-		then
-			SYBASELIBS="-Wl,-rpath $SYBASELIBSPATH $SYBASELIBS"
-		fi
 		echo "$as_me:$LINENO: checking if Sybase can be dynamically linked without $DLLIB" >&5
 echo $ECHO_N "checking if Sybase can be dynamically linked without $DLLIB... $ECHO_C" >&6
 
@@ -19566,7 +20351,7 @@ SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$SYBASEINCLUDES"
 LIBS="$SYBASELIBS $SOCKETLIB"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBPATH"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBSPATH"
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -19622,7 +20407,7 @@ SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$SYBASEINCLUDES"
 LIBS="$SYBASELIBS $SOCKETLIB $DLLIB"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBPATH"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBSPATH"
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -19677,8 +20462,10 @@ export LD_LIBRARY_PATH
 echo "$as_me: WARNING: No Sybase link configuration could be found." >&2;}
 		SYBASEINCLUDES=""
 		SYBASELIBS=""
+		SYBASELIBSPATH=""
 		SYBASESTATIC=""
 	fi
+
 
 
 
@@ -19702,7 +20489,7 @@ if ( test "$ENABLE_ODBC" = "yes" )
 then
 
 	ODBCSTATIC=""
-	ODBCLIBPATH=""
+	ODBCLIBSPATH=""
 	STATICFLAG=""
 	if ( test -n "$STATICLINK" )
 	then
@@ -19715,8 +20502,12 @@ then
 
 eval "ODBCINCLUDES=\"\""
 eval "ODBCLIBS=\"\""
-eval "ODBCLIBPATH=\"\""
+eval "ODBCLIBSPATH=\"\""
 eval "UNIXODBCSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$ODBCPATH
 NAME=unixodbc
@@ -19728,6 +20519,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -20144,11 +20936,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -20174,8 +20966,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -20234,10 +21026,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -20264,7 +21056,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -20323,7 +21115,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -20353,7 +21145,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -20452,21 +21244,23 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "ODBCINCLUDES=\"$INCLUDESTRING\""
 eval "ODBCLIBS=\"$LIBSTRING\""
-eval "ODBCLIBPATH=\"$LIBPATH\""
+eval "ODBCLIBSPATH=\"$LIBPATH\""
 eval "UNIXODBCSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
 
 
 	if ( test -n "$ODBCLIBS" )
@@ -20477,8 +21271,12 @@ eval "UNIXODBCSTATIC=\"$STATIC\""
 
 eval "ODBCINCLUDES=\"\""
 eval "ODBCLIBS=\"\""
-eval "ODBCLIBPATH=\"\""
+eval "ODBCLIBSPATH=\"\""
 eval "IODBCSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 SEARCHPATH=$ODBCPATH
 NAME=iodbc
@@ -20490,6 +21288,7 @@ INCLUDESTRING=""
 LIBSTRING=""
 LIBPATH=""
 STATIC=""
+HEADERSANDLIBSPATH=""
 
 
 FOUNDHEADER=""
@@ -20906,11 +21705,11 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "INCLUDESTRING=\"-I$i/include\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -20936,8 +21735,8 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "INCLUDESTRING=\"-I$i/include\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -20996,10 +21795,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-		eval "LIBPATH=\"$i\"; LIBSTRING=\"-L$i -l$LIBNAME\""
+		eval "LIBPATH=\"$i/lib\"; LIBSTRING=\"-L$i/lib -l$LIBNAME\""
 	fi
 else
-	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	if ( test -n "$i/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 		as_ac_File=`echo "ac_cv_file_$i/lib/lib$LIBNAME.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/lib$LIBNAME.a" >&5
@@ -21026,7 +21825,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "INCLUDESTRING=\"-I$i/include/$NAME\""
-			eval "LIBSTRING=\"-L$i -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+			eval "LIBSTRING=\"-L$i/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
@@ -21085,7 +21884,7 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INCLUDESTRING=\"-I$i\""
+		eval "INCLUDESTRING=\"-I$i/include\""
 		eval "LIBPATH=\"$i/lib/$NAME\"; LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\""
 	fi
 else
@@ -21115,7 +21914,7 @@ fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INCLUDESTRING=\"-I$i\""
+			eval "INCLUDESTRING=\"-I$i/include\""
 			eval "LIBSTRING=\"-L$i/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
@@ -21214,27 +22013,30 @@ fi
 			fi
 			if ( test -n "$LIBSTRING" )
 			then
+				HEADERSANDLIBSPATH="$i"
 				break
 			fi
 		fi
 	done
-fi
-
-if ( test -n "$LINKRPATH" -a -n "$LIBPATH" )
-then
-	LIBSTRING="-Wl,-rpath $LIBPATH $LIBSTRING"
+else
+	HEADERSANDLIBSPATH="/usr"
 fi
 
 eval "ODBCINCLUDES=\"$INCLUDESTRING\""
 eval "ODBCLIBS=\"$LIBSTRING\""
-eval "ODBCLIBPATH=\"$LIBPATH\""
+eval "ODBCLIBSPATH=\"$LIBPATH\""
 eval "IODBCSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
 
 		if ( test -n "$ODBCLIBS" )
 		then
 			HAVE_IODBC="yes"
 		fi
 	fi
+
 
 
 
@@ -21246,11 +22048,6 @@ eval "IODBCSTATIC=\"$STATIC\""
 		ODBCSTATIC="$UNIXODBCSTATIC"
 	fi
 
-
-	if ( test -n "$RPATHFLAG" -a -n "$ODBCLIBSPATH" )
-	then
-		ODBCLIBS="-Wl,-rpath $ODBCLIBPATH $ODBCLIBS"
-	fi
 
 	if ( test -n "$HAVE_UNIXODBC" )
 	then
@@ -21267,7 +22064,7 @@ SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
 LIBS="$ODBCLIBS $SOCKETLIB"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBPATH"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -21331,7 +22128,7 @@ SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
 LIBS="$ODBCLIBS $SOCKETLIB"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBPATH"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -21756,10 +22553,6 @@ fi
 
 	fi
 
-	if ( test -n "$RPATHFLAG" -a -n "$DB2LIBSPATH" )
-	then
-		DB2LIBS="-Wl,-rpath $DB2LIBSPATH $DB2LIBS"
-	fi
 
 
 
@@ -22093,10 +22886,6 @@ export LD_LIBRARY_PATH
 
 	if ( test -z "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
 	then
-		if ( test -n "$RPATHFLAG" -a -n "$INTERBASELIBSPATH" )
-		then
-			INTERBASELIBS="-Wl,-rpath $INTERBASELIBSPATH $INTERBASELIBS"
-		fi
 		echo "$as_me:$LINENO: checking if Interbase can be dynamically linked without $DLLIB" >&5
 echo $ECHO_N "checking if Interbase can be dynamically linked without $DLLIB... $ECHO_C" >&6
 
@@ -22218,6 +23007,7 @@ echo "$as_me: WARNING: No Interbase link configuration could be found." >&2;}
 		INTERBASELIBS=""
 		INTERBASESTATIC=""
 	fi
+
 
 
 
@@ -26715,40 +27505,52 @@ s,@RUDIMENTSPATH@,$RUDIMENTSPATH,;t t
 s,@RUDIMENTSINCLUDES@,$RUDIMENTSINCLUDES,;t t
 s,@RUDIMENTSLIBS@,$RUDIMENTSLIBS,;t t
 s,@RUDIMENTSDEBUGLIBS@,$RUDIMENTSDEBUGLIBS,;t t
+s,@RUDIMENTSLIBSPATH@,$RUDIMENTSLIBSPATH,;t t
 s,@ORACLEVERSION@,$ORACLEVERSION,;t t
 s,@ORACLEINCLUDES@,$ORACLEINCLUDES,;t t
 s,@ORACLELIBS@,$ORACLELIBS,;t t
+s,@ORACLELIBSPATH@,$ORACLELIBSPATH,;t t
 s,@ORACLESTATIC@,$ORACLESTATIC,;t t
 s,@MYSQLINCLUDES@,$MYSQLINCLUDES,;t t
 s,@MYSQLLIBS@,$MYSQLLIBS,;t t
+s,@MYSQLLIBSPATH@,$MYSQLLIBSPATH,;t t
 s,@MYSQLSTATIC@,$MYSQLSTATIC,;t t
 s,@MSQLINCLUDES@,$MSQLINCLUDES,;t t
 s,@MSQLLIBS@,$MSQLLIBS,;t t
+s,@MSQLLIBSPATH@,$MSQLLIBSPATH,;t t
 s,@MSQLSTATIC@,$MSQLSTATIC,;t t
 s,@POSTGRESQLINCLUDES@,$POSTGRESQLINCLUDES,;t t
 s,@POSTGRESQLLIBS@,$POSTGRESQLLIBS,;t t
+s,@POSTGRESQLLIBSPATH@,$POSTGRESQLLIBSPATH,;t t
 s,@POSTGRESQLSTATIC@,$POSTGRESQLSTATIC,;t t
 s,@GDBMLIBS@,$GDBMLIBS,;t t
 s,@SQLITEINCLUDES@,$SQLITEINCLUDES,;t t
 s,@SQLITELIBS@,$SQLITELIBS,;t t
+s,@SQLITELIBSPATH@,$SQLITELIBSPATH,;t t
 s,@SQLITESTATIC@,$SQLITESTATIC,;t t
 s,@LAGOINCLUDES@,$LAGOINCLUDES,;t t
 s,@LAGOLIBS@,$LAGOLIBS,;t t
+s,@LAGOLIBSPATH@,$LAGOLIBSPATH,;t t
 s,@LAGOSTATIC@,$LAGOSTATIC,;t t
 s,@FREETDSINCLUDES@,$FREETDSINCLUDES,;t t
 s,@FREETDSLIBS@,$FREETDSLIBS,;t t
+s,@FREETDSLIBSPATH@,$FREETDSLIBSPATH,;t t
 s,@FREETDSSTATIC@,$FREETDSSTATIC,;t t
 s,@SYBASEINCLUDES@,$SYBASEINCLUDES,;t t
 s,@SYBASELIBS@,$SYBASELIBS,;t t
+s,@SYBASELIBSPATH@,$SYBASELIBSPATH,;t t
 s,@SYBASESTATIC@,$SYBASESTATIC,;t t
 s,@ODBCINCLUDES@,$ODBCINCLUDES,;t t
 s,@ODBCLIBS@,$ODBCLIBS,;t t
+s,@ODBCLIBSPATH@,$ODBCLIBSPATH,;t t
 s,@ODBCSTATIC@,$ODBCSTATIC,;t t
 s,@DB2INCLUDES@,$DB2INCLUDES,;t t
 s,@DB2LIBS@,$DB2LIBS,;t t
+s,@DB2LIBSPATH@,$DB2LIBSPATH,;t t
 s,@DB2STATIC@,$DB2STATIC,;t t
 s,@INTERBASEINCLUDES@,$INTERBASEINCLUDES,;t t
 s,@INTERBASELIBS@,$INTERBASELIBS,;t t
+s,@INTERBASELIBSPATH@,$INTERBASELIBSPATH,;t t
 s,@INTERBASESTATIC@,$INTERBASESTATIC,;t t
 s,@PERL@,$PERL,;t t
 s,@HAVE_PERL@,$HAVE_PERL,;t t
