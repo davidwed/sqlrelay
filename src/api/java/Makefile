@@ -16,6 +16,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) com/firstworks/sqlrelay/*.class
+	rm -rf .libs
 
 rebuild: clean all
 

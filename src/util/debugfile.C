@@ -86,7 +86,7 @@ void	debugfile::debugPrintBlob(const char *blob, unsigned long length) {
 	stringbuffer	*debugstr=new stringbuffer();
 	debugstr->append('\n');
 	int	column=0;
-	for (int i=0; i<length; i++) {
+	for (unsigned long i=0; i<length; i++) {
 		if (blob[i]>=' ' && blob[i]<='~') {
 			debugstr->append(blob[i]);
 		} else {
@@ -111,7 +111,7 @@ void	debugfile::debugPrintClob(const char *clob, unsigned long length) {
 	// print a \0 instead
 	stringbuffer	*debugstr=new stringbuffer();
 	debugstr->append('\n');
-	for (int i=0; i<length; i++) {
+	for (unsigned long i=0; i<length; i++) {
 		if (clob[i]==(char)NULL) {
 			debugstr->append("\\0");
 		} else {

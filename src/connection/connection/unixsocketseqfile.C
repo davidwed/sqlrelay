@@ -109,7 +109,7 @@ int	unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
 	if (size<1) {
 		buffer=0;
 	}
-	sprintf(unixsocketptr,"%d",buffer);
+	sprintf(unixsocketptr,"%ld",buffer);
 
 	#ifdef SERVER_DEBUG
 	char	*string=new char[21+strlen(unixsocketptr)+1];
@@ -127,7 +127,7 @@ int	unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
 
 	#ifdef SERVER_DEBUG
 	string=new char[50];
-	sprintf(string,"writing new sequence number: %d",buffer);
+	sprintf(string,"writing new sequence number: %ld",buffer);
 	dl->write("connection",1,string);
 	delete[] string;
 	#endif

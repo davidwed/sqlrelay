@@ -321,9 +321,9 @@ stringbuffer	*sqlrcursor::fakeInputBinds(const char *query) {
 		// are we inside of quotes ?
 		if (*ptr=='\'') {
 			if (inquotes) {
-				inquotes==0;
+				inquotes=0;
 			} else {
-				inquotes==1;
+				inquotes=1;
 			}
 		}
 
@@ -331,7 +331,6 @@ stringbuffer	*sqlrcursor::fakeInputBinds(const char *query) {
 		if (!inquotes && (*ptr==prefix || *ptr=='?')) {
 
 			// look through the list of vars
-			int	match=0;
 			for (int i=0; i<inbindcount; i++) {
 
 				// if we find a match, perform the substitution

@@ -548,9 +548,9 @@ void	sqlrconnection::debugPrint(const char *string) {
 
 void	sqlrconnection::debugPrint(long number) {
 	if (printfunction) {
-		(*printfunction)("%d",number);
+		(*printfunction)("%ld",number);
 	} else {
-		printf("%d",number);
+		printf("%ld",number);
 	}
 }
 
@@ -573,7 +573,7 @@ void	sqlrconnection::debugPrint(char character) {
 void	sqlrconnection::debugPrintBlob(const char *blob, unsigned long length) {
 	debugPrint('\n');
 	int	column=0;
-	for (int i=0; i<length; i++) {
+	for (unsigned long i=0; i<length; i++) {
 		if (blob[i]>=' ' && blob[i]<='~') {
 			debugPrint(blob[i]);
 		} else {
@@ -590,7 +590,7 @@ void	sqlrconnection::debugPrintBlob(const char *blob, unsigned long length) {
 
 void	sqlrconnection::debugPrintClob(const char *clob, unsigned long length) {
 	debugPrint('\n');
-	for (int i=0; i<length; i++) {
+	for (unsigned long i=0; i<length; i++) {
 		if (clob[i]==(char)NULL) {
 			debugPrint("\\0");
 		} else {
@@ -1098,10 +1098,10 @@ void	sqlrcursor::deleteVariables() {
 void	sqlrcursor::clearRows() {
 
 	// delete data in rows for long datatypes
-	int	rowbuffercount=rowcount-firstrowindex;
-	for (int i=0; i<rowbuffercount; i++) {
-		for (int j=0; j<colcount; j++) {
-			char	*data=getFieldInternal(i,j);
+	unsigned long	rowbuffercount=rowcount-firstrowindex;
+	for (unsigned long i=0; i<rowbuffercount; i++) {
+	        for (unsigned long j=0; j<colcount; j++) {
+		        // char	*data=getFieldInternal(i,j);
 			if (getColumn(j)->longdatatype) {
 				delete[] getFieldInternal(i,j);
 			}
@@ -1127,14 +1127,14 @@ void	sqlrcursor::clearRows() {
 
 	// delete arrays of fields and field lengths
 	if (fields) {
-		for (int i=0; i<rowbuffercount; i++) {
+		for (unsigned long i=0; i<rowbuffercount; i++) {
 			delete[] fields[i];
 		}
 		delete[] fields;
 		fields=NULL;
 	}
 	if (fieldlengths) {
-		for (int i=0; i<rowbuffercount; i++) {
+		for (unsigned long i=0; i<rowbuffercount; i++) {
 			delete[] fieldlengths[i];
 		}
 		delete[] fieldlengths;
@@ -1183,7 +1183,7 @@ int	sqlrcursor::fetchRowIntoBuffer(int row) {
 	// if we getting the entire result set at once, then the result set 
 	// buffer index is the requested row-firstrowindex
 	if (!rsbuffersize) {
-		if (row<rowcount && row>=firstrowindex) {
+		if (row<(int)rowcount && row>=(int)firstrowindex) {
 			return row-firstrowindex;
 		}
 		return -1;
@@ -1192,7 +1192,7 @@ int	sqlrcursor::fetchRowIntoBuffer(int row) {
 	// but, if we're not getting the entire result set at once
 	// and if the requested row is not in the current range, 
 	// fetch more data from the connection
-	while (row>=(firstrowindex+rsbuffersize) && !endofresultset) {
+	while (row>=(int)(firstrowindex+rsbuffersize) && !endofresultset) {
 		if (sqlrc->connected || 
 				(cachesource && cachesourceind)) {
 			clearRows();
@@ -1237,7 +1237,7 @@ char	**sqlrcursor::getColumnNames() {
 		// build a 2d array of pointers to the column names
 		columnnamearray=new char *[colcount+1];
 		columnnamearray[colcount]=NULL;
-		for (int i=0; i<colcount; i++) {
+		for (unsigned long i=0; i<colcount; i++) {
 			columnnamearray[i]=getColumn(i)->name;
 		}
 	}
@@ -1248,7 +1248,7 @@ char	*sqlrcursor::getColumnName(int col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<colcount) {
+			colcount && col>=0 && col<(int)colcount) {
 		return getColumn(col)->name;
 	}
 	return NULL;
@@ -1258,7 +1258,7 @@ char	*sqlrcursor::getColumnType(int col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<colcount) {
+			colcount && col>=0 && col<(int)colcount) {
 		column	*whichcolumn=getColumn(col);
 		if (columntypeformat!=COLUMN_TYPE_IDS) {
 			return whichcolumn->typestring;
@@ -1272,7 +1272,7 @@ int	sqlrcursor::getColumnLength(int col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<colcount) {
+			colcount && col>=0 && col<(int)colcount) {
 		return getColumn(col)->length;
 	}
 	return 0;
@@ -1282,7 +1282,7 @@ int	sqlrcursor::getLongest(int col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<colcount) {
+			colcount && col>=0 && col<(int)colcount) {
 		return getColumn(col)->longest;
 	} 
 	return 0;
@@ -1293,7 +1293,7 @@ char	*sqlrcursor::getColumnType(const char *col) {
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO) {
 		column	*whichcolumn;
-		for (int i=0; i<colcount; i++) {
+		for (unsigned long i=0; i<colcount; i++) {
 			whichcolumn=getColumn(i);
 			if (!strcasecmp(whichcolumn->name,col)) {
 				if (columntypeformat!=COLUMN_TYPE_IDS) {
@@ -1311,7 +1311,7 @@ int	sqlrcursor::getColumnLength(const char *col) {
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO) {
 		column	*whichcolumn;
-		for (int i=0; i<colcount; i++) {
+		for (unsigned long i=0; i<colcount; i++) {
 			whichcolumn=getColumn(i);
 			if (!strcasecmp(whichcolumn->name,col)) {
 				return whichcolumn->length;
@@ -1326,7 +1326,7 @@ int	sqlrcursor::getLongest(const char *col) {
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO) {
 		column	*whichcolumn;
-		for (int i=0; i<colcount; i++) {
+		for (unsigned long i=0; i<colcount; i++) {
 			whichcolumn=getColumn(i);
 			if (!strcasecmp(whichcolumn->name,col)) {
 				return whichcolumn->longest;
@@ -1356,7 +1356,7 @@ void	sqlrcursor::cacheData() {
 		cachedestind->write(position);
 
 		// write the row to the cache file
-		for (int j=0; j<colcount; j++) {
+		for (unsigned long j=0; j<colcount; j++) {
 			unsigned short	type;
 			long	len;
 			char	*field=getFieldInternal(i,j);
@@ -1430,8 +1430,8 @@ void	sqlrcursor::getNullsAsNulls() {
 
 char	*sqlrcursor::getField(int row, int col) {
 
-	if (rowcount && row>=0 && row>=firstrowindex && 
-					col>=0 && col<colcount) {
+	if (rowcount && row>=0 && row>=(int)firstrowindex && 
+					col>=0 && col<(int)colcount) {
 
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
@@ -1450,8 +1450,8 @@ char	*sqlrcursor::getField(int row, const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
-			rowcount && row>=0 && row>=firstrowindex) {
-		for (int i=0; i<colcount; i++) {
+			rowcount && row>=0 && row>=(int)firstrowindex) {
+		for (unsigned long i=0; i<colcount; i++) {
 			if (!strcasecmp(getColumn(i)->name,col)) {
 
 				// in the event that we're stepping through the
@@ -1473,8 +1473,8 @@ char	*sqlrcursor::getField(int row, const char *col) {
 
 long	sqlrcursor::getFieldLength(int row, int col) {
 
-	if (rowcount && row>=0 && row>=firstrowindex && 
-					col>=0 && col<colcount) {
+	if (rowcount && row>=0 && row>=(int)firstrowindex && 
+					col>=0 && col<(int)colcount) {
 
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
@@ -1492,9 +1492,9 @@ long	sqlrcursor::getFieldLength(int row, const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
-			rowcount && row>=0 && row>=firstrowindex) {
+			rowcount && row>=0 && row>=(int)firstrowindex) {
 
-		for (int i=0; i<colcount; i++) {
+		for (unsigned long i=0; i<colcount; i++) {
 			if (!strcasecmp(getColumn(i)->name,col)) {
 
 				// in the event that we're stepping through the
@@ -1516,7 +1516,7 @@ long	sqlrcursor::getFieldLength(int row, const char *col) {
 
 char	**sqlrcursor::getRow(int row) {
 
-	if (rowcount && row>=0 && row>=firstrowindex) {
+	if (rowcount && row>=0 && row>=(int)firstrowindex) {
 
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
@@ -1535,7 +1535,7 @@ char	**sqlrcursor::getRow(int row) {
 
 long	*sqlrcursor::getRowLengths(int row) {
 
-	if (rowcount && row>=0 && row>=firstrowindex) {
+	if (rowcount && row>=0 && row>=(int)firstrowindex) {
 
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
@@ -1571,13 +1571,13 @@ void	sqlrcursor::createFields() {
 	// the fields array will contain 2 elements:
 	// 	fields[0] (corresponding to row 3) and
 	// 	fields[1] (corresponding to row 4)
-	int	rowbuffercount=rowcount-firstrowindex;
+	unsigned long	rowbuffercount=rowcount-firstrowindex;
 	fields=new char **[rowbuffercount+1];
 	fields[rowbuffercount]=(char **)NULL;
-	for (int i=0; i<rowbuffercount; i++) {
+	for (unsigned long i=0; i<rowbuffercount; i++) {
 		fields[i]=new char *[colcount+1];
 		fields[i][colcount]=(char *)NULL;
-		for (int j=0; j<colcount; j++) {
+		for (unsigned long j=0; j<colcount; j++) {
 			fields[i][j]=getFieldInternal(i,j);
 		}
 	}
@@ -1588,13 +1588,13 @@ void	sqlrcursor::createFieldLengths() {
 	// the fieldlengths array will contain 2 elements:
 	// 	fieldlengths[0] (corresponding to row 3) and
 	// 	fieldlengths[1] (corresponding to row 4)
-	int	rowbuffercount=rowcount-firstrowindex;
+	unsigned long	rowbuffercount=rowcount-firstrowindex;
 	fieldlengths=new unsigned long *[rowbuffercount+1];
 	fieldlengths[rowbuffercount]=(unsigned long)NULL;
-	for (int i=0; i<rowbuffercount; i++) {
+	for (unsigned long i=0; i<rowbuffercount; i++) {
 		fieldlengths[i]=new unsigned long[colcount+1];
 		fieldlengths[i][colcount]=(unsigned long)NULL;
-		for (int j=0; j<colcount; j++) {
+		for (unsigned long j=0; j<colcount; j++) {
 			fieldlengths[i][j]=getFieldLengthInternal(i,j);
 		}
 	}
@@ -1770,7 +1770,7 @@ int	sqlrcursor::parseData() {
 	unsigned short	type;
 	unsigned long	length;
 	char	*buffer=NULL;
-	long	colindex=0;
+	unsigned long	colindex=0;
 	column	*currentcol;
 	row	*currentrow=NULL;
 
@@ -1857,7 +1857,7 @@ int	sqlrcursor::parseData() {
 			// for non-long, non-NULL datatypes...
 			// get the field into a buffer
 			buffer=(char *)rowstorage->malloc(length+1);
-			if (getString(buffer,length)!=length) {
+			if ((unsigned long)getString(buffer,length)!=length) {
 				return -1;
 			}
 			buffer[length]=(char)NULL;
@@ -1896,7 +1896,7 @@ int	sqlrcursor::parseData() {
 				}
 				totallength=totallength+length;
 
-				if (getString(buffer,length)!=length) {
+				if ((unsigned long)getString(buffer,length)!=length) {
 					delete[] buffer;
 					return -1;
 				}
@@ -1936,7 +1936,7 @@ int	sqlrcursor::parseData() {
 		// keep track of the longest field
 		if (sendcolumninfo==SEND_COLUMN_INFO && 
 				sentcolumninfo==SEND_COLUMN_INFO) {
-			if (length>currentcol->longest) {
+			if (length>(unsigned long)(currentcol->longest)) {
 				currentcol->longest=length;
 			}
 		}
@@ -2017,7 +2017,7 @@ int	sqlrcursor::parseOutputBinds() {
 			}
 			outbindvars[count].valuesize=length;
 			outbindvars[count].value.stringval=new char[length+1];
-			if (getString(outbindvars[count].value.
+			if ((unsigned long)getString(outbindvars[count].value.
 						stringval,length)!=length) {
 				return -1;
 			}
@@ -2067,7 +2067,7 @@ int	sqlrcursor::parseOutputBinds() {
 				}
 				totallength=totallength+length;
 
-				if (getString(buffer,length)!=length) {
+				if ((unsigned long)getString(buffer,length)!=length) {
 					delete[] buffer;
 					return -1;
 				}
@@ -2159,7 +2159,7 @@ void	sqlrcursor::cacheColumnInfo() {
 		// write the columns themselves
 		unsigned short	namelen;
 		column	*whichcolumn;
-		for (int i=0; i<colcount; i++) {
+		for (unsigned long i=0; i<colcount; i++) {
 			whichcolumn=getColumn(i);
 			namelen=strlen(whichcolumn->name);
 			cachedest->write(namelen);
@@ -2413,7 +2413,7 @@ int	sqlrcursor::parseColumnInfo() {
 		column		*currentcol;
 
 		// get the columninfo segment
-		for (long i=0; i<colcount; i++) {
+		for (unsigned long i=0; i<colcount; i++) {
 	
 			// get the column name length
 			if (getShort(&length)!=sizeof(unsigned short)) {
@@ -2966,7 +2966,7 @@ void	sqlrcursor::clearColumns() {
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
 				columntypeformat!=COLUMN_TYPE_IDS) {
-		for (int i=0; i<colcount; i++) {
+		for (unsigned long i=0; i<colcount; i++) {
 			delete[] getColumn(i)->typestring;
 		}
 	}
@@ -3994,7 +3994,7 @@ void	sqlrcursor::validateBindsInternal(const char *query) {
 		// "select * from table where table_name=:table_name", both
 		// table_name's would match, but only the second is a bind
 		// variable
-		while (ptr=strstr(start,inbindvars[i].variable)) {
+		while ((ptr=strstr(start,inbindvars[i].variable))) {
 
 			// for a match to be a bind variable, it must be 
 			// preceded by a colon and can't be followed by an
@@ -4035,7 +4035,7 @@ void	sqlrcursor::validateBindsInternal(const char *query) {
 		// there may be more than 1 match for the variable name as in
 		// "select * from table where table_name=:table_name", both
 		// table_name's would match, but only 1 is correct
-		while (ptr=strstr(start,outbindvars[i].variable)) {
+		while ((ptr=strstr(start,outbindvars[i].variable))) {
 
 			// for a match to be a bind variable, it must be 
 			// preceded by a colon and can't be followed by an

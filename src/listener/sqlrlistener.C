@@ -135,7 +135,7 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 		return 0;
 	}
 
-	if (passdescriptor=cfgfl.getPassDescriptor()) {
+	if ((passdescriptor=cfgfl.getPassDescriptor())) {
 		if (!listenOnHandoffSocket(&tmpdir,cmdl->getId())) {
 			return 0;
 		}
@@ -187,7 +187,7 @@ int	sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
 		fprintf(stderr,"	This usually means that the ");
 		fprintf(stderr,"sqlr-listener is already running for ");
 		fprintf(stderr,"the \n");
-		fprintf(stderr,"	%s");
+		fprintf(stderr,"	%s",id);
 		fprintf(stderr," instance.\n");
 		fprintf(stderr,"	If it is not running, please remove ");
 		fprintf(stderr,"the file and restart.\n");
@@ -859,8 +859,9 @@ int	sqlrlistener::getAuth() {
 	// if there's a read error, just exit with an error code
 	unsigned long	size;
 	clientsock->read(&size);
-	char		userbuffer[USERSIZE+1];
-	if (size>USERSIZE || clientsock->read(userbuffer,size)!=size) {
+	char		userbuffer[(unsigned long)USERSIZE+1];
+	if (size>(unsigned long)USERSIZE ||
+	    (unsigned long)(clientsock->read(userbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: user size is wrong");
@@ -869,9 +870,9 @@ int	sqlrlistener::getAuth() {
 	}
 	userbuffer[size]=(char)NULL;
 
-	char		passwordbuffer[USERSIZE+1];
+	char		passwordbuffer[(unsigned long)USERSIZE+1];
 	clientsock->read(&size);
-	if (size>USERSIZE || clientsock->read(passwordbuffer,size)!=size) {
+	if (size>(unsigned long)USERSIZE || (unsigned long)(clientsock->read(passwordbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: password size is wrong");
@@ -1018,9 +1019,6 @@ void	sqlrlistener::getAConnection() {
 			debugPrint("listener",1,"handoff=reconnect");
 			#endif
 
-			// buffer to hold the port
-			unsigned short	connectionport;
-
 			// get the unix port
 			unixportstrlen=0;
 			while (*ptr!=':' && unixportstrlen<MAXPATHLEN) {
@@ -1157,6 +1155,7 @@ int	sqlrlistener::disconnectFromConnection(datatransport *connsock) {
 	if (!passdescriptor) {
 		delete connsock;
 	}
+	return 1;
 }
 
 int	sqlrlistener::passDescriptor() {
@@ -1232,7 +1231,7 @@ void	sqlrlistener::waitForClientClose(int authstatus, int passstatus) {
 		// for a DOS attack.  We'll read the maximum
 		// number of bytes that could be sent.
 
-		int	counter=0;
+		unsigned int	counter=0;
 		while (clientsock->read(&dummy)>0 && counter<
 				// sending auth
 				(sizeof(short)+

@@ -20,6 +20,8 @@
 	perl API returns undef for getField() and getOutputBind() for NULL
 		values now
 	netbsd init script is fixed now
+	applied lots of patches from Takeshi Taguchi for typo's and compiler
+		warnings
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

@@ -404,7 +404,7 @@ int	sqlrconnection::handlePidFile() {
 	if (checkForPidFile(pidfile)==-1) {
 		printf("\nsqlr-connection error:\n");
 		printf("	The file %s",tmpdir->getString());
-		printf("/sqlr-listener-",cmdl->getId());
+		printf("/sqlr-listener-%s",cmdl->getId());
 		printf(" was not found.\n");
 		printf("	This usually means that the sqlr-listener \n");
 		printf("is not running.\n");
@@ -1007,9 +1007,10 @@ int	sqlrconnection::authenticate() {
 }
 
 int	sqlrconnection::getUserFromClient() {
-	unsigned long size;
+	unsigned long size=0;
 	clientsock->read(&size);
-	if (size>USERSIZE || clientsock->read(userbuffer,size)!=size) {
+	if (size>(unsigned long)USERSIZE ||
+		(unsigned long)(clientsock->read(userbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",1,
 			"authentication failed: user size is wrong");
@@ -1021,9 +1022,10 @@ int	sqlrconnection::getUserFromClient() {
 }
 
 int	sqlrconnection::getPasswordFromClient() {
-	unsigned long size;
+	unsigned long size=0;
 	clientsock->read(&size);
-	if (size>USERSIZE || clientsock->read(passwordbuffer,size)!=size) {
+	if (size>(unsigned long)USERSIZE ||
+		(unsigned long)(clientsock->read(passwordbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",1,
 			"authentication failed: password size is wrong");
@@ -1468,7 +1470,8 @@ void	sqlrconnection::resumeResultSet() {
 
 		// send the error itself
 		clientsock->write((unsigned short)43);
-		clientsock->write("The requested result set was not suspended.",43);
+		clientsock->write("The requested result set was not suspended.",
+					43);
 	}
 
 	#ifdef SERVER_DEBUG
@@ -1801,9 +1804,10 @@ int	sqlrconnection::getQuery() {
 	}
 
 	// read the query into the buffer
-	if (clientsock->read(cur[currentcur]->querybuffer,
-				cur[currentcur]->querylength)!=
-					cur[currentcur]->querylength) {
+	if ((unsigned long)(clientsock->read(cur[currentcur]->querybuffer,
+				cur[currentcur]->querylength))!=
+					(unsigned long)(cur[currentcur]->
+								querylength)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting query failed: client sent short query");
@@ -1863,7 +1867,7 @@ int	sqlrconnection::getInputBinds() {
 			if (!getLobBind(bv)) {
 				return 0;
 			}
-		}
+		}		  
 	}
 
 	#ifdef SERVER_DEBUG
@@ -2085,15 +2089,16 @@ int	sqlrconnection::getBindVarName(bindvar *bv) {
 int	sqlrconnection::getBindVarType(bindvar *bv) {
 
 	// get the type
-	if (clientsock->read((unsigned short *)&(bv->type))!=
-					sizeof(unsigned short)) {
+        unsigned short type;
+	if (clientsock->read((unsigned short *)&type)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 				"getting binds failed: bad type size");
 		#endif
 		return 0;
 	}
-
+	bv->type=(bindtype)type;
+	
 	return 1;
 }
 
@@ -2148,8 +2153,8 @@ int	sqlrconnection::getStringBind(bindvar *bv) {
 	#endif
 
 	// get the bind value
-	if (clientsock->read(bv->value.stringval,
-				bv->valuesize)!=bv->valuesize) {
+	if ((unsigned long)(clientsock->read(bv->value.stringval,
+			bv->valuesize))!=(unsigned long)(bv->valuesize)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"getting binds failed: bad value");
 		#endif
@@ -2263,8 +2268,8 @@ int	sqlrconnection::getLobBind(bindvar *bv) {
 	bv->value.stringval=(char *)bindpool->malloc(bv->valuesize+1);
 
 	// get the bind value
-	if (clientsock->read(bv->value.stringval,
-					bv->valuesize)!=bv->valuesize) {
+	if ((unsigned long)(clientsock->read(bv->value.stringval,
+			bv->valuesize))!=(unsigned long)(bv->valuesize)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 				"getting binds failed: bad value");
@@ -2553,7 +2558,7 @@ int	sqlrconnection::returnResultSetData() {
 
 
 	// send the specified number of rows back
-	for (int i=0; (!fetch || i<fetch); i++) {
+	for (unsigned long i=0; (!fetch || i<fetch); i++) {
 
 		if (!cur[currentcur]->fetchRow()) {
 			clientsock->write((unsigned short)END_RESULT_SET);
@@ -2623,7 +2628,7 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 
 		#ifdef SERVER_DEBUG
 		char	string[30];
-		sprintf(string,"actual rows: %d",actual);
+		sprintf(string,"actual rows: %ld",actual);
 		debugPrint("connection",3,string);
 		#endif
 
@@ -2644,7 +2649,7 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 
 		#ifdef SERVER_DEBUG
 		char	string[46];
-		sprintf(string,"affected rows: %d",affected);
+		sprintf(string,"affected rows: %ld",affected);
 		debugPrint("connection",3,string);
 		#endif
 
@@ -2758,7 +2763,7 @@ void	sqlrconnection::sendField(const char *data, unsigned long size) {
 
 	#ifdef SERVER_DEBUG
 	debugstr->append("\"");
-	for (int i=0; i<size; i++) {
+	for (unsigned long i=0; i<size; i++) {
 		debugstr->append(data[i]);
 	}
 	debugstr->append("\",");
@@ -2785,7 +2790,7 @@ void	sqlrconnection::startSendingLong() {
 void	sqlrconnection::sendLongSegment(const char *data, unsigned long size) {
 
 	#ifdef SERVER_DEBUG
-	for (int i=0; i<size; i++) {
+	for (unsigned long i=0; i<size; i++) {
 		debugstr->append(data[i]);
 	}
 	#endif
