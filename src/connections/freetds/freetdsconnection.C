@@ -645,7 +645,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 		}
 
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-			freetdsconn->deadconnection=1;
+			freetdsconn->deadconnection=true;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			// maybe return false
 			return false;
@@ -750,7 +750,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 	// errors to the screen when cleanUpData() is called.
 	if (moneycolumn) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-			freetdsconn->deadconnection=1;
+			freetdsconn->deadconnection=true;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			// maybe return false
 			return false;
@@ -993,7 +993,7 @@ void freetdscursor::discardResults() {
 	if (results==CS_SUCCEED) {
 		do {
 			if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-				freetdsconn->deadconnection=1;
+				freetdsconn->deadconnection=true;
 				// FIXME: call ct_close(CS_FORCE_CLOSE)
 				// maybe return false
 			}
@@ -1003,7 +1003,7 @@ void freetdscursor::discardResults() {
 
 	if (results==CS_FAIL) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_ALL)==CS_FAIL) {
-			freetdsconn->deadconnection=1;
+			freetdsconn->deadconnection=true;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			// maybe return false
 		}
@@ -1062,7 +1062,14 @@ CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt,
 		CS_LAYER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_NUMBER(msgp->msgnumber)==63) {
-		deadconnection=1;
+		deadconnection=true;
+
+	// for a read from sql server failed message, set deadconnection to 1
+	} else if (CS_SEVERITY(msgp->msgnumber)==78 &&
+		CS_LAYER(msgp->msgnumber)==0 &&
+		CS_ORIGIN(msgp->msgnumber)==0 &&
+		CS_NUMBER(msgp->msgnumber)==36) {
+		deadconnection=true;
 	}
 
 	return CS_SUCCEED;
@@ -1105,7 +1112,14 @@ CS_RETCODE freetdsconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 		CS_NUMBER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_LAYER(msgp->msgnumber)==63) {
-		deadconnection=1;
+		deadconnection=true;
+
+	// for a read from sql server failed message, set deadconnection to 1
+	} else if (CS_SEVERITY(msgp->msgnumber)==78 &&
+		CS_LAYER(msgp->msgnumber)==0 &&
+		CS_ORIGIN(msgp->msgnumber)==0 &&
+		CS_NUMBER(msgp->msgnumber)==36) {
+		deadconnection=true;
 	}
 
 	return CS_SUCCEED;
