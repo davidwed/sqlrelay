@@ -374,7 +374,9 @@ void	mysqlcursor::returnColumnInfo() {
 					strlen(mysqlfield->name),
 					type,length,
 					mysqlfield->length,
-					mysqlfield->decimals);
+					mysqlfield->decimals,
+					!(IS_NOT_NULL(mysqlfield->flags)),
+					IS_PRI_KEY(mysqlfield->flags));
 	}
 }
 

@@ -290,11 +290,11 @@ void	postgresqlcursor::returnColumnInfo() {
 
 		if (postgresqlconn->typemangling==1) {
 			conn->sendColumnDefinition(name,strlen(name),
-							type,size,0,0);
+							type,size,0,0,0,0);
 		} else {
 			conn->sendColumnDefinitionString(name,strlen(name),
 					typestring,strlen(typestring),size,
-								0,0);
+								0,0,0,0);
 		}
 	}
 }

@@ -231,7 +231,9 @@ void	msqlcursor::returnColumnInfo() {
 		conn->sendColumnDefinition(msqlfield->name,
 					strlen(msqlfield->name),
 					type,msqlfield->length,
-					precision,scale);
+					precision,scale,
+					!(IS_NOT_NULL(msqlfield->flags)),
+					0);
 	}
 }
 

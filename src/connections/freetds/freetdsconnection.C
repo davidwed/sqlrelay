@@ -693,7 +693,7 @@ void	freetdscursor::returnColumnInfo() {
 					type,
 					column[i].maxlength,
 					column[i].precision,
-					column[i].scale);
+					column[i].scale,0,0);
 	}
 }
 

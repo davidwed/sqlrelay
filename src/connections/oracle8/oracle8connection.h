@@ -42,6 +42,7 @@ struct describe {
 	sb4		buflen;
 	ub1		precision;
 	ub1		scale;
+	ub1		nullok;
 };
 
 class oracle8connection;

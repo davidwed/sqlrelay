@@ -17,6 +17,8 @@ class column {
 		unsigned char	longdatatype;
 		unsigned long	precision;
 		unsigned long	scale;
+		unsigned short	nullable;
+		unsigned short	primarykey;
 };
 
 #endif

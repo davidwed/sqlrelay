@@ -1298,6 +1298,26 @@ unsigned long	sqlrcursor::getColumnScale(int col) {
 	return 0;
 }
 
+unsigned short	sqlrcursor::getColumnIsNullable(int col) {
+
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO &&
+			colcount && col>=0 && col<(int)colcount) {
+		return getColumn(col)->nullable;
+	}
+	return 0;
+}
+
+unsigned short	sqlrcursor::getColumnIsPrimaryKey(int col) {
+
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO &&
+			colcount && col>=0 && col<(int)colcount) {
+		return getColumn(col)->primarykey;
+	}
+	return 0;
+}
+
 int	sqlrcursor::getLongest(int col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
@@ -1365,6 +1385,36 @@ unsigned long	sqlrcursor::getColumnScale(const char *col) {
 			whichcolumn=getColumn(i);
 			if (!strcasecmp(whichcolumn->name,col)) {
 				return whichcolumn->scale;
+			}
+		}
+	}
+	return 0;
+}
+
+unsigned short	sqlrcursor::getColumnIsNullable(const char *col) {
+
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO) {
+		column	*whichcolumn;
+		for (unsigned long i=0; i<colcount; i++) {
+			whichcolumn=getColumn(i);
+			if (!strcasecmp(whichcolumn->name,col)) {
+				return whichcolumn->nullable;
+			}
+		}
+	}
+	return 0;
+}
+
+unsigned short	sqlrcursor::getColumnIsPrimaryKey(const char *col) {
+
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO) {
+		column	*whichcolumn;
+		for (unsigned long i=0; i<colcount; i++) {
+			whichcolumn=getColumn(i);
+			if (!strcasecmp(whichcolumn->name,col)) {
+				return whichcolumn->nullable;
 			}
 		}
 	}
@@ -2224,6 +2274,8 @@ void	sqlrcursor::cacheColumnInfo() {
 			cachedest->write(whichcolumn->length);
 			cachedest->write(whichcolumn->precision);
 			cachedest->write(whichcolumn->scale);
+			cachedest->write(whichcolumn->nullable);
+			cachedest->write(whichcolumn->primarykey);
 		}
 	}
 }
@@ -2536,6 +2588,18 @@ int	sqlrcursor::parseColumnInfo() {
 				return -1;
 			}
 
+			// get whether the column is nullable
+			if (getShort(&currentcol->nullable)!=
+						sizeof(unsigned long)) {
+				return -1;
+			}
+
+			// get whether the column is a primary key
+			if (getShort(&currentcol->primarykey)!=
+						sizeof(unsigned long)) {
+				return -1;
+			}
+
 			// initialize the longest value
 			currentcol->longest=0;
 	
@@ -2558,7 +2622,14 @@ int	sqlrcursor::parseColumnInfo() {
 				sqlrc->debugPrint((long)currentcol->precision);
 				sqlrc->debugPrint(",");
 				sqlrc->debugPrint((long)currentcol->scale);
-				sqlrc->debugPrint(")\n");
+				sqlrc->debugPrint(") ");
+				if (!(long)currentcol->nullable) {
+					sqlrc->debugPrint("NOT NULL ");
+				}
+				if ((long)currentcol->primarykey) {
+					sqlrc->debugPrint("Primary Key");
+				}
+				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}
 

@@ -361,6 +361,14 @@ class sqlrcursor {
 				// Scale is the total number of digits to the
 				// right of the decimal point in a number.
 				// eg: 123.45 has a scale of 2.
+		unsigned short	getColumnIsNullable(int col);
+		unsigned short	getColumnIsNullable(const char *col);
+				// Returns 1 if the specified column can
+				// contain nulls and 0 otherwise.
+		unsigned short	getColumnIsPrimaryKey(int col);
+		unsigned short	getColumnIsPrimaryKey(const char *col);
+				// Returns 1 if the specified column is a
+				// primary key and 0 otherwise.
 		int	getLongest(int col);
 		int	getLongest(const char *col);
 				// Returns the length of the longest field

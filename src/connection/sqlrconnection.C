@@ -2712,7 +2712,9 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 						unsigned short type, 
 						unsigned long size,
 						unsigned long precision,
-						unsigned long scale) {
+						unsigned long scale,
+						unsigned short nullable,
+						unsigned short primarykey) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -2727,7 +2729,13 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 	debugstr->append((long)precision);
 	debugstr->append(",");
 	debugstr->append((long)scale);
-	debugstr->append(")");
+	debugstr->append(") ");
+	if (!nullable) {
+		debugstr->append("NOT NULL ");
+	}
+	if (primarykey) {
+		debugstr->append("Primary key");
+	}
 	debugPrint("connection",3,debugstr->getString());
 	delete debugstr;
 	#endif
@@ -2738,6 +2746,8 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 	clientsock->write(size);
 	clientsock->write(precision);
 	clientsock->write(scale);
+	clientsock->write(nullable);
+	clientsock->write(primarykey);
 }
 
 void	sqlrconnection::sendColumnDefinitionString(const char *name,
@@ -2746,7 +2756,9 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 						unsigned short typelen,
 						unsigned long size,
 						unsigned long precision,
-						unsigned long scale) {
+						unsigned long scale,
+						unsigned short nullable,
+						unsigned short primarykey) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -2763,7 +2775,13 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 	debugstr->append((long)precision);
 	debugstr->append(",");
 	debugstr->append((long)scale);
-	debugstr->append(")");
+	debugstr->append(") ");
+	if (!nullable) {
+		debugstr->append("NOT NULL ");
+	}
+	if (primarykey) {
+		debugstr->append("Primary key");
+	}
 	debugPrint("connection",3,debugstr->getString());
 	delete debugstr;
 	#endif
@@ -2775,6 +2793,8 @@ void	sqlrconnection::sendColumnDefinitionString(const char *name,
 	clientsock->write(size);
 	clientsock->write(precision);
 	clientsock->write(scale);
+	clientsock->write(nullable);
+	clientsock->write(primarykey);
 }
 
 void	sqlrconnection::sendField(const char *data, unsigned long size) {

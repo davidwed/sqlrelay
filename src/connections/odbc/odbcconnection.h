@@ -30,6 +30,7 @@ struct column {
 	int	length;
 	int	precision;
 	int	scale;
+	int	nullable;
 };
 
 class odbcconnection;

@@ -1,4 +1,9 @@
+implement nullable, primary key, precision, scale in non c++ api's
+
+implement nullable,primary key for connections
+
 is there a better way to get a column's precision in interbase
+precision/scale in postgresql
 
 add column precision/scale to protocol doc
 

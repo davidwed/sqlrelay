@@ -27,6 +27,8 @@
 		that support it
 	all databases return the number of bytes required to store the column
 		on the server for getColumnLength now
+	added support for determining whether a column is nullable or a primary
+		key for databases that support it
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

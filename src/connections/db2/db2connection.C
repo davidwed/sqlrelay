@@ -325,6 +325,13 @@ int	db2cursor::executeQuery(const char *query, long length,
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
+
+			// column nullable
+			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_NULLABLE,
+					NULL,0,NULL,&(col[i].nullable));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
 		}
 
 		// bind the column to a buffer
@@ -446,7 +453,7 @@ void	db2cursor::returnColumnInfo() {
 		// send column definition
 		conn->sendColumnDefinition(col[i].name,col[i].namelength,type,
 					col[i].length,col[i].precision,
-					col[i].scale);
+					col[i].scale,col[i].nullable,0);
 	}
 }
 

@@ -182,16 +182,22 @@ void	lagocursor::returnColumnInfo() {
 	char	*name;
 	int	precision;
 	int	scale;
+	int	nullable;
 	int	length;
 	int	type;
 
 	// for each column...
 	for (int i=1; i<ncols+1; i++) {
 
-		// get name, precision and scale
+		// get name, precision, scale and nullability
 		name=(char *)Lgetcolname(lagoresult,i);
 		precision=Lgetcolprec(lagoresult,i);
 		scale=Lgetcolscale(lagoresult,i);
+
+		// though Lgetcolnull is defined in lago.h,
+		// it's not in liblago.a
+		//nullable=(Lgetcolnull(lagoresult,i)!=0);
+		nullable=0;
 
 		// set column type
 		LType	coltype=Lgetcoltype(lagoresult,i);
@@ -232,7 +238,8 @@ void	lagocursor::returnColumnInfo() {
 
 		// send the column definition
 		conn->sendColumnDefinition(name,strlen(name),type,
-						length,precision,scale);
+						length,precision,scale,
+						nullable,0);
 	}
 }
 

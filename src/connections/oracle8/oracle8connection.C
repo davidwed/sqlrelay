@@ -870,6 +870,14 @@ int	oracle8cursor::executeQuery(const char *query, long length,
 				return 0;
 			}
 
+			// get whether the column is nullable
+			if (OCIAttrGet((dvoid *)desc[i].paramd,OCI_DTYPE_PARAM,
+				(dvoid *)&desc[i].nullok,(ub4 *)NULL,
+				(ub4)OCI_ATTR_IS_NULL,
+				oracle8conn->err)!=OCI_SUCCESS) {
+				return 0;
+			}
+
 			// is the column a LOB?
 			if (desc[i].dbtype==BLOB_TYPE ||
 				desc[i].dbtype==CLOB_TYPE ||
@@ -1048,7 +1056,8 @@ void	oracle8cursor::returnColumnInfo() {
 					type,
 					(int)desc[i].dbsize,
 					(unsigned short)desc[i].precision,
-					(unsigned short)desc[i].scale);
+					(unsigned short)desc[i].scale,
+					(unsigned short)desc[i].nullok,0);
 	}
 }
 

@@ -364,6 +364,13 @@ int	odbccursor::executeQuery(const char *query, long length,
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
+
+			// column nullable
+			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_NULLABLE,
+					NULL,0,NULL,&(col[i].nullable));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
 #else
 			// column name
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_LABEL,
@@ -402,6 +409,14 @@ int	odbccursor::executeQuery(const char *query, long length,
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_SCALE,
 					NULL,0,NULL,
 					(SQLINTEGER *)&(col[i].scale));
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return 0;
+			}
+
+			// column nullable
+			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_NULLABLE,
+					NULL,0,NULL,
+					(SQLINTEGER *)&(col[i].nullable));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
@@ -513,7 +528,7 @@ void	odbccursor::returnColumnInfo() {
 		// send column definition
 		conn->sendColumnDefinition(col[i].name,col[i].namelength,type,
 						col[i].length,col[i].precision,
-						col[i].scale);
+						col[i].scale,0,0);
 	}
 }
 
