@@ -975,24 +975,19 @@ int	sqlrlistener::handOffClient() {
 
 void	sqlrlistener::getAConnection() {
 
-printf("getAConnection\n");
 	for (;;) {
 
-printf("looping\n");
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"getting a connection...");
 		#endif
 
 		// wait for exclusive access to the
 		// shared memory among listeners
-printf("wait 1\n");
 		semset->wait(1);
 
 		// wait for an available connection
-printf("wait 2\n");
 		semset->wait(2);
 
-printf("after wait 2\n");
 		// get a pointer to the shared memory segment
 		char	*ptr=(char *)((long)idmemory->getPointer()+
 						(2*sizeof(unsigned int)));
@@ -1057,14 +1052,11 @@ printf("after wait 2\n");
 		semset->signal(1);
 
 		// decerment the number of "forked, busy listeners"
-printf("wait 10\n");
 		semset->wait(10);
-printf("after\n");
 
 		// make sure the connection is actually up, if not, fork a child
 		// to jog it, spin back and get another connection
 		if (connectionIsUp(connectionid)) {
-printf("breaking\n");
 			break;
 		} else {
 			pingDatabase();

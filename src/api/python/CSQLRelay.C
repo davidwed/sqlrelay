@@ -547,10 +547,12 @@ static PyObject *getOutputBind(PyObject *self, PyObject *args) {
   char *variable;
   long sqlrcur;
   char *rc;
+  int rl;
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getOutputBind(variable);
-  return Py_BuildValue("s", rc);
+  rl=((sqlrcursor *)sqlrcur)->getOutputBindLength(variable);
+  return Py_BuildValue("s#", rc, rl);
 }
 
 static PyObject *getOutputBindLength(PyObject *self, PyObject *args) {
@@ -655,19 +657,22 @@ static PyObject *getNullsAsNone(PyObject *self, PyObject *args) {
 static PyObject *getField(PyObject *self, PyObject *args) {
   long sqlrcur;
   char  *rc;
+  int  rl;
   int row;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "liO", &sqlrcur, &row, &col))
     return NULL;
   if (PyString_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getField(row, PyString_AsString(col));
+    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyString_AsString(col));
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getField(row, PyInt_AsLong(col));
+    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyInt_AsLong(col));
   }
   if (!rc) {
     return Py_None;
   }
-  return Py_BuildValue("s", rc);
+  return Py_BuildValue("s#", rc, rl);
 }
 
 static PyObject *getFieldLength(PyObject *self, PyObject *args) {

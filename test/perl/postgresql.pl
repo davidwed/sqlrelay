@@ -184,8 +184,8 @@ checkSuccessString($cur->getColumnType(6),"date");
 checkSuccessString($cur->getColumnType('testdate'),"date");
 checkSuccessString($cur->getColumnType(7),"time");
 checkSuccessString($cur->getColumnType('testtime'),"time");
-checkSuccessString($cur->getColumnType(8),"timestamptz");
-checkSuccessString($cur->getColumnType('testtimestamp'),"timestamptz");
+checkSuccessString($cur->getColumnType(8),"timestamp");
+checkSuccessString($cur->getColumnType('testtimestamp'),"timestamp");
 print("\n");
 
 print("COLUMN LENGTH: \n");

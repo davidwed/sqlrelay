@@ -636,6 +636,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_fetchfrombindcursor) {
 DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbind) {
 	zval **sqlrcur,**variable;
 	char *r;
+	long rl;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -643,10 +644,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbind) {
 	convert_to_long_ex(sqlrcur);
 	convert_to_string_ex(variable);
 	r=((sqlrcursor *)(*sqlrcur)->value.lval)->getOutputBind((*variable)->value.str.val);
+	rl=((sqlrcursor *)(*sqlrcur)->value.lval)->getOutputBindLength((*variable)->value.str.val);
 	if (!r) {
 		RETURN_NULL();
 	}
-	RETURN_STRING(r,1);
+	RETURN_STRINGL(r,rl,1);
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindlength) {
@@ -799,6 +801,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getnullsasnulls) {
 DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 	zval **sqlrcur,**row,**col;
 	char *r=NULL;
+	long rl;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -808,14 +811,16 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 	if (Z_TYPE_PP(col)==IS_LONG) {
 		convert_to_long_ex(col);
 		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getField((*row)->value.lval,(*col)->value.lval);
+		rl=((sqlrcursor *)(*sqlrcur)->value.lval)->getFieldLength((*row)->value.lval,(*col)->value.lval);
 	} else if (Z_TYPE_PP(col)==IS_STRING) {
 		convert_to_string_ex(col);
 		r=((sqlrcursor *)(*sqlrcur)->value.lval)->getField((*row)->value.lval,(*col)->value.str.val);
+		rl=((sqlrcursor *)(*sqlrcur)->value.lval)->getFieldLength((*row)->value.lval,(*col)->value.str.val);
 	}
 	if (!r) {
 		RETURN_NULL();
 	}
-	RETURN_STRING(r,1);
+	RETURN_STRINGL(r,rl,1);
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldlength) {

@@ -206,8 +206,8 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testdate"),"date");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,7),"time");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtime"),"time");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,8),"timestamptz");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtimestamp"),"timestamptz");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,8),"timestamp");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtimestamp"),"timestamp");
 	printf("\n");
 
 	printf("COLUMN LENGTH: \n");

@@ -206,8 +206,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testdate"),"date");
 	checkSuccess(cur->getColumnType(7),"time");
 	checkSuccess(cur->getColumnType("testtime"),"time");
-	checkSuccess(cur->getColumnType(8),"timestamptz");
-	checkSuccess(cur->getColumnType("testtimestamp"),"timestamptz");
+	checkSuccess(cur->getColumnType(8),"timestamp");
+	checkSuccess(cur->getColumnType("testtimestamp"),"timestamp");
 	printf("\n");
 
 	printf("COLUMN LENGTH: \n");

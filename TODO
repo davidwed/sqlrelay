@@ -1,4 +1,16 @@
-listener should know not to hand off to a connection if it's db is down
+mysql instructions for giving a user privileges doesn't have enough fields.
+
+Ruby/Java getField and getOutputBind methods are not binary-safe
+
+tests need to check blob/lobs with binary data in them
+
+perl api appears to turn NULLs into ""'s
+
+incorporate interbase patches
+
+if all space is used up in a filesystem, SQL Relay stops working
+
+could debug logs be logrotate compatible?
 
 looks like Oracle 8.0 doesn't support temp-LOB's
 

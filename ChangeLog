@@ -2,6 +2,13 @@
 	scaler checks to see if a DB is marked as down before it tries to	
 		log into it, if it is marked as down, then it tries a
 		different DB
+	connection sends it's connectionid to listener along with port/socket
+	listener check to see if a DB is marked as down before trying to
+		hand off a client to it.  if it is, then the listener forks
+		and pings the db to get it to come back up.
+	php API uses RETURN_STRINGL for getField and getOutputBind now
+	python API uses Py_BuildValue("s#" ...) for getField and getOutputBind
+		now
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3
