@@ -86,8 +86,6 @@ all: libsqlrclient.la libsqlrclient_p.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) */*.lo
 	$(LIBTOOL) --mode=clean $(RM) */*.o
 

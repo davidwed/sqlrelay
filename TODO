@@ -1,12 +1,17 @@
+libpq-sqlrelay.a fails to install when building RPM
+extract-debug errors during RPM build 
+
 does "=NULL" have to be translated to "is NULL" in fake binds?
 
+implement unique flag like nullable, primary key, precision, scale
 implement nullable, primary key, precision, scale in non c++ api's
 nullable,primary key isn't implemented for many connections
+implement unique/nullable/primary key as a bitmap
 
 is there a better way to get a column's precision in interbase
 precision/scale in postgresql
 
-add column precision/scale to protocol doc
+add column precision/scale/flags to protocol doc
 
 for non-root users, initroot should be set to $(prefix)
 

@@ -146,9 +146,21 @@ Summary: Development files for developing programs C that use SQL Relay compiled
 Group: Development/Libraries
 
 %description client-devel-c-debug
-Header files and static libraries to use for developing programs in C that
-use SQL Relay compiled with debugging support.
+Header files and static libraries to use for developing programs in C that use SQL Relay compiled with debugging support.
 
+%package client-postgresql
+Summary: Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead.
+Group: Applications/Libraries
+
+%description client-postgresql
+Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead.
+
+%package client-postgresql-debug
+Summary: Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead, compiled with debugging support.
+Group: Applications/Libraries
+
+%description client-postgresql-debug
+Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead, compiled with debugging support.
 
 %package config-gtk
 Summary: SQL Relay GUI configuration tool.
@@ -363,6 +375,7 @@ rm -rf %{buildroot}
 # variable screws up the ruby install
 %makeinstall \
 	incdir=%{buildroot}%{_includedir} \
+	docdir=%{buildroot}%{_docdir}/%{name}-%{version} \
 	PYTHONDIR=%{buildroot}%{pythondir} \
 	ZOPEDIR=%{buildroot}%{zopedir} \
 	PHPEXTDIR=%{buildroot}%{phpextdir} \
@@ -372,13 +385,6 @@ rm -rf %{buildroot}
 	initroot=%{buildroot}
 # now install ruby
 %{!?_without_ruby: %makeinstall DESTDIR=%{buildroot}}
-# remove crap from doc dir
-rm -f doc/Makefile
-rm -rf doc/*/CVS
-rm -rf doc/*/*/CVS
-rm -rf doc/*/*/*/CVS
-rm -rf doc/*/*/*/*/CVS
-rm -rf doc/*/*/*/*/*/CVS
 
 %pre
 # Add the "sqlrelay" user
@@ -484,6 +490,18 @@ rm -rf %{buildroot}
 %{_libdir}/libsqlrclientwrapper_p.la
 %{_libdir}/libsqlrclientwrapper_p.so
 
+%files client-postgresql
+%defattr(-, root, root)
+%{_libdir}/libpq-sqlrelay-*.so.*
+%{_libdir}/libpq-sqlrelay.a
+%{_libdir}/libpq-sqlrelay.la
+
+%files client-postgresql-debug
+%defattr(-, root, root)
+%{_libdir}/libpq-sqlrelay_p-*.so.*
+%{_libdir}/libpq-sqlrelay_p.a
+%{_libdir}/libpq-sqlrelay_p.la
+
 %{!?_without_gtk:%files config-gtk}
 %{!?_without_gtk:%defattr(-, root, root)}
 %{!?_without_gtk:%{_bindir}/sqlr-config-gtk}
@@ -569,7 +587,7 @@ rm -rf %{buildroot}
 %{!?_without_tcl:%{tcldir}/sqlrelay/*}
 
 %files doc
-%doc doc
+%{_docdir}/%{name}-%{version}
 
 %changelog
 * Mon Feb 17 2003 David Muse <dmuse@firstworks.com>
