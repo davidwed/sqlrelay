@@ -1,7 +1,3 @@
-interbase hang on select??
-sybase hang on create table??
-test interbase/sybase dead database relogin
-
 perl apis -> CPAN
 
 fedora-core-2 isn't set up
