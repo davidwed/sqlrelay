@@ -8,7 +8,7 @@ WriteMakefile(
 	'VERSION_FROM'	=> "SQLRCursor.pm",
 	'CC'		=> "@CXX@",
 	'INC'		=> "-I../../../.. -I../../../common -I../../c++/include @RUDIMENTSINCLUDES@",
-	'LIBS'		=> ["-L../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @STDCPPLIB@ @SOCKETLIB@ @LIBDMALLOC@ @LIBEFENCE@"],
+	'LIBS'		=> ["-L../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @STDCPPLIB@ @SOCKETLIB@ @PTHREADLIBS@ @LIBDMALLOC@ @LIBEFENCE@"],
 	'XSPROTOARG'	=> "-noprototypes",
 	'LD'		=> "@CXX@",
 	'TYPEMAPS'	=> ["perlobject.map"],

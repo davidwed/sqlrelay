@@ -1,4 +1,7 @@
-memory leak in getFieldByIndex?
+mysql 4 has mysqld_safe instead of safe_mysqld
+freebsd:
+	api's need to be linked against pthread lib
+	c/c++/python api tests crash but sqlrsh doesn't
 
 test finished-suspended-result-set's with oracle/db2/sybase/freetds
 
