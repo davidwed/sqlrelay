@@ -26,13 +26,13 @@ bool lagoconnection::logIn() {
 	lagocontext=Lnewctx();
 
 	// handle host
-	char	*hostval="localhost";
+	const char	*hostval="localhost";
 	if (host && host[0]) {
 		hostval=host;
 	}
 
 	// handle port
-	char	*portval="7412";
+	const char	*portval="7412";
 	if (port && port[0]) {
 		portval=port;
 	}
@@ -45,7 +45,7 @@ bool lagoconnection::logIn() {
 	}
 
 	// handle user
-	char	*user=getUser();
+	const char	*user=getUser();
 	if (!(user && user[0])) {
 		printf("No user was specified in the connect string.\n");
 		Ldelctx(lagocontext);
@@ -53,7 +53,7 @@ bool lagoconnection::logIn() {
 	}
 
 	// handle password
-	char	*password=getPassword();
+	const char	*password=getPassword();
 	if (!(password && password[0])) {
 		printf("No password was specified in the connect string.\n");
 		Ldelctx(lagocontext);
@@ -153,12 +153,12 @@ bool lagocursor::executeQuery(const char *query, long length, bool execute) {
 	return true;
 }
 
-char *lagocursor::getErrorMessage(bool *liveconnection) {
+const char *lagocursor::getErrorMessage(bool *liveconnection) {
 
 	// only return an error message of the error wasn't a dead database
 	*liveconnection=(Lisconnected(lagoconn->lagocontext))?true:false;
 	if (*liveconnection) {
-		return (char *)Lgeterrmsg(lagoconn->lagocontext);
+		return Lgeterrmsg(lagoconn->lagocontext);
 	} else {
 		return "";
 	}

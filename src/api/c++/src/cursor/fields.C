@@ -20,7 +20,7 @@ unsigned long sqlrcursor::getFieldLengthInternal(int row, int col) {
 	return extrarows[row-OPTIMISTIC_ROW_COUNT]->getFieldLength(col);
 }
 
-char *sqlrcursor::getField(int row, int col) {
+const char *sqlrcursor::getField(int row, int col) {
 
 	if (rowcount && row>=0 && row>=(int)firstrowindex && 
 					col>=0 && col<(int)colcount) {
@@ -31,24 +31,23 @@ char *sqlrcursor::getField(int row, int col) {
 		int	rowbufferindex=fetchRowIntoBuffer(row);
 
 		if (rowbufferindex>-1) {
-			char	*retval=getFieldInternal(rowbufferindex,col);
-			return retval;
+			return getFieldInternal(rowbufferindex,col);
 		}
 	}
 	return NULL;
 }
 
 long sqlrcursor::getFieldAsLong(int row, int col) {
-	char	*field=getField(row,col);
+	const char	*field=getField(row,col);
 	return (field)?atol(field):0;
 }
 
 double sqlrcursor::getFieldAsDouble(int row, int col) {
-	char	*field=getField(row,col);
+	const char	*field=getField(row,col);
 	return (field)?atof(field):0.0;
 }
 
-char *sqlrcursor::getField(int row, const char *col) {
+const char *sqlrcursor::getField(int row, const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
@@ -75,12 +74,12 @@ char *sqlrcursor::getField(int row, const char *col) {
 }
 
 long sqlrcursor::getFieldAsLong(int row, const char *col) {
-	char	*field=getField(row,col);
+	const char	*field=getField(row,col);
 	return (field)?atol(field):0;
 }
 
 double sqlrcursor::getFieldAsDouble(int row, const char *col) {
-	char	*field=getField(row,col);
+	const char	*field=getField(row,col);
 	return (field)?atof(field):0.0;
 }
 
@@ -128,7 +127,7 @@ long sqlrcursor::getFieldLength(int row, const char *col) {
 	return -1;
 }
 
-char	**sqlrcursor::getRow(int row) {
+const char * const *sqlrcursor::getRow(int row) {
 
 	if (rowcount && row>=0 && row>=(int)firstrowindex) {
 

@@ -17,6 +17,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 
 #ifdef HAVE_READLINE
@@ -406,11 +409,11 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, environment *env) {
 	}
 
 	// display column names
-	int	charcount=0;
-	int	colcount=sqlrcur->colCount();
-	char	*name;
-	int	namelen;
-	int	longest;
+	int		charcount=0;
+	int		colcount=sqlrcur->colCount();
+	const char	*name;
+	int		namelen;
+	int		longest;
 
 	// iterate through columns
 	for (int i=0; i<sqlrcur->colCount(); i++) {
@@ -462,8 +465,8 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, environment *env) {
 	int	namelen;
 	int	longest;
 
-	int	i=0;
-	char	*field="";
+	int		i=0;
+	const char	*field="";
 	while (field && colcount) {
 		for (int j=0; j<colcount; j++) {
 
@@ -606,7 +609,8 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			#ifdef HAVE_READLINE
 				prmpt.append(promptcount);
 				prmpt.append("> ");
-				char	*cmd=readline(prmpt.getString());
+				char	*cmd=readline(const_cast<char *>(
+							prmpt.getString()));
 				prmpt.clear();
 				if (cmd && cmd[0]) {
 					charstring::rightTrim(cmd);
@@ -670,18 +674,18 @@ void sqlrsh::execute(int argc, const char **argv) {
 	commandline	cmdline(argc,argv);
 	sqlrconfigfile	cfgfile;
 	usercontainer	*currentnode=NULL;
-	char		*host;
+	const char	*host;
 	int		port;
-	char		*socket;
-	char		*user;
-	char		*password;
-	char		*script=NULL;
+	const char	*socket;
+	const char	*user;
+	const char	*password;
+	const char	*script=NULL;
 
-	char	*config=cmdline.value("-config");
+	const char	*config=cmdline.value("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
-	char	*id=cmdline.value("-id");
+	const char	*id=cmdline.value("-id");
 
 	if (!(id && id[0])) {
 
@@ -693,13 +697,13 @@ void sqlrsh::execute(int argc, const char **argv) {
 			exit(1);
 		}
 
-		host=(char *)argv[1];
+		host=argv[1];
 		port=atoi(argv[2]);
-		socket=(char *)argv[3];
-		user=(char *)argv[4];
-		password=(char *)argv[5];
+		socket=argv[3];
+		user=argv[4];
+		password=argv[5];
 		if (argv[6]) {
-			script=(char *)argv[6];
+			script=argv[6];
 		}
 
 	} else {

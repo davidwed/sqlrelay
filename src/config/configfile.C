@@ -258,7 +258,7 @@ void configfile::deleteInstance(instance *instanceptr) {
 
 instance *configfile::findInstance(const char *id) {
 
-	char	*currentid;
+	const char	*currentid;
 
 	currentinstance=firstinstance;
 
@@ -376,28 +376,28 @@ instance::~instance() {
 	}
 }
 
-char	*instance::getId() {
-	char	*retval=instancenode->getAttribute("id")->getValue();
+const char	*instance::getId() {
+	const char	*retval=instancenode->getAttributeValue("id");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_ID;
 }
 
-char	*instance::getPort() {
-	char	*retval=instancenode->getAttribute("port")->getValue();
+const char	*instance::getPort() {
+	const char	*retval=instancenode->getAttributeValue("port");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_PORT;
 }
 
-char	*instance::getUnixPort() {
-	char	*retval=instancenode->getAttribute("socket")->getValue();
+const char	*instance::getUnixPort() {
+	const char	*retval=instancenode->getAttributeValue("socket");
 	if (retval) {
 		return retval;
 	} else {
-		retval=instancenode->getAttribute("unixport")->getValue();
+		retval=instancenode->getAttributeValue("unixport");
 		if (retval) {
 			return retval;
 		}
@@ -405,134 +405,131 @@ char	*instance::getUnixPort() {
 	return DEFAULT_SOCKET;
 }
 
-char	*instance::getDbase() {
-	char	*retval=instancenode->getAttribute("dbase")->getValue();
+const char	*instance::getDbase() {
+	const char	*retval=instancenode->getAttributeValue("dbase");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_DBASE;
 }
 
-char	*instance::getConnections() {
-	char	*retval=instancenode->getAttribute("connections")->getValue();
+const char	*instance::getConnections() {
+	const char	*retval=instancenode->getAttributeValue("connections");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_CONNECTIONS;
 }
 
-char	*instance::getMaxConnections() {
-	char	*retval=instancenode->
-				getAttribute("maxconnections")->
-					getValue();
+const char	*instance::getMaxConnections() {
+	const char	*retval=instancenode->
+				getAttributeValue("maxconnections");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_MAXCONNECTIONS;
 }
 
-char	*instance::getMaxQueueLength() {
-	char	*retval=instancenode->
-				getAttribute("maxqueuelength")->
-					getValue();
+const char	*instance::getMaxQueueLength() {
+	const char	*retval=instancenode->
+				getAttributeValue("maxqueuelength");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_MAXQUEUELENGTH;
 }
 
-char	*instance::getGrowby() {
-	char	*retval=instancenode->getAttribute("growby")->getValue();
+const char	*instance::getGrowby() {
+	const char	*retval=instancenode->getAttributeValue("growby");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_GROWBY;
 }
 
-char	*instance::getTtl() {
-	char	*retval=instancenode->getAttribute("ttl")->getValue();
+const char	*instance::getTtl() {
+	const char	*retval=instancenode->getAttributeValue("ttl");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_TTL;
 }
 
-char	*instance::getEndOfSession() {
-	char	*retval=instancenode->getAttribute("endofsession")->getValue();
+const char	*instance::getEndOfSession() {
+	const char	*retval=instancenode->getAttributeValue("endofsession");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_ENDOFSESSION;
 }
 
-char	*instance::getSessionTimeout() {
-	char	*retval=instancenode->
-				getAttribute("sessiontimeout")->
-					getValue();
+const char	*instance::getSessionTimeout() {
+	const char	*retval=instancenode->
+				getAttributeValue("sessiontimeout");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_SESSIONTIMEOUT;
 }
 
-char	*instance::getRunAsUser() {
-	char	*retval=instancenode->getAttribute("runasuser")->getValue();
+const char	*instance::getRunAsUser() {
+	const char	*retval=instancenode->getAttributeValue("runasuser");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_RUNASUSER;
 }
 
-char	*instance::getRunAsGroup() {
-	char	*retval=instancenode->getAttribute("runasgroup")->getValue();
+const char	*instance::getRunAsGroup() {
+	const char	*retval=instancenode->getAttributeValue("runasgroup");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_RUNASGROUP;
 }
 
-char	*instance::getCursors() {
-	char	*retval=instancenode->getAttribute("cursors")->getValue();
+const char	*instance::getCursors() {
+	const char	*retval=instancenode->getAttributeValue("cursors");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_CURSORS;
 }
 
-char	*instance::getAuthTier() {
-	char	*retval=instancenode->getAttribute("authtier")->getValue();
+const char	*instance::getAuthTier() {
+	const char	*retval=instancenode->getAttributeValue("authtier");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_AUTHTIER;
 }
 
-char	*instance::getHandoff() {
-	char	*retval=instancenode->getAttribute("handoff")->getValue();
+const char	*instance::getHandoff() {
+	const char	*retval=instancenode->getAttributeValue("handoff");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_HANDOFF;
 }
 
-char	*instance::getDeniedIps() {
-	char	*retval=instancenode->getAttribute("deniedips")->getValue();
+const char	*instance::getDeniedIps() {
+	const char	*retval=instancenode->getAttributeValue("deniedips");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_DENIEDIPS;
 }
 
-char	*instance::getAllowedIps() {
-	char	*retval=instancenode->getAttribute("allowedips")->getValue();
+const char	*instance::getAllowedIps() {
+	const char	*retval=instancenode->getAttributeValue("allowedips");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_ALLOWEDIPS;
 }
 
-char	*instance::getDebug() {
-	char	*retval=instancenode->getAttribute("debug")->getValue();
+const char	*instance::getDebug() {
+	const char	*retval=instancenode->getAttributeValue("debug");
 	if (retval) {
 		return retval;
 	}
@@ -667,7 +664,7 @@ void	instance::deleteUser(user *userptr) {
 
 user	*instance::findUser(const char *userid) {
 
-	char	*currentuserid;
+	const char	*currentuserid;
 
 	currentuser=firstuser;
 
@@ -708,16 +705,16 @@ user::~user() {
 	}
 }
 
-char	*user::getUser() {
-	char	*retval=usernode->getAttribute("user")->getValue();
+const char	*user::getUser() {
+	const char	*retval=usernode->getAttributeValue("user");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_USER;
 }
 
-char	*user::getPassword() {
-	char	*retval=usernode->getAttribute("password")->getValue();
+const char	*user::getPassword() {
+	const char	*retval=usernode->getAttributeValue("password");
 	if (retval) {
 		return retval;
 	}
@@ -791,7 +788,7 @@ void	instance::deleteConnection(connection *connectionptr) {
 
 connection	*instance::findConnection(const char *connectionnode) {
 
-	char	*currentconnid;
+	const char	*currentconnid;
 
 	currentconnection=firstconnection;
 
@@ -837,26 +834,25 @@ connection::~connection() {
 	}
 }
 
-char	*connection::getConnectionId() {
-	char	*retval=connectionnode->
-				getAttribute("connectionid")->
-					getValue();
+const char	*connection::getConnectionId() {
+	const char	*retval=connectionnode->
+					getAttributeValue("connectionid");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_CONNECTIONID;
 }
 
-char	*connection::getString() {
-	char	*retval=connectionnode->getAttribute("string")->getValue();
+const char	*connection::getString() {
+	const char	*retval=connectionnode->getAttributeValue("string");
 	if (retval) {
 		return retval;
 	}
 	return DEFAULT_CONNECTSTRING;
 }
 
-char	*connection::getMetric() {
-	char	*retval=connectionnode->getAttribute("metric")->getValue();
+const char	*connection::getMetric() {
+	const char	*retval=connectionnode->getAttributeValue("metric");
 	if (retval) {
 		return retval;
 	}

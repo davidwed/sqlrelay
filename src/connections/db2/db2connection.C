@@ -17,14 +17,14 @@ void db2connection::handleConnectString() {
 
 	// override legacy "server" parameter with modern "db" parameter
 	server=connectStringValue("server");
-	char	*tmp=connectStringValue("db");
+	const char	*tmp=connectStringValue("db");
 	if (tmp && tmp[0]) {
 		server=tmp;
 	}
 
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
-	char	*autocom=connectStringValue("autocommit");
+	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
@@ -378,7 +378,7 @@ bool db2cursor::executeQuery(const char *query, long length, bool execute) {
 	return true;
 }
 
-char *db2cursor::getErrorMessage(bool *liveconnection) {
+const char *db2cursor::getErrorMessage(bool *liveconnection) {
 
 	SQLCHAR		error[501];
 	SQLCHAR		state[10];

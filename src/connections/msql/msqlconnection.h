@@ -15,19 +15,19 @@ class msqlconnection;
 class msqlcursor : public sqlrcursor {
 	friend class msqlconnection;
 	private:
-			msqlcursor(sqlrconnection *conn);
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
+				msqlcursor(sqlrconnection *conn);
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 
 		m_result	*msqlresult;
 		m_field		*msqlfield;
@@ -60,8 +60,8 @@ class msqlconnection : public sqlrconnection {
 
 		int	msql;
 
-		char	*host;
-		char	*db;
+		const char	*host;
+		const char	*db;
 
 		int	devnull;
 };

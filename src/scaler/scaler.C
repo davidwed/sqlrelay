@@ -56,7 +56,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	commandline	cmdl(argc,argv);
 
 	// get the id
-	char	*tmpid=cmdl.value("-id");
+	const char	*tmpid=cmdl.value("-id");
 	if (!(tmpid && tmpid[0])) {
 		tmpid=DEFAULT_ID;
 		fprintf(stderr,"Warning! using default id.\n");
@@ -100,7 +100,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	}
 
 	// get the config file
-	char	*tmpconfig=cmdl.value("-config");
+	const char	*tmpconfig=cmdl.value("-config");
 	if (!(tmpconfig && tmpconfig[0])) {
 		tmpconfig=DEFAULT_CONFIG_FILE;
 	}
@@ -117,8 +117,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 		}
 
 		// run as user/group specified in the config file
-		char	*runasuser=cfgfile->getRunAsUser();
-		char	*runasgroup=cfgfile->getRunAsGroup();
+		const char	*runasuser=cfgfile->getRunAsUser();
+		const char	*runasgroup=cfgfile->getRunAsGroup();
 		if (runasuser[0] && runasgroup[0]) {
 
 			// get the user that we're currently running as
@@ -302,7 +302,7 @@ bool scaler::openMoreConnections() {
 				// in to it yet, so in that case, don't even
 				// test to see if the database is up or down
 				if (connections && !availableDatabase()) {
-					sleep::macrosleep(1);
+					rudiments::sleep::macrosleep(1);
 					continue;
 				}
 

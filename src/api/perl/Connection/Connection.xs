@@ -12,11 +12,11 @@ REQUIRE: 1.925
 
 sqlrconnection *
 sqlrconnection::new(server,port,socket,user,password,retrytime,tries)
-		char *server
+		const char *server
 		int port
-		char *socket
-		char *user
-		char *password
+		const char *socket
+		const char *user
+		const char *password
 		int retrytime
 		int tries
 	CODE:
@@ -40,13 +40,13 @@ sqlrconnection::suspendSession()
 int
 sqlrconnection::getConnectionPort()
 
-char *
+const char *
 sqlrconnection::getConnectionSocket()
 
 bool
 sqlrconnection::resumeSession(port,socket)
 		int	port
-		char	*socket
+		const char	*socket
 
 bool
 sqlrconnection::ping()
@@ -63,7 +63,7 @@ sqlrconnection::commit()
 bool
 sqlrconnection::rollback()
 
-char *
+const char *
 sqlrconnection::identify()
 
 void

@@ -32,6 +32,10 @@
 	updated config.guess
 	fixed PHP api to use resource lists - cleans up itself now with no need
 		to use sqlrcon/cur_free
+	fixed PHP Pear DB script bug which would cause an error code to be
+		returned if -1 was returned for affected rows (ie. if a
+		database doesn't support affected rows)
+	added -framework Python to compile python stuff on Darwin/Mac OS X
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

@@ -39,12 +39,6 @@ metric="1"/>
 
 --------------------------------------------------------------------------------
 
-valgrind returns memory errors
-
-people have been reporting freetds problems
-
-CFLAGS="-framework Python" to get python API to compile on OS X
-
 perl apis -> CPAN
 
 api needs to expose integer column types
@@ -53,14 +47,15 @@ numeric output bind variables
 
 mysql 4.1, 5.0 - bind vars
 postgresql 8 - bind vars
+php 5
 
 call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
-
-document installing MSDE from http://www.microsoft.com/sql/msde/default.asp
 
 use large writes rather than lots of small writes, small writes appear to
 	trigger the nagle algorithm and slow down network transmission
 	materially
+
+people have been reporting freetds problems
 
 --------------------------------------------------------------------------------
 

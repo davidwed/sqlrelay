@@ -52,41 +52,41 @@ class odbcconnection;
 class odbccursor : public sqlrcursor {
 	friend class odbcconnection;
 	private:
-			odbccursor(sqlrconnection *conn);
-			~odbccursor();
-		bool	prepareQuery(const char *query, long length);
-		bool	inputBindString(const char *variable, 
-					unsigned short variablesize,
-					const char *value, 
-					unsigned short valuesize,
-					short *isnull);
-		bool	inputBindLong(const char *variable, 
-					unsigned short variablesize,
-					unsigned long *value);
-		bool	inputBindDouble(const char *variable, 
-					unsigned short variablesize,
-					double *value, 
-					unsigned short precision,
-					unsigned short scale);
-		bool	outputBindString(const char *variable, 
-					unsigned short variablesize,
-					const char *value, 
-					unsigned short valuesize,
-					short *isnull);
-		short	nonNullBindValue();
-		short	nullBindValue();
-		bool	bindValueIsNull(short isnull);
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
+				odbccursor(sqlrconnection *conn);
+				~odbccursor();
+		bool		prepareQuery(const char *query, long length);
+		bool		inputBindString(const char *variable, 
+						unsigned short variablesize,
+						const char *value, 
+						unsigned short valuesize,
+						short *isnull);
+		bool		inputBindLong(const char *variable, 
+						unsigned short variablesize,
+						unsigned long *value);
+		bool		inputBindDouble(const char *variable, 
+						unsigned short variablesize,
+						double *value, 
+						unsigned short precision,
+						unsigned short scale);
+		bool		outputBindString(const char *variable, 
+						unsigned short variablesize,
+						const char *value, 
+						unsigned short valuesize,
+						short *isnull);
+		short		nonNullBindValue();
+		short		nullBindValue();
+		bool		bindValueIsNull(short isnull);
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
 
 
 		long		erg;
@@ -124,26 +124,26 @@ class odbccursor : public sqlrcursor {
 class odbcconnection : public sqlrconnection {
 	friend class odbccursor;
 	private:
-		int	getNumberOfConnectStringVars();
-		void	handleConnectString();
-		bool	logIn();
+		int		getNumberOfConnectStringVars();
+		void		handleConnectString();
+		bool		logIn();
 		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
-		void	logOut();
+		void		deleteCursor(sqlrcursor *curs);
+		void		logOut();
 #if (ODBCVER>=0x0300)
-		bool	autoCommitOn();
-		bool	autoCommitOff();
-		bool	commit();
-		bool	rollback();
+		bool		autoCommitOn();
+		bool		autoCommitOff();
+		bool		commit();
+		bool		rollback();
 #endif
-		bool	ping();
-		char	*identify();
+		bool		ping();
+		const char	*identify();
 
 		long	erg;
 		SQLHENV	env;
 		SQLHDBC	dbc;
 
-		char	*dsn;
+		const char	*dsn;
 };
 
 #endif

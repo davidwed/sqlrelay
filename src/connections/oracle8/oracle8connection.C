@@ -32,7 +32,7 @@ void oracle8connection::handleConnectString() {
 	setPassword(connectStringValue("password"));
 	sid=connectStringValue("oracle_sid");
 	home=connectStringValue("oracle_home");
-	char	*autocom=connectStringValue("autocommit");
+	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
@@ -157,8 +157,8 @@ bool oracle8connection::logIn() {
 	}
 
 	// set username and password
-	char	*user=getUser();
-	char	*password=getPassword();
+	const char	*user=getUser();
+	const char	*password=getPassword();
 	if (OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)user,
 				(ub4)charstring::length(user),
@@ -364,11 +364,11 @@ bool oracle8connection::rollback() {
 	return (OCITransRollback(svc,err,OCI_DEFAULT)==OCI_SUCCESS);
 }
 
-char *oracle8connection::pingQuery() {
+const char *oracle8connection::pingQuery() {
 	return "select 1 from dual";
 }
 
-char *oracle8connection::identify() {
+const char *oracle8connection::identify() {
 	return "oracle8";
 }
 
@@ -1117,7 +1117,7 @@ bool oracle8cursor::queryIsCommitOrRollback() {
 	return (!stmttype);
 }
 
-char *oracle8cursor::getErrorMessage(bool *liveconnection) {
+const char *oracle8cursor::getErrorMessage(bool *liveconnection) {
 
 	// get the message from oracle
 	text	message[1024];

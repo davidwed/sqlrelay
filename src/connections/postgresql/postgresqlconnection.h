@@ -15,19 +15,19 @@ class postgresqlconnection;
 class postgresqlcursor : public sqlrcursor {
 	friend class postgresqlconnection;
 	private:
-			postgresqlcursor(sqlrconnection *conn);
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
+				postgresqlcursor(sqlrconnection *conn);
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 
 		int		ddlquery;
 		PGresult	*pgresult;
@@ -43,16 +43,16 @@ class postgresqlcursor : public sqlrcursor {
 class postgresqlconnection : public sqlrconnection {
 	friend class postgresqlcursor;
 	private:
-		int	getNumberOfConnectStringVars();
-		void	handleConnectString();
-		bool	logIn();
+		int		getNumberOfConnectStringVars();
+		void		handleConnectString();
+		bool		logIn();
 		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
-		void	logOut();
-		char	*identify();
+		void		deleteCursor(sqlrcursor *curs);
+		void		logOut();
+		const char	*identify();
 
-		void	endSession();
-		void	dropTable(const char *table);
+		void		endSession();
+		void		dropTable(const char *table);
 
 		int	datatypecount;
 		long	*datatypeids;
@@ -60,12 +60,12 @@ class postgresqlconnection : public sqlrconnection {
 
 		PGconn	*pgconn;
 
-		char	*host;
-		char	*port;
-		char	*options;
-		char	*tty;
-		char	*db;
-		int	typemangling;
+		const char	*host;
+		const char	*port;
+		const char	*options;
+		const char	*tty;
+		const char	*db;
+		int		typemangling;
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	public:

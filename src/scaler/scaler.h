@@ -14,6 +14,9 @@
 #include <rudiments/sharedmemory.h>
 #include <rudiments/randomnumber.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 class scaler : public daemonprocess {
 
@@ -36,9 +39,9 @@ class scaler : public daemonprocess {
 
 		char		*pidfile;
 
-		char		*id;
+		const char	*id;
 		char		*config;
-		char		*dbase;
+		const char	*dbase;
 
 		sqlrconfigfile	*cfgfile;
 
@@ -54,7 +57,7 @@ class scaler : public daemonprocess {
 		sharedmemory	*idmemory;
 
 		linkedlist< connectstringcontainer * >	*connectstringlist;
-		char			*connectionid;
+		const char		*connectionid;
 		int			metrictotal;
 
 		int		currentseed;

@@ -29,7 +29,7 @@ void sqlrcursor::setCacheTtl(int ttl) {
 	cachettl=ttl;
 }
 
-char *sqlrcursor::getCacheFileName() {
+const char *sqlrcursor::getCacheFileName() {
 	return cachedestname;
 }
 

@@ -344,11 +344,13 @@ AC_SUBST(MICROSOFT)
 
 AC_DEFUN([FW_CHECK_OSX],
 [
-	dnl Hack so "make install" will work on OS X
+	PYTHONFRAMEWORK=""
 	if ( test "`uname -s`" = "Darwin" -a -r "INSTALL" )
 	then
 		mv INSTALL INSTALL.txt
+		PYTHONFRAMEWORK="-framework Python"
 	fi
+	AC_SUBST(PYTHONFRAMEWORK)
 ])
 
 
@@ -397,6 +399,24 @@ else
 	AC_MSG_RESULT(no)
 fi
 AC_DEFINE_UNQUOTED(INLINE,$INLINE,Some compliers don't support the inline keyword)
+])
+
+
+AC_DEFUN([FW_CXX_NAMESPACES],
+[
+	AC_LANG_SAVE
+	AC_LANG_CPLUSPLUS
+	SQLRELAY_NAMESPACE=""
+	AC_MSG_CHECKING(namespace support)
+	AC_TRY_COMPILE([namespace Outer { namespace Inner { int i = 0; }}],[using namespace Outer::Inner; return i;],[SQLRELAY_NAMESPACE="yes"],[])
+	AC_LANG_RESTORE
+	if ( test "$SQLRELAY_NAMESPACE" = yes )
+	then
+		AC_MSG_RESULT(yes)
+  		AC_DEFINE(SQLRELAY_NAMESPACE,1,Compiler supports namespaces)
+	else
+		AC_MSG_RESULT(no)
+	fi
 ])
 
 

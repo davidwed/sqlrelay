@@ -110,7 +110,7 @@ bool sybaseconnection::logIn() {
 
 
 	// set the user to use
-	char	*user=getUser();
+	const char	*user=getUser();
 	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
 			(CS_VOID *)((user && user[0])?user:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -120,7 +120,7 @@ bool sybaseconnection::logIn() {
 
 
 	// set the password to use
-	char	*password=getPassword();
+	const char	*password=getPassword();
 	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
 			(CS_VOID *)((password && password[0])?password:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -247,7 +247,7 @@ void sybaseconnection::logOut() {
 	cs_ctx_drop(context);
 }
 
-char *sybaseconnection::identify() {
+const char *sybaseconnection::identify() {
 	return "sybase";
 }
 
@@ -681,7 +681,7 @@ bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
 	return true;
 }
 
-char *sybasecursor::getErrorMessage(bool *liveconnection) {
+const char *sybasecursor::getErrorMessage(bool *liveconnection) {
 	if (sybaseconn->deadconnection) {
 		*liveconnection=false;
 	} else {

@@ -8,16 +8,20 @@
 
 #include <rudiments/xmldom.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 class user {
 	friend class instance;
 	public:
-			user(xmldomnode *usernode);
-			~user();
-		char	*getUser();
-		char	*getPassword();
-		void	setUser(const char *user);
-		void	setPassword(const char *password);
-		user	*nextUser();
+				user(xmldomnode *usernode);
+				~user();
+		const char	*getUser();
+		const char	*getPassword();
+		void		setUser(const char *user);
+		void		setPassword(const char *password);
+		user		*nextUser();
 	private:
 		xmldomnode	*usernode;
 		user		*next;
@@ -27,14 +31,14 @@ class user {
 class connection {
 	friend class instance;
 	public:
-			connection(xmldomnode *connectionnode);
-			~connection();
-		char	*getConnectionId();
-		char	*getString();
-		char	*getMetric();
-		void	setConnectionId(const char *connectionid);
-		void	setString(const char *string);
-		void	setMetric(const char *metric);
+				connection(xmldomnode *connectionnode);
+				~connection();
+		const char	*getConnectionId();
+		const char	*getString();
+		const char	*getMetric();
+		void		setConnectionId(const char *connectionid);
+		void		setString(const char *string);
+		void		setMetric(const char *metric);
 		connection	*nextConnection();
 	private:
 		xmldomnode	*connectionnode;
@@ -48,25 +52,25 @@ class instance {
 	public:
 			instance(xmldomnode *instancenode);
 			~instance();
-		char	*getId();
-		char	*getPort();
-		char	*getUnixPort();
-		char	*getDbase();
-		char	*getConnections();
-		char	*getMaxConnections();
-		char	*getMaxQueueLength();
-		char	*getGrowby();
-		char	*getTtl();
-		char	*getEndOfSession();
-		char	*getSessionTimeout();
-		char	*getRunAsUser();
-		char	*getRunAsGroup();
-		char	*getCursors();
-		char	*getAuthTier();
-		char	*getHandoff();
-		char	*getDeniedIps();
-		char	*getAllowedIps();
-		char	*getDebug();
+		const char	*getId();
+		const char	*getPort();
+		const char	*getUnixPort();
+		const char	*getDbase();
+		const char	*getConnections();
+		const char	*getMaxConnections();
+		const char	*getMaxQueueLength();
+		const char	*getGrowby();
+		const char	*getTtl();
+		const char	*getEndOfSession();
+		const char	*getSessionTimeout();
+		const char	*getRunAsUser();
+		const char	*getRunAsGroup();
+		const char	*getCursors();
+		const char	*getAuthTier();
+		const char	*getHandoff();
+		const char	*getDeniedIps();
+		const char	*getAllowedIps();
+		const char	*getDebug();
 		void	setId(const char *id);
 		void	setPort(const char *port);
 		void	setUnixPort(const char *unixport);

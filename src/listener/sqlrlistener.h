@@ -6,7 +6,6 @@
 
 #include <config.h>
 #include <defaults.h>
-#include <rudiments/signalclasses.h>
 #include <rudiments/daemonprocess.h>
 #include <rudiments/listener.h>
 #include <rudiments/unixserversocket.h>
@@ -14,8 +13,8 @@
 #include <rudiments/filedescriptor.h>
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
-#include <authenticator.h>
 #include <rudiments/regularexpression.h>
+#include <authenticator.h>
 
 #include <cmdline.h>
 #include <debugfile.h>
@@ -26,8 +25,11 @@
 	#include <rudiments/logger.h>
 #endif
 
-
 #include <defines.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 class handoffsocketnode {
 	friend class sqlrlistener;

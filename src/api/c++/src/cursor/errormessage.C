@@ -4,7 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-char *sqlrcursor::errorMessage() {
+const char *sqlrcursor::errorMessage() {
 	if (error) {
 		return error;
 	} else if (sqlrc->error) {

@@ -114,7 +114,7 @@ bool freetdsconnection::logIn() {
 
 
 	// set the user to use
-	char	*user=getUser();
+	const char	*user=getUser();
 	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
 			(CS_VOID *)((user && user[0])?user:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -124,7 +124,7 @@ bool freetdsconnection::logIn() {
 
 
 	// set the password to use
-	char	*password=getPassword();
+	const char	*password=getPassword();
 	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
 			(CS_VOID *)((password && password[0])?password:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -808,7 +808,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 	return true;
 }
 
-char *freetdscursor::getErrorMessage(bool *liveconnection) {
+const char *freetdscursor::getErrorMessage(bool *liveconnection) {
 	if (freetdsconn->deadconnection) {
 		*liveconnection=false;
 	} else {

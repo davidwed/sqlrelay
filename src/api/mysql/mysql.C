@@ -714,7 +714,8 @@ void mysql_data_seek(MYSQL_RES *result, my_ulonglong offset) {
 }
 
 MYSQL_ROW mysql_fetch_row(MYSQL_RES *result) {
-	MYSQL_ROW	retval=result->sqlrcur->getRow(result->currentrow);
+	MYSQL_ROW	retval=
+		(MYSQL_ROW)result->sqlrcur->getRow(result->currentrow);
 	if (retval) {
 		result->previousrow=result->currentrow;
 		result->currentrow++;
@@ -737,7 +738,8 @@ unsigned int mysql_errno(MYSQL *mysql) {
 }
 
 const char *mysql_error(MYSQL *mysql) {
-	char	*err=mysql->currentstmt->result->sqlrcur->errorMessage();
+	const char	*err=
+		mysql->currentstmt->result->sqlrcur->errorMessage();
 	return (err)?err:"";
 }
 
@@ -1071,7 +1073,8 @@ int mysql_execute(MYSQL_STMT *stmt) {
 
 		for (int i=0; i<colcount; i++) {
 
-			fields[i].name=sqlrcur->getColumnName(i);
+			fields[i].name=const_cast<char *>(
+					sqlrcur->getColumnName(i));
 			fields[i].table="";
 			fields[i].def="";
 
@@ -1083,7 +1086,8 @@ int mysql_execute(MYSQL_STMT *stmt) {
 			#if defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0)
   			fields[i].catalog="";
-  			fields[i].org_name=sqlrcur->getColumnName(i);
+  			fields[i].org_name=const_cast<char *>(
+						sqlrcur->getColumnName(i));
 			fields[i].name_length=strlen(fields[i].name);
 			fields[i].org_name_length=strlen(fields[i].org_name);
 			fields[i].table_length=strlen(fields[i].table);
@@ -1097,7 +1101,8 @@ int mysql_execute(MYSQL_STMT *stmt) {
 			#endif
 
 			// figure out the column type
-			char	*columntypestring=sqlrcur->getColumnType(i);
+			const char	*columntypestring=
+						sqlrcur->getColumnType(i);
 			enum enum_field_types	columntype=
 					map_col_type(columntypestring);
 			fields[i].type=columntype;

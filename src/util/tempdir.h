@@ -4,6 +4,10 @@
 #include <rudiments/logger.h>
 #include <cmdline.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 class tempdir {
 	public:
 			tempdir(cmdline *cmdl);

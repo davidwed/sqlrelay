@@ -41,7 +41,7 @@ int	sqlrcon_getConnectionPort(sqlrcon sqlrconref);
 			   communicating over. This parameter may be 
 			   passed to another connection for use in
 			   the sqlrcon_resumeSession() command. */
-char	*sqlrcon_getConnectionSocket(sqlrcon sqlrconref);
+const char	*sqlrcon_getConnectionSocket(sqlrcon sqlrconref);
 			/* Returns the unix socket that the connection is 
 			   communicating over. This parameter may be 
 			   passed to another connection for use in
@@ -54,7 +54,7 @@ int	sqlrcon_resumeSession(sqlrcon sqlrconref, int port, const char *socket);
 int	sqlrcon_ping(sqlrcon sqlrconref); 
 			/* Returns 1 if the database is up and 0
 			   if it's down. */
-char	*sqlrcon_identify(sqlrcon sqlrconref); 
+const char	*sqlrcon_identify(sqlrcon sqlrconref); 
 			/* Returns the type of database: 
 			     oracle7, oracle8, postgresql, mysql, etc. */
 
@@ -141,7 +141,7 @@ void	sqlrcur_setCacheTtl(sqlrcur sqlrcurref, int ttl);
 			   cached result set "ttl" seconds after it's 
 			   created, provided it's scanning the directory
 			   containing the cache files. */
-char	*sqlrcur_getCacheFileName(sqlrcur sqlrcurref);
+const char	*sqlrcur_getCacheFileName(sqlrcur sqlrcurref);
 			/* Returns the name of the file containing the
 			   most recently cached result set. */
 void	sqlrcur_cacheOff(sqlrcur sqlrcurref);
@@ -264,7 +264,8 @@ int	sqlrcur_fetchFromBindCursor(sqlrcur sqlrcurref);
 			/* Fetch from a cursor that was returned as
 			   an output bind variable. */
 
-char	*sqlrcur_getOutputBind(sqlrcur sqlrcurref, const char *variable);
+const char	*sqlrcur_getOutputBind(sqlrcur sqlrcurref,
+					const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable. */
 long	sqlrcur_getOutputBindAsLong(sqlrcur sqlrcurref,
@@ -324,7 +325,7 @@ int	sqlrcur_endOfResultSet(sqlrcur sqlrcurref);
 			   with a parameter other than 0. */
   
 
-char	*sqlrcur_errorMessage(sqlrcur sqlrcurref); 
+const char	*sqlrcur_errorMessage(sqlrcur sqlrcurref); 
 			/* If a query failed and generated an error, the
 			   error message is available here.  If the 
 			   query succeeded then this function returns a 
@@ -339,8 +340,9 @@ void	sqlrcur_getNullsAsNulls(sqlrcur sqlrcurref);
 			/* Tells the connection to return NULL fields and
 			   output bind variables as NULL's. */
 
-char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col); 
-char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row, const char *col); 
+const char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col); 
+const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row,
+							const char *col); 
 			/* Returns a pointer to the value of the 
 			   specified row and column. */
 long	sqlrcur_getFieldAsLongByIndex(sqlrcur sqlrcurref, int row, int col); 
@@ -352,8 +354,9 @@ double	sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, int row,
 							const char *col); 
 			/* Returns the specified field as a double precision
 			   floating point number. */
-char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col); 
-char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row, const char *col); 
+const char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col); 
+const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row,
+							const char *col); 
 			/* Returns a pointer to the value of the 
 			   specified row and column. */
 long	sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref, int row, int col); 
@@ -361,19 +364,20 @@ long	sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref, int row,
 							const char *col); 
 			/* Returns the length of the 
 			   specified row and column. */
-char	**sqlrcur_getRow(sqlrcur sqlrcurref, int row); 
+const char * const *sqlrcur_getRow(sqlrcur sqlrcurref, int row); 
 			/* Returns a null terminated array of the 
 			   values of the fields in the specified row. */
 long	*sqlrcur_getRowLengths(sqlrcur sqlrcurref, int row); 
 			/* Returns a null terminated array of the 
 			   lengths of the fields in the specified row. */
-char	**sqlrcur_getColumnNames(sqlrcur sqlrcurref); 
+const char * const *sqlrcur_getColumnNames(sqlrcur sqlrcurref); 
 			/* Returns a null terminated array of the 
 			   column names of the current result set. */
-char	*sqlrcur_getColumnName(sqlrcur sqlrcurref, int col); 
+const char	*sqlrcur_getColumnName(sqlrcur sqlrcurref, int col); 
 			/* Returns the name of the specified column. */
-char	*sqlrcur_getColumnTypeByIndex(sqlrcur sqlrcurref, int col); 
-char	*sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref, const char *col); 
+const char	*sqlrcur_getColumnTypeByIndex(sqlrcur sqlrcurref, int col); 
+const char	*sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref,
+							const char *col); 
 			/* Returns the type of the specified column. */
 int	sqlrcur_getColumnLengthByIndex(sqlrcur sqlrcurref, int col); 
 int	sqlrcur_getColumnLengthByName(sqlrcur sqlrcurref, const char *col); 

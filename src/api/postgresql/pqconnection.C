@@ -14,7 +14,7 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 
 #include <pqdefinitions.h>
 #include <stdlib.h>
-#include <string.h>
+#include <rudiments/charstring.h>
 
 extern "C" {
 
@@ -49,36 +49,38 @@ PGconn *allocatePGconn(const char *conninfo,
 		conn->connstr->setDelimiter(' ');
 		conn->connstr->parse(conninfo);
 
-		conn->host=conn->connstr->getValue("host");
-		conn->host=(conn->host)?conn->host:(char *)"";
-		conn->port=conn->connstr->getValue("port");
+		const char	*tmphost=conn->connstr->getValue("host");
+		conn->host=charstring::duplicate((tmphost)?tmphost:"");
+		const char	*tmpport=conn->connstr->getValue("port");
 		// if port is passed in via conninfo, an empty port is NOT
 		// translated to 5432
-		conn->port=(conn->port)?conn->port:(char *)"";
-		conn->options=conn->connstr->getValue("options");
-		conn->options=(conn->options)?conn->options:(char *)"";
-		conn->tty=conn->connstr->getValue("tty");
-		conn->tty=(conn->tty)?conn->tty:(char *)"";
-		conn->db=conn->connstr->getValue("dbname");
-		conn->db=(conn->db)?conn->db:(char *)"";
-		conn->user=conn->connstr->getValue("user");
-		conn->user=(conn->user)?conn->user:(char *)"";
-		conn->password=conn->connstr->getValue("password");
-		conn->password=(conn->password)?conn->password:(char *)"";
+		conn->port=charstring::duplicate((tmpport)?tmpport:"");
+		const char	*tmpoptions=conn->connstr->getValue("options");
+		conn->options=charstring::duplicate((tmpoptions)?tmpoptions:"");
+		const char	*tmptty=conn->connstr->getValue("tty");
+		conn->tty=charstring::duplicate((tmptty)?tmptty:"");
+		const char	*tmpdbname=conn->connstr->getValue("dbname");
+		conn->db=charstring::duplicate((tmpdbname)?tmpdbname:"");
+		const char	*tmpuser=conn->connstr->getValue("user");
+		conn->user=charstring::duplicate((tmpuser)?tmpuser:"");
+		const char	*tmppassword=conn->connstr->
+						getValue("password");
+		conn->password=charstring::duplicate((tmppassword)?
+							tmppassword:"");
 
 	} else {
 
 		conn->connstr=NULL;
 
-		conn->host=strdup((host)?host:"");
+		conn->host=charstring::duplicate((host)?host:"");
 		// if port is passed in via parameters, an empty port is
 		// translated to 5432
-		conn->port=strdup((port)?port:"5432");
-		conn->options=strdup((options)?options:"");
-		conn->tty=strdup((tty)?tty:"");
-		conn->db=strdup((db)?db:"");
-		conn->user=strdup((user)?user:"");
-		conn->password=strdup((password)?password:"");
+		conn->port=charstring::duplicate((port)?port:"5432");
+		conn->options=charstring::duplicate((options)?options:"");
+		conn->tty=charstring::duplicate((tty)?tty:"");
+		conn->db=charstring::duplicate((db)?db:"");
+		conn->user=charstring::duplicate((user)?user:"");
+		conn->password=charstring::duplicate((password)?password:"");
 	}
 
 	conn->clientencoding=PG_UTF8;
@@ -115,15 +117,14 @@ void freePGconn(PGconn *conn) {
 		delete conn->connstr;
 		conn->connstr=NULL;
 		conn->conninfo=NULL;
-	} else {
-		delete[] conn->host;
-		delete[] conn->port;
-		delete[] conn->options;
-		delete[] conn->tty;
-		delete[] conn->db;
-		delete[] conn->user;
-		delete[] conn->password;
 	}
+	delete[] conn->host;
+	delete[] conn->port;
+	delete[] conn->options;
+	delete[] conn->tty;
+	delete[] conn->db;
+	delete[] conn->user;
+	delete[] conn->password;
 
 	conn->currentresult=NULL;
 	conn->nonblockingmode=0;

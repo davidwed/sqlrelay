@@ -90,14 +90,14 @@ bool mdbtoolscursor::openCursor(int id) {
 	}
 
 	// handle db
-	char	*dbval;
+	const char	*dbval;
 	if (mdbtoolsconn->db && mdbtoolsconn->db[0]) {
 		dbval=mdbtoolsconn->db;
 	} else {
 		dbval="";
 	}
 
-	return mdb_sql_open(&mdbsql,dbval);
+	return mdb_sql_open(&mdbsql,const_cast<char *>(dbval));
 }
 
 bool mdbtoolscursor::closeCursor() {
@@ -131,7 +131,7 @@ bool mdbtoolscursor::executeQuery(const char *query,
 	}
 #else
 	if (newquery) {
-		g_input_ptr=newquery->getString();
+		g_input_ptr=const_cast<char *>(newquery->getString());
 		_mdb_sql(&mdbsql);
 		if (yyparse()) {
 			delete newquery;
@@ -149,7 +149,7 @@ bool mdbtoolscursor::executeQuery(const char *query,
 	return true;
 }
 
-char *mdbtoolscursor::getErrorMessage(bool *liveconnection) {
+const char *mdbtoolscursor::getErrorMessage(bool *liveconnection) {
 	*liveconnection=true;
 	return "error";
 }

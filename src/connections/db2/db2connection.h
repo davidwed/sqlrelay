@@ -39,36 +39,36 @@ class db2cursor : public sqlrcursor {
 			db2cursor(sqlrconnection *conn);
 			~db2cursor();
 	private:
-		bool	prepareQuery(const char *query, long length);
-		bool	inputBindString(const char *variable, 
-					unsigned short variablesize,
-					const char *value, 
-					unsigned short valuesize,
-					short *isnull);
-		bool	inputBindLong(const char *variable, 
-					unsigned short variablesize,
-					unsigned long *value);
-		bool	inputBindDouble(const char *variable, 
-					unsigned short variablesize,
-					double *value, 
-					unsigned short precision,
-					unsigned short scale);
-		bool	outputBindString(const char *variable, 
-					unsigned short variablesize,
-					char *value, 
-					unsigned short valuesize,
-					short *isnull);
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
+		bool		prepareQuery(const char *query, long length);
+		bool		inputBindString(const char *variable, 
+						unsigned short variablesize,
+						const char *value, 
+						unsigned short valuesize,
+						short *isnull);
+		bool		inputBindLong(const char *variable, 
+						unsigned short variablesize,
+						unsigned long *value);
+		bool		inputBindDouble(const char *variable, 
+						unsigned short variablesize,
+						double *value, 
+						unsigned short precision,
+						unsigned short scale);
+		bool		outputBindString(const char *variable, 
+						unsigned short variablesize,
+						char *value, 
+						unsigned short valuesize,
+						short *isnull);
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
 
 		long		erg;
 		SQLHSTMT	stmt;
@@ -117,7 +117,7 @@ class db2connection : public sqlrconnection {
 		long		erg;
 		SQLHDBC		dbc;
 
-		char		*server;
+		const char	*server;
 };
 
 #endif

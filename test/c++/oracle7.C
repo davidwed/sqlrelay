@@ -11,7 +11,7 @@ sqlrcursor	*cur;
 sqlrconnection	*secondcon;
 sqlrcursor	*secondcur;
 
-void checkSuccess(char *value, char *success) {
+void checkSuccess(const char *value, const char *success) {
 
 	if (!success) {
 		if (!value) {
@@ -59,15 +59,15 @@ int	main(int argc, char **argv) {
 	double	subvaldoubles[3]={10.55,10.556,10.5556};
 	unsigned short	precs[3]={4,5,6};
 	unsigned short	scales[3]={2,3,4};
-	char	*numvar;
-	char	*stringvar;
-	char	*floatvar;
-	char	**cols;
-	char	**fields;
+	const char	*numvar;
+	const char	*stringvar;
+	const char	*floatvar;
+	const char * const *cols;
+	const char * const *fields;
 	int	port;
-	char	*socket;
+	const char	*socket;
 	int	id;
-	char	*filename;
+	const char	*filename;
 	//const char	*arraybindvars[6]={"var1","var2","var3","var4","var5",NULL};
 	//const char	*arraybindvals[5]={"7","testchar7","testvarchar7","01-JAN-2007","testlong7"};
 	const char	*arraybindvars[6]={"var1","var2","var3","var4",NULL};

@@ -38,7 +38,7 @@
 		bool	connected;
 
 		// connection
-		char			*server;
+		const char		*server;
 		unsigned short		listenerinetport;
 		unsigned short		connectioninetport;
 		char			*listenerunixport;
@@ -48,9 +48,9 @@
 		int			tries;
 
 		// authentication
-		char		*user;
+		const char	*user;
 		int		userlen;
-		char		*password;
+		const char	*password;
 		int		passwordlen;
 		bool		reconnect;
 

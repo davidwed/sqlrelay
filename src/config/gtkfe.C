@@ -976,7 +976,7 @@ void gtkfe::populateInstanceList() {
 	instance	*inst=conffile->firstInstance();
 	int		i=0;
 	while (inst) {
-		clisttext[0][0]=inst->getId();
+		clisttext[0][0]=const_cast<char *>(inst->getId());
 		gtk_clist_append(GTK_CLIST(instancelist),(gchar **)clisttext);
 		gtk_clist_set_row_data(GTK_CLIST(instancelist),i,
 					(gpointer)inst);
@@ -1093,7 +1093,7 @@ void gtkfe::populateUserList(instance *inst) {
 	user	*usr=inst->firstUser();
 	int	i=0;
 	while (usr) {
-		clisttext[0][0]=usr->getUser();
+		clisttext[0][0]=const_cast<char *>(usr->getUser());
 		gtk_clist_append(GTK_CLIST(userlist),(gchar **)clisttext);
 		gtk_clist_set_row_data(GTK_CLIST(userlist),i,
 					(gpointer)usr);
@@ -1131,7 +1131,7 @@ void gtkfe::populateConnectionList(instance *inst) {
 	connection	*conn=inst->firstConnection();
 	int		i=0;
 	while (conn) {
-		clisttext[0][0]=conn->getConnectionId();
+		clisttext[0][0]=const_cast<char *>(conn->getConnectionId());
 		gtk_clist_append(GTK_CLIST(connectionlist),(gchar **)clisttext);
 		gtk_clist_set_row_data(GTK_CLIST(connectionlist),i,
 					(gpointer)conn);

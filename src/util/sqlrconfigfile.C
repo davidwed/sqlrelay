@@ -53,38 +53,16 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 
 sqlrconfigfile::~sqlrconfigfile() {
 
-	if (dbase[0]) {
-		delete[] dbase;
-	}
-
-	if (unixport[0]) {
-		delete[] unixport;
-	}
-
-	if (endofsession[0]) {
-		delete[] endofsession;
-	}
-	if (runasuser[0]) {
-		delete[] runasuser;
-	}
-	if (runasgroup[0]) {
-		delete[] runasgroup;
-	}
-	if (authtier[0]) {
-		delete[] authtier;
-	}
-	if (handoff[0]) {
-		delete[] handoff;
-	}
-	if (allowedips[0]) {
-		delete[] allowedips;
-	}
-	if (deniedips[0]) {
-		delete[] deniedips;
-	}
-	if (debug[0]) {
-		delete[] debug;
-	}
+	delete[] dbase;
+	delete[] unixport;
+	delete[] endofsession;
+	delete[] runasuser;
+	delete[] runasgroup;
+	delete[] authtier;
+	delete[] handoff;
+	delete[] allowedips;
+	delete[] deniedips;
+	delete[] debug;
 
 	usernode	*un=userlist.getNodeByIndex(0);
 	while (un) {
@@ -103,7 +81,7 @@ int sqlrconfigfile::getPort() {
 	return port;
 }
 
-char *sqlrconfigfile::getUnixPort() {
+const char *sqlrconfigfile::getUnixPort() {
 	return unixport;
 }
 
@@ -115,7 +93,7 @@ bool sqlrconfigfile::getListenOnUnix() {
 	return listenonunix;
 }
 
-char *sqlrconfigfile::getDbase() {
+const char *sqlrconfigfile::getDbase() {
 	return dbase;
 }
 
@@ -144,7 +122,7 @@ bool sqlrconfigfile::getDynamicScaling() {
 			growby>0 && ttl>0);
 }
 
-char *sqlrconfigfile::getEndOfSession() {
+const char *sqlrconfigfile::getEndOfSession() {
 	return endofsession;
 }
 
@@ -156,11 +134,11 @@ long sqlrconfigfile::getSessionTimeout() {
 	return sessiontimeout;
 }
 
-char *sqlrconfigfile::getRunAsUser() {
+const char *sqlrconfigfile::getRunAsUser() {
 	return runasuser;
 }
 
-char *sqlrconfigfile::getRunAsGroup() {
+const char *sqlrconfigfile::getRunAsGroup() {
 	return runasgroup;
 }
 
@@ -168,7 +146,7 @@ int sqlrconfigfile::getCursors() {
 	return cursors;
 }
 
-char *sqlrconfigfile::getAuthTier() {
+const char *sqlrconfigfile::getAuthTier() {
 	return authtier;
 }
 
@@ -184,7 +162,7 @@ bool sqlrconfigfile::getAuthOnDatabase() {
 	return authondatabase;
 }
 
-char *sqlrconfigfile::getHandOff() {
+const char *sqlrconfigfile::getHandOff() {
 	return handoff;
 }
 
@@ -192,15 +170,15 @@ bool sqlrconfigfile::getPassDescriptor() {
 	return passdescriptor;
 }
 
-char *sqlrconfigfile::getAllowedIps() {
+const char *sqlrconfigfile::getAllowedIps() {
 	return allowedips;
 }
 
-char *sqlrconfigfile::getDeniedIps() {
+const char *sqlrconfigfile::getDeniedIps() {
 	return deniedips;
 }
 
-char *sqlrconfigfile::getDebug() {
+const char *sqlrconfigfile::getDebug() {
 	return debug;
 }
 
@@ -260,7 +238,7 @@ int sqlrconfigfile::getMetricTotal() {
 	return metrictotal;
 }
 
-bool sqlrconfigfile::tagStart(char *name) {
+bool sqlrconfigfile::tagStart(const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -280,7 +258,7 @@ bool sqlrconfigfile::tagStart(char *name) {
 	return true;
 }
 
-bool sqlrconfigfile::attributeName(char *name) {
+bool sqlrconfigfile::attributeName(const char *name) {
 
 	// don't do anything if we're already done
 	if (done) {
@@ -338,11 +316,13 @@ bool sqlrconfigfile::attributeName(char *name) {
 		currentattribute=STRING_ATTRIBUTE;
 	} else if (!charstring::compare(name,"metric")) {
 		currentattribute=METRIC_ATTRIBUTE;
+	} else {
+		currentattribute=(attribute)0;
 	}
 	return true;
 }
 
-bool sqlrconfigfile::attributeValue(char *value) {
+bool sqlrconfigfile::attributeValue(const char *value) {
 
 	// don't do anything if we're already done
 	if (done) {
@@ -374,7 +354,6 @@ bool sqlrconfigfile::attributeValue(char *value) {
 			dbase=charstring::duplicate((value)?value:
 							DEFAULT_DBASE);
 		} else if (currentattribute==CONNECTIONS_ATTRIBUTE) {
-			//connections=atoi(value,DEFAULT_CONNECTIONS,1);
 			connections=atoi(value,DEFAULT_CONNECTIONS,0);
 		} else if (currentattribute==MAXCONNECTIONS_ATTRIBUTE) {
 			maxconnections=atoi(value,DEFAULT_MAXCONNECTIONS,1);
@@ -474,7 +453,7 @@ long sqlrconfigfile::atol(const char *value,
 	return retval;
 }
 
-bool sqlrconfigfile::tagEnd(char *name) {
+bool sqlrconfigfile::tagEnd(const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -489,11 +468,11 @@ bool sqlrconfigfile::tagEnd(char *name) {
 	return true;
 }
 
-int sqlrconfigfile::parse(const char *config, char *id) {
+int sqlrconfigfile::parse(const char *config, const char *id) {
 	return parse(config,id,0);
 }
 
-int sqlrconfigfile::parse(const char *config, char *id,
+int sqlrconfigfile::parse(const char *config, const char *id,
 					int connectstringcount) {
 
 	// init some variables
@@ -510,8 +489,8 @@ int sqlrconfigfile::parse(const char *config, char *id,
 	}
 
 	// parse the user's .sqlrelay.conf file
-	char *filename;
-	char *homedir=getenv("HOME");
+	const char	*homedir=getenv("HOME");
+	char		*filename;
 	if (homedir && homedir[0]) {
 		filename=new char[charstring::length(homedir)+15+1];
 		sprintf(filename,"%s/.sqlrelay.conf",homedir);
@@ -555,11 +534,11 @@ void usercontainer::setPassword(const char *password) {
 	}
 }
 
-char *usercontainer::getUser() {
+const char *usercontainer::getUser() {
 	return user;
 }
 
-char *usercontainer::getPassword() {
+const char *usercontainer::getPassword() {
 	return password;
 }
 
@@ -591,11 +570,11 @@ void connectstringcontainer::setMetric(int metric) {
 	this->metric=metric;
 }
 
-char *connectstringcontainer::getConnectionId() {
+const char *connectstringcontainer::getConnectionId() {
 	return connectionid;
 }
 
-char *connectstringcontainer::getString() {
+const char *connectstringcontainer::getString() {
 	return string;
 }
 
@@ -610,6 +589,7 @@ void connectstringcontainer::parseConnectString() {
 	connectstring.parse(string);
 }
 
-char *connectstringcontainer::getConnectStringValue(const char *variable) {
+const char *connectstringcontainer::getConnectStringValue(
+						const char *variable) {
 	return connectstring.getValue(variable);
 }

@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.1 2004-02-22 22:45:51 mused Exp $
+// $Id: sqlrelay.php,v 1.2 2005-01-19 06:09:49 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -153,7 +153,7 @@ class DB_sqlrelay extends DB_common
         If there are any affected rows, then the query was definitely not a
         select, otherwise there's no good way to know what kind of query it was
         except by parsing it. */
-        if ($this->affectedrows == 0 &&
+        if ($this->affectedrows <= 0 &&
                 preg_match('/^\s*\(?\s*SELECT\s+/si', $query) &&
                     !preg_match('/^\s*\(?\s*SELECT\s+INTO\s/si', $query)) {
             return new DB_sqlrelay_cursor($cursor);

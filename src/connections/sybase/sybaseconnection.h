@@ -23,47 +23,47 @@ class sybaseconnection;
 class sybasecursor : public sqlrcursor {
 	friend class sybaseconnection;
 	private:
-			sybasecursor(sqlrconnection *conn);
-			~sybasecursor();
-		bool	openCursor(int id);
-		bool	closeCursor();
-		bool	prepareQuery(const char *query, long length);
-		bool	inputBindString(const char *variable,
+				sybasecursor(sqlrconnection *conn);
+				~sybasecursor();
+		bool		openCursor(int id);
+		bool		closeCursor();
+		bool		prepareQuery(const char *query, long length);
+		bool		inputBindString(const char *variable,
 						unsigned short variablesize,
 						const char *value,
 						unsigned short valuesize,
 						short *isnull);
-		bool	inputBindLong(const char *variable,
+		bool		inputBindLong(const char *variable,
 						unsigned short variablesize,
 						unsigned long *value);
-		bool	inputBindDouble(const char *variable,
+		bool		inputBindDouble(const char *variable,
 						unsigned short variablesize,
 						double *value,
 						unsigned short precision,
 						unsigned short scale);
-		bool	outputBindString(const char *variable, 
+		bool		outputBindString(const char *variable, 
 						unsigned short variablesize,
 						char *value, 
 						unsigned short valuesize, 
 						short *isnull);
-		bool	executeQuery(const char *query,
+		bool		executeQuery(const char *query,
 						long length,
 						bool execute);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
-		void	discardResults();
-		void	discardCursor();
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
+		void		discardResults();
+		void		discardCursor();
 
-		char	*cursorname;
+		const char	*cursorname;
 
-		void	checkRePrepare();
+		void		checkRePrepare();
 
 		CS_COMMAND	*languagecmd;
 		CS_COMMAND	*cursorcmd;
@@ -93,7 +93,7 @@ class sybasecursor : public sqlrcursor {
 		CS_SMALLINT	nullindicator[MAX_SELECT_LIST_SIZE]
 					[FETCH_AT_ONCE];
 
-		char		*query;
+		const char	*query;
 		int		length;
 		bool		prepared;
 		bool		clean;
@@ -113,32 +113,32 @@ class sybaseconnection : public sqlrconnection {
 			sybaseconnection();
 			~sybaseconnection();
 	private:
-		int	getNumberOfConnectStringVars();
-		void	handleConnectString();
-		bool	logIn();
-		void	logInError(const char *error, int stage);
+		int		getNumberOfConnectStringVars();
+		void		handleConnectString();
+		bool		logIn();
+		void		logInError(const char *error, int stage);
 		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
-		void	logOut();
-		char	*identify();
-		char	bindVariablePrefix();
-		void	dropTempTable(sqlrcursor *cursor,
-					const char *tablename);
+		void		deleteCursor(sqlrcursor *curs);
+		void		logOut();
+		const char	*identify();
+		char		bindVariablePrefix();
+		void		dropTempTable(sqlrcursor *cursor,
+						const char *tablename);
 
 		CS_CONTEXT	*context;
 		CS_LOCALE	*locale;
 		CS_CONNECTION	*dbconn;
 
-		char		*sybase;
-		char		*lang;
-		char		*server;
-		char		*db;
-		char		*charset;
-		char		*language;
-		char		*encryption;
+		const char	*sybase;
+		const char	*lang;
+		const char	*server;
+		const char	*db;
+		const char	*charset;
+		const char	*language;
+		const char	*encryption;
 		int		enc;
-		char		*hostname;
-		char		*packetsize;
+		const char	*hostname;
+		const char	*packetsize;
 
 		environment	*env;
 

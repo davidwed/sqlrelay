@@ -25,43 +25,43 @@ class freetdsconnection;
 class freetdscursor : public sqlrcursor {
 	friend class freetdsconnection;
 	private:
-			freetdscursor(sqlrconnection *conn);
-			~freetdscursor();
-		bool	openCursor(int id);
-		bool	closeCursor();
-		bool	prepareQuery(const char *query, long length);
-		/*bool	inputBindString(const char *variable,
+				freetdscursor(sqlrconnection *conn);
+				~freetdscursor();
+		bool		openCursor(int id);
+		bool		closeCursor();
+		bool		prepareQuery(const char *query, long length);
+		/*bool		inputBindString(const char *variable,
 						unsigned short variablesize,
 						const char *value,
 						unsigned short valuesize,
 						short *isnull);
-		bool	inputBindLong(const char *variable,
+		bool		inputBindLong(const char *variable,
 						unsigned short variablesize,
 						unsigned long *value);
-		bool	inputBindDouble(const char *variable,
+		bool		inputBindDouble(const char *variable,
 						unsigned short variablesize,
 						double *value,
 						unsigned short precision,
 						unsigned short scale);
-		bool	outputBindString(const char *variable, 
+		bool		outputBindString(const char *variable, 
 						unsigned short variablesize,
 						char *value, 
 						unsigned short valuesize, 
 						short *isnull);*/
-		bool	executeQuery(const char *query,
+		bool		executeQuery(const char *query,
 						long length,
 						bool execute);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
-		void	discardResults();
-		void	discardCursor();
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
+		void		discardResults();
+		void		discardCursor();
 
 		char	*cursorname;
 
@@ -134,16 +134,16 @@ class freetdsconnection : public sqlrconnection {
 		CS_LOCALE	*locale;
 		CS_CONNECTION	*dbconn;
 
-		char		*sybase;
-		char		*lang;
-		char		*server;
-		char		*db;
-		char		*charset;
-		char		*language;
-		char		*encryption;
+		const char	*sybase;
+		const char	*lang;
+		const char	*server;
+		const char	*db;
+		const char	*charset;
+		const char	*language;
+		const char	*encryption;
 		int		enc;
-		char		*hostname;
-		char		*packetsize;
+		const char	*hostname;
+		const char	*packetsize;
 
 		environment	*env;
 

@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-char *sqlrconnection::getConnectionSocket() {
+const char *sqlrconnection::getConnectionSocket() {
 
 	if (!suspendsessionsent && !openSession()) {
 		return NULL;

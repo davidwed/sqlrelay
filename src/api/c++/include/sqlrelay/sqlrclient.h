@@ -6,6 +6,10 @@
 
 #include <sqlrelay/private/sqlrincludes.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 class sqlrconnection {
 	public:
 			sqlrconnection(const char *server, int port,
@@ -43,7 +47,7 @@ class sqlrconnection {
 				// communicating over. This parameter may be 
 				// passed to another connection for use in
 				// the resumeSession() method.
-		char	*getConnectionSocket();
+		const char	*getConnectionSocket();
 				// Returns the unix socket that the connection 
 				// is communicating over. This parameter may be 
 				// passed to another connection for use in
@@ -57,7 +61,7 @@ class sqlrconnection {
 		bool	ping();
 				// Returns true if the database is up and false
 				// if it's down.
-		char	*identify();
+		const char	*identify();
 				// Returns the type of database: 
 				//   oracle7, oracle8, postgresql, mysql, etc.
 
@@ -152,7 +156,7 @@ class sqlrcursor {
 				// cached result set "ttl" seconds after it's 
 				// created, provided it's scanning the directory
 				// containing the cache files.
-		char	*getCacheFileName();
+		const char	*getCacheFileName();
 				// Returns the name of the file containing the
 				// cached result set.
 		void	cacheOff();
@@ -260,7 +264,7 @@ class sqlrcursor {
 				// Fetch from a cursor that was returned as
 				// an output bind variable.
 
-		char	*getOutputBind(const char *variable);
+		const char	*getOutputBind(const char *variable);
 				// Get the value stored in a previously
 				// defined output bind variable.
 		long	getOutputBindAsLong(const char *variable);
@@ -318,7 +322,7 @@ class sqlrcursor {
 				// with a parameter other than false.
 		
 		
-		char	*errorMessage();
+		const char	*errorMessage();
 				// If a query failed and generated an error, 
 				// the error message is available here.  If 
 				// the query succeeded then this method 
@@ -335,8 +339,8 @@ class sqlrcursor {
 				// than as empty strings.
 
 
-		char	*getField(int row, int col);
-		char	*getField(int row, const char *col);
+		const char	*getField(int row, int col);
+		const char	*getField(int row, const char *col);
 				// Returns a pointer to the value of the 
 				// specified row and column.
 		long	getFieldAsLong(int row, int col);
@@ -351,19 +355,19 @@ class sqlrcursor {
 		long	getFieldLength(int row, const char *col);
 				// Returns the length of the 
 				// specified row and column.
-		char	**getRow(int row);
+		const char * const *getRow(int row);
 				// Returns a null terminated array of the 
 				// values of the fields in the specified row.
 		long	*getRowLengths(int row);
 				// Returns a null terminated array of the 
 				// lengths of the fields in the specified row.
-		char	**getColumnNames();
+		const char * const *getColumnNames();
 				// Returns a null terminated array of the 
 				// column names of the current result set.
-		char	*getColumnName(int col);
+		const char	*getColumnName(int col);
 				// Returns the name of the specified column.
-		char	*getColumnType(int col);
-		char	*getColumnType(const char *col);
+		const char	*getColumnType(int col);
+		const char	*getColumnType(const char *col);
 				// Returns the type of the specified column.
 		int	getColumnLength(int col);
 		int	getColumnLength(const char *col);

@@ -11,7 +11,7 @@ sqlrcursor	*cur;
 sqlrconnection	*secondcon;
 sqlrcursor	*secondcur;
 
-void checkSuccess(char *value, char *success) {
+void checkSuccess(const char *value, const char *success) {
 
 	if (!success) {
 		if (!value) {
@@ -74,8 +74,8 @@ int	main(int argc, char **argv) {
 	char	*numvar;
 	char	*stringvar;
 	char	*floatvar;
-	char	**cols;
-	char	**fields;
+	const char * const *cols;
+	const char * const *fields;
 	int	port;
 	char	*socket;
 	int	id;

@@ -97,17 +97,19 @@ class sqlrcursor {
 		virtual	bool	executeQuery(const char *query,
 							long length,
 							bool execute)=0;
-		virtual	bool	queryIsNotSelect();
-		virtual	bool	queryIsCommitOrRollback();
-		virtual	char	*getErrorMessage(bool *liveconnection)=0;
-		virtual	void	returnRowCounts()=0;
-		virtual	void	returnColumnCount()=0;
-		virtual	void	returnColumnInfo()=0;
-		virtual	bool	noRowsToReturn()=0;
-		virtual	bool	skipRow()=0;
-		virtual	bool	fetchRow()=0;
-		virtual	void	returnRow()=0;
-		virtual	void	cleanUpData(bool freeresult, bool freebinds);
+		virtual	bool		queryIsNotSelect();
+		virtual	bool		queryIsCommitOrRollback();
+		virtual	const char	*getErrorMessage(
+						bool *liveconnection)=0;
+		virtual	void		returnRowCounts()=0;
+		virtual	void		returnColumnCount()=0;
+		virtual	void		returnColumnInfo()=0;
+		virtual	bool		noRowsToReturn()=0;
+		virtual	bool		skipRow()=0;
+		virtual	bool		fetchRow()=0;
+		virtual	void		returnRow()=0;
+		virtual	void		cleanUpData(bool freeresult,
+							bool freebinds);
 
 	protected:
 		regularexpression	createtemp;

@@ -33,8 +33,8 @@ bool sqlrconnection::returnError(sqlrcursor *cursor) {
 
 	// get the error message from the database
 	// return value: 1 if database connection is still alive, 0 if not
-	bool	liveconnection;
-	char	*error=cursor->getErrorMessage(&liveconnection);
+	bool		liveconnection;
+	const char	*error=cursor->getErrorMessage(&liveconnection);
 
 	// only return an error message if the error wasn't a dead database
 	if (liveconnection) {

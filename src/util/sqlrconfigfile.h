@@ -11,6 +11,10 @@
 #include <rudiments/linkedlist.h>
 #include <rudiments/parameterstring.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 typedef enum {
 	ID_ATTRIBUTE=1,
 	PORT_ATTRIBUTE,
@@ -44,13 +48,13 @@ class usercontainer {
 				usercontainer();
 				~usercontainer();
 
-		void	setUser(const char *user);
-		void	setPassword(const char *password);
-		char	*getUser();
-		char	*getPassword();
+		void		setUser(const char *user);
+		void		setPassword(const char *password);
+		const char	*getUser();
+		const char	*getPassword();
 	private:
-		char		*user;
-		char		*password;
+		const char	*user;
+		const char	*password;
 };
 
 typedef linkedlistnode< usercontainer * >	usernode;
@@ -59,19 +63,19 @@ class connectstringcontainer {
 	public:
 				connectstringcontainer(int connectstringcount);
 				~connectstringcontainer();
-		void	parseConnectString();
-		void	setConnectionId(const char *connectionid);
-		void	setString(const char *string);
-		void	setMetric(int metric);
-		char	*getConnectionId();
-		char	*getString();
-		int	getMetric();
-		char	*getConnectStringValue(const char *variable);
+		void		parseConnectString();
+		void		setConnectionId(const char *connectionid);
+		void		setString(const char *string);
+		void		setMetric(int metric);
+		const char	*getConnectionId();
+		const char	*getString();
+		int		getMetric();
+		const char	*getConnectStringValue(const char *variable);
 	private:
 
-		char			*connectionid;
-		char			*string;
-		int			metric;
+		const char	*connectionid;
+		const char	*string;
+		int		metric;
 
 		// connect string parameters
 		parameterstring	connectstring;
@@ -84,37 +88,37 @@ class sqlrconfigfile : public xmlsax {
 	public:
 			sqlrconfigfile();
 			~sqlrconfigfile();
-		int	parse(const char *config, char *id);
-		int	parse(const char *config, char *id,
-					int connectstringcount);
-		int	getPort();
-		char	*getUnixPort();
-		bool	getListenOnInet();
-		bool	getListenOnUnix();
-		char	*getDbase();
-		int	getConnections();
-		int	getMaxConnections();
-		int	getMaxQueueLength();
-		int	getGrowBy();
-		int	getTtl();
-		bool	getDynamicScaling();
-		char	*getEndOfSession();
-		bool	getEndOfSessionCommit();
-		long	getSessionTimeout();
-		char	*getRunAsUser();
-		char	*getRunAsGroup();
-		int	getCursors();
-		char	*getAuthTier();
-		bool	getAuthOnListener();
-		bool	getAuthOnConnection();
-		bool	getAuthOnDatabase();
-		char	*getHandOff();
-		bool	getPassDescriptor();
-		char	*getAllowedIps();
-		char	*getDeniedIps();
-		char	*getDebug();
-		bool	getDebugListener();
-		bool	getDebugConnection();
+		int	parse(const char *config, const char *id);
+		int	parse(const char *config, const char *id,
+						int connectstringcount);
+		int		getPort();
+		const char	*getUnixPort();
+		bool		getListenOnInet();
+		bool		getListenOnUnix();
+		const char	*getDbase();
+		int		getConnections();
+		int		getMaxConnections();
+		int		getMaxQueueLength();
+		int		getGrowBy();
+		int		getTtl();
+		bool		getDynamicScaling();
+		const char	*getEndOfSession();
+		bool		getEndOfSessionCommit();
+		long		getSessionTimeout();
+		const char	*getRunAsUser();
+		const char	*getRunAsGroup();
+		int		getCursors();
+		const char	*getAuthTier();
+		bool		getAuthOnListener();
+		bool		getAuthOnConnection();
+		bool		getAuthOnDatabase();
+		const char	*getHandOff();
+		bool		getPassDescriptor();
+		const char	*getAllowedIps();
+		const char	*getDeniedIps();
+		const char	*getDebug();
+		bool		getDebugListener();
+		bool		getDebugConnection();
 
 		linkedlist< usercontainer * >	*getUserList();
 		linkedlist< connectstringcontainer * >
@@ -124,7 +128,7 @@ class sqlrconfigfile : public xmlsax {
 		int			getConnectionCount();
 		int			getMetricTotal();
 	private:
-		char		*id;
+		const char	*id;
 		bool		correctid;
 		bool		done;
 		attribute	currentattribute;
@@ -136,38 +140,38 @@ class sqlrconfigfile : public xmlsax {
 					const char *defaultvalue,
 					long minvalue);
 
-		bool	tagStart(char *name);
-		bool	attributeName(char *name);
-		bool	attributeValue(char *value);
-		bool	tagEnd(char *name);
+		bool	tagStart(const char *name);
+		bool	attributeName(const char *name);
+		bool	attributeValue(const char *value);
+		bool	tagEnd(const char *name);
 
-		int	port;
-		bool	listenoninet;
-		char	*unixport;
-		bool	listenonunix;
-		char	*dbase;
-		int	connections;
-		int	maxconnections;
-		int	maxqueuelength;
-		int	growby;
-		int	ttl;
-		char	*endofsession;
-		bool	endofsessioncommit;
-		long	sessiontimeout;
-		char	*runasuser;
-		char	*runasgroup;
-		int	cursors;
-		char	*authtier;
-		bool	authonlistener;
-		bool	authonconnection;
-		bool	authondatabase;
-		char	*handoff;
-		bool	passdescriptor;
-		char	*allowedips;
-		char	*deniedips;
-		char	*debug;
-		bool	debuglistener;
-		bool	debugconnection;
+		int		port;
+		bool		listenoninet;
+		const char	*unixport;
+		bool		listenonunix;
+		const char	*dbase;
+		int		connections;
+		int		maxconnections;
+		int		maxqueuelength;
+		int		growby;
+		int		ttl;
+		const char	*endofsession;
+		bool		endofsessioncommit;
+		long		sessiontimeout;
+		const char	*runasuser;
+		const char	*runasgroup;
+		int		cursors;
+		const char	*authtier;
+		bool		authonlistener;
+		bool		authonconnection;
+		bool		authondatabase;
+		const char	*handoff;
+		bool		passdescriptor;
+		const char	*allowedips;
+		const char	*deniedips;
+		const char	*debug;
+		bool		debuglistener;
+		bool		debugconnection;
 
 		usercontainer	*currentuser;
 

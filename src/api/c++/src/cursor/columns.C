@@ -42,7 +42,7 @@ column *sqlrcursor::getColumnInternal(int index) {
 	return &extracolumns[index-OPTIMISTIC_COLUMN_COUNT];
 }
 
-char **sqlrcursor::getColumnNames() {
+const char * const *sqlrcursor::getColumnNames() {
 
 	if (sendcolumninfo==DONT_SEND_COLUMN_INFO ||
 			sentcolumninfo==DONT_SEND_COLUMN_INFO) {
@@ -66,12 +66,12 @@ char **sqlrcursor::getColumnNames() {
 	return columnnamearray;
 }
 
-char *sqlrcursor::getColumnName(int col) {
+const char *sqlrcursor::getColumnName(int col) {
 	column	*whichcol=getColumn(col);
 	return (whichcol)?whichcol->name:NULL;
 }
 
-char *sqlrcursor::getColumnType(int col) {
+const char *sqlrcursor::getColumnType(int col) {
 	column	*whichcol=getColumn(col);
 	if (whichcol) {
 		if (columntypeformat!=COLUMN_TYPE_IDS) {
@@ -144,7 +144,7 @@ int sqlrcursor::getLongest(int col) {
 	return (whichcol)?whichcol->longest:0;
 }
 
-char *sqlrcursor::getColumnType(const char *col) {
+const char *sqlrcursor::getColumnType(const char *col) {
 	column	*whichcol=getColumn(col);
 	if (whichcol) {
 		if (columntypeformat!=COLUMN_TYPE_IDS) {

@@ -15,19 +15,19 @@ class mysqlconnection;
 class mysqlcursor : public sqlrcursor {
 	friend class mysqlconnection;
 	private:
-			mysqlcursor(sqlrconnection *conn);
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
+				mysqlcursor(sqlrconnection *conn);
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	*mysqlfield;
@@ -43,35 +43,35 @@ class mysqlcursor : public sqlrcursor {
 class mysqlconnection : public sqlrconnection {
 	friend class mysqlcursor;
 	public:
-			mysqlconnection();
+				mysqlconnection();
 	private:
-		int	getNumberOfConnectStringVars();
-		void	handleConnectString();
-		bool	logIn();
+		int		getNumberOfConnectStringVars();
+		void		handleConnectString();
+		bool		logIn();
 #ifdef HAVE_MYSQL_CHANGE_USER
-		bool	changeUser(const char *newuser,
-					const char *newpassword);
+		bool		changeUser(const char *newuser,
+						const char *newpassword);
 #endif
 		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
-		void	logOut();
-		bool	isTransactional();
+		void		deleteCursor(sqlrcursor *curs);
+		void		logOut();
+		bool		isTransactional();
 #ifdef HAVE_MYSQL_PING
-		bool	ping();
+		bool		ping();
 #endif
-		char	*identify();
-		bool	autoCommitOn();
-		bool	autoCommitOff();
-		bool	commit();
-		bool	rollback();
+		const char	*identify();
+		bool		autoCommitOn();
+		bool		autoCommitOff();
+		bool		commit();
+		bool		rollback();
 
 		MYSQL	mysql;
 		int	connected;
 
-		char	*db;
-		char	*host;
-		char	*port;
-		char	*socket;
+		const char	*db;
+		const char	*host;
+		const char	*port;
+		const char	*socket;
 };
 
 #endif

@@ -20,7 +20,7 @@ char	*conGetStringUTFChars(JNIEnv *env, jstring string, jboolean *modifier) {
 }
 
 void	conReleaseStringUTFChars(JNIEnv *env, jstring string, char *chararray) {
-	if (string) {
+	if (string && chararray) {
 		env->ReleaseStringUTFChars(string,chararray);
 	}
 }

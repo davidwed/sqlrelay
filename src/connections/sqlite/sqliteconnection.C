@@ -72,7 +72,7 @@ bool sqliteconnection::ping() {
 	return true;
 }
 
-char *sqliteconnection::identify() {
+const char *sqliteconnection::identify() {
 	return "sqlite";
 }
 
@@ -223,7 +223,7 @@ int sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
 	}
 }
 
-char *sqlitecursor::getErrorMessage(bool *liveconnection) {
+const char *sqlitecursor::getErrorMessage(bool *liveconnection) {
 	*liveconnection=true;
 	if (sqliteconn->errmesg &&
 		(!charstring::compare(sqliteconn->errmesg,

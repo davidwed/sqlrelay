@@ -62,7 +62,7 @@ bool sqlrcursor::executeQuery() {
 			if (*ptr==']' && inbraces && !inquotes) {
 		
 				// look for an = sign, skipping whitespace
-				char	*bptr=braces->getString();
+				const char	*bptr=braces->getString();
 				while (*bptr && (*bptr==' ' || 
 					*bptr=='	' || *bptr=='\n')) {
 					bptr++;

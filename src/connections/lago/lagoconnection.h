@@ -15,19 +15,19 @@ class lagoconnection;
 class lagocursor : public sqlrcursor {
 	friend class lagoconnection;
 	private:
-			lagocursor(sqlrconnection *conn);
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
+				lagocursor(sqlrconnection *conn);
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 
 		LRST	lagoresult;
 		int	ncols;
@@ -56,9 +56,9 @@ class lagoconnection : public sqlrconnection {
 
 		LCTX	lagocontext;
 
-		char	*host;
-		char	*port;
-		char	*db;
+		const char	*host;
+		const char	*port;
+		const char	*db;
 };
 
 #endif

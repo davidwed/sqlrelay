@@ -5,6 +5,7 @@
 
 #include <sqlrlistener.h>
 
+#include <rudiments/signalclasses.h>
 #include <rudiments/permissions.h>
 #include <rudiments/unixclientsocket.h>
 #include <rudiments/inetclientsocket.h>
@@ -290,8 +291,8 @@ void sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
 void sqlrlistener::setIpPermissions(sqlrconfigfile *cfgfl) {
 
 	// get denied and allowed ip's and compile the expressions
-	char	*deniedips=cfgfl->getDeniedIps();
-	char	*allowedips=cfgfl->getAllowedIps();
+	const char	*deniedips=cfgfl->getDeniedIps();
+	const char	*allowedips=cfgfl->getAllowedIps();
 	if (deniedips[0]) {
 		denied=new regularexpression(deniedips);
 	}
@@ -453,7 +454,7 @@ bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 
 	// get inet and unix ports to listen on
 	unsigned short	port=cfgfl->getPort();
-	char		*uport=cfgfl->getUnixPort();
+	const char	*uport=cfgfl->getUnixPort();
 	if (uport && uport[0]) {
 		unixport=charstring::duplicate(uport);
 	}
@@ -1037,9 +1038,9 @@ void sqlrlistener::clientSession(filedescriptor *sock) {
 		// sleep before and after returning an
 		// authentication error to discourage
 		// brute-force password attacks
-		sleep::macrosleep(2);
+		rudiments::sleep::macrosleep(2);
 		sock->write((unsigned short)ERROR);
-		sleep::macrosleep(2);
+		rudiments::sleep::macrosleep(2);
 	}
 
 	waitForClientClose(authstatus,passstatus,sock);

@@ -26,22 +26,22 @@ class sqliteconnection;
 class sqlitecursor : public sqlrcursor {
 	friend class sqliteconnection;
 	private:
-			sqlitecursor(sqlrconnection *conn);
-			~sqlitecursor();
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		int	runQuery(stringbuffer *newquery,
-					const char *query);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
+				sqlitecursor(sqlrconnection *conn);
+				~sqlitecursor();
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		int		runQuery(stringbuffer *newquery,
+						const char *query);
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 
 		stringbuffer	*newquery;
 		char		**result;
@@ -57,23 +57,23 @@ class sqlitecursor : public sqlrcursor {
 class sqliteconnection : public sqlrconnection {
 	friend class sqlitecursor;
 	public:
-			sqliteconnection();
+				sqliteconnection();
 	private:
-		int	getNumberOfConnectStringVars();
-		void	handleConnectString();
-		bool	logIn();
+		int		getNumberOfConnectStringVars();
+		void		handleConnectString();
+		bool		logIn();
 		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
-		void	logOut();
-		bool	ping();
-		char	*identify();
+		void		deleteCursor(sqlrcursor *curs);
+		void		logOut();
+		bool		ping();
+		const char	*identify();
 #ifndef SQLITE_TRANSACTIONAL
-		bool	isTransactional();
-		bool	commit();
-		bool	rollback();
+		bool		isTransactional();
+		bool		commit();
+		bool		rollback();
 #endif
 
-		char	*db;
+		const char	*db;
 
 #ifdef SQLITE3
 		sqlite3	*sqliteptr;

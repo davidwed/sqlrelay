@@ -54,13 +54,13 @@ sqlrcursor::lowerCaseColumnNames()
 
 void
 sqlrcursor::cacheToFile(filename)
-		char *filename
+		const char *filename
 
 void
 sqlrcursor::setCacheTtl(ttl)
 		int ttl
 
-char *
+const char *
 sqlrcursor::getCacheFileName()
 
 void
@@ -68,11 +68,11 @@ sqlrcursor::cacheOff()
 
 bool
 sqlrcursor::sendQuery(query)
-		char *query
+		const char *query
 
 bool
 sqlrcursor::sendQueryWithLength(query,length)
-		char *query
+		const char *query
 		int length
 	CODE:
 		RETVAL=THIS->sendQuery(query,length);
@@ -81,16 +81,16 @@ sqlrcursor::sendQueryWithLength(query,length)
 
 bool
 sqlrcursor::sendFileQuery(path,file)
-		char *path
-		char *file
+		const char *path
+		const char *file
 
 void
 sqlrcursor::prepareQuery(query)
-		char *query
+		const char *query
 
 void
 sqlrcursor::prepareQueryWithLength(query,length)
-		char *query
+		const char *query
 		int length
 	CODE:
 		THIS->prepareQuery(query,length);
@@ -98,12 +98,12 @@ sqlrcursor::prepareQueryWithLength(query,length)
 
 bool
 sqlrcursor::prepareFileQuery(path,file)
-		char *path
-		char *file
+		const char *path
+		const char *file
 
 void
 sqlrcursor::substitution(variable,...)
-		char *variable
+		const char *variable
 	CODE:
 		if (SvIOK(ST(2))) {
 			THIS->substitution(variable,(long)SvIV(ST(2)));
@@ -114,7 +114,7 @@ sqlrcursor::substitution(variable,...)
 		} else if (SvPOK(ST(2))) {
 			THIS->substitution(variable,SvPV(ST(2),na));
 		} else {
-			THIS->substitution(variable,(char *)NULL);
+			THIS->substitution(variable,(const char *)NULL);
 		}
 
 void
@@ -125,7 +125,7 @@ sqlrcursor::countBindVariables()
 
 void
 sqlrcursor::inputBind(variable,...)
-		char *variable
+		const char *variable
 	CODE:
 		if (SvIOK(ST(2))) {
 			THIS->inputBind(variable,(long)SvIV(ST(2)));
@@ -136,19 +136,19 @@ sqlrcursor::inputBind(variable,...)
 		} else if (SvPOK(ST(2))) {
 			THIS->inputBind(variable,SvPV(ST(2),na));
 		} else {
-			THIS->inputBind(variable,(char *)NULL);
+			THIS->inputBind(variable,(const char *)NULL);
 		}
 
 void
 sqlrcursor::inputBindBlob(variable,value,size)
-		char *variable
-		char *value
+		const char *variable
+		const char *value
 		unsigned long size
 
 void
 sqlrcursor::inputBindClob(variable,value,size)
-		char *variable
-		char *value
+		const char *variable
+		const char *value
 		unsigned long size
 
 void
@@ -162,27 +162,27 @@ sqlrcursor::fetchFromBindCursor()
 
 void
 sqlrcursor::defineOutputBind(variable,length)
-		char *variable
+		const char *variable
 		int length
 
 void
 sqlrcursor::defineOutputBindBlob(variable)
-		char *variable
+		const char *variable
 
 void
 sqlrcursor::defineOutputBindClob(variable)
-		char *variable
+		const char *variable
 
 void
 sqlrcursor::defineOutputBindCursor(variable)
-		char *variable
+		const char *variable
 
-char *
+const char *
 sqlrcursor::getOutputBind(variable)
-		char *variable
+		const char *variable
 	CODE:
-		char	*value=THIS->getOutputBind(variable);
-		long	length=THIS->getOutputBindLength(variable);
+		const char	*value=THIS->getOutputBind(variable);
+		long		length=THIS->getOutputBindLength(variable);
 		ST(0)=sv_newmortal();
 		if (value) {
 			sv_setpvn(ST(0),value,length);
@@ -192,7 +192,7 @@ sqlrcursor::getOutputBind(variable)
 
 long
 sqlrcursor::getOutputBindAsLong(variable)
-		char *variable
+		const char *variable
 	CODE:
 		long	value=THIS->getOutputBindAsLong(variable);
 		ST(0)=sv_newmortal();
@@ -200,7 +200,7 @@ sqlrcursor::getOutputBindAsLong(variable)
 
 double
 sqlrcursor::getOutputBindAsDouble(variable)
-		char *variable
+		const char *variable
 	CODE:
 		double	value=THIS->getOutputBindAsDouble(variable);
 		ST(0)=sv_newmortal();
@@ -208,13 +208,13 @@ sqlrcursor::getOutputBindAsDouble(variable)
 
 long
 sqlrcursor::getOutputBindLength(variable)
-		char *variable
+		const char *variable
 
 sqlrcursor *
 sqlrcursor::getOutputBindCursor(variable)
-		char *variable
+		const char *variable
 	PREINIT:
-		char *	CLASS = "SQLRelay::Cursor";
+		const char *	CLASS = "SQLRelay::Cursor";
 	CODE:
 		RETVAL=THIS->getOutputBindCursor(variable);
 		RETVAL->copyReferences();
@@ -223,7 +223,7 @@ sqlrcursor::getOutputBindCursor(variable)
 
 bool
 sqlrcursor::openCachedResultSet(filename)
-	char	*filename
+	const char	*filename
 
 int
 sqlrcursor::colCount()
@@ -243,7 +243,7 @@ sqlrcursor::firstRowIndex()
 bool
 sqlrcursor::endOfResultSet()
 
-char *
+const char *
 sqlrcursor::errorMessage()
 
 void
@@ -265,12 +265,12 @@ sqlrcursor::validRow(row)
 	OUTPUT:
 		RETVAL
 
-char *
+const char *
 sqlrcursor::getField(row,...)
 		int	row
 	CODE:
-		char	*field;
-		long	length;
+		const char	*field;
+		long		length;
 		ST(0)=sv_newmortal();
 		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
 			field=THIS->getField(row,(int)SvIV(ST(2)));
@@ -324,11 +324,11 @@ sqlrcursor::getFieldLength(row,...)
 	OUTPUT:
 		RETVAL
 
-char **
+const char * const *
 sqlrcursor::getColumnNames()
 	PPCODE:
 		int	index=0;
-		char	**namesptr=THIS->getColumnNames();
+		const char * const *namesptr=THIS->getColumnNames();
 		EXTEND(SP,THIS->colCount());
 		if (namesptr) {
 			for (index=0; index<THIS->colCount(); index++) {
@@ -336,11 +336,11 @@ sqlrcursor::getColumnNames()
 			}
 		}
 
-char *
+const char *
 sqlrcursor::getColumnName(col)
 		int col
 
-char *
+const char *
 sqlrcursor::getColumnType(...)
 	CODE:
 		RETVAL=NULL;
@@ -508,4 +508,4 @@ sqlrcursor::resumeResultSet(id)
 bool
 sqlrcursor::resumeCachedResultSet(id,filename)
 		int id
-		char *filename
+		const char *filename

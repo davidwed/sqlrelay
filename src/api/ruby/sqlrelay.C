@@ -16,7 +16,7 @@ static void sqlrcon_free(void *sqlrcon) {
 static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 				VALUE user, VALUE password, 
 				VALUE tries, VALUE retrytime) {
-	char	*socketstr;
+	const char	*socketstr;
 	if (socket==Qnil) {
 		socketstr="";
 	} else {
@@ -54,7 +54,7 @@ static VALUE sqlrcon_getConnectionPort(VALUE self) {
 static VALUE sqlrcon_getConnectionSocket(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	char	*result=sqlrcon->getConnectionSocket();
+	const char	*result=sqlrcon->getConnectionSocket();
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -78,7 +78,7 @@ static VALUE sqlrcon_ping(VALUE self) {
 static VALUE sqlrcon_identify(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	char	*result=sqlrcon->identify();
+	const char	*result=sqlrcon->identify();
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -250,7 +250,7 @@ static VALUE sqlrcur_setCacheTtl(VALUE self, VALUE ttl) {
 static VALUE sqlrcur_getCacheFileName(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	*result=sqlrcur->getCacheFileName();
+	const char	*result=sqlrcur->getCacheFileName();
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -340,7 +340,7 @@ static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
 					(unsigned short)NUM2INT(precision),
 					(unsigned short)NUM2INT(scale));
 	} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
-		sqlrcur->substitution(STR2CSTR(variable),(char *)NULL);
+		sqlrcur->substitution(STR2CSTR(variable),(const char *)NULL);
 	}
 	return Qnil;
 }
@@ -365,7 +365,7 @@ static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
 					(unsigned short)NUM2INT(precision),
 					(unsigned short)NUM2INT(scale));
 	} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
-		sqlrcur->inputBind(STR2CSTR(variable),(char *)NULL);
+		sqlrcur->inputBind(STR2CSTR(variable),(const char *)NULL);
 	}
 	return Qnil;
 }
@@ -466,7 +466,8 @@ static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
 					(unsigned short)NUM2INT(precision),
 					(unsigned short)NUM2INT(scale));
 		} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
-			sqlrcur->substitution(STR2CSTR(variable),(char *)NULL);
+			sqlrcur->substitution(STR2CSTR(variable),
+						(const char *)NULL);
 		}
 	}
 	return Qnil;
@@ -510,7 +511,8 @@ static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
 					(unsigned short)NUM2INT(precision),
 					(unsigned short)NUM2INT(scale));
 		} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
-			sqlrcur->inputBind(STR2CSTR(variable),(char *)NULL);
+			sqlrcur->inputBind(STR2CSTR(variable),
+						(const char *)NULL);
 		}
 	}
 	return Qnil;
@@ -538,9 +540,9 @@ static VALUE sqlrcur_fetchFromBindCursor(VALUE self) {
 static VALUE sqlrcur_getOutputBind(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	*varname=STR2CSTR(variable);
-	char	*result=sqlrcur->getOutputBind(varname);
-	long	length=sqlrcur->getOutputBindLength(varname);
+	const char	*varname=STR2CSTR(variable);
+	const char	*result=sqlrcur->getOutputBind(varname);
+	long		length=sqlrcur->getOutputBindLength(varname);
 	if (result) {
 		return rb_str_new(result,length);
 	} else {
@@ -551,16 +553,16 @@ static VALUE sqlrcur_getOutputBind(VALUE self, VALUE variable) {
 static VALUE sqlrcur_getOutputBindAsLong(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	*varname=STR2CSTR(variable);
-	long	result=sqlrcur->getOutputBindAsLong(varname);
+	const char	*varname=STR2CSTR(variable);
+	long		result=sqlrcur->getOutputBindAsLong(varname);
 	return INT2NUM(result);
 }
 
 static VALUE sqlrcur_getOutputBindAsDouble(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	*varname=STR2CSTR(variable);
-	double	result=sqlrcur->getOutputBindAsDouble(varname);
+	const char	*varname=STR2CSTR(variable);
+	double		result=sqlrcur->getOutputBindAsDouble(varname);
 	return rb_float_new(result);
 }
 
@@ -625,7 +627,7 @@ static VALUE sqlrcur_endOfResultSet(VALUE self) {
 static VALUE sqlrcur_errorMessage(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	*result=sqlrcur->errorMessage();
+	const char	*result=sqlrcur->errorMessage();
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -650,8 +652,8 @@ static VALUE sqlrcur_getNullsAsNils(VALUE self) {
 static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	*result;
-	long	length;
+	const char	*result;
+	long		length;
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
 		result=sqlrcur->getField(NUM2INT(row),STR2CSTR(col));
 		length=sqlrcur->getFieldLength(NUM2INT(row),STR2CSTR(col));
@@ -705,7 +707,7 @@ static VALUE sqlrcur_getFieldLength(VALUE self, VALUE row, VALUE col) {
 static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	**fields=sqlrcur->getRow(NUM2INT(row));
+	const char * const *fields=sqlrcur->getRow(NUM2INT(row));
 	VALUE	fieldary=rb_ary_new2(sqlrcur->colCount());
 	for (int i=0; i<sqlrcur->colCount(); i++) {
 		if (fields[i]) {
@@ -720,7 +722,7 @@ static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
 static VALUE sqlrcur_getRowHash(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	**fields=sqlrcur->getRow(NUM2INT(row));
+	const char * const *fields=sqlrcur->getRow(NUM2INT(row));
 	VALUE	fieldhash=rb_hash_new();
 	for (int i=0; i<sqlrcur->colCount(); i++) {
 		if (fields[i]) {
@@ -766,7 +768,7 @@ static VALUE sqlrcur_getRowLengthsHash(VALUE self, VALUE row) {
 static VALUE sqlrcur_getColumnNames(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	**names=sqlrcur->getColumnNames();
+	const char * const *names=sqlrcur->getColumnNames();
 	if (!names) {
 		return Qnil;
 	}
@@ -784,7 +786,7 @@ static VALUE sqlrcur_getColumnNames(VALUE self) {
 static VALUE sqlrcur_getColumnName(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	*result=sqlrcur->getColumnName(NUM2INT(col));
+	const char	*result=sqlrcur->getColumnName(NUM2INT(col));
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -795,7 +797,7 @@ static VALUE sqlrcur_getColumnName(VALUE self, VALUE col) {
 static VALUE sqlrcur_getColumnType(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char		*result;
+	const char	*result;
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
 		result=sqlrcur->getColumnType(STR2CSTR(col));
 	} else {

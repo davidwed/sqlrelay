@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.8 2004-04-01 16:06:00 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.9 2005-01-19 06:09:51 mused Exp $
  */
 
 #include <strings.h>
@@ -350,7 +350,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	for (row = 0; row < cur->rowCount(); row++) {
 	  rowObj = Tcl_NewObj();
 	  for (col = 0; col < cur->colCount(); col++) {
-	    char *field = cur->getField(row, col);
+	    const char *field = cur->getField(row, col);
 	    if (field == (char *)NULL) { field = ""; }
 	    if (Tcl_ListObjAppendElement(interp, rowObj,
 					 Tcl_NewStringObj(field, -1))
@@ -975,7 +975,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     case SQLRCUR_getFieldByIndex:
       {
 	int row, col;
-	char *field = (char *)NULL;
+	const char *field = (const char *)NULL;
 	if (objc != 4) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "row col");
 	  return TCL_ERROR;
@@ -984,7 +984,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	    Tcl_GetIntFromObj(interp, objv[3], &col) != TCL_OK) {
 	  return TCL_ERROR;
 	}
-	if ((field = cur->getField(row, col)) == (char *)NULL) {
+	if ((field = cur->getField(row, col)) == (const char *)NULL) {
 	  field = "";
 	}
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(field, -1));
@@ -993,7 +993,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     case SQLRCUR_getFieldByName:
       {
 	int row;
-	char *field = (char *)NULL;
+	const char *field = (const char *)NULL;
 	if (objc != 4) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "row col");
 	  return TCL_ERROR;
@@ -1001,7 +1001,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if (Tcl_GetIntFromObj(interp, objv[2], &row) != TCL_OK) {
 	  return TCL_ERROR;
 	}
-	if ((field = cur->getField(row, Tcl_GetString(objv[3]))) == (char *)NULL) {
+	if ((field = cur->getField(row, Tcl_GetString(objv[3]))) == (const char *)NULL) {
 	  field = "";
 	}
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(field, -1));
@@ -1095,7 +1095,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     case SQLRCUR_getRow:
       {
 	int row, col;
-	char **rowarray;
+	const char * const *rowarray;
 	Tcl_Obj *resultList;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "row");
@@ -1107,9 +1107,8 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	rowarray = cur->getRow(row);
 	resultList = Tcl_NewObj();
 	for (col = 0; col < cur->colCount(); col++) {
-	  if (rowarray[col] == NULL) { rowarray[col] = ""; }
 	  if (Tcl_ListObjAppendElement(interp, resultList,
-				       Tcl_NewStringObj(rowarray[col], -1)) != TCL_OK) {
+				       Tcl_NewStringObj((rowarray[col])?rowarray[col]:"", -1)) != TCL_OK) {
 	    return TCL_ERROR;
 	  }
 	}
@@ -1142,7 +1141,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     case SQLRCUR_getColumnNames:
       {
 	int i = 0;
-	char **namearray;
+	const char * const *namearray;
 	Tcl_Obj *resultList;
 	if (objc > 2) {
 	  Tcl_WrongNumArgs(interp, 2, objv, NULL);
@@ -1150,7 +1149,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	}
 	namearray = cur->getColumnNames();
 	resultList = Tcl_NewObj();
-	while (namearray[i] != (char *)NULL) {
+	while (namearray[i] != (const char *)NULL) {
 	  if (Tcl_ListObjAppendElement(interp, resultList,
 				       Tcl_NewStringObj(namearray[i++], -1)) != TCL_OK) {
 	    return TCL_ERROR;
@@ -1162,7 +1161,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     case SQLRCUR_getColumnName:
       {
 	int col;
-	char *name = (char *)NULL;
+	const char *name = (const char *)NULL;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "col");
 	  return TCL_ERROR;
@@ -1170,7 +1169,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if (Tcl_GetIntFromObj(interp, objv[2], &col) != TCL_OK) {
 	  return TCL_ERROR;
 	}
-	if ((name = cur->getColumnName(col)) == (char *)NULL) {
+	if ((name = cur->getColumnName(col)) == (const char *)NULL) {
 	  name = "";
 	}
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(name, -1));
@@ -1179,7 +1178,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     case SQLRCUR_getColumnTypeByIndex:
       {
 	int col;
-	char *name = (char *)NULL;
+	const char *name = (const char *)NULL;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "col");
 	  return TCL_ERROR;
@@ -1187,7 +1186,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if (Tcl_GetIntFromObj(interp, objv[2], &col) != TCL_OK) {
 	  return TCL_ERROR;
 	}
-	if ((name = cur->getColumnType(col)) == (char *)NULL) {
+	if ((name = cur->getColumnType(col)) == (const char *)NULL) {
 	  name = "";
 	}
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(name, -1));
@@ -1195,12 +1194,12 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_getColumnTypeByName:
       {
-	char *name = (char *)NULL;
+	const char *name = (const char *)NULL;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "col");
 	  return TCL_ERROR;
 	}
-	if ((name = cur->getColumnType(Tcl_GetString(objv[2]))) == (char *)NULL) {
+	if ((name = cur->getColumnType(Tcl_GetString(objv[2]))) == (const char *)NULL) {
 	  name = "";
 	}
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(name, -1));
@@ -1713,7 +1712,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
   }
   case SQLR_RESUMESESSION: {
     int port;
-    char *socket;
+    const char *socket;
 
     if (objc != 4) {
       Tcl_WrongNumArgs(interp, 2, objv, "port socket");

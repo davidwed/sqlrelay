@@ -40,21 +40,21 @@ bool mysqlconnection::logIn() {
 	// For some newer versions, a NULL host causes problems, but an empty
 	// string is safe.
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
-	char	*hostval=(char *)((host && host[0])?host:"");
+	const char	*hostval=(host && host[0])?host:"";
 #else
-	char	*hostval=(char *)((host && host[0])?host:NULL);
+	const char	*hostval=(host && host[0])?host:NULL;
 #endif
 
 	// Handle db.
-	char	*dbval=(char *)((db && db[0])?db:"");
+	const char	*dbval=(db && db[0])?db:"";
 	
 	// log in
-	char	*user=getUser();
-	char	*password=getPassword();
+	const char	*user=getUser();
+	const char	*password=getPassword();
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	// Handle port and socket.
-	int	portval=(port && port[0])?atoi(port):0;
-	char	*socketval=(char *)((socket && socket[0])?socket:NULL);
+	int		portval=(port && port[0])?atoi(port):0;
+	const char	*socketval=(socket && socket[0])?socket:NULL;
 	#if MYSQL_VERSION_ID>=32200
 	// initialize database connection structure
 	if (!mysql_init(&mysql)) {
@@ -68,11 +68,11 @@ bool mysqlconnection::logIn() {
 						portval,socketval,0)) {
 	#endif
 		fprintf(stderr,"mysql_real_connect failed: %s\n",
-					(char *)mysql_error(&mysql));
+						mysql_error(&mysql));
 #else
 	if (!mysql_connect(&mysql,hostval,user,password)) {
 		fprintf(stderr,"mysql_connect failed: %s\n",
-					(char *)mysql_error(&mysql));
+						mysql_error(&mysql));
 #endif
 		logOut();
 		return false;
@@ -80,7 +80,7 @@ bool mysqlconnection::logIn() {
 #ifdef MYSQL_SELECT_DB
 	if (mysql_select_db(&mysql,dbval)) {
 		fprintf(stderr,"mysql_select_db failed: %s\n",
-					(char *)mysql_error(&mysql));
+						mysql_error(&mysql));
 		logOut();
 		return false;
 	}
@@ -116,7 +116,7 @@ bool mysqlconnection::ping() {
 }
 #endif
 
-char *mysqlconnection::identify() {
+const char *mysqlconnection::identify() {
 	return "mysql";
 }
 
@@ -221,10 +221,10 @@ bool mysqlcursor::executeQuery(const char *query, long length, bool execute) {
 	return true;
 }
 
-char *mysqlcursor::getErrorMessage(bool *liveconnection) {
+const char *mysqlcursor::getErrorMessage(bool *liveconnection) {
 
 	*liveconnection=true;
-	char	*err=(char *)mysql_error(&mysqlconn->mysql);
+	const char	*err=mysql_error(&mysqlconn->mysql);
 #if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
 		defined(HAVE_MYSQL_CR_SERVER_LOST) 
 	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR

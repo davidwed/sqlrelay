@@ -83,7 +83,7 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 
 		if (conn->removetrailingsemicolons==-1) {
 
-			char	*dbtype=conn->sqlrcon->identify();
+			const char	*dbtype=conn->sqlrcon->identify();
 			if (!dbtype) {
 				conn->error=new char[
 					strlen(result->sqlrcur->
@@ -162,7 +162,7 @@ char *PQresStatus(ExecStatusType status) {
 }
 
 char *PQresultErrorMessage(const PGresult *res) {
-	return res->sqlrcur->errorMessage();
+	return const_cast<char *>(res->sqlrcur->errorMessage());
 }
 
 
@@ -185,7 +185,7 @@ int PQbinaryTuples(const PGresult *res) {
 }
 
 char *PQfname(const PGresult *res, int field_num) {
-	return res->sqlrcur->getColumnName(field_num);
+	return const_cast<char *>(res->sqlrcur->getColumnName(field_num));
 }
 
 int PQfnumber(const PGresult *res, const char *field_name) {
@@ -554,7 +554,7 @@ Oid PQftype(const PGresult *res, int field_num) {
 
 	// if the type is numeric then we're using a postgresql database and
 	// typemangling is turned off, so we'll just return the type
-	char	*columntype=res->sqlrcur->getColumnType(field_num);
+	const char	*columntype=res->sqlrcur->getColumnType(field_num);
 	Oid	oid=atoi(columntype);
 	if (oid) {
 		return oid;
@@ -615,7 +615,7 @@ char *PQcmdTuples(PGresult *res) {
 }
 
 char *PQgetvalue(const PGresult *res, int tup_num, int field_num) {
-	return res->sqlrcur->getField(tup_num,field_num);
+	return const_cast<char *>(res->sqlrcur->getField(tup_num,field_num));
 }
 
 int PQgetlength(const PGresult *res, int tup_num, int field_num) {

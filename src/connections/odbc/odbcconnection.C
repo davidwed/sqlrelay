@@ -17,7 +17,7 @@ void odbcconnection::handleConnectString() {
 	dsn=connectStringValue("dsn");
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
-	char	*autocom=connectStringValue("autocommit");
+	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
@@ -107,7 +107,7 @@ bool odbcconnection::ping() {
 	return true;
 }
 
-char *odbcconnection::identify() {
+const char *odbcconnection::identify() {
 	return "odbc";
 }
 
@@ -576,7 +576,7 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 	return true;
 }
 
-char *odbccursor::getErrorMessage(bool *liveconnection) {
+const char *odbccursor::getErrorMessage(bool *liveconnection) {
 
 	SQLCHAR		error[501];
 	SQLCHAR		state[10];

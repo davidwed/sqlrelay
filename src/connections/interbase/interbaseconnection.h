@@ -47,40 +47,40 @@ class interbaseconnection;
 class interbasecursor : public sqlrcursor {
 	friend class interbaseconnection;
 	private:
-			interbasecursor(sqlrconnection *conn);
-			~interbasecursor();
-		bool	prepareQuery(const char *query, long length);
-		bool	inputBindString(const char *variable, 
-					unsigned short variablesize,
-					const char *value, 
-					unsigned short valuesize,
-					short *isnull);
-		bool	inputBindLong(const char *variable, 
-					unsigned short variablesize,
-					unsigned long *value);
-		bool	inputBindDouble(const char *variable, 
-					unsigned short variablesize,
-					double *value, 
-					unsigned short precision,
-					unsigned short scale);
-		bool	outputBindString(const char *variable, 
-					unsigned short variablesize,
-					char *value, 
-					unsigned short valuesize,
-					short *isnull);
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		bool	queryIsNotSelect();
-		bool	queryIsCommitOrRollback();
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
+				interbasecursor(sqlrconnection *conn);
+				~interbasecursor();
+		bool		prepareQuery(const char *query, long length);
+		bool		inputBindString(const char *variable, 
+						unsigned short variablesize,
+						const char *value, 
+						unsigned short valuesize,
+						short *isnull);
+		bool		inputBindLong(const char *variable, 
+						unsigned short variablesize,
+						unsigned long *value);
+		bool		inputBindDouble(const char *variable, 
+						unsigned short variablesize,
+						double *value, 
+						unsigned short precision,
+						unsigned short scale);
+		bool		outputBindString(const char *variable, 
+						unsigned short variablesize,
+						char *value, 
+						unsigned short valuesize,
+						short *isnull);
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		bool		queryIsNotSelect();
+		bool		queryIsCommitOrRollback();
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
 
 		isc_stmt_handle	stmt;
 		XSQLDA	ISC_FAR	*outsqlda;
@@ -120,7 +120,7 @@ class interbaseconnection : public sqlrconnection {
 		isc_db_handle	db;
 		isc_tr_handle	tr;
 
-		char		*database;
+		const char	*database;
 		int		dialect;
 
 		environment	*env;

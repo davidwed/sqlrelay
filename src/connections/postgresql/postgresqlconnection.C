@@ -37,7 +37,7 @@ void postgresqlconnection::handleConnectString() {
 	db=connectStringValue("db");
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
-	char	*typemang=connectStringValue("typemangling");
+	const char	*typemang=connectStringValue("typemangling");
 	typemangling=0;
 	if (typemang) {
 		if (!charstring::compareIgnoringCase(typemang,"yes")) {
@@ -137,7 +137,7 @@ void postgresqlconnection::logOut() {
 	}
 }
 
-char *postgresqlconnection::identify() {
+const char *postgresqlconnection::identify() {
 	return "postgresql";
 }
 
@@ -158,7 +158,7 @@ bool postgresqlcursor::executeQuery(const char *query, long length,
 
 	// fake binds
 	stringbuffer	*newquery=fakeInputBinds(query);
-	char	*queryptr=(char *)query;
+	const char	*queryptr=query;
 	if (newquery) {
 		queryptr=newquery->getString();
 	}
@@ -201,7 +201,7 @@ bool postgresqlcursor::executeQuery(const char *query, long length,
 	return true;
 }
 
-char *postgresqlcursor::getErrorMessage(bool *liveconnection) {
+const char *postgresqlcursor::getErrorMessage(bool *liveconnection) {
 	*liveconnection=(PQstatus(postgresqlconn->pgconn)==CONNECTION_OK);
 	return PQerrorMessage(postgresqlconn->pgconn);
 }

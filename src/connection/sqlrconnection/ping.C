@@ -12,8 +12,8 @@ void sqlrconnection::pingCommand() {
 
 bool sqlrconnection::ping() {
 	sqlrcursor	*pingcur=initCursor();
-	char	*pingquery=pingQuery();
-	int	pingquerylen=charstring::length(pingQuery());
+	const char	*pingquery=pingQuery();
+	int		pingquerylen=charstring::length(pingQuery());
 	if (pingcur->openCursor(-1) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
 		pingcur->executeQuery(pingquery,pingquerylen,true)) {
@@ -27,6 +27,6 @@ bool sqlrconnection::ping() {
 	return false;
 }
 
-char *sqlrconnection::pingQuery() {
+const char *sqlrconnection::pingQuery() {
 	return "select 1";
 }

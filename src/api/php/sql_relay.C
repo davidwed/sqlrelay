@@ -117,7 +117,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_getconnectionport) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_getconnectionsocket) {
 	zval **sqlrcon;
-	char *r;
+	const char *r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -127,7 +127,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_getconnectionsocket) {
 	if (connection) {
 		r=connection->getConnectionSocket();
 		if (r) {
-			RETURN_STRING(r,1);
+			RETURN_STRING(const_cast<char *>(r),1);
 		}
 	}
 	RETURN_FALSE;
@@ -348,7 +348,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_setcachettl) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcachefilename) {
 	zval **sqlrcur;
-	char *r;
+	const char *r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -358,7 +358,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcachefilename) {
 	if (cursor) {
 		r=cursor->getCacheFileName();
 		if (r) {
-			RETURN_STRING(r,1);
+			RETURN_STRING(const_cast<char *>(r),1);
 		}
 	}
 	RETURN_FALSE;
@@ -504,7 +504,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_substitution) {
 			convert_to_double_ex(value);
 			cursor->substitution((*variable)->value.str.val,(*value)->value.dval,(unsigned short)(*precision)->value.lval,(unsigned short)(*scale)->value.lval);
 		} else if (Z_TYPE_PP(value)==IS_NULL) {
-			cursor->substitution((*variable)->value.str.val,(char *)NULL);
+			cursor->substitution((*variable)->value.str.val,(const char *)NULL);
 		}
 	}
 }
@@ -563,7 +563,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbind) {
 			convert_to_double_ex(value);
 			cursor->inputBind((*variable)->value.str.val,(*value)->value.dval,(unsigned short)(*precision)->value.lval,(unsigned short)(*scale)->value.lval);
 		} else if (Z_TYPE_PP(value)==IS_NULL) {
-			cursor->inputBind((*variable)->value.str.val,(char *)NULL);
+			cursor->inputBind((*variable)->value.str.val,(const char *)NULL);
 		}
 	}
 }
@@ -703,7 +703,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_substitutions) {
 				convert_to_long_ex(scale);
 				cursor->substitution((*var)->value.str.val,(*val)->value.dval,(unsigned short)(*precision)->value.lval,(unsigned short)(*scale)->value.lval);
 			} else if (Z_TYPE_PP(val)==IS_NULL) {
-				cursor->substitution((*var)->value.str.val,(char *)NULL);
+				cursor->substitution((*var)->value.str.val,(const char *)NULL);
 			}
 		}
 	}
@@ -749,7 +749,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbinds) {
 				convert_to_double_ex(val);
 				cursor->inputBind((*var)->value.str.val,(*val)->value.dval,(unsigned short)(*precision)->value.lval,(unsigned short)(*scale)->value.lval);
 			} else if (Z_TYPE_PP(val)==IS_NULL) {
-				cursor->inputBind((*var)->value.str.val,(char *)NULL);
+				cursor->inputBind((*var)->value.str.val,(const char *)NULL);
 			}
 		}
 	}
@@ -802,7 +802,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_fetchfrombindcursor) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbind) {
 	zval **sqlrcur,**variable;
-	char *r;
+	const char *r;
 	long rl;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
@@ -815,7 +815,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbind) {
 		r=cursor->getOutputBind((*variable)->value.str.val);
 		rl=cursor->getOutputBindLength((*variable)->value.str.val);
 		if (r) {
-			RETURN_STRINGL(r,rl,1);
+			RETURN_STRINGL(const_cast<char *>(r),rl,1);
 		}
 	}
 	RETURN_NULL();
@@ -1004,7 +1004,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_endofresultset) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_errormessage) {
 	zval **sqlrcur;
-	char *r;
+	const char *r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1014,7 +1014,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_errormessage) {
 	if (cursor) {
 		r=cursor->errorMessage();
 		if (r) {
-			RETURN_STRING(r,1);
+			RETURN_STRING(const_cast<char *>(r),1);
 		}
 	}
 	RETURN_NULL();
@@ -1048,7 +1048,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getnullsasnulls) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 	zval **sqlrcur,**row,**col;
-	char *r=NULL;
+	const char *r=NULL;
 	long rl;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
@@ -1068,7 +1068,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 			rl=cursor->getFieldLength((*row)->value.lval,(*col)->value.str.val);
 		}
 		if (r) {
-			RETURN_STRINGL(r,rl,1);
+			RETURN_STRINGL(const_cast<char *>(r),rl,1);
 		}
 	}
 	RETURN_NULL();
@@ -1145,7 +1145,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldlength) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 	zval **sqlrcur,**row;
-	char **r;
+	const char * const *r;
 	int i;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
@@ -1168,14 +1168,15 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 		if (!r[i]) {
 			add_next_index_null(return_value);
 		} else {
-			add_next_index_string(return_value,r[i],1);
+			add_next_index_string(return_value,const_cast<char *>(r[i]),1);
 		}
 	}
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 	zval **sqlrcur,**row;
-	char **r,**rC;
+	const char * const *r;
+	const char * const *rC;
 	int i;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
@@ -1204,9 +1205,9 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 	}
 	for (i=0; i<cursor->colCount(); i++) {
 		if (!r[i]) {
-			add_assoc_null(return_value,rC[i]);
+			add_assoc_null(return_value,const_cast<char *>(rC[i]));
 		} else {
-			add_assoc_string(return_value,rC[i],r[i],1);
+			add_assoc_string(return_value,const_cast<char *>(rC[i]),const_cast<char *>(r[i]),1);
 		}
 	}
 }
@@ -1240,7 +1241,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengths) {
 DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengthsassoc) {
 	zval **sqlrcur,**row;
 	long *r;
-	char **rC;
+	const char * const *rC;
 	int i;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
@@ -1268,13 +1269,13 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengthsassoc) {
 		RETURN_FALSE;
 	}
 	for (i=0; i<cursor->colCount(); i++) {
-		add_assoc_long(return_value,rC[i],r[i]);
+		add_assoc_long(return_value,const_cast<char *>(rC[i]),r[i]);
 	}
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnnames) {
 	zval **sqlrcur;
-	char **r;
+	const char * const *r;
 	int i;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
@@ -1293,13 +1294,13 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnnames) {
 		RETURN_FALSE;
 	}
 	for (i=0; i<cursor->colCount(); i++) {
-		add_next_index_string(return_value,r[i],1);
+		add_next_index_string(return_value,const_cast<char *>(r[i]),1);
 	}
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnname) {
 	zval **sqlrcur,**col;
-	char *r;
+	const char *r;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1310,7 +1311,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnname) {
 	if (cursor) {
 		r=cursor->getColumnName((*col)->value.lval);
 		if (r) {
-			RETURN_STRING(r,1);
+			RETURN_STRING(const_cast<char *>(r),1);
 		}
 	}
 	RETURN_FALSE;
@@ -1318,7 +1319,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnname) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumntype) {
 	zval **sqlrcur,**col;
-	char *r=NULL;
+	const char *r=NULL;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1334,7 +1335,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumntype) {
 			r=cursor->getColumnType((*col)->value.str.val);
 		}
 		if (r) {
-			RETURN_STRING(r,1);
+			RETURN_STRING(const_cast<char *>(r),1);
 		}
 	}
 	RETURN_FALSE;
@@ -1750,7 +1751,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_rollback) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_identify) {
 	zval **sqlrcon;
-	char *r;
+	const char *r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1760,7 +1761,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_identify) {
 	if (connection) {
 		r=connection->identify();
 		if (r) {
-			RETURN_STRING(r,1);
+			RETURN_STRING(const_cast<char *>(r),1);
 		}
 	}
 	RETURN_FALSE;

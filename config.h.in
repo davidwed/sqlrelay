@@ -300,6 +300,9 @@
 /* Some versions of sqlite are transactional */
 #undef SQLITE_TRANSACTIONAL
 
+/* Compiler supports namespaces */
+#undef SQLRELAY_NAMESPACE
+
 /* Some systems use SQLLEN * in SQLRowCount */
 #undef SQLROWCOUNT_SQLLEN
 

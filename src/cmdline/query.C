@@ -11,6 +11,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 int main(int argc, const char **argv) {
 
 	#include <version.h>
@@ -19,20 +23,20 @@ int main(int argc, const char **argv) {
 	usercontainer	*currentnode=NULL;
 
 	commandline	cmdline(argc,argv);
-	char		*host;
+	const char	*host;
 	int		port;
-	char		*socket;
-	char		*user;
-	char		*password;
-	char		*query="";
+	const char	*socket;
+	const char	*user;
+	const char	*password;
+	const char	*query="";
 	int		debug=0;
 	int		exitval=0;
 
-	char	*config=cmdline.value("-config");
+	const char	*config=cmdline.value("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
-	char	*id=cmdline.value("-id");
+	const char	*id=cmdline.value("-id");
 	if (!(id && id[0])) {
 
 
@@ -44,12 +48,12 @@ int main(int argc, const char **argv) {
 			exit(1);
 		}
 
-		host=(char *)argv[1];
+		host=argv[1];
 		port=atoi(argv[2]);
-		socket=(char *)argv[3];
-		user=(char *)argv[4];
-		password=(char *)argv[5];
-		query=(char *)argv[6];
+		socket=argv[3];
+		user=argv[4];
+		password=argv[5];
+		query=argv[6];
 		if (argv[7] && !charstring::compare(argv[7],"debug")) {
 			debug=1;
 		}
@@ -81,7 +85,7 @@ int main(int argc, const char **argv) {
 				if (!charstring::compare(argv[i],"debug")) {
 					continue;
 				}
-				query=(char *)argv[i];
+				query=argv[i];
 				break;
 			}
 		} else {
@@ -101,9 +105,9 @@ int main(int argc, const char **argv) {
 	sqlrcur.dontGetColumnInfo();
 	sqlrcur.setResultSetBufferSize(100);
 	if (sqlrcur.sendQuery(query)) {
-		int	i=0;
-		int	cols=sqlrcur.colCount();
-		char	*field="";
+		int		i=0;
+		int		cols=sqlrcur.colCount();
+		const char	*field="";
 		while (cols && field) {
 			for (int j=0; j<cols; j++) {
 				if ((field=sqlrcur.getField(i,j))) {

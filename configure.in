@@ -687,6 +687,7 @@ echo "***** Structures *************"
 AC_TYPE_MODE_T
 AC_TYPE_SIGNAL
 FW_CHECK_SIGNALS
+FW_CXX_NAMESPACES
 echo "******************************"
 
 

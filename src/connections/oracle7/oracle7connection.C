@@ -27,7 +27,7 @@ void oracle7connection::handleConnectString() {
 	setPassword(connectStringValue("password"));
 	sid=connectStringValue("oracle_sid");
 	home=connectStringValue("oracle_home");
-	char	*autocom=connectStringValue("autocommit");
+	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
@@ -118,11 +118,11 @@ bool oracle7connection::rollback() {
 	return (!orol(&lda));
 }
 
-char *oracle7connection::pingQuery() {
+const char *oracle7connection::pingQuery() {
 	return "select 1 from dual";
 }
 
-char *oracle7connection::identify() {
+const char *oracle7connection::identify() {
 	return "oracle7";
 }
 
@@ -328,7 +328,7 @@ bool oracle7cursor::queryIsCommitOrRollback() {
 	return (cda.ft==COMMIT_QUERY || cda.ft==ROLLBACK_QUERY);
 }
 
-char *oracle7cursor::getErrorMessage(bool *liveconnection) {
+const char *oracle7cursor::getErrorMessage(bool *liveconnection) {
 
 	// get the message from oracle
 	text	message[512];

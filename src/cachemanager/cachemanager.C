@@ -35,7 +35,7 @@ cachemanager::cachemanager(int argc, const char **argv) {
 	commandline	cmdl(argc,argv);
 
 	// get the scaninterval
-	char	*scanint=cmdl.value("-scaninterval");
+	const char	*scanint=cmdl.value("-scaninterval");
 	if (scanint && scanint[0]) {
 		scaninterval=atoi(scanint);
 	} else {
@@ -43,7 +43,7 @@ cachemanager::cachemanager(int argc, const char **argv) {
 	}
 
 	// get the directories to scan
-	char	*cachedirs=cmdl.value("-cachedirs");
+	const char	*cachedirs=cmdl.value("-cachedirs");
 	parseCacheDirs(cachedirs);
 }
 
@@ -101,7 +101,7 @@ void cachemanager::scan() {
 		}
 
 		// wait...
-		sleep::macrosleep(scaninterval);
+		rudiments::sleep::macrosleep(scaninterval);
 	}
 
 }

@@ -7,33 +7,37 @@
 
 #include <rudiments/commandline.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 class cmdline : public commandline {
 	public:
 			cmdline(int argc, const char **argv);
 
-		char	*getConfig() const;
-		char	*getId() const;
-		char	*getLocalStateDir() const;
+		const char	*getConfig() const;
+		const char	*getId() const;
+		const char	*getLocalStateDir() const;
 	private:
 		void	setConfig();
 		void	setId();
 		void	setLocalStateDir();
 
 		// command line parameters
-		char	*id;
-		char	*config;
-		char	*localstatedir;
+		const char	*id;
+		const char	*config;
+		const char	*localstatedir;
 };
 
-inline char	*cmdline::getConfig() const {
+inline const char *cmdline::getConfig() const {
 	return config;
 }
 
-inline char	*cmdline::getId() const {
+inline const char *cmdline::getId() const {
 	return id;
 }
 
-inline char	*cmdline::getLocalStateDir() const {
+inline const char *cmdline::getLocalStateDir() const {
 	return localstatedir;
 }
 

@@ -17,21 +17,21 @@ class mdbtoolsconnection;
 class mdbtoolscursor : public sqlrcursor {
 	friend class mdbtoolsconnection;
 	private:
-			mdbtoolscursor(sqlrconnection *conn);
-		bool	openCursor(int id);
-		bool	closeCursor();
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
+				mdbtoolscursor(sqlrconnection *conn);
+		bool		openCursor(int id);
+		bool		closeCursor();
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 
 		mdbtoolsconnection	*mdbtoolsconn;
 
@@ -57,7 +57,7 @@ class mdbtoolsconnection : public sqlrconnection {
 		bool	commit();
 		bool	rollback();
 
-		char	*db;
+		const char	*db;
 };
 
 #endif

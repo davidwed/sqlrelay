@@ -38,7 +38,7 @@ int	sqlrcon_getConnectionPort(sqlrcon sqlrconref) {
 	return sqlrconref->getConnectionPort();
 }
 
-char	*sqlrcon_getConnectionSocket(sqlrcon sqlrconref) {
+const char	*sqlrcon_getConnectionSocket(sqlrcon sqlrconref) {
 	return sqlrconref->getConnectionSocket();
 }
 
@@ -51,7 +51,7 @@ int	sqlrcon_ping(sqlrcon sqlrconref) {
 	return sqlrconref->ping();
 }
 
-char	*sqlrcon_identify(sqlrcon sqlrconref) {
+const char	*sqlrcon_identify(sqlrcon sqlrconref) {
 	return sqlrconref->identify();
 }
 
@@ -134,7 +134,7 @@ void	sqlrcur_setCacheTtl(sqlrcur sqlrcurref, int ttl) {
 	sqlrcurref->setCacheTtl(ttl);
 }
 
-char	*sqlrcur_getCacheFileName(sqlrcur sqlrcurref) {
+const char	*sqlrcur_getCacheFileName(sqlrcur sqlrcurref) {
 	return sqlrcurref->getCacheFileName();
 }
 
@@ -288,7 +288,8 @@ void	sqlrcur_defineOutputBindCursor(sqlrcur sqlrcurref,
 	sqlrcurref->defineOutputBindCursor(variable);
 }
 
-char	*sqlrcur_getOutputBind(sqlrcur sqlrcurref, const char *variable) {
+const char	*sqlrcur_getOutputBind(sqlrcur sqlrcurref,
+					const char *variable) {
 	return sqlrcurref->getOutputBind(variable);
 }
 
@@ -338,7 +339,7 @@ int	sqlrcur_endOfResultSet(sqlrcur sqlrcurref) {
 	return sqlrcurref->endOfResultSet();
 }
 
-char	*sqlrcur_errorMessage(sqlrcur sqlrcurref) {
+const char	*sqlrcur_errorMessage(sqlrcur sqlrcurref) {
 	return sqlrcurref->errorMessage();
 }
 
@@ -350,11 +351,12 @@ void	sqlrcur_getNullsAsNulls(sqlrcur sqlrcurref) {
 	sqlrcurref->getNullsAsNulls();
 }
 
-char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col) {
+const char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col) {
 	return sqlrcurref->getField(row,col);
 }
 
-char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row, const char *col) {
+const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row,
+							const char *col) {
 	return sqlrcurref->getField(row,col);
 }
 
@@ -387,7 +389,7 @@ long	sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref,
 	return sqlrcurref->getFieldLength(row,col);
 }
 
-char	**sqlrcur_getRow(sqlrcur sqlrcurref, int row) {
+const char * const *sqlrcur_getRow(sqlrcur sqlrcurref, int row) {
 	return sqlrcurref->getRow(row);
 }
 
@@ -395,15 +397,15 @@ long	*sqlrcur_getRowLengths(sqlrcur sqlrcurref, int row) {
 	return sqlrcurref->getRowLengths(row);
 }
 
-char	**sqlrcur_getColumnNames(sqlrcur sqlrcurref) {
+const char * const *sqlrcur_getColumnNames(sqlrcur sqlrcurref) {
 	return sqlrcurref->getColumnNames();
 }
 
-char	*sqlrcur_getColumnName(sqlrcur sqlrcurref, int col) {
+const char	*sqlrcur_getColumnName(sqlrcur sqlrcurref, int col) {
 	return sqlrcurref->getColumnName(col);
 }
 
-char	*sqlrcur_getColumnTypeByIndex(sqlrcur sqlrcurref, int col) {
+const char	*sqlrcur_getColumnTypeByIndex(sqlrcur sqlrcurref, int col) {
 	return sqlrcurref->getColumnType(col);
 }
 
@@ -411,7 +413,8 @@ int	sqlrcur_getColumnLengthByIndex(sqlrcur sqlrcurref, int col) {
 	return sqlrcurref->getColumnLength(col);
 }
 
-char	*sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref, const char *col) {
+const char	*sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref,
+						const char *col) {
 	return sqlrcurref->getColumnType(col);
 }
 

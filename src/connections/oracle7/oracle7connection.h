@@ -70,43 +70,43 @@ class oracle7connection;
 class oracle7cursor : public sqlrcursor {
 	friend class oracle7connection;
 	private:
-			oracle7cursor(sqlrconnection *conn);
-			~oracle7cursor();
-		bool	openCursor(int id);
-		bool	closeCursor();
-		bool	prepareQuery(const char *query, long length);
-		bool	inputBindString(const char *variable, 
-					unsigned short variablesize,
-					const char *value, 
-					unsigned short valuesize,
-					short *isnull);
-		bool	inputBindLong(const char *variable, 
-					unsigned short variablesize,
-					unsigned long *value);
-		bool	inputBindDouble(const char *variable, 
-					unsigned short variablesize,
-					double *value,
-					unsigned short precision,
-					unsigned short scale);
-		bool	outputBindString(const char *variable, 
-					unsigned short variablesize,
-					char *value,
-					unsigned short valuesize,
-					short *isnull);
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
-		bool	queryIsNotSelect();
-		bool	queryIsCommitOrRollback();
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
+				oracle7cursor(sqlrconnection *conn);
+				~oracle7cursor();
+		bool		openCursor(int id);
+		bool		closeCursor();
+		bool		prepareQuery(const char *query, long length);
+		bool		inputBindString(const char *variable, 
+						unsigned short variablesize,
+						const char *value, 
+						unsigned short valuesize,
+						short *isnull);
+		bool		inputBindLong(const char *variable, 
+						unsigned short variablesize,
+						unsigned long *value);
+		bool		inputBindDouble(const char *variable, 
+						unsigned short variablesize,
+						double *value,
+						unsigned short precision,
+						unsigned short scale);
+		bool		outputBindString(const char *variable, 
+						unsigned short variablesize,
+						char *value,
+						unsigned short valuesize,
+						short *isnull);
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
+		bool		queryIsNotSelect();
+		bool		queryIsCommitOrRollback();
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 	private:
 
 		Cda_Def		cda;
@@ -136,24 +136,24 @@ class oracle7connection : public sqlrconnection {
 			oracle7connection();
 			~oracle7connection();
 	private:
-		int	getNumberOfConnectStringVars();
-		void	handleConnectString();
-		bool	logIn();
+		int		getNumberOfConnectStringVars();
+		void		handleConnectString();
+		bool		logIn();
 		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
-		void	logOut();
-		bool	autoCommitOn();
-		bool	autoCommitOff();
-		bool	commit();
-		bool	rollback();
-		char	*pingQuery();
-		char	*identify();
+		void		deleteCursor(sqlrcursor *curs);
+		void		logOut();
+		bool		autoCommitOn();
+		bool		autoCommitOff();
+		bool		commit();
+		bool		rollback();
+		const char	*pingQuery();
+		const char	*identify();
 
 		Lda_Def		lda;
 		ub4		hda[256/sizeof(ub4)];
 
-		char		*home;
-		char		*sid;
+		const char	*home;
+		const char	*sid;
 
 		environment	*env;
 };

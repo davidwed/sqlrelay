@@ -9,7 +9,7 @@ void sqlrconnection::identifyCommand() {
 	debugPrint("connection",1,"identify");
 	#endif
 
-	char		*ident=identify();
+	const char	*ident=identify();
 	unsigned short	idlen=(unsigned short)charstring::length(ident);
 	clientsock->write(idlen);
 	clientsock->write(ident,idlen);

@@ -20,7 +20,7 @@ char	*curGetStringUTFChars(JNIEnv *env, jstring string, jboolean *modifier) {
 }
 
 void	curReleaseStringUTFChars(JNIEnv *env, jstring string, char *chararray) {
-	if (string) {
+	if (string && chararray) {
 		env->ReleaseStringUTFChars(string,chararray);
 	}
 }
@@ -1099,7 +1099,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getRow
 	jobjectArray	retarray=env->NewObjectArray(colcount,
 					env->FindClass("java/lang/String"),
 					env->NewStringUTF(""));
-	char	**field=cur->getRow((int)row);
+	const char * const *field=cur->getRow((int)row);
 	for (int i=0; i<colcount; i++) {
 		env->SetObjectArrayElement(retarray,i,
 					env->NewStringUTF(field[i]));
@@ -1146,7 +1146,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumn
 	jobjectArray	retarray=env->NewObjectArray(colcount,
 					env->FindClass("java/lang/String"),
 					env->NewStringUTF(""));
-	char	**colnames=cur->getColumnNames();
+	const char * const *colnames=cur->getColumnNames();
 	if (!colnames) {
 		return 0;
 	}

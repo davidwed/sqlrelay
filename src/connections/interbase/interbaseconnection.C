@@ -32,12 +32,12 @@ void interbaseconnection::handleConnectString() {
 
 	// override legacy "database" parameter with modern "db" parameter
 	database=connectStringValue("database");
-	char *tmp=connectStringValue("db");
+	const char	*tmp=connectStringValue("db");
 	if (tmp && tmp[0]) {
 		database=tmp;
 	}
 
-	char	*dialectstr=connectStringValue("dialect");
+	const char	*dialectstr=connectStringValue("dialect");
 	if (dialectstr) {
 		dialect=atoi(dialectstr);
 		if (dialect<1) {
@@ -51,7 +51,7 @@ void interbaseconnection::handleConnectString() {
 	}
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
-	char	*autocom=connectStringValue("autocommit");
+	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
@@ -67,20 +67,20 @@ bool interbaseconnection::logIn() {
 	dpblength=dpbptr-dpb;
 
 	// handle user/password parameters
-	char	*user=getUser();
+	const char	*user=getUser();
 	if (user) {
 		env->setValue("ISC_USER",user);
 	}
-	char	*password=getPassword();
+	const char	*password=getPassword();
 	if (password) {
 		env->setValue("ISC_PASSWORD",password);
 	}
 
 	// attach to the database
 	if (isc_attach_database(error,charstring::length(database),
-							database,&db,
-							//dpblength,dpb)) {
-							0,NULL)) {
+					const_cast<char *>(database),&db,
+					//dpblength,dpb)) {
+					0,NULL)) {
 		db=0L;
 		return false;
 	}
@@ -498,7 +498,7 @@ bool interbasecursor::queryIsCommitOrRollback() {
 		querytype==isc_info_sql_stmt_rollback);
 }
 
-char *interbasecursor::getErrorMessage(bool *liveconnection) {
+const char *interbasecursor::getErrorMessage(bool *liveconnection) {
 
 	char	msg[512];
 	long	*pvector=interbaseconn->error;

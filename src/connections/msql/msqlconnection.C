@@ -26,18 +26,18 @@ void msqlconnection::handleConnectString() {
 bool msqlconnection::logIn() {
 
 	// handle db
-	char	*dbval;
+	const char	*dbval;
 	if (db && db[0]) {
 		dbval=db;
 	} else {
 		dbval="";
 	}
 
-	if ((msql=msqlConnect(host))==-1) {
+	if ((msql=msqlConnect(const_cast<char *>(host)))==-1) {
 		return false;
 	}
 
-	if (msqlSelectDB(msql,dbval)==-1) {
+	if (msqlSelectDB(msql,const_cast<char *>(dbval))==-1) {
 		logOut();
 		return false;
 	}
@@ -114,13 +114,14 @@ bool msqlcursor::executeQuery(const char *query, long length,bool execute) {
 
 	// execute the query
 	if (newquery) {
-		if (msqlQuery(msqlconn->msql,newquery->getString())==-1) {
+		if (msqlQuery(msqlconn->msql,
+			const_cast<char *>(newquery->getString()))==-1) {
 			delete newquery;
 			return false;
 		}
 		delete newquery;
 	} else {
-		if (msqlQuery(msqlconn->msql,(char *)query)==-1) {
+		if (msqlQuery(msqlconn->msql,const_cast<char *>(query))==-1) {
 			return false;
 		}
 	}
@@ -147,7 +148,7 @@ bool msqlcursor::executeQuery(const char *query, long length,bool execute) {
 	return true;
 }
 
-char *msqlcursor::getErrorMessage(bool *liveconnection) {
+const char *msqlcursor::getErrorMessage(bool *liveconnection) {
 
 	*liveconnection=true;
 	if (!charstring::compareIgnoringCase(msqlErrMsg,

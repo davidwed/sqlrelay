@@ -58,87 +58,87 @@ class oracle8connection;
 class oracle8cursor : public sqlrcursor {
 	friend class oracle8connection;
 	private:
-			oracle8cursor(sqlrconnection *conn);
-			~oracle8cursor();
-		bool	openCursor(int id);
-		bool	closeCursor();
-		bool	prepareQuery(const char *query, long length);
-		bool	inputBindString(const char *variable, 
-					unsigned short variablesize,
-					const char *value, 
-					unsigned short valuesize,
-					short *isnull);
-		bool	inputBindLong(const char *variable, 
-					unsigned short variablesize,
-					unsigned long *value);
-		bool	inputBindDouble(const char *variable, 
-					unsigned short variablesize,
-					double *value,
-					unsigned short precision,
-					unsigned short scale);
-		bool	outputBindString(const char *variable, 
-					unsigned short variablesize,
-					char *value,
-					unsigned short valuesize,
-					short *isnull);
+				oracle8cursor(sqlrconnection *conn);
+				~oracle8cursor();
+		bool		openCursor(int id);
+		bool		closeCursor();
+		bool		prepareQuery(const char *query, long length);
+		bool		inputBindString(const char *variable, 
+						unsigned short variablesize,
+						const char *value, 
+						unsigned short valuesize,
+						short *isnull);
+		bool		inputBindLong(const char *variable, 
+						unsigned short variablesize,
+						unsigned long *value);
+		bool		inputBindDouble(const char *variable, 
+						unsigned short variablesize,
+						double *value,
+						unsigned short precision,
+						unsigned short scale);
+		bool		outputBindString(const char *variable, 
+						unsigned short variablesize,
+						char *value,
+						unsigned short valuesize,
+						short *isnull);
 #ifdef HAVE_ORACLE_8i
-		bool	inputBindBlob(const char *variable, 
-					unsigned short variablesize,
-					const char *value, 
-					unsigned long valuesize,
-					short *isnull);
-		bool	inputBindClob(const char *variable, 
-					unsigned short variablesize,
-					const char *value, 
-					unsigned long valuesize,
-					short *isnull);
-		bool	inputBindGenericLob(const char *variable, 
-					unsigned short variablesize,
-					const char *value, 
-					unsigned long valuesize,
-					short *isnull,
-					ub1 temptype,
-					ub2 type);
-		bool	outputBindBlob(const char *variable, 
-					unsigned short variablesize,
-					int index,
-					short *isnull);
-		bool	outputBindClob(const char *variable, 
-					unsigned short variablesize,
-					int index,
-					short *isnull);
-		bool	outputBindGenericLob(const char *variable, 
-					unsigned short variablesize,
-					int index,
-					short *isnull,
-					ub2 type);
-		bool	outputBindCursor(const char *variable,
-					unsigned short variablesize,
-					sqlrcursor *cursor);
-		void	returnOutputBindBlob(int index);
-		void	returnOutputBindClob(int index);
-		void	returnOutputBindGenericLob(int index);
+		bool		inputBindBlob(const char *variable, 
+						unsigned short variablesize,
+						const char *value, 
+						unsigned long valuesize,
+						short *isnull);
+		bool		inputBindClob(const char *variable, 
+						unsigned short variablesize,
+						const char *value, 
+						unsigned long valuesize,
+						short *isnull);
+		bool		inputBindGenericLob(const char *variable, 
+						unsigned short variablesize,
+						const char *value, 
+						unsigned long valuesize,
+						short *isnull,
+						ub1 temptype,
+						ub2 type);
+		bool		outputBindBlob(const char *variable, 
+						unsigned short variablesize,
+						int index,
+						short *isnull);
+		bool		outputBindClob(const char *variable, 
+						unsigned short variablesize,
+						int index,
+						short *isnull);
+		bool		outputBindGenericLob(const char *variable, 
+						unsigned short variablesize,
+						int index,
+						short *isnull,
+						ub2 type);
+		bool		outputBindCursor(const char *variable,
+						unsigned short variablesize,
+						sqlrcursor *cursor);
+		void		returnOutputBindBlob(int index);
+		void		returnOutputBindClob(int index);
+		void		returnOutputBindGenericLob(int index);
 #endif
-		bool	executeQuery(const char *query,
-					long length,
-					bool execute);
+		bool		executeQuery(const char *query,
+						long length,
+						bool execute);
 #ifdef HAVE_ORACLE_8i
-		void	checkForTempTable(const char *query,
-						unsigned long length);
+		void		checkForTempTable(const char *query,
+							unsigned long length);
 #endif
-		bool	queryIsNotSelect();
-		bool	queryIsCommitOrRollback();
-		char	*getErrorMessage(bool *liveconnection);
-		void	returnRowCounts();
-		void	returnColumnCount();
-		void	returnColumnInfo();
-		bool	noRowsToReturn();
-		bool	skipRow();
-		bool	fetchRow();
-		void	returnRow();
-		void	cleanUpData(bool freeresult, bool freebinds);
+		bool		queryIsNotSelect();
+		bool		queryIsCommitOrRollback();
+		const char	*getErrorMessage(bool *liveconnection);
+		void		returnRowCounts();
+		void		returnColumnCount();
+		void		returnColumnInfo();
+		bool		noRowsToReturn();
+		bool		skipRow();
+		bool		fetchRow();
+		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 
-		void	checkRePrepare();
+		void		checkRePrepare();
 
 		OCIStmt		*stmt;
 		ub2		stmttype;
@@ -190,26 +190,26 @@ class oracle8cursor : public sqlrcursor {
 class oracle8connection : public sqlrconnection {
 	friend class oracle8cursor;
 	public:
-			oracle8connection();
-			~oracle8connection();
+				oracle8connection();
+				~oracle8connection();
 	private:
-		int	getNumberOfConnectStringVars();
-		void	handleConnectString();
-		bool	logIn();
-		void	logInError(const char *errmsg);
+		int		getNumberOfConnectStringVars();
+		void		handleConnectString();
+		bool		logIn();
+		void		logInError(const char *errmsg);
 		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
-		void	logOut();
+		void		deleteCursor(sqlrcursor *curs);
+		void		logOut();
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
-		bool	changeUser(const char *newuser,
+		bool		changeUser(const char *newuser,
 						const char *newpassword);
 #endif
-		bool	autoCommitOn();
-		bool	autoCommitOff();
-		bool	commit();
-		bool	rollback();
-		char	*pingQuery();
-		char	*identify();
+		bool		autoCommitOn();
+		bool		autoCommitOff();
+		bool		commit();
+		bool		rollback();
+		const char	*pingQuery();
+		const char	*identify();
 
 		ub4		statementmode;
 
@@ -225,8 +225,8 @@ class oracle8connection : public sqlrconnection {
 		bool		supportsproxycredentials;
 #endif
 
-		char		*home;
-		char		*sid;
+		const char	*home;
+		const char	*sid;
 
 		environment	*environ;
 };

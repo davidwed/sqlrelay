@@ -71,7 +71,7 @@ static PyObject *getConnectionPort(PyObject *self, PyObject *args) {
 
 static PyObject *getConnectionSocket(PyObject *self, PyObject *args) {
   long sqlrcon;
-  char *rc;
+  const char *rc;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
     return NULL;
   rc=((sqlrconnection *)sqlrcon)->getConnectionSocket();
@@ -104,7 +104,7 @@ static PyObject *ping(PyObject *self, PyObject *args) {
 
 static PyObject *identify(PyObject *self, PyObject *args) {
   long sqlrcon;
-  char *rc;
+  const char *rc;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
@@ -278,7 +278,7 @@ static PyObject *setCacheTtl(PyObject *self, PyObject *args) {
 
 static PyObject *getCacheFileName(PyObject *self, PyObject *args) {
   long sqlrcur;
-  char  *rc;
+  const char *rc;
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getCacheFileName();
@@ -576,7 +576,7 @@ static PyObject *fetchFromBindCursor(PyObject *self, PyObject *args) {
 static PyObject *getOutputBind(PyObject *self, PyObject *args) {
   char *variable;
   long sqlrcur;
-  char *rc;
+  const char *rc;
   int rl;
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
@@ -706,7 +706,7 @@ static PyObject *getNullsAsNone(PyObject *self, PyObject *args) {
 
 static PyObject *getField(PyObject *self, PyObject *args) {
   long sqlrcur;
-  char  *rc;
+  const char *rc;
   int  rl;
   int row;
   PyObject *col;
@@ -783,7 +783,7 @@ _get_row(sqlrcursor *sqlrcur, int row)
 {
   int num_cols;
   int counter;
-  char **row_data;
+  const char * const *row_data;
   PyObject *my_list;
   num_cols=sqlrcur->colCount();
   my_list =  PyList_New(num_cols);
@@ -822,8 +822,8 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
   int row;
   PyObject *my_dictionary;
   int counter;
-  char *field;
-  char *name;
+  const char *field;
+  const char *name;
   if (!PyArg_ParseTuple(args, "li", &sqlrcur, &row))
     return NULL;
   my_dictionary=PyDict_New();
@@ -939,7 +939,7 @@ static PyObject *getRowLengthsRange(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnName(PyObject *self, PyObject *args) {
   long sqlrcur;
-  char  *rc;
+  const char *rc;
   int col;
   if (!PyArg_ParseTuple(args, "li", &sqlrcur, &col))
     return NULL;
@@ -951,7 +951,7 @@ static PyObject *getColumnNames(PyObject *self, PyObject *args) {
   long sqlrcur;
   int counter;
   int num_cols;
-  char **rc;
+  const char * const *rc;
   PyObject *my_list;
   my_list = PyList_New(0);
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
@@ -969,7 +969,7 @@ static PyObject *getColumnNames(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnType(PyObject *self, PyObject *args) {
   long sqlrcur;
-  char *rc;
+  const char *rc;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;

@@ -17,8 +17,8 @@
 #include <rudiments/regularexpression.h>
 #include <rudiments/sharedmemory.h>
 #include <rudiments/semaphoreset.h>
-#include <authenticator.h>
 
+#include <authenticator.h>
 #include <debugfile.h>
 #include <tempdir.h>
 
@@ -27,6 +27,10 @@
 #include <cmdline.h>
 
 #include <defines.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 class sqlrconnection : public daemonprocess, public listener, public debugfile {
 	friend class sqlrcursor;
@@ -52,9 +56,9 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual bool	autoCommitOff();
 		virtual bool	commit();
 		virtual bool	rollback();
-		virtual char	*pingQuery();
-		virtual bool	ping();
-		virtual char	*identify()=0;
+		virtual const char	*pingQuery();
+		virtual bool		ping();
+		virtual const char	*identify()=0;
 		virtual sqlrcursor	*initCursor()=0;
 		virtual void	deleteCursor(sqlrcursor *curs)=0;
 		virtual	short	nonNullBindValue();
@@ -66,8 +70,8 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual bool	isTransactional();
 		virtual void	setUser(const char *user);
 		virtual void	setPassword(const char *password);
-		virtual char	*getUser();
-		virtual char	*getPassword();
+		virtual const char	*getUser();
+		virtual const char	*getPassword();
 		virtual void	dropTempTables(sqlrcursor *cursor,
 						stringlist *tablelist);
 		virtual void	dropTempTable(sqlrcursor *cursor,
@@ -79,14 +83,14 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 	public:
 		// methods used by derived classes
-		char	*connectStringValue(const char *variable);
-		void	setAutoCommitBehavior(bool ac);
-		bool	getAutoCommitBehavior();
-		bool	sendColumnInfo();
-		void	sendRowCounts(long actual, long affected);
-		void	sendColumnCount(unsigned long ncols);
-		void	sendColumnTypeFormat(unsigned short format);
-		void	sendColumnDefinition(const char *name, 
+		const char	*connectStringValue(const char *variable);
+		void		setAutoCommitBehavior(bool ac);
+		bool		getAutoCommitBehavior();
+		bool		sendColumnInfo();
+		void		sendRowCounts(long actual, long affected);
+		void		sendColumnCount(unsigned long ncols);
+		void		sendColumnTypeFormat(unsigned short format);
+		void		sendColumnDefinition(const char *name, 
 						unsigned short namelen, 
 						unsigned short type, 
 						unsigned long size,
@@ -100,7 +104,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 						unsigned short zerofill,
 						unsigned short binary,
 						unsigned short autoincrement);
-		void	sendColumnDefinitionString(const char *name, 
+		void		sendColumnDefinitionString(const char *name, 
 						unsigned short namelen, 
 						const char *type, 
 						unsigned short typelen, 
@@ -115,15 +119,20 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 						unsigned short zerofill,
 						unsigned short binary,
 						unsigned short autoincrement);
-		void	sendField(const char *data, unsigned long size);
-		void	sendNullField();
-		void	startSendingLong();
-		void	sendLongSegment(const char *data, unsigned long size);
-		void	endSendingLong();
-		void	addSessionTempTableForDrop(const char *tablename);
-		void	addSessionTempTableForTrunc(const char *tablename);
-		void	addTransactionTempTableForDrop(const char *tablename);
-		void	addTransactionTempTableForTrunc(const char *tablename);
+		void		sendField(const char *data, unsigned long size);
+		void		sendNullField();
+		void		startSendingLong();
+		void		sendLongSegment(const char *data,
+						unsigned long size);
+		void		endSendingLong();
+		void		addSessionTempTableForDrop(
+						const char *tablename);
+		void		addSessionTempTableForTrunc(
+						const char *tablename);
+		void		addTransactionTempTableForDrop(
+						const char *tablename);
+		void		addTransactionTempTableForTrunc(
+						const char *tablename);
 
 	private:
 		// methods used internally
@@ -302,8 +311,8 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		unixclientsocket	handoffsockun;
 		bool			connected;
 
-		char	*connectionid;
-		int	ttl;
+		const char	*connectionid;
+		int		ttl;
 
 		int	sockseq;
 

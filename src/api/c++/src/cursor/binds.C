@@ -386,7 +386,7 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 	}
 }
 
-char *sqlrcursor::getOutputBind(const char *variable) {
+const char *sqlrcursor::getOutputBind(const char *variable) {
 
 	if (variable) {
 		for (int i=0; i<outbindcount; i++) {
@@ -404,12 +404,12 @@ char *sqlrcursor::getOutputBind(const char *variable) {
 }
 
 long sqlrcursor::getOutputBindAsLong(const char *variable) {
-	char	*outputbindvalue=getOutputBind(variable);
+	const char	*outputbindvalue=getOutputBind(variable);
 	return (outputbindvalue)?atol(outputbindvalue):0;
 }
 
 double sqlrcursor::getOutputBindAsDouble(const char *variable) {
-	char	*outputbindvalue=getOutputBind(variable);
+	const char	*outputbindvalue=getOutputBind(variable);
 	return (outputbindvalue)?atof(outputbindvalue):0.0;
 }
 

@@ -21,6 +21,10 @@
 	#include <sys/ndir.h>
 #endif
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 class dirnode {
 	friend class cachemanager;
 	private:

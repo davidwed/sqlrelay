@@ -10,6 +10,10 @@
 #include <math.h>
 #include <stdio.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 int getConnections(sqlrconfigfile *cfgfile) {
 	int	connections=cfgfile->getConnections();
 	if (connections>MAX_CONNECTIONS) {
@@ -166,8 +170,8 @@ bool startConnections(sqlrconfigfile *cfgfile, int strace,
 	return true;
 }
 
-bool startScaler(sqlrconfigfile *cfgfile, char *id, char *config,
-				char *localstatedir, int connectiondebug) {
+bool startScaler(sqlrconfigfile *cfgfile, const char *id, const char *config,
+			const char *localstatedir, int connectiondebug) {
 
 	// don't start the scalar if unless dynamic scaling is enabled
 	if (!cfgfile->getDynamicScaling()) {
@@ -196,7 +200,7 @@ bool startScaler(sqlrconfigfile *cfgfile, char *id, char *config,
 	return success;
 }
 
-bool startCacheManager(char *localstatedir) {
+bool startCacheManager(const char *localstatedir) {
 
 	// create a ps command that will detect if the cachemanager is running
 	stringbuffer	command;
@@ -246,10 +250,10 @@ int main(int argc, const char **argv) {
 
 	// get the command line args
 	cmdline	cmdl(argc,argv);
-	char	*localstatedir=cmdl.value("-localstatedir");
-	int	strace=cmdl.found("-strace");
-	char	*id=cmdl.getId();
-	char	*config=cmdl.getConfig();
+	const char	*localstatedir=cmdl.value("-localstatedir");
+	int		strace=cmdl.found("-strace");
+	const char	*id=cmdl.getId();
+	const char	*config=cmdl.getConfig();
 
 	// parse the config file(s)
 	sqlrconfigfile	cfgfile;
