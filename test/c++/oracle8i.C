@@ -826,8 +826,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("CURSOR BINDS: \n");
-	checkSuccess(cur->sendQuery("create or replace package types as type cursorType is ref cursor; end;"),1);
-	checkSuccess(cur->sendQuery("create or replace function sp_testtable return types.cursortype as l_cursor    types.cursorType; begin open l_cursor for select * from testtable; return l_cursor; end;"),1);
+	checkSuccess(cur->sendQuery("create or replace package types is type cursorType is ref cursor; end;"),1);
+	checkSuccess(cur->sendQuery("create or replace function sp_testtable return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable; return l_cursor; end;"),1);
 	cur->prepareQuery("begin  :curs:=sp_testtable; end;");
 	cur->defineOutputBindCursor("curs");
 	checkSuccess(cur->executeQuery(),1);
@@ -937,21 +937,25 @@ int	main(int argc, char **argv) {
 	// stored procedures
 	printf("STORED PROCEDURE: \n");
 	// return no value
-	checkSuccess(cur->sendQuery("create or replace procedure testproc(in1 number, in2 number(2,2), in3 varchar2(20) as begin return; end;"),1);
-	cur->prepareQuery("select testproc(:in1,:in2,:in3) from dual");
+	cur->sendQuery("drop function testproc");
+	cur->sendQuery("drop procedure testproc");
+	checkSuccess(cur->sendQuery("create or replace procedure testproc(in1 in number, in2 in number, in3 in varchar2) is begin return; end;"),1);
+	cur->prepareQuery("begin testproc(:in1,:in2,:in3); end;");
 	cur->inputBind("in1",1);
 	cur->inputBind("in2",1.1,2,1);
 	cur->inputBind("in3","hello");
 	checkSuccess(cur->executeQuery(),1);
 	// return single value
-	checkSuccess(cur->sendQuery("create or replace procedure testproc(in1 number, in2 number(2,2), in3 varchar2(20) returns number as begin return in1; end;"),1);
+	cur->sendQuery("drop function testproc");
+	cur->sendQuery("drop procedure testproc");
+	checkSuccess(cur->sendQuery("create or replace function testproc(in1 in number, in2 in number, in3 in varchar2) return number is begin return in1; end;"),1);
 	cur->prepareQuery("select testproc(:in1,:in2,:in3) from dual");
 	cur->inputBind("in1",1);
 	cur->inputBind("in2",1.1,2,1);
 	cur->inputBind("in3","hello");
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,0),"1");
-	checkSuccess(cur->sendQuery("begin  :out1:=testproc(:in1,:in2,:in3); end;"),1);
+	cur->prepareQuery("begin  :out1:=testproc(:in1,:in2,:in3); end;");
 	cur->inputBind("in1",1);
 	cur->inputBind("in2",1.1,2,1);
 	cur->inputBind("in3","hello");
@@ -959,7 +963,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getOutputBind("out1"),"1");
 	// return multiple values
-	checkSuccess(cur->sendQuery("create or replace procedure proc(in1 number, in2 number(2,2), in3 varchar2(20), out1 number out, out2 number(2,2) out, out3 varchar2(20) out) as begin :out1:=in1; :out2:=in2; :out3:=in3; end;"),1);
+	cur->sendQuery("drop function testproc");
+	cur->sendQuery("drop procedure testproc");
+	checkSuccess(cur->sendQuery("create or replace procedure testproc(in1 in number, in2 in number, in3 in varchar2, out1 out number, out2 out number, out3 out varchar2) is begin out1:=in1; out2:=in2; out3:=in3; end;"),1);
+	cur->prepareQuery("begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;");
 	cur->inputBind("in1",1);
 	cur->inputBind("in2",1.1,2,1);
 	cur->inputBind("in3","hello");
@@ -970,7 +977,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getOutputBind("out1"),"1");
 	checkSuccess(atof(cur->getOutputBind("out2")),1.1);
 	checkSuccess(cur->getOutputBind("out3"),"hello");
-	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
+	cur->sendQuery("drop function testproc");
+	cur->sendQuery("drop procedure testproc");
 	printf("\n");
 
 

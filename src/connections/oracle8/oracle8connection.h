@@ -180,8 +180,7 @@ class oracle8cursor : public sqlrcursor {
 		oracle8connection	*oracle8conn;
 
 #ifdef HAVE_ORACLE_8i
-		regularexpression	preserverowslower;
-		regularexpression	preserverowsupper;
+		regularexpression	preserverows;
 #endif
 };
 	

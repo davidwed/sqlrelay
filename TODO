@@ -7,7 +7,6 @@ fix erwin's fake binds problem
 VB wrapper
 
 stored procedure examples in "Programming with SQL Relay using the XXX API" docs
-test oracle stored procedures
 
 can sybase stored procedures return result sets?
 eg.

@@ -1383,14 +1383,11 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 	// free row/column resources
 	if (freeresult) {
 		for (int i=0; i<ncols; i++) {
-			if (freerows) {
-				for (int j=0; j<FETCH_AT_ONCE; j++) {
-					if (def_lob[i][j]) {
-						OCIDescriptorFree(
-							def_lob[i][j],
-							OCI_DTYPE_LOB);
-						def_lob[i][j]=NULL;
-					}
+			for (int j=0; j<FETCH_AT_ONCE; j++) {
+				if (def_lob[i][j]) {
+					OCIDescriptorFree(def_lob[i][j],
+								OCI_DTYPE_LOB);
+					def_lob[i][j]=NULL;
 				}
 			}
 			if (def[i]) {

@@ -120,6 +120,29 @@ Click <b>Yes</b>.<br><br>
 
 <span class="heading1">Post-Installation</span><br>
 
+<p>Sometimes, for some reason, during an installation, the tnslistener does not
+get configured to listen for connections to the ora1 database.  Take a look
+at /u01/app/oracle/product/10.1.0/network/admin/listener.ora and make sure
+that there is an entry like the following:</p>
+
+<blockquote>
+<font color="#298a52"><b>SID_LIST_LISTENER</b></font> =
+  (<font color="#298a52"><b>SID_LIST</b></font> =
+    (<font color="#298a52"><b>SID_DESC</b></font> =
+      (<font color="#a52829"><b>SID_NAME</b></font> = PLSExtProc)
+      (<font color="#a52829"><b>ORACLE_HOME</b></font> = /u01/app/<font color="#008a8c">oracle</font>/product/10.1.0)
+      (<font color="#a52829"><b>PROGRAM</b></font> = extproc)
+    )
+    (<font color="#298a52"><b>SID_DESC</b></font> =
+      (<font color="#a52829"><b>SID_NAME</b></font> = ora1)
+      (<font color="#a52829"><b>ORACLE_HOME</b></font> = /u01/app/<font color="#008a8c">oracle</font>/product/10.1.0)
+    )
+  )
+</blockquote>
+
+<p>The second SID_DESC section may be missing from your listener.ora file.  If
+it is, update your listener.ora file, adding the necessary section.</p>
+
 <p>During the installation, several ancillary processes were started.  You can
 shut some of them down by executing the following commands (as oracle):</p>
 
