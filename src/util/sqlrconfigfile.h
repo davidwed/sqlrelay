@@ -89,32 +89,32 @@ class sqlrconfigfile : public xmlsax {
 					int connectstringcount);
 		int	getPort();
 		char	*getUnixPort();
-		int	getListenOnInet();
-		int	getListenOnUnix();
+		bool	getListenOnInet();
+		bool	getListenOnUnix();
 		char	*getDbase();
 		int	getConnections();
 		int	getMaxConnections();
 		int	getMaxQueueLength();
 		int	getGrowBy();
 		int	getTtl();
-		int	getDynamicScaling();
+		bool	getDynamicScaling();
 		char	*getEndOfSession();
-		int	getEndOfSessionCommit();
+		bool	getEndOfSessionCommit();
 		int	getSessionTimeout();
 		char	*getRunAsUser();
 		char	*getRunAsGroup();
 		int	getCursors();
 		char	*getAuthTier();
-		int	getAuthOnListener();
-		int	getAuthOnConnection();
-		int	getAuthOnDatabase();
+		bool	getAuthOnListener();
+		bool	getAuthOnConnection();
+		bool	getAuthOnDatabase();
 		char	*getHandOff();
-		int	getPassDescriptor();
+		bool	getPassDescriptor();
 		char	*getAllowedIps();
 		char	*getDeniedIps();
 		char	*getDebug();
-		int	getDebugListener();
-		int	getDebugConnection();
+		bool	getDebugListener();
+		bool	getDebugConnection();
 
 		linkedlist< usercontainer * >	*getUserList();
 		linkedlist< connectstringcontainer * >
@@ -125,8 +125,8 @@ class sqlrconfigfile : public xmlsax {
 		int			getMetricTotal();
 	private:
 		char		*id;
-		int		correctid;
-		int		done;
+		bool		correctid;
+		bool		done;
 		attribute	currentattribute;
 
 		int	atoi(const char *value,
@@ -139,9 +139,9 @@ class sqlrconfigfile : public xmlsax {
 		bool	tagEnd(char *name);
 
 		int	port;
-		int	listenoninet;
+		bool	listenoninet;
 		char	*unixport;
-		int	listenonunix;
+		bool	listenonunix;
 		char	*dbase;
 		int	connections;
 		int	maxconnections;
@@ -149,22 +149,22 @@ class sqlrconfigfile : public xmlsax {
 		int	growby;
 		int	ttl;
 		char	*endofsession;
-		int	endofsessioncommit;
+		bool	endofsessioncommit;
 		int	sessiontimeout;
 		char	*runasuser;
 		char	*runasgroup;
 		int	cursors;
 		char	*authtier;
-		int	authonlistener;
-		int	authonconnection;
-		int	authondatabase;
+		bool	authonlistener;
+		bool	authonconnection;
+		bool	authondatabase;
 		char	*handoff;
-		int	passdescriptor;
+		bool	passdescriptor;
 		char	*allowedips;
 		char	*deniedips;
 		char	*debug;
-		int	debuglistener;
-		int	debugconnection;
+		bool	debuglistener;
+		bool	debugconnection;
 
 		usercontainer	*currentuser;
 

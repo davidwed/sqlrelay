@@ -22,9 +22,9 @@
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	port=::atoi(DEFAULT_PORT);
-	listenoninet=(port)?1:0;
+	listenoninet=(port)?true:false;
 	unixport=strdup(DEFAULT_SOCKET);
-	listenonunix=(unixport[0])?1:0;
+	listenonunix=(unixport[0])?true:false;
 	dbase=strdup(DEFAULT_DBASE);
 	connections=::atoi(DEFAULT_CONNECTIONS);
 	maxconnections=::atoi(DEFAULT_MAXCONNECTIONS);
@@ -38,16 +38,16 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	runasgroup=strdup(DEFAULT_RUNASGROUP);
 	cursors=::atoi(DEFAULT_CURSORS);
 	authtier=strdup(DEFAULT_AUTHTIER);
-	authonlistener=(strstr(authtier,"listener"))?1:0;
-	authonconnection=(strstr(authtier,"connection"))?1:0;
-	authondatabase=(!strcmp(authtier,"database"))?1:0;
+	authonlistener=(strstr(authtier,"listener"))?true:false;
+	authonconnection=(strstr(authtier,"connection"))?true:false;
+	authondatabase=!strcmp(authtier,"database");
 	handoff=strdup(DEFAULT_HANDOFF);
-	passdescriptor=(strcmp(handoff,"pass")==0);
+	passdescriptor=!strcmp(handoff,"pass");
 	allowedips=strdup(DEFAULT_DENIEDIPS);
 	deniedips=strdup(DEFAULT_DENIEDIPS);
 	debug=strdup(DEFAULT_DEBUG);
-	debuglistener=(strstr(debug,"listener"))?1:0;
-	debugconnection=(strstr(debug,"connection"))?1:0;
+	debuglistener=(strstr(debug,"listener"))?true:false;
+	debugconnection=(strstr(debug,"connection"))?true:false;
 	currentuser=NULL;
 	firstconnect=NULL;
 	currentconnect=NULL;
@@ -111,11 +111,11 @@ char *sqlrconfigfile::getUnixPort() {
 	return unixport;
 }
 
-int sqlrconfigfile::getListenOnInet() {
+bool sqlrconfigfile::getListenOnInet() {
 	return listenoninet;
 }
 
-int sqlrconfigfile::getListenOnUnix() {
+bool sqlrconfigfile::getListenOnUnix() {
 	return listenonunix;
 }
 
@@ -143,7 +143,7 @@ int sqlrconfigfile::getTtl() {
 	return ttl;
 }
 
-int sqlrconfigfile::getDynamicScaling() {
+bool sqlrconfigfile::getDynamicScaling() {
 	return (maxqueuelength>=0 && maxconnections>connections &&
 			growby>0 && ttl>0);
 }
@@ -152,7 +152,7 @@ char *sqlrconfigfile::getEndOfSession() {
 	return endofsession;
 }
 
-int sqlrconfigfile::getEndOfSessionCommit() {
+bool sqlrconfigfile::getEndOfSessionCommit() {
 	return endofsessioncommit;
 }
 
@@ -176,15 +176,15 @@ char *sqlrconfigfile::getAuthTier() {
 	return authtier;
 }
 
-int sqlrconfigfile::getAuthOnListener() {
+bool sqlrconfigfile::getAuthOnListener() {
 	return authonlistener;
 }
 
-int sqlrconfigfile::getAuthOnConnection() {
+bool sqlrconfigfile::getAuthOnConnection() {
 	return authonconnection;
 }
 
-int sqlrconfigfile::getAuthOnDatabase() {
+bool sqlrconfigfile::getAuthOnDatabase() {
 	return authondatabase;
 }
 
@@ -192,10 +192,7 @@ char *sqlrconfigfile::getHandOff() {
 	return handoff;
 }
 
-int sqlrconfigfile::getPassDescriptor() {
-	// descriptor passing doesn't work if we're using dynamic scaling,
-	// so override it here...
-	//return passdescriptor && !getDynamicScaling();
+bool sqlrconfigfile::getPassDescriptor() {
 	return passdescriptor;
 }
 
@@ -211,11 +208,11 @@ char *sqlrconfigfile::getDebug() {
 	return debug;
 }
 
-int sqlrconfigfile::getDebugListener() {
+bool sqlrconfigfile::getDebugListener() {
 	return debuglistener;
 }
 
-int sqlrconfigfile::getDebugConnection() {
+bool sqlrconfigfile::getDebugConnection() {
 	return debugconnection;
 }
 
@@ -358,7 +355,7 @@ bool sqlrconfigfile::attributeValue(char *value) {
 		// if we haven't found the correct id yet, check for it
 		if (currentattribute==ID_ATTRIBUTE) {
 			if (value && !strcmp(value,id)) {
-				correctid=1;
+				correctid=true;
 			}
 		}
 	
@@ -367,7 +364,7 @@ bool sqlrconfigfile::attributeValue(char *value) {
 		// if we have found the correct id, process the attribute
 		if (currentattribute==PORT_ATTRIBUTE) {
 			port=atoi(value,DEFAULT_PORT,1);
-			listenoninet=1;
+			listenoninet=true;
 		} else if (currentattribute==SOCKET_ATTRIBUTE) {
 			delete[] unixport;
 			unixport=strdup((value)?value:DEFAULT_SOCKET);
@@ -402,13 +399,15 @@ bool sqlrconfigfile::attributeValue(char *value) {
 		} else if (currentattribute==AUTHTIER_ATTRIBUTE) {
 			delete[] authtier;
 			authtier=strdup((value)?value:DEFAULT_AUTHTIER);
-			authonlistener=(strstr(authtier,"listener"))?1:0;
-			authonconnection=(strstr(authtier,"connection"))?1:0;
-			authondatabase=(!strcmp(authtier,"database"))?1:0;
+			authonlistener=(strstr(authtier,"listener"))?
+								true:false;
+			authonconnection=(strstr(authtier,"connection"))?
+								true:false;
+			authondatabase=!strcmp(authtier,"database");
 		} else if (currentattribute==HANDOFF_ATTRIBUTE) {
 			delete[] handoff;
 			handoff=strdup((value)?value:DEFAULT_HANDOFF);
-			passdescriptor=(strcmp(handoff,"pass")==0);
+			passdescriptor=!strcmp(handoff,"pass");
 		} else if (currentattribute==DENIEDIPS_ATTRIBUTE) {
 			delete[] deniedips;
 			deniedips=strdup((value)?value:DEFAULT_DENIEDIPS);
@@ -418,8 +417,8 @@ bool sqlrconfigfile::attributeValue(char *value) {
 		} else if (currentattribute==DEBUG_ATTRIBUTE) {
 			delete[] debug;
 			debug=strdup((value)?value:DEFAULT_DEBUG);
-			debuglistener=(strstr(debug,"listener"))?1:0;
-			debugconnection=(strstr(debug,"connection"))?1:0;
+			debuglistener=(strstr(debug,"listener"))?true:false;
+			debugconnection=(strstr(debug,"connection"))?true:false;
 		} else if (currentattribute==USER_ATTRIBUTE) {
 			currentuser->setUser((value)?value:DEFAULT_USER);
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {
@@ -462,7 +461,7 @@ bool sqlrconfigfile::tagEnd(char *name) {
 
 	// we're done if we've found the right instance at this point
 	if (correctid && !strcmp((char *)name,"instance")) {
-		done=1;
+		done=true;
 	}
 	return true;
 }
@@ -477,8 +476,8 @@ int sqlrconfigfile::parse(const char *config, char *id,
 	// init some variables
 	this->connectstringcount=connectstringcount;
 	this->id=id;
-	correctid=0;
-	done=0;
+	correctid=false;
+	done=false;
 
 	// parse the file
 	int	retval=1;
