@@ -61,8 +61,15 @@ running somewhere.</p>
 fluxbox window managers in the past, though they may work for you.</p>
 
 <p>If you have a CD, mount it and cd to the mount point.  If you have a cpio
-distribution, extract all three files using <i>cpio ????</i> and cd to the
-Disk1 directory created by the extraction.</p>
+distribution, extract all three files using:<p>
+
+<blockquote><b>
+cpio -idmv &lt; lnx_920_disk1.cpio<br>
+cpio -idmv &lt; lnx_920_disk2.cpio<br>
+cpio -idmv &lt; lnx_920_disk3.cpio<br>
+</b></blockquote>
+
+Change directories to the Disk1 directory.<br><br>
 
 Type <b>./runInstaller</b><br><br>
 

@@ -34,11 +34,15 @@
 	%define gtkdevel %(echo "gtk-devel")
 	%define rubydevel %(echo "ruby")
 	%define tcldevel %(echo "tcl-devel")
+	%define initscript /etc/init.d/sqlrelay
+	%define inittab /etc/sqlrelay
 %else
 	%define phpdevel %(echo "php-devel")
 	%define gtkdevel %(echo "gtk+-devel")
 	%define rubydevel %(echo "ruby-devel")
 	%define tcldevel %(echo "tcl")
+	%define initscript /etc/rc.d/init.d/sqlrelay
+	%define inittab /etc/sysconfig/sqlrelay
 %endif
 
 Summary: Persistent database connection system.
@@ -302,8 +306,8 @@ Man pages for SQL Relay.
 
 
 %define	tcldir		%(dirname `rpm -q -l %{tcldevel} | grep tclConfig.sh`)
-%define	pythondir	%(echo -e "import sys\\nimport string\\nout=''\\nfor i in sys.path:\\n if len(i)>0:\\n  for j in range(0,len(i)):\\n   if j<len(i)-1:\\n    out=out+i[j]\\n   else:\\n    if i[j]!='/':\\n     out=out+i[j]\\n  break\\nprint out" | python)
-%define	zopedir		/opt/Zope/lib/python/Products
+%define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "1.5" "1.6" "2.0" "2.1" "2.2" "2.3"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
+%define	zopedir		%(ZOPEPATH="/opt/Zope"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/opt"; do for j in "zope" "Zope"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib/python/Products"; fi; done; done; echo $ZOPEPATH)
 %define	phpextdir	%(php-config --extension-dir)
 %define	perl_prefix	%(eval "export `perl -V:prefix`"; echo $prefix)
 %define	perl_sitelib	%(eval "export `perl -V:sitelib`"; echo $sitelib)
@@ -351,9 +355,7 @@ rm -rf %{buildroot}
 # variable screws up the ruby install
 %makeinstall \
 	DESTDIR=%{buildroot} \
-	incdir=%{buildroot}%{_includedir} \
 	docdir=%{buildroot}%{_docdir}/%{name}-%{version} \
-	initroot=%{buildroot} \
 	HAVE_RUBY=""
 # get rid of some garbage
 rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
@@ -393,8 +395,8 @@ rm -rf %{buildroot}
 %defattr(-, root, root)
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.conf.example
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
-%config(noreplace) %attr(600, root, root) /etc/sysconfig/sqlrelay
-/etc/rc.d/init.d/sqlrelay
+%config(noreplace) %attr(600, root, root) %{inittab}
+%{initscript}
 %{_bindir}/sqlr-cachemanager*
 %{_bindir}/sqlr-listener*
 %{_bindir}/sqlr-scaler*
