@@ -3,8 +3,8 @@ package DBD::SQLRelay;
 use strict;
 use vars qw($err $errstr $sqlstate $drh);
 $DBD::SQLRelay::VERSION='@SQLR_VERSION@';
-use Firstworks::SQLRConnection;
-use Firstworks::SQLRCursor;
+use SQLRelay::Connection;
+use SQLRelay::Cursor;
 
 $err=0;			# holds error code for DBI::err
 $errstr='';		# holds error string for DBI::err
@@ -75,8 +75,8 @@ sub connect {
 		}
 	}
 	
-	# create an SQLRConnection
-	my $connection=Firstworks::SQLRConnection->new($dsn{'host'},
+	# create an Connection
+	my $connection=SQLRelay::Connection->new($dsn{'host'},
 							$dsn{'port'},
 							$dsn{'socket'},
 							$user,
@@ -128,8 +128,8 @@ sub prepare {
 	# create a blank statement handle
 	my $sth=DBI::_new_sth($dbh,{'Statement'=>$statement});
 	
-	# create an SQLRCursor
-	my $cursor=Firstworks::SQLRCursor->new($dbh->FETCH('driver_connection'));
+	# create an Cursor
+	my $cursor=SQLRelay::Cursor->new($dbh->FETCH('driver_connection'));
 
 	# store statement-specific data in the statement handle
 	#$sth->STORE('driver_params',[]);
