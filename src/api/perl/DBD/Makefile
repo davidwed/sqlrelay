@@ -20,17 +20,21 @@ install:
 	$(INSTALL) -m 644 SQLRelay.pm $(PERLSITELIB)/DBD
 ifeq ($(CYGWIN),)
 ifneq ($(POD2MAN),)
+ifneq ($(PERLINSTALLMAN3DIR),)
 	$(POD2MAN) SQLRelay.pm > DBD::SQLRelay.$(PERLMAN3EXT)
 	$(MKINSTALLDIRS) $(PERLINSTALLMAN3DIR)
 	$(INSTALL) -m 644 DBD::SQLRelay.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
 	$(RM) DBD::SQLRelay.$(PERLMAN3EXT)
 endif
 endif
+endif
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/DBD/SQLRelay
 	echo $(PERLSITELIB)/DBD/SQLRelay.pm > $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist
 ifeq ($(CYGWIN),)
 ifneq ($(POD2MAN),)
+ifneq ($(PERLINSTALLMAN3DIR),)
 	echo $(PERLINSTALLMAN3DIR)/DBD::SQLRelay.$(PERLMAN3EXT) >> $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist
+endif
 endif
 endif
 

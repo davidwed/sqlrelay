@@ -136,11 +136,13 @@ install: Cursor.so
 	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
 	$(RM) Cursor.so
 ifneq ($(POD2MAN),)
+ifneq ($(PERLINSTALLMAN3DIR),)
 	$(POD2MAN) Cursor.pm > SQLRelay::Cursor.$(PERLMAN3EXT)
 	$(MKINSTALLDIRS) $(PERLINSTALLMAN3DIR)
 	$(INSTALL) -m 644 SQLRelay::Cursor.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
 	$(RM) SQLRelay::Cursor.$(PERLMAN3EXT)
 	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Cursor.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+endif
 endif
 	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.so > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
