@@ -12,11 +12,10 @@
 listenercomm::listenercomm(ipc *ipcptr, connectioncmdline *cmdlineptr) {
 	this->ipcptr=ipcptr;
 	this->cmdlineptr=cmdlineptr;
-	handoffsockun=NULL;
+	connected=false;
 }
 
 listenercomm::~listenercomm() {
-	delete handoffsockun;
 }
 
 #ifdef SERVER_DEBUG
@@ -37,7 +36,7 @@ void listenercomm::announceAvailability(char *tmpdir,
 
 	// if we're passing around file descriptors, connect to listener 
 	// if we haven't already and pass it this process's pid
-	if (passdescriptor && !handoffsockun) {
+	if (passdescriptor && !connected) {
 		registerForHandoff(tmpdir);
 	}
 
@@ -102,15 +101,14 @@ void listenercomm::registerForHandoff(char *tmpdir) {
 	#endif
 
 	// construct the name of the socket to connect to
-	char	*handoffsockname=new char[strlen(tmpdir)+1+
+	char	handoffsockname[strlen(tmpdir)+1+
 					strlen(cmdlineptr->getId())+8+1];
 	sprintf(handoffsockname,"%s/%s-handoff",tmpdir,cmdlineptr->getId());
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[17+strlen(handoffsockname)+1];
+	char	string[17+strlen(handoffsockname)+1];
 	sprintf(string,"handoffsockname: %s",handoffsockname);
 	dl->write("connection",1,string);
-	delete[] string;
 	#endif
 
 	// Try to connect over and over forever on 1 second intervals.
@@ -122,19 +120,15 @@ void listenercomm::registerForHandoff(char *tmpdir) {
 		dl->write("connection",1,"trying...");
 		#endif
 
-		handoffsockun=new unixclientsocket();
-		handoffsockun->connectToServer(handoffsockname,-1,-1,1,0);
-		if (handoffsockun->write((unsigned long)getpid())==
+		handoffsockun.connectToServer(handoffsockname,-1,-1,1,0);
+		if (handoffsockun.write((unsigned long)getpid())==
 						sizeof(unsigned long)) {
+			connected=true;
 			break;
 		}
 		deRegisterForHandoff(tmpdir);
-		delete handoffsockun;
-		handoffsockun=NULL;
+		connected=false;
 	}
-
-	// clean up
-	delete[] handoffsockname;
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"done registering for handoff");
@@ -142,10 +136,10 @@ void listenercomm::registerForHandoff(char *tmpdir) {
 }
 
 bool listenercomm::receiveFileDescriptor(int *descriptor) {
-	bool	retval=handoffsockun->receiveFileDescriptor(descriptor);
+	bool	retval=handoffsockun.receiveFileDescriptor(descriptor);
 	if (!retval) {
-		delete handoffsockun;
-		handoffsockun=NULL;
+		handoffsockun.close();
+		connected=false;
 	}
 	return retval;
 }
@@ -157,26 +151,21 @@ void listenercomm::deRegisterForHandoff(char *tmpdir) {
 	#endif
 
 	// construct the name of the socket to connect to
-	char	*removehandoffsockname=new char[strlen(tmpdir)+1+
+	char	removehandoffsockname[strlen(tmpdir)+1+
 					strlen(cmdlineptr->getId())+14+1];
 	sprintf(removehandoffsockname,"%s/%s-removehandoff",
 					tmpdir,cmdlineptr->getId());
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[23+strlen(removehandoffsockname)+1];
+	char	string[23+strlen(removehandoffsockname)+1];
 	sprintf(string,"removehandoffsockname: %s",removehandoffsockname);
 	dl->write("connection",1,string);
-	delete[] string;
 	#endif
 
 	// attach to the socket and write the process id
-	unixclientsocket	*removehandoffsockun=new unixclientsocket();
-	removehandoffsockun->connectToServer(removehandoffsockname,-1,-1,0,1);
-	removehandoffsockun->write((unsigned long)getpid());
-
-	// clean up
-	delete removehandoffsockun;
-	delete[] removehandoffsockname;
+	unixclientsocket	removehandoffsockun;
+	removehandoffsockun.connectToServer(removehandoffsockname,-1,-1,0,1);
+	removehandoffsockun.write((unsigned long)getpid());
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"done de-registering for handoff");

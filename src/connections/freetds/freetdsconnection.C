@@ -275,7 +275,7 @@ bool freetdscursor::openCursor(int id) {
 	bool	retval=true;
 	if (freetdsconn->db && freetdsconn->db[0]) {
 		int	len=strlen(freetdsconn->db)+4;
-		char	*query=new char[len+1];
+		char	query[len+1];
 		sprintf(query,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true))) {
@@ -283,7 +283,6 @@ bool freetdscursor::openCursor(int id) {
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=false;
 		}
-		delete[] query;
 		cleanUpData(true,true,true);
 	}
 	return (retval && sqlrcursor::openCursor(id));

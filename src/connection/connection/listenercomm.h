@@ -32,7 +32,8 @@ class listenercomm {
 
 		ipc			*ipcptr;
 		connectioncmdline	*cmdlineptr;
-		unixclientsocket	*handoffsockun;
+		unixclientsocket	handoffsockun;
+		bool			connected;
 
 		#ifdef SERVER_DEBUG
 		logger *dl;

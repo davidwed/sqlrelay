@@ -120,7 +120,6 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		unixserversocket	*removehandoffsockun;
 		unixserversocket	*fixupsockun;
 		char			*fixupsockname;
-		datatransport		*clientsock;
 
 		handoffsocketnode	**handoffsocklist;
 

@@ -271,7 +271,7 @@ bool sybasecursor::openCursor(int id) {
 	bool	retval=true;
 	if (sybaseconn->db && sybaseconn->db[0]) {
 		int	len=strlen(sybaseconn->db)+4;
-		char	*query=new char[len+1];
+		char	query[len+1];
 		sprintf(query,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true))) {
@@ -279,7 +279,6 @@ bool sybasecursor::openCursor(int id) {
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=false;
 		}
-		delete[] query;
 		cleanUpData(true,true,true);
 	}
 	return (retval && sqlrcursor::openCursor(id));

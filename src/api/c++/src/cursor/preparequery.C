@@ -103,7 +103,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	if (!queryfile.open(fullpath,O_RDONLY)) {
 
 		// set the error
-		char	*err=new char[32+strlen(fullpath)];
+		char	err[32+strlen(fullpath)];
 		strcpy(err,"The file ");
 		strcat(err,fullpath);
 		strcat(err," could not be opened.\n");
@@ -113,7 +113,6 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 			sqlrc->debugPreEnd();
 		}
 		setError(err);
-		delete[] err;
 
 		// set queryptr to NULL so executeQuery won't try to do
 		// anything with it in the event that it gets called

@@ -67,7 +67,11 @@ int sqlrconnection::handleQuery(sqlrcursor *cursor,
 				clientsock->read(&skipfetch);
 				clientsock->read(&skipfetch);
 
-				cursor->abort();
+				// Even though there was an error, we still 
+				// need to send the client the id of the 
+				// cursor that it's going to use.
+				clientsock->write((unsigned short)cursor->id);
+
 				#ifdef SERVER_DEBUG
 				debugPrint("connection",1,
 					"failed to handle query: error");

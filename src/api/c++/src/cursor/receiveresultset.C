@@ -26,6 +26,7 @@ bool sqlrcursor::processResultSet(int rowtoget) {
 	// check for an error
 	if (success && !noError()) {
 		getErrorFromServer();
+		getCursorId();
 		return false;
 	}
 
