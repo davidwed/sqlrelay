@@ -10152,6 +10152,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -10187,6 +10356,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -10314,10 +10484,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -10534,6 +10705,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -10569,6 +10909,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -10696,10 +11037,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -11891,6 +12233,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -11926,6 +12437,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -12053,10 +12565,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -12650,6 +13163,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -12685,6 +13367,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -12812,10 +13495,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -13034,6 +13718,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -13069,6 +13922,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -13196,10 +14050,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -13419,6 +14274,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -13454,6 +14478,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -13581,10 +14606,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -14095,6 +15121,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -14130,6 +15325,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -14257,10 +15453,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -14512,6 +15709,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -14547,6 +15913,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -14674,10 +16041,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -15030,6 +16398,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -15065,6 +16602,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -15192,10 +16730,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -15528,6 +17067,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -15563,6 +17271,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -15690,10 +17399,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -16563,6 +18273,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -16598,6 +18477,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -16725,10 +18605,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
@@ -16949,6 +18830,175 @@ HEADERSANDLIBSPATH=""
 FOUNDHEADER=""
 FOUNDLIB=""
 
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$SEARCHPATH/include/$NAME/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+		eval "LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$SEARCHPATH/lib/$NAME/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\""
+			eval "LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+fi
+
+
+if ( test -z "$LIBSTRING" )
+then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
 if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
@@ -16984,6 +19034,7 @@ fi
 	fi
 fi
 
+fi
 if ( test -z "$LIBSTRING" )
 then
 
@@ -17111,10 +19162,11 @@ fi
 
 fi
 
+
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then

@@ -118,7 +118,27 @@ LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
 
-FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+dnl first, check the specified path
+FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+if ( test -z "$LIBSTRING" )
+then
+	FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib\"; LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"],[$SEARCHPATH/lib/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+fi
+if ( test -z "$LIBSTRING" )
+then
+	FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+fi
+if ( test -z "$LIBSTRING" )
+then
+	FW_CHECK_HEADER_LIB([$SEARCHPATH/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$SEARCHPATH/include/$NAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"$SEARCHPATH/lib/$NAME\"; LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"],[$SEARCHPATH/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$SEARCHPATH/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+fi
+
+
+dnl now, check /usr
+if ( test -z "$LIBSTRING" )
+then
+	FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[INCLUDESTRING=\"\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+fi
 if ( test -z "$LIBSTRING" )
 then
 	FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/lib$LIBNAME.so],[LIBPATH=\"\"; LIBSTRING=\"-l$LIBNAME\"],[/usr/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
@@ -132,10 +152,12 @@ then
 	FW_CHECK_HEADER_LIB([/usr/include/$NAME/$HEADER],[INCLUDESTRING=\"-I/usr/include/$NAME\"],[/usr/lib/$NAME/lib$LIBNAME.so],[LIBPATH=\"/usr/lib/$NAME\"; LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"],[/usr/lib/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L/usr/lib/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 fi
 
+
+dnl now, run though some other paths
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "$SEARCHPATH" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then

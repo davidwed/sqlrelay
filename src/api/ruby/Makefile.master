@@ -30,7 +30,7 @@ clean:
 
 install: all
 	$(MAKE) site-install
-	$(MAKE) -f Makefile.install install
+	$(MAKE) -f Makefile.install install-dbd
 	$(RM) Makefile mkmf.log
 
 uninstall: makefile

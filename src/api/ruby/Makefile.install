@@ -1,5 +1,5 @@
 include Makefile
 
-install:
+install-dbd:
 	@$(RUBY) -r ftools -e 'File::makedirs(*ARGV)' $(sitelibdir)/DBD/SQLRelay
 	@$(RUBY) -r ftools -e 'File::install(ARGV[0], ARGV[1], 0644, true)' SQLRelay.rb $(sitelibdir)/DBD/SQLRelay/SQLRelay.rb

@@ -345,6 +345,7 @@ Man pages for SQL Relay.
 %define	perl_prefix	%(eval "export `perl -V:prefix`"; echo $prefix)
 %define	perl_sitelib	%(eval "export `perl -V:sitelib`"; echo $sitelib)
 %define perl_installarchlib	%(eval "export `perl -V:installarchlib`"; echo $installarchlib)
+%define perl_installsitearch	%(eval "export `perl -V:installsitearch`"; echo $installsitearch)
 %define	perl_sitearch	%(eval "export `perl -V:sitearch`"; echo $sitearch)
 %define	perl_installman3dir	%(eval "export `perl -V:installman3dir`"; echo $installman3dir)
 %define	perl_man3ext	%(eval "export `perl -V:man3ext`"; echo $man3ext)
@@ -394,6 +395,8 @@ rm -rf %{buildroot}
 	TCLLIBSPATH=%{buildroot}%{tcldir} \
 	HAVE_RUBY="" \
 	initroot=%{buildroot}
+# get rid of some garbage
+rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
 # now install ruby
 %{!?_without_ruby: cd src/api/ruby; make DESTDIR=%{buildroot} -f Makefile.master install}
 
@@ -571,8 +574,11 @@ rm -rf %{buildroot}
 %{!?_without_perl:%files perl}
 %{!?_without_perl:%defattr(-, root, root)}
 %{!?_without_perl:%{perl_sitelib}/DBD/SQLRelay.pm}
-%{!?_without_perl:%{perl_sitearch}/Firstworks}
-%{!?_without_perl:%{perl_sitearch}/auto/Firstworks}
+%{!?_without_perl:%{perl_sitearch}/Firstworks/SQLRConnection.pm}
+%{!?_without_perl:%{perl_sitearch}/Firstworks/SQLRCursor.pm}
+%{!?_without_perl:%{perl_sitearch}/auto/Firstworks/SQLRConnection}
+%{!?_without_perl:%{perl_sitearch}/auto/Firstworks/SQLRCursor}
+%{!?_without_perl:%{perl_sitearch}/auto/DBD/SQLRelay}
 %{!?_without_perl:%{perl_installman3dir}/*.%{perl_man3ext}*}
 
 %{!?_without_php:%files php}
@@ -585,7 +591,7 @@ rm -rf %{buildroot}
 
 %{!?_without_ruby:%files ruby}
 %{!?_without_ruby:%defattr(-, root, root)}
-%{!?_without_ruby:%{ruby_sitearchdir}/*.so}
+%{!?_without_ruby:%{ruby_sitearchdir}/sqlrelay.so}
 %{!?_without_ruby:%{ruby_sitelibdir}/DBD/SQLRelay}
 
 %{!?_without_zope:%files zope}
