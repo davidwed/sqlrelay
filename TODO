@@ -25,6 +25,8 @@ redhat-7.3
 suse-9.0
 	DESTDIR problem with ruby/python/zope?
 
+fedora-core-1 isn't set up
+
 solaris-9
 	#define _XOPEN_SOURCE 600 required for redhat 7.3 to get swab, but
 		breaks strtoll on solaris 9

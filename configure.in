@@ -35,14 +35,6 @@ AC_ARG_WITH(rudiments-prefix,
 	[  --with-rudiments-prefix       Location of rudiments],
 	RUDIMENTSPATH="$withval",
 	RUDIMENTSPATH="")
-AC_ARG_WITH(ssl-includes,
-	[  --with-ssl-includes     SSL includes],
-	SSLINCLUDES="$withval",
-	SSLINCLUDES="")
-AC_ARG_WITH(ssl-libs,
-	[  --with-ssl-libs         SSL libraries],
-	SSLLIBS="$withval",
-	SSLLIBS="")
 AC_ARG_WITH(libgdbm-prefix,
 	[  --with-libgdbm-prefix         Location of libgdbm],
 	GDBMPATH="$withval",
@@ -485,8 +477,6 @@ AC_CHECK_LIB(dl,dlopen,DLLIB=-ldl,DLLIB="")
 AC_SUBST(DLLIB)
 AC_CHECK_LIB(aio,aioread,AIOLIB=-laio,AIOLIB="")
 AC_SUBST(AIOLIB)
-FW_CHECK_SSL
-
 FW_CHECK_NEED_REDHAT_9_GLIBC_2_3_2_HACK
 
 echo "******************************"
