@@ -52,7 +52,6 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 }
 
 sqlrlistener::~sqlrlistener() {
-printf("~sqlrlistener\n");
 	delete semset;
 	delete idmemory;
 	if (unixport) {
