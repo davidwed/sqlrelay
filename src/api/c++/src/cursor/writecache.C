@@ -262,6 +262,10 @@ void	sqlrcursor::cacheData() {
 
 void	sqlrcursor::finishCaching() {
 
+	if (!cachedest) {
+		return;
+	}
+
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Finishing caching.\n");
