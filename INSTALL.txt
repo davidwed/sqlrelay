@@ -102,7 +102,7 @@ RPM INSTALL:
 	This will generate RPM's in the system-wide RPM directory (usually
 	/usr/src/redhat/RPMS or /usr/local/rpm/RPMS) under the subdirectory
 	corresponding to your system architecture.  You can install them by
-	changing directories into packages/RPMS and executing 
-	the following command as root:
+	changing directories into that directory and executing the following
+	command as root:
 
 		rpm -i sqlrelay-*

@@ -1,12 +1,12 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
+#include <msqlconnection.h>
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
-#include <msqlconnection.h>
 
 #include <datatypes.h>
 

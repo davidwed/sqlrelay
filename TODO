@@ -7,7 +7,7 @@ lots of documentation fixes:
 	db2 8.1 installation
 	sybase 12.5 installation (license manager stuff)
 	db2 7.1 startup directions are wrong;
-		you have to run db2start/db2stop as db2as
+		you have to run db2start/db2shut as db2as
 	fix clientapis.html
 
 Tests:

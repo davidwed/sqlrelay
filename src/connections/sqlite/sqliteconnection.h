@@ -6,14 +6,14 @@
 
 #define NUM_CONNECT_STRING_VARS 1
 
+#include <pthread.h>
+
 #include <sqlrconnection.h>
 #include <rudiments/semaphoreset.h>
 
 extern "C" {
 	#include <sqlite.h>
 }
-
-#include <pthread.h>
 
 #include <config.h>
 
