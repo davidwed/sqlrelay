@@ -1,94 +1,104 @@
-<HTML>
-<HEAD>
-<TITLE>SQLRelay</TITLE>
-<LINK REV="made" HREF="mailto:bhcompile@daffy.perf.redhat.com">
-</HEAD>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>SQLRelay</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
 
-<BODY>
+<body style="background-color: white">
 
-<A NAME="__index__"></A>
+<p><a name="__index__"></a></p>
 <!-- INDEX BEGIN -->
 
-<UL>
+<ul>
 
-	<LI><A HREF="#name">NAME</A></LI>
-	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
-	<LI><A HREF="#description">DESCRIPTION</A></LI>
-	<LI><A HREF="#author">AUTHOR</A></LI>
-	<LI><A HREF="#see also">SEE ALSO</A></LI>
-</UL>
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
 <!-- INDEX END -->
 
-<HR>
-<P>
-<H1><A NAME="name">NAME</A></H1>
-<P>DBD::SQLRelay - perl DBI driver for SQL Relay</P>
-<P>
-<HR>
-<H1><A NAME="synopsis">SYNOPSIS</A></H1>
-<P>use DBD::SQLRelay;</P>
-<P>my $dbh = DBI -&gt; connect ('dbi:SQLRelay:$dsn', $login, $password);</P>
-<P>
-<HR>
-<H1><A NAME="description">DESCRIPTION</A></H1>
-<P>This module is a pure-Perl DBI binding to SQL Relay's native API. 
-Connection string consists of following parts:</P>
-<DL>
-<DT><STRONG><A NAME="item_host%3D%2E%2E%2E_default%3A_localhost_%2D%2D%2D_ho"><STRONG>host=...</STRONG>      default: <EM>localhost</EM> --- hostname of SQL Relay server;</A></STRONG><BR>
-<DD>
-<DT><STRONG><A NAME="item_port%3D%2E%2E%2E_default%3A_9000_%2D%2D%2D_port_nu"><STRONG>port=...</STRONG>      default: <EM>9000</EM>      --- port number that SQL Relay server listens on;</A></STRONG><BR>
-<DD>
-<DT><STRONG><A NAME="item_tries%3D%2E%2E%2E_default%3A_1_%2D%2D%2D_how_much_"><STRONG>tries=...</STRONG>     default: <EM>1</EM>         --- how much times do we try to connect;</A></STRONG><BR>
-<DD>
-<DT><STRONG><A NAME="item_time"><STRONG>retrytime=...</STRONG> default: <EM>0</EM>         --- time (in seconds) between connect attempts;</A></STRONG><BR>
-<DD>
-<DT><STRONG><A NAME="item_debug%3D%2E%2E%2E_default%3A_0_%2D%2D%2D_set_it_to"><STRONG>debug=...</STRONG>     default: <EM>0</EM>         --- set it to 1 if you want to get some debug messages in stdout;</A></STRONG><BR>
-<DD>
-Once connected, DB handler works as usual (see <EM>DBI</EM>).
-<P>Don't ever try to share one SQLRelay connect by multiple scripts, for example, if you use 
-Apache mod_perl. Every $dbh holds one of server connections, so call <CODE>disconnect()</CODE> directly
-at the end of every script and don't use Apache::DBI or SQLRelay will be deadlocked.</P>
-<P>If you use <A HREF="/HTML/Mason.html">the HTML::Mason manpage</A>, your handler.pl sould look like this:</P>
-<PRE>
-  ...</PRE>
-<PRE>
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>DBD::SQLRelay - perl DBI driver for SQL Relay</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>use DBD::SQLRelay;</p>
+<p>my $dbh = DBI -&gt; connect ('dbi:SQLRelay:$dsn', $login, $password);</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module is a pure-Perl DBI binding to SQL Relay's native API. 
+Connection string consists of following parts:</p>
+<dl>
+<dt><strong><a name="item_host%3d%2e%2e%2e_default%3a_localhost_%2d%2d%2d_ho"><strong>host=...</strong>      default: <em>localhost</em> --- hostname of SQL Relay server;</a></strong><br />
+</dt>
+<dt><strong><a name="item_port%3d%2e%2e%2e_default%3a_9000_%2d%2d%2d_port_nu"><strong>port=...</strong>      default: <em>9000</em>      --- port number that SQL Relay server listens on;</a></strong><br />
+</dt>
+<dt><strong><a name="item_tries%3d%2e%2e%2e_default%3a_1_%2d%2d%2d_how_much_"><strong>tries=...</strong>     default: <em>1</em>         --- how much times do we try to connect;</a></strong><br />
+</dt>
+<dt><strong><a name="item_time"><strong>retrytime=...</strong> default: <em>0</em>         --- time (in seconds) between connect attempts;</a></strong><br />
+</dt>
+<dt><strong><a name="item_debug%3d%2e%2e%2e_default%3a_0_%2d%2d%2d_set_it_to"><strong>debug=...</strong>     default: <em>0</em>         --- set it to 1 if you want to get some debug messages in stdout;</a></strong><br />
+</dt>
+<dd>
+Once connected, DB handler works as usual (see <em>DBI</em>).
+</dd>
+<dd>
+<p>Don't ever try to share one SQLRelay connect by multiple scripts, for example, if you use 
+Apache mod_perl. Every $dbh holds one of server connections, so call <code>disconnect()</code> directly
+at the end of every script and don't use Apache::DBI or SQLRelay will be deadlocked.</p>
+</dd>
+<dd>
+<p>If you use <a href="/HTML/Mason.html">the HTML::Mason manpage</a>, your handler.pl sould look like this:</p>
+</dd>
+<dd>
+<pre>
+  ...</pre>
+</dd>
+<dd>
+<pre>
      {
        package HTML::Mason::Commands;
        use DBI;
        use vars qw($db);  
      }
-</PRE>
-<PRE>
-
-  ...</PRE>
-<PRE>
+ 
+  ...</pre>
+</dd>
+<dd>
+<pre>
      sub handler {
-</PRE>
-<PRE>
+       
+       $HTML::Mason::Commands::dbh = DBI -&gt; connect (...);
+       
+       my $status = $ah -&gt; handle_request (...);
+     
+       $HTML::Mason::Commands::dbh -&gt; disconnect;
+       
+       return $status;
+              
+     }</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>D. E. Ovsyanko, <a href="mailto:do@mobile.ru">do@mobile.ru</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="http://www.firstworks.com">http://www.firstworks.com</a></p>
 
-       $HTML::Mason::Commands::dbh = DBI -&gt; connect (...);</PRE>
-<PRE>
+</body>
 
-       my $status = $ah -&gt; handle_request (...);</PRE>
-<PRE>
-
-       $HTML::Mason::Commands::dbh -&gt; disconnect;</PRE>
-<PRE>
-
-       return $status;</PRE>
-<PRE>
-
-     }</PRE>
-<P></P></DL>
-<P>
-<HR>
-<H1><A NAME="author">AUTHOR</A></H1>
-<P>D. E. Ovsyanko, <A HREF="mailto:do@mobile.ru">do@mobile.ru</A></P>
-<P>
-<HR>
-<H1><A NAME="see also">SEE ALSO</A></H1>
-<P><A HREF="http://www.firstworks.com">http://www.firstworks.com</A></P>
-
-</BODY>
-
-</HTML>
+</html>

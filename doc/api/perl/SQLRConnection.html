@@ -1,145 +1,149 @@
-<HTML>
-<HEAD>
-<TITLE>SQLRConnection</TITLE>
-<LINK REV="made" HREF="mailto:bhcompile@daffy.perf.redhat.com">
-</HEAD>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>SQLRConnection</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
 
-<BODY>
+<body style="background-color: white">
 
-<A NAME="__index__"></A>
+<p><a name="__index__"></a></p>
 <!-- INDEX BEGIN -->
 
-<UL>
+<ul>
 
-	<LI><A HREF="#name">NAME</A></LI>
-	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
-	<LI><A HREF="#description">DESCRIPTION</A></LI>
-	<LI><A HREF="#author">AUTHOR</A></LI>
-</UL>
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
 <!-- INDEX END -->
 
-<HR>
-<P>
-<H1><A NAME="name">NAME</A></H1>
-<PRE>
-    Firstworks::SQLRConnection - Perl API for SQL Relay</PRE>
-<P>
-<HR>
-<H1><A NAME="synopsis">SYNOPSIS</A></H1>
-<PRE>
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<pre>
+    Firstworks::SQLRConnection - Perl API for SQL Relay</pre>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
         use Firstworks::SQLRConnection;
-        use Firstworks::SQLRStmt;</PRE>
-<PRE>
+        use Firstworks::SQLRStmt;</pre>
+<pre>
         my $sc=Firstworks::SQLRConnection-&gt;new(&quot;testhost&quot;,9000,&quot;&quot;,
                                           &quot;testuser&quot;,&quot;testpassword&quot;,0,1);
-        my $ss=Firstworks::SQLRStmt-&gt;new($sc);</PRE>
-<PRE>
+        my $ss=Firstworks::SQLRStmt-&gt;new($sc);</pre>
+<pre>
         $ss-&gt;sendQuery(&quot;select table_name from user_tables&quot;);
-        $sc-&gt;endSession();</PRE>
-<PRE>
+        $sc-&gt;endSession();</pre>
+<pre>
         for (my $i=0; $i&lt;$ss-&gt;rowCount(); $i++) {
                 print $ss-&gt;getField($i,&quot;table_name&quot;), &quot;\n&quot;;
-        }</PRE>
-<P>
-<HR>
-<H1><A NAME="description">DESCRIPTION</A></H1>
-<PRE>
-    Firstworks::SQLRConnection</PRE>
-<PRE>
+        }</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<pre>
+    Firstworks::SQLRConnection</pre>
+<pre>
         new(server, port, socket, user, password, retrytime, tries);
             # Initiates a connection to &quot;server&quot; on &quot;port&quot;
             # or to the unix &quot;socket&quot; on the local machine
             # and authenticates with &quot;user&quot; and &quot;password&quot;.
             # Failed connections will be retried for 
-            # &quot;tries&quot; times on interval &quot;retrytime&quot;
-            # or on for a default number of times on
-            # a default interval if left unspecified.
+            # &quot;tries&quot; times on interval &quot;retrytime&quot;.
+            # If &quot;tries&quot; is 0 then retries will continue
+            # forever.  If &quot;retrytime&quot; is 0 then retries
+            # will be attempted on a default interval.
             #
             # If the &quot;socket&quot; parameter is neither
             # NULL nor &quot;&quot; then an attempt will be made to
             # connect through it before attempting to
             # connect to &quot;server&quot; on &quot;port&quot;.  If it is
             # NULL or &quot;&quot; then no attempt will be made to
-            # connect through the socket.</PRE>
-<PRE>
+            # connect through the socket.</pre>
+<pre>
         DESTROY();
             # Disconnects and ends the session if
-            # it hasn't been ended already.</PRE>
-<PRE>
+            # it hasn't been ended already.</pre>
+<pre>
         endSession();
-            # Ends the session.</PRE>
-<PRE>
+            # Ends the session.</pre>
+<pre>
         suspendSession();
             # Leaves the session open so another client
             # can connect to it.
-</PRE>
-<PRE>
-
+            
         getConnectionPort();
             # Returns the inet port that the client is 
             # communicating over. This parameter may be 
             # passed to another client for use in
-            # the resumeSession() command below.</PRE>
-<PRE>
+            # the resumeSession() command below.</pre>
+<pre>
         getConnectionSocket();
             # Returns the unix socket that the client is 
             # communicating over. This parameter may be 
             # passed to another client for use in
-            # the resumeSession() command below.</PRE>
-<PRE>
+            # the resumeSession() command below.</pre>
+<pre>
         resumeSession(port,socket);
             # Resumes a session previously left open 
             # using suspendSession().
-            # Returns 1 on success and 0 on failure.</PRE>
-<PRE>
+            # Returns 1 on success and 0 on failure.</pre>
+<pre>
         ping();
             # Returns 1 if the database is up and 0
-            # if it's down.</PRE>
-<PRE>
+            # if it's down.</pre>
+<pre>
         identify();
             # Returns the type of database:
-            #   oracle7, oracle8, postgresql, mysql, etc.</PRE>
-<PRE>
+            #   oracle7, oracle8, postgresql, mysql, etc.</pre>
+<pre>
         autoCommitOn();
             # Instructs the database to perform a commit
             # after every successful query.
             # Returns 1 if setting autocommit on succeeded
-            # and 0 if it failed.</PRE>
-<PRE>
+            # and 0 if it failed.</pre>
+<pre>
         autoCommitOff();
             # Instructs the database to wait for the 
             # client to tell it when to commit.
             # Returns 1 if setting autocommit off succeeded
-            # and 0 if it failed.</PRE>
-<PRE>
+            # and 0 if it failed.</pre>
+<pre>
         commit();
             # Issues a commit.  Returns 1 if the commit
             # succeeded, 0 if it failed and -1 if an
-            # error occurred.</PRE>
-<PRE>
+            # error occurred.</pre>
+<pre>
         rollback();
             # Issues a rollback.  Returns 1 if the rollback
             # succeeded, 0 if it failed and -1 if an
-            # error occurred.</PRE>
-<PRE>
+            # error occurred.</pre>
+<pre>
         debugOn();
             # Causes verbose debugging information to be 
             # sent to standard output.  Another way to do 
-            # this is to start a query with &quot;-- debug\n&quot;.</PRE>
-<PRE>
+            # this is to start a query with &quot;-- debug\n&quot;.</pre>
+<pre>
         debugOff();
-            # Turns debugging off.</PRE>
-<PRE>
+            # Turns debugging off.</pre>
+<pre>
         getDebug();
             # Returns 1 if debugging is currently on and 0
-            # if debugging is currently off.</PRE>
-<P>
-<HR>
-<H1><A NAME="author">AUTHOR</A></H1>
-<PRE>
+            # if debugging is currently off.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<pre>
     David Muse
-    dmuse@firstworks.com</PRE>
+    dmuse@firstworks.com</pre>
 
-</BODY>
+</body>
 
-</HTML>
+</html>
