@@ -705,6 +705,25 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBind
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getOutputBindAsBytes
+ * Signature: (Ljava/lang/String;)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindAsBytes
+  (JNIEnv *env, jobject self, jstring variable) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*variablestring=curGetStringUTFChars(env,variable,0);
+	long	length=cur->getOutputBindLength(variablestring);
+	jbyteArray	retval=env->NewByteArray(length);
+	env->SetByteArrayRegion(retval,0,length,
+				(jbyte *)cur->getOutputBind(variablestring));
+	curReleaseStringUTFChars(env,variable,variablestring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getOutputBindLength
  * Signature: (Ljava/lang/String;)J
  */
@@ -893,6 +912,42 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getField__ILja
 				env->GetFieldID(cls,"cursor","I"));
 	char	*colstring=curGetStringUTFChars(env,col,0);
 	jstring	retval=env->NewStringUTF(cur->getField((int)row,colstring));
+	curReleaseStringUTFChars(env,col,colstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getFieldAsBytes
+ * Signature: (II)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsBytes__II
+  (JNIEnv *env, jobject self, jint row, jint col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	long	length=cur->getFieldLength((int)row,(int)col);
+	jbyteArray	retval=env->NewByteArray(length);
+	env->SetByteArrayRegion(retval,0,length,
+				(jbyte *)cur->getField((int)row,(int)col));
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getFieldAsBytes
+ * Signature: (ILjava/lang/String;)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsBytes__ILjava_lang_String_2
+  (JNIEnv *env, jobject self, jint row, jstring col) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*colstring=curGetStringUTFChars(env,col,0);
+	long	length=cur->getFieldLength((int)row,colstring);
+	jbyteArray	retval=env->NewByteArray(length);
+	env->SetByteArrayRegion(retval,0,length,
+				(jbyte *)cur->getField((int)row,colstring));
 	curReleaseStringUTFChars(env,col,colstring);
 	return retval;
 }

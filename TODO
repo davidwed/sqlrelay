@@ -1,6 +1,6 @@
-mysql instructions for giving a user privileges doesn't have enough fields.
+suspend/resumeResultSet doesn't appear to work if result set is done
 
-Ruby/Java getField and getOutputBind methods are not binary-safe
+test,document Java "asBytes" methods
 
 tests need to check blob/lobs with binary data in them
 

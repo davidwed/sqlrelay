@@ -1090,21 +1090,21 @@ void	sqlrlistener::pingDatabase() {
 	if (!(childpid=fork())) {
 
 		// connect to the database connection
-		// FIXME: what if the connect fails?
 		datatransport	*connsock=connectToConnection();
+		if (connsock) {
 
-		// send it a ping command
-		connsock->write((unsigned short)PING);
+			// send it a ping command
+			connsock->write((unsigned short)PING);
 
-		// get the ping result
-		// FIXME: what if the ping fails?
-		unsigned short	result=1;
-		if (connsock->read(&result)!=sizeof(unsigned short)) {
-			result=0;
+			// get the ping result
+			unsigned short	result=1;
+			if (connsock->read(&result)!=sizeof(unsigned short)) {
+				result=0;
+			}
+
+			// disconnect
+			disconnectFromConnection(connsock);
 		}
-
-		// disconnect
-		disconnectFromConnection(connsock);
 
 		// since this is the forked off listener, we don't
 		// want to actually remove the semaphore set or shared
@@ -1131,7 +1131,7 @@ datatransport	*sqlrlistener::connectToConnection() {
 		// first, try for the unix port
 		if (unixportstr && unixportstr[0]) {
 			unixclientsocket	*unixsock=
-					new unixclientsocket();
+							new unixclientsocket();
 			connected=unixsock->connectToServer(unixportstr,0,1);
 			if (connected) {
 				return unixsock;
@@ -1141,10 +1141,8 @@ datatransport	*sqlrlistener::connectToConnection() {
 		// then try for the inet port
 		if (!connected) {
 			inetclientsocket	*inetsock=
-					new inetclientsocket();
-			// FIXME: if sqlrelay isn't bound to 127.0.0.1, this
-			// won't work
-			connected=inetsock->connectToServer("localhost",
+							new inetclientsocket();
+			connected=inetsock->connectToServer("127.0.0.1",
 								inetport,0,1);
 			if (connected) {
 				return inetsock;

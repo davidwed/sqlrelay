@@ -532,9 +532,11 @@ static VALUE sqlrcur_fetchFromBindCursor(VALUE self) {
 static VALUE sqlrcur_getOutputBind(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	*result=sqlrcur->getOutputBind(STR2CSTR(variable));
+	char	*varname=STR2CSTR(variable);
+	char	*result=sqlrcur->getOutputBind(varname);
+	long	length=sqlrcur->getOutputBindLength(varname);
 	if (result) {
-		return rb_str_new2(result);
+		return rb_str_new(result,length);
 	} else {
 		return Qnil;
 	}
@@ -627,13 +629,16 @@ static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	char	*result;
+	long	length;
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
 		result=sqlrcur->getField(NUM2INT(row),STR2CSTR(col));
+		length=sqlrcur->getFieldLength(NUM2INT(row),STR2CSTR(col));
 	} else {
 		result=sqlrcur->getField(NUM2INT(row),NUM2INT(col));
+		length=sqlrcur->getFieldLength(NUM2INT(row),NUM2INT(col));
 	}
 	if (result) {
-		return rb_str_new2(result);
+		return rb_str_new(result,length);
 	} else {
 		return Qnil;
 	}

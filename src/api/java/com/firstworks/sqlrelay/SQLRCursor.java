@@ -169,6 +169,9 @@ public class SQLRCursor {
 	public native String	getOutputBind(String variable);
 	/** Get the length of the value stored in a
 	 *  previously defined output bind variable.  */
+	public native byte[]	getOutputBindAsBytes(String variable);
+	/** Get the length of the value stored in a
+	 *  previously defined output bind variable.  */
 	public native long	getOutputBindLength(String variable);
 	/** Get the cursor associated with a
 	 *  previously defined output bind variable.  */
@@ -241,6 +244,12 @@ public class SQLRCursor {
 	/** Returns a pointer to the value of the 
 	 *  specified row and column.  */
 	public native String	getField(int row, String col);
+	/** Returns the length of the 
+	 *  specified row and column.  */
+	public native byte[]	getFieldAsBytes(int row, int col);
+	/** Returns a pointer to the value of the 
+	 *  specified row and column.  */
+	public native byte[]	getFieldAsBytes(int row, String col);
 	/** Returns the length of the 
 	 *  specified row and column.  */
 	public native long	getFieldLength(int row, int col);

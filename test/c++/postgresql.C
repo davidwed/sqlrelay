@@ -78,7 +78,6 @@ int	main(int argc, char **argv) {
 	con=new sqlrconnection(argv[1],atoi(argv[2]), 
 					argv[3],argv[4],argv[5],0,1);
 	cur=new sqlrcursor(con);
-	con->debugOn();
 
 	printf("IDENTIFY: \n");
 	checkSuccess(con->identify(),"postgresql");
