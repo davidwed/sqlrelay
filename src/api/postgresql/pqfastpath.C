@@ -1,0 +1,17 @@
+extern "C" {
+
+typedef struct {
+	int	len;
+	int	isint;
+	union {
+		int	*ptr;
+		int	integer;
+	} u;
+} PQArgBlock;
+
+// fast path interface --- not really recommended for application use.
+PGresult *PQfn(PGconn *conn, int fnid, int *result_buf, int *result_len,
+	 	int result_is_int, const PQArgBlock *args, int nargs) {
+}
+
+}
