@@ -137,6 +137,13 @@ class oracle8cursor : public sqlrcursor {
 		ub2		def_col_retcode[MAX_SELECT_LIST_SIZE]
 						[FETCH_AT_ONCE];
 
+		OCIBind		*inbindpp[MAXVAR];
+		OCIBind		*outbindpp[MAXVAR];
+		OCIBind		*curbindpp[MAXVAR];
+		int		inbindcount;
+		int		outbindcount;
+		int		curbindcount;
+
 		OCILobLocator	*inbind_lob[MAXVAR];
 		OCILobLocator	*outbind_lob[MAXVAR];
 		int		inbindlobcount;

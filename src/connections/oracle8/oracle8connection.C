@@ -323,6 +323,14 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	fetchatonce=FETCH_AT_ONCE;
 	inbindlobcount=0;
 	outbindlobcount=0;
+	inbindcount=0;
+	outbindcount=0;
+	curbindcount=0;
+	for (int i=0; i<MAXVAR; i++) {
+		inbindpp[i]=NULL;
+		outbindpp[i]=NULL;
+		curbindpp[i]=NULL;
+	}
 }
 
 oracle8cursor::~oracle8cursor() {
@@ -392,14 +400,13 @@ int	oracle8cursor::inputBindString(const char *variable,
 						short *isnull) {
 	checkRePrepare();
 
-	OCIBind	*bindpp=NULL;
-
 	// the size of the value must include the terminating NULL
 	if (isNumber(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
-		if (OCIBindByPos(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
+				oracle8conn->err,
 				(ub4)atoi(variable+1),
 				(dvoid *)value,(sb4)valuesize+1,
 				SQLT_STR,
@@ -408,7 +415,8 @@ int	oracle8cursor::inputBindString(const char *variable,
 			return 0;
 		}
 	} else {
-		if (OCIBindByName(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByName(stmt,&inbindpp[inbindcount],
+				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,(sb4)valuesize+1,
 				SQLT_STR,
@@ -417,6 +425,7 @@ int	oracle8cursor::inputBindString(const char *variable,
 			return 0;
 		}
 	}
+	inbindcount++;
 	return 1;
 }
 
@@ -426,13 +435,12 @@ int	oracle8cursor::inputBindLong(const char *variable,
 						unsigned long *value) {
 	checkRePrepare();
 
-	OCIBind	*bindpp=NULL;
-
 	if (isNumber(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
-		if (OCIBindByPos(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
+				oracle8conn->err,
 				(ub4)atoi(variable+1),
 				(dvoid *)value,(sb4)sizeof(long),
 				SQLT_INT,
@@ -441,7 +449,8 @@ int	oracle8cursor::inputBindLong(const char *variable,
 			return 0;
 		}
 	} else {
-		if (OCIBindByName(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByName(stmt,&inbindpp[inbindcount],
+				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,(sb4)sizeof(long),
 				SQLT_INT,
@@ -450,6 +459,7 @@ int	oracle8cursor::inputBindLong(const char *variable,
 			return 0;
 		}
 	}
+	inbindcount++;
 	return 1;
 }
 
@@ -461,13 +471,12 @@ int	oracle8cursor::inputBindDouble(const char *variable,
 						unsigned short scale) {
 	checkRePrepare();
 
-	OCIBind	*bindpp=NULL;
-
 	if (isNumber(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
-		if (OCIBindByPos(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
+				oracle8conn->err,
 				(ub4)atoi(variable+1),
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
@@ -476,7 +485,8 @@ int	oracle8cursor::inputBindDouble(const char *variable,
 			return 0;
 		}
 	} else {
-		if (OCIBindByName(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByName(stmt,&inbindpp[inbindcount],
+				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
@@ -485,6 +495,7 @@ int	oracle8cursor::inputBindDouble(const char *variable,
 			return 0;
 		}
 	}
+	inbindcount++;
 	return 1;
 }
 
@@ -517,71 +528,72 @@ int	oracle8cursor::inputBindGenericLob(const char *variable,
 						ub2 type) {
 
 	checkRePrepare();
-
-	OCIBind		*bindpp=NULL;
-	unsigned int	index=inbindlobcount;
-	ub4		size=valuesize;
+	ub4	size=valuesize;
 
 	// create a temporary lob, write the value to it
 	if (OCIDescriptorAlloc((dvoid *)oracle8conn->env,
-			(dvoid **)&inbind_lob[index],
+			(dvoid **)&inbind_lob[inbindlobcount],
 			(ub4)OCI_DTYPE_LOB,
 			(size_t)0,(dvoid **)0)!=OCI_SUCCESS) {
 		return 0;
 	}
 	if (OCILobCreateTemporary(oracle8conn->svc,oracle8conn->err,
-			inbind_lob[index],(ub2)0,SQLCS_IMPLICIT,
+			inbind_lob[inbindlobcount],(ub2)0,SQLCS_IMPLICIT,
 			temptype,OCI_ATTR_NOCACHE,
 			OCI_DURATION_SESSION)!=OCI_SUCCESS) {
-		OCIHandleFree(inbind_lob[index],OCI_DTYPE_LOB);
+		OCIHandleFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
 		return 0;
 	}
 	if (OCILobOpen(oracle8conn->svc,oracle8conn->err,
-			inbind_lob[index],
+			inbind_lob[inbindlobcount],
 			OCI_LOB_READWRITE)!=OCI_SUCCESS) {
 		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
-					inbind_lob[index]);
-		OCIHandleFree(inbind_lob[index],OCI_DTYPE_LOB);
+					inbind_lob[inbindlobcount]);
+		OCIHandleFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
 		return 0;
 	}
 	if (OCILobWrite(oracle8conn->svc,oracle8conn->err,
-			inbind_lob[index],&size,1,(void *)value,size,
+			inbind_lob[inbindlobcount],&size,1,
+			(void *)value,size,
 			OCI_ONE_PIECE,(dvoid *)0,
 			(sb4 (*)(dvoid*,dvoid*,ub4*,ub1 *))0,
 			0,SQLCS_IMPLICIT)!=OCI_SUCCESS) {
 
 		OCILobClose(oracle8conn->svc,oracle8conn->err,
-					inbind_lob[index]);
+					inbind_lob[inbindlobcount]);
 		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
-					inbind_lob[index]);
-		OCIHandleFree(inbind_lob[index],OCI_DTYPE_LOB);
+					inbind_lob[inbindlobcount]);
+		OCIHandleFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB);
 		return 0;
 	}
-	inbindlobcount++;
 
 	// bind the temporary lob
 	if (isNumber(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
-		if (OCIBindByPos(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
+				oracle8conn->err,
 				(ub4)atoi(variable+1),
-				(dvoid *)&inbind_lob[index],(sb4)0,
+				(dvoid *)&inbind_lob[inbindlobcount],(sb4)0,
 				type,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return 0;
 		}
 	} else {
-		if (OCIBindByName(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByName(stmt,&inbindpp[inbindcount],
+				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
-				(dvoid *)&inbind_lob[index],(sb4)0,
+				(dvoid *)&inbind_lob[inbindlobcount],(sb4)0,
 				type,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return 0;
 		}
 	}
+	inbindlobcount++;
+	inbindcount++;
 	return 1;
 }
 
@@ -592,12 +604,12 @@ int	oracle8cursor::outputBindString(const char *variable,
 						short *isnull) {
 	checkRePrepare();
 
-	OCIBind	*bindpp=NULL;
 	if (isNumber(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
-		if (OCIBindByPos(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByPos(stmt,&outbindpp[outbindcount],
+				oracle8conn->err,
 				(ub4)atoi(variable+1),
 				(dvoid *)value,
 				(sb4)valuesize,
@@ -607,7 +619,8 @@ int	oracle8cursor::outputBindString(const char *variable,
 			return 0;
 		}
 	} else {
-		if (OCIBindByName(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByName(stmt,&outbindpp[outbindcount],
+				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,
 				(sb4)valuesize,
@@ -617,6 +630,7 @@ int	oracle8cursor::outputBindString(const char *variable,
 			return 0;
 		}
 	}
+	outbindcount++;
 	return 1;
 }
 
@@ -641,7 +655,6 @@ int	oracle8cursor::outputBindGenericLob(const char *variable,
 						ub2 type) {
 
 	checkRePrepare();
-	OCIBind	*bindpp=NULL;
 
 	// allocate a lob descriptor
 	if (OCIDescriptorAlloc((dvoid *)oracle8conn->env,
@@ -656,7 +669,8 @@ int	oracle8cursor::outputBindGenericLob(const char *variable,
 		if (!atoi(variable+1)) {
 			return 0;
 		}
-		if (OCIBindByPos(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByPos(stmt,&outbindpp[outbindcount],
+			oracle8conn->err,
 			(ub4)atoi(variable+1),
 			(dvoid *)&outbind_lob[index],(sb4)-1,
 			type,
@@ -665,7 +679,8 @@ int	oracle8cursor::outputBindGenericLob(const char *variable,
 				return 0;
 		}
 	} else {
-		if (OCIBindByName(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByName(stmt,&outbindpp[outbindcount],
+				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)&outbind_lob[index],(sb4)-1,
 				type,
@@ -674,6 +689,7 @@ int	oracle8cursor::outputBindGenericLob(const char *variable,
 			return 0;
 		}
 	}
+	outbindcount++;
 	return 1 ;
 }
 
@@ -683,12 +699,12 @@ int	oracle8cursor::outputBindCursor(const char *variable,
 
 	checkRePrepare();
 
-	OCIBind	*bindpp=NULL;
 	if (isNumber(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
-		if (OCIBindByPos(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByPos(stmt,&curbindpp[curbindcount],
+				oracle8conn->err,
 				(ub4)atoi(variable+1),
 				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
 				(sb4)0,
@@ -698,7 +714,8 @@ int	oracle8cursor::outputBindCursor(const char *variable,
 			return 0;
 		}
 	} else {
-		if (OCIBindByName(stmt,&bindpp,oracle8conn->err,
+		if (OCIBindByName(stmt,&curbindpp[curbindcount],
+				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
 				(sb4)0,
@@ -708,6 +725,7 @@ int	oracle8cursor::outputBindCursor(const char *variable,
 			return 0;
 		}
 	}
+	curbindcount++;
 	return 1;
 }
 
@@ -1226,16 +1244,29 @@ void	oracle8cursor::cleanUpData() {
 	// free lob bind resources
 	for (i=0; i<inbindlobcount; i++) {
 		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
-					inbind_lob[i]);
+						inbind_lob[i]);
 		OCILobClose(oracle8conn->svc,oracle8conn->err,inbind_lob[i]);
 		OCIHandleFree(inbind_lob[i],OCI_DTYPE_LOB);
 	}
 	for (i=0; i<outbindlobcount; i++) {
-		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
-			outbind_lob[i]);
-		OCILobClose(oracle8conn->svc,oracle8conn->err,outbind_lob[i]);
-		OCIHandleFree(outbind_lob[i],OCI_DTYPE_LOB);
+		if (outbind_lob[i]) {
+			OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
+						outbind_lob[i]);
+			OCILobClose(oracle8conn->svc,oracle8conn->err,
+						outbind_lob[i]);
+			OCIHandleFree(outbind_lob[i],OCI_DTYPE_LOB);
+		}
 	}
 	inbindlobcount=0;
 	outbindlobcount=0;
+
+	// free regular bind resources
+	for (int i=0; i<MAXVAR; i++) {
+		inbindpp[i]=NULL;
+		outbindpp[i]=NULL;
+		curbindpp[i]=NULL;
+	}
+	inbindcount=0;
+	outbindcount=0;
+	curbindcount=0;
 }
