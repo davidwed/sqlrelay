@@ -1,6 +1,9 @@
 db2 start/stop script works, but isn't right, should be able to use
 	db2start, db2stop
 
+document that setting tds version wrong in freetds.conf can cause:
+Error:  Attempt to initiate a new SQL Server operation with results pending.
+
 --------------------------------------------------------------------------------
 
 rename interbase stuff firebird
