@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+
+Name: sqlrelay-c++
+Description: SQLRelay C++ client library
+Version: @SQLR_VERSION@
+Requires: rudiments
+Libs: -L@libdir@ -lsqlrclient 
+Cflags: -I@includedir@
