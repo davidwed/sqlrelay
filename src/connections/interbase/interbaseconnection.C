@@ -342,10 +342,9 @@ bool interbasecursor::executeQuery(const char *query, long length,
 	} else if (querytype==isc_info_sql_stmt_rollback) {
 		return !isc_rollback_retaining(interbaseconn->error,
 							&interbaseconn->tr);
-	}
+	} else if (queryIsExecSP) {
 
-	// if the query is a stored procedure then execute it as such
-	if (queryIsExecSP) {
+		// if the query is a stored procedure then execute it as such
 		if (isc_dsql_execute2(interbaseconn->error,
 					&interbaseconn->tr,
 					&stmt,1,insqlda,outsqlda)) {

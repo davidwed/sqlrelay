@@ -8,6 +8,7 @@
 #include <datatypes.h>
 
 #include <stdlib.h>
+#include <unistd.h>
 
 #ifdef __GNUC__
 stringbuffer	*freetdsconnection::errorstring;
@@ -17,9 +18,14 @@ bool		freetdsconnection::deadconnection;
 freetdsconnection::freetdsconnection() {
 	errorstring=NULL;
 	env=new environment();
+	dropcursor=NULL;
 }
 
 freetdsconnection::~freetdsconnection() {
+	if (dropcursor) {
+		dropcursor->closeCursor();
+		delete dropcursor;
+	}
 	delete errorstring;
 	delete env;
 }
@@ -193,6 +199,14 @@ bool freetdsconnection::logIn() {
 		logInError("failed to connect to the database",6);
 		return false;
 	}
+
+	// create a cursor that will be used to drop temp tables
+	dropcursor=initCursor();
+	if (!dropcursor->openCursor(-1)) {
+		dropcursor->closeCursor();
+		delete dropcursor;
+		return false;
+	}
 	return true;
 }
 
@@ -247,6 +261,7 @@ char freetdsconnection::bindVariablePrefix() {
 freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	freetdsconn=(freetdsconnection *)conn;
 	cmd=NULL;
+	cursorname=NULL;
 	#ifdef VERSION_NO
 		tdsversion=atof(VERSION_NO+9);
 	#else
@@ -267,25 +282,29 @@ freetdscursor::~freetdscursor() {
 	if (cmd) {
 		ct_cmd_drop(cmd);
 	}
+	delete cursorname;
 }
 
 bool freetdscursor::openCursor(int id) {
 
+	cursorname=charstring::parseNumber((long)id);
+
 	// switch to the correct database
-	bool	retval=true;
+	/*bool	retval=true;
 	if (freetdsconn->db && freetdsconn->db[0]) {
 		int	len=strlen(freetdsconn->db)+4;
 		char	query[len+1];
 		sprintf(query,"use %s",freetdsconn->db);
-		if (!(prepareQuery(query,len) &&
-				executeQuery(query,len,true))) {
+		if (!(prepareQuery(query,len)) ||
+				!(executeQuery(query,len,true))) {
 			bool	live;
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=false;
 		}
 		cleanUpData(true,true,true);
 	}
-	return (retval && sqlrcursor::openCursor(id));
+	return (retval && sqlrcursor::openCursor(id));*/
+	return true;
 }
 
 bool freetdscursor::prepareQuery(const char *query, long length) {
@@ -305,34 +324,19 @@ bool freetdscursor::prepareQuery(const char *query, long length) {
 	// FreeTDS version 0.62 and greater support bind variables
 	if (tdsversion>=0.62) {
 
-		// prepare...
-		/*if (ct_dynamic(cmd,CS_PREPARE,"id",CS_NULLTERM,
-				(CS_CHAR *)query,length)!=CS_SUCCEED) {
-			return false;
-		}
-		if (ct_send(cmd)!=CS_SUCCEED) {
-			return false;
-		}
-		CS_RETCODE	result;
-		while (ct_results(cmd,&result)==CS_SUCCEED);
-
-		// describe...
-		if (ct_dynamic(cmd,CS_DESCRIBE_INPUT,"ID",CS_NULLTERM,
-						NULL,CS_UNUSED)!=CS_SUCCEED) {
-			return false;
-		}
-		ct_send(cmd);
-		while (ct_results(cmd,&result)==CS_SUCCEED);
-
-		// execute (won't really be executed until
-		// 			ct_send() is called later)...
-		if (ct_dynamic(cmd,CS_EXECUTE,"id",CS_NULLTERM,
-					NULL,CS_UNUSED)!=CS_SUCCEED) {
+		/*if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)query,length,
+						CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}*/
-
-		if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)query,length,
-						CS_UNUSED)!=CS_SUCCEED) {
+		if (ct_cursor(cmd,CS_CURSOR_DECLARE,cursorname,CS_NULLTERM,
+					(CS_CHAR *)query,length,
+					CS_UNUSED)!=CS_SUCCEED ||
+			ct_cursor(cmd,CS_CURSOR_OPEN,NULL,CS_UNUSED,
+					NULL,CS_UNUSED,
+					CS_UNUSED)!=CS_SUCCEED ||
+			ct_cursor(cmd,CS_CURSOR_ROWS,NULL,CS_UNUSED,
+					NULL,CS_UNUSED,
+					(CS_INT)1)!=CS_SUCCEED) {
 			return false;
 		}
 	}
@@ -469,6 +473,8 @@ bool freetdscursor::outputBindString(const char *variable,
 
 bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 
+printf("%d: executeQuery(%s)\n",getpid(),query);
+
 	// clear out any errors
 	if (freetdsconn->errorstring) {
 		freetdsconn->deadconnection=false;
@@ -515,14 +521,19 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 	// result sets?  We're only interested in the first one,
 	// the rest will be cancelled.  Return a dead database on failure
 	if (ct_results(cmd,&results_type)==CS_FAIL) {
-		ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+		//ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+		ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
+					NULL,CS_UNUSED,CS_DEALLOC);
 		freetdsconn->deadconnection=true;
 		return false;
 	}
 
+
 	// handle a failed command
 	if ((int)results_type==CS_CMD_FAIL) {
-		ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+		//ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+		ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
+					NULL,CS_UNUSED,CS_DEALLOC);
 		return false;
 	}
 
@@ -609,7 +620,9 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 	// result set.  Otherwise FreeTDS will spew "unknown marker"
 	// errors to the screen when cleanUpData() is called.
 	if (moneycolumn) {
-		ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+		//ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+		ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
+					NULL,CS_UNUSED,CS_DEALLOC);
 	}
 
 	// return success only if no error was generated
@@ -800,14 +813,17 @@ void freetdscursor::returnRow() {
 
 void freetdscursor::cleanUpData(bool freerows, bool freecols,
 							bool freebinds) {
+printf("%d: cleanUpData()\n",getpid());
 
 	// Cancel the rest of the result sets.
 	// FreeTDS gets pissed off if you try to step through the result
 	// sets, cancelling each one if you didn't ct_describe it earlier,
 	// or if you didn't fetch all of the rows.  It doesn't seem to mind
 	// if you cancel all the result sets at once though.
-	if (freerows) {
-		ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+	if (freerows && cmd) {
+		//ct_cancel(freetdsconn->dbconn,NULL,CS_CANCEL_ALL);
+		ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
+					NULL,CS_UNUSED,CS_DEALLOC);
 	}
 }
 
@@ -925,4 +941,15 @@ CS_RETCODE freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 			append(msgp->text)->append("\n");
 
 	return CS_SUCCEED;
+}
+
+void freetdsconnection::dropTempTable(const char *tablename) {
+	stringbuffer	dropquery;
+	dropquery.append("drop table #")->append(tablename);
+	if (dropcursor->prepareQuery(dropquery.getString(),
+					dropquery.getStringLength())) {
+		dropcursor->executeQuery(dropquery.getString(),
+					dropquery.getStringLength(),1);
+	}
+	dropcursor->cleanUpData(true,true,true);
 }

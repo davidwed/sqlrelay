@@ -67,6 +67,8 @@ class freetdscursor : public sqlrcursor {
 		void	cleanUpData(bool freerows, bool freecols,
 							bool freebinds);
 
+		char		*cursorname;
+
 		double		tdsversion;
 		int		returnedcolumns;
 
@@ -111,6 +113,7 @@ class freetdsconnection : public sqlrconnection {
 		void	logOut();
 		char	*identify();
 		char	bindVariablePrefix();
+		void	dropTempTable(const char *tablename);
 
 		CS_CONTEXT	*context;
 		CS_LOCALE	*locale;
@@ -130,6 +133,8 @@ class freetdsconnection : public sqlrconnection {
 
 		static	stringbuffer	*errorstring;
 		static	bool		deadconnection;
+
+		sqlrcursor	*dropcursor;
 
 		static	CS_RETCODE	csMessageCallback(CS_CONTEXT *ctxt,
 						CS_CLIENTMSG *msgp);

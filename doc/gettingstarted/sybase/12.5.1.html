@@ -45,9 +45,6 @@ prior to installation.</p>
 echo 134217728 > /proc/sys/kernel/shmmax
 </b></blockquote>
 
-<p>It appears that the database server doesn't require this setting for
-production, only for installation.</p>
-
 <span class="heading2">Extract The Distribution</span><br>
 
 <p>The distribution comes as a tarball.  Extract it as follows:</p>
@@ -150,6 +147,8 @@ with whatever directory Sybase ASE is installed in.</p>
 <B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>PATH</FONT><B><FONT color=#a62828>=</FONT></B><FONT color=#a620f7>$PATH</FONT>:<FONT color=#a620f7>$SYBASE</FONT>/ASE-12.5/bin:<FONT color=#a620f7>$SYBASE</FONT>/ASE-12.5/install
 
 <B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>LANG</FONT><B><FONT color=#a62828>=</FONT></B>en_US</FONT>
+
+<font color="#a52829"><b>echo</b></font><font color="#ff00ff"> 134217728 </font><font color="#a52829"><b>&gt;</b></font> /proc/sys/kernel/shmmax
 
 <B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
         start<B><FONT color=#a62828>)</FONT></B>

@@ -4,8 +4,14 @@
 #include <sqlrconnection.h>
 
 void sqlrconnection::abortResultSetCommand(sqlrcursor *cursor) {
+
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"abort result set");
 	#endif
+
+	// Very important...
+	// Do not cleanUpData() here, otherwise result sets that were suspended
+	// after the entire result set was fetched won't be able to return
+	// column data when resumed.
 	cursor->abort();
 }

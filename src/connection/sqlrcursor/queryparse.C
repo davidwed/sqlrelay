@@ -10,6 +10,8 @@
 	#include <strings.h>
 #endif
 
+#include <unistd.h>
+
 bool sqlrcursor::queryIsNotSelect() {
 
 	// scan the query, bypassing whitespace and comments.
@@ -54,6 +56,8 @@ char *sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
 
 void sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
 
+printf("%d: checkForTempTable()\n",getpid());
+
 	char	*ptr=(char *)query;
 	char	*endptr=(char *)query+length;
 
@@ -66,10 +70,13 @@ void sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
 	// see if the query matches the pattern for a temporary query that
 	// creates a temporary table
 	if (createtemplower.match(ptr)) {
+printf("lower match\n");
 		ptr=createtemplower.getSubstringEnd(0);
 	} else if (createtempupper.match(ptr)) {
+printf("upper match\n");
 		ptr=createtempupper.getSubstringEnd(0);
 	} else {
+printf("no match\n");
 		return;
 	}
 

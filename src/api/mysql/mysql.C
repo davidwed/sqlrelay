@@ -618,7 +618,9 @@ MYSQL_RES *mysql_use_result(MYSQL *mysql) {
 void mysql_free_result(MYSQL_RES *result) {
 	if (result) {
 		delete result->sqlrcur;
-		delete[] result->fields;
+		if (result->fields) {
+			delete[] result->fields;
+		}
 		delete result;
 	}
 }
@@ -1265,8 +1267,12 @@ void mysql_stmt_data_seek(MYSQL_STMT *stmt, my_ulonglong offset) {
 
 my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 	if (stmt) {
-		mysql_free_result(stmt->result);
+		// It would seem like we'd want to call mysql_free_result here,
+		// but the mysql client calls it manually before calling
+		// mysql_close(), so presumably that's how apps should act.
+		//mysql_free_result(stmt->result);
 		delete stmt;
+		stmt=NULL;
 	}
 	return true;
 }

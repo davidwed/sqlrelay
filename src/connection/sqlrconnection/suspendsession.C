@@ -24,9 +24,16 @@ void sqlrconnection::suspendSession() {
 	accepttimeout=cfgfl->getSessionTimeout();
 	for (int i=0; i<cfgfl->getCursors(); i++) {
 		if (!cur[i]->suspendresultset && cur[i]->busy) {
+
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",3,(long)i);
 			#endif
+
+			// Very important...
+			// Do not cleanUpData() here, otherwise result sets
+			// that were suspended after the entire result set was
+			// fetched won't be able to return column data when
+			// resumed.
 			cur[i]->abort();
 		}
 	}

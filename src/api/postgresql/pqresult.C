@@ -82,7 +82,18 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 		result->sqlrcur->copyReferences();
 
 		if (conn->removetrailingsemicolons==-1) {
+
 			char	*dbtype=conn->sqlrcon->identify();
+			if (!dbtype) {
+				conn->error=new char[
+					strlen(result->sqlrcur->
+							errorMessage())+2];
+				sprintf(conn->error,"%s\n",
+					result->sqlrcur->errorMessage());
+				PQclear(result);
+				return NULL;
+			}
+
 			// FIXME: it's possible that other non-postgresql
 			// databases allow trailing semicolons
 			conn->removetrailingsemicolons=

@@ -2,37 +2,32 @@ cygwin:
 	requires rudiments without ssl/pcre support
 	perl api won't build
 
-interbase stored procedure/output bind tests fails at isc_dsql_prepare
+sybase problems:
+	11.9.2 clients segfauls on Fedora, no good way to avoid this, but 12.5.1
+		allegedly runs on Fedora.  Need to see if this is true for
+		redhat 8/9, others
+	must use cursors, otherwise connection can only run 1 query at a time
+		not using cursors is causing the temptable problem
+	should close the cursor rather than use ct_cancel
+	can cursors be used with non-selects?
+	can ct_param be used with cursors?
+	freetds 0.62 allegedly supports cursors, if using an older version,
+		only allow 1 cursor per connection
+	12.5.1 throws lots of errors
 
-ct_param problem:
-	try using TDS version 5 - already using version 5
-	try using ct_dynamic - not supported by ct_param yet
-	try using sp_executesql:
-		query is translated into:
-			"execute sp_executesql N'...query...',
-					@var1 = ...value1...,
-					@var2 = ...value2...,
-					@var3 = ...value3...,
-					..."
+interbase stored procedure/output bind tests fails at isc_dsql_prepare
+test sybase/freetds stored procedures
 
 fix erwin's fake binds problem
 
 VB wrapper
 
-stored procedures:
-	tests for mysql, sybase
-	stored procedure examples in faq
-
-probably related to temp table dropping:
-	freetds connection writes an error but succeeds in dropping the table
+stored procedure examples in faq
 
 sybase connection won't even start now
 
 idle client timeout
 perl apis -> CPAN
-
-psql doesn't work 100% with drop-in library
-mysql client segfaults at exit with drop-in library
 
 address Matthias Klose's concerns:
 --------------------------------------------------------------------------------
@@ -115,6 +110,7 @@ setting backlog:
 
 
 Tests:
+	stored procedures for mysql-5.0
 	adodb using peardb driver
 	db2 temp tables
 	odbc temp tables
@@ -221,6 +217,8 @@ Features:
 	support output bind vars and stored procedures in sybase
 	could debug logs be logrotate compatible?
 	postgresql drop-in api lacks many features
+	postgresql drop-in needs to parse out ; delimited queries for db's
+		that don't support that, execute them seperately
 	mysql drop-in api lacks a few features
 	sybase/freetds (possibly others) need options for setting chained mode 
 		and isolation mode when client connects

@@ -272,7 +272,9 @@ that is not supported by Sybase ASE.  For example, LANG=en_US.iso885915 on
 Redhat 7.3.  If SQL Relay fails to start, try setting LANG to something that is
 defined in /opt/sybase-11.9.2/locales/locales.dat such as en_US for english.
 The LC_ALL environment variable needs to be set to something that is defined in
-/opt/sybase-11.9.2/locales/locales.dat as well.</li>
+/opt/sybase-11.9.2/locales/locales.dat as well.  SQL Relay version 0.35 and
+higher have a connectstring parameter for sybase connections called "lang"
+which does the same thing.</li>
 <li><p>Sybase and FreeTDS both provide the libct.so library and the ctpublic.h
 header file.  If FreeTDS is installed from an RPM or other package, it is
 possible for it's libct.so to be installed in /usr/lib and it's header file to

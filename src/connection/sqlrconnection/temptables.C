@@ -18,11 +18,12 @@ void sqlrconnection::dropTempTable(const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table ")->append(tablename);
 	sqlrcursor	*dropcur=initCursor();
-	if (dropcur->openCursor(-1) &&
-		dropcur->prepareQuery(dropquery.getString(),
-					dropquery.getStringLength()) &&
-		dropcur->executeQuery(dropquery.getString(),
-					dropquery.getStringLength(),1)) {
+	if (dropcur->openCursor(-1)) {
+		if (dropcur->prepareQuery(dropquery.getString(),
+					dropquery.getStringLength())) {
+			dropcur->executeQuery(dropquery.getString(),
+					dropquery.getStringLength(),1);
+		}
 		dropcur->cleanUpData(true,true,true);
 	}
 	dropcur->closeCursor();
@@ -44,11 +45,12 @@ void sqlrconnection::truncateTempTable(const char *tablename) {
 	stringbuffer	truncatequery;
 	truncatequery.append("delete from ")->append(tablename);
 	sqlrcursor	*truncatecur=initCursor();
-	if (truncatecur->openCursor(-1) &&
-		truncatecur->prepareQuery(truncatequery.getString(),
-					truncatequery.getStringLength()) &&
-		truncatecur->executeQuery(truncatequery.getString(),
-					truncatequery.getStringLength(),1)) {
+	if (truncatecur->openCursor(-1)) {
+		if (truncatecur->prepareQuery(truncatequery.getString(),
+					truncatequery.getStringLength())) {
+			truncatecur->executeQuery(truncatequery.getString(),
+					truncatequery.getStringLength(),1);
+		}
 		truncatecur->cleanUpData(true,true,true);
 	}
 	truncatecur->closeCursor();

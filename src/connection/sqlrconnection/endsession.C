@@ -16,9 +16,6 @@ void sqlrconnection::endSession() {
 	debugPrint("connection",2,"ending session...");
 	#endif
 
-	truncateTempTables(&sessiontemptablesfortrunc);
-	dropTempTables(&sessiontemptablesfordrop);
-
 	// must set suspendedsession to false here so resumed sessions won't 
 	// automatically re-suspend
 	suspendedsession=false;
@@ -29,15 +26,26 @@ void sqlrconnection::endSession() {
 	#endif
 	for (int i=0; i<cfgfl->getCursors(); i++) {
 		if (cur[i]->busy) {
+
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",3,(long)i);
 			#endif
+
+			// Very important...
+			// Do not cleanUpData() here, otherwise result sets
+			// that were suspended after the entire result set was
+			// fetched won't be able to return column data when
+			// resumed.
 			cur[i]->abort();
 		}
 	}
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done aborting all busy cursors");
 	#endif
+
+	// truncate/drop temp tables
+	truncateTempTables(&sessiontemptablesfortrunc);
+	dropTempTables(&sessiontemptablesfordrop);
 
 	// commit or rollback if necessary
 	if (isTransactional() && commitorrollback) {

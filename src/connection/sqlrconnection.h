@@ -68,6 +68,10 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual void	setPassword(const char *password);
 		virtual char	*getUser();
 		virtual char	*getPassword();
+		virtual void	dropTempTables(stringlist *tablelist);
+		virtual void	dropTempTable(const char *tablename);
+		virtual void	truncateTempTables(stringlist *tablelist);
+		virtual void	truncateTempTable(const char *tablename);
 
 	public:
 		// methods used by derived classes
@@ -198,10 +202,6 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	resumeResultSet(sqlrcursor *cursor);
 		void	suspendSession();
 		void	endSession();
-		void	dropTempTables(stringlist *tablelist);
-		void	dropTempTable(const char *tablename);
-		void	truncateTempTables(stringlist *tablelist);
-		void	truncateTempTable(const char *tablename);
 		bool	getCommand(unsigned short *command);
 		void	noAvailableCursors(unsigned short command);
 		bool	getQuery(sqlrcursor *cursor);

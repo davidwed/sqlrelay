@@ -41,15 +41,14 @@ class sqlrconnection;
 
 class sqlrcursor {
 	friend class sqlrconnection;
-	friend class cursormanager;
 	public:
 			sqlrcursor(sqlrconnection *conn);
 		virtual	~sqlrcursor();
 
-	protected:
 		// interface definition
 		virtual	bool	openCursor(int id);
 		virtual	bool	closeCursor();
+
 		virtual	bool	prepareQuery(const char *query, long length);
 		virtual	bool	inputBindString(const char *variable, 
 						unsigned short variablesize,
@@ -111,10 +110,10 @@ class sqlrcursor {
 		virtual	void	cleanUpData(bool freerows, bool freecols,
 								bool freebinds);
 
+	protected:
 		regularexpression	createtemplower;
 		regularexpression	createtempupper;
 
-	public:
 		// methods/variables used by derived classes
 		stringbuffer	*fakeInputBinds(const char *query);
 

@@ -155,16 +155,20 @@ int	main(int argc, char **argv) {
 	cur->inputBind("1",5);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,0),"5");
-	/*cur->prepareQuery("select ? from testproc(?)");
+
+con->debugOn();
+	cur->prepareQuery("select ? from testproc(?)");
+	cur->inputBind("1",5);
 	cur->inputBind("2",5);
 	cur->defineOutputBind("1",5);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getOutputBind("1"),"5");
-	cur->prepareQuery("execute procedure testproc ? returning_values ?");
+	/*cur->prepareQuery("execute procedure testproc(?) returning_values ?");
 	cur->inputBind("1",5);
 	cur->defineOutputBind("2",5);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getOutputBind("2"),"5");*/
+
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");
 
