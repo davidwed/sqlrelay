@@ -8,6 +8,7 @@ ADODB interface
 VB wrapper
 FIXME's in mysql drop-in library
 column flags for non-mysql databases
+call endSession() from perl DBD finish method
 licenses:
 	Pear DB driver
 	mysql replacement library
@@ -24,16 +25,14 @@ tests:
 	perl dbi driver
 		execute_array
 		bind_param_array
-		selectall_arrayref
-		selectall_hashref
-		selectcol_arrayref
-		selectcol_hashref
-		selectrow_array
-		selectrow_arrayref
-		selectrow_hashref
+		selectall_arrayref with attr/binds
+		selectall_hashref with attr/binds
+		selectcol_arrayref with attr/binds
+		selectrow_array with attr/binds
+		selectrow_arrayref with attr/binds
+		selectrow_hashref with attr/binds
 		prepare_cached
-		fetchall_arrayref
-		fetchall_hashref
+		fetchall_arrayref with slice
 		quote
 		err
 		errstr

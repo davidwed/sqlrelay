@@ -8,4 +8,4 @@ clean:
 rebuild: clean all
 
 mysqltest: mysqltest.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(MYSQLINCLUDES) $? -s -o $@ $(MYSQLLIBS) $(EXTRALIBS) $(SOCKETLIB)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(MYSQLINCLUDES) $? -s -o $@ $(MYSQLLIBS) $(EXTRALIBS) $(SOCKETLIBS)

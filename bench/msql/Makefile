@@ -8,4 +8,4 @@ clean:
 rebuild: clean all
 
 msqltest: msqltest.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(MSQLINCLUDES) $? -s -o $@ $(MSQLLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(MSQLINCLUDES) $? -s -o $@ $(MSQLLIBS) $(EXTRALIBS) $(SOCKETLIBS)

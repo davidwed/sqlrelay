@@ -8,4 +8,4 @@ clean:
 rebuild: clean all
 
 lagotest: lagotest.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(LAGOINCLUDES) $? -s -o $@ $(LAGOLIBS) $(EXTRALIBS) $(SOCKETLIB) $(NSLLIB)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(LAGOINCLUDES) $? -s -o $@ $(LAGOLIBS) $(EXTRALIBS) $(SOCKETLIBS)

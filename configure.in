@@ -470,12 +470,13 @@ if ( test -n "$READLINELIB" -a -n "$HISTORYLIB" -a -n "$TERMCAPLIB" ); then
 fi
 AC_SUBST(READLINELIB)
 
-AC_CHECK_LIB(socket,socket,SOCKETLIB=-lsocket,SOCKETLIB="")
-AC_SUBST(SOCKETLIB)
-AC_CHECK_LIB(xnet,gethostbyname,XNETLIB=-lxnet,XNETLIB="")
-AC_SUBST(XNETLIB)
-AC_CHECK_LIB(nsl,gethostbyname,NSLLIB=-lnsl,NSLLIB="")
-AC_SUBST(NSLLIB)
+#AC_CHECK_LIB(socket,socket,SOCKETLIB=-lsocket,SOCKETLIB="")
+#AC_SUBST(SOCKETLIB)
+#AC_CHECK_LIB(xnet,gethostbyname,XNETLIB=-lxnet,XNETLIB="")
+#AC_SUBST(XNETLIB)
+#AC_CHECK_LIB(nsl,gethostbyname,NSLLIB=-lnsl,NSLLIB="")
+#AC_SUBST(NSLLIB)
+FW_CHECK_SOCKET_LIBS
 AC_CHECK_LIB(dl,dlopen,DLLIB=-ldl,DLLIB="")
 AC_SUBST(DLLIB)
 AC_CHECK_LIB(aio,aioread,AIOLIB=-laio,AIOLIB="")

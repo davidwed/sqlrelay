@@ -8,4 +8,4 @@ clean:
 rebuild: clean all
 
 db2test: db2test.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(DB2INCLUDES) $? -s -o $@ $(DB2LIBS) $(EXTRALIBS) $(SOCKETLIB)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(DB2INCLUDES) $? -s -o $@ $(DB2LIBS) $(EXTRALIBS) $(SOCKETLIBS)

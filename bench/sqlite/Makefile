@@ -8,4 +8,4 @@ clean:
 rebuild: clean all
 
 sqlitetest: sqlitetest.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(SQLITEINCLUDES) $? -s -o $@ $(SQLITELIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(SQLITEINCLUDES) $? -s -o $@ $(SQLITELIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIBS)

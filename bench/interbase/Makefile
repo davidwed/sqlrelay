@@ -8,4 +8,4 @@ clean:
 rebuild: clean all
 
 interbasetest: interbasetest.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(INTERBASEINCLUDES) $? -s -o $@ $(INTERBASELIBS) $(EXTRALIBS) $(SOCKETLIB)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(INTERBASEINCLUDES) $? -s -o $@ $(INTERBASELIBS) $(EXTRALIBS) $(SOCKETLIBS)

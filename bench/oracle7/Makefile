@@ -8,4 +8,4 @@ clean:
 rebuild: clean all
 
 ora7test: ora7test.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(ORACLEINCLUDES) $? -s -o $@ $(ORACLELIBS) $(EXTRALIBS) $(SOCKETLIB)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(ORACLEINCLUDES) $? -s -o $@ $(ORACLELIBS) $(EXTRALIBS) $(SOCKETLIBS)
