@@ -31,14 +31,14 @@
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.33.1
+Version: 0.34
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
 Source0: %{name}-%{version}.tar.gz
 URL: http://sqlrelay.sourceforge.net
 Buildroot: %{_tmppath}/%{name}-root
-BuildRequires: rudiments-devel >= 0.25
+BuildRequires: rudiments-devel >= 0.26
 %{!?_without_gtk:BuildRequires: ,gtk+-devel}
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}

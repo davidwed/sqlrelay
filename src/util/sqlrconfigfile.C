@@ -20,33 +20,33 @@
 #include <defaults.h>
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
-	port=0;
-	listenoninet=0;
-	unixport="";
-	listenonunix=0;
-	dbase="";
-	connections=0;
-	maxconnections=0;
-	maxqueuelength=0;
-	growby=0;
-	ttl=0;
-	endofsession="";
-	endofsessioncommit=0;
-	sessiontimeout=0;
-	runasuser="";
-	runasgroup="";
-	cursors=0;
-	authtier="";
-	authonlistener=0;
-	authonconnection=0;
-	authondatabase=0;
-	handoff="";
-	passdescriptor=0;
-	allowedips="";
-	deniedips="";
-	debug="";
-	debuglistener=0;
-	debugconnection=0;
+	port=atoi(DEFAULT_PORT);
+	listenoninet=(port)?1:0;
+	unixport=DEFAULT_SOCKET;
+	listenonunix=(unixport)?1:0;
+	dbase=DEFAULT_DBASE;
+	connections=atoi(DEFAULT_CONNECTIONS);
+	maxconnections=atoi(DEFAULT_MAXCONNECTIONS);
+	maxqueuelength=atoi(DEFAULT_MAXQUEUELENGTH);
+	growby=atoi(DEFAULT_GROWBY);
+	ttl=atoi(DEFAULT_TTL);
+	endofsession=DEFAULT_ENDOFSESSION;
+	endofsessioncommit=!strcmp(endofsession,"commit");
+	sessiontimeout=atoi(DEFAULT_SESSIONTIMEOUT);
+	runasuser=DEFAULT_RUNASUSER;
+	runasgroup=DEFAULT_RUNASGROUP;
+	cursors=atoi(DEFAULT_CURSORS);
+	authtier=DEFAULT_AUTHTIER;
+	authonlistener=(strstr(authtier,"listener"))?1:0;
+	authonconnection=(strstr(authtier,"connection"))?1:0;
+	authondatabase=(!strcmp(authtier,"database"))?1:0;
+	handoff=DEFAULT_HANDOFF;
+	passdescriptor=(strcmp(handoff,"pass")==0);
+	allowedips=DEFAULT_DENIEDIPS;
+	deniedips=DEFAULT_DENIEDIPS;
+	debug=DEFAULT_DEBUG;
+	debuglistener=(strstr(debug,"listener"))?1:0;
+	debugconnection=(strstr(debug,"connection"))?1:0;
 	firstuser=NULL;
 	currentuser=NULL;
 	usercount=0;
@@ -457,25 +457,16 @@ int	sqlrconfigfile::attributeValue(char *value) {
 			} else {
 				authtier=DEFAULT_AUTHTIER;
 			}
-			authonlistener=0;
-			authonconnection=0;
-			authondatabase=0;
-			if (strstr(authtier,"listener")) {
-				authonlistener=1;
-			}
-			if (strstr(authtier,"connection")) {
-				authonconnection=1;
-			}
-			if (!strcmp(authtier,"database")) {
-				authondatabase=1;
-			}
+			authonlistener=(strstr(authtier,"listener"))?1:0;
+			authonconnection=(strstr(authtier,"connection"))?1:0;
+			authondatabase=(!strcmp(authtier,"database"))?1:0;
 		} else if (currentattribute==HANDOFF_ATTRIBUTE) {
 			if (value) {
 				handoff=strdup(value);
 			} else {
 				handoff=DEFAULT_HANDOFF;
 			}
-			passdescriptor=strcmp(handoff,"pass")==0;
+			passdescriptor=(strcmp(handoff,"pass")==0);
 		} else if (currentattribute==DENIEDIPS_ATTRIBUTE) {
 			if (value) {
 				deniedips=strdup(value);
@@ -494,16 +485,8 @@ int	sqlrconfigfile::attributeValue(char *value) {
 			} else {
 				debug=DEFAULT_DEBUG;
 			}
-			if (strstr(debug,"listener")) {
-				debuglistener=1;
-			} else {
-				debuglistener=0;
-			}
-			if (strstr(debug,"connection")) {
-				debugconnection=1;
-			} else {
-				debugconnection=0;
-			}
+			debuglistener=(strstr(debug,"listener"))?1:0;
+			debugconnection=(strstr(debug,"connection"))?1:0;
 		} else if (currentattribute==USER_ATTRIBUTE) {
 			if (value) {
 				currentuser->setUser(value);
@@ -647,7 +630,7 @@ connectstringnode::connectstringnode(int connectstringcount) {
 	this->connectstringcount=connectstringcount;
 	connectionid=NULL;
 	string=NULL;
-	metric=0;
+	metric=atoi(DEFAULT_METRIC);
 	next=NULL;
 	connectstringvar=NULL;
 	connectstringval=NULL;

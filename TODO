@@ -1,3 +1,5 @@
+is there a zero-cursor bug?
+
 db2 start/stop doesn't work
 	db2start/db2stop works when run as a given instance owner
 
