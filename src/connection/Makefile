@@ -60,129 +60,128 @@ SRCS = sqlrconnection/constructor.C \
 	sqlrcursor/binds.C \
 	sqlrcursor/fakebinds.C \
 	sqlrcursor/abort.C
-NLOBJS = sqlrconnection/constructor.n.lo \
-	sqlrconnection/destructor.n.lo \
-	sqlrconnection/initconnection.n.lo \
-	sqlrconnection/opensockets.n.lo \
-	sqlrconnection/listen.n.lo \
-	sqlrconnection/clientsession.n.lo \
-	sqlrconnection/authenticate.n.lo \
-	sqlrconnection/suspendsession.n.lo \
-	sqlrconnection/endsession.n.lo \
-	sqlrconnection/ping.n.lo \
-	sqlrconnection/identify.n.lo \
-	sqlrconnection/autocommit.n.lo \
-	sqlrconnection/commit.n.lo \
-	sqlrconnection/rollback.n.lo \
-	sqlrconnection/newquery.n.lo \
-	sqlrconnection/handlequery.n.lo \
-	sqlrconnection/handleerror.n.lo \
-	sqlrconnection/getbinds.n.lo \
-	sqlrconnection/getsendcolumninfo.n.lo \
-	sqlrconnection/reexecutequery.n.lo \
-	sqlrconnection/fetchfrombindcursor.n.lo \
-	sqlrconnection/fetchresultset.n.lo \
-	sqlrconnection/returnresultsetheader.n.lo \
-	sqlrconnection/sendrowcounts.n.lo \
-	sqlrconnection/returnoutputbindvalues.n.lo \
-	sqlrconnection/sendcolumns.n.lo \
-	sqlrconnection/returnresultsetdata.n.lo \
-	sqlrconnection/skiprows.n.lo \
-	sqlrconnection/sendfield.n.lo \
-	sqlrconnection/abortresultset.n.lo \
-	sqlrconnection/suspendresultset.n.lo \
-	sqlrconnection/resumeresultset.n.lo \
-	sqlrconnection/closeconnection.n.lo \
-	sqlrconnection/closecursors.n.lo \
-	sqlrconnection/temptables.n.lo \
-	sqlrconnection/changeuser.n.lo \
-	sqlrconnection/relogin.n.lo \
-	sqlrconnection/markdatabasedavailable.n.lo \
-	sqlrconnection/getuser.n.lo \
-	sqlrconnection/getpassword.n.lo \
-	sqlrconnection/connectstringvalue.n.lo \
-	sqlrconnection/istransactional.n.lo \
-	sqlrconnection/bindparameters.n.lo \
-	connection/connectioncmdline.n.lo \
-	connection/ipc.n.lo \
-	connection/listenercomm.n.lo \
-	connection/scalercomm.n.lo \
-	connection/unixsocketseqfile.n.lo \
-	sqlrcursor/constructor.n.lo \
-	sqlrcursor/destructor.n.lo \
-	sqlrcursor/openclose.n.lo \
-	sqlrcursor/preparequery.n.lo \
-	sqlrcursor/queryparse.n.lo \
-	sqlrcursor/binds.n.lo \
-	sqlrcursor/fakebinds.n.lo \
-	sqlrcursor/abort.n.lo
-PLOBJS = sqlrconnection/constructor.p.lo \
-	sqlrconnection/destructor.p.lo \
-	sqlrconnection/initconnection.p.lo \
-	sqlrconnection/opensockets.p.lo \
-	sqlrconnection/listen.p.lo \
-	sqlrconnection/clientsession.p.lo \
-	sqlrconnection/authenticate.p.lo \
-	sqlrconnection/suspendsession.p.lo \
-	sqlrconnection/endsession.p.lo \
-	sqlrconnection/ping.p.lo \
-	sqlrconnection/identify.p.lo \
-	sqlrconnection/autocommit.p.lo \
-	sqlrconnection/commit.p.lo \
-	sqlrconnection/rollback.p.lo \
-	sqlrconnection/newquery.p.lo \
-	sqlrconnection/handlequery.p.lo \
-	sqlrconnection/handleerror.p.lo \
-	sqlrconnection/getbinds.p.lo \
-	sqlrconnection/getsendcolumninfo.p.lo \
-	sqlrconnection/reexecutequery.p.lo \
-	sqlrconnection/fetchfrombindcursor.p.lo \
-	sqlrconnection/fetchresultset.p.lo \
-	sqlrconnection/returnresultsetheader.p.lo \
-	sqlrconnection/sendrowcounts.p.lo \
-	sqlrconnection/returnoutputbindvalues.p.lo \
-	sqlrconnection/sendcolumns.p.lo \
-	sqlrconnection/returnresultsetdata.p.lo \
-	sqlrconnection/skiprows.p.lo \
-	sqlrconnection/sendfield.p.lo \
-	sqlrconnection/abortresultset.p.lo \
-	sqlrconnection/suspendresultset.p.lo \
-	sqlrconnection/resumeresultset.p.lo \
-	sqlrconnection/closeconnection.p.lo \
-	sqlrconnection/closecursors.p.lo \
-	sqlrconnection/temptables.p.lo \
-	sqlrconnection/changeuser.p.lo \
-	sqlrconnection/relogin.p.lo \
-	sqlrconnection/markdatabasedavailable.p.lo \
-	sqlrconnection/getuser.p.lo \
-	sqlrconnection/getpassword.p.lo \
-	sqlrconnection/connectstringvalue.p.lo \
-	sqlrconnection/istransactional.p.lo \
-	sqlrconnection/bindparameters.p.lo \
-	connection/connectioncmdline.p.lo \
-	connection/ipc.p.lo \
-	connection/listenercomm.p.lo \
-	connection/scalercomm.p.lo \
-	connection/unixsocketseqfile.p.lo \
-	sqlrcursor/constructor.p.lo \
-	sqlrcursor/destructor.p.lo \
-	sqlrcursor/openclose.p.lo \
-	sqlrcursor/preparequery.p.lo \
-	sqlrcursor/queryparse.p.lo \
-	sqlrcursor/binds.p.lo \
-	sqlrcursor/fakebinds.p.lo \
-	sqlrcursor/abort.p.lo
+LOBJS = sqlrconnection/constructor.lo \
+	sqlrconnection/destructor.lo \
+	sqlrconnection/initconnection.lo \
+	sqlrconnection/opensockets.lo \
+	sqlrconnection/listen.lo \
+	sqlrconnection/clientsession.lo \
+	sqlrconnection/authenticate.lo \
+	sqlrconnection/suspendsession.lo \
+	sqlrconnection/endsession.lo \
+	sqlrconnection/ping.lo \
+	sqlrconnection/identify.lo \
+	sqlrconnection/autocommit.lo \
+	sqlrconnection/commit.lo \
+	sqlrconnection/rollback.lo \
+	sqlrconnection/newquery.lo \
+	sqlrconnection/handlequery.lo \
+	sqlrconnection/handleerror.lo \
+	sqlrconnection/getbinds.lo \
+	sqlrconnection/getsendcolumninfo.lo \
+	sqlrconnection/reexecutequery.lo \
+	sqlrconnection/fetchfrombindcursor.lo \
+	sqlrconnection/fetchresultset.lo \
+	sqlrconnection/returnresultsetheader.lo \
+	sqlrconnection/sendrowcounts.lo \
+	sqlrconnection/returnoutputbindvalues.lo \
+	sqlrconnection/sendcolumns.lo \
+	sqlrconnection/returnresultsetdata.lo \
+	sqlrconnection/skiprows.lo \
+	sqlrconnection/sendfield.lo \
+	sqlrconnection/abortresultset.lo \
+	sqlrconnection/suspendresultset.lo \
+	sqlrconnection/resumeresultset.lo \
+	sqlrconnection/closeconnection.lo \
+	sqlrconnection/closecursors.lo \
+	sqlrconnection/temptables.lo \
+	sqlrconnection/changeuser.lo \
+	sqlrconnection/relogin.lo \
+	sqlrconnection/markdatabasedavailable.lo \
+	sqlrconnection/getuser.lo \
+	sqlrconnection/getpassword.lo \
+	sqlrconnection/connectstringvalue.lo \
+	sqlrconnection/istransactional.lo \
+	sqlrconnection/bindparameters.lo \
+	connection/connectioncmdline.lo \
+	connection/ipc.lo \
+	connection/listenercomm.lo \
+	connection/scalercomm.lo \
+	connection/unixsocketseqfile.lo \
+	sqlrcursor/constructor.lo \
+	sqlrcursor/destructor.lo \
+	sqlrcursor/openclose.lo \
+	sqlrcursor/preparequery.lo \
+	sqlrcursor/queryparse.lo \
+	sqlrcursor/binds.lo \
+	sqlrcursor/fakebinds.lo \
+	sqlrcursor/abort.lo
+DLOBJS = sqlrconnection/constructor.d.lo \
+	sqlrconnection/destructor.d.lo \
+	sqlrconnection/initconnection.d.lo \
+	sqlrconnection/opensockets.d.lo \
+	sqlrconnection/listen.d.lo \
+	sqlrconnection/clientsession.d.lo \
+	sqlrconnection/authenticate.d.lo \
+	sqlrconnection/suspendsession.d.lo \
+	sqlrconnection/endsession.d.lo \
+	sqlrconnection/ping.d.lo \
+	sqlrconnection/identify.d.lo \
+	sqlrconnection/autocommit.d.lo \
+	sqlrconnection/commit.d.lo \
+	sqlrconnection/rollback.d.lo \
+	sqlrconnection/newquery.d.lo \
+	sqlrconnection/handlequery.d.lo \
+	sqlrconnection/handleerror.d.lo \
+	sqlrconnection/getbinds.d.lo \
+	sqlrconnection/getsendcolumninfo.d.lo \
+	sqlrconnection/reexecutequery.d.lo \
+	sqlrconnection/fetchfrombindcursor.d.lo \
+	sqlrconnection/fetchresultset.d.lo \
+	sqlrconnection/returnresultsetheader.d.lo \
+	sqlrconnection/sendrowcounts.d.lo \
+	sqlrconnection/returnoutputbindvalues.d.lo \
+	sqlrconnection/sendcolumns.d.lo \
+	sqlrconnection/returnresultsetdata.d.lo \
+	sqlrconnection/skiprows.d.lo \
+	sqlrconnection/sendfield.d.lo \
+	sqlrconnection/abortresultset.d.lo \
+	sqlrconnection/suspendresultset.d.lo \
+	sqlrconnection/resumeresultset.d.lo \
+	sqlrconnection/closeconnection.d.lo \
+	sqlrconnection/closecursors.d.lo \
+	sqlrconnection/temptables.d.lo \
+	sqlrconnection/changeuser.d.lo \
+	sqlrconnection/relogin.d.lo \
+	sqlrconnection/markdatabasedavailable.d.lo \
+	sqlrconnection/getuser.d.lo \
+	sqlrconnection/getpassword.d.lo \
+	sqlrconnection/connectstringvalue.d.lo \
+	sqlrconnection/istransactional.d.lo \
+	sqlrconnection/bindparameters.d.lo \
+	connection/connectioncmdline.d.lo \
+	connection/ipc.d.lo \
+	connection/listenercomm.d.lo \
+	connection/scalercomm.d.lo \
+	connection/unixsocketseqfile.d.lo \
+	sqlrcursor/constructor.d.lo \
+	sqlrcursor/destructor.d.lo \
+	sqlrcursor/openclose.d.lo \
+	sqlrcursor/preparequery.d.lo \
+	sqlrcursor/queryparse.d.lo \
+	sqlrcursor/binds.d.lo \
+	sqlrcursor/fakebinds.d.lo \
+	sqlrcursor/abort.d.lo
 
-.SUFFIXES: .n.lo .p.lo
+.SUFFIXES: .lo .d.lo
 
-.C.n.lo:
+.C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.p.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+.C.d.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
 
-#all: libsqlrconnection.la libsqlrconnection_p.la
-all: libsqlrconnection.la
+all: libsqlrconnection.la libsqlrconnection_debug.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -193,19 +192,19 @@ clean:
 
 rebuild: clean all
 
-libsqlrconnection.la: $(SRCS) $(NLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+libsqlrconnection.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
-libsqlrconnection_p.la: $(SRCS) $(PLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
-
+libsqlrconnection_debug.la: $(SRCS) $(DLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(DLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrconnection.la $(libdir)
-	#$(LIBTOOL) --mode=install $(INSTALL) libsqlrconnection_p.la $(libdir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrconnection.la $(libdir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrconnection_debug.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection_debug.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection_p.la

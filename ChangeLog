@@ -39,6 +39,10 @@
 	postgresql connection uses PQfmod if PQfsize returns -1
 	updated libtool scripts
 	cleaned up and sped up unsupported signal checks in configure script
+	fixed bug where failure to specify metrics caused crashing
+	sqlrconfigfile class doesn't cause crashes when id isn't found anymore
+	config file arguments that are less than a certain value (in most cases
+		less than 1) are set to the default value now 
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

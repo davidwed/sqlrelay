@@ -8,6 +8,7 @@
 
 #include <rudiments/xmlsax.h>
 #include <rudiments/stringbuffer.h>
+#include <rudiments/list.h>
 
 typedef enum {
 	ID_ATTRIBUTE=1,
@@ -36,29 +37,28 @@ typedef enum {
 	METRIC_ATTRIBUTE
 } attribute;
 
-class usernode {
+class usercontainer {
 	friend class sqlrconfigfile;
 	public:
-				usernode();
-				~usernode();
+				usercontainer();
+				~usercontainer();
 
 		void	setUser(const char *user);
 		void	setPassword(const char *password);
 		char	*getUser();
 		char	*getPassword();
-
-		usernode	*getNext();
 	private:
 		char		*user;
 		char		*password;
-		usernode	*next;
 };
 
-class connectstringnode {
-	friend class sqlrconfigfile;
+typedef listnode< usercontainer * >	usernode;
+
+class connectstringcontainer {
 	public:
-				connectstringnode(int connectstringcount);
-				~connectstringnode();
+				connectstringcontainer(int connectstringcount);
+				~connectstringcontainer();
+		void	parseConnectString();
 		void	setConnectionId(const char *connectionid);
 		void	setString(const char *string);
 		void	setMetric(int metric);
@@ -66,21 +66,19 @@ class connectstringnode {
 		char	*getString();
 		int	getMetric();
 		char	*getConnectStringValue(const char *variable);
-
-		connectstringnode	*getNext();
 	private:
-		void	parseConnectString();
 
 		char			*connectionid;
 		char			*string;
 		int			metric;
-		connectstringnode	*next;
 
 		// connect string parameters
 		int		connectstringcount;
 		stringbuffer	**connectstringvar;
 		stringbuffer	**connectstringval;
 };
+
+typedef listnode< connectstringcontainer * >	connectstringnode;
 
 class sqlrconfigfile : public xmlsax {
 	public:
@@ -118,10 +116,10 @@ class sqlrconfigfile : public xmlsax {
 		int	getDebugListener();
 		int	getDebugConnection();
 
-		usernode		*getUsers();
-		int			getUserCount();
-		connectstringnode	*getConnectStrings();
-		connectstringnode	*getConnectString(
+		list< usercontainer * >	*getUserList();
+		list< connectstringcontainer * >
+					*getConnectStringList();
+		connectstringcontainer	*getConnectString(
 						const char *connectionid);
 		int			getConnectionCount();
 		int			getMetricTotal();
@@ -130,6 +128,10 @@ class sqlrconfigfile : public xmlsax {
 		int		correctid;
 		int		done;
 		attribute	currentattribute;
+
+		int	atoi(const char *value,
+					const char *defaultvalue,
+					int minvalue);
 
 		int	tagStart(char *name);
 		int	attributeName(char *name);
@@ -164,16 +166,17 @@ class sqlrconfigfile : public xmlsax {
 		int	debuglistener;
 		int	debugconnection;
 
-		usernode	*firstuser;
-		usernode	*currentuser;
-		int		usercount;
+		usercontainer	*currentuser;
 
-		connectstringnode	*firstconnect;
-		connectstringnode	*currentconnect;
+		connectstringcontainer	*firstconnect;
+		connectstringcontainer	*currentconnect;
 		int			connectioncount;
 		int			metrictotal;
 
 		int	connectstringcount;
+
+		list< connectstringcontainer * >	connectstringlist;
+		list< usercontainer * >			userlist;
 };
 
 #endif

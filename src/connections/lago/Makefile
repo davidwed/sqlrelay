@@ -4,7 +4,7 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(LAGOINCLUDES)
 LIBS = $(LAGOLIBS) $(abs_srcdir)/src/connection/libsqlrconnection.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(NSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(LAGOLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_p.la $(abs_srcdir)/src/util/libsqlrutil_p.la $(RUDIMENTSDEBUGLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(NSLLIB) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(LAGOLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(NSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
 ifeq ($(strip $(LAGOLIBSPATH)),)
 	RPATH =
 else
@@ -12,17 +12,16 @@ else
 endif
 
 SRCS= lagoconnection.C main.C
-NLOBJS= lagoconnection.n.lo main.n.lo
-PLOBJS= lagoconnection.p.lo main.p.lo
+LOBJS= lagoconnection.lo main.lo
+DLOBJS= lagoconnection.d.lo main.d.lo
 
-.SUFFIXES: .n.lo .p.lo
+.SUFFIXES: .lo .d.lo
 
-.C.n.lo:
+.C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.p.lo:
-	#$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+.C.d.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
 
 all: sqlr-connection-lago sqlr-connection-lago-debug
 
@@ -34,17 +33,16 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-lago: $(SRCS) $(NLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS) $(RPATH)
+sqlr-connection-lago: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
-sqlr-connection-lago-debug: $(SRCS) $(PLOBJS)
-	#$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS) $(RPATH)
-	$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ $(PLOBJS) $(LIBS) $(RPATH)
+sqlr-connection-lago-debug: $(SRCS) $(DLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ $(DLOBJS) $(DEBUGLIBS) $(RPATH)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-lago $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-lago-debug $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago-debug $(bindir)
 	$(abs_srcdir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(abs_srcdir)/mkinstalldirs $(debugdir)

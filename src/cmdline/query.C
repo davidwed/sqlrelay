@@ -17,7 +17,7 @@ int	main(int argc, const char **argv) {
 	#include <version.h>
 
 	sqlrconfigfile	cfgfile;
-	usernode	*currentnode=NULL;
+	usercontainer	*currentnode=NULL;
 
 	commandline	cmdline(argc,argv);
 	char		*host;
@@ -63,7 +63,8 @@ int	main(int argc, const char **argv) {
 			host="localhost";
 			port=cfgfile.getPort();
 			socket=cfgfile.getUnixPort();
-			currentnode=cfgfile.getUsers();
+			// FIXME: this can return 0
+			cfgfile.getUserList()->getDataByIndex(0,&currentnode);
 			user=currentnode->getUser();
 			password=currentnode->getPassword();
 

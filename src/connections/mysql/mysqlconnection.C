@@ -172,16 +172,16 @@ int	mysqlcursor::executeQuery(const char *query, long length,
 
 	// execute the query
 	if (newquery) {
-		if (queryresult=mysql_real_query(&mysqlconn->mysql,
+		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
 					newquery->getString(),
-					strlen(newquery->getString()))) {
+					strlen(newquery->getString())))) {
 			delete newquery;
 			return 0;
 		}
 		delete newquery;
 	} else {
-		if (queryresult=mysql_real_query(&mysqlconn->mysql,
-							query,length)) {
+		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
+							query,length))) {
 			return 0;
 		}
 	}

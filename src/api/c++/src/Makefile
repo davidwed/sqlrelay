@@ -55,118 +55,63 @@ SRCS = connection/constructor.C \
 	cursor/skipandfetch.C \
 	cursor/abortresultset.C \
 	row/row.C
-NLOBJS = connection/constructor.n.lo \
-	connection/destructor.n.lo \
-	connection/copyreferences.n.lo \
-	connection/ping.n.lo \
-	connection/identify.n.lo \
-	connection/endsession.n.lo \
-	connection/suspendsession.n.lo \
-	connection/resumesession.n.lo \
-	connection/autocommit.n.lo \
-	connection/commit.n.lo \
-	connection/rollback.n.lo \
-	connection/debug.n.lo \
-	connection/error.n.lo \
-	connection/getreconnect.n.lo \
-	connection/getconnectionport.n.lo \
-	connection/getconnectionsocket.n.lo \
-	connection/authentication.n.lo \
-	connection/getnewport.n.lo \
-	connection/clearsessionflags.n.lo \
-	connection/opensession.n.lo \
-	connection/closeconnection.n.lo \
-	cursor/constructor.n.lo \
-	cursor/destructor.n.lo \
-	cursor/copyreferences.n.lo \
-	cursor/columns.n.lo \
-	cursor/fields.n.lo \
-	cursor/columnnamecase.n.lo \
-	cursor/nulls.n.lo \
-	cursor/suspendresultset.n.lo \
-	cursor/binds.n.lo \
-	cursor/fetchfrombindcursor.n.lo \
-	cursor/rowcounts.n.lo \
-	cursor/getcolumninfo.n.lo \
-	cursor/resultsetbuffersize.n.lo \
-	cursor/errormessage.n.lo \
-	cursor/readcache.n.lo \
-	cursor/writecache.n.lo \
-	cursor/resume.n.lo \
-	cursor/getresultsetid.n.lo \
-	cursor/preparequery.n.lo \
-	cursor/sendquery.n.lo \
-	cursor/executequery.n.lo \
-	cursor/runquery.n.lo \
-	cursor/receiveresultset.n.lo \
-	cursor/parsecolumninfo.n.lo \
-	cursor/parseoutputbinds.n.lo \
-	cursor/parsedata.n.lo \
-	cursor/clearresultset.n.lo \
-	cursor/skipandfetch.n.lo \
-	cursor/abortresultset.n.lo \
-	row/row.n.lo
-PLOBJS = connection/constructor.p.lo \
-	connection/destructor.p.lo \
-	connection/ping.p.lo \
-	connection/identify.p.lo \
-	connection/endsession.p.lo \
-	connection/suspendsession.p.lo \
-	connection/resumesession.p.lo \
-	connection/autocommit.p.lo \
-	connection/commit.p.lo \
-	connection/rollback.p.lo \
-	connection/debug.p.lo \
-	connection/error.p.lo \
-	connection/getreconnect.p.lo \
-	connection/getconnectionport.p.lo \
-	connection/getconnectionsocket.p.lo \
-	connection/authentication.p.lo \
-	connection/getnewport.p.lo \
-	connection/copyreferences.p.lo \
-	connection/clearsessionflags.p.lo \
-	connection/opensession.p.lo \
-	connection/closeconnection.p.lo \
-	cursor/constructor.p.lo \
-	cursor/destructor.p.lo \
-	cursor/copyreferences.p.lo \
-	cursor/columns.p.lo \
-	cursor/fields.p.lo \
-	cursor/columnnamecase.p.lo \
-	cursor/nulls.p.lo \
-	cursor/suspendresultset.p.lo \
-	cursor/binds.p.lo \
-	cursor/fetchfrombindcursor.p.lo \
-	cursor/rowcounts.p.lo \
-	cursor/getcolumninfo.p.lo \
-	cursor/resultsetbuffersize.p.lo \
-	cursor/errormessage.p.lo \
-	cursor/readcache.p.lo \
-	cursor/writecache.p.lo \
-	cursor/resume.p.lo \
-	cursor/getresultsetid.p.lo \
-	cursor/preparequery.p.lo \
-	cursor/sendquery.p.lo \
-	cursor/executequery.p.lo \
-	cursor/runquery.p.lo \
-	cursor/receiveresultset.p.lo \
-	cursor/parsecolumninfo.p.lo \
-	cursor/parseoutputbinds.p.lo \
-	cursor/parsedata.p.lo \
-	cursor/clearresultset.p.lo \
-	cursor/skipandfetch.p.lo \
-	cursor/abortresultset.p.lo \
-	row/row.p.lo
+LOBJS = connection/constructor.lo \
+	connection/destructor.lo \
+	connection/copyreferences.lo \
+	connection/ping.lo \
+	connection/identify.lo \
+	connection/endsession.lo \
+	connection/suspendsession.lo \
+	connection/resumesession.lo \
+	connection/autocommit.lo \
+	connection/commit.lo \
+	connection/rollback.lo \
+	connection/debug.lo \
+	connection/error.lo \
+	connection/getreconnect.lo \
+	connection/getconnectionport.lo \
+	connection/getconnectionsocket.lo \
+	connection/authentication.lo \
+	connection/getnewport.lo \
+	connection/clearsessionflags.lo \
+	connection/opensession.lo \
+	connection/closeconnection.lo \
+	cursor/constructor.lo \
+	cursor/destructor.lo \
+	cursor/copyreferences.lo \
+	cursor/columns.lo \
+	cursor/fields.lo \
+	cursor/columnnamecase.lo \
+	cursor/nulls.lo \
+	cursor/suspendresultset.lo \
+	cursor/binds.lo \
+	cursor/fetchfrombindcursor.lo \
+	cursor/rowcounts.lo \
+	cursor/getcolumninfo.lo \
+	cursor/resultsetbuffersize.lo \
+	cursor/errormessage.lo \
+	cursor/readcache.lo \
+	cursor/writecache.lo \
+	cursor/resume.lo \
+	cursor/getresultsetid.lo \
+	cursor/preparequery.lo \
+	cursor/sendquery.lo \
+	cursor/executequery.lo \
+	cursor/runquery.lo \
+	cursor/receiveresultset.lo \
+	cursor/parsecolumninfo.lo \
+	cursor/parseoutputbinds.lo \
+	cursor/parsedata.lo \
+	cursor/clearresultset.lo \
+	cursor/skipandfetch.lo \
+	cursor/abortresultset.lo \
+	row/row.lo
 
-.SUFFIXES: .n.lo .p.lo
+.SUFFIXES: .lo
 
-.C.n.lo:
+.C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.p.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
-
-#all: libsqlrclient.la libsqlrclient_p.la
 all: libsqlrclient.la
 
 clean:
@@ -176,16 +121,12 @@ clean:
 
 rebuild: clean all
 
-libsqlrclient.la: $(SRCS) $(NLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
-
-libsqlrclient_p.la: $(SRCS) $(PLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+libsqlrclient.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrclient.la $(libdir)/libsqlrclient.la
-	#$(LIBTOOL) --mode=install $(INSTALL) libsqlrclient_p.la $(libdir)/libsqlrclient_p.la
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrclient.la $(libdir)/libsqlrclient.la
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(abs_srcdir)/mkinstalldirs $(cachedir)
 	chmod 777 $(cachedir)

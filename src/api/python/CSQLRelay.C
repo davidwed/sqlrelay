@@ -559,7 +559,6 @@ static PyObject *getOutputBindAsLong(PyObject *self, PyObject *args) {
   char *variable;
   long sqlrcur;
   long rc;
-  int rl;
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getOutputBindAsLong(variable);
@@ -570,7 +569,6 @@ static PyObject *getOutputBindAsDouble(PyObject *self, PyObject *args) {
   char *variable;
   long sqlrcur;
   double rc;
-  int rl;
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getOutputBindAsDouble(variable);
@@ -814,7 +812,6 @@ static PyObject *getRowRange(PyObject *self, PyObject *args) {
   int end_row;
   long sqlrcur;
   int counter;
-  PyObject *cur_row;
   PyObject *my_list;
   my_list = PyList_New(0);
   if (!PyArg_ParseTuple(args, "lii", &sqlrcur, &beg_row, &end_row))
@@ -880,7 +877,6 @@ static PyObject *getRowLengthsRange(PyObject *self, PyObject *args) {
   int end_row;
   long sqlrcur;
   int counter;
-  PyObject *cur_row;
   PyObject *my_list;
   my_list = PyList_New(0);
   if (!PyArg_ParseTuple(args, "lii", &sqlrcur, &beg_row, &end_row))

@@ -135,15 +135,10 @@ int	scaler::initScaler(int argc, const char **argv) {
 		dbase=strdup(cfgfile->getDbase());
 
 		// get the list of connect strings
-		connectstringlist=cfgfile->getConnectStrings();
+		connectstringlist=cfgfile->getConnectStringList();
 
 		// add up the connection metrics
-		connectstringnode	*currentnode=connectstringlist;
-		metrictotal=0;
-		while (currentnode) {
-			metrictotal=metrictotal+currentnode->getMetric();
-			currentnode=currentnode->getNext();
-		}
+		metrictotal=cfgfile->getMetricTotal();
 	}
 
 
@@ -284,14 +279,15 @@ void	scaler::getRandomConnectionId() {
 
 	// run through list, decrementing scalednum by the metric
 	// for each, when scalednum is 0, pick that connection id
-	connectstringnode	*currentnode=connectstringlist;
-	while (currentnode) {
+	connectstringnode	*csn=connectstringlist->getNodeByIndex(0);
+	while (csn) {
+		connectstringcontainer	*currentnode=csn->getData();
 		scalednum=scalednum-currentnode->getMetric();
 		if (scalednum<=0) {
 			connectionid=currentnode->getConnectionId();
 			break;
 		}
-		currentnode=currentnode->getNext();
+		csn=csn->getNext();
 	}
 }
 

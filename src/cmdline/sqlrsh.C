@@ -503,7 +503,7 @@ void	sqlrsh::displayStats(sqlrcursor *sqlrcur, environment *env) {
 	red(env);
 	printf("	System time     : ");
 	magenta(env);
-	printf("%d\n",clock());
+	printf("%ld\n",clock());
 	white(env);
 }
 
@@ -563,8 +563,6 @@ void	sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 							environment *env) {
 
 	// init some variables
-	char		buffer1;
-	char		buffer2;
 	stringbuffer	*command;
 	int		exitprogram=0;
 	int		promptcount;
@@ -667,7 +665,7 @@ void	sqlrsh::execute(int argc, const char **argv) {
 
 	commandline	cmdline(argc,argv);
 	sqlrconfigfile	cfgfile;
-	usernode	*currentnode=NULL;
+	usercontainer	*currentnode=NULL;
 	char		*host;
 	int		port;
 	char		*socket;
@@ -708,7 +706,8 @@ void	sqlrsh::execute(int argc, const char **argv) {
 			host="localhost";
 			port=cfgfile.getPort();
 			socket=cfgfile.getUnixPort();
-			currentnode=cfgfile.getUsers();
+			// FIXME: this can return 0
+			cfgfile.getUserList()->getDataByIndex(0,&currentnode);
 			user=currentnode->getUser();
 			password=currentnode->getPassword();
 		} else {

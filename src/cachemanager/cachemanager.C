@@ -85,10 +85,10 @@ void	cachemanager::scan() {
 		while (currentdir) {
 
 			// open directory
-			if (dir=opendir(currentdir->dirname)) {
+			if ((dir=opendir(currentdir->dirname))) {
 
 				// loop through directory, erasing
-				while (current=readdir(dir)) {
+				while ((current=readdir(dir))) {
 					if (strcmp(current->d_name,".") &&
 						strcmp(current->d_name,"..")) {
 						erase(currentdir->dirname,

@@ -1,6 +1,5 @@
-perl api's don't get installed right when building a slackware package
+slackware package build isn't right
 if all space is used up in a filesystem, SQL Relay stops working
-zero-cursor bug
 if no users are defined, connections crash
 suspend/resumeResultSet doesn't appear to work if result set is done
 

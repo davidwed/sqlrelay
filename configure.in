@@ -1,19 +1,14 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/listener/sqlrlistener.C)
 
-LDFLAGS=""
-AC_SUBST(LDFLAGS)
-CFLAGS=""
-AC_SUBST(CFLAGS)
-CXXFLAGS=""
-AC_SUBST(CXXFLAGS)
-DEBUGCXXFLAGS="-g -pg"
-AC_SUBST(DEBUGCXXFLAGS)
-DEBUGCFLAGS="-g -pg"
-AC_SUBST(DEBUGCFLAGS)
-
-
 dnl Compile time options.
+AC_ARG_ENABLE(debug,
+	[  --enable-debug          compile with -g and -pg options and don't strip binaries],
+	CFLAGS="-g -pg -Wall"; CXXFLAGS="-g -pg -fno-exceptions -Wall"; INSTALLSTRIP="",
+	CFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; CXXFLAGS="-fomit-frame-pointer -fno-exceptions -Wall"; INSTALLSTRIP="-s")
+AC_SUBST(INSTALLSTRIP)
+AC_SUBST(CFLAGS)
+AC_SUBST(CXXFLAGS)
 AC_ARG_ENABLE(static,
 	[  --enable-static               Enable static linking],
 	STATICLINK="-static",

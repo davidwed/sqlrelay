@@ -4,7 +4,7 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(MSQLINCLUDES)
 LIBS = $(MSQLLIBS) $(abs_srcdir)/src/connection/libsqlrconnection.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(MSQLLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_p.la $(abs_srcdir)/src/util/libsqlrutil_p.la $(RUDIMENTSDEBUGLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(MSQLLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 ifeq ($(strip $(MSQLLIBSPATH)),)
 	RPATH =
 else
@@ -12,17 +12,16 @@ else
 endif
 
 SRCS= msqlconnection.C main.C
-NLOBJS= msqlconnection.n.lo main.n.lo
-PLOBJS= msqlconnection.p.lo main.p.lo
+LOBJS= msqlconnection.lo main.lo
+DLOBJS= msqlconnection.d.lo main.d.lo
 
-.SUFFIXES: .n.lo .p.lo
+.SUFFIXES: .lo .d.lo
 
-.C.n.lo:
+.C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.p.lo:
-	#$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+.C.d.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
 
 all: sqlr-connection-msql sqlr-connection-msql-debug
 
@@ -34,17 +33,16 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-msql: $(SRCS) $(NLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(MSQLSTATIC) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS) $(RPATH)
+sqlr-connection-msql: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(MSQLSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
-sqlr-connection-msql-debug: $(SRCS) $(PLOBJS)
-	#$(LIBTOOL) --mode=link $(CXX) $(MSQLSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS) $(RPATH)
-	$(LIBTOOL) --mode=link $(CXX) $(MSQLSTATIC) $(LDFLAGS) -o $@ $(PLOBJS) $(LIBS) $(RPATH)
+sqlr-connection-msql-debug: $(SRCS) $(DLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(MSQLSTATIC) $(LDFLAGS) -o $@ $(DLOBJS) $(DEBUGLIBS) $(RPATH)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-msql $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-msql-debug $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql-debug $(bindir)
 	$(abs_srcdir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(abs_srcdir)/mkinstalldirs $(debugdir)

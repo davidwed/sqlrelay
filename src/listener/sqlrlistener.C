@@ -810,7 +810,7 @@ void	sqlrlistener::forkChild() {
 
 	#ifdef SERVER_DEBUG
 	char	debugstring[16+6];
-	sprintf(debugstring,"forked a child: %d",childpid);
+	sprintf(debugstring,"forked a child: %ld",childpid);
 	debugPrint("listener",0,debugstring);
 	#endif
 

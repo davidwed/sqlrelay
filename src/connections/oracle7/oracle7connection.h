@@ -120,7 +120,7 @@ class oracle7cursor : public sqlrcursor {
 	
 		int		row;
 		int		maxrow;
-		int		totalrows;
+		unsigned int	totalrows;
 
 		oracle7connection	*oracle7conn;
 };

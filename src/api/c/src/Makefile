@@ -6,18 +6,13 @@ INSTALL = $(abs_srcdir)/install-sh -c
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c/include -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 
 SRCS = sqlrclientwrapper.C
-NLOBJS = sqlrclientwrapper.n.lo
-PLOBJS = sqlrclientwrapper.p.lo
+LOBJS = sqlrclientwrapper.lo
 
-.SUFFIXES: .n.lo .p.lo
+.SUFFIXES: .lo
 
-.C.n.lo:
+.C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.p.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCFLAGS) $(CPPFLAGS) -c $< -o $@
-
-#all: libsqlrclientwrapper.la libsqlrclientwrapper_p.la
 all: libsqlrclientwrapper.la
 
 clean:
@@ -27,16 +22,12 @@ clean:
 
 rebuild: clean all
 
-libsqlrclientwrapper.la: $(SRCS) $(NLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
-
-libsqlrclientwrapper_p.la: $(SRCS) $(PLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+libsqlrclientwrapper.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
-	#$(LIBTOOL) --mode=install $(INSTALL) libsqlrclientwrapper_p.la $(libdir)/libsqlrclientwrapper_p.la
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
 	$(abs_srcdir)/mkinstalldirs $(cachedir)
 	chmod 777 $(cachedir)
 

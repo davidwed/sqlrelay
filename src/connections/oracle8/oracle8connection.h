@@ -159,7 +159,7 @@ class oracle8cursor : public sqlrcursor {
 
 		int		row;
 		int		maxrow;
-		int		totalrows;
+		unsigned int	totalrows;
 
 		int		fetchatonce;
 

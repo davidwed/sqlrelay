@@ -4,7 +4,7 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(DB2INCLUDES)
 LIBS = $(DB2LIBS) $(abs_srcdir)/src/connection/libsqlrconnection.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(DB2LIBS) $(abs_srcdir)/src/connection/libsqlrconnection_p.la $(abs_srcdir)/src/util/libsqlrutil_p.la $(RUDIMENTSDEBUGLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(DB2LIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 ifeq ($(strip $(DB2LIBSPATH)),)
 	RPATH =
 else
@@ -12,17 +12,16 @@ else
 endif
 
 SRCS= db2connection.C main.C
-NLOBJS= db2connection.n.lo main.n.lo
-PLOBJS= db2connection.p.lo main.p.lo
+LOBJS= db2connection.lo main.lo
+DLOBJS= db2connection.d.lo main.d.lo
 
-.SUFFIXES: .n.lo .p.lo
+.SUFFIXES: .lo .d.lo
 
-.C.n.lo:
+.C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.p.lo:
-	#$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+.C.d.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
 
 all: sqlr-connection-db2 sqlr-connection-db2-debug
 
@@ -34,17 +33,16 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-db2: $(SRCS) $(NLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(DB2STATIC) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS) $(RPATH)
+sqlr-connection-db2: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(DB2STATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
-sqlr-connection-db2-debug: $(SRCS) $(PLOBJS)
-	#$(LIBTOOL) --mode=link $(CXX) $(DB2STATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS) $(RPATH)
-	$(LIBTOOL) --mode=link $(CXX) $(DB2STATIC) $(LDFLAGS) -o $@ $(PLOBJS) $(LIBS) $(RPATH)
+sqlr-connection-db2-debug: $(SRCS) $(DLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(DB2STATIC) $(LDFLAGS) -o $@ $(DLOBJS) $(DEBUGLIBS) $(RPATH)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-db2 $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-db2-debug $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2 $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2-debug $(bindir)
 	$(abs_srcdir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(abs_srcdir)/mkinstalldirs $(debugdir)

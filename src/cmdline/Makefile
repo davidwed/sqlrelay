@@ -4,17 +4,12 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = $(abs_srcdir)/src/util/libsqlrutil.la $(abs_srcdir)/src/api/c++/src/libsqlrclient.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(abs_srcdir)/src/util/libsqlrutil_p.la $(abs_srcdir)/src/api/c++/src/libsqlrclient_p.la $(RUDIMENTSDEBUGLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-.SUFFIXES: .n.lo .p.lo
+.SUFFIXES: .lo
 
-.C.n.lo:
+.C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.p.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
-
-#all: query query-debug fields fields-debug sqlrsh sqlrsh-debug
 all: query fields sqlrsh
 
 clean:
@@ -29,32 +24,20 @@ clean:
 
 rebuild: clean all
 
-query: query.C query.n.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.n.lo $(LIBS) -rpath $(libdir)
+query: query.C query.lo
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.lo $(LIBS) -rpath $(libdir)
 
-query-debug: query.C query.p.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.p.lo $(DEBUGLIBS) -rpath $(libdir)
+fields: fields.C fields.lo
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.lo $(LIBS) -rpath $(libdir)
 
-fields: fields.C fields.n.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.n.lo $(LIBS) -rpath $(libdir)
-
-fields-debug: fields.C fields.p.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.p.lo $(DEBUGLIBS) -rpath $(libdir)
-
-sqlrsh: sqlrsh.C sqlrsh.n.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.n.lo $(LIBS) $(READLINELIB) -rpath $(libdir)
-
-sqlrsh-debug: sqlrsh.C sqlrsh.p.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.p.lo $(DEBUGLIBS) $(READLINELIB) -rpath $(libdir)
+sqlrsh: sqlrsh.C sqlrsh.lo
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIB) -rpath $(libdir)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) -s query $(bindir)
-	#$(LIBTOOL) --mode=install $(INSTALL) query-debug $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) -s fields $(bindir)
-	#$(LIBTOOL) --mode=install $(INSTALL) fields-debug $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) -s sqlrsh $(bindir)
-	#$(LIBTOOL) --mode=install $(INSTALL) sqlrsh-debug $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) query $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) fields $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlrsh $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query

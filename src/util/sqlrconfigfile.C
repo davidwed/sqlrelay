@@ -20,40 +20,37 @@
 #include <defaults.h>
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
-	port=atoi(DEFAULT_PORT);
+	port=::atoi(DEFAULT_PORT);
 	listenoninet=(port)?1:0;
-	unixport=DEFAULT_SOCKET;
-	listenonunix=(unixport)?1:0;
-	dbase=DEFAULT_DBASE;
-	connections=atoi(DEFAULT_CONNECTIONS);
-	maxconnections=atoi(DEFAULT_MAXCONNECTIONS);
-	maxqueuelength=atoi(DEFAULT_MAXQUEUELENGTH);
-	growby=atoi(DEFAULT_GROWBY);
-	ttl=atoi(DEFAULT_TTL);
-	endofsession=DEFAULT_ENDOFSESSION;
+	unixport=strdup(DEFAULT_SOCKET);
+	listenonunix=(unixport[0])?1:0;
+	dbase=strdup(DEFAULT_DBASE);
+	connections=::atoi(DEFAULT_CONNECTIONS);
+	maxconnections=::atoi(DEFAULT_MAXCONNECTIONS);
+	maxqueuelength=::atoi(DEFAULT_MAXQUEUELENGTH);
+	growby=::atoi(DEFAULT_GROWBY);
+	ttl=::atoi(DEFAULT_TTL);
+	endofsession=strdup(DEFAULT_ENDOFSESSION);
 	endofsessioncommit=!strcmp(endofsession,"commit");
-	sessiontimeout=atoi(DEFAULT_SESSIONTIMEOUT);
-	runasuser=DEFAULT_RUNASUSER;
-	runasgroup=DEFAULT_RUNASGROUP;
-	cursors=atoi(DEFAULT_CURSORS);
-	authtier=DEFAULT_AUTHTIER;
+	sessiontimeout=::atoi(DEFAULT_SESSIONTIMEOUT);
+	runasuser=strdup(DEFAULT_RUNASUSER);
+	runasgroup=strdup(DEFAULT_RUNASGROUP);
+	cursors=::atoi(DEFAULT_CURSORS);
+	authtier=strdup(DEFAULT_AUTHTIER);
 	authonlistener=(strstr(authtier,"listener"))?1:0;
 	authonconnection=(strstr(authtier,"connection"))?1:0;
 	authondatabase=(!strcmp(authtier,"database"))?1:0;
-	handoff=DEFAULT_HANDOFF;
+	handoff=strdup(DEFAULT_HANDOFF);
 	passdescriptor=(strcmp(handoff,"pass")==0);
-	allowedips=DEFAULT_DENIEDIPS;
-	deniedips=DEFAULT_DENIEDIPS;
-	debug=DEFAULT_DEBUG;
+	allowedips=strdup(DEFAULT_DENIEDIPS);
+	deniedips=strdup(DEFAULT_DENIEDIPS);
+	debug=strdup(DEFAULT_DEBUG);
 	debuglistener=(strstr(debug,"listener"))?1:0;
 	debugconnection=(strstr(debug,"connection"))?1:0;
-	firstuser=NULL;
 	currentuser=NULL;
-	usercount=0;
 	firstconnect=NULL;
 	currentconnect=NULL;
 	connectstringcount=0;
-	connectioncount=0;
 	metrictotal=0;
 }
 
@@ -92,169 +89,182 @@ sqlrconfigfile::~sqlrconfigfile() {
 		delete[] debug;
 	}
 
-	currentuser=firstuser;
-	while (currentuser) {
-		firstuser=currentuser->next;
-		delete currentuser;
-		currentuser=firstuser;
+	usernode	*un=userlist.getNodeByIndex(0);
+	while (un) {
+		delete un->getData();
+		un=un->getNext();
 	}
 
-	currentconnect=firstconnect;
-	while (currentconnect) {
-		firstconnect=currentconnect->next;
-		delete currentconnect;
-		currentconnect=firstconnect;
+	connectstringnode	*csn=connectstringlist.getNodeByIndex(0);
+	while (csn) {
+		delete csn->getData();
+		csn=csn->getNext();
 	}
 }
 
-int	sqlrconfigfile::getPort() {
+int sqlrconfigfile::getPort() {
 	return port;
 }
 
-char	*sqlrconfigfile::getUnixPort() {
+char *sqlrconfigfile::getUnixPort() {
 	return unixport;
 }
 
-int	sqlrconfigfile::getListenOnInet() {
+int sqlrconfigfile::getListenOnInet() {
 	return listenoninet;
 }
 
-int	sqlrconfigfile::getListenOnUnix() {
+int sqlrconfigfile::getListenOnUnix() {
 	return listenonunix;
 }
 
-char	*sqlrconfigfile::getDbase() {
+char *sqlrconfigfile::getDbase() {
 	return dbase;
 }
 
-int	sqlrconfigfile::getConnections() {
+int sqlrconfigfile::getConnections() {
 	return connections;
 }
 
-int	sqlrconfigfile::getMaxConnections() {
+int sqlrconfigfile::getMaxConnections() {
 	return maxconnections;
 }
 
-int	sqlrconfigfile::getMaxQueueLength() {
+int sqlrconfigfile::getMaxQueueLength() {
 	return maxqueuelength;
 }
 
-int	sqlrconfigfile::getGrowBy() {
+int sqlrconfigfile::getGrowBy() {
 	return growby;
 }
 
-int	sqlrconfigfile::getTtl() {
+int sqlrconfigfile::getTtl() {
 	return ttl;
 }
 
-int	sqlrconfigfile::getDynamicScaling() {
+int sqlrconfigfile::getDynamicScaling() {
 	return (maxqueuelength>=0 && maxconnections>connections &&
 			growby>0 && ttl>0);
 }
 
-char	*sqlrconfigfile::getEndOfSession() {
+char *sqlrconfigfile::getEndOfSession() {
 	return endofsession;
 }
 
-int	sqlrconfigfile::getEndOfSessionCommit() {
+int sqlrconfigfile::getEndOfSessionCommit() {
 	return endofsessioncommit;
 }
 
-int	sqlrconfigfile::getSessionTimeout() {
+int sqlrconfigfile::getSessionTimeout() {
 	return sessiontimeout;
 }
 
-char	*sqlrconfigfile::getRunAsUser() {
+char *sqlrconfigfile::getRunAsUser() {
 	return runasuser;
 }
 
-char	*sqlrconfigfile::getRunAsGroup() {
+char *sqlrconfigfile::getRunAsGroup() {
 	return runasgroup;
 }
 
-int	sqlrconfigfile::getCursors() {
+int sqlrconfigfile::getCursors() {
 	return cursors;
 }
 
-char	*sqlrconfigfile::getAuthTier() {
+char *sqlrconfigfile::getAuthTier() {
 	return authtier;
 }
 
-int	sqlrconfigfile::getAuthOnListener() {
+int sqlrconfigfile::getAuthOnListener() {
 	return authonlistener;
 }
 
-int	sqlrconfigfile::getAuthOnConnection() {
+int sqlrconfigfile::getAuthOnConnection() {
 	return authonconnection;
 }
 
-int	sqlrconfigfile::getAuthOnDatabase() {
+int sqlrconfigfile::getAuthOnDatabase() {
 	return authondatabase;
 }
 
-char	*sqlrconfigfile::getHandOff() {
+char *sqlrconfigfile::getHandOff() {
 	return handoff;
 }
 
-int	sqlrconfigfile::getPassDescriptor() {
+int sqlrconfigfile::getPassDescriptor() {
 	// descriptor passing doesn't work if we're using dynamic scaling,
 	// so override it here...
 	return passdescriptor && !getDynamicScaling();
 }
 
-char	*sqlrconfigfile::getAllowedIps() {
+char *sqlrconfigfile::getAllowedIps() {
 	return allowedips;
 }
 
-char	*sqlrconfigfile::getDeniedIps() {
+char *sqlrconfigfile::getDeniedIps() {
 	return deniedips;
 }
 
-char	*sqlrconfigfile::getDebug() {
+char *sqlrconfigfile::getDebug() {
 	return debug;
 }
 
-int	sqlrconfigfile::getDebugListener() {
+int sqlrconfigfile::getDebugListener() {
 	return debuglistener;
 }
 
-int	sqlrconfigfile::getDebugConnection() {
+int sqlrconfigfile::getDebugConnection() {
 	return debugconnection;
 }
 
-usernode	*sqlrconfigfile::getUsers() {
-	return firstuser;
+list< usercontainer * > *sqlrconfigfile::getUserList() {
+	// if there are no users in the list, add a default user/password
+	if (!userlist.getLength()) {
+		currentuser=new usercontainer();
+		currentuser->setUser(DEFAULT_USER);
+		currentuser->setPassword(DEFAULT_PASSWORD);
+		userlist.append(currentuser);
+	}
+	return &userlist;
 }
 
-int	sqlrconfigfile::getUserCount() {
-	return usercount;
+list< connectstringcontainer * > *sqlrconfigfile::getConnectStringList() {
+	return &connectstringlist;
 }
 
-connectstringnode	*sqlrconfigfile::getConnectStrings() {
-	return firstconnect;
-}
-
-connectstringnode	*sqlrconfigfile::getConnectString(
+connectstringcontainer *sqlrconfigfile::getConnectString(
 						const char *connectionid) {
-	currentconnect=firstconnect;
-	while (currentconnect) {
-		if (!strcmp(connectionid,currentconnect->getConnectionId())) {
-			return currentconnect;
+	connectstringnode	*csn=connectstringlist.getNodeByIndex(0);
+	while (csn) {
+		if (!strcmp(connectionid,csn->getData()->getConnectionId())) {
+			return csn->getData();
 		}
-		currentconnect=currentconnect->next;
+		csn=csn->getNext();
 	}
 	return NULL;
 }
 
-int	sqlrconfigfile::getConnectionCount() {
-	return connectioncount;
+int sqlrconfigfile::getConnectionCount() {
+	return connectstringlist.getLength();
 }
 
-int	sqlrconfigfile::getMetricTotal() {
+int sqlrconfigfile::getMetricTotal() {
+	// This is tallied here instead of whenever the parser runs into a
+	// metric attribute because people often forget to include metric
+	// attributes.  In that case, though each connection has a metric,
+	// metrictotal=0, causing no connections to start.
+	if (!metrictotal) {
+		connectstringnode	*csn=
+					connectstringlist.getNodeByIndex(0);
+		while (csn) {
+			metrictotal=metrictotal+csn->getData()->getMetric();
+			csn=csn->getNext();
+		}
+	}
 	return metrictotal;
 }
 
-int	sqlrconfigfile::tagStart(char *name) {
+int sqlrconfigfile::tagStart(char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -264,34 +274,17 @@ int	sqlrconfigfile::tagStart(char *name) {
 
 	// set the current tag
 	if (!strcmp(name,"user")) {
-		if (!firstuser) {
-			firstuser=new usernode();
-			currentuser=firstuser;
-			usercount=1;
-		} else {
-			currentuser->next=new usernode();
-			currentuser=currentuser->next;
-			usercount++;
-		}
+		currentuser=new usercontainer();
+		userlist.append(currentuser);
 	} else if (!strcmp(name,"connection")) {
-		if (!firstconnect) {
-			firstconnect=
-				new connectstringnode(connectstringcount);
-			currentconnect=firstconnect;
-			connectioncount=1;
-			metrictotal=0;
-		} else {
-			currentconnect->next=
-				new connectstringnode(connectstringcount);
-			currentconnect=currentconnect->next;
-			connectioncount++;
-		}
+		currentconnect=new connectstringcontainer(connectstringcount);
+		connectstringlist.append(currentconnect);
 	}
 
 	return 1;
 }
 
-int	sqlrconfigfile::attributeName(char *name) {
+int sqlrconfigfile::attributeName(char *name) {
 
 	// don't do anything if we're already done
 	if (done) {
@@ -351,7 +344,7 @@ int	sqlrconfigfile::attributeName(char *name) {
 	return 1;
 }
 
-int	sqlrconfigfile::attributeValue(char *value) {
+int sqlrconfigfile::attributeValue(char *value) {
 
 	// don't do anything if we're already done
 	if (done) {
@@ -371,164 +364,89 @@ int	sqlrconfigfile::attributeValue(char *value) {
 
 		// if we have found the correct id, process the attribute
 		if (currentattribute==PORT_ATTRIBUTE) {
-			if (value) {
-				port=atoi(value);
-			} else {
-				port=atoi(DEFAULT_PORT);
-			}
+			port=atoi(value,DEFAULT_PORT,1);
 			listenoninet=1;
 		} else if (currentattribute==SOCKET_ATTRIBUTE) {
-			if (value) {
-				unixport=strdup(value);
-			} else {
-				unixport=DEFAULT_SOCKET;
-			}
+			delete[] unixport;
+			unixport=strdup((value)?value:DEFAULT_SOCKET);
 			listenonunix=(unixport[0]!=(char)NULL);
 		} else if (currentattribute==DBASE_ATTRIBUTE) {
-			if (value) {
-				dbase=strdup(value);
-			} else {
-				dbase=DEFAULT_DBASE;
-			}
+			delete[] dbase;
+			dbase=strdup((value)?value:DEFAULT_DBASE);
 		} else if (currentattribute==CONNECTIONS_ATTRIBUTE) {
-			if (value) {
-				connections=atoi(value);
-			} else {
-				connections=atoi(DEFAULT_CONNECTIONS);
-			}
+			connections=atoi(value,DEFAULT_CONNECTIONS,1);
 		} else if (currentattribute==MAXCONNECTIONS_ATTRIBUTE) {
-			if (value) {
-				maxconnections=atoi(value);
-			} else {
-				maxconnections=atoi(DEFAULT_MAXCONNECTIONS);
-			}
+			maxconnections=atoi(value,DEFAULT_MAXCONNECTIONS,1);
 		} else if (currentattribute==MAXQUEUELENGTH_ATTRIBUTE) {
-			if (value) {
-				maxqueuelength=atoi(value);
-			} else {
-				maxqueuelength=atoi(DEFAULT_MAXQUEUELENGTH);
-			}
+			maxqueuelength=atoi(value,DEFAULT_MAXQUEUELENGTH,1);
 		} else if (currentattribute==GROWBY_ATTRIBUTE) {
-			if (value) {
-				growby=atoi(value);
-			} else {
-				growby=atoi(DEFAULT_GROWBY);
-			}
+			growby=atoi(value,DEFAULT_GROWBY,1);
 		} else if (currentattribute==TTL_ATTRIBUTE) {
-			if (value) {
-				ttl=atoi(value);
-			} else {
-				ttl=atoi(DEFAULT_TTL);
-			}
+			ttl=atoi(value,DEFAULT_TTL,1);
 		} else if (currentattribute==ENDOFSESSION_ATTRIBUTE) {
-			if (value) {
-				endofsession=strdup(value);
-			} else {
-				endofsession=DEFAULT_ENDOFSESSION;
-			}
+			delete[] endofsession;
+			endofsession=strdup((value)?value:DEFAULT_ENDOFSESSION);
 			endofsessioncommit=!strcmp(endofsession,"commit");
 		} else if (currentattribute==SESSIONTIMEOUT_ATTRIBUTE) {
-			if (value) {
-				sessiontimeout=atoi(value);
-			} else {
-				sessiontimeout=atoi(DEFAULT_SESSIONTIMEOUT);
-			}
+			sessiontimeout=atoi(value,DEFAULT_SESSIONTIMEOUT,1);
 		} else if (currentattribute==RUNASUSER_ATTRIBUTE) {
-			if (value) {
-				runasuser=strdup(value);
-			} else {
-				runasuser=DEFAULT_RUNASUSER;
-			}
+			delete[] runasuser;
+			runasuser=strdup((value)?value:DEFAULT_RUNASUSER);
 		} else if (currentattribute==RUNASGROUP_ATTRIBUTE) {
-			if (value) {
-				runasgroup=strdup(value);
-			} else {
-				runasgroup=DEFAULT_RUNASGROUP;
-			}
+			delete[] runasgroup;
+			runasgroup=strdup((value)?value:DEFAULT_RUNASGROUP);
 		} else if (currentattribute==CURSORS_ATTRIBUTE) {
-			if (value) {
-				cursors=atoi(value);
-			} else {
-				cursors=atoi(DEFAULT_CURSORS);
-			}
+			cursors=atoi(value,DEFAULT_CURSORS,1);
 		} else if (currentattribute==AUTHTIER_ATTRIBUTE) {
-			if (value) {
-				authtier=strdup(value);
-			} else {
-				authtier=DEFAULT_AUTHTIER;
-			}
+			delete[] authtier;
+			authtier=strdup((value)?value:DEFAULT_AUTHTIER);
 			authonlistener=(strstr(authtier,"listener"))?1:0;
 			authonconnection=(strstr(authtier,"connection"))?1:0;
 			authondatabase=(!strcmp(authtier,"database"))?1:0;
 		} else if (currentattribute==HANDOFF_ATTRIBUTE) {
-			if (value) {
-				handoff=strdup(value);
-			} else {
-				handoff=DEFAULT_HANDOFF;
-			}
+			delete[] handoff;
+			handoff=strdup((value)?value:DEFAULT_HANDOFF);
 			passdescriptor=(strcmp(handoff,"pass")==0);
 		} else if (currentattribute==DENIEDIPS_ATTRIBUTE) {
-			if (value) {
-				deniedips=strdup(value);
-			} else {
-				deniedips=DEFAULT_DENIEDIPS;
-			}
+			delete[] deniedips;
+			deniedips=strdup((value)?value:DEFAULT_DENIEDIPS);
 		} else if (currentattribute==ALLOWEDIPS_ATTRIBUTE) {
-			if (value) {
-				allowedips=strdup(value);
-			} else {
-				allowedips=DEFAULT_DENIEDIPS;
-			}
+			delete[] allowedips;
+			allowedips=strdup((value)?value:DEFAULT_DENIEDIPS);
 		} else if (currentattribute==DEBUG_ATTRIBUTE) {
-			if (value) {
-				debug=strdup(value);
-			} else {
-				debug=DEFAULT_DEBUG;
-			}
+			delete[] debug;
+			debug=strdup((value)?value:DEFAULT_DEBUG);
 			debuglistener=(strstr(debug,"listener"))?1:0;
 			debugconnection=(strstr(debug,"connection"))?1:0;
 		} else if (currentattribute==USER_ATTRIBUTE) {
-			if (value) {
-				currentuser->setUser(value);
-			} else {
-				currentuser->setUser(DEFAULT_USER);
-			}
+			currentuser->setUser((value)?value:DEFAULT_USER);
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {
-			if (value) {
-				currentuser->setPassword(value);
-			} else {
-				currentuser->setPassword(DEFAULT_PASSWORD);
-			}
+			currentuser->setPassword((value)?value:
+							DEFAULT_PASSWORD);
 		} else if (currentattribute==CONNECTIONID_ATTRIBUTE) {
-			if (value) {
-				currentconnect->setConnectionId(value);
-			} else {
-				currentconnect->setConnectionId(
+			currentconnect->setConnectionId((value)?value:
 							DEFAULT_CONNECTIONID);
-			}
 		} else if (currentattribute==STRING_ATTRIBUTE) {
-			if (value) {
-				currentconnect->setString(value);
-			} else {
-				currentconnect->setString(
+			currentconnect->setString((value)?value:
 							DEFAULT_CONNECTSTRING);
-			}
 			currentconnect->parseConnectString();
 		} else if (currentattribute==METRIC_ATTRIBUTE) {
-			int	metric;
-			if (value) {
-				metric=atoi(value);
-			} else {
-				metric=atoi(DEFAULT_METRIC);
-			}
-			currentconnect->setMetric(metric);
-			metrictotal=metrictotal+metric;
+			currentconnect->setMetric(atoi(value,DEFAULT_METRIC,1));
 		}
 	}
 	return 1;
 }
 
-int	sqlrconfigfile::tagEnd(char *name) {
+int sqlrconfigfile::atoi(const char *value,
+				const char *defaultvalue, int minvalue) {
+	int	retval=::atoi((value)?value:defaultvalue);
+	if (retval<minvalue) {
+		retval=::atoi(defaultvalue);
+	}
+	return retval;
+}
+
+int sqlrconfigfile::tagEnd(char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -543,11 +461,11 @@ int	sqlrconfigfile::tagEnd(char *name) {
 	return 1;
 }
 
-int	sqlrconfigfile::parse(const char *config, char *id) {
+int sqlrconfigfile::parse(const char *config, char *id) {
 	return parse(config,id,0);
 }
 
-int	sqlrconfigfile::parse(const char *config, char *id,
+int sqlrconfigfile::parse(const char *config, char *id,
 					int connectstringcount) {
 
 	// init some variables
@@ -564,8 +482,8 @@ int	sqlrconfigfile::parse(const char *config, char *id,
 	}
 
 	// parse the user's .sqlrelay.conf file
-	char	*filename;
-	char	*homedir=getenv("HOME");
+	char *filename;
+	char *homedir=getenv("HOME");
 	if (homedir && homedir[0]) {
 		filename=new char[strlen(homedir)+15+1];
 		sprintf(filename,"%s/.sqlrelay.conf",homedir);
@@ -587,13 +505,12 @@ int	sqlrconfigfile::parse(const char *config, char *id,
 	return retval;
 }
 
-usernode::usernode() {
+usercontainer::usercontainer() {
 	user=NULL;
 	password=NULL;
-	next=NULL;
 }
 
-usernode::~usernode() {
+usercontainer::~usercontainer() {
 	if (user) {
 		delete[] user;
 	}
@@ -602,41 +519,36 @@ usernode::~usernode() {
 	}
 }
 
-void	usernode::setUser(const char *user) {
+void usercontainer::setUser(const char *user) {
 	if (user) {
 		this->user=strdup(user);
 	}
 }
 
-void	usernode::setPassword(const char *password) {
+void usercontainer::setPassword(const char *password) {
 	if (password) {
 		this->password=strdup(password);
 	}
 }
 
-char	*usernode::getUser() {
+char *usercontainer::getUser() {
 	return user;
 }
 
-char	*usernode::getPassword() {
+char *usercontainer::getPassword() {
 	return password;
 }
 
-usernode	*usernode::getNext() {
-	return next;
-}
-
-connectstringnode::connectstringnode(int connectstringcount) {
+connectstringcontainer::connectstringcontainer(int connectstringcount) {
 	this->connectstringcount=connectstringcount;
 	connectionid=NULL;
 	string=NULL;
-	metric=atoi(DEFAULT_METRIC);
-	next=NULL;
+	metric=::atoi(DEFAULT_METRIC);
 	connectstringvar=NULL;
 	connectstringval=NULL;
 }
 
-connectstringnode::~connectstringnode() {
+connectstringcontainer::~connectstringcontainer() {
 	delete[] string;
 	delete[] connectionid;
 
@@ -649,39 +561,35 @@ connectstringnode::~connectstringnode() {
 	delete[] connectstringval;
 }
 
-void	connectstringnode::setConnectionId(const char *connectionid) {
+void connectstringcontainer::setConnectionId(const char *connectionid) {
 	if (connectionid) {
 		this->connectionid=strdup(connectionid);
 	}
 }
 
-void	connectstringnode::setString(const char *string) {
+void connectstringcontainer::setString(const char *string) {
 	if (string) {
 		this->string=strdup(string);
 	}
 }
 
-void	connectstringnode::setMetric(int metric) {
+void connectstringcontainer::setMetric(int metric) {
 	this->metric=metric;
 }
 
-char	*connectstringnode::getConnectionId() {
+char *connectstringcontainer::getConnectionId() {
 	return connectionid;
 }
 
-char	*connectstringnode::getString() {
+char *connectstringcontainer::getString() {
 	return string;
 }
 
-int	connectstringnode::getMetric() {
+int connectstringcontainer::getMetric() {
 	return metric;
 }
 
-connectstringnode	*connectstringnode::getNext() {
-	return next;
-}
-
-void	connectstringnode::parseConnectString() {
+void connectstringcontainer::parseConnectString() {
 
 	if (!connectstringcount) {
 		return;
@@ -697,8 +605,8 @@ void	connectstringnode::parseConnectString() {
 
 	// parse connect string of form:
 	//	 name1=value1;name2=value2;name3=value3;
-	char	*ptr1=string;
-	char	*ptr2=string;
+	char *ptr1=string;
+	char *ptr2=string;
 	int	current=0;
 	while (*ptr2) {
 		while (*ptr2 && *ptr2!='=') {
@@ -733,7 +641,7 @@ void	connectstringnode::parseConnectString() {
 	}
 }
 
-char	*connectstringnode::getConnectStringValue(const char *variable) {
+char *connectstringcontainer::getConnectStringValue(const char *variable) {
 
 	// search for the given variable, return the given value,
 	// search is case insensitive

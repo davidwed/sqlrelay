@@ -24,7 +24,7 @@ void	sqliteconnection::handleConnectString() {
 
 int	sqliteconnection::logIn() {
 #ifdef SQLITE_TRANSACTIONAL
-	if (sqliteptr=sqlite_open(db,666,&errmesg)) {
+	if ((sqliteptr=sqlite_open(db,666,&errmesg))) {
 		return 1;
 	}
 	if (errmesg) {

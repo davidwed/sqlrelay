@@ -98,7 +98,8 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 				int connectiondebug) {
 
 	// get the connection count and total metric
-	connectstringnode	*connectionlist=cfgfile->getConnectStrings();
+	list< connectstringcontainer *>	*connectionlist=
+						cfgfile->getConnectStringList();
 
 	// if the metrictotal was 0, start no connections
 	if (!cfgfile->getMetricTotal()) {
@@ -116,17 +117,21 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 	int	connections=getConnections(cfgfile);
 
 	// start the connections
-	connectstringnode	*currentnode=connectionlist;
+	connectstringnode	*csn=connectionlist->getNodeByIndex(0);
+	connectstringcontainer	*csc;
 	int	metric=0;
 	int	startup=0;
 	int	totalstarted=0;
 	int	done=0;
 	while (!done) {
+
+		// get the appropriate connection
+		csc=csn->getData();
 	
 		// scale the number of each connection to start by 
 		// each connection's metric vs the total number of 
 		// connections to start up
-		metric=currentnode->getMetric();
+		metric=csc->getMetric();
 		if (metric>0) {
 			startup=(int)ceil(
 				((double)(metric*connections))/
@@ -142,13 +147,12 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 		}
 
 		printf("\nStarting %d connections to ",startup);
-		printf("%s :\n",currentnode->getConnectionId());
+		printf("%s :\n",csc->getConnectionId());
 
 		// fire them up
 		for (int i=0; i<startup; i++) {
-	
 			if (!startConnection(strace,cfgfile->getDbase(),
-					id,currentnode->getConnectionId(),
+					id,csc->getConnectionId(),
 					config,localstatedir,connectiondebug)) {
 				return 0;
 			}
@@ -162,9 +166,7 @@ int	startConnections(sqlrconfigfile *cfgfile, int strace,
 		}
 
 		// next...
-		if (currentnode) {
-			currentnode=currentnode->getNext();
-		}
+		csn=csn->getNext();
 	}
 	return 1;
 }
