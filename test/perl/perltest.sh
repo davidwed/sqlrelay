@@ -1,8 +1,8 @@
 #!/bin/sh
 
-#./db2.pl localhost 8001 "" db2test db2test
+./db2.pl localhost 8001 "" db2test db2test
 #./freetds.pl localhost 8002 "" freetdstest freetdstest
-./interbase.pl localhost 8003 "" interbasetest interbasetest
+#./interbase.pl localhost 8003 "" interbasetest interbasetest
 #./lago.pl localhost 8004 "" lagotest lagotest
 #./msql.pl localhost 8005 "" msqltest msqltest
 #./mysql.pl localhost 8006 "" mysqltest mysqltest

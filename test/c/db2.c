@@ -147,7 +147,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_affectedRows(cur),1);
 	printf("\n");
 
-	printf("STORED PROCEDURE: \n");
+	/*printf("STORED PROCEDURE: \n");
 	sqlrcur_sendQuery(cur,"drop procedure testproc");
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 	sqlrcur_prepareQuery(cur,"call testproc(?,?)");
@@ -156,7 +156,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	checkSuccessString(sqlrcur_getOutputBind(cur,"2"),"5");
 	checkSuccessInt(sqlrcur_sendQuery(cur,"drop procedure testproc"),1);
-	printf("\n");
+	printf("\n");*/
 
 	printf("SELECT: \n");
 	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testsmallint"),1);

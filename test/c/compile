@@ -7,5 +7,5 @@
 #gcc -I/usr/local/firstworks/include -g -o lago lago.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
 #gcc -I/usr/local/firstworks/include -g -o freetds freetds.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
 #gcc -I/usr/local/firstworks/include -g -o sybase sybase.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-gcc -I/usr/local/firstworks/include -g -o interbase interbase.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
-#gcc -I/usr/local/firstworks/include -g -o db2 db2.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+#gcc -I/usr/local/firstworks/include -g -o interbase interbase.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence
+gcc -I/usr/local/firstworks/include -g -o db2 db2.c -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++ -lm -lefence

@@ -1,5 +1,6 @@
-trouble with db2
-db2 init script needs db2start for each instance
+stored procedure test doesn't work with db2 8.1
+db2 start/stop doesn't work
+	db2start/db2stop works when run as a given instance owner
 
 scaling/handoff=pass incompatibility
 	setting backlog:

@@ -26,6 +26,7 @@
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
 <li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+<li><a href="#quirks">MySQL Quirks</a></li>
 </ul>
 
 <a name="installation"></a>
@@ -420,6 +421,46 @@ attribute of the connection tag.</p>
 <blockquote>
 <b>sqlr-stop mysqltest</b>
 </blockquote>
+
+<a name="quirks"></a>
+<span class="heading1">MySQL Quirks</span><br>
+
+<p>Most versions of MySQL don't support transactions, but some do.  If you're
+using MySQL-max or if you built MySQL with Innodb support, then you have the
+option of running MySQL with support for transactions.</p>
+
+<p>MySQL does not support foreign key constraints.  For example, take the
+following table declarations:</p>
+
+<blockquote>
+<pre>
+<font color="#a02828"><b>create</b></font> <font color="#6858c8">table</font> cars (
+        car_id  int     <font color="#a02828"><b>not</b></font> <font color="#6858c8">null</font>,
+        ...
+);
+
+<font color="#a02828"><b>create</b></font> <font color="#6858c8">table</font> keys (
+        key_id  int     <font color="#a02828"><b>not</b></font> <font color="#6858c8">null</font>,
+        ...
+);
+
+<font color="#a02828"><b>create</b></font> <font color="#6858c8">table</font> keys_of_cars (
+        car_id  int     <font color="#a02828"><b>not</b></font> <font color="#6858c8">null</font>,
+        key_id  int     <font color="#a02828"><b>not</b></font> <font color="#6858c8">null</font>,
+        ...
+        foreign key (car_id) references cars (car_id),
+        foreign key (key_id) references keys (key_id)
+);
+</pre>
+</blockquote>
+
+<p>In many other databases, attempting to insert car_id's key_id's into
+the keys_of_cars table will fail unless those car_id's and key_id's exist in
+the cars and keys tables respectively.  Under MySQL, this will not fail.</p>
+
+<p>What's quirky about MySQL is that it allows the foreign key syntax, but
+ignores it.  Other databases that don't support foreign keys don't allow the
+syntax either.</p>
 
 </body>
 

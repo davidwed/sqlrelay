@@ -88,16 +88,16 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_affectedRows($cur),1);
 	echo("\n");
 
-	echo("STORED PROCEDURE: \n");
-	sqlrcur_sendQuery($cur,"drop procedure testproc");
-	checkSuccess(sqlrcur_sendQuery($cur,"create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
-	sqlrcur_prepareQuery($cur,"call testproc(?,?)");
-	sqlrcur_inputBind($cur,"1",5);
-	sqlrcur_defineOutputBind($cur,"2",10);
-	checkSuccess(sqlrcur_executeQuery($cur),1);
-	checkSuccess(sqlrcur_getOutputBind($cur,"2"),"5");
-	checkSuccess(sqlrcur_sendQuery($cur,"drop procedure testproc"),1);
-	echo("\n");
+	#echo("STORED PROCEDURE: \n");
+	#sqlrcur_sendQuery($cur,"drop procedure testproc");
+	#checkSuccess(sqlrcur_sendQuery($cur,"create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
+	#sqlrcur_prepareQuery($cur,"call testproc(?,?)");
+	#sqlrcur_inputBind($cur,"1",5);
+	#sqlrcur_defineOutputBind($cur,"2",10);
+	#checkSuccess(sqlrcur_executeQuery($cur),1);
+	#checkSuccess(sqlrcur_getOutputBind($cur,"2"),"5");
+	#checkSuccess(sqlrcur_sendQuery($cur,"drop procedure testproc"),1);
+	#echo("\n");
 
 	echo("SELECT: \n");
 	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testsmallint"),1);

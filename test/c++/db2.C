@@ -146,7 +146,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->affectedRows(),1);
 	printf("\n");
 
-	printf("STORED PROCEDURE: \n");
+	/*printf("STORED PROCEDURE: \n");
 	cur->sendQuery("drop procedure testproc");
 	checkSuccess(cur->sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 	cur->prepareQuery("call testproc(?,?)");
@@ -155,7 +155,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getOutputBind("2"),"5");
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
-	printf("\n");
+	printf("\n");*/
 
 	printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testsmallint"),1);

@@ -125,7 +125,7 @@ server coordinates the instances.  The administration server is owned by an
 OS-level user.  Each instance is owned by a seperate OS-level user as well.</p>
 
 <p>To create an instance and an administration server, run 
-<i>BAS_DIR/install/db2setup</i>, a text-based installation program.</p>
+<i>BASE_DIR/install/db2setup</i>, a text-based installation program.</p>
 
 <blockquote>
 Select <b>[ Create... ]</b><br>
@@ -218,8 +218,9 @@ port 50000.</p>
 
 <span class="heading2">Starting the Database at Boot Time</span><br>
 
-<p>You can use the following script to start/stop the database at 
-boot/shutdown time.</p>
+<p>During the DB2 installation process, /etc/inittab is modified such that
+the database will be started at boot time.  However, if you would like to start
+and stop the database at will, you can use the following script.</p>
 
 <blockquote>
 <PRE>
@@ -227,10 +228,10 @@ boot/shutdown time.</p>
 
 <B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
         start<B><FONT color=#a62828>)</FONT></B>
-                /usr/IBMdb2/V7.1/instance/db2strt
+                /usr/IBMdb2/V7.1/instance/db2istrt
         <B><FONT color=#a62828>;;</FONT></B>
         stop<B><FONT color=#a62828>)</FONT></B>
-                /usr/IBMdb2/V7.1/instance/db2shut
+                /usr/IBMdb2/V7.1/instance/db2ishut
         <B><FONT color=#a62828>;;</FONT></B>
         *<B><FONT color=#a62828>)</FONT></B>
         <B><FONT color=#a62828>echo</FONT></B><FONT color=#ff00ff> $</FONT><B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>Usage: </FONT><FONT color=#a620f7>$0</FONT><FONT color=#ff00ff> {start|stop}</FONT><B><FONT color=#a62828>&quot;</FONT></B>

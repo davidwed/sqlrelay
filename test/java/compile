@@ -1,8 +1,8 @@
 #export FWCLASSPATH=/usr/java
 export FWCLASSPATH=/usr/local/firstworks/java
-#javac -classpath $CLASSPATH:$FWCLASSPATH db2.java
+javac -classpath $CLASSPATH:$FWCLASSPATH db2.java
 #javac -classpath $CLASSPATH:$FWCLASSPATH freetds.java
-javac -classpath $CLASSPATH:$FWCLASSPATH interbase.java
+#javac -classpath $CLASSPATH:$FWCLASSPATH interbase.java
 #javac -classpath $CLASSPATH:$FWCLASSPATH lago.java
 #javac -classpath $CLASSPATH:$FWCLASSPATH msql.java
 #javac -classpath $CLASSPATH:$FWCLASSPATH mysql.java

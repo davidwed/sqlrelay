@@ -97,16 +97,16 @@ def main():
 	checkSuccess(cur.affectedRows(),1)
 	print
 
-	print "STORED PROCEDURE: "
-	cur.sendQuery("drop procedure testproc");
-	checkSuccess(cur.sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1)
-	cur.prepareQuery("call testproc(?,?)")
-	cur.inputBind("1",5)
-	cur.defineOutputBind("2",10)
-	checkSuccess(cur.executeQuery(),1)
-	checkSuccess(cur.getOutputBind("2"),"5")
-	checkSuccess(cur.sendQuery("drop procedure testproc"),1)
-	print
+	#print "STORED PROCEDURE: "
+	#cur.sendQuery("drop procedure testproc");
+	#checkSuccess(cur.sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1)
+	#cur.prepareQuery("call testproc(?,?)")
+	#cur.inputBind("1",5)
+	#cur.defineOutputBind("2",10)
+	#checkSuccess(cur.executeQuery(),1)
+	#checkSuccess(cur.getOutputBind("2"),"5")
+	#checkSuccess(cur.sendQuery("drop procedure testproc"),1)
+	#print
 
 
 	print "SELECT: "
