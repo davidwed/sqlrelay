@@ -4,7 +4,7 @@
 #include <config.h>
 #include <defaults.h>
 #include <rudiments/commandline.h>
-#include <rudiments/sleep.h>
+#include <rudiments/snooze.h>
 #include <scaler.h>
 
 #include <rudiments/permissions.h>
@@ -297,7 +297,7 @@ bool scaler::openMoreConnections() {
 				// in to it yet, so in that case, don't even
 				// test to see if the database is up or down
 				if (connections && !availableDatabase()) {
-					sleep::macrosleep(1);
+					snooze::macrosnooze(1);
 					continue;
 				}
 

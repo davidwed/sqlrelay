@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <rudiments/sleep.h>
+#include <rudiments/snooze.h>
 #include <rudiments/process.h>
 
 // for sprintf
@@ -144,7 +144,7 @@ void sqlrconnection::registerForHandoff(const char *tmpdir) {
 			}
 			deRegisterForHandoff(tmpdir);
 		}
-		rudiments::sleep::macrosleep(1);
+		snooze::macrosnooze(1);
 	}
 
 	#ifdef SERVER_DEBUG

@@ -5,7 +5,7 @@
 #include <defaults.h>
 #include <sqlrconfigfile.h>
 #include <cmdline.h>
-#include <rudiments/sleep.h>
+#include <rudiments/snooze.h>
 
 // for ceil()
 #include <math.h>
@@ -25,7 +25,7 @@ int getConnections(sqlrconfigfile *cfgfile) {
 }
 
 bool startListener(const char *id, const char *config,
-			const char *localstatedir, int listenerdebug) {
+			const char *localstatedir, bool listenerdebug) {
 
 	// start the listener
 	printf("\nStarting listener:\n");
@@ -51,16 +51,16 @@ bool startListener(const char *id, const char *config,
 		printf("\nsqlr-listener failed to start.\n");
 	}
 
-	sleep::macrosleep(1);
+	snooze::macrosnooze(1);
 
 	return success;
 }
 
 
-bool startConnection(int strace, const char *dbase,
+bool startConnection(bool strace, const char *dbase,
 				const char *id, const char *connectionid,
 				const char *config, const char *localstatedir,
-				int connectiondebug) {
+				bool connectiondebug) {
 
 	stringbuffer	command;
 	if (strace) {
@@ -93,10 +93,10 @@ bool startConnection(int strace, const char *dbase,
 	return success;
 }
 
-bool startConnections(sqlrconfigfile *cfgfile, int strace,
+bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 				const char *id, const char *config,
 				const char *localstatedir,
-				int connectiondebug) {
+				bool connectiondebug) {
 
 	// get the connection count and total metric
 	linkedlist< connectstringcontainer *>	*connectionlist=
@@ -157,7 +157,7 @@ bool startConnections(sqlrconfigfile *cfgfile, int strace,
 					config,localstatedir,connectiondebug)) {
 				return false;
 			}
-			sleep::macrosleep(1);
+			snooze::macrosnooze(1);
 		}
 
 		// have we started enough connections?
@@ -173,7 +173,7 @@ bool startConnections(sqlrconfigfile *cfgfile, int strace,
 }
 
 bool startScaler(sqlrconfigfile *cfgfile, const char *id, const char *config,
-			const char *localstatedir, int connectiondebug) {
+			const char *localstatedir, bool connectiondebug) {
 
 	// don't start the scalar if unless dynamic scaling is enabled
 	if (!cfgfile->getDynamicScaling()) {

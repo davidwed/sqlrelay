@@ -82,6 +82,8 @@ Ruby</a></td>
 </td></tr>
 </table>
 
+<p>Add paths to dll's to PATH environment variable using control panel...</p>
+
 <p>Now, download SQL Relay and follow the <a href="installation.html">standard
 instructions</a> for building and installing it.  Use the Cygwin shell rather
 than the Windows Command Line or DOS shell to build and install SQL Relay.</p>
@@ -94,8 +96,13 @@ IPC server simulates these facilities on Windows.  Install the server as a
 service and start it up following the instructions
 <a href="http://cygwin.com/cygwin-ug-net/using-cygserver.html">here</a>.
 
+<p>Add "server" to CYGWIN environment variable using control panel...</p>
+
 <p>Once the IPC server is running, start up the database and follow the
 <a href="running.html">standard instructions</a> for running SQL Relay.</p>
+
+<p>FIXME: Don't run from ssh, CYGWIN environment variable there doesn't contain
+"server"...</p>
 
 <p>Currently, there is no facility for installing SQL Relay as a service, so
 it must be restarted manually upon reboot.</p>

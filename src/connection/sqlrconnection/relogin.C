@@ -3,7 +3,7 @@
 
 #include <config.h>
 #include <sqlrconnection.h>
-#include <rudiments/sleep.h>
+#include <rudiments/snooze.h>
 
 void sqlrconnection::reLogIn() {
 
@@ -30,7 +30,7 @@ void sqlrconnection::reLogIn() {
 				break;
 			}
 		}
-		sleep::macrosleep(5);
+		snooze::macrosnooze(5);
 	}
 
 	#ifdef SERVER_DEBUG

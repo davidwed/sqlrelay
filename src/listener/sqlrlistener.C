@@ -10,7 +10,7 @@
 #include <rudiments/unixclientsocket.h>
 #include <rudiments/inetclientsocket.h>
 #include <rudiments/rawbuffer.h>
-#include <rudiments/sleep.h>
+#include <rudiments/snooze.h>
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
@@ -1052,12 +1052,12 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 
 	} else if (authstatus==0) {
 
-		// sleep before and after returning an
+		// snooze before and after returning an
 		// authentication error to discourage
 		// brute-force password attacks
-		rudiments::sleep::macrosleep(2);
+		snooze::macrosnooze(2);
 		clientsock->write((unsigned short)ERROR);
-		rudiments::sleep::macrosleep(2);
+		snooze::macrosnooze(2);
 	}
 
 	waitForClientClose(authstatus,passstatus,clientsock);

@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/randomnumber.h>
 #include <rudiments/datetime.h>
-#include <rudiments/sleep.h>
+#include <rudiments/snooze.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -63,6 +63,6 @@ main(int argc, char **argv) {
 			runQuery(dt.getEpoch());
 			_exit(0);
 		}
-		rudiments::sleep::macrosleep(1);
+		snooze::macrosnooze(1);
 	}
 }

@@ -121,7 +121,7 @@ then
 fi
 
 
-for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/usr/local/firstworks"
+for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks" 
 do
 	if ( test -n "$paths" )
 	then
@@ -590,7 +590,7 @@ then
 
 else
 
-	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/usr/sfw" "/usr/pkg" "/usr/local/firstworks"
+	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/usr/sfw" "/usr/pkg" "/sw" "/usr/local/firstworks"
 	do
 		if ( test -n "$i" )
 		then
@@ -920,7 +920,7 @@ then
 
 		if ( test -z "$MYSQLLIBS" )
 		then
-			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin"
+			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/sw/bin"
 			do
 				MYSQLINCLUDES=`$i/mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
 				MYSQLLIBS=`$i/mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
@@ -2027,7 +2027,7 @@ then
 			AC_CHECK_PROG(PERL,perl,"perl")
 			if ( test -z "$PERL" )
 			then
-				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin"
+				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
 				do
 					FW_CHECK_FILE("$i/perl5",[PERL=\"$i/perl5\"])
 					FW_CHECK_FILE("$i/perl",[PERL=\"$i/perl\"])
@@ -2088,7 +2088,7 @@ then
 		if ( test -n "$PYTHONPATH" )
 		then
 		
-			for i in "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
+			for i in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
 			do
 				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib/python$i/config" )
 				then
@@ -2116,7 +2116,7 @@ then
 			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
 			then
 
-				for i in "23" "22" "21" "20" "16" "15"
+				for i in "24" "23" "22" "21" "20" "16" "15"
 				do
 
 					FW_CHECK_HEADER_LIB([$PYTHONPATH/include/Python.h],[PYTHONINCLUDES=\"-I$PYTHONPATH/include\"],[$PYTHONPATH/libs/libpython$j.lib],[PYTHONDIR=\"$PYTHONPATH/Lib\"; PYTHONLIB=\"-L$PYTHONPATH/libs -lpython$j\"],[],[])
@@ -2131,9 +2131,9 @@ then
 		
 		else
 		
-			for j in "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
+			for j in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
 			do
-				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j"
+				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/sw/include/python$j"
 				do
 					if ( test -d "$i" )
 					then
@@ -2146,7 +2146,7 @@ then
 					fi
 				done
 			
-				for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j"
+				for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j"
 				do
 					if ( test -d "$i/config" )
 					then
@@ -2172,7 +2172,7 @@ then
 			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
 			then
 
-				for j in "23" "22" "21" "20" "16" "15"
+				for j in "24" "23" "22" "21" "20" "16" "15"
 				do
 					FW_CHECK_HEADER_LIB([/cygdrive/c/Python$j/include/Python.h],[PYTHONINCLUDES=\"-I/cygdrive/c/Python$j/include\"],[/cygdrive/c/Python$j/libs/python$j.lib],[PYTHONDIR=\"/cygdrive/c/Python$j/Lib\"; PYTHONLIB=\"-L/cygdrive/c/Python$j/libs -lpython$j\"],[],[])
 					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
@@ -2239,7 +2239,7 @@ then
 		
 				if ( test -z "$ZOPEDIR" )
 				then
-					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/usr/lib" "/opt"
+					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/usr/lib" "/opt" "/sw"
 					do
 						for j in "zope" "Zope"
 						do
@@ -2306,7 +2306,7 @@ then
 			AC_CHECK_PROG(RUBY,"ruby","ruby")
 			if ( test -z "$RUBY" )
 			then
-				for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin"
+				for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
 				do
 					FW_CHECK_FILE("$i/ruby",[RUBY=\"$i/ruby\"])
 					if ( test -n "$RUBY" )
@@ -2447,7 +2447,7 @@ then
 				AC_CHECK_PROG(PHPCONFIG,"php-config","php-config")
 				if ( test -z "$PHPCONFIG" )
 				then
-					for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin"
+					for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
 					do
 						FW_CHECK_FILE("$i/php-config",[PHPCONFIG=\"$i/php-config\"])
 						if ( test -n "$PHPCONFIG" )
@@ -2490,7 +2490,7 @@ AC_DEFUN([FW_CHECK_PHP_PEAR_DB],
 	if ( test -z "$PHPPEARDBDIR" )
 	then
 
-		for i in "/usr" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/sfw"
+		for i in "/usr" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/sfw" "/sw"
 		do
 			for j in "pear/DB" "pear/bootstrap/DB"
 			do
@@ -2545,7 +2545,7 @@ then
 		then
 			FW_CHECK_FILE($TCLINCLUDEPATH/tcl.h,[TCLINCLUDE=\"-I$TCLINCLUDEPATH\"])
 		else
-			for i in "/usr/include" "$prefix/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include" "/usr/sfw/include"
+			for i in "/usr/include" "$prefix/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include" "/usr/sfw/include" "/sw/include"
 			do
 				FW_CHECK_FILE($i/tcl.h,[TCLINCLUDE=\"-I$i\"])
 				for j in "tcl8.0" "tcl8.1" "tcl8.2" "tcl8.3" "tcl8.4" "tcl8.5"
@@ -2587,7 +2587,7 @@ then
 			else
 				if ( test -z "$MICROSOFT" )
 				then
-					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib"
+					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
 					do
 						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 						do
@@ -2598,7 +2598,7 @@ then
 				fi
 				if ( test -z "$TCLLIB" )
 				then
-					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib"
+					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
 					do
 						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 						do
@@ -2668,7 +2668,7 @@ then
 			AC_CHECK_PROG(GTKCONFIG,"gtk-config","gtk-config")
 			if ( test -z "$GTKCONFIG" )
 			then
-				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/gtk/bin" "/usr/local/gtk+/bin" "/opt/sfw/bin" "/usr/sfw/bin"
+				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/gtk/bin" "/usr/local/gtk+/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
 				do
 					for j in "gtk-config" "gtk12-config" "gtk10-config"
 					do

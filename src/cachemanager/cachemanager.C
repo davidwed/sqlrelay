@@ -3,7 +3,7 @@
 
 #include <cachemanager.h>
 #include <rudiments/commandline.h>
-#include <rudiments/sleep.h>
+#include <rudiments/snooze.h>
 #include <rudiments/charstring.h>
 #include <rudiments/datetime.h>
 #include <rudiments/file.h>
@@ -102,7 +102,7 @@ void cachemanager::scan() {
 		}
 
 		// wait...
-		sleep::macrosleep(scaninterval);
+		snooze::macrosnooze(scaninterval);
 	}
 
 }

@@ -43,6 +43,7 @@
 	added .PHONY makefile flag, removed INSTALL -> INSTALL.txt hack
 	added /usr/sfw to configure script's search paths
 	uses rudiments error class
+	added /sw to configure script's search paths
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

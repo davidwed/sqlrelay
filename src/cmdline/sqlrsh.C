@@ -92,6 +92,7 @@ class	sqlrsh {
 		void	displayHeader(sqlrcursor *sqlrcur, environment *env);
 		void	displayResultSet(sqlrcursor *sqlrcur, environment *env);
 		void	displayStats(sqlrcursor *sqlrcur, environment *env);
+		void	ping(sqlrconnection *sqlrcon, environment *env);
 		void	displayHelp(environment *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env);
@@ -116,9 +117,11 @@ class	sqlrsh {
 #endif
 };
 
+#ifndef HAVE_READLINE
 sqlrsh::sqlrsh() {
 	standardin.setFileDescriptor(0);
 }
+#endif
 
 void sqlrsh::systemRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 						environment *env) {
@@ -254,6 +257,7 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"debug",5) ||
 		!charstring::compareIgnoringCase(ptr,"final",5) ||
 		!charstring::compareIgnoringCase(ptr,"help",4) ||
+		!charstring::compareIgnoringCase(ptr,"ping",4) ||
 		!charstring::compareIgnoringCase(ptr,"run",3)) {
 
 		// return value of 1 is internal command
@@ -298,6 +302,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		cmdtype=5;
 	} else if (!charstring::compareIgnoringCase(ptr,"help",4)) {	
 		displayHelp(env);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"ping",4)) {	
+		ping(sqlrcon,env);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"run",3)) {	
 		ptr=ptr+3;
@@ -540,6 +547,13 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, environment *env) {
 	printf("	System time     : ");
 	magenta(env);
 	printf("%ld\n",clock());
+	white(env);
+}
+
+void sqlrsh::ping(sqlrconnection *sqlrcon, environment *env) {
+	red(env);
+	printf((sqlrcon->ping())?"	The database is up.\n":
+				"	The database is down.\n");
 	white(env);
 }
 
