@@ -225,7 +225,7 @@ then
 fi
 if ( test "$DB" = "mysql" )
 then
-	$INITDIR/mysql stop
+	sudo $INITDIR/mysql stop
 fi
 if ( test "$DB" = "oldmysql" )
 then
@@ -237,7 +237,7 @@ then
 fi
 if ( test "$DB" = "oracle8" )
 then
-	$INITDIR/oracle stop
+	sudo $INITDIR/oracle stop
 fi
 if ( test "$DB" = "oracle8i" )
 then
@@ -249,7 +249,7 @@ then
 fi
 if ( test "$DB" = "postgresql7" )
 then
-	$INITDIR/postgresql stop
+	sudo $INITDIR/postgresql stop
 fi
 if ( test "$DB" = "sybase" )
 then
