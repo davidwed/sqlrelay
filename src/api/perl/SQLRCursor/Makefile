@@ -13,13 +13,12 @@
 #	CC => q[c++]
 #	CCFLAGS => q[-pedantic -w -O2 -fPIC]
 #	INC => q[-I../../../.. -I../../../common -I../../c++/include -I/usr/local/firstworks/include]
-#	LD => q[ld]
-#	LDDLFLAGS => q[-G]
-#	LIBS => [q[-L../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments  -lstdc++-3-libc6.2-2-2.10.0 -lc]]
+#	LD => q[c++]
+#	LIBS => [q[-L../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments]]
 #	NAME => q[Firstworks::SQLRCursor]
-#	OBJECT => q[$(O_FILES)]
 #	TYPEMAPS => [q[perlobject.map]]
 #	VERSION_FROM => q[SQLRCursor.pm]
+#	XSOPT => q[-C++]
 #	XSPROTOARG => q[-noprototypes]
 #	realclean => { FILES=>q[perl] }
 
@@ -37,8 +36,8 @@ CCCDLFLAGS = -fPIC
 CCDLFLAGS = -rdynamic
 DLEXT = so
 DLSRC = dl_dlopen.xs
-LD = ld
-LDDLFLAGS = -G
+LD = c++
+LDDLFLAGS = -shared -L/usr/local/lib
 LDFLAGS =  -L/usr/local/lib
 LIBC = /lib/libc-2.2.5.so
 LIB_EXT = .a
@@ -110,7 +109,7 @@ PARENT_NAME = Firstworks
 DLBASE = $(BASEEXT)
 VERSION_FROM = SQLRCursor.pm
 INC = -I../../../.. -I../../../common -I../../c++/include -I/usr/local/firstworks/include
-OBJECT = $(O_FILES)
+OBJECT = $(BASEEXT)$(OBJ_EXT)
 LDFROM = $(OBJECT)
 LINKTYPE = dynamic
 
@@ -193,7 +192,7 @@ XSUBPPDIR = /usr/lib/perl5/5.6.1/ExtUtils
 XSUBPP = $(XSUBPPDIR)/xsubpp
 XSPROTOARG = -noprototypes
 XSUBPPDEPS = $(XSUBPPDIR)/typemap perlobject.map typemap $(XSUBPP)
-XSUBPPARGS = -typemap $(XSUBPPDIR)/typemap -typemap perlobject.map -typemap typemap
+XSUBPPARGS = -C++ -typemap $(XSUBPPDIR)/typemap -typemap perlobject.map -typemap typemap
 
 
 # --- MakeMaker tools_other section:
@@ -201,7 +200,7 @@ XSUBPPARGS = -typemap $(XSUBPPDIR)/typemap -typemap perlobject.map -typemap type
 SHELL = /bin/sh
 CHMOD = chmod
 CP = cp
-LD = ld
+LD = c++
 MV = mv
 NOOP = $(SHELL) -c true
 RM_F = rm -f
@@ -284,10 +283,10 @@ MPOLLUTE =
 # Firstworks::SQLRCursor might depend on some other libraries:
 # See ExtUtils::Liblist for details
 #
-EXTRALIBS = -L/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc
-LDLOADLIBS = -L/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc
+EXTRALIBS = -L/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments
+LDLOADLIBS = -L/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments
 BSLOADLIBS = 
-LD_RUN_PATH = /usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs:/usr/local/firstworks/lib:/usr/lib:/lib
+LD_RUN_PATH = /usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs:/usr/local/firstworks/lib
 
 
 # --- MakeMaker const_cccmd section:
@@ -882,7 +881,7 @@ pm_to_blib: $(TO_INST_PM)
 #	DLEXT => q[so]
 #	DLSRC => q[dl_dlopen.xs]
 #	EXE_EXT => q[]
-#	EXTRALIBS => q[-L/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc]
+#	EXTRALIBS => q[-L/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments]
 #	FIRST_MAKEFILE => q[Makefile]
 #	FULLEXT => q[Firstworks/SQLRCursor]
 #	FULLPERL => q[/usr/bin/perl]
@@ -928,15 +927,15 @@ pm_to_blib: $(TO_INST_PM)
 #	INST_MAN1DIR => q[blib/man1]
 #	INST_MAN3DIR => q[blib/man3]
 #	INST_SCRIPT => q[blib/script]
-#	LD => q[ld]
-#	LDDLFLAGS => q[-G]
+#	LD => q[c++]
+#	LDDLFLAGS => q[-shared -L/usr/local/lib]
 #	LDFLAGS => q[ -L/usr/local/lib]
 #	LDFROM => q[$(OBJECT)]
-#	LDLOADLIBS => q[-L/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments -lstdc++-3-libc6.2-2-2.10.0 -lc]
-#	LD_RUN_PATH => q[/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs:/usr/local/firstworks/lib:/usr/lib:/lib]
+#	LDLOADLIBS => q[-L/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments]
+#	LD_RUN_PATH => q[/usr/local/src/sqlrelay/src/api/perl/SQLRCursor/../../c++/src/.libs:/usr/local/firstworks/lib]
 #	LIBC => q[/lib/libc-2.2.5.so]
 #	LIBPERL_A => q[libperl.a]
-#	LIBS => [q[-L../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments  -lstdc++-3-libc6.2-2-2.10.0 -lc]]
+#	LIBS => [q[-L../../c++/src/.libs -lsqlrclient -L/usr/local/firstworks/lib -lrudiments]]
 #	LIB_EXT => q[.a]
 #	LINKTYPE => q[dynamic]
 #	MAKEFILE => q[Makefile]
@@ -952,7 +951,7 @@ pm_to_blib: $(TO_INST_PM)
 #	NEEDS_LINKING => q[1]
 #	NOECHO => q[@]
 #	NOOP => q[$(SHELL) -c true]
-#	OBJECT => q[$(O_FILES)]
+#	OBJECT => q[$(BASEEXT)$(OBJ_EXT)]
 #	OBJ_EXT => q[.o]
 #	OPTIMIZE => q[-O2 -march=i386 -mcpu=i686]
 #	OSNAME => q[linux]
@@ -988,6 +987,7 @@ pm_to_blib: $(TO_INST_PM)
 #	VERSION_FROM => q[SQLRCursor.pm]
 #	VERSION_SYM => q[0_33]
 #	XS => { SQLRCursor.xs=>q[SQLRCursor.c] }
+#	XSOPT => q[-C++]
 #	XSPROTOARG => q[-noprototypes]
 #	XS_VERSION => q[0.33]
 #	realclean => { FILES=>q[perl] }

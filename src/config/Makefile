@@ -5,6 +5,7 @@ INSTALL = $(top_builddir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../ -I../common $(RUDIMENTSINCLUDES) `$(GTKCONFIG) --cflags`
 LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= configfile.C gtkfe.C
 LOBJS= configfile.lo gtkfe.lo
@@ -32,7 +33,7 @@ sqlr-config-gtk: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) `$(GTKCONFIG) --libs` $(LIBS)
 
 sqlr-config-gtk-debug: $(SRCS) $(PLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) `$(GTKCONFIG) --libs` $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) `$(GTKCONFIG) --libs` $(DEBUGLIBS)
 
 install:
 	$(top_builddir)/mkinstalldirs $(bindir)
