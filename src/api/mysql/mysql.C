@@ -127,7 +127,10 @@ typedef char **MYSQL_ROW;
 
 struct MYSQL_RES {
 	sqlrcursor		*sqlrcur;
-	unsigned int		errno;
+	// don't call this errno, some systems have a macro for errno
+	// which will get substituted in for all errno references and give
+	// undesirable results
+	unsigned int		errorno;
 	my_ulonglong		previousrow;
 	my_ulonglong		currentrow;
 	MYSQL_FIELD_OFFSET	currentfield;
@@ -728,7 +731,7 @@ unsigned int mysql_warning_count(MYSQL *mysql) {
 }
 
 unsigned int mysql_errno(MYSQL *mysql) {
-	return mysql->currentstmt->result->errno;
+	return mysql->currentstmt->result->errorno;
 }
 
 const char *mysql_error(MYSQL *mysql) {
@@ -766,7 +769,7 @@ MYSQL_STMT *mysql_prepare(MYSQL *mysql, const char *query,
 	stmt->result=new MYSQL_RES;
 	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
 	stmt->result->sqlrcur->copyReferences();
-	stmt->result->errno=0;
+	stmt->result->errorno=0;
 	stmt->result->fields=NULL;
 	stmt->result->sqlrcur->prepareQuery(query,length);
 	return stmt;
@@ -1271,7 +1274,7 @@ my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 
 
 unsigned int mysql_stmt_errno(MYSQL_STMT *stmt) {
-	return stmt->result->errno;
+	return stmt->result->errorno;
 }
 
 const char *mysql_stmt_error(MYSQL_STMT *stmt) {
