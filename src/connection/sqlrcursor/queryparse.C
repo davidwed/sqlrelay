@@ -67,10 +67,8 @@ void sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
 
 	// see if the query matches the pattern for a temporary query that
 	// creates a temporary table
-	if (createtemplower.match(ptr)) {
-		ptr=createtemplower.getSubstringEnd(0);
-	} else if (createtempupper.match(ptr)) {
-		ptr=createtempupper.getSubstringEnd(0);
+	if (createtemp.match(ptr)) {
+		ptr=createtemp.getSubstringEnd(0);
 	} else {
 		return;
 	}

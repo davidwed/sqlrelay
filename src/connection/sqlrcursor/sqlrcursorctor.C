@@ -10,6 +10,5 @@ sqlrcursor::sqlrcursor(sqlrconnection *conn) {
 	outbindcount=0;
 	busy=false;
 
-	createtemplower.compile("(create|declare)[ \\t\\r\\n]+((global|local)?[ \\t\\r\\n]+)?temp(orary)?[ \\t\\r\\n]+table[ \\t\\r\\n]+");
-	createtempupper.compile("(CREATE|declare)[ \\t\\r\\n]+((GLOBAL|LOCAL)?[ \\t\\r\\n]+)?TEMP(ORARY)?[ \\t\\r\\n]+TABLE[ \\t\\r\\n]+");
+	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");
 }

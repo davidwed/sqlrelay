@@ -101,8 +101,8 @@ class freetdscursor : public sqlrcursor {
 		bool		prepared;
 		bool		clean;
 
-		regularexpression	cursorquerylower;
-		regularexpression	cursorqueryupper;
+		regularexpression	cursorquery;
+		regularexpression	rpcquery;
 
 		freetdsconnection	*freetdsconn;
 };

@@ -249,6 +249,19 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
+	printf("STORED PROCEDURE: \n");
+con->debugOn();
+	//cur->sendQuery("drop procedure testproc");
+	//checkSuccess(cur->sendQuery("create procedure testproc @invar int, @outvar int output as select @outvar=@invar"),1);
+	//cur->prepareQuery("exec testproc @invar, @outvar");
+	checkSuccess(cur->sendQuery("declare @outvar int"),1);
+	checkSuccess(cur->sendQuery("exec testproc 5, @outvar output"),1);
+	checkSuccess(cur->sendQuery("select @outvar"),1);
+	checkSuccess(cur->getField(0,0),"5");
+
+	//checkSuccess(cur->sendQuery("drop procedure testproc"),1);
+	printf("\n");
+
 	printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	printf("\n");

@@ -80,6 +80,9 @@ class sybasecursor : public sqlrcursor {
 
 		CS_DATAFMT	parameter[MAX_BIND_VARS];
 		int		paramindex;
+		char		*outbindvalues[MAX_BIND_VARS];
+		unsigned short	outbindvaluelengths[MAX_BIND_VARS];
+		int		outbindindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
 		char		data[MAX_SELECT_LIST_SIZE]
@@ -95,8 +98,10 @@ class sybasecursor : public sqlrcursor {
 		bool		prepared;
 		bool		clean;
 
-		regularexpression	cursorquerylower;
-		regularexpression	cursorqueryupper;
+		regularexpression	cursorquery;
+		regularexpression	rpcquery;
+
+		bool			isrpcquery;
 
 		sybaseconnection	*sybaseconn;
 };

@@ -395,10 +395,8 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 		def[i]=NULL;
 	}
 #ifdef HAVE_ORACLE_8i
-	createtemplower.compile("create[ \\t\\n\\r]+global[ \\t\\n\\r]+temporary[ \\t\\n\\r]+table[ \\t\\n\\r]+");
-	createtempupper.compile("CREATE[ \\t\\n\\r]+GLOBAL[ \\t\\n\\r]+TEMPORARY[ \\t\\n\\r]+table[ \\t\\n\\r]+");
-	preserverowslower.compile("on[ \\t\\n\\r]+commit[ \\t\\n\\r]+preserve[ \\t\\n\\r]+rows");
-	preserverowsupper.compile("on[ \\t\\n\\r]+commit[ \\t\\n\\r]+preserve[ \\t\\n\\r]+rows");
+	createtemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
+	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
 #endif
 }
 
@@ -906,10 +904,8 @@ void oracle8cursor::checkForTempTable(const char *query,
 	}
 
 	// look for "create global temporary table "
-	if (createtemplower.match(ptr)) {
-		ptr=createtemplower.getSubstringEnd(0);
-	} else if (createtempupper.match(ptr)) {
-		ptr=createtempupper.getSubstringEnd(0);
+	if (createtemp.match(ptr)) {
+		ptr=createtemp.getSubstringEnd(0);
 	} else {
 		return;
 	}
@@ -924,7 +920,7 @@ void oracle8cursor::checkForTempTable(const char *query,
 	// append to list of temp tables
 	// check for "on commit preserve rows" otherwise assume
 	// "on commit delete rows"
-	if (preserverowslower.match(ptr) || preserverowsupper.match(ptr)) {
+	if (preserverows.match(ptr)) {
 		conn->addSessionTempTableForTrunc(tablename.getString());
 	}
 }

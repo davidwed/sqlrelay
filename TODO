@@ -2,6 +2,8 @@ cygwin:
 	requires rudiments without ssl/pcre support
 	perl api won't build
 
+support sybase/freetds stored procedures
+
 interbase stored procedure/output bind tests fails at isc_dsql_prepare
 test sybase/freetds stored procedures
 

@@ -288,11 +288,14 @@ freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 
 	// replace the regular expressions used to detect creation of a
 	// temporary table
-	createtemplower.compile("create[ \\t\\r\\n]+table[ \\t\\r\\n]+#");
-	createtempupper.compile("CREATE[ \\t\\r\\n]+TABLE[ \\t\\r\\n]+#");
+	createtemp.compile("(create|CREATE)[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+#");
+	createtemp.study();
 
-	cursorquerylower.compile("(select|execute)[ \\t\\r\\n]+");
-	cursorqueryupper.compile("(SELECT|EXECUTE)[ \\t\\r\\n]+");
+	cursorquery.compile("^(select|SELECT)[ \\t\\r\\n]+");
+	cursorquery.study();
+
+	rpcquery.compile("^(execute|EXECUTE|exec|EXEC)[ \\t\\r\\n]+");
+	rpcquery.study();
 }
 
 freetdscursor::~freetdscursor() {
@@ -356,8 +359,7 @@ bool freetdscursor::prepareQuery(const char *query, long length) {
 
 	// This code is here in case freetds ever actually supports cursors...
 	if (false) {
-		if (cursorquerylower.match(query) ||
-			cursorqueryupper.match(query)) {
+		if (cursorquery.match(query)) {
 
 			// initiate a cursor command
 			cmd=cursorcmd;
@@ -366,6 +368,17 @@ bool freetdscursor::prepareQuery(const char *query, long length) {
 					(CS_CHAR *)query,length,
 					CS_UNUSED)!=CS_SUCCEED) {
 					//CS_READ_ONLY)!=CS_SUCCEED) {
+				return false;
+			}
+
+		} else if (rpcquery.match(query)) {
+
+			// initiate a language command
+			cmd=languagecmd;
+			if (ct_command(languagecmd,CS_RPC_CMD,
+				(CS_CHAR *)rpcquery.getSubstringEnd(0),
+				length-rpcquery.getSubstringEndOffset(0),
+				CS_UNUSED)!=CS_SUCCEED) {
 				return false;
 			}
 

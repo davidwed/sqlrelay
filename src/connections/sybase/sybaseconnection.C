@@ -263,13 +263,16 @@ sybasecursor::sybasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	cursorcmd=NULL;
 	cursorname=NULL;
 
-	// replace the regular expressions used to detect creation of a
+	// replace the regular expression used to detect creation of a
 	// temporary table
-	createtemplower.compile("create[ \\t\\r\\n]+table[ \\t\\r\\n]+#");
-	createtempupper.compile("CREATE[ \\t\\r\\n]+TABLE[ \\t\\r\\n]+#");
+	createtemp.compile("(create|CREATE)[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+#");
+	createtemp.study();
 
-	cursorquerylower.compile("(select|execute)[ \\t\\r\\n]+");
-	cursorqueryupper.compile("(SELECT|EXECUTE)[ \\t\\r\\n]+");
+	cursorquery.compile("^(select|SELECT)[ \\t\\r\\n]+");
+	cursorquery.study();
+
+	rpcquery.compile("^(execute|exec|EXECUTE|EXEC)[ \\t\\r\\n]+");
+	rpcquery.study();
 }
 
 sybasecursor::~sybasecursor() {
@@ -330,8 +333,11 @@ bool sybasecursor::prepareQuery(const char *query, long length) {
 	this->length=length;
 
 	paramindex=0;
+	outbindindex=0;
 
-	if (cursorquerylower.match(query) || cursorqueryupper.match(query)) {
+	isrpcquery=false;
+
+	if (cursorquery.match(query)) {
 
 		// initiate a cursor command
 		cmd=cursorcmd;
@@ -339,6 +345,18 @@ bool sybasecursor::prepareQuery(const char *query, long length) {
 					(CS_CHAR *)cursorname,CS_NULLTERM,
 					(CS_CHAR *)query,length,
 					CS_READ_ONLY)!=CS_SUCCEED) {
+			return false;
+		}
+
+	} else if (rpcquery.match(query)) {
+
+		// initiate an rpc command
+		isrpcquery=true;
+		cmd=languagecmd;
+		if (ct_command(languagecmd,CS_RPC_CMD,
+				(CS_CHAR *)rpcquery.getSubstringEnd(0),
+				length-rpcquery.getSubstringEndOffset(0),
+				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
 
@@ -461,9 +479,13 @@ bool sybasecursor::outputBindString(const char *variable,
 					unsigned short valuesize, 
 					short *isnull) {
 
-	// this code is here in case SQL Relay ever supports rpc commands
+	checkRePrepare();
 
-	/*(CS_VOID)memset(&parameter[paramindex],0,
+	outbindvalues[outbindindex]=value;
+	outbindvaluelengths[outbindindex]=valuesize;
+	outbindindex++;
+
+	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
@@ -477,11 +499,12 @@ bool sybasecursor::outputBindString(const char *variable,
 	parameter[paramindex].status=CS_RETURN;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-			(CS_VOID *)value,valuesize,
+			(CS_VOID *)NULL,0,
+			//value,valuesize,
 			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
 		return false;
 	}
-	paramindex++;*/
+	paramindex++;
 	return true;
 }
 
@@ -531,20 +554,36 @@ bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
 		}
 
 		if (cmd==languagecmd) {
-			// For non-cursor commands, there should be only
-			// one result set.
-			break;
-		} else if (cmd==cursorcmd && (resultstype==CS_ROW_RESULT ||
+
+			if (isrpcquery) {
+				// For rpc commands, there should be two
+				// result sets - CS_STATUS_RESULT,
+				// maybe a CS_PARAM_RESULT and maybe a
+				// CS_ROW_RESULT, we're not guaranteed
+				// what order they'll come in though, what
+				// a pickle...
+				// For now, we care about the CS_PARAM_RESULT,
+				// presumably there will only be 1 row in it...
+				if (resultstype==CS_PARAM_RESULT) {
+					break;
+				}
+			} else {
+				// For language commands, there should be only
+				// one result set.
+				break;
+			}
+
+		} else if (resultstype==CS_ROW_RESULT ||
 					resultstype==CS_CURSOR_RESULT ||
-					resultstype==CS_COMPUTE_RESULT ||
-					resultstype==CS_PARAM_RESULT ||
-					resultstype==CS_STATUS_RESULT)) {
+					resultstype==CS_COMPUTE_RESULT) {
 			// For cursor commands, each call to ct_cursor will
 			// have generated a result set.  There will be result
 			// sets for the CS_CURSOR_DECLARE, CS_CURSOR_ROWS and
 			// CS_CURSOR_OPEN calls.  We need to skip past the
 			// first 2, unless they failed.  If they failed, it
 			// will be caught above.
+			// For rpc commands, there will be several result sets,
+			// skip until we find one that we care about...
 			break;
 		}
 
@@ -568,8 +607,7 @@ bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
 	if (resultstype==CS_ROW_RESULT ||
 			resultstype==CS_CURSOR_RESULT ||
 			resultstype==CS_COMPUTE_RESULT ||
-			resultstype==CS_PARAM_RESULT ||
-			resultstype==CS_STATUS_RESULT) {
+			resultstype==CS_PARAM_RESULT) {
 
 		if (ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -610,6 +648,34 @@ bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
 		} 
 	}
 
+	// if we're doing an rpc query, the result set should be a single
+	// row of output parameter results, fetch it and populate the output
+	// bind variables...
+	if (isrpcquery) {
+
+		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
+				&rowsread)!=CS_SUCCEED && !rowsread) {
+			return false;
+		}
+		
+		// copy data into output bind values
+		CS_INT	maxindex=outbindindex;
+		if (ncols<outbindindex) {
+			// this shouldn't happen...
+			maxindex=ncols;
+		}
+		for (CS_INT i=0; i<maxindex; i++) {
+			CS_INT	length=outbindvaluelengths[i];
+			if (datalength[i][0]<length) {
+				length=datalength[i][0];
+			}
+			memcpy(outbindvalues[i],data[i][0],length);
+		}
+
+		discardResults();
+		ncols=0;
+	}
+
 	// return success only if no error was generated
 	if (sybaseconn->errorstring) {
 		return false;
@@ -647,9 +713,7 @@ void sybasecursor::returnColumnInfo() {
 	// unless the query was a successful select, send no header
 	if (resultstype!=CS_ROW_RESULT &&
 			resultstype!=CS_CURSOR_RESULT &&
-			resultstype!=CS_COMPUTE_RESULT &&
-			resultstype!=CS_PARAM_RESULT &&
-			resultstype!=CS_STATUS_RESULT) {
+			resultstype!=CS_COMPUTE_RESULT) {
 		return;
 	}
 
@@ -751,9 +815,7 @@ bool sybasecursor::noRowsToReturn() {
 	// unless the query was a successful select, send no data
 	return (resultstype!=CS_ROW_RESULT &&
 			resultstype!=CS_CURSOR_RESULT &&
-			resultstype!=CS_COMPUTE_RESULT &&
-			resultstype!=CS_PARAM_RESULT &&
-			resultstype!=CS_STATUS_RESULT);
+			resultstype!=CS_COMPUTE_RESULT);
 }
 
 bool sybasecursor::skipRow() {
