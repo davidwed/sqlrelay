@@ -19319,6 +19319,7 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 
 CC=$OLDCC
 sed -e "s|^CC=\"$CXX\"$|CC=\"$CC\"|" -e "s|^LTCC=\"$CXX\"$|LTCC=\"$CC\"|" libtool > libtool.gcc
+chmod 755 libtool.gcc
 
 if ( test "$USE_SYSTEM_LIBTOOL" = "yes" )
 then
@@ -19420,15 +19421,6 @@ else
 		do
 
 
-eval "PTHREADINCLUDES=\"\""
-eval "PTHREADLIBS=\"\""
-eval "PTHREADLIBPATH=\"\""
-eval "PTHREADSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
 SEARCHPATH=$PTHREADPATH
 NAME=pthread
 HEADER=pthread.h
@@ -19441,6 +19433,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "PTHREADINCLUDES=\"\""
+eval "PTHREADLIBS=\"\""
+eval "PTHREADLIBPATH=\"\""
+eval "PTHREADSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -21497,15 +21498,6 @@ else
 	then
 
 
-eval "RUDIMENTSINCLUDES=\"\""
-eval "RUDIMENTSLIBS=\"\""
-eval "RUDIMENTSLIBSPATH=\"\""
-eval "RUDIMENTSSTATIC=\"\""
-if ( test -n "RUDIMENTSPATH" )
-then
-	eval "RUDIMENTSPATH=\"\""
-fi
-
 SEARCHPATH=$RUDIMENTSPATH
 NAME=rudiments
 HEADER=rudiments/daemonprocess.h
@@ -21518,6 +21510,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "RUDIMENTSINCLUDES=\"\""
+eval "RUDIMENTSLIBS=\"\""
+eval "RUDIMENTSLIBSPATH=\"\""
+eval "RUDIMENTSSTATIC=\"\""
+if ( test -n "RUDIMENTSPATH" )
+then
+	eval "RUDIMENTSPATH=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -23621,15 +23622,6 @@ then
 
 
 
-eval "MYSQLINCLUDES=\"\""
-eval "MYSQLLIBS=\"\""
-eval "MYSQLLIBSPATH=\"\""
-eval "MYSQLSTATIC=\"\""
-if ( test -n "dummy" )
-then
-	eval "dummy=\"\""
-fi
-
 SEARCHPATH=$MYSQLPATH
 NAME=mysql
 HEADER=mysql.h
@@ -23642,6 +23634,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "MYSQLINCLUDES=\"\""
+eval "MYSQLLIBS=\"\""
+eval "MYSQLLIBSPATH=\"\""
+eval "MYSQLSTATIC=\"\""
+if ( test -n "dummy" )
+then
+	eval "dummy=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -25088,15 +25089,6 @@ then
 
 
 
-eval "POSTGRESQLINCLUDES=\"\""
-eval "POSTGRESQLLIBS=\"\""
-eval "POSTGRESQLLIBSPATH=\"\""
-eval "POSTGRESQLSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
 SEARCHPATH=$POSTGRESQLPATH
 NAME=pgsql
 HEADER=libpq-fe.h
@@ -25109,6 +25101,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "POSTGRESQLINCLUDES=\"\""
+eval "POSTGRESQLLIBS=\"\""
+eval "POSTGRESQLLIBSPATH=\"\""
+eval "POSTGRESQLSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -26159,15 +26160,6 @@ fi
 		if ( test -z "$POSTGRESQLLIBS" )
 		then
 
-
-eval "POSTGRESQLINCLUDES=\"\""
-eval "POSTGRESQLLIBS=\"\""
-eval "POSTGRESQLLIBSPATH=\"\""
-eval "POSTGRESQLSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
 
 SEARCHPATH=$POSTGRESQLPATH
 NAME=postgresql
@@ -26182,6 +26174,15 @@ LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
 
+eval "POSTGRESQLINCLUDES=\"\""
+eval "POSTGRESQLLIBS=\"\""
+eval "POSTGRESQLLIBSPATH=\"\""
+eval "POSTGRESQLSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
+
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
 
@@ -27233,15 +27234,6 @@ fi
 		then
 
 
-eval "POSTGRESQLINCLUDES=\"\""
-eval "POSTGRESQLLIBS=\"\""
-eval "POSTGRESQLLIBSPATH=\"\""
-eval "POSTGRESQLSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
 SEARCHPATH=$POSTGRESQLPATH
 NAME=postgres
 HEADER=libpq-fe.h
@@ -27254,6 +27246,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "POSTGRESQLINCLUDES=\"\""
+eval "POSTGRESQLLIBS=\"\""
+eval "POSTGRESQLLIBSPATH=\"\""
+eval "POSTGRESQLSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -28777,15 +28778,6 @@ then
 else
 
 
-eval "GDBMINCLUDES=\"\""
-eval "GDBMLIBS=\"\""
-eval "GDBMLIBSPATH=\"\""
-eval "GDBMSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
 SEARCHPATH=$LIBGDBMPATH
 NAME=gdbm
 HEADER=gdbm.h
@@ -28798,6 +28790,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "GDBMINCLUDES=\"\""
+eval "GDBMLIBS=\"\""
+eval "GDBMLIBSPATH=\"\""
+eval "GDBMSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -29882,15 +29883,6 @@ fi
 		then
 
 
-eval "SQLITEINCLUDES=\"\""
-eval "SQLITELIBS=\"\""
-eval "SQLITELIBSPATH=\"\""
-eval "SQLITESTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
 SEARCHPATH=$SQLITEPATH
 NAME=sqlite
 HEADER=sqlite.h
@@ -29903,6 +29895,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "SQLITEINCLUDES=\"\""
+eval "SQLITELIBS=\"\""
+eval "SQLITELIBSPATH=\"\""
+eval "SQLITESTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -31098,15 +31099,6 @@ then
 
 
 
-eval "LAGOINCLUDES=\"\""
-eval "LAGOLIBS=\"\""
-eval "LAGOLIBSPATH=\"\""
-eval "LAGOSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
 SEARCHPATH=$LAGOPATH
 NAME=lago
 HEADER=lago.h
@@ -31119,6 +31111,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "LAGOINCLUDES=\"\""
+eval "LAGOLIBS=\"\""
+eval "LAGOLIBSPATH=\"\""
+eval "LAGOSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -32293,15 +32294,6 @@ then
 
 
 
-eval "FREETDSINCLUDES=\"\""
-eval "FREETDSLIBS=\"\""
-eval "FREETDSLIBPATH=\"\""
-eval "FREETDSSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
 SEARCHPATH=$FREETDSPATH
 NAME=freetds
 HEADER=ctpublic.h
@@ -32314,6 +32306,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "FREETDSINCLUDES=\"\""
+eval "FREETDSLIBS=\"\""
+eval "FREETDSLIBPATH=\"\""
+eval "FREETDSSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -34072,15 +34073,6 @@ then
 
 
 
-eval "ODBCINCLUDES=\"\""
-eval "ODBCLIBS=\"\""
-eval "ODBCLIBSPATH=\"\""
-eval "UNIXODBCSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
 SEARCHPATH=$ODBCPATH
 NAME=unixodbc
 HEADER=sql.h
@@ -34093,6 +34085,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "ODBCINCLUDES=\"\""
+eval "ODBCLIBS=\"\""
+eval "ODBCLIBSPATH=\"\""
+eval "UNIXODBCSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then
@@ -35146,15 +35147,6 @@ fi
 		else
 
 
-eval "ODBCINCLUDES=\"\""
-eval "ODBCLIBS=\"\""
-eval "ODBCLIBSPATH=\"\""
-eval "IODBCSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
 SEARCHPATH=$ODBCPATH
 NAME=iodbc
 HEADER=sql.h
@@ -35167,6 +35159,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "ODBCINCLUDES=\"\""
+eval "ODBCLIBS=\"\""
+eval "ODBCLIBSPATH=\"\""
+eval "IODBCSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
 
 if ( test "$USEFULLLIBPATH" = "yes" )
 then

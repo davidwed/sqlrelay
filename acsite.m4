@@ -97,15 +97,6 @@ fi
 AC_DEFUN([FW_CHECK_HEADERS_AND_LIBS],
 [
 
-eval "$7=\"\""
-eval "$8=\"\""
-eval "$9=\"\""
-eval "$10=\"\""
-if ( test -n "$11" )
-then
-	eval "$11=\"\""
-fi
-
 SEARCHPATH=$1
 NAME=$2
 HEADER=$3
@@ -118,6 +109,15 @@ LIBSTRING=""
 LIBPATH=""
 STATIC=""
 HEADERSANDLIBSPATH=""
+
+eval "$7=\"\""
+eval "$8=\"\""
+eval "$9=\"\""
+eval "$10=\"\""
+if ( test -n "$11" )
+then
+	eval "$11=\"\""
+fi
 
 dnl first, check the specified path
 if ( test "$USEFULLLIBPATH" = "yes" )
