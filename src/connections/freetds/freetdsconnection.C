@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <freetdsconnection.h>
+#include <rudiments/string.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -326,7 +327,7 @@ int	freetdscursor::prepareQuery(const char *query, long length) {
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
-	if (isNumber(variable+1,variablesize-1)) {
+	if (string::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
@@ -354,7 +355,7 @@ int	freetdscursor::inputBindLong(const char *variable,
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
-	if (isNumber(variable+1,variablesize-1)) {
+	if (string::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
@@ -381,7 +382,7 @@ int	freetdscursor::inputBindDouble(const char *variable,
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
-	if (isNumber(variable+1,variablesize-1)) {
+	if (string::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {
@@ -412,7 +413,7 @@ int	freetdsconnection::outputBindString(const char *variable,
 
 	(CS_VOID)memset(&parameter[paramindex],0,
 			sizeof(parameter[paramindex]));
-	if (isNumber(variable+1,variablesize-1)) {
+	if (string::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]=(char)NULL;
 		parameter[paramindex].namelen=0;
 	} else {

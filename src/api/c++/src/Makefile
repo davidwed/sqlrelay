@@ -6,6 +6,7 @@ CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c++/inc
 
 SRCS = connection/constructor.C \
 	connection/destructor.C \
+	connection/copyreferences.C \
 	connection/ping.C \
 	connection/identify.C \
 	connection/endsession.C \
@@ -21,14 +22,42 @@ SRCS = connection/constructor.C \
 	connection/getconnectionsocket.C \
 	connection/authentication.C \
 	connection/getnewport.C \
-	connection/copyreferences.C \
 	connection/clearsessionflags.C \
 	connection/opensession.C \
 	connection/closeconnection.C \
-	cursor/sqlrcursor.C \
+	cursor/constructor.C \
+	cursor/destructor.C \
+	cursor/copyreferences.C \
+	cursor/columns.C \
+	cursor/fields.C \
+	cursor/columnnamecase.C \
+	cursor/nulls.C \
+	cursor/suspendresultset.C \
+	cursor/binds.C \
+	cursor/fetchfrombindcursor.C \
+	cursor/rowcounts.C \
+	cursor/getcolumninfo.C \
+	cursor/resultsetbuffersize.C \
+	cursor/errormessage.C \
+	cursor/readcache.C \
+	cursor/writecache.C \
+	cursor/resume.C \
+	cursor/getresultsetid.C \
+	cursor/preparequery.C \
+	cursor/sendquery.C \
+	cursor/executequery.C \
+	cursor/runquery.C \
+	cursor/receiveresultset.C \
+	cursor/parsecolumninfo.C \
+	cursor/parseoutputbinds.C \
+	cursor/parsedata.C \
+	cursor/clearresultset.C \
+	cursor/skipandfetch.C \
+	cursor/abortresultset.C \
 	row/row.C
 NLOBJS = connection/constructor.n.lo \
 	connection/destructor.n.lo \
+	connection/copyreferences.n.lo \
 	connection/ping.n.lo \
 	connection/identify.n.lo \
 	connection/endsession.n.lo \
@@ -44,11 +73,38 @@ NLOBJS = connection/constructor.n.lo \
 	connection/getconnectionsocket.n.lo \
 	connection/authentication.n.lo \
 	connection/getnewport.n.lo \
-	connection/copyreferences.n.lo \
 	connection/clearsessionflags.n.lo \
 	connection/opensession.n.lo \
 	connection/closeconnection.n.lo \
-	cursor/sqlrcursor.n.lo \
+	cursor/constructor.n.lo \
+	cursor/destructor.n.lo \
+	cursor/copyreferences.n.lo \
+	cursor/columns.n.lo \
+	cursor/fields.n.lo \
+	cursor/columnnamecase.n.lo \
+	cursor/nulls.n.lo \
+	cursor/suspendresultset.n.lo \
+	cursor/binds.n.lo \
+	cursor/fetchfrombindcursor.n.lo \
+	cursor/rowcounts.n.lo \
+	cursor/getcolumninfo.n.lo \
+	cursor/resultsetbuffersize.n.lo \
+	cursor/errormessage.n.lo \
+	cursor/readcache.n.lo \
+	cursor/writecache.n.lo \
+	cursor/resume.n.lo \
+	cursor/getresultsetid.n.lo \
+	cursor/preparequery.n.lo \
+	cursor/sendquery.n.lo \
+	cursor/executequery.n.lo \
+	cursor/runquery.n.lo \
+	cursor/receiveresultset.n.lo \
+	cursor/parsecolumninfo.n.lo \
+	cursor/parseoutputbinds.n.lo \
+	cursor/parsedata.n.lo \
+	cursor/clearresultset.n.lo \
+	cursor/skipandfetch.n.lo \
+	cursor/abortresultset.n.lo \
 	row/row.n.lo
 PLOBJS = connection/constructor.p.lo \
 	connection/destructor.p.lo \
@@ -71,7 +127,35 @@ PLOBJS = connection/constructor.p.lo \
 	connection/clearsessionflags.p.lo \
 	connection/opensession.p.lo \
 	connection/closeconnection.p.lo \
-	cursor/sqlrcursor.p.lo \
+	cursor/constructor.p.lo \
+	cursor/destructor.p.lo \
+	cursor/copyreferences.p.lo \
+	cursor/columns.p.lo \
+	cursor/fields.p.lo \
+	cursor/columnnamecase.p.lo \
+	cursor/nulls.p.lo \
+	cursor/suspendresultset.p.lo \
+	cursor/binds.p.lo \
+	cursor/fetchfrombindcursor.p.lo \
+	cursor/rowcounts.p.lo \
+	cursor/getcolumninfo.p.lo \
+	cursor/resultsetbuffersize.p.lo \
+	cursor/errormessage.p.lo \
+	cursor/readcache.p.lo \
+	cursor/writecache.p.lo \
+	cursor/resume.p.lo \
+	cursor/getresultsetid.p.lo \
+	cursor/preparequery.p.lo \
+	cursor/sendquery.p.lo \
+	cursor/executequery.p.lo \
+	cursor/runquery.p.lo \
+	cursor/receiveresultset.p.lo \
+	cursor/parsecolumninfo.p.lo \
+	cursor/parseoutputbinds.p.lo \
+	cursor/parsedata.p.lo \
+	cursor/clearresultset.p.lo \
+	cursor/skipandfetch.p.lo \
+	cursor/abortresultset.p.lo \
 	row/row.p.lo
 
 .SUFFIXES: .n.lo .p.lo

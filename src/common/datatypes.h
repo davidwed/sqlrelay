@@ -93,7 +93,7 @@ typedef	enum {
 	DOUBLE_PRECISION_DATATYPE
 } datatype;
 
-char	*datatypestring[] = {
+static char	*datatypestring[] = {
 	"UNKNOWN",
 	// addded by freetds
 	"CHAR",		// 1
@@ -178,17 +178,7 @@ char	*datatypestring[] = {
 	// none added by sqlite
 };
 
-int isNumber(const char *var, int varlen) {
-
-	for (int i=0; i<varlen; i++) {
-		if (var[i]<'0' || var[i]>'9') {
-			return 0;
-		}
-	}
-	return 1;
-}
-
-int isNumberTypeChar(const char *type) { 
+static int isNumberTypeChar(const char *type) { 
 	if (!strcmp(type,"NUMBER") || !strcmp(type,"INT") ||
 		!strcmp(type,"SMALLINT") || !strcmp(type,"TINYINT") ||
 		!strcmp(type,"NUMERIC") || !strcmp(type,"BIT") ||
@@ -216,7 +206,7 @@ int isNumberTypeChar(const char *type) {
 	return 0;
 }
 
-int isNumberTypeInt(int type) {
+static int isNumberTypeInt(int type) {
 	if (type==NUMBER_DATATYPE || type==INT_DATATYPE ||
 		type==SMALLINT_DATATYPE || type==TINYINT_DATATYPE ||
 		type==NUMERIC_DATATYPE || type==BIT_DATATYPE ||

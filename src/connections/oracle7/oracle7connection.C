@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <oracle7connection.h>
+#include <rudiments/string.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -161,7 +162,7 @@ int	oracle7cursor::inputBindString(const char *variable,
 						short *isnull) {
 
 	// bind the value to the variable
-	if (isNumber(variable+1,variablesize-1)) {
+	if (string::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
@@ -185,7 +186,7 @@ int	oracle7cursor::inputBindLong(const char *variable,
 						unsigned long *value) {
 	
 	// bind the value to the variable
-	if (isNumber(variable+1,variablesize-1)) {
+	if (string::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
@@ -211,7 +212,7 @@ int	oracle7cursor::inputBindDouble(const char *variable,
 						unsigned short scale) {
 	
 	// bind the value to the variable
-	if (isNumber(variable+1,variablesize-1)) {
+	if (string::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}
@@ -237,7 +238,7 @@ int	oracle7cursor::outputBindString(const char *variable,
 					short *isnull) {
 
 	// bind the value to the variable
-	if (isNumber(variable+1,variablesize-1)) {
+	if (string::isInteger(variable+1,variablesize-1)) {
 		if (!atoi(variable+1)) {
 			return 0;
 		}

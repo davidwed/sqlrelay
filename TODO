@@ -1,5 +1,5 @@
 libpq-sqlrelay.a fails to install when building RPM
-extract-debug errors during RPM build 
+perl api's don't get installed right when building an RPM
 
 does "=NULL" have to be translated to "is NULL" in fake binds?
 

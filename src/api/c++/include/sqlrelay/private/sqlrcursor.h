@@ -56,12 +56,12 @@
 		int	skipRows(int rowtoget);
 
 		void	startCaching();
+		void	cacheError();
 		void	cacheNoError();
 		void	cacheColumnInfo();
 		void	cacheOutputBinds(int count);
 		void	cacheData();
 		void	finishCaching();
-		void	suspendCaching();
  
 		int	fetchRowIntoBuffer(int row);
 
