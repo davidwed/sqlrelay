@@ -3,7 +3,7 @@ include ../../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB) $(PYTHONLIBS) $(SSLLIB) $(CRYPTOLIB) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB) $(SSLLIB) $(CRYPTOLIB) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH = -rpath /lib
 ifneq ($(strip $(libdir)),)
 ifeq ($(PYTHONUSERPATH),yes)
@@ -12,7 +12,7 @@ endif
 endif
 
 SRCS = CSQLRelay.C
-LOBJS = CSQLRelay.lo python.lo
+LOBJS = CSQLRelay.lo
 
 .SUFFIXES: .lo
 
@@ -28,9 +28,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) CSQLRelay.so
 
 rebuild: clean all
-
-python.lo:
-	cp $(PYTHONOBJ) $@
 
 CSQLRelay.so: libCSQLRelay.la
 	for i in `find .libs -name "libCSQLRelay*so*"`; \
