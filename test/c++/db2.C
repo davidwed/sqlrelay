@@ -47,6 +47,18 @@ void checkSuccess(int value, int success) {
 	}
 }
 
+void checkSuccess(double value, double success) {
+
+	if (value==success) {
+		printf("success ");
+	} else {
+		printf("failure ");
+		delete cur;
+		delete con;
+		exit(0);
+	}
+}
+
 int	main(int argc, char **argv) {
 
 	char	*dbtype;
@@ -148,13 +160,20 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("STORED PROCEDURE: \n");
+	// return multiple values
 	cur->sendQuery("drop procedure testproc");
-	checkSuccess(cur->sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
-	cur->prepareQuery("call testproc(?,?)");
-	cur->inputBind("1",5);
-	cur->defineOutputBind("2",10);
+	checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 double, in in3 varchar(20), out out1 int, out out2 double, out out3 varchar(20)) language sql begin set out1 = in1; set out2 = in2; set out3 = in3; end"),1);
+	cur->prepareQuery("call testproc(?,?,?,?,?,?)");
+	cur->inputBind("1",1);
+	cur->inputBind("2",1.1,2,1);
+	cur->inputBind("3","hello");
+	cur->defineOutputBind("4",25);
+	cur->defineOutputBind("5",25);
+	cur->defineOutputBind("6",25);
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBind("2"),"5");
+	checkSuccess(cur->getOutputBind("4"),"1");
+	checkSuccess(atof(cur->getOutputBind("5")),1.1);
+	checkSuccess(cur->getOutputBind("6"),"hello");
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");
 

@@ -47,6 +47,18 @@ void checkSuccess(int value, int success) {
 	}
 }
 
+void checkSuccess(double value, double success) {
+
+	if (value==success) {
+		printf("success ");
+	} else {
+		printf("failure ");
+		delete cur;
+		delete con;
+		exit(0);
+	}
+}
+
 
 int	main(int argc, char **argv) {
 
@@ -108,8 +120,7 @@ int	main(int argc, char **argv) {
 
 	printf("CREATE STORED PROCEDURE: \n");
 	cur->sendQuery("drop procedure testproc");
-	//checkSuccess(cur->sendQuery("create procedure testproc @inint int, @outint int output, @instring varchar(20), @outstring varchar(20) output as select @outint=@inint select @outstring=@instring"),1);
-	checkSuccess(cur->sendQuery("create procedure testproc @instring varchar(20), @outstring varchar(20) output as select @outstring=@instring"),1);
+	checkSuccess(cur->sendQuery("create procedure testproc @in1 int, @in2 float, @in3 varchar(20), @out1 varchar(20) output, @out2 varchar(20) output, @out3 varchar(20) output as select @out1=convert(varchar(20),@in1), @out2=convert(varchar(20),@in2), @out3=convert(varchar(20),@in3)"),1);
 	printf("\n");
 
 	// drop existing table
@@ -256,14 +267,18 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("STORED PROCEDURE: \n");
+	// return multiple values
 	cur->prepareQuery("exec testproc");
-	//cur->inputBind("inint","5");
-	cur->inputBind("instring","hello");
-	//cur->defineOutputBind("outint",20);
-	cur->defineOutputBind("outstring",20);
+	cur->inputBind("in1",1);
+	cur->inputBind("in2",1.1,2,1);
+	cur->inputBind("in3","hello");
+	cur->defineOutputBind("out1",20);
+	cur->defineOutputBind("out2",20);
+	cur->defineOutputBind("out3",20);
 	checkSuccess(cur->executeQuery(),1);
-	//checkSuccess(cur->getOutputBind("outint"),"5");
-	checkSuccess(cur->getOutputBind("outstring"),"hello");
+	checkSuccess(cur->getOutputBind("out1"),"1");
+	checkSuccess(atof(cur->getOutputBind("out2")),1.1);
+	checkSuccess(cur->getOutputBind("out3"),"hello");
 	printf("\n");
 
 	printf("SELECT: \n");

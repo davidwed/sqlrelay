@@ -20,6 +20,7 @@
 <li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
 <li><a href="#cursors">Cursors</a></li>
 <li><a href="#columns">Getting Column Information</a></li>
+<li><a href="#storedprocedures">Stored Procedures</a></li>
 <li><a href="#caching">Caching The Result Set</a></li>
 <li><a href="#suspending">Suspending and Resuming Sessions</a></li>
 </ul>
@@ -769,6 +770,593 @@ main() {
 }
 </pre>
 </blockquote>
+
+<a name="storedprocedures"></a>
+<span class="heading2">Stored Procedures</span><br><br>
+
+<p>Many databases support stored procedures.  Stored procedures are sets of
+queries and procedural code that are executed inside of the database itself.
+For example, a stored procedure may select rows from one table, iterate through
+the result set and, based on the values in each row, insert, update or delete
+rows in other tables.  A client program could do this as well, but a stored
+procedure is generally more efficient because queries and result sets don't
+have to be sent back and forth between the client and database.  Also, stored
+procedures are generally stored in the database in a compiled state, while
+queries may have to be re-parsed and re-compiled each time they are sent.</p>
+
+<p>While many databases support stored procedures.  The syntax for creating
+and executing stored procedures varies greatly between databases.</p>
+
+<p>SQL Relay supports stored procedures for most databases, but there are
+some caveats.  Stored procedures are not currently supported when using FreeTDS
+against Sybase or Microsoft SQL Server.  Blob/Clob bind variables are only
+supported in Oracle 8i or higher.  Sybase stored procedures must use varchar
+output parameters.</p>
+
+<p>Stored procedures typically take input paramters from client programs through
+input bind variables and return values back to client programs either through
+bind variables or result sets.  Stored procedures can be broken down into
+several categories, based on the values that they return.  Some stored
+procedures don't return any values, some return a single value, some return
+multiple values and some return entire result sets.</p>
+
+<span class="heading3">No Values</span><br>
+
+<p>Some stored procedures don't return any values.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create procedure testproc(in1 number, in2 number(2,1), in3 varchar2(20)) as
+begin
+	insert into mytable values (:in1,:in2,:in3);
+end;
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+cur->prepareQuery("select testproc(:in1,:in2,:in3) from dual");
+cur->inputBind("in1",1);
+cur->inputBind("in2",1.1,2,1);
+cur->inputBind("in3","hello");
+cur->executeQuery();
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create procedure testproc @in1 int, @in2 float, @in3 varchar(20) as
+	insert into mytable values (@in1,@in2,@in3)
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+cur->prepareQuery("exec testproc");
+cur->inputBind("in1",1);
+cur->inputBind("in2",1.1,2,1);
+cur->inputBind("in3","hello");
+cur->executeQuery();
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+<span class="heading4">Interbase and Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create procedure testproc(in1 integer, in2 float, in3 varchar(20)) as
+	insert into mytable values (in1,in2,in3);
+	suspend;
+end;
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+cur->prepareQuery("execute procedure testproc ?, ?, ?");
+cur->inputBind("1",1);
+cur->inputBind("2",1.1,2,1);
+cur->inputBind("3","hello");
+cur->executeQuery();
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+<span class="heading4">DB2</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create procedure testproc(in in1 int, in in2 double, in in3 varchar(20)) language sql
+begin
+	insert into mytable values (in1,in2,in3);
+end;
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+cur->prepareQuery("call testproc(?,?,?)");
+cur->inputBind("1",1);
+cur->inputBind("2",1.1,2,1);
+cur->inputBind("3","hello");
+cur->executeQuery();
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create function testproc(int,float,varchar(20)) returns void as '
+begin
+	insert into mytable values ($1,$2,$3);
+	return;
+end;' language plpgsql
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+cur->prepareQuery("select testproc(:in1,:in2,:in3)");
+cur->inputBind("in1",1);
+cur->inputBind("in2",1.1,2,1);
+cur->inputBind("in3","hello");
+cur->executeQuery();
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+
+
+
+<br><span class="heading3">Single Values</span><br>
+
+<p>Some stored procedures return single values.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>In Oracle, stored procedures can return values through output parameters or
+as return values of the procedure itself.</p>
+
+<p>Here is an example where the procedure itself returns a value.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create procedure testproc(in1 number, in2 number(2,1), in3 varchar2(20)) returns number as
+begin
+	return :in1;
+end;
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+cur->prepareQuery("select testproc(:in1,:in2,:in3) from dual");
+cur->inputBind("in1",1);
+cur->inputBind("in2",1.1,2,1);
+cur->inputBind("in3","hello");
+cur->executeQuery();
+char	*result=cur->getField(0,0);
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+<p>Here is an example where the value is returned through an output
+parameter.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create procedure testproc(in1 number, in2 number(2,1), in3 varchar2(20), out1 out number) as
+begin
+	:out1:=:in1;
+end;
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+cur->prepareQuery("select testproc(:in1,:in2,:in3,:out1) from dual");
+cur->inputBind("in1",1);
+cur->inputBind("in2",1.1,2,1);
+cur->inputBind("in3","hello");
+cur->defineOutputBind("out1",20);
+cur->executeQuery();
+char	*result=cur->getOutputBind("out1");
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>In Sybase and Microsoft SQL Server, stored procedures return values
+through output parameters rather than as return values of the procedure
+itself.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create procedure testproc @in1 int, @in2 float, @in3 varchar(20), @out1 int as
+	select @out1=@in1
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+cur->prepareQuery("exec testproc");
+cur->inputBind("in1",1);
+cur->inputBind("in2",1.1,2,1);
+cur->inputBind("in3","hello");
+cur->defineOutputBind("out1",20);
+cur->executeQuery();
+char	*result=cur->getOutputBind("out1");
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+
+<span class="heading4">Interbase and Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create procedure testproc(in1 integer, in2 float, in3 varchar(20)) returns (out1 integer) as
+	out1=in1;
+	suspend;
+end;
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+cur->prepareQuery("select * from testproc(?,?,?)");
+cur->inputBind("1",1);
+cur->inputBind("2",1.1,2,1);
+cur->inputBind("3","hello");
+cur->executeQuery();
+char	*result=cur->getField(0,0);
+</blockquote>
+
+<p>Alternatively, you can run a query like the following and receive the result
+using an output bind variable.  Note that in Interbase/Firebird, input and
+output bind variable indices are distict from one another.  The index of the
+output bind variable is 1 rather than 4, even though there were 3 input bind
+variables.</p>
+
+<blockquote>
+cur->prepareQuery("execute procedure testproc ?, ?, ?");
+cur->inputBind("1",1);
+cur->inputBind("2",1.1,2,1);
+cur->inputBind("3","hello");
+cur->defineOutputBind("1",20);
+cur->executeQuery();
+char	*result=cur->getOutputBind("1");
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+
+<span class="heading4">DB2</span><br>
+
+<p>In DB2, stored procedures return values through output parameters rather
+than as return values of the procedure itself.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create procedure testproc(in in1 int, in in2 double, in in3 varchar(20), out out1 int) language sql
+begin
+	set out1 = in1;
+end
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+cur->prepareQuery("call testproc(?,?,?,?)");
+cur->inputBind("1",1);
+cur->inputBind("2",1.1,2,1);
+cur->inputBind("3","hello");
+cur->defineOutputBind("4",25);
+cur->executeQuery();
+char	*result=cur->getOutputBind("4");
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop procedure testproc
+</blockquote>
+
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+create function testfunc(int,float,char(20)) returns void as '
+declare
+	in1 int;
+	in2 float;
+	in3 char(20);
+begin
+	in1:=$1;
+	return;
+end;
+' language plpgsql
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+cur->prepareQuery("select * from testfunc(:in1,:in2,:in3)");
+cur->inputBind("in1",1);
+cur->inputBind("in2",1.1,4,2);
+cur->inputBind("in3","hello");
+cur->executeQuery();
+char	*result=cur->getField(0,0);
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+drop function testfunc(int,float,char(20))
+</blockquote>
+
+
+
+<br><span class="heading3">Multiple Values</span><br>
+
+<p>Some stored procedures return multiple values.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+
+<span class="heading4">Interbase and Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+
+<span class="heading4">DB2</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+
+
+<br><span class="heading3">Result Sets</span><br>
+
+<p>Some stored procedures return entire result sets.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+
+<span class="heading4">Interbase and Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+
+<span class="heading4">DB2</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To execute the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+</blockquote>
+
 
 <a name="caching"></a>
 <span class="heading2">Caching The Result Set</span><br><br>

@@ -499,8 +499,7 @@ bool sybasecursor::outputBindString(const char *variable,
 	parameter[paramindex].status=CS_RETURN;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-			(CS_VOID *)NULL,0,
-			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
+		(CS_VOID *)NULL,0,(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
 		return false;
 	}
 	paramindex++;

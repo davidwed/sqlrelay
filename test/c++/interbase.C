@@ -47,6 +47,18 @@ void checkSuccess(int value, int success) {
 	}
 }
 
+void checkSuccess(double value, double success) {
+
+	if (value==success) {
+		printf("success ");
+	} else {
+		printf("failure ");
+		delete cur;
+		delete con;
+		exit(0);
+	}
+}
+
 int	main(int argc, char **argv) {
 
 	char	*dbtype;
@@ -149,26 +161,28 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("STORED PROCEDURE: \n");
+	// return multiple values
 	cur->sendQuery("drop procedure testproc");
-	checkSuccess(cur->sendQuery("create procedure testproc(invar integer) returns (outvar integer) as begin outvar = invar; suspend; end"),1);
-	cur->prepareQuery("select * from testproc(?)");
-	cur->inputBind("1",5);
+	checkSuccess(cur->sendQuery("create procedure testproc(in1 integer, in2 float, in3 varchar(20)) returns (out1 integer, out2 float, out3 varchar(20)) as begin out1 = in1; out2 = in2; out3 = in3; suspend; end"),1);
+	cur->prepareQuery("select * from testproc(?,?,?)");
+	cur->inputBind("1",1);
+	cur->inputBind("2",1.1,2,1);
+	cur->inputBind("3","hello");
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getField(0,0),"5");
-
-con->debugOn();
-	cur->prepareQuery("select ? from testproc(?)");
-	cur->inputBind("1",5);
-	cur->inputBind("2",5);
-	cur->defineOutputBind("1",5);
+	checkSuccess(cur->getField(0,0),"1");
+	checkSuccess(cur->getField(0,1),"1.1000");
+	checkSuccess(cur->getField(0,2),"hello");
+	cur->prepareQuery("execute procedure testproc ?, ?, ?");
+	cur->inputBind("1",1);
+	cur->inputBind("2",1.1,2,1);
+	cur->inputBind("3","hello");
+	cur->defineOutputBind("1",20);
+	cur->defineOutputBind("2",20);
+	cur->defineOutputBind("3",20);
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBind("1"),"5");
-	/*cur->prepareQuery("execute procedure testproc(?) returning_values ?");
-	cur->inputBind("1",5);
-	cur->defineOutputBind("2",5);
-	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBind("2"),"5");*/
-
+	checkSuccess(cur->getOutputBind("1"),"1                   ");
+	checkSuccess(atof(cur->getOutputBind("2")),1.1);
+	checkSuccess(cur->getOutputBind("3"),"hello               ");
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");
 

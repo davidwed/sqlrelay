@@ -145,10 +145,10 @@ interbasecursor::interbasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	interbaseconn=(interbaseconnection *)conn;
 	errormsg=NULL;
 
-	outsqlda=(XSQLDA ISC_FAR *)malloc(
-			XSQLDA_LENGTH(MAX_SELECT_LIST_SIZE));
+	outsqlda=(XSQLDA ISC_FAR *)malloc(XSQLDA_LENGTH(MAX_SELECT_LIST_SIZE));
 	outsqlda->version=SQLDA_VERSION1;
-	outsqlda->sqln=MAX_SELECT_LIST_SIZE;
+	outsqlda->sqln=(MAX_SELECT_LIST_SIZE>MAX_BIND_VARS)?
+				MAX_SELECT_LIST_SIZE:MAX_BIND_VARS;
 
 	insqlda=(XSQLDA ISC_FAR *)malloc(XSQLDA_LENGTH(MAX_BIND_VARS));
 	insqlda->version=SQLDA_VERSION1;
@@ -345,21 +345,19 @@ bool interbasecursor::executeQuery(const char *query, long length,
 	} else if (queryIsExecSP) {
 
 		// if the query is a stored procedure then execute it as such
-		if (isc_dsql_execute2(interbaseconn->error,
-					&interbaseconn->tr,
-					&stmt,1,insqlda,outsqlda)) {
-			return false;
+		bool	retval=!isc_dsql_execute2(interbaseconn->error,
+						&interbaseconn->tr,
+						&stmt,1,insqlda,outsqlda);
+
+		// make sure each output bind variable gets null terminated
+		for (int i=0; i<outsqlda->sqld; i++) {
+			outsqlda->sqlvar[i].
+				sqldata[outsqlda->sqlvar[i].sqllen-1]=0;
 		}
 
-		for (int i=0; i<outsqlda->sqld; i++) {
-			if ((outsqlda->sqlvar[i].sqltype==SQL_TEXT) ||
-				(outsqlda->sqlvar[i].sqltype==
-							SQL_TEXT+1) ) {
-				outsqlda->sqlvar[i].sqldata[
-					outsqlda->sqlvar[i].sqllen-1]=0;
-			}
-		}
-		return true;
+		// set column count to 0
+		outsqlda->sqld=0;
+		return retval;
 	}
 
 	// handle non-stored procedures...
@@ -490,7 +488,7 @@ bool interbasecursor::executeQuery(const char *query, long length,
 }
 
 bool interbasecursor::queryIsNotSelect() {
-	return !(querytype==isc_info_sql_stmt_select);
+	return (querytype!=isc_info_sql_stmt_select);
 }
 
 bool interbasecursor::queryIsCommitOrRollback() {
@@ -530,6 +528,9 @@ void interbasecursor::returnRowCounts() {
 }
 
 void interbasecursor::returnColumnCount() {
+	// for exec procedure queries, outsqlda contains output bind values
+	// rather than column info and there is no result set, thus no column
+	// info
 	conn->sendColumnCount(outsqlda->sqld);
 }
 
@@ -596,7 +597,9 @@ void interbasecursor::returnColumnInfo() {
 }
 
 bool interbasecursor::noRowsToReturn() {
-	return (!outsqlda->sqld);
+	// for exec procedure queries, outsqlda contains output bind values
+	// rather than a result set and there is no result set
+	return (queryIsExecSP)?true:!outsqlda->sqld;
 }
 
 bool interbasecursor::skipRow() {

@@ -71,6 +71,18 @@ void checkSuccess(int value, int success) {
 	}
 }
 
+void checkSuccess(double value, double success) {
+
+	if (value==success) {
+		printf("success ");
+	} else {
+		printf("failure ");
+		delete cur;
+		delete con;
+		exit(0);
+	}
+}
+
 int	main(int argc, char **argv) {
 
 	char	*dbtype;
@@ -830,6 +842,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(bindcur->getField(6,0),"7");
 	checkSuccess(bindcur->getField(7,0),"8");
 	delete bindcur;
+	checkSuccess(cur->sendQuery("drop package types"),1);
 	printf("\n");
 
 	printf("LONG CLOB: \n");
@@ -918,6 +931,46 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
 	checkSuccess(cur->getField(0,0),"0");
 	cur->sendQuery("drop table temptablepreserve\n");
+	printf("\n");
+
+
+	// stored procedures
+	printf("STORED PROCEDURE: \n");
+	// return no value
+	checkSuccess(cur->sendQuery("create or replace procedure testproc(in1 number, in2 number(2,2), in3 varchar2(20) as begin return; end;"),1);
+	cur->prepareQuery("select testproc(:in1,:in2,:in3) from dual");
+	cur->inputBind("in1",1);
+	cur->inputBind("in2",1.1,2,1);
+	cur->inputBind("in3","hello");
+	checkSuccess(cur->executeQuery(),1);
+	// return single value
+	checkSuccess(cur->sendQuery("create or replace procedure testproc(in1 number, in2 number(2,2), in3 varchar2(20) returns number as begin return in1; end;"),1);
+	cur->prepareQuery("select testproc(:in1,:in2,:in3) from dual");
+	cur->inputBind("in1",1);
+	cur->inputBind("in2",1.1,2,1);
+	cur->inputBind("in3","hello");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getField(0,0),"1");
+	checkSuccess(cur->sendQuery("begin  :out1:=testproc(:in1,:in2,:in3); end;"),1);
+	cur->inputBind("in1",1);
+	cur->inputBind("in2",1.1,2,1);
+	cur->inputBind("in3","hello");
+	cur->defineOutputBind("out1",20);
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBind("out1"),"1");
+	// return multiple values
+	checkSuccess(cur->sendQuery("create or replace procedure proc(in1 number, in2 number(2,2), in3 varchar2(20), out1 number out, out2 number(2,2) out, out3 varchar2(20) out) as begin :out1:=in1; :out2:=in2; :out3:=in3; end;"),1);
+	cur->inputBind("in1",1);
+	cur->inputBind("in2",1.1,2,1);
+	cur->inputBind("in3","hello");
+	cur->defineOutputBind("out1",20);
+	cur->defineOutputBind("out2",20);
+	cur->defineOutputBind("out3",20);
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBind("out1"),"1");
+	checkSuccess(atof(cur->getOutputBind("out2")),1.1);
+	checkSuccess(cur->getOutputBind("out3"),"hello");
+	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");
 
 

@@ -2,13 +2,17 @@ cygwin:
 	requires rudiments without ssl/pcre support
 	perl api won't build
 
-interbase stored procedure/output bind tests fails at isc_dsql_prepare
-
 fix erwin's fake binds problem
 
 VB wrapper
 
-stored procedure examples in faq
+stored procedure examples in "Programming with SQL Relay using the XXX API" docs
+test oracle stored procedures
+
+can sybase stored procedures return result sets?
+eg.
+	create procedure query @id int as
+		select * from table where id=@id return
 
 idle client timeout
 client connect timeout

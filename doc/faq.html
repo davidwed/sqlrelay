@@ -983,67 +983,15 @@ delete cur;
 <a name="storedprocs"></a>
 <span class="heading3">How do I run stored procedures?</span>
 
-<p>Stored procedures work in all databases that support them.  However, you may
-not be able to take full advantage of them in some databases.
+<p>Stored procedures work in most databases that support them, with some
+caveats.  Stored procedures are not supported when using FreeTDS against
+Sybase/MS SQL Server.  Binding clob/blob values are only supported in
+Oracle 8i or higher.  When using stored procedures with Sybase, output
+parameters must be varchar types.</p>
 
-<p>All databases allow you to use SELECT to retrieve the result of a stored
-procedure.  However, some databases only allow you to retrieve a single value
-from a stored procedure using SELECT.  When using those databases, retrieving
-more than 1 value from a stored procedure requires that you use output bind
-variables.  If the output of a stored procedure is a cursor, then you may have
-to use a special output bind cursor.  Currently output bind cursors are only
-supported for Oracle 8i or greater.</p>
-
-<p>Below are examples for how to run stored procedures and retrieve the
-results for different databases.</p>
-
-<p>Oracle 7 or 8:</p>
-
-<blockquote>
-Procedures that return a scalar value:<br>
-Procedures that return multiple values using output bind cursors:<br>
-Procedures that return cursors:<br>
-</blockquote>
-
-<p>Oracle 8i or greater:</p>
-
-<blockquote>
-Procedures that return a scalar value:<br>
-Procedures that return multiple values using output bind cursors:<br>
-Procedures that return cursors:<br>
-</blockquote>
-
-<p>Sybase or Microsoft SQL Server:</p>
-
-<blockquote>
-Procedures that return a scalar value:<br>
-Procedures that return multiple values using output bind cursors:<br>
-Procedures that return cursors:<br>
-</blockquote>
-
-<p>DB2 or ODBC:</p>
-
-<blockquote>
-Procedures that return a scalar value:<br>
-Procedures that return multiple values using output bind cursors:<br>
-Procedures that return cursors:<br>
-</blockquote>
-
-<p>Interbase or Firebird:</p>
-
-<blockquote>
-Procedures that return a scalar value:<br>
-Procedures that return multiple values using output bind cursors:<br>
-Procedures that return cursors:<br>
-</blockquote>
-
-<p>PostgreSQL:</p>
-
-<blockquote>
-Procedures that return a scalar value:<br>
-Procedures that return multiple values using output bind cursors:<br>
-Procedures that return cursors:<br>
-</blockquote>
+<p>The syntax for creating and executing a stored procedure is different for
+each database.  Each of the "Programming with SQL Relay using the XXX API"
+documents explain how to use stored procedures in detail.</p>
 
 <a name="returning"></a>
 <span class="heading3">How do I get data out of DML with RETURNING 
