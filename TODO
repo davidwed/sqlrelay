@@ -1,5 +1,14 @@
+fix spec file
+
+compatibility:
+	sybase 12.5
+	interbase 6.5
+	interbase 7
+
 lots of documentation fixes:
-	db2 8.1 installation procedure
+	installation:
+		db2 8.1
+		sybase 12.5
 	db2 startup directions are wrong;
 		you have to run db2start/db2stop as db2as
 	fix clientapis.html
@@ -10,7 +19,6 @@ fix rpm build instructions in INSTALL.txt
 
 does zope stuff work?
 
-incorporate new spec file
 java/com/firstworks/sqlrelay needs to be removed if empty when rpm is
 	uninstalled
 
@@ -23,8 +31,6 @@ Tests:
 	need database reconnect tests
 
 Compatibility:
-	sybase 12.5
-	interbase 6.5/7
 	gtk-2
 	ruby module segfaults on netbsd/openbsd
 	python api methods that call PyArg_ParseTuple with an "O" argument 

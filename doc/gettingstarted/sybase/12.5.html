@@ -1,0 +1,77 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With Sybase - Initializing an 12.5 Server</title>
+<link rel="stylesheet" href="../../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Initializing an 12.5 Server</span><br>
+
+
+<p>After installing Sybase Adaptive Server Enterprise, you can initialize the 
+server by following these steps.</p>
+
+<p>First, <i>su</i> to the sybase user using the -l option.</p>
+
+<blockquote>
+<b>su -l sybase</b>
+</blockquote>
+
+<p>You should be presented with the a great deal of text.</p>
+
+<p>Run <i>asecfg</i>.  A dialog will appear.
+Click <b>Configure a new server</b>.</p>
+
+<p>Another dialog will appear, prompting you to
+<b>Click the check boxes for the types of servers to create and provide names
+for these servers.</b></p>
+
+<blockquote>
+select <b>Adaptive Server</b><br>
+enter a server name, I usually use localhost but any name will do<br>
+select <b>OK</b><br>
+</blockquote>
+
+<p>A new dialog will appear, prompting you to enter filenames for <b>Master</b>
+and <b>Sybsystemprocs</b> device files, and device and database sizes for each.
+
+<blockquote>
+enter <i>/opt/sybase-12.5/master.dat</i> for the <b>Master</b> device file<br>
+enter <i>/opt/sybase-12.5/sybsystemprocs.dat</i> for the <b>Sybsystemprocs</b>
+device file<br>
+Select <b>Edit Advanced Adaptive Server Attributes</b><br>
+</blockquote>
+
+<p>A new dialog will appear, prompting you to enter filenames for the
+<b>Sybsystemdb</b> device file, size and database sizes.</p>
+
+<blockquote>
+enter <i>/opt/sybase-12.5/sybsystemdb.dat</i> for the <b>Sybsystemdb</b> 
+device file<br>
+Select <b>Go Back</b><br>
+</blockquote>
+
+<p>This should return you to the previous dialog.</p>
+
+<blockquote>
+Select <b>Build Server!</b><br>
+</blockquote>
+
+<p>A warning dialog will appear indicating that the files are not raw device
+files.  Ignore this warning and select <b>Yes</b> to proceed.</p>
+
+<p>A Status Output dialog will appear.  As the database is built, the dialog 
+provides feedback about the process.  When it's done, select <b>OK</b>.</p>
+
+<p>A dialog will appear above the Status Output dialog asking if you would
+like to localize your server.  Select <b>No</b> on this dialog and <b>Exit</b> 
+on the Status Output dialog.  A final dialog will appear confirming that you 
+want to exit.  Select <b>Yes</b>.</p>
+
+<p>You should now be returned to the original dialog.  Click <b>Exit</b>.</p>
+
+</body>
+
+</html>

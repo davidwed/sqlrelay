@@ -1,46 +1,57 @@
 include ../config.mk
 
-top_srcdir = ..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ..
+INSTALL = $(top_builddir)/install-sh -c
+
+initroot =
 
 install:
 ifeq ($(UNAME),Linux)
 	if ( test -d "/etc/rc.d/init.d" -a -d "/etc/sysconfig" -a -d "/var/lock/subsys" ); then \
-		$(INSTALL) -m 755 redhat/init.d/sqlrelay /etc/rc.d/init.d; \
-		$(INSTALL) -m 644 redhat/sysconfig/sqlrelay /etc/sysconfig; \
+		$(top_builddir)/mkinstalldirs $(initroot)/etc/rc.d/init.d; \
+		$(top_builddir)/mkinstalldirs $(initroot)/etc/sysconfig; \
+		$(INSTALL) -m 755 redhat/init.d/sqlrelay $(initroot)/etc/rc.d/init.d; \
+		$(INSTALL) -m 644 redhat/sysconfig/sqlrelay $(initroot)/etc/sysconfig; \
 	fi; \
 	if ( test -r "/etc/rc.d/rc.inet2" -a -d "/etc/rc.d" -a -d "/var/lock/subsys" ); then \
-		$(INSTALL) -m 755 slackware/rc.d/rc.sqlrelay /etc/rc.d; \
-		$(INSTALL) -m 644 slackware/sqlrelay /etc; \
+		$(top_builddir)/mkinstalldirs $(initroot)/etc/rc.d; \
+		$(INSTALL) -m 755 slackware/rc.d/rc.sqlrelay $(initroot)/etc/rc.d; \
+		$(INSTALL) -m 644 slackware/sqlrelay $(initroot)/etc; \
 	fi; \
 	if ( test -r "/etc/init.d" -a -d "/var/lock" ); then \
-		$(INSTALL) -m 755 debian/init.d/sqlrelay /etc/init.d; \
-		$(INSTALL) -m 644 debian/sqlrelay /etc; \
+		$(top_builddir)/mkinstalldirs $(initroot)/etc/init.d; \
+		$(INSTALL) -m 755 debian/init.d/sqlrelay $(initroot)/etc/init.d; \
+		$(INSTALL) -m 644 debian/sqlrelay $(initroot)/etc; \
 	fi
 endif
 ifeq ($(UNAME),NetBSD)
-	$(INSTALL) -m 755 netbsd/rc.d/sqlrelay /etc/rc.d
-	$(INSTALL) -m 644 netbsd/sqlrelay /etc
+	$(top_builddir)/mkinstalldirs $(initroot)/etc/rc.d
+	$(INSTALL) -m 755 netbsd/rc.d/sqlrelay $(initroot)/etc/rc.d
+	$(INSTALL) -m 644 netbsd/sqlrelay $(initroot)/etc
 endif
 ifeq ($(UNAME),FreeBSD)
-	$(INSTALL) -m 755 freebsd/rc.d/sqlrelay /usr/local/etc/rc.d
-	$(INSTALL) -m 644 freebsd/sqlrelay /etc
+	$(top_builddir)/mkinstalldirs $(initroot)/usr/local/etc/rc.d
+	$(INSTALL) -m 755 freebsd/rc.d/sqlrelay $(initroot)/usr/local/etc/rc.d
+	$(INSTALL) -m 644 freebsd/sqlrelay $(initroot)/etc
 endif
 ifeq ($(UNAME),SCO_SV)
-	$(INSTALL) -m 755 openserver/init.d/sqlrelay /etc/init.d
-	$(INSTALL) -m 644 openserver/sqlrelay /etc
+	$(top_builddir)/mkinstalldirs $(initroot)/etc/init.d
+	$(INSTALL) -m 755 openserver/init.d/sqlrelay $(initroot)/etc/init.d
+	$(INSTALL) -m 644 openserver/sqlrelay $(initroot)/etc
 endif
+ifeq ($(initroot),)
 	if ( test -x "/sbin/chkconfig" ); then \
 		/sbin/chkconfig --add sqlrelay; \
 	fi
+endif
 
 uninstall:
 	if ( test -x "/sbin/chkconfig" -a -n "`/sbin/chkconfig --list sqlrelay 2> /dev/null`"); then \
 		/sbin/chkconfig --del sqlrelay; \
 	fi
-	$(RM) /etc/rc.d/init.d/sqlrelay
-	$(RM) /etc/rc.d/rc.sqlrelay
-	$(RM) /etc/init.d/sqlrelay
-	$(RM) /usr/local/etc/rc.d/sqlrelay
-	$(RM) /etc/sysconfig/sqlrelay
-	$(RM) /etc/sqlrelay
+	$(RM) $(initroot)/etc/rc.d/init.d/sqlrelay
+	$(RM) $(initroot)/etc/rc.d/rc.sqlrelay
+	$(RM) $(initroot)/etc/init.d/sqlrelay
+	$(RM) $(initroot)/usr/local/etc/rc.d/sqlrelay
+	$(RM) $(initroot)/etc/sysconfig/sqlrelay
+	$(RM) $(initroot)/etc/sqlrelay
