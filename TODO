@@ -1,5 +1,4 @@
-use tclConfig.sh if it exists, spec file may need it too, or may need to do
-	the same thing that the configure script does to find tcldir
+suse uses debian init file, does it work?
 
 ADODB - have a driver, just need to incorporate it
 scaling/handoff=pass incompatibility

@@ -29,9 +29,21 @@
 # --without zope
 # --without tcl
 
+%if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
+	%define phpdevel %(echo "mod_php4-devel")
+	%define gtkdevel %(echo "gtk-devel")
+	%define rubydevel %(echo "ruby")
+	%define tcldevel %(echo "tcl-devel")
+%else
+	%define phpdevel %(echo "php-devel")
+	%define gtkdevel %(echo "gtk+-devel")
+	%define rubydevel %(echo "ruby-devel")
+	%define tcldevel %(echo "tcl")
+%endif
+
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.34.2
+Version: 0.34.3
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
@@ -39,16 +51,16 @@ Source0: %{name}-%{version}.tar.gz
 URL: http://sqlrelay.sourceforge.net
 Buildroot: %{_tmppath}/%{name}-root
 BuildRequires: rudiments-devel >= 0.26
-%{!?_without_gtk:BuildRequires: ,gtk+-devel}
+%{!?_without_gtk:BuildRequires: ,%{gtkdevel}}
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}
 %{!?_without_postgresql:BuildRequires: ,postgresql-devel}
 %{!?_without_perl:BuildRequires: ,perl}
-%{!?_without_php:BuildRequires: ,php-devel}
+%{!?_without_php:BuildRequires: ,%{phpdevel}}
 %{!?_without_python:BuildRequires: ,python-devel}
-%{!?_without_ruby:BuildRequires: ,ruby-devel}
+%{!?_without_ruby:BuildRequires: ,%{rubydevel}}
 %{!?_without_zope:BuildRequires: ,python-devel}
-%{!?_without_tcl:BuildRequires: ,tcl}
+%{!?_without_tcl:BuildRequires: ,%{tcldevel}}
 
 %description
 SQL Relay is a persistent database connection pooling, proxying and load 
@@ -289,7 +301,7 @@ Group: Applications/Database
 Man pages for SQL Relay.
 
 
-%define	tcldir		%(dirname `rpm -q -l tcl | grep tclConfig.sh`)
+%define	tcldir		%(dirname `rpm -q -l %{tcldevel} | grep tclConfig.sh`)
 %define	pythondir	%(echo -e "import sys\\nimport string\\nout=''\\nfor i in sys.path:\\n if len(i)>0:\\n  for j in range(0,len(i)):\\n   if j<len(i)-1:\\n    out=out+i[j]\\n   else:\\n    if i[j]!='/':\\n     out=out+i[j]\\n  break\\nprint out" | python)
 %define	zopedir		/opt/Zope/lib/python/Products
 %define	phpextdir	%(php-config --extension-dir)
