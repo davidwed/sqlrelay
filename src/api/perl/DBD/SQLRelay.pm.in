@@ -308,7 +308,6 @@ sub execute {
 	# get some result set info
 	my $colcount=$cursor->colCount();
 	my $rowcount=$cursor->rowCount();
-	my $affectedrows=$cursor->affectedRows();
 	my @colnames=map {$cursor->getColumnName($_)} (0..$colcount-1);
 	$sth->STORE('driver_NUM_OF_ROWS',$rowcount);
 	$sth->STORE('NUM_OF_FIELDS',$colcount);
@@ -327,7 +326,11 @@ sub execute {
 		$$variable=$cursor->getOutputBind($param);
 	}
 
-	return $affectedrows||'0E0';
+	my $rows=$sth->rows();
+	if ($rows==0) {
+		return "0E0";
+	}
+	return $sth->rows;
 }
 
 sub fetchrow_arrayref {
@@ -367,8 +370,8 @@ sub rows {
 	# get parameters
 	my ($sth)=@_;
 
-	# return the number of rows in the result set
-	return $sth->FETCH('driver_NUM_OF_ROWS');
+	# return the number of affected rows
+	return $sth->FETCH('driver_cursor')->affectedRows();
 }
 
 sub finish {
