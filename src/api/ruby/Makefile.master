@@ -21,7 +21,7 @@ all: makefile
 makefile:
 	if ( test ! -r "Makefile" ); then \
 		$(RUBY) extconf.rb --with-rudiments-dir=$(RUDIMENTSPATH); \
-		sed -e "s/ gcc/ $(CXX)/g" -e "s/ cc/ $(CXX)/g" -e "s| ruby| $(RUBY)|g" -e "s/^CPPFLAGS = /CPPFLAGS = -I\.\.\/c++\/include /g" -e "s/-lsqlrclient/-L\.\.\/c++\/src\/\.libs -lsqlrclient $(PTHREADLIBS) $(STDCPPLIB)/g" Makefile > Makefile.new; \
+		sed -e "s| gcc| $(CXX)|g" -e "s| cc| $(CXX)|g" -e "s| ruby| $(RUBY)|g" -e "s|^CPPFLAGS = |CPPFLAGS = -I\.\./c++/include |g" -e "s|-lsqlrclient|-L$(libdir) -lsqlrclient $(PTHREADLIBS) $(STDCPPLIB)|g" Makefile > Makefile.new; \
 		mv Makefile.new Makefile; \
 	fi
 

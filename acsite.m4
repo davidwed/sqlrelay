@@ -347,13 +347,13 @@ AC_DEFUN([FW_CHECK_STDCPP],
 
 dnl checks for the pthreads library
 dnl requires:  PTHREADSPATH, RPATHFLAG, cross_compiling
-dnl sets the substitution variable PTHREADSLIB
-dnl sets the environment variable PTHREADSLIBPATH
+dnl sets the substitution variable PTHREADLIBS
+dnl sets the environment variable PTHREADLIBSPATH
 AC_DEFUN([FW_CHECK_PTHREADS],
 [
 
-PTHREADSLIB=""
-PTHREADSLIBPATH=""
+PTHREADLIBS=""
+PTHREADLIBSPATH=""
 
 if ( test "$cross_compiling" = "yes" )
 then
@@ -362,9 +362,9 @@ then
 	echo "cross compiling"
 	if ( test -n "$PTHREADSPATH" )
 	then
-		PTHREADSLIB="-L$PTHREADSPATH/lib -lpthread"
+		PTHREADLIBS="-L$PTHREADSPATH/lib -lpthread"
 	else
-		PTHREADSLIB="-lpthread"
+		PTHREADLIBS="-lpthread"
 	fi
 
 else
@@ -375,28 +375,28 @@ else
 		do
 			if ( test -n "$j" )
 			then
-				FW_CHECK_LIB([$j/lib$i.so],[PTHREADSLIBPATH=\"$j\"; PTHREADSLIB=\"-L$j -l$i\"],[$j/lib$i.a],[PTHREADSLIB=\"-L$j -l$i\"])
-				if ( test -n "$PTHREADSLIB" )
+				FW_CHECK_LIB([$j/lib$i.so],[PTHREADLIBSPATH=\"$j\"; PTHREADLIBS=\"-L$j -l$i\"],[$j/lib$i.a],[PTHREADLIBS=\"-L$j -l$i\"])
+				if ( test -n "$PTHREADLIBS" )
 				then
 					break
 				fi
 			fi
 		done
 	
-		FW_CHECK_LIB([/usr/lib/lib$i.so],[PTHREADSLIBPATH=\"\"; PTHREADSLIB=\"-l$i\"],[/usr/lib/lib$i.a],[PTHREADSLIB=\"-l$i\"])
-		if ( test -n "$PTHREADSLIB" )
+		FW_CHECK_LIB([/usr/lib/lib$i.so],[PTHREADLIBSPATH=\"\"; PTHREADLIBS=\"-l$i\"],[/usr/lib/lib$i.a],[PTHREADLIBS=\"-l$i\"])
+		if ( test -n "$PTHREADLIBS" )
 		then
 			if ( test "$i" = "c_r" )
 			then
-				PTHREADSLIB="-pthread $PTHREADSLIB"
+				PTHREADLIBS="-pthread $PTHREADLIBS"
 			fi
 			break
 		fi
 	done
 fi
 
-FW_LIBS(pthreads,[$PTHREADSLIB])
-AC_SUBST(PTHREADSLIB)
+FW_LIBS(pthreads,[$PTHREADLIBS])
+AC_SUBST(PTHREADLIBS)
 ])
 
 
@@ -928,7 +928,7 @@ then
 			STATICFLAG="-static"
 		fi
 		
-		if ( test -n "$PTHREADSLIB" )
+		if ( test -n "$PTHREADLIBS" )
 		then
 			FW_CHECK_HEADERS_AND_LIBS([$SQLITEPATH],[sqlite],[sqlite.h],[sqlite],[$STATICFLAG],[$RPATHFLAG],[SQLITEINCLUDES],[SQLITELIBS],[SQLITELIBSPATH],[SQLITESTATIC])
 		else
@@ -1006,7 +1006,7 @@ then
 			AC_MSG_WARN(Lago support will not be built.)
 		else
 			AC_MSG_CHECKING(if Lago needs threads)
-			FW_TRY_LINK([#include <lago.h>],[LCTX lctx; lctx=Lnewctx(); Ldelctx(lctx);],[$LAGOSTATIC $LAGOINCLUDES],[$LAGOLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$LAGOLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); LAGOLIBS="$LAGOLIBS $PTHREADSLIB"])
+			FW_TRY_LINK([#include <lago.h>],[LCTX lctx; lctx=Lnewctx(); Ldelctx(lctx);],[$LAGOSTATIC $LAGOINCLUDES],[$LAGOLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$LAGOLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); LAGOLIBS="$LAGOLIBS $PTHREADLIBS"])
 		fi
 
 	fi
@@ -1256,7 +1256,7 @@ then
 			FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADSLIB"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADLIBS"])
 		fi
 		if ( test -n "$HAVE_IODBC" )
 		then
@@ -1265,7 +1265,7 @@ then
 			FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS=\"$ODBCLIBS $PTHREADSLIB\"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS=\"$ODBCLIBS $PTHREADLIBS\"])
 		fi
 		if ( test -z "$ODBCLIBS" )
 		then
