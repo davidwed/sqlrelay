@@ -1,3 +1,35 @@
+AC_DEFUN([FW_VERSION],
+[
+if ( test -n "$2" )
+then
+	echo "$1 version... $2"
+fi
+])
+
+AC_DEFUN([FW_INCLUDES],
+[
+if ( test -n "$2" )
+then
+	echo "$1 includes... $2"
+fi
+])
+
+AC_DEFUN([FW_LIBS],
+[
+if ( test -n "$2" )
+then
+	echo "$1 libs... $2"
+fi
+])
+
+AC_DEFUN([FW_CHECK_FILE],
+[
+if ( test -r "$1" )
+then
+	eval "$2"
+fi
+])
+
 AC_DEFUN([FW_TRY_LINK],
 [
 SAVECPPFLAGS="$CPPFLAGS"
@@ -18,14 +50,14 @@ export LD_LIBRARY_PATH
 AC_DEFUN([FW_CHECK_LIB],
 [
 FOUNDLIB=""
-AC_CHECK_FILE($1, FOUNDLIB="yes")
+FW_CHECK_FILE($1,[FOUNDLIB=\"yes\"])
 if ( test -n "$FOUNDLIB" )
 then
 	eval "$2"
 else
 	if ( test -n "$3" )
 	then
-		AC_CHECK_FILE($3, FOUNDLIB="yes")
+		FW_CHECK_FILE($3,[FOUNDLIB=\"yes\"])
 		if ( test -n "$FOUNDLIB" )
 		then
 			eval "$4"
@@ -39,8 +71,8 @@ AC_DEFUN([FW_CHECK_HEADER_LIB],
 [
 FOUNDHEADER=""
 FOUNDLIB=""
-AC_CHECK_FILE($1, FOUNDHEADER="yes")
-AC_CHECK_FILE($3, FOUNDLIB="yes")
+FW_CHECK_FILE($1,[FOUNDHEADER=\"yes\"])
+FW_CHECK_FILE($3,[FOUNDLIB=\"yes\"])
 if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
@@ -51,7 +83,7 @@ then
 else
 	if ( test -n "$5" -a -n "$6" )
 	then
-		AC_CHECK_FILE($5, FOUNDLIB="yes")
+		FW_CHECK_FILE($5,[FOUNDLIB=\"yes\"])
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "$2"
@@ -336,6 +368,8 @@ else
 		fi
 	done
 fi
+
+FW_LIBS(pthreads,[$PTHREADSLIB])
 AC_SUBST(PTHREADSLIB)
 ])
 
@@ -391,6 +425,9 @@ then
 	AC_MSG_ERROR(Rudiments not found.  SQL-Relay requires this package.)
 	exit
 fi
+
+FW_INCLUDES(rudiments,[$RUDIMENTSINCLUDES])
+FW_LIBS(rudiments,[$RUDIMENTSLIBS])
 
 AC_SUBST(RUDIMENTSPATH)
 AC_SUBST(RUDIMENTSINCLUDES)
@@ -534,6 +571,14 @@ then
 	then
 		AC_DEFINE(HAVE_ORACLE_8i,1,Oracle 8i or greater)
 	fi
+
+	if ( test -n $"ORACLE_VERSION" )
+	then
+		FW_VERSION(oracle,[$ORACLEVERSION])
+		FW_INCLUDES(oracle,[$ORACLEINCLUDES])
+		FW_LIBS(oracle,[$ORACLELIBS])
+	fi
+
 	AC_SUBST(ORACLEVERSION)
 	AC_SUBST(ORACLEINCLUDES)
 	AC_SUBST(ORACLELIBS)
@@ -582,12 +627,12 @@ then
 		else
 			if ( test -n "$MYSQLPATH" )
 			then
-				AC_CHECK_FILE($MYSQLPATH/include/mysql.h,MYSQLINCLUDES="-I$MYSQLPATH/include")
-				AC_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.a,MYSQLLIBS="-L$MYSQLPATH/lib/opt -lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
-				AC_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.so,MYSQLLIBSPATH="$MYSQLPATH/lib/opt"; MYSQLLIBS="-L$MYSQLPATH/lib/opt -lmysqlclient")
+				FW_CHECK_FILE($MYSQLPATH/include/mysql.h,[MYSQLINCLUDES=\"-I$MYSQLPATH/include\"])
+				FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.a,[MYSQLLIBS=\"-L$MYSQLPATH/lib/opt -lmysqlclient\"; MYSQLSTATIC=\"$STATICFLAG\"])
+				FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.so,[MYSQLLIBSPATH=\"$MYSQLPATH/lib/opt\"; MYSQLLIBS=\"-L$MYSQLPATH/lib/opt -lmysqlclient\"])
 			else
-				AC_CHECK_FILE("/cygdrive/c/mysql/include/mysql.h",MYSQLINCLUDES="-I/cygdrive/c/mysql/include")
-				AC_CHECK_FILE("/cygdrive/c/mysql/lib/opt/libmySQL.dll",MYSQLLIBS="/cygdrive/c/mysql/lib/opt/libmySQL.dll")
+				FW_CHECK_FILE("/cygdrive/c/mysql/include/mysql.h",[MYSQLINCLUDES=\"-I/cygdrive/c/mysql/include\"])
+				FW_CHECK_FILE("/cygdrive/c/mysql/lib/opt/libmySQL.dll",[MYSQLLIBS=\"/cygdrive/c/mysql/lib/opt/libmySQL.dll\"])
 			fi
 		fi
 		
@@ -615,6 +660,9 @@ then
 			AC_MSG_WARN(MySQL support will not be built.)
 		fi
 	fi
+
+	FW_INCLUDES(mysql,[$MYSQLINCLUDES])
+	FW_LIBS(mysql,[$MYSQLLIBS])
 		
 	AC_SUBST(MYSQLINCLUDES)
 	AC_SUBST(MYSQLLIBS)
@@ -674,6 +722,9 @@ then
 			AC_MSG_WARN(mSQL support will not be built.)
 		fi
 	fi
+
+	FW_INCLUDES(msql,[$MSQLINCLUDES])
+	FW_LIBS(msql,[$MSQLLIBS])
 		
 	AC_SUBST(MSQLINCLUDES)
 	AC_SUBST(MSQLLIBS)
@@ -688,6 +739,7 @@ AC_DEFUN([FW_CHECK_POSTGRESQL],
 [
 if ( test "$ENABLE_POSTGRESQL" = "yes" )
 then
+
 	if ( test "$cross_compiling" = "yes" )
 	then
 
@@ -765,6 +817,9 @@ then
 			AC_MSG_WARN(PostgreSQL support will not be built.)
 		fi
 	fi
+
+	FW_INCLUDES(postgresql,[$POSTGRESQLINCLUDES])
+	FW_LIBS(postgresql,[$POSTGRESQLLIBS])
 		
 	AC_SUBST(POSTGRESQLINCLUDES)
 	AC_SUBST(POSTGRESQLLIBS)
@@ -776,6 +831,7 @@ fi
 
 AC_DEFUN([FW_CHECK_GDBM],
 [
+
 if ( test "$cross_compiling" = "yes" )
 then
 	dnl cross compiling ...
@@ -789,6 +845,9 @@ then
 else
 	FW_CHECK_HEADERS_AND_LIBS([$LIBGDBMPATH],[gdbm],[gdbm.h],[gdbm],[$STATICFLAG],[$RPATHFLAG],[GDBMINCLUDES],[GDBMLIBS],[GDBMLIBSPATH],[GDBMSTATIC])
 fi
+
+FW_LIBS(gdbm,[$GDBMLIBS])
+
 AC_SUBST(GDBMLIBS)
 ])
 
@@ -856,6 +915,9 @@ then
 		
 		fi
 	fi
+
+	FW_INCLUDES(sqlite,[$SQLITEINCLUDES])
+	FW_LIBS(sqlite,[$SQLITELIBS])
 		
 	AC_SUBST(SQLITEINCLUDES)
 	AC_SUBST(SQLITELIBS)
@@ -870,6 +932,7 @@ AC_DEFUN([FW_CHECK_LAGO],
 [
 if ( test "$ENABLE_LAGO" = "yes" )
 then
+
 	if ( test "$cross_compiling" = "yes" )
 	then
 
@@ -901,6 +964,9 @@ then
 		fi
 
 	fi
+
+	FW_INCLUDES(lago,[$LAGOINCLUDES])
+	FW_LIBS(lago,[$LAGOLIBS])
 
 	AC_SUBST(LAGOINCLUDES)
 	AC_SUBST(LAGOLIBS)
@@ -954,6 +1020,9 @@ then
 			AC_LANG(C)
 		fi
 	fi
+
+	FW_INCLUDES(freetds,[$FREETDSINCLUDES])
+	FW_LIBS(freetds,[$FREETDSLIBS])
 		
 	AC_SUBST(FREETDSINCLUDES)
 	AC_SUBST(FREETDSLIBS)
@@ -1059,6 +1128,9 @@ then
 			AC_MSG_WARN(Sybase support will not be built.)
 		fi
 	fi
+
+	FW_INCLUDES(sybase,[$SYBASEINCLUDES])
+	FW_LIBS(sybase,[$SYBASELIBS])
 		
 	AC_SUBST(SYBASEINCLUDES)
 	AC_SUBST(SYBASELIBS)
@@ -1145,7 +1217,11 @@ then
 		then
 			AC_MSG_WARN(ODBC support will not be built.)
 		fi
+
 	fi
+
+	FW_INCLUDES(odbc,[$ODBCINCLUDES])
+	FW_LIBS(odbc,[$ODBCLIBS])
 fi
 ])
 
@@ -1203,6 +1279,10 @@ then
 			AC_MSG_WARN(DB2 support will not be built.)
 		fi
 	fi
+
+	FW_VERSION(db2,[$DB2VERSION])
+	FW_INCLUDES(db2,[$DB2INCLUDES])
+	FW_LIBS(db2,[$DB2LIBS])
 		
 	AC_SUBST(DB2INCLUDES)
 	AC_SUBST(DB2LIBS)
@@ -1299,6 +1379,9 @@ then
 			AC_MSG_WARN(Interbase support will not be built.)
 		fi
 	fi
+
+	FW_INCLUDES(interbase,[$INTERBASEINCLUDES])
+	FW_LIBS(interbase,[$INTERBASELIBS])
 	
 	AC_SUBST(INTERBASEINCLUDES)
 	AC_SUBST(INTERBASELIBS)
@@ -1328,15 +1411,15 @@ then
 
 		if ( test -n "$PERLPATH" )
 		then
-			AC_CHECK_FILE("$PERLPATH/bin/perl",PERL="$PERLPATH/bin/perl"; HAVE_PERL="yes")
+			FW_CHECK_FILE("$PERLPATH/bin/perl",[PERL=\"$PERLPATH/bin/perl\"; HAVE_PERL=\"yes\"])
 		else
 			AC_CHECK_PROG(PERL,perl,"perl")
 			if ( test -z "$PERL" )
 			then
 				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin"
 				do
-					AC_CHECK_FILE("$i/perl5",PERL="$i/perl5")
-					AC_CHECK_FILE("$i/perl",PERL="$i/perl")
+					FW_CHECK_FILE("$i/perl5",[PERL=\"$i/perl5\"])
+					FW_CHECK_FILE("$i/perl",[PERL=\"$i/perl\"])
 					if ( test -n "$PERL" )
 					then
 						break
@@ -1382,8 +1465,6 @@ then
 
 	else
 
-		AC_MSG_CHECKING(for Python)
-		
 		if ( test -n "$PYTHONPATH" )
 		then
 		
@@ -1477,12 +1558,14 @@ then
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONOBJ" -a -n "$PYTHONDIR" )
 		then
 			HAVE_PYTHON="yes"
-			AC_MSG_RESULT(yes)
 		else
 			AC_MSG_WARN(The Python API will not be built.)
-			AC_MSG_RESULT(no)
 		fi
 	fi
+
+	FW_VERSION(python,[$PYTHONVERSION])
+	FW_INCLUDES(python,[$PYTHONINCLUDES])
+	FW_LIBS(python,[$PYTHONLIBS])
 
 	AC_SUBST(HAVE_PYTHON)
 	AC_SUBST(PYTHONINCLUDES)
@@ -1499,6 +1582,8 @@ AC_DEFUN([FW_CHECK_ZOPE],
 [
 if ( test "$ENABLE_ZOPE" = "yes" )
 then
+
+	AC_MSG_CHECKING(for Zope)
 
 	HAVE_ZOPE=""
 	ZOPEDIR=""
@@ -1524,14 +1609,14 @@ then
 					do
 						for j in "zope" "Zope"
 						do
-							AC_CHECK_FILE("$i/$j/lib/python/Products/__init__.py",HAVE_ZOPE="yes"; ZOPEDIR="$i/$j/lib/python/Products")
+							FW_CHECK_FILE("$i/$j/lib/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j/lib/python/Products\"])
 							if ( test -n "$ZOPEDIR" )
 							then
 								break
 							fi
 							for k in "2.2" "2.3" "2.4" "2.5" "2.6"
 							do
-								AC_CHECK_FILE("$i/$j-$k/lib/python/Products/__init__.py",HAVE_ZOPE="yes"; ZOPEDIR="$i/$j-$k/lib/python/Products")
+								FW_CHECK_FILE("$i/$j-$k/lib/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib/python/Products\"])
 								if ( test -n "$ZOPEDIR" )
 								then
 									break
@@ -1552,6 +1637,8 @@ then
 			AC_MSG_WARN(The Zope API will not be installed.)
 		fi
 	fi
+
+	AC_MSG_RESULT($ZOPEDIR)
 
 	AC_SUBST(HAVE_ZOPE)
 	AC_SUBST(ZOPEDIR)
@@ -1578,14 +1665,14 @@ then
 	
 		if ( test -n "$RUBYPATH" )
 		then
-			AC_CHECK_FILE("$RUBYPATH/bin/ruby",RUBY="$RUBYPATH/bin/ruby")
+			FW_CHECK_FILE("$RUBYPATH/bin/ruby",[RUBY=\"$RUBYPATH/bin/ruby\"])
 		else
 			AC_CHECK_PROG(RUBY,"ruby","ruby")
 			if ( test -z "$RUBY" )
 			then
 				for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
 				do
-					AC_CHECK_FILE("$i/ruby",RUBY="$i/ruby")
+					FW_CHECK_FILE("$i/ruby",[RUBY=\"$i/ruby\"])
 					if ( test -n "$RUBY" )
 					then
 						break
@@ -1633,7 +1720,7 @@ then
 			do
 				if ( test -z "$JAVAPATH" )
 				then
-					AC_CHECK_FILE("$i/include/jni.h",JAVAPATH="$i")
+					FW_CHECK_FILE("$i/include/jni.h",[JAVAPATH=\"$i\"])
 				else
 					break
 				fi
@@ -1642,18 +1729,18 @@ then
 		
 		if ( test -z "$JAVAPATH" )
 		then
-			AC_CHECK_FILE("/usr/local/java/include/jni.h",JAVAPATH="/usr/local/java")
+			FW_CHECK_FILE("/usr/local/java/include/jni.h",[JAVAPATH=\"/usr/local/java\"])
 		fi
 		
 		if ( test -z "$JAVAPATH" )
 		then
-			AC_CHECK_FILE("/usr/java/include/jni.h",JAVAPATH="/usr/java")
+			FW_CHECK_FILE("/usr/java/include/jni.h",[JAVAPATH=\"/usr/java\"])
 		fi
 		
 		if ( test -n "$JAVAPATH" )
 		then
-			AC_CHECK_FILE("$JAVAPATH/bin/javac",JAVAC="$JAVAPATH/bin/javac")
-			AC_CHECK_FILE("$JAVAPATH/include/jni.h",JAVAINCLUDES="-I$JAVAPATH/include")
+			FW_CHECK_FILE("$JAVAPATH/bin/javac",[JAVAC=\"$JAVAPATH/bin/javac\"])
+			FW_CHECK_FILE("$JAVAPATH/include/jni.h",[JAVAINCLUDES=\"-I$JAVAPATH/include\"])
 			if ( test -n "$JAVAINCLUDES" )
 			then
 				for i in `ls -d $JAVAPATH/include/*`
@@ -1674,6 +1761,8 @@ then
 			AC_MSG_WARN(The Java API will not be built.)
 		fi
 	fi
+
+	FW_INCLUDES(java,[$JAVAINCLUDES])
 		
 	AC_SUBST(HAVE_JAVA)
 	AC_SUBST(JAVAC)
@@ -1702,14 +1791,14 @@ then
 		PHPCONFIG=""
 		if ( test -n "$PHPPATH" )
 		then
-			AC_CHECK_FILE("$PHPPATH/bin/php-config",PHPCONFIG="$PHPPATH/bin/php-config")
+			FW_CHECK_FILE("$PHPPATH/bin/php-config",[PHPCONFIG=\"$PHPPATH/bin/php-config\"])
 		else
 			AC_CHECK_PROG(PHPCONFIG,"php-config","php-config")
 			if ( test -z "$PHPCONFIG" )
 			then
 				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
 				do
-					AC_CHECK_FILE("$i/php-config",PHPCONFIG="$i/php-config")
+					FW_CHECK_FILE("$i/php-config",[PHPCONFIG=\"$i/php-config\"])
 					if ( test -n "$PHPCONFIG" )
 					then
 						break
@@ -1733,6 +1822,8 @@ then
 		fi
 		
 	fi
+
+	FW_INCLUDES(php,[$PHPINCLUDES])
 
 	AC_SUBST(HAVE_PHP)
 	AC_SUBST(PHPINCLUDES)
@@ -1763,14 +1854,14 @@ then
 		dnl Checks for TCL.
 		if ( test -n "$TCLINCLUDEPATH" )
 		then
-			AC_CHECK_FILE($TCLINCLUDEPATH/tcl.h,TCLINCLUDE="-I$TCLINCLUDEPATH")
+			FW_CHECK_FILE($TCLINCLUDEPATH/tcl.h,[TCLINCLUDE=\"-I$TCLINCLUDEPATH\"])
 		else
 			for i in "/usr/include" "$prefix/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
 			do
-				AC_CHECK_FILE($i/tcl.h,TCLINCLUDE="-I$i")
+				FW_CHECK_FILE($i/tcl.h,[TCLINCLUDE=\"-I$i\"])
 				for j in "tcl8.2" "tcl8.3" "tcl8.4" "tcl8.5"
 				do
-					AC_CHECK_FILE($i/$j/tcl.h,TCLINCLUDE="-I$i/$j")
+					FW_CHECK_FILE($i/$j/tcl.h,[TCLINCLUDE=\"-I$i/$j\"])
 				done
 			done
 		fi
@@ -1780,17 +1871,17 @@ then
 		else
 			if ( test -n "$TCLLIBSPATH" )
 			then
-				AC_CHECK_FILE($TCLLIBSPATH/libtclstub.a,TCLLIB="-L$TCLLIBSPATH -ltclstub"; TCLINCLUDE="-DUSE_TCL_STUBS $TCLINCLUDE")
+				FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 				for i in "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 				do
-					AC_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a, TCLLIB="-L$TCLLIBSPATH -ltclstub$i"; TCLINCLUDE="-DUSE_TCL_STUBS $TCLINCLUDE")
+					FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 				done
 				if ( test -z "$TCLLIB" )
 				then
-					AC_CHECK_FILE($TCLLIBSPATH/libtcl.so,TCLLIB="-L$TCLLIBSPATH -ltcl")
+					FW_CHECK_FILE($TCLLIBSPATH/libtcl.so,[TCLLIB=\"-L$TCLLIBSPATH -ltcl\"])
 					for i in "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 					do
-						AC_CHECK_FILE($TCLLIBSPATH/libtcl$i.so,TCLLIB="-L$TCLLIBSPATH -ltcl$i")
+						FW_CHECK_FILE($TCLLIBSPATH/libtcl$i.so,[TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\"])
 					done
 				fi
 			else
@@ -1798,7 +1889,7 @@ then
 				do
 					for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 					do
-						AC_CHECK_FILE($i/libtclstub$j.a,TCLLIB="-L$i -ltclstub$j"; TCLLIBSPATH="$i"; TCLINCLUDE="-DUSE_TCL_STUBS $TCLINCLUDE")
+						FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 					done
 				done
 				if ( test -z "$TCLLIB" )
@@ -1807,7 +1898,7 @@ then
 					do
 						for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 						do
-							AC_CHECK_FILE($i/libtcl$j.so,TCLLIB="-L$i -ltcl$j"; TCLLIBSPATH="$i")
+							FW_CHECK_FILE($i/libtcl$j.so,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
 						done
 					done
 				fi
@@ -1820,6 +1911,9 @@ then
 			HAVE_TCL="yes"
 		fi
 	fi
+
+	FW_INCLUDES(tcl,[$TCLINCLUDE])
+	FW_LIBS(tcl,[$TCLLIB])
 
 	AC_SUBST(HAVE_TCL)
 	AC_SUBST(TCLINCLUDE)
@@ -1848,7 +1942,7 @@ then
 		
 		if ( test -n "$GTKPATH" )
 		then
-			AC_CHECK_FILE("$GTKPATH/bin/gtk-config",GTKCONFIG="$GTKPATH/bin/gtk-config")
+			FW_CHECK_FILE("$GTKPATH/bin/gtk-config",[GTKCONFIG=\"$GTKPATH/bin/gtk-config\"])
 		else
 			AC_CHECK_PROG(GTKCONFIG,"gtk-config","gtk-config")
 			if ( test -z "$GTKCONFIG" )
@@ -1857,7 +1951,7 @@ then
 				do
 					for j in "gtk-config" "gtk12-config" "gtk10-config"
 					do
-						AC_CHECK_FILE("$i/$j",GTKCONFIG="$i/$j")
+						FW_CHECK_FILE("$i/$j",[GTKCONFIG=\"$i/$j\"])
 						if ( test -n "$GTKCONFIG" )
 						then	
 							break
@@ -1876,7 +1970,7 @@ then
 			AC_MSG_WARN(GTK config tool will not be built.)
 		fi
 	fi
-		
+
 	AC_SUBST(HAVE_GTK)
 	AC_DEFINE_UNQUOTED(GTK_VERSION,$GTKVER,Second decimal of the version of gtk)
 	AC_SUBST(GTKCONFIG)

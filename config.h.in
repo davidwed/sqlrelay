@@ -43,6 +43,9 @@
 /* oci.h */
 #undef HAVE_OCI_H
 
+/* Oracle 8i or greater */
+#undef HAVE_ORACLE_8i
+
 /* Define to 1 if you have the `putenv' function. */
 #undef HAVE_PUTENV
 
