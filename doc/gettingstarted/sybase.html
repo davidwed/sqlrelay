@@ -483,17 +483,10 @@ password <i>testpassword</i>.</p>
 <b>sqlr-start -id sybasetest</b>
 </blockquote>
 
-<p>Note that some newer Linux Distributions set the LANG environment variable
-to a value that is not supported by Sybase ASE.  For example,
-LANG=en_US.iso885915 on Redhat 7.3.  If SQL Relay fails to start, try setting
-LANG to something that is defined in /opt/sybase-11.9.2/locales/locales.dat
-such as en_US for english.  The LC_ALL environment variable needs to be set to
-something that is defined in /opt/sybase-11.9.2/locales/locales.dat as well.</p>
-
-<p>For some reason the environment variable LD_LIBRARY_PATH needs to contain
-/opt/sybase-11.9.2/lib as well.  I'm not really sure why, I'd expect that if
-/opt/sybase-11.9.2/lib was in /etc/ld.so.conf (on systems that support that),
-it would work, but it doesn't appear to.</p>
+<p>Note that there are a couple of common problems people have with the Sybase
+connection.  See the <a href="../faq.html">FAQ</a> and the
+<a href="../running.html#problems">common problems</a> section of the document
+on running SQL Relay for more info.</p>
 
 <p>To connect to the instance and run queries, use the following command.</p>
 
