@@ -6,12 +6,12 @@ INSTALL = $(top_builddir)/install-sh -c
 CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I../../ -I../common -I../libsqlrutil $(RUDIMENTSINCLUDES)
 
 SRCS = cmdline.C debugfile.C tempdir.C sqlrconfigfile.C authenticator.C
-LOBJS = cmdline.lo debugfile.lo tempdir.lo sqlrconfigfile.lo authenticator.lo
+NLOBJS = cmdline.n.lo debugfile.n.lo tempdir.n.lo sqlrconfigfile.n.lo authenticator.n.lo
 PLOBJS = cmdline.p.lo debugfile.p.lo tempdir.p.lo sqlrconfigfile.p.lo authenticator.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -26,8 +26,8 @@ clean:
 
 rebuild: clean all
 
-libsqlrutil.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+libsqlrutil.la: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 libsqlrutil_p.la: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)

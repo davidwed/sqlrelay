@@ -165,7 +165,7 @@ class oracle8cursor : public sqlrcursor {
 class oracle8connection : public sqlrconnection {
 	friend class oracle8cursor;
 	public:
-				oracle8connection();
+			oracle8connection();
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
@@ -174,7 +174,7 @@ class oracle8connection : public sqlrconnection {
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
-		int		changeUser(const char *newuser,
+		int	changeUser(const char *newuser,
 						const char *newpassword);
 #endif
 		unsigned short	autoCommitOn();

@@ -5,15 +5,15 @@ INSTALL = $(top_builddir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(ORACLEINCLUDES)
 LIBS = $(ORACLELIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(ORACLELIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(ORACLELIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE) -lefence
 
 SRCS= oracle8connection.C main.C
-LOBJS= oracle8connection.lo main.lo
+NLOBJS= oracle8connection.n.lo main.n.lo
 PLOBJS= oracle8connection.p.lo main.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -29,8 +29,8 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-oracle8: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
+sqlr-connection-oracle8: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS)
 
 sqlr-connection-oracle8-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(ORACLESTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)

@@ -299,16 +299,18 @@ int	oracle8connection::rollback() {
 }
 
 int	oracle8connection::ping() {
-	oracle8cursor	cur(this);
-	if (cur.openCursor(-1) && 
-		cur.prepareQuery("select 1 from dual",18) && 
-		cur.executeQuery("select 1 from dual",18,1)) {
-		cur.cleanUpData();
-		cur.closeCursor();
+	oracle8cursor	pingcur(this);
+	pingcur.openCursor(-1);
+	/*if (pingcur.openCursor(-1) && 
+		pingcur.prepareQuery("select 1 from dual",18) && 
+		pingcur.executeQuery("select 1 from dual",18,1)) {
+		pingcur.cleanUpData();
+		pingcur.closeCursor();
 		return 1;
 	}
-	cur.closeCursor();
-	return 0;
+	pingcur.closeCursor();
+	return 0;*/
+	return 1;
 }
 
 char	*oracle8connection::identify() {

@@ -8,12 +8,12 @@ LIBS = $(RUDIMENTSLIBS) -L../util -lsqlrutil $(EXTRALIBS) $(SOCKETLIB) $(LIBDMAL
 DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) -L../util -lsqlrutil_p $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = scaler.C main.C
-LOBJS = scaler.lo main.lo
+NLOBJS = scaler.n.lo main.n.lo
 PLOBJS = scaler.p.lo main.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -29,8 +29,8 @@ clean:
 
 rebuild: clean all
 
-sqlr-scaler: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
+sqlr-scaler: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS)
 
 sqlr-scaler-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)

@@ -8,12 +8,12 @@ LIBS = $(POSTGRESQLLIBS) -L../../connection -lsqlrconnection -L../../util -lsqlr
 DEBUGLIBS = $(POSTGRESQLLIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= postgresqlconnection.C main.C
-LOBJS= postgresqlconnection.lo main.lo
+NLOBJS= postgresqlconnection.n.lo main.n.lo
 PLOBJS= postgresqlconnection.p.lo main.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -29,8 +29,8 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-postgresql: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(POSTGRESQLSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
+sqlr-connection-postgresql: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(POSTGRESQLSTATIC) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS)
 
 sqlr-connection-postgresql-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(POSTGRESQLSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)

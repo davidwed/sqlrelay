@@ -8,12 +8,12 @@ LIBS = $(RUDIMENTSLIBS) -L../util -lsqlrutil $(EXTRALIBS) $(SOCKETLIB) $(LIBDMAL
 DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) -L../util -lsqlrutil_p $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = sqlrlistener.C main.C
-LOBJS = sqlrlistener.lo main.lo
+NLOBJS = sqlrlistener.n.lo main.n.lo
 PLOBJS = sqlrlistener.p.lo main.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -29,8 +29,8 @@ clean:
 
 rebuild: clean all
 
-sqlr-listener: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
+sqlr-listener: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS)
 
 sqlr-listener-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)

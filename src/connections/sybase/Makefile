@@ -8,12 +8,12 @@ LIBS = $(SYBASELIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil
 DEBUGLIBS = $(SYBASELIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= sybaseconnection.C main.C
-LOBJS= sybaseconnection.lo main.lo
+NLOBJS= sybaseconnection.n.lo main.n.lo
 PLOBJS= sybaseconnection.p.lo main.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -29,8 +29,8 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-sybase: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(SYBASESTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
+sqlr-connection-sybase: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(SYBASESTATIC) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS)
 
 sqlr-connection-sybase-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(SYBASESTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
