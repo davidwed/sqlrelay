@@ -3,9 +3,9 @@ include ../config.mk
 all: 
 ifneq ($(ORACLELIBS),)
 	$(MAKE) -C oracle7 all
-	ifneq ($(ORACLELIBS),7)
-		$(MAKE) -C oracle8 all
-	endif
+ifneq ($(ORACLEVERSION),7)
+	$(MAKE) -C oracle8 all
+endif
 endif
 ifneq ($(MYSQLLIBS),)
 	$(MAKE) -C mysql all

@@ -85,6 +85,9 @@
 /* Oracle 8i or greater */
 #undef HAVE_ORACLE_8i
 
+/* Some versions of postgresql have PQexecParams */
+#undef HAVE_POSTGRESQL_PQEXECPARAMS
+
 /* Some versions of postgresql have PQfmod */
 #undef HAVE_POSTGRESQL_PQFMOD
 

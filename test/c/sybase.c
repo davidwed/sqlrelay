@@ -12,7 +12,7 @@ sqlrcur	cur;
 sqlrcon	secondcon;
 sqlrcur	secondcur;
 
-void checkSuccessString(char *value, char *success) {
+void checkSuccessString(const char *value, const char *success) {
 
 	if (!success) {
 		if (!value) {
@@ -51,7 +51,7 @@ void checkSuccessInt(int value, int success) {
 
 int	main(int argc, char **argv) {
 
-	char	*dbtype;
+	const char	*dbtype;
 	char	*bindvars[14]={"1","2","3","4","5","6",
 				"7","8","9","10","11","12",
 				"13",NULL};
@@ -74,15 +74,15 @@ int	main(int argc, char **argv) {
 	double	subvaldoubles[3]={10.55,10.556,10.5556};
 	unsigned short	precs[3]={4,5,6};
 	unsigned short	scales[3]={2,3,4};
-	char	*numvar;
-	char	*stringvar;
-	char	*floatvar;
-	char	**cols;
-	char	**fields;
+	const char	*numvar;
+	const char	*stringvar;
+	const char	*floatvar;
+	const char * const *cols;
+	const char * const *fields;
 	int	port;
-	char	*socket;
+	const char	*socket;
 	int	id;
-	char	*filename;
+	const char	*filename;
 	long	*fieldlens;
 
 	// usage...

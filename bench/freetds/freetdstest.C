@@ -8,8 +8,11 @@
 
 extern "C" {
 	#include <ctpublic.h>
-	#include <ctfunctions.h>
 }
+
+#ifndef HAVE_FREETDS_FUNCTION_DEFINITIONS
+	#include <ctfunctions.h>
+#endif
 
 #define FETCH_AT_ONCE 1
 #define MAX_SELECT_LIST_SIZE 256

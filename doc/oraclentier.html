@@ -1,11 +1,11 @@
 <html>
 <head>
-<title>firstworks   Using SQL Relay With Oracle8i/9i n-Tiered Authentication</title>
+<title>firstworks   Using SQL Relay With Oracle 8i/9i/10g n-Tiered Authentication</title>
 <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
 
-<span class="heading1">Using SQL Relay With Oracle8i/9i n-Tiered Authentication</span><br><br>
+<span class="heading1">Using SQL Relay With Oracle 8i/9i/10g n-Tiered Authentication</span><br><br>
 
 <span class="heading2">Background</span>
 
@@ -68,6 +68,16 @@ GRANT CREATE SESSION TO proxyuser;</b></blockquote>
 ALTER USER user2 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;<br>
 ALTER USER user3 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;</b>
 </blockquote>
+
+<p>Note that you cannot do this with the SYSTEM user.  Ie.  you cannot run:</p>
+
+<blockquote>
+<b>ALTER USER SYSTEM GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;</b><br>
+</blockquote>
+
+<p>If you need to access the database through SQL Relay as the SYSTEM user, you
+must set up an instance of SQL Relay which logs in as the SYSTEM user and use
+that instance for accessing the database.</p>
 
 <p>You can enable auditing of the queries that the users have run through the
 proxyrole as follows.  Note: to enable auditing, you must set AUDIT_TRAIL=yes 

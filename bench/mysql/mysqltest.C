@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	for (int count=0; count<iterations; count++) {
 
 		// init
-#ifdef MYSQL_VERSION
+#ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	#if MYSQL_VERSION_ID>=32200
 		mysql_init(&mysql);
 	

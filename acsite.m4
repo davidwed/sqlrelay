@@ -1114,6 +1114,9 @@ then
 		AC_MSG_CHECKING(if PostgreSQL has PQsetNoticeProcessor)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQsetNoticeProcessor(NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR,1,Some versions of postgresql have PQsetNoticeProcessor)],[AC_MSG_RESULT(no)])
+		AC_MSG_CHECKING(if PostgreSQL has PQexecParams)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQexecParams(NULL,NULL,0,NULL,NULL,NULL,NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQEXECPARAMS,1,Some versions of postgresql have PQexecParams)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(postgresql,[$POSTGRESQLINCLUDES])
