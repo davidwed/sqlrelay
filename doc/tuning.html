@@ -1,0 +1,231 @@
+<html>
+<head>
+<title>firstworks   Tuning SQL Relay</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Tuning SQL Relay</span><br><br>
+
+<ul>
+<li><a href="#localdbconnection">Connect To The Database Using a Local Connection</a></li>
+<li><a href="unixsocket">Connect To SQL Relay Using a Unix Socket</a></li>
+<li><a href="handoff">Use File Descriptor Passing</a></li>
+<li><a href="systemparameters">Tweak Various System Parameters</a></li>
+<li><a href="dontgetcolumninfo">Don't Get Unnecessary Column Info</a></li>
+<li><a href="resultsetbuffersize">Use Result Set Buffer Size</a></li>
+</ul>
+
+<a name="localdbconnection"></a>
+<span class="heading2">Connect To The Database Using a Local Connection</span><br><br>
+
+<p>One of the most common mistakes that people make when using SQL Relay is
+running SQL Relay on the same machine as the database, but not using a "local
+connection" to the database.  It's an easy mistake to make, but when remedied,
+it can result in a substantial improvement in performance.</p>
+
+<p>Most databases support "remote connections" (usually over an inet socket) and
+"local connections" (usually over a unix socket).  If you're running SQL Relay
+on a seperate machine from the database, you have to configure it to connect to
+the database using a remote connection.  However, if you're running SQL Relay
+on the same machine as the database, then you should configure it to connect to
+the database using a local connection if possible.</p>
+
+<span class="heading3">IBM DB2</span>
+<span class="heading3">Interbase</span>
+<span class="heading3">Lago</span>
+<span class="heading3">Msql</span>
+<span class="heading3">MySQL</span>
+
+<p>MySQL supports local connections over a unix socket.</p>
+
+<p>By default, MySQL is usually configured to accept local connections.  To make
+sure MySQL is configuerd to accept local connections, edit the MySQL
+configuration file (usually /etc/my.cnf) and add a line like the following to
+the [mysqld] section if it's not already there:</p>
+
+<blockquote>
+socket=/var/lib/mysql/mysql.sock
+</blockquote>
+
+<p>Now restart MySQL.</p>
+
+<p>To make sure SQL Relay will connect to MySQL using the local connection,
+edit the sqlrelay.conf file and make sure that the connectstring for the
+MySQL instance uses the socket parameter, as follows:</p>
+
+<blockquote>
+user=testuser;password=testpassword;db=testdb;socket=/var/lib/mysql/mysql.sock
+</blockquote>
+
+<p>as opposed to:</p>
+
+<blockquote>
+user=testuser;password=testpassword;db=testdb;host=localhost;port=5432
+</blockquote>
+
+<span class="heading3">Oracle</span>
+<span class="heading3">PostgreSQL</span>
+<span class="heading3">SQLite</span>
+<span class="heading3">Sybase</span>
+
+<a name="unixsocket"></a>
+<span class="heading2">Connect To SQL Relay Using a Unix Socket</span><br><br>
+
+<p>SQL Relay supports inet and unix sockets.  If you are runing the SQL Relay
+client (your program) and the SQL Relay server on the same machine, make sure
+that they are talking to each other over the unix socket.</p>
+
+<p>First make sure that SQL Relay is configured to listen on a unix
+socket.  In the sqlrelay.conf file, the instance that is talking to mysql
+should have a socket attribute:</p>
+
+<blockquote>
+<instance id="mysqltest" port="8006" socket="/tmp/mysqltest.socket" ... >
+</blockquote>
+
+<p>In the above example, the SQL Relay server will listen on inet port 8006 and
+unix socket /tmp/mysqltest.socket.</p>
+
+<p>Now make sure that your app is using that socket as well.  When you create
+a new sqlrconnection, make sure you tell it to use the unix socket:</p>
+
+<blockquote>
+sqlrconnection	*con=new sqlrconnection("localhost",8006,"/tmp/mysqltest.socket","user","password",0,1);
+<blockquote>
+
+<p>as opposed to:</p>
+
+<blockquote>
+sqlrconnection	*con=new sqlrconnection("localhost",8006,NULL,"user","password",0,1);
+</blockquote>
+
+<p>(for non-C++ api's the syntax is similar)</p>
+
+<p>The client will first try the unix socket, then if it can't connect, it will
+try the host/port.</p>
+
+<p>Make sure to type the filename of the unix socket correctly :)  I've seen
+several cases where people were really confused why they were getting bad
+performance even though they were using unix sockets.  They had just typed the
+unix socket file name wrong and it was trying it, failing, then falling back to
+host/port.</p>
+
+
+<a name="handoff"></a>
+<span class="heading2">Use File Descriptor Passing</span><br><br>
+
+<p>SQL Relay has a listener process that waits for incoming clients, then hands
+them off to a seperate process that is already logged into the database when one
+of those processes is available.  The handoff can be done using file descriptor
+passing or by causing the client to disconnect from the listener and reconnect
+to the other process.  File descriptor passing is much faster and uses fewer
+system resources.</p>
+
+<p>In the sqlrelay.conf file, for the instance that is talking to mysql, make
+sure the handoff attribute is set to "pass":
+
+<blockquote>
+<instance id="mysqltest" port="8006" ... handoff="pass" ... >
+</blockquote>
+
+<p>as opposed to:</p>
+
+<blockquote>
+<instance id="mysqltest" port="8006" ... handoff="reconnect" ... >
+</blockquote>
+
+
+<a name="systemparameters"></a>
+<span class="heading2">Tweak Various System Parameters</span><br><br>
+
+<p>Certain system parameters can be tuned to get better performance out of
+SQL Relay.</p>
+
+<span class="heading3">TIME_WAIT timeout</span>
+
+<p>The first paramater that comes to mind is the TIME_WAIT timeout.  When a TCP 
+client disconnects from a server, the socket that the client was connected on
+goes into a TIME_WAIT state for typically between a minute and 4 minutes.</p>
+
+<p>For servers serving data over the the unreliable internet, this is probably 
+reasonable.  For internal servers, dedicated to serving other internal servers 
+on a reliable network, reducing the length of the timeout is probably OK.</p>
+
+<p>Here's why it helps...</p>
+
+<p>The kernel keeps a list of sockets in the TIME_WAIT state.  When the list
+is full, failures start to occur.  On my test machine (running a linux 2.4 
+kernel), I can have about 1000 sockets in the TIME_WAIT state before running
+into problems.</p>
+
+<p>If your server is getting new client connections faster than it can bleed off
+sockets in the TIME_WAIT state, the list will ultimately get full.  Decreasing
+the timeout increases the bleed-off rate.</p>
+
+<p>The following instructions illustrate how to change the timeout rate for
+Linux and Solaris.  Note that I got these instructions off of the web and have
+not tried all of them myself.</p>
+
+<p>For Linux, set the timeout by executing the following command.  In this
+example, the timeout is set to 30 seconds.  You should put this command in a
+system startup file so it will be executed at boot time.</p>
+
+<p>echo 30 &gt; /proc/sys/net/ipv4/tcp_fin_timeout</p>
+
+<p>For Solaris, the parameter can be modified while the system is running
+using the ndd command to set the number of milliseconds to wait.  These
+examples set the timeout to 30 seconds.  You should put these commands in a 
+system startup file so they'll be executed at boot time.</p>
+
+<p>For Solaris 2.6 and earlier:  ndd -set /dev/tcp tcp_close_wait_interval 30000</p>
+
+<p>For Solaris 2.7 and later:  ndd -set /dev/tcp tcp_time_wait_interval 30000</p>
+
+<span class="heading3">Port range</span>
+
+<p>Another paramter that you may want to tweak is the range of available ports.
+On Linux 2.2 kernels, it defaults to ports 1024 through 4999.  You can display
+the range by running:</p>
+
+<p>/sbin/sysctl net.ipv4.ip_local_port_range</p>
+
+<p>You can increase this to range from 1024 to 65535 by running the following 
+command:</p>
+
+<p>/sbin/sysctl -w net.ipv4.ip_local_port_range="1024 65535"</p>
+
+<p>You should put this command in a system startup file so it'll be executed at
+boot time.</p>
+
+<p>I'm not sure what the default port range is or how to change it on other
+operating systems.</p>
+
+
+<a name="dontgetcolumninfo"></a>
+<span class="heading2">Don't Get Unnecessary Column Info</span><br><br>
+
+<p>If you run select queries but don't need to know the names/types/sizes of
+the columns, rather you can just refer to them by number, then you can call
+dontGetColumnInfo() before running your query and much less data will be
+transmitted from the SQL Relay server to the client.  This is really useful for
+speeding up 1 column queries like "select count(*) from mytable".</p>
+
+
+<a name="resultsetbuffersize"></a>
+<span class="heading2">Use Result Set Buffer Size</span><br><br>
+
+<p>By default, SQL Relay fetches the entire result set of a query into memory.
+SQL Relay was originally written for use with web-based apps, and most web
+pages display small result sets so generally it's faster if the entire result
+set is buffered.  But, if you run select queries that return really long result
+sets, you should use setResultSetBufferSize() to fetch rows in groups instead
+of all at once or 1 at a time.  The value to use tends to be query-specific
+though so you usually have to do some benchmarking to get it optimized.  If you
+fetch too many rows at once, memory has to be allocated which slows things down
+(and in really bad cases can cause swapping) but if you fetch too few at once,
+it causes too many round trips to the database.  Each query has a sweet spot,
+finding it may dramatically improve that query's performance.</p>
+
+</body>
+</html>
