@@ -5,6 +5,10 @@
 #include <sqlrelay/sqlrclient.h>
 #include <stdlib.h>
 #include <defines.h>
+#include <string.h>
+#ifdef HAVE_STRINGS_H
+	#include <strings.h>
+#endif
 
 char	*sqlrcursor::getFieldInternal(int row, int col) {
 	if (row<OPTIMISTIC_ROW_COUNT) {
