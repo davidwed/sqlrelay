@@ -2,10 +2,10 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-ifeq ($(INSTALLPREFIX),)
+ifeq ($(DESTDIR),)
 	INSTPREFIX = 
 else
-	INSTPREFIX = -inst-prefix-dir $(INSTALLPREFIX)
+	INSTPREFIX = -inst-prefix-dir $(DESTDIR)
 endif
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
@@ -45,16 +45,16 @@ clean:
 rebuild: clean all
 
 libmysql3sqlrelay.la: mysql.C mysql3.lo
-	$(LIBTOOL) --mode=link $(CXX) $(INSTPREFIX) -O -o $@ mysql3.lo -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) -O -o $@ mysql3.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 libmysql40sqlrelay.la: mysql.C mysql40.lo
-	$(LIBTOOL) --mode=link $(CXX) $(INSTPREFIX) -O -o $@ mysql40.lo -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) -O -o $@ mysql40.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 libmysql41sqlrelay.la: mysql.C mysql41.lo
-	$(LIBTOOL) --mode=link $(CXX) $(INSTPREFIX) -O -o $@ mysql41.lo -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) -O -o $@ mysql41.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 libmysql50sqlrelay.la: mysql.C mysql50.lo
-	$(LIBTOOL) --mode=link $(CXX) $(INSTPREFIX) -O -o $@ mysql50.lo -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) -O -o $@ mysql50.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libdir)

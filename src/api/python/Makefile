@@ -31,7 +31,7 @@ clean:
 rebuild: clean all
 
 libCSQLRelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(PYTHONDIR)/site-packages/SQLRelay $(RPATH) -module -no-undefined $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(PYTHONDIR)/site-packages/SQLRelay $(RPATH) -module -no-undefined
 
 CSQLRelay.so:
 	if ( test -r .libs/libCSQLRelay.0.0.0 ); \

@@ -85,7 +85,7 @@ clean:
 rebuild: clean all
 
 libConnection.la: Connection.xs Connection.C Connection.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ Connection.lo -rpath $(PERLSITEARCH)/auto/SQLRelay/Connection $(RPATH) -module -no-undefined $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ Connection.lo $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Connection $(RPATH) -module -no-undefined
 
 Connection.so:
 	if ( test -r .libs/libConnection.0.0.0 ); \

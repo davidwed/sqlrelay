@@ -1,8 +1,5 @@
 perl apis -> CPAN
 
-fedora-core-1
-	rpm fails - sqlite problem
-
 fedora-core-2 isn't set up
 suse-9.1 isn't set up
 

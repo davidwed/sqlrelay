@@ -358,7 +358,7 @@ Man pages for SQL Relay.
 	%{?_without_ruby:	--disable-ruby} \
 	%{?_without_zope:	--disable-zope}
 	
-make INSTALLPREFIX=%{buildroot}
+make
 
 %install
 rm -rf %{buildroot}

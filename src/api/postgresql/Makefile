@@ -2,10 +2,10 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-ifeq ($(INSTALLPREFIX),)
+ifeq ($(DESTDIR),)
 	INSTPREFIX = 
 else
-	INSTPREFIX = -inst-prefix-dir $(INSTALLPREFIX)
+	INSTPREFIX = -inst-prefix-dir $(DESTDIR)
 endif
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
@@ -40,7 +40,7 @@ clean:
 rebuild: clean all
 
 libpqsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(INSTPREFIX) -O -o $@ $(LOBJS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) -O -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
