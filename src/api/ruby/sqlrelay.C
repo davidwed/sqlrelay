@@ -181,7 +181,7 @@ static VALUE sqlrcur_new(VALUE self, VALUE connection) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(connection,sqlrconnection,sqlrcon);
 	sqlrcursor	*sqlrcur=new sqlrcursor(sqlrcon);
-	sqlrcon->copyReferences();
+	sqlrcur->copyReferences();
 	return Data_Wrap_Struct(self,0,sqlrcur_free,(void *)sqlrcur);
 }
 
@@ -552,7 +552,7 @@ static VALUE sqlrcur_getOutputBindCursor(VALUE self, VALUE variable) {
 	sqlrcursor	*returnsqlrcur=sqlrcur->getOutputBindCursor(
 							STR2CSTR(variable));
 	returnsqlrcur->copyReferences();
-	return Data_Wrap_Struct(csqlrcursor,0,sqlrcon_free,
+	return Data_Wrap_Struct(csqlrcursor,0,sqlrcur_free,
 					(void *)returnsqlrcur);
 }
 
