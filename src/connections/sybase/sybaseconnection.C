@@ -944,6 +944,14 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_NUMBER(msgp->msgnumber)==63) {
 		deadconnection=1;
+	} else
+	// for a net-libraryoperation terminated due to disconnect,
+	// set deadconnection to 1
+	if (CS_SEVERITY(msgp->msgnumber)==5 &&
+		CS_LAYER(msgp->msgnumber)==5 &&
+		CS_ORIGIN(msgp->msgnumber)==3 &&
+		CS_NUMBER(msgp->msgnumber)==6) {
+		deadconnection=1;
 	}
 
 	return CS_SUCCEED;
@@ -986,6 +994,14 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 		CS_NUMBER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_LAYER(msgp->msgnumber)==63) {
+		deadconnection=1;
+	} else
+	// for a net-libraryoperation terminated due to disconnect,
+	// set deadconnection to 1
+	if (CS_SEVERITY(msgp->msgnumber)==5 &&
+		CS_LAYER(msgp->msgnumber)==5 &&
+		CS_ORIGIN(msgp->msgnumber)==3 &&
+		CS_NUMBER(msgp->msgnumber)==6) {
 		deadconnection=1;
 	}
 
