@@ -40,6 +40,10 @@
 		supports it, otherwise it uses sqlrconnection::changeUser()
 	added oracle 10g support
 	moved some code back into sqlrconnection class from helper classes
+	renamed constructor/destructor.C *ctor/*dtor.C for connection and c++
+		to remove object file name collisions, between the collisions
+		and a bug in strip, the static C++ api library wouldn't work
+	applied a patch so varchars in oracle8 can be up to 32768 bytes long
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

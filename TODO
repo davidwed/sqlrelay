@@ -1,7 +1,3 @@
-bind-by-position problem with oracle 10g
-
-include docs for installing oracle on fedora, suse 8, etc...
-
 cygwin:
 	requires rudiments without ssl/pcre support
 	perl api won't build
@@ -269,13 +265,15 @@ backends:
 	bugzilla port
 
 API's:
-	wrapper:
-		JDBC
-		ODBC
-		QT3
-		C# - have a driver, just need to incorporate it
-		ADA
-		Eiffel
+	JDBC
+	ODBC
+	QT3
+	C# - have a driver, just need to incorporate it
+	ADA
+	Eiffel
+	gnome-db
+	D
+		
 
 Native DB Support:
 	Informix

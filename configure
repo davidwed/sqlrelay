@@ -22609,7 +22609,7 @@ fi
 
 if ( test -n "$FOUNDLIB" )
 then
-	eval "ORACLEVERSION=\"10gi\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\""
+	eval "ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\""
 else
 	if ( test -n "" )
 	then

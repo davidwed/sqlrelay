@@ -72,6 +72,7 @@ then
 	ARGS="localhost 8009 \"\" oracle8test oracle8test"
 	PHPARGS="host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
 	sudo $INITDIR/oracle start
+	sleep 5
 	sudo sqlr-start -id oracle8test
 fi
 if ( test "$DB" = "oracle8i" )
