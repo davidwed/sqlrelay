@@ -271,6 +271,21 @@ AC_SUBST(STRIP)
 ])
 
 
+dnl checks to see if -pipe option to gcc works or not
+AC_DEFUN([FW_CHECK_PIPE],
+[
+AC_MSG_CHECKING(for -pipe option)
+FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-pipe],[],[],[PIPE="-pipe"],[PIPE=""])
+if ( test -n "$PIPE" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(PIPE)
+])
+
+
 dnl Checks for microsoft platform.
 dnl sets the substitution variables MINGW32, CYGWIN and UWIN as appropriate
 dnl also moves INSTALL to INSTALL.txt if we're using windows

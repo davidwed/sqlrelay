@@ -47,6 +47,9 @@ rebuild: clean all
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	if ( test "$(STRIP)" != "touch" ); then \
+		$(STRIP) -x -R .note -R .comment $@; \
+	fi
 
 libsqlrelay.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -module

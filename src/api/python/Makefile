@@ -18,6 +18,9 @@ LOBJS = CSQLRelay.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	if ( test "$(STRIP)" != "touch" ); then \
+		$(STRIP) -x -R .note -R .comment $@; \
+	fi
 
 all: libCSQLRelay.la
 

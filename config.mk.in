@@ -30,6 +30,9 @@ debugdir = ${localstatedir}/sqlrelay/debug
 CC = @CC@
 CXX = @CXX@
 
+# strip command
+STRIP = @STRIP@
+
 # includes and defines (-I and -D flags)
 BASECPPFLAGS = @CPPFLAGS@
 TMPDIRCPPFLAG = -DTMP_DIR=\"$(tmpdir)\"
@@ -42,8 +45,8 @@ STATICLINK = @STATICLINK@
 INSTALLSTRIP = @INSTALLSTRIP@
 
 # debug and optimization flags (-g, -O2, etc.)
-CXXFLAGS = @CXXFLAGS@
-CFLAGS = @CFLAGS@
+CXXFLAGS = @CXXFLAGS@ @SMALLCODE@ @PIPE@
+CFLAGS = @CFLAGS@ @SMALLCODE@ @PIPE@
 
 # libtool command
 LIBTOOL = @LIBTOOL@
