@@ -1751,7 +1751,7 @@ then
 		then
 			AC_CHECK_FILE($TCLINCLUDEPATH/tcl.h,TCLINCLUDE="-I$TCLINCLUDEPATH")
 		else
-			for i in "/usr/include" "$prefix/include"
+			for i in "/usr/include" "$prefix/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
 			do
 				AC_CHECK_FILE($i/tcl.h,TCLINCLUDE="-I$i")
 				for j in "tcl8.2" "tcl8.3" "tcl8.4" "tcl8.5"
@@ -1780,7 +1780,7 @@ then
 					done
 				fi
 			else
-				for i in "/usr/lib" "$prefix/lib"
+				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/include" "/opt/sfw/include"
 				do
 					for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 					do
@@ -1789,7 +1789,7 @@ then
 				done
 				if ( test -z "$TCLLIB" )
 				then
-					for i in "/usr/lib" "$prefix/lib"
+					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/include" "/opt/sfw/include"
 					do
 						for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 						do

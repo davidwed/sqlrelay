@@ -23983,7 +23983,7 @@ if test `eval echo '${'$as_ac_File'}'` = yes; then
 fi
 
 		else
-			for i in "/usr/include" "$prefix/include"
+			for i in "/usr/include" "$prefix/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
 			do
 				as_ac_File=`echo "ac_cv_file_$i/tcl.h" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/tcl.h" >&5
@@ -24139,7 +24139,7 @@ fi
 					done
 				fi
 			else
-				for i in "/usr/lib" "$prefix/lib"
+				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/include" "/opt/sfw/include"
 				do
 					for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 					do
@@ -24169,7 +24169,7 @@ fi
 				done
 				if ( test -z "$TCLLIB" )
 				then
-					for i in "/usr/lib" "$prefix/lib"
+					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/include" "/opt/sfw/include"
 					do
 						for j in "" "8.2" "8.3" "8.4" "8.5" "82" "83" "84" "85"
 						do
