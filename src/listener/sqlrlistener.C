@@ -113,6 +113,10 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	setUserAndGroup(&cfgfl);
 
+	if (!verifyAccessToConfigFile(cmdl->getConfig(),&cfgfl)) {
+		return false;
+	}
+
 	#ifdef SERVER_DEBUG
 	openDebugFile("listener",cmdl->getLocalStateDir());
 	#endif
@@ -169,6 +173,48 @@ void sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
 		fprintf(stderr,"Warning: could not change user to %s\n",
 						cfgfl->getRunAsUser());
 	} 
+}
+
+bool sqlrlistener::verifyAccessToConfigFile(const char *configfile,
+						sqlrconfigfile *cfgfl) {
+
+	if (!cfgfl->getDynamicScaling()) {
+		return true;
+	}
+
+	file	test;
+	if (!test.open(configfile,O_RDONLY)) {
+		fprintf(stderr,"\nsqlr-listener error:\n");
+		fprintf(stderr,"	This instance of SQL Relay is ");
+		fprintf(stderr,"configured to run as:\n");
+		fprintf(stderr,"		user: %s\n",
+						cfgfl->getRunAsUser());
+		fprintf(stderr,"		group: %s\n\n",
+						cfgfl->getRunAsGroup());
+		fprintf(stderr,"	However, the config file %s\n",
+								configfile);
+		fprintf(stderr,"	cannot be read by that user ");
+		fprintf(stderr,"or group.\n\n");
+		fprintf(stderr,"	Since you're using dynamic scaling ");
+		fprintf(stderr,"(ie. maxconnections>connections),\n");
+		fprintf(stderr,"	new connections would be started as\n");
+		fprintf(stderr,"		user: %s\n",
+						cfgfl->getRunAsUser());
+		fprintf(stderr,"		group: %s\n\n",
+						cfgfl->getRunAsGroup());
+		fprintf(stderr,"	They would not be able to read the");
+		fprintf(stderr,"config file and would shut down.\n\n");
+		fprintf(stderr,"	To remedy this problem, make %s\n",
+								configfile);
+		fprintf(stderr,"	readable by\n");
+		fprintf(stderr,"		user: %s\n",
+						cfgfl->getRunAsUser());
+		fprintf(stderr,"		group: %s\n",
+						cfgfl->getRunAsGroup());
+		return false;
+	}
+	test.close();
+	return true;
 }
 
 bool sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {

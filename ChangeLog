@@ -17,6 +17,9 @@
 	removed MAXQUERYLENGTH from sqlrdefines.h
 	fixed bug where query length > MAXQUERYLENGTH could cause segfault when
 		copying references
+	sqlr-listener and sqlr-scaler refuse to start now if
+		runasuser/runasgroup can't read the config file
+	sqlr-scaler shouldn't loop up if sqlr-listener is killed now
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

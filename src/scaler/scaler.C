@@ -121,6 +121,49 @@ bool scaler::initScaler(int argc, const char **argv) {
 			runAsGroup(runasgroup);
 		}
 
+		// make sure user/group can read the config file
+		// (This shouldn't be necessary because if the user/group
+		// can't read the file, the sqlr-listener won't start and if
+		// it won't start, the scaler won't start.  However someone
+		// could get crafty and force the sqlr-scaler to start so
+		// we'll do this check just to make sure)
+		file	test;
+		if (!test.open(config,O_RDONLY)) {
+			fprintf(stderr,"\nsqlr-scaler error:\n");
+			fprintf(stderr,"	This instance of ");
+			fprintf(stderr,"SQL Relay is ");
+			fprintf(stderr,"configured to run as:\n");
+			fprintf(stderr,"		user: %s\n",
+						cfgfile->getRunAsUser());
+			fprintf(stderr,"		group: %s\n\n",
+						cfgfile->getRunAsGroup());
+			fprintf(stderr,"	However, the config file %s\n",
+								config);
+			fprintf(stderr,"	cannot be read by that user ");
+			fprintf(stderr,"or group.\n\n");
+			fprintf(stderr,"	Since you're using ");
+			fprintf(stderr,"dynamic scaling ");
+			fprintf(stderr,"(ie. maxconnections>connections),\n");
+			fprintf(stderr,"	new connections would be ");
+			fprintf(stderr,"started as\n");
+			fprintf(stderr,"		user: %s\n",
+						cfgfile->getRunAsUser());
+			fprintf(stderr,"		group: %s\n\n",
+						cfgfile->getRunAsGroup());
+			fprintf(stderr,"	They would not be able to ");
+			fprintf(stderr,"read the");
+			fprintf(stderr,"config file and would shut down.\n\n");
+			fprintf(stderr,"	To remedy this problem, ");
+			fprintf(stderr,"make %s\n",config);
+			fprintf(stderr,"	readable by\n");
+			fprintf(stderr,"		user: %s\n",
+						cfgfile->getRunAsUser());
+			fprintf(stderr,"		group: %s\n",
+						cfgfile->getRunAsGroup());
+			return false;
+		}
+		test.close();
+
 		// get the dynamic connection scaling parameters
 		maxconnections=cfgfile->getMaxConnections();
 		maxqueuelength=cfgfile->getMaxQueueLength();
@@ -181,10 +224,15 @@ void scaler::cleanUp() {
 }
 
 
-void scaler::openMoreConnections() {
+bool scaler::openMoreConnections() {
 
 	// wait for a new listener to fire up and increment the listener count
-	semset->wait(6);
+	if (!semset->wait(6)) {
+		// If this returns false then an error has occurred and the
+		// semaphore can't be accessed.  Most likely the sqlr-listener
+		// has been killed.
+		return false;
+	}
 
 	int	sessions=countSessions();
 	int	connections=countConnections();
@@ -194,7 +242,7 @@ void scaler::openMoreConnections() {
 
 	// do we need to open more connections?
 	if ((sessions-connections)<=maxqueuelength) {
-		return;
+		return true;
 	}
 
 	// can more be opened, or will we exceed the max?
@@ -247,6 +295,8 @@ void scaler::openMoreConnections() {
 			}
 		}
 	}
+
+	return true;
 }
 
 void scaler::getRandomConnectionId() {
@@ -303,13 +353,5 @@ int scaler::countConnections() {
 }
 
 void scaler::loop() {
-
-	// FIXME: if the listener dies before the scaler does, the wait() inside
-	// openMoreConnections() will fall through every time, the session count
-	// will be -1, connections will always be greater than that,
-	// openMoreConnections() will return, and just loop up forever...
-	for (;;) {
-		// open more connections if necessary
-		openMoreConnections();
-	}
+	while (openMoreConnections()) {}
 }

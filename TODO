@@ -37,69 +37,22 @@ metric="1"/>
 </connections>
 </instance>
 
-
-
-Problem #2:
-
-I got it to become somewhat stable for a few hours by
-upping the
-starting connections to 30 and maxconnection to 100...
-it scaled up to
-about 35 at times and didnt hang or become
-unresponsive at all. But
-then when i went to switch the application back to
-direct db access
-and then stopped sql relay a few minutes after, it
-locked up my entire
-server and was unable to log back in to see what
-happened.
-
-BTW: I forgot to put this in my earlier post... this
-machine runs
-nothing but SQL Relay on it and the Oracle client
-required to access
-the db. The machine was never taxed out running sql
-realy or anything
-but it blew up and died when i tried to stop sql
-relay..
-
-
-
-Problem #3:
-
-I am still having the problem with sql relay hanging
-and/or crashing
-the server. But now i have discovered a new problem...
-
-When it goes to scale more connections, i get this
-"Warning: could not
-change group to nobody". I have a nobody user and a
-nobody group on
-the server. I also started sql relay as root and it
-does run as nobody.
 --------------------------------------------------------------------------------
 
 sqlr-connection running as nobody/nobody complains about trying to switch to
 	the nobody group
 
-scaler can loop up listener is killed, see FIXME
-scaler loops up if the connections can't read the sqlrelay.conf file (or can't
-	start for whatever reason)
-
-document installing MSDE from http://www.microsoft.com/sql/msde/default.asp
-
-connections should print a warning if the runasuser/runasgroup can't read
-	sqlrelay.conf
-
-perl apis -> CPAN
+people have been reporting freetds problems
 
 php module needs to clean itself up (close connections) if the script dies
+
+CFLAGS="-framework Python" to get python API to compile on OS X
+
+perl apis -> CPAN
 
 api needs to expose integer column types
 
 numeric output bind variables
-
-CFLAGS="-framework Python" to get python API to compile on OS X
 
 does setResultSetBufferSize prevent PythonDB, Perl DBI, etc. from fetching more
 	than 100 rows?
@@ -107,9 +60,9 @@ does setResultSetBufferSize prevent PythonDB, Perl DBI, etc. from fetching more
 mysql 4.1, 5.0 - bind vars
 postgresql 8 - bind vars
 
-people have been reporting freetds problems
-
 call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
+
+document installing MSDE from http://www.microsoft.com/sql/msde/default.asp
 
 --------------------------------------------------------------------------------
 
