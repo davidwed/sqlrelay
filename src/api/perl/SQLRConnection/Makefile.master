@@ -54,7 +54,7 @@ makefile:
 	if ( test ! -r Makefile ); then \
 		$(PERL) Makefile.PL; \
 		if ( test "$(UNAME)" = "SCO_SV" -a "`$(CC) --version`" = "2.95.2"); then \
-			sed -e 's| -belf||g' Makefile > Makefile.master; \
-			mv Makefile.master Makefile; \
+			sed -e 's| -belf||g' Makefile > Makefile.fixed; \
+			mv Makefile.fixed Makefile; \
 		fi; \
 	fi
