@@ -29,7 +29,7 @@ python.lo:
 CSQLRelay.so: libCSQLRelay.la
 	for i in `find .libs -name "libCSQLRelay*so*"`; \
 	do \
-		cp -L $$i CSQLRelay.so; \
+		cp $$i CSQLRelay.so; \
 	done
 	$(LIBTOOL) --mode=clean $(RM) *.la
 

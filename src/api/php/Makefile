@@ -42,7 +42,7 @@ rebuild: clean all
 sql_relay.so: libsql_relay.la
 	for i in `find .libs -name "libsql_relay*so*"`; \
 	do \
-		cp -L $$i sql_relay.so; \
+		cp $$i sql_relay.so; \
 	done
 	$(LIBTOOL) --mode=clean $(RM) *.la
 
