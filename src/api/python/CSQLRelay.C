@@ -544,7 +544,9 @@ static PyObject *executeQuery(PyObject *self, PyObject *args) {
   int rc;
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
+  Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->executeQuery();
+  Py_END_ALLOW_THREADS
   return Py_BuildValue("i", rc);
 }
 
