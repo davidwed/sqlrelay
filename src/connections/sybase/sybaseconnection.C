@@ -20,14 +20,12 @@ int		sybaseconnection::deadconnection;
 
 sybaseconnection::sybaseconnection() {
 	errorstring=NULL;
-	sybaseenv=NULL;
-	dsqueryenv=NULL;
+	env=new environment();
 }
 
 sybaseconnection::~sybaseconnection() {
-	delete[] sybaseenv;
-	delete[] dsqueryenv;
 	delete errorstring;
+	delete env;
 }
 
 int	sybaseconnection::getNumberOfConnectStringVars() {
@@ -51,9 +49,7 @@ int	sybaseconnection::logIn() {
 
 	// set sybase
 	if (sybase && sybase[0]) {
-		sybaseenv=new char[strlen(sybase)+8];
-		sprintf(sybaseenv,"SYBASE=%s",sybase);
-		if (!setEnv("SYBASE",sybase,sybaseenv)) {
+		if (!env->setValue("SYBASE",sybase)) {
 			logInError("Failed to set SYBASE environment variable.",1);
 			return 0;
 		}
@@ -61,9 +57,7 @@ int	sybaseconnection::logIn() {
 
 	// set server
 	if (server && server[0]) {
-		dsqueryenv=new char[strlen(server)+9];
-		sprintf(dsqueryenv,"DSQUERY=%s",server);
-		if (!setEnv("DSQUERY",server,dsqueryenv)) {
+		if (!env->setValue("DSQUERY",server)) {
 			logInError("Failed to set DSQUERY environment variable.",2);
 			return 0;
 		}
@@ -229,6 +223,7 @@ int	sybaseconnection::logIn() {
 }
 
 void	sybaseconnection::logInError(const char *error, int stage) {
+
 	errorstring=new stringbuffer();
 	errorstring->append(error);
 
@@ -243,14 +238,6 @@ void	sybaseconnection::logInError(const char *error, int stage) {
 	}
 	if (stage>2) {
 		cs_ctx_drop(context);
-	}
-	if (stage>1) {
-		delete[] dsqueryenv;
-		dsqueryenv=NULL;
-	}
-	if (stage>0) {
-		delete[] sybaseenv;
-		sybaseenv=NULL;
 	}
 }
 
@@ -269,11 +256,6 @@ void	sybaseconnection::logOut() {
 	ct_con_drop(dbconn);
 	ct_exit(context,CS_UNUSED);
 	cs_ctx_drop(context);
-
-	delete[] sybaseenv;
-	sybaseenv=NULL;
-	delete[] dsqueryenv;
-	dsqueryenv=NULL;
 }
 
 char	*sybaseconnection::identify() {

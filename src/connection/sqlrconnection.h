@@ -74,8 +74,6 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		char	*connectStringValue(const char *variable);
 		void	setAutoCommitBehavior(int ac);
 		int	getAutoCommitBehavior();
-		int	setEnv(const char *var, const char *string,
-						const char *pestr);
 		int	sendColumnInfo();
 		void	sendRowCounts(long actual, long affected);
 		void	sendColumnCount(unsigned long ncols);

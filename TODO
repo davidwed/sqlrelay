@@ -1,4 +1,4 @@
-need to build lago against mit-pthreads on openbsd
+mysql test fails column length test
 
 stored procedure test doesn't work with db2 8.1
 db2 start/stop doesn't work

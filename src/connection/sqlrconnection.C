@@ -2808,18 +2808,6 @@ void	sqlrconnection::endSendingLong() {
 	clientsock->write((unsigned short)END_LONG_DATA);
 }
 
-int	sqlrconnection::setEnv(const char *var, const char *string,
-							const char *pestr) {
-
-	#if defined(HAVE_SETENV)
-		return (setenv(var,string,1)!=-1);
-	#elif defined(HAVE_PUTENV)
-		return (putenv(pestr)!=-1);
-	#else
-		#error "Couldn't find a suitable replacement for putenv."
-	#endif
-}
-
 int	sqlrconnection::isTransactional() {
 	return 1;
 }

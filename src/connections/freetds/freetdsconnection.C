@@ -15,14 +15,12 @@ int		freetdsconnection::deadconnection;
 
 freetdsconnection::freetdsconnection() {
 	errorstring=NULL;
-	sybaseenv=NULL;
-	dsqueryenv=NULL;
+	env=new environment();
 }
 
 freetdsconnection::~freetdsconnection() {
-	delete[] sybaseenv;
-	delete[] dsqueryenv;
 	delete errorstring;
+	delete env;
 }
 
 int	freetdsconnection::getNumberOfConnectStringVars() {
@@ -46,9 +44,7 @@ int	freetdsconnection::logIn() {
 
 	// set sybase environment variable
 	if (sybase && sybase[0]) {
-		sybaseenv=new char[strlen(sybase)+8];
-		sprintf(sybaseenv,"SYBASE=%s",sybase);
-		if (!setEnv("SYBASE",sybase,sybaseenv)) {
+		if (!env->setValue("SYBASE",sybase)) {
 			logInError("Failed to set SYBASE environment variable.",1);
 			return 0;
 		}
@@ -56,9 +52,7 @@ int	freetdsconnection::logIn() {
 
 	// set dsquery environment variable
 	if (server && server[0]) {
-		dsqueryenv=new char[strlen(server)+9];
-		sprintf(dsqueryenv,"DSQUERY=%s",server);
-		if (!setEnv("DSQUERY",server,dsqueryenv)) {
+		if (!env->setValue("DSQUERY",server)) {
 			logInError("Failed to set DSQUERY environment variable.",2);
 			return 0;
 		}
@@ -239,14 +233,6 @@ void	freetdsconnection::logInError(const char *error, int stage) {
 	if (stage>2) {
 		cs_ctx_drop(context);
 	}
-	if (stage>1) {
-		delete[] dsqueryenv;
-		dsqueryenv=NULL;
-	}
-	if (stage>0) {
-		delete[] sybaseenv;
-		sybaseenv=NULL;
-	}
 }
 
 sqlrcursor	*freetdsconnection::initCursor() {
@@ -264,11 +250,6 @@ void	freetdsconnection::logOut() {
 	ct_con_drop(dbconn);
 	ct_exit(context,CS_UNUSED);
 	cs_ctx_drop(context);
-
-	delete[] sybaseenv;
-	sybaseenv=NULL;
-	delete[] dsqueryenv;
-	dsqueryenv=NULL;
 }
 
 char	*freetdsconnection::identify() {

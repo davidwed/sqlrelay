@@ -15,15 +15,17 @@
 
 oracle8connection::oracle8connection() {
 
-	oraclehomeenv=NULL;
-	oraclesidenv=NULL;
-	twotaskenv=NULL;
-
 	statementmode=OCI_DEFAULT;
 
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
 #endif
+
+	environ=new environment();
+}
+
+oracle8connection::~oracle8connection() {
+	delete environ;
 }
 
 int	oracle8connection::getNumberOfConnectStringVars() {
@@ -44,16 +46,12 @@ int	oracle8connection::logIn() {
 
 	// handle ORACLE_HOME
 	if (home) {
-		oraclehomeenv=new char[strlen(home)+13];
-		sprintf(oraclehomeenv,"ORACLE_HOME=%s",home);
-		if (!setEnv("ORACLE_HOME",home,oraclehomeenv)) {
+		if (!environ->setValue("ORACLE_HOME",home)) {
 			fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
 			return 0;
 		}
 	} else {
-		if (!getenv("ORACLE_HOME")) {
+		if (!environ->getValue("ORACLE_HOME")) {
 			fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
 			return 0;
 		}
@@ -61,46 +59,26 @@ int	oracle8connection::logIn() {
 
 	// handle ORACLE_SID
 	if (sid) {
-		oraclesidenv=new char[strlen(sid)+12];
-		sprintf(oraclesidenv,"ORACLE_SID=%s",sid);
-		if (!setEnv("ORACLE_SID",sid,oraclesidenv)) {
+		if (!environ->setValue("ORACLE_SID",sid)) {
 			fprintf(stderr,"Failed to set ORACLE_SID environment variable.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
-			delete[] oraclesidenv;
-			oraclesidenv=NULL;
 			return 0;
 		}
 	} else {
-		if (!getenv("ORACLE_SID")) {
+		if (!environ->getValue("ORACLE_SID")) {
 			fprintf(stderr,"No ORACLE_SID environment variable set or specified in connect string.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
 			return 0;
 		}
 	}
 
 	// handle TWO_TASK
 	if (sid) {
-		twotaskenv=new char[strlen(sid)+10];
-		sprintf(twotaskenv,"TWO_TASK=%s",sid);
-		if (!setEnv("TWO_TASK",sid,twotaskenv)) {
+		if (!environ->setValue("TWO_TASK",sid)) {
 			fprintf(stderr,"Failed to set TWO_TASK environment variable.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
-			delete[] oraclesidenv;
-			oraclesidenv=NULL;
-			delete[] twotaskenv;
-			twotaskenv=NULL;
 			return 0;
 		}
 	} else {
-		if (!getenv("TWO_TASK")) {
+		if (!environ->getValue("TWO_TASK")) {
 			fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
-			delete[] oraclesidenv;
-			oraclesidenv=NULL;
 			return 0;
 		}
 	}
@@ -128,12 +106,6 @@ int	oracle8connection::logIn() {
 
 	// attach to the server
 	if (OCIServerAttach(srv,err,(text *)sid,strlen(sid),0)!=OCI_SUCCESS) {
-		delete[] oraclehomeenv;
-		oraclehomeenv=NULL;
-		delete[] oraclesidenv;
-		oraclesidenv=NULL;
-		delete[] twotaskenv;
-		twotaskenv=NULL;
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
@@ -175,12 +147,6 @@ int	oracle8connection::logIn() {
 		fprintf(stderr,"%s\n",message);
 
 		OCIServerDetach(srv,err,OCI_DEFAULT);
-		delete[] oraclehomeenv;
-		oraclehomeenv=NULL;
-		delete[] oraclesidenv;
-		oraclesidenv=NULL;
-		delete[] twotaskenv;
-		twotaskenv=NULL;
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
@@ -227,13 +193,6 @@ void	oracle8connection::logOut() {
 	OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 	OCIHandleFree(srv,OCI_HTYPE_SERVER);
 	OCIHandleFree(err,OCI_HTYPE_ERROR);
-
-	delete[] oraclehomeenv;
-	oraclehomeenv=NULL;
-	delete[] oraclesidenv;
-	oraclesidenv=NULL;
-	delete[] twotaskenv;
-	twotaskenv=NULL;
 }
 
 #ifdef OCI_ATTR_PROXY_CREDENTIALS

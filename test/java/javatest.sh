@@ -6,9 +6,9 @@ export LD_LIBRARY_PATH
 CLASSPATH=$CLASSPATH:/usr/local/firstworks/java:./
 #CLASSPATH=$CLASSPATH:/usr/java:./
 export CLASSPATH
-java db2 localhost 8001 "" db2test db2test
+#java db2 localhost 8001 "" db2test db2test
 #java freetds localhost 8002 "" freetdstest freetdstest
-#java interbase localhost 8003 "" interbasetest interbasetest
+java interbase localhost 8003 "" interbasetest interbasetest
 #java lago localhost 8004 "" lagotest lagotest
 #java msql localhost 8005 "" msqltest msqltest
 #java mysql localhost 8006 "" mysqltest mysqltest

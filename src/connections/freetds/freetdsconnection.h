@@ -14,6 +14,7 @@
 
 #define NUM_CONNECT_STRING_VARS 10
 
+#include <rudiments/environment.h>
 #include <sqlrconnection.h>
 
 extern "C" {
@@ -114,9 +115,6 @@ class freetdsconnection : public sqlrconnection {
 		CS_LOCALE	*locale;
 		CS_CONNECTION	*dbconn;
 
-		char		*sybaseenv;
-		char		*dsqueryenv;
-
 		char		*sybase;
 		char		*server;
 		char		*db;
@@ -126,6 +124,8 @@ class freetdsconnection : public sqlrconnection {
 		int		enc;
 		char		*hostname;
 		char		*packetsize;
+
+		environment	*env;
 
 		static	stringbuffer	*errorstring;
 		static	int		deadconnection;

@@ -14,9 +14,11 @@
 #endif
 
 oracle7connection::oracle7connection() {
-	oraclehomeenv=NULL;
-	oraclesidenv=NULL;
-	twotaskenv=NULL;
+	env=new environment();
+}
+
+oracle7connection::~oracle7connection() {
+	delete env;
 }
 
 int	oracle7connection::getNumberOfConnectStringVars() {
@@ -36,16 +38,12 @@ int	oracle7connection::logIn() {
 
 	// handle ORACLE_HOME
 	if (home) {
-		oraclehomeenv=new char[strlen(home)+13];
-		sprintf(oraclehomeenv,"ORACLE_HOME=%s",home);
-		if (!setEnv("ORACLE_HOME",home,oraclehomeenv)) {
+		if (!env->setValue("ORACLE_HOME",home)) {
 			fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
 			return 0;
 		}
 	} else {
-		if (!getenv("ORACLE_HOME")) {
+		if (!env->getValue("ORACLE_HOME")) {
 			fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
 			return 0;
 		}
@@ -53,46 +51,26 @@ int	oracle7connection::logIn() {
 
 	// handle ORACLE_SID
 	if (sid) {
-		oraclesidenv=new char[strlen(sid)+12];
-		sprintf(oraclesidenv,"ORACLE_SID=%s",sid);
-		if (!setEnv("ORACLE_SID",sid,oraclesidenv)) {
+		if (!env->setValue("ORACLE_SID",sid)) {
 			fprintf(stderr,"Failed to set ORACLE_SID environment variable.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
-			delete[] oraclesidenv;
-			oraclesidenv=NULL;
 			return 0;
 		}
 	} else {
-		if (!getenv("ORACLE_SID")) {
+		if (!env->getValue("ORACLE_SID")) {
 			fprintf(stderr,"No ORACLE_SID environment variable set or specified in connect string.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
 			return 0;
 		}
 	}
 
 	// handle TWO_TASK
 	if (sid) {
-		twotaskenv=new char[strlen(sid)+10];
-		sprintf(twotaskenv,"TWO_TASK=%s",sid);
-		if (!setEnv("TWO_TASK",sid,twotaskenv)) {
+		if (!env->setValue("TWO_TASK",sid)) {
 			fprintf(stderr,"Failed to set TWO_TASK environment variable.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
-			delete[] oraclesidenv;
-			oraclesidenv=NULL;
-			delete[] twotaskenv;
-			twotaskenv=NULL;
 			return 0;
 		}
 	} else {
-		if (!getenv("TWO_TASK")) {
+		if (!env->getValue("TWO_TASK")) {
 			fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
-			delete[] oraclehomeenv;
-			oraclehomeenv=NULL;
-			delete[] oraclesidenv;
-			oraclesidenv=NULL;
 			return 0;
 		}
 	}
@@ -108,12 +86,6 @@ int	oracle7connection::logIn() {
 		sword	n=oerhms(&lda,lda.rc,message,(sword)sizeof(message));
 		message[n]=(text)NULL;
 		fprintf(stderr,"%s\n",message);
-		delete[] oraclehomeenv;
-		oraclehomeenv=NULL;
-		delete[] oraclesidenv;
-		oraclesidenv=NULL;
-		delete[] twotaskenv;
-		twotaskenv=NULL;
 		return 0;
 	}
 	return 1;
@@ -129,12 +101,6 @@ void	oracle7connection::deleteCursor(sqlrcursor *curs) {
 
 void	oracle7connection::logOut() {
 	ologof(&lda);
-	delete[] oraclehomeenv;
-	oraclehomeenv=NULL;
-	delete[] oraclesidenv;
-	oraclesidenv=NULL;
-	delete[] twotaskenv;
-	twotaskenv=NULL;
 }
 
 unsigned short	oracle7connection::autoCommitOn() {

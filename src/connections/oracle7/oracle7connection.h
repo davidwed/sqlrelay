@@ -11,6 +11,7 @@
 
 #define NUM_CONNECT_STRING_VARS 5
 
+#include <rudiments/environment.h>
 #include <sqlrconnection.h>
 
 #include <config.h>
@@ -129,6 +130,7 @@ class oracle7connection : public sqlrconnection {
 	friend class oracle7cursor;
 	public:
 			oracle7connection();
+			~oracle7connection();
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
@@ -150,9 +152,7 @@ class oracle7connection : public sqlrconnection {
 		char		*sid;
 		int		autocommit;
 
-		char		*oraclehomeenv;
-		char		*oraclesidenv;
-		char		*twotaskenv;
+		environment	*env;
 };
 
 #endif

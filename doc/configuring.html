@@ -209,7 +209,7 @@ value of keeping persistent database connections.</p>
 <span class="heading2">Handoff</span><br><br>
 
 <p>When an <b>SQL Relay</b> client needs to talk to the database, it connects
-to a listner process which queues it up until a database connection daemon is
+to a listener process which queues it up until a database connection daemon is
 available.  When a daemon is available, the client is "handed off" to it.  This
 "handoff" can be done in one of two ways.  The client can disconnect from the
 listener and reconnect to the connection daemon, or the existing connection to 

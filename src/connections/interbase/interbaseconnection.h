@@ -6,6 +6,7 @@
 
 #define NUM_CONNECT_STRING_VARS 6
 
+#include <rudiments/environment.h>
 #include <sqlrconnection.h>
 
 #include <ibase.h>
@@ -118,8 +119,7 @@ class interbaseconnection : public sqlrconnection {
 		char		*database;
 		int		dialect;
 
-		char		*iscuserenv;
-		char		*iscpasswordenv;
+		environment	*env;
 
 		ISC_STATUS	error[20];
 };

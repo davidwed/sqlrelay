@@ -10,6 +10,7 @@
 
 #define NUM_CONNECT_STRING_VARS 5
 
+#include <rudiments/environment.h>
 #include <sqlrconnection.h>
 
 extern "C" {
@@ -166,6 +167,7 @@ class oracle8connection : public sqlrconnection {
 	friend class oracle8cursor;
 	public:
 			oracle8connection();
+			~oracle8connection();
 	private:
 		int	getNumberOfConnectStringVars();
 		void	handleConnectString();
@@ -201,9 +203,7 @@ class oracle8connection : public sqlrconnection {
 		char		*sid;
 		int		autocommit;
 
-		char		*oraclehomeenv;
-		char		*oraclesidenv;
-		char		*twotaskenv;
+		environment	*environ;
 };
 
 #endif

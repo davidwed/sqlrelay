@@ -17,17 +17,11 @@
 interbaseconnection::interbaseconnection() {
 	db=0L;
 	tr=0L;
-	iscuserenv=NULL;
-	iscpasswordenv=NULL;
+	env=new environment();
 }
 
 interbaseconnection::~interbaseconnection() {
-	if (iscuserenv) {
-		delete[] iscuserenv;
-	}
-	if (iscpasswordenv) {
-		delete[] iscpasswordenv;
-	}
+	delete env;
 }
 
 int	interbaseconnection::getNumberOfConnectStringVars() {
@@ -74,15 +68,11 @@ int	interbaseconnection::logIn() {
 	// handle user/password parameters
 	char	*user=getUser();
 	if (user) {
-		iscuserenv=new char[strlen(user)+10];
-		sprintf(iscuserenv,"ISC_USER=%s",user);
-		setEnv("ISC_USER",user,iscuserenv);
+		env->setValue("ISC_USER",user);
 	}
 	char	*password=getPassword();
 	if (password) {
-		iscpasswordenv=new char[strlen(password)+10];
-		sprintf(iscpasswordenv,"ISC_PASSWORD=%s",password);
-		setEnv("ISC_PASSWORD",password,iscpasswordenv);
+		env->setValue("ISC_PASSWORD",password);
 	}
 
 	// attach to the database
