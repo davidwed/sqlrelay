@@ -1,3 +1,9 @@
+postgresql perl/python tests fail
+
+
+
+query/fields cmdline tools need a timeout option.
+
 ruby api crashes on exit
 
 forked listeners need to close handoff file descriptors
@@ -11,8 +17,6 @@ odbc connection should check the odbc definition
 	for connect string arguments - SQLBrowseConnect
 java/com/firstworks/sqlrelay needs to be removed if empty when rpm is
 	uninstalled
-java api needs clob/lob/cursor methods
-java can't find sqlr_alloc
 should sqlr-start kill the listner if no connections start?
 float/double datatypes come back with no particular scale/precision in many db's
 
@@ -28,6 +32,8 @@ interbase docs aren't available at the link in gettingstarted/interbase.html
 db2 startup directions are wrong, you have to run db2start/db2stop as db2as
 sybase startup can fail because LANG is set funny - need note in docs
 fix documents to reflect java package
+
+better transaction handling for postgresql
 
 Tests:
 	odbc tests
