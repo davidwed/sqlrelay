@@ -1,4 +1,7 @@
-#include <connection/unixsocketseqfile.h>
+// Copyright (c) 1999-2004  David Muse
+// See the file COPYING for more information
+
+#include <sqlrconnection.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -11,16 +14,10 @@
 
 #include <config.h>
 
-#ifdef SERVER_DEBUG
-void unixsocketseqfile::setDebugLogger(logger *dl) {
-	this->dl=dl;
-}
-#endif
-
-bool unixsocketseqfile::getUnixSocket(char *tmpdir, char *unixsocketptr) {
+bool sqlrconnection::getUnixSocket(char *tmpdir, char *unixsocketptr) {
 
 	#ifdef SERVER_DEBUG
-	dl->write("connection",0,"getting unix socket...");
+	debugPrint("connection",0,"getting unix socket...");
 	#endif
 
 	if ((sockseq=openSequenceFile(tmpdir,unixsocketptr))==-1 ||
@@ -41,13 +38,13 @@ bool unixsocketseqfile::getUnixSocket(char *tmpdir, char *unixsocketptr) {
 	}
 
 	#ifdef SERVER_DEBUG
-	dl->write("connection",0,"done getting unix socket");
+	debugPrint("connection",0,"done getting unix socket");
 	#endif
 
 	return true;
 }
 
-int unixsocketseqfile::openSequenceFile(char *tmpdir, char *unixsocketptr) {
+int sqlrconnection::openSequenceFile(char *tmpdir, char *unixsocketptr) {
 
 	// open the sequence file and get the current port number
 	char	*sockseqname=new char[strlen(tmpdir)+9];
@@ -56,17 +53,17 @@ int unixsocketseqfile::openSequenceFile(char *tmpdir, char *unixsocketptr) {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[8+strlen(sockseqname)+1];
 	sprintf(string,"opening %s",sockseqname);
-	dl->write("connection",1,string);
+	debugPrint("connection",1,string);
 	delete[] string;
 	#endif
 
 	mode_t	oldumask=umask(011);
-	int	sockseq=open(sockseqname,O_RDWR|O_CREAT,
+	int	sockseqfd=open(sockseqname,O_RDWR|O_CREAT,
 				permissions::everyoneReadWrite());
 	umask(oldumask);
 
 	// handle error
-	if (sockseq==-1) {
+	if (sockseqfd==-1) {
 		fprintf(stderr,"Could not open: %s\n",sockseqname);
 		fprintf(stderr,"Make sure that the file and directory are \n");
 		fprintf(stderr,"readable and writable.\n\n");
@@ -75,21 +72,21 @@ int unixsocketseqfile::openSequenceFile(char *tmpdir, char *unixsocketptr) {
 		#ifdef SERVER_DEBUG
 		string=new char[14+strlen(sockseqname)+1];
 		sprintf(string,"couldn't open %s",sockseqname);
-		dl->write("connection",1,string);
+		debugPrint("connection",1,string);
 		delete[] string;
 		#endif
 	}
 
 	delete[] sockseqname;
 
-	return sockseq;
+	return sockseqfd;
 }
 
-bool unixsocketseqfile::lockSequenceFile() {
+bool sqlrconnection::lockSequenceFile() {
 
 	// lock the file in a platform-independent manner
 	#ifdef SERVER_DEBUG
-	dl->write("connection",1,"locking...");
+	debugPrint("connection",1,"locking...");
 	#endif
 
 	struct	flock fl;
@@ -101,7 +98,7 @@ bool unixsocketseqfile::lockSequenceFile() {
 }
 
 
-bool unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
+bool sqlrconnection::getAndIncrementSequenceNumber(char *unixsocketptr) {
 
 	// get the sequence number from the file
 	long	buffer;
@@ -114,7 +111,7 @@ bool unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
 	#ifdef SERVER_DEBUG
 	char	*string=new char[21+strlen(unixsocketptr)+1];
 	sprintf(string,"got sequence number: %s",unixsocketptr);
-	dl->write("connection",1,string);
+	debugPrint("connection",1,string);
 	delete[] string;
 	#endif
 
@@ -128,7 +125,7 @@ bool unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
 	#ifdef SERVER_DEBUG
 	string=new char[50];
 	sprintf(string,"writing new sequence number: %ld",buffer);
-	dl->write("connection",1,string);
+	debugPrint("connection",1,string);
 	delete[] string;
 	#endif
 
@@ -139,11 +136,11 @@ bool unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
 	return (write(sockseq,(void *)&buffer,sizeof(long))==sizeof(long));
 }
 
-bool unixsocketseqfile::unLockSequenceFile() {
+bool sqlrconnection::unLockSequenceFile() {
 
 	// unlock and close the file in a platform-independent manner
 	#ifdef SERVER_DEBUG
-	dl->write("connection",1,"unlocking...");
+	debugPrint("connection",1,"unlocking...");
 	#endif
 
 	struct	flock fl;

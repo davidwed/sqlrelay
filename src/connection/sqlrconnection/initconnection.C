@@ -11,13 +11,20 @@
 bool sqlrconnection::initConnection(int argc, const char **argv,
 						bool detachbeforeloggingin) {
 
-	cmdl=new connectioncmdline(argc,argv);
+	// process command line
+	cmdl=new cmdline(argc,argv);
+
+	// get the connection id from the command line
+	connectionid=cmdl->value("-connectionid");
+	if (!connectionid[0]) {
+		connectionid=DEFAULT_CONNECTIONID;
+		fprintf(stderr,"Warning: using default connectionid.\n");
+	}
+	// get the time to live from the command line
+	ttl=atoi(cmdl->value("-ttl"));
+
 	cfgfl=new sqlrconfigfile();
 	authc=new authenticator(cfgfl);
-	ipcptr=new ipc();
-	lsnrcom=new listenercomm(ipcptr,cmdl);
-	sclrcom=new scalercomm(ipcptr);
-	ussf=new unixsocketseqfile();
 	tmpdir=new tempdir(cmdl);
 
 	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId(),
@@ -28,12 +35,7 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 	setUserAndGroup();
 
 	#ifdef SERVER_DEBUG
-		// set loggers here...
-		debugfile::openDebugFile("connection",cmdl->getLocalStateDir());
-		ipcptr->setDebugLogger(getDebugLogger());
-		sclrcom->setDebugLogger(getDebugLogger());
-		ussf->setDebugLogger(getDebugLogger());
-		lsnrcom->setDebugLogger(getDebugLogger());
+	debugfile::openDebugFile("connection",cmdl->getLocalStateDir());
 	#endif
 
 	// handle the unix socket directory
@@ -46,21 +48,21 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 		return false;
 	}
 
-	constr=cfgfl->getConnectString(cmdl->getConnectionId());
+	constr=cfgfl->getConnectString(connectionid);
 	handleConnectString();
 
 	initDatabaseAvailableFileName();
 
 	if (cfgfl->getListenOnUnix() &&
-		!ussf->getUnixSocket(tmpdir->getString(),unixsocketptr)) {
+		!getUnixSocket(tmpdir->getString(),unixsocketptr)) {
 		return false;
 	}
 
 	#ifndef SERVER_DEBUG
-		if (detachbeforeloggingin) {
-			// detach from the controlling tty
-			detach();
-		}
+	if (detachbeforeloggingin) {
+		// detach from the controlling tty
+		detach();
+	}
 	#endif
 
 	blockSignals();
@@ -70,10 +72,10 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 	}
 
 	#ifndef SERVER_DEBUG
-		if (!detachbeforeloggingin) {
-			// detach from the controlling tty
-			detach();
-		}
+	if (!detachbeforeloggingin) {
+		// detach from the controlling tty
+		detach();
+	}
 	#endif
 
 	setInitialAutoCommitBehavior();
@@ -82,14 +84,14 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 		return false;
 	}
 
-	if (!ipcptr->createSharedMemoryAndSemaphores(tmpdir->getString(),
+	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
 							cmdl->getId())) {
 		return false;
 	}
 
 	// increment connection counter
 	if (cfgfl->getDynamicScaling()) {
-		sclrcom->incrementConnectionCount();
+		incrementConnectionCount();
 	}
 
 	markDatabaseAvailable();
@@ -148,10 +150,11 @@ bool sqlrconnection::handlePidFile() {
 void sqlrconnection::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
-	updown=new char[strlen(tmpdir->getString())+1+strlen(cmdl->getId())+1+
-					strlen(cmdl->getConnectionId())+1];
+	updown=new char[strlen(tmpdir->getString())+1+
+					strlen(cmdl->getId())+1+
+					strlen(connectionid)+1];
 	sprintf(updown,"%s/%s-%s",tmpdir->getString(),cmdl->getId(),
-						cmdl->getConnectionId());
+							connectionid);
 }
 
 void sqlrconnection::blockSignals() {

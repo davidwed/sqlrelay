@@ -8,8 +8,10 @@ LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 SRCS = sqlrconnection/constructor.C \
 	sqlrconnection/destructor.C \
 	sqlrconnection/initconnection.C \
+	sqlrconnection/ipc.C \
 	sqlrconnection/opensockets.C \
 	sqlrconnection/listen.C \
+	sqlrconnection/listenercomm.C \
 	sqlrconnection/clientsession.C \
 	sqlrconnection/authenticate.C \
 	sqlrconnection/suspendsession.C \
@@ -18,6 +20,7 @@ SRCS = sqlrconnection/constructor.C \
 	sqlrconnection/identify.C \
 	sqlrconnection/autocommit.C \
 	sqlrconnection/commit.C \
+	sqlrconnection/connectioncount.C \
 	sqlrconnection/rollback.C \
 	sqlrconnection/newquery.C \
 	sqlrconnection/handlequery.C \
@@ -48,11 +51,7 @@ SRCS = sqlrconnection/constructor.C \
 	sqlrconnection/connectstringvalue.C \
 	sqlrconnection/istransactional.C \
 	sqlrconnection/bindparameters.C \
-	connection/connectioncmdline.C \
-	connection/ipc.C \
-	connection/listenercomm.C \
-	connection/scalercomm.C \
-	connection/unixsocketseqfile.C \
+	sqlrconnection/unixsocketseqfile.C \
 	sqlrcursor/constructor.C \
 	sqlrcursor/destructor.C \
 	sqlrcursor/openclose.C \
@@ -64,8 +63,10 @@ SRCS = sqlrconnection/constructor.C \
 LOBJS = sqlrconnection/constructor.lo \
 	sqlrconnection/destructor.lo \
 	sqlrconnection/initconnection.lo \
+	sqlrconnection/ipc.lo \
 	sqlrconnection/opensockets.lo \
 	sqlrconnection/listen.lo \
+	sqlrconnection/listenercomm.lo \
 	sqlrconnection/clientsession.lo \
 	sqlrconnection/authenticate.lo \
 	sqlrconnection/suspendsession.lo \
@@ -74,6 +75,7 @@ LOBJS = sqlrconnection/constructor.lo \
 	sqlrconnection/identify.lo \
 	sqlrconnection/autocommit.lo \
 	sqlrconnection/commit.lo \
+	sqlrconnection/connectioncount.lo \
 	sqlrconnection/rollback.lo \
 	sqlrconnection/newquery.lo \
 	sqlrconnection/handlequery.lo \
@@ -104,11 +106,7 @@ LOBJS = sqlrconnection/constructor.lo \
 	sqlrconnection/connectstringvalue.lo \
 	sqlrconnection/istransactional.lo \
 	sqlrconnection/bindparameters.lo \
-	connection/connectioncmdline.lo \
-	connection/ipc.lo \
-	connection/listenercomm.lo \
-	connection/scalercomm.lo \
-	connection/unixsocketseqfile.lo \
+	sqlrconnection/unixsocketseqfile.lo \
 	sqlrcursor/constructor.lo \
 	sqlrcursor/destructor.lo \
 	sqlrcursor/openclose.lo \
@@ -120,8 +118,10 @@ LOBJS = sqlrconnection/constructor.lo \
 DLOBJS = sqlrconnection/constructor.d.lo \
 	sqlrconnection/destructor.d.lo \
 	sqlrconnection/initconnection.d.lo \
+	sqlrconnection/ipc.d.lo \
 	sqlrconnection/opensockets.d.lo \
 	sqlrconnection/listen.d.lo \
+	sqlrconnection/listenercomm.d.lo \
 	sqlrconnection/clientsession.d.lo \
 	sqlrconnection/authenticate.d.lo \
 	sqlrconnection/suspendsession.d.lo \
@@ -130,6 +130,7 @@ DLOBJS = sqlrconnection/constructor.d.lo \
 	sqlrconnection/identify.d.lo \
 	sqlrconnection/autocommit.d.lo \
 	sqlrconnection/commit.d.lo \
+	sqlrconnection/connectioncount.d.lo \
 	sqlrconnection/rollback.d.lo \
 	sqlrconnection/newquery.d.lo \
 	sqlrconnection/handlequery.d.lo \
@@ -160,11 +161,7 @@ DLOBJS = sqlrconnection/constructor.d.lo \
 	sqlrconnection/connectstringvalue.d.lo \
 	sqlrconnection/istransactional.d.lo \
 	sqlrconnection/bindparameters.d.lo \
-	connection/connectioncmdline.d.lo \
-	connection/ipc.d.lo \
-	connection/listenercomm.d.lo \
-	connection/scalercomm.d.lo \
-	connection/unixsocketseqfile.d.lo \
+	sqlrconnection/unixsocketseqfile.d.lo \
 	sqlrcursor/constructor.d.lo \
 	sqlrcursor/destructor.d.lo \
 	sqlrcursor/openclose.d.lo \

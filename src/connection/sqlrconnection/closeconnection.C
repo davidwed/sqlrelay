@@ -6,13 +6,13 @@
 void sqlrconnection::closeConnection() {
 
 	// decrement the connection counter
-	if (cfgfl->getDynamicScaling() && ipcptr->initialized()) {
-		sclrcom->decrementConnectionCount();
+	if (cfgfl->getDynamicScaling() && semset && idmemory) {
+		decrementConnectionCount();
 	}
 
 	// deregister and close the handoff socket if necessary
 	if (cfgfl->getPassDescriptor()) {
-		lsnrcom->deRegisterForHandoff(tmpdir->getString());
+		deRegisterForHandoff(tmpdir->getString());
 	}
 
 	// close the cursors

@@ -1,4 +1,7 @@
-#include <connection/listenercomm.h>
+// Copyright (c) 1999-2004  David Muse
+// See the file COPYING for more information
+
+#include <sqlrconnection.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -9,29 +12,14 @@
 
 #include <defines.h>
 
-listenercomm::listenercomm(ipc *ipcptr, connectioncmdline *cmdlineptr) {
-	this->ipcptr=ipcptr;
-	this->cmdlineptr=cmdlineptr;
-	connected=false;
-}
-
-listenercomm::~listenercomm() {
-}
-
-#ifdef SERVER_DEBUG
-void listenercomm::setDebugLogger(logger *dl) {
-	this->dl=dl;
-}
-#endif
-
-void listenercomm::announceAvailability(char *tmpdir,
+void sqlrconnection::announceAvailability(char *tmpdir,
 					bool passdescriptor,
 					char *unixsocket,
 					unsigned short inetport,
 					char *connectionid) {
 
 	#ifdef SERVER_DEBUG
-	dl->write("connection",0,"announcing availability...");
+	debugPrint("connection",0,"announcing availability...");
 	#endif
 
 	// if we're passing around file descriptors, connect to listener 
@@ -41,15 +29,15 @@ void listenercomm::announceAvailability(char *tmpdir,
 	}
 
 	// handle time-to-live
-	alarm(cmdlineptr->getTtl());
+	alarm(ttl);
 
-	ipcptr->acquireAnnounceMutex();
+	acquireAnnounceMutex();
 
 	// cancel time-to-live alarm
 	alarm(0);
 
 	// get a pointer to the shared memory segment
-	shmdata	*idmemoryptr=ipcptr->getAnnounceBuffer();
+	shmdata	*idmemoryptr=getAnnounceBuffer();
 
 	// first, write the connectionid into the segment
 	strncpy(idmemoryptr->connectionid,connectionid,MAXCONNECTIONIDLEN);
@@ -59,7 +47,7 @@ void listenercomm::announceAvailability(char *tmpdir,
 	if (passdescriptor) {
 
 		#ifdef SERVER_DEBUG
-		dl->write("connection",1,"handoff=pass");
+		debugPrint("connection",1,"handoff=pass");
 		#endif
 
 		// write the pid into the segment
@@ -69,7 +57,7 @@ void listenercomm::announceAvailability(char *tmpdir,
 	} else {
 
 		#ifdef SERVER_DEBUG
-		dl->write("connection",1,"handoff=reconnect");
+		debugPrint("connection",1,"handoff=reconnect");
 		#endif
 
 		// convert the port to network byte order and write it into
@@ -83,32 +71,31 @@ void listenercomm::announceAvailability(char *tmpdir,
 		}
 	}
 
-	ipcptr->signalListenerToRead();
+	signalListenerToRead();
 
-	ipcptr->waitForListenerToFinishReading();
+	waitForListenerToFinishReading();
 
-	ipcptr->releaseAnnounceMutex();
+	releaseAnnounceMutex();
 
 	#ifdef SERVER_DEBUG
-	dl->write("connection",0,"done announcing availability...");
+	debugPrint("connection",0,"done announcing availability...");
 	#endif
 }
 
-void listenercomm::registerForHandoff(char *tmpdir) {
+void sqlrconnection::registerForHandoff(char *tmpdir) {
 
 	#ifdef SERVER_DEBUG
-	dl->write("connection",0,"registering for handoff...");
+	debugPrint("connection",0,"registering for handoff...");
 	#endif
 
 	// construct the name of the socket to connect to
-	char	handoffsockname[strlen(tmpdir)+1+
-					strlen(cmdlineptr->getId())+8+1];
-	sprintf(handoffsockname,"%s/%s-handoff",tmpdir,cmdlineptr->getId());
+	char	handoffsockname[strlen(tmpdir)+1+strlen(cmdl->getId())+8+1];
+	sprintf(handoffsockname,"%s/%s-handoff",tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
 	char	string[17+strlen(handoffsockname)+1];
 	sprintf(string,"handoffsockname: %s",handoffsockname);
-	dl->write("connection",1,string);
+	debugPrint("connection",1,string);
 	#endif
 
 	// Try to connect over and over forever on 1 second intervals.
@@ -117,7 +104,7 @@ void listenercomm::registerForHandoff(char *tmpdir) {
 	for (;;) {
 
 		#ifdef SERVER_DEBUG
-		dl->write("connection",1,"trying...");
+		debugPrint("connection",1,"trying...");
 		#endif
 
 		handoffsockun.connectToServer(handoffsockname,-1,-1,1,0);
@@ -131,11 +118,11 @@ void listenercomm::registerForHandoff(char *tmpdir) {
 	}
 
 	#ifdef SERVER_DEBUG
-	dl->write("connection",0,"done registering for handoff");
+	debugPrint("connection",0,"done registering for handoff");
 	#endif
 }
 
-bool listenercomm::receiveFileDescriptor(int *descriptor) {
+bool sqlrconnection::receiveFileDescriptor(int *descriptor) {
 	bool	retval=handoffsockun.receiveFileDescriptor(descriptor);
 	if (!retval) {
 		handoffsockun.close();
@@ -144,22 +131,22 @@ bool listenercomm::receiveFileDescriptor(int *descriptor) {
 	return retval;
 }
 
-void listenercomm::deRegisterForHandoff(char *tmpdir) {
+void sqlrconnection::deRegisterForHandoff(char *tmpdir) {
 	
 	#ifdef SERVER_DEBUG
-	dl->write("connection",0,"de-registering for handoff...");
+	debugPrint("connection",0,"de-registering for handoff...");
 	#endif
 
 	// construct the name of the socket to connect to
 	char	removehandoffsockname[strlen(tmpdir)+1+
-					strlen(cmdlineptr->getId())+14+1];
+					strlen(cmdl->getId())+14+1];
 	sprintf(removehandoffsockname,"%s/%s-removehandoff",
-					tmpdir,cmdlineptr->getId());
+					tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
 	char	string[23+strlen(removehandoffsockname)+1];
 	sprintf(string,"removehandoffsockname: %s",removehandoffsockname);
-	dl->write("connection",1,string);
+	debugPrint("connection",1,string);
 	#endif
 
 	// attach to the socket and write the process id
@@ -168,6 +155,6 @@ void listenercomm::deRegisterForHandoff(char *tmpdir) {
 	removehandoffsockun.write((unsigned long)getpid());
 
 	#ifdef SERVER_DEBUG
-	dl->write("connection",0,"done de-registering for handoff");
+	debugPrint("connection",0,"done de-registering for handoff");
 	#endif
 }

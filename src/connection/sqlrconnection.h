@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2001  David Muse
+// Copyright (c) 1999-2004  David Muse
 // See the file COPYING for more information
 
 #ifndef SQLRCONNECTION_H
@@ -20,13 +20,11 @@
 #include <debugfile.h>
 #include <tempdir.h>
 
-#include <connection/connectioncmdline.h>
 #include <connection/ipc.h>
-#include <connection/scalercomm.h>
 #include <connection/unixsocketseqfile.h>
-#include <connection/listenercomm.h>
 #include <sqlrcursor.h>
 
+#include <cmdline.h>
 
 #include <defines.h>
 
@@ -123,6 +121,40 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		// methods used internally
 		void	setUserAndGroup();
 		bool	initCursors(bool create);
+		void	incrementConnectionCount();
+		void	decrementConnectionCount();
+		void	decrementSessionCount();
+		void	announceAvailability(char *tmpdir,
+					bool passdescriptor,
+					char *unixsocket,
+					unsigned short inetport,
+					char *connectionid);
+		void	registerForHandoff(char *tmpdir);
+		bool	receiveFileDescriptor(int *descriptor);
+		void	deRegisterForHandoff(char *tmpdir);
+		bool	getUnixSocket(char *tmpdir, char *unixsocketptr);
+		int	openSequenceFile(char *tmpdir, char *unixsocketptr);
+		bool	lockSequenceFile();
+		bool	getAndIncrementSequenceNumber(char *unixsocketptr);
+		bool	unLockSequenceFile();
+
+
+		bool		createSharedMemoryAndSemaphores(char *tmpdir,
+								char *id);
+		void		acquireAnnounceMutex();
+		shmdata		*getAnnounceBuffer();
+		void		signalListenerToRead();
+		void		waitForListenerToFinishReading();
+		void		releaseAnnounceMutex();
+		void		acquireConnectionCountMutex();
+		unsigned int	*getConnectionCountBuffer();
+		void		signalScalerToRead();
+		void		releaseConnectionCountMutex();
+		void		acquireSessionCountMutex();
+		unsigned int	*getSessionCountBuffer();
+		void		releaseSessionCountMutex();
+
+
 		sqlrcursor	*getCursor(unsigned short command);
 		sqlrcursor	*findAvailableCursor();
 		void	closeCursors(bool destroy);
@@ -211,12 +243,8 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	setInitialAutoCommitBehavior();
 		bool	openSockets();
 
-		connectioncmdline	*cmdl;
+		cmdline			*cmdl;
 		sqlrconfigfile		*cfgfl;
-		ipc			*ipcptr;
-		listenercomm		*lsnrcom;
-		scalercomm		*sclrcom;
-		unixsocketseqfile	*ussf;
 
 		char			*user;
 		char			*password;
@@ -262,6 +290,17 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		stringlist	sessiontemptablesfortrunc;
 		stringlist	transtemptablesfordrop;
 		stringlist	transtemptablesfortrunc;
+
+		unixclientsocket	handoffsockun;
+		bool			connected;
+
+		char	*connectionid;
+		int	ttl;
+
+		int	sockseq;
+
+		semaphoreset	*semset;
+		sharedmemory	*idmemory;
 
 	protected:
 #ifdef SERVER_DEBUG

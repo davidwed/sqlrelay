@@ -7,10 +7,8 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 
 	cmdl=NULL;
 	cfgfl=NULL;
-	ipcptr=NULL;
-	lsnrcom=NULL;
-	sclrcom=NULL;
-	ussf=NULL;
+	semset=NULL;
+	idmemory=NULL;
 
 	updown=NULL;
 
@@ -30,6 +28,8 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 	autocommit=0;
 	checkautocommit=0;
 	performautocommit=0;
+
+	connected=false;
 
 	// maybe someday these parameters will be configurable
 	bindpool=new memorypool(512,128,100);

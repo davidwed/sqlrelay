@@ -12,9 +12,6 @@ sqlrconnection::~sqlrconnection() {
 
 	delete cmdl;
 	delete cfgfl;
-	delete sclrcom;
-	delete ussf;
-	delete lsnrcom;
 
 	delete[] updown;
 
@@ -28,7 +25,21 @@ sqlrconnection::~sqlrconnection() {
 	debugPrint("connection",0,"done deleting authc");
 	#endif
 
-	delete ipcptr;
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",0,"deleting idmemory...");
+	#endif
+	delete idmemory;
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",0,"done deleting idmemory");
+	#endif
+
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",0,"deleting semset...");
+	#endif
+	delete semset;
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",0,"done deleting semset");
+	#endif
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"deleting unixsocket...");

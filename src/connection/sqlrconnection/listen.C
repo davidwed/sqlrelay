@@ -10,11 +10,11 @@ void sqlrconnection::listen() {
 
 		waitForAvailableDatabase();
 		initSession();
-		lsnrcom->announceAvailability(tmpdir->getString(),
+		announceAvailability(tmpdir->getString(),
 						cfgfl->getPassDescriptor(),
 						unixsocket,
 						inetport,
-						cmdl->getConnectionId());
+						connectionid);
 
 		// loop to handle suspended sessions
 		for (;;) {
@@ -56,7 +56,7 @@ void sqlrconnection::listen() {
 		}
 
 		if (cfgfl->getDynamicScaling()) {
-			sclrcom->decrementSessionCount();
+			decrementSessionCount();
 		}
 	}
 }
@@ -129,7 +129,7 @@ int sqlrconnection::waitForClient() {
 		// receive the descriptor and use it, if we failed to get the
 		// descriptor, delete the socket and return failure
 		int	descriptor;
-		if (!lsnrcom->receiveFileDescriptor(&descriptor)) {
+		if (!receiveFileDescriptor(&descriptor)) {
 
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",1,"pass failed");
