@@ -211,7 +211,7 @@ call getNullsAsEmptyStrings().</p>
 value as a long or double, you can use getOutputBindAsLong() or
 getOutputBindAsDouble().</p>
 
-<p>If you are using Oracle 8 or higher, you can insert data into BLOB
+<p>If you are using Oracle 8i or higher, you can insert data into BLOB
 and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
 
 <blockquote>
@@ -243,7 +243,7 @@ and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
 </pre>
 </blockquote>
 
-<p>Likewise, with Oracle 8, you can retreive BLOB or CLOB data using
+<p>Likewise, with Oracle 8i, you can retreive BLOB or CLOB data using
 defineOutputBindBlob(), defineOutputBindClob(), getOutputBind() and
 getOutputBindLength().</p>
 
@@ -487,7 +487,7 @@ iterate through it's result set, inserting rows into another table, using only
 <p>Prior to SQL Relay version 0.25, you would have had to buffer the first
 result set or use 2 database connections instead of just 1.</p>
 
-<p>If you are using stored procedures with Oracle 8 or higher, a stored
+<p>If you are using stored procedures with Oracle 8i or higher, a stored
 procedure can execute a query and return a cursor.  A cursor bind variable can
 then retrieve that cursor.  Your program can retrieve the result set from the
 cursor.  All of this can be accomplished using defineOutputBindCursor(),
