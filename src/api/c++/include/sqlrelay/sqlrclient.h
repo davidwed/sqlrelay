@@ -319,7 +319,7 @@ class sqlrcursor {
 				// still pending on the server and true if not.
 				// This method can only return false if 
 				// setResultSetBufferSize() has been called
-				// with a parameter other than false.
+				// with a parameter other than 0.
 		
 		
 		const char	*errorMessage();

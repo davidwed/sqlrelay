@@ -1,15 +1,5 @@
-sockseq is becoming a socket on freebsd
-
-looks like more than maxconnections can be started -
-	scaler can apparantly loop back and start another connection before
-	the first connection increments the connection count
-
-do some benchmarking/profiling
-
---------------------------------------------------------------------------------
-
-people have been reporting freetds problems -
-	may be the version of freetds though
+don't just toggle TCP_NODELAY to flush write buffer, redesign protocol so it
+	doesn't do so many write()'s or read()'s
 
 bulk DML methods
 
@@ -275,6 +265,7 @@ API's:
 	D
 	dbstep
 	ADODB driver
+	PHP5 Creole driver
 		
 
 Native DB Support:

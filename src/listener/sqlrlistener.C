@@ -1018,7 +1018,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		semset->dontRemove();
 
 		cleanUp();
-		_exit(0);
+		exit(0);
 	}
 
 	#ifdef SERVER_DEBUG
