@@ -140,7 +140,7 @@ int	sqlrconnection::endSession() {
 
 int	sqlrconnection::suspendSession() {
 
-	if (!connected && !openSession()) {
+	if (!openSession()) {
 		return 0;
 	}
 
@@ -171,7 +171,7 @@ int	sqlrconnection::suspendSession() {
 
 int	sqlrconnection::getConnectionPort() {
 
-	if (!suspendsessionsent && !connected && !openSession()) {
+	if (!suspendsessionsent && !openSession()) {
 		return 0;
 	}
 
@@ -188,7 +188,7 @@ int	sqlrconnection::getConnectionPort() {
 
 char	*sqlrconnection::getConnectionSocket() {
 
-	if (!suspendsessionsent && !connected && !openSession()) {
+	if (!suspendsessionsent && !openSession()) {
 		return NULL;
 	}
 
@@ -332,7 +332,7 @@ int	sqlrconnection::getNewPort() {
 
 int	sqlrconnection::ping() {
 
-	if (!connected && !openSession()) {
+	if (!openSession()) {
 		return 0;
 	}
 
@@ -357,7 +357,7 @@ int	sqlrconnection::ping() {
 
 char	*sqlrconnection::identify() {
 
-	if (!connected && !openSession()) {
+	if (!openSession()) {
 		return 0;
 	}
 
@@ -404,7 +404,7 @@ int	sqlrconnection::autoCommitOff() {
 
 int	sqlrconnection::autoCommit(unsigned short on) {
 
-	if (!connected && !openSession()) {
+	if (!openSession()) {
 		return 0;
 	}
 
@@ -433,7 +433,7 @@ int	sqlrconnection::autoCommit(unsigned short on) {
 
 int	sqlrconnection::commit() {
 
-	if (!connected && !openSession()) {
+	if (!openSession()) {
 		return 0;
 	}
 
@@ -456,7 +456,7 @@ int	sqlrconnection::commit() {
 
 int	sqlrconnection::rollback() {
 
-	if (!connected && !openSession()) {
+	if (!openSession()) {
 		return 0;
 	}
 
@@ -632,6 +632,10 @@ void	sqlrconnection::clearSessionFlags() {
 }
 
 int	sqlrconnection::openSession() {
+
+	if (connected) {
+		return 1;
+	}
 
 	if (debug) {
 		debugPreStart();
@@ -1245,195 +1249,92 @@ char	**sqlrcursor::getColumnNames() {
 }
 
 char	*sqlrcursor::getColumnName(int col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<(int)colcount) {
-		return getColumn(col)->name;
-	}
-	return NULL;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->name:NULL;
 }
 
 char	*sqlrcursor::getColumnType(int col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<(int)colcount) {
-		column	*whichcolumn=getColumn(col);
+	column	*whichcol=getColumn(col);
+	if (whichcol) {
 		if (columntypeformat!=COLUMN_TYPE_IDS) {
-			return whichcolumn->typestring;
+			return whichcol->typestring;
+		} else {
+			return datatypestring[whichcol->type];
 		}
-		return datatypestring[whichcolumn->type];
 	}
 	return NULL;
 }
 
 int	sqlrcursor::getColumnLength(int col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<(int)colcount) {
-		return getColumn(col)->length;
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->length:0;
 }
 
 unsigned long	sqlrcursor::getColumnPrecision(int col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<(int)colcount) {
-		return getColumn(col)->precision;
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->precision:0;
 }
 
 unsigned long	sqlrcursor::getColumnScale(int col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<(int)colcount) {
-		return getColumn(col)->scale;
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->scale:0;
 }
 
 unsigned short	sqlrcursor::getColumnIsNullable(int col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<(int)colcount) {
-		return getColumn(col)->nullable;
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->nullable:0;
 }
 
 unsigned short	sqlrcursor::getColumnIsPrimaryKey(int col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<(int)colcount) {
-		return getColumn(col)->primarykey;
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->primarykey:0;
 }
 
 int	sqlrcursor::getLongest(int col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO &&
-			colcount && col>=0 && col<(int)colcount) {
-		return getColumn(col)->longest;
-	} 
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->longest:0;
 }
 
 char	*sqlrcursor::getColumnType(const char *col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO) {
-		column	*whichcolumn;
-		for (unsigned long i=0; i<colcount; i++) {
-			whichcolumn=getColumn(i);
-			if (!strcasecmp(whichcolumn->name,col)) {
-				if (columntypeformat!=COLUMN_TYPE_IDS) {
-					return whichcolumn->typestring;
-				}
-				return datatypestring[whichcolumn->type];
-			}
+	column	*whichcol=getColumn(col);
+	if (whichcol) {
+		if (columntypeformat!=COLUMN_TYPE_IDS) {
+			return whichcol->typestring;
+		} else {
+			return datatypestring[whichcol->type];
 		}
 	}
 	return NULL;
 }
 
 int	sqlrcursor::getColumnLength(const char *col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO) {
-		column	*whichcolumn;
-		for (unsigned long i=0; i<colcount; i++) {
-			whichcolumn=getColumn(i);
-			if (!strcasecmp(whichcolumn->name,col)) {
-				return whichcolumn->length;
-			}
-		}
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->length:0;
 }
 
 unsigned long	sqlrcursor::getColumnPrecision(const char *col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO) {
-		column	*whichcolumn;
-		for (unsigned long i=0; i<colcount; i++) {
-			whichcolumn=getColumn(i);
-			if (!strcasecmp(whichcolumn->name,col)) {
-				return whichcolumn->precision;
-			}
-		}
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->precision:0;
 }
 
 unsigned long	sqlrcursor::getColumnScale(const char *col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO) {
-		column	*whichcolumn;
-		for (unsigned long i=0; i<colcount; i++) {
-			whichcolumn=getColumn(i);
-			if (!strcasecmp(whichcolumn->name,col)) {
-				return whichcolumn->scale;
-			}
-		}
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->scale:0;
 }
 
 unsigned short	sqlrcursor::getColumnIsNullable(const char *col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO) {
-		column	*whichcolumn;
-		for (unsigned long i=0; i<colcount; i++) {
-			whichcolumn=getColumn(i);
-			if (!strcasecmp(whichcolumn->name,col)) {
-				return whichcolumn->nullable;
-			}
-		}
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->nullable:0;
 }
 
 unsigned short	sqlrcursor::getColumnIsPrimaryKey(const char *col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO) {
-		column	*whichcolumn;
-		for (unsigned long i=0; i<colcount; i++) {
-			whichcolumn=getColumn(i);
-			if (!strcasecmp(whichcolumn->name,col)) {
-				return whichcolumn->nullable;
-			}
-		}
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->primarykey:0;
 }
 
 int	sqlrcursor::getLongest(const char *col) {
-
-	if (sendcolumninfo==SEND_COLUMN_INFO && 
-			sentcolumninfo==SEND_COLUMN_INFO) {
-		column	*whichcolumn;
-		for (unsigned long i=0; i<colcount; i++) {
-			whichcolumn=getColumn(i);
-			if (!strcasecmp(whichcolumn->name,col)) {
-				return whichcolumn->longest;
-			}
-		}
-	}
-	return 0;
+	column	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->longest:0;
 }
 
 void	sqlrcursor::cacheData() {
@@ -1511,7 +1412,6 @@ int	sqlrcursor::colCount() {
 }
 
 char	*sqlrcursor::errorMessage() {
-
 	if (error) {
 		return error;
 	} else if (sqlrc->error) {
@@ -1996,7 +1896,8 @@ int	sqlrcursor::parseData() {
 				}
 				totallength=totallength+length;
 
-				if ((unsigned long)getString(buffer,length)!=length) {
+				if ((unsigned long)getString(buffer,length)!=
+								length) {
 					delete[] buffer;
 					return -1;
 				}
@@ -2167,7 +2068,8 @@ int	sqlrcursor::parseOutputBinds() {
 				}
 				totallength=totallength+length;
 
-				if ((unsigned long)getString(buffer,length)!=length) {
+				if ((unsigned long)getString(buffer,length)!=
+								length) {
 					delete[] buffer;
 					return -1;
 				}
@@ -2590,13 +2492,13 @@ int	sqlrcursor::parseColumnInfo() {
 
 			// get whether the column is nullable
 			if (getShort(&currentcol->nullable)!=
-						sizeof(unsigned long)) {
+						sizeof(unsigned short)) {
 				return -1;
 			}
 
 			// get whether the column is a primary key
 			if (getShort(&currentcol->primarykey)!=
-						sizeof(unsigned long)) {
+						sizeof(unsigned short)) {
 				return -1;
 			}
 
@@ -2664,10 +2566,29 @@ void	sqlrcursor::createColumnBuffers() {
 }
 
 column	*sqlrcursor::getColumn(int index) {
-	if (index<OPTIMISTIC_COLUMN_COUNT) {
-		return &columns[index];
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO &&
+			colcount && index>=0 && index<(int)colcount) {
+		if (index<OPTIMISTIC_COLUMN_COUNT) {
+			return &columns[index];
+		}
+		return &extracolumns[index-OPTIMISTIC_COLUMN_COUNT];
 	}
-	return &extracolumns[index-OPTIMISTIC_COLUMN_COUNT];
+	return NULL;
+}
+
+column	*sqlrcursor::getColumn(const char *name) {
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO) {
+		column	*whichcolumn;
+		for (unsigned long i=0; i<colcount; i++) {
+			whichcolumn=getColumn(i);
+			if (!strcasecmp(whichcolumn->name,name)) {
+				return whichcolumn;
+			}
+		}
+	}
+	return NULL;
 }
 
 void	sqlrcursor::abortResultSet() {
@@ -3293,16 +3214,18 @@ int	sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	// add the path to the fullpath
 	int	index=0;
 	int	counter=0;
-	while (path[index] && counter<MAXPATHLEN) {
-		fullpath[counter]=path[index];
-		index++;
-		counter++;
-	}
+	if (path) {
+		while (path[index] && counter<MAXPATHLEN) {
+			fullpath[counter]=path[index];
+			index++;
+			counter++;
+		}
 
-	// add the "/" to the fullpath
-	if (counter<=MAXPATHLEN) {
-		fullpath[counter]='/';
-		counter++;
+		// add the "/" to the fullpath
+		if (counter<=MAXPATHLEN) {
+			fullpath[counter]='/';
+			counter++;
+		}
 	}
 
 	// add the file to the fullpath
@@ -3323,8 +3246,10 @@ int	sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("File name ");
-			sqlrc->debugPrint((char *)path);
-			sqlrc->debugPrint("/");
+			if (path) {
+				sqlrc->debugPrint((char *)path);
+				sqlrc->debugPrint("/");
+			}
 			sqlrc->debugPrint((char *)filename);
 			sqlrc->debugPrint(" is too long.");
 			sqlrc->debugPrint("\n");
@@ -4053,7 +3978,7 @@ int	sqlrcursor::sendQueryInternal(const char *query) {
 	}
 	clearResultSet();
 
-	if (!sqlrc->connected && !sqlrc->openSession()) {
+	if (!sqlrc->openSession()) {
 		return 0;
 	}
 

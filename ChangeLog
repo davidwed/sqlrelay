@@ -29,6 +29,9 @@
 		on the server for getColumnLength now
 	added support for determining whether a column is nullable or a primary
 		key for databases that support it
+	fixed a bug where supplying a NULL path in sendFileQuery() would cause
+		a crash
+	fixed a bug where NULL binds weren't being faked at all
 
 0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
 	added -lstdc++ to libs if using gcc3

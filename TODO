@@ -1,6 +1,7 @@
-implement nullable, primary key, precision, scale in non c++ api's
+does "=NULL" have to be translated to "is NULL" in fake binds?
 
-implement nullable,primary key for connections
+implement nullable, primary key, precision, scale in non c++ api's
+nullable,primary key isn't implemented for many connections
 
 is there a better way to get a column's precision in interbase
 precision/scale in postgresql

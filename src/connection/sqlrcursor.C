@@ -411,6 +411,8 @@ void	sqlrcursor::performSubstitution(stringbuffer *buffer, int which) {
 		buffer->append(inbindvars[which].value.doubleval.value,
 				inbindvars[which].value.doubleval.precision,
 				inbindvars[which].value.doubleval.scale);
+	} else if (inbindvars[which].type==NULL_BIND) {
+		buffer->append("NULL");
 	}
 }
 
