@@ -15,7 +15,7 @@ extern "C" {
 
 typedef unsigned long long	my_ulonglong;
 typedef bool			my_bool;
-typedef unsigned long long	MYSQL_ROW_OFFSET;
+typedef my_ulonglong *		MYSQL_ROW_OFFSET;
 typedef unsigned int		MYSQL_FIELD_OFFSET;
 
 enum enum_mysql_set_option { MYSQL_SET_OPTION_UNKNOWN_OPTION };
@@ -125,7 +125,8 @@ typedef char **MYSQL_ROW;
 struct MYSQL_RES {
 	sqlrcursor		*sqlrcur;
 	unsigned int		errno;
-	MYSQL_ROW_OFFSET	currentrow;
+	my_ulonglong		previousrow;
+	my_ulonglong		currentrow;
 	MYSQL_FIELD_OFFSET	currentfield;
 	MYSQL_FIELD		*fields;
 };
@@ -584,9 +585,7 @@ my_ulonglong mysql_insert_id(MYSQL *mysql) {
 
 
 MYSQL_RES *mysql_store_result(MYSQL *mysql) {
-	MYSQL_RES	*retval=mysql->currentstmt->result;
-	mysql->currentstmt->result=NULL;
-	return retval;
+	return mysql->currentstmt->result;
 }
 
 MYSQL_RES *mysql_use_result(MYSQL *mysql) {
@@ -648,7 +647,7 @@ unsigned long *mysql_fetch_lengths(MYSQL_RES *result) {
 }
 
 unsigned int mysql_field_count(MYSQL *mysql) {
-	return mysql->currentstmt->result->sqlrcur->colCount();
+	return mysql_num_fields(mysql->currentstmt->result);
 }
 
 MYSQL_FIELD_OFFSET mysql_field_seek(MYSQL_RES *result,
@@ -668,35 +667,38 @@ my_ulonglong mysql_num_rows(MYSQL_RES *result) {
 }
 
 my_ulonglong mysql_affected_rows(MYSQL *mysql) {
-	return mysql->currentstmt->result->sqlrcur->affectedRows();
+	return mysql_stmt_affected_rows(mysql->currentstmt);
 }
 
+
+// FIXME: MYSQL_ROW_OFFSET is (or could be) smaller than my_ulonglong
 MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result, MYSQL_ROW_OFFSET offset) {
-	my_ulonglong	oldrow=result->currentrow;
-	result->currentrow=result->currentrow+offset;
-	return oldrow;
+	result->previousrow=result->currentrow;
+	result->currentrow=(my_ulonglong)offset;
+	return (MYSQL_ROW_OFFSET)result->previousrow;
 }
 
-// FIXME: this should return MYSQL_ROWS * for mysql-3
+// FIXME: MYSQL_ROW_OFFSET is (or could be) smaller than my_ulonglong
 MYSQL_ROW_OFFSET mysql_row_tell(MYSQL_RES *result) {
-	return result->currentrow;
+	return (MYSQL_ROW_OFFSET)result->currentrow;
 }
 
 void mysql_data_seek(MYSQL_RES *result, my_ulonglong offset) {
+	result->previousrow=result->currentrow;
 	result->currentrow=offset;
 }
 
 MYSQL_ROW mysql_fetch_row(MYSQL_RES *result) {
 	MYSQL_ROW	retval=result->sqlrcur->getRow(result->currentrow);
 	if (retval) {
+		result->previousrow=result->currentrow;
 		result->currentrow++;
 	}
 	return retval;
 }
 
 my_bool mysql_eof(MYSQL_RES *result) {
-	MYSQL_ROW_OFFSET	rowcount=
-		(MYSQL_ROW_OFFSET)result->sqlrcur->rowCount();
+	my_ulonglong	rowcount=(my_ulonglong)result->sqlrcur->rowCount();
 	return (!rowcount || result->currentrow>=rowcount);
 }
 
@@ -991,6 +993,7 @@ enum enum_field_types map_col_type(const char *columntype) {
 
 int mysql_execute(MYSQL_STMT *stmt) {
 
+	stmt->result->previousrow=0;
 	stmt->result->currentrow=0;
 	stmt->result->currentfield=0;
 	sqlrcursor	*sqlrcur=stmt->result->sqlrcur;
@@ -1179,7 +1182,7 @@ my_bool mysql_send_long_data(MYSQL_STMT *stmt,
 
 
 my_ulonglong mysql_stmt_num_rows(MYSQL_STMT *stmt) {
-	return stmt->result->sqlrcur->rowCount();
+	return mysql_num_rows(stmt->result);
 }
 
 my_ulonglong mysql_stmt_affected_rows(MYSQL_STMT *stmt) {
@@ -1188,17 +1191,15 @@ my_ulonglong mysql_stmt_affected_rows(MYSQL_STMT *stmt) {
 
 MYSQL_ROW_OFFSET mysql_stmt_row_seek(MYSQL_STMT *stmt,
 					MYSQL_ROW_OFFSET offset) {
-	MYSQL_ROW_OFFSET	oldrow=stmt->result->currentrow;
-	stmt->result->currentrow=stmt->result->currentrow+offset;
-	return oldrow;
+	return mysql_row_seek(stmt->result,offset);
 }
 
 MYSQL_ROW_OFFSET mysql_stmt_row_tell(MYSQL_STMT *stmt) {
-	return stmt->result->currentrow;
+	return mysql_row_tell(stmt->result);
 }
 
 void mysql_stmt_data_seek(MYSQL_STMT *stmt, my_ulonglong offset) {
-	stmt->result->currentrow=offset;
+	mysql_data_seek(stmt->result,offset);
 }
 
 
