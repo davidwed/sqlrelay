@@ -11,16 +11,18 @@ ifeq ($(UNAME),Linux)
 		$(abs_srcdir)/mkinstalldirs $(initroot)/etc/sysconfig; \
 		$(INSTALL) -m 755 redhat/init.d/sqlrelay $(initroot)/etc/rc.d/init.d; \
 		$(INSTALL) -m 644 redhat/sysconfig/sqlrelay $(initroot)/etc/sysconfig; \
-	fi; \
-	if ( test -r "/etc/rc.d/rc.inet2" -a -d "/etc/rc.d" -a -d "/var/lock/subsys" ); then \
-		$(abs_srcdir)/mkinstalldirs $(initroot)/etc/rc.d; \
-		$(INSTALL) -m 755 slackware/rc.d/rc.sqlrelay $(initroot)/etc/rc.d; \
-		$(INSTALL) -m 644 slackware/sqlrelay $(initroot)/etc; \
-	fi; \
-	if ( test -r "/etc/init.d" -a -d "/var/lock" ); then \
-		$(abs_srcdir)/mkinstalldirs $(initroot)/etc/init.d; \
-		$(INSTALL) -m 755 debian/init.d/sqlrelay $(initroot)/etc/init.d; \
-		$(INSTALL) -m 644 debian/sqlrelay $(initroot)/etc; \
+	else \
+		if ( test -r "/etc/rc.d/rc.inet2" -a -d "/etc/rc.d" -a -d "/var/lock/subsys" ); then \
+			$(abs_srcdir)/mkinstalldirs $(initroot)/etc/rc.d; \
+			$(INSTALL) -m 755 slackware/rc.d/rc.sqlrelay $(initroot)/etc/rc.d; \
+			$(INSTALL) -m 644 slackware/sqlrelay $(initroot)/etc; \
+		else \
+			if ( test -r "/etc/init.d" -a -d "/var/lock" ); then \
+				$(abs_srcdir)/mkinstalldirs $(initroot)/etc/init.d; \
+				$(INSTALL) -m 755 debian/init.d/sqlrelay $(initroot)/etc/init.d; \
+				$(INSTALL) -m 644 debian/sqlrelay $(initroot)/etc; \
+			fi; \
+		fi; \
 	fi
 endif
 ifeq ($(UNAME),NetBSD)

@@ -306,6 +306,7 @@ echo "******************************"
 
 
 FW_CHECK_MICROSOFT
+FW_CHECK_STDCPP
 
 dnl Checks for inline keyword
 echo

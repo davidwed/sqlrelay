@@ -405,7 +405,7 @@ fi
 
 
 %clean
-#rm -rf %{buildroot}
+rm -rf %{buildroot}
 
 
 %files

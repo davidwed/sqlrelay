@@ -27,13 +27,13 @@ start(){
             echo -n $"Launching instance with id '${connid}':"
             sqlr-start -id ${connid} >/dev/null 2>&1
             RETVAL=$?
-            [ $RETVAL -eq 0 ] && success || failure
+            [ $RETVAL -eq 0 ] && echo "success" || echo "failure"
             launched=1
         done
-        [ "$launched" -eq 1 ] || passed
+        [ "$launched" -eq 1 ] || echo "passed"
         echo
     else
-        failure
+        echo "failure"
     fi
     [ $RETVAL -eq 0 ] && touch /var/lock/sqlrelay
     return $RETVAL
@@ -43,7 +43,7 @@ stop(){
     echo -n $"Stopping SQL Relay: "
     sqlr-stop >/dev/null 2>&1
     RETVAL=$?
-    [ $RETVAL -eq 0 ] && success || failure
+    [ $RETVAL -eq 0 ] && echo "success" || echo "failure"
     echo
     [ $RETVAL -eq 0 ] && rm -f /var/lock/sqlrelay
     return $RETVAL

@@ -1,3 +1,7 @@
+0.33.1 - fixed double-install of /etc/init.d/sqlrelay on redhat
+	added -lstdc++ to libs if using gcc3
+	applied fixes to commandline clients
+
 0.33 -	configure script figures out rpm build directory better
 	added sane defaults for every configfile parameter
 	updated dtd

@@ -8,7 +8,7 @@ WriteMakefile(
 	'VERSION_FROM'	=> "SQLRConnection.pm",
 	'CC'		=> "@CXX@",
 	'INC'		=> "-I../../../.. -I../../../common -I../../c++/include @RUDIMENTSINCLUDES@",
-	'LIBS'		=> ["-L../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @SOCKETLIB@ @LIBDMALLOC@"],
+	'LIBS'		=> ["-L../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @STDCPPLIB@ @SOCKETLIB@ @LIBDMALLOC@"],
 	'XSPROTOARG'	=> "-noprototypes",
 	'LD'		=> "@CXX@",
 	'TYPEMAPS'	=> ["perlobject.map"],

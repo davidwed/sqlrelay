@@ -278,6 +278,19 @@ AC_DEFINE_UNQUOTED(INLINE,$INLINE,Some compliers don't support the inline keywor
 ])
 
 
+dnl if gcc3 is used then we must link against libstdc++
+AC_DEFUN([FW_CHECK_STDCPP],
+[
+	CXX_VERSION=`$CXX --version | grep " 3\."`
+	if ( test -n "$CXX_VERSION" )
+	then
+		STDCPPLIB="-lstdc++"
+	else
+		STDCPPLIB=""
+	fi
+	AC_SUBST(STDCPPLIB)
+])
+
 dnl checks for the pthreads library
 dnl requires:  PTHREADSPATH, RPATHFLAG, cross_compiling
 dnl sets the substitution variable PTHREADSLIB
@@ -325,14 +338,6 @@ else
 fi
 AC_SUBST(PTHREADSLIB)
 ])
-
-
-
-
-
-
-
-
 
 
 dnl checks for the rudiments library

@@ -133,7 +133,6 @@ Availability:
 	if a connection dies mysteriously, a new one should fire up
 
 backends:
-	nss_sqlrelay
 	pam_sqlrelay
 	mod_auth_sqlrelay for apache
 	samba auth module
