@@ -43,43 +43,43 @@ ifneq ($(strip $(SYBASELIBS)),)
 endif
 
 db2.class: db2.java
-	javac -classpath $$CLASSPATH:$(javadir) db2.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) db2.java
 
 freetds.class: freetds.java
-	javac -classpath $$CLASSPATH:$(javadir) freetds.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) freetds.java
 
 interbase.class: interbase.java
-	javac -classpath $$CLASSPATH:$(javadir) interbase.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) interbase.java
 
 lago.class: lago.java
-	javac -classpath $$CLASSPATH:$(javadir) lago.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) lago.java
 
 msql.class: msql.java
-	javac -classpath $$CLASSPATH:$(javadir) msql.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) msql.java
 
 mysql.class: mysql.java
-	javac -classpath $$CLASSPATH:$(javadir) mysql.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) mysql.java
 
 oracle7.class: oracle7.java
-	javac -classpath $$CLASSPATH:$(javadir) oracle7.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) oracle7.java
 
 oracle8.class: oracle8.java
-	javac -classpath $$CLASSPATH:$(javadir) oracle8.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) oracle8.java
 
 oracle8i.class: oracle8i.java
-	javac -classpath $$CLASSPATH:$(javadir) oracle8i.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) oracle8i.java
 
 postgresql6.class: postgresql6.java
-	javac -classpath $$CLASSPATH:$(javadir) postgresql6.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) postgresql6.java
 
 postgresql7.class: postgresql7.java
-	javac -classpath $$CLASSPATH:$(javadir) postgresql7.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) postgresql7.java
 
 sqlite.class: sqlite.java
-	javac -classpath $$CLASSPATH:$(javadir) sqlite.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) sqlite.java
 
 sybase.class: sybase.java
-	javac -classpath $$CLASSPATH:$(javadir) sybase.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir) sybase.java
 
 
 rebuild.class: clean all
