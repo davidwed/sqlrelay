@@ -17,7 +17,7 @@ RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v En
 endif
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(RUBYUSERPATH),yes)
@@ -66,7 +66,7 @@ clean:
 rebuild: clean all
 
 libsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(RUBYDIR)/site-packages/SQLRelay $(RPATH) -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(RUBYDIR)/site-packages/SQLRelay $(RPATH) -module -no-undefined $(LIBS)
 
 sqlrelay.so:
 	if ( test -r .libs/libsqlrelay.0.0.0 ); \
