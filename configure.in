@@ -1175,6 +1175,16 @@ if ( test "$ENABLE_FREETDS" = "yes" ); then
 	
 	if ( test -z "$FREETDSLIBS" ); then
 		AC_MSG_WARN("FreeTDS support will not be built.")
+	else
+		AC_LANG(C++)
+		AC_MSG_CHECKING(whether ctpublic.h contains function definitions)
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$FREETDSINCLUDES"
+		AC_TRY_COMPILE([#include <ctpublic.h>
+		#include <stdlib.h>],
+		CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions),AC_MSG_RESULT(no))
+		CPPFLAGS="$TEMPCPPFLAGS"
+		AC_LANG(C)
 	fi
 	echo "******************************"
 fi
@@ -1613,11 +1623,16 @@ if ( test "$ENABLE_PERL" = "yes" ); then
 	fi
 	if ( test -n "$PERL" ); then
 		HAVE_PERL="yes"
+		PERLPREFIXCMD=`$PERL -V:prefix`
+echo $PERLPREFIXCMD
+		PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
+echo $PERLPREFIX
 	else
 		AC_MSG_WARN("The Perl API will not be built.")
 	fi
 	AC_SUBST(HAVE_PERL)
 	AC_SUBST(PERL)
+	AC_SUBST(PERLPREFIX)
 	echo "******************************"
 fi
 

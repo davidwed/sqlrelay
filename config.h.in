@@ -16,6 +16,9 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* Some versions of FreeTDS have function definitions */
+#undef HAVE_FREETDS_FUNCTION_DEFINITIONS
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

@@ -1,8 +1,8 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-// the cs_ functions are not defined in any header file, I guess
-// C allows that...  C++ does not however, so here they are
+// in freetds prior to 0.61, the cs_ functions are not defined in any header
+// file. C allows that...  C++ does not, so here they are
 extern	CS_INT	cs_ctx_alloc(CS_INT,CS_CONTEXT **);
 extern	CS_INT	ct_init(CS_CONTEXT *,CS_INT);
 extern	CS_INT	ct_callback(CS_CONTEXT *,CS_CONNECTION *,

@@ -27,10 +27,10 @@ clean:
 rebuild: clean all
 
 libsqlrclientwrapper.la: $(SRCS) $(NLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) -L$(abs_srcdir)/src/api/c++/src -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) $(abs_srcdir)/src/api/c++/src/libsqlrclient.la $(RUDIMENTSLIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 libsqlrclientwrapper_p.la: $(SRCS) $(PLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -L$(abs_srcdir)/src/api/c++/src -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient_p $(RUDIMENTSDEBUGLIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) $(abs_srcdir)/src/api/c++/src/libsqlrclient_p.la $(RUDIMENTSDEBUGLIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)

@@ -1,9 +1,9 @@
 /* Copyright (c) 2000  Adam Kropielnicki
    See the file COPYING for more information */
 
-#include "phpincludes.h"
-
 #include "sqlrelay/sqlrclient.h"
+
+#include "phpincludes.h"
 
 extern "C" {
 

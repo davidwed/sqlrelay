@@ -1,11 +1,17 @@
-apparantly freetds 0.61 defines it's functions
+tgz problems:
+	make prefix=... install screws up ruby install
+		because it overrides DESTDIR
+
+
 postgresql test program compile fails on SCO
 can't find pthreads lib on SCO
 
 compatibility:
+	oracle 9.2
 	sybase 12.5
 	interbase 6.5
 	interbase 7
+	perl 5.8
 
 lots of documentation fixes:
 	db2 8.1 installation
@@ -13,6 +19,7 @@ lots of documentation fixes:
 	db2 7.1 startup directions are wrong;
 		you have to run db2start/db2shut as db2as
 	fix clientapis.html
+	oracle 9.2 installation
 
 Tests:
 	zope
@@ -61,7 +68,6 @@ Security:
 	SSL encryption
 
 Packages:
-	Slackware
 	FreeBSD
 	NetBSD
 	OpenBSD

@@ -10,7 +10,7 @@ WriteMakefile(
 	'CC'		=> "@CXX@",
 	'CCFLAGS'	=> "-pedantic",
 	'INC'		=> "-I../../../.. -I../../../common -I../../c++/include @RUDIMENTSINCLUDES@",
-	'LIBS'		=> ["-L../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @SOCKETLIB@ @LIBDMALLOC@"],
+	'LIBS'		=> ["../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @SOCKETLIB@ @LIBDMALLOC@"],
 	'XSPROTOARG'	=> "-noprototypes",
 	#'LD'		=> "@PERLLD@",
 	'LD'		=> "@CXX@",

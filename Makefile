@@ -73,7 +73,7 @@ distclean: unconfig
 
 tgz: all
 	mkdir /tmp/sqlrelay-$(SQLR_VERSION)
-	make prefix=/tmp/sqlrelay-$(SQLR_VERSION)/$(prefix) install
+	make prefix=/tmp/sqlrelay-$(SQLR_VERSION)/$(prefix) PYTHONDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(PYTHONDIR) PHPEXTDIR=/tmp/sqlrelay-$(SQLR_VERSION)/$(PHPEXTDIR) PREFIX=/tmp/sqlrelay-$(SQLR_VERSION)/$(PERLPREFIX) DESTDIR=/tmp/sqlrelay-$(SQLR_VERSION) initroot=/tmp/sqlrelay-$(SQLR_VERSION) install
 	cd /tmp/sqlrelay-$(SQLR_VERSION); makepkg sqlrelay-$(SQLR_VERSION).tgz
 	mv /tmp/sqlrelay-$(SQLR_VERSION)/sqlrelay-$(SQLR_VERSION).tgz $(PWD)
 	$(RMTREE) /tmp/sqlrelay-$(SQLR_VERSION)

@@ -468,7 +468,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS LDFLAGS CFLAGS CXXFLAGS DEBUGCXXFLAGS DEBUGCFLAGS LIBDMALLOC LIBEFENCE build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S ECHO RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP EGREP LIBTOOL CXX ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE AR PS UNAME MINGW32 CYGWIN UWIN DYNAMICAR PERLLD PERLLDFLAGS PTHREADSLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSDEBUGLIBS READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB SSLLIB CRYPTOLIB ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCSTATIC DB2INCLUDES DB2LIBS DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASESTATIC PERL HAVE_PERL HAVE_PYTHON PYTHONINCLUDES PYTHONLIBS PYTHONOBJ PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS LDFLAGS CFLAGS CXXFLAGS DEBUGCXXFLAGS DEBUGCFLAGS LIBDMALLOC LIBEFENCE build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S ECHO RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP EGREP LIBTOOL CXX ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE AR PS UNAME MINGW32 CYGWIN UWIN DYNAMICAR PERLLD PERLLDFLAGS PTHREADSLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSDEBUGLIBS READLINELIB SOCKETLIB XNETLIB NSLLIB DLLIB AIOLIB SSLLIB CRYPTOLIB ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCSTATIC DB2INCLUDES DB2LIBS DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONLIBS PYTHONOBJ PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -12902,6 +12902,68 @@ fi
 	if ( test -z "$FREETDSLIBS" ); then
 		{ echo "$as_me:$LINENO: WARNING: \"FreeTDS support will not be built.\"" >&5
 echo "$as_me: WARNING: \"FreeTDS support will not be built.\"" >&2;}
+	else
+		ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		echo "$as_me:$LINENO: checking whether ctpublic.h contains function definitions" >&5
+echo $ECHO_N "checking whether ctpublic.h contains function definitions... $ECHO_C" >&6
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$FREETDSINCLUDES"
+
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <ctpublic.h>
+		#include <stdlib.h>
+int
+main ()
+{
+CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6;
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_FREETDS_FUNCTION_DEFINITIONS 1
+_ACEOF
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+		CPPFLAGS="$TEMPCPPFLAGS"
+		ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
 	fi
 	echo "******************************"
 fi
@@ -14782,10 +14844,15 @@ fi
 	fi
 	if ( test -n "$PERL" ); then
 		HAVE_PERL="yes"
+		PERLPREFIXCMD=`$PERL -V:prefix`
+echo $PERLPREFIXCMD
+		PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
+echo $PERLPREFIX
 	else
 		{ echo "$as_me:$LINENO: WARNING: \"The Perl API will not be built.\"" >&5
 echo "$as_me: WARNING: \"The Perl API will not be built.\"" >&2;}
 	fi
+
 
 
 	echo "******************************"
@@ -19114,6 +19181,7 @@ s,@INTERBASELIBS@,$INTERBASELIBS,;t t
 s,@INTERBASESTATIC@,$INTERBASESTATIC,;t t
 s,@PERL@,$PERL,;t t
 s,@HAVE_PERL@,$HAVE_PERL,;t t
+s,@PERLPREFIX@,$PERLPREFIX,;t t
 s,@HAVE_PYTHON@,$HAVE_PYTHON,;t t
 s,@PYTHONINCLUDES@,$PYTHONINCLUDES,;t t
 s,@PYTHONLIBS@,$PYTHONLIBS,;t t

@@ -3,8 +3,8 @@ include ../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util $(RUDIMENTSINCLUDES)
-LIBS = $(RUDIMENTSLIBS) -L$(abs_srcdir)/src/util -lsqlrutil $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) -L$(abs_srcdir)/src/util -lsqlrutil_p $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(RUDIMENTSLIBS) $(abs_srcdir)/src/util/libsqlrutil.la $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) $(abs_srcdir)/src/util/libsqlrutil_p.la $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = scaler.C main.C
 NLOBJS = scaler.n.lo main.n.lo

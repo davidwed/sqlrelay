@@ -18,7 +18,9 @@
 
 extern "C" {
 	#include <ctpublic.h>
-	#include <ctfunctions.h>
+	#ifndef HAVE_FREETDS_FUNCTION_DEFINITIONS
+		#include <ctfunctions.h>
+	#endif
 }
 
 class freetdsconnection;
