@@ -23,14 +23,19 @@ all:
 	if ( test ! -r libsql_relay.la ); then \
 		cp phpincludes2.h phpincludes.h; \
 		$(MAKE) libsql_relay.la 2> errors2; \
-	fi
-	if ( test ! -r libsql_relay.la ); then \
-		if ( test -s errors1 ); then \
-			echo "first try errors : "; cat errors1; echo; \
+		if ( test ! -r libsql_relay.la ); then \
+			if ( test -s errors1 ); then \
+				echo "first try errors : "; cat errors1; echo; \
+			fi; \
+			if ( test -s errors2 ); then \
+				echo "second try errors : "; cat errors2; echo; \
+			fi; \
+			exit 1; \
+		else \
+			cat errors2; \
 		fi; \
-		if ( test -s errors2 ); then \
-			echo "second try errors : "; cat errors2; echo; \
-		fi; \
+	else \
+		cat errors1; \
 	fi
 	$(RM) errors1
 	$(RM) errors2

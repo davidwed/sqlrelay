@@ -2,8 +2,8 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-PERLCCFLAGS = $(DESTDIR)$(shell eval "export `$(PERL) -V:ccflags`"; echo $$ccflags | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend|g' -e 's| -x03||g' )
-PERLOPTIMIZE = $(DESTDIR)$(shell eval "export `$(PERL) -V:optimize`"; echo $$optimize | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend|g' -e 's| -x03||g' )
+PERLCCFLAGS = $(DESTDIR)$(shell eval "export `$(PERL) -V:ccflags`"; echo $$ccflags | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend||g' -e 's| -x03||g' )
+PERLOPTIMIZE = $(DESTDIR)$(shell eval "export `$(PERL) -V:optimize`"; echo $$optimize | sed -e 's| -belf||g' -e 's| -KPIC||g' -e 's| -xdepend||g' -e 's| -x03||g' )
 PERLSITEARCH = $(DESTDIR)$(shell eval "export `$(PERL) -V:sitearch`"; echo $$sitearch )
 PERL_INC = $(DESTDIR)$(shell eval "export `$(PERL) -V:archlibexp`"; echo "-I$$archlibexp/CORE" )
 PERL_LIB = $(DESTDIR)$(shell eval "export `$(PERL) -V:privlibexp`"; echo $$privlibexp )
@@ -109,7 +109,6 @@ SQLRConnection.so:
 	fi
 
 install: SQLRConnection.so
-	$(LIBTOOL) --mode=install $(INSTALL) SQLRConnection.so $(PERLSITEARCH)
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/Firstworks
 	$(LIBTOOL) --mode=install $(INSTALL) -m 644 SQLRConnection.pm $(PERLSITEARCH)/Firstworks
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/Firstworks/SQLRConnection
@@ -117,6 +116,7 @@ install: SQLRConnection.so
 	touch $(PERLSITEARCH)/auto/Firstworks/SQLRConnection/SQLRConnection.bs
 	$(RM) SQLRConnection.so
 	pod2man SQLRConnection.pm > Firstworks::SQLRConnection.$(PERLMAN3EXT)
+	$(MKINSTALLDIRS) $(PERLINSTALLMAN3DIR)
 	$(LIBTOOL) --mode=install $(INSTALL) -m 644 Firstworks::SQLRConnection.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
 	$(RM) Firstworks::SQLRConnection.$(PERLMAN3EXT)
 	echo $(PERLSITEARCH)/auto/Firstworks/SQLRConnection/SQLRConnection.so > $(PERLSITEARCH)/auto/Firstworks/SQLRConnection/.packlist

@@ -20,17 +20,21 @@ all:
 	if ( test ! -r libsqlrelay.la ); then \
 		cp tclincludes2.h tclincludes.h; \
 		$(MAKE) libsqlrelay.la 2> errors2; \
-	fi
-	if ( test ! -r libsqlrelay.la ); then \
-		if ( test -s errors1 ); then \
-			echo "first try errors : "; cat errors1; echo; \
+		if ( test ! -r libsqlrelay.la ); then \
+			if ( test -s errors1 ); then \
+				echo "first try errors : "; cat errors1; echo; \
+			fi; \
+			if ( test -s errors2 ); then \
+				echo "second try errors : "; cat errors2; echo; \
+			fi; \
+			exit 1; \
+		else \
+			cat errors2; \
 		fi; \
-		if ( test -s errors2 ); then \
-			echo "second try errors : "; cat errors2; echo; \
-		fi; \
+	else \
+		cat errors1; \
 	fi
-	$(RM) errors1
-	$(RM) errors2
+	$(RM) errors1 errors2 tclincludes.h
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la

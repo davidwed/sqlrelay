@@ -33,6 +33,7 @@ LOBJS = sqlrelay.lo
 			if ( test -s errors2 ); then \
 				echo "second try errors : "; cat errors2; echo; \
 			fi; \
+			exit 1; \
 		else \
 			cat errors2; \
 			$(STRIPCOMMENTNOTE) $@; \
@@ -92,6 +93,7 @@ sqlrelay.so:
 	fi
 
 install: sqlrelay.so
+	$(MKINSTALLDIRS) $(RUBYSITEARCHDIR)
 	$(LIBTOOL) --mode=install $(INSTALL) sqlrelay.so $(RUBYSITEARCHDIR)
 	$(MKINSTALLDIRS) $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(LIBTOOL) --mode=install $(INSTALL) -m 644 SQLRelay.rb $(RUBYSITELIBDIR)/DBD/SQLRelay

@@ -1,4 +1,5 @@
-ruby 1.8 compatibility
+use tclConfig.sh if it exists, spec file may need it too, or may need to do
+	the same thing that the configure script does to find tcldir
 
 ADODB - have a driver, just need to incorporate it
 scaling/handoff=pass incompatibility
