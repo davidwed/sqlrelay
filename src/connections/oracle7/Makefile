@@ -24,11 +24,9 @@ DLOBJS= oracle7connection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-oracle7 sqlr-connection-oracle7-debug
 
@@ -48,8 +46,8 @@ sqlr-connection-oracle7-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle7$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle7-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-oracle7$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-oracle7-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

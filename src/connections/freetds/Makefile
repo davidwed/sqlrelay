@@ -24,11 +24,9 @@ DLOBJS= freetdsconnection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-freetds sqlr-connection-freetds-debug
 
@@ -48,8 +46,8 @@ sqlr-connection-freetds-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-freetds$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-freetds-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

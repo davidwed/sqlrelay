@@ -46,11 +46,9 @@ LOBJS = sqlrelay.lo
 			exit 1; \
 		else \
 			cat errors2; \
-			$(STRIPCOMMENTNOTE) $@; \
 		fi; \
 	else \
 		cat errors1; \
-		$(STRIPCOMMENTNOTE) $@; \
 	fi; \
 	$(RM) errors1 errors2 rubyincludes.h
 
@@ -111,7 +109,7 @@ sqlrelay.dll:
 ifeq ($(CYGWIN),)
 install: sqlrelay.so
 	$(MKINSTALLDIRS) $(RUBYSITEARCHDIR)
-	$(INSTALL) $(INSTALLSTRIP) sqlrelay.so $(RUBYSITEARCHDIR)
+	$(INSTALL) sqlrelay.so $(RUBYSITEARCHDIR)
 	$(MKINSTALLDIRS) $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(INSTALL) -m 644 SQLRelay.rb $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(RM) sqlrelay.so
@@ -122,7 +120,7 @@ uninstall:
 else
 install: sqlrelay.dll
 	$(MKINSTALLDIRS) $(RUBYSITEARCHDIR)
-	$(INSTALL) $(INSTALLSTRIP) sqlrelay.dll $(RUBYSITEARCHDIR)
+	$(INSTALL) sqlrelay.dll $(RUBYSITEARCHDIR)
 	$(MKINSTALLDIRS) $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(INSTALL) -m 644 SQLRelay.rb $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(RM) sqlrelay.dll

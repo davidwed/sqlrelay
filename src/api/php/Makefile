@@ -15,7 +15,6 @@ endif
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPILE_DL=1 -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all:
 	cp phpincludes1.h phpincludes.h; \
@@ -90,7 +89,7 @@ sql_relay.so:
 
 install: sql_relay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(INSTALL) $(INSTALLSTRIP) sql_relay.so $(DESTDIR)$(PHPEXTDIR)
+	$(INSTALL) sql_relay.so $(DESTDIR)$(PHPEXTDIR)
 	$(RM) sql_relay.so
 
 uninstall:

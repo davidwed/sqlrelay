@@ -18,7 +18,6 @@ LOBJS = CSQLRelay.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: libCSQLRelay.la
 
@@ -76,7 +75,7 @@ CSQLRelay.dll:
 ifeq ($(CYGWIN),)
 install: CSQLRelay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
-	$(INSTALL) $(INSTALLSTRIP) CSQLRelay.so $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) CSQLRelay.so $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(INSTALL) -m 644 PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 ifeq ($(PYTHON_HAVE_WEAKREF),yes)
 	$(INSTALL) -m 644 PySQLRDB.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
@@ -88,7 +87,7 @@ endif
 else
 install: CSQLRelay.dll
 	$(MKINSTALLDIRS) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
-	$(INSTALL) $(INSTALLSTRIP) CSQLRelay.dll $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) CSQLRelay.dll $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(INSTALL) -m 644 PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(INSTALL) -m 644 PySQLRDB.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(INSTALL) -m 644 __init__.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay

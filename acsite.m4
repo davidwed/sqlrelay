@@ -288,23 +288,6 @@ AC_SUBST(UNAME)
 ])
 
 
-dnl determines whether we're using GNU strip or not
-dnl sets the substitution variable STRIP to "touch" if we're not
-AC_DEFUN([FW_CHECK_GNU_STRIP],
-[
-GNUSTRIP=`$STRIP --version 2> /dev/null | grep "GNU strip"`
-AC_MSG_CHECKING(for GNU strip)
-if ( test -n "$GNUSTRIP" )
-then
-	AC_MSG_RESULT(yes)
-else
-	STRIP="touch"
-	AC_MSG_RESULT(no)
-fi
-AC_SUBST(STRIP)
-])
-
-
 dnl checks to see if -pipe option to gcc works or not
 AC_DEFUN([FW_CHECK_PIPE],
 [

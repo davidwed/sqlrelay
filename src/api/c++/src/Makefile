@@ -113,7 +113,6 @@ LOBJS = connection/connectionctor.lo \
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: libsqlrclient.la
 
@@ -129,7 +128,7 @@ libsqlrclient.la: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(INSTALL) $(INSTALLSTRIP) libsqlrclient.la $(libdir)/libsqlrclient.la
+	$(INSTALL) libsqlrclient.la $(libdir)/libsqlrclient.la
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(cachedir)
 	chmod 777 $(cachedir)

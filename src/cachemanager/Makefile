@@ -18,7 +18,6 @@ LOBJS = cachemanager.lo main.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-cachemanager
 
@@ -34,7 +33,7 @@ sqlr-cachemanager: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-cachemanager$(EXE) $(bindir)
+	$(INSTALL) sqlr-cachemanager$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-cachemanager$(EXE)

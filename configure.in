@@ -7,14 +7,13 @@ AC_ARG_ENABLE(small-code,
 	SMALLCODE="-O -Os -fno-exceptions",
 	SMALLCODE="")
 AC_ARG_ENABLE(debug,
-	[  --enable-debug                compile with -g and -pg options and don't strip binaries],
-	CFLAGS="$CFLAGS -g -pg -Wall"; CXXFLAGS="$CXXFLAGS -g -pg -Wall"; INSTALLSTRIP=""; DEBUGSTRIP="touch",
-	CFLAGS="$CFLAGS -Wall"; CXXFLAGS="$CXXFLAGS -Wall"; INSTALLSTRIP="-s"; DEBUGSTRIP="")
+	[  --enable-debug                compile with -g and -pg options],
+	CFLAGS="$CFLAGS -g -pg -Wall"; CXXFLAGS="$CXXFLAGS -g -pg -Wall",
+	CFLAGS="$CFLAGS -Wall"; CXXFLAGS="$CXXFLAGS -Wall")
 
 CFLAGS="$SMALLCODE $CFLAGS"
 CXXFLAGS="$SMALLCODE $CXXFLAGS"
 
-AC_SUBST(INSTALLSTRIP)
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_ARG_ENABLE(client-rpath,
@@ -421,15 +420,7 @@ FW_CHECK_LD_RPATH
 FW_CHECK_PS
 FW_CHECK_UNAME
 
-if ( test -n "$DEBUGSTRIP" )
-then
-	STRIP="$DEBUGSTRIP"
-	AC_SUBST(STRIP)
-fi
-
-FW_CHECK_GNU_STRIP
 FW_CHECK_PIPE
-
 echo "******************************"
 
 
@@ -742,9 +733,8 @@ then
 fi
 
 
-MAKELIST="config.mk strip-comment-note src/api/perl/Connection/Connection.pm src/api/perl/Cursor/Cursor.pm src/api/perl/DBD/SQLRelay.pm bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay test/test sqlrelay-c++.pc sqlrelay-c.pc"
+MAKELIST="config.mk src/api/perl/Connection/Connection.pm src/api/perl/Cursor/Cursor.pm src/api/perl/DBD/SQLRelay.pm bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay test/test sqlrelay-c++.pc sqlrelay-c.pc"
 AC_OUTPUT($MAKELIST)
-chmod 755 strip-comment-note
 chmod 755 bin/sqlr-stop
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config

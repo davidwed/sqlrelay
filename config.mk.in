@@ -32,10 +32,6 @@ debugdir = ${localstatedir}/sqlrelay/debug
 CC = @CC@
 CXX = @CXX@
 
-# strip command
-STRIP = @STRIP@
-STRIPCOMMENTNOTE = $(top_builddir)/strip-comment-note
-
 # includes and defines (-I and -D flags)
 BASECPPFLAGS = @CPPFLAGS@ @PTHREADINCLUDES@
 TMPDIRCPPFLAG = -DTMP_DIR=\"$(tmpdir)\"
@@ -45,7 +41,6 @@ CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\"
 # link flags (-s, -static, -melf, -belf, etc.)
 LDFLAGS = @LDFLAGS@
 STATICLINK = @STATICLINK@
-INSTALLSTRIP = @INSTALLSTRIP@
 
 # debug and optimization flags (-g, -O2, etc.)
 CXXFLAGS = @CXXFLAGS@ @PIPE@
@@ -56,7 +51,7 @@ LIBTOOL = @LIBTOOL@
 LIBTOOLGCC = @LIBTOOLGCC@
 
 # install command
-INSTALL = STRIPPROG="$(STRIP)" $(LIBTOOL) --mode=install $(top_builddir)/install-sh -c
+INSTALL = $(LIBTOOL) --mode=install $(top_builddir)/install-sh -c
 
 # mkinstalldirs command
 MKINSTALLDIRS = $(top_builddir)/mkinstalldirs

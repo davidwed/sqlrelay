@@ -13,7 +13,6 @@ LOBJS= configfile.lo gtkfe.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-config-gtk
 
@@ -31,7 +30,7 @@ sqlr-config-gtk: $(SRCS) $(LOBJS)
 
 install:
 	$(top_builddir)/mkinstalldirs $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-config-gtk$(EXE) $(bindir)
+	$(INSTALL) sqlr-config-gtk$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-config-gtk$(EXE)

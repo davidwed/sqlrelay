@@ -18,7 +18,6 @@ LOBJS = scaler.lo main.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-scaler
 
@@ -34,7 +33,7 @@ sqlr-scaler: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-scaler$(EXE) $(bindir)
+	$(INSTALL) sqlr-scaler$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler$(EXE)

@@ -17,7 +17,6 @@ LOBJS = sqlrclientwrapper.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: libsqlrclientwrapper.la
 
@@ -33,7 +32,7 @@ libsqlrclientwrapper.la: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(INSTALL) $(INSTALLSTRIP) libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
+	$(INSTALL) libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
 	$(MKINSTALLDIRS) $(cachedir)
 	chmod 777 $(cachedir)
 

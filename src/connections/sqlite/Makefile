@@ -24,11 +24,9 @@ DLOBJS= sqliteconnection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-sqlite sqlr-connection-sqlite-debug
 
@@ -48,8 +46,8 @@ sqlr-connection-sqlite-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-sqlite$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-sqlite-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

@@ -53,19 +53,15 @@ endif
 					exit 1; \
 				else \
 					cat errors4; \
-					$(STRIPCOMMENTNOTE) $@; \
 				fi; \
 			else \
 				cat errors3; \
-				$(STRIPCOMMENTNOTE) $@; \
 			fi; \
 		else \
 			cat errors2; \
-			$(STRIPCOMMENTNOTE) $@; \
 		fi; \
 	else \
 		cat errors1; \
-		$(STRIPCOMMENTNOTE) $@; \
 	fi; \
 	$(RM) errors1 errors2 errors3 errors4 perlincludes.h
 

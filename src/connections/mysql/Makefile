@@ -24,11 +24,9 @@ DLOBJS= mysqlconnection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-mysql sqlr-connection-mysql-debug
 
@@ -48,8 +46,8 @@ sqlr-connection-mysql-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-mysql$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-mysql-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-mysql$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-mysql-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

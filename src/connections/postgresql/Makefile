@@ -24,11 +24,9 @@ DLOBJS= postgresqlconnection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-postgresql sqlr-connection-postgresql-debug
 
@@ -48,8 +46,8 @@ sqlr-connection-postgresql-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-postgresql$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-postgresql-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

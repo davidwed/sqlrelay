@@ -24,11 +24,9 @@ DLOBJS= interbaseconnection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-interbase sqlr-connection-interbase-debug
 
@@ -48,8 +46,8 @@ sqlr-connection-interbase-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-interbase$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-interbase-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-interbase$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-interbase-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

@@ -12,7 +12,6 @@ LOBJS = cmdline.lo debugfile.lo tempdir.lo sqlrconfigfile.lo authenticator.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: libsqlrutil.la
 
@@ -28,7 +27,7 @@ libsqlrutil.la: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(INSTALL) $(INSTALLSTRIP) libsqlrutil.la $(libdir)
+	$(INSTALL) libsqlrutil.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

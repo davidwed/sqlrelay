@@ -24,11 +24,9 @@ DLOBJS= odbcconnection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-odbc sqlr-connection-odbc-debug
 
@@ -48,8 +46,8 @@ sqlr-connection-odbc-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-odbc$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-odbc-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-odbc$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-odbc-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

@@ -15,7 +15,6 @@ endif
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: query fields sqlrsh
 
@@ -42,9 +41,9 @@ sqlrsh: sqlrsh.C sqlrsh.lo
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) query$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) fields$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlrsh$(EXE) $(bindir)
+	$(INSTALL) query$(EXE) $(bindir)
+	$(INSTALL) fields$(EXE) $(bindir)
+	$(INSTALL) sqlrsh$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query$(EXE)

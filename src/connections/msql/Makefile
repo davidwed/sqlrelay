@@ -24,11 +24,9 @@ DLOBJS= msqlconnection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-msql sqlr-connection-msql-debug
 
@@ -48,8 +46,8 @@ sqlr-connection-msql-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-msql$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-msql-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

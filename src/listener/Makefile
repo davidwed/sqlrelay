@@ -19,11 +19,9 @@ DLOBJS = sqlrlistener.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-listener sqlr-listener-debug
 
@@ -43,8 +41,8 @@ sqlr-listener-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-listener$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-listener-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-listener$(EXE) $(bindir)
+	$(INSTALL) sqlr-listener-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener$(EXE)

@@ -175,11 +175,9 @@ DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: libsqlrconnection.la libsqlrconnection_debug.la
 
@@ -200,8 +198,8 @@ libsqlrconnection_debug.la: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(INSTALL) $(INSTALLSTRIP) libsqlrconnection.la $(libdir)
-	$(INSTALL) $(INSTALLSTRIP) libsqlrconnection_debug.la $(libdir)
+	$(INSTALL) libsqlrconnection.la $(libdir)
+	$(INSTALL) libsqlrconnection_debug.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

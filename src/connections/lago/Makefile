@@ -24,11 +24,9 @@ DLOBJS= lagoconnection.d.lo main.d.lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 all: sqlr-connection-lago sqlr-connection-lago-debug
 
@@ -48,8 +46,8 @@ sqlr-connection-lago-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago$(EXE) $(bindir)
-	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago-debug$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-lago$(EXE) $(bindir)
+	$(INSTALL) sqlr-connection-lago-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

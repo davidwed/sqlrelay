@@ -51,7 +51,6 @@ rebuild: clean all
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	$(STRIPCOMMENTNOTE) $@
 
 libsqlrelay.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -module -no-undefined
@@ -99,13 +98,13 @@ sqlrelay.dll:
 ifeq ($(CYGWIN),)
 install: sqlrelay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(INSTALL) $(INSTALLSTRIP) sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(INSTALL) sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.so
 else
 install: sqlrelay.dll
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(INSTALL) $(INSTALLSTRIP) sqlrelay.dll $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(INSTALL) sqlrelay.dll $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.dll
 endif
