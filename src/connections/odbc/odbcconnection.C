@@ -609,7 +609,10 @@ bool odbccursor::fetchRow() {
 		return false;
 	}
 	if (!row) {
-		SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
+		erg=SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
 		SQLGetStmtAttr(stmt,SQL_ATTR_ROW_NUMBER,
 				(SQLPOINTER)&rownumber,0,NULL);
 		if (rownumber==totalrows) {
