@@ -650,8 +650,11 @@ compile time and defaults to 5.</p>
 <a name="columns"></a>
 <span class="heading2">Getting Column Information</span><br><br>
 
-<p>The name, type, length and length of the longest field of each column are 
-available.</p>
+<p>The name, type, length, precision, scale and length of the longest field of
+each column are available.  Determining whether the column is nullable, the
+primary key or unique is also available.  All databases support name, type and
+length, but not all databases support scale or precision, or determining
+whether a column is nullable, the primary key or unique.</p>
 
 <blockquote>
 <PRE>
@@ -672,7 +675,18 @@ public class MyClass {
                 	System.out.println(<FONT color=#ff00ff>&quot;Type:          &quot;</FONT> + cur.getColumnType(i));
                 	System.out.print(<FONT color=#ff00ff>&quot;Length:        &quot;</FONT>);
                 	System.out.println(cur.getColumnLength(i));
-                	System.out.println(<FONT color=#ff00ff>&quot;Longest Field: &quot;</FONT> + cur.getLongest(i));
+                	System.out.print(<FONT color=#ff00ff>&quot;Precision:     &quot;</FONT>);
+                	System.out.println(cur.getColumnPrecision(i));
+                	System.out.print(<FONT color=#ff00ff>&quot;Scale:         &quot;</FONT>);
+                	System.out.println(cur.getColumnScale(i));
+                	System.out.print(<FONT color=#ff00ff>&quot;Longest Field: &quot;</FONT>);
+                	System.out.println(cur.getLongest(i));
+                	System.out.print(<FONT color=#ff00ff>&quot;Nullable:       &quot;</FONT>);
+                	System.out.println(cur.getColumnIsNullable(i));
+                	System.out.print(<FONT color=#ff00ff>&quot;Primary Key:    &quot;</FONT>);
+                	System.out.println(cur.getColumnIsPrimaryKey(i));
+                	System.out.print(<FONT color=#ff00ff>&quot;Unique:         &quot;</FONT>);
+                	System.out.println(cur.getColumnIsUnique(i));
                 	System.out.println();
         	}
 

@@ -634,8 +634,11 @@ compile time and defaults to 5.</p>
 <a name="columns"></a>
 <span class="heading2">Getting Column Information</span><br><br>
 
-<p>The name, type, length and length of the longest field of each column are 
-available.</p>
+<p>The name, type, length, precision, scale and length of the longest field of
+each column are available.  Determining whether the column is nullable, the
+primary key or unique is also available.  All databases support name, type and
+length, but not all databases support scale or precision, or determining
+whether a column is nullable, the primary key or unique.</p>
 
 <blockquote>
 <PRE>
@@ -654,7 +657,12 @@ main() {
                 cout &lt;&lt; <FONT color=#ff00ff>&quot;Name:          &quot;</FONT> &lt;&lt; cur-&gt;getColumnName(i) &lt;&lt; endl;
                 cout &lt;&lt; <FONT color=#ff00ff>&quot;Type:          &quot;</FONT> &lt;&lt; cur-&gt;getColumnType(i) &lt;&lt; endl;
                 cout &lt;&lt; <FONT color=#ff00ff>&quot;Length:        &quot;</FONT> &lt;&lt; cur-&gt;getColumnLength(i) &lt;&lt; endl;
+                cout &lt;&lt; <FONT color=#ff00ff>&quot;Precision:     &quot;</FONT> &lt;&lt; cur-&gt;getColumnPrecision(i) &lt;&lt; endl;
+                cout &lt;&lt; <FONT color=#ff00ff>&quot;Scale:         &quot;</FONT> &lt;&lt; cur-&gt;getColumnScale(i) &lt;&lt; endl;
                 cout &lt;&lt; <FONT color=#ff00ff>&quot;Longest Field: &quot;</FONT> &lt;&lt; cur-&gt;getLongest(i) &lt;&lt; endl;
+                cout &lt;&lt; <FONT color=#ff00ff>&quot;Nullable:      &quot;</FONT> &lt;&lt; cur-&gt;getColumnIsNullable(i) &lt;&lt; endl;
+                cout &lt;&lt; <FONT color=#ff00ff>&quot;Primary Key:   &quot;</FONT> &lt;&lt; cur-&gt;getColumnIsPrimaryKey(i) &lt;&lt; endl;
+                cout &lt;&lt; <FONT color=#ff00ff>&quot;Unique:        &quot;</FONT> &lt;&lt; cur-&gt;getColumnIsUnique(i) &lt;&lt; endl;
                 cout &lt;&lt; endl;
         }
 

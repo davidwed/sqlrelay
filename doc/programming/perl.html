@@ -517,8 +517,11 @@ compile time and defaults to 5.</p>
 <a name="columns"></a>
 <span class="heading2">Getting Column Information</span><br><br>
 
-<p>The name, type, length and length of the longest field of each column are 
-available.</p>
+<p>The name, type, length, precision, scale and length of the longest field of
+each column are available.  Determining whether the column is nullable, the
+primary key or unique is also available.  All databases support name, type and
+length, but not all databases support scale or precision, or determining
+whether a column is nullable, the primary key or unique.</p>
 
 <blockquote>
 <PRE>
@@ -534,8 +537,13 @@ available.</p>
 <B><FONT color=#a52a2a>for</FONT></B> (<FONT color=#008b8b>$i</FONT>=<FONT color=#ff00ff>0</FONT>; <FONT color=#008b8b>$i</FONT>&lt;<FONT color=#008b8b>$cur</FONT>-&gt;colCount(); <FONT color=#008b8b>$i</FONT>++) {
         <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Name:          </FONT><FONT color=#008b8b>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getColumnName(<FONT color=#008b8b>$i</FONT>));
         <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Type:          </FONT><FONT color=#008b8b>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getColumnType(<FONT color=#008b8b>$i</FONT>));
-        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Length:        </FONT><FONT color=#008b8b>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getColumnLength(<FONT color=#008b8b>$i</FONT>));
-        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Longest Field: </FONT><FONT color=#008b8b>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getLongest(<FONT color=#008b8b>$i</FONT>));
+        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Length:        </FONT><FONT color=#008b8b>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getColumnLength(<FONT color=#008b8b>$i</FONT>));
+        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Precision:     </FONT><FONT color=#008b8b>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getColumnPrecision(<FONT color=#008b8b>$i</FONT>));
+        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Scale:         </FONT><FONT color=#008b8b>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getColumnScale(<FONT color=#008b8b>$i</FONT>));
+        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Longest Field: </FONT><FONT color=#008b8b>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getLongest(<FONT color=#008b8b>$i</FONT>));
+        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Nullable:      </FONT><FONT color=#008b8b>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getColumnIsNullable(<FONT color=#008b8b>$i</FONT>));
+        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Primary Key:   </FONT><FONT color=#008b8b>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getColumnIsPrimaryKey(<FONT color=#008b8b>$i</FONT>));
+        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>Unique:        </FONT><FONT color=#008b8b>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getColumnIsUnique(<FONT color=#008b8b>$i</FONT>));
         <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>);
 }
 </PRE>

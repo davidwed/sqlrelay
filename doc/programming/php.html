@@ -585,8 +585,11 @@ compile time and defaults to 5.</p>
 <a name="columns"></a>
 <span class="heading2">Getting Column Information</span><br><br>
 
-<p>The name, type, length and length of the longest field of each column are 
-available.</p>
+<p>The name, type, length, precision, scale and length of the longest field of
+each column are available.  Determining whether the column is nullable, the
+primary key or unique is also available.  All databases support name, type and
+length, but not all databases support scale or precision, or determining
+whether a column is nullable, the primary key or unique.</p>
 
 <blockquote>
 <PRE>
@@ -609,8 +612,23 @@ available.</p>
              <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Length: </FONT>&quot;;
              <FONT color=#008b8b>echo</FONT> sqlrcur_getColumnLength<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT>;
              <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Precision: </FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> sqlrcur_getColumnPrecision<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Scale: </FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> sqlrcur_getColumnScale<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
              <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Longest Field: </FONT>&quot;;
              <FONT color=#008b8b>echo</FONT> sqlrcur_getLongest<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Nullable: </FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> sqlrcur_getColumnIsNullable<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Primary Key: </FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> sqlrcur_getColumnIsPrimaryKey<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Unique: </FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> sqlrcur_getColumnIsUnique<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT>;
              <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n\n</FONT>&quot;;
      <FONT color=#6a5acd>}</FONT>
 

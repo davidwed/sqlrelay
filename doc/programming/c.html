@@ -660,8 +660,11 @@ compile time and defaults to 5.</p>
 <a name="columns"></a>
 <span class="heading2">Getting Column Information</span><br><br>
 
-<p>The name, type, length and length of the longest field of each column are 
-available.</p>
+<p>The name, type, length, precision, scale and length of the longest field of
+each column are available.  Determining whether the column is nullable, the
+primary key or unique is also available.  All databases support name, type and
+length, but not all databases support scale or precision, or determining
+whether a column is nullable, the primary key or unique.</p>
 
 <blockquote>
 <PRE>
@@ -681,8 +684,13 @@ main() {
         <B><FONT color=#a52a2a>for</FONT></B> (i=<FONT color=#ff00ff>0</FONT>; i&lt;sqlrcur_colCount(cur); i++) {
                 printf(<FONT color=#ff00ff>&quot;Name:          </FONT><FONT color=#6a5acd>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnName(cur,i));
                 printf(<FONT color=#ff00ff>&quot;Type:          </FONT><FONT color=#6a5acd>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnType(cur,i));
-                printf(<FONT color=#ff00ff>&quot;Length:        </FONT><FONT color=#6a5acd>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnLength(cur,i));
-                printf(<FONT color=#ff00ff>&quot;Longest Field: </FONT><FONT color=#6a5acd>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getLongest(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Length:        </FONT><FONT color=#6a5acd>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnLength(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Precision:     </FONT><FONT color=#6a5acd>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnPrecision(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Scale:         </FONT><FONT color=#6a5acd>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnScale(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Longest Field: </FONT><FONT color=#6a5acd>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getLongest(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Nullable:      </FONT><FONT color=#6a5acd>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnIsNullable(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Primary Key:   </FONT><FONT color=#6a5acd>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnIsPrimaryKey(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Unique:        </FONT><FONT color=#6a5acd>%d</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnIsUnique(cur,i));
                 printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>);
         }
 

@@ -509,8 +509,11 @@ compile time and defaults to 5.</p>
 <a name="columns"></a>
 <span class="heading2">Getting Column Information</span><br><br>
 
-<p>The name, type, length and length of the longest field of each column are 
-available.</p>
+<p>The name, type, length, precision, scale and length of the longest field of
+each column are available.  Determining whether the column is nullable, the
+primary key or unique is also available.  All databases support name, type and
+length, but not all databases support scale or precision, or determining
+whether a column is nullable, the primary key or unique.</p>
 
 <blockquote>
 <PRE>
@@ -532,8 +535,23 @@ available.</p>
              puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Length:        </FONT><FONT color=#6858c8>&quot;</FONT>
              puts cur.getColumnLength(i)
              puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Precision:     </FONT><FONT color=#6858c8>&quot;</FONT>
+             puts cur.getColumnPrecision(i)
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Scale:         </FONT><FONT color=#6858c8>&quot;</FONT>
+             puts cur.getColumnScale(i)
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
              puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Longest Field: </FONT><FONT color=#6858c8>&quot;</FONT>
              puts cur.getLongest(i)
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Nullable:      </FONT><FONT color=#6858c8>&quot;</FONT>
+             puts cur.getColumnIsNullable(i)
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Primary Key:   </FONT><FONT color=#6858c8>&quot;</FONT>
+             puts cur.getColumnIsPrimaryKey(i)
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Unique:        </FONT><FONT color=#6858c8>&quot;</FONT>
+             puts cur.getColumnIsUnique(i)
              puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
      <B><FONT color=#a02828>end</FONT></B>
 </PRE>

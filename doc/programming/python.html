@@ -491,8 +491,11 @@ compile time and defaults to 5.</p>
 <a name="columns"></a>
 <span class="heading2">Getting Column Information</span><br><br>
 
-<p>The name, type, length and length of the longest field of each column are 
-available.</p>
+<p>The name, type, length, precision, scale and length of the longest field of
+each column are available.  Determining whether the column is nullable, the
+primary key or unique is also available.  All databases support name, type and
+length, but not all databases support scale or precision, or determining
+whether a column is nullable, the primary key or unique.</p>
 
 <blockquote>
 <PRE>
@@ -508,7 +511,12 @@ con.endSession()
         print '<FONT color=#ff00ff>Name:          </FONT>', cur.getColumnName(i)
         print '<FONT color=#ff00ff>Type:          </FONT>', cur.getColumnType(i)
         print '<FONT color=#ff00ff>Length:        </FONT>', cur.getColumnLength(i)
+        print '<FONT color=#ff00ff>Precision:     </FONT>', cur.getColumnPrecision(i)
+        print '<FONT color=#ff00ff>Scale:         </FONT>', cur.getColumnScale(i)
         print '<FONT color=#ff00ff>Longest Field: </FONT>', cur.getLongest(i)
+        print '<FONT color=#ff00ff>Nullable:      </FONT>', cur.getColumnIsNullable(i)
+        print '<FONT color=#ff00ff>Primary Key:   </FONT>', cur.getColumnIsPrimaryKey(i)
+        print '<FONT color=#ff00ff>Unique:        </FONT>', cur.getColumnIsUnique(i)
 </PRE>
 </blockquote>
 
