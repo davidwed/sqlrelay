@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>SQLRConnection</title>
+<title>Connection</title>
 <link rev="made" href="mailto:root@localhost" />
 </head>
 
@@ -24,18 +24,18 @@
 </p>
 <h1><a name="name">NAME</a></h1>
 <pre>
-    Firstworks::SQLRConnection - Perl API for SQL Relay</pre>
+    SQLRelay::Connection - Perl API for SQL Relay</pre>
 <p>
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
 <pre>
-        use Firstworks::SQLRConnection;
-        use Firstworks::SQLRStmt;</pre>
+        use SQLRelay::Connection;
+        use SQLRelay::Cursor;</pre>
 <pre>
-        my $sc=Firstworks::SQLRConnection-&gt;new(&quot;testhost&quot;,9000,&quot;&quot;,
+        my $sc=SQLRelay::Connection-&gt;new(&quot;testhost&quot;,9000,&quot;&quot;,
                                           &quot;testuser&quot;,&quot;testpassword&quot;,0,1);
-        my $ss=Firstworks::SQLRStmt-&gt;new($sc);</pre>
+        my $ss=SQLRelay::Cursor-&gt;new($sc);</pre>
 <pre>
         $ss-&gt;sendQuery(&quot;select table_name from user_tables&quot;);
         $sc-&gt;endSession();</pre>
@@ -48,7 +48,7 @@
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
 <pre>
-    Firstworks::SQLRConnection</pre>
+    SQLRelay::Connection</pre>
 <pre>
         new(server, port, socket, user, password, retrytime, tries);
             # Initiates a connection to &quot;server&quot; on &quot;port&quot;
