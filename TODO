@@ -1,8 +1,7 @@
+postgresql typemangling doesn't identify the text column type
+
 forked listeners need to close handoff file descriptors
 handoff=pass does not work with dynamic scaling
-
-docs and tests for clob/blob/cursor bind methods and upper/lower/mixed column
-	case methods for non c++/perl api's
 
 incorporate postgresql column type query
 If a connection dies mysteriously, a new one should fire up.
@@ -24,9 +23,6 @@ incorporate new spec file
 
 test changeUser() with non-oracle databases
 non-c++/perl clob/blob/cursor bind tests
-clob insert/update/select tests
-clob pl/sql in/out variable test
-clob pl/sql return value test
 
 interbase directions for using gsec don't work for me
 interbase docs aren't available at the link in gettingstarted/interbase.html

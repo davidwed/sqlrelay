@@ -64,6 +64,8 @@
 		connection
 	added signal option to sqlr-stop
 	it's possible to do negative input bind long's now
+	when relogging in to a db that went down, cursors are just reset, not
+		deleted/created, this allows the query to be re-executed
 
 0.32 -	affectedRows and totalRows were returning 0 instead of -1 for databases
 		that don't know that value, now they return -1

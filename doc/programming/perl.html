@@ -146,13 +146,12 @@ provides functions for making substitutions and binds in those queries.</p>
 substitution(), inputBind() and executeQuery().</p>
 
 <blockquote>
+<PRE>
 /usr/local/myprogram/sql/myquery.sql:
 
 	select * from mytable $(whereclause)
 
-program code:
-
-<PRE>
+Program code:<br>
 <B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
 <B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
 
@@ -173,6 +172,17 @@ want to retrieve data from a call to one of it's functions.  To facilitate
 this, SQL Relay provides the defineOutputBind() and getOutputBind() methods.</p>
 
 <blockquote>
+PL/SQL Procedure:<br>
+<pre>
+<font color="#6858c8">FUNCTION</font> sp_mytable <font color="#6858c8">RETURN</font> types.cursorType
+l_cursor types.cursorType;
+<font color="#6858c8">BEGIN</font>
+        OPEN l_cursor <font color="#6858c8">FOR</font> <font color="#a02828"><b>SELECT</b></font> * <font color="#6858c8">FROM</font> mytable;
+        <font color="#6858c8">RETURN</font> l_cursor;
+<font color="#6858c8">END</font>;
+</pre>
+<br>
+Program code:
 <PRE>
 <B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRConnection;
 <B><FONT color=#a52a2a>use </FONT></B>Firstworks::SQLRCursor;
@@ -246,11 +256,11 @@ getOutputBindLength().</p>
 <font color="#008888">$cur</font>-&gt;defineOutputBindClob(<font color="#f800f8">&quot;</font><font color="#f800f8">desc</font><font color="#f800f8">&quot;</font>);
 <font color="#008888">$cur</font>-&gt;executeQuery();
 
-<font color="#a02828"><b>my</b></font> <font color="#008888">$image</font>=getOutputBind(<font color="#f800f8">&quot;</font><font color="#f800f8">image</font><font color="#f800f8">&quot;</font>);
-<font color="#a02828"><b>my</b></font> <font color="#008888">$imagelength</font>=getOutputBindLength(<font color="#f800f8">&quot;</font><font color="#f800f8">image</font><font color="#f800f8">&quot;</font>);
+<font color="#a02828"><b>my</b></font> <font color="#008888">$image</font>=<font color="#008888">$cur</font>-&gt;getOutputBind(<font color="#f800f8">&quot;</font><font color="#f800f8">image</font><font color="#f800f8">&quot;</font>);
+<font color="#a02828"><b>my</b></font> <font color="#008888">$imagelength</font>=<font color="#008888">$cur</font>-&gt;getOutputBindLength(<font color="#f800f8">&quot;</font><font color="#f800f8">image</font><font color="#f800f8">&quot;</font>);
 
-<font color="#a02828"><b>my</b></font> <font color="#008888">$desc</font>=getOutputBind(<font color="#f800f8">&quot;</font><font color="#f800f8">desc</font><font color="#f800f8">&quot;</font>);
-<font color="#a02828"><b>my</b></font> <font color="#008888">$desclength</font>=getOutputBindLength(<font color="#f800f8">&quot;</font><font color="#f800f8">desc</font><font color="#f800f8">&quot;</font>);
+<font color="#a02828"><b>my</b></font> <font color="#008888">$desc</font>=<font color="#008888">$cur</font>-&gt;getOutputBind(<font color="#f800f8">&quot;</font><font color="#f800f8">desc</font><font color="#f800f8">&quot;</font>);
+<font color="#a02828"><b>my</b></font> <font color="#008888">$desclength</font>=<font color="#008888">$cur</font>-&gt;getOutputBindLength(<font color="#f800f8">&quot;</font><font color="#f800f8">desc</font><font color="#f800f8">&quot;</font>);
 
 <font color="#008888">$con</font>-&gt;endSession();
 

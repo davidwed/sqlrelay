@@ -144,12 +144,12 @@ provides functions for making substitutions and binds in those queries.</p>
 substitution(), inputBind() and executeQuery().</p>
 
 <blockquote>
+<PRE>
 /usr/local/myprogram/sql/myquery.sql:
 
 	select * from mytable $(whereclause)
 
-program code:
-<PRE>
+Program code:<br>
      <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
 
      con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
@@ -191,6 +191,65 @@ this, SQL Relay provides the defineOutputBind() and getOutputBind() methods.</p>
 If you would it to come back as a None instead, you can call the 
 getNullsAsNone() method.  To revert to the default behavior, you can
 call getNullsAsEmptyStrings().</p>
+
+<p>If you are using Oracle 8 or higher, you can insert data into BLOB
+and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
+
+<blockquote>
+<pre>
+<font color="#a020f0">require</font>(<font color="#6858c8">'</font><font color="#f800f8">sqlrelay</font><font color="#6858c8">'</font>)
+
+con=<font color="#6858c8">SQLRConnection</font>.new(<font color="#6858c8">&quot;</font><font color="#f800f8">host</font><font color="#6858c8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#6858c8">&quot;&quot;</font>,<font color="#6858c8">&quot;</font><font color="#f800f8">user</font><font color="#6858c8">&quot;</font>,<font color="#6858c8">&quot;</font><font color="#f800f8">password</font><font color="#6858c8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>)
+cur=<font color="#6858c8">SQLRCursor</font>.new(con)
+
+cur.executeQuery(<font color="#6858c8">&quot;</font><font color="#f800f8">create table images (image blob, description clob)</font><font color="#6858c8">&quot;</font>)
+
+imagedata=<font color="#6858c8">''</font>
+imagelength=<font color="#f800f8">0</font>
+
+... read an image from a file into imagedata <font color="#a02828"><b>and</b></font> the length of the
+                file into imagelength ...
+
+description=<font color="#6858c8">''</font>
+desclength=<font color="#f800f8">0</font>
+
+... read a description from a file into description <font color="#a02828"><b>and</b></font> the length of
+                the file into desclength ...
+
+cur.prepareQuery(<font color="#6858c8">&quot;</font><font color="#f800f8">insert into images values (:image,:desc)</font><font color="#6858c8">&quot;</font>)
+cur.inputBindBlob(<font color="#6858c8">&quot;</font><font color="#f800f8">image</font><font color="#6858c8">&quot;</font>,imagedata,imagelength)
+cur.inputBindClob(<font color="#6858c8">&quot;</font><font color="#f800f8">desc</font><font color="#6858c8">&quot;</font>,description,desclength)
+cur.executeQuery()
+</pre>
+</blockquote>
+
+<p>Likewise, with Oracle 8, you can retreive BLOB or CLOB data using
+defineOutputBindBlob(), defineOutputBindClob(), getOutputBind() and
+getOutputBindLength().</p>
+
+<blockquote>
+<pre>
+<font color="#a020f0">require</font>(<font color="#6858c8">'</font><font color="#f800f8">sqlrelay</font><font color="#6858c8">'</font>)
+
+con=<font color="#6858c8">SQLRConnection</font>.new(<font color="#6858c8">&quot;</font><font color="#f800f8">host</font><font color="#6858c8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#6858c8">&quot;&quot;</font>,<font color="#6858c8">&quot;</font><font color="#f800f8">user</font><font color="#6858c8">&quot;</font>,<font color="#6858c8">&quot;</font><font color="#f800f8">password</font><font color="#6858c8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>)
+cur=<font color="#6858c8">SQLRCursor</font>.new(con)
+
+cur.prepareQuery(<font color="#6858c8">&quot;</font><font color="#f800f8">begin  select image into :image from images;  select description into :desc from images;  end;</font><font color="#6858c8">&quot;</font>)
+cur.defineOutputBindBlob(<font color="#6858c8">&quot;</font><font color="#f800f8">image</font><font color="#6858c8">&quot;</font>)
+cur.defineOutputBindClob(<font color="#6858c8">&quot;</font><font color="#f800f8">desc</font><font color="#6858c8">&quot;</font>)
+cur.executeQuery()
+
+image=cur.getOutputBind(<font color="#6858c8">&quot;</font><font color="#f800f8">image</font><font color="#6858c8">&quot;</font>)
+imagelength=cur.getOutputBindLength(<font color="#6858c8">&quot;</font><font color="#f800f8">image</font><font color="#6858c8">&quot;</font>)
+
+desc=cur.getOutputBind(<font color="#6858c8">&quot;</font><font color="#f800f8">desc</font><font color="#6858c8">&quot;</font>)
+desclength=cur.getOutputBindLength(<font color="#6858c8">&quot;</font><font color="#f800f8">desc</font><font color="#6858c8">&quot;</font>)
+
+con.endSession()
+
+... <font color="#a02828"><b>do</b></font> something with image <font color="#a02828"><b>and</b></font> desc ...
+</pre>
+</blockquote>
 
 <p>Sometimes it's convenient to bind a bunch of variables that may or may not 
 actually be in the query.  For example, if you are building a web based
@@ -402,6 +461,48 @@ index=<FONT color=#f800f8>0</FONT>;
 <p>Prior to SQL Relay version 0.25, you would have had to buffer the first
 result set or use 2 database connections instead of just 1.</p>
 
+<p>If you are using stored procedures with Oracle 8 or higher, a stored
+procedure can execute a query and return a cursor.  A cursor bind variable can
+then retrieve that cursor.  Your program can retrieve the result set from the
+cursor.  All of this can be accomplished using defineOutputBindCursor(),
+getOutputBindCursor() and fetchFromOutputBindCursor().</p>
+
+<blockquote>
+PL/SQL Procedure:<br>
+<pre>
+<font color="#6858c8">FUNCTION</font> sp_mytable <font color="#6858c8">RETURN</font> types.cursorType
+l_cursor types.cursorType;
+<font color="#6858c8">BEGIN</font>
+        OPEN l_cursor <font color="#6858c8">FOR</font> <font color="#a02828"><b>SELECT</b></font> * <font color="#6858c8">FROM</font> mytable;
+        <font color="#6858c8">RETURN</font> l_cursor;
+<font color="#6858c8">END</font>;
+</pre>
+<br>
+Program code:
+<pre>
+<font color="#a020f0">require</font>(<font color="#6858c8">'</font><font color="#f800f8">sqlrelay</font><font color="#6858c8">'</font>)
+
+con=<font color="#6858c8">SQLRConnection</font>.new(<font color="#6858c8">&quot;</font><font color="#f800f8">host</font><font color="#6858c8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#6858c8">&quot;&quot;</font>,<font color="#6858c8">&quot;</font><font color="#f800f8">user</font><font color="#6858c8">&quot;</font>,<font color="#6858c8">&quot;</font><font color="#f800f8">password</font><font color="#6858c8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>)
+cur=<font color="#6858c8">SQLRCursor</font>.new(con)
+
+cur.prepareQuery(<font color="#6858c8">&quot;</font><font color="#f800f8">begin  :curs:=sp_mytable end;</font><font color="#6858c8">&quot;</font>)
+cur.defineOutputBindCursor(<font color="#6858c8">&quot;</font><font color="#f800f8">curs</font><font color="#6858c8">&quot;</font>)
+cur.executeQuery()
+
+bindcur=cur.getOutputBindCursor(<font color="#6858c8">&quot;</font><font color="#f800f8">curs</font><font color="#6858c8">&quot;</font>)
+bindcur.fetchFromBindCursor()
+
+<font color="#0000f8"># print fields from table</font>
+<font color="#a02828"><b>for</b></font> i <font color="#a02828"><b>in</b></font> <font color="#f800f8">0</font>..bindcur.rowCount()-<font color="#f800f8">1</font> <font color="#a02828"><b>do</b></font>
+        <font color="#a02828"><b>for</b></font> j <font color="#a02828"><b>in</b></font> <font color="#f800f8">0</font>..bindcur.colCount()-<font color="#f800f8">1</font> <font color="#a02828"><b>do</b></font>
+                puts bindcur.getField(i,j)
+                puts <font color="#6858c8">&quot;</font><font color="#f800f8">, </font><font color="#6858c8">&quot;</font>
+        <font color="#a02828"><b>end</b></font>
+        puts <font color="#6858c8">&quot;</font><font color="#6858c8">\n</font><font color="#6858c8">&quot;</font>
+<font color="#a02828"><b>end</b></font>
+</pre>
+</blockquote>
+
 <p>The number of cursors simultaneously available per-connection is set at 
 compile time and defaults to 5.</p>
 
@@ -436,6 +537,56 @@ available.</p>
              puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
      <B><FONT color=#a02828>end</FONT></B>
 </PRE>
+</blockquote>
+
+<p>Some databases force column names to upper case, others force column names
+to lower case, and others still support mixed-case column names.  Sometimes,
+when migrating between databases, you can run into trouble.  You can use
+upperCaseColumnNames() and lowerCaseColumnNames() to cause column names to be
+converted to upper or lower case, or you can use mixedCaseColumnNames() to
+cause column names to be returned in the same case as they are defined in the
+database.</p>
+
+<blockquote>
+<pre>
+<font color="#a020f0">require</font>(<font color="#6858c8">'</font><font color="#f800f8">sqlrelay</font><font color="#6858c8">'</font>)
+
+con=<font color="#6858c8">SQLRConnection</font>.new(<font color="#6858c8">&quot;</font><font color="#f800f8">host</font><font color="#6858c8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#6858c8">&quot;&quot;</font>,<font color="#6858c8">&quot;</font><font color="#f800f8">user</font><font color="#6858c8">&quot;</font>,<font color="#6858c8">&quot;</font><font color="#f800f8">password</font><font color="#6858c8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>)
+cur=<font color="#6858c8">SQLRCursor</font>.new(con)
+
+<font color="#0000f8"># column names will be forced to upper case</font>
+cur.upperCaseColumnNames()
+cur.sendQuery(<font color="#6858c8">&quot;</font><font color="#f800f8">select * from my_table</font><font color="#6858c8">&quot;</font>)
+con.endSession()
+
+<font color="#a02828"><b>for</b></font> i <font color="#a02828"><b>in</b></font> <font color="#f800f8">0</font>..cur.colCount()-<font color="#f800f8">1</font> <font color="#a02828"><b>do</b></font>
+        puts <font color="#6858c8">&quot;</font><font color="#f800f8">Name:  </font><font color="#6858c8">&quot;</font>
+        puts cur.getColumnName(i)
+        puts <font color="#6858c8">&quot;</font><font color="#6858c8">\n</font><font color="#6858c8">&quot;</font>
+<font color="#a02828"><b>end</b></font>
+
+<font color="#0000f8"># column names will be forced to lower case</font>
+cur.lowerCaseColumnNames()
+cur.sendQuery(<font color="#6858c8">&quot;</font><font color="#f800f8">select * from my_table</font><font color="#6858c8">&quot;</font>)
+con.endSession()
+
+<font color="#a02828"><b>for</b></font> i <font color="#a02828"><b>in</b></font> <font color="#f800f8">0</font>..cur.colCount()-<font color="#f800f8">1</font> <font color="#a02828"><b>do</b></font>
+        puts <font color="#6858c8">&quot;</font><font color="#f800f8">Name:  </font><font color="#6858c8">&quot;</font>
+        puts cur.getColumnName(i)
+        puts <font color="#6858c8">&quot;</font><font color="#6858c8">\n</font><font color="#6858c8">&quot;</font>
+<font color="#a02828"><b>end</b></font>
+
+<font color="#0000f8"># column names will be the same as they are in the database</font>
+cur.mixedCaseColumnNames()
+cur.sendQuery(<font color="#6858c8">&quot;</font><font color="#f800f8">select * from my_table</font><font color="#6858c8">&quot;</font>)
+con.endSession()
+
+<font color="#a02828"><b>for</b></font> i <font color="#a02828"><b>in</b></font> <font color="#f800f8">0</font>..cur.colCount()-<font color="#f800f8">1</font> <font color="#a02828"><b>do</b></font>
+        puts <font color="#6858c8">&quot;</font><font color="#f800f8">Name:  </font><font color="#6858c8">&quot;</font>
+        puts cur.getColumnName(i)
+        puts <font color="#6858c8">&quot;</font><font color="#6858c8">\n</font><font color="#6858c8">&quot;</font>
+<font color="#a02828"><b>end</b></font>
+</pre>
 </blockquote>
 
 <a name="caching"></a>

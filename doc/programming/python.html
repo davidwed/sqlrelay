@@ -142,12 +142,12 @@ provides functions for making substitutions and binds in those queries.</p>
 substitution(), inputBind() and executeQuery().</p>
 
 <blockquote>
+<PRE>
 /usr/local/myprogram/sql/myquery.sql:
 
 	select * from mytable $(whereclause)
 
-program code:
-<PRE>
+Program code:<br>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
 con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
@@ -189,6 +189,76 @@ con.endSession()
 If you would it to come back as a None instead, you can call the 
 getNullsAsNone() method.  To revert to the default behavior, you can
 call getNullsAsEmptyStrings().</p>
+
+<p>If you are using Oracle 8 or higher, you can insert data into BLOB
+and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
+
+<blockquote>
+<pre>
+<font color="#a020f0">from</font> SQLRelay <font color="#a020f0">import</font> PySQLRClient
+
+con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">host</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
+cur=PySQLRClient.sqlrcursor(con)
+
+cur.executeQuery(&quot;<font color="#f800f8">create table images (image blob, description clob)</font>&quot;)
+
+imagedata=''
+imagelength=0
+
+... read an image from a file into imagedata and the length of the
+                file into imagelength ...
+
+description=''
+desclength=0
+
+... read a description from a file into description and the length of
+                the file into desclength ...
+
+cur.prepareQuery(&quot;<font color="#f800f8">insert into images values (:image,:desc)</font>&quot;)
+cur.inputBindBlob(&quot;<font color="#f800f8">image</font>&quot;,imagedata,imagelength)
+cur.inputBindClob(&quot;<font color="#f800f8">desc</font>&quot;,description,desclength)
+cur.executeQuery()
+</pre>
+</blockquote>
+
+<p>Likewise, with Oracle 8, you can retreive BLOB or CLOB data using
+defineOutputBindBlob(), defineOutputBindClob(), getOutputBind() and
+getOutputBindLength().</p>
+
+<blockquote>
+PL/SQL Procedure:<br>
+<pre>
+<font color="#6858c8">FUNCTION</font> sp_mytable <font color="#6858c8">RETURN</font> types.cursorType
+l_cursor types.cursorType;
+<font color="#6858c8">BEGIN</font>
+        OPEN l_cursor <font color="#6858c8">FOR</font> <font color="#a02828"><b>SELECT</b></font> * <font color="#6858c8">FROM</font> mytable;
+        <font color="#6858c8">RETURN</font> l_cursor;
+<font color="#6858c8">END</font>;
+</pre>
+<br>
+Program code:
+<pre>
+<font color="#a020f0">from</font> SQLRelay <font color="#a020f0">import</font> PySQLRClient
+
+con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">host</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
+cur=PySQLRClient.sqlrcursor(con)
+
+cur.prepareQuery(&quot;<font color="#f800f8">begin  select image into :image from images;  select description into :desc from images;  end;</font>&quot;)
+cur.defineOutputBindBlob(&quot;<font color="#f800f8">image</font>&quot;)
+cur.defineOutputBindClob(&quot;<font color="#f800f8">desc</font>&quot;)
+cur.executeQuery()
+
+image=cur.getOutputBind(&quot;<font color="#f800f8">image</font>&quot;)
+imagelength=cur.getOutputBindLength(&quot;<font color="#f800f8">image</font>&quot;)
+
+desc=cur.getOutputBind(&quot;<font color="#f800f8">desc</font>&quot;)
+desclength=cur.getOutputBindLength(&quot;<font color="#f800f8">desc</font>&quot;)
+
+con.endSession()
+
+... do something with image and desc ...
+</pre>
+</blockquote>
 
 <p>Sometimes it's convenient to bind a bunch of variables that may or may not 
 actually be in the query.  For example, if you are building a web based
@@ -387,6 +457,34 @@ index=0
 <p>Prior to SQL Relay version 0.25, you would have had to buffer the first
 result set or use 2 database connections instead of just 1.</p>
 
+<p>If you are using stored procedures with Oracle 8 or higher, a stored
+procedure can execute a query and return a cursor.  A cursor bind variable can
+then retrieve that cursor.  Your program can retrieve the result set from the
+cursor.  All of this can be accomplished using defineOutputBindCursor(),
+getOutputBindCursor() and fetchFromOutputBindCursor().</p>
+
+<blockquote>
+<pre>
+<font color="#a020f0">from</font> SQLRelay <font color="#a020f0">import</font> PySQLRClient
+
+con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">host</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
+cur=PySQLRClient.sqlrcursor(con)
+
+cur.prepareQuery(&quot;<font color="#f800f8">begin  :curs:=sp_mytable end;</font>&quot;)
+cur.defineOutputBindCursor(&quot;<font color="#f800f8">curs</font>&quot;)
+cur.executeQuery()
+
+bindcur=cur.getOutputBindCursor(&quot;<font color="#f800f8">curs</font>&quot;)
+bindcur.fetchFromBindCursor()
+
+<font color="#0000f8"># print fields from table</font>
+<font color="#a02828"><b>for</b></font> i <font color="#a02828"><b>in</b></font> range(0,bindcur.rowCount()-1):
+        <font color="#a02828"><b>for</b></font> j <font color="#a02828"><b>in</b></font> range(0,bindcur.colCount()-1):
+                <font color="#a02828"><b>print</b></font> bindcur.getField(i,j), &quot;<font color="#f800f8">, </font>&quot;
+        <font color="#a02828"><b>print</b></font>
+</pre>
+</blockquote>
+
 <p>The number of cursors simultaneously available per-connection is set at 
 compile time and defaults to 5.</p>
 
@@ -412,6 +510,47 @@ con.endSession()
         print '<FONT color=#ff00ff>Length:        </FONT>', cur.getColumnLength(i)
         print '<FONT color=#ff00ff>Longest Field: </FONT>', cur.getLongest(i)
 </PRE>
+</blockquote>
+
+<p>Some databases force column names to upper case, others force column names
+to lower case, and others still support mixed-case column names.  Sometimes,
+when migrating between databases, you can run into trouble.  You can use
+upperCaseColumnNames() and lowerCaseColumnNames() to cause column names to be
+converted to upper or lower case, or you can use mixedCaseColumnNames() to
+cause column names to be returned in the same case as they are defined in the
+database.</p>
+
+<blockquote>
+<pre>
+<font color="#a020f0">from</font> SQLRelay <font color="#a020f0">import</font> PySQLRClient
+
+con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">host</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
+cur=PySQLRClient.sqlrcursor(con)
+
+<font color="#0000f8"># column names will be forced to upper case</font>
+cur.upperCaseColumnNames()
+cur.sendQuery(&quot;<font color="#f800f8">select * from my_table</font>&quot;)
+con.endSession()
+
+<font color="#a02828"><b>for</b></font> i <font color="#a02828"><b>in</b></font> range(0,cur.colCount()-1):
+        <font color="#a02828"><b>print</b></font> &quot;<font color="#f800f8">Name:  </font>&quot;, cur.getColumnName(i)
+
+<font color="#0000f8"># column names will be forced to lower case</font>
+cur.lowerCaseColumnNames()
+cur.sendQuery(&quot;<font color="#f800f8">select * from my_table</font>&quot;)
+con.endSession()
+
+<font color="#a02828"><b>for</b></font> i <font color="#a02828"><b>in</b></font> range(0,cur.colCount()-1):
+        <font color="#a02828"><b>print</b></font> &quot;<font color="#f800f8">Name:  </font>&quot;, cur.getColumnName(i)
+
+<font color="#0000f8"># column names will be the same as they are in the database</font>
+cur.lowerCaseColumnNames()
+cur.sendQuery(&quot;<font color="#f800f8">select * from my_table</font>&quot;)
+con.endSession()
+
+<font color="#a02828"><b>for</b></font> i <font color="#a02828"><b>in</b></font> range(0,cur.colCount()-1):
+        <font color="#a02828"><b>print</b></font> &quot;<font color="#f800f8">Name:  </font>&quot;, cur.getColumnName(i)
+</pre>
 </blockquote>
 
 <a name="caching"></a>
@@ -491,7 +630,7 @@ rs=getResultSetId()
 cur.suspendResultSet()
 con.suspendSession()
 
-... <B><FONT color=#a52a2a>pass</FONT></B> the rs, port <B><FONT color=#a52a2a>and</FONT></B> socket to the next page ...
+... pass the rs, port and socket to the next page ...
 </PRE>
 </blockquote>
 
@@ -501,7 +640,7 @@ con.suspendSession()
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-... get port <B><FONT color=#a52a2a>and</FONT></B> socket <FONT color=#a020f0>from</FONT> previous page ...
+... get port and socket from previous page ...
 
 con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)

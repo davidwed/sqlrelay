@@ -167,12 +167,12 @@ sqlrcur_prepareFileQuery(), sqlrcur_substitution(), sqlrcur_inputBind() and
 sqlrcur_executeQuery().</p>
 
 <blockquote>
+<PRE>
 /usr/local/myprogram/sql/myquery.sql:
 
 	select * from mytable $(whereclause)
 
-program code:
-<PRE>
+Program code:<br>
 <FONT color=#6a5acd>&lt;?</FONT>
      <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
 
@@ -198,6 +198,17 @@ this, SQL Relay provides the sqlrcur_defineOutputBind() and sqlrcur_getOutputBin
 methods.</p>
 
 <blockquote>
+PL/SQL Procedure:<br>
+<pre>
+<font color="#6858c8">FUNCTION</font> sp_mytable <font color="#6858c8">RETURN</font> types.cursorType
+l_cursor types.cursorType;
+<font color="#6858c8">BEGIN</font>
+        OPEN l_cursor <font color="#6858c8">FOR</font> <font color="#a02828"><b>SELECT</b></font> * <font color="#6858c8">FROM</font> mytable;
+        <font color="#6858c8">RETURN</font> l_cursor;
+<font color="#6858c8">END</font>;
+</pre>
+<br>
+Program code:
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
      <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
@@ -225,6 +236,75 @@ methods.</p>
 If you would it to come back as undefined instead, you can call the 
 sqlrcur_getNullsAsUndefined() method.  To revert to the default behavior, you can
 call sqlrcur_getNullsAsEmptyStrings().</p>
+
+<p>If you are using Oracle 8 or higher, you can insert data into BLOB
+and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
+
+<blockquote>
+<pre>
+<font color="#6858c8">&lt;?</font>
+        <font color="#008888">dl</font><font color="#6858c8">(</font>sqlrelay<font color="#a02828"><b>.</b></font>so<font color="#6858c8">)</font>
+
+        <font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#a02828"><b>=</b></font>sqlrcon_alloc<font color="#6858c8">(</font>&quot;<font color="#f800f8">host</font>&quot;,<font color="#f800f8">9000</font>,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,<font color="#f800f8">0</font>,<font color="#f800f8">1</font><font color="#6858c8">)</font>;
+        <font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#a02828"><b>=</b></font>sqlrcur_alloc<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+
+        sqlrcur_executeQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">create table images (image blob, description clob)</font>&quot;<font color="#6858c8">)</font>;
+
+        <font color="#a02828"><b>$</b></font><font color="#008888">imagedata</font><font color="#a02828"><b>=</b></font>&quot;&quot;;
+        <font color="#a02828"><b>$</b></font><font color="#008888">imagelength</font><font color="#a02828"><b>=</b></font><font color="#f800f8">0</font>;
+
+        <font color="#a02828"><b>...</b></font> read an image from a <font color="#008888">file</font> into imagedata <font color="#a02828"><b>and</b></font> the length of the
+                <font color="#008888">file</font> into imagelength <font color="#a02828"><b>...</b></font>
+
+        <font color="#a02828"><b>$</b></font><font color="#008888">description</font><font color="#a02828"><b>=</b></font>&quot;&quot;;
+        <font color="#a02828"><b>$</b></font><font color="#008888">desclength</font><font color="#a02828"><b>=</b></font><font color="#f800f8">0</font>;
+
+        <font color="#a02828"><b>...</b></font> read a description from a <font color="#008888">file</font> into description <font color="#a02828"><b>and</b></font> the length of
+                the <font color="#008888">file</font> into desclength <font color="#a02828"><b>...</b></font>
+
+        sqlrcur_prepareQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">insert into images values (:image,:desc)</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcur_inputBindBlob<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">image</font>&quot;,<font color="#a02828"><b>$</b></font><font color="#008888">imagedata</font>,<font color="#a02828"><b>$</b></font><font color="#008888">imagelength</font><font color="#6858c8">)</font>;
+        sqlrcur_inputBindClob<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">desc</font>&quot;,<font color="#a02828"><b>$</b></font><font color="#008888">description</font>,<font color="#a02828"><b>$</b></font><font color="#008888">desclength</font><font color="#6858c8">)</font>;
+        sqlrcur_executeQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+
+        sqlrcur_free<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+        sqlrcon_free<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+<font color="#6858c8">?&gt;</font>
+</pre>
+</blockquote>
+
+<p>Likewise, with Oracle 8, you can retreive BLOB or CLOB data using
+defineOutputBindBlob(), defineOutputBindClob(), getOutputBind() and
+getOutputBindLength().</p>
+
+<blockquote>
+<pre>
+<font color="#6858c8">&lt;?</font>
+        <font color="#008888">dl</font><font color="#6858c8">(</font>sqlrelay<font color="#a02828"><b>.</b></font>so<font color="#6858c8">)</font>
+
+        <font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#a02828"><b>=</b></font>sqlrcon_alloc<font color="#6858c8">(</font>&quot;<font color="#f800f8">host</font>&quot;,<font color="#f800f8">9000</font>,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,<font color="#f800f8">0</font>,<font color="#f800f8">1</font><font color="#6858c8">)</font>;
+        <font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#a02828"><b>=</b></font>sqlrcur_alloc<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+
+        sqlrcur_prepareQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">begin  select image into :image from images;  select description into :desc from images;  end;</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcur_defineOutputBindBlob<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">image</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcur_defineOutputBindClob<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">desc</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcur_executeQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+
+        <font color="#a02828"><b>$</b></font><font color="#008888">image</font><font color="#a02828"><b>=</b></font>sqlrcur_getOutputBind<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">image</font>&quot;<font color="#6858c8">)</font>;
+        <font color="#a02828"><b>$</b></font><font color="#008888">imagelength</font><font color="#a02828"><b>=</b></font>sqlrcur_getOutputBindLength<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">image</font>&quot;<font color="#6858c8">)</font>;
+
+        <font color="#a02828"><b>$</b></font><font color="#008888">desc</font><font color="#a02828"><b>=</b></font>sqlrcur_getOutputBind<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">desc</font>&quot;<font color="#6858c8">)</font>;
+        <font color="#a02828"><b>$</b></font><font color="#008888">desclength</font><font color="#a02828"><b>=</b></font>sqlrcur_getOutputBindLength<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">desc</font>&quot;<font color="#6858c8">)</font>;
+
+        sqlrcon_endSession<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+
+        <font color="#a02828"><b>...</b></font> <font color="#a02828"><b>do</b></font> something with image <font color="#a02828"><b>and</b></font> desc <font color="#a02828"><b>...</b></font>
+
+        sqlrcur_free<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+        sqlrcon_free<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+<font color="#6858c8">?&gt;</font>
+</pre>
+</blockquote>
 
 <p>Sometimes it's convenient to bind a bunch of variables that may or may not 
 actually be in the query.  For example, if you are building a web based
@@ -430,6 +510,7 @@ iterate through it's result set, inserting rows into another table, using only
 
 <p>For example:</p>
 
+<blockquote>
 <PRE>
 <FONT color=#6858c8>&lt;?</FONT>
         <FONT color=#008888>dl</FONT><FONT color=#6858c8>(</FONT>sqlrelay<B><FONT color=#a02828>.</FONT></B>so<FONT color=#6858c8>)</FONT>
@@ -455,9 +536,48 @@ iterate through it's result set, inserting rows into another table, using only
         sqlrcon_free<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><FONT color=#6858c8>)</FONT>;
 <FONT color=#6858c8>?&gt;</FONT>
 </PRE>
+</blockquote>
 
 <p>Prior to SQL Relay version 0.25, you would have had to buffer the first
 result set or use 2 database connections instead of just 1.</p>
+
+<p>If you are using stored procedures with Oracle 8 or higher, a stored
+procedure can execute a query and return a cursor.  A cursor bind variable can
+then retrieve that cursor.  Your program can retrieve the result set from the
+cursor.  All of this can be accomplished using defineOutputBindCursor(),
+getOutputBindCursor() and fetchFromOutputBindCursor().</p>
+
+<blockquote>
+<pre>
+<font color="#6858c8">&lt;?</font>
+        <font color="#008888">dl</font><font color="#6858c8">(</font>sqlrelay<font color="#a02828"><b>.</b></font>so<font color="#6858c8">)</font>
+
+        <font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#a02828"><b>=</b></font>sqlrcon_alloc<font color="#6858c8">(</font>&quot;<font color="#f800f8">host</font>&quot;,<font color="#f800f8">9000</font>,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,<font color="#f800f8">0</font>,<font color="#f800f8">1</font><font color="#6858c8">)</font>;
+        <font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#a02828"><b>=</b></font>sqlrcur_alloc<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+
+        sqlrcur_prepareQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">begin  :curs:=sp_mytable; end;</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcur_defineOutputBindCursor<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">curs</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcur_executeQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+
+        sqlrcur         bindcur<font color="#a02828"><b>=</b></font>sqlrcur_getOutputBindCursor<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">curs</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcur_fetchFromBindCursor<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">bindcur</font><font color="#6858c8">)</font>;
+
+        <font color="#0000f8"># print fields from table</font>
+        <font color="#a02828"><b>for</b></font> <font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>=</b></font><font color="#f800f8">0</font>; <font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>&lt;</b></font>sqlrcur_rowCount<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">bindcur</font><font color="#6858c8">)</font>; <font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>++</b></font><font color="#6858c8">)</font> <font color="#6858c8">{</font>
+                <font color="#a02828"><b>for</b></font> <font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">j</font><font color="#a02828"><b>=</b></font><font color="#f800f8">0</font>; <font color="#a02828"><b>$</b></font><font color="#008888">j</font><font color="#a02828"><b>&lt;</b></font>sqlrcur_colCount<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">bindcur</font><font color="#6858c8">)</font>; <font color="#a02828"><b>$</b></font><font color="#008888">j</font><font color="#a02828"><b>++</b></font><font color="#6858c8">)</font> <font color="#6858c8">{</font>
+                        <font color="#008888">echo</font> sqlrcur_getField<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">bindcur</font>,<font color="#a02828"><b>$</b></font><font color="#008888">i</font>,<font color="#a02828"><b>$</b></font><font color="#008888">j</font><font color="#6858c8">)</font>;
+                        <font color="#008888">echo</font> &quot;<font color="#f800f8">, </font>&quot;;
+                <font color="#6858c8">}</font>
+                <font color="#008888">echo</font> &quot;<font color="#6858c8">\n</font>&quot;;
+        <font color="#6858c8">}</font>
+
+        sqlrcur_free<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">bindcur</font><font color="#6858c8">)</font>;
+
+        sqlrcur_free<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+        sqlrcon_free<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+<font color="#6858c8">?&gt;</font>
+</pre>
+</blockquote>
 
 <p>The number of cursors simultaneously available per-connection is set at 
 compile time and defaults to 5.</p>
@@ -498,6 +618,62 @@ available.</p>
      sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 <FONT color=#6a5acd>?&gt;</FONT>
 </PRE>
+</blockquote>
+
+<p>Some databases force column names to upper case, others force column names
+to lower case, and others still support mixed-case column names.  Sometimes,
+when migrating between databases, you can run into trouble.  You can use
+upperCaseColumnNames() and lowerCaseColumnNames() to cause column names to be
+converted to upper or lower case, or you can use mixedCaseColumnNames() to
+cause column names to be returned in the same case as they are defined in the
+database.</p>
+
+<blockquote>
+<pre>
+<font color="#6858c8">&lt;?</font>
+        <font color="#008888">dl</font><font color="#6858c8">(</font>sqlrelay<font color="#a02828"><b>.</b></font>so<font color="#6858c8">)</font>
+
+
+        <font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#a02828"><b>=</b></font>sqlrcon_alloc<font color="#6858c8">(</font>&quot;<font color="#f800f8">host</font>&quot;,<font color="#f800f8">9000</font>,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,<font color="#f800f8">0</font>,<font color="#f800f8">1</font><font color="#6858c8">)</font>;
+        <font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#a02828"><b>=</b></font>sqlrcur_alloc<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+
+        <font color="#0000f8"># column names will be forced to upper case</font>
+        sqlrcur_upperCaseColumnNames<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+        sqlrcur_endQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">select * from my_table</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcon_endSession<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+
+        <font color="#a02828"><b>for</b></font> <font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>=</b></font><font color="#f800f8">0</font>; <font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>&lt;</b></font>sqlrcur_colCount<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>; <font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>++</b></font><font color="#6858c8">)</font> <font color="#6858c8">{</font>
+                <font color="#008888">echo</font> &quot;<font color="#f800f8">Name: </font>&quot;;
+                <font color="#008888">echo</font> sqlrcur_getColumnName<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,<font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#6858c8">)</font>;
+                <font color="#008888">echo</font> &quot;<font color="#6858c8">\n</font>&quot;;
+        <font color="#6858c8">}</font>
+
+        <font color="#0000f8"># column names will be forced to lower case</font>
+        sqlrcur_lowerCaseColumnNames<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+        sqlrcur_endQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">select * from my_table</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcon_endSession<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+
+        <font color="#a02828"><b>for</b></font> <font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>=</b></font><font color="#f800f8">0</font>; <font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>&lt;</b></font>sqlrcur_colCount<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>; <font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>++</b></font><font color="#6858c8">)</font> <font color="#6858c8">{</font>
+                <font color="#008888">echo</font> &quot;<font color="#f800f8">Name: </font>&quot;;
+                <font color="#008888">echo</font> sqlrcur_getColumnName<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,<font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#6858c8">)</font>;
+                <font color="#008888">echo</font> &quot;<font color="#6858c8">\n</font>&quot;;
+        <font color="#6858c8">}</font>
+
+        <font color="#0000f8"># column names will be the same as they are in the database</font>
+        sqlrcur_mixedCaseColumnNames<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+        sqlrcur_endQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">select * from my_table</font>&quot;<font color="#6858c8">)</font>;
+        sqlrcon_endSession<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+
+        <font color="#a02828"><b>for</b></font> <font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>=</b></font><font color="#f800f8">0</font>; <font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>&lt;</b></font>sqlrcur_colCount<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>; <font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#a02828"><b>++</b></font><font color="#6858c8">)</font> <font color="#6858c8">{</font>
+                <font color="#008888">echo</font> &quot;<font color="#f800f8">Name: </font>&quot;;
+                <font color="#008888">echo</font> sqlrcur_getColumnName<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,<font color="#a02828"><b>$</b></font><font color="#008888">i</font><font color="#6858c8">)</font>;
+                <font color="#008888">echo</font> &quot;<font color="#6858c8">\n</font>&quot;;
+        <font color="#6858c8">}</font>
+
+        sqlrcur_free<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#6858c8">)</font>;
+        sqlrcon_free<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
+<font color="#6858c8">?&gt;</font>
+</pre>
 </blockquote>
 
 <a name="caching"></a>
