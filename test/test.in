@@ -1,5 +1,8 @@
 #!/bin/sh
 
+HTTPDINIT=/etc/rc.d/init.d/httpd
+PHPDIR=/var/www/html
+
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@prefix@/java/com/firstworks/sqlrelay
 export CLASSPATH=$CLASSPATH:./:@prefix@/java
 
@@ -78,7 +81,6 @@ then
 	PHPARGS="host=localhost&port=8012&socket=&user=sybasetest&password=sybasetest"
 fi
 
-rm -f cachefile* sqlnet.log
 
 if ( test "$API" = "c" -o -z "$API" )
 then
@@ -86,6 +88,7 @@ then
 	echo "C:"
 	cd c
 	./$DB $ARGS
+	rm -f cachefile* sqlnet.log
 	cd ..
 fi
 
@@ -95,6 +98,7 @@ then
 	echo "C++:"
 	cd c++
 	./$DB $ARGS
+	rm -f cachefile* sqlnet.log
 	cd ..
 fi
 
@@ -106,6 +110,7 @@ then
 		echo "Java:"
 		cd java
 		java $DB $ARGS
+		rm -f cachefile* sqlnet.log
 		cd ..
 	fi
 fi
@@ -118,6 +123,7 @@ then
 		echo "Perl:"
 		cd perl
 		perl $DB.pl $ARGS
+		rm -f cachefile* sqlnet.log
 		cd ..
 	fi
 fi
@@ -130,6 +136,7 @@ then
 		echo "Python:"
 		cd python
 		python $DB.py $ARGS
+		rm -f cachefile* sqlnet.log
 		cd ..
 	fi
 fi
@@ -142,6 +149,7 @@ then
 		echo "Ruby:"
 		cd ruby
 		ruby $DB.rb $ARGS
+		rm -f cachefile* sqlnet.log
 		cd ..
 	fi
 fi
@@ -153,12 +161,12 @@ then
 		echo
 		echo "PHP:"
 		cd php
-		sudo /etc/rc.d/init.d/httpd start
+		sudo $HTTPDINIT start
 		sleep 1
 		chmod 755 $DB.php
-		sudo cp $DB.php /var/www/html
+		sudo cp $DB.php $PHPDIR
 		lynx -dump "http://localhost/$DB.php?$PHPARGS"
-		sudo /etc/rc.d/init.d/httpd stop
+		sudo $HTTPDINIT stop
 		sudo rm -f /tmp/cachefile* sqlnet.log
 		cd ..
 	fi
