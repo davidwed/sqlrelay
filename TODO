@@ -1,24 +1,6 @@
-cygwin
-	mysql connection crashes on function call
-
-need "using sqlrelay on windows doc"
-	installing packages
-	optional cygwin components
-	running sqlrelay clients
-	add path to mysql dll to PATH
-
-VB wrapper
-
 idle client timeout
 client connect timeout
 perl apis -> CPAN
-
-sqlite test segfaults after suspeneded session tests
-sqlite commit/rollback fails too
-sqlite temp tables fail
-all tests should strdup the result of getConnectionSocket?
-
-fix pythondb for python < 2.1
 
 --------------------------------------------------------------------------------
 
@@ -77,28 +59,37 @@ Tests:
 	oldmysql test files for non-C++ api's
 
 cygwin:
+	mysql connection crashes on function call
 	how to install as a service?
-	how to build a php extension?
-		1) need php source 
-	active state python
-		http://sebsauvage.net/python/mingw.html
-	non-cygwin ruby
-		creates funny CFLAGS
-	active state perl
-		PERL5LIB env var points to Oracle's perl installation
-		perl -V:prefix return C:\Perl
-	active state tcl
-		no doubt will have similar problems...
-		-I/cygdrive/Tcl/include
-		-L/cygdrive/c/Tcl/lib -ltcl84 -ltclstub84
-	zope
-		/cygdrive/c/Program Files/Zope-2.7.1/lib/python/Products
-	sqlite
-		.dll and .def file wherever
-	msql
-		won't build, need older bison
-	lago
-		???
+	languages:
+		VB wrapper
+		how to build a php extension?
+			1) need php source 
+		active state python
+			http://sebsauvage.net/python/mingw.html
+		non-cygwin ruby
+			creates funny CFLAGS
+		active state perl
+			PERL5LIB env var points to Oracle's perl installation
+			perl -V:prefix return C:\Perl
+		active state tcl
+			no doubt will have similar problems...
+			-I/cygdrive/Tcl/include
+			-L/cygdrive/c/Tcl/lib -ltcl84 -ltclstub84
+		zope
+			/cygdrive/c/Program Files/Zope-2.7.1/lib/python/Products
+	databases:
+		sqlite
+			.dll and .def file wherever
+		msql
+			won't build, need older bison
+		lago
+			???
+	doc
+		installing packages
+		optional cygwin components
+		running sqlrelay clients
+		add path to mysql dll to PATH
 
 Compatibility:
 	support @,: or ? for fake bind variables

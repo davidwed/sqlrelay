@@ -397,7 +397,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType(0),"UNKNOWN");
 	printf("\n");
 
-	/*printf("SUSPENDED SESSION: \n");
+	printf("SUSPENDED SESSION: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
@@ -441,7 +441,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->endOfResultSet(),1);
 	checkSuccess(cur->rowCount(),8);
 	cur->setResultSetBufferSize(0);
-	printf("\n");*/
+	printf("\n");
 
 	printf("CACHED RESULT SET: \n");
 	cur->cacheToFile("cachefile1");
@@ -506,7 +506,7 @@ int	main(int argc, char **argv) {
 	cur->setResultSetBufferSize(0);
 	printf("\n");
 
-	/*printf("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: \n");
+	printf("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: \n");
 	cur->setResultSetBufferSize(2);
 	cur->cacheToFile("cachefile1");
 	cur->setCacheTtl(200);
@@ -543,9 +543,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(8,0),NULL);
 	cur->setResultSetBufferSize(0);
 	delete[] filename;
-	printf("\n");*/
+	printf("\n");
 
-	/*printf("COMMIT AND ROLLBACK: \n");
+	printf("COMMIT AND ROLLBACK: \n");
 	secondcon=new sqlrconnection(argv[1],
 				atoi(argv[2]), 
 				argv[3],argv[4],argv[5],0,1);
@@ -576,13 +576,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(5,0),NULL);
 	checkSuccess(cur->getField(6,0),NULL);
 	checkSuccess(cur->getField(7,0),NULL);
-	printf("\n");*/
+	printf("\n");
 
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 
 	// temporary tables
-	/*printf("TEMPORARY TABLES: \n");
+	printf("TEMPORARY TABLES: \n");
 	cur->sendQuery("drop table temptable\n");
 	cur->sendQuery("create temporary table temptable (col1 int)");
 	checkSuccess(cur->sendQuery("insert into temptable values (1)"),1);
@@ -592,7 +592,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 	checkSuccess(cur->sendQuery("select count(*) from temptable"),0);
 	cur->sendQuery("drop table temptable\n");
-	printf("\n");*/
+	printf("\n");
 
 	// invalid queries...
 	printf("INVALID QUERIES: \n");

@@ -1190,7 +1190,7 @@ then
 		then
 			AC_MSG_WARN(SQLite support will not be built.)
 		else
-			if ( test -n "$SQLITEVERSION" )
+			if ( test -z "$SQLITEVERSION" )
 			then
 				AC_MSG_CHECKING(if SQLite needs gdbm)
 				SQLITENEEDGDBM=""
@@ -1821,6 +1821,7 @@ then
 	PYTHONINCLUDES=""
 	PYTHONDIR=""
 	PYTHONLIB=""
+	PYTHONVERSION=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -1833,7 +1834,7 @@ then
 		if ( test -n "$PYTHONPATH" )
 		then
 		
-			for i in "1.5" "1.6" "2.0" "2.1" "2.2" "2.3"
+			for i in "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
 			do
 				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib/python$i/config" )
 				then
@@ -1853,6 +1854,7 @@ then
 		
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 				then
+					PYTHONVERSION=`echo $i | sed -e "s|\.||"`
 					break
 				fi
 			done
@@ -1860,12 +1862,13 @@ then
 			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
 			then
 
-				for i in "15" "16" "20" "21" "22" "23"
+				for i in "23" "22" "21" "20" "16" "15"
 				do
 
 					FW_CHECK_HEADER_LIB([$PYTHONPATH/include/Python.h],[PYTHONINCLUDES=\"-I$PYTHONPATH/include\"],[$PYTHONPATH/libs/libpython$j.lib],[PYTHONDIR=\"$PYTHONPATH/Lib\"; PYTHONLIB=\"-L$PYTHONPATH/libs -lpython$j\"],[],[])
 					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 					then
+						PYTHONVERSION=$i
 						break
 					fi
 
@@ -1874,7 +1877,7 @@ then
 		
 		else
 		
-			for j in "1.5" "1.6" "2.0" "2.1" "2.2" "2.3"
+			for j in "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
 			do
 				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"
 				do
@@ -1884,6 +1887,7 @@ then
 					fi
 					if ( test -n "$PYTHONINCLUDES" )
 					then
+						PYTHONVERSION=`echo $j | sed -e "s|\.||"`
 						break
 					fi
 				done
@@ -1914,11 +1918,12 @@ then
 			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
 			then
 
-				for j in "15" "16" "20" "21" "22" "23"
+				for j in "23" "22" "21" "20" "16" "15"
 				do
 					FW_CHECK_HEADER_LIB([/cygdrive/c/Python$j/include/Python.h],[PYTHONINCLUDES=\"-I/cygdrive/c/Python$j/include\"],[/cygdrive/c/Python$j/libs/python$j.lib],[PYTHONDIR=\"/cygdrive/c/Python$j/Lib\"; PYTHONLIB=\"-L/cygdrive/c/Python$j/libs -lpython$j\"],[],[])
 					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 					then
+						PYTHONVERSION=$j
 						break
 					fi
 				done
@@ -1936,10 +1941,17 @@ then
 
 	FW_INCLUDES(python,[$PYTHONINCLUDES])
 
+	PYTHON_HAVE_WEAKREF=""
+	if ( test "$PYTHONVERSION" -ge "21" )
+	then
+		PYTHON_HAVE_WEAKREF="yes"
+	fi
+
 	AC_SUBST(HAVE_PYTHON)
 	AC_SUBST(PYTHONINCLUDES)
 	AC_SUBST(PYTHONDIR)
 	AC_SUBST(PYTHONLIB)
+	AC_SUBST(PYTHON_HAVE_WEAKREF)
 fi
 ])
 

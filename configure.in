@@ -902,6 +902,13 @@ echo "	Clustered/Replicated database support."
 echo "	Perl API."
 echo
 
+if ( test -n "$PYTHONVERSION" -a "$PYTHONVERSION" -lt "21" )
+then
+	echo
+	echo "WARNING!  Support for Python versions prior to 2.1 is"
+	echo "          deprecated and will be removed soon."
+fi
+
 if ( test "$FREETDSSYSTEMWARNING" = "yes" -a "$SYBASEBUILD" != "no     " )
 then
 	echo

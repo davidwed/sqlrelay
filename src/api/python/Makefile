@@ -78,7 +78,11 @@ install: CSQLRelay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(INSTALL) $(INSTALLSTRIP) CSQLRelay.so $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(INSTALL) -m 644 PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+ifeq ($(PYTHON_HAVE_WEAKREF),yes)
 	$(INSTALL) -m 644 PySQLRDB.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+else
+	$(INSTALL) -m 644 PySQLRDB-noweakref.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay/PySQLRDB.py
+endif
 	$(INSTALL) -m 644 __init__.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(RM) CSQLRelay.so
 else
