@@ -58,5 +58,6 @@ unconfig: clean
 	$(RM) init/debian/init.d/sqlrelay
 	$(RM) test/test
 	$(RM) libtool
+	$(RM) libtool.gcc
 
 distclean: unconfig

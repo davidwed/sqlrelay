@@ -1,9 +1,8 @@
+top_builddir = ../../../..
+
 include ../../../../config.mk
 
-
-INSTALL = $(abs_srcdir)/install-sh -c
-
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c/include -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 ifneq ($(strip $(libdir)),)
 ifeq ($(CUSERPATH),yes)
 	RPATH = -R $(libdir)
@@ -34,9 +33,9 @@ libsqlrclientwrapper.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
-	$(abs_srcdir)/mkinstalldirs $(libdir)
+	$(MKINSTALLDIRS) $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
-	$(abs_srcdir)/mkinstalldirs $(cachedir)
+	$(MKINSTALLDIRS) $(cachedir)
 	chmod 777 $(cachedir)
 
 uninstall:

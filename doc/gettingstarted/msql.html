@@ -27,10 +27,13 @@
 <p>I've sucessfully installed mSQL on Linux, FreeBSD, NetBSD, OpenBSD, SCO 
 OpenServer and Solaris.  I've had to compile it from source on all platforms
 except SCO OpenServer.  mSQL is available from the 
-<a href="http://www.hughes.com.au">mSQL home page</a>.  It compiles cleanly on 
-all platforms, though you will need yacc (or bison from GNU binutils).  By 
-default, mSQL installs itself in /usr/local/Hughes.  Note that you should add
-/usr/local/Hughes/bin to your PATH environment variable.</p>
+<a href="http://www.hughes.com.au">mSQL home page</a>.  It compiles on all
+platforms using gcc prior to version 3.3 and yacc or GNU bison prior to version
+1.50.  If your platform comes with newer versions of gcc or bison, then you may
+have to download and compile older versions and use them to compile msql.</p>
+
+<p>By default, mSQL installs itself in /usr/local/Hughes.  Note that you
+should add /usr/local/Hughes/bin to your PATH environment variable.</p>
 
 <p>When compiling from source, you should create a user named msql, assign it a 
 password, then compile and install mSQL as that user.</p>

@@ -1,6 +1,6 @@
-include ../../../config.mk
+top_builddir = ../../..
 
-INSTALL = $(abs_srcdir)/install-sh -c
+include ../../../config.mk
 
 ifeq ($(INSTALLPREFIX),)
 	INSTPREFIX = 
@@ -8,8 +8,8 @@ else
 	INSTPREFIX = -inst-prefix-dir $(INSTALLPREFIX)
 endif
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PSQLUSERPATH),yes)
 	RPATH = -R $(libdir)
@@ -44,7 +44,7 @@ libpqsqlrelay.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
-	$(abs_srcdir)/mkinstalldirs $(libdir)
+	$(MKINSTALLDIRS) $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libpqsqlrelay.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 

@@ -1,9 +1,9 @@
+top_builddir = ../../..
+
 include ../../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
-CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(SSLLIB) $(CRYPTOLIB) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(SSLLIB) $(CRYPTOLIB) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PYTHONUSERPATH),yes)
@@ -70,7 +70,7 @@ CSQLRelay.so:
 	fi
 
 install: CSQLRelay.so
-	$(abs_srcdir)/mkinstalldirs $(PYTHONDIR)/site-packages/SQLRelay
+	$(MKINSTALLDIRS) $(PYTHONDIR)/site-packages/SQLRelay
 	$(LIBTOOL) --mode=install $(INSTALL) CSQLRelay.so $(PYTHONDIR)/site-packages/SQLRelay
 	$(LIBTOOL) --mode=install $(INSTALL) -m 644 PySQLRClient.py $(PYTHONDIR)/site-packages/SQLRelay
 	$(LIBTOOL) --mode=install $(INSTALL) -m 644 PySQLRDB.py $(PYTHONDIR)/site-packages/SQLRelay

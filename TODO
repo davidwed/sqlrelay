@@ -1,23 +1,29 @@
+abs_srcdir and abs_builddir aren't getting set properly
+
+ADODB - have a driver, just need to incorporate it
+scaling/handoff=pass incompatibility
+OS X compatibility
+
+
 oldmysql test files for non-C++ api's
 
 db2 start/stop doesn't work for 7.2
 	db2start/db2stop works when run as a given instance owner
 	db2 appears to need a license suddenly
 
-scaling/handoff=pass incompatibility
-	setting backlog:
-		linux:
-			looks like max is 128 on linux 2.0
-			2.2/2.4 - /proc/sys/net/ipv4/tcp_max_syn_backlog
-				Default is 1024 for systems with more than 128Mb
-				of memory, and 128 for low memory machines.
-				If you make it greater than 1024, change
-				TCP_SYNQ_HSIZE in include/net/tcp.h to keep
-				TCP_SYNQ_HSIZE*16<=tcp_max_syn_backlog
-				and recompile kernel.
-			syn cookies - no max backlog
-		solaris:
-			/usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
+setting backlog:
+	linux:
+		looks like max is 128 on linux 2.0
+		2.2/2.4 - /proc/sys/net/ipv4/tcp_max_syn_backlog
+			Default is 1024 for systems with more than 128Mb
+			of memory, and 128 for low memory machines.
+			If you make it greater than 1024, change
+			TCP_SYNQ_HSIZE in include/net/tcp.h to keep
+			TCP_SYNQ_HSIZE*16<=tcp_max_syn_backlog
+			and recompile kernel.
+		syn cookies - no max backlog
+	solaris:
+		/usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
 
 
 handle temp tables properly:
@@ -50,6 +56,7 @@ Tests:
 	interbase stored procedures
 
 Compatibility:
+	daemontools
 	incorporate pkg-config stuff
 	crypto/ssl lib tests need to look in various places for the library
 	SCO:
@@ -159,7 +166,6 @@ backends:
 
 API's:
 	wrapper:
-		ADODB - have a driver, just need to incorporate it
 		PHP DBI
 		JDBC
 		ODBC

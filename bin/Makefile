@@ -1,9 +1,9 @@
+top_builddir = ..
+
 include ../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
 install:
-	$(abs_srcdir)/mkinstalldirs $(bindir)
+	$(MKINSTALLDIRS) $(bindir)
 	$(INSTALL) backupschema $(bindir)
 	$(INSTALL) sqlr-stop $(bindir)
 	$(INSTALL) sqlrclient-config $(bindir)

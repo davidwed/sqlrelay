@@ -1,9 +1,9 @@
+top_builddir = ../..
+
 include ../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
-CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util $(RUDIMENTSINCLUDES)
-LIBS = -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
+LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(CLIENTUSERPATH),yes)
@@ -35,7 +35,7 @@ sqlr-scaler: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:
-	$(abs_srcdir)/mkinstalldirs $(bindir)
+	$(MKINSTALLDIRS) $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-scaler $(bindir)
 
 uninstall:

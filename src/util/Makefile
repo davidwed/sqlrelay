@@ -1,8 +1,8 @@
+top_builddir = ../..
+
 include ../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
-CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 
 SRCS = cmdline.C debugfile.C tempdir.C sqlrconfigfile.C authenticator.C
 LOBJS = cmdline.lo debugfile.lo tempdir.lo sqlrconfigfile.lo authenticator.lo
@@ -28,7 +28,7 @@ libsqlrutil.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
-	$(abs_srcdir)/mkinstalldirs $(libdir)
+	$(MKINSTALLDIRS) $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrutil.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 

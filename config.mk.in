@@ -1,10 +1,10 @@
 SHELL = /bin/sh
 VPATH = @srcdir@
 
-abs_srcdir = @abs_srcdir@
-top_srcdir = $(abs_srcdir)
-abs_builddir = @abs_builddir@
-top_builddir = $(abs_builddir)
+#abs_srcdir = @abs_srcdir@
+#top_srcdir = $(abs_srcdir)
+#abs_builddir = @abs_builddir@
+#top_builddir = $(abs_builddir)
 
 SQLR_VERSION = @SQLR_VERSION@
 SONAME_VERSION_INFO = @SONAME_VERSION_INFO@
@@ -19,7 +19,6 @@ libexecdir = @libexecdir@
 bindir = @bindir@
 localstatedir = @localstatedir@
 sysconfdir = @sysconfdir@
-localstatedir = @localstatedir@
 mandir = @mandir@
 docdir = ${prefix}/doc/sqlrelay
 tmpdir = ${localstatedir}/sqlrelay/tmp
@@ -50,6 +49,13 @@ CFLAGS = @CFLAGS@ @SMALLCODE@ @PIPE@
 
 # libtool command
 LIBTOOL = @LIBTOOL@
+LIBTOOLGCC = @LIBTOOLGCC@
+
+# install command
+INSTALL = $(top_builddir)/install-sh -c
+
+# mkinstalldirs command
+MKINSTALLDIRS = $(top_builddir)/mkinstalldirs
 
 # commands to erase files and directories
 RM = rm -f

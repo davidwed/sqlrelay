@@ -1,33 +1,33 @@
+top_builddir = ..
+
 include ../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
 install:
-	$(abs_srcdir)/mkinstalldirs $(docdir)
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/c
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/c++
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/perl
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/php
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/python
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/ruby
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/java
-	$(abs_srcdir)/mkinstalldirs $(docdir)/css
-	$(abs_srcdir)/mkinstalldirs $(docdir)/programming
-	$(abs_srcdir)/mkinstalldirs $(docdir)/programming/zope
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/5
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/6
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/7
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/8
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/redhat/9
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/slackware
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/slackware/7
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/oracle/linux/slackware/8
-	$(abs_srcdir)/mkinstalldirs $(docdir)/gettingstarted/sybase
+	$(MKINSTALLDIRS) $(docdir)
+	$(MKINSTALLDIRS) $(docdir)/api
+	$(MKINSTALLDIRS) $(docdir)/api/c
+	$(MKINSTALLDIRS) $(docdir)/api/c++
+	$(MKINSTALLDIRS) $(docdir)/api/perl
+	$(MKINSTALLDIRS) $(docdir)/api/php
+	$(MKINSTALLDIRS) $(docdir)/api/python
+	$(MKINSTALLDIRS) $(docdir)/api/ruby
+	$(MKINSTALLDIRS) $(docdir)/api/java
+	$(MKINSTALLDIRS) $(docdir)/css
+	$(MKINSTALLDIRS) $(docdir)/programming
+	$(MKINSTALLDIRS) $(docdir)/programming/zope
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/5
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/6
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/7
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/8
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/9
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/slackware
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/slackware/7
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/slackware/8
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/sybase
 	$(INSTALL) -m 644 clientapis.html $(docdir)
 	$(INSTALL) -m 644 configuring.html $(docdir)
 	$(INSTALL) -m 644 connections.html $(docdir)
@@ -61,9 +61,9 @@ install:
 	$(INSTALL) -m 644 api/java/package-list $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/packages.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/stylesheet.css $(docdir)/api/java
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/java/com
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/java/com/firstworks
-	$(abs_srcdir)/mkinstalldirs $(docdir)/api/java/com/firstworks/sqlrelay
+	$(MKINSTALLDIRS) $(docdir)/api/java/com
+	$(MKINSTALLDIRS) $(docdir)/api/java/com/firstworks
+	$(MKINSTALLDIRS) $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-frame.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-summary.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-tree.html $(docdir)/api/java/com/firstworks/sqlrelay

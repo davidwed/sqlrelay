@@ -1,9 +1,9 @@
+top_builddir = ../../..
+
 include ../../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
-CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) -I$(abs_srcdir) -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES) -fPIC
-LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(TCLLIBS) $(SSLLIB) $(CRYPTOLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) -fPIC
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(TCLLIBS) $(SSLLIB) $(CRYPTOLIB) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(TCLUSERPATH),yes)
@@ -89,7 +89,7 @@ sqlrelay.so:
 	fi
 
 install: sqlrelay.so
-	$(abs_srcdir)/mkinstalldirs $(TCLLIBSPATH)/sqlrelay
+	$(MKINSTALLDIRS) $(TCLLIBSPATH)/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) -s sqlrelay.so $(TCLLIBSPATH)/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) -m 644 pkgIndex.tcl $(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.so

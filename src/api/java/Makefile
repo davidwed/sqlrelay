@@ -1,8 +1,8 @@
+top_builddir = ../../..
+
 include ../../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(JAVAUSERPATH),yes)
@@ -33,10 +33,10 @@ java:
 	$(JAVAC) com/firstworks/sqlrelay/*.java
 
 libSQLRConnection.la: com_firstworks_sqlrelay_SQLRConnection.C com_firstworks_sqlrelay_SQLRConnection.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRConnection.lo -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) -module
+	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRConnection.lo -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) -module
 
 libSQLRCursor.la: com_firstworks_sqlrelay_SQLRCursor.C com_firstworks_sqlrelay_SQLRCursor.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRCursor.lo -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) -module
+	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRCursor.lo -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) -module
 
 libSQLRConnection.so:
 	if ( test -r .libs/libSQLRConnection.0.0.0 ); \
@@ -107,7 +107,7 @@ libSQLRCursor.so:
 	fi
 
 install: libSQLRConnection.so libSQLRCursor.so
-	$(abs_srcdir)/mkinstalldirs $(javadir)/com/firstworks/sqlrelay
+	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) -s libSQLRConnection.so $(javadir)/com/firstworks/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) -s libSQLRCursor.so $(javadir)/com/firstworks/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay

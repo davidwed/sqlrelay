@@ -325,7 +325,8 @@ void	sqlrlistener::shmError(const char *id, int shmid) {
 	fprintf(stderr,"to inspect existing shared memory \n");
 	fprintf(stderr,"	segments and the ipcrm command to ");
 	fprintf(stderr,"remove the shared memory segment with ");
-	fprintf(stderr,"\n	id %d\n\n",shmid);
+	fprintf(stderr,"\n	id %d.\n\n",shmid);
+	fprintf(stderr,"	Error was: %s\n\n",strerror(errno));
 }
 
 void	sqlrlistener::semError(const char *id, int semid) {
@@ -337,15 +338,15 @@ void	sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr," instance.\n\n");
 	fprintf(stderr,"	If it is not running, ");
 	fprintf(stderr,"something may have crashed and left ");
-	fprintf(stderr,"an old segment\n");
+	fprintf(stderr,"an old semaphore set\n");
 	fprintf(stderr,"	lying around.  Use the ipcs ");
 	fprintf(stderr,"command to inspect existing ");
-	fprintf(stderr,"semaphore set \n");
-	fprintf(stderr,"	segments and the ipcrm ");
+	fprintf(stderr,"semaphore sets \n");
+	fprintf(stderr,"	and the ipcrm ");
 	fprintf(stderr,"command to remove the semaphore set ");
-	fprintf(stderr,"segment with \n");
-	fprintf(stderr,"	id %d",semid);
-	fprintf(stderr,".\n\n");
+	fprintf(stderr,"with \n");
+	fprintf(stderr,"	id %d.\n\n",semid);
+	fprintf(stderr,"	Error was: %s\n\n",strerror(errno));
 }
 
 int	sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {

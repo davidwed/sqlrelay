@@ -1,10 +1,10 @@
+top_builddir = ../../..
+
 include ../../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
-
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/authenticator -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(ORACLEINCLUDES)
-LIBS = $(ORACLELIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(ORACLELIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection_debug -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/authenticator -I$(top_builddir)/src/connection $(RUDIMENTSINCLUDES) $(ORACLEINCLUDES)
+LIBS = $(ORACLELIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(ORACLELIBS) -L$(top_builddir)/src/connection -lsqlrconnection_debug -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(ORACLELIBSPATH)),)
 ifeq ($(ORACLEUSERPATH),yes)
 	RPATH = -R $(ORACLELIBSPATH)
@@ -51,12 +51,12 @@ sqlr-connection-oracle8-debug: $(SRCS) $(DLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ $(DLOBJS) $(DEBUGLIBS) $(RPATH)
 
 install:
-	$(abs_srcdir)/mkinstalldirs $(bindir)
+	$(MKINSTALLDIRS) $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle8 $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle8-debug $(bindir)
-	$(abs_srcdir)/mkinstalldirs $(tmpdir)
+	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(abs_srcdir)/mkinstalldirs $(debugdir)
+	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:

@@ -1,10 +1,12 @@
+top_builddir = ../../..
+
 include ../../../config.mk
 
-INSTALL = $(abs_srcdir)/install-sh -c
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(INTERBASEINCLUDES)
-LIBS = $(INTERBASELIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(INTERBASELIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection_debug -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/connection $(RUDIMENTSINCLUDES) $(INTERBASEINCLUDES)
+LIBS = $(INTERBASELIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(INTERBASELIBS) -L$(top_builddir)/src/connection -lsqlrconnection_debug -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(INTERBASELIBSPATH)),)
 ifeq ($(INTERBASEUSERPATH),yes)
 	RPATH = -R $(INTERBASELIBSPATH)
@@ -51,12 +53,12 @@ sqlr-connection-interbase-debug: $(SRCS) $(DLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(INTERBASESTATIC) $(LDFLAGS) -o $@ $(DLOBJS) $(DEBUGLIBS) $(RPATH)
 
 install:
-	$(abs_srcdir)/mkinstalldirs $(bindir)
+	$(MKINSTALLDIRS) $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-interbase $(bindir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-interbase-debug $(bindir)
-	$(abs_srcdir)/mkinstalldirs $(tmpdir)
+	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(abs_srcdir)/mkinstalldirs $(debugdir)
+	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:

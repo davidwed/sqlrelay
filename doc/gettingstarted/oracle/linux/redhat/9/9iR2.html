@@ -47,20 +47,6 @@ make<br>
 make install<br>
 </b></blockquote>
 
-<p>Now edit /usr/lib/gcc-lib/i386-redhat-linux/3.2.2/specs and modify the lines
-that read:</p>
-
-<blockquote>
-<b><pre>*lib:
-%{pthread:-lpthread}    %{shared:-lc}    %{!shared:%{mieee-fp:-lieee} %{profile:-lc_p}%{!profile:-lc}}
-</b></pre></blockquote>
-
-<p>to read:</p>
-<blockquote>
-<b><pre>*lib:
-%{pthread:-lpthread}    -lctypefixup %{shared:-lc}    %{!shared:%{mieee-fp:-lieee} %{profile:-lc_p}%{!profile:-lc}}
-</b></pre></blockquote>
-
 <p>Now, log in as the oracle user.</p>
 
 <p>Since Oracle 9.2.0 uses a graphical installer, you need to be running X
