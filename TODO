@@ -1,40 +1,4 @@
-db2 start/stop script works, but isn't right, should be able to use
-	db2start, db2stop
-
-document that setting tds version wrong in freetds.conf can cause:
-Error:  Attempt to initiate a new SQL Server operation with results pending.
-
---------------------------------------------------------------------------------
-
-rename interbase stuff firebird
-
-need a "relay ping" method that tries to connect to the SQL Relay server and
-	returns true/false if that was possible or not
-
---------------------------------------------------------------------------------
-
-bulk DML methods
-
-figure out how to get the drop-in client compiled into the mysql PHP module
-	like the mysql native client is
-
 perl apis -> CPAN
-
-api needs to expose integer column types
-
-numeric output bind variables
-
-mysql 4.1, 5.0 - bind vars
-postgresql 8 - bind vars
-php 5
-
-call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
-
-Some databases (like postgresql) are in auto-commit mode unless you manually
-	begin a transaction.  SQL Relay calls commit/rollback at the end of
-	a client session, even if the database is in auto-commit mode.
-	For postgresql at least, this is expensive.  It should only call
-	commit/rollback if the database isn't in auto-commit mode.
 
 --------------------------------------------------------------------------------
 
@@ -117,8 +81,6 @@ cygwin:
 			.dll and .def file wherever
 		msql
 			won't build, need older bison
-		lago
-			???
 	doc
 		installing packages
 		optional cygwin components
@@ -137,6 +99,15 @@ Compatibility:
 		ruby api won't build
 		postgresql won't configure
 		php api won't build
+	mysql 4.1, 5.0 - bind vars
+	postgresql 8 - bind vars
+	php 5
+	de-support lago
+	rename interbase stuff firebird
+	db2 start/stop script works, but isn't right, should be able to use
+		db2start, db2stop
+	figure out how to get the drop-in client compiled into the mysql PHP
+		module like the mysql native client is
 
 Documentation:
 	snippets from tnsnames.ora can be used as ORACLE_SID
@@ -152,6 +123,9 @@ Documentation:
 	performance benchmark charts
 	HOWTO for linuxdoc.org
 	man pages for everything
+	setting tds version wrong in freetds.conf can cause:
+		Error:  Attempt to initiate a new SQL Server operation
+			with results pending.
 
 Performance/Code Enhancements:
 	idle client timeout
@@ -252,6 +226,17 @@ Features:
 	odbc connection should check the odbc definition
 		for connect string arguments - SQLBrowseConnect
 	solaris init script
+	api needs to expose integer column types
+	numeric output bind variables
+	call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
+	Some databases (like postgresql) are in auto-commit mode unless you
+		manually begin a transaction.  SQL Relay calls commit/rollback
+		at the end of a client session, even if the database is in
+		auto-commit mode.  For postgresql at least, this is expensive.
+		It should only call commit/rollback if the database isn't in
+		auto-commit mode.
+	need a "relay ping" method that tries to connect to the SQL Relay
+		server and returns true/false if that was possible or not
 
 Availability:
 	connections should ping database server every so often to make sure
