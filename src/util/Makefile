@@ -22,7 +22,7 @@ clean:
 rebuild: clean all
 
 libsqlrutil.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath /lib -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)

@@ -4,6 +4,12 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) -I$(abs_srcdir) -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES) -fPIC
 LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB) $(TCLLIBS) $(SSLLIB) $(CRYPTOLIB) $(LIBDMALLOC) $(LIBEFENCE)
+RPATH = -rpath /lib
+ifneq ($(strip $(libdir)),)
+ifeq ($(TCLUSERPATH),yes)
+	RPATH = -rpath $(libdir)
+endif
+endif
 
 SRCS = sqlrelayCmd.C
 LOBJS = sqlrelayCmd.lo
@@ -50,7 +56,7 @@ sqlrelay.so: libsqlrelay.la
 	$(LIBTOOL) --mode=clean $(RM) *.la
 
 libsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(TCLLIBSPATH)/sqlrelay

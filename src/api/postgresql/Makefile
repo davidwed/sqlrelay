@@ -4,6 +4,12 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c++/include -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES)
 LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB)
+RPATH = -rpath /lib
+ifneq ($(strip $(libdir)),)
+ifeq ($(PSQLUSERPATH),yes)
+	RPATH = -rpath $(libdir)
+endif
+endif
 
 SRCS = pqasync.C pqconndefaults.C pqconnection.C pqcopy.C \
 	pqencoding.C pqescape.C pqfastpath.C pqlob.C \
@@ -27,7 +33,7 @@ clean:
 rebuild: clean all
 
 libpq-sqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)

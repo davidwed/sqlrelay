@@ -34,10 +34,10 @@ clean:
 rebuild: clean all
 
 sqlr-listener: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 sqlr-listener-debug: $(SRCS) $(DLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(DLOBJS) $(LIBS) -rpath $(libdir)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(DLOBJS) $(LIBS) $(RPATH)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)

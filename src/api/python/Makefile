@@ -3,7 +3,13 @@ include ../../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB) $(PYTHONLIBS) $(SSLLIB) $(CRYPTOLIB) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE) 
+LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB) $(PYTHONLIBS) $(SSLLIB) $(CRYPTOLIB) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+RPATH = -rpath /lib
+ifneq ($(strip $(libdir)),)
+ifeq ($(PYTHONUSERPATH),yes)
+	RPATH = -rpath $(libdir)
+endif
+endif
 
 SRCS = CSQLRelay.C
 LOBJS = CSQLRelay.lo python.lo
@@ -34,7 +40,7 @@ CSQLRelay.so: libCSQLRelay.la
 	$(LIBTOOL) --mode=clean $(RM) *.la
 
 libCSQLRelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 
 install:

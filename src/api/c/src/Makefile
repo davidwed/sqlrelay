@@ -4,6 +4,12 @@ include ../../../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/api/c/include -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+RPATH = -rpath /lib
+ifneq ($(strip $(libdir)),)
+ifeq ($(CUSERPATH),yes)
+	RPATH = -rpath $(libdir)
+endif
+endif
 
 SRCS = sqlrclientwrapper.C
 LOBJS = sqlrclientwrapper.lo
@@ -23,7 +29,7 @@ clean:
 rebuild: clean all
 
 libsqlrclientwrapper.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(libdir)

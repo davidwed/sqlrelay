@@ -3,6 +3,12 @@ include ../../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
+RPATH = -rpath /lib
+ifneq ($(strip $(libdir)),)
+ifeq ($(JAVAUSERPATH),yes)
+	RPATH = -rpath $(libdir)
+endif
+endif
 
 .SUFFIXES: .lo
 
@@ -24,10 +30,10 @@ java:
 	$(JAVAC) com/firstworks/sqlrelay/*.java
 
 libSQLRConnection.la: com_firstworks_sqlrelay_SQLRConnection.C com_firstworks_sqlrelay_SQLRConnection.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRConnection.lo -L$(abs_srcdir)/src/api/c++/src -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRConnection.lo -L$(abs_srcdir)/src/api/c++/src -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 libSQLRCursor.la: com_firstworks_sqlrelay_SQLRCursor.C com_firstworks_sqlrelay_SQLRCursor.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRCursor.lo -L$(abs_srcdir)/src/api/c++/src -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRCursor.lo -L$(abs_srcdir)/src/api/c++/src -L$(abs_srcdir)/src/api/c++/src/.libs -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	for i in `find .libs -name "libSQLRConnection*so*"`; \

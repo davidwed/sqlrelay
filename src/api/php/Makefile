@@ -4,6 +4,12 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
 LIBS = -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(STDCPPLIB)
+RPATH = -rpath /lib
+ifneq ($(strip $(libdir)),)
+ifeq ($(PHPUSERPATH),yes)
+	RPATH = -rpath $(libdir)
+endif
+endif
 
 .SUFFIXES: .lo
 
@@ -47,7 +53,7 @@ sql_relay.so: libsql_relay.la
 	$(LIBTOOL) --mode=clean $(RM) *.la
 
 libsql_relay.la: sql_relay.C sql_relay.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LIBS) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(PHPEXTDIR)
