@@ -702,6 +702,26 @@ class postgresql7 {
 	
 		// drop existing table
 		cur.sendQuery("drop table testtable");
+
+		System.out.println("STORED PROCEDURES: ");
+		cur.sendQuery("drop function testfunc(int)");
+		checkSuccess(cur.sendQuery("create function testfunc(int) returns int as ' begin return $1; end;' language plpgsql"),1);
+		cur.prepareQuery("select * from testfunc(:int)");
+		cur.inputBind("int",5);
+		checkSuccess(cur.executeQuery(),1);
+		checkSuccess(cur.getField(0,0),"5");
+		cur.sendQuery("drop function testfunc(int)");
+
+		cur.sendQuery("drop function testfunc(int,char(20))");
+		checkSuccess(cur.sendQuery("create function testfunc(int, char(20)) returns record as ' declare output record; begin select $1,$2 into output; return output; end;' language plpgsql"),1);
+		cur.prepareQuery("select * from testfunc(:int,:char) as (col1 int, col2 char(20))");
+		cur.inputBind("int",5);
+		cur.inputBind("char","hello");
+		checkSuccess(cur.executeQuery(),1);
+		checkSuccess(cur.getField(0,0),"5");
+		checkSuccess(cur.getField(0,1),"hello");
+		cur.sendQuery("drop function testfunc(int,char(20))");
+		System.out.println();
 	
 		// invalid queries...
 		System.out.println("INVALID QUERIES: ");

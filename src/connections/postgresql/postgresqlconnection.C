@@ -135,25 +135,8 @@ void	postgresqlconnection::logOut() {
 	}
 }
 
-int	postgresqlconnection::commit() {
-	if (!sqlrconnection::commit()) {
-		return 0;
-	}
-	return 1;
-}
-
-int	postgresqlconnection::rollback() {
-	if (!sqlrconnection::rollback()) {
-		return 0;
-	}
-	return 1;
-}
-
 int	postgresqlconnection::ping() {
-	if (PQstatus(pgconn)==CONNECTION_OK) {
-		return 1;
-	}
-	return 0;
+	return (PQstatus(pgconn)==CONNECTION_OK);
 }
 
 char	*postgresqlconnection::identify() {

@@ -112,17 +112,11 @@ void	interbaseconnection::logOut() {
 }
 
 int	interbaseconnection::commit() {
-	if (isc_commit_retaining(error,&tr)) {
-		return 0;
-	}
-	return 1;
+	return (!isc_commit_retaining(error,&tr));
 }
 
 int	interbaseconnection::rollback() {
-	if (isc_rollback_retaining(error,&tr)) {
-		return 0;
-	}
-	return 1;
+	return (!isc_rollback_retaining(error,&tr));
 }
 
 int	interbaseconnection::ping() {
@@ -140,10 +134,7 @@ int	interbaseconnection::ping() {
 				sizeof(dbitems),dbitems,
 				sizeof(resbuffer),resbuffer);
 
-	if (status[0] == 1 && status[1]) {
-		return 0;
-	}
-	return 1;
+	return !(status[0]==1 && status[1]);
 }
 
 char	*interbaseconnection::identify() {
@@ -196,7 +187,7 @@ int	interbasecursor::prepareQuery(const char *query, long length) {
 	char	*qptr=(char *)query;
 	while (*qptr==' ' || *qptr=='\n' || *qptr=='	');
 
-	// prepare the cursor using the appropriate transaction
+	// prepare the cursor
 	if (isc_dsql_prepare(interbaseconn->error,&interbaseconn->tr,
 					&stmt,length,(char *)query,
 					interbaseconn->dialect,outsqlda)) {
@@ -315,7 +306,6 @@ int	interbasecursor::outputBindString(const char *variable,
 
 	// if we're doing output binds then the
 	// query must be a stored procedure
-	// FIXME: what if the procedure only has input vars?
 	queryIsExecSP=1;
 
 	// make bind vars 1 based like all other db's
@@ -488,7 +478,7 @@ int	interbasecursor::executeQuery(const char *query, long length,
 		}
 	}
 
-	// Execute the query, using the appropriate transaction.  
+	// Execute the query
 	return !isc_dsql_execute(interbaseconn->error,&interbaseconn->tr,
 							&stmt,1,insqlda);
 }
@@ -600,11 +590,7 @@ void	interbasecursor::returnColumnInfo() {
 }
 
 int	interbasecursor::noRowsToReturn() {
-
-	if (outsqlda->sqld==0) {
-		return 1;
-	}
-	return 0;
+	return (outsqlda->sqld==0);
 }
 
 int	interbasecursor::skipRow() {

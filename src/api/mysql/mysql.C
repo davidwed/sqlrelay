@@ -404,6 +404,7 @@ unsigned long mysql_get_client_version() {
 char *mysql_get_host_info(MYSQL *mysql) {
 	// Returns a string describing the type of connection in use,
 	// including the server host name.
+	// Should be "host via [unix|inet] socket"
 	return "";
 }
 
@@ -502,6 +503,7 @@ unsigned long mysql_escape_string(char *to, const char *from,
 					unsigned long length) {
 	return mysql_real_escape_string(NULL,to,from,length);
 }
+
 char *mysql_odbc_escape_string(MYSQL *mysql, char *to,
 				unsigned long to_length,
 				const char *from,
@@ -518,6 +520,46 @@ void myodbc_remove_escape(MYSQL *mysql, char *name) {
 	// FIXME: implement this
 }
 
+unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
+					const char *from,
+					unsigned long length) {
+
+	if (mysql && strcmp(mysql->sqlrcon->identify(),"mysql")) {
+		memcpy(to,from,length);
+		to[length]=(char)NULL;
+		return length;
+	}
+	
+	unsigned long	fromindex=0;
+	unsigned long	toindex=0;
+	while (fromindex<length) {
+		if (from[fromindex]=='\'') {
+			to[toindex++]='\\';
+			to[toindex++]='\'';
+		} else if (from[fromindex]=='\"') {
+			to[toindex++]='\\';
+			to[toindex++]='"';
+		} else if (from[fromindex]=='\n') {
+			to[toindex++]='\\';
+			to[toindex++]='n';
+		} else if (from[fromindex]=='\r') {
+			to[toindex++]='\\';
+			to[toindex++]='r';
+		} else if (from[fromindex]=='\\') {
+			to[toindex++]='\\';
+			to[toindex++]='\\';
+		} else if (from[fromindex]==26) {
+			to[toindex++]='\\';
+			to[toindex++]='Z';
+		} else {
+			to[toindex++]=from[fromindex];
+		}
+		fromindex++;
+	}
+	to[toindex]=(char)NULL;
+	return toindex;
+}
+
 int mysql_query(MYSQL *mysql, const char *query) {
 	return mysql_real_query(mysql,query,strlen(query));
 }
@@ -532,42 +574,6 @@ int mysql_read_query_result(MYSQL *mysql) {
 	// FIXME: looks like this checks to see if a query sent with
 	// mysql_send_query has finished or not
 	return 0;
-}
-
-unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
-					const char *from,
-					unsigned long length) {
-
-	if (strcmp(mysql->sqlrcon->identify(),"mysql")) {
-		memcpy(to,from,length);
-		return length;
-	}
-	
-	unsigned long	fromindex=0;
-	unsigned long	toindex=0;
-	while (fromindex<length) {
-		if (from[fromindex]=='\'') {
-			to[toindex++]='\\';
-			to[toindex]='\'';
-		} else if (from[fromindex]=='\"') {
-			to[toindex++]='\\';
-			to[toindex]='"';
-		} else if (from[fromindex]=='\n') {
-			to[toindex++]='\\';
-			to[toindex]='n';
-		} else if (from[fromindex]=='\r') {
-			to[toindex++]='\\';
-			to[toindex]='r';
-		} else if (from[fromindex]=='\\') {
-			to[toindex++]='\\';
-			to[toindex]='\\';
-		} else if (from[fromindex]!=';') {
-			to[toindex]=from[fromindex];
-		}
-		toindex++;
-		fromindex++;
-	}
-	return fromindex;
 }
 
 int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length) {
@@ -979,6 +985,42 @@ static enum enum_field_types	mysqltypemap[]={
 	// "INT64"
 	MYSQL_TYPE_LONGLONG,
 	// "DOUBLE PRECISION"
+	MYSQL_TYPE_DOUBLE,
+	// "int2"
+	MYSQL_TYPE_SHORT,
+	// "_int2"
+	MYSQL_TYPE_LONG ,
+	// "int4"
+	MYSQL_TYPE_LONG,
+	// "_int4"
+	MYSQL_TYPE_LONG,
+	// int8
+	MYSQL_TYPE_LONG,
+	// _int8
+	MYSQL_TYPE_LONG,
+	// oid
+	MYSQL_TYPE_LONG,
+	// _oid
+	MYSQL_TYPE_LONG,
+	// tid
+	MYSQL_TYPE_LONG,
+	// _tid
+	MYSQL_TYPE_LONG,
+	// xid
+	MYSQL_TYPE_LONG,
+	// _xid
+	MYSQL_TYPE_LONG,
+	// cid
+	MYSQL_TYPE_LONG,
+	// _cid
+	MYSQL_TYPE_LONG,
+	// float4
+	MYSQL_TYPE_FLOAT,
+	// _float4
+	MYSQL_TYPE_FLOAT,
+	// float8
+	MYSQL_TYPE_DOUBLE,
+	// _float8
 	MYSQL_TYPE_DOUBLE
 };
 

@@ -106,10 +106,7 @@ void	mysqlconnection::logOut() {
 
 #ifdef HAVE_MYSQL_PING
 int	mysqlconnection::ping() {
-	if (!mysql_ping(&mysql)) {
-		return 1;
-	}
-	return 0;
+	return (!mysql_ping(&mysql))?1:0;
 }
 #endif
 

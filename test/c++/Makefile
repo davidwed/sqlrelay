@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-CPPFLAGS = $(BASCPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
 LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) -lm $(LIBEFENCE)
 
 .SUFFIXES: .lo

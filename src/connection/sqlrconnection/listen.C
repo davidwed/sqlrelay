@@ -132,6 +132,7 @@ int	sqlrconnection::waitForClient() {
 
 			return -1;
 		}
+
 		clientsock=new datatransport(descriptor);
 
 		#ifdef SERVER_DEBUG

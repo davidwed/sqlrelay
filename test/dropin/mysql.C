@@ -105,7 +105,6 @@ int	main(int argc, char **argv) {
 
 
 
-
 	printf("mysql_real_query: select\n");
 	query="select * from testdb.testtable";
 	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
@@ -357,7 +356,6 @@ int	main(int argc, char **argv) {
 
 
 
-
 	printf("mysql_real_query: select\n");
 	query="select * from testdb.testtable";
 	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
@@ -416,6 +414,27 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
 	printf("\n");
 
+	printf("mysql_escape_string:\n");
+	char	to[100];
+	char	from[100];
+	sprintf(from," ' \" \n \r \\ ; %c ",26);
+	checkSuccess(mysql_escape_string(to,from,15),21);
+	checkSuccess(to," \\' \\\" \\n \\r \\\\ ; \\Z ");
+	printf("\n");
+
+	printf("mysql_real_escape_string:\n");
+	checkSuccess(mysql_real_escape_string(&mysql,to,from,15),21);
+	checkSuccess(to," \\' \\\" \\n \\r \\\\ ; \\Z ");
+	printf("\n");
+
+	printf("mysql_get_*_info:\n");
+	printf("server: %s\n",mysql_get_server_info(&mysql));
+	printf("client: %s\n",mysql_get_client_info());
+	printf("host: %s\n",mysql_get_host_info(&mysql));
+	printf("proto: %d\n",mysql_get_proto_info(&mysql));
+	printf("\n");
+	
+
 	// mysql_error
 	// mysql_errno
 	// mysql_thread_id
@@ -437,11 +456,6 @@ int	main(int argc, char **argv) {
 	// mysql_kill
 	// mysql_stat
 
-	// mysql_get_server_info
-	// mysql_get_client_info
-	// mysql_get_host_info
-	// mysql_get_proto_info
-
 	// mysql_list_dbs
 	// mysql_list_tables
 	// mysql_list_fields
@@ -449,10 +463,9 @@ int	main(int argc, char **argv) {
 	// mysql_list_processes
 
 	// mysql_options
-
-	// mysql_escape_string
-	// mysql_real_escape_string
+		
 	// mysql_odbc_escape_string
-	
+	// myodbc_remove_escape
+
 	mysql_close(&mysql);
 }

@@ -1,16 +1,18 @@
-probably related to temp table dropping...
+socket for file descriptor passing is apparantly getting closed or something,
+	recvmesg fails when a client hits the connection for the second time
+
+VB wrapper
+
+probably related to temp table dropping:
 	postgresql test causes connection to crash on 2nd run
 	mysql test causes connection to crash on 2nd run
 	freetds connection writes an error but succeeds in dropping the table
 	sybase connection won't even start now
 
-odbc temp tables ???
-
-VB wrapper
-FIXME's in mysql drop-in library
 licenses:
 	Pear DB driver
 	mysql replacement library
+	postgresql replacement library
 docs:
 	mysql drop-in library
 	postgresql drop-in library
@@ -19,15 +21,21 @@ docs:
 	perl dbi driver bind_param_inout
 	new column flags
 	countBindVariables()
+	temporary table handling
+	instructions for adding procedural language support to postgresql
+	update faq, indicating that stored procedures are supported for more
+		databases than just oracle
 tests:
-	mysql drop-in library
-	postgresql drop-in library
 	adodb test
+	db2 temp tables
+	odbc temp tables
+	interbase stored procedure/output bind tests fails at isc_dsql_prepare
+
 freetds-0.62/ct_param support
 idle client timeout
 perl apis -> CPAN
 
-oldmysql test files for non-C++ api's
+--------------------------------------------------------------------------------
 
 db2 start/stop doesn't work for 7.2
 	db2start/db2stop works when run as a given instance owner
@@ -52,18 +60,17 @@ Tests:
 	zope
 	tcl
 	odbc tests
+	mysql_stmt calls in drop-in library
 	better pythondb/rubydbi tests
 	test init scripts
 	test send query w/length
 	test upper/lower/mixed column case methods
 	need database reconnect tests
-	interbase stored procedure/output bind test
 	column flags
 	getFieldAsXXX
 	getOutputBindAsXXX
 	Java "getXXXAsByteArray" methods
 	check blob/lobs with binary data in them
-	interbase stored procedures
 	perl dbi driver
 		execute_array
 		bind_param_array
@@ -82,12 +89,12 @@ Tests:
 		begin_work
 		available_drivers
 		data_sources
+	oldmysql test files for non-C++ api's
 
 Compatibility:
 	support @,: or ? for fake bind variables
 	rewrite queries with ?'s or @'s for oracle, rewrite
 				queries with ?'s or :'s for
-	sybase
 	mysql 4.1, 5.0
 	daemontools
 	SCO:
@@ -152,6 +159,7 @@ Features:
 	support output bind vars and stored procedures in sybase
 	could debug logs be logrotate compatible?
 	postgresql drop-in api lacks many features
+	mysql drop-in api lacks a few features
 	sybase/freetds (possibly others) need options for setting chained mode 
 		and isolation mode when client connects
 	sqlr-import/sqlr-export tools

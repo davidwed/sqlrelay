@@ -49,8 +49,6 @@ class postgresqlconnection : public sqlrconnection {
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		int	commit();
-		int	rollback();
 		int	ping();
 		char	*identify();
 

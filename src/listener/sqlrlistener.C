@@ -1261,11 +1261,10 @@ bool sqlrlistener::passClientFileDescriptorToConnection(
 
 	// pass the file descriptor of the connected client over to the
 	// available connection
-	bool	retval=false;
-	if (connectionsock->passFileDescriptor(
-					clientsock->getFileDescriptor())) {
+	bool	retval=connectionsock->passFileDescriptor(
+					clientsock->getFileDescriptor());
+	if (retval) {
 
-		retval=true;
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"done passing descriptor");
 		#endif

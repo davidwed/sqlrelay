@@ -34,6 +34,14 @@ The SQLRelay software package is really several packages:
 	directory of this distribution.  This package is hereafter refered to
 	as The SQLRelay TCL API.
 
+9) Source code, scripts and binaries found in the src/api/postgresql
+	directory of this distribution.  This package is hereafter refered to
+	as The SQLRelay PostgreSQL Drop-In API.
+
+10) Source code, scripts and binaries found in the src/api/mysql
+	directory of this distribution.  This package is hereafter refered to
+	as The SQLRelay MySQL Drop-In API.
+
 --------------------------------------------------------------------------------
 
 The SQLRelay Executables

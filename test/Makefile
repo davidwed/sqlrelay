@@ -6,6 +6,7 @@ all:
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java all
 endif
+	$(MAKE) -C dropin all
 
 clean:
 	$(MAKE) -C c clean
@@ -14,5 +15,6 @@ clean:
 	$(MAKE) -C perl clean
 	$(MAKE) -C python clean
 	$(MAKE) -C ruby clean
+	$(MAKE) -C dropin clean
 
 rebuild: clean all

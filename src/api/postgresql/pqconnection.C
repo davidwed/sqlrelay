@@ -31,17 +31,20 @@ PGconn *allocatePGconn(const char *conninfo,
 	if (conninfo) {
 
 		conn->connstr=new parameterstring();
+		conn->connstr->setDelimiter(' ');
 		conn->connstr->parse(conninfo);
 
 		conn->host=conn->connstr->getValue("host");
 		conn->host=(conn->host)?conn->host:(char *)"";
 		conn->port=conn->connstr->getValue("port");
+		// if port is passed in via conninfo, an empty port is NOT
+		// translated to 5432
 		conn->port=(conn->port)?conn->port:(char *)"";
 		conn->options=conn->connstr->getValue("options");
 		conn->options=(conn->options)?conn->options:(char *)"";
 		conn->tty=conn->connstr->getValue("tty");
 		conn->tty=(conn->tty)?conn->tty:(char *)"";
-		conn->db=conn->connstr->getValue("db");
+		conn->db=conn->connstr->getValue("dbname");
 		conn->db=(conn->db)?conn->db:(char *)"";
 		conn->user=conn->connstr->getValue("user");
 		conn->user=(conn->user)?conn->user:(char *)"";
@@ -53,7 +56,9 @@ PGconn *allocatePGconn(const char *conninfo,
 		conn->connstr=NULL;
 
 		conn->host=strdup((host)?host:"");
-		conn->port=strdup((port)?port:"");
+		// if port is passed in via parameters, an empty port is
+		// translated to 5432
+		conn->port=strdup((port)?port:"5432");
 		conn->options=strdup((options)?options:"");
 		conn->tty=strdup((tty)?tty:"");
 		conn->db=strdup((db)?db:"");
@@ -71,8 +76,10 @@ PGconn *allocatePGconn(const char *conninfo,
 
 	conn->error=NULL;
 
-	conn->sqlrcon=new sqlrconnection(host,atoi((port)?port:""),
-						"",user,password,0,1);
+	conn->sqlrcon=new sqlrconnection(atoi(conn->port)?conn->host:"",
+					atoi((conn->port)?conn->port:""),
+					(!atoi(conn->port))?conn->port:"",
+					conn->user,conn->password,0,1);
 	conn->sqlrcon->copyReferences();
 
 	return conn;

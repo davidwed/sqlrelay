@@ -653,6 +653,27 @@ function checkSuccess($value,$success) {
 	# drop existing table
 	sqlrcur_sendQuery($cur,"drop table testtable");
 
+	# stored procedures
+	echo("STORED PROCEDURES: \n");
+	sqlrcur_sendQuery($cur,"drop function testfunc(int)");
+	checkSuccess(sqlrcur_sendQuery($cur,"create function testfunc(int) returns int as ' begin return $1; end;' language plpgsql"),1);
+	sqlrcur_prepareQuery($cur,"select * from testfunc(:int)");
+	sqlrcur_inputBind($cur,"int",5);
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	checkSuccess(sqlrcur_getField($cur,0,0),"5");
+	sqlrcur_sendQuery($cur,"drop function testfunc(int)");
+
+	sqlrcur_sendQuery($cur,"drop function testfunc(int,char(20))");
+	checkSuccess(sqlrcur_sendQuery($cur,"create function testfunc(int, char(20)) returns record as ' declare output record; begin select $1,$2 into output; return output; end;' language plpgsql"),1);
+	sqlrcur_prepareQuery($cur,"select * from testfunc(:int,:char) as (col1 int, col2 char(20))");
+	sqlrcur_inputBind($cur,"int",5);
+	sqlrcur_inputBind($cur,"char","hello");
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	checkSuccess(sqlrcur_getField($cur,0,0),"5");
+	checkSuccess(sqlrcur_getField($cur,0,1),"hello");
+	sqlrcur_sendQuery($cur,"drop function testfunc(int,char(20))");
+	echo("\n");
+
 	# invalid queries...
 	echo("INVALID QUERIES: \n");
 	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testint"),0);

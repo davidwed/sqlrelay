@@ -6,14 +6,13 @@ public class SQLRelayDriver implements java.sql.Driver {
 
     static {
         try {
-            new SQLRelayDriver();
+            java.sql.DriverManager.registerDriver(new SQLRelayDriver());
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public SQLRelayDriver() throws SQLException {
-        java.sql.DriverManager.registerDriver(this);
     }
 
     /**
