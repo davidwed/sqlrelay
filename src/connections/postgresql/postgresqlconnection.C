@@ -12,6 +12,9 @@
 
 #include <datatypes.h>
 
+static void	nullNoticeProcessor(void *arg, const char *message) {
+}
+
 int	postgresqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
@@ -53,12 +56,8 @@ int	postgresqlconnection::logIn() {
 		return 0;
 	}
 
-	// FIXME: can use PQsetNoticeProcessor to do this
-	int	devnull;
-	if ((devnull=open("/dev/null",O_RDONLY))>0) {
-		dup2(devnull,STDOUT_FILENO);
-		dup2(devnull,STDERR_FILENO);
-	}
+	// make sure that no messages get sent to the console
+	PQsetNoticeProcessor(pgconn,nullNoticeProcessor,NULL);
 
 	// get the datatypes
 	if (typemangling==2) {
@@ -282,19 +281,19 @@ void	postgresqlcursor::returnColumnInfo() {
 		name=PQfname(pgresult,i);
 		size=PQfsize(pgresult,i);
 		if (size<0) {
+			size=PQfmod(pgresult,i);
+		}
+		if (size<0) {
 			size=0;
 		}
 
-		// I thought maybe fmod returned the scale but maybe not
-		//scale=PQfmod(pgresult,i);
-
 		if (postgresqlconn->typemangling==1) {
 			conn->sendColumnDefinition(name,strlen(name),
-							type,size,0,0,0,0);
+							type,size,0,0,0,0,0);
 		} else {
 			conn->sendColumnDefinitionString(name,strlen(name),
 					typestring,strlen(typestring),size,
-								0,0,0,0);
+								0,0,0,0,0);
 		}
 	}
 }
