@@ -190,24 +190,24 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN TYPES: \n");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,0),"INT");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testint"),"INT");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,1),"FLOAT");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testfloat"),"FLOAT");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,2),"REAL");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testreal"),"REAL");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,3),"SMALLINT");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testsmallint"),"SMALLINT");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,4),"CHAR");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testchar"),"CHAR");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,5),"VARCHAR");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"VARCHAR");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,6),"DATE");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testdate"),"DATE");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,7),"TIME");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtime"),"TIME");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,8),"TIMESTAMP");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtimestamp"),"TIMESTAMP");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,0),"int4");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testint"),"int4");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,1),"float8");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testfloat"),"float8");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,2),"float4");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testreal"),"float4");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,3),"int2");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testsmallint"),"int2");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,4),"bpchar");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testchar"),"bpchar");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,5),"varchar");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"varchar");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,6),"date");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testdate"),"date");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,7),"time");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtime"),"time");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,8),"timestamptz");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtimestamp"),"timestamptz");
 	printf("\n");
 
 	printf("COLUMN LENGTH: \n");
@@ -472,7 +472,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testint"),1);
 	checkSuccessString(sqlrcur_getColumnName(cur,0),"testint");
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,0),4);
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,0),"INT");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,0),"int4");
 	printf("\n");
 
 	printf("SUSPENDED SESSION: \n");

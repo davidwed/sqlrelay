@@ -1,6 +1,4 @@
 <html><pre><?php
-
-		echo("during\n");
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
 

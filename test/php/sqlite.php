@@ -1,4 +1,4 @@
-<html><pre><?
+<html><pre><?php
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
 

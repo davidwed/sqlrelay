@@ -6,11 +6,30 @@ import com.firstworks.sqlrelay.SQLRCursor;
 
 
 class oracle8 {
+
+	private static void checkSuccess(String value, String success, int length) {
 	
+		if (success==null) {
+			if (value==null) {
+				System.out.println("success ");
+				return;
+			} else {
+				System.out.println("failure ");
+				
+				
+				System.exit(0);
+			}
+		}
 	
-	
-	
-	
+		if (value.regionMatches(0,success,0,length)) {
+			System.out.println("success ");
+		} else {
+			System.out.println("failure ");
+			
+			
+			System.exit(0);
+		}
+	}
 	
 	private static void checkSuccess(String value, String success) {
 	
@@ -59,6 +78,10 @@ class oracle8 {
 		double[]	subvaldoubles={10.55,10.556,10.5556};
 		int[]	precs={4,5,6};
 		int[]	scales={2,3,4};
+		String	clobvar;
+		long	clobvarlength;
+		String	blobvar;
+		long	blobvarlength;
 		String	numvar;
 		String	stringvar;
 		String	floatvar;
@@ -100,11 +123,11 @@ class oracle8 {
 		cur.sendQuery("drop table testtable");
 	
 		System.out.println("CREATE TEMPTABLE: ");
-		checkSuccess(cur.sendQuery("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long)"),1);
+		checkSuccess(cur.sendQuery("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long, testclob clob, testblob blob)"),1);
 		System.out.println();
 	
 		System.out.println("INSERT: ");
-		checkSuccess(cur.sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')"),1);
+		checkSuccess(cur.sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())"),1);
 		System.out.println();
 	
 		System.out.println("AFFECTED ROWS: ");
@@ -112,12 +135,14 @@ class oracle8 {
 		System.out.println();
 	
 		System.out.println("BIND BY POSITION: ");
-		cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+		cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)");
 		cur.inputBind("1",2);
 		cur.inputBind("2","testchar2");
 		cur.inputBind("3","testvarchar2");
 		cur.inputBind("4","01-JAN-2002");
 		cur.inputBind("5","testlong2");
+		cur.inputBindClob("6","testclob2",9);
+		cur.inputBindBlob("7","testblob2",9);
 		checkSuccess(cur.executeQuery(),1);
 		cur.clearBinds();
 		cur.inputBind("1",3);
@@ -125,22 +150,28 @@ class oracle8 {
 		cur.inputBind("3","testvarchar3");
 		cur.inputBind("4","01-JAN-2003");
 		cur.inputBind("5","testlong3");
+		cur.inputBindClob("6","testclob3",9);
+		cur.inputBindBlob("7","testblob3",9);
 		checkSuccess(cur.executeQuery(),1);
 		System.out.println();
 	
 		System.out.println("ARRAY OF BINDS BY POSITION: ");
 		cur.clearBinds();
 		cur.inputBinds(bindvars,bindvals);
+		cur.inputBindClob("var6","testclob4",9);
+		cur.inputBindBlob("var7","testblob4",9);
 		checkSuccess(cur.executeQuery(),1);
 		System.out.println();
 	
 		System.out.println("BIND BY NAME: ");
-		cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+		cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)");
 		cur.inputBind("var1",5);
 		cur.inputBind("var2","testchar5");
 		cur.inputBind("var3","testvarchar5");
 		cur.inputBind("var4","01-JAN-2005");
 		cur.inputBind("var5","testlong5");
+		cur.inputBindClob("var6","testclob5",9);
+		cur.inputBindBlob("var7","testblob5",9);
 		checkSuccess(cur.executeQuery(),1);
 		cur.clearBinds();
 		cur.inputBind("var1",6);
@@ -148,12 +179,16 @@ class oracle8 {
 		cur.inputBind("var3","testvarchar6");
 		cur.inputBind("var4","01-JAN-2006");
 		cur.inputBind("var5","testlong6");
+		cur.inputBindClob("var6","testclob6",9);
+		cur.inputBindBlob("var7","testblob6",9);
 		checkSuccess(cur.executeQuery(),1);
 		System.out.println();
 	
 		System.out.println("ARRAY OF BINDS BY NAME: ");
 		cur.clearBinds();
 		cur.inputBinds(arraybindvars,arraybindvals);
+		cur.inputBindClob("var6","testclob7",9);
+		cur.inputBindBlob("var7","testblob7",9);
 		checkSuccess(cur.executeQuery(),1);
 		System.out.println();
 	
@@ -164,7 +199,9 @@ class oracle8 {
 		cur.inputBind("var3","testvarchar8");
 		cur.inputBind("var4","01-JAN-2008");
 		cur.inputBind("var5","testlong8");
-		cur.inputBind("var6","junkvalue");
+		cur.inputBindClob("var6","testclob8",9);
+		cur.inputBindBlob("var7","testblob8",9);
+		cur.inputBind("var9","junkvalue");
 		cur.validateBinds();
 		checkSuccess(cur.executeQuery(),1);
 		System.out.println();
@@ -218,7 +255,7 @@ class oracle8 {
 		System.out.println();
 	
 		System.out.println("COLUMN COUNT: ");
-		checkSuccess(cur.colCount(),5);
+		checkSuccess(cur.colCount(),7);
 		System.out.println();
 	
 		System.out.println("COLUMN NAMES: ");
@@ -227,12 +264,16 @@ class oracle8 {
 		checkSuccess(cur.getColumnName(2),"TESTVARCHAR");
 		checkSuccess(cur.getColumnName(3),"TESTDATE");
 		checkSuccess(cur.getColumnName(4),"TESTLONG");
+		checkSuccess(cur.getColumnName(5),"TESTCLOB");
+		checkSuccess(cur.getColumnName(6),"TESTBLOB");
 		cols=cur.getColumnNames();
 		checkSuccess(cols[0],"TESTNUMBER");
 		checkSuccess(cols[1],"TESTCHAR");
 		checkSuccess(cols[2],"TESTVARCHAR");
 		checkSuccess(cols[3],"TESTDATE");
 		checkSuccess(cols[4],"TESTLONG");
+		checkSuccess(cols[5],"TESTCLOB");
+		checkSuccess(cols[6],"TESTBLOB");
 		System.out.println();
 	
 		System.out.println("COLUMN TYPES: ");
@@ -246,6 +287,10 @@ class oracle8 {
 		checkSuccess(cur.getColumnType("testdate"),"DATE");
 		checkSuccess(cur.getColumnType(4),"LONG");
 		checkSuccess(cur.getColumnType("testlong"),"LONG");
+		checkSuccess(cur.getColumnType(5),"CLOB");
+		checkSuccess(cur.getColumnType("testclob"),"CLOB");
+		checkSuccess(cur.getColumnType(6),"BLOB");
+		checkSuccess(cur.getColumnType("testblob"),"BLOB");
 		System.out.println();
 	
 		System.out.println("COLUMN LENGTH: ");
@@ -259,6 +304,10 @@ class oracle8 {
 		checkSuccess(cur.getColumnLength("testdate"),7);
 		checkSuccess(cur.getColumnLength(4),0);
 		checkSuccess(cur.getColumnLength("testlong"),0);
+		checkSuccess(cur.getColumnLength(5),0);
+		checkSuccess(cur.getColumnLength("testclob"),0);
+		checkSuccess(cur.getColumnLength(6),0);
+		checkSuccess(cur.getColumnLength("testblob"),0);
 		System.out.println();
 	
 		System.out.println("LONGEST COLUMN: ");
@@ -272,6 +321,10 @@ class oracle8 {
 		checkSuccess(cur.getLongest("testdate"),9);
 		checkSuccess(cur.getLongest(4),9);
 		checkSuccess(cur.getLongest("testlong"),9);
+		checkSuccess(cur.getLongest(5),9);
+		checkSuccess(cur.getLongest("testclob"),9);
+		checkSuccess(cur.getLongest(6),9);
+		checkSuccess(cur.getLongest("testblob"),9);
 		System.out.println();
 	
 		System.out.println("ROW COUNT: ");
@@ -296,12 +349,16 @@ class oracle8 {
 		checkSuccess(cur.getField(0,2),"testvarchar1");
 		checkSuccess(cur.getField(0,3),"01-JAN-01");
 		checkSuccess(cur.getField(0,4),"testlong1");
+		checkSuccess(cur.getField(0,5),"testclob1");
+		checkSuccess(cur.getField(0,6),"");
 		System.out.println();
 		checkSuccess(cur.getField(7,0),"8");
 		checkSuccess(cur.getField(7,1),"testchar8                               ");
 		checkSuccess(cur.getField(7,2),"testvarchar8");
 		checkSuccess(cur.getField(7,3),"01-JAN-08");
 		checkSuccess(cur.getField(7,4),"testlong8");
+		checkSuccess(cur.getField(7,5),"testclob8");
+		checkSuccess(cur.getField(7,6),"testblob8");
 		System.out.println();
 	
 		System.out.println("FIELD LENGTHS BY INDEX: ");
@@ -310,12 +367,16 @@ class oracle8 {
 		checkSuccess(cur.getFieldLength(0,2),12);
 		checkSuccess(cur.getFieldLength(0,3),9);
 		checkSuccess(cur.getFieldLength(0,4),9);
+		checkSuccess(cur.getFieldLength(0,5),9);
+		checkSuccess(cur.getFieldLength(0,6),0);
 		System.out.println();
 		checkSuccess(cur.getFieldLength(7,0),1);
 		checkSuccess(cur.getFieldLength(7,1),40);
 		checkSuccess(cur.getFieldLength(7,2),12);
 		checkSuccess(cur.getFieldLength(7,3),9);
 		checkSuccess(cur.getFieldLength(7,4),9);
+		checkSuccess(cur.getFieldLength(7,5),9);
+		checkSuccess(cur.getFieldLength(7,6),9);
 		System.out.println();
 	
 		System.out.println("FIELDS BY NAME: ");
@@ -324,12 +385,16 @@ class oracle8 {
 		checkSuccess(cur.getField(0,"testvarchar"),"testvarchar1");
 		checkSuccess(cur.getField(0,"testdate"),"01-JAN-01");
 		checkSuccess(cur.getField(0,"testlong"),"testlong1");
+		checkSuccess(cur.getField(0,"testclob"),"testclob1");
+		checkSuccess(cur.getField(0,"testblob"),"");
 		System.out.println();
 		checkSuccess(cur.getField(7,"testnumber"),"8");
 		checkSuccess(cur.getField(7,"testchar"),"testchar8                               ");
 		checkSuccess(cur.getField(7,"testvarchar"),"testvarchar8");
 		checkSuccess(cur.getField(7,"testdate"),"01-JAN-08");
 		checkSuccess(cur.getField(7,"testlong"),"testlong8");
+		checkSuccess(cur.getField(7,"testclob"),"testclob8");
+		checkSuccess(cur.getField(7,"testblob"),"testblob8");
 		System.out.println();
 	
 		System.out.println("FIELD LENGTHS BY NAME: ");
@@ -338,12 +403,16 @@ class oracle8 {
 		checkSuccess(cur.getFieldLength(0,"testvarchar"),12);
 		checkSuccess(cur.getFieldLength(0,"testdate"),9);
 		checkSuccess(cur.getFieldLength(0,"testlong"),9);
+		checkSuccess(cur.getFieldLength(0,"testclob"),9);
+		checkSuccess(cur.getFieldLength(0,"testblob"),0);
 		System.out.println();
 		checkSuccess(cur.getFieldLength(7,"testnumber"),1);
 		checkSuccess(cur.getFieldLength(7,"testchar"),40);
 		checkSuccess(cur.getFieldLength(7,"testvarchar"),12);
 		checkSuccess(cur.getFieldLength(7,"testdate"),9);
 		checkSuccess(cur.getFieldLength(7,"testlong"),9);
+		checkSuccess(cur.getFieldLength(7,"testclob"),9);
+		checkSuccess(cur.getFieldLength(7,"testblob"),9);
 		System.out.println();
 	
 		System.out.println("FIELDS BY ARRAY: ");
@@ -353,6 +422,8 @@ class oracle8 {
 		checkSuccess(fields[2],"testvarchar1");
 		checkSuccess(fields[3],"01-JAN-01");
 		checkSuccess(fields[4],"testlong1");
+		checkSuccess(fields[5],"testclob1");
+		checkSuccess(fields[6],"");
 		System.out.println();
 	
 		System.out.println("FIELD LENGTHS BY ARRAY: ");
@@ -362,6 +433,8 @@ class oracle8 {
 		checkSuccess(fieldlens[2],12);
 		checkSuccess(fieldlens[3],9);
 		checkSuccess(fieldlens[4],9);
+		checkSuccess(fieldlens[5],9);
+		checkSuccess(fieldlens[6],0);
 		System.out.println();
 	
 		System.out.println("INDIVIDUAL SUBSTITUTIONS: ");
@@ -566,7 +639,7 @@ class oracle8 {
 		System.out.println();
 	
 		System.out.println("COLUMN COUNT FOR CACHED RESULT SET: ");
-		checkSuccess(cur.colCount(),5);
+		checkSuccess(cur.colCount(),7);
 		System.out.println();
 	
 		System.out.println("COLUMN NAMES FOR CACHED RESULT SET: ");
@@ -575,12 +648,16 @@ class oracle8 {
 		checkSuccess(cur.getColumnName(2),"TESTVARCHAR");
 		checkSuccess(cur.getColumnName(3),"TESTDATE");
 		checkSuccess(cur.getColumnName(4),"TESTLONG");
+		checkSuccess(cur.getColumnName(5),"TESTCLOB");
+		checkSuccess(cur.getColumnName(6),"TESTBLOB");
 		cols=cur.getColumnNames();
 		checkSuccess(cols[0],"TESTNUMBER");
 		checkSuccess(cols[1],"TESTCHAR");
 		checkSuccess(cols[2],"TESTVARCHAR");
 		checkSuccess(cols[3],"TESTDATE");
 		checkSuccess(cols[4],"TESTLONG");
+		checkSuccess(cols[5],"TESTCLOB");
+		checkSuccess(cols[6],"TESTBLOB");
 		System.out.println();
 	
 		System.out.println("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: ");
@@ -666,12 +743,125 @@ class oracle8 {
 		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
 		checkSuccess(secondcur.getField(0,0),"8");
 		checkSuccess(con.autoCommitOn(),1);
-		checkSuccess(cur.sendQuery("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10')"),1);
+		checkSuccess(cur.sendQuery("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10','testclob10',empty_blob())"),1);
 		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
 		checkSuccess(secondcur.getField(0,0),"9");
 		checkSuccess(con.autoCommitOff(),1);
 		System.out.println();
-	
+
+
+		System.out.println("CLOB AND BLOB OUTPUT BIND:");
+		cur.sendQuery("drop table testtable1");
+		checkSuccess(cur.sendQuery("create table testtable1 (testclob clob, testblob blob)"),1);
+		cur.prepareQuery("insert into testtable1 values ('hello',:var1)");
+		cur.inputBindBlob("var1","hello",5);
+		checkSuccess(cur.executeQuery(),1);
+		cur.prepareQuery("begin select testclob into :clobvar from testtable1;  select testblob into :blobvar from testtable1; end;");
+		cur.defineOutputBindClob("clobvar");
+		cur.defineOutputBindBlob("blobvar");
+		checkSuccess(cur.executeQuery(),1);
+		clobvar=cur.getOutputBind("clobvar");
+		clobvarlength=cur.getOutputBindLength("clobvar");
+		blobvar=cur.getOutputBind("blobvar");
+		blobvarlength=cur.getOutputBindLength("blobvar");
+		checkSuccess(clobvar,"hello",5);
+		checkSuccess(clobvarlength,5);
+		checkSuccess(blobvar,"hello",5);
+		checkSuccess(blobvarlength,5);
+		cur.sendQuery("drop table testtable1");
+		System.out.println();
+
+		System.out.println("NULL AND EMPTY CLOBS AND CLOBS:");
+		cur.getNullsAsNulls();
+		cur.sendQuery("create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)");
+		cur.prepareQuery("insert into testtable1 values (:var1,:var2,:var3,:var4)");
+		cur.inputBindClob("var1","",0);
+		cur.inputBindClob("var2",null,0);
+		cur.inputBindBlob("var3","",0);
+		cur.inputBindBlob("var4",null,0);
+		checkSuccess(cur.executeQuery(),1);
+		cur.sendQuery("select * from testtable1");
+		checkSuccess(cur.getField(0,0),null);
+		checkSuccess(cur.getField(0,1),null);
+		checkSuccess(cur.getField(0,2),null);
+		checkSuccess(cur.getField(0,3),null);
+		cur.sendQuery("drop table testtable1");
+		System.out.println();
+
+		System.out.println("CURSOR BINDS:");
+		checkSuccess(cur.sendQuery("create or replace package types as type cursorType is ref cursor; end;"),1);
+		checkSuccess(cur.sendQuery("create or replace function sp_testtable return types.cursortype as l_cursor    types.cursorType; begin open l_cursor for select * from testtable; return l_cursor; end;"),1);
+		cur.prepareQuery("begin  :curs:=sp_testtable; end;");
+		cur.defineOutputBindCursor("curs");
+		checkSuccess(cur.executeQuery(),1);
+		SQLRCursor	bindcur=cur.getOutputBindCursor("curs");
+		checkSuccess(bindcur.fetchFromBindCursor(),1);
+		checkSuccess(bindcur.getField(0,0),"1");
+		checkSuccess(bindcur.getField(1,0),"2");
+		checkSuccess(bindcur.getField(2,0),"3");
+		checkSuccess(bindcur.getField(3,0),"4");
+		checkSuccess(bindcur.getField(4,0),"5");
+		checkSuccess(bindcur.getField(5,0),"6");
+		checkSuccess(bindcur.getField(6,0),"7");
+		checkSuccess(bindcur.getField(7,0),"8");
+		System.out.println();
+
+		System.out.println("LONG CLOB:");
+		cur.sendQuery("drop table testtable2");
+		cur.sendQuery("create table testtable2 (testclob clob)");
+		cur.prepareQuery("insert into testtable2 values (:clobval)");
+		StringBuffer	clobval=new StringBuffer();
+		for (int i=0; i<8*1024; i++) {
+			clobval.append('C');
+		}
+		cur.inputBindClob("clobval",clobval.toString(),8*1024);
+		checkSuccess(cur.executeQuery(),1);
+		cur.sendQuery("select testclob from testtable2");
+		checkSuccess(clobval.toString(),cur.getField(0,"testclob"));
+		cur.prepareQuery("begin select testclob into :clobbindval from testtable2; end;");
+		cur.defineOutputBindClob("clobbindval");
+		checkSuccess(cur.executeQuery(),1);
+		String	clobbindvar=cur.getOutputBind("clobbindval");
+		checkSuccess(cur.getOutputBindLength("clobbindval"),8*1024);
+		checkSuccess(clobval.toString(),clobbindvar);
+		cur.sendQuery("drop table testtable2");
+		System.out.println();
+
+
+		System.out.println("LONG OUTPUT BIND");
+		cur.sendQuery("drop table testtable2");
+		cur.sendQuery("create table testtable2 (testval varchar2(4000))");
+		cur.prepareQuery("insert into testtable2 values (:testval)");
+		StringBuffer	testval=new StringBuffer();
+		for (int i=0; i<4000; i++) {
+			testval.append('C');
+		}
+		cur.inputBind("testval",testval.toString());
+		checkSuccess(cur.executeQuery(),1);
+		cur.sendQuery("select testval from testtable2");
+		checkSuccess(testval.toString(),cur.getField(0,"testval"));
+		StringBuffer	query=new StringBuffer();
+		query.append("begin :bindval:='");
+		query.append(testval.toString());
+		query.append("'; end;");
+		cur.prepareQuery(query.toString());
+		cur.defineOutputBind("bindval",4000);
+		checkSuccess(cur.executeQuery(),1);
+		checkSuccess(cur.getOutputBindLength("bindval"),4000);
+		checkSuccess(cur.getOutputBind("bindval"),testval.toString());
+		cur.sendQuery("drop table testtable2");
+		System.out.println();
+
+		System.out.println("NEGATIVE INPUT BIND");
+		cur.sendQuery("create table testtable2 (testval number)");
+		cur.prepareQuery("insert into testtable2 values (:testval)");
+		cur.inputBind("testval",-1);
+		checkSuccess(cur.executeQuery(),1);
+		cur.sendQuery("select testval from testtable2");
+		checkSuccess(cur.getField(0,"testval"),"-1");
+		cur.sendQuery("drop table testtable2");
+		System.out.println();
+
 		// drop existing table
 		cur.sendQuery("drop table testtable");
 	

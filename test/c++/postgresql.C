@@ -189,24 +189,24 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN TYPES: \n");
-	checkSuccess(cur->getColumnType(0),"INT");
-	checkSuccess(cur->getColumnType("testint"),"INT");
-	checkSuccess(cur->getColumnType(1),"FLOAT");
-	checkSuccess(cur->getColumnType("testfloat"),"FLOAT");
-	checkSuccess(cur->getColumnType(2),"REAL");
-	checkSuccess(cur->getColumnType("testreal"),"REAL");
-	checkSuccess(cur->getColumnType(3),"SMALLINT");
-	checkSuccess(cur->getColumnType("testsmallint"),"SMALLINT");
-	checkSuccess(cur->getColumnType(4),"CHAR");
-	checkSuccess(cur->getColumnType("testchar"),"CHAR");
-	checkSuccess(cur->getColumnType(5),"VARCHAR");
-	checkSuccess(cur->getColumnType("testvarchar"),"VARCHAR");
-	checkSuccess(cur->getColumnType(6),"DATE");
-	checkSuccess(cur->getColumnType("testdate"),"DATE");
-	checkSuccess(cur->getColumnType(7),"TIME");
-	checkSuccess(cur->getColumnType("testtime"),"TIME");
-	checkSuccess(cur->getColumnType(8),"TIMESTAMP");
-	checkSuccess(cur->getColumnType("testtimestamp"),"TIMESTAMP");
+	checkSuccess(cur->getColumnType(0),"int4");
+	checkSuccess(cur->getColumnType("testint"),"int4");
+	checkSuccess(cur->getColumnType(1),"float8");
+	checkSuccess(cur->getColumnType("testfloat"),"float8");
+	checkSuccess(cur->getColumnType(2),"float4");
+	checkSuccess(cur->getColumnType("testreal"),"float4");
+	checkSuccess(cur->getColumnType(3),"int2");
+	checkSuccess(cur->getColumnType("testsmallint"),"int2");
+	checkSuccess(cur->getColumnType(4),"bpchar");
+	checkSuccess(cur->getColumnType("testchar"),"bpchar");
+	checkSuccess(cur->getColumnType(5),"varchar");
+	checkSuccess(cur->getColumnType("testvarchar"),"varchar");
+	checkSuccess(cur->getColumnType(6),"date");
+	checkSuccess(cur->getColumnType("testdate"),"date");
+	checkSuccess(cur->getColumnType(7),"time");
+	checkSuccess(cur->getColumnType("testtime"),"time");
+	checkSuccess(cur->getColumnType(8),"timestamptz");
+	checkSuccess(cur->getColumnType("testtimestamp"),"timestamptz");
 	printf("\n");
 
 	printf("COLUMN LENGTH: \n");
@@ -471,7 +471,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	checkSuccess(cur->getColumnName(0),"testint");
 	checkSuccess(cur->getColumnLength(0),4);
-	checkSuccess(cur->getColumnType(0),"INT");
+	checkSuccess(cur->getColumnType(0),"int4");
 	printf("\n");
 
 	printf("SUSPENDED SESSION: \n");

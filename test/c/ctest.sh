@@ -7,8 +7,8 @@
 #./msql localhost 8005 "" msqltest msqltest
 #./mysql localhost 8006 "" mysqltest mysqltest
 #./oracle7 localhost 8008 "" oracle7test oracle7test
-./oracle8 localhost 8009 "" oracle8test oracle8test
-#./postgresql localhost 8010 "" postgresqltest postgresqltest
+#./oracle8 localhost 8009 "" oracle8test oracle8test
+./postgresql localhost 8010 "" postgresqltest postgresqltest
 #./sqlite localhost 8011 "" sqlitetest sqlitetest
 #./sybase localhost 8012 "" sybasetest sybasetest
 

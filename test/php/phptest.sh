@@ -31,13 +31,13 @@ sleep 1
 #cp oracle7.php /usr/local/web
 #lynx -dump "http://localhost/oracle7.php?host=localhost&port=8008&socket=&user=oracle7test&password=oracle7test"
 
-chmod 755 oracle8.php
-cp oracle8.php /usr/local/web
-lynx -dump "http://localhost/oracle8.php?host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
+#chmod 755 oracle8.php
+#cp oracle8.php /usr/local/web
+#lynx -dump "http://localhost/oracle8.php?host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
 
-#chmod 755 postgresql.php
-#cp postgresql.php /usr/local/web
-#lynx -dump "http://localhost/postgresql.php?host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+chmod 755 postgresql.php
+cp postgresql.php /usr/local/web
+lynx -dump "http://localhost/postgresql.php?host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
 
 #chmod 755 sqlite.php
 #cp sqlite.php /usr/local/web

@@ -1,4 +1,4 @@
-<html><pre><?
+<html><pre><?php
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
 
@@ -130,24 +130,24 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("COLUMN TYPES: \n");
-	checkSuccess(sqlrcur_getColumnType($cur,0),"INT");
-	checkSuccess(sqlrcur_getColumnType($cur,"testint"),"INT");
-	checkSuccess(sqlrcur_getColumnType($cur,1),"FLOAT");
-	checkSuccess(sqlrcur_getColumnType($cur,"testfloat"),"FLOAT");
-	checkSuccess(sqlrcur_getColumnType($cur,2),"REAL");
-	checkSuccess(sqlrcur_getColumnType($cur,"testreal"),"REAL");
-	checkSuccess(sqlrcur_getColumnType($cur,3),"SMALLINT");
-	checkSuccess(sqlrcur_getColumnType($cur,"testsmallint"),"SMALLINT");
-	checkSuccess(sqlrcur_getColumnType($cur,4),"CHAR");
-	checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"CHAR");
-	checkSuccess(sqlrcur_getColumnType($cur,5),"VARCHAR");
-	checkSuccess(sqlrcur_getColumnType($cur,"testvarchar"),"VARCHAR");
-	checkSuccess(sqlrcur_getColumnType($cur,6),"DATE");
-	checkSuccess(sqlrcur_getColumnType($cur,"testdate"),"DATE");
-	checkSuccess(sqlrcur_getColumnType($cur,7),"TIME");
-	checkSuccess(sqlrcur_getColumnType($cur,"testtime"),"TIME");
-	checkSuccess(sqlrcur_getColumnType($cur,8),"TIMESTAMP");
-	checkSuccess(sqlrcur_getColumnType($cur,"testtimestamp"),"TIMESTAMP");
+	checkSuccess(sqlrcur_getColumnType($cur,0),"int4");
+	checkSuccess(sqlrcur_getColumnType($cur,"testint"),"int4");
+	checkSuccess(sqlrcur_getColumnType($cur,1),"float8");
+	checkSuccess(sqlrcur_getColumnType($cur,"testfloat"),"float8");
+	checkSuccess(sqlrcur_getColumnType($cur,2),"float4");
+	checkSuccess(sqlrcur_getColumnType($cur,"testreal"),"float4");
+	checkSuccess(sqlrcur_getColumnType($cur,3),"int2");
+	checkSuccess(sqlrcur_getColumnType($cur,"testsmallint"),"int2");
+	checkSuccess(sqlrcur_getColumnType($cur,4),"bpchar");
+	checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"bpchar");
+	checkSuccess(sqlrcur_getColumnType($cur,5),"varchar");
+	checkSuccess(sqlrcur_getColumnType($cur,"testvarchar"),"varchar");
+	checkSuccess(sqlrcur_getColumnType($cur,6),"date");
+	checkSuccess(sqlrcur_getColumnType($cur,"testdate"),"date");
+	checkSuccess(sqlrcur_getColumnType($cur,7),"time");
+	checkSuccess(sqlrcur_getColumnType($cur,"testtime"),"time");
+	checkSuccess(sqlrcur_getColumnType($cur,8),"timestamptz");
+	checkSuccess(sqlrcur_getColumnType($cur,"testtimestamp"),"timestamptz");
 	echo("\n");
 
 	echo("COLUMN LENGTH: \n");
@@ -436,7 +436,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testint"),1);
 	checkSuccess(sqlrcur_getColumnName($cur,0),"testint");
 	checkSuccess(sqlrcur_getColumnLength($cur,0),4);
-	checkSuccess(sqlrcur_getColumnType($cur,0),"INT");
+	checkSuccess(sqlrcur_getColumnType($cur,0),"int4");
 	echo("\n");
 
 	echo("SUSPENDED SESSION: \n");

@@ -7,8 +7,8 @@
 #./msql.py localhost 8005 "" msqltest msqltest
 #./mysql.py localhost 8006 "" mysqltest mysqltest
 #./oracle7.py localhost 8008 "" oracle7test oracle7test
-./oracle8.py localhost 8009 "" oracle8test oracle8test
-#./postgresql.py localhost 8010 "" postgresqltest postgresqltest
+#./oracle8.py localhost 8009 "" oracle8test oracle8test
+./postgresql.py localhost 8010 "" postgresqltest postgresqltest
 #./sqlite.py localhost 8011 "" sqlitetest sqlitetest
 #./sybase.py localhost 8012 "" sybasetest sybasetest
 
