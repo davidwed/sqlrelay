@@ -14,6 +14,7 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 
 #include <pqdefinitions.h>
 #include <stdlib.h>
+#include <string.h>
 
 extern "C" {
 

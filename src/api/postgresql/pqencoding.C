@@ -14,6 +14,7 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 
 #include <rudiments/environment.h>
 #include <pqdefinitions.h>
+#include <string.h>
 
 // FIXME: support encodings other than UTF8
 

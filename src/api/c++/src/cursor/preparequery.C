@@ -3,6 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
+#include <string.h>
 
 void sqlrcursor::prepareQuery(const char *query) {
 	prepareQuery(query,strlen(query));

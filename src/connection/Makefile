@@ -3,7 +3,7 @@ top_builddir = ../..
 include ../../config.mk
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
-LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/sqlrconnectiondtor.C \
@@ -193,10 +193,10 @@ clean:
 rebuild: clean all
 
 libsqlrconnection.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
 
 libsqlrconnection_debug.la: $(SRCS) $(DLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(DLOBJS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(DLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)

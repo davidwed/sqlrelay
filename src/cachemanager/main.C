@@ -3,6 +3,7 @@
 
 #include <cachemanager.h>
 #include <stdio.h>
+#include <string.h>
 
 cachemanager	*cacheman;
 

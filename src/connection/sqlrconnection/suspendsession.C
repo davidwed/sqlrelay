@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
+#include <string.h>
 
 void sqlrconnection::suspendSessionCommand() {
 	#ifdef SERVER_DEBUG

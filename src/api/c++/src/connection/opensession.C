@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <errno.h>
+#include <string.h>
 
 bool sqlrconnection::openSession() {
 

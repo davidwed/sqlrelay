@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
+#include <string.h>
 
 sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
 					const char *user, const char *password, 

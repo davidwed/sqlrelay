@@ -354,21 +354,6 @@ AC_SUBST(PIPE)
 
 
 
-dnl Determines what extension shared object files have
-AC_DEFUN([FW_CHECK_SO_EXT],
-[
-AC_MSG_CHECKING(for dynamic library extension)
-if ( test "`uname -s`" = "Darwin" )
-then
-	SO="dylib"
-else
-	SO="so"
-fi
-AC_MSG_RESULT($SO)
-])
-
-
-
 dnl Checks for microsoft platform.
 dnl sets the substitution variables MINGW32, CYGWIN and UWIN as appropriate
 dnl also moves INSTALL to INSTALL.txt if we're using windows
@@ -402,6 +387,27 @@ then
 	EXE=".exe"
 fi
 AC_SUBST(EXE)
+AC_SUBST(MICROSOFT)
+])
+
+
+
+dnl Determines what extension shared object files have
+AC_DEFUN([FW_CHECK_SO_EXT],
+[
+AC_MSG_CHECKING(for dynamic library extension)
+if ( test -n "$MICROSOFT" )
+then
+	SO="dll.a"
+else
+	if ( test "`uname -s`" = "Darwin" )
+	then
+		SO="dylib"
+	else
+		SO="so"
+	fi
+fi
+AC_MSG_RESULT($SO)
 ])
 
 
@@ -793,7 +799,6 @@ then
 		if ( test -n "$MYSQLPATH" )
 		then
 			MYSQLINCLUDES="-I$MYSQLPATH/include/mysql"
-			dnl MYSQLLIBS="-L$MYSQLPATH/lib/mysql -lmysqlclient"
 			MYSQLLIBS="$MYSQLPATH/lib/mysql/libmysqlclient.$SO"
 			MYSQLLIBSPATH="$MYSQLPATH/lib/mysql"
 		fi
@@ -814,9 +819,7 @@ then
 			if ( test -n "$MYSQLPATH" )
 			then
 				FW_CHECK_FILE($MYSQLPATH/include/mysql.h,[MYSQLINCLUDES=\"-I$MYSQLPATH/include\"])
-				dnl FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.a,[MYSQLLIBS=\"-L$MYSQLPATH/lib/opt -lmysqlclient\"; MYSQLSTATIC=\"$STATICFLAG\"])
 				FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.a,[MYSQLLIBS=\"$MYSQLPATH/lib/libmysqlclient.a\"; MYSQLSTATIC=\"$STATICFLAG\"])
-				dnl FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.$SO,[MYSQLLIBSPATH=\"$MYSQLPATH/lib/opt\"; MYSQLLIBS=\"-L$MYSQLPATH/lib/opt -lmysqlclient\"])
 				FW_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.$SO,[MYSQLLIBSPATH=\"$MYSQLPATH/lib/opt\"; MYSQLLIBS=\"$MYSQLPATH/lib/opt/libmysqlclient.$SO\"])
 			else
 				FW_CHECK_FILE("/cygdrive/c/mysql/include/mysql.h",[MYSQLINCLUDES=\"-I/cygdrive/c/mysql/include\"])
@@ -1944,6 +1947,7 @@ then
 	HAVE_JAVA=""
 	JAVAC=""
 	JAVAINCLUDES=""
+	JAVALIB=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -2006,6 +2010,7 @@ then
 	AC_SUBST(HAVE_JAVA)
 	AC_SUBST(JAVAC)
 	AC_SUBST(JAVAINCLUDES)
+	AC_SUBST(JAVALIB)
 fi
 ])
 
@@ -2018,6 +2023,7 @@ then
 	HAVE_PHP=""
 	PHPINCLUDES=""
 	PHPEXTDIR=""
+	PHPLIB=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -2027,39 +2033,45 @@ then
 
 	else
 	
-		PHPCONFIG=""
-		if ( test -n "$PHPPATH" )
+		if ( test -n "$MICROSOFT" )
 		then
-			FW_CHECK_FILE("$PHPPATH/bin/php-config",[PHPCONFIG=\"$PHPPATH/bin/php-config\"])
+			dnl Windows stuff here...
+			echo "windows..."
 		else
-			AC_CHECK_PROG(PHPCONFIG,"php-config","php-config")
-			if ( test -z "$PHPCONFIG" )
+			PHPCONFIG=""
+			if ( test -n "$PHPPATH" )
 			then
-				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
-				do
-					FW_CHECK_FILE("$i/php-config",[PHPCONFIG=\"$i/php-config\"])
-					if ( test -n "$PHPCONFIG" )
-					then
-						break
-					fi
-				done
+				FW_CHECK_FILE("$PHPPATH/bin/php-config",[PHPCONFIG=\"$PHPPATH/bin/php-config\"])
+			else
+				AC_CHECK_PROG(PHPCONFIG,"php-config","php-config")
+				if ( test -z "$PHPCONFIG" )
+				then
+					for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
+					do
+						FW_CHECK_FILE("$i/php-config",[PHPCONFIG=\"$i/php-config\"])
+						if ( test -n "$PHPCONFIG" )
+						then
+							break
+						fi
+					done
+				fi
+			fi
+			
+			if ( test -n "$PHPCONFIG" )
+			then
+				HAVE_PHP="yes"
+				PHPPREFIX=`$PHPCONFIG --prefix`
+				dnl some php's fail to replace ${prefix} with
+				dnl their prefix when you run php-config
+				dnl --includes, but php-config --prefix usually
+				dnl works so we fake it here
+				PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
+				PHPEXTDIR=`$PHPCONFIG --extension-dir`
+			else
+				HAVE_PHP=""
+				AC_MSG_WARN(The PHP API will not be built.)
 			fi
 		fi
-		
-		if ( test -n "$PHPCONFIG" )
-		then
-			HAVE_PHP="yes"
-			PHPPREFIX=`$PHPCONFIG --prefix`
-			dnl some php's fail to replace ${prefix} with their prefix when
-			dnl you run php-config --includes, but php-config --prefix
-			dnl usually works so we fake it here
-			PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
-			PHPEXTDIR=`$PHPCONFIG --extension-dir`
-		else
-			HAVE_PHP=""
-			AC_MSG_WARN(The PHP API will not be built.)
-		fi
-		
 	fi
 
 	FW_INCLUDES(php,[$PHPINCLUDES])
@@ -2067,6 +2079,7 @@ then
 	AC_SUBST(HAVE_PHP)
 	AC_SUBST(PHPINCLUDES)
 	AC_SUBST(PHPEXTDIR)
+	AC_SUBST(PHPLIB)
 fi
 ])
 
@@ -2146,27 +2159,39 @@ then
 		else
 			if ( test -n "$TCLLIBSPATH" )
 			then
-				FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-				for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-				do
-					FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-				done
+				if ( test -z "$MICROSOFT" )
+				then
+					FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+					if ( test -z "$TCLLIB" )
+					then
+						for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+						do
+							FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+						done
+					fi
+				fi
 				if ( test -z "$TCLLIB" )
 				then
 					FW_CHECK_FILE($TCLLIBSPATH/libtcl.$SO,[TCLLIB=\"-L$TCLLIBSPATH -ltcl\"])
-					for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-					do
-						FW_CHECK_FILE($TCLLIBSPATH/libtcl$i.$SO,[TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\"])
-					done
+					if ( test -z "$TCLLIB" )
+					then
+						for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+						do
+							FW_CHECK_FILE($TCLLIBSPATH/libtcl$i.$SO,[TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\"])
+						done
+					fi
 				fi
 			else
-				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
-				do
-					for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+				if ( test -z "$MICROSOFT" )
+				then
+					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
 					do
-						FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+						do
+							FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+						done
 					done
-				done
+				fi
 				if ( test -z "$TCLLIB" )
 				then
 					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
@@ -2174,6 +2199,16 @@ then
 						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 						do
 							FW_CHECK_FILE($i/libtcl$j.$SO,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
+							dnl for some reason, the
+							dnl tcl dll stub library
+							dnl is called libtcl.a
+							dnl instead of
+							dnl libtcl.dll.a on
+							dnl cygwin
+							if ( test -z "$TCLLIB" -a -n "$MICROSOFT" )
+							then
+								FW_CHECK_FILE($i/libtcl$j.a,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
+							fi
 						done
 					done
 				fi

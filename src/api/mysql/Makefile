@@ -45,16 +45,16 @@ clean:
 rebuild: clean all
 
 libmysql3sqlrelay.la: mysql.C mysql3.lo
-	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ mysql3.lo $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ mysql3.lo -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
 
 libmysql40sqlrelay.la: mysql.C mysql40.lo
-	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ mysql40.lo $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ mysql40.lo -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
 
 libmysql41sqlrelay.la: mysql.C mysql41.lo
-	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ mysql41.lo $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ mysql41.lo -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
 
 libmysql50sqlrelay.la: mysql.C mysql50.lo
-	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ mysql50.lo $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) $(INSTALLPREFIX) -O -o $@ mysql50.lo -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)

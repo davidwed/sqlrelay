@@ -31,6 +31,8 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 #endif
 //#endif
 
+#include <string.h>
+
 extern "C" {
 
 typedef struct _PQprintOpt {

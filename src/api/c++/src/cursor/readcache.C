@@ -3,6 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
+#include <string.h>
 
 bool sqlrcursor::openCachedResultSet(const char *filename) {
 

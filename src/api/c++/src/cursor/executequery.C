@@ -4,6 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
+#include <string.h>
 
 bool sqlrcursor::executeQuery() {
 

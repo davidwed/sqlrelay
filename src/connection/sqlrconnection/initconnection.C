@@ -7,6 +7,7 @@
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
 #endif
+#include <string.h>
 
 bool sqlrconnection::initConnection(int argc, const char **argv,
 						bool detachbeforeloggingin) {

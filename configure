@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALLSTRIP SMALLCODE CFLAGS CXXFLAGS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC PS UNAME PIPE MINGW32 CYGWIN UWIN EXE PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB SSLINCLUDES SSLLIBS RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALLSTRIP SMALLCODE CFLAGS CXXFLAGS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC PS UNAME PIPE MINGW32 CYGWIN UWIN EXE MICROSOFT PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB SSLINCLUDES SSLLIBS RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC PERL HAVE_PERL PERLPREFIX HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONVERSION HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY HAVE_JAVA JAVAC JAVAINCLUDES JAVALIB HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPLIB PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -19353,21 +19353,6 @@ fi
 
 
 
-echo "$as_me:$LINENO: checking for dynamic library extension" >&5
-echo $ECHO_N "checking for dynamic library extension... $ECHO_C" >&6
-if ( test "`uname -s`" = "Darwin" )
-then
-	SO="dylib"
-else
-	SO="so"
-fi
-echo "$as_me:$LINENO: result: $SO" >&5
-echo "${ECHO_T}$SO" >&6
-
-echo "******************************"
-
-
-
 CYGWIN=""
 MINGW32=""
 UWIN=""
@@ -19392,6 +19377,28 @@ then
 	MICROSOFT="yes"
 	EXE=".exe"
 fi
+
+
+
+
+echo "$as_me:$LINENO: checking for dynamic library extension" >&5
+echo $ECHO_N "checking for dynamic library extension... $ECHO_C" >&6
+if ( test -n "$MICROSOFT" )
+then
+	SO="dll.a"
+else
+	if ( test "`uname -s`" = "Darwin" )
+	then
+		SO="dylib"
+	else
+		SO="so"
+	fi
+fi
+echo "$as_me:$LINENO: result: $SO" >&5
+echo "${ECHO_T}$SO" >&6
+
+
+echo "******************************"
 
 
 
@@ -23425,7 +23432,7 @@ then
 		if ( test -n "$MYSQLPATH" )
 		then
 			MYSQLINCLUDES="-I$MYSQLPATH/include/mysql"
-						MYSQLLIBS="$MYSQLPATH/lib/mysql/libmysqlclient.$SO"
+			MYSQLLIBS="$MYSQLPATH/lib/mysql/libmysqlclient.$SO"
 			MYSQLLIBSPATH="$MYSQLPATH/lib/mysql"
 		fi
 
@@ -38340,6 +38347,7 @@ then
 	HAVE_JAVA=""
 	JAVAC=""
 	JAVAINCLUDES=""
+	JAVALIB=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -38432,6 +38440,7 @@ fi
 
 
 
+
 fi
 
 echo "******************************"
@@ -38491,21 +38500,27 @@ echo "$as_me: WARNING: \"The TCL API will not be installed.\"" >&2;}
 		else
 			if ( test -n "$TCLLIBSPATH" )
 			then
+				if ( test -z "$MICROSOFT" )
+				then
 
 if ( test -r "$TCLLIBSPATH/libtclstub.a" )
 then
 	eval "TCLLIB=\"-L$TCLLIBSPATH -ltclstub\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\""
 fi
 
-				for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-				do
+					if ( test -z "$TCLLIB" )
+					then
+						for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+						do
 
 if ( test -r "$TCLLIBSPATH/libtclstub$i.a" )
 then
 	eval "TCLLIB=\"-L$TCLLIBSPATH -ltclstub$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\""
 fi
 
-				done
+						done
+					fi
+				fi
 				if ( test -z "$TCLLIB" )
 				then
 
@@ -38514,29 +38529,35 @@ then
 	eval "TCLLIB=\"-L$TCLLIBSPATH -ltcl\""
 fi
 
-					for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-					do
+					if ( test -z "$TCLLIB" )
+					then
+						for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+						do
 
 if ( test -r "$TCLLIBSPATH/libtcl$i.$SO" )
 then
 	eval "TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\""
 fi
 
-					done
+						done
+					fi
 				fi
 			else
-				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
-				do
-					for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+				if ( test -z "$MICROSOFT" )
+				then
+					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
 					do
+						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+						do
 
 if ( test -r "$i/libtclstub$j.a" )
 then
 	eval "TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\""
 fi
 
+						done
 					done
-				done
+				fi
 				if ( test -z "$TCLLIB" )
 				then
 					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib"
@@ -38549,6 +38570,15 @@ then
 	eval "TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\""
 fi
 
+																																																	if ( test -z "$TCLLIB" -a -n "$MICROSOFT" )
+							then
+
+if ( test -r "$i/libtcl$j.a" )
+then
+	eval "TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\""
+fi
+
+							fi
 						done
 					done
 				fi
@@ -38666,6 +38696,7 @@ then
 	HAVE_PHP=""
 	PHPINCLUDES=""
 	PHPEXTDIR=""
+	PHPLIB=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -38674,17 +38705,21 @@ then
 
 	else
 
-		PHPCONFIG=""
-		if ( test -n "$PHPPATH" )
+		if ( test -n "$MICROSOFT" )
 		then
+						echo "windows..."
+		else
+			PHPCONFIG=""
+			if ( test -n "$PHPPATH" )
+			then
 
 if ( test -r ""$PHPPATH/bin/php-config"" )
 then
 	eval "PHPCONFIG=\"$PHPPATH/bin/php-config\""
 fi
 
-		else
-			# Extract the first word of ""php-config"", so it can be a program name with args.
+			else
+				# Extract the first word of ""php-config"", so it can be a program name with args.
 set dummy "php-config"; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
@@ -38719,36 +38754,36 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-			if ( test -z "$PHPCONFIG" )
-			then
-				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
-				do
+				if ( test -z "$PHPCONFIG" )
+				then
+					for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
+					do
 
 if ( test -r ""$i/php-config"" )
 then
 	eval "PHPCONFIG=\"$i/php-config\""
 fi
 
-					if ( test -n "$PHPCONFIG" )
-					then
-						break
-					fi
-				done
+						if ( test -n "$PHPCONFIG" )
+						then
+							break
+						fi
+					done
+				fi
+			fi
+
+			if ( test -n "$PHPCONFIG" )
+			then
+				HAVE_PHP="yes"
+				PHPPREFIX=`$PHPCONFIG --prefix`
+																				PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
+				PHPEXTDIR=`$PHPCONFIG --extension-dir`
+			else
+				HAVE_PHP=""
+				{ echo "$as_me:$LINENO: WARNING: The PHP API will not be built." >&5
+echo "$as_me: WARNING: The PHP API will not be built." >&2;}
 			fi
 		fi
-
-		if ( test -n "$PHPCONFIG" )
-		then
-			HAVE_PHP="yes"
-			PHPPREFIX=`$PHPCONFIG --prefix`
-												PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
-			PHPEXTDIR=`$PHPCONFIG --extension-dir`
-		else
-			HAVE_PHP=""
-			{ echo "$as_me:$LINENO: WARNING: The PHP API will not be built." >&5
-echo "$as_me: WARNING: The PHP API will not be built." >&2;}
-		fi
-
 	fi
 
 
@@ -38756,6 +38791,7 @@ if ( test -n "$PHPINCLUDES" )
 then
 	echo "php includes... $PHPINCLUDES"
 fi
+
 
 
 
@@ -42774,6 +42810,7 @@ s,@MINGW32@,$MINGW32,;t t
 s,@CYGWIN@,$CYGWIN,;t t
 s,@UWIN@,$UWIN,;t t
 s,@EXE@,$EXE,;t t
+s,@MICROSOFT@,$MICROSOFT,;t t
 s,@PTHREADINCLUDES@,$PTHREADINCLUDES,;t t
 s,@PTHREADLIBS@,$PTHREADLIBS,;t t
 s,@READLINELIB@,$READLINELIB,;t t
@@ -42846,6 +42883,7 @@ s,@HAVE_RUBY@,$HAVE_RUBY,;t t
 s,@HAVE_JAVA@,$HAVE_JAVA,;t t
 s,@JAVAC@,$JAVAC,;t t
 s,@JAVAINCLUDES@,$JAVAINCLUDES,;t t
+s,@JAVALIB@,$JAVALIB,;t t
 s,@HAVE_TCL@,$HAVE_TCL,;t t
 s,@TCLINCLUDE@,$TCLINCLUDE,;t t
 s,@TCLLIB@,$TCLLIB,;t t
@@ -42854,6 +42892,7 @@ s,@PHPCONFIG@,$PHPCONFIG,;t t
 s,@HAVE_PHP@,$HAVE_PHP,;t t
 s,@PHPINCLUDES@,$PHPINCLUDES,;t t
 s,@PHPEXTDIR@,$PHPEXTDIR,;t t
+s,@PHPLIB@,$PHPLIB,;t t
 s,@PHPPEARDBDIR@,$PHPPEARDBDIR,;t t
 s,@GTKCONFIG@,$GTKCONFIG,;t t
 s,@HAVE_GTK@,$HAVE_GTK,;t t

@@ -54,6 +54,7 @@ endif
 				else \
 					cat errors4; \
 					$(STRIPCOMMENTNOTE) $@; \
+				fi; \
 			else \
 				cat errors3; \
 				$(STRIPCOMMENTNOTE) $@; \

@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
+#include <string.h>
 
 bool sqlrconnection::resumeSession(int port, const char *socket) {
 

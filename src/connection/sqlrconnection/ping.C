@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
+#include <string.h>
 
 void sqlrconnection::pingCommand() {
 	#ifdef SERVER_DEBUG

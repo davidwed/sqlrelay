@@ -4,6 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
+#include <string.h>
 
 unsigned short sqlrcursor::countBindVariables() const {
 

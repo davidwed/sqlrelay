@@ -3,7 +3,7 @@ top_builddir = ../../..
 include ../../../config.mk
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L$(top_builddir)/src/api/c++/src $(TCLLIBS) -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(TCLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(TCLUSERPATH),yes)
@@ -54,7 +54,7 @@ rebuild: clean all
 	$(STRIPCOMMENTNOTE) $@
 
 libsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -module -no-undefined $(LIBS)
 
 sqlrelay.so:
 	if ( test -r .libs/libsqlrelay.0.0.0 ); \

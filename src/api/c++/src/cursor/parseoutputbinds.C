@@ -4,6 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
+#include <string.h>
 
 bool sqlrcursor::parseOutputBinds() {
 

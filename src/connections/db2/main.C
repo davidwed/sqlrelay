@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 db2connection	*conn;
 signalhandler	*alarmhandler;

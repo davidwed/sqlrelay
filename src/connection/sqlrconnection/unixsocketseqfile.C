@@ -29,7 +29,7 @@ bool sqlrconnection::getUnixSocket(char *tmpdir, char *unixsocketptr) {
 		close(sockseq);
 		return false;
 	}
-	if (unLockSequenceFile()==-1) {
+	if (!unLockSequenceFile()) {
 		close(sockseq);
 		return false;
 	}

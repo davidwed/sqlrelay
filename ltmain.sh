@@ -4509,6 +4509,7 @@ EOF
 #include <malloc.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <string.h>
 
 #if defined(PATH_MAX)
 # define LT_PATHMAX PATH_MAX

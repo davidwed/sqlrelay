@@ -9,6 +9,7 @@
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
 #endif
+#include <string.h>
 
 void sqlrconnection::markDatabaseAvailable() {
 

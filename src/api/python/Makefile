@@ -3,7 +3,7 @@ top_builddir = ../../..
 include ../../../config.mk
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(PYTHONLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PYTHONUSERPATH),yes)
@@ -31,7 +31,7 @@ clean:
 rebuild: clean all
 
 libCSQLRelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LIBS) -rpath $(PYTHONDIR)/site-packages/SQLRelay $(RPATH) -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(PYTHONDIR)/site-packages/SQLRelay $(RPATH) -module -no-undefined $(LIBS)
 
 CSQLRelay.so:
 	if ( test -r .libs/libCSQLRelay.0.0.0 ); \

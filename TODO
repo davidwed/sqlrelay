@@ -1,6 +1,8 @@
 cygwin:
-	requires rudiments without ssl/pcre support
-	perl api won't build
+	how to build a php extension?
+		1) need php source 
+
+must run cygserver and set CYGWIN=server for ipc to work
 
 fix erwin's fake binds problem
 
@@ -10,7 +12,9 @@ idle client timeout
 client connect timeout
 perl apis -> CPAN
 
-check out Tony/Erik's perl dbi patch
+document how to use new features of Tony/Erik's perl dbi patch
+update "Tuning SQL Relay" document - unix sockets for all db's
+document issue with sqlrelay.conf permissions and runasuser="nobody"
 
 --------------------------------------------------------------------------------
 

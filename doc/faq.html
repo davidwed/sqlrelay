@@ -1067,64 +1067,7 @@ on the TODO list though.</p>
 <a name="tweaks"></a>
 <span class="heading3">What system parameters can I tweak to get better performance out of SQL Relay?</span><br><br>
 
-<span class="heading3">TIME_WAIT timeout</span>
-
-<p>The first paramater that comes to mind is the TIME_WAIT timeout.  When a TCP 
-client disconnects from a server, the socket that the client was connected on
-goes into a TIME_WAIT state for typically between a minute and 4 minutes.</p>
-
-<p>For servers serving data over the the unreliable internet, this is probably 
-reasonable.  For internal servers, dedicated to serving other internal servers 
-on a reliable network, reducing the length of the timeout is probably OK.</p>
-
-<p>Here's why it helps...</p>
-
-<p>The kernel keeps a list of sockets in the TIME_WAIT state.  When the list
-is full, failures start to occur.  On my test machine (running a linux 2.4 
-kernel), I can have about 1000 sockets in the TIME_WAIT state before running
-into problems.</p>
-
-<p>If your server is getting new client connections faster than it can bleed off
-sockets in the TIME_WAIT state, the list will ultimately get full.  Decreasing
-the timeout increases the bleed-off rate.</p>
-
-<p>The following instructions illustrate how to change the timeout rate for
-Linux and Solaris.  Note that I got these instructions off of the web and have
-not tried all of them myself.</p>
-
-<p>For Linux, set the timeout by executing the following command.  In this
-example, the timeout is set to 30 seconds.  You should put this command in a
-system startup file so it will be executed at boot time.</p>
-
-<p>echo 30 &gt; /proc/sys/net/ipv4/tcp_fin_timeout</p>
-
-<p>For Solaris, the parameter can be modified while the system is running
-using the ndd command to set the number of milliseconds to wait.  These
-examples set the timeout to 30 seconds.  You should put these commands in a 
-system startup file so they'll be executed at boot time.</p>
-
-<p>For Solaris 2.6 and earlier:  ndd -set /dev/tcp tcp_close_wait_interval 30000</p>
-
-<p>For Solaris 2.7 and later:  ndd -set /dev/tcp tcp_time_wait_interval 30000</p>
-
-<span class="heading3">Port range</span>
-
-<p>Another paramter that you may want to tweak is the range of available ports.
-On Linux 2.2 kernels, it defaults to ports 1024 through 4999.  You can display
-the range by running:</p>
-
-<p>/sbin/sysctl net.ipv4.ip_local_port_range</p>
-
-<p>You can increase this to range from 1024 to 65535 by running the following 
-command:</p>
-
-<p>/sbin/sysctl -w net.ipv4.ip_local_port_range="1024 65535"</p>
-
-<p>You should put this command in a system startup file so it'll be executed at
-boot time.</p>
-
-<p>I'm not sure what the default port range is or how to change it on other
-operating systems.</p>
+<p>See <a href="tuning.html">Tuning SQL Relay...</a></p>
 
 <li><a href="#firewall">If I leave SQL Relay idle for a long time, then come back and try to use it, my program gets hung or I get a low level TCP error from the database.  What does that mean?</a></li>
 
