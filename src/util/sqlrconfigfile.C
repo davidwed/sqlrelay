@@ -264,12 +264,12 @@ int sqlrconfigfile::getMetricTotal() {
 	return metrictotal;
 }
 
-int sqlrconfigfile::tagStart(char *name) {
+bool sqlrconfigfile::tagStart(char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
 	if (done || !correctid) {
-		return 1;
+		return true;
 	}
 
 	// set the current tag
@@ -281,14 +281,14 @@ int sqlrconfigfile::tagStart(char *name) {
 		connectstringlist.append(currentconnect);
 	}
 
-	return 1;
+	return true;
 }
 
-int sqlrconfigfile::attributeName(char *name) {
+bool sqlrconfigfile::attributeName(char *name) {
 
 	// don't do anything if we're already done
 	if (done) {
-		return 1;
+		return true;
 	}
 
 	// set the current attribute
@@ -341,14 +341,14 @@ int sqlrconfigfile::attributeName(char *name) {
 	} else if (!strcmp(name,"metric")) {
 		currentattribute=METRIC_ATTRIBUTE;
 	}
-	return 1;
+	return true;
 }
 
-int sqlrconfigfile::attributeValue(char *value) {
+bool sqlrconfigfile::attributeValue(char *value) {
 
 	// don't do anything if we're already done
 	if (done) {
-		return 1;
+		return true;
 	}
 
 	if (!correctid) {
@@ -434,7 +434,7 @@ int sqlrconfigfile::attributeValue(char *value) {
 			currentconnect->setMetric(atoi(value,DEFAULT_METRIC,1));
 		}
 	}
-	return 1;
+	return true;
 }
 
 int sqlrconfigfile::atoi(const char *value,
@@ -446,19 +446,19 @@ int sqlrconfigfile::atoi(const char *value,
 	return retval;
 }
 
-int sqlrconfigfile::tagEnd(char *name) {
+bool sqlrconfigfile::tagEnd(char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
 	if (done || !correctid) {
-		return 1;
+		return true;
 	}
 
 	// we're done if we've found the right instance at this point
 	if (correctid && !strcmp((char *)name,"instance")) {
 		done=1;
 	}
-	return 1;
+	return true;
 }
 
 int sqlrconfigfile::parse(const char *config, char *id) {
@@ -476,7 +476,7 @@ int sqlrconfigfile::parse(const char *config, char *id,
 
 	// parse the file
 	int	retval=1;
-	if (!parseFile(config)<0) {
+	if (!parseFile(config)) {
 		fprintf(stderr,"Couldn't parse config file %s.\n",config);
 		retval=0;
 	}

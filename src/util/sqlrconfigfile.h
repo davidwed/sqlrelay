@@ -133,10 +133,10 @@ class sqlrconfigfile : public xmlsax {
 					const char *defaultvalue,
 					int minvalue);
 
-		int	tagStart(char *name);
-		int	attributeName(char *name);
-		int	attributeValue(char *value);
-		int	tagEnd(char *name);
+		bool	tagStart(char *name);
+		bool	attributeName(char *name);
+		bool	attributeValue(char *value);
+		bool	tagEnd(char *name);
 
 		int	port;
 		int	listenoninet;

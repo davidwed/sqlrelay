@@ -4,8 +4,8 @@
 #g++ -I/usr/local/firstworks/include -g -o msql msql.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o lago lago.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o sqlite sqlite.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
-#g++ -I/usr/local/firstworks/include -g -o postgresql postgresql.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
+g++ -I/usr/local/firstworks/include -g -o postgresql postgresql.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o freetds freetds.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o sybase sybase.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
 #g++ -I/usr/local/firstworks/include -g -o interbase interbase.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
-g++ -I/usr/local/firstworks/include -g -o db2 db2.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
+#g++ -I/usr/local/firstworks/include -g -o db2 db2.C -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lefence
