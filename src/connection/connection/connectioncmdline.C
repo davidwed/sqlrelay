@@ -11,7 +11,7 @@ connectioncmdline::connectioncmdline(int argc, const char **argv) :
 	setTtl();
 }
 
-void	connectioncmdline::setConnectionId() {
+void connectioncmdline::setConnectionId() {
 
 	// get the connection id from the command line
 	connectionid=value("-connectionid");
@@ -21,7 +21,7 @@ void	connectioncmdline::setConnectionId() {
 	}
 }
 
-void	connectioncmdline::setTtl() {
+void connectioncmdline::setTtl() {
 
 	// get the time to live from the command line
 	ttl=atoi(value("-ttl"));

@@ -20,13 +20,13 @@ listenercomm::~listenercomm() {
 }
 
 #ifdef SERVER_DEBUG
-void	listenercomm::setDebugLogger(logger *dl) {
+void listenercomm::setDebugLogger(logger *dl) {
 	this->dl=dl;
 }
 #endif
 
-void	listenercomm::announceAvailability(char *tmpdir,
-					int passdescriptor,
+void listenercomm::announceAvailability(char *tmpdir,
+					bool passdescriptor,
 					char *unixsocket,
 					unsigned short inetport,
 					char *connectionid) {
@@ -95,7 +95,7 @@ void	listenercomm::announceAvailability(char *tmpdir,
 	#endif
 }
 
-void	listenercomm::registerForHandoff(char *tmpdir) {
+void listenercomm::registerForHandoff(char *tmpdir) {
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"registering for handoff...");
@@ -130,6 +130,7 @@ void	listenercomm::registerForHandoff(char *tmpdir) {
 		}
 		deRegisterForHandoff(tmpdir);
 		delete handoffsockun;
+		handoffsockun=NULL;
 	}
 
 	// clean up
@@ -140,8 +141,8 @@ void	listenercomm::registerForHandoff(char *tmpdir) {
 	#endif
 }
 
-int	listenercomm::receiveFileDescriptor(int *descriptor) {
-	int	retval=handoffsockun->receiveFileDescriptor(descriptor);
+bool listenercomm::receiveFileDescriptor(int *descriptor) {
+	bool	retval=handoffsockun->receiveFileDescriptor(descriptor);
 	if (!retval) {
 		delete handoffsockun;
 		handoffsockun=NULL;
@@ -149,7 +150,7 @@ int	listenercomm::receiveFileDescriptor(int *descriptor) {
 	return retval;
 }
 
-void	listenercomm::deRegisterForHandoff(char *tmpdir) {
+void listenercomm::deRegisterForHandoff(char *tmpdir) {
 	
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"de-registering for handoff...");

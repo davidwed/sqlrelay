@@ -1833,7 +1833,7 @@ then
 		
 				if ( test -z "$ZOPEDIR" )
 				then
-					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/opt"
+					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/usr/lib" "/opt"
 					do
 						for j in "zope" "Zope"
 						do

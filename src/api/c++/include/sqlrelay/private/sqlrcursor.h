@@ -98,9 +98,9 @@
 
 		// bind variables
 		bindvar		inbindvars[MAXVAR];
-		int		inbindcount;
+		unsigned short	inbindcount;
 		bindvar		outbindvars[MAXVAR];
-		int		outbindcount;
+		unsigned short	outbindcount;
 		int		validatebinds;
 
 		// result set

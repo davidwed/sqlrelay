@@ -12,12 +12,12 @@ class unixsocketseqfile {
 		void	setDebugLogger(logger *dl);
 		#endif
 
-		int	getUnixSocket(char *tmpdir, char *unixsocketptr);
+		bool	getUnixSocket(char *tmpdir, char *unixsocketptr);
 	private:
 		int	openSequenceFile(char *tmpdir, char *unixsocketptr);
-		int	lockSequenceFile();
-		int	getAndIncrementSequenceNumber(char *unixsocketptr);
-		int	unLockSequenceFile();
+		bool	lockSequenceFile();
+		bool	getAndIncrementSequenceNumber(char *unixsocketptr);
+		bool	unLockSequenceFile();
 
 		int	sockseq;
 

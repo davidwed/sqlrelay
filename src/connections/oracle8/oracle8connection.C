@@ -688,7 +688,7 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 	}
 	inbindlobcount++;
 	inbindcount++;
-	return false;
+	return true;
 }
 
 bool oracle8cursor::outputBindBlob(const char *variable,

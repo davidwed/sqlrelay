@@ -34,12 +34,12 @@ ipc::~ipc() {
 }
 
 #ifdef SERVER_DEBUG
-void	ipc::setDebugLogger(logger *dl) {
+void ipc::setDebugLogger(logger *dl) {
 	this->dl=dl;
 }
 #endif
 
-int	ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
+bool ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 
 	char	*idfilename=new char[strlen(tmpdir)+1+strlen(id)+1];
 	sprintf(idfilename,"%s/%s",tmpdir,id);
@@ -61,7 +61,7 @@ int	ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 		delete idmemory;
 		idmemory=NULL;
 		delete[] idfilename;
-		return 0;
+		return false;
 	}
 
 
@@ -78,7 +78,7 @@ int	ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 		semset=NULL;
 		idmemory=NULL;
 		delete[] idfilename;
-		return 0;
+		return false;
 	}
 
 	#ifdef SERVER_DEBUG
@@ -88,58 +88,58 @@ int	ipc::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 
 	delete[] idfilename;
 
-	return 1;
+	return true;
 }
 
-int	ipc::initialized() {
+bool ipc::initialized() {
 	return (semset && idmemory);
 }
 
-void	ipc::acquireAnnounceMutex() {
+void ipc::acquireAnnounceMutex() {
 	semset->wait(0);
 }
 
-shmdata	*ipc::getAnnounceBuffer() {
+shmdata *ipc::getAnnounceBuffer() {
 	return (shmdata *)idmemory->getPointer();
 }
 
-void	ipc::releaseAnnounceMutex() {
+void ipc::releaseAnnounceMutex() {
 	semset->signal(0);
 }
 
-void	ipc::signalListenerToRead() {
+void ipc::signalListenerToRead() {
 	semset->signal(2);
 }
 
-void	ipc::waitForListenerToFinishReading() {
+void ipc::waitForListenerToFinishReading() {
 	semset->wait(3);
 }
 
-void	ipc::acquireConnectionCountMutex() {
+void ipc::acquireConnectionCountMutex() {
 	semset->wait(4);
 }
 
-unsigned int	*ipc::getConnectionCountBuffer() {
+unsigned int *ipc::getConnectionCountBuffer() {
 	return (unsigned int *)idmemory->getPointer();
 }
 
-void	ipc::releaseConnectionCountMutex() {
+void ipc::releaseConnectionCountMutex() {
 	semset->signal(4);
 }
 
-void	ipc::acquireSessionCountMutex() {
+void ipc::acquireSessionCountMutex() {
 	semset->wait(5);
 }
 
-unsigned int	*ipc::getSessionCountBuffer() {
+unsigned int *ipc::getSessionCountBuffer() {
 	return (unsigned int *)((long)idmemory->getPointer()+
 						sizeof(unsigned int));
 }
 
-void	ipc::releaseSessionCountMutex() {
+void ipc::releaseSessionCountMutex() {
 	semset->signal(5);
 }
 
-void	ipc::signalScalerToRead() {
+void ipc::signalScalerToRead() {
 	semset->signal(8);
 }

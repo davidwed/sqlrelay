@@ -111,7 +111,7 @@ sqlrcursor *sqlrconnection::getCursor(unsigned short command) {
 		clientsock->read(&neednewcursor)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
-			"error: client cursor request failed, need new cursor stage");
+			"client cursor request failed, need new cursor stage");
 		#endif
 		return NULL;
 	}
@@ -125,7 +125,7 @@ sqlrcursor *sqlrconnection::getCursor(unsigned short command) {
 		if (clientsock->read(&index)!=sizeof(unsigned short)) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
-				"error: client cursor request failed, cursor index stage");
+				"client cursor request failed, cursor index stage");
 			#endif
 			return NULL;
 		}
@@ -135,7 +135,8 @@ sqlrcursor *sqlrconnection::getCursor(unsigned short command) {
 		if (index>cfgfl->getCursors()) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
-				"error: client requested an invalid cursor");
+				"client requested an invalid cursor:");
+			debugPrint("connection",3,(long)index);
 			#endif
 			return NULL;
 		}
@@ -152,7 +153,6 @@ sqlrcursor *sqlrconnection::getCursor(unsigned short command) {
 	cursor->busy=true;
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"returning requested cursor");
 	debugPrint("connection",1,"done getting a cursor");
 	#endif
 	return cursor;
@@ -162,17 +162,15 @@ sqlrcursor *sqlrconnection::findAvailableCursor() {
 
 	for (int i=0; i<cfgfl->getCursors(); i++) {
 		if (!cur[i]->busy) {
-			cur[i]->busy=true;
 			#ifdef SERVER_DEBUG
+			debugPrint("connection",2,"found a free cursor:");
 			debugPrint("connection",3,(long)i);
-			debugPrint("connection",2,"found a free cursor...");
-			debugPrint("connection",2,"done getting a cursor");
 			#endif
 			return cur[i];
 		}
 	}
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,
+	debugPrint("connection",2,
 			"find available cursor failed: all cursors are busy");
 	#endif
 	return NULL;
@@ -274,20 +272,20 @@ void sqlrconnection::noAvailableCursors(unsigned short command) {
 bool sqlrconnection::getCommand(unsigned short *command) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"getting command...");
+	debugPrint("connection",1,"getting command...");
 	#endif
 
 	// get the command
 	if (clientsock->read(command)!=sizeof(unsigned short)) {
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		debugPrint("connection",1,
 			"getting command failed: client sent bad command");
 		#endif
 		return false;
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done getting command");
+	debugPrint("connection",1,"done getting command");
 	#endif
 	return true;
 }

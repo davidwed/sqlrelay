@@ -169,10 +169,10 @@ bool sqlrconnection::processQuery(sqlrcursor *cursor,
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"re-executing...");
 		#endif
-		success=cursor->handleBinds() && 
+		success=(cursor->handleBinds() && 
 			cursor->executeQuery(cursor->querybuffer,
 						cursor->querylength,
-						reallyexecute);
+						reallyexecute));
 	} else if (bindcursor) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"bind cursor...");
@@ -188,7 +188,7 @@ bool sqlrconnection::processQuery(sqlrcursor *cursor,
 						cursor->querylength) && 
 			cursor->handleBinds() && 
 			cursor->executeQuery(cursor->querybuffer,
-						cursor->querylength,1));
+						cursor->querylength,true));
 	}
 
 	// was the query a commit or rollback?

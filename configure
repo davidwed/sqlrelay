@@ -20547,6 +20547,11 @@ fi
 	then
 		HAVE_PTHREAD="yes"
 	fi
+
+		if ( test -n "$PTHREADINCLUDES" -a "$MICROSOFT" = "yes" )
+	then
+		PTHREADLIBS="-pthread"
+	fi
 fi
 
 
@@ -37982,7 +37987,7 @@ echo $ECHO_N "checking for Zope... $ECHO_C" >&6
 
 				if ( test -z "$ZOPEDIR" )
 				then
-					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/opt"
+					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/usr/lib" "/opt"
 					do
 						for j in "zope" "Zope"
 						do

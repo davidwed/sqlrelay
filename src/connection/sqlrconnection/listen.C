@@ -18,7 +18,9 @@ void sqlrconnection::listen() {
 
 		// loop to handle suspended sessions
 		for (;;) {
+
 			int	success=waitForClient();
+
 			if (success==1) {
 
 				suspendedsession=false;

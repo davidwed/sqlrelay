@@ -5,12 +5,12 @@ scalercomm::scalercomm(ipc *ipcptr) {
 }
 
 #ifdef SERVER_DEBUG
-void	scalercomm::setDebugLogger(logger *dl) {
+void scalercomm::setDebugLogger(logger *dl) {
 	this->dl=dl;
 }
 #endif
 
-void	scalercomm::incrementConnectionCount() {
+void scalercomm::incrementConnectionCount() {
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"incrementing connection count...");
@@ -35,7 +35,7 @@ void	scalercomm::incrementConnectionCount() {
 	#endif
 }
 
-void	scalercomm::decrementConnectionCount() {
+void scalercomm::decrementConnectionCount() {
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"decrementing connection count...");
@@ -58,7 +58,7 @@ void	scalercomm::decrementConnectionCount() {
 	#endif
 }
 
-void	scalercomm::decrementSessionCount() {
+void scalercomm::decrementSessionCount() {
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"decrementing session count...");

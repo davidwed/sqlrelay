@@ -12,42 +12,42 @@
 #include <config.h>
 
 #ifdef SERVER_DEBUG
-void	unixsocketseqfile::setDebugLogger(logger *dl) {
+void unixsocketseqfile::setDebugLogger(logger *dl) {
 	this->dl=dl;
 }
 #endif
 
-int	unixsocketseqfile::getUnixSocket(char *tmpdir, char *unixsocketptr) {
+bool unixsocketseqfile::getUnixSocket(char *tmpdir, char *unixsocketptr) {
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"getting unix socket...");
 	#endif
 
 	if ((sockseq=openSequenceFile(tmpdir,unixsocketptr))==-1 ||
-					lockSequenceFile()==-1) {
-		return 0;
+						!lockSequenceFile()) {
+		return false;
 	}
-	if (getAndIncrementSequenceNumber(unixsocketptr)==-1) {
+	if (!getAndIncrementSequenceNumber(unixsocketptr)) {
 		unLockSequenceFile();
 		close(sockseq);
-		return 0;
+		return false;
 	}
 	if (unLockSequenceFile()==-1) {
 		close(sockseq);
-		return 0;
+		return false;
 	}
 	if (close(sockseq)==-1) {
-		return 0;
+		return false;
 	}
 
 	#ifdef SERVER_DEBUG
 	dl->write("connection",0,"done getting unix socket");
 	#endif
 
-	return 1;
+	return true;
 }
 
-int	unixsocketseqfile::openSequenceFile(char *tmpdir, char *unixsocketptr) {
+int unixsocketseqfile::openSequenceFile(char *tmpdir, char *unixsocketptr) {
 
 	// open the sequence file and get the current port number
 	char	*sockseqname=new char[strlen(tmpdir)+9];
@@ -85,7 +85,7 @@ int	unixsocketseqfile::openSequenceFile(char *tmpdir, char *unixsocketptr) {
 	return sockseq;
 }
 
-int	unixsocketseqfile::lockSequenceFile() {
+bool unixsocketseqfile::lockSequenceFile() {
 
 	// lock the file in a platform-independent manner
 	#ifdef SERVER_DEBUG
@@ -101,7 +101,7 @@ int	unixsocketseqfile::lockSequenceFile() {
 }
 
 
-int	unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
+bool unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
 
 	// get the sequence number from the file
 	long	buffer;
@@ -134,12 +134,12 @@ int	unixsocketseqfile::getAndIncrementSequenceNumber(char *unixsocketptr) {
 
 	// write the sequence number back to the file
 	if (lseek(sockseq,0,SEEK_SET)==-1) {
-		return 0;
+		return false;
 	}
 	return (write(sockseq,(void *)&buffer,sizeof(long))==sizeof(long));
 }
 
-int	unixsocketseqfile::unLockSequenceFile() {
+bool unixsocketseqfile::unLockSequenceFile() {
 
 	// unlock and close the file in a platform-independent manner
 	#ifdef SERVER_DEBUG

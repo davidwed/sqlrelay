@@ -410,17 +410,17 @@ database.</p>
 <p>To access the database, the file $ORACLE_HOME/network/admin/tnsnames.ora 
 must also be configured.  This file contains an entry for each database that 
 the local system needs to know about.  Here is an example of a tnsnames.ora 
-entry, identifying the database <i>TESTDB</i> on the local machine.</p>
+entry, identifying the database <i>ORA1</i> on the local machine.</p>
 
 <blockquote>
 <PRE>
-TESTDB.LOCALDOMAIN =
+ORA1.LOCALDOMAIN =
   (<B><FONT color=#288a51>DESCRIPTION</FONT></B> =
     (<B><FONT color=#288a51>ADDRESS_LIST</FONT></B> =
       (<B><FONT color=#288a51>ADDRESS</FONT></B> = (<B><FONT color=#a62828>PROTOCOL</FONT></B> = <B><FONT color=#a62828>TCP</FONT></B>)(<B><FONT color=#a62828>HOST</FONT></B> = localhost)(<B><FONT color=#a62828>PORT</FONT></B> = 1521))
     )
     (<B><FONT color=#288a51>CONNECT_DATA</FONT></B> =
-      (<B><FONT color=#a62828>SERVICE_NAME</FONT></B> = testdb)
+      (<B><FONT color=#a62828>SERVICE_NAME</FONT></B> = ora1)
     )
   )
 </PRE>
@@ -428,7 +428,7 @@ TESTDB.LOCALDOMAIN =
 
 <p>For Oracle 7 and 8, the format is SID = (... parameters ...).  For Oracle 8i
 and 9i, the format is SID.DOMAIN = (... parameters ...). In this example
-the SID is TESTDB.  The HOST parameter refers to the DNS name of the host that 
+the SID is ORA1.  The HOST parameter refers to the DNS name of the host that 
 the database is running on.  The SERVICE_NAME refers to the SID of the database 
 as it is known on that host.</p>
 
@@ -458,7 +458,7 @@ chown oracle:oinstall /u01/app/oracle/oradata/ora1
 user:</p>
 
 <blockquote>
-<b>sqlplus system/manager@testdb</b>
+<b>sqlplus system/manager@ora1</b>
 </blockquote>
 
 <p>The following queries
@@ -526,7 +526,7 @@ schema by logging in as SYSTEM and running the following queries:</p>
 <p>Now you can exit and log in as the new user with the following command:</p>
 
 <blockquote>
-<b>sqlplus testuser/testpassword@testdb</b>
+<b>sqlplus testuser/testpassword@ora1</b>
 </blockquote>
 
 <p>To delete a user and everything owned by that user, log in as SYSTEM and run
@@ -567,17 +567,17 @@ $ORACLE_HOME/network/admin/tnsnames.ora file.  Alternatively, an individual
 user can have a .tnsnames.ora file.</p>
 
 <p>The following command logs <i>testuser</i> with password <i>testpassword</i>
-into the database identified by the SID <i>testdb</i>.</p>
+into the database identified by the SID <i>ora1</i>.</p>
 
 <blockquote>
-<b>sqlplus testuser/testpassword@testdb</b>
+<b>sqlplus testuser/testpassword@ora1</b>
 </blockquote>
 
 <p>A sample session follows.</p>
 
 <blockquote>
 <PRE>
-[user@localhost user]$ <b>sqlplus testuser/testpassword@testdb</b>
+[user@localhost user]$ <b>sqlplus testuser/testpassword@ora1</b>
 
 SQL*Plus: Release <FONT color=#ff00ff>8.1.7.0.0</FONT> - Production on Tue Jan <FONT color=#ff00ff>8</FONT> <FONT color=#ff00ff>18</FONT>:<FONT color=#ff00ff>44</FONT>:<FONT color=#ff00ff>46</FONT> <FONT color=#ff00ff>2002</FONT>
 
@@ -666,7 +666,7 @@ JServer Release <FONT color=#ff00ff>8.1</FONT>.<FONT color=#ff00ff>7.0</FONT>.<F
 <p>Accessing Oracle from SQL Relay requires an instance entry in your 
 <i>sqlrelay.conf</i> file for the database that you want 
 to access.  Here is an example <i>sqlrelay.conf</i> which defines an SQL Relay 
-instance called oracletest.  This instance connects to the <i>testdb</i> 
+instance called oracletest.  This instance connects to the <i>ora1</i> 
 database as the user <i>testuser</i> with password <i>testpassword</i>.</p>
 
 <PRE>
@@ -679,7 +679,7 @@ database as the user <i>testuser</i> with password <i>testpassword</i>.</p>
                         <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
-                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpassword;oracle_sid=testdb&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpassword;oracle_sid=ora1&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/connections&gt;</FONT>
         <FONT color=#008a8e>&lt;/instance&gt;</FONT>
 

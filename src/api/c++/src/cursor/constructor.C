@@ -79,5 +79,7 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 	cursorid=0;
 	havecursorid=false;
 
+	// initialize all bind/substitution-related variables
+	clearVariables();
 	initVariables();
 }

@@ -34,8 +34,7 @@ bool sqlrconnection::getNewPort() {
 	connectionunixport=connectionunixportbuffer;
 
 	// get the inet port
-	if (read((unsigned short *)&connectioninetport)!=
-					sizeof(unsigned short)) {
+	if (read(&connectioninetport)!=sizeof(unsigned short)) {
 		setError("Failed to get the inet connection port.\n A network error may have ocurred.");
 		return false;
 	}

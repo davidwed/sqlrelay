@@ -179,11 +179,11 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 	char	*after;
 	bool	found;
 	int	len;
-	int	count;
+	unsigned short	count;
 
 	// check each input bind
 	count=inbindcount;
-	for (int i=0; i<count; i++) {
+	for (unsigned short i=0; i<count; i++) {
 
 		// don't check bind-by-position variables
 		len=strlen(inbindvars[i].variable);
@@ -225,7 +225,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 
 	// check each output bind
 	count=outbindcount;
-	for (int i=0; i<count; i++) {
+	for (unsigned short i=0; i<count; i++) {
 
 		// don't check bind-by-position variables
 		len=strlen(outbindvars[i].variable);

@@ -21,18 +21,18 @@ class listenercomm {
 		#endif
 
 		void	announceAvailability(char *tmpdir,
-					int passdescriptor,
+					bool passdescriptor,
 					char *unixsocket,
 					unsigned short inetport,
 					char *connectionid);
-		int	receiveFileDescriptor(int *descriptor);
+		bool	receiveFileDescriptor(int *descriptor);
 		void	deRegisterForHandoff(char *tmpdir);
-		unixclientsocket	*handoffsockun;
 	private:
 		void	registerForHandoff(char *tmpdir);
 
 		ipc			*ipcptr;
 		connectioncmdline	*cmdlineptr;
+		unixclientsocket	*handoffsockun;
 
 		#ifdef SERVER_DEBUG
 		logger *dl;

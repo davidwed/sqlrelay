@@ -9,9 +9,6 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	debugPrint("connection",2,"returning result set data...");
 	#endif
 
-	// see if this result set even has any rows to return
-	int	norows=cursor->noRowsToReturn();
-
 	// get the number of rows to skip
 	unsigned long	skip;
 	if (clientsock->read(&skip)!=sizeof(unsigned long)) {
@@ -32,7 +29,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 
 
 	// for some queries, there are no rows to return, 
-	if (norows) {
+	if (cursor->noRowsToReturn()) {
 		clientsock->write((unsigned short)END_RESULT_SET);
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done returning result set data");

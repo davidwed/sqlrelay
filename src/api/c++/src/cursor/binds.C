@@ -50,8 +50,7 @@ void sqlrcursor::clearVariables() {
 	// setting the bind/substitution variable 
 	// counts to 0 effectively clears them
 	subcount=0;
-	inbindcount=0;
-	outbindcount=0;
+	clearBinds();
 }
 
 void sqlrcursor::initVariables() {

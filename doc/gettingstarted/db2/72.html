@@ -43,8 +43,9 @@ on any Linux distribution.  These RPM's can be downloaded from
 </p>
 
 <ul>
-<li><b>compat-glibc-6.2-2.1.3.2.i386.rpm</b> for RedHat Linux 7.2</li>
-<li><b>compat-egcs-6.2-1.1.2.16.i386.rpm</b> for RedHat Linux 7.2</li>
+<li><b>compat-glibc-6.2-2.1.3.2.i386.rpm</b> for RedHat Linux 7.3</li>
+<li><b>compat-egcs-6.2-1.1.2.16.i386.rpm</b> for RedHat Linux 7.3</li>
+<li><b>compat-libstdc++-6.2-2.9.0.16.i386.rpm</b> for RedHat Linux 7.3</li>
 </ul>
 
 <p>You can install the compatibility RPM's using <i>rpm -i</i>.</p>
@@ -281,7 +282,7 @@ commands.  To get each instance to start at boot time, you need to run the
 following command as root for each instance:</p>
 
 <blockquote>
-<b>db2iauto -on INSTANCE_USER</b>
+<b>/usr/IBMdb2/V7.1/bin/db2iauto -on INSTANCE_USER</b>
 </blockquote>
 
 <p>Where INSTANCE_USER is replaced by the username of the user associated with
@@ -291,7 +292,7 @@ the instance you want to start at boot time.</p>
 run the following command as root for each instance:</p>
 
 <blockquote>
-<b>db2iauto -off INSTANCE_USER</b>
+<b>/usr/IBMdb2/V7.1/bin/db2iauto -off INSTANCE_USER</b>
 </blockquote>
 
 </body>

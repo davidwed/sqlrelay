@@ -13,13 +13,13 @@ class ipc {
 			ipc();
 			~ipc();
 
-		int	initialized();
+		bool	initialized();
 
 		#ifdef SERVER_DEBUG
 		void	setDebugLogger(logger *dl);
 		#endif
 
-		int		createSharedMemoryAndSemaphores(char *tmpdir,
+		bool		createSharedMemoryAndSemaphores(char *tmpdir,
 								char *id);
 
 		void		acquireAnnounceMutex();

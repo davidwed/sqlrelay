@@ -111,7 +111,7 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		sqlrc->write((unsigned short)cursorid);
 	}
 
-	return false;
+	return true;
 }
 
 void sqlrcursor::sendInputBinds() {
@@ -125,10 +125,10 @@ void sqlrcursor::sendInputBinds() {
 	}
 
 	// write the input bind variables/values to the server.
-	sqlrc->write((unsigned short)inbindcount);
+	sqlrc->write(inbindcount);
 	unsigned long	size;
-	int	count=inbindcount;
-	for (int i=0; i<count; i++) {
+	unsigned short	count=inbindcount;
+	for (unsigned short i=0; i<count; i++) {
 
 		// don't send anything if the send flag is turned off
 		if (!inbindvars[i].send) {
@@ -260,10 +260,10 @@ void sqlrcursor::sendOutputBinds() {
 	}
 
 	// write the output bind variables to the server.
-	sqlrc->write((unsigned short)outbindcount);
+	sqlrc->write(outbindcount);
 	unsigned short	size;
-	int	count=outbindcount;
-	for (int i=0; i<count; i++) {
+	unsigned short	count=outbindcount;
+	for (unsigned short i=0; i<count; i++) {
 
 		// don't send anything if the send flag is turned off
 		if (!outbindvars[i].send) {
