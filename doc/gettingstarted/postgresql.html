@@ -405,6 +405,26 @@ For PostgreSQL 6:
 
 </blockquote>
 
+<p>You may want to add stored procedure support to your database.  PostgreSQL
+databases can support stored procedures written in PL/pgSQL, PL/TCL, PL/Perl,
+and PL/Python.  Different versions of PostgreSQL support different procedural
+languages.</p>
+
+<p>You can use the <i>createlang</i> command to enable support for a stored
+procedure language in a particular database.  For example, the following
+commands enable support for all languages in the testdb database.</p>
+
+<blockquote><b>
+createlang -U postgres -W plpgsql testdb<br>
+Password: newpassword<br>
+createlang -U postgres -W pltcl testdb<br>
+Password: newpassword<br>
+createlang -U postgres -W plperl testdb<br>
+Password: newpassword<br>
+createlang -U postgres -W plpython testdb<br>
+Password: newpassword
+</b></blockquote>
+
 <p>If you want to drop the database, you can do so with the following 
 command.</p>
 

@@ -61,6 +61,8 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 
 <span class="heading2">Programming Questions</span><br><br>
 <ol>
+<li><a href="#php">My PHP application uses up all of the SQL Relay connections,
+and I keep having to restart SQL Relay.  What gives?</a></li>
 <li><a href="#buffer">Why does SQL Relay buffer the entire result set?</a></li>
 <li><a href="#nobuffer">How do keep SQL Relay from buffering the entire result 
 set?</a></li>
@@ -69,6 +71,7 @@ set?</a></li>
 <li><a href="#storedprocs">How do I run stored procedures?</a></li>
 <li><a href="#returning">How do I get data out of DML with RETURNING 
 clauses?</a></li>
+<li><a href="#temptables">Do temporary tables work with SQL Relay?</a></li>
 <li><a href="#threadsafe">Is the SQL Relay API thread-safe?</a></li>
 <li><a href="#clientcache">How does client-side result-set caching 
 work?</a></li>
@@ -764,6 +767,108 @@ if it's not compiled against Oracle 7.</p>
 
 <span class="heading3">Programming Questions</span><br><br>
 
+<a name="php"></a>
+<span class="heading3">My PHP application uses up all of the SQL Relay
+connections, and I keep having to restart SQL Relay.  What gives?</span>
+
+<p>PHP pages that use SQL Relay are usually set up like this:</p>
+
+<blockquote>
+<pre>
+dl("sql_relay.so");
+
+var $con=sqlrcon_alloc(...);
+var $cur=sqlrcur_alloc($con);
+
+... do some stuff ...
+
+sqlrcur_free($cur)
+sqlrcon_free($con)
+</pre>
+</blockquote>
+
+<p>If someone clicks stop in their browser before sqlrcur_free is called,
+execution of the page stops there and sqlrcur_free never gets called.  As a
+result, the socket connection between the web server and SQL Relay is never
+severed and the SQL Relay connection remains occupied even though the PHP page
+that opened the connection isn't running anymore.</p>
+
+<p>The best solution to this problem is to create a shutdown function and
+register it with a call to register_shutdown_function().</p>
+
+<p>For example:</p>
+
+<blockquote>
+<pre>
+dl("sql_relay.so");
+
+var $con;
+var $cur;
+
+function shutdown() {
+	sqlrcur_free($cur);
+	sqlrcon_free($con);
+}
+
+$con=sqlrcon_alloc(...);
+$cur=sqlrcur_alloc($con);
+
+register_shutdown_function(shutdown);
+
+... do some stuff ...
+</pre>
+</blockquote>
+
+<p>Note that in this example, sqlrcur_free() and sqlrcon_free() aren't called
+at the end of the page.  This is because the shutdown function gets called
+whether the page was aborted or completed successfully.</p>
+
+<p>If you want to create a function who's contents are executed only on abort,
+you can use the connection_aborted() function.  In the following code, the
+shutdown() function free's the cursor and connection if the script was aborted
+but lets the script free them on it's own if it completed successfully.  This
+code is redundant but it illustrates the functionality of connection_aborted().
+</p>
+
+<blockquote>
+<pre>
+dl("sql_relay.so");
+
+var $con;
+var $cur;
+
+function shutdown() {
+	if (connection_aborted()) {
+		sqlrcur_free($cur);
+		sqlrcon_free($con);
+	}
+}
+
+$con=sqlrcon_alloc(...);
+$cur=sqlrcur_alloc($con);
+
+register_shutdown_function(shutdown);
+
+... do some stuff ...
+
+sqlrcur_free($cur);
+sqlrcon_free($con);
+</pre>
+</blockquote>
+
+<p>Another option is to call ignore_user_abort(TRUE) early on in the script.  If
+ignore_user_abort() is used, then if a user clicks stop, the PHP script is not
+aborted.  Rather, the remainder of its output is just never sent to the browser.
+This solution is less efficient than using register_shutdown_function() but also
+works.<p>
+
+<p>SQL Relay version 0.35 should also feature an idle client timeout.  If a
+client remains connected to SQL Relay for a configurable amount of time but
+does nothing, then SQL Relay will close the connection to that client.  This
+should make the results less catastrophic when people forget to call
+register_shutdown_function() or ignore_user_abort() but is still less
+efficient.</p>
+
 <a name="buffer"></a>
 <span class="heading3">Why does SQL Relay buffer the entire result set?</span>
 
@@ -851,20 +956,75 @@ delete cur;
 <a name="storedprocs"></a>
 <span class="heading3">How do I run stored procedures?</span>
 
-<p>Stored procedures are only known to work with Oracle.  You can use the 
-following syntax to get the result of the stored procedure in the result 
-set:</p>
+<p>Stored procedures work in all databases that support them.  However, you may
+not be able to take full advantage of them in some databases.
 
-<pre>
-select function(:input1,:input2,:input3) from dual
-</pre>
+<p>All databases allow you to use SELECT to retrieve the result of a stored
+procedure.  However, some databases only allow you to retrieve a single value
+from a stored procedure using SELECT.  When using those databases, retrieving
+more than 1 value from a stored procedure requires that you use output bind
+variables.  If the output of a stored procedure is a cursor, then you may have
+to use a special output bind cursor.  Currently output bind cursors are only
+supported for Oracle 8i or greater.</p>
 
-<p>or using an output bind variable:</p>
+<p>Below are examples for how to run stored procedures and retrieve the
+results for different databases.</p>
 
-<pre>
-begin  :output=function(:input1,:input2,:input3);  end;
-</pre>
+<p>Oracle 7 or 8:</p>
 
+<blockquote>
+Procedures that return a scalar value:<br>
+Procedures that return multiple values using output bind cursors:<br>
+Procedures that return cursors:<br>
+</blockquote>
+
+<p>Oracle 8i or greater:</p>
+
+<blockquote>
+Procedures that return a scalar value:<br>
+Procedures that return multiple values using output bind cursors:<br>
+Procedures that return cursors:<br>
+</blockquote>
+
+<p>Sybase or Microsoft SQL Server:</p>
+
+<blockquote>
+Procedures that return a scalar value:<br>
+Procedures that return multiple values using output bind cursors:<br>
+Procedures that return cursors:<br>
+</blockquote>
+
+<p>DB2 or ODBC:</p>
+
+<blockquote>
+Procedures that return a scalar value:<br>
+Procedures that return multiple values using output bind cursors:<br>
+Procedures that return cursors:<br>
+</blockquote>
+
+<p>Interbase:</p>
+
+<blockquote>
+Procedures that return a scalar value:<br>
+Procedures that return multiple values using output bind cursors:<br>
+Procedures that return cursors:<br>
+</blockquote>
+
+<p>PostgreSQL:</p>
+
+<blockquote>
+Procedures that return a scalar value:<br>
+Procedures that return multiple values using output bind cursors:<br>
+Procedures that return cursors:<br>
+</blockquote>
+
+<p>MySQL:</p>
+
+<blockquote>
+Procedures that return a scalar value:<br>
+Procedures that return multiple values using output bind cursors:<br>
+Procedures that return cursors:<br>
+</blockquote>
 
 <a name="returning"></a>
 <span class="heading3">How do I get data out of DML with RETURNING 
@@ -878,18 +1038,28 @@ values returned are scalar.  Vector values are not supported.  For example:</p>
 insert into testtable values ("one",2) returning :first, :second
 </pre>
 
+<a name="temptables"></a>
+<span class="heading3">Do temporary tables work with SQL Relay?</span>
+
+<p>Yes.  Support for PostgreSQL temporary tables was added in version 0.34 and
+support for all other databases was added in 0.35.</p>
+
+<p>The reason temporary tables are an issue is because normally temporary tables
+are either dropped or truncated when an application closes it's connection to
+the database or commits/rolls-back a transaction.   Transaction-scope
+tables work naturally with SQL Relay.  But, since SQL Relay never logs out of
+the database, the database doesn't know to drop or truncate tables when an
+application closes it's connection to SQL Relay.  To remedy this, SQL Relay
+parses each query according to the rules for creating a temporary table for
+the database that it is connected to and keeps a list of temporary tables.
+Then, when the application closes it's connection, SQL Relay dropps or
+truncates the tables.</p>
+
 <a name="threadsafe"></a>
 <span class="heading3">Is the SQL Relay API thread-safe?</span>
 
-<p>This is always a tricky question to answer for object oriented API's.</p>
-
-<p>In the strictest sense, the sqlrconnection and sqlrcursor classes upon which
-all the API's are based is not thread safe because it has member variables that
-are not protected by mutexes.</p>
-
-<p>This does not mean that you can't use the SQL Relay API in a multithreaded
-environment.  It just means that you can't share a single instance of an
-sqlrconnection or sqlrcursor between threads.</p>
+<p>Yes.  However, you cannot share an instance of an sqlrconnection or
+sqlrcursor between threads without protecting the calls with mutexes.</p>
 
 <a name="clientcache"></a>
 <span class="heading3">How does client-side result-set caching work?</span>

@@ -13,6 +13,7 @@
 <li><a href="#daemons">Using the drop-in replacement library with daemons</a></li>
 <li><a href="#inetd">Using the drop-in replacement library with inetd/xinetd helper programs</a></li>
 <li><a href="#modules">Using the drop-in replacement library with modules</a></li>
+<li><a href="#work">Function support</a></li>
 </ul>
 
 <br>
@@ -41,10 +42,18 @@ throttling facilities.</p>
 <span class="heading2">Using the drop-in replacement library with command-line programs</span><br>
 
 <p>You can use the SQL Relay drop-in replacement library for PostgreSQL clients
-by loading the drop-in library and running your program as follows.  In this
-example, we're running the "psql" program against an instance of SQL Relay
-running on the localhost, port 8009 against an Oracle database.  This instance
-of SQL Relay is configured with a username/password of
+by loading the drop-in library and running your program.</p>
+
+<p>The parameters that would ordinarily indicate which host, port, socket,
+username and password to use to connect to PostgreSQL will be used as
+parameters to connect to SQL Relay.  The parameter that would ordinarily
+indicate which database to connect to will be ignored.  Instances of SQL Relay
+are configured to connect to a single database, and that database will be used
+by the client program.</p>
+
+<p>In the following example, we're running the "psql" program against an
+instance of SQL Relay running on the localhost, port 8009 against an Oracle
+database.  This instance of SQL Relay is configured with a username/password of
 oracle8user/oracle8pass.</p>
 
 <p>For sh-based shells:</p>
@@ -75,6 +84,45 @@ are fulfilled by the SQL Relay drop-in replacement library instead.</p>
 Oracle database through SQL Relay.</p>
 
 <blockquote>
+<pre>
+ORA<font color="#ff00ff">-06550</font>: line <font color="#ff00ff">1</font>, <font color="#6b59ce">column</font> <font color="#ff00ff">6</font>:
+PLS<font color="#ff00ff">-00103</font>: Encountered the symbol <font color="#ff00ff">&quot;;&quot;</font> when expecting one <font color="#6b59ce">of</font> the following:
+
+   <font color="#6b59ce">begin</font> case declare exit <font color="#6b59ce">for</font> goto <font color="#6b59ce">if</font> <font color="#6b59ce">loop</font> mod <font color="#6b59ce">null</font> pragma
+   raise <font color="#6b59ce">return</font> <font color="#a52829"><b>select</b></font> <font color="#a52829"><b>update</b></font> while <font color="#6b59ce">with</font> &lt;an identifier&gt;
+   &lt;a double-quoted delimited-identifier&gt; &lt;a bind variable&gt; &lt;&lt;
+   close <font color="#6b59ce">current</font> <font color="#a52829"><b>delete</b></font> fetch <font color="#a52829"><b>lock</b></font> <font color="#a52829"><b>insert</b></font> open <font color="#a52829"><b>rollback</b></font>
+   <font color="#a52829"><b>savepoint</b></font> <font color="#a52829"><b>set</b></font> sql <font color="#a52829"><b>execute</b></font> <font color="#a52829"><b>commit</b></font> forall merge
+   &lt;a single-quoted SQL string&gt; pipe
+The symbol <font color="#ff00ff">&quot;exit&quot;</font> was substituted <font color="#6b59ce">for</font> <font color="#ff00ff">&quot;;&quot;</font> <font color="#6b59ce">to</font> continue.
+ORA<font color="#ff00ff">-06550</font>: line <font color="#ff00ff">1</font>, <font color="#6b59ce">column</font> <font color="#ff00ff">84</font>:
+PLS<font color="#ff00ff">-00103</font>: Encountered the symbol <font color="#ff00ff">&quot;end-of-file&quot;</font> when expecting one <font color="#6b59ce">of</font> the following:
+
+   ; <font color="#a52829"><b>comment</b></font> work &lt;a SQL statement&gt;
+
+Attempted Query:
+<font color="#6b59ce">BEGIN</font>; <font color="#a52829"><b>SELECT</b></font> usesuper <font color="#6b59ce">FROM</font> pg_catalog.pg_user <font color="#6b59ce">WHERE</font> usename = <font color="#ff00ff">'oracle8test'</font>; <font color="#a52829"><b>COMMIT</b></font>
+Welcome <font color="#6b59ce">to</font> psql <font color="#ff00ff">7.3</font>.<font color="#ff00ff">4</font>-RH, the PostgreSQL interactive terminal.
+
+<font color="#6b59ce">Type</font>:  \copyright <font color="#6b59ce">for</font> distribution terms
+       \h <font color="#6b59ce">for</font> help <font color="#6b59ce">with</font> SQL commands
+       \? <font color="#6b59ce">for</font> help <font color="#6b59ce">on</font> internal slash commands
+       \g <font color="#a52829"><b>or</b></font> terminate <font color="#6b59ce">with</font> semicolon <font color="#6b59ce">to</font> <font color="#a52829"><b>execute</b></font> query
+       \q <font color="#6b59ce">to</font> quit
+
+=&gt; <font color="#a52829"><b>create</b></font> <font color="#6b59ce">table</font> testtable (col1 <font color="#298a52"><b>varchar2</b></font>(<font color="#ff00ff">60</font>), col2 <font color="#298a52"><b>number</b></font>(<font color="#ff00ff">5</font>,<font color="#ff00ff">2</font>));
+
+=&gt; <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> testtable <font color="#6b59ce">values</font> (<font color="#ff00ff">'hello'</font>,<font color="#ff00ff">123</font>.<font color="#ff00ff">45</font>);
+
+=&gt; <font color="#a52829"><b>select</b></font> * <font color="#6b59ce">from</font> testtable;
+ COL1  |  COL2
+<font color="#0000ff">-------+--------</font>
+ hello | <font color="#ff00ff">123</font>.<font color="#ff00ff">45</font>
+(<font color="#ff00ff">1</font> <font color="#6b59ce">row</font>)
+
+=&gt; \q
+
+</pre>
 </blockquote>
 
 <br>
@@ -194,6 +242,129 @@ command to the daemon's startup script or write a script to run the LD_PRELOAD
 command and pass along the command line arguments (see the section
 <a href="#inetd">Using the drop-in replacement library with inetd/xinetd helper
 programs above)</a>).</p>
+
+<br>
+<a name="work"></a>
+<span class="heading2">Function support</span><br>
+
+<p>The SQL Relay drop-in replacement library for PostgreSQL implements most of
+the native PostgreSQL client library's functions, but there are a few functions
+that aren't implemented because SQL Relay doesn't have a good way to support
+them.  These functions return safe values or a failure condition.</p>
+
+<p>Here is a list of functions that are implemented and functions that are not.
+If your application uses one of the functions that is not implemented, you may
+or may not be able to use it with the SQL Relay drop-in replacement library for
+PostgreSQL.</p>
+
+<table border="1">
+
+<tr><th>Function</th><th>Implemented?</th></tr>
+
+<tr><td>PQsetdbLogin</td><td>yes, but ignores the db, options and tty parameters</td></tr>
+<tr><td>PQsetdb</td><td>yes</td></tr>
+<tr><td>PQconnectdb</td><td>yes</td></tr>
+<tr><td>PQfinish</td><td>yes</td></tr>
+<tr><td>PQreset</td><td>yes</td></tr>
+<tr><td>PQdb</td><td>yes</td></tr>
+<tr><td>PQuser</td><td>yes</td></tr>
+<tr><td>PQpass</td><td>yes</td></tr>
+<tr><td>PQhost</td><td>yes</td></tr>
+<tr><td>PQport</td><td>yes</td></tr>
+<tr><td>PQtty</td><td>yes</td></tr>
+<tr><td>PQoptions</td><td>yes</td></tr>
+<tr><td>PQstatus</td><td>yes</td></tr>
+<tr><td>PQerrorMessage</td><td>yes</td></tr>
+<tr><td>PQsocket</td><td>no, always returns -1</td></tr>
+<tr><td>PQbackendPID</td><td>no, always returns -1</td></tr>
+<tr><td>PQgetssl</td><td>no, always returns 0</td></tr>
+<tr><td>PQclientEncoding</td><td>yes</td></tr>
+<tr><td>PQsetClientEncoding</td><td>yes</td></tr>
+<tr><td>PQsetNoticeProcessor</td><td>yes</td></tr>
+
+<tr><td>PQescapeString</td><td>yes</td></tr>
+<tr><td>PQescapeBytea</td><td>yes</td></tr>
+<tr><td>PQunescapeBytea</td><td>yes</td></tr>
+
+<tr><td>PQclear</td><td>yes</td></tr>
+<tr><td>PQexec</td><td>yes</td></tr>
+<tr><td>PQresultStatus</td><td>yes</td></tr>
+<tr><td>PQresStatus</td><td>yes</td></tr>
+<tr><td>PQresultErrorMessage</td><td>yes, returns the SQL Relay error string</td></tr>
+<tr><td>PQntuples</td><td>yes</td></tr>
+<tr><td>PQnfields</td><td>yes</td></tr>
+<tr><td>PQbinaryTuples</td><td>yes</td></tr>
+<tr><td>PQfname</td><td>yes</td></tr>
+<tr><td>PQfnumber</td><td>yes</td></tr>
+<tr><td>PQftype</td><td>yes</td></tr>
+<tr><td>PQfsize</td><td>yes</td></tr>
+<tr><td>PQfmod</td><td>yes</td></tr>
+<tr><td>PQcmdStatus</td><td>yes</td></tr>
+<tr><td>PQoidStatus</td><td>yes</td></tr>
+<tr><td>PQoidValue</td><td>yes</td></tr>
+<tr><td>PQcmdTuples</td><td>yes</td></tr>
+<tr><td>PQgetvalue</td><td>yes</td></tr>
+<tr><td>PQgetlength</td><td>yes</td></tr>
+<tr><td>PQgetisnull</td><td>yes</td></tr>
+<tr><td>PQmakeEmptyPGresult</td><td>yes</td></tr>
+
+<tr><td>PQprint</td><td>yes</td></tr>
+<tr><td>PQdisplayTuples</td><td>yes</td></tr>
+<tr><td>PQprintTuples</td><td>yes</td></tr>
+
+<tr><td>PQconndefaults</td><td>always returns NULL</td></tr>
+<tr><td>PQconninfoFree</td><td>yes</td></tr>
+
+<tr><td>PQtrace</td><td>sort of, just calls sqlrconnection::debugOn()</td></tr>
+<tr><td>PQuntrace</td><td>sort of, just calls sqlrconnection::debugOff()</td></tr>
+
+<tr><td>PQgetline</td><td>no, NULL terminates string and returns EOF</td></tr>
+<tr><td>PQputline</td><td>no, always returns EOF</td></tr>
+<tr><td>PQgetlineAsync</td><td>no, NULL terminates buffer and returns EOF</td></tr>
+<tr><td>PQputnbytes</td><td>no, always returns EOF</td></tr>
+<tr><td>PQendcopy</td><td>no, always returns -1 for failure</td></tr>
+
+<tr><td>PQmblen</td><td>only for UTF8, always returns 1</td></tr>
+<tr><td>PQenv2encoding</td><td>only for UTF8</td></tr>
+
+<tr><td>PQfn</td><td>no, always returns NULL</td></tr>
+
+<tr><td>lo_open</td><td>no, always returns -1</td></tr>
+<tr><td>lo_close</td><td>no, always returns -1</td></tr>
+<tr><td>lo_read</td><td>no, always returns -1</td></tr>
+<tr><td>lo_write</td><td>no, always returns -1</td></tr>
+<tr><td>lo_lseek</td><td>no, always returns -1</td></tr>
+<tr><td>lo_creat</td><td>no, always returns -1</td></tr>
+<tr><td>lo_tell</td><td>no, always returns -1</td></tr>
+<tr><td>lo_unlink</td><td>no, always returns -1</td></tr>
+<tr><td>lo_import</td><td>no, always returns -1</td></tr>
+<tr><td>lo_export</td><td>no, always returns -1</td></tr>
+
+<tr><td>PQnotifies</td><td>no, always returns NULL</td></tr>
+<tr><td>PQfreeNotify</td><td>no, does nothing</td></tr>
+
+<tr><td colspan="2">
+The following functions implement the PostgreSQL asynchronous query API.
+SQL Relay doesn't have an asynchronous query API so they are implemented
+as calls to synchronous query functions.  They work, but in a synchronous
+manner.
+</td></tr>
+<tr><td>PQconnectStart</td><td>yes</td></tr>
+<tr><td>PQconnectPoll</td><td>yes</td></tr>
+<tr><td>PQresetStart</td><td>yes</td></tr>
+<tr><td>PQresetPoll</td><td>yes</td></tr>
+<tr><td>PQrequestCancel</td><td>yes</td></tr>
+<tr><td>PQsendQuery</td><td>yes</td></tr>
+<tr><td>PQgetResult</td><td>yes</td></tr>
+<tr><td>PQisBusy</td><td>yes</td></tr>
+<tr><td>PQconsumeInput</td><td>yes</td></tr>
+<tr><td>PQsetnonblocking</td><td>yes</td></tr>
+<tr><td>PQisnonblocking</td><td>yes</td></tr>
+<tr><td>PQflush</td><td>yes</td></tr>
+<tr><td>PQsendSome</td><td>yes</td></tr>
+
+</table>
+
 
 </body>
 </html>

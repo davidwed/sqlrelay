@@ -11,6 +11,7 @@
 <li><a href="#session">Establishing a Sessions</a></li>
 <li><a href="#query">Executing Queries</a></li>
 <li><a href="#commit">Commits and Rollbacks</a></li>
+<li><a href="#temptables">Temporary Tables</a></li>
 <li><a href="#errors">Catching Errors</a></li>
 <li><a href="#bindvars">Substitution and Bind Variables</a></li>
 <li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
@@ -109,6 +110,31 @@ Autocommit is off, the database commits when the client instructs it to, or
 (by default) when a client disconnects.  For databases that don't support 
 Autocommit, autoCommitOn() and autoCommitOff() have no effect.</p>
 
+<a name="temptables"></a>
+<span class="heading2">Temporary Tables</span><br><br>
+
+<p>Some databases support temporary tables.  That is, tables which are
+automatically dropped or truncated when an application closes it's connection
+to the database or when a transaction is committed or rolled back.</p>
+
+<p>For databases which drop or truncate tables when a transaction is committed
+or rolled back, temporary tables work naturally.</p>
+
+<p>However, for databases which drop or truncate tables when an application
+closes it's connection to the database, there is an issue.  Since SQL Relay
+maintains persistent database connections, when an application disconnects from
+SQL Relay, the connection between SQL Relay and the database remains, so
+the database does not know to drop or truncate the table.  To remedy this
+situation, SQL Relay parses each query to see if it created a temporary table,
+keeps a list of temporary tables and drops (or truncates them) when the
+application disconnects from SQL Relay.  Since each database has slightly
+different syntax for creating a temporary table, SQL Relay parses each query
+according to the rules for that database.</p>
+
+<p>In effect, temporary tables should work when an application connects to
+SQL Relay in the same manner that they would work if the application connected
+directly to the database.</p>
+
 <a name="errors"></a>
 <span class="heading2">Catching Errors</span><br><br>
 
@@ -196,6 +222,9 @@ getOutputBindAsDouble().</p>
 
 <p>If you are using Oracle 8i or higher, you can insert data into BLOB
 and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
+
+<p>If you are curious how many bind variables have been declared in a query,
+you can call countBindVariables() after preparing the query.</p>
 
 <blockquote>
 <pre>
