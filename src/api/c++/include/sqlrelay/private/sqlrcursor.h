@@ -77,6 +77,7 @@
 		void	createRowBuffers();
 		column	*getColumn(int index);
 		column	*getColumn(const char *name);
+		column	*getColumnInternal(int index);
 		char	*getColStorage(int length);
 		void	createColumnBuffers();
 
