@@ -48,8 +48,8 @@ sqlr-connection-msql-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-msql-debug $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

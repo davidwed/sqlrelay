@@ -195,7 +195,8 @@ char *sqlrconfigfile::getHandOff() {
 int sqlrconfigfile::getPassDescriptor() {
 	// descriptor passing doesn't work if we're using dynamic scaling,
 	// so override it here...
-	return passdescriptor && !getDynamicScaling();
+	//return passdescriptor && !getDynamicScaling();
+	return passdescriptor;
 }
 
 char *sqlrconfigfile::getAllowedIps() {
@@ -379,7 +380,7 @@ bool sqlrconfigfile::attributeValue(char *value) {
 		} else if (currentattribute==MAXCONNECTIONS_ATTRIBUTE) {
 			maxconnections=atoi(value,DEFAULT_MAXCONNECTIONS,1);
 		} else if (currentattribute==MAXQUEUELENGTH_ATTRIBUTE) {
-			maxqueuelength=atoi(value,DEFAULT_MAXQUEUELENGTH,1);
+			maxqueuelength=atoi(value,DEFAULT_MAXQUEUELENGTH,0);
 		} else if (currentattribute==GROWBY_ATTRIBUTE) {
 			growby=atoi(value,DEFAULT_GROWBY,1);
 		} else if (currentattribute==TTL_ATTRIBUTE) {

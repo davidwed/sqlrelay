@@ -156,6 +156,10 @@ AC_ARG_WITH(db2-prefix,
 	[  --with-db2-prefix             Location of DB2],
 	DB2PATH="$withval",
 	DB2PATH="")
+AC_ARG_WITH(db2-version,
+	[  --with-db2-version            DB2 Version (7 or 8)],
+	DB2VERSION="$withval",
+	DB2VERSION="7")
 AC_ARG_ENABLE(db2,
 	[  --disable-db2                 Don't build DB2 connection],
 	ENABLE_DB2="",

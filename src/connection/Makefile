@@ -2,8 +2,6 @@ top_builddir = ../..
 
 include ../../config.mk
 
-INSTALL = $(top_builddir)/install-sh -c
-
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
 
 SRCS = sqlrconnection/constructor.C \
@@ -204,8 +202,8 @@ libsqlrconnection_debug.la: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrconnection.la $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrconnection_debug.la $(libdir)
+	$(INSTALL) $(INSTALLSTRIP) libsqlrconnection.la $(libdir)
+	$(INSTALL) $(INSTALLSTRIP) libsqlrconnection_debug.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

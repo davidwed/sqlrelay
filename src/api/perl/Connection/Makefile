@@ -112,14 +112,14 @@ Connection.so:
 
 install: Connection.so
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 Connection.pm $(PERLSITEARCH)/SQLRelay
+	$(INSTALL) -m 644 Connection.pm $(PERLSITEARCH)/SQLRelay
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Connection
-	$(LIBTOOL) --mode=install $(INSTALL) -m 755 Connection.so $(PERLSITEARCH)/auto/SQLRelay/Connection
+	$(INSTALL) -m 755 Connection.so $(PERLSITEARCH)/auto/SQLRelay/Connection
 	touch $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs
 	$(RM) Connection.so
 	pod2man Connection.pm > SQLRelay::Connection.$(PERLMAN3EXT)
 	$(MKINSTALLDIRS) $(PERLINSTALLMAN3DIR)
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 SQLRelay::Connection.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
+	$(INSTALL) -m 644 SQLRelay::Connection.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
 	$(RM) SQLRelay::Connection.$(PERLMAN3EXT)
 	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.so > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist

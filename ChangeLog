@@ -1,5 +1,12 @@
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch
+	added PHP Pear DB driver
+	added --with-db2-version configure option
+	STRIPPROG is set before calling install-sh now
+	added fixup socket to listener so forked clients can retrieve the
+		handoff socket from a newly spawned database connection, this
+		makes it possible to use scaling and handoff=pass
+	switched a few methods that return int to return bool in listener
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

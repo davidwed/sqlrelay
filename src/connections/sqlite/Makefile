@@ -48,8 +48,8 @@ sqlr-connection-sqlite-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sqlite-debug $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

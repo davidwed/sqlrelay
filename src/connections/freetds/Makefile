@@ -48,8 +48,8 @@ sqlr-connection-freetds-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-freetds-debug $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

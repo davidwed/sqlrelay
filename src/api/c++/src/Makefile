@@ -127,7 +127,7 @@ libsqlrclient.la: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrclient.la $(libdir)/libsqlrclient.la
+	$(INSTALL) $(INSTALLSTRIP) libsqlrclient.la $(libdir)/libsqlrclient.la
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(cachedir)
 	chmod 777 $(cachedir)

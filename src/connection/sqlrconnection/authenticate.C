@@ -4,6 +4,9 @@
 #include <config.h>
 #include <sqlrconnection.h>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <string.h>
 #ifdef HAVE_STRINGS_H
 	#include <strings.h>

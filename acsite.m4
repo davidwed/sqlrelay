@@ -1405,7 +1405,6 @@ then
 	DB2LIBS=""
 	DB2LIBSPATH=""
 	DB2STATIC=""
-	DB2VERSION="7"
 
 	if ( test "$cross_compiling" = "yes" )
 	then

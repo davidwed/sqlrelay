@@ -94,9 +94,9 @@ sqlrelay.so:
 
 install: sqlrelay.so
 	$(MKINSTALLDIRS) $(RUBYSITEARCHDIR)
-	$(LIBTOOL) --mode=install $(INSTALL) sqlrelay.so $(RUBYSITEARCHDIR)
+	$(INSTALL) $(INSTALLSTRIP) sqlrelay.so $(RUBYSITEARCHDIR)
 	$(MKINSTALLDIRS) $(RUBYSITELIBDIR)/DBD/SQLRelay
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 SQLRelay.rb $(RUBYSITELIBDIR)/DBD/SQLRelay
+	$(INSTALL) -m 644 SQLRelay.rb $(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(RM) sqlrelay.so
 
 uninstall:

@@ -48,8 +48,8 @@ sqlr-connection-db2-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2 $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2 $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-db2-debug $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

@@ -44,6 +44,8 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 	clientsockun=NULL;
 	handoffsockun=NULL;
 	removehandoffsockun=NULL;
+	fixupsockun=NULL;
+	fixupsockname=NULL;
 
 	handoffsocklist=NULL;
 
@@ -84,6 +86,8 @@ void	sqlrlistener::cleanUp() {
 	}
 
 	delete removehandoffsockun;
+	delete[] fixupsockname;
+	delete fixupsockun;
 	delete denied;
 	delete allowed;
 
@@ -92,7 +96,7 @@ void	sqlrlistener::cleanUp() {
 	#endif
 }
 
-int	sqlrlistener::initListener(int argc, const char **argv) {
+bool	sqlrlistener::initListener(int argc, const char **argv) {
 
 	init=1;
 
@@ -102,7 +106,7 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 	sqlrconfigfile	cfgfl;
 
 	if (!cfgfl.parse(cmdl->getConfig(),cmdl->getId())) {
-		return 0;
+		return false;
 	}
 
 	setUserAndGroup(&cfgfl);
@@ -112,7 +116,7 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 	#endif
 
 	if (!handlePidFile(&tmpdir,cmdl->getId())) {
-		return 0;
+		return false;
 	}
 
 	handleDynamicScaling(&cfgfl);
@@ -126,19 +130,22 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 	setIpPermissions(&cfgfl);
 
 	if (!createSharedMemoryAndSemaphores(&tmpdir,cmdl->getId())) {
-		return 0;
+		return false;
 	}
 
 	if (!listenOnClientSockets(&cfgfl)) {
-		return 0;
+		return false;
 	}
 
 	if ((passdescriptor=cfgfl.getPassDescriptor())) {
 		if (!listenOnHandoffSocket(&tmpdir,cmdl->getId())) {
-			return 0;
+			return false;
 		}
 		if (!listenOnDeregistrationSocket(&tmpdir,cmdl->getId())) {
-			return 0;
+			return false;
+		}
+		if (!listenOnFixupSocket(&tmpdir,cmdl->getId())) {
+			return false;
 		}
 	}
 
@@ -146,7 +153,7 @@ int	sqlrlistener::initListener(int argc, const char **argv) {
 	detach();
 	#endif
 
-	return 1;
+	return true;
 }
 
 void	sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
@@ -162,7 +169,7 @@ void	sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
 	} 
 }
 
-int	sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
+bool	sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
 
 	// check/set pid file
 	pidfile=new char[tmpdir->getLength()+15+strlen(id)+1];
@@ -182,11 +189,11 @@ int	sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
 		fprintf(stderr,"the file and restart.\n");
 		delete[] pidfile;
 		pidfile=NULL;
-		return 0;
+		return false;
 	}
 
 	createPidFile(pidfile,permissions::ownerReadWrite());
-	return 1;
+	return true;
 }
 
 void	sqlrlistener::handleDynamicScaling(sqlrconfigfile *cfgfl) {
@@ -231,7 +238,7 @@ void	sqlrlistener::setIpPermissions(sqlrconfigfile *cfgfl) {
 	}
 }
 
-int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
+bool	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 							const char *id) {
 
 	// initialize the ipc filename
@@ -250,7 +257,7 @@ int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	if (idfd==-1) {
 		ipcFileError(idfilename);
 		delete[] idfilename;
-		return 0;
+		return false;
 	} else {
 		close(idfd);
 	}
@@ -261,7 +268,7 @@ int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	if (key==-1) {
 		ftokError(idfilename);
 		delete[] idfilename;
-		return 0;
+		return false;
 	}
 
 	// create the shared memory segment
@@ -277,7 +284,7 @@ int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 		shmError(id,idmemory->getId());
 		delete[] idfilename;
 		delete idmemory;
-		return 0;
+		return false;
 	}
 
 	// create (or connect) to the semaphore set
@@ -294,10 +301,10 @@ int	sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 		delete[] idfilename;
 		delete idmemory;
 		delete semset;
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }
 
 void	sqlrlistener::ipcFileError(const char *idfilename) {
@@ -349,7 +356,7 @@ void	sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr,"	Error was: %s\n\n",strerror(errno));
 }
 
-int	sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
+bool	sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 
 	// get inet and unix ports to listen on
 	unsigned short	port=cfgfl->getPort();
@@ -366,7 +373,7 @@ int	sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 	}
 
 	// attempt to listen on the inet port, if necessary
-	int	listening=0;
+	bool	listening=false;
 	if (port) {
 		clientsockin=new inetserversocket();
 		clientsockin->reuseAddresses();
@@ -407,14 +414,14 @@ int	sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 	return listening;
 }
 
-int	sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
+bool	sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
 
 	// the handoff socket
 	char	*handoffsockname=new char[tmpdir->getLength()+1+strlen(id)+8+1];
 	sprintf(handoffsockname,"%s/%s-handoff",tmpdir->getString(),id);
 
 	handoffsockun=new unixserversocket();
-	int	success=handoffsockun->listenOnSocket(handoffsockname,0066,15);
+	bool	success=handoffsockun->listenOnSocket(handoffsockname,0066,15);
 
 	if (success) {
 		addFileDescriptor(handoffsockun->getFileDescriptor());
@@ -430,7 +437,7 @@ int	sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
 	return success;
 }
 
-int	sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
+bool	sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 							const char *id) {
 
 	// the deregistration socket
@@ -440,7 +447,7 @@ int	sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 						tmpdir->getString(),id);
 
 	removehandoffsockun=new unixserversocket();
-	int	success=removehandoffsockun->listenOnSocket(
+	bool	success=removehandoffsockun->listenOnSocket(
 						removehandoffsockname,0066,15);
 
 	if (success) {
@@ -457,9 +464,33 @@ int	sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 	return success;
 }
 
+bool	sqlrlistener::listenOnFixupSocket(tempdir *tmpdir, const char *id) {
+
+	// the fixup socket
+	fixupsockname=new char[tmpdir->getLength()+1+strlen(id)+6+1];
+	sprintf(fixupsockname,"%s/%s-fixup",tmpdir->getString(),id);
+
+	fixupsockun=new unixserversocket();
+	bool	success=fixupsockun->listenOnSocket(fixupsockname,0066,15);
+
+	if (success) {
+		addFileDescriptor(fixupsockun->getFileDescriptor());
+	} else {
+		fprintf(stderr,"Could not listen on unix socket: ");
+		fprintf(stderr,"%s\n",fixupsockname);
+		fprintf(stderr,"Make sure that the file and ");
+		fprintf(stderr,"directory are readable and writable.");
+		fprintf(stderr,"\n\n");
+	}
+
+	return success;
+}
+
 void	sqlrlistener::listen() {
 	blockSignals();
 	for(;;) {
+		// FIXME: this can return true/false, should we do anything
+		// with that?
 		handleClientConnection(waitForData());
 	}
 }
@@ -622,22 +653,28 @@ int	sqlrlistener::waitForData() {
 	return fd;
 }
 
-void	sqlrlistener::handleClientConnection(int fd) {
+bool	sqlrlistener::handleClientConnection(int fd) {
 
-	// if something connected to the handoff or derigistration 
-	// socket, it must have been a connection, handle it and
-	// loop back
+	// If something connected to the handoff or derigistration 
+	// socket, it must have been a connection.
+	//
+	// If something connected to the fixup socket, it must have been a
+	// forked off listener looking for the file descriptor of a socket
+	// associated with a newly spawned connection daemon.
+	//
+	// Either way, handle it and loop back.
 	if (passdescriptor) {
 		if (fd==handoffsockun->getFileDescriptor()) {
 			clientsock=handoffsockun->
 					acceptClientConnection();
-			registerHandoff(clientsock);
-			return;
+			return registerHandoff(clientsock);
 		} else if (fd==removehandoffsockun->getFileDescriptor()) {
 			clientsock=removehandoffsockun->
 					acceptClientConnection();
-			deRegisterHandoff(clientsock);
-			return;
+			return deRegisterHandoff(clientsock);
+		} else if (fd==fixupsockun->getFileDescriptor()) {
+			clientsock=fixupsockun->acceptClientConnection();
+			return fixup(clientsock);
 		}
 	}
 
@@ -652,13 +689,13 @@ void	sqlrlistener::handleClientConnection(int fd) {
 		// socket and loop back.
 		if (denied && deniedIp()) {
 			disconnectClient();
-			return;
+			return true;
 		}
 
 	} else if (fd==clientsockun->getFileDescriptor()) {
 		clientsock=clientsockun->acceptClientConnection();
 	} else {
-		return;
+		return true;
 	}
 
 	// The logic here is that if there are no other forked, busy listeners
@@ -688,10 +725,12 @@ void	sqlrlistener::handleClientConnection(int fd) {
 
 		clientSession();
 	}
+
+	return true;
 }
 
 
-void	sqlrlistener::registerHandoff(datatransport *sock) {
+bool	sqlrlistener::registerHandoff(datatransport *sock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"registering handoff...");
@@ -699,7 +738,13 @@ void	sqlrlistener::registerHandoff(datatransport *sock) {
 
 	// get the connection daemon's pid
 	unsigned long processid;
-	sock->read(&processid);
+	if (sock->read(&processid)!=sizeof(unsigned long)) {
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",1,"failed to read process id");
+		#endif
+		delete sock;
+		return false;
+	}
 
 	// find a free node in the list, if we find another node with the
 	// same pid, then the old connection must have died off mysteriously,
@@ -718,9 +763,10 @@ void	sqlrlistener::registerHandoff(datatransport *sock) {
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"done registering handoff...");
 	#endif
+	return true;
 }
 
-void	sqlrlistener::deRegisterHandoff(datatransport *sock) {
+bool	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"de-registering handoff...");
@@ -728,7 +774,13 @@ void	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 
 	// get the connection daemon's pid
 	unsigned long	processid;
-	sock->read(&processid);
+	if (sock->read(&processid)!=sizeof(unsigned long)) {
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",1,"failed to read process id");
+		#endif
+		delete sock;
+		return false;
+	}
 
 	// remove the matching socket from the list
 	for (int i=0; i<maxconnections; i++) {
@@ -736,11 +788,7 @@ void	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 			handoffsocklist[i]->pid=0;
 			delete handoffsocklist[i]->sock;
 			handoffsocklist[i]->sock=NULL;
-			#ifdef SERVER_DEBUG
-			debugPrint("listener",0,
-					"done de-registering handoff...");
-			#endif
-			return;
+			break;
 		}
 	}
 
@@ -750,9 +798,57 @@ void	sqlrlistener::deRegisterHandoff(datatransport *sock) {
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"done de-registering handoff...");
 	#endif
+	return true;
 }
 
-int	sqlrlistener::deniedIp() {
+bool	sqlrlistener::fixup(datatransport *sock) {
+
+	#ifdef SERVER_DEBUG
+	debugPrint("listener",0,
+			"passing socket of newly spawned connection...");
+	#endif
+
+	// get the pid of the connection daemon the child listener needs
+	unsigned long	processid;
+	if (sock->read(&processid)!=sizeof(unsigned long)) {
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",1,"failed to read process id");
+		#endif
+		delete sock;
+		return false;
+	}
+
+	// look through the handoffsocklist for the pid
+	bool	retval=false;
+	for (int i=0; i<maxconnections; i++) {
+		if (handoffsocklist[i]->pid==processid) {
+			retval=sock->passFileDescriptor(handoffsocklist[i]->
+						sock->getFileDescriptor());
+			#ifdef SERVER_DEBUG
+			debugPrint("listener",1,
+					"found socket for requested pid ");
+			if (retval) {
+				debugPrint("listener",1,
+						"passed it successfully");
+			} else {
+				debugPrint("listener",1,"failed to pass it");
+			}
+			#endif
+		}
+	}
+
+	// clean up
+	delete sock;
+
+	#ifdef SERVER_DEBUG
+	debugPrint("listener",0,
+			"done passing socket of newly spawned connection");
+	#endif
+
+	return retval;
+}
+
+bool	sqlrlistener::deniedIp() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"checking for valid ip...");
@@ -767,7 +863,7 @@ int	sqlrlistener::deniedIp() {
 		#endif
 
 		delete[] ip;
-		return 1;
+		return true;
 	}
 
 	#ifdef SERVER_DEBUG
@@ -775,7 +871,7 @@ int	sqlrlistener::deniedIp() {
 	#endif
 
 	delete[] ip;
-	return 0;
+	return false;
 }
 
 void	sqlrlistener::disconnectClient() {
@@ -822,7 +918,7 @@ void	sqlrlistener::forkChild() {
 
 void	sqlrlistener::clientSession() {
 
-	int	passstatus=0;
+	bool	passstatus=false;
 
 	// handle authentication
 	int	authstatus=getAuth();
@@ -944,7 +1040,7 @@ void	sqlrlistener::incrementSessionCount() {
 }
 
 
-int	sqlrlistener::handOffClient() {
+bool	sqlrlistener::handOffClient() {
 
 	getAConnection();
 	clientsock->write((unsigned short)NO_ERROR);
@@ -957,13 +1053,16 @@ int	sqlrlistener::handOffClient() {
 	if (passdescriptor) {
 		clientsock->write((unsigned short)DONT_RECONNECT);
 
-		// if pass descriptor fails, we can still write to the client,
-		// send it an error message
-		if (!passDescriptor()) {
+		// Get the socket associated with the pid of the available
+		// connection and pass the client to the connection.  If any
+		// of this fails, we can still write to the client, send it an
+		// error message.
+		if (!findMatchingSocket() ||
+				!passClientFileDescriptorToConnection()) {
 			clientsock->write((unsigned short)ERROR);
 			clientsock->write((unsigned short)70);
 			clientsock->write("The listener failed to hand the client off to the database connection.");
-			return 0;
+			return false;
 		}
 	} else {
 		clientsock->write((unsigned short)RECONNECT);
@@ -972,7 +1071,7 @@ int	sqlrlistener::handOffClient() {
 		clientsock->write((unsigned short)inetport);
 	}
 
-	return 1;
+	return true;
 }
 
 void	sqlrlistener::getAConnection() {
@@ -1055,13 +1154,13 @@ void	sqlrlistener::getAConnection() {
 	
 }
 
-int	sqlrlistener::connectionIsUp(char *connectionid) {
+bool	sqlrlistener::connectionIsUp(const char *connectionid) {
 
 	// initialize the database up/down filename
 	char	*updown=new char[strlen(TMP_DIR)+1+strlen(cmdl->getId())+1+
 						strlen(connectionid)+1];
 	sprintf(updown,"%s/%s-%s",TMP_DIR,cmdl->getId(),connectionid);
-	int	retval=file::exists(updown);
+	bool	retval=file::exists(updown);
 	delete[] updown;
 	return retval;
 }
@@ -1136,53 +1235,117 @@ datatransport	*sqlrlistener::connectToConnection() {
 	return NULL;
 }
 
-int	sqlrlistener::disconnectFromConnection(datatransport *connsock) {
+void	sqlrlistener::disconnectFromConnection(datatransport *connsock) {
 	connsock->close();
 	if (!passdescriptor) {
 		delete connsock;
 	}
-	return 1;
 }
 
-int	sqlrlistener::passDescriptor() {
+bool	sqlrlistener::passClientFileDescriptorToConnection() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",1,"passing descriptor...");
 	#endif
 
+	// pass the file descriptor of the connected client over to the
+	// available connection
+	bool	retval=false;
+	if (availableconnectionsock->passFileDescriptor(
+					clientsock->getFileDescriptor())) {
+
+		retval=true;
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,"done passing descriptor");
+		#endif
+
+	} else {
+
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,"passing descriptor failed");
+		#endif
+
+		// If we get an error, delete the socket and remove the
+		// connection from the list.  The connection must be out of
+		// commission for some reason, perhaps it died.  We need to
+		// remove it from the list because if we didn't fork off to
+		// handle the client and another client connects, we'll be
+		// using the same list and we don't want to run into this
+		// trouble again.
+		// FIXME: What if a client gets forked off and runs into the
+		// bad connection?  The bad connection is still in the parent
+		// process's list.
+		delete availableconnectionsock;
+		availableconnectionsock=NULL;
+		*availableconnectionpid=0;
+	}
+	return retval;
+}
+
+bool	sqlrlistener::findMatchingSocket() {
+
 	// Look through the list of handoff sockets for the pid of the 
 	// connection that we got during the call to getAConnection().
 	// When we find it, send the descriptor of the clientsock to the 
 	// connection over the handoff socket associated with that node.
-	//
-	// If for some reason, the socket is closed when we find it, remove it
-	// and return an error.
-
 	for (int i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i]->pid==connectionpid) {
-			if (handoffsocklist[i]->sock->passFileDescriptor(
-					clientsock->getFileDescriptor())) {
-
-				#ifdef SERVER_DEBUG
-				debugPrint("listener",0,
-					"done passing descriptor");
-				#endif
-				return 1;
-			} 
-			handoffsocklist[i]->pid=0;
-			delete handoffsocklist[i]->sock;
-			handoffsocklist[i]->sock=NULL;
-			break;
+			availableconnectionsock=handoffsocklist[i]->sock;
+			availableconnectionpid=&handoffsocklist[i]->pid;
+			return true;
 		}
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("listener",0,"passing descriptor failed");
-	#endif
-	return 0;
+	// if the available connection wasn't in our list then it must have
+	// fired up after we forked, so we'll need to connect back to the main
+	// listener process and ask it for the pid
+	return requestFixup();
 }
 
-void	sqlrlistener::waitForClientClose(int authstatus, int passstatus) {
+bool	sqlrlistener::requestFixup() {
+
+	#ifdef SERVER_DEBUG
+	debugPrint("listener",0,
+			"requesting socket of newly spawned connection...");
+	#endif
+
+	// connect to the fixup socket of the parent listener
+	unixclientsocket	fixupclientsockun;
+	if (!fixupclientsockun.connectToServer(fixupsockname,0,1)) {
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,
+			"failed to connect to parent listener process");
+		#endif
+		return false;
+	}
+
+	// send the pid of the connection that we need
+	if (fixupclientsockun.write(connectionpid)!=sizeof(unsigned long)) {
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,"failed to send the pid");
+		#endif
+		return false;
+	}
+
+	// get the file descriptor of the socket
+	int	fd;
+	if (!fixupclientsockun.receiveFileDescriptor(&fd)) {
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,"failed to receive the socket");
+		#endif
+		return false;
+	}
+	fixupserversockun.setFileDescriptor(fd);
+	availableconnectionsock=&fixupserversockun;
+
+	#ifdef SERVER_DEBUG
+	debugPrint("listener",0,
+			"received socket of newly spawned connection");
+	#endif
+	return true;
+}
+
+void	sqlrlistener::waitForClientClose(int authstatus, bool passstatus) {
 
 	// Sometimes the listener sends the ports and closes
 	// the socket while they are still buffered but not

@@ -54,7 +54,7 @@ LIBTOOL = @LIBTOOL@
 LIBTOOLGCC = @LIBTOOLGCC@
 
 # install command
-INSTALL = $(top_builddir)/install-sh -c
+INSTALL = STRIPPROG="$(STRIP)" $(LIBTOOL) --mode=install $(top_builddir)/install-sh -c
 
 # mkinstalldirs command
 MKINSTALLDIRS = $(top_builddir)/mkinstalldirs

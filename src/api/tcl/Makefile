@@ -92,8 +92,8 @@ sqlrelay.so:
 
 install: sqlrelay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) -s sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(INSTALL) $(INSTALLSTRIP) sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(RM) sqlrelay.so
 
 uninstall:

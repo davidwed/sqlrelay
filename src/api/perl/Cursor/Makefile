@@ -112,14 +112,14 @@ Cursor.so:
 
 install: Cursor.so
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH)/SQLRelay
+	$(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH)/SQLRelay
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Cursor
-	$(LIBTOOL) --mode=install $(INSTALL) -m 755 Cursor.so $(PERLSITEARCH)/auto/SQLRelay/Cursor
+	$(INSTALL) -m 755 Cursor.so $(PERLSITEARCH)/auto/SQLRelay/Cursor
 	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
 	$(RM) Cursor.so
 	pod2man Cursor.pm > SQLRelay::Cursor.$(PERLMAN3EXT)
 	$(MKINSTALLDIRS) $(PERLINSTALLMAN3DIR)
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 SQLRelay::Cursor.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
+	$(INSTALL) -m 644 SQLRelay::Cursor.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
 	$(RM) SQLRelay::Cursor.$(PERLMAN3EXT)
 	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.so > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist

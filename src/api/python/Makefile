@@ -69,10 +69,10 @@ CSQLRelay.so:
 
 install: CSQLRelay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
-	$(LIBTOOL) --mode=install $(INSTALL) CSQLRelay.so $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 PySQLRDB.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
-	$(LIBTOOL) --mode=install $(INSTALL) -m 644 __init__.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) $(INSTALLSTRIP) CSQLRelay.so $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) -m 644 PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) -m 644 PySQLRDB.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(INSTALL) -m 644 __init__.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(RM) CSQLRelay.so
 
 uninstall:

@@ -6,7 +6,7 @@
 	<!ATTLIST instance dbase (oracle7|oracle8|mysql|msql|postgresql|sqlite|lago|freetds|sybase|odbc|db2|interbase) "oracle8">
 	<!ATTLIST instance connections CDATA "1">
 	<!ATTLIST instance maxconnections CDATA "1">
-	<!ATTLIST instance maxqueuelength CDATA "1">
+	<!ATTLIST instance maxqueuelength CDATA "0">
 	<!ATTLIST instance growby CDATA "1">
 	<!ATTLIST instance ttl CDATA "60">
 	<!ATTLIST instance endofsession (commit|rollback) "commit">

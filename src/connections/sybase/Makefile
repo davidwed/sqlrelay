@@ -48,8 +48,8 @@ sqlr-connection-sybase-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-sybase $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-sybase-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sybase $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-sybase-debug $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

@@ -194,7 +194,7 @@ then
 		sleep 1
 		chmod 755 $DB.php
 		sudo cp $DB.php $PHPDIR
-		lynx -dump "http://localhost/$DB.php?$PHPARGS"
+		lynx -dump -source "http://localhost/$DB.php?$PHPARGS"
 		sudo $HTTPDINIT stop
 		sudo rm -f /tmp/cachefile* sqlnet.log
 		cd ..

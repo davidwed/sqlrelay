@@ -40,44 +40,48 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 	public:
 			sqlrlistener();
 			~sqlrlistener();
-		int	initListener(int argc, const char **argv);
+		bool	initListener(int argc, const char **argv);
 		void	listen();
 	private:
 		void	cleanUp();
 		void	setUserAndGroup(sqlrconfigfile *cfgfl);
-		int	handlePidFile(tempdir *tmpdir, const char *id);
+		bool	handlePidFile(tempdir *tmpdir, const char *id);
 		void	handleDynamicScaling(sqlrconfigfile *cfgfl);
 		void	setHandoffMethod(sqlrconfigfile *cfgfl);
 		void	setIpPermissions(sqlrconfigfile *cfgfl);
-		int	createSharedMemoryAndSemaphores(tempdir *tmpdir,
+		bool	createSharedMemoryAndSemaphores(tempdir *tmpdir,
 								const char *id);
 		void	ipcFileError(const char *idfilename);
 		void	ftokError(const char *idfilename);
 		void	shmError(const char *id, int shmid);
 		void	semError(const char *id, int semid);
-		int	listenOnClientSockets(sqlrconfigfile *cfgfl);
-		int	listenOnHandoffSocket(tempdir *tmpdir, const char *id);
-		int	listenOnDeregistrationSocket(tempdir *tmpdir,
+		bool	listenOnClientSockets(sqlrconfigfile *cfgfl);
+		bool	listenOnHandoffSocket(tempdir *tmpdir, const char *id);
+		bool	listenOnDeregistrationSocket(tempdir *tmpdir,
 								const char *id);
+		bool	listenOnFixupSocket(tempdir *tmpdir, const char *id);
 		void	blockSignals();
 		int	waitForData();
-		void	handleClientConnection(int fd);
-		void	registerHandoff(datatransport *sock);
-		void	deRegisterHandoff(datatransport *sock);
-		int	deniedIp();
+		bool	handleClientConnection(int fd);
+		bool	registerHandoff(datatransport *sock);
+		bool	deRegisterHandoff(datatransport *sock);
+		bool	fixup(datatransport *sock);
+		bool	deniedIp();
 		void	disconnectClient();
 		void	forkChild();
 		void	clientSession();
 		int	getAuth();
 		void	incrementSessionCount();
-		int	handOffClient();
+		bool	handOffClient();
 		void	getAConnection();
-		int	connectionIsUp(char *connectionid);
+		bool	findMatchingSocket();
+		bool	requestFixup();
+		bool	connectionIsUp(const char *connectionid);
 		void	pingDatabase();
 		datatransport	*connectToConnection();
-		int	disconnectFromConnection(datatransport *connsock);
-		int	passDescriptor();
-		void	waitForClientClose(int authstatus, int passstatus);
+		void	disconnectFromConnection(datatransport *connsock);
+		bool	passClientFileDescriptorToConnection();
+		void	waitForClientClose(int authstatus, bool passstatus);
 
 		char		*pidfile;
 
@@ -103,9 +107,14 @@ class sqlrlistener : public daemonprocess, public listener, public debugfile {
 		inetserversocket	*clientsockin;
 		unixserversocket	*handoffsockun;
 		unixserversocket	*removehandoffsockun;
+		unixserversocket	*fixupsockun;
+		char			*fixupsockname;
+		unixsocket		fixupserversockun;
 		datatransport		*clientsock;
 
 		handoffsocketnode	**handoffsocklist;
+		datatransport		*availableconnectionsock;
+		unsigned long		*availableconnectionpid;
 
 		regularexpression	*allowed;
 		regularexpression	*denied;

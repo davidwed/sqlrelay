@@ -27,7 +27,7 @@ libsqlrutil.la: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) libsqlrutil.la $(libdir)
+	$(INSTALL) $(INSTALLSTRIP) libsqlrutil.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

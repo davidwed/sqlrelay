@@ -2,8 +2,6 @@ top_builddir = ../..
 
 include ../../config.mk
 
-INSTALL = $(top_builddir)/install-sh -c
-
 CPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = -L$(top_builddir)/src/util -lsqlrutil -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
@@ -44,9 +42,9 @@ sqlrsh: sqlrsh.C sqlrsh.lo
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) query $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) fields $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlrsh $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) query $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) fields $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlrsh $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query

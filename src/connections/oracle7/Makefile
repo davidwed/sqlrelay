@@ -48,8 +48,8 @@ sqlr-connection-oracle7-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle7 $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle7-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle7 $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-oracle7-debug $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

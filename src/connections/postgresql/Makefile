@@ -48,8 +48,8 @@ sqlr-connection-postgresql-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-postgresql-debug $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)

@@ -90,7 +90,7 @@ sql_relay.so:
 
 install: sql_relay.so
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(LIBTOOL) --mode=install $(INSTALL) -s sql_relay.so $(DESTDIR)$(PHPEXTDIR)
+	$(INSTALL) $(INSTALLSTRIP) sql_relay.so $(DESTDIR)$(PHPEXTDIR)
 	$(RM) sql_relay.so
 
 uninstall:

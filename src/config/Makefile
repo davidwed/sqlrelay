@@ -31,7 +31,7 @@ sqlr-config-gtk: $(SRCS) $(LOBJS)
 
 install:
 	$(top_builddir)/mkinstalldirs $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-config-gtk $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-config-gtk $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-config-gtk

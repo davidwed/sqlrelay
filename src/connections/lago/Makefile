@@ -48,8 +48,8 @@ sqlr-connection-lago-debug: $(SRCS) $(DLOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago $(bindir)
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago-debug $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago $(bindir)
+	$(INSTALL) $(INSTALLSTRIP) sqlr-connection-lago-debug $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(debugdir)
