@@ -4,29 +4,21 @@ compatibility:
 	interbase 7
 
 lots of documentation fixes:
-	installation:
-		db2 8.1
-		sybase 12.5
-	db2 startup directions are wrong;
+	db2 8.1 installation
+	sybase 12.5 installation (license manager stuff)
+	db2 7.1 startup directions are wrong;
 		you have to run db2start/db2stop as db2as
 	fix clientapis.html
-	describe ping() vs. pingQuery() methods in connections.html
-	describe sendColumnTypeFormat() in connections.html
-
-fix rpm build instructions in INSTALL.txt
-
-does zope stuff work?
-
-java/com/firstworks/sqlrelay needs to be removed if empty when rpm is
-	uninstalled
 
 Tests:
+	zope
 	odbc tests
 	better perldbi/pythondb/rubydbi tests
 	test init scripts
 	test send query w/length
 	test upper/lower/mixed column case methods
 	need database reconnect tests
+	interbase stored procedure/output bind test
 
 Compatibility:
 	gtk-2
@@ -37,7 +29,7 @@ Compatibility:
 
 Documentation:
 	getting started docs for MS SQL Server
-	diagrams
+	"how sqlrelay works" with diagrams and animations
 	example sqlrelay.conf's for different configurations
 	recommended settings for each db, scaling
 	performance benchmark charts
@@ -58,7 +50,7 @@ Performance:
 	server side result set caching
 	support batch DML in oracle8
 	for databases that can return non-strings in their result sets, 
-		send non strings to client - is this a good idea?
+		send non strings to client
 
 Security:
 	address connection hijacking for handoff=reconnect
@@ -77,7 +69,7 @@ Features:
 	sybase/freetds (possibly others) need options for setting chained mode 
 		and isolation mode when client connects
 	sqlr-import/sqlr-export tools
-	support output bind vars and stored procedures in sybase/interbase/db2
+	support output bind vars and stored procedures in sybase
 	support vector binds
 	handle output binds in Perl-DBD, Python-DB, Ruby-DBD
 	datatype support:
@@ -104,13 +96,21 @@ Features:
 Availability:
 	connections should ping database server every so often to make sure
 		it's up, if it's not, relogin
-	a query should re-execute when the database comes back up
 	master, fallback databases, where connection only goes to the fallback
 		if the master is overloaded or down
 		statistics, stat monitoring interface
 	if a connection dies mysteriously, a new one should fire up
 
-openldap backend
+backends:
+	nss_sqlrelay
+	pam_sqlrelay
+	mod_auth_sqlrelay for apache
+	samba auth module
+	bind 9.1 backend
+	dhcp backend
+	qmail backend
+	qpopper port
+	bugzilla port
 
 API's:
 	wrapper:

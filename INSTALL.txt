@@ -64,16 +64,45 @@ CUSTOM INSTALL:
 
 RPM INSTALL:
 
-	If your system supports RedHat Package Manager RPM's then you can
-	build and install them like this:
+	If your system supports RedHat Package Manager RPM version 4.0.3 or
+	greater then you can build RPMS by running the following command
+	against the distribution tarball:
 
-		configure
-	
-	As root:
-		make rpm
+		rpm -ta sqlrelay-xxx.tar.gz
 
-	This will generate RPM's in the packages/RPMS directory.  You can 
-	install them by changing directories into packages/RPMS and executing 
+	(where xxx is replaced with the version number)
+
+	You can instruct the build process not to build certain modules by
+	giving it one of the following flags:
+
+		-without db2
+		-without freetds
+		-without interbase
+		-without lago
+		-without msql
+		-without mysql
+		-without odbc
+		-without oracle
+		-without postgresql
+		-without sqlite
+		-without sybase
+		-without perl
+		-without python
+		-without php
+		-without java
+		-without zope
+
+	For example, if you want to build everything but the oracle and zope
+	modules, then you would run the following command:
+
+		rpm -ta -without oracle -without zope sqlrelay-xxx.tar.gz
+
+	(where xxx is replaced with the version number)
+
+	This will generate RPM's in the system-wide RPM directory (usually
+	/usr/src/redhat/RPMS or /usr/local/rpm/RPMS) under the subdirectory
+	corresponding to your system architecture.  You can install them by
+	changing directories into packages/RPMS and executing 
 	the following command as root:
 
-		rpm -i *
+		rpm -i sqlrelay-*

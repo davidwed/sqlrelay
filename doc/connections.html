@@ -898,10 +898,11 @@ mycursor::~mycursor() {
 
 <B><FONT color=#288850>void</FONT></B>    mycursor::returnColumnInfo() {
 
-	... First, send back the number of rows and
-            affected rows using the sendRowCounts()
-            method.  For databases that don't return
-	    these values, return -1 instead. ...
+	... It is possible to send back column types as strings or
+	    id's.  Using id's is faster and preferred, however
+	    if your database requires users to define their own
+	    column types and has no built-in types, you can return
+	    strings instead. ...
 
         ... if the query isn't a select, return immediately ...
 
@@ -919,14 +920,15 @@ mycursor::~mycursor() {
 
         ... Run through the columns of the result set, 
             for each, use the sendColumnDefinition()
-            method to return the name, type and size
-            of each.  The column type should be one
-            of the types in the datatypes.h file, so
-            you'll have to establish a mapping between
-            one of them and the database API's data
-            types.  If your database has a type that's 
-            not in that file, add it and submit a 
-            patch! ...
+	    (or sendColumnDefinitionString()) method
+	    to return the name, type and size of each.
+	    When using sendColumnDefinition(), the
+	    column type should be one of the types in
+	    the datatypes.h file, so you'll have to
+	    establish a mapping between one of them and
+	    the database API's data types.  If your
+	    database has a type that's not in that file,
+	    add it and submit a patch! ...
 }
 
 </pre>
@@ -1221,6 +1223,13 @@ the nullBindValue() and nonNullBindValue() methods to return the appropriate
 values.  You should also override the bindValueIsNull() method to return
 0 if the value passed into it corresponds to your non-NULL indicator and 1 if
 the value passed into it corresponds to your NULL indicator.</p> 
+
+<p>If your database API has a function for determining whether the database
+is up or down (a ping method) then you should implement the ping() method.  The
+example MySQL connection does this.  However, if your database has no such
+method, the connection class can run a simple query and check for a "database
+is down" error.  You can specify a query to run by implementing the pingQuery()
+method instead of the ping() method.</p>
 
 </body>
 </html>
