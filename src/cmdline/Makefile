@@ -4,6 +4,12 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = $(abs_srcdir)/src/util/libsqlrutil.la $(abs_srcdir)/src/api/c++/src/libsqlrclient.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+RPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(CLIENTUSERPATH),yes)
+	RPATH = -rpath $(libdir)
+endif
+endif
 
 .SUFFIXES: .lo
 
@@ -25,13 +31,13 @@ clean:
 rebuild: clean all
 
 query: query.C query.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.lo $(LIBS) -rpath $(libdir)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.lo $(LIBS) $(RPATH)
 
 fields: fields.C fields.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.lo $(LIBS) -rpath $(libdir)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.lo $(LIBS) $(RPATH)
 
 sqlrsh: sqlrsh.C sqlrsh.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIB) -rpath $(libdir)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIB) $(RPATH)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)

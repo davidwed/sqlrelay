@@ -5,11 +5,14 @@ INSTALL = $(abs_srcdir)/install-sh -c
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(SYBASEINCLUDES)
 LIBS = $(SYBASELIBS) $(abs_srcdir)/src/connection/libsqlrconnection.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 DEBUGLIBS = $(SYBASELIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-ifeq ($(strip $(SYBASELIBSPATH)),)
-	RPATH =
-else
+ifneq ($(strip $(SYBASELIBSPATH)),)
 ifeq ($(SYBASEUSERPATH),yes)
 	RPATH = -rpath $(SYBASELIBSPATH)
+endif
+endif
+ifneq ($(strip $(libdir)),)
+ifeq ($(SERVERUSERPATH),yes)
+	RPATH += -rpath $(libdir)
 endif
 endif
 

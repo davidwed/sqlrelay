@@ -5,11 +5,14 @@ INSTALL = $(abs_srcdir)/install-sh -c
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(ODBCINCLUDES)
 LIBS = $(ODBCLIBS) $(abs_srcdir)/src/connection/libsqlrconnection.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 DEBUGLIBS = $(ODBCLIBS) $(abs_srcdir)/src/connection/libsqlrconnection_debug.la $(abs_srcdir)/src/util/libsqlrutil.la $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-ifeq ($(strip $(ODBCLIBSPATH)),)
-	RPATH =
-else
+ifneq ($(strip $(ODBCLIBSPATH)),)
 ifeq ($(ODBCUSERPATH),yes)
 	RPATH = -rpath $(ODBCLIBSPATH)
+endif
+endif
+ifneq ($(strip $(libdir)),)
+ifeq ($(SERVERUSERPATH),yes)
+	RPATH += -rpath $(libdir)
 endif
 endif
 

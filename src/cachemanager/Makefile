@@ -4,6 +4,12 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -DCACHE_DIR=\"$(cachedir)\" -I./ -I$(abs_srcdir) -I$(abs_srcdir)/src/common $(RUDIMENTSINCLUDES)
 LIBS = $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+RPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(SERVERUSERPATH),yes)
+	RPATH = -rpath $(libdir)
+endif
+endif
 
 SRCS = cachemanager.C main.C
 LOBJS = cachemanager.lo main.lo
@@ -23,7 +29,7 @@ clean:
 rebuild: clean all
 
 sqlr-cachemanager: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) -rpath $(libdir)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:
 	$(abs_srcdir)/mkinstalldirs $(bindir)

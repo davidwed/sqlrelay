@@ -9,6 +9,16 @@ AC_ARG_ENABLE(debug,
 AC_SUBST(INSTALLSTRIP)
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
+AC_ARG_ENABLE(client-rpath,
+	[  --enable-client-rpath         Use -rpath when linking SQL Relay client programs against SQL Relay libraries],
+	CLIENTUSERPATH="yes",
+	CLIENTUSERPATH="")
+AC_SUBST(CLIENTUSERPATH)
+AC_ARG_ENABLE(server-rpath,
+	[  --enable-server-rpath         Use -rpath when linking SQL Relay server programs against SQL Relay libraries],
+	SERVERUSERPATH="yes",
+	SERVERUSERPATH="")
+AC_SUBST(SERVERUSERPATH)
 AC_ARG_ENABLE(static,
 	[  --enable-static               Enable static linking],
 	STATICLINK="-static",
