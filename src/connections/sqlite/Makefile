@@ -3,16 +3,16 @@ include ../../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(SQLITEINCLUDES)
-LIBS = $(SQLITELIBS) -L$(libdir) -lsqlrconnection -L$(libdir) -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(SQLITELIBS) -L$(libdir) -lsqlrconnection_debug -L$(libdir) -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(SQLITELIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(SQLITELIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection_debug -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(SQLITELIBSPATH)),)
 ifeq ($(SQLITEUSERPATH),yes)
-	RPATH = -rpath $(SQLITELIBSPATH)
+	RPATH = -R $(SQLITELIBSPATH)
 endif
 endif
 ifneq ($(strip $(libdir)),)
 ifeq ($(SERVERUSERPATH),yes)
-	RPATH += -rpath $(libdir)
+	RPATH += -R $(libdir)
 endif
 endif
 

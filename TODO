@@ -1,5 +1,3 @@
-perl api's still need -L$(libdir) -lsqlrclient
-
 test finished-suspended-result-set's with oracle/db2/sybase/freetds
 
 db2 start/stop doesn't work

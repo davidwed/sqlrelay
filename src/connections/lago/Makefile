@@ -3,16 +3,16 @@ include ../../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(LAGOINCLUDES)
-LIBS = $(LAGOLIBS) -L$(libdir) -lsqlrconnection -L$(libdir) -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(NSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(LAGOLIBS) -L$(libdir) -lsqlrconnection_debug -L$(libdir) -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(NSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(LAGOLIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(NSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(LAGOLIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection_debug -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(NSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(LAGOLIBSPATH)),)
 ifeq ($(LAGOUSERPATH),yes)
-	RPATH = -rpath $(LAGOLIBSPATH)
+	RPATH = -R $(LAGOLIBSPATH)
 endif
 endif
 ifneq ($(strip $(libdir)),)
 ifeq ($(SERVERUSERPATH),yes)
-	RPATH += -rpath $(libdir)
+	RPATH += -R $(libdir)
 endif
 endif
 

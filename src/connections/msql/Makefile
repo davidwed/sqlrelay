@@ -3,16 +3,16 @@ include ../../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util -I$(abs_srcdir)/src/connection $(RUDIMENTSINCLUDES) $(MSQLINCLUDES)
-LIBS = $(MSQLLIBS) -L$(libdir) -lsqlrconnection -L$(libdir) -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(MSQLLIBS) -L$(libdir) -lsqlrconnection_debug -L$(libdir) -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(MSQLLIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(MSQLLIBS) -L$(abs_srcdir)/src/connection -lsqlrconnection_debug -L$(abs_srcdir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(MSQLLIBSPATH)),)
 ifeq ($(MSQLUSERPATH),yes)
-	RPATH = -rpath $(MSQLLIBSPATH)
+	RPATH = -R $(MSQLLIBSPATH)
 endif
 endif
 ifneq ($(strip $(libdir)),)
 ifeq ($(SERVERUSERPATH),yes)
-	RPATH += -rpath $(libdir)
+	RPATH += -R $(libdir)
 endif
 endif
 

@@ -7,7 +7,7 @@ LIBS = $(RUDIMENTSLIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(SERVERUSERPATH),yes)
-	RPATH = -rpath $(libdir)
+	RPATH = -R $(libdir)
 endif
 endif
 

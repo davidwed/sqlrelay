@@ -3,10 +3,10 @@ include ../../../config.mk
 INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
-RPATH = -rpath /lib
+RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(JAVAUSERPATH),yes)
-	RPATH = -rpath $(libdir)
+	RPATH = -R $(libdir)
 endif
 endif
 
@@ -30,10 +30,10 @@ java:
 	$(JAVAC) com/firstworks/sqlrelay/*.java
 
 libSQLRConnection.la: com_firstworks_sqlrelay_SQLRConnection.C com_firstworks_sqlrelay_SQLRConnection.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRConnection.lo -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(STDCPPLIB) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRConnection.lo -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(STDCPPLIB) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 libSQLRCursor.la: com_firstworks_sqlrelay_SQLRCursor.C com_firstworks_sqlrelay_SQLRCursor.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRCursor.lo -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(STDCPPLIB) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRCursor.lo -L$(abs_srcdir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(STDCPPLIB) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
 	for i in `find .libs -name "libSQLRConnection*so*"`; \
@@ -44,12 +44,14 @@ install:
 	do \
 		cp $$i libSQLRCursor.so; \
 	done
-	$(LIBTOOL) --mode=clean $(RM) *.la
+	#$(LIBTOOL) --mode=clean $(RM) *.la
 	$(abs_srcdir)/mkinstalldirs $(javadir)/com/firstworks/sqlrelay
 	$(INSTALL) -s libSQLRConnection.so $(javadir)/com/firstworks/sqlrelay
 	$(INSTALL) -s libSQLRCursor.so $(javadir)/com/firstworks/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay
 	$(LIBTOOL) --mode=install $(INSTALL) com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay
+	$(RM) libSQLRConnection.so
+	$(RM) libSQLRCursor.so
 
 uninstall:
 	$(RMTREE) $(javadir)/com/firstworks/sqlrelay
