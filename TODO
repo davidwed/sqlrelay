@@ -10,7 +10,6 @@ probably related to temp table dropping:
 	sybase connection won't even start now
 
 licenses:
-	Pear DB driver
 	mysql replacement library
 	postgresql replacement library
 docs:

@@ -22,23 +22,27 @@ The SQLRelay software package is really several packages:
 	directory of this distribution. This package is 
 	hereafter refered to as The SQLRelay PHP API.
 
-6) Source code, scripts and binaries found in the src/api/ruby 
+6) Source code, scripts and binaries found in the src/api/phppeardb
+	directory of this distribution. This package is 
+	hereafter refered to as The SQLRelay PHP PEAR DB API.
+
+7) Source code, scripts and binaries found in the src/api/ruby 
 	directory of this distribution except for SQLRelay.rb. 
         This package is hereafter refered to as The SQLRelay Ruby API.
 
-7) The file SQLRelay.rb found in the src/api/ruby directory of this
+8) The file SQLRelay.rb found in the src/api/ruby directory of this
 	distribution.  This package is hereafter refered to as The SQLRelay 
 	Ruby DBD.
 
-8) Source code, scripts and binaries found in the src/api/tcl
+9) Source code, scripts and binaries found in the src/api/tcl
 	directory of this distribution.  This package is hereafter refered to
 	as The SQLRelay TCL API.
 
-9) Source code, scripts and binaries found in the src/api/postgresql
+10) Source code, scripts and binaries found in the src/api/postgresql
 	directory of this distribution.  This package is hereafter refered to
 	as The SQLRelay PostgreSQL Drop-In API.
 
-10) Source code, scripts and binaries found in the src/api/mysql
+11) Source code, scripts and binaries found in the src/api/mysql
 	directory of this distribution.  This package is hereafter refered to
 	as The SQLRelay MySQL Drop-In API.
 
@@ -114,6 +118,27 @@ You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the
 Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA  02111-1307, USA.
+
+--------------------------------------------------------------------------------
+
+The SQLRelay PHP PEAR DB API
+Copyright (c) 2004  David Muse
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the
+Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA  02111-1307, USA.
+
 --------------------------------------------------------------------------------
 
 The SQLRelay Ruby API
