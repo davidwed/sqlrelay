@@ -288,8 +288,17 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
+/* Some systems use SQLLEN * in SQLBINDPARAMETER */
+#undef SQLBINDPARAMETER_SQLLEN
+
+/* Some systems use SQLLEN * in SQLColAttribute */
+#undef SQLCOLATTRIBUTE_SQLLEN
+
 /* Some versions of sqlite are transactional */
 #undef SQLITE_TRANSACTIONAL
+
+/* Some systems use SQLLEN * in SQLRowCount */
+#undef SQLROWCOUNT_SQLLEN
 
 /* Version */
 #undef SQLR_VERSION

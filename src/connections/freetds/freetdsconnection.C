@@ -269,6 +269,7 @@ freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	char	*versionstring=strdup("freetds v0.00.0");
 	#endif
 
+	// FIXME: what if we don't find 'v'
 	char	*v=strchr(versionstring,'v');
 	*v=(char)NULL;
 	majorversion=atoi(v+1);
@@ -308,31 +309,38 @@ freetdscursor::~freetdscursor() {
 
 bool freetdscursor::openCursor(int id) {
 
+printf("openCursor()\n");
 	clean=true;
 
 	cursorname=charstring::parseNumber((long)id);
 
+printf("1\n");
 	if (ct_cmd_alloc(freetdsconn->dbconn,&languagecmd)!=CS_SUCCEED) {
 		return false;
 	}
+printf("2\n");
 	if (ct_cmd_alloc(freetdsconn->dbconn,&cursorcmd)!=CS_SUCCEED) {
 		return false;
 	}
 	cmd=NULL;
 
+printf("switch to correct database...\n");
 	// switch to the correct database
 	bool	retval=true;
 	if (freetdsconn->db && freetdsconn->db[0]) {
 		int	len=strlen(freetdsconn->db)+4;
 		char	query[len+1];
 		sprintf(query,"use %s",freetdsconn->db);
+printf("running: %s\n",query);
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true))) {
 			bool	live;
 			fprintf(stderr,"%s\n",getErrorMessage(&live));
 			retval=false;
 		}
+printf("clean up...\n");
 		cleanUpData(true,true);
+printf("after clean up.\n");
 	}
 	return (retval && sqlrcursor::openCursor(id));
 }

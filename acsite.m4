@@ -1575,6 +1575,27 @@ then
 
 	fi
 
+	if ( test -n "$ODBCLIBS" )
+	then
+		AC_MSG_CHECKING(if SQLBindParameter takes SQLLEN * argument)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>],[SQLBindParameter(0,0,0,0,0,0,0,0,0,(SQLLEN *)NULL);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLBINDPARAMETER_SQLLEN,1,Some systems use SQLLEN * in SQLBINDPARAMETER)],[AC_MSG_RESULT(no)])
+
+		AC_MSG_CHECKING(if SQLColAttribute takes SQLLEN * argument)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>],[SQLColAttribute(0,0,0,0,0,0,(SQLLEN *)NULL);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLCOLATTRIBUTE_SQLLEN,1,Some systems use SQLLEN * in SQLColAttribute)],[AC_MSG_RESULT(no)])
+		
+		AC_MSG_CHECKING(if SQLRowCount takes SQLLEN * argument)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>],[SQLRowCount(0,(SQLLEN *)0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLROWCOUNT_SQLLEN,1,Some systems use SQLLEN * in SQLRowCount)],[AC_MSG_RESULT(no)])
+	fi
+
 	FW_INCLUDES(odbc,[$ODBCINCLUDES])
 	FW_LIBS(odbc,[$ODBCLIBS])
 fi

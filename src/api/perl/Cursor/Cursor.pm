@@ -6,7 +6,7 @@ package SQLRelay::Cursor;
 require DynaLoader;
 @ISA = 'DynaLoader';
 
-$VERSION = '0.35';
+$VERSION = '0.36';
 
 bootstrap SQLRelay::Cursor $VERSION;
 

@@ -161,7 +161,7 @@ AC_ARG_WITH(db2-prefix,
 AC_ARG_WITH(db2-version,
 	[  --with-db2-version            DB2 Version (7 or 8)],
 	DB2VERSION="$withval",
-	DB2VERSION="7")
+	DB2VERSION="8")
 AC_ARG_ENABLE(db2,
 	[  --disable-db2                 Don't build DB2 connection],
 	ENABLE_DB2="",
@@ -662,7 +662,7 @@ AC_SUBST(RPM_BUILD_DIR)
 
 
 dnl Default build variables.
-SQLR_VERSION="0.35"
+SQLR_VERSION="0.36"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
 dnl rules for CURRENT:REVISION:AGE version info:

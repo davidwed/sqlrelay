@@ -1,7 +1,32 @@
 perl apis -> CPAN
 
-fedora-core-2 isn't set up
-suse-9.1 isn't set up
+document 10g on fedora core 2 dbca failure fix
+
+move socket files into their own directory so they can't collide with other
+	stuff in tmp directory
+
+document that snippets from tnsnames.ora can be used as ORACLE_SID
+
+look at npgsql for .net data provider example
+
+FIXME parsing TDS_VERSION_NO in freetds connection
+
+if connections=0 and maxconnections>0 then one connection does get started,
+	sometimes connections with a ttl don't die off
+
+php module needs to clean itself up (close connections) if the script dies
+
+api needs to expose integer column types
+
+CFLAGS="-framework Python" to get python API to compile on OS X
+
+HFS is case insensitive but case preserving, need INSTALL.txt hack for OS X
+
+compile problem with ODBC 3.52
+
+Matthias's freetds version patch
+
+python DB stops other threads
 
 --------------------------------------------------------------------------------
 
@@ -98,7 +123,8 @@ Compatibility:
 	support @,: or ? for fake bind variables
 	rewrite queries with ?'s or @'s for oracle, rewrite
 				queries with ?'s or :'s for
-	mysql 4.1, 5.0
+	mysql 4.1, 5.0 - bind vars
+	postgresql 8 - bind vars
 	support libmysqlclient_r
 	daemontools
 	SCO:
@@ -162,6 +188,29 @@ Packages:
 	Unixware/OpenUnix
 
 Features:
+	distribute selects to slaves, dml/ddl to master:
+		If SQL Relay is running in master/slave mode, then when a
+		client connects to the listener, the listener could hand it off
+		to 2 sqlr-connections.  The client could keep track of these
+		2 sqlr-connections and send non-selects to the master and
+		selects to the slave.  The application will need to be aware
+		that it's operating in a master/slave environment though, and
+		either turn on autocommit or execute commit's manually.
+
+		(Since the client needs to wait for 2 connections, the potential
+		for the classic dining philosophers deadlock problem exists
+		and will need to be addressed)
+		
+		To decide which database is the master, the sqlr-listener will
+		need to know which connectionid is associated with that
+		database.  It will detect if the master has gone down and
+		attempt to reconnect.  Potentially, the sqlr-listener could
+		listen on a socket for "promote/demote" instructions from other
+		software.  If the master has gone down and the sqlr-listener
+		receives a "demote master, promote slave" instruction and
+		a set of connectionids and act accordingly.  The reverse
+		could happen when the master comes back up.
+
 	use PAM if possible as alternative to defining users in sqlrelay.conf
 	support stored procedures that return result sets in
 		sybase, interbase, db2

@@ -201,7 +201,12 @@ bool odbccursor::inputBindString(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLINTEGER *)isnull);
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)isnull
+				#else
+				(SQLINTEGER *)isnull
+				#endif
+				);
 	} else {
 		erg=SQLBindParameter(stmt,
 				atoi(variable+1),
@@ -212,7 +217,12 @@ bool odbccursor::inputBindString(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLINTEGER *)NULL);
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)NULL
+				#else
+				(SQLINTEGER *)NULL
+				#endif
+				);
 	}
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -233,7 +243,12 @@ bool odbccursor::inputBindLong(const char *variable,
 				0,
 				value,
 				sizeof(long),
-				(SQLINTEGER *)NULL);
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)NULL
+				#else
+				(SQLINTEGER *)NULL
+				#endif
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -255,7 +270,12 @@ bool odbccursor::inputBindDouble(const char *variable,
 				scale,
 				value,
 				sizeof(double),
-				(SQLINTEGER *)NULL);
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)NULL
+				#else
+				(SQLINTEGER *)NULL
+				#endif
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -277,7 +297,12 @@ bool odbccursor::outputBindString(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLINTEGER *)isnull);
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)isnull
+				#else
+				(SQLINTEGER *)isnull
+				#endif
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -330,42 +355,77 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LABEL,
 					col[i].name,MAX_ITEM_BUFFER_SIZE,
 					(SQLSMALLINT *)&(col[i].namelength),
-					NULL);
+					#ifdef SQLCOLATTRIBUTE_SQLLEN
+					NULL
+					#else
+					(SQLLEN *)NULL
+					#endif
+					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
 			// column length
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
-					NULL,0,NULL,&(col[i].length));
+					NULL,0,NULL,
+					#ifdef SQLCOLATTRIBUTE_SQLLEN
+					(SQLLEN *)&(col[i].length)
+					#else
+					&(col[i].length)
+					#endif
+					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 	
 			// column type
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TYPE,
-					NULL,0,NULL,&(col[i].type));
+					NULL,0,NULL,
+					#ifdef SQLCOLATTRIBUTE_SQLLEN
+					(SQLLEN *)&(col[i].type)
+					#else
+					&(col[i].type)
+					#endif
+					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
 			// column precision
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_PRECISION,
-					NULL,0,NULL,&(col[i].precision));
+					NULL,0,NULL,
+					#ifdef SQLCOLATTRIBUTE_SQLLEN
+					(SQLLEN *)&(col[i].precision)
+					#else
+					&(col[i].precision)
+					#endif
+					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
 			// column scale
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_SCALE,
-					NULL,0,NULL,&(col[i].scale));
+					NULL,0,NULL,
+					#ifdef SQLCOLATTRIBUTE_SQLLEN
+					(SQLLEN *)&(col[i].scale)
+					#else
+					&(col[i].scale)
+					#endif
+					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
 			// column nullable
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_NULLABLE,
-					NULL,0,NULL,&(col[i].nullable));
+					NULL,0,NULL,
+					#ifdef SQLCOLATTRIBUTE_SQLLEN
+					(SQLLEN *)&(col[i].nullable)
+					#else
+					&(col[i].nullable)
+					#endif
+					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -378,7 +438,13 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 
 			// unsigned number
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_UNSIGNED,
-					NULL,0,NULL,&(col[i].unsignednumber));
+					NULL,0,NULL,
+					#ifdef SQLCOLATTRIBUTE_SQLLEN
+					(SQLLEN *)&(col[i].unsignednumber)
+					#else
+					&(col[i].unsignednumber)
+					#endif
+					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -389,7 +455,13 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 
 			// autoincrement
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_AUTO_UNIQUE_VALUE,
-					NULL,0,NULL,&(col[i].autoincrement));
+					NULL,0,NULL,
+					#ifdef SQLCOLATTRIBUTE_SQLLEN
+					(SQLLEN *)&(col[i].autoincrement)
+					#else
+					&(col[i].autoincrement)
+					#endif
+					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -487,7 +559,11 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 	}
 
 	// get the row count
+#ifdef SQLROWCOUNT_SQLLEN
+	erg=SQLRowCount(stmt,(SQLLEN *)&affectedrows);
+#else
 	erg=SQLRowCount(stmt,&affectedrows);
+#endif
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
