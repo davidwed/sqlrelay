@@ -1,61 +1,196 @@
-install compat-gcc and compat-db
+<html>
 
-The jre shipped with oracle has a bug, it requires the symbol __libc_wait which
-is supposed to be private (ie. no apps are supposed to use it), but was public
-in versions of glibc prior to the version shipped with fedora core 1.
+<head>
+<title>SQL Relay - Getting Started With Oracle</title>
+<link rel="stylesheet" href="../../../../../css/styles.css">
+</head>
 
-apply patch
+<body>
 
-has same ins_oemagent.mk ctypefixup problem
+<span class="heading1">Set Up the Environment</span><br>
 
-ERROR:
-cd $ORACLE_HOME/rdbms/lib
-make -f ins_rdbms.mk
-/usr/bin/ld: /u01/app/oracle/product/9.2.0/rdbms/lib/oracle: hidden symbol `__fixunssfdi' in /usr/lib/gcc-lib/i386-redhat-linux/3.3.2/libgcc.a(_fixunssfdi.oS) is referenced by DSO
+<p>Add the following line to /home/oracle/.bashrc near the bottom:</p>
 
-edit env_rdbms.mk, change gcc to gcc296, retry
+<blockquote>
+<b>export LD_ASSUME_KERNEL=2.4.1</b>
+</blockquote>
+
+<span class="heading1">Install Compatibility Packages</span><br>
+
+<p>The Apache web server that comes with Oracle 9i requires Berkeley DB version
+3.  Part of the installation process requires gcc version 2.96.  Fedora Core 1
+doesn't come with any version of Berkeley DB and comes with gcc version 3.3.2.
+However, there are compatibility RPM's available for Redhat 9 that will also
+work with Fedora Core 1:</p>
+
+<blockquote><b>compat-db-3.3.11-4.i386.rpm<br>
+compat-gcc-7.3-2.96.118.i386.rpm</b></blockquote>
+
+<p>You can download these RPMS from <a href="http://rpmfind.net">rpmfind</a>
+and install them using <i>rpm -i</i> as root.
+
+<p>The version of glibc that comes with Fedora Core 1 has a bug in it.</p>
+
+<p>To assure that Oracle will install and run, download and install
+<a href="http://www.firstworks.com/support/libctypefixup-1.0.tar.gz">libctypefixup</a> using the following commands (as root).</p>
+
+<blockquote>
+<b>tar xf libctypefixup-1.0.tar.gz<br>
+cd libctypefixup-1.0<br>
+make<br>
+make install<br>
+</b></blockquote>
+
+<p>Oracle 9i uses a Java-based installer and comes with it's own JRE.  The
+version of Java that Oracle 9i comes with has a bug though and is incompatible
+with the version of glibc that comes with Fedora Core 1.</p>
+
+<p>To assure that the Oracle installer will run, download and install
+<a href="http://www.firstworks.com/support/libwaitfixup-1.0.tar.gz">libwaitfixup</a> using the following commands (as root).</p>
+
+<blockquote>
+<b>tar xf libwaitfixup-1.0.tar.gz<br>
+cd libwaitfixup-1.0<br>
+make<br>
+make install<br>
+echo "/lib/libwaitfixup.so" &gt;&gt; /etc/ld.so.preload</br>
+</b></blockquote>
+
+<span class="heading1">Install Oracle</span><br>
+
+<p>Now, log in as the oracle user.</p>
+
+<p>Since Oracle 9.2.0 uses a graphical installer, you need to be running X
+Windows or point the DISPLAY environment variable to an X Windows session
+running somewhere.</p>
+
+<p>I have had problems with the graphical installer on enlightenment and
+fluxbox window managers in the past, though they may work for you.</p>
+
+<p>If you have a CD, mount it and cd to the mount point.  If you have a cpio
+distribution, extract all three files using:<p>
+
+<blockquote><b>
+cpio -idmv &lt; lnx_920_disk1.cpio<br>
+cpio -idmv &lt; lnx_920_disk2.cpio<br>
+cpio -idmv &lt; lnx_920_disk3.cpio<br>
+</b></blockquote>
+
+Change directories to the Disk1 directory.<br><br>
+
+Type <b>./runInstaller</b><br><br>
+
+On the <b>Welcome</b> screen click <b>Next</b><br><br>
+
+An <b>Inventory Location</b> dialog will pop up.<br>
+Accept the default base directory and click <b>OK</b><br><br>
+
+On the <b>Unix Group Name</b> screen, enter <i>oinstall</i> for the
+<b>UNIX Group Name</b> and click <b>Next</b><br><br>
+
+A dialog will pop up and prompt you to run /tmp/orainstRoot.sh as root.<br>
+Follow the instructions and click <b>Continue</b><br><br>
+
+On the <b>File Locations</b> screen, accept the defaults and
+click <b>Next</b><br><br>
+
+On the <b>Available Products</b> screen, accept the default selection
+<b>Oracle9i Database 9.2.0.1.0</b> and click <b>Next</b><br><br>
+
+On the <b>Installation Types</b> screen, accept the default selection 
+<b>Enterprise Edition</b> and click <b>Next</b><br><br>
+
+On the <b>Database Configuration</b> screen, accept the default selection
+<b>General Purpose</b> and click <b>Next</b><br><br>
+
+On the <b>Database Identification</b> screen, enter <i>ora1</i> for both
+<b>Global Database Name</b> and <b>SID</b> and click <b>Next</b><br><br>
+
+On the <b>Database File Location</b> screen, accept the default
+<b>Directory for Database Files</b> and click <b>Next</b><br><br>
+
+On the <b>Database Character Set</b> screen, accept the default
+selection <b>Use the default character set</b> and click <b>Next</b><br><br>
+
+On the <b>Summary</b> screen, click <b>Install</b><br><br>
+
+The <b>Install</b> screen will show the progress of the installation<br><br>
 
 
-ERROR:
-cd $ORACLE_HOME/ctx/lib
-make -f ins_ctx.mk
-/usr/bin/ld: ctxhx: hidden symbol `stat' in /usr/lib/libc_nonshared.a(stat.oS) is referenced by DSO
+If a dialog pops up indicating:
 
-no good fix right now, click ignore, it's not a critical system?
+<blockquote>
+Error in invoking target install of makefile<br>
+/u01/app/oracle/product/9.2.0/network/lib/ins_oemagent.mk
+</blockquote>
 
-netca won't run unless patch is used instead of jre1.3.1_09
-edit netca, change:
-#JREDIR=/u01/app/oracle/product/9.2.0/JRE
-JREDIR=/usr/java/jre1.3.1_09
-#JRE=$JREDIR/bin/jre
-JRE=$JREDIR/bin/java
-
-run:
-./netca /orahome /u01/app/oracle/product/9.2.0 /instype typical /inscomp client,oraclenet,javavm,server,ano /insprtcl tcp,tcps /cfg local /authadp NO_VALUE /nodeinfo NO_VALUE /responseFile /u01/app/oracle/product/9.2.0/network/install/netca_typ.rsp
-
-dbca won't run unless patch is used instead of jre1.3.1_09
-edit dbca, change:
-#JRE_DIR=/u01/app/oracle/product/9.2.0/JRE
-JRE_DIR=/usr/java/jre1.3.1_09
-change:
-# Run DBCA
-$JRE_DIR/bin/jre -native -DORACLE_HOME=$OH -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
-else
-# Run DBCA
-$JRE_DIR/bin/jre -DORACLE_HOME=$OH -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
-fi
+edit /u01/app/oracle/product/9.2.0/network/lib/env_oemagent.mk and change:
+<pre>
+	LDLIBS=$(EXPDLIBS) $(EXOSLIBS) $(SYSLIBS) $(EXSYSLIBS) $(MATHLIB) $(USRLIBS)
+</pre>
 to:
-# Run DBCA
-$JRE_DIR/bin/java -native -DORACLE_HOME=$OH -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
-else
-# Run DBCA
-$JRE_DIR/bin/java -DORACLE_HOME=$OH -DJDBC_PROTOCOL=thin -mx64m -classpath $CLASSPATH oracle.sysman.assistants.dbca.Dbca $ARGUMENTS
+<pre>
+	LDLIBS=$(EXPDLIBS) $(EXOSLIBS) $(SYSLIBS) $(EXSYSLIBS) $(MATHLIB) $(USRLIBS) -lctypefixup
+</pre>
+then click <b>Retry</b><br><br><br>
 
-run:
-./dbca  -progress_only    -createDatabase -templateName General_Purpose.dbc -gdbName ora1 -sid ora1  -datafileJarLocation /u01/app/oracle/product/9.2.0/assistants/dbca/templates -datafileDestination /u01/app/oracle/oradata -responseFile NO_VALUE     -characterset WE8ISO8859P1 -passwordDialog true
+If a dialog pops up indicating:
 
-needs /etc/rac_on
+<blockquote>
+Error in invoking target install of makefile<br>
+/u01/app/oracle/product/9.2.0/rdbms/lib/ins_rdbms.mk
+</blockquote>
+
+edit /u01/app/oracle/product/9.2.0/rdbms/lib/env_rdbms.mk and change all
+instances of <b>gcc</b> to read <b>gcc296</b> then click
+<b>Retry</b><br><br><br>
 
 
-I wonder if I can re-symlink $ORACLE_HOME/JRE and /u01/app/oracle/jre/1.3.1
-to /usr/java/jre1.3.1_09
+If a dialog pops up indicating:
+<blockquote>
+Error in invoking target install of makefile<br>
+/u01/app/oracle/product/9.2.0/ctx/lib/ins_ctx.mk
+</blockquote>
+Click <b>Ignore</b>.  There is no known workaround for this problem and the
+affected system doesn't appear to be critical.<br><br>
+
+<p>At the end of the installation, a dialog will pop up asking you to run
+root.sh.  Just follow the directions on the dialog and click <b>Ok</b><br><br>
+
+On the <b>Configuration Tools</b> screen, the Database Creation Assistant
+will run and a dialog will most likely pop up, indicating that it failed.
+In that case, click Ok on the dialog and, run the following command as root:
+
+<blockquote><b>touch /etc/rac_on</b></blockquote>
+
+Now select <b>Oracle Database Configuration Assistant</b> And click <b>Retry</b>
+<br><br>
+
+A dialog will pop up indicating that a database is being created.
+After a while, another dialog will pop up instructing you to provide passwords
+for the SYS and SYSTEM users.  Enter new passwords for these users.  Note that
+you cannont use the classic "manager" and "change_on_install" passwords.<br>
+Click <b>OK</b><br><br>
+
+Sometimes the Database Creation Assistant will just hang here.  Select
+<b>Oracle Database Configuration Assistant</b> And click Stop.  If it doesn't
+stop, you may have to kill it from the command line using the following command:
+
+<blockquote><b>
+kill `ps -efa | grep "JDBC_PROTOCOL=thin" | cut -c10-15`
+</b></blockquote>
+
+When the Database Creation Assistant is finished (or killed), click Next.<br><br>
+
+On the <b>End Of Installation</b> screen click <b>Exit</b><br><br>
+
+<p>In some cases, dbstart and dbshut don't work after installation.  To ensure
+that they will work, you need to run the following command:</p>
+
+<blockquote><b>
+cp /u01/app/oracle/admin/ora1/pfile/initora1.ora.* /u01/app/oracle/product/9.2.0/dbs/initora1.ora
+</b></blockquote>
+
+</body>
+
+</html>
