@@ -93,6 +93,7 @@ typedef	enum {
 	DOUBLE_PRECISION_DATATYPE
 } datatype;
 
+#ifdef NEED_DATATYPESTRING
 static char	*datatypestring[] = {
 	"UNKNOWN",
 	// addded by freetds
@@ -177,7 +178,9 @@ static char	*datatypestring[] = {
 	// none added by postgresql
 	// none added by sqlite
 };
+#endif
 
+#ifdef NEED_IS_NUMBER_TYPE_CHAR
 static int isNumberTypeChar(const char *type) { 
 	if (!strcmp(type,"NUMBER") || !strcmp(type,"INT") ||
 		!strcmp(type,"SMALLINT") || !strcmp(type,"TINYINT") ||
@@ -205,7 +208,9 @@ static int isNumberTypeChar(const char *type) {
 	}
 	return 0;
 }
+#endif
 
+#ifdef NEED_IS_NUMBER_TYPE_INT
 static int isNumberTypeInt(int type) {
 	if (type==NUMBER_DATATYPE || type==INT_DATATYPE ||
 		type==SMALLINT_DATATYPE || type==TINYINT_DATATYPE ||
@@ -224,6 +229,7 @@ static int isNumberTypeInt(int type) {
 	}
 	return 0;
 }
+#endif
 
 }
 

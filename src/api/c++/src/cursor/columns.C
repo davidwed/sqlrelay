@@ -4,6 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
+#define NEED_DATATYPESTRING
 #include <datatypes.h>
 
 int	sqlrcursor::colCount() {

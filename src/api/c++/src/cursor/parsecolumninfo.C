@@ -5,6 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/string.h>
 #include <defines.h>
+#define NEED_DATATYPESTRING
 #include <datatypes.h>
 
 int	sqlrcursor::parseColumnInfo() {

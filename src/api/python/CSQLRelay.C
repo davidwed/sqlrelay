@@ -6,6 +6,7 @@
 
 extern "C" {
 
+#define NEED_IS_NUMBER_TYPE_CHAR
 #include <datatypes.h>
 
 static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {

@@ -1,6 +1,8 @@
 test finished-suspended-result-set's with oracle/db2/sybase/freetds
 slackware package build isn't right
 
+make -rpath optional for each database
+
 db2 start/stop doesn't work
 	db2start/db2stop works when run as a given instance owner
 
