@@ -91,7 +91,7 @@ sqlrelay.so:
 	fi
 
 sqlrelay.dll:
-	if ( test -r .libs/libsqlrelay.0.0.0 ); \
+	if ( test -r .libs/cygsqlrelay-0.dll ); \
 	then \
 		cp .libs/cygsqlrelay-0.dll sqlrelay.dll; \
 	fi
