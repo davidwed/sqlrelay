@@ -10,8 +10,8 @@ PERL_LIB = $(DESTDIR)$(shell eval "export `$(PERL) -V:privlibexp`"; echo $$privl
 PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "export `$(PERL) -V:installman3dir`"; echo $$installman3dir )
 PERLMAN3EXT = $(shell eval "export `$(PERL) -V:man3ext`"; echo $$man3ext )
 
-CPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE) $(PERLCCFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PERL_INC)
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE) $(PERLCCFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(SSLINCLUDES) $(PERL_INC)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(SSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PERLUSERPATH),yes)

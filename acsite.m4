@@ -493,6 +493,54 @@ fi
 
 
 
+
+dnl checks for the ssl library
+dnl requires:  SSLPATH, RPATHFLAG, cross_compiling
+dnl sets the substitution variable SSLLIB
+AC_DEFUN([FW_CHECK_SSL],
+[
+
+HAVE_SSL=""
+SSLINCLUDES=""
+SSLLIB=""
+
+if ( test "$cross_compiling" = "yes" )
+then
+	
+	dnl cross compiling
+	echo "cross compiling"
+	if ( test -n "$SSLPATH" )
+	then
+		SSLINCLUDES="-I$SSLPATH/include"
+		SSLLIB="-L$SSLPATH/lib -lssl"
+	else
+		SSLLIB="-lssl"
+	fi
+	HAVE_SSL="yes"
+
+else
+
+	if ( test -n "$SSLLIB" )
+	then
+		HAVE_SSL="yes"
+	else
+		FW_CHECK_HEADERS_AND_LIBS([$SSLPATH],[ssl],[openssl/ssl.h],[ssl],[""],[""],[SSLINCLUDES],[SSLLIB],[SSLLIBPATH],[SSLSTATIC])
+		if ( test -n "$SSLLIB" )
+		then
+			HAVE_SSL="yes"
+		fi
+	fi
+fi
+
+FW_INCLUDES(ssl,[$SSLINCLUDES])
+FW_LIBS(ssl,[$SSLLIB])
+
+AC_SUBST(HAVE_SSL)
+AC_SUBST(SSLINCLUDES)
+AC_SUBST(SSLLIB)
+])
+
+
 dnl checks for the rudiments library
 dnl requires:  MICROSOFT, RUDIMENTSPATH, RPATHFLAG, cross_compiling
 dnl sets the substitution variables RUDIMENTSLIBS, RUDIMENTSLIBSPATH,

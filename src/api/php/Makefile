@@ -2,8 +2,8 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(SSLINCLUDES) $(PHPINCLUDES)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(SSLLIB)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)

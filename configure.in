@@ -32,6 +32,10 @@ AC_ARG_WITH(rudiments-prefix,
 	[  --with-rudiments-prefix       Location of rudiments],
 	RUDIMENTSPATH="$withval",
 	RUDIMENTSPATH="")
+AC_ARG_WITH(ssl-prefix,
+	[  --with-ssl-prefix       Location of ssl library],
+	SSLPATH="$withval",
+	SSLPATH="")
 AC_ARG_WITH(libgdbm-prefix,
 	[  --with-libgdbm-prefix         Location of libgdbm],
 	GDBMPATH="$withval",
@@ -468,8 +472,7 @@ AC_CHECK_LIB(dl,dlopen,DLLIB=-ldl,DLLIB="")
 AC_SUBST(DLLIB)
 AC_CHECK_LIB(aio,aioread,AIOLIB=-laio,AIOLIB="")
 AC_SUBST(AIOLIB)
-AC_CHECK_LIB(ssl,SSL_new,SSLLIB=-lssl,SSLLIB="")
-AC_SUBST(SSLLIB)
+FW_CHECK_SSL
 AC_CHECK_LIB(crypto,CRYPTO_add_lock,CRYPTOLIB=-lcrypto,CRYPTOLIB="")
 AC_SUBST(CRYPTOLIB)
 

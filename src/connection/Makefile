@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SSLINCLUDES)
 
 SRCS = sqlrconnection/constructor.C \
 	sqlrconnection/destructor.C \

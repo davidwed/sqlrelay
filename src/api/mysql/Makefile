@@ -8,8 +8,8 @@ else
 	INSTPREFIX = -inst-prefix-dir $(INSTALLPREFIX)
 endif
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(SSLINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(PTHREADLIBS) $(SSLLIB)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PSQLUSERPATH),yes)
 	RPATH = -R $(libdir)

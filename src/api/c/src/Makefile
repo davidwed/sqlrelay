@@ -2,7 +2,7 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(SSLINCLUDES)
 ifneq ($(strip $(libdir)),)
 ifeq ($(CUSERPATH),yes)
 	RPATH = -R $(libdir)
