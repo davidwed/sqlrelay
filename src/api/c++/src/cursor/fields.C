@@ -3,6 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
+#include <stdlib.h>
 #include <defines.h>
 
 char	*sqlrcursor::getFieldInternal(int row, int col) {
@@ -37,6 +38,16 @@ char	*sqlrcursor::getField(int row, int col) {
 	return NULL;
 }
 
+long	sqlrcursor::getFieldAsLong(int row, int col) {
+	char	*field=getField(row,col);
+	return (field)?atol(field):0;
+}
+
+double	sqlrcursor::getFieldAsDouble(int row, int col) {
+	char	*field=getField(row,col);
+	return (field)?atof(field):0.0;
+}
+
 char	*sqlrcursor::getField(int row, const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
@@ -60,6 +71,16 @@ char	*sqlrcursor::getField(int row, const char *col) {
 		}
 	}
 	return NULL;
+}
+
+long	sqlrcursor::getFieldAsLong(int row, const char *col) {
+	char	*field=getField(row,col);
+	return (field)?atol(field):0;
+}
+
+double	sqlrcursor::getFieldAsDouble(int row, const char *col) {
+	char	*field=getField(row,col);
+	return (field)?atof(field):0.0;
 }
 
 long	sqlrcursor::getFieldLength(int row, int col) {

@@ -30,7 +30,7 @@ PGconn *allocatePGconn(const char *conninfo,
 	conn->conninfo=(char *)conninfo;
 	if (conninfo) {
 
-		conn->connstr=new connectstring();
+		conn->connstr=new parameterstring();
 		conn->connstr->parse(conninfo);
 
 		conn->host=conn->connstr->getValue("host");

@@ -1,4 +1,4 @@
-#include <rudiments/connectstring.h>
+#include <rudiments/parameterstring.h>
 #include <sqlrelay/sqlrclient.h>
 
 extern "C" {
@@ -40,7 +40,7 @@ struct pg_conn {
 
 	sqlrconnection	*sqlrcon;
 
-	connectstring	*connstr;
+	parameterstring	*connstr;
 
 	char		*conninfo;
 

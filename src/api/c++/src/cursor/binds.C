@@ -362,6 +362,16 @@ char	*sqlrcursor::getOutputBind(const char *variable) {
 	return NULL;
 }
 
+long	sqlrcursor::getOutputBindAsLong(const char *variable) {
+	char	*outputbindvalue=getOutputBind(variable);
+	return (outputbindvalue)?atol(outputbindvalue):0;
+}
+
+double	sqlrcursor::getOutputBindAsDouble(const char *variable) {
+	char	*outputbindvalue=getOutputBind(variable);
+	return (outputbindvalue)?atof(outputbindvalue):0.0;
+}
+
 long	sqlrcursor::getOutputBindLength(const char *variable) {
 
 	if (variable) {

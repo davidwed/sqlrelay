@@ -257,6 +257,14 @@ class sqlrcursor {
 		char	*getOutputBind(const char *variable);
 				// Get the value stored in a previously
 				// defined output bind variable.
+		long	getOutputBindAsLong(const char *variable);
+				// Get the value stored in a previously
+				// defined output bind variable as a long
+				// integer.
+		double	getOutputBindAsDouble(const char *variable);
+				// Get the value stored in a previously
+				// defined output bind variable as a double
+				// precision floating point number.
 		long	getOutputBindLength(const char *variable);
 				// Get the length of the value stored in a
 				// previously defined output bind variable.
@@ -325,6 +333,14 @@ class sqlrcursor {
 		char	*getField(int row, const char *col);
 				// Returns a pointer to the value of the 
 				// specified row and column.
+		long	getFieldAsLong(int row, int col);
+		long	getFieldAsLong(int row, const char *col);
+				// Returns the specified field as a long
+				// integer.
+		double	getFieldAsDouble(int row, int col);
+		double	getFieldAsDouble(int row, const char *col);
+				// Returns the specified field as a double
+				// precision floating point number.
 		long	getFieldLength(int row, int col);
 		long	getFieldLength(int row, const char *col);
 				// Returns the length of the 
