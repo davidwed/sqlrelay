@@ -18,6 +18,7 @@ ifneq ($(HAVE_RUBY),)
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php all
+	$(MAKE) -C phppeardb all
 endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java all
@@ -44,6 +45,7 @@ ifneq ($(HAVE_RUBY),)
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php clean
+	$(MAKE) -C phppeardb clean
 endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java clean
@@ -71,6 +73,7 @@ ifneq ($(HAVE_RUBY),)
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php rebuild
+	$(MAKE) -C phppeardb rebuild
 endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java rebuild
@@ -97,6 +100,7 @@ ifneq ($(HAVE_RUBY),)
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php install
+	$(MAKE) -C phppeardb install
 endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java install
@@ -126,6 +130,7 @@ ifneq ($(HAVE_RUBY),)
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php uninstall
+	$(MAKE) -C phppeardb uninstall
 endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java uninstall
