@@ -73,6 +73,8 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 
 	// options...
 	sendcolumninfo=SEND_COLUMN_INFO;
+	sentcolumninfo=SEND_COLUMN_INFO;
+	columntypeformat=COLUMN_TYPE_IDS;
 	colcase=MIXED_CASE;
 
 	// cursor id
