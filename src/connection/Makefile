@@ -62,7 +62,8 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrcursor/queryparse.C \
 	sqlrcursor/binds.C \
 	sqlrcursor/fakebinds.C \
-	sqlrcursor/abort.C
+	sqlrcursor/abort.C \
+	sqlrcursor/sid.C
 LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/sqlrconnectiondtor.lo \
 	sqlrconnection/flushwritebuffer.lo \
@@ -118,7 +119,8 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrcursor/queryparse.lo \
 	sqlrcursor/binds.lo \
 	sqlrcursor/fakebinds.lo \
-	sqlrcursor/abort.lo
+	sqlrcursor/abort.lo \
+	sqlrcursor/sid.lo
 DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
 	sqlrconnection/sqlrconnectiondtor.d.lo \
 	sqlrconnection/flushwritebuffer.d.lo \
@@ -174,7 +176,8 @@ DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
 	sqlrcursor/queryparse.d.lo \
 	sqlrcursor/binds.d.lo \
 	sqlrcursor/fakebinds.d.lo \
-	sqlrcursor/abort.d.lo
+	sqlrcursor/abort.d.lo \
+	sqlrcursor/sid.d.lo
 
 .SUFFIXES: .lo .d.lo
 

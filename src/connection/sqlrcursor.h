@@ -111,6 +111,49 @@ class sqlrcursor {
 		virtual	void		cleanUpData(bool freeresult,
 							bool freebinds);
 
+
+		// SID virtual methods
+
+		/* method performs SQL Injection Detection */
+		virtual bool	sql_injection_detection_ingress(
+							const char *query);
+		virtual bool	sql_injection_detection_egress();
+
+		/* method connects to SID database */
+		virtual void	sql_injection_detection_database_init();
+
+		/* method maintains log for SQL Injection Detection */
+		virtual void 	sql_injection_detection_log(const char *query,
+							char *parsed_sql,
+							char *log_buffer);
+
+		/* method gets parameters for SQL Injection Detection */
+		virtual void 	sql_injection_detection_parameters();
+
+		/* method determines if SQL in black list */
+		virtual bool	sql_injection_detection_ingress_bl(
+							const char *query);
+		virtual bool	sql_injection_detection_egress_bl();
+
+		/* method determines if SQL in white list */
+		virtual bool	sql_injection_detection_ingress_wl(
+							const char *query);
+		virtual bool	sql_injection_detection_egress_wl();
+
+		/* method determines if SQL in learned database */
+		virtual bool	sql_injection_detection_ingress_ldb();
+		virtual bool	sql_injection_detection_egress_ldb();
+
+		/* method parses the sql query */
+		virtual void 	sql_injection_detection_parse_sql(
+							const char *query);
+		virtual void 	sql_injection_detection_parse_results();
+
+		/* method to check for a row in a sid db */
+		virtual bool	sql_injection_detection_check_db(
+							const char *sid_db);
+	
+
 	protected:
 		regularexpression	createtemp;
 
