@@ -1,7 +1,7 @@
 include ../../config.mk
 
 CPPFLAGS = $(BASCPPFLAGS) -I$(incdir) $(RUDIMENTSINCLUDES)
-LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) -lm -lefence
+LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) -lm $(LIBEFENCE)
 
 .SUFFIXES: .lo
 

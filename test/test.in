@@ -66,16 +66,19 @@ fi
 
 rm -f cachefile* sqlnet.log
 
+echo "C:"
 cd c
 ./$DB $ARGS
 cd ..
 
+echo "C++:"
 cd c++
 ./$DB $ARGS
 cd ..
 
 if ( test "@HAVE_JAVA@" = "yes" )
 then
+	echo "Java:"
 	cd java
 	java $DB.class $ARGS
 	cd ..
@@ -83,6 +86,7 @@ fi
 
 if ( test "@HAVE_PERL@" = "yes" )
 then
+	echo "Perl:"
 	cd perl
 	perl $DB.pl $ARGS
 	cd ..
@@ -90,6 +94,7 @@ fi
 
 if ( test "@HAVE_PYTHON@" = "yes" )
 then
+	echo "Python:"
 	cd python
 	python $DB.py $ARGS
 	cd ..
@@ -97,6 +102,7 @@ fi
 
 if ( test "@HAVE_RUBY@" = "yes" )
 then
+	echo "Ruby:"
 	cd ruby
 	ruby $DB.rb $ARGS
 	cd ..
@@ -104,6 +110,7 @@ fi
 
 if ( test "@HAVE_PHP@" = "yes" )
 then
+	echo "PHP:"
 	cd php
 	sudo /etc/rc.d/init.d/httpd start
 	sleep 1
