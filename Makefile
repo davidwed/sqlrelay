@@ -1,3 +1,5 @@
+top_builddir = .
+
 include config.mk
 
 all:
@@ -24,6 +26,9 @@ install:
 	$(MAKE) -C etc install
 	$(MAKE) -C src install
 	$(MAKE) -C init install
+	$(MKINSTALLDIRS) $(libdir)/pkgconfig
+	$(INSTALL) -m 0644 sqlrelay-c.pc $(libdir)/pkgconfig/sqlrelay-c.pc
+	$(INSTALL) -m 0644 sqlrelay-c++.pc $(libdir)/pkgconfig/sqlrelay-c++.pc
 
 uninstall:
 	$(MAKE) -C bin uninstall
@@ -32,6 +37,8 @@ uninstall:
 	$(MAKE) -C etc uninstall
 	$(MAKE) -C src uninstall
 	$(MAKE) -C init uninstall
+	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc
+	$(RM) $(libdir)/pkgconfig/sqlrelay-c++.pc
 
 unconfig: clean
 	$(RM) config.cache
@@ -60,5 +67,7 @@ unconfig: clean
 	$(RM) libtool
 	$(RM) libtool.gcc
 	$(RM) strip-comment-note
+	$(RM) sqlrelay-c.pc
+	$(RM) sqlrelay-c++.pc
 
 distclean: unconfig

@@ -1,3 +1,6 @@
+0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
+		patch
+
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API
 	spec file searches for zope and python paths

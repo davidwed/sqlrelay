@@ -1,6 +1,6 @@
 ADODB - have a driver, just need to incorporate it
+add pkgconfig stuff
 scaling/handoff=pass incompatibility
-OS X compatibility
 
 oldmysql test files for non-C++ api's
 

@@ -442,6 +442,7 @@ rm -rf %{buildroot}
 %{_libdir}/libsqlrclient.a
 %{_libdir}/libsqlrclient.la
 %{_libdir}/libsqlrclient.so
+%{_libdir}/pkgconfig/sqlrelay-c++.pc
 
 %files client-devel-c
 %defattr(-, root, root)
@@ -450,6 +451,7 @@ rm -rf %{buildroot}
 %{_libdir}/libsqlrclientwrapper.a
 %{_libdir}/libsqlrclientwrapper.la
 %{_libdir}/libsqlrclientwrapper.so
+%{_libdir}/pkgconfig/sqlrelay-c.pc
 
 %files client-postgresql
 %defattr(-, root, root)
