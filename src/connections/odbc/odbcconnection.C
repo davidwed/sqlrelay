@@ -329,7 +329,7 @@ int	odbccursor::executeQuery(const char *query, long length,
 		if (conn->sendColumnInfo()) {
 #if (ODBCVER >= 0x0300)
 			// column name
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LABEL,
 					col[i].name,MAX_ITEM_BUFFER_SIZE,
 					(SQLSMALLINT *)&(col[i].namelength),
 					NULL);
@@ -338,35 +338,35 @@ int	odbccursor::executeQuery(const char *query, long length,
 			}
 
 			// column length
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LENGTH,
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
 					NULL,0,NULL,&(col[i].length));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
 	
 			// column type
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_TYPE,
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TYPE,
 					NULL,0,NULL,&(col[i].type));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
 
 			// column precision
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_PRECISION,
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_PRECISION,
 					NULL,0,NULL,&(col[i].precision));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
 
 			// column scale
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_SCALE,
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_SCALE,
 					NULL,0,NULL,&(col[i].scale));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;
 			}
 
 			// column nullable
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_NULLABLE,
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_NULLABLE,
 					NULL,0,NULL,&(col[i].nullable));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return 0;

@@ -10,6 +10,7 @@
 extern "C" {
 
 #define CR_UNKNOWN_ERROR	2000
+#define MYSQL_NO_DATA		100
 
 typedef unsigned long long	my_ulonglong;
 typedef bool			my_bool;
@@ -96,30 +97,6 @@ struct MYSQL_FIELD {
 };
 #endif
 
-// This is the same for all versions of mysql that I've ever seen
-typedef char **MYSQL_ROW;
-
-struct MYSQL_RES {
-	sqlrcursor		*sqlrcur;
-	unsigned int		errno;
-	MYSQL_ROW_OFFSET	currentrow;
-	MYSQL_FIELD_OFFSET	currentfield;
-	MYSQL_FIELD		*fields;
-};
-
-struct MYSQL_STMT {
-	MYSQL_RES	*result;
-};
-
-struct MYSQL {
-	const char	*host;
-	unsigned int	port;
-	const char	*unix_socket;
-	sqlrconnection	*sqlrcon;
-	MYSQL_STMT	*currentstmt;
-	bool		deleteonclose;
-};
-
 // taken directly from mysql.h - 5.0
 struct MYSQL_BIND {
   unsigned long	*length;          /* output length pointer */
@@ -141,7 +118,30 @@ struct MYSQL_BIND {
   void (*fetch_result);/*(struct MYSQL_BIND *, unsigned char **row);*/
 };
 
+// This is the same for all versions of mysql that I've ever seen
+typedef char **MYSQL_ROW;
 
+struct MYSQL_RES {
+	sqlrcursor		*sqlrcur;
+	unsigned int		errno;
+	MYSQL_ROW_OFFSET	currentrow;
+	MYSQL_FIELD_OFFSET	currentfield;
+	MYSQL_FIELD		*fields;
+};
+
+struct MYSQL_STMT {
+	MYSQL_RES	*result;
+	MYSQL_BIND	*resultbinds;
+};
+
+struct MYSQL {
+	const char	*host;
+	unsigned int	port;
+	const char	*unix_socket;
+	sqlrconnection	*sqlrcon;
+	MYSQL_STMT	*currentstmt;
+	bool		deleteonclose;
+};
 
 
 MYSQL *mysql_init(MYSQL *mysql);
@@ -346,18 +346,18 @@ int mysql_kill(MYSQL *mysql, unsigned long pid) {
 char *mysql_get_client_info() {
 	// Returns a string that represents the client library version.
 	// FIXME: not sure these are right
-#ifdef COMPAT_MYSQL_3
-	return "3.23.58";
-#endif
-#ifdef COMPAT_MYSQL_4_0
-	return "4.0.17";
-#endif
-#ifdef COMPAT_MYSQL_4_1
-	return "4.1.1";
-#endif
-#ifdef COMPAT_MYSQL_5_0
-	return "5.0.0";
-#endif
+	#ifdef COMPAT_MYSQL_3
+		return "3.23.58";
+	#endif
+	#ifdef COMPAT_MYSQL_4_0
+		return "4.0.17";
+	#endif
+	#ifdef COMPAT_MYSQL_4_1
+		return "4.1.1";
+	#endif
+	#ifdef COMPAT_MYSQL_5_0
+		return "5.0.0";
+	#endif
 }
 
 unsigned long mysql_get_client_version() {
@@ -366,18 +366,18 @@ unsigned long mysql_get_client_version() {
 	// the release level, and ZZ is the version number within the release
 	// level. For example, a value of 40102 represents a client library
 	// version of 4.1.2.
-#ifdef COMPAT_MYSQL_3
-	return 32358;
-#endif
-#ifdef COMPAT_MYSQL_4_0
-	return 40017;
-#endif
-#ifdef COMPAT_MYSQL_4_1
-	return 40101;
-#endif
-#ifdef COMPAT_MYSQL_5_0
-	return 50000;
-#endif
+	#ifdef COMPAT_MYSQL_3
+		return 32358;
+	#endif
+	#ifdef COMPAT_MYSQL_4_0
+		return 40017;
+	#endif
+	#ifdef COMPAT_MYSQL_4_1
+		return 40101;
+	#endif
+	#ifdef COMPAT_MYSQL_5_0
+		return 50000;
+	#endif
 }
 
 char *mysql_get_host_info(MYSQL *mysql) {
@@ -394,36 +394,36 @@ unsigned int mysql_get_proto_info(MYSQL *mysql) {
 char *mysql_get_server_info(MYSQL *mysql) {
 	// Returns a string that represents the server version number.
 	// FIXME: not sure these are right
-#ifdef COMPAT_MYSQL_3
-	return "3.23.58";
-#endif
-#ifdef COMPAT_MYSQL_4_0
-	return "4.0.17";
-#endif
-#ifdef COMPAT_MYSQL_4_1
-	return "4.1.1";
-#endif
-#ifdef COMPAT_MYSQL_5_0
-	return "5.0.0";
-#endif
+	#ifdef COMPAT_MYSQL_3
+		return "3.23.58";
+	#endif
+	#ifdef COMPAT_MYSQL_4_0
+		return "4.0.17";
+	#endif
+	#ifdef COMPAT_MYSQL_4_1
+		return "4.1.1";
+	#endif
+	#ifdef COMPAT_MYSQL_5_0
+		return "5.0.0";
+	#endif
 }
 
 unsigned long mysql_get_server_version(MYSQL *mysql) {
 	// A number that represents the MySQL server version in format:
 	// main_version*10000 + minor_version *100 + sub_version
 	// For example, 4.1.0 is returned as 40100.
-#ifdef COMPAT_MYSQL_3
-	return 32358;
-#endif
-#ifdef COMPAT_MYSQL_4_0
-	return 40017;
-#endif
-#ifdef COMPAT_MYSQL_4_1
-	return 40101;
-#endif
-#ifdef COMPAT_MYSQL_5_0
-	return 50000;
-#endif
+	#ifdef COMPAT_MYSQL_3
+		return 32358;
+	#endif
+	#ifdef COMPAT_MYSQL_4_0
+		return 40017;
+	#endif
+	#ifdef COMPAT_MYSQL_4_1
+		return 40101;
+	#endif
+	#ifdef COMPAT_MYSQL_5_0
+		return 50000;
+	#endif
 }
 
 
@@ -566,7 +566,7 @@ int mysql_next_result(MYSQL *mysql) {
 
 MYSQL_RES *mysql_list_fields(MYSQL *mysql, const char *table,
 						const char *wild) {
-	// FIXME:
+	// FIXME: implement this
 	return NULL;
 }
 
@@ -774,8 +774,8 @@ my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 }
 
 my_bool mysql_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
-	// FIXME:
-	return false;
+	stmt->resultbinds=bind;
+	return true;
 }
 
 static enum enum_field_types	mysqltypemap[]={
@@ -1083,6 +1083,30 @@ MYSQL_RES *mysql_param_result(MYSQL_STMT *stmt) {
 
 
 int mysql_fetch(MYSQL_STMT *stmt) {
+
+	MYSQL_ROW	row=mysql_fetch_row(stmt->result);
+	if (!row) {
+		return MYSQL_NO_DATA;
+	}
+
+	unsigned long	*lengths=mysql_fetch_lengths(stmt->result);
+
+	for (int i=0; i<stmt->result->sqlrcur->colCount(); i++) {
+			*(stmt->resultbinds[i].length)=lengths[i];
+			if (!row[i]) {
+				*(stmt->resultbinds[i].is_null)=true;
+			} else {
+				*(stmt->resultbinds[i].is_null)=false;
+				memcpy(stmt->resultbinds[i].buffer,
+						row[i],lengths[i]);
+			}
+			stmt->resultbinds[i].buffer[lengths[i]]=(char)NULL;
+
+			// FIXME: I think I'm supposed to convert to
+			// some other type based on the column type...
+			stmt->resultbinds[i].buffer_type=MYSQL_TYPE_STRING,
+			stmt->resultbinds[i].buffer_length=lengths[i];
+	}
 	return 0;
 }
 

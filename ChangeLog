@@ -20,6 +20,7 @@
 		removed clearBinds() after execute()
 		initialized a few hash values when execute() fails
 		added support for output bind parameters
+	odbc connection uses ODBC v 3.0 column attribute names now
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

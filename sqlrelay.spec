@@ -320,6 +320,7 @@ Man pages for SQL Relay.
 %define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "1.5" "1.6" "2.0" "2.1" "2.2" "2.3"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
 %define	zopedir		%(ZOPEPATH="/opt/Zope"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/opt"; do for j in "zope" "Zope"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib/python/Products"; fi; done; done; echo $ZOPEPATH)
 %define	phpextdir	%(php-config --extension-dir)
+%define	phppeardbdir	%(echo "`php-config --prefix`/share/pear/DB")
 %define	perl_prefix	%(eval "export `perl -V:prefix`"; echo $prefix)
 %define	perl_sitelib	%(eval "export `perl -V:sitelib`"; echo $sitelib)
 %define	perl_installarchlib	%(eval "export `perl -V:installarchlib`"; echo $installarchlib)
@@ -542,6 +543,7 @@ rm -rf %{buildroot}
 %{!?_without_php:%files php}
 %{!?_without_php:%defattr(-, root, root)}
 %{!?_without_php:%{phpextdir}/sql_relay.so}
+%{!?_without_php:%{phppeardbdir}/sqlrelay.php}
 
 %{!?_without_python:%files python}
 %{!?_without_python:%defattr(-, root, root)}

@@ -134,11 +134,12 @@ sub prepare {
 	# store statement-specific data in the statement handle
 	#$sth->STORE('driver_params',[]);
 	$sth->STORE('driver_database_handle',$dbh);
-	$sth->STORE('NUM_OF_PARAMS',($statement=~tr/?//));
 	$sth->STORE('driver_is_select',($statement=~/^\s*select/i));
 	$sth->STORE('driver_cursor',$cursor);
 
 	$cursor->prepareQuery($statement);
+
+	$sth->STORE('NUM_OF_PARAMS',$cursor->countBindVariables());
 
 	return $sth;
 }
@@ -309,9 +310,11 @@ sub execute {
 	my $colcount=$cursor->colCount();
 	my $rowcount=$cursor->rowCount();
 	my @colnames=map {$cursor->getColumnName($_)} (0..$colcount-1);
+	my @coltypes=map {$cursor->getColumnType($_)} (0..$colcount-1);
 	$sth->STORE('driver_NUM_OF_ROWS',$rowcount);
 	$sth->STORE('NUM_OF_FIELDS',$colcount);
 	$sth->{NAME}=\@colnames;
+	$sth->{TYPE}=\@coltypes;
 	$sth->STORE('driver_FETCHED_ROWS',0);
 
 	# get the list of output bind variables and turn it into an array

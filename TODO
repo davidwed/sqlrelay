@@ -7,6 +7,7 @@ sqlrclient classes shouldn't inherit from inet/unixclientsocket,
 ADODB interface
 VB wrapper
 FIXME's in mysql drop-in library
+column flags for non-mysql databases
 licenses:
 	Pear DB driver
 	mysql replacement library
@@ -20,10 +21,29 @@ docs:
 tests:
 	mysql drop-in library
 	postgresql drop-in library
+	perl dbi driver
+		execute_array
+		bind_param_array
+		selectall_arrayref
+		selectall_hashref
+		selectcol_arrayref
+		selectcol_hashref
+		selectrow_array
+		selectrow_arrayref
+		selectrow_hashref
+		prepare_cached
+		fetchall_arrayref
+		fetchall_hashref
+		quote
+		err
+		errstr
+		state
+		begin_work
+		available_drivers
+		data_sources
 freetds-0.62/ct_param support
 idle client timeout
 perl apis -> CPAN
-add pear db driver RPM
 
 oldmysql test files for non-C++ api's
 
@@ -62,7 +82,7 @@ Tests:
 	zope
 	tcl
 	odbc tests
-	better perldbi/pythondb/rubydbi tests
+	better pythondb/rubydbi tests
 	test init scripts
 	test send query w/length
 	test upper/lower/mixed column case methods
@@ -123,7 +143,6 @@ Performance/Code Enhancements:
 	api for running queries in the background
 
 Security:
-	address connection hijacking for handoff=reconnect
 	SSL encryption
 
 Packages:
@@ -184,14 +203,11 @@ backends:
 
 API's:
 	wrapper:
-		PHP DBI
 		JDBC
 		ODBC
 		QT3
 		C# - have a driver, just need to incorporate it
 		ADA
-	replacement libs for native db api libs - 
-		translate msql/mysql/postgresql calls to sqlrelay calls
 
 Native DB Support:
 	Informix
