@@ -455,7 +455,6 @@ else
 		if ( test -n "$PTHREADLIBS" )
 		then
 			HAVE_PTHREAD="yes"
-			break
 		fi
 	fi
 fi
