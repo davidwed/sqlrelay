@@ -111,12 +111,12 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
 	printf("\n");
 
-	printf("mysql_store_result:\n");
-	MYSQL_RES	*result=mysql_store_result(&mysql);
-
 	printf("mysql_field_count:\n");
 	checkSuccess(mysql_field_count(&mysql),19);
 	printf("\n");
+
+	printf("mysql_store_result:\n");
+	MYSQL_RES	*result=mysql_store_result(&mysql);
 
 	printf("mysql_num_fields:\n");
 	checkSuccess(mysql_num_fields(result),19);
@@ -130,64 +130,64 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_field_seek(result,0),0);
 	printf("\n");
 
-	printf("mysql_fetch_field:\n");
+	printf("mysql_fetch_field/mysql_field_tell:\n");
 	MYSQL_FIELD	*field;
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),1);
 	checkSuccess(field->name,"testtinyint");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),2);
 	checkSuccess(field->name,"testsmallint");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),3);
 	checkSuccess(field->name,"testmediumint");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),4);
 	checkSuccess(field->name,"testint");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),5);
 	checkSuccess(field->name,"testbigint");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),6);
 	checkSuccess(field->name,"testfloat");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),7);
 	checkSuccess(field->name,"testreal");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),8);
 	checkSuccess(field->name,"testdecimal");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),9);
 	checkSuccess(field->name,"testdate");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),10);
 	checkSuccess(field->name,"testtime");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),11);
 	checkSuccess(field->name,"testdatetime");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),12);
 	checkSuccess(field->name,"testyear");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),13);
 	checkSuccess(field->name,"testchar");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),14);
 	checkSuccess(field->name,"testtext");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),15);
 	checkSuccess(field->name,"testvarchar");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),16);
 	checkSuccess(field->name,"testtinytext");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),17);
 	checkSuccess(field->name,"testmediumtext");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),18);
 	checkSuccess(field->name,"testlongtext");
-
 	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),19);
 	checkSuccess(field->name,"testtimestamp");
 	printf("\n");
 
@@ -195,17 +195,71 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_field_seek(result,0),19);
 	printf("\n");
 
-	// FIXME:
-	printf("mysql_fetch_fields:\n");
-	printf("\n");
-
-	// FIXME:
 	printf("mysql_fetch_field_direct:\n");
+	field=mysql_fetch_field_direct(result,0);
+	checkSuccess(field->name,"testtinyint");
+	field=mysql_fetch_field_direct(result,1);
+	checkSuccess(field->name,"testsmallint");
+	field=mysql_fetch_field_direct(result,2);
+	checkSuccess(field->name,"testmediumint");
+	field=mysql_fetch_field_direct(result,3);
+	checkSuccess(field->name,"testint");
+	field=mysql_fetch_field_direct(result,4);
+	checkSuccess(field->name,"testbigint");
+	field=mysql_fetch_field_direct(result,5);
+	checkSuccess(field->name,"testfloat");
+	field=mysql_fetch_field_direct(result,6);
+	checkSuccess(field->name,"testreal");
+	field=mysql_fetch_field_direct(result,7);
+	checkSuccess(field->name,"testdecimal");
+	field=mysql_fetch_field_direct(result,8);
+	checkSuccess(field->name,"testdate");
+	field=mysql_fetch_field_direct(result,9);
+	checkSuccess(field->name,"testtime");
+	field=mysql_fetch_field_direct(result,10);
+	checkSuccess(field->name,"testdatetime");
+	field=mysql_fetch_field_direct(result,11);
+	checkSuccess(field->name,"testyear");
+	field=mysql_fetch_field_direct(result,12);
+	checkSuccess(field->name,"testchar");
+	field=mysql_fetch_field_direct(result,13);
+	checkSuccess(field->name,"testtext");
+	field=mysql_fetch_field_direct(result,14);
+	checkSuccess(field->name,"testvarchar");
+	field=mysql_fetch_field_direct(result,15);
+	checkSuccess(field->name,"testtinytext");
+	field=mysql_fetch_field_direct(result,16);
+	checkSuccess(field->name,"testmediumtext");
+	field=mysql_fetch_field_direct(result,17);
+	checkSuccess(field->name,"testlongtext");
+	field=mysql_fetch_field_direct(result,18);
+	checkSuccess(field->name,"testtimestamp");
 	printf("\n");
 
-	// FIXME:
-	printf("mysql_field_tell:\n");
+#if 0
+	printf("mysql_fetch_fields:\n");
+	field=mysql_fetch_fields(result);
+	checkSuccess(field[0].name,"testtinyint");
+	checkSuccess(field[1].name,"testsmallint");
+	checkSuccess(field[2].name,"testmediumint");
+	checkSuccess(field[3].name,"testint");
+	checkSuccess(field[4].name,"testbigint");
+	checkSuccess(field[5].name,"testfloat");
+	checkSuccess(field[6].name,"testreal");
+	checkSuccess(field[7].name,"testdecimal");
+	checkSuccess(field[8].name,"testdate");
+	checkSuccess(field[9].name,"testtime");
+	checkSuccess(field[10].name,"testdatetime");
+	checkSuccess(field[11].name,"testyear");
+	checkSuccess(field[12].name,"testchar");
+	checkSuccess(field[13].name,"testtext");
+	checkSuccess(field[14].name,"testvarchar");
+	checkSuccess(field[15].name,"testtinytext");
+	checkSuccess(field[16].name,"testmediumtext");
+	checkSuccess(field[17].name,"testlongtext");
+	checkSuccess(field[18].name,"testtimestamp");
 	printf("\n");
+#endif
 
 	printf("mysql_fetch_row:\n");
 	MYSQL_ROW	row;
@@ -275,7 +329,27 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[17],"longtext2");
 	printf("\n");
 
+	printf("mysql_data_seek:\n");
+	mysql_data_seek(result,0);
+	row=mysql_fetch_row(result);
+	checkSuccess(row[0],"1");
+	printf("\n");
+
+	printf("mysql_row_tell/mysql_row_seek:\n");
+	mysql_data_seek(result,0);
+	MYSQL_ROW_OFFSET	zerorowoffset=mysql_row_tell(result);
+	row=mysql_fetch_row(result);
+	checkSuccess(row[0],"1");
+	row=mysql_fetch_row(result);
+	checkSuccess(row[0],"2");
+	mysql_row_seek(result,zerorowoffset);
+	row=mysql_fetch_row(result);
+	checkSuccess(row[0],"1");
+	printf("\n");
+
 	printf("mysql_eof:\n");
+	mysql_data_seek(result,1);
+	row=mysql_fetch_row(result);
 	checkSuccess(mysql_eof(result),1);
 	printf("\n");
 
@@ -333,21 +407,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[16],"mediumtext2");
 	checkSuccess(row[17],"longtext2");
 	checkSuccess((int)mysql_fetch_row(result),0);
-	printf("\n");
-
-
-
-
-	// FIXME:
-	printf("mysql_row_tell:\n");
-	printf("\n");
-
-	// FIXME:
-	printf("mysql_data_seek:\n");
-	printf("\n");
-
-	// FIXME:
-	printf("mysql_row_seek:\n");
 	printf("\n");
 
 
