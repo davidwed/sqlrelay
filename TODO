@@ -1,5 +1,5 @@
-ADODB - have a driver, just need to incorporate it
-add pkgconfig stuff
+ADODB and Pear DB interfaces
+Pear DB interface license
 scaling/handoff=pass incompatibility
 
 oldmysql test files for non-C++ api's

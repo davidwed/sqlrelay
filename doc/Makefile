@@ -42,8 +42,8 @@ install:
 	$(INSTALL) -m 644 api/c/sqlrclientwrapper.h.html $(docdir)/api/c
 	$(INSTALL) -m 644 api/c++/sqlrclient.h.html $(docdir)/api/c++
 	$(INSTALL) -m 644 api/perl/perl.html $(docdir)/api/perl
-	$(INSTALL) -m 644 api/perl/SQLRConnection.html $(docdir)/api/perl
-	$(INSTALL) -m 644 api/perl/SQLRCursor.html $(docdir)/api/perl
+	$(INSTALL) -m 644 api/perl/Connection.html $(docdir)/api/perl
+	$(INSTALL) -m 644 api/perl/Cursor.html $(docdir)/api/perl
 	$(INSTALL) -m 644 api/perl/SQLRelay.html $(docdir)/api/perl
 	$(INSTALL) -m 644 api/php/doc.html $(docdir)/api/php
 	$(INSTALL) -m 644 api/python/PySQLRClient.py.html $(docdir)/api/python
