@@ -188,6 +188,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) */*.o
 	$(RMTREE) */.libs
+	$(RMTREE) .libs
 
 rebuild: clean all
 
