@@ -231,7 +231,7 @@ int sqlrcursor::fetchRowIntoBuffer(int row) {
 				sqlrc->cs->write(cursorid);
 			}
 
-			if (skipAndFetch(row)==-1 || parseData()==-1) {
+			if (!skipAndFetch(row) || !parseData()) {
 				return -1;
 			}
 

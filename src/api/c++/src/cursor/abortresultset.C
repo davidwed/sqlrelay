@@ -41,7 +41,7 @@ void sqlrcursor::abortResultSet() {
 				// it hits the end of the result set, but
 				// if it or skipAndFetch return a -1 (network
 				// error) we'll have to call it ourselves.
-				if (skipAndFetch(-1)==-1 || parseData()==-1) {
+				if (!skipAndFetch(-1) || !parseData()) {
 					finishCaching();
 					return;
 				}
