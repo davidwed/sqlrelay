@@ -1,9 +1,9 @@
 perl apis -> CPAN
 
-suse-9.0
-	DESTDIR problem with ruby
+fedora-core-1
+	rpm fails - sqlite problem
 
-fedora-core-1 isn't set up
+fedora-core-2 isn't set up
 suse-9.1 isn't set up
 
 --------------------------------------------------------------------------------
@@ -163,6 +163,7 @@ Packages:
 	Unixware/OpenUnix
 
 Features:
+	use PAM if possible as alternative to defining users in sqlrelay.conf
 	support stored procedures that return result sets in
 		sybase, interbase, db2
 	support non-string output binds sybase stored procedures
