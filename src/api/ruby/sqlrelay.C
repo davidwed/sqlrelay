@@ -687,7 +687,6 @@ static VALUE sqlrcur_getFieldAsDouble(VALUE self, VALUE row, VALUE col) {
 static VALUE sqlrcur_getFieldLength(VALUE self, VALUE row, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	char	*result;
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
 		return INT2NUM((int)sqlrcur->getFieldLength(NUM2INT(row),
 								STR2CSTR(col)));
