@@ -1,8 +1,6 @@
 test finished-suspended-result-set's with oracle/db2/sybase/freetds
 slackware package build isn't right
 
-document oracle 8.0/8i temp-blob compile flag
-
 db2 start/stop doesn't work
 	db2start/db2stop works when run as a given instance owner
 
@@ -75,8 +73,6 @@ Documentation:
 	performance benchmark charts
 	HOWTO for linuxdoc.org
 	man pages for everything
-	document checkForTempTable()
-	fix clientapis.html
 	oracle 9.2 installation
 
 Performance/Code Enhancements:

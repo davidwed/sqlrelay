@@ -51,7 +51,7 @@
 #define END_LONG_DATA 3
 #define CURSOR_DATA 4
 
-#define END_BIND_VARS 5
+#define END_BIND_VARS 5 
 
 #define DONT_RE_EXECUTE 0
 #define RE_EXECUTE 1

@@ -714,6 +714,9 @@ mycursor::~mycursor() {
 
 <B><FONT color=#288850>int</FONT></B>     mycursor::executeQuery(<B><FONT color=#288850>char</FONT></B> *query, <B><FONT color=#288850>long</FONT></B> length) {
 
+	... check for a query that creates a temporary
+	    table if your database supports them ...
+
 	... set row and column counts to 0 ...
 
         Note: Some databases have a 3 step query
@@ -748,6 +751,8 @@ mycursor::~mycursor() {
 
 <font color="#288850"><b>int</b></font>     mysqlcursor::executeQuery(<font color="#288850"><b>const</b></font> <font color="#288850"><b>char</b></font> *query, <font color="#288850"><b>long</b></font> length,
                                                 <font color="#288850"><b>unsigned</b></font> <font color="#288850"><b>short</b></font> execute) {
+
+        checkForTempTable(query,length);
 
         <font color="#0000f8">// initialize counts</font>
         ncols=<font color="#f800f8">0</font>;
@@ -945,91 +950,136 @@ mycursor::~mycursor() {
                 <font color="#a02828"><b>return</b></font>;
         }
 
-        <font color="#0000f8">// a useful variable</font>
-        <font color="#288850"><b>int</b></font>     type;
+        <font color="#0000ff">// some useful variables</font>
+        <font color="#2e8b57"><b>int</b></font>     type;
+        <font color="#2e8b57"><b>int</b></font>     length;
 
-        <font color="#0000f8">// position ourselves at the first field</font>
-        mysql_field_seek(mysqlresult,<font color="#f800f8">0</font>);
+        <font color="#0000ff">// position ourselves at the first field</font>
+        mysql_field_seek(mysqlresult,<font color="#ff00ff">0</font>);
 
-        <font color="#0000f8">// for each column...</font>
-        <font color="#a02828"><b>for</b></font> (<font color="#288850"><b>int</b></font> i=<font color="#f800f8">0</font>; i&lt;ncols; i++) {
+        <font color="#0000ff">// for each column...</font>
+        <font color="#a52a2a"><b>for</b></font> (<font color="#2e8b57"><b>int</b></font> i=<font color="#ff00ff">0</font>; i&lt;ncols; i++) {
 
-                <font color="#0000f8">// fetch the field</font>
+                <font color="#0000ff">// fetch the field</font>
                 mysqlfield=mysql_fetch_field(mysqlresult);
 
-                <font color="#0000f8">// append column type to the header</font>
-                <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_STRING) {
+                <font color="#0000ff">// append column type to the header</font>
+                <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_STRING) {
                         type=STRING_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_VAR_STRING) {
+                        length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_VAR_STRING) {
                         type=CHAR_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_DECIMAL) {
+                        length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length+<font color="#ff00ff">1</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_DECIMAL) {
                         type=DECIMAL_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_TINY) {
+                        <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;decimals&gt;<font color="#ff00ff">0</font>) {
+                                length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length+<font color="#ff00ff">2</font>;
+                        } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;decimals==<font color="#ff00ff">0</font>) {
+                                length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length+<font color="#ff00ff">1</font>;
+                        }
+                        <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;length&lt;mysqlfield-&gt;decimals) {
+                                length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;decimals+<font color="#ff00ff">2</font>;
+                        }
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_TINY) {
                         type=TINYINT_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_SHORT) {
+                        length=<font color="#ff00ff">1</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_SHORT) {
                         type=SMALLINT_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_LONG) {
+                        length=<font color="#ff00ff">2</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_LONG) {
                         type=INT_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_FLOAT) {
+                        length=<font color="#ff00ff">4</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_FLOAT) {
                         type=FLOAT_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_DOUBLE) {
+                        <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;length&lt;=<font color="#ff00ff">24</font>) {
+                                length=<font color="#ff00ff">4</font>;
+                        } <font color="#a52a2a"><b>else</b></font> {
+                                length=<font color="#ff00ff">8</font>;
+                        }
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_DOUBLE) {
                         type=REAL_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_LONGLONG) {
+                        length=<font color="#ff00ff">8</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_LONGLONG) {
                         type=BIGINT_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_INT24) {
+                        length=<font color="#ff00ff">8</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_INT24) {
                         type=MEDIUMINT_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_TIMESTAMP) {
+                        length=<font color="#ff00ff">3</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_TIMESTAMP) {
                         type=TIMESTAMP_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_DATE) {
+                        length=<font color="#ff00ff">4</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_DATE) {
                         type=DATE_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_TIME) {
+                        length=<font color="#ff00ff">3</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_TIME) {
                         type=TIME_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_DATETIME) {
+                        length=<font color="#ff00ff">3</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_DATETIME) {
                         type=DATETIME_DATATYPE;
-<font color="#a020f0">#if MYSQL_VERSION_ID&gt;=</font><font color="#f800f8">32200</font>
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_YEAR) {
+                        length=<font color="#ff00ff">8</font>;
+<font color="#a020f0">#if MYSQL_VERSION_ID&gt;=</font><font color="#ff00ff">32200</font>
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_YEAR) {
                         type=YEAR_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_NEWDATE) {
+                        length=<font color="#ff00ff">1</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_NEWDATE) {
                         type=NEWDATE_DATATYPE;
+                        length=<font color="#ff00ff">1</font>;
 <font color="#a020f0">#endif</font>
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_NULL) {
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_NULL) {
                         type=NULL_DATATYPE;
 <font color="#a020f0">#ifdef MYSQL_VERSION_ID</font>
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_ENUM) {
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_ENUM) {
                         type=ENUM_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_SET) {
+                        <font color="#0000ff">// 1 or 2 bytes delepending on the # of enum values</font>
+                        <font color="#0000ff">// (65535 max)</font>
+                        length=<font color="#ff00ff">2</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_SET) {
                         type=SET_DATATYPE;
+                        <font color="#0000ff">// 1,2,3,4 or 8 bytes delepending on the # of members</font>
+                        <font color="#0000ff">// (64 max)</font>
+                        length=<font color="#ff00ff">8</font>;
 <font color="#a020f0">#endif</font>
-                <font color="#0000f8">// For some reason, tinyblobs, mediumblobs and longblobs</font>
-                <font color="#0000f8">// all show up as FIELD_TYPE_BLOB despite field types being</font>
-                <font color="#0000f8">// defined for those types.  tinyblobs have a length</font>
-                <font color="#0000f8">// of 255 though, so that can be used for something.  medium</font>
-                <font color="#0000f8">// and long blobs both have the same length though.  Go</font>
-                <font color="#0000f8">// figure.  Also, the word TEXT and BLOB appear to be</font>
-                <font color="#0000f8">// interchangable.  We'll use BLOB because it appears to be</font>
-                <font color="#0000f8">// more standard than TEXT.  I wonder if this will be changed</font>
-                <font color="#0000f8">// in a future incarnation of mysql.  I also wonder what</font>
-                <font color="#0000f8">// happens on a 64 bit machine.</font>
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_TINY_BLOB) {
+                <font color="#0000ff">// For some reason, tinyblobs, mediumblobs and longblobs</font>
+                <font color="#0000ff">// all show up as FIELD_TYPE_BLOB despite field types being</font>
+                <font color="#0000ff">// defined for those types.  tinyblobs have a length</font>
+                <font color="#0000ff">// of 255 though, so that can be used for something.  medium</font>
+                <font color="#0000ff">// and long blobs both have the same length though.  Go</font>
+                <font color="#0000ff">// figure.  Also, the word TEXT and BLOB appear to be</font>
+                <font color="#0000ff">// interchangable.  We'll use BLOB because it appears to be</font>
+                <font color="#0000ff">// more standard than TEXT.  I wonder if this will be changed</font>
+                <font color="#0000ff">// in a future incarnation of mysql.  I also wonder what</font>
+                <font color="#0000ff">// happens on a 64 bit machine.</font>
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_TINY_BLOB) {
                         type=TINY_BLOB_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_MEDIUM_BLOB) {
+                        length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length+<font color="#ff00ff">2</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_MEDIUM_BLOB) {
                         type=MEDIUM_BLOB_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_LONG_BLOB) {
+                        length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length+<font color="#ff00ff">3</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_LONG_BLOB) {
                         type=LONG_BLOB_DATATYPE;
-                } <font color="#a02828"><b>else</b></font> <font color="#a02828"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_BLOB) {
-                        <font color="#a02828"><b>if</b></font> ((<font color="#288850"><b>int</b></font>)mysqlfield-&gt;length==<font color="#f800f8">255</font>) {
+                        length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length+<font color="#ff00ff">4</font>;
+                } <font color="#a52a2a"><b>else</b></font> <font color="#a52a2a"><b>if</b></font> (mysqlfield-&gt;type==FIELD_TYPE_BLOB) {
+                        <font color="#a52a2a"><b>if</b></font> ((<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length==<font color="#ff00ff">255</font>) {
                                 type=TINY_BLOB_DATATYPE;
-                        } <font color="#a02828"><b>else</b></font> {
+                                length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length+<font color="#ff00ff">2</font>;
+                        } <font color="#a52a2a"><b>else</b></font> {
                                 type=BLOB_DATATYPE;
+                                length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length+<font color="#ff00ff">3</font>;
                         }
-                } <font color="#a02828"><b>else</b></font> {
+                } <font color="#a52a2a"><b>else</b></font> {
                         type=UNKNOWN_DATATYPE;
+                        length=(<font color="#2e8b57"><b>int</b></font>)mysqlfield-&gt;length;
                 }
 
-                <font color="#0000f8">// send column definition</font>
+                <font color="#0000ff">// send column definition</font>
+                <font color="#0000ff">// for mysql, length is actually precision</font>
                 conn-&gt;sendColumnDefinition(mysqlfield-&gt;name,
                                         strlen(mysqlfield-&gt;name),
-                                        type,(<font color="#288850"><b>int</b></font>)mysqlfield-&gt;length);
+                                        type,length,
+                                        mysqlfield-&gt;length,
+                                        mysqlfield-&gt;decimals,
+                                        !(IS_NOT_NULL(mysqlfield-&gt;flags)),
+                                        IS_PRI_KEY(mysqlfield-&gt;flags),<font color="#ff00ff">0</font>);
         }
 }
 
@@ -1152,6 +1202,12 @@ mycursor::~mycursor() {
 	... if you allocated any memory between
             getting the query and returning the
             result set, deallocate it here ...
+
+	... Note, this method shouldn't arbitrarily
+	    deallocate memory.  It is possible that
+	    it might be called before the first
+	    query has been run, after a query failed
+	    to run, etc. ...
 }
 
 </pre>

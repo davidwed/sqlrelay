@@ -155,7 +155,7 @@ int	sqlrcursor::parseColumnInfo() {
 					return -1;
 				}
 
-				// get the column data
+				// get the column type
 				currentcol->typestring=new
 					char[currentcol->typestringlength+1];
 				currentcol->typestring[
@@ -231,7 +231,10 @@ int	sqlrcursor::parseColumnInfo() {
 					sqlrc->debugPrint("NOT NULL ");
 				}
 				if ((long)currentcol->primarykey) {
-					sqlrc->debugPrint("Primary Key");
+					sqlrc->debugPrint("Primary Key ");
+				}
+				if ((long)currentcol->primarykey) {
+					sqlrc->debugPrint("Unique");
 				}
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
