@@ -159,10 +159,10 @@ rm /extraswap</b>
 <span class="heading3">Configure the Kernel</span><br>
 
 <p>Oracle recommends that you configure your kernel to support more and larger
-shared memory segments and semaphores.  With few exceptions, I haven't needed
-to do this to get the installation to complete or to run a small development
-database.  However, if you like, you can temporarily increase the maximum
-shared memory size to 1G as follows:</p>
+shared memory segments and semaphores.  Oracle 9i requires that you at least
+temporarily increase the maximum shared memory segment size for installation.
+To temporarily increase the maximum shared memory segment size, follow these
+instructions:</p>
 
 <blockquote>
 <b>echo `expr 1024 \* 1024 \* 1024` > /proc/sys/kernel/shmmax</b>
