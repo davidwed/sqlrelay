@@ -1,12 +1,13 @@
 #include <rudiments/environment.h>
 #include <pqdefinitions.h>
 
+// FIXME: support encodings other than UTF8
+
 extern "C" {
 
 int translateEncoding(const char *encoding) {
-	//printf("translateEncoding: %s\n",encoding);
+	// translate "encoding" into an encoding id
 	if (encoding) {
-		// FIXME: support other encodings
 		if (!strcmp(encoding,"UTF8")) {
 			return PG_UTF8;
 		}
@@ -15,14 +16,13 @@ int translateEncoding(const char *encoding) {
 }
 
 int PQmblen(const unsigned char *s, int encoding) {
-	//printf("PQmblem\n");
 	// determine length of multibyte encoded char at *s
-	// FIXME: support other encodings
 	return 1;
 }
 
 int PQenv2encoding(void) {
-	//printf("PQenv2encoding\n");
+	// get value of PGCLIENTENCODING environment variable
+	// and translate it to an encoding ID
 	environment	env;
 	return translateEncoding(env.getValue("PGCLIENTENCODING"));
 }

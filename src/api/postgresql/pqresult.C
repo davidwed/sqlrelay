@@ -39,8 +39,6 @@ int	queryIsNotSelect(const char *querybuffer) {
 }
 
 void PQclear(PGresult *res) {
-	//printf("PQclear\n");
-
 	if (res) {
 		res->parent->nonblockingmode=res->previousnonblockingmode;
 		delete res->sqlrcur;
@@ -49,7 +47,6 @@ void PQclear(PGresult *res) {
 }
 
 PGresult *PQexec(PGconn *conn, const char *query) {
-	//printf("PQexec\n");
 
 	PGresult	*result=new PGresult;
 	result->parent=conn;
@@ -86,13 +83,11 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 }
 
 ExecStatusType PQresultStatus(const PGresult *res) {
-	//printf("PQresultStatus\n");
-	// FIXME: what should I return if res is NULL
+	// FIXME: I'm not sure I should return PGRES_FATAL_ERROR if res is NULL
 	return (res)?res->execstatus:PGRES_FATAL_ERROR;
 }
 
 char *PQresStatus(ExecStatusType status) {
-	//printf("PQresStatus\n");
 
 	// need to test these out for real to be sure what should be returned
 	if (status==PGRES_EMPTY_QUERY) {
@@ -116,34 +111,28 @@ char *PQresStatus(ExecStatusType status) {
 }
 
 char *PQresultErrorMessage(const PGresult *res) {
-	//printf("PQresultErrorMessage\n");
 	return res->sqlrcur->errorMessage();
 }
 
 
 int PQntuples(const PGresult *res) {
-	//printf("PQntuples\n");
 	return res->sqlrcur->rowCount();
 }
 
 int PQnfields(const PGresult *res) {
-	//printf("PQnfields\n");
 	return res->sqlrcur->colCount();
 }
 
 int PQbinaryTuples(const PGresult *res) {
-	//printf("PQbinaryTuples\n");
 	// return 1 if result set contains binary data, 0 otherwise
 	return 1;
 }
 
 char *PQfname(const PGresult *res, int field_num) {
-	//printf("PQfname\n");
 	return res->sqlrcur->getColumnName(field_num);
 }
 
 int PQfnumber(const PGresult *res, const char *field_name) {
-	//printf("PQfnumber\n");
 	for (int i=0; i<res->sqlrcur->colCount(); i++) {
 		if (!strcmp(field_name,res->sqlrcur->getColumnName(i))) {
 			return i;
@@ -153,22 +142,20 @@ int PQfnumber(const PGresult *res, const char *field_name) {
 }
 
 Oid PQftype(const PGresult *res, int field_num) {
-	//printf("PQftype\n");
 	return atoi(res->sqlrcur->getColumnType(field_num));
 }
 
 int PQfsize(const PGresult *res, int field_num) {
-	//printf("PQfsize\n");
 	return res->sqlrcur->getColumnLength(field_num);
 }
 
 int PQfmod(const PGresult *res, int field_num) {
-	//printf("PQfmod badly implemented\n");
+	// this should return the "type-specific modifier" for a field, like
+	// for char fields, the number of characters
 	return -1;
 }
 
 char *PQcmdStatus(PGresult *res) {
-	//printf("PQcmdStatus badly implemented\n");
 	// should return a string represeting the "command type" like:
 	//	SELECT, INSERT, UPDATE, DROP, etc.
 	if (res->queryisnotselect) {
@@ -179,44 +166,37 @@ char *PQcmdStatus(PGresult *res) {
 }
 
 char *PQoidStatus(const PGresult *res) {
-	//printf("PQoidStatus badly implemented\n");
 	// return OID of tuple if query was an insert,
 	// otherwise return InvalidOid
 	return "InvalidOid";
 }
 
 Oid PQoidValue(const PGresult *res) {
-	//printf("PQoidValue badly implemented\n");
 	// return OID of tuple if query was an insert,
 	// otherwise return InvalidOid
 	return InvalidOid;
 }
 
 char *PQcmdTuples(PGresult *res) {
-	//printf("PQcmdTuples\n");
 	return string::parseNumber((long)res->sqlrcur->affectedRows());
 }
 
 char *PQgetvalue(const PGresult *res, int tup_num, int field_num) {
-	//printf("PQgetvalue\n");
 	return res->sqlrcur->getField(tup_num,field_num);
 }
 
 int PQgetlength(const PGresult *res, int tup_num, int field_num) {
-	//printf("PQgetlength\n");
 	return res->sqlrcur->getFieldLength(tup_num,field_num);
 }
 
 int PQgetisnull(const PGresult *res, int tup_num, int field_num) {
-	//printf("PQgetisnull\n");
 	return (res->sqlrcur->getField(tup_num,field_num)==(char *)NULL);
 }
 
-// Make an empty PGresult with given status (some apps find this
-// useful). If conn is not NULL and status indicates an error, the
-// conn's errorMessage is copied.
 PGresult *PQmakeEmptyPGresult(PGconn *conn, ExecStatusType status) {
-	//printf("PQmakeEmptyPGresult\n");
+	// Make an empty PGresult with given status (some apps find this
+	// useful). If conn is not NULL and status indicates an error, the
+	// conn's errorMessage is copied.
 	PGresult	*result=new PGresult;
 	result->sqlrcur=NULL;
 	result->execstatus=status;
