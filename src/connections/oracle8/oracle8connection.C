@@ -15,13 +15,11 @@
 #endif
 
 oracle8connection::oracle8connection() {
-
+	stringbindvaluelength=MAX_STRING_BIND_VALUE_SIZE;
 	statementmode=OCI_DEFAULT;
-
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
 #endif
-
 	environ=new environment();
 }
 

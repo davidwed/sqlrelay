@@ -8,6 +8,8 @@
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	4096
 
+#define MAX_STRING_BIND_VALUE_SIZE	32767
+
 #define NUM_CONNECT_STRING_VARS 5
 
 #include <rudiments/environment.h>
