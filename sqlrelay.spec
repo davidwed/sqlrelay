@@ -413,7 +413,7 @@ rm -rf %{buildroot}
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.conf.example
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
 %config(noreplace) %attr(600, root, root) /etc/sysconfig/sqlrelay
-/etc/init.d/sqlrelay
+/etc/rc.d/init.d/sqlrelay
 %{_bindir}/sqlr-cachemanager
 %{_bindir}/sqlr-listener
 %{_bindir}/sqlr-listener-debug
