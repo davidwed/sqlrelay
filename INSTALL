@@ -85,17 +85,3 @@ RPM INSTALL:
 	command as root:
 
 		rpm -i --nodeps sqlrelay-*
-
-SLACKWARE INSTALL:
-
-	If you are a Slackware user, you can build a tgz of SQL Relay by
-	running the following command as root:
-
-		make tgz
-
-	answer y to both questions it asks you.
-
-	This will generate sqlrelay-xxx.tgz in the current directory which
-	can be installed using the command:
-
-		installpkg sqlrelay-*.tgz

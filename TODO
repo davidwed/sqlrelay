@@ -1,4 +1,4 @@
-mysql 4 has mysqld_safe instead of safe_mysqld
+perl api's still need -L$(libdir) -lsqlrclient
 
 test finished-suspended-result-set's with oracle/db2/sybase/freetds
 
@@ -33,7 +33,6 @@ handle temp tables properly:
 		are they truncated???
 	interbase: ???
 
-
 Tests:
 	zope
 	tcl
@@ -66,8 +65,6 @@ Compatibility:
 		ruby module segfaults
 		python api methods that call PyArg_ParseTuple with an "O"
 			argument don't work, not exactly sure why
-	openbsd:
-		postgresql drop-in library won't install
 
 Documentation:
 	getting started docs for MS SQL Server
@@ -79,6 +76,7 @@ Documentation:
 	HOWTO for linuxdoc.org
 	man pages for everything
 	oracle 9.2 installation
+	mysql 4 installation
 
 Performance/Code Enhancements:
 	make some methods that return int return bool

@@ -157,7 +157,7 @@ dnl now, run though some other paths
 if ( test -z "$LIBSTRING" )
 then
 
-	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/local/firstworks"
+	for paths in "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/local/firstworks"
 	do
 		if ( test -n "$paths" )
 		then
