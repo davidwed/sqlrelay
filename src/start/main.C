@@ -155,7 +155,8 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 			if (!startConnection(strace,cfgfile->getDbase(),
 					id,csc->getConnectionId(),
 					config,localstatedir,connectiondebug)) {
-				return false;
+				// it's ok if at least 1 connection started up
+				return (totalstarted>0 || i>0);
 			}
 			snooze::macrosnooze(1);
 		}
