@@ -264,8 +264,8 @@ bool db2cursor::executeQuery(const char *query, long length, bool execute) {
 
 	// initialize counts
 	ncols=0;
-	row=0;
-	maxrow=0;
+	rowgroupindex=0;
+	totalinrowgroup=0;
 	totalrows=0;
 
 	// execute the query
@@ -363,7 +363,6 @@ bool db2cursor::executeQuery(const char *query, long length, bool execute) {
 		// bind the column to a buffer
 		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 				field[i],MAX_ITEM_BUFFER_SIZE,
-				//indicator[i]);
 				(SQLINTEGER *)&indicator[i]);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
@@ -500,7 +499,7 @@ bool db2cursor::noRowsToReturn() {
 
 bool db2cursor::skipRow() {
 	if (fetchRow()) {
-		row++;
+		rowgroupindex++;
 		return true;
 	}
 	return false;
@@ -508,38 +507,50 @@ bool db2cursor::skipRow() {
 
 bool db2cursor::fetchRow() {
 
-	if (row==FETCH_AT_ONCE) {
-		row=0;
+	if (rowgroupindex==FETCH_AT_ONCE) {
+		rowgroupindex=0;
 	}
-	if (row>0 && row==maxrow) {
+	if (rowgroupindex>0 && rowgroupindex==totalinrowgroup) {
 		return false;
 	}
-	if (!row) {
-		SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
+	if (!rowgroupindex) {
 
-
-#if (DB2VERSION==8)
-		// An apparant bug in version 8.1 causes the
-		// SQL_ATTR_ROW_NUMBER to always be 1, running through the row
-		// status buffer appears to work.
-		for (rownumber=0; rownumber<FETCH_AT_ONCE; rownumber++) {
-			if (rowstat[rownumber]!=SQL_SUCCESS && 
-				rowstat[rownumber]!=SQL_SUCCESS_WITH_INFO) {
-				break;
-			}
+		// SQLFetchScroll should return SQL_SUCCESS or
+		// SQL_SUCCESS_WITH_INFO if it successfully fetched a group of
+		// rows, otherwise we're at the end of the result and there are
+		// no more rows to fetch.
+		SQLRETURN	result=SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
+		if (result!=SQL_SUCCESS && result!=SQL_SUCCESS_WITH_INFO) {
+			// there are no more rows to be fetched
+			return false;
 		}
 
-		// FIXME: is this right?
-		rownumber=rownumber+totalrows;	// 20040225 by akaishi
+		// Determine the current rownumber
+#if (DB2VERSION==8)
+		// An apparant bug in version 8.1 causes the
+		// SQL_ATTR_ROW_NUMBER to always be 1, running through
+		// the row status buffer appears to work.
+		int	index=0;
+		while (index<FETCH_AT_ONCE &&
+			(rowstat[index]==SQL_SUCCESS ||
+			rowstat[index]==SQL_SUCCESS_WITH_INFO)) {
+			index++;
+		}
+		rownumber=totalrows+index;
 #else
 		SQLGetStmtAttr(stmt,SQL_ATTR_ROW_NUMBER,
 				(SQLPOINTER)&rownumber,0,NULL);
 #endif
 
+		// In the event that there's a bug in SQLFetchScroll and it
+		// returns SQL_SUCCESS or SQL_SUCCESS_WITH_INFO even if we were
+		// at the end of the result set and there were no more rows to
+		// fetch, this will also catch the end of the result set.
+		// I think there was a bug like that in DB2 version 7.2.
 		if (rownumber==totalrows) {
 			return false;
 		}
-		maxrow=rownumber-totalrows;
+		totalinrowgroup=rownumber-totalrows;
 		totalrows=rownumber;
 	}
 	return true;
@@ -550,14 +561,15 @@ void db2cursor::returnRow() {
 	for (int index=0; index<ncols; index++) {
 
 		// handle a null field
-		if (indicator[index][row]==SQL_NULL_DATA) {
+		if (indicator[index][rowgroupindex]==SQL_NULL_DATA) {
 			conn->sendNullField();
 			continue;
 		}
 
 		// handle a non-null field
-		conn->sendField(field[index][row],indicator[index][row]);
+		conn->sendField(field[index][rowgroupindex],
+				indicator[index][rowgroupindex]);
 	}
 
-	row++;
+	rowgroupindex++;
 }

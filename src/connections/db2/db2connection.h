@@ -85,8 +85,8 @@ class db2cursor : public sqlrcursor {
 #endif
 		column 		col[MAX_SELECT_LIST_SIZE];
 
-		int		row;
-		int		maxrow;
+		int		rowgroupindex;
+		int		totalinrowgroup;
 		int		totalrows;
 		int		rownumber;
 
