@@ -8,12 +8,12 @@ LIBS = $(MYSQLLIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil 
 DEBUGLIBS = $(MYSQLLIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= mysqlconnection.C main.C
-LOBJS= mysqlconnection.lo main.lo
+NLOBJS= mysqlconnection.n.lo main.n.lo
 PLOBJS= mysqlconnection.p.lo main.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -29,8 +29,8 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-mysql: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(MYSQLSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
+sqlr-connection-mysql: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(MYSQLSTATIC) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS)
 
 sqlr-connection-mysql-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(MYSQLSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)

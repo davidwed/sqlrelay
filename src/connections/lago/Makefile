@@ -8,12 +8,12 @@ LIBS = $(LAGOLIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $
 DEBUGLIBS = $(LAGOLIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(NSLLIB) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= lagoconnection.C main.C
-LOBJS= lagoconnection.lo main.lo
+NLOBJS= lagoconnection.n.lo main.n.lo
 PLOBJS= lagoconnection.p.lo main.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -29,8 +29,8 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-lago: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
+sqlr-connection-lago: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ $(NLOBJS) $(LIBS)
 
 sqlr-connection-lago-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)

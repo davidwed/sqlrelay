@@ -6,12 +6,12 @@ INSTALL = $(top_builddir)/install-sh -c
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../../ -I../include -I../../../common $(RUDIMENTSINCLUDES)
 
 SRCS = row.C sqlrclient.C
-LOBJS = row.lo sqlrclient.lo
+NLOBJS = row.n.lo sqlrclient.n.lo
 PLOBJS = row.p.lo sqlrclient.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -26,8 +26,8 @@ clean:
 
 rebuild: clean all
 
-libsqlrclient.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+libsqlrclient.la: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 libsqlrclient_p.la: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)

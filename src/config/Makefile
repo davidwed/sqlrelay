@@ -8,12 +8,12 @@ LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 DEBUGLIBS = $(RUDIMENTSDEBUGLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS= configfile.C gtkfe.C
-LOBJS= configfile.lo gtkfe.lo
+NLOBJS= configfile.n.lo gtkfe.n.lo
 PLOBJS= configfile.p.lo gtkfe.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -29,8 +29,8 @@ clean:
 
 rebuild: clean all
 
-sqlr-config-gtk: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) `$(GTKCONFIG) --libs` $(LIBS)
+sqlr-config-gtk: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(NLOBJS) `$(GTKCONFIG) --libs` $(LIBS)
 
 sqlr-config-gtk-debug: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) `$(GTKCONFIG) --libs` $(DEBUGLIBS)

@@ -6,12 +6,12 @@ INSTALL = $(top_builddir)/install-sh -c
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../ -I../common -I../util $(RUDIMENTSINCLUDES)
 
 SRCS = sqlrconnection.C connection/connectioncmdline.C connection/ipc.C connection/listenercomm.C connection/scalercomm.C connection/unixsocketseqfile.C sqlrcursor.C
-LOBJS = sqlrconnection.lo connection/connectioncmdline.lo connection/ipc.lo connection/listenercomm.lo connection/scalercomm.lo connection/unixsocketseqfile.lo sqlrcursor.lo
+NLOBJS = sqlrconnection.n.lo connection/connectioncmdline.n.lo connection/ipc.n.lo connection/listenercomm.n.lo connection/scalercomm.n.lo connection/unixsocketseqfile.n.lo sqlrcursor.n.lo
 PLOBJS = sqlrconnection.p.lo connection/connectioncmdline.p.lo connection/ipc.p.lo connection/listenercomm.p.lo connection/scalercomm.p.lo connection/unixsocketseqfile.p.lo sqlrcursor.p.lo
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -28,8 +28,8 @@ clean:
 
 rebuild: clean all
 
-libsqlrconnection.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
+libsqlrconnection.la: $(SRCS) $(NLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(NLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 libsqlrconnection_p.la: $(SRCS) $(PLOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)

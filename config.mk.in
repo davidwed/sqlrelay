@@ -39,8 +39,8 @@ STATICLINK = @STATICLINK@
 # debug and optimization flags (-g, -O2, etc.)
 CXXFLAGS = -pedantic @CXXFLAGS@
 CFLAGS = -pedantic @CFLAGS@
-DEBUGCXXFLAGS = -pedantic @DEBUGCXXFLAGS@
-DEBUGCFLAGS = -pedantic @DEBUGCFLAGS@
+DEBUGCXXFLAGS = -pedantic @DEBUGCXXFLAGS@ -DSERVER_DEBUG
+DEBUGCFLAGS = -pedantic @DEBUGCFLAGS@ -DSERVER_DEBUG
 
 # libtool command
 LIBTOOL = @LIBTOOL@

@@ -7,9 +7,9 @@ CPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir
 LIBS = -L../util -lsqlrutil -L../api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 DEBUGLIBS = -L../util -lsqlrutil_p -L../api/c++/src -lsqlrclient_p $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-.SUFFIXES: .lo .p.lo
+.SUFFIXES: .n.lo .p.lo
 
-.C.lo:
+.C.n.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 .C.p.lo:
@@ -29,23 +29,23 @@ clean:
 
 rebuild: clean all
 
-query: query.C query.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.lo $(LIBS)
+query: query.C query.n.lo
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.n.lo $(LIBS)
 
 query-debug: query.C query.p.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.p.lo $(DEBUGLIBS)
 
-fields: fields.C fields.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.lo $(LIBS)
+fields: fields.C fields.n.lo
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.n.lo $(LIBS)
 
 fields-debug: fields.C fields.p.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.p.lo $(DEBUGLIBS)
 
-sqlrsh: sqlrsh.C sqlrsh.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIB)
+sqlrsh: sqlrsh.C sqlrsh.n.lo
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.n.lo $(LIBS) $(READLINELIB)
 
 sqlrsh-debug: sqlrsh.C sqlrsh.p.lo
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(DEBUGLIBS) $(READLINELIB)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.p.lo $(DEBUGLIBS) $(READLINELIB)
 
 install:
 	$(top_builddir)/mkinstalldirs $(bindir)

@@ -39,10 +39,10 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 			sqlrconnection();
 		virtual	~sqlrconnection();
 
-			int	initConnection(int argc, const char **argv,
+		int	initConnection(int argc, const char **argv,
 						int detachbeforeloggingin);
-			void	listen();
-			void	closeConnection();
+		void	listen();
+		void	closeConnection();
 
 
 	protected:
@@ -57,7 +57,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual unsigned short	autoCommitOff();
 		virtual int	commit();
 		virtual int	rollback();
-		virtual int	ping()=0;
+		virtual int	ping();
 		virtual char	*identify()=0;
 		virtual sqlrcursor	*initCursor()=0;
 		virtual void	deleteCursor(sqlrcursor *curs)=0;
@@ -73,117 +73,114 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual char	*getPassword();
 
 	public:
-			// methods used by derived classes
-			char	*connectStringValue(const char *variable);
-			void	setAutoCommitBehavior(int ac);
-			int	getAutoCommitBehavior();
-			int	setEnv(const char *var, const char *string,
+		// methods used by derived classes
+		char	*connectStringValue(const char *variable);
+		void	setAutoCommitBehavior(int ac);
+		int	getAutoCommitBehavior();
+		int	setEnv(const char *var, const char *string,
 						const char *pestr);
-			int	sendColumnInfo();
-			void	sendRowCounts(long actual, 
-						long affected);
-			void	sendColumnCount(unsigned long ncols);
-			void	sendColumnTypeFormat(unsigned short format);
-			void	sendColumnDefinition(const char *name, 
+		int	sendColumnInfo();
+		void	sendRowCounts(long actual, long affected);
+		void	sendColumnCount(unsigned long ncols);
+		void	sendColumnTypeFormat(unsigned short format);
+		void	sendColumnDefinition(const char *name, 
 						unsigned short namelen, 
 						unsigned short type, 
 						unsigned long size);
-			void	sendColumnDefinitionString(const char *name, 
+		void	sendColumnDefinitionString(const char *name, 
 						unsigned short namelen, 
 						const char *type, 
 						unsigned short typelen, 
 						unsigned long size);
-			void	sendField(const char *data,
-						unsigned long size);
-			void	sendNullField();
-			void	startSendingLong();
-			void	sendLongSegment(const char *data,
-						unsigned long size);
-			void	endSendingLong();
+		void	sendField(const char *data, unsigned long size);
+		void	sendNullField();
+		void	startSendingLong();
+		void	sendLongSegment(const char *data, unsigned long size);
+		void	endSendingLong();
 
 	private:
-			// methods used internally
-			void	setUserAndGroup();
-			void	createCursorArray();
-			int	initCursors(int create);
-			int	getCursor();
-			int	findAvailableCursor();
-			void	closeCursors(int destroy);
-			void	setUnixSocketDirectory();
-			int	handlePidFile();
-			void	initSharedMemoryAndSemaphoreFileName();
-			int	createSharedMemoryAndSemaphores();
-			void	reLogIn();
-			void	initSession();
-			int	waitForClient();
-			void	clientSession();
-			int	authenticateCommand();
-			void	suspendSessionCommand();
-			void	endSessionCommand();
-			void	pingCommand();
-			void	identifyCommand();
-			void	autoCommitCommand();
-			void	commitCommand();
-			void	rollbackCommand();
-			int	newQueryCommand();
-			int	reExecuteQueryCommand();
-			int	fetchFromBindCursorCommand();
-			int	fetchResultSetCommand();
-			void	abortResultSetCommand();
-			void	suspendResultSetCommand();
-			int	resumeResultSetCommand();
-			void	waitForClientClose();
-			void	closeSuspendedSessionSockets();
-			int	authenticate();
-			int	getUserFromClient();
-			int	getPasswordFromClient();
-			int	connectionBasedAuth(const char *userbuffer,
+		// methods used internally
+		void	setUserAndGroup();
+		void	createCursorArray();
+		int	initCursors(int create);
+		int	getCursor();
+		int	findAvailableCursor();
+		void	closeCursors(int destroy);
+		void	setUnixSocketDirectory();
+		int	handlePidFile();
+		void	initSharedMemoryAndSemaphoreFileName();
+		int	createSharedMemoryAndSemaphores();
+		void	reLogIn();
+		void	initSession();
+		int	waitForClient();
+		void	clientSession();
+		int	authenticateCommand();
+		void	suspendSessionCommand();
+		void	endSessionCommand();
+		void	pingCommand();
+		void	identifyCommand();
+		void	autoCommitCommand();
+		void	commitCommand();
+		void	rollbackCommand();
+		int	newQueryCommand();
+		int	reExecuteQueryCommand();
+		int	fetchFromBindCursorCommand();
+		int	fetchResultSetCommand();
+		void	abortResultSetCommand();
+		void	suspendResultSetCommand();
+		int	resumeResultSetCommand();
+		void	waitForClientClose();
+		void	closeSuspendedSessionSockets();
+		int	authenticate();
+		int	getUserFromClient();
+		int	getPasswordFromClient();
+		int	connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-			int	databaseBasedAuth(const char *userbuffer,
+		int	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-			int	handleQuery(int reexecute, int reallyexecute);
-			int	getQueryFromClient(int reexecute);
-			void	resumeResultSet();
-			void	suspendSession();
-			void	endSession();
-			int	getCommand(unsigned short *command);
-			void	noAvailableCursors();
-			int	getQuery();
-			int	getInputBinds();
-			int	getOutputBinds();
-			int	getBindVarCount(unsigned short *count);
-			int	getBindVarName(bindvar *bv);
-			int	getBindVarType(bindvar *bv);
-			void	getNullBind(bindvar *bv);
-			int	getBindSize(bindvar *bv, unsigned long maxsize);
-			int	getStringBind(bindvar *bv);
-			int	getLongBind(bindvar *bv);
-			int	getDoubleBind(bindvar *bv);
-			int	getLobBind(bindvar *bv);
-			int	getSendColumnInfo();
-			int	processQuery(int reexecute, int reallyexecute);
-			int	handleBinds();
-			void	commitOrRollback();
-			int	handleError();
-			int	returnError();
-			void	returnResultSet();
-			void	returnOutputBindValues();
-			void	returnResultSetHeader();
-			int	returnResultSetData();
+		int	handleQuery(int reexecute, int reallyexecute);
+		int	getQueryFromClient(int reexecute);
+		void	resumeResultSet();
+		void	suspendSession();
+		void	endSession();
+		int	getCommand(unsigned short *command);
+		void	noAvailableCursors();
+		int	getQuery();
+		int	getInputBinds();
+		int	getOutputBinds();
+		int	getBindVarCount(unsigned short *count);
+		int	getBindVarName(bindvar *bv);
+		int	getBindVarType(bindvar *bv);
+		void	getNullBind(bindvar *bv);
+		int	getBindSize(bindvar *bv, unsigned long maxsize);
+		int	getStringBind(bindvar *bv);
+		int	getLongBind(bindvar *bv);
+		int	getDoubleBind(bindvar *bv);
+		int	getLobBind(bindvar *bv);
+		int	getSendColumnInfo();
+		int	processQuery(int reexecute, int reallyexecute);
+		int	handleBinds();
+		void	commitOrRollback();
+		int	handleError();
+		int	returnError();
+		void	returnResultSet();
+		void	returnOutputBindValues();
+		void	returnResultSetHeader();
+		int	returnResultSetData();
 
-			long	rowsToFetch();
-			long	rowsToSkip();
+		long	rowsToFetch();
+		long	rowsToSkip();
 
-			void	initDatabaseAvailableFileName();
-			void	waitForAvailableDatabase();
-			int	availableDatabase();
-			void	markDatabaseUnavailable();
-			void	markDatabaseAvailable();
+		void	initDatabaseAvailableFileName();
+		void	waitForAvailableDatabase();
+		int	availableDatabase();
+		void	markDatabaseUnavailable();
+		void	markDatabaseAvailable();
 
-			void	blockSignals();
-			int	attemptLogIn();
-			void	setInitialAutoCommitBehavior();
-			int	openSockets();
+		void	blockSignals();
+		int	attemptLogIn();
+		void	setInitialAutoCommitBehavior();
+		int	openSockets();
 
 		connectioncmdline	*cmdl;
 		sqlrconfigfile		*cfgfl;

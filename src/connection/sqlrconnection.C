@@ -158,7 +158,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 	#ifndef SERVER_DEBUG
 		if (detachbeforeloggingin) {
 			// detach from the controlling tty
-			detach();
+			//detach();
 		}
 	#endif
 
@@ -171,7 +171,7 @@ int	sqlrconnection::initConnection(int argc, const char **argv,
 	#ifndef SERVER_DEBUG
 		if (!detachbeforeloggingin) {
 			// detach from the controlling tty
-			detach();
+			//detach();
 		}
 	#endif
 
@@ -617,8 +617,7 @@ void	sqlrconnection::closeConnection() {
 	#endif
 	removeAllFileDescriptors();
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
-						"done removing all sockets");
+	debugPrint("connection",0,"done removing all sockets");
 	#endif
 
 
@@ -628,8 +627,7 @@ void	sqlrconnection::closeConnection() {
 	#endif
 	delete serversockun;
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
-						"done deleting unix socket");
+	debugPrint("connection",0,"done deleting unix socket");
 	#endif
 
 
@@ -638,8 +636,7 @@ void	sqlrconnection::closeConnection() {
 	#endif
 	delete serversockin;
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
-						"done deleting inet socket");
+	debugPrint("connection",0,"done deleting inet socket");
 	#endif
 }
 
@@ -701,8 +698,7 @@ void	sqlrconnection::listen() {
 void	sqlrconnection::waitForAvailableDatabase() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
-				"waiting for available database...");
+	debugPrint("connection",0,"waiting for available database...");
 	#endif
 
 	if (!availableDatabase()) {
@@ -800,8 +796,7 @@ int	sqlrconnection::openSockets() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
-					"done listening on sockets");
+	debugPrint("connection",0,"done listening on sockets");
 	#endif
 
 	return 1;
@@ -824,10 +819,8 @@ int	sqlrconnection::waitForClient() {
 		if (!lsnrcom->receiveFileDescriptor(&descriptor)) {
 
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",1,
-						"pass failed");
-			debugPrint("connection",0,
-						"done waiting for client");
+			debugPrint("connection",1,"pass failed");
+			debugPrint("connection",0,"done waiting for client");
 			#endif
 
 			return -1;
@@ -835,10 +828,8 @@ int	sqlrconnection::waitForClient() {
 		clientsock=new datatransport(descriptor);
 
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,
-						"pass succeeded");
-		debugPrint("connection",0,
-						"done waiting for client");
+		debugPrint("connection",1,"pass succeeded");
+		debugPrint("connection",0,"done waiting for client");
 		#endif
 
 	} else {
@@ -852,14 +843,11 @@ int	sqlrconnection::waitForClient() {
 
 		#ifdef SERVER_DEBUG
 		if (fd>-1) {
-			debugPrint("connection",1,
-							"reconnect succeeded");
+			debugPrint("connection",1,"reconnect succeeded");
 		} else {
-			debugPrint("connection",1,
-							"reconnect failed");
+			debugPrint("connection",1,"reconnect failed");
 		}
-		debugPrint("connection",0,
-						"done waiting for client");
+		debugPrint("connection",0,"done waiting for client");
 		#endif
 
 		if (fd==-1) {
@@ -872,8 +860,7 @@ int	sqlrconnection::waitForClient() {
 void	sqlrconnection::clientSession() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
-						"client session...");
+	debugPrint("connection",0,"client session...");
 	#endif
 
 	// a session consists of getting a query and returning a result set
@@ -962,8 +949,7 @@ void	sqlrconnection::clientSession() {
 	closeSuspendedSessionSockets();
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
-					"done with client session");
+	debugPrint("connection",0,"done with client session");
 	#endif
 }
 
@@ -1003,8 +989,7 @@ int	sqlrconnection::authenticate() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,
-			"authentication was done on listener");
+	debugPrint("connection",1,"authentication was done on listener");
 	#endif
 	return 1;
 }
@@ -2135,8 +2120,7 @@ int	sqlrconnection::getStringBind(bindvar *bv) {
 	bv->isnull=nonNullBindValue();
 
 	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,
-						bv->value.stringval);
+		debugPrint("connection",4,bv->value.stringval);
 	#endif
 
 	return 1;
@@ -2579,8 +2563,7 @@ int	sqlrconnection::returnResultSetData() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-				"done returning result set data");
+	debugPrint("connection",2,"done returning result set data");
 	#endif
 	return 1;
 }
@@ -2588,8 +2571,7 @@ int	sqlrconnection::returnResultSetData() {
 int	sqlrconnection::skipRows(int rows) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-						"skipping rows...");
+	debugPrint("connection",2,"skipping rows...");
 	#endif
 
 	for (int i=0; i<rows; i++) {
@@ -2826,8 +2808,7 @@ int	sqlrconnection::isTransactional() {
 void	sqlrconnection::initSession() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
-					"initializing session...");
+	debugPrint("connection",0,"initializing session...");
 	#endif
 
 	commitorrollback=0;
@@ -2838,16 +2819,14 @@ void	sqlrconnection::initSession() {
 	accepttimeout=5;
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
-					"done initializing session...");
+	debugPrint("connection",0,"done initializing session...");
 	#endif
 }
 
 void	sqlrconnection::commitOrRollback() {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"commit or rollback check...");
+	debugPrint("connection",2,"commit or rollback check...");
 	#endif
 
 	// if the query was a commit or rollback, set a flag indicating so
@@ -2868,8 +2847,7 @@ void	sqlrconnection::commitOrRollback() {
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-				"done with commit or rollback check");
+	debugPrint("connection",2,"done with commit or rollback check");
 	#endif
 }
 
@@ -2929,6 +2907,10 @@ int	sqlrconnection::rollback() {
 	#endif
 
 	return retval;
+}
+
+int	sqlrconnection::ping() {
+	return 1;
 }
 
 void	sqlrconnection::setUser(const char *user) {
