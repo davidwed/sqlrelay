@@ -18,28 +18,53 @@ out what the problem is, let me know at
 
 <p>Unlike previous versions of Sybase ASE, version 12.5 needs to be licensed
 before it can be installed.  If you downloaded Sybase ASE, you should have
-received an email from sybase with a license code in it.  Follow these
-instructions to license Sybase ASE.</p>
+received an email from sybase with a license code in it.  If the email contains
+the following pieces of information, then you have a "real" license:</p>
+
+<ul>
+<li>Order Number</li>
+<li>Feature Name</li>
+<li>Feature Count</li>
+<li>Software Version</li>
+<li>Authorization Code</li>
+</ul>
+
+<p>Otherwise, you have a "demo" license.  A demo license will have an
+expiration date.</p>
+
+<p>Follow these instructions to license Sybase ASE.</p>
 
 <blockquote>
+<p>Log in as root and run /opt/sybase-12.5/install/sybinstall.sh</p>
+<blockquote>
+<b>Note:</b> If you moved /opt/sybase-12.5 to some other directory to save
+space on the /opt partition and then symlinked it back to /opt/sybase-12.5,
+the sybinstall.sh script will fail and report errors.  To solve the problem,
+modify it as follows and re-run it.  Change:
+<blockquote><b>chmod ug+w `find ${SYBASE} -type d -print`</b></blockquote>
+to
+<blockquote><b>chmod ug+w `find ${SYBASE}/ -type d -print`</b></blockquote>
+</blockquote>
 <p>Log in as the sybase user.</p>
-<p>Start the license server by running startd.sh $SYBASE/$SYBASE_SYSAM</p>
-<p>Make sure lmgrd is running by running "ps -efa | grep lmgrd",
-sometimes it doesn't start.</p>
-<p>The license manager client is a Java program.  Sybase ASE ships with 
-java version 1.2.2 but I've never been able to get the program to run properly
-under that version.  I have been able to get it working with Sun's JDK 1.3.1.
-If you have Sun's JDK 1.3.1 installed, edit /opt/sybase-12.5/SYSAM/bin/lmgr and
-change JAVA_HOME=$SYBASE/shared-1_0/jre-1.2.2 to
-JAVA_HOME=/usr/java/jdk1.3.1_07.</p>
-<p>Run lmgr.  A graphical license manager application should pop up.</p>
-<p>Leave the radio button for Ase checked and click Next.</p>
-<p>When the "Do you have a Sybase Software Asset Management Certificate to
-register?" dialog pops up, click Yes.</p>
+<p>You're supposed to start the license manager daemon here, but it always
+fails, so skip this step and run the license manager client.</p>
+<p>The license manager client is a Java program.  If you are using a kernel
+that supports the Native Posix Thread Library (such as the one that ships with
+Redhat 9), you'll need to run the following command:</p>
+<blockquote><i>export LD_ASSUME_KERNEL=2.4.1</i></blockquote>
+<p>Run <i>lmgr</i>.  A graphical license manager application should pop up.</p>
+<p><b>If you have a "real" license:</b> Leave the radio button for Ase checked
+and click Next.  When the "Do you have a Sybase Software Asset Management
+Certificate to register?" dialog pops up, click Yes.</p>
+<p><b>If you have a "demo" license:</b> Check AseDemo and click Next.  A dialog
+will pop up asking if you have upgraded to a real license.  Click No.</p>
 <p>On the screen titled "Enter the information provided on your Sybase License
-Certificate"</b>, enter the Order Number, Feature Name, Feature Count, Software
-Version and Authorization Code from the email you received from Sybase when you
-downloaded the software.  Click Done.</p>
+Certificate"</b>, enter the information from the email you received from Sybase
+when you downloaded the software.  Click Done.</p>
+<p>The program will bomb out, complaining that it tried to restart the license
+manager, but couldn't.</p>
+<p>Start the license server by running
+<i>startd.sh $SYBASE/$SYBASE_SYSAM</i> manually.</p>
 </blockquote>
 
 <p>Now that the software has been licensed, it can be initialized.</p>
@@ -49,14 +74,6 @@ downloaded the software.  Click Done.</p>
 
 <p>After installing Sybase Adaptive Server Enterprise, you can initialize the 
 server by following these steps.</p>
-
-<p>First, <i>su</i> to the sybase user using the -l option.</p>
-
-<blockquote>
-<b>su -l sybase</b>
-</blockquote>
-
-<p>You should be presented with the a great deal of text.</p>
 
 <p>Run <i>asecfg</i>.  A dialog will appear.
 Click <b>Configure a new server</b>.</p>

@@ -407,18 +407,53 @@ created: SYS and SYSTEM. The default password for the SYSTEM user is
 <i>change_on_install</i>.  These users own the tables that contain privileges 
 and other housekeeping information.</p>
 
-<p>The following command logs the SYSTEM user into the ORA1 instance:</p>
+<p>Database tables are stored in a file or set of files collectively called a
+tablespace.  The tables owned by the SYS and SYSTEM users are kept in their
+own tablespace.  Though you could create your own tables there, it's not a 
+good idea.  You should create your own tablespace.</p>
+
+<p>First, check to see if <i>/u01/app/oracle/oradata</i> and
+<i>/u01/app/oracle/oradata/ora1</i> exist.  If either does not, run one or
+both of the following commands to create the necessary directory:</p>
+
+<blockquote><b>
+mkdir -p /u01/app/oracle/oradata<br>
+chown oracle:oinstall /u01/app/oracle/oradata<br><br>
+mkdir -p /u01/app/oracle/oradata/ora1<br>
+chown oracle:oinstall /u01/app/oracle/oradata/ora1
+</b></blockquote>
+
+<p>Now, use the following command to log into the ORA1 instance as the SYSTEM
+user:</p>
 
 <blockquote>
 <b>sqlplus system/manager@testdb</b>
 </blockquote>
 
-<p>Database tables are stored in a file or set of files collectively called a
-tablespace.  The tables owned by the SYS and SYSTEM users are kept in their
-own tablespace.  Though you could create your own tables there, it's not a 
-good idea.  You should create your own tablespace.  The following queries
+<p>The following queries
 create a tablespace and temporary tablespace called <i>testtablespace</i> and 
 <i>testtablespacetemp</i> with some minimal sizing parameters.</p>
+
+<p>For versions of Oracle less than 9i, use the following queries:</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>CREATE</FONT></B> TABLESPACE testtablespace
+	DATAFILE <FONT color=#ff00ff>'/u01/app/oracle/oradata/ora1/testtablespace01.dbf'</FONT> 
+	<FONT color=#6959cf>SIZE</FONT> 1M REUSE
+	AUTOEXTEND <FONT color=#6959cf>ON</FONT> NEXT 1M
+	MAXSIZE UNLIMITED
+	NOLOGGING;
+
+<B><FONT color=#a62828>CREATE</FONT></B> TABLESPACE testtablespacetemp
+	DATAFILE <FONT color=#ff00ff>'/u01/app/oracle/oradata/ora1/testtablespacetemp01.dbf'</FONT> 
+	<FONT color=#6959cf>SIZE</FONT> 2M REUSE
+	AUTOEXTEND <FONT color=#6959cf>ON</FONT> NEXT 1M
+	MAXSIZE UNLIMITED;
+</PRE>
+</blockquote>
+
+<p>For Oracle 9i, use the following queries:</p>
 
 <blockquote>
 <PRE>

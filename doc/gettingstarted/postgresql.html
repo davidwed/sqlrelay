@@ -200,18 +200,7 @@ command like the following.  This command assigns the <i>postgres</i> user the
 password <i>newpassword</i>.</p>
 
 <blockquote>
-For PostgreSQL 7:
-
-<blockquote>
 <b>psql -c &quot;</b><B><FONT color=#a62828>ALTER</FONT></B> <FONT color=#6959cf>USER</FONT> postgres <FONT color=#6959cf>WITH</FONT> PASSWORD <FONT color=#ff00ff>'newpassword'</FONT>&quot;<b> -d template1</b>
-</blockquote>
-
-For PostgreSQL 6:
-
-<blockquote>
-<b>psql -c &quot;</b><B><FONT color=#a62828>ALTER</FONT></B> <FONT color=#6959cf>USER</FONT> postgres <FONT color=#6959cf>WITH</FONT> PASSWORD newpassword&quot;<b> -d template1</b>
-</blockquote>
-
 </blockquote>
 
 <p>If your system uses socket credentials and you don't want it to, or if it
@@ -280,42 +269,15 @@ we'll just make our database owned by the postgres user.</p>
 <i>postgres</i>, log in as <i>postgres</i> and run the following command.</p>
 
 <blockquote>
-For PostgreSQL 7:
-
-<blockquote>
 <b>psql -U postgres -c &quot;</b><B><FONT color=#a62828>CREATE</FONT></B> DATABASE testdb<b>&quot; -d template1</b><br>
 <b>Password: newpassword</b>
 </blockquote>
 
-For PostgreSQL 6:
-
-<blockquote>
-<b>psql -u -c &quot;</b><B><FONT color=#a62828>CREATE</FONT></B> DATABASE testdb<b>&quot; -d template1</b><br>
-<b>Username: postgres</b>
-<b>Password: newpassword</b>
-</blockquote>
-
-</blockquote>
-
 <p>Once the database has been created, you can log into it as follows.</p>
-
-
-<blockquote>
-For PostgreSQL 7:
 
 <blockquote>
 <b>psql -U postgres -d testdb</b><br>
 <b>Password: newpassword</b>
-</blockquote>
-
-For PostgreSQL 6:
-
-<blockquote>
-<b>psql -u -d testdb</b><br>
-<b>Username: postgres</b>
-<b>Password: newpassword</b>
-</blockquote>
-
 </blockquote>
 
 <p>Once logged in, you can create, drop and modify tables and run queries in 
@@ -330,53 +292,22 @@ databases.  For more information, consult the PostgreSQL
 creates a user named <i>testuser</i> with password <i>testpassword</i>.</p>
 
 <blockquote>
-For PostgreSQL 7:
-
-<blockquote>
 <PRE>
 <b>psql -U postgres -c</b> &quot;<B><FONT color=#a62828>CREATE</FONT></B> <FONT color=#6959cf>USER</FONT> testuser <FONT color=#6959cf>WITH</FONT> PASSWORD <FONT color=#ff00ff>'testpassword'</FONT>&quot; <b>-d testdb</b>
 <b>Password: newpassword</b>
 </PRE>
 </blockquote>
 
-For PostgreSQL 6:
-
-<blockquote>
-<PRE>
-<b>psql -u -c</b> &quot;<B><FONT color=#a62828>CREATE</FONT></B> <FONT color=#6959cf>USER</FONT> testuser <FONT color=#6959cf>WITH</FONT> PASSWORD testpassword <b>-d testdb</b>
-<b>Username: postgres</b>
-<b>Password: newpassword</b>
-</PRE>
-</blockquote>
-
-</blockquote>
-
 <p>You can now log into the database as <i>testuser</i> using the following 
 command.</p>
-
-<blockquote>
-For PostgreSQL 7:
 
 <blockquote>
 <b>psql -U testuser -d testdb</b><br>
 <b>Password: testpassword</b>
 </blockquote>
 
-For PostgreSQL 6:
-
-<blockquote>
-<b>psql -u -d testdb</b><br>
-<b>Username: testuser</b>
-<b>Password: testpassword</b>
-</blockquote>
-
-</blockquote>
-
 <p>If you want to drop a user,  you can do so.  The following command drops a 
 user named <i>testuser</i>.</p>
-
-<blockquote>
-For PostgreSQL 7:
 
 <blockquote>
 <PRE>
@@ -385,41 +316,14 @@ For PostgreSQL 7:
 </PRE>
 </blockquote>
 
-For PostgreSQL 6:
-
-<blockquote>
-<PRE>
-<B>psql -u -c &quot;<FONT color=#a62828>DROP</FONT></B> <FONT color=#6959cf>USER</FONT> testuser&quot; <b>-d testdb</b>
-<b>Username: postgres</b>
-<b>Password: newpassword</b>
-</PRE>
-</blockquote>
-
-</blockquote>
-
 <p>If you want to drop the database, you can do so with the following 
 command.</p>
-
-<blockquote>
-For PostgreSQL 7:
 
 <blockquote>
 <PRE>
 <B>psql -U postgres -c &quot;<FONT color=#a62828>DROP</FONT></B> DATABASE testdb&quot; <b>-d template1</b>
 <b>Password: newpassword</b>
 </PRE>
-</blockquote>
-
-For PostgreSQL 6:
-
-<blockquote>
-<PRE>
-<B>psql -u -c &quot;<FONT color=#a62828>DROP</FONT></B> DATABASE testdb&quot; <b>-d template1</b>
-<b>Username: postgres</b>
-<b>Password: newpassword</b>
-</PRE>
-</blockquote>
-
 </blockquote>
 
 <p>This should be enough to get you started.  To set up more complex 
@@ -435,42 +339,16 @@ the <i>testuser</i> user with password <i>testpassword</i>, use the following
 command.</p>
 
 <blockquote>
-For PostgreSQL 7:
-
-<blockquote>
 <b>psql -U testuser -d testdb</b><br>
 <b>Password: testpassword</b><br>
-</blockquote>
-
-For PostgreSQL 6:
-
-<blockquote>
-<b>psql -u -d testdb</b><br>
-<b>Username: testuser</b><br>
-<b>Password: testpassword</b><br>
-</blockquote>
-
 </blockquote>
 
 <p>If you want to access a database on a remote machine, say on 
 <i>testhost</i>, use the -h option as follows.</p>
 
 <blockquote>
-For PostgreSQL 7:
-
-<blockquote>
 <b>psql -U testuser -h testhost -d testdb</b><br>
 <b>Password: testpassword</b><br>
-</blockquote>
-
-For PostgreSQL 6:
-
-<blockquote>
-<b>psql -u -h testhost -d testdb</b><br>
-<b>Username: testuser</b><br>
-<b>Password: testpassword</b><br>
-</blockquote>
-
 </blockquote>
 
 <p>Once you're connected to the database, the <i>psql</i> client prompts you to
