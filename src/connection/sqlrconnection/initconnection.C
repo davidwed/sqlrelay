@@ -46,8 +46,6 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 		return false;
 	}
 
-	createCursorArray();
-
 	constr=cfgfl->getConnectString(cmdl->getConnectionId());
 	handleConnectString();
 
@@ -145,16 +143,6 @@ bool sqlrconnection::handlePidFile() {
 	}
 
 	return retval;
-}
-
-void sqlrconnection::createCursorArray() {
-
-	// how many cursors should we use, create an array for them
-	int	cursorcount=cfgfl->getCursors();
-	cur=new sqlrcursor *[cursorcount];
-	for (int i=0; i<cursorcount; i++) {
-		cur[i]=NULL;
-	}
 }
 
 void sqlrconnection::initDatabaseAvailableFileName() {
@@ -358,7 +346,12 @@ bool sqlrconnection::initCursors(bool create) {
 	debugPrint("connection",0,"initializing cursors...");
 	#endif
 
-	for (int i=0; i<cfgfl->getCursors(); i++) {
+	int	cursorcount=cfgfl->getCursors();
+	if (create) {
+		cur=new sqlrcursor *[cursorcount];
+	}
+
+	for (int i=0; i<cursorcount; i++) {
 
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",1,(long)i);

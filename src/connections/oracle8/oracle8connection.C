@@ -238,6 +238,20 @@ bool oracle8connection::logIn() {
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
 		return false;
 	}
+
+#ifdef OCI_ATTR_PROXY_CREDENTIALS
+	// figure out what version database we're connected to...
+	supportsproxycredentials=false;
+	char	versionbuf[512];
+	if (OCIServerVersion((dvoid *)svc,err,
+				(text *)versionbuf,sizeof(versionbuf),
+				OCI_HTYPE_SVCCTX)==OCI_SUCCESS &&
+			(!strncmp(versionbuf,"Oracle8i ",9) ||
+			!strncmp(versionbuf,"Oracle9i ",9) ||
+			!strncmp(versionbuf,"Oracle10g ",10))) {
+		supportsproxycredentials=true;
+	}
+#endif
 	return true;
 }
 
@@ -285,6 +299,13 @@ void oracle8connection::logOut() {
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 bool oracle8connection::changeUser(const char *newuser,
 					const char *newpassword) {
+
+	// if the database we're connected to doesn't
+	// support proxy credentials, use the sqlrconnection
+	// class's default changeUser() method
+	if (!supportsproxycredentials) {
+		return sqlrconnection::changeUser(newuser,newpassword);
+	}
 
 	// delete any previously existing "newsessions"
 	if (newsession) {
@@ -390,6 +411,7 @@ oracle8cursor::~oracle8cursor() {
 bool oracle8cursor::openCursor(int id) {
 
 	// allocate a cursor handle
+	stmt=NULL;
 	if (OCIHandleAlloc((dvoid *)oracle8conn->env,(dvoid **)&stmt,
 				OCI_HTYPE_STMT,(size_t)0,
 				(dvoid **)0)!=OCI_SUCCESS) {
@@ -400,7 +422,7 @@ bool oracle8cursor::openCursor(int id) {
 	if (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
 				(dvoid *)&fetchatonce,(ub4)0,
 				OCI_ATTR_PREFETCH_ROWS,
-				(OCIError *)oracle8conn->err)) {
+				(OCIError *)oracle8conn->err)!=OCI_SUCCESS) {
 		return false;
 	}
 	return sqlrcursor::openCursor(id);

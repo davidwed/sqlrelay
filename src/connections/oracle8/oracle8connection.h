@@ -219,6 +219,7 @@ class oracle8connection : public sqlrconnection {
 
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 		OCISession	*newsession;
+		bool		supportsproxycredentials;
 #endif
 
 		char		*home;

@@ -33,6 +33,11 @@
 		fixed a bug that it revealed
 	postgresql connection uses "select 1" for ping instead of calling
 		PQstatus (which doesn't actually check the connection status)
+	fixed changeUser() bug where login/initCursor was done in the wrong
+		order and the cursor array was getting deleted
+	Oracle8 connection checks the version of the database now and uses
+		proxy credentials for authtier=database only when the database
+		supports it, otherwise it uses sqlrconnection::changeUser()
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API

@@ -1,6 +1,23 @@
-fix erwin's fake binds problem
+include docs for installing oracle on redhat 8, fedora, suse 8, etc...
+
+cygwin:
+	requires rudiments without ssl/pcre support
+	perl api won't build
+
+oracle 8 client needs to check to see what version of the database it's
+	connected to and not use proxy credentials to switch users if the
+	version < 8.1... Use OCIServerVersion and parse the result
+
+when not using proxy credentials for user-change, oracle 8 client can't
+	recreate cursors when logging back in
+
+interbase stored procedure/output bind tests fails at isc_dsql_prepare
+
+freetds-0.62/ct_param support
 
 check out the new db2 patch and see if it really works
+
+fix erwin's fake binds problem
 
 address Matthias Klose's concerns:
 --------------------------------------------------------------------------------
@@ -66,21 +83,6 @@ instead of:
         rm -rf $(d)/usr/lib/zope/lib/python/Products/ZSQLRelayDA/SQLRelay
 --------------------------------------------------------------------------------
 
-cygwin:
-	requires rudiments without ssl/pcre support
-	perl api won't build
-
-when not using proxy credentials for user-change, oracle 8 client can't
-	recreate cursors when logging back in
-
-oracle 8 client needs to check to see what version of the database it's
-	connected to and not use proxy credentials to switch users if the
-	version < 8.1... Use OCIServerVersion and parse the result
-
-interbase stored procedure/output bind tests fails at isc_dsql_prepare
-
-freetds-0.62/ct_param support
-
 VB wrapper
 
 ADODB driver
@@ -90,10 +92,9 @@ stored procedures:
 	stored procedure examples in faq
 
 probably related to temp table dropping:
-	postgresql test causes connection to crash on 2nd run
-	mysql test causes connection to crash on 2nd run
 	freetds connection writes an error but succeeds in dropping the table
-	sybase connection won't even start now
+
+sybase connection won't even start now
 
 idle client timeout
 perl apis -> CPAN
@@ -281,6 +282,7 @@ API's:
 		QT3
 		C# - have a driver, just need to incorporate it
 		ADA
+		Eiffel
 
 Native DB Support:
 	Informix

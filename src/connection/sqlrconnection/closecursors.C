@@ -25,6 +25,7 @@ void sqlrconnection::closeCursors(bool destroy) {
 		}
 		if (destroy) {
 			delete[] cur;
+			cur=NULL;
 		}
 	}
 

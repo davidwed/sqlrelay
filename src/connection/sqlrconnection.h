@@ -122,7 +122,6 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 	private:
 		// methods used internally
 		void	setUserAndGroup();
-		void	createCursorArray();
 		bool	initCursors(bool create);
 		sqlrcursor	*getCursor(unsigned short command);
 		sqlrcursor	*findAvailableCursor();
