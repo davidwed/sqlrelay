@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(ORACLEINCLUDES)
+LIBS = $(ORACLELIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(ORACLELIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(ORACLELIBS)" ); then \
-		$(MAKE) sqlr-connection-oracle7; \
-		$(MAKE) sqlr-connection-oracle7-debug; \
-	fi
+SRCS= oracle7connection.C main.C
+LOBJS= oracle7connection.lo main.lo
+PLOBJS= oracle7connection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-oracle7 sqlr-connection-oracle7-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-oracle7
-	$(RM) sqlr-connection-oracle7-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-oracle7
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-oracle7-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(ORACLEINCLUDES) -c $<
+sqlr-connection-oracle7: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-oracle7connection_debug.o: oracle7connection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(ORACLEINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(ORACLEINCLUDES) -c $< -o $@
-
-sqlr-connection-oracle7: oracle7connection.C oracle7connection.o main.C main.o 
-	$(CXX) $(ORACLESTATIC) $(LDFLAGS) -o $@ oracle7connection.o main.o $(ORACLELIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-oracle7-debug: oracle7connection.C oracle7connection_debug.o main.C main_debug.o 
-	$(CXX) $(ORACLESTATIC) $(DEBUGLDFLAGS) -o $@ oracle7connection_debug.o main_debug.o $(ORACLELIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-oracle7-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(ORACLESTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(ORACLELIBS)" ); then \
-		$(INSTALL) sqlr-connection-oracle7 $(bindir); \
-		$(INSTALL) sqlr-connection-oracle7-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-oracle7 $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-oracle7-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-oracle7
-	$(RM) $(bindir)/sqlr-connection-oracle7-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-oracle7
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-oracle7-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

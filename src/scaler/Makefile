@@ -1,31 +1,44 @@
 include ../../config.mk
 
-top_srcdir = ../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../ -I../common -I../util $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I../../ -I../common -I../util $(RUDIMENTSINCLUDES)
 LIBS = $(RUDIMENTSLIBS) -L../util -lsqlrutil $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = scaler.C main.C
-OBJS = scaler.o main.o
+LOBJS = scaler.lo main.lo
+PLOBJS = scaler.p.lo main.p.lo
 
-all: sqlr-scaler
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-scaler sqlr-scaler-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-scaler
+	$(LIBTOOL) --mode=clean $(RM) sqlr-scaler
+	$(LIBTOOL) --mode=clean $(RM) sqlr-scaler-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+sqlr-scaler: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-sqlr-scaler: $(SRCS) $(OBJS)
-	$(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+sqlr-scaler-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) $(LIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	$(INSTALL) sqlr-scaler $(bindir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-scaler $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-scaler-debug $(bindir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-scaler
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler-debug

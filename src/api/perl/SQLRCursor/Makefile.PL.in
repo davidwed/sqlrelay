@@ -4,6 +4,7 @@ require Config;
 $Verbose = 1;
 
 WriteMakefile(
+	#'PREFIX'	=> "@prefix@",
 	'NAME'		=> "Firstworks::SQLRCursor",
 	'VERSION_FROM'	=> "SQLRCursor.pm",
 	'CC'		=> "@CXX@",

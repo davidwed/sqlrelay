@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(MSQLINCLUDES)
+LIBS = $(MSQLLIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(MSQLLIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(XNETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(MSQLLIBS)" ); then \
-		$(MAKE) sqlr-connection-msql; \
-		$(MAKE) sqlr-connection-msql-debug; \
-	fi
+SRCS= msqlconnection.C main.C
+LOBJS= msqlconnection.lo main.lo
+PLOBJS= msqlconnection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-msql sqlr-connection-msql-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-msql
-	$(RM) sqlr-connection-msql-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-msql
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-msql-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(MSQLINCLUDES) -c $<
+sqlr-connection-msql: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(MSQLSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-msqlconnection_debug.o: msqlconnection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(MSQLINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(MSQLINCLUDES) -c $< -o $@
-
-sqlr-connection-msql: msqlconnection.C msqlconnection.o main.C main.o 
-	$(CXX) $(MSQLSTATIC) $(LDFLAGS) -o $@ msqlconnection.o main.o $(MSQLLIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-msql-debug: msqlconnection.C msqlconnection_debug.o main.C main_debug.o 
-	$(CXX) $(MSQLSTATIC) $(DEBUGLDFLAGS) -o $@ msqlconnection_debug.o main_debug.o $(MSQLLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-msql-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(MSQLSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(MSQLLIBS)" ); then \
-		$(INSTALL) sqlr-connection-msql $(bindir); \
-		$(INSTALL) sqlr-connection-msql-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-msql $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-msql-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-msql
-	$(RM) $(bindir)/sqlr-connection-msql-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-msql
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-msql-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

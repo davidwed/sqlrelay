@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(SYBASEINCLUDES)
+LIBS = $(SYBASELIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(SYBASELIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(SYBASELIBS)" ); then \
-		$(MAKE) sqlr-connection-sybase; \
-		$(MAKE) sqlr-connection-sybase-debug; \
-	fi
+SRCS= sybaseconnection.C main.C
+LOBJS= sybaseconnection.lo main.lo
+PLOBJS= sybaseconnection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-sybase sqlr-connection-sybase-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-sybase
-	$(RM) sqlr-connection-sybase-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sybase
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sybase-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(SYBASEINCLUDES) -c $<
+sqlr-connection-sybase: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(SYBASESTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-sybaseconnection_debug.o: sybaseconnection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(SYBASEINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(SYBASEINCLUDES) -c $< -o $@
-
-sqlr-connection-sybase: sybaseconnection.C sybaseconnection.o main.C main.o 
-	$(CXX) $(SYBASESTATIC) $(LDFLAGS) -o $@ sybaseconnection.o main.o $(SYBASELIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-sybase-debug: sybaseconnection.C sybaseconnection_debug.o main.C main_debug.o 
-	$(CXX) $(SYBASESTATIC) $(DEBUGLDFLAGS) -o $@ sybaseconnection_debug.o main_debug.o $(SYBASELIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-sybase-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(SYBASESTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(SYBASELIBS)" ); then \
-		$(INSTALL) sqlr-connection-sybase $(bindir); \
-		$(INSTALL) sqlr-connection-sybase-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-sybase $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-sybase-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-sybase
-	$(RM) $(bindir)/sqlr-connection-sybase-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sybase
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sybase-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

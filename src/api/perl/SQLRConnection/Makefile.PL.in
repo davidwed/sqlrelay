@@ -4,10 +4,11 @@ require Config;
 $Verbose = 1;
 
 WriteMakefile(
+	#'PREFIX'	=> "@prefix@",
 	'NAME'		=> "Firstworks::SQLRConnection",
 	'VERSION_FROM'	=> "SQLRConnection.pm",
 	'CC'		=> "@CXX@",
-	'CCFLAGS'	=> "-pedantic -w -O2 -fPIC",
+	'CCFLAGS'	=> "-pedantic -O2 -fPIC",
 	'INC'		=> "-I../../../.. -I../../../common -I../../c++/include @RUDIMENTSINCLUDES@",
 	'LIBS'		=> ["-L../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @SOCKETLIB@ @LIBSTDCPP@ @LIBDMALLOC@"],
 	'XSPROTOARG'	=> "-noprototypes",

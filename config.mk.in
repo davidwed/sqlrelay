@@ -26,7 +26,10 @@ CC = @CC@
 CXX = @CXX@
 
 # includes and defines (-I and -D flags)
-BASECPPFLAGS = @CPPFLAGS@ -DTMP_DIR=\"$(tmpdir)\" -DDEBUG_DIR=\"$(debugdir)\" -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\"
+BASECPPFLAGS = @CPPFLAGS@
+TMPDIRCPPFLAG = -DTMP_DIR=\"$(tmpdir)\"
+DEBUGDIRCPPFLAG = -DDEBUG_DIR=\"$(debugdir)\"
+CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\"
 
 # link flags (-s, -static, -melf, -belf, etc.)
 LDFLAGS = @LDFLAGS@
@@ -78,6 +81,7 @@ UWIN = @UWIN@
 # rudiments library
 RUDIMENTSPATH = @RUDIMENTSPATH@
 RUDIMENTSLIBS = @RUDIMENTSLIBS@ 
+RUDIMENTSDEBUGLIBS = @RUDIMENTSDEBUGLIBS@ 
 RUDIMENTSINCLUDES = @RUDIMENTSINCLUDES@ 
 
 # perl

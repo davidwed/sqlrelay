@@ -3,57 +3,57 @@ include ../config.mk
 top_srcdir = ..
 
 all: 
-	if ( test -n "$(ORACLELIBS)" ); then \
-		cd oracle7; $(MAKE) all; \
-	fi
-	if ( test -n "$(ORACLELIBS)" -a "$(ORACLEVERSION)" != "7" ); then \
-		cd oracle8; $(MAKE) all; \
-	fi
-	if ( test -n "$(MYSQLLIBS)" ); then \
-		cd mysql; $(MAKE) all; \
-	fi
-	if ( test -n "$(MSQLLIBS)" ); then \
-		cd msql; $(MAKE) all; \
-	fi
-	if ( test -n "$(POSTGRESQLLIBS)" ); then \
-		cd postgresql; $(MAKE) all; \
-	fi
-	if ( test -n "$(SQLITELIBS)" ); then \
-		cd sqlite; $(MAKE) all; \
-	fi
-	if ( test -n "$(LAGOLIBS)" ); then \
-		cd lago; $(MAKE) all; \
-	fi
-	if ( test -n "$(FREETDSLIBS)" ); then \
-		cd freetds; $(MAKE) all; \
-	fi
-	if ( test -n "$(ODBCLIBS)" ); then \
-		cd odbc; $(MAKE) all; \
-	fi
-	if ( test -n "$(DB2LIBS)" ); then \
-		cd db2; $(MAKE) all; \
-	fi
-	if ( test -n "$(INTERBASELIBS)" ); then \
-		cd interbase; $(MAKE) all; \
-	fi
-	if ( test -n "$(SYBASELIBS)" ); then \
-		cd sybase; $(MAKE) all; \
-	fi
-	cd sqlrelay; $(MAKE) all
+ifneq ($(ORACLELIBS),)
+	$(MAKE) -C oracle7 all
+	ifneq ($(ORACLELIBS),7)
+		$(MAKE) -C oracle8 all
+	endif
+endif
+ifneq ($(MYSQLLIBS),)
+	$(MAKE) -C mysql all
+endif
+ifneq ($(MSQLLIBS),)
+	$(MAKE) -C msql all
+endif
+ifneq ($(POSTGRESQLLIBS),)
+	$(MAKE) -C postgresql all
+endif
+ifneq ($(SQLITELIBS),)
+	$(MAKE) -C sqlite all
+endif
+ifneq ($(LAGOLIBS),)
+	$(MAKE) -C lago all
+endif
+ifneq ($(FREETDSLIBS),)
+	$(MAKE) -C freetds all
+endif
+ifneq ($(ODBCLIBS),)
+	$(MAKE) -C odbc all
+endif
+ifneq ($(DB2LIBS),)
+	$(MAKE) -C db2 all
+endif
+ifneq ($(INTERBASELIBS),)
+	$(MAKE) -C interbase all
+endif
+ifneq ($(SYBASELIBS),)
+	$(MAKE) -C sybase all
+endif
+	$(MAKE) -C sqlrelay all
 
 clean:
-	cd oracle7; $(MAKE) clean
-	cd oracle8; $(MAKE) clean
-	cd mysql; $(MAKE) clean
-	cd msql; $(MAKE) clean
-	cd postgresql; $(MAKE) clean
-	cd sqlite; $(MAKE) clean
-	cd lago; $(MAKE) clean
-	cd freetds; $(MAKE) clean
-	cd odbc; $(MAKE) clean
-	cd db2; $(MAKE) clean
-	cd sqlrelay; $(MAKE) clean
-	cd interbase; $(MAKE) clean
-	cd sybase; $(MAKE) clean
+	$(MAKE) -C oracle7 clean
+	$(MAKE) -C oracle8 clean
+	$(MAKE) -C mysql clean
+	$(MAKE) -C msql clean
+	$(MAKE) -C postgresql clean
+	$(MAKE) -C sqlite clean
+	$(MAKE) -C lago clean
+	$(MAKE) -C freetds clean
+	$(MAKE) -C odbc clean
+	$(MAKE) -C db2 clean
+	$(MAKE) -C interbase clean
+	$(MAKE) -C sybase clean
+	$(MAKE) -C sqlrelay clean
 
 rebuild: clean all

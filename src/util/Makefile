@@ -1,55 +1,43 @@
 include ../../config.mk
 
-top_srcdir = ../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../ -I../common -I../libsqlrutil $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I../../ -I../common -I../libsqlrutil $(RUDIMENTSINCLUDES)
 
 SRCS = cmdline.C debugfile.C tempdir.C sqlrconfigfile.C authenticator.C
-OBJS = cmdline.o debugfile.o tempdir.o sqlrconfigfile.o authenticator.o
+LOBJS = cmdline.lo debugfile.lo tempdir.lo sqlrconfigfile.lo authenticator.lo
+PLOBJS = cmdline.p.lo debugfile.p.lo tempdir.p.lo sqlrconfigfile.p.lo authenticator.p.lo
 
-all:
-	$(MAKE) libsqlrutil.a; \
-	if ( test "$(MINGW32)" != "yes" -a "$(CYGWIN)" != "yes" -a "$(UWIN)" != "yes" ); then \
-		$(MAKE) libsqlrutil.so; \
-	else \
-		$(MAKE) libsqlrutil.dll; \
-	fi
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: libsqlrutil.la libsqlrutil_p.la
 
 clean:
-	$(RM) *.o *.a *.so
+	$(LIBTOOL) --mode=clean $(RM) *.la
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+libsqlrutil.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
-libsqlrutil.a: $(SRCS) $(OBJS)
-	$(STATICAR) $@ $(OBJS)
-
-libsqlrutil.so: $(SRCS) $(OBJS)
-	$(DYNAMICAR) $@ $(OBJS)
-
-libsqlrutil.dll: cmdline.C cmdline.o
-	dllwrap --export-all-symbols --output-def libsqlrutil.def --output-exp libsqlrutil.exp --output-lib libsqlrutil.lib --dllname $@ $(OBJS) -lstdc++ $(RUDIMENTSLIBS)
-	$(RM) libsqlrutil.def
-	$(RM) libsqlrutil.exp
+libsqlrutil_p.la: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(PLOBJS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(libdir)
-	$(INSTALL) -m 644 libsqlrutil.a $(libdir); \
-	if ( test "$(MINGW32)" != "yes" -a "$(CYGWIN)" != "yes" -a "$(UWIN)" != "yes" ); then \
-		$(RM) $(libdir)/libsqlrutil.so*; \
-		$(INSTALL) libsqlrutil.so $(libdir)/libsqlrutil.so.$(SQLR_VERSION); \
-		cd $(libdir); \
-		$(SYMLINK) libsqlrutil.so.$(SQLR_VERSION) libsqlrutil.so; \
-	else \
-		$(INSTALL) libsqlrutil.dll $(libdir); \
-		$(INSTALL) libsqlrutil.lib $(libdir); \
-	fi
+	$(top_builddir)/mkinstalldirs $(libdir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrutil.la $(libdir)
+	$(LIBTOOL) --mode=install $(INSTALL) libsqlrutil_p.la $(libdir)
+	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
-	$(RM) $(libdir)/libsqlrutil.so*
-	$(RM) $(libdir)/libsqlrutil.a
-	$(RM) $(libdir)/libsqlrutil.dll
-	$(RM) $(libdir)/libsqlrutil.lib
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrutil.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrutil_p.la

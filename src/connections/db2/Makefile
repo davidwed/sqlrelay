@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(DB2INCLUDES)
+LIBS = $(DB2LIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(DB2LIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(DB2LIBS)" ); then \
-		$(MAKE) sqlr-connection-db2; \
-		$(MAKE) sqlr-connection-db2-debug; \
-	fi
+SRCS= db2connection.C main.C
+LOBJS= db2connection.lo main.lo
+PLOBJS= db2connection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-db2 sqlr-connection-db2-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-db2
-	$(RM) sqlr-connection-db2-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-db2
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-db2-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DB2INCLUDES) -c $<
+sqlr-connection-db2: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(DB2STATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-db2connection_debug.o: db2connection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(DB2INCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(DB2INCLUDES) -c $< -o $@
-
-sqlr-connection-db2: db2connection.C db2connection.o main.C main.o 
-	$(CXX) $(DB2STATIC) $(LDFLAGS) -o $@ db2connection.o main.o $(DB2LIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-db2-debug: db2connection.C db2connection_debug.o main.C main_debug.o 
-	$(CXX) $(DB2STATIC) $(DEBUGLDFLAGS) -o $@ db2connection_debug.o main_debug.o $(DB2LIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-db2-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(DB2STATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(DB2LIBS)" ); then \
-		$(INSTALL) sqlr-connection-db2 $(bindir); \
-		$(INSTALL) sqlr-connection-db2-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-db2 $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-db2-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-db2
-	$(RM) $(bindir)/sqlr-connection-db2-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-db2
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-db2-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

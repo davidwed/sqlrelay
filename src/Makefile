@@ -1,70 +1,71 @@
 include ../config.mk
 
 all:
-	cd util; $(MAKE) all
-	cd listener; $(MAKE) all
-	cd connection; $(MAKE) all
-	cd connections; $(MAKE) all
-	cd start; $(MAKE) all
-	cd cachemanager; $(MAKE) all
-	cd scaler; $(MAKE) all
-	if ( test -n "$(HAVE_GTK)" ); then \
-		cd config; $(MAKE) all; cd ..; \
-	fi
-	cd api; $(MAKE) all
-	cd cmdline; $(MAKE) all
+	$(MAKE) -C util all
+	$(MAKE) -C listener all
+	$(MAKE) -C connection all
+	$(MAKE) -C connections all
+	$(MAKE) -C start all
+	$(MAKE) -C cachemanager all
+	$(MAKE) -C scaler all
+ifneq ($(HAVE_GTK),)
+	$(MAKE) -C config all
+endif
+	$(MAKE) -C api all
+	$(MAKE) -C cmdline all
 
 clean:
-	cd util; $(MAKE) clean
-	cd listener; $(MAKE) clean
-	cd connection; $(MAKE) clean
-	cd connections; $(MAKE) clean
-	cd start; $(MAKE) clean
-	cd cachemanager; $(MAKE) clean
-	cd scaler; $(MAKE) clean
-	if ( test -n "$(HAVE_GTK)" ); then \
-		cd config; $(MAKE) clean; cd ..; \
-	fi
-	cd api; $(MAKE) clean
-	cd cmdline; $(MAKE) clean
+	$(MAKE) -C util clean
+	$(MAKE) -C listener clean
+	$(MAKE) -C connection clean
+	$(MAKE) -C connections clean
+	$(MAKE) -C start clean
+	$(MAKE) -C cachemanager clean
+	$(MAKE) -C scaler clean
+ifneq ($(HAVE_GTK),)
+	$(MAKE) -C config clean
+endif
+	$(MAKE) -C api clean
+	$(MAKE) -C cmdline clean
 
 rebuild:
-	cd util; $(MAKE) rebuild
-	cd listener; $(MAKE) rebuild
-	cd connection; $(MAKE) rebuild
-	cd cachemanager; $(MAKE) rebuild
-	cd start; $(MAKE) rebuild
-	cd scaler; $(MAKE) rebuild
-	if ( test -n "$(HAVE_GTK)" ); then \
-		cd config; $(MAKE) rebuild; cd ..; \
-	fi
-	cd api; $(MAKE) rebuild
-	cd cmdline; $(MAKE) rebuild
+	$(MAKE) -C util rebuild
+	$(MAKE) -C listener rebuild
+	$(MAKE) -C connection rebuild
+	$(MAKE) -C connections rebuild
+	$(MAKE) -C start rebuild
+	$(MAKE) -C cachemanager rebuild
+	$(MAKE) -C scaler rebuild
+ifneq ($(HAVE_GTK),)
+	$(MAKE) -C config rebuild
+endif
+	$(MAKE) -C api rebuild
+	$(MAKE) -C cmdline rebuild
 
 install:
-	cd util; $(MAKE) install
-	cd listener; $(MAKE) install
-	cd connection; $(MAKE) install
-	cd connections; $(MAKE) install
-	cd cachemanager; $(MAKE) install
-	cd start; $(MAKE) install
-	cd scaler; $(MAKE) install
-	if ( test -n "$(HAVE_GTK)" ); then \
-		cd config; $(MAKE) install; cd ..; \
-	fi
-	cd api; $(MAKE) install
-	cd cmdline; $(MAKE) install
+	$(MAKE) -C util install
+	$(MAKE) -C listener install
+	$(MAKE) -C connection install
+	$(MAKE) -C connections install
+	$(MAKE) -C start install
+	$(MAKE) -C cachemanager install
+	$(MAKE) -C scaler install
+ifneq ($(HAVE_GTK),)
+	$(MAKE) -C config install
+endif
+	$(MAKE) -C api install
+	$(MAKE) -C cmdline install
 
 uninstall:
-	cd util; $(MAKE) uninstall
-	cd listener; $(MAKE) uninstall
-	cd connection; $(MAKE) uninstall
-	cd connections; $(MAKE) uninstall
-	cd cachemanager; $(MAKE) uninstall
-	cd start; $(MAKE) uninstall
-	cd scaler; $(MAKE) uninstall
-	if ( test -n "$(HAVE_GTK)" ); then \
-		cd config; $(MAKE) uninstall; cd ..; \
-	fi
-	cd cmdline; $(MAKE) uninstall
-	cd api; $(MAKE) uninstall
+	$(MAKE) -C util uninstall
+	$(MAKE) -C listener uninstall
+	$(MAKE) -C connection uninstall
+	$(MAKE) -C connections uninstall
+	$(MAKE) -C start uninstall
+	$(MAKE) -C cachemanager uninstall
+	$(MAKE) -C scaler uninstall
+ifneq ($(HAVE_GTK),)
+	$(MAKE) -C config uninstall
+endif
+	$(MAKE) -C api uninstall
+	$(MAKE) -C cmdline uninstall

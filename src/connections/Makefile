@@ -1,109 +1,107 @@
 include ../../config.mk
 
-top_srcdir = ../..
-
 all:
-	if ( test -n "$(DB2LIBS)" ); then \
-		cd db2; $(MAKE) all; \
-	fi
-	if ( test -n "$(FREETDSLIBS)" ); then \
-		cd freetds; $(MAKE) all; \
-	fi
-	if ( test -n "$(INTERBASELIBS)" ); then \
-		cd interbase; $(MAKE) all; \
-	fi
-	if ( test -n "$(LAGOLIBS)" ); then \
-		cd lago; $(MAKE) all; \
-	fi
-	if ( test -n "$(MSQLLIBS)" ); then \
-		cd msql; $(MAKE) all; \
-	fi
-	if ( test -n "$(MYSQLLIBS)" ); then \
-		cd mysql; $(MAKE) all; \
-	fi
-	if ( test -n "$(ODBCLIBS)" ); then \
-		cd odbc; $(MAKE) all; \
-	fi
-	if ( test -n "$(ORACLELIBS)" ); then \
-		cd oracle7; $(MAKE) all; \
-	fi
-	if ( test -n "$(ORACLELIBS)" -a "$(ORACLEVERSION)" != "7" ); then \
-		cd oracle8; $(MAKE) all; \
-	fi
-	if ( test -n "$(POSTGRESQLLIBS)" ); then \
-		cd postgresql; $(MAKE) all; \
-	fi
-	if ( test -n "$(SQLITELIBS)" ); then \
-		cd sqlite; $(MAKE) all; \
-	fi
-	if ( test -n "$(SYBASELIBS)" ); then \
-		cd sybase; $(MAKE) all; \
-	fi
+ifneq ($(strip $(DB2LIBS)),)
+	$(MAKE) -C db2 all
+endif
+ifneq ($(strip $(FREETDSLIBS)),)
+	$(MAKE) -C freetds all
+endif
+ifneq ($(strip $(INTERBASELIBS)),)
+	$(MAKE) -C interbase all
+endif
+ifneq ($(strip $(LAGOLIBS)),)
+	$(MAKE) -C lago all
+endif
+ifneq ($(strip $(MSQLLIBS)),)
+	$(MAKE) -C msql all
+endif
+ifneq ($(strip $(MYSQLLIBS)),)
+	$(MAKE) -C mysql all
+endif
+ifneq ($(strip $(ODBCLIBS)),)
+	$(MAKE) -C odbc all
+endif
+ifneq ($(strip $(ORACLELIBS)),)
+	$(MAKE) -C oracle7 all
+ifneq ($(strip $(ORACLEVERSION)),7)
+	$(MAKE) -C oracle8 all
+endif
+endif
+ifneq ($(strip $(POSTGRESQLLIBS)),)
+	$(MAKE) -C postgresql all
+endif
+ifneq ($(strip $(SQLITELIBS)),)
+	$(MAKE) -C sqlite all
+endif
+ifneq ($(strip $(SYBASELIBS)),)
+	$(MAKE) -C sybase all
+endif
 
 clean:
-	cd oracle7; $(MAKE) clean
-	cd oracle8; $(MAKE) clean
-	cd mysql; $(MAKE) clean
-	cd msql; $(MAKE) clean
-	cd postgresql; $(MAKE) clean
-	cd sqlite; $(MAKE) clean
-	cd lago; $(MAKE) clean
-	cd freetds; $(MAKE) clean
-	cd sybase; $(MAKE) clean
-	cd odbc; $(MAKE) clean
-	cd db2; $(MAKE) clean
-	cd interbase; $(MAKE) clean
+	$(MAKE) -C db2 clean
+	$(MAKE) -C freetds clean
+	$(MAKE) -C interbase clean
+	$(MAKE) -C lago clean
+	$(MAKE) -C msql clean
+	$(MAKE) -C mysql clean
+	$(MAKE) -C odbc clean
+	$(MAKE) -C oracle7 clean
+	$(MAKE) -C oracle8 clean
+	$(MAKE) -C postgresql clean
+	$(MAKE) -C sqlite clean
+	$(MAKE) -C sybase clean
 
 rebuild: clean all
 
 install:
-	if ( test -n "$(ORACLELIBS)" ); then \
-		cd oracle7; $(MAKE) install; \
-	fi
-	if ( test -n "$(ORACLELIBS)" -a "$(ORACLEVERSION)" != "7"); then \
-		cd oracle8; $(MAKE) install; \
-	fi
-	if ( test -n "$(MYSQLLIBS)" ); then \
-		cd mysql; $(MAKE) install; \
-	fi
-	if ( test -n "$(MSQLLIBS)" ); then \
-		cd msql; $(MAKE) install; \
-	fi
-	if ( test -n "$(POSTGRESQLLIBS)" ); then \
-		cd postgresql; $(MAKE) install; \
-	fi
-	if ( test -n "$(SQLITELIBS)" ); then \
-		cd sqlite; $(MAKE) install; \
-	fi
-	if ( test -n "$(LAGOLIBS)" ); then \
-		cd lago; $(MAKE) install; \
-	fi
-	if ( test -n "$(FREETDSLIBS)" ); then \
-		cd freetds; $(MAKE) install; \
-	fi
-	if ( test -n "$(SYBASELIBS)" ); then \
-		cd sybase; $(MAKE) install; \
-	fi
-	if ( test -n "$(ODBCLIBS)" ); then \
-		cd odbc; $(MAKE) install; \
-	fi
-	if ( test -n "$(DB2LIBS)" ); then \
-		cd db2; $(MAKE) install; \
-	fi
-	if ( test -n "$(INTERBASELIBS)" ); then \
-		cd interbase; $(MAKE) install; \
-	fi
+ifneq ($(strip $(DB2LIBS)),)
+	$(MAKE) -C db2 install
+endif
+ifneq ($(strip $(FREETDSLIBS)),)
+	$(MAKE) -C freetds install
+endif
+ifneq ($(strip $(INTERBASELIBS)),)
+	$(MAKE) -C interbase install
+endif
+ifneq ($(strip $(LAGOLIBS)),)
+	$(MAKE) -C lago install
+endif
+ifneq ($(strip $(MSQLLIBS)),)
+	$(MAKE) -C msql install
+endif
+ifneq ($(strip $(MYSQLLIBS)),)
+	$(MAKE) -C mysql install
+endif
+ifneq ($(strip $(ODBCLIBS)),)
+	$(MAKE) -C odbc install
+endif
+ifneq ($(strip $(ORACLELIBS)),)
+	$(MAKE) -C oracle7 install
+ifneq ($(strip $(ORACLEVERSION)),7)
+	$(MAKE) -C oracle8 install
+endif
+endif
+ifneq ($(strip $(POSTGRESQLLIBS)),)
+	$(MAKE) -C postgresql install
+endif
+ifneq ($(strip $(SQLITELIBS)),)
+	$(MAKE) -C sqlite install
+endif
+ifneq ($(strip $(SYBASELIBS)),)
+	$(MAKE) -C sybase install
+endif
 
 uninstall:
-	cd oracle7; $(MAKE) uninstall
-	cd oracle8; $(MAKE) uninstall
-	cd mysql; $(MAKE) uninstall
-	cd msql; $(MAKE) uninstall
-	cd postgresql; $(MAKE) uninstall
-	cd sqlite; $(MAKE) uninstall
-	cd lago; $(MAKE) uninstall
-	cd freetds; $(MAKE) uninstall
-	cd sybase; $(MAKE) uninstall
-	cd odbc; $(MAKE) uninstall
-	cd db2; $(MAKE) uninstall
-	cd interbase; $(MAKE) uninstall
+	$(MAKE) -C db2 uninstall
+	$(MAKE) -C freetds uninstall
+	$(MAKE) -C interbase uninstall
+	$(MAKE) -C lago uninstall
+	$(MAKE) -C msql uninstall
+	$(MAKE) -C mysql uninstall
+	$(MAKE) -C odbc uninstall
+	$(MAKE) -C oracle7 uninstall
+	$(MAKE) -C oracle8 uninstall
+	$(MAKE) -C postgresql uninstall
+	$(MAKE) -C sqlite uninstall
+	$(MAKE) -C sybase uninstall

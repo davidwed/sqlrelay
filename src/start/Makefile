@@ -1,31 +1,43 @@
 include ../../config.mk
 
-top_srcdir = ../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../..
+INSTALL = $(top_builddir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../ -I../common -I../util $(RUDIMENTSINCLUDES) $(PSDEFINE)
 LIBS = $(RUDIMENTSLIBS) -L../util -lsqlrutil $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = main.C
-OBJS = main.o
+LOBJS = main.lo
+PLOBJS = main.p.lo
 
-all: sqlr-start
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-start sqlr-start-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-start
+	$(LIBTOOL) --mode=clean $(RM) sqlr-start
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+sqlr-start: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-sqlr-start: $(SRCS) $(OBJS)
-	$(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+sqlr-start-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) $(LIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	$(INSTALL) sqlr-start $(bindir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-start $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-start-debug $(bindir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-start
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-start
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-start-debug

@@ -404,15 +404,15 @@ RUDIMENTSLIBSPATH=""
 RUDIMENTSINCLUDES=""
 if ( test -z "$MICROSOFT" ); then
 	if ( test -n "$RUDIMENTSPATH" ); then
-		AC_CHECK_FILE($RUDIMENTSPATH/lib/librudiments.a, RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments")
-		AC_CHECK_FILE($RUDIMENTSPATH/lib/librudiments.so, RUDIMENTSLIBSPATH="$RUDIMENTSPATH/lib"; RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments")
+		AC_CHECK_FILE($RUDIMENTSPATH/lib/librudiments.a, RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"; RUDIMENTSDEBUGLIBS="-L$RUDIMENTSPATH/lib -lrudiments_p")
+		AC_CHECK_FILE($RUDIMENTSPATH/lib/librudiments.so, RUDIMENTSLIBSPATH="$RUDIMENTSPATH/lib"; RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"; RUDIMENTSDEBUGLIBS="-L$RUDIMENTSPATH/lib -lrudiments_p")
 		AC_CHECK_FILE($RUDIMENTSPATH/include/rudiments/daemonprocess.h, RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include")
 		AC_CHECK_FILE($RUDIMENTSPATH/include/firstworks/rudiments/daemonprocess.h, RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include/firstworks")
 	else
 		for i in "/usr/local/firstworks" "/usr" "/usr/local" "/usr/pkg" "/opt/sfw"
 		do
-			AC_CHECK_FILE($i/lib/librudiments.a, RUDIMENTSLIBS="-L$i/lib -lrudiments"; RUDIMENTSPATH="$i")
-			AC_CHECK_FILE($i/lib/librudiments.so, RUDIMENTSLIBSPATH="$i/lib"; RUDIMENTSLIBS="-L$i/lib -lrudiments"; RUDIMENTSPATH="$i")
+			AC_CHECK_FILE($i/lib/librudiments.a, RUDIMENTSLIBS="-L$i/lib -lrudiments"; RUDIMENTSPATH="$i"; RUDIMENTSDEBUGLIBS="-L$RUDIMENTSPATH/lib -lrudiments_p")
+			AC_CHECK_FILE($i/lib/librudiments.so, RUDIMENTSLIBSPATH="$i/lib"; RUDIMENTSLIBS="-L$i/lib -lrudiments"; RUDIMENTSPATH="$i"; RUDIMENTSDEBUGLIBS="-L$RUDIMENTSPATH/lib -lrudiments_p")
 			AC_CHECK_FILE($i/include/rudiments/daemonprocess.h, RUDIMENTSINCLUDES="-I$i/include"; RUDIMENTSPATH="$i")
 			if ( test -n "$RUDIMENTSLIBS" ); then
 				break;
@@ -421,9 +421,9 @@ if ( test -z "$MICROSOFT" ); then
 	fi
 else
 	if ( test -n "$RUDIMENTSPATH" ); then
-		AC_CHECK_FILE($RUDIMENTSPATH/lib/librudiments.dll, RUDIMENTSLIBS="$RUDIMENTSPATH/lib/librudiments.dll" RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include")
+		AC_CHECK_FILE($RUDIMENTSPATH/lib/librudiments.dll, RUDIMENTSLIBS="$RUDIMENTSPATH/lib/librudiments.dll"; RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"; RUDIMENTSDEBUGLIBS="$RUDIMENTSPATH/lib/librudiments_p.dll")
 	else
-		AC_CHECK_FILE(/usr/local/firstworks/lib/librudiments.dll, RUDIMENTSLIBS="/usr/local/firstworks/lib/librudiments.dll" RUDIMENTSINCLUDES="-I/usr/local/firstworks/include")
+		AC_CHECK_FILE(/usr/local/firstworks/lib/librudiments.dll, RUDIMENTSLIBS="/usr/local/firstworks/lib/librudiments.dll"; RUDIMENTSINCLUDES="-I/usr/local/firstworks/include"; RUDIMENTSDEBUGLIBS="$RUDIMENTSPATH/lib/librudiments_p.dll")
 	fi
 fi
 
@@ -438,6 +438,7 @@ fi
 AC_SUBST(RUDIMENTSPATH)
 AC_SUBST(RUDIMENTSINCLUDES)
 AC_SUBST(RUDIMENTSLIBS)
+AC_SUBST(RUDIMENTSDEBUGLIBS)
 
 PRELIBS=$LIBS
 LIBS="-lhistory -ltermcap"
@@ -2059,7 +2060,7 @@ dnl if interfaces added,                      c:r:a -> c:r:a+1
 dnl if interfaces removed,                    c:r:a -> c:r:0
 SONAME_VERSION_INFO="1:0:0"
 AC_SUBST(SONAME_VERSION_INFO)
-LDFLAGS="-s"
+LDFLAGS=""
 AC_SUBST(LDFLAGS)
 DEBUGLDFLAGS=""
 AC_SUBST(DEBUGLDFLAGS)
@@ -2163,7 +2164,7 @@ if ( test -n "$INTERBASELIBS" ); then
 	cat spec/sqlrelay-interbase.spec.in >> sqlrelay.spec.in.in
 	echo "" >> sqlrelay.spec.in.in
 fi
-MAKELIST="config.mk src/api/perl/SQLRConnection/Makefile.PL src/api/perl/SQLRCursor/Makefile.PL src/api/perl/SQLRConnection/SQLRConnection.pm src/api/perl/SQLRCursor/SQLRCursor.pm src/api/perl/DBD/SQLRelay.pm sqlrelay.spec.in bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay"
+MAKELIST="config.mk src/api/perl/SQLRConnection/Makefile.PL src/api/perl/SQLRCursor/Makefile.PL src/api/perl/SQLRConnection/SQLRConnection.pm src/api/perl/SQLRCursor/SQLRCursor.pm src/api/perl/DBD/Makefile.PL src/api/perl/DBD/SQLRelay.pm sqlrelay.spec.in bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlr-stop
 chmod 755 bin/sqlrclient-config

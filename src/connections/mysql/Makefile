@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(MYSQLINCLUDES)
+LIBS = $(MYSQLLIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(MYSQLLIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(MYSQLLIBS)" ); then \
-		$(MAKE) sqlr-connection-mysql; \
-		$(MAKE) sqlr-connection-mysql-debug; \
-	fi
+SRCS= mysqlconnection.C main.C
+LOBJS= mysqlconnection.lo main.lo
+PLOBJS= mysqlconnection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-mysql sqlr-connection-mysql-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-mysql
-	$(RM) sqlr-connection-mysql-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mysql
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mysql-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(MYSQLINCLUDES) -c $<
+sqlr-connection-mysql: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(MYSQLSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-mysqlconnection_debug.o: mysqlconnection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(MYSQLINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(MYSQLINCLUDES) -c $< -o $@
-
-sqlr-connection-mysql: mysqlconnection.C mysqlconnection.o main.C main.o 
-	$(CXX) $(MYSQLSTATIC) $(LDFLAGS) -o $@ mysqlconnection.o main.o $(MYSQLLIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-mysql-debug: mysqlconnection.C mysqlconnection_debug.o main.C main_debug.o 
-	$(CXX) $(MYSQLSTATIC) $(DEBUGLDFLAGS) -o $@ mysqlconnection_debug.o main_debug.o $(MYSQLLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-mysql-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(MYSQLSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(MYSQLLIBS)" ); then \
-		$(INSTALL) sqlr-connection-mysql $(bindir); \
-		$(INSTALL) sqlr-connection-mysql-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-mysql $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-mysql-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-mysql
-	$(RM) $(bindir)/sqlr-connection-mysql-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-mysql
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-mysql-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -36,6 +36,7 @@ install:
 	$(top_builddir)/mkinstalldirs $(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) -s libsqlrclient.la $(libdir)/libsqlrclient.la
 	$(LIBTOOL) --mode=install $(INSTALL) libsqlrclient_p.la $(libdir)/libsqlrclient_p.la
+	$(LIBTOOL) --mode=finish $(libdir)
 	$(top_builddir)/mkinstalldirs $(cachedir)
 	chmod 777 $(cachedir)
 

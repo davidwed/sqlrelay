@@ -1,18 +1,18 @@
 include ../../../config.mk
 
 all:
-	cd src; $(MAKE) all
+	$(MAKE) -C src all
 
 clean:
-	cd src; $(MAKE) clean
+	$(MAKE) -C src clean
 
 rebuild:
-	cd src; $(MAKE) rebuild
+	$(MAKE) -C src rebuild
 
 install:
-	cd src; $(MAKE) install
-	cd include; $(MAKE) install
+	$(MAKE) -C src install
+	$(MAKE) -C include install
 
 uninstall:
-	cd src; $(MAKE) uninstall
-	cd include; $(MAKE) uninstall
+	$(MAKE) -C src uninstall
+	$(MAKE) -C include uninstall

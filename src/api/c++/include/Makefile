@@ -3,6 +3,8 @@ include ../../../../config.mk
 top_builddir = ../../../..
 INSTALL = $(top_builddir)/install-sh -c
 
+all:
+
 install:
 	$(top_builddir)/mkinstalldirs $(incdir)/sqlrelay
 	$(top_builddir)/mkinstalldirs $(incdir)/sqlrelay/private

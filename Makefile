@@ -2,46 +2,59 @@ include config.mk
 top_srcdir = .
 
 all:
-	cd src; $(MAKE) all
+	$(MAKE) -C src all
 
 clients:
-	cd src; $(MAKE) clients
+	$(MAKE) -C src clients
 
 servers:
-	cd src; $(MAKE) servers
+	$(MAKE) -C src servers
 
 clean:
-	cd src; $(MAKE) clean
-	cd bench; $(MAKE) clean
-	$(RMTREE) .pics */.pics */*/.pics */*/*/.pics */*/*/*/.pics */*/*/*/*/.pics
+	$(MAKE) -C src clean
+	$(MAKE) -C bench clean
+	$(RMTREE) .pics
+	$(RMTREE) */.pics
+	$(RMTREE) */*/.pics
+	$(RMTREE) */*/*/.pics
+	$(RMTREE) */*/*/*/.pics
+	$(RMTREE) */*/*/*/*/.pics
 	$(RM) packages/RPMS/*.rpm
 	$(RM) packages/SRPMS/*.rpm
 
 rebuild:
-	cd src; $(MAKE) rebuild
+	$(MAKE) -C src rebuild
 
 install:
-	cd bin; $(MAKE) install
-	cd doc; $(MAKE) install
-	cd man; $(MAKE) install
-	cd etc; $(MAKE) install
-	cd src; $(MAKE) install
-	cd init; $(MAKE) install
+	$(MAKE) -C bin install
+	$(MAKE) -C doc install
+	$(MAKE) -C man install
+	$(MAKE) -C etc install
+	$(MAKE) -C src install
+	$(MAKE) -C init install
 
 uninstall:
-	cd bin; $(MAKE) uninstall
-	cd doc; $(MAKE) uninstall
-	#cd man; $(MAKE) uninstall
-	cd etc; $(MAKE) uninstall
-	cd src; $(MAKE) uninstall
-	cd init; $(MAKE) uninstall
+	$(MAKE) -C bin uninstall
+	$(MAKE) -C doc uninstall
+	$(MAKE) -C man uninstall
+	$(MAKE) -C etc uninstall
+	$(MAKE) -C src uninstall
+	$(MAKE) -C init uninstall
 
 unconfig: clean
-	$(RM) config.cache config.h config.h~ config.h.in~ config.log config.status config.mk
+	$(RM) config.cache
+	$(RM) config.h
+	$(RM) config.h~
+	$(RM) config.h.in~
+	$(RM) config.log
+	$(RM) config.status
+	$(RM) config.mk
 	$(RMTREE) autom4te.cache
-	$(RM) src/api/perl/Makefile.PL
+	$(RM) src/api/perl/SQLRConnection/Makefile.PL
 	$(RM) src/api/perl/SQLRConnection/SQLRConnection.pm
+	$(RM) src/api/perl/SQLRCursor/Makefile.PL
 	$(RM) src/api/perl/SQLRCursor/SQLRCursor.pm
+	$(RM) src/api/perl/DBD/Makefile.PL
 	$(RM) src/api/perl/DBD/SQLRelay.pm
 	$(RM) sqlrelay.spec.in.in
 	$(RM) sqlrelay.spec.in
@@ -58,12 +71,12 @@ unconfig: clean
 distclean: unconfig
 
 rpm:
-	if ( test -n "$(HAVE_PERL)" ); then \
-		cd src/api/perl/SQLRConnection; $(MAKE) -f Makefile.master rpminfo; \
-	fi
-	if ( test -n "$(HAVE_RUBY)" ); then \
-		cd src/api/ruby; $(MAKE) -f Makefile.master rpminfo; \
-	fi
+ifneq ($(HAVE_PERL),)
+	$(MAKE) -C src/api/perl/SQLRConnection -f Makefile.master rpminfo
+endif
+ifneq ($(HAVE_RUBY),)
+	$(MAKE) -C src/api/ruby -f Makefile.master rpminfo
+endif
 	./buildspec
 	rm rpminfo
 	chmod 666 sqlrelay.spec

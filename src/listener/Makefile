@@ -1,44 +1,44 @@
 include ../../config.mk
 
-top_srcdir = ../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../..
+INSTALL = $(top_builddir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../ -I../common -I../util $(RUDIMENTSINCLUDES)
 LIBS = $(RUDIMENTSLIBS) -L../util -lsqlrutil $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = sqlrlistener.C main.C
-OBJS = sqlrlistener.o main.o
-DEBUGOBJS = sqlrlistener_debug.o main_debug.o
+LOBJS = sqlrlistener.lo main.lo
+PLOBJS = sqlrlistener.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-listener sqlr-listener-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-listener
-	$(RM) sqlr-listener-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-listener
+	$(LIBTOOL) --mode=clean $(RM) sqlr-listener-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+sqlr-listener: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-sqlrlistener_debug.o: sqlrlistener.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
-
-sqlr-listener: $(SRCS) $(OBJS)
-	$(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
-
-sqlr-listener-debug: $(SRCS) $(DEBUGOBJS)
-	$(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(DEBUGOBJS) $(LIBS)
+sqlr-listener-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(PLOBJS) $(LIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	$(INSTALL) sqlr-listener $(bindir)
-	$(INSTALL) sqlr-listener-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-listener $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-listener-debug $(bindir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-listener
-	$(RM) $(bindir)/sqlr-listener-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener-debug

@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(INTERBASEINCLUDES)
+LIBS = $(INTERBASELIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(INTERBASELIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(INTERBASELIBS)" ); then \
-		$(MAKE) sqlr-connection-interbase; \
-		$(MAKE) sqlr-connection-interbase-debug; \
-	fi
+SRCS= interbaseconnection.C main.C
+LOBJS= interbaseconnection.lo main.lo
+PLOBJS= interbaseconnection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-interbase sqlr-connection-interbase-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-interbase
-	$(RM) sqlr-connection-interbase-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-interbase
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-interbase-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INTERBASEINCLUDES) -c $<
+sqlr-connection-interbase: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(INTERBASESTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-interbaseconnection_debug.o: interbaseconnection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(INTERBASEINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(INTERBASEINCLUDES) -c $< -o $@
-
-sqlr-connection-interbase: interbaseconnection.C interbaseconnection.o main.C main.o 
-	$(CXX) $(INTERBASESTATIC) $(LDFLAGS) -o $@ interbaseconnection.o main.o $(INTERBASELIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-interbase-debug: interbaseconnection.C interbaseconnection_debug.o main.C main_debug.o 
-	$(CXX) $(INTERBASESTATIC) $(DEBUGLDFLAGS) -o $@ interbaseconnection_debug.o main_debug.o $(INTERBASELIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-interbase-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(INTERBASESTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(INTERBASELIBS)" ); then \
-		$(INSTALL) sqlr-connection-interbase $(bindir); \
-		$(INSTALL) sqlr-connection-interbase-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-interbase $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-interbase-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-interbase
-	$(RM) $(bindir)/sqlr-connection-interbase-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-interbase
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-interbase-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(POSTGRESQLINCLUDES)
+LIBS = $(POSTGRESQLLIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(POSTGRESQLLIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(POSTGRESQLLIBS)" ); then \
-		$(MAKE) sqlr-connection-postgresql; \
-		$(MAKE) sqlr-connection-postgresql-debug; \
-	fi
+SRCS= postgresqlconnection.C main.C
+LOBJS= postgresqlconnection.lo main.lo
+PLOBJS= postgresqlconnection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-postgresql sqlr-connection-postgresql-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-postgresql
-	$(RM) sqlr-connection-postgresql-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-postgresql
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-postgresql-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(POSTGRESQLINCLUDES) -c $<
+sqlr-connection-postgresql: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(POSTGRESQLSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-postgresqlconnection_debug.o: postgresqlconnection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(POSTGRESQLINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(POSTGRESQLINCLUDES) -c $< -o $@
-
-sqlr-connection-postgresql: postgresqlconnection.o main.C main.o 
-	$(CXX) $(POSTGRESQLSTATIC) $(LDFLAGS) -o $@ postgresqlconnection.o main.o $(POSTGRESQLLIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-postgresql-debug: postgresqlconnection_debug.o main.C main_debug.o 
-	$(CXX) $(POSTGRESQLSTATIC) $(DEBUGLDFLAGS) -o $@ postgresqlconnection_debug.o main_debug.o $(POSTGRESQLLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-postgresql-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(POSTGRESQLSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(POSTGRESQLLIBS)" ); then \
-		$(INSTALL) sqlr-connection-postgresql $(bindir); \
-		$(INSTALL) sqlr-connection-postgresql-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-postgresql $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-postgresql-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-postgresql
-	$(RM) $(bindir)/sqlr-connection-postgresql-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -1,118 +1,107 @@
 include ../../config.mk
 
 all:
-	cd c++; $(MAKE) all
-	cd c; $(MAKE) all
-	if ( test -n "$(HAVE_PYTHON)" ); then \
-		cd python; $(MAKE) all; \
-	fi
-	if ( test -n "$(HAVE_PERL)" ); then \
-		cd perl/SQLRConnection; $(MAKE) -f Makefile.master all; \
-		cd ../..; \
-		cd perl/SQLRCursor; $(MAKE) -f Makefile.master all; \
-		cd ../..; \
-		cd perl/DBD; $(MAKE) -f Makefile.master all; \
-	fi
-	if ( test -n "$(HAVE_RUBY)" ); then \
-		cd ruby; $(MAKE) -f Makefile.master all; \
-	fi
-	if ( test -n "$(HAVE_PHP)" ); then \
-		cd php; $(MAKE) all; \
-	fi
-	if ( test -n "$(HAVE_JAVA)" ); then \
-		cd java; $(MAKE) all; \
-	fi
+	$(MAKE) -C c++ all
+	$(MAKE) -C c all
+ifneq ($(HAVE_PYTHON),)
+	$(MAKE) -C python all
+endif
+ifneq ($(HAVE_PERL),)
+	$(MAKE) -C perl/SQLRConnection -f Makefile.master all
+	$(MAKE) -C perl/SQLRCursor -f Makefile.master all
+	$(MAKE) -C perl/DBD -f Makefile.master all
+endif
+ifneq ($(HAVE_RUBY),)
+	$(MAKE) -C ruby -f Makefile.master all
+endif
+ifneq ($(HAVE_PHP),)
+	$(MAKE) -C php all
+endif
+ifneq ($(HAVE_JAVA),)
+	$(MAKE) -C java all
+endif
 
 clean:
-	cd c++; $(MAKE) clean
-	cd c; $(MAKE) clean
-	if ( test -n "$(HAVE_PYTHON)" ); then \
-		cd python; $(MAKE) clean; \
-	fi
-	if ( test -n "$(HAVE_PERL)" ); then \
-		cd perl/SQLRConnection; $(MAKE) -f Makefile.master clean; \
-		cd ../..; \
-		cd perl/SQLRCursor; $(MAKE) -f Makefile.master clean; \
-		cd ../..; \
-		cd perl/DBD; $(MAKE) -f Makefile.master clean; \
-	fi
-	if ( test -n "$(HAVE_RUBY)" ); then \
-		cd ruby; $(MAKE) -f Makefile.master clean; \
-	fi
-	if ( test -n "$(HAVE_PHP)" ); then \
-		cd php; $(MAKE) clean; \
-	fi
-	if ( test -n "$(HAVE_JAVA)" ); then \
-		cd java; $(MAKE) clean; \
-	fi
+	$(MAKE) -C c++ clean
+	$(MAKE) -C c clean
+ifneq ($(HAVE_PYTHON),)
+	$(MAKE) -C python clean
+endif
+ifneq ($(HAVE_PERL),)
+	$(MAKE) -C perl/SQLRConnection -f Makefile.master clean
+	$(MAKE) -C perl/SQLRCursor -f Makefile.master clean
+	$(MAKE) -C perl/DBD -f Makefile.master clean
+endif
+ifneq ($(HAVE_RUBY),)
+	$(MAKE) -C ruby -f Makefile.master clean
+endif
+ifneq ($(HAVE_PHP),)
+	$(MAKE) -C php clean
+endif
+ifneq ($(HAVE_JAVA),)
+	$(MAKE) -C java clean
+endif
+
 
 rebuild:
-	cd c++; $(MAKE) rebuild
-	cd c; $(MAKE) rebuild
-	if ( test -n "$(HAVE_PYTHON)" ); then \
-		cd python; $(MAKE) rebuild; \
-	fi
-	if ( test -n "$(HAVE_PERL)" ); then \
-		cd perl/SQLRConnection; $(MAKE) -f Makefile.master rebuild; \
-		cd ../..; \
-		cd perl/SQLRCursor; $(MAKE) -f Makefile.master rebuild; \
-		cd ../..; \
-		cd perl/DBD; $(MAKE) -f Makefile.master rebuild; \
-	fi
-	if ( test -n "$(HAVE_RUBY)" ); then \
-		cd ruby; $(MAKE) -f Makefile.master rebuild; \
-	fi
-	if ( test -n "$(HAVE_PHP)" ); then \
-		cd php; $(MAKE) rebuild; \
-	fi
-	if ( test -n "$(HAVE_JAVA)" ); then \
-		cd java; $(MAKE) rebuild; \
-	fi
+	$(MAKE) -C c++ rebuild
+	$(MAKE) -C c rebuild
+ifneq ($(HAVE_PYTHON),)
+	$(MAKE) -C python rebuild
+endif
+ifneq ($(HAVE_PERL),)
+	$(MAKE) -C perl/SQLRConnection -f Makefile.master rebuild
+	$(MAKE) -C perl/SQLRCursor -f Makefile.master rebuild
+	$(MAKE) -C perl/DBD -f Makefile.master rebuild
+endif
+ifneq ($(HAVE_RUBY),)
+	$(MAKE) -C ruby -f Makefile.master rebuild
+endif
+ifneq ($(HAVE_PHP),)
+	$(MAKE) -C php rebuild
+endif
+ifneq ($(HAVE_JAVA),)
+	$(MAKE) -C java rebuild
+endif
 
 install:
-	cd c++; $(MAKE) install
-	cd c; $(MAKE) install
-	if ( test -n "$(HAVE_PYTHON)" ); then \
-		cd python; $(MAKE) install; \
-	fi
-	if ( test -n "$(HAVE_RUBY)" ); then \
-		cd ruby; $(MAKE) -f Makefile.master install; \
-	fi
-	if ( test -n "$(HAVE_PHP)" ); then \
-		cd php; $(MAKE) install; \
-	fi
-	if ( test -n "$(HAVE_PERL)" ); then \
-		cd perl/SQLRConnection; $(MAKE) -f Makefile.master install; \
-		cd ../..; \
-		cd perl/SQLRCursor; $(MAKE) -f Makefile.master install; \
-		cd ../..; \
-		cd perl/DBD; $(MAKE) -f Makefile.master install; \
-	fi
-	if ( test -n "$(HAVE_JAVA)" ); then \
-		cd java; $(MAKE) install; \
-	fi
-	cd zope; $(MAKE) install
+	$(MAKE) -C c++ install
+	$(MAKE) -C c install
+ifneq ($(HAVE_PYTHON),)
+	$(MAKE) -C python install
+endif
+ifneq ($(HAVE_PERL),)
+	$(MAKE) -C perl/SQLRConnection -f Makefile.master install
+	$(MAKE) -C perl/SQLRCursor -f Makefile.master install
+	$(MAKE) -C perl/DBD -f Makefile.master install
+endif
+ifneq ($(HAVE_RUBY),)
+	$(MAKE) -C ruby -f Makefile.master install
+endif
+ifneq ($(HAVE_PHP),)
+	$(MAKE) -C php install
+endif
+ifneq ($(HAVE_JAVA),)
+	$(MAKE) -C java install
+endif
 
 uninstall:
-	cd c++; $(MAKE) uninstall
-	cd c; $(MAKE) uninstall
-	if ( test -n "$(HAVE_PYTHON)" ); then \
-		cd python; $(MAKE) uninstall; \
-	fi
-	if ( test -n "$(HAVE_RUBY)" ); then \
-		cd ruby; $(MAKE) -f Makefile.master uninstall; \
-	fi
-	if ( test -n "$(HAVE_PHP)" ); then \
-		cd php; $(MAKE) uninstall; \
-	fi
-	if ( test -n "$(HAVE_PERL)" ); then \
-		cd perl/SQLRConnection; $(MAKE) -f Makefile.master uninstall; \
-		cd ../..; \
-		cd perl/SQLRCursor; $(MAKE) -f Makefile.master uninstall; \
-		cd ../..; \
-		cd perl/DBD; $(MAKE) -f Makefile.master uninstall; \
-	fi
-	if ( test -n "$(HAVE_JAVA)" ); then \
-		cd java; $(MAKE) uninstall; \
-	fi
-	cd zope; $(MAKE) uninstall
+	$(MAKE) -C c++ uninstall
+	$(MAKE) -C c uninstall
+ifneq ($(HAVE_PYTHON),)
+	$(MAKE) -C python uninstall
+endif
+ifneq ($(HAVE_PERL),)
+	$(MAKE) -C perl/SQLRConnection -f Makefile.master uninstall
+	$(MAKE) -C perl/SQLRCursor -f Makefile.master uninstall
+	$(MAKE) -C perl/DBD -f Makefile.master uninstall
+endif
+ifneq ($(HAVE_RUBY),)
+	$(MAKE) -C ruby -f Makefile.master uninstall
+endif
+ifneq ($(HAVE_PHP),)
+	$(MAKE) -C php uninstall
+endif
+ifneq ($(HAVE_JAVA),)
+	$(MAKE) -C java uninstall
+endif

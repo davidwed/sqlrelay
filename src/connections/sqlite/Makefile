@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(SQLITEINCLUDES)
+LIBS = $(SQLITELIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(SQLITELIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(SQLITELIBS)" ); then \
-		$(MAKE) sqlr-connection-sqlite; \
-		$(MAKE) sqlr-connection-sqlite-debug; \
-	fi
+SRCS= sqliteconnection.C main.C
+LOBJS= sqliteconnection.lo main.lo
+PLOBJS= sqliteconnection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-sqlite sqlr-connection-sqlite-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-sqlite
-	$(RM) sqlr-connection-sqlite-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sqlite
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sqlite-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(SQLITEINCLUDES) -c $<
+sqlr-connection-sqlite: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(SQLITESTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-sqliteconnection_debug.o: sqliteconnection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(SQLITEINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(SQLITEINCLUDES) -c $< -o $@
-
-sqlr-connection-sqlite: sqliteconnection.C sqliteconnection.o main.C main.o 
-	$(CXX) $(SQLITESTATIC) $(LDFLAGS) -o $@ sqliteconnection.o main.o $(SQLITELIBS) $(PTHREADLIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-sqlite-debug: sqliteconnection.C sqliteconnection_debug.o main.C main_debug.o 
-	$(CXX) $(SQLITESTATIC) $(DEBUGLDFLAGS) -o $@ sqliteconnection_debug.o main_debug.o $(SQLITELIBS) $(PTHREADLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-sqlite-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(SQLITESTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(SQLITELIBS)" ); then \
-		$(INSTALL) sqlr-connection-sqlite $(bindir); \
-		$(INSTALL) sqlr-connection-sqlite-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-sqlite $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-sqlite-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-sqlite
-	$(RM) $(bindir)/sqlr-connection-sqlite-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(ODBCINCLUDES)
+LIBS = $(ODBCLIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(ODBCLIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(ODBCLIBS)" ); then \
-		$(MAKE) sqlr-connection-odbc; \
-		$(MAKE) sqlr-connection-odbc-debug; \
-	fi
+SRCS= odbcconnection.C main.C
+LOBJS= odbcconnection.lo main.lo
+PLOBJS= odbcconnection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-odbc sqlr-connection-odbc-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-odbc
-	$(RM) sqlr-connection-odbc-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(ODBCINCLUDES) -c $<
+sqlr-connection-odbc: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(ODBCSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-odbcconnection_debug.o: odbcconnection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(ODBCINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(ODBCINCLUDES) -c $< -o $@
-
-sqlr-connection-odbc: odbcconnection.C odbcconnection.o main.C main.o 
-	$(CXX) $(ODBCSTATIC) $(LDFLAGS) -o $@ odbcconnection.o main.o $(ODBCLIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-odbc-debug: odbcconnection.C odbcconnection_debug.o main.C main_debug.o 
-	$(CXX) $(ODBCSTATIC) $(DEBUGLDFLAGS) -o $@ odbcconnection_debug.o main_debug.o $(ODBCLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-odbc-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(ODBCSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(ODBCLIBS)" ); then \
-		$(INSTALL) sqlr-connection-odbc $(bindir); \
-		$(INSTALL) sqlr-connection-odbc-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-odbc $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-odbc-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-odbc
-	$(RM) $(bindir)/sqlr-connection-odbc-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

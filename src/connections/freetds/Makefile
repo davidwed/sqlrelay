@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(FREETDSINCLUDES)
+LIBS = $(FREETDSLIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(FREETDSLIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(FREETDSLIBS)" ); then \
-		$(MAKE) sqlr-connection-freetds; \
-		$(MAKE) sqlr-connection-freetds-debug; \
-	fi
+SRCS= freetdsconnection.C main.C
+LOBJS= freetdsconnection.lo main.lo
+PLOBJS= freetdsconnection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-freetds sqlr-connection-freetds-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-freetds
-	$(RM) sqlr-connection-freetds-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-freetds
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-freetds-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(FREETDSINCLUDES) -c $<
+sqlr-connection-freetds: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(FREETDSSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-freetdsconnection_debug.o: freetdsconnection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(FREETDSINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(FREETDSINCLUDES) -c $< -o $@
-
-sqlr-connection-freetds: freetdsconnection.C freetdsconnection.o main.C main.o 
-	$(CXX) $(FREETDSSTATIC) $(LDFLAGS) -o $@ freetdsconnection.o main.o $(FREETDSLIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-freetds-debug: freetdsconnection.C freetdsconnection_debug.o main.C main_debug.o 
-	$(CXX) $(FREETDSSTATIC) $(DEBUGLDFLAGS) -o $@ freetdsconnection_debug.o main_debug.o $(FREETDSLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-freetds-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(FREETDSSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(FREETDSLIBS)" ); then \
-		$(INSTALL) sqlr-connection-freetds $(bindir); \
-		$(INSTALL) sqlr-connection-freetds-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-freetds $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-freetds-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-freetds
-	$(RM) $(bindir)/sqlr-connection-freetds-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-freetds
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-freetds-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

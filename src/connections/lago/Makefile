@@ -1,53 +1,52 @@
 include ../../../config.mk
 
-top_srcdir = ../../..
-INSTALL = $(top_srcdir)/install-sh -c
+top_builddir = ../../..
+INSTALL = $(top_builddir)/install-sh -c
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../connection $(RUDIMENTSINCLUDES)
-LIBS = -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(NSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I../../../ -I../../common -I../../util -I../../authenticator -I../../connection $(RUDIMENTSINCLUDES) $(LAGOINCLUDES)
+LIBS = $(LAGOLIBS) -L../../connection -lsqlrconnection -L../../util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIB) $(NSLLIB) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = $(LAGOLIBS) -L../../connection -lsqlrconnection_p -L../../util -lsqlrutil $(RUDIMENTSDEBUGLIBS) $(EXTRALIBS) $(NSLLIB) $(SOCKETLIB) $(LIBDMALLOC) $(LIBEFENCE)
 
-all: 
-	if ( test -n "$(LAGOLIBS)" ); then \
-		$(MAKE) sqlr-connection-lago; \
-		$(MAKE) sqlr-connection-lago-debug; \
-	fi
+SRCS= lagoconnection.C main.C
+LOBJS= lagoconnection.lo main.lo
+PLOBJS= lagoconnection.p.lo main.p.lo
+
+.SUFFIXES: .lo .p.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.p.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(DEBUGCXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-connection-lago sqlr-connection-lago-debug
 
 clean:
-	$(RM) *.o
-	$(RM) sqlr-connection-lago
-	$(RM) sqlr-connection-lago-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-lago
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-lago-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
 
 rebuild: clean all
 
-.C.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LAGOINCLUDES) -c $<
+sqlr-connection-lago: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS)
 
-lagoconnection_debug.o: lagoconnection.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(LAGOINCLUDES) -c $< -o $@
-
-main_debug.o: main.C
-	$(CXX) -DSERVER_DEBUG $(DEBUGCXXFLAGS) $(CPPFLAGS) $(LAGOINCLUDES) -c $< -o $@
-
-sqlr-connection-lago: lagoconnection.C lagoconnection.o main.C main.o 
-	$(CXX) $(LAGOSTATIC) $(LDFLAGS) -o $@ lagoconnection.o main.o $(LAGOLIBS) -L../../connection -lsqlrconnection $(LIBS)
-
-sqlr-connection-lago-debug: lagoconnection.C lagoconnection_debug.o main.C main_debug.o 
-	$(CXX) $(LAGOSTATIC) $(DEBUGLDFLAGS) -o $@ lagoconnection_debug.o main_debug.o $(LAGOLIBS) -L../../connection -lsqlrconnection_debug $(LIBS)
+sqlr-connection-lago-debug: $(SRCS) $(PLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(LAGOSTATIC) $(DEBUGLDFLAGS) -o $@ $(PLOBJS) $(DEBUGLIBS)
 
 install:
-	$(top_srcdir)/mkinstalldirs $(bindir)
-	if ( test -n "$(LAGOLIBS)" ); then \
-		$(INSTALL) sqlr-connection-lago $(bindir); \
-		$(INSTALL) sqlr-connection-lago-debug $(bindir); \
-	fi
-	$(top_srcdir)/mkinstalldirs $(tmpdir)
+	$(top_builddir)/mkinstalldirs $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) -s sqlr-connection-lago $(bindir)
+	$(LIBTOOL) --mode=install $(INSTALL) sqlr-connection-lago-debug $(bindir)
+	$(top_builddir)/mkinstalldirs $(tmpdir)
 	chmod 777 $(tmpdir)
-	$(top_srcdir)/mkinstalldirs $(debugdir)
+	$(top_builddir)/mkinstalldirs $(debugdir)
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(RM) $(bindir)/sqlr-connection-lago
-	$(RM) $(bindir)/sqlr-connection-lago-debug
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-lago
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-lago-debug
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)
