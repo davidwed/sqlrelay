@@ -44,6 +44,7 @@
 	added /usr/sfw to configure script's search paths
 	uses rudiments error class
 	added /sw to configure script's search paths
+	added -Wno-long-double if system supports it
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

@@ -384,6 +384,21 @@ AC_SUBST(PIPE)
 ])
 
 
+dnl checks to see if -Wno-long-double option to gcc works or not
+AC_DEFUN([FW_CHECK_WNOLONGDOUBLE],
+[
+AC_MSG_CHECKING(for -Wno-long-double option)
+FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wno-long-double],[],[],[WNOLONGDOUBLE="-Wno-long-double"],[WNOLONGDOUBLE=""])
+if ( test -n "$WNOLONGDOUBLE" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(WNOLONGDOUBLE)
+])
+
+
 
 dnl Checks for microsoft platform.
 dnl sets the substitution variables MINGW32, CYGWIN and UWIN as appropriate
@@ -424,7 +439,6 @@ AC_DEFUN([FW_CHECK_OSX],
 	if ( test "`uname -s`" = "Darwin" -a -r "INSTALL" )
 	then
 		PYTHONFRAMEWORK="-framework Python"
-		CPPFLAGS="$CPPFLAGS -Wno-long-double"
 	fi
 	AC_SUBST(PYTHONFRAMEWORK)
 ])
