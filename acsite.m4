@@ -803,6 +803,8 @@ then
 		if ( test -z "$MYSQLLIBS" )
 		then
 			AC_MSG_WARN(MySQL support will not be built.)
+		else
+			FW_CHECK_MYSQL_FUNCTIONS()
 		fi
 	fi
 
@@ -815,7 +817,26 @@ then
 	AC_SUBST(MYSQLSTATIC)
 fi
 ])
-	
+
+AC_DEFUN([FW_CHECK_MYSQL_FUNCTIONS],
+[
+	AC_MSG_CHECKING(for mysql_ping)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[mysql_ping(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_PING,1,MySQL supports mysql_ping)],[AC_MSG_RESULT(no)])
+
+	AC_MSG_CHECKING(for mysql_change_user)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[mysql_change_user(NULL,NULL,NULL,NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_CHANGE_USER,1,MySQL supports mysql_change_user)],[AC_MSG_RESULT(no)])
+
+	AC_MSG_CHECKING(for mysql_commit)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[mysql_commit(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_COMMIT,1,MySQL supports mysql_commit)],[AC_MSG_RESULT(no)])
+
+	AC_MSG_CHECKING(for mysql_prepare)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[mysql_prepare(NULL,NULL,0);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_PREPARE,1,MySQL supports mysql_prepare)],[AC_MSG_RESULT(no)])
+
+])
 
 
 AC_DEFUN([FW_CHECK_MSQL],

@@ -3,6 +3,10 @@ Pear DB interface license
 scaling/handoff=pass incompatibility
 freetds-0.62/ct_param support
 full mysql4 support/docs
+	configure should look for:
+		mysql_select_db
+		mysql_ping
+	mysql4.0 - mysql_change_user
 mysql replacement library
 
 oldmysql test files for non-C++ api's

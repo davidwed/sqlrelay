@@ -31,6 +31,18 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* MySQL supports mysql_change_user */
+#undef HAVE_MYSQL_CHANGE_USER
+
+/* MySQL supports mysql_commit */
+#undef HAVE_MYSQL_COMMIT
+
+/* MySQL supports mysql_ping */
+#undef HAVE_MYSQL_PING
+
+/* MySQL supports mysql_prepare */
+#undef HAVE_MYSQL_PREPARE
+
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 #undef HAVE_NDIR_H
 
