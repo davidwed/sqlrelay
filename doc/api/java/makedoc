@@ -1,1 +1,5 @@
-javadoc ../../../src/api/java/*.java
+rm -f *.html
+rm -f *.css
+rm -rf com
+rm -f package-list
+javadoc ../../../src/api/java/com/firstworks/sqlrelay/*.java
