@@ -16,7 +16,7 @@
 // | Author: Stig Bakken <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.1 2004-01-07 05:47:37 mused Exp $
+// $Id: sqlrelay.php,v 1.2 2004-01-07 06:29:18 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -264,7 +264,6 @@ class DB_sqlrelay extends DB_common
     function freeResult(&$sqlrcursor)
     {
         sqlrcur_free($sqlrcursor->cursor);
-        // FIXME: how do I delete $sqlrcursor?
         return TRUE;
     }
 
@@ -408,12 +407,13 @@ class DB_sqlrelay extends DB_common
          *      DB_TABLEINFO_ORDERTABLE * or with DB_TABLEINFO_FULL
          */
 
-        // if $result is a string, then we want information about a
-        // table without a resultset else we want information about a resultset
         if (is_string($sqlrcursor)) {
-            // FIXME: not supported
-        } else if (!$sqlrcursor || !$sqlrcursor->cursor) {
-            // FIXME: handle null cursors
+            // if $result is a string, then we want information about a
+            // table without a resultset else we want information about a
+            // resultset, this is not yet supported
+            return null;
+        } else if (empty($sqlrcursor) || empty($sqlrcursor)) {
+            return null;
         }
 
         $count = sqlrcur_colCount($sqlrcursor->cursor);
@@ -444,10 +444,6 @@ class DB_sqlrelay extends DB_common
             }
         }
 
-        // free the result only if we were called on a table
-        if (is_string($result)) {
-            // FIXME: not supported
-        }
         return $res;
 
     }
