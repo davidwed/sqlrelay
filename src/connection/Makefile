@@ -4,9 +4,6 @@ INSTALL = $(abs_srcdir)/install-sh -c
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(abs_srcdir)/ -I$(abs_srcdir)/src/common -I$(abs_srcdir)/src/util $(RUDIMENTSINCLUDES)
 
-#SRCS = sqlrconnection.C connection/connectioncmdline.C connection/ipc.C connection/listenercomm.C connection/scalercomm.C connection/unixsocketseqfile.C sqlrcursor.C
-#NLOBJS = sqlrconnection.n.lo connection/connectioncmdline.n.lo connection/ipc.n.lo connection/listenercomm.n.lo connection/scalercomm.n.lo connection/unixsocketseqfile.n.lo sqlrcursor.n.lo
-#PLOBJS = sqlrconnection.p.lo connection/connectioncmdline.p.lo connection/ipc.p.lo connection/listenercomm.p.lo connection/scalercomm.p.lo connection/unixsocketseqfile.p.lo sqlrcursor.p.lo
 SRCS = sqlrconnection/constructor.C \
 	sqlrconnection/destructor.C \
 	sqlrconnection/initconnection.C \
