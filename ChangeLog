@@ -6,6 +6,7 @@
 		in CSQLRelay.C
 	fixed freetds version check even more
 	INSTALL is moved to INSTALL.txt for OS X now
+	applied Matthias Klose's Zope configure patch
 
 0.35 - added (slightly modified) pkgconfig stuff from Dolphpower's pkgconfig
 		patch

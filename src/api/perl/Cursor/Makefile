@@ -2,8 +2,8 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" )
-PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" )
+PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
+PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
 PERLINSTALLARCHLIB = $(DESTDIR)$(shell eval "`$(PERL) -V:installarchlib`"; export installarchlib; echo $$installarchlib | sed -e "s|UNKNOWN||g" )
 PERLSITEARCH = $(DESTDIR)$(shell eval "`$(PERL) -V:sitearch`"; export sitearch; echo $$sitearch | sed -e "s|UNKNOWN||g" )
 PERL_INC = $(DESTDIR)$(shell eval "`$(PERL) -V:archlibexp`"; export archlibexp; echo "-I$$archlibexp/CORE" | sed -e "s|UNKNOWN||g" )

@@ -269,20 +269,28 @@ freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	char	*versionstring=strdup("freetds v0.00.0");
 	#endif
 
-	// FIXME: what if we don't find 'v'
 	char	*v=strchr(versionstring,'v');
-	*v=(char)NULL;
-	majorversion=atoi(v+1);
-
-	char	*firstdot=strchr(v+1,'.');
-	*firstdot=(char)NULL;
-	minorversion=atoi(firstdot+1);
-
-	char	*seconddot=strchr(firstdot+1,'.');
-	if (seconddot) {
-		*seconddot=(char)NULL;
-		patchlevel=atoi(seconddot+1);
+	if (v) {
+		*v=(char)NULL;
+		majorversion=atoi(v+1);
+		char	*firstdot=strchr(v+1,'.');
+		if (firstdot) {
+			*firstdot=(char)NULL;
+			minorversion=atoi(firstdot+1);
+			char	*seconddot=strchr(firstdot+1,'.');
+			if (seconddot) {
+				*seconddot=(char)NULL;
+				patchlevel=atoi(seconddot+1);
+			} else {
+				patchlevel=0;
+			}
+		} else {
+			minorversion=0;
+			patchlevel=0;
+		}
 	} else {
+		majorversion=0;
+		minorversion=0;
 		patchlevel=0;
 	}
 

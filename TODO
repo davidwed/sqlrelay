@@ -1,6 +1,6 @@
-perl apis -> CPAN
+sqlrsh crashes if you hit ctrl-D
 
-document 10g on fedora core 2 dbca failure fix
+perl apis -> CPAN
 
 move socket files into their own directory so they can't collide with other
 	stuff in tmp directory
@@ -8,8 +8,6 @@ move socket files into their own directory so they can't collide with other
 document that snippets from tnsnames.ora can be used as ORACLE_SID
 
 look at npgsql for .net data provider example
-
-FIXME parsing TDS_VERSION_NO in freetds connection
 
 if connections=0 and maxconnections>0 then one connection does get started,
 	sometimes connections with a ttl don't die off
@@ -20,7 +18,7 @@ api needs to expose integer column types
 
 CFLAGS="-framework Python" to get python API to compile on OS X
 
-HFS is case insensitive but case preserving, need INSTALL.txt hack for OS X
+does setResultSetBufferSize prevent PythonDB from fetching more than 100 rows?
 
 --------------------------------------------------------------------------------
 

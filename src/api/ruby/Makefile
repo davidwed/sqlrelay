@@ -2,7 +2,7 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-RUBYCFLAGS = $(shell $(RUBY) getcflags.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYCFLAGS = $(shell $(RUBY) getcflags.rb | sed -e "s|-mtune=pentium4||g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 
 ifeq ($(shell $(RUBY) getsitearchdir.rb | grep -c DESTDIR),0)
 RUBYSITEARCHDIR = $(DESTDIR)$(RUBYCYGDRIVEPREFIX)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )

@@ -342,6 +342,15 @@ AC_SUBST(MICROSOFT)
 ])
 
 
+AC_DEFUN([FW_CHECK_OSX],
+[
+	dnl Hack so "make install" will work on OS X
+	if ( test "`uname -s`" = "Darwin" -a -r "INSTALL" )
+	then
+		mv INSTALL INSTALL.txt
+	fi
+])
+
 
 dnl Determines what extension shared object files have
 AC_DEFUN([FW_CHECK_SO_EXT],
@@ -1121,6 +1130,41 @@ AC_SUBST(GDBMLIBS)
 ])
 
 
+AC_DEFUN([FW_CHECK_GLIB],
+[
+
+if ( test "$cross_compiling" = "yes" )
+then
+	dnl cross compiling ...
+	echo "cross compiling"
+	if ( test -n "$GLIBPATH" )
+	then
+		GLIBINCLUDES="-I$GLIBPATH/include/glib-2.0 -I$GLIBPATH/lib/glib/include"
+		GLIBLIBS="-L$GLIBPATH/lib -lglib-2.0"
+		GLIBLIBSPATH="$GLIBPATH/lib"
+	fi
+else
+	GLIBINCLUDES="`pkg-config glib-2.0 --cflags 2> /dev/null`"
+	GLIBLIBS="`pkg-config glib-2.0 --libs 2> /dev/null`"
+	if ( test -z "$GLIBINCLUDES" -a -z "$GLIBLIBS" )
+	then
+		FW_CHECK_HEADERS_AND_LIBS([$LIBGLIBPATH],[glib-2.0],[glib.h],[glib-2.0],[$STATICFLAG],[$RPATHFLAG],[GLIBINCLUDES],[GLIBLIBS],[GLIBLIBSPATH],[GLIBSTATIC])
+		if ( test -n "$GLIBINCLUDES" )
+		then
+			DIRNAME1=`dirname $GLIBINCLUDES`
+			DIRNAME2=`dirname $DIRNAME1`
+			GLIBINCLUDES="$GLIBINCLUDES $DIRNAME2/lib/glib/include"
+		fi
+	fi
+fi
+
+FW_INCLUDES(glib,[$GLIBINCLUDES])
+FW_LIBS(glib,[$GLIBLIBS])
+
+AC_SUBST(GLIBLIBS)
+])
+
+
 AC_DEFUN([FW_CHECK_SQLITE],
 [
 if ( test "$ENABLE_SQLITE" = "yes" )
@@ -1793,6 +1837,66 @@ fi
 
 
 
+AC_DEFUN([FW_CHECK_MDBTOOLS],
+[
+if ( test "$ENABLE_MDBTOOLS" = "yes" )
+then
+	FW_CHECK_GLIB
+	if ( test -n "$GLIBINCLUDES" -a -n "$GLIBLIBS" )
+	then
+
+		MDBTOOLSSTATIC=""
+
+		if ( test "$cross_compiling" = "yes" )
+		then
+
+			dnl cross compiling ...
+			echo "cross compiling"
+			if ( test -n "$MDBTOOLSPATH" )
+			then
+				MDBTOOLSINCLUDES="-I$MDBTOOLSPATH/include $GLIBINCLUDES"
+				MDBTOOLSLIBS="-L$MDBTOOLSPATH/lib -lmdbsql -lmdb $GLIBLIBS"
+				MDBTOOLSLIBSPATH="$MDBTOOLSPATH/lib"
+			fi
+
+		else
+
+			STATICFLAG=""
+			if ( test -n "$STATICLINK" )
+			then
+				STATICFLAG="-static"
+			fi
+
+			FW_CHECK_HEADERS_AND_LIBS([$MDBTOOLSPATH],[mdbsql],[mdbsql.h],[mdbsql],[$STATICFLAG],[$RPATHFLAG],[MDBSQLINCLUDES],[MDBSQLLIBS],[MDBSQLLIBSPATH],[MDBSQLSTATIC])
+			FW_CHECK_HEADERS_AND_LIBS([$MDBTOOLSPATH],[mdb],[mdbtools.h],[mdb],[$STATICFLAG],[$RPATHFLAG],[MDBINCLUDES],[MDBLIBS],[MDBTOOLSLIBSPATH],[MDBTOOLSSTATIC])
+
+			if ( test -n "$MDBSQLINCLUDES" -a -n "$MDBSQLLIBS" -a -n "$MDBINCLUDES" -a -n "$MDBLIBS" )
+			then
+				MDBTOOLSINCLUDES="$MDBINCLUDES $MDBSQLINCLUDES $GLIBINCLUDES"
+				MDBTOOLSLIBS="$MDBSQLLIBS $MDBLIBS $GLIBLIBS"
+			fi
+	
+			AC_SUBST(MDBTOOLSINCLUDES)
+			AC_SUBST(MDBTOOLSLIBS)
+			AC_SUBST(MDBTOOLSLIBSPATH)
+			AC_SUBST(MDBTOOLSSTATIC)
+		
+			if ( test -z "$MDBTOOLSLIBS" )
+			then
+				AC_MSG_WARN(MDB Tools support will not be built.)
+			fi
+
+		fi
+
+	fi
+
+	FW_INCLUDES(mdbtools,[$MDBTOOLSINCLUDES])
+	FW_LIBS(mdbtools,[$MDBTOOLSLIBS])
+fi
+])
+
+
+
 AC_DEFUN([FW_CHECK_PERL],
 [
 if ( test "$ENABLE_PERL" = "yes" )
@@ -2025,6 +2129,7 @@ then
 			if ( test -n "$ZOPEPATH" )
 			then
 				ZOPEDIR="$ZOPEPATH/lib/python/Products"
+				HAVE_ZOPE="yes"
 			else
 		
 				if ( test -z "$ZOPEDIR" )
