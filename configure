@@ -9571,6 +9571,10 @@ fi
 
 		if ( test -n "$PTHREADSLIB" )
 		then
+			if ( test "$i" = "c_r" )
+			then
+				PTHREADSLIB="-pthread $PTHREADSLIB"
+			fi
 			break
 		fi
 	done

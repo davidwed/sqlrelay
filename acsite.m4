@@ -386,6 +386,10 @@ else
 		FW_CHECK_LIB([/usr/lib/lib$i.so],[PTHREADSLIBPATH=\"\"; PTHREADSLIB=\"-l$i\"],[/usr/lib/lib$i.a],[PTHREADSLIB=\"-l$i\"])
 		if ( test -n "$PTHREADSLIB" )
 		then
+			if ( test "$i" = "c_r" )
+			then
+				PTHREADSLIB="-pthread $PTHREADSLIB"
+			fi
 			break
 		fi
 	done

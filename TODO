@@ -1,3 +1,6 @@
+openbsd - lago/pthread problem, libpq-sqlrelay install problem
+freebsd - listener/pthread problem
+
 test finished-suspended-result-set's with oracle/db2/sybase/freetds
 slackware package build isn't right
 
