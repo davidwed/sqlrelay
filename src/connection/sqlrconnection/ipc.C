@@ -63,7 +63,13 @@ bool sqlrconnection::createSharedMemoryAndSemaphores(char *tmpdir, char *id) {
 }
 
 void sqlrconnection::acquireAnnounceMutex() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"acquiring announce mutex");
+	#endif
 	semset->wait(0);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done acquiring announce mutex");
+	#endif
 }
 
 shmdata *sqlrconnection::getAnnounceBuffer() {
@@ -71,19 +77,43 @@ shmdata *sqlrconnection::getAnnounceBuffer() {
 }
 
 void sqlrconnection::releaseAnnounceMutex() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"releasing announce mutex");
+	#endif
 	semset->signal(0);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done releasing announce mutex");
+	#endif
 }
 
 void sqlrconnection::signalListenerToRead() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"signalling listener to read");
+	#endif
 	semset->signal(2);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done signalling listener to read");
+	#endif
 }
 
 void sqlrconnection::waitForListenerToFinishReading() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"waiting for listener");
+	#endif
 	semset->wait(3);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done waiting for listener");
+	#endif
 }
 
 void sqlrconnection::acquireConnectionCountMutex() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"acquiring connection count mutex");
+	#endif
 	semset->wait(4);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done acquiring connection count mutex");
+	#endif
 }
 
 unsigned int *sqlrconnection::getConnectionCountBuffer() {
@@ -91,11 +121,23 @@ unsigned int *sqlrconnection::getConnectionCountBuffer() {
 }
 
 void sqlrconnection::releaseConnectionCountMutex() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"releasing connection count mutex");
+	#endif
 	semset->signal(4);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done releasing connection count mutex");
+	#endif
 }
 
 void sqlrconnection::acquireSessionCountMutex() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"acquiring session count mutex");
+	#endif
 	semset->wait(5);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done acquiring session count mutex");
+	#endif
 }
 
 unsigned int *sqlrconnection::getSessionCountBuffer() {
@@ -104,9 +146,21 @@ unsigned int *sqlrconnection::getSessionCountBuffer() {
 }
 
 void sqlrconnection::releaseSessionCountMutex() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"releasing session count mutex");
+	#endif
 	semset->signal(5);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done releasing session count mutex");
+	#endif
 }
 
 void sqlrconnection::signalScalerToRead() {
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"signalling scaler to read");
+	#endif
 	semset->signal(8);
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",1,"done signalling scaler to read");
+	#endif
 }

@@ -1091,10 +1091,24 @@ void sqlrlistener::getAConnection(unsigned long *connectionpid,
 
 		// wait for exclusive access to the
 		// shared memory among listeners
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,"acquiring exclusive shm access");
+		#endif
 		semset->wait(1);
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,"done acquiring exclusive shm access");
+		#endif
 
 		// wait for an available connection
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,
+				"waiting for an available connection");
+		#endif
 		semset->wait(2);
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,
+				"done waiting for an available connection");
+		#endif
 
 		// get a pointer to the shared memory segment
 		shmdata	*ptr=(shmdata *)idmemory->getPointer();
@@ -1136,13 +1150,35 @@ void sqlrlistener::getAConnection(unsigned long *connectionpid,
 		}
 
 		// tell the connection that we've gotten it's data
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,
+				"signalling connection that we've read");
+		#endif
 		semset->signal(3);
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,
+				"done signalling connection that we've read");
+		#endif
 
 		// allow other listeners access to the shared memory
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,"releasing exclusive shm access");
+		#endif
 		semset->signal(1);
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,"done releasing exclusive shm access");
+		#endif
 
-		// decerment the number of "forked, busy listeners"
+		// decrement the number of "forked, busy listeners"
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,
+				"decrementing forked, busy listeners");
+		#endif
 		semset->wait(10);
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",0,
+				"done decrementing forked, busy listeners");
+		#endif
 
 		// make sure the connection is actually up, if not, fork a child
 		// to jog it, spin back and get another connection

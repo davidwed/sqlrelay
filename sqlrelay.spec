@@ -11,6 +11,7 @@
 # --without freetds
 # --without interbase
 # --without lago
+# --without mdbtools
 # --without msql
 # --without mysql
 # --without odbc
@@ -180,6 +181,14 @@ Group: Applications/Databases
 SQL Relay connection daemon for Lago.
 
 
+%package mdbtools
+Summary: SQL Relay connection daemon for MDB Tools (Microsoft Access).
+Group: Applications/Databases
+
+%description mdbtools
+SQL Relay connection daemon for MDB Tools (Microsoft Access).
+
+
 %package msql
 Summary: SQL Relay connection daemon for mSQL.
 Group: Applications/Databases
@@ -343,6 +352,7 @@ Man pages for SQL Relay.
 	%{?_without_freetds:	--disable-freetds} \
 	%{?_without_interbase:	--disable-interbase} \
 	%{?_without_lago:	--disable-lago} \
+	%{?_without_mdbtools:	--disable-mdbtools} \
 	%{?_without_msql:	--disable-msql} \
 	%{?_without_mysql:	--disable-mysql} \
 	%{?_without_odbc:	--disable-odbc} \
@@ -476,6 +486,10 @@ rm -rf %{buildroot}
 %{!?_without_lago:%files lago}
 %{!?_without_lago:%defattr(-, root, root)}
 %{!?_without_lago:%{_bindir}/sqlr-connection-lago*}
+
+%{!?_without_mdbtools:%files mdbtools}
+%{!?_without_mdbtools:%defattr(-, root, root)}
+%{!?_without_mdbtools:%{_bindir}/sqlr-connection-mdbtools*}
 
 %{!?_without_msql:%files msql}
 %{!?_without_msql:%defattr(-, root, root)}
