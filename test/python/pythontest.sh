@@ -1,8 +1,8 @@
 #!/bin/sh
 
 #./db2.py localhost 8001 "" db2test db2test
-./freetds.py localhost 8002 "" freetdstest freetdstest
-#./interbase.py localhost 8003 "" interbasetest interbasetest
+#./freetds.py localhost 8002 "" freetdstest freetdstest
+./interbase.py localhost 8003 "" interbasetest interbasetest
 #./lago.py localhost 8004 "" lagotest lagotest
 #./msql.py localhost 8005 "" msqltest msqltest
 #./mysql.py localhost 8006 "" mysqltest mysqltest

@@ -205,10 +205,10 @@ def main():
 	checkSuccess(cur.getLongest('TESTDECIMAL'),4)
 	checkSuccess(cur.getLongest(3),4)
 	checkSuccess(cur.getLongest('TESTNUMERIC'),4)
-	checkSuccess(cur.getLongest(4),11)
-	checkSuccess(cur.getLongest('TESTFLOAT'),11)
-	checkSuccess(cur.getLongest(5),21)
-	checkSuccess(cur.getLongest('TESTDOUBLE'),21)
+	checkSuccess(cur.getLongest(4),6)
+	checkSuccess(cur.getLongest('TESTFLOAT'),6)
+	checkSuccess(cur.getLongest(5),6)
+	checkSuccess(cur.getLongest('TESTDOUBLE'),6)
 	checkSuccess(cur.getLongest(6),10)
 	checkSuccess(cur.getLongest('TESTDATE'),10)
 	checkSuccess(cur.getLongest(7),8)
@@ -242,9 +242,9 @@ def main():
 	checkSuccess(cur.getField(0,1),"1")
 	checkSuccess(cur.getField(0,2),"1.10")
 	checkSuccess(cur.getField(0,3),"1.10")
-	#checkSuccess(cur.getField(0,4),"1.1")
-	#checkSuccess(cur.getField(0,5),"1.1")
-	checkSuccess(cur.getField(0,6),"2001-01-01")
+	checkSuccess(cur.getField(0,4),"1.1000")
+	checkSuccess(cur.getField(0,5),"1.1000")
+	checkSuccess(cur.getField(0,6),"2001:01:01")
 	checkSuccess(cur.getField(0,7),"01:00:00")
 	checkSuccess(cur.getField(0,8),"testchar1                                         ")
 	checkSuccess(cur.getField(0,9),"testvarchar1")
@@ -253,9 +253,9 @@ def main():
 	checkSuccess(cur.getField(7,1),"8")
 	checkSuccess(cur.getField(7,2),"8.80")
 	checkSuccess(cur.getField(7,3),"8.80")
-	#checkSuccess(cur.getField(7,4),"8.8")
-	#checkSuccess(cur.getField(7,5),"8.8")
-	checkSuccess(cur.getField(7,6),"2008-01-01")
+	checkSuccess(cur.getField(7,4),"8.8000")
+	checkSuccess(cur.getField(7,5),"8.8000")
+	checkSuccess(cur.getField(7,6),"2008:01:01")
 	checkSuccess(cur.getField(7,7),"08:00:00")
 	checkSuccess(cur.getField(7,8),"testchar8                                         ")
 	checkSuccess(cur.getField(7,9),"testvarchar8")
@@ -266,8 +266,8 @@ def main():
 	checkSuccess(cur.getFieldLength(0,1),1)
 	checkSuccess(cur.getFieldLength(0,2),4)
 	checkSuccess(cur.getFieldLength(0,3),4)
-	checkSuccess(cur.getFieldLength(0,4),11)
-	checkSuccess(cur.getFieldLength(0,5),21)
+	checkSuccess(cur.getFieldLength(0,4),6)
+	checkSuccess(cur.getFieldLength(0,5),6)
 	checkSuccess(cur.getFieldLength(0,6),10)
 	checkSuccess(cur.getFieldLength(0,7),8)
 	checkSuccess(cur.getFieldLength(0,8),50)
@@ -277,8 +277,8 @@ def main():
 	checkSuccess(cur.getFieldLength(7,1),1)
 	checkSuccess(cur.getFieldLength(7,2),4)
 	checkSuccess(cur.getFieldLength(7,3),4)
-	checkSuccess(cur.getFieldLength(7,4),11)
-	checkSuccess(cur.getFieldLength(7,5),21)
+	checkSuccess(cur.getFieldLength(7,4),6)
+	checkSuccess(cur.getFieldLength(7,5),6)
 	checkSuccess(cur.getFieldLength(7,6),10)
 	checkSuccess(cur.getFieldLength(7,7),8)
 	checkSuccess(cur.getFieldLength(7,8),50)
@@ -290,9 +290,9 @@ def main():
 	checkSuccess(cur.getField(0,"TESTSMALLINT"),"1")
 	checkSuccess(cur.getField(0,"TESTDECIMAL"),"1.10")
 	checkSuccess(cur.getField(0,"TESTNUMERIC"),"1.10")
-	#checkSuccess(cur.getField(0,"TESTFLOAT"),"1.1")
-	#checkSuccess(cur.getField(0,"TESTDOUBLE"),"1.1")
-	checkSuccess(cur.getField(0,"TESTDATE"),"2001-01-01")
+	checkSuccess(cur.getField(0,"TESTFLOAT"),"1.1000")
+	checkSuccess(cur.getField(0,"TESTDOUBLE"),"1.1000")
+	checkSuccess(cur.getField(0,"TESTDATE"),"2001:01:01")
 	checkSuccess(cur.getField(0,"TESTTIME"),"01:00:00")
 	checkSuccess(cur.getField(0,"TESTCHAR"),"testchar1                                         ")
 	checkSuccess(cur.getField(0,"TESTVARCHAR"),"testvarchar1")
@@ -301,9 +301,9 @@ def main():
 	checkSuccess(cur.getField(7,"TESTSMALLINT"),"8")
 	checkSuccess(cur.getField(7,"TESTDECIMAL"),"8.80")
 	checkSuccess(cur.getField(7,"TESTNUMERIC"),"8.80")
-	#checkSuccess(cur.getField(7,"TESTFLOAT"),"8.8")
-	#checkSuccess(cur.getField(7,"TESTDOUBLE"),"8.8")
-	checkSuccess(cur.getField(7,"TESTDATE"),"2008-01-01")
+	checkSuccess(cur.getField(7,"TESTFLOAT"),"8.8000")
+	checkSuccess(cur.getField(7,"TESTDOUBLE"),"8.8000")
+	checkSuccess(cur.getField(7,"TESTDATE"),"2008:01:01")
 	checkSuccess(cur.getField(7,"TESTTIME"),"08:00:00")
 	checkSuccess(cur.getField(7,"TESTCHAR"),"testchar8                                         ")
 	checkSuccess(cur.getField(7,"TESTVARCHAR"),"testvarchar8")
@@ -314,8 +314,8 @@ def main():
 	checkSuccess(cur.getFieldLength(0,"TESTSMALLINT"),1)
 	checkSuccess(cur.getFieldLength(0,"TESTDECIMAL"),4)
 	checkSuccess(cur.getFieldLength(0,"TESTNUMERIC"),4)
-	checkSuccess(cur.getFieldLength(0,"TESTFLOAT"),11)
-	checkSuccess(cur.getFieldLength(0,"TESTDOUBLE"),21)
+	checkSuccess(cur.getFieldLength(0,"TESTFLOAT"),6)
+	checkSuccess(cur.getFieldLength(0,"TESTDOUBLE"),6)
 	checkSuccess(cur.getFieldLength(0,"TESTDATE"),10)
 	checkSuccess(cur.getFieldLength(0,"TESTTIME"),8)
 	checkSuccess(cur.getFieldLength(0,"TESTCHAR"),50)
@@ -325,8 +325,8 @@ def main():
 	checkSuccess(cur.getFieldLength(7,"TESTSMALLINT"),1)
 	checkSuccess(cur.getFieldLength(7,"TESTDECIMAL"),4)
 	checkSuccess(cur.getFieldLength(7,"TESTNUMERIC"),4)
-	checkSuccess(cur.getFieldLength(7,"TESTFLOAT"),11)
-	checkSuccess(cur.getFieldLength(7,"TESTDOUBLE"),21)
+	checkSuccess(cur.getFieldLength(7,"TESTFLOAT"),6)
+	checkSuccess(cur.getFieldLength(7,"TESTDOUBLE"),6)
 	checkSuccess(cur.getFieldLength(7,"TESTDATE"),10)
 	checkSuccess(cur.getFieldLength(7,"TESTTIME"),8)
 	checkSuccess(cur.getFieldLength(7,"TESTCHAR"),50)
@@ -339,9 +339,9 @@ def main():
 	checkSuccess(fields[1],1)
 	checkSuccess(fields[2],1.1)
 	checkSuccess(fields[3],1.1)
-	#checkSuccess(fields[4],1.1)
-	#checkSuccess(fields[5],1.1)
-	checkSuccess(fields[6],"2001-01-01")
+	checkSuccess(fields[4],1.1)
+	checkSuccess(fields[5],1.1)
+	checkSuccess(fields[6],"2001:01:01")
 	checkSuccess(fields[7],"01:00:00")
 	checkSuccess(fields[8],"testchar1                                         ")
 	checkSuccess(fields[9],"testvarchar1")
@@ -353,8 +353,8 @@ def main():
 	checkSuccess(fieldlens[1],1)
 	checkSuccess(fieldlens[2],4)
 	checkSuccess(fieldlens[3],4)
-	checkSuccess(fieldlens[4],11)
-	checkSuccess(fieldlens[5],21)
+	checkSuccess(fieldlens[4],6)
+	checkSuccess(fieldlens[5],6)
 	checkSuccess(fieldlens[6],10)
 	checkSuccess(fieldlens[7],8)
 	checkSuccess(fieldlens[8],50)
@@ -367,9 +367,9 @@ def main():
 	checkSuccess(fields["TESTSMALLINT"],1)
 	checkSuccess(fields["TESTDECIMAL"],1.1)
 	checkSuccess(fields["TESTNUMERIC"],1.1)
-	#checkSuccess(fields["TESTFLOAT"],1.1)
-	#checkSuccess(fields["TESTDOUBLE"],1.1)
-	checkSuccess(fields["TESTDATE"],"2001-01-01")
+	checkSuccess(fields["TESTFLOAT"],1.1)
+	checkSuccess(fields["TESTDOUBLE"],1.1)
+	checkSuccess(fields["TESTDATE"],"2001:01:01")
 	checkSuccess(fields["TESTTIME"],"01:00:00")
 	checkSuccess(fields["TESTCHAR"],"testchar1                                         ")
 	checkSuccess(fields["TESTVARCHAR"],"testvarchar1")
@@ -379,9 +379,9 @@ def main():
 	checkSuccess(fields["TESTSMALLINT"],8)
 	checkSuccess(fields["TESTDECIMAL"],8.8)
 	checkSuccess(fields["TESTNUMERIC"],8.8)
-	#checkSuccess(fields["TESTFLOAT"],8.8)
-	#checkSuccess(fields["TESTDOUBLE"],8.8)
-	checkSuccess(fields["TESTDATE"],"2008-01-01")
+	checkSuccess(fields["TESTFLOAT"],8.8)
+	checkSuccess(fields["TESTDOUBLE"],8.8)
+	checkSuccess(fields["TESTDATE"],"2008:01:01")
 	checkSuccess(fields["TESTTIME"],"08:00:00")
 	checkSuccess(fields["TESTCHAR"],"testchar8                                         ")
 	checkSuccess(fields["TESTVARCHAR"],"testvarchar8")
@@ -393,8 +393,8 @@ def main():
 	checkSuccess(fieldlengths["TESTSMALLINT"],1)
 	checkSuccess(fieldlengths["TESTDECIMAL"],4)
 	checkSuccess(fieldlengths["TESTNUMERIC"],4)
-	checkSuccess(fieldlengths["TESTFLOAT"],11)
-	checkSuccess(fieldlengths["TESTDOUBLE"],21)
+	checkSuccess(fieldlengths["TESTFLOAT"],6)
+	checkSuccess(fieldlengths["TESTDOUBLE"],6)
 	checkSuccess(fieldlengths["TESTDATE"],10)
 	checkSuccess(fieldlengths["TESTTIME"],8)
 	checkSuccess(fieldlengths["TESTCHAR"],50)
@@ -405,8 +405,8 @@ def main():
 	checkSuccess(fieldlengths["TESTSMALLINT"],1)
 	checkSuccess(fieldlengths["TESTDECIMAL"],4)
 	checkSuccess(fieldlengths["TESTNUMERIC"],4)
-	checkSuccess(fieldlengths["TESTFLOAT"],11)
-	checkSuccess(fieldlengths["TESTDOUBLE"],21)
+	checkSuccess(fieldlengths["TESTFLOAT"],6)
+	checkSuccess(fieldlengths["TESTDOUBLE"],6)
 	checkSuccess(fieldlengths["TESTDATE"],10)
 	checkSuccess(fieldlengths["TESTTIME"],8)
 	checkSuccess(fieldlengths["TESTCHAR"],50)
@@ -687,21 +687,21 @@ def main():
 	print
 
 	#print "COMMIT AND ROLLBACK: "
-	#secondcon=PySQLRClient.sqlrconnection(sys.argv[1],
-				#string.atoi(sys.argv[2]), 
-				#sys.argv[3],sys.argv[4],sys.argv[5])
-	#secondcur=PySQLRClient.sqlrcursor(secondcon)
-	#checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
-	#checkSuccess(secondcur.getField(0,0),"0")
-	#checkSuccess(con.commit(),1)
-	#checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
-	#checkSuccess(secondcur.getField(0,0),"8")
-	#checkSuccess(con.autoCommitOn(),1)
-	#checkSuccess(cur.sendQuery("insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',NULL)"),1)
-	#checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
-	#checkSuccess(secondcur.getField(0,0),"9")
-	#checkSuccess(con.autoCommitOff(),1)
-	#print
+	secondcon=PySQLRClient.sqlrconnection(sys.argv[1],
+				string.atoi(sys.argv[2]), 
+				sys.argv[3],sys.argv[4],sys.argv[5])
+	secondcur=PySQLRClient.sqlrcursor(secondcon)
+	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
+	checkSuccess(secondcur.getField(0,0),"0")
+	checkSuccess(con.commit(),1)
+	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
+	checkSuccess(secondcur.getField(0,0),"8")
+	checkSuccess(con.autoCommitOn(),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',NULL)"),1)
+	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
+	checkSuccess(secondcur.getField(0,0),"9")
+	checkSuccess(con.autoCommitOff(),1)
+	print
 
 	print "ROW RANGE:"
 	checkSuccess(cur.sendQuery("select * from testtable order by testinteger"),1)
@@ -711,9 +711,9 @@ def main():
 	checkSuccess(rows[0][1],1);
 	checkSuccess(rows[0][2],1.1);
 	checkSuccess(rows[0][3],1.1);
-	#checkSuccess(rows[0][4],1.1);
-	#checkSuccess(rows[0][5],1.1);
-	checkSuccess(rows[0][6],"2001-01-01")
+	checkSuccess(rows[0][4],1.1);
+	checkSuccess(rows[0][5],1.1);
+	checkSuccess(rows[0][6],"2001:01:01")
 	checkSuccess(rows[0][7],"01:00:00")
 	checkSuccess(rows[0][8],"testchar1                                         ")
 	checkSuccess(rows[0][9],"testvarchar1")
@@ -722,9 +722,9 @@ def main():
 	checkSuccess(rows[1][1],2);
 	checkSuccess(rows[1][2],2.2);
 	checkSuccess(rows[1][3],2.2);
-	#checkSuccess(rows[1][4],2.2);
-	#checkSuccess(rows[1][5],2.2);
-	checkSuccess(rows[1][6],"2002-01-01")
+	checkSuccess(rows[1][4],2.2);
+	checkSuccess(rows[1][5],2.2);
+	checkSuccess(rows[1][6],"2002:01:01")
 	checkSuccess(rows[1][7],"02:00:00")
 	checkSuccess(rows[1][8],"testchar2                                         ")
 	checkSuccess(rows[1][9],"testvarchar2")
@@ -733,9 +733,9 @@ def main():
 	checkSuccess(rows[2][1],3);
 	checkSuccess(rows[2][2],3.3);
 	checkSuccess(rows[2][3],3.3);
-	#checkSuccess(rows[2][4],3.3);
-	#checkSuccess(rows[2][5],3.3);
-	checkSuccess(rows[2][6],"2003-01-01")
+	checkSuccess(rows[2][4],3.3);
+	checkSuccess(rows[2][5],3.3);
+	checkSuccess(rows[2][6],"2003:01:01")
 	checkSuccess(rows[2][7],"03:00:00")
 	checkSuccess(rows[2][8],"testchar3                                         ")
 	checkSuccess(rows[2][9],"testvarchar3")
@@ -744,9 +744,9 @@ def main():
 	checkSuccess(rows[3][1],4);
 	checkSuccess(rows[3][2],4.4);
 	checkSuccess(rows[3][3],4.4);
-	#checkSuccess(rows[3][4],4.4);
-	#checkSuccess(rows[3][5],4.4);
-	checkSuccess(rows[3][6],"2004-01-01")
+	checkSuccess(rows[3][4],4.4);
+	checkSuccess(rows[3][5],4.4);
+	checkSuccess(rows[3][6],"2004:01:01")
 	checkSuccess(rows[3][7],"04:00:00")
 	checkSuccess(rows[3][8],"testchar4                                         ")
 	checkSuccess(rows[3][9],"testvarchar4")
@@ -755,9 +755,9 @@ def main():
 	checkSuccess(rows[4][1],5);
 	checkSuccess(rows[4][2],5.5);
 	checkSuccess(rows[4][3],5.5);
-	#checkSuccess(rows[4][4],5.5);
-	#checkSuccess(rows[4][5],5.5);
-	checkSuccess(rows[4][6],"2005-01-01")
+	checkSuccess(rows[4][4],5.5);
+	checkSuccess(rows[4][5],5.5);
+	checkSuccess(rows[4][6],"2005:01:01")
 	checkSuccess(rows[4][7],"05:00:00")
 	checkSuccess(rows[4][8],"testchar5                                         ")
 	checkSuccess(rows[4][9],"testvarchar5")
@@ -766,9 +766,9 @@ def main():
 	checkSuccess(rows[5][1],6);
 	checkSuccess(rows[5][2],6.6);
 	checkSuccess(rows[5][3],6.6);
-	#checkSuccess(rows[5][4],6.6);
-	#checkSuccess(rows[5][5],6.6);
-	checkSuccess(rows[5][6],"2006-01-01")
+	checkSuccess(rows[5][4],6.6);
+	checkSuccess(rows[5][5],6.6);
+	checkSuccess(rows[5][6],"2006:01:01")
 	checkSuccess(rows[5][7],"06:00:00")
 	checkSuccess(rows[5][8],"testchar6                                         ")
 	checkSuccess(rows[5][9],"testvarchar6")

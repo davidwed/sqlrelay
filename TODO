@@ -1,5 +1,3 @@
-sybase connection doesn't report an error when it can't log in
-
 need a reliable way to ping msql
 
 query/fields cmdline tools need a timeout option.
@@ -18,17 +16,11 @@ odbc connection should check the odbc definition
 java/com/firstworks/sqlrelay needs to be removed if empty when rpm is
 	uninstalled
 should sqlr-start kill the listner if no connections start?
-float/double datatypes come back with no particular scale/precision in many db's
 
 incorporate pkg-config stuff
 incorporate ADODB driver
 incorporate new spec file
 
-test changeUser() with non-oracle databases
-non-c++/perl clob/blob/cursor bind tests
-
-interbase directions for using gsec don't work for me
-interbase docs aren't available at the link in gettingstarted/interbase.html
 db2 startup directions are wrong, you have to run db2start/db2stop as db2as
 fix documents to reflect java package
 
@@ -44,8 +36,8 @@ Tests:
 
 Compatibility:
 	sybase 12.5
-	interbase 6.5
-	firebird
+	ibm db2 8
+	interbase 6.5/7
 	gtk-2
 	ruby module segfaults on netbsd/openbsd
 	python api methods that call PyArg_ParseTuple with an "O" argument 
@@ -81,7 +73,6 @@ Security:
 	SSL encryption
 
 Packages:
-	Debian
 	Slackware
 	FreeBSD
 	NetBSD
@@ -94,10 +85,9 @@ Features:
 	sybase/freetds (possibly others) need options for setting chained mode 
 		and isolation mode when client connects
 	sqlr-import/sqlr-export tools
-	support output bind vars and stored procedures in sybase
+	support output bind vars and stored procedures in sybase/interbase/db2
 	support vector binds
 	handle output binds in Perl-DBD, Python-DB, Ruby-DBD
-	changeAuth() for non-oracle8i needs to just log out/back in
 	datatype support:
 		handle binary data correctly in all databases
 		identical long/lob datatype support in all databases

@@ -7,13 +7,13 @@ sleep 1
 #cp db2.php /usr/local/web
 #lynx -dump "http://localhost/db2.php?host=localhost&port=8001&socket=&user=db2test&password=db2test"
 
-chmod 755 freetds.php
-cp freetds.php /usr/local/web
-lynx -dump "http://localhost/freetds.php?host=localhost&port=8002&socket=&user=freetdstest&password=freetdstest"
+#chmod 755 freetds.php
+#cp freetds.php /usr/local/web
+#lynx -dump "http://localhost/freetds.php?host=localhost&port=8002&socket=&user=freetdstest&password=freetdstest"
 
-#chmod 755 interbase.php
-#cp interbase.php /usr/local/web
-#lynx -dump "http://localhost/interbase.php?host=localhost&port=8003&socket=&user=interbasetest&password=interbasetest"
+chmod 755 interbase.php
+cp interbase.php /usr/local/web
+lynx -dump "http://localhost/interbase.php?host=localhost&port=8003&socket=&user=interbasetest&password=interbasetest"
 
 #chmod 755 lago.php
 #cp lago.php /usr/local/web

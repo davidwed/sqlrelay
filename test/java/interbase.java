@@ -257,10 +257,10 @@ class interbase {
 		checkSuccess(cur.getLongest("TESTDECIMAL"),4);
 		checkSuccess(cur.getLongest(3),4);
 		checkSuccess(cur.getLongest("TESTNUMERIC"),4);
-		checkSuccess(cur.getLongest(4),11);
-		checkSuccess(cur.getLongest("TESTFLOAT"),11);
-		checkSuccess(cur.getLongest(5),21);
-		checkSuccess(cur.getLongest("TESTDOUBLE"),21);
+		checkSuccess(cur.getLongest(4),6);
+		checkSuccess(cur.getLongest("TESTFLOAT"),6);
+		checkSuccess(cur.getLongest(5),6);
+		checkSuccess(cur.getLongest("TESTDOUBLE"),6);
 		checkSuccess(cur.getLongest(6),10);
 		checkSuccess(cur.getLongest("TESTDATE"),10);
 		checkSuccess(cur.getLongest(7),8);
@@ -294,9 +294,9 @@ class interbase {
 		checkSuccess(cur.getField(0,1),"1");
 		checkSuccess(cur.getField(0,2),"1.10");
 		checkSuccess(cur.getField(0,3),"1.10");
-		//checkSuccess(cur.getField(0,4),"1.1");
-		//checkSuccess(cur.getField(0,5),"1.1");
-		checkSuccess(cur.getField(0,6),"2001-01-01");
+		checkSuccess(cur.getField(0,4),"1.1000");
+		checkSuccess(cur.getField(0,5),"1.1000");
+		checkSuccess(cur.getField(0,6),"2001:01:01");
 		checkSuccess(cur.getField(0,7),"01:00:00");
 		checkSuccess(cur.getField(0,8),"testchar1                                         ");
 		checkSuccess(cur.getField(0,9),"testvarchar1");
@@ -305,9 +305,9 @@ class interbase {
 		checkSuccess(cur.getField(7,1),"8");
 		checkSuccess(cur.getField(7,2),"8.80");
 		checkSuccess(cur.getField(7,3),"8.80");
-		//checkSuccess(cur.getField(7,4),"8.8");
-		//checkSuccess(cur.getField(7,5),"8.8");
-		checkSuccess(cur.getField(7,6),"2008-01-01");
+		checkSuccess(cur.getField(7,4),"8.8000");
+		checkSuccess(cur.getField(7,5),"8.8000");
+		checkSuccess(cur.getField(7,6),"2008:01:01");
 		checkSuccess(cur.getField(7,7),"08:00:00");
 		checkSuccess(cur.getField(7,8),"testchar8                                         ");
 		checkSuccess(cur.getField(7,9),"testvarchar8");
@@ -318,8 +318,8 @@ class interbase {
 		checkSuccess(cur.getFieldLength(0,1),1);
 		checkSuccess(cur.getFieldLength(0,2),4);
 		checkSuccess(cur.getFieldLength(0,3),4);
-		checkSuccess(cur.getFieldLength(0,4),11);
-		checkSuccess(cur.getFieldLength(0,5),21);
+		checkSuccess(cur.getFieldLength(0,4),6);
+		checkSuccess(cur.getFieldLength(0,5),6);
 		checkSuccess(cur.getFieldLength(0,6),10);
 		checkSuccess(cur.getFieldLength(0,7),8);
 		checkSuccess(cur.getFieldLength(0,8),50);
@@ -329,8 +329,8 @@ class interbase {
 		checkSuccess(cur.getFieldLength(7,1),1);
 		checkSuccess(cur.getFieldLength(7,2),4);
 		checkSuccess(cur.getFieldLength(7,3),4);
-		checkSuccess(cur.getFieldLength(7,4),11);
-		checkSuccess(cur.getFieldLength(7,5),21);
+		checkSuccess(cur.getFieldLength(7,4),6);
+		checkSuccess(cur.getFieldLength(7,5),6);
 		checkSuccess(cur.getFieldLength(7,6),10);
 		checkSuccess(cur.getFieldLength(7,7),8);
 		checkSuccess(cur.getFieldLength(7,8),50);
@@ -342,9 +342,9 @@ class interbase {
 		checkSuccess(cur.getField(0,"TESTSMALLINT"),"1");
 		checkSuccess(cur.getField(0,"TESTDECIMAL"),"1.10");
 		checkSuccess(cur.getField(0,"TESTNUMERIC"),"1.10");
-		//checkSuccess(cur.getField(0,"TESTFLOAT"),"1.1");
-		//checkSuccess(cur.getField(0,"TESTDOUBLE"),"1.1");
-		checkSuccess(cur.getField(0,"TESTDATE"),"2001-01-01");
+		checkSuccess(cur.getField(0,"TESTFLOAT"),"1.1000");
+		checkSuccess(cur.getField(0,"TESTDOUBLE"),"1.1000");
+		checkSuccess(cur.getField(0,"TESTDATE"),"2001:01:01");
 		checkSuccess(cur.getField(0,"TESTTIME"),"01:00:00");
 		checkSuccess(cur.getField(0,"TESTCHAR"),"testchar1                                         ");
 		checkSuccess(cur.getField(0,"TESTVARCHAR"),"testvarchar1");
@@ -353,9 +353,9 @@ class interbase {
 		checkSuccess(cur.getField(7,"TESTSMALLINT"),"8");
 		checkSuccess(cur.getField(7,"TESTDECIMAL"),"8.80");
 		checkSuccess(cur.getField(7,"TESTNUMERIC"),"8.80");
-		//checkSuccess(cur.getField(7,"TESTFLOAT"),"8.8");
-		//checkSuccess(cur.getField(7,"TESTDOUBLE"),"8.8");
-		checkSuccess(cur.getField(7,"TESTDATE"),"2008-01-01");
+		checkSuccess(cur.getField(7,"TESTFLOAT"),"8.8000");
+		checkSuccess(cur.getField(7,"TESTDOUBLE"),"8.8000");
+		checkSuccess(cur.getField(7,"TESTDATE"),"2008:01:01");
 		checkSuccess(cur.getField(7,"TESTTIME"),"08:00:00");
 		checkSuccess(cur.getField(7,"TESTCHAR"),"testchar8                                         ");
 		checkSuccess(cur.getField(7,"TESTVARCHAR"),"testvarchar8");
@@ -366,8 +366,8 @@ class interbase {
 		checkSuccess(cur.getFieldLength(0,"TESTSMALLINT"),1);
 		checkSuccess(cur.getFieldLength(0,"TESTDECIMAL"),4);
 		checkSuccess(cur.getFieldLength(0,"TESTNUMERIC"),4);
-		checkSuccess(cur.getFieldLength(0,"TESTFLOAT"),11);
-		checkSuccess(cur.getFieldLength(0,"TESTDOUBLE"),21);
+		checkSuccess(cur.getFieldLength(0,"TESTFLOAT"),6);
+		checkSuccess(cur.getFieldLength(0,"TESTDOUBLE"),6);
 		checkSuccess(cur.getFieldLength(0,"TESTDATE"),10);
 		checkSuccess(cur.getFieldLength(0,"TESTTIME"),8);
 		checkSuccess(cur.getFieldLength(0,"TESTCHAR"),50);
@@ -377,8 +377,8 @@ class interbase {
 		checkSuccess(cur.getFieldLength(7,"TESTSMALLINT"),1);
 		checkSuccess(cur.getFieldLength(7,"TESTDECIMAL"),4);
 		checkSuccess(cur.getFieldLength(7,"TESTNUMERIC"),4);
-		checkSuccess(cur.getFieldLength(7,"TESTFLOAT"),11);
-		checkSuccess(cur.getFieldLength(7,"TESTDOUBLE"),21);
+		checkSuccess(cur.getFieldLength(7,"TESTFLOAT"),6);
+		checkSuccess(cur.getFieldLength(7,"TESTDOUBLE"),6);
 		checkSuccess(cur.getFieldLength(7,"TESTDATE"),10);
 		checkSuccess(cur.getFieldLength(7,"TESTTIME"),8);
 		checkSuccess(cur.getFieldLength(7,"TESTCHAR"),50);
@@ -391,9 +391,9 @@ class interbase {
 		checkSuccess(fields[1],"1");
 		checkSuccess(fields[2],"1.10");
 		checkSuccess(fields[3],"1.10");
-		//checkSuccess(fields[4],"1.1");
-		//checkSuccess(fields[5],"1.1");
-		checkSuccess(fields[6],"2001-01-01");
+		checkSuccess(fields[4],"1.1000");
+		checkSuccess(fields[5],"1.1000");
+		checkSuccess(fields[6],"2001:01:01");
 		checkSuccess(fields[7],"01:00:00");
 		checkSuccess(fields[8],"testchar1                                         ");
 		checkSuccess(fields[9],"testvarchar1");
@@ -405,8 +405,8 @@ class interbase {
 		checkSuccess(fieldlens[1],1);
 		checkSuccess(fieldlens[2],4);
 		checkSuccess(fieldlens[3],4);
-		checkSuccess(fieldlens[4],11);
-		checkSuccess(fieldlens[5],21);
+		checkSuccess(fieldlens[4],6);
+		checkSuccess(fieldlens[5],6);
 		checkSuccess(fieldlens[6],10);
 		checkSuccess(fieldlens[7],8);
 		checkSuccess(fieldlens[8],50);
@@ -710,21 +710,21 @@ class interbase {
 		System.out.println();
 	
 		//System.out.println("COMMIT AND ROLLBACK: ");
-		//SQLRConnection secondcon=new SQLRConnection(args[0],
-					//Integer.parseInt(args[1]), 
-					//args[2],args[3],args[4],0,1);
-		//SQLRCursor secondcur=new SQLRCursor(secondcon);
-		//checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
-		//checkSuccess(secondcur.getField(0,0),"0");
-		//checkSuccess(con.commit(),1);
-		//checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
-		//checkSuccess(secondcur.getField(0,0),"8");
-		//checkSuccess(con.autoCommitOn(),1);
-		//checkSuccess(cur.sendQuery("insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',null)"),1);
-		//checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
-		//checkSuccess(secondcur.getField(0,0),"9");
-		//checkSuccess(con.autoCommitOff(),1);
-		//System.out.println();
+		SQLRConnection secondcon=new SQLRConnection(args[0],
+					Integer.parseInt(args[1]), 
+					args[2],args[3],args[4],0,1);
+		SQLRCursor secondcur=new SQLRCursor(secondcon);
+		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
+		checkSuccess(secondcur.getField(0,0),"0");
+		checkSuccess(con.commit(),1);
+		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
+		checkSuccess(secondcur.getField(0,0),"8");
+		checkSuccess(con.autoCommitOn(),1);
+		checkSuccess(cur.sendQuery("insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',null)"),1);
+		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
+		checkSuccess(secondcur.getField(0,0),"9");
+		checkSuccess(con.autoCommitOff(),1);
+		System.out.println();
 	
 		// drop existing table
 		con.commit();

@@ -204,10 +204,10 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getLongest($cur,"TESTDECIMAL"),4);
 	checkSuccess(sqlrcur_getLongest($cur,3),4);
 	checkSuccess(sqlrcur_getLongest($cur,"TESTNUMERIC"),4);
-	checkSuccess(sqlrcur_getLongest($cur,4),11);
-	checkSuccess(sqlrcur_getLongest($cur,"TESTFLOAT"),11);
-	checkSuccess(sqlrcur_getLongest($cur,5),21);
-	checkSuccess(sqlrcur_getLongest($cur,"TESTDOUBLE"),21);
+	checkSuccess(sqlrcur_getLongest($cur,4),6);
+	checkSuccess(sqlrcur_getLongest($cur,"TESTFLOAT"),6);
+	checkSuccess(sqlrcur_getLongest($cur,5),6);
+	checkSuccess(sqlrcur_getLongest($cur,"TESTDOUBLE"),6);
 	checkSuccess(sqlrcur_getLongest($cur,6),10);
 	checkSuccess(sqlrcur_getLongest($cur,"TESTDATE"),10);
 	checkSuccess(sqlrcur_getLongest($cur,7),8);
@@ -241,9 +241,9 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,1),"1");
 	checkSuccess(sqlrcur_getField($cur,0,2),"1.10");
 	checkSuccess(sqlrcur_getField($cur,0,3),"1.10");
-	#checkSuccess(sqlrcur_getField($cur,0,4),"1.1");
-	#checkSuccess(sqlrcur_getField($cur,0,5),"1.1");
-	checkSuccess(sqlrcur_getField($cur,0,6),"2001-01-01");
+	checkSuccess(sqlrcur_getField($cur,0,4),"1.1000");
+	checkSuccess(sqlrcur_getField($cur,0,5),"1.1000");
+	checkSuccess(sqlrcur_getField($cur,0,6),"2001:01:01");
 	checkSuccess(sqlrcur_getField($cur,0,7),"01:00:00");
 	checkSuccess(sqlrcur_getField($cur,0,8),"testchar1                                         ");
 	checkSuccess(sqlrcur_getField($cur,0,9),"testvarchar1");
@@ -252,9 +252,9 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,7,1),"8");
 	checkSuccess(sqlrcur_getField($cur,7,2),"8.80");
 	checkSuccess(sqlrcur_getField($cur,7,3),"8.80");
-	#checkSuccess(sqlrcur_getField($cur,7,4),"8.8");
-	#checkSuccess(sqlrcur_getField($cur,7,5),"8.8");
-	checkSuccess(sqlrcur_getField($cur,7,6),"2008-01-01");
+	checkSuccess(sqlrcur_getField($cur,7,4),"8.8000");
+	checkSuccess(sqlrcur_getField($cur,7,5),"8.8000");
+	checkSuccess(sqlrcur_getField($cur,7,6),"2008:01:01");
 	checkSuccess(sqlrcur_getField($cur,7,7),"08:00:00");
 	checkSuccess(sqlrcur_getField($cur,7,8),"testchar8                                         ");
 	checkSuccess(sqlrcur_getField($cur,7,9),"testvarchar8");
@@ -265,8 +265,8 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,0,1),1);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,2),4);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,3),4);
-	checkSuccess(sqlrcur_getFieldLength($cur,0,4),11);
-	checkSuccess(sqlrcur_getFieldLength($cur,0,5),21);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,4),6);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,5),6);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,6),10);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,7),8);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,8),50);
@@ -276,8 +276,8 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,7,1),1);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,2),4);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,3),4);
-	checkSuccess(sqlrcur_getFieldLength($cur,7,4),11);
-	checkSuccess(sqlrcur_getFieldLength($cur,7,5),21);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,4),6);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,5),6);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,6),10);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,7),8);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,8),50);
@@ -289,9 +289,9 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,"TESTSMALLINT"),"1");
 	checkSuccess(sqlrcur_getField($cur,0,"TESTDECIMAL"),"1.10");
 	checkSuccess(sqlrcur_getField($cur,0,"TESTNUMERIC"),"1.10");
-	#checkSuccess(sqlrcur_getField($cur,0,"TESTFLOAT"),"1.1");
-	#checkSuccess(sqlrcur_getField($cur,0,"TESTDOUBLE"),"1.1");
-	checkSuccess(sqlrcur_getField($cur,0,"TESTDATE"),"2001-01-01");
+	checkSuccess(sqlrcur_getField($cur,0,"TESTFLOAT"),"1.1000");
+	checkSuccess(sqlrcur_getField($cur,0,"TESTDOUBLE"),"1.1000");
+	checkSuccess(sqlrcur_getField($cur,0,"TESTDATE"),"2001:01:01");
 	checkSuccess(sqlrcur_getField($cur,0,"TESTTIME"),"01:00:00");
 	checkSuccess(sqlrcur_getField($cur,0,"TESTCHAR"),"testchar1                                         ");
 	checkSuccess(sqlrcur_getField($cur,0,"TESTVARCHAR"),"testvarchar1");
@@ -300,9 +300,9 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,7,"TESTSMALLINT"),"8");
 	checkSuccess(sqlrcur_getField($cur,7,"TESTDECIMAL"),"8.80");
 	checkSuccess(sqlrcur_getField($cur,7,"TESTNUMERIC"),"8.80");
-	#checkSuccess(sqlrcur_getField($cur,7,"TESTFLOAT"),"8.8");
-	#checkSuccess(sqlrcur_getField($cur,7,"TESTDOUBLE"),"8.8");
-	checkSuccess(sqlrcur_getField($cur,7,"TESTDATE"),"2008-01-01");
+	checkSuccess(sqlrcur_getField($cur,7,"TESTFLOAT"),"8.8000");
+	checkSuccess(sqlrcur_getField($cur,7,"TESTDOUBLE"),"8.8000");
+	checkSuccess(sqlrcur_getField($cur,7,"TESTDATE"),"2008:01:01");
 	checkSuccess(sqlrcur_getField($cur,7,"TESTTIME"),"08:00:00");
 	checkSuccess(sqlrcur_getField($cur,7,"TESTCHAR"),"testchar8                                         ");
 	checkSuccess(sqlrcur_getField($cur,7,"TESTVARCHAR"),"testvarchar8");
@@ -313,8 +313,8 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTSMALLINT"),1);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTDECIMAL"),4);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTNUMERIC"),4);
-	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTFLOAT"),11);
-	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTDOUBLE"),21);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTFLOAT"),6);
+	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTDOUBLE"),6);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTDATE"),10);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTTIME"),8);
 	checkSuccess(sqlrcur_getFieldLength($cur,0,"TESTCHAR"),50);
@@ -324,8 +324,8 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTSMALLINT"),1);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTDECIMAL"),4);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTNUMERIC"),4);
-	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTFLOAT"),11);
-	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTDOUBLE"),21);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTFLOAT"),6);
+	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTDOUBLE"),6);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTDATE"),10);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTTIME"),8);
 	checkSuccess(sqlrcur_getFieldLength($cur,7,"TESTCHAR"),50);
@@ -338,9 +338,9 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields[1],"1");
 	checkSuccess($fields[2],"1.10");
 	checkSuccess($fields[3],"1.10");
-	#checkSuccess($fields[4],"1.1");
-	#checkSuccess($fields[5],"1.1");
-	checkSuccess($fields[6],"2001-01-01");
+	checkSuccess($fields[4],"1.1000");
+	checkSuccess($fields[5],"1.1000");
+	checkSuccess($fields[6],"2001:01:01");
 	checkSuccess($fields[7],"01:00:00");
 	checkSuccess($fields[8],"testchar1                                         ");
 	checkSuccess($fields[9],"testvarchar1");
@@ -352,8 +352,8 @@ function checkSuccess($value,$success) {
 	checkSuccess($fieldlens[1],1);
 	checkSuccess($fieldlens[2],4);
 	checkSuccess($fieldlens[3],4);
-	checkSuccess($fieldlens[4],11);
-	checkSuccess($fieldlens[5],21);
+	checkSuccess($fieldlens[4],6);
+	checkSuccess($fieldlens[5],6);
 	checkSuccess($fieldlens[6],10);
 	checkSuccess($fieldlens[7],8);
 	checkSuccess($fieldlens[8],50);
@@ -367,9 +367,9 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields["TESTSMALLINT"],"1");
 	checkSuccess($fields["TESTDECIMAL"],"1.10");
 	checkSuccess($fields["TESTNUMERIC"],"1.10");
-	#checkSuccess($fields["TESTFLOAT"],"1.1");
-	#checkSuccess($fields["TESTDOUBLE"],"1.1");
-	checkSuccess($fields["TESTDATE"],"2001-01-01");
+	checkSuccess($fields["TESTFLOAT"],"1.1000");
+	checkSuccess($fields["TESTDOUBLE"],"1.1000");
+	checkSuccess($fields["TESTDATE"],"2001:01:01");
 	checkSuccess($fields["TESTTIME"],"01:00:00");
 	checkSuccess($fields["TESTCHAR"],"testchar1                                         ");
 	checkSuccess($fields["TESTVARCHAR"],"testvarchar1");
@@ -379,9 +379,9 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields["TESTSMALLINT"],"8");
 	checkSuccess($fields["TESTDECIMAL"],"8.80");
 	checkSuccess($fields["TESTNUMERIC"],"8.80");
-	#checkSuccess($fields["TESTFLOAT"],"8.8");
-	#checkSuccess($fields["TESTDOUBLE"],"8.8");
-	checkSuccess($fields["TESTDATE"],"2008-01-01");
+	checkSuccess($fields["TESTFLOAT"],"8.8000");
+	checkSuccess($fields["TESTDOUBLE"],"8.8000");
+	checkSuccess($fields["TESTDATE"],"2008:01:01");
 	checkSuccess($fields["TESTTIME"],"08:00:00");
 	checkSuccess($fields["TESTCHAR"],"testchar8                                         ");
 	checkSuccess($fields["TESTVARCHAR"],"testvarchar8");
@@ -393,8 +393,8 @@ function checkSuccess($value,$success) {
 	checkSuccess($fieldlengths["TESTSMALLINT"],1);
 	checkSuccess($fieldlengths["TESTDECIMAL"],4);
 	checkSuccess($fieldlengths["TESTNUMERIC"],4);
-	checkSuccess($fieldlengths["TESTFLOAT"],11);
-	checkSuccess($fieldlengths["TESTDOUBLE"],21);
+	checkSuccess($fieldlengths["TESTFLOAT"],6);
+	checkSuccess($fieldlengths["TESTDOUBLE"],6);
 	checkSuccess($fieldlengths["TESTDATE"],10);
 	checkSuccess($fieldlengths["TESTTIME"],8);
 	checkSuccess($fieldlengths["TESTCHAR"],50);
@@ -405,8 +405,8 @@ function checkSuccess($value,$success) {
 	checkSuccess($fieldlengths["TESTSMALLINT"],1);
 	checkSuccess($fieldlengths["TESTDECIMAL"],4);
 	checkSuccess($fieldlengths["TESTNUMERIC"],4);
-	checkSuccess($fieldlengths["TESTFLOAT"],11);
-	checkSuccess($fieldlengths["TESTDOUBLE"],21);
+	checkSuccess($fieldlengths["TESTFLOAT"],6);
+	checkSuccess($fieldlengths["TESTDOUBLE"],6);
 	checkSuccess($fieldlengths["TESTDATE"],10);
 	checkSuccess($fieldlengths["TESTTIME"],8);
 	checkSuccess($fieldlengths["TESTCHAR"],50);
@@ -691,21 +691,21 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	#echo("COMMIT AND ROLLBACK: \n");
-	#$secondcon=sqlrcon_alloc($host,
-				#$port, 
-				#$socket,$user,$password,0,1);
-	#$secondcur=sqlrcur_alloc($secondcon);
-	#checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
-	#checkSuccess(sqlrcur_getField($secondcur,0,0),"0");
-	#checkSuccess(sqlrcon_commit($con),1);
-	#checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
-	#checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
-	#checkSuccess(sqlrcon_autoCommitOn($con),1);
-	#checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',NULL)"),1);
-	#checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
-	#checkSuccess(sqlrcur_getField($secondcur,0,0),"9");
-	#checkSuccess(sqlrcon_autoCommitOff($con),1);
-	#echo("\n");
+	$secondcon=sqlrcon_alloc($host,
+				$port, 
+				$socket,$user,$password,0,1);
+	$secondcur=sqlrcur_alloc($secondcon);
+	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
+	checkSuccess(sqlrcur_getField($secondcur,0,0),"0");
+	checkSuccess(sqlrcon_commit($con),1);
+	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
+	checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
+	checkSuccess(sqlrcon_autoCommitOn($con),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',NULL)"),1);
+	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
+	checkSuccess(sqlrcur_getField($secondcur,0,0),"9");
+	checkSuccess(sqlrcon_autoCommitOff($con),1);
+	echo("\n");
 
 	# drop existing table
 	sqlrcon_commit($con);

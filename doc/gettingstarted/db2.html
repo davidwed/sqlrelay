@@ -51,7 +51,7 @@ not come with your distribution, you'll need to download and install it.</p>
 <p>For Debian Linux, on newer Debian releases, if you have configured 
 <i>apt</i> as illustrated in 
 <a href="http://www.debian.org/doc/manuals/apt-howto/index.en.html">the 
-APT-HOWTO</a>, run <i>apt-get install rpm</i>.  If your distribution came with
+APT-HOWTO</a>, run <i>apt-get install pdksh</i>.  If your distribution came with
 pdksh, you may be prompted to enter a CD.  If not, it will be downloaded from 
 the internet.<p>
 
@@ -126,9 +126,10 @@ from <a href="http://rpmfind.net">rpmfind</a>.  You'll need the following RPM's.
 <a name="env"></a>
 <span class="heading2">PATH Environment Variable</span><br>
 
-<p>On TurboLinux (and possibly other distributions as well), the DB2 installer
-tries to run some command line programs that are found in /sbin and /usr/sbin.
-Make sure that these directories are in the root user's PATH.</p>
+<p>The DB2 installer tries to run some command line programs that are found in
+/sbin and /usr/sbin.  Make sure that these directories are in the root user's
+PATH.  This is an issue on TurboLinux and possibly other distributions as well.
+</p>
 
 <a name="db2"></a>
 <span class="heading2">DB2 Installation</span><br>
@@ -138,6 +139,8 @@ Make sure that these directories are in the root user's PATH.</p>
 a tarball.  As root, create a temporary directory, move the tarball into it and
 extract it using <i>tar xf</i>.  The extraction process creates a directory 
 called 018_EEE_LNX_NLV.  Change directories to 018_EEE_LNX_NLV.</p>
+
+<p>009_ESE_LNX_32_NLV for 8.1...</p>
 
 <p>On Debian Linux and Slackware Linux, edit the db2_install script and
 comment out the line:</p>
@@ -149,6 +152,8 @@ comment out the line:</p>
 <p>Run the db2_install script.</p>
 
 <p>When prompted to specify a keyword, type DB2.EENT and press return.</p>
+
+<p>DB2.ESE for 8.1...</p>
 
 <p>When the script completes, run <i>rpm -qa</i> and verify that the following 
 RPM's were installed:</p>
@@ -181,6 +186,52 @@ db2jdbc71-7.1.0-40<br>
 db2adt71-7.1.0-40<br>
 </b></blockquote>
 
+<p>for 8.1...</p>
+
+<blockquote><b>
+IBM_db2icw81-8.1.0-0<br>
+IBM_db2repl81-8.1.0-0<br>
+IBM_db2dwcm81-8.1.0-0<br>
+IBM_db2dj81-8.1.0-0<br>
+IBM_db2icc81-8.1.0-0<br>
+IBM_db2icuc81-8.1.0-0<br>
+IBM_db2xmls81-8.1.0-0<br>
+IBM_db2jdbc81-8.1.0-0<br>
+IBM_db2djx81-8.1.0-0<br>
+IBM_db2msen81-8.1.0-0<br>
+IBM_db2conv81-8.1.0-0<br>
+IBM_db2icut81-8.1.0-0<br>
+IBM_db2chen81-8.1.0-0<br>
+IBM_db2cj81-8.1.0-0<br>
+IBM_db2inst81-8.1.0-0<br>
+IBM_db2ca81-8.1.0-0<br>
+IBM_db2crte81-8.1.0-0<br>
+IBM_db2smpl81-8.1.0-0<br>
+IBM_db2essg81-8.1.0-0<br>
+IBM_db2cliv81-8.1.0-0<br>
+IBM_db2secl81-8.1.0-0<br>
+IBM_db2jhen81-8.1.0-0<br>
+IBM_db2adt81-8.1.0-0<br>
+IBM_db2dc81-8.1.0-0<br>
+IBM_db2wbdb81-8.1.0-0<br>
+IBM_db2conn81-8.1.0-0<br>
+IBM_db2engn81-8.1.0-0<br>
+IBM_db2pext81-8.1.0-0<br>
+IBM_db2icms81-8.1.0-0<br>
+IBM_db2sesm81-8.1.0-0<br>
+IBM_db2adts81-8.1.0-0<br>
+IBM_db2xml81-8.1.0-0<br>
+IBM_db2rte81-8.1.0-0<br>
+IBM_db2inx81-8.1.0-0<br>
+IBM_db2cucs81-8.1.0-0<br>
+IBM_db2sp81-8.1.0-0<br>
+IBM_db2fs81-8.1.0-0<br>
+IBM_db2das81-8.1.0-0<br>
+IBM_db2cc81-8.1.0-0<br>
+</b></blockquote>
+
+<p>8.1 installs int /opt/IBM/db2/V8.1...</p>
+
 <a name="odbc"></a>
 <span class="heading2">Restore unixODBC if Necessary</span><br>
 
@@ -211,6 +262,8 @@ misinformation.</p>
 <i>/usr/IBMdb2/V7.1/doc/db2insthtml en_US</i>.  To view the documentation, 
 point your browser at <a href="file://usr/IBMdb2/V7.1/doc/en_US/html">
 /usr/IBMdb2/V7.1/doc/en_US/html</a>.</p>
+
+<p>not on 8.1...</p>
 
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>

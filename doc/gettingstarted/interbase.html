@@ -1,13 +1,13 @@
 <html>
 
 <head>
-<title>SQL Relay - Getting Started With Interbase</title>
+<title>SQL Relay - Getting Started With Interbase/Firebird</title>
 <link rel="stylesheet" href="../css/styles.css">
 </head>
 
 <body>
 
-<span class="heading1">Getting Started With Interbase</span><br>
+<span class="heading1">Getting Started With Interbase/Firebird</span><br>
 
 <ul>
 <li><a href="#installation">Installation</a></li>
@@ -22,25 +22,48 @@
 <a name="installation"></a>
 <span class="heading1">Installation</span><br>
 
-<p>I've successfully installed Interbase 6.0.1 on Linux.  I've never tried to 
-install it on any other platform or any other version on Linux.</p>
+<p>I've successfully installed Interbase 6.0.1 and Firebird 1.0.0 and 1.0.2 on
+Linux.  I've never tried to install them on any other platform.</p>
 
-<p>You can download binary distributions of Interbase 6.0.1 in tar.gz or RPM 
-formats from the <a href="http://www.borland.com">Borland web site</a> for 
-Linux and Solaris.  The tar.gz distribution comes with an install script.  The 
-RPM distribution can be installed using <i>rpm -i</i>.  Source code 
-distributions are also available.</p>
+<p>There are 2 versions of Interbase/Firebird: Classic Server (CS) and
+Super Server (SS).  Classic Server only allows a single connection while Super
+Server allows multiple connections.  I recommend using Super Server and this
+document describes it's installation.</p>
 
-<p>There are 2 versions of Interbase: Classic and Super Server.  Classic only 
-allows a single connection while Super Server allows multiple connections.
-I recommend using Super Server and this document describes it's installation.
-</p>
+<p>You can download source and binary distributions of Interbase 6.0.1 for
+Linux or Solaris in tar.gz or RPM formats from the
+<a href="http://www.borland.com">Borland web site</a>.  Binary and source
+distributions of Firebird in many different formats (including tar.gz and RPM)
+for many different platforms are available at the
+<a href="http://firebird.sourceforge.net">Firebird web site</a>.
+
+<p>The tar.gz distributions come with an install script.  The RPM distributions
+can be installed using <i>rpm -i</i>.</p>
+
+<span class="heading2">Install libncurses.so.4</span><br>
+
+<p>Interbase 6.0.1 requires libncurses.so.4.  Many older distributions come
+with libncurses.so.4.  Many newer distributions come with libncurses.so.5 (or
+newer).  Some distributions come with both.  If your distribution does NOT have 
+libncurses.so.4, create a symbolic link to the newer library as follows.</p>
+
+<p>(These instructions assume that your system has ncurses version 5.2 and that
+libncurses.so.5.2 resides in /usr/lib.  If your system has a different version 
+of ncurses or if it resides somewhere else (for example, in /lib) then modify 
+the instructions accordingly)</p>
+
+<blockquote>
+<b>cd /usr/lib<br>
+ln -s libncurses.so.5.2 libncurses.so.4</b>
+</blockquote>
 
 <a name="startingatboot"></a>
 <span class="heading2">Starting the Database at Boot Time</span><br>
 
-<p>You can use the following script to start/stop the database at
-boot/shutdown time.</p>
+<p>The package distributions of Interbase and Firebird install a script which
+starts the database at boot time and stops it at shutdown time.  If you
+compiled from source, you'll need to install a script like the following to
+start/stop the database at boot/shutdown time.</p>
 
 <blockquote>
 <PRE>
@@ -48,10 +71,10 @@ boot/shutdown time.</p>
 
 <B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
   start<B><FONT color=#a62828>)</FONT></B>
-        <B><FONT color=#a62828>/opt/interbase/bin/ibserver &amp;</FONT></B>
+        <B><FONT color=#a62828>/opt/interbase/bin/ibmgr -start</FONT></B>
         <B><FONT color=#a62828>;;</FONT></B>
   stop<B><FONT color=#a62828>)</FONT></B>
-        <B><FONT color=#a62828>kill</FONT></B> <FONT color=#6959cf>`ps </FONT><FONT color=#6959cf>-efa</FONT><FONT color=#6959cf> </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> grep ibserver </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> grep </FONT><FONT color=#6959cf>-v</FONT><FONT color=#6959cf> grep </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> awk </FONT><B><FONT color=#a62828>'</FONT></B><FONT color=#ff00ff>{print $2}</FONT><B><FONT color=#a62828>'</FONT></B><FONT color=#6959cf>`</FONT>
+        <B><FONT color=#a62828>/opt/interbase/bin/ibmgr -shut -user sysdba -password changeme</FONT></B>
         <B><FONT color=#a62828>;;</FONT></B>
   *<B><FONT color=#a62828>)</FONT></B>
         <B><FONT color=#a62828>echo</FONT></B><FONT color=#ff00ff> $</FONT><B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>Usage: </FONT><FONT color=#a620f7>$0</FONT><FONT color=#ff00ff> {start|stop}</FONT><B><FONT color=#a62828>&quot;</FONT></B>
@@ -67,6 +90,10 @@ boot/shutdown time.</p>
 database.  Running it with the "stop" option shuts the database down.  To
 access a database, it must be running.</p>
 
+<p>Note that the /etc/hosts.equiv file must contain an entry for localhost and
+possibly localhost.localdomain for the database to start properly and for the
+"local" tools (such as <i>ibmgr</i> and <i>gsec</i> to function.</p>
+
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>
 
@@ -75,7 +102,7 @@ you'll have to create a database.</p>
 
 <p>The installation process creates a security database named <i>isc4.gdb</i> 
 containing host and user privileges and an administrative user named 
-<i>SYSDBA</i> who's password is <i>changeme</i>.</p>
+<i>SYSDBA</i> with a password of either <i>changeme</i> or <i>masterkey</i>.</p>
 
 <p>Interbase user names are case insensitive and can be up to 31 characters 
 long.  Interbase passwords are case sensitive and can be up to 32 characters 
@@ -85,6 +112,9 @@ long, but only the first 8 characters are actually used.</p>
 <i>newpassword</i> and create a new user named <i>testuser</i> with password 
 <i>testpassword</i>.  <i>gsec</i> must be run as root, from the directory 
 containing <i>isc4.gdb</i>.  A gsec session follows.</p>
+
+<p>Note that the /etc/hosts.equiv file must contain an entry for localhost and
+possibly localhost.localdomain for the <i>gsec</i> to function.</p>
 
 <blockquote>
 <PRE>
@@ -98,6 +128,9 @@ GSEC<B><FONT color=#a62828>&gt;</FONT></B> modify testuser <FONT color=#6959cf>-
 GSEC<B><FONT color=#a62828>&gt;</FONT></B> quit 
 </PRE>
 </blockquote>
+
+<p>Now that the <i>SYSDBA</i> password has been changed in the database, you
+should update the start/stop script with the new password as well.</p>
 
 <p>Though you can create tables in the <i>isc4.gdb</i> database using the 
 SYSDBA user, it's not a good idea.  You should create a new database using a
@@ -114,18 +147,19 @@ SQL&gt; quit;
 </PRE>
 </blockquote>
 
-<p>Interbase databases are referenced by the pathname of the database file.  If
-you try to create a database using a file name that already exists or if you
-forget to enclose the file name in single quotes, you'll get a cryptic error 
-indicating that the 'database' token is unknown.  So, if you get a message like
-that, make sure that you enclosed the file name in single quotes and make sure
-that the database file that you're trying to create doesn't already exist.</p>
+<p>Interbase/Firebird databases are referenced by the pathname of the database
+file.  If you try to create a database using a file name that already exists or
+if you forget to enclose the file name in single quotes, you'll get a cryptic
+error indicating that the 'database' token is unknown.  So, if you get a
+message like that, make sure that you enclosed the file name in single quotes
+and make sure that the database file that you're trying to create doesn't
+already exist.</p>
 
 <p>Now you can log into the <i>/home/user/testdb.gdb</i> database as 
 <i>testuser</i> with the following command.</p>
 
 <blockquote>
-<b>/opt/interbase/bin/isql -u testuser -p testpassword /home/user/test.gdb</b>
+<b>/opt/interbase/bin/isql -u testuser -p testpassword /home/user/testdb.gdb</b>
 </blockquote>
 
 <p>The only users that can drop a database are the user that owns the database 
@@ -158,20 +192,21 @@ GSEC<B><FONT color=#a62828>&gt;</FONT></B> quit
 
 <p>This should be enough to get you started.  To set up more complex 
 configurations, consult the 
-<a href="http://www.borland.com/techpubs/interbase/ib_b60_doc.zip">Interbase 
-documentation</a>.</p>
+<a href="http://firebird.sourceforge.net/index.php?op=doc">Interbase
+/Firebird documentation</a>.</p>
 
 <a name="accessing"></a>
 <span class="heading1">Accessing a Database</span><br>
 
-<p>The first step in accessing an Interbase database is setting up your 
-environment.  The Interbase client is called </i>isql</i>.  Note that 
-<i>unixODBC</i> and <i>Sybase</i> have a client called <i>isql</i> as well 
+<p>The first step in accessing an Interbase/Firebird database is setting up
+your environment.  The Interbase/Firebird client is called </i>isql</i>.  Note
+that <i>unixODBC</i> and <i>Sybase</i> have a client called <i>isql</i> as well 
 which could be installed in /usr/bin, /usr/local/bin or /opt/sybase*/bin.  If 
 you have <i>unixODBC</i> or <i>Sybase</i> installed, you'll have to decide 
 which client you want the <i>isql</i> command to run.  If you want it to run 
-the Interbase client, follow the instructions below.  Otherwise, you'll have to 
-run the Interbase <i>isql</i> client by it's full pathname.</p>
+the Interbase/Firebird client, follow the instructions below.  Otherwise,
+you'll have to run the Interbase/Firebird <i>isql</i> client by it's full
+pathname.</p>
 
 <p>In the configuration script for your shell, add <i>/opt/interbase/bin</i> to
 your PATH environment variable as follows.</p>
@@ -269,8 +304,8 @@ SQL&gt; quit;
 <a name="sqlrelay"></a>
 <span class="heading1">Accessing a Database With SQL Relay</span><br>
 
-<p>Accessing Interbase from SQL Relay requires an instance entry in your 
-<i>sqlrelay.conf</i> file for the database that you want 
+<p>Accessing Interbase/Firebird from SQL Relay requires an instance entry in
+your <i>sqlrelay.conf</i> file for the database that you want 
 to access.  Here is an example <i>sqlrelay.conf</i> which defines an SQL Relay 
 instance called interbasetest.  This instance connects to the 
 <i>/home/user/testdb</i> database as the user <i>testuser</i> with password 
