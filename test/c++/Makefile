@@ -102,5 +102,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) sybase
 	$(LIBTOOL) --mode=clean $(RM) cachefile*
 	$(LIBTOOL) --mode=clean $(RM) sqlnet.log
+	$(RMTREE) .libs
 
 rebuild: clean all

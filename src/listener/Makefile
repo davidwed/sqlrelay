@@ -30,6 +30,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-listener-debug
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(RMTREE) .libs
 
 rebuild: clean all
 

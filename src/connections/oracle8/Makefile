@@ -35,6 +35,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-oracle8-debug
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(RMTREE) .libs
 
 rebuild: clean all
 

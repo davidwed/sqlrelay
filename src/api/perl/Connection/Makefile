@@ -77,6 +77,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.$(PERLMAN3EXT)
 	$(LIBTOOL) --mode=clean $(RM) errors*
 	$(LIBTOOL) --mode=clean $(RM) perlincludes.h
+	$(RMTREE) .libs
 
 rebuild: clean all
 

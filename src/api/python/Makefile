@@ -26,6 +26,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o	
 	$(LIBTOOL) --mode=clean $(RM) *.so
+	$(RMTREE) .libs
 
 rebuild: clean all
 

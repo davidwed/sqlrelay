@@ -47,6 +47,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) phpincludes.h
 	$(LIBTOOL) --mode=clean $(RM) errors1
 	$(LIBTOOL) --mode=clean $(RM) errors2
+	$(RMTREE) .libs
 
 rebuild: clean all
 

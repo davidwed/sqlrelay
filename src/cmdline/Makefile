@@ -27,6 +27,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) query-debug
 	$(LIBTOOL) --mode=clean $(RM) sqlrsh
 	$(LIBTOOL) --mode=clean $(RM) sqlrsh-debug
+	$(RMTREE) .libs
 
 rebuild: clean all
 

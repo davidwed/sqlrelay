@@ -44,6 +44,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) tclincludes.h
 	$(LIBTOOL) --mode=clean $(RM) errors1
 	$(LIBTOOL) --mode=clean $(RM) errors2
+	$(RMTREE) .libs
 
 rebuild: clean all
 

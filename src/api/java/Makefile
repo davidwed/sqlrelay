@@ -23,6 +23,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) *.so
 	$(LIBTOOL) --mode=clean $(RM) com/firstworks/sqlrelay/*.class
+	$(RMTREE) .libs
 
 rebuild: clean all
 
