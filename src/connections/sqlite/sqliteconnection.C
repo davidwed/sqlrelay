@@ -9,6 +9,15 @@
 #include <sys/ipc.h>
 #include <sys/stat.h>
 
+#ifndef SQLITE3
+	#define	sqlite3_open		sqlite_open
+	#define	sqlite3_close		sqlite_close
+	#define	sqlite3_get_table	sqlite_get_table
+	#define	sqlite3_errmsg		sqlite_errmsg
+	#define	sqlite3_free_table	sqlite_free_table
+#endif
+
+
 sqliteconnection::sqliteconnection() : sqlrconnection() {
 	sqliteptr=NULL;
 	errmesg=NULL;
@@ -24,9 +33,16 @@ void sqliteconnection::handleConnectString() {
 
 bool sqliteconnection::logIn() {
 #ifdef SQLITE_TRANSACTIONAL
-	if ((sqliteptr=sqlite_open(db,666,&errmesg))) {
+#ifdef SQLITE3
+	if (sqlite3_open(db,&sqliteptr)==SQLITE_OK) {
+#else
+	if ((sqliteptr=sqlite3_open(db,666,&errmesg))) {
+#endif
 		return true;
 	}
+#ifdef SQLITE3
+	errmesg=strdup(sqlite3_errmsg(sqliteptr));
+#endif
 	if (errmesg) {
 		fprintf(stderr,"%s\n",errmesg);
 	}
@@ -47,7 +63,7 @@ void sqliteconnection::deleteCursor(sqlrcursor *curs) {
 void sqliteconnection::logOut() {
 #ifdef SQLITE_TRANSACTIONAL
 	if (sqliteptr) {
-		sqlite_close(sqliteptr);
+		sqlite3_close(sqliteptr);
 	}
 #endif
 }
@@ -137,11 +153,17 @@ bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
 	// before each query or the results of ddl/dml queries are never
 	// visible to other sessions.
 	if (sqliteconn->sqliteptr) {
-		sqlite_close(sqliteconn->sqliteptr);
+		sqlite3_close(sqliteconn->sqliteptr);
 	}
+#ifdef SQLITE3
+	if (sqlite3_open(sqliteconn->db,&(sqliteconn->sqliteptr))!=SQLITE_OK) {
+		sqliteconn->errmesg=
+			strdup(sqlite3_errmsg(sqliteconn->sqliteptr));
+#else
 	if (!(sqliteconn->sqliteptr=
 			sqlite_open(sqliteconn->db,666,
 						&sqliteconn->errmesg))) {
+#endif
 		return false;
 	}
 	result=runQuery(newquery,query);
@@ -170,12 +192,12 @@ int sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
 
 	// run the appropriate query
 	if (newquery) {
-		return sqlite_get_table(sqliteconn->sqliteptr,
+		return sqlite3_get_table(sqliteconn->sqliteptr,
 					newquery->getString(),
 					&result,&nrow,&ncolumn,
 					&sqliteconn->errmesg);
 	} else {
-		return sqlite_get_table(sqliteconn->sqliteptr,
+		return sqlite3_get_table(sqliteconn->sqliteptr,
 					query,
 					&result,&nrow,&ncolumn,
 					&sqliteconn->errmesg);
@@ -265,7 +287,7 @@ void sqlitecursor::cleanUpData(bool freeresult, bool freebinds) {
 		newquery=NULL;
 	}
 	if (freeresult && result) {
-		sqlite_free_table(result);
+		sqlite3_free_table(result);
 		result=NULL;
 	}
 }

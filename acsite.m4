@@ -1151,6 +1151,7 @@ then
 	SQLITELIBS=""
 	SQLITELIBSPATH=""
 	SQLITESTATIC=""
+	SQLITEVERSION=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -1173,6 +1174,14 @@ then
 		if ( test -n "$PTHREADLIBS" )
 		then
 			FW_CHECK_HEADERS_AND_LIBS([$SQLITEPATH],[sqlite],[sqlite.h],[sqlite],[$STATICFLAG],[$RPATHFLAG],[SQLITEINCLUDES],[SQLITELIBS],[SQLITELIBSPATH],[SQLITESTATIC])
+			if ( test -z "$SQLITELIBS" )
+			then
+				FW_CHECK_HEADERS_AND_LIBS([$SQLITEPATH],[sqlite],[sqlite3.h],[sqlite3],[$STATICFLAG],[$RPATHFLAG],[SQLITEINCLUDES],[SQLITELIBS],[SQLITELIBSPATH],[SQLITESTATIC])
+				if ( test -n "$SQLITELIBS" )
+				then
+					SQLITEVERSION="3"
+				fi
+			fi
 		else
 			AC_MSG_WARN(pthreads was not found.)
 		fi
@@ -1181,27 +1190,35 @@ then
 		then
 			AC_MSG_WARN(SQLite support will not be built.)
 		else
-			AC_MSG_CHECKING(if SQLite needs gdbm)
-			SQLITENEEDGDBM=""
-			FW_TRY_LINK([#include <sqlite.h>],[sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$SQLITELIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes"])
-		
-			if ( test -n "$SQLITENEEDGDBM" )
+			if ( test -n "$SQLITEVERSION" )
 			then
-				if ( test -z "$GDBMLIBS" )
+				AC_MSG_CHECKING(if SQLite needs gdbm)
+				SQLITENEEDGDBM=""
+				FW_TRY_LINK([#include <sqlite.h>],[sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$SQLITELIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes"])
+			
+				if ( test -n "$SQLITENEEDGDBM" )
 				then
-					AC_MSG_WARN(SQLite needs GDBM but GDBM was not found. SQLite support will not be built.)
-					SQLITELIBS=""
-					SQLITELIBSPATH=""
-					SQLITEINCLUDES=""
-					SQLITESTATIC=""
-				else 
-					SQLITELIBS="$SQLITELIBS $GDBMLIBS"
+					if ( test -z "$GDBMLIBS" )
+					then
+						AC_MSG_WARN(SQLite needs GDBM but GDBM was not found. SQLite support will not be built.)
+						SQLITELIBS=""
+						SQLITELIBSPATH=""
+						SQLITEINCLUDES=""
+						SQLITESTATIC=""
+					else 
+						SQLITELIBS="$SQLITELIBS $GDBMLIBS"
+					fi
+				else
+					AC_DEFINE_UNQUOTED(SQLITE_TRANSACTIONAL,1,Some versions of sqlite are transactional)
 				fi
-			else
-				AC_DEFINE_UNQUOTED(SQLITE_TRANSACTIONAL,1,Some versions of sqlite are transactional)
 			fi
-		
 		fi
+	fi
+
+	if ( test "$SQLITEVERSION" = "3" )
+	then
+		SQLITEINCLUDES="-DSQLITE3 $SQLITEINCLUDES"
+		AC_DEFINE_UNQUOTED(SQLITE_TRANSACTIONAL,1,Some versions of sqlite are transactional)
 	fi
 
 	FW_INCLUDES(sqlite,[$SQLITEINCLUDES])

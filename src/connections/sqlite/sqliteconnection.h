@@ -11,7 +11,11 @@
 #include <sqlrconnection.h>
 
 extern "C" {
+#ifdef SQLITE3
+	#include <sqlite3.h>
+#else
 	#include <sqlite.h>
+#endif
 }
 
 #include <config.h>
@@ -70,7 +74,11 @@ class sqliteconnection : public sqlrconnection {
 
 		char	*db;
 
+#ifdef SQLITE3
+		sqlite3	*sqliteptr;
+#else
 		sqlite	*sqliteptr;
+#endif
 		char	*errmesg;
 };
 

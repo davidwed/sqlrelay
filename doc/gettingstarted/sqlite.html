@@ -60,11 +60,11 @@ using <i>rpm -i</i>.</p>
 <span class="heading1">Creating a Database</span><br>
 
 <p>In version 1.0.x of SQLite, a database is just a directory with table files 
-in it.  In versions 2.x, the database is a single file.  Unlike other relation 
-database systems, there is no daemon managing the database, the SQLite API 
-interprets queries and runs them against the file(s) directly. I usually create
-a directory /usr/local/sqlite/var and create database directories or files 
-there as follows.  SQLite database users are equivalent to unix users.  
+in it.  In versions 2.x an 3.x, the database is a single file.  Unlike other
+relation database systems, there is no daemon managing the database, the SQLite
+API interprets queries and runs them against the file(s) directly. I usually
+create a directory /usr/local/sqlite/var and create database directories or
+files there as follows.  SQLite database users are equivalent to unix users.  
 Database directory and file permissions dictate what permissions a user has on 
 the database.</p>
 
@@ -74,8 +74,9 @@ the database.</p>
 <b>chmod 755 /usr/local/sqlite/var</b><br>
 </blockquote>
 
-<p>For SQLite versions 2.x, it is only necessary to create the directory, the
-database file will get created the first time a user tries to access it.</p>
+<p>For SQLite versions 2.x and 3.x, it is only necessary to create the
+directory, the database file will get created the first time a user tries to
+access it.</p>
 
 <p>For SQLite version 1.0.x, the following commands are necessary to create a 
 database called <i>testdb</i> owned by the user <i>testuser</i>.</p>
@@ -90,11 +91,12 @@ database called <i>testdb</i> owned by the user <i>testuser</i>.</p>
 <span class="heading1">Accessing a Database</span><br>
 
 <p>To access an SQLite database, su to the appropriate user and run the
-sqlite command line utility.</p>
+sqlite3 command line utility (for versions 1.0.x and 2.x the command line
+utility is just called sqlite).</p>
 
 <blockquote>
 <b>su testuser</b><br>
-<b>sqlite /usr/local/sqlite/var/testdb</b>
+<b>sqlite3 /usr/local/sqlite/var/testdb</b>
 </blockquote>
 
 <p>Once you're connected to the database, the sqlite client prompts you to
@@ -105,8 +107,8 @@ end it with a semicolon.  To exit, type .exit</p>
 
 <blockquote>
 <PRE>
-[testuser@localhost testuser]$ <b>sqlite /usr/local/sqlite/var/testdb</b>
-SQLite version <FONT color=#ff00ff>2.2.0</FONT>
+[testuser@localhost testuser]$ <b>sqlite3 /usr/local/sqlite/var/testdb</b>
+SQLite version <FONT color=#ff00ff>3.0.2</FONT>
 Enter <FONT color=#ff00ff>&quot;.help&quot;</FONT> for instructions
 sqlite&gt; <B><FONT color=#a62828>create</FONT></B> <FONT color=#6959cf>table</FONT> testtable (
    ...&gt; col1 <B><FONT color=#288a51>char</FONT></B>(<FONT color=#ff00ff>40</FONT>),

@@ -10,7 +10,7 @@ idle client timeout
 client connect timeout
 perl apis -> CPAN
 
-incorporate sqlite3 patches
+sqlite test segfaults after suspeneded session tests
 
 fix pythondb for python < 2.1
 
