@@ -27,6 +27,7 @@
 # --without python
 # --without ruby
 # --without zope
+# --without tcl
 
 Summary: Persistent database connection system.
 Name: sqlrelay
@@ -47,18 +48,19 @@ BuildRequires: rudiments-devel >= 0.25
 %{!?_without_python:BuildRequires: ,python-devel}
 %{!?_without_ruby:BuildRequires: ,ruby-devel}
 %{!?_without_zope:BuildRequires: ,python-devel}
+%{!?_without_tcl:BuildRequires: ,tcl}
 
 %description
 SQL Relay is a persistent database connection pooling, proxying and load 
 balancing system for Unix and Linux supporting ODBC, Oracle, MySQL, mSQL, 
 PostgreSQL, Sybase, MS SQL Server, IBM DB2, Interbase, Lago and SQLite with C, 
-C++, Perl, Perl-DBD, Python, Python-DB, Zope, PHP, Ruby and Java APIs, command 
-line clients, a GUI configuration tool and extensive documentation.  The APIs 
-support advanced database operations such as bind variables, multi-row fetches,
-client side result set caching and suspended transactions.  It is ideal for 
-speeding up database-driven web-based applications, accessing databases from 
-unsupported platforms, migrating between databases, distributing access to 
-replicated databases and throttling database access.
+C++, Perl, Perl-DBD, Python, Python-DB, Zope, PHP, Ruby, Java and TCL APIs,
+command line clients, a GUI configuration tool and extensive documentation.
+The APIs support advanced database operations such as bind variables, multi-row
+fetches, client side result set caching and suspended transactions.  It is
+ideal for speeding up database-driven web-based applications, accessing
+databases from unsupported platforms, migrating between databases, distributing
+access to replicated databases and throttling database access.
 
 
 %package clients
@@ -299,6 +301,15 @@ Group: Development/Languages
 %description zope
 SQL Relay modules for Zope.
 
+
+%package tcl
+Summary: SQL Relay modules for TCL.
+Group: Development/Languages
+
+%description tcl
+SQL Relay modules for TCL.
+
+%define tcldir		/usr/lib/tcl
 %define pythondir	%(echo -e "import sys\\nimport string\\nout=''\\nfor i in sys.path:\\n if len(i)>0:\\n  for j in range(0,len(i)):\\n   if j<len(i)-1:\\n    out=out+i[j]\\n   else:\\n    if i[j]!='/':\\n     out=out+i[j]\\n  break\\nprint out" | python)
 %define	zopedir		%{pythondir}/python/Products
 %define	phpextdir	%(php-config --extension-dir)
@@ -328,6 +339,7 @@ SQL Relay modules for Zope.
 	%{?_without_sqlite:	--disable-sqlite} \
 	%{?_without_sybase:	--disable-sybase} \
 	%{?_without_java:	--disable-java} \
+	%{?_without_tcl:	--disable-tcl} \
 	%{?_without_perl:	--disable-perl} \
 	%{?_without_php:	--disable-php} \
 	%{?_without_python:	--disable-python} \
@@ -534,6 +546,10 @@ fi
 %{!?_without_zope:%files zope}
 %{!?_without_zope:%defattr(-, root, root)}
 %{!?_without_zope:%{zopedir}/ZSQLRelayDA}
+
+%{!?_without_tcl:%files tcl}
+%{!?_without_tcl:%defattr(-, root, root)}
+%{!?_without_tcl:%{tcldir}/sqlrelay/*}
 
 
 %changelog

@@ -1,3 +1,5 @@
+is there a better way to get tclprefix in spec file
+
 scaling/handoff=pass incompatibility
 	setting backlog:
 		linux:
@@ -42,6 +44,7 @@ lots of documentation fixes:
 
 Tests:
 	zope
+	tcl
 	odbc tests
 	better perldbi/pythondb/rubydbi tests
 	test init scripts
@@ -145,10 +148,10 @@ backends:
 API's:
 	wrapper:
 		ADODB - have a driver, just need to incorporate it
+		PHP DBI
 		JDBC
 		ODBC
 		QT3
-		TCL
 		C#
 		ADA
 	replacement libs for native db api libs - 
