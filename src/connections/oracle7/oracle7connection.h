@@ -9,7 +9,7 @@
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	2048
 
-#define NUM_CONNECT_STRING_VARS 5
+#define NUM_CONNECT_STRING_VARS	5
 
 #include <rudiments/environment.h>
 #include <sqlrconnection.h>
