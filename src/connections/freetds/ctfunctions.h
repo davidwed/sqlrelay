@@ -3,6 +3,8 @@
 
 // in freetds prior to 0.61, the cs_ functions are not defined in any header
 // file. C allows that...  C++ does not, so here they are
+extern "C" {
+
 extern	CS_INT	cs_ctx_alloc(CS_INT,CS_CONTEXT **);
 extern	CS_INT	ct_init(CS_CONTEXT *,CS_INT);
 extern	CS_INT	ct_callback(CS_CONTEXT *,CS_CONNECTION *,
@@ -31,3 +33,4 @@ extern	CS_INT	cs_loc_drop(CS_CONTEXT *,CS_LOCALE *);
 extern	CS_INT	ct_cancel(CS_CONNECTION *,CS_COMMAND *,CS_INT);
 extern	CS_INT	ct_dynamic(CS_COMMAND *,CS_INT,CS_CHAR *,CS_INT,CS_CHAR *,CS_INT);
 
+}
