@@ -1,0 +1,789 @@
+0.33 -	configure script figures out rpm build directory better
+	added sane defaults for every configfile parameter
+	updated dtd
+	sqlr-config-gtk fills in default values now
+	"listener and connection" attribute values in config file have been
+		changed to "listener_and_connection" to satify xmllint, but
+		"listener and connection" still works
+	updated sqlrelay.conf.example
+	added sqlrclient-config and sqlrclientwrapper-config scripts
+	removing rpm's removes /usr/local/firstworks/java , include/sqlrelay,
+		and var if they're empty
+	programs return proper exit status's now
+	connection class's listen() method takes a parameter indicating whether
+		to detach before/after logging in.  Detach before allows DB2
+		to work, detach after allows an exit status to be returned
+		if logging in fails
+	query.py isn't installed anymore, it's redundant
+	getRow was using row instead of whichrow, fixed that
+	added sendQuery that takes a length parameter to handle binary data
+	added upper/lower/mixed column name methods
+	java API's are in com.firstworks.sqlrelay package now
+	added init scripts
+	queries with substitutions correctly reset their length after the
+		substitutions are applied now
+	incorporated minx's LOB-fetching bugfixes into oracle8 connection
+	oracle 8.1.7's OCILobRead doesn't return OCI_NEED_DATA, worked around
+		that
+	oracle8 connection handles NULL LOB's correctly now as well
+	query and sqlrsh programs set their result set buffer sizes to 100 now
+		so huge queries don't use up all your ram
+	added getOutputBindLength method to API's
+	added __del__ methods to PySQLRDB classes
+	several connections didn't process the correct number of connect-string
+		variables
+	uses rudiments' updated client/server architecture
+	uses rudiments' logger class now
+	renamed libauthenticator, libconfigfile, libconnection to libsqlr*
+		and added support for using them as shared libraries
+	libsqlrconfigfile is based on rudiments xmlsax class now
+	sqlr-config-gtk is based on rudiments xmldom class now
+	dependency on libxml no longer exists
+	LOB and string binds use memorypool class now
+	fixed init script and ruby api uninstall problems
+	applied Leo Almeida's python db patches which handle closing
+		cursors/connections better
+	moved a bunch of sqlrconnection class code into other classes, created
+		a few new classes that are used by it alone
+	postgresql connection closes stdout/stderr after logging in now
+	added -localstatedir command line option to redirect
+		/usr/local/firstworks/var to somewhere else
+	moved allocate calls into logIn() methods of connections and deallocate
+		methods into logOut() methods; makes reconnect work with
+		oracle8
+	added support for cursor output binds
+	changed the way that the clients and servers negotiate which cursor
+		that the client should use
+	added REEXECUTE_QUERY and FETCH_FROM_BIND_CURSOR protocol directives
+	changed SENDING_QUERY directive to NEW_QUERY
+	removed all iostream references, should allow sqlrelay to be
+		compiled against uclibc (for all connections that can also
+		be compiled against uclibc)
+	added error message if ftok fails in listener
+
+0.32 -	affectedRows and totalRows were returning 0 instead of -1 for databases
+		that don't know that value, now they return -1
+	python api's suspendSession() returns 1 or 0 now
+	suspendResultSet was screwing up the results of firstRowIndex() and
+		rowCount() but they are fixed now
+	python/ruby API's would crash if getColumnNames was called after calling
+		dontGetColumnInfo
+	invalid DDL caused sqlr-connection-oracle8 to crash, that's fixed now
+	fixed several cached-result-set related bugs
+	client automatically retries reads that were interrupted by signals now,
+		this should fix lots of spurious "network error" bug reports
+	client suppresses low level error messages unless debug is set on now
+	complies with gcc3 now
+	make rpm ignores perl/ruby if you don't have them now
+	postgres database returns affected row count now
+	bug fix - ruby api returns column length now instead of type when 
+		getColumnLength is called
+	ruby api handles nil socket now
+	added ruby dbd api contributed by Michael Neuman
+	updated clientapi documentation with regard to commit/rollback and
+		server-side authentication
+	fixed oraclentier documentation bugs
+	spec files take config directories into account now
+	sendRowCounts in libconnection took unsigned longs, but was being passed
+		-1's if the database couldn't supply the parameter, dumb
+	configure looks for libssl and links it into the python lib now
+	perl getRow and getColumnNames don't segfault now when there is no row
+		or columns
+	fixed abortResultSet/cacheData/finishCaching-related segfault
+	handoff between listener and database connection can be done by passing
+		file descriptors or by instructing the client to reconnect
+	congfigure looks in /opt/sfw for software now - 
+		per the solaris companion CD
+	configure looks for python.o and ccpython.o now
+	configure looks for sybase stuff in /usr/local/sybase
+	configure looks for serversocketpool.h instead of server.h to 
+		find rudiments now
+	connections listen on inet/unix ports only if listener is 
+		configured to now
+	configure script correctly determines the existence of oci.h now
+	updated dtd - port not required any more, authentication -> authtier
+		authentication or authtier work for compatibility now
+	allowed/denied ips configuration option
+	profiling libraries libsqlrclient_p.a and libsqlrclientwrapper_p.a
+		are now generated
+	getColumnType(char *col) wasn't returning the correct column type for
+		nonstandard types
+	sqlrcursor recycles column data and result set buffers now and creates
+		the columnnames array on demand instead of every time
+	the postgresql connection has an autocommit-yes/no option now which
+		defaults to autocommit
+	when in non-autocommit mode, the postgresql connection does a 
+		commit/begin before ddl statements now
+	added autocommit options to db2, oracle and odbc databases
+	added autoCommitOn/Off() api calls
+	ruby API builds against local c++ library instead of the one installed
+		to the system now
+	listener creates semaphore/shared memory segment now, other programs
+		just attach to it
+	listener checks/sets a pid file
+	listener throws errors, refuses to start if the pid file is already
+		out there or if it can't create a semaphore set or shared 
+		memory segment
+	connections, scaler refuse to start unless the listener is running
+	configure detects sybase on freebsd but there seems to be a problem
+		with sybase on freebsd - core dump in configure program
+	configure script detects, configures for Oracle 9i now, at least on
+		Linux
+	configure script shouldn't put -L/usr/lib or -Wl,--rpath /usr/lib into
+		compile strings any more
+	include files moved to sqlrelay subdir of incdir
+	perl api suspendSession returns int now
+	ruby and php api inputBinds and substitutions work now
+	postgresql connection correctly returns REAL datatype in typemangling 
+		mode
+	postgresql connection correctly returns NULL's now
+	mysql connection correctly returns affected rows now
+	fake binds like :var1 and :var11 are no longer screwed up
+	decimal and int64 datatypes are recognized as numbers now
+	msql connection correctly returns datatypes now
+	lago connection correctly returns column lengths now
+	lago connection correctly returns whether a column is null or not
+	sybase/freetds connections correctly interpret the "db" connectstring
+		parameter now
+	sybase/freetds smalldatetime and smallmoney types are properly
+		represented now
+	bind-by-position works in sybase now
+	sybase/freetds reports correct field length now
+	sybase/freetds/interbase now support 256 input and 256 output bind
+		vars correctly
+	affected rows is enabled for freetds version > 0.52
+	queries returning MONEY/SMALLMONEY columns are disabled for freetds
+		version < 0.53
+	freetds connection correctly supports fake bind variables now
+	freetds connection doesn't spew unknown marker errors when cleaning
+		up after result sets that weren't ct_describe'd
+	configure script finds libxml in /opt/gnome now
+	-version or --version returns version for cmdline programs now
+	replaced VERSION with SQLR_VERSION throughout code to avoid conflicts
+	incorporated a patch to enable php-4.1.1 compatibility
+	sqlite connection rewritten to be more conventional, also supports
+		transactions in sqlite 2
+	sqlr-stop correctly cleans up the tempfile dir and properly figures
+		out what directory that is instead of always using 
+		/usr/local/firstworks/var/sqlrelay/tmp
+	interbase returns correct datatypes now
+	non-faked NULL binds work correctly now
+	added server-side debugging
+	sqlr-start can run with -strace option now to generate strace files
+		for sqlr-connections
+	configure script now looks for gnome-xml first and only looks for 
+		libxml if it doesn't find gnome-xml
+	closeCursors works correctly now
+	changed server connect string parameter to db for db2
+	changed database connect string parameter to db for interbase
+	libconnection detaches from the controlling tty before logging into
+		the database now.  This is necessary for db2 connections to 
+		work.
+	db2 date/time/timestamp types are reported instead of unknown now
+	port connection string parameter not used in freetds/sybase anymore
+	implemented ping for db2, interbase, msql
+	undef as value for an input bind/substitution works in perl api now
+	java/php api's handle NULL strings correctly now, especially in
+		substitutions/inputBinds
+	sockseq permissions get set correctly now
+	interbase connection uses 1 transaction for ddl and another for non-ddl
+		now, ddl is committed immediately
+	transactions work in interbase now
+	fields, query and sqlrsh don't crash (or act strangely) now if the -id
+		command line option is used with an invalid id
+	added -lcrypt to interbse compile requirements to support Firebird
+	configure looks for libxml2/parser.h as well as libxml/parser.h now
+	support for ruby 1.6.7
+	changed python module name from CSQLRelay to SQLRelay.CSQLRelay in
+		Py_InitModule call
+	ruby build script replaces "CC = cc" with "CC = $(CXX)" and "CC = gcc"
+		with "CC = $(CXX)" now instead of just replacing gcc with g++
+	reworked the rpm-building stuff
+	added -lcrypto to python api build script
+	bench doesn't compile by default now
+	configure checks /opt for db2 now
+	incorporated Dieter Maurer's patch which aligns the port number in
+		shared memory correctly for Solaris and others
+	rpm build should work on non-redhat systems now
+	fixed many memory leaks in C++ api
+	replaced lots of strstreams with char arrays
+	oracle connections print more error messages when they fail to log in
+	oracle8 connection cleans up when repreparing for binds now
+	connections close cursors after pings now
+	for connections which check whether a result set is NULL before
+		cleaning it up, the result set is set to NULL after cleaning
+		it up, and also in the cursor constructor, this prevents
+		calls to abort() (which in turn call cleanUpData()) from
+		cleaning up a pointer that has already been cleaned up
+	connections that have to set environment vars do so in a manner that
+		will work with old versions of libc, putenv and setenv now
+	fixed improper AC_TRY_LINK calls in configure, changed AC_TRY_RUN's to
+		AC_TRY_LINK's
+	everything should be compatible with autoconf 2.53 now
+	added -lm to Oracle libs
+
+0.31 -	skipped
+
+0.30 -	replaced lingerOnClose() calls with a read that will fall through
+		when the client closes it's end of the connection
+	implemented the close() method for PySQLRDB's cursor class
+	if a library's include files are in /usr/include, -I/usr/include is
+		no longer put into the compile string, it was causing problems
+		for gcc3
+	use umask to set file permissions instead of doing it using fstream
+		directly, works with gcc3's fstream now
+	added commit/rollback methods to the API to help get around some
+		ODBC databases not implementing those methods
+	added support for ODBC>=3.0 when using iodbc
+	renamed ruby API files to fall in line with ruby DBI naming conventions
+	bug fix: had failed to NULL terminate user/password in listener
+	implemented Oracle n-tier authentication for Oracle8i
+	new authentication scheme - 
+		listener/connection/listener and connection/database options
+	support for SQLite-2.0 which doesn't need GDBM
+	bug fie: Zope adapter's _finish and _abort didn't call close()
+	better detection/auto-install of Zope API
+	added test for gtk12-config and gtk10-config in configure
+	reworked build system to configure faster
+	fixed bug where an invalid query would end the session
+	fixed ps -efa/ps aux bug for BSD systems
+
+0.29 -	bind variable debug doesn't screw up <pre></pre> anymore
+	added Zope detection/auto-install
+	configure script finds java install from various rpms now
+	explicit check for Oracle's libwtc.a/libwtc.so
+	check for ld -G vs ld -shared
+	looks for postgresql libs/includes in many new places
+	configure checks to see if odbc or lago need threads now
+	sqlr-config-gtk doesn't make libcfparse.a now, just links against
+		configfile.o
+	much more robust library detection in configure script now
+	sqlr-stop works with systems that don't have SYSV ps command
+	sqlr-config-gtk should compile against gtk-1.0 now
+	ruby api should "make clean" even when ruby isn't in your PATH now
+	mysql connection should compile against mysql's that dont have the
+		mysql_real_connect method now
+	in connection class, wherever I was setting busy=0, I call abort() now,
+		this ensures that busy=0, suspendresultset=0 and cleanUpData()
+		get's called
+	make clean cleans up all bench dirs now
+	make makes all bench dirs now
+	fixed ICONVPATH/LIBICONVPATH problem in configure
+	if libxml wasn't found, the query,fields and sqlrsh commands will
+		compile now, just without the -id and -config options
+	zope install copies python api into zope dir now instead of symlinking
+		to it
+	
+
+0.28 -	sqlrsh compiles against readline version 2 now
+	fixed a bug where a connection daemon would dump core if dynamic scaling
+		is turned on and it fails to log into the database or create
+		cursors
+	support for .sqlrelay.conf
+	cleaned up signed/unsigned short/long's everywhere
+	c api's sqlrcur_getOutputBind didn't work, but it does now
+	took care of a bunch of compiler warnings
+	if you leave out the -connectionid parameter when running
+		sqlr-connection-xxx it will use the first connectionid
+		if one exists
+	added cursors parameter to the config file and sqlr-config-gtk
+	connection daemons shouldn't core dump now if they fail to log in
+	implemented executemany and rowcount in pythondb api
+	documented pythondb api similarly to other api's
+	libconnection runs returnResultSetData immediately after handleQuery
+		and resumeResultSet now.  This obviates the need for the
+		client to send a FETCH_RESULT_SET command/cursor and fixes a
+		bug where the client could fetch the wrong result set by
+		sending the wrong cursor.
+	fixed a bug that would cause previous queries to be re-executed instead
+		of the current query when prepareFileQuery is used
+	by default, postgresql connection returns numeric types now
+	added mangletypes connect string option to postgresql connection
+	made ping/identify more efficient, made them connection-based rather
+		than cursor based
+	configure --includedir should work now
+	documented perl DBD api similarly to other api's
+	client debug messages detect whether the app is a web app or not by
+		checking for the DOCUMENT_ROOT environment variable and
+		put <pre></pre> tags around debug messages if it's found
+	sqlr-listener doesn't fork bomb any more when trying to run 2 on the
+		same port, now it exits gracefully
+	fixed a bug where the connection daemons weren't calling 
+		disconnectClient()
+	C API doesn't convert back and forth between a class pointer and a long
+		anymore, now it uses a typedef struct pointer for the same
+		thing, simplfies the code
+	listener sockets linger on close now, for 10 seconds
+	changed sqlr-stop to use awk instead of cut
+
+0.27 -	added java API
+	all API shared object libraries are linked against $(LIBSTDCPP) now
+	in the C++ API, if copyrefs is turned on, cachefile name is copied now
+		this is an "oops" fix
+	defined getRowLengths (and friends) functions in the python api,
+		this is another "oops" fix
+	fixed the ruby Makefile, sometimes it wouldn't make properly
+	resumeSession() wasn't copying the unix socket into the buffer when
+		copyReferences() was set, but it does now
+
+0.26 -  implemented rebinding/reexecution
+	pythondb API's execute method uses its "parameters" as input binds
+	pythondb API's callproc method calls execute
+	pythondb api is threadsafe at level 1, not 0
+	changed sqlrelay.conf.example and all docs to use port 9000 since that's
+		the default port in defaults.h
+	configure script now deals with sysconfdir, localstatedir, libdir, 
+		etc. directives now
+	sqlrsh uses gnu readline if it's available
+	added ruby API
+
+0.25 -	made relative pathnames work in --with-xxx-prefix configure arguments
+	prepareFileQuery returns 1 or 0 now, depending on whether the file
+		could be opened or not.  It also sets the error messsage in
+		that case and no longer prints it out unless debug is set on.
+	forgot to set liveconnection to 1 in a lot of cases
+	modified client/server protocol so it doesn't send negative numbers
+		across networks, should fix a lot of problems
+	removed implicit directory for caching files in API
+	added -scaninterval and -cachedirs command line parameters to 
+		cachemanager
+	fixed api so it won't try to substitute or execute a NULL query if 
+		prepareFileQuery fails
+	api returns better errors now
+	added getFieldLength()'s methods/functions
+	code cleanup, especially s/Header/ColumnInfo/g
+	it's now possible for the API's to tell the server not to get or send
+		column info
+	fixed double-type bind/substitution problem in php api
+	Oracle8 connection uses array fetch now
+	fixed a bug that would have caused dml to possibly not be committed 
+		and duplicated instead
+	fixed a configure bug that wouldn't find libgds.so for interbase
+	connections create/connect to semaphores, detach after logging in 
+		now, should elimiate problem of semaphores/shared memory 
+		segments hanging around after failed logins
+	made sure to close/unlink sockets during shutdown
+	made sure to lock the sockseq file, I can't believe I missed that...
+	added XNETLIB to src/cmdline/Makefile.in
+	added an -enable-static option to the configure script
+	modified everything to allow multiple statements to be executed through
+		a single connection
+	fixed a bug that could cause getField() commands to return the wrong
+		data (or segfault) when resuming a suspended session with a
+		suspended result set
+	fixed a bug that could cause cache file's to lose data when not 
+		buffering the entire result set at once
+	fixed a bug that would cause cached result sets to get truncated when
+		ending a session
+	python getRow methods don't crash on an empty result set now
+	connections use the same inet/unix port for the duration of their
+		existence now instead of getting a new one for each client
+		session
+	PHP and Python API's used to both call setResultSetBufferSize() instead
+		of setCacheTtl() when their setCacheTtl method was called
+	Removed all offset-related API functions, replaced them with a row
+		indexing system
+	caught a bug that would cause python getRowRange to potentially
+		run off the end of the result set
+	PySQLRDB.py uses CSQLRelay.so directly now instead of going through
+		PySQLRClient yielding a reasonable performance improvement
+	Moved some code from PySQLRClient.py to CSQLRelay.C
+	Added bind-by-position support to oracle connections, validateBinds()
+		no longer tries to validate bind-by-position variables
+	Added fakeInputBinds method, call it in all connections where the
+		db doesn't support binds directly
+	configure script will find libxml2.a/.so now
+	removed -O2 flag, was causing floor/pow functions to work improperly
+		with iostreams
+	postgresql connection returns UNKNOWN_DATATYPE now for all of it's
+		non-standard datatypes
+	postgresql connection returns 0 instead of -1 for lengths of varchar and
+		char types now
+	modified perl-dbd api to use input bind methods instead of substitutions
+	added lots of comments to the perl-dbd api
+	the user/password connect string options work for interbase now
+	the python/pythondb api connection constructors take the same parameters
+		as the other api's now
+	added check for gethostbyname in libnsl, added it to lago compiles
+	added libsocket to pthreads check
+	perl API tries 3 different ways to compile instead of just trying to 
+		figure out how ahead of time
+	php API tries 2 different ways to compile instead of just trying to 
+		figure out how ahead of time
+	oops, not-connected to oracle error is 3114 not 3144, fixed that
+	added a call logOut() to reLogIn() in libconnection
+
+
+0.24 -  listener cleans up unix socket file on exit
+	connections clean up unix socket files after use
+	some cygwin compatibility tweaks
+	fixed bugs in the sqlrelay.conf DTD
+	changed oracle7 connection to ofen 10 rows at a time
+	changed oracle8 connection to prefetch 10 rows at a time
+	changed db2 connection to use fixed size, recycled buffers
+	changed db2 and odbc connections to SQLFetchScroll 10 rows at a time
+	changed freetds connection to use fixed size, recycled buffers
+	added port argument to freetds connectstring
+	configure script looks for python 1.6, 2.0 and 2.1 now
+	configure script looks for libiconv and uses it with libxml if
+		necessary
+	added -lwtc8 to ORACLELIBS, some versions appear to need it
+	improved/simplified freetds connection code and set it up to work with
+		array fetches, should that ever work in freetds
+	added sybase connection
+	modified bind variable methods in libconnection... established 0 as
+		non-null and -1 as null
+	added bindVariablePrefix() method to libconnection... established : as
+		the default prefix
+	removed nonNullBindValue() and nullBindValue() methods from oracle
+		and interbase connections since the base class methods now
+		work for those datbases
+	added bindVariableIsNull() methods to db2 and odbc connections which
+		were missing that method
+	fixed interbase bind problem
+	changed sybase connection to ct_fetch 10 rows at a time
+	updated the docs.
+	updated the dblist.h file for the gtk config program with the current
+		list of database connection types
+	fixed a bug in the interbase connection that would cause it to crash
+		unless a dialect was selected
+	modified bench programs to use multi-row fetch like the connections do
+	added @DLLIB@ to ORACLE_LIBS in config.mk.in  Solaris 2.6 appears to
+		need it
+	added a test for libaio.so and added it to the list of ORACLE_LIBS,
+		Solaris 2.6 appears to need it
+	make clean now removes the .pics directories that Konqueror makes
+	changed cacheOn() to cacheToFile(), making it thread safe
+	all programs use rudiments permissions class now
+	Python and PHP API's use the C++ API directly now instead of going
+		through the C wrapper
+	Perl API should compile on any system now
+	added --with-gdbm-prefix and --with-iconv-prefix to configure script
+	changed order that configure searches for Perl, php-config
+	removed attempt to statically link oracle connection
+	better odbc detection in configure script
+	restored iodbc compatibility
+	added compatibility with older versions of mysql
+	
+
+0.23 -  added an interbase connection
+	added a comma after LONGVARCHAR in the datatypestring array in 
+		datatypes.h -- fixed misidentified column types in db2 and
+		interbase
+	fixed transposed configure/make in installing.html document
+	changed "unixport" to "socket" in sqlrelay.conf and in sqlr-config-gtk
+		in sqlrelay.conf, unixport still works for back-compatibility
+	odbc connection does binds now
+	found and fixed a memory leak that was causing memory associated with
+		executing a statement not to be freed
+	added libxml's libz dependancy back, some libxml's can read compressed
+		files
+	moved commitOrRollback() to after processQuery()
+	fixed the python docs, the constructor syntax was really wrong
+	changed parseQuery() method to prepareQuery() in libconnection
+
+0.22 -  added #!/bin/sh to top of sqlr-stop and backupschema
+	removed a bunch of strlen()'s that weren't necessary
+	passed variable sizes into functions that needed them instead of 
+		letting the function calculate it or using a strlen()
+	initVariables only happens in copyreferences mode now
+	used fixed size, recycled buffers instead of dynamic 
+		allocation/destruction in lots of places
+	in the api, several buffers aren't allocated now until the first time
+		they're needed, then they're recycled afterwards
+	client/listener authentication protocol is different
+	connection catches attempts to send really large queries, bind 
+		variables or bind values and shuts down the connection
+	api endeavors to catch those closed connections and react with an 
+		descriptive error or fail with a broken pipe error
+	added db2 connection
+	added precision/scale parameters to double binds
+	added runasuser/runasgroup parameters
+	added db2 and odbc benchmark programs
+	added db2 test script
+	None's in python inputBinds and substitutions work as NULL's now
+	fixed bug that caused openCachedResultSet() to miscalculate the
+		total number of rows in the result set and crash trying to
+		access the 0'th row
+	made sqlr-stop keep from trying to kill itself
+	updated documentation
+
+0.21 -  failure to read the query size, skip, or fetch sizes could cause the 
+		connection daemon to crash, fixed that
+	connection daemon and api use static, recycled bindvar array instead 
+		of dynamic allocation
+	modularized the bind/substitution var code in the api
+	got rid of fakeBinds(), you just can't fake binds
+	API call to validate binds rather than automatically doing it in the
+		connection daemon
+	insert/update with a NULL input bind inserts/updates a NULL now 
+		instead of a ""
+	added getNullsAsNulls() and getNullsAsEmptyStrings() methods so NULLs
+		can be returned as either NULLs or empty strings
+
+0.20 -  fixed sendQuery after openCachedResultSet API bug
+	added ODBC connection
+	fixed Oracle-related build bug
+	tweaks for gcc-2.96
+	added sqlr-config-gtk
+	modified the NEWS file
+	added support for input and output scalar bind variables
+	eliminated Final queries
+	eliminated Cache queries
+	implemented new methods for caching
+	implemented 4 stage (prepare, substitute, bind, execute) querying
+	fixed unititalized variable problem in returnResultSet() 
+		of libconnection
+	made getRow() and getColumnNames() perl methods return arrays like 
+		you'd expect them to
+	fixed failure to delete semaphores/sharedmemory segments when
+		killing listener bug
+	zend-ized the php API more than it was.
+	added api method allowing the programmer to override the function
+		used to print debug messages
+	php API can now print debug messages
+	added copyReferences() method and functionality to C++ API to fix
+		problems related to lost references and garbage-collecting
+		in perl/python/php
+	added substitution/bind support for long and double types
+	added -version command line arg to all programs
+	changed the NEWS file
+	removed namespace from sqlrelay.conf, it wasn't done correctly anyway,
+		maybe I'll add it back later...
+	removed sendEndOfSession from Python API
+	Perl, Python and PHP API's have type-independant functions/methods for
+		getting fields, setting substitution and bind variables, etc.
+	added substitutions and inputBinds functions to Perl, Python, PHP API's
+	added getRowHash, getRowDict to Perl, Python API's
+	renamed getarray to getrowassoc in PHP API
+	reformatted the PHP API code
+	updated docs
+	Makefile tweakage
+	input/output bind code in libconnection makes sure the variables exist
+		in the query before trying to bind them now
+	sqlr-stop removes temp files now
+	handled NULLs better in substitutions and inputBinds
+	removed sendField for int/floats from libconnection
+	the listener can pass sockets to connection daemons now instead of
+		requiring the client to reconnect
+
+0.19 -	made sure to delete alarmhandler in main.C for all db connections
+	made sure to delete each authstring before deleting the array itself
+		in the listener
+	major protocol changes, should be much faster and use much less
+		memory
+	made a lot of changes so the result set can be buffered in chunks 
+		instead of all at once
+	added functionality for getting the number of rows affected by an
+		insert/update/delete if the back end database supports it
+	if a connection receives a query, but the database is down, when it
+		re-connects, it retries the query now
+	fixed oracle float value problem
+	added functions to python and php api's
+	fixed perl bug with cached queries
+	fixed bug where (query length)%511==0 and (query length)!=511
+	added API test scripts
+	added oracle8 connection (uses OCI8)
+	renamed oracle connection to oracle7
+	added support for LONG's in oracle7 connection
+	added support for LOB's in oracle8 connection
+	added ping and identify methods
+	made isTransactional() return 1 by default, adjusted connection daemons
+		in response
+	made oracle connection daemons use OCI commit and rollback functions
+	documented client-server protocol and connection daemon library
+	fixed mysql,msql connections to work with suspended result sets
+	ping was broken in most of the connections, fixed it
+	defaulted sessiontimeout to 60 seconds
+	fixed bug where next query after an error would fail
+	sending auth/query strings work like sending the rest of the strings 
+		now
+	bug fix - connection calls cleanUpData() for non-select queries now
+	bug fix - connection calls cleanUpData() when the result set is done 
+		now
+	made openCachedResultSet() leave the session open
+
+0.18 -	handled PL_na/na conversion better in perl API
+	removed redundant -fpic and unnecessary -DPIC
+	fixed problem with Perl API that caused rudiments library not to be
+		linked in at run-time
+	fixed a bug in query.py that kept it from connecting
+	bunch of --with-xxx-prefix build fixes
+	fixed Solaris linker issues
+	changed killsqlr to sqlr-stop and improved it
+	allowed c++ to be used instead of forcing g++
+	fixed mysql bench bug
+	fixed a few memory leaks
+	preliminary CYGWIN support
+	added -s to executable compilation string and removed calls to strip
+	changed build to detect a shared object version of libstdc++ and use 
+		"ld -G -o" with it if there is one.  If there is only the
+		static version of libstdc++.a then the build uses "c++ -Wl,-G"
+		This is to provide generic support for systems with or without
+		GNU ld, systems with or without a shared object version of
+		libstdc++, systems with multiple versions of libstdc++ and
+		perl Makefiles.
+	removed libz dependancy from libxml
+	fixed scaler to accurately scale connections without overrunning
+		maxconnections
+	added socket paramter to sqlrc_alloc in PHP API.
+	output from sqlr-connections started by sqlr-scaler doesn't go to 
+		/dev/null anymore
+	made python API thread-happy
+	changed configure script to look for libg++.so and use it if it
+		finds it.  This is mainly for FreeBSD compatibility.
+	postgresql/msql connections redirect their stdout/stderr to /dev/null
+		now because both spew data now and then
+
+0.17 -	commit/rollback only gets issued at end of session if any non-select
+		queries were issued during the session since the last
+		commit/rollback was issued
+	fixed bug in API - sendEndOfSession followed by a query would fail
+	added unix domain socket support
+	got rid of extern "C" { #undef __cplusplus ... #define __cplusplus }
+		it caused more problems than it solved
+	spelled persistent correctly in the NEWS file
+	added --with-xxx-prefix command line options to configure script
+	fixed NULL number problem with oracle connections
+	can now leave a session open and pass the port/socket to another
+		client which can resume the session
+	added dynamic connection scaling
+	changed sendEndOfSession() to endSession() and sendLeaveSessionOpen()
+		to suspendSession()
+	blocked all signals but SIGINT and SIGTERM in listener
+	blocked all signals but SIGINT, SIGTERM and SIGALRM in connection
+	updated Python and PHP API's; converted sendEndOfSession to endSession
+
+0.16 -	added debug command to sqlrsh
+	bug fixes for queries longer than 511 characters
+	updated query.py
+	updated PHP module - fixed error handling, added documentation
+	added perl DBD module
+	fixed documentation errors
+	updated the NEWS file
+	added endofsession attribute to the sqlrelay:instance tag in the
+		config file.  connection can now issue either a commit or
+		a rollback when the client dies or ends it's session.
+	fixed bug in mysql connection which caused random errors, I have no
+		idea how it ever worked, but it almost always did.
+	changed license on perl API to Artistic
+	made connections advertise to listener via shared memory rather than
+		a fifo
+	added some minimal sqlrsh documentation
+	fixed a long standing synchronization problem - actually the change
+		was in the rudiments library, but the effect is most
+		noticable here
+	made the freetds connection sendNullField() when the ct_convert command
+		returns a NULL instead of a string for the field value
+
+0.15 -  config file parser fixes
+	freetds connection, bench and testsuite
+	added return values to returnData and returnHeader in libconnection
+	bench directory compiles by default now
+	listener hands off client to connection which sends data directly
+		back to client instead of going through the listener first
+	transmissions between client and daemons are done in blocks rather
+		than character at a time now
+	client/daemon protocol optimizations
+	added getLongest() methods to C,C++,Perl API
+	python/zope API reports errors correctly now
+	python/zope API will reconnect if connection is dropped somehow
+	added sqlrsh command line program
+	added Python API docs
+	added PHP API
+	blocked SIGPIPE, handled broken pipes another way
+
+0.14 -	documenation improvements and fixes
+	added -fpic -fPIC -DPIC to CXXFLAGS
+	added extern "C" and #undef/#define __cplusplus in various places
+	added modes to install scripts
+	Python API
+	Zope Adapter
+	bench directory with benchmark programs
+	testsuite directory with test scripts
+	updated connection code to handle double quotes, backslashes and
+		semicolons correctly in every case
+	updated API's to handle double quotes, backslashes and semicolons
+		correctly too
+
+0.13 -	build fix: calls to "test" are now more compatible with non-bash
+		shells
+
+0.12 -	if connection receives an end of session, it sends a commit to
+		the database, or more precisely calls the commit() method
+		of the connection class which, for transactional databases,
+		sends a commit and for non-transactional databases, does
+		nothing.
+	build now succeeds with gnome-xml
+	added support for SQLite and Lago databases
+	build now detects a suitable cpp command and uses it when building
+		the perl API instead of just calling cpp directly
+	VERY preliminary work on FreeTDS (Sybase/MS SQL Server) connection
+
+0.11 -	perldoc documentation for the perl API
+	added warnings to indicate when default parameters are fallen back on
+	cleaner build
+	added extern "C"'s around c includes - fixed dynamic loading bugs
+	added varargs functions to perl API
+
+0.10 -	put LDFLAGS into Makefiles
+	configure now adds -static to LDFLAGS to generate static binaries if
+		possible (not possible when linking sqlr-connection-oracle on 
+		linux) Ran into problems when dynamically linking a binary on 
+		one OS release then trying to run it against the slightly 
+		different libraries of another release.  Stripped, static 
+		binaries run faster and use less memory than dynamically linked
+		ones anyway.  The only price you pay is space on the 
+		filesystem.  If you'd like dynamic linking though and think 
+		that it will work for you, just remove -static from the 
+		config.mk.in file before running configure or the config.mk 
+		file after running configure.
+	general Makefile maintenance
+	reorganized code into libconnections and classes which inherit from it
+		for each connection.  No more #IFDEF BUILD_XXX's.
+		Connection classes for new databases should be easier to code
+		now.
+	moved commandline processing into listener and connection classes and
+		out of the main.C files
+	little optimizations here and there
+	can send multiple Final queries per connection now
+	can open connections to a cluster of databases or a set of replicated
+		databases within a single id now
+	multiple users/passwords per id
+	if a connection detects that the database went down, the other 
+		connections to that database don't advertise themselves
+	C API
+	Preliminary Perl API
+	Connect string doesn't have to have a trailing semicolon now.
+	Fixed mysql connection bug which caused it to never return a result 
+		set.
+	Oracle 8.1.5 compatibility (perhaps 8.1.x ?)
+
+0.9 -	oops fix.  it's now possible to store " and \ in the database
+	moved config file parsing routines from main into listener/connection 
+		classes to help support a future plugin architecture
+	reengineered Makefiles to be friendlier to non-gnu make
+
+0.8 -	XML config file (requires libxml-1.8.7 or newer)
+	fixed a bug where connections could fail to advertise
+
+0.7 -	added PostgreSQL support
+	added mSQL support
+
+0.6 -	documentation installs now
+	added MySQL support
+	fixed some documentation typo's
+
+0.5 -	more robust build/install/uninstall
+
+0.4 -	configure based install. 
+	Reorganization of includes.
+	make install/uninstall directives.
+	Got rid of RCS.
+
+0.3 -	Stability fixes.
+	Synchronization fixes.
+
+0.2 -	First Release. Totally different from 0.1.
+	
+0.1 -	Not Released.

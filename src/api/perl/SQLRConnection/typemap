@@ -1,0 +1,2 @@
+TYPEMAP
+sqlrconnection *	O_OBJECT

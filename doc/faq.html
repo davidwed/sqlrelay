@@ -1,0 +1,987 @@
+<html>
+<head>
+<title>firstworks   SQL Relay FAQ</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">SQL Relay FAQ</span><br><br>
+
+<span class="heading2">General Questions</span><br><br>
+<ol>
+<li><a href="#whatis">What is SQL Relay?</a></li>
+<li><a href="#doforme">What can SQL Relay do for me?</a></li>
+<li><a href="#platforms">What platforms does SQL Relay run on?</a></li>
+<li><a href="#howwork">How does SQL Relay work?</a></li>
+<li><a href="#efficiency">How can SQL Relay improve the efficiency of my 
+website?</a></li>
+<li><a href="#oracle">Why is SQL Relay especially good for migrating my 
+database-driven web-based application to Oracle?</a></li>
+<li><a href="#freebsd">Why is SQL Relay especially good for Open/Net/FreeBSD 
+and PowerPC Linux?</a></li>
+<li><a href="#pooling">Can I use SQL Relay for database connection 
+pooling?</a></li>
+<li><a href="#overloaded">Can SQL Relay keep my database from getting 
+overloaded?</a></li>
+<li><a href="#replicated">How can SQL Relay be used with replicated or 
+clustered databases?</a></li>
+<li><a href="#firewall">Can I use SQL Relay to firewall ad-hoc 
+queries?</a></li>
+<li><a href="#databaseusers">Can SQL Relay proxy multiple database users
+instead of using the same user for every session?</a></li>
+</ol>
+
+<span class="heading2">API Comparison Questions</span><br><br>
+<ol>
+<li><a href="#cgi">Why should I use SQL Relay with CGI's instead of using a native database 
+API?</a></li>
+<li><a href="#odbc">How does SQL Relay compare to ODBC, JDBC, Perl::DBI, PHP::ADODB, Ruby::DBI or PythonDB?</a></li>
+<li><a href="#dbiproxy">How does SQL Relay compare to DBI::Proxy?</a></li>
+<li><a href="#apachedbi">How does SQL Relay compare to Apache::DBI or PHP's internal 
+persistent database connections?</a></li>
+<li><a href="#zope">Why should I use SQL Relay with Zope?</a></li>
+</ol>
+
+<span class="heading2">Database-Specific Questions</span><br><br>
+<ol>
+<li><a href="#canxxxdb">Can I use SQL Relay to connect to XXX 
+database?</a></li>
+<li><a href="#whyxxxdb">Why should I use SQL Relay with XXX database?</a></li>
+<li><a href="#features">Does SQL Relay support XXX's specific 
+features?</a></li>
+<li><a href="#sqlserver">Why can't I get SQL Relay to connect to 
+Sybase/Microsoft SQL Server?</a></li>
+<li><a href="#freetds">I know that Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</a></li>
+<li><a href="#money">Why are money types crashing my FreeTDS connections?</a>
+<li><a href="#sybasefreetdsdiff">What's the difference between the Sybase and FreeTDS connections?</a></li>
+<li><a href="#postgresql">Postgresql's native API uses numbers for types but
+SQL Relay mangles them.  How do I get the numbers?</a>
+<li><a href="#oracleconnections">What is the difference between the Oracle7 connection and the Oracle8 connection?</a></li>
+</ol>
+
+<span class="heading2">Programming Questions</span><br><br>
+<ol>
+<li><a href="#buffer">Why does SQL Relay buffer the entire result set?</a></li>
+<li><a href="#nobuffer">How do keep SQL Relay from buffering the entire result 
+set?</a></li>
+<li><a href="#bindvars">How do I use bind variables?</a></li>
+<li><a href="#vectorbinds">Why can't I do vector binds?</a></li>
+<li><a href="#storedprocs">How do I run stored procedures?</a></li>
+<li><a href="#returning">How do I get data out of DML with RETURNING 
+clauses?</a></li>
+<li><a href="#threadsafe">Is the SQL Relay API thread-safe?</a></li>
+<li><a href="#clientcache">How does client-side result-set caching 
+work?</a></li>
+<li><a href="#servercache">What about server-side result-set caching?</a></li>
+</ol>
+
+<span class="heading2">Administration Questions</span><br><br>
+<ol>
+<li><a href="#tweaks">What system parameters can I tweak to get better performance out of SQL Relay</a></li>
+</ol>
+
+
+<span class="heading2">General Questions</span><br><br>
+
+<a name="whatis"></a>
+<span class="heading3">What is SQL Relay?</span><br><br>
+
+<p>
+SQL Relay is a persistent database connection pooling, proxying and load 
+balancing system for Unix and Linux supporting ODBC, Oracle, MySQL, mSQL, 
+PostgreSQL, Sybase, MS SQL Server, IBM DB2, Interbase, Lago and SQLite with 
+APIs for C, C++, Perl, Perl-DBD, Python, Python-DB, Zope, PHP, Ruby, Ruby-DBD 
+and Java, command line clients, a GUI configuration tool and extensive 
+documentation.  The APIs support advanced database operations such as bind 
+variables, multi-row fetches, client side result set caching and suspended 
+transactions.  It is ideal for speeding up database-driven web-based 
+applications, accessing databases from unsupported platforms, migrating between 
+databases, distributing access to replicated databases and throttling database 
+access.
+</p>
+
+<a name="doforme"></a>
+<span class="heading3">What can SQL Relay do for me?</span>
+
+<p>SQL Relay can improve the efficiency of database-driven web-based 
+applications, provide databases access from unsupported platforms, ease 
+migration between database vendors, distribute access to replicated databases 
+and facilitate throttled database access.</p>
+
+<p>SQL Relay is not exactly a "drop-in" solution though.  It requires 
+configuration and possibly programming to be useful.</p>
+
+<a name="platforms"></a>
+<span class="heading3">What platforms does SQL Relay run on?</span>
+
+<p>Unix variants.  It is known to run on Linux (x86 and PPC), SCO Open Server,
+Solaris, FreeBSD, OpenBSD and NetBSD.  The client API's compile and work on 
+Win32 platforms using Cygwin or UWIN.   I only have access to Linux, SCO,
+FreeBSD, OpenBSD, NetBSD and Win32 systems, so from time to time a new release 
+breaks compatibility with other platforms.  Please send bug reports of this 
+sort to 
+<a href="mailto:developer@firstworks.com">developer@firstworks.com</a>.</p>
+
+<p>There are no known endian issues with SQL Relay, however it appears 
+to be 64bit incompatible as it is known to compile but crash on Alpha.  I'd
+like to see SQL Relay run on every Unix variant if possible.  If 
+there's a platform you'd like to see supported and if you can grant me access 
+to a machine running that platform, send mail to 
+<a href="mailto:developer@firstworks.com">developer@firstworks.com</a>.</p>
+
+<a name="howwork"></a>
+<span class="heading3">How does SQL Relay work?</span>
+
+<p>SQL Relay's connection daemons log into and maintain sessions with 
+databases.  These connection daemons advertise themselves with a listener 
+daemon which listens on an inet and/or unix port for client connections.
+When a client connects to the listener, if a connection daemon is available, 
+the listener hands off the client to that connection.  If no connection daemon
+is available, the client must wait in queue until one is.  Once a client
+is handed off to a connection daemon, the client communicates to the database 
+through the session maintained by that daemon.</p>
+
+<a name="efficiency"></a>
+<span class="heading3">How can SQL Relay improve the efficiency of my 
+website?</span>
+
+<p>Here are some examples of how SQL Relay can improve the efficiency 
+of your web site.</p>
+
+<p>Let's say you're running CGI's againt a transactional database such as 
+PostgreSQL, MS SQL Server or Oracle.  CGI's have to log into and out of the 
+database each time they run.  If you use SQL Relay to maintain 
+persistent connections to the database and just log into and out of 
+SQL Relay, you can reduce the amount of time wasted establishing 
+database connections and handle more CGI requests per-second.  This is both
+because the time-cost of connecting to SQL Relay is smaller than
+the time-cost of connecting to a transactional database, and because the 
+SQL Relay client library is smaller than most database client 
+libraries, resulting in a more lightweight CGI.</p>
+
+<p>Let's say you're using Apache, PHP and Oracle and you determine by doing
+all sorts of analysis that you need to keep 30 Apache processes running to
+provide adequate response.  Since most of your site isn't database-driven,
+on average, no more than 5 PHP's actually access the database simultaneously.
+Currently, you're using persistent connections to defeat the time-cost of 
+logging into Oracle, but you have to maintain 30 connections (1 per web server
+process) which takes up a lot of memory on both the web server and database 
+server and you really only need 5 connections. By using SQL Relay you can 
+reduce the number of Oracle connections to the 5 that you need, continue to 
+run 30 Apache processes and reclaim the wasted memory on both machines.</p>
+
+<p>Many websites run a combination of PHP's and Perl modules.  Perl modules can
+use Apache::DBI and PHP's have a persistent database connection system, but a 
+PHP cannot use an Apache::DBI connection and a Perl module cannot use a PHP 
+persistent connection.  Thus in order to make sure that there are enough 
+database connections for each platform, many more web-server processes
+have to be run, perhaps twice as many.  If the PHP's and Perl modules used
+SQL Relay instead, they could share databse connections and reduce the number
+of web-server processes and database connections.</p>
+
+<p>SQL Relay makes it easy to distribute load over replicated servers.  A 
+common scaling solution when using MySQL or PostgreSQL in a read-only web 
+environment is to run several web servers with a dedicated database server for
+each web server or group of web servers and update all the databases 
+simultaneously at scheduled intervals.  This usually works pretty well, but
+sometimes database or web servers get runs of heavy load while others
+are idle.  In other cases, an uneven number of machines is required.  For 
+example, your application may need 3 web servers but only 2 database servers 
+or vice-versa.  People usually just by 3 of each, wasting money.  Moreover, in 
+most cases, the servers have to be equivalently powerful machines.  You can't
+usually just add another cheap machine that you have lying around into the 
+pool.   SQL Relay can connect to multiple, replicated or clustered database
+servers, providing web-based applications access to whichever server isn't 
+busy.  SQL Relay can also be configured to maintain more connections to more
+powerful machines and fewer connections to less powerful machines, enabling
+unevenly matched machines to be used in the same database pool.  Collectively,
+these features allow you to save money by using only the exact number of
+servers that you need and by enabling you to use spare hardware in your 
+database pools.</p>
+
+
+<a name="oracle"></a>
+<span class="heading3">Why is SQL Relay especially good for migrating my 
+database-driven web-based application to Oracle?</span>
+
+<p>Connecting to Oracle databases is especially time-costly and OCI libraries 
+are especially heavyweight compared to other databases.  Moving that overhead 
+out of your application is especially advantageous with Oracle.</p>
+
+<a name="freebsd"></a>
+<span class="heading3">Why is SQL Relay especially good for Open/Net/FreeBSD and 
+PowerPC Linux?</span>
+
+<p>Open/Net/FreeBSD and PowerPC Linux are good platforms for web server farms 
+but both lack API support from prominent commercial database vendors.  SQL 
+Relay provides a connection solution for these platforms and others.</p>
+
+<a name="pooling"></a>
+<span class="heading3">Can I use SQL Relay for database connection 
+pooling?</span>
+
+<p>Yes.</p>
+
+<p>SQL Relay maintains persistent connections to databases
+which can be shared among clients over lightweight TCP connections using 
+inet or unix sockets.  This means SQL Relay can even be used for 
+database connection pooling across multiple machines.</p>
+
+<a name="overloaded"></a>
+<span class="heading3">Can SQL Relay keep my database from getting 
+overloaded?</span>
+
+<p>Yes.</p>
+
+<p>A common problem with high-traffic, database-driven websites is that in 
+order to handle the number of incoming requests, large numbers of web server
+processes or threads must run.  Using conventional connection pooling 
+mechanisms, at least one persistent database connection would be maintained
+per-process.  Sometimes, under heavy load, the database server just can't 
+handle the traffic from that many simultaneous client connections.</p>
+
+<p>Clustering is one solution, but clustering is expensive and not available
+for all databases.</p>
+
+<p>By placing SQL Relay between your web servers and database, you can 
+maintain a smaller number of persistent connections to your database and
+funnel all database requests through those connections.  When the number
+of database session requests exceeds the number of persistent connections, the
+session requests are queued.  This ultimately causes delayed response to the
+client, but keeps the database running smoothly.  In most cases, the delay is 
+negligable and the tradeoff is acceptable.</p>
+
+<a name="replicated"></a>
+<span class="heading3">How can SQL Relay be used with replicated or clustered 
+databases?</span>
+
+<p>If you have replicated or clustered databases, SQL Relay can be
+configured to maintain connections to some or all of the database servers and
+distribute sessions over them.  SQL Relay can even be configured to 
+maintain more connections to more powerful machines and fewer connections 
+to less powerful machines, enabling a heterogenous mixture of machines to 
+be used in the database server pool.</p>
+
+<p>Note that SQL Relay cannot be used to replicate databases or 
+keep replicated databases synchronized.  If you are using SQL Relay to 
+access replicated databases then it is assumed that there is some means by 
+which the databases are kept synchronized external to SQL Relay.</p>
+
+<a name="firewall"></a>
+<span class="heading3">Can I use SQL Relay to firewall ad-hoc queries?</span>
+
+<p>No.</p>
+
+<p>This feature is on the TODO list though.</p>
+
+<a name="databaseusers"></a>
+<span class="heading3">Can SQL Relay proxy multiple database users instead of 
+using the same user for every session?</span>
+
+<p>Yes.  Set the authtier attribute of the instance tag in the sqlrelay.conf
+file to "database".  See <a href="configuring.html">Configuring SQL Relay</a>
+for more information.</p>
+
+<p>SQL Relay does it very efficiently when used with Oracle8i/9i.  But, 
+the database must be configured properly.  See
+<a href="oraclentier.html">this document</a> for step-by-step instructions.</p>
+
+<p>Oracle 8i/9i allows a process that is connected to the database to switch
+users without disconnecting from the database.  When used with other databases,
+SQL Relay logs out and logs back in to the database whenever it needs to switch
+users.</p>
+
+
+<span class="heading3">API Comparison Questions</span><br><br>
+
+<a name="cgi"></a>
+<span class="heading3">Why should I use SQL Relay with CGI's instead of using a
+native database API?</span>
+
+<p>CGI's have to log into and out of the database each time they run.  This
+can take a long time.  Native database API libraries are often very large. 
+Since SQL Relay maintains persistent database connections, is fast to 
+connect to and has a lightweight client API, using SQL Relay with CGI's
+usually results in a faster applications that use less memory.</p>
+
+<a name="odbc"></a>
+<span class="heading3">How does SQL Relay compare to ODBC, JDBC, Perl::DBI, 
+PHP::ADODB, Ruby::DBI or PythonDB?</span>
+
+<p>This is sort of an apples-to-oranges comparison.  These API's are
+primarily targeted as abstraction layers and make no attempt to improve 
+application performance.  They are in many ways more full featured than the
+SQL Relay client API's.  SQL Relay currently supports Perl::DBI, Ruby::DBI and
+PythonDB on the API side and ODBC on the database connection side.  An ODBC API
+for SQL Relay is on the TODO list.</p>
+
+<a name="dbiproxy"></a>
+<span class="heading3">How does SQL Relay compare to DBI::Proxy?</span>
+
+<p>DBI::Proxy is Perl-specific or at least very challenging to use from other 
+languages.  SQL Relay is likely to outperform DBI::Proxy since DBI::Proxy is 
+primarily targeted at providing access to databases from unsupported 
+platforms, not at improving application performance.  SQL Relay can provide 
+access to databases from unsupported platforms as well, even platforms for 
+which there is no unix support using the ODBC connection and an ODBC to ODBC 
+bridge.</p>
+
+<a name="apachedbi"></a>
+<span class="heading3">How does SQL Relay compare to Apache::DBI or PHP's persistent database connections?</span>
+
+<p>SQL Relay is more lightweight and potentially faster than 
+Apache::DBI and is competitive in speed with PHP's persistent connections. 
+SQL Relay can be used to provide a connection pool to multiple machines
+and has more backend features than Apache::DBI or PHP.  However, the
+DBD and PHP API's are more full featured than the SQL Relay API's and 
+are generally considered to be simpler to implement.</p>
+
+<p>When using Apache::DBI or PHP's persistent connections, a connection is 
+opened to the database for every web server process.  Frequently, web sites 
+need to run large numbers of processes to provide adequate response.  As the 
+number of database connections grows, resources get strained and a lot of 
+database connections go unused most of the time.</p>
+
+<p>If a website runs a mixture of Perl modules and PHP scripts, the issue can
+be doubled.</p>
+
+<p>SQL Relay makes more efficient use of resources by maintaining fewer 
+persistent connections to the database and funnelling all database requests 
+through those connections.  When the number of database session requests 
+exceeds the number of persistent connections, the session requests are queued.  
+This ultimately causes delayed response to the client, but keeps the database 
+running smoothly.  In most cases, the delay is negligable and the tradeoff is 
+acceptable.</p>
+
+<a name="zope"></a>
+<span class="heading3">Why should I use SQL Relay with Zope?</span>
+
+<p>The same efficiency arguments that can be made against
+Apache::DBI and PHP's persistent connections cannot be made against Zope.
+Zope maintains a hackable (some say "configurable") number of persistent 
+database connections in it's cache and shares them among it's threads.  The 
+number of database connections and threads are independent.  There is always 
+the possibility that one or all of the database connections will get pushed 
+out of the cache and have to be started back up later, but in practice, this 
+is highly unlikely and happens very infrequently.</p>
+
+<p>If you have such a large farm of Zope machines that the number of persistent
+database connections is straining the database server's resources, SQL Relay 
+can provide a middle tier to reduce the number of persistent connections.</p>
+
+<p>SQL Relay adds immediate support for load distribution over a group 
+of clustered or replicated databases to Zope.</p>
+
+<p>SQL Relay can provide a means for connecting to databases for which there is no Zope adapter.</p>
+
+<p>When using the ZOracleDA, Zope generally needs to be restarted if the 
+database is bounced.  When using SQL Relay, the database can be bounced 
+without having to restart Zope.  This behavior may be specific to the 
+ZOracleDA though, and it may just be a bug.  SQL Relay also supports 
+Oracle LOB and long datatypes.  ZOracleDA uses OCI7 calls instead of OCI8
+calls and does not support those datatypes.</p>
+
+<span class="heading3">Database-Specific Questions</span><br><br>
+
+<a name="canxxxdb"></a>
+<span class="heading3">Can I use SQL Relay to connect to XXX database?</span>
+
+<p>SQL Relay can connect to Oracle, MySQL, mSQL, PostgreSQL, Sybase, 
+DB2, Interbase, Lago and SQLite using connection daemons compiled against their
+native API's.  Additionally, SQL Relay can connect to Microsoft SQL Server
+or Sybase using a connection compiled against FreeTDS.  Using the ODBC 
+connection, compiled against iODBC or unixODBC, SQL Relay can connect to
+any database with an ODBC driver for unix or, using the ODBC to ODBC bridge,
+can connect to any database with an ODBC driver for any platform.</p>
+
+<a name="whyxxxdb"></a>
+<span class="heading3">Why should I use SQL Relay with XXX database?</span>
+
+<br><br>
+<table border="1">
+<tr>
+<td><b>Database</b></td>
+<td><b>Limit the number of open connections.</b></td>
+<td><b>Distribute over replicated or clustered databases.</b></td>
+<td><b>Overcome the connection delay.</b></td>
+<td><b>Provide remote access.</b></td>
+</tr>
+<tr>
+<td><b>Oracle</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>MySQL</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>mSQL</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>PostgreSQL</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>Sybase</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>DB2</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>Interbase</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>Lago</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>SQLite</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><b>FreeTDS</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>ODBC</b></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</table>
+<br><br>
+
+<a name="features"></a>
+<span class="heading3">Does SQL Relay support XXX's specific features?</span>
+
+<br><br>
+<table border="1">
+<tr>
+<td><b>Database</b></td>
+<td><b>Queries</b></td>
+<td><b>Bind Variables</b></td>
+<td><b>Procedural Language</b></td>
+<td><b>Auto-Commit</b></td>
+</tr>
+<tr>
+<td><b>Oracle</b></td>
+<td>Yes</td>
+<td>Scalar Input/Output</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><b>MySQL</b></td>
+<td>Yes</td>
+<td>Scalar Input</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>mSQL</b></td>
+<td>Yes</td>
+<td>Scalar Input</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>PostgreSQL</b></td>
+<td>Yes</td>
+<td>Scalar Input</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>Sybase</b></td>
+<td>Yes</td>
+<td>Scalar Input</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>DB2</b></td>
+<td>Yes</td>
+<td>Scalar Input/Output</td>
+<td>Unknown</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><b>Interbase</b></td>
+<td>Yes</td>
+<td>Scalar Input</td>
+<td>Unknown</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><b>Lago</b></td>
+<td>Yes</td>
+<td>Scalar Input</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>SQLite</b></td>
+<td>Yes</td>
+<td>Scalar Input</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>FreeTDS</b></td>
+<td>Yes</td>
+<td>Scalar Input</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><b>ODBC</b></td>
+<td>Yes</td>
+<td>Scalar Input/Output if DB supports it.</td>
+<td>Yes if DB supports it.</td>
+<td>Yes if DB supports it.</td>
+</tr>
+</table>
+<br><br>
+
+<a name="sqlserver"></a>
+<span class="heading3">Why can't I get SQL Relay to connect to Sybase/Microsoft
+SQL Server?</span>
+
+<p>The server parameter in the string attribute of the connection tag does not
+refer to the DNS name of the server.  Rather it refers to an entry in the 
+"interfaces" file.  The Sybase and FreeTDS libraries look for that file in 
+default places, but if the file is installed somewhere else and the library 
+can't find it, it will not be able to figure out what host/port the server
+is running on.  One way to tell SQL Relay where the file is located is to
+set the SYBASE environment variable to the directory containing the file before
+starting SQL Relay.  Starting with version 0.32, the string attribute of the
+connection tag takes a sybase parameter which sets the environment variable.</p>
+
+<p>Another problem that people have connecting to Sybase/Microsoft SQL Server
+is related to database selection.  Until version 0.32, the Sybase and FreeTDS
+connection daemons ignored the "db" connectstring parameter.  This was an
+oversight.  The connection daemons would connect to the correct server but
+would not use the correct database.  Instead, the connection daemons would
+be connected to the master database on that server.  This is fixed in 0.32.
+To work around this problem in an older release it is necessary to fully
+qualify table names if the table is not in the master database.  A fully
+qualified table name is dbname.username.tablename.</p>
+
+<a name="freetds"></a>
+<span class="heading3">I know that Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</span>
+
+<p>Before version 0.53, calling the FreeTDS function to get the number of 
+affected rows would cause a segmentation fault.  As of version 0.32, SQL Relay
+figures out what version of FreeTDS is installed at compile time and only 
+enables affected rows if the FreeTDS version is greater than 0.52.  If you 
+compile against an earlier version of FreeTDS, a -1 is returned for affected 
+rows as if the database didn't support the feature.</p>
+
+<a name="money"></a>
+<span class="heading3">Why are money types crashing my FreeTDS connections?</span>
+
+<p>Before version 0.53, calling the FreeTDS function ct_fetch when a result
+set had a MONEY or SMALLMONEY column in it would cause a segmentation fault.
+As of version 0.32, SQL Relay figures out what version of FreeTDS is installed 
+at compile time and only enables queries selecting MONEY or SMALLMONEY columns 
+if the FreeTDS version is greater than 0.52.  If you compile against an earlier
+version of FreeTDS, any attempt to run a query selecting MONEY or SMALLMONEY
+column will fail with an error indicating that you should recompile SQL Relay
+against a newer version of FreeTDS.</p>
+
+<a name="#sybasefreetdsdiff"></a>
+<span class="heading3">What's the difference between the Sybase and FreeTDS 
+connections?</span>
+
+<p>The sqlr-connection-sybase program is compiled against Sybase ctlib; the 
+libraries that come with Sybase Adaptive Server Enterprise.  They use a 
+protocol called TDS (Tabular Data Stream) to talk to the database.</p>
+
+<p>The sqlr-connection-freetds program is compiled against FreeTDS, an 
+open-source implementation of the TDS protocol and ctlib.</p>
+
+<p>Older versions of Microsoft SQL Server are compatible with Sybase ctlib, but
+newer versions are not.  FreeTDS is compatible with all versions of Sybase 
+Adaptive Server Enterprise and Microsoft SQL Server.</p>
+
+<p>Unfortunately, FreeTDS is an incomplete implementation of TDS.  Several 
+features are buggy, inconsistent or non-existent.  For example...</p>
+
+<ul>
+<li>Programs compiled against FreeTDS&lt;0.53 crash when fetching MONEY and 
+SMALLMONEY datatypes.  SQL Relay handles this by preventing queries which
+fetch MONEY or SMALLMONEY datatypes from running if it's compiled against 
+FreeTDS&lt;0.53.</li>
+<li>Programs compiled against FreeTDS&lt;0.53 crash when attempting to find out
+how many rows were affected by an insert/update/delete query.  SQL Relay handles
+this by not requesting the affected row count and just returning -1 if it's
+compiled against FreeTDS&lt;0.53.</li>
+<li>Bind variables are unsupported.  The ct_param and ct_setparam functions
+simply don't exist in FreeTDS ctlib.  SQL Relay handles this by faking input 
+bind variables in the same manner that the MySQL, mSQL, PostgreSQL, Lago and 
+SQLite connections do.</li>
+<li>FLOAT, NUMERIC and DECIMAL datatypes are all represented as FLOAT 
+datatypes.  There doesn't appear to be any workaround for this.</li>
+<li>Columns of type CHAR have trailing spaces truncated.  For a CHAR(20) column,
+inserting a value 
+<pre>'hello'</pre>
+will be returned as
+<pre>'hello'</pre> 
+instead of
+<pre>'hello               '</pre>
+To add to the problem CHAR and VARCHAR datatypes are both represented as CHAR 
+in FreeTDS and Sybase ctlib, so there's no good way to know whether to append 
+trailing spaces or not.</li>
+<li>Under Sybase ctlib, MONEY datatypes have 2 decmial places by default but 
+can have up to 4.  Under FreeTDS, they have 4 decimal places.</li>
+<li>Date formats are slightly different.  FreeTDS left-pads single digit days 
+and hours with a single 0.  For example, Sybase ctlib returns 1:00 AM on 
+01/01/2001 as
+<pre>Jan  1 2001  1:00AM'</pre>
+while FreeTDS returns it as
+<pre>Jan 01 2001 01:00AM'</pre></li>
+<li>Sybase ctlib returns REAL and FLOAT datatypes with arbitrary decimal 
+places.  Inserting 1.1 as a REAL or FLOAT type then selecting it might return 
+1.09888874310 or something similar.  With FreeTDS, inserting 1.1 then selecting
+it returns 1.1.  Sybase behaves like FreeTDS for DECIMAL and NUMBER types.</li>
+</ul>
+
+<p>There are possibly other inconsistencies, but these are the only ones that 
+I've run into so far.</p>
+
+<p>FreeTDS is great software despite it's inconsistencies.  Sybase ctlib is 
+impossibly complex.  Anyone attempting to re-engineer it is braver than I am.  
+I'm impressed that FreeTDS works as well as it does, and it's getting better 
+with each release.</p>
+
+<a name="postgresql"></a>
+<span class="heading3">Postgresql's native API uses numbers for types but
+SQL Relay mangles them.  How do I get the numbers?</span>
+
+<p>Prior to version 0.28, SQL Relay mangled Postgresql numeric types into
+pseudo-standard datatype names.  I read a thread in a discussion group 
+indicating that someone was specifically unhappy with SQL Relay because of this
+behavior though, and decided to change it.  So, as of version 0.28, by default,
+SQL Relay returns numeric types when run against Postgresql.  If you prefer
+getting type names, you can set the mangletypes connect string value to "yes"
+in your sqlrelay.conf file.</p>
+
+<p>For example, in version 0.28 or higher the following connectstring will 
+instruct SQL Relay to return type names instead of numbers:</p>
+
+<blockquote>
+user=myuser;password=mypass;db=testdb;mangletypes=yes
+</blockquote>
+
+<p>In version 0.28 or higher the following connectstring will instruct SQL 
+Relay to return type numbers:</p>
+
+<blockquote>
+user=myuser;password=mypass;db=testdb;mangletypes=no
+</blockquote>
+
+<p>Leaving the mangletypes parameter out altogether is the same as setting it
+to "no".</p>
+
+<a name="oracleconnections"></a>
+<span class="heading3">What is the difference between the Oracle7 connection and the Oracle8 connection?</span>
+
+<p>Between versions 7 and 8, Oracle radically changed OCI; their client API.
+The Oracle7 connection uses OCI version 7 and the Oracle8 connection uses
+OCI version 8.<p>
+
+<p>The Oracle8 connection supports LOB datatypes and true bind-by-position.</p>
+
+<P>For example, in the query:</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> mytable <FONT color=#6959cf>where</FONT> col1=:val1 <B><FONT color=#a62828>and</FONT></B> col2=:val2
+</PRE>
+</blockquote>
+
+<P>You can bind variables to "val1" and "val2" or "1" and "2".  Using the
+Oracle7 connection, you can only bind to "val1" and "val2".  If you want to
+bind to "1" and "2", your query would have to look like this:</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> mytable <FONT color=#6959cf>where</FONT> col1=:<FONT color=#ff00ff>1</FONT> <B><FONT color=#a62828>and</FONT></B> col2=:<FONT color=#ff00ff>2</FONT>
+</PRE>
+</blockquote>
+
+<p>Oracle 8,8i and 9i support OCI 7 and OCI 8.  If you have an Oracle 8,8i or 
+9i database, you can connect to it using the Oracle7 connection provided that
+you are not using Oracle MTS (Multi-Threaded Server).  Oracle 8, 8i and 9i 
+support LOB datatypes though, which are not supported by Oracle 7.  The
+Oracle7 connection will retun empty strings and UNKNOWN datatypes for LOB
+fields.</p>
+
+<p>Oracle is attempting to phase out OCI 7, but has mostly maintained 
+compatibility.  The libraries and headers that come with Oracle 8, 8i and 9i
+contain OCI 7 and OCI 8 functions.  If you compile SQL Relay against Oracle 8,
+8i or 9i, both connections will be built.  If you compile SQL Relay against
+Oracle 7, only the Oracle7 connection will be built.<p>
+
+<p>Since Oracle is phasing out OCI 7, you may run into some inconsistencies.
+For example, the libraries that ship with Oracle 9.0.1 for Linux don't support 
+OCI 7 functions for dealing with LONG datatypes.  If you compile SQL Relay 
+against Oracle 9.0.1, the Oracle7 connection will return empty strings for LONG 
+fields and 0's for their lengths.  It seems like I had that same problem with 
+Oracle 8.1.6 on Linux, but 8.1.7 works fine (and 8.1.6 is no longer available
+to verify the problem).  So, expect inconsistencies with the Oracle7 connection
+if it's not compiled against Oracle 7.</p>
+
+<span class="heading3">Programming Questions</span><br><br>
+
+<a name="buffer"></a>
+<span class="heading3">Why does SQL Relay buffer the entire result set?</span>
+
+<p>SQL Relay is targeted for web-based applications.  For the most part,
+queries with relatively small result sets are used to build web pages.  For
+small result sets, it more efficient to buffer the entire result set than to
+step through it, building the page.  It's usually faster because it reduces
+network round-trips and allows one program to drop the connection to SQL 
+Relay, freeing it up for more programs to use while the first program builds 
+its page.</p>
+
+<a name="nobuffer"></a>
+<span class="heading3">How do keep SQL Relay from buffering the entire result 
+set?</span>
+
+<p>For large result sets it can be impractical to buffer the entire result set.
+Use the setResultSetBufferSize() method in the C++, Perl, Python, Ruby and Java
+API's or the sqlrcur_setResultSetBufferSize() function in the C or PHP API's to 
+specify how many rows of the result set to buffer at once.</p>
+
+<a name="bindvars"></a>
+<span class="heading3">How do I use bind variables?</span>
+
+<p>That depends on the database you're using.  Oracle supports named bind
+variables while other databases only support binds by position.  Below are
+pseudocode examples of both.</p>
+
+<p>Oracle example:</p>
+<pre>
+sqlrconnection	*con=new sqlrconnection(...);
+sqlrcursor	*cur=new sqlrcursor(cur);
+cur-&gt;prepareQuery("select * from table where charcol=:charval and intcol=:intval and floatcol=:floatval");
+cur-&gt;inputBind("charval","hello");
+cur-&gt;inputBind("intval",10);
+cur-&gt;inputBind("floatval",5.5,1,1);
+cur-&gt;executeQuery();
+delete cur;
+delete con;
+</pre>
+
+<p>Sybase/MS SQL Server example:</p>
+<pre>
+sqlrconnection	*con=new sqlrconnection(...);
+sqlrcursor	*cur=new sqlrcursor(cur);
+cur-&gt;prepareQuery("select * from table where charcol=@charval and intcol=@intval and floatcol=@floatval");
+cur-&gt;inputBind("charval","hello");
+cur-&gt;inputBind("intval",10);
+cur-&gt;inputBind("floatval",5.5,1,1);
+cur-&gt;executeQuery();
+delete cur;
+delete con;
+</pre>
+
+<p>Other DB example:</p>
+<pre>
+sqlrconnection	*con=new sqlrconnection(...);
+sqlrcursor	*cur=new sqlrcursor(cur);
+cur-&gt;prepareQuery("select * from table where charcol=? and intcol=? and floatcol=?");
+cur-&gt;inputBind("0","hello");
+cur-&gt;inputBind("1",10);
+cur-&gt;inputBind("2",5.5,1,1);
+cur-&gt;executeQuery();
+delete cur;
+delete con;
+</pre>
+
+<p>Output bind variables work similarly but are only supported on Oracle.</p>
+
+<pre>
+sqlrconnection	*con=new sqlrconnection(...);
+sqlrcursor	*cur=new sqlrcursor(con);
+cur-&gt;prepareQuery("insert into table values ('hello') returning :charval");
+cur-&gt;defineOutputBind("charval","hello",10);
+cur-&gt;executeQuery();
+cout &lt;&lt; "charval is: " &lt;&lt; cur-&gt;getOutputBind("charval") &lt;&lt; endl;
+delete con;
+delete cur;
+</pre>
+
+<a name="vectorbinds"></a>
+<span class="heading3">Why can't I do vector binds?</span>
+
+<p>Vector binds just aren't implemented yet.</p>
+
+<a name="storedprocs"></a>
+<span class="heading3">How do I run stored procedures?</span>
+
+<p>Stored procedures are only known to work with Oracle.  You can use the 
+following syntax to get the result of the stored procedure in the result 
+set:</p>
+
+<pre>
+select function(:input1,:input2,:input3) from dual
+</pre>
+
+<p>or using an output bind variable:</p>
+
+<pre>
+begin  :output=function(:input1,:input2,:input3);  end;
+</pre>
+
+
+<a name="returning"></a>
+<span class="heading3">How do I get data out of DML with RETURNING 
+clauses?</span>
+
+<p>DML with RETURNING clauses are only known to work with Oracle.  You can use 
+output bind variables to get data out of DML with RETURNING clauses if the 
+values returned are scalar.  Vector values are not supported.  For example:</p>
+
+<pre>
+insert into testtable values ("one",2) returning :first, :second
+</pre>
+
+<a name="threadsafe"></a>
+<span class="heading3">Is the SQL Relay API thread-safe?</span>
+
+<p>This is always a tricky question to answer for object oriented API's.</p>
+
+<p>In the strictest sense, the sqlrconnection and sqlrcursor classes upon which
+all the API's are based is not thread safe because it has member variables that
+are not protected by mutexes.</p>
+
+<p>This does not mean that you can't use the SQL Relay API in a multithreaded
+environment.  It just means that you can't share a single instance of an
+sqlrconnection or sqlrcursor between threads.</p>
+
+<a name="clientcache"></a>
+<span class="heading3">How does client-side result-set caching work?</span>
+
+<p>When the cacheToFile() and setCacheTtl() methods are called prior to running
+a query, the client caches the result set from the query in a file on the
+local file system and attaches a time-to-live tag to the file.  The full 
+pathname of this file can be retrieved using the getCacheFileName() method.</p>
+
+<p>The file sits in the cache directory (usually 
+/usr/local/firstworks/var/sqlrelay/cache) until it is removed by the 
+sqlr-cachemanager program.  sqlr-cachemanager scans the files in the cache
+directory every so often and removes the ones who's time to live has expired.
+</p>
+
+<p>Until the file is removed, other applications can open the file by name
+using the openCachedResultSet() methods.  At this point, the API acts as if it
+had run a query that generated that result set.</p>
+
+<a name="servercache"></a>
+<span class="heading3">What about server-side result-set caching?</span>
+
+<p>Server-side result set caching has not been implemented.  This feature is 
+on the TODO list though.</p>
+
+
+<a name="tweaks"></a>
+<span class="heading3">What system parameters can I tweak to get better performance out of SQL Relay?</span><br><br>
+
+<span class="heading3">TIME_WAIT timeout</span>
+
+<p>The first paramater that comes to mind is the TIME_WAIT timeout.  When a TCP 
+client disconnects from a server, the socket that the client was connected on
+goes into a TIME_WAIT state for typically between a minute and 4 minutes.</p>
+
+<p>For servers serving data over the the unreliable internet, this is probably 
+reasonable.  For internal servers, dedicated to serving other internal servers 
+on a reliable network, reducing the length of the timeout is probably OK.</p>
+
+<p>Here's why it helps...</p>
+
+<p>The kernel keeps a list of sockets in the TIME_WAIT state.  When the list
+is full, failures start to occur.  On my test machine (running a linux 2.4 
+kernel), I can have about 1000 sockets in the TIME_WAIT state before running
+into problems.</p>
+
+<p>If your server is getting new client connections faster than it can bleed off
+sockets in the TIME_WAIT state, the list will ultimately get full.  Decreasing
+the timeout increases the bleed-off rate.</p>
+
+<p>The following instructions illustrate how to change the timeout rate for
+Linux and Solaris.  Note that I got these instructions off of the web and have
+not tried all of them myself.</p>
+
+<p>For Linux, set the timeout by executing the following command.  In this
+example, the timeout is set to 30 seconds.  You should put this command in a
+system startup file so it will be executed at boot time.</p>
+
+<p>echo 30 &gt; /proc/sys/net/ipv4/tcp_fin_timeout</p>
+
+<p>For Solaris, the parameter can be modified while the system is running
+using the ndd command to set the number of milliseconds to wait.  These
+examples set the timeout to 30 seconds.  You should put these commands in a 
+system startup file so they'll be executed at boot time.</p>
+
+<p>For Solaris 2.6 and earlier:  ndd -set /dev/tcp tcp_close_wait_interval 30000</p>
+
+<p>For Solaris 2.7 and later:  ndd -set /dev/tcp tcp_time_wait_interval 30000</p>
+
+<span class="heading3">Port range</span>
+
+<p>Another paramter that you may want to tweak is the range of available ports.
+On Linux 2.2 kernels, it defaults to ports 1024 through 4999.  You can display
+the range by running:</p>
+
+<p>/sbin/sysctl net.ipv4.ip_local_port_range</p>
+
+<p>You can increase this to range from 1024 to 65535 by running the following 
+command:</p>
+
+<p>/sbin/sysctl -w net.ipv4.ip_local_port_range="1024 65535"</p>
+
+<p>You should put this command in a system startup file so it'll be executed at
+boot time.</p>
+
+<p>I'm not sure what the default port range is or how to change it on other
+operating systems.</p>
+
+</body>
+</html>

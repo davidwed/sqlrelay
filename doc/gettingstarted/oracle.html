@@ -1,0 +1,678 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With Oracle</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Getting Started With Oracle</span><br>
+
+<ul>
+<li><a href="#installation">Installation</a></li>
+<ul>
+<li><a href="#solaris">Solaris</a></li>
+<li><a href="#openserver">SCO OpenServer</a></li>
+<li><a href="#linux">Linux</a></li>
+<ul>
+<li><a href="#users">Create Users, Groups and Directories</a></li>
+<li><a href="#kernel">Configurate the Kernel</a></li>
+<li><a href="#support">Install the Support Software</a></li>
+<li><a href="#java">Install Java</a></li>
+<li><a href="#compat">Install Compatibility Packages</a></li>
+<li><a href="#env">Set Up the Environment</a></li>
+<li><a href="#oracle">Install Oracle</a></li>
+<li><a href="#issues">Known Issues and Workarounds</a></li>
+</ul>
+<li><a href="#startingatboot">Starting the Database at Boot Time</a></li>
+</ul>
+<li><a href="#creating">Creating a Database</a></li>
+<li><a href="#accessing">Accessing a Database</a></li>
+<li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+</ul>
+
+<a name="installation"></a>
+<span class="heading1">Installation</span><br>
+
+<p>I've sucessfully installed Oracle on SCO OpenServer and Linux and I've
+witnessed many Solaris installations.</p>
+
+<p>When installing Oracle, the most common mistake I've made is having too 
+little physical ram or swap.  The second most common mistake I've made is not 
+configuring the kernel with enough shared memory or semaphore resources.  The 
+installation instructions that come with Oracle for each platform indicate how 
+much ram and swap you need and how to configure the kernel properly.  I 
+recommend meeting these requirements prior to installation.</p>
+
+<a name="solaris"></a>
+<span class="heading2">Solaris</span><br>
+
+<p>Oracle versions 8.1.5-9.0.1 for Solaris have been or are currently available
+for download from <a href="http://technet.oracle.com">technet.oracle.com</a> 
+or on CD.  Installation appears to be as simple as following the directions.  
+Note that for Solaris, these versions of Oracle will fail to create a database 
+at installation time unless the kernel is configured properly to support more 
+and larger shared memory segments and semaphores.  Aside from neglecting this 
+step, I've never seen or heard of anyone having much difficulty with these 
+versions on Solaris.</p>
+
+<a name="openserver"></a>
+<span class="heading2">SCO OpenServer</span><br>
+
+<p>Oracle 7.3 is the most current version that runs on SCO OpenServer.  It is
+was once available on CD but is currently out of production and no longer 
+supported.  I've installed it successfully on OpenServer 5.0.4 and 5.0.5 but 
+have not been able to get it working on 5.0.6.</p>
+
+<p>Oracle recommends that you configure your kernel to support more and larger
+shared memory segments and semaphores.  I've never needed to do this to get
+the installation to complete or to run a small development database.  For 
+production systems however, I recommend following Oracle's recommendations.</p>
+
+<p>If NIS is configured, you'll have lots of problems that won't show up until
+the very end of the installation.  The installer scripts use <i>domainname</i>
+to get the DNS domain name of the machine it's being installed on.  This
+is crazy because <i>domainname</i> returns the NIS domain name, not the DNS 
+domain name, but the installation uses it to get the DNS domain name anyway.  
+Installation works fine if the NIS domain name is not set (or if it happens to 
+be set to the same name as the DNS domain name).  Otherwise, all kinds of 
+things break and can't be easily fixed after the installation is finished.  If 
+you really need NIS, configure it after installing Oracle.</p>
+
+<p>Set the video mode to 1024x768 with 256 colors.  The installer won't run in 
+any other resolution or depth.</p>
+
+<p>Install the COFF Linker Patch if it's available for your version of SCO
+OpenServer.  It's currently available from the 
+<a href="http://www.caldera.com/support/ftplists/osr5list.html">SCO OpenServer 
+Support</a> section of the Caldera web site.  Without it, the installation
+will fail about halfway through.</p>
+
+<p>To install Oracle 7.3, create a /mnt directory if one does not exist.  Then 
+insert the CD and run the following commands as root.</p>
+
+<blockquote><b>
+mount /dev/cd0 /mnt<br>
+cd /mnt<br>
+./wginstall
+</b></blockquote>
+
+<p>A graphical installation program should pop up shortly.  The installation 
+should proceed smoothly from there.</p>
+
+<a name="linux"></a>
+<span class="heading2">Linux</span><br>
+
+<p>Oracle has supported Linux since version 8.0.5. Versions 8.0.5 through 9.0.1
+have been or are currently available from 
+<a href="http://technet.oracle.com">technet.oracle.com</a> and have been 
+available on CD from various sources as well.</p>
+
+<p>I've successfully installed Oracle 8.0.5 on RedHat 5.2,  Oracle 8.1.6-8.1.7
+on RedHat 6.2-7.2, and Oracle 8.1.7 on Mandrake 8.2, Debian 2.2r5 and Slackware
+8.  I've never been able to get any version to install on TurboLinux 7.  I was 
+once able to shoehorn Oracle 8.1.5 onto RedHat 6.1 (I think) but I have not 
+been able to get it to install on any version since.  I haven't tried any other
+Oracle versions on any other Linux distributions.</p>
+
+<a name="users"></a>
+<span class="heading3">Create Users, Groups and Directories</span><br>
+
+<p>Run the following commands as root to set up the appropriate users, groups
+and directories.</p>
+
+<blockquote><b>
+groupadd oinstall<br>
+groupadd dba<br>
+groupadd oper<br>
+mkdir /home/oracle<br>
+useradd oracle -g oinstall -G dba,oper<br>
+chown -R oracle:dba /home/oracle<br>
+passwd oracle</b>  (assign the oracle user a password) <br>
+<b>mkdir /u01<br>
+chown oracle:dba /u01<br>
+chmod 775 /u01<br>
+</b></blockquote>
+
+<p>Edit /home/oracle/.bashrc and add the following command near the bottom.</p>
+
+<blockquote><b>
+umask 022
+</b></blockquote>
+
+<a name="kernel"></a>
+<span class="heading3">Configure the Kernel</span><br>
+
+<p>Oracle recommends that you configure your kernel to support more and larger
+shared memory segments and semaphores.  I've never needed to do this to get
+the installation to complete or to run a small development database.  For 
+production systems however, I recommend following Oracle's recommendations.</p>
+
+<a name="support"></a>
+<span class="heading3">Install the Support Software</span><br>
+
+<p>The Oracle installer needs the GNU C Compiler (gcc) and GNU Binutils (ar, 
+as, ld, etc.) to compile and link several libraries at installation time.  Make
+sure that these packages are installed.</p>
+
+<a name="java"></a>
+<span class="heading3">Install Java</span><br>
+
+<p>If you are installing Oracle 8.1.x, you need to install a Java 
+Runtime Environment as well.  You can download the appropriate JRE from 
+<a href="http://www.blackdown.com">blackdown</a>.</p>
+
+<p>For Oracle 8.1.6 you need to download 
+<b>jre118_v3-glibc-2.1.3.tar.bz2</b> and execute the following commands.</p>
+
+<blockquote><b>
+mv jre118_v3-glibc-2.1.3.tar.bz2 /usr/local<br>
+cd /usr/local<br>
+bunzip2 jre118_v3-glibc-2.1.3.tar.bz2<br>
+tar xf jre118_v3-glibc-2.1.3.tar<br>
+ln -s jre118_v3 java<br>
+rm jre118_v3-glibc-2.1.3.tar<br>
+</b></blockquote>
+
+<br>
+
+<a name="compat"></a>
+<span class="heading3">Install Compatibility Packages</span><br>
+
+<p>Oracle 8.0.5 for Linux requires glibc 2.0 and installs cleanly on RedHat 5.
+I've shoehorned it on to other platforms, but it was so hideous and worked so 
+minimally that I dare not publish the process.</p>
+
+<p>Oracle 8.1.x for Linux requires glibc 2.1.  Many newer Linux 
+distributions come with glibc 2.2.  On these distributions it is necessary to 
+install some compatibility packages.</p>
+
+<p>Distributions that come with glibc 2.1 include RedHat 6, Debian 2.2, 
+Mandrake 7 and Slackware 7.  Distributions that come with glibc 
+2.2 include RedHat 7, Mandrake 8 and Slackware 8.</p>
+
+<p>RedHat provides compatability RPM's for RedHat 7 that can actually be used
+on any Linux that comes with glibc 2.2.  These RPM's can be downloaded
+from <a href="http://rpmfind.net">rpmfind</a>.  Even if you're installing on
+a non-RPM-based Linux distribution, you'll need the following RPM's.</p>
+
+<ul>
+<li><b>compat-glibc-6.2-2.1.3.2.i386.rpm</b> for RedHat Linux 7.2</li>
+<li><b>compat-egcs-6.2-1.1.2.16.i386.rpm</b> for RedHat Linux 7.2</li>
+</ul>
+
+<span class="heading4">RPM-based Linux</span><br>
+
+<p>On an RPM-based linux distribution, you can install the RPM's using 
+<i>rpm -i</i>.</p>
+
+<span class="heading4">Slackware</span><br>
+
+<p>On Slackware, you'll need to install RPM.  The RPM package is available
+from <a href="ftp://ftp.slackware.com">ftp.slackware.com</a>.  You can install 
+it using <i>installpkg</i>.  Once RPM is installed, log in as root and run
+<i>rpm --initdb</i>.</p>
+
+<p>For Slackware, you'll also need the binutils source RPM.  Note that this is 
+a <b>source</b> RPM, not a binary RPM.</p>
+
+<ul>
+<li><b>binutils-2.11.90.8-9.src.rpm</b> for RedHat Linux 7.2</li>
+</ul>
+
+<p>Once RPM is installed and you have downloaded the compat-glibc, compat-egcs
+and binutils RPM's, run the following commands as root.</p>
+
+<blockquote>
+<b>rpm -i --nodeps compat-glibc-6.2-2.1.3.2.i386.rpm<br>
+rpm -i --nodeps compat-egcs-6.2-1.1.2.16.i386.rpm<br>
+rpm -i --nodeps binutils-2.11.90.0.8-9.src.rpm<br>
+cp /usr/src/rpm/SOURCES/binutils-2.11.90.0.8.tar.bz2 /root<br>
+cd /root<br>
+bunzip2 binutils-2.11.90.0.8.tar.bz2<br>
+tar xf binutils-2.11.90.0.8.tar<br>
+cd binutils-2.11.90.0.8<br>
+cp /usr/src/rpm/SOURCES/binutils-2.11.90.0.4-glibc21.patch .<br>
+patch -p1 &lt; binutils-2.11.90.0.4-glibc21.patch<br>
+configure --prefix=/usr/local/binutils-glibc21<br>
+make<br>
+make install<br></b>
+</blockquote>
+
+<p>If you don't get any errors, you should end up with a directory called
+/usr/local/binutils-glibc21 containing everything necessary to link Oracle
+against the glibc-2.1 provided by the compat RPM's.</p>
+
+<a name="env"></a>
+<span class="heading3">Set Up the Environment</span><br>
+
+<p>Edit /home/oracle/.bashrc and add the following command near the bottom.</p>
+
+<blockquote>
+<b>. /usr/i386-glibc21-linux/bin/i386-glibc21-linux-env.sh</b>
+</blockquote>
+
+<p>If you are running a 2.4 (or higher) kernel, add the following line as 
+well.</p>
+
+<blockquote>
+<b>export LD_ASSUME_KERNEL=2.2.5</b>
+</blockquote>
+
+<p>Edit /etc/profile and add the following somewhere near the top, replacing
+8.1.7 in the ORACLE_VERSION environment variable with the version of Oracle 
+that you are installing.</p>
+
+<blockquote><b>
+export ORACLE_VERSION=8.1.7<br>
+export ORACLE_BASE=/u01/app/oracle<br>
+export ORACLE_HOME=$ORACLE_BASE/product/$ORACLE_VERSION<br>
+export ORACLE_SID=ora1<br>
+export PATH=$PATH:$ORACLE_HOME/bin<br>
+export CLASSPATH=$ORACLE_BASE/jdbc/lib/classes111.zip<br>
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib<br>
+export ORA_NLS33=$ORACLE_HOME/ocommon/nls/admin/data<br>
+export ORACLE_OWNER=oracle<br>
+export ORACLE_TERM=386<br>
+export NLS_LANG=american<br>
+</b></blockquote>
+
+<p>If you want to use a language other than US English, consult the following
+table and replace <b>american</b> with the appropriate language string.</p>
+
+
+<table BORDER COLS=2 WIDTH="400" NOSAVE >
+<tr NOSAVE>
+<td><b><font face="Arial,Helvetica">Language</font></b></td>
+<td NOSAVE><b><font face="Arial,Helvetica">NLS_LANG value</font></b></td>
+</tr>
+<tr><td>US English</td><td>american</td></tr>
+<tr><td>Arabic</td><td>arabic</td></tr>
+<tr><td>Brazilian Portugese</td><td>"brazilian portugese"</td></tr>
+<tr><td>Canadian French</td><td>frc</td></tr>
+<tr><td>Czech</td><td>czech</td></tr>
+<tr><td>Danish</td><td>danish</td></tr>
+<tr><td>Dutch</td><td>dutch</td></tr>
+<tr><td>Finnish</td><td>finnish</td></tr>
+<tr><td>French</td><td>french</td></tr>
+<tr><td>German</td><td>german</td></tr>
+<tr><td>Hungarian</td><td>hungarian</td></tr>
+<tr><td>Icelandic</td><td>is</td></tr>
+<tr><td>Italian</td><td>italian</td></tr>
+<tr><td>Japanese</td><td>japanese</td></tr>
+<tr><td>Korean</td><td>korean</td></tr>
+<tr><td>Lithuanian</td><td>lt</td></tr>
+<tr><td>Mexican Spanish</td><td>esm</td></tr>
+<tr><td>Norweigan</td><td>norweigan</td></tr>
+<tr><td>Polish</td><td>polish</td></tr>
+<tr><td>Portugese</td><td>portugese</td></tr>
+<tr><td>Russian</td><td>russian</td></tr>
+<tr><td>Simplified Chinese</td><td>"simplified chinese"</td></tr>
+<tr><td>Slovak</td><td>slovak</td></tr>
+<tr><td>Swedish</td><td>swedish</td></tr>
+<tr><td>Thai</td><td>th</td></tr>
+<tr><td>Traditional Chinese</td><td>"traditional chinese"</td></tr>
+<tr><td>Turkish</td><td>turkish</td></tr>
+</table>
+
+<br>
+
+<a name="oracle"></a>
+<span class="heading3">Install Oracle</span><br>
+
+<p>At this point, you should be ready to install Oracle.  Log in as the oracle 
+user.</p>
+
+<p>Oracle 8.0.5 has a text-based installer.  Oracle 8.1.x have 
+Java-based graphical installers.  I've heard that the graphical installer has 
+trouble with some versions of the Enlightenment window manager, but I've never 
+experienced any difficulty myself.</p>
+
+<p>If you are installing from a CD, mount the CD and cd to the directory it's
+mounted on.  If you are installing from a download, extract the distribution 
+using <i>tar xfz</i>.</p>
+
+<p>Each version of Oracle has slightly different installation procedures.
+Follow the links below for the version of Oracle that you are installing.  Note
+that on most platforms and for most versions of Oracle, the installation will
+fail at some point.  Refer to the notes below for known issues and 
+workarounds.</p>
+
+<p><a href="oracle/805.html">Installing Oracle 8.0.5</a><br>
+Oracle 8.1.6 is no longer available from 
+<a href="http://technet.oracle.com">technet.oracle.com</a> and I don't have
+it lying around anymore so I can't write installation docs, but the installation
+procedure is similar to 8.1.7.<br>
+<a href="oracle/817.html">Installing Oracle 8.1.7</a><br>
+
+<a name="issues"></a>
+<span class="heading3">Known Issues and Workarounds</span><br>
+
+<p>On Slackware and Debian, near the end of the installation, when the 
+installer asks you to run root.sh, edit root.sh and change <b>AWK=/bin/awk</b> 
+to <b>AWK=/usr/bin/awk</b> before running the script.</p>
+
+<a name="startingatboot"></a>
+<span class="heading2">Starting the Database at Boot Time</span><br>
+
+<p>You can use the following script to start/stop the database at 
+boot/shutdown time.  Replace /u01/app/oracle/product/8.1.7 with your 
+$ORACLE_HOME</p>
+
+<blockquote>
+<PRE>
+<FONT color=#0000ff>#!/bin/sh</FONT>
+
+<B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
+  start<B><FONT color=#a62828>)</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/8.1.7/bin/dbstart</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/8.1.7/bin/lsnrctl start</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        <B><FONT color=#a62828>;;</FONT></B>
+  stop<B><FONT color=#a62828>)</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/8.1.7/bin/dbshut</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/8.1.7/bin/lsnrctl stop</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        <B><FONT color=#a62828>;;</FONT></B>
+  *<B><FONT color=#a62828>)</FONT></B>
+        <B><FONT color=#a62828>echo</FONT></B><FONT color=#ff00ff> $</FONT><B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>Usage: </FONT><FONT color=#a620f7>$0</FONT><FONT color=#ff00ff> {start|stop}</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        <B><FONT color=#a62828>exit</FONT></B> <FONT color=#ff00ff>1</FONT>
+<B><FONT color=#a62828>esac</FONT></B>
+
+<B><FONT color=#a62828>exit</FONT></B> <FONT color=#ff00ff>0</FONT>
+
+</PRE>
+</blockquote>
+
+<p>Install this script and run it with the "start" option to start up the
+database.  Running it with the "stop" option shuts the database down.  To
+access a database, it must be running.</p>
+
+<a name="creating"></a>
+<span class="heading1">Creating a Database</span><br>
+
+<p>During the installation, you could have chosen to create a database instance.
+If you did not create one during installation, you can do so afterward. For 
+Oracle 8.1 and higher, login as oracle, run $ORACLE_HOME/bin/dbassist and 
+following the on-screen instructions.</p>
+
+<p>The dbassist program will ask you to provide an SID; a local identifier for 
+the database.  No two databases on the same machine can have the same SID.  If 
+you are using Oracle 8i or 9i you will also be asked to provide a Global 
+Identifier.  The Global Identifier should be unique among the Oracle databases 
+on the local network.</p>
+
+<p>After creating the database, edit the file /etc/oratab and look for a line
+containing the SID of the database you just created.  Change the N at the end 
+of that line to Y.  This configures the database to start when the dbstart 
+command is issued.</p>
+
+<p>At this point, you can run the start/stop script to start up the 
+database.</p>
+
+<p>To access the database, the file $ORACLE_HOME/network/admin/tnsnames.ora 
+must also be configured.  This file contains an entry for each database that 
+the local system needs to know about.  Here is an example of a tnsnames.ora 
+entry, identifying the database <i>TESTDB</i> on the local machine.</p>
+
+<blockquote>
+<PRE>
+TESTDB.LOCALDOMAIN =
+  (<B><FONT color=#288a51>DESCRIPTION</FONT></B> =
+    (<B><FONT color=#288a51>ADDRESS_LIST</FONT></B> =
+      (<B><FONT color=#288a51>ADDRESS</FONT></B> = (<B><FONT color=#a62828>PROTOCOL</FONT></B> = <B><FONT color=#a62828>TCP</FONT></B>)(<B><FONT color=#a62828>HOST</FONT></B> = localhost)(<B><FONT color=#a62828>PORT</FONT></B> = 1521))
+    )
+    (<B><FONT color=#288a51>CONNECT_DATA</FONT></B> =
+      (<B><FONT color=#a62828>SERVICE_NAME</FONT></B> = testdb)
+    )
+  )
+</PRE>
+</blockquote>
+
+<p>For Oracle 7 and 8, the format is SID = (... parameters ...).  For Oracle 8i
+and 9i, the format is SID.DOMAIN = (... parameters ...). In this example
+the SID is TESTDB.  The HOST parameter refers to the DNS name of the host that 
+the database is running on.  The SERVICE_NAME refers to the SID of the database 
+as it is known on that host.</p>
+
+<p>When a database instance is created, two special administration users are 
+created: SYS and SYSTEM. The default password for the SYSTEM user is 
+<i>manager</i>.  The default password for the SYS user is 
+<i>change_on_install</i>.  These users own the tables that contain privileges 
+and other housekeeping information.</p>
+
+<p>The following command logs the SYSTEM user into the ORA1 instance:</p>
+
+<blockquote>
+<b>sqlplus system/manager@testdb</b>
+</blockquote>
+
+<p>Database tables are stored in a file or set of files collectively called a
+tablespace.  The tables owned by the SYS and SYSTEM users are kept in their
+own tablespace.  Though you could create your own tables there, it's not a 
+good idea.  You should create your own tablespace.  The following queries
+create a tablespace and temporary tablespace called <i>testtablespace</i> and 
+<i>testtablespacetemp</i> with some minimal sizing parameters.</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>CREATE</FONT></B> TABLESPACE testtablespace
+	DATAFILE <FONT color=#ff00ff>'/u01/app/oracle/oradata/ora1/testtablespace01.dbf'</FONT> 
+	<FONT color=#6959cf>SIZE</FONT> 25K REUSE
+	AUTOEXTEND <FONT color=#6959cf>ON</FONT> NEXT 25K
+	MAXSIZE UNLIMITED
+	NOLOGGING
+	MINIMUM EXTENT 25K;
+
+<B><FONT color=#a62828>CREATE</FONT></B> TABLESPACE testtablespacetemp
+	DATAFILE <FONT color=#ff00ff>'/u01/app/oracle/oradata/ora1/testtablespacetemp01.dbf'</FONT> 
+	<FONT color=#6959cf>SIZE</FONT> 25K REUSE
+	AUTOEXTEND <FONT color=#6959cf>ON</FONT> NEXT 25K
+	MAXSIZE UNLIMITED
+	NOLOGGING
+	MINIMUM EXTENT 25K;
+</PRE>
+</blockquote>
+
+<p>The set of database objects (such as tables, indexes, stored procedures and 
+triggers) owned by a particular user is called a schema.  Though schemas may be
+distributed across tablespaces, they are more often confined to a single 
+tablespace.  The SYSTEM and SYS schemas contain tables used by internal systems
+and should not be used for application data.  You can create a new user and 
+schema by logging in as SYSTEM and running the following queries:</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>CREATE</FONT></B> <FONT color=#6959cf>USER</FONT> testuser <FONT color=#6959cf>IDENTIFIED</FONT> <FONT color=#6959cf>BY</FONT> testpassword
+	<FONT color=#6959cf>DEFAULT</FONT> TABLESPACE testtablespace 
+	TEMPORARY TABLESPACE testtablespacetemp;
+
+<B><FONT color=#a62828>GRANT</FONT></B> <B><FONT color=#a62828>CREATE</FONT></B> <FONT color=#6959cf>SESSION</FONT> <FONT color=#6959cf>TO</FONT> testuser;
+
+<B><FONT color=#a62828>GRANT</FONT></B> <FONT color=#6959cf>RESOURCE</FONT> <FONT color=#6959cf>TO</FONT> testuser;
+</PRE>
+</blockquote>
+
+<p>Now you can exit and log in as the new user with the following command:</p>
+
+<blockquote>
+<b>sqlplus testuser/testpassword@testdb</b>
+</blockquote>
+
+<p>To delete a user and everything owned by that user, log in as SYSTEM and run
+the following command:</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>DROP</FONT></B> <FONT color=#6959cf>USER</FONT> testuser CASCADE;
+</PRE>
+</blockquote>
+
+<p>To delete a tablespace, log in as SYSTEM and run the following command:</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>DROP</FONT></B> <FONT color=#6959cf>TABLESPACE</FONT> testtablespace;
+
+<B><FONT color=#a62828>DROP</FONT></B> <FONT color=#6959cf>TABLESPACE</FONT> testtablespacetemp;
+</PRE>
+</blockquote>
+
+<p>This should be enough you get you started.  To set up more complex 
+configurations, consult the documentation that came with your Oracle 
+distribution.</p>
+
+<a name="accessing"></a>
+<span class="heading1">Accessing a Database</span><br>
+
+
+<p>Any user can access an Oracle database provided that the users environment
+is configured correctly.  The ORACLE_HOME environment variable needs to be set 
+to the same value that it was set for the oracle user during installation.  The
+PATH varible must contain $ORACLE_HOME/bin and the LD_LIBRARY_PATH variable 
+must contain $ORACLE_HOME/lib.</p>
+
+<p>The user must have read access to the
+$ORACLE_HOME/network/admin/tnsnames.ora file.  Alternatively, an individual 
+user can have a .tnsnames.ora file.</p>
+
+<p>The following command logs <i>testuser</i> with password <i>testpassword</i>
+into the database identified by the SID <i>testdb</i>.</p>
+
+<blockquote>
+<b>sqlplus testuser/testpassword@testdb</b>
+</blockquote>
+
+<p>A sample session follows.</p>
+
+<blockquote>
+<PRE>
+[user@localhost user]$ <b>sqlplus testuser/testpassword@testdb</b>
+
+SQL*Plus: Release <FONT color=#ff00ff>8.1.7.0.0</FONT> - Production on Tue Jan <FONT color=#ff00ff>8</FONT> <FONT color=#ff00ff>18</FONT>:<FONT color=#ff00ff>44</FONT>:<FONT color=#ff00ff>46</FONT> <FONT color=#ff00ff>2002</FONT>
+
+(c) Copyright <FONT color=#ff00ff>2001</FONT> Oracle Corporation.  All rights reserved.
+
+
+Connected to:
+Oracle8i Enterprise Edition Release <FONT color=#ff00ff>8.1</FONT>.<FONT color=#ff00ff>7.0</FONT>.<FONT color=#ff00ff>0</FONT> - Production
+JServer Release <FONT color=#ff00ff>8.1</FONT>.<FONT color=#ff00ff>7.0</FONT>.<FONT color=#ff00ff>0</FONT> - Production
+
+SQL&gt; <B><FONT color=#a62828>create</FONT></B> <FONT color=#6959cf>table</FONT> testtable (
+  <FONT color=#ff00ff>2</FONT>  col1 <B><FONT color=#288a51>varchar2</FONT></B>(<FONT color=#ff00ff>40</FONT>),
+  <FONT color=#ff00ff>3</FONT>  col2 <B><FONT color=#288a51>number</FONT></B>
+  <FONT color=#ff00ff>4</FONT>  );
+
+Table created.
+
+SQL&gt; <B><FONT color=#a62828>select</FONT></B> table_name <FONT color=#6959cf>from</FONT> user_tables;
+
+TABLE_NAME
+<FONT color=#0000ff>------------------------------</FONT>
+TESTTABLE
+
+SQL&gt; describe testtable;
+ Name                                      <FONT color=#6959cf>Null</FONT>?    <FONT color=#6959cf>Type</FONT>
+ <FONT color=#0000ff>----------------------------------------- -------- ----------------------------</FONT>
+ COL1                                               <B><FONT color=#288a51>VARCHAR2</FONT></B>(<FONT color=#ff00ff>40</FONT>)
+ COL2                                               <B><FONT color=#288a51>NUMBER</FONT></B>
+
+SQL&gt; <B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> testtable <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'hello'</FONT>,<FONT color=#ff00ff>50</FONT>);
+
+<FONT color=#ff00ff>1</FONT> row created.
+
+SQL&gt; <B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> testtable <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'hi'</FONT>,<FONT color=#ff00ff>60</FONT>);
+
+<FONT color=#ff00ff>1</FONT> row created.
+
+SQL&gt; <B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> testtable <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'bye'</FONT>,<FONT color=#ff00ff>70</FONT>);
+
+<FONT color=#ff00ff>1</FONT> row created.
+
+SQL&gt; <B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> testtable;
+
+COL1                                           COL2
+<FONT color=#0000ff>---------------------------------------- ----------</FONT>
+hello                                            <FONT color=#ff00ff>50</FONT>
+hi                                               <FONT color=#ff00ff>60</FONT>
+bye                                              <FONT color=#ff00ff>70</FONT>
+
+SQL&gt; <B><FONT color=#a62828>delete</FONT></B> <FONT color=#6959cf>from</FONT> testtable <FONT color=#6959cf>where</FONT> col2=<FONT color=#ff00ff>50</FONT>;
+
+<FONT color=#ff00ff>1</FONT> row deleted.
+
+SQL&gt; <B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> testtable;
+
+COL1                                           COL2
+<FONT color=#0000ff>---------------------------------------- ----------</FONT>
+hi                                               <FONT color=#ff00ff>60</FONT>
+bye                                              <FONT color=#ff00ff>70</FONT>
+
+SQL&gt; <B><FONT color=#a62828>update</FONT></B> testtable <B><FONT color=#a62828>set</FONT></B> col2=<FONT color=#ff00ff>0</FONT> <FONT color=#6959cf>where</FONT> col1=<FONT color=#ff00ff>'hi'</FONT>;
+
+<FONT color=#ff00ff>1</FONT> row updated.
+
+SQL&gt; <B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> testtable;
+
+COL1                                           COL2
+<FONT color=#0000ff>---------------------------------------- ----------</FONT>
+hi                                                <FONT color=#ff00ff>0</FONT>
+bye                                              <FONT color=#ff00ff>70</FONT>
+
+SQL&gt; <B><FONT color=#a62828>drop</FONT></B> <FONT color=#6959cf>table</FONT> testtable;
+
+Table dropped.
+
+SQL&gt; quit
+Disconnected from Oracle8i Enterprise Edition Release <FONT color=#ff00ff>8.1</FONT>.<FONT color=#ff00ff>7.0</FONT>.<FONT color=#ff00ff>0</FONT> - Production
+JServer Release <FONT color=#ff00ff>8.1</FONT>.<FONT color=#ff00ff>7.0</FONT>.<FONT color=#ff00ff>0</FONT> - Production
+
+</PRE>
+</blockquote>
+
+<a name="sqlrelay"></a>
+<span class="heading1">Accessing a Database With SQL Relay</span><br>
+
+<p>Accessing Oracle from SQL Relay requires an instance entry in your 
+<i>sqlrelay.conf</i> file for the database that you want 
+to access.  Here is an example <i>sqlrelay.conf</i> which defines an SQL Relay 
+instance called oracletest.  This instance connects to the <i>testdb</i> 
+database as the user <i>testuser</i> with password <i>testpassword</i>.</p>
+
+<PRE>
+<FONT color=#0000ff>&lt;?</FONT><B><FONT color=#288a51>xml version=</FONT></B><FONT color=#ff00ff>&quot;1.0&quot;</FONT><FONT color=#0000ff>?&gt;</FONT>
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>DOCTYPE</FONT></B> instances <B><FONT color=#a62828>SYSTEM</FONT></B> <FONT color=#ff00ff>&quot;sqlrelay.dtd&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+<FONT color=#008a8e>&lt;instances&gt;</FONT>
+
+        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/oracletest.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;oracle&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;0&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> authtier=</FONT><FONT color=#ff00ff>&quot;listener&quot;</FONT><FONT color=#008a8e> handoff=</FONT><FONT color=#ff00ff>&quot;pass&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+                <FONT color=#008a8e>&lt;users&gt;</FONT>
+                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/users&gt;</FONT>
+                <FONT color=#008a8e>&lt;connections&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;oracletest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpassword;sid=testdb&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/connections&gt;</FONT>
+        <FONT color=#008a8e>&lt;/instance&gt;</FONT>
+
+<FONT color=#008a8e>&lt;/instances&gt;</FONT>
+</PRE>
+
+<p>Now you can start up this instance with the following command.</p>
+
+<blockquote>
+<b>sqlr-start -id oracletest</b>
+</blockquote>
+
+<p>To connect to the instance and run queries, use the following command.</p>
+
+<blockquote>
+<b>sqlrsh -id oracletest</b>
+</blockquote>
+
+<p>The following command shuts down the SQL Relay instance.</p>
+
+<blockquote>
+<b>sqlr-stop oracletest</b>
+</blockquote>
+
+</body>
+
+</html>

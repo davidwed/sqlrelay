@@ -1,0 +1,108 @@
+%define ver @SQLR_VERSION@
+%define rel 1
+%define prefix @prefix@
+%define exec_prefix @exec_prefix@
+%define incdir @includedir@
+%define libdir @libdir@
+%define bindir @bindir@
+%define localstatedir @localstatedir@
+%define sysconfdir @sysconfdir@
+%define localstatedir @localstatedir@
+
+Summary: Persistent database connection system.
+Requires: rudiments = 0.24
+Name: sqlrelay
+Version: %{ver}
+Release: %{rel}
+Source: http://www.firstworks.com/downloads/sqlrelay/%{name}-%{ver}.tar.gz
+Copyright: GPL/LGPL and Other Licenses
+URL: http://www.firstworks.com
+Group: Database/Daemons
+Packager: David Muse <mused@firstworks.com>
+Buildroot: /var/tmp/%{name}-root
+
+%description
+SQL Relay is a persistent database connection pooling, proxying and load 
+balancing system for Unix and Linux supporting ODBC, Oracle, MySQL, mSQL, 
+PostgreSQL, Sybase, MS SQL Server, IBM DB2, Interbase, Lago and SQLite with C, 
+C++, Perl, Perl-DBD, Python, Python-DB, Zope, PHP, Ruby and Java APIs, command 
+line clients, a GUI configuration tool and extensive documentation.  The APIs 
+support advanced database operations such as bind variables, multi-row fetches,
+client side result set caching and suspended transactions.  It is ideal for 
+speeding up database-driven web-based applications, accessing databases from 
+unsupported platforms, migrating between databases, distributing access to 
+replicated databases and throttling database access.
+
+%prep
+rm -rf ${RPM_BUILD_ROOT}
+
+%setup
+
+%build
+make unconfig
+CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix}
+make
+
+%install
+sed -e "s|^PREFIX = |PREFIX = ${RPM_BUILD_ROOT}|" \
+src/api/perl/DBD/Makefile > src/api/perl/DBD/Makefile.new
+mv src/api/perl/DBD/Makefile.new src/api/perl/DBD/Makefile 
+sed -e "s|^PREFIX = |PREFIX = ${RPM_BUILD_ROOT}|" \
+src/api/perl/SQLRConnection/Makefile > src/api/perl/SQLRConnection/Makefile.new
+mv src/api/perl/SQLRConnection/Makefile.new \
+src/api/perl/SQLRConnection/Makefile 
+sed -e "s|^PREFIX = |PREFIX = ${RPM_BUILD_ROOT}|" \
+src/api/perl/SQLRCursor/Makefile > src/api/perl/SQLRCursor/Makefile.new
+mv src/api/perl/SQLRCursor/Makefile.new src/api/perl/SQLRCursor/Makefile 
+sed -e "s|^PYTHONDIR = |PYTHONDIR = ${RPM_BUILD_ROOT}|" \
+config.mk > config.mk.new
+mv config.mk.new config.mk
+sed -e "s|^ZOPEDIR = |ZOPEDIR = ${RPM_BUILD_ROOT}|" \
+config.mk > config.mk.new
+mv config.mk.new config.mk
+sed -e "s|^PHPEXTDIR = |PHPEXTDIR = ${RPM_BUILD_ROOT}|" \
+config.mk > config.mk.new
+mv config.mk.new config.mk
+sed -e "s|prefix|rubyprefix|g" \
+src/api/ruby/Makefile > src/api/ruby/Makefile.new
+mv src/api/ruby/Makefile.new src/api/ruby/Makefile
+make prefix=${RPM_BUILD_ROOT}%{prefix} DESTDIR=${RPM_BUILD_ROOT} install
+
+%post
+NEWLIBDIR=`echo "%{libdir}" | sed -e "s|\/|\\\\\/|g"`
+NEWLDSOCONF=`sed -e "/^$NEWLIBDIR$/d" /etc/ld.so.conf`
+echo "$NEWLDSOCONF" > /etc/ld.so.conf
+echo %{libdir} >> /etc/ld.so.conf
+/sbin/ldconfig
+
+%postun
+if ( test ! -d "%{libdir}" ); then
+	NEWLIBDIR=`echo "%{libdir}" | sed -e "s|\/|\\\\\/|g"`
+	NEWLDSOCONF=`sed -e "/^$NEWLIBDIR$/d" /etc/ld.so.conf`
+	echo "$NEWLDSOCONF" > /etc/ld.so.conf
+	/sbin/ldconfig
+fi
+rmdir %{localstatedir}/sqlrelay
+
+%clean
+rm -rf ${RPM_BUILD_ROOT}
+
+%files
+%defattr(-,root,root)
+%{sysconfdir}/sqlrelay.conf.example
+%{sysconfdir}/sqlrelay.dtd
+%{bindir}/backupschema
+%{bindir}/fields
+%{bindir}/query
+%{bindir}/sqlr-cachemanager
+%{bindir}/sqlr-listener
+%{bindir}/sqlr-listener-debug
+%{bindir}/sqlr-scaler
+%{bindir}/sqlrsh
+%{bindir}/sqlr-start
+%{bindir}/sqlr-stop
+%{libdir}/libsqlrclient.so.*
+%{libdir}/libsqlrclientwrapper.so.*
+%{localstatedir}/sqlrelay/tmp
+%{localstatedir}/sqlrelay/cache
+%{localstatedir}/sqlrelay/debug

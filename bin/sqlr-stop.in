@@ -1,0 +1,64 @@
+#!/bin/sh
+# Copyright (c) 1999-2000 David Muse
+# See the file COPYING for more information
+
+prefix=@prefix@
+tmpdir=@localstatedir@/sqlrelay/tmp
+
+echo "Killing the following processes:"
+
+VALID="`ps -efal 2>&1 | grep illegal | grep -v grep`"
+if ( test ! -n "$VALID" ); then
+
+	ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
+
+	for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $4}'`
+	do
+		kill $i
+	done
+
+	sleep 1
+
+	for i in `ps -eafl | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $4}'`
+	do
+		kill $i
+	done
+
+	if ( test -n "`ps -efal | grep sqlr- | grep ' $1' | grep -v grep | grep -v sqlr-stop`" ); then
+		echo "Processes still alive:"
+		ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
+	else
+		echo "All processes killed."
+	fi
+	
+else
+
+	ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
+
+	for i in `ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
+	do
+		kill $i
+	done
+
+	sleep 1
+
+	for i in `ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
+	do
+		kill $i
+	done
+
+	if ( test -n "`ps aux | grep sqlr- | grep ' $1' | grep -v grep | grep -v sqlr-stop`" ); then
+		echo "Processes still alive:"
+		ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
+	else
+		echo "All processes killed."
+	fi
+fi
+
+# clean up tmp files
+if ( test -n "$1" ); then
+	rm -f ${tmpdir}/$1
+	rm -f ${tmpdir}/$1-*
+else
+	rm -f ${tmpdir}/*
+fi

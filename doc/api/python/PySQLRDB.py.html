@@ -1,0 +1,184 @@
+<HTML>
+<HEAD>
+<TITLE>/usr/local/src/sqlrelay-0.30/src/api/python/PySQLRDB.py.html</TITLE>
+</HEAD>
+<BODY BGcolor=#FFFFFF TEXT=#000000>
+<PRE>
+<FONT color=#0000f8>#! /usr/bin/env python</FONT>
+
+<FONT color=#0000f8># Copyright (c) 2000 Roman Milner</FONT>
+<FONT color=#0000f8># See the file COPYING for more information</FONT>
+
+<FONT color=#a020f0>import</FONT> sys
+<FONT color=#a020f0>from</FONT> time <FONT color=#a020f0>import</FONT> localtime, time, mktime
+<FONT color=#a020f0>import</FONT> string
+<FONT color=#a020f0>import</FONT> exceptions
+<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> CSQLRelay
+
+apilevel = '<FONT color=#f800f8>2.0</FONT>'
+threadsafety = 1
+paramstyle = '<FONT color=#f800f8>named</FONT>'
+
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>Error</FONT>(exceptions.StandardError):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>Warning</FONT>(exceptions.StandardError):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>InterfaceError</FONT>(Error):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>DatabaseError</FONT>(Error):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>InternalError</FONT>(DatabaseError):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>OperationalError</FONT>(DatabaseError):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>ProgrammingError</FONT>(DatabaseError):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>IntegrityError</FONT>(DatabaseError):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>DataError</FONT>(DatabaseError):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>NotSupportedError</FONT>(DatabaseError):
+    <B><FONT color=#a02828>pass</FONT></B>
+
+
+<B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>connect</FONT>(host, port, socket, user, password, retrytime=0, tries=1):
+    <B><FONT color=#a02828>return</FONT></B> SQLRConnection(host, port, socket, user, password, retrytime, tries)
+
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>SQLRConnection</FONT>:
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>__init__</FONT>(self, host, port, socket, user, password, retrytime, tries):
+        self.connection = CSQLRelay.sqlrcon_alloc(host, port, socket, user, password, retrytime, tries)
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>close</FONT>(self):
+        CSQLRelay.sqlrcon_free(self.connection)
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>commit</FONT>(self):
+        self.rowcount=0
+        <B><FONT color=#a02828>return</FONT></B> CSQLRelay.commit(self.connection)
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>rollback</FONT>(self):
+        self.rowcount=0
+        <B><FONT color=#a02828>return</FONT></B> CSQLRelay.rollback(self.connection)
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>cursor</FONT>(self):
+        <B><FONT color=#a02828>return</FONT></B> SQLRCursor(self.connection)
+
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>SQLRCursor</FONT>:
+
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>__init__</FONT>(self, con):
+        self.cursor = CSQLRelay.sqlrcur_alloc(con)
+        self.arraysize = 1
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>setinputsizes</FONT>(self):
+        <B><FONT color=#a02828>pass</FONT></B>
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>setoutputsize</FONT>(self):
+        <B><FONT color=#a02828>pass</FONT></B>
+        
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>execute</FONT>(self, operation, parameters=None):
+        self.rowcount=0
+        self.cur_row = 0
+        CSQLRelay.prepareQuery(self.cursor,operation)
+        <B><FONT color=#a02828>if</FONT></B> parameters <B><FONT color=#a02828>is</FONT></B> <B><FONT color=#a02828>not</FONT></B> None:
+                <B><FONT color=#a02828>for</FONT></B> i <B><FONT color=#a02828>in</FONT></B> parameters.keys():
+                        precision=0
+                        scale=0
+                        <B><FONT color=#a02828>if</FONT></B> type(parameters.keys())==type(1.1):
+                                precision=len(str(parameters.keys()))-1
+                                scale=precision-len(str(int(parameters.keys())))-1
+                        CSQLRelay.inputBind(self.cursor,i,parameters[i],precision,scale)
+        CSQLRelay.executeQuery(self.cursor)
+        the_error = CSQLRelay.errorMessage(self.cursor)
+        <B><FONT color=#a02828>if</FONT></B> the_error:
+            <B><FONT color=#a02828>raise</FONT></B> DatabaseError, '<FONT color=#f800f8>&lt;pre&gt;%s&lt;/pre&gt;</FONT>' % the_error
+        self.__set_description()
+        self.rowcount=CSQLRelay.totalRows(self.cursor)
+        <B><FONT color=#a02828>if</FONT></B> CSQLRelay.affectedRows(self.cursor)&gt;0:
+                self.rowcount=CSQLRelay.affectedRows(self.cursor)
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>executemany</FONT>(self, operation, parameters=None):
+        <B><FONT color=#a02828>if</FONT></B> parameters <B><FONT color=#a02828>is</FONT></B> None:
+                self.execute(operation)
+        <B><FONT color=#a02828>else</FONT></B>:
+                self.rowcount=0
+                self.cur_row = 0
+                CSQLRelay.prepareQuery(self.cursor,operation)
+                <B><FONT color=#a02828>for</FONT></B> p <B><FONT color=#a02828>in</FONT></B> parameters:
+                        CSQLRelay.clearBinds(self.cursor)
+                        <B><FONT color=#a02828>if</FONT></B> p <B><FONT color=#a02828>is</FONT></B> <B><FONT color=#a02828>not</FONT></B> None:
+                                <B><FONT color=#a02828>for</FONT></B> i <B><FONT color=#a02828>in</FONT></B> p.keys():
+                                        precision=0
+                                        scale=0
+                                        <B><FONT color=#a02828>if</FONT></B> type(p.keys())==type(1.1):
+                                                precision=len(str(p.keys()))-1
+                                                scale=precision-len(str(int(p.keys())))-1
+                                        CSQLRelay.inputBind(self.cursor,i,p[i],precision,scale)
+                        CSQLRelay.executeQuery(self.cursor)
+                        the_error = CSQLRelay.errorMessage(self.cursor)
+                        <B><FONT color=#a02828>if</FONT></B> the_error:
+                                <B><FONT color=#a02828>raise</FONT></B> DatabaseError, '<FONT color=#f800f8>&lt;pre&gt;%s&lt;/pre&gt;</FONT>' % the_error
+                        self.__set_description()
+                        self.rowcount=CSQLRelay.totalRows(self.cursor)
+                        <B><FONT color=#a02828>if</FONT></B> CSQLRelay.affectedRows(self.cursor)&gt;0:
+                                self.rowcount=CSQLRelay.affectedRows(self.cursor)
+        
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>callproc</FONT>(self, procname, parameters=None):
+        self.execute(procname,parameters)
+        
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>fetchone</FONT>(self):
+        row = CSQLRelay.getRow(self.cursor,self.cur_row)
+        self.cur_row = self.cur_row + 1
+        <B><FONT color=#a02828>return</FONT></B> row
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>fetchmany</FONT>(self, size=None):
+        <B><FONT color=#a02828>if</FONT></B> <B><FONT color=#a02828>not</FONT></B> size:
+            size = self.arraysize
+        num_rows = CSQLRelay.rowCount(self.cursor)
+        <B><FONT color=#a02828>if</FONT></B> size &gt;= num_rows:
+            size = num_rows-1
+        rc = CSQLRelay.getRowRange(self.cursor, self.cur_row, size)
+        self.cur_row = size
+        <B><FONT color=#a02828>return</FONT></B> rc
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>fetchall</FONT>(self):
+        rc = []
+        num_rows = CSQLRelay.rowCount(self.cursor)
+        <B><FONT color=#a02828>for</FONT></B> row <B><FONT color=#a02828>in</FONT></B> range(self.cur_row, num_rows):
+            row = CSQLRelay.getRow(self.cursor,self.cur_row)
+            self.cur_row = self.cur_row + 1
+            rc.append(row)
+        <B><FONT color=#a02828>return</FONT></B> rc
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>close</FONT>(self):
+        CSQLRelay.sqlrcur_free(self.cursor)
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>__set_description</FONT>(self):
+        desc = []
+        col_c = CSQLRelay.colCount(self.cursor)
+        <B><FONT color=#a02828>if</FONT></B> <B><FONT color=#a02828>not</FONT></B> col_c:
+            self.description = []
+            <B><FONT color=#a02828>return</FONT></B> None
+        <B><FONT color=#a02828>for</FONT></B> field <B><FONT color=#a02828>in</FONT></B> range(col_c):
+            row = []
+            row.append(CSQLRelay.getColumnName(self.cursor,field),)
+            row.append(CSQLRelay.getColumnType(self.cursor,field),)
+            row.append(CSQLRelay.getColumnLength(self.cursor,field))
+            desc.append(tuple(row))
+        self.description = tuple(desc)
+        <B><FONT color=#a02828>return</FONT></B> tuple(desc)
+</PRE>
+</BODY>
+</HTML>

@@ -1,0 +1,19 @@
+# Generated automatically from Makefile.PL.in by configure.
+use ExtUtils::MakeMaker;
+require Config;
+$Verbose = 1;
+
+WriteMakefile(
+	'NAME'		=> "Firstworks::SQLRConnection",
+	'VERSION_FROM'	=> "SQLRConnection.pm",
+	'CC'		=> "@CXX@",
+	'CCFLAGS'	=> "-pedantic -w -O2 -fPIC",
+	'INC'		=> "-I../../../.. -I../../../common -I../../c++/include @RUDIMENTSINCLUDES@",
+	'LIBS'		=> ["-L../../c++/src/.libs -lsqlrclient @RUDIMENTSLIBS@ @SOCKETLIB@ @LIBSTDCPP@"],
+	'XSPROTOARG'	=> "-noprototypes",
+	'LD'		=> "@PERLLD@",
+	'LDDLFLAGS'	=> "@PERLLDFLAGS@",
+	'OBJECT'	=> '$(O_FILES)',
+	'TYPEMAPS'	=> ["perlobject.map"],
+	'realclean'	=> {'FILES' => 'perl'},
+);

@@ -1,0 +1,369 @@
+<HTML>
+<HEAD>
+<TITLE>/usr/local/src/sqlrelay-0.25/doc/api/ruby/ruby.html</TITLE>
+</HEAD>
+<BODY BGcolor=#FFFFFF TEXT=#000000>
+<PRE>
+<FONT color=#0000f8># Copyright (c) 2001 David Muse</FONT>
+<FONT color=#0000f8># See the file COPYING for more information</FONT>
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>SQLRConnection</FONT>
+
+<FONT color=#f800f8>    A wrapper for the sqlrelay connection API.  Closely follows the C++ API.</FONT>
+
+    <FONT color=#008888>new</FONT>(host, port, socket, user, password, retrytime, tries)
+<FONT color=#f800f8>        Opens a connection to the sqlrelay server and authenticates with</FONT>
+<FONT color=#f800f8>        user and password.  Failed connections are retried for tries times</FONT>
+<FONT color=#f800f8>        at retrytime interval.  </FONT>
+        
+    <FONT color=#008888>endSession</FONT>()
+<FONT color=#f800f8>        Ends the current session.</FONT>
+
+    <FONT color=#008888>suspendSession</FONT>()
+<FONT color=#f800f8>        Disconnects this connection from the current</FONT>
+<FONT color=#f800f8>        session but leaves the session open so </FONT>
+<FONT color=#f800f8>        that another connection can connect to it </FONT>
+<FONT color=#f800f8>        using resumeSession().</FONT>
+
+    <FONT color=#008888>getConnectionPort</FONT>()
+<FONT color=#f800f8>        Returns the inet port that the connection is </FONT>
+<FONT color=#f800f8>        communicating over. This parameter may be </FONT>
+<FONT color=#f800f8>        passed to another connection for use in</FONT>
+<FONT color=#f800f8>        the resumeSession() method.</FONT>
+
+    <FONT color=#008888>getConnectionSocket</FONT>()
+<FONT color=#f800f8>        Returns the unix socket that the connection is </FONT>
+<FONT color=#f800f8>        communicating over. This parameter may be </FONT>
+<FONT color=#f800f8>        passed to another connection for use in</FONT>
+<FONT color=#f800f8>        the resumeSession() method.</FONT>
+
+    <FONT color=#008888>resumeSession</FONT>(port, socket)
+<FONT color=#f800f8>        Resumes a session previously left open </FONT>
+<FONT color=#f800f8>        using suspendSession().</FONT>
+<FONT color=#f800f8>        Returns 1 on success and 0 on failure.</FONT>
+
+    <FONT color=#008888>ping</FONT>()
+<FONT color=#f800f8>        Returns 1 if the database is up and 0</FONT>
+<FONT color=#f800f8>        if it's down.</FONT>
+
+    <FONT color=#008888>identify</FONT>()
+<FONT color=#f800f8>        Returns the type of database </FONT>
+<FONT color=#f800f8>          oracle7, oracle8, postgresql, mysql, etc.</FONT>
+
+    <FONT color=#008888>autoCommitOn</FONT>()
+<FONT color=#f800f8>        Instructs the database to perform a commit</FONT>
+<FONT color=#f800f8>        after every successful query.  Returns a 1</FONT>
+<FONT color=#f800f8>        on success, 0 on failure and -1 if an error</FONT>
+<FONT color=#f800f8>        occurred. </FONT>
+
+    <FONT color=#008888>autoCommitOff</FONT>()
+<FONT color=#f800f8>        Instructs the database to wait for the client</FONT>
+<FONT color=#f800f8>        to tell it when to commit.  Returns a 1 on</FONT>
+<FONT color=#f800f8>        success, 0 on failure and -1 if an error</FONT>
+<FONT color=#f800f8>        occurred. </FONT>
+
+    <FONT color=#008888>commit</FONT>()
+<FONT color=#f800f8>        Issues a commit.  Returns a 1 if the commit </FONT>
+<FONT color=#f800f8>        succeeded, 0 if it failed and -1 if an </FONT>
+<FONT color=#f800f8>        error occurred. </FONT>
+
+    <FONT color=#008888>rollback</FONT>()
+<FONT color=#f800f8>        Issues a rollback.  Returns a 1 if the rollback </FONT>
+<FONT color=#f800f8>        succeeded, 0 if it failed and -1 if an </FONT>
+<FONT color=#f800f8>        error occurred. </FONT>
+
+    <FONT color=#008888>debugOn</FONT>()
+<FONT color=#f800f8>        Turn verbose debugging on.</FONT>
+
+    <FONT color=#008888>debugOff</FONT>()
+<FONT color=#f800f8>        Turn verbose debugging off.</FONT>
+
+    <FONT color=#008888>getDebug</FONT>()
+<FONT color=#f800f8>        Returns 1 if debugging is turned on and 0 if debugging is turned off.</FONT>
+
+
+
+
+
+<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>SQLRCursor</FONT>
+
+
+<FONT color=#f800f8>    A wrapper for the sqlrelay cursor API.  Closely follows the C++ API.</FONT>
+
+    <FONT color=#008888>new</FONT>(sqlrcon)
+
+    <FONT color=#008888>setResultSetBufferSize</FONT>(rows)
+<FONT color=#f800f8>        Sets the number of rows of the result set</FONT>
+<FONT color=#f800f8>        to buffer at a time.  0 (the default)</FONT>
+<FONT color=#f800f8>        means buffer the entire result set.</FONT>
+
+    <FONT color=#008888>getResultSetBufferSize</FONT>()
+<FONT color=#f800f8>        Returns the number of result set rows that </FONT>
+<FONT color=#f800f8>        will be buffered at a time or 0 for the</FONT>
+<FONT color=#f800f8>        entire result set.</FONT>
+
+    <FONT color=#008888>dontGetColumnInfo</FONT>()
+<FONT color=#f800f8>        Tells the server not to send any column</FONT>
+<FONT color=#f800f8>        info (names, types, sizes).  If you don't</FONT>
+<FONT color=#f800f8>        need that info, you should call this</FONT>
+<FONT color=#f800f8>        method to improve performance.</FONT>
+
+    <FONT color=#008888>getColumnInfo</FONT>()
+<FONT color=#f800f8>        Tells the server to send column info.</FONT>
+
+    <FONT color=#008888>mixedCaseColumnNames</FONT>()
+<FONT color=#f800f8>        Columns names are returned in the same</FONT>
+<FONT color=#f800f8>        case as they are defined in the database.</FONT>
+<FONT color=#f800f8>        This is the default.</FONT>
+
+    <FONT color=#008888>upperCaseColumnNames</FONT>()
+<FONT color=#f800f8>        Columns names are converted to upper case.</FONT>
+
+    <FONT color=#008888>lowerCaseColumnNames</FONT>()
+<FONT color=#f800f8>        Columns names are converted to lower case.</FONT>
+
+    <FONT color=#008888>cacheToFile</FONT>(filename)
+<FONT color=#f800f8>        Sets query caching on.  Future queries</FONT>
+<FONT color=#f800f8>        The full pathname of the file can be</FONT>
+<FONT color=#f800f8>        retrieved using getCacheFileName().</FONT>
+<FONT color=#f800f8>        </FONT>
+<FONT color=#f800f8>        A default time-to-live of 10 minutes is</FONT>
+<FONT color=#f800f8>        also set.</FONT>
+<FONT color=#f800f8>        </FONT>
+<FONT color=#f800f8>        Note that once cacheToFile() is called,</FONT>
+<FONT color=#f800f8>        the result sets of all future queries will</FONT>
+<FONT color=#f800f8>        be cached to that file until another call </FONT>
+<FONT color=#f800f8>        to cacheToFile() changes which file to</FONT>
+<FONT color=#f800f8>        cache to or a call to cacheOff() turns off</FONT>
+<FONT color=#f800f8>        caching.</FONT>
+
+    <FONT color=#008888>setCacheTtl</FONT>(ttl)
+<FONT color=#f800f8>        Sets the time-to-live for cached result</FONT>
+<FONT color=#f800f8>        sets. The sqlr-cachemanger will remove each </FONT>
+<FONT color=#f800f8>        cached result set &quot;ttl&quot; seconds after it's </FONT>
+<FONT color=#f800f8>        created.</FONT>
+
+    <FONT color=#008888>getCacheFileName</FONT>()
+<FONT color=#f800f8>        Returns the name of the file containing the most</FONT>
+<FONT color=#f800f8>        recently cached result set.</FONT>
+
+    <FONT color=#008888>cacheOff</FONT>()
+<FONT color=#f800f8>        Sets query caching off.</FONT>
+
+
+<FONT color=#f800f8>    If you don't need to use substitution or bind variables</FONT>
+<FONT color=#f800f8>    in your queries, use these two methods.</FONT>
+    <FONT color=#008888>sendQuery</FONT>(query)
+<FONT color=#f800f8>        Send a SQL query to the server and</FONT>
+<FONT color=#f800f8>        gets a result set.</FONT>
+
+    <FONT color=#008888>sendQueryWithLength</FONT>(query)
+<FONT color=#f800f8>        Sends "query" with length "length" and gets</FONT>
+<FONT color=#f800f8>        a result set. This method must be used if</FONT>
+<FONT color=#f800f8>        the query contains binary data.</FONT>
+
+    <FONT color=#008888>sendFileQuery</FONT>(path, file)
+<FONT color=#f800f8>        Send the SQL query in path/file to the server and</FONT>
+<FONT color=#f800f8>        gets a result set.</FONT>
+
+<FONT color=#f800f8>    If you need to use substitution or bind variables, in your</FONT>
+<FONT color=#f800f8>    queries use the following methods.  See the API documentation</FONT>
+<FONT color=#f800f8>    for more information about substitution and bind variables.</FONT>
+    <FONT color=#008888>prepareQuery</FONT>(query)
+<FONT color=#f800f8>        Prepare to execute query.</FONT>
+
+    <FONT color=#008888>prepareQueryWithLength</FONT>(query, length)
+<FONT color=#f800f8>        Prepare to execute "query" with length</FONT>
+<FONT color=#f800f8>        "length".  This method must be used if the</FONT>
+<FONT color=#f800f8>        query contains binary data.</FONT>
+
+    <FONT color=#008888>prepareFileQuery</FONT>(path, file)
+<FONT color=#f800f8>        Prepare to execute the contents of path/filename.</FONT>
+
+    <FONT color=#008888>substitute</FONT>(variable, value, [precision, scale])
+<FONT color=#f800f8>        Define a substitution variable.</FONT>
+<FONT color=#f800f8>        Precision and scale are only</FONT>
+<FONT color=#f800f8>        necessary for floating point</FONT>
+<FONT color=#f800f8>        values.</FONT>
+
+    <FONT color=#008888>inputBind</FONT>(variable, value, [precision, scale])
+<FONT color=#f800f8>        Define an input bind varaible.</FONT>
+<FONT color=#f800f8>        Precision and scale are only</FONT>
+<FONT color=#f800f8>        necessary for floating point</FONT>
+<FONT color=#f800f8>        values.</FONT>
+
+    <FONT color=#008888>defineOutputBind</FONT>(variable, length)
+<FONT color=#f800f8>        Define an output bind varaible.</FONT>
+    <FONT color=#008888>defineOutputBindBlob</FONT>(variable, length)
+<FONT color=#f800f8>        Define an output bind varaible.</FONT>
+    <FONT color=#008888>defineOutputBindClob</FONT>(variable, length)
+<FONT color=#f800f8>        Define an output bind varaible.</FONT>
+    <FONT color=#008888>defineOutputBindCursor</FONT>(variable, length)
+<FONT color=#f800f8>        Define an output bind varaible.</FONT>
+
+
+<FONT color=#f800f8>    These functions take arrays for parameters</FONT>
+    <FONT color=#008888>substitutions</FONT>(variables, values, [precisions, scales])
+<FONT color=#f800f8>        Define substitution variables.</FONT>
+<FONT color=#f800f8>        Precisions and scales are only</FONT>
+<FONT color=#f800f8>        necessary for floating point</FONT>
+<FONT color=#f800f8>        values.</FONT>
+
+    <FONT color=#008888>inputBinds</FONT>(variables, values, [precisions, scales])
+<FONT color=#f800f8>        Define input bind variables.</FONT>
+<FONT color=#f800f8>        Precisions and scales are only</FONT>
+<FONT color=#f800f8>        necessary for floating point</FONT>
+<FONT color=#f800f8>        values.</FONT>
+        
+
+    <FONT color=#008888>validateBinds</FONT>()
+<FONT color=#f800f8>        If you are binding to any variables that </FONT>
+<FONT color=#f800f8>        might not actually be in your query, call </FONT>
+<FONT color=#f800f8>        this to ensure that the database won't try </FONT>
+<FONT color=#f800f8>        to bind them unless they really are in the </FONT>
+<FONT color=#f800f8>        query.</FONT>
+
+    <FONT color=#008888>executeQuery</FONT>()
+<FONT color=#f800f8>        Execute the query that was previously</FONT>
+<FONT color=#f800f8>        prepared and bound.</FONT>
+
+    <FONT color=#008888>fetchFromBindCursor</FONT>()
+<FONT color=#f800f8>        Fetch from a cursor that was returned as</FONT>
+<FONT color=#f800f8>        an output bind variable.</FONT>
+
+    <FONT color=#008888>getOutputBind</FONT>(variable)
+<FONT color=#f800f8>        Retrieve the value of an output bind variable.</FONT>
+
+    <FONT color=#008888>getOutputBindLength</FONT>(variable)
+<FONT color=#f800f8>        Get the length of the value stored in a</FONT>
+<FONT color=#f800f8>        previously defined output bind variable.</FONT>
+
+    <FONT color=#008888>getOutputBindCursor</FONT>(variable)
+<FONT color=#f800f8>        Get the cursor associated with a previously</FONT>
+<FONT color=#f800f8>        defined output bind variable.</FONT>
+
+
+    <FONT color=#008888>openCachedResultSet</FONT>(filename)
+<FONT color=#f800f8>        Open a result set after a sendCachedQeury</FONT>
+
+    <FONT color=#008888>colCount</FONT>()
+<FONT color=#f800f8>        Returns the number of columns in the current result set.</FONT>
+
+    <FONT color=#008888>rowCount</FONT>()
+<FONT color=#f800f8>        Returns the number of rows in the current result set.</FONT>
+
+    <FONT color=#008888>totalRows</FONT>()
+<FONT color=#f800f8>        Returns the total number of rows that will </FONT>
+<FONT color=#f800f8>        be returned in the result set.  Not all </FONT>
+<FONT color=#f800f8>        databases support this call.  Don't use it </FONT>
+<FONT color=#f800f8>        for applications which are designed to be </FONT>
+<FONT color=#f800f8>        portable across databases.  -1 is returned</FONT>
+<FONT color=#f800f8>        by databases which don't support this option.</FONT>
+
+    <FONT color=#008888>affectedRows</FONT>()
+<FONT color=#f800f8>        Returns the number of rows that were </FONT>
+<FONT color=#f800f8>        updated, inserted or deleted by the query.</FONT>
+<FONT color=#f800f8>        Not all databases support this call.  Don't </FONT>
+<FONT color=#f800f8>        use it for applications which are designed </FONT>
+<FONT color=#f800f8>        to be portable across databases.  -1 is </FONT>
+<FONT color=#f800f8>        returned by databases which don't support </FONT>
+<FONT color=#f800f8>        this option.</FONT>
+
+    <FONT color=#008888>firstRowIndex</FONT>()
+<FONT color=#f800f8>        Returns the index of the first buffered row.</FONT>
+<FONT color=#f800f8>        This is useful when buffering only part of</FONT>
+<FONT color=#f800f8>        the result set at a time.</FONT>
+
+    <FONT color=#008888>endOfResultSet</FONT>()
+<FONT color=#f800f8>        Returns 0 if part of the result set is still</FONT>
+<FONT color=#f800f8>        pending on the server and 1 if not.  This</FONT>
+<FONT color=#f800f8>        method can only return 0 if </FONT>
+<FONT color=#f800f8>        setResultSetBufferSize() has been called</FONT>
+<FONT color=#f800f8>        with a parameter other than 0.</FONT>
+
+    <FONT color=#008888>errorMessage</FONT>()
+<FONT color=#f800f8>        If the query failed, the error message will be returned</FONT>
+<FONT color=#f800f8>        from this method.  Otherwise, it returns None.</FONT>
+
+    <FONT color=#008888>getNullsAsEmptyStrings</FONT>()
+<FONT color=#f800f8>        Tells the cursor to return NULL fields and output</FONT>
+<FONT color=#f800f8>        bind variables as empty strings.</FONT>
+<FONT color=#f800f8>        This is the default.</FONT>
+
+    <FONT color=#008888>getNullsAsNone</FONT>()
+<FONT color=#f800f8>        Tells the cursor to return NULL fields and output</FONT>
+<FONT color=#f800f8>        bind variables as NULL's.</FONT>
+
+    <FONT color=#008888>getField</FONT>(row, col)
+<FONT color=#f800f8>        Returns the value of the specified row and</FONT>
+<FONT color=#f800f8>        column.  col may be a column name or number.</FONT>
+
+    <FONT color=#008888>getFieldLength</FONT>(row, col)
+<FONT color=#f800f8>        Returns the length of the specified row and</FONT>
+<FONT color=#f800f8>        column.  col may be a column name or number.</FONT>
+
+    <FONT color=#008888>getRow</FONT>(row)
+<FONT color=#f800f8>        Returns a list of values in the given row.</FONT>
+
+    <FONT color=#008888>getRowHash</FONT>(row)
+<FONT color=#f800f8>        Returns the requested row as values in a dictionary</FONT>
+<FONT color=#f800f8>        with column names for keys.</FONT>
+
+    <FONT color=#008888>getRowRange</FONT>(beg, end)
+<FONT color=#f800f8>        Returns a list of lists of the rows between beg and end.</FONT>
+<FONT color=#f800f8>        Note this function has no equivalent in other SQL Relay API's.</FONT>
+
+    <FONT color=#008888>getRowLengths</FONT>(row)
+<FONT color=#f800f8>        Returns a list of lengths in the given row.</FONT>
+
+    <FONT color=#008888>getRowLengthsHash</FONT>(row)
+<FONT color=#f800f8>        Returns the requested row lengths as values in a dictionary</FONT>
+<FONT color=#f800f8>        with column names for keys.</FONT>
+
+    <FONT color=#008888>getRowLengthsRange</FONT>(beg, end)
+<FONT color=#f800f8>        Returns a list of lists of the lengths of rows between beg and end.</FONT>
+<FONT color=#f800f8>        Note this function has no equivalent in other SQL Relay API's.</FONT>
+
+    <FONT color=#008888>getColumnName</FONT>(col)
+<FONT color=#f800f8>        Returns the name of column number col.</FONT>
+
+    <FONT color=#008888>getColumnNames</FONT>()
+<FONT color=#f800f8>        Returns a list of column names in the current result set.</FONT>
+
+    <FONT color=#008888>getColumnType</FONT>(col)
+<FONT color=#f800f8>        Returns the type of the specified column.  col may</FONT>
+<FONT color=#f800f8>        be a name or number.</FONT>
+
+    <FONT color=#008888>getColumnLength</FONT>(col)
+<FONT color=#f800f8>        Returns the length of the specified column.  col may</FONT>
+<FONT color=#f800f8>        be a name or number.</FONT>
+
+    <FONT color=#008888>getLongest</FONT>(col)
+<FONT color=#f800f8>        Returns the length of the specified column.  col may</FONT>
+<FONT color=#f800f8>        be a name or number.</FONT>
+
+    <FONT color=#008888>getResultSetId</FONT>()
+<FONT color=#f800f8>        Returns the internal ID of this result set.</FONT>
+<FONT color=#f800f8>        This parameter may be passed to another </FONT>
+<FONT color=#f800f8>        cursor for use in the resumeResultSet() </FONT>
+<FONT color=#f800f8>        method.</FONT>
+
+    <FONT color=#008888>suspendResultSet</FONT>()
+<FONT color=#f800f8>        Tells the server to leave this result</FONT>
+<FONT color=#f800f8>        set open when the cursor calls </FONT>
+<FONT color=#f800f8>        suspendSession() so that another cursor can </FONT>
+<FONT color=#f800f8>        connect to it using resumeResultSet() after </FONT>
+<FONT color=#f800f8>        it calls resumeSession().</FONT>
+
+    <FONT color=#008888>resumeResultSet</FONT>(id)
+<FONT color=#f800f8>        Resumes a result set previously left open </FONT>
+<FONT color=#f800f8>        using suspendSession().</FONT>
+<FONT color=#f800f8>        Returns 1 on success and 0 on failure.</FONT>
+
+    <FONT color=#008888>resumeCachedResultSet</FONT>(id, filename)
+<FONT color=#f800f8>        Resumes a result set previously left open</FONT>
+<FONT color=#f800f8>        using suspendSession() and continues caching</FONT>
+<FONT color=#f800f8>        Returns 1 on success and 0 on failure.</FONT>
+</PRE>
+</BODY>
+</HTML>

@@ -1,0 +1,12 @@
+%package db2
+Summary: SQL Relay connection daemon for IBM DB2.
+Requires: sqlrelay = %{ver}
+Group: Database/Daemons
+
+%description db2
+SQL Relay connection daemon for IBM DB2.
+
+%files db2
+%defattr(-,root,root)
+%{bindir}/sqlr-connection-db2
+%{bindir}/sqlr-connection-db2-debug

@@ -1,0 +1,13 @@
+This is PHP module which supports SQL-relay library
+
+After building module you can use it by adding module in PHP script:
+
+<?
+..
+dl("sql_relay.so");
+
+and now you can call SQL-relay functions. They are similar to C ones.
+
+Module was originally written with PHP-4.0.0
+
+Adam Kropielnicki <adasz@wp.pl>

@@ -1,0 +1,2300 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(src/connection/sqlrconnection.C)
+
+
+
+dnl Compile time options.
+AC_ARG_ENABLE(static,
+	[  --enable-static               Enable static linking],
+	STATICLINK="-static",
+	STATICLINK="")
+AC_ARG_WITH(rudiments-prefix,
+	[  --with-rudiments-prefix       Location of rudiments],
+	RUDIMENTSPATH=$withval,
+	RUDIMENTSPATH="")
+AC_ARG_WITH(libstdcpp-path,
+	[  --with-libstdcpp-path         Location of libstdc++],
+	STDCPPPATH=$withval,
+	STDCPPPATH="/lib /usr/lib /usr/local/lib")
+AC_ARG_WITH(libgdbm-prefix,
+	[  --with-libgdbm-prefix         Location of libgdbm],
+	GDBMPATH=$withval,
+	GDBMPATH="")
+AC_ARG_WITH(oracle-home,
+	[  --with-oracle-home            Location of Oracle],
+	ORACLE_HOME=$withval)
+AC_ARG_WITH(mysql-prefix,
+	[  --with-mysql-prefix           Location of MySQL],
+	MYSQLPATH=$withval,
+	MYSQLPATH="")
+AC_ARG_WITH(msql-prefix,
+	[  --with-msql-prefix            Location of mSQL],
+	MSQLPATH=$withval,
+	MSQLPATH="")
+AC_ARG_WITH(postgresql-prefix,
+	[  --with-postgresql-prefix      Location of PostgreSQL],
+	POSTGRESQLPATH=$withval,
+	POSTGRESQLPATH="")
+AC_ARG_WITH(sqlite-prefix,
+	[  --with-sqlite-prefix          Location of SQLite],
+	SQLITEPATH=$withval,
+	SQLITEPATH="")
+AC_ARG_WITH(lago-prefix,
+	[  --with-lago-prefix            Location of Lago],
+	LAGOPATH=$withval,
+	LAGOPATH="")
+AC_ARG_WITH(freetds-prefix,
+	[  --with-freetds-prefix         Location of FreeTDS],
+	FREETDSPATH=$withval,
+	FREETDSPATH="")
+AC_ARG_WITH(sybase-prefix,
+	[  --with-sybase-prefix          Location of Sybase],
+	SYBASEPATH=$withval,
+	SYBASEPATH="")
+AC_ARG_WITH(odbc-prefix,
+	[  --with-odbc-prefix            Location of ODBC],
+	ODBCPATH=$withval,
+	ODBCPATH="")
+AC_ARG_WITH(db2-prefix,
+	[  --with-db2-prefix             Location of DB2],
+	DB2PATH=$withval,
+	DB2PATH="")
+AC_ARG_WITH(interbase-prefix,
+	[  --with-interbase-prefix       Location of Interbase],
+	INTERBASEPATH=$withval,
+	INTERBASEPATH="")
+AC_ARG_WITH(perl-prefix,
+	[  --with-perl-prefix            Location of Perl],
+	PERLPATH=$withval,
+	PERLPATH="")
+AC_ARG_WITH(python-prefix,
+	[  --with-python-prefix          Location of Python],
+	PYTHONPATH=$withval,
+	PYTHONPATH="")
+AC_ARG_WITH(zope-prefix,
+	[  --with-zope-prefix            Location of Zope],
+	ZOPEPATH=$withval,
+	ZOPEPATH="")
+AC_ARG_WITH(ruby-prefix,
+	[  --with-ruby-prefix            Location of Ruby],
+	RUBYPATH=$withval,
+	RUBYPATH="")
+AC_ARG_WITH(java-prefix,
+	[  --with-java-prefix            Location of Java],
+	JAVAPATH=$withval,
+	JAVAPATH="")
+AC_ARG_WITH(php-prefix,
+	[  --with-php-prefix             Location of PHP],
+	PHPPATH=$withval,
+	PHPPATH="")
+AC_ARG_WITH(gtk-prefix,
+	[  --with-gtk-prefix             Location of GTK+],
+	GTKPATH=$withval,
+	GTKPATH="")
+AC_ARG_WITH(ptheads-prefix,
+	[  --with-ptheads-prefix         Location of Pthreads],
+	PTHREADSPATH=$withval,
+	PTHREADSPATH="")
+AC_ARG_WITH(system-libtool,
+	[  --with-system-libtool   use system libtool instead of ./libtool],
+	USE_SYSTEM_LIBTOOL=$withval,
+	USE_SYSTEM_LIBTOOL="no")
+
+
+dnl Rewrite supplied paths.
+PWD=`pwd`
+if ( test -n "$RUDIMENTSPATH"  -a "`echo $RUDIMENTSPATH | cut -c-3`" = "../" ); then
+	RUDIMENTSPATH="$PWD/$RUDIMENTSPATH"
+fi
+if ( test -n "$STDCPPPATH" -a "`echo $STDCPPPATH | cut -c-3`" = "../" ); then
+	STDCPPPATH="$PWD/$STDCPPPATH"
+fi
+if ( test -n "$GDBMPATH" -a "`echo $GDBMPATH | cut -c-3`" = "../" ); then
+	GDBMPATH="$PWD/$GDBMPATH"
+fi
+if ( test -n "$MYSQLPATH" -a "`echo $MYSQLPATH | cut -c-3`" = "../" ); then
+	MYSQLPATH="$PWD/$MYSQLPATH"
+fi
+if ( test -n "$MSQLPATH" -a "`echo $MSQLPATH | cut -c-3`" = "../" ); then
+	MSQLPATH="$PWD/$MSQLPATH"
+fi
+if ( test -n "$POSTGRESQLPATH" -a "`echo $POSTGRESQLPATH | cut -c-3`" = "../" ); then
+	POSTGRESQLPATH="$PWD/$POSTGRESQLPATH"
+fi
+if ( test -n "$SQLITEPATH" -a "`echo $SQLITEPATH | cut -c-3`" = "../" ); then
+	SQLITEPATH="$PWD/$SQLITEPATH"
+fi
+if ( test -n "$LAGOPATH" -a "`echo $LAGOPATH | cut -c-3`" = "../" ); then
+	LAGOPATH="$PWD/$LAGOPATH"
+fi
+if ( test -n "$FREETDSPATH" -a "`echo $FREETDSPATH | cut -c-3`" = "../" ); then
+	FREETDSPATH="$PWD/$FREETDSPATH"
+fi
+if ( test -n "$SYBASEPATH" -a "`echo $SYBASEPATH | cut -c-3`" = "../" ); then
+	SYBASEPATH="$PWD/$SYBASEPATH"
+fi
+if ( test -n "$ODBCPATH" -a "`echo $ODBCPATH | cut -c-3`" = "../" ); then
+	ODBCPATH="$PWD/$ODBCPATH"
+fi
+if ( test -n "$DB2PATH" -a "`echo $DB2PATH | cut -c-3`" = "../" ); then
+	DB2PATH="$PWD/$DB2PATH"
+fi
+if ( test -n "$INTERBASEPATH" -a "`echo $INTERBASEPATH | cut -c-3`" = "../" ); then
+	INTERBASEPATH="$PWD/$INTERBASEPATH"
+fi
+if ( test -n "$PERLPATH" -a "`echo $PERLPATH | cut -c-3`" = "../" ); then
+	PERLPATH="$PWD/$PERLPATH"
+fi
+if ( test -n "$PYTHONPATH" -a "`echo $PYTHONPATH | cut -c-3`" = "../" ); then
+	PYTHONPATH="$PWD/$PYTHONPATH"
+fi
+if ( test -n "$ZOPEPATH" -a "`echo $ZOPEPATH | cut -c-3`" = "../" ); then
+	ZOPEPATH="$PWD/$ZOPEPATH"
+fi
+if ( test -n "$RUBYPATH" -a "`echo $RUBYPATH | cut -c-3`" = "../" ); then
+	RUBYPATH="$PWD/$RUBYPATH"
+fi
+if ( test -n "$JAVAPATH" -a "`echo $JAVAPATH | cut -c-3`" = "../" ); then
+	JAVAPATH="$PWD/$JAVAPATH"
+fi
+if ( test -n "$PHPPATH" -a "`echo $PHPPATH | cut -c-3`" = "../" ); then
+	PHPPATH="$PWD/$PHPPATH"
+fi
+if ( test -n "$GTKPATH" -a "`echo $GTKPATH | cut -c-3`" = "../" ); then
+	GTKPATH="$PWD/$GTKPATH"
+fi
+if ( test -n "$PTHREADSPATH" -a "`echo $PTHREADSPATH | cut -c-3`" = "../" ); then
+	PTHREADSPATH="$PWD/$PTHREADSPATH"
+fi
+
+
+dnl Checks for programs.
+echo
+echo "***** Programs ***************"
+CC=gcc
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+#AC_LANG(C++)
+
+dnl have to set ar here because libtool (currently) fails
+dnl to use the correct one when cross-compiling
+AC_CHECK_PROG(AR,$host_alias-ar,$host_alias-ar,ar)
+AC_SUBST(AR)
+
+dnl How to create a shared library.
+AC_MSG_CHECKING(whether ld -G works)
+ld -G 2> conftest
+INVALID="`grep invalid conftest`"
+if ( test -n "$INVALID" ); then
+	SHAREDFLAG="-shared"
+	AC_MSG_RESULT(no)
+else
+	SHAREDFLAG="-G"
+	AC_MSG_RESULT(yes)
+fi
+rm conftest
+
+AC_MSG_CHECKING(whether ld -rpath works)
+ld -rpath /usr/lib 2> conftest
+INVALID="`grep 'no input files' conftest`"
+if ( test -n "$INVALID" ); then
+	RPATHFLAG="yes"
+	AC_MSG_RESULT(yes)
+else
+	RPATHFLAG=""
+	AC_MSG_RESULT(no)
+fi
+rm conftest
+
+AC_CHECK_PS
+
+UNAME=`uname -s`
+AC_SUBST(UNAME)
+
+echo "******************************"
+
+
+dnl Checks for libtool.
+echo
+echo "***** Libtool ****************"
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+echo "******************************"
+
+dnl override libtool if so desired
+dnl a bit crude, but AC_PROG_LIBTOOL sets vital
+dnl environment variables, it seems
+if ( test "$USE_SYSTEM_LIBTOOL" = "yes" ); then
+  LIBTOOL="libtool"
+fi
+
+
+dnl Check for microsoft platform.
+echo
+echo "***** Microsoft **************"
+
+AC_MSG_CHECKING(for UWIN environment)
+UNAME=`uname | cut -f1 -d"-"`
+UWIN="no"
+if ( test "$UNAME" = "UWIN" ); then
+	UWIN="yes"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(UWIN)
+
+AC_MINGW32
+AC_SUBST(MINGW32)
+ 
+AC_CYGWIN
+AC_SUBST(CYGWIN)
+
+dnl Hack so "make install" will work on windows.
+MICROSOFT=""
+if ( test "$UWIN" = "yes" -o "$MINGW32" = "yes" -o "$CYGWIN" = "yes" ); then
+	if ( test -r "INSTALL" ); then
+		mv INSTALL INSTALL.txt
+	fi
+	MICROSOFT="yes"
+fi
+echo "******************************"
+
+
+dnl Checks for inline keyword
+echo
+echo "***** Inline Functions *******"
+AC_CHECK_INLINE
+echo "******************************"
+
+
+dnl Checks for libstdc++.
+echo
+echo "***** C++ Libraries **********"
+
+LIBSTDCPPSO=""
+for i in $STDCPPPATH
+do
+	CHECKLIB=$i/libstdc++*.so*
+	for j in `ls $CHECKLIB 2> /dev/null`
+	do
+		if (test -n $j); then
+			LIBSTDCPPSO=-l`echo $j | sed -e "s|$i/lib||" | sed -e "s|\.so.*||"`
+		fi
+	done
+
+	CHECKLIB=$i/libstdc++-2*.so*
+	for j in `ls $CHECKLIB 2> /dev/null`
+	do
+		if (test -n $j); then
+			LIBSTDCPPSO=-l`echo $j | sed -e "s|$i/lib||" | sed -e "s|\.so.*||"`
+		fi
+	done
+
+	CHECKLIB=$i/libstdc++-3*.so*
+	for j in `ls $CHECKLIB 2> /dev/null`
+	do
+		if (test -n $j); then
+			LIBSTDCPPSO=-l`echo $j | sed -e "s|$i/lib||" | sed -e "s|\.so.*||"`
+		fi
+	done
+done
+
+LIBSTDCPPA=`$CXX --print-file-name=libstdc++.a`
+
+AC_MSG_CHECKING(for libstdc++)
+if (test -n "$LIBSTDCPPSO" -o "$LIBSTDCPPA" != "libstdc++.a")
+then
+	if (test -n "$LIBSTDCPPSO"); then
+		AC_MSG_RESULT($LIBSTDCPPSO)
+		LIBSTDCPP="$LIBSTDCPPSO -lc"
+		DYNAMICAR="ld $SHAREDFLAG -o"
+		PERLLD="ld"
+		PERLLDFLAGS="$SHAREDFLAG"
+
+		AC_MSG_CHECKING(for libg++)
+		if (test -r "/usr/lib/libg++.so"); then
+			LIBSTDCPP="$LIBSTDCPP -lg++"
+			AC_MSG_RESULT(yes)
+		else
+			AC_MSG_RESULT(no)
+		fi
+
+		AC_MSG_CHECKING(for libgcc)
+		if (test -r "/usr/lib/libgcc.so"); then
+			LIBSTDCPP="$LIBSTDCPP -lgcc"
+			AC_MSG_RESULT(yes)
+		else
+			AC_MSG_RESULT(no)
+		fi
+	else
+		AC_MSG_RESULT($LIBSTDCPPA)
+		LIBSTDCPP=""
+		DYNAMICAR="$CXX -Wl,$SHAREDFLAG -o"
+		PERLLD="$CXX"
+		PERLLDFLAGS="-Wl,$SHAREDFLAG"
+	fi
+	AC_SUBST(LIBSTDCPP)
+	AC_SUBST(DYNAMICAR)
+	AC_SUBST(PERLLD)
+	AC_SUBST(PERLLDFLAGS)
+else
+	AC_MSG_RESULT(no)
+	AC_MSG_ERROR("libstdc++ not found.  SQL-Relay requires this library.")
+fi
+echo "******************************"
+
+
+dnl Checks for thread library.
+echo
+echo "***** threads ****************"
+PTHREADSLIB=""
+PTHREADSLIBPATH=""
+
+for i in "pthread" "pth" "c_r"
+do
+	if ( test -n "$PTHREADSPATH" ); then
+		AC_CHECK_FILE($PTHREADSPATH/lib/lib$i.a, PTHREADSLIB="-L$PTHREADSPATH/lib -l$i")
+		AC_CHECK_FILE($PTHREADSPATH/lib/lib$i.so, PTHREADSLIBPATH="$PTHREADSPATH/lib"; PTHREADSLIB="-L$PTHREADSPATH/lib -l$i")
+	else
+		for j in "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/pthread" "/usr/local/lib/pthreads" "/usr/local/lib/pth" "/usr/local/pthread/lib" "/usr/local/pthreads/lib" "/opt/sfw/lib"
+		do
+			AC_CHECK_FILE($j/lib$i.a,PTHREADSLIB="-L$j -l$i")
+			AC_CHECK_FILE($j/lib$i.so,PTHREADSLIBPATH="$j"; PTHREADSLIB="-L$j -l$i")
+			if ( test -n "$PTHREADSLIB" ); then
+				break
+			fi
+		done
+
+		AC_CHECK_FILE(/usr/lib/lib$i.a,PTHREADSLIB="-l$i")
+		AC_CHECK_FILE(/usr/lib/lib$i.so,PTHREADSLIBPATH=""; PTHREADSLIB="-l$i")
+	fi
+	if ( test -n "$PTHREADSLIB" ); then
+		break
+	fi
+done
+
+if ( test -n "$RPATHFLAG" -a -n "$PTHREADSLIBPATH" ); then
+	PTHREADSLIB="-Wl,-rpath $PTHREADSLIBPATH $PTHREADSLIB"
+fi
+AC_SUBST(PTHREADSLIB)
+echo "******************************"
+
+
+dnl Checks for libraries.
+echo
+echo "***** Libraries **************"
+RUDIMENTSLIBS=""
+RUDIMENTSLIBSPATH=""
+RUDIMENTSINCLUDES=""
+if ( test -z "$MICROSOFT" ); then
+	if ( test -n "$RUDIMENTSPATH" ); then
+		AC_CHECK_FILE($RUDIMENTSPATH/lib/librudiments.a, RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments")
+		AC_CHECK_FILE($RUDIMENTSPATH/lib/librudiments.so, RUDIMENTSLIBSPATH="$RUDIMENTSPATH/lib"; RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments")
+		AC_CHECK_FILE($RUDIMENTSPATH/include/rudiments/daemonprocess.h, RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include")
+		AC_CHECK_FILE($RUDIMENTSPATH/include/firstworks/rudiments/daemonprocess.h, RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include/firstworks")
+	else
+		for i in "/usr/local/firstworks" "/usr" "/usr/local" "/usr/pkg" "/opt/sfw"
+		do
+			AC_CHECK_FILE($i/lib/librudiments.a, RUDIMENTSLIBS="-L$i/lib -lrudiments"; RUDIMENTSPATH="$i")
+			AC_CHECK_FILE($i/lib/librudiments.so, RUDIMENTSLIBSPATH="$i/lib"; RUDIMENTSLIBS="-L$i/lib -lrudiments"; RUDIMENTSPATH="$i")
+			AC_CHECK_FILE($i/include/rudiments/daemonprocess.h, RUDIMENTSINCLUDES="-I$i/include"; RUDIMENTSPATH="$i")
+			if ( test -n "$RUDIMENTSLIBS" ); then
+				break;
+			fi
+		done
+	fi
+else
+	if ( test -n "$RUDIMENTSPATH" ); then
+		AC_CHECK_FILE($RUDIMENTSPATH/lib/librudiments.dll, RUDIMENTSLIBS="$RUDIMENTSPATH/lib/librudiments.dll" RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include")
+	else
+		AC_CHECK_FILE(/usr/local/firstworks/lib/librudiments.dll, RUDIMENTSLIBS="/usr/local/firstworks/lib/librudiments.dll" RUDIMENTSINCLUDES="-I/usr/local/firstworks/include")
+	fi
+fi
+
+if ( test -z "$RUDIMENTSINCLUDES" -o -z "$RUDIMENTSLIBS"); then
+	AC_MSG_ERROR("Rudiments not found.  SQL-Relay requires this package.")
+	exit
+fi
+	
+if ( test -n "$RPATHFLAG" -a -n "$RUDIMENTSPATH" ); then
+	RUDIMENTSLIB="-Wl,-rpath $RUDIMENTSPATH $RUDIMENTSLIB"
+fi
+AC_SUBST(RUDIMENTSPATH)
+AC_SUBST(RUDIMENTSINCLUDES)
+AC_SUBST(RUDIMENTSLIBS)
+
+PRELIBS=$LIBS
+LIBS="-lhistory -ltermcap"
+AC_CHECK_LIB(readline,readline,READLINELIB="-lreadline" ,READLINELIB="")
+LIBS=$PRELIBS
+
+PRELIBS=$LIBS
+LIBS="-ltermcap"
+AC_CHECK_LIB(history,add_history,HISTORYLIB="-lhistory" ,HISTROYLIB="")
+LIBS=$PRELIBS
+
+AC_CHECK_LIB(termcap,tgetnum,TERMCAPLIB="-ltermcap" ,TERMCAPLIB="")
+
+if ( test -n "$READLINELIB" -a -n "$HISTORYLIB" -a -n "$TERMCAPLIB" ); then
+	AC_DEFINE_UNQUOTED(HAVE_READLINE,1,Do we have readline)
+	READLINELIB="$READLINELIB $HISTORYLIB $TERMCAPLIB"
+fi
+AC_SUBST(READLINELIB)
+
+AC_CHECK_LIB(socket,socket,SOCKETLIB=-lsocket,SOCKETLIB="")
+AC_SUBST(SOCKETLIB)
+AC_CHECK_LIB(xnet,gethostbyname,XNETLIB=-lxnet,XNETLIB="")
+AC_SUBST(XNETLIB)
+AC_CHECK_LIB(nsl,gethostbyname,NSLLIB=-lnsl,NSLLIB="")
+AC_SUBST(NSLLIB)
+AC_CHECK_LIB(dl,dlopen,DLLIB=-ldl,DLLIB="")
+AC_SUBST(DLLIB)
+AC_CHECK_LIB(aio,aioread,AIOLIB=-laio,AIOLIB="")
+AC_SUBST(AIOLIB)
+AC_CHECK_LIB(ssl,SSL_new,SSLLIB=-lssl,SSLLIB="")
+AC_SUBST(SSLLIB)
+AC_CHECK_LIB(crypto,CRYPTO_add_lock,CRYPTOLIB=-lcrypto,CRYPTOLIB="")
+AC_SUBST(CRYPTOLIB)
+
+echo "******************************"
+
+
+dnl Checks for Oracle.
+echo
+echo "***** Oracle *****************"
+ORACLEVERSION=""
+ORACLEINCLUDES=""
+ORACLELIBS=""
+ORACLELIBSPATH=""
+ORACLESTATIC=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+AC_MSG_CHECKING(for ORACLE_HOME)
+
+if ( test -n "$ORACLE_HOME" ); then
+	AC_MSG_RESULT(yes)
+	AC_CHECK_FILE($ORACLE_HOME/lib/libcore3.a,ORACLEVERSION="7"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl -lm $AIOLIB")
+	AC_CHECK_FILE($ORACLE_HOME/lib/libcore4.a,ORACLEVERSION="8.0"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 -lm $AIOLIB")
+	WTC8=""
+	AC_CHECK_FILE($ORACLE_HOME/lib/libwtc8.so,WTC8="-lwtc8")
+	AC_CHECK_FILE($ORACLE_HOME/lib/libwtc8.a,WTC8="-lwtc8")
+	AC_CHECK_FILE($ORACLE_HOME/lib/libcore8.a,ORACLEVERSION="8.1"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient8 -lcommon8 -lgeneric8 -lclntsh -lcore8 -lnls8 $WTC8 -lm $AIOLIB")
+	AC_CHECK_FILE($ORACLE_HOME/lib/libcore9.a,ORACLEVERSION="9.0"; ORACLELIBSPATH="$ORACLE_HOME/lib"; ORACLELIBS="-L$ORACLE_HOME/lib -lclient9 -lcommon9 -lgeneric9 -lclntsh -lcore9 -lnls9 -lwtc9 -lm $AIOLIB")
+	if ( test -n "$ORACLEVERSION" ); then
+		ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
+		echo "hmmm, looks like Oracle$ORACLEVERSION..."
+	fi
+	AC_CHECK_FILE($ORACLE_HOME/lib/libclntsh.a,ORACLESTATIC="$STATICFLAG")
+else
+	AC_MSG_RESULT(no)
+	AC_MSG_WARN("The ORACLE_HOME environment variable is not set.  Oracle support will not be built.")
+fi
+
+
+OCI_H=""
+if ( test -n "$ORACLELIBS" ); then
+	AC_MSG_CHECKING(if Oracle has oci.h)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
+	LIBS="$ORACLELIBS $SOCKETLIB"
+	if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" ); then
+		LIBS="-Wl,-rpath $ORACLELIBSPATH $LIBS"
+	fi
+	AC_TRY_LINK([#include <oci.h>
+	#include <stdlib.h>],
+	exit(0);, AC_MSG_RESULT(yes); OCI_H="yes", AC_MSG_RESULT(no))
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+fi
+
+
+LINKFAIL=""
+if ( test -n "$ORACLESTATIC" -a -n "$ORACLELIBS" ); then
+	AC_MSG_CHECKING(if Oracle can be statically linked without $DLLIB)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
+	LIBS="$ORACLELIBS $SOCKETLIB"
+	if ( test -n "$OCI_H" ); then
+		AC_TRY_LINK([#include <oci.h>
+		#include <stdlib.h>],
+		olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);, AC_MSG_RESULT(yes), AC_MSG_RESULT(no); LINKFAIL="yes")
+	else
+		AC_TRY_LINK([#include <ociapr.h>
+		#include <stdlib.h>],
+		olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);, AC_MSG_RESULT(yes), AC_MSG_RESULT(no); LINKFAIL="yes")
+	fi
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+		AC_MSG_CHECKING(if Oracle can be statically linked with $DLLIB)
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
+		LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
+		if ( test -n "$OCI_H" ); then
+			AC_TRY_LINK([#include <oci.h>
+			#include <stdlib.h>],
+			olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);, AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL="", AC_MSG_RESULT(no); ORACLESTATIC=""; LINKFAIL="yes")
+		else
+			AC_TRY_LINK([#include <ociapr.h>
+			#include <stdlib.h>],
+			olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);, AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL="", AC_MSG_RESULT(no); ORACLESTATIC=""; LINKFAIL="yes")
+		fi
+		LIBS=""
+		CPPFLAGS="$TEMPCPPFLAGS"
+	fi
+fi
+
+if ( test -z "$ORACLESTATIC" -a -n "$ORACLELIBS" ); then
+	if ( test -n "$RPATHFLAG" -a -n "$ORACLELIBSPATH" ); then
+		ORACLELIBS="-Wl,-rpath $ORACLELIBSPATH $ORACLELIBS"
+	fi
+	AC_MSG_CHECKING(if Oracle can be dynamically linked without $DLLIB)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$ORACLEINCLUDES"
+	LIBS="$ORACLELIBS $SOCKETLIB"
+	if ( test -n "$OCI_H" ); then
+		AC_TRY_LINK([#include <oci.h>
+		#include <stdlib.h>],
+		olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);, AC_MSG_RESULT(yes), AC_MSG_RESULT(no); LINKFAIL="yes")
+	else
+		AC_TRY_LINK([#include <ociapr.h>
+		#include <stdlib.h>],
+		olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);, AC_MSG_RESULT(yes), AC_MSG_RESULT(no); LINKFAIL="yes")
+	fi
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+		AC_MSG_CHECKING(if Oracle can be dynamically linked with $DLLIB)
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$ORACLEINCLUDES"
+		LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
+		if ( test -n "$OCI_H" ); then
+			AC_TRY_LINK([#include <oci.h>
+			#include <stdlib.h>],
+			olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);, AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL="", AC_MSG_RESULT(no); LINKFAIL="yes")
+		else
+			AC_TRY_LINK([#include <ociapr.h>
+			#include <stdlib.h>],
+			olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);, AC_MSG_RESULT(yes); ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL="", AC_MSG_RESULT(no); LINKFAIL="yes")
+		fi
+		LIBS=""
+		CPPFLAGS="$TEMPCPPFLAGS"
+	fi
+fi
+
+if ( test -n "$LINKFAIL" ); then
+	AC_MSG_WARN("No Oracle link configuration could be found.")
+	ORACLEVERSION=""
+	ORACLEINCLUDES=""
+	ORACLELIBS=""
+	ORACLESTATIC=""
+fi
+
+if ( test -n "$OCI_H" ); then
+	AC_DEFINE(HAVE_OCI_H,1,oci.h)
+fi
+
+AC_SUBST(ORACLEVERSION)
+AC_SUBST(ORACLEINCLUDES)
+AC_SUBST(ORACLELIBS)
+AC_SUBST(ORACLESTATIC)
+
+echo "******************************"
+
+
+
+dnl Checks for MySQL.
+echo
+echo "***** MySQL ******************"
+MYSQLINCLUDES=""
+MYSQLLIBS=""
+MYSQLLIBSPATH=""
+MYSQLSTATIC=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+
+if ( test -z "$MICROSOFT" ); then
+	if ( test -n "$MYSQLPATH" ); then
+		AC_CHECK_FILE($MYSQLPATH/include/mysql/mysql.h,MYSQLINCLUDES="-I$MYSQLPATH/include/mysql")
+		AC_CHECK_FILE($MYSQLPATH/include/mysql.h,MYSQLINCLUDES="-I$MYSQLPATH/include")
+		AC_CHECK_FILE($MYSQLPATH/lib/mysql/libmysqlclient.a,MYSQLLIBS="-L$MYSQLPATH/lib/mysql -lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
+		AC_CHECK_FILE($MYSQLPATH/lib/mysql/libmysqlclient.so,MYSQLLIBSPATH="$MYSQLPATH/lib/mysql"; MYSQLLIBS="-L$MYSQLPATH/lib/mysql -lmysqlclient")
+		AC_CHECK_FILE($MYSQLPATH/lib/libmysqlclient.a,MYSQLLIBS="-L$MYSQLPATH/lib -lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
+		AC_CHECK_FILE($MYSQLPATH/lib/libmysqlclient.so,MYSQLLIBSPATH="$MYSQLPATH/lib"; MYSQLLIBS="-L$MYSQLPATH/lib -lmysqlclient")
+	else
+		for i in "/usr/include/mysql" "/usr/include" "/usr/local/mysql/include/mysql" "/usr/local/mysql/include" "/usr/local/include/mysql" "/usr/pkg/include/mysql" "/usr/pkg/include" "/opt/sfw/include"
+		do
+			AC_CHECK_FILE($i/mysql.h,MYSQLINCLUDES="-I$i")
+			if ( test -n "$MYSQLINCLUDES" ); then
+				break
+			fi
+		done
+
+		for i in "/usr/lib/mysql" "/usr/local/mysql/lib/mysql" "/usr/local/mysql/lib" "/usr/local/lib/mysql" "/usr/pkg/lib/mysql" "/usr/pkg/lib" "/opt/sfw/lib"
+		do
+			AC_CHECK_FILE($i/libmysqlclient.a,MYSQLLIBS="-L$i -lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
+			AC_CHECK_FILE($i/libmysqlclient.so,MYSQLLIBSPATH="$i"; MYSQLLIBS="-L$i -lmysqlclient")
+			if ( test -n "$MYSQLLIBS" ); then
+				break
+			fi
+		done
+		AC_CHECK_FILE(/usr/lib/libmysqlclient.a,MYSQLLIBS="-lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
+		AC_CHECK_FILE(/usr/lib/libmysqlclient.so,MYSQLLIBSPATH=""; MYSQLLIBS="-lmysqlclient")
+	fi
+else
+	if ( test -n "$MYSQLPATH" ); then
+		AC_CHECK_FILE($MYSQLPATH/include/mysql.h,MYSQLINCLUDES="-I$MYSQLPATH/include")
+		AC_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.a,MYSQLLIBS="-L$MYSQLPATH/lib/opt -lmysqlclient"; MYSQLSTATIC="$STATICFLAG")
+		AC_CHECK_FILE($MYSQLPATH/lib/opt/libmysqlclient.so,MYSQLLIBSPATH="$MYSQLPATH/lib/opt"; MYSQLLIBS="-L$MYSQLPATH/lib/opt -lmysqlclient")
+	else
+		AC_CHECK_FILE("/cygdrive/c/mysql/include/mysql.h",MYSQLINCLUDES="-I/cygdrive/c/mysql/include")
+		AC_CHECK_FILE("/cygdrive/c/mysql/lib/opt/libmySQL.dll",MYSQLLIBS="/cygdrive/c/mysql/lib/opt/libmySQL.dll")
+	fi
+fi
+
+if ( test -n "$MYSQLLIBS" ); then
+
+	AC_MSG_CHECKING(if MySQL requires -lz)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
+	LIBS="$MYSQLLIBS $SOCKETLIB"
+	AC_TRY_LINK([#include <mysql.h>
+	#include <stdlib.h>],
+	mysql_real_connect(NULL,NULL,NULL,NULL,NULL,0,NULL,0); mysql_real_query(NULL,NULL,0); mysql_store_result(NULL); mysql_num_fields(NULL); mysql_fetch_row(NULL); mysql_free_result(NULL); mysql_close(NULL);, AC_MSG_RESULT(no),AC_MSG_RESULT(yes); MYSQLLIBS="$MYSQLLIBS -lz")
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+
+	NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
+	if ( test -n "$NEEDSLIBZ" ); then
+		AC_CHECK_LIB(z,gzopen,,MYSQLINCLUDES=""; MYSQLLIBS=""; AC_MSG_WARN("MySQL requires libz but libz was not found."))
+	fi
+fi
+
+if ( test "$MYSQLINCLUDES" = "-I/usr/include" ); then
+	MYSQLINCLUDES=""
+fi
+
+if ( test -n "$RPATHFLAG" -a -n "$MYSQLLIBSPATH" ); then
+	MYSQLLIBS="-Wl,-rpath $MYSQLLIBSPATH $MYSQLLIBS"
+fi
+AC_SUBST(MYSQLINCLUDES)
+AC_SUBST(MYSQLLIBS)
+AC_SUBST(MYSQLSTATIC)
+
+if ( test -z "$MYSQLLIBS" ); then
+	AC_MSG_WARN("MySQL support will not be built.")
+fi
+
+echo "******************************"
+
+
+
+dnl Checks for mSQL.
+echo
+echo "***** mSQL *******************"
+MSQLINCLUDES=""
+MSQLLIBS=""
+MSQLLIBSPATH=""
+MSQLSTATIC=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+
+if ( test -n "$MSQLPATH" ); then
+	AC_CHECK_FILE($MSQLPATH/include/msql.h,MSQLINCLUDES="-I$MSQLPATH/include")
+	AC_CHECK_FILE($MSQLPATH/lib/libmsql.a,MSQLLIBS="-L$MSQLPATH/lib -lmsql"; MSQLSTATIC="$STATICFLAG")
+	AC_CHECK_FILE($MSQLPATH/lib/libmsql.so,MSQLLIBSPATH="$MSQLPATH/lib"; MSQLLIBS="-L$MSQLPATH/lib -lmsql")
+else
+	AC_CHECK_FILE(/usr/local/Hughes/include/msql.h,MSQLINCLUDES="-I/usr/local/Hughes/include")
+	AC_CHECK_FILE(/usr/local/Hughes/lib/libmsql.a,MSQLLIBS="-L/usr/local/Hughes/lib -lmsql"; MSQLSTATIC="$STATICFLAG")
+	AC_CHECK_FILE(/usr/local/Hughes/lib/libmsql.so,MSQLLIBSPATH="/usr/local/Hughes/lib"; MSQLLIBS="-L/usr/local/Hughes/lib -lmsql")
+fi
+
+if ( test -n "$RPATHFLAG" -a -n "$MSQLLIBSPATH" ); then
+	MSQLLIBS="-Wl,-rpath $MSQLLIBSPATH $MSQLLIBS"
+fi
+
+AC_SUBST(MSQLINCLUDES)
+AC_SUBST(MSQLLIBS)
+AC_SUBST(MSQLSTATIC)
+
+if ( test -z "$MSQLLIBS" ); then
+	AC_MSG_WARN("mSQL support will not be built.")
+fi
+
+echo "******************************"
+
+
+
+dnl Checks for PostgreSQL.
+echo
+echo "***** PostgreSQL *************"
+POSTGRESQLINCLUDES=""
+POSTGRESQLLIBS=""
+POSTGRESQLSTATIC=""
+POSTGRESQLLIBPATH=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+
+if ( test -n "$POSTGRESQLPATH" ); then
+	AC_CHECK_FILE($POSTGRESQLPATH/include/libpq-fe.h,POSTGRESQLINCLUDES="-I$POSTGRESQLPATH/include")
+	AC_CHECK_FILE($POSTGRESQLPATH/lib/libpq.a,POSTGRESQLLIBS="-L$POSTGRESQLPATH/lib -lpq"; POSTGRESQLSTATIC="$STATICFLAG")
+	AC_CHECK_FILE($POSTGRESQLPATH/lib/libpq.so,POSTGRESQLLIBPATH="$POSTGRESQLPATH/lib"; POSTGRESQLLIBS="-L$POSTGRESQLPATH/lib -lpq")
+else
+	for i in "/usr/include" "/usr/local/pgsql/include" "/usr/local/include" "/usr/local/include/pgsql" "/usr/pkg/include" "/usr/pkg/include/pgsql" "/usr/pkg/pgsql/include" "/usr/include/pgsql" "/usr/local/postgresql/include" "/usr/local/include/postgresql" "/usr/pkg/postgresql/include" "/usr/pkg/include/postgresql" "/usr/include/postgresql" "/opt/sfw/include"
+	do
+		AC_CHECK_FILE($i/libpq-fe.h,POSTGRESQLINCLUDES="-I$i")
+		if ( test -n "$POSTGRESQLINCLUDES" ); then
+			break
+		fi
+	done
+
+	for i in "/usr/local/pgsql/lib" "/usr/local/lib" "/usr/local/lib/pgsql" "/usr/pkg/lib" "/usr/pkg/lib/pgsql" "/usr/pkg/pgsql/lib" "/usr/lib/pgsql" "/usr/local/postgresql/lib" "/usr/local/lib/postgresql" "/usr/pkg/postgresql/lib" "/usr/pkg/lib/postgresql" "/usr/lib/postgresql"  "/opt/sfw/lib"
+	do
+		AC_CHECK_FILE($i/libpq.a,POSTGRESQLLIBS="-L$i -lpq"; POSTGRESQLSTATIC="$STATICFLAG")
+		AC_CHECK_FILE($i/libpq.so,POSTGRESQLLIBPATH="$i"; POSTGRESQLLIBS="-L$i -lpq")
+		if ( test -n "$POSTGRESQLLIBS" ); then
+			break
+		fi
+	done
+
+	AC_CHECK_FILE(/usr/lib/libpq.a,POSTGRESQLLIBS="-lpq"; POSTGRESQLSTATIC="$STATICFLAG")
+	AC_CHECK_FILE(/usr/lib/libpq.so,POSTGRESQLLIBPATH=""; POSTGRESQLLIBS="-lpq")
+fi
+
+LINKFAIL=""
+if ( test -n "$POSTGRESQLSTATIC" -a -n "$POSTGRESQLLIBS" ); then
+	AC_MSG_CHECKING(if PostgreSQL can be statically linked without -lcrypt)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$POSTGRESQLSTATIC $POSTGRESQLINCLUDES"
+	LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+	AC_TRY_LINK([#include <libpq-fe.h>
+	#include <stdlib.h>],
+	PQsetdbLogin(NULL,NULL,NULL,NULL,NULL,NULL,NULL);, AC_MSG_RESULT(yes), AC_MSG_RESULT(no); LINKFAIL="yes")
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	if ( test -n "$LINKFAIL" ); then
+		AC_MSG_CHECKING(if PostgreSQL can be statically linked with -lcrypt)
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$POSTGRESQLSTATIC $POSTGRESQLINCLUDES"
+		LIBS="$POSTGRESQLLIBS $SOCKETLIB -lcrypt"
+		AC_TRY_LINK([#include <libpq-fe.h>
+		#include <stdlib.h>],
+		PQsetdbLogin(NULL,NULL,NULL,NULL,NULL,NULL,NULL);, AC_MSG_RESULT(yes); POSTGRESQLLIBS="$POSTGRESQLLIBS -lcrypt"; LINKFAIL="", AC_MSG_RESULT(no); POSTGRESQLSTATIC=""; LINKFAIL="yes")
+		LIBS=""
+		CPPFLAGS="$TEMPCPPFLAGS"
+	fi
+fi
+
+if ( test -z "$POSTGRESQLSTATIC" -a -n "$POSTGRESQLLIBS" ); then
+	if ( test -n "$RPATHFLAG" -a -n "$POSTGRESQLLIBPATH" ); then
+		POSTGRESQLLIBS="-Wl,-rpath $POSTGRESQLLIBPATH $POSTGRESQLLIBS"
+	fi
+	AC_MSG_CHECKING(if PostgreSQL can be dynamically linked without -lcrypt)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$POSTGRESQLINCLUDES"
+	LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+	AC_TRY_LINK([#include <libpq-fe.h>
+	#include <stdlib.h>],
+	PQsetdbLogin(NULL,NULL,NULL,NULL,NULL,NULL,NULL);, AC_MSG_RESULT(yes), AC_MSG_RESULT(no); LINKFAIL="yes")
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	if ( test -n "$LINKFAIL" ); then
+		AC_MSG_CHECKING(if PostgreSQL can be dynamically linked with -lcrypt)
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$POSTGRESQLINCLUDES"
+		LIBS="$POSTGRESQLLIBS $SOCKETLIB -lcrypt"
+		OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+		LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBPATH"
+		export LD_LIBRARY_PATH
+		AC_TRY_LINK([#include <libpq-fe.h>
+		#include <stdlib.h>],
+		PQsetdbLogin(NULL,NULL,NULL,NULL,NULL,NULL,NULL);, AC_MSG_RESULT(yes); POSTGRESQLLIBS="$POSTGRESQLLIBS -lcrypt"; LINKFAIL="", AC_MSG_RESULT(no); LINKFAIL="yes")
+		LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
+		export LD_LIBRARY_PATH
+		LIBS=""
+		CPPFLAGS="$TEMPCPPFLAGS"
+	fi
+fi
+
+if ( test -n "$LINKFAIL" ); then
+	AC_MSG_WARN("No PostgreSQL link configuration could be found.")
+	POSTGRESQLINCLUDES=""
+	POSTGRESQLLIBS=""
+	POSTGRESQLSTATIC=""
+fi
+
+if ( test "$POSTGRESQLINCLUDES" = "-I/usr/include" ); then
+	POSTGRESQLINCLUDES=""
+fi
+
+AC_SUBST(POSTGRESQLINCLUDES)
+AC_SUBST(POSTGRESQLLIBS)
+AC_SUBST(POSTGRESQLSTATIC)
+
+if ( test -z "$POSTGRESQLLIBS" ); then
+	AC_MSG_WARN("PostgreSQL support will not be built.")
+fi
+
+echo "******************************"
+
+
+
+dnl Checks for SQLite.
+echo
+echo "***** SQLite *******************"
+SQLITESTATIC=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+
+GDBMLIBS=""
+GDBMLIBSPATH=""
+if ( test -n "$LIBGDBMPATH" ); then
+	AC_CHECK_FILE($LIBGDBMPATH/lib/libgdbm.a,GDBMLIBS="-L$LIBGDBMPATH/lib -lgdbm")
+	AC_CHECK_FILE($LIBGDBMPATH/lib/libgdbm.so,GDBMLIBSPATH="$LIBGDBMPATH/lib"; GDBMLIBS="-L$LIBGDBMPATH/lib -lgdbm")
+else
+	for i in "/usr/local/lib" "/usr/pkg/lib" "/usr/local/libgdbm" "/opt/sfw/lib"
+	do
+		AC_CHECK_FILE($i/libgdbm.a,GDBMLIBS="-L$i -lgdbm")
+		AC_CHECK_FILE($i/libgdbm.so,GDBMLIBSPATH="$i"; GDBMLIBS="-L$i -lgdbm")
+		if ( test -n "$GDBMLIBS" ); then
+			break
+		fi
+	done
+
+	AC_CHECK_FILE(/usr/lib/libgdbm.a,GDBMLIBS="-lgdbm")
+	AC_CHECK_FILE(/usr/lib/libgdbm.so,GDBMLIBSPATH=""; GDBMLIBS="-lgdbm")
+fi
+AC_SUBST(GDBMLIBS)
+
+SQLITEINCLUDES=""
+SQLITELIBS=""
+SQLITELIBPATH=""
+
+if ( test -n "$PTHREADSLIB" ); then
+	if ( test -n "$SQLITEPATH" ); then
+		AC_CHECK_FILE($SQLITEPATH/include/sqlite.h,SQLITEINCLUDES="-I$SQLITEPATH/include")
+		AC_CHECK_FILE($SQLITEPATH/lib/libsqlite.a,SQLITELIBS="-L$SQLITEPATH/lib -lsqlite")
+		AC_CHECK_FILE($SQLITEPATH/lib/libsqlite.so,SQLITELIBPATH="$SQLIBEPATH/lib"; SQLITELIBS="-L$SQLITEPATH/lib -lsqlite")
+	else
+		for i in "/usr/include" "/usr/local/sqlite/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
+		do
+			AC_CHECK_FILE($i/sqlite.h,SQLITEINCLUDES="-I$i")
+			if ( test -n "$SQLITEINCLUDES" ); then
+				break
+			fi
+		done
+		for i in "/usr/local/sqlite/lib" "/usr/local/lib" "/usr/pkg/lib" "/usr/local/lib/sqlite" "/opt/sfw/lib"
+		do
+			AC_CHECK_FILE($i/libsqlite.a,SQLITELIBS="-L$i -lsqlite"; SQLITESTATIC="$STATICFLAG")
+			AC_CHECK_FILE($i/libsqlite.so,SQLITELIBPATH="$i"; SQLITELIBS="-L$i -lsqlite")
+			if ( test -n "$SQLITELIBS" ); then
+				break
+			fi
+		done
+
+		AC_CHECK_FILE(/usr/lib/libsqlite.a,SQLITELIBS="-lsqlite"; SQLITESTATIC="$STATICFLAG")
+		AC_CHECK_FILE(/usr/lib/libsqlite.so,SQLITELIBPATH=""; SQLITELIBS="-lsqlite")
+	fi
+	
+	if ( test "$SQLITEINCLUDES" = "-I/usr/include" ); then
+		SQLITEINCLUDES=""
+	fi
+else
+	AC_MSG_WARN("pthreads was not found.")
+fi
+	
+if ( test -z "$SQLITELIBS" ); then
+	AC_MSG_WARN("SQLite support will not be built.")
+else
+	if ( test -n "$RPATHFLAG" -a -n "$SQLITELIBSPATH" ); then
+		SQLITELIBS="-Wl,-rpath $SQLITELIBSPATH $SQLITELIBS"
+	fi
+	AC_MSG_CHECKING(if SQLite needs gdbm)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$SQLITESTATIC $SQLITEINCLUDES"
+	LIBS="$SQLITELIBS $SOCKETLIB"
+	OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SQLITELIBPATH"
+	export LD_LIBRARY_PATH
+	SQLITENEEDGDBM=""
+	AC_TRY_LINK([#include <sqlite.h>],
+	sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);, AC_MSG_RESULT(no), AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes")
+	LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+
+	if ( test -n "$SQLITENEEDGDBM" ); then
+		if ( test -z "$GDBMLIBS" ); then
+			AC_MSG_WARN("SQLite needs GDBM but GDBM was not found. SQLite support will not be built.")
+			SQLITELIBS=""
+			SQLITEINCLUDES=""
+			SQLITESTATIC=""
+		else 
+			SQLITELIBS="$SQLITELIBS $GDBMLIBS"
+		fi
+	else
+		AC_DEFINE_UNQUOTED(SQLITE_TRANSACTIONAL,1,Some versions of sqlite are transactional)
+	fi
+
+fi
+
+AC_SUBST(SQLITEINCLUDES)
+AC_SUBST(SQLITELIBS)
+AC_SUBST(SQLITESTATIC)
+
+echo "******************************"
+
+
+
+dnl Checks for Lago.
+echo
+echo "***** Lago *********************"
+LAGOINCLUDES=""
+LAGOLIBS=""
+LAGOSTATIC=""
+LAGOLIBPATH=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+
+if ( test -n "$LAGOPATH" ); then
+	AC_CHECK_FILE($LAGOPATH/include/lago.h,LAGOINCLUDES="-I$LAGOPATH/include")
+	AC_CHECK_FILE($LAGOPATH/lib/liblago.a,LAGOLIBS="-L$LAGOPATH/lib -llago"; LAGOSTATIC="$STATICFLAG")
+	AC_CHECK_FILE($LAGOPATH/lib/liblago.so,LAGOLIBPATH="$LAGOPATH/lib"; LAGOLIBS="-L$LAGOPATH/lib -llago")
+else
+	for i in "/usr/include" "/usr/local/lago/include" "/usr/pkg/include" "/usr/local/include" "/opt/sfw/include"
+	do
+		AC_CHECK_FILE($i/lago.h,LAGOINCLUDES="-I$i")
+		if ( test -n "$LAGOINCLUDES" ); then
+			break
+		fi
+	done
+	for i in "/usr/local/lago/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib/lago" "/opt/sfw/lib"
+	do
+		AC_CHECK_FILE($i/liblago.a,LAGOLIBS="-L$i -llago"; LAGOSTATIC="$STATICFLAG")
+		AC_CHECK_FILE($i/liblago.so,LAGOLIBPATH="$i"; LAGOLIBS="-L$i -llago")
+		if ( test -n "$LAGOLIBS" ); then
+			break
+		fi
+	done
+
+	AC_CHECK_FILE(/usr/lib/liblago.a,LAGOLIBS="-llago"; LAGOSTATIC="$STATICFLAG")
+	AC_CHECK_FILE(/usr/lib/liblago.so,LAGOLIBPATH=""; LAGOLIBS="-llago")
+fi
+
+if ( test -z "$LAGOLIBS" ); then
+	AC_MSG_WARN("Lago support will not be built.")
+else
+	if ( test -n "$RPATHFLAG" -a -n "$LAGOLIBSPATH" ); then
+		LAGOLIBS="-Wl,-rpath $LAGOLIBSPATH $LAGOLIBS"
+	fi
+	AC_MSG_CHECKING(if Lago needs threads)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$LAGOSTATIC $LAGOINCLUDES"
+	LIBS="$LAGOLIBS $SOCKETLIB"
+	OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LAGOLIBPATH"
+	export LD_LIBRARY_PATH
+	AC_TRY_LINK([#include <lago.h>],
+	LCTX lctx; lctx=Lnewctx(); Ldelctx(lctx);, AC_MSG_RESULT(no), AC_MSG_RESULT(yes); LAGOLIBS="$LAGOLIBS $PTHREADSLIB")
+	LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+fi
+
+if ( test "$LAGOINCLUDES" = "-I/usr/include" ); then
+	LAGOINCLUDES=""
+fi
+
+AC_SUBST(LAGOINCLUDES)
+AC_SUBST(LAGOLIBS)
+AC_SUBST(LAGOSTATIC)
+
+echo "******************************"
+
+
+
+dnl Checks for FreeTDS.
+echo
+echo "***** FreeTDS ******************"
+FREETDSINCLUDES=""
+FREETDSLIBS=""
+FREETDSLIBSPATH=""
+FREETDSSTATIC=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+
+if ( test -n "$FREETDSPATH" ); then
+	AC_CHECK_FILE($FREETDSPATH/include/ctpublic.h,FREETDSINCLUDES="-I$FREETDSPATH/include")
+	AC_CHECK_FILE($FREETDSPATH/lib/libct.a,FREETDSLIBS="-L$FREETDSPATH/lib -lct"; FREETDSSTATIC="$STATICFLAG")
+	AC_CHECK_FILE($FREETDSPATH/lib/libct.so,FREETDSLIBSPATH="$FREETDSPATH/lib"; FREETDSLIBS="-L$FREETDSPATH/lib -lct")
+else
+	for i in "/usr/include" "/usr/local/freetds/include" "/usr/include/freetds" "/usr/local/include" "/usr/local/include/freetds" "/usr/pkg/include" "/usr/pkg/include/freetds" "/usr/pkg/freetds/include" "/opt/sfw/includ"
+	do
+		AC_CHECK_FILE($i/ctpublic.h,FREETDSINCLUDES="-I$i")
+		if ( test -n "$FREETDSINCLUDES" ); then
+			break
+		fi
+	done
+
+	for i in "/usr/local/freetds/lib" "/usr/local/lib" "/usr/local/lib/freetds" "/usr/pkg/lib" "/usr/pkg/freetds/lib" "/opt/sfw/lib"
+	do
+		AC_CHECK_FILE($i/libct.a,FREETDSLIBS="-L$i -lct"; FREETDSSTATIC="$STATICFLAG")
+		AC_CHECK_FILE($i/libct.so,FREETDSLIBSPATH="$i"; FREETDSLIBS="-L$i -lct")
+		if ( test -n "$FREETDSLIBS" ); then
+			break
+		fi
+	done
+
+	AC_CHECK_FILE(/usr/lib/libct.a,FREETDSLIBS="-lct"; FREETDSSTATIC="$STATICFLAG")
+	AC_CHECK_FILE(/usr/lib/libct.so,FREETDSLIBSPATH=""; FREETDSLIBS="-lct")
+fi
+
+if ( test "$FREETDSINCLUDES" = "-I/usr/include" ); then
+	FREETDSINCLUDES=""
+fi
+
+if ( test -n "$RPATHFLAG" -a -n "$FREETDSLIBSPATH" ); then
+	FREETDSLIBS="-Wl,-rpath $FREETDSLIBSPATH $FREETDSLIBS"
+fi
+
+AC_SUBST(FREETDSINCLUDES)
+AC_SUBST(FREETDSLIBS)
+AC_SUBST(FREETDSSTATIC)
+
+if ( test -z "$FREETDSLIBS" ); then
+	AC_MSG_WARN("FreeTDS support will not be built.")
+fi
+
+
+
+echo "******************************"
+dnl Checks for Sybase.
+echo
+echo "***** Sybase *****************"
+SYBASEINCLUDES=""
+SYBASELIBS=""
+SYBASESTATIC=""
+SYBASELIBPATH=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+
+if ( test -n "$SYBASEPATH" ); then
+	AC_CHECK_FILE($SYBASEPATH/include/ctpublic.h,SYBASEINCLUDES="-I$SYBASEPATH/include")
+	AC_CHECK_FILE($SYBASEPATH/lib/libct.a,SYBASELIBS="-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG")
+	AC_CHECK_FILE($SYBASEPATH/lib/libct.so,SYBASELIBPATH="$SYBASEPATH/lib"; SYBASELIBS="-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck")
+else
+
+	AC_CHECK_FILE(/usr/local/sybase/include/ctpublic.h,SYBASEINCLUDES="-I/usr/local/sybase/include")
+	AC_CHECK_FILE(/usr/local/sybase/lib/libct.a,SYBASELIBS="-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG")
+	AC_CHECK_FILE(/usr/local/sybase/lib/libct.so,SYBASELIBPATH="/usr/local/sybase/lib"; SYBASELIBS="-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck")
+
+	AC_CHECK_FILE(/opt/sybase/include/ctpublic.h,SYBASEINCLUDES="-I/opt/sybase/include")
+	AC_CHECK_FILE(/opt/sybase/lib/libct.a,SYBASELIBS="-L/opt/sybase/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG")
+	AC_CHECK_FILE(/opt/sybase/lib/libct.so,SYBASELIBPATH="/opt/sybase/lib"; SYBASELIBS="-L/opt/sybase/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck")
+
+	if ( test -z "$SYBASELIBS" ); then
+		for i in "11.9.2" "11.0.3.3" "12.5"
+		do
+			AC_CHECK_FILE(/opt/sybase-$i/include/ctpublic.h,SYBASEINCLUDES="-I/opt/sybase-$i/include")
+			AC_CHECK_FILE(/opt/sybase-$i/lib/libct.a,SYBASELIBS="-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck"; SYBASESTATIC="$STATICFLAG")
+			AC_CHECK_FILE(/opt/sybase-$i/lib/libct.so,SYBASELIBPATH="/opt/sybase-$i/lib"; SYBASELIBS="-L/opt/sybase-$i/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl -linsck")
+			if ( test -n "$SYBASELIBS" ); then
+				break
+			fi
+		done
+	fi
+fi
+
+if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBPATH" ); then
+	SYBASELIBS="-Wl,-rpath $SYBASELIBPATH $SYBASELIBS"
+fi
+
+LINKFAIL=""
+if ( test -n "$SYBASESTATIC" -a -n "$SYBASELIBS" ); then
+	AC_MSG_CHECKING(if Sybase can be statically linked without $DLLIB)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$SYBASESTATIC $SYBASEINCLUDES"
+	LIBS="$SYBASELIBS $SOCKETLIB"
+	AC_TRY_LINK([#include <ctpublic.h>
+	#include <stdlib.h>],
+	CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);, AC_MSG_RESULT(yes),AC_MSG_RESULT(no); LINKFAIL="yes")
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+		AC_MSG_CHECKING(if Sybase can be statically linked with $DLLIB)
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$SYBASESTATIC $SYBASEINCLUDES"
+		LIBS="$SYBASELIBS $SOCKETLIB $DLLIB"
+		AC_TRY_LINK([#include <ctpublic.h>
+		#include <stdlib.h>],
+		CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);, AC_MSG_RESULT(yes); SYBASELIBS="$SYBASELIBS $DLLIB"; LINKFAIL="";, AC_MSG_RESULT(no); SYBASESTATIC="")
+		LIBS=""
+		CPPFLAGS="$TEMPCPPFLAGS"
+	fi
+fi
+
+if ( test -z "$SYBASESTATIC" -a -n "$SYBASELIBS" ); then
+	if ( test -n "$RPATHFLAG" -a -n "$SYBASELIBSPATH" ); then
+		SYBASELIBS="-Wl,-rpath $SYBASELIBSPATH $SYBASELIBS"
+	fi
+	AC_MSG_CHECKING(if Sybase can be dynamically linked without $DLLIB)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$SYBASEINCLUDES"
+	LIBS="$SYBASELIBS $SOCKETLIB"
+	OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBPATH"
+	export LD_LIBRARY_PATH
+	AC_TRY_LINK([#include <ctpublic.h>
+	#include <stdlib.h>],
+	CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);, AC_MSG_RESULT(yes),AC_MSG_RESULT(no); LINKFAIL="yes")
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+		AC_MSG_CHECKING(if Sybase can be dynamically linked with $DLLIB)
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$SYBASEINCLUDES"
+		LIBS="$SYBASELIBS $SOCKETLIB $DLLIB"
+		AC_TRY_LINK([#include <ctpublic.h>
+		#include <stdlib.h>],
+		CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);, AC_MSG_RESULT(yes); SYBASELIBS="$SYBASELIBS $DLLIB"; LINKFAIL="", AC_MSG_RESULT(no))
+		LIBS=""
+		CPPFLAGS="$TEMPCPPFLAGS"
+	fi
+	LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH
+fi
+
+if ( test -n "$LINKFAIL" ); then
+	AC_MSG_WARN("No Sybase link configuration could be found.")
+	SYBASEINCLUDES=""
+	SYBASELIBS=""
+	SYBASESTATIC=""
+fi
+
+AC_SUBST(SYBASEINCLUDES)
+AC_SUBST(SYBASELIBS)
+AC_SUBST(SYBASESTATIC)
+
+if ( test -z "$SYBASELIBS" ); then
+	AC_MSG_WARN("Sybase support will not be built.")
+fi
+
+echo "******************************"
+
+
+
+dnl Checks for ODBC.
+echo
+echo "***** ODBC *********************"
+ODBCINCLUDES=""
+ODBCLIBS=""
+ODBCSTATIC=""
+IODBCSTATIC=""
+UNIXODBCSTATIC=""
+ODBCLIBPATH=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+HAVE_IODBC=""
+HAVE_UNIXODBC=""
+
+if ( test -n "$ODBCPATH" ); then
+	AC_CHECK_FILE($ODBCPATH/include/sql.h,ODBCINCLUDES="-I$ODBCPATH/include")
+
+	# iodbc
+	AC_CHECK_FILE($ODBCPATH/lib/libiodbc.a,ODBCLIBS="-L$ODBCPATH/lib -liodbc"; HAVE_IODBC="yes"; IODBCSTATIC="$STATICFLAG")
+	AC_CHECK_FILE($ODBCPATH/lib/libiodbc.so,ODBCLIBPATH="$ODBCPATH/lib"; ODBCLIBS="-L$ODBCPATH/lib -liodbc"; HAVE_IODBC="yes")
+
+	# unixodbc
+	AC_CHECK_FILE($ODBCPATH/lib/libodbc.a,ODBCLIBS="-L$ODBCPATH/lib -lodbc"; HAVE_UNIXODBC="yes"; UNIXODBCSTATIC="$STATICFLAG")
+	AC_CHECK_FILE($ODBCPATH/lib/libodbc.so,ODBCLIBPATH="$ODBCPATH/lib"; ODBCLIBS="-L$ODBCPATH/lib -lodbc"; HAVE_UNIXODBC="yes")
+
+else
+
+	# headers
+	for i in "/usr/include" "/usr/local/unixodbc/include" "/usr/local/iodbc/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include"
+	do
+		AC_CHECK_FILE($i/sql.h,ODBCINCLUDES="-I$i")
+		if ( test -n "$ODBCINCLUDES" ); then
+			break
+		fi
+	done
+
+	# iodbc
+	for i in "/usr/local/iodbc/lib" "/usr/local/lib" "/usr/local/lib/iodbc" "/usr/pkg/lib" "/opt/sfw/lib"
+	do
+		AC_CHECK_FILE($i/libiodbc.a,ODBCLIBS="-L$i -liodbc"; HAVE_IODBC="yes"; IODBCSTATIC="$STATICFLAG")
+		AC_CHECK_FILE($i/libiodbc.so,ODBCLIBPATH="$i"; ODBCLIBS="-L$i -liodbc"; HAVE_IODBC="yes")
+		if ( test -n "$ODBCLIBS" ); then
+			break
+		fi
+	done
+
+	AC_CHECK_FILE(/usr/lib/libiodbc.a,ODBCLIBS="-liodbc"; HAVE_IODBC="yes"; IODBCSTATIC="$STATICFLAG")
+	AC_CHECK_FILE(/usr/lib/libiodbc.so,ODBCLIBPATH=""; ODBCLIBS="-liodbc"; HAVE_IODBC="yes")
+
+	# unixodbc
+	for i in "/usr/local/unixodbc/lib" "/usr/local/lib" "/usr/local/lib/unixodbc" "/usr/pkg/lib" "/opt/sfw/lib"
+	do
+		AC_CHECK_FILE($i/libodbc.a,ODBCLIBS="-L$i -lodbc"; HAVE_UNIXODBC="yes"; UNIXODBCSTATIC="$STATICFLAG")
+		AC_CHECK_FILE($i/libodbc.so,ODBCLIBPATH="$i"; ODBCLIBS="-L$i -lodbc"; HAVE_UNIXODBC="yes")
+		if ( test -n "$ODBCLIBS" ); then
+			break
+		fi
+	done
+
+	AC_CHECK_FILE(/usr/lib/libodbc.a,ODBCLIBS="-lodbc"; HAVE_UNIXODBC="yes"; UNIXODBCSTATIC="$STATICFLAG")
+	AC_CHECK_FILE(/usr/lib/libodbc.so,ODBCLIBPATH=""; ODBCLIBS="-lodbc"; HAVE_UNIXODBC="yes")
+fi
+
+if ( test "$ODBCINCLUDES" = "-I/usr/include" ); then
+	ODBCINCLUDES=""
+fi
+
+AC_SUBST(ODBCINCLUDES)
+AC_SUBST(ODBCLIBS)
+if ( test -n "`echo $ODBCLIBS | grep iodbc`" ); then
+	ODBCSTATIC="$IODBCSTATIC"
+else
+	ODBCSTATIC="$UNIXODBCSTATIC"
+fi
+AC_SUBST(ODBCSTATIC)
+
+if ( test -n "$RPATHFLAG" -a -n "$ODBCLIBSPATH" ); then
+	ODBCLIBS="-Wl,-rpath $ODBCLIBPATH $ODBCLIBS"
+fi
+
+if ( test -n "$HAVE_UNIXODBC" ); then
+	AC_DEFINE(HAVE_UNIXODBC,1,UnixODBC)
+	AC_MSG_CHECKING(if UnixODBC needs threads)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
+	LIBS="$ODBCLIBS $SOCKETLIB"
+	OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBPATH"
+	export LD_LIBRARY_PATH
+	AC_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>],
+SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);, AC_MSG_RESULT(no), AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADSLIB")
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH
+fi
+if ( test -n "$HAVE_IODBC" ); then
+	AC_DEFINE(HAVE_IODBC,1,iODBC)
+	AC_MSG_CHECKING(if iODBC needs threads)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
+	LIBS="$ODBCLIBS $SOCKETLIB"
+	OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBPATH"
+	export LD_LIBRARY_PATH
+	AC_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>],
+SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);, AC_MSG_RESULT(no), AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADSLIB")
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH
+fi
+if ( test -z "$ODBCLIBS" ); then
+	AC_MSG_WARN("ODBC support will not be built.")
+fi
+
+echo "******************************"
+
+
+
+dnl Checks for DB2.
+echo
+echo "***** DB2 **********************"
+DB2INCLUDES=""
+DB2LIBS=""
+DB2LIBSPATH=""
+DB2STATIC=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+
+if ( test -n "$DB2PATH" ); then
+	AC_CHECK_FILE($DB2PATH/include/sql.h,DB2INCLUDES="-I$DB2PATH/include")
+	AC_CHECK_FILE($DB2PATH/lib/libdb2.a,DB2LIBS="-L$DB2PATH/lib -ldb2"; DB2STATIC="$STATICFLAG")
+	AC_CHECK_FILE($DB2PATH/lib/libdb2.so,DB2LIBSPATH="$DB2PATH/lib"; DB2LIBS="-L$DB2PATH/lib -ldb2")
+
+else
+
+	# check /opt
+	AC_CHECK_FILE(/opt/IBMdb2/V7.1/include/sql.h,DB2INCLUDES="-I/opt/IBMdb2/V7.1/include")
+	AC_CHECK_FILE(/opt/IBMdb2/V7.1/lib/libdb2.a,DB2LIBS="-L/opt/IBMdb2/V7.1/lib -ldb2"; DB2STATIC="$STATICFLAG")
+	AC_CHECK_FILE(/opt/IBMdb2/V7.1/lib/libdb2.so,DB2LIBSPATH="/opt/IBMdb2/V7.1/lib"; DB2LIBS="-L/opt/IBMdb2/V7.1/lib -ldb2")
+
+	# check /usr
+	AC_CHECK_FILE(/usr/IBMdb2/V7.1/include/sql.h,DB2INCLUDES="-I/usr/IBMdb2/V7.1/include")
+	AC_CHECK_FILE(/usr/IBMdb2/V7.1/lib/libdb2.a,DB2LIBS="-L/usr/IBMdb2/V7.1/lib -ldb2"; DB2STATIC="$STATICFLAG")
+	AC_CHECK_FILE(/usr/IBMdb2/V7.1/lib/libdb2.so,DB2LIBSPATH="/usr/IBMdb2/V7.1/lib"; DB2LIBS="-L/usr/IBMdb2/V7.1/lib -ldb2")
+fi
+
+if ( test -n "$RPATHFLAG" -a -n "$DB2LIBSPATH" ); then
+	DB2LIBS="-Wl,-rpath $DB2LIBSPATH $DB2LIBS"
+fi
+
+AC_SUBST(DB2INCLUDES)
+AC_SUBST(DB2LIBS)
+AC_SUBST(DB2STATIC)
+
+if ( test -z "$DB2LIBS" ); then
+	AC_MSG_WARN("DB2 support will not be built.")
+fi
+
+echo "******************************"
+
+
+
+dnl Checks for Interbase.
+echo
+echo "***** Interbase **************"
+INTERBASEINCLUDES=""
+INTERBASELIBS=""
+INTERBASELIBSPATH=""
+INTERBASESTATIC=""
+STATICFLAG=""
+if ( test -n "$STATICLINK" ); then
+	STATICFLAG="-static"
+fi
+
+if ( test -n "$INTERBASEPATH" ); then
+	AC_CHECK_FILE($INTERBASEPATH/include/ibase.h,INTERBASEINCLUDES="-I$INTERBASEPATH/include")
+	AC_CHECK_FILE($INTERBASEPATH/lib/libgds.a,INTERBASELIBS="-L$INTERBASEPATH/lib -lgds -lcrypt"; INTERBASESTATIC="$STATICFLAG")
+	AC_CHECK_FILE($INTERBASEPATH/lib/libgds.so,INTERBASELIBSPATH="$INTERBASPATH/lib"; INTERBASELIBS="-L$INTERBASEPATH/lib -lgds -lcrypt")
+
+else
+
+	# includes
+	AC_CHECK_FILE(/usr/include/ibase.h,INTERBASEINCLUDES="")
+	AC_CHECK_FILE(/usr/lib/libgds.a,INTERBASELIBS="-lgds -lcrypt"; INTERBASESTATIC="$STATICFLAG")
+	AC_CHECK_FILE(/usr/lib/libgds.so,INTERBASELIBS="-lgds -lcrypt")
+fi
+
+LINKFAIL=""
+if ( test -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" ); then
+	AC_MSG_CHECKING(if Interbase can be statically linked without $DLLIB)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$INTERBASESTATIC $INTERBASEINCLUDES"
+	LIBS="$INTERBASELIBS $SOCKETLIB"
+	AC_TRY_LINK([#include <ibase.h>
+	#include <stdlib.h>],
+	isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);, AC_MSG_RESULT(yes),AC_MSG_RESULT(no); LINKFAIL="yes")
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+		AC_MSG_CHECKING(if Interbase can be statically linked with $DLLIB)
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$INTERBASESTATIC $INTERBASEINCLUDES"
+		LIBS="$INTERBASELIBS $SOCKETLIB $DLLIB"
+		AC_TRY_LINK([#include <ibase.h>
+		#include <stdlib.h>],
+		isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);, AC_MSG_RESULT(yes); INTERBASELIBS="$INTERBASELIBS $DLLIB"; LINKFAIL="";, AC_MSG_RESULT(no); INTERBASESTATIC="")
+		LIBS=""
+		CPPFLAGS="$TEMPCPPFLAGS"
+	fi
+fi
+
+if ( test -z "$INTERBASESTATIC" -a -n "$INTERBASELIBS" ); then
+	if ( test -n "$RPATHFLAG" -a -n "$INTERBASELIBSPATH" ); then
+		INTERBASELIBS="-Wl,-rpath $INTERBASELIBSPATH $INTERBASELIBS"
+	fi
+	AC_MSG_CHECKING(if Interbase can be dynamically linked without $DLLIB)
+	TEMPCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$INTERBASEINCLUDES"
+	LIBS="$INTERBASELIBS $SOCKETLIB"
+	AC_TRY_LINK([#include <ibase.h>
+	#include <stdlib.h>],
+	isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);, AC_MSG_RESULT(yes),AC_MSG_RESULT(no); LINKFAIL="yes")
+	LIBS=""
+	CPPFLAGS="$TEMPCPPFLAGS"
+	if ( test -n "$LINKFAIL" -a -n "$DLLIB" ); then
+		AC_MSG_CHECKING(if Interbase can be dynamically linked with $DLLIB)
+		TEMPCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$INTERBASEINCLUDES"
+		LIBS="$INTERBASELIBS $SOCKETLIB $DLLIB"
+		AC_TRY_LINK([#include <ibase.h>
+		#include <stdlib.h>],
+		isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);, AC_MSG_RESULT(yes); INTERBASELIBS="$INTERBASELIBS $DLLIB"; LINKFAIL="", AC_MSG_RESULT(no))
+		LIBS=""
+		CPPFLAGS="$TEMPCPPFLAGS"
+	fi
+fi
+
+if ( test -n "$LINKFAIL" ); then
+	AC_MSG_WARN("No Interbase link configuration could be found.")
+	INTERBASEINCLUDES=""
+	INTERBASELIBS=""
+	INTERBASESTATIC=""
+fi
+
+AC_SUBST(INTERBASEINCLUDES)
+AC_SUBST(INTERBASELIBS)
+AC_SUBST(INTERBASESTATIC)
+
+if ( test -z "$INTERBASELIBS" ); then
+	AC_MSG_WARN("Interbase support will not be built.")
+fi
+
+echo "******************************"
+
+
+
+dnl Checks for Perl.
+echo
+echo "***** Perl *******************"
+HAVE_PERL=""
+PERL=""
+if ( test -n "$PERLPATH" ); then
+	AC_CHECK_FILE("$PERLPATH/bin/perl",PERL="$PERLPATH/bin/perl"; HAVE_PERL="yes")
+else
+	AC_CHECK_PROG(PERL,perl,"perl")
+	if ( test -z "$PERL" ); then
+		for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin"
+		do
+			AC_CHECK_FILE("$i/perl5",PERL="$i/perl5")
+			AC_CHECK_FILE("$i/perl",PERL="$i/perl")
+			if ( test -n "$PERL" ); then
+				break
+			fi
+		done
+	fi
+fi
+if ( test -n "$PERL" ); then
+	HAVE_PERL="yes"
+else
+	AC_MSG_WARN("The Perl API will not be built.")
+fi
+AC_SUBST(HAVE_PERL)
+AC_SUBST(PERL)
+echo "******************************"
+
+
+
+dnl Checks for python.
+echo
+echo "***** Python *****************"
+HAVE_PYTHON=""
+PYTHONINCLUDES=""
+PYTHONLIBS=""
+PYTHONOBJ=""
+PYTHONDIR=""
+PYTHONVERSION=""
+AC_MSG_CHECKING(for Python)
+
+if ( test -n "$PYTHONPATH" ); then
+
+	for i in "1.5" "1.6" "2.0" "2.1" "2.2"
+	do
+		if ( test -d "$PYTHONPATH/include/python$i" ); then
+			PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
+		fi
+
+		if ( test -r "$PYTHONPATH/lib/python$i/config/python.o" -a -r "$PYTHONPATH/lib/python$i/config/libpython$i.a"); then
+			PYTHONLIBS="-L$PYTHONPATH/lib/python$i/config -lpython$i"
+			PYTHONOBJ="$PYTHONPATH/lib/python$i/config/python.o"
+
+		else
+			if ( test -r "$PYTHONPATH/lib/python$i/config/ccpython.o" -a -r "$PYTHONPATH/lib/python$i/config/libpython$i.a"); then
+			PYTHONLIBS="-L$PYTHONPATH/lib/python$i/config -lpython$i"
+			PYTHONOBJ="$PYTHONPATH/lib/python$i/config/ccpython.o"
+			fi
+		fi
+	
+		if ( test -d "$PYTHONPATH/lib/python$i"); then
+			PYTHONDIR="$PYTHONPATH/lib/python$i"
+		fi
+
+		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONDIR" ); then
+			PYTHONVERSION="$i"
+			break
+		fi
+	done
+
+else
+
+	for j in "1.5" "1.6" "2.0" "2.1" "2.2"
+	do
+		for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"
+		do
+			if ( test -d "$i" ); then
+				PYTHONINCLUDES="-I$i"
+			fi
+			if ( test -n "$PYTHONINCLUDES" ); then
+				break
+			fi
+		done
+	
+		for i in "/usr/lib/python$j/config" "/usr/local/lib/python$j/config" "/usr/pkg/lib/python$j/config" "/usr/local/python$j/lib/python$j/config" "/opt/sfw/lib/python$j/config"
+		do
+			if ( test -r "$i/python.o" -a -r "$i/libpython$j.a"); then
+				PYTHONLIBS="-L$i -lpython$j"
+				PYTHONOBJ="$i/python.o"
+			else
+				if ( test -r "$i/ccpython.o" -a -r "$i/libpython$j.a"); then
+					PYTHONLIBS="-L$i/config -lpython$j"
+					PYTHONOBJ="$i/config/ccpython.o"
+				fi
+			fi
+			if ( test -n "$PYTHONLIBS" ); then
+				break
+			fi
+		done
+	
+		for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"
+		do
+			if ( test -d "$i"); then
+				PYTHONDIR="$i"
+			fi
+			if ( test -n "$PYTHONDIR" ); then
+				break
+			fi
+		done
+		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONDIR" ); then
+			PYTHONVERSION="$j"
+			break
+		fi
+	done
+
+fi
+
+if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONLIBS" -a -n "$PYTHONOBJ" -a -n "$PYTHONDIR"); then
+	HAVE_PYTHON="yes"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_WARN("The Python API will not be built.")
+	AC_MSG_RESULT(no)
+fi
+
+AC_SUBST(HAVE_PYTHON)
+AC_SUBST(PYTHONINCLUDES)
+AC_SUBST(PYTHONLIBS)
+AC_SUBST(PYTHONOBJ)
+AC_SUBST(PYTHONDIR)
+AC_SUBST(PYTHONVERSION)
+echo "******************************"
+
+
+
+dnl Checks for zope.
+echo
+echo "***** Zope *******************"
+HAVE_ZOPE=""
+
+if ( test -n "$HAVE_PYTHON"); then
+	if ( test -n "$ZOPEPATH"); then
+		ZOPEDIR="$ZOPEPATH/lib/python/Products"
+	else
+
+		if ( test -z "$ZOPEDIR" ); then
+			for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/opt"
+			do
+				for j in "zope" "Zope"
+				do
+					AC_CHECK_FILE("$i/$j/lib/python/Products/__init__.py",HAVE_ZOPE="yes"; ZOPEDIR="$i/$j/lib/python/Products")
+					if ( test -n "$ZOPEDIR" ); then
+						break
+					fi
+					for k in "2.2" "2.3" "2.4"
+					do
+						AC_CHECK_FILE("$i/$j-$k/lib/python/Products/__init__.py",HAVE_ZOPE="yes"; ZOPEDIR="$i/$j-$k/lib/python/Products")
+						if ( test -n "$ZOPEDIR" ); then
+							break
+						fi
+					done
+				done
+				if ( test -n "$ZOPEDIR" ); then
+					break
+				fi
+			done
+		fi
+	fi
+fi
+
+if ( test -z "$HAVE_ZOPE"); then
+	AC_MSG_WARN("The Zope API will not be installed.")
+fi
+AC_SUBST(HAVE_ZOPE)
+AC_SUBST(ZOPEDIR)
+echo "******************************"
+
+
+
+dnl Checks for Ruby.
+echo
+echo "***** Ruby *******************"
+HAVE_RUBY=""
+RUBY=""
+
+if ( test -n "$RUBYPATH"); then
+	AC_CHECK_FILE("$RUBYPATH/bin/ruby",RUBY="$RUBYPATH/bin/ruby")
+else
+	AC_CHECK_PROG(RUBY,"ruby","ruby")
+	if ( test -z "$RUBY"); then
+		for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
+		do
+			AC_CHECK_FILE("$i/ruby",RUBY="$i/ruby")
+			if ( test -n "$RUBY" ); then
+				break
+			fi
+		done
+	fi
+fi
+
+if ( test -n "$RUBY"); then
+	HAVE_RUBY="yes"
+else
+	HAVE_RUBY=""
+	AC_MSG_WARN("The Ruby API will not be built.")
+fi
+
+AC_SUBST(HAVE_RUBY)
+AC_SUBST(RUBY)
+echo "******************************"
+
+
+
+dnl Checks for Java.
+echo
+echo "***** Java *******************"
+HAVE_JAVA=""
+JAVAC=""
+JAVAINCLUDES=""
+
+if ( test -z "$JAVAPATH"); then
+	for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/local/java 2>/dev/null`
+	do
+		if ( test -z "$JAVAPATH"); then
+			AC_CHECK_FILE("$i/include/jni.h",JAVAPATH="$i")
+		else
+			break
+		fi
+	done
+fi
+
+if ( test -z "$JAVAPATH"); then
+	AC_CHECK_FILE("/usr/local/java/include/jni.h",JAVAPATH="/usr/local/java")
+fi
+
+if ( test -z "$JAVAPATH"); then
+	AC_CHECK_FILE("/usr/java/include/jni.h",JAVAPATH="/usr/java")
+fi
+
+if ( test -n "$JAVAPATH"); then
+	AC_CHECK_FILE("$JAVAPATH/bin/javac",JAVAC="$JAVAPATH/bin/javac")
+	AC_CHECK_FILE("$JAVAPATH/include/jni.h",JAVAINCLUDES="-I$JAVAPATH/include")
+	if ( test -n "$JAVAINCLUDES"); then
+		for i in `ls -l $JAVAPATH/include | grep drw | awk '{print $9}'`
+		do
+			JAVAINCLUDES="$JAVAINCLUDES -I$JAVAPATH/include/$i"
+		done
+	fi
+fi
+
+if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES"); then
+	HAVE_JAVA="yes"
+else
+	HAVE_JAVA=""
+	AC_MSG_WARN("The Java API will not be built.")
+fi
+
+AC_SUBST(HAVE_JAVA)
+AC_SUBST(JAVAC)
+AC_SUBST(JAVAINCLUDES)
+echo "******************************"
+
+
+dnl Checks for PHP.
+echo
+echo "***** PHP ********************"
+HAVE_PHP=""
+PHPCONFIG=""
+
+if ( test -n "$PHPPATH"); then
+	AC_CHECK_FILE("$PHPPATH/bin/php-config",PHPCONFIG="$PHPPATH/bin/php-config")
+else
+	AC_CHECK_PROG(PHPCONFIG,"php-config","php-config")
+	if ( test -z "$PHPCONFIG"); then
+		for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin"
+		do
+			AC_CHECK_FILE("$i/php-config",PHPCONFIG="$i/php-config")
+			if ( test -n "$PHPCONFIG" ); then
+				break
+			fi
+		done
+	fi
+fi
+
+if ( test -n "$PHPCONFIG"); then
+	HAVE_PHP="yes"
+	PHPPREFIX=`$PHPCONFIG --prefix`
+	# some php's fail to replace ${prefix} with their prefix when you
+	# run php-config --includes, but php-config --prefix usually works
+	# so we fake it here
+	PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
+	PHPEXTDIR=`$PHPCONFIG --extension-dir`
+else
+	HAVE_PHP=""
+	AC_MSG_WARN("The PHP API will not be built.")
+fi
+
+AC_SUBST(HAVE_PHP)
+AC_SUBST(PHPINCLUDES)
+AC_SUBST(PHPEXTDIR)
+echo "******************************"
+
+
+
+dnl Checks for GTK+.
+echo
+echo "***** GTK+ *******************"
+HAVE_GTK=""
+GTKVER=""
+GTKCONFIG=""
+
+if ( test -n "$GTKPATH"); then
+	AC_CHECK_FILE("$GTKPATH/bin/gtk-config",GTKCONFIG="$GTKPATH/bin/gtk-config")
+else
+	AC_CHECK_PROG(GTKCONFIG,"gtk-config","gtk-config")
+	if ( test -z "$GTKCONFIG"); then
+		for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/gtk/bin" "/usr/local/gtk+/bin" "/opt/sfw/bin"
+		do
+			for j in "gtk-config" "gtk12-config" "gtk10-config"
+			do
+				AC_CHECK_FILE("$i/$j",GTKCONFIG="$i/$j")
+				if ( test -n "$GTKCONFIG" ); then	
+					break
+				fi
+			done
+		done
+	fi
+fi
+
+if ( test -n "$GTKCONFIG"); then
+	GTKVER=`$GTKCONFIG --version | cut -d'.' -f2`
+	HAVE_GTK="yes"
+else
+	HAVE_GTK=""
+	AC_MSG_WARN("GTK config tool will not be built.")
+fi
+
+AC_SUBST(HAVE_GTK)
+AC_DEFINE_UNQUOTED(GTK_VERSION,$GTKVER,Second decimal of the version of gtk)
+AC_SUBST(GTKCONFIG)
+echo "******************************"
+
+
+
+dnl Checks for header files.
+echo
+echo "***** Headers ****************"
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h strings.h)
+echo "******************************"
+
+
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+echo
+echo "***** Structures *************"
+AC_TYPE_MODE_T
+AC_TYPE_SIGNAL
+AC_MSG_CHECKING(for SIGHUP)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGHUP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGHUP,1,Do we have SIGHUP),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGINT)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGINT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGINT,1,Do we have SIGINT),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGQUIT)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGQUIT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGQUIT,1,Do we have SIGQUIT),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGILL)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGILL);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGILL,1,Do we have SIGILL),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGTRAP)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTRAP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTRAP,1,Do we have SIGTRAP),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGABRT)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGABRT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGABRT,1,Do we have SIGABRT),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGIOT)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGIOT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGIOT,1,Do we have SIGIOT),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGBUS)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGBUS);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGBUS,1,Do we have SIGBUS),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGFPE)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGFPE);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGFPE,1,Do we have SIGFPE),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGKILL)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGKILL);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGKILL,1,Do we have SIGKILL),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGUSR1)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGUSR1);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGUSR1,1,Do we have SIGUSR1),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGSEGV)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGSEGV);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGSEGV,1,Do we have SIGSEGV),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGUSR2)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGUSR2);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGUSR2,1,Do we have SIGUSR2),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGPIPE)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGPIPE);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGPIPE,1,Do we have SIGPIPE),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGALRM)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGALRM);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGALRM,1,Do we have SIGALRM),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGTERM)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTERM);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTERM,1,Do we have SIGTERM),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGSTKFLT)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGSTKFLT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGSTKFLT,1,Do we have SIGSTKFLT),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGCHLD)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGCHLD);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGCHLD,1,Do we have SIGCHLD),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGCONT)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGCONT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGCONT,1,Do we have SIGCONT),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGSTOP)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGSTOP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGSTOP,1,Do we have SIGSTOP),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGTSTP)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTSTP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTSTP,1,Do we have SIGTSTP),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGTTIN)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTTIN);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTTIN,1,Do we have SIGTTIN),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGTTOU)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTTOU);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTTOU,1,Do we have SIGTTOU),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGURG)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGURG);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGURG,1,Do we have SIGURG),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGXCPU)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGXCPU);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGXCPU,1,Do we have SIGXCPU),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGXFSZ)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGXFSZ);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGXFSZ,1,Do we have SIGXFSZ),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGVTALRM)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGVTALRM);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGVTALRM,1,Do we have SIGVTALRM),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGPROF)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGPROF);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGPROF,1,Do we have SIGPROF),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGWINCH)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGWINCH);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGWINCH,1,Do we have SIGWINCH),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGIO)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGIO);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGIO,1,Do we have SIGIO),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGPOLL)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGPOLL);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGPOLL,1,Do we have SIGPOLL),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGPWR)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGPWR);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGPWR,1,Do we have SIGPWR),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGUNUSED)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGUNUSED);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGUNUSED,1,Do we have SIGUNUSED),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGEMT)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGEMT);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGEMT,1,Do we have SIGEMT),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGSYS)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGSYS);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGSYS,1,Do we have SIGSYS),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGCLD)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGCLD);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGCLD,1,Do we have SIGCLD),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGWAITING)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGWAITING);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGWAITING,1,Do we have SIGWAITING),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGLWP)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGLWP);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGLWP,1,Do we have SIGLWP),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGFREEZE)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGFREEZE);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGFREEZE,1,Do we have SIGFREEZE),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGTHAW)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGTHAW);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGTHAW,1,Do we have SIGTHAW),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGCANCEL)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGCANCEL);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGCANCEL,1,Do we have SIGCANCEL),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGLOST)
+AC_TRY_LINK([#include <signal.h>
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGLOST);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGLOST,1,Do we have SIGLOST),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for _SIGRTMIN)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,_SIGRTMIN);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE__SIGRTMIN,1,Do we have _SIGRTMIN),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for _SIGRTMAX)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,_SIGRTMAX);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE__SIGRTMAX,1,Do we have _SIGRTMAX),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGRTMIN)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGRTMIN);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGRTMIN,1,Do we have SIGRTMIN),AC_MSG_RESULT(no))
+AC_MSG_CHECKING(for SIGRTMAX)
+AC_TRY_LINK([#include <signal.h> 
+#include <stdlib.h>],
+sigset_t set; sigemptyset(&set); sigaddset(&set,SIGRTMAX);, AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIGRTMAX,1,Do we have SIGRTMAX),AC_MSG_RESULT(no))
+
+echo "******************************"
+
+
+
+dnl Checks for library functions.
+echo
+echo "***** Functions **************"
+AC_CHECK_FUNCS(mkfifo mknod putenv setenv)
+echo "******************************"
+
+
+dnl Checks for rpm build directory.
+RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
+AC_SUBST(RPM_BUILD_DIR)
+
+
+
+dnl Default build variables.
+SQLR_VERSION="0.33"
+AC_SUBST(SQLR_VERSION)
+AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
+dnl rules for CURRENT:REVISION:AGE version info:
+dnl apply the following rules in order:
+dnl if library source changed at all,         c:r:a -> c:r+1:a
+dnl if interfaces added, removed, or changed, c:r:a -> c+1:0:a
+dnl if interfaces added,                      c:r:a -> c:r:a+1
+dnl if interfaces removed,                    c:r:a -> c:r:0
+SONAME_VERSION_INFO="1:0:0"
+AC_SUBST(SONAME_VERSION_INFO)
+LDFLAGS="-s"
+AC_SUBST(LDFLAGS)
+CFLAGS=""
+AC_SUBST(CFLAGS)
+CXXFLAGS=""
+AC_SUBST(CXXFLAGS)
+DEBUGCXXFLAGS="-g -pg"
+AC_SUBST(DEBUGCXXFLAGS)
+DEBUGCFLAGS="-g -pg"
+AC_SUBST(DEBUGCFLAGS)
+AC_SUBST(STATICLINK)
+AC_PREFIX_DEFAULT(/usr/local/firstworks)
+AC_CONFIG_HEADER(config.h)
+
+
+
+dnl Search for Makefile.in's and output Makefiles from them.
+echo
+echo "***** Output Files ***********"
+
+
+dnl Build sqlrelay.spec.in file
+cat spec/sqlrelay-common.spec.in > sqlrelay.spec.in.in
+echo "" >> sqlrelay.spec.in.in
+cat spec/sqlrelay-doc.spec.in >> sqlrelay.spec.in.in
+echo "" >> sqlrelay.spec.in.in
+cat spec/sqlrelay-c++.spec.in >> sqlrelay.spec.in.in
+echo "" >> sqlrelay.spec.in.in
+cat spec/sqlrelay-c.spec.in >> sqlrelay.spec.in.in
+echo "" >> sqlrelay.spec.in.in
+if ( test -n "$HAVE_PERL" ); then
+	cat spec/sqlrelay-perl.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$HAVE_PYTHON" ); then
+	cat spec/sqlrelay-python.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$HAVE_ZOPE" ); then
+	cat spec/sqlrelay-zope.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$HAVE_RUBY" ); then
+	cat spec/sqlrelay-ruby.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$HAVE_PHP" ); then
+	cat spec/sqlrelay-php.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$HAVE_JAVA" ); then
+	cat spec/sqlrelay-java.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$ORACLEVERSION" ); then
+	cat spec/sqlrelay-oracle7.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$ORACLEVERSION" -a "$ORACLEVERSION" != "7"); then
+	cat spec/sqlrelay-oracle8.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$MYSQLLIBS" ); then
+	cat spec/sqlrelay-mysql.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$MSQLLIBS" ); then
+	cat spec/sqlrelay-msql.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$POSTGRESQLLIBS" ); then
+	cat spec/sqlrelay-postgresql.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$SQLITELIBS" ); then
+	cat spec/sqlrelay-sqlite.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$LAGOLIBS" ); then
+	cat spec/sqlrelay-lago.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$FREETDSLIBS" ); then
+	cat spec/sqlrelay-freetds.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$SYBASELIBS" ); then
+	cat spec/sqlrelay-sybase.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$ODBCLIBS" ); then
+	cat spec/sqlrelay-odbc.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$DB2LIBS" ); then
+	cat spec/sqlrelay-db2.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+if ( test -n "$INTERBASELIBS" ); then
+	cat spec/sqlrelay-interbase.spec.in >> sqlrelay.spec.in.in
+	echo "" >> sqlrelay.spec.in.in
+fi
+MAKELIST="config.mk src/api/perl/SQLRConnection/Makefile.PL src/api/perl/SQLRCursor/Makefile.PL src/api/perl/SQLRConnection/SQLRConnection.pm src/api/perl/SQLRCursor/SQLRCursor.pm src/api/perl/DBD/SQLRelay.pm sqlrelay.spec.in bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay"
+AC_OUTPUT($MAKELIST)
+chmod 755 bin/sqlr-stop
+chmod 755 bin/sqlrclient-config
+chmod 755 bin/sqlrclientwrapper-config
+chmod 755 init/openserver/init.d/sqlrelay
+chmod 755 init/redhat/init.d/sqlrelay
+chmod 755 init/slackware/rc.d/rc.sqlrelay
+chmod 755 init/debian/init.d/sqlrelay
+chmod 755 init/netbsd/rc.d/sqlrelay
+chmod 755 init/freebsd/rc.d/sqlrelay
+
+
+
+dnl Summary.
+echo
+echo "***** Summary ***********************************************"
+
+echo " Version      : $SQLR_VERSION"
+
+APIS=" API's        : C++  C  "
+if ( test -n "$HAVE_PERL" ); then
+	APIS=$APIS"Perl  "
+fi
+if ( test -n "$HAVE_PYTHON" ); then
+	APIS=$APIS"Python  "
+fi
+if ( test -n "$HAVE_ZOPE" ); then
+	APIS=$APIS"Zope  "
+fi
+if ( test -n "$HAVE_RUBY" ); then
+	APIS=$APIS"Ruby  "
+fi
+if ( test -n "$HAVE_PHP" ); then
+	APIS=$APIS"PHP  "
+fi
+if ( test -n "$HAVE_JAVA" ); then
+	APIS=$APIS"Java  "
+fi
+echo "$APIS"
+
+ORACLE7BUILD="no     "
+ORACLE8BUILD="no     "
+MYSQLBUILD="no     "
+MSQLBUILD="no     "
+POSTGRESQLBUILD="no     "
+SQLITEBUILD="no     "
+LAGOBUILD="no     "
+FREETDSBUILD="no     "
+SYBASEBUILD="no     "
+ODBCBUILD="no     "
+DB2BUILD="no     "
+INTERBASEBUILD="no     "
+if ( test -n "$ORACLEVERSION" ); then
+	ORACLE7BUILD="dynamic"
+	if ( test -n "$ORACLESTATIC" ); then
+		ORACLE7BUILD="static "
+	fi
+fi
+if ( test -n "$ORACLEVERSION" -a "$ORACLEVERSION" != "7"); then
+	ORACLE8BUILD="dynamic"
+	if ( test -n "$ORACLESTATIC" ); then
+		ORACLE8BUILD="static "
+	fi
+fi
+if ( test -n "$MYSQLLIBS" ); then
+	MYSQLBUILD="dynamic"
+	if ( test -n "$MYSQLSTATIC" ); then
+		MYSQLBUILD="static "
+	fi
+fi
+if ( test -n "$MSQLLIBS" ); then
+	MSQLBUILD="dynamic"
+	if ( test -n "$MSQLSTATIC" ); then
+		MSQLBUILD="static "
+	fi
+fi
+if ( test -n "$POSTGRESQLLIBS" ); then
+	POSTGRESQLBUILD="dynamic"
+	if ( test -n "$POSTGRESQLSTATIC" ); then
+		POSTGRESQLBUILD="static "
+	fi
+fi
+if ( test -n "$SQLITELIBS" ); then
+	SQLITEBUILD="dynamic"
+	if ( test -n "$SQLITESTATIC" ); then
+		SQLITEBUILD="static "
+	fi
+fi
+if ( test -n "$LAGOLIBS" ); then
+	LAGOBUILD="dynamic"
+	if ( test -n "$LAGOSTATIC" ); then
+		LAGOBUILD="static "
+	fi
+fi
+if ( test -n "$FREETDSLIBS" ); then
+	FREETDSBUILD="dynamic"
+	if ( test -n "$FREETDSSTATIC" ); then
+		FREETDSBUILD="static "
+	fi
+fi
+if ( test -n "$SYBASELIBS" ); then
+	SYBASEBUILD="dynamic"
+	if ( test -n "$SYBASESTATIC" ); then
+		SYBASEBUILD="static "
+	fi
+fi
+if ( test -n "$ODBCLIBS" ); then
+	ODBCBUILD="dynamic"
+	if ( test -n "$ODBCSTATIC" ); then
+		ODBCBUILD="static "
+	fi
+fi
+if ( test -n "$DB2LIBS" ); then
+	DB2BUILD="dynamic"
+	if ( test -n "$DB2STATIC" ); then
+		DB2BUILD="static "
+	fi
+fi
+if ( test -n "$INTERBASELIBS" ); then
+	INTERBASEBUILD="dynamic"
+	if ( test -n "$INTERBASESTATIC" ); then
+		INTERBASEBUILD="static "
+	fi
+fi
+echo " Connections  : Oracle7     $ORACLE7BUILD       Oracle8    $ORACLE8BUILD"
+echo "                MySQL       $MYSQLBUILD       mSQL       $MSQLBUILD"
+echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
+echo "                Lago        $LAGOBUILD       FreeTDS    $FREETDSBUILD"
+echo "                Sybase      $SYBASEBUILD       ODBC       $ODBCBUILD"
+echo "                DB2         $DB2BUILD       Interbase  $INTERBASEBUILD"
+
+echo "*************************************************************"
+echo
+echo "If you expected a Connection or API that doesn't show up in the Summary"
+echo "then the configure script probably couldn't find a package it needed to"
+echo "build it.  You can manually specify package locations using command line"
+echo "options."
+echo
+echo "Type:  configure --help   for a list of options."
+echo
+
+dnl Credits.
+echo
+echo "Thanks to MP3.com for sponsoring:"
+echo "	Clustered/Replicated database support."
+echo "	Perl API."
+echo

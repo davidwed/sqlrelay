@@ -1,0 +1,145 @@
+<HTML>
+<HEAD>
+<TITLE>SQLRConnection</TITLE>
+<LINK REV="made" HREF="mailto:bhcompile@daffy.perf.redhat.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+    Firstworks::SQLRConnection - Perl API for SQL Relay</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Firstworks::SQLRConnection;
+        use Firstworks::SQLRStmt;</PRE>
+<PRE>
+        my $sc=Firstworks::SQLRConnection-&gt;new(&quot;testhost&quot;,9000,&quot;&quot;,
+                                          &quot;testuser&quot;,&quot;testpassword&quot;,0,1);
+        my $ss=Firstworks::SQLRStmt-&gt;new($sc);</PRE>
+<PRE>
+        $ss-&gt;sendQuery(&quot;select table_name from user_tables&quot;);
+        $sc-&gt;endSession();</PRE>
+<PRE>
+        for (my $i=0; $i&lt;$ss-&gt;rowCount(); $i++) {
+                print $ss-&gt;getField($i,&quot;table_name&quot;), &quot;\n&quot;;
+        }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<PRE>
+    Firstworks::SQLRConnection</PRE>
+<PRE>
+        new(server, port, socket, user, password, retrytime, tries);
+            # Initiates a connection to &quot;server&quot; on &quot;port&quot;
+            # or to the unix &quot;socket&quot; on the local machine
+            # and authenticates with &quot;user&quot; and &quot;password&quot;.
+            # Failed connections will be retried for 
+            # &quot;tries&quot; times on interval &quot;retrytime&quot;
+            # or on for a default number of times on
+            # a default interval if left unspecified.
+            #
+            # If the &quot;socket&quot; parameter is neither
+            # NULL nor &quot;&quot; then an attempt will be made to
+            # connect through it before attempting to
+            # connect to &quot;server&quot; on &quot;port&quot;.  If it is
+            # NULL or &quot;&quot; then no attempt will be made to
+            # connect through the socket.</PRE>
+<PRE>
+        DESTROY();
+            # Disconnects and ends the session if
+            # it hasn't been ended already.</PRE>
+<PRE>
+        endSession();
+            # Ends the session.</PRE>
+<PRE>
+        suspendSession();
+            # Leaves the session open so another client
+            # can connect to it.
+</PRE>
+<PRE>
+
+        getConnectionPort();
+            # Returns the inet port that the client is 
+            # communicating over. This parameter may be 
+            # passed to another client for use in
+            # the resumeSession() command below.</PRE>
+<PRE>
+        getConnectionSocket();
+            # Returns the unix socket that the client is 
+            # communicating over. This parameter may be 
+            # passed to another client for use in
+            # the resumeSession() command below.</PRE>
+<PRE>
+        resumeSession(port,socket);
+            # Resumes a session previously left open 
+            # using suspendSession().
+            # Returns 1 on success and 0 on failure.</PRE>
+<PRE>
+        ping();
+            # Returns 1 if the database is up and 0
+            # if it's down.</PRE>
+<PRE>
+        identify();
+            # Returns the type of database:
+            #   oracle7, oracle8, postgresql, mysql, etc.</PRE>
+<PRE>
+        autoCommitOn();
+            # Instructs the database to perform a commit
+            # after every successful query.
+            # Returns 1 if setting autocommit on succeeded
+            # and 0 if it failed.</PRE>
+<PRE>
+        autoCommitOff();
+            # Instructs the database to wait for the 
+            # client to tell it when to commit.
+            # Returns 1 if setting autocommit off succeeded
+            # and 0 if it failed.</PRE>
+<PRE>
+        commit();
+            # Issues a commit.  Returns 1 if the commit
+            # succeeded, 0 if it failed and -1 if an
+            # error occurred.</PRE>
+<PRE>
+        rollback();
+            # Issues a rollback.  Returns 1 if the rollback
+            # succeeded, 0 if it failed and -1 if an
+            # error occurred.</PRE>
+<PRE>
+        debugOn();
+            # Causes verbose debugging information to be 
+            # sent to standard output.  Another way to do 
+            # this is to start a query with &quot;-- debug\n&quot;.</PRE>
+<PRE>
+        debugOff();
+            # Turns debugging off.</PRE>
+<PRE>
+        getDebug();
+            # Returns 1 if debugging is currently on and 0
+            # if debugging is currently off.</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+    David Muse
+    mused@firstworks.com</PRE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,12 @@
+%package freetds
+Summary: SQL Relay connection daemon for FreeTDS (Sybase and Microsoft SQL Server).
+Requires: sqlrelay = %{ver}
+Group: Database/Daemons
+
+%description freetds
+SQL Relay connection daemon for FreeTDS (Sybase and Microsoft SQL Server).
+
+%files freetds
+%defattr(-,root,root)
+%{bindir}/sqlr-connection-freetds
+%{bindir}/sqlr-connection-freetds-debug

@@ -1,0 +1,354 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay using the Perl DBI API</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Programming with SQL Relay using the Perl DBI API</span><br><br>
+
+<ul>
+<li><a href="#session">Establishing a Sessions</a></li>
+<li><a href="#query">Executing Queries</a></li>
+<li><a href="#commit">Commits and Rollbacks</a></li>
+<li><a href="#errors">Catching Errors</a></li>
+<li><a href="#bindvars">Bind Variables</a></li>
+<li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
+<li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#cursors">Cursors</a></li>
+<li><a href="#columns">Getting Column Information</a></li>
+</ul>
+
+<a name="session"></a>
+<span class="heading2">Establishing a Session</span><br><br>
+
+<p>To use SQL Relay, you have to identify the connection that you intend to 
+use.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+... <FONT color=#008888>execute</FONT> <FONT color=#008888>some</FONT> <FONT color=#008888>queries</FONT> ...
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+<p>After calling the connect(), a session is established when the first 
+execute() is run.</p>
+
+<p>For the duration of the session, the client stays connected to a database
+connection daemon.  While one client is connected, no other client can connect.
+Care should be taken to minimize the length of a session.</p>
+
+<p>If you're using a transactional database, ending a session has a catch.
+Database connection daemons can be configured to send either a commit or
+rollback at the end of a session if DML queries were executed during the
+session with no commit or rollback.  Program accordingly.</p>
+
+<a name="query"></a>
+<span class="heading2">Executing Queries</span><br><br>
+
+<p>Call prepare() and execute() to run a query.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from user_tables</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>();
+
+... <FONT color=#008888>process</FONT> <FONT color=#008888>the</FONT> <FONT color=#008888>result</FONT> <FONT color=#008888>set</FONT> ...
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+<a name="commit"></a>
+<span class="heading2">Commits and Rollbacks</span><br><br>
+
+<p>If you need to execute a commit or rollback, you should use the commit()
+and rollback() methods rather than sending a "commit" or "rollback" query.  
+There are two reasons for this.  First, it's much more efficient to call the 
+methods.  Second, if you're writing code that can run on transactional or 
+non-transactional databases, some non-transactional databases will throw errors
+if they receive a "commit" or "rollback" query, but by calling the commit() 
+and rollback() methods you instruct the database connection daemon to call the 
+commit and rollback API methods for that database rather than issuing them as 
+queries.  If the API's have no commit or rollback methods, the calls do nothing
+and the database throws no error.  This is especially important when using SQL 
+Relay with ODBC.</p>
+
+<p>You can also turn Autocommit on or off by setting the AutoCommit attribute
+of the database handle.</p>
+
+<p>The following command turns Autocommit on.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#008a8e>$dbh</FONT>-&gt;{AutoCommit} = <FONT color=#ff00ff>1</FONT>;
+</PRE>
+</blockquote>
+
+<p>The following command turns Autocommit off.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#008a8e>$dbh</FONT>-&gt;{AutoCommit} = <FONT color=#ff00ff>0</FONT>;
+</PRE>
+</blockquote>
+
+<p>When Autocommit is on, the database performs a commit after each successful 
+DML or DDL query.  When Autocommit is off, the database commits when the client 
+instructs it to, or (by default) when a client disconnects.  For databases that
+don't support Autocommit, setting the AutoCommit attribute has no effect.</p>
+
+<a name="errors"></a>
+<span class="heading2">Catching Errors</span><br><br>
+
+<p>If your calls to connect(), prepare() or execute() fail, you can catch the
+error in DBI-&gt;errstr.
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>)
+        <B><FONT color=#a02828>or</FONT></B> <B><FONT color=#a02828>die</FONT></B> <FONT color=#008888>DBI</FONT>-&gt;<FONT color=#008888>errstr</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from user_tables</FONT><FONT color=#f800f8>&quot;</FONT>)
+        <B><FONT color=#a02828>or</FONT></B> <B><FONT color=#a02828>die</FONT></B> <FONT color=#008888>DBI</FONT>-&gt;<FONT color=#008888>errstr</FONT>;
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>()
+        <B><FONT color=#a02828>or</FONT></B> <B><FONT color=#a02828>die</FONT></B> <FONT color=#008888>DBI</FONT>-&gt;<FONT color=#008888>errstr</FONT>;
+
+... <FONT color=#008888>process</FONT> <FONT color=#008888>the</FONT> <FONT color=#008888>result</FONT> <FONT color=#008888>set</FONT> ...
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+<a name="bindvars"></a>
+<span class="heading2">Bind Variables</span><br><br>
+
+<p>Programs rarely execute fixed queries.  More often than not, some part
+of the query is dynamically generated.  The Perl DBI API provides means
+for using bind variables in those queries.</p>
+
+<p>For a detailed discussion of binds, see 
+<a href="binds.html">this document</a>.</p>
+
+<p>Here is an example using the bind_params() function.  The first parameter of
+the bind_params() function corresponds to the name or position of the bind 
+variable.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table where col1=:1 and col2=:2 and col3=:3</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>bind_param</FONT>(<FONT color=#f800f8>1</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>hello</FONT><FONT color=#f800f8>&quot;</FONT>);
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>bind_param</FONT>(<FONT color=#f800f8>2</FONT>,<FONT color=#f800f8>1</FONT>);
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>bind_param</FONT>(<FONT color=#f800f8>3</FONT>,<FONT color=#f800f8>5</FONT>.<FONT color=#f800f8>5</FONT>);
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>();
+
+... <FONT color=#008888>process</FONT> <FONT color=#008888>the</FONT> <FONT color=#008888>result</FONT> <FONT color=#008888>set</FONT> ...
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+<p>Here is an example using the execute() function directly.  The additional
+parameters correspond to bind variable positions.  Note that the first
+parameter must be "undef".</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table where col1=:0 and col2=:1 and col3=:2</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>(<B><FONT color=#a02828>undef</FONT></B>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>hello</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>1</FONT>,<FONT color=#f800f8>5</FONT>.<FONT color=#f800f8>5</FONT>);
+
+... <FONT color=#008888>process</FONT> <FONT color=#008888>the</FONT> <FONT color=#008888>result</FONT> <FONT color=#008888>set</FONT> ...
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+<a name="rebinding"></a>
+<span class="heading2">Re-Binding and Re-Execution</span><br><br>
+
+<p>A feature of the prepare/bind/execute paradigm is the ability to prepare, 
+bind and execute a query once, then re-bind and re-execute the query 
+over and over without re-preparing it.  If your backend database natively 
+supports this paradigm, you can reap a substantial performance improvement.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table where col1=:0 and col2=:1 and col3=:2</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>(<B><FONT color=#a02828>undef</FONT></B>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>hello</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>1</FONT>,<FONT color=#f800f8>1</FONT>.<FONT color=#f800f8>1</FONT>);
+
+... <FONT color=#008888>process</FONT> <FONT color=#008888>result</FONT> <FONT color=#008888>set</FONT> ...
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>(<B><FONT color=#a02828>undef</FONT></B>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>hi</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>2</FONT>,<FONT color=#f800f8>2</FONT>.<FONT color=#f800f8>2</FONT>);
+
+... <FONT color=#008888>process</FONT> <FONT color=#008888>result</FONT> <FONT color=#008888>set</FONT> ...
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>(<B><FONT color=#a02828>undef</FONT></B>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>goodbye</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>3</FONT>,<FONT color=#f800f8>3</FONT>.<FONT color=#f800f8>3</FONT>);
+
+... <FONT color=#008888>process</FONT> <FONT color=#008888>result</FONT> <FONT color=#008888>set</FONT> ...
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+<a name="fields"></a>
+<span class="heading2">Accessing Fields in the Result Set</span><br><br>
+
+<p>The fetchrow_array(), bind_columns() and fetch() functions are useful for 
+processing result sets.  fetchrow_array() returns an array of values.  
+bind_columns() associates variables with columns which are set when fetch() is
+called.</p>
+
+<p>Here's an example using fetchrow_array().</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from user_tables</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>();
+
+<B><FONT color=#a02828>while</FONT></B> (<FONT color=#008888>@data</FONT>=<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>fetchrow_array</FONT>()) {
+        
+        <B><FONT color=#a02828>foreach</FONT></B> <FONT color=#008888>$col</FONT> (<FONT color=#008888>@data</FONT>) {
+                <B><FONT color=#a02828>print</FONT></B> <FONT color=#f800f8>&quot;</FONT><FONT color=#6858c8>\&quot;</FONT><FONT color=#008888>$col</FONT><FONT color=#6858c8>\&quot;</FONT><FONT color=#f800f8>,</FONT><FONT color=#f800f8>&quot;</FONT>;
+        }
+        <B><FONT color=#a02828>print</FONT></B> <FONT color=#f800f8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#f800f8>&quot;</FONT>;
+}
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+<p>Here's an example using bind_columns() and fetch().  Note that the first
+bind_columns() parameter must be "undef".</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>();
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>bind_columns</FONT>(<B><FONT color=#a02828>undef</FONT></B>,<FONT color=#008888>\$col1</FONT>,<FONT color=#008888>\$col2</FONT>,<FONT color=#008888>\$col3</FONT>,<FONT color=#008888>\$col4</FONT>);
+
+<B><FONT color=#a02828>while</FONT></B> (<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>fetch</FONT>()) {
+        <B><FONT color=#a02828>print</FONT></B> <FONT color=#f800f8>&quot;</FONT><FONT color=#008888>$col</FONT><FONT color=#f800f8>, </FONT><FONT color=#008888>$col2</FONT><FONT color=#f800f8>, </FONT><FONT color=#008888>$col3</FONT><FONT color=#f800f8>, </FONT><FONT color=#008888>$col4</FONT><FONT color=#6858c8>\n</FONT><FONT color=#f800f8>&quot;</FONT>;
+}
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+
+<a name="cursors"></a>
+<span class="heading2">Cursors</span><br><br>
+
+<p>Cursors make it possible to execute queries while processing the result
+set of another query.  You can select rows from a table in one query, then 
+iterate through it's result set, inserting rows into another table, using only 
+1 database connection for both operations.</p>
+
+<p>For example:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth1</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_first_table</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<FONT color=#008888>$sth1</FONT>-&gt;<FONT color=#008888>execute</FONT>();
+<FONT color=#008888>$sth1</FONT>-&gt;<FONT color=#008888>bind_columns</FONT>(<B><FONT color=#a02828>undef</FONT></B>,<FONT color=#008888>\$col1</FONT>,<FONT color=#008888>\$col2</FONT>,<FONT color=#008888>\$col3</FONT>);
+
+<B><FONT color=#a02828>while</FONT></B> (<FONT color=#008888>$sth1</FONT>-&gt;<FONT color=#008888>fetch</FONT>()) {
+        <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth2</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>insert into my_second_table values (:0, :1, :2, sysdate)</FONT><FONT color=#f800f8>&quot;</FONT>);
+        <FONT color=#008888>$sth2</FONT>-&gt;<FONT color=#008888>execute</FONT>(<B><FONT color=#a02828>undef</FONT></B>,<FONT color=#008888>$col1</FONT>,<FONT color=#008888>$col2</FONT>,<FONT color=#008888>$col3</FONT>);
+}
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+<a name="columns"></a>
+<span class="heading2">Getting Column Information</span><br><br>
+
+<p>After executing a query, the column count is stored in the NUMBER_OF_FIELDS
+statement property and column names are stored in the NAME statement property.
+They are accessible as follows:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#!/usr/bin/env perl</FONT>
+
+<FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#f800f8>&quot;</FONT>);
+
+<FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>();
+
+<B><FONT color=#a02828>for</FONT></B> (<FONT color=#008888>$i</FONT>=<FONT color=#f800f8>1</FONT>; <FONT color=#008888>$i</FONT>&lt;=<FONT color=#008888>$sth</FONT>-&gt;{<FONT color=#008888>NUM_OF_FIELDS</FONT>}; <FONT color=#008888>$i</FONT>++) {
+       <B><FONT color=#a02828>print</FONT></B> <FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>Column </FONT><FONT color=#008888>$i</FONT><FONT color=#f800f8>: </FONT><FONT color=#008888>$sth</FONT><FONT color=#f800f8>-&gt;{NAME}-&gt;[i-1]</FONT><FONT color=#6858c8>\n</FONT><FONT color=#f800f8>&quot;</FONT>;
+}
+
+<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;
+</PRE>
+</blockquote>
+
+</body>
+</html>

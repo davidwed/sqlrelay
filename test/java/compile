@@ -1,0 +1,1 @@
+javac -classpath $CLASSPATH:/usr/local/firstworks/java *.java

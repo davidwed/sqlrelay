@@ -1,0 +1,348 @@
+<HTML>
+<HEAD>
+<TITLE>sqlrclientwrapper.h.html</TITLE>
+</HEAD>
+<BODY BGcolor=#FFFFFF TEXT=#000000>
+<PRE>
+<FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Copyright (c) 2000-2001  David Muse</FONT>
+<FONT color=#0000ff> See the file COPYING for more information */</FONT>
+
+<FONT color=#a620f7>#ifndef SQLRCLIENTWRAPPER_H</FONT>
+<FONT color=#a620f7>#define SQLRCLIENTWRAPPER_H</FONT>
+
+<B><FONT color=#288a51>typedef</FONT></B> <B><FONT color=#288a51>struct</FONT></B> sqlrconnection *sqlrcon;
+<B><FONT color=#288a51>typedef</FONT></B> <B><FONT color=#288a51>struct</FONT></B> sqlrcursor *sqlrcur;
+
+sqlrcon sqlrcon_alloc(<B><FONT color=#288a51>char</FONT></B> *server, <B><FONT color=#288a51>int</FONT></B> port, <B><FONT color=#288a51>char</FONT></B> *socket,
+                                        <B><FONT color=#288a51>char</FONT></B> *user, <B><FONT color=#288a51>char</FONT></B> *password, 
+                                        <B><FONT color=#288a51>int</FONT></B> retrytime, <B><FONT color=#288a51>int</FONT></B> tries);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Initiates a connection to &quot;server&quot; on &quot;port&quot;</FONT>
+<FONT color=#0000ff>                           or to the unix &quot;socket&quot; on the local machine</FONT>
+<FONT color=#0000ff>                           and authenticates with &quot;user&quot; and &quot;password&quot;.</FONT>
+<FONT color=#0000ff>                           Failed connections will be retried for </FONT>
+<FONT color=#0000ff>                           &quot;tries&quot; times on interval &quot;retrytime&quot;</FONT>
+<FONT color=#0000ff>                           or on for a default number of times on</FONT>
+<FONT color=#0000ff>                           a default interval if left unspecified.</FONT>
+
+<FONT color=#0000ff>                           If the &quot;socket&quot; parameter is nether </FONT>
+<FONT color=#0000ff>                           NULL nor &quot;&quot; then an attempt will be made to </FONT>
+<FONT color=#0000ff>                           connect through it before attempting to </FONT>
+<FONT color=#0000ff>                           connect to &quot;server&quot; on &quot;port&quot;.  If it is </FONT>
+<FONT color=#0000ff>                           NULL or &quot;&quot; then no attempt will be made to </FONT>
+<FONT color=#0000ff>                           connect through the socket.*/</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcon_free(sqlrcon sqlrconref); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Disconnects and ends the session if</FONT>
+<FONT color=#0000ff>                           it hasn't been terminated already. */</FONT>
+
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_endSession(sqlrcon sqlrconref); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Ends the session. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_suspendSession(sqlrcon sqlrconref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Disconnects this connection from the current</FONT>
+<FONT color=#0000ff>                           session but leaves the session open so </FONT>
+<FONT color=#0000ff>                           that another connection can connect to it </FONT>
+<FONT color=#0000ff>                           using sqlrcon_resumeSession(). */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_getConnectionPort(sqlrcon sqlrconref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the inet port that the connection is </FONT>
+<FONT color=#0000ff>                           communicating over. This parameter may be </FONT>
+<FONT color=#0000ff>                           passed to another connection for use in</FONT>
+<FONT color=#0000ff>                           the sqlrcon_resumeSession() command. */</FONT>
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcon_getConnectionSocket(sqlrcon sqlrconref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the unix socket that the connection is </FONT>
+<FONT color=#0000ff>                           communicating over. This parameter may be </FONT>
+<FONT color=#0000ff>                           passed to another connection for use in</FONT>
+<FONT color=#0000ff>                           the sqlrcon_resumeSession() command. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_resumeSession(sqlrcon sqlrconref, <B><FONT color=#288a51>int</FONT></B> port, <B><FONT color=#288a51>char</FONT></B> *socket);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Resumes a session previously left open </FONT>
+<FONT color=#0000ff>                           using sqlrcon_suspendSession().</FONT>
+<FONT color=#0000ff>                           Returns 1 on success and 0 on failure. */</FONT>
+
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_ping(sqlrcon sqlrconref); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns 1 if the database is up and 0</FONT>
+<FONT color=#0000ff>                           if it's down. */</FONT>
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcon_identify(sqlrcon sqlrconref); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the type of database: </FONT>
+<FONT color=#0000ff>                             oracle7, oracle8, postgresql, mysql, etc. */</FONT>
+
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_autoCommitOn(sqlrcon sqlrconref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Instructs the database to perform a commit</FONT>
+<FONT color=#0000ff>                           after every successful query. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_autoCommitOff(sqlrcon sqlrconref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Instructs the database to wait for the </FONT>
+<FONT color=#0000ff>                           client to tell it when to commit. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_commit(sqlrcon sqlrconref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Issues a commit.  Returns 1 if the commit</FONT>
+<FONT color=#0000ff>                           succeeded, 0 if it failed and -1 if an</FONT>
+<FONT color=#0000ff>                           error occurred. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_rollback(sqlrcon sqlrconref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Issues a rollback.  Returns 1 if the rollback</FONT>
+<FONT color=#0000ff>                           succeeded, 0 if it failed and -1 if an</FONT>
+<FONT color=#0000ff>                           error occurred. */</FONT>
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcon_debugOn(sqlrcon sqlrconref); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Causes verbose debugging information to be </FONT>
+<FONT color=#0000ff>                           sent to standard output.  Another way to do </FONT>
+<FONT color=#0000ff>                           this is to start a query with &quot;-- debug\n&quot;. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcon_debugOff(sqlrcon sqlrconref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Turns debugging off. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcon_getDebug(sqlrcon sqlrconref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns 0 if debugging is off and 1 if </FONT>
+<FONT color=#0000ff>                           debugging is on. */</FONT>
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcon_debugPrintFunction(sqlrcon sqlrconref, 
+                                        <B><FONT color=#288a51>int</FONT></B> (*printfunction)(<B><FONT color=#288a51>const</FONT></B> <B><FONT color=#288a51>char</FONT></B> *,...));
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Allows you to replace the function used</FONT>
+<FONT color=#0000ff>                           to print debug messages with your own</FONT>
+<FONT color=#0000ff>                           function.  The function is expected to take</FONT>
+<FONT color=#0000ff>                           arguments like printf. */</FONT>
+
+
+sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_free(sqlrcur sqlrcurref);
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_setResultSetBufferSize(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> rows);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Sets the number of rows of the result set</FONT>
+<FONT color=#0000ff>                           to buffer at a time.  0 (the default)</FONT>
+<FONT color=#0000ff>                           means buffer the entire result set. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the number of result set rows that </FONT>
+<FONT color=#0000ff>                           will be buffered at a time or 0 for the</FONT>
+<FONT color=#0000ff>                           entire result set. */</FONT>
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_dontGetColumnInfo(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Tells the server not to send any column</FONT>
+<FONT color=#0000ff>                           info (names, types, sizes).  If you don't</FONT>
+<FONT color=#0000ff>                           need that info, you should call this</FONT>
+<FONT color=#0000ff>                           function to improve performance. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_getColumnInfo(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Tells the server to send column info. */</FONT>
+
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_mixedCaseColumnNames(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Columns names are returned in the same</FONT>
+<FONT color=#0000ff>                           case as they are defined in the database.</FONT>
+<FONT color=#0000ff>                           This is the default. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_upperCaseColumnNames(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Columns names are converted to upper case. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_lowerCaseColumnNames(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Columns names are converted to lower case. */</FONT>
+
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_cacheToFile(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *filename);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Sets query caching on.  Future queries</FONT>
+<FONT color=#0000ff>                           will be cached to the file &quot;filename&quot;.</FONT>
+<FONT color=#0000ff>                          </FONT>
+<FONT color=#0000ff>                           A default time-to-live of 10 minutes is</FONT>
+<FONT color=#0000ff>                           also set.</FONT>
+<FONT color=#0000ff>                          </FONT>
+<FONT color=#0000ff>                           Note that once sqlrcur_cacheToFile() is called,</FONT>
+<FONT color=#0000ff>                           the result sets of all future queries will</FONT>
+<FONT color=#0000ff>                           be cached to that file until another call </FONT>
+<FONT color=#0000ff>                           to sqlrcur_cacheToFile() changes which file to</FONT>
+<FONT color=#0000ff>                           cache to or a call to sqlrcur_cacheOff() turns off</FONT>
+<FONT color=#0000ff>                           caching. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_setCacheTtl(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> ttl);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Sets the time-to-live for cached result</FONT>
+<FONT color=#0000ff>                           sets. The sqlr-cachemanger will remove each </FONT>
+<FONT color=#0000ff>                           cached result set &quot;ttl&quot; seconds after it's </FONT>
+<FONT color=#0000ff>                           created, provided it's scanning the directory</FONT>
+<FONT color=#0000ff>                           containing the cache files. */</FONT>
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcur_getCacheFileName(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the name of the file containing the</FONT>
+<FONT color=#0000ff>                           most recently cached result set. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_cacheOff(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Sets query caching off. */</FONT>
+
+
+
+<FONT color=#0000ff>/*</FONT><FONT color=#0000ff> If you need to use substitution or bind variables, in your</FONT>
+<FONT color=#0000ff>   queries use the following functions.  See the API documentation</FONT>
+<FONT color=#0000ff>   for more information about substitution and bind variables. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_sendQuery(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *query); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Sends &quot;query&quot; and gets a result set. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_sendQueryWithLength(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *query,
+                                                                <B><FONT color=#288a51>int</FONT></B> length); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Sends &quot;query&quot; with length &quot;length&quot; and gets</FONT>
+<FONT color=#0000ff>                           a result set. This function must be used if</FONT>
+<FONT color=#0000ff>                           the query contains binary data. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_sendFileQuery(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *path, <B><FONT color=#288a51>char</FONT></B> *filename);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Sends the query in file &quot;path&quot;/&quot;filename&quot; </FONT>
+<FONT color=#0000ff>                           and gets a result set. */</FONT>
+
+
+<FONT color=#0000ff>/*</FONT><FONT color=#0000ff> If you need to use substitution or bind variables, in your</FONT>
+<FONT color=#0000ff>   queries use the following functions.  See the footnote for </FONT>
+<FONT color=#0000ff>   information about substitution and bind variables. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_prepareQuery(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *query);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Prepare to execute &quot;query&quot;. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_prepareQueryWithLength(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *query,
+                                                                <B><FONT color=#288a51>int</FONT></B> length);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Prepare to execute &quot;query&quot; with length </FONT>
+<FONT color=#0000ff>                           &quot;length&quot;.  This function must be used if the</FONT>
+<FONT color=#0000ff>                           query contains binary data. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_prepareFileQuery(sqlrcur sqlrcurref, 
+                                        <B><FONT color=#288a51>char</FONT></B> *path, <B><FONT color=#288a51>char</FONT></B> *filename);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Prepare to execute the contents </FONT>
+<FONT color=#0000ff>                           of &quot;path&quot;/&quot;filename&quot;. */</FONT>
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_subString(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *variable, <B><FONT color=#288a51>char</FONT></B> *value);
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_subLong(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *variable, <B><FONT color=#288a51>long</FONT></B> value);
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_subDouble(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *variable, <B><FONT color=#288a51>double</FONT></B> value,
+                        <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>short</FONT></B> precision, <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>short</FONT></B> scale);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Define a substitution variable. */</FONT>
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_clearBinds(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Clear all bind variables. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_inputBindString(sqlrcur sqlrcurref, 
+                                        <B><FONT color=#288a51>char</FONT></B> *variable, <B><FONT color=#288a51>char</FONT></B> *value);
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_inputBindLong(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *variable, 
+                                                <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>long</FONT></B> value);
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_inputBindDouble(sqlrcur sqlrcurref, 
+                                        <B><FONT color=#288a51>char</FONT></B> *variable, <B><FONT color=#288a51>double</FONT></B> value,
+                                        <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>short</FONT></B> precision, 
+                                        <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>short</FONT></B> scale);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Define an input bind variable. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_defineOutputBind(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *variable, 
+                                                                <B><FONT color=#288a51>int</FONT></B> length);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Define an output bind variable. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_subStrings(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> **variables, <B><FONT color=#288a51>char</FONT></B> **values);
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_subLongs(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> **variables, <B><FONT color=#288a51>long</FONT></B> *values);
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_subDoubles(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> **variables, <B><FONT color=#288a51>double</FONT></B> *values,
+                        <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>short</FONT></B> *precisions, <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>short</FONT></B> *scales);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Define an array of substitution variables. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_inputBindStrings(sqlrcur sqlrcurref, 
+                                        <B><FONT color=#288a51>char</FONT></B> **variables, <B><FONT color=#288a51>char</FONT></B> **values);
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_inputBindLongs(sqlrcur sqlrcurref, 
+                                        <B><FONT color=#288a51>char</FONT></B> **variables, 
+                                        <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>long</FONT></B> *values);
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_inputBindDoubles(sqlrcur sqlrcurref, 
+                                        <B><FONT color=#288a51>char</FONT></B> **variables, <B><FONT color=#288a51>double</FONT></B> *values,
+                                        <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>short</FONT></B> *precisions, 
+                                        <B><FONT color=#288a51>unsigned</FONT></B> <B><FONT color=#288a51>short</FONT></B> *scales);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Define an array of input bind variables. */</FONT>
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_validateBinds(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> If you are binding to any variables that </FONT>
+<FONT color=#0000ff>                           might not actually be in your query, call </FONT>
+<FONT color=#0000ff>                           this to ensure that the database won't try </FONT>
+<FONT color=#0000ff>                           to bind them unless they really are in the </FONT>
+<FONT color=#0000ff>                           query.  There is a performance penalty for</FONT>
+<FONT color=#0000ff>                           calling this function */</FONT>
+
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_executeQuery(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Execute the query that was previously prepared </FONT>
+<FONT color=#0000ff>                           and bound. */</FONT>
+
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcur_getOutputBind(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *variable);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Get the value stored in a previously</FONT>
+<FONT color=#0000ff>                           defined output bind variable. */</FONT>
+
+
+
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_openCachedResultSet(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *filename); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Opens a cached result set.</FONT>
+<FONT color=#0000ff>                           Returns 1 on success and 0 on failure. */</FONT>
+
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_colCount(sqlrcur sqlrcurref); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the number of columns in the current</FONT>
+<FONT color=#0000ff>                           result set. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_rowCount(sqlrcur sqlrcurref); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the number of rows in the current </FONT>
+<FONT color=#0000ff>                           result set. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_totalRows(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the total number of rows that will </FONT>
+<FONT color=#0000ff>                           be returned in the result set.  Not all </FONT>
+<FONT color=#0000ff>                           databases support this call.  Don't use it </FONT>
+<FONT color=#0000ff>                           for applications which are designed to be </FONT>
+<FONT color=#0000ff>                           portable across databases.  -1 is returned</FONT>
+<FONT color=#0000ff>                           by databases which don't support this option. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_affectedRows(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the number of rows that were </FONT>
+<FONT color=#0000ff>                           updated, inserted or deleted by the query.</FONT>
+<FONT color=#0000ff>                           Not all databases support this call.  Don't </FONT>
+<FONT color=#0000ff>                           use it for applications which are designed </FONT>
+<FONT color=#0000ff>                           to be portable across databases.  -1 is </FONT>
+<FONT color=#0000ff>                           returned by databases which don't support </FONT>
+<FONT color=#0000ff>                           this option. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_firstRowIndex(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the index of the first buffered row.</FONT>
+<FONT color=#0000ff>                           This is useful when buffering only part of</FONT>
+<FONT color=#0000ff>                           the result set at a time. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_endOfResultSet(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns 0 if part of the result set is still</FONT>
+<FONT color=#0000ff>                           pending on the server and 1 if not.  This</FONT>
+<FONT color=#0000ff>                           function can only return 0 if </FONT>
+<FONT color=#0000ff>                           setResultSetBufferSize() has been called</FONT>
+<FONT color=#0000ff>                           with a parameter other than 0. */</FONT>
+  
+
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcur_errorMessage(sqlrcur sqlrcurref); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> If a query failed and generated an error, the</FONT>
+<FONT color=#0000ff>                           error message is available here.  If the </FONT>
+<FONT color=#0000ff>                           query succeeded then this function returns a </FONT>
+<FONT color=#0000ff>                           NULL. */</FONT>
+
+
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_getNullsAsEmptyStrings(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Tells the connection to return NULL fields and</FONT>
+<FONT color=#0000ff>                           output bind variables as empty strings.</FONT>
+<FONT color=#0000ff>                           This is the default. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_getNullsAsNulls(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Tells the connection to return NULL fields and</FONT>
+<FONT color=#0000ff>                           output bind variables as NULL's. */</FONT>
+
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> row, <B><FONT color=#288a51>int</FONT></B> col); 
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcur_getFieldByName(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> row, <B><FONT color=#288a51>char</FONT></B> *col); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns a pointer to the value of the </FONT>
+<FONT color=#0000ff>                           specified row and column. */</FONT>
+<B><FONT color=#288a51>long</FONT></B>    sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> row, <B><FONT color=#288a51>int</FONT></B> col); 
+<B><FONT color=#288a51>long</FONT></B>    sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> row, <B><FONT color=#288a51>char</FONT></B> *col); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the length of the </FONT>
+<FONT color=#0000ff>                           specified row and column. */</FONT>
+<B><FONT color=#288a51>char</FONT></B>    **sqlrcur_getRow(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> row); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns a null terminated array of the </FONT>
+<FONT color=#0000ff>                           values of the fields in the specified row. */</FONT>
+<B><FONT color=#288a51>long</FONT></B>    *sqlrcur_getRowLengths(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> row); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns a null terminated array of the </FONT>
+<FONT color=#0000ff>                           lengths of the fields in the specified row. */</FONT>
+<B><FONT color=#288a51>char</FONT></B>    **sqlrcur_getColumnNames(sqlrcur sqlrcurref); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns a null terminated array of the </FONT>
+<FONT color=#0000ff>                           column names of the current result set. */</FONT>
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcur_getColumnName(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> col); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the name of the specified column. */</FONT>
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcur_getColumnTypeByIndex(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> col); 
+<B><FONT color=#288a51>char</FONT></B>    *sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *col); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the type of the specified column. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_getColumnLengthByIndex(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> col); 
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_getColumnLengthByName(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *col); 
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the length of the specified column. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_getLongestByIndex(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> col);
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_getLongestByName(sqlrcur sqlrcurref, <B><FONT color=#288a51>char</FONT></B> *col);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the length of the longest field in the</FONT>
+<FONT color=#0000ff>                           specified column. */</FONT>
+
+
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_getResultSetId(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Returns the internal ID of this result set.</FONT>
+<FONT color=#0000ff>                           This parameter may be passed to another </FONT>
+<FONT color=#0000ff>                           statement for use in the resumeResultSet() </FONT>
+<FONT color=#0000ff>                           function. */</FONT>
+<B><FONT color=#288a51>void</FONT></B>    sqlrcur_suspendResultSet(sqlrcur sqlrcurref);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Tells the server to leave this result</FONT>
+<FONT color=#0000ff>                           set open when the connection calls </FONT>
+<FONT color=#0000ff>                           suspendSession() so that another connection can </FONT>
+<FONT color=#0000ff>                           connect to it using resumeResultSet() after </FONT>
+<FONT color=#0000ff>                           it calls resumeSession(). */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_resumeResultSet(sqlrcur sqlrcurref, <B><FONT color=#288a51>int</FONT></B> id);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Resumes a result set previously left open </FONT>
+<FONT color=#0000ff>                           using suspendSession().</FONT>
+<FONT color=#0000ff>                           Returns 1 on success and 0 on failure. */</FONT>
+<B><FONT color=#288a51>int</FONT></B>     sqlrcur_resumeCachedResultSet(sqlrcur sqlrcurref, 
+                                                <B><FONT color=#288a51>int</FONT></B> id, <B><FONT color=#288a51>char</FONT></B> *filename);
+                        <FONT color=#0000ff>/*</FONT><FONT color=#0000ff> Resumes a result set previously left open</FONT>
+<FONT color=#0000ff>                           using suspendSession() and continues caching</FONT>
+<FONT color=#0000ff>                           the result set to &quot;filename&quot;.</FONT>
+<FONT color=#0000ff>                           Returns 1 on success and 0 on failure. */</FONT>
+<FONT color=#a620f7>#endif</FONT>
+</PRE>
+</BODY>
+</HTML>

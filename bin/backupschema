@@ -1,0 +1,25 @@
+#!/bin/sh
+# Copyright (c) 1999-2000  David Muse
+# See the file COPYING for more information
+
+for i in `query $1 $2 "" $3 $4 "select table_name from user_tables"`
+do
+	TABLE=`echo $i | cut -d"\"" -f2`
+
+	echo "Processing: $TABLE"
+
+	CTLFILE=$TABLE.ctl
+
+	echo "LOAD DATA" > $CTLFILE
+	echo "INFILE *" >> $CTLFILE
+	echo "APPEND" >> $CTLFILE
+	echo "INTO TABLE $TABLE" >> $CTLFILE
+	echo "FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'" >> $CTLFILE
+	echo -n "(" >> $CTLFILE
+	fields $1 $2 "" $3 $4 "$TABLE" >> $CTLFILE
+	echo -n ")" >> $CTLFILE
+	echo >> $CTLFILE
+	echo "BEGINDATA" >> $CTLFILE
+
+	query $1 $2 "" $3 $4 "select * from $TABLE" >> $CTLFILE
+done

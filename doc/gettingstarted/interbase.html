@@ -1,0 +1,322 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With Interbase</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Getting Started With Interbase</span><br>
+
+<ul>
+<li><a href="#installation">Installation</a></li>
+<ul>
+<li><a href="#startingatboot">Starting the Database at Boot Time</a></li>
+</ul>
+<li><a href="#creating">Creating a Database</a></li>
+<li><a href="#accessing">Accessing a Database</a></li>
+<li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+</ul>
+
+<a name="installation"></a>
+<span class="heading1">Installation</span><br>
+
+<p>I've successfully installed Interbase 6.0.1 on Linux.  I've never tried to 
+install it on any other platform or any other version on Linux.</p>
+
+<p>You can download binary distributions of Interbase 6.0.1 in tar.gz or RPM 
+formats from the <a href="http://www.borland.com">Borland web site</a> for 
+Linux and Solaris.  The tar.gz distribution comes with an install script.  The 
+RPM distribution can be installed using <i>rpm -i</i>.  Source code 
+distributions are also available.</p>
+
+<p>There are 2 versions of Interbase: Classic and Super Server.  Classic only 
+allows a single connection while Super Server allows multiple connections.
+I recommend using Super Server and this document describes it's installation.
+</p>
+
+<a name="startingatboot"></a>
+<span class="heading2">Starting the Database at Boot Time</span><br>
+
+<p>You can use the following script to start/stop the database at
+boot/shutdown time.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#0000ff>#!/bin/sh</FONT>
+
+<B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
+  start<B><FONT color=#a62828>)</FONT></B>
+        <B><FONT color=#a62828>/opt/interbase/bin/ibserver &amp;</FONT></B>
+        <B><FONT color=#a62828>;;</FONT></B>
+  stop<B><FONT color=#a62828>)</FONT></B>
+        <B><FONT color=#a62828>kill</FONT></B> <FONT color=#6959cf>`ps </FONT><FONT color=#6959cf>-efa</FONT><FONT color=#6959cf> </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> grep ibserver </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> grep </FONT><FONT color=#6959cf>-v</FONT><FONT color=#6959cf> grep </FONT><B><FONT color=#a62828>|</FONT></B><FONT color=#6959cf> awk </FONT><B><FONT color=#a62828>'</FONT></B><FONT color=#ff00ff>{print $2}</FONT><B><FONT color=#a62828>'</FONT></B><FONT color=#6959cf>`</FONT>
+        <B><FONT color=#a62828>;;</FONT></B>
+  *<B><FONT color=#a62828>)</FONT></B>
+        <B><FONT color=#a62828>echo</FONT></B><FONT color=#ff00ff> $</FONT><B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>Usage: </FONT><FONT color=#a620f7>$0</FONT><FONT color=#ff00ff> {start|stop}</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        <B><FONT color=#a62828>exit</FONT></B> <FONT color=#ff00ff>1</FONT>
+<B><FONT color=#a62828>esac</FONT></B>
+
+<B><FONT color=#a62828>exit</FONT></B> <FONT color=#ff00ff>0</FONT>
+
+</PRE>
+</blockquote>
+
+<p>Install this script and run it with the "start" option to start up the
+database.  Running it with the "stop" option shuts the database down.  To
+access a database, it must be running.</p>
+
+<a name="creating"></a>
+<span class="heading1">Creating a Database</span><br>
+
+<p>After installation, Interbase is ready to use but to do any useful work, 
+you'll have to create a database.</p>
+
+<p>The installation process creates a security database named <i>isc4.gdb</i> 
+containing host and user privileges and an administrative user named 
+<i>SYSDBA</i> who's password is <i>changeme</i>.</p>
+
+<p>Interbase user names are case insensitive and can be up to 31 characters 
+long.  Interbase passwords are case sensitive and can be up to 32 characters 
+long, but only the first 8 characters are actually used.</p>
+
+<p>Use the <i>gsec</i> utility to change the <i>SYSDBA</i> password to 
+<i>newpass</i> and create a new user named <i>testuser</i> with password 
+<i>testpass</i>.  <i>gsec</i> must be run as root, from the directory 
+containing <i>isc4.gdb</i>.  A gsec session follows.</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>[</FONT></B>root@localhost root<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># cd /opt/interbase</FONT>
+<B><FONT color=#a62828>[</FONT></B>root@localhost interbase<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># ls -l isc4.gdb</FONT>
+-rw-rw-rw-    <FONT color=#ff00ff>1</FONT> root     root       <FONT color=#ff00ff>618496</FONT> Feb <FONT color=#ff00ff>18</FONT> <FONT color=#ff00ff>14</FONT>:<FONT color=#ff00ff>29</FONT> isc4.gdb
+<B><FONT color=#a62828>[</FONT></B>root@localhost interbase<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># /opt/interbase/bin/gsec</FONT>
+GSEC<B><FONT color=#a62828>&gt;</FONT></B> modify sysdba <FONT color=#6959cf>-pw</FONT> newpass
+GSEC<B><FONT color=#a62828>&gt;</FONT></B> add testuser
+GSEC<B><FONT color=#a62828>&gt;</FONT></B> modify testuser <FONT color=#6959cf>-pw</FONT> testpass
+GSEC<B><FONT color=#a62828>&gt;</FONT></B> quit 
+</PRE>
+</blockquote>
+
+<p>Though you can create tables in the <i>isc4.gdb</i> database using the 
+SYSDBA user, it's not a good idea.  You should create a new database using a
+regular user.  The following sequence of commands creates a database called
+<i>/home/user/testdb.gdb</i> which is owned by <i>testuser</i>.</p>
+
+<blockquote>
+<PRE>
+[user@localhost user]$ /opt/interbase/bin/isql -u testuser -p testpass
+Use CONNECT or CREATE DATABASE to specify a database
+SQL&gt; <B><FONT color=#a62828>create</FONT></B> database <FONT color=#ff00ff>'/home/user/testdb.gdb'</FONT>;
+SQL&gt; <B><FONT color=#a62828>commit</FONT></B>;
+SQL&gt; quit;
+</PRE>
+</blockquote>
+
+<p>Interbase databases are referenced by the pathname of the database file.  If
+you try to create a database using a file name that already exists or if you
+forget to enclose the file name in single quotes, you'll get a cryptic error 
+indicating that the 'database' token is unknown.  So, if you get a message like
+that, make sure that you enclosed the file name in single quotes and make sure
+that the database file that you're trying to create doesn't already exist.</p>
+
+<p>Now you can log into the <i>/home/user/testdb.gdb</i> database as 
+<i>testuser</i> with the following command.</p>
+
+<blockquote>
+<b>/opt/interbase/bin/isql -u testuser -p testpass /home/user/test.gdb</b>
+</blockquote>
+
+<p>The only users that can drop a database are the user that owns the database 
+and the <i>SYSDBA</i> user.  If you want to drop the database, you can do so 
+using <i>isql</i> as follows.</p>
+
+<blockquote>
+<PRE>
+[user@localhost user]$ /opt/interbase/bin/isql -u testuser -p testpass /home/user/testdb.gdb 
+Database:  /home/user/testdb.gdb, User: testuser
+SQL&gt; <B><FONT color=#a62828>drop</FONT></B> database;
+SQL&gt; <B><FONT color=#a62828>commit</FONT></B>;
+SQL&gt; quit;
+</PRE>
+</blockquote>
+
+<p>To delete a user, use the <i>gsec</i> utility as the root user and delete 
+the appropriate user as follows.</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>[</FONT></B>root@localhost root<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># cd /opt/interbase</FONT>
+<B><FONT color=#a62828>[</FONT></B>root@localhost interbase<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># ls -l isc4.gdb</FONT>
+-rw-rw-rw-    <FONT color=#ff00ff>1</FONT> root     root       <FONT color=#ff00ff>626688</FONT> Feb <FONT color=#ff00ff>18</FONT> <FONT color=#ff00ff>20</FONT>:<FONT color=#ff00ff>43</FONT> isc4.gdb
+<B><FONT color=#a62828>[</FONT></B>root@localhost interbase<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># /opt/interbase/bin/gsec</FONT>
+GSEC<B><FONT color=#a62828>&gt;</FONT></B> delete testuser
+GSEC<B><FONT color=#a62828>&gt;</FONT></B> quit
+</PRE>
+</blockquote>
+
+<p>This should be enough to get you started.  To set up more complex 
+configurations, consult the 
+<a href="http://www.borland.com/techpubs/interbase/ib_b60_doc.zip">Interbase 
+documentation</a>.</p>
+
+<a name="accessing"></a>
+<span class="heading1">Accessing a Database</span><br>
+
+<p>The first step in accessing an Interbase database is setting up your 
+environment.  The Interbase client is called </i>isql</i>.  Note that 
+<i>unixODBC</i> and <i>Sybase</i> have a client called <i>isql</i> as well 
+which could be installed in /usr/bin, /usr/local/bin or /opt/sybase*/bin.  If 
+you have <i>unixODBC</i> or <i>Sybase</i> installed, you'll have to decide 
+which client you want the <i>isql</i> command to run.  If you want it to run 
+the Interbase client, follow the instructions below.  Otherwise, you'll have to 
+run the Interbase <i>isql</i> client by it's full pathname.</p>
+
+<p>In the configuration script for your shell, add <i>/opt/interbase/bin</i> to
+your PATH environment variable as follows.</p>
+
+<p>For Bourne shells:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#008a8e>PATH</FONT>=<FONT color=#a620f7>$PATH</FONT>:/opt/interbase/bin
+<B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>PATH</FONT>
+</PRE>
+</blockquote>
+
+<p>For C-shells:</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>setenv</FONT></B> <FONT color=#6959cf>PATH</FONT> <B><FONT color=#288a51>${PATH}</FONT></B>:/opt/interbase/bin
+</PRE>
+</blockquote>
+
+<p>Now log out and log back in and you can access the database using the 
+<i>isql</i> client.  For example, to access a database called 
+<i>/home/user/testdb.gdb</i> on the local machine as the <i>testuser</i> user 
+with password <i>testpassword</i>, use the following command.</p>
+
+<blockquote>
+<b>isql -u testuser -p testpassword /home/user/testdb.gdb</b>
+</blockquote>
+
+<p>To connect to an interbase database on a remote machine, prepend the database
+filename with the remote hostname, followed by a colon.  For example, to access 
+a database called <i>/home/user/testdb.gdb</i> on the remote machine 
+<i>testhost</i> as the <i>testuser</i> user with password <i>testpassword</i>, 
+use the following command.</p>
+
+<blockquote>
+<b>isql -u testuser -p testpassword testhost:/home/user/testdb.gdb</b>
+</blockquote>
+
+<p>Once you're connected to the database, the isql client prompts you to enter
+a query.  Queries may be split across multiple lines.  To run a query, 
+end it with a semicolon.  To exit, type quit;.</p>
+
+<p>A sample <i>isql</i> session follows.</p>
+
+<blockquote>
+<PRE>
+[user@localhost user]$ /opt/interbase/bin/isql -u testuser -p testpass /home/user/testdb.gdb
+Database:  /home/user/testdb.gdb, <FONT color=#6959cf>User</FONT>: testuser
+SQL&gt; <B><FONT color=#a62828>create</FONT></B> <FONT color=#6959cf>table</FONT> testtable (
+CON&gt; col1 <B><FONT color=#288a51>char</FONT></B>(<FONT color=#ff00ff>40</FONT>),
+CON&gt; col2 integer
+CON&gt; );
+SQL&gt; show <FONT color=#6959cf>table</FONT> testtable;
+COL1                            <B><FONT color=#288a51>CHAR</FONT></B>(<FONT color=#ff00ff>40</FONT>) Nullable 
+COL2                            <B><FONT color=#288a51>INTEGER</FONT></B> Nullable 
+SQL&gt; <B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> testtable <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'hello'</FONT>,<FONT color=#ff00ff>50</FONT>);
+SQL&gt; <B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> testtable <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'hi'</FONT>,<FONT color=#ff00ff>60</FONT>);
+SQL&gt; <B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> testtable <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'bye'</FONT>,<FONT color=#ff00ff>70</FONT>);
+SQL&gt; <B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> testtable;
+
+COL1                                             COL2 
+======================================== ============ 
+
+hello                                              <FONT color=#ff00ff>50</FONT> 
+hi                                                 <FONT color=#ff00ff>60</FONT> 
+bye                                                <FONT color=#ff00ff>70</FONT> 
+
+SQL&gt; <B><FONT color=#a62828>update</FONT></B> testtable <B><FONT color=#a62828>set</FONT></B> col2=<FONT color=#ff00ff>0</FONT> <FONT color=#6959cf>where</FONT> col1=<FONT color=#ff00ff>'hi'</FONT>;
+SQL&gt; <B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> testtable;
+
+COL1                                             COL2 
+======================================== ============ 
+
+hello                                              <FONT color=#ff00ff>50</FONT> 
+hi                                                  <FONT color=#ff00ff>0</FONT> 
+bye                                                <FONT color=#ff00ff>70</FONT> 
+
+SQL&gt; <B><FONT color=#a62828>delete</FONT></B> <FONT color=#6959cf>from</FONT> testtable <FONT color=#6959cf>where</FONT> col2=<FONT color=#ff00ff>50</FONT>;
+SQL&gt; <B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> testtable;
+
+COL1                                             COL2 
+======================================== ============ 
+
+hi                                                  <FONT color=#ff00ff>0</FONT> 
+bye                                                <FONT color=#ff00ff>70</FONT> 
+
+SQL&gt; <B><FONT color=#a62828>commit</FONT></B>;
+SQL&gt; <B><FONT color=#a62828>drop</FONT></B> <FONT color=#6959cf>table</FONT> testtable;
+SQL&gt; quit;
+</PRE>
+</blockquote>
+
+<a name="sqlrelay"></a>
+<span class="heading1">Accessing a Database With SQL Relay</span><br>
+
+<p>Accessing Interbase from SQL Relay requires an instance entry in your 
+<i>sqlrelay.conf</i> file for the database that you want 
+to access.  Here is an example <i>sqlrelay.conf</i> which defines an SQL Relay 
+instance called interbasetest.  This instance connects to the 
+<i>/home/user/testdb</i> database as the user <i>testuser</i> with password 
+<i>testpassword</i>.</p>
+
+<PRE>
+<FONT color=#0000ff>&lt;?</FONT><B><FONT color=#288a51>xml version=</FONT></B><FONT color=#ff00ff>&quot;1.0&quot;</FONT><FONT color=#0000ff>?&gt;</FONT>
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>DOCTYPE</FONT></B> instances <B><FONT color=#a62828>SYSTEM</FONT></B> <FONT color=#ff00ff>&quot;sqlrelay.dtd&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+<FONT color=#008a8e>&lt;instances&gt;</FONT>
+
+        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/interbasetest.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;interbase&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;0&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> authtier=</FONT><FONT color=#ff00ff>&quot;listener&quot;</FONT><FONT color=#008a8e> handoff=</FONT><FONT color=#ff00ff>&quot;pass&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+                <FONT color=#008a8e>&lt;users&gt;</FONT>
+                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/users&gt;</FONT>
+                <FONT color=#008a8e>&lt;connections&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpass;database=/home/user/testdb.gdb;dialect=3&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/connections&gt;</FONT>
+        <FONT color=#008a8e>&lt;/instance&gt;</FONT>
+
+<FONT color=#008a8e>&lt;/instances&gt;</FONT>
+</PRE>
+
+<p>Note that in this example, the database parameter of the string attribute in
+the connection tag references the local database <i>/home/user/testdb.gdb</i>.
+If you want to access a remote database, prepend the database filename with
+the remote hostname followed by a colon.  For example: 
+<i>testhost:/home/user/testdb.gdb</i>.</p>
+
+<p>Now you can start up this instance with the following command.</p>
+
+<blockquote>
+<b>sqlr-start -id interbasetest</b>
+</blockquote>
+
+<p>To connect to the instance and run queries, use the following command.</p>
+
+<blockquote>
+<b>sqlrsh -id interbasetest</b>
+</blockquote>
+
+<p>The following command shuts down the SQL Relay instance.</p>
+
+<blockquote>
+<b>sqlr-stop interbasetest</b>
+</blockquote>
+
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+.TH sqlrsh 1 "2002-06-10" "interactive query tool" SQL\ Relay
+
+.SH NAME
+sqlrsh \- interactive query tool for SQL Relay
+
+.SH SYNOPSIS
+.B sqlrsh
+\fIhost port socket user passwd \fR[\fIscript\fR]
+.br
+.B sqlrsh
+[-config \fIconfigfile\fR] -id \fIid \fR[\fIscript\fR]
+.br
+
+.SH DESCRIPTION
+.B sqlrsh
+is an interactive query tool similar to (though not as powerful as)
+SQL Plus, mysql, psql, isql and the like. Run it and type
+.B help;
+at the prompt for detailed usage instructions. When sqlrsh starts up,
+it reads and executes two rc files, the system rc file
+(/etc/sqlrelay/sqlrshrc on Debian) and a personal rc file .sqlrshrc in
+your home directory. These files should contain sqlrsh commands,
+ending in semicolons, seperated by carraige returns. Any commands may
+be used in the rc files, even queries.
+
+.SH OPTIONS
+.TP
+\fIhost\fR
+hostname of the machine running the listener daemon
+.TP
+\fIport\fR
+port number the listener daemon is listening on, for local or remote connections
+.TP
+\fIsocket\fR
+socket the listener daemon is listening on, for local connections
+.TP
+\fIuser\fR
+SQL Relay user name (as per config file)
+.TP
+\fIpasswd\fR
+SQL Relay password (as per config file)
+.TP
+\fB-config\fR \fIconfigfile\fR
+config file to use (default /etc/sqlrelay/sqlrelay.conf)
+.TP
+\fB-id\fR \fIid\fR
+instance to use (as per config file)
+.TP
+\fIscript\fR
+script (containing sqlrsh commands and queries) to run (default ~/.sqlrshrc)
+
+.SH EXAMPLES
+.TP
+\fBsqlrsh "" "" /tmp/examplesocket fred secret\fR
+Connect to the SQL Relay listener daemon running on the local
+machine, with socket \fB/tmp/examplesocket\fR, as user \fBfred\fR,
+with password \fBsecret\fR.
+.TP
+\fBsqlrsh dbsvr 9000 "" fred secret\fR
+Connect to the SQL Relay listener daemon running on the remote
+machine \fBdbsvr\fR, on port \fB9000\fR, as user \fBfred\fR,
+with password \fBsecret\fR.
+.TP
+\fBsqlrsh -id example\fR
+Connect to the SQL Relay listener daemon for instance \fBexample\fR
+(as defined in /etc/sqlrelay/sqlrelay.config).
+
+.SH SEE ALSO
+\fBfields\fP(1),
+\fBquery\fP(1),
+\fBsqlr-config-gtk\fP(1),
+\#\fBsqlrsh\fP(1),
+\fBsqlr-cachemanager\fP(8),
+\fBsqlr-connection\fP(8),
+\fBsqlr-listener\fP(8),
+\fBsqlr-scaler\fP(8),
+\fBsqlr-start\fP(8),
+\fBsqlr-stop\fP(8),
+and the documentation in /usr/share/doc/sqlrelay.
+
+.SH AUTHORS
+This manual page was written by Andreas Tille <tille@debian.org> and
+Florian M. Weps <fweps@pop.agri.ch>, for the Debian GNU/Linux system
+(but may be used by others).

@@ -1,0 +1,12 @@
+%package sybase
+Summary: SQL Relay connection daemon for Sybase.
+Requires: sqlrelay = %{ver}
+Group: Database/Daemons
+
+%description sybase
+SQL Relay connection daemon for Sybase.
+
+%files sybase
+%defattr(-,root,root)
+%{bindir}/sqlr-connection-sybase
+%{bindir}/sqlr-connection-sybase-debug

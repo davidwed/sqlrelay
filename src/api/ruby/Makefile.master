@@ -1,0 +1,51 @@
+include ../../../config.mk
+
+all: makefile
+	if ( test ! -r sqlrelay.o ); then \
+		cp rubyincludes1.h rubyincludes.h; \
+		$(MAKE) 2> errors1; \
+		if ( test ! -r sqlrelay.o ); then \
+			echo; \
+			echo; \
+			echo "	Hmm, looks like that didn't work."; \
+			echo "	Let's try something different..."; \
+			echo; \
+			echo; \
+			cp rubyincludes2.h rubyincludes.h; \
+			$(MAKE) 2> errors2; \
+			if ( test ! -r sqlrelay.o ); then \
+				echo "first try errors : "; \
+				cat errors1; \
+				echo; \
+				echo "second try errors : "; \
+				cat errors2; \
+				echo; \
+			fi \
+		fi \
+	fi; \
+	$(RM) errors1 errors2 mkmf.log
+			
+
+makefile:
+	if ( test ! -r "Makefile" ); then \
+		$(RUBY) extconf.rb --with-sqlrclient-dir=../c++ --with-rudiments-dir=$(RUDIMENTSPATH); \
+		sed -e "s/ gcc/ $(CXX)/g" -e "s/ cc/ $(CXX)/g" -e "s| ruby| $(RUBY)|g" -e "s/^CPPFLAGS = /CPPFLAGS = -I\.\.\/c++\/include /g" -e "s/-lsqlrclient/-L\.\.\/c++\/lib -lsqlrclient/g" Makefile > Makefile.new; \
+		mv Makefile.new Makefile; \
+	fi
+
+clean: makefile
+	$(MAKE) clean
+	$(RM) Makefile rubyincludes.h mkmf.log errors1 errors2
+
+install: all
+	$(MAKE) site-install
+	$(MAKE) -f Makefile.install install
+	$(RM) Makefile mkmf.log
+
+uninstall: makefile
+	$(MAKE) -f Makefile.uninstall uninstall
+	$(RM) Makefile mkmf.log
+
+rpminfo: makefile
+	$(MAKE) -f Makefile.rpminfo rpminfo
+	$(RM) Makefile mkmf.log

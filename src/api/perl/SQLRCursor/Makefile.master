@@ -1,0 +1,69 @@
+include ../../../../config.mk
+
+all: makefile
+	if ( test ! -r blib/arch/auto/Firstworks/SQLRCursor/SQLRCursor.so ); then \
+		cp perlincludes1.h perlincludes.h; \
+		$(MAKE) 2> errors1; \
+		if ( test ! -r blib/arch/auto/Firstworks/SQLRCursor/SQLRCursor.so ); then \
+			echo; \
+			echo; \
+			echo "	Hmm, looks like that didn't work."; \
+			echo "	Let's try something different..."; \
+			echo; \
+			echo; \
+			cp perlincludes2.h perlincludes.h; \
+			$(MAKE) 2> errors2; \
+			if ( test ! -r blib/arch/auto/Firstworks/SQLRCursor/SQLRCursor.so ); then \
+				echo; \
+				echo; \
+				echo "	Looks like that didn't work either."; \
+				echo "	Let's try one more time..."; \
+				echo; \
+				echo; \
+				cp perlincludes3.h perlincludes.h; \
+				$(MAKE) 2> errors3; \
+				if ( test ! -r blib/arch/auto/Firstworks/SQLRCursor/SQLRCursor.so ); then \
+					echo "first try errors : "; \
+					cat errors1; \
+					echo; \
+					echo "second try errors : "; \
+					cat errors2; \
+					echo; \
+					echo "third try errors : "; \
+					cat errors3; \
+					echo; \
+				fi \
+			fi \
+		fi \
+	fi; \
+	$(RM) errors1; \
+	$(RM) errors2; \
+	$(RM) errors3
+
+clean: makefile
+	$(MAKE) realclean
+	$(RM) Makefile.old
+	$(RM) perlincludes.h
+	$(RM) errors1
+	$(RM) errors2
+	$(RM) errors3
+
+rebuild: clean all
+
+install:
+	$(MAKE) install
+
+uninstall:
+	if ( test ! -r Makefile ); then \
+		$(PERL) Makefile.PL; \
+		$(MAKE) uninstall; \
+		$(MAKE) clean; \
+		$(RM) Makefile.old; \
+	else \
+		$(MAKE) uninstall; \
+	fi
+
+makefile:
+	if ( test ! -r Makefile ); then \
+		$(PERL) Makefile.PL; \
+	fi

@@ -1,0 +1,874 @@
+// Copyright (c) 2000  David Muse
+// See the file COPYING for more information
+
+#include <configfile.h>
+
+#include <string.h>
+
+#include <defaults.h>
+
+#include <rudiments/permissions.h>
+
+configfile::configfile() {
+	doc=NULL;
+	firstinstance=NULL;
+	lastinstance=NULL;
+	currentfile=NULL;
+}
+
+configfile::~configfile() {
+	close();
+}
+
+void	configfile::blank() {
+
+	currentfile=NULL;
+
+	if (doc) {
+		delete doc;
+	}
+
+	doc=new xmldom();
+	doc->createRootNode();
+	root=doc->getRootNode();
+	root->cascadeOnDelete();
+
+	// create the xml version node
+	xmldomnode	*xmlversion=new xmldomnode(root->getNullNode(),
+							TAG_XMLDOMNODETYPE,
+							"?xml","?xml");
+	xmlversion->insertAttribute("version","1.0",
+					xmlversion->getAttributeCount());
+
+	// create the doctype node
+
+	// create the instances node
+	instances=new xmldomnode(root->getNullNode(),TAG_XMLDOMNODETYPE,
+							"instances",
+							"instances");
+
+	// add the xml version, doctype and instances
+	// tags with \n's after each
+	root->insertChild(xmlversion,root->getChildCount());
+	root->insertText("\n",root->getChildCount());
+	root->insertChild(instances,root->getChildCount());
+	root->insertText("\n",root->getChildCount());
+}
+
+int	configfile::parse(const char *filename) {
+
+	currentfile=(char *)filename;
+
+	if (doc) {
+		delete doc;
+	}
+
+	// create a new xml document
+	doc=new xmldom();
+
+	// parse the file
+	if (doc->parseFile(filename)) {
+
+		// get the root element
+		root=doc->getRootNode();
+
+		// get the instances element
+		instances=root->getChild("instances");
+
+		// build the instance list
+		firstinstance=NULL;
+		lastinstance=NULL;
+
+		// get the first instance element
+		currentnode=instances->getChild("instance");
+
+		// loop through the children of the instance tag
+		// and create more instances
+		for (int i=0; i<instances->getChildCount(); i++) {
+
+			// get the next child node, make sure it's
+			// an "instance" tag
+			currentnode=instances->getChild(i);
+			if (currentnode->isNullNode() || 
+				currentnode->getType()!=TAG_XMLDOMNODETYPE ||
+				strcmp(currentnode->getName(),"instance")) {
+				continue;
+			}
+
+			// create a new instance
+			if (!firstinstance) {
+				firstinstance=new instance(currentnode);
+				currentinstance=firstinstance;
+			} else {
+				currentinstance->next=new instance(currentnode);
+				currentinstance->next->previous=currentinstance;
+				currentinstance=currentinstance->next;
+			}
+			lastinstance=currentinstance;
+		}
+		return 1;
+	}
+	delete doc;
+	return 0;
+}
+
+int	configfile::write() {
+	return doc->writeFile(currentfile,permissions::ownerReadWrite());
+}
+
+int	configfile::write(const char *filename) {
+	return doc->writeFile(filename,permissions::ownerReadWrite());
+}
+
+void	configfile::close() {
+
+	// delete the instance list
+	if (firstinstance) {
+		currentinstance=firstinstance;
+		while (currentinstance) {
+			firstinstance=currentinstance;
+			currentinstance=currentinstance->next;
+			delete firstinstance;
+		}
+	}
+	firstinstance=NULL;
+	lastinstance=NULL;
+
+	// free the doc
+	delete doc;
+	doc=NULL;
+
+	// set currentfile NULL
+	currentfile=NULL;
+}
+
+char	*configfile::currentFile() {
+	return currentfile;
+}
+
+instance	*configfile::addInstance(const char *id,
+				const char *port, 
+				const char *unixport,
+				const char *dbase,
+				const char *connections,
+				const char *maxconnections,
+				const char *maxqueuelength,
+				const char *growby,
+				const char *ttl,
+				const char *endofsession,
+				const char *sessiontimeout,
+				const char *runasuser,
+				const char *runasgroup,
+				const char *cursors,
+				const char *authtier,
+				const char *handoff,
+				const char *deniedips,
+				const char *allowedips,
+				const char *debug) {
+
+	xmldomnode	*newchild=new xmldomnode(root->getNullNode(),
+							TAG_XMLDOMNODETYPE,
+							"instance",
+							"instance");
+
+	newchild->insertAttribute("id",id,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("port",port,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("unixport",unixport,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("dbase",dbase,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("connections",connections,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("maxconnections",maxconnections,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("maxqueuelength",maxqueuelength,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("growby",growby,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("ttl",ttl,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("endofsession",endofsession,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("sessiontimeout",sessiontimeout,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("runasuser",runasuser,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("runasgroup",runasgroup,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("cursors",cursors,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("authtier",authtier,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("handoff",handoff,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("deniedips",deniedips,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("allowedips",allowedips,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("debug",debug,
+					newchild->getAttributeCount());
+
+	xmldomnode	*newusers=new xmldomnode(root->getNullNode(),
+							TAG_XMLDOMNODETYPE,
+							"users",
+							"users");
+	xmldomnode	*newconnections=new xmldomnode(root->getNullNode(),
+							TAG_XMLDOMNODETYPE,
+							"connections",
+							"connections");
+
+	instances->insertText("\n	",instances->getChildCount());
+	instances->insertChild(newchild,instances->getChildCount());
+	instances->insertText("\n",instances->getChildCount());
+	newchild->insertText("\n		",newchild->getChildCount());
+	newchild->insertChild(newusers,newchild->getChildCount());
+	newchild->insertText("\n		",newchild->getChildCount());
+	newchild->insertChild(newconnections,newchild->getChildCount());
+	newchild->insertText("\n	",newchild->getChildCount());
+
+	if (lastinstance) {
+		lastinstance->next=new instance(newchild);
+		lastinstance->next->previous=lastinstance;
+		lastinstance=lastinstance->next;
+	} else {
+		lastinstance=new instance(newchild);
+		firstinstance=lastinstance;
+	}
+	return lastinstance;
+}
+
+void	configfile::deleteInstance(instance *instanceptr) {
+
+	if (instanceptr==firstinstance) {
+		firstinstance=instanceptr->next;
+	}
+	if (instanceptr==lastinstance) {
+		lastinstance=instanceptr->previous;
+	}
+	if (instanceptr->next) {
+		instanceptr->next->previous=instanceptr->previous;
+	}
+	if (instanceptr->previous) {
+		instanceptr->previous->next=instanceptr->next;
+	}
+	delete instanceptr;
+}
+
+instance	*configfile::findInstance(const char *id) {
+
+	char	*currentid;
+
+	currentinstance=firstinstance;
+
+	while (currentinstance) {
+		currentid=currentinstance->getId();
+		if (currentid && !strcmp(id,currentid)) {
+			delete currentid;
+			return currentinstance;
+		} else {
+			if (currentinstance->next) {
+				currentinstance=currentinstance->next;
+			} else {
+				break;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+instance	*configfile::firstInstance() {
+	return firstinstance;
+}
+
+instance::instance(xmldomnode *instancenode) {
+
+	this->instancenode=instancenode;
+
+	next=NULL;
+	previous=NULL;
+
+	// create the list of users
+	users=instancenode->getChild("users");
+	for (int i=0; i<users->getChildCount(); i++) {
+
+		// get the next child node, make sure it's
+		// an "user" tag
+		xmldomnode	*currentnode=users->getChild(i);
+		if (currentnode->isNullNode() || 
+			currentnode->getType()!=TAG_XMLDOMNODETYPE ||
+			strcmp(currentnode->getName(),"user")) {
+			continue;
+		}
+
+		// create a new user
+		if (!firstuser) {
+			firstuser=new user(currentnode);
+			currentuser=firstuser;
+		} else {
+			currentuser->next=new user(currentnode);
+			currentuser->next->previous=currentuser;
+			currentuser=currentuser->next;
+		}
+		lastuser=currentuser;
+	}
+
+
+	// create the list of connections
+	connections=instancenode->getChild("connections");
+	for (int i=0; i<connections->getChildCount(); i++) {
+
+		// get the next child node, make sure it's
+		// an "connection" tag
+		xmldomnode	*currentnode=connections->getChild(i);
+		if (currentnode->isNullNode() || 
+			currentnode->getType()!=TAG_XMLDOMNODETYPE ||
+			strcmp(currentnode->getName(),"connection")) {
+			continue;
+		}
+
+		// create a new connection
+		if (!firstconnection) {
+			firstconnection=new connection(currentnode);
+			currentconnection=firstconnection;
+		} else {
+			currentconnection->next=new connection(currentnode);
+			currentconnection->next->previous=currentconnection;
+			currentconnection=currentconnection->next;
+		}
+		lastconnection=currentconnection;
+	}
+}
+
+instance::~instance() {
+
+	// delete the user list
+	if (firstuser) {
+		currentuser=firstuser;
+		while (currentuser) {
+			firstuser=currentuser;
+			currentuser=currentuser->next;
+			delete firstuser;
+		}
+	}
+
+	// delete the connection list
+	if (firstconnection) {
+		currentconnection=firstconnection;
+		while (currentconnection) {
+			firstconnection=currentconnection;
+			currentconnection=currentconnection->next;
+			delete firstconnection;
+		}
+	}
+
+	if (next) {
+		next->previous=previous;
+	}
+	if (previous) {
+		previous->next=next;
+	}
+}
+
+char	*instance::getId() {
+	char	*retval=instancenode->getAttribute("id")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_ID;
+}
+
+char	*instance::getPort() {
+	char	*retval=instancenode->getAttribute("port")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_PORT;
+}
+
+char	*instance::getUnixPort() {
+	char	*retval=instancenode->getAttribute("socket")->getValue();
+	if (retval) {
+		return retval;
+	} else {
+		retval=instancenode->getAttribute("unixport")->getValue();
+		if (retval) {
+			return retval;
+		}
+	}
+	return DEFAULT_SOCKET;
+}
+
+char	*instance::getDbase() {
+	char	*retval=instancenode->getAttribute("dbase")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_DBASE;
+}
+
+char	*instance::getConnections() {
+	char	*retval=instancenode->getAttribute("connections")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_CONNECTIONS;
+}
+
+char	*instance::getMaxConnections() {
+	char	*retval=instancenode->
+				getAttribute("maxconnections")->
+					getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_MAXCONNECTIONS;
+}
+
+char	*instance::getMaxQueueLength() {
+	char	*retval=instancenode->
+				getAttribute("maxqueuelength")->
+					getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_MAXQUEUELENGTH;
+}
+
+char	*instance::getGrowby() {
+	char	*retval=instancenode->getAttribute("growby")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_GROWBY;
+}
+
+char	*instance::getTtl() {
+	char	*retval=instancenode->getAttribute("ttl")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_TTL;
+}
+
+char	*instance::getEndOfSession() {
+	char	*retval=instancenode->getAttribute("endofsession")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_ENDOFSESSION;
+}
+
+char	*instance::getSessionTimeout() {
+	char	*retval=instancenode->
+				getAttribute("sessiontimeout")->
+					getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_SESSIONTIMEOUT;
+}
+
+char	*instance::getRunAsUser() {
+	char	*retval=instancenode->getAttribute("runasuser")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_RUNASUSER;
+}
+
+char	*instance::getRunAsGroup() {
+	char	*retval=instancenode->getAttribute("runasgroup")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_RUNASGROUP;
+}
+
+char	*instance::getCursors() {
+	char	*retval=instancenode->getAttribute("cursors")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_CURSORS;
+}
+
+char	*instance::getAuthTier() {
+	char	*retval=instancenode->getAttribute("authtier")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_AUTHTIER;
+}
+
+char	*instance::getHandoff() {
+	char	*retval=instancenode->getAttribute("handoff")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_HANDOFF;
+}
+
+char	*instance::getDeniedIps() {
+	char	*retval=instancenode->getAttribute("deniedips")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_DENIEDIPS;
+}
+
+char	*instance::getAllowedIps() {
+	char	*retval=instancenode->getAttribute("allowedips")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_ALLOWEDIPS;
+}
+
+char	*instance::getDebug() {
+	char	*retval=instancenode->getAttribute("debug")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_DEBUG;
+}
+
+void	instance::setId(const char *id) {
+	instancenode->getAttribute("id")->setValue(id);
+}
+
+void	instance::setPort(const char *port) {
+	instancenode->getAttribute("port")->setValue(port);
+}
+
+void	instance::setUnixPort(const char *unixport) {
+	instancenode->getAttribute("socket")->setValue(unixport);
+}
+
+
+void	instance::setDbase(const char *dbase) {
+	instancenode->getAttribute("dbase")->setValue(dbase);
+}
+
+void	instance::setConnections(const char *connections) {
+	instancenode->getAttribute("connections")->setValue(connections);
+}
+
+void	instance::setMaxConnections(const char *maxconnections) {
+	instancenode->getAttribute("maxconnections")->setValue(maxconnections);
+}
+
+void	instance::setMaxQueueLength(const char *maxqueuelength) {
+	instancenode->getAttribute("maxqueuelength")->setValue(maxqueuelength);
+}
+
+void	instance::setGrowby(const char *growby) {
+	instancenode->getAttribute("growby")->setValue(growby);
+}
+
+void	instance::setTtl(const char *ttl) {
+	instancenode->getAttribute("ttl")->setValue(ttl);
+}
+
+void	instance::setEndOfSession(const char *endofsession) {
+	instancenode->getAttribute("endofsession")->setValue(endofsession);
+}
+
+void	instance::setSessionTimeout(const char *sessiontimeout) {
+	instancenode->getAttribute("sessiontimeout")->setValue(sessiontimeout);
+}
+
+void	instance::setRunAsUser(const char *runasuser) {
+	instancenode->getAttribute("runasuser")->setValue(runasuser);
+}
+
+void	instance::setRunAsGroup(const char *runasgroup) {
+	instancenode->getAttribute("runasgroup")->setValue(runasgroup);
+}
+
+void	instance::setCursors(const char *cursors) {
+	instancenode->getAttribute("cursors")->setValue(cursors);
+}
+
+void	instance::setAuthTier(const char *authtier) {
+	instancenode->getAttribute("authtier")->setValue(authtier);
+}
+
+void	instance::setHandoff(const char *handoff) {
+	instancenode->getAttribute("handoff")->setValue(handoff);
+}
+
+void	instance::setDeniedIps(const char *deniedips) {
+	instancenode->getAttribute("deniedips")->setValue(deniedips);
+}
+
+void	instance::setAllowedIps(const char *allowedips) {
+	instancenode->getAttribute("allowedips")->setValue(allowedips);
+}
+
+void	instance::setDebug(const char *debug) {
+	instancenode->getAttribute("debug")->setValue(debug);
+}
+
+user	*instance::addUser(const char *usr, const char *password) {
+
+	xmldomnode	*newchild=new xmldomnode(users->getNullNode(),
+					TAG_XMLDOMNODETYPE,
+					"user","user");
+
+	newchild->insertAttribute("user",usr,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("password",password,
+					newchild->getAttributeCount());
+
+	if (!users->getChildCount()) {
+		users->insertText("\n			",
+					users->getChildCount());
+	} else {
+		users->getChild(users->getChildCount()-1)->
+				setValue("\n			");
+	}
+	users->insertChild(newchild,users->getChildCount());
+	users->insertText("\n		",users->getChildCount());
+
+	if (lastuser) {
+		lastuser->next=new user(newchild);
+		lastuser->next->previous=lastuser;
+		lastuser=lastuser->next;
+	} else {
+		lastuser=new user(newchild);
+		firstuser=lastuser;
+	}
+	return lastuser;
+}
+
+void	instance::deleteUser(user *userptr) {
+
+	if (userptr==firstuser) {
+		firstuser=userptr->next;
+	}
+	if (userptr==lastuser) {
+		lastuser=userptr->previous;
+	}
+	if (userptr->next) {
+		userptr->next->previous=userptr->previous;
+	}
+	if (userptr->previous) {
+		userptr->previous->next=userptr->next;
+	}
+	delete userptr;
+}
+
+user	*instance::findUser(const char *userid) {
+
+	char	*currentuserid;
+
+	currentuser=firstuser;
+
+	while (currentuser) {
+		currentuserid=currentuser->getUser();
+		if (currentuserid && !strcmp(userid,currentuserid)) {
+			delete currentuserid;
+			return currentuser;
+		} else {
+			if (currentuser->next) {
+				currentuser=currentuser->next;
+			} else {
+				break;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+user	*instance::firstUser() {
+	return firstuser;
+}
+
+user::user(xmldomnode *usernode) {
+	this->usernode=usernode;
+	next=NULL;
+	previous=NULL;
+}
+
+user::~user() {
+	if (next) {
+		next->previous=previous;
+	}
+	if (previous) {
+		previous->next=next;
+	}
+}
+
+char	*user::getUser() {
+	char	*retval=usernode->getAttribute("user")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_USER;
+}
+
+char	*user::getPassword() {
+	char	*retval=usernode->getAttribute("password")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_PASSWORD;
+}
+
+void	user::setUser(const char *user) {
+	usernode->getAttribute("user")->setValue(user);
+}
+
+void	user::setPassword(const char *password) {
+	usernode->getAttribute("password")->setValue(password);
+}
+
+user	*user::nextUser() {
+	return next;
+}
+
+connection	*instance::addConnection(const char *connectionid,
+				const char *string, 
+				const char *metric) {
+
+	xmldomnode	*newchild=new xmldomnode(connections->getNullNode(),
+					TAG_XMLDOMNODETYPE,
+					"connection","connection");
+
+	newchild->insertAttribute("connectionid",connectionid,
+				newchild->getAttributeCount());
+	newchild->insertAttribute("string",string,
+				newchild->getAttributeCount());
+	newchild->insertAttribute("metric",metric,
+				newchild->getAttributeCount());
+
+	if (!connections->getChildCount()) {
+		connections->insertText("\n			",
+					connections->getChildCount());
+	} else {
+		connections->getChild(connections->getChildCount()-1)->
+				setValue("\n			");
+	}
+	connections->insertChild(newchild,connections->getChildCount());
+	connections->insertText("\n		",connections->getChildCount());
+
+	if (lastconnection) {
+		lastconnection->next=new connection(newchild);
+		lastconnection->next->previous=lastconnection;
+		lastconnection=lastconnection->next;
+	} else {
+		lastconnection=new connection(newchild);
+		firstconnection=lastconnection;
+	}
+	return lastconnection;
+}
+
+void	instance::deleteConnection(connection *connectionptr) {
+
+	if (connectionptr==firstconnection) {
+		firstconnection=connectionptr->next;
+	}
+	if (connectionptr==lastconnection) {
+		lastconnection=connectionptr->previous;
+	}
+	if (connectionptr->next) {
+		connectionptr->next->previous=connectionptr->previous;
+	}
+	if (connectionptr->previous) {
+		connectionptr->previous->next=connectionptr->next;
+	}
+	delete connectionptr;
+}
+
+connection	*instance::findConnection(const char *connectionnode) {
+
+	char	*currentconnid;
+
+	currentconnection=firstconnection;
+
+	while (currentconnection) {
+		currentconnid=currentconnection->getConnectionId();
+		if (currentconnid && !strcmp(connectionnode,currentconnid)) {
+			delete currentconnid;
+			return currentconnection;
+		} else {
+			if (currentconnection->next) {
+				currentconnection=currentconnection->next;
+			} else {
+				break;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+
+connection	*instance::firstConnection() {
+	return firstconnection;
+}
+
+instance	*instance::nextInstance() {
+	return next;
+}
+
+connection::connection(xmldomnode *connectionnode) {
+	this->connectionnode=connectionnode;
+	next=NULL;
+	previous=NULL;
+}
+
+connection::~connection() {
+	if (next) {
+		next->previous=previous;
+	}
+	if (previous) {
+		previous->next=next;
+	}
+}
+
+char	*connection::getConnectionId() {
+	char	*retval=connectionnode->
+				getAttribute("connectionid")->
+					getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_CONNECTIONID;
+}
+
+char	*connection::getString() {
+	char	*retval=connectionnode->getAttribute("string")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_CONNECTSTRING;
+}
+
+char	*connection::getMetric() {
+	char	*retval=connectionnode->getAttribute("metric")->getValue();
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_METRIC;
+}
+
+void	connection::setConnectionId(const char *connectionid) {
+	connectionnode->getAttribute("connectionid")->setValue(connectionid);
+}
+
+void	connection::setString(const char *string) {
+	connectionnode->getAttribute("string")->setValue(string);
+}
+
+void	connection::setMetric(const char *metric) {
+	connectionnode->getAttribute("metric")->setValue(metric);
+}
+
+connection	*connection::nextConnection() {
+	return next;
+}

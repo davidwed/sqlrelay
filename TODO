@@ -1,0 +1,147 @@
+document new lago patch
+incorporate postgresql column type query
+If a connection dies mysteriously, a new one should fire up.
+maximum allowed clob bind value length should be configurable
+many of methods should be const methods
+solaris init script
+odbc connection should check the odbc definition
+	for connect string arguments - SQLBrowseConnect
+java/com/firstworks/sqlrelay needs to be removed if empty when rpm is
+	uninstalled
+java api needs clob/lob/cursor methods
+java can't find sqlr_alloc
+should sqlr-start kill the listner if no connections start?
+float/double datatypes come back with no particular scale/precision in many db's
+
+incorporate pkg-config stuff
+incorporate ADODB driver
+incorporate new spec file
+
+test changeUser() with non-oracle databases
+non-c++/perl clob/blob/cursor bind tests
+clob insert/update/select tests
+clob pl/sql in/out variable test
+clob pl/sql return value test
+
+interbase directions for using gsec don't work for me
+interbase docs aren't available at the link in gettingstarted/interbase.html
+db2 startup directions are wrong, you have to run db2start/db2stop as db2as
+sybase startup can fail because LANG is set funny - need note in docs
+document upper/lower/mixed column case methods
+document clob/blob/cursor bind methods
+fix documents to reflect java package
+
+Tests:
+	odbc tests
+	better perldbi/pythondb/rubydbi tests
+	test init scripts
+	test send query w/length
+	test upper/lower/mixed column case methods
+	need database reconnect tests
+
+Compatibility:
+	sybase 12.5
+	interbase 6.5
+	firebird
+	gtk-2
+	ruby module segfaults on netbsd/openbsd
+	python api methods that call PyArg_ParseTuple with an "O" argument 
+		don't work on openbsd/netbsd, not exactly sure why
+
+Documentation:
+	getting started docs for MS SQL Server
+	diagrams
+	example sqlrelay.conf's for different configurations
+	recommended settings for each db, scaling
+	performance benchmark charts
+	HOWTO for linuxdoc.org
+	man pages
+
+Performance:
+	persistent cursors - parse query, attach an id to it, make it available
+			to other sessions
+	client-side persistence/socket handoff daemon
+	connection daemons could put buffers in shared memory and
+		clients could send queries, access buffers using 
+		shared memory and semaphores instead of unix sockets
+	api methods to use preallocated buffers for result sets
+	api methods for configuring optimistic buffer sizes
+	configurable preallocated buffers on the server side
+	result set compression during transmission for distant relays
+	server side result set caching
+	support batch DML in oracle8
+	for databases that can return non-strings in their result sets, 
+		send non strings to client - is this a good idea?
+
+Security:
+	address connection hijacking for handoff=reconnect
+	SSL encryption
+
+Packages:
+	Debian
+	Slackware
+	FreeBSD
+	NetBSD
+	OpenBSD
+	Solaris
+	OpenServer
+	Unixware/OpenUnix
+
+Features:
+	sybase/freetds (possibly others) need options for setting chained mode 
+		and isolation mode when client connects
+	sqlr-import/sqlr-export tools
+	support output bind vars and stored procedures in sybase
+	support vector binds
+	handle output binds in Perl-DBD, Python-DB, Ruby-DBD
+	changeAuth() for non-oracle8i needs to just log out/back in
+	datatype support:
+		handle binary data correctly in all databases
+		identical long/lob datatype support in all databases
+		more advanced long/lob datatype support
+		support for array datatypes
+		handle blobs in interbase
+		handle timestamps
+	replication
+	query filtering
+	quotas
+	logging
+	handle commit/rollback for named transactions
+	implement API's that handle errors with exceptions
+
+Availability:
+	connections should ping database server every so often to make sure
+		it's up, if it's not, relogin
+	a query should re-execute when the database comes back up
+	master, fallback databases, where connection only goes to the fallback
+		if the master is overloaded or down
+		statistics, stat monitoring interface
+
+openldap backend
+
+API's:
+	wrapper:
+		PHP - ADODB?
+		JDBC
+		ODBC
+		QT3
+		TCL
+		C# (mono?)
+		ADA
+	replacement libs for native db api libs - 
+		translate msql/mysql/postgresql calls to sqlrelay calls
+
+Native DB Support:
+	Informix
+	SAP DB
+	LocalSQL
+	kekedb
+	ThinkSQL
+	picosql
+
+Config Tools:
+	QT
+	curses
+	need keyboard shortcuts
+	size should be less than 640x480
+	connectstring editor

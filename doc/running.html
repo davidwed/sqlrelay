@@ -1,0 +1,327 @@
+<html>
+<head>
+<title>firstworks   Running SQL Relay</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Running SQL Relay</span><br><br>
+
+<ul>
+<li><a href="#everything">Starting Everything at Once</a></li>
+<li><a href="#individual">Starting Daemons Individually</a></li>
+<ul>
+<li><a href="#connection">Setting Up a Connection</a></li>
+<li><a href="#listener">Setting Up a Listener</a></li>
+<li><a href="#scaler">Setting Up a Scaler</a></li>
+<li><a href="#cachemanager">Setting Up a Cache Manager</a></li>
+</ul>
+<li><a href="#extending">Extending, Killing and Restarting</a></li>
+<li><a href="#cmdline">Using The Command Line Interfaces</a></li>
+<li><a href="#problems">Common Problems</a></li>
+</ul>
+
+<a name="everything"></a>
+<span class="heading2">Starting Everything at Once:</span><br><br>
+
+<p>The <b>sqlr-start</b> program is provided to simplify the startup 
+process.</p>
+
+<blockquote>
+<p>sqlr-start  -id ID  -config CONFIGFILE  [-localstatedir LOCALSTATEDIR]</p>
+</blockquote>
+
+<p>The <b>sqlr-start</b> program starts up one instance of 
+<b>sqlr-listener</b>, one instance of <b>sqlr-scaler</b> and the number of 
+<b>sqlr-connection</b> daemons specified in the config file for the given 
+id.</p>
+
+<p>The <b>sqlr-start</b> program also checks to see if a 
+<b>sqlr-cachemanager</b> is running.  If one is then it leaves it running.  If 
+not then it starts one.</p>
+
+<p>See the section about <b>sqlr-cachemanager</b> below for an important note
+about it.</p>
+
+<p>If the optional LOCALSTATEDIR argument is used, it is passed to the programs
+started by <b>sqlr-start</b> as appropriate.</p>
+
+<span class="heading2">Debugging and Tracing:</span><br><br>
+
+<p>The instance tag of the CONFIGFILE contains an optional debug attribute.  
+When it is set, the <b>sqlr-start</b> program starts up debugging versions of 
+the <b>sqlr-listener</b> and/or <b>sqlr-connection</b> daemons.  These daemons 
+output debugging information to files in 
+/usr/local/firstworks/var/sqlrelay/debug.  See 
+<a href="configuring.html">Configuring SQL Relay</a> for more information on 
+the debug attribute.</p>
+
+<p>The <b>sqlr-start</b> program also takes an optional <b>-strace</b>
+parameter.  When run as root, if the <b>-strace</b> parameter is used, 
+<b>sqlr-start</b> starts the <b>sqlr-connection</b> daemons using 
+<i>strace -ff -o sqlr-connection-strace</i> causing
+<i>sqlr-connection-strace.pid</i> files to be written to the root directory.
+See the <i>strace</i> man page for more information.</p>
+
+<a name="individual"></a>
+<span class="heading2">Starting Daemons Individually:</span><br><br>
+
+<p>If for some reason you don't want to use <b>sqlr-start</b>, you can start
+the daemons individually.</p>
+
+
+<a name="listener"></a>
+<span class="heading2">Setting Up a Listener:</span><br><br>
+
+<p>The first step in is setting up a listener.  The job of the listener is to 
+connect to a TCP port and wait for queries.  When it gets one, it waits for an 
+available connection daemon and hands off the client to it.</p>
+
+<p>Run the <b>sqlr-listener</b> daemon to establish a listener.</p>
+
+<blockquote>
+<p>sqlr-listener  -id ID  -config CONFIGFILE  [-localstatedir LOCALSTATEDIR]</p>
+</blockquote>
+
+<p>CONFIGFILE is the filename of the configuration file to use.  The default 
+configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
+
+<p>ID is an identifier that associates a listener with a pool of 
+connections.</p>
+
+<p>Only one listener needs to be established for a given ID.</p>
+
+<p>LOCALSTATEDIR is the base directory for temporary files and debug logs.  By
+default, this is /usr/local/firstworks/var, PREFIX/var if you compiled
+SQL Relay with a prefix other than /usr/local/firstworks or possibly another
+directory if you specified a different localstatedir when compiling SQL Relay.
+Under the localstatedir, temporary files go in sqlrelay/tmp and debug logs
+go in sqlrelay/debug.</p>
+
+
+<a name="connection"></a>
+<span class="heading2">Setting Up a Connection:</span><br><br>
+
+<p>Connecting to a database is the next step.  To estabish a connection, run 
+one or more of the <b>sqlr-connection</b> daemons.</p>
+
+<blockquote>
+<p>sqlr-connection-"dbase"  -id ID  -config CONFIGFILE  -connectionid 
+CONNECTIONID  [-localstatedir LOCALSTATEDIR]</p>
+</blockquote>
+
+<p>Where "dbase" is one of oracle7, oracle8, mysql, msql, postgresql, sqlite, 
+lago, odbc, db2, interbase, sybase or freetds.</p>
+
+<p>CONFIGFILE is the configuration file to use when starting the daemon.  The 
+default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
+
+<p>ID is just an identifier.  Starting multiple connections with
+the same ID make them available as a pool of connections.  The more connections
+you start, the more queries can be executed in parallel.  In addition, the
+ID argument specifies which config file entry to use.</p>
+
+<p>CONNECTIONID is another identifier.  When using replicated or clustered 
+databases, within a pool of connections, some connections will connected to 1 
+machine and some will connect to another.  This argument tells the connection 
+daemon which machine to connect to.  When not using clustered or replicated 
+databases, this id will be the same for every connection in the pool.</p>
+
+<p>LOCALSTATEDIR is the base directory for temporary files and debug logs.  By
+default, this is /usr/local/firstworks/var, PREFIX/var if you compiled
+SQL Relay with a prefix other than /usr/local/firstworks or possibly another
+directory if you specified a different localstatedir when compiling SQL Relay.
+Under the localstatedir, temporary files go in sqlrelay/tmp and debug logs
+go in sqlrelay/debug.</p>
+
+
+<a name="scaler"></a>
+<span class="heading2">Setting Up the Scaler:</span><br><br>
+
+<p>The third step is running the scaler.  You can start as many 
+<b>sqlr-connection</b> daemons as you like.  If you start fewer than the 
+maximum number defined for the ID, the <b>sqlr-scaler</b> daemon will fire up 
+new connections on demand.  The new connections will time out after a period of
+inactivity and shut down on their own.</p>
+
+<p>Run the <b>sqlr-scaler</b> daemon to establish a scaler.</p>
+
+<blockquote>
+<p>sqlr-scaler -id ID -config CONFIGFILE</p>
+</blockquote>
+
+<p>CONFIGFILE is the filename of the configuration file to use.  The default 
+configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
+
+<p>ID is the same as the ID argument in the <b>sqlr-connection</b> daemon and 
+associates a scaler with a pool of connections.</p>
+
+<p>Only one scaler needs to be established for a given ID.</p>
+
+
+<a name="cachemanager"></a>
+<span class="heading2">Setting Up the Cache Manager:</span><br><br>
+
+<p>The fourth step is running the cache manager.  Clients can cache result sets
+with a time-to-live on them.  The cache manager goes through the cached result 
+sets periodically and removes the ones that have expired.</p>
+
+<p>Run the <b>sqlr-cachemanager</b> daemon to establish the cache manager.</p>
+
+<blockquote>
+<p>sqlr-cachemanager [-scaninterval INTERVAL] [-cachedirs CACHEDIRS]</p>
+</blockquote>
+
+<p>The optional INTERVAL argument specifies in seconds how often the cache
+manager scans the result sets.  Each scan is scheduled from the end of the
+previous scan.  If the argument is left off, the cache manager scans at a 
+default interval of 30 seconds.</p>
+
+<p>The optional CACHEDIRS argument is a colon seperated list of directories to
+scan for cache files.  If you use <b>sqlr-start</b> and specify a
+LOCALSTATEDIR, sqlr-start will pass the -scandirs LOCALSTATEDIR/sqlrelay/cache
+to sqlr-cachemanager.</p>
+
+<p>Only one cache manager needs to be started per machine.</p>
+
+<p><b>Important Note:</b> Since cache managers clean up after <b>SQL Relay</b> 
+clients, not servers, they need to be run on machines which run clients that 
+could cache result sets.  These may not be the same machines that run the 
+<b>sqlr-listener</b> and <b>sqlr-connection</b> daemons.  If there is no
+<b>SQL Relay</b> installation on those machines, you should create the cache 
+directory (/usr/local/firstworks/var/sqlrelay/cache unless changed at compile 
+time), install the <b>sqlr-cachemanager</b> program by itself and set it up
+to run at boot time.</p>
+
+<a name="extending"></a>
+<span class="heading2">Extending, Killing and Restarting:</span><br><br>
+
+<p>Once the daemons are up and running, clients can use them.  In the event
+that more connections are required, additional <b>sqlr-connection-"dbase"</b> 
+daemons may be started from the command line using the same ID and CONFIGFILE 
+and will be immediately available to clients.</p>
+
+<p>Connection daemons should not be killed once they have been started without
+restarting everything with that ID.</p>
+
+<p>The <b>sqlr-stop</b> command is provided to kill running daemons.  It accepts
+a single argument, the id of the instance to kill.  Running it kills anything 
+with "sqlr-" and that id in it's name.  It uses grep, so it's not perfect. If 
+you have id's like "web" and "webster" and run "sqlr-stop web" then it will 
+kill both of them.  Running it with no arguments will kill all <b>SQL Relay</b>
+processes.</p>
+
+
+<a name="cmdline"></a>
+<span class="heading2">Using the Command Line Interfaces:</span><br><br>
+
+<p>Four command line utilities are provided for use with <b>SQL Relay</b>: 
+<b>query</b>, <b>fields</b>, <b>backupschema</b> and <b>sqlrsh</b>.  The syntax
+for each is:</p>
+
+<blockquote>
+<p>query  HOST PORT SOCKET USER PASSWORD QUERY</p>
+<p>fields  HOST PORT SOCKET USER PASSWORD TABLE</p>
+<p>backupschema  HOST SOCKET PORT USER PASSWORD</p>
+<p>sqlrsh  HOST PORT SOCKET USER PASSWORD</p>
+</blockquote>
+
+<p>The HOST, PORT, SOCKET, USER and PASSWORD arguments specify which listener 
+to connect to and what authentication to use.<p>
+
+<p>The <b>query</b> command executes the query specified in the QUERY parameter
+and returns the result set as a quote/comma/return seperated value list to 
+standard output.</p>
+
+<p>The <b>fields</b> command returns a comma seperated list of the fields in the
+table specified by the TABLE argument to standard output.</p>
+
+<p>The <b>backupschema</b> command only works against oracle databases and uses
+the "select table_name from user_tables" query in combination with the 
+<b>query</b> and <b>fields</b> commands to generate Oracle SQL Loader control 
+files for all tables owned by the user a particular connection is logged in as.
+The command is useful for backing up an entire schema of data to a readily 
+re-importable format.</p>
+
+<p><b>sqlrsh</b> is an interactive query tool similar to (though not as 
+powerful as) SQL Plus, mysql, psql, isql and the like.  Run it and type help; 
+at the prompt for detailed usage instructions.  When sqlrsh starts up, it reads
+and executes two rc files, the system rc file (most likely 
+/usr/local/firstworks/etc/sqlrshrc) and a personal rc file .sqlrshrc in your
+home directory.  These files should contain sqlrsh commands, ending in 
+semicolons, seperated by carraige returns.  Any commands may be used in the
+rc files, even queries.</p>
+
+
+<a name="problems"></a>
+<span class="heading2">Common Problems:</span><br><br>
+
+<ul>
+<li><p>FreeTDS or Sybase connection fails with error: Connection refused.</p></li>
+<ul>
+<li></p>The FreeTDS and Sybase libraries try to connect to port 4000
+(or 1433 if FreeTDS is compiled with version 7.0 (MS SQL Server) support) 
+by default.  The environment variables TDSPORT and DBLIB_PORT must both be set
+to override the default port.  As of version 0.24, the FreeTDS and Sybase 
+connections' connectstring now accept a port argument which instruct the 
+connections to set those variables.</p>
+<p>Sybase ASE 11.9.2 runs on port 4100 by default and MS SQL Server runs on
+port 1433 by default.  If you try to connect to an instance of one of them and
+get an error, you can either reconfigure the instance to run on port 4000 or 
+set the port argument of the connectstring in CONFIGFILE to the port that 
+the instance is actually running on.</p>
+</li>
+</ul>
+<li><p>bind failed</p></li>
+<ul>
+<li><p>The most common cause of this problem is configuring <b>SQL Relay</b> 
+to listen on the same port that the database is listening on.  For example,
+if your database is listening on port 4100 and you run <b>SQL Relay</b> on
+the same machine, you can't configure <b>SQL Relay</b> to listen on port 
+4100 or it will issue "bind failed" when the listener tries to run.</p></li>
+<li><p>A slightly less common cause of this problem is configuring 
+<b>SQL Relay</b> to listen on a port that some other service is already 
+listening on.  For example, web and cache servers often listen on port 8080 
+and IRC servers often listen on port 7000.  You can see if some other service 
+is listening on the port you want to <b>SQL Relay</b> to listen on by running 
+<i>netstat -ap | grep PORT</i> where PORT is replaced with the port number that 
+you'd like <b>SQL Relay</b> to listen on.  If you get anything back from that
+command, then there is another service already listening on that port.</p></li>
+<li><p>If you kill and restart the daemons and get the message: "bind failed." 
+as the listener is starting, then there are 2 possibilities.  First, all the
+daemons may not have been killed.  In this case, kill them all and make sure
+they are dead by using <i>ps -efal | grep sqlr-</i> before restarting them.  The
+second possibility is that the port the listener was listening on didn't get
+closed.  Executing <i>netstat -a | grep PORTNUMBER</i> will reveal any 
+connections still lingering on the port.  If all the daemons are dead but the 
+connections are still lingering, wait 2 minutes or so before restarting the 
+daemons.  The lingering connections should have timed out by then.</p></li>
+</ul>
+<li><p>Everything starts fine but clients can't execute queries.</p></li>
+<ul>
+<li><p>The most common cause of this problem is telling the client to connect 
+to the port that the database is listening on rather than the port that 
+<b>SQL Relay</b> is listening on.  For example, if the database is listening
+on port 4100 and you have an instance of <b>SQL Relay</b> connected to it and
+have configured <b>SQL Relay</b> to listen on port 9000, then a common mistake
+would be to try to connect an <b>SQL Relay</b> client to port 4100 instead of 
+port 9000.</p></li>
+<li><p><b>SQL Relay</b> daemons use semaphores and shared memory segments.  
+If a daemon crashes unexpectedly, even if you kill all the other daemons, a
+semaphore or shared memory segment may still be hanging around.  These can 
+interfere with future attempts to start up daemons with the same ID.  You can 
+use the <i>ipcs</i> command to inspect the shared memory segments and 
+semaphores and the <i>ipcrm</i> command to remove any lingering ones.</p></li>  
+<li><p>The <b>SQL Relay</b> daemons also use temporary files, usually
+located in /usr/local/firstworks/var/sqlrelay/tmp.  That directory
+should have 777 permissions, but sometimes it doesn't.  The sockseq file in 
+that directory should have 666 permissions, but sometimes it doesn't.  The
+files named ID and ID-CONNECTIONID owned by the user that started the 
+connections in that directory should get removed by <b>sqlr-stop</b>, but 
+sometimes they don't.  Sometimes <b>sqlr-stop</b> isn't even used to stop the 
+daemons.</p></li>
+</ul>
+</ul>
+
+</body>
+</html>

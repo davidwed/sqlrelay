@@ -1,0 +1,12 @@
+%package interbase
+Summary: SQL Relay connection daemon for Interbase.
+Requires: sqlrelay = %{ver}
+Group: Database/Daemons
+
+%description interbase
+SQL Relay connection daemon for Interbase.
+
+%files interbase
+%defattr(-,root,root)
+%{bindir}/sqlr-connection-interbase
+%{bindir}/sqlr-connection-interbase-debug

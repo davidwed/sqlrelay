@@ -1,0 +1,1 @@
+rm -f *.o sqlrtest_cpp cachefile* oracle7 oracle8 msql mysql lago sqlite postgresql freetds sybase interbase db2

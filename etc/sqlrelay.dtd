@@ -1,0 +1,32 @@
+<!ELEMENT instances (instance*)>
+<!ELEMENT instance (users,connections)>
+	<!ATTLIST instance id CDATA "defaultid">
+	<!ATTLIST instance port CDATA "9000">
+	<!ATTLIST instance socket CDATA "/tmp/sqlrelay.socket">
+	<!ATTLIST instance dbase (oracle7|oracle8|mysql|msql|postgresql|sqlite|lago|freetds|sybase|odbc|db2|interbase) "oracle8">
+	<!ATTLIST instance connections CDATA "1">
+	<!ATTLIST instance maxconnections CDATA "1">
+	<!ATTLIST instance maxqueuelength CDATA "1">
+	<!ATTLIST instance growby CDATA "1">
+	<!ATTLIST instance ttl CDATA "60">
+	<!ATTLIST instance endofsession (commit|rollback) "commit">
+	<!ATTLIST instance sessiontimeout CDATA "60">
+	<!ATTLIST instance runasuser CDATA "nobody">
+	<!ATTLIST instance runasgroup CDATA "nobody">
+	<!ATTLIST instance cursors CDATA "5">
+	<!ATTLIST instance authtier (listener|connection|listener_and_connection|database) "listener">
+	<!ATTLIST instance handoff (pass|reconnect) "reconnect">
+	<!ATTLIST instance deniedips CDATA "">
+	<!ATTLIST instance allowedips CDATA "">
+	<!ATTLIST instance debug (none|listener|connection|listener_and_connection) "none">
+
+<!ELEMENT users (user*)>
+<!ELEMENT user EMPTY>
+	<!ATTLIST user user CDATA "user">
+	<!ATTLIST user password CDATA "password">
+
+<!ELEMENT connections (connection*)>
+<!ELEMENT connection EMPTY>
+	<!ATTLIST connection connectionid CDATA "defaultid">
+	<!ATTLIST connection string CDATA "user=scott;password=tiger">
+	<!ATTLIST connection metric CDATA "1">

@@ -1,0 +1,85 @@
+#! /bin/sh
+#
+# sqlrelay   This starts and stops SQL relay.
+#
+# chkconfig: 345 85 15
+# description: Persistent database connection system.
+
+prefix=/usr/local/firstworks
+sysconfdir=${prefix}/etc
+
+if ( test -n -r "${sysconfdir}/sqlrelay.conf" ); then
+        exit 1
+fi
+
+RETVAL=0
+
+# Add appropriate bin/lib paths
+if ( test "${prefix}" != "/usr" ); then
+        PATH=$PATH:${prefix}/bin
+        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${prefix}/lib
+        export PATH LD_LIBRARY_PATH
+fi
+
+start(){
+    echo -n $"Starting SQL Relay: "
+    if ( test -r "/etc/sqlrelay" ); then
+        launched=0
+        for connid in `grep -v ^# /etc/sqlrelay`; do
+            echo
+            echo -n $"Launching instance with id '${connid}':"
+            sqlr-start -id ${connid} >/dev/null 2>&1
+            RETVAL=$?
+            if ( test "$RETVAL" -eq "0" ); then
+                echo "success"
+            else
+                echo "failure"
+            fi
+            launched=1
+        done
+        if ( test "$launched" -ne "1" ); then
+            echo "passed"
+        fi
+        echo
+    else
+        echo "failure"
+    fi
+    return $RETVAL
+}
+
+stop(){
+    echo -n $"Stopping SQL Relay: "
+    sqlr-stop >/dev/null 2>&1
+    RETVAL=$?
+    if ( test "$RETVAL" -eq "0" ); then
+        echo "success"
+    else
+        echo "failure"
+    fi
+    echo
+    return $RETVAL
+}
+
+restart(){
+    stop
+    start
+}
+
+
+# See how we were called.
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    *)
+        echo "Usage: sqlrelay {start|stop|restart}"
+        RETVAL=1
+esac
+
+exit $RETVAL

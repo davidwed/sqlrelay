@@ -1,0 +1,27 @@
+.\"Created with GNOME Manpages Editor Wizard
+.\"http://gmanedit.sourceforge.net
+.\"Sergio Rua <srua@gpul.org>
+.\"
+.TH sqlr-stop 1 "11 17, 2001" "kill running SQLRelay daemons"
+
+.SH NAME
+sqlr-stop \- kill running SQLRelay daemons
+
+.SH SYNOPSIS
+.B sqlr-stop
+[\fB\-id\fP \fIID\fP]
+
+.SH DESCRIPTION
+.B sqlr-stop
+program is provided to simplify the stop process.
+
+The sqlr-stop command is provided to kill running daemons. It accepts
+a single argument, the id of the instance to kill. Running it kills
+anything with "sqlr-" and that id in it's name. It uses grep, so it's
+not perfect. If you have id's like "web" and "webster" and run
+"sqlr-stop web" then it will kill both of them. Running it with no
+arguments will kill all SQL Relay processes.
+
+.SH AUTHOR
+This manual page was written by Andreas Tille <tille@debian.org>,
+for the Debian GNU/Linux system (but may be used by others).

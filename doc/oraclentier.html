@@ -1,0 +1,124 @@
+<html>
+<head>
+<title>firstworks   Using SQL Relay With Oracle8i/9i n-Tiered Authentication</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Using SQL Relay With Oracle8i/9i n-Tiered Authentication</span><br><br>
+
+<span class="heading2">Background</span>
+
+<p>Ordinarily, <b>SQL Relay</b> logs into the database as a particular user
+several times and hands those sessions off to <b>SQL Relay</b> clients, thus
+avoiding the cost of connecting to and disconnecting from the database over and 
+over.  A sometimes undesirable side-effect of this approach is that it is
+impossible to distinguish which queries were run by which <b>SQL Relay</b> 
+users from within the database since <b>SQL Relay</b> uses the same
+database user to run all queries.</p>
+
+<p>Oracle n-tiered authentication provides a way around this side-effect.</p>
+
+<p>If you set up a proxy role, a proxy user and a set of users that can be 
+proxied by that proxy user in Oracle and configure <b>SQL Relay</b> to use the
+"database" authentication tier, <b>SQL Relay</b> users will map to Oracle
+users.</p>
+
+<span class="heading2">Setting Up Oracle</span>
+
+<p>First, locate the initSID.ora file for the database.  This file can be
+found in the $ORACLE_BASE/admin/$ORACLE_SID/pfile directory.  Edit it,
+changing the "compatibility" parameter to a version equal to or higher than
+"8.1.0".  Restart the database.</p>
+
+<p>Next, log into the database as system and create a set of users:</p>
+
+<blockquote><b>CREATE USER user1 IDENTIFIED BY user1;<br>
+GRANT CREATE SESSION TO user1;<br>
+CREATE USER user2 IDENTIFIED BY user2;<br>
+GRANT CREATE SESSION TO user2;<br>
+CREATE USER user3 IDENTIFIED BY user3;<br>
+GRANT CREATE SESSION TO user3;</b></blockquote>
+
+<p>Now, create a proxy role and give the users access to it:</p>
+
+<blockquote><b>CREATE ROLE proxyrole;<br>
+GRANT proxyrole TO user1;<br>
+GRANT proxyrole TO user2;<br>
+GRANT proxyrole TO user3;</b></blockquote>
+
+<p>At this point, you'll need to perform grants to the proxyrole to give it 
+whatever permissions that the users that may use it will need.  Grants to roles
+are the performed like grants to users.  For example if proxyrole needs random 
+access to "publictable" and read access to "readonlytable":</p>
+
+<blockquote><b>GRANT all ON publictable TO proxyrole;<br>
+GRANT select ON readonlytable TO proxyrole;<br>
+</b></blockquote>
+
+<p>Create a proxy user:</p>
+ 
+<blockquote><b>CREATE USER proxyuser IDENTIFIED BY proxyuser;<br>
+GRANT CREATE SESSION TO proxyuser;</b></blockquote>
+
+<p>Give the users access through the proxy user:</p>
+
+<blockquote>
+<b>ALTER USER user1 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;<br>
+ALTER USER user2 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;<br>
+ALTER USER user3 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;</b>
+</blockquote>
+
+<p>You can enable auditing of the queries that the users have run through the
+proxyrole as follows.  Note: to enable auditing, you must set AUDIT_TRAIL=yes 
+in the $ORACLE_BASE/admin/$ORACLE_SID/pfile/initSID.ora file and restart the 
+database.</p>
+
+<blockquote><b>AUDIT SELECT BY proxyuser ON BEHALF OF user1;<br>
+AUDIT SELECT BY proxyuser ON BEHALF OF user2;<br>
+AUDIT SELECT BY proxyuser ON BEHALF OF user3;</b></blockquote>
+
+<span class="heading2">Setting Up SQL Relay</span>
+
+<p><b>SQL Relay</b> should be set up to use the database authentication tier 
+and to log into Oracle as the proxy user.  Below is an sqlrelay.conf file
+that does this.  Note the authtier attribute of the instance tag.  Note also 
+that there are no users defined as they are unnecessary for this kind of 
+configuration.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#0000f8>&lt;?</FONT><B><FONT color=#288850>xml</FONT></B><B><FONT color=#288850> </FONT></B><B><FONT color=#288850>version</FONT></B>=<FONT color=#f800f8>&quot;1.0&quot;</FONT><FONT color=#0000f8>?&gt;</FONT>
+<FONT color=#008888>&lt;!</FONT><B><FONT color=#a02828>DOCTYPE</FONT></B> instances <B><FONT color=#a02828>SYSTEM</FONT></B> <FONT color=#f800f8>&quot;sqlrelay.dtd&quot;</FONT><FONT color=#008888>&gt;</FONT>
+<FONT color=#008888>&lt;instances&gt;</FONT>
+
+        <FONT color=#008888>&lt;instance </FONT><B><FONT color=#288850>id</FONT></B>=<FONT color=#f800f8>&quot;proxyuser&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>port</FONT></B>=<FONT color=#f800f8>&quot;9000&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>socket</FONT></B>=<FONT color=#f800f8>&quot;/tmp/proxyuser.socket&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>dbase</FONT></B>=<FONT color=#f800f8>&quot;oracle8&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>connections</FONT></B>=<FONT color=#f800f8>&quot;1&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>maxconnections</FONT></B>=<FONT color=#f800f8>&quot;3&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>maxqueuelength</FONT></B>=<FONT color=#f800f8>&quot;0&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>growby</FONT></B>=<FONT color=#f800f8>&quot;1&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>ttl</FONT></B>=<FONT color=#f800f8>&quot;60&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>endofsession</FONT></B>=<FONT color=#f800f8>&quot;commit&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>sessiontimeout</FONT></B>=<FONT color=#f800f8>&quot;600&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>runasuser</FONT></B>=<FONT color=#f800f8>&quot;nobody&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>runasgroup</FONT></B>=<FONT color=#f800f8>&quot;nobody&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>cursors</FONT></B>=<FONT color=#f800f8>&quot;5&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>authtier</FONT></B>=<FONT color=#f800f8>&quot;database&quot;</FONT><FONT color=#008888>&gt;</FONT>
+                <FONT color=#008888>&lt;users&gt;</FONT>
+                <FONT color=#008888>&lt;/users&gt;</FONT>
+                <FONT color=#008888>&lt;connections&gt;</FONT>
+                        <FONT color=#008888>&lt;</FONT><FONT color=#008888>connection </FONT><B><FONT color=#288850>connectionid</FONT></B>=<FONT color=#f800f8>&quot;proxyuser&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>string</FONT></B>=<FONT color=#f800f8>&quot;user=proxyuser;password=proxyuser;oracle_sid=ora1;&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>metric</FONT></B>=<FONT color=#f800f8>&quot;1&quot;</FONT><FONT color=#008888>/&gt;</FONT>
+                <FONT color=#008888>&lt;/connections&gt;</FONT>
+        <FONT color=#008888>&lt;/instance&gt;</FONT>
+
+<FONT color=#008888>&lt;/instances&gt;</FONT>
+</PRE>
+</blockquote>
+
+<span class="heading2">Running SQL Relay</span>
+
+<p>Now that Oracle and <b>SQL Relay</b> are configured, you can run 
+<b>SQL Relay</b> as follows:</p>
+
+<blockquote>sqlr-start -id proxyuser</blockquote>
+
+<p>You can use sqlrsh to access it as any of the database level users that
+you created earlier:</p>
+
+<blockquote>sqlrsh localhost 9000 "/tmp/proxyuser.socket" user1 user1<br>
+or<br>
+sqlrsh localhost 9000 "/tmp/proxyuser.socket" user2 user2<br>
+or<br>
+sqlrsh localhost 9000 "/tmp/proxyuser.socket" user3 user3</blockquote>
+
+</body>
+</html>

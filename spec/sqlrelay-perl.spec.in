@@ -1,0 +1,16 @@
+%package perl
+Summary: SQL Relay modules for Perl.
+Requires: sqlrelay = %{ver},perl = PERLVERSION,perl-DBI
+Group: Libraries
+
+%description perl
+SQL Relay modules for Perl.
+
+%files perl
+%defattr(-,root,root)
+PERLSITELIBEXP/DBD/SQLRelay.pm
+PERLSITEARCHEXP/Firstworks/
+PERLSITEARCHEXP/auto/Firstworks/
+PERLINSTALLMAN3DIR/DBD::SQLRelay.PERLMAN3EXT.gz
+PERLINSTALLMAN3DIR/Firstworks::SQLRConnection.PERLMAN3EXT.gz
+PERLINSTALLMAN3DIR/Firstworks::SQLRCursor.PERLMAN3EXT.gz

@@ -1,0 +1,79 @@
+BASIC INSTALL:
+
+	To compile sqlrelay type:
+
+		configure
+		make
+
+	To install sqlrelay become superuser and type:
+
+		make install
+
+	Libraries are installed in /usr/local/firstworks/lib
+	Includes are installed in /usr/local/firstworks/include
+	Binaries and scripts are installed in /usr/local/firstworks/bin
+
+	To uninstall sqlrelay become superuser and type:
+
+		make uninstall
+
+
+
+CUSTOM INSTALL:
+
+	Some defaults settings can be modified by editing the file defaults.h
+	The file contains descriptions of each modifyable parameter.
+
+	The default installation prefix is /usr/local/firstworks.
+	The libraries are installed in /usr/local/firstworks/lib,
+	the header files in /usr/local/firstworks/include and
+	the binaries and scripts are installed in /usr/local/firstworks/bin.
+
+	The /usr/local/firstworks part of these paths may be changed to any 
+	other directory by invoking configure with the --prefix option.
+
+		For example:
+			configure --prefix=/usr/local
+
+	This invocation would cause the libraries to be installed in
+	/usr/local/lib, the header files in /usr/local/include and
+	the binaries and scripts to be installed in /usr/local/bin.
+
+
+
+	To compile sqlrelay, first type:
+
+		configure
+
+	This will generate a file called config.mk containing some
+	compile time options.  Edit this file to your liking.  If you
+	run configure again, you will have to edit the file again.
+
+	Then type:
+
+		make
+
+	To install sqlrelay become superuser and type:
+
+		make install
+
+	To uninstall sqlrelay become superuser and type:
+
+		make uninstall
+
+
+RPM INSTALL:
+
+	If your system supports RedHat Package Manager RPM's then you can
+	build and install them like this:
+
+		configure
+	
+	As root:
+		make rpm
+
+	This will generate RPM's in the packages/RPMS directory.  You can 
+	install them by changing directories into packages/RPMS and executing 
+	the following command as root:
+
+		rpm -i *

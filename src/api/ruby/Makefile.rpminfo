@@ -1,0 +1,7 @@
+include Makefile
+
+rpminfo:
+	echo "RUBYPREFIX=$(prefix) " >> ../../../rpminfo
+	echo "RUBYVERSION=$(ruby_version) " >> ../../../rpminfo
+	echo "RUBYARCH=$(arch)" >> ../../../rpminfo
+	chmod 666 ../../../rpminfo

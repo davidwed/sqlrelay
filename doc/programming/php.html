@@ -1,0 +1,636 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay using the PHP API</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Programming with SQL Relay using the PHP API</span><br><br>
+
+<ul>
+<li><a href="#session">Establishing a Sessions</a></li>
+<li><a href="#query">Executing Queries</a></li>
+<li><a href="#commit">Commits and Rollbacks</a></li>
+<li><a href="#errors">Catching Errors</a></li>
+<li><a href="#bindvars">Substitution and Bind Variables</a></li>
+<li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
+<li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
+<li><a href="#cursors">Cursors</a></li>
+<li><a href="#columns">Getting Column Information</a></li>
+<li><a href="#caching">Caching The Result Set</a></li>
+<li><a href="#suspending">Suspending and Resuming Sessions</a></li>
+</ul>
+
+<a name="session"></a>
+<span class="heading2">Establishing a Session</span><br><br>
+
+<p>To use SQL Relay, you have to identify the connection that you intend to 
+use.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> execute some queries <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>An alternative to running dl(sql_relay.so) is to put a line like:</p>
+<blockquote>
+extension=sql_relay.so
+</blockquote>
+<p>In your php.ini file.  Doing this will improve performance as the library
+isn't loaded and unloaded each time a script runs, but only once when
+the web-server is started.</p>
+
+<p>After calling the constructor, a session is established when the first 
+query, sqlrcur_ping() or sqlrcur_identify() is run.</p>
+
+<p>For the duration of the session, the client stays connected to a database
+connection daemon.  While one client is connected, no other client can connect.
+Care should be taken to minimize the length of a session.</p>
+
+<p>If you're using a transactional database, ending a session has a catch.
+Database connection daemons can be configured to send either a commit or
+rollback at the end of a session if DML queries were executed during the
+session with no commit or rollback.  Program accordingly.</p>
+
+<a name="query"></a>
+<span class="heading2">Executing Queries</span><br><br>
+
+<p>Call sqlrcur_sendQuery() or sqlrcur_sendFileQuery() to run a query.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> <B><FONT color=#a52a2a>do</FONT></B> some stuff that takes a short <FONT color=#008b8b>time</FONT> <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_sendFileQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>/usr/local/myprogram/sql</FONT>&quot;,&quot;<FONT color=#ff00ff>myquery.sql</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> <B><FONT color=#a52a2a>do</FONT></B> some stuff that takes a long <FONT color=#008b8b>time</FONT> <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_other_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> process the result set <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>Note the call to sqlrcur_endSession() after the call to sqlrcur_sendFileQuery().
+Since the program does some stuff that takes a long time between that query and
+the next, ending the session there allows another client an opportunity to use 
+that database connection while your client is busy.  The next call to 
+sqlrcur_sendQuery() establishes another session.  Since the program does some 
+stuff that takes a short time between the first two queries, it's OK to leave 
+the session open between them.</p>
+
+<a name="commit"></a>
+<span class="heading2">Commits and Rollbacks</span><br><br>
+
+<p>If you need to execute a commit or rollback, you should use the 
+sqlrcon_commit() and sqlrcon_rollback() functions rather than sending a 
+"commit" or "rollback" query.  There are two reasons for this.  First, it's 
+much more efficient to call the methods.  Second, if you're writing code that 
+can run on transactional or non-transactional databases, some non-transactional
+databases will throw errors if they receive a "commit" or "rollback" query, 
+but by calling the sqlrcon_commit() and sqlrcon_rollback() functions you 
+instruct the database connection daemon to call the commit and rollback API 
+methods for that database rather than issuing them as queries.  If the API's 
+have no commit or rollback methods, the calls do nothing and the database 
+throws no error.  This is especially important when using SQL Relay with 
+ODBC.</p>
+
+<p>You can also turn Autocommit on or off with the sqlrcon_autoCommitOn() and
+sqlrcon_autoCommitOff() functions.  When Autocommit is on, the database
+performs a commit after each successful DML or DDL query.  When Autocommit is
+off, the database commits when the client instructs it to, or (by default)
+when a client disconnects.  For databases that don't support Autocommit, 
+sqlrcon_autoCommitOn() and sqlrcon_autoCommitOff() have no effect.</p>
+
+<a name="errors"></a>
+<span class="heading2">Catching Errors</span><br><br>
+
+<p>If your call to sqlrcur_sendQuery() or sqlrcur_sendFileQuery() returns a 0, the 
+query failed.  You can find out why by calling sqlrcur_errorMessage().</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>if</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>!</FONT></B>sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_nonexistant_table</FONT>&quot;<FONT color=#6a5acd>))</FONT> <FONT color=#6a5acd>{</FONT>
+             <FONT color=#008b8b>echo</FONT> sqlrcur_errorMessage<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+     <FONT color=#6a5acd>}</FONT>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<a name="bindvars"></a>
+<span class="heading2">Substitution and Bind Variables</span><br><br>
+
+<p>Programs rarely execute fixed queries.  More often than not, some part
+of the query is dynamically generated.  It's convenient to store queries in 
+files so they can be changed by a non-PHP programmer.  The SQL Relay API 
+provides functions for making substitutions and binds in those queries.</p>
+
+<p>For a detailed discussion of substitutions and binds, see
+<a href="binds.html">this document</a>.
+
+<p>Rather than just calling sqlrcur_sendFileQuery() you call 
+sqlrcur_prepareFileQuery(), sqlrcur_substitution(), sqlrcur_inputBind() and 
+sqlrcur_executeQuery().</p>
+
+<blockquote>
+/usr/local/myprogram/sql/myquery.sql:
+
+	select * from mytable $(whereclause)
+
+program code:
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_prepareFileQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>/usr/local/myprogram/sql</FONT>&quot;,&quot;<FONT color=#ff00ff>myquery.sql</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcur_substitution<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>whereclause</FONT>&quot;,&quot;<FONT color=#ff00ff>where col1=:value1</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcur_inputBind<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>value1</FONT>&quot;,&quot;<FONT color=#ff00ff>true</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcur_executeQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> process the result set <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>If you're using a database with an embedded procedural language, you may
+want to retrieve data from a call to one of it's functions.  To facilitate
+this, SQL Relay provides the sqlrcur_defineOutputBind() and sqlrcur_getOutputBind()
+methods.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_prepareQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>begin  :result:=addTwoNumbers(:num1,:num2);  end;</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcur_inputBind<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>num1</FONT>&quot;,<FONT color=#ff00ff>10</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_inputBind<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>num2</FONT>&quot;,<FONT color=#ff00ff>20</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_defineOutputBind<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>result</FONT>&quot;,<FONT color=#ff00ff>100</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_executeQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>result</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_getOutputBind<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>result</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> <B><FONT color=#a52a2a>do</FONT></B> something with the result <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>The sqlrcur_getOutputBind() function returns a NULL value as an empty string.  
+If you would it to come back as undefined instead, you can call the 
+sqlrcur_getNullsAsUndefined() method.  To revert to the default behavior, you can
+call sqlrcur_getNullsAsEmptyStrings().</p>
+
+<p>Sometimes it's convenient to bind a bunch of variables that may or may not 
+actually be in the query.  For example, if you are building a web based
+application, it may be easy to just bind all the form variables/values from the
+previous page, even though some of them don't appear in the query.  Databases
+usually generate errors in this case.  Calling validateBinds() just prior to
+calling executeQuery() causes the API to check the query for each bind variable
+before actually binding it, preventing those kinds of errors.  There is a 
+performance cost associated with calling validateBinds().</p>
+
+
+<a name="rebinding"></a>
+<span class="heading2">Re-Binding and Re-Execution</span><br><br>
+
+<p>Another feature of the prepare/bind/execute paradigm is the ability to 
+prepare, bind and execute a query once, then re-bind and re-execute the query 
+over and over without re-preparing it.  If your backend database natively 
+supports this paradigm, you can reap a substantial performance improvement.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6858c8>&lt;?</FONT>
+       <FONT color=#008888>dl</FONT><FONT color=#6858c8>(</FONT>sqlrelay<B><FONT color=#a02828>.</FONT></B>so<FONT color=#6858c8>)</FONT>
+
+       <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcon_alloc<FONT color=#6858c8>(</FONT>&quot;<FONT color=#f800f8>host</FONT>&quot;,<FONT color=#f800f8>9000</FONT>,&quot;&quot;,&quot;<FONT color=#f800f8>user</FONT>&quot;,&quot;<FONT color=#f800f8>password</FONT>&quot;,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT><FONT color=#6858c8>)</FONT>;
+       <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcur_alloc<FONT color=#6858c8>(</FONT>con<FONT color=#6858c8>)</FONT>;
+
+       sqlrcur_prepareQuery<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT>,&quot;<FONT color=#f800f8>select * from mytable where mycolumn&gt;:value</FONT>&quot;<FONT color=#6858c8>)</FONT>;
+       sqlrcur_inputBind<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT>,&quot;<FONT color=#f800f8>value</FONT>&quot;,<FONT color=#f800f8>1</FONT><FONT color=#6858c8>)</FONT>;
+       sqlrcur_executeQuery<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT><FONT color=#6858c8>)</FONT>;
+
+       <B><FONT color=#a02828>...</FONT></B> process the result set <B><FONT color=#a02828>...</FONT></B>
+
+       sqlrcur_clearBinds<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT><FONT color=#6858c8>)</FONT>;
+       sqlrcur_inputBind<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT>,&quot;<FONT color=#f800f8>value</FONT>&quot;,<FONT color=#f800f8>5</FONT><FONT color=#6858c8>)</FONT>;
+       sqlrcur_executeQuery<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT><FONT color=#6858c8>)</FONT>;
+
+       <B><FONT color=#a02828>...</FONT></B> process the result set <B><FONT color=#a02828>...</FONT></B>
+
+       sqlrcur_clearBinds<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT><FONT color=#6858c8>)</FONT>;
+       sqlrcur_inputBind<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT>,&quot;<FONT color=#f800f8>value</FONT>&quot;,<FONT color=#f800f8>10</FONT><FONT color=#6858c8>)</FONT>;
+       sqlrcur_executeQuery<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT><FONT color=#6858c8>)</FONT>;
+
+       <B><FONT color=#a02828>...</FONT></B> process the result set <B><FONT color=#a02828>...</FONT></B>
+
+       sqlrcur_free<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT><FONT color=#6858c8>)</FONT>;
+       sqlrcon_free<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><FONT color=#6858c8>)</FONT>;
+<FONT color=#6858c8>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<a name="fields"></a>
+<span class="heading2">Accessing Fields in the Result Set</span><br><br>
+
+<p>The sqlrcur_rowCount(), sqlrcur_colCount() and sqlrcur_getField() methods are 
+useful for processing result sets.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>0</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>&lt;</FONT></B>sqlrcur_rowCount<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+             <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>0</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>&lt;</FONT></B>sqlrcur_colCount<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+                     <FONT color=#008b8b>echo</FONT> sqlrcur_getField<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><FONT color=#6a5acd>)</FONT>;
+                     <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>,</FONT>&quot;;
+             <FONT color=#6a5acd>}</FONT>
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+     <FONT color=#6a5acd>}</FONT>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>You can also use sqlrcur_getRow() or sqlrcur_getRowAssoc() to get the entire 
+row.</p>
+
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>0</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>&lt;</FONT></B>sqlrcur_rowCount<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+             <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>rowarray</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_getRow<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><FONT color=#6a5acd>)</FONT>;
+             <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>0</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>&lt;</FONT></B>sqlrcur_colCount<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+                     <FONT color=#008b8b>echo</FONT> rowarray<FONT color=#6a5acd>[</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><FONT color=#6a5acd>]</FONT>;
+                     <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>,</FONT>&quot;;
+             <FONT color=#6a5acd>}</FONT>
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+     <FONT color=#6a5acd>}</FONT>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>The sqlrcur_getField(), sqlrcur_getRow() and sqlrcur_getRowAssoc() methods 
+return NULL fields as empty strings.  If you would like them to come back as 
+NULL's instead, you can call the sqlrcur_getNullsAsNulls() method.  To revert 
+to the default behavior, you can call sqlrcur_getNullsAsEmptyStrings().</p>
+
+<p>If you want to access the result set, but don't care about the
+column information (column names, types or sizes) and don't mind getting
+fields by their numeric index instead of by name,  you can call the
+sqlrcur_dontGetColumnInfo() method prior to executing your query.  This can 
+result in a performance improvement, especially when many queries with small
+result sets are executed in rapid succession.  You can call 
+sqlrcur_getColumnInfo() again later to turn off this feature.</p>
+
+<a name="largeresultsets"></a>
+<span class="heading2">Dealing With Large Result Sets</span><br><br>
+
+<p>SQL Relay normally buffers the entire result set.  This can speed things up 
+at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.</p>
+
+<p>Use sqlrcur_setResultSetBufferSize() to set the number of rows to buffer at a 
+time.  Calls to sqlrcur_getRow(), sqlrcur_getRowAssoc() and sqlrcur_getField() cause 
+the chunk containing the requested field to be fetched.  Rows in that chunk are
+accessible but rows before it are not.</p>
+
+<p>For example, if you setResultSetBufferSize(5) and execute a query that 
+returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14, 
+then 15-19.  When rows 5-9 are available, getField(0,0) will return NULL and 
+getField(11,0) will cause rows 10-14 to be fetched and return the requested
+value.</p>
+
+<p>When buffering the result set in chunks, don't end the session until after
+you're done with the result set.</p>
+
+<p>If you call sqlrcur_setResultSetBufferSize() and forget what you set it to, 
+you can always call sqlrcur_getResultSetBufferSize().</p>
+
+<p>When buffering a result set in chunks, the sqlrcur_rowCount() method returns
+the number of rows returned so far.  The sqlrcur_firstRowIndex() method returns 
+the index of the first row of the currently buffered chunk.
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_setResultSetBufferSize<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<FONT color=#ff00ff>5</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>while</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>!</FONT></B>done<FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+             <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>0</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>&lt;</FONT></B>sqlrcur_colCount<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+                     <B><FONT color=#a52a2a>if</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>field</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_getField<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><FONT color=#6a5acd>))</FONT> <FONT color=#6a5acd>{</FONT>
+                             <FONT color=#008b8b>echo</FONT> <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>field</FONT>;
+                             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>,</FONT>&quot;;
+                     <FONT color=#6a5acd>}</FONT> <B><FONT color=#a52a2a>else</FONT></B> <FONT color=#6a5acd>{</FONT>
+                             done<B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>1</FONT>;
+                     <FONT color=#6a5acd>}</FONT>
+             <FONT color=#6a5acd>}</FONT>
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+             <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>++</FONT></B>;
+     <FONT color=#6a5acd>}</FONT>
+
+    sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_other_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+
+    <B><FONT color=#a52a2a>...</FONT></B> process this query's result set in chunks also <B><FONT color=#a52a2a>...</FONT></B>
+
+    sqlrcur_setResultSetBufferSize<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<FONT color=#ff00ff>0</FONT><FONT color=#6a5acd>)</FONT>;
+
+    sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_third_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+
+    <B><FONT color=#a52a2a>...</FONT></B> process this query's result set all at once <B><FONT color=#a52a2a>...</FONT></B>
+
+    sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+    sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+    sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<a name="cursors"></a>
+<span class="heading2">Cursors</span><br><br>
+
+<p>Cursors make it possible to execute queries while processing the result
+set of another query.  You can select rows from a table in one query, then 
+iterate through it's result set, inserting rows into another table, using only 
+1 database connection for both operations.</p>
+
+<p>For example:</p>
+
+<PRE>
+<FONT color=#6858c8>&lt;?</FONT>
+        <FONT color=#008888>dl</FONT><FONT color=#6858c8>(</FONT>sqlrelay<B><FONT color=#a02828>.</FONT></B>so<FONT color=#6858c8>)</FONT>
+
+        <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcon_alloc<FONT color=#6858c8>(</FONT>&quot;<FONT color=#f800f8>host</FONT>&quot;,<FONT color=#f800f8>9000</FONT>,&quot;&quot;,&quot;<FONT color=#f800f8>user</FONT>&quot;,&quot;<FONT color=#f800f8>password</FONT>&quot;,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT><FONT color=#6858c8>)</FONT>;
+        <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor1</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcur_alloc<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><FONT color=#6858c8>)</FONT>;
+        <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor2</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcur_alloc<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><FONT color=#6858c8>)</FONT>;
+
+        sqlrcur_setResultSetBufferSize<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor1</FONT>,<FONT color=#f800f8>10</FONT><FONT color=#6858c8>)</FONT>;
+        sqlrcur_sendQuery<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor1</FONT>,&quot;<FONT color=#f800f8>select * from my_huge_table</FONT>&quot;<FONT color=#6858c8>)</FONT>;
+
+        <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>index</FONT><B><FONT color=#a02828>=</FONT></B><FONT color=#f800f8>0</FONT>;
+        <B><FONT color=#a02828>while</FONT></B> <FONT color=#6858c8>(</FONT><B><FONT color=#a02828>!</FONT></B>sqlrcur_endOfResultSet<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor1</FONT><FONT color=#6858c8>))</FONT> <FONT color=#6858c8>{</FONT>
+                sqlrcur_prepareQuery<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor2</FONT>,&quot;<FONT color=#f800f8>insert into my_other_table values (:1,:2,:3)</FONT>&quot;<FONT color=#6858c8>)</FONT>;
+                sqlrcur_inputBind<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor2</FONT>,&quot;<FONT color=#f800f8>1</FONT>&quot;,sqlrcur_getField<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor1</FONT>,index,<FONT color=#f800f8>1</FONT><FONT color=#6858c8>))</FONT>;
+                sqlrcur_inputBind<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor2</FONT>,&quot;<FONT color=#f800f8>2</FONT>&quot;,sqlrcur_getField<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor1</FONT>,index,<FONT color=#f800f8>2</FONT><FONT color=#6858c8>))</FONT>;
+                sqlrcur_inputBind<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor2</FONT>,&quot;<FONT color=#f800f8>3</FONT>&quot;,sqlrcur_getField<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor1</FONT>,index,<FONT color=#f800f8>3</FONT><FONT color=#6858c8>))</FONT>;
+                sqlrcur_executeQuery<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor2</FONT><FONT color=#6858c8>)</FONT>;
+        <FONT color=#6858c8>}</FONT>
+
+        sqlrcur_free<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor2</FONT><FONT color=#6858c8>)</FONT>;
+        sqlrcur_free<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor1</FONT><FONT color=#6858c8>)</FONT>;
+        sqlrcon_free<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><FONT color=#6858c8>)</FONT>;
+<FONT color=#6858c8>?&gt;</FONT>
+</PRE>
+
+<p>Prior to SQL Relay version 0.25, you would have had to buffer the first
+result set or use 2 database connections instead of just 1.</p>
+
+<p>The number of cursors simultaneously available per-connection is set at 
+compile time and defaults to 5.</p>
+
+<a name="columns"></a>
+<span class="heading2">Getting Column Information</span><br><br>
+
+<p>The name, type, length and length of the longest field of each column are 
+available.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>0</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><B><FONT color=#a52a2a>&lt;</FONT></B>sqlrcur_colCount<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Name: </FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> sqlrcur_getColumnName<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Type: </FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> sqlrcur_getColumnType<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Length: </FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> sqlrcur_getColumnLength<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>Longest Field: </FONT>&quot;;
+             <FONT color=#008b8b>echo</FONT> sqlrcur_getLongest<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>i</FONT><FONT color=#6a5acd>)</FONT><FONT color=#6a5acd>)</FONT>;
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n\n</FONT>&quot;;
+     <FONT color=#6a5acd>}</FONT>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<a name="caching"></a>
+<span class="heading2">Caching The Result Set</span><br><br>
+
+<p>Say you're writing a web-based report where a query with a huge result set
+is executed and 20 rows are displayed per page.  Rather than rerunning the 
+query for every page every time and dumping all but the 20 rows you want to
+display, you can run the query once, cache the result set to a local file and
+just open the file for each page of the report.</p>
+
+<p>First CGI:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> generate a unique file name <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_cacheToFile<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>,</FONT><FONT color=#008b8b>filename</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_setCacheTtl<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<FONT color=#ff00ff>600</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_cacheOff<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> pass the filename to the next page <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>Second CGI:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>...</FONT></B> get the filename from the previous page <B><FONT color=#a52a2a>...</FONT></B>
+
+     <B><FONT color=#a52a2a>...</FONT></B> get the page to display from the previous page <B><FONT color=#a52a2a>...</FONT></B>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_openCachedResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,filename<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>=$</FONT></B><FONT color=#008b8b>pagetodisplay</FONT><B><FONT color=#a52a2a>*</FONT></B><FONT color=#ff00ff>20</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>&lt;</FONT></B><FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>pagetodisplay</FONT><B><FONT color=#a52a2a>+</FONT></B><FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT><B><FONT color=#a52a2a>*</FONT></B><FONT color=#ff00ff>20</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+             <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>0</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>&lt;</FONT></B>sqlrcur_colCount<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+                     <FONT color=#008b8b>echo</FONT> sqlrcur_getField<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><FONT color=#6a5acd>)</FONT>;
+                     <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>,</FONT>&quot;;
+             <FONT color=#6a5acd>}</FONT>
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+     <FONT color=#6a5acd>}</FONT>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+
+<a name="suspending"></a>
+<span class="heading2">Suspending and Resuming Sessions</span><br><br>
+
+<p>Sometimes web-based applications need a single database transaction to span
+multiple pages.  Since SQL Relay sessions can be suspended and resumed, this
+is possible.</p>
+
+<p>First CGI:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>port</FONT><B><FONT color=#a52a2a>=</FONT></B>getConnectionPort<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>socket</FONT><B><FONT color=#a52a2a>=</FONT></B>getConnectionPort<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>rs</FONT><B><FONT color=#a52a2a>=</FONT></B>getResultSetId<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_suspendResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_suspendSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> pass the rs, port <B><FONT color=#a52a2a>and</FONT></B> socket to the <FONT color=#008b8b>next</FONT> page <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>Second CGI:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+     <FONT color=#008b8b>dl</FONT><FONT color=#6a5acd>(</FONT>sqlrelay<B><FONT color=#a52a2a>.</FONT></B>so<FONT color=#6a5acd>)</FONT>
+
+     <B><FONT color=#a52a2a>...</FONT></B> get rs, port <B><FONT color=#a52a2a>and</FONT></B> socket from previous page <B><FONT color=#a52a2a>...</FONT></B>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcon_resumeSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>port</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>socket</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_resumeResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>rs</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>commit</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>You can also distribute the processing of a result set across a series of
+CGI's using suspended sessions.  If you're buffering a result set in chunks
+instead of all at once and suspend a session, when you resume the session you 
+can continue to retrieve rows from the result set.</p>
+
+<p>Similarly, if you're buffering a result set in chunks, caching that
+result set and suspend your session.  When you resume the session, you can
+continue caching the result set.  You must use sqlrcur_resumeCachedResultSet()
+instead of sqlrcur_resumeResultSet() however.</p>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+%package devel-c++
+Summary: Libraries and includes for developing with SQL Relay in C++.
+Requires: rudiments-devel = 0.24,sqlrelay = %{ver}
+Group: Development/Libraries
+
+%description devel-c++
+Libraries and includes for developing with SQL Relay in C++.
+
+%post devel-c++
+NEWLIBDIR=`echo "%{libdir}" | sed -e "s|\/|\\\\\/|g"`
+NEWLDSOCONF=`sed -e "/^$NEWLIBDIR$/d" /etc/ld.so.conf`
+echo "$NEWLDSOCONF" > /etc/ld.so.conf
+echo %{libdir} >> /etc/ld.so.conf
+/sbin/ldconfig
+
+%postun devel-c++
+if ( test ! -d "%{libdir}" ); then
+	NEWLIBDIR=`echo "%{libdir}" | sed -e "s|\/|\\\\\/|g"`
+	NEWLDSOCONF=`sed -e "/^$NEWLIBDIR$/d" /etc/ld.so.conf`
+	echo "$NEWLDSOCONF" > /etc/ld.so.conf
+	/sbin/ldconfig
+fi
+rmdir %{incdir}/sqlrelay/private
+rmdir %{incdir}/sqlrelay
+
+%files devel-c++
+%defattr(-,root,root)
+%{bindir}/sqlrclient-config
+%{incdir}/sqlrelay/sqlrclient.h
+%{incdir}/sqlrelay/private/bindvar.h
+%{incdir}/sqlrelay/private/column.h
+%{incdir}/sqlrelay/private/row.h
+%{incdir}/sqlrelay/private/sqlrconnection.h
+%{incdir}/sqlrelay/private/sqlrcursor.h
+%{incdir}/sqlrelay/private/sqlrdefines.h
+%{incdir}/sqlrelay/private/sqlrincludes.h
+%{libdir}/libsqlrclient.a
+%{libdir}/libsqlrclient_p.a
+%{libdir}/libsqlrclient.so

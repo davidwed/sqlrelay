@@ -1,0 +1,34 @@
+David Muse - mused@firstworks.com
+	Core daemons and connections
+	C, C++, Perl and Ruby API's
+
+Roman Milner - rmilner@pointone.com
+	Python API
+	Zope Adapter
+
+Adam Kropielnicki - adasz@wp.pl
+	PHP Module
+
+Dmitry Ovsyanko - do@rambler.ru
+	Perl DBD Module
+
+Eric Peters - egpeters@u.washington.edu - www.myecamp.com
+	PHP Module - sqlrc_getarray() function
+
+Michael Neuman - neumann@s-direktnet.de
+	Ruby DBD Module
+
+minx@nownuri.net
+	Oracle CLOB support
+
+Florain Weps - fweps@greenmail.ch   and   Andreas Tille - tille@debian.org
+	man pages, patches, debian packages
+
+Fixes/Patches incorporated from:
+	Adrian Likins
+	Christoph Schwarz
+	Adrian Pavlykevych
+	Vladimir Kirichenko
+	Sang Jin Park
+	Dieter Maurer
+	Leonardo Rochael Almeida

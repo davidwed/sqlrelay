@@ -1,0 +1,12 @@
+%package oracle7
+Summary: SQL Relay connection daemon for Oracle.
+Requires: sqlrelay = %{ver}
+Group: Database/Daemons
+
+%description oracle7
+SQL Relay connection daemon for Oracle.
+
+%files oracle7
+%defattr(-,root,root)
+%{bindir}/sqlr-connection-oracle7
+%{bindir}/sqlr-connection-oracle7-debug

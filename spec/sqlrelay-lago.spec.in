@@ -1,0 +1,12 @@
+%package lago
+Summary: SQL Relay connection daemon for Lago.
+Requires: sqlrelay = %{ver}
+Group: Database/Daemons
+
+%description lago
+SQL Relay connection daemon for Lago.
+
+%files lago
+%defattr(-,root,root)
+%{bindir}/sqlr-connection-lago
+%{bindir}/sqlr-connection-lago-debug

@@ -1,0 +1,12 @@
+%package ruby
+Summary: An SQL Relay module for Ruby.
+Requires: sqlrelay = %{ver},ruby >= RUBYVERSION
+Group: Libraries
+
+%description ruby
+An SQL Relay module for Ruby.
+
+%files ruby
+%defattr(-,root,root)
+RUBYPREFIX/lib/ruby/site_ruby/RUBYVERSION/RUBYARCH/sqlrelay.so
+RUBYPREFIX/lib/ruby/site_ruby/RUBYVERSION/DBD/SQLRelay/SQLRelay.rb

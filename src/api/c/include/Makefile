@@ -1,0 +1,11 @@
+include ../../../../config.mk
+
+top_srcdir = ../../../..
+INSTALL = $(top_srcdir)/install-sh -c
+
+install:
+	$(INSTALL) -m 644 sqlrelay/sqlrclientwrapper.h $(incdir)/sqlrelay
+
+uninstall:
+	$(RM) $(incdir)/sqlrclientwrapper.h
+	$(RM) $(incdir)/sqlrelay/sqlrclientwrapper.h

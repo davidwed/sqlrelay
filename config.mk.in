@@ -1,0 +1,199 @@
+SHELL = /bin/sh
+VPATH = @srcdir@
+
+SQLR_VERSION = @SQLR_VERSION@
+SONAME_VERSION_INFO = @SONAME_VERSION_INFO@
+
+# installation directories
+prefix = @prefix@
+exec_prefix= @exec_prefix@
+incdir = @includedir@
+libdir = @libdir@
+javadir = ${exec_prefix}/java
+libexecdir = @libexecdir@
+bindir = @bindir@
+localstatedir = @localstatedir@
+sysconfdir = @sysconfdir@
+localstatedir = @localstatedir@
+mandir = @mandir@
+docdir = ${prefix}/doc/sqlrelay
+tmpdir = ${localstatedir}/sqlrelay/tmp
+cachedir = ${localstatedir}/sqlrelay/cache
+debugdir = ${localstatedir}/sqlrelay/debug
+
+# compiler to use
+CC = @CC@
+CXX = @CXX@
+
+# includes and defines (-I and -D flags)
+BASECPPFLAGS = @CPPFLAGS@ -DTMP_DIR=\"$(tmpdir)\" -DDEBUG_DIR=\"$(debugdir)\" -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\"
+
+# link flags (-s, -static, -melf, -belf, etc.)
+LDFLAGS = @LDFLAGS@
+STATICLINK = @STATICLINK@
+
+# debug and optimization flags (-g, -O2, etc.)
+CXXFLAGS = -pedantic -w @CXXFLAGS@
+CFLAGS = -pedantic -w @CFLAGS@
+DEBUGCXXFLAGS = -pedantic -w @DEBUGCXXFLAGS@
+DEBUGCFLAGS = -pedantic -w @DEBUGCFLAGS@
+
+# libtool command
+LIBTOOL = @LIBTOOL@
+
+# command to build a shared object library
+DYNAMICAR = @DYNAMICAR@
+
+# command to build a static library
+STATICAR = ar cr
+
+# commands to erase files and directories
+RM = rm -f
+RMTREE = rm -rf
+
+# command to create a symbolic link
+SYMLINK = ln -s
+
+# command to create a blank file
+TOUCH = touch
+
+# ps command
+PSDEFINE = -DPS=\"@PS@\"
+
+# uname -s
+UNAME = @UNAME@
+
+# rpm build directory
+RPM_BUILD_DIR = @RPM_BUILD_DIR@
+
+# extra libs
+EXTRALIBS = @LIBS@
+
+# windows environment
+MINGW32 = @MINGW32@
+CYGWIN = @CYGWIN@
+UWIN = @UWIN@
+
+# rudiments library
+RUDIMENTSPATH = @RUDIMENTSPATH@
+RUDIMENTSLIBS = @RUDIMENTSLIBS@ 
+RUDIMENTSINCLUDES = @RUDIMENTSINCLUDES@ 
+
+# perl
+HAVE_PERL = @HAVE_PERL@
+PERL = @PERL@
+
+
+# python
+HAVE_PYTHON = @HAVE_PYTHON@
+PYTHONINCLUDES = @PYTHONINCLUDES@
+PYTHONLIBS = @PYTHONLIBS@
+PYTHONOBJ = @PYTHONOBJ@
+PYTHONDIR = @PYTHONDIR@
+
+
+# zope
+HAVE_ZOPE = @HAVE_ZOPE@
+ZOPEDIR = @ZOPEDIR@
+
+
+# ruby
+HAVE_RUBY = @HAVE_RUBY@
+RUBY = @RUBY@
+
+
+# php
+HAVE_PHP = @HAVE_PHP@
+PHPINCLUDES = @PHPINCLUDES@
+PHPEXTDIR = @PHPEXTDIR@
+
+
+# java
+HAVE_JAVA = @HAVE_JAVA@
+JAVAC = @JAVAC@
+JAVAINCLUDES = @JAVAINCLUDES@
+
+
+# libstdc++
+LIBSTDCPP = @LIBSTDCPP@
+
+# libpthread
+PTHREADLIBS = @PTHREADSLIB@
+
+# readline
+READLINELIB = @READLINELIB@
+
+# GTK stuff
+HAVE_GTK = @HAVE_GTK@
+GTKCONFIG = @GTKCONFIG@
+
+# libnsl
+NSLLIB = @NSLLIB@
+
+# libsocket
+SOCKETLIB = @SOCKETLIB@
+
+# libxnet
+XNETLIB = @XNETLIB@
+
+# libssl
+SSLLIB = @SSLLIB@
+
+# libcrypto
+CRYPTOLIB = @CRYPTOLIB@
+
+# Oracle stuff
+ORACLEVERSION = @ORACLEVERSION@
+ORACLEINCLUDES = @ORACLEINCLUDES@
+ORACLELIBS = @ORACLELIBS@
+ORACLESTATIC = @ORACLESTATIC@
+
+# MySQL stuff
+MYSQLINCLUDES = @MYSQLINCLUDES@
+MYSQLLIBS = @MYSQLLIBS@
+MYSQLSTATIC = @MYSQLSTATIC@
+
+# mSQL stuff
+MSQLINCLUDES = @MSQLINCLUDES@
+MSQLLIBS = @MSQLLIBS@
+MSQLSTATIC = @MSQLSTATIC@
+
+# PostgreSQL stuff
+POSTGRESQLINCLUDES = @POSTGRESQLINCLUDES@
+POSTGRESQLLIBS = @POSTGRESQLLIBS@
+POSTGRESQLSTATIC = @POSTGRESQLSTATIC@
+
+# SQLite stuff
+SQLITEINCLUDES = @SQLITEINCLUDES@
+SQLITELIBS = @SQLITELIBS@
+SQLITESTATIC = @SQLITESTATIC@
+
+# Lago stuff
+LAGOINCLUDES = @LAGOINCLUDES@
+LAGOLIBS = @LAGOLIBS@
+LAGOSTATIC = @LAGOSTATIC@
+
+# FreeTDS stuff
+FREETDSINCLUDES = @FREETDSINCLUDES@
+FREETDSLIBS = @FREETDSLIBS@
+FREETDSSTATIC = @FREETDSSTATIC@
+
+# Sybase stuff
+SYBASEINCLUDES = @SYBASEINCLUDES@
+SYBASELIBS = @SYBASELIBS@
+SYBASESTATIC = @SYBASESTATIC@
+
+# ODBC stuff
+ODBCINCLUDES = @ODBCINCLUDES@
+ODBCLIBS = @ODBCLIBS@
+ODBCSTATIC = @ODBCSTATIC@
+
+# DB2 stuff
+DB2INCLUDES = @DB2INCLUDES@
+DB2LIBS = @DB2LIBS@
+DB2STATIC = @DB2STATIC@
+
+# Interbase stuff
+INTERBASEINCLUDES = @INTERBASEINCLUDES@
+INTERBASELIBS = @INTERBASELIBS@
+INTERBASESTATIC = @INTERBASESTATIC@

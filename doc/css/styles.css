@@ -1,0 +1,85 @@
+body {
+	background:	white;
+	color:		black;
+	font-family:	arial;
+	font-weight:	medium;
+	font-size:	10pt;
+}
+
+.heading1 {
+	color:		black;
+	font-family:	arial;
+	font-weight:	bold;
+	font-size:	20pt;
+}
+
+.heading2 {
+	color:		black;
+	font-family:	arial;
+	font-weight:	bold;
+	font-size:	16pt;
+}
+
+.heading3 {
+	color:		black;
+	font-family:	arial;
+	font-weight:	bold;
+	font-size:	12pt;
+}
+
+.heading4 {
+	color:		black;
+	font-family:	arial;
+	font-weight:	bold;
+	font-size:	10pt;
+}
+
+.heading {
+	color:		black;
+	font-family:	arial;
+	font-weight:	bold;
+	font-size:	14pt;
+}
+
+.subject {
+	color:		black;
+	font-family:	arial;
+	font-weight:	bold;
+	font-size:	12pt;
+}
+
+a {
+	color:		blue;
+	font-family:	arial;
+	font-weight:	medium;
+	font-size:	10pt;
+}
+
+input {
+	color:		black;
+	font-family:	courier;
+	font-weight:	medium;
+	font-size:	10pt;
+}
+
+.login {
+	color:		black;
+	font-family:	arial;
+	font-weight:	medium;
+	font-size:	10pt;
+}
+
+p {
+	background:	white;
+	color:		black;
+	font-family:	arial;
+	font-weight:	medium;
+	font-size:	10pt;
+}
+
+pre {
+	color:		black;
+	font-family:	courier;
+	font-weight:	medium;
+	font-size:	10pt;
+}

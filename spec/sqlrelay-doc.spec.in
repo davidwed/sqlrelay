@@ -1,0 +1,76 @@
+%package doc
+Summary: SQL Relay documentation.
+Group: Database/Daemons
+
+%description doc
+SQL Relay documentation.
+
+%files doc
+%defattr(-,root,root)
+%{sysconfdir}/sqlrelay.conf.example
+%{prefix}/doc/sqlrelay/api/c/sqlrclientwrapper.h.html
+%{prefix}/doc/sqlrelay/api/c++/sqlrclient.h.html
+%{prefix}/doc/sqlrelay/api/java/allclasses-frame.html
+%{prefix}/doc/sqlrelay/api/java/deprecated-list.html
+%{prefix}/doc/sqlrelay/api/java/help-doc.html
+%{prefix}/doc/sqlrelay/api/java/index-all.html
+%{prefix}/doc/sqlrelay/api/java/index.html
+%{prefix}/doc/sqlrelay/api/java/overview-tree.html
+%{prefix}/doc/sqlrelay/api/java/package-list
+%{prefix}/doc/sqlrelay/api/java/packages.html
+%{prefix}/doc/sqlrelay/api/java/serialized-form.html
+%{prefix}/doc/sqlrelay/api/java/SQLRConnection.html
+%{prefix}/doc/sqlrelay/api/java/SQLRCursor.html
+%{prefix}/doc/sqlrelay/api/java/stylesheet.css
+%{prefix}/doc/sqlrelay/api/perl/SQLRConnection.html
+%{prefix}/doc/sqlrelay/api/perl/SQLRCursor.html
+%{prefix}/doc/sqlrelay/api/perl/SQLRelay.html
+%{prefix}/doc/sqlrelay/api/php/doc.html
+%{prefix}/doc/sqlrelay/api/python/PySQLRClient.py.html
+%{prefix}/doc/sqlrelay/api/python/PySQLRDB.py.html
+%{prefix}/doc/sqlrelay/api/ruby/ruby.html
+%{prefix}/doc/sqlrelay/api/ruby/rubydbi.html
+%{prefix}/doc/sqlrelay/clientapis.html
+%{prefix}/doc/sqlrelay/configuring.html
+%{prefix}/doc/sqlrelay/connections.html
+%{prefix}/doc/sqlrelay/css/styles.css
+%{prefix}/doc/sqlrelay/index.html
+%{prefix}/doc/sqlrelay/installing.html
+%{prefix}/doc/sqlrelay/introduction.html
+%{prefix}/doc/sqlrelay/introtowebdb.html
+%{prefix}/doc/sqlrelay/invisible.gif
+%{prefix}/doc/sqlrelay/programming/binds.html
+%{prefix}/doc/sqlrelay/programming/c.html
+%{prefix}/doc/sqlrelay/programming/c++.html
+%{prefix}/doc/sqlrelay/programming/java.html
+%{prefix}/doc/sqlrelay/programming/perldbi.html
+%{prefix}/doc/sqlrelay/programming/perl.html
+%{prefix}/doc/sqlrelay/programming/php.html
+%{prefix}/doc/sqlrelay/programming/pythondb.html
+%{prefix}/doc/sqlrelay/programming/python.html
+%{prefix}/doc/sqlrelay/programming/ruby.html
+%{prefix}/doc/sqlrelay/programming/rubydbi.html
+%{prefix}/doc/sqlrelay/programming/zope/instance.gif
+%{prefix}/doc/sqlrelay/programming/zope/management.gif
+%{prefix}/doc/sqlrelay/programming/zope/resultset.gif
+%{prefix}/doc/sqlrelay/programming/zope/sqlrelay.gif
+%{prefix}/doc/sqlrelay/programming/zope/test.gif
+%{prefix}/doc/sqlrelay/programming/zope/testzsqlmethod.gif
+%{prefix}/doc/sqlrelay/programming/zope/zsqlmethod.gif
+%{prefix}/doc/sqlrelay/programming/zope/zsqlmethodresultset.gif
+%{prefix}/doc/sqlrelay/programming/zope.html
+%{prefix}/doc/sqlrelay/running.html
+%{prefix}/doc/sqlrelay/gettingstarted/db2.html
+%{prefix}/doc/sqlrelay/gettingstarted/interbase.html
+%{prefix}/doc/sqlrelay/gettingstarted/lago.html
+%{prefix}/doc/sqlrelay/gettingstarted/msql.html
+%{prefix}/doc/sqlrelay/gettingstarted/mssqlserver.html
+%{prefix}/doc/sqlrelay/gettingstarted/mysql.html
+%{prefix}/doc/sqlrelay/gettingstarted/oracle.html
+%{prefix}/doc/sqlrelay/gettingstarted/oracle/805.html
+%{prefix}/doc/sqlrelay/gettingstarted/oracle/817.html
+%{prefix}/doc/sqlrelay/gettingstarted/postgresql.html
+%{prefix}/doc/sqlrelay/gettingstarted/sqlite.html
+%{prefix}/doc/sqlrelay/gettingstarted/sybase.html
+%{prefix}/doc/sqlrelay/gettingstarted/sybase/11.0.3.3.html
+%{prefix}/doc/sqlrelay/gettingstarted/sybase/11.9.2.html

@@ -1,0 +1,84 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With Sybase - Initializing an 11.0.3.3 Server</title>
+<link rel="stylesheet" href="../../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Initializing an 11.0.3.3 Server</span><br>
+
+
+<p>After installing Sybase Adaptive Server Enterprise, you can initialize the 
+server by following these steps.</p>
+
+<p>First, <i>su</i> to the sybase user using the -l option.</p>
+
+<blockquote>
+<b>su -l sybase</b>
+</blockquote>
+
+<p>Run <b>install/sybinit</b>, a text-based installation program.  When
+prompted, follow these instructions.</p>
+
+<blockquote>
+select <b>3. Configure a Server product</b><br>
+select <b>1. SQL Server</b><br>
+select <b>1. Configure a new Adaptive Server</b><br>
+type ctrl-a to accept the default server name<br>
+<br>
+select <b>1. CONFIGURE SERVER'S INTERFACES FILE ENTRY</b><br>
+select <b>3. Add a new listener service</b><br>
+don't modify the default hostname/address<br>
+select <b>2. Port:</b><br>
+enter 4100<br>
+type ctrl-a to <b>Accept and Continue</b><br>
+type y when prompted with <b>Is this information correct?</b><br>
+type ctrl-a to <b>Accept and Continue</b><br>
+type y when prompted with <b>Write the changes to the interfaces file now?</b><br>
+<br>
+select <b>2. MASTER DEVICE CONFIGURATION</b><br>
+type ctrl-a to <b>Accept and Continue</b><br>
+Press <return> to continue, ignoring all WARNING's.
+<br>
+select <b>3. SYBSYSTEMPROCS DATABASE CONFIGURATION</b><br>
+type ctrl-a to <b>Accept and Continue</b><br>
+<br>
+select <b>4. SET ERRORLOG LOCATION</b><br>
+type ctrl-a to <b>Accept and Continue</b><br>
+<br>
+select <b>5. CONFIGURE DEFAULT BACKUP SERVER</b><br>
+type ctrl-a to <b>Accept and Continue</b><br>
+<br>
+select <b>6. CONFIGURE LANGUAGES</b><br>
+type ctrl-a to <b>Accept and Continue</b><br>
+<br>
+select <b>7. CONFIGURE CHARACTER SETS</b><br>
+type ctrl-a to <b>Accept and Continue</b><br>
+<br>
+select <b>8. CONFIGURE SORT ORDER</b><br>
+type ctrl-a to <b>Accept and Continue</b><br>
+<br>
+select <b>9. CONFIGURE AUDITING</b><br>
+type ctrl-a to <b>Accept and Continue</b><br>
+<br>
+on the <b>SYBASE SERVER CONFIGURATION</b> screen, type ctrl-a to <b>Accept and Continue</b><br>
+type y when prompted with <b>Execute the Sybase Server Configuration now?</b><br>
+Press &lt;return&gt; to continue, ignoring all WARNING's.
+<br>
+</blockquote>
+
+<p>If all goes well, you should see several <b>Running task:</b> and 
+<b>Task succeeded:</b> messages.  When you get a <b>Configuration completed 
+successfully</b> message, press &lt;return&gt; to continue.</p>
+
+<blockquote>
+type ctrl-x to <b>Exit Screen</b><br>
+type ctrl-x to <b>Exit Screen</b><br>
+type ctrl-x to <b>Exit Screen</b><br>
+</blockquote>
+
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With Oracle - Installing Oracle 8.1.7</title>
+<link rel="stylesheet" href="../../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Installing Oracle 8.1.7</span><br>
+
+<p>First, log in as the oracle user.</p>
+
+<p>Since Oracle 8.1.7 uses a graphical installer, you need to be running X
+Windows or point the DISPLAY environment variable to an X Windows session
+running somewhere.</p>
+
+<p>Installing Oracle 8.1.7 tends to be easy and painless.  If you have a CD,
+mount it and cd to the mount point.  If you have a tar.gz distribution, extract
+it using <i>tar xfz</i> and cd to the Disk1 directory created by the 
+extraction.</p>
+
+Type <b>./runInstaller</b><br><br>
+
+On the <b>Welcome screen</b> click <b>Next</b><br><br>
+
+On the <b>File Locations screen</b>...<br>
+Check the <b>Destination</b>, it should be the same as the ORACLE_HOME 
+Environment variable.<br>
+Click <b>Next</b><br><br>
+
+On the <b>Available Products</b> screen...<br>
+Select <b>Oracle8i Enterprise Edition 8.1.7</b><br>
+Click <b>Next</b><br><br>
+
+On the <b>Installation Types</b> screen<br>
+Select <b>Typical</b><br>
+Click <b>Next</b><br><br>
+
+On the <b>Database Identification</b> screen...<br>
+Enter ora1 for <b>Global Database Name</b> and <b>SID</b><br>
+Click <b>Next</b><br><br>
+
+On the <b>Database File Location</b> screen...<br>
+For <b>Directory for Database Files</b> enter /u01<br>
+Click <b>Next</b><br><br>
+
+On the <b>Choose JDK Home Directory</b> screen...<br>
+For <b>Enter JDK Home</b> enter /usr/local/java<br>
+Click <b>Next</b><br><br>
+
+On the <b>Summary</b> screen click <b>Install</b><br><br>
+
+The <b>Install</b> screen will show the installation progress<br><br> 
+
+<p>On Slackware, about halfway through this process, you will most likely get 
+an error.  Switch to another screen and edit the file 
+$ORACLE_HOME/bin/genclntsh.  Search for a line like 
+<b>LD="ld -shared -L${ORACLE_HOME}/lib"</b> and modify it to read 
+<b>LD="/usr/local/binutils-glibc21/bin/ld -shared -L{ORACLE_HOME}/lib"</b>.
+Then run $ORACLE_HOME/bin/genclntsh manually.  When it finishes, click 
+retry.</p>
+
+At the end of the installation, a Dialog will pop up<br>
+Follow the directions on the dialog then click <b>Ok</b><br><br>
+
+On the <b>Configuration Tools</b> screen, the Net8 Configuration Dialog will
+pop up<br>
+Check <b>Perform typical configuration</b><br>
+Click <b>Next</b><br><br>
+
+A dialog will pop up indicating that a database is being created<br>
+After a while, a dialog will pop up indicating that database creation 
+completed<br>
+Click <b>Ok</b>
+
+On the <b>End Of Installation</b> screen click <b>Exit</b><br><br>
+
+On the <b>Do you really want to exit?</b> dialog click <b>Yes</b><br>
+
+
+</body>
+
+</html>

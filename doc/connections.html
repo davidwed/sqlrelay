@@ -1,0 +1,1239 @@
+<html>
+<head>
+<title>firstworks   SQL Relay Database Connection Daemons</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">SQL Relay Database Connection Daemons</span><br><br>
+
+<p>Most database API's work like this:</p>
+
+<ul>
+<li>Initialize</li>
+<li>Log into the database</li>
+<li>Loop</li>
+<ul>
+<li>Execute a query</li>
+<li>Get the result set column description</li>
+<li>Loop</li>
+<ul>
+<li>Fetch a row</li>
+<li>Manipulate the fields in the row</li>
+</ul>
+</ul>
+<li>Log out</li>
+<li>Clean up</li>
+</ul>
+
+<p>The <b>SQL Relay</b> connection daemon class works this way too.  Writing a 
+connection daemon mainly consists of wrapping database API methods in 
+corresponding connection class methods.  More specifically, to write a new 
+connection daemon, you create classes which inherit from the "connection" 
+and "cursor" classes and implement their pure virtual methods.</p>
+
+<p>Below is an example.  On the left is pseudocode and on the right, the
+code for the MySQL connection.</p>
+
+<span class="heading2">Header File</span><br><br>
+<table width="100%" border="1">
+<tr>
+<td valign="top">
+<pre>
+
+<FONT color=#0000f8>// Copyright (c) 2000-2001  David Muse</FONT>
+<FONT color=#0000f8>// See the file COPYING for more information</FONT>
+
+<FONT color=#a020f0>#ifndef MYCONNECTION_H</FONT>
+<FONT color=#a020f0>#define MYCONNECTION_H</FONT>
+
+<FONT color=#a020f0>#define NUM_CONNECT_STRING_VARS </FONT><FONT color=#f800f8>however many connect string vars you have</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;connection.h&gt;</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt; whatever header files you need &gt;</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt; your header file &gt;</FONT>
+
+<B><FONT color=#288850>class</FONT></B> myconnection;
+
+<B><FONT color=#288850>class</FONT></B> mycursor : <B><FONT color=#a02828>public</FONT></B> cursor {
+        <B><FONT color=#a02828>friend</FONT></B> <B><FONT color=#288850>class</FONT></B> myconnection;
+        <B><FONT color=#a02828>private</FONT></B>:
+                        mycursor(connection *conn);
+                        ~mycursor();
+
+		... override the cursor class's pure virtual methods ...
+
+                <B><FONT color=#288850>int</FONT></B>     executeQuery(<B><FONT color=#288850>char</FONT></B> *query, <B><FONT color=#288850>long</FONT></B> length);
+                <B><FONT color=#288850>char</FONT></B>    *getErrorMessage(<B><FONT color=#288850>int</FONT></B> *liveconnection);
+                <B><FONT color=#288850>void</FONT></B>    returnRowCounts();
+                <B><FONT color=#288850>void</FONT></B>    returnColumnCount();
+                <B><FONT color=#288850>void</FONT></B>    returnColumnInfo();
+                <B><FONT color=#288850>int</FONT></B>     noRowsToReturn();
+                <B><FONT color=#288850>int</FONT></B>     skipRow();
+                <B><FONT color=#288850>int</FONT></B>     fetchRow();
+                <B><FONT color=#288850>void</FONT></B>    returnRow();
+                <B><FONT color=#288850>void</FONT></B>    cleanUpData();
+
+		... you'll need a result set descriptor
+		    possibly some other descriptors ...
+
+		... you'll probably need variables for
+		    the number of rows, columns,
+		    affected rows and an error message ...
+
+		... and a pointer to the connection class ...
+                myconnection *myconn;
+};
+
+<B><FONT color=#288850>class</FONT></B> myconnection : <B><FONT color=#a02828>public</FONT></B> connection {
+        <B><FONT color=#a02828>friend</FONT></B> <B><FONT color=#288850>class</FONT></B> mycursor;
+        <B><FONT color=#a02828>public</FONT></B>:
+                        myconnection();
+                        ~myconnection();
+        <B><FONT color=#a02828>private</FONT></B>:
+
+		... override the connection class's pure virtual methods ...
+
+                <B><FONT color=#288850>int</FONT></B>             getNumberOfConnectStringVars();
+                <B><FONT color=#288850>void</FONT></B>            handleConnectString();
+                <B><FONT color=#288850>int</FONT></B>             logIn();
+                cursor          *initCursor();
+                <B><FONT color=#288850>void</FONT></B>            deleteCursor(cursor *curs);
+                <B><FONT color=#288850>void</FONT></B>            logOut();
+                <B><FONT color=#288850>int</FONT></B>             isTransactional();
+                <B><FONT color=#288850>int</FONT></B>             ping();
+                <B><FONT color=#288850>char</FONT></B>            *identify();
+                <B><FONT color=#288850>unsigned short</FONT></B>  *autoCommitOn();
+                <B><FONT color=#288850>unsigned short</FONT></B>  *autoCommitOff();
+                <B><FONT color=#288850>void</FONT></B>            commit();
+                <B><FONT color=#288850>void</FONT></B>            rollback();
+
+
+		... you'll need a connection descriptor here ...
+
+		... you'll also need variables for the 
+		    connect string arguments ...
+};
+
+<FONT color=#a020f0>#endif</FONT>
+</pre>
+</td>
+<td>
+<pre>
+
+<FONT color=#0000f8>// Copyright (c) 2000-2001  David Muse</FONT>
+<FONT color=#0000f8>// See the file COPYING for more information</FONT>
+
+<FONT color=#a020f0>#ifndef MYSQLCONNECTION_H</FONT>
+<FONT color=#a020f0>#define MYSQLCONNECTION_H</FONT>
+
+<FONT color=#a020f0>#define NUM_CONNECT_STRING_VARS </FONT><FONT color=#f800f8>6</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;connection.h&gt;</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;fstream.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;strstream.h&gt;</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;mysql.h&gt;</FONT>
+
+<B><FONT color=#288850>class</FONT></B> mysqlconnection;
+
+<B><FONT color=#288850>class</FONT></B> mysqlcursor : <B><FONT color=#a02828>public</FONT></B> cursor {
+        <B><FONT color=#a02828>friend</FONT></B> <B><FONT color=#288850>class</FONT></B> mysqlconnection;
+        <B><FONT color=#a02828>private</FONT></B>:
+                        mysqlcursor(connection *conn);
+                        ~mysqlcursor();
+                <B><FONT color=#288850>int</FONT></B>     executeQuery(<B><FONT color=#288850>char</FONT></B> *query, <B><FONT color=#288850>long</FONT></B> length);
+                <B><FONT color=#288850>char</FONT></B>    *getErrorMessage(<B><FONT color=#288850>int</FONT></B> *liveconnection);
+                <B><FONT color=#288850>void</FONT></B>    returnRowCounts();
+                <B><FONT color=#288850>void</FONT></B>    returnColumnCount();
+                <B><FONT color=#288850>void</FONT></B>    returnColumnInfo();
+                <B><FONT color=#288850>int</FONT></B>     noRowsToReturn();
+                <B><FONT color=#288850>int</FONT></B>     skipRow();
+                <B><FONT color=#288850>int</FONT></B>     fetchRow();
+                <B><FONT color=#288850>void</FONT></B>    returnRow();
+                <B><FONT color=#288850>void</FONT></B>    cleanUpData();
+
+                MYSQL_RES       *mysqlresult;
+                MYSQL_FIELD     *mysqlfield;
+                MYSQL_ROW       mysqlrow;
+                <B><FONT color=#288850>int</FONT></B>             ncols;
+                <B><FONT color=#288850>int</FONT></B>             nrows;
+                <B><FONT color=#288850>int</FONT></B>             affectedrows;
+                strstream       *errmesg;
+
+                mysqlconnection *mysqlconn;
+};
+
+<B><FONT color=#288850>class</FONT></B> mysqlconnection : <B><FONT color=#a02828>public</FONT></B> connection {
+        <B><FONT color=#a02828>friend</FONT></B> <B><FONT color=#288850>class</FONT></B> mysqlcursor;
+        <B><FONT color=#a02828>public</FONT></B>:
+                        mysqlconnection();
+        <B><FONT color=#a02828>private</FONT></B>:
+                <B><FONT color=#288850>int</FONT></B>             getNumberOfConnectStringVars();
+                <B><FONT color=#288850>void</FONT></B>            handleConnectString();
+                <B><FONT color=#288850>int</FONT></B>             logIn();
+                cursor          *initCursor();
+                <B><FONT color=#288850>void</FONT></B>            deleteCursor(cursor *curs);
+                <B><FONT color=#288850>void</FONT></B>            logOut();
+                <B><FONT color=#288850>int</FONT></B>             isTransactional();
+                <B><FONT color=#288850>int</FONT></B>             ping();
+                <B><FONT color=#288850>char</FONT></B>            *identify();
+                <B><FONT color=#288850>unsigned short</FONT></B>  *autoCommitOn();
+                <B><FONT color=#288850>unsigned short</FONT></B>  *autoCommitOff();
+                <B><FONT color=#288850>void</FONT></B>            commit();
+                <B><FONT color=#288850>void</FONT></B>            rollback();
+
+                MYSQL           mysql;
+                <B><FONT color=#288850>int</FONT></B>             connected;
+
+                <B><FONT color=#288850>char</FONT></B>            *user;
+                <B><FONT color=#288850>char</FONT></B>            *password;
+                <B><FONT color=#288850>char</FONT></B>            *db;
+                <B><FONT color=#288850>char</FONT></B>            *host;
+                <B><FONT color=#288850>char</FONT></B>            *port;
+                <B><FONT color=#288850>char</FONT></B>            *socket;
+};
+
+<FONT color=#a020f0>#endif</FONT>
+</pre>
+</td>
+</tr>
+</table>
+
+<br><br>
+
+<span class="heading2">.C File</span><br><br>
+<table border="1">
+<tr>
+<td valign="top">
+<pre>
+
+<FONT color=#0000f8>// Copyright (c) 1999-2001  Your Name Here</FONT>
+<FONT color=#0000f8>// See the file COPYING for more information</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt; your header file &gt;</FONT>
+
+	... you need to include this file too ...
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;datatypes.h&gt;</FONT>
+
+	... you may need to include some other headers ...
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<FONT color=#0000f8>// Copyright (c) 1999-2001  David Muse</FONT>
+<FONT color=#0000f8>// See the file COPYING for more information</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;mysqlconnection.h&gt;</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;datatypes.h&gt;</FONT>
+
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;stdlib.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;string.h&gt;</FONT>
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+myconnection::myconnection() {
+        connected=<FONT color=#f800f8>0</FONT>;
+
+	... initialize whatever you need to here ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+mysqlconnection::mysqlconnection() {
+        connected=<FONT color=#f800f8>0</FONT>;
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+myconnection::~myconnection() {
+
+	... deallocate whatever you initialized ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+	... the mysqlconnection has no destructor ...
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     myconnection::getNumberOfConnectStringVars() {
+        <B><FONT color=#a02828>return</FONT></B> NUM_CONNECT_STRING_VARS;
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mysqlconnection::getNumberOfConnectStringVars() {
+        <B><FONT color=#a02828>return</FONT></B> NUM_CONNECT_STRING_VARS;
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    myconnection::handleConnectString() {
+
+	... set your connect string variables 
+            using the connectStringValue()
+            method ...
+
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mysqlconnection::handleConnectString() {
+        user=connectStringValue(<FONT color=#f800f8>&quot;user&quot;</FONT>);
+        password=connectStringValue(<FONT color=#f800f8>&quot;password&quot;</FONT>);
+        db=connectStringValue(<FONT color=#f800f8>&quot;db&quot;</FONT>);
+        host=connectStringValue(<FONT color=#f800f8>&quot;host&quot;</FONT>);
+        port=connectStringValue(<FONT color=#f800f8>&quot;port&quot;</FONT>);
+        socket=connectStringValue(<FONT color=#f800f8>&quot;socket&quot;</FONT>);
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mysqlconnection::logIn() {
+
+        ... set some default values for any
+            missing connect string variables ...
+
+        ... connect to the database ...
+
+        ... return 1 for success, 0 for failure ...
+
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mysqlconnection::logIn() {
+
+
+        <FONT color=#0000f8>// handle host</FONT>
+        <B><FONT color=#288850>char</FONT></B>    *hostval;
+        <B><FONT color=#a02828>if</FONT></B> (host &amp;&amp; host[<FONT color=#f800f8>0</FONT>]) {
+                hostval=host;
+        } <B><FONT color=#a02828>else</FONT></B> {
+                hostval=<FONT color=#f800f8>&quot;&quot;</FONT>;
+        }
+
+        <FONT color=#0000f8>// handle port</FONT>
+        <B><FONT color=#288850>int</FONT></B>     portval;
+        <B><FONT color=#a02828>if</FONT></B> (port &amp;&amp; port[<FONT color=#f800f8>0</FONT>]) {
+                portval=atoi(port);
+        } <B><FONT color=#a02828>else</FONT></B> {
+                portval=<FONT color=#f800f8>0</FONT>;
+        }
+
+        <FONT color=#0000f8>// handle socket</FONT>
+        <B><FONT color=#288850>char</FONT></B>    *socketval;
+        <B><FONT color=#a02828>if</FONT></B> (socket &amp;&amp; socket[<FONT color=#f800f8>0</FONT>]) {
+                socketval=socket;
+        } <B><FONT color=#a02828>else</FONT></B> {
+                socketval=<FONT color=#f800f8>NULL</FONT>;
+        }
+
+        <FONT color=#0000f8>// handle db</FONT>
+        <B><FONT color=#288850>char</FONT></B>    *dbval;
+        <B><FONT color=#a02828>if</FONT></B> (db &amp;&amp; db[<FONT color=#f800f8>0</FONT>]) {
+                dbval=db;
+        } <B><FONT color=#a02828>else</FONT></B> {
+                dbval=<FONT color=#f800f8>&quot;&quot;</FONT>;
+        }
+        
+        <FONT color=#0000f8>// initialize database connection structure</FONT>
+<FONT color=#a020f0>#if MYSQL_VERSION_ID&gt;=</FONT><FONT color=#f800f8>32200</FONT>
+        <B><FONT color=#a02828>if</FONT></B> (!mysql_init(&amp;mysql)) {
+                <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>0</FONT>;
+        }
+<FONT color=#a020f0>#endif</FONT>
+
+        <FONT color=#0000f8>// log in</FONT>
+<FONT color=#a020f0>#if MYSQL_VERSION_ID&gt;=</FONT><FONT color=#f800f8>32200</FONT>
+        <B><FONT color=#a02828>if</FONT></B> (!mysql_real_connect(&amp;mysql,hostval,user,password,dbval,
+                                        portval,socketval,<FONT color=#f800f8>0</FONT>)) {
+<FONT color=#a020f0>#else</FONT>
+        <B><FONT color=#a02828>if</FONT></B> (!mysql_real_connect(&amp;mysql,hostval,user,password,
+                                        portval,socketval,<FONT color=#f800f8>0</FONT>)) {
+<FONT color=#a020f0>#endif</FONT>
+                logOut();
+                <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>0</FONT>;
+        } <B><FONT color=#a02828>else</FONT></B> {
+<FONT color=#a020f0>#if MYSQL_VERSION_ID&lt;</FONT><FONT color=#f800f8>32200</FONT>
+                <B><FONT color=#a02828>if</FONT></B> (!mysql_select_db(&amp;mysql,dbval)) {
+                        logOut();
+                        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>0</FONT>;
+                }
+<FONT color=#a020f0>#endif</FONT>
+                connected=<FONT color=#f800f8>1</FONT>;
+                <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>1</FONT>;
+        }
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+cursor  *myconnection::initCursor() {
+        <B><FONT color=#a02828>return</FONT></B> (cursor *)<B><FONT color=#a02828>new</FONT></B> mycursor((connection *)<B><FONT color=#a02828>this</FONT></B>);
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+cursor  *mysqlconnection::initCursor() {
+        <B><FONT color=#a02828>return</FONT></B> (cursor *)<B><FONT color=#a02828>new</FONT></B> mysqlcursor((connection *)<B><FONT color=#a02828>this</FONT></B>);
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    myconnection::deleteCursor(cursor *curs) {
+        <B><FONT color=#a02828>delete</FONT></B> (mycursor *)curs;
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mysqlconnection::deleteCursor(cursor *curs) {
+        <B><FONT color=#a02828>delete</FONT></B> (mysqlcursor *)curs;
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    myconnection::logOut() {
+
+	... disconnect from the database ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mysqlconnection::logOut() {
+        connected=<FONT color=#f800f8>0</FONT>;
+        mysql_close(&amp;mysql);
+}
+
+</pre>
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    myconnection::logOut() {
+
+	... disconnect from the database ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mysqlconnection::logOut() {
+        connected=<FONT color=#f800f8>0</FONT>;
+        mysql_close(&amp;mysql);
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>char</FONT></B>    *myconnection::identify() {
+
+	... return the name of your database ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>char</FONT></B>    *mysqlconnection::identify() {
+        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>&quot;mysql&quot;</FONT>;
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>unsigned short</FONT></B>    myconnection::autoCommmitOn() {
+
+	... set autocommit on ...
+
+	... return 1 for success and 0 for failure ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>unsigned short</FONT></B>    mysqlconnection::autoCommitOn() {
+        <FONT color=#0000f8>// do nothing</FONT>
+        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>1</FONT>;
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>unsigned short</FONT></B>    myconnection::autoCommmitOff() {
+
+	... set autocommit off ...
+
+	... return 1 for success and 0 for failure ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>unsigned short</FONT></B>    mysqlconnection::autoCommitOff() {
+        <FONT color=#0000f8>// do nothing</FONT>
+        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>1</FONT>;
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     myconnection::isTransactional() {
+
+	... you only need this method if your
+            database is not transactional ...
+
+        ... return a 0 ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mysqlconnection::isTransactional() {
+        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>0</FONT>;
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     myconnection::ping() {
+
+	... test to see if the database connection
+            is still good, return 1 if it is, and
+            0 if it's not ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mysqlconnection::ping() {
+<FONT color=#a020f0>#if MYSQL_VERSION_ID&gt;=</FONT><FONT color=#f800f8>32200</FONT>
+        <B><FONT color=#a02828>if</FONT></B> (!mysql_ping(&amp;mysql)) {
+                <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>1</FONT>;
+        }
+        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>0</FONT>;
+<FONT color=#a020f0>#else</FONT>
+        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>1</FONT>;
+<FONT color=#a020f0>#endif</FONT>
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>     myconnection::commit() {
+
+	... if your database has a special commit 
+	    function, call it here ...
+
+	... if your database is non-transactional,
+	    make this function do nothing ...
+
+        ... if your database is transactional but
+            doesn't have a special commit function,
+            don't even implement this method at all,
+	    let the base class provide it ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>     mysqlconnection::commit() {
+        <FONT color=#0000f8>// do nothing</FONT>
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>     myconnection::rollback() {
+
+	... if your database has a special rollback 
+	    function, call it here ...
+
+	... if your database is non-transactional,
+	    make this function do nothing ...
+
+        ... if your database is transactional but
+            doesn't have a special rollback function,
+            don't even implement this method at all,
+	    let the base class provide it ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>     mysqlconnection::rollback() {
+        <FONT color=#0000f8>// do nothing</FONT>
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+mycursor::mycursor(connection *conn) : cursor(conn) {
+
+        mysqlconn=(mysqlconnection *)conn;
+        errmesg=<FONT color=#f800f8>NULL</FONT>;
+
+	... initialize whatever you need to here ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+mysqlcursor::mysqlcursor(connection *conn) : cursor(conn) {
+        mysqlconn=(mysqlconnection *)conn;
+        errmesg=<FONT color=#f800f8>NULL</FONT>;
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+mycursor::~mycursor() {
+
+	... deallocate whatever you initialized ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+mysqlcursor::~mysqlcursor() {
+        <B><FONT color=#a02828>if</FONT></B> (errmesg) {
+                <B><FONT color=#a02828>delete</FONT></B> errmesg;
+        }
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mycursor::executeQuery(<B><FONT color=#288850>char</FONT></B> *query, <B><FONT color=#288850>long</FONT></B> length) {
+
+	... set row and column counts to 0 ...
+
+        Note: Some databases have a 3 step query
+              execution process involving bind variables.
+              See the information at the end of this
+              document for how to handle those
+              databases.
+
+	... if your database doesn't support real
+	    binds, then create a strstream buffer,
+	    call fakeInputBinds() and pass the
+	    result into your execute query command
+	    (unless the result is NULL which means
+	    there were no variables to bind in which
+	    case you must execute the original query) ...
+
+        ... get the result set ...
+
+        ... get information about the result set 
+            such as the row and column counts
+            and the number of affected rows 
+            (affected rows are the number of rows
+            affected by an insert, update or delete) ...
+
+        ... return 1 for success, 0 for failure ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mysqlcursor::executeQuery(<B><FONT color=#288850>char</FONT></B> *query, <B><FONT color=#288850>long</FONT></B> length) {
+
+        <FONT color=#0000f8>// initialize counts</FONT>
+        ncols=<FONT color=#f800f8>0</FONT>;
+        nrows=<FONT color=#f800f8>0</FONT>;
+
+        <FONT color=#0000f8>// fake binds</FONT>
+        strstream       *newquery=fakeInputBinds(query);
+
+        <FONT color=#0000f8>// execute the query</FONT>
+        <B><FONT color=#a02828>if</FONT></B> (newquery) {
+                <B><FONT color=#a02828>if</FONT></B> (mysql_real_query(&amp;mysqlconn-&gt;mysql,
+                                        newquery-&gt;str(),
+                                        newquery-&gt;rdbuf()-&gt;pcount()-<FONT color=#f800f8>1</FONT>)) {
+                        <B><FONT color=#a02828>delete</FONT></B> newquery;
+                        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>0</FONT>;
+                }
+                <B><FONT color=#a02828>delete</FONT></B> newquery;
+        } <B><FONT color=#a02828>else</FONT></B> {
+                <B><FONT color=#a02828>if</FONT></B> (mysql_real_query(&amp;mysqlconn-&gt;mysql,query,length)) {
+                        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>0</FONT>;
+                }
+        }
+
+        <FONT color=#0000f8>// store the result set</FONT>
+        <B><FONT color=#a02828>if</FONT></B> ((mysqlresult=mysql_store_result(&amp;mysqlconn-&gt;mysql))==
+                                                (MYSQL_RES *)<FONT color=#f800f8>NULL</FONT>) {
+
+                <FONT color=#0000f8>// if there was an error then return failure, otherwise</FONT>
+                <FONT color=#0000f8>// the query must have been some DML or DDL</FONT>
+                <B><FONT color=#288850>char</FONT></B>    *err=mysql_error(&amp;mysqlconn-&gt;mysql);
+                <B><FONT color=#a02828>if</FONT></B> (err &amp;&amp; err[<FONT color=#f800f8>0</FONT>]) {
+                        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>0</FONT>;
+                } <B><FONT color=#a02828>else</FONT></B> {
+                        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>1</FONT>;
+                }
+        }
+
+        <FONT color=#0000f8>// get the column count</FONT>
+        ncols=mysql_num_fields(mysqlresult);
+
+        <FONT color=#0000f8>// get the row count</FONT>
+        nrows=mysql_num_rows(mysqlresult);
+
+        <FONT color=#0000f8>// get the row count</FONT>
+        affectedrows=mysql_affected_rows(&amp;mysqlconn-&gt;mysql);
+
+        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>1</FONT>;
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>char</FONT></B>    *mycursor::getErrorMessage(<B><FONT color=#288850>int</FONT></B> *liveconnection) {
+
+	... call the database API to get an error message ...
+
+        ... if that error is a down database, set the
+            "liveconnection" parameter to 1 ...
+
+        ... return the error message string ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>char</FONT></B>    *mysqlcursor::getErrorMessage(<B><FONT color=#288850>int</FONT></B> *liveconnection) {
+
+        <FONT color=#0000f8>// store the error message because mysql_ping will set it blank</FONT>
+        <B><FONT color=#a02828>if</FONT></B> (errmesg) {
+                <B><FONT color=#a02828>delete</FONT></B> errmesg;
+        }
+        errmesg=<B><FONT color=#a02828>new</FONT></B> strstream();
+        *errmesg &lt;&lt; mysql_error(&amp;mysqlconn-&gt;mysql) &lt;&lt; ends;
+
+<FONT color=#a020f0>#if MYSQL_VERSION_ID&gt;=</FONT><FONT color=#f800f8>32200</FONT>
+        <FONT color=#0000f8>// only return an error if the database is up</FONT>
+        <B><FONT color=#a02828>if</FONT></B> (mysqlconn-&gt;connected &amp;&amp; !mysql_ping(&amp;mysqlconn-&gt;mysql)) {
+                *liveconnection=<FONT color=#f800f8>1</FONT>;
+                <B><FONT color=#a02828>return</FONT></B> errmesg-&gt;str();
+        } <B><FONT color=#a02828>else</FONT></B> {
+                *liveconnection=<FONT color=#f800f8>0</FONT>;
+                <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>&quot;&quot;</FONT>;
+        }
+<FONT color=#a020f0>#else</FONT>
+        <B><FONT color=#a02828>return</FONT></B> errmesg-&gt;str();
+<FONT color=#a020f0>#endif</FONT>
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mycursor::returnColumnCount() {
+
+	... use the sendColumnCount() method to 
+	    return the number of columns in the result set...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mysqlcursor::returnColumnCount() {
+        conn-&gt;sendColumnCount(ncols);
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mycursor::returnRowCounts() {
+
+	... use the sendRowCounts() method to return the 
+	    number of rows and/or affected rows in the result set...
+
+	... if your database api doesn't supply one or both
+	    of these values, return -1 for whichever it doesn't
+	    supply ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mysqlcursor::returnRowCounts() {
+
+        <FONT color=#0000f8>// send row counts</FONT>
+        conn-&gt;sendRowCounts((<B><FONT color=#288850>long</FONT></B>)nrows,(<B><FONT color=#288850>long</FONT></B>)affectedrows);
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mycursor::returnColumnInfo() {
+
+	... First, send back the number of rows and
+            affected rows using the sendRowCounts()
+            method.  For databases that don't return
+	    these values, return -1 instead. ...
+
+        ... if the query isn't a select, return immediately ...
+
+        ... Position yourself at the first column.
+            This is important because returnColumnInfo()
+            may be called more than 1 time per result
+            set (if the user suspends the result set
+            for example) and you don't want to be
+            off the end of the column list from the
+            previous call.  Some database API's provide
+            methods for accessing the columns by index
+            or require you to store the definitions
+            in your own array.  For those databases, 
+            this positioning is not necessary. ...
+
+        ... Run through the columns of the result set, 
+            for each, use the sendColumnDefinition()
+            method to return the name, type and size
+            of each.  The column type should be one
+            of the types in the datatypes.h file, so
+            you'll have to establish a mapping between
+            one of them and the database API's data
+            types.  If your database has a type that's 
+            not in that file, add it and submit a 
+            patch! ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mysqlcursor::returnColumnInfo() {
+
+        <FONT color=#0000f8>// for DML or DDL queries, return no column info</FONT>
+        <B><FONT color=#a02828>if</FONT></B> (!mysqlresult) {
+                <B><FONT color=#a02828>return</FONT></B>;
+        }
+
+        <FONT color=#0000f8>// a useful variable</FONT>
+        <B><FONT color=#288850>int</FONT></B>     type;
+
+        <FONT color=#0000f8>// position ourselves at the first field</FONT>
+        mysql_field_seek(mysqlresult,<FONT color=#f800f8>0</FONT>);
+
+        <FONT color=#0000f8>// for each column...</FONT>
+        <B><FONT color=#a02828>for</FONT></B> (<B><FONT color=#288850>int</FONT></B> i=<FONT color=#f800f8>0</FONT>; i&lt;ncols; i++) {
+
+                <FONT color=#0000f8>// fetch the field</FONT>
+                mysqlfield=mysql_fetch_field(mysqlresult);
+
+                <FONT color=#0000f8>// append column type to the header</FONT>
+                <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_STRING) {
+                        type=STRING_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_VAR_STRING) {
+                        type=VARSTRING_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_DECIMAL) {
+                        type=DECIMAL_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_TINY) {
+                        type=TINY_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_SHORT) {
+                        type=SHORT_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_LONG) {
+                        type=LONG_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_FLOAT) {
+                        type=FLOAT_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_DOUBLE) {
+                        type=DOUBLE_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_LONGLONG) {
+                        type=LONGLONG_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_INT24) {
+                        type=INT24_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_TIMESTAMP) {
+                        type=TIMESTAMP_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_DATE) {
+                        type=DATE_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_TIME) {
+                        type=TIME_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_DATETIME) {
+                        type=DATETIME_DATATYPE;
+<FONT color=#a020f0>#if MYSQL_VERSION_ID&gt;=</FONT><FONT color=#f800f8>32200</FONT>
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_YEAR) {
+                        type=YEAR_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_NEWDATE) {
+                        type=NEWDATE_DATATYPE;
+<FONT color=#a020f0>#endif</FONT>
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_NULL) {
+                        type=NULL_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_ENUM) {
+                        type=ENUM_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_SET) {
+                        type=SET_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_TINY_BLOB) {
+                        type=TINY_BLOB_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_MEDIUM_BLOB) {
+                        type=MEDIUM_BLOB_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_LONG_BLOB) {
+                        type=LONG_BLOB_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> <B><FONT color=#a02828>if</FONT></B> (mysqlfield-&gt;type==FIELD_TYPE_BLOB) {
+                        type=BLOB_DATATYPE;
+                } <B><FONT color=#a02828>else</FONT></B> {
+                        type=UNKNOWN_DATATYPE;
+                }
+
+                <FONT color=#0000f8>// send column definition</FONT>
+                conn-&gt;sendColumnDefinition(mysqlfield-&gt;name,
+                                        strlen(mysqlfield-&gt;name),
+                                        type,(<B><FONT color=#288850>int</FONT></B>)mysqlfield-&gt;length);
+        }
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mycursor::noRowsToReturn() {
+
+	... test to see if you're at the end of the
+            result set, if so, return 1, otherwise
+            return 0 ...
+
+        ... if there is no good way to know this
+	    for your database, just return 0 ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mysqlcursor::noRowsToReturn() {
+
+        <FONT color=#0000f8>// for DML or DDL queries, return no data</FONT>
+        <B><FONT color=#a02828>if</FONT></B> (!mysqlresult) {
+                <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>1</FONT>;
+        }
+        <B><FONT color=#a02828>return</FONT></B> <FONT color=#f800f8>0</FONT>;
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mycursor::skipRow() {
+
+	... If your API can skip rows in the result set without
+	    actually fetching them, then do that here.  If not
+	    just call fetchRow() ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mysqlcursor::skipRow() {
+        <B><FONT color=#a02828>return</FONT></B> fetchRow();
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mycursor::fetchRow() {
+
+	... fetch a row, return a 1 for success and 0 for failure ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>int</FONT></B>     mysqlcursor::fetchRow() {
+
+        <B><FONT color=#a02828>return</FONT></B> ((mysqlrow=mysql_fetch_row(mysqlresult))!=<FONT color=#f800f8>NULL</FONT>);
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mycursor::returnRow() {
+
+	... run through each column of the result 
+            set and return it using the sendField()
+            method ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mysqlcursor::returnRow() {
+
+        <B><FONT color=#a02828>for</FONT></B> (<B><FONT color=#288850>int</FONT></B> col=<FONT color=#f800f8>0</FONT>; col&lt;ncols; col++) {
+
+                <B><FONT color=#a02828>if</FONT></B> (mysqlrow[col]) {
+                        conn-&gt;sendField(mysqlrow[col],strlen(mysqlrow[col]));
+                } <B><FONT color=#a02828>else</FONT></B> {
+                        conn-&gt;sendNullField();
+                }
+        }
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mycursor::cleanUpData() {
+
+	... if you allocated any memory between
+            getting the query and returning the
+            result set, deallocate it here ...
+}
+
+</pre>
+</td>
+<td valign="top">
+<pre>
+
+<B><FONT color=#288850>void</FONT></B>    mysqlcursor::cleanUpData() {
+        <B><FONT color=#a02828>if</FONT></B> (mysqlresult!=(MYSQL_RES *)<FONT color=#f800f8>NULL</FONT>) {
+                mysql_free_result(mysqlresult);
+        }
+}
+
+</pre>
+</td>
+</tr>
+</table>
+
+<p>If your database has a lightweight facility for switching from one user to 
+another without just logging out and logging back in as a different user,
+you should consider overriding the <code>changeUser()</code> method.</p>
+
+<p>You may elect to override some more of the cursor class's virtual methods
+as well.</p>
+
+<p>When a session is ended (either on purpose or accident) the connection
+daemon sends either a commit or rollback (depending on how it's configured)
+to the database if any DML or DDL queries were executed.  The following
+methods are used to implement this functionality.</p>
+
+<ul>
+<li><code>int queryIsNotSelect()</code>
+<li><code>int queryIsCommitOrRollback()</code>
+</ul>
+
+<p>The queryIsNotSelect() method returns 0 if the query is a SELECT and 1 
+if it is not.  Similarly, the queryIsCommitOrRollback() method returns 1 if the
+query is either a COMMIT or ROLLBACK and 0 if it is not.  The connection class
+implements these methods by parsing the text of the query.  Many database 
+API's have their own means of identifying the query type.  If yours does, then 
+you should use it to override these methods.</p>
+
+<p>Some databases have a 3 part process for executing queries or 
+procedural code. In Part 1, the database figures out what steps it will take to
+run the query or code.  In Part 2, local variables or values are "bound" to 
+variables in those steps.  In Part 3, the steps are executed.  If your 
+database has a process like this, you should override these methods.
+
+<ul>
+<li><code>int prepareQuery()</code>
+<li><code>int inputBindValue()</code>
+<li><code>int outputBindValue()</code>
+<li><code>int bindVariablePrefix()</code>
+<li><code>int nullBindValue()</code>
+<li><code>int nonNullBindValue()</code>
+<li><code>int bindValueIsNull()</code>
+</ul>
+
+<p>The prepareQuery() method should execute Part 1 functions.  The 
+inputBindValue() and outputBindValue() methods should handle functions for 
+Part 2.  And the executeQuery() method should handle Part 3.</p>
+
+<p>If your database uses a character other than a colon as a prefix for it's
+named bind variables, then you should override the bindVariablePrefix() method
+to return that character.  Similarly, if your database uses a value other
+than 0 in it's bind functions to indicate that a value is NULL and a value 
+other than -1 to indicate that a value is non-NULL then you should override
+the nullBindValue() and nonNullBindValue() methods to return the appropriate
+values.  You should also override the bindValueIsNull() method to return
+0 if the value passed into it corresponds to your non-NULL indicator and 1 if
+the value passed into it corresponds to your NULL indicator.</p> 
+
+</body>
+</html>

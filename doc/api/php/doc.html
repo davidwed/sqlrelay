@@ -1,0 +1,678 @@
+<HTML>
+<HEAD>
+<NAME>SQL-relay PHP module</NAME>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H1>PHP API</H1>
+<HR>
+<UL>
+<LI><A HREF="#USING">USING</A>
+<LI><A HREF="#FUNCTIONS">FUNCTIONS</A>
+<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<H3><A NAME="USING">USING</H3>
+You can use the module by loading it in your PHP script
+and calling SQL Relay functions.
+<P>
+For example:
+<PRE>
+dl("sql_relay.so");
+$con=sqlrcon_alloc("adasz",9000,"","user1","password1",0,1);
+$cur=sqlrcur_alloc($con);
+sqlrcur_sendQuery($cur,"select table_name from user_tables");
+sqlrcon_endSession($con);
+for ($i=0; $i&#60;sqlrcur_rowCount($cur); $i++)
+{
+  printf("%s\n",sqlrcur_getField($cur,$i,"table_name"));
+}
+sqlrcur_free($cur);
+sqlrcon_free($con);
+</PRE>
+<p>An alternative to running dl(sql_relay.so) is to put a line like:</p>
+<blockquote>
+extension=sql_relay.so
+</blockquote>
+<p>In your php.ini file.  Doing this will improve performance as the library
+isn't loaded and unloaded each time a script runs, but only once when
+the web-server is started.</p>
+<HR>
+<H3><A NAME="FUNCTIONS">FUNCTIONS</H3>
+<UL>
+<LI>
+<CODE>
+int sqlrcon_alloc(string server, int port, string socket, 
+		string user, string password,
+                int retrytime, int tries)
+</CODE>
+<P>
+Initiates a connection to "server" on "port"
+or to the unix "socket" on the local machine
+and authenticates with "user" and "password".
+Failed connections will be retried for 
+"tries" times on interval "retrytime"
+or on for a default number of times on
+a default interval if left unspecified.
+</P>
+<P>
+If the "socket" parameter is nether 
+NULL nor "" then an attempt will be made to 
+connect through it before attempting to 
+connect to "server" on "port".  If it is 
+NULL or "" then no attempt will be made to 
+connect through the socket.*/
+<P>
+<LI>
+<CODE>
+void sqlrcon_free(int sqlrconref)
+</CODE>
+<P>
+Disconnects and terminates the session if
+it hasn't been terminated already.
+<P>
+<LI>
+<CODE>
+void sqlrcon_endSession(int sqlrconref)
+</CODE>
+<P>
+terminates the session
+<P>
+<LI>
+<CODE>
+void sqlrcon_suspendSession(int sqlrconref)
+</CODE>
+<P>
+Disconnects this client from the current
+session but leaves the session open so 
+that another client can connect to it 
+using sqlrcon_resumeSession().
+<P>
+<LI>
+<CODE>
+int sqlrcon_getConnectionPort(int sqlrconref)
+</CODE>
+<P>
+Returns the inet port that the client is 
+communicating over. This parameter may be 
+passed to another client for use in
+the sqlrcon_resumeSession() command.
+<P>
+<LI>
+<CODE>
+string sqlrcon_getConnectionSocket(int sqlrconref)
+</CODE>
+<P>
+Returns the unix socket that the client is 
+communicating over. This parameter may be 
+passed to another client for use in
+the sqlrcon_resumeSession() command.
+<P>
+<LI>
+<CODE>
+int sqlrcon_resumeSession(int sqlrconref, int port, string socket)
+</CODE>
+<P>
+Resumes a session previously left open 
+using sqlrcon_suspendSession().
+Returns 1 on success and 0 on failure.
+<P>
+<LI>
+<CODE>
+int sqlrcon_ping(int sqlrconref) 
+</CODE>
+<P>
+Returns 1 if the database is up and 0
+if it's down.
+<P>
+<LI>
+<CODE>
+string sqlrcon_identify(int sqlrconref) 
+</CODE>
+<P>
+Returns the type of database: 
+oracle7, oracle8, postgresql, mysql, etc.
+<P>
+<LI>
+<CODE>
+int sqlrcon_autoCommitOn(int sqlrconref) 
+</CODE>
+<P>
+Instructs the database to perform a commit
+after every successful query.
+<P>
+<LI>
+<CODE>
+int sqlrcon_autoCommitOff(int sqlrconref) 
+</CODE>
+<P>
+Instructs the database to wait for the 
+client to tell it when to commit.
+<P>
+<LI>
+<CODE>
+int sqlrcon_commit(int sqlrconref) 
+</CODE>
+<P>
+Issues a commit. Returns 1 if the commit succeeded,
+0 if it failed and -1 if an error occurred.
+<P>
+<LI>
+<CODE>
+int sqlrcon_rollback(int sqlrconref) 
+</CODE>
+<P>
+Issues a rollback. Returns 1 if the rollback succeeded,
+0 if it failed and -1 if an error occurred.
+<P>
+<LI>
+<CODE>
+void sqlrcon_debugOn(int sqlrconref)
+</CODE>
+<P>
+Causes verbose debugging information to be
+sent to standard output.  Another way to do
+this is to start a query with "-- debug\n".
+<P>
+<LI>
+<CODE>
+void sqlrcon_debugOff(int sqlrconref)
+</CODE>
+<P>
+turns debugging off
+<P>
+<LI>
+<CODE>
+int sqlrcon_getDebug(int sqlrconref)
+</CODE>
+<P>
+returns FALSE if debugging is off and TRUE if
+debugging is on
+<P>
+<LI>
+<CODE>
+int sqlrcur_alloc(int sqlrconref)
+</CODE>
+<LI>
+<CODE>
+void sqlrcur_free(int sqlrcur)
+</CODE>
+<LI>
+<CODE>
+void sqlrcur_setResultSetBufferSize(int sqlrcurref, int rows)
+</CODE>
+<P>
+Sets the number of rows of the result set
+to buffer at a time.  0 (the default)
+means buffer the entire result set.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getResultSetBufferSize(int sqlrcurref)
+</CODE>
+<P>
+Returns the number of result set rows that 
+will be buffered at a time or 0 for the
+entire result set.
+<P>
+<LI>
+<CODE>
+void sqlrcur_dontGetColumnInfo(int sqlrcurref)
+</CODE>
+<P>
+Tells the server not to send any column
+info (names, types, sizes).  If you don't
+need that info, you should call this
+method to improve performance.
+<P>
+<LI>
+<CODE>
+void sqlrcur_mixedCaseColumnNames(int sqlrcurref)
+</CODE>
+<P>
+Columns names are returned in the same
+case as they are defined in the database.
+This is the default.
+<P>
+<LI>
+<CODE>
+void sqlrcur_upperCaseColumnNames(int sqlrcurref)
+</CODE>
+<P>
+Columns names are converted to upper case.
+<P>
+<LI>
+<CODE>
+void sqlrcur_lowerCaseColumnNames(int sqlrcurref)
+</CODE>
+<P>
+Columns names are converted to lower case.
+<P>
+<LI>
+<CODE>
+void sqlrcur_getColumnInfo(int sqlrcurref)
+</CODE>
+<P>
+Tells the server to send column info.
+<P>
+<LI>
+<CODE>
+void sqlrcur_cacheToFile(int sqlrcurref, string filename)
+</CODE>
+<P>
+Sets query caching on.  Future queries
+will be cached to the file "filename".
+
+A default time-to-live of 10 minutes is
+also set.
+
+Note that once sqlrcur_cacheToFile() is called,
+the result sets of all future queries will
+be cached to that file until another call 
+to sqlrcur_cacheToFile() changes which file to
+cache to or a call to sqlrcur_cacheOff() turns off
+caching.
+<P>
+<LI>
+<CODE>
+void sqlrcur_setCacheTtl(int sqlrcurref, int ttl)
+</CODE>
+<P>
+Sets the time-to-live for cached result
+sets. The sqlr-cachemanger will remove each 
+cached result set "ttl" seconds after it's 
+created.
+<P>
+<LI>
+<CODE>
+string sqlrcur_getCacheFileName(int sqlrcurref)
+</CODE>
+<P>
+Returns the name of the file containing the
+most recently cached result set.
+<P>
+<LI>
+<CODE>
+void sqlrcur_cacheOff(int sqlrcurref)
+</CODE>
+<P>
+Sets query caching off.
+<P>
+</UL>
+<P>
+If you don't need to use substitution or bind variables
+in your queries, use these two methods.
+<P>
+<UL>
+<LI>
+<CODE>
+int sqlrcur_sendQuery(int sqlrcurref, string query)
+</CODE>
+<P>
+Sends "query" and gets a return set.
+Returns TRUE on success and FALSE on failure.
+<P>
+<LI>
+<CODE>
+int sqlrcur_sendQueryWithLength(int sqlrcurref, string query, int length)
+</CODE>
+<P>
+Sends "query" with length "length" and gets
+a result set. This method must be used if
+the query contains binary data.
+<P>
+<LI>
+<CODE>
+int sqlrcur_sendFileQuery(int sqlrcurref, string path, string filename)
+</CODE>
+<P>
+Sends the query in file "path"/"filename"
+and gets a return set.
+Returns TRUE on success and FALSE on failure.
+<P>
+</UL>
+<P>
+If you need to use substitution or bind variables, in your
+queries use the following methods.  See the API documentation
+for more information about substitution and bind variables.
+<P>
+<UL>
+<LI>
+<CODE>
+void sqlrcur_prepareQuery(int sqlrcurref, string query)
+</CODE>
+<P>
+Prepare to execute "query".
+<P>
+<LI>
+<CODE>
+void sqlrcur_prepareQueryWithLength(int sqlrcurref, string query, int length)
+</CODE>
+<P>
+Prepare to execute "query" with length 
+"length".  This method must be used if the
+query contains binary data.
+<P>
+<LI>
+<CODE>
+void sqlrcur_prepareFileQuery(int sqlrcurref, string path, string filename)
+</CODE>
+<P>
+Prepare to execute the contents of "path"/"filename".
+<P>
+<LI>
+<CODE>
+void sqlrcur_substitution(int sqlrcurref, string variable, string value)
+<BR>
+void sqlrcur_substitution(int sqlrcurref, string variable, long value)
+<BR>
+void sqlrcur_substitution(int sqlrcurref, string variable, double value, short precision, short scale)
+</CODE>
+<P>
+Define a substitution variable.
+<P>
+<LI>
+<CODE>
+void sqlrcur_clearBinds()
+</CODE>
+<P>
+Clear all bind variables.
+<P>
+<LI>
+<CODE>
+void sqlrcur_inputBind(int sqlrcurref, string variable, string value)
+<BR>
+void sqlrcur_inputBind(int sqlrcurref, string variable, long value)
+<BR>
+void sqlrcur_inputBind(int sqlrcurref, string variable, double value, short precision, short scale)
+</CODE>
+<P>
+Define an input bind variable.
+<P>
+<LI>
+<CODE>
+void sqlrcur_defineOutputBind(int sqlrcurref, string variable, int length)
+</CODE>
+<P>
+Define an output bind variable.
+<P>
+<LI>
+<CODE>
+void sqlrcur_validateBinds(int sqlrcurref)
+</CODE>
+<P>
+If you are binding to any variables that might not actually be in your query, 
+call this to ensure that the database won't try to bind them unless they really
+are in the query.
+<P>
+<LI>
+<CODE>
+int sqlrcur_executeQuery(int sqlrcurref)
+</CODE>
+<P>
+Execute the query that was previously prepared and bound.
+<P>
+<LI>
+<LI>
+<CODE>
+int sqlrcur_fetchFromBindCursor(int sqlrcurref)
+</CODE>
+<P>
+Fetch from a cursor that was returned as an output bind variable.
+<P>
+<CODE>
+int sqlrcur_getOutputBind(int sqlrcurref, string variable)
+</CODE>
+<P>
+Get the value stored in a previously defined output bind variable.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getOutputBindLength(int sqlrcurref, string variable)
+</CODE>
+<P>
+Get the length of the value stored in a previously defined output bind variable.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getOutputBindCursor(int sqlrcurref, string variable)
+</CODE>
+<P>
+Get the cursor associated with a previously defined output bind variable.
+<P>
+<LI>
+<CODE>
+int sqlrcur_openCachedResultSet(int sqlrcurref, string filename)
+</CODE>
+<P>
+Opens a cached result set as if a query that
+would have generated it had been executed.
+Returns TRUE on success and FALSE on failure.
+<P>
+<LI>
+<CODE>
+int sqlrcur_colCount(int sqlrcurref)
+</CODE>
+<P>
+returns the number of columns in the current
+return set
+<P>
+<LI>
+<CODE>
+int sqlrcur_rowCount(int sqlrcurref)
+</CODE>
+<P>
+returns the number of rows in the current
+return set
+<P>
+<LI>
+<CODE>
+int sqlrcur_totalRows(int sqlrcurref)
+</CODE>
+<P>
+Returns the total number of rows that will 
+be returned in the result set.  Not all 
+databases support this call.  Don't use it 
+for applications which are designed to be 
+portable across databases.  -1 is returned
+by databases which don't support this option.
+<P>
+<LI>
+<CODE>
+int sqlrcur_affectedRows(int sqlrcurref)
+</CODE>
+<P>
+Returns the number of rows that were 
+updated, inserted or deleted by the query.
+Not all databases support this call.  Don't 
+use it for applications which are designed 
+to be portable across databases.  -1 is 
+returned by databases which don't support 
+this option.
+<P>
+<LI>
+<CODE>
+int sqlrcur_firstRowIndex(int sqlrcurref)
+</CODE>
+<P>
+Returns the index of the first buffered row.
+This is useful when buffering only part of
+the result set at a time.
+<P>
+<LI>
+<CODE>
+int sqlrcur_endOfResultSet(int sqlrcurref)
+</CODE>
+<P>
+Returns 0 if part of the result set is still
+pending on the server and 1 if not.  This
+method can only return 0 if 
+setResultSetBufferSize() has been called
+with a parameter other than 0.
+<P>
+<LI>
+<CODE>
+string sqlrcur_errorMessage(int sqlrcurref)
+</CODE>
+<P>
+If a query failed and generated an error, the
+error message is available here.  If the
+query succeeded then this method returns FALSE
+<P>
+<LI>
+<CODE>
+string sqlrcur_getNullsAsEmptyStrings(int sqlrcurref)
+</CODE>
+<P>
+Tells the client to return NULL fields and output bind variables
+as empty strings.  This is the default.
+<P>
+<LI>
+<CODE>
+string sqlrcur_getNullsAsUndefined(int sqlrcurref)
+</CODE>
+<P>
+Tells the client to return NULL fields and output bind variables
+as undefined.
+<P>
+<LI>
+<CODE>
+string sqlrcur_getField(int sqlrcurref, int row, int col)
+</CODE>
+<P>
+returns a string with value of the
+specified row and column
+<P>
+<LI>
+<CODE>
+string sqlrcur_getFieldLength(int sqlrcurref, int row, int col)
+</CODE>
+<P>
+returns the length of the
+specified row and column
+<P>
+<LI>
+<CODE>
+array sqlrcur_getRow(int sqlrcurref, int row)
+</CODE>
+<P>
+returns an indexed array of the
+values of the specified row
+<P>
+<LI>
+<CODE>
+array sqlrcur_getRowLengths(int sqlrcurref, int row)
+</CODE>
+<P>
+returns an indexed array of the
+lengths of the specified row
+<P>
+<LI>
+<CODE>
+array sqlrcur_getRowAssoc(int sqlrcurref, int row)
+</CODE>
+<P>
+returns an associative array of the
+values of the specified row
+<P>
+<LI>
+<CODE>
+array sqlrcur_getRowLengthsAssoc(int sqlrcurref, int row)
+</CODE>
+<P>
+returns an associative array of the
+lengths of the specified row
+<P>
+<LI>
+<CODE>
+array sqlrcur_getColumnNames(int sqlrcurref)
+</CODE>
+<P>
+returns the array of the
+column names of the current return set
+<P>
+<LI>
+<CODE>
+string sqlrcur_getColumnName(int sqlrcurref, int col)
+</CODE>
+<P>
+returns the name of the specified column
+<P>
+<LI>
+<CODE>
+string sqlrcur_getColumnType(int sqlrcurref, string col)
+<BR>
+string sqlrcur_getColumnType(int sqlrcurref, int col)
+</CODE>
+<P>
+returns the type of the specified column
+<P>
+<LI>
+<CODE>
+int sqlrcur_getColumnLength(int sqlrcurref, string col)
+<BR>
+int sqlrcur_getColumnLength(int sqlrcurref, int col)
+</CODE>
+<P>
+returns the length of the specified column.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getLongest(int sqlrcurref, string col)
+<BR>
+int sqlrcur_getLongest(int sqlrcurref, int col)
+</CODE>
+<P>
+Returns the length of the longest field in the
+specified column.
+<P>
+
+<LI>
+<CODE>
+int sqlrcur_getResultSetId(int sqlrcurref) 
+</CODE>
+<P>
+Returns the internal ID of this result set.
+This parameter may be passed to another 
+statement for use in the resumeResultSet() 
+method.
+<P>
+<LI>
+<CODE>
+void sqlrcur_suspendResultSet(int sqlrcurref) 
+</CODE>
+<P>
+Tells the server to leave this result
+set open when the connection calls 
+suspendSession() so that another connection can 
+connect to it using resumeResultSet() after 
+it calls resumeSession().
+<P>
+<LI>
+<CODE>
+void sqlrcur_resumeResultSet(int sqlrcurref, int id) 
+</CODE>
+<P>
+Resumes a result set previously left open 
+using suspendSession().
+Returns 1 on success and 0 on failure.
+<P>
+<LI>
+<CODE>
+void sqlrcur_resumeCachedResultSet(int sqlrcurref, int id, string filename) 
+</CODE>
+<P>
+Resumes a result set previously left open
+using suspendSession() and continues caching
+the result set to "filename".
+Returns 1 on success and 0 on failure. 
+<P>
+</UL>
+<HR>
+<H3><A NAME="AUTHOR">AUTHOR</H3>
+<BLOCKQUOTE>
+Adam Kropielnicki
+<BR>
+<ADDRESS>adasz@wp.pl</ADDRESS>
+</BLOCKQUOTE>
+</BODY>
+</HTML>

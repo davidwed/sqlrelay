@@ -1,0 +1,555 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay using the Ruby API</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Programming with SQL Relay using the Ruby API</span><br><br>
+
+<ul>
+<li><a href="#session">Establishing a Sessions</a></li>
+<li><a href="#query">Executing Queries</a></li>
+<li><a href="#commit">Commits and Rollbacks</a></li>
+<li><a href="#errors">Catching Errors</a></li>
+<li><a href="#bindvars">Substitution and Bind Variables</a></li>
+<li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
+<li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
+<li><a href="#cursors">Cursors</a></li>
+<li><a href="#columns">Getting Column Information</a></li>
+<li><a href="#caching">Caching The Result Set</a></li>
+<li><a href="#suspending">Suspending and Resuming Sessions</a></li>
+</ul>
+
+<a name="session"></a>
+<span class="heading2">Establishing a Session</span><br><br>
+
+<p>To use SQL Relay, you have to identify the connection that you intend to 
+use.</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     ... execute some queries ...
+</PRE>
+</blockquote>
+
+<p>After calling the constructor, a session is established when the first 
+query, ping() or identify() is run.</p>
+
+<p>For the duration of the session, the client stays connected to a database
+connection daemon.  While one client is connected, no other client can connect.
+Care should be taken to minimize the length of a session.</p>
+
+<p>If you're using a transactional database, ending a session has a catch.
+Database connection daemons can be configured to send either a commit or
+rollback at the end of a session if DML queries were executed during the
+session with no commit or rollback.  Program accordingly.</p>
+
+<a name="query"></a>
+<span class="heading2">Executing Queries</span><br><br>
+
+<p>Call sendQuery() or sendFileQuery() to run a query.</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#6858c8>&quot;</FONT>)
+
+     ... <B><FONT color=#a02828>do</FONT></B> some stuff that takes a short time ...
+
+     cur.sendFileQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>/usr/local/myprogram/sql</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>myquery.sql</FONT><FONT color=#6858c8>&quot;</FONT>)
+     con.endSession()
+
+     ... <B><FONT color=#a02828>do</FONT></B> some stuff that takes a long time ...
+
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_other_table</FONT><FONT color=#6858c8>&quot;</FONT>)
+     con.endSession()
+
+     ... process the result set ...
+</PRE>
+</blockquote>
+
+<p>Note the call to endSession() after the call to sendFileQuery().  Since the
+program does some stuff that takes a long time between that query and the next,
+ending the session there allows another client an opportunity to use that
+database connection while your client is busy.  The next call to sendQuery() 
+establishes another session.  Since the program does some stuff that takes a 
+short time between the first two queries, it's OK to leave the session open 
+between them.</p>
+
+<a name="commit"></a>
+<span class="heading2">Commits and Rollbacks</span><br><br>
+
+<p>If you need to execute a commit or rollback, you should use the commit()
+and rollback() methods of the SQLRConnection class rather than sending a 
+"commit" or "rollback" query.  There are two reasons for this.  First, it's 
+much more efficient to call the methods.  Second, if you're writing code that 
+can run on transactional or non-transactional databases, some non-transactional 
+databases will throw errors if they receive a "commit" or "rollback" query, but 
+by calling the commit() and rollback() methods you instruct the database 
+connection daemon to call the commit and rollback API methods for that database 
+rather than issuing them as queries.  If the API's have no commit or rollback 
+methods, the calls do nothing and the database throws no error.  This is 
+especially important when using SQL Relay with ODBC.</p>
+
+<p>You can also turn Autocommit on or off with the autoCommitOn() and
+autoCommitOff() methods of the SQLRConnection class.  When Autocommit is on, 
+the database performs a commit after each successful DML or DDL query.  When 
+Autocommit is off, the database commits when the client instructs it to, or 
+(by default) when a client disconnects.  For databases that don't support 
+Autocommit, autoCommitOn() and autoCommitOff() have no effect.</p>
+
+<a name="errors"></a>
+<span class="heading2">Catching Errors</span><br><br>
+
+<p>If your call to sendQuery() or sendFileQuery() returns a 0, the query failed.
+You can find out why by calling errorMessage().</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+<B><FONT color=#a02828>     if</FONT></B> !cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_nonexistant_table</FONT><FONT color=#6858c8>&quot;</FONT>) <B><FONT color=#a02828>then</FONT></B>
+             puts cur.errorMessage()
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+    <B><FONT color=#a02828>end</FONT></B>
+</PRE>
+</blockquote>
+
+<a name="bindvars"></a>
+<span class="heading2">Substitution and Bind Variables</span><br><br>
+
+<p>Programs rarely execute fixed queries.  More often than not, some part
+of the query is dynamically generated.  It's convenient to store queries in 
+files so they can be changed by a non-Ruby programmer.  The SQL Relay API 
+provides functions for making substitutions and binds in those queries.</p>
+
+<p>For a detailed discussion of substitutions and binds, see
+<a href="binds.html">this document</a>.
+
+<p>Rather than just calling sendFileQuery() you call prepareFileQuery(),
+substitution(), inputBind() and executeQuery().</p>
+
+<blockquote>
+/usr/local/myprogram/sql/myquery.sql:
+
+	select * from mytable $(whereclause)
+
+program code:
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     cur.prepareFileQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>/usr/local/myprogram/sql</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>myquery.sql</FONT><FONT color=#6858c8>&quot;</FONT>)
+     cur.substitution(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>whereclause</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>where col1=:value1</FONT><FONT color=#6858c8>&quot;</FONT>)
+     cur.inputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>value1</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>true</FONT><FONT color=#6858c8>&quot;</FONT>)
+     cur.executeQuery()
+
+     ... process the result set ...
+</PRE>
+</blockquote>
+
+<p>If you're using a database with an embedded procedural language, you may
+want to retrieve data from a call to one of it's functions.  To facilitate
+this, SQL Relay provides the defineOutputBind() and getOutputBind() methods.</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     cur.prepareQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>begin  :result:=addTwoNumbers(:num1,:num2);  end;</FONT><FONT color=#6858c8>&quot;</FONT>)
+     cur.inputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>num1</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>10</FONT>)
+     cur.inputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>num2</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>20</FONT>)
+     cur.defineOutputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>result</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>100</FONT>)
+     cur.executeQuery()
+     result=cur.getOutputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>result</FONT><FONT color=#6858c8>&quot;</FONT>)
+     con.endSession()
+
+     ... <B><FONT color=#a02828>do</FONT></B> something with the result ...
+</PRE>
+</blockquote>
+
+<p>The getOutputBind() function returns a NULL value as an empty string.  
+If you would it to come back as a None instead, you can call the 
+getNullsAsNone() method.  To revert to the default behavior, you can
+call getNullsAsEmptyStrings().</p>
+
+<p>Sometimes it's convenient to bind a bunch of variables that may or may not 
+actually be in the query.  For example, if you are building a web based
+application, it may be easy to just bind all the form variables/values from the
+previous page, even though some of them don't appear in the query.  Databases
+usually generate errors in this case.  Calling validateBinds() just prior to
+calling executeQuery() causes the API to check the query for each bind variable
+before actually binding it, preventing those kinds of errors.  There is a 
+performance cost associated with calling validateBinds().</p>
+
+<a name="rebinding"></a>
+<span class="heading2">Re-Binding and Re-Execution</span><br><br>
+
+<p>Another feature of the prepare/bind/execute paradigm is the ability to 
+prepare, bind and execute a query once, then re-bind and re-execute the query 
+over and over without re-preparing it.  If your backend database natively 
+supports this paradigm, you can reap a substantial performance improvement.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(<FONT color=#6858c8>$con</FONT>);
+
+cur.prepareQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from mytable where mycolumn&gt;:value</FONT><FONT color=#6858c8>&quot;</FONT>);
+cur.inputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>value</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>1</FONT>);
+cur.executeQuery();
+
+... process the result set ...
+
+cur.clearBinds();
+cur.inputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>value</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>5</FONT>);
+cur.executeQuery();
+
+... process the result set ...
+
+cur.clearBinds();
+cur.inputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>value</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>10</FONT>);
+cur.executeQuery();
+
+... process the result set ...
+</PRE>
+</blockquote>
+
+<a name="fields"></a>
+<span class="heading2">Accessing Fields in the Result Set</span><br><br>
+
+<p>The rowCount(), colCount() and getField() methods are useful for processing
+result sets.</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#6858c8>&quot;</FONT>)
+     con.endSession()
+
+     <B><FONT color=#a02828>for</FONT></B> row <B><FONT color=#a02828>in</FONT></B> <FONT color=#f800f8>0</FONT>..cur.rowCount()-<FONT color=#f800f8>1</FONT> <B><FONT color=#a02828>do</FONT></B>
+             <B><FONT color=#a02828>for</FONT></B> col <B><FONT color=#a02828>in</FONT></B> <FONT color=#f800f8>0</FONT>..cur.colCount()-<FONT color=#f800f8>1</FONT> <B><FONT color=#a02828>do</FONT></B>
+                     puts cur.getField(row,col)
+                     puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>,</FONT><FONT color=#6858c8>&quot;</FONT>
+             <B><FONT color=#a02828>end</FONT></B>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+     <B><FONT color=#a02828>end</FONT></B>
+
+</PRE>
+</blockquote>
+
+<p>You can also use getRow() or getRowHash() to get the entire row or 
+getRowRange() to get a range of rows.</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#6858c8>&quot;</FONT>)
+     con.endSession()
+
+     <B><FONT color=#a02828>for</FONT></B> row <B><FONT color=#a02828>in</FONT></B> <FONT color=#f800f8>0</FONT>..cur.rowCount()-<FONT color=#f800f8>1</FONT> <B><FONT color=#a02828>do</FONT></B>
+             rowarray=cur.getRow(row)
+             <B><FONT color=#a02828>for</FONT></B> col <B><FONT color=#a02828>in</FONT></B> <FONT color=#f800f8>0</FONT>..cur.colCount() <B><FONT color=#a02828>do</FONT></B>
+                     puts rowarray[col]
+                     puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>,</FONT><FONT color=#6858c8>&quot;</FONT>
+             <B><FONT color=#a02828>end</FONT></B>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+      <B><FONT color=#a02828>end</FONT></B>
+</PRE>
+</blockquote>
+
+<p>The getField(), getRow() and getRowHash() methods return NULL fields 
+as empty strings.  If you would like them to come back as NULL's instead, you 
+can call the getNullsAsNulls() method.  To revert to the default behavior, you 
+can call getNullsAsEmptyStrings().</p>
+
+<p>If you want to access the result set, but don't care about the
+column information (column names, types or sizes) and don't mind getting
+fields by their numeric index instead of by name,  you can call the
+dontGetColumnInfo() method prior to executing your query.  This can result
+in a performance improvement, especially when many queries with small
+result sets are executed in rapid succession.  You can call getColumnInfo()
+again later to turn off this feature.</p>
+
+<a name="largeresultsets"></a>
+<span class="heading2">Dealing With Large Result Sets</span><br><br>
+
+<p>SQL Relay normally buffers the entire result set.  This can speed things up 
+at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.</p>
+
+<p>Use setResultSetBufferSize() to set the number of rows to buffer at a time.
+Calls to getRow(), getRowRange(), getRowHash() and getField() cause the 
+chunk containing the requested field to be fetched.  Rows in that chunk are 
+accessible but rows before it are not.</p>
+
+<p>For example, if you setResultSetBufferSize(5) and execute a query that 
+returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14, 
+then 15-19.  When rows 5-9 are available, getField(0,0) will return NULL and 
+getField(11,0) will cause rows 10-14 to be fetched and return the requested
+value.</p>
+
+<p>When buffering the result set in chunks, don't end the session until after
+you're done with the result set.</p>
+
+<p>If you call setResultSetBufferSize() and forget what you set it to, you
+can always call getResultSetBufferSize().</p>
+
+<p>When buffering a result set in chunks, the rowCount() method returns
+the number of rows returned so far.  The firstRowIndex() method returns the
+index of the first row of the currently buffered chunk.
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     cur.setResultSetBufferSize(<FONT color=#f800f8>5</FONT>)
+
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#6858c8>&quot;</FONT>)
+
+     done=<FONT color=#f800f8>0</FONT>;
+     row=<FONT color=#f800f8>0</FONT>;
+<B><FONT color=#a02828>     while</FONT></B> done!=0 <B><FONT color=#a02828>do</FONT></B>
+             <B><FONT color=#a02828>for</FONT></B> col <B><FONT color=#a02828>in</FONT></B> <FONT color=#f800f8>0</FONT>..cur.colCount()-<FONT color=#f800f8>1</FONT> <B><FONT color=#a02828>do</FONT></B>
+<B><FONT color=#a02828>                     if</FONT></B> field=cur.getField(row,col) <B><FONT color=#a02828>then</FONT></B>
+                             puts field
+                             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>,</FONT><FONT color=#6858c8>&quot;</FONT>
+                     <B><FONT color=#a02828>else</FONT></B>
+                             done=<FONT color=#f800f8>1</FONT>;
+                     <B><FONT color=#a02828>end</FONT></B>
+             <B><FONT color=#a02828>end</FONT></B>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+             row++;
+     <B><FONT color=#a02828>end</FONT></B>
+
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_other_table</FONT><FONT color=#6858c8>&quot;</FONT>)
+
+     ... process this querys result set <B><FONT color=#a02828>in</FONT></B> chunks also ...
+
+     cur.setResultSetBufferSize(<FONT color=#f800f8>0</FONT>)
+
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_third_table</FONT><FONT color=#6858c8>&quot;</FONT>)
+
+     ... process this querys result set all at once ...
+
+     con.endSession()
+</PRE>
+</blockquote>
+
+<a name="cursors"></a>
+<span class="heading2">Cursors</span><br><br>
+
+<p>Cursors make it possible to execute queries while processing the result
+set of another query.  You can select rows from a table in one query, then 
+iterate through it's result set, inserting rows into another table, using only 
+1 database connection for both operations.</p>
+
+<p>For example:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+cursor1=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+cursor2=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+cursor1.setResultSetBufferSize(<FONT color=#f800f8>10</FONT>);
+cursor1.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_huge_table</FONT><FONT color=#6858c8>&quot;</FONT>);
+
+index=<FONT color=#f800f8>0</FONT>;
+<B><FONT color=#a02828>while</FONT></B> cursor1.endOfResultSet()!=1 <B><FONT color=#a02828>do</FONT></B>
+        cursor2.prepareQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>insert into my_other_table values (:1,:2,:3)</FONT><FONT color=#6858c8>&quot;</FONT>);
+        cursor2.inputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>1</FONT><FONT color=#6858c8>&quot;</FONT>,cursor1.getField(index,<FONT color=#f800f8>1</FONT>));
+        cursor2.inputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>2</FONT><FONT color=#6858c8>&quot;</FONT>,cursor1.getField(index,<FONT color=#f800f8>2</FONT>));
+        cursor2.inputBind(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>3</FONT><FONT color=#6858c8>&quot;</FONT>,cursor1.getField(index,<FONT color=#f800f8>3</FONT>));
+        cursor2.executeQuery();
+<B><FONT color=#a02828>end</FONT></B>
+</PRE>
+</blockquote>
+
+<p>Prior to SQL Relay version 0.25, you would have had to buffer the first
+result set or use 2 database connections instead of just 1.</p>
+
+<p>The number of cursors simultaneously available per-connection is set at 
+compile time and defaults to 5.</p>
+
+<a name="columns"></a>
+<span class="heading2">Getting Column Information</span><br><br>
+
+<p>The name, type, length and length of the longest field of each column are 
+available.</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#6858c8>&quot;</FONT>)
+     con.endSession()
+
+     <B><FONT color=#a02828>for</FONT></B> i <B><FONT color=#a02828>in</FONT></B> <FONT color=#f800f8>0</FONT>..cur.colCount()-<FONT color=#f800f8>1</FONT> <B><FONT color=#a02828>do</FONT></B>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Name:          </FONT><FONT color=#6858c8>&quot;</FONT>
+             puts cur.getColumnName(i)
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Type:          </FONT><FONT color=#6858c8>&quot;</FONT>
+             puts cur.getColumnType(i)
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Length:        </FONT><FONT color=#6858c8>&quot;</FONT>
+             puts cur.getColumnLength(i)
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>Longest Field: </FONT><FONT color=#6858c8>&quot;</FONT>
+             puts cur.getLongest(i)
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+     <B><FONT color=#a02828>end</FONT></B>
+</PRE>
+</blockquote>
+
+<a name="caching"></a>
+<span class="heading2">Caching The Result Set</span><br><br>
+
+<p>Say you're writing a web-based report where a query with a huge result set
+is executed and 20 rows are displayed per page.  Rather than rerunning the 
+query for every page every time and dumping all but the 20 rows you want to
+display, you can run the query once, cache the result set to a local file and
+just open the file for each page of the report.</p>
+
+<p>First CGI:</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     ... generate a unique file name ...
+
+     cur.cacheToFile(filename)
+     cur.setCacheTtl(<FONT color=#f800f8>600</FONT>)
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#6858c8>&quot;</FONT>)
+     con.endSession()
+     cur.cacheOff()
+
+     ... pass the filename to the <B><FONT color=#a02828>next</FONT></B> page ...
+
+</PRE>
+</blockquote>
+
+<p>Second CGI:</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     ... get the filename from the previous page ...
+
+     ... get the page to display from the previous page ...
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     cur.openCachedResultSet(filename)
+     con.endSession()
+
+     <B><FONT color=#a02828>for</FONT></B> row <B><FONT color=#a02828>in</FONT></B> pagetodisplay*<FONT color=#f800f8>20</FONT>..((pagetodisplay+<FONT color=#f800f8>1</FONT>)*<FONT color=#f800f8>20</FONT>)-<FONT color=#f800f8>1</FONT> <B><FONT color=#a02828>do</FONT></B>
+             <B><FONT color=#a02828>for</FONT></B> col <B><FONT color=#a02828>in</FONT></B> <FONT color=#f800f8>0</FONT>..cur.colCount()-<FONT color=#f800f8>1</FONT> <B><FONT color=#a02828>do</FONT></B>
+                     puts cur.getField(row,col)
+                     puts <FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>,</FONT><FONT color=#6858c8>&quot;</FONT>
+             <B><FONT color=#a02828>end</FONT></B>
+             puts <FONT color=#6858c8>&quot;</FONT><FONT color=#6858c8>\n</FONT><FONT color=#6858c8>&quot;</FONT>
+     <B><FONT color=#a02828>end</FONT></B>
+</PRE>
+</blockquote>
+
+
+<a name="suspending"></a>
+<span class="heading2">Suspending and Resuming Sessions</span><br><br>
+
+<p>Sometimes web-based applications need a single database transaction to span
+multiple pages.  Since SQL Relay sessions can be suspended and resumed, this
+is possible.</p>
+
+<p>First CGI:</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>insert into my_table values (1,2,3)</FONT><FONT color=#6858c8>&quot;</FONT>)
+     port=getConnectionPort()
+     socket=getConnectionPort()
+     rs=getResultSetId()
+     cur.suspendResultSet()
+     con.suspendSession()
+
+     ... pass the rs, port <B><FONT color=#a02828>and</FONT></B> socket to the <B><FONT color=#a02828>next</FONT></B> page ...
+</PRE>
+</blockquote>
+
+<p>Second CGI:</p>
+
+<blockquote>
+<PRE>
+     <FONT color=#a020f0>require</FONT>(<FONT color=#6858c8>'</FONT><FONT color=#f800f8>sqlrelay</FONT><FONT color=#6858c8>'</FONT>)
+
+     ... get port <B><FONT color=#a02828>and</FONT></B> socket from previous page ...
+
+     con=<FONT color=#6858c8>SQLRConnection</FONT>.new(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>host</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#6858c8>&quot;&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>user</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>password</FONT><FONT color=#6858c8>&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>)
+     cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
+
+     con.resumeSession(port,socket)
+     cur.resumeResultSet(rs)
+     cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>commit</FONT><FONT color=#6858c8>&quot;</FONT>)
+     con.endSession()
+</PRE>
+</blockquote>
+
+<p>You can also distribute the processing of a result set across a series of
+CGI's using suspended sessions.  If you're buffering a result set in chunks
+instead of all at once and suspend a session, when you resume the session you 
+can continue to retrieve rows from the result set.</p>
+
+<p>Similarly, if you're buffering a result set in chunks, caching that
+result set and suspend your session.  When you resume the session, you can
+continue caching the result set.  You must use resumeCachedResultSet()
+instead of resumeResultSet() however.</p>
+
+</body>
+</html>

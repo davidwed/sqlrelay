@@ -1,0 +1,12 @@
+%package odbc
+Summary: SQL Relay connection daemon for ODBC.
+Requires: sqlrelay = %{ver}
+Group: Database/Daemons
+
+%description odbc
+SQL Relay connection daemon for ODBC.
+
+%files odbc
+%defattr(-,root,root)
+%{bindir}/sqlr-connection-odbc
+%{bindir}/sqlr-connection-odbc-debug

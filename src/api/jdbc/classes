@@ -1,0 +1,27 @@
+must be fully implemented:
+java.sql.Driver
+java.sql.DatabaseMetaData
+java.sql.ResultSetMetaData
+
+must be partially implemented:
+java.sql.CallableStatement
+java.sql.Connection
+java.sql.PreparedStatement
+java.sql.ResultSet
+java.sql.Statement
+
+optional:
+java.sql.Array
+java.sql.Blob
+javax.sql.ConnectionEventListener
+javax.sql.ConnectionPoolDataSource
+java.sql.Clob
+javax.sql.DataSource
+javax.sql.PooledConnection
+java.sql.Ref
+java.sql.SQLData
+java.sql.SQLInput
+java.sql.SQLOutput
+java.sql.Struct
+javax.sql.XAConnection
+javax.sql.XADataSource 

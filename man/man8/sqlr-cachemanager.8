@@ -1,0 +1,44 @@
+.TH sqlr-cachemanager 8 "2002-06-10" "running the cache manager" "SQL Relay"
+
+.SH NAME
+sqlr-cachemanager \- running the cache manager
+
+.SH SYNOPSIS
+.B sqlr-cachemanager
+\fIinterval\fR
+
+.SH DESCRIPTION
+Clients can cache result sets with a time-to-live on them. The cache
+manager goes through the cached result sets periodically and removes
+the ones that have expired.
+
+Run the
+.B sqlr-cachemanager
+daemon to establish the cache manager.
+
+Only one cache manager needs to be started per machine.
+
+.B Important Note:
+Since cache managers clean up after SQL Relay clients, not servers,
+they need to be run on machines which run clients that could cache
+result sets. These may not be the same machines that run the
+sqlr-listener and sqlr-connection daemons. If there is no SQL Relay
+installation on those machines, you should create the cache directory
+(/var/cache/sqlrelay), install the sqlr-cachemanager program by itself
+and set it up to run at boot time.
+
+.SH OPTIONS
+The optional INTERVAL argument specifies in seconds how often the
+cache manager scans the result sets. Each scan is scheduled from the
+end of the previous scan. If the argument is left off, the cache
+manager scans at a default interval of 30 seconds.
+
+.SH SEE ALSO
+sqlr-listener(8)
+.br
+sqlr-connection(8)
+
+.SH AUTHOR
+This manual page was written by Andreas Tille <tille@debian.org>,
+for the Debian GNU/Linux system (but may be used by others).
+

@@ -1,0 +1,720 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay using the C API</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Programming with SQL Relay using the C API</span><br><br>
+
+<ul>
+<li><a href="#compiling">Compiling an SQL Relay Client Program</a></li>
+<li><a href="#session">Establishing a Sessions</a></li>
+<li><a href="#query">Executing Queries</a></li>
+<li><a href="#commit">Commits and Rollbacks</a></li>
+<li><a href="#errors">Catching Errors</a></li>
+<li><a href="#bindvars">Substitution and Bind Variables</a></li>
+<li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
+<li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
+<li><a href="#cursors">Cursors</a></li>
+<li><a href="#columns">Getting Column Information</a></li>
+<li><a href="#caching">Caching The Result Set</a></li>
+<li><a href="#suspending">Suspending and Resuming Sessions</a></li>
+</ul>
+
+
+<a name="compiling"></a>
+<span class="heading2">Compiling an SQL Relay Client Program</span><br><br>
+
+<p>When writing an SQL Relay client program using the C API, you need to
+include the sqlrclientwrapper.h file.<p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>You'll also need to link against the sqlrclientwrapper, sqlrclient and 
+rudiments libraries.  The include file is usually found in 
+/usr/local/firstworks/include and the libraries are usually found in 
+/usr/local/firstworks/lib.</p>
+
+<p>The command to compile your .c file to object code will look something like
+this (assuming you're using the GNU C compiler):</p>
+
+<blockquote>
+gcc -I/usr/local/firstworks/include -c myprogram.c
+</blockquote>
+
+<p>The command to compile your .o file to an executable will look something like
+this (assuming you're using the GNU C++ compiler):</p>
+
+<blockquote>
+g++ -o myprogram myprogram.o -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments
+</blockquote>
+
+<p>Note that g++ was used to link, not gcc.  You could alternatively link using
+gcc like this:</p>
+
+<blockquote>
+gcc -o myprogram myprogram.o -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++
+</blockquote>
+
+<p>When using the C API, it is important to compile the .c files to object code
+using the C compiler before linking them using the C++ compiler.  
+Compiling/Linking in one step using the C++ compiler the will most likely fail
+as it will generate C++ style symbols for function calls which will not be 
+resolved in the sqlrclientwrapper library since it contains C style function 
+symbols.  Compiling to object code using the C compiler as a seperate step
+ensures that C style symbols will be generated for function calls.</p>
+
+<a name="session"></a>
+<span class="heading2">Establishing a Session</span><br><br>
+
+<p>To use SQL Relay, you have to identify the connection that you intend to 
+use.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+
+        ... execute some queries ...
+
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<p>After calling the constructor, a session is established when the first 
+query, sqlrcur_ping() or sqlrcur_identify() is run.</p>
+
+<p>For the duration of the session, the client stays connected to a database
+connection daemon.  While one client is connected, no other client can connect.
+Care should be taken to minimize the length of a session.</p>
+
+<p>If you're using a transactional database, ending a session has a catch.
+Database connection daemons can be configured to send either a commit or
+rollback at the end of a session if DML queries were executed during the
+session with no commit or rollback.  Program accordingly.</p>
+
+<a name="query"></a>
+<span class="heading2">Executing Queries</span><br><br>
+
+<p>Call sqlrcur_sendQuery() or sqlrcur_sendFileQuery() to run a query.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
+
+        ... <B><FONT color=#a52a2a>do</FONT></B> some stuff that takes a <B><FONT color=#2e8b57>short</FONT></B> time ...
+
+        sqlrcur_sendFileQuery(cur,<FONT color=#ff00ff>&quot;/usr/local/myprogram/sql&quot;</FONT>,<FONT color=#ff00ff>&quot;myquery.sql&quot;</FONT>);
+        sqlrcon_endSession(con);
+
+        ... <B><FONT color=#a52a2a>do</FONT></B> some stuff that takes a <B><FONT color=#2e8b57>long</FONT></B> time ...
+
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_other_table&quot;</FONT>);
+        sqlrcon_endSession(con);
+
+        ... process the result set ...
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<p>Note the call to sqlrcon_endSession() after the call to sqlrcur_sendFileQuery().
+Since the program does some stuff that takes a long time between that query and
+the next, ending the session there allows another client an opportunity to use 
+that database connection while your client is busy.  The next call to 
+sqlrcur_sendQuery() establishes another session.  Since the program does some 
+stuff that takes a short time between the first two queries, it's OK to leave 
+the session open between them.</p>
+
+<a name="commit"></a>
+<span class="heading2">Commits and Rollbacks</span><br><br>
+
+<p>If you need to execute a commit or rollback, you should use the 
+sqlrcon_commit() and sqlrcon_rollback() functions rather than sending a "commit"
+or "rollback" query.  There are two reasons for this.  First, it's much more 
+efficient to call the methods.  Second, if you're writing code that can run on 
+transactional or non-transactional databases, some non-transactional databases 
+will throw errors if they receive a "commit" or "rollback" query, but by calling
+the sqlrcon_commit() and sqlrcon_rollback() functions you instruct the database
+connection daemon to call the commit and rollback API methods for that database
+rather than issuing them as queries.  If the API's have no commit or rollback 
+methods, the calls do nothing and the database throws no error.  This is 
+especially important when using SQL Relay with ODBC.</p>
+
+<p>You can also turn Autocommit on or off with the sqlrcon_autoCommitOn() and 
+sqlrcon_autoCommitOff() functions.  When Autocommit is on, the database 
+performs a commit after each successful DML or DDL query.  When Autocommit is 
+off, the database commits when the client instructs it to, or (by default) when
+a client disconnects.  For databases that don't support Autocommit, 
+sqlrcon_autoCommitOn() and sqlrcon_autoCommitOff() have no effect.</p>
+
+
+<a name="errors"></a>
+<span class="heading2">Catching Errors</span><br><br>
+
+<p>If your call to sqlrcur_sendQuery() or sqlrcur_sendFileQuery() returns a 0, the 
+query failed.  You can find out why by calling sqlrcur_errorMessage().</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        <B><FONT color=#a52a2a>if</FONT></B> (!sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_nonexistant_table&quot;</FONT>)) {
+                printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_errorMessage(cur));
+        }
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<a name="bindvars"></a>
+<span class="heading2">Substitution and Bind Variables</span><br><br>
+
+<p>Programs rarely execute fixed queries.  More often than not, some part
+of the query is dynamically generated.  It's convenient to store queries in 
+files so they can be changed by a non-C programmer.  The SQL Relay API 
+provides functions for making substitutions and binds in those queries.</p>
+
+<p>For a detailed discussion of substitutions and binds, see
+<a href="binds.html">this document</a>.
+
+<p>Rather than just calling sqlrcur_sendFileQuery() you call 
+sqlrcur_prepareFileQuery(), one or more of sqlrcur_subString(), sqlrcur_subLong() or
+sqlrcur_subDouble, one or more of sqlrcur_inputBindString(), 
+sqlrcur_inputBindLong() or sqlr_inputBindDouble() and sqlrcur_executeQuery().</p>
+
+<blockquote>
+/usr/local/myprogram/sql/myquery.sql:
+
+	select * from mytable $(whereclause)
+
+program code:
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_prepareFileQuery(cur,<FONT color=#ff00ff>&quot;/usr/local/myprogram/sql&quot;</FONT>,<FONT color=#ff00ff>&quot;myquery.sql&quot;</FONT>);
+        sqlrcur_subString(cur,<FONT color=#ff00ff>&quot;whereclause&quot;</FONT>,<FONT color=#ff00ff>&quot;where col1=:value1&quot;</FONT>);
+        sqlrcur_inputBindString(cur,<FONT color=#ff00ff>&quot;value1&quot;</FONT>,<FONT color=#ff00ff>&quot;true&quot;</FONT>);
+        sqlrcur_executeQuery(cur);
+
+        ... process the result set ...
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<p>If you're using a database with an embedded procedural language, you may
+want to retrieve data from a call to one of it's functions.  To facilitate
+this, SQL Relay provides the sqlrcur_defineOutputBind() and sqlrcur_getOutputBind()
+methods.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        <B><FONT color=#2e8b57>int</FONT></B>        result;
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_prepareQuery(cur,<FONT color=#ff00ff>&quot;begin  :result:=addTwoNumbers(:num1,:num2);  end;&quot;</FONT>);
+        sqlrcur_inputBind(cur,<FONT color=#ff00ff>&quot;num1&quot;</FONT>,<FONT color=#ff00ff>10</FONT>);
+        sqlrcur_inputBind(cur,<FONT color=#ff00ff>&quot;num2&quot;</FONT>,<FONT color=#ff00ff>20</FONT>);
+        sqlrcur_defineOutputBind(cur,<FONT color=#ff00ff>&quot;result&quot;</FONT>,<FONT color=#ff00ff>100</FONT>);
+        sqlrcur_executeQuery(cur);
+        result=atoi(sqlrcur_getOutputBind(cur,<FONT color=#ff00ff>&quot;result&quot;</FONT>));
+        sqlrcon_endSession(con);
+
+        ... <B><FONT color=#a52a2a>do</FONT></B> something with the result ...
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<p>The sqlrcur_getOutputBind() function returns a NULL value as an empty string.  
+If you would it to come back as a NULL instead, you can call the 
+sqlrcur_getNullsAsNulls() method.  To revert to the default behavior, you can
+call sqlrcur_getNullsAsEmptyStrings().</p>
+
+<p>Sometimes it's convenient to bind a bunch of variables that may or may not 
+actually be in the query.  For example, if you are building a web based
+application, it may be easy to just bind all the form variables/values from the
+previous page, even though some of them don't appear in the query.  Databases
+usually generate errors in this case.  Calling validateBinds() just prior to
+calling executeQuery() causes the API to check the query for each bind variable
+before actually binding it, preventing those kinds of errors.  There is a 
+performance cost associated with calling validateBinds().</p>
+
+
+<a name="rebinding"></a>
+<span class="heading2">Re-Binding and Re-Execution</span><br><br>
+
+<p>Another feature of the prepare/bind/execute paradigm is the ability to 
+prepare, bind and execute a query once, then re-bind and re-execute the query 
+over and over without re-preparing it.  If your backend database natively 
+supports this paradigm, you can reap a substantial performance improvement.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_prepareQuery(cur,<FONT color=#f800f8>&quot;select * from mytable where mycolumn&gt;:value&quot;</FONT>);
+        sqlrcur_inputBind(cur,<FONT color=#f800f8>&quot;value&quot;</FONT>,<FONT color=#f800f8>1</FONT>);
+        sqlrcur_executeQuery(cur);
+
+        ... process the result set ...
+
+        sqlrcur_clearBinds(cur);
+        sqlrcur_inputBind(cur,<FONT color=#f800f8>&quot;value&quot;</FONT>,<FONT color=#f800f8>5</FONT>);
+        sqlrcur_executeQuery(cur);
+
+        ... process the result set ...
+
+        sqlrcur_clearBinds(cur);
+        sqlrcur_inputBind(cur,<FONT color=#f800f8>&quot;value&quot;</FONT>,<FONT color=#f800f8>10</FONT>);
+        sqlrcur_executeQuery(cur);
+
+        ... process the result set ...
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+
+<a name="fields"></a>
+<span class="heading2">Accessing Fields in the Result Set</span><br><br>
+
+<p>The sqlrcur_rowCount(), sqlrcur_colCount() and sqlrcur_getFieldByIndex() methods 
+are useful for processing result sets.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        <B><FONT color=#2e8b57>int</FONT></B>        row,col;
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
+        sqlrcon_endSession(con);
+
+        <B><FONT color=#a52a2a>for</FONT></B> (row=<FONT color=#ff00ff>0</FONT>; row&lt;sqlrcur_rowCount(cur); row++) {
+                <B><FONT color=#a52a2a>for</FONT></B> (col=<FONT color=#ff00ff>0</FONT>; col&lt;sqlrcur_colCount(cur); col++) {
+                        printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>%s</FONT><FONT color=#ff00ff>,&quot;</FONT>,sqlrcur_getFieldByIndex(cur,row,col));
+                }
+                printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>);
+        }
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<p>You can also use sqlrcur_getRow() which returns a NULL-terminated array of the
+fields in the row.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        <B><FONT color=#2e8b57>int</FONT></B>        row,col;
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
+        sqlrcon_endSession(con);
+
+        <B><FONT color=#a52a2a>for</FONT></B> (row=<FONT color=#ff00ff>0</FONT>; row&lt;sqlrcur_rowCount(cur); row++) {
+                <B><FONT color=#2e8b57>char</FONT></B>    **rowarray=sqlrcur_getRow(cur,row);
+                <B><FONT color=#a52a2a>for</FONT></B> (col=<FONT color=#ff00ff>0</FONT>; col&lt;sqlrcur_colCount(cur); col++) {
+                        printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>%s</FONT><FONT color=#ff00ff>,&quot;</FONT>,rowarray[col]);
+                }
+                printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>);
+        }
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<p>The sqlrcur_getFieldByIndex(), sqlrcur_getFieldByName() and sqlrcur_getRow() 
+functions return NULL fields as empty strings.  If you would like them to come 
+back as NULL's instead, you can call the sqlrcur_getNullsAsNulls() method.  To 
+revert to the default behavior, you can call sqlrcur_getNullsAsEmptyStrings().</p>
+
+<p>If you want to access the result set, but don't care about the
+column information (column names, types or sizes) and don't mind getting
+fields by their numeric index instead of by name,  you can call the
+sqlrcur_dontGetColumnInfo() method prior to executing your query.  This can 
+result in a performance improvement, especially when many queries with small
+result sets are executed in rapid succession.  You can call 
+sqlrcur_getColumnInfo() again later to turn off this feature.</p>
+
+<a name="largeresultsets"></a>
+<span class="heading2">Dealing With Large Result Sets</span><br><br>
+
+<p>SQL Relay normally buffers the entire result set.  This can speed things up 
+at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.</p>
+
+<p>Use sqlrcur_setResultSetBufferSize() to set the number of rows to buffer at a 
+time.  Calls to sqlrcur_getRow(), sqlrcur_getFieldByIndex() and 
+sqlrcur_getFieldByName() cause the chunk containing the requested field to be 
+fetched.  Rows in that chunk are accessible but rows before it are not.</p>
+
+<p>For example, if you setResultSetBufferSize(5) and execute a query that 
+returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14, 
+then 15-19.  When rows 5-9 are available, getFieldByIndex(0,0) will return NULL
+and getFieldByIndex(11,0) will cause rows 10-14 to be fetched and return the 
+requested value.</p>
+
+<p>When buffering the result set in chunks, don't end the session until after
+you're done with the result set.</p>
+
+<p>If you call sqlrcur_setResultSetBufferSize() and forget what you set it to, 
+you can always call sqlrcur_getResultSetBufferSize().</p>
+
+<p>When buffering a result set in chunks, the sqlrcur_rowCount() method returns
+the number of rows returned so far.  The sqlrcur_firstRowIndex() method returns 
+the index of the first row of the currently buffered chunk.
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        <B><FONT color=#2e8b57>int</FONT></B>     done=<FONT color=#ff00ff>0</FONT>;
+        <B><FONT color=#2e8b57>int</FONT></B>     row=<FONT color=#ff00ff>0</FONT>;
+        <B><FONT color=#2e8b57>int</FONT></B>     col;
+        <B><FONT color=#2e8b57>char</FONT></B>    *field;
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_setResultSetBufferSize(cur,<FONT color=#ff00ff>5</FONT>);
+
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
+
+        <B><FONT color=#a52a2a>while</FONT></B> (!done) {
+                <B><FONT color=#a52a2a>for</FONT></B> (col=<FONT color=#ff00ff>0</FONT>; col&lt;sqlrcur_colCount(cur); col++) {
+                        <B><FONT color=#a52a2a>if</FONT></B> (field=sqlrcur_getFieldByIndex(cur,row,col)) {
+                                printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>%s</FONT><FONT color=#ff00ff>,&quot;</FONT>,field);
+                        } <B><FONT color=#a52a2a>else</FONT></B> {
+                                done=<FONT color=#ff00ff>1</FONT>;
+                        }
+                }
+                printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>);
+                row++;
+        }
+
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_other_table&quot;</FONT>);
+
+        ... process this query's result set in chunks also ...
+
+        sqlrcur_setResultSetBufferSize(cur,<FONT color=#ff00ff>0</FONT>);
+
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_third_table&quot;</FONT>);
+
+        ... process this query's result set all at once ...
+
+        sqlrcon_endSession(con);
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<a name="cursors"></a>
+<span class="heading2">Cursors</span><br><br>
+
+<p>Cursors make it possible to execute queries while processing the result
+set of another query.  You can select rows from a table in one query, then 
+iterate through it's result set, inserting rows into another table, using only 
+1 database connection for both operations.</p>
+
+<p>For example:</p>
+
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+
+main() {
+
+        sqlrcon      con;
+        sqlrcur      cursor1;
+        sqlrcur      cursor2;
+        <B><FONT color=#288850>int</FONT></B>          index;
+
+        con=new sqlrcon_alloc(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        cursor1=new sqlrcur_alloc(con);
+        cursor2=new sqlrcur_alloc(con);
+
+        sqlrcur_setResultSetBufferSize(cursor1,<FONT color=#f800f8>10</FONT>);
+        sqlrcur_sendQuery(cursor1,<FONT color=#f800f8>&quot;select * from my_huge_table&quot;</FONT>);
+
+        index=<FONT color=#f800f8>0</FONT>;
+        <B><FONT color=#a02828>while</FONT></B> (!sqlrcur_endOfResultSet(cursor1)) {
+                sqlrcur_prepareQuery(cursor2,<FONT color=#f800f8>&quot;insert into my_other_table values (:1,:2,:3)&quot;</FONT>);
+                sqlrcur_inputBind(cursor2,<FONT color=#f800f8>&quot;1&quot;</FONT>,sqlrcur_getField(cursor1,index,<FONT color=#f800f8>1</FONT>));
+                sqlrcur_inputBind(cursor2,<FONT color=#f800f8>&quot;2&quot;</FONT>,sqlrcur_getField(cursor1,index,<FONT color=#f800f8>2</FONT>));
+                sqlrcur_inputBind(cursor2,<FONT color=#f800f8>&quot;3&quot;</FONT>,sqlrcur_getField(cursor1,index,<FONT color=#f800f8>3</FONT>));
+                sqlrcur_executeQuery(cursor2);
+        }
+
+        sqlrcur_free(cursor2);
+        sqlrcur_free(cursor1);
+        sqlrcon_free(con);
+}
+</PRE>
+
+<p>Prior to SQL Relay version 0.25, you would have had to buffer the first
+result set or use 2 database connections instead of just 1.</p>
+
+<p>The number of cursors simultaneously available per-connection is set at 
+compile time and defaults to 5.</p>
+
+<a name="columns"></a>
+<span class="heading2">Getting Column Information</span><br><br>
+
+<p>The name, type, length and length of the longest field of each column are 
+available.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        <B><FONT color=#2e8b57>int</FONT></B>        i;
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
+        sqlrcon_endSession(con);
+
+        <B><FONT color=#a52a2a>for</FONT></B> (i=<FONT color=#ff00ff>0</FONT>; i&lt;sqlrcur_colCount(cur); i++) {
+                printf(<FONT color=#ff00ff>&quot;Name:          </FONT><FONT color=#6a5acd>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnName(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Type:          </FONT><FONT color=#6a5acd>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnType(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Length:        </FONT><FONT color=#6a5acd>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getColumnLength(cur,i));
+                printf(<FONT color=#ff00ff>&quot;Longest Field: </FONT><FONT color=#6a5acd>%s</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>,sqlrcur_getLongest(cur,i));
+                printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>);
+        }
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<a name="caching"></a>
+<span class="heading2">Caching The Result Set</span><br><br>
+
+<p>Say you're writing a web-based report where a query with a huge result set
+is executed and 20 rows are displayed per page.  Rather than rerunning the 
+query for every page every time and dumping all but the 20 rows you want to
+display, you can run the query once, cache the result set to a local file and
+just open the file for each page of the report.</p>
+
+<p>First CGI:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        <B><FONT color=#2e8b57>char</FONT></B>       *filename;
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+	... generate a unique file name ...
+
+        sqlrcur_cacheToFile(cur,filename);
+        sqlrcur_setCacheTtl(cur,<FONT color=#ff00ff>600</FONT>);
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
+        sqlrcon_endSession(con);
+        sqlrcur_cacheOff(cur);
+
+        ... pass the filename to the next page ...
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<p>Second CGI:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        <B><FONT color=#2e8b57>int</FONT></B>        row,col;
+
+        ... get the filename from the previous page ...
+
+        ... get the page to display from the previous page ...
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_openCachedResultSet(cur,filename);
+        sqlrcon_endSession(con);
+
+        <B><FONT color=#a52a2a>for</FONT></B> (row=pagetodisplay*<FONT color=#ff00ff>20</FONT>; row&lt;(pagetodisplay+<FONT color=#ff00ff>1</FONT>)*<FONT color=#ff00ff>20</FONT>; row++) {
+                <B><FONT color=#a52a2a>for</FONT></B> (col=<FONT color=#ff00ff>0</FONT>; col&lt;sqlrcur_colCount(cur); col++) {
+                        printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>%s</FONT><FONT color=#ff00ff>,&quot;</FONT>,sqlrcur_getFieldByIndex(cur,row,col));
+                }
+                printf(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>);
+        }
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+
+<a name="suspending"></a>
+<span class="heading2">Suspending and Resuming Sessions</span><br><br>
+
+<p>Sometimes web-based applications need a single database transaction to span
+multiple pages.  Since SQL Relay sessions can be suspended and resumed, this
+is possible.</p>
+
+<p>First CGI:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        <B><FONT color=#2e8b57>int</FONT></B>        port;
+        <B><FONT color=#2e8b57>char</FONT></B>       *socket;
+        <B><FONT color=#2e8b57>int</FONT></B>        rs;
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;insert into my_table values (1,2,3)&quot;</FONT>);
+        port=getConnectionPort(cur);
+        socket=getConnectionPort(cur);
+	rs=sqlrcur_getResultSetId(cur);
+	sqlrcur_suspendResultSet(cur);
+        sqlrcon_suspendSession(con);
+
+        ... pass the rs, port and socket to the next page ...
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<p>Second CGI:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;sqlrelay/sqlrclientwrapper.h&gt;</FONT>
+<FONT color=#a020f0>#include </FONT><FONT color=#ff00ff>&lt;stdio.h&gt;</FONT>
+
+main() {
+
+        ... get rs, port and socket from previous page ...
+
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcur      cur=sqlrcur_alloc(con);
+
+        sqlrcon_resumeSession(con,port,socket);
+	sqlrcur_resumeResultSet(cur,rs);
+        sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;commit&quot;</FONT>);
+        sqlrcon_endSession(con);
+
+        sqlrcur_free(cur);
+        sqlrcon_free(con);
+}
+</PRE>
+</blockquote>
+
+<p>You can also distribute the processing of a result set across a series of
+CGI's using suspended sessions.  If you're buffering a result set in chunks
+instead of all at once and suspend a session, when you resume the session you 
+can continue to retrieve rows from the result set.</p>
+
+<p>Similarly, if you're buffering a result set in chunks, caching that
+result set and suspend your session.  When you resume the session, you can
+continue caching the result set.  You must use sqlrcur_resumeCachedResultSet()
+instead of sqlrcur_resumeResultSet() however.</p>
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+<html>
+<head>
+<title>firstworks   Configuring SQL Relay</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Configuring SQL Relay</span><br><br>
+
+<p>You can use sqlr-config-gtk to configure <b>SQL Relay</b>, but you can also 
+edit the configuration file (usually /usr/local/firstworks/etc/sqlrelay.conf) 
+by hand.</p>
+
+<p>The file format is complicated and is best explained with an example.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#0000ff>&lt;?</FONT><B><FONT color=#288a51>xml version=</FONT></B><FONT color=#ff00ff>&quot;1.0&quot;</FONT><FONT color=#0000ff>?&gt;</FONT>
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>DOCTYPE</FONT></B> instances <B><FONT color=#a62828>SYSTEM</FONT></B> <FONT color=#ff00ff>&quot;sqlrelay.dtd&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+
+<FONT color=#008a8e>&lt;instances&gt;</FONT>
+
+        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;example&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/example.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;oracle8&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;15&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> authtier=</FONT><FONT color=#ff00ff>&quot;listener&quot;</FONT><FONT color=#008a8e> handoff=</FONT><FONT color=#ff00ff>&quot;pass&quot;</FONT><FONT color=#008a8e> deniedips=</FONT><FONT color=#ff00ff>&quot;&quot;</FONT><FONT color=#008a8e> allowedips=</FONT><FONT color=#ff00ff>&quot;&quot;</FONT><FONT color=#008a8e> debug=</FONT><FONT color=#ff00ff>&quot;none&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+                <FONT color=#008a8e>&lt;users&gt;</FONT>
+                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;user1&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;password1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;user2&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;password2&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;user3&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;password3&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/users&gt;</FONT>
+                <FONT color=#008a8e>&lt;connections&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;db1&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=exampleuser1;password=examplepassword1;oracle_sid=EXAMPLE1;&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;db2&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=exampleuser2;password=examplepassword2;oracle_sid=EXAMPLE2;&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;db3&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=exampleuser3;password=examplepassword3;oracle_sid=EXAMPLE3;&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;db4&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=exampleuser4;password=examplepassword4;oracle_sid=EXAMPLE4;&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;6&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/connections&gt;</FONT>
+        <FONT color=#008a8e>&lt;/instance&gt;</FONT>
+
+<FONT color=#008a8e>&lt;/instances&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>As you can see, it's an XML file.  Below is it's DTD.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ELEMENT</FONT></B> instances <B><FONT color=#288a51>(</FONT></B><FONT color=#ff00ff>instance</FONT><FONT color=#008a8e>*</FONT><B><FONT color=#288a51>)</FONT></B><FONT color=#008a8e>&gt;</FONT>
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ELEMENT</FONT></B> instance <B><FONT color=#288a51>(</FONT></B><FONT color=#ff00ff>users</FONT><FONT color=#008a8e>,</FONT><FONT color=#ff00ff>connections</FONT><B><FONT color=#288a51>)</FONT></B><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance id <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;defaultid&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance port <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance socket <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;/tmp/sqlrelay.socket&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance dbase <B><FONT color=#288a51>(</FONT></B><FONT color=#ff00ff>oracle7</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>oracle8</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>mysql</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>msql</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>postgresql</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>sqlite</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>lago</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>freetds</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>sybase</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>odbc</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>db2</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>interbase</FONT><B><FONT color=#288a51>)</FONT></B> <FONT color=#ff00ff>&quot;oracle8&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance connections <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance maxconnections <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance maxqueuelength <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance growby <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance ttl <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance endofsession <B><FONT color=#288a51>(</FONT></B><FONT color=#ff00ff>commit</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>rollback</FONT><B><FONT color=#288a51>)</FONT></B> <FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance sessiontimeout <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance runasuser <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance runasgroup <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance cursors <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance authtier <B><FONT color=#288a51>(</FONT></B><FONT color=#ff00ff>listener</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>connection</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>listener_and_connection</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>database</FONT><B><FONT color=#288a51>)</FONT></B> <FONT color=#ff00ff>&quot;listener&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance handoff <B><FONT color=#288a51>(</FONT></B><FONT color=#ff00ff>pass</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>reconnect</FONT><B><FONT color=#288a51>)</FONT></B> <FONT color=#ff00ff>&quot;reconnect&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance deniedips <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance allowedips <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> instance debug <B><FONT color=#288a51>(</FONT></B><FONT color=#ff00ff>none</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>listener</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>connection</FONT><FONT color=#008a8e>|</FONT><FONT color=#ff00ff>listener_and_connection</FONT><B><FONT color=#288a51>)</FONT></B> <FONT color=#ff00ff>&quot;none&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ELEMENT</FONT></B> users <B><FONT color=#288a51>(</FONT></B><FONT color=#ff00ff>user</FONT><FONT color=#008a8e>*</FONT><B><FONT color=#288a51>)</FONT></B><FONT color=#008a8e>&gt;</FONT>
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ELEMENT</FONT></B> user <FONT color=#008a8e>EMPTY</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> user user <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;user&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> user password <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;password&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ELEMENT</FONT></B> connections <B><FONT color=#288a51>(</FONT></B><FONT color=#ff00ff>connection</FONT><FONT color=#008a8e>*</FONT><B><FONT color=#288a51>)</FONT></B><FONT color=#008a8e>&gt;</FONT>
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ELEMENT</FONT></B> connection <FONT color=#008a8e>EMPTY</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> connection connectionid <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;defaultid&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> connection string <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;user=scott;password=tiger&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>ATTLIST</FONT></B> connection metric <B><FONT color=#288a51>CDATA</FONT></B> <FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+</PRE>
+</blockquote>
+
+<p>So what do all these tags do?</p>
+
+<p>The <b>instances</b> tag is just the root tag.  The sqlrelay.conf
+file should have only one of these tags surrounding all other tags.</p>
+
+<p>Each <b>instance</b> tag defines an instance of sqlrelay.  An
+instance consists of one sqlr-listener and one or more sqlr-connection daemons.
+You can define as many of these as you like.</p>
+
+<p>The <b>users</b> tag surrounds the list of users that may connect to
+the instance.</p>
+
+<p>Each <b>user</b> tag defines a user/password combination that
+may be used to connect to the instance.</p>
+
+<p>The <b>connections</b> tag surrounds the list of sqlr-connection
+daemon configurations used by the instance.</p>
+
+<p>Each <b>connection</b> tag defines a sqlr-connection daemon 
+configuration.  In most cases, there will be only 1 of these tags.  In cases
+where clustered or replicated databases are used, the sqlr-connection daemons 
+may need to be able to connect to multiple machines.  In that case, there would
+be more than 1 line here.</p>
+
+<p>Below is a description of the attributes for each tag.</p>
+
+<ul>
+<li><b>instance</b>
+<ul>
+<li><b>id</b> - the ID of this instance</li>
+<li><b>port</b> - the port the listener should listen on</li>
+<li><b>socket</b> - the unix socket (filename) the listener should listen on</li>
+<li><b>dbase</b> - the type of database the connection daemon should connect to.  Should be one of: oracle7, oracle8, mysql, msql, postgresql, sqlite, lago, freetds, sybase, odbc, db2 or interbase</li>
+<li><b>connections</b> - the number of sqlr-connection daemons to start up when using sqlr-start.</li>
+<li><b>maxconnections</b> - the maximum number of sqlr-connection daemons to scale to.</li>
+<li><b>maxqueuelength</b> - the size the queue of waiting clients has to grow to before more connections will be spawned.</li>
+<li><b>growby</b> - the number of connections that will be started up when new connections are spawned.</li>
+<li><b>ttl</b> - the amount of time that an idle connection will stay alive after being spawned dynamically (does not apply to connections spawned by sqlr-start).</li>
+<li><b>endofsession</b> - the command to issue when a client ends it's session or dies.  Should be either commit or rollback.</li>
+<li><b>sessiontimeout</b> - if a client leaves a session open for another client to pick up but no client picks it up, the session will time out after this interval.</li>
+<li><b>runasuser</b> - the user to run the sqlr-listener, sqlr-connections and sqlr-scaler as.</li>
+<li><b>runasgroup</b> - the group to run the sqlr-listener and sqlr-connections and sqlr-scaler as.</li>
+<li><b>cursors</b> - the number of open database cursors to maintain</li>
+<li><b>authtier</b> - where to authenticate, see note below</li>
+<li><b>handoff</b> - method for handing off a client from listener to connection, can be one of: reconnect or pass, see note below</li>
+<li><b>deinedips</b> - a regular expression indicating which IP addresses will be denied access</li>
+<li><b>allowedips</b> - a regular expression indicating which IP addresses will be allowed access, overriding deniedips</li>
+<li><b>debug</b> - instructs the listener and/or connection daemons to log debugging information when sqlr-start is run with the -debug option, see note 
+below</li>
+</ul>
+<li><b>user</b>
+<ul>
+<li><b>user</b> - the user name required to connect to the listener</li>
+<li><b>password</b> - the password required to connect to the listener</li>
+</ul>
+<li><b>connection</b>
+<ul>
+<li><b>connectionid</b> - the ID of this connection</li>
+<li><b>string</b> - the database connect string the connection daemon should use</li>
+<ul>
+<li>For <b>oracle7</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;autocommit=yes/no;"  
+<li>For <b>oracle8</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;autocommit=yes/no;"
+<li>For <b>mysql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;socket=SOCKET;"</li>
+<li>For <b>msql</b> databases, the connect string syntax is "host=HOST;db=DB;"</li>
+<li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;options=OPTIONS;tty=TTY;typemangling=MANGLING;"  If the typemangling parameter is set to "yes" then postgresql column types are translated to standard types.  By default, the postgresql type number is returned.
+<li>For <b>sqlite</b> databases, the connect string syntax is "db=DB;"</li>
+<li>For <b>lago</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;"</li>
+<li>For <b>freetds</b> databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;encryption=ENCRYPTION;hostname=HOSTNAME;packetsize=PACKETSIZE;"  The sybase parameter is the directory containing the "interfaces" file.</li>
+<li>For <b>sybase</b> databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;encryption=ENCRYPTION;hostname=HOSTNAME;packetsize=PACKETSIZE;"  The sybase parameter is the directory containing the "interfaces" file.</li>
+<li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;" 
+<li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;" 
+<li>For <b>interbase</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;"
+</ul>
+<li><b>metric</b> - a number that influences how many of this connection should be started</li>
+</ul>
+</ul>
+
+<p>Most of the tag attributes are straightforward.  The most complicated one
+are the <b>metric</b> attribute of the <b>connection</b> tag and the 
+<b>authtier</b> attribute of the <b>instance</b> tag.</p>
+
+<span class="heading2">Metric</span><br><br>
+
+<p>The <b>metric</b> attribute doesn't define how many connections are started, 
+the <b>connections</b> attribute of the <b>instance</b> tag defines that.  The 
+<b>metric</b> attribute influences how many of the total connections will be of
+that connection type.  The higher the metric relative to the other metrics, the
+more of that connection type will be started.</p>
+
+<span class="heading2">Authtier</span><br><br>
+
+<p>The client will send a user and password to the sqlr-listener and 
+sqlr-connection daemons when it connects to them.  The <b>authtier</b> 
+attribute indicates which daemon will actually pay attention to that user
+and password.</p>
+
+<p>If the <b>authtier</b> attribute is set to "listener", the sqlr-listener will
+compare the user/password to the list of user/passwords in the sqlrelay.conf
+file defined in the <b>users</b> tag and accept or reject the client connection.
+If the client is accepted, it is handed off to the sqlr-connection-database
+daemon which assumes that it has already been authenticated and does not perform
+it's own authentication.</p>
+
+<p>If the <b>authtier</b> attribute is set to "connection", the sqlr-listener 
+will ignore the user/password and just hand off the client to the 
+sqlr-connection-database daemon which will compare the user/password to the 
+list of user/passwords in the sqlrelay.conf file and accept or reject the 
+client connection.</p>
+
+<p>If the <b>authtier</b> attribute is set to "listener_and_connection" then 
+both daemons will perform the authentication.  This is the most secure method
+and the default but is slower than "listener" or "connection" alone.</p>
+
+<p>If the <b>authtier</b> attribute is set to "database", the sqlr-listener
+daemon will ignore the user/password and the sqlr-connection-database daemon
+may use database-specific methods for authenticating and proxying the user.</p>
+
+<p>When SQL Relay is used with Oracle 8i/9i, the sqlr-connection-database
+daemon switches users without logging out.  The sqlr-connection-database 
+daemon must be configured to log into the database as a user that can proxy 
+other users and the client must attempt to log in to <b>SQL Relay</b> as one 
+of the users that can be proxied.  See 
+<a href="oraclentier.html">this document</a> for more information including
+instructions for configuring Oracle.</p>
+
+<p>When SQL Relay is used with any other database, it simply logs out and logs
+back in as a different user.  This is quite ineffecient and defeats the 
+value of keeping persistent database connections.</p>
+
+<span class="heading2">Handoff</span><br><br>
+
+<p>When an <b>SQL Relay</b> client needs to talk to the database, it connects
+to a listner process which queues it up until a database connection daemon is
+available.  When a daemon is available, the client is "handed off" to it.  This
+"handoff" can be done in one of two ways.  The client can disconnect from the
+listener and reconnect to the connection daemon, or the existing connection to 
+the client can be passed from the listener to the connection daemon.  These two
+methods are referred to as "reconnect" and "pass".  "Reconnect" works on every 
+platform.  "Pass" works on most platforms but not all.  SCO OpenServer and 
+Linux kernels prior to 2.2 don't support "pass".  Other platforms may not 
+support "pass" as well but those certainly don't.  If <b>SQL Relay</b> is being
+run on a different machine than it's clients, "pass" is substantially faster 
+than "reconnect" and more lightweight in any case.  It should be used if
+possible.</p>
+
+<span class="heading2">Debug</span><br><br>
+
+<p>If the debug attribute is not set to "none", when <b>sqlr-start</b> is run,
+it runs special versions of the <b>sqlr-listener</b> and 
+<b>sqlr-connection</b> daemons which log debug information to files in 
+/usr/local/firstworks/var/sqlrelay/debug.  When the daemons start up, they 
+print out the exact filename that they are logging to.  This filename will be 
+listener.PID or connection.PID where PID is the process ID of the daemon.  Note
+that the <b>sqlr-listener</b> forks each time it gets a client connection and 
+generates a seperate file for each forked process as well as one for the main 
+process.</p>
+
+<p>The debug attribute can be one of: "none", "listener", "connection" or 
+"listener_and_connection".  If "none" is specified, no debugging information
+is logged.  If "listener" is specified, then only the listener daemon logs 
+debug information.  If "connection" is specified, then only the connection 
+daemons log debug information.  If "listener_and_connection" is specified, all 
+daemons log debug information.</p> 
+
+</body>
+</html>

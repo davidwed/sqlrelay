@@ -1,0 +1,193 @@
+<html>
+<head>
+<title>firstworks   Installing SQL Relay</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Installing SQL Relay</span><br><br>
+
+<ul>
+<li><a href="#prerequisites">Prerequisites</a>
+<li><a href="#downloading">Downloading SQL Relay</a>
+<li><a href="#unpacking">Unpacking SQL Relay</a>
+<li><a href="#compiling">Compiling SQL Relay</a>
+<li><a href="#installing">Installing SQL Relay</a>
+<li><a href="#rpms">Installing SQL Relay RPMS</a>
+</ul>
+
+<a name="prerequisites"></a>
+<span class="heading2">Prerequisites:</span><br><br>
+
+<p>Before you can compile <b>SQL Relay</b>, you will need to install some
+pre-requisites.</p>
+
+<p>The <b>Rudiments</b> library is essential.  It's available
+from <a target="_top" href="http://www.firstworks.com">www.firstworks.com</a>
+</p>
+
+<p>If you want to build the non-C/C++ API's, you need one or more of
+<a href="http://www.perl.org">Perl</a>, 
+<a href="http://www.php.org">PHP</a>,
+<a href="http://www.python.org">Python</a>,
+<a href="http://www.ruby-lang.org">Ruby</a>,
+<a href="http://java.sun.com">Java</a> or
+<a href="http://www.zope.org">Zope</a>.
+
+<p>To build the database connection daemons, you'll need one or more of
+<a target="_top" href="http://www.oracle.com">Oracle</a>
+(Version 7.3.x, 8.0.x or 8.1.x),
+<a target="_top" href="http://web.mysql.com">MySQL</a>, 
+<a target="_top" href="http://www.Hughes.com.au">mSQL</a>, 
+<a target="_top" href="http://www.postgresql.org">PostgreSQL</a>, 
+<a target="_top" href="http://www.hwaci.com/sw/sqlite">SQLite</a>,
+<a target="_top" href="http://lago.sourceforge.net">Lago</a>,
+<a target="_top" href="http://www.unixodbc.org">unixODBC</a>,
+<a target="_top" href="http://www.iodbc.org">iODBC</a>,
+<a target="_top" href="http://www.ibm.com/software/data/db2/">DB2</a>,
+<a target="_top" href="http://www.borland.com/interbase/">Interbase</a>,
+<a target="_top" href="http://www.sybase.com">Sybase</a> or
+<a target="_top" href="http://www.freetds.org">FreeTDS</a> (for
+accessing either
+<a target="_top" href="http://www.sybase.com">Sybase</a> or
+<a target="_top" href="http://www.microsof.com/sql/default.html">MS SQL Server</a>).
+
+<p>To build the GUI configuration tool, you'll need GTK+ and glib.  Both are
+available from <a href="http://www.gtk.org">www.gtk.org</a>.</p>
+
+<a name="downloading"></a>
+<span class="heading2">Downloading SQL Relay:</span><br><br>
+<p>You can download the most current source distribution of <b>SQL Relay</b> 
+from <a href="http://www.firstworks.com">www.firstworks.com</a>.</p>
+
+<a name="unpacking"></a>
+<span class="heading2">Unpacking SQL Relay:</span><br><br>
+
+<p>To unpack the distribution, copy the file to a location on your machine
+that you have access to and execute the following commands:</p>
+
+<ul>
+<li>gunzip sqlrelay-X.XX.tar.gz</li>
+<li>tar xf sqlrelay-X.XX.tar</li>
+</ul>
+
+<p>This will create a sqlrelay-X.XX directory. Change directories into that 
+directory.</p>
+
+<a name="compiling"></a>
+<span class="heading2">Compiling SQL Relay:</span><br><br>
+
+<p>To compile <b>SQL Relay</b>, read the INSTALL file, 
+make sure your ORACLE_HOME environment variable is set if you are going to 
+compile with Oracle support, then execute the following commands:</p>
+
+<ul>
+<li>configure</li>
+<li>make</li>
+</ul>
+
+<p>The configure command takes lots of command line options, most of which tell
+it where to find prerequisite software in case any of it is installed in
+non-standard locations.  It also takes the --prefix option in case you want
+to install <b>SQL Relay</b> somewhere other than /usr/local/firstworks.  You
+can run "configure --help" to get a list of command line options.</p>
+
+<p>If you want to rebuild <b>SQL Relay</b> for any reason, type:</p>
+
+<ul>
+<li>make clean</li>
+<li>make</li>
+</ul>
+
+<p>If you want to re-configure <b>SQL Relay</b> type:</p>
+
+<ul>
+<li>make clean</li>
+<li>make unconfig</li>
+<li>configure</li>
+<li>make</li>
+</ul>
+
+<p><b>SQL Relay</b> should compile and function on unix-based systems
+using the GNU development system.  Other compilers may work too but have not
+been tested on the current version.</p>
+
+<p>The -pedantic flag must be used with newer GNU compilers.  This flag is
+turned on by default, don't disable it.</p>
+
+<p>After a complete, sucessful compilation, the lib directory should 
+contain:</p>
+
+<ul>
+<li>libsqlrclient.a
+<li>libsqlrclient.so
+</ul>
+
+<p>The bin directory should contain:</p>
+
+<ul>
+<li>sqlr-listener
+<li>sqlr-cachemanager
+<li>sqlr-start
+<li>sqlr-stop
+<li>query
+<li>fields
+<li>backupschema  
+<li>sqlrsh
+<li>sqlr-config-gtk
+<li>and one or more of...
+<ul>
+<li>sqlr-connection-oracle7  (does not support LOB's)
+<li>sqlr-connection-oracle8  (does support LOB's)
+<li>sqlr-connection-mysql
+<li>sqlr-connection-msql
+<li>sqlr-connection-postgresql
+<li>sqlr-connection-sqlite
+<li>sqlr-connection-lago
+<li>sqlr-connection-freetds
+<li>sqlr-connection-sybase
+<li>sqlr-connection-odbc
+<li>sqlr-connection-db2
+<li>sqlr-connection-interbase
+</ul>
+</ul>
+
+<a name="installing"></a>
+<span class="heading2">Installing SQL Relay:</span><br><br>
+
+<p>To install <b>SQL Relay</b>, become root and type:</p>
+
+<ul>
+<li>make install</li>
+</ul>
+
+<p>By default, everything is installed under /usr/local/firstworks.</p>
+
+<p>To uninstall <b>SQL Relay</b>, become root and type:</p>
+
+<ul>
+<li>make uninstall</li>
+</ul>
+
+
+<a name="rpms"></a>
+<span class="heading2">Installing SQL Relay RPMS:</span><br><br>
+
+<p>If your platform supports RedHat Package Manager RPM's, you can build
+them after running configure and make by running the following command as 
+root:</p>
+
+<ul>
+<li>make rpm</li>
+</ul>
+
+<p>This will generate RPM's in the packages/RPMS directory.  You can install 
+them by changing directories into packages/RPMS and executing the following 
+command as root:</p>
+
+<ul>
+<li>rpm -i *</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+** Assumptions **
+
+These directions assume that your Zope installation is in /usr/zope
+
+If this assumption does not apply to you then substitute your installation
+path for the one in this document.
+
+
+
+** Directions **
+
+To uninstall the Zope adapter, remove the
+/usr/zope/lib/python/Products/ZSQLRelayDA directory using the command:
+
+rm -rf /usr/zope/lib/python/Products/ZSQLRelayDA

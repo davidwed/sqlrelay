@@ -1,0 +1,242 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay using the Python DB API</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Programming with SQL Relay using the Python DB API</span><br><br>
+
+<ul>
+<li><a href="#session">Establishing a Sessions</a></li>
+<li><a href="#query">Executing Queries</a></li>
+<li><a href="#commit">Commits and Rollbacks</a></li>
+<li><a href="#errors">Catching Errors</a></li>
+<li><a href="#bindvars">Bind Variables</a></li>
+<li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
+<li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#cursors">Cursors</a></li>
+<li><a href="#columns">Getting Column Information</a></li>
+</ul>
+
+<a name="session"></a>
+<span class="heading2">Establishing a Session</span><br><br>
+
+<p>To use SQL Relay, you have to identify the connection that you intend to 
+use.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
+
+con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+cur=con.cursor()
+
+... execute some queries ...
+</PRE>
+</blockquote>
+
+<p>After calling the connect(), a session is established when the first 
+execute() is run.</p>
+
+<p>For the duration of the session, the client stays connected to a database
+connection daemon.  While one client is connected, no other client can connect.
+Care should be taken to minimize the length of a session.</p>
+
+<p>If you're using a transactional database, ending a session has a catch.
+Database connection daemons can be configured to send either a commit or
+rollback at the end of a session if DML queries were executed during the
+session with no commit or rollback.  Program accordingly.</p>
+
+<a name="query"></a>
+<span class="heading2">Executing Queries</span><br><br>
+
+<p>Call execute() to run a query.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
+
+con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+cur=con.cursor()
+
+cur.execute('<FONT color=#ff00ff>select * from my_table</FONT>')
+
+... process the result set ...
+
+</PRE>
+</blockquote>
+
+<a name="commit"></a>
+<span class="heading2">Commits and Rollbacks</span><br><br>
+
+<p>If you need to execute a commit or rollback, you should use the commit()
+and rollback() methods rather than sending a "commit" or "rollback" query.  
+There are two reasons for this.  First, it's much more efficient to call the 
+methods.  Second, if you're writing code that can run on transactional or 
+non-transactional databases, some non-transactional databases will throw errors
+if they receive a "commit" or "rollback" query, but by calling the commit() 
+and rollback() methods you instruct the database connection daemon to call the 
+commit and rollback API methods for that database rather than issuing them as 
+queries.  If the API's have no commit or rollback methods, the calls do nothing
+and the database throws no error.  This is especially important when using SQL 
+Relay with ODBC.</p>
+
+<a name="errors"></a>
+<span class="heading2">Catching Errors</span><br><br>
+
+<p>If your call to execute() raises an exception, the query failed.
+You can find out why by catching the exception.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
+
+con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+cur=con.cursor()
+
+<B><FONT color=#a52a2a>try</FONT></B>:
+	cur.execute('<FONT color=#ff00ff>select * from my_nonexistant_table</FONT>')
+<B><FONT color=#a52a2a>except</FONT></B> PySQLRDB.DatabaseError, e:
+	print e
+
+</PRE>
+</blockquote>
+
+<a name="bindvars"></a>
+<span class="heading2">Bind Variables</span><br><br>
+
+<p>Programs rarely execute fixed queries.  More often than not, some part
+of the query is dynamically generated.  The Python DB API provides a means
+for using bind variables in those queries.</p>
+
+<p>For a detailed discussion of binds, see 
+<a href="binds.html">this document</a>.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
+
+con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+cur=con.cursor()
+
+cur.execute('<FONT color=#ff00ff>select * from my_table where column1&gt;:val1 and column2=:val2 and column3&lt;:val3</FONT>',{'<FONT color=#ff00ff>val1</FONT>':1,'<FONT color=#ff00ff>val2</FONT>':'<FONT color=#ff00ff>hello</FONT>','<FONT color=#ff00ff>val3</FONT>':50.546})
+
+... process the result set ...
+
+</PRE>
+</blockquote>
+
+<a name="rebinding"></a>
+<span class="heading2">Re-Binding and Re-Execution</span><br><br>
+
+<p>A feature of the prepare/bind/execute paradigm is the ability to prepare, 
+bind and execute a query once, then re-bind and re-execute the query 
+over and over without re-preparing it.  If your backend database natively 
+supports this paradigm, you can reap a substantial performance improvement.</p>
+
+<p>The Python DB API supports this paradigm via the executemany method.  If you
+pass in a list of parameter dictionaries, the query will be re-executed for
+each dictionary of bind variable/values.</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
+
+con=PySQLRDB.connect('<FONT color=#f800f8>host</FONT>',9000,'','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
+cur=con.cursor()
+
+cur.executemany('<FONT color=#ff00ff>insert into my_table values (:val1,:val2,:val3)</FONT>',
+		[{'<FONT color=#ff00ff>val1</FONT>':1,'<FONT color=#ff00ff>val2</FONT>':'<FONT color=#ff00ff>hello</FONT>','<FONT color=#ff00ff>val3</FONT>':1.11},
+		{'<FONT color=#ff00ff>val1</FONT>':2,'<FONT color=#ff00ff>val2</FONT>':'<FONT color=#ff00ff>hi</FONT>','<FONT color=#ff00ff>val3</FONT>':2.22},
+		{'<FONT color=#ff00ff>val1</FONT>':3,'<FONT color=#ff00ff>val2</FONT>':'<FONT color=#ff00ff>bye</FONT>','<FONT color=#ff00ff>val3</FONT>':3,33}])
+
+</PRE>
+</blockquote>
+
+<a name="fields"></a>
+<span class="heading2">Accessing Fields in the Result Set</span><br><br>
+
+<p>The fetchone(), fetchmany() and fetchall() methods are useful for processing
+result sets.  fetchone() returns a list of values.  fetchmany() and fetchall()
+each return a list of rows where each row is a list of values.</p>
+
+<p>The rowcount member variable gives the number of rows in the result set of
+a select query or the number of rows affected by an insert/update/delete query.
+</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
+
+con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+cur=con.cursor()
+
+cur.execute('<FONT color=#ff00ff>select * from my_table</FONT>')
+
+print '<FONT color=#ff00ff>rowcount:</FONT>', cur.rowcount
+
+print '<FONT color=#ff00ff>the first row:</FONT>'
+print cur.fetchone()
+print
+
+print '<FONT color=#ff00ff>the next three rows:</FONT>'
+print cur.fetchmany(3)
+print
+
+print '<FONT color=#ff00ff>the rest of the rows:</FONT>'
+print cur.fetchall()
+print
+</PRE>
+</blockquote>
+
+<a name="cursors"></a>
+<span class="heading2">Cursors</span><br><br>
+
+<p>Cursors make it possible to execute queries while processing the result
+set of another query.  You can select rows from a table in one query, then 
+iterate through it's result set, inserting rows into another table, using only 
+1 database connection for both operations.</p>
+
+<p>For example:</p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
+
+con=PySQLRDB.sqlrconnection('<FONT color=#f800f8>host</FONT>',9000,'','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
+cursor1=con.cursor()
+cursor2=con.cursor()
+
+cursor1.execute('<FONT color=#f800f8>select * from my_huge_table</FONT>')
+
+<B><FONT color=#a02828>for</FONT></B> a in cursor1.fetchall():
+        cursor2.execute('<FONT color=#f800f8>insert into my_other_table values (:1,:2,:3)</FONT>',{':1',a[0],':2',a[1],':3',a[2]})
+</PRE>
+</blockquote>
+
+<a name="columns"></a>
+<span class="heading2">Getting Column Information</span><br><br>
+
+<p>After executing a query, column information is stored in the desc 
+variable.  desc is a list of tuples.  Each tuple corresponds to a column, 
+containing it's name, type and length. </p>
+
+<blockquote>
+<PRE>
+<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
+
+con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+cur=con.cursor()
+
+cur.execute('<FONT color=#ff00ff>select * from my_table</FONT>')
+
+<B><FONT color=#a52a2a>for</FONT></B> name,type,length <B><FONT color=#a52a2a>in</FONT></B> cur.desc:
+        print '<FONT color=#ff00ff>Name:          </FONT>', name
+        print '<FONT color=#ff00ff>Type:          </FONT>', type
+        print '<FONT color=#ff00ff>Length:        </FONT>', length
+</PRE>
+</blockquote>
+
+</body>
+</html>

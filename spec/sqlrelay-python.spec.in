@@ -1,0 +1,11 @@
+%package python
+Summary: SQL Relay modules for Python.
+Requires: sqlrelay = %{ver},python >= @PYTHONVERSION@
+Group: Libraries
+
+%description python
+SQL Relay modules for Python.
+
+%files python
+%defattr(-,root,root)
+@PYTHONDIR@/site-packages/SQLRelay/

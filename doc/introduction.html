@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>firstworks   Introduction to SQL Relay</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Introduction to SQL Relay</span><br><br>
+
+<p>The original motivation for <b>SQL Relay</b> stems from the following 
+challenges:</p>
+
+<ul>
+<li>The API that Oracle provides along with it's database is obscure.</li>
+<li>Oracle databases can take a relatively long time to log into, reducing the
+snappyness of transient programs such as CGI's.</li>
+<li>Transient programs need to be small and statically linked to be efficient.  
+The Oracle libraries are large and one of them (libclntsh.so) is only 
+available as a shared object library on Linux.</li>
+<li>It would be nice to be able to run a pool of web-servers using heterogenous
+hardware and operating systems against an Oracle database, but not be limited 
+to Oracle-supported platforms for the web-servers.</li>
+<li>Web-based applications that display reports need to display different
+segments of the same query's result set over multiple individual runs of a 
+given program.  It would be nice to be able to cache that result set rather
+than have to re-run the same query over and over, discarding most of it each
+time.</li>
+</ul>
+
+<p>The following solution addresses these challenges:</p>
+
+<ul>
+<li>A set of connection daemons maintain multiple open connections to 
+Oracle.</li>
+<li>A listener daemon listens on a TCP port for client connections.</li>
+<li>The connection daemons advertise themselves to the listener daemon when 
+they are available.</li>
+<li>A client establishes a session with the listner daemon using a 
+lightweight, statically linked C++ API library which can be compiled for any 
+OS, independantly of the daemons.</li>
+<li>The listener hands off the session to an available session daemon.</li>
+<li>The connection daemon receives queries from the client over the network,
+executes the queries and returning the result sets back over the network to the 
+client.</li>
+<li>The client may then operate on the result set using API calls or cache it
+for use by another client.</li>
+<li>The session framework allows transactional operations like commits and 
+rollbacks to work without having to auto-commit each query.</li>
+<li>A cache manager daemon maintains the query cache and removes stale result
+sets.</li>
+</ul>
+
+<p><b>SQL Relay</b> aims at implementing that solution.</p>
+
+<p>Though <b>SQL Relay</b> is a fairly solid piece of software, it can still
+be enhanced.  Below are some planned enhancements.</p>
+
+<ul>
+<li>Support for more databases.</li>
+<li>Encrypted transmissions.</li>
+<li>Replication facilitation.</li>
+<li>Server-side result set caching.</li>
+<li>TCL API's.</li>
+<li>Ports for non-unix based platforms.</li>
+</ul>
+
+<p>If you would like to contribute to this project, please contact <a href="mailto:developer@firstworks.com">developer@firstworks.com</a>.</p>
+
+</body>
+</html>
