@@ -24,7 +24,7 @@ start(){
         for connid in `grep -v ^# /etc/sqlrelay`; do
             echo
             echo -n $"Launching instance with id '${connid}':"
-            sqlr-start -id ${connid} >/dev/null 2>&1
+            sqlr-start -id ${connid} 0<&- 1>&- 2>&-
             RETVAL=$?
             [ $RETVAL -eq 0 ] && echo "success" || echo "failure"
             launched=1
