@@ -1,0 +1,10 @@
+#!/bin/sh
+
+./mysql localhost 0 "/var/lib/mysql/mysql.sock" testuser testpassword
+
+echo
+echo
+echo
+
+#export LD_PRELOAD=/usr/local/firstworks/lib/libmysql3sqlrelay-0.35.so.1.0.0
+#./mysql localhost 8006 "" mysqltest mysqltest
