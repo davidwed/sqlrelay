@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <defaults.h>
 #include <sqlrconfigfile.h>
 #include <sqlrconnection.h>
 
@@ -29,6 +28,7 @@
 
 #include <defines.h>
 #include <datatypes.h>
+#include <defaults.h>
 
 
 sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {

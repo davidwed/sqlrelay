@@ -2,9 +2,6 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <defaults.h>
-#include <datatypes.h>
-#include <defines.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/string.h>
 #include <rudiments/stringbuffer.h>
@@ -21,17 +18,14 @@
 	#include <strings.h>
 #endif
 #include <sys/types.h>
-#include <sys/stat.h>
-extern "C" {
-	#undef __cplusplus
-	#include <fcntl.h>
-	#define __cplusplus
-}
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
 #endif
 #include <errno.h>
 
+#include <defines.h>
+#include <defaults.h>
+#include <datatypes.h>
 
 sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
 					const char *user, const char *password, 

@@ -2,8 +2,6 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <defaults.h>
-#include <defines.h>
 
 #include <sqlrlistener.h>
 
@@ -20,6 +18,9 @@
 	#include <unistd.h>
 #endif
 #include <errno.h>
+
+#include <defines.h>
+#include <defaults.h>
 
 sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 
