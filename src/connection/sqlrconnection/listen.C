@@ -186,5 +186,7 @@ int sqlrconnection::waitForClient() {
 	}
 
 	clientsock->translateByteOrder();
+	clientsock->setReadBufferSize(8192);
+	clientsock->setWriteBufferSize(8192);
 	return 1;
 }

@@ -8,6 +8,7 @@ void sqlrconnection::rollbackCommand() {
 	debugPrint("connection",1,"rollback");
 	#endif
 	clientsock->write(rollback());
+	flushWriteBuffer();
 	commitorrollback=false;
 }
 

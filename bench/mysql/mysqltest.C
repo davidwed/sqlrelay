@@ -62,22 +62,24 @@ int main(int argc, char **argv) {
 			mysqlresult=mysql_store_result(&mysql);
 
 			// run through the rows
-			int	cols=mysql_num_fields(mysqlresult);
-			while(mysqlrow=mysql_fetch_row(mysqlresult)) {
-				for (int i=0; i<cols; i++) {
-					//printf("\"%s\",",mysqlrow[i]);
+			if (mysqlresult) {
+				int	cols=mysql_num_fields(mysqlresult);
+				while(mysqlrow=mysql_fetch_row(mysqlresult)) {
+					for (int i=0; i<cols; i++) {
+						//printf("\"%s\",",mysqlrow[i]);
+					}
+					//printf("\n");
 				}
-				//printf("\n");
-			}
 
-			// free the result set
-			mysql_free_result(mysqlresult);
+				// free the result set
+				mysql_free_result(mysqlresult);
+			}
 		}
 
 		// log off
 		mysql_close(&mysql);
 	}
 
-	printf("total system time used: %d\n",clock());
-	printf("total real time: %d\n",time(NULL)-starttime);
+	printf("total system time used: %ld\n",clock());
+	printf("total real time: %ld\n",time(NULL)-starttime);
 }

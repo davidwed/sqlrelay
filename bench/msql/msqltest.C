@@ -61,6 +61,6 @@ int main(int argc, char **argv) {
 		msqlClose(msql);
 	}
 
-	printf("total system time used: %d\n",clock());
-	printf("total real time: %d\n",time(NULL)-starttime);
+	printf("total system time used: %ld\n",clock());
+	printf("total real time: %ld\n",time(NULL)-starttime);
 }

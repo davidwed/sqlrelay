@@ -93,6 +93,7 @@ class	sqlrsh {
 		void	displayResultSet(sqlrcursor *sqlrcur, environment *env);
 		void	displayStats(sqlrcursor *sqlrcur, environment *env);
 		void	ping(sqlrconnection *sqlrcon, environment *env);
+		void	identify(sqlrconnection *sqlrcon, environment *env);
 		void	displayHelp(environment *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env);
@@ -258,6 +259,7 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"final",5) ||
 		!charstring::compareIgnoringCase(ptr,"help",4) ||
 		!charstring::compareIgnoringCase(ptr,"ping",4) ||
+		!charstring::compareIgnoringCase(ptr,"identify",8) ||
 		!charstring::compareIgnoringCase(ptr,"run",3) ||
 		!charstring::compareIgnoringCase(ptr,"@",1)) {
 
@@ -313,6 +315,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"@",1)) {	
 		ptr=ptr+1;
 		cmdtype=6;
+	} else if (!charstring::compareIgnoringCase(ptr,"identify",8)) {	
+		identify(sqlrcon,env);
+		return;
 	} else {
 		return;
 	}
@@ -570,6 +575,13 @@ void sqlrsh::ping(sqlrconnection *sqlrcon, environment *env) {
 				"	The database is down.\n");
 	white(env);
 }
+
+void sqlrsh::identify(sqlrconnection *sqlrcon, environment *env) {
+	red(env);
+	printf("%s\n",sqlrcon->identify());
+	white(env);
+}
+
 
 void sqlrsh::displayHelp(environment *env) {
 

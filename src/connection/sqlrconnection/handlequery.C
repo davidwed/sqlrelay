@@ -59,23 +59,6 @@ int sqlrconnection::handleQuery(sqlrcursor *cursor,
 			// was a down database that has presumably
 			// come back up by now.  Loop back...
 			if (handleError(cursor)) {
-
-				// client will be sending skip/fetch,
-				// better get it even though we're not gonna
-				// use it
-				unsigned long	skipfetch;
-				clientsock->read(&skipfetch);
-				clientsock->read(&skipfetch);
-
-				// Even though there was an error, we still 
-				// need to send the client the id of the 
-				// cursor that it's going to use.
-				clientsock->write((unsigned short)cursor->id);
-
-				#ifdef SERVER_DEBUG
-				debugPrint("connection",1,
-					"failed to handle query: error");
-				#endif
 				return -1;
 			}
 		}

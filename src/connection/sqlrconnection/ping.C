@@ -8,6 +8,7 @@ void sqlrconnection::pingCommand() {
 	debugPrint("connection",1,"ping");
 	#endif
 	clientsock->write(ping());
+	flushWriteBuffer();
 }
 
 bool sqlrconnection::ping() {

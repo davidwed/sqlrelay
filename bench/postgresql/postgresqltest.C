@@ -35,8 +35,7 @@ int main(int argc, char **argv) {
 	for (int count=0; count<iterations; count++) {
 
 		// log in
-		pgconn=PQsetdbLogin(host,port,NULL,NULL,db,
-					"testuser","testpassword");
+		pgconn=PQsetdbLogin(host,port,NULL,NULL,db,user,password);
 
 		for (int qcount=0; qcount<queriesperiteration; qcount++) {
 
@@ -60,6 +59,6 @@ int main(int argc, char **argv) {
 		PQfinish(pgconn);
 	}
 
-	printf("total system time used: %d\n",clock());
-	printf("total real time: %d\n",time(NULL)-starttime);
+	printf("total system time used: %ld\n",clock());
+	printf("total real time: %ld\n",time(NULL)-starttime);
 }

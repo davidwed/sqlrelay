@@ -5,6 +5,8 @@
 
 void sqlrconnection::flushWriteBuffer() {
 
+	clientsock->flushWriteBuffer(-1,-1);
+
 	// toggle TCP_NODELAY to flush the write buffer
 	clientsock->dontBufferWrites();
 	clientsock->bufferWrites();

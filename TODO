@@ -1,13 +1,7 @@
 need a "relay ping" method that tries to connect to the SQL Relay server and
 	returns true/false if that was possible or not
 
-if database is configured to accept 10 connections but sqlrelay is configured to
-	start more than 10, the startup process crashes
-
 --------------------------------------------------------------------------------
-
-don't just toggle TCP_NODELAY to flush write buffer, redesign protocol so it
-	doesn't do so many write()'s or read()'s
 
 bulk DML methods
 
@@ -25,6 +19,12 @@ postgresql 8 - bind vars
 php 5
 
 call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
+
+Some databases (like postgresql) are in auto-commit mode unless you manually
+	begin a transaction.  SQL Relay calls commit/rollback at the end of
+	a client session, even if the database is in auto-commit mode.
+	For postgresql at least, this is expensive.  It should only call
+	commit/rollback if the database isn't in auto-commit mode.
 
 --------------------------------------------------------------------------------
 

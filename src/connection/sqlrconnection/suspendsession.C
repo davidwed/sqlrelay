@@ -8,6 +8,7 @@ void sqlrconnection::suspendSessionCommand() {
 	debugPrint("connection",1,"suspend session");
 	#endif
 	suspendSession();
+	flushWriteBuffer();
 }
 
 void sqlrconnection::suspendSession() {

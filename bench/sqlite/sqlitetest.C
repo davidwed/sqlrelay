@@ -17,6 +17,7 @@ extern "C" {
 	#define	sqlite3_get_table	sqlite_get_table
 	#define	sqlite3_errmsg		sqlite_errmsg
 	#define	sqlite3_free_table	sqlite_free_table
+	#define	sqlite3_exec		sqlite_exec
 	sqlite		*sqliteptr;
 #else
 	sqlite3		*sqliteptr;
@@ -69,6 +70,6 @@ int main(int argc, char **argv) {
 		sqlite3_close(sqliteptr);
 	}
 
-	printf("total system time used: %d\n",clock());
-	printf("total real time: %d\n",time(NULL)-starttime);
+	printf("total system time used: %ld\n",clock());
+	printf("total real time: %ld\n",time(NULL)-starttime);
 }

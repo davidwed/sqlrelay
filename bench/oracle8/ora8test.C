@@ -28,18 +28,9 @@ struct describe {
 	sb4	buflen;
 };
 	
-/*struct define {
-	OCIDefine	*def;
-	ub1	buf[MAX_ITEM_BUFFER_SIZE];
-	sb2	indp;
-	ub2	col_retlen;
-	ub2	col_retcode;
-};*/
-
 sword		ncols;
 
 describe	desc[MAX_SELECT_LIST_SIZE];
-//define		def[MAX_SELECT_LIST_SIZE];
 
 OCIDefine	*def[MAX_SELECT_LIST_SIZE];
 ub1		def_buf[MAX_SELECT_LIST_SIZE]
@@ -82,6 +73,13 @@ int main(int argc, char **argv) {
 
 	for (int count=0; count<iterations; count++) {
 
+#ifdef HAVE_ORACLE_8i
+		OCIEnvCreate((OCIEnv **)&env,OCI_DEFAULT,(dvoid *)0,
+				(dvoid *(*)(dvoid *, size_t))0,
+				(dvoid *(*)(dvoid *, dvoid *, size_t))0,
+				(void (*)(dvoid *, dvoid *))0,
+				(size_t)0,(dvoid **)0);
+#else
 		// initialize OCI
 		OCIInitialize(OCI_DEFAULT,(dvoid *)0, 
 			(dvoid*(*)(dvoid *,size_t))0,
@@ -89,7 +87,8 @@ int main(int argc, char **argv) {
 			(void(*)(dvoid *,dvoid *))0);
 
 		// init the environment
-		OCIEnvInit((OCIEnv **)&env,OCI_DEFAULT,(size_t)0,(dvoid **)0); 
+		OCIEnvInit((OCIEnv **)&env,OCI_DEFAULT,(size_t)0,(dvoid **)0);
+#endif
 
 		// allocate an error handle
 		OCIHandleAlloc((dvoid *)env,(dvoid **)&err,OCI_HTYPE_ERROR,
@@ -163,9 +162,16 @@ int main(int argc, char **argv) {
 					(ub4)OCI_NTV_SYNTAX,
 					(ub4)OCI_DEFAULT);
 
+			ub2	stmttype;
+			OCIAttrGet(stmt,OCI_HTYPE_STMT,
+					(dvoid *)&stmttype,(ub4 *)NULL,
+					OCI_ATTR_STMT_TYPE,err);
+
+			ub4	iters=(stmttype!=OCI_STMT_SELECT);
+
 			// execute the query
-			OCIStmtExecute(svc,stmt,err,0,(ub4)0,NULL,NULL,
-							OCI_DEFAULT);
+			OCIStmtExecute(svc,stmt,err,iters,(ub4)0,NULL,NULL,
+								OCI_DEFAULT);
 
 
 			OCIAttrGet((dvoid *)stmt,OCI_HTYPE_STMT,
@@ -212,24 +218,27 @@ int main(int argc, char **argv) {
 			}
 
 			// go fetch all rows and columns
-			ub4	newpos;
-			int	oldpos=0;
-			for (;;) {
-				OCIStmtFetch(stmt,err,fetchatonce,
-					OCI_FETCH_NEXT,OCI_DEFAULT);
-				OCIAttrGet(stmt,OCI_HTYPE_STMT,
+			if (ncols) {
+				ub4	newpos;
+				ub4	oldpos=0;
+				for (;;) {
+					OCIStmtFetch(stmt,err,fetchatonce,
+						OCI_FETCH_NEXT,OCI_DEFAULT);
+					OCIAttrGet(stmt,OCI_HTYPE_STMT,
 						(dvoid *)&newpos,(ub4 *)0,
 						OCI_ATTR_ROW_COUNT,err);
-				if (newpos==oldpos) {
-					break;
-				}
-				for (int j=0; j<newpos-oldpos; j++) {
-					for (int i=0; i<ncols; i++) {
-						//printf("\"%s\",",def_buf[i][j]);
+					if (newpos==oldpos) {
+						break;
 					}
-					//printf("\n");
+					for (ub4 j=0; j<newpos-oldpos; j++) {
+						for (int i=0; i<ncols; i++) {
+							//printf("\"%s\",",
+							//	def_buf[i][j]);
+						}
+						//printf("\n");
+					}
+					oldpos=newpos;
 				}
-				oldpos=newpos;
 			}
 
 			// free resources
@@ -253,6 +262,6 @@ int main(int argc, char **argv) {
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
 	}
 
-	printf("total system time used: %d\n",clock());
-	printf("total real time: %d\n",time(NULL)-starttime);
+	printf("total system time used: %ld\n",clock());
+	printf("total real time: %ld\n",time(NULL)-starttime);
 }

@@ -52,7 +52,23 @@ bool sqlrconnection::returnError(sqlrcursor *cursor) {
 		clientsock->write("\nAttempted Query:\n");
 		clientsock->write(cursor->querybuffer);
 
+		// client will be sending skip/fetch,
+		// better get it even though we're not gonna
+		// use it
+		unsigned long	skipfetch;
+		clientsock->read(&skipfetch);
+		clientsock->read(&skipfetch);
+
+		// Even though there was an error, we still 
+		// need to send the client the id of the 
+		// cursor that it's going to use.
+		clientsock->write((unsigned short)cursor->id);
 		flushWriteBuffer();
+
+
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",1,"failed to handle query: error");
+		#endif
 	}
 	
 	#ifdef SERVER_DEBUG

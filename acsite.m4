@@ -121,102 +121,61 @@ then
 fi
 
 
-for paths in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks" 
+for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
-	if ( test -n "$paths" -a -d "$paths" )
+	if ( test -n "$path" -a -d "$path" )
 	then
 
-		for LIBDIR in "lib" "lib64"
-		do
-
-			if ( test "$paths" = "/" )
-			then
-				dnl look in /usr/include and /$LIBDIR
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-					FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"/$LIBDIR/lib$LIBNAME.$SOSUFFIX\"],[/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-				else
-					FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-l$LIBNAME\"],[/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				fi
-
-				dnl set paths to "" so we won't get //'s from here on
-				paths=""
-			fi
-
-			dnl look in $path/include and $path/$LIBDIR
+		if ( test "$path" = "/" )
+		then
+			dnl look in /usr/include and /$LIBDIR
 			if ( test "$USEFULLLIBPATH" = "yes" )
 			then
-				FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR\"; LIBSTRING=\"$paths/$LIBDIR/lib$LIBNAME.$SOSUFFIX\"],[$paths/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"$paths/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"/$LIBDIR/lib$LIBNAME.$SOSUFFIX\"],[/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 			else
-				FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR\"; LIBSTRING=\"-L$paths/$LIBDIR -l$LIBNAME\"],[$paths/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/$LIBDIR -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-l$LIBNAME\"],[/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
 
-			dnl look in $path/include/$NAME and $path/$LIBDIR
-			if ( test -z "$LIBSTRING" )
-			then
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR\"; LIBSTRING=\"$paths/$LIBDIR/lib$LIBNAME.$SOSUFFIX\"],[$paths/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"$paths/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-				else
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR\"; LIBSTRING=\"-L$paths/$LIBDIR -l$LIBNAME\"],[$paths/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/$LIBDIR -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				fi
-			fi
+			dnl set path to "" so we won't get //'s from here on
+			path=""
+		fi
 
-			dnl look in $path/include and $path/$LIBDIR/$NAME
-			if ( test -z "$LIBSTRING" )
-			then
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-					FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/$LIBDIR/$NAME/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR/$NAME\"; LIBSTRING=\"$paths/$LIBDIR/$NAME/lib$LIBNAME.$SOSUFFIX\"],[$paths/$LIBDIR/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$paths/$LIBDIR/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-				else
-					FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/$LIBDIR/$NAME/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR/$NAME\"; LIBSTRING=\"-L$paths/$LIBDIR/$NAME -l$LIBNAME\"],[$paths/$LIBDIR/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/$LIBDIR/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				fi
-			fi
 
-			dnl look in $path/include/$NAME and $path/$LIBDIR/$NAME
-			if ( test -z "$LIBSTRING" )
-			then
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/$LIBDIR/$NAME/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR/$NAME\"; LIBSTRING=\"$paths/$LIBDIR/$NAME/lib$LIBNAME.$SOSUFFIX\"],[$paths/$LIBDIR/$NAME/lib$LIBNAME.a],[LIBSTRING=\"$paths/$LIBDIR/$NAME/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-				else
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/$LIBDIR/$NAME/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR/$NAME\"; LIBSTRING=\"-L$paths/$LIBDIR/$NAME -l$LIBNAME\"],[$paths/$LIBDIR/$NAME/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/$LIBDIR/$NAME -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				fi
-			fi
-
-			dnl look in $path/include and $path/$LIBDIR/opt
-			if ( test -z "$LIBSTRING" )
-			then
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-					FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/$LIBDIR/opt/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR/opt\"; LIBSTRING=\"$paths/$LIBDIR/opt/lib$LIBNAME.$SOSUFFIX\"],[$paths/$LIBDIR/opt/lib$LIBNAME.a],[LIBSTRING=\"$paths/$LIBDIR/opt/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-				else
-					FW_CHECK_HEADER_LIB([$paths/include/$HEADER],[INCLUDESTRING=\"-I$paths/include\"],[$paths/$LIBDIR/opt/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR/opt\"; LIBSTRING=\"-L$paths/$LIBDIR/opt -l$LIBNAME\"],[$paths/$LIBDIR/opt/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/$LIBDIR/opt -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				fi
-			fi
-
-			dnl look in $path/include/$NAME and $path/$LIBDIR/opt
-			if ( test -z "$LIBSTRING" )
-			then
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/$LIBDIR/opt/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR/opt\"; LIBSTRING=\"$paths/$LIBDIR/opt/lib$LIBNAME.$SOSUFFIX\"],[$paths/$LIBDIR/opt/lib$LIBNAME.a],[LIBSTRING=\"$paths/$LIBDIR/opt/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-				else
-					FW_CHECK_HEADER_LIB([$paths/include/$NAME/$HEADER],[INCLUDESTRING=\"-I$paths/include/$NAME\"],[$paths/$LIBDIR/opt/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$paths/$LIBDIR/opt\"; LIBSTRING=\"-L$paths/$LIBDIR/opt -l$LIBNAME\"],[$paths/$LIBDIR/opt/lib$LIBNAME.a],[LIBSTRING=\"-L$paths/$LIBDIR/opt -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				fi
-			fi
+		for libpath in "$path/$LIBDIR" "$path/$LIBDIR/$NAME" "$path/$LIBDIR/opt"
+		do
 
 			if ( test -n "$LIBSTRING" )
 			then
-				HEADERSANDLIBSPATH="$paths"
 				break
 			fi
 
+			for includepath in "$path/include" "$path/include/$NAME"
+			do
+
+				if ( test -n "$LIBSTRING" )
+				then
+					break
+				fi
+
+				dnl look in $path/$LIBDIR
+				if ( test "$USEFULLLIBPATH" = "yes" )
+				then
+					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"$libpath/lib$LIBNAME.$SOSUFFIX\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+				else
+					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				fi
+			done
 		done
+
+		if ( test -n "$LIBSTRING" )
+		then
+			HEADERSANDLIBSPATH="$path"
+			break
+		fi
 	fi
 done
 
-dnl remove -I/usr/include, -L/lib and -L/usr/lib, -L/lib64 and -L/usr/lib64
+dnl remove -I/usr/include, -L/lib, -L/usr/lib, -L/lib64 and -L/usr/lib64
 INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
 LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
 LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
@@ -386,6 +345,16 @@ else
 	fi
 fi
 AC_MSG_RESULT($SOSUFFIX)
+])
+
+AC_DEFUN([FW_CHECK_LIBDIR],
+[
+AC_MSG_CHECKING(for library directory)
+case $host_cpu in
+	x86_64 ) LIBDIR="lib64" ;;
+	* ) LIBDIR="lib" ;;
+esac
+AC_MSG_RESULT($LIBDIR)
 ])
 
 
@@ -578,6 +547,7 @@ then
 	ORACLELIBSPATH=""
 	ORACLESTATIC=""
 	STATICFLAG=""
+	LINKFAIL=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -594,11 +564,11 @@ then
 
 		if ( test -n "$CYGWIN" )
 		then
-			for ORACLE_HOME in "`ls -d /cygdrive/c/oracle/product/*/*/OCI`"
+			for ORACLE_HOME in "`ls -d /cygdrive/c/oracle/product/*/*/OCI 2> /dev/null`"
 			do
-				instance=`dirname $ORACLE_HOME`
-				home=`dirname $instance`
-				version=`basename $home | cut -f1 -d'.'`
+				instance=`dirname $ORACLE_HOME 2> /dev/null`
+				home=`dirname $instance 2> /dev/null`
+				version=`basename $home 2> /dev/null | cut -f1 -d'.'`
 				if ( test "$version" = "10" )
 				then
 					ORACLEVERSION="10g"
@@ -808,6 +778,11 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 		FW_LIBS(oracle,[$ORACLELIBS])
 	fi
 
+	if ( test -z "$ORACLELIBS" -o -n "$LINKFAIL" )
+	then
+		AC_MSG_WARN(Oracle support will not be built.)
+	fi
+
 	AC_SUBST(ORACLEVERSION)
 	AC_SUBST(ORACLEINCLUDES)
 	AC_SUBST(ORACLELIBS)
@@ -850,7 +825,17 @@ then
 
 		if ( test -n "$CYGWIN" )
 		then
-			FW_CHECK_HEADER_LIB([/cygdrive/c/mysql/include/mysql.h],[MYSQLINCLUDES=\"-I/cygdrive/c/mysql/include\"],[/cygdrive/c/mysql/lib/opt/libmysql.lib],[MYSQLLIBSPATH=\"/cygdrive/c/mysql/lib/opt\"; MYSQLLIBS=\"-L/cygdrive/c/mysql/lib/opt -lmysql\"],[/cygdrive/c/mysql/lib/opt/mysqlclient.lib],[MYSQLLIBS=\"/cygdrive/c/mysql/lib/opt/mysqlclient.lib\"; MYSQLSTATIC=\"$STATICFLAG\"])
+			for dir in `ls -d /cygdrive/c/mysql /cygdrive/c/Program\ Files/MySQL/* 2> /dev/null | sed -e "s| |%20|g"`
+			do
+				rm -f stage/mysql
+				fixeddir=`echo "$dir" | sed -e "s|%20|\\\\ |g"`
+				ln -s "$fixeddir" stage/mysql
+				FW_CHECK_HEADER_LIB([`pwd`/stage/mysql/include/mysql.h],[MYSQLINCLUDES=\"-I`pwd`/stage/mysql/include\"],[`pwd`/stage/mysql/lib/opt/libmysql.lib],[MYSQLLIBSPATH=\"`pwd`/stage/mysql/lib/opt\"; MYSQLLIBS=\"-L`pwd`/stage/mysql/lib/opt -lmysql\"],[`pwd`/stage/mysql/lib/opt/mysqlclient.lib],[MYSQLLIBS=\"`pwd`/stage/mysql/lib/opt/mysqlclient.lib\"; MYSQLSTATIC=\"$STATICFLAG\"])
+				if ( test -n "$MYSQLLIBS" )
+				then
+					break
+				fi
+			done
 		fi
 
 		if ( test -z "$MYSQLLIBS" )
@@ -1193,8 +1178,8 @@ else
 		FW_CHECK_HEADERS_AND_LIBS([$LIBGLIBPATH],[glib-2.0],[glib.h],[glib-2.0],[$STATICFLAG],[$RPATHFLAG],[GLIBINCLUDES],[GLIBLIBS],[GLIBLIBSPATH],[GLIBSTATIC])
 		if ( test -n "$GLIBINCLUDES" )
 		then
-			DIRNAME1=`dirname $GLIBINCLUDES`
-			DIRNAME2=`dirname $DIRNAME1`
+			DIRNAME1=`dirname $GLIBINCLUDES 2> /dev/null`
+			DIRNAME2=`dirname $DIRNAME1 2> /dev/null`
 			GLIBINCLUDES="$GLIBINCLUDES $DIRNAME2/lib/glib/include"
 		fi
 	fi
@@ -1817,9 +1802,12 @@ then
 		then
 			if ( test -n "$CYGWIN" )
 			then
-				for dir in "`ls -d /cygdrive/c/Firebird*`"
+				for dir in `ls -d /cygdrive/c/Firebird* /cygdrive/c/Program\ Files/Firebird/Firebird* 2> /dev/null | sed -e "s| |%20|g"`
 				do
-					FW_CHECK_HEADER_LIB([$dir/include/ibase.h],[INTERBASEINCLUDES=\"-I$dir/include\"],[$dir/bin/fbclient.dll],[INTERBASELIBS=\"-L$dir/bin -lfbclient\"],[],[])
+					rm -f stage/firebird
+					fixeddir=`echo "$dir" | sed -e "s|%20|\\\\ |g"`
+					ln -s "$fixeddir" stage/firebird
+					FW_CHECK_HEADER_LIB([`pwd`/stage/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I`pwd`/stage/firebird/include\"],[`pwd`/stage/firebird/bin/fbclient.dll],[INTERBASELIBS=\"-L`pwd`/stage/firebird/bin -lfbclient\"],[],[])
 				done
 			else
 				FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
@@ -1894,6 +1882,7 @@ then
 	MDBTOOLSLIBS=""
 	MDBTOOLSLIBSPATH=""
 	MDBTOOLSSTATIC=""
+	LINKFAIL=""
 
 	if ( test -n "$GLIBINCLUDES" -a -n "$GLIBLIBS" )
 	then
@@ -1932,11 +1921,11 @@ then
 			fi
 		
 		fi
+	fi
 
-		if ( test -z "$MDBTOOLSLIBS" -o -n "$LINKFAIL" )
-		then
-			AC_MSG_WARN(MDB Tools support will not be built.)
-		fi
+	if ( test -z "$MDBTOOLSLIBS" -o -n "$LINKFAIL" )
+	then
+		AC_MSG_WARN(MDB Tools support will not be built.)
 	fi
 
 	FW_INCLUDES(mdbtools,[$MDBTOOLSINCLUDES])
@@ -2042,30 +2031,27 @@ then
 		
 			for i in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
 			do
-				for LIBDIR in "lib" "lib64"
-				do
-					if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/$LIBDIR/python$i/config" )
+				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/$LIBDIR/python$i/config" )
+				then
+					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
+					PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
+					if ( test -n "$CYGWIN" )
 					then
-						PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
-						PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
-						if ( test -n "$CYGWIN" )
+						if ( test -r "$PYTHONPATH/$LIBDIR/python$i/config/libpython$i.dll.a" )
 						then
-							if ( test -r "$PYTHONPATH/$LIBDIR/python$i/config/libpython$i.dll.a" )
-							then
-								PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
-								PYTHONLIB="-L$PYTHONDIR/config -lpython$i"
-							fi
-						else
 							PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
+							PYTHONLIB="-L$PYTHONDIR/config -lpython$i"
 						fi
+					else
+						PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
 					fi
+				fi
 			
-					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
-					then
-						PYTHONVERSION=`echo $i | sed -e "s|\.||"`
-						break
-					fi
-				done
+				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
+				then
+					PYTHONVERSION=`echo $i | sed -e "s|\.||"`
+					break
+				fi
 			done
 
 			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
@@ -2099,25 +2085,22 @@ then
 					fi
 				done
 
-				for LIBDIR in "lib" "lib64"
+				for i in "/usr/$LIBDIR/python$j" "/usr/local/$LIBDIR/python$j" "/usr/pkg/$LIBDIR/python$j" "/usr/local/python$j/$LIBDIR/python$j" "/opt/sfw/$LIBDIR/python$j" "/usr/sfw/$LIBDIR/python$j" "/sfw/$LIBDIR/python$j" "/sw/$LIBDIR/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/$LIBDIR/python$j"
 				do
-					for i in "/usr/$LIBDIR/python$j" "/usr/local/$LIBDIR/python$j" "/usr/pkg/$LIBDIR/python$j" "/usr/local/python$j/$LIBDIR/python$j" "/opt/sfw/$LIBDIR/python$j" "/usr/sfw/$LIBDIR/python$j" "/sfw/$LIBDIR/python$j" "/sw/$LIBDIR/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/$LIBDIR/python$j"
-					do
-						if ( test -d "$i/config" )
+					if ( test -d "$i/config" )
+					then
+						if ( test -n "$CYGWIN" -a -r "$i/config/libpython$j.dll.a" )
 						then
-							if ( test -n "$CYGWIN" -a -r "$i/config/libpython$j.dll.a" )
-							then
-								PYTHONDIR="$i"
-								PYTHONLIB="-L$PYTHONDIR/config -lpython$j"
-							else
-								PYTHONDIR="$i"
-							fi
-							if ( test -n "$PYTHONDIR" )
-							then
-								break
-							fi
+							PYTHONDIR="$i"
+							PYTHONLIB="-L$PYTHONDIR/config -lpython$j"
+						else
+							PYTHONDIR="$i"
 						fi
-					done
+						if ( test -n "$PYTHONDIR" )
+						then
+							break
+						fi
+					fi
 				done
 
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
@@ -2331,7 +2314,7 @@ then
 		
 		if ( test -z "$JAVAPATH" )
 		then
-			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /cygdrive/c/jdk* /cygdrive/c/j2sdk* 2>/dev/null /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK`
+			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK 2> /dev/null`
 			do
 				if ( test -z "$JAVAPATH" )
 				then
@@ -2341,6 +2324,24 @@ then
 					break
 				fi
 			done
+
+			if ( test -z "$JAVAPATH" )
+			then
+				if ( test -n "$CYGWIN" )
+				then
+					for dir in `ls -d /cygdrive/c/jdk* /cygdrive/c/j2sdk* /cygdrive/c/Program\ Files/Java/* 2> /dev/null | sed -e "s| |%20|g"`
+					do
+						rm -f stage/java
+						fixeddir=`echo "$dir" | sed -e "s|%20|\\\\ |g"`
+						ln -s "$fixeddir" stage/java
+						FW_CHECK_FILE("`pwd`/stage/java/include/jni.h",[JAVAPATH=\"`pwd`/stage/java\"])
+						if ( test -n "$JAVAPATH" )
+						then
+							break
+						fi
+					done
+				fi
+			fi
 		fi
 		
 		if ( test -n "$JAVAPATH" )
@@ -2431,6 +2432,8 @@ then
 				dnl works so we fake it here
 				PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
 				PHPEXTDIR=`$PHPCONFIG --extension-dir`
+				PHPVERSION=`$PHPCONFIG --version`
+				PHPMAJORVERSION=`echo "$PHPVERSION" | cut -d'.' -f1`
 			else
 				HAVE_PHP=""
 				AC_MSG_WARN(The PHP API will not be built.)
@@ -2444,6 +2447,8 @@ then
 	AC_SUBST(PHPINCLUDES)
 	AC_SUBST(PHPEXTDIR)
 	AC_SUBST(PHPLIB)
+	AC_SUBST(PHPVERSION)
+	AC_SUBST(PHPMAJORVERSION)
 fi
 ])
 
@@ -2550,38 +2555,32 @@ then
 			else
 				if ( test -z "$MICROSOFT" )
 				then
-					for LIBDIR in "lib" "lib64"
+					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
 					do
-						for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 						do
-							for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-							do
-								dnl FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-								FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"$i/libtclstub$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-							done
+							dnl FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+							FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"$i/libtclstub$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 						done
 					done
 				fi
 				if ( test -z "$TCLLIB" )
 				then
-					for LIBDIR in "lib" "lib64"
+					for i in "/usr/$LIBDIR" "$prefix/$LIBDIR" "/usr/local/$LIBDIR" "/usr/pkg/$LIBDIR" "/opt/sfw/$LIBDIR" "/usr/sfw/$LIBDIR" "/sw/$LIBDIR"
 					do
-						for i in "/usr/$LIBDIR" "$prefix/$LIBDIR" "/usr/local/$LIBDIR" "/usr/pkg/$LIBDIR" "/opt/sfw/$LIBDIR" "/usr/sfw/$LIBDIR" "/sw/$LIBDIR"
+						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 						do
-							for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-							do
-								FW_CHECK_FILE($i/libtcl$j.$SOSUFFIX,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
-								dnl for some reason, the
-								dnl tcl dll stub library
-								dnl is called libtcl.a
-								dnl instead of
-								dnl libtcl.dll.a on
-								dnl cygwin
-								if ( test -z "$TCLLIB" -a -n "$CYGWIN" )
-								then
-									FW_CHECK_FILE($i/libtcl$j.a,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
-								fi
-							done
+							FW_CHECK_FILE($i/libtcl$j.$SOSUFFIX,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
+							dnl for some reason, the
+							dnl tcl dll stub library
+							dnl is called libtcl.a
+							dnl instead of
+							dnl libtcl.dll.a on
+							dnl cygwin
+							if ( test -z "$TCLLIB" -a -n "$CYGWIN" )
+							then
+								FW_CHECK_FILE($i/libtcl$j.a,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
+							fi
 						done
 					done
 				fi

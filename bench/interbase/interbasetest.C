@@ -11,6 +11,12 @@
 #include <math.h>
 #include <time.h>
 
+#include <rudiments/environment.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 #define MAX_ITEM_BUFFER_SIZE 4096
 #define MAX_SELECT_LIST_SIZE 256
 
@@ -43,21 +49,27 @@ fieldstruct	field[MAX_SELECT_LIST_SIZE];
 
 int main(int argc, char **argv) {
 
-	if (argc<6) {
-		printf("usage: interbasetest database query iterations queriesperiteration\n");
+	if (argc<7) {
+		printf("usage: interbasetest user password database query iterations queriesperiteration\n");
 		exit(0);
 	}
 
-	char	*database=argv[1];
-	char	*query=argv[2];
-	int	iterations=atoi(argv[3]);
-	int	queriesperiteration=atoi(argv[4]);
+	char	*user=argv[1];
+	char	*password=argv[2];
+	char	*database=argv[3];
+	char	*query=argv[4];
+	int	iterations=atoi(argv[5]);
+	int	queriesperiteration=atoi(argv[6]);
+
+	// handle user/password parameters
+	environment	env;
+	env.setValue("ISC_USER",user);
+	env.setValue("ISC_PASSWORD",password);
 
 
 	time_t	starttime=time(NULL);
 	printf("interbasetest running, please wait...\n");
 	clock();
-
 
 	for (int count=0; count<iterations; count++) {
 
@@ -69,16 +81,26 @@ int main(int argc, char **argv) {
 		outsqlda->version=SQLDA_VERSION1;
 		outsqlda->sqln=MAX_SELECT_LIST_SIZE;
 
-		isc_attach_database(NULL,strlen(database),database,
-							&db,dpblength,NULL);
-		isc_start_transaction(NULL,&tr,1,&db,0,NULL);
+		if (isc_attach_database(NULL,strlen(database),database,
+							&db,
+							//dpblength,NULL);
+							0,NULL)) {
+			printf("attach failed\n");
+		}
+		if (isc_start_transaction(NULL,&tr,1,&db,0,NULL)) {
+			printf("start trans failed\n");
+		}
 
 		for (int qcount=0; qcount<queriesperiteration; qcount++) {
 	
 			stmt=NULL;
-			isc_dsql_allocate_statement(NULL,&db,&stmt);
-			isc_dsql_prepare(NULL,&tr,&stmt,strlen(query),
-							query,3,outsqlda);
+			if (isc_dsql_allocate_statement(NULL,&db,&stmt)) {
+				printf("allocate failed\n");
+			}
+			if (isc_dsql_prepare(NULL,&tr,&stmt,strlen(query),
+							query,3,outsqlda)) {
+				printf("prepare failed\n");
+			}
 	
 			// describe the statement
 			outsqlda->sqld=0;
@@ -208,6 +230,7 @@ int main(int argc, char **argv) {
 			isc_dsql_execute(NULL,&tr,&stmt,1,NULL);
 	
 			// fetch a row
+			if (outsqlda->sqld) {
 			while (!isc_dsql_fetch(NULL,&stmt,1,outsqlda)) {
 	
 				for (int col=0; col<outsqlda->sqld; col++) {
@@ -302,7 +325,7 @@ int main(int argc, char **argv) {
 							//printf("%d",field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale));
 						} else {
 							//printf("%d",field[col].
-								int64buffer);
+								//int64buffer);
 						}
 						//printf(",");
 					#endif
@@ -407,6 +430,7 @@ int main(int argc, char **argv) {
 				}
 				//printf("\n");
 			}
+			}
 			
 			isc_dsql_free_statement(NULL,&stmt,DSQL_drop);
 		}
@@ -414,4 +438,7 @@ int main(int argc, char **argv) {
 		isc_detach_database(NULL,&db);
 		free(outsqlda);
 	}
+
+	printf("total system time used: %ld\n",clock());
+	printf("total real time: %ld\n",time(NULL)-starttime);
 }

@@ -797,6 +797,9 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 		return true;
 	}
 
+	clientsock->setReadBufferSize(8192);
+	clientsock->setWriteBufferSize(8192);
+
 	// Don't fork unless we have to.
 	//
 	// If there are no busy listeners and there are available connections,
@@ -1647,6 +1650,7 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 }
 
 void sqlrlistener::flushWriteBuffer(filedescriptor *fd) {
+	fd->flushWriteBuffer(-1,-1);
 	fd->dontBufferWrites();
 	fd->bufferWrites();
 }
