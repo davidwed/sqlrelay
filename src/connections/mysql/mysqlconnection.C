@@ -250,6 +250,8 @@ void	mysqlcursor::returnRowCounts() {
 
 void	mysqlcursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	// for DML or DDL queries, return no column info
 	if (!mysqlresult) {
 		return;

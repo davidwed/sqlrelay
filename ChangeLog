@@ -66,6 +66,14 @@
 	it's possible to do negative input bind long's now
 	when relogging in to a db that went down, cursors are just reset, not
 		deleted/created, this allows the query to be re-executed
+	fixed a memory leak in Oracle8 connection where OCIHandleFree was being
+		used instead of OCIDescriptorFree
+	Postgresql connection supports typemangling=lookup option now where
+		the connection will query the pg_type table at startup and
+		return type name values from it
+	Fixed lurking memory bug in api where column buffers weren't getting
+		created if dontGetColumnInfo() was called, but the longdatatype
+		member was getting referenced anyway.
 
 0.32 -	affectedRows and totalRows were returning 0 instead of -1 for databases
 		that don't know that value, now they return -1

@@ -942,8 +942,6 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 			OPTIMISTIC_COLUMN_DATA_SIZE/OPTIMISTIC_COLUMN_COUNT,5);
 	columnnamearray=NULL;
 
-	nonstandardtypes=NULL;
-
 	returnnulls=0;
 
 	// cache file
@@ -1253,8 +1251,8 @@ char	*sqlrcursor::getColumnType(int col) {
 			sentcolumninfo==SEND_COLUMN_INFO &&
 			colcount && col>=0 && col<colcount) {
 		column	*whichcolumn=getColumn(col);
-		if (whichcolumn->type>=NUMBER_OF_DATATYPES) {
-			return nonstandardtypes[col];
+		if (columntypeformat!=COLUMN_TYPE_IDS) {
+			return whichcolumn->typestring;
 		}
 		return datatypestring[whichcolumn->type];
 	}
@@ -1289,8 +1287,8 @@ char	*sqlrcursor::getColumnType(const char *col) {
 		for (int i=0; i<colcount; i++) {
 			whichcolumn=getColumn(i);
 			if (!strcasecmp(whichcolumn->name,col)) {
-				if (whichcolumn->type>=NUMBER_OF_DATATYPES) {
-					return nonstandardtypes[i];
+				if (columntypeformat!=COLUMN_TYPE_IDS) {
+					return whichcolumn->typestring;
 				}
 				return datatypestring[whichcolumn->type];
 			}
@@ -1932,17 +1930,17 @@ int	sqlrcursor::parseData() {
 			sqlrc->debugPreEnd();
 		}
 
+		// tag the column as a long data type or not
+		currentcol=getColumn(colindex);
+		currentcol->longdatatype=(type==END_LONG_DATA)?1:0;
+
 		// keep track of the longest field
 		if (sendcolumninfo==SEND_COLUMN_INFO && 
 				sentcolumninfo==SEND_COLUMN_INFO) {
-			currentcol=getColumn(colindex);
 			if (length>currentcol->longest) {
 				currentcol->longest=length;
 			}
 		}
-
-		// tag the column as a long data type or not
-		currentcol->longdatatype=(type==END_LONG_DATA)?1:0;
 
 		// move to the next column, handle end of row 
 		colindex++;
@@ -2157,6 +2155,11 @@ void	sqlrcursor::cacheColumnInfo() {
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO) {
 
+		// write column type format
+		write(cachedestfd,(void *)&columntypeformat,
+					sizeof(unsigned short));
+
+		// write the columns themselves
 		unsigned short	namelen;
 		column	*whichcolumn;
 		for (int i=0; i<colcount; i++) {
@@ -2165,8 +2168,17 @@ void	sqlrcursor::cacheColumnInfo() {
 			write(cachedestfd,(void *)&namelen,
 						sizeof(unsigned short));
 			write(cachedestfd,(void *)whichcolumn->name,namelen);
-			write(cachedestfd,(void *)&whichcolumn->type,
+			if (columntypeformat!=COLUMN_TYPE_IDS) {
+				write(cachedestfd,(void *)&whichcolumn->type,
 						sizeof(unsigned short));
+			} else {
+				write(cachedestfd,
+					(void *)&whichcolumn->typestringlength,
+						sizeof(unsigned short));
+				write(cachedestfd,
+					(void *)&whichcolumn->typestring,
+					whichcolumn->typestringlength);
+			}
 			write(cachedestfd,(void *)&whichcolumn->length,
 						sizeof(unsigned long));
 		}
@@ -2396,10 +2408,18 @@ int	sqlrcursor::parseColumnInfo() {
 		sqlrc->debugPreEnd();
 	}
 
+	// we have to do this here even if we're not getting the column
+	// descriptions because we are going to use the longdatatype member
+	// variable no matter what
+	createColumnBuffers();
+
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO) {
 
-		createColumnBuffers();
+		// get whether column types will be predefined id's or strings
+		if (getShort(&columntypeformat)!=sizeof(unsigned short)) {
+			return -1;
+		}
 
 		// some useful variables
 		unsigned short	length;
@@ -2430,24 +2450,33 @@ int	sqlrcursor::parseColumnInfo() {
 				text::lower(currentcol->name);
 			}
 
-			// get the column type
-			if (getShort(&currentcol->type)!=
-						sizeof(unsigned short)) {
-				return -1;
-			}
+			if (columntypeformat==COLUMN_TYPE_IDS) {
 
-			// handle non-standard column numbers (for example,
-			// from postgresql)
-			if (currentcol->type>=NUMBER_OF_DATATYPES) {
-				if (!nonstandardtypes) {
-					nonstandardtypescount=colcount;
-					nonstandardtypes=new char *[colcount];
-					for (int j=0; j<colcount; j++) {
-						nonstandardtypes[j]=new char[6];
-					}
+				// get the column type
+				if (getShort(&currentcol->type)!=
+						sizeof(unsigned short)) {
+					return -1;
 				}
-				sprintf(nonstandardtypes[i],"%d",
-					currentcol->type-NUMBER_OF_DATATYPES);
+
+			} else {
+
+				// get the column type length
+				if (getShort(&currentcol->typestringlength)!=
+						sizeof(unsigned short)) {
+					return -1;
+				}
+
+				// get the column data
+				currentcol->typestring=new
+					char[currentcol->typestringlength+1];
+				currentcol->typestring[
+					currentcol->typestringlength]=
+								(char)NULL;
+				if (getString(currentcol->typestring,
+						currentcol->typestringlength)!=
+						currentcol->typestringlength) {
+					return -1;
+				}
 			}
 
 			// get the column length
@@ -2465,8 +2494,9 @@ int	sqlrcursor::parseColumnInfo() {
 				sqlrc->debugPrint(currentcol->name);
 				sqlrc->debugPrint("\",");
 				sqlrc->debugPrint("\"");
-				if (currentcol->type>NUMBER_OF_DATATYPES) {
-					sqlrc->debugPrint(nonstandardtypes[i]);
+				if (columntypeformat!=COLUMN_TYPE_IDS) {
+					sqlrc->debugPrint(
+						currentcol->typestring);
 				} else {
 					sqlrc->debugPrint(datatypestring[
 							currentcol->type]);
@@ -2946,11 +2976,23 @@ int	sqlrcursor::getString(char *string, int size) {
 
 void	sqlrcursor::clearColumns() {
 
+	// delete the column type strings (if necessary)
+	if (sendcolumninfo==SEND_COLUMN_INFO && 
+			sentcolumninfo==SEND_COLUMN_INFO &&
+				columntypeformat!=COLUMN_TYPE_IDS) {
+		for (int i=0; i<colcount; i++) {
+			delete[] getColumn(i)->typestring;
+		}
+	}
+
 	// clear column name strings
 	if (columns && sentcolumninfo==SEND_COLUMN_INFO) {
 		char	*colname;
 		for (int i=0; i<colcount; i++) {
 			colname=getColumn(i)->name;
+			// FIXME: should there be a delete here???
+			// or should this whole block not be here because
+			// of the free() done next???
 		}
 	}
 
@@ -2964,15 +3006,6 @@ void	sqlrcursor::clearColumns() {
 	// delete array pointing to each column name
 	delete[] columnnamearray;
 	columnnamearray=NULL;
-
-	// delete the array for nonstandard types
-	if (nonstandardtypes) {
-		for (int i=0; i<nonstandardtypescount; i++) {
-			delete[] nonstandardtypes[i];
-		}
-		delete[] nonstandardtypes;
-		nonstandardtypes=NULL;
-	}
 }
 
 void	sqlrcursor::dontGetColumnInfo() {

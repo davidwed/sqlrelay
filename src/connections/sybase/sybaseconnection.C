@@ -595,6 +595,8 @@ void	sybasecursor::returnColumnCount() {
 
 void	sybasecursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	// unless the query was a successful select, send no header
 	if (results_type!=CS_ROW_RESULT) {
 		return;

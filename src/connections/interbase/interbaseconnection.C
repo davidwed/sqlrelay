@@ -554,6 +554,8 @@ void	interbasecursor::returnColumnCount() {
 
 void	interbasecursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	// a useful variable
 	int	type;
 

@@ -168,6 +168,8 @@ void	msqlcursor::returnColumnCount() {
 
 void	msqlcursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	// for dml/ddl queries, return no header
 	if (!msqlresult) {
 		return;

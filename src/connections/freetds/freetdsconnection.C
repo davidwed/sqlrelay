@@ -633,6 +633,8 @@ void	freetdscursor::returnColumnCount() {
 
 void	freetdscursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	returnedcolumns=1;
 
 	// unless the query was a successful select, send no header

@@ -16,6 +16,7 @@ class postgresqlcursor : public sqlrcursor {
 	friend class postgresqlconnection;
 	private:
 			postgresqlcursor(sqlrconnection *conn);
+
 		int	executeQuery(const char *query, long length,
 					unsigned short execute);
 		char	*getErrorMessage(int *liveconnection);
@@ -52,6 +53,10 @@ class postgresqlconnection : public sqlrconnection {
 		int	rollback();
 		int	ping();
 		char	*identify();
+
+		int	datatypecount;
+		long	*datatypeids;
+		char	**datatypenames;
 
 		PGconn	*pgconn;
 

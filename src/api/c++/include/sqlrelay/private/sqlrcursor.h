@@ -111,6 +111,7 @@
 		unsigned short	suspendresultsetsent;
 		unsigned short	endofresultset;
 
+		unsigned short	columntypeformat;
 		unsigned long	colcount;
 		unsigned long	previouscolcount;
 
@@ -137,9 +138,6 @@
 		int		getrowlengthcount;
 		char		***fields;
 		unsigned long	**fieldlengths;
-
-		int		nonstandardtypescount;
-		char		**nonstandardtypes;
 
 		int		returnnulls;
 

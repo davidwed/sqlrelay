@@ -1028,6 +1028,8 @@ void	oracle8cursor::returnColumnCount() {
 
 void	oracle8cursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	// a useful variable
 	int	type;
 

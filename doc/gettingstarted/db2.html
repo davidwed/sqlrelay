@@ -437,7 +437,7 @@ connect to the remote database.</p>
 <tr><td>Hostname</td><td><i>remotehost</i></td></tr>
 <tr><td>Instance</td><td><i>testinst<br>
 <pre>
-	owned by user testinst with password testpass
+	owned by user testinst with password testpassword
 	allows remote connections on port 50000
 <pre>
 </i></td></tr>
@@ -493,7 +493,7 @@ To list the current command option settings, type LIST COMMAND OPTIONS.
 
 For more detailed help, refer to the Online Reference Manual.
 
-<b>db2 =&gt; <FONT color=#6959cf>connect</FONT> <FONT color=#6959cf>to</FONT> remotedb <FONT color=#6959cf>user</FONT> testinst <FONT color=#6959cf>using</FONT> testpass</b>
+<b>db2 =&gt; <FONT color=#6959cf>connect</FONT> <FONT color=#6959cf>to</FONT> remotedb <FONT color=#6959cf>user</FONT> testinst <FONT color=#6959cf>using</FONT> testpassword</b>
 
    Database Connection Information
 
@@ -705,7 +705,7 @@ example, the <i>db2inst1</i> user owns the <i>db2inst1</i> instance where the
 
         <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;db2test&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/db2test.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;db2&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;0&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;db2inst1&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;db2inst1&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> authtier=</FONT><FONT color=#ff00ff>&quot;listener&quot;</FONT><FONT color=#008a8e> handoff=</FONT><FONT color=#ff00ff>&quot;pass&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
                 <FONT color=#008a8e>&lt;users&gt;</FONT>
-                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;db2test&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;db2test&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;testuser&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;testpassword&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
                         <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;db2test&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;db=db2inst1&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>

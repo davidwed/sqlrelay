@@ -430,6 +430,8 @@ void	odbccursor::returnColumnCount() {
 
 void	odbccursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	// a useful variable
 	int	type;
 

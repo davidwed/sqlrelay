@@ -1,9 +1,6 @@
-postgresql typemangling doesn't identify the text column type
-
 forked listeners need to close handoff file descriptors
 handoff=pass does not work with dynamic scaling
 
-incorporate postgresql column type query
 If a connection dies mysteriously, a new one should fire up.
 maximum allowed clob bind value length should be configurable
 many of methods should be const methods

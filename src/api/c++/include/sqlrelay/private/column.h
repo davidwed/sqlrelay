@@ -8,7 +8,10 @@ class column {
 	friend class sqlrcursor;
 	private:
 		char		*name;
+		// these 3 should be made into a union
 		unsigned short	type;
+		char		*typestring;
+		unsigned short	typestringlength;
 		unsigned long	length;
 		int		longest;
 		unsigned char	longdatatype;

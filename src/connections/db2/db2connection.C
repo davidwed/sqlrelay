@@ -362,6 +362,8 @@ void	db2cursor::returnColumnCount() {
 
 void	db2cursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	// a useful variable
 	int	type;
 

@@ -26,12 +26,23 @@ void	postgresqlconnection::handleConnectString() {
 	setPassword(connectStringValue("password"));
 	char	*typemang=connectStringValue("typemangling");
 	typemangling=0;
-	if (typemang && !strcasecmp(typemang,"yes")) {
-		typemangling=1;
+	if (typemang) {
+		if (!strcasecmp(typemang,"yes")) {
+			typemangling=1;
+		} else {
+			typemangling=2;
+		}
 	}
 }
 
 int	postgresqlconnection::logIn() {
+
+	// initialize the datatype storage buffers
+	if (typemangling==2) {
+		datatypecount=0;
+		datatypeids=NULL;
+		datatypenames=NULL;
+	}
 			
 	// log in
 	pgconn=PQsetdbLogin(host,port,options,tty,db,getUser(),getPassword());
@@ -47,6 +58,30 @@ int	postgresqlconnection::logIn() {
 		dup2(devnull,STDOUT_FILENO);
 		dup2(devnull,STDERR_FILENO);
 	}
+
+	// get the datatypes
+	if (typemangling==2) {
+		PGresult	*result=PQexec(pgconn,
+					"select oid,typname from pg_type");
+		if (result==(PGresult *)NULL) {
+			return 0;
+		}
+
+		// create the datatype storage buffers
+		datatypecount=PQntuples(result);
+		datatypeids=new long[datatypecount];
+		datatypenames=new char *[datatypecount];
+
+		// copy the datatype ids/names into the buffers
+		for (int i=0; i<datatypecount; i++) {
+			datatypeids[i]=atoi(PQgetvalue(result,i,0));
+			datatypenames[i]=strdup(PQgetvalue(result,i,1));
+		}
+	
+		// clean up
+		PQclear(result);
+	}
+
 	return 1;
 }
 
@@ -59,7 +94,23 @@ void	postgresqlconnection::deleteCursor(sqlrcursor *curs) {
 }
 
 void	postgresqlconnection::logOut() {
+
 	PQfinish(pgconn);
+
+	if (typemangling==2) {
+
+		// delete the datatype storage buffers
+		for (int i=0; i<datatypecount; i++) {
+			delete[] datatypenames[i];
+		}
+		delete[] datatypeids;
+		delete[] datatypenames;
+
+		// re-initialize the datatype storage buffers
+		datatypecount=0;
+		datatypeids=NULL;
+		datatypenames=NULL;
+	}
 }
 
 int	postgresqlconnection::commit() {
@@ -159,9 +210,19 @@ void	postgresqlcursor::returnColumnCount() {
 
 void	postgresqlcursor::returnColumnInfo() {
 
+	if (postgresqlconn->typemangling==1) {
+		conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+	} else {
+		conn->sendColumnTypeFormat(COLUMN_TYPE_NAMES);
+	}
+
 	// some useful variables
 	Oid	pgfieldtype;
-	int	type;
+	unsigned short	type;
+	char	*typestring;
+	if (!postgresqlconn->typemangling) {
+		typestring=new char[6];
+	}
 	char	*name;
 	int	size;
 
@@ -176,7 +237,9 @@ void	postgresqlcursor::returnColumnInfo() {
 		// If typemangling is turned on, translate to standard types, 
 		// otherwise return the type number.
 		pgfieldtype=PQftype(pgresult,i);
-		if (postgresqlconn->typemangling) {
+		if (!postgresqlconn->typemangling) {
+			sprintf(typestring,"%d",(int)pgfieldtype);
+		} else if (postgresqlconn->typemangling==1) {
 			if ((int)pgfieldtype==23) {
 				type=INT_DATATYPE;
 			} else if ((int)pgfieldtype==701) {
@@ -201,8 +264,14 @@ void	postgresqlcursor::returnColumnInfo() {
 			} else {
 				type=UNKNOWN_DATATYPE;
 			}
-		} else {
-			type=(int)pgfieldtype+NUMBER_OF_DATATYPES;
+		} else if (postgresqlconn->typemangling==2) {
+			for (int i=0; i<postgresqlconn->datatypecount; i++) {
+				if ((long)pgfieldtype==
+					postgresqlconn->datatypeids[i]) {
+					typestring=postgresqlconn->
+							datatypenames[i];
+				}
+			}
 		}
 
 		// send column definition
@@ -211,7 +280,13 @@ void	postgresqlcursor::returnColumnInfo() {
 		if (size<0) {
 			size=0;
 		}
-		conn->sendColumnDefinition(name,strlen(name),type,size);
+
+		if (postgresqlconn->typemangling==1) {
+			conn->sendColumnDefinition(name,strlen(name),type,size);
+		} else {
+			conn->sendColumnDefinitionString(name,strlen(name),
+					typestring,strlen(typestring),size);
+		}
 	}
 }
 

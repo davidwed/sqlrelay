@@ -425,6 +425,8 @@ void	oracle7cursor::returnColumnCount() {
 
 void	oracle7cursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	// a useful variables
 	int		type;
 

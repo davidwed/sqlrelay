@@ -176,6 +176,8 @@ void	lagocursor::returnColumnCount() {
 
 void	lagocursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	// gonna need this later
 	int	length;
 	int	type;

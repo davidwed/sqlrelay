@@ -165,18 +165,37 @@ access a database, it must be running.</p>
 <a name="initial"></a>
 <span class="heading2">Initial Configuration</span><br>
 
+<p>To configure the database, it must be running, so start it up now.</p>
+
 <p>It's necessary to perform administrative tasks as the <i>postgres</i> 
 user.  Assigning it a password makes this easier.</p>
 
-<p>By default, PostgreSQL is fairly insecure.  Any user on the local machine
-can connect to the database without supplying a password.  To begin securing 
-PostgreSQL, log in as <i>postgres</i>.</p>
+<p>Many distributions of PostgreSQL are fairly insecure by default;  any
+user on the local machine can connect to the database without supplying a
+password.  Some distributions of PostgreSQL are secured using socket
+credentials by default.</p>
+
+<p>To determine what kind of distribution you have, log in as the
+<i>postgres</i> user.</p>
+
+<p>View the file <i>pg_hba.conf</i> (usually found in <i>/var/lib/pgsql</i>,
+<i>/var/lib/pgsql/data</i> or <i>/usr/local/pgsql/var/data</i>) and look for a
+line like the following:</p>
+
+<blockquote><b><pre>
+local        all	ident	sameuser
+</pre></b></blockquote>
+
+<p>If there's a line like that in your database, then all database users will
+have the same password as the system password for the user of the same name.</p>
 
 <p>By default, PostgreSQL has a database called <i>template1</i> containing
 privileges and other housekeeping data and an adminstrative user named 
-<i>postgres</i>.  The <i>postgres</i> database user initially has no password.
-To assign it a password, run a command like the following.  This command assigns
-the <i>postgres</i> user the password <i>newpassword</i>.</p>
+<i>postgres</i>.  Unless your system uses socket credentials, the
+<i>postgres</i> database user initially has no password.  To assign it a
+password (or to override the password assigned by socket credentials), run a
+command like the following.  This command assigns the <i>postgres</i> user the
+password <i>newpassword</i>.</p>
 
 <blockquote>
 For PostgreSQL 7:
@@ -193,8 +212,9 @@ For PostgreSQL 6:
 
 </blockquote>
 
-<p>Now edit the <i>pg_hba.conf</i> file (usually found in 
-<i>/var/lib/pgsql</i>, <i>/var/lib/pgsql/data</i> or 
+<p>If your system uses socket credentials and you don't want it to, or if it
+does not use socket credentials, edit the <i>pg_hba.conf</i> file (usually
+found in <i>/var/lib/pgsql</i>, <i>/var/lib/pgsql/data</i> or 
 <i>/usr/local/pgsql/var/data</i>) and look for lines like the following:</p>
 
 <blockquote><b><pre>
@@ -211,11 +231,31 @@ host         all         127.0.0.1     255.255.255.255     password
 
 <p>By default, PostgreSQL listens on a unix socket, but not on an inet socket.
 Thus, clients running on the local machine can connect to the database, but
-clients running on remote hosts cannot.  To change this behavior, I had 
-to modify the pg_ctl script and add the -i option to the postmaster startup 
-command.  There doesn't appear to be an easier way.  Additionally, you must
-add a line to the <i>pg_hba.conf</i> file to allow remote hosts to access local
-databases.  The following line allows all hosts in the 192.168.2.0 class C 
+clients running on remote hosts cannot.</p>
+
+<p>Look for a file called postgresql.conf in the same directory as pg_hba.conf.
+Edit the file and look for a line like the following:</b>
+
+<blockquote><b><pre>
+tcpip_socket = false
+</pre></b></blockquote>
+
+<p>Change it to read:</b>
+
+<blockquote><b><pre>
+tcpip_socket = true
+</pre></b></blockquote>
+
+<p>If the file has no line like this, then the line.</p>
+
+<p>If your distribution has no postgresql.conf file, you will have to modify
+the pg_ctl script and add the -i option to the postmaster startup command.
+This script has changed a bit from version to version, so it may take a bit of
+trial and error to find the exact spot in the file to make the modification.</p>
+
+<p>Once you have configured PostgreSQL listen on an inet socket, you must add a
+line to the <i>pg_hba.conf</i> file to allow remote hosts to access local
+databases.  The following line allows all hosts in the 192.168.2.0 class C
 network to access all databases on the local machine, using password 
 authentication.</p>
 
@@ -524,7 +564,7 @@ database running on the remote server <i>testhost</i> as the user
                         <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;postgresqltest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;postgresqltest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
-                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;postgresqltest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;host=testhost;db=testdb;user=testuser;password=testpass&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;postgresqltest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;host=testhost;db=testdb;user=testuser;password=testpassword&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/connections&gt;</FONT>
         <FONT color=#008a8e>&lt;/instance&gt;</FONT>
 

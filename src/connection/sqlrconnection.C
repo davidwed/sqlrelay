@@ -27,6 +27,7 @@
 #endif
 
 #include <defines.h>
+#include <datatypes.h>
 
 
 sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
@@ -2636,8 +2637,7 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 	} else {
 
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-						"actual rows unknown");
+		debugPrint("connection",3,"actual rows unknown");
 		#endif
 
 		clientsock->write((unsigned short)NO_ACTUAL_ROWS);
@@ -2660,24 +2660,21 @@ void	sqlrconnection::sendRowCounts(long actual, long affected) {
 	} else {
 
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,
-						"affected rows unknown");
+		debugPrint("connection",3,"affected rows unknown");
 		#endif
 
 		clientsock->write((unsigned short)NO_AFFECTED_ROWS);
 	}
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"done sending row counts");
+	debugPrint("connection",2,"done sending row counts");
 	#endif
 }
 
 void	sqlrconnection::sendColumnCount(unsigned long ncols) {
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-					"sending column count...");
+	debugPrint("connection",2,"sending column count...");
 	#endif
 
 	#ifdef SERVER_DEBUG
@@ -2686,8 +2683,28 @@ void	sqlrconnection::sendColumnCount(unsigned long ncols) {
 	clientsock->write(ncols);
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
-						"done sending column count");
+	debugPrint("connection",2,"done sending column count");
+	#endif
+}
+
+void	sqlrconnection::sendColumnTypeFormat(unsigned short format) {
+
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",2,"sending column type format...");
+	#endif
+
+	#ifdef SERVER_DEBUG
+	if (format==COLUMN_TYPE_IDS) {
+		debugPrint("connection",3,"id's");
+	} else {
+		debugPrint("connection",3,"names");
+	}
+	#endif
+
+	clientsock->write(format);
+
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",2,"done sending column type format");
 	#endif
 }
 
@@ -2712,6 +2729,34 @@ void	sqlrconnection::sendColumnDefinition(const char *name,
 	clientsock->write(namelen);
 	clientsock->write(name,namelen);
 	clientsock->write(type);
+	clientsock->write(size);
+}
+
+void	sqlrconnection::sendColumnDefinitionString(const char *name,
+							unsigned short namelen,
+							const char *type, 
+							unsigned short typelen,
+							unsigned long size) {
+
+	#ifdef SERVER_DEBUG
+	debugstr=new stringbuffer();
+	for (int i=0; i<namelen; i++) {
+		debugstr->append(name[i]);
+	}
+	debugstr->append(":");
+	for (int i=0; i<typelen; i++) {
+		debugstr->append(type[i]);
+	}
+	debugstr->append(":");
+	debugstr->append((long)size);
+	debugPrint("connection",3,debugstr->getString());
+	delete debugstr;
+	#endif
+
+	clientsock->write(namelen);
+	clientsock->write(name,namelen);
+	clientsock->write(typelen);
+	clientsock->write(type,typelen);
 	clientsock->write(size);
 }
 

@@ -203,6 +203,8 @@ void	sqlitecursor::returnColumnCount() {
 
 void	sqlitecursor::returnColumnInfo() {
 
+	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
+
 	if (!result) {
 		return;
 	}

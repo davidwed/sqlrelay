@@ -7,7 +7,8 @@
 
 extern "C" {
 
-#define NUMBER_OF_DATATYPES 72
+#define COLUMN_TYPE_IDS		0
+#define COLUMN_TYPE_NAMES	1
 
 typedef	enum {
 	UNKNOWN_DATATYPE=0,
