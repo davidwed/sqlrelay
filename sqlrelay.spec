@@ -309,6 +309,15 @@ Group: Development/Languages
 %description tcl
 SQL Relay modules for TCL.
 
+
+%package doc
+Summary: Documentation for SQL Relay.
+Group: Applications/Database
+
+%description doc
+Documentation for SQL Relay.
+
+
 %define tcldir		/usr/lib/tcl
 %define pythondir	%(echo -e "import sys\\nimport string\\nout=''\\nfor i in sys.path:\\n if len(i)>0:\\n  for j in range(0,len(i)):\\n   if j<len(i)-1:\\n    out=out+i[j]\\n   else:\\n    if i[j]!='/':\\n     out=out+i[j]\\n  break\\nprint out" | python)
 %define	zopedir		%{pythondir}/python/Products
@@ -361,6 +370,13 @@ rm -rf %{buildroot}
 	initroot=%{buildroot}
 # now install ruby
 %{!?_without_ruby: %makeinstall DESTDIR=%{buildroot}}
+# remove crap from doc dir
+rm -f doc/Makefile
+rm -rf doc/*/CVS
+rm -rf doc/*/*/CVS
+rm -rf doc/*/*/*/CVS
+rm -rf doc/*/*/*/*/CVS
+rm -rf doc/*/*/*/*/*/CVS
 
 %pre
 # Add the "sqlrelay" user
@@ -392,7 +408,6 @@ fi
 
 %files
 %defattr(-, root, root)
-%doc AUTHORS COPYING ChangeLog NEWS TODO doc
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.conf.example
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
 %config(noreplace) %attr(600, root, root) /etc/sysconfig/sqlrelay
@@ -551,6 +566,8 @@ fi
 %{!?_without_tcl:%defattr(-, root, root)}
 %{!?_without_tcl:%{tcldir}/sqlrelay/*}
 
+%files doc
+%doc doc
 
 %changelog
 * Mon Feb 17 2003 David Muse <mused@firstworks.com>
