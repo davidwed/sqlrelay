@@ -1,6 +1,9 @@
 ADODB and Pear DB interfaces
 Pear DB interface license
 scaling/handoff=pass incompatibility
+freetds-0.62/ct_param support
+full mysql4 support/docs
+mysql replacement library
 
 oldmysql test files for non-C++ api's
 
@@ -75,7 +78,6 @@ Documentation:
 	performance benchmark charts
 	HOWTO for linuxdoc.org
 	man pages for everything
-	mysql 4 installation
 
 Performance/Code Enhancements:
 	make some methods that return int return bool

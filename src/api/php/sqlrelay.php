@@ -16,7 +16,7 @@
 // | Author: Stig Bakken <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.2 2004-01-07 06:29:18 mused Exp $
+// $Id: sqlrelay.php,v 1.3 2004-01-12 05:09:21 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -34,6 +34,8 @@ class DB_sqlrelay_cursor
 {
     var $cursor;
     var $rownum = 0;
+    var $prepare_tokens = array();
+    var $prepare_types = array();
 
     function DB_sqlrelay_cursor($cur)
     {
@@ -106,7 +108,7 @@ class DB_sqlrelay extends DB_common
 
         $this->connection = sqlrcon_alloc($host, $port, $socket,
                                             $user, $pw, $retrytime, $tries);
-        //sqlrcon_debugOn($this->connection);
+        sqlrcon_debugOn($this->connection);
         return DB_OK;
     }
 
@@ -124,7 +126,7 @@ class DB_sqlrelay extends DB_common
     {
         sqlrcon_free($this->connection);
         $this->connection = null;
-        return TRUE;
+        return true;
     }
 
     // }}}
@@ -145,16 +147,25 @@ class DB_sqlrelay extends DB_common
     {
 
         $cursor = sqlrcur_alloc($this->connection);
-        if (!sqlrcur_sendQuery($cursor,$query)) {
+        if (!sqlrcur_sendQuery($cursor, $query)) {
             $error = sqlrcur_errorMessage($cursor);
             sqlrcur_free($cursor);
             return $this->raiseError(DB_ERROR, null, null, null, $error);
         }
 
         $affectedrows = sqlrcur_affectedRows($cursor);
-        return new DB_sqlrelay_cursor($cursor);
 
-        # FIXME: return DB_OK for non-selects???
+        /* If the query was a select, return a cursor, otherwise return DB_OK.
+        If there are any affected rows, then the query was definitely not a
+        select, otherwise there's no good way to know what kind of query it was
+        except by parsing it. */
+        if ($affectedrows==0 &&
+                preg_match('/^\s*\(?\s*SELECT\s+/si', $query) &&
+                    !preg_match('/^\s*\(?\s*SELECT\s+INTO\s/si', $query)) {
+            return new DB_sqlrelay_cursor($cursor);
+        }
+        sqlrcur_free($cursor);
+        return DB_OK;
     }
 
     // }}}
@@ -170,14 +181,14 @@ class DB_sqlrelay extends DB_common
     * @access public
     * @see execute
     */
-
+/*
     function prepare($query)
     {
         $cursor = sqlrcur_alloc($this->connection);
         sqlrcur_prepareQuery($cursor, $query);
         return new DB_sqlrelay_cursor($cursor);
     }
-
+*/
     // }}}
     // {{{ execute()
     /**
@@ -196,6 +207,7 @@ class DB_sqlrelay extends DB_common
     * @access public
     * @see prepare()
     */
+/*
     function &execute(&$sqlrcursor, $data = false)
     {
         sqlrcur_clearBinds($sqlrcursor->cursor);
@@ -213,7 +225,7 @@ class DB_sqlrelay extends DB_common
         }
         return $sqlrcursor;
     }
-
+*/
     // }}}
     // {{{ fetchInto()
 
@@ -263,8 +275,21 @@ class DB_sqlrelay extends DB_common
      */
     function freeResult(&$sqlrcursor)
     {
-        sqlrcur_free($sqlrcursor->cursor);
-        return TRUE;
+        if (is_resource($sqlrcursor) {
+            sqlrcur_free($sqlrcursor->cursor);
+            return true;
+        }
+
+        // $sqlrcursor is a prepared query handle
+        $sqlrcursor = (int)$sqlrcursor;
+        if (!isset($this->prepare_tokens[$sqlrcursor])) {
+            return false;
+        }
+
+        $this->prepare_types = array();
+        $this->prepare_tokens = array();
+
+        return true;
     }
 
     // }}}
