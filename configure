@@ -22599,6 +22599,33 @@ fi
 	fi
 fi
 
+
+FOUNDLIB=""
+
+if ( test -r "$ORACLE_HOME/lib/libcore10.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	eval "ORACLEVERSION=\"10gi\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\""
+else
+	if ( test -n "" )
+	then
+
+if ( test -r "" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
+fi
+
 			if ( test -n "$ORACLEVERSION" )
 			then
 				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
@@ -23349,7 +23376,7 @@ _ACEOF
 		fi
 	fi
 
-	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" )
+	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" -o "$ORACLEVERSION" = "10g" )
 	then
 
 cat >>confdefs.h <<\_ACEOF

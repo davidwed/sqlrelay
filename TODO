@@ -1,15 +1,10 @@
-include docs for installing oracle on redhat 8, fedora, suse 8, etc...
+bind-by-position problem with oracle 10g
+
+include docs for installing oracle on fedora, suse 8, etc...
 
 cygwin:
 	requires rudiments without ssl/pcre support
 	perl api won't build
-
-oracle 8 client needs to check to see what version of the database it's
-	connected to and not use proxy credentials to switch users if the
-	version < 8.1... Use OCIServerVersion and parse the result
-
-when not using proxy credentials for user-change, oracle 8 client can't
-	recreate cursors when logging back in
 
 interbase stored procedure/output bind tests fails at isc_dsql_prepare
 
@@ -18,6 +13,25 @@ freetds-0.62/ct_param support
 check out the new db2 patch and see if it really works
 
 fix erwin's fake binds problem
+
+VB wrapper
+
+ADODB driver
+
+stored procedures:
+	tests for mysql, sybase
+	stored procedure examples in faq
+
+probably related to temp table dropping:
+	freetds connection writes an error but succeeds in dropping the table
+
+sybase connection won't even start now
+
+idle client timeout
+perl apis -> CPAN
+
+psql doesn't work 100% with drop-in library
+mysql client segfaults at exit with drop-in library
 
 address Matthias Klose's concerns:
 --------------------------------------------------------------------------------
@@ -81,26 +95,6 @@ instead of:
         mv $(d)/usr/lib/zope/lib/python/ZSQLRelayDA \
                 $(d)/usr/lib/zope/lib/python/Products/
         rm -rf $(d)/usr/lib/zope/lib/python/Products/ZSQLRelayDA/SQLRelay
---------------------------------------------------------------------------------
-
-VB wrapper
-
-ADODB driver
-
-stored procedures:
-	tests for mysql, sybase
-	stored procedure examples in faq
-
-probably related to temp table dropping:
-	freetds connection writes an error but succeeds in dropping the table
-
-sybase connection won't even start now
-
-idle client timeout
-perl apis -> CPAN
-
-psql doesn't work 100% with drop-in library
-mysql client segfaults at exit with drop-in library
 
 --------------------------------------------------------------------------------
 
@@ -192,7 +186,6 @@ Performance/Code Enhancements:
 	call endSession() from perl DBD finish method
 	sqlrclient classes shouldn't inherit from inet/unixclientsocket,
 		rather should have member variables for each
-	make some methods that return int return bool
 	implement column flags as a bitmap
 	persistent cursors - parse query, attach an id to it,
 				make it available to other sessions

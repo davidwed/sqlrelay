@@ -1,0 +1,32 @@
+set ORACLE_VERSION=10.1.0
+
+don't need LD_ASSUME_KERNEL
+
+change /etc/redhat-release to read:
+Red Hat Enterprise Linux ES release 3 (Taroon Update 1) 
+
+increase filemax to 65536
+echo 65536 > /proc/sys/fs/file-max
+
+increase shmmax to 2147483648
+echo 2147483648 > /proc/sys/kernel/shmmax
+
+increase semaphore parameters
+echo "250 32000 100 128" > /proc/sys/kernel/sem
+
+download ship.db.cpio.gz
+gunzip ship.db.cpio.gz
+cpio -idmv < ship.db.cpio
+
+run runInstaller as oracle user
+
+dbca complains 2 times about invalid password, appears harmless
+
+stop ancillary processes
+	su - oracle
+	isqlplusctl stop
+	emctl stop dbconsole
+	emctl stop agent
+
+	su - root
+	/etc/rc.d/init.d/init.cssd stop

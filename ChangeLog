@@ -38,6 +38,8 @@
 	Oracle8 connection checks the version of the database now and uses
 		proxy credentials for authtier=database only when the database
 		supports it, otherwise it uses sqlrconnection::changeUser()
+	added oracle 10g support
+	moved some code back into sqlrconnection class from helper classes
 
 0.34.3 - updated spec file for suse 9.0
 	applied a patch to fix a typo in C API
