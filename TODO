@@ -4,10 +4,12 @@ perl api's don't get installed right when building an RPM
 does "=NULL" have to be translated to "is NULL" in fake binds?
 
 implement unique flag like nullable, primary key, precision, scale
-implement nullable, primary key, precision, scale in non c++ api's
 nullable,primary key isn't implemented for many connections
 implement unique/nullable/primary key as a bitmap
+
+implement nullable, primary key, precision, scale in non c++ api's
 implement getFieldAsXXX and getOutputBindAsXXX for non-c++ api's
+	(c is done)
 
 is there a better way to get a column's precision in interbase
 precision/scale in postgresql
@@ -23,7 +25,6 @@ use connectstring class to parse/store connectstrings
 test,document Java "getXXXAsByteArray" methods
 document oracle 8.0/8i temp-blob compile flag
 tests need to check blob/lobs with binary data in them
-interbase stored procedures don't work unless there's an output bind var
 test interbase stored procedures
 
 tcl-8.0.3 (redhat 5.2) compatibility
@@ -36,8 +37,6 @@ java inputBindBlob() method probably needs to take a byte array instead of a
 	string
 
 could debug logs be logrotate compatible?
-
-sybase/oracle on redhat 9
 
 db2 start/stop doesn't work
 	db2start/db2stop works when run as a given instance owner

@@ -6,7 +6,7 @@
 
 extern "C" {
 
-extern int isNumberTypeChar(char *type);
+#include <datatypes.h>
 
 static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
   sqlrconnection *sqlrcon;

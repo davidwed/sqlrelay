@@ -288,6 +288,16 @@ char	*sqlrcur_getOutputBind(sqlrcur sqlrcurref, const char *variable) {
 	return sqlrcurref->getOutputBind(variable);
 }
 
+long	sqlrcur_getOutputBindAsLong(sqlrcur sqlrcurref,
+						const char *variable) {
+	return sqlrcurref->getOutputBindAsLong(variable);
+}
+
+double	sqlrcur_getOutputBindAsDouble(sqlrcur sqlrcurref,
+						const char *variable) {
+	return sqlrcurref->getOutputBindAsDouble(variable);
+}
+
 long	sqlrcur_getOutputBindLength(sqlrcur sqlrcurref, const char *variable) {
 	return sqlrcurref->getOutputBindLength(variable);
 }
@@ -344,6 +354,26 @@ char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row, const char *col) {
 	return sqlrcurref->getField(row,col);
 }
 
+long	sqlrcur_getFieldAsLongByIndex(sqlrcur sqlrcurref, int row,
+								int col) {
+	return sqlrcurref->getFieldAsLong(row,col);
+}
+
+long	sqlrcur_getFieldAsLongByName(sqlrcur sqlrcurref, int row,
+							const char *col) {
+	return sqlrcurref->getFieldAsLong(row,col);
+}
+
+double	sqlrcur_getFieldAsDoubleByIndex(sqlrcur sqlrcurref, int row,
+								int col) {
+	return sqlrcurref->getFieldAsDouble(row,col);
+}
+
+double	sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, int row,
+							const char *col) {
+	return sqlrcurref->getFieldAsDouble(row,col);
+}
+
 long	sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref, int row, int col) {
 	return sqlrcurref->getFieldLength(row,col);
 }
@@ -383,6 +413,44 @@ char	*sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref, const char *col) {
 
 int	sqlrcur_getColumnLengthByName(sqlrcur sqlrcurref, const char *col) {
 	return sqlrcurref->getColumnLength(col);
+}
+
+unsigned long	sqlrcur_getColumnPrecisionByIndex(sqlrcur sqlrcurref, int col) {
+	return sqlrcurref->getColumnPrecision(col);
+}
+
+unsigned long	sqlrcur_getColumnPrecisionByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnPrecision(col);
+}
+
+unsigned long	sqlrcur_getColumnScaleByIndex(sqlrcur sqlrcurref, int col) {
+	return sqlrcurref->getColumnScale(col);
+}
+
+unsigned long	sqlrcur_getColumnScaleByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnScale(col);
+}
+
+unsigned short	sqlrcur_getColumnIsNullableByIndex(sqlrcur sqlrcurref,
+							int col) {
+	return sqlrcurref->getColumnIsNullable(col);
+}
+
+unsigned short	sqlrcur_getColumnIsNullableByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnIsNullable(col);
+}
+
+unsigned short	sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcur sqlrcurref,
+							int col) {
+	return sqlrcurref->getColumnIsPrimaryKey(col);
+}
+
+unsigned short	sqlrcur_getColumnIsPrimaryKeyByName(sqlrcur sqlrcurref,
+							const char *col) {
+	return sqlrcurref->getColumnIsPrimaryKey(col);
 }
 
 int	sqlrcur_getLongestByName(sqlrcur sqlrcurref, const char *col) {

@@ -260,6 +260,17 @@ int	sqlrcur_fetchFromBindCursor(sqlrcur sqlrcurref);
 char	*sqlrcur_getOutputBind(sqlrcur sqlrcurref, const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable. */
+long	sqlrcur_getOutputBindAsLong(sqlrcur sqlrcurref,
+						const char *variable);
+			/* Get the value stored in a previously
+			   defined output bind variable as a 
+			   long integer. */
+double	sqlrcur_getOutputBindAsDouble(sqlrcur sqlrcurref,
+						const char *variable);
+			/* Get the value stored in a previously
+			   defined output bind variable as a 
+			   double precision floating point
+			   number. */
 long	sqlrcur_getOutputBindLength(sqlrcur sqlrcurref, const char *variable);
 			/* Get the length of the value stored in a previously
 			   defined output bind variable. */
@@ -325,6 +336,19 @@ char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col);
 char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row, const char *col); 
 			/* Returns a pointer to the value of the 
 			   specified row and column. */
+long	sqlrcur_getFieldAsLongByIndex(sqlrcur sqlrcurref, int row, int col); 
+long	sqlrcur_getFieldAsLongByName(sqlrcur sqlrcurref, int row,
+							const char *col); 
+			/* Returns the specified field as a long integer. */
+double	sqlrcur_getFieldAsDoubleByIndex(sqlrcur sqlrcurref, int row, int col); 
+double	sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, int row,
+							const char *col); 
+			/* Returns the specified field as a double precision
+			   floating point number. */
+char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col); 
+char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row, const char *col); 
+			/* Returns a pointer to the value of the 
+			   specified row and column. */
 long	sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref, int row, int col); 
 long	sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref, int row,
 							const char *col); 
@@ -347,6 +371,36 @@ char	*sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref, const char *col);
 int	sqlrcur_getColumnLengthByIndex(sqlrcur sqlrcurref, int col); 
 int	sqlrcur_getColumnLengthByName(sqlrcur sqlrcurref, const char *col); 
 			/* Returns the length of the specified column. */
+unsigned long	sqlrcur_getColumnPrecisionByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned long	sqlrcur_getColumnPrecisionByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns the precision of the specified
+			   column.
+			   Precision is the total number of digits in
+			   a number.  eg: 123.45 has a precision of 5.
+			   For non-numeric types, it's the number of
+			   characters in the string. */
+unsigned long	sqlrcur_getColumnScaleByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned long	sqlrcur_getColumnScaleByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns the scale of the specified column.
+			   Scale is the total number of digits to the
+			   right of the decimal point in a number.
+			   eg: 123.45 has a scale of 2. */
+unsigned short	sqlrcur_getColumnIsNullableByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned short	sqlrcur_getColumnIsNullableByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns 1 if the specified column can
+			   contain nulls and 0 otherwise. */
+unsigned short	sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcur sqlrcurref,
+							int col);
+unsigned short	sqlrcur_getColumnIsPrimaryKeyByName(sqlrcur sqlrcurref,
+							const char *col);
+			/* Returns 1 if the specified column is a
+			   primary key and 0 otherwise. */
 int	sqlrcur_getLongestByIndex(sqlrcur sqlrcurref, int col);
 int	sqlrcur_getLongestByName(sqlrcur sqlrcurref, const char *col);
 			/* Returns the length of the longest field in the

@@ -359,7 +359,7 @@ AC_SUBST(SSLLIB)
 AC_CHECK_LIB(crypto,CRYPTO_add_lock,CRYPTOLIB=-lcrypto,CRYPTOLIB="")
 AC_SUBST(CRYPTOLIB)
 
-FW_CHECK_NEED_GLIBC_2_3_FIXUP
+FW_CHECK_NEED_GLIBC_2_3_HACK
 
 echo "******************************"
 

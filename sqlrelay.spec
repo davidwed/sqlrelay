@@ -335,6 +335,7 @@ Documentation for SQL Relay.
 %define	zopedir		/opt/Zope/lib/python/Products
 %define	phpextdir	%(php-config --extension-dir)
 %define	perl_sitelib	%(eval "export `perl -V:sitelib`"; echo $sitelib)
+%define	perl_sitearch	%(eval "export `perl -V:sitearch`"; echo $sitearch)
 %define	perl_installman3dir	%(eval "export `perl -V:installman3dir`"; echo $installman3dir)
 %define	perl_man3ext	%(eval "export `perl -V:man3ext`"; echo $man3ext)
 
