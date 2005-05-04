@@ -41,6 +41,7 @@ int	main(int argc, char **argv) {
 		// instantiation
 		con=new sqlrconnection(argv[1],atoi(argv[2]), 
 					argv[3],argv[4],argv[5],0,1);
+con->debugOn();
 		con->copyReferences();
 		cur=new sqlrcursor(con);
 		cur->copyReferences();

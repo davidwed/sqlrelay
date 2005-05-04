@@ -557,6 +557,8 @@ then
 
 	else
 
+		AC_MSG_CHECKING(for oracle includes and libraries)
+
 		if ( test -n "$STATICLINK" )
 		then
 			STATICFLAG="-static"
@@ -596,13 +598,9 @@ then
 				fi
 			done
 		else
-
-			AC_MSG_CHECKING(for ORACLE_HOME)
 		
 			if ( test -n "$ORACLE_HOME" )
 			then
-
-				AC_MSG_RESULT(yes)
 
 				dnl use sysliblist if it's there
 				SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
@@ -618,22 +616,40 @@ then
 				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore10.a],[ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 				FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
 			else
-				AC_MSG_RESULT(no)
-				AC_MSG_WARN(The ORACLE_HOME environment variable is not set.  Oracle support will not be built.)
-			fi
 
+				for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
+				do
+					if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.so" -a -r "/usr/include/oracle/$version/client/oci.h" )
+					then
+						ORACLEVERSION="10g"
+						ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
+						ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh"
+						ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
+					fi
+				done
+			fi
 		fi
 		
 		if ( test -n "$ORACLEVERSION" )
 		then
-			if ( test -n "$CYGWIN" )
+			if ( test -z "$ORACLEINCLUDES" )
 			then
-				ORACLEINCLUDES="-I$ORACLE_HOME/include"
-			else
-				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
+				if ( test -n "$CYGWIN" )
+				then
+					ORACLEINCLUDES="-I$ORACLE_HOME/include"
+				else
+					ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
+				fi
 			fi
-			echo "hmmm, looks like Oracle$ORACLEVERSION..."
 		fi
+
+		if ( test -n "$ORACLELIBS" -a -n "$ORACLEINCLUDES" )
+		then
+			AC_MSG_RESULT(yes)
+		else
+			AC_MSG_RESULT(no)
+		fi
+		
 		
 		OCI_H=""
 		if ( test -n "$ORACLELIBS" )
@@ -790,6 +806,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 	AC_SUBST(ORACLESTATIC)
 fi
 ])
+
 
 
 

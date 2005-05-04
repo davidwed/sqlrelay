@@ -20642,6 +20642,9 @@ then
 
 	else
 
+		echo "$as_me:$LINENO: checking for oracle includes and libraries" >&5
+echo $ECHO_N "checking for oracle includes and libraries... $ECHO_C" >&6
+
 		if ( test -n "$STATICLINK" )
 		then
 			STATICFLAG="-static"
@@ -20708,14 +20711,8 @@ fi
 			done
 		else
 
-			echo "$as_me:$LINENO: checking for ORACLE_HOME" >&5
-echo $ECHO_N "checking for ORACLE_HOME... $ECHO_C" >&6
-
 			if ( test -n "$ORACLE_HOME" )
 			then
-
-				echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
 
 								SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
 				if ( test ! -n "$SYSLIBLIST" )
@@ -20886,24 +20883,42 @@ fi
 fi
 
 			else
-				echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-				{ echo "$as_me:$LINENO: WARNING: The ORACLE_HOME environment variable is not set.  Oracle support will not be built." >&5
-echo "$as_me: WARNING: The ORACLE_HOME environment variable is not set.  Oracle support will not be built." >&2;}
-			fi
 
+				for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
+				do
+					if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.so" -a -r "/usr/include/oracle/$version/client/oci.h" )
+					then
+						ORACLEVERSION="10g"
+						ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
+						ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh"
+						ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
+					fi
+				done
+			fi
 		fi
 
 		if ( test -n "$ORACLEVERSION" )
 		then
-			if ( test -n "$CYGWIN" )
+			if ( test -z "$ORACLEINCLUDES" )
 			then
-				ORACLEINCLUDES="-I$ORACLE_HOME/include"
-			else
-				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
+				if ( test -n "$CYGWIN" )
+				then
+					ORACLEINCLUDES="-I$ORACLE_HOME/include"
+				else
+					ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
+				fi
 			fi
-			echo "hmmm, looks like Oracle$ORACLEVERSION..."
 		fi
+
+		if ( test -n "$ORACLELIBS" -a -n "$ORACLEINCLUDES" )
+		then
+			echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+		else
+			echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+		fi
+
 
 		OCI_H=""
 		if ( test -n "$ORACLELIBS" )
@@ -34548,7 +34563,7 @@ RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
 
 
 
-SQLR_VERSION="0.36"
+SQLR_VERSION="0.36.1"
 
 
 cat >>confdefs.h <<_ACEOF
