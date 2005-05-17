@@ -623,7 +623,7 @@ then
 					then
 						ORACLEVERSION="10g"
 						ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
-						ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh"
+						ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -lnnz10"
 						ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
 					fi
 				done
