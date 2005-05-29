@@ -62,9 +62,9 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 		return false;
 	}
 
+	#ifndef SERVER_DEBUG
 	bool	nodetach=cmdl->found("-nodetach");
 
-	#ifndef SERVER_DEBUG
 	if (!nodetach && detachbeforeloggingin) {
 		// detach from the controlling tty
 		detach();
