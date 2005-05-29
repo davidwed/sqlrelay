@@ -26,10 +26,10 @@ bool sqlrcursor::parseData() {
 	}
 
 	// useful variables
-	unsigned short	type;
-	unsigned long	length;
+	uint16_t	type;
+	uint32_t	length;
 	char	*buffer=NULL;
-	unsigned long	colindex=0;
+	uint32_t	colindex=0;
 	column	*currentcol;
 	row	*currentrow=NULL;
 
@@ -37,13 +37,13 @@ bool sqlrcursor::parseData() {
 	firstrowindex=rowcount;
 
 	// keep track of how large the buffer is
-	int	rowbuffercount=0;
+	uint32_t	rowbuffercount=0;
 
 	// get rows
 	for (;;) {
 
 		// get the type of the field
-		if (getShort(&type)!=sizeof(unsigned short)) {
+		if (getShort(&type)!=sizeof(uint16_t)) {
 			setError("Failed to get the field type.\n A network error may have occurred");
 			return false;
 		}
@@ -110,7 +110,7 @@ bool sqlrcursor::parseData() {
 		} else if (type==NORMAL_DATA) {
 		
 			// handle non-null data
-			if (getLong(&length)!=sizeof(unsigned long)) {
+			if (getLong(&length)!=sizeof(uint32_t)) {
 				setError("Failed to get the field length.\n A network error may have occurred");
 				return false;
 			}
@@ -118,7 +118,7 @@ bool sqlrcursor::parseData() {
 			// for non-long, non-NULL datatypes...
 			// get the field into a buffer
 			buffer=(char *)rowstorage->malloc(length+1);
-			if ((unsigned long)getString(buffer,length)!=length) {
+			if ((uint32_t)getString(buffer,length)!=length) {
 				setError("Failed to get the field data.\n A network error may have occurred");
 				return false;
 			}
@@ -127,12 +127,12 @@ bool sqlrcursor::parseData() {
 		} else if (type==START_LONG_DATA) {
 
 			// handle a long datatype
-			char	*oldbuffer=NULL;
-			int	totallength=0;
+			char		*oldbuffer=NULL;
+			uint32_t	totallength=0;
 			for (;;) {
 
 				// get the type of the chunk
-				if (getShort(&type)!=sizeof(unsigned short)) {
+				if (getShort(&type)!=sizeof(uint16_t)) {
 					setError("Failed to get chunk type.\n A network error may have occurred");
 					return false;
 				}
@@ -143,7 +143,7 @@ bool sqlrcursor::parseData() {
 				}
 
 				// get the length of the chunk
-				if (getLong(&length)!=sizeof(unsigned long)) {
+				if (getLong(&length)!=sizeof(uint32_t)) {
 					delete[] buffer;
 					setError("Failed to get chunk length.\n A network error may have occurred");
 					return false;
@@ -163,7 +163,7 @@ bool sqlrcursor::parseData() {
 				totallength=totallength+length;
 
 				// get the chunk of data
-				if ((unsigned long)getString(buffer,length)!=
+				if ((uint32_t)getString(buffer,length)!=
 								length) {
 					delete[] buffer;
 					setError("Failed to get chunk data.\n A network error may have occurred");
@@ -208,7 +208,7 @@ bool sqlrcursor::parseData() {
 				sentcolumninfo==SEND_COLUMN_INFO) {
 
 			// keep track of the longest field
-			if (length>(unsigned long)(currentcol->longest)) {
+			if (length>currentcol->longest) {
 				currentcol->longest=length;
 			}
 		}
@@ -249,7 +249,7 @@ void sqlrcursor::createRowBuffers() {
 	// rows will hang around from now until the cursor is deleted,
 	// getting reused with each query
 	rows=new row *[OPTIMISTIC_ROW_COUNT];
-	for (int i=0; i<OPTIMISTIC_ROW_COUNT; i++) {
+	for (uint32_t i=0; i<OPTIMISTIC_ROW_COUNT; i++) {
 		rows[i]=new row(colcount);
 	}
 }
@@ -257,12 +257,12 @@ void sqlrcursor::createRowBuffers() {
 void sqlrcursor::createExtraRowArray() {
 
 	// create the arrays
-	int	howmany=rowcount-firstrowindex-OPTIMISTIC_ROW_COUNT;
+	uint32_t	howmany=rowcount-firstrowindex-OPTIMISTIC_ROW_COUNT;
 	extrarows=new row *[howmany];
 	
 	// populate the arrays
 	row	*currentrow=firstextrarow;
-	for (int i=0; i<howmany; i++) {
+	for (uint32_t i=0; i<howmany; i++) {
 		extrarows[i]=currentrow;
 		currentrow=currentrow->next;
 	}

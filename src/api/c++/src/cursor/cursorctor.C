@@ -50,8 +50,6 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 			OPTIMISTIC_RESULT_SET_SIZE/OPTIMISTIC_ROW_COUNT,5);
 	fields=NULL;
 	fieldlengths=NULL;
-	getrowcount=0;
-	getrowlengthcount=0;
 
 	colcount=0;
 	previouscolcount=0;

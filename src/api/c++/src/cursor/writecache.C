@@ -25,7 +25,7 @@ void sqlrcursor::cacheToFile(const char *filename) {
 	sprintf(cachedestindname,"%s.ind",filename);
 }
 
-void sqlrcursor::setCacheTtl(int ttl) {
+void sqlrcursor::setCacheTtl(uint32_t ttl) {
 	cachettl=ttl;
 }
 
@@ -82,7 +82,7 @@ void sqlrcursor::startCaching() {
 			// write ttl to files
 			datetime	dt;
 			dt.getSystemDateAndTime();
-			long	expiration=dt.getEpoch()+cachettl;
+			int32_t	expiration=dt.getEpoch()+cachettl;
 			cachedest->write(expiration);
 			cachedestind->write(expiration);
 		}
@@ -110,9 +110,9 @@ void sqlrcursor::cacheError() {
 
 	// write the number of returned rows, affected rows 
 	// and a zero to terminate the column descriptions
-	cachedest->write((unsigned short)NO_ACTUAL_ROWS);
-	cachedest->write((unsigned short)NO_AFFECTED_ROWS);
-	cachedest->write((unsigned short)END_COLUMN_INFO);
+	cachedest->write((uint16_t)NO_ACTUAL_ROWS);
+	cachedest->write((uint16_t)NO_AFFECTED_ROWS);
+	cachedest->write((uint16_t)END_COLUMN_INFO);
 }
 
 void sqlrcursor::cacheNoError() {
@@ -121,7 +121,7 @@ void sqlrcursor::cacheNoError() {
 		return;
 	}
 
-	cachedest->write((unsigned short)NO_ERROR);
+	cachedest->write((uint16_t)NO_ERROR);
 }
 
 void sqlrcursor::cacheColumnInfo() {
@@ -156,9 +156,9 @@ void sqlrcursor::cacheColumnInfo() {
 		cachedest->write(columntypeformat);
 
 		// write the columns themselves
-		unsigned short	namelen;
-		column	*whichcolumn;
-		for (unsigned long i=0; i<colcount; i++) {
+		uint16_t	namelen;
+		column		*whichcolumn;
+		for (uint32_t i=0; i<colcount; i++) {
 
 			// get the column
 			whichcolumn=getColumnInternal(i);
@@ -195,17 +195,17 @@ void sqlrcursor::cacheColumnInfo() {
 	}
 }
 
-void sqlrcursor::cacheOutputBinds(int count) {
+void sqlrcursor::cacheOutputBinds(uint32_t count) {
 
 	if (resumed || !cachedest) {
 		return;
 	}
 
 	// write the variable/value pairs to the cache file
-	unsigned short	len;
-	for (int i=0; i<count; i++) {
+	uint16_t	len;
+	for (uint32_t i=0; i<count; i++) {
 
-		cachedest->write((unsigned short)outbindvars[i].type);
+		cachedest->write(outbindvars[i].type);
 
 		len=charstring::length(outbindvars[i].variable);
 		cachedest->write(len);
@@ -221,7 +221,7 @@ void sqlrcursor::cacheOutputBinds(int count) {
 	}
 
 	// terminate the list of output binds
-	cachedest->write((unsigned short)END_BIND_VARS);
+	cachedest->write((uint16_t)END_BIND_VARS);
 }
 
 void sqlrcursor::cacheData() {
@@ -231,23 +231,23 @@ void sqlrcursor::cacheData() {
 	}
 
 	// write the data to the cache file
-	int	rowbuffercount=rowcount-firstrowindex;
-	for (int i=0; i<rowbuffercount; i++) {
+	uint32_t	rowbuffercount=rowcount-firstrowindex;
+	for (uint32_t i=0; i<rowbuffercount; i++) {
 
 		// get the current offset in the cache destination file
-		long	position=cachedest->getCurrentPosition();
+		int32_t	position=cachedest->getCurrentPosition();
 
 		// seek to the right place in the index file and write the
 		// destination file offset
 		cachedestind->setPositionRelativeToBeginning(
-			13+sizeof(long)+((firstrowindex+i)*sizeof(long)));
+			13+sizeof(int32_t)+((firstrowindex+i)*sizeof(int32_t)));
 		cachedestind->write(position);
 
 		// write the row to the cache file
-		for (unsigned long j=0; j<colcount; j++) {
-			unsigned short	type;
-			long	len;
-			char	*field=getFieldInternal(i,j);
+		for (uint32_t j=0; j<colcount; j++) {
+			uint16_t	type;
+			int32_t		len;
+			char		*field=getFieldInternal(i,j);
 			if (field) {
 				type=NORMAL_DATA;
 				len=charstring::length(field);
@@ -281,7 +281,7 @@ void sqlrcursor::finishCaching() {
 	}
 
 	// terminate the result set
-	cachedest->write((unsigned short)END_RESULT_SET);
+	cachedest->write((uint16_t)END_RESULT_SET);
 
 	// close the cache file and clean up
 	clearCacheDest();

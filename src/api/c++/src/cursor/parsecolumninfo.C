@@ -18,20 +18,20 @@ bool sqlrcursor::parseColumnInfo() {
 	}
 
 	// first get whether the server knows the total number of rows or not
-	if (getShort(&knowsactualrows)!=sizeof(unsigned short)) {
+	if (getShort(&knowsactualrows)!=sizeof(uint16_t)) {
 		setError("Failed to get whether the server knows the number actual rows or not.\n A network error may have occurred.");
 		return false;
 	}
 
 	// get the number of rows returned by the query
 	if (knowsactualrows==ACTUAL_ROWS) {
-		if (getLong(&actualrows)!=sizeof(unsigned long)) {
+		if (getLong(&actualrows)!=sizeof(uint32_t)) {
 			setError("Failed to get the number of actual rows.\n A network error may have occurred.");
 			return false;
 		}
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
-			sqlrc->debugPrint((long)actualrows);
+			sqlrc->debugPrint((int32_t)actualrows);
 			sqlrc->debugPreEnd();
 		}
 	} else {
@@ -50,20 +50,20 @@ bool sqlrcursor::parseColumnInfo() {
 	}
 
 	// get whether the server knows the number of affected rows or not
-	if (getShort(&knowsaffectedrows)!=sizeof(unsigned short)) {
+	if (getShort(&knowsaffectedrows)!=sizeof(uint16_t)) {
 		setError("Failed to get whether the server knows the number of affected rows or not.\n A network error may have occurred.");
 		return false;
 	}
 
 	// get the number of rows affected by the query
 	if (knowsaffectedrows==AFFECTED_ROWS) {
-		if (getLong(&affectedrows)!=sizeof(unsigned long)) {
+		if (getLong(&affectedrows)!=sizeof(uint32_t)) {
 			setError("Failed to get the number of affected rows.\n A network error may have occurred.");
 			return false;
 		}
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
-			sqlrc->debugPrint((long)affectedrows);
+			sqlrc->debugPrint((int32_t)affectedrows);
 			sqlrc->debugPreEnd();
 		}
 	} else {
@@ -81,20 +81,20 @@ bool sqlrcursor::parseColumnInfo() {
 	}
 
 	// get whether the server is sending column info or not
-	if (getShort(&sentcolumninfo)!=sizeof(unsigned short)) {
+	if (getShort(&sentcolumninfo)!=sizeof(uint16_t)) {
 		setError("Failed to get whether the server is sending column info or not.\n A network error may have occurred.");
 		return false;
 	}
 
 	// get column count
-	if (getLong(&colcount)!=sizeof(unsigned long)) {
+	if (getLong(&colcount)!=sizeof(uint32_t)) {
 		setError("Failed to get the column count.\n A network error may have occurred.");
 		return false;
 	}
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Column count: ");
-		sqlrc->debugPrint((long)colcount);
+		sqlrc->debugPrint((int32_t)colcount);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
@@ -108,20 +108,20 @@ bool sqlrcursor::parseColumnInfo() {
 			sentcolumninfo==SEND_COLUMN_INFO) {
 
 		// get whether column types will be predefined id's or strings
-		if (getShort(&columntypeformat)!=sizeof(unsigned short)) {
+		if (getShort(&columntypeformat)!=sizeof(uint16_t)) {
 			setError("Failed to whether column types will be predefined id's or strings.\n A network error may have occurred.");
 			return false;
 		}
 
 		// some useful variables
-		unsigned short	length;
+		uint16_t	length;
 		column		*currentcol;
 
 		// get the columninfo segment
-		for (unsigned long i=0; i<colcount; i++) {
+		for (uint32_t i=0; i<colcount; i++) {
 	
 			// get the column name length
-			if (getShort(&length)!=sizeof(unsigned short)) {
+			if (getShort(&length)!=sizeof(uint16_t)) {
 				setError("Failed to get the column name length.\n A network error may have occurred.");
 				return false;
 			}
@@ -148,7 +148,7 @@ bool sqlrcursor::parseColumnInfo() {
 
 				// get the column type
 				if (getShort(&currentcol->type)!=
-						sizeof(unsigned short)) {
+						sizeof(uint16_t)) {
 					setError("Failed to get the column type.\n A network error may have occurred.");
 					return false;
 				}
@@ -157,7 +157,7 @@ bool sqlrcursor::parseColumnInfo() {
 
 				// get the column type length
 				if (getShort(&currentcol->typestringlength)!=
-						sizeof(unsigned short)) {
+						sizeof(uint16_t)) {
 					setError("Failed to get the column type length.\n A network error may have occurred.");
 					return false;
 				}
@@ -188,27 +188,27 @@ bool sqlrcursor::parseColumnInfo() {
 			// get whether the column is binary
 			// get whether the column is auto-incremented
 			if (getLong(&currentcol->length)!=
-						sizeof(unsigned long) ||
+						sizeof(uint32_t) ||
 				getLong(&currentcol->precision)!=
-						sizeof(unsigned long) ||
+						sizeof(uint32_t) ||
 				getLong(&currentcol->scale)!=
-						sizeof(unsigned long) ||
+						sizeof(uint32_t) ||
 				getShort(&currentcol->nullable)!=
-						sizeof(unsigned short) ||
+						sizeof(uint16_t) ||
 				getShort(&currentcol->primarykey)!=
-						sizeof(unsigned short) ||
+						sizeof(uint16_t) ||
 				getShort(&currentcol->unique)!=
-						sizeof(unsigned short) ||
+						sizeof(uint16_t) ||
 				getShort(&currentcol->partofkey)!=
-						sizeof(unsigned short) ||
+						sizeof(uint16_t) ||
 				getShort(&currentcol->unsignednumber)!=
-						sizeof(unsigned short) ||
+						sizeof(uint16_t) ||
 				getShort(&currentcol->zerofill)!=
-						sizeof(unsigned short) ||
+						sizeof(uint16_t) ||
 				getShort(&currentcol->binary)!=
-						sizeof(unsigned short) ||
+						sizeof(uint16_t) ||
 				getShort(&currentcol->autoincrement)!=
-						sizeof(unsigned short)) {
+						sizeof(uint16_t)) {
 				setError("Failed to get column info.\n A network error may have occurred.");
 				return false;
 			}
@@ -230,34 +230,35 @@ bool sqlrcursor::parseColumnInfo() {
 							currentcol->type]);
 				}
 				sqlrc->debugPrint("\", ");
-				sqlrc->debugPrint((long)currentcol->length);
+				sqlrc->debugPrint((int32_t)currentcol->length);
 				sqlrc->debugPrint(" (");
-				sqlrc->debugPrint((long)currentcol->precision);
+				sqlrc->debugPrint((int32_t)
+							currentcol->precision);
 				sqlrc->debugPrint(",");
-				sqlrc->debugPrint((long)currentcol->scale);
+				sqlrc->debugPrint((int32_t)currentcol->scale);
 				sqlrc->debugPrint(") ");
-				if (!(long)currentcol->nullable) {
+				if (!currentcol->nullable) {
 					sqlrc->debugPrint("NOT NULL ");
 				}
-				if ((long)currentcol->primarykey) {
+				if (currentcol->primarykey) {
 					sqlrc->debugPrint("Primary Key ");
 				}
-				if ((long)currentcol->unique) {
+				if (currentcol->unique) {
 					sqlrc->debugPrint("Unique ");
 				}
-				if ((long)currentcol->partofkey) {
+				if (currentcol->partofkey) {
 					sqlrc->debugPrint("Part of a Key ");
 				}
-				if ((long)currentcol->unsignednumber) {
+				if (currentcol->unsignednumber) {
 					sqlrc->debugPrint("Unsigned ");
 				}
-				if ((long)currentcol->zerofill) {
+				if (currentcol->zerofill) {
 					sqlrc->debugPrint("Zero Filled ");
 				}
-				if ((long)currentcol->binary) {
+				if (currentcol->binary) {
 					sqlrc->debugPrint("Binary ");
 				}
-				if ((long)currentcol->autoincrement) {
+				if (currentcol->autoincrement) {
 					sqlrc->debugPrint("Auto-Increment ");
 				}
 				sqlrc->debugPrint("\n");

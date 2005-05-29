@@ -40,11 +40,11 @@ bool sqlrconnection::returnError(sqlrcursor *cursor) {
 	if (liveconnection) {
 
 		// indicate that an error has occurred
-		clientsock->write((unsigned short)ERROR);
+		clientsock->write((uint16_t)ERROR);
 
 		// send the error itself
 		int	errorlen=charstring::length(error);
-		clientsock->write((unsigned short)(errorlen+
+		clientsock->write((uint16_t)(errorlen+
 				charstring::length(cursor->querybuffer)+18));
 		clientsock->write(error,errorlen);
 
@@ -55,14 +55,14 @@ bool sqlrconnection::returnError(sqlrcursor *cursor) {
 		// client will be sending skip/fetch,
 		// better get it even though we're not gonna
 		// use it
-		unsigned long	skipfetch;
+		uint32_t	skipfetch;
 		clientsock->read(&skipfetch);
 		clientsock->read(&skipfetch);
 
 		// Even though there was an error, we still 
 		// need to send the client the id of the 
 		// cursor that it's going to use.
-		clientsock->write((unsigned short)cursor->id);
+		clientsock->write(cursor->id);
 		flushWriteBuffer();
 
 

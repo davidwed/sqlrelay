@@ -6,8 +6,8 @@
 
 bool sqlrconnection::getReconnect() {
 
-	unsigned short	recon;
-	if (cs->read(&recon)!=sizeof(unsigned short)) {
+	uint16_t	recon;
+	if (cs->read(&recon)!=sizeof(uint16_t)) {
 		setError("Failed to get whether we need to reconnect.\n A network error may have ocurred.");
 		return false;
 	}

@@ -6,8 +6,8 @@
 bool sqlrconnection::getNewPort() {
 
 	// get the size of the unix port string
-	unsigned short	size;
-	if (cs->read(&size)!=sizeof(unsigned short)) {
+	uint16_t	size;
+	if (cs->read(&size)!=sizeof(uint16_t)) {
 		setError("Failed to get the size of the unix connection port.\n A network error may have ocurred.");
 		return false;
 	}
@@ -19,7 +19,7 @@ bool sqlrconnection::getNewPort() {
 		errstr.append("The pathname of the unix port was too long: ");
 		errstr.append(size);
 		errstr.append(" bytes.  The maximum size is ");
-		errstr.append((unsigned short)MAXPATHLEN);
+		errstr.append((uint16_t)MAXPATHLEN);
 		errstr.append(" bytes.");
 		setError(errstr.getString());
 		return false;
@@ -34,7 +34,7 @@ bool sqlrconnection::getNewPort() {
 	connectionunixport=connectionunixportbuffer;
 
 	// get the inet port
-	if (cs->read(&connectioninetport)!=sizeof(unsigned short)) {
+	if (cs->read(&connectioninetport)!=sizeof(uint16_t)) {
 		setError("Failed to get the inet connection port.\n A network error may have ocurred.");
 		return false;
 	}

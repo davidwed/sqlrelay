@@ -13,12 +13,12 @@ REQUIRE: 1.925
 sqlrconnection *
 sqlrconnection::new(server,port,socket,user,password,retrytime,tries)
 		const char *server
-		int port
+		uint16_t port
 		const char *socket
 		const char *user
 		const char *password
-		int retrytime
-		int tries
+		int32_t retrytime
+		int32_t tries
 	CODE:
 		RETVAL=new sqlrconnection(server,port,socket,
 					user,password,retrytime,tries);
@@ -37,7 +37,7 @@ sqlrconnection::endSession()
 bool
 sqlrconnection::suspendSession()
 
-int
+int16_t
 sqlrconnection::getConnectionPort()
 
 const char *
@@ -45,7 +45,7 @@ sqlrconnection::getConnectionSocket()
 
 bool
 sqlrconnection::resumeSession(port,socket)
-		int	port
+		int16_t		port
 		const char	*socket
 
 bool

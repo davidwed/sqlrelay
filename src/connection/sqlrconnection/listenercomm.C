@@ -76,7 +76,7 @@ void sqlrconnection::announceAvailability(const char *tmpdir,
 
 		// write the pid into the segment
 		idmemoryptr->connectioninfo.connectionpid=
-					(unsigned long)process::getProcessId();
+						process::getProcessId();
 
 	} else {
 
@@ -137,8 +137,8 @@ void sqlrconnection::registerForHandoff(const char *tmpdir) {
 		if (handoffsockun.connect(handoffsockname,-1,-1,1,0)==
 							RESULT_SUCCESS) {
 			if (handoffsockun.write(
-				(unsigned long)process::getProcessId())==
-							sizeof(unsigned long)) {
+				(uint32_t)process::getProcessId())==
+							sizeof(uint32_t)) {
 				connected=true;
 				break;
 			}
@@ -182,7 +182,7 @@ void sqlrconnection::deRegisterForHandoff(const char *tmpdir) {
 	// attach to the socket and write the process id
 	unixclientsocket	removehandoffsockun;
 	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
-	removehandoffsockun.write((unsigned long)process::getProcessId());
+	removehandoffsockun.write((uint32_t)process::getProcessId());
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done de-registering for handoff");

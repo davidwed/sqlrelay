@@ -22,7 +22,7 @@ bool sqlrconnection::commit() {
 	char	*commitquery="commit";
 	int	commitquerylen=6;
 	bool	retval=false;
-	if (commitcur->openCursor(-1) &&
+	if (commitcur->openCursor(0) &&
 		commitcur->prepareQuery(commitquery,commitquerylen)) {
 		retval=commitcur->executeQuery(commitquery,commitquerylen,true);
 	}

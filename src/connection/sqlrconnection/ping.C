@@ -15,7 +15,7 @@ bool sqlrconnection::ping() {
 	sqlrcursor	*pingcur=initCursor();
 	const char	*pingquery=pingQuery();
 	int		pingquerylen=charstring::length(pingQuery());
-	if (pingcur->openCursor(-1) &&
+	if (pingcur->openCursor(0) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
 		pingcur->executeQuery(pingquery,pingquerylen,true)) {
 		pingcur->cleanUpData(true,true);

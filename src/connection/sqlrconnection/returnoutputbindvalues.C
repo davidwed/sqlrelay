@@ -7,11 +7,11 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning output bind values");
-	debugPrint("connection",3,(long)cursor->outbindcount);
+	debugPrint("connection",3,cursor->outbindcount);
 	#endif
 
 	// run through the output bind values, sending them back
-	for (unsigned short i=0; i<cursor->outbindcount; i++) {
+	for (uint16_t i=0; i<cursor->outbindcount; i++) {
 
 		bindvar	*bv=&(cursor->outbindvars[i]);
 
@@ -27,7 +27,7 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 			debugstr->append("NULL");
 			#endif
 
-			clientsock->write((unsigned short)NULL_DATA);
+			clientsock->write((uint16_t)NULL_DATA);
 
 		} else if (bv->type==BLOB_BIND) {
 
@@ -52,7 +52,7 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 			debugstr->append(bv->value.stringval);
 			#endif
 
-			clientsock->write((unsigned short)NORMAL_DATA);
+			clientsock->write((uint16_t)NORMAL_DATA);
 			bv->valuesize=charstring::length(
 						(char *)bv->value.stringval);
 			clientsock->write(bv->valuesize);
@@ -65,7 +65,7 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 			debugstr->append(bv->value.cursorid);
 			#endif
 
-			clientsock->write((unsigned short)CURSOR_DATA);
+			clientsock->write((uint16_t)CURSOR_DATA);
 			clientsock->write(bv->value.cursorid);
 		}
 

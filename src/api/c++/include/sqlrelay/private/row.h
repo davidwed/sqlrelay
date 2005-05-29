@@ -4,26 +4,28 @@
 #ifndef ROW_H
 #define ROW_H
 
+#include <stdint.h>
+
 class row {
 	friend class sqlrcursor;
 	private:
-			row(int colcount);
+			row(uint32_t colcount);
 			~row();
-		void	resize(int colcount);
-		void	addField(int column, 
-				const char *buffer, unsigned long length);
+		void	resize(uint32_t colcount);
+		void	addField(uint32_t column, 
+				const char *buffer, uint32_t length);
 
-		char		*getField(int column) const;
-		unsigned long	getFieldLength(int column) const;
+		char		*getField(uint32_t column) const;
+		uint32_t	getFieldLength(uint32_t column) const;
 
 		row	*next;
 
 		char		*fields[OPTIMISTIC_COLUMN_COUNT];
-		unsigned long	fieldlengths[OPTIMISTIC_COLUMN_COUNT];
+		uint32_t	fieldlengths[OPTIMISTIC_COLUMN_COUNT];
 		char		**extrafields;
-		unsigned long	*extrafieldlengths;
+		uint32_t	*extrafieldlengths;
 
-		int	colcount;
+		uint32_t	colcount;
 };
 
 #endif

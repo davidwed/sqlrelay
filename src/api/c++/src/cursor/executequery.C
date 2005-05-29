@@ -111,7 +111,7 @@ bool sqlrcursor::executeQuery() {
 		
 				// first iterate through the arrays passed in
 				found=false;
-				for (int i=0; i<subcount && !found; i++) {
+				for (uint16_t i=0; i<subcount && !found; i++) {
 		
 					// if we find a match, write the 
 					// value to the container and skip 
@@ -182,11 +182,11 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 	char	*after;
 	bool	found;
 	int	len;
-	unsigned short	count;
+	uint16_t	count;
 
 	// check each input bind
 	count=inbindcount;
-	for (unsigned short i=0; i<count; i++) {
+	for (uint16_t i=0; i<count; i++) {
 
 		// don't check bind-by-position variables
 		len=charstring::length(inbindvars[i].variable);
@@ -222,14 +222,14 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 		}
 
 		if (!found) {
-			inbindvars[i].send=0;
+			inbindvars[i].send=false;
 			inbindcount--;
 		}
 	}
 
 	// check each output bind
 	count=outbindcount;
-	for (unsigned short i=0; i<count; i++) {
+	for (uint16_t i=0; i<count; i++) {
 
 		// don't check bind-by-position variables
 		len=charstring::length(outbindvars[i].variable);
@@ -264,13 +264,13 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 		}
 
 		if (!found) {
-			outbindvars[i].send=0;
+			outbindvars[i].send=false;
 			outbindcount--;
 		}
 	}
 }
 
-void sqlrcursor::performSubstitution(stringbuffer *buffer, int which) {
+void sqlrcursor::performSubstitution(stringbuffer *buffer, uint16_t which) {
 
 	if (subvars[which].type==STRING_BIND) {
 		buffer->append(subvars[which].value.stringval);

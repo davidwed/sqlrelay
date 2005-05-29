@@ -19,9 +19,9 @@ class authenticator {
 
 	private:
 		linkedlist< usercontainer * >	userlist;
-		unsigned long			usercount;
-		char			**users;
-		char			**passwords;
+		uint32_t			usercount;
+		char				**users;
+		char				**passwords;
 };
 
 #endif

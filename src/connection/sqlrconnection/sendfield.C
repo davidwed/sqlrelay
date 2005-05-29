@@ -3,17 +3,17 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::sendField(const char *data, unsigned long size) {
+void sqlrconnection::sendField(const char *data, uint32_t size) {
 
 	#ifdef SERVER_DEBUG
 	debugstr->append("\"");
-	for (unsigned long i=0; i<size; i++) {
+	for (uint32_t i=0; i<size; i++) {
 		debugstr->append(data[i]);
 	}
 	debugstr->append("\",");
 	#endif
 
-	clientsock->write((unsigned short)NORMAL_DATA);
+	clientsock->write((uint16_t)NORMAL_DATA);
 	clientsock->write(size);
 	clientsock->write(data,size);
 }
@@ -24,22 +24,22 @@ void sqlrconnection::sendNullField() {
 	debugstr->append("NULL");
 	#endif
 
-	clientsock->write((unsigned short)NULL_DATA);
+	clientsock->write((uint16_t)NULL_DATA);
 }
 
 void sqlrconnection::startSendingLong() {
-	clientsock->write((unsigned short)START_LONG_DATA);
+	clientsock->write((uint16_t)START_LONG_DATA);
 }
 
-void sqlrconnection::sendLongSegment(const char *data, unsigned long size) {
+void sqlrconnection::sendLongSegment(const char *data, uint32_t size) {
 
 	#ifdef SERVER_DEBUG
-	for (unsigned long i=0; i<size; i++) {
+	for (uint32_t i=0; i<size; i++) {
 		debugstr->append(data[i]);
 	}
 	#endif
 
-	clientsock->write((unsigned short)NORMAL_DATA);
+	clientsock->write((uint16_t)NORMAL_DATA);
 	clientsock->write(size);
 	clientsock->write(data,size);
 }
@@ -50,5 +50,5 @@ void sqlrconnection::endSendingLong() {
 	debugstr->append(",");
 	#endif
 
-	clientsock->write((unsigned short)END_LONG_DATA);
+	clientsock->write((uint16_t)END_LONG_DATA);
 }

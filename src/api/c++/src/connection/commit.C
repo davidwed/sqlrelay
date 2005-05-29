@@ -17,7 +17,7 @@ bool sqlrconnection::commit() {
 		debugPreEnd();
 	}
 
-	cs->write((unsigned short)COMMIT);
+	cs->write((uint16_t)COMMIT);
 
 	flushWriteBuffer();
 

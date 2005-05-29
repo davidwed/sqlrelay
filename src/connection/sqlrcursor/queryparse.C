@@ -47,7 +47,7 @@ char *sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
 	return ptr;
 }
 
-void sqlrcursor::checkForTempTable(const char *query, unsigned long length) {
+void sqlrcursor::checkForTempTable(const char *query, uint32_t length) {
 
 	char	*ptr=(char *)query;
 	char	*endptr=(char *)query+length;
@@ -93,9 +93,8 @@ bool sqlrcursor::skipWhitespace(char **ptr, const char *endptr) {
 	return *ptr!=endptr;
 }
 
-bool sqlrcursor::advance(char **ptr, const char *endptr,
-						unsigned short steps) {
-	for (unsigned short i=0; i<steps && *ptr<endptr; i++) {
+bool sqlrcursor::advance(char **ptr, const char *endptr, uint16_t steps) {
+	for (uint16_t i=0; i<steps && *ptr<endptr; i++) {
 		(*ptr)++;
 	}
 	return *ptr!=endptr;

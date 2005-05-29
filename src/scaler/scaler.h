@@ -32,10 +32,10 @@ class scaler : public daemonprocess {
 		bool	openMoreConnections();
 		void	getRandomConnectionId();
 		bool	availableDatabase();
-		int	countSessions();
-		int	countConnections();
+		int32_t	countSessions();
+		int32_t	countConnections();
 
-		int		tmpdirlen;
+		int32_t		tmpdirlen;
 
 		char		*pidfile;
 
@@ -45,10 +45,10 @@ class scaler : public daemonprocess {
 
 		sqlrconfigfile	*cfgfile;
 
-		int		maxconnections;
-		int		maxqueuelength;
-		int		growby;
-		int		ttl;
+		int32_t		maxconnections;
+		int32_t		maxqueuelength;
+		int32_t		growby;
+		int32_t		ttl;
 
 		char		*idfilename;
 
@@ -58,13 +58,13 @@ class scaler : public daemonprocess {
 
 		linkedlist< connectstringcontainer * >	*connectstringlist;
 		const char		*connectionid;
-		int			metrictotal;
+		int32_t			metrictotal;
 
 		int		currentseed;
 
 		bool		init;
 
-		int		debug;
+		bool		debug;
 };
 
 #endif

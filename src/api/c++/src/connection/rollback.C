@@ -17,7 +17,7 @@ bool sqlrconnection::rollback() {
 		debugPreEnd();
 	}
 
-	cs->write((unsigned short)ROLLBACK);
+	cs->write((uint16_t)ROLLBACK);
 	flushWriteBuffer();
 
 	bool	response;

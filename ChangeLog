@@ -1,3 +1,16 @@
+0.37 - integrated Charles Frank's SID code
+	fixed bug in configure script where it would erroneously report that
+		the MDB tools connection wouldn't be built
+	single-quotes and backslashes are escaped when using fake input binds
+		now
+	fixed "integer expression expected" error when running
+		configure --disable-python
+	changed "connections" to "instance id's" in /etc/sqlrelay
+	sqlrsh's help displays help for ping/identify commands
+	changed sybase installation instructions to use alien on debian
+	changed test -n -r "${sysconfdir}/sqlrelay.conf" to 
+		test ! -r "${sysconfdir}/sqlrelay.conf" in init scripts
+
 0.36 - configure script defaults db2 version to 8
 	configure script detects various odbc function paramters, uses them to
 		build odbc connection

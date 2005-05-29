@@ -39,7 +39,7 @@ query: query.C query.lo
 fields: fields.C fields.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.lo $(LIBS) $(RPATH)
 
-sqlrsh: sqlrsh.C sqlrsh.lo
+sqlrsh: sqlrsh.C sqlrsh.lo 
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIB) $(RPATH)
 
 install:

@@ -46,7 +46,7 @@ bool sqlrconnection::openSession() {
 			debugPrint("Inet socket: ");
 			debugPrint(server);
 			debugPrint(":");
-			debugPrint((long)listenerinetport);
+			debugPrint((int32_t)listenerinetport);
 			debugPrint("\n");
 			debugPreEnd();
 		}
@@ -65,6 +65,9 @@ bool sqlrconnection::openSession() {
 	}
 
 	// use 8k read and write buffers
+	cs->dontUseNaglesAlgorithm();
+	cs->setTcpReadBufferSize(8192);
+	cs->setTcpWriteBufferSize(0);
 	cs->setReadBufferSize(8192);
 	cs->setWriteBufferSize(8192);
 
@@ -145,7 +148,7 @@ bool sqlrconnection::openSession() {
 				debugPrint(server);
 				debugPrint("\n");
 				debugPrint("	inet port: ");
-				debugPrint((long)connectioninetport);
+				debugPrint((int32_t)connectioninetport);
 				debugPrint("\n");
 				debugPreEnd();
 			}
@@ -172,6 +175,9 @@ bool sqlrconnection::openSession() {
 		if (connected) {
 
 			// use 8k read and write buffers
+			cs->dontUseNaglesAlgorithm();
+			cs->setTcpReadBufferSize(8192);
+			cs->setTcpWriteBufferSize(0);
 			cs->setReadBufferSize(8192);
 			cs->setWriteBufferSize(8192);
 

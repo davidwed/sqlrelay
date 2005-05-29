@@ -12,13 +12,13 @@ bool sqlrconnection::authenticateCommand() {
 
 	if (!authenticate()) {
 		// indicate that an error has occurred
-		clientsock->write((unsigned short)ERROR);
+		clientsock->write((uint16_t)ERROR);
 		flushWriteBuffer();
 		endSession();
 		return false;
 	}
 	// indicate that no error has occurred
-	clientsock->write((unsigned short)NO_ERROR);
+	clientsock->write((uint16_t)NO_ERROR);
 	flushWriteBuffer();
 	return true;
 }
@@ -48,10 +48,10 @@ bool sqlrconnection::authenticate() {
 }
 
 bool sqlrconnection::getUserFromClient() {
-	unsigned long size=0;
-	if (clientsock->read(&size)==sizeof(unsigned long) &&
-		size<=(unsigned long)USERSIZE &&
-		(unsigned long)(clientsock->read(userbuffer,size))==size) {
+	uint32_t	size=0;
+	if (clientsock->read(&size)==sizeof(uint32_t) &&
+		size<=(uint32_t)USERSIZE &&
+		(uint32_t)(clientsock->read(userbuffer,size))==size) {
 		userbuffer[size]=(char)NULL;
 		return true;
 	}
@@ -63,10 +63,10 @@ bool sqlrconnection::getUserFromClient() {
 }
 
 bool sqlrconnection::getPasswordFromClient() {
-	unsigned long size=0;
-	if (clientsock->read(&size)==sizeof(unsigned long) &&
-		size<=(unsigned long)USERSIZE &&
-		(unsigned long)(clientsock->read(passwordbuffer,size))==size) {
+	uint32_t size=0;
+	if (clientsock->read(&size)==sizeof(uint32_t) &&
+		size<=(uint32_t)USERSIZE &&
+		(uint32_t)(clientsock->read(passwordbuffer,size))==size) {
 		passwordbuffer[size]=(char)NULL;
 		return true;
 	}

@@ -20,19 +20,18 @@ class bindvar {
 		char	*variable;
 		union {
 			char	*stringval;
-			long	longval;
+			int32_t	longval;
 			struct {
-				double	value;
-				unsigned short	precision;
-				unsigned short	scale;
+				double		value;
+				uint32_t	precision;
+				uint32_t	scale;
 			} doubleval;
-			char	*lobval;
-			unsigned short	cursorid;
+			char		*lobval;
+			uint16_t	cursorid;
 		} value;
-		unsigned long	valuesize;
+		uint32_t	valuesize;
 		bindtype	type;
-		unsigned short	send;
-		
+		bool		send;
 };
 
 #endif

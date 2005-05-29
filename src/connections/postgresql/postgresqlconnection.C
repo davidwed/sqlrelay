@@ -24,7 +24,7 @@ static void nullNoticeProcessor(void *arg, const char *message) {
 }
 #endif
 
-int postgresqlconnection::getNumberOfConnectStringVars() {
+uint16_t postgresqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -55,10 +55,9 @@ bool postgresqlconnection::logIn() {
 		datatypeids=NULL;
 		datatypenames=NULL;
 	}
-			
+
 	// log in
-	pgconn=PQsetdbLogin(host,port,options,tty,db,
-				getUser(),getPassword());
+	pgconn=PQsetdbLogin(host,port,options,tty,db,getUser(),getPassword());
 
 	// check the status of the login
 	if (PQstatus(pgconn)==CONNECTION_BAD) {
@@ -86,7 +85,7 @@ bool postgresqlconnection::logIn() {
 
 		// create the datatype storage buffers
 		datatypecount=PQntuples(result);
-		datatypeids=new long[datatypecount];
+		datatypeids=new int32_t[datatypecount];
 		datatypenames=new char *[datatypecount];
 
 		// copy the datatype ids/names into the buffers
@@ -146,11 +145,10 @@ const char *postgresqlconnection::identify() {
 postgresqlcursor::postgresqlcursor(sqlrconnection *conn) :
 						sqlrcursor(conn) {
 	postgresqlconn=(postgresqlconnection *)conn;
-	ddlquery=0;
 	pgresult=NULL;
 }
 
-bool postgresqlcursor::executeQuery(const char *query, long length,
+bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
 	// initialize the counts
@@ -197,7 +195,7 @@ bool postgresqlcursor::executeQuery(const char *query, long length,
 	char	*affrows=PQcmdTuples(pgresult);
 	affectedrows=0;
 	if (affrows && affrows[0]) {
-		affectedrows=atol(affrows);
+		affectedrows=charstring::toUnsignedLong(affrows);
 	}
 
 	return true;
@@ -209,8 +207,7 @@ const char *postgresqlcursor::getErrorMessage(bool *liveconnection) {
 }
 
 void postgresqlcursor::returnRowCounts() {
-	// send row counts (affected rows unknown in postgresql)
-	conn->sendRowCounts((long)nrows,(long)affectedrows);
+	conn->sendRowCounts(true,nrows,true,affectedrows);
 }
 
 void postgresqlcursor::returnColumnCount() {
@@ -226,21 +223,21 @@ void postgresqlcursor::returnColumnInfo() {
 	}
 
 	// some useful variables
-	Oid	pgfieldtype;
-	unsigned short	type;
-	char	*typestring;
+	Oid		pgfieldtype;
+	uint16_t	type;
+	char		*typestring;
 	if (!postgresqlconn->typemangling) {
 		typestring=new char[6];
 	}
 	char		*name;
-	int		size;
+	int32_t		size;
 
 	// is this binary data (all columns will contain
 	// binary data if it is)
-	int	binary=PQbinaryTuples(pgresult);
+	int16_t	binary=PQbinaryTuples(pgresult);
 
 	// for each column...
-	for (int i=0; i<ncols; i++) {
+	for (int32_t i=0; i<ncols; i++) {
 
 		// Types are strange in POSTGRESQL, there are no actual
 		// types, only internal numbers that correspond to 
@@ -250,35 +247,36 @@ void postgresqlcursor::returnColumnInfo() {
 		// types, otherwise return the type number.
 		pgfieldtype=PQftype(pgresult,i);
 		if (!postgresqlconn->typemangling) {
-			sprintf(typestring,"%d",(int)pgfieldtype);
+			sprintf(typestring,"%d",(int32_t)pgfieldtype);
 		} else if (postgresqlconn->typemangling==1) {
-			if ((int)pgfieldtype==23) {
+			if ((int32_t)pgfieldtype==23) {
 				type=INT_DATATYPE;
-			} else if ((int)pgfieldtype==701) {
+			} else if ((int32_t)pgfieldtype==701) {
 				type=FLOAT_DATATYPE;
-			} else if ((int)pgfieldtype==700) {
+			} else if ((int32_t)pgfieldtype==700) {
 				type=REAL_DATATYPE;
-			} else if ((int)pgfieldtype==21) {
+			} else if ((int32_t)pgfieldtype==21) {
 				type=SMALLINT_DATATYPE;
-			} else if ((int)pgfieldtype==1042) {
+			} else if ((int32_t)pgfieldtype==1042) {
 				type=CHAR_DATATYPE;
-			} else if ((int)pgfieldtype==1043) {
+			} else if ((int32_t)pgfieldtype==1043) {
 				type=VARCHAR_DATATYPE;
-			} else if ((int)pgfieldtype==25) {
+			} else if ((int32_t)pgfieldtype==25) {
 				type=TEXT_DATATYPE;
-			} else if ((int)pgfieldtype==1082) {
+			} else if ((int32_t)pgfieldtype==1082) {
 				type=DATE_DATATYPE;
-			} else if ((int)pgfieldtype==1083) {
+			} else if ((int32_t)pgfieldtype==1083) {
 				type=TIME_DATATYPE;
-			} else if ((int)pgfieldtype==1296 || 
-					(int)pgfieldtype==1184) {
+			} else if ((int32_t)pgfieldtype==1296 || 
+					(int32_t)pgfieldtype==1184) {
 				type=TIMESTAMP_DATATYPE;
 			} else {
 				type=UNKNOWN_DATATYPE;
 			}
 		} else if (postgresqlconn->typemangling==2) {
 			for (int i=0; i<postgresqlconn->datatypecount; i++) {
-				if ((long)pgfieldtype==
+
+				if ((int32_t)pgfieldtype==
 					postgresqlconn->datatypeids[i]) {
 					typestring=postgresqlconn->
 							datatypenames[i];
@@ -334,7 +332,7 @@ bool postgresqlcursor::fetchRow() {
 void postgresqlcursor::returnRow() {
 
 	// send the row back
-	for (int col=0; col<ncols; col++) {
+	for (int32_t col=0; col<ncols; col++) {
 
 		// get the row
 		if (PQgetisnull(pgresult,currentrow,col)) {

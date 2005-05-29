@@ -17,12 +17,12 @@ const char *sqlrconnection::identify() {
 		debugPreEnd();
 	}
 
-	cs->write((unsigned short)IDENTIFY);
+	cs->write((uint16_t)IDENTIFY);
 	flushWriteBuffer();
 
 	// get the id
-	unsigned short	size;
-	if (cs->read(&size)==sizeof(unsigned short)) {
+	uint16_t	size;
+	if (cs->read(&size)==sizeof(uint16_t)) {
 		id=new char[size+1];
 		if (cs->read(id,size)!=size) {
 			setError("Failed to identify.\n A network error may have ocurred.");

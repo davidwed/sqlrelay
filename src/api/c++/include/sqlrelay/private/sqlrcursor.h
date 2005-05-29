@@ -21,25 +21,30 @@
 		void	sendGetColumnInfo();
 		void	defineOutputBindGeneric(const char *variable,
 						bindtype type,
-						unsigned long valuesize);
-		void	stringVar(bindvar *var, const char *variable, const char *value);
-		void	longVar(bindvar *var, const char *variable, long value);
+						uint32_t valuesize);
+		void	stringVar(bindvar *var,
+					const char *variable,
+					const char *value);
+		void	longVar(bindvar *var,
+					const char *variable,
+					int32_t value);
 		void	doubleVar(bindvar *var, const char *variable, 
 						double value,
-						unsigned short precision,
-						unsigned short scale);
+						uint32_t precision,
+						uint32_t scale);
 		void	lobVar(bindvar *var, const char *variable,
-					const char *value, unsigned long size,
+					const char *value, uint32_t size,
 					bindtype type);
 		void	initVar(bindvar *var, const char *variable);
-		void	performSubstitution(stringbuffer *buffer, int which);
+		void	performSubstitution(stringbuffer *buffer,
+							uint16_t which);
 		bool	runQuery(const char *query);
 		void	abortResultSet();
-		bool	processResultSet(int rowtoget);
+		bool	processResultSet(bool getallrows, uint32_t rowtoget);
 
-		int	getString(char *string, int size);
-		int	getShort(unsigned short *integer);
-		int	getLong(unsigned long *integer);
+		int32_t	getString(char *string, int32_t size);
+		int32_t	getShort(uint16_t *integer);
+		int32_t	getLong(uint32_t *integer);
 
 		bool	noError();
 		bool	getCursorId();
@@ -51,34 +56,37 @@
 		void	getErrorFromServer();
 		void	handleError();
 
-		bool	skipAndFetch(int rowtoget);
+		bool	skipAndFetch(bool getallrows, uint32_t rowtoget);
+		bool	skipRows(bool getallrows, uint32_t rowtoget);
 		void	fetchRows();
-		bool	skipRows(int rowtoget);
 
 		void	startCaching();
 		void	cacheError();
 		void	cacheNoError();
 		void	cacheColumnInfo();
-		void	cacheOutputBinds(int count);
+		void	cacheOutputBinds(uint32_t count);
 		void	cacheData();
 		void	finishCaching();
  
-		int	fetchRowIntoBuffer(int row);
+		bool	fetchRowIntoBuffer(bool getallrows,
+					uint32_t row, uint32_t *rowbufferindex);
 
 		void	createColumnArrays();
 		void	createExtraRowArray();
 		void	createFields();
 		void	createFieldLengths();
 
-		char		*getFieldInternal(int row, int col);
-		unsigned long	getFieldLengthInternal(int row, int col);
+		char		*getFieldInternal(uint32_t row,
+							uint32_t col);
+		uint32_t	getFieldLengthInternal(uint32_t row,
+							uint32_t col);
 
-		char	*getRowStorage(int length);
+		char	*getRowStorage(int32_t length);
 		void	createRowBuffers();
-		column	*getColumn(int index);
+		column	*getColumn(uint32_t index);
 		column	*getColumn(const char *name);
-		column	*getColumnInternal(int index);
-		char	*getColStorage(int length);
+		column	*getColumnInternal(uint32_t index);
+		char	*getColStorage(int32_t length);
 		void	createColumnBuffers();
 
 
@@ -88,32 +96,32 @@
 		// query
 		char		*querybuffer;
 		char		*queryptr;
-		int		querylen;
+		uint32_t	querylen;
 		char		*fullpath;
 		bool		reexecute;
 
 		// substitution variables
 		bindvar		subvars[MAXVAR];
-		int		subcount;
+		int16_t		subcount;
 
 		// bind variables
 		bindvar		inbindvars[MAXVAR];
-		unsigned short	inbindcount;
+		uint16_t	inbindcount;
 		bindvar		outbindvars[MAXVAR];
-		unsigned short	outbindcount;
-		int		validatebinds;
+		uint16_t	outbindcount;
+		bool		validatebinds;
 
 		// result set
-		long		rsbuffersize;
-		unsigned short	sendcolumninfo;
-		unsigned short	sentcolumninfo;
+		uint32_t	rsbuffersize;
+		uint16_t	sendcolumninfo;
+		uint16_t	sentcolumninfo;
 
-		unsigned short	suspendresultsetsent;
+		uint16_t	suspendresultsetsent;
 		bool		endofresultset;
 
-		unsigned short	columntypeformat;
-		unsigned long	colcount;
-		unsigned long	previouscolcount;
+		uint16_t	columntypeformat;
+		uint32_t	colcount;
+		uint32_t	previouscolcount;
 
 		columncase	colcase;
 
@@ -122,28 +130,26 @@
 		memorypool	*colstorage;
 		char		**columnnamearray;
 
-		unsigned long	firstrowindex;
-		long		rowcount;
-		long		previousrowcount;
-		unsigned short	knowsactualrows;
-		unsigned long	actualrows;
-		unsigned short	knowsaffectedrows;
-		unsigned long	affectedrows;
+		uint32_t	firstrowindex;
+		uint32_t	rowcount;
+		uint32_t	previousrowcount;
+		uint16_t	knowsactualrows;
+		uint32_t	actualrows;
+		uint16_t	knowsaffectedrows;
+		uint32_t	affectedrows;
 
 		row		**rows;
 		row		**extrarows;
 		memorypool	*rowstorage;
 		row		*firstextrarow;
-		int		getrowcount;
-		int		getrowlengthcount;
 		char		***fields;
-		unsigned long	**fieldlengths;
+		uint32_t	**fieldlengths;
 
 		bool		returnnulls;
 
 		// result set caching
 		bool		cacheon;
-		int		cachettl;
+		int32_t		cachettl;
 		char		*cachedestname;
 		char		*cachedestindname;
 		file		*cachedest;
@@ -165,12 +171,13 @@
 		sqlrcursor	*prev;
 
 		// cursor id
-		unsigned short	cursorid;
+		uint16_t	cursorid;
 		bool		havecursorid;
 
 	public:
 		void		copyReferences();
-		short		getOutputBindCursorId(const char *variable);
-		void		attachToBindCursor(short bindcursorid);
+		bool		outputBindCursorIdIsValid(const char *variable);
+		uint16_t	getOutputBindCursorId(const char *variable);
+		void		attachToBindCursor(uint16_t bindcursorid);
 
 	friend class sqlrconnection;

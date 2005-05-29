@@ -6,9 +6,7 @@
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	4096
-
-#define MAX_STRING_BIND_VALUE_SIZE	32767
+#define MAX_ITEM_BUFFER_SIZE	32768
 
 #define NUM_CONNECT_STRING_VARS 5
 
@@ -60,71 +58,72 @@ class oracle8cursor : public sqlrcursor {
 	private:
 				oracle8cursor(sqlrconnection *conn);
 				~oracle8cursor();
-		bool		openCursor(int id);
+		bool		openCursor(uint16_t id);
 		bool		closeCursor();
-		bool		prepareQuery(const char *query, long length);
+		bool		prepareQuery(const char *query,
+						uint32_t length);
 		bool		inputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned short valuesize,
-						short *isnull);
+						uint16_t valuesize,
+						int16_t *isnull);
 		bool		inputBindLong(const char *variable, 
-						unsigned short variablesize,
-						unsigned long *value);
+						uint16_t variablesize,
+						uint32_t *value);
 		bool		inputBindDouble(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value,
-						unsigned short precision,
-						unsigned short scale);
+						uint32_t precision,
+						uint32_t scale);
 		bool		outputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						char *value,
-						unsigned short valuesize,
-						short *isnull);
+						uint16_t valuesize,
+						int16_t *isnull);
 #ifdef HAVE_ORACLE_8i
 		bool		inputBindBlob(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned long valuesize,
-						short *isnull);
+						uint32_t valuesize,
+						int16_t *isnull);
 		bool		inputBindClob(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned long valuesize,
-						short *isnull);
+						uint32_t valuesize,
+						int16_t *isnull);
 		bool		inputBindGenericLob(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned long valuesize,
-						short *isnull,
+						uint32_t valuesize,
+						int16_t *isnull,
 						ub1 temptype,
 						ub2 type);
 		bool		outputBindBlob(const char *variable, 
-						unsigned short variablesize,
-						int index,
-						short *isnull);
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
 		bool		outputBindClob(const char *variable, 
-						unsigned short variablesize,
-						int index,
-						short *isnull);
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
 		bool		outputBindGenericLob(const char *variable, 
-						unsigned short variablesize,
-						int index,
-						short *isnull,
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull,
 						ub2 type);
 		bool		outputBindCursor(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						sqlrcursor *cursor);
-		void		returnOutputBindBlob(int index);
-		void		returnOutputBindClob(int index);
-		void		returnOutputBindGenericLob(int index);
+		void		returnOutputBindBlob(uint16_t index);
+		void		returnOutputBindClob(uint16_t index);
+		void		returnOutputBindGenericLob(uint16_t index);
 #endif
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 #ifdef HAVE_ORACLE_8i
 		void		checkForTempTable(const char *query,
-							unsigned long length);
+							uint32_t length);
 #endif
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
@@ -159,26 +158,26 @@ class oracle8cursor : public sqlrcursor {
 		OCIBind		*inbindpp[MAXVAR];
 		OCIBind		*outbindpp[MAXVAR];
 		OCIBind		*curbindpp[MAXVAR];
-		int		inbindcount;
-		int		outbindcount;
-		int		curbindcount;
+		uint16_t	inbindcount;
+		uint16_t	outbindcount;
+		uint16_t	curbindcount;
 
 #ifdef HAVE_ORACLE_8i
 		OCILobLocator	*inbind_lob[MAXVAR];
 		OCILobLocator	*outbind_lob[MAXVAR];
-		int		inbindlobcount;
-		int		outbindlobcount;
+		uint16_t	inbindlobcount;
+		uint16_t	outbindlobcount;
 #endif
 
-		int		row;
-		int		maxrow;
-		unsigned int	totalrows;
+		uint32_t	row;
+		uint32_t	maxrow;
+		uint32_t	totalrows;
 
-		int		fetchatonce;
+		uint32_t	fetchatonce;
 
 		char		*query;
-		int		length;
-		int		prepared;
+		uint32_t	length;
+		bool		prepared;
 
 		oracle8connection	*oracle8conn;
 
@@ -193,7 +192,7 @@ class oracle8connection : public sqlrconnection {
 				oracle8connection();
 				~oracle8connection();
 	private:
-		int		getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn();
 		void		logInError(const char *errmsg);

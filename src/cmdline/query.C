@@ -24,12 +24,12 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdline(argc,argv);
 	const char	*host;
-	int		port;
+	int16_t		port;
 	const char	*socket;
 	const char	*user;
 	const char	*password;
 	const char	*query="";
-	int		debug=0;
+	bool		debug=false;
 	int		exitval=0;
 
 	const char	*config=cmdline.value("-config");
@@ -55,7 +55,7 @@ int main(int argc, const char **argv) {
 		password=argv[5];
 		query=argv[6];
 		if (argv[7] && !charstring::compare(argv[7],"debug")) {
-			debug=1;
+			debug=true;
 		}
 
 	} else {
@@ -73,7 +73,7 @@ int main(int argc, const char **argv) {
 
 			// find the query and optional debug
 			if (cmdline.found("debug")) {
-				debug=1;
+				debug=true;
 			}
 
 			// find the query

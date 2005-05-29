@@ -18,7 +18,7 @@ oracle7connection::~oracle7connection() {
 	delete env;
 }
 
-int oracle7connection::getNumberOfConnectStringVars() {
+uint16_t oracle7connection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -135,7 +135,7 @@ oracle7cursor::~oracle7cursor() {
 	delete errormessage;
 }
 
-bool oracle7cursor::openCursor(int id) {
+bool oracle7cursor::openCursor(uint16_t id) {
 	return (!oopen(&cda,&oracle7conn->lda,
 			(text *)0,-1,-1,(text *)0,-1) &&
 			sqlrcursor::openCursor(id));
@@ -145,17 +145,17 @@ bool oracle7cursor::closeCursor() {
 	return !oclose(&cda);
 }
 
-bool oracle7cursor::prepareQuery(const char *query, long length) {
+bool oracle7cursor::prepareQuery(const char *query, uint32_t length) {
 	// parse the query
 	return (!oparse(&cda,(text *)query,(sb4)length,
 			(sword)PARSE_DEFER,(ub4)PARSE_V7_LNG));
 }
 
 bool oracle7cursor::inputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned short valuesize,
-						short *isnull) {
+						uint16_t valuesize,
+						int16_t *isnull) {
 
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -180,8 +180,8 @@ bool oracle7cursor::inputBindString(const char *variable,
 }
 
 bool oracle7cursor::inputBindLong(const char *variable, 
-						unsigned short variablesize,
-						unsigned long *value) {
+						uint16_t variablesize,
+						uint32_t *value) {
 	
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -189,13 +189,13 @@ bool oracle7cursor::inputBindLong(const char *variable,
 			return false;
 		}
 		if (obndrn(&cda,(sword)charstring::toLong(variable+1),
-			(ub1 *)value,(sword)sizeof(long),LONG_BIND_TYPE,
+			(ub1 *)value,(sword)sizeof(uint32_t),LONG_BIND_TYPE,
 			-1,(sb2 *)0,(text *)0,-1,-1)) {
 			return false;
 		}
 	} else {
 		if (obndrv(&cda,(text *)variable,(sword)variablesize,
-			(ub1 *)value,(sword)sizeof(long),LONG_BIND_TYPE,
+			(ub1 *)value,(sword)sizeof(uint32_t),LONG_BIND_TYPE,
 			-1,(sb2 *)0,(text *)0,-1,-1)) {
 			return false;
 		}
@@ -204,10 +204,10 @@ bool oracle7cursor::inputBindLong(const char *variable,
 }
 
 bool oracle7cursor::inputBindDouble(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value,
-						unsigned short precision,
-						unsigned short scale) {
+						uint32_t precision,
+						uint32_t scale) {
 	
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -230,10 +230,10 @@ bool oracle7cursor::inputBindDouble(const char *variable,
 }
 
 bool oracle7cursor::outputBindString(const char *variable, 
-					unsigned short variablesize,
+					uint16_t variablesize,
 					char *value, 
-					unsigned short valuesize, 
-					short *isnull) {
+					uint16_t valuesize, 
+					int16_t *isnull) {
 
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -257,7 +257,8 @@ bool oracle7cursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool oracle7cursor::executeQuery(const char *query, long length, bool execute) {
+bool oracle7cursor::executeQuery(const char *query, uint32_t length,
+							bool execute) {
 
 	// initialize the column count
 	ncols=0;
@@ -347,7 +348,7 @@ const char *oracle7cursor::getErrorMessage(bool *liveconnection) {
 	delete errormessage;
 	errormessage=new stringbuffer();
 	if (*liveconnection) {
-		for (int i=0; i<n; i++) {
+		for (sword i=0; i<n; i++) {
 			errormessage->append((char)message[i]);
 		}
 	}
@@ -357,7 +358,7 @@ const char *oracle7cursor::getErrorMessage(bool *liveconnection) {
 
 void oracle7cursor::returnRowCounts() {
 	// send row counts (actual row count unknown in oracle)
-	oracle7conn->sendRowCounts((long)-1,(long)cda.rpc);
+	oracle7conn->sendRowCounts(false,0,true,cda.rpc);
 }
 
 void oracle7cursor::returnColumnCount() {
@@ -369,13 +370,13 @@ void oracle7cursor::returnColumnInfo() {
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// a useful variables
-	int		type;
+	uint16_t	type;
 
 	// for each column...
-	for (int i=0; i<ncols; i++) {
+	for (sword i=0; i<ncols; i++) {
 
 		// set column type
-		unsigned short	binary=0;
+		uint16_t	binary=0;
 		if (desc[i].dbtype==VARCHAR2_TYPE) {
 			type=VARCHAR2_DATATYPE;
 		} else if (desc[i].dbtype==NUMBER_TYPE) {
@@ -402,11 +403,12 @@ void oracle7cursor::returnColumnInfo() {
 
 		// send the column definition
 		conn->sendColumnDefinition((char *)desc[i].buf,
-					(short)desc[i].buflen,type,
-					(int)desc[i].dbsize,
-					(unsigned short)desc[i].precision,
-					(unsigned short)desc[i].scale,
-					(unsigned short)desc[i].nullok,0,0,
+					(uint16_t)desc[i].buflen,
+					type,
+					(uint32_t)desc[i].dbsize,
+					(uint32_t)desc[i].precision,
+					(uint32_t)desc[i].scale,
+					(uint16_t)desc[i].nullok,0,0,
 					0,0,0,binary,0);
 	}
 }
@@ -468,7 +470,7 @@ void oracle7cursor::returnRow() {
 
 				conn->sendLongSegment((char *)
 							def_buf[col][row],
-							(long)retlen);
+							(uint32_t)retlen);
 
 				offset=offset+retlen;
 			}
@@ -481,7 +483,7 @@ void oracle7cursor::returnRow() {
 
 		// handle normal datatypes
 		conn->sendField((char *)def_buf[col][row],
-					(int)def_col_retlen[col][row]);
+					(uint32_t)def_col_retlen[col][row]);
 	}
 
 	// increment the row counter

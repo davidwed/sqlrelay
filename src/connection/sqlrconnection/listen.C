@@ -101,7 +101,7 @@ void sqlrconnection::initSession() {
 
 	commitorrollback=false;
 	suspendedsession=false;
-	for (int i=0; i<cfgfl->getCursors(); i++) {
+	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
 		cur[i]->suspendresultset=false;
 	}
 	accepttimeout=5;
@@ -111,7 +111,7 @@ void sqlrconnection::initSession() {
 	#endif
 }
 
-int sqlrconnection::waitForClient() {
+int32_t sqlrconnection::waitForClient() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"waiting for client...");
@@ -186,6 +186,9 @@ int sqlrconnection::waitForClient() {
 	}
 
 	clientsock->translateByteOrder();
+	clientsock->dontUseNaglesAlgorithm();
+	clientsock->setTcpReadBufferSize(8192);
+	clientsock->setTcpWriteBufferSize(0);
 	clientsock->setReadBufferSize(8192);
 	clientsock->setWriteBufferSize(8192);
 	return 1;

@@ -20,7 +20,7 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 		fprintf(stderr,"Warning: using default connectionid.\n");
 	}
 	// get the time to live from the command line
-	ttl=charstring::toLong(cmdl->value("-ttl"));
+	ttl=charstring::toUnsignedLong(cmdl->value("-ttl"));
 
 	cfgfl=new sqlrconfigfile();
 	authc=new authenticator(cfgfl);
@@ -48,6 +48,11 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 	}
 
 	constr=cfgfl->getConnectString(connectionid);
+	if (!constr) {
+		fprintf(stderr,"Error: invalid connectionid \"%s\".\n",
+							connectionid);
+		return false;
+	}
 	handleConnectString();
 
 	initDatabaseAvailableFileName();
@@ -57,8 +62,10 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 		return false;
 	}
 
+	bool	nodetach=cmdl->found("-nodetach");
+
 	#ifndef SERVER_DEBUG
-	if (detachbeforeloggingin) {
+	if (!nodetach && detachbeforeloggingin) {
 		// detach from the controlling tty
 		detach();
 	}
@@ -71,7 +78,7 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 	}
 
 	#ifndef SERVER_DEBUG
-	if (!detachbeforeloggingin) {
+	if (!nodetach && !detachbeforeloggingin) {
 		// detach from the controlling tty
 		detach();
 	}
@@ -366,15 +373,15 @@ bool sqlrconnection::initCursors(bool create) {
 	debugPrint("connection",0,"initializing cursors...");
 	#endif
 
-	int	cursorcount=cfgfl->getCursors();
+	int32_t	cursorcount=cfgfl->getCursors();
 	if (create) {
 		cur=new sqlrcursor *[cursorcount];
 	}
 
-	for (int i=0; i<cursorcount; i++) {
+	for (int32_t i=0; i<cursorcount; i++) {
 
 		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,(long)i);
+		debugPrint("connection",1,i);
 		#endif
 
 		if (create) {

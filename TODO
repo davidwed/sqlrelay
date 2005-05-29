@@ -1,3 +1,41 @@
+sybase on irix has libtcl rather than libsybtcl and .so files are in devlib
+	directory rather than in lib directory
+
+irix (and probably other unixes) have chkconfig but it doesn't support the
+	--add option, so init/Makefile doesn't properly symlink the boot script
+	appropriately
+
+make max clob/blob upload size configurable
+
+make everything single-process/multithread and use techniques described in 
+	the C10K problem to handle client/server io
+
+support ?'s instead of :1, :2, :3 for bind variables, Pear DB automatically
+	inserts them when using autoExecute()
+
+really long clobs (like 20 mb) cause segfaults
+
+Docs need to explain:	
+	exactly what should be put in /etc/sqlrelay
+	examples of deniedips and allowedips
+	minimum manditory connect string variables for each database
+	note that if you have mulitple instances configured with the
+		same port or socket then they cannot be run at the same time
+	a few words about what each connect string variable does
+
+make location of /etc/sqlrelay and rc.sqlrelay compile-time options
+
+make installation location of sql_relay.so and sqlrelay.php (and possibly other
+	API's files) configurable at compile-time
+
+look into OCIBreak/obreak function calls for cancelling oracle commands
+
+mdbtools connection won't compile against mdbtools-0.5 on freebsd
+
+configure script doesn't find zope on openbsd
+
+fake inputBind for strings should escape single quotes
+
 perl apis -> CPAN
 
 --------------------------------------------------------------------------------
@@ -269,7 +307,11 @@ API's:
 	dbstep
 	ADODB driver
 	PHP5 Creole driver
-		
+
+Drop-in replacement libraries:
+	Oracle OCI7/8
+	Sybase-ct
+	Interbase
 
 Native DB Support:
 	Informix
@@ -281,6 +323,7 @@ Native DB Support:
 	shsql
 	does clip provide an odbc driver for accessing x-base files?
 	daffodildb/one$db
+	LK bin DB - http://www.lksoft.cjb.net/en/
 
 Config Tools:
 	gtk2

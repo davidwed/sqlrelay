@@ -48,11 +48,11 @@ void sqlrconnection::debugPrint(const char *string) {
 	}
 }
 
-void sqlrconnection::debugPrint(long number) {
+void sqlrconnection::debugPrint(int32_t number) {
 	if (printfunction) {
-		(*printfunction)("%ld",number);
+		(*printfunction)("%d",number);
 	} else {
-		printf("%ld",number);
+		printf("%d",number);
 	}
 }
 
@@ -72,10 +72,10 @@ void sqlrconnection::debugPrint(char character) {
 	}
 }
 
-void sqlrconnection::debugPrintBlob(const char *blob, unsigned long length) {
+void sqlrconnection::debugPrintBlob(const char *blob, uint32_t length) {
 	debugPrint('\n');
 	int	column=0;
-	for (unsigned long i=0; i<length; i++) {
+	for (uint32_t i=0; i<length; i++) {
 		if (blob[i]>=' ' && blob[i]<='~') {
 			debugPrint(blob[i]);
 		} else {
@@ -90,9 +90,9 @@ void sqlrconnection::debugPrintBlob(const char *blob, unsigned long length) {
 	debugPrint('\n');
 }
 
-void sqlrconnection::debugPrintClob(const char *clob, unsigned long length) {
+void sqlrconnection::debugPrintClob(const char *clob, uint32_t length) {
 	debugPrint('\n');
-	for (unsigned long i=0; i<length; i++) {
+	for (uint32_t i=0; i<length; i++) {
 		if (clob[i]==(char)NULL) {
 			debugPrint("\\0");
 		} else {

@@ -72,29 +72,30 @@ class oracle7cursor : public sqlrcursor {
 	private:
 				oracle7cursor(sqlrconnection *conn);
 				~oracle7cursor();
-		bool		openCursor(int id);
+		bool		openCursor(uint16_t id);
 		bool		closeCursor();
-		bool		prepareQuery(const char *query, long length);
+		bool		prepareQuery(const char *query,
+						uint32_t length);
 		bool		inputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned short valuesize,
+						uint16_t valuesize,
 						short *isnull);
 		bool		inputBindLong(const char *variable, 
-						unsigned short variablesize,
-						unsigned long *value);
+						uint16_t variablesize,
+						uint32_t *value);
 		bool		inputBindDouble(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value,
-						unsigned short precision,
-						unsigned short scale);
+						uint32_t precision,
+						uint32_t scale);
 		bool		outputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						char *value,
-						unsigned short valuesize,
+						uint16_t valuesize,
 						short *isnull);
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
@@ -122,9 +123,9 @@ class oracle7cursor : public sqlrcursor {
 		ub2		def_col_retcode[MAX_SELECT_LIST_SIZE]
 							[FETCH_AT_ONCE];
 	
-		int		row;
-		int		maxrow;
-		unsigned int	totalrows;
+		uint32_t	row;
+		uint32_t	maxrow;
+		uint32_t	totalrows;
 
 		oracle7connection	*oracle7conn;
 };
@@ -136,7 +137,7 @@ class oracle7connection : public sqlrconnection {
 			oracle7connection();
 			~oracle7connection();
 	private:
-		int		getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn();
 		sqlrcursor	*initCursor();

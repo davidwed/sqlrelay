@@ -4,6 +4,6 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-int sqlrcursor::getResultSetId() {
+uint16_t sqlrcursor::getResultSetId() {
 	return cursorid;
 }

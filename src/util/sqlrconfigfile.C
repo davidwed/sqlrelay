@@ -23,7 +23,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	ttl=charstring::toLong(DEFAULT_TTL);
 	endofsession=charstring::duplicate(DEFAULT_ENDOFSESSION);
 	endofsessioncommit=!charstring::compare(endofsession,"commit");
-	sessiontimeout=::atol(DEFAULT_SESSIONTIMEOUT);
+	sessiontimeout=charstring::toUnsignedLong(DEFAULT_SESSIONTIMEOUT);
 	runasuser=charstring::duplicate(DEFAULT_RUNASUSER);
 	runasgroup=charstring::duplicate(DEFAULT_RUNASGROUP);
 	cursors=charstring::toLong(DEFAULT_CURSORS);
@@ -71,7 +71,7 @@ sqlrconfigfile::~sqlrconfigfile() {
 	}
 }
 
-int sqlrconfigfile::getPort() {
+uint16_t sqlrconfigfile::getPort() {
 	return port;
 }
 
@@ -91,23 +91,23 @@ const char *sqlrconfigfile::getDbase() {
 	return dbase;
 }
 
-int sqlrconfigfile::getConnections() {
+uint32_t sqlrconfigfile::getConnections() {
 	return connections;
 }
 
-int sqlrconfigfile::getMaxConnections() {
+uint32_t sqlrconfigfile::getMaxConnections() {
 	return maxconnections;
 }
 
-int sqlrconfigfile::getMaxQueueLength() {
+uint32_t sqlrconfigfile::getMaxQueueLength() {
 	return maxqueuelength;
 }
 
-int sqlrconfigfile::getGrowBy() {
+uint32_t sqlrconfigfile::getGrowBy() {
 	return growby;
 }
 
-int sqlrconfigfile::getTtl() {
+uint32_t sqlrconfigfile::getTtl() {
 	return ttl;
 }
 
@@ -124,7 +124,7 @@ bool sqlrconfigfile::getEndOfSessionCommit() {
 	return endofsessioncommit;
 }
 
-long sqlrconfigfile::getSessionTimeout() {
+uint32_t sqlrconfigfile::getSessionTimeout() {
 	return sessiontimeout;
 }
 
@@ -136,7 +136,7 @@ const char *sqlrconfigfile::getRunAsGroup() {
 	return runasgroup;
 }
 
-int sqlrconfigfile::getCursors() {
+uint16_t sqlrconfigfile::getCursors() {
 	return cursors;
 }
 
@@ -212,11 +212,11 @@ connectstringcontainer *sqlrconfigfile::getConnectString(
 	return NULL;
 }
 
-int sqlrconfigfile::getConnectionCount() {
+uint32_t sqlrconfigfile::getConnectionCount() {
 	return connectstringlist.getLength();
 }
 
-int sqlrconfigfile::getMetricTotal() {
+uint32_t sqlrconfigfile::getMetricTotal() {
 	// This is tallied here instead of whenever the parser runs into a
 	// metric attribute because people often forget to include metric
 	// attributes.  In that case, though each connection has a metric,
@@ -336,7 +336,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 
 		// if we have found the correct id, process the attribute
 		if (currentattribute==PORT_ATTRIBUTE) {
-			port=atoi(value,DEFAULT_PORT,1);
+			port=atouint32_t(value,DEFAULT_PORT,1);
 			listenoninet=true;
 		} else if (currentattribute==SOCKET_ATTRIBUTE) {
 			delete[] unixport;
@@ -348,15 +348,17 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			dbase=charstring::duplicate((value)?value:
 							DEFAULT_DBASE);
 		} else if (currentattribute==CONNECTIONS_ATTRIBUTE) {
-			connections=atoi(value,DEFAULT_CONNECTIONS,0);
+			connections=atouint32_t(value,DEFAULT_CONNECTIONS,0);
 		} else if (currentattribute==MAXCONNECTIONS_ATTRIBUTE) {
-			maxconnections=atoi(value,DEFAULT_MAXCONNECTIONS,1);
+			maxconnections=
+				atouint32_t(value,DEFAULT_MAXCONNECTIONS,1);
 		} else if (currentattribute==MAXQUEUELENGTH_ATTRIBUTE) {
-			maxqueuelength=atoi(value,DEFAULT_MAXQUEUELENGTH,0);
+			maxqueuelength=
+				atouint32_t(value,DEFAULT_MAXQUEUELENGTH,0);
 		} else if (currentattribute==GROWBY_ATTRIBUTE) {
-			growby=atoi(value,DEFAULT_GROWBY,1);
+			growby=atouint32_t(value,DEFAULT_GROWBY,1);
 		} else if (currentattribute==TTL_ATTRIBUTE) {
-			ttl=atoi(value,DEFAULT_TTL,1);
+			ttl=atouint32_t(value,DEFAULT_TTL,1);
 		} else if (currentattribute==ENDOFSESSION_ATTRIBUTE) {
 			delete[] endofsession;
 			endofsession=charstring::duplicate((value)?value:
@@ -364,7 +366,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			endofsessioncommit=
 				!charstring::compare(endofsession,"commit");
 		} else if (currentattribute==SESSIONTIMEOUT_ATTRIBUTE) {
-			sessiontimeout=atol(value,DEFAULT_SESSIONTIMEOUT,1);
+			sessiontimeout=
+				atouint32_t(value,DEFAULT_SESSIONTIMEOUT,1);
 		} else if (currentattribute==RUNASUSER_ATTRIBUTE) {
 			delete[] runasuser;
 			runasuser=charstring::duplicate((value)?value:
@@ -374,7 +377,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			runasgroup=charstring::duplicate((value)?value:
 							DEFAULT_RUNASGROUP);
 		} else if (currentattribute==CURSORS_ATTRIBUTE) {
-			cursors=atoi(value,DEFAULT_CURSORS,1);
+			cursors=atouint32_t(value,DEFAULT_CURSORS,1);
 		} else if (currentattribute==AUTHTIER_ATTRIBUTE) {
 			delete[] authtier;
 			authtier=charstring::duplicate((value)?value:
@@ -423,26 +426,19 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							DEFAULT_CONNECTSTRING);
 			currentconnect->parseConnectString();
 		} else if (currentattribute==METRIC_ATTRIBUTE) {
-			currentconnect->setMetric(atoi(value,DEFAULT_METRIC,1));
+			currentconnect->setMetric(
+					atouint32_t(value,DEFAULT_METRIC,1));
 		}
 	}
 	return true;
 }
 
-int sqlrconfigfile::atoi(const char *value,
-				const char *defaultvalue, int minvalue) {
-	int	retval=charstring::toLong((value)?value:defaultvalue);
+uint32_t sqlrconfigfile::atouint32_t(const char *value,
+				const char *defaultvalue, uint32_t minvalue) {
+	uint32_t	retval=charstring::toUnsignedLong(
+						(value)?value:defaultvalue);
 	if (retval<minvalue) {
-		retval=charstring::toLong(defaultvalue);
-	}
-	return retval;
-}
-
-long sqlrconfigfile::atol(const char *value,
-				const char *defaultvalue, long minvalue) {
-	long	retval=::atol((value)?value:defaultvalue);
-	if (retval<minvalue) {
-		retval=::atol(defaultvalue);
+		retval=charstring::toUnsignedLong(defaultvalue);
 	}
 	return retval;
 }
@@ -462,12 +458,12 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 	return true;
 }
 
-int sqlrconfigfile::parse(const char *config, const char *id) {
+bool sqlrconfigfile::parse(const char *config, const char *id) {
 	return parse(config,id,0);
 }
 
-int sqlrconfigfile::parse(const char *config, const char *id,
-					int connectstringcount) {
+bool sqlrconfigfile::parse(const char *config, const char *id,
+					uint16_t connectstringcount) {
 
 	// init some variables
 	this->connectstringcount=connectstringcount;
@@ -476,10 +472,10 @@ int sqlrconfigfile::parse(const char *config, const char *id,
 	done=false;
 
 	// parse the file
-	int	retval=1;
+	bool	retval=true;
 	if (!parseFile(config)) {
 		fprintf(stderr,"Couldn't parse config file %s.\n",config);
-		retval=0;
+		retval=false;
 	}
 
 	// parse the user's .sqlrelay.conf file
@@ -500,7 +496,7 @@ int sqlrconfigfile::parse(const char *config, const char *id,
 	// if the specified instance wasn't found, warn the user
 	if (!done) {
 		fprintf(stderr,"Couldn't find id %s.\n",id);
-		retval=0;
+		retval=false;
 	}
 
 	return retval;
@@ -536,7 +532,7 @@ const char *usercontainer::getPassword() {
 	return password;
 }
 
-connectstringcontainer::connectstringcontainer(int connectstringcount) {
+connectstringcontainer::connectstringcontainer(uint16_t connectstringcount) {
 	this->connectstringcount=connectstringcount;
 	connectionid=NULL;
 	string=NULL;
@@ -560,7 +556,7 @@ void connectstringcontainer::setString(const char *string) {
 	}
 }
 
-void connectstringcontainer::setMetric(int metric) {
+void connectstringcontainer::setMetric(uint32_t metric) {
 	this->metric=metric;
 }
 
@@ -572,7 +568,7 @@ const char *connectstringcontainer::getString() {
 	return string;
 }
 
-int connectstringcontainer::getMetric() {
+uint32_t connectstringcontainer::getMetric() {
 	return metric;
 }
 

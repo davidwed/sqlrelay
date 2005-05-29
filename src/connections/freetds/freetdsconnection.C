@@ -33,7 +33,7 @@ freetdsconnection::~freetdsconnection() {
 	delete env;
 }
 
-int freetdsconnection::getNumberOfConnectStringVars() {
+uint16_t freetdsconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -158,7 +158,7 @@ bool freetdsconnection::logIn() {
 
 	// set encryption
 	if (encryption && charstring::toLong(encryption)==1) {
-		enc=CS_TRUE;
+		CS_INT	enc=CS_TRUE;
 		if (ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 			(CS_VOID *)&enc,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -212,7 +212,7 @@ bool freetdsconnection::logIn() {
 	return true;
 }
 
-void freetdsconnection::logInError(const char *error, int stage) {
+void freetdsconnection::logInError(const char *error, uint16_t stage) {
 
 	fprintf(stderr,"%s\n",error);
 
@@ -319,11 +319,11 @@ freetdscursor::~freetdscursor() {
 	delete[] cursorname;
 }
 
-bool freetdscursor::openCursor(int id) {
+bool freetdscursor::openCursor(uint16_t id) {
 
 	clean=true;
 
-	cursorname=charstring::parseNumber((long)id);
+	cursorname=charstring::parseNumber(id);
 
 	if (ct_cmd_alloc(freetdsconn->dbconn,&languagecmd)!=CS_SUCCEED) {
 		return false;
@@ -336,8 +336,8 @@ bool freetdscursor::openCursor(int id) {
 	// switch to the correct database
 	bool	retval=true;
 	if (freetdsconn->db && freetdsconn->db[0]) {
-		int	len=charstring::length(freetdsconn->db)+4;
-		char	query[len+1];
+		uint32_t	len=charstring::length(freetdsconn->db)+4;
+		char		query[len+1];
 		sprintf(query,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true))) {
@@ -364,7 +364,7 @@ bool freetdscursor::closeCursor() {
 	return retval;
 }
 
-bool freetdscursor::prepareQuery(const char *query, long length) {
+bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 
 	clean=true;
 
@@ -436,10 +436,10 @@ void freetdscursor::checkRePrepare() {
 }
 
 /*bool freetdscursor::inputBindString(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value,
-						unsigned short valuesize,
-						short *isnull) {
+						uint16_t valuesize,
+						int15_t *isnull) {
 
 	checkRePrepare();
 
@@ -465,8 +465,8 @@ void freetdscursor::checkRePrepare() {
 }
 
 bool freetdscursor::inputBindLong(const char *variable,
-						unsigned short variablesize,
-						unsigned long *value) {
+						uint16_t variablesize,
+						uint32_t *value) {
 
 	checkRePrepare();
 
@@ -484,7 +484,7 @@ bool freetdscursor::inputBindLong(const char *variable,
 	parameter[paramindex].status=CS_INPUTVALUE;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-		(CS_VOID *)value,sizeof(long),0)!=CS_SUCCEED) {
+		(CS_VOID *)value,sizeof(int32_t),0)!=CS_SUCCEED) {
 		return false;
 	}
 	paramindex++;
@@ -492,10 +492,10 @@ bool freetdscursor::inputBindLong(const char *variable,
 }
 
 bool freetdscursor::inputBindDouble(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value,
-						unsigned short precision,
-						unsigned short scale) {
+						uint32_t precision,
+						uint32_t scale) {
 
 	checkRePrepare();
 
@@ -523,10 +523,10 @@ bool freetdscursor::inputBindDouble(const char *variable,
 }
 
 bool freetdscursor::outputBindString(const char *variable, 
-					unsigned short variablesize,
+					uint16_t variablesize,
 					char *value, 
-					unsigned short valuesize, 
-					short *isnull) {
+					uint16_t valuesize, 
+					int15_t *isnull) {
 
 	outbindvalues[outbindindex]=value;
 	outbindvaluelengths[outbindindex]=valuesize;
@@ -554,7 +554,8 @@ bool freetdscursor::outputBindString(const char *variable,
 	return true;
 }*/
 
-bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
+bool freetdscursor::executeQuery(const char *query, uint32_t length,
+							bool execute) {
 
 	// clear out any errors
 	if (freetdsconn->errorstring) {
@@ -588,6 +589,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 
 	// initialize return values
 	ncols=0;
+	knowsaffectedrows=false;
 	affectedrows=0;
 	row=0;
 	maxrow=0;
@@ -677,9 +679,9 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 	// Affected row count is only supported in versio>=0.53 but appears
 	// to be broken in 0.61 as well
 	if (majorversion==0 && (minorversion<53 || minorversion==61)) {
-		affectedrows=-1;
+		knowsaffectedrows=false;
 	} else {
-		affectedrows=0;
+		knowsaffectedrows=true;
 	}
 
 	bool	moneycolumn=false;
@@ -700,7 +702,7 @@ bool freetdscursor::executeQuery(const char *query, long length, bool execute) {
 		}
 
 		// bind columns
-		for (int i=0; i<(int)ncols; i++) {
+		for (CS_INT i=0; i<ncols; i++) {
 
 			// dealing with money columns cause freetds < 0.53 to
 			// crash, take care of that here...
@@ -824,7 +826,7 @@ const char *freetdscursor::getErrorMessage(bool *liveconnection) {
 void freetdscursor::returnRowCounts() {
 
 	// send row counts (actual row count unknown in sybase)
-	conn->sendRowCounts((long)-1,(long)affectedrows);
+	conn->sendRowCounts(false,0,knowsaffectedrows,affectedrows);
 }
 
 void freetdscursor::returnColumnCount() {
@@ -845,10 +847,10 @@ void freetdscursor::returnColumnInfo() {
 	}
 
 	// gonna need this later
-	int	type;
+	int32_t	type;
 
 	// for each column...
-	for (int i=0; i<(int)ncols; i++) {
+	for (CS_INT i=0; i<ncols; i++) {
 
 		// get the column description
 		if (ct_describe(cmd,i+1,&column[i])!=CS_SUCCEED) {
@@ -856,7 +858,7 @@ void freetdscursor::returnColumnInfo() {
 		}
 	
 		// set the datatype
-		unsigned short	binary=0;
+		uint16_t	binary=0;
 		if (column[i].datatype==CS_CHAR_TYPE) {
 			type=CHAR_DATATYPE;
 		} else if (column[i].datatype==CS_INT_TYPE) {
@@ -976,7 +978,7 @@ bool freetdscursor::fetchRow() {
 void freetdscursor::returnRow() {
 
 	// send each row back
-	for (int col=0; col<(int)ncols; col++) {
+	for (CS_INT col=0; col<ncols; col++) {
 		if (nullindicator[col][row]>-1 && datalength[col][row]) {
 			conn->sendField(data[col][row],datalength[col][row]-1);
 		} else {
@@ -1049,16 +1051,16 @@ CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt,
 
 	errorstring->append("Client Library error:\n");
 	errorstring->append("	severity(")->
-				append((long)CS_SEVERITY(msgp->msgnumber))->
+				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	layer(")->
-				append((long)CS_LAYER(msgp->msgnumber))->
+				append((int32_t)CS_LAYER(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	origin(")->
-				append((long)CS_ORIGIN(msgp->msgnumber))->
+				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	number(")->
-				append((long)CS_NUMBER(msgp->msgnumber))->
+				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("Error:	")->append(msgp->msgstring)->
 				append("\n");
@@ -1099,16 +1101,16 @@ CS_RETCODE freetdsconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 
 	errorstring->append("Client Library error:\n");
 	errorstring->append("	severity(")->
-				append((long)CS_SEVERITY(msgp->msgnumber))->
+				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	layer(")->
-				append((long)CS_LAYER(msgp->msgnumber))->
+				append((int32_t)CS_LAYER(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	origin(")->
-				append((long)CS_ORIGIN(msgp->msgnumber))->
+				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	number(")->
-				append((long)CS_NUMBER(msgp->msgnumber))->
+				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("Error:	")->append(msgp->msgstring)->
 				append("\n");
@@ -1157,13 +1159,13 @@ CS_RETCODE freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	errorstring->append("Server message:\n");
 	errorstring->append("	severity(")->
-				append((long)msgp->severity)->append(")\n");
+				append((int32_t)msgp->severity)->append(")\n");
 	errorstring->append("	number(")->
-				append((long)msgp->msgnumber)->append(")\n");
+				append((int32_t)msgp->msgnumber)->append(")\n");
 	errorstring->append("	state(")->
-				append((long)msgp->state)->append(")\n");
+				append((int32_t)msgp->state)->append(")\n");
 	errorstring->append("	line(")->
-				append((long)msgp->line)->append(")\n");
+				append((int32_t)msgp->line)->append(")\n");
 	errorstring->append("Server Name:\n")->
 				append(msgp->svrname)->append("\n");
 	errorstring->append("Procedure Name:\n")->

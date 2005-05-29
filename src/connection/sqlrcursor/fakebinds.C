@@ -34,7 +34,7 @@ stringbuffer *sqlrcursor::fakeInputBinds(const char *query) {
 		if (!inquotes && (*ptr==prefix || *ptr=='?')) {
 
 			// look through the list of vars
-			for (int i=0; i<inbindcount; i++) {
+			for (int16_t i=0; i<inbindcount; i++) {
 
 				// if we find a match, perform the substitution
 				// and skip past the variable...
@@ -103,11 +103,27 @@ stringbuffer *sqlrcursor::fakeInputBinds(const char *query) {
 	return outputquery;
 }
 
-void sqlrcursor::performSubstitution(stringbuffer *buffer, int index) {
+void sqlrcursor::performSubstitution(stringbuffer *buffer, int16_t index) {
 	if (inbindvars[index].type==STRING_BIND) {
+
 		buffer->append("'");
-		buffer->append(inbindvars[index].value.stringval);
+
+		size_t	length=charstring::length(
+					inbindvars[index].value.stringval);
+
+		for (size_t ind=0; ind<length; ind++) {
+
+			char	ch=inbindvars[index].value.stringval[ind];
+
+			// escape \'s and quotes
+			if (ch=='\'' || ch=='\\') {
+				buffer->append('\\');
+			}
+			buffer->append(ch);
+		}
+
 		buffer->append("'");
+
 	} else if (inbindvars[index].type==LONG_BIND) {
 		buffer->append(inbindvars[index].value.longval);
 	} else if (inbindvars[index].type==DOUBLE_BIND) {

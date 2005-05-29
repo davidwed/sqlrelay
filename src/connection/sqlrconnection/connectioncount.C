@@ -12,11 +12,11 @@ void sqlrconnection::incrementConnectionCount() {
 	acquireConnectionCountMutex();
 
 	// increment the counter
-	unsigned int	*connectioncount=getConnectionCountBuffer();
+	uint32_t	*connectioncount=getConnectionCountBuffer();
 	(*connectioncount)++;
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,(long)(*connectioncount));
+	debugPrint("connection",1,(int32_t)(*connectioncount));
 	#endif
 
 	signalScalerToRead();
@@ -37,11 +37,11 @@ void sqlrconnection::decrementConnectionCount() {
 	acquireConnectionCountMutex();
 
 	// decrement the counter
-	unsigned int	*connectioncount=getConnectionCountBuffer();
+	uint32_t	*connectioncount=getConnectionCountBuffer();
 	(*connectioncount)--;
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,(long)(*connectioncount));
+	debugPrint("connection",1,(int32_t)(*connectioncount));
 	#endif
 
 	releaseConnectionCountMutex();
@@ -60,11 +60,11 @@ void sqlrconnection::decrementSessionCount() {
 	acquireSessionCountMutex();
 
 	// decrement the counter
-	unsigned int	*sessioncount=getSessionCountBuffer();
+	uint32_t	*sessioncount=getSessionCountBuffer();
 	(*sessioncount)--;
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,(long)(*sessioncount));
+	debugPrint("connection",1,(int32_t)(*sessioncount));
 	#endif
 
 	releaseSessionCountMutex();

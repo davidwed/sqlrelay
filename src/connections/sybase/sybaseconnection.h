@@ -25,29 +25,30 @@ class sybasecursor : public sqlrcursor {
 	private:
 				sybasecursor(sqlrconnection *conn);
 				~sybasecursor();
-		bool		openCursor(int id);
+		bool		openCursor(uint16_t id);
 		bool		closeCursor();
-		bool		prepareQuery(const char *query, long length);
+		bool		prepareQuery(const char *query,
+						uint32_t length);
 		bool		inputBindString(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value,
-						unsigned short valuesize,
-						short *isnull);
+						uint16_t valuesize,
+						int16_t *isnull);
 		bool		inputBindLong(const char *variable,
-						unsigned short variablesize,
-						unsigned long *value);
+						uint16_t variablesize,
+						uint32_t *value);
 		bool		inputBindDouble(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value,
-						unsigned short precision,
-						unsigned short scale);
+						uint32_t precision,
+						uint32_t scale);
 		bool		outputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						char *value, 
-						unsigned short valuesize, 
-						short *isnull);
+						uint16_t valuesize, 
+						int16_t *isnull);
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 		const char	*getErrorMessage(bool *liveconnection);
 		void		returnRowCounts();
@@ -74,15 +75,15 @@ class sybasecursor : public sqlrcursor {
 		CS_INT		affectedrows;
 
 		CS_INT		rowsread;
-		int		row;
-		int		maxrow;
-		int		totalrows;
+		CS_INT		row;
+		CS_INT		maxrow;
+		CS_INT		totalrows;
 
 		CS_DATAFMT	parameter[MAX_BIND_VARS];
-		int		paramindex;
+		uint16_t	paramindex;
 		char		*outbindvalues[MAX_BIND_VARS];
-		unsigned short	outbindvaluelengths[MAX_BIND_VARS];
-		int		outbindindex;
+		uint16_t	outbindvaluelengths[MAX_BIND_VARS];
+		uint16_t	outbindindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
 		char		data[MAX_SELECT_LIST_SIZE]
@@ -94,7 +95,7 @@ class sybasecursor : public sqlrcursor {
 					[FETCH_AT_ONCE];
 
 		const char	*query;
-		int		length;
+		uint32_t	length;
 		bool		prepared;
 		bool		clean;
 
@@ -113,10 +114,10 @@ class sybaseconnection : public sqlrconnection {
 			sybaseconnection();
 			~sybaseconnection();
 	private:
-		int		getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn();
-		void		logInError(const char *error, int stage);
+		void		logInError(const char *error, uint16_t stage);
 		sqlrcursor	*initCursor();
 		void		deleteCursor(sqlrcursor *curs);
 		void		logOut();
@@ -136,7 +137,6 @@ class sybaseconnection : public sqlrconnection {
 		const char	*charset;
 		const char	*language;
 		const char	*encryption;
-		int		enc;
 		const char	*hostname;
 		const char	*packetsize;
 

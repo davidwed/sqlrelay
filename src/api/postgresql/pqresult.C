@@ -173,7 +173,7 @@ int PQnfields(const PGresult *res) {
 
 int PQbinaryTuples(const PGresult *res) {
 	// return 1 if result set contains binary data, 0 otherwise
-	for (int i=0; i<res->sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<res->sqlrcur->colCount(); i++) {
 		if (res->sqlrcur->getColumnIsBinary(i)) {
 			return 1;
 		}
@@ -186,7 +186,7 @@ char *PQfname(const PGresult *res, int field_num) {
 }
 
 int PQfnumber(const PGresult *res, const char *field_name) {
-	for (int i=0; i<res->sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<res->sqlrcur->colCount(); i++) {
 		if (!charstring::compare(field_name,
 					res->sqlrcur->getColumnName(i))) {
 			return i;
@@ -576,7 +576,7 @@ int PQfsize(const PGresult *res, int field_num) {
 	// otherwise, return the column length
 	Oid	oid=PQftype(res,field_num);
 	return (oid==1042 || oid==1043)?
-		-1:res->sqlrcur->getColumnLength(field_num);
+		-1:(int)res->sqlrcur->getColumnLength(field_num);
 }
 
 int PQfmod(const PGresult *res, int field_num) {
@@ -584,7 +584,7 @@ int PQfmod(const PGresult *res, int field_num) {
 	// otherwise, return -1
 	Oid	oid=PQftype(res,field_num);
 	return (oid==1042 || oid==1043)?
-		res->sqlrcur->getColumnLength(field_num):-1;
+		(int)res->sqlrcur->getColumnLength(field_num):-1;
 }
 
 char *PQcmdStatus(PGresult *res) {
@@ -610,7 +610,7 @@ Oid PQoidValue(const PGresult *res) {
 }
 
 char *PQcmdTuples(PGresult *res) {
-	return charstring::parseNumber((long)res->sqlrcur->affectedRows());
+	return charstring::parseNumber(res->sqlrcur->affectedRows());
 }
 
 char *PQgetvalue(const PGresult *res, int tup_num, int field_num) {

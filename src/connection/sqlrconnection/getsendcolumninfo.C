@@ -9,7 +9,7 @@ bool sqlrconnection::getSendColumnInfo() {
 	debugPrint("connection",2,"getting send column info...");
 	#endif
 
-	if (clientsock->read(&sendcolumninfo)!=sizeof(unsigned short)) {
+	if (clientsock->read(&sendcolumninfo)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"getting send column info failed");
 		#endif

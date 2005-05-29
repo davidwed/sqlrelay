@@ -19,7 +19,7 @@
 mdbtoolsconnection::mdbtoolsconnection() {
 }
 
-int mdbtoolsconnection::getNumberOfConnectStringVars() {
+uint16_t mdbtoolsconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -78,7 +78,7 @@ mdbtoolscursor::mdbtoolscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
 }
 
-bool mdbtoolscursor::openCursor(int id) {
+bool mdbtoolscursor::openCursor(uint16_t id) {
 
 	if (!sqlrcursor::openCursor(id)) {
 		return false;
@@ -105,8 +105,8 @@ bool mdbtoolscursor::closeCursor() {
 	return true;
 }
 
-bool mdbtoolscursor::executeQuery(const char *query,
-					long length, bool execute) {
+bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
+							bool execute) {
 
 	// fake binds
 	stringbuffer	*newquery=fakeInputBinds(query);
@@ -151,7 +151,7 @@ const char *mdbtoolscursor::getErrorMessage(bool *liveconnection) {
 
 void mdbtoolscursor::returnRowCounts() {
 	// row count and affected row count are unknown
-	conn->sendRowCounts((long)-1,(long)-1);
+	conn->sendRowCounts(false,0,false,0);
 }
 
 void mdbtoolscursor::returnColumnCount() {

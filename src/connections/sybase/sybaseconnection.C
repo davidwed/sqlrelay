@@ -29,7 +29,7 @@ sybaseconnection::~sybaseconnection() {
 	delete env;
 }
 
-int sybaseconnection::getNumberOfConnectStringVars() {
+uint16_t sybaseconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -154,7 +154,7 @@ bool sybaseconnection::logIn() {
 
 	// set encryption
 	if (encryption && charstring::toLong(encryption)==1) {
-		enc=CS_TRUE;
+		CS_INT	enc=CS_TRUE;
 		if (ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 			(CS_VOID *)&enc,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -208,7 +208,7 @@ bool sybaseconnection::logIn() {
 	return true;
 }
 
-void sybaseconnection::logInError(const char *error, int stage) {
+void sybaseconnection::logInError(const char *error, uint16_t stage) {
 
 	fprintf(stderr,"%s\n",error);
 
@@ -280,11 +280,11 @@ sybasecursor::~sybasecursor() {
 	delete[] cursorname;
 }
 
-bool sybasecursor::openCursor(int id) {
+bool sybasecursor::openCursor(uint16_t id) {
 
 	clean=true;
 
-	cursorname=charstring::parseNumber((long)id);
+	cursorname=charstring::parseNumber(id);
 
 	if (ct_cmd_alloc(sybaseconn->dbconn,&languagecmd)!=CS_SUCCEED) {
 		return false;
@@ -297,7 +297,7 @@ bool sybasecursor::openCursor(int id) {
 	// switch to the correct database
 	bool	retval=true;
 	if (sybaseconn->db && sybaseconn->db[0]) {
-		int	len=charstring::length(sybaseconn->db)+4;
+		int32_t	len=charstring::length(sybaseconn->db)+4;
 		char	query[len+1];
 		sprintf(query,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) &&
@@ -325,7 +325,7 @@ bool sybasecursor::closeCursor() {
 	return retval;
 }
 
-bool sybasecursor::prepareQuery(const char *query, long length) {
+bool sybasecursor::prepareQuery(const char *query, uint32_t length) {
 
 	clean=true;
 
@@ -387,10 +387,10 @@ void sybasecursor::checkRePrepare() {
 }
 
 bool sybasecursor::inputBindString(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value,
-						unsigned short valuesize,
-						short *isnull) {
+						uint16_t valuesize,
+						int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -416,8 +416,8 @@ bool sybasecursor::inputBindString(const char *variable,
 }
 
 bool sybasecursor::inputBindLong(const char *variable,
-						unsigned short variablesize,
-						unsigned long *value) {
+						uint16_t variablesize,
+						uint32_t *value) {
 
 	checkRePrepare();
 
@@ -435,7 +435,7 @@ bool sybasecursor::inputBindLong(const char *variable,
 	parameter[paramindex].status=CS_INPUTVALUE;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-		(CS_VOID *)value,sizeof(long),0)!=CS_SUCCEED) {
+		(CS_VOID *)value,sizeof(uint32_t),0)!=CS_SUCCEED) {
 		return false;
 	}
 	paramindex++;
@@ -443,10 +443,10 @@ bool sybasecursor::inputBindLong(const char *variable,
 }
 
 bool sybasecursor::inputBindDouble(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value,
-						unsigned short precision,
-						unsigned short scale) {
+						uint32_t precision,
+						uint32_t scale) {
 
 	checkRePrepare();
 
@@ -474,10 +474,10 @@ bool sybasecursor::inputBindDouble(const char *variable,
 }
 
 bool sybasecursor::outputBindString(const char *variable, 
-					unsigned short variablesize,
+					uint16_t variablesize,
 					char *value, 
-					unsigned short valuesize, 
-					short *isnull) {
+					uint16_t valuesize, 
+					int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -506,7 +506,8 @@ bool sybasecursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
+bool sybasecursor::executeQuery(const char *query, uint32_t length,
+							bool execute) {
 
 	// clear out any errors
 	if (sybaseconn->errorstring) {
@@ -617,7 +618,7 @@ bool sybasecursor::executeQuery(const char *query, long length, bool execute) {
 		}
 
 		// bind columns
-		for (int i=0; i<(int)ncols; i++) {
+		for (CS_INT i=0; i<ncols; i++) {
 
 			// get the field as a null terminated character string
 			// no longer than MAX_ITEM_BUFFER_SIZE, override some
@@ -697,7 +698,7 @@ const char *sybasecursor::getErrorMessage(bool *liveconnection) {
 void sybasecursor::returnRowCounts() {
 
 	// send row counts (actual row count unknown in sybase)
-	conn->sendRowCounts((long)-1,(long)affectedrows);
+	conn->sendRowCounts(false,0,true,affectedrows);
 }
 
 void sybasecursor::returnColumnCount() {
@@ -716,10 +717,10 @@ void sybasecursor::returnColumnInfo() {
 	}
 
 	// gonna need this later
-	int	type;
+	int16_t	type;
 
 	// for each column...
-	for (int i=0; i<(int)ncols; i++) {
+	for (CS_INT i=0; i<ncols; i++) {
 
 		// get the column description
 		if (ct_describe(cmd,i+1,&column[i])!=CS_SUCCEED) {
@@ -727,7 +728,7 @@ void sybasecursor::returnColumnInfo() {
 		}
 	
 		// set the datatype
-		unsigned short	binary=0;
+		uint16_t	binary=0;
 		if (column[i].datatype==CS_CHAR_TYPE) {
 			type=CHAR_DATATYPE;
 		} else if (column[i].datatype==CS_INT_TYPE) {
@@ -845,7 +846,7 @@ bool sybasecursor::fetchRow() {
 void sybasecursor::returnRow() {
 
 	// send each row back
-	for (int col=0; col<(int)ncols; col++) {
+	for (CS_INT col=0; col<ncols; col++) {
 		if (nullindicator[col][row]>-1 && datalength[col][row]) {
 			conn->sendField(data[col][row],datalength[col][row]-1);
 		} else {
@@ -916,16 +917,16 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 
 	errorstring->append("Client Library error:\n");
 	errorstring->append("	severity(")->
-				append((long)CS_SEVERITY(msgp->msgnumber))->
+				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	layer(")->
-				append((long)CS_LAYER(msgp->msgnumber))->
+				append((int32_t)CS_LAYER(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	origin(")->
-				append((long)CS_ORIGIN(msgp->msgnumber))->
+				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	number(")->
-				append((long)CS_NUMBER(msgp->msgnumber))->
+				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("Error:	")->append(msgp->msgstring)->
 				append("\n");
@@ -967,16 +968,16 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 
 	errorstring->append("Client Library error:\n");
 	errorstring->append("	severity(")->
-				append((long)CS_SEVERITY(msgp->msgnumber))->
+				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	layer(")->
-				append((long)CS_LAYER(msgp->msgnumber))->
+				append((int32_t)CS_LAYER(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	origin(")->
-				append((long)CS_ORIGIN(msgp->msgnumber))->
+				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("	number(")->
-				append((long)CS_NUMBER(msgp->msgnumber))->
+				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
 	errorstring->append("Error:	")->append(msgp->msgstring)->
 				append("\n");
@@ -1025,13 +1026,13 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	errorstring->append("Server message:\n");
 	errorstring->append("	severity(")->
-				append((long)msgp->severity)->append(")\n");
+				append((int32_t)msgp->severity)->append(")\n");
 	errorstring->append("	number(")->
-				append((long)msgp->msgnumber)->append(")\n");
+				append((int32_t)msgp->msgnumber)->append(")\n");
 	errorstring->append("	state(")->
-				append((long)msgp->state)->append(")\n");
+				append((int32_t)msgp->state)->append(")\n");
 	errorstring->append("	line(")->
-				append((long)msgp->line)->append(")\n");
+				append((int32_t)msgp->line)->append(")\n");
 	errorstring->append("Server Name:\n")->
 				append(msgp->svrname)->append("\n");
 	errorstring->append("Procedure Name:\n")->

@@ -38,13 +38,18 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 
 		// make sure it's a cache file and skip the ttl
 		char		magicid[13];
-		unsigned long	longvar;
+		uint32_t	longvar;
 		if (getString(magicid,13)==13 &&
 			!charstring::compare(magicid,"SQLRELAYCACHE",13) &&
-			getLong(&longvar)==sizeof(unsigned long)) {
+			getLong(&longvar)==sizeof(uint32_t)) {
 
 			// process the result set
-			return processResultSet(firstrowindex+rsbuffersize-1);
+			if (rsbuffersize) {
+				return processResultSet(false,firstrowindex+
+								rsbuffersize-1);
+			} else {
+				return processResultSet(true,0);
+			}
 		} else {
 
 			// if the test above failed, the file is either not

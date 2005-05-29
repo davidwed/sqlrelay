@@ -85,7 +85,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_endsession) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_suspendsession) {
 	zval **sqlrcon;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -101,7 +101,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_suspendsession) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_getconnectionport) {
 	zval **sqlrcon;
-	int r;
+	uint16_t r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -135,7 +135,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_getconnectionsocket) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_resumesession) {
 	zval **sqlrcon,**port,**socket;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcon,&port,&socket) 
 					== FAILURE) {
@@ -180,7 +180,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_debugoff) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_getdebug) {
 	zval **sqlrcon;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -239,7 +239,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_setresultsetbuffersize) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getresultsetbuffersize) {
 	zval **sqlrcur;
-	int r;
+	uint32_t r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -379,7 +379,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_cacheoff) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_sendquery) {
 	zval **sqlrcur,**query;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&query) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -396,7 +396,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_sendquery) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_sendquerywithlength) {
 	zval **sqlrcur,**query,**length;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&query,&length) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -414,7 +414,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_sendquerywithlength) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_sendfilequery) {
 	zval **sqlrcur,**path,**filename;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&path,&filename) 
 					== FAILURE) {
@@ -462,7 +462,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_preparequerywithlength) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_preparefilequery) {
 	zval **sqlrcur,**path,**filename;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&path,&filename) 
 					== FAILURE) {
@@ -524,7 +524,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_clearbinds) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_countbindvariables) {
 	zval **sqlrcur;
-	unsigned short r;
+	uint16_t r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -770,7 +770,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_validatebinds) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_executequery) {
 	zval **sqlrcur;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -786,7 +786,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_executequery) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_fetchfrombindcursor) {
 	zval **sqlrcur;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -803,7 +803,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_fetchfrombindcursor) {
 DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbind) {
 	zval **sqlrcur,**variable;
 	const char *r;
-	long rl;
+	uint32_t rl;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -823,7 +823,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbind) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindaslong) {
 	zval **sqlrcur,**variable;
-	long r;
+	int32_t r;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -857,7 +857,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindasdouble) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindlength) {
 	zval **sqlrcur,**variable;
-	long r;
+	uint32_t r;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -891,7 +891,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindcursor) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_opencachedresultset) {
 	zval **sqlrcur,**filename;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&filename) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -908,7 +908,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_opencachedresultset) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_colcount) {
 	zval **sqlrcur;
-	int r;
+	uint32_t r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -924,7 +924,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_colcount) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_rowcount) {
 	zval **sqlrcur;
-	int r;
+	uint32_t r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -940,7 +940,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_rowcount) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_totalrows) {
 	zval **sqlrcur;
-	int r;
+	uint32_t r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -956,7 +956,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_totalrows) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_affectedrows) {
 	zval **sqlrcur;
-	int r;
+	uint32_t r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -972,7 +972,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_affectedrows) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_firstrowindex) {
 	zval **sqlrcur;
-	int r;
+	uint32_t r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -988,7 +988,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_firstrowindex) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_endofresultset) {
 	zval **sqlrcur;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1049,7 +1049,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getnullsasnulls) {
 DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 	zval **sqlrcur,**row,**col;
 	const char *r=NULL;
-	long rl;
+	uint32_t rl;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1076,7 +1076,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldaslong) {
 	zval **sqlrcur,**row,**col;
-	long r=0;
+	int32_t r=0;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1122,7 +1122,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldasdouble) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldlength) {
 	zval **sqlrcur,**row,**col;
-	long r=-1;
+	uint32_t r=0;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1146,7 +1146,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldlength) {
 DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 	zval **sqlrcur,**row;
 	const char * const *r;
-	int i;
+	uint32_t i;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1177,7 +1177,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 	zval **sqlrcur,**row;
 	const char * const *r;
 	const char * const *rC;
-	int i;
+	uint32_t i;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1214,8 +1214,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengths) {
 	zval **sqlrcur,**row;
-	long *r;
-	int i;
+	uint32_t *r;
+	uint32_t i;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1240,9 +1240,9 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengths) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengthsassoc) {
 	zval **sqlrcur,**row;
-	long *r;
+	uint32_t *r;
 	const char * const *rC;
-	int i;
+	uint32_t i;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1276,7 +1276,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengthsassoc) {
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnnames) {
 	zval **sqlrcur;
 	const char * const *r;
-	int i;
+	uint32_t i;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1343,7 +1343,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumntype) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnlength) {
 	zval **sqlrcur,**col;
-	int r=0;
+	uint32_t r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1365,7 +1365,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnlength) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnprecision) {
 	zval **sqlrcur,**col;
-	int r=0;
+	uint32_t r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1387,7 +1387,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnprecision) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnscale) {
 	zval **sqlrcur,**col;
-	int r=0;
+	uint32_t r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1409,7 +1409,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnscale) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisnullable) {
 	zval **sqlrcur,**col;
-	int r=0;
+	bool r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1431,7 +1431,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisnullable) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisprimarykey) {
 	zval **sqlrcur,**col;
-	int r=0;
+	bool r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1453,7 +1453,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisprimarykey) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisunique) {
 	zval **sqlrcur,**col;
-	int r=0;
+	bool r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1475,7 +1475,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisunique) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnispartofkey) {
 	zval **sqlrcur,**col;
-	int r=0;
+	bool r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1497,7 +1497,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnispartofkey) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisunsigned) {
 	zval **sqlrcur,**col;
-	int r=0;
+	bool r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1519,7 +1519,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisunsigned) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumniszerofilled) {
 	zval **sqlrcur,**col;
-	int r=0;
+	bool r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1541,7 +1541,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumniszerofilled) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisbinary) {
 	zval **sqlrcur,**col;
-	int r=0;
+	bool r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1563,7 +1563,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisbinary) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisautoincrement) {
 	zval **sqlrcur,**col;
-	int r=0;
+	bool r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1585,7 +1585,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisautoincrement) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getlongest) {
 	zval **sqlrcur,**col;
-	int r=0;
+	uint32_t r=0;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1607,7 +1607,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getlongest) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_getresultsetid) {
 	zval **sqlrcur;
-	int r;
+	uint16_t r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1636,7 +1636,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_suspendresultset) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_resumeresultset) {
 	zval **sqlrcur, **id;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&id) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1653,7 +1653,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_resumeresultset) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_resumecachedresultset) {
 	zval **sqlrcur, **id, **filename;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&id,&filename) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1671,7 +1671,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_resumecachedresultset) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_ping) {
 	zval **sqlrcon;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1687,7 +1687,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_ping) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_autocommiton) {
 	zval **sqlrcon;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1703,7 +1703,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_autocommiton) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_autocommitoff) {
 	zval **sqlrcon;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1719,7 +1719,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_autocommitoff) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_commit) {
 	zval **sqlrcon;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;
@@ -1735,7 +1735,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_commit) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_rollback) {
 	zval **sqlrcon;
-	int r;
+	bool r;
 	if (ZEND_NUM_ARGS() != 1 || 
 		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
 		WRONG_PARAM_COUNT;

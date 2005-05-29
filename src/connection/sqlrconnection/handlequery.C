@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-int sqlrconnection::handleQuery(sqlrcursor *cursor,
+int32_t sqlrconnection::handleQuery(sqlrcursor *cursor,
 					bool reexecute, bool bindcursor,
 					bool reallyexecute) {
 
@@ -26,16 +26,15 @@ int sqlrconnection::handleQuery(sqlrcursor *cursor,
 		if (processQuery(cursor,reexecute,bindcursor,reallyexecute)) {
 
 			// indicate that no error has occurred
-			clientsock->write((unsigned short)NO_ERROR);
+			clientsock->write((uint16_t)NO_ERROR);
 
 			// send the client the id of the 
 			// cursor that it's going to use
-			clientsock->write((unsigned short)cursor->id);
+			clientsock->write(cursor->id);
 
 			// tell the client that this is not a
 			// suspended result set
-			clientsock->write((unsigned short)
-						NO_SUSPENDED_RESULT_SET);
+			clientsock->write((uint16_t)NO_SUSPENDED_RESULT_SET);
 
 			// if the query processed 
 			// ok then return a result set
@@ -89,8 +88,7 @@ bool sqlrconnection::getQuery(sqlrcursor *cursor) {
 	#endif
 
 	// get the length of the query
-	if (clientsock->read(&cursor->querylength)!=
-					sizeof(unsigned long)) {
+	if (clientsock->read(&cursor->querylength)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting query failed: client sent bad query length size");
@@ -108,9 +106,9 @@ bool sqlrconnection::getQuery(sqlrcursor *cursor) {
 	}
 
 	// read the query into the buffer
-	if ((unsigned long)(clientsock->read(cursor->querybuffer,
+	if ((uint32_t)(clientsock->read(cursor->querybuffer,
 						cursor->querylength))!=
-					(unsigned long)(cursor->querylength)) {
+							cursor->querylength) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting query failed: client sent short query");
@@ -121,7 +119,7 @@ bool sqlrconnection::getQuery(sqlrcursor *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"querylength:");
-	debugPrint("connection",4,(long)cursor->querylength);
+	debugPrint("connection",4,(int32_t)cursor->querylength);
 	debugPrint("connection",3,"query:");
 	debugPrint("connection",0,cursor->querybuffer);
 	debugPrint("connection",2,"getting query succeeded");

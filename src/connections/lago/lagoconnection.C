@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int lagoconnection::getNumberOfConnectStringVars() {
+uint16_t lagoconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -116,7 +116,8 @@ lagocursor::lagocursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	lagoconn=(lagoconnection *)conn;
 }
 
-bool lagocursor::executeQuery(const char *query, long length, bool execute) {
+bool lagocursor::executeQuery(const char *query, uint32_t length,
+							bool execute) {
 
 	// initialize return values
 	ncols=0;
@@ -167,7 +168,7 @@ const char *lagocursor::getErrorMessage(bool *liveconnection) {
 void lagocursor::returnRowCounts() {
 
 	// send row counts (affected row count unknown in Lago)
-	conn->sendRowCounts((long)nrows,(long)-1);
+	conn->sendRowCounts(true,nrows,false,0);
 }
 
 void lagocursor::returnColumnCount() {
@@ -179,15 +180,15 @@ void lagocursor::returnColumnInfo() {
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// gonna need this later
-	char	*name;
-	int	precision;
-	int	scale;
-	int	nullable;
-	int	length;
-	int	type;
+	char		*name;
+	uint32_t	precision;
+	uint32_t	scale;
+	uint16_t	nullable;
+	uint32_t	length;
+	uint16_t	type;
 
 	// for each column...
-	for (int i=1; i<ncols+1; i++) {
+	for (uint32_t i=1; i<ncols+1; i++) {
 
 		// get name, precision, scale and nullability
 		name=(char *)Lgetcolname(lagoresult,i);
@@ -266,7 +267,7 @@ void lagocursor::returnRow() {
 	char	*field;
 
 	// here's that 1 based column thing again
-	for (int col=1; col<ncols+1; col++) {
+	for (uint32_t col=1; col<ncols+1; col++) {
 
 		field=(char *)Lgetasstr(lagoresult,col);
 

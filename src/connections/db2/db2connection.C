@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-int db2connection::getNumberOfConnectStringVars() {
+uint16_t db2connection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -75,11 +75,11 @@ void db2connection::logOut() {
 	SQLFreeHandle(SQL_HANDLE_ENV,env);
 }
 
-short db2connection::nullBindValue() {
+int16_t db2connection::nullBindValue() {
 	return SQL_NULL_DATA;
 }
 
-bool db2connection::bindValueIsNull(short isnull) {
+bool db2connection::bindValueIsNull(int16_t isnull) {
 	if (isnull==SQL_NULL_DATA) {
 		return true;
 	}
@@ -126,7 +126,7 @@ db2cursor::~db2cursor() {
 	}
 }
 
-bool db2cursor::prepareQuery(const char *query, long length) {
+bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 
 	if (stmt) {
 		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
@@ -163,10 +163,10 @@ bool db2cursor::prepareQuery(const char *query, long length) {
 }
 
 bool db2cursor::inputBindString(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					const char *value,
-					unsigned short valuesize,
-					short *isnull) {
+					uint16_t valuesize,
+					int16_t *isnull) {
 
 	if (*isnull==SQL_NULL_DATA) {
 		erg=SQLBindParameter(stmt,
@@ -198,8 +198,8 @@ bool db2cursor::inputBindString(const char *variable,
 }
 
 bool db2cursor::inputBindLong(const char *variable,
-					unsigned short variablesize,
-					unsigned long *value) {
+					uint16_t variablesize,
+					uint32_t *value) {
 
 	erg=SQLBindParameter(stmt,
 				charstring::toLong(variable+1),
@@ -218,10 +218,10 @@ bool db2cursor::inputBindLong(const char *variable,
 }
 
 bool db2cursor::inputBindDouble(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					double *value,
-					unsigned short precision,
-					unsigned short scale) {
+					uint32_t precision,
+					uint32_t scale) {
 
 	erg=SQLBindParameter(stmt,
 				charstring::toLong(variable+1),
@@ -240,10 +240,10 @@ bool db2cursor::inputBindDouble(const char *variable,
 }
 
 bool db2cursor::outputBindString(const char *variable, 
-					unsigned short variablesize,
+					uint16_t variablesize,
 					char *value, 
-					unsigned short valuesize, 
-					short *isnull) {
+					uint16_t valuesize, 
+					int16_t *isnull) {
 
 	erg=SQLBindParameter(stmt,
 				charstring::toLong(variable+1),
@@ -261,7 +261,7 @@ bool db2cursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool db2cursor::executeQuery(const char *query, long length, bool execute) {
+bool db2cursor::executeQuery(const char *query, uint32_t length, bool execute) {
 
 	// initialize counts
 	ncols=0;
@@ -287,7 +287,7 @@ bool db2cursor::executeQuery(const char *query, long length, bool execute) {
 	}
 
 	// run through the columns
-	for (int i=0; i<ncols; i++) {
+	for (SQLSMALLINT i=0; i<ncols; i++) {
 
 		if (conn->sendColumnInfo()) {
 
@@ -400,7 +400,7 @@ const char *db2cursor::getErrorMessage(bool *liveconnection) {
 }
 
 void db2cursor::returnRowCounts() {
-	conn->sendRowCounts((long)-1,(long)affectedrows);
+	conn->sendRowCounts(false,0,true,affectedrows);
 }
 
 void db2cursor::returnColumnCount() {
@@ -412,12 +412,12 @@ void db2cursor::returnColumnInfo() {
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// a useful variable
-	int	type;
+	uint16_t	type;
 
 	// for each column...
-	for (int i=0; i<ncols; i++) {
+	for (SQLSMALLINT i=0; i<ncols; i++) {
 
-		unsigned short	binary=0;
+		uint16_t	binary=0;
 		if (col[i].type==SQL_BIGINT) {
 			type=BIGINT_DATATYPE;
 		} else if (col[i].type==SQL_BINARY) {
@@ -531,7 +531,7 @@ bool db2cursor::fetchRow() {
 		// An apparant bug in version 8.1 causes the
 		// SQL_ATTR_ROW_NUMBER to always be 1, running through
 		// the row status buffer appears to work.
-		int	index=0;
+		int32_t	index=0;
 		while (index<FETCH_AT_ONCE) {
 			index++;
 		}
@@ -563,7 +563,7 @@ bool db2cursor::fetchRow() {
 
 void db2cursor::returnRow() {
 
-	for (int index=0; index<ncols; index++) {
+	for (SQLSMALLINT index=0; index<ncols; index++) {
 
 		// handle a null field
 		if (indicator[index][rowgroupindex]==SQL_NULL_DATA) {

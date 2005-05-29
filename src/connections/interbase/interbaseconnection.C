@@ -22,7 +22,7 @@ interbaseconnection::~interbaseconnection() {
 	delete env;
 }
 
-int interbaseconnection::getNumberOfConnectStringVars() {
+uint16_t interbaseconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -84,12 +84,11 @@ bool interbaseconnection::logIn() {
 	}
 
 	// start a transaction
-	if (isc_start_transaction(error,&tr,1,&db,
-				(unsigned short)sizeof(tpb),&tpb)) {
+	if (isc_start_transaction(error,&tr,1,&db,(uint16_t)sizeof(tpb),&tpb)) {
 
 		// print the error message
-		char	msg[512];
-		long	*err=error;
+		char		msg[512];
+		ISC_STATUS	*err=error;
 		while (isc_interprete(msg,&err)) {
 			fprintf(stderr,"%s\n",msg);
 		}
@@ -168,7 +167,7 @@ interbasecursor::~interbasecursor() {
 	free(insqlda);
 }
 
-bool interbasecursor::prepareQuery(const char *query, long length) {
+bool interbasecursor::prepareQuery(const char *query, uint32_t length) {
 
 	queryIsExecSP=false;
 
@@ -205,7 +204,7 @@ bool interbasecursor::prepareQuery(const char *query, long length) {
 		return false;
 	}
 
-	int	len=isc_vax_integer(resbuffer+1,2);
+	ISC_LONG	len=isc_vax_integer(resbuffer+1,2);
 	querytype=isc_vax_integer(resbuffer+3,len);
 
 	// find bind parameters, if any
@@ -219,13 +218,13 @@ bool interbasecursor::prepareQuery(const char *query, long length) {
 }
 
 bool interbasecursor::inputBindString(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					const char *value,
-					unsigned short valuesize,
-					short *isnull) {
+					uint16_t valuesize,
+					int16_t *isnull) {
 
 	// make bind vars 1 based like all other db's
-	int	index=charstring::toLong(variable+1)-1;
+	long	index=charstring::toLong(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -247,11 +246,11 @@ bool interbasecursor::inputBindString(const char *variable,
 }
 
 bool interbasecursor::inputBindLong(const char *variable,
-					unsigned short variablesize,
-					unsigned long *value) {
+					uint16_t variablesize,
+					uint32_t *value) {
 
 	// make bind vars 1 based like all other db's
-	int	index=charstring::toLong(variable+1)-1;
+	long	index=charstring::toLong(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -273,13 +272,13 @@ bool interbasecursor::inputBindLong(const char *variable,
 }
 
 bool interbasecursor::inputBindDouble(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					double *value,
-					unsigned short precision,
-					unsigned short scale) {
+					uint32_t precision,
+					uint32_t scale) {
 
 	// make bind vars 1 based like all other db's
-	int	index=charstring::toLong(variable+1)-1;
+	long	index=charstring::toLong(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -301,17 +300,17 @@ bool interbasecursor::inputBindDouble(const char *variable,
 }
 
 bool interbasecursor::outputBindString(const char *variable, 
-				unsigned short variablesize,
+				uint16_t variablesize,
 				char *value, 
-				unsigned short valuesize, 
-				short *isnull) {
+				uint16_t valuesize, 
+				int16_t *isnull) {
 
 	// if we're doing output binds then the
 	// query must be a stored procedure
 	queryIsExecSP=true;
 
 	// make bind vars 1 based like all other db's
-	int	index=charstring::toLong(variable+1)-1;
+	long	index=charstring::toLong(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -332,7 +331,7 @@ bool interbasecursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool interbasecursor::executeQuery(const char *query, long length,
+bool interbasecursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
 	// for commit or rollback, execute the API call and return
@@ -350,7 +349,7 @@ bool interbasecursor::executeQuery(const char *query, long length,
 						&stmt,1,insqlda,outsqlda);
 
 		// make sure each output bind variable gets null terminated
-		for (int i=0; i<outsqlda->sqld; i++) {
+		for (short i=0; i<outsqlda->sqld; i++) {
 			outsqlda->sqlvar[i].
 				sqldata[outsqlda->sqlvar[i].sqllen-1]=0;
 		}
@@ -371,7 +370,7 @@ bool interbasecursor::executeQuery(const char *query, long length,
 		outsqlda->sqld=MAX_SELECT_LIST_SIZE;
 	}
 
-	for (int i=0; i<outsqlda->sqld; i++) {
+	for (short i=0; i<outsqlda->sqld; i++) {
 
 		// save the actual field type
 		field[i].type=outsqlda->sqlvar[i].sqltype;
@@ -498,8 +497,8 @@ bool interbasecursor::queryIsCommitOrRollback() {
 
 const char *interbasecursor::getErrorMessage(bool *liveconnection) {
 
-	char	msg[512];
-	long	*pvector=interbaseconn->error;
+	char		msg[512];
+	ISC_STATUS	*pvector=interbaseconn->error;
 
 	// declare a buffer for the error
 	if (errormsg) {
@@ -514,7 +513,7 @@ const char *interbasecursor::getErrorMessage(bool *liveconnection) {
 
 	// get the error message
 	// FIXME: vladimir commented this out why?
-	long	sqlcode=isc_sqlcode(interbaseconn->error);
+	ISC_LONG	sqlcode=isc_sqlcode(interbaseconn->error);
 	isc_sql_interprete(sqlcode, msg, 512);
 	errormsg->append(msg);
 
@@ -524,7 +523,7 @@ const char *interbasecursor::getErrorMessage(bool *liveconnection) {
 }
 
 void interbasecursor::returnRowCounts() {
-	conn->sendRowCounts((long)-1,(long)-1);
+	conn->sendRowCounts(false,0,false,0);
 }
 
 void interbasecursor::returnColumnCount() {
@@ -538,10 +537,10 @@ void interbasecursor::returnColumnInfo() {
 
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
-	long	precision;
+	short	precision;
 
 	// for each column...
-	for (int i=0; i<outsqlda->sqld; i++) {
+	for (short i=0; i<outsqlda->sqld; i++) {
 
 		if (field[i].sqlrtype==CHAR_DATATYPE) {
 			precision=outsqlda->sqlvar[i].sqllen;
@@ -621,7 +620,7 @@ bool interbasecursor::fetchRow() {
 
 void interbasecursor::returnRow() {
 
-	for (int col=0; col<outsqlda->sqld; col++) {
+	for (short col=0; col<outsqlda->sqld; col++) {
 
 		// handle a null field
 		if ((outsqlda->sqlvar[col].sqltype & 1) && 
@@ -634,8 +633,8 @@ void interbasecursor::returnRow() {
 		// handle a non-null field
 		if (outsqlda->sqlvar[col].sqltype==SQL_TEXT ||
 				outsqlda->sqlvar[col].sqltype==SQL_TEXT+1) {
-			int	maxlen=outsqlda->sqlvar[col].sqllen;
-			int	reallen=charstring::length(field[col].
+			size_t	maxlen=outsqlda->sqlvar[col].sqllen;
+			size_t	reallen=charstring::length(field[col].
 								textbuffer);
 			if (reallen>maxlen) {
 				reallen=maxlen;
@@ -675,11 +674,11 @@ void interbasecursor::returnRow() {
 					sqltype==SQL_VARYING+1) {
 			// the first 2 bytes are the length in 
 			// an SQL_VARYING field
-			short	size;
+			int16_t	size;
 			rawbuffer::copy((void *)&size,
 					(void *)field[col].textbuffer,
-					sizeof(short));
-			conn->sendField(field[col].textbuffer+sizeof(short),
+					sizeof(int16_t));
+			conn->sendField(field[col].textbuffer+sizeof(int16_t),
 					size);
 
 		// Looks like sometimes interbase returns INT64's as
@@ -692,7 +691,7 @@ void interbasecursor::returnRow() {
 					sqltype==SQL_LONG+1) &&
 				!outsqlda->sqlvar[col].sqlscale) {
 			stringbuffer	buffer;
-			buffer.append(field[col].longbuffer);
+			buffer.append((int32_t)field[col].longbuffer);
 			conn->sendField(buffer.getString(),
 					charstring::length(buffer.getString()));
 		} else if (
@@ -720,7 +719,7 @@ void interbasecursor::returnRow() {
 			
 				// gotta get the right number
 				// of decimal places
-				for (int i=charstring::length(
+				for (int32_t i=charstring::length(
 						decimal.getString());
 					i<-outsqlda->sqlvar[col].sqlscale;
 					i++) {

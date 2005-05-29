@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-bool sqlrconnection::resumeSession(int port, const char *socket) {
+bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	// if already connected, end the session
 	if (connected) {
@@ -21,7 +21,7 @@ bool sqlrconnection::resumeSession(int port, const char *socket) {
 	} else {
 		connectionunixport=(char *)socket;
 	}
-	connectioninetport=(unsigned short)port;
+	connectioninetport=port;
 
 	// first, try for the unix port
 	if (socket && socket[0]) {
@@ -46,6 +46,9 @@ bool sqlrconnection::resumeSession(int port, const char *socket) {
 	if (connected) {
 
 		// use 8k read and write buffers
+		cs->dontUseNaglesAlgorithm();
+		cs->setTcpReadBufferSize(8192);
+		cs->setTcpWriteBufferSize(0);
 		cs->setReadBufferSize(8192);
 		cs->setWriteBufferSize(8192);
 

@@ -25,7 +25,7 @@ sqlrcursor::~sqlrcursor() {
 	delete[] extracolumns;
 	delete colstorage;
 	if (rows) {
-		for (int i=0; i<OPTIMISTIC_ROW_COUNT; i++) {
+		for (uint32_t i=0; i<OPTIMISTIC_ROW_COUNT; i++) {
 			delete rows[i];
 		}
 		delete[] rows;

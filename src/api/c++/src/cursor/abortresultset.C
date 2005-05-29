@@ -14,7 +14,7 @@ void sqlrcursor::abortResultSet() {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Aborting Result Set For Cursor: ");
-		sqlrc->debugPrint((long)cursorid);
+		sqlrc->debugPrint((int32_t)cursorid);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
@@ -32,7 +32,7 @@ void sqlrcursor::abortResultSet() {
 				// if we're not fetching from a cached result 
 				// set tell the server to send one 
 				if (!cachesource && !cachesourceind) {
-					sqlrc->cs->write((unsigned short)
+					sqlrc->cs->write((uint16_t)
 							FETCH_RESULT_SET);
 					sqlrc->cs->write(cursorid);
 				}
@@ -41,13 +41,13 @@ void sqlrcursor::abortResultSet() {
 				// it hits the end of the result set, but
 				// if it or skipAndFetch return a -1 (network
 				// error) we'll have to call it ourselves.
-				if (!skipAndFetch(-1) || !parseData()) {
+				if (!skipAndFetch(true,0) || !parseData()) {
 					finishCaching();
 					return;
 				}
 			}
 		} else {
-			sqlrc->cs->write((unsigned short)ABORT_RESULT_SET);
+			sqlrc->cs->write((uint16_t)ABORT_RESULT_SET);
 			sqlrc->cs->write(cursorid);
 			sqlrc->flushWriteBuffer();
 		}

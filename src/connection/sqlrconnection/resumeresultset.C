@@ -28,17 +28,17 @@ void sqlrconnection::resumeResultSet(sqlrcursor *cursor) {
 		#endif
 
 		// indicate that no error has occurred
-		clientsock->write((unsigned short)NO_ERROR);
+		clientsock->write((uint16_t)NO_ERROR);
 
 		// send the client the id of the 
 		// cursor that it's going to use
-		clientsock->write((unsigned short)cursor->id);
-		clientsock->write((unsigned short)SUSPENDED_RESULT_SET);
+		clientsock->write(cursor->id);
+		clientsock->write((uint16_t)SUSPENDED_RESULT_SET);
 
 		// if the requested cursor really had a suspended
 		// result set, send the lastrow of it to the client
 		// then send the result set header
-		clientsock->write((unsigned long)lastrow);
+		clientsock->write((uint32_t)lastrow);
 		returnResultSetHeader(cursor);
 
 	} else {
@@ -49,10 +49,10 @@ void sqlrconnection::resumeResultSet(sqlrcursor *cursor) {
 		#endif
 
 		// indicate that an error has occurred
-		clientsock->write((unsigned short)ERROR);
+		clientsock->write((uint16_t)ERROR);
 
 		// send the error itself
-		clientsock->write((unsigned short)43);
+		clientsock->write((uint16_t)43);
 		clientsock->write("The requested result set was not suspended.",
 					43);
 	}

@@ -58,7 +58,7 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define docdir %{_docdir}/%{name}-%{version}
 %endif
 
-BuildRequires: rudiments-devel >= 0.26
+BuildRequires: rudiments-devel >= 0.29
 %{!?_without_gtk:BuildRequires: ,%{gtkdevel}}
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}

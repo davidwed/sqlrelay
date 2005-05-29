@@ -17,7 +17,7 @@ class msqlcursor : public sqlrcursor {
 	private:
 				msqlcursor(sqlrconnection *conn);
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 		const char	*getErrorMessage(bool *liveconnection);
 		void		returnRowCounts();
@@ -34,7 +34,6 @@ class msqlcursor : public sqlrcursor {
 		m_row		msqlrow;
 		int		ncols;
 		int		nrows;
-		int		affectedrows;
 
 		msqlconnection	*msqlconn;
 };
@@ -44,7 +43,7 @@ class msqlconnection : public sqlrconnection {
 	public:
 			msqlconnection();
 	private:
-		int	getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn();
 		sqlrcursor	*initCursor();

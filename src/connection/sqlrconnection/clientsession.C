@@ -14,7 +14,7 @@ void sqlrconnection::clientSession() {
 	for (;;) {
 
 		// is this a query, fetch, abort, suspend or resume...
-		unsigned short	command;
+		uint16_t	command;
 		if (!getCommand(&command)) {
 			endSession();
 			break;
@@ -99,16 +99,16 @@ void sqlrconnection::clientSession() {
 	#endif
 }
 
-sqlrcursor *sqlrconnection::getCursor(unsigned short command) {
+sqlrcursor *sqlrconnection::getCursor(uint16_t command) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"getting a cursor...");
 	#endif
 
 	// does the client need a cursor or does it already have one
-	unsigned short	neednewcursor=DONT_NEED_NEW_CURSOR;
+	uint16_t	neednewcursor=DONT_NEED_NEW_CURSOR;
 	if (command==NEW_QUERY &&
-		clientsock->read(&neednewcursor)!=sizeof(unsigned short)) {
+		clientsock->read(&neednewcursor)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"client cursor request failed, need new cursor stage");
@@ -121,8 +121,8 @@ sqlrcursor *sqlrconnection::getCursor(unsigned short command) {
 	if (neednewcursor==DONT_NEED_NEW_CURSOR) {
 
 		// which cursor is the client requesting?
-		unsigned short	index;
-		if (clientsock->read(&index)!=sizeof(unsigned short)) {
+		uint16_t	index;
+		if (clientsock->read(&index)!=sizeof(uint16_t)) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 				"client cursor request failed, cursor index stage");
@@ -136,7 +136,7 @@ sqlrcursor *sqlrconnection::getCursor(unsigned short command) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 				"client requested an invalid cursor:");
-			debugPrint("connection",3,(long)index);
+			debugPrint("connection",3,index);
 			#endif
 			return NULL;
 		}
@@ -160,11 +160,11 @@ sqlrcursor *sqlrconnection::getCursor(unsigned short command) {
 
 sqlrcursor *sqlrconnection::findAvailableCursor() {
 
-	for (int i=0; i<cfgfl->getCursors(); i++) {
+	for (int16_t i=0; i<cfgfl->getCursors(); i++) {
 		if (!cur[i]->busy) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,"found a free cursor:");
-			debugPrint("connection",3,(long)i);
+			debugPrint("connection",3,i);
 			#endif
 			return cur[i];
 		}
@@ -193,7 +193,7 @@ void sqlrconnection::waitForClientClose() {
 	debugPrint("connection",1,
 			"waiting for client to close the connection...");
 	#endif
-	unsigned short	dummy;
+	uint16_t	dummy;
 	clientsock->read(&dummy);
 	clientsock->close();
 	delete clientsock;
@@ -230,7 +230,7 @@ void sqlrconnection::closeSuspendedSessionSockets() {
 	}
 }
 
-void sqlrconnection::noAvailableCursors(unsigned short command) {
+void sqlrconnection::noAvailableCursors(uint16_t command) {
 
 	// If no cursor was available, the client
 	// cound send an entire query and bind vars
@@ -240,21 +240,21 @@ void sqlrconnection::noAvailableCursors(unsigned short command) {
 	// though, that would provide a point of entry
 	// for a DOS attack.  We'll read the maximum
 	// number of bytes that could be sent.
-	unsigned int	size=(
+	uint32_t	size=(
 				// query size and query
-				sizeof(long)+MAXQUERYSIZE+
+				sizeof(uint32_t)+MAXQUERYSIZE+
 				// input bind var count
-				sizeof(short)+
+				sizeof(uint16_t)+
 				// input bind vars
-				MAXVAR*(2*sizeof(short)+BINDVARLENGTH)+
+				MAXVAR*(2*sizeof(uint16_t)+BINDVARLENGTH)+
 				// output bind var count
-				sizeof(short)+
+				sizeof(uint16_t)+
 				// output bind vars
-				MAXVAR*(2*sizeof(short)+BINDVARLENGTH)+
+				MAXVAR*(2*sizeof(uint16_t)+BINDVARLENGTH)+
 				// get column info
-				sizeof(short)+
+				sizeof(uint16_t)+
 				// skip/fetch
-				2*sizeof(long));
+				2*sizeof(uint32_t));
 
 	clientsock->useNonBlockingMode();
 	unsigned char	dummy[size];
@@ -262,22 +262,22 @@ void sqlrconnection::noAvailableCursors(unsigned short command) {
 	clientsock->useBlockingMode();
 
 	// indicate that an error has occurred
-	clientsock->write((unsigned short)ERROR);
+	clientsock->write((uint16_t)ERROR);
 
 	// send the error itself
-	clientsock->write((unsigned short)62);
+	clientsock->write((uint16_t)62);
 	clientsock->write("No server-side cursors were available to process the query.",62);
 	flushWriteBuffer();
 }
 
-bool sqlrconnection::getCommand(unsigned short *command) {
+bool sqlrconnection::getCommand(uint16_t *command) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"getting command...");
 	#endif
 
 	// get the command
-	if (clientsock->read(command)!=sizeof(unsigned short)) {
+	if (clientsock->read(command)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",1,
 			"getting command failed: client sent bad command");

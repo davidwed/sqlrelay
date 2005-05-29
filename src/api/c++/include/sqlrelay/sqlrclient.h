@@ -12,10 +12,10 @@ using namespace rudiments;
 
 class sqlrconnection {
 	public:
-			sqlrconnection(const char *server, int port,
+			sqlrconnection(const char *server, uint16_t port,
 					const char *socket,
 					const char *user, const char *password,
-					int retrytime, int tries);
+					int32_t retrytime, int32_t tries);
 				// Initiates a connection to "server" on "port"
 				// or to the unix "socket" on the local machine
 				// and authenticates with "user" and "password".
@@ -42,7 +42,7 @@ class sqlrconnection {
 				// session but leaves the session open so 
 				// that another connection can connect to it 
 				// using resumeSession().
-		int	getConnectionPort();
+		uint16_t	getConnectionPort();
 				// Returns the inet port that the connection is 
 				// communicating over. This parameter may be 
 				// passed to another connection for use in
@@ -52,7 +52,7 @@ class sqlrconnection {
 				// is communicating over. This parameter may be 
 				// passed to another connection for use in
 				// the resumeSession() method.
-		bool	resumeSession(int port, const char *socket);
+		bool	resumeSession(uint16_t port, const char *socket);
 				// Resumes a session previously left open 
 				// using suspendSession().
 				// Returns true on success and false on failure.
@@ -109,11 +109,11 @@ class sqlrcursor {
 			sqlrcursor(sqlrconnection *sqlrc);
 			~sqlrcursor();
 
-		void	setResultSetBufferSize(int rows);
+		void	setResultSetBufferSize(uint32_t rows);
 				// Sets the number of rows of the result set
 				// to buffer at a time.  0 (the default)
 				// means buffer the entire result set.
-		int	getResultSetBufferSize();
+		uint32_t	getResultSetBufferSize();
 				// Returns the number of result set rows that 
 				// will be buffered at a time or 0 for the
 				// entire result set.
@@ -150,7 +150,7 @@ class sqlrcursor {
 				// to cacheToFile() changes which file to
 				// cache to or a call to cacheOff() turns off
 				// caching.
-		void	setCacheTtl(int ttl);
+		void	setCacheTtl(uint32_t ttl);
 				// Sets the time-to-live for cached result
 				// sets. The sqlr-cachemanger will remove each 
 				// cached result set "ttl" seconds after it's 
@@ -167,7 +167,7 @@ class sqlrcursor {
 		// in your queries, use these two methods.
 		bool	sendQuery(const char *query);
 				// Sends "query" and gets a result set.
-		bool	sendQuery(const char *query, int length);
+		bool	sendQuery(const char *query, uint32_t length);
 				// Sends "query" with length "length" and gets
 				// a result set. This method must be used if
 				// the query contains binary data.
@@ -182,7 +182,7 @@ class sqlrcursor {
 		// bind variables.
 		void	prepareQuery(const char *query);
 				// Prepare to execute "query".
-		void	prepareQuery(const char *query, int length);
+		void	prepareQuery(const char *query, uint32_t length);
 				// Prepare to execute "query" with length 
 				// "length".  This method must be used if the
 				// query contains binary data.
@@ -195,31 +195,33 @@ class sqlrcursor {
 		void	clearBinds();
 				// Clear all bind variables.
 
-		unsigned short	countBindVariables() const;
+		uint16_t	countBindVariables() const;
 				// Parses the previously prepared query,
 				// counts the number of bind variables defined
 				// in it and returns that number.
 
 		void	substitution(const char *variable, const char *value);
-		void	substitution(const char *variable, long value);
+		void	substitution(const char *variable, int32_t value);
 		void	substitution(const char *variable, double value, 
-					unsigned short precision, 
-					unsigned short scale);
+							uint32_t precision, 
+							uint32_t scale);
 				// Define a substitution variable.
 
 		void	inputBind(const char *variable, const char *value);
-		void	inputBind(const char *variable, long value);
+		void	inputBind(const char *variable, int32_t value);
 		void	inputBind(const char *variable, double value, 
-					unsigned short precision, 
-					unsigned short scale);
-		void	inputBindBlob(const char *variable, const char *value,
-						unsigned long size);
-		void	inputBindClob(const char *variable, const char *value,
-						unsigned long size);
+							uint32_t precision, 
+							uint32_t scale);
+		void	inputBindBlob(const char *variable,
+						const char *value,
+						uint32_t size);
+		void	inputBindClob(const char *variable,
+						const char *value,
+						uint32_t size);
 				// Define an input bind variable.
 
 		void	defineOutputBind(const char *variable,
-					unsigned long bufferlength);
+						uint32_t bufferlength);
 				// Define an output bind variable.
 				// "bufferlength" bytes will be reserved
 				// to store the value.
@@ -233,19 +235,19 @@ class sqlrcursor {
 		void	substitutions(const char **variables,
 						const char **values);
 		void	substitutions(const char **variables,
-						const long *values);
+						const int32_t *values);
 		void	substitutions(const char **variables,
 					const double *values,
-					const unsigned short *precisions, 
-					const unsigned short *scales);
+					const uint32_t *precisions, 
+					const uint32_t *scales);
 				// Define an array of substitution variables.
 		void	inputBinds(const char **variables, const char **values);
 		void	inputBinds(const char **variables,
-					const unsigned long *values);
+					const int32_t *values);
 		void	inputBinds(const char **variables,
 					const double *values, 
-					const unsigned short *precisions, 
-					const unsigned short *scales);
+					const uint32_t *precisions, 
+					const uint32_t *scales);
 				// Define an array of input bind variables.
 
 		void	validateBinds();
@@ -267,7 +269,7 @@ class sqlrcursor {
 		const char	*getOutputBind(const char *variable);
 				// Get the value stored in a previously
 				// defined output bind variable.
-		long	getOutputBindAsLong(const char *variable);
+		int32_t	getOutputBindAsLong(const char *variable);
 				// Get the value stored in a previously
 				// defined output bind variable as a long
 				// integer.
@@ -275,7 +277,7 @@ class sqlrcursor {
 				// Get the value stored in a previously
 				// defined output bind variable as a double
 				// precision floating point number.
-		long	getOutputBindLength(const char *variable);
+		uint32_t	getOutputBindLength(const char *variable);
 				// Get the length of the value stored in a
 				// previously defined output bind variable.
 		sqlrcursor	*getOutputBindCursor(const char *variable);
@@ -287,22 +289,22 @@ class sqlrcursor {
 				// Opens a cached result set.
 				// Returns true on success and false on failure.
 
-		int	colCount();
+		uint32_t	colCount();
 				// Returns the number of columns in the current
 				// result set.
-		int	rowCount();
+		uint32_t	rowCount();
 				// Returns the number of rows in the current 
 				// result set (if the result set is being
 				// stepped through, this returns the number
 				// of rows processed so far).
-		int	totalRows();
+		uint32_t	totalRows();
 				// Returns the total number of rows that will 
 				// be returned in the result set.  Not all 
 				// databases support this call.  Don't use it 
 				// for applications which are designed to be 
 				// portable across databases.  -1 is returned
 				// by databases which don't support this option.
-		int	affectedRows();
+		uint32_t	affectedRows();
 				// Returns the number of rows that were 
 				// updated, inserted or deleted by the query.
 				// Not all databases support this call.  Don't 
@@ -310,7 +312,7 @@ class sqlrcursor {
 				// to be portable across databases.  -1 is 
 				// returned by databases which don't support 
 				// this option.
-		int	firstRowIndex();
+		uint32_t	firstRowIndex();
 				// Returns the index of the first buffered row.
 				// This is useful when buffering only part of
 				// the result set at a time.
@@ -339,95 +341,95 @@ class sqlrcursor {
 				// than as empty strings.
 
 
-		const char	*getField(int row, int col);
-		const char	*getField(int row, const char *col);
+		const char	*getField(uint32_t row, uint32_t col);
+		const char	*getField(uint32_t row, const char *col);
 				// Returns a pointer to the value of the 
 				// specified row and column.
-		long	getFieldAsLong(int row, int col);
-		long	getFieldAsLong(int row, const char *col);
+		int32_t	getFieldAsLong(uint32_t row, uint32_t col);
+		int32_t	getFieldAsLong(uint32_t row, const char *col);
 				// Returns the specified field as a long
 				// integer.
-		double	getFieldAsDouble(int row, int col);
-		double	getFieldAsDouble(int row, const char *col);
+		double	getFieldAsDouble(uint32_t row, uint32_t col);
+		double	getFieldAsDouble(uint32_t row, const char *col);
 				// Returns the specified field as a double
 				// precision floating point number.
-		long	getFieldLength(int row, int col);
-		long	getFieldLength(int row, const char *col);
+		uint32_t	getFieldLength(uint32_t row, uint32_t col);
+		uint32_t	getFieldLength(uint32_t row, const char *col);
 				// Returns the length of the 
 				// specified row and column.
-		const char * const *getRow(int row);
+		const char * const *getRow(uint32_t row);
 				// Returns a null terminated array of the 
 				// values of the fields in the specified row.
-		long	*getRowLengths(int row);
+		uint32_t	*getRowLengths(uint32_t row);
 				// Returns a null terminated array of the 
 				// lengths of the fields in the specified row.
 		const char * const *getColumnNames();
 				// Returns a null terminated array of the 
 				// column names of the current result set.
-		const char	*getColumnName(int col);
+		const char	*getColumnName(uint32_t col);
 				// Returns the name of the specified column.
-		const char	*getColumnType(int col);
+		const char	*getColumnType(uint32_t col);
 		const char	*getColumnType(const char *col);
 				// Returns the type of the specified column.
-		int	getColumnLength(int col);
-		int	getColumnLength(const char *col);
+		uint32_t	getColumnLength(uint32_t col);
+		uint32_t	getColumnLength(const char *col);
 				// Returns the number of bytes required on
 				// the server to store the data.
-		unsigned long	getColumnPrecision(int col);
-		unsigned long	getColumnPrecision(const char *col);
+		uint32_t	getColumnPrecision(uint32_t col);
+		uint32_t	getColumnPrecision(const char *col);
 				// Returns the precision of the specified
 				// column.
 				// Precision is the total number of digits in
 				// a number.  eg: 123.45 has a precision of 5.
 				// For non-numeric types, it's the number of
 				// characters in the string.
-		unsigned long	getColumnScale(int col);
-		unsigned long	getColumnScale(const char *col);
+		uint32_t	getColumnScale(uint32_t col);
+		uint32_t	getColumnScale(const char *col);
 				// Returns the scale of the specified column.
 				// Scale is the total number of digits to the
 				// right of the decimal point in a number.
 				// eg: 123.45 has a scale of 2.
-		unsigned short	getColumnIsNullable(int col);
-		unsigned short	getColumnIsNullable(const char *col);
+		bool		getColumnIsNullable(uint32_t col);
+		bool		getColumnIsNullable(const char *col);
 				// Returns 1 if the specified column can
 				// contain nulls and 0 otherwise.
-		unsigned short	getColumnIsPrimaryKey(int col);
-		unsigned short	getColumnIsPrimaryKey(const char *col);
+		bool		getColumnIsPrimaryKey(uint32_t col);
+		bool		getColumnIsPrimaryKey(const char *col);
 				// Returns 1 if the specified column is a
 				// primary key and 0 otherwise.
-		unsigned short	getColumnIsUnique(int col);
-		unsigned short	getColumnIsUnique(const char *col);
+		bool		getColumnIsUnique(uint32_t col);
+		bool		getColumnIsUnique(const char *col);
 				// Returns 1 if the specified column is
 				// unique and 0 otherwise.
-		unsigned short	getColumnIsPartOfKey(int col);
-		unsigned short	getColumnIsPartOfKey(const char *col);
+		bool		getColumnIsPartOfKey(uint32_t col);
+		bool		getColumnIsPartOfKey(const char *col);
 				// Returns 1 if the specified column is
 				// part of a composite key and 0 otherwise.
-		unsigned short	getColumnIsUnsigned(int col);
-		unsigned short	getColumnIsUnsigned(const char *col);
+		bool		getColumnIsUnsigned(uint32_t col);
+		bool		getColumnIsUnsigned(const char *col);
 				// Returns 1 if the specified column is
 				// an unsigned number and 0 otherwise.
-		unsigned short	getColumnIsZeroFilled(int col);
-		unsigned short	getColumnIsZeroFilled(const char *col);
+		bool		getColumnIsZeroFilled(uint32_t col);
+		bool		getColumnIsZeroFilled(const char *col);
 				// Returns 1 if the specified column was
 				// created with the zero-fill flag and 0
 				// otherwise.
-		unsigned short	getColumnIsBinary(int col);
-		unsigned short	getColumnIsBinary(const char *col);
+		bool		getColumnIsBinary(uint32_t col);
+		bool		getColumnIsBinary(const char *col);
 				// Returns 1 if the specified column
 				// contains binary data and 0
 				// otherwise.
-		unsigned short	getColumnIsAutoIncrement(int col);
-		unsigned short	getColumnIsAutoIncrement(const char *col);
+		bool		getColumnIsAutoIncrement(uint32_t col);
+		bool		getColumnIsAutoIncrement(const char *col);
 				// Returns 1 if the specified column
 				// auto-increments and 0 otherwise.
-		int	getLongest(int col);
-		int	getLongest(const char *col);
+		uint32_t	getLongest(uint32_t col);
+		uint32_t	getLongest(const char *col);
 				// Returns the length of the longest field
 				// in the specified column.
 
 
-		int	getResultSetId();
+		uint16_t	getResultSetId();
 				// Returns the internal ID of this result set.
 				// This parameter may be passed to another 
 				// cursor for use in the resumeResultSet() 
@@ -438,11 +440,12 @@ class sqlrcursor {
 				// suspendSession() so that another connection 
 				// can connect to it using resumeResultSet() 
 				// after it calls resumeSession().
-		bool	resumeResultSet(int id);
+		bool	resumeResultSet(uint16_t id);
 				// Resumes a result set previously left open 
 				// using suspendSession().
 				// Returns true on success and false on failure.
-		bool	resumeCachedResultSet(int id, const char *filename);
+		bool	resumeCachedResultSet(uint16_t id,
+						const char *filename);
 				// Resumes a result set previously left open
 				// using suspendSession() and continues caching
 				// the result set to "filename".

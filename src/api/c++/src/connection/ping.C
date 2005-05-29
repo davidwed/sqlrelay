@@ -17,7 +17,7 @@ bool sqlrconnection::ping() {
 		debugPreEnd();
 	}
 
-	cs->write((unsigned short)PING);
+	cs->write((uint16_t)PING);
 	flushWriteBuffer();
 
 	// get the ping result

@@ -23,11 +23,11 @@ void sqlrconnection::suspendSession() {
 	#endif
 	suspendedsession=true;
 	accepttimeout=cfgfl->getSessionTimeout();
-	for (int i=0; i<cfgfl->getCursors(); i++) {
+	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
 		if (!cur[i]->suspendresultset && cur[i]->busy) {
 
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",3,(long)i);
+			debugPrint("connection",3,i);
 			#endif
 
 			// Very important...
@@ -57,8 +57,8 @@ void sqlrconnection::suspendSession() {
 		if (!openSockets()) {
 			// send the client a 0 sized unix port and a 0 for the
 			// inet port if an error occurred opening the sockets
-			clientsock->write((unsigned short)0);
-			clientsock->write((unsigned short)0);
+			clientsock->write((uint16_t)0);
+			clientsock->write((uint16_t)0);
 		}
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done opening a socket to resume on");
@@ -68,12 +68,12 @@ void sqlrconnection::suspendSession() {
 		debugPrint("connection",2,"passing socket info to client...");
 		#endif
 		if (serversockun) {
-			unsigned short	unixsocketsize=
+			uint16_t	unixsocketsize=
 					charstring::length(unixsocket);
 			clientsock->write(unixsocketsize);
 			clientsock->write(unixsocket,unixsocketsize);
 		} else {
-			clientsock->write((unsigned short)0);
+			clientsock->write((uint16_t)0);
 		}
 		clientsock->write(inetport);
 		#ifdef SERVER_DEBUG

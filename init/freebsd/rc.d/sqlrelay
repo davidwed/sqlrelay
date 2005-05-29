@@ -8,7 +8,7 @@
 prefix=${DESTDIR}/usr/local/firstworks
 sysconfdir=${prefix}/etc
 
-if ( test -n -r "${sysconfdir}/sqlrelay.conf" ); then
+if ( test ! -r "${sysconfdir}/sqlrelay.conf" ); then
         exit 1
 fi
 

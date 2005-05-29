@@ -27,7 +27,6 @@ void sqlrcursor::clearResultSet() {
 	affectedrows=0;
 	endofresultset=true;
 	suspendresultsetsent=0;
-	getrowcount=0;
 }
 
 void sqlrcursor::clearError() {
@@ -41,9 +40,9 @@ void sqlrcursor::clearError() {
 void sqlrcursor::clearRows() {
 
 	// delete data in rows for long datatypes
-	unsigned long	rowbuffercount=rowcount-firstrowindex;
-	for (unsigned long i=0; i<rowbuffercount; i++) {
-	        for (unsigned long j=0; j<colcount; j++) {
+	uint32_t	rowbuffercount=rowcount-firstrowindex;
+	for (uint32_t i=0; i<rowbuffercount; i++) {
+	        for (uint32_t j=0; j<colcount; j++) {
 			if (getColumnInternal(j)->longdatatype) {
 				delete[] getFieldInternal(i,j);
 			}
@@ -69,14 +68,14 @@ void sqlrcursor::clearRows() {
 
 	// delete arrays of fields and field lengths
 	if (fields) {
-		for (unsigned long i=0; i<rowbuffercount; i++) {
+		for (uint32_t i=0; i<rowbuffercount; i++) {
 			delete[] fields[i];
 		}
 		delete[] fields;
 		fields=NULL;
 	}
 	if (fieldlengths) {
-		for (unsigned long i=0; i<rowbuffercount; i++) {
+		for (uint32_t i=0; i<rowbuffercount; i++) {
 			delete[] fieldlengths[i];
 		}
 		delete[] fieldlengths;
@@ -92,7 +91,7 @@ void sqlrcursor::clearColumns() {
 	// delete the column type strings (if necessary)
 	if (sentcolumninfo==SEND_COLUMN_INFO &&
 				columntypeformat!=COLUMN_TYPE_IDS) {
-		for (unsigned long i=0; i<colcount; i++) {
+		for (uint32_t i=0; i<colcount; i++) {
 			delete[] getColumnInternal(i)->typestring;
 		}
 	}

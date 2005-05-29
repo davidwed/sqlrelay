@@ -15,20 +15,20 @@
 #include <sqlcli1.h>
 
 struct column {
-	char	name[MAX_ITEM_BUFFER_SIZE];
-	int	namelength;
-	int	type;
-	int	length;
-	int	precision;
-	int	scale;
-	int	nullable;
-	int	primarykey;
-	int	unique;
-	int	partofkey;
-	int	unsignednumber;
-	int	zerofill;
-	int	binary;
-	int	autoincrement;
+	char		name[MAX_ITEM_BUFFER_SIZE];
+	uint16_t	namelength;
+	int16_t		type;
+	uint32_t	length;
+	uint32_t	precision;
+	uint32_t	scale;
+	uint16_t	nullable;
+	uint16_t	primarykey;
+	uint16_t	unique;
+	uint16_t	partofkey;
+	uint16_t	unsignednumber;
+	uint16_t	zerofill;
+	uint16_t	binary;
+	uint16_t	autoincrement;
 };
 
 class db2connection;
@@ -39,27 +39,28 @@ class db2cursor : public sqlrcursor {
 			db2cursor(sqlrconnection *conn);
 			~db2cursor();
 	private:
-		bool		prepareQuery(const char *query, long length);
+		bool		prepareQuery(const char *query,
+						uint32_t length);
 		bool		inputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned short valuesize,
-						short *isnull);
+						uint16_t valuesize,
+						int16_t *isnull);
 		bool		inputBindLong(const char *variable, 
-						unsigned short variablesize,
-						unsigned long *value);
+						uint16_t variablesize,
+						uint32_t *value);
 		bool		inputBindDouble(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value, 
-						unsigned short precision,
-						unsigned short scale);
+						uint32_t precision,
+						uint32_t scale);
 		bool		outputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						char *value, 
-						unsigned short valuesize,
-						short *isnull);
+						uint16_t valuesize,
+						int16_t *isnull);
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 		const char	*getErrorMessage(bool *liveconnection);
 		void		returnRowCounts();
@@ -70,9 +71,8 @@ class db2cursor : public sqlrcursor {
 		bool		fetchRow();
 		void		returnRow();
 
-		long		erg;
+		SQLRETURN	erg;
 		SQLHSTMT	stmt;
-		long		result;
 		SQLSMALLINT	ncols;
 		SQLINTEGER 	affectedrows;
 		char		field[MAX_SELECT_LIST_SIZE]
@@ -85,10 +85,10 @@ class db2cursor : public sqlrcursor {
 #endif
 		column 		col[MAX_SELECT_LIST_SIZE];
 
-		int		rowgroupindex;
-		int		totalinrowgroup;
-		int		totalrows;
-		int		rownumber;
+		uint32_t	rowgroupindex;
+		uint32_t	totalinrowgroup;
+		uint32_t	totalrows;
+		uint32_t	rownumber;
 
 		stringbuffer	*errormsg;
 
@@ -98,14 +98,14 @@ class db2cursor : public sqlrcursor {
 class db2connection : public sqlrconnection {
 	friend class db2cursor;
 	private:
-		int	getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn();
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		short	nullBindValue();
-		bool	bindValueIsNull(short isnull);
+		int16_t	nullBindValue();
+		bool	bindValueIsNull(int16_t isnull);
 		bool	autoCommitOn();
 		bool	autoCommitOff();
 		bool	commit();
@@ -114,7 +114,7 @@ class db2connection : public sqlrconnection {
 		char	*identify();
 
 		SQLHENV		env;
-		long		erg;
+		SQLRETURN	erg;
 		SQLHDBC		dbc;
 
 		const char	*server;

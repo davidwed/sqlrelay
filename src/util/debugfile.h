@@ -14,12 +14,16 @@ class debugfile {
 		void	openDebugFile(const char *name,
 					const char *localstatedir);
 		void	closeDebugFile();
-		void	debugPrint(const char *name, int tabs,
-						const char *string);
-		void	debugPrint(const char *name, int tabs, long number);
-		void	debugPrint(const char *name, int tabs, double number);
-		void	debugPrintBlob(const char *blob, unsigned long length);
-		void	debugPrintClob(const char *clob, unsigned long length);
+		void	debugPrint(const char *name, int32_t tabs,
+							const char *string);
+		void	debugPrint(const char *name, int32_t tabs,
+							int32_t number);
+		void	debugPrint(const char *name, int32_t tabs,
+							uint32_t number);
+		void	debugPrint(const char *name, int32_t tabs,
+							double number);
+		void	debugPrintBlob(const char *blob, uint32_t length);
+		void	debugPrintClob(const char *clob, uint32_t length);
 		logger	*getDebugLogger();
 	private:
 		filedestination	*dbgfile;

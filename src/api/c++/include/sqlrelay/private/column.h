@@ -8,22 +8,22 @@ class column {
 	friend class sqlrcursor;
 	private:
 		char		*name;
-		unsigned short	type;
+		uint16_t	type;
 		char		*typestring;
-		unsigned short	typestringlength;
-		unsigned long	length;
-		int		longest;
+		uint16_t	typestringlength;
+		uint32_t	length;
+		uint32_t	longest;
 		unsigned char	longdatatype;
-		unsigned long	precision;
-		unsigned long	scale;
-		unsigned short	nullable;
-		unsigned short	primarykey;
-		unsigned short	unique;
-		unsigned short	partofkey;
-		unsigned short	unsignednumber;
-		unsigned short	zerofill;
-		unsigned short	binary;
-		unsigned short	autoincrement;
+		uint32_t	precision;
+		uint32_t	scale;
+		uint16_t	nullable;
+		uint16_t	primarykey;
+		uint16_t	unique;
+		uint16_t	partofkey;
+		uint16_t	unsignednumber;
+		uint16_t	zerofill;
+		uint16_t	binary;
+		uint16_t	autoincrement;
 };
 
 #endif

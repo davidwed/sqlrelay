@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrcursor::openCursor(int id) {
+bool sqlrcursor::openCursor(uint16_t id) {
 	this->id=id;
 	return true;
 }

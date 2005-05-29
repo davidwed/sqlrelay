@@ -557,6 +557,8 @@ then
 
 	else
 
+		AC_MSG_CHECKING(for oracle includes and libraries)
+
 		if ( test -n "$STATICLINK" )
 		then
 			STATICFLAG="-static"
@@ -596,13 +598,9 @@ then
 				fi
 			done
 		else
-
-			AC_MSG_CHECKING(for ORACLE_HOME)
 		
 			if ( test -n "$ORACLE_HOME" )
 			then
-
-				AC_MSG_RESULT(yes)
 
 				dnl use sysliblist if it's there
 				SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
@@ -618,22 +616,40 @@ then
 				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore10.a],[ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 				FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
 			else
-				AC_MSG_RESULT(no)
-				AC_MSG_WARN(The ORACLE_HOME environment variable is not set.  Oracle support will not be built.)
-			fi
 
+				for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
+				do
+					if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.so" -a -r "/usr/include/oracle/$version/client/oci.h" )
+					then
+						ORACLEVERSION="10g"
+						ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
+						ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -lnnz10"
+						ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
+					fi
+				done
+			fi
 		fi
 		
 		if ( test -n "$ORACLEVERSION" )
 		then
-			if ( test -n "$CYGWIN" )
+			if ( test -z "$ORACLEINCLUDES" )
 			then
-				ORACLEINCLUDES="-I$ORACLE_HOME/include"
-			else
-				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
+				if ( test -n "$CYGWIN" )
+				then
+					ORACLEINCLUDES="-I$ORACLE_HOME/include"
+				else
+					ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
+				fi
 			fi
-			echo "hmmm, looks like Oracle$ORACLEVERSION..."
 		fi
+
+		if ( test -n "$ORACLELIBS" -a -n "$ORACLEINCLUDES" )
+		then
+			AC_MSG_RESULT(yes)
+		else
+			AC_MSG_RESULT(no)
+		fi
+		
 		
 		OCI_H=""
 		if ( test -n "$ORACLELIBS" )
@@ -899,6 +915,15 @@ then
 	AC_SUBST(MYSQLLIBS)
 	AC_SUBST(MYSQLLIBSPATH)
 	AC_SUBST(MYSQLSTATIC)
+
+	SIDINCLUDES="$MYSQLINCLUDES"
+	SIDLIBS="$MYSQLLIBS"
+	AC_SUBST(SIDINCLUDES)
+	AC_SUBST(SIDLIBS)
+	if ( test -n "$SIDLIBS" )
+	then
+		AC_DEFINE(INCLUDE_SID,1,Include support for SID)
+	fi
 fi
 ])
 
@@ -1882,7 +1907,6 @@ then
 	MDBTOOLSLIBS=""
 	MDBTOOLSLIBSPATH=""
 	MDBTOOLSSTATIC=""
-	LINKFAIL=""
 
 	if ( test -n "$GLIBINCLUDES" -a -n "$GLIBLIBS" )
 	then
@@ -1912,18 +1936,17 @@ then
 
 			if ( test -n "$MDBSQLINCLUDES" -o -n "$MDBSQLLIBS" -o -n "$MDBINCLUDES" -o -n "$MDBLIBS" )
 			then
-				LINKFAIL=""
 				MDBTOOLSINCLUDES="$MDBINCLUDES $MDBSQLINCLUDES $GLIBINCLUDES"
 				MDBTOOLSLIBS="$MDBSQLLIBS $MDBLIBS $GLIBLIBS"
 				AC_MSG_CHECKING(if MDB Tools has mdb_run_query)
 				FW_TRY_LINK([#include <mdbsql.h>
-#include <stdlib.h>],[mdb_run_query(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_RUN_QUERY,1,Some versions of mdbtools define mdb_run_query)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>],[mdb_run_query(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_RUN_QUERY,1,Some versions of mdbtools define mdb_run_query)],[AC_MSG_RESULT(no)])
 			fi
 		
 		fi
 	fi
 
-	if ( test -z "$MDBTOOLSLIBS" -o -n "$LINKFAIL" )
+	if ( test -z "$MDBTOOLSLIBS" )
 	then
 		AC_MSG_WARN(MDB Tools support will not be built.)
 	fi

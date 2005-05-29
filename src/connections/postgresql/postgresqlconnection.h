@@ -21,7 +21,7 @@ class postgresqlcursor : public sqlrcursor {
 	private:
 				postgresqlcursor(sqlrconnection *conn);
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 		const char	*getErrorMessage(bool *liveconnection);
 		void		returnRowCounts();
@@ -33,12 +33,11 @@ class postgresqlcursor : public sqlrcursor {
 		void		returnRow();
 		void		cleanUpData(bool freeresult, bool freebinds);
 
-		int		ddlquery;
 		PGresult	*pgresult;
 		ExecStatusType	pgstatus;
 		int		ncols;
 		int		nrows;
-		int		affectedrows;
+		uint32_t	affectedrows;
 		int		currentrow;
 
 		postgresqlconnection	*postgresqlconn;
@@ -47,7 +46,7 @@ class postgresqlcursor : public sqlrcursor {
 class postgresqlconnection : public sqlrconnection {
 	friend class postgresqlcursor;
 	private:
-		int		getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn();
 		sqlrcursor	*initCursor();
@@ -59,7 +58,7 @@ class postgresqlconnection : public sqlrconnection {
 		void		dropTable(const char *table);
 
 		int	datatypecount;
-		long	*datatypeids;
+		int32_t	*datatypeids;
 		char	**datatypenames;
 
 		PGconn	*pgconn;
@@ -69,7 +68,7 @@ class postgresqlconnection : public sqlrconnection {
 		const char	*options;
 		const char	*tty;
 		const char	*db;
-		int		typemangling;
+		uint16_t	typemangling;
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	public:

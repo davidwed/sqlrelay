@@ -15,15 +15,15 @@ bool sqlrcursor::parseOutputBinds() {
 	}
 
 	// useful variables
-	unsigned short	type;
-	unsigned long	length;
+	uint16_t	type;
+	uint32_t	length;
 	int	count=0;
 
 	// get the bind values
 	for (;;) {
 
 		// get the data type
-		if (getShort(&type)!=sizeof(unsigned short)) {
+		if (getShort(&type)!=sizeof(uint16_t)) {
 			setError("Failed to get data type.\n A network error may have occurred.");
 
 			return false;
@@ -48,7 +48,7 @@ bool sqlrcursor::parseOutputBinds() {
 		} else if (type==NORMAL_DATA) {
 
 			// get the value length
-			if (getLong(&length)!=sizeof(unsigned long)) {
+			if (getLong(&length)!=sizeof(uint32_t)) {
 				setError("Failed to get string value length.\n A network error may have occurred.");
 				return false;
 			}
@@ -56,7 +56,7 @@ bool sqlrcursor::parseOutputBinds() {
 			outbindvars[count].value.stringval=new char[length+1];
 
 			// get the value
-			if ((unsigned long)getString(outbindvars[count].value.
+			if ((uint32_t)getString(outbindvars[count].value.
 						stringval,length)!=length) {
 				setError("Failed to get string value.\n A network error may have occurred.");
 				return false;
@@ -66,9 +66,9 @@ bool sqlrcursor::parseOutputBinds() {
 		} else if (type==CURSOR_DATA) {
 
 			// get the cursor id
-			if (getShort((unsigned short *)
+			if (getShort((uint16_t *)
 					&(outbindvars[count].value.cursorid))!=
-						sizeof(unsigned short)) {
+						sizeof(uint16_t)) {
 				setError("Failed to get cursor id.\n A network error may have occurred.");
 				return false;
 			}
@@ -77,13 +77,12 @@ bool sqlrcursor::parseOutputBinds() {
 
 			char	*buffer=NULL;
 			char	*oldbuffer=NULL;
-			unsigned long	totallength=0;
-			unsigned long	length;
+			uint32_t	totallength=0;
+			uint32_t	length;
 			for (;;) {
 
 				// get the type of the chunk
-				if (getShort(&type)!=
-						sizeof(unsigned short)) {
+				if (getShort(&type)!=sizeof(uint16_t)) {
 					setError("Failed to get chunk type.\n A network error may have occurred.");
 					return false;
 				}
@@ -94,7 +93,7 @@ bool sqlrcursor::parseOutputBinds() {
 				}
 
 				// get the length of the chunk
-				if (getLong(&length)!=sizeof(unsigned long)) {
+				if (getLong(&length)!=sizeof(uint32_t)) {
 					delete[] buffer;
 					setError("Failed to get chunk length.\n A network error may have occurred.");
 					return false;
@@ -114,7 +113,7 @@ bool sqlrcursor::parseOutputBinds() {
 				totallength=totallength+length;
 
 				// get the chunk of data
-				if ((unsigned long)getString(buffer,length)!=
+				if ((uint32_t)getString(buffer,length)!=
 								length) {
 					delete[] buffer;
 					setError("Failed to get chunk data.\n A network error may have occurred.");
@@ -145,7 +144,7 @@ bool sqlrcursor::parseOutputBinds() {
 					outbindvars[count].value.lobval,
 					outbindvars[count].valuesize);
 			} else if (outbindvars[count].type==CURSOR_BIND) {
-				sqlrc->debugPrint((long)outbindvars[count].
+				sqlrc->debugPrint((int32_t)outbindvars[count].
 								value.cursorid);
 			} else {
 				sqlrc->debugPrint(outbindvars[count].

@@ -61,25 +61,26 @@ typedef linkedlistnode< usercontainer * >	usernode;
 
 class connectstringcontainer {
 	public:
-				connectstringcontainer(int connectstringcount);
+				connectstringcontainer(
+						uint16_t connectstringcount);
 				~connectstringcontainer();
 		void		parseConnectString();
 		void		setConnectionId(const char *connectionid);
 		void		setString(const char *string);
-		void		setMetric(int metric);
+		void		setMetric(uint32_t metric);
 		const char	*getConnectionId();
 		const char	*getString();
-		int		getMetric();
+		uint32_t	getMetric();
 		const char	*getConnectStringValue(const char *variable);
 	private:
 
 		const char	*connectionid;
 		const char	*string;
-		int		metric;
+		uint32_t	metric;
 
 		// connect string parameters
 		parameterstring	connectstring;
-		int		connectstringcount;
+		uint16_t	connectstringcount;
 };
 
 typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
@@ -88,26 +89,26 @@ class sqlrconfigfile : public xmlsax {
 	public:
 			sqlrconfigfile();
 			~sqlrconfigfile();
-		int	parse(const char *config, const char *id);
-		int	parse(const char *config, const char *id,
-						int connectstringcount);
-		int		getPort();
+		bool	parse(const char *config, const char *id);
+		bool	parse(const char *config, const char *id,
+						uint16_t connectstringcount);
+		uint16_t	getPort();
 		const char	*getUnixPort();
 		bool		getListenOnInet();
 		bool		getListenOnUnix();
 		const char	*getDbase();
-		int		getConnections();
-		int		getMaxConnections();
-		int		getMaxQueueLength();
-		int		getGrowBy();
-		int		getTtl();
+		uint32_t	getConnections();
+		uint32_t	getMaxConnections();
+		uint32_t	getMaxQueueLength();
+		uint32_t	getGrowBy();
+		uint32_t	getTtl();
 		bool		getDynamicScaling();
 		const char	*getEndOfSession();
 		bool		getEndOfSessionCommit();
-		long		getSessionTimeout();
+		uint32_t	getSessionTimeout();
 		const char	*getRunAsUser();
 		const char	*getRunAsGroup();
-		int		getCursors();
+		uint16_t	getCursors();
 		const char	*getAuthTier();
 		bool		getAuthOnListener();
 		bool		getAuthOnConnection();
@@ -125,42 +126,42 @@ class sqlrconfigfile : public xmlsax {
 					*getConnectStringList();
 		connectstringcontainer	*getConnectString(
 						const char *connectionid);
-		int			getConnectionCount();
-		int			getMetricTotal();
+		uint32_t		getConnectionCount();
+		uint32_t		getMetricTotal();
 	private:
 		const char	*id;
 		bool		correctid;
 		bool		done;
 		attribute	currentattribute;
 
-		int	atoi(const char *value,
+		uint32_t	atouint32_t(const char *value,
 					const char *defaultvalue,
-					int minvalue);
-		long	atol(const char *value,
+					uint32_t minvalue);
+		uint16_t	atouint16_t(const char *value,
 					const char *defaultvalue,
-					long minvalue);
+					uint16_t minvalue);
 
 		bool	tagStart(const char *name);
 		bool	attributeName(const char *name);
 		bool	attributeValue(const char *value);
 		bool	tagEnd(const char *name);
 
-		int		port;
+		uint16_t	port;
 		bool		listenoninet;
 		const char	*unixport;
 		bool		listenonunix;
 		const char	*dbase;
-		int		connections;
-		int		maxconnections;
-		int		maxqueuelength;
-		int		growby;
-		int		ttl;
+		uint32_t	connections;
+		uint32_t	maxconnections;
+		uint32_t	maxqueuelength;
+		uint32_t	growby;
+		uint32_t	ttl;
 		const char	*endofsession;
 		bool		endofsessioncommit;
-		long		sessiontimeout;
+		uint32_t	sessiontimeout;
 		const char	*runasuser;
 		const char	*runasgroup;
-		int		cursors;
+		uint16_t	cursors;
 		const char	*authtier;
 		bool		authonlistener;
 		bool		authonconnection;
@@ -177,10 +178,10 @@ class sqlrconfigfile : public xmlsax {
 
 		connectstringcontainer	*firstconnect;
 		connectstringcontainer	*currentconnect;
-		int			connectioncount;
-		int			metrictotal;
+		uint32_t		connectioncount;
+		uint32_t		metrictotal;
 
-		int	connectstringcount;
+		uint16_t	connectstringcount;
 
 		linkedlist< connectstringcontainer * >	connectstringlist;
 		linkedlist< usercontainer * >		userlist;

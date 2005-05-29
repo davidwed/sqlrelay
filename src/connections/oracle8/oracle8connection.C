@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 oracle8connection::oracle8connection() {
-	stringbindvaluelength=MAX_STRING_BIND_VALUE_SIZE;
+	stringbindvaluelength=MAX_ITEM_BUFFER_SIZE;
 	statementmode=OCI_DEFAULT;
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
@@ -24,7 +24,7 @@ oracle8connection::~oracle8connection() {
 	delete environ;
 }
 
-int oracle8connection::getNumberOfConnectStringVars() {
+uint16_t oracle8connection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -374,7 +374,7 @@ const char *oracle8connection::identify() {
 }
 
 oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
-	prepared=0;
+	prepared=false;
 	errormessage=NULL;
 	oracle8conn=(oracle8connection *)conn;
 	fetchatonce=FETCH_AT_ONCE;
@@ -385,13 +385,13 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	inbindcount=0;
 	outbindcount=0;
 	curbindcount=0;
-	for (int i=0; i<MAXVAR; i++) {
+	for (uint16_t i=0; i<MAXVAR; i++) {
 		inbindpp[i]=NULL;
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
 	}
-	for (int i=0; i<MAX_SELECT_LIST_SIZE; i++) {
-		for (int j=0; j<FETCH_AT_ONCE; j++) {
+	for (uint16_t i=0; i<MAX_SELECT_LIST_SIZE; i++) {
+		for (uint32_t j=0; j<FETCH_AT_ONCE; j++) {
 			def_lob[i][j]=NULL;
 		}
 		def[i]=NULL;
@@ -406,7 +406,7 @@ oracle8cursor::~oracle8cursor() {
 	delete errormessage;
 }
 
-bool oracle8cursor::openCursor(int id) {
+bool oracle8cursor::openCursor(uint16_t id) {
 
 	// allocate a cursor handle
 	stmt=NULL;
@@ -430,7 +430,7 @@ bool oracle8cursor::closeCursor() {
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
 
-bool oracle8cursor::prepareQuery(const char *query, long length) {
+bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 
 	// keep a pointer to the query and length in case it needs to be 
 	// reprepared later
@@ -456,15 +456,15 @@ void oracle8cursor::checkRePrepare() {
 	if (!prepared && stmttype && stmttype!=OCI_STMT_SELECT) {
 		cleanUpData(true,true);
 		prepareQuery(query,length);
-		prepared=1;
+		prepared=true;
 	}
 }
 
 bool oracle8cursor::inputBindString(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value,
-						unsigned short valuesize,
-						short *isnull) {
+						uint16_t valuesize,
+						int16_t *isnull) {
 	checkRePrepare();
 
 	// the size of the value must include the terminating NULL
@@ -500,8 +500,8 @@ bool oracle8cursor::inputBindString(const char *variable,
 
 
 bool oracle8cursor::inputBindLong(const char *variable,
-						unsigned short variablesize,
-						unsigned long *value) {
+						uint16_t variablesize,
+						uint32_t *value) {
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -511,7 +511,7 @@ bool oracle8cursor::inputBindLong(const char *variable,
 		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
 				(ub4)charstring::toLong(variable+1),
-				(dvoid *)value,(sb4)sizeof(long),
+				(dvoid *)value,(sb4)sizeof(int32_t),
 				SQLT_INT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
@@ -521,7 +521,7 @@ bool oracle8cursor::inputBindLong(const char *variable,
 		if (OCIBindByName(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
-				(dvoid *)value,(sb4)sizeof(long),
+				(dvoid *)value,(sb4)sizeof(int32_t),
 				SQLT_INT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
@@ -534,10 +534,10 @@ bool oracle8cursor::inputBindLong(const char *variable,
 
 
 bool oracle8cursor::inputBindDouble(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value,
-						unsigned short precision,
-						unsigned short scale) {
+						uint32_t precision,
+						uint32_t scale) {
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -569,10 +569,10 @@ bool oracle8cursor::inputBindDouble(const char *variable,
 }
 
 bool oracle8cursor::outputBindString(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						char *value,
-						unsigned short valuesize,
-						short *isnull) {
+						uint16_t valuesize,
+						int16_t *isnull) {
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -609,30 +609,30 @@ bool oracle8cursor::outputBindString(const char *variable,
 
 #ifdef HAVE_ORACLE_8i
 bool oracle8cursor::inputBindBlob(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value,
-						unsigned long valuesize,
-						short *isnull) {
+						uint32_t valuesize,
+						int16_t *isnull) {
 	return inputBindGenericLob(variable,variablesize,
 					value,valuesize,isnull,
 					OCI_TEMP_BLOB,SQLT_BLOB);
 }
 
 bool oracle8cursor::inputBindClob(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value,
-						unsigned long valuesize,
-						short *isnull) {
+						uint32_t valuesize,
+						int16_t *isnull) {
 	return inputBindGenericLob(variable,variablesize,
 					value,valuesize,isnull,
 					OCI_TEMP_CLOB,SQLT_CLOB);
 }
 
 bool oracle8cursor::inputBindGenericLob(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value,
-						unsigned long valuesize,
-						short *isnull,
+						uint32_t valuesize,
+						int16_t *isnull,
 						ub1 temptype,
 						ub2 type) {
 
@@ -712,25 +712,25 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 }
 
 bool oracle8cursor::outputBindBlob(const char *variable,
-						unsigned short variablesize,
-						int index,
-						short *isnull) {
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull) {
 	return outputBindGenericLob(variable,variablesize,index,
 						isnull,SQLT_BLOB);
 }
 
 bool oracle8cursor::outputBindClob(const char *variable,
-						unsigned short variablesize,
-						int index,
-						short *isnull) {
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull) {
 	return outputBindGenericLob(variable,variablesize,index,
 						isnull,SQLT_CLOB);
 }
 
 bool oracle8cursor::outputBindGenericLob(const char *variable,
-						unsigned short variablesize,
-						int index,
-						short *isnull,
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull,
 						ub2 type) {
 
 	checkRePrepare();
@@ -751,7 +751,9 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 		if (OCIBindByPos(stmt,&outbindpp[outbindcount],
 			oracle8conn->err,
 			(ub4)charstring::toLong(variable+1),
-			(dvoid *)&outbind_lob[index],(sb4)-1,
+			(dvoid *)&outbind_lob[index],
+			//(sb4)-1,
+			(sb4)sizeof(OCILobLocator *),
 			type,
 			(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 			OCI_DEFAULT)!=OCI_SUCCESS) {
@@ -761,7 +763,9 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 		if (OCIBindByName(stmt,&outbindpp[outbindcount],
 				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
-				(dvoid *)&outbind_lob[index],(sb4)-1,
+				(dvoid *)&outbind_lob[index],
+				//(sb4)-1,
+				(sb4)sizeof(OCILobLocator *),
 				type,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
@@ -773,7 +777,7 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 }
 
 bool oracle8cursor::outputBindCursor(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						sqlrcursor *cursor) {
 
 	checkRePrepare();
@@ -808,21 +812,21 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	return true;
 }
 
-void oracle8cursor::returnOutputBindBlob(int index) {
+void oracle8cursor::returnOutputBindBlob(uint16_t index) {
 	returnOutputBindGenericLob(index);
 }
 
-void oracle8cursor::returnOutputBindClob(int index) {
+void oracle8cursor::returnOutputBindClob(uint16_t index) {
 	returnOutputBindGenericLob(index);
 }
 
-void oracle8cursor::returnOutputBindGenericLob(int index) {
+void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 
 	// handle lob datatypes
 	char	buf[MAX_ITEM_BUFFER_SIZE+1];
 	ub4	retlen=MAX_ITEM_BUFFER_SIZE;
 	ub4	offset=1;
-	int	start=1;
+	bool	start=true;
 
 	// Get the length of the lob. If we fail to read the
 	// length, send a NULL field.  Unfortunately, there
@@ -854,7 +858,7 @@ void oracle8cursor::returnOutputBindGenericLob(int index) {
 				(dvoid *)buf,
 				MAX_ITEM_BUFFER_SIZE,
 				(dvoid *)NULL,
-		(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
+				(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
 				(ub2)0,
 				(ub1)SQLCS_IMPLICIT);
 
@@ -871,9 +875,9 @@ void oracle8cursor::returnOutputBindGenericLob(int index) {
 		} else {
 			if (start) {
 				conn->startSendingLong();
-				start=0;
+				start=false;
 			}
-			conn->sendLongSegment((char *)buf,(long)retlen);
+			conn->sendLongSegment((char *)buf,(int32_t)retlen);
 			offset=offset+retlen;
 			retlen=MAX_ITEM_BUFFER_SIZE;
 		}
@@ -893,8 +897,7 @@ void oracle8cursor::returnOutputBindGenericLob(int index) {
 	}
 }
 
-void oracle8cursor::checkForTempTable(const char *query,
-						unsigned long length) {
+void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 
 	char	*ptr=(char *)query;
 	char	*endptr=(char *)query+length;
@@ -928,7 +931,8 @@ void oracle8cursor::checkForTempTable(const char *query,
 }
 #endif
 
-bool oracle8cursor::executeQuery(const char *query, long length, bool execute) {
+bool oracle8cursor::executeQuery(const char *query, uint32_t length,
+							bool execute) {
 
 	// initialize the column count
 	ncols=0;
@@ -967,7 +971,7 @@ bool oracle8cursor::executeQuery(const char *query, long length, bool execute) {
 		}
 
 		// reset the prepared flag
-		prepared=0;
+		prepared=false;
 	}
 
 	// if the query is a select, describe/define it
@@ -982,7 +986,7 @@ bool oracle8cursor::executeQuery(const char *query, long length, bool execute) {
 		}
 
 		// run through the columns...
-		for (int i=0; i<ncols; i++) {
+		for (sword i=0; i<ncols; i++) {
 
 			// get the entire column definition
 			if (OCIParamGet(stmt,OCI_HTYPE_STMT,
@@ -1047,7 +1051,7 @@ bool oracle8cursor::executeQuery(const char *query, long length, bool execute) {
 				desc[i].dbsize=0;
 
 				// allocate a lob descriptor
-				for (int j=0; j<FETCH_AT_ONCE; j++) {
+				for (uint32_t j=0; j<FETCH_AT_ONCE; j++) {
 					if (OCIDescriptorAlloc(
 						(void *)oracle8conn->env,
 						(void **)&def_lob[i][j],
@@ -1098,7 +1102,7 @@ bool oracle8cursor::executeQuery(const char *query, long length, bool execute) {
 				}
 
 				// set the lob member to NULL
-				for (int j=0; j<FETCH_AT_ONCE; j++) {
+				for (uint32_t j=0; j<FETCH_AT_ONCE; j++) {
 					def_lob[i][j]=NULL;
 				}
 			}
@@ -1156,7 +1160,7 @@ void oracle8cursor::returnRowCounts() {
 			OCI_ATTR_ROW_COUNT,oracle8conn->err);
 
 	// don't know how to get affected row count in OCI8
-	conn->sendRowCounts((long)-1,(long)rows);
+	conn->sendRowCounts(false,0,true,rows);
 }
 
 void oracle8cursor::returnColumnCount() {
@@ -1168,13 +1172,13 @@ void oracle8cursor::returnColumnInfo() {
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// a useful variable
-	int	type;
+	uint16_t	type;
 
 	// for each column...
-	for (int i=0; i<ncols; i++) {
+	for (sword i=0; i<ncols; i++) {
 
 		// set column type
-		unsigned short	binary=0;
+		uint16_t	binary=0;
 		if (desc[i].dbtype==VARCHAR2_TYPE) {
 			type=VARCHAR2_DATATYPE;
 		} else if (desc[i].dbtype==NUMBER_TYPE) {
@@ -1209,12 +1213,12 @@ void oracle8cursor::returnColumnInfo() {
 
 		// send the column definition
 		conn->sendColumnDefinition((char *)desc[i].buf,
-					(short)desc[i].buflen,
+					(uint16_t)desc[i].buflen,
 					type,
-					(int)desc[i].dbsize,
-					(unsigned short)desc[i].precision,
-					(unsigned short)desc[i].scale,
-					(unsigned short)desc[i].nullok,0,0,
+					(uint32_t)desc[i].dbsize,
+					(uint32_t)desc[i].precision,
+					(uint32_t)desc[i].scale,
+					(uint16_t)desc[i].nullok,0,0,
 					0,0,0,binary,0);
 	}
 }
@@ -1328,7 +1332,7 @@ void oracle8cursor::returnRow() {
 					}
 					conn->sendLongSegment(
 						(char *)def_buf[col][row],
-						(long)retlen);
+						(int32_t)retlen);
 					offset=offset+retlen;
 					retlen=MAX_ITEM_BUFFER_SIZE;
 				}
@@ -1385,8 +1389,8 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	// free row/column resources
 	if (freeresult) {
-		for (int i=0; i<ncols; i++) {
-			for (int j=0; j<FETCH_AT_ONCE; j++) {
+		for (sword i=0; i<ncols; i++) {
+			for (uint32_t j=0; j<FETCH_AT_ONCE; j++) {
 				if (def_lob[i][j]) {
 					OCIDescriptorFree(def_lob[i][j],
 								OCI_DTYPE_LOB);
@@ -1403,7 +1407,7 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 	if (freebinds) {
 		// free lob bind resources
 #ifdef HAVE_ORACLE_8i
-		for (int i=0; i<inbindlobcount; i++) {
+		for (uint16_t i=0; i<inbindlobcount; i++) {
 			OCILobFreeTemporary(oracle8conn->svc,
 							oracle8conn->err,
 							inbind_lob[i]);
@@ -1411,7 +1415,7 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 							inbind_lob[i]);
 			OCIDescriptorFree(inbind_lob[i],OCI_DTYPE_LOB);
 		}
-		for (int i=0; i<outbindlobcount; i++) {
+		for (uint16_t i=0; i<outbindlobcount; i++) {
 			if (outbind_lob[i]) {
 				OCILobFreeTemporary(oracle8conn->svc,
 							oracle8conn->err,

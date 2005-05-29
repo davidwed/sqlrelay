@@ -10,10 +10,10 @@ void sqlrconnection::closeCursors(bool destroy) {
 	#endif
 
 	if (cur) {
-		for (int i=0; i<cfgfl->getCursors(); i++) {
+		for (int32_t i=0; i<cfgfl->getCursors(); i++) {
 
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",1,(long)i);
+			debugPrint("connection",1,i);
 			#endif
 
 			if (cur[i]) {

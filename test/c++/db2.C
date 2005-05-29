@@ -61,26 +61,26 @@ void checkSuccess(double value, double success) {
 
 int	main(int argc, char **argv) {
 
-	char	*dbtype;
+	char		*dbtype;
 	const char	*bindvars[11]={"1","2","3","4","5","6","7","8","9","10",NULL};
 	const char	*bindvals[10]={"4","4","4","4.4","4.4","4.4",
 			"testchar4","testvarchar4","01/01/2004","04:00:00"};
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
-	long	subvallongs[3]={1,2,3};
-	double	subvaldoubles[3]={10.55,10.556,10.5556};
-	unsigned short	precs[3]={4,5,6};
-	unsigned short	scales[3]={2,3,4};
-	char	*numvar;
-	char	*stringvar;
-	char	*floatvar;
+	int32_t		subvallongs[3]={1,2,3};
+	double		subvaldoubles[3]={10.55,10.556,10.5556};
+	uint16_t	precs[3]={4,5,6};
+	uint16_t	scales[3]={2,3,4};
+	char		*numvar;
+	char		*stringvar;
+	char		*floatvar;
 	const char * const *cols;
 	const char * const *fields;
-	int	port;
-	char	*socket;
-	int	id;
-	char	*filename;
-	long	*fieldlens;
+	uint16_t	port;
+	char		*socket;
+	uint16_t	id;
+	char		*filename;
+	uint32_t	*fieldlens;
 
 	// usage...
 	if (argc<5) {

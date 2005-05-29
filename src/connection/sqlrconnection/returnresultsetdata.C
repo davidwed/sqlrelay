@@ -10,8 +10,8 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	#endif
 
 	// get the number of rows to skip
-	unsigned long	skip;
-	if (clientsock->read(&skip)!=sizeof(unsigned long)) {
+	uint32_t	skip;
+	if (clientsock->read(&skip)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"returning result set data failed");
 		#endif
@@ -19,8 +19,8 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	}
 
 	// get the number of rows to fetch
-	unsigned long	fetch;
-	if (clientsock->read(&fetch)!=sizeof(unsigned long)) {
+	uint32_t	fetch;
+	if (clientsock->read(&fetch)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"returning result set data failed");
 		#endif
@@ -30,7 +30,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 
 	// for some queries, there are no rows to return, 
 	if (cursor->noRowsToReturn()) {
-		clientsock->write((unsigned short)END_RESULT_SET);
+		clientsock->write((uint16_t)END_RESULT_SET);
 		flushWriteBuffer();
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done returning result set data");
@@ -45,7 +45,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 
 	// skip the specified number of rows
 	if (!skipRows(cursor,skip)) {
-		clientsock->write((unsigned short)END_RESULT_SET);
+		clientsock->write((uint16_t)END_RESULT_SET);
 		flushWriteBuffer();
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"done returning result set data");
@@ -64,10 +64,10 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	#endif
 
 	// send the specified number of rows back
-	for (unsigned long i=0; (!fetch || i<fetch); i++) {
+	for (uint32_t i=0; (!fetch || i<fetch); i++) {
 
 		if (!cursor->fetchRow()) {
-			clientsock->write((unsigned short)END_RESULT_SET);
+			clientsock->write((uint16_t)END_RESULT_SET);
 			flushWriteBuffer();
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
@@ -85,7 +85,12 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 		delete debugstr;
 		#endif
 
-		lastrow++;
+		if (lastrowvalid) {
+			lastrow++;
+		} else {
+			lastrowvalid=true;
+			lastrow=0;
+		}
 	}
 	flushWriteBuffer();
 

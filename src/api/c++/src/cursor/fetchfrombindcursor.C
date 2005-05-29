@@ -19,14 +19,18 @@ bool sqlrcursor::fetchFromBindCursor() {
 	endofresultset=false;
 
 	// tell the server we're fetching from a bind cursor
-	sqlrc->cs->write((unsigned short)FETCH_FROM_BIND_CURSOR);
+	sqlrc->cs->write((uint16_t)FETCH_FROM_BIND_CURSOR);
 
 	// send the cursor id to the server
-	sqlrc->cs->write((unsigned short)cursorid);
+	sqlrc->cs->write((uint16_t)cursorid);
 
 	sendGetColumnInfo();
 
 	sqlrc->flushWriteBuffer();
 
-	return processResultSet(rsbuffersize-1);
+	if (rsbuffersize) {
+		return processResultSet(false,rsbuffersize-1);
+	} else {
+		return processResultSet(true,0);
+	}
 }

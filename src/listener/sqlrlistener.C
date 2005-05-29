@@ -86,7 +86,7 @@ void sqlrlistener::cleanUp() {
 	delete handoffsockun;
 
 	if (handoffsocklist) {
-		for (int i=0; i<maxconnections; i++) {
+		for (int32_t i=0; i<maxconnections; i++) {
 			delete handoffsocklist[i].sock;
 		}
 		delete[] handoffsocklist;
@@ -282,7 +282,7 @@ void sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
 
 		// create the list of handoff nodes
 		handoffsocklist=new handoffsocketnode[maxconnections];
-		for (int i=0; i<maxconnections; i++) {
+		for (int32_t i=0; i<maxconnections; i++) {
 			handoffsocklist[i].pid=0;
 		}
 	}
@@ -453,7 +453,7 @@ void sqlrlistener::semError(const char *id, int semid) {
 bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 
 	// get inet and unix ports to listen on
-	unsigned short	port=cfgfl->getPort();
+	uint16_t	port=cfgfl->getPort();
 	const char	*uport=cfgfl->getUnixPort();
 	if (uport && uport[0]) {
 		unixport=charstring::duplicate(uport);
@@ -797,6 +797,9 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 		return true;
 	}
 
+	clientsock->dontUseNaglesAlgorithm();
+	clientsock->setTcpReadBufferSize(8192);
+	clientsock->setTcpWriteBufferSize(0);
 	clientsock->setReadBufferSize(8192);
 	clientsock->setWriteBufferSize(8192);
 
@@ -843,8 +846,8 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	#endif
 
 	// get the connection daemon's pid
-	unsigned long processid;
-	if (sock->read(&processid)!=sizeof(unsigned long)) {
+	uint32_t processid;
+	if (sock->read(&processid)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",1,"failed to read process id");
 		#endif
@@ -856,7 +859,7 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	// same pid, then the old connection must have died off mysteriously,
 	// replace it
 	bool	inserted=false;
-	for (int i=0; i<maxconnections; i++) {
+	for (int32_t i=0; i<maxconnections; i++) {
 		if (!handoffsocklist[i].pid) {
 			handoffsocklist[i].pid=processid;
 			handoffsocklist[i].sock=sock;
@@ -876,7 +879,7 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	if (inserted==false) {
 		handoffsocketnode	*newhandoffsocklist=
 				new handoffsocketnode[maxconnections+1];
-		for (int i=0; i<maxconnections; i++) {
+		for (int32_t i=0; i<maxconnections; i++) {
 			newhandoffsocklist[i].pid=handoffsocklist[i].pid;
 			newhandoffsocklist[i].sock=handoffsocklist[i].sock;
 		}
@@ -900,8 +903,8 @@ bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 	#endif
 
 	// get the connection daemon's pid
-	unsigned long	processid;
-	if (sock->read(&processid)!=sizeof(unsigned long)) {
+	uint32_t	processid;
+	if (sock->read(&processid)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",1,"failed to read process id");
 		#endif
@@ -910,7 +913,7 @@ bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 	}
 
 	// remove the matching socket from the list
-	for (int i=0; i<maxconnections; i++) {
+	for (int32_t i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i].pid==processid) {
 			handoffsocklist[i].pid=0;
 			delete handoffsocklist[i].sock;
@@ -936,8 +939,8 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 	#endif
 
 	// get the pid of the connection daemon the child listener needs
-	unsigned long	processid;
-	if (sock->read(&processid)!=sizeof(unsigned long)) {
+	uint32_t	processid;
+	if (sock->read(&processid)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",1,"failed to read process id");
 		#endif
@@ -947,7 +950,7 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 
 	// look through the handoffsocklist for the pid
 	bool	retval=false;
-	for (int i=0; i<maxconnections; i++) {
+	for (int32_t i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i].pid==processid) {
 			retval=sock->passFileDescriptor(handoffsocklist[i].
 						sock->getFileDescriptor());
@@ -1006,7 +1009,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 	// if the client connected to one of the non-handoff
 	// sockets, fork a child to handle it
-	long	childpid;
+	pid_t	childpid;
 	if (!(childpid=fork())) {
 
 		#ifdef SERVER_DEBUG
@@ -1028,7 +1031,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 	#ifdef SERVER_DEBUG
 	char	debugstring[16+6];
-	sprintf(debugstring,"forked a child: %ld",childpid);
+	sprintf(debugstring,"forked a child: %d",childpid);
 	debugPrint("listener",0,debugstring);
 	#endif
 
@@ -1043,7 +1046,7 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 	bool	passstatus=false;
 
 	// handle authentication
-	int	authstatus=getAuth(clientsock);
+	int32_t	authstatus=getAuth(clientsock);
 
 	// 3 possible outcomes: 1=pass 0=fail -1=bad data
 	if (authstatus==1) {
@@ -1059,7 +1062,7 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 		// authentication error to discourage
 		// brute-force password attacks
 		snooze::macrosnooze(2);
-		clientsock->write((unsigned short)ERROR);
+		clientsock->write((uint16_t)ERROR);
 		snooze::macrosnooze(2);
 	}
 
@@ -1067,7 +1070,7 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 	delete clientsock;
 }
 
-int sqlrlistener::getAuth(filedescriptor *clientsock) {
+int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"getting authentication...");
@@ -1075,11 +1078,11 @@ int sqlrlistener::getAuth(filedescriptor *clientsock) {
 
 	// Get the user/password. For either one, if they are too big or
 	// if there's a read error, just exit with an error code
-	unsigned long	size;
+	uint32_t	size;
 	clientsock->read(&size);
-	char		userbuffer[(unsigned long)USERSIZE+1];
-	if (size>(unsigned long)USERSIZE ||
-	    (unsigned long)(clientsock->read(userbuffer,size))!=size) {
+	char		userbuffer[(uint32_t)USERSIZE+1];
+	if (size>(uint32_t)USERSIZE ||
+	    (uint32_t)(clientsock->read(userbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: user size is wrong");
@@ -1088,10 +1091,10 @@ int sqlrlistener::getAuth(filedescriptor *clientsock) {
 	}
 	userbuffer[size]=(char)NULL;
 
-	char		passwordbuffer[(unsigned long)USERSIZE+1];
+	char		passwordbuffer[(uint32_t)USERSIZE+1];
 	clientsock->read(&size);
-	if (size>(unsigned long)USERSIZE ||
-		(unsigned long)(clientsock->read(passwordbuffer,size))!=size) {
+	if (size>(uint32_t)USERSIZE ||
+		(uint32_t)(clientsock->read(passwordbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: password size is wrong");
@@ -1142,13 +1145,13 @@ void sqlrlistener::incrementSessionCount() {
 	#endif
 
 	// increment the counter
-	unsigned int	*sessioncount=
-				(unsigned int *)((long)idmemory->getPointer()+
-					sizeof(unsigned int));
+	uint32_t	*sessioncount=
+				(uint32_t *)((long)idmemory->getPointer()+
+					sizeof(uint32_t));
 	(*sessioncount)++;
 
 	#ifdef SERVER_DEBUG
-	debugPrint("listener",1,(long)(*sessioncount));
+	debugPrint("listener",1,(int32_t)(*sessioncount));
 	#endif
 
 	if (dynamicscaling) {
@@ -1176,10 +1179,10 @@ void sqlrlistener::incrementSessionCount() {
 
 bool sqlrlistener::handOffClient(filedescriptor *sock) {
 
-	unsigned long	connectionpid;
-	unsigned short	inetport;
+	uint32_t	connectionpid;
+	uint16_t	inetport;
 	char 		unixportstr[MAXPATHLEN+1];
-	unsigned short	unixportstrlen;
+	uint16_t	unixportstrlen;
 	bool		retval=false;
 
 	// loop in case client doesn't get handed off successfully
@@ -1210,8 +1213,8 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 				// FIXME: should there be a limit to the number
 				// of times we retry?  If so, should we return
 				// this error
-				/*sock->write((unsigned short)ERROR);
-				sock->write((unsigned short)70);
+				/*sock->write((uint16_t)ERROR);
+				sock->write((uint16_t)70);
 				sock->write("The listener failed to hand the client off to the database connection.");
 				retval=false;
 				break;*/
@@ -1227,8 +1230,8 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 
 			// if we got this far, everything has worked,
 			// inform the client...
-			sock->write((unsigned short)NO_ERROR);
-			sock->write((unsigned short)DONT_RECONNECT);
+			sock->write((uint16_t)NO_ERROR);
+			sock->write((uint16_t)DONT_RECONNECT);
 			flushWriteBuffer(sock);
 			retval=true;
 			break;
@@ -1238,11 +1241,11 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 			// FIXME: if we're not passing around file descriptors,
 			// how can we deterimine if a connection has crashed
 			// or been killed?
-			sock->write((unsigned short)NO_ERROR);
-			sock->write((unsigned short)RECONNECT);
+			sock->write((uint16_t)NO_ERROR);
+			sock->write((uint16_t)RECONNECT);
 			sock->write(unixportstrlen);
 			sock->write(unixportstr);
-			sock->write((unsigned short)inetport);
+			sock->write((uint16_t)inetport);
 			flushWriteBuffer(sock);
 			retval=true;
 			break;
@@ -1261,10 +1264,10 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 	return retval;
 }
 
-void sqlrlistener::getAConnection(unsigned long *connectionpid,
-					unsigned short *inetport,
+void sqlrlistener::getAConnection(uint32_t *connectionpid,
+					uint16_t *inetport,
 					char *unixportstr,
-					unsigned short *unixportstrlen) {
+					uint16_t *unixportstrlen) {
 
 	// get a pointer to the shared memory segment
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
@@ -1384,13 +1387,13 @@ bool sqlrlistener::connectionIsUp(const char *connectionid) {
 	return retval;
 }
 
-void sqlrlistener::pingDatabase(unsigned long connectionpid,
+void sqlrlistener::pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,
-					unsigned short inetport) {
+					uint16_t inetport) {
 
 	// fork off and cause the connection to ping the database, this should
 	// cause it to reconnect
-	long	childpid;
+	pid_t	childpid;
 	if (!(childpid=fork())) {
 
 		// connect to the database connection
@@ -1400,12 +1403,12 @@ void sqlrlistener::pingDatabase(unsigned long connectionpid,
 		if (connsock) {
 
 			// send it a ping command
-			connsock->write((unsigned short)PING);
+			connsock->write((uint16_t)PING);
 			flushWriteBuffer(connsock);
 
 			// get the ping result
-			unsigned short	result=1;
-			if (connsock->read(&result)!=sizeof(unsigned short)) {
+			uint16_t	result=1;
+			if (connsock->read(&result)!=sizeof(uint16_t)) {
 				result=0;
 			}
 
@@ -1424,13 +1427,13 @@ void sqlrlistener::pingDatabase(unsigned long connectionpid,
 	}
 }
 
-filedescriptor *sqlrlistener::connectToConnection(unsigned long connectionpid,
+filedescriptor *sqlrlistener::connectToConnection(uint32_t connectionpid,
 						const char *unixportstr,
-						unsigned short inetport) {
+						uint16_t inetport) {
 
 	if (passdescriptor) {
 
-		for (int i=0; i<maxconnections; i++) {
+		for (int32_t i=0; i<maxconnections; i++) {
 			if (handoffsocklist[i].pid==connectionpid) {
 				return handoffsocklist[i].sock;
 			}
@@ -1438,7 +1441,7 @@ filedescriptor *sqlrlistener::connectToConnection(unsigned long connectionpid,
 
 	} else {
 
-		int connected=RESULT_ERROR;
+		int32_t connected=RESULT_ERROR;
 
 		// first, try for the unix port
 		if (unixportstr && unixportstr[0]) {
@@ -1511,14 +1514,14 @@ bool sqlrlistener::passClientFileDescriptorToConnection(
 	return retval;
 }
 
-bool sqlrlistener::findMatchingSocket(unsigned long connectionpid,
+bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 					filedescriptor *connectionsock) {
 
 	// Look through the list of handoff sockets for the pid of the 
 	// connection that we got during the call to getAConnection().
 	// When we find it, send the descriptor of the clientsock to the 
 	// connection over the handoff socket associated with that node.
-	for (int i=0; i<maxconnections; i++) {
+	for (int32_t i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i].pid==connectionpid) {
 			connectionsock->setFileDescriptor(handoffsocklist[i].
 						sock->getFileDescriptor());
@@ -1532,7 +1535,7 @@ bool sqlrlistener::findMatchingSocket(unsigned long connectionpid,
 	return requestFixup(connectionpid,connectionsock);
 }
 
-bool sqlrlistener::requestFixup(unsigned long connectionpid,
+bool sqlrlistener::requestFixup(uint32_t connectionpid,
 					filedescriptor *connectionsock) {
 
 	#ifdef SERVER_DEBUG
@@ -1552,7 +1555,7 @@ bool sqlrlistener::requestFixup(unsigned long connectionpid,
 	}
 
 	// send the pid of the connection that we need
-	if (fixupclientsockun.write(connectionpid)!=sizeof(unsigned long)) {
+	if (fixupclientsockun.write(connectionpid)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"failed to send the pid");
 		#endif
@@ -1576,7 +1579,7 @@ bool sqlrlistener::requestFixup(unsigned long connectionpid,
 	return true;
 }
 
-void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
+void sqlrlistener::waitForClientClose(int32_t authstatus, bool passstatus,
 						filedescriptor *clientsock) {
 
 	// Sometimes the listener sends the ports and closes
@@ -1593,7 +1596,7 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 	// guarantee that the client will get the ports without
 	// requiring the client to send data back indicating so.
 
-	unsigned short	dummy;
+	uint16_t	dummy;
 	if (!passdescriptor || (passdescriptor && authstatus<1)) {
 
 		// If we're not passing descriptors or if
@@ -1613,33 +1616,33 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 		// for a DOS attack.  We'll read the maximum
 		// number of bytes that could be sent.
 
-		unsigned int	counter=0;
+		uint32_t	counter=0;
 		clientsock->useNonBlockingMode();
 		while (clientsock->read(&dummy)>0 && counter<
 				// sending auth
-				(sizeof(short)+
+				(sizeof(uint16_t)+
 				// user/password
-				2*(sizeof(long)+USERSIZE)+
+				2*(sizeof(uint32_t)+USERSIZE)+
 				// sending query
-				sizeof(short)+
+				sizeof(uint16_t)+
 				// need a cursor
-				sizeof(short)+
+				sizeof(uint16_t)+
 				// executing new query
-				sizeof(short)+
+				sizeof(uint16_t)+
 				// query size and query
-				sizeof(long)+MAXQUERYSIZE+
+				sizeof(uint32_t)+MAXQUERYSIZE+
 				// input bind var count
-				sizeof(short)+
+				sizeof(uint16_t)+
 				// input bind vars
-				MAXVAR*(2*sizeof(short)+BINDVARLENGTH)+
+				MAXVAR*(2*sizeof(uint16_t)+BINDVARLENGTH)+
 				// output bind var count
-				sizeof(short)+
+				sizeof(uint16_t)+
 				// output bind vars
-				MAXVAR*(2*sizeof(short)+BINDVARLENGTH)+
+				MAXVAR*(2*sizeof(uint16_t)+BINDVARLENGTH)+
 				// get column info
-				sizeof(short)+
+				sizeof(uint16_t)+
 				// skip/fetch
-				2*sizeof(long)
+				2*sizeof(uint32_t)
 				// divide by two because we're
 				// reading 2 bytes at a time
 				)/2) {
@@ -1651,6 +1654,4 @@ void sqlrlistener::waitForClientClose(int authstatus, bool passstatus,
 
 void sqlrlistener::flushWriteBuffer(filedescriptor *fd) {
 	fd->flushWriteBuffer(-1,-1);
-	fd->dontBufferWrites();
-	fd->bufferWrites();
 }

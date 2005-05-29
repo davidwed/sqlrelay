@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-int odbcconnection::getNumberOfConnectStringVars() {
+uint16_t odbcconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -145,7 +145,7 @@ odbccursor::~odbccursor() {
 	}
 }
 
-bool odbccursor::prepareQuery(const char *query, long length) {
+bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 	if (stmt) {
 #if (ODBCVER >= 0x0300)
@@ -187,9 +187,9 @@ bool odbccursor::prepareQuery(const char *query, long length) {
 }
 
 bool odbccursor::inputBindString(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					const char *value,
-					unsigned short valuesize,
+					uint16_t valuesize,
 					short *isnull) {
 
 	if (*isnull==SQL_NULL_DATA) {
@@ -232,8 +232,8 @@ bool odbccursor::inputBindString(const char *variable,
 }
 
 bool odbccursor::inputBindLong(const char *variable,
-					unsigned short variablesize,
-					unsigned long *value) {
+					uint16_t variablesize,
+					uint32_t *value) {
 
 	erg=SQLBindParameter(stmt,
 				charstring::toLong(variable+1),
@@ -257,10 +257,10 @@ bool odbccursor::inputBindLong(const char *variable,
 }
 
 bool odbccursor::inputBindDouble(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					double *value,
-					unsigned short precision,
-					unsigned short scale) {
+					uint32_t precision,
+					uint32_t scale) {
 
 	erg=SQLBindParameter(stmt,
 				charstring::toLong(variable+1),
@@ -284,9 +284,9 @@ bool odbccursor::inputBindDouble(const char *variable,
 }
 
 bool odbccursor::outputBindString(const char *variable, 
-					unsigned short variablesize,
+					uint16_t variablesize,
 					const char *value, 
-					unsigned short valuesize, 
+					uint16_t valuesize, 
 					short *isnull) {
 
 	erg=SQLBindParameter(stmt,
@@ -322,7 +322,8 @@ bool odbccursor::bindValueIsNull(short isnull) {
 	return (isnull==SQL_NULL_DATA);
 }
 
-bool odbccursor::executeQuery(const char *query, long length, bool execute) {
+bool odbccursor::executeQuery(const char *query, uint32_t length,
+							bool execute) {
 
 	// initialize counts
 	ncols=0;
@@ -348,7 +349,7 @@ bool odbccursor::executeQuery(const char *query, long length, bool execute) {
 	}
 
 	// run through the columns
-	for (int i=0; i<ncols; i++) {
+	for (SQLSMALLINT i=0; i<ncols; i++) {
 
 		if (conn->sendColumnInfo()) {
 #if (ODBCVER >= 0x0300)
@@ -600,7 +601,7 @@ const char *odbccursor::getErrorMessage(bool *liveconnection) {
 void odbccursor::returnRowCounts() {
 
 	// send row counts
-	conn->sendRowCounts((long)-1,(long)affectedrows);
+	conn->sendRowCounts(false,0,true,affectedrows);
 }
 
 void odbccursor::returnColumnCount() {
@@ -612,12 +613,12 @@ void odbccursor::returnColumnInfo() {
 	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// a useful variable
-	int	type;
+	uint16_t	type;
 
 	// for each column...
-	for (int i=0; i<ncols; i++) {
+	for (SQLSMALLINT i=0; i<ncols; i++) {
 
-		unsigned short	binary=0;
+		uint16_t	binary=0;
 		if (col[i].type==SQL_BIGINT) {
 			type=BIGINT_DATATYPE;
 		} else if (col[i].type==SQL_BINARY) {
@@ -723,7 +724,7 @@ void odbccursor::returnRow() {
 // successfully supports array fetches
 
 /*#if (ODBCVER >= 0x0300)
-	for (int index=0; index<ncols; index++) {
+	for (SQLSMALLINT index=0; index<ncols; index++) {
 
 		// handle a null field
 		if (indicator[index][row]==SQL_NULL_DATA) {
@@ -736,7 +737,7 @@ void odbccursor::returnRow() {
 	}
 	row++;
 #else*/
-	for (int index=0; index<ncols; index++) {
+	for (SQLSMALLINT index=0; index<ncols; index++) {
 
 		// handle a null field
 		if (indicator[index]==SQL_NULL_DATA) {

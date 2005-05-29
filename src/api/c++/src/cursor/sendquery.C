@@ -9,7 +9,7 @@ bool sqlrcursor::sendQuery(const char *query) {
 	return executeQuery();
 }
 
-bool sqlrcursor::sendQuery(const char *query, int length) {
+bool sqlrcursor::sendQuery(const char *query, uint32_t length) {
 	prepareQuery(query,length);
 	return executeQuery();
 }

@@ -13,10 +13,10 @@ class tempdir {
 			tempdir(cmdline *cmdl);
 			~tempdir();
 		char	*getString();
-		int	getLength();
+		int32_t	getLength();
 	protected:
 		char	*tmpdir;
-		int	tmpdirlen;
+		int32_t	tmpdirlen;
 };
 
 #endif

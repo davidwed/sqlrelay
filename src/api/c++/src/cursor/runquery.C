@@ -16,8 +16,14 @@ bool sqlrcursor::runQuery(const char *query) {
 
 		sqlrc->flushWriteBuffer();
 
-		if (processResultSet(rsbuffersize-1)) {
-			return true;
+		if (rsbuffersize) {
+			if (processResultSet(false,rsbuffersize-1)) {
+				return true;
+			}
+		} else {
+			if (processResultSet(true,0)) {
+				return true;
+			}
 		}
 	}
 	return false;
@@ -50,7 +56,7 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		sqlrc->debugPrint(query);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPrint("Length: ");
-		sqlrc->debugPrint((long)querylen);
+		sqlrc->debugPrint((int32_t)querylen);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
@@ -59,20 +65,20 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 	if (!reexecute) {
 
 		// tell the server we're sending a query
-		sqlrc->cs->write((unsigned short)NEW_QUERY);
+		sqlrc->cs->write((uint16_t)NEW_QUERY);
 
 		if (havecursorid) {
 
 			// tell the server we already have a cursor
-			sqlrc->cs->write((unsigned short)DONT_NEED_NEW_CURSOR);
+			sqlrc->cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
 
 			// send the cursor id to the server
-			sqlrc->cs->write((unsigned short)cursorid);
+			sqlrc->cs->write(cursorid);
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("Requesting Cursor: ");
-				sqlrc->debugPrint((long)cursorid);
+				sqlrc->debugPrint((int32_t)cursorid);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}
@@ -80,7 +86,7 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		} else {
 
 			// tell the server we need a cursor
-			sqlrc->cs->write((unsigned short)NEED_NEW_CURSOR);
+			sqlrc->cs->write((uint16_t)NEED_NEW_CURSOR);
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
@@ -90,7 +96,7 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		}
 
 		// send the query
-		sqlrc->cs->write((unsigned long)querylen);
+		sqlrc->cs->write(querylen);
 		sqlrc->cs->write(query,querylen);
 
 	} else {
@@ -101,16 +107,16 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 			sqlrc->debugPrint("previous query.");
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPrint("Requesting Cursor: ");
-			sqlrc->debugPrint((long)cursorid);
+			sqlrc->debugPrint((int32_t)cursorid);
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
 
 		// tell the server we're sending a query
-		sqlrc->cs->write((unsigned short)REEXECUTE_QUERY);
+		sqlrc->cs->write((uint16_t)REEXECUTE_QUERY);
 
 		// send the cursor id to the server
-		sqlrc->cs->write((unsigned short)cursorid);
+		sqlrc->cs->write(cursorid);
 	}
 
 	return true;
@@ -121,16 +127,16 @@ void sqlrcursor::sendInputBinds() {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Sending ");
-		sqlrc->debugPrint((long)inbindcount);
+		sqlrc->debugPrint((int32_t)inbindcount);
 		sqlrc->debugPrint(" Input Bind Variables:\n");
 		sqlrc->debugPreEnd();
 	}
 
 	// write the input bind variables/values to the server.
 	sqlrc->cs->write(inbindcount);
-	unsigned long	size;
-	unsigned short	count=inbindcount;
-	for (unsigned short i=0; i<count; i++) {
+	uint16_t	size;
+	uint16_t	count=inbindcount;
+	for (uint16_t i=0; i<count; i++) {
 
 		// don't send anything if the send flag is turned off
 		if (!inbindvars[i].send) {
@@ -139,19 +145,18 @@ void sqlrcursor::sendInputBinds() {
 		}
 
 		// send the variable
-		size=(unsigned long)charstring::length(
-					inbindvars[i].variable);
-		sqlrc->cs->write((unsigned short)size);
+		size=charstring::length(inbindvars[i].variable);
+		sqlrc->cs->write(size);
 		sqlrc->cs->write(inbindvars[i].variable,(size_t)size);
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint(inbindvars[i].variable);
 			sqlrc->debugPrint("(");
-			sqlrc->debugPrint((long)size);
+			sqlrc->debugPrint((int32_t)size);
 		}
 
 		// send the type
-		sqlrc->cs->write((unsigned short)inbindvars[i].type);
+		sqlrc->cs->write((uint16_t)inbindvars[i].type);
 
 		// send the value
 		if (inbindvars[i].type==NULL_BIND) {
@@ -163,11 +168,9 @@ void sqlrcursor::sendInputBinds() {
 
 		} else if (inbindvars[i].type==STRING_BIND) {
 
-			sqlrc->cs->write((unsigned long)
-						inbindvars[i].valuesize);
+			sqlrc->cs->write(inbindvars[i].valuesize);
 			if (inbindvars[i].valuesize>0) {
-				sqlrc->cs->write(inbindvars[i].
-					value.stringval,
+				sqlrc->cs->write(inbindvars[i].value.stringval,
 					(size_t)inbindvars[i].valuesize);
 			}
 
@@ -176,8 +179,8 @@ void sqlrcursor::sendInputBinds() {
 				sqlrc->debugPrint(inbindvars[i].
 							value.stringval);
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((long)inbindvars[i].
-							valuesize);
+				sqlrc->debugPrint((int32_t)inbindvars[i].
+								valuesize);
 				sqlrc->debugPrint(")");
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
@@ -187,14 +190,14 @@ void sqlrcursor::sendInputBinds() {
 
 			char	negative=inbindvars[i].value.longval<0?1:0;
 			sqlrc->cs->write(negative);
-			sqlrc->cs->write((unsigned long)
+			sqlrc->cs->write((uint32_t)
 					(inbindvars[i].value.longval*
 					 		((negative)?-1:1)));
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint(":LONG)=");
-				sqlrc->debugPrint((long)inbindvars[i].
-							value.longval);
+				sqlrc->debugPrint((int32_t)inbindvars[i].
+								value.longval);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}
@@ -203,9 +206,9 @@ void sqlrcursor::sendInputBinds() {
 
 			sqlrc->cs->write((double)inbindvars[i].value.
 							doubleval.value);
-			sqlrc->cs->write((unsigned short)inbindvars[i].value.
+			sqlrc->cs->write(inbindvars[i].value.
 							doubleval.precision);
-			sqlrc->cs->write((unsigned short)inbindvars[i].value.
+			sqlrc->cs->write(inbindvars[i].value.
 							doubleval.scale);
 
 			if (sqlrc->debug) {
@@ -213,10 +216,10 @@ void sqlrcursor::sendInputBinds() {
 				sqlrc->debugPrint(inbindvars[i].value.
 							doubleval.value);
 				sqlrc->debugPrint(":");
-				sqlrc->debugPrint((long)inbindvars[i].value.
+				sqlrc->debugPrint((int32_t)inbindvars[i].value.
 							doubleval.precision);
 				sqlrc->debugPrint(",");
-				sqlrc->debugPrint((long)inbindvars[i].value.
+				sqlrc->debugPrint((int32_t)inbindvars[i].value.
 							doubleval.scale);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
@@ -225,8 +228,7 @@ void sqlrcursor::sendInputBinds() {
 		} else if (inbindvars[i].type==BLOB_BIND ||
 				inbindvars[i].type==CLOB_BIND) {
 
-			sqlrc->cs->write((unsigned long)
-						inbindvars[i].valuesize);
+			sqlrc->cs->write(inbindvars[i].valuesize);
 			if (inbindvars[i].valuesize>0) {
 				sqlrc->cs->write(inbindvars[i].
 					value.lobval,
@@ -246,8 +248,8 @@ void sqlrcursor::sendInputBinds() {
 						inbindvars[i].valuesize);
 				}
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((long)inbindvars[i].
-							valuesize);
+				sqlrc->debugPrint((int32_t)inbindvars[i].
+								valuesize);
 				sqlrc->debugPrint(")");
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
@@ -266,9 +268,9 @@ void sqlrcursor::sendOutputBinds() {
 
 	// write the output bind variables to the server.
 	sqlrc->cs->write(outbindcount);
-	unsigned short	size;
-	unsigned short	count=outbindcount;
-	for (unsigned short i=0; i<count; i++) {
+	uint16_t	size;
+	uint16_t	count=outbindcount;
+	for (uint16_t i=0; i<count; i++) {
 
 		// don't send anything if the send flag is turned off
 		if (!outbindvars[i].send) {
@@ -277,14 +279,12 @@ void sqlrcursor::sendOutputBinds() {
 		}
 
 		// send the variable, type and size that the buffer needs to be
-		size=(unsigned short)charstring::length(
-					outbindvars[i].variable);
-		sqlrc->cs->write((unsigned short)size);
+		size=charstring::length(outbindvars[i].variable);
+		sqlrc->cs->write(size);
 		sqlrc->cs->write(outbindvars[i].variable,(size_t)size);
-		sqlrc->cs->write((unsigned short)outbindvars[i].type);
+		sqlrc->cs->write((uint16_t)outbindvars[i].type);
 		if (outbindvars[i].type!=CURSOR_BIND) {
-			sqlrc->cs->write((unsigned long)
-					outbindvars[i].valuesize);
+			sqlrc->cs->write(outbindvars[i].valuesize);
 		}
 
 		if (sqlrc->debug) {
@@ -292,7 +292,7 @@ void sqlrcursor::sendOutputBinds() {
 			sqlrc->debugPrint(outbindvars[i].variable);
 			if (outbindvars[i].type!=CURSOR_BIND) {
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((long)outbindvars[i].
+				sqlrc->debugPrint((int32_t)outbindvars[i].
 								valuesize);
 				sqlrc->debugPrint(")");
 			}
@@ -310,13 +310,13 @@ void sqlrcursor::sendGetColumnInfo() {
 			sqlrc->debugPrint("Send Column Info: yes\n");
 			sqlrc->debugPreEnd();
 		}
-		sqlrc->cs->write((unsigned short)SEND_COLUMN_INFO);
+		sqlrc->cs->write((uint16_t)SEND_COLUMN_INFO);
 	} else {
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Send Column Info: no\n");
 			sqlrc->debugPreEnd();
 		}
-		sqlrc->cs->write((unsigned short)DONT_SEND_COLUMN_INFO);
+		sqlrc->cs->write((uint16_t)DONT_SEND_COLUMN_INFO);
 	}
 }

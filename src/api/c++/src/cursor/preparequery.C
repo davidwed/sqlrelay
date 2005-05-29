@@ -9,9 +9,9 @@ void sqlrcursor::prepareQuery(const char *query) {
 	prepareQuery(query,charstring::length(query));
 }
 
-void sqlrcursor::prepareQuery(const char *query, int length) {
+void sqlrcursor::prepareQuery(const char *query, uint32_t length) {
 	reexecute=false;
-	validatebinds=0;
+	validatebinds=false;
 	resumed=false;
 	clearVariables();
 	querylen=length;
@@ -21,7 +21,7 @@ void sqlrcursor::prepareQuery(const char *query, int length) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("The query is too large.  ");
 			sqlrc->debugPrint("MAXQUERYSIZE is ");
-			sqlrc->debugPrint((long)MAXQUERYSIZE);
+			sqlrc->debugPrint((int32_t)MAXQUERYSIZE);
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
@@ -40,7 +40,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 
 	// init some variables
 	reexecute=false;
-	validatebinds=0;
+	validatebinds=false;
 	resumed=false;
 	clearVariables();
 
@@ -50,8 +50,8 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	}
 
 	// add the path to the fullpath
-	int	index=0;
-	int	counter=0;
+	uint32_t	index=0;
+	uint32_t	counter=0;
 	if (path) {
 		while (path[index] && counter<MAXPATHLEN) {
 			fullpath[counter]=path[index];
@@ -144,7 +144,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 			sqlrc->debugPrint(fullpath);
 			sqlrc->debugPrint(" is too large. ");
 			sqlrc->debugPrint("MAXQUERYSIZE is ");
-			sqlrc->debugPrint((long)MAXQUERYSIZE);
+			sqlrc->debugPrint((int32_t)MAXQUERYSIZE);
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
@@ -164,7 +164,7 @@ void sqlrcursor::initQueryBuffer() {
 	}
 }
 
-void sqlrcursor::attachToBindCursor(short bindcursorid) {
+void sqlrcursor::attachToBindCursor(uint16_t bindcursorid) {
 	prepareQuery("");
 	reexecute=true;
 	cursorid=bindcursorid;

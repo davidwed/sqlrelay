@@ -21,7 +21,7 @@ void sqlrconnection::returnResultSetHeader(sqlrcursor *cursor) {
 
 	// write a flag to the client indicating whether 
 	// or not the column information will be sent
-	clientsock->write((unsigned short)sendcolumninfo);
+	clientsock->write(sendcolumninfo);
 
 	#ifdef SERVER_DEBUG
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
@@ -59,7 +59,7 @@ void sqlrconnection::returnResultSetHeader(sqlrcursor *cursor) {
 
 
 	// terminate the bind vars
-	clientsock->write((unsigned short)END_BIND_VARS);
+	clientsock->write((uint16_t)END_BIND_VARS);
 
 	flushWriteBuffer();
 

@@ -24,7 +24,7 @@ int main(int argc, const char **argv) {
 	sqlrconfigfile	cfgfile;
 	usercontainer	*currentnode=NULL;
 	const char	*host;
-	int		port;
+	uint16_t	port;
 	const char	*socket;
 	const char	*user;
 	const char	*password;
@@ -91,7 +91,7 @@ int main(int argc, const char **argv) {
 	sqlrcur.sendQuery(query.getString());
 	sqlrcon.endSession();
 
-	for (int j=0; j<sqlrcur.colCount(); j++) {
+	for (uint32_t j=0; j<sqlrcur.colCount(); j++) {
 		printf("%s",sqlrcur.getColumnName(j));
 		if (j<sqlrcur.colCount()-1) {
 			printf(",");

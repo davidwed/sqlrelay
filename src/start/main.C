@@ -16,8 +16,8 @@
 using namespace rudiments;
 #endif
 
-int getConnections(sqlrconfigfile *cfgfile) {
-	int	connections=cfgfile->getConnections();
+int32_t getConnections(sqlrconfigfile *cfgfile) {
+	int32_t	connections=cfgfile->getConnections();
 	if (connections>MAX_CONNECTIONS) {
 		connections=MAX_CONNECTIONS;
 	}
@@ -115,14 +115,14 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	}
 
 	// get number of connections
-	int	connections=getConnections(cfgfile);
+	int32_t	connections=getConnections(cfgfile);
 
 	// start the connections
 	connectstringnode	*csn=connectionlist->getNodeByIndex(0);
 	connectstringcontainer	*csc;
-	int	metric=0;
-	int	startup=0;
-	int	totalstarted=0;
+	int32_t	metric=0;
+	int32_t	startup=0;
+	int32_t	totalstarted=0;
 	bool	done=false;
 	while (!done) {
 
@@ -134,7 +134,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 		// connections to start up
 		metric=csc->getMetric();
 		if (metric>0) {
-			startup=(int)ceil(
+			startup=(int32_t)ceil(
 				((double)(metric*connections))/
 				((double)cfgfile->getMetricTotal()));
 		} else {
@@ -151,7 +151,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 		printf("%s :\n",csc->getConnectionId());
 
 		// fire them up
-		for (int i=0; i<startup; i++) {
+		for (int32_t i=0; i<startup; i++) {
 			if (!startConnection(strace,cfgfile->getDbase(),
 					id,csc->getConnectionId(),
 					config,localstatedir,connectiondebug)) {
@@ -254,7 +254,7 @@ int main(int argc, const char **argv) {
 	// get the command line args
 	cmdline	cmdl(argc,argv);
 	const char	*localstatedir=cmdl.value("-localstatedir");
-	int		strace=cmdl.found("-strace");
+	bool		strace=cmdl.found("-strace");
 	const char	*id=cmdl.getId();
 	const char	*config=cmdl.getConfig();
 
@@ -265,7 +265,7 @@ int main(int argc, const char **argv) {
 	}
 
 	// start listener, connections, scaler, cachemanager
-	int	exitstatus=!(startListener(id,config,
+	bool	exitstatus=!(startListener(id,config,
 				localstatedir,cfgfile.getDebugListener()) &&
 			startConnections(&cfgfile,strace,id,config,
 				localstatedir,cfgfile.getDebugConnection()) &&

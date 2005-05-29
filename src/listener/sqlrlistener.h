@@ -34,7 +34,7 @@ using namespace rudiments;
 class handoffsocketnode {
 	friend class sqlrlistener;
 	private:
-		unsigned long		pid;
+		uint32_t		pid;
 		filedescriptor		*sock;
 };
 
@@ -73,36 +73,35 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 		bool	deniedIp(filedescriptor *clientsock);
 		void	forkChild(filedescriptor *clientsock);
 		void	clientSession(filedescriptor *clientsock);
-		int	getAuth(filedescriptor *clientsock);
+		int32_t	getAuth(filedescriptor *clientsock);
 		void	incrementSessionCount();
 		bool	handOffClient(filedescriptor *sock);
-		void	getAConnection(unsigned long *connectionpid,
-					unsigned short *inetport,
+		void	getAConnection(uint32_t *connectionpid,
+					uint16_t *inetport,
 					char *unixportstr,
-					unsigned short *unixportstrlen);
-		bool	findMatchingSocket(unsigned long connectionpid,
+					uint16_t *unixportstrlen);
+		bool	findMatchingSocket(uint32_t connectionpid,
 					filedescriptor *connectionsock);
-		bool	requestFixup(unsigned long connectionpid,
+		bool	requestFixup(uint32_t connectionpid,
 					filedescriptor *connectionsock);
 		bool	connectionIsUp(const char *connectionid);
-		void	pingDatabase(unsigned long connectionpid,
+		void	pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,
-					unsigned short inetport);
-		filedescriptor	*connectToConnection(
-						unsigned long connectionpid,
+					uint16_t inetport);
+		filedescriptor	*connectToConnection(uint32_t connectionpid,
 						const char *unixportstr,
-						unsigned short inetport);
+						uint16_t inetport);
 		void	disconnectFromConnection(filedescriptor *sock);
 		bool	passClientFileDescriptorToConnection(
 					filedescriptor *connectionsock,
 					int fd);
-		void	waitForClientClose(int authstatus, bool passstatus,
+		void	waitForClientClose(int32_t authstatus, bool passstatus,
 						filedescriptor *clientsock);
 		void	flushWriteBuffer(filedescriptor *fd);
 
 		bool		passdescriptor;
 
-		int		maxconnections;
+		int32_t		maxconnections;
 		bool		dynamicscaling;
 
 		char		*unixport;

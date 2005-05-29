@@ -30,7 +30,7 @@ bool sqlrconnection::autoCommit(bool on) {
 		debugPreEnd();
 	}
 
-	cs->write((unsigned short)AUTOCOMMIT);
+	cs->write((uint16_t)AUTOCOMMIT);
 	cs->write(on);
 
 	flushWriteBuffer();

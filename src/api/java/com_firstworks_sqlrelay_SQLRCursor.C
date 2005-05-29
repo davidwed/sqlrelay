@@ -1117,13 +1117,13 @@ JNIEXPORT jlongArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getRowLengt
 	jclass		cls=env->GetObjectClass(self);
 	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
 				env->GetFieldID(cls,"cursor","I"));
-	int	colcount=cur->colCount();
-	long	*rowlengths=cur->getRowLengths((int)row);
+	uint32_t	colcount=cur->colCount();
+	uint32_t	*rowlengths=cur->getRowLengths((int)row);
 	if (!rowlengths) {
 		return 0;
 	}
 	jlong	*jrowlengths=new jlong[colcount];
-	for (int i=0; i<colcount; i++) {
+	for (uint32_t i=0; i<colcount; i++) {
 		jrowlengths[i]=(jlong)rowlengths[i];
 	}
 	jlongArray	retarray=env->NewLongArray(colcount);

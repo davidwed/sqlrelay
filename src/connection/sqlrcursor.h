@@ -6,6 +6,10 @@
 
 #include <defines.h>
 
+#ifdef INCLUDE_SID
+	#include <mysql.h>
+#endif
+
 enum bindtype {
 	NULL_BIND,
 	STRING_BIND,
@@ -21,20 +25,20 @@ class bindvar {
 	friend class sqlrcursor;
 	private:
 		char	*variable;
-		short	variablesize;
+		int16_t	variablesize;
 		union {
 			char	*stringval;
-			long	longval;
+			int32_t	longval;
 			struct	{
 				double		value;
-				unsigned short	precision;
-				unsigned short	scale;
+				uint32_t	precision;
+				uint32_t	scale;
 			} doubleval;
-			unsigned short	cursorid;
+			uint16_t	cursorid;
 		} value;
-		unsigned long	valuesize;
+		uint32_t	valuesize;
 		bindtype	type;
-		short		isnull;
+		int16_t		isnull;
 };
 
 class sqlrconnection;
@@ -46,56 +50,57 @@ class sqlrcursor {
 		virtual	~sqlrcursor();
 
 		// interface definition
-		virtual	bool	openCursor(int id);
+		virtual	bool	openCursor(uint16_t id);
 		virtual	bool	closeCursor();
 
-		virtual	bool	prepareQuery(const char *query, long length);
+		virtual	bool	prepareQuery(const char *query,
+						uint32_t length);
 		virtual	bool	inputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned short valuesize,
-						short *isnull);
+						uint16_t valuesize,
+						int16_t *isnull);
 		virtual	bool	inputBindLong(const char *variable, 
-						unsigned short variablesize,
-						unsigned long *value);
+						uint16_t variablesize,
+						uint32_t *value);
 		virtual	bool	inputBindDouble(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value,
-						unsigned short precision,
-						unsigned short scale);
+						uint32_t precision,
+						uint32_t scale);
 		virtual	bool	inputBindBlob(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned long valuesize,
-						short *isnull);
+						uint32_t valuesize,
+						int16_t *isnull);
 		virtual	bool	inputBindClob(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned long valuesize,
-						short *isnull);
+						uint32_t valuesize,
+						int16_t *isnull);
 		virtual	bool	outputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						char *value,
-						unsigned short valuesize,
-						short *isnull);
+						uint16_t valuesize,
+						int16_t *isnull);
 		virtual	bool	outputBindBlob(const char *variable, 
-						unsigned short variablesize,
-						int index,
-						short *isnull);
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
 		virtual	bool	outputBindClob(const char *variable, 
-						unsigned short variablesize,
-						int index,
-						short *isnull);
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
 		virtual	bool	outputBindCursor(const char *variable,
-						unsigned short variablesize,
+						uint16_t variablesize,
 						sqlrcursor *cursor);
-		virtual	void	returnOutputBindBlob(int index);
-		virtual	void	returnOutputBindClob(int index);
-		virtual	void	returnOutputBindCursor(int index);
+		virtual	void	returnOutputBindBlob(uint16_t index);
+		virtual	void	returnOutputBindClob(uint16_t index);
+		virtual	void	returnOutputBindCursor(uint16_t index);
 		virtual void	checkForTempTable(const char *query,
-							unsigned long length);
+							uint32_t length);
 		virtual	bool	executeQuery(const char *query,
-							long length,
+							uint32_t length,
 							bool execute)=0;
 		virtual	bool		queryIsNotSelect();
 		virtual	bool		queryIsCommitOrRollback();
@@ -112,12 +117,15 @@ class sqlrcursor {
 							bool freebinds);
 
 
+#ifdef INCLUDE_SID
 		// SID virtual methods
 
 		/* method performs SQL Injection Detection */
 		virtual bool	sql_injection_detection_ingress(
 							const char *query);
-		virtual bool	sql_injection_detection_egress();
+		virtual bool	sql_injection_detection_egress(
+					int32_t num_fields,
+					const char * const *field_names);
 
 		/* method connects to SID database */
 		virtual void	sql_injection_detection_database_init();
@@ -147,11 +155,14 @@ class sqlrcursor {
 		/* method parses the sql query */
 		virtual void 	sql_injection_detection_parse_sql(
 							const char *query);
-		virtual void 	sql_injection_detection_parse_results();
+		virtual void 	sql_injection_detection_parse_results(
+					int32_t num_fields,
+					const char * const *field_names);
 
 		/* method to check for a row in a sid db */
 		virtual bool	sql_injection_detection_check_db(
 							const char *sid_db);
+#endif
 	
 
 	protected:
@@ -163,28 +174,54 @@ class sqlrcursor {
 		bool	skipComment(char **ptr, const char *endptr);
 		bool	skipWhitespace(char **ptr, const char *endptr);
 		bool	advance(char **ptr, const char *endptr,
-						unsigned short steps);
+						uint16_t steps);
 
 		sqlrconnection	*conn;
+
+#ifdef INCLUDE_SID
+		// variables for SID
+		int32_t	sql_inject_load_params;
+		int32_t	ingress_mode;
+		int32_t	egress_mode;
+		int32_t	listen_mode;
+		int32_t	verification_mode;
+		int32_t	prevention_mode;	
+
+		char	sid_parsed_sql[BUFSIZ];
+		char	sid_parsed_results[BUFSIZ];
+		char	sid_query[BUFSIZ];
+
+		char	sid_log_message[BUFSIZ];
+
+		MYSQL		*sid_mysql;
+		MYSQL_RES	*sid_res;
+		MYSQL_ROW	sid_row;
+		MYSQL_FIELD	*sid_fields;
+
+		int32_t	sid_query_result;
+
+		bool	sql_injection_detection;
+#endif
 
 	private:
 		// methods used internally
 		bool	handleBinds();
-		void	performSubstitution(stringbuffer *buffer, int index);
+		void	performSubstitution(stringbuffer *buffer,
+							int16_t index);
 		void	abort();
 		char	*skipWhitespaceAndComments(const char *querybuffer);
 
 		char		querybuffer[MAXQUERYSIZE+1];
-		unsigned long	querylength;
+		uint32_t	querylength;
 
 		bindvar		inbindvars[MAXVAR];
-		unsigned short	inbindcount;
+		uint16_t	inbindcount;
 		bindvar		outbindvars[MAXVAR];
-		unsigned short	outbindcount;
+		uint16_t	outbindcount;
 
 		bool		suspendresultset;
 		bool		busy;
-		int		id;
+		uint16_t	id;
 };
 
 #endif

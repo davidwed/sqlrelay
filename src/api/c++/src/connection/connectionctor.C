@@ -3,9 +3,10 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
+sqlrconnection::sqlrconnection(const char *server, uint16_t port,
+					const char *socket,
 					const char *user, const char *password, 
-					int retrytime, int tries) {
+					int32_t retrytime, int32_t tries) {
 
 	// initialize...
 
@@ -18,7 +19,7 @@ sqlrconnection::sqlrconnection(const char *server, int port, const char *socket,
 
 	// connection
 	this->server=(char *)server;
-	listenerinetport=(unsigned short)port;
+	listenerinetport=port;
 	listenerunixport=(char *)socket;
 	this->retrytime=retrytime;
 	this->tries=tries;

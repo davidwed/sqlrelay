@@ -49,27 +49,28 @@ class interbasecursor : public sqlrcursor {
 	private:
 				interbasecursor(sqlrconnection *conn);
 				~interbasecursor();
-		bool		prepareQuery(const char *query, long length);
+		bool		prepareQuery(const char *query,
+						uint32_t length);
 		bool		inputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						const char *value, 
-						unsigned short valuesize,
+						uint16_t valuesize,
 						short *isnull);
 		bool		inputBindLong(const char *variable, 
-						unsigned short variablesize,
-						unsigned long *value);
+						uint16_t variablesize,
+						uint32_t *value);
 		bool		inputBindDouble(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						double *value, 
-						unsigned short precision,
-						unsigned short scale);
+						uint32_t precision,
+						uint32_t scale);
 		bool		outputBindString(const char *variable, 
-						unsigned short variablesize,
+						uint16_t variablesize,
 						char *value, 
-						unsigned short valuesize,
+						uint16_t valuesize,
 						short *isnull);
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
@@ -87,7 +88,7 @@ class interbasecursor : public sqlrcursor {
 		XSQLDA	ISC_FAR	*insqlda;
 		ISC_BLOB_DESC	to_desc;
 
-		int		querytype;
+		ISC_LONG	querytype;
 
 		fieldstruct	field[MAX_SELECT_LIST_SIZE];
 
@@ -104,7 +105,7 @@ class interbaseconnection : public sqlrconnection {
 			interbaseconnection();
 			~interbaseconnection();
 	private:
-		int	getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn();
 		sqlrcursor	*initCursor();
@@ -121,7 +122,7 @@ class interbaseconnection : public sqlrconnection {
 		isc_tr_handle	tr;
 
 		const char	*database;
-		int		dialect;
+		unsigned short	dialect;
 
 		environment	*env;
 

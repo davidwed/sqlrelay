@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrcursor::prepareQuery(const char *query, long querylength) {
+bool sqlrcursor::prepareQuery(const char *query, uint32_t querylength) {
 	// by default, do nothing...
 	return true;
 }

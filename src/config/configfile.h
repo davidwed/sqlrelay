@@ -120,9 +120,9 @@ class configfile {
 				configfile();
 				~configfile();
 		void		blank();
-		int		parse(const char *filename);
-		int		write();
-		int		write(const char *filename);
+		bool		parse(const char *filename);
+		bool		write();
+		bool		write(const char *filename);
 		void		close();
 		char		*currentFile();
 		instance	*addInstance(const char *id,

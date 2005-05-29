@@ -380,7 +380,7 @@ static char	*datatypestring[] = {
 #endif
 
 #ifdef NEED_IS_NUMBER_TYPE_CHAR
-static int isNumberTypeChar(const char *type) { 
+static bool isNumberTypeChar(const char *type) { 
 	return (!charstring::compare(type,"NUMBER") ||
 		!charstring::compare(type,"INT") ||
 		!charstring::compare(type,"SMALLINT") ||
@@ -434,7 +434,7 @@ static int isNumberTypeChar(const char *type) {
 #endif
 
 #ifdef NEED_IS_BLOB_TYPE_CHAR
-static int isBlobTypeChar(const char *type) { 
+static bool isBlobTypeChar(const char *type) { 
 	return (!charstring::compare(type,"IMAGE") ||
 		!charstring::compare(type,"BINARY") ||
 		!charstring::compare(type,"VARBINARY") ||
@@ -454,14 +454,14 @@ static int isBlobTypeChar(const char *type) {
 #endif
 
 #ifdef NEED_IS_UNSIGNED_TYPE_CHAR
-static int isUnsignedTypeChar(const char *type) { 
+static bool isUnsignedTypeChar(const char *type) { 
 	return (!charstring::compare(type,"USHORT") ||
 		!charstring::compare(type,"UINT"));
 }
 #endif
 
 #ifdef NEED_IS_BINARY_TYPE_CHAR
-static int isBinaryTypeChar(const char *type) { 
+static bool isBinaryTypeChar(const char *type) { 
 	return (!charstring::compare(type,"IMAGE") ||
 		!charstring::compare(type,"BINARY") ||
 		!charstring::compare(type,"VARBINARY") ||
@@ -483,7 +483,7 @@ static int isBinaryTypeChar(const char *type) {
 #endif
 
 #ifdef NEED_IS_NUMBER_TYPE_INT
-static int isNumberTypeInt(int type) {
+static bool isNumberTypeInt(int32_t type) {
 	return (type==NUMBER_DATATYPE || type==INT_DATATYPE ||
 		type==SMALLINT_DATATYPE || type==TINYINT_DATATYPE ||
 		type==NUMERIC_DATATYPE || type==BIT_DATATYPE ||

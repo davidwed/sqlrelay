@@ -7,11 +7,11 @@
 
 #include <config.h>
 
-row::row(int colcount) {
+row::row(uint32_t colcount) {
 	this->colcount=colcount;
 	if (colcount>=OPTIMISTIC_COLUMN_COUNT) {
 		extrafields=new char *[colcount-OPTIMISTIC_COLUMN_COUNT];
-		extrafieldlengths=new unsigned long
+		extrafieldlengths=new uint32_t
 					[colcount-OPTIMISTIC_COLUMN_COUNT];
 	} else {
 		extrafields=NULL;
@@ -24,17 +24,17 @@ row::~row() {
 	delete[] extrafieldlengths;
 }
 
-void row::resize(int colcount) {
+void row::resize(uint32_t colcount) {
 	if (colcount>=OPTIMISTIC_COLUMN_COUNT) {
 		delete[] extrafields;
 		delete[] extrafieldlengths;
 		extrafields=new char *[colcount-OPTIMISTIC_COLUMN_COUNT];
-		extrafieldlengths=new unsigned long
+		extrafieldlengths=new uint32_t
 					[colcount-OPTIMISTIC_COLUMN_COUNT];
 	}
 }
 
-void row::addField(int column, const char *buffer, unsigned long length) {
+void row::addField(uint32_t column, const char *buffer, uint32_t length) {
 	if (column<OPTIMISTIC_COLUMN_COUNT) {
 		fields[column]=(char *)buffer;
 		fieldlengths[column]=length;
@@ -44,7 +44,7 @@ void row::addField(int column, const char *buffer, unsigned long length) {
 	}
 }
 
-char *row::getField(int column) const {
+char *row::getField(uint32_t column) const {
 	if (column<OPTIMISTIC_COLUMN_COUNT) {
 		return fields[column];
 	} else {
@@ -52,7 +52,7 @@ char *row::getField(int column) const {
 	}
 }
 
-unsigned long row::getFieldLength(int column) const {
+uint32_t row::getFieldLength(uint32_t column) const {
 	if (column<OPTIMISTIC_COLUMN_COUNT) {
 		return fieldlengths[column];
 	} else {

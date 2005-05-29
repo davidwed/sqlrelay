@@ -6,7 +6,7 @@
 bool sqlrcursor::handleBinds() {
 	
 	// iterate through the arrays, binding values to variables
-	for (int i=0; i<inbindcount; i++) {
+	for (int16_t i=0; i<inbindcount; i++) {
 
 		// bind the value to the variable
 		if (inbindvars[i].type==STRING_BIND ||
@@ -21,8 +21,7 @@ bool sqlrcursor::handleBinds() {
 		} else if (inbindvars[i].type==LONG_BIND) {
 			if (!inputBindLong(inbindvars[i].variable,
 				inbindvars[i].variablesize,
-				(unsigned long *)
-					&inbindvars[i].value.longval)) {
+				(uint32_t *)&inbindvars[i].value.longval)) {
 				return false;
 			}
 		} else if (inbindvars[i].type==DOUBLE_BIND) {
@@ -51,7 +50,7 @@ bool sqlrcursor::handleBinds() {
 			}
 		}
 	}
-	for (int i=0; i<outbindcount; i++) {
+	for (int16_t i=0; i<outbindcount; i++) {
 
 		// bind the value to the variable
 		if (outbindvars[i].type==STRING_BIND) {
@@ -87,91 +86,91 @@ bool sqlrcursor::handleBinds() {
 }
 
 bool sqlrcursor::inputBindString(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					const char *value,
-					unsigned short valuesize,
-					short *isnull) {
+					uint16_t valuesize,
+					int16_t *isnull) {
 	// by default, do nothing...
 	return true;
 }
 
 bool sqlrcursor::inputBindLong(const char *variable,
-					unsigned short variablesize,
-					unsigned long *value) {
+					uint16_t variablesize,
+					uint32_t *value) {
 	// by default, do nothing...
 	return true;
 }
 
 bool sqlrcursor::inputBindDouble(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					double *value, 
-					unsigned short precision,
-					unsigned short scale) {
+					uint32_t precision,
+					uint32_t scale) {
 	// by default, do nothing...
 	return true;
 }
 
 bool sqlrcursor::inputBindBlob(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					const char *value,
-					unsigned long valuesize,
-					short *isnull) {
+					uint32_t valuesize,
+					int16_t *isnull) {
 	// by default, do nothing...
 	return true;
 }
 
 bool sqlrcursor::inputBindClob(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					const char *value,
-					unsigned long valuesize,
-					short *isnull) {
+					uint32_t valuesize,
+					int16_t *isnull) {
 	// by default, do nothing...
 	return true;
 }
 
 bool sqlrcursor::outputBindString(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					char *value, 
-					unsigned short valuesize, 
-					short *isnull) {
+					uint16_t valuesize, 
+					int16_t *isnull) {
 	// by default, do nothing...
 	return true;
 }
 
 bool sqlrcursor::outputBindBlob(const char *variable,
-					unsigned short variablesize,
-					int index,
-					short *isnull) {
+					uint16_t variablesize,
+					uint16_t index,
+					int16_t *isnull) {
 	// by default, do nothing...
 	return true;
 }
 
 bool sqlrcursor::outputBindClob(const char *variable,
-					unsigned short variablesize,
-					int index,
-					short *isnull) {
+					uint16_t variablesize,
+					uint16_t index,
+					int16_t *isnull) {
 	// by default, do nothing...
 	return true;
 }
 
 bool sqlrcursor::outputBindCursor(const char *variable,
-					unsigned short variablesize,
+					uint16_t variablesize,
 					sqlrcursor *cursor) {
 	// by default, do nothing...
 	return true;
 }
 
-void sqlrcursor::returnOutputBindBlob(int index) {
+void sqlrcursor::returnOutputBindBlob(uint16_t index) {
 	// by default, do nothing...
 	return;
 }
 
-void sqlrcursor::returnOutputBindClob(int index) {
+void sqlrcursor::returnOutputBindClob(uint16_t index) {
 	// by default, do nothing...
 	return;
 }
 
-void sqlrcursor::returnOutputBindCursor(int index) {
+void sqlrcursor::returnOutputBindCursor(uint16_t index) {
 	// by default, do nothing...
 	return;
 }

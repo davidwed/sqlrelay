@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.11 2005-02-25 05:47:40 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.12 2005-05-29 17:52:47 mused Exp $
  */
 
 #include <tcl.h>
@@ -336,7 +336,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     {
     case SQLRCUR_eval:
       {
-	int row, col;
+	uint32_t row, col;
 	Tcl_Obj *rowObj, *result;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "query");
@@ -1094,7 +1094,8 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_getRow:
       {
-	int row, col;
+	int row;
+	uint32_t col;
 	const char * const *rowarray;
 	Tcl_Obj *resultList;
 	if (objc != 3) {
@@ -1117,8 +1118,9 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_getRowLengths:
       {
-	int row, col;
-	long *lenarray;
+	int row;
+	uint32_t col;
+	uint32_t *lenarray;
 	Tcl_Obj *resultList;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "row");

@@ -18,10 +18,10 @@ class mdbtoolscursor : public sqlrcursor {
 	friend class mdbtoolsconnection;
 	private:
 				mdbtoolscursor(sqlrconnection *conn);
-		bool		openCursor(int id);
+		bool		openCursor(uint16_t id);
 		bool		closeCursor();
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 		const char	*getErrorMessage(bool *liveconnection);
 		void		returnRowCounts();
@@ -43,7 +43,7 @@ class mdbtoolsconnection : public sqlrconnection {
 	public:
 			mdbtoolsconnection();
 	private:
-		int	getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn();
 		sqlrcursor	*initCursor();

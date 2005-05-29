@@ -9,7 +9,7 @@ msqlconnection::msqlconnection() {
 	devnull=-2;
 }
 
-int msqlconnection::getNumberOfConnectStringVars() {
+uint16_t msqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -97,7 +97,8 @@ msqlcursor::msqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	msqlresult=NULL;
 }
 
-bool msqlcursor::executeQuery(const char *query, long length,bool execute) {
+bool msqlcursor::executeQuery(const char *query, uint32_t length,
+							bool execute) {
 
 	// initialize return values
 	ncols=0;
@@ -156,7 +157,7 @@ const char *msqlcursor::getErrorMessage(bool *liveconnection) {
 void msqlcursor::returnRowCounts() {
 
 	// send row counts (affected row count unknown in msql)
-	conn->sendRowCounts((long)nrows,(long)-1);
+	conn->sendRowCounts(true,nrows,false,0);
 }
 
 void msqlcursor::returnColumnCount() {
@@ -173,15 +174,15 @@ void msqlcursor::returnColumnInfo() {
 	}
 
 	// some useful variables
-	int	type;
-	int	precision;
-	int	scale;
+	uint16_t	type;
+	uint32_t	precision;
+	uint32_t	scale;
 
 	// position ourselves on the first field
 	msqlFieldSeek(msqlresult,0);
 
 	// for each column...
-	for (int i=0; i<ncols; i++) {
+	for (int32_t i=0; i<ncols; i++) {
 
 		// fetch the field
 		msqlfield=msqlFetchField(msqlresult);
@@ -251,7 +252,7 @@ bool msqlcursor::fetchRow() {
 
 void msqlcursor::returnRow() {
 
-	for (int col=0; col<ncols; col++) {
+	for (int32_t col=0; col<ncols; col++) {
 
 		if (msqlrow[col]) {
 			conn->sendField(msqlrow[col],

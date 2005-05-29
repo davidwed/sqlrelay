@@ -77,15 +77,15 @@
 // and connection daemons.  A struct is used instead of just stepping a pointer
 // through the shared memory segment to avoid alignment issues.
 struct shmdata {
-	unsigned int	totalconnections;
-	unsigned int	connectionsinuse;
+	uint32_t	totalconnections;
+	uint32_t	connectionsinuse;
 	char		connectionid[MAXCONNECTIONIDLEN];
 	union {
 		struct {
-			unsigned short	inetport;
+			uint16_t	inetport;
 			char		unixsocket[MAXPATHLEN];
 		} sockets;
-		unsigned long	connectionpid;
+		pid_t	connectionpid;
 	} connectioninfo;
 };
 

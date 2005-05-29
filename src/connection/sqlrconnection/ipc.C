@@ -132,8 +132,8 @@ void sqlrconnection::acquireConnectionCountMutex() {
 	#endif
 }
 
-unsigned int *sqlrconnection::getConnectionCountBuffer() {
-	return (unsigned int *)idmemory->getPointer();
+uint32_t *sqlrconnection::getConnectionCountBuffer() {
+	return (uint32_t *)idmemory->getPointer();
 }
 
 void sqlrconnection::releaseConnectionCountMutex() {
@@ -157,9 +157,8 @@ void sqlrconnection::acquireSessionCountMutex() {
 	#endif
 }
 
-unsigned int *sqlrconnection::getSessionCountBuffer() {
-	return (unsigned int *)((long)idmemory->getPointer()+
-						sizeof(unsigned int));
+uint32_t *sqlrconnection::getSessionCountBuffer() {
+	return (uint32_t *)((long)idmemory->getPointer()+sizeof(uint32_t));
 }
 
 void sqlrconnection::releaseSessionCountMutex() {

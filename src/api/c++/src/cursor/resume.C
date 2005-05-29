@@ -5,11 +5,11 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-bool sqlrcursor::resumeResultSet(int id) {
+bool sqlrcursor::resumeResultSet(uint16_t id) {
 	return resumeCachedResultSet(id,NULL);
 }
 
-bool sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
+bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 
 	if (!endofresultset && !suspendresultsetsent) {
 		abortResultSet();
@@ -27,28 +27,28 @@ bool sqlrcursor::resumeCachedResultSet(int id, const char *filename) {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Resuming Result Set of Cursor: ");
-		sqlrc->debugPrint((long)id);
+		sqlrc->debugPrint((int32_t)id);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
 
 	// tell the server we want to resume the result set
-	sqlrc->cs->write((unsigned short)RESUME_RESULT_SET);
+	sqlrc->cs->write((uint16_t)RESUME_RESULT_SET);
 
 	// send the id of the cursor we want to 
 	// resume the result set of to the server
-	sqlrc->cs->write((unsigned short)id);
+	sqlrc->cs->write(id);
 
 	// process the result set
 	if (filename && filename[0]) {
 		cacheToFile(filename);
 	}
 	if (rsbuffersize) {
-		if (processResultSet(firstrowindex+rsbuffersize-1)) {
+		if (processResultSet(true,firstrowindex+rsbuffersize-1)) {
 			return true;
 		}
 	} else {
-		if (processResultSet(-1)) {
+		if (processResultSet(false,0)) {
 			return true;
 		}
 	}

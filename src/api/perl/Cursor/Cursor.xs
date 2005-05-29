@@ -32,9 +32,9 @@ sqlrcursor::DESTROY()
 
 void
 sqlrcursor::setResultSetBufferSize(rows)
-		int rows
+		uint32_t rows
 
-int
+uint32_t
 sqlrcursor::getResultSetBufferSize()
 
 void
@@ -58,7 +58,7 @@ sqlrcursor::cacheToFile(filename)
 
 void
 sqlrcursor::setCacheTtl(ttl)
-		int ttl
+		uint32_t ttl
 
 const char *
 sqlrcursor::getCacheFileName()
@@ -73,7 +73,7 @@ sqlrcursor::sendQuery(query)
 bool
 sqlrcursor::sendQueryWithLength(query,length)
 		const char *query
-		int length
+		uint32_t length
 	CODE:
 		RETVAL=THIS->sendQuery(query,length);
 	OUTPUT:
@@ -91,7 +91,7 @@ sqlrcursor::prepareQuery(query)
 void
 sqlrcursor::prepareQueryWithLength(query,length)
 		const char *query
-		int length
+		uint32_t length
 	CODE:
 		THIS->prepareQuery(query,length);
 		
@@ -106,11 +106,11 @@ sqlrcursor::substitution(variable,...)
 		const char *variable
 	CODE:
 		if (SvIOK(ST(2))) {
-			THIS->substitution(variable,(long)SvIV(ST(2)));
+			THIS->substitution(variable,(int32_t)SvIV(ST(2)));
 		} else if (SvNOK(ST(2))) {
 			THIS->substitution(variable,(double)SvNV(ST(2)),
-						(unsigned short)SvIV(ST(3)),
-						(unsigned short)SvIV(ST(4)));
+						(uint32_t)SvIV(ST(3)),
+						(uint32_t)SvIV(ST(4)));
 		} else if (SvPOK(ST(2))) {
 			THIS->substitution(variable,SvPV(ST(2),na));
 		} else {
@@ -120,7 +120,7 @@ sqlrcursor::substitution(variable,...)
 void
 sqlrcursor::clearBinds()
 
-unsigned short
+uint16_t
 sqlrcursor::countBindVariables()
 
 void
@@ -128,11 +128,11 @@ sqlrcursor::inputBind(variable,...)
 		const char *variable
 	CODE:
 		if (SvIOK(ST(2))) {
-			THIS->inputBind(variable,(long)SvIV(ST(2)));
+			THIS->inputBind(variable,(int32_t)SvIV(ST(2)));
 		} else if (SvNOK(ST(2))) {
 			THIS->inputBind(variable,(double)SvNV(ST(2)),
-						(unsigned short)SvIV(ST(3)),
-						(unsigned short)SvIV(ST(4)));
+						(uint32_t)SvIV(ST(3)),
+						(uint32_t)SvIV(ST(4)));
 		} else if (SvPOK(ST(2))) {
 			THIS->inputBind(variable,SvPV(ST(2),na));
 		} else {
@@ -143,13 +143,13 @@ void
 sqlrcursor::inputBindBlob(variable,value,size)
 		const char *variable
 		const char *value
-		unsigned long size
+		uint32_t size
 
 void
 sqlrcursor::inputBindClob(variable,value,size)
 		const char *variable
 		const char *value
-		unsigned long size
+		uint32_t size
 
 void
 sqlrcursor::validateBinds()
@@ -163,7 +163,7 @@ sqlrcursor::fetchFromBindCursor()
 void
 sqlrcursor::defineOutputBind(variable,length)
 		const char *variable
-		int length
+		uint32_t length
 
 void
 sqlrcursor::defineOutputBindBlob(variable)
@@ -182,7 +182,7 @@ sqlrcursor::getOutputBind(variable)
 		const char *variable
 	CODE:
 		const char	*value=THIS->getOutputBind(variable);
-		long		length=THIS->getOutputBindLength(variable);
+		uint32_t	length=THIS->getOutputBindLength(variable);
 		ST(0)=sv_newmortal();
 		if (value) {
 			sv_setpvn(ST(0),value,length);
@@ -190,11 +190,11 @@ sqlrcursor::getOutputBind(variable)
 			ST(0)=&sv_undef;
 		}
 
-long
+int32_t
 sqlrcursor::getOutputBindAsLong(variable)
 		const char *variable
 	CODE:
-		long	value=THIS->getOutputBindAsLong(variable);
+		int32_t	value=THIS->getOutputBindAsLong(variable);
 		ST(0)=sv_newmortal();
 		sv_setiv(ST(0),value);
 
@@ -206,7 +206,7 @@ sqlrcursor::getOutputBindAsDouble(variable)
 		ST(0)=sv_newmortal();
 		sv_setnv(ST(0),value);
 
-long
+uint32_t
 sqlrcursor::getOutputBindLength(variable)
 		const char *variable
 
@@ -225,19 +225,19 @@ bool
 sqlrcursor::openCachedResultSet(filename)
 	const char	*filename
 
-int
+uint32_t
 sqlrcursor::colCount()
 
-int
+uint32_t
 sqlrcursor::rowCount()
 
-int
+uint32_t
 sqlrcursor::totalRows()
 
-int
+uint32_t
 sqlrcursor::affectedRows()
 
-int
+uint32_t
 sqlrcursor::firstRowIndex()
 
 bool
@@ -254,9 +254,9 @@ sqlrcursor::getNullsAsUndefined()
 	CODE:
 		THIS->getNullsAsNulls();
 
-int
+bool
 sqlrcursor::validRow(row)
-		int	row
+		uint32_t	row
 	CODE:
 		RETVAL=1;
 		if (!THIS->getRow(row)) {
@@ -267,14 +267,14 @@ sqlrcursor::validRow(row)
 
 const char *
 sqlrcursor::getField(row,...)
-		int	row
+		uint32_t	row
 	CODE:
 		const char	*field;
-		long		length;
+		uint32_t	length;
 		ST(0)=sv_newmortal();
 		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
-			field=THIS->getField(row,(int)SvIV(ST(2)));
-			length=THIS->getFieldLength(row,(int)SvIV(ST(2)));
+			field=THIS->getField(row,(uint32_t)SvIV(ST(2)));
+			length=THIS->getFieldLength(row,(uint32_t)SvIV(ST(2)));
 		} else if (SvPOK(ST(2))) {
 			field=THIS->getField(row,SvPV(ST(2),na));
 			length=THIS->getFieldLength(row,SvPV(ST(2),na));
@@ -285,14 +285,14 @@ sqlrcursor::getField(row,...)
 			ST(0)=&sv_undef;
 		}
 
-long
+int32_t
 sqlrcursor::getFieldAsLong(row,...)
-		int	row
+		uint32_t	row
 	CODE:
-		long	field;
+		int32_t	field;
 		ST(0)=sv_newmortal();
 		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
-			field=THIS->getFieldAsLong(row,(int)SvIV(ST(2)));
+			field=THIS->getFieldAsLong(row,(uint32_t)SvIV(ST(2)));
 		} else if (SvPOK(ST(2))) {
 			field=THIS->getFieldAsLong(row,SvPV(ST(2),na));
 		} 
@@ -300,24 +300,24 @@ sqlrcursor::getFieldAsLong(row,...)
 
 double
 sqlrcursor::getFieldAsDouble(row,...)
-		int	row
+		uint32_t	row
 	CODE:
 		double	field;
 		ST(0)=sv_newmortal();
 		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
-			field=THIS->getFieldAsDouble(row,(int)SvIV(ST(2)));
+			field=THIS->getFieldAsDouble(row,(uint32_t)SvIV(ST(2)));
 		} else if (SvPOK(ST(2))) {
 			field=THIS->getFieldAsDouble(row,SvPV(ST(2),na));
 		} 
 		sv_setnv(ST(0),field);
 
-long
+uint32_t
 sqlrcursor::getFieldLength(row,...)
-		int	row
+		uint32_t	row
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
-			RETVAL=THIS->getFieldLength(row,(int)SvIV(ST(2)));
+			RETVAL=THIS->getFieldLength(row,(uint32_t)SvIV(ST(2)));
 		} else if (SvPOK(ST(2))) {
 			RETVAL=THIS->getFieldLength(row,SvPV(ST(2),na));
 		}
@@ -327,7 +327,7 @@ sqlrcursor::getFieldLength(row,...)
 const char * const *
 sqlrcursor::getColumnNames()
 	PPCODE:
-		int	index=0;
+		uint32_t	index=0;
 		const char * const *namesptr=THIS->getColumnNames();
 		EXTEND(SP,THIS->colCount());
 		if (namesptr) {
@@ -338,164 +338,164 @@ sqlrcursor::getColumnNames()
 
 const char *
 sqlrcursor::getColumnName(col)
-		int col
+		uint32_t col
 
 const char *
 sqlrcursor::getColumnType(...)
 	CODE:
 		RETVAL=NULL;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnType((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnType((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnType(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-int
+uint32_t
 sqlrcursor::getColumnLength(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnLength((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnLength((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnLength(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned long
+uint32_t
 sqlrcursor::getColumnPrecision(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnPrecision((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnPrecision((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnPrecision(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned long
+uint32_t
 sqlrcursor::getColumnScale(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnScale((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnScale((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnScale(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned short
+bool
 sqlrcursor::getColumnIsNullable(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnIsNullable((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnIsNullable((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnIsNullable(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned short
+bool
 sqlrcursor::getColumnIsPrimaryKey(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnIsPrimaryKey((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnIsPrimaryKey((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnIsPrimaryKey(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned short
+bool
 sqlrcursor::getColumnIsUnique(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnIsUnique((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnIsUnique((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnIsUnique(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned short
+bool
 sqlrcursor::getColumnIsPartOfKey(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnIsPartOfKey((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnIsPartOfKey((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnIsPartOfKey(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned short
+bool
 sqlrcursor::getColumnIsUnsigned(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnIsUnsigned((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnIsUnsigned((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnIsUnsigned(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned short
+bool
 sqlrcursor::getColumnIsZeroFilled(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnIsZeroFilled((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnIsZeroFilled((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnIsZeroFilled(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned short
+bool
 sqlrcursor::getColumnIsBinary(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnIsBinary((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnIsBinary((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnIsBinary(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-unsigned short
+bool
 sqlrcursor::getColumnIsAutoIncrement(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getColumnIsAutoIncrement((int)SvIV(ST(1)));
+			RETVAL=THIS->getColumnIsAutoIncrement((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getColumnIsAutoIncrement(SvPV(ST(1),na));
 		}
 	OUTPUT:
 
-int
+uint32_t
 sqlrcursor::getLongest(...)
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(1)) || SvNOK(ST(1))) {
-			RETVAL=THIS->getLongest((int)SvIV(ST(1)));
+			RETVAL=THIS->getLongest((uint32_t)SvIV(ST(1)));
 		} else if (SvPOK(ST(1))) {
 			RETVAL=THIS->getLongest(SvPV(ST(1),na));
 		}
 	OUTPUT:
 		RETVAL
 
-int
+uint16_t
 sqlrcursor::getResultSetId()
 
 void
@@ -503,9 +503,9 @@ sqlrcursor::suspendResultSet()
 
 bool
 sqlrcursor::resumeResultSet(id)
-		int id
+		uint16_t id
 
 bool
 sqlrcursor::resumeCachedResultSet(id,filename)
-		int id
+		uint16_t id
 		const char *filename

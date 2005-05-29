@@ -7,9 +7,9 @@
 typedef	struct sqlrconnection *sqlrcon;
 typedef	struct sqlrcursor *sqlrcur;
 
-sqlrcon	sqlrcon_alloc(const char *server, int port, const char *socket,
+sqlrcon	sqlrcon_alloc(const char *server, uint16_t port, const char *socket,
 					const char *user, const char *password, 
-					int retrytime, int tries);
+					int32_t retrytime, int32_t tries);
 			/* Initiates a connection to "server" on "port"
 			   or to the unix "socket" on the local machine
 			   and authenticates with "user" and "password".
@@ -36,7 +36,7 @@ int	sqlrcon_suspendSession(sqlrcon sqlrconref);
 			   session but leaves the session open so 
 			   that another connection can connect to it 
 			   using sqlrcon_resumeSession(). */
-int	sqlrcon_getConnectionPort(sqlrcon sqlrconref);
+uint16_t	sqlrcon_getConnectionPort(sqlrcon sqlrconref);
 			/* Returns the inet port that the connection is 
 			   communicating over. This parameter may be 
 			   passed to another connection for use in
@@ -46,7 +46,8 @@ const char	*sqlrcon_getConnectionSocket(sqlrcon sqlrconref);
 			   communicating over. This parameter may be 
 			   passed to another connection for use in
 			   the sqlrcon_resumeSession() command. */
-int	sqlrcon_resumeSession(sqlrcon sqlrconref, int port, const char *socket);
+int	sqlrcon_resumeSession(sqlrcon sqlrconref, uint16_t port,
+							const char *socket);
 			/* Resumes a session previously left open 
 			   using sqlrcon_suspendSession().
 			   Returns 1 on success and 0 on failure. */
@@ -94,11 +95,11 @@ void	sqlrcon_debugPrintFunction(sqlrcon sqlrconref,
 sqlrcur	sqlrcur_alloc(sqlrcon sqlrconref);
 void	sqlrcur_free(sqlrcur sqlrcurref);
 
-void	sqlrcur_setResultSetBufferSize(sqlrcur sqlrcurref, int rows);
+void	sqlrcur_setResultSetBufferSize(sqlrcur sqlrcurref, uint32_t rows);
 			/* Sets the number of rows of the result set
 			   to buffer at a time.  0 (the default)
 			   means buffer the entire result set. */
-int	sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref);
+uint32_t	sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref);
 			/* Returns the number of result set rows that 
 			   will be buffered at a time or 0 for the
 			   entire result set. */
@@ -135,7 +136,7 @@ void	sqlrcur_cacheToFile(sqlrcur sqlrcurref, const char *filename);
 			   to sqlrcur_cacheToFile() changes which file to
 			   cache to or a call to sqlrcur_cacheOff() turns off
 			   caching. */
-void	sqlrcur_setCacheTtl(sqlrcur sqlrcurref, int ttl);
+void	sqlrcur_setCacheTtl(sqlrcur sqlrcurref, uint32_t ttl);
 			/* Sets the time-to-live for cached result
 			   sets. The sqlr-cachemanger will remove each 
 			   cached result set "ttl" seconds after it's 
@@ -155,7 +156,7 @@ void	sqlrcur_cacheOff(sqlrcur sqlrcurref);
 int	sqlrcur_sendQuery(sqlrcur sqlrcurref, const char *query); 
 			/* Sends "query" and gets a result set. */
 int	sqlrcur_sendQueryWithLength(sqlrcur sqlrcurref, const char *query,
-								int length); 
+							uint32_t length); 
 			/* Sends "query" with length "length" and gets
 			   a result set. This function must be used if
 			   the query contains binary data. */
@@ -171,7 +172,7 @@ int	sqlrcur_sendFileQuery(sqlrcur sqlrcurref,
 void	sqlrcur_prepareQuery(sqlrcur sqlrcurref, const char *query);
 			/* Prepare to execute "query". */
 void	sqlrcur_prepareQueryWithLength(sqlrcur sqlrcurref, const char *query,
-								int length);
+							uint32_t length);
 			/* Prepare to execute "query" with length 
 			   "length".  This function must be used if the
 			   query contains binary data. */
@@ -182,16 +183,17 @@ void	sqlrcur_prepareFileQuery(sqlrcur sqlrcurref,
 
 void	sqlrcur_subString(sqlrcur sqlrcurref,
 				const char *variable, const char *value);
-void	sqlrcur_subLong(sqlrcur sqlrcurref, const char *variable, long value);
+void	sqlrcur_subLong(sqlrcur sqlrcurref,
+				const char *variable, int32_t value);
 void	sqlrcur_subDouble(sqlrcur sqlrcurref,
 				const char *variable, double value,
-				unsigned short precision, unsigned short scale);
+				uint32_t precision, uint32_t scale);
 			/* Define a substitution variable. */
 
 void	sqlrcur_clearBinds(sqlrcur sqlrcurref);
 			/* Clear all bind variables. */
 
-unsigned short	sqlrcur_countBindVariables(sqlrcur sqlrcurref);
+uint16_t	sqlrcur_countBindVariables(sqlrcur sqlrcurref);
 			/* Parses the previously prepared query,
 			   counts the number of bind variables defined
 			   in it and returns that number. */
@@ -199,21 +201,21 @@ unsigned short	sqlrcur_countBindVariables(sqlrcur sqlrcurref);
 void	sqlrcur_inputBindString(sqlrcur sqlrcurref, 
 				const char *variable, const char *value);
 void	sqlrcur_inputBindLong(sqlrcur sqlrcurref, const char *variable, 
-							long value);
+							int32_t value);
 void	sqlrcur_inputBindDouble(sqlrcur sqlrcurref, 
 					const char *variable, double value,
-					unsigned short precision, 
-					unsigned short scale);
+					uint32_t precision, 
+					uint32_t scale);
 void	sqlrcur_inputBindBlob(sqlrcur sqlrcurref, 
 					const char *variable, const char *value,
-					unsigned long size);
+					uint32_t size);
 void	sqlrcur_inputBindClob(sqlrcur sqlrcurref, 
 					const char *variable, const char *value,
-					unsigned long size);
+					uint32_t size);
 			/* Define an input bind variable. */
 
 void	sqlrcur_defineOutputBind(sqlrcur sqlrcurref, const char *variable, 
-							unsigned long length);
+							uint32_t length);
 			/* Define an output bind variable.
 			  "length" bytes will be reserved to store the value. */
 void	sqlrcur_defineOutputBindBlob(sqlrcur sqlrcurref,
@@ -229,23 +231,23 @@ void	sqlrcur_defineOutputBindCursor(sqlrcur sqlrcurref,
 void	sqlrcur_subStrings(sqlrcur sqlrcurref,
 				const char **variables, const char **values);
 void	sqlrcur_subLongs(sqlrcur sqlrcurref,
-				const char **variables, const long *values);
+				const char **variables, const int32_t *values);
 void	sqlrcur_subDoubles(sqlrcur sqlrcurref,
 				const char **variables, const double *values,
-				const unsigned short *precisions,
-				const unsigned short *scales);
+				const uint32_t *precisions,
+				const uint32_t *scales);
 			/* Define an array of substitution variables. */
 void	sqlrcur_inputBindStrings(sqlrcur sqlrcurref, 
 					const char **variables,
 					const char **values);
 void	sqlrcur_inputBindLongs(sqlrcur sqlrcurref, 
 					const char **variables, 
-					const unsigned long *values);
+					const int32_t *values);
 void	sqlrcur_inputBindDoubles(sqlrcur sqlrcurref, 
 					const char **variables,
 					const double *values,
-					const unsigned short *precisions, 
-					const unsigned short *scales);
+					const uint32_t *precisions, 
+					const uint32_t *scales);
 			/* Define an array of input bind variables. */
 
 void	sqlrcur_validateBinds(sqlrcur sqlrcurref);
@@ -268,7 +270,7 @@ const char	*sqlrcur_getOutputBind(sqlrcur sqlrcurref,
 					const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable. */
-long	sqlrcur_getOutputBindAsLong(sqlrcur sqlrcurref,
+int32_t	sqlrcur_getOutputBindAsLong(sqlrcur sqlrcurref,
 						const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable as a 
@@ -279,7 +281,8 @@ double	sqlrcur_getOutputBindAsDouble(sqlrcur sqlrcurref,
 			   defined output bind variable as a 
 			   double precision floating point
 			   number. */
-long	sqlrcur_getOutputBindLength(sqlrcur sqlrcurref, const char *variable);
+uint32_t	sqlrcur_getOutputBindLength(sqlrcur sqlrcurref,
+						const char *variable);
 			/* Get the length of the value stored in a previously
 			   defined output bind variable. */
 sqlrcur	sqlrcur_getOutputBindCursor(sqlrcur sqlrcurref, const char *variable);
@@ -292,20 +295,20 @@ int	sqlrcur_openCachedResultSet(sqlrcur sqlrcurref, const char *filename);
 			/* Opens a cached result set.
 			   Returns 1 on success and 0 on failure. */
 
-int	sqlrcur_colCount(sqlrcur sqlrcurref); 
+uint32_t	sqlrcur_colCount(sqlrcur sqlrcurref); 
 			/* Returns the number of columns in the current
 			   result set. */
-int	sqlrcur_rowCount(sqlrcur sqlrcurref); 
+uint32_t	sqlrcur_rowCount(sqlrcur sqlrcurref); 
 			/* Returns the number of rows in the current 
 			   result set. */
-int	sqlrcur_totalRows(sqlrcur sqlrcurref);
+uint32_t	sqlrcur_totalRows(sqlrcur sqlrcurref);
 			/* Returns the total number of rows that will 
 			   be returned in the result set.  Not all 
 			   databases support this call.  Don't use it 
 			   for applications which are designed to be 
 			   portable across databases.  -1 is returned
 			   by databases which don't support this option. */
-int	sqlrcur_affectedRows(sqlrcur sqlrcurref);
+uint32_t	sqlrcur_affectedRows(sqlrcur sqlrcurref);
 			/* Returns the number of rows that were 
 			   updated, inserted or deleted by the query.
 			   Not all databases support this call.  Don't 
@@ -313,7 +316,7 @@ int	sqlrcur_affectedRows(sqlrcur sqlrcurref);
 			   to be portable across databases.  -1 is 
 			   returned by databases which don't support 
 			   this option. */
-int	sqlrcur_firstRowIndex(sqlrcur sqlrcurref);
+uint32_t	sqlrcur_firstRowIndex(sqlrcur sqlrcurref);
 			/* Returns the index of the first buffered row.
 			   This is useful when buffering only part of
 			   the result set at a time. */
@@ -340,51 +343,58 @@ void	sqlrcur_getNullsAsNulls(sqlrcur sqlrcurref);
 			/* Tells the connection to return NULL fields and
 			   output bind variables as NULL's. */
 
-const char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col); 
-const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row,
+const char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref,
+						uint32_t row, uint32_t col); 
+const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, uint32_t row,
 							const char *col); 
 			/* Returns a pointer to the value of the 
 			   specified row and column. */
-long	sqlrcur_getFieldAsLongByIndex(sqlrcur sqlrcurref, int row, int col); 
-long	sqlrcur_getFieldAsLongByName(sqlrcur sqlrcurref, int row,
+int32_t	sqlrcur_getFieldAsLongByIndex(sqlrcur sqlrcurref,
+						uint32_t row, uint32_t col); 
+int32_t	sqlrcur_getFieldAsLongByName(sqlrcur sqlrcurref, uint32_t row,
 							const char *col); 
 			/* Returns the specified field as a long integer. */
-double	sqlrcur_getFieldAsDoubleByIndex(sqlrcur sqlrcurref, int row, int col); 
-double	sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, int row,
+double	sqlrcur_getFieldAsDoubleByIndex(sqlrcur sqlrcurref,
+						uint32_t row, uint32_t col); 
+double	sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, uint32_t row,
 							const char *col); 
 			/* Returns the specified field as a double precision
 			   floating point number. */
-const char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, int row, int col); 
-const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, int row,
+const char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref,
+						uint32_t row, uint32_t col); 
+const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, uint32_t row,
 							const char *col); 
 			/* Returns a pointer to the value of the 
 			   specified row and column. */
-long	sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref, int row, int col); 
-long	sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref, int row,
+uint32_t	sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref,
+						uint32_t row, uint32_t col); 
+uint32_t	sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref, uint32_t row,
 							const char *col); 
 			/* Returns the length of the 
 			   specified row and column. */
-const char * const *sqlrcur_getRow(sqlrcur sqlrcurref, int row); 
+const char * const *sqlrcur_getRow(sqlrcur sqlrcurref, uint32_t row); 
 			/* Returns a null terminated array of the 
 			   values of the fields in the specified row. */
-long	*sqlrcur_getRowLengths(sqlrcur sqlrcurref, int row); 
+uint32_t	*sqlrcur_getRowLengths(sqlrcur sqlrcurref, uint32_t row); 
 			/* Returns a null terminated array of the 
 			   lengths of the fields in the specified row. */
 const char * const *sqlrcur_getColumnNames(sqlrcur sqlrcurref); 
 			/* Returns a null terminated array of the 
 			   column names of the current result set. */
-const char	*sqlrcur_getColumnName(sqlrcur sqlrcurref, int col); 
+const char	*sqlrcur_getColumnName(sqlrcur sqlrcurref, uint32_t col); 
 			/* Returns the name of the specified column. */
-const char	*sqlrcur_getColumnTypeByIndex(sqlrcur sqlrcurref, int col); 
+const char	*sqlrcur_getColumnTypeByIndex(sqlrcur sqlrcurref, uint32_t col); 
 const char	*sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref,
 							const char *col); 
 			/* Returns the type of the specified column. */
-int	sqlrcur_getColumnLengthByIndex(sqlrcur sqlrcurref, int col); 
-int	sqlrcur_getColumnLengthByName(sqlrcur sqlrcurref, const char *col); 
+uint32_t	sqlrcur_getColumnLengthByIndex(sqlrcur sqlrcurref,
+							uint32_t col); 
+uint32_t	sqlrcur_getColumnLengthByName(sqlrcur sqlrcurref,
+							const char *col); 
 			/* Returns the length of the specified column. */
-unsigned long	sqlrcur_getColumnPrecisionByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned long	sqlrcur_getColumnPrecisionByName(sqlrcur sqlrcurref,
+uint32_t	sqlrcur_getColumnPrecisionByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+uint32_t	sqlrcur_getColumnPrecisionByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns the precision of the specified
 			   column.
@@ -392,72 +402,72 @@ unsigned long	sqlrcur_getColumnPrecisionByName(sqlrcur sqlrcurref,
 			   a number.  eg: 123.45 has a precision of 5.
 			   For non-numeric types, it's the number of
 			   characters in the string. */
-unsigned long	sqlrcur_getColumnScaleByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned long	sqlrcur_getColumnScaleByName(sqlrcur sqlrcurref,
+uint32_t	sqlrcur_getColumnScaleByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+uint32_t	sqlrcur_getColumnScaleByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns the scale of the specified column.
 			   Scale is the total number of digits to the
 			   right of the decimal point in a number.
 			   eg: 123.45 has a scale of 2. */
-unsigned short	sqlrcur_getColumnIsNullableByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned short	sqlrcur_getColumnIsNullableByName(sqlrcur sqlrcurref,
+int		sqlrcur_getColumnIsNullableByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+int		sqlrcur_getColumnIsNullableByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns 1 if the specified column can
 			   contain nulls and 0 otherwise. */
-unsigned short	sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned short	sqlrcur_getColumnIsPrimaryKeyByName(sqlrcur sqlrcurref,
+int		sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+int		sqlrcur_getColumnIsPrimaryKeyByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns 1 if the specified column is a
 			   primary key and 0 otherwise. */
-unsigned short	sqlrcur_getColumnIsUniqueByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned short	sqlrcur_getColumnIsUniqueByName(sqlrcur sqlrcurref,
+int		sqlrcur_getColumnIsUniqueByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+int		sqlrcur_getColumnIsUniqueByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns 1 if the specified column is
 			   unique and 0 otherwise. */
-unsigned short	sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned short	sqlrcur_getColumnIsPartOfKeyByName(sqlrcur sqlrcurref,
+int		sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+int		sqlrcur_getColumnIsPartOfKeyByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns 1 if the specified column is
 			   part of a composite key and 0 otherwise. */
-unsigned short	sqlrcur_getColumnIsUnsignedByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned short	sqlrcur_getColumnIsUnsignedByName(sqlrcur sqlrcurref,
+int		sqlrcur_getColumnIsUnsignedByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+int		sqlrcur_getColumnIsUnsignedByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns 1 if the specified column is
 			   an unsigned number and 0 otherwise. */
-unsigned short	sqlrcur_getColumnIsZeroFilledByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned short	sqlrcur_getColumnIsZeroFilledByName(sqlrcur sqlrcurref,
+int		sqlrcur_getColumnIsZeroFilledByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+int		sqlrcur_getColumnIsZeroFilledByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns 1 if the specified column was
 			   created with the zero-fill flag and 0
 			   otherwise. */
-unsigned short	sqlrcur_getColumnIsBinaryByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned short	sqlrcur_getColumnIsBinaryByName(sqlrcur sqlrcurref,
+int		sqlrcur_getColumnIsBinaryByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+int		sqlrcur_getColumnIsBinaryByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns 1 if the specified column
 			   contains binary data and 0
 			   otherwise. */
-unsigned short	sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcur sqlrcurref,
-							int col);
-unsigned short	sqlrcur_getColumnIsAutoIncrementByName(sqlrcur sqlrcurref,
+int		sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcur sqlrcurref,
+							uint32_t col);
+int		sqlrcur_getColumnIsAutoIncrementByName(sqlrcur sqlrcurref,
 							const char *col);
 			/* Returns 1 if the specified column
 			   auto-increments and 0 otherwise. */
 
-int	sqlrcur_getLongestByIndex(sqlrcur sqlrcurref, int col);
-int	sqlrcur_getLongestByName(sqlrcur sqlrcurref, const char *col);
+uint32_t	sqlrcur_getLongestByIndex(sqlrcur sqlrcurref, uint32_t col);
+uint32_t	sqlrcur_getLongestByName(sqlrcur sqlrcurref, const char *col);
 			/* Returns the length of the longest field in the
 			   specified column. */
 
 
-int	sqlrcur_getResultSetId(sqlrcur sqlrcurref);
+uint16_t	sqlrcur_getResultSetId(sqlrcur sqlrcurref);
 			/* Returns the internal ID of this result set.
 			   This parameter may be passed to another 
 			   statement for use in the resumeResultSet() 
@@ -468,12 +478,12 @@ void	sqlrcur_suspendResultSet(sqlrcur sqlrcurref);
 			   suspendSession() so that another connection can 
 			   connect to it using resumeResultSet() after 
 			   it calls resumeSession(). */
-int	sqlrcur_resumeResultSet(sqlrcur sqlrcurref, int id);
+int	sqlrcur_resumeResultSet(sqlrcur sqlrcurref, uint16_t id);
 			/* Resumes a result set previously left open 
 			   using suspendSession().
 			   Returns 1 on success and 0 on failure. */
 int	sqlrcur_resumeCachedResultSet(sqlrcur sqlrcurref, 
-						int id, const char *filename);
+					uint16_t id, const char *filename);
 			/* Resumes a result set previously left open
 			   using suspendSession() and continues caching
 			   the result set to "filename".

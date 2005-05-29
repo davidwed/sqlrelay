@@ -32,7 +32,7 @@ scaler::scaler() : daemonprocess() {
 	config=NULL;
 	dbase=NULL;
 
-	debug=0;
+	debug=false;
 }
 
 scaler::~scaler() {
@@ -88,9 +88,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	}
 
 	// check for debug
-	if (cmdl.found("-debug")) {
-		debug=1;
-	}
+	debug=cmdl.found("-debug");
 
 	// get the config file
 	const char	*tmpconfig=cmdl.value("-config");
@@ -279,7 +277,7 @@ bool scaler::openMoreConnections() {
 	if ((connections+growby)<=maxconnections) {
 
 		// open "growby" connections
-		for (int i=0; i<growby; i++) {
+		for (int32_t i=0; i<growby; i++) {
 
 			// loop until a connection is successfully started
 			bool	success=false;
@@ -359,27 +357,27 @@ bool scaler::availableDatabase() {
 	return retval;
 }
 
-int scaler::countSessions() {
+int32_t scaler::countSessions() {
 
 	// get the number of open connections
-	unsigned int	*sessions=(unsigned int *)((long)idmemory->getPointer()+
-							sizeof(unsigned int));
+	uint32_t	*sessions=(uint32_t *)((long)idmemory->getPointer()+
+							sizeof(uint32_t));
 
 	return (int)(*sessions);
 }
 
-int scaler::countConnections() {
+int32_t scaler::countConnections() {
 
 	// wait for access to the connection counter
 	semset->waitWithUndo(4);
 
 	// get the number of connections
-	unsigned int	*connections=(unsigned int *)idmemory->getPointer();
+	uint32_t	*connections=(uint32_t *)idmemory->getPointer();
 
 	// signal that the connection counter may be accessed by someone else
 	semset->signalWithUndo(4);
 
-	return (int)(*connections);
+	return *connections;
 }
 
 void scaler::loop() {

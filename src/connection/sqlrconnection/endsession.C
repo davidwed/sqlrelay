@@ -24,11 +24,11 @@ void sqlrconnection::endSession() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"aborting all busy cursors...");
 	#endif
-	for (int i=0; i<cfgfl->getCursors(); i++) {
+	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
 		if (cur[i]->busy) {
 
 			#ifdef SERVER_DEBUG
-			debugPrint("connection",3,(long)i);
+			debugPrint("connection",3,i);
 			#endif
 
 			// It's ok to call cleanUpData() here, ordinarily we

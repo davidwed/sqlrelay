@@ -12,14 +12,14 @@ bool sqlrconnection::sendColumnInfo() {
 	return false;
 }
 
-void sqlrconnection::sendColumnCount(unsigned long ncols) {
+void sqlrconnection::sendColumnCount(uint32_t ncols) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"sending column count...");
 	#endif
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,(long)ncols);
+	debugPrint("connection",3,(int32_t)ncols);
 	#endif
 	clientsock->write(ncols);
 
@@ -28,7 +28,7 @@ void sqlrconnection::sendColumnCount(unsigned long ncols) {
 	#endif
 }
 
-void sqlrconnection::sendColumnTypeFormat(unsigned short format) {
+void sqlrconnection::sendColumnTypeFormat(uint16_t format) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"sending column type format...");
@@ -50,23 +50,23 @@ void sqlrconnection::sendColumnTypeFormat(unsigned short format) {
 }
 
 void sqlrconnection::sendColumnDefinition(const char *name,
-						unsigned short namelen,
-						unsigned short type, 
-						unsigned long size,
-						unsigned long precision,
-						unsigned long scale,
-						unsigned short nullable,
-						unsigned short primarykey,
-						unsigned short unique,
-						unsigned short partofkey,
-						unsigned short unsignednumber,
-						unsigned short zerofill,
-						unsigned short binary,
-						unsigned short autoincrement) {
+						uint16_t namelen,
+						uint16_t type, 
+						uint32_t size,
+						uint32_t precision,
+						uint32_t scale,
+						uint16_t nullable,
+						uint16_t primarykey,
+						uint16_t unique,
+						uint16_t partofkey,
+						uint16_t unsignednumber,
+						uint16_t zerofill,
+						uint16_t binary,
+						uint16_t autoincrement) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
-	for (int i=0; i<namelen; i++) {
+	for (uint16_t i=0; i<namelen; i++) {
 		debugstr->append(name[i]);
 	}
 	debugstr->append(":");
@@ -108,28 +108,28 @@ void sqlrconnection::sendColumnDefinition(const char *name,
 }
 
 void sqlrconnection::sendColumnDefinitionString(const char *name,
-						unsigned short namelen,
+						uint16_t namelen,
 						const char *type, 
-						unsigned short typelen,
-						unsigned long size,
-						unsigned long precision,
-						unsigned long scale,
-						unsigned short nullable,
-						unsigned short primarykey,
-						unsigned short unique,
-						unsigned short partofkey,
-						unsigned short unsignednumber,
-						unsigned short zerofill,
-						unsigned short binary,
-						unsigned short autoincrement) {
+						uint16_t typelen,
+						uint32_t size,
+						uint32_t precision,
+						uint32_t scale,
+						uint16_t nullable,
+						uint16_t primarykey,
+						uint16_t unique,
+						uint16_t partofkey,
+						uint16_t unsignednumber,
+						uint16_t zerofill,
+						uint16_t binary,
+						uint16_t autoincrement) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
-	for (int i=0; i<namelen; i++) {
+	for (uint16_t i=0; i<namelen; i++) {
 		debugstr->append(name[i]);
 	}
 	debugstr->append(":");
-	for (int i=0; i<typelen; i++) {
+	for (uint16_t i=0; i<typelen; i++) {
 		debugstr->append(type[i]);
 	}
 	debugstr->append(":");

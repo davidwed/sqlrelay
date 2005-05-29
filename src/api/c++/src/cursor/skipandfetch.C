@@ -4,14 +4,14 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 
-bool sqlrcursor::skipAndFetch(int rowtoget) {
+bool sqlrcursor::skipAndFetch(bool getallrows, uint32_t rowtoget) {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Skipping and Fetching\n");
-		if (rowtoget>-1) {
+		if (!getallrows) {
 			sqlrc->debugPrint("	row to get: ");
-			sqlrc->debugPrint((long)rowtoget);
+			sqlrc->debugPrint((int32_t)rowtoget);
 			sqlrc->debugPrint("\n");
 		}
 		sqlrc->debugPreEnd();
@@ -19,7 +19,7 @@ bool sqlrcursor::skipAndFetch(int rowtoget) {
 
 	// if we're stepping through the result set, we can possibly 
 	// skip a big chunk of it...
-	if (!skipRows(rowtoget)) {
+	if (!skipRows(getallrows,rowtoget)) {
 		return false;
 	}
 
@@ -35,7 +35,7 @@ void sqlrcursor::fetchRows() {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Fetching ");
-		sqlrc->debugPrint(rsbuffersize);
+		sqlrc->debugPrint((int32_t)rsbuffersize);
 		sqlrc->debugPrint(" rows\n");
 		sqlrc->debugPreEnd();
 	}
@@ -46,17 +46,16 @@ void sqlrcursor::fetchRows() {
 	}
 
 	// otherwise, send to the connection the number of rows to send back
-	sqlrc->cs->write((unsigned long)rsbuffersize);
+	sqlrc->cs->write(rsbuffersize);
 }
 
-bool sqlrcursor::skipRows(int rowtoget) {
+bool sqlrcursor::skipRows(bool getallrows, uint32_t rowtoget) {
 
 	// if we're reading from a cached result set we have to manually skip
 	if (cachesource && cachesourceind) {
 
-		// if rowtoget is -1 then don't skip,
-		// otherwise skip to the next block of rows
-		if (rowtoget==-1) {
+		// skip to the next block of rows
+		if (getallrows) {
 			return true;
 		} else {
 			rowcount=rowtoget-(rowtoget%rsbuffersize);
@@ -64,9 +63,9 @@ bool sqlrcursor::skipRows(int rowtoget) {
 
 		// get the row offset from the index
 		cachesourceind->setPositionRelativeToBeginning(
-				13+sizeof(long)+(rowcount*sizeof(long)));
-		long	rowoffset;
-		if (cachesourceind->read(&rowoffset)!=sizeof(long)) {
+				13+sizeof(int32_t)+(rowcount*sizeof(int32_t)));
+		int32_t	rowoffset;
+		if (cachesourceind->read(&rowoffset)!=sizeof(int32_t)) {
 			setError("The cache file index appears to be corrupt.");
 			return false;
 		}
@@ -78,15 +77,15 @@ bool sqlrcursor::skipRows(int rowtoget) {
 
 	// calculate how many rows to skip unless we're buffering the entire
 	// result set or caching the result set
-	unsigned long	skip=0;
-	if (rsbuffersize && !cachedest && rowtoget>-1) {
-		skip=(long)((rowtoget-(rowtoget%rsbuffersize))-rowcount); 
+	uint32_t	skip=0;
+	if (rsbuffersize && !cachedest && !getallrows) {
+		skip=(rowtoget-(rowtoget%rsbuffersize))-rowcount; 
 		rowcount=rowcount+skip;
 	}
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Skipping ");
-		sqlrc->debugPrint((long)skip);
+		sqlrc->debugPrint((int32_t)skip);
 		sqlrc->debugPrint(" rows\n");
 		sqlrc->debugPreEnd();
 	}

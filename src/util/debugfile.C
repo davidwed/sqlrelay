@@ -63,32 +63,32 @@ void debugfile::closeDebugFile() {
 	}
 }
 
-void debugfile::debugPrint(const char *name, int tabs, const char *string) {
+void debugfile::debugPrint(const char *name, int32_t tabs, const char *string) {
 	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,string);
 	delete[] header;
 }
 
-void debugfile::debugPrint(const char *name, int tabs, long number) {
+void debugfile::debugPrint(const char *name, int32_t tabs, int32_t number) {
 	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,number);
 	delete[] header;
 }
 
-void debugfile::debugPrint(const char *name, int tabs, double number) {
+void debugfile::debugPrint(const char *name, int32_t tabs, double number) {
 	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,number);
 	delete[] header;
 }
 
-void debugfile::debugPrintBlob(const char *blob, unsigned long length) {
+void debugfile::debugPrintBlob(const char *blob, uint32_t length) {
 
 	// write printable characters from the blob, for all other characters,
 	// print a period instead, also print a carriage return every 80 columns
 	stringbuffer	*debugstr=new stringbuffer();
 	debugstr->append('\n');
 	int	column=0;
-	for (unsigned long i=0; i<length; i++) {
+	for (uint32_t i=0; i<length; i++) {
 		if (blob[i]>=' ' && blob[i]<='~') {
 			debugstr->append(blob[i]);
 		} else {
@@ -107,13 +107,13 @@ void debugfile::debugPrintBlob(const char *blob, unsigned long length) {
 	delete debugstr;
 }
 
-void debugfile::debugPrintClob(const char *clob, unsigned long length) {
+void debugfile::debugPrintClob(const char *clob, uint32_t length) {
 
 	// write printable characters from the clob, for NULl characters,
 	// print a \0 instead
 	stringbuffer	*debugstr=new stringbuffer();
 	debugstr->append('\n');
-	for (unsigned long i=0; i<length; i++) {
+	for (uint32_t i=0; i<length; i++) {
 		if (clob[i]==(char)NULL) {
 			debugstr->append("\\0");
 		} else {

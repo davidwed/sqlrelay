@@ -46,7 +46,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 	protected:
 		// interface definition
-		virtual	int	getNumberOfConnectStringVars()=0;
+		virtual	uint16_t	getNumberOfConnectStringVars()=0;
 		virtual	void	handleConnectString()=0;
 		virtual	bool	logIn()=0;
 		virtual	void	logOut()=0;
@@ -61,12 +61,11 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual const char	*identify()=0;
 		virtual sqlrcursor	*initCursor()=0;
 		virtual void	deleteCursor(sqlrcursor *curs)=0;
-		virtual	short	nonNullBindValue();
-		virtual	short	nullBindValue();
+		virtual	int16_t	nonNullBindValue();
+		virtual	int16_t	nullBindValue();
 		virtual char	bindVariablePrefix();
-		virtual bool	bindValueIsNull(short isnull);
-		virtual	bool	skipRows(sqlrcursor *cursor,
-						unsigned long rows);
+		virtual bool	bindValueIsNull(int16_t isnull);
+		virtual	bool	skipRows(sqlrcursor *cursor, uint32_t rows);
 		virtual bool	isTransactional();
 		virtual void	setUser(const char *user);
 		virtual void	setPassword(const char *password);
@@ -87,43 +86,46 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void		setAutoCommitBehavior(bool ac);
 		bool		getAutoCommitBehavior();
 		bool		sendColumnInfo();
-		void		sendRowCounts(long actual, long affected);
-		void		sendColumnCount(unsigned long ncols);
-		void		sendColumnTypeFormat(unsigned short format);
+		void		sendRowCounts(bool knowsactual,
+						uint32_t actual,
+						bool knowsaffected,
+						uint32_t affected);
+		void		sendColumnCount(uint32_t ncols);
+		void		sendColumnTypeFormat(uint16_t format);
 		void		sendColumnDefinition(const char *name, 
-						unsigned short namelen, 
-						unsigned short type, 
-						unsigned long size,
-						unsigned long precision,
-						unsigned long scale,
-						unsigned short nullable,
-						unsigned short primarykey,
-						unsigned short unique,
-						unsigned short partofkey,
-						unsigned short unsignednumber,
-						unsigned short zerofill,
-						unsigned short binary,
-						unsigned short autoincrement);
+						uint16_t namelen, 
+						uint16_t type, 
+						uint32_t size,
+						uint32_t precision,
+						uint32_t scale,
+						uint16_t nullable,
+						uint16_t primarykey,
+						uint16_t unique,
+						uint16_t partofkey,
+						uint16_t unsignednumber,
+						uint16_t zerofill,
+						uint16_t binary,
+						uint16_t autoincrement);
 		void		sendColumnDefinitionString(const char *name, 
-						unsigned short namelen, 
+						uint16_t namelen, 
 						const char *type, 
-						unsigned short typelen, 
-						unsigned long size,
-						unsigned long precision,
-						unsigned long scale,
-						unsigned short nullable,
-						unsigned short primarykey,
-						unsigned short unique,
-						unsigned short partofkey,
-						unsigned short unsignednumber,
-						unsigned short zerofill,
-						unsigned short binary,
-						unsigned short autoincrement);
-		void		sendField(const char *data, unsigned long size);
+						uint16_t typelen, 
+						uint32_t size,
+						uint32_t precision,
+						uint32_t scale,
+						uint16_t nullable,
+						uint16_t primarykey,
+						uint16_t unique,
+						uint16_t partofkey,
+						uint16_t unsignednumber,
+						uint16_t zerofill,
+						uint16_t binary,
+						uint16_t autoincrement);
+		void		sendField(const char *data, uint32_t size);
 		void		sendNullField();
 		void		startSendingLong();
 		void		sendLongSegment(const char *data,
-						unsigned long size);
+						uint32_t size);
 		void		endSendingLong();
 		void		addSessionTempTableForDrop(
 						const char *tablename);
@@ -144,7 +146,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	announceAvailability(const char *tmpdir,
 					bool passdescriptor,
 					const char *unixsocket,
-					unsigned short inetport,
+					uint16_t inetport,
 					const char *connectionid);
 		void	registerForHandoff(const char *tmpdir);
 		bool	receiveFileDescriptor(int *descriptor);
@@ -170,22 +172,22 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void		waitForListenerToFinishReading();
 		void		releaseAnnounceMutex();
 		void		acquireConnectionCountMutex();
-		unsigned int	*getConnectionCountBuffer();
+		uint32_t	*getConnectionCountBuffer();
 		void		signalScalerToRead();
 		void		releaseConnectionCountMutex();
 		void		acquireSessionCountMutex();
-		unsigned int	*getSessionCountBuffer();
+		uint32_t	*getSessionCountBuffer();
 		void		releaseSessionCountMutex();
 
 
-		sqlrcursor	*getCursor(unsigned short command);
+		sqlrcursor	*getCursor(uint16_t command);
 		sqlrcursor	*findAvailableCursor();
 		void	closeCursors(bool destroy);
 		void	setUnixSocketDirectory();
 		bool	handlePidFile();
 		void	reLogIn();
 		void	initSession();
-		int	waitForClient();
+		int32_t	waitForClient();
 		void	clientSession();
 		bool	authenticateCommand();
 		void	suspendSessionCommand();
@@ -211,7 +213,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 						const char *passwordbuffer);
 		bool	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-		int	handleQuery(sqlrcursor *cursor,
+		int32_t	handleQuery(sqlrcursor *cursor,
 					bool reexecute,
 					bool bindcursor,
 					bool reallyexecute);
@@ -221,16 +223,16 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	resumeResultSet(sqlrcursor *cursor);
 		void	suspendSession();
 		void	endSession();
-		bool	getCommand(unsigned short *command);
-		void	noAvailableCursors(unsigned short command);
+		bool	getCommand(uint16_t *command);
+		void	noAvailableCursors(uint16_t command);
 		bool	getQuery(sqlrcursor *cursor);
 		bool	getInputBinds(sqlrcursor *cursor);
 		bool	getOutputBinds(sqlrcursor *cursor);
-		bool	getBindVarCount(unsigned short *count);
+		bool	getBindVarCount(uint16_t *count);
 		bool	getBindVarName(bindvar *bv);
 		bool	getBindVarType(bindvar *bv);
 		void	getNullBind(bindvar *bv);
-		bool	getBindSize(bindvar *bv, unsigned long maxsize);
+		bool	getBindSize(bindvar *bv, uint32_t maxsize);
 		bool	getStringBind(bindvar *bv);
 		bool	getLongBind(bindvar *bv);
 		bool	getDoubleBind(bindvar *bv);
@@ -247,9 +249,6 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	returnOutputBindValues(sqlrcursor *cursor);
 		void	returnResultSetHeader(sqlrcursor *cursor);
 		bool	returnResultSetData(sqlrcursor *cursor);
-
-		long	rowsToFetch();
-		long	rowsToSkip();
 
 		void	initDatabaseAvailableFileName();
 		void	waitForAvailableDatabase();
@@ -276,11 +275,11 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 		char		*updown;
 
-		unsigned short	inetport;
+		uint16_t	inetport;
 		char		*unixsocket;
 		char		*unixsocketptr;
 
-		unsigned short	sendcolumninfo;
+		uint16_t	sendcolumninfo;
 
 		authenticator	*authc;
 
@@ -295,9 +294,10 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		bool		autocommit;
 		bool		checkautocommit;
 		bool		performautocommit;
-		long		accepttimeout;
+		int32_t		accepttimeout;
 		bool		suspendedsession;
-		long		lastrow;
+		bool		lastrowvalid;
+		uint32_t	lastrow;
 
 		inetserversocket	*serversockin;
 		unixserversocket	*serversockun;
@@ -316,15 +316,15 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		bool			connected;
 
 		const char	*connectionid;
-		int		ttl;
+		unsigned int	ttl;
 
 		semaphoreset	*semset;
 		sharedmemory	*idmemory;
 
 	protected:
 
-		unsigned long	stringbindvaluelength;
-		unsigned long	lobbindvaluelength;
+		uint32_t	stringbindvaluelength;
+		uint32_t	lobbindvaluelength;
 
 #ifdef SERVER_DEBUG
 		stringbuffer	*debugstr;

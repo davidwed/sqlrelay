@@ -2,3 +2,9 @@ TYPEMAP
 sqlrconnection *	O_OBJECT
 sqlrcursor *		O_OBJECT
 const char *		T_PV
+uint16_t		T_UV
+uint32_t		T_UV
+uint64_t		T_UV
+int16_t			T_IV
+int32_t			T_IV
+int64_t			T_IV

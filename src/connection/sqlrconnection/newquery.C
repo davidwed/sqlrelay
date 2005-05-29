@@ -11,11 +11,11 @@ bool sqlrconnection::newQueryCommand(sqlrcursor *cursor) {
 
 	// handle query will return 1 for success,
 	// 0 for network error and -1 for a bad query
-	int	querystatus=handleQuery(cursor,false,false,true);
+	int32_t	querystatus=handleQuery(cursor,false,false,true);
 	if (querystatus==1) {
 
 		// reinit lastrow
-		lastrow=-1;
+		lastrowvalid=false;
 		if (!returnResultSetData(cursor)) {
 			endSession();
 			return false;

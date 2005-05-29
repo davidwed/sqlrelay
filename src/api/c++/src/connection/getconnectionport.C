@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-int sqlrconnection::getConnectionPort() {
+uint16_t sqlrconnection::getConnectionPort() {
 
 	if (!suspendsessionsent && !openSession()) {
 		return 0;
@@ -12,10 +12,10 @@ int sqlrconnection::getConnectionPort() {
 	if (debug) {
 		debugPreStart();
 		debugPrint("Getting connection port: ");
-		debugPrint((long)connectioninetport);
+		debugPrint((int32_t)connectioninetport);
 		debugPrint("\n");
 		debugPreEnd();
 	}
 
-	return (int)connectioninetport;
+	return connectioninetport;
 }

@@ -64,7 +64,7 @@ class	sqlrsh {
 		void	execute(int argc, const char **argv);
 	private:
 		void	startupMessage(environment *env,
-					const char *host, int port,
+					const char *host, uint16_t port,
 					const char *user);
 		void	systemRcFile(sqlrconnection *sqlrcon, 
 					sqlrcursor *sqlrcur, 
@@ -99,9 +99,6 @@ class	sqlrsh {
 					sqlrcursor *sqlrcur, environment *env);
 		void	prompt(unsigned long promptcount);
 		void	error(const char *errstring);
-		void	addLineToCommand(stringbuffer *command,
-						stringbuffer *line,
-						int final);
 
 		void	setColor(environment *env, int value);
 		void	black(environment *env);
@@ -436,18 +433,18 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, environment *env) {
 	}
 
 	// display column names
-	int		charcount=0;
-	int		colcount=sqlrcur->colCount();
+	uint32_t	charcount=0;
+	uint32_t	colcount=sqlrcur->colCount();
 	const char	*name;
-	int		namelen;
-	int		longest;
+	uint32_t	namelen;
+	uint32_t	longest;
 
 	if (!colcount) {
 		return;
 	}
 
 	// iterate through columns
-	for (int i=0; i<sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
 
 		// write the column name
 		if (i%2==1) {
@@ -468,7 +465,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, environment *env) {
 		charcount=charcount+longest;
 
 		// pad after the name with spaces
-		for (int j=namelen; j<longest; j++) {
+		for (uint32_t j=namelen; j<longest; j++) {
 			printf(" ");
 		}
 
@@ -482,7 +479,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, environment *env) {
 
 	// display delimiter
 	red(env);
-	for (int i=0; i<charcount; i++) {
+	for (uint32_t i=0; i<charcount; i++) {
 		printf("=");
 	}
 	printf("\n");
@@ -492,18 +489,18 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, environment *env) {
 void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, environment *env) {
 
 	// display column names
-	int	colcount=sqlrcur->colCount();
-	int	namelen;
-	int	longest;
+	uint32_t	colcount=sqlrcur->colCount();
+	uint32_t	namelen;
+	uint32_t	longest;
 
 	if (!colcount) {
 		return;
 	}
 
-	int		i=0;
+	uint32_t	i=0;
 	const char	*field="";
 	while (field && colcount) {
-		for (int j=0; j<colcount; j++) {
+		for (uint32_t j=0; j<colcount; j++) {
 
 			if (!(field=sqlrcur->getField(i,j))) {
 				break;
@@ -529,8 +526,8 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, environment *env) {
 			}
 
 			// pad after the name with spaces
-			for (int k=charstring::length(sqlrcur->getField(i,j)); 
-						k<longest; k++) {
+			for (uint32_t k=sqlrcur->getFieldLength(i,j); 
+							k<longest; k++) {
 				printf(" ");
 			}
 
@@ -591,6 +588,14 @@ void sqlrsh::displayHelp(environment *env) {
 	printf("	followed by a semicolon.  Queries may be \n");
 	printf("	split over multiple lines.\n\n");
 	cyan(env);
+	printf("		ping		- ");
+	green(env);
+	printf("pings the database\n");
+	cyan(env);
+	printf("		identify	- ");
+	green(env);
+	printf("returns the type of database\n");
+	cyan(env);
 	printf("		run script	- ");
 	green(env);
 	printf("runs commands contained in file \"script\"\n");
@@ -623,8 +628,8 @@ void sqlrsh::displayHelp(environment *env) {
 	white(env);
 }
 
-void sqlrsh::startupMessage(environment *env,
-				const char *host, int port, const char *user) {
+void sqlrsh::startupMessage(environment *env, const char *host,
+					uint16_t port, const char *user) {
 
 	red(env);
 	printf("SQLRShell - ");
@@ -646,7 +651,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	stringbuffer	command;
 	stringbuffer	prmpt;
 	int		exitprogram=0;
-	unsigned long	promptcount;
+	uint32_t	promptcount;
 
 	while (!exitprogram) {
 
@@ -674,9 +679,9 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				ssize_t	bytes=standardin.read(cmd,1024);
 				cmd[bytes-1]=(char)NULL;
 			#endif
-			int	len=charstring::length(cmd);
+			size_t	len=charstring::length(cmd);
 			done=false;
-			for (int i=0; i<len; i++) {
+			for (size_t i=0; i<len; i++) {
 				if (i==len-1) {
 				       if (cmd[i]==';') {
 						done=true;
@@ -725,7 +730,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 	sqlrconfigfile	cfgfile;
 	usercontainer	*currentnode=NULL;
 	const char	*host;
-	int		port;
+	uint16_t	port;
 	const char	*socket;
 	const char	*user;
 	const char	*password;

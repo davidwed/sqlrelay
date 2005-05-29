@@ -21,7 +21,7 @@ sqliteconnection::sqliteconnection() : sqlrconnection() {
 	errmesg=NULL;
 }
 
-int sqliteconnection::getNumberOfConnectStringVars() {
+uint16_t sqliteconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
@@ -104,7 +104,8 @@ sqlitecursor::~sqlitecursor() {
 	cleanUpData(true,true);
 }
 
-bool sqlitecursor::executeQuery(const char *query, long length, bool execute) {
+bool sqlitecursor::executeQuery(const char *query, uint32_t length,
+							bool execute) {
 
 	// fake binds
 	newquery=fakeInputBinds(query);
@@ -236,7 +237,7 @@ const char *sqlitecursor::getErrorMessage(bool *liveconnection) {
 void sqlitecursor::returnRowCounts() {
 
 	// affected row counts are unknown in sqlite
-	conn->sendRowCounts((long)nrow,(long)-1);
+	conn->sendRowCounts(true,nrow,false,0);
 }
 
 void sqlitecursor::returnColumnCount() {
@@ -253,7 +254,7 @@ void sqlitecursor::returnColumnInfo() {
 
 	// sqlite is kind of strange, the row of 
 	// the result set is the column names
-	for (int i=0; i<ncolumn; i++) {
+	for (int32_t i=0; i<ncolumn; i++) {
 
 		// column type and size are unknown in sqlite
 		conn->sendColumnDefinition(columnnames[i],
@@ -288,7 +289,7 @@ void sqlitecursor::returnRow() {
 	// in a 2-d array of pointers to rows/columns, but rather
 	// a 1-d array pointing to fields.  You have to manually keep
 	// track of which column you're on.
-	for (int i=0; i<ncolumn; i++) {
+	for (int32_t i=0; i<ncolumn; i++) {
 		if (result[rowindex]) {
 			conn->sendField(result[rowindex],
 					charstring::length(result[rowindex]));

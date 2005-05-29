@@ -5,53 +5,51 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-char *sqlrcursor::getFieldInternal(int row, int col) {
+char *sqlrcursor::getFieldInternal(uint32_t row, uint32_t col) {
 	if (row<OPTIMISTIC_ROW_COUNT) {
 		return rows[row]->getField(col);
 	}
 	return extrarows[row-OPTIMISTIC_ROW_COUNT]->getField(col);
 }
 
-unsigned long sqlrcursor::getFieldLengthInternal(int row, int col) {
+uint32_t sqlrcursor::getFieldLengthInternal(uint32_t row, uint32_t col) {
 	if (row<OPTIMISTIC_ROW_COUNT) {
 		return rows[row]->getFieldLength(col);
 	}
 	return extrarows[row-OPTIMISTIC_ROW_COUNT]->getFieldLength(col);
 }
 
-const char *sqlrcursor::getField(int row, int col) {
+const char *sqlrcursor::getField(uint32_t row, uint32_t col) {
 
-	if (rowcount && row>=0 && row>=(int)firstrowindex && 
-					col>=0 && col<(int)colcount) {
+	if (rowcount && row>=firstrowindex && col<colcount) {
 
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
 		// may have to be fetched into the buffer...
-		int	rowbufferindex=fetchRowIntoBuffer(row);
-
-		if (rowbufferindex>-1) {
+		uint32_t	rowbufferindex;
+		if (fetchRowIntoBuffer(false,row,&rowbufferindex)) {
 			return getFieldInternal(rowbufferindex,col);
 		}
 	}
 	return NULL;
 }
 
-long sqlrcursor::getFieldAsLong(int row, int col) {
+int32_t sqlrcursor::getFieldAsLong(uint32_t row, uint32_t col) {
 	const char	*field=getField(row,col);
 	return (field)?charstring::toLong(field):0;
 }
 
-double sqlrcursor::getFieldAsDouble(int row, int col) {
+double sqlrcursor::getFieldAsDouble(uint32_t row, uint32_t col) {
 	const char	*field=getField(row,col);
 	return (field)?charstring::toDouble(field):0.0;
 }
 
-const char *sqlrcursor::getField(int row, const char *col) {
+const char *sqlrcursor::getField(uint32_t row, const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
-			rowcount && row>=0 && row>=(int)firstrowindex) {
-		for (unsigned long i=0; i<colcount; i++) {
+			rowcount && row>=firstrowindex) {
+		for (uint32_t i=0; i<colcount; i++) {
 			if (!charstring::compareIgnoringCase(
 					getColumnInternal(i)->name,col)) {
 
@@ -59,9 +57,9 @@ const char *sqlrcursor::getField(int row, const char *col) {
 				// result set instead of buffering the entire 
 				// thing, the requested row may have to be 
 				// fetched into the buffer...
-				int	rowbufferindex=fetchRowIntoBuffer(row);
-
-				if (rowbufferindex>-1) {
+				uint32_t	rowbufferindex;
+				if (fetchRowIntoBuffer(false,row,
+							&rowbufferindex)) {
 					return getFieldInternal(
 							rowbufferindex,i);
 				}
@@ -72,40 +70,38 @@ const char *sqlrcursor::getField(int row, const char *col) {
 	return NULL;
 }
 
-long sqlrcursor::getFieldAsLong(int row, const char *col) {
+int32_t sqlrcursor::getFieldAsLong(uint32_t row, const char *col) {
 	const char	*field=getField(row,col);
 	return (field)?charstring::toLong(field):0;
 }
 
-double sqlrcursor::getFieldAsDouble(int row, const char *col) {
+double sqlrcursor::getFieldAsDouble(uint32_t row, const char *col) {
 	const char	*field=getField(row,col);
 	return (field)?charstring::toDouble(field):0.0;
 }
 
-long sqlrcursor::getFieldLength(int row, int col) {
+uint32_t sqlrcursor::getFieldLength(uint32_t row, uint32_t col) {
 
-	if (rowcount && row>=0 && row>=(int)firstrowindex && 
-					col>=0 && col<(int)colcount) {
+	if (rowcount && row>=firstrowindex && col<colcount) {
 
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
 		// may have to be fetched into the buffer...
-		int	rowbufferindex=fetchRowIntoBuffer(row);
-
-		if (rowbufferindex>-1) {
+		uint32_t	rowbufferindex;
+		if (fetchRowIntoBuffer(false,row,&rowbufferindex)) {
 			return getFieldLengthInternal(rowbufferindex,col);
 		}
 	}
-	return -1;
+	return 0;
 }
 
-long sqlrcursor::getFieldLength(int row, const char *col) {
+uint32_t sqlrcursor::getFieldLength(uint32_t row, const char *col) {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO && 
 			sentcolumninfo==SEND_COLUMN_INFO &&
-			rowcount && row>=0 && row>=(int)firstrowindex) {
+			rowcount && row>=firstrowindex) {
 
-		for (unsigned long i=0; i<colcount; i++) {
+		for (uint32_t i=0; i<colcount; i++) {
 			if (!charstring::compareIgnoringCase(
 					getColumnInternal(i)->name,col)) {
 
@@ -113,29 +109,28 @@ long sqlrcursor::getFieldLength(int row, const char *col) {
 				// result set instead of buffering the entire 
 				// thing, the requested row may have to be 
 				// fetched into the buffer...
-				int	rowbufferindex=fetchRowIntoBuffer(row);
-
-				if (rowbufferindex>-1) {
+				uint32_t	rowbufferindex;
+				if (fetchRowIntoBuffer(false,row,
+							&rowbufferindex)) {
 					return getFieldLengthInternal(
 							rowbufferindex,i);
 				}
-				return -1;
+				return 0;
 			}
 		}
 	}
-	return -1;
+	return 0;
 }
 
-const char * const *sqlrcursor::getRow(int row) {
+const char * const *sqlrcursor::getRow(uint32_t row) {
 
-	if (rowcount && row>=0 && row>=(int)firstrowindex) {
+	if (rowcount && row>=firstrowindex) {
 
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
 		// may have to be fetched into the buffer...
-		int	rowbufferindex=fetchRowIntoBuffer(row);
-
-		if (rowbufferindex>-1) {
+		uint32_t	rowbufferindex;
+		if (fetchRowIntoBuffer(false,row,&rowbufferindex)) {
 			if (!fields) {
 				createFields();
 			}
@@ -150,32 +145,31 @@ void sqlrcursor::createFields() {
 	// the fields array will contain 2 elements:
 	// 	fields[0] (corresponding to row 3) and
 	// 	fields[1] (corresponding to row 4)
-	unsigned long	rowbuffercount=rowcount-firstrowindex;
+	uint32_t	rowbuffercount=rowcount-firstrowindex;
 	fields=new char **[rowbuffercount+1];
 	fields[rowbuffercount]=(char **)NULL;
-	for (unsigned long i=0; i<rowbuffercount; i++) {
+	for (uint32_t i=0; i<rowbuffercount; i++) {
 		fields[i]=new char *[colcount+1];
 		fields[i][colcount]=(char *)NULL;
-		for (unsigned long j=0; j<colcount; j++) {
+		for (uint32_t j=0; j<colcount; j++) {
 			fields[i][j]=getFieldInternal(i,j);
 		}
 	}
 }
 
-long *sqlrcursor::getRowLengths(int row) {
+uint32_t *sqlrcursor::getRowLengths(uint32_t row) {
 
-	if (rowcount && row>=0 && row>=(int)firstrowindex) {
+	if (rowcount && row>=firstrowindex) {
 
 		// in the event that we're stepping through the result set 
 		// instead of buffering the entire thing, the requested row
 		// may have to be fetched into the buffer...
-		int	rowbufferindex=fetchRowIntoBuffer(row);
-
-		if (rowbufferindex>-1) {
+		uint32_t	rowbufferindex;
+		if (fetchRowIntoBuffer(false,row,&rowbufferindex)) {
 			if (!fieldlengths) {
 				createFieldLengths();
 			}
-			return (long *)fieldlengths[rowbufferindex];
+			return fieldlengths[rowbufferindex];
 		}
 	}
 	return NULL;
@@ -186,13 +180,13 @@ void sqlrcursor::createFieldLengths() {
 	// the fieldlengths array will contain 2 elements:
 	// 	fieldlengths[0] (corresponding to row 3) and
 	// 	fieldlengths[1] (corresponding to row 4)
-	unsigned long	rowbuffercount=rowcount-firstrowindex;
-	fieldlengths=new unsigned long *[rowbuffercount+1];
-	fieldlengths[rowbuffercount]=(unsigned long)NULL;
-	for (unsigned long i=0; i<rowbuffercount; i++) {
-		fieldlengths[i]=new unsigned long[colcount+1];
-		fieldlengths[i][colcount]=(unsigned long)NULL;
-		for (unsigned long j=0; j<colcount; j++) {
+	uint32_t	rowbuffercount=rowcount-firstrowindex;
+	fieldlengths=new uint32_t *[rowbuffercount+1];
+	fieldlengths[rowbuffercount]=(uint32_t)NULL;
+	for (uint32_t i=0; i<rowbuffercount; i++) {
+		fieldlengths[i]=new uint32_t[colcount+1];
+		fieldlengths[i][colcount]=(uint32_t)NULL;
+		for (uint32_t j=0; j<colcount; j++) {
 			fieldlengths[i][j]=getFieldLengthInternal(i,j);
 		}
 	}

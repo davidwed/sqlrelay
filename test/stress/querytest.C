@@ -16,16 +16,16 @@ sqlrcursor	*secondcur;
 int	main(int argc, char **argv) {
 
 	char	*dbtype;
-	char	*bindvars[2]={"var1",NULL};
-	char	*bindvals[1]={"testchar3"};
-	char	*subvars[2]={"col1",NULL};
-	char	*subvalstrings[1]={"testchar"};
-	char	**cols;
-	char	**fields;
+	const char *bindvars[2]={"var1",NULL};
+	const char *bindvals[1]={"testchar3"};
+	const char *subvars[2]={"col1",NULL};
+	const char *subvalstrings[1]={"testchar"};
+	const char * const *cols;
+	const char * const *fields;
 	int	port;
-	char	*socket;
+	const char	*socket;
 	int	id;
-	char	*filename;
+	const char	*filename;
 	long	*fieldlens;
 	int	counter=1;
 

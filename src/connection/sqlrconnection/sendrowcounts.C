@@ -3,44 +3,46 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::sendRowCounts(long actual, long affected) {
+void sqlrconnection::sendRowCounts(bool knowsactual, uint32_t actual,
+					bool knowsaffected, uint32_t affected) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"sending row counts...");
 	#endif
 
 	// send actual rows, if that is known
-	if (actual>-1) {
+	if (knowsactual) {
 
 		#ifdef SERVER_DEBUG
 		char	string[30];
-		sprintf(string,"actual rows: %ld",actual);
+		sprintf(string,"actual rows: %d",actual);
 		debugPrint("connection",3,string);
 		#endif
 
-		clientsock->write((unsigned short)ACTUAL_ROWS);
-		clientsock->write((unsigned long)actual);
+		clientsock->write((uint16_t)ACTUAL_ROWS);
+		clientsock->write(actual);
+
 	} else {
 
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"actual rows unknown");
 		#endif
 
-		clientsock->write((unsigned short)NO_ACTUAL_ROWS);
+		clientsock->write((uint16_t)NO_ACTUAL_ROWS);
 	}
 
 	
 	// send affected rows, if that is known
-	if (affected>-1) {
+	if (knowsaffected) {
 
 		#ifdef SERVER_DEBUG
 		char	string[46];
-		sprintf(string,"affected rows: %ld",affected);
+		sprintf(string,"affected rows: %d",affected);
 		debugPrint("connection",3,string);
 		#endif
 
-		clientsock->write((unsigned short)AFFECTED_ROWS);
-		clientsock->write((unsigned long)affected);
+		clientsock->write((uint16_t)AFFECTED_ROWS);
+		clientsock->write(affected);
 
 	} else {
 
@@ -48,7 +50,7 @@ void sqlrconnection::sendRowCounts(long actual, long affected) {
 		debugPrint("connection",3,"affected rows unknown");
 		#endif
 
-		clientsock->write((unsigned short)NO_AFFECTED_ROWS);
+		clientsock->write((uint16_t)NO_AFFECTED_ROWS);
 	}
 
 	#ifdef SERVER_DEBUG

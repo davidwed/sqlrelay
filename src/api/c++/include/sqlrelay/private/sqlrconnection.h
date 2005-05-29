@@ -16,11 +16,11 @@
 		void	debugPreStart();
 		void	debugPreEnd();
 		void	debugPrint(const char *string);
-		void	debugPrint(long number);
+		void	debugPrint(int32_t number);
 		void	debugPrint(double number);
 		void	debugPrint(char character);
-		void	debugPrintBlob(const char *blob, unsigned long length);
-		void	debugPrintClob(const char *clob, unsigned long length);
+		void	debugPrintBlob(const char *blob, uint32_t length);
+		void	debugPrintClob(const char *clob, uint32_t length);
 
 		bool	autoCommit(bool on);
 
@@ -41,19 +41,19 @@
 
 		// connection
 		const char		*server;
-		unsigned short		listenerinetport;
-		unsigned short		connectioninetport;
+		uint16_t		listenerinetport;
+		uint16_t		connectioninetport;
 		char			*listenerunixport;
 		char			*connectionunixport;
 		char			connectionunixportbuffer[MAXPATHLEN+1];
-		int			retrytime;
-		int			tries;
+		int32_t			retrytime;
+		int32_t			tries;
 
 		// authentication
 		const char	*user;
-		int		userlen;
+		uint32_t	userlen;
 		const char	*password;
-		int		passwordlen;
+		uint32_t	passwordlen;
 		bool		reconnect;
 
 		// error
@@ -64,7 +64,7 @@
 
 		// debug
 		bool		debug;
-		int		webdebug;
+		int32_t		webdebug;
 		int		(*printfunction)(const char *,...);
 
 		// copy references flag

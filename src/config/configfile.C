@@ -54,7 +54,7 @@ void configfile::blank() {
 	root->insertText("\n",root->getChildCount());
 }
 
-int configfile::parse(const char *filename) {
+bool configfile::parse(const char *filename) {
 
 	currentfile=(char *)filename;
 
@@ -83,7 +83,7 @@ int configfile::parse(const char *filename) {
 
 		// loop through the children of the instance tag
 		// and create more instances
-		for (int i=0; i<instances->getChildCount(); i++) {
+		for (int32_t i=0; i<instances->getChildCount(); i++) {
 
 			// get the next child node, make sure it's
 			// an "instance" tag
@@ -106,17 +106,17 @@ int configfile::parse(const char *filename) {
 			}
 			lastinstance=currentinstance;
 		}
-		return 1;
+		return true;
 	}
 	delete doc;
-	return 0;
+	return false;
 }
 
-int configfile::write() {
+bool configfile::write() {
 	return doc->writeFile(currentfile,permissions::ownerReadWrite());
 }
 
-int configfile::write(const char *filename) {
+bool configfile::write(const char *filename) {
 	return doc->writeFile(filename,permissions::ownerReadWrite());
 }
 
@@ -295,7 +295,7 @@ instance::instance(xmldomnode *instancenode) {
 
 	// create the list of users
 	users=instancenode->getChild("users");
-	for (int i=0; i<users->getChildCount(); i++) {
+	for (int32_t i=0; i<users->getChildCount(); i++) {
 
 		// get the next child node, make sure it's
 		// an "user" tag
@@ -321,7 +321,7 @@ instance::instance(xmldomnode *instancenode) {
 
 	// create the list of connections
 	connections=instancenode->getChild("connections");
-	for (int i=0; i<connections->getChildCount(); i++) {
+	for (int32_t i=0; i<connections->getChildCount(); i++) {
 
 		// get the next child node, make sure it's
 		// an "connection" tag

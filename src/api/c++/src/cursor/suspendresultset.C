@@ -15,7 +15,7 @@ void sqlrcursor::suspendResultSet() {
 
 	if (sqlrc->connected && !cached) {
 
-		sqlrc->cs->write((unsigned short)SUSPEND_RESULT_SET);
+		sqlrc->cs->write((uint16_t)SUSPEND_RESULT_SET);
 		sqlrc->cs->write(cursorid);
 
 		sqlrc->flushWriteBuffer();

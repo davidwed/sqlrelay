@@ -98,11 +98,11 @@ bool sqlrconnection::getAndIncrementSequenceNumber(file *sockseq,
 							char *unixsocketptr) {
 
 	// get the sequence number from the file
-	long	buffer;
-	if (sockseq->read(&buffer)!=sizeof(long)) {
+	int32_t	buffer;
+	if (sockseq->read(&buffer)!=sizeof(int32_t)) {
 		buffer=0;
 	}
-	sprintf(unixsocketptr,"%ld",buffer);
+	sprintf(unixsocketptr,"%d",buffer);
 
 	#ifdef SERVER_DEBUG
 	char	*string=new char[21+charstring::length(unixsocketptr)+1];
@@ -120,7 +120,7 @@ bool sqlrconnection::getAndIncrementSequenceNumber(file *sockseq,
 
 	#ifdef SERVER_DEBUG
 	string=new char[50];
-	sprintf(string,"writing new sequence number: %ld",buffer);
+	sprintf(string,"writing new sequence number: %d",buffer);
 	debugPrint("connection",1,string);
 	delete[] string;
 	#endif
@@ -129,7 +129,7 @@ bool sqlrconnection::getAndIncrementSequenceNumber(file *sockseq,
 	if (sockseq->setPositionRelativeToBeginning(0)==-1) {
 		return false;
 	}
-	return (sockseq->write(buffer)==sizeof(long));
+	return (sockseq->write(buffer)==sizeof(int32_t));
 }
 
 bool sqlrconnection::unLockSequenceFile(file *sockseq) {

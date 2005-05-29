@@ -15,7 +15,7 @@ bool sqlrconnection::getInputBinds(sqlrcursor *cursor) {
 	}
 	
 	// fill the buffers
-	for (int i=0; i<cursor->inbindcount && i<MAXVAR; i++) {
+	for (uint16_t i=0; i<cursor->inbindcount && i<MAXVAR; i++) {
 
 		bindvar	*bv=&(cursor->inbindvars[i]);
 
@@ -64,7 +64,7 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 	}
 
 	// fill the buffers
-	for (int i=0; i<cursor->outbindcount && i<MAXVAR; i++) {
+	for (uint16_t i=0; i<cursor->outbindcount && i<MAXVAR; i++) {
 
 		bindvar	*bv=&(cursor->outbindvars[i]);
 
@@ -117,10 +117,10 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 	return true;
 }
 
-bool sqlrconnection::getBindVarCount(unsigned short *count) {
+bool sqlrconnection::getBindVarCount(uint16_t *count) {
 
 	// get the number of input bind variable/values
-	if (clientsock->read(count)!=sizeof(unsigned short)) {
+	if (clientsock->read(count)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting binds failed: client sent bad bind count size");
@@ -132,7 +132,8 @@ bool sqlrconnection::getBindVarCount(unsigned short *count) {
 	if (*count>MAXVAR) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
-			"getting binds failed: client tried to send too many binds");
+			"getting binds failed: client tried to send too many binds:");
+		debugPrint("connection",3,(int32_t)*count);
 		#endif
 		return false;
 	}
@@ -142,10 +143,10 @@ bool sqlrconnection::getBindVarCount(unsigned short *count) {
 
 bool sqlrconnection::getBindVarName(bindvar *bv) {
 
-	unsigned short	bindnamesize;
+	uint16_t	bindnamesize;
 
 	// get the variable name size
-	if (clientsock->read(&bindnamesize)!=sizeof(unsigned short)) {
+	if (clientsock->read(&bindnamesize)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting binds failed: bad variable name length size");
@@ -185,8 +186,8 @@ bool sqlrconnection::getBindVarName(bindvar *bv) {
 bool sqlrconnection::getBindVarType(bindvar *bv) {
 
 	// get the type
-        unsigned short type;
-	if (clientsock->read((unsigned short *)&type)!=sizeof(unsigned short)) {
+        uint16_t type;
+	if (clientsock->read(&type)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 				"getting binds failed: bad type size");
@@ -198,10 +199,10 @@ bool sqlrconnection::getBindVarType(bindvar *bv) {
 	return true;
 }
 
-bool sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
+bool sqlrconnection::getBindSize(bindvar *bv, uint32_t maxsize) {
 
 	// get the size of the value
-	if (clientsock->read(&(bv->valuesize))!=sizeof(unsigned long)) {
+	if (clientsock->read(&(bv->valuesize))!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",
 			2,"getting binds failed: bad value length size");
@@ -210,14 +211,14 @@ bool sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
 	}
 
 	// bounds checking
-	if (bv->valuesize>maxsize) {
+	/*if (bv->valuesize>maxsize) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 				"getting binds failed: bad value length");
-		debugPrint("connection",3,(long)bv->valuesize);
+		debugPrint("connection",3,bv->valuesize);
 		#endif
 		return false;
-	}
+	}*/
 
 	return true;
 }
@@ -249,8 +250,8 @@ bool sqlrconnection::getStringBind(bindvar *bv) {
 	#endif
 
 	// get the bind value
-	if ((unsigned long)(clientsock->read(bv->value.stringval,
-			bv->valuesize))!=(unsigned long)(bv->valuesize)) {
+	if ((uint32_t)(clientsock->read(bv->value.stringval,
+			bv->valuesize))!=(uint32_t)(bv->valuesize)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"getting binds failed: bad value");
 		#endif
@@ -283,8 +284,8 @@ bool sqlrconnection::getLongBind(bindvar *bv) {
 	}
 
 	// get the value itself
-	unsigned long	value;
-	if (clientsock->read(&value)!=sizeof(unsigned long)) {
+	uint32_t	value;
+	if (clientsock->read(&value)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"getting binds failed: bad value");
@@ -293,7 +294,7 @@ bool sqlrconnection::getLongBind(bindvar *bv) {
 	}
 
 	// set the value
-	bv->value.longval=((long)value)*(negative?-1:1);
+	bv->value.longval=((int32_t)value)*(negative?-1:1);
 
 	#ifdef SERVER_DEBUG
 		debugPrint("connection",4,bv->value.longval);
@@ -319,7 +320,7 @@ bool sqlrconnection::getDoubleBind(bindvar *bv) {
 
 	// get the precision
 	if (clientsock->read(&(bv->value.doubleval.precision))!=
-						sizeof(unsigned short)) {
+						sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"getting binds failed: bad precision");
@@ -329,7 +330,7 @@ bool sqlrconnection::getDoubleBind(bindvar *bv) {
 
 	// get the scale
 	if (clientsock->read(&(bv->value.doubleval.scale))!=
-						sizeof(unsigned short)) {
+						sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"getting binds failed: bad scale");
@@ -364,8 +365,8 @@ bool sqlrconnection::getLobBind(bindvar *bv) {
 	bv->value.stringval=(char *)bindpool->malloc(bv->valuesize+1);
 
 	// get the bind value
-	if ((unsigned long)(clientsock->read(bv->value.stringval,
-			bv->valuesize))!=(unsigned long)(bv->valuesize)) {
+	if ((uint32_t)(clientsock->read(bv->value.stringval,
+			bv->valuesize))!=(uint32_t)(bv->valuesize)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 				"getting binds failed: bad value");
@@ -380,12 +381,12 @@ bool sqlrconnection::getLobBind(bindvar *bv) {
 	bv->isnull=nonNullBindValue();
 
 	#ifdef SERVER_DEBUG
-		if (bv->type==BLOB_BIND) {
+		/*if (bv->type==BLOB_BIND) {
 			debugPrintBlob(bv->value.stringval,bv->valuesize);
 		}
 		if (bv->type==CLOB_BIND) {
 			debugPrintClob(bv->value.stringval,bv->valuesize);
-		}
+		}*/
 	#endif
 
 	return true;

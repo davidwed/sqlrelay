@@ -17,7 +17,7 @@ class lagocursor : public sqlrcursor {
 	private:
 				lagocursor(sqlrconnection *conn);
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 		const char	*getErrorMessage(bool *liveconnection);
 		void		returnRowCounts();
@@ -29,10 +29,10 @@ class lagocursor : public sqlrcursor {
 		void		returnRow();
 		void		cleanUpData(bool freeresult, bool freebinds);
 
-		LRST	lagoresult;
-		int	ncols;
-		int	nrows;
-		int	affectedrows;
+		LRST		lagoresult;
+		uint32_t	ncols;
+		uint32_t	nrows;
+		uint32_t	affectedrows;
 
 		lagoconnection	*lagoconn;
 };
@@ -40,7 +40,7 @@ class lagocursor : public sqlrcursor {
 class lagoconnection : public sqlrconnection {
 	friend class lagocursor;
 	private:
-		int	getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn();
 		sqlrcursor	*initCursor();

@@ -437,7 +437,12 @@ dnl have to set ar here because libtool (currently) fails
 dnl to use the correct one when cross-compiling
 AC_CHECK_PROG(AR,$host_alias-ar,$host_alias-ar,ar)
 AC_SUBST(AR)
+echo "******************************"
 
+
+dnl Checks for platform-specific stuff
+echo
+echo "***** Platform ***************"
 FW_CHECK_MICROSOFT
 FW_CHECK_OSX
 FW_CHECK_SO_EXT
@@ -449,6 +454,16 @@ FW_CHECK_UNAME
 
 FW_CHECK_PIPE
 FW_CHECK_WNOLONGDOUBLE
+
+AC_CHECK_SIZEOF(int16_t)
+AC_CHECK_SIZEOF(int32_t)
+AC_CHECK_SIZEOF(int64_t)
+AC_CHECK_SIZEOF(uint16_t)
+AC_CHECK_SIZEOF(uint32_t)
+AC_CHECK_SIZEOF(uint64_t)
+AC_CHECK_SIZEOF(float)
+AC_CHECK_SIZEOF(double)
+AC_CHECK_SIZEOF(long double)
 echo "******************************"
 
 
@@ -699,7 +714,7 @@ AC_SUBST(RPM_BUILD_DIR)
 
 
 dnl Default build variables.
-SQLR_VERSION="0.36"
+SQLR_VERSION="0.37"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
 dnl rules for CURRENT:REVISION:AGE version info:
@@ -933,11 +948,14 @@ echo "	Clustered/Replicated database support."
 echo "	Perl API."
 echo
 
-if ( test -n "$PYTHONVERSION" -a "$PYTHONVERSION" -lt "21" )
+if ( test -n "$PYTHONVERSION" )
 then
-	echo
-	echo "WARNING!  Support for Python versions prior to 2.1 is"
-	echo "          deprecated and will be removed soon."
+ 	if ( test "$PYTHONVERSION" -lt "21" )
+	then
+		echo
+		echo "WARNING!  Support for Python versions prior to 2.1 is"
+		echo "          deprecated and will be removed soon."
+	fi
 fi
 
 if ( test "$FREETDSSYSTEMWARNING" = "yes" -a "$SYBASEBUILD" != "no     " )

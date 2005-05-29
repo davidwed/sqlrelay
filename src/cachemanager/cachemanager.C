@@ -78,7 +78,7 @@ void cachemanager::scan() {
 			if (dir.open(currentdir->dirname)) {
 
 				// loop through directory, erasing
-				unsigned long	index=0;
+				uint32_t	index=0;
 				for (;;) {
 					char	*name=dir.getChildName(index);
 					if (!name) {
@@ -125,7 +125,7 @@ void cachemanager::erase(const char *dirname, const char *filename) {
 		if (!charstring::compare(magicid,"SQLRELAYCACHE",13)) {
 
 			// get the ttl
-			long ttl;
+			int32_t ttl;
 			fl.read(&ttl);
 	
 			fl.close();

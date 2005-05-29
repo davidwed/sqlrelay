@@ -37,6 +37,7 @@ static VALUE sqlrcon_endSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	sqlrcon->endSession();
+	return Qnil;
 }
 
 static VALUE sqlrcon_suspendSession(VALUE self) {
@@ -709,7 +710,7 @@ static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	const char * const *fields=sqlrcur->getRow(NUM2INT(row));
 	VALUE	fieldary=rb_ary_new2(sqlrcur->colCount());
-	for (int i=0; i<sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
 		if (fields[i]) {
 			rb_ary_store(fieldary,i,rb_str_new2(fields[i]));
 		} else {
@@ -724,7 +725,7 @@ static VALUE sqlrcur_getRowHash(VALUE self, VALUE row) {
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	const char * const *fields=sqlrcur->getRow(NUM2INT(row));
 	VALUE	fieldhash=rb_hash_new();
-	for (int i=0; i<sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
 		if (fields[i]) {
 			rb_hash_aset(fieldhash,
 					rb_str_new2(sqlrcur->getColumnName(i)),
@@ -741,12 +742,12 @@ static VALUE sqlrcur_getRowHash(VALUE self, VALUE row) {
 static VALUE sqlrcur_getRowLengths(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	long	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
+	uint32_t	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
 	if (!lengths) {
 		return Qnil;
 	}
 	VALUE	lengthary=rb_ary_new2(sqlrcur->colCount());
-	for (int i=0; i<sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
 		rb_ary_store(lengthary,i,INT2NUM(lengths[i]));
 	}
 	return lengthary;
@@ -755,9 +756,9 @@ static VALUE sqlrcur_getRowLengths(VALUE self, VALUE row) {
 static VALUE sqlrcur_getRowLengthsHash(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	long	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
+	uint32_t	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
 	VALUE	lengthhash=rb_hash_new();
-	for (int i=0; i<sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
 		rb_hash_aset(lengthhash,
 				rb_str_new2(sqlrcur->getColumnName(i)),
 				INT2NUM(lengths[i]));
@@ -773,7 +774,7 @@ static VALUE sqlrcur_getColumnNames(VALUE self) {
 		return Qnil;
 	}
 	VALUE	nameary=rb_ary_new2(sqlrcur->colCount());
-	for (int i=0; i<sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
 		if (names[i]) {
 			rb_ary_store(nameary,i,rb_str_new2(names[i]));
 		} else {

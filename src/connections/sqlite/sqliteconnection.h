@@ -27,7 +27,7 @@ class sqlitecursor : public sqlrcursor {
 				sqlitecursor(sqlrconnection *conn);
 				~sqlitecursor();
 		bool		executeQuery(const char *query,
-						long length,
+						uint32_t length,
 						bool execute);
 		int		runQuery(stringbuffer *newquery,
 						const char *query);
@@ -46,7 +46,6 @@ class sqlitecursor : public sqlrcursor {
 		char		**columnnames;
 		int		nrow;
 		int		ncolumn;
-
 		int		rowindex;
 
 		sqliteconnection	*sqliteconn;
@@ -57,7 +56,7 @@ class sqliteconnection : public sqlrconnection {
 	public:
 				sqliteconnection();
 	private:
-		int		getNumberOfConnectStringVars();
+		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn();
 		sqlrcursor	*initCursor();
