@@ -118,6 +118,7 @@ class	sqlrsh {
 #ifndef HAVE_READLINE
 sqlrsh::sqlrsh() {
 	standardin.setFileDescriptor(0);
+	standardin.allowShortReads();
 }
 #endif
 
