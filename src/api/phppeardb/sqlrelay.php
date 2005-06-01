@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.3.2.2 2005-06-01 16:32:03 mused Exp $
+// $Id: sqlrelay.php,v 1.3.2.3 2005-06-01 18:25:12 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -27,13 +27,16 @@ require_once "DB/common.php";
 class DB_sqlrelay_cursor
 {
     var $cursor;
+    var $identity = "";
+    var $connection;
     var $rownum = 0;
     var $prepare_tokens = array();
     var $prepare_types = array();
 
-    function DB_sqlrelay_cursor($cur)
+    function DB_sqlrelay_cursor($cur,$connection)
     {
         $this->cursor = $cur;
+        $this->connection = $connection;
         $this->rownun = 0;
     }
 }
@@ -85,8 +88,23 @@ class DB_sqlrelay extends DB_common
 
     function connect($dsninfo, $persistent = false)
     {
-        if (!PEAR::loadExtension('sql_relay')) {
-            return $this->raiseError(DB_ERROR_EXTENSION_NOT_FOUND);
+
+        $hasloadextension = false;
+        foreach (get_class_methods(get_class($this)) as $method) {
+            if ($method == "loadextension") {
+                $hasloadextension = true;
+                break;
+            }
+        }
+
+        if ($hasloadextension == true) {
+            if (!PEAR::loadExtension('sql_relay')) {
+                return $this->raiseError(DB_ERROR_EXTENSION_NOT_FOUND);
+            }
+        } else {
+            if (!DB::assertExtension('sql_relay')) {
+                return $this->raiseError(DB_ERROR_EXTENSION_NOT_FOUND);
+            }
         }
 
         $this->dsn = $dsninfo;
@@ -101,6 +119,7 @@ class DB_sqlrelay extends DB_common
 
         $this->connection = sqlrcon_alloc($host, $port, $socket,
                                             $user, $pw, $retrytime, $tries);
+sqlrcon_debugOn($this->connection);
         return DB_OK;
     }
 
@@ -182,7 +201,128 @@ class DB_sqlrelay extends DB_common
         $cursor = sqlrcur_alloc($this->connection);
         sqlrcur_setResultSetBufferSize($cursor,100);
         sqlrcur_prepareQuery($cursor, $query);
-        return new DB_sqlrelay_cursor($cursor);
+        return new DB_sqlrelay_cursor($cursor,$connection);
+    }
+
+    // }}}
+    // {{{ autoExecute()
+
+    /**
+     * Automaticaly generates an insert or update query and call prepare()
+     * and execute() with it
+     *
+     * @param string $table         the table name
+     * @param array  $fields_values the associative array where $key is a
+     *                               field name and $value its value
+     * @param int    $mode          a type of query to make:
+     *                               DB_AUTOQUERY_INSERT or DB_AUTOQUERY_UPDATE
+     * @param string $where         for update queries: the WHERE clause to
+     *                               append to the SQL statement.  Don't
+     *                               include the "WHERE" keyword.
+     *
+     * @return mixed  a new DB_result object for successful SELECT queries
+     *                 or DB_OK for successul data manipulation queries.
+     *                 A DB_Error object on failure.
+     *
+     * @uses DB_common::autoPrepare(), DB_common::execute()
+     */
+    function autoExecute($table, $fields_values, $mode = DB_AUTOQUERY_INSERT,
+                         $where = false)
+    {
+        $sth = $this->autoPrepare($table, array_keys($fields_values), $mode,
+                                  $where);
+        if (DB::isError($sth)) {
+            return $sth;
+        }
+        $ret =& $this->execute($sth, $fields_values);
+        $this->freePrepared($sth);
+        return $ret;
+
+    }
+
+    // }}}
+    // {{{ buildManipSQL()
+
+    /**
+     * Produces an SQL query string for autoPrepare()
+     *
+     * Example:
+     * <pre>
+     * buildManipSQL('table_sql', array('field1', 'field2', 'field3'),
+     *               DB_AUTOQUERY_INSERT);
+     * </pre>
+     *
+     * That returns
+     * <samp>
+     * INSERT INTO table_sql (field1,field2,field3) VALUES (?,?,?)
+     * </samp>
+     *
+     * NOTES:
+     *   - This belongs more to a SQL Builder class, but this is a simple
+     *     facility.
+     *   - Be carefull! If you don't give a $where param with an UPDATE
+     *     query, all the records of the table will be updated!
+     *
+     * @param string $table         the table name
+     * @param array  $table_fields  the array of field names
+     * @param int    $mode          a type of query to make:
+     *                               DB_AUTOQUERY_INSERT or DB_AUTOQUERY_UPDATE
+     * @param string $where         for update queries: the WHERE clause to
+     *                               append to the SQL statement.  Don't
+     *                               include the "WHERE" keyword.
+     *
+     * @return string  the sql query for autoPrepare()
+     */
+    function buildManipSQL($table, $table_fields, $mode, $where = false)
+    {
+        if ($identity == "") {
+            $idenity = sqlrcon_identify($this->connection);
+        }
+        if (count($table_fields) == 0) {
+            return $this->raiseError(DB_ERROR_NEED_MORE_DATA);
+        }
+        $first = true;
+        switch ($mode) {
+            case DB_AUTOQUERY_INSERT:
+                $values = '';
+                $names = '';
+                foreach ($table_fields as $value) {
+                    if ($first) {
+                        $first = false;
+                    } else {
+                        $names .= ',';
+                        $values .= ',';
+                    }
+                    $names .= $value;
+                    if ($identity != "sybase" && $identity != "freetds") {
+                        $values .= ":$value";
+                    } else {
+                        $values .= "@$value";
+                    }
+                }
+                return "INSERT INTO $table ($names) VALUES ($values)";
+            case DB_AUTOQUERY_UPDATE:
+                $set = '';
+                foreach ($table_fields as $value) {
+                    if ($first) {
+                        $first = false;
+                    } else {
+                        $set .= ',';
+                    }
+                    if ($identity != "sybase" && $identity != "freetds") {
+                        $set .= "$value = :$value";
+                    } else {
+                        $set .= "$value = @$value";
+                    }
+                }
+                $sql = "UPDATE $table SET $set";
+                if ($where) {
+                    $sql .= " WHERE $where";
+                }
+                return $sql;
+            default:
+                return $this->raiseError(DB_ERROR_SYNTAX);
+        }
     }
 
     // }}}
