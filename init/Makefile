@@ -53,13 +53,13 @@ ifeq ($(UNAME),SCO_SV)
 	$(INSTALL) -m 644 openserver/sqlrelay $(initroot)/etc
 endif
 ifeq ($(initroot),)
-	if ( test -x "/sbin/chkconfig" ); then \
+	if ( test -x "/sbin/chkconfig" -a -n "`/sbin/chkconfig -h 2>&1 | grep add`" ); then \
 		/sbin/chkconfig --add sqlrelay; \
 	fi
 endif
 
 uninstall:
-	if ( test -x "/sbin/chkconfig" -a -n "`/sbin/chkconfig --list sqlrelay 2> /dev/null`"); then \
+	if ( test -x "/sbin/chkconfig" -a -n "`/sbin/chkconfig -h 2>&1 | grep add`" -a -n "`/sbin/chkconfig --list sqlrelay 2> /dev/null`"); then \
 		/sbin/chkconfig --del sqlrelay; \
 	fi
 	$(RM) $(initroot)/etc/rc.d/init.d/sqlrelay
