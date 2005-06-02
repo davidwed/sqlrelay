@@ -19855,15 +19855,13 @@ echo "******************************"
 echo
 echo "***** Libraries **************"
 
-PRELIBS=$LIBS
-LIBS="-lhistory -ltermcap"
-echo "$as_me:$LINENO: checking for readline in -lreadline" >&5
-echo $ECHO_N "checking for readline in -lreadline... $ECHO_C" >&6
-if test "${ac_cv_lib_readline_readline+set}" = set; then
+echo "$as_me:$LINENO: checking for tgetnum in -ltermcap" >&5
+echo $ECHO_N "checking for tgetnum in -ltermcap... $ECHO_C" >&6
+if test "${ac_cv_lib_termcap_tgetnum+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lreadline  $LIBS"
+LIBS="-ltermcap  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -19877,11 +19875,11 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
    builtin and then its argument prototype would still apply.  */
-char readline ();
+char tgetnum ();
 int
 main ()
 {
-readline ();
+tgetnum ();
   ;
   return 0;
 }
@@ -19908,29 +19906,28 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_readline_readline=yes
+  ac_cv_lib_termcap_tgetnum=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_readline_readline=no
+ac_cv_lib_termcap_tgetnum=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_readline_readline" >&5
-echo "${ECHO_T}$ac_cv_lib_readline_readline" >&6
-if test $ac_cv_lib_readline_readline = yes; then
-  READLINELIB="-lreadline"
+echo "$as_me:$LINENO: result: $ac_cv_lib_termcap_tgetnum" >&5
+echo "${ECHO_T}$ac_cv_lib_termcap_tgetnum" >&6
+if test $ac_cv_lib_termcap_tgetnum = yes; then
+  TERMCAPLIB="-ltermcap"
 else
-  READLINELIB=""
+  TERMCAPLIB=""
 fi
 
-LIBS=$PRELIBS
 
 PRELIBS=$LIBS
-LIBS="-ltermcap"
+LIBS="$TERMCAPLIB"
 echo "$as_me:$LINENO: checking for add_history in -lhistory" >&5
 echo $ECHO_N "checking for add_history in -lhistory... $ECHO_C" >&6
 if test "${ac_cv_lib_history_add_history+set}" = set; then
@@ -20003,13 +20000,15 @@ fi
 
 LIBS=$PRELIBS
 
-echo "$as_me:$LINENO: checking for tgetnum in -ltermcap" >&5
-echo $ECHO_N "checking for tgetnum in -ltermcap... $ECHO_C" >&6
-if test "${ac_cv_lib_termcap_tgetnum+set}" = set; then
+PRELIBS=$LIBS
+LIBS="$HISTORYLIB $TERMCAPLIB"
+echo "$as_me:$LINENO: checking for readline in -lreadline" >&5
+echo $ECHO_N "checking for readline in -lreadline... $ECHO_C" >&6
+if test "${ac_cv_lib_readline_readline+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-ltermcap  $LIBS"
+LIBS="-lreadline  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -20023,11 +20022,11 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
    builtin and then its argument prototype would still apply.  */
-char tgetnum ();
+char readline ();
 int
 main ()
 {
-tgetnum ();
+readline ();
   ;
   return 0;
 }
@@ -20054,27 +20053,28 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_termcap_tgetnum=yes
+  ac_cv_lib_readline_readline=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_termcap_tgetnum=no
+ac_cv_lib_readline_readline=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_termcap_tgetnum" >&5
-echo "${ECHO_T}$ac_cv_lib_termcap_tgetnum" >&6
-if test $ac_cv_lib_termcap_tgetnum = yes; then
-  TERMCAPLIB="-ltermcap"
+echo "$as_me:$LINENO: result: $ac_cv_lib_readline_readline" >&5
+echo "${ECHO_T}$ac_cv_lib_readline_readline" >&6
+if test $ac_cv_lib_readline_readline = yes; then
+  READLINELIB="-lreadline"
 else
-  TERMCAPLIB=""
+  READLINELIB=""
 fi
 
+LIBS=$PRELIBS
 
-if ( test -n "$READLINELIB" -a -n "$HISTORYLIB" -a -n "$TERMCAPLIB" ); then
+if ( test -n "$READLINELIB" ); then
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_READLINE 1
@@ -20084,12 +20084,6 @@ _ACEOF
 fi
 
 
-#AC_CHECK_LIB(socket,socket,SOCKETLIB=-lsocket,SOCKETLIB="")
-#AC_SUBST(SOCKETLIB)
-#AC_CHECK_LIB(xnet,gethostbyname,XNETLIB=-lxnet,XNETLIB="")
-#AC_SUBST(XNETLIB)
-#AC_CHECK_LIB(nsl,gethostbyname,NSLLIB=-lnsl,NSLLIB="")
-#AC_SUBST(NSLLIB)
 
 	ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -34563,7 +34557,7 @@ RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
 
 
 
-SQLR_VERSION="0.36.2"
+SQLR_VERSION="0.36.3"
 
 
 cat >>confdefs.h <<_ACEOF

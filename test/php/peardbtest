@@ -1,4 +1,5 @@
 #!/bin/sh
 
-sudo cp oracle8ipeardb.php /var/www/html
-lynx -dump -source "http://localhost/oracle8ipeardb.php?host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
+#sudo cp oracle8ipeardb.php /var/www/html
+#lynx -dump -source "http://localhost/oracle8ipeardb.php?host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"
+lynx -dump -source "http://localhost/postgresql7peardb.php?host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"

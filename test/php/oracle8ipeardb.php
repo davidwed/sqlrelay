@@ -33,11 +33,11 @@ require_once 'DB.php';
 	$db->query("drop table testtable");
 
 	echo("CREATE TEMPTABLE: \n");
-	checkSuccess($db,$db->query("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long)"),DB_OK);
+	$db->query("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long)");
 	echo("\n");
 
 	echo("INSERT: \n");
-	checkSuccess($db,$db->query("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')"),DB_OK);
+	$db->query("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')");
 	echo("\n");
 
 	echo("AFFECTED ROWS: \n");
