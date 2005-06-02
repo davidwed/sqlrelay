@@ -1,4 +1,8 @@
 0.36.3 - added allowShortReads option to non-readline sqlrsh build
+	fixes to php pear db driver for autoExecute
+	sqlrsh uses libreadline even on systems that don't have libhistory now
+	changed test -n -r "${sysconfdir}/sqlrelay.conf" to 
+		test ! -r "${sysconfdir}/sqlrelay.conf" in init scripts
 
 0.36.2 - added -lnnz10 to instantclient configuration
 
