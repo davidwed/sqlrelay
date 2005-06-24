@@ -113,7 +113,7 @@ class interbaseconnection : public sqlrconnection {
 		bool	commit();
 		bool	rollback();
 		bool	ping();
-		char	*identify();
+		const char	*identify();
 
 		char		dpb[256];
 		short		dpblength;

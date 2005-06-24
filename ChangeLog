@@ -1,3 +1,7 @@
+0.36.4 - fixed mdbsql detection
+	fixed const error in mdbtools connection
+	added const to *connection::identify()/pingQuery() methods
+
 0.36.3 - added allowShortReads option to non-readline sqlrsh build
 	fixes to php pear db driver for autoExecute
 	sqlrsh uses libreadline even on systems that don't have libhistory now

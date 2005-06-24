@@ -251,7 +251,7 @@ void freetdsconnection::logOut() {
 	cs_ctx_drop(context);
 }
 
-char *freetdsconnection::identify() {
+const char *freetdsconnection::identify() {
 	return "freetds";
 }
 

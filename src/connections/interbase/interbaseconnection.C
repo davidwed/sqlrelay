@@ -137,7 +137,7 @@ bool interbaseconnection::ping() {
 	return !(status[0]==1 && status[1]);
 }
 
-char *interbaseconnection::identify() {
+const char *interbaseconnection::identify() {
 	return "interbase";
 }
 

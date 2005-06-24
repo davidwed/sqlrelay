@@ -106,11 +106,11 @@ bool db2connection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
-char *db2connection::pingQuery() {
+const char *db2connection::pingQuery() {
 	return "values 1";
 }
 
-char *db2connection::identify() {
+const char *db2connection::identify() {
 	return "db2";
 }
 

@@ -52,7 +52,7 @@ class msqlconnection : public sqlrconnection {
 		void	logOut();
 		bool	isTransactional();
 		bool	ping();
-		char	*identify();
+		const char	*identify();
 		bool	autoCommitOn();
 		bool	autoCommitOff();
 		bool	commit();

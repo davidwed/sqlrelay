@@ -125,7 +125,7 @@ class freetdsconnection : public sqlrconnection {
 		sqlrcursor	*initCursor();
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
-		char	*identify();
+		const char	*identify();
 		char	bindVariablePrefix();
 		void	dropTempTable(sqlrcursor *cursor,
 					const char *tablename);

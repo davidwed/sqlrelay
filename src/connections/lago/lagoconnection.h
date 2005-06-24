@@ -47,7 +47,7 @@ class lagoconnection : public sqlrconnection {
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
 		bool	ping();
-		char	*identify();
+		const char	*identify();
 		bool	isTransactional();
 		bool	autoCommitOn();
 		bool	autoCommitOff();

@@ -110,8 +110,8 @@ class db2connection : public sqlrconnection {
 		bool	autoCommitOff();
 		bool	commit();
 		bool	rollback();
-		char	*pingQuery();
-		char	*identify();
+		const char	*pingQuery();
+		const char	*identify();
 
 		SQLHENV		env;
 		long		erg;

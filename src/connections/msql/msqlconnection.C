@@ -64,7 +64,7 @@ bool msqlconnection::ping() {
 	return true;
 }
 
-char *msqlconnection::identify() {
+const char *msqlconnection::identify() {
 	return "msql";
 }
 
