@@ -12,6 +12,15 @@
 
 #include <stdlib.h>
 
+static char tpb[] = {
+	isc_tpb_version3,
+	isc_tpb_write,
+	isc_tpb_read_committed,
+	isc_tpb_rec_version,
+	// FIXME: vladimir changed this to isc_tpb_nowait.  why?
+	isc_tpb_wait
+};
+
 interbaseconnection::interbaseconnection() {
 	db=0L;
 	tr=0L;
@@ -37,7 +46,7 @@ void interbaseconnection::handleConnectString() {
 
 	const char	*dialectstr=connectStringValue("dialect");
 	if (dialectstr) {
-		dialect=charstring::toLong(dialectstr);
+		dialect=charstring::toInteger(dialectstr);
 		if (dialect<1) {
 			dialect=1;
 		}
@@ -136,7 +145,7 @@ bool interbaseconnection::ping() {
 	return !(status[0]==1 && status[1]);
 }
 
-char *interbaseconnection::identify() {
+const char *interbaseconnection::identify() {
 	return "interbase";
 }
 
@@ -224,7 +233,7 @@ bool interbasecursor::inputBindString(const char *variable,
 					int16_t *isnull) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toLong(variable+1)-1;
+	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -250,7 +259,7 @@ bool interbasecursor::inputBindLong(const char *variable,
 					uint32_t *value) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toLong(variable+1)-1;
+	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -278,7 +287,7 @@ bool interbasecursor::inputBindDouble(const char *variable,
 					uint32_t scale) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toLong(variable+1)-1;
+	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
@@ -310,7 +319,7 @@ bool interbasecursor::outputBindString(const char *variable,
 	queryIsExecSP=true;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toLong(variable+1)-1;
+	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
 		return false;
 	}

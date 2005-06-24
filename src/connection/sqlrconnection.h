@@ -65,7 +65,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual	int16_t	nullBindValue();
 		virtual char	bindVariablePrefix();
 		virtual bool	bindValueIsNull(int16_t isnull);
-		virtual	bool	skipRows(sqlrcursor *cursor, uint32_t rows);
+		virtual	bool	skipRows(sqlrcursor *cursor, uint64_t rows);
 		virtual bool	isTransactional();
 		virtual void	setUser(const char *user);
 		virtual void	setPassword(const char *password);
@@ -87,9 +87,9 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		bool		getAutoCommitBehavior();
 		bool		sendColumnInfo();
 		void		sendRowCounts(bool knowsactual,
-						uint32_t actual,
+						uint64_t actual,
 						bool knowsaffected,
-						uint32_t affected);
+						uint64_t affected);
 		void		sendColumnCount(uint32_t ncols);
 		void		sendColumnTypeFormat(uint16_t format);
 		void		sendColumnDefinition(const char *name, 
@@ -123,7 +123,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 						uint16_t autoincrement);
 		void		sendField(const char *data, uint32_t size);
 		void		sendNullField();
-		void		startSendingLong();
+		void		startSendingLong(uint64_t longlength);
 		void		sendLongSegment(const char *data,
 						uint32_t size);
 		void		endSendingLong();
@@ -297,7 +297,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		int32_t		accepttimeout;
 		bool		suspendedsession;
 		bool		lastrowvalid;
-		uint32_t	lastrow;
+		uint64_t	lastrow;
 
 		inetserversocket	*serversockin;
 		unixserversocket	*serversockun;

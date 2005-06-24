@@ -46,7 +46,7 @@ bool sqlrconnection::openSession() {
 			debugPrint("Inet socket: ");
 			debugPrint(server);
 			debugPrint(":");
-			debugPrint((int32_t)listenerinetport);
+			debugPrint((int64_t)listenerinetport);
 			debugPrint("\n");
 			debugPreEnd();
 		}
@@ -148,7 +148,7 @@ bool sqlrconnection::openSession() {
 				debugPrint(server);
 				debugPrint("\n");
 				debugPrint("	inet port: ");
-				debugPrint((int32_t)connectioninetport);
+				debugPrint((int64_t)connectioninetport);
 				debugPrint("\n");
 				debugPreEnd();
 			}

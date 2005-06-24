@@ -469,12 +469,12 @@ bool oracle8cursor::inputBindString(const char *variable,
 
 	// the size of the value must include the terminating NULL
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
-				(ub4)charstring::toLong(variable+1),
+				(ub4)charstring::toInteger(variable+1),
 				(dvoid *)value,(sb4)valuesize+1,
 				SQLT_STR,
 				(dvoid *)isnull,(ub2 *)0,
@@ -505,12 +505,12 @@ bool oracle8cursor::inputBindLong(const char *variable,
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
-				(ub4)charstring::toLong(variable+1),
+				(ub4)charstring::toInteger(variable+1),
 				(dvoid *)value,(sb4)sizeof(int32_t),
 				SQLT_INT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -541,12 +541,12 @@ bool oracle8cursor::inputBindDouble(const char *variable,
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
-				(ub4)charstring::toLong(variable+1),
+				(ub4)charstring::toInteger(variable+1),
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -576,12 +576,12 @@ bool oracle8cursor::outputBindString(const char *variable,
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[outbindcount],
 				oracle8conn->err,
-				(ub4)charstring::toLong(variable+1),
+				(ub4)charstring::toInteger(variable+1),
 				(dvoid *)value,
 				(sb4)valuesize,
 				SQLT_STR,
@@ -683,12 +683,12 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 
 	// bind the temporary lob
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
-				(ub4)charstring::toLong(variable+1),
+				(ub4)charstring::toInteger(variable+1),
 				(dvoid *)&inbind_lob[inbindlobcount],(sb4)0,
 				type,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -745,12 +745,12 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 
 	// bind the lob descriptor
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[outbindcount],
 			oracle8conn->err,
-			(ub4)charstring::toLong(variable+1),
+			(ub4)charstring::toInteger(variable+1),
 			(dvoid *)&outbind_lob[index],
 			//(sb4)-1,
 			(sb4)sizeof(OCILobLocator *),
@@ -783,12 +783,12 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&curbindpp[curbindcount],
 				oracle8conn->err,
-				(ub4)charstring::toLong(variable+1),
+				(ub4)charstring::toInteger(variable+1),
 				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
 				(sb4)0,
 				SQLT_RSET,
@@ -874,7 +874,7 @@ void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 			break;
 		} else {
 			if (start) {
-				conn->startSendingLong();
+				conn->startSendingLong(loblength);
 				start=false;
 			}
 			conn->sendLongSegment((char *)buf,(int32_t)retlen);
@@ -891,7 +891,7 @@ void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 
 	// handle empty lob's
 	if (!loblength) {
-		conn->startSendingLong();
+		conn->startSendingLong(0);
 		conn->sendLongSegment("",0);
 		conn->endSendingLong();
 	}
@@ -1327,7 +1327,8 @@ void oracle8cursor::returnRow() {
 					break;
 				} else {
 					if (start) {
-						conn->startSendingLong();
+						conn->startSendingLong(
+								loblength);
 						start=false;
 					}
 					conn->sendLongSegment(
@@ -1346,7 +1347,7 @@ void oracle8cursor::returnRow() {
 
 			// handle empty lob's
 			if (!loblength) {
-				conn->startSendingLong();
+				conn->startSendingLong(0);
 				conn->sendLongSegment("",0);
 				conn->endSendingLong();
 			}

@@ -194,7 +194,7 @@ bool odbccursor::inputBindString(const char *variable,
 
 	if (*isnull==SQL_NULL_DATA) {
 		erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
@@ -210,7 +210,7 @@ bool odbccursor::inputBindString(const char *variable,
 				);
 	} else {
 		erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
@@ -236,7 +236,7 @@ bool odbccursor::inputBindLong(const char *variable,
 					uint32_t *value) {
 
 	erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_LONG,
 				SQL_INTEGER,
@@ -263,7 +263,7 @@ bool odbccursor::inputBindDouble(const char *variable,
 					uint32_t scale) {
 
 	erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_DOUBLE,
 				SQL_DECIMAL,
@@ -290,7 +290,7 @@ bool odbccursor::outputBindString(const char *variable,
 					short *isnull) {
 
 	erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,

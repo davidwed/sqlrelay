@@ -38,7 +38,7 @@ void sqlrconnection::resumeResultSet(sqlrcursor *cursor) {
 		// if the requested cursor really had a suspended
 		// result set, send the lastrow of it to the client
 		// then send the result set header
-		clientsock->write((uint32_t)lastrow);
+		clientsock->write(lastrow);
 		returnResultSetHeader(cursor);
 
 	} else {

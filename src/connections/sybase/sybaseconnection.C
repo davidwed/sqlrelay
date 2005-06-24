@@ -144,24 +144,27 @@ bool sybaseconnection::logIn() {
 	}
 
 	// set packetsize
+	uint16_t	ps=charstring::toInteger(packetsize);
 	if (packetsize && packetsize[0] &&
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
-				(CS_VOID *)charstring::toLong(packetsize),
-				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
+				(CS_VOID *)&ps,sizeof(ps),
+				(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the packetsize",5);
 		return false;
 	}
 
 	// set encryption
-	if (encryption && charstring::toLong(encryption)==1) {
+	/*if (encryption && charstring::toInteger(encryption)==1) {
+		// FIXME: need to set CS_SEC_CHALLENGE/CS_SEC_NEGOTIATE
+		// parameters too
 		CS_INT	enc=CS_TRUE;
-		if (ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
+		if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
 			(CS_VOID *)&enc,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			logInError("failed to set the encryption",5);
 			return false;
 		}
-	}
+	}*/
 
 	// init locale
 	locale=NULL;

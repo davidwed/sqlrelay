@@ -84,7 +84,7 @@ bool lagoconnection::ping() {
 	return (Lisconnected(lagocontext))?true:false;
 }
 
-char *lagoconnection::identify() {
+const char *lagoconnection::identify() {
 	return "lago";
 }
 

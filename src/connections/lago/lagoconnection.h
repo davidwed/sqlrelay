@@ -31,8 +31,7 @@ class lagocursor : public sqlrcursor {
 
 		LRST		lagoresult;
 		uint32_t	ncols;
-		uint32_t	nrows;
-		uint32_t	affectedrows;
+		uint64_t	nrows;
 
 		lagoconnection	*lagoconn;
 };
@@ -47,7 +46,7 @@ class lagoconnection : public sqlrconnection {
 		void	deleteCursor(sqlrcursor *curs);
 		void	logOut();
 		bool	ping();
-		char	*identify();
+		const char	*identify();
 		bool	isTransactional();
 		bool	autoCommitOn();
 		bool	autoCommitOff();

@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection::skipRows(sqlrcursor *cursor, uint32_t rows) {
+bool sqlrconnection::skipRows(sqlrcursor *cursor, uint64_t rows) {
 
 	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
@@ -14,7 +14,7 @@ bool sqlrconnection::skipRows(sqlrcursor *cursor, uint32_t rows) {
 	delete debugstr;
 	#endif
 
-	for (uint32_t i=0; i<rows; i++) {
+	for (uint64_t i=0; i<rows; i++) {
 
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"skip...");

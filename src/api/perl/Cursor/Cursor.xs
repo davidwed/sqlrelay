@@ -32,9 +32,9 @@ sqlrcursor::DESTROY()
 
 void
 sqlrcursor::setResultSetBufferSize(rows)
-		uint32_t rows
+		uint64_t rows
 
-uint32_t
+uint64_t
 sqlrcursor::getResultSetBufferSize()
 
 void
@@ -106,7 +106,7 @@ sqlrcursor::substitution(variable,...)
 		const char *variable
 	CODE:
 		if (SvIOK(ST(2))) {
-			THIS->substitution(variable,(int32_t)SvIV(ST(2)));
+			THIS->substitution(variable,(int64_t)SvIV(ST(2)));
 		} else if (SvNOK(ST(2))) {
 			THIS->substitution(variable,(double)SvNV(ST(2)),
 						(uint32_t)SvIV(ST(3)),
@@ -128,7 +128,7 @@ sqlrcursor::inputBind(variable,...)
 		const char *variable
 	CODE:
 		if (SvIOK(ST(2))) {
-			THIS->inputBind(variable,(int32_t)SvIV(ST(2)));
+			THIS->inputBind(variable,(int64_t)SvIV(ST(2)));
 		} else if (SvNOK(ST(2))) {
 			THIS->inputBind(variable,(double)SvNV(ST(2)),
 						(uint32_t)SvIV(ST(3)),
@@ -190,11 +190,11 @@ sqlrcursor::getOutputBind(variable)
 			ST(0)=&sv_undef;
 		}
 
-int32_t
-sqlrcursor::getOutputBindAsLong(variable)
+int64_t
+sqlrcursor::getOutputBindAsInteger(variable)
 		const char *variable
 	CODE:
-		int32_t	value=THIS->getOutputBindAsLong(variable);
+		int64_t	value=THIS->getOutputBindAsInteger(variable);
 		ST(0)=sv_newmortal();
 		sv_setiv(ST(0),value);
 
@@ -228,16 +228,16 @@ sqlrcursor::openCachedResultSet(filename)
 uint32_t
 sqlrcursor::colCount()
 
-uint32_t
+uint64_t
 sqlrcursor::rowCount()
 
-uint32_t
+uint64_t
 sqlrcursor::totalRows()
 
-uint32_t
+uint64_t
 sqlrcursor::affectedRows()
 
-uint32_t
+uint64_t
 sqlrcursor::firstRowIndex()
 
 bool
@@ -256,7 +256,7 @@ sqlrcursor::getNullsAsUndefined()
 
 bool
 sqlrcursor::validRow(row)
-		uint32_t	row
+		uint64_t	row
 	CODE:
 		RETVAL=1;
 		if (!THIS->getRow(row)) {
@@ -267,7 +267,7 @@ sqlrcursor::validRow(row)
 
 const char *
 sqlrcursor::getField(row,...)
-		uint32_t	row
+		uint64_t	row
 	CODE:
 		const char	*field;
 		uint32_t	length;
@@ -285,22 +285,23 @@ sqlrcursor::getField(row,...)
 			ST(0)=&sv_undef;
 		}
 
-int32_t
-sqlrcursor::getFieldAsLong(row,...)
-		uint32_t	row
+int64_t
+sqlrcursor::getFieldAsInteger(row,...)
+		uint64_t	row
 	CODE:
-		int32_t	field;
+		int64_t	field;
 		ST(0)=sv_newmortal();
 		if (SvIOK(ST(2)) || SvNOK(ST(2))) {
-			field=THIS->getFieldAsLong(row,(uint32_t)SvIV(ST(2)));
+			field=THIS->getFieldAsInteger(row,
+						(uint32_t)SvIV(ST(2)));
 		} else if (SvPOK(ST(2))) {
-			field=THIS->getFieldAsLong(row,SvPV(ST(2),na));
+			field=THIS->getFieldAsInteger(row,SvPV(ST(2),na));
 		} 
 		sv_setiv(ST(0),field);
 
 double
 sqlrcursor::getFieldAsDouble(row,...)
-		uint32_t	row
+		uint64_t	row
 	CODE:
 		double	field;
 		ST(0)=sv_newmortal();
@@ -313,7 +314,7 @@ sqlrcursor::getFieldAsDouble(row,...)
 
 uint32_t
 sqlrcursor::getFieldLength(row,...)
-		uint32_t	row
+		uint64_t	row
 	CODE:
 		RETVAL=0;
 		if (SvIOK(ST(2)) || SvNOK(ST(2))) {

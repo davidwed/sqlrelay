@@ -148,24 +148,27 @@ bool freetdsconnection::logIn() {
 	}
 
 	// set packetsize
+	uint16_t	ps=charstring::toInteger(packetsize);
 	if (packetsize && packetsize[0] &&
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
-				(CS_VOID *)charstring::toLong(packetsize),
-				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
+				(CS_VOID *)&ps,sizeof(ps),
+				(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the packetsize",5);
 		return false;
 	}
 
 	// set encryption
-	if (encryption && charstring::toLong(encryption)==1) {
+	/*if (encryption && charstring::toInteger(encryption)==1) {
+		// FIXME: need to set CS_SEC_CHALLENGE/CS_SEC_NEGOTIATE
+		// parameters too
 		CS_INT	enc=CS_TRUE;
-		if (ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
+		if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
 			(CS_VOID *)&enc,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			logInError("failed to set the encryption",5);
 			return false;
 		}
-	}
+	}*/
 
 	// init locale
 	locale=NULL;
@@ -251,7 +254,7 @@ void freetdsconnection::logOut() {
 	cs_ctx_drop(context);
 }
 
-char *freetdsconnection::identify() {
+const char *freetdsconnection::identify() {
 	return "freetds";
 }
 
@@ -272,16 +275,16 @@ freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	char	*v=charstring::findFirst(versionstring,'v');
 	if (v) {
 		*v=(char)NULL;
-		majorversion=charstring::toLong(v+1);
+		majorversion=charstring::toInteger(v+1);
 		char	*firstdot=charstring::findFirst(v+1,'.');
 		if (firstdot) {
 			*firstdot=(char)NULL;
-			minorversion=charstring::toLong(firstdot+1);
+			minorversion=charstring::toInteger(firstdot+1);
 			char	*seconddot=
 				charstring::findFirst(firstdot+1,'.');
 			if (seconddot) {
 				*seconddot=(char)NULL;
-				patchlevel=charstring::toLong(seconddot+1);
+				patchlevel=charstring::toInteger(seconddot+1);
 			} else {
 				patchlevel=0;
 			}

@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-uint32_t sqlrcursor::firstRowIndex() {
+uint64_t sqlrcursor::firstRowIndex() {
 	return firstrowindex;
 }
 
@@ -13,18 +13,18 @@ bool sqlrcursor::endOfResultSet() {
 	return endofresultset;
 }
 
-uint32_t sqlrcursor::rowCount() {
+uint64_t sqlrcursor::rowCount() {
 	return rowcount;
 }
 
-uint32_t sqlrcursor::affectedRows() {
+uint64_t sqlrcursor::affectedRows() {
 	if (knowsaffectedrows==AFFECTED_ROWS) {
 		return affectedrows;
 	}
 	return 0;
 }
 
-uint32_t sqlrcursor::totalRows() {
+uint64_t sqlrcursor::totalRows() {
 	if (knowsactualrows==ACTUAL_ROWS) {
 		return actualrows;
 	}

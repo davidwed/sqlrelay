@@ -284,8 +284,8 @@ bool sqlrconnection::getLongBind(bindvar *bv) {
 	}
 
 	// get the value itself
-	uint32_t	value;
-	if (clientsock->read(&value)!=sizeof(uint32_t)) {
+	uint64_t	value;
+	if (clientsock->read(&value)!=sizeof(uint64_t)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"getting binds failed: bad value");
@@ -294,10 +294,10 @@ bool sqlrconnection::getLongBind(bindvar *bv) {
 	}
 
 	// set the value
-	bv->value.longval=((int32_t)value)*(negative?-1:1);
+	bv->value.longval=((int64_t)value)*(negative?-1:1);
 
 	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,bv->value.longval);
+		debugPrint("connection",4,(int32_t)bv->value.longval);
 	#endif
 
 	return true;

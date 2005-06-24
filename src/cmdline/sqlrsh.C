@@ -554,11 +554,11 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, environment *env) {
 	red(env);
 	printf("	Rows Returned   : ");
 	magenta(env);
-	printf("%d\n",sqlrcur->rowCount());
+	printf("%lld\n",sqlrcur->rowCount());
 	red(env);
 	printf("	Fields Returned : ");
 	magenta(env);
-	printf("%d\n",sqlrcur->rowCount()*sqlrcur->colCount());
+	printf("%lld\n",sqlrcur->rowCount()*sqlrcur->colCount());
 	red(env);
 	printf("	System time     : ");
 	magenta(env);
@@ -754,7 +754,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		}
 
 		host=argv[1];
-		port=charstring::toLong(argv[2]);
+		port=charstring::toInteger(argv[2]);
 		socket=argv[3];
 		user=argv[4];
 		password=argv[5];

@@ -10,8 +10,8 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	#endif
 
 	// get the number of rows to skip
-	uint32_t	skip;
-	if (clientsock->read(&skip)!=sizeof(uint32_t)) {
+	uint64_t	skip;
+	if (clientsock->read(&skip)!=sizeof(uint64_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"returning result set data failed");
 		#endif
@@ -19,8 +19,8 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	}
 
 	// get the number of rows to fetch
-	uint32_t	fetch;
-	if (clientsock->read(&fetch)!=sizeof(uint32_t)) {
+	uint64_t	fetch;
+	if (clientsock->read(&fetch)!=sizeof(uint64_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"returning result set data failed");
 		#endif
@@ -64,7 +64,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 	#endif
 
 	// send the specified number of rows back
-	for (uint32_t i=0; (!fetch || i<fetch); i++) {
+	for (uint64_t i=0; (!fetch || i<fetch); i++) {
 
 		if (!cursor->fetchRow()) {
 			clientsock->write((uint16_t)END_RESULT_SET);

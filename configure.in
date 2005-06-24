@@ -486,30 +486,24 @@ dnl Checks for libraries.
 echo
 echo "***** Libraries **************"
 
-PRELIBS=$LIBS
-LIBS="-lhistory -ltermcap"
-AC_CHECK_LIB(readline,readline,READLINELIB="-lreadline" ,READLINELIB="")
-LIBS=$PRELIBS
+AC_CHECK_LIB(termcap,tgetnum,TERMCAPLIB="-ltermcap" ,TERMCAPLIB="")
 
 PRELIBS=$LIBS
-LIBS="-ltermcap"
+LIBS="$TERMCAPLIB"
 AC_CHECK_LIB(history,add_history,HISTORYLIB="-lhistory" ,HISTROYLIB="")
 LIBS=$PRELIBS
 
-AC_CHECK_LIB(termcap,tgetnum,TERMCAPLIB="-ltermcap" ,TERMCAPLIB="")
+PRELIBS=$LIBS
+LIBS="$HISTORYLIB $TERMCAPLIB"
+AC_CHECK_LIB(readline,readline,READLINELIB="-lreadline" ,READLINELIB="")
+LIBS=$PRELIBS
 
-if ( test -n "$READLINELIB" -a -n "$HISTORYLIB" -a -n "$TERMCAPLIB" ); then
+if ( test -n "$READLINELIB" ); then
 	AC_DEFINE_UNQUOTED(HAVE_READLINE,1,Do we have readline)
 	READLINELIB="$READLINELIB $HISTORYLIB $TERMCAPLIB"
 fi
 AC_SUBST(READLINELIB)
 
-#AC_CHECK_LIB(socket,socket,SOCKETLIB=-lsocket,SOCKETLIB="")
-#AC_SUBST(SOCKETLIB)
-#AC_CHECK_LIB(xnet,gethostbyname,XNETLIB=-lxnet,XNETLIB="")
-#AC_SUBST(XNETLIB)
-#AC_CHECK_LIB(nsl,gethostbyname,NSLLIB=-lnsl,NSLLIB="")
-#AC_SUBST(NSLLIB)
 FW_CHECK_SOCKET_LIBS
 AC_CHECK_LIB(dl,dlopen,DLLIB=-ldl,DLLIB="")
 AC_SUBST(DLLIB)
@@ -632,7 +626,7 @@ echo "******************************"
 
 dnl Checks for python.
 echo
-echo "***** Python *****************"
+echo "***** Python 2.1 or newer ****"
 FW_CHECK_PYTHON
 echo "******************************"
 

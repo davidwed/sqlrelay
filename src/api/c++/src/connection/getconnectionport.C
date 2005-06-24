@@ -12,7 +12,7 @@ uint16_t sqlrconnection::getConnectionPort() {
 	if (debug) {
 		debugPreStart();
 		debugPrint("Getting connection port: ");
-		debugPrint((int32_t)connectioninetport);
+		debugPrint((int64_t)connectioninetport);
 		debugPrint("\n");
 		debugPreEnd();
 	}

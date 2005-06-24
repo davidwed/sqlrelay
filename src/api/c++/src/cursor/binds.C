@@ -110,7 +110,7 @@ void sqlrcursor::substitution(const char *variable, const char *value) {
 	}
 }
 
-void sqlrcursor::substitution(const char *variable, int32_t value) {
+void sqlrcursor::substitution(const char *variable, int64_t value) {
 	if (subcount<MAXVAR && variable && variable[0]) {
 		longVar(&subvars[subcount],variable,value);
 		subcount++;
@@ -156,7 +156,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value) {
 	}
 }
 
-void sqlrcursor::inputBind(const char *variable, int32_t value) {
+void sqlrcursor::inputBind(const char *variable, int64_t value) {
 	if (inbindcount<MAXVAR && variable && variable[0]) {
 		longVar(&inbindvars[inbindcount],variable,value);
 		inbindvars[inbindcount].send=true;
@@ -186,7 +186,7 @@ void sqlrcursor::substitutions(const char **variables, const char **values) {
 	}
 }
 
-void sqlrcursor::substitutions(const char **variables, const int32_t *values) {
+void sqlrcursor::substitutions(const char **variables, const int64_t *values) {
 	uint16_t	index=0;
 	while (variables[index] && subcount<MAXVAR) {
 		if (variables[index] && variables[index][0]) {
@@ -228,7 +228,7 @@ void sqlrcursor::inputBinds(const char **variables, const char **values) {
 	}
 }
 
-void sqlrcursor::inputBinds(const char **variables, const int32_t *values) {
+void sqlrcursor::inputBinds(const char **variables, const int64_t *values) {
 	uint16_t	index=0;
 	while (variables[index] && inbindcount<MAXVAR) {
 		if (variables[index] && variables[index][0]) {
@@ -278,7 +278,7 @@ void sqlrcursor::stringVar(bindvar *var, const char *variable,
 	}
 }
 
-void sqlrcursor::longVar(bindvar *var, const char *variable, int32_t value) {
+void sqlrcursor::longVar(bindvar *var, const char *variable, int64_t value) {
 	initVar(var,variable);
 	var->type=LONG_BIND;
 	var->value.longval=value;
@@ -401,14 +401,14 @@ const char *sqlrcursor::getOutputBind(const char *variable) {
 	return NULL;
 }
 
-int32_t sqlrcursor::getOutputBindAsLong(const char *variable) {
+int64_t sqlrcursor::getOutputBindAsInteger(const char *variable) {
 	const char	*outputbindvalue=getOutputBind(variable);
-	return (outputbindvalue)?atol(outputbindvalue):0;
+	return (outputbindvalue)?charstring::toInteger(outputbindvalue):0;
 }
 
 double sqlrcursor::getOutputBindAsDouble(const char *variable) {
 	const char	*outputbindvalue=getOutputBind(variable);
-	return (outputbindvalue)?atof(outputbindvalue):0.0;
+	return (outputbindvalue)?charstring::toFloat(outputbindvalue):0.0;
 }
 
 uint32_t sqlrcursor::getOutputBindLength(const char *variable) {

@@ -48,11 +48,11 @@ void sqlrconnection::debugPrint(const char *string) {
 	}
 }
 
-void sqlrconnection::debugPrint(int32_t number) {
+void sqlrconnection::debugPrint(int64_t number) {
 	if (printfunction) {
-		(*printfunction)("%d",number);
+		(*printfunction)("%lld",number);
 	} else {
-		printf("%d",number);
+		printf("%lld",number);
 	}
 }
 

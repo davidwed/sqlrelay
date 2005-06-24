@@ -3,8 +3,8 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::sendRowCounts(bool knowsactual, uint32_t actual,
-					bool knowsaffected, uint32_t affected) {
+void sqlrconnection::sendRowCounts(bool knowsactual, uint64_t actual,
+					bool knowsaffected, uint64_t affected) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"sending row counts...");
@@ -15,7 +15,7 @@ void sqlrconnection::sendRowCounts(bool knowsactual, uint32_t actual,
 
 		#ifdef SERVER_DEBUG
 		char	string[30];
-		sprintf(string,"actual rows: %d",actual);
+		sprintf(string,"actual rows: %lld",actual);
 		debugPrint("connection",3,string);
 		#endif
 
@@ -37,7 +37,7 @@ void sqlrconnection::sendRowCounts(bool knowsactual, uint32_t actual,
 
 		#ifdef SERVER_DEBUG
 		char	string[46];
-		sprintf(string,"affected rows: %d",affected);
+		sprintf(string,"affected rows: %lld",affected);
 		debugPrint("connection",3,string);
 		#endif
 

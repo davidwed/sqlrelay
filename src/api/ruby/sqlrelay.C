@@ -551,11 +551,11 @@ static VALUE sqlrcur_getOutputBind(VALUE self, VALUE variable) {
 	}
 }
 
-static VALUE sqlrcur_getOutputBindAsLong(VALUE self, VALUE variable) {
+static VALUE sqlrcur_getOutputBindAsInteger(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	const char	*varname=STR2CSTR(variable);
-	long		result=sqlrcur->getOutputBindAsLong(varname);
+	long		result=sqlrcur->getOutputBindAsInteger(varname);
 	return INT2NUM(result);
 }
 
@@ -669,14 +669,14 @@ static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
 	}
 }
 
-static VALUE sqlrcur_getFieldAsLong(VALUE self, VALUE row, VALUE col) {
+static VALUE sqlrcur_getFieldAsInteger(VALUE self, VALUE row, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	long	result;
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		result=sqlrcur->getFieldAsLong(NUM2INT(row),STR2CSTR(col));
+		result=sqlrcur->getFieldAsInteger(NUM2INT(row),STR2CSTR(col));
 	} else {
-		result=sqlrcur->getFieldAsLong(NUM2INT(row),NUM2INT(col));
+		result=sqlrcur->getFieldAsInteger(NUM2INT(row),NUM2INT(col));
 	}
 	return INT2NUM(result);
 }
@@ -1030,8 +1030,8 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_fetchFromBindCursor,0);
 	rb_define_method(csqlrcursor,"getOutputBind",
 				(CAST)sqlrcur_getOutputBind,1);
-	rb_define_method(csqlrcursor,"getOutputBindAsLong",
-				(CAST)sqlrcur_getOutputBindAsLong,1);
+	rb_define_method(csqlrcursor,"getOutputBindAsInteger",
+				(CAST)sqlrcur_getOutputBindAsInteger,1);
 	rb_define_method(csqlrcursor,"getOutputBindAsDouble",
 				(CAST)sqlrcur_getOutputBindAsDouble,1);
 	rb_define_method(csqlrcursor,"getOutputBindLength",
@@ -1060,8 +1060,8 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_getNullsAsNils,0);
 	rb_define_method(csqlrcursor,"getField",
 				(CAST)sqlrcur_getField,2);
-	rb_define_method(csqlrcursor,"getFieldAsLong",
-				(CAST)sqlrcur_getFieldAsLong,2);
+	rb_define_method(csqlrcursor,"getFieldAsInteger",
+				(CAST)sqlrcur_getFieldAsInteger,2);
 	rb_define_method(csqlrcursor,"getFieldAsDouble",
 				(CAST)sqlrcur_getFieldAsDouble,2);
 	rb_define_method(csqlrcursor,"getFieldLength",

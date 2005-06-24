@@ -55,6 +55,15 @@ chmod 775 /opt/firebird<br>
 chown firebird:firebird /opt/firebird
 </b></blockquote>
 
+<p>Firebird 1.5 requires libstdc++.so.5 but most Linux distributions ship with
+a more recent version.  If your system doesn't have /usr/lib/libstdc++.so.5
+then you may need to install a compatibility library.  On Fedora Core 4, you
+need to install compat-libstdc++-33 as follows (as root):</p>
+
+<blockquote><b>
+yum install compat-libstdc++-33
+</b></blockquote>
+
 <span class="heading2">Install libncurses.so.4</span><br>
 
 <p>Interbase 6.0.1 requires libncurses.so.4.  Many older distributions come

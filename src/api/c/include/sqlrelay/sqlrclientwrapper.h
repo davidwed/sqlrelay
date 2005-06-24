@@ -95,11 +95,11 @@ void	sqlrcon_debugPrintFunction(sqlrcon sqlrconref,
 sqlrcur	sqlrcur_alloc(sqlrcon sqlrconref);
 void	sqlrcur_free(sqlrcur sqlrcurref);
 
-void	sqlrcur_setResultSetBufferSize(sqlrcur sqlrcurref, uint32_t rows);
+void	sqlrcur_setResultSetBufferSize(sqlrcur sqlrcurref, uint64_t rows);
 			/* Sets the number of rows of the result set
 			   to buffer at a time.  0 (the default)
 			   means buffer the entire result set. */
-uint32_t	sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref);
+uint64_t	sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref);
 			/* Returns the number of result set rows that 
 			   will be buffered at a time or 0 for the
 			   entire result set. */
@@ -184,7 +184,7 @@ void	sqlrcur_prepareFileQuery(sqlrcur sqlrcurref,
 void	sqlrcur_subString(sqlrcur sqlrcurref,
 				const char *variable, const char *value);
 void	sqlrcur_subLong(sqlrcur sqlrcurref,
-				const char *variable, int32_t value);
+				const char *variable, int64_t value);
 void	sqlrcur_subDouble(sqlrcur sqlrcurref,
 				const char *variable, double value,
 				uint32_t precision, uint32_t scale);
@@ -201,7 +201,7 @@ uint16_t	sqlrcur_countBindVariables(sqlrcur sqlrcurref);
 void	sqlrcur_inputBindString(sqlrcur sqlrcurref, 
 				const char *variable, const char *value);
 void	sqlrcur_inputBindLong(sqlrcur sqlrcurref, const char *variable, 
-							int32_t value);
+							int64_t value);
 void	sqlrcur_inputBindDouble(sqlrcur sqlrcurref, 
 					const char *variable, double value,
 					uint32_t precision, 
@@ -231,7 +231,7 @@ void	sqlrcur_defineOutputBindCursor(sqlrcur sqlrcurref,
 void	sqlrcur_subStrings(sqlrcur sqlrcurref,
 				const char **variables, const char **values);
 void	sqlrcur_subLongs(sqlrcur sqlrcurref,
-				const char **variables, const int32_t *values);
+				const char **variables, const int64_t *values);
 void	sqlrcur_subDoubles(sqlrcur sqlrcurref,
 				const char **variables, const double *values,
 				const uint32_t *precisions,
@@ -242,7 +242,7 @@ void	sqlrcur_inputBindStrings(sqlrcur sqlrcurref,
 					const char **values);
 void	sqlrcur_inputBindLongs(sqlrcur sqlrcurref, 
 					const char **variables, 
-					const int32_t *values);
+					const int64_t *values);
 void	sqlrcur_inputBindDoubles(sqlrcur sqlrcurref, 
 					const char **variables,
 					const double *values,
@@ -270,7 +270,7 @@ const char	*sqlrcur_getOutputBind(sqlrcur sqlrcurref,
 					const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable. */
-int32_t	sqlrcur_getOutputBindAsLong(sqlrcur sqlrcurref,
+int64_t	sqlrcur_getOutputBindAsInteger(sqlrcur sqlrcurref,
 						const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable as a 
@@ -298,17 +298,17 @@ int	sqlrcur_openCachedResultSet(sqlrcur sqlrcurref, const char *filename);
 uint32_t	sqlrcur_colCount(sqlrcur sqlrcurref); 
 			/* Returns the number of columns in the current
 			   result set. */
-uint32_t	sqlrcur_rowCount(sqlrcur sqlrcurref); 
+uint64_t	sqlrcur_rowCount(sqlrcur sqlrcurref); 
 			/* Returns the number of rows in the current 
 			   result set. */
-uint32_t	sqlrcur_totalRows(sqlrcur sqlrcurref);
+uint64_t	sqlrcur_totalRows(sqlrcur sqlrcurref);
 			/* Returns the total number of rows that will 
 			   be returned in the result set.  Not all 
 			   databases support this call.  Don't use it 
 			   for applications which are designed to be 
 			   portable across databases.  -1 is returned
 			   by databases which don't support this option. */
-uint32_t	sqlrcur_affectedRows(sqlrcur sqlrcurref);
+uint64_t	sqlrcur_affectedRows(sqlrcur sqlrcurref);
 			/* Returns the number of rows that were 
 			   updated, inserted or deleted by the query.
 			   Not all databases support this call.  Don't 
@@ -316,7 +316,7 @@ uint32_t	sqlrcur_affectedRows(sqlrcur sqlrcurref);
 			   to be portable across databases.  -1 is 
 			   returned by databases which don't support 
 			   this option. */
-uint32_t	sqlrcur_firstRowIndex(sqlrcur sqlrcurref);
+uint64_t	sqlrcur_firstRowIndex(sqlrcur sqlrcurref);
 			/* Returns the index of the first buffered row.
 			   This is useful when buffering only part of
 			   the result set at a time. */
@@ -344,38 +344,38 @@ void	sqlrcur_getNullsAsNulls(sqlrcur sqlrcurref);
 			   output bind variables as NULL's. */
 
 const char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref,
-						uint32_t row, uint32_t col); 
-const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, uint32_t row,
+						uint64_t row, uint32_t col); 
+const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, uint64_t row,
 							const char *col); 
 			/* Returns a pointer to the value of the 
 			   specified row and column. */
-int32_t	sqlrcur_getFieldAsLongByIndex(sqlrcur sqlrcurref,
-						uint32_t row, uint32_t col); 
-int32_t	sqlrcur_getFieldAsLongByName(sqlrcur sqlrcurref, uint32_t row,
+int64_t	sqlrcur_getFieldAsIntegerByIndex(sqlrcur sqlrcurref,
+						uint64_t row, uint32_t col); 
+int64_t	sqlrcur_getFieldAsIntegerByName(sqlrcur sqlrcurref, uint64_t row,
 							const char *col); 
 			/* Returns the specified field as a long integer. */
 double	sqlrcur_getFieldAsDoubleByIndex(sqlrcur sqlrcurref,
-						uint32_t row, uint32_t col); 
-double	sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, uint32_t row,
+						uint64_t row, uint32_t col); 
+double	sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, uint64_t row,
 							const char *col); 
 			/* Returns the specified field as a double precision
 			   floating point number. */
 const char	*sqlrcur_getFieldByIndex(sqlrcur sqlrcurref,
-						uint32_t row, uint32_t col); 
-const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, uint32_t row,
+						uint64_t row, uint32_t col); 
+const char	*sqlrcur_getFieldByName(sqlrcur sqlrcurref, uint64_t row,
 							const char *col); 
 			/* Returns a pointer to the value of the 
 			   specified row and column. */
 uint32_t	sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref,
-						uint32_t row, uint32_t col); 
-uint32_t	sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref, uint32_t row,
+						uint64_t row, uint32_t col); 
+uint32_t	sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref, uint64_t row,
 							const char *col); 
 			/* Returns the length of the 
 			   specified row and column. */
-const char * const *sqlrcur_getRow(sqlrcur sqlrcurref, uint32_t row); 
+const char * const *sqlrcur_getRow(sqlrcur sqlrcurref, uint64_t row); 
 			/* Returns a null terminated array of the 
 			   values of the fields in the specified row. */
-uint32_t	*sqlrcur_getRowLengths(sqlrcur sqlrcurref, uint32_t row); 
+uint32_t	*sqlrcur_getRowLengths(sqlrcur sqlrcurref, uint64_t row); 
 			/* Returns a null terminated array of the 
 			   lengths of the fields in the specified row. */
 const char * const *sqlrcur_getColumnNames(sqlrcur sqlrcurref); 

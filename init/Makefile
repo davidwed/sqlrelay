@@ -52,6 +52,18 @@ ifeq ($(UNAME),SCO_SV)
 	$(INSTALL) -m 755 openserver/init.d/sqlrelay $(initroot)/etc/init.d
 	$(INSTALL) -m 644 openserver/sqlrelay $(initroot)/etc
 endif
+ifeq ($(UNAME),IRIX)
+	# should work for irix too
+	$(MKINSTALLDIRS) $(initroot)/etc/init.d
+	$(INSTALL) -m 755 openserver/init.d/sqlrelay $(initroot)/etc/init.d
+	$(INSTALL) -m 644 openserver/sqlrelay $(initroot)/etc
+endif
+ifeq ($(UNAME),IRIX64)
+	# should work for irix too
+	$(MKINSTALLDIRS) $(initroot)/etc/init.d
+	$(INSTALL) -m 755 openserver/init.d/sqlrelay $(initroot)/etc/init.d
+	$(INSTALL) -m 644 openserver/sqlrelay $(initroot)/etc
+endif
 ifeq ($(initroot),)
 	if ( test -x "/sbin/chkconfig" -a -n "`/sbin/chkconfig -h 2>&1 | grep add`" ); then \
 		/sbin/chkconfig --add sqlrelay; \

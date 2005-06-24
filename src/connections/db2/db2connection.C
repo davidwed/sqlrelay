@@ -106,11 +106,11 @@ bool db2connection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
-char *db2connection::pingQuery() {
+const char *db2connection::pingQuery() {
 	return "values 1";
 }
 
-char *db2connection::identify() {
+const char *db2connection::identify() {
 	return "db2";
 }
 
@@ -170,7 +170,7 @@ bool db2cursor::inputBindString(const char *variable,
 
 	if (*isnull==SQL_NULL_DATA) {
 		erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
@@ -181,7 +181,7 @@ bool db2cursor::inputBindString(const char *variable,
 				(SQLINTEGER *)isnull);
 	} else {
 		erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
@@ -202,7 +202,7 @@ bool db2cursor::inputBindLong(const char *variable,
 					uint32_t *value) {
 
 	erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_LONG,
 				SQL_INTEGER,
@@ -224,7 +224,7 @@ bool db2cursor::inputBindDouble(const char *variable,
 					uint32_t scale) {
 
 	erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_DOUBLE,
 				SQL_DECIMAL,
@@ -246,7 +246,7 @@ bool db2cursor::outputBindString(const char *variable,
 					int16_t *isnull) {
 
 	erg=SQLBindParameter(stmt,
-				charstring::toLong(variable+1),
+				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,

@@ -235,12 +235,12 @@ void sqlrcursor::cacheData() {
 	for (uint32_t i=0; i<rowbuffercount; i++) {
 
 		// get the current offset in the cache destination file
-		int32_t	position=cachedest->getCurrentPosition();
+		int64_t	position=cachedest->getCurrentPosition();
 
 		// seek to the right place in the index file and write the
 		// destination file offset
 		cachedestind->setPositionRelativeToBeginning(
-			13+sizeof(int32_t)+((firstrowindex+i)*sizeof(int32_t)));
+			13+sizeof(int32_t)+((firstrowindex+i)*sizeof(int64_t)));
 		cachedestind->write(position);
 
 		// write the row to the cache file

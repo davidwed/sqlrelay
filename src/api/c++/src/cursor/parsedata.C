@@ -28,16 +28,16 @@ bool sqlrcursor::parseData() {
 	// useful variables
 	uint16_t	type;
 	uint32_t	length;
-	char	*buffer=NULL;
+	char		*buffer=NULL;
 	uint32_t	colindex=0;
-	column	*currentcol;
-	row	*currentrow=NULL;
+	column		*currentcol;
+	row		*currentrow=NULL;
 
 	// set firstrowindex to the index of the first row in the buffer
 	firstrowindex=rowcount;
 
 	// keep track of how large the buffer is
-	uint32_t	rowbuffercount=0;
+	uint64_t	rowbuffercount=0;
 
 	// get rows
 	for (;;) {
@@ -126,13 +126,22 @@ bool sqlrcursor::parseData() {
 
 		} else if (type==START_LONG_DATA) {
 
+			uint64_t	totallength;
+			if (getLongLong(&totallength)!=sizeof(uint64_t)) {
+				setError("Failed to get total length.\n A network error may have occurred");
+				return false;
+			}
+
+			// create a buffer to hold the data
+			buffer=new char[totallength+1];
+
 			// handle a long datatype
-			char		*oldbuffer=NULL;
-			uint32_t	totallength=0;
+			uint64_t	offset=0;
 			for (;;) {
 
 				// get the type of the chunk
 				if (getShort(&type)!=sizeof(uint16_t)) {
+					delete[] buffer;
 					setError("Failed to get chunk type.\n A network error may have occurred");
 					return false;
 				}
@@ -149,37 +158,23 @@ bool sqlrcursor::parseData() {
 					return false;
 				}
 
-				// create a buffer to hold the chunk
-				buffer=new char[totallength+length+1];
-				if (totallength) {
-					rawbuffer::copy(buffer,oldbuffer,
-								totallength);
-					delete[] oldbuffer;
-					oldbuffer=buffer;
-					buffer=buffer+totallength;
-				} else {
-					oldbuffer=buffer;
-				}
-				totallength=totallength+length;
-
 				// get the chunk of data
-				if ((uint32_t)getString(buffer,length)!=
-								length) {
+				if ((uint32_t)getString(buffer+offset,
+							length)!=length) {
 					delete[] buffer;
 					setError("Failed to get chunk data.\n A network error may have occurred");
 					return false;
 				}
 
-				// NULL terminate the buffer.  This makes 
-				// certain operations safer and won't hurt
-				// since the actual length (which doesn't
-				// include the NULL) is available from
-				// getFieldLength.
-				buffer[length]=(char)NULL;
+				offset=offset+length;
 			}
-			buffer=oldbuffer;
+			// NULL terminate the buffer.  This makes 
+			// certain operations safer and won't hurt
+			// since the actual length (which doesn't
+			// include the NULL) is available from
+			// getFieldLength.
+			buffer[totallength]=(char)NULL;
 			length=totallength;
-
 		}
 
 		// add the buffer to the current row
@@ -249,7 +244,7 @@ void sqlrcursor::createRowBuffers() {
 	// rows will hang around from now until the cursor is deleted,
 	// getting reused with each query
 	rows=new row *[OPTIMISTIC_ROW_COUNT];
-	for (uint32_t i=0; i<OPTIMISTIC_ROW_COUNT; i++) {
+	for (uint64_t i=0; i<OPTIMISTIC_ROW_COUNT; i++) {
 		rows[i]=new row(colcount);
 	}
 }
@@ -257,12 +252,12 @@ void sqlrcursor::createRowBuffers() {
 void sqlrcursor::createExtraRowArray() {
 
 	// create the arrays
-	uint32_t	howmany=rowcount-firstrowindex-OPTIMISTIC_ROW_COUNT;
+	uint64_t	howmany=rowcount-firstrowindex-OPTIMISTIC_ROW_COUNT;
 	extrarows=new row *[howmany];
 	
 	// populate the arrays
 	row	*currentrow=firstextrarow;
-	for (uint32_t i=0; i<howmany; i++) {
+	for (uint64_t i=0; i<howmany; i++) {
 		extrarows[i]=currentrow;
 		currentrow=currentrow->next;
 	}

@@ -34,7 +34,7 @@ int main(int argc, const char **argv) {
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
-	const char	*id=id=cmdline.value("-id");
+	const char	*id=cmdline.value("-id");
 
 	if (!(id && id[0])) {
 
@@ -47,7 +47,7 @@ int main(int argc, const char **argv) {
 		}
 
 		host=argv[1];
-		port=charstring::toLong(argv[2]);
+		port=charstring::toInteger(argv[2]);
 		socket=argv[3];
 		user=argv[4];
 		password=argv[5];

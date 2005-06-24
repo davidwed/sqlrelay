@@ -7,7 +7,7 @@
 #include <defines.h>
 #include <datatypes.h>
 
-bool sqlrcursor::processResultSet(bool getallrows, uint32_t rowtoget) {
+bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 
 	// start caching the result set
 	if (cacheon) {
@@ -106,7 +106,7 @@ bool sqlrcursor::getCursorId() {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Cursor ID: ");
-		sqlrc->debugPrint((int32_t)cursorid);
+		sqlrc->debugPrint((int64_t)cursorid);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
@@ -127,7 +127,7 @@ bool sqlrcursor::getSuspended() {
 		// If it was suspended the server will send the index of the 
 		// last row from the previous result set.
 		// Initialize firstrowindex and rowcount from this index.
-		if (sqlrc->cs->read(&firstrowindex)!=sizeof(uint32_t)) {
+		if (sqlrc->cs->read(&firstrowindex)!=sizeof(uint64_t)) {
 			setError("Failed to get the index of the last row of a previously suspended result set.\n A network error may have ocurred.");
 			return false;
 		}
@@ -137,7 +137,7 @@ bool sqlrcursor::getSuspended() {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Previous result set was ");
 	       		sqlrc->debugPrint("suspended at row index: ");
-			sqlrc->debugPrint((int32_t)firstrowindex);
+			sqlrc->debugPrint((int64_t)firstrowindex);
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
@@ -203,8 +203,8 @@ void sqlrcursor::handleError() {
 	finishCaching();
 }
 
-bool sqlrcursor::fetchRowIntoBuffer(bool getallrows, uint32_t row,
-						uint32_t *rowbufferindex) {
+bool sqlrcursor::fetchRowIntoBuffer(bool getallrows, uint64_t row,
+						uint64_t *rowbufferindex) {
 
 	// if we getting the entire result set at once, then the result set 
 	// buffer index is the requested row-firstrowindex
@@ -262,6 +262,17 @@ int32_t sqlrcursor::getShort(uint16_t *integer) {
 }
 
 int32_t sqlrcursor::getLong(uint32_t *integer) {
+
+	// if the result set is coming from a cache file, read from
+	// the file, if not, read from the server
+	if (cachesource && cachesourceind) {
+		return cachesource->read(integer);
+	} else {
+		return sqlrc->cs->read(integer);
+	}
+}
+
+int32_t sqlrcursor::getLongLong(uint64_t *integer) {
 
 	// if the result set is coming from a cache file, read from
 	// the file, if not, read from the server

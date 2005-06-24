@@ -93,7 +93,7 @@ PGconn *allocatePGconn(const char *conninfo,
 
 	conn->error=NULL;
 
-	int	portnumber=charstring::toLong(conn->port);
+	int	portnumber=charstring::toInteger(conn->port);
 
 	conn->sqlrcon=new sqlrconnection((portnumber)?conn->host:"",
 					portnumber,

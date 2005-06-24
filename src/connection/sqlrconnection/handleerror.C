@@ -55,7 +55,7 @@ bool sqlrconnection::returnError(sqlrcursor *cursor) {
 		// client will be sending skip/fetch,
 		// better get it even though we're not gonna
 		// use it
-		uint32_t	skipfetch;
+		uint64_t	skipfetch;
 		clientsock->read(&skipfetch);
 		clientsock->read(&skipfetch);
 

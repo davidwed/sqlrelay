@@ -1931,7 +1931,7 @@ then
 				STATICFLAG="-static"
 			fi
 
-			FW_CHECK_HEADERS_AND_LIBS([$MDBTOOLSPATH],[mdbsql],[mdbsql.h],[mdbsql],[$STATICFLAG],[$RPATHFLAG],[MDBSQLINCLUDES],[MDBSQLLIBS],[MDBSQLLIBSPATH],[MDBSQLSTATIC])
+			FW_CHECK_HEADERS_AND_LIBS([$MDBTOOLSPATH],[mdb],[mdbsql.h],[mdbsql],[$STATICFLAG],[$RPATHFLAG],[MDBSQLINCLUDES],[MDBSQLLIBS],[MDBSQLLIBSPATH],[MDBSQLSTATIC])
 			FW_CHECK_HEADERS_AND_LIBS([$MDBTOOLSPATH],[mdb],[mdbtools.h],[mdb],[$STATICFLAG],[$RPATHFLAG],[MDBINCLUDES],[MDBLIBS],[MDBTOOLSLIBSPATH],[MDBTOOLSSTATIC])
 
 			if ( test -n "$MDBSQLINCLUDES" -o -n "$MDBSQLLIBS" -o -n "$MDBINCLUDES" -o -n "$MDBLIBS" )
@@ -2052,7 +2052,7 @@ then
 		if ( test -n "$PYTHONPATH" )
 		then
 		
-			for i in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
+			for i in "2.4" "2.3" "2.2" "2.1"
 			do
 				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/$LIBDIR/python$i/config" )
 				then
@@ -2080,7 +2080,7 @@ then
 			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
 			then
 
-				for i in "24" "23" "22" "21" "20" "16" "15"
+				for i in "24" "23" "22" "21"
 				do
 					FW_CHECK_HEADER_LIB([$PYTHONPATH/include/Python.h],[PYTHONINCLUDES=\"-I$PYTHONPATH/include\"],[$PYTHONPATH/libs/libpython$j.lib],[PYTHONDIR=\"$PYTHONPATH/Lib\"; PYTHONLIB=\"-L$PYTHONPATH/libs -lpython$j\"],[],[])
 					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
@@ -2093,7 +2093,7 @@ then
 		
 		else
 		
-			for j in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
+			for j in "2.4" "2.3" "2.2" "2.1"
 			do
 				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j"
 				do
@@ -2135,7 +2135,7 @@ then
 			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
 			then
 
-				for j in "24" "23" "22" "21" "20" "16" "15"
+				for j in "24" "23" "22" "21"
 				do
 					FW_CHECK_HEADER_LIB([/cygdrive/c/Python$j/include/Python.h],[PYTHONINCLUDES=\"-I/cygdrive/c/Python$j/include\"],[/cygdrive/c/Python$j/libs/python$j.lib],[PYTHONDIR=\"/cygdrive/c/Python$j/Lib\"; PYTHONLIB=\"-L/cygdrive/c/Python$j/libs -lpython$j\"],[],[])
 					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
@@ -2158,17 +2158,10 @@ then
 
 	FW_INCLUDES(python,[$PYTHONINCLUDES])
 
-	PYTHON_HAVE_WEAKREF=""
-	if ( test "$PYTHONVERSION" -ge "21" )
-	then
-		PYTHON_HAVE_WEAKREF="yes"
-	fi
-
 	AC_SUBST(HAVE_PYTHON)
 	AC_SUBST(PYTHONINCLUDES)
 	AC_SUBST(PYTHONDIR)
 	AC_SUBST(PYTHONLIB)
-	AC_SUBST(PYTHON_HAVE_WEAKREF)
 fi
 ])
 

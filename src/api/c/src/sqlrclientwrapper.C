@@ -91,11 +91,11 @@ void sqlrcur_free(sqlrcur sqlrcurref) {
 	delete (sqlrcur )sqlrcurref;
 }
 
-void sqlrcur_setResultSetBufferSize(sqlrcur sqlrcurref, uint32_t rows) {
+void sqlrcur_setResultSetBufferSize(sqlrcur sqlrcurref, uint64_t rows) {
 	sqlrcurref->setResultSetBufferSize(rows);
 }
 
-uint32_t sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref) {
+uint64_t sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref) {
 	return sqlrcurref->getResultSetBufferSize();
 }
 
@@ -168,7 +168,7 @@ void sqlrcur_subString(sqlrcur sqlrcurref, const char *variable,
 	sqlrcurref->substitution(variable,value);
 }
 
-void sqlrcur_subLong(sqlrcur sqlrcurref, const char *variable, int32_t value) {
+void sqlrcur_subLong(sqlrcur sqlrcurref, const char *variable, int64_t value) {
 	sqlrcurref->substitution(variable,value);
 }
 
@@ -191,7 +191,7 @@ void sqlrcur_inputBindString(sqlrcur sqlrcurref, const char *variable,
 }
 
 void sqlrcur_inputBindLong(sqlrcur sqlrcurref, const char *variable, 
-							int32_t value) {
+							int64_t value) {
 	sqlrcurref->inputBind(variable,value);
 }
 
@@ -218,7 +218,7 @@ void sqlrcur_subStrings(sqlrcur sqlrcurref,
 }
 
 void sqlrcur_subLongs(sqlrcur sqlrcurref, const char **variables,
-						const int32_t *values) {
+						const int64_t *values) {
 	sqlrcurref->substitutions(variables,values);
 }
 
@@ -236,7 +236,7 @@ void sqlrcur_inputBindStrings(sqlrcur sqlrcurref, const char **variables,
 }
 
 void sqlrcur_inputBindLongs(sqlrcur sqlrcurref, const char **variables, 
-						const int32_t *values) {
+						const int64_t *values) {
 	sqlrcurref->inputBinds(variables,values);
 }
 
@@ -285,9 +285,9 @@ const char *sqlrcur_getOutputBind(sqlrcur sqlrcurref,
 	return sqlrcurref->getOutputBind(variable);
 }
 
-int32_t sqlrcur_getOutputBindAsLong(sqlrcur sqlrcurref,
+int64_t sqlrcur_getOutputBindAsInteger(sqlrcur sqlrcurref,
 						const char *variable) {
-	return sqlrcurref->getOutputBindAsLong(variable);
+	return sqlrcurref->getOutputBindAsInteger(variable);
 }
 
 double sqlrcur_getOutputBindAsDouble(sqlrcur sqlrcurref,
@@ -307,7 +307,7 @@ int sqlrcur_openCachedResultSet(sqlrcur sqlrcurref, const char *filename) {
 	return sqlrcurref->openCachedResultSet(filename);
 }
 
-uint32_t sqlrcur_rowCount(sqlrcur sqlrcurref) {
+uint64_t sqlrcur_rowCount(sqlrcur sqlrcurref) {
 	return sqlrcurref->rowCount();
 }
 
@@ -315,15 +315,15 @@ uint32_t sqlrcur_colCount(sqlrcur sqlrcurref) {
 	return sqlrcurref->colCount();
 }
 
-uint32_t sqlrcur_totalRows(sqlrcur sqlrcurref) {
+uint64_t sqlrcur_totalRows(sqlrcur sqlrcurref) {
 	return sqlrcurref->totalRows();
 }
 
-uint32_t sqlrcur_affectedRows(sqlrcur sqlrcurref) {
+uint64_t sqlrcur_affectedRows(sqlrcur sqlrcurref) {
 	return sqlrcurref->affectedRows();
 }
 
-uint32_t sqlrcur_firstRowIndex(sqlrcur sqlrcurref) {
+uint64_t sqlrcur_firstRowIndex(sqlrcur sqlrcurref) {
 	return sqlrcurref->firstRowIndex();
 }
 
@@ -344,50 +344,50 @@ void sqlrcur_getNullsAsNulls(sqlrcur sqlrcurref) {
 }
 
 const char *sqlrcur_getFieldByIndex(sqlrcur sqlrcurref,
-					uint32_t row, uint32_t col) {
+					uint64_t row, uint32_t col) {
 	return sqlrcurref->getField(row,col);
 }
 
-const char *sqlrcur_getFieldByName(sqlrcur sqlrcurref, uint32_t row,
+const char *sqlrcur_getFieldByName(sqlrcur sqlrcurref, uint64_t row,
 							const char *col) {
 	return sqlrcurref->getField(row,col);
 }
 
-int32_t sqlrcur_getFieldAsLongByIndex(sqlrcur sqlrcurref,
-					uint32_t row, uint32_t col) {
-	return sqlrcurref->getFieldAsLong(row,col);
+int64_t sqlrcur_getFieldAsIntegerByIndex(sqlrcur sqlrcurref,
+					uint64_t row, uint32_t col) {
+	return sqlrcurref->getFieldAsInteger(row,col);
 }
 
-int32_t sqlrcur_getFieldAsLongByName(sqlrcur sqlrcurref, uint32_t row,
+int64_t sqlrcur_getFieldAsIntegerByName(sqlrcur sqlrcurref, uint64_t row,
 							const char *col) {
-	return sqlrcurref->getFieldAsLong(row,col);
+	return sqlrcurref->getFieldAsInteger(row,col);
 }
 
-double sqlrcur_getFieldAsDoubleByIndex(sqlrcur sqlrcurref, uint32_t row,
+double sqlrcur_getFieldAsDoubleByIndex(sqlrcur sqlrcurref, uint64_t row,
 								uint32_t col) {
 	return sqlrcurref->getFieldAsDouble(row,col);
 }
 
-double sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, uint32_t row,
+double sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, uint64_t row,
 							const char *col) {
 	return sqlrcurref->getFieldAsDouble(row,col);
 }
 
 uint32_t sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref,
-					uint32_t row, uint32_t col) {
+					uint64_t row, uint32_t col) {
 	return sqlrcurref->getFieldLength(row,col);
 }
 
 uint32_t sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref,
-						uint32_t row, const char *col) {
+						uint64_t row, const char *col) {
 	return sqlrcurref->getFieldLength(row,col);
 }
 
-const char * const *sqlrcur_getRow(sqlrcur sqlrcurref, uint32_t row) {
+const char * const *sqlrcur_getRow(sqlrcur sqlrcurref, uint64_t row) {
 	return sqlrcurref->getRow(row);
 }
 
-uint32_t *sqlrcur_getRowLengths(sqlrcur sqlrcurref, uint32_t row) {
+uint32_t *sqlrcur_getRowLengths(sqlrcur sqlrcurref, uint64_t row) {
 	return sqlrcurref->getRowLengths(row);
 }
 

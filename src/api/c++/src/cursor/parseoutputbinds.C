@@ -17,10 +17,16 @@ bool sqlrcursor::parseOutputBinds() {
 	// useful variables
 	uint16_t	type;
 	uint32_t	length;
-	int	count=0;
+	uint16_t	count=0;
 
 	// get the bind values
 	for (;;) {
+
+		if (sqlrc->debug) {
+			sqlrc->debugPreStart();
+			sqlrc->debugPrint("	getting type...\n");
+			sqlrc->debugPreEnd();
+		}
 
 		// get the data type
 		if (getShort(&type)!=sizeof(uint16_t)) {
@@ -29,12 +35,24 @@ bool sqlrcursor::parseOutputBinds() {
 			return false;
 		}
 
+		if (sqlrc->debug) {
+			sqlrc->debugPreStart();
+			sqlrc->debugPrint("	done getting type\n");
+			sqlrc->debugPreEnd();
+		}
+
 		// check for end of bind values
 		if (type==END_BIND_VARS) {
 
 			break;
 
 		} else if (type==NULL_DATA) {
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("	NULL output bind\n");
+				sqlrc->debugPreEnd();
+			}
 
 			// handle a null value
 			if (returnnulls) {
@@ -45,7 +63,18 @@ bool sqlrcursor::parseOutputBinds() {
 								(char)NULL;
 			}
 
+			if (sqlrc->debug) {
+				sqlrc->debugPrint("		");
+				sqlrc->debugPrint("done fetching.\n");
+			}
+
 		} else if (type==NORMAL_DATA) {
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("	STRING output bind\n");
+				sqlrc->debugPreEnd();
+			}
 
 			// get the value length
 			if (getLong(&length)!=sizeof(uint32_t)) {
@@ -55,6 +84,14 @@ bool sqlrcursor::parseOutputBinds() {
 			outbindvars[count].valuesize=length;
 			outbindvars[count].value.stringval=new char[length+1];
 
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("		length=");
+				sqlrc->debugPrint((int64_t)length);
+				sqlrc->debugPrint("\n");
+				sqlrc->debugPreEnd();
+			}
+
 			// get the value
 			if ((uint32_t)getString(outbindvars[count].value.
 						stringval,length)!=length) {
@@ -63,7 +100,20 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 			outbindvars[count].value.stringval[length]=(char)NULL;
 
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("		");
+				sqlrc->debugPrint("done fetching\n");
+				sqlrc->debugPreEnd();
+			}
+
 		} else if (type==CURSOR_DATA) {
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("	CURSOR output bind\n");
+				sqlrc->debugPreEnd();
+			}
 
 			// get the cursor id
 			if (getShort((uint16_t *)
@@ -73,16 +123,55 @@ bool sqlrcursor::parseOutputBinds() {
 				return false;
 			}
 
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("		");
+				sqlrc->debugPrint("done fetching\n");
+				sqlrc->debugPreEnd();
+			}
+
 		} else {
 
-			char	*buffer=NULL;
-			char	*oldbuffer=NULL;
-			uint32_t	totallength=0;
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("	LOB/CLOB ");
+				sqlrc->debugPrint("output bind\n");
+				sqlrc->debugPreEnd();
+			}
+
+			// must be START_LONG_DATA...
+			// get the total length of the long data
+			uint64_t	totallength;
+			if (getLongLong(&totallength)!=sizeof(uint64_t)) {
+				setError("Failed to get total length.\n A network error may have occurred.");
+				return false;
+			}
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("		length=");
+				sqlrc->debugPrint((int64_t)totallength);
+				sqlrc->debugPrint("\n");
+				sqlrc->debugPreEnd();
+			}
+
+			// create a buffer to hold the data
+			char	*buffer=new char[totallength+1];
+
+			uint64_t	offset=0;
 			uint32_t	length;
 			for (;;) {
 
+				if (sqlrc->debug) {
+					sqlrc->debugPreStart();
+					sqlrc->debugPrint("		");
+					sqlrc->debugPrint("fetching...\n");
+					sqlrc->debugPreEnd();
+				}
+
 				// get the type of the chunk
 				if (getShort(&type)!=sizeof(uint16_t)) {
+					delete[] buffer;
 					setError("Failed to get chunk type.\n A network error may have occurred.");
 					return false;
 				}
@@ -99,35 +188,31 @@ bool sqlrcursor::parseOutputBinds() {
 					return false;
 				}
 
-				// create a buffer to hold the chunk
-				buffer=new char[totallength+length+1];
-				if (totallength) {
-					rawbuffer::copy(buffer,oldbuffer,
-								totallength);
-					delete[] oldbuffer;
-					oldbuffer=buffer;
-					buffer=buffer+totallength;
-				} else {
-					oldbuffer=buffer;
-				}
-				totallength=totallength+length;
-
 				// get the chunk of data
-				if ((uint32_t)getString(buffer,length)!=
-								length) {
+				if ((uint32_t)getString(buffer+offset,
+							length)!=length) {
 					delete[] buffer;
 					setError("Failed to get chunk data.\n A network error may have occurred.");
 					return false;
 				}
 
-				// NULL terminate the buffer.  This makes 
-				// certain operations safer and won't hurt
-				// since the actual length (which doesn't
-				// include the NULL) is available from
-				// getOutputBindLength.
-				buffer[length]=(char)NULL;
+				offset=offset+length;
 			}
-			outbindvars[count].value.lobval=oldbuffer;
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("		");
+				sqlrc->debugPrint("done fetching.\n");
+				sqlrc->debugPreEnd();
+			}
+
+			// NULL terminate the buffer.  This makes 
+			// certain operations safer and won't hurt
+			// since the actual length (which doesn't
+			// include the NULL) is available from
+			// getOutputBindLength.
+			buffer[totallength]=(char)NULL;
+			outbindvars[count].value.lobval=buffer;
 			outbindvars[count].valuesize=totallength;
 		}
 
@@ -144,7 +229,7 @@ bool sqlrcursor::parseOutputBinds() {
 					outbindvars[count].value.lobval,
 					outbindvars[count].valuesize);
 			} else if (outbindvars[count].type==CURSOR_BIND) {
-				sqlrc->debugPrint((int32_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)outbindvars[count].
 								value.cursorid);
 			} else {
 				sqlrc->debugPrint(outbindvars[count].

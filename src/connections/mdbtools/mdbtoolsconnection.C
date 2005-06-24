@@ -46,7 +46,7 @@ bool mdbtoolsconnection::ping() {
 	return true;
 }
 
-char *mdbtoolsconnection::identify() {
+const char *mdbtoolsconnection::identify() {
 	return "mdbtools";
 }
 
@@ -115,7 +115,7 @@ bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
 	mdb_sql_reset(&mdbsql);
 #ifdef HAVE_MDB_RUN_QUERY
 	if (newquery) {
-		if (!mdb_run_query(&mdbsql,newquery->getString())) {
+		if (!mdb_run_query(&mdbsql,(char *)newquery->getString())) {
 			delete newquery;
 			return false;
 		}

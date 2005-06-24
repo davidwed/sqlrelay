@@ -31,7 +31,8 @@ you need the version that comes with it's own pthreads implementation.</p>
 
 <p>Older versions of lago will not successfully compile with gcc 2.96 or 3.x.
 You'll have to use gcc 2.95.  Newer versions of lago come with a patch that
-enables them to be compiled with gcc 2.96 or 3.x.</p>
+enables them to be compiled with gcc 2.96-3.4.3.  Lago cannot be compiled with
+versions of gcc newer than 3.4.3.</p>
 
 <p>To install the patch, run the following commands:</p>
 
@@ -41,14 +42,15 @@ cd lago
 patch -p1 < ../lago-0.5.2-gcc3.patch
 </blockquote>
 
-<p>If you want to build an unpatched or older version of lago and your
-distribution does not come with gcc 2.95, you can download it from 
+<p>If you want to build lago and your distribution does not come with a
+compatible version of gcc, you can download it from 
 <a href="ftp://ftp.gnu.org/pub/gcc">the GNU ftp site</a> and compile it.  I 
-usually give the gcc <i>configure</i> script the 
-<i>--prefix=/usr/local/gnu-2.95</i> parameter so that gcc will be installed 
-under /usr/local/gcc-2.95.  Then, when building lago, I add 
-/usr/local/gcc-2.95 to the beginning of my PATH environment variable so that it
-will be used during the build.</p>
+usually give the gcc <i>configure</i> script a <i>prefix</i> argument such as
+<i>--prefix=/usr/local/gnu-2.95</i> so that gcc will be completely installed 
+under it's own directory, in this case /usr/local/gcc-2.95.  Then, when
+building lago, I add the bin directory of the prefix, in this case
+/usr/local/gcc-2.95/bin, to the beginning of my PATH environment variable so
+that it will be used during the build.</p>
 
 <p>To build and install lago, you should create a lago user, assign it a 
 password then build and install the software as that user.  I usually give the 

@@ -37,7 +37,7 @@ class postgresqlcursor : public sqlrcursor {
 		ExecStatusType	pgstatus;
 		int		ncols;
 		int		nrows;
-		uint32_t	affectedrows;
+		uint64_t	affectedrows;
 		int		currentrow;
 
 		postgresqlconnection	*postgresqlconn;

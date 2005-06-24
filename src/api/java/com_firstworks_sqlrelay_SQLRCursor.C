@@ -734,16 +734,16 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBind
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getOutputBindAsLong
+ * Method:    getOutputBindAsInteger
  * Signature: (Ljava/lang/String;)J;
  */
-JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindAsLong
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindAsInteger
   (JNIEnv *env, jobject self, jstring variable) {
 	jclass		cls=env->GetObjectClass(self);
 	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
 				env->GetFieldID(cls,"cursor","I"));
 	char	*variablestring=curGetStringUTFChars(env,variable,0);
-	jlong	retval=(jlong)cur->getOutputBindAsLong(variablestring);
+	jlong	retval=(jlong)cur->getOutputBindAsInteger(variablestring);
 	curReleaseStringUTFChars(env,variable,variablestring);
 	return retval;
 }
@@ -980,29 +980,29 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getField__ILja
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getFieldAsLong
+ * Method:    getFieldAsInteger
  * Signature: (II)J
  */
-JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsLong__II
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsInteger__II
   (JNIEnv *env, jobject self, jint row, jint col) {
 	jclass		cls=env->GetObjectClass(self);
 	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
 				env->GetFieldID(cls,"cursor","I"));
-	return (jlong)cur->getFieldAsLong((int)row,(int)col);
+	return (jlong)cur->getFieldAsInteger((int)row,(int)col);
 }
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getFieldAsLong
+ * Method:    getFieldAsInteger
  * Signature: (ILjava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsLong__ILjava_lang_String_2
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsInteger__ILjava_lang_String_2
   (JNIEnv *env, jobject self, jint row, jstring col) {
 	jclass		cls=env->GetObjectClass(self);
 	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
 				env->GetFieldID(cls,"cursor","I"));
 	char	*colstring=curGetStringUTFChars(env,col,0);
-	jlong	retval=(jlong)cur->getFieldAsLong((int)row,colstring);
+	jlong	retval=(jlong)cur->getFieldAsInteger((int)row,colstring);
 	curReleaseStringUTFChars(env,col,colstring);
 	return retval;
 }

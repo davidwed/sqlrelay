@@ -27,7 +27,7 @@
 					const char *value);
 		void	longVar(bindvar *var,
 					const char *variable,
-					int32_t value);
+					int64_t value);
 		void	doubleVar(bindvar *var, const char *variable, 
 						double value,
 						uint32_t precision,
@@ -40,11 +40,12 @@
 							uint16_t which);
 		bool	runQuery(const char *query);
 		void	abortResultSet();
-		bool	processResultSet(bool getallrows, uint32_t rowtoget);
+		bool	processResultSet(bool getallrows, uint64_t rowtoget);
 
 		int32_t	getString(char *string, int32_t size);
 		int32_t	getShort(uint16_t *integer);
 		int32_t	getLong(uint32_t *integer);
+		int32_t	getLongLong(uint64_t *integer);
 
 		bool	noError();
 		bool	getCursorId();
@@ -56,8 +57,8 @@
 		void	getErrorFromServer();
 		void	handleError();
 
-		bool	skipAndFetch(bool getallrows, uint32_t rowtoget);
-		bool	skipRows(bool getallrows, uint32_t rowtoget);
+		bool	skipAndFetch(bool getallrows, uint64_t rowtoget);
+		bool	skipRows(bool getallrows, uint64_t rowtoget);
 		void	fetchRows();
 
 		void	startCaching();
@@ -69,16 +70,16 @@
 		void	finishCaching();
  
 		bool	fetchRowIntoBuffer(bool getallrows,
-					uint32_t row, uint32_t *rowbufferindex);
+					uint64_t row, uint64_t *rowbufferindex);
 
 		void	createColumnArrays();
 		void	createExtraRowArray();
 		void	createFields();
 		void	createFieldLengths();
 
-		char		*getFieldInternal(uint32_t row,
+		char		*getFieldInternal(uint64_t row,
 							uint32_t col);
-		uint32_t	getFieldLengthInternal(uint32_t row,
+		uint32_t	getFieldLengthInternal(uint64_t row,
 							uint32_t col);
 
 		char	*getRowStorage(int32_t length);
@@ -112,7 +113,7 @@
 		bool		validatebinds;
 
 		// result set
-		uint32_t	rsbuffersize;
+		uint64_t	rsbuffersize;
 		uint16_t	sendcolumninfo;
 		uint16_t	sentcolumninfo;
 
@@ -130,13 +131,13 @@
 		memorypool	*colstorage;
 		char		**columnnamearray;
 
-		uint32_t	firstrowindex;
-		uint32_t	rowcount;
-		uint32_t	previousrowcount;
+		uint64_t	firstrowindex;
+		uint64_t	rowcount;
+		uint64_t	previousrowcount;
 		uint16_t	knowsactualrows;
-		uint32_t	actualrows;
+		uint64_t	actualrows;
 		uint16_t	knowsaffectedrows;
-		uint32_t	affectedrows;
+		uint64_t	affectedrows;
 
 		row		**rows;
 		row		**extrarows;

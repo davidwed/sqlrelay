@@ -8,8 +8,22 @@
 	changed "connections" to "instance id's" in /etc/sqlrelay
 	sqlrsh's help displays help for ping/identify commands
 	changed sybase installation instructions to use alien on debian
+	de-supported python<2.1
+
+0.36.4 - fixed mdbsql detection
+	fixed const error in mdbtools connection
+	added const to *connection::identify()/pingQuery() methods
+
+0.36.3 - added allowShortReads option to non-readline sqlrsh build
+	fixes to php pear db driver for autoExecute
+	sqlrsh uses libreadline even on systems that don't have libhistory now
 	changed test -n -r "${sysconfdir}/sqlrelay.conf" to 
 		test ! -r "${sysconfdir}/sqlrelay.conf" in init scripts
+
+0.36.2 - added -lnnz10 to instantclient configuration
+
+0.36.1 - added support for oracle instantclient
+	added python 2.4 to spec file
 
 0.36 - configure script defaults db2 version to 8
 	configure script detects various odbc function paramters, uses them to

@@ -81,7 +81,7 @@ work?</a></li>
 <span class="heading2">Administration Questions</span><br><br>
 <ol>
 <li><a href="#tweaks">What system parameters can I tweak to get better performance out of SQL Relay</a></li>
-<li><a href="#firewall">If I leave SQL Relay idle for a long time, then come back and try to use it, I get a low level TCP error from the database.  What does that mean?</a></li>
+<li><a href="#firewallhang">If I leave SQL Relay idle for a long time, then come back and try to use it, I get a low level TCP error from the database.  What does that mean?</a></li>
 <li><a href="#ttl">Why doesn't the last connection die off when I set connections=0 and maxconnections to some larger number and let SQL Relay go idle for a long time?</a></li>
 </ol>
 
@@ -1070,7 +1070,7 @@ on the TODO list though.</p>
 
 <p>See <a href="tuning.html">Tuning SQL Relay...</a></p>
 
-<a name="firewall"></a>
+<a name="firewallhang"></a>
 <span class="heading3">If I leave SQL Relay idle for a long time, then come back and try to use it, my program gets hung or I get a low level TCP error from the database.  What does that mean?</span><br><br>
 
 <p>If you are running SQL Relay on one machine and the database on a seperate

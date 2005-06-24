@@ -1,19 +1,56 @@
+make 0.36.4 release with CLOB updates, fix NULL bind in PHP Pear autoExecute bug
+
+this code:
+	from SQLRelay import PySQLRClient
+	from SQLRelay import PySQLRDB
+
+	con=PySQLRClient.sqlrconnection('localhost',9000,'','test','test',0,1)
+	cur=PySQLRClient.sqlrcursor(con)
+	cur.getNullsAsNone()
+
+	for a in range(100):
+    	res = cur.sendQuery('select * from CKK_KLIENCI')  
+    	print 'cursor:', cur.rowCount()
+    	print 'run_no:', a
+    	for row in range(cur.rowCount()):
+        	print 'row:', row
+        	for col in range(cur.colCount()):
+            	cur.getField(row,col)
+	con.endSession()
+	print 'end'
+crashes with deallocaing "None" error
+
+
+on FC4, sybase-12.5.2 needs libstdc++-libc6.2-2.so.3 from compat-libstdc++-296
+sybase-12.5.? is case sensitive and creates a database called LOCALHOST not
+	localhost like the docs say
+
+sqlr-import/sqlr-export tools
+
+use 64 bits for input bind numbers
+use 64 bits in java api
+change:
+	double get???AsDouble
+to
+	long double get???AsFloat();
+change:
+	inputBindLong
+to
+	inputBindInteger
+and
+	inputBindDouble
+to
+	inputBindFloat
+
+fix freetds/sybase ct_con_prop/encryption FIXME's
+
 sybase on irix has libtcl rather than libsybtcl and .so files are in devlib
 	directory rather than in lib directory
-
-irix (and probably other unixes) have chkconfig but it doesn't support the
-	--add option, so init/Makefile doesn't properly symlink the boot script
-	appropriately
 
 make max clob/blob upload size configurable
 
 make everything single-process/multithread and use techniques described in 
 	the C10K problem to handle client/server io
-
-support ?'s instead of :1, :2, :3 for bind variables, Pear DB automatically
-	inserts them when using autoExecute()
-
-really long clobs (like 20 mb) cause segfaults
 
 Docs need to explain:	
 	exactly what should be put in /etc/sqlrelay
@@ -34,9 +71,11 @@ mdbtools connection won't compile against mdbtools-0.5 on freebsd
 
 configure script doesn't find zope on openbsd
 
-fake inputBind for strings should escape single quotes
+PySQLRDB.py needs to return DateTime objects for date-type columns
 
 perl apis -> CPAN
+
+support gcj
 
 --------------------------------------------------------------------------------
 
@@ -241,7 +280,6 @@ Features:
 	mysql drop-in api lacks a few features
 	sybase/freetds (possibly others) need options for setting chained mode 
 		and isolation mode when client connects
-	sqlr-import/sqlr-export tools
 	support vector binds
 	handle output binds in Python-DB, Ruby-DBD
 	datatype support:
@@ -324,6 +362,7 @@ Native DB Support:
 	does clip provide an odbc driver for accessing x-base files?
 	daffodildb/one$db
 	LK bin DB - http://www.lksoft.cjb.net/en/
+	Cache - http://intersystems.com
 
 Config Tools:
 	gtk2

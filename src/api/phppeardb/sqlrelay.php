@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.4 2005-06-01 18:26:20 mused Exp $
+// $Id: sqlrelay.php,v 1.5 2005-06-24 01:13:03 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -27,7 +27,6 @@ require_once "DB/common.php";
 class DB_sqlrelay_cursor
 {
     var $cursor;
-    var $identity = "";
     var $connection;
     var $rownum = 0;
     var $prepare_tokens = array();
@@ -50,6 +49,7 @@ class DB_sqlrelay extends DB_common
     var $autocommit = false;
     var $fetchmode = DB_FETCHMODE_ORDERED; /* Default fetch mode */
     var $affectedrows = 0;
+    var $identity = "";
 
     // }}}
     // {{{ constructor
@@ -119,7 +119,6 @@ class DB_sqlrelay extends DB_common
 
         $this->connection = sqlrcon_alloc($host, $port, $socket,
                                             $user, $pw, $retrytime, $tries);
-sqlrcon_debugOn($this->connection);
         return DB_OK;
     }
 

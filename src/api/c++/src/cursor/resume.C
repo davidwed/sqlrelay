@@ -27,7 +27,7 @@ bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Resuming Result Set of Cursor: ");
-		sqlrc->debugPrint((int32_t)id);
+		sqlrc->debugPrint((int64_t)id);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}

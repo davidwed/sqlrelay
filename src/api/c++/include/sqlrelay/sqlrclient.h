@@ -109,11 +109,11 @@ class sqlrcursor {
 			sqlrcursor(sqlrconnection *sqlrc);
 			~sqlrcursor();
 
-		void	setResultSetBufferSize(uint32_t rows);
+		void	setResultSetBufferSize(uint64_t rows);
 				// Sets the number of rows of the result set
 				// to buffer at a time.  0 (the default)
 				// means buffer the entire result set.
-		uint32_t	getResultSetBufferSize();
+		uint64_t	getResultSetBufferSize();
 				// Returns the number of result set rows that 
 				// will be buffered at a time or 0 for the
 				// entire result set.
@@ -201,14 +201,14 @@ class sqlrcursor {
 				// in it and returns that number.
 
 		void	substitution(const char *variable, const char *value);
-		void	substitution(const char *variable, int32_t value);
+		void	substitution(const char *variable, int64_t value);
 		void	substitution(const char *variable, double value, 
 							uint32_t precision, 
 							uint32_t scale);
 				// Define a substitution variable.
 
 		void	inputBind(const char *variable, const char *value);
-		void	inputBind(const char *variable, int32_t value);
+		void	inputBind(const char *variable, int64_t value);
 		void	inputBind(const char *variable, double value, 
 							uint32_t precision, 
 							uint32_t scale);
@@ -235,7 +235,7 @@ class sqlrcursor {
 		void	substitutions(const char **variables,
 						const char **values);
 		void	substitutions(const char **variables,
-						const int32_t *values);
+						const int64_t *values);
 		void	substitutions(const char **variables,
 					const double *values,
 					const uint32_t *precisions, 
@@ -243,7 +243,7 @@ class sqlrcursor {
 				// Define an array of substitution variables.
 		void	inputBinds(const char **variables, const char **values);
 		void	inputBinds(const char **variables,
-					const int32_t *values);
+					const int64_t *values);
 		void	inputBinds(const char **variables,
 					const double *values, 
 					const uint32_t *precisions, 
@@ -269,7 +269,7 @@ class sqlrcursor {
 		const char	*getOutputBind(const char *variable);
 				// Get the value stored in a previously
 				// defined output bind variable.
-		int32_t	getOutputBindAsLong(const char *variable);
+		int64_t	getOutputBindAsInteger(const char *variable);
 				// Get the value stored in a previously
 				// defined output bind variable as a long
 				// integer.
@@ -292,19 +292,19 @@ class sqlrcursor {
 		uint32_t	colCount();
 				// Returns the number of columns in the current
 				// result set.
-		uint32_t	rowCount();
+		uint64_t	rowCount();
 				// Returns the number of rows in the current 
 				// result set (if the result set is being
 				// stepped through, this returns the number
 				// of rows processed so far).
-		uint32_t	totalRows();
+		uint64_t	totalRows();
 				// Returns the total number of rows that will 
 				// be returned in the result set.  Not all 
 				// databases support this call.  Don't use it 
 				// for applications which are designed to be 
 				// portable across databases.  -1 is returned
 				// by databases which don't support this option.
-		uint32_t	affectedRows();
+		uint64_t	affectedRows();
 				// Returns the number of rows that were 
 				// updated, inserted or deleted by the query.
 				// Not all databases support this call.  Don't 
@@ -312,7 +312,7 @@ class sqlrcursor {
 				// to be portable across databases.  -1 is 
 				// returned by databases which don't support 
 				// this option.
-		uint32_t	firstRowIndex();
+		uint64_t	firstRowIndex();
 				// Returns the index of the first buffered row.
 				// This is useful when buffering only part of
 				// the result set at a time.
@@ -341,26 +341,26 @@ class sqlrcursor {
 				// than as empty strings.
 
 
-		const char	*getField(uint32_t row, uint32_t col);
-		const char	*getField(uint32_t row, const char *col);
+		const char	*getField(uint64_t row, uint32_t col);
+		const char	*getField(uint64_t row, const char *col);
 				// Returns a pointer to the value of the 
 				// specified row and column.
-		int32_t	getFieldAsLong(uint32_t row, uint32_t col);
-		int32_t	getFieldAsLong(uint32_t row, const char *col);
+		int64_t	getFieldAsInteger(uint64_t row, uint32_t col);
+		int64_t	getFieldAsInteger(uint64_t row, const char *col);
 				// Returns the specified field as a long
 				// integer.
-		double	getFieldAsDouble(uint32_t row, uint32_t col);
-		double	getFieldAsDouble(uint32_t row, const char *col);
+		double	getFieldAsDouble(uint64_t row, uint32_t col);
+		double	getFieldAsDouble(uint64_t row, const char *col);
 				// Returns the specified field as a double
 				// precision floating point number.
-		uint32_t	getFieldLength(uint32_t row, uint32_t col);
-		uint32_t	getFieldLength(uint32_t row, const char *col);
+		uint32_t	getFieldLength(uint64_t row, uint32_t col);
+		uint32_t	getFieldLength(uint64_t row, const char *col);
 				// Returns the length of the 
 				// specified row and column.
-		const char * const *getRow(uint32_t row);
+		const char * const *getRow(uint64_t row);
 				// Returns a null terminated array of the 
 				// values of the fields in the specified row.
-		uint32_t	*getRowLengths(uint32_t row);
+		uint32_t	*getRowLengths(uint64_t row);
 				// Returns a null terminated array of the 
 				// lengths of the fields in the specified row.
 		const char * const *getColumnNames();

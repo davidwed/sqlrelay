@@ -169,11 +169,11 @@ class oracle8cursor : public sqlrcursor {
 		uint16_t	outbindlobcount;
 #endif
 
-		uint32_t	row;
-		uint32_t	maxrow;
-		uint32_t	totalrows;
+		uint64_t	row;
+		uint64_t	maxrow;
+		uint64_t	totalrows;
 
-		uint32_t	fetchatonce;
+		ub4		fetchatonce;
 
 		char		*query;
 		uint32_t	length;

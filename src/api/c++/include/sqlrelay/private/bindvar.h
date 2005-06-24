@@ -20,7 +20,7 @@ class bindvar {
 		char	*variable;
 		union {
 			char	*stringval;
-			int32_t	longval;
+			int64_t	longval;
 			struct {
 				double		value;
 				uint32_t	precision;

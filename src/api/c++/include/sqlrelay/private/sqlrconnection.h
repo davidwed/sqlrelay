@@ -16,7 +16,7 @@
 		void	debugPreStart();
 		void	debugPreEnd();
 		void	debugPrint(const char *string);
-		void	debugPrint(int32_t number);
+		void	debugPrint(int64_t number);
 		void	debugPrint(double number);
 		void	debugPrint(char character);
 		void	debugPrintBlob(const char *blob, uint32_t length);

@@ -7,9 +7,7 @@ void sqlrconnection::sendField(const char *data, uint32_t size) {
 
 	#ifdef SERVER_DEBUG
 	debugstr->append("\"");
-	for (uint32_t i=0; i<size; i++) {
-		debugstr->append(data[i]);
-	}
+	debugstr->append(data,size);
 	debugstr->append("\",");
 	#endif
 
@@ -27,16 +25,15 @@ void sqlrconnection::sendNullField() {
 	clientsock->write((uint16_t)NULL_DATA);
 }
 
-void sqlrconnection::startSendingLong() {
+void sqlrconnection::startSendingLong(uint64_t longlength) {
 	clientsock->write((uint16_t)START_LONG_DATA);
+	clientsock->write(longlength);
 }
 
 void sqlrconnection::sendLongSegment(const char *data, uint32_t size) {
 
 	#ifdef SERVER_DEBUG
-	for (uint32_t i=0; i<size; i++) {
-		debugstr->append(data[i]);
-	}
+	debugstr->append(data,size);
 	#endif
 
 	clientsock->write((uint16_t)NORMAL_DATA);

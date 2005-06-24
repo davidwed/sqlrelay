@@ -53,7 +53,7 @@ bool mysqlconnection::logIn() {
 	const char	*password=getPassword();
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	// Handle port and socket.
-	int		portval=(port && port[0])?charstring::toLong(port):0;
+	int		portval=(port && port[0])?charstring::toInteger(port):0;
 	const char	*socketval=(socket && socket[0])?socket:NULL;
 	#if MYSQL_VERSION_ID>=32200
 	// initialize database connection structure

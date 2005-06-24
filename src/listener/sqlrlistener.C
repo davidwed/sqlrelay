@@ -462,7 +462,7 @@ bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 	// if neither port nor unixport are specified, set up to 
 	// listen on the default inet port
 	if (!port && !unixport) {
-		port=charstring::toLong(DEFAULT_PORT);
+		port=charstring::toInteger(DEFAULT_PORT);
 		fprintf(stderr,"Warning! using default port.\n");
 	}
 

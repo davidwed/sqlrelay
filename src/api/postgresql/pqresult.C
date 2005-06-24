@@ -553,7 +553,7 @@ Oid PQftype(const PGresult *res, int field_num) {
 	// if the type is numeric then we're using a postgresql database and
 	// typemangling is turned off, so we'll just return the type
 	const char	*columntype=res->sqlrcur->getColumnType(field_num);
-	Oid	oid=charstring::toLong(columntype);
+	Oid	oid=charstring::toInteger(columntype);
 	if (oid) {
 		return oid;
 	}

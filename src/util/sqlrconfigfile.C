@@ -11,22 +11,22 @@
 #include <defaults.h>
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
-	port=charstring::toLong(DEFAULT_PORT);
+	port=charstring::toInteger(DEFAULT_PORT);
 	listenoninet=(port)?true:false;
 	unixport=charstring::duplicate(DEFAULT_SOCKET);
 	listenonunix=(unixport[0])?true:false;
 	dbase=charstring::duplicate(DEFAULT_DBASE);
-	connections=charstring::toLong(DEFAULT_CONNECTIONS);
-	maxconnections=charstring::toLong(DEFAULT_MAXCONNECTIONS);
-	maxqueuelength=charstring::toLong(DEFAULT_MAXQUEUELENGTH);
-	growby=charstring::toLong(DEFAULT_GROWBY);
-	ttl=charstring::toLong(DEFAULT_TTL);
+	connections=charstring::toInteger(DEFAULT_CONNECTIONS);
+	maxconnections=charstring::toInteger(DEFAULT_MAXCONNECTIONS);
+	maxqueuelength=charstring::toInteger(DEFAULT_MAXQUEUELENGTH);
+	growby=charstring::toInteger(DEFAULT_GROWBY);
+	ttl=charstring::toInteger(DEFAULT_TTL);
 	endofsession=charstring::duplicate(DEFAULT_ENDOFSESSION);
 	endofsessioncommit=!charstring::compare(endofsession,"commit");
-	sessiontimeout=charstring::toUnsignedLong(DEFAULT_SESSIONTIMEOUT);
+	sessiontimeout=charstring::toUnsignedInteger(DEFAULT_SESSIONTIMEOUT);
 	runasuser=charstring::duplicate(DEFAULT_RUNASUSER);
 	runasgroup=charstring::duplicate(DEFAULT_RUNASGROUP);
-	cursors=charstring::toLong(DEFAULT_CURSORS);
+	cursors=charstring::toInteger(DEFAULT_CURSORS);
 	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
 	authonlistener=charstring::contains(authtier,"listener");
 	authonconnection=charstring::contains(authtier,"connection");
@@ -435,10 +435,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 
 uint32_t sqlrconfigfile::atouint32_t(const char *value,
 				const char *defaultvalue, uint32_t minvalue) {
-	uint32_t	retval=charstring::toUnsignedLong(
+	uint32_t	retval=charstring::toUnsignedInteger(
 						(value)?value:defaultvalue);
 	if (retval<minvalue) {
-		retval=charstring::toUnsignedLong(defaultvalue);
+		retval=charstring::toUnsignedInteger(defaultvalue);
 	}
 	return retval;
 }
@@ -536,7 +536,7 @@ connectstringcontainer::connectstringcontainer(uint16_t connectstringcount) {
 	this->connectstringcount=connectstringcount;
 	connectionid=NULL;
 	string=NULL;
-	metric=charstring::toLong(DEFAULT_METRIC);
+	metric=charstring::toInteger(DEFAULT_METRIC);
 }
 
 connectstringcontainer::~connectstringcontainer() {

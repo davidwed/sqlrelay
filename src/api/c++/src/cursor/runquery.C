@@ -56,7 +56,7 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		sqlrc->debugPrint(query);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPrint("Length: ");
-		sqlrc->debugPrint((int32_t)querylen);
+		sqlrc->debugPrint((int64_t)querylen);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
@@ -78,7 +78,7 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("Requesting Cursor: ");
-				sqlrc->debugPrint((int32_t)cursorid);
+				sqlrc->debugPrint((int64_t)cursorid);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}
@@ -107,7 +107,7 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 			sqlrc->debugPrint("previous query.");
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPrint("Requesting Cursor: ");
-			sqlrc->debugPrint((int32_t)cursorid);
+			sqlrc->debugPrint((int64_t)cursorid);
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
@@ -127,7 +127,7 @@ void sqlrcursor::sendInputBinds() {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Sending ");
-		sqlrc->debugPrint((int32_t)inbindcount);
+		sqlrc->debugPrint((int64_t)inbindcount);
 		sqlrc->debugPrint(" Input Bind Variables:\n");
 		sqlrc->debugPreEnd();
 	}
@@ -152,7 +152,7 @@ void sqlrcursor::sendInputBinds() {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint(inbindvars[i].variable);
 			sqlrc->debugPrint("(");
-			sqlrc->debugPrint((int32_t)size);
+			sqlrc->debugPrint((int64_t)size);
 		}
 
 		// send the type
@@ -179,7 +179,7 @@ void sqlrcursor::sendInputBinds() {
 				sqlrc->debugPrint(inbindvars[i].
 							value.stringval);
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((int32_t)inbindvars[i].
+				sqlrc->debugPrint((int64_t)inbindvars[i].
 								valuesize);
 				sqlrc->debugPrint(")");
 				sqlrc->debugPrint("\n");
@@ -190,13 +190,13 @@ void sqlrcursor::sendInputBinds() {
 
 			char	negative=inbindvars[i].value.longval<0?1:0;
 			sqlrc->cs->write(negative);
-			sqlrc->cs->write((uint32_t)
+			sqlrc->cs->write((uint64_t)
 					(inbindvars[i].value.longval*
 					 		((negative)?-1:1)));
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint(":LONG)=");
-				sqlrc->debugPrint((int32_t)inbindvars[i].
+				sqlrc->debugPrint((int64_t)inbindvars[i].
 								value.longval);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
@@ -216,10 +216,10 @@ void sqlrcursor::sendInputBinds() {
 				sqlrc->debugPrint(inbindvars[i].value.
 							doubleval.value);
 				sqlrc->debugPrint(":");
-				sqlrc->debugPrint((int32_t)inbindvars[i].value.
+				sqlrc->debugPrint((int64_t)inbindvars[i].value.
 							doubleval.precision);
 				sqlrc->debugPrint(",");
-				sqlrc->debugPrint((int32_t)inbindvars[i].value.
+				sqlrc->debugPrint((int64_t)inbindvars[i].value.
 							doubleval.scale);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
@@ -248,7 +248,7 @@ void sqlrcursor::sendInputBinds() {
 						inbindvars[i].valuesize);
 				}
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((int32_t)inbindvars[i].
+				sqlrc->debugPrint((int64_t)inbindvars[i].
 								valuesize);
 				sqlrc->debugPrint(")");
 				sqlrc->debugPrint("\n");
@@ -292,7 +292,7 @@ void sqlrcursor::sendOutputBinds() {
 			sqlrc->debugPrint(outbindvars[i].variable);
 			if (outbindvars[i].type!=CURSOR_BIND) {
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((int32_t)outbindvars[i].
+				sqlrc->debugPrint((int64_t)outbindvars[i].
 								valuesize);
 				sqlrc->debugPrint(")");
 			}

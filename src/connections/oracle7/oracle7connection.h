@@ -123,9 +123,9 @@ class oracle7cursor : public sqlrcursor {
 		ub2		def_col_retcode[MAX_SELECT_LIST_SIZE]
 							[FETCH_AT_ONCE];
 	
-		uint32_t	row;
-		uint32_t	maxrow;
-		uint32_t	totalrows;
+		uint64_t	row;
+		uint64_t	maxrow;
+		uint64_t	totalrows;
 
 		oracle7connection	*oracle7conn;
 };

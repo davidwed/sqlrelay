@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC SIDINCLUDES SIDLIBS MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLPREFIX PERLCYGDRIVEPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB PYTHON_HAVE_WEAKREF HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYCYGDRIVEPREFIX RUBYLIB HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPLIB PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC SIDINCLUDES SIDLIBS MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLPREFIX PERLCYGDRIVEPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYCYGDRIVEPREFIX RUBYLIB HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPLIB PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -23586,15 +23586,13 @@ echo "******************************"
 echo
 echo "***** Libraries **************"
 
-PRELIBS=$LIBS
-LIBS="-lhistory -ltermcap"
-echo "$as_me:$LINENO: checking for readline in -lreadline" >&5
-echo $ECHO_N "checking for readline in -lreadline... $ECHO_C" >&6
-if test "${ac_cv_lib_readline_readline+set}" = set; then
+echo "$as_me:$LINENO: checking for tgetnum in -ltermcap" >&5
+echo $ECHO_N "checking for tgetnum in -ltermcap... $ECHO_C" >&6
+if test "${ac_cv_lib_termcap_tgetnum+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lreadline  $LIBS"
+LIBS="-ltermcap  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -23608,11 +23606,11 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
    builtin and then its argument prototype would still apply.  */
-char readline ();
+char tgetnum ();
 int
 main ()
 {
-readline ();
+tgetnum ();
   ;
   return 0;
 }
@@ -23639,29 +23637,28 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_readline_readline=yes
+  ac_cv_lib_termcap_tgetnum=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_readline_readline=no
+ac_cv_lib_termcap_tgetnum=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_readline_readline" >&5
-echo "${ECHO_T}$ac_cv_lib_readline_readline" >&6
-if test $ac_cv_lib_readline_readline = yes; then
-  READLINELIB="-lreadline"
+echo "$as_me:$LINENO: result: $ac_cv_lib_termcap_tgetnum" >&5
+echo "${ECHO_T}$ac_cv_lib_termcap_tgetnum" >&6
+if test $ac_cv_lib_termcap_tgetnum = yes; then
+  TERMCAPLIB="-ltermcap"
 else
-  READLINELIB=""
+  TERMCAPLIB=""
 fi
 
-LIBS=$PRELIBS
 
 PRELIBS=$LIBS
-LIBS="-ltermcap"
+LIBS="$TERMCAPLIB"
 echo "$as_me:$LINENO: checking for add_history in -lhistory" >&5
 echo $ECHO_N "checking for add_history in -lhistory... $ECHO_C" >&6
 if test "${ac_cv_lib_history_add_history+set}" = set; then
@@ -23734,13 +23731,15 @@ fi
 
 LIBS=$PRELIBS
 
-echo "$as_me:$LINENO: checking for tgetnum in -ltermcap" >&5
-echo $ECHO_N "checking for tgetnum in -ltermcap... $ECHO_C" >&6
-if test "${ac_cv_lib_termcap_tgetnum+set}" = set; then
+PRELIBS=$LIBS
+LIBS="$HISTORYLIB $TERMCAPLIB"
+echo "$as_me:$LINENO: checking for readline in -lreadline" >&5
+echo $ECHO_N "checking for readline in -lreadline... $ECHO_C" >&6
+if test "${ac_cv_lib_readline_readline+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-ltermcap  $LIBS"
+LIBS="-lreadline  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -23754,11 +23753,11 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
    builtin and then its argument prototype would still apply.  */
-char tgetnum ();
+char readline ();
 int
 main ()
 {
-tgetnum ();
+readline ();
   ;
   return 0;
 }
@@ -23785,27 +23784,28 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_termcap_tgetnum=yes
+  ac_cv_lib_readline_readline=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_termcap_tgetnum=no
+ac_cv_lib_readline_readline=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_termcap_tgetnum" >&5
-echo "${ECHO_T}$ac_cv_lib_termcap_tgetnum" >&6
-if test $ac_cv_lib_termcap_tgetnum = yes; then
-  TERMCAPLIB="-ltermcap"
+echo "$as_me:$LINENO: result: $ac_cv_lib_readline_readline" >&5
+echo "${ECHO_T}$ac_cv_lib_readline_readline" >&6
+if test $ac_cv_lib_readline_readline = yes; then
+  READLINELIB="-lreadline"
 else
-  TERMCAPLIB=""
+  READLINELIB=""
 fi
 
+LIBS=$PRELIBS
 
-if ( test -n "$READLINELIB" -a -n "$HISTORYLIB" -a -n "$TERMCAPLIB" ); then
+if ( test -n "$READLINELIB" ); then
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_READLINE 1
@@ -23815,12 +23815,6 @@ _ACEOF
 fi
 
 
-#AC_CHECK_LIB(socket,socket,SOCKETLIB=-lsocket,SOCKETLIB="")
-#AC_SUBST(SOCKETLIB)
-#AC_CHECK_LIB(xnet,gethostbyname,XNETLIB=-lxnet,XNETLIB="")
-#AC_SUBST(XNETLIB)
-#AC_CHECK_LIB(nsl,gethostbyname,NSLLIB=-lnsl,NSLLIB="")
-#AC_SUBST(NSLLIB)
 
 	ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -33345,7 +33339,7 @@ fi
 
 
 SEARCHPATH=$MDBTOOLSPATH
-NAME=mdbsql
+NAME=mdb
 HEADER=mdbsql.h
 LIBNAME=mdbsql
 LINKSTATIC=$STATICFLAG
@@ -34055,7 +34049,7 @@ echo "******************************"
 
 
 echo
-echo "***** Python *****************"
+echo "***** Python 2.1 or newer ****"
 
 if ( test "$ENABLE_PYTHON" = "yes" )
 then
@@ -34076,7 +34070,7 @@ then
 		if ( test -n "$PYTHONPATH" )
 		then
 
-			for i in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
+			for i in "2.4" "2.3" "2.2" "2.1"
 			do
 				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/$LIBDIR/python$i/config" )
 				then
@@ -34104,7 +34098,7 @@ then
 			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
 			then
 
-				for i in "24" "23" "22" "21" "20" "16" "15"
+				for i in "24" "23" "22" "21"
 				do
 
 FOUNDHEADER=""
@@ -34155,7 +34149,7 @@ fi
 
 		else
 
-			for j in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"
+			for j in "2.4" "2.3" "2.2" "2.1"
 			do
 				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j"
 				do
@@ -34197,7 +34191,7 @@ fi
 			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
 			then
 
-				for j in "24" "23" "22" "21" "20" "16" "15"
+				for j in "24" "23" "22" "21"
 				do
 
 FOUNDHEADER=""
@@ -34262,13 +34256,6 @@ if ( test -n "$PYTHONINCLUDES" )
 then
 	echo "python includes... $PYTHONINCLUDES"
 fi
-
-
-	PYTHON_HAVE_WEAKREF=""
-	if ( test "$PYTHONVERSION" -ge "21" )
-	then
-		PYTHON_HAVE_WEAKREF="yes"
-	fi
 
 
 
@@ -39137,7 +39124,6 @@ s,@HAVE_PYTHON@,$HAVE_PYTHON,;t t
 s,@PYTHONINCLUDES@,$PYTHONINCLUDES,;t t
 s,@PYTHONDIR@,$PYTHONDIR,;t t
 s,@PYTHONLIB@,$PYTHONLIB,;t t
-s,@PYTHON_HAVE_WEAKREF@,$PYTHON_HAVE_WEAKREF,;t t
 s,@HAVE_ZOPE@,$HAVE_ZOPE,;t t
 s,@ZOPEDIR@,$ZOPEDIR,;t t
 s,@RUBY@,$RUBY,;t t

@@ -33,15 +33,6 @@ struct fieldstruct {
 	short		nullindicator;
 };
 
-static char tpb[] = {
-	isc_tpb_version3,
-	isc_tpb_write,
-	isc_tpb_read_committed,
-	isc_tpb_rec_version,
-	// FIXME: vladimir changed this to isc_tpb_nowait.  why?
-	isc_tpb_wait
-};
-
 class interbaseconnection;
 
 class interbasecursor : public sqlrcursor {
@@ -114,7 +105,7 @@ class interbaseconnection : public sqlrconnection {
 		bool	commit();
 		bool	rollback();
 		bool	ping();
-		char	*identify();
+		const char	*identify();
 
 		char		dpb[256];
 		short		dpblength;

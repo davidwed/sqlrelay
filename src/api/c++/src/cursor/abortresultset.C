@@ -14,7 +14,7 @@ void sqlrcursor::abortResultSet() {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Aborting Result Set For Cursor: ");
-		sqlrc->debugPrint((int32_t)cursorid);
+		sqlrc->debugPrint((int64_t)cursorid);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}

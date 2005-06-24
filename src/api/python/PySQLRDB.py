@@ -151,7 +151,7 @@ class SQLRCursor:
 	self.execute(procname,parameters)
         
     def fetchone(self):
-        row=CSQLRelay.getRow(self.cursor,self.cur_row)
+        row=__getRow(self.cur_row)
         self.cur_row=self.cur_row+1
         return row
 
@@ -161,7 +161,7 @@ class SQLRCursor:
         num_rows=CSQLRelay.rowCount(self.cursor)
         if size>=num_rows:
             size=num_rows-1
-        rc=CSQLRelay.getRowRange(self.cursor, self.cur_row, size)
+        rc=__getRowRange(self.cur_row, size)
         self.cur_row=size
         return rc
 
@@ -169,7 +169,7 @@ class SQLRCursor:
         rc=[]
         num_rows=CSQLRelay.rowCount(self.cursor)
         for row in range(self.cur_row, num_rows):
-            row=CSQLRelay.getRow(self.cursor,self.cur_row)
+            row=__getRow(self.cur_row)
             self.cur_row=self.cur_row+1
             rc.append(row)
         return rc
@@ -193,3 +193,17 @@ class SQLRCursor:
             desc.append(tuple(row))
         self.description=tuple(desc)
         return tuple(desc)
+
+    def __getRow(self, row):
+	# FIXME: go through each field, if the column type is a date/time
+	# column, then create a DateTime object and return it instead of
+	# a string
+        rc=CSQLRelay.getRow(self.cursor,row)
+	return rc
+
+    def __getRowRange(self, row, size):
+	# FIXME: go through each field, if the column type is a date/time
+	# column, then create a DateTime object and return it instead of
+	# a string
+        rc=CSQLRelay.getRowRange(self.cursor,row,size)
+	return rc

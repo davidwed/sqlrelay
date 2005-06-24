@@ -91,7 +91,7 @@ bool postgresqlconnection::logIn() {
 		// copy the datatype ids/names into the buffers
 		for (int i=0; i<datatypecount; i++) {
 			datatypeids[i]=
-				charstring::toLong(PQgetvalue(result,i,0));
+				charstring::toInteger(PQgetvalue(result,i,0));
 			datatypenames[i]=
 				charstring::duplicate(PQgetvalue(result,i,1));
 		}
@@ -195,7 +195,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	char	*affrows=PQcmdTuples(pgresult);
 	affectedrows=0;
 	if (affrows && affrows[0]) {
-		affectedrows=charstring::toUnsignedLong(affrows);
+		affectedrows=charstring::toInteger(affrows);
 	}
 
 	return true;

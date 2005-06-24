@@ -159,10 +159,10 @@ bool oracle7cursor::inputBindString(const char *variable,
 
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
-		if (obndrn(&cda,(sword)charstring::toLong(variable+1),
+		if (obndrn(&cda,(sword)charstring::toInteger(variable+1),
 			(ub1 *)value,(sword)valuesize+1,
 			NULL_TERMINATED_STRING,
 			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
@@ -185,10 +185,10 @@ bool oracle7cursor::inputBindLong(const char *variable,
 	
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
-		if (obndrn(&cda,(sword)charstring::toLong(variable+1),
+		if (obndrn(&cda,(sword)charstring::toInteger(variable+1),
 			(ub1 *)value,(sword)sizeof(uint32_t),LONG_BIND_TYPE,
 			-1,(sb2 *)0,(text *)0,-1,-1)) {
 			return false;
@@ -211,10 +211,10 @@ bool oracle7cursor::inputBindDouble(const char *variable,
 	
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
-		if (obndrn(&cda,(sword)charstring::toLong(variable+1),
+		if (obndrn(&cda,(sword)charstring::toInteger(variable+1),
 			(ub1 *)value,(sword)sizeof(double),DOUBLE_BIND_TYPE,
 			(sword)scale,(sb2 *)0,(text *)0,-1,-1)) {
 			return false;
@@ -237,10 +237,10 @@ bool oracle7cursor::outputBindString(const char *variable,
 
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toLong(variable+1)) {
+		if (!charstring::toInteger(variable+1)) {
 			return false;
 		}
-		if (obndrn(&cda,(sword)charstring::toLong(variable+1),
+		if (obndrn(&cda,(sword)charstring::toInteger(variable+1),
 			(ub1 *)value,(sword)valuesize,
 			NULL_TERMINATED_STRING,
 			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
@@ -459,7 +459,7 @@ void oracle7cursor::returnRow() {
 			ub4	retlen=MAX_ITEM_BUFFER_SIZE;
 			sb4	offset=0;
 
-			conn->startSendingLong();
+			conn->startSendingLong(def_col_retlen[col][row]);
 
 			while (retlen==MAX_ITEM_BUFFER_SIZE) {
 

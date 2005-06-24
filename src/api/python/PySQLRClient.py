@@ -393,13 +393,13 @@ class sqlrcursor:
         """
         return CSQLRelay.getOutputBind(self.cursor, variable)
 
-    def getOutputBindAsLong(self, variable):
+    def getOutputBindAsInteger(self, variable):
         """
         Get the value stored in a previously
         defined output bind variable as a long
         integer.
         """
-        return CSQLRelay.getOutputBindAsLong(self.cursor, variable)
+        return CSQLRelay.getOutputBindAsInteger(self.cursor, variable)
 
     def getOutputBindAsDouble(self, variable):
         """
@@ -515,11 +515,11 @@ class sqlrcursor:
         """
         return CSQLRelay.getField(self.cursor, row, col)
 
-    def getFieldAsLong(self, row, col):
+    def getFieldAsInteger(self, row, col):
         """
         Returns the specified field as a long integer.
         """
-        return CSQLRelay.getFieldAsLong(self.cursor, row, col)
+        return CSQLRelay.getFieldAsInteger(self.cursor, row, col)
 
     def getFieldAsDouble(self, row, col):
         """

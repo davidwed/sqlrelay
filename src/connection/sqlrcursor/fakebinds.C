@@ -56,7 +56,7 @@ stringbuffer *sqlrcursor::fakeInputBinds(const char *query) {
 				//      select 3,35 from mytable
 				if (
 					(*ptr=='?' && 
-					charstring::toLong(
+					charstring::toInteger(
 						inbindvars[i].variable+1)==
 									index) 
 

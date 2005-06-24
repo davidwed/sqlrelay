@@ -21,7 +21,7 @@ void sqlrcursor::prepareQuery(const char *query, uint32_t length) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("The query is too large.  ");
 			sqlrc->debugPrint("MAXQUERYSIZE is ");
-			sqlrc->debugPrint((int32_t)MAXQUERYSIZE);
+			sqlrc->debugPrint((int64_t)MAXQUERYSIZE);
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
@@ -144,7 +144,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 			sqlrc->debugPrint(fullpath);
 			sqlrc->debugPrint(" is too large. ");
 			sqlrc->debugPrint("MAXQUERYSIZE is ");
-			sqlrc->debugPrint((int32_t)MAXQUERYSIZE);
+			sqlrc->debugPrint((int64_t)MAXQUERYSIZE);
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}

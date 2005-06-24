@@ -85,10 +85,10 @@ class db2cursor : public sqlrcursor {
 #endif
 		column 		col[MAX_SELECT_LIST_SIZE];
 
-		uint32_t	rowgroupindex;
-		uint32_t	totalinrowgroup;
-		uint32_t	totalrows;
-		uint32_t	rownumber;
+		uint64_t	rowgroupindex;
+		uint64_t	totalinrowgroup;
+		uint64_t	totalrows;
+		uint64_t	rownumber;
 
 		stringbuffer	*errormsg;
 
@@ -110,8 +110,8 @@ class db2connection : public sqlrconnection {
 		bool	autoCommitOff();
 		bool	commit();
 		bool	rollback();
-		char	*pingQuery();
-		char	*identify();
+		const char	*pingQuery();
+		const char	*identify();
 
 		SQLHENV		env;
 		SQLRETURN	erg;

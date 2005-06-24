@@ -1215,7 +1215,7 @@ int mysql_fetch(MYSQL_STMT *stmt) {
 
 	unsigned long	*lengths=mysql_fetch_lengths(stmt->result);
 
-	for (int i=0; i<stmt->result->sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<stmt->result->sqlrcur->colCount(); i++) {
 		*(stmt->resultbinds[i].length)=lengths[i];
 		if (!row[i]) {
 			*(stmt->resultbinds[i].is_null)=true;

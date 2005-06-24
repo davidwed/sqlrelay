@@ -179,7 +179,7 @@ public class SQLRCursor {
 	/** Get the value stored in a previously
 	 *  defined output bind variable as a long
 	 *  integer. */
-	public native long	getOutputBindAsLong(String variable);
+	public native long	getOutputBindAsInteger(String variable);
 	/** Get the value stored in a previously
 	 *  defined output bind variable as a double
 	 *  precision floating point number. */
@@ -259,9 +259,9 @@ public class SQLRCursor {
 	 *  specified row and column.  */
 	public native String	getField(int row, String col);
 	/** Returns the specified field as a long integer */
-	public native long	getFieldAsLong(int row, int col);
+	public native long	getFieldAsInteger(int row, int col);
 	/** Returns the specified field as a long integer */
-	public native long	getFieldAsLong(int row, String col);
+	public native long	getFieldAsInteger(int row, String col);
 	/** Returns the specified field as a double floating point number */
 	public native double	getFieldAsDouble(int row, int col);
 	/** Returns the specified field as a double floating point number */

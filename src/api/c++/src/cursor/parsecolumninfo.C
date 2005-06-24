@@ -25,13 +25,13 @@ bool sqlrcursor::parseColumnInfo() {
 
 	// get the number of rows returned by the query
 	if (knowsactualrows==ACTUAL_ROWS) {
-		if (getLong(&actualrows)!=sizeof(uint32_t)) {
+		if (getLongLong(&actualrows)!=sizeof(uint64_t)) {
 			setError("Failed to get the number of actual rows.\n A network error may have occurred.");
 			return false;
 		}
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
-			sqlrc->debugPrint((int32_t)actualrows);
+			sqlrc->debugPrint((int64_t)actualrows);
 			sqlrc->debugPreEnd();
 		}
 	} else {
@@ -57,13 +57,13 @@ bool sqlrcursor::parseColumnInfo() {
 
 	// get the number of rows affected by the query
 	if (knowsaffectedrows==AFFECTED_ROWS) {
-		if (getLong(&affectedrows)!=sizeof(uint32_t)) {
+		if (getLongLong(&affectedrows)!=sizeof(uint64_t)) {
 			setError("Failed to get the number of affected rows.\n A network error may have occurred.");
 			return false;
 		}
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
-			sqlrc->debugPrint((int32_t)affectedrows);
+			sqlrc->debugPrint((int64_t)affectedrows);
 			sqlrc->debugPreEnd();
 		}
 	} else {
@@ -94,7 +94,7 @@ bool sqlrcursor::parseColumnInfo() {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Column count: ");
-		sqlrc->debugPrint((int32_t)colcount);
+		sqlrc->debugPrint((int64_t)colcount);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
@@ -230,12 +230,12 @@ bool sqlrcursor::parseColumnInfo() {
 							currentcol->type]);
 				}
 				sqlrc->debugPrint("\", ");
-				sqlrc->debugPrint((int32_t)currentcol->length);
+				sqlrc->debugPrint((int64_t)currentcol->length);
 				sqlrc->debugPrint(" (");
-				sqlrc->debugPrint((int32_t)
+				sqlrc->debugPrint((int64_t)
 							currentcol->precision);
 				sqlrc->debugPrint(",");
-				sqlrc->debugPrint((int32_t)currentcol->scale);
+				sqlrc->debugPrint((int64_t)currentcol->scale);
 				sqlrc->debugPrint(") ");
 				if (!currentcol->nullable) {
 					sqlrc->debugPrint("NOT NULL ");
