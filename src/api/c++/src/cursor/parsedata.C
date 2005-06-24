@@ -126,13 +126,21 @@ bool sqlrcursor::parseData() {
 
 		} else if (type==START_LONG_DATA) {
 
+			unsigned long	totallength;
+			if (getLong(&totallength)!=sizeof(unsigned long)) {
+				setError("Failed to get total length.\n A network error may have occurred");
+				return false;
+			}
+
+			buffer=new char[totallength+1];
+
 			// handle a long datatype
-			char	*oldbuffer=NULL;
-			int	totallength=0;
+			unsigned long	offset=0;
 			for (;;) {
 
 				// get the type of the chunk
 				if (getShort(&type)!=sizeof(unsigned short)) {
+					delete[] buffer;
 					setError("Failed to get chunk type.\n A network error may have occurred");
 					return false;
 				}
@@ -149,35 +157,22 @@ bool sqlrcursor::parseData() {
 					return false;
 				}
 
-				// create a buffer to hold the chunk
-				buffer=new char[totallength+length+1];
-				if (totallength) {
-					rawbuffer::copy(buffer,oldbuffer,
-								totallength);
-					delete[] oldbuffer;
-					oldbuffer=buffer;
-					buffer=buffer+totallength;
-				} else {
-					oldbuffer=buffer;
-				}
-				totallength=totallength+length;
-
 				// get the chunk of data
-				if ((unsigned long)getString(buffer,length)!=
-								length) {
+				if ((unsigned long)getString(buffer+offset,
+							length)!=length) {
 					delete[] buffer;
 					setError("Failed to get chunk data.\n A network error may have occurred");
 					return false;
 				}
 
-				// NULL terminate the buffer.  This makes 
-				// certain operations safer and won't hurt
-				// since the actual length (which doesn't
-				// include the NULL) is available from
-				// getFieldLength.
-				buffer[length]=(char)NULL;
+				offset=offset+length;
 			}
-			buffer=oldbuffer;
+			// NULL terminate the buffer.  This makes 
+			// certain operations safer and won't hurt
+			// since the actual length (which doesn't
+			// include the NULL) is available from
+			// getFieldLength.
+			buffer[totallength]=(char)NULL;
 			length=totallength;
 
 		}

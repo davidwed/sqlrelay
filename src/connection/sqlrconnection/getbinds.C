@@ -210,14 +210,14 @@ bool sqlrconnection::getBindSize(bindvar *bv, unsigned long maxsize) {
 	}
 
 	// bounds checking
-	if (bv->valuesize>maxsize) {
+	/*if (bv->valuesize>maxsize) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 				"getting binds failed: bad value length");
 		debugPrint("connection",3,(long)bv->valuesize);
 		#endif
 		return false;
-	}
+	}*/
 
 	return true;
 }

@@ -457,7 +457,7 @@ void oracle7cursor::returnRow() {
 			ub4	retlen=MAX_ITEM_BUFFER_SIZE;
 			sb4	offset=0;
 
-			conn->startSendingLong();
+			conn->startSendingLong(def_col_retlen[col][row]);
 
 			while (retlen==MAX_ITEM_BUFFER_SIZE) {
 

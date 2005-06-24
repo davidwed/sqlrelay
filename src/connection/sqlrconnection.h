@@ -121,7 +121,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 						unsigned short autoincrement);
 		void		sendField(const char *data, unsigned long size);
 		void		sendNullField();
-		void		startSendingLong();
+		void		startSendingLong(unsigned long length);
 		void		sendLongSegment(const char *data,
 						unsigned long size);
 		void		endSendingLong();

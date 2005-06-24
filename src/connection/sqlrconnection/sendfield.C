@@ -27,8 +27,9 @@ void sqlrconnection::sendNullField() {
 	clientsock->write((unsigned short)NULL_DATA);
 }
 
-void sqlrconnection::startSendingLong() {
+void sqlrconnection::startSendingLong(unsigned long length) {
 	clientsock->write((unsigned short)START_LONG_DATA);
+	clientsock->write(length);
 }
 
 void sqlrconnection::sendLongSegment(const char *data, unsigned long size) {

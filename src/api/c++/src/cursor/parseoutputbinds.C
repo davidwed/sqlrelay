@@ -75,15 +75,23 @@ bool sqlrcursor::parseOutputBinds() {
 
 		} else {
 
-			char	*buffer=NULL;
-			char	*oldbuffer=NULL;
 			unsigned long	totallength=0;
+			if (getLong(&totallength)!=sizeof(unsigned long)) {
+				setError("Failed to get total length.\n A network error may have occurred.");
+				return false;
+			}
+
+			// create a buffer to hold the data
+			char	*buffer=new char[totallength+1];
+
+			unsigned long	offset=0;
 			unsigned long	length;
 			for (;;) {
 
 				// get the type of the chunk
 				if (getShort(&type)!=
 						sizeof(unsigned short)) {
+					delete[] buffer;
 					setError("Failed to get chunk type.\n A network error may have occurred.");
 					return false;
 				}
@@ -100,35 +108,23 @@ bool sqlrcursor::parseOutputBinds() {
 					return false;
 				}
 
-				// create a buffer to hold the chunk
-				buffer=new char[totallength+length+1];
-				if (totallength) {
-					rawbuffer::copy(buffer,oldbuffer,
-								totallength);
-					delete[] oldbuffer;
-					oldbuffer=buffer;
-					buffer=buffer+totallength;
-				} else {
-					oldbuffer=buffer;
-				}
-				totallength=totallength+length;
-
 				// get the chunk of data
-				if ((unsigned long)getString(buffer,length)!=
-								length) {
+				if ((unsigned long)getString(buffer+offset,
+							length)!=length) {
 					delete[] buffer;
 					setError("Failed to get chunk data.\n A network error may have occurred.");
 					return false;
 				}
 
-				// NULL terminate the buffer.  This makes 
-				// certain operations safer and won't hurt
-				// since the actual length (which doesn't
-				// include the NULL) is available from
-				// getOutputBindLength.
-				buffer[length]=(char)NULL;
+				offset=offset+length;
 			}
-			outbindvars[count].value.lobval=oldbuffer;
+			// NULL terminate the buffer.  This makes 
+			// certain operations safer and won't hurt
+			// since the actual length (which doesn't
+			// include the NULL) is available from
+			// getOutputBindLength.
+			buffer[totallength]=(char)NULL;
+			outbindvars[count].value.lobval=buffer;
 			outbindvars[count].valuesize=totallength;
 		}
 

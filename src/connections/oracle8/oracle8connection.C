@@ -870,7 +870,7 @@ void oracle8cursor::returnOutputBindGenericLob(int index) {
 			break;
 		} else {
 			if (start) {
-				conn->startSendingLong();
+				conn->startSendingLong(loblength);
 				start=0;
 			}
 			conn->sendLongSegment((char *)buf,(long)retlen);
@@ -887,7 +887,7 @@ void oracle8cursor::returnOutputBindGenericLob(int index) {
 
 	// handle empty lob's
 	if (!loblength) {
-		conn->startSendingLong();
+		conn->startSendingLong(0);
 		conn->sendLongSegment("",0);
 		conn->endSendingLong();
 	}
@@ -1323,7 +1323,8 @@ void oracle8cursor::returnRow() {
 					break;
 				} else {
 					if (start) {
-						conn->startSendingLong();
+						conn->startSendingLong(
+								loblength);
 						start=false;
 					}
 					conn->sendLongSegment(
@@ -1342,7 +1343,7 @@ void oracle8cursor::returnRow() {
 
 			// handle empty lob's
 			if (!loblength) {
-				conn->startSendingLong();
+				conn->startSendingLong(0);
 				conn->sendLongSegment("",0);
 				conn->endSendingLong();
 			}
