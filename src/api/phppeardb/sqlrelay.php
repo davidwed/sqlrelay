@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.3.2.3 2005-06-01 18:25:12 mused Exp $
+// $Id: sqlrelay.php,v 1.3.2.4 2005-06-30 02:54:47 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -91,7 +91,8 @@ class DB_sqlrelay extends DB_common
 
         $hasloadextension = false;
         foreach (get_class_methods(get_class($this)) as $method) {
-            if ($method == "loadextension") {
+printf("$method\n");
+            if ($method == "loadextension" || $method == "loadExtension") {
                 $hasloadextension = true;
                 break;
             }
@@ -348,10 +349,8 @@ sqlrcon_debugOn($this->connection);
     {
         sqlrcur_clearBinds($sqlrcursor->cursor);
         if ($data) {
-            while ($element = current($data)) {
-                $index = key($data);
-                sqlrcur_inputBind($sqlrcursor->cursor, $index, $data["$index"]);
-                next($data);
+            foreach ($data as $index=>$value) {
+                sqlrcur_inputBind($sqlrcursor->cursor, $index, $value);
             }
         }
         if (!sqlrcur_executeQuery($sqlrcursor->cursor)) {
