@@ -1,6 +1,10 @@
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection
 	added const to *connection::identify()/pingQuery() methods
+	improved efficency of sending lob's
+	added Py_INCREF(Py_None) before returning Py_None's or adding them
+		to an array
+	fixed php pear db bug that caused NULL values not to be inserted
 
 0.36.3 - added allowShortReads option to non-readline sqlrsh build
 	fixes to php pear db driver for autoExecute

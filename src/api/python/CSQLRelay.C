@@ -722,6 +722,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
   }
   Py_END_ALLOW_THREADS
   if (!rc) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
   return Py_BuildValue("s#", rc, rl);
@@ -791,10 +792,12 @@ _get_row(sqlrcursor *sqlrcur, int row)
   row_data=sqlrcur->getRow(row);
   Py_END_ALLOW_THREADS
   if (!row_data) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
   for (counter = 0; counter < num_cols; ++counter) {
     if (!row_data[counter]) {
+        Py_INCREF(Py_None);
         PyList_SetItem(my_list, counter, Py_None);
     } else if (isNumberTypeChar(sqlrcur->getColumnType(counter))) {
       if (!charstring::contains(row_data[counter], '.')) {
@@ -842,6 +845,7 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
       if (field) {
         PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("s",field));
       } else {
+        Py_INCREF(Py_None);
         PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_None);
       }
     }
@@ -881,10 +885,12 @@ _get_row_lengths(sqlrcursor *sqlrcur, int row)
   row_data=sqlrcur->getRowLengths(row);
   Py_END_ALLOW_THREADS
   if (!row_data) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
   for (counter = 0; counter < num_cols; ++counter) {
     if (!row_data[counter]) {
+        Py_INCREF(Py_None);
         PyList_SetItem(my_list, counter, Py_None);
     } else {
       PyList_SetItem(my_list, counter, Py_BuildValue("l", row_data[counter]));
@@ -964,6 +970,7 @@ static PyObject *getColumnNames(PyObject *self, PyObject *args) {
     }
     return my_list;
   }
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
