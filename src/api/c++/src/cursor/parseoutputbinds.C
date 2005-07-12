@@ -37,13 +37,7 @@ bool sqlrcursor::parseOutputBinds() {
 		} else if (type==NULL_DATA) {
 
 			// handle a null value
-			if (returnnulls) {
-				outbindvars[count].value.stringval=NULL;
-			} else {
-				outbindvars[count].value.stringval=new char[1];
-				outbindvars[count].value.stringval[0]=
-								(char)NULL;
-			}
+			outbindvars[count].value.stringval=NULL;
 
 		} else if (type==NORMAL_DATA) {
 

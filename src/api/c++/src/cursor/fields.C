@@ -30,7 +30,11 @@ const char *sqlrcursor::getField(int row, int col) {
 		int	rowbufferindex=fetchRowIntoBuffer(row);
 
 		if (rowbufferindex>-1) {
-			return getFieldInternal(rowbufferindex,col);
+			char	*field=getFieldInternal(rowbufferindex,col);
+			if (!field && !returnnulls) {
+				return "";
+			}
+			return field;
 		}
 	}
 	return NULL;
@@ -62,8 +66,12 @@ const char *sqlrcursor::getField(int row, const char *col) {
 				int	rowbufferindex=fetchRowIntoBuffer(row);
 
 				if (rowbufferindex>-1) {
-					return getFieldInternal(
+					char	*field=getFieldInternal(
 							rowbufferindex,i);
+					if (!field && !returnnulls) {
+						return "";
+					}
+					return field;
 				}
 				return NULL;
 			}
@@ -158,6 +166,9 @@ void sqlrcursor::createFields() {
 		fields[i][colcount]=(char *)NULL;
 		for (unsigned long j=0; j<colcount; j++) {
 			fields[i][j]=getFieldInternal(i,j);
+			if (!fields[i][j] && !returnnulls) {
+				fields[i][j]="";
+			}
 		}
 	}
 }

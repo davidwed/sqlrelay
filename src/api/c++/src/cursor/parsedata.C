@@ -99,12 +99,7 @@ bool sqlrcursor::parseData() {
 		if (type==NULL_DATA) {
 
 			// handle null data
-			if (returnnulls) {
-				buffer=NULL;
-			} else {
-				buffer=(char *)rowstorage->malloc(1);
-				buffer[0]=(char)NULL;
-			}
+			buffer=NULL;
 			length=0;
 
 		} else if (type==NORMAL_DATA) {

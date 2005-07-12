@@ -40,6 +40,8 @@ Source0: %{name}-%{version}.tar.gz
 URL: http://sqlrelay.sourceforge.net
 Buildroot: %{_tmppath}/%{name}-root
 
+%define fedoraversion %(cat /etc/redhat-release 2> /dev/null | grep Fedora | cut -f4 -d' ')
+
 %if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
 	%define phpdevel %(echo "mod_php4-devel")
 	%define gtkdevel %(echo "gtk-devel")
@@ -52,7 +54,12 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define phpdevel %(echo "php-devel")
 	%define gtkdevel %(echo "gtk+-devel")
 	%define rubydevel %(echo "ruby-devel")
-	%define tcldevel %(echo "tcl")
+	# fedora core >= 4 uses tcl-devel, other distros use tcl
+	%if %([[ "%{fedoraversion}" -ge "4" ]] && echo 1 || echo 0)
+		%define tcldevel %(echo "tcl-devel")
+	%else
+		%define tcldevel %(echo "tcl")
+	%endif
 	%define initscript /etc/rc.d/init.d/sqlrelay
 	%define inittab /etc/sysconfig/sqlrelay
 	%define docdir %{_docdir}/%{name}-%{version}
@@ -462,12 +469,14 @@ rm -rf %{buildroot}
 %files client-postgresql
 %defattr(-, root, root)
 %{_libdir}/libpqsqlrelay-*.so.*
+%{_libdir}/libpqsqlrelay.so
 %{_libdir}/libpqsqlrelay.a
 %{_libdir}/libpqsqlrelay.la
 
 %files client-mysql
 %defattr(-, root, root)
 %{_libdir}/libmysql*sqlrelay-*.so.*
+%{_libdir}/libmysql*sqlrelay.so
 %{_libdir}/libmysql*sqlrelay.a
 %{_libdir}/libmysql*sqlrelay.la
 

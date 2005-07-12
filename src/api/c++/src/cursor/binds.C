@@ -394,6 +394,10 @@ const char *sqlrcursor::getOutputBind(const char *variable) {
 			if (!charstring::compare(outbindvars[i].variable,
 								variable)) {
 				if (outbindvars[i].type==STRING_BIND) {
+					if (!outbindvars[i].value.stringval &&
+						!returnnulls) {
+						return "";
+					}
 					return outbindvars[i].value.stringval;
 				} else {
 					return outbindvars[i].value.lobval;

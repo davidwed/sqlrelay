@@ -5,6 +5,7 @@
 	added Py_INCREF(Py_None) before returning Py_None's or adding them
 		to an array
 	fixed php pear db bug that caused NULL values not to be inserted
+	fixed a bug where a null clob could cause crashes
 
 0.36.3 - added allowShortReads option to non-readline sqlrsh build
 	fixes to php pear db driver for autoExecute
