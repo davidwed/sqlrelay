@@ -21,9 +21,6 @@ endif
 ifneq ($(SQLITELIBS),)
 	$(MAKE) -C sqlite all
 endif
-ifneq ($(LAGOLIBS),)
-	$(MAKE) -C lago all
-endif
 ifneq ($(FREETDSLIBS),)
 	$(MAKE) -C freetds all
 endif
@@ -48,7 +45,6 @@ clean:
 	$(MAKE) -C msql clean
 	$(MAKE) -C postgresql clean
 	$(MAKE) -C sqlite clean
-	$(MAKE) -C lago clean
 	$(MAKE) -C freetds clean
 	$(MAKE) -C odbc clean
 	$(MAKE) -C db2 clean
