@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH LAGOUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC SIDINCLUDES SIDLIBS MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC LAGOINCLUDES LAGOLIBS LAGOLIBSPATH LAGOSTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLPREFIX PERLCYGDRIVEPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYCYGDRIVEPREFIX RUBYLIB HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPLIB PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC SIDINCLUDES SIDLIBS MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLPREFIX PERLCYGDRIVEPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYCYGDRIVEPREFIX RUBYLIB HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPLIB PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1035,8 +1035,6 @@ Optional Features:
   --enable-postgresql-rpath     Use -rpath when building PostgreSQL connection
   --disable-sqlite              Don't build SQLite connection
   --enable-sqlite-rpath         Use -rpath when building SQLite connection
-  --disable-lago                Don't build Lago connection
-  --enable-lago-rpath           Use -rpath when building Lago connection
   --disable-freetds             Don't build FreeTDS connection
   --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection
   --disable-sybase              Don't build Sybase connection
@@ -1084,7 +1082,6 @@ Optional Packages:
   --with-msql-prefix            Location of mSQL
   --with-postgresql-prefix      Location of PostgreSQL
   --with-sqlite-prefix          Location of SQLite
-  --with-lago-prefix            Location of Lago
   --with-freetds-prefix         Location of FreeTDS
   --with-sybase-prefix          Location of Sybase
   --with-odbc-prefix            Location of ODBC
@@ -1750,29 +1747,6 @@ else
 fi;
 
 
-# Check whether --with-lago-prefix or --without-lago-prefix was given.
-if test "${with_lago_prefix+set}" = set; then
-  withval="$with_lago_prefix"
-  LAGOPATH="$withval"
-else
-  LAGOPATH=""
-fi;
-# Check whether --enable-lago or --disable-lago was given.
-if test "${enable_lago+set}" = set; then
-  enableval="$enable_lago"
-  ENABLE_LAGO=""
-else
-  ENABLE_LAGO="yes"
-fi;
-# Check whether --enable-lago-rpath or --disable-lago-rpath was given.
-if test "${enable_lago_rpath+set}" = set; then
-  enableval="$enable_lago_rpath"
-  LAGOUSERPATH="yes"
-else
-  LAGOUSERPATH=""
-fi;
-
-
 # Check whether --with-freetds-prefix or --without-freetds-prefix was given.
 if test "${with_freetds_prefix+set}" = set; then
   withval="$with_freetds_prefix"
@@ -2170,9 +2144,6 @@ if ( test -n "$POSTGRESQLPATH" -a "`echo $POSTGRESQLPATH | cut -c-3`" = "../" );
 fi
 if ( test -n "$SQLITEPATH" -a "`echo $SQLITEPATH | cut -c-3`" = "../" ); then
 	SQLITEPATH="$PWD/$SQLITEPATH"
-fi
-if ( test -n "$LAGOPATH" -a "`echo $LAGOPATH | cut -c-3`" = "../" ); then
-	LAGOPATH="$PWD/$LAGOPATH"
 fi
 if ( test -n "$FREETDSPATH" -a "`echo $FREETDSPATH | cut -c-3`" = "../" ); then
 	FREETDSPATH="$PWD/$FREETDSPATH"
@@ -4518,7 +4489,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4521 "configure"' > conftest.$ac_ext
+  echo '#line 4492 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5634,7 +5605,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5637:" \
+echo "$as_me:5608:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6665,11 +6636,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6668: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6639: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6672: \$? = $ac_status" >&5
+   echo "$as_me:6643: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6897,11 +6868,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6900: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6871: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6904: \$? = $ac_status" >&5
+   echo "$as_me:6875: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6964,11 +6935,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6967: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6938: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6971: \$? = $ac_status" >&5
+   echo "$as_me:6942: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9082,7 +9053,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9085 "configure"
+#line 9056 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9180,7 +9151,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9183 "configure"
+#line 9154 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11336,11 +11307,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11339: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11310: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11343: \$? = $ac_status" >&5
+   echo "$as_me:11314: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11403,11 +11374,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11406: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11377: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11410: \$? = $ac_status" >&5
+   echo "$as_me:11381: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12732,7 +12703,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12735 "configure"
+#line 12706 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12830,7 +12801,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12833 "configure"
+#line 12804 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13652,11 +13623,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13655: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13626: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13659: \$? = $ac_status" >&5
+   echo "$as_me:13630: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -13719,11 +13690,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13722: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13693: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13726: \$? = $ac_status" >&5
+   echo "$as_me:13697: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15685,11 +15656,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15688: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15659: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15692: \$? = $ac_status" >&5
+   echo "$as_me:15663: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15917,11 +15888,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15920: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15891: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15924: \$? = $ac_status" >&5
+   echo "$as_me:15895: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15984,11 +15955,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15987: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15958: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15991: \$? = $ac_status" >&5
+   echo "$as_me:15962: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18102,7 +18073,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18105 "configure"
+#line 18076 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18200,7 +18171,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18203 "configure"
+#line 18174 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -29302,368 +29273,6 @@ echo "******************************"
 
 
 echo
-echo "***** Lago *******************"
-
-if ( test "$ENABLE_LAGO" = "yes" )
-then
-
-	if ( test "$cross_compiling" = "yes" )
-	then
-
-				echo "cross compiling"
-		if ( test -n "$LAGOPATH" )
-		then
-			LAGOINCLUDES="-I$LAGOPATH/include"
-			LAGOLIBS="-L$LAGOPATH/lib -llago"
-			LAGOLIBSPATH="$LAGOPATH/lib"
-		fi
-
-	else
-
-		STATICFLAG=""
-		if ( test -n "$STATICLINK" )
-		then
-			STATICFLAG="-static"
-		fi
-
-
-
-SEARCHPATH=$LAGOPATH
-NAME=lago
-HEADER=lago.h
-LIBNAME=lago
-LINKSTATIC=$STATICFLAG
-LINKRPATH=$RPATHFLAG
-USEFULLLIBPATH=
-INCLUDESTRING=""
-LIBSTRING=""
-LIBPATH=""
-STATIC=""
-HEADERSANDLIBSPATH=""
-
-eval "LAGOINCLUDES=\"\""
-eval "LAGOLIBS=\"\""
-eval "LAGOLIBSPATH=\"\""
-eval "LAGOSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
-
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
-do
-	if ( test -n "$path" -a -d "$path" )
-	then
-
-		if ( test "$path" = "/" )
-		then
-						if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/$LIBDIR/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/$LIBDIR/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/$LIBDIR/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/$LIBDIR/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-						path=""
-		fi
-
-
-		for libpath in "$path/$LIBDIR" "$path/$LIBDIR/$NAME" "$path/$LIBDIR/opt"
-		do
-
-			if ( test -n "$LIBSTRING" )
-			then
-				break
-			fi
-
-			for includepath in "$path/include" "$path/include/$NAME"
-			do
-
-				if ( test -n "$LIBSTRING" )
-				then
-					break
-				fi
-
-								if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$libpath/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				fi
-			done
-		done
-
-		if ( test -n "$LIBSTRING" )
-		then
-			HEADERSANDLIBSPATH="$path"
-			break
-		fi
-	fi
-done
-
-INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
-
-eval "LAGOINCLUDES=\"$INCLUDESTRING\""
-eval "LAGOLIBS=\"$LIBSTRING\""
-eval "LAGOLIBSPATH=\"$LIBPATH\""
-eval "LAGOSTATIC=\"$STATIC\""
-if ( test -n "" )
-then
-	eval "=\"$HEADERSANDLIBSPATH\""
-fi
-
-
-		if ( test -z "$LAGOLIBS" )
-		then
-			{ echo "$as_me:$LINENO: WARNING: Lago support will not be built." >&5
-echo "$as_me: WARNING: Lago support will not be built." >&2;}
-		else
-			echo "$as_me:$LINENO: checking if Lago needs threads" >&5
-echo $ECHO_N "checking if Lago needs threads... $ECHO_C" >&6
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$LAGOSTATIC $LAGOINCLUDES"
-LIBS="$LAGOLIBS $SOCKETLIB"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LAGOLIBSPATH"
-export LD_LIBRARY_PATH
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <lago.h>
-int
-main ()
-{
-LCTX lctx; lctx=Lnewctx(); Ldelctx(lctx);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; LAGOLIBS="$LAGOLIBS $PTHREADLIBS"
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-		fi
-
-	fi
-
-
-if ( test -n "$LAGOINCLUDES" )
-then
-	echo "lago includes... $LAGOINCLUDES"
-fi
-
-
-if ( test -n "$LAGOLIBS" )
-then
-	echo "lago libs... $LAGOLIBS"
-fi
-
-
-
-
-
-
-fi
-
-echo "******************************"
-
-
-
-echo
 echo "***** FreeTDS ******************"
 
 if ( test "$ENABLE_FREETDS" = "yes" )
@@ -38983,7 +38592,6 @@ s,@MYSQLUSERPATH@,$MYSQLUSERPATH,;t t
 s,@MSQLUSERPATH@,$MSQLUSERPATH,;t t
 s,@POSTGRESQLUSERPATH@,$POSTGRESQLUSERPATH,;t t
 s,@SQLITEUSERPATH@,$SQLITEUSERPATH,;t t
-s,@LAGOUSERPATH@,$LAGOUSERPATH,;t t
 s,@FREETDSUSERPATH@,$FREETDSUSERPATH,;t t
 s,@SYBASEUSERPATH@,$SYBASEUSERPATH,;t t
 s,@ODBCUSERPATH@,$ODBCUSERPATH,;t t
@@ -39086,10 +38694,6 @@ s,@SQLITEINCLUDES@,$SQLITEINCLUDES,;t t
 s,@SQLITELIBS@,$SQLITELIBS,;t t
 s,@SQLITELIBSPATH@,$SQLITELIBSPATH,;t t
 s,@SQLITESTATIC@,$SQLITESTATIC,;t t
-s,@LAGOINCLUDES@,$LAGOINCLUDES,;t t
-s,@LAGOLIBS@,$LAGOLIBS,;t t
-s,@LAGOLIBSPATH@,$LAGOLIBSPATH,;t t
-s,@LAGOSTATIC@,$LAGOSTATIC,;t t
 s,@FREETDSINCLUDES@,$FREETDSINCLUDES,;t t
 s,@FREETDSLIBS@,$FREETDSLIBS,;t t
 s,@FREETDSLIBSPATH@,$FREETDSLIBSPATH,;t t
@@ -39694,7 +39298,6 @@ MYSQLBUILD="no     "
 MSQLBUILD="no     "
 POSTGRESQLBUILD="no     "
 SQLITEBUILD="no     "
-LAGOBUILD="no     "
 FREETDSBUILD="no     "
 SYBASEBUILD="no     "
 ODBCBUILD="no     "
@@ -39737,12 +39340,6 @@ if ( test -n "$SQLITELIBS" ); then
 		SQLITEBUILD="static "
 	fi
 fi
-if ( test -n "$LAGOLIBS" ); then
-	LAGOBUILD="dynamic"
-	if ( test -n "$LAGOSTATIC" ); then
-		LAGOBUILD="static "
-	fi
-fi
 if ( test -n "$FREETDSLIBS" ); then
 	FREETDSBUILD="dynamic"
 	if ( test -n "$FREETDSSTATIC" ); then
@@ -39782,10 +39379,9 @@ fi
 echo " Connections  : Oracle7     $ORACLE7BUILD       Oracle8    $ORACLE8BUILD"
 echo "                MySQL       $MYSQLBUILD       mSQL       $MSQLBUILD"
 echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
-echo "                Lago        $LAGOBUILD       FreeTDS    $FREETDSBUILD"
-echo "                Sybase      $SYBASEBUILD       ODBC       $ODBCBUILD"
-echo "                DB2         $DB2BUILD       Interbase  $INTERBASEBUILD"
-echo "                MDB Tools   $MDBTOOLSBUILD"
+echo "                FreeTDS     $FREETDSBUILD       Sybase     $SYBASEBUILD"
+echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"
+echo "                Interbase   $INTERBASEBUILD       MDB Tools  $MDBTOOLSBUILD"
 
 echo "*************************************************************"
 echo

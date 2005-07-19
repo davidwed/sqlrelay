@@ -4,6 +4,8 @@
 #ifndef SQLRCLIENTWRAPPER_H
 #define SQLRCLIENTWRAPPER_H
 
+#include <stdint.h>
+
 typedef	struct sqlrconnection *sqlrcon;
 typedef	struct sqlrcursor *sqlrcur;
 

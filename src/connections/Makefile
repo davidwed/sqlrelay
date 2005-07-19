@@ -12,9 +12,6 @@ endif
 ifneq ($(strip $(INTERBASELIBS)),)
 	$(MAKE) -C interbase all
 endif
-ifneq ($(strip $(LAGOLIBS)),)
-	$(MAKE) -C lago all
-endif
 ifneq ($(strip $(MDBTOOLSLIBS)),)
 	$(MAKE) -C mdbtools all
 endif
@@ -47,7 +44,6 @@ clean:
 	$(MAKE) -C db2 clean
 	$(MAKE) -C freetds clean
 	$(MAKE) -C interbase clean
-	$(MAKE) -C lago clean
 	$(MAKE) -C mdbtools clean
 	$(MAKE) -C msql clean
 	$(MAKE) -C mysql clean
@@ -72,9 +68,6 @@ ifneq ($(strip $(INTERBASELIBS)),)
 endif
 ifneq ($(strip $(MDBTOOLSLIBS)),)
 	$(MAKE) -C mdbtools install
-endif
-ifneq ($(strip $(LAGOLIBS)),)
-	$(MAKE) -C lago install
 endif
 ifneq ($(strip $(MSQLLIBS)),)
 	$(MAKE) -C msql install
@@ -105,7 +98,6 @@ uninstall:
 	$(MAKE) -C db2 uninstall
 	$(MAKE) -C freetds uninstall
 	$(MAKE) -C interbase uninstall
-	$(MAKE) -C lago uninstall
 	$(MAKE) -C mdbtools uninstall
 	$(MAKE) -C msql uninstall
 	$(MAKE) -C mysql uninstall

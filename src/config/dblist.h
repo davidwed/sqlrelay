@@ -8,11 +8,11 @@ char	*databaselist[]={
 	"msql",
 	"postgresql",
 	"sqlite",
-	"lago",
 	"freetds",
 	"sybase",
 	"db2",
 	"interbase",
 	"odbc",
+	"mdbtools",
 	(char *)NULL
 };

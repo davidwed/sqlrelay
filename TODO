@@ -1,25 +1,8 @@
-make 0.36.4 release with CLOB updates, fix NULL bind in PHP Pear autoExecute bug
 
-this code:
-	from SQLRelay import PySQLRClient
-	from SQLRelay import PySQLRDB
 
-	con=PySQLRClient.sqlrconnection('localhost',9000,'','test','test',0,1)
-	cur=PySQLRClient.sqlrcursor(con)
-	cur.getNullsAsNone()
+get php input bind blob/clob's working, support bytea data type
 
-	for a in range(100):
-    	res = cur.sendQuery('select * from CKK_KLIENCI')  
-    	print 'cursor:', cur.rowCount()
-    	print 'run_no:', a
-    	for row in range(cur.rowCount()):
-        	print 'row:', row
-        	for col in range(cur.colCount()):
-            	cur.getField(row,col)
-	con.endSession()
-	print 'end'
-crashes with deallocaing "None" error
-
+get windows/sqlite/tcl working for Ray Moseley
 
 on FC4, sybase-12.5.2 needs libstdc++-libc6.2-2.so.3 from compat-libstdc++-296
 sybase-12.5.? is case sensitive and creates a database called LOCALHOST not
@@ -178,8 +161,6 @@ Compatibility:
 		php api won't build
 	mysql 4.1, 5.0 - bind vars
 	postgresql 8 - bind vars
-	php 5
-	de-support lago
 	rename interbase stuff firebird
 	db2 start/stop script works, but isn't right, should be able to use
 		db2start, db2stop
@@ -233,6 +214,7 @@ Performance/Code Enhancements:
 	login errors should be printed on the screen by sqlrconnection class,
 		not by individual connections
 	api for running queries in the background
+		(asynchronous queries w/timeouts)
 
 Security:
 	SSL encryption

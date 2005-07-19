@@ -706,8 +706,8 @@ static PyObject *getNullsAsNone(PyObject *self, PyObject *args) {
 
 static PyObject *getField(PyObject *self, PyObject *args) {
   long sqlrcur;
-  const char *rc;
-  uint32_t  rl;
+  const char *rc="";
+  uint32_t  rl=0;
   uint64_t row;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lKO", &sqlrcur, &row, &col))
@@ -722,6 +722,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
   }
   Py_END_ALLOW_THREADS
   if (!rc) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
   return Py_BuildValue("s#", rc, rl);
@@ -729,7 +730,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
 
 static PyObject *getFieldAsInteger(PyObject *self, PyObject *args) {
   long sqlrcur;
-  int64_t rc;
+  int64_t rc=0;
   uint64_t row;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lKO", &sqlrcur, &row, &col))
@@ -746,7 +747,7 @@ static PyObject *getFieldAsInteger(PyObject *self, PyObject *args) {
 
 static PyObject *getFieldAsDouble(PyObject *self, PyObject *args) {
   long sqlrcur;
-  double rc;
+  double rc=0.0;
   uint64_t row;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lKO", &sqlrcur, &row, &col))
@@ -763,7 +764,7 @@ static PyObject *getFieldAsDouble(PyObject *self, PyObject *args) {
 
 static PyObject *getFieldLength(PyObject *self, PyObject *args) {
   long sqlrcur;
-  uint32_t rc;
+  uint32_t rc=0;
   uint64_t row;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lKO", &sqlrcur, &row, &col))
@@ -791,10 +792,12 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
   row_data=sqlrcur->getRow(row);
   Py_END_ALLOW_THREADS
   if (!row_data) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
   for (counter = 0; counter < num_cols; ++counter) {
     if (!row_data[counter]) {
+        Py_INCREF(Py_None);
         PyList_SetItem(my_list, counter, Py_None);
     } else if (isNumberTypeChar(sqlrcur->getColumnType(counter))) {
       if (!charstring::contains(row_data[counter], '.')) {
@@ -842,6 +845,7 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
       if (field) {
         PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("s",field));
       } else {
+        Py_INCREF(Py_None);
         PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_None);
       }
     }
@@ -881,10 +885,12 @@ _get_row_lengths(sqlrcursor *sqlrcur, uint64_t row)
   row_data=sqlrcur->getRowLengths(row);
   Py_END_ALLOW_THREADS
   if (!row_data) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
   for (counter = 0; counter < num_cols; ++counter) {
     if (!row_data[counter]) {
+      Py_INCREF(Py_None);
       PyList_SetItem(my_list, counter, Py_None);
     } else {
       PyList_SetItem(my_list, counter, Py_BuildValue("l", row_data[counter]));
@@ -964,12 +970,13 @@ static PyObject *getColumnNames(PyObject *self, PyObject *args) {
     }
     return my_list;
   }
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
 static PyObject *getColumnType(PyObject *self, PyObject *args) {
   long sqlrcur;
-  const char *rc;
+  const char *rc="";
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -983,7 +990,7 @@ static PyObject *getColumnType(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnLength(PyObject *self, PyObject *args) {
   long sqlrcur;
-  uint32_t rc;
+  uint32_t rc=0;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -997,7 +1004,7 @@ static PyObject *getColumnLength(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnPrecision(PyObject *self, PyObject *args) {
   long sqlrcur;
-  uint32_t rc;
+  uint32_t rc=0;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1011,7 +1018,7 @@ static PyObject *getColumnPrecision(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnScale(PyObject *self, PyObject *args) {
   long sqlrcur;
-  uint32_t rc;
+  uint32_t rc=0;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1025,7 +1032,7 @@ static PyObject *getColumnScale(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnIsNullable(PyObject *self, PyObject *args) {
   long sqlrcur;
-  bool rc;
+  bool rc=false;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1039,7 +1046,7 @@ static PyObject *getColumnIsNullable(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnIsPrimaryKey(PyObject *self, PyObject *args) {
   long sqlrcur;
-  bool rc;
+  bool rc=false;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1053,7 +1060,7 @@ static PyObject *getColumnIsPrimaryKey(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnIsUnique(PyObject *self, PyObject *args) {
   long sqlrcur;
-  bool rc;
+  bool rc=false;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1067,7 +1074,7 @@ static PyObject *getColumnIsUnique(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnIsPartOfKey(PyObject *self, PyObject *args) {
   long sqlrcur;
-  bool rc;
+  bool rc=false;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1081,7 +1088,7 @@ static PyObject *getColumnIsPartOfKey(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnIsUnsigned(PyObject *self, PyObject *args) {
   long sqlrcur;
-  bool rc;
+  bool rc=false;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1095,7 +1102,7 @@ static PyObject *getColumnIsUnsigned(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnIsZeroFilled(PyObject *self, PyObject *args) {
   long sqlrcur;
-  bool rc;
+  bool rc=false;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1109,7 +1116,7 @@ static PyObject *getColumnIsZeroFilled(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnIsBinary(PyObject *self, PyObject *args) {
   long sqlrcur;
-  bool rc;
+  bool rc=false;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1123,7 +1130,7 @@ static PyObject *getColumnIsBinary(PyObject *self, PyObject *args) {
 
 static PyObject *getColumnIsAutoIncrement(PyObject *self, PyObject *args) {
   long sqlrcur;
-  bool rc;
+  bool rc=false;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;
@@ -1137,7 +1144,7 @@ static PyObject *getColumnIsAutoIncrement(PyObject *self, PyObject *args) {
 
 static PyObject *getLongest(PyObject *self, PyObject *args) {
   long sqlrcur;
-  uint32_t rc;
+  uint32_t rc=false;
   PyObject *col;
   if (!PyArg_ParseTuple(args, "lO", &sqlrcur, &col))
     return NULL;

@@ -44,7 +44,11 @@ void sqlrcursor::clearRows() {
 	for (uint32_t i=0; i<rowbuffercount; i++) {
 	        for (uint32_t j=0; j<colcount; j++) {
 			if (getColumnInternal(j)->longdatatype) {
-				delete[] getFieldInternal(i,j);
+				// don't delete null columns
+				// (who's lengths will be 0)
+				if (getFieldLengthInternal(i,j)) {
+					delete[] getFieldInternal(i,j);
+				}
 			}
 		}
 	}

@@ -10,7 +10,6 @@
 # --without db2
 # --without freetds
 # --without interbase
-# --without lago
 # --without mdbtools
 # --without msql
 # --without mysql
@@ -40,6 +39,8 @@ Source0: %{name}-%{version}.tar.gz
 URL: http://sqlrelay.sourceforge.net
 Buildroot: %{_tmppath}/%{name}-root
 
+%define fedoraversion %(cat /etc/redhat-release 2> /dev/null | grep Fedora | cut -f4 -d' ')
+
 %if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
 	%define phpdevel %(echo "mod_php4-devel")
 	%define gtkdevel %(echo "gtk-devel")
@@ -52,13 +53,18 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define phpdevel %(echo "php-devel")
 	%define gtkdevel %(echo "gtk+-devel")
 	%define rubydevel %(echo "ruby-devel")
-	%define tcldevel %(echo "tcl")
+	# fedora core >= 4 uses tcl-devel, other distros use tcl
+	%if %([[ "%{fedoraversion}" -ge "4" ]] && echo 1 || echo 0)
+		%define tcldevel %(echo "tcl-devel")
+	%else
+		%define tcldevel %(echo "tcl")
+	%endif
 	%define initscript /etc/rc.d/init.d/sqlrelay
 	%define inittab /etc/sysconfig/sqlrelay
 	%define docdir %{_docdir}/%{name}-%{version}
 %endif
 
-BuildRequires: rudiments-devel >= 0.29
+BuildRequires: rudiments-devel >= 0.28.1
 %{!?_without_gtk:BuildRequires: ,%{gtkdevel}}
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}
@@ -73,14 +79,16 @@ BuildRequires: rudiments-devel >= 0.29
 %description
 SQL Relay is a persistent database connection pooling, proxying and load 
 balancing system for Unix and Linux supporting ODBC, Oracle, MySQL, mSQL, 
-PostgreSQL, Sybase, MS SQL Server, IBM DB2, Interbase, Lago and SQLite with C, 
-C++, Perl, Perl-DBD, Python, Python-DB, Zope, PHP, Ruby, Java and TCL APIs,
-command line clients, a GUI configuration tool and extensive documentation.
-The APIs support advanced database operations such as bind variables, multi-row
-fetches, client side result set caching and suspended transactions.  It is
-ideal for speeding up database-driven web-based applications, accessing
-databases from unsupported platforms, migrating between databases, distributing
-access to replicated databases and throttling database access.
+PostgreSQL, Sybase, MS SQL Server, IBM DB2, Interbase, SQLite and
+MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
+Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java and TCL, drop-in replacement
+libraries for MySQL and PostgreSQL clients, command line clients, a GUI
+configuration tool and extensive documentation.  The APIs support advanced
+database operations such as bind variables, multi-row fetches, client side
+result set caching and suspended transactions.  It is ideal for speeding up
+database-driven web-based applications, accessing databases from unsupported
+platforms, migrating between databases, distributing access to replicated
+databases and throttling database access.
 
 
 %package clients
@@ -171,14 +179,6 @@ Group: Applications/Databases
 
 %description interbase
 SQL Relay connection daemon for Interbase.
-
-
-%package lago
-Summary: SQL Relay connection daemon for Lago.
-Group: Applications/Databases
-
-%description lago
-SQL Relay connection daemon for Lago.
 
 
 %package mdbtools
@@ -327,9 +327,9 @@ Man pages for SQL Relay.
 
 %define	tcldir		%(dirname `rpm -q -l %{tcldevel} | grep tclConfig.sh`)
 %ifarch x86_64
-%define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib64/python$j" "/usr/local/lib64/python$j" "/usr/pkg/lib64/python$j" "/usr/local/python$j/lib64/python$j" "/opt/sfw/lib64/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
+%define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib64/python$j" "/usr/local/lib64/python$j" "/usr/pkg/lib64/python$j" "/usr/local/python$j/lib64/python$j" "/opt/sfw/lib64/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
 %else
-%define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
+%define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
 %endif
 %define	zopedir		%(ZOPEPATH="/opt/Zope/lib/python/Proucts"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/usr/lib" "/opt"; do for j in "zope" "Zope"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib/python/Products"; fi; done; done; echo $ZOPEPATH)
 %define	phpextdir	%(php-config --extension-dir)
@@ -355,7 +355,6 @@ Man pages for SQL Relay.
 	%{?_without_db2:	--disable-db2} \
 	%{?_without_freetds:	--disable-freetds} \
 	%{?_without_interbase:	--disable-interbase} \
-	%{?_without_lago:	--disable-lago} \
 	%{?_without_mdbtools:	--disable-mdbtools} \
 	%{?_without_msql:	--disable-msql} \
 	%{?_without_mysql:	--disable-mysql} \
@@ -462,12 +461,14 @@ rm -rf %{buildroot}
 %files client-postgresql
 %defattr(-, root, root)
 %{_libdir}/libpqsqlrelay-*.so.*
+%{_libdir}/libpqsqlrelay.so
 %{_libdir}/libpqsqlrelay.a
 %{_libdir}/libpqsqlrelay.la
 
 %files client-mysql
 %defattr(-, root, root)
 %{_libdir}/libmysql*sqlrelay-*.so.*
+%{_libdir}/libmysql*sqlrelay.so
 %{_libdir}/libmysql*sqlrelay.a
 %{_libdir}/libmysql*sqlrelay.la
 
@@ -486,10 +487,6 @@ rm -rf %{buildroot}
 %{!?_without_interbase:%files interbase}
 %{!?_without_interbase:%defattr(-, root, root)}
 %{!?_without_interbase:%{_bindir}/sqlr-connection-interbase*}
-
-%{!?_without_lago:%files lago}
-%{!?_without_lago:%defattr(-, root, root)}
-%{!?_without_lago:%{_bindir}/sqlr-connection-lago*}
 
 %{!?_without_mdbtools:%files mdbtools}
 %{!?_without_mdbtools:%defattr(-, root, root)}

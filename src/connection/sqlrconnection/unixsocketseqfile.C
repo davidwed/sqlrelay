@@ -126,7 +126,7 @@ bool sqlrconnection::getAndIncrementSequenceNumber(file *sockseq,
 	#endif
 
 	// write the sequence number back to the file
-	if (sockseq->setPositionRelativeToBeginning((off_t)0)==-1) {
+	if (sockseq->setPositionRelativeToBeginning(0)==-1) {
 		return false;
 	}
 	return (sockseq->write(buffer)==sizeof(int32_t));

@@ -55,7 +55,6 @@ RPM INSTALL:
 		-without db2
 		-without freetds
 		-without interbase
-		-without lago
 		-without msql
 		-without mysql
 		-without odbc
@@ -63,6 +62,7 @@ RPM INSTALL:
 		-without postgresql
 		-without sqlite
 		-without sybase
+		-without mdbtools
 		-without perl
 		-without python
 		-without php

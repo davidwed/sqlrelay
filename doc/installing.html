@@ -36,12 +36,11 @@ from <a target="_top" href="http://www.firstworks.com">www.firstworks.com</a>
 
 <p>To build the database connection daemons, you'll need one or more of
 <a target="_top" href="http://www.oracle.com">Oracle</a>
-(Version 7.3.x, 8.x or 9.x),
+(Version 7.3.x, 8.x, 9.x or 10.x),
 <a target="_top" href="http://web.mysql.com">MySQL</a>, 
 <a target="_top" href="http://www.Hughes.com.au">mSQL</a>, 
 <a target="_top" href="http://www.postgresql.org">PostgreSQL</a>, 
 <a target="_top" href="http://www.hwaci.com/sw/sqlite">SQLite</a>,
-<a target="_top" href="http://lago.sourceforge.net">Lago</a>,
 <a target="_top" href="http://www.unixodbc.org">unixODBC</a>,
 <a target="_top" href="http://www.iodbc.org">iODBC</a>,
 <a target="_top" href="http://www.ibm.com/software/data/db2/">DB2</a>,
@@ -50,7 +49,8 @@ from <a target="_top" href="http://www.firstworks.com">www.firstworks.com</a>
 <a target="_top" href="http://www.freetds.org">FreeTDS</a> (for
 accessing either
 <a target="_top" href="http://www.sybase.com">Sybase</a> or
-<a target="_top" href="http://www.microsof.com/sql/default.html">MS SQL Server</a>).
+<a target="_top" href="http://www.microsof.com/sql/default.html">MS SQL Server</a>),
+<a target="_top" href="http://mdbtools.sourceforge.net">MDB Tools</a> for accessing MS Access Databases.
 
 <p>To build the GUI configuration tool, you'll need GTK+ and glib.  Both are
 available from <a href="http://www.gtk.org">www.gtk.org</a>.</p>
@@ -148,7 +148,6 @@ giving it one of the following flags:</p>
 -without db2<br>
 -without freetds<br>
 -without interbase<br>
--without lago<br>
 -without msql<br>
 -without mysql<br>
 -without odbc<br>
@@ -156,6 +155,7 @@ giving it one of the following flags:</p>
 -without postgresql<br>
 -without sqlite<br>
 -without sybase<br>
+-without mdbtools<br>
 -without perl<br>
 -without python<br>
 -without php<br>

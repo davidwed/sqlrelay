@@ -1310,55 +1310,6 @@ fi
 
 
 
-AC_DEFUN([FW_CHECK_LAGO],
-[
-if ( test "$ENABLE_LAGO" = "yes" )
-then
-
-	if ( test "$cross_compiling" = "yes" )
-	then
-
-		dnl cross compiling ...
-		echo "cross compiling"
-		if ( test -n "$LAGOPATH" )
-		then
-			LAGOINCLUDES="-I$LAGOPATH/include"
-			LAGOLIBS="-L$LAGOPATH/lib -llago"
-			LAGOLIBSPATH="$LAGOPATH/lib"
-		fi
-
-	else
-
-		STATICFLAG=""
-		if ( test -n "$STATICLINK" )
-		then
-			STATICFLAG="-static"
-		fi
-
-		FW_CHECK_HEADERS_AND_LIBS([$LAGOPATH],[lago],[lago.h],[lago],[$STATICFLAG],[$RPATHFLAG],[LAGOINCLUDES],[LAGOLIBS],[LAGOLIBSPATH],[LAGOSTATIC])
-		
-		if ( test -z "$LAGOLIBS" )
-		then
-			AC_MSG_WARN(Lago support will not be built.)
-		else
-			AC_MSG_CHECKING(if Lago needs threads)
-			FW_TRY_LINK([#include <lago.h>],[LCTX lctx; lctx=Lnewctx(); Ldelctx(lctx);],[$LAGOSTATIC $LAGOINCLUDES],[$LAGOLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$LAGOLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); LAGOLIBS="$LAGOLIBS $PTHREADLIBS"])
-		fi
-
-	fi
-
-	FW_INCLUDES(lago,[$LAGOINCLUDES])
-	FW_LIBS(lago,[$LAGOLIBS])
-
-	AC_SUBST(LAGOINCLUDES)
-	AC_SUBST(LAGOLIBS)
-	AC_SUBST(LAGOLIBSPATH)
-	AC_SUBST(LAGOSTATIC)
-fi
-])
-
-
-
 AC_DEFUN([FW_CHECK_FREETDS],
 [
 if ( test "$ENABLE_FREETDS" = "yes" )

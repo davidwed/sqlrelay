@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.5 2005-06-24 01:13:03 mused Exp $
+// $Id: sqlrelay.php,v 1.6 2005-07-19 17:58:50 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -27,6 +27,7 @@ require_once "DB/common.php";
 class DB_sqlrelay_cursor
 {
     var $cursor;
+    var $identity = "";
     var $connection;
     var $rownum = 0;
     var $prepare_tokens = array();
@@ -49,7 +50,6 @@ class DB_sqlrelay extends DB_common
     var $autocommit = false;
     var $fetchmode = DB_FETCHMODE_ORDERED; /* Default fetch mode */
     var $affectedrows = 0;
-    var $identity = "";
 
     // }}}
     // {{{ constructor
@@ -91,7 +91,8 @@ class DB_sqlrelay extends DB_common
 
         $hasloadextension = false;
         foreach (get_class_methods(get_class($this)) as $method) {
-            if ($method == "loadextension") {
+printf("$method\n");
+            if ($method == "loadextension" || $method == "loadExtension") {
                 $hasloadextension = true;
                 break;
             }
@@ -119,6 +120,7 @@ class DB_sqlrelay extends DB_common
 
         $this->connection = sqlrcon_alloc($host, $port, $socket,
                                             $user, $pw, $retrytime, $tries);
+sqlrcon_debugOn($this->connection);
         return DB_OK;
     }
 
@@ -347,10 +349,8 @@ class DB_sqlrelay extends DB_common
     {
         sqlrcur_clearBinds($sqlrcursor->cursor);
         if ($data) {
-            while ($element = current($data)) {
-                $index = key($data);
-                sqlrcur_inputBind($sqlrcursor->cursor, $index, $data["$index"]);
-                next($data);
+            foreach ($data as $index=>$value) {
+                sqlrcur_inputBind($sqlrcursor->cursor, $index, $value);
             }
         }
         if (!sqlrcur_executeQuery($sqlrcursor->cursor)) {

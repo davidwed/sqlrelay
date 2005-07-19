@@ -74,12 +74,10 @@ class sqlrconnection {
 				// client to tell it when to commit.
 		bool	commit();
 				// Issues a commit.  Returns 1 if the commit
-				// succeeded, 0 if it failed and -1 if an
-				// error occurred.
+				// succeeded, 0 if it failed.
 		bool	rollback();
 				// Issues a rollback.  Returns 1 if the rollback
-				// succeeded, 0 if it failed and -1 if an
-				// error occurred.
+				// succeeded, 0 if it failed.
 
 
 		void	debugOn();
@@ -302,14 +300,14 @@ class sqlrcursor {
 				// be returned in the result set.  Not all 
 				// databases support this call.  Don't use it 
 				// for applications which are designed to be 
-				// portable across databases.  -1 is returned
+				// portable across databases.  0 is returned
 				// by databases which don't support this option.
 		uint64_t	affectedRows();
 				// Returns the number of rows that were 
 				// updated, inserted or deleted by the query.
 				// Not all databases support this call.  Don't 
 				// use it for applications which are designed 
-				// to be portable across databases.  -1 is 
+				// to be portable across databases.  0 is 
 				// returned by databases which don't support 
 				// this option.
 		uint64_t	firstRowIndex();
