@@ -58,7 +58,7 @@ def main():
 	print
 
 	print "AFFECTED ROWS: "
-	checkSuccess(cur.affectedRows(),-1)
+	checkSuccess(cur.affectedRows(),0)
 	print
 
 	print "BIND BY POSITION: "
@@ -320,7 +320,7 @@ def main():
 	print
 
 	print "TOTAL ROWS: "
-	checkSuccess(cur.totalRows(),-1)
+	checkSuccess(cur.totalRows(),0)
 	print
 
 	print "FIRST ROW INDEX: "

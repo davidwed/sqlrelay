@@ -95,6 +95,21 @@ require_once 'DB.php';
 			"5" => "testlong8");
 	$res=$db->execute($res,$bindvars);
 
+	# auto execute
+	$bindvars=array("testnumber" => 9,
+			"testchar" => "testchar9",
+			"testvarchar" => "testvarchar9",
+			"testdate" => "01-JAN-2009",
+			"testlong" => "testlong9");
+	$res=$db->autoExecute("testtable",$bindvars,DB_AUTOQUERY_INSERT);
+
+	$bindvars=array("testnumber" => NULL,
+			"testchar" => NULL,
+			"testvarchar" => NULL,
+			"testdate" => NULL,
+			"testlong" => NULL);
+	$res=$db->autoExecute("testtable",$bindvars,DB_AUTOQUERY_INSERT);
+
 	echo("SELECT: \n");
 	$res=$db->query("select * from testtable order by testnumber");
 	echo("\n");

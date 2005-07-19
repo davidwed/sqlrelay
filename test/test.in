@@ -33,13 +33,6 @@ then
 	sudo $INITDIR/firebird start
 	sudo sqlr-start -id interbasetest
 fi
-if ( test "$DB" = "lago" )
-then
-	ARGS="localhost 8004 \"\" lagotest lagotest"
-	PHPARGS="host=localhost&port=8004&socket=&user=lagotest&password=lagotest"
-	sudo $INITDIR/lago start
-	sudo sqlr-start -id lagotest
-fi
 if ( test "$DB" = "msql" )
 then
 	ARGS="localhost 8005 \"\" msqltest msqltest"
@@ -222,10 +215,6 @@ fi
 if ( test "$DB" = "interbase" )
 then
 	sudo $INITDIR/firebird stop
-fi
-if ( test "$DB" = "lago" )
-then
-	sudo $INITDIR/lago stop
 fi
 if ( test "$DB" = "msql" )
 then

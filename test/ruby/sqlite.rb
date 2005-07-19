@@ -60,7 +60,7 @@ checkSuccess(cur.sendQuery("insert into testtable values (4,4.4,'testchar4','tes
 print "\n"
 
 print "AFFECTED ROWS: \n"
-checkSuccess(cur.affectedRows(),-1)
+checkSuccess(cur.affectedRows(),0)
 print "\n"
 
 print "BIND BY NAME: \n"

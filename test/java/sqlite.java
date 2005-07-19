@@ -122,7 +122,7 @@ class sqlite {
 		System.out.println();
 	
 		System.out.println("AFFECTED ROWS: ");
-		checkSuccess(cur.affectedRows(),-1);
+		checkSuccess(cur.affectedRows(),0);
 		System.out.println();
 	
 		System.out.println("BIND BY NAME: ");

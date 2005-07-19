@@ -51,7 +51,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("AFFECTED ROWS: \n");
-	checkSuccess(sqlrcur_affectedRows($cur),-1);
+	checkSuccess(sqlrcur_affectedRows($cur),0);
 	echo("\n");
 
 	echo("BIND BY NAME: \n");

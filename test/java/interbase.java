@@ -160,7 +160,7 @@ class interbase {
 		System.out.println();
 	
 		System.out.println("AFFECTED ROWS: ");
-		checkSuccess(cur.affectedRows(),-1);
+		checkSuccess(cur.affectedRows(),0);
 		System.out.println();
 
 	    System.out.println("STORED PROCEDURE: ");
@@ -286,7 +286,7 @@ class interbase {
 		System.out.println();
 	
 		System.out.println("TOTAL ROWS: ");
-		checkSuccess(cur.totalRows(),-1);
+		checkSuccess(cur.totalRows(),0);
 		System.out.println();
 	
 		System.out.println("FIRST ROW INDEX: ");

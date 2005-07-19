@@ -55,8 +55,8 @@ int	main(int argc, char **argv) {
 	char	*subvalstrings[3]={"hi","hello","bye"};
 	long	subvallongs[3]={1,2,3};
 	double	subvaldoubles[3]={10.55,10.556,10.5556};
-	unsigned short	precs[3]={4,5,6};
-	unsigned short	scales[3]={2,3,4};
+	uint32_t	precs[3]={4,5,6};
+	uint32_t	scales[3]={2,3,4};
 	const char	*numvar;
 	const char	*stringvar;
 	const char	*floatvar;
@@ -110,7 +110,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
-	checkSuccessInt(sqlrcur_affectedRows(cur),-1);
+	checkSuccessInt(sqlrcur_affectedRows(cur),0);
 	printf("\n");
 
 	printf("BIND BY NAME: \n");

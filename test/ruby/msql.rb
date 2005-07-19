@@ -56,7 +56,7 @@ checkSuccess(cur.sendQuery("insert into testtable values ('char4','01-Jan-2004',
 print "\n"
 
 print "AFFECTED ROWS: \n"
-checkSuccess(cur.affectedRows(),-1)
+checkSuccess(cur.affectedRows(),0)
 print "\n"
 
 print "BIND BY NAME: \n"

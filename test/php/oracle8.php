@@ -222,7 +222,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("TOTAL ROWS: \n");
-	checkSuccess(sqlrcur_totalRows($cur),-1);
+	checkSuccess(sqlrcur_totalRows($cur),0);
 	echo("\n");
 
 	echo("FIRST ROW INDEX: \n");

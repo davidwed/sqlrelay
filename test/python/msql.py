@@ -55,7 +55,7 @@ def main():
 	print
 
 	print "AFFECTED ROWS: "
-	checkSuccess(cur.affectedRows(),-1)
+	checkSuccess(cur.affectedRows(),0)
 	print
 
 	print "BIND BY NAME: "

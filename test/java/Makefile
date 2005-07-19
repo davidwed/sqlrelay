@@ -14,9 +14,6 @@ endif
 ifneq ($(strip $(INTERBASELIBS)),)
 	$(MAKE) interbase.class
 endif
-ifneq ($(strip $(LAGOLIBS)),)
-	$(MAKE) lago.class
-endif
 ifneq ($(strip $(MSQLLIBS)),)
 	$(MAKE) msql.class
 endif
@@ -52,9 +49,6 @@ freetds.class: freetds.java
 
 interbase.class: interbase.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir) interbase.java
-
-lago.class: lago.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) lago.java
 
 msql.class: msql.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir) msql.java

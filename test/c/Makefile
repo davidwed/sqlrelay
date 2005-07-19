@@ -22,9 +22,6 @@ endif
 ifneq ($(strip $(INTERBASELIBS)),)
 	$(MAKE) interbase
 endif
-ifneq ($(strip $(LAGOLIBS)),)
-	$(MAKE) lago
-endif
 ifneq ($(strip $(MSQLLIBS)),)
 	$(MAKE) msql
 endif
@@ -55,9 +52,6 @@ freetds: freetds.c freetds.lo
 
 interbase: interbase.c interbase.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ interbase.lo $(LIBS)
-
-lago: lago.c lago.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ lago.lo $(LIBS)
 
 msql: msql.c msql.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ msql.lo $(LIBS)
@@ -92,7 +86,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) db2
 	$(LIBTOOL) --mode=clean $(RM) freetds
 	$(LIBTOOL) --mode=clean $(RM) interbase
-	$(LIBTOOL) --mode=clean $(RM) lago
 	$(LIBTOOL) --mode=clean $(RM) msql
 	$(LIBTOOL) --mode=clean $(RM) mysql
 	$(LIBTOOL) --mode=clean $(RM) oracle7

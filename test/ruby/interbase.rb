@@ -98,7 +98,7 @@ checkSuccess(cur.sendQuery("insert into testtable values (8,8,8.8,8.8,8.8,8.8,'0
 print "\n"
 
 print "AFFECTED ROWS: \n"
-checkSuccess(cur.affectedRows(),-1)
+checkSuccess(cur.affectedRows(),0)
 print "\n"
 
 print "STORED PROCEDURE: \n"
@@ -224,7 +224,7 @@ checkSuccess(cur.rowCount(),8)
 print "\n"
 
 print "TOTAL ROWS: \n"
-checkSuccess(cur.totalRows(),-1)
+checkSuccess(cur.totalRows(),0)
 print "\n"
 
 print "FIRST ROW INDEX: \n"
