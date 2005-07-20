@@ -165,8 +165,10 @@ mysqlcursor::mysqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	mysqlresult=NULL;
 
 	// SID initialization
+#ifdef INCLUDE_SID
 	sql_injection_detection_database_init(); 
 	sql_injection_detection_parameters(); 
+#endif
 }
 
 bool mysqlcursor::executeQuery(const char *query, uint32_t length,
@@ -182,12 +184,18 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 	// fake binds
 	stringbuffer	*newquery=fakeInputBinds(query);
 
+#ifdef INCLUDE_SID
 	// perform ingress fitering
 	sql_injection_detection = false;
 	sql_injection_detection = sql_injection_detection_ingress(query);
+#endif
 
 	// execute the query
+#ifdef INCLUDE_SID
 	if (newquery && !sql_injection_detection) {
+#else
+	if (newquery) {
+#endif
 
 		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
 					newquery->getString(),
@@ -203,7 +211,9 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 		}
 	}
 
+#ifdef INCLUDE_SID
         if (!sql_injection_detection) {
+#endif
 
 		checkForTempTable(query,length);
 
@@ -233,6 +243,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 			field_names[i]=mysql_fetch_field(mysqlresult)->name;
 		}
 
+#ifdef INCLUDE_SID
 		// perform sid egress filtering
 
 		if (sql_injection_detection_egress(ncols, field_names)==true) {
@@ -246,12 +257,15 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 
 			return true;
 		}
+#endif
 
 
 		// get the row count
 		nrows=mysql_num_rows(mysqlresult);
 
+#ifdef INCLUDE_SID
 	}
+#endif
 
 	return true;
 }
