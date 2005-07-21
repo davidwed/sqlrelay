@@ -1,12 +1,8 @@
-
+freetds test fails, maybe freetds-version related or tds version?
 
 get php input bind blob/clob's working, support bytea data type
 
 get windows/sqlite/tcl working for Ray Moseley
-
-on FC4, sybase-12.5.2 needs libstdc++-libc6.2-2.so.3 from compat-libstdc++-296
-sybase-12.5.? is case sensitive and creates a database called LOCALHOST not
-	localhost like the docs say
 
 sqlr-import/sqlr-export tools
 
@@ -35,13 +31,7 @@ make max clob/blob upload size configurable
 make everything single-process/multithread and use techniques described in 
 	the C10K problem to handle client/server io
 
-Docs need to explain:	
-	exactly what should be put in /etc/sqlrelay
-	examples of deniedips and allowedips
-	minimum manditory connect string variables for each database
-	note that if you have mulitple instances configured with the
-		same port or socket then they cannot be run at the same time
-	a few words about what each connect string variable does
+Docs need to explain exactly what should be put in /etc/sqlrelay
 
 make location of /etc/sqlrelay and rc.sqlrelay compile-time options
 
@@ -49,8 +39,6 @@ make installation location of sql_relay.so and sqlrelay.php (and possibly other
 	API's files) configurable at compile-time
 
 look into OCIBreak/obreak function calls for cancelling oracle commands
-
-mdbtools connection won't compile against mdbtools-0.5 on freebsd
 
 configure script doesn't find zope on openbsd
 

@@ -108,7 +108,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
-	checkSuccess(cur->affectedRows(),-1);
+	checkSuccess(cur->affectedRows(),0);
 	printf("\n");
 
 	printf("BIND BY NAME: \n");

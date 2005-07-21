@@ -17,11 +17,12 @@
 struct column {
 	char		name[MAX_ITEM_BUFFER_SIZE];
 	uint16_t	namelength;
-	int16_t		type;
-	uint32_t	length;
-	uint32_t	precision;
-	uint32_t	scale;
-	uint16_t	nullable;
+	// SQLColAttribute requires that these are signed, 32 bit integers
+	int32_t		type;
+	int32_t		length;
+	int32_t		precision;
+	int32_t		scale;
+	int32_t		nullable;
 	uint16_t	primarykey;
 	uint16_t	unique;
 	uint16_t	partofkey;

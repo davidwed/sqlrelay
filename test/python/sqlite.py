@@ -563,7 +563,8 @@ def main():
 				string.atoi(sys.argv[2]), 
 				sys.argv[3],sys.argv[4],sys.argv[5],0,1)
 	secondcur=PySQLRClient.sqlrcursor(secondcon)
-	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),0)
+	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
+	checkSuccess(secondcur.getField(0,0),"0")
 	checkSuccess(con.commit(),1)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),"8")

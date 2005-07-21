@@ -251,8 +251,8 @@ have a client called <i>isql</i> as well which could be installed in /usr/bin,
 want the <i>isql</i> command to run.  If you want it to run the Sybase client,
 follow the instructions below.  Otherwise, you'll have to run the Sybase
 <i>isql</i> client by it's full pathname which could be
-/opt/sybase-11.9.2/bin/isql, /opt/sybase-12.5/OCS/bin/isql or some other
-path.</p>
+/opt/sybase/OCS/bin/isql, /opt/sybase-12.5/OCS/bin/isql,
+/opt/sybase-11.9.2/bin/isql or some other path.</p>
 
 <p>In the configuration script for your shell, add the path to the Sybase isql
 client to your PATH environment variable as follows.  In these examples,
@@ -263,7 +263,7 @@ elsewhere.</p>
 
 <blockquote>
 <PRE>
-<FONT color=#008a8e>PATH</FONT>=<FONT color=#a620f7>$PATH</FONT>:/opt/sybase-11.9.2/bin
+<FONT color=#008a8e>PATH</FONT>=<FONT color=#a620f7>$PATH</FONT>:/opt/sybase/OCS/bin
 <B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>PATH</FONT>
 </PRE>
 </blockquote>
@@ -272,7 +272,7 @@ elsewhere.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a62828>setenv</FONT></B> <FONT color=#6959cf>PATH</FONT> <B><FONT color=#288a51>${PATH}</FONT></B>:/opt/sybase-11.9.2/bin
+<B><FONT color=#a62828>setenv</FONT></B> <FONT color=#6959cf>PATH</FONT> <B><FONT color=#288a51>${PATH}</FONT></B>:/opt/sybase/OCS/bin
 </PRE>
 </blockquote>
 
@@ -280,18 +280,25 @@ elsewhere.</p>
 <i>isql</i> client. 
 
 <p>The initialization process should have created a server named 
-<i>localhost</i> (or whatever name you assigned it) with an administrative user
-named <i>sa</i> which has no password.</p>
-
-<p>(Note that in sybase 12.5.1, the server name is case sensitive and by
-default it uses upper case server names, so you may have to use LOCALHOST
-as the server name)</p>
+<i>LOCALHOST</i> (or <i>localhost</i> for version 11.9.2 or earlier) with an
+administrative user named <i>sa</i> which has no password.</p>
 
 <p>To set the administrative user's password, log into the database with the
 following command.  When it prompts you for a password, just press return.</p>
 
 <blockquote>
+For Sybase 12.5 or later:
+
+<blockquote>
+<b>isql -U sa -S LOCALHOST</b>
+</blockquote>
+
+For Sybase 11.9.2 or earlier:
+
+<blockquote>
 <b>isql -U sa -S localhost</b>
+</blockquote>
+
 </blockquote>
 
 <p>At the prompt, run the following stored procedure to give <i>sa</i> the
@@ -314,7 +321,18 @@ go
 type <i>sapassword</i>.</p>
 
 <blockquote>
+For Sybase 12.5 or later:
+
+<blockquote>
+<b>isql -U sa -S LOCALHOST</b>
+</blockquote>
+
+For Sybase 11.9.2 or earlier:
+
+<blockquote>
 <b>isql -U sa -S localhost</b>
+</blockquote>
+
 </blockquote>
 
 <p>Though you could create your own tables using the <i>sa</i> user and the 
@@ -332,7 +350,18 @@ quit
 <p>Now log into the database you just created with the following command.</p>
 
 <blockquote>
+For Sybase 12.5 or later:
+
+<blockquote>
+<b>isql -U sa -S LOCALHOST -D testdb</b>
+</blockquote>
+
+For Sybase 11.9.2 or earlier:
+
+<blockquote>
 <b>isql -U sa -S localhost -D testdb</b>
+</blockquote>
+
 </blockquote>
 
 <p>Creating a user is a 2 step process.  First a universal login must be 
@@ -357,7 +386,18 @@ quit
 promted for a password, enter <i>testpassword</i>.</p>
 
 <blockquote>
+For Sybase 12.5 or later:
+
+<blockquote>
+<b>isql -U testuser -S LOCALHOST -D testdb</b>
+</blockquote>
+
+For Sybase 11.9.2 or earlier:
+
+<blockquote>
 <b>isql -U testuser -S localhost -D testdb</b>
+</blockquote>
+
 </blockquote>
 
 <p>A common problem when using Sybase ASE in this minimal configuration is 
@@ -373,7 +413,19 @@ being suspended until space is made available in the log.
 follows.  When it promts you for a password, type <i>sapassword</i>.</p>
 
 <blockquote>
-<b>isql -U sa -S localhost</b>
+For Sybase 12.5 or later:
+
+
+<blockquote>
+<b>isql -U testuser -S LOCALHOST -D testdb</b>
+</blockquote>
+
+For Sybase 11.9.2 or earlier:
+
+<blockquote>
+<b>isql -U testuser -S localhost -D testdb</b>
+</blockquote>
+
 </blockquote>
 
 <p>Once logged in, execute the following series of commands.</p>
@@ -440,18 +492,18 @@ hostname of the machine you want to connect to, but rather to an entry in the
 an entry in the <i>$SYBASE/interfaces</i> file on the machine the database was 
 created on.  This entry can then be copied into the <i>$SYBASE/interfaces</i>
 file on other machines to provide them remote access to the database.  Below is
-a sample entry for a server named <i>remotehost</i> which refers to an instance 
+a sample entry for a server named <i>REMOTEHOST</i> which refers to an instance 
 of Sybase ASE running on <i>testhost.testdomain.com</i>, on port 4100, 
 accessible over tcp on ethernet and a similar entry for a server named 
-<i>localhost</i> which is running on <i>localhost</i>.</p>
+<i>LOCALHOST</i> which is running on <i>localhost</i>.</p>
 
 <blockquote>
 <pre><b>
-remotehost
+REMOTEHOST
 	master tcp ether testhost.testdomain.com 4100
 	query tcp ether testhost.testdomain.com 4100
 
-localhost
+LOCALHOST
 	master tcp ether localhost 4100
 	query tcp ether localhost 4100
 </b></pre>
@@ -459,11 +511,11 @@ localhost
 
 <p>Similar entries can be made to access servers running on other hosts.</p>
 
-<p>To access the database <i>testdb</i> on the server <i>localhost</i> as the
+<p>To access the database <i>testdb</i> on the server <i>LOCALHOST</i> as the
 user <i>testuser</i>, run the following command.</p>
 
 <blockquote>
-<b>isql -U testuser -S localhost -D testdb</b>
+<b>isql -U testuser -S LOCALHOST -D testdb</b>
 </blockquote>
 
 <p>Once you're connected to the database, the <i>isql</i> client prompts you
@@ -474,7 +526,7 @@ type go on a line by itself.  To exit, type quit on a line by itself.</p>
 
 <blockquote>
 <PRE>
-[user@localhost user]$ /opt/sybase<FONT color=#ff00ff>-11.9</FONT>.<FONT color=#ff00ff>2</FONT>/bin/isql -U testuser -S localhost -D testdb
+[user@localhost user]$ /opt/sybase/OCS/bin/isql -U testuser -S LOCALHOST -D testdb
 Password: 
 <FONT color=#ff00ff>1</FONT>&gt; <B><FONT color=#a62828>create</FONT></B> <FONT color=#6959cf>table</FONT> testtable (
 <FONT color=#ff00ff>2</FONT>&gt; col1 <B><FONT color=#288a51>char</FONT></B>(<FONT color=#ff00ff>40</FONT>),
@@ -568,7 +620,7 @@ The attribute <FONT color=#ff00ff>'exp_row_size'</FONT> is not applicable to tab
 <i>sqlrelay.conf</i> file for the database that you want 
 to access.  Here is an example <i>sqlrelay.conf</i> which defines an SQL Relay 
 instance called sybasetest.  This instance connects to the <i>testdb</i> 
-database on the server <i>localhost</i> as the user <i>testuser</i> with 
+database on the server <i>LOCALHOST</i> as the user <i>testuser</i> with 
 password <i>testpassword</i>.</p>
 
 <PRE>
@@ -581,7 +633,7 @@ password <i>testpassword</i>.</p>
                         <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;sybasetest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;sybasetest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
-                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;sybasetest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;server=localhost;db=testdb;user=testuser;password=testpassword;&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;sybasetest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;server=LOCALHOST;db=testdb;user=testuser;password=testpassword;&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/connections&gt;</FONT>
         <FONT color=#008a8e>&lt;/instance&gt;</FONT>
 

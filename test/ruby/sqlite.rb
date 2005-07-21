@@ -529,7 +529,8 @@ secondcon=SQLRConnection.new(ARGV[0],
 			ARGV[1].to_i, 
 			ARGV[2],ARGV[3],ARGV[4],0,1)
 secondcur=SQLRCursor.new(secondcon)
-checkSuccess(secondcur.sendQuery("select count(*) from testtable"),0)
+checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
+checkSuccess(secondcur.getField(0,0),"0")
 checkSuccess(con.commit(),1)
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 checkSuccess(secondcur.getField(0,0),"8")

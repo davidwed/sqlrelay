@@ -349,7 +349,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getLongest(15),9);
 	checkSuccess(cur->getLongest(16),11);
 	checkSuccess(cur->getLongest(17),9);
-	checkSuccess(cur->getLongest(18),14);
+	checkSuccess(cur->getLongest(18),19);
 	checkSuccess(cur->getLongest("testtinyint"),1);
 	checkSuccess(cur->getLongest("testsmallint"),1);
 	checkSuccess(cur->getLongest("testmediumint"),1);
@@ -368,7 +368,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getLongest("testtinytext"),9);
 	checkSuccess(cur->getLongest("testmediumtext"),11);
 	checkSuccess(cur->getLongest("testlongtext"),9);
-	checkSuccess(cur->getLongest("testtimestamp"),14);
+	checkSuccess(cur->getLongest("testtimestamp"),19);
 	printf("\n");
 
 	printf("ROW COUNT: \n");

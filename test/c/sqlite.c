@@ -583,7 +583,8 @@ int	main(int argc, char **argv) {
 				atoi(argv[2]), 
 				argv[3],argv[4],argv[5],0,1);
 	secondcur=sqlrcur_alloc(secondcon);
-	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),0);
+	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"0");
 	checkSuccessInt(sqlrcon_commit(con),1);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"8");

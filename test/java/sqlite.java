@@ -592,7 +592,8 @@ class sqlite {
 				    	Integer.parseInt(args[1]), 
 				    	args[2],args[3],args[4],0,1);
 	    	SQLRCursor secondcur=new SQLRCursor(secondcon);
-	    	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),0);
+	    	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
+	    	checkSuccess(secondcur.getField(0,0),"0");
 	    	checkSuccess(con.commit(),1);
 	    	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
 	    	checkSuccess(secondcur.getField(0,0),"8");

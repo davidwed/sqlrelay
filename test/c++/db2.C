@@ -36,6 +36,7 @@ void checkSuccess(const char *value, const char *success) {
 }
 
 void checkSuccess(int value, int success) {
+	//printf("%d==%d\n",value,success);
 
 	if (value==success) {
 		printf("success ");

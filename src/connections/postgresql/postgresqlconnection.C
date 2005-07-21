@@ -32,7 +32,6 @@ void postgresqlconnection::handleConnectString() {
 	host=connectStringValue("host");
 	port=connectStringValue("port");
 	options=connectStringValue("options");
-	tty=connectStringValue("tty");
 	db=connectStringValue("db");
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
@@ -57,7 +56,7 @@ bool postgresqlconnection::logIn() {
 	}
 
 	// log in
-	pgconn=PQsetdbLogin(host,port,options,tty,db,getUser(),getPassword());
+	pgconn=PQsetdbLogin(host,port,options,NULL,db,getUser(),getPassword());
 
 	// check the status of the login
 	if (PQstatus(pgconn)==CONNECTION_BAD) {

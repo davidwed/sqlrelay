@@ -4,7 +4,7 @@
 #ifndef POSTGRESQLCONNECTION_H
 #define POSTGRESQLCONNECTION_H
 
-#define NUM_CONNECT_STRING_VARS 8
+#define NUM_CONNECT_STRING_VARS 7
 
 #include <sqlrconnection.h>
 
@@ -66,7 +66,6 @@ class postgresqlconnection : public sqlrconnection {
 		const char	*host;
 		const char	*port;
 		const char	*options;
-		const char	*tty;
 		const char	*db;
 		uint16_t	typemangling;
 

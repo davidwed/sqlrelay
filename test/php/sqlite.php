@@ -534,7 +534,8 @@ function checkSuccess($value,$success) {
 	echo("COMMIT AND ROLLBACK: \n");
 	$secondcon=sqlrcon_alloc($host,$port,$socket,$user,$password,0,1);
 	$secondcur=sqlrcur_alloc($secondcon);
-	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),0);
+	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
+	checkSuccess(sqlrcur_getField($secondcur,0,0),"0");
 	checkSuccess(sqlrcon_commit($con),1);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
 	checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
