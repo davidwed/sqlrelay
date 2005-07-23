@@ -1,6 +1,10 @@
 freetds test fails, maybe freetds-version related or tds version?
 
-get php input bind blob/clob's working, support bytea data type
+non-sqlite tcl tests
+tcl docs
+
+get postgresql input bind blob/clob's working, support bytea data type
+	with python's cpickle.dumps/loads
 
 get windows/sqlite/tcl working for Ray Moseley
 
@@ -35,9 +39,6 @@ Docs need to explain exactly what should be put in /etc/sqlrelay
 
 make location of /etc/sqlrelay and rc.sqlrelay compile-time options
 
-make installation location of sql_relay.so and sqlrelay.php (and possibly other
-	API's files) configurable at compile-time
-
 look into OCIBreak/obreak function calls for cancelling oracle commands
 
 configure script doesn't find zope on openbsd
@@ -71,7 +72,6 @@ Tests:
 	db2 temp tables
 	odbc temp tables
 	zope
-	tcl
 	odbc tests
 	mysql_stmt calls in drop-in library
 	better pythondb/rubydbi tests

@@ -8,6 +8,13 @@
 #include <Python.h>
 #include <sqlrelay/sqlrclient.h>
 
+#if PY_MAJOR_VERSION >= 2
+#if PY_MINOR_VERSION >= 3
+	#define SUPPORTS_UNSIGNED	1
+#endif
+#endif
+
+
 extern "C" {
 
 #define NEED_IS_NUMBER_TYPE_CHAR
@@ -22,11 +29,17 @@ static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
   uint16_t port;
   int32_t retrytime;
   int32_t tries;
-  if (!PyArg_ParseTuple(args, "sHsssii", &host, &port, &socket, &user, &password, &retrytime, &tries))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+		"sHsssii",
+#else
+		"shsssii",
+#endif
+		&host, &port, &socket, &user, &password, &retrytime, &tries))
     return NULL;
   sqlrcon = new sqlrconnection(host, port, socket, user, password, 1, 1);
   sqlrcon->copyReferences();
-  return Py_BuildValue("l", sqlrcon);
+  return Py_BuildValue("l", (long)sqlrcon);
 }
 
 static PyObject *sqlrcon_free(PyObject *self, PyObject *args) {
@@ -57,7 +70,7 @@ static PyObject *suspendSession(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->suspendSession();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getConnectionPort(PyObject *self, PyObject *args) {
@@ -66,7 +79,7 @@ static PyObject *getConnectionPort(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
     return NULL;
   rc=((sqlrconnection *)sqlrcon)->getConnectionPort();
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getConnectionSocket(PyObject *self, PyObject *args) {
@@ -83,12 +96,18 @@ static PyObject *resumeSession(PyObject *self, PyObject *args) {
   uint16_t port;
   char *socket;
   bool rc;
-  if (!PyArg_ParseTuple(args, "lHs", &sqlrcon, &port, &socket))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lHs",
+#else
+	"lhs",
+#endif
+	&sqlrcon, &port, &socket))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->resumeSession(port,socket);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *ping(PyObject *self, PyObject *args) {
@@ -99,7 +118,7 @@ static PyObject *ping(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->ping();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *identify(PyObject *self, PyObject *args) {
@@ -121,7 +140,7 @@ static PyObject *autoCommitOn(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->autoCommitOn();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *autoCommitOff(PyObject *self, PyObject *args) {
@@ -132,7 +151,7 @@ static PyObject *autoCommitOff(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->autoCommitOff();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *commit(PyObject *self, PyObject *args) {
@@ -143,7 +162,7 @@ static PyObject *commit(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->commit();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *rollback(PyObject *self, PyObject *args) {
@@ -154,7 +173,7 @@ static PyObject *rollback(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->rollback();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *debugOn(PyObject *self, PyObject *args) {
@@ -177,7 +196,7 @@ static PyObject *getDebug(PyObject *self, PyObject *args) {
   long sqlrcon;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
     return NULL;
-  return Py_BuildValue("h", ((sqlrconnection *)sqlrcon)->getDebug());
+  return Py_BuildValue("h", (short)((sqlrconnection *)sqlrcon)->getDebug());
 }
 
 static PyObject *sqlrcur_alloc(PyObject *self, PyObject *args) {
@@ -187,7 +206,7 @@ static PyObject *sqlrcur_alloc(PyObject *self, PyObject *args) {
     return NULL;
   sqlrcur = new sqlrcursor((sqlrconnection *)sqlrcon);
   sqlrcur->copyReferences();
-  return Py_BuildValue("l", sqlrcur);
+  return Py_BuildValue("l", (long)sqlrcur);
 }
 
 static PyObject *sqlrcur_free(PyObject *self, PyObject *args) {
@@ -203,7 +222,13 @@ static PyObject *sqlrcur_free(PyObject *self, PyObject *args) {
 static PyObject *setResultSetBufferSize(PyObject *self, PyObject *args) {
   long sqlrcur;
   uint64_t rows;
-  if (!PyArg_ParseTuple(args, "lK", &sqlrcur, &rows))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lK",
+#else
+	"lL",
+#endif
+	&sqlrcur, &rows))
     return NULL;
   ((sqlrcursor *)sqlrcur)->setResultSetBufferSize(rows);
   return Py_BuildValue("h", 0);
@@ -215,7 +240,8 @@ static PyObject *getResultSetBufferSize(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getResultSetBufferSize();
-  return Py_BuildValue("K", rc);
+  // FIXME: lame, python doesn't support building values from uint64_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *dontGetColumnInfo(PyObject *self, PyObject *args) {
@@ -270,7 +296,13 @@ static PyObject *cacheToFile(PyObject *self, PyObject *args) {
 static PyObject *setCacheTtl(PyObject *self, PyObject *args) {
   long sqlrcur;
   uint32_t ttl;
-  if (!PyArg_ParseTuple(args, "lI", &sqlrcur, &ttl))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lI",
+#else
+	"li",
+#endif
+	&sqlrcur, &ttl))
     return NULL;
   ((sqlrcursor *)sqlrcur)->setCacheTtl(ttl);
   return Py_BuildValue("h", 0);
@@ -302,7 +334,7 @@ static PyObject *sendQuery(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->sendQuery(sqlString);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *sendQueryWithLength(PyObject *self, PyObject *args) {
@@ -310,12 +342,18 @@ static PyObject *sendQueryWithLength(PyObject *self, PyObject *args) {
   long sqlrcur;
   uint32_t length;
   bool rc;
-  if (!PyArg_ParseTuple(args, "lsI", &sqlrcur, &sqlString, &length))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lsI",
+#else
+	"lsi",
+#endif
+	&sqlrcur, &sqlString, &length))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->sendQuery(sqlString,length);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *sendFileQuery(PyObject *self, PyObject *args) {
@@ -328,7 +366,7 @@ static PyObject *sendFileQuery(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->sendFileQuery(path, file);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *prepareQuery(PyObject *self, PyObject *args) {
@@ -344,7 +382,13 @@ static PyObject *prepareQueryWithLength(PyObject *self, PyObject *args) {
   char *sqlString;
   long sqlrcur;
   uint32_t length;
-  if (!PyArg_ParseTuple(args, "lsI", &sqlrcur, &sqlString, &length))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lsI",
+#else
+	"lsi",
+#endif
+	&sqlrcur, &sqlString, &length))
     return NULL;
   ((sqlrcursor *)sqlrcur)->prepareQuery(sqlString,length);
   return Py_BuildValue("h", 0);
@@ -360,7 +404,7 @@ static PyObject *prepareFileQuery(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->prepareFileQuery(path, file);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *substitution(PyObject *self, PyObject *args) {
@@ -369,7 +413,13 @@ static PyObject *substitution(PyObject *self, PyObject *args) {
   PyObject *value;
   uint32_t precision;
   uint32_t scale;
-  if (!PyArg_ParseTuple(args, "lsOII", &sqlrcur, &variable, &value, &precision, &scale))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lsOII",
+#else
+	"lsOii",
+#endif
+	&sqlrcur, &variable, &value, &precision, &scale))
     return NULL;
   if (value==Py_None) {
     ((sqlrcursor *)sqlrcur)->substitution(variable, (char *)NULL);
@@ -425,7 +475,8 @@ static PyObject *countBindVariables(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->countBindVariables();
-  return Py_BuildValue("H", rc);
+  // FIXME: lame, python doesn't support building values from uint16_t's
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *inputBind(PyObject *self, PyObject *args) {
@@ -434,7 +485,13 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
   uint32_t precision;
   uint32_t scale;
   long sqlrcur;
-  if (!PyArg_ParseTuple(args, "lsOII", &sqlrcur, &variable, &value, &precision, &scale))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lsOII",
+#else
+	"lsOii",
+#endif
+	&sqlrcur, &variable, &value, &precision, &scale))
     return NULL;
   if (value==Py_None) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (char *)NULL);
@@ -453,7 +510,13 @@ static PyObject *inputBindBlob(PyObject *self, PyObject *args) {
   PyObject *value;
   uint32_t size;
   long sqlrcur;
-  if (!PyArg_ParseTuple(args, "lsOI", &sqlrcur, &variable, &value, &size))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lsOI",
+#else
+	"lsOi",
+#endif
+	&sqlrcur, &variable, &value, &size))
     return NULL;
   if (value==Py_None) {
     ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, NULL, size);
@@ -468,7 +531,13 @@ static PyObject *inputBindClob(PyObject *self, PyObject *args) {
   PyObject *value;
   uint32_t size;
   long sqlrcur;
-  if (!PyArg_ParseTuple(args, "lsOI", &sqlrcur, &variable, &value, &size))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lsOI",
+#else
+	"lsOi",
+#endif
+	&sqlrcur, &variable, &value, &size))
     return NULL;
   if (value==Py_None) {
     ((sqlrcursor *)sqlrcur)->inputBindClob(variable, NULL, size);
@@ -510,7 +579,13 @@ static PyObject *defineOutputBind(PyObject *self, PyObject *args) {
   char *variable;
   uint32_t length;
   long sqlrcur;
-  if (!PyArg_ParseTuple(args, "lsI", &sqlrcur, &variable, &length))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lsI",
+#else
+	"lsi",
+#endif
+	&sqlrcur, &variable, &length))
     return NULL;
   ((sqlrcursor *)sqlrcur)->defineOutputBind(variable, length);
   return Py_BuildValue("h", 0);
@@ -559,7 +634,7 @@ static PyObject *executeQuery(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->executeQuery();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *fetchFromBindCursor(PyObject *self, PyObject *args) {
@@ -570,7 +645,7 @@ static PyObject *fetchFromBindCursor(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->fetchFromBindCursor();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getOutputBind(PyObject *self, PyObject *args) {
@@ -592,7 +667,8 @@ static PyObject *getOutputBindAsInteger(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getOutputBindAsInteger(variable);
-  return Py_BuildValue("L", rc);
+  // FIXME: lame, python doesn't support building values from int64_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *getOutputBindAsDouble(PyObject *self, PyObject *args) {
@@ -612,7 +688,8 @@ static PyObject *getOutputBindLength(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getOutputBindLength(variable);
-  return Py_BuildValue("I", rc);
+  // FIXME: lame, python doesn't support building values from uint32_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *openCachedResultSet(PyObject *self, PyObject *args) {
@@ -624,7 +701,7 @@ static PyObject *openCachedResultSet(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->openCachedResultSet(filename);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *colCount(PyObject *self, PyObject *args) {
@@ -633,7 +710,8 @@ static PyObject *colCount(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->colCount();
-  return Py_BuildValue("I", rc);
+  // FIXME: lame, python doesn't support building values from uint32_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *rowCount(PyObject *self, PyObject *args) {
@@ -642,7 +720,8 @@ static PyObject *rowCount(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->rowCount();
-  return Py_BuildValue("K", rc);
+  // FIXME: lame, python doesn't support building values from uint64_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *totalRows(PyObject *self, PyObject *args) {
@@ -651,7 +730,8 @@ static PyObject *totalRows(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->totalRows();
-  return Py_BuildValue("K", rc);
+  // FIXME: lame, python doesn't support building values from uint64_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *affectedRows(PyObject *self, PyObject *args) {
@@ -660,7 +740,8 @@ static PyObject *affectedRows(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->affectedRows();
-  return Py_BuildValue("K", rc);
+  // FIXME: lame, python doesn't support building values from uint64_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *firstRowIndex(PyObject *self, PyObject *args) {
@@ -669,7 +750,8 @@ static PyObject *firstRowIndex(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->firstRowIndex();
-  return Py_BuildValue("K", rc);
+  // FIXME: lame, python doesn't support building values from uint64_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *endOfResultSet(PyObject *self, PyObject *args) {
@@ -678,7 +760,7 @@ static PyObject *endOfResultSet(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->endOfResultSet();
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *errorMessage(PyObject *self, PyObject *args) {
@@ -710,7 +792,13 @@ static PyObject *getField(PyObject *self, PyObject *args) {
   uint32_t  rl=0;
   uint64_t row;
   PyObject *col;
-  if (!PyArg_ParseTuple(args, "lKO", &sqlrcur, &row, &col))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lKO",
+#else
+	"lLO",
+#endif
+	&sqlrcur, &row, &col))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
@@ -733,7 +821,13 @@ static PyObject *getFieldAsInteger(PyObject *self, PyObject *args) {
   int64_t rc=0;
   uint64_t row;
   PyObject *col;
-  if (!PyArg_ParseTuple(args, "lKO", &sqlrcur, &row, &col))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lKO",
+#else
+	"lLO",
+#endif
+	&sqlrcur, &row, &col))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
@@ -742,7 +836,8 @@ static PyObject *getFieldAsInteger(PyObject *self, PyObject *args) {
     rc=((sqlrcursor *)sqlrcur)->getFieldAsInteger(row, PyInt_AsLong(col));
   }
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("k", rc);
+  // FIXME: lame, python doesn't support building values from int64_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *getFieldAsDouble(PyObject *self, PyObject *args) {
@@ -750,7 +845,13 @@ static PyObject *getFieldAsDouble(PyObject *self, PyObject *args) {
   double rc=0.0;
   uint64_t row;
   PyObject *col;
-  if (!PyArg_ParseTuple(args, "lKO", &sqlrcur, &row, &col))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lKO",
+#else
+	"lLO",
+#endif
+	&sqlrcur, &row, &col))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
@@ -767,7 +868,13 @@ static PyObject *getFieldLength(PyObject *self, PyObject *args) {
   uint32_t rc=0;
   uint64_t row;
   PyObject *col;
-  if (!PyArg_ParseTuple(args, "lKO", &sqlrcur, &row, &col))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lKO",
+#else
+	"lLO",
+#endif
+	&sqlrcur, &row, &col))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
@@ -776,7 +883,8 @@ static PyObject *getFieldLength(PyObject *self, PyObject *args) {
     rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyInt_AsLong(col));
   }
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("I", rc);
+  // FIXME: lame, python doesn't support building values from uint32_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *
@@ -815,7 +923,13 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
 static PyObject *getRow(PyObject *self, PyObject *args) {
   long sqlrcur;
   uint64_t row;
-  if (!PyArg_ParseTuple(args, "lK", &sqlrcur, &row))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lK",
+#else
+	"lL",
+#endif
+	&sqlrcur, &row))
     return NULL;
   return _get_row((sqlrcursor *)sqlrcur, row);
 }
@@ -827,7 +941,13 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
   uint32_t counter;
   const char *field;
   const char *name;
-  if (!PyArg_ParseTuple(args, "lK", &sqlrcur, &row))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lK",
+#else
+	"lL",
+#endif
+	&sqlrcur, &row))
     return NULL;
   my_dictionary=PyDict_New();
   for (counter=0; counter<((sqlrcursor *)sqlrcur)->colCount(); counter++) {
@@ -860,7 +980,13 @@ static PyObject *getRowRange(PyObject *self, PyObject *args) {
   uint64_t counter;
   PyObject *my_list;
   my_list = PyList_New(0);
-  if (!PyArg_ParseTuple(args, "lKK", &sqlrcur, &beg_row, &end_row))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lKK",
+#else
+	"lLL",
+#endif
+	&sqlrcur, &beg_row, &end_row))
     return NULL;
   uint64_t max_rows=((sqlrcursor *)sqlrcur)->rowCount();
   if (end_row>=max_rows) {
@@ -893,7 +1019,8 @@ _get_row_lengths(sqlrcursor *sqlrcur, uint64_t row)
       Py_INCREF(Py_None);
       PyList_SetItem(my_list, counter, Py_None);
     } else {
-      PyList_SetItem(my_list, counter, Py_BuildValue("l", row_data[counter]));
+      // FIXME: lame, python doesn't support building values from uint32_t's
+      PyList_SetItem(my_list, counter, Py_BuildValue("l", (long)row_data[counter]));
     }
   }
   return my_list;
@@ -902,7 +1029,13 @@ _get_row_lengths(sqlrcursor *sqlrcur, uint64_t row)
 static PyObject *getRowLengths(PyObject *self, PyObject *args) {
   long sqlrcur;
   uint64_t row;
-  if (!PyArg_ParseTuple(args, "lK", &sqlrcur, &row))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lK",
+#else
+	"lL",
+#endif
+	&sqlrcur, &row))
     return NULL;
   return _get_row_lengths((sqlrcursor *)sqlrcur, row);
 }
@@ -911,14 +1044,21 @@ static PyObject *getRowLengthsDictionary(PyObject *self, PyObject *args) {
   long sqlrcur;
   uint64_t row;
   PyObject *my_dictionary;
-  if (!PyArg_ParseTuple(args, "lK", &sqlrcur, &row))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lK",
+#else
+	"lL",
+#endif
+	&sqlrcur, &row))
     return NULL;
   my_dictionary=PyDict_New();
   for (uint32_t counter=0; counter<((sqlrcursor *)sqlrcur)->colCount(); counter++) {
     Py_BEGIN_ALLOW_THREADS
     PyDict_SetItem(my_dictionary,
         Py_BuildValue("s",((sqlrcursor *)sqlrcur)->getColumnName(counter)),
-        Py_BuildValue("I",((sqlrcursor *)sqlrcur)->getFieldLength(row,counter)));
+        // FIXME: lame, python doesn't support building values from uint32_t's
+        Py_BuildValue("l",(long)((sqlrcursor *)sqlrcur)->getFieldLength(row,counter)));
     Py_END_ALLOW_THREADS
   }
   return my_dictionary;
@@ -931,7 +1071,13 @@ static PyObject *getRowLengthsRange(PyObject *self, PyObject *args) {
   uint64_t counter;
   PyObject *my_list;
   my_list = PyList_New(0);
-  if (!PyArg_ParseTuple(args, "lKK", &sqlrcur, &beg_row, &end_row))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lKK",
+#else
+	"lLL",
+#endif
+	&sqlrcur, &beg_row, &end_row))
     return NULL;
   uint64_t max_rows=((sqlrcursor *)sqlrcur)->rowCount();
   if (end_row>=max_rows) {
@@ -947,7 +1093,13 @@ static PyObject *getColumnName(PyObject *self, PyObject *args) {
   long sqlrcur;
   const char *rc;
   uint32_t col;
-  if (!PyArg_ParseTuple(args, "lI", &sqlrcur, &col))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lI",
+#else
+	"li",
+#endif
+	&sqlrcur, &col))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getColumnName(col);
   return Py_BuildValue("s", rc);
@@ -999,7 +1151,8 @@ static PyObject *getColumnLength(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnLength(PyInt_AsLong(col));
   }
-  return Py_BuildValue("I", rc);
+  // FIXME: lame, python doesn't support building values from uint32_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *getColumnPrecision(PyObject *self, PyObject *args) {
@@ -1013,7 +1166,8 @@ static PyObject *getColumnPrecision(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnPrecision(PyInt_AsLong(col));
   }
-  return Py_BuildValue("I", rc);
+  // FIXME: lame, python doesn't support building values from uint32_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *getColumnScale(PyObject *self, PyObject *args) {
@@ -1027,7 +1181,8 @@ static PyObject *getColumnScale(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnScale(PyInt_AsLong(col));
   }
-  return Py_BuildValue("I", rc);
+  // FIXME: lame, python doesn't support building values from uint32_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *getColumnIsNullable(PyObject *self, PyObject *args) {
@@ -1041,7 +1196,7 @@ static PyObject *getColumnIsNullable(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnIsNullable(PyInt_AsLong(col));
   }
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getColumnIsPrimaryKey(PyObject *self, PyObject *args) {
@@ -1055,7 +1210,7 @@ static PyObject *getColumnIsPrimaryKey(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnIsPrimaryKey(PyInt_AsLong(col));
   }
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getColumnIsUnique(PyObject *self, PyObject *args) {
@@ -1069,7 +1224,7 @@ static PyObject *getColumnIsUnique(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnIsUnique(PyInt_AsLong(col));
   }
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getColumnIsPartOfKey(PyObject *self, PyObject *args) {
@@ -1083,7 +1238,7 @@ static PyObject *getColumnIsPartOfKey(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnIsPartOfKey(PyInt_AsLong(col));
   }
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getColumnIsUnsigned(PyObject *self, PyObject *args) {
@@ -1097,7 +1252,7 @@ static PyObject *getColumnIsUnsigned(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnIsUnsigned(PyInt_AsLong(col));
   }
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getColumnIsZeroFilled(PyObject *self, PyObject *args) {
@@ -1111,7 +1266,7 @@ static PyObject *getColumnIsZeroFilled(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnIsZeroFilled(PyInt_AsLong(col));
   }
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getColumnIsBinary(PyObject *self, PyObject *args) {
@@ -1125,7 +1280,7 @@ static PyObject *getColumnIsBinary(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnIsBinary(PyInt_AsLong(col));
   }
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getColumnIsAutoIncrement(PyObject *self, PyObject *args) {
@@ -1139,7 +1294,7 @@ static PyObject *getColumnIsAutoIncrement(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getColumnIsAutoIncrement(PyInt_AsLong(col));
   }
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getLongest(PyObject *self, PyObject *args) {
@@ -1153,7 +1308,8 @@ static PyObject *getLongest(PyObject *self, PyObject *args) {
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getLongest(PyInt_AsLong(col));
   }
-  return Py_BuildValue("I", rc);
+  // FIXME: lame, python doesn't support building values from uint32_t's
+  return Py_BuildValue("l", (long)rc);
 }
 
 static PyObject *getResultSetId(PyObject *self, PyObject *args) {
@@ -1162,7 +1318,8 @@ static PyObject *getResultSetId(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getResultSetId();
-  return Py_BuildValue("H", rc);
+  // FIXME: lame, python doesn't support building values from uint16_t's
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *suspendResultSet(PyObject *self, PyObject *args) {
@@ -1179,12 +1336,18 @@ static PyObject *resumeResultSet(PyObject *self, PyObject *args) {
   long sqlrcur;
   bool rc;
   uint16_t id;
-  if (!PyArg_ParseTuple(args, "lH", &sqlrcur, &id))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lH",
+#else
+	"lh",
+#endif
+	&sqlrcur, &id))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->resumeResultSet(id);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *resumeCachedResultSet(PyObject *self, PyObject *args) {
@@ -1192,12 +1355,18 @@ static PyObject *resumeCachedResultSet(PyObject *self, PyObject *args) {
   bool rc;
   uint16_t id;
   char *filename;
-  if (!PyArg_ParseTuple(args, "lHs", &sqlrcur, &id, &filename))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lHs",
+#else
+	"lhs",
+#endif
+	&sqlrcur, &id, &filename))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->resumeCachedResultSet(id,filename);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *outputBindCursorIdIsValid(PyObject *self, PyObject *args) {
@@ -1209,7 +1378,7 @@ static PyObject *outputBindCursorIdIsValid(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->outputBindCursorIdIsValid(variable);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("h", rc);
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *getOutputBindCursorId(PyObject *self, PyObject *args) {
@@ -1221,13 +1390,20 @@ static PyObject *getOutputBindCursorId(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrcursor *)sqlrcur)->getOutputBindCursorId(variable);
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("H", rc);
+  // FIXME: lame, python doesn't support building values from uint16_t's
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *attachToBindCursor(PyObject *self, PyObject *args) {
   long sqlrcur;
   uint16_t bindcursorid;
-  if (!PyArg_ParseTuple(args, "lH", &sqlrcur, &bindcursorid))
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+	"lH",
+#else
+	"lh",
+#endif
+	&sqlrcur, &bindcursorid))
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   ((sqlrcursor *)sqlrcur)->attachToBindCursor(bindcursorid);

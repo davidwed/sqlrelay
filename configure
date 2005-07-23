@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH PYTHONUSERPATH JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC SIDINCLUDES SIDLIBS MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLPREFIX PERLCYGDRIVEPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYCYGDRIVEPREFIX RUBYLIB HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPLIB PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH OVERRIDEPERLSITEARCH OVERRIDEPERLSITELIB OVERRIDEPERLINSTALLMAN3DIR OVERRIDEPERLMAN3EXT PYTHONUSERPATH OVERRIDERUBYSITEARCHDIR OVERRIDERUBYSITELIBDIR JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOLGCC MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC SIDINCLUDES SIDLIBS MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLPREFIX PERLCYGDRIVEPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYCYGDRIVEPREFIX RUBYLIB HAVE_JAVA JAVAC JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1092,14 +1092,22 @@ Optional Packages:
   --with-mdbtools-prefix        Location of MDB Tools
   --with-perl-prefix            Location of Perl
   --with-pod2man                Full pathname of pod2man
+  --with-perl-site-arch         Override Perl's built-in PERLSITEARCH variable (location to install binary perl modules)
+  --with-perl-site-lib          Override Perl's built-in PERLSITELIB variable (location to install non-binary perl modules)
+  --with-perl-install-man3-dir  Override Perl's built-in PERLINSTALLMAN3DIR variable (location to install perl module man pages)
+  --with-perl-man3-ext          Override Perl's built-in PERLMAN3EXT variable (extension to put on perl module man pages)
   --with-python-prefix          Location of Python
+  --with-python-dir             Path to install Python driver
   --with-zope-prefix            Location of Zope
   --with-ruby-prefix            Location of Ruby
+  --with-ruby-site-arch-dir     Override Ruby's built-in sitearchdir variable (location to install binary ruby modules)
+  --with-ruby-site-lib-dir      Override Ruby's built-in sitelibdir variable (location to install binary ruby modules)
   --with-java-prefix            Location of Java
   --with-php-prefix             Location of PHP
+  --with-php-ext-dir            Path to install PHP modules
   --with-pear-db-dir            Path to install PHP Pear DB driver
   --with-tcl-include		 Location of tcl.h include file
-  --with-tcl-libraries		 Location of libtcl
+  --with-tcl-libraries		 Location of libtcl, where to install tcl module
   --with-gtk-prefix             Location of GTK+
   --with-pthread-prefix         Location of pthread library
   --with-system-libtool   use system libtool instead of ./libtool
@@ -1917,6 +1925,42 @@ else
   ENABLE_PERL="yes"
 fi;
 
+# Check whether --with-perl-site-arch or --without-perl-site-arch was given.
+if test "${with_perl_site_arch+set}" = set; then
+  withval="$with_perl_site_arch"
+  OVERRIDEPERLSITEARCH="$withval"
+else
+  OVERRIDEPERLSITEARCH=""
+fi;
+
+
+# Check whether --with-perl-site-lib or --without-perl-site-lib was given.
+if test "${with_perl_site_lib+set}" = set; then
+  withval="$with_perl_site_lib"
+  OVERRIDEPERLSITELIB="$withval"
+else
+  OVERRIDEPERLSITELIB=""
+fi;
+
+
+# Check whether --with-perl-install-man3-dir or --without-perl-install-man3-dir was given.
+if test "${with_perl_install_man3_dir+set}" = set; then
+  withval="$with_perl_install_man3_dir"
+  OVERRIDEPERLINSTALLMAN3DIR="$withval"
+else
+  OVERRIDEPERLINSTALLMAN3DIR=""
+fi;
+
+
+# Check whether --with-perl-man3-ext or --without-perl-man3-ext was given.
+if test "${with_perl_man3_ext+set}" = set; then
+  withval="$with_perl_man3_ext"
+  OVERRIDEPERLMAN3EXT="$withval"
+else
+  OVERRIDEPERLMAN3EXT=""
+fi;
+
+
 # Check whether --with-python-prefix or --without-python-prefix was given.
 if test "${with_python_prefix+set}" = set; then
   withval="$with_python_prefix"
@@ -1939,6 +1983,14 @@ else
   PYTHONUSERPATH=""
 fi;
 
+
+# Check whether --with-python-dir or --without-python-dir was given.
+if test "${with_python_dir+set}" = set; then
+  withval="$with_python_dir"
+  PYTHONDIR="$withval"
+else
+  PYTHONDIR=""
+fi;
 
 # Check whether --with-zope-prefix or --without-zope-prefix was given.
 if test "${with_zope_prefix+set}" = set; then
@@ -1969,6 +2021,24 @@ if test "${enable_ruby+set}" = set; then
 else
   ENABLE_RUBY="yes"
 fi;
+
+# Check whether --with-ruby-site-arch-dir or --without-ruby-site-arch-dir was given.
+if test "${with_ruby_site_arch_dir+set}" = set; then
+  withval="$with_ruby_site_arch_dir"
+  OVERRIDERUBYSITEARCHDIR="$withval"
+else
+  OVERRIDERUBYSITEARCHDIR=""
+fi;
+
+
+# Check whether --with-ruby-site-lib-dir or --without-ruby-site-lib-dir was given.
+if test "${with_ruby_site_lib_dir+set}" = set; then
+  withval="$with_ruby_site_lib_dir"
+  OVERRIDERUBYSITELIBDIR="$withval"
+else
+  OVERRIDERUBYSITELIBDIR=""
+fi;
+
 
 # Check whether --with-java-prefix or --without-java-prefix was given.
 if test "${with_java_prefix+set}" = set; then
@@ -2015,6 +2085,14 @@ else
   PHPUSERPATH=""
 fi;
 
+
+# Check whether --with-php-ext-dir or --without-php-ext-dir was given.
+if test "${with_php_ext_dir+set}" = set; then
+  withval="$with_php_ext_dir"
+  PHPEXTDIR="$withval"
+else
+  PHPEXTDIR=""
+fi;
 
 # Check whether --with-pear-db-dir or --without-pear-db-dir was given.
 if test "${with_pear_db_dir+set}" = set; then
@@ -4497,7 +4575,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4500 "configure"' > conftest.$ac_ext
+  echo '#line 4578 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5613,7 +5691,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5616:" \
+echo "$as_me:5694:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6644,11 +6722,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6647: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6725: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6651: \$? = $ac_status" >&5
+   echo "$as_me:6729: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6876,11 +6954,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6879: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6957: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6883: \$? = $ac_status" >&5
+   echo "$as_me:6961: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6943,11 +7021,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6946: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7024: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6950: \$? = $ac_status" >&5
+   echo "$as_me:7028: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9061,7 +9139,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9064 "configure"
+#line 9142 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9159,7 +9237,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9162 "configure"
+#line 9240 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11315,11 +11393,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11318: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11396: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11322: \$? = $ac_status" >&5
+   echo "$as_me:11400: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11382,11 +11460,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11385: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11463: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11389: \$? = $ac_status" >&5
+   echo "$as_me:11467: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12711,7 +12789,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12714 "configure"
+#line 12792 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12809,7 +12887,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12812 "configure"
+#line 12890 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13631,11 +13709,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13634: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13712: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13638: \$? = $ac_status" >&5
+   echo "$as_me:13716: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -13698,11 +13776,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13701: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13779: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13705: \$? = $ac_status" >&5
+   echo "$as_me:13783: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15664,11 +15742,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15667: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15745: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15671: \$? = $ac_status" >&5
+   echo "$as_me:15749: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15896,11 +15974,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15899: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15977: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15903: \$? = $ac_status" >&5
+   echo "$as_me:15981: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15963,11 +16041,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15966: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16044: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15970: \$? = $ac_status" >&5
+   echo "$as_me:16048: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18081,7 +18159,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18084 "configure"
+#line 18162 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18179,7 +18257,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18182 "configure"
+#line 18260 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -33674,6 +33752,8 @@ echo "***** Python 2.1 or newer ****"
 if ( test "$ENABLE_PYTHON" = "yes" )
 then
 
+	OVERRIDEPYTHONDIR="$PYTHONDIR"
+
 	HAVE_PYTHON=""
 	PYTHONINCLUDES=""
 	PYTHONDIR=""
@@ -33877,6 +33957,11 @@ then
 	echo "python includes... $PYTHONINCLUDES"
 fi
 
+
+	if ( test -n "$OVERRIDEPYTHONDIR" )
+	then
+		PYTHONDIR="$OVERRIDEPYTHONDIR"
+	fi
 
 
 
@@ -34471,10 +34556,11 @@ echo "***** PHP ********************"
 if ( test "$ENABLE_PHP" = "yes" )
 then
 
+	OVERRIDEPHPEXTDIR="$PHPEXTDIR"
+
 	HAVE_PHP=""
 	PHPINCLUDES=""
 	PHPEXTDIR=""
-	PHPLIB=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -34573,6 +34659,10 @@ then
 fi
 
 
+	if ( test -n "$OVERRIDEPHPEXTDIR" )
+	then
+		PHPEXTDIR="$OVERRIDEPHPEXTDIR"
+	fi
 
 
 
@@ -38609,7 +38699,13 @@ s,@ODBCUSERPATH@,$ODBCUSERPATH,;t t
 s,@DB2USERPATH@,$DB2USERPATH,;t t
 s,@INTERBASEUSERPATH@,$INTERBASEUSERPATH,;t t
 s,@MDBTOOLSUSERPATH@,$MDBTOOLSUSERPATH,;t t
+s,@OVERRIDEPERLSITEARCH@,$OVERRIDEPERLSITEARCH,;t t
+s,@OVERRIDEPERLSITELIB@,$OVERRIDEPERLSITELIB,;t t
+s,@OVERRIDEPERLINSTALLMAN3DIR@,$OVERRIDEPERLINSTALLMAN3DIR,;t t
+s,@OVERRIDEPERLMAN3EXT@,$OVERRIDEPERLMAN3EXT,;t t
 s,@PYTHONUSERPATH@,$PYTHONUSERPATH,;t t
+s,@OVERRIDERUBYSITEARCHDIR@,$OVERRIDERUBYSITEARCHDIR,;t t
+s,@OVERRIDERUBYSITELIBDIR@,$OVERRIDERUBYSITELIBDIR,;t t
 s,@JAVAUSERPATH@,$JAVAUSERPATH,;t t
 s,@PHPUSERPATH@,$PHPUSERPATH,;t t
 s,@TCLUSERPATH@,$TCLUSERPATH,;t t
@@ -38756,7 +38852,6 @@ s,@PHPCONFIG@,$PHPCONFIG,;t t
 s,@HAVE_PHP@,$HAVE_PHP,;t t
 s,@PHPINCLUDES@,$PHPINCLUDES,;t t
 s,@PHPEXTDIR@,$PHPEXTDIR,;t t
-s,@PHPLIB@,$PHPLIB,;t t
 s,@PHPVERSION@,$PHPVERSION,;t t
 s,@PHPMAJORVERSION@,$PHPMAJORVERSION,;t t
 s,@PHPPEARDBDIR@,$PHPPEARDBDIR,;t t

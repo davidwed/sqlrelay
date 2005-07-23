@@ -11,6 +11,8 @@
 	de-supported python<2.1
 	clob/lob's aren't deleted if their length is 0
 	removed lago support
+	fixed slight bugs in tcl api
+	added sqlite/tcl test
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

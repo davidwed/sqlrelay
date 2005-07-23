@@ -6,10 +6,26 @@ include ../../../../config.mk
 
 PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e "s|UNKNOWN||g" )
 PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e "s|UNKNOWN||g" )
+ifeq ($(OVERRIDEPERLSITEARCH),)
 PERLSITEARCH = $(DESTDIR)$(shell eval "`$(PERL) -V:sitearch`"; export sitearch; echo $$sitearch | sed -e "s|UNKNOWN||g" )
+else
+PERLSITEARCH = $(DESTDIR)$(OVERRIDEPERLSITEARCH)
+endif
+ifeq ($(OVERRIDEPERLSITELIB),)
 PERLSITELIB = $(DESTDIR)$(shell eval "`$(PERL) -V:sitelib`"; export sitelib; echo $$sitelib | sed -e "s|UNKNOWN||g" )
+else
+PERLSITELIB = $(DESTDIR)$(OVERRIDEPERLSITELIB)
+endif
+ifeq ($(OVERRIDEPERLINSTALLMAN3DIR),)
 PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "`$(PERL) -V:installman3dir`"; export installman3dir; echo $$installman3dir )
+else
+PERLINSTALLMAN3DIR = $(DESTDIR)$(OVERRIDEPERLINSTALLMAN3DIR)
+endif
+ifeq ($(OVERRIDEPERLMAN3EXT),)
 PERLMAN3EXT = $(shell eval "`$(PERL) -V:man3ext`"; export man3ext; echo $$man3ext | sed -e "s|UNKNOWN||g" )
+else
+PERLMAN3EXT = $(OVERRIDEPERLMAN3EXT)
+endif
 
 all:
 

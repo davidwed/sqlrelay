@@ -281,7 +281,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getLongest($cur,15),9);
 	checkSuccess(sqlrcur_getLongest($cur,16),11);
 	checkSuccess(sqlrcur_getLongest($cur,17),9);
-	checkSuccess(sqlrcur_getLongest($cur,18),14);
+	checkSuccess(sqlrcur_getLongest($cur,18),19);
 	checkSuccess(sqlrcur_getLongest($cur,"testtinyint"),1);
 	checkSuccess(sqlrcur_getLongest($cur,"testsmallint"),1);
 	checkSuccess(sqlrcur_getLongest($cur,"testmediumint"),1);
@@ -300,7 +300,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getLongest($cur,"testtinytext"),9);
 	checkSuccess(sqlrcur_getLongest($cur,"testmediumtext"),11);
 	checkSuccess(sqlrcur_getLongest($cur,"testlongtext"),9);
-	checkSuccess(sqlrcur_getLongest($cur,"testtimestamp"),14);
+	checkSuccess(sqlrcur_getLongest($cur,"testtimestamp"),19);
 	echo("\n");
 
 	echo("ROW COUNT: \n");

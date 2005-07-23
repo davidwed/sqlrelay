@@ -4,6 +4,7 @@
 #include <sqlrelay/sqlrclientwrapper.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 sqlrcon	con;
 sqlrcur	cur;
@@ -35,6 +36,7 @@ void checkSuccessString(const char *value, const char *success) {
 }
 
 void checkSuccessInt(int value, int success) {
+	//printf("%d=%d\n",value,success);
 
 	if (value==success) {
 		printf("success ");
@@ -48,23 +50,19 @@ void checkSuccessInt(int value, int success) {
 
 int	main(int argc, char **argv) {
 
-	const char	*dbtype;
-	char	*subvars[4]={"var1","var2","var3",NULL};
-	char	*subvalstrings[3]={"hi","hello","bye"};
-	long	subvallongs[3]={1,2,3};
-	double	subvaldoubles[3]={10.55,10.556,10.5556};
+	const char	*subvars[4]={"var1","var2","var3",NULL};
+	const char	*subvalstrings[3]={"hi","hello","bye"};
+	int64_t		subvallongs[3]={1,2,3};
+	double		subvaldoubles[3]={10.55,10.556,10.5556};
 	uint32_t	precs[3]={4,5,6};
 	uint32_t	scales[3]={2,3,4};
-	const char	*numvar;
-	const char	*stringvar;
-	const char	*floatvar;
 	const char * const *cols;
 	const char * const *fields;
-	int	port;
+	uint16_t	port;
 	const char	*socket;
-	int	id;
-	const char	*filename;
-	long	*fieldlens;
+	uint16_t	id;
+	char		*filename;
+	uint32_t	*fieldlens;
 
 
 	// usage...
@@ -346,7 +344,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,15),9);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,16),11);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,17),9);
-	checkSuccessInt(sqlrcur_getLongestByIndex(cur,18),14);
+	checkSuccessInt(sqlrcur_getLongestByIndex(cur,18),19);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtinyint"),1);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testsmallint"),1);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testmediumint"),1);
@@ -365,7 +363,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtinytext"),9);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testmediumtext"),11);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testlongtext"),9);
-	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtimestamp"),14);
+	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtimestamp"),19);
 	printf("\n");
 
 	printf("ROW COUNT: \n");
@@ -958,4 +956,6 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	printf("\n");
+
+	exit(0);
 }

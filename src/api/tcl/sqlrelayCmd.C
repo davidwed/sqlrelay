@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.13 2005-06-24 01:13:04 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.14 2005-07-23 05:22:30 mused Exp $
  */
 
 #include <tcl.h>
@@ -90,7 +90,7 @@ void sqlrcurDelete(ClientData data) {
  *   $cur getOutputBindAsDouble variable
  *   $cur getOutputBindLength variable
  *   $cur getOutputBindCursor variable
- *   $cur openCacheResultSet variable
+ *   $cur openCachedResultSet variable
  *   $cur colCount
  *   $cur rowCount
  *   $cur totalRows
@@ -173,7 +173,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "defineOutputBindBlob",
     "defineOutputBindClob",
     "defineOutputBindCursor",
-    "substitution",
+    "substitutions",
     "inputBinds",
     "validateBinds",
     "executeQuery",
@@ -183,7 +183,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "getOutputBindAsDouble",
     "getOutputBindLength",
     "getOutputBindCursor",
-    "openCacheResultSet",
+    "openCachedResultSet",
     "colCount",
     "rowCount",
     "totalRows",
@@ -270,7 +270,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_getOutputBindAsDouble,
     SQLRCUR_getOutputBindLength,
     SQLRCUR_getOutputBindCursor,
-    SQLRCUR_openCacheResultSet,
+    SQLRCUR_openCachedResultSet,
     SQLRCUR_colCount,
     SQLRCUR_rowCount,
     SQLRCUR_totalRows,
@@ -668,7 +668,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	int num = 0, len = 0, i = 0;
 	Tcl_Obj **argList, *variableObj, *valueObj, *precisionObj, *scaleObj;
 	if (objc != 3) {
-	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value ?presition scale?}...}");
+	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value ?precision scale?}...}");
 	  return TCL_ERROR;
 	}
 	if (Tcl_ListObjGetElements(interp, objv[2], &num, &argList) != TCL_OK) {
@@ -725,7 +725,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	int num = 0, len = 0, i = 0;
 	Tcl_Obj **argList, *variableObj, *valueObj, *precisionObj, *scaleObj;
 	if (objc != 3) {
-	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value ?presition scale?}...}");
+	  Tcl_WrongNumArgs(interp, 2, objv, "{{variable value ?precision scale?}...}");
 	  return TCL_ERROR;
 	}
 	if (Tcl_ListObjGetElements(interp, objv[2], &num, &argList) != TCL_OK) {
@@ -879,7 +879,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	}
 	break;
       }
-    case SQLRCUR_openCacheResultSet:
+    case SQLRCUR_openCachedResultSet:
       {
 	Tcl_Obj *result;
 	if (objc != 3) {

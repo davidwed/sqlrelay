@@ -6,12 +6,23 @@ include ../../../../config.mk
 
 PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|-xildoff||" -e "s|-xspace||" -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
 PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-xdepend||g' -e 's|-xO3||g' -e "s|-xildoff||" -e "s|-xspace||" -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=pentium4||g")
-PERLINSTALLARCHLIB = $(DESTDIR)$(shell eval "`$(PERL) -V:installarchlib`"; export installarchlib; echo $$installarchlib | sed -e "s|UNKNOWN||g" )
+ifeq ($(OVERRIDEPERLSITEARCH),)
 PERLSITEARCH = $(DESTDIR)$(shell eval "`$(PERL) -V:sitearch`"; export sitearch; echo $$sitearch | sed -e "s|UNKNOWN||g" )
+else
+PERLSITEARCH = $(DESTDIR)$(PERLSITEARCH)
+endif
 PERL_INC = $(DESTDIR)$(shell eval "`$(PERL) -V:archlibexp`"; export archlibexp; echo "-I$$archlibexp/CORE" | sed -e "s|UNKNOWN||g" )
 PERL_LIB = $(DESTDIR)$(shell eval "`$(PERL) -V:privlibexp`"; export privlibexp; echo $$privlibexp | sed -e "s|UNKNOWN||g" )
+ifeq ($(OVERRIDEPERLINSTALLMAN3DIR),)
 PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "`$(PERL) -V:installman3dir`"; export installman3dir; echo $$installman3dir | sed -e "s|UNKNOWN||g" )
+else
+PERLINSTALLMAN3DIR = $(DESTDIR)$(PERLINSTALLMAN3DIR)
+endif
+ifeq ($(OVERRIDEPERLMAN3EXT),)
 PERLMAN3EXT = $(shell eval "`$(PERL) -V:man3ext`"; export man3ext; echo $$man3ext | sed -e "s|UNKNOWN||g" )
+else
+PERLMAN3EXT = $(OVERRIDEPERLMAN3EXT)
+endif
 
 CPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE) $(PERLCCFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PERL_INC)
 LIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)

@@ -14,6 +14,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/python
 	$(MKINSTALLDIRS) $(docdir)/api/ruby
 	$(MKINSTALLDIRS) $(docdir)/api/java
+	$(MKINSTALLDIRS) $(docdir)/api/tcl
 	$(MKINSTALLDIRS) $(docdir)/dropin
 	$(MKINSTALLDIRS) $(docdir)/css
 	$(MKINSTALLDIRS) $(docdir)/programming
@@ -88,6 +89,7 @@ install:
 	$(INSTALL) -m 644 programming/ruby.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/rubydbi.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/java.html $(docdir)/programming
+	$(INSTALL) -m 644 programming/tcl.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/zope.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/zope/instance.gif $(docdir)/programming/zope
 	$(INSTALL) -m 644 programming/zope/management.gif $(docdir)/programming/zope

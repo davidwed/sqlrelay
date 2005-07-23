@@ -199,6 +199,19 @@ then
 	fi
 fi
 
+#if ( test "$API" = "tcl" -o -z "$API" )
+if ( test "$API" = "tcl" )
+then
+	if ( test "@HAVE_TCL@" = "yes" )
+	then
+		echo
+		echo "TCL:"
+		cd tcl
+		tclsh $DB.tcl $ARGS
+		rm -f cachefile* sqlnet.log
+		cd ..
+	fi
+fi
 
 
 if ( test "$DB" = "db2" )

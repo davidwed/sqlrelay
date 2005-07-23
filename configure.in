@@ -202,6 +202,26 @@ AC_ARG_ENABLE(perl,
 	[  --disable-perl                Don't build Perl api],
 	ENABLE_PERL="",
 	ENABLE_PERL="yes")
+AC_ARG_WITH(perl-site-arch,
+	[  --with-perl-site-arch         Override Perl's built-in PERLSITEARCH variable (location to install binary perl modules)],
+	OVERRIDEPERLSITEARCH="$withval",
+	OVERRIDEPERLSITEARCH="")
+	AC_SUBST(OVERRIDEPERLSITEARCH)
+AC_ARG_WITH(perl-site-lib,
+	[  --with-perl-site-lib          Override Perl's built-in PERLSITELIB variable (location to install non-binary perl modules)],
+	OVERRIDEPERLSITELIB="$withval",
+	OVERRIDEPERLSITELIB="")
+	AC_SUBST(OVERRIDEPERLSITELIB)
+AC_ARG_WITH(perl-install-man3-dir,
+	[  --with-perl-install-man3-dir  Override Perl's built-in PERLINSTALLMAN3DIR variable (location to install perl module man pages)],
+	OVERRIDEPERLINSTALLMAN3DIR="$withval",
+	OVERRIDEPERLINSTALLMAN3DIR="")
+	AC_SUBST(OVERRIDEPERLINSTALLMAN3DIR)
+AC_ARG_WITH(perl-man3-ext,
+	[  --with-perl-man3-ext          Override Perl's built-in PERLMAN3EXT variable (extension to put on perl module man pages)],
+	OVERRIDEPERLMAN3EXT="$withval",
+	OVERRIDEPERLMAN3EXT="")
+	AC_SUBST(OVERRIDEPERLMAN3EXT)
 AC_ARG_WITH(python-prefix,
 	[  --with-python-prefix          Location of Python],
 	PYTHONPATH="$withval",
@@ -215,6 +235,10 @@ AC_ARG_ENABLE(python-rpath,
 	PYTHONUSERPATH="yes",
 	PYTHONUSERPATH="")
 AC_SUBST(PYTHONUSERPATH)
+AC_ARG_WITH(python-dir,
+	[  --with-python-dir             Path to install Python driver],
+	PYTHONDIR="$withval",
+	PYTHONDIR="")
 AC_ARG_WITH(zope-prefix,
 	[  --with-zope-prefix            Location of Zope],
 	ZOPEPATH="$withval",
@@ -231,6 +255,16 @@ AC_ARG_ENABLE(ruby,
 	[  --disable-ruby                Don't build Ruby api],
 	ENABLE_RUBY="",
 	ENABLE_RUBY="yes")
+AC_ARG_WITH(ruby-site-arch-dir,
+	[  --with-ruby-site-arch-dir     Override Ruby's built-in sitearchdir variable (location to install binary ruby modules)],
+	OVERRIDERUBYSITEARCHDIR="$withval",
+	OVERRIDERUBYSITEARCHDIR="")
+	AC_SUBST(OVERRIDERUBYSITEARCHDIR)
+AC_ARG_WITH(ruby-site-lib-dir,
+	[  --with-ruby-site-lib-dir      Override Ruby's built-in sitelibdir variable (location to install binary ruby modules)],
+	OVERRIDERUBYSITELIBDIR="$withval",
+	OVERRIDERUBYSITELIBDIR="")
+	AC_SUBST(OVERRIDERUBYSITELIBDIR)
 AC_ARG_WITH(java-prefix,
 	[  --with-java-prefix            Location of Java],
 	JAVAPATH="$withval",
@@ -257,6 +291,10 @@ AC_ARG_ENABLE(php-rpath,
 	PHPUSERPATH="yes",
 	PHPUSERPATH="")
 AC_SUBST(PHPUSERPATH)
+AC_ARG_WITH(php-ext-dir,
+	[  --with-php-ext-dir            Path to install PHP modules],
+	PHPEXTDIR="$withval",
+	PHPEXTDIR="")
 AC_ARG_WITH(pear-db-dir,
 	[  --with-pear-db-dir            Path to install PHP Pear DB driver],
 	PHPPEARDBDIR="$withval",
@@ -266,7 +304,7 @@ AC_ARG_WITH(tcl-include,
 	TCLINCLUDEPATH="$withval",
 	TCLINCLUDEPATH="")
 AC_ARG_WITH(tcl-libraries,
-	[  --with-tcl-libraries		 Location of libtcl],
+	[  --with-tcl-libraries		 Location of libtcl, where to install tcl module],
 	TCLLIBSPATH="$withval",
 	TCLLIBSPATH="")
 AC_ARG_ENABLE(tcl,

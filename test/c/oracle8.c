@@ -49,13 +49,13 @@ void checkSuccessInt(int value, int success) {
 }
 
 int	main(int argc, char **argv) {
-	const char	*dbtype;
-	char	*bindvars[6]={"1","2","3","4","5",NULL};
-	char	*bindvals[5]={"4","testchar4","testvarchar4","01-JAN-2004","testlong4"};
-	char	*subvars[4]={"var1","var2","var3",NULL};
-	char	*subvalstrings[3]={"hi","hello","bye"};
-	long	subvallongs[3]={1,2,3};
-	double	subvaldoubles[3]={10.55,10.556,10.5556};
+	const char	*bindvars[6]={"1","2","3","4","5",NULL};
+	const char	*bindvals[5]={"4","testchar4","testvarchar4",
+						"01-JAN-2004","testlong4"};
+	const char	*subvars[4]={"var1","var2","var3",NULL};
+	const char	*subvalstrings[3]={"hi","hello","bye"};
+	int64_t		subvallongs[3]={1,2,3};
+	double		subvaldoubles[3]={10.55,10.556,10.5556};
 	uint32_t	precs[3]={4,5,6};
 	uint32_t	scales[3]={2,3,4};
 	const char	*numvar;
@@ -63,13 +63,15 @@ int	main(int argc, char **argv) {
 	const char	*floatvar;
 	const char * const *cols;
 	const char * const *fields;
-	int	port;
+	uint16_t	port;
 	const char	*socket;
-	int	id;
-	const char	*filename;
-	char	*arraybindvars[6]={"var1","var2","var3","var4","var5",NULL};
-	char	*arraybindvals[5]={"7","testchar7","testvarchar7","01-JAN-2007","testlong7"};
-	long	*fieldlens;
+	uint16_t	id;
+	char		*filename;
+	const char	*arraybindvars[6]={"var1","var2","var3",
+						"var4","var5",NULL};
+	const char	*arraybindvals[5]={"7","testchar7","testvarchar7",
+						"01-JAN-2007","testlong7"};
+	uint32_t	*fieldlens;
 
 
 	// usage...
@@ -708,4 +710,5 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	printf("\n");
 
+	exit(0);
 }

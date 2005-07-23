@@ -50,23 +50,19 @@ void checkSuccessInt(int value, int success) {
 
 int	main(int argc, char **argv) {
 
-	const char	*dbtype;
-	char	*subvars[4]={"var1","var2","var3",NULL};
-	char	*subvalstrings[3]={"hi","hello","bye"};
-	long	subvallongs[3]={1,2,3};
-	double	subvaldoubles[3]={10.55,10.556,10.5556};
+	const char	*subvars[4]={"var1","var2","var3",NULL};
+	const char	*subvalstrings[3]={"hi","hello","bye"};
+	int64_t		subvallongs[3]={1,2,3};
+	double		subvaldoubles[3]={10.55,10.556,10.5556};
 	uint32_t	precs[3]={4,5,6};
 	uint32_t	scales[3]={2,3,4};
-	const char	*numvar;
-	const char	*stringvar;
-	const char	*floatvar;
 	const char * const *cols;
 	const char * const *fields;
-	int	port;
+	uint16_t	port;
 	const char	*socket;
-	int	id;
-	const char	*filename;
-	long	*fieldlens;
+	uint16_t	id;
+	char		*filename;
+	uint32_t	*fieldlens;
 
 	// usage...
 	if (argc<5) {
@@ -723,4 +719,6 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	printf("\n");
+
+	exit(0);
 }

@@ -62,7 +62,6 @@ void checkSuccess(double value, double success) {
 
 int	main(int argc, char **argv) {
 
-	char		*dbtype;
 	const char	*bindvars[11]={"1","2","3","4","5","6","7","8","9","10",NULL};
 	const char	*bindvals[10]={"4","4","4","4.4","4.4","4.4",
 			"testchar4","testvarchar4","01/01/2004","04:00:00"};
@@ -72,9 +71,6 @@ int	main(int argc, char **argv) {
 	double		subvaldoubles[3]={10.55,10.556,10.5556};
 	uint32_t	precs[3]={4,5,6};
 	uint32_t	scales[3]={2,3,4};
-	char		*numvar;
-	char		*stringvar;
-	char		*floatvar;
 	const char * const *cols;
 	const char * const *fields;
 	uint16_t	port;

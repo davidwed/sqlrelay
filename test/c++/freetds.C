@@ -49,16 +49,12 @@ void checkSuccess(int value, int success) {
 
 int	main(int argc, char **argv) {
 
-	char		*dbtype;
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
 	int64_t		subvallongs[3]={1,2,3};
 	double		subvaldoubles[3]={10.55,10.556,10.5556};
 	uint32_t	precs[3]={4,5,6};
 	uint32_t	scales[3]={2,3,4};
-	char		*numvar;
-	char		*stringvar;
-	char		*floatvar;
 	const char * const *cols;
 	const char * const *fields;
 	uint16_t	port;
