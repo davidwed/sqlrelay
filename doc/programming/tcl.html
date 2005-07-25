@@ -141,10 +141,21 @@ directly to the database.</p>
 <span class="heading2">Catching Errors</span><br><br>
 
 <p>If your call to sendQuery() or sendFileQuery() returns a 0, the query failed.
-You can find out why by calling errorMessage().</p>
+You can find out why by catching the error and displaying it.</p>
 
 <blockquote>
-FIXME...
+<pre>
+load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
+
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
+
+catch {<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from my_table&quot;</font>} error
+
+<font color="#a52a2a"><b>if</b></font> {<font color="#008b8b">$error</font> != <font color="#ff00ff">1</font>} {
+        puts <font color="#008b8b">$error</font>
+}
+</pre>
 </blockquote>
 
 <a name="bindvars"></a>
@@ -412,7 +423,29 @@ the number of rows returned so far.  The firstRowIndex() method returns the
 index of the first row of the currently buffered chunk.
 
 <blockquote>
-FIXME...
+<pre>
+load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
+
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
+
+<font color="#008b8b">$cur</font> setResultSetBufferSize <font color="#ff00ff">2</font>
+
+catch {<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from testtable&quot;</font>}
+
+<font color="#a52a2a"><b>set</b></font> row <font color="#ff00ff">0</font>
+<font color="#a52a2a"><b>while</b></font> {true} {
+        <font color="#a52a2a"><b>for</b></font> {<font color="#a52a2a"><b>set</b></font> col <font color="#ff00ff">0</font>} {<font color="#008b8b">$col</font>&lt;[<font color="#008b8b">$cur</font> colCount]} {<font color="#a52a2a"><b>incr</b></font> col} {
+                puts -nonewline [<font color="#008b8b">$cur</font> getFieldByIndex <font color="#008b8b">$row</font> <font color="#008b8b">$col</font>]
+                puts -nonewline <font color="#ff00ff">&quot;,&quot;</font>
+        }
+        puts <font color="#ff00ff">&quot;&quot;</font>
+        <font color="#a52a2a"><b>incr</b></font> row
+        <font color="#a52a2a"><b>if</b></font> {[<font color="#008b8b">$cur</font> endOfResultSet]==<font color="#ff00ff">1</font> &amp;&amp; <font color="#008b8b">$row</font>==[<font color="#008b8b">$cur</font> rowCount]} {
+                <font color="#a52a2a"><b>break</b></font>
+        }
+}
+</pre>
 </blockquote>
 
 <a name="cursors"></a>
@@ -466,7 +499,7 @@ load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 <font color="#008b8b">$cur</font> defineOutputBindCursor <font color="#ff00ff">&quot;curs&quot;</font>
 <font color="#008b8b">$cur</font> executeQuery
 
-<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$bindcur</font> [<font color="#008b8b">$cur</font> getOutputBindCursor <font color="#ff00ff">&quot;curs&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> bindcur [<font color="#008b8b">$cur</font> getOutputBindCursor <font color="#ff00ff">&quot;curs&quot;</font>]
 <font color="#008b8b">$bindcur</font> fetchFromBindCursor
 
 <font color="#0000ff"># print fields from table</font>
@@ -636,11 +669,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin testproc(:in1,:in2,:in3); end;</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;begin testproc(:in1,:in2,:in3); end;&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
 </pre>
 </blockquote>
 
@@ -669,11 +702,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;exec testproc&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
 </pre>
 </blockquote>
 
@@ -704,11 +737,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">execute procedure testproc ?, ?, ?</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;execute procedure testproc ?, ?, ?&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
 </pre>
 </blockquote>
 
@@ -738,11 +771,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;call testproc(?,?,?)&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
 </pre>
 </blockquote>
 
@@ -773,11 +806,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testproc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;select testproc(:in1,:in2,:in3)&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
 </pre>
 </blockquote>
 
@@ -822,12 +855,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testproc(:in1,:in2,:in3) from dual</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;select testproc(:in1,:in2,:in3) from dual&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> result [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
 </pre>
 </blockquote>
 
@@ -858,13 +891,13 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin testproc(:in1,:in2,:in3,:out1); end;</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;begin testproc(:in1,:in2,:in3,:out1); end;&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;out1&quot;</font> <font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> result [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;out1&quot;</font>]
 </pre>
 </blockquote>
 
@@ -897,13 +930,13 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;exec testproc&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;out1&quot;</font>,<font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> result [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;out1&quot;</font>]
 </pre>
 </blockquote>
 
@@ -935,12 +968,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testproc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;select * from testproc(?,?,?)&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> result [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
 </pre>
 </blockquote>
 
@@ -952,13 +985,13 @@ variables.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">execute procedure testproc ?, ?, ?</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;execute procedure testproc ?, ?, ?&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;1&quot;</font> <font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> result [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;1&quot;</font>]
 </pre>
 </blockquote>
 
@@ -992,13 +1025,13 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(?,?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">4</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">25</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">4</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;call testproc(?,?,?,?)&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;4&quot;</font> <font color="#ff00ff">25</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> result [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;4&quot;</font>]
 </pre>
 </blockquote>
 
@@ -1035,12 +1068,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;select * from testfunc(:in1,:in2,:in3)&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">4</font> <font color="#ff00ff">2</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> result [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
 </pre>
 </blockquote>
 
@@ -1085,17 +1118,17 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out2</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;out1&quot;</font> <font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;out2&quot;</font> <font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;out3&quot;</font> <font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> out1 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;out1&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> out2 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;out2&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> out3 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;out3&quot;</font>]
 </pre>
 </blockquote>
 
@@ -1126,17 +1159,17 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out2</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;exec testproc&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;out1&quot;</font>,<font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;out2&quot;</font>,<font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;out3&quot;</font>,<font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> out1 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;out1&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> out2 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;out2&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> out3 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;out3&quot;</font>]
 </pre>
 </blockquote>
 
@@ -1170,14 +1203,14 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testproc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">2</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;select * from testproc(?,?,?)&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">4</font> <font color="#ff00ff">2</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> out1 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> out2 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> out3 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">2</font>]
 </pre>
 </blockquote>
 
@@ -1189,17 +1222,17 @@ bind variables.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">execute procedure testproc ?, ?, ?</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;execute procedure testproc ?, ?, ?&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;1&quot;</font> <font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;2&quot;</font> <font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;3&quot;</font> <font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> out1 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;1&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> out2 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;2&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> out3 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;3&quot;</font>]
 </pre>
 </blockquote>
 
@@ -1232,17 +1265,17 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(?,?,?,?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">4</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">25</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">5</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">25</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">6</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">25</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">4</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">5</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">6</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;call testproc(?,?,?,?,?,?)&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;4&quot;</font> <font color="#ff00ff">25</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;5&quot;</font> <font color="#ff00ff">25</font>
+<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;6&quot;</font> <font color="#ff00ff">25</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> out1 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;4&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> out2 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;5&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> out3 [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;6&quot;</font>]
 </pre>
 </blockquote>
 
@@ -1277,14 +1310,14 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">2</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in1&quot;</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in2&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">4</font> <font color="#ff00ff">2</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;in3&quot;</font> <font color="#ff00ff">&quot;hello&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> out1 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> out2 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> out3 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">2</font>]
 </pre>
 </blockquote>
 
@@ -1328,17 +1361,17 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin  :curs:=testproc; end;</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;defineOutputBindCursor(<font color="#ff00ff">&quot;</font><font color="#ff00ff">curs</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;executeQuery();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$bindcur</font>=<font color="#008a8c">$cur</font>-&gt;getOutputBindCursor(<font color="#ff00ff">&quot;</font><font color="#ff00ff">curs</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$bindcur</font>-&gt;fetchFromBindCursor();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field00</font>=<font color="#008a8c">$bindcur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field01</font>=<font color="#008a8c">$bindcur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field02</font>=<font color="#008a8c">$bindcur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">2</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field10</font>=<font color="#008a8c">$bindcur</font>-&gt;getField(<font color="#ff00ff">1</font>,<font color="#ff00ff">0</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field11</font>=<font color="#008a8c">$bindcur</font>-&gt;getField(<font color="#ff00ff">1</font>,<font color="#ff00ff">1</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field12</font>=<font color="#008a8c">$bindcur</font>-&gt;getField(<font color="#ff00ff">1</font>,<font color="#ff00ff">2</font>);
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;begin  :curs:=testproc; end;&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBindCursor <font color="#ff00ff">&quot;curs&quot;</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> bindcur [<font color="#008b8b">$cur</font> getOutputBindCursor <font color="#ff00ff">&quot;curs&quot;</font>]
+<font color="#008b8b">$bindcur</font> fetchFromBindCursor
+<font color="#a52a2a"><b>set</b></font> field00 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> field01 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> field02 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">2</font>]
+<font color="#a52a2a"><b>set</b></font> field10 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">1</font> <font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> field11 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">1</font> <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> field12 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">1</font> <font color="#ff00ff">2</font>]
 ...
 </pre>
 </blockquote>
@@ -1396,13 +1429,13 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;sendQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc() as (testint int, testfloat float, testchar char(40))</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field00</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field01</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field02</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">2</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field10</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">1</font>,<font color="#ff00ff">0</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field11</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">1</font>,<font color="#ff00ff">1</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$field12</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">1</font>,<font color="#ff00ff">2</font>);
+<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from testfunc() as (testint int, testfloat float, testchar char(40))&quot;</font>
+<font color="#a52a2a"><b>set</b></font> field00 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> field01 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> field02 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font>,<font color="#ff00ff">2</font>]
+<font color="#a52a2a"><b>set</b></font> field10 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">1</font>,<font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> field11 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">1</font>,<font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> field12 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">1</font>,<font color="#ff00ff">2</font>]
 ...
 </pre>
 </blockquote>
@@ -1428,49 +1461,48 @@ just open the file for each page of the report.</p>
 <p>First CGI:</p>
 
 <blockquote>
-<PRE>
-<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
-<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
+<pre>
+load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
-	... generate a unique file name ...
+        ... generate a unique file name ...
 
-<FONT color=#008b8b>$cur</FONT>-&gt;cacheToFile(filename);
-<FONT color=#008b8b>$cur</FONT>-&gt;setCacheTtl(<FONT color=#ff00ff>600</FONT>);
-<FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_table</FONT><FONT color=#ff00ff>&quot;</FONT>);
-<FONT color=#008b8b>$con</FONT>-&gt;endSession();
-<FONT color=#008b8b>$cur</FONT>-&gt;cacheOff();
+<font color="#008b8b">$cur</font> cacheToFile <font color="#008b8b">$filename</font>
+<font color="#008b8b">$cur</font> setCacheTtl <font color="#ff00ff">600</font>
+<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from my_table&quot;</font>
+<font color="#008b8b">$con</font> endSession
+<font color="#008b8b">$cur</font> cacheOff
 
         ... pass the filename to the next page ...
-</PRE>
+</pre>
 </blockquote>
 
 <p>Second CGI:</p>
 
 <blockquote>
-<PRE>
-<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
-<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
+<pre>
+load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
         ... get the filename from the previous page ...
 
         ... get the page to display from the previous page ...
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
-<FONT color=#008b8b>$cur</FONT>-&gt;openCachedResultSet(filename);
-<FONT color=#008b8b>$con</FONT>-&gt;endSession();
+<font color="#008b8b">$cur</font> openCachedResultSet <font color="#008b8b">$filename</font>
+<font color="#008b8b">$con</font> endSession
 
-<B><FONT color=#a52a2a>for</FONT></B> (<FONT color=#008b8b>$row</FONT>=pagetodisplay*<FONT color=#ff00ff>20</FONT>; <FONT color=#008b8b>$row</FONT>&lt;(pagetodisplay+<FONT color=#ff00ff>1</FONT>)*<FONT color=#ff00ff>20</FONT>; <FONT color=#008b8b>$row</FONT>++) {
-        <B><FONT color=#a52a2a>for</FONT></B> (<FONT color=#008b8b>$col</FONT>=<FONT color=#ff00ff>0</FONT>; <FONT color=#008b8b>$col</FONT>&lt;<FONT color=#008b8b>$cur</FONT>-&gt;colCount(); <FONT color=#008b8b>$col</FONT>++) {
-                <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#008b8b>%s</FONT><FONT color=#ff00ff>,</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$cur</FONT>-&gt;getField(<FONT color=#008b8b>$row</FONT>,<FONT color=#008b8b>$col</FONT>));
+<font color="#a52a2a"><b>for</b></font> {<font color="#a52a2a"><b>set</b></font> row [<font color="#a52a2a"><b>expr</b></font> <font color="#008b8b">$pagetodisplay</font> * <font color="#ff00ff">20</font>]} {<font color="#008b8b">$row</font>&lt;[<font color="#a52a2a"><b>expr</b></font> [<font color="#a52a2a"><b>expr</b></font> <font color="#008b8b">$pagetodisplay</font> + <font color="#ff00ff">1</font>] * <font color="#ff00ff">20</font>]} {<font color="#a52a2a"><b>incr</b></font> row} {
+        <font color="#a52a2a"><b>for</b></font> {<font color="#a52a2a"><b>set</b></font> col <font color="#ff00ff">0</font>} {<font color="#008b8b">$col</font>&lt;[<font color="#008b8b">$cur</font> colCount]} {<font color="#a52a2a"><b>incr</b></font> col} {
+                puts -nonewline <font color="#008b8b">$cur</font> getField <font color="#008b8b">$row</font> <font color="#008b8b">$col</font>
+                puts -nonewline <font color="#ff00ff">&quot;,&quot;</font>
         }
-        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>);
+        puts <font color="#ff00ff">&quot;&quot;</font>
 }
-</PRE>
+</pre>
 </blockquote>
 
 
@@ -1484,41 +1516,39 @@ is possible.</p>
 <p>First CGI:</p>
 
 <blockquote>
-<PRE>
-<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
-<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
+<pre>
+load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
-<FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT><FONT color=#ff00ff>&quot;</FONT>);
-<FONT color=#008b8b>$port</FONT>=<FONT color=#0008b8b>$cur</FONT>-&gt;getConnectionPort();
-<FONT color=#008b8b>$curocket</FONT>=<FONT color=#0008b8b>$cur</FONT>-&gt;getConnectionSocket();
-<FONT color=#008b8b>$rs</FONT>=<FONT color=#0008b8b>$cur</FONT>-&gt;getResultSetId();
-<FONT color=#008b8b>$cur</FONT>-&gt;suspendResultSet();
-<FONT color=#008b8b>$con</FONT>-&gt;suspendSession();
+<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;insert into my_table values (1,2,3)&quot;</font>
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$port</font> [<font color="#008b8b">$cur</font> getConnectionPort]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$cusocket</font> [<font color="#008b8b">$cur</font> getConnectionSocket]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$rs</font> [<font color="#008b8b">$cur</font> getResultSetId]
+<font color="#008b8b">$cur</font> suspendResultSet
+<font color="#008b8b">$con</font> suspendSession
 
-        ... pass the rs, port <B><FONT color=#a52a2a>and</FONT></B> <B><FONT color=#a52a2a>socket</FONT></B> to the <B><FONT color=#a52a2a>next</FONT></B> page ...
-</PRE>
+        ... pass the rs, port and socket to the next page ...
+</pre>
 </blockquote>
 
 <p>Second CGI:</p>
 
 <blockquote>
-<PRE>
-<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
-<B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
+<pre>
+load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-        ... get rs, port <B><FONT color=#a52a2a>and</FONT></B> <B><FONT color=#a52a2a>socket</FONT></B> from previous page ...
+        ... get rs, port and socket from previous page ...
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
-<FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
-<FONT color=#008b8b>$con</FONT>-&gt;resumeSession(port,<FONT color=#a52a2a>$socket</FONT>);
-<FONT color=#008b8b>$cur</FONT>-&gt;resumeResultSet(<FONT color=#a52a2a>$rs</FONT>);
-<FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>commit</FONT><FONT color=#ff00ff>&quot;</FONT>);
-<FONT color=#008b8b>$con</FONT>-&gt;endSession();
-</PRE>
+<font color="#008b8b">$con</font> resumeSession <font color="#008b8b">$port</font> <font color="#008b8b">$socket</font>
+<font color="#008b8b">$cur</font> resumeResultSet <font color="#008b8b">$rs</font>
+<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;commit&quot;</font>
+<font color="#008b8b">$con</font> endSession
+</pre>
 </blockquote>
 
 <p>You can also distribute the processing of a result set across a series of
