@@ -1,7 +1,6 @@
 freetds test fails, maybe freetds-version related or tds version?
 
 non-sqlite tcl tests
-tcl reference
 
 get postgresql input bind blob/clob's working, support bytea data type
 	with python's cpickle.dumps/loads

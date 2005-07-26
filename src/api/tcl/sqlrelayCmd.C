@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.14 2005-07-23 05:22:30 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.15 2005-07-26 02:21:58 mused Exp $
  */
 
 #include <tcl.h>
@@ -67,8 +67,10 @@ void sqlrcurDelete(ClientData data) {
  *   $cur getCacheFileName
  *   $cur cacheOff
  *   $cur sendQuery query
+ *   $cur sendQueryWithLength query length
  *   $cur sendFileQuery path filename
  *   $cur prepareQuery query
+ *   $cur prepareQueryWithLength query length
  *   $cur prepareFileQuery path filename
  *   $cur substitution variable value
  *   $cur clearBinds
@@ -160,6 +162,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "getCacheFileName",
     "cacheOff",
     "sendQuery",
+    "sendQueryWithLength",
     "sendFileQuery",
     "prepareQuery",
     "prepareFileQuery",
@@ -247,6 +250,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_getCacheFileName,
     SQLRCUR_cacheOff,
     SQLRCUR_sendQuery,
+    SQLRCUR_sendQueryWithLength,
     SQLRCUR_sendFileQuery,
     SQLRCUR_prepareQuery,
     SQLRCUR_prepareFileQuery,
@@ -485,6 +489,20 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
 	break;
       }
+    case SQLRCUR_sendQueryWithLength: 
+      {
+	int result = 0;
+	if (objc != 4) {
+	  Tcl_WrongNumArgs(interp,3, objv, "query length");
+	  return TCL_ERROR;
+	}
+	if (!(result = cur->sendQueryWithLength(Tcl_GetString(objv[2]),Tcl_GetIntFromObj(objv[3])))) {
+	  Tcl_AppendResult(interp,cur->errorMessage(),(char *)NULL);
+	  return TCL_ERROR;
+	}
+	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
+	break;
+      }
     case SQLRCUR_sendFileQuery:
       {
 	int result = 0;
@@ -507,6 +525,15 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  return TCL_ERROR;
 	}
 	cur->prepareQuery(Tcl_GetString(objv[2]));
+	break;
+      }
+    case SQLRCUR_prepareQueryWithLength:
+      {
+	if (objc != 4) {
+	  Tcl_WrongNumArgs(interp,3, objv, "query length");
+	  return TCL_ERROR;
+	}
+	cur->prepareQuery(Tcl_GetString(objv[2]),Tcl_GetIntFromObj(objv[3]));
 	break;
       }
     case SQLRCUR_prepareFileQuery:
