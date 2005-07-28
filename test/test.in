@@ -199,8 +199,7 @@ then
 	fi
 fi
 
-#if ( test "$API" = "tcl" -o -z "$API" )
-if ( test "$API" = "tcl" )
+if ( test "$API" = "tcl" -o -z "$API" )
 then
 	if ( test "@HAVE_TCL@" = "yes" )
 	then

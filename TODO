@@ -1,7 +1,5 @@
 freetds test fails, maybe freetds-version related or tds version?
 
-non-sqlite tcl tests
-
 get postgresql input bind blob/clob's working, support bytea data type
 	with python's cpickle.dumps/loads
 
@@ -33,8 +31,6 @@ make max clob/blob upload size configurable
 
 make everything single-process/multithread and use techniques described in 
 	the C10K problem to handle client/server io
-
-Docs need to explain exactly what should be put in /etc/sqlrelay
 
 make location of /etc/sqlrelay and rc.sqlrelay compile-time options
 

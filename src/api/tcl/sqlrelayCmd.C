@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.15 2005-07-26 02:21:58 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.16 2005-07-28 01:56:27 mused Exp $
  */
 
 #include <tcl.h>
@@ -165,6 +165,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "sendQueryWithLength",
     "sendFileQuery",
     "prepareQuery",
+    "prepareQueryWithLength",
     "prepareFileQuery",
     "substitution",
     "clearBinds",
@@ -253,6 +254,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_sendQueryWithLength,
     SQLRCUR_sendFileQuery,
     SQLRCUR_prepareQuery,
+    SQLRCUR_prepareQueryWithLength,
     SQLRCUR_prepareFileQuery,
     SQLRCUR_substitution,
     SQLRCUR_clearBinds,
@@ -492,11 +494,13 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     case SQLRCUR_sendQueryWithLength: 
       {
 	int result = 0;
+	int length = 0;
 	if (objc != 4) {
 	  Tcl_WrongNumArgs(interp,3, objv, "query length");
 	  return TCL_ERROR;
 	}
-	if (!(result = cur->sendQueryWithLength(Tcl_GetString(objv[2]),Tcl_GetIntFromObj(objv[3])))) {
+	Tcl_GetIntFromObj(interp, objv[3], &length);
+	if (!(result = cur->sendQuery(Tcl_GetString(objv[2]),length))) {
 	  Tcl_AppendResult(interp,cur->errorMessage(),(char *)NULL);
 	  return TCL_ERROR;
 	}
@@ -529,11 +533,13 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_prepareQueryWithLength:
       {
+	int length = 0;
 	if (objc != 4) {
 	  Tcl_WrongNumArgs(interp,3, objv, "query length");
 	  return TCL_ERROR;
 	}
-	cur->prepareQuery(Tcl_GetString(objv[2]),Tcl_GetIntFromObj(objv[3]));
+	Tcl_GetIntFromObj(interp, objv[3], &length);
+	cur->prepareQuery(Tcl_GetString(objv[2]),length);
 	break;
       }
     case SQLRCUR_prepareFileQuery:
@@ -627,7 +633,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  Tcl_WrongNumArgs(interp,2, objv, "variable value size");
 	  return TCL_ERROR;
 	}
-	if (Tcl_GetLongFromObj(interp, objv[3], &size) != TCL_OK) {
+	if (Tcl_GetLongFromObj(interp, objv[4], &size) != TCL_OK) {
 	  return TCL_ERROR;
 	}
 	cur->inputBindBlob(Tcl_GetString(objv[2]),
@@ -642,7 +648,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  Tcl_WrongNumArgs(interp,2, objv, "variable value size");
 	  return TCL_ERROR;
 	}
-	if (Tcl_GetLongFromObj(interp, objv[3], &size) != TCL_OK) {
+	if (Tcl_GetLongFromObj(interp, objv[4], &size) != TCL_OK) {
 	  return TCL_ERROR;
 	}
 	cur->inputBindClob(Tcl_GetString(objv[2]),
@@ -829,14 +835,16 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_fetchFromBindCursor:
       {
+	int result = 0;
 	if (objc > 2) {
 	  Tcl_WrongNumArgs(interp, 2, objv, NULL);
 	  return TCL_ERROR;
 	}
-	if (!cur->fetchFromBindCursor()) {
+	if (!(result = cur->fetchFromBindCursor())) {
 	  Tcl_AppendResult(interp,cur->errorMessage(),(char *)NULL);
 	  return TCL_ERROR;
 	}
+	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
 	break;
       }
     case SQLRCUR_getOutputBind:
@@ -1787,9 +1795,9 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     if (flag) {
-      con->autoCommitOn();
+      Tcl_SetObjResult(interp, Tcl_NewIntObj(con->autoCommitOn()));
     } else {
-      con->autoCommitOff();
+      Tcl_SetObjResult(interp, Tcl_NewIntObj(con->autoCommitOff()));
     }
     break;
   }
