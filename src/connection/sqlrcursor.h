@@ -21,9 +21,7 @@ enum bindtype {
 };
 
 class bindvar {
-	friend class sqlrconnection;
-	friend class sqlrcursor;
-	private:
+	public:
 		char	*variable;
 		int16_t	variablesize;
 		union {
@@ -203,6 +201,11 @@ class sqlrcursor {
 		bool	sql_injection_detection;
 #endif
 
+		uint16_t	inbindcount;
+		bindvar		inbindvars[MAXVAR];
+		uint16_t	outbindcount;
+		bindvar		outbindvars[MAXVAR];
+
 	private:
 		// methods used internally
 		bool	handleBinds();
@@ -213,11 +216,6 @@ class sqlrcursor {
 
 		char		querybuffer[MAXQUERYSIZE+1];
 		uint32_t	querylength;
-
-		bindvar		inbindvars[MAXVAR];
-		uint16_t	inbindcount;
-		bindvar		outbindvars[MAXVAR];
-		uint16_t	outbindcount;
 
 		bool		suspendresultset;
 		bool		busy;

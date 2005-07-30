@@ -1,6 +1,7 @@
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that
 		the MDB tools connection wouldn't be built
+	uses (u)int[16|32]_t instead of short/long, etc.
 	single-quotes and backslashes are escaped when using fake input binds
 		now
 	fixed "integer expression expected" error when running
@@ -13,6 +14,7 @@
 	removed lago support
 	fixed some bugs in tcl api
 	added tcl tests
+	implemented native binds for postgresql8
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

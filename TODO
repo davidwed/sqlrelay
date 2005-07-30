@@ -1,7 +1,9 @@
+support postgresql bind variables with countBindVariables()
+
 freetds test fails, maybe freetds-version related or tds version?
 
-get postgresql input bind blob/clob's working, support bytea data type
-	with python's cpickle.dumps/loads
+add detailed FAQ entry about sending writes to a master, distributing reads over
+	a set of slaves
 
 get windows/sqlite/tcl working for Ray Moseley
 

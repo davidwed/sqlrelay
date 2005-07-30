@@ -36,6 +36,7 @@ endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
 	$(MAKE) postgresql6
 	$(MAKE) postgresql7
+	$(MAKE) postgresql8
 endif
 ifneq ($(strip $(SQLITELIBS)),)
 	$(MAKE) sqlite
@@ -79,6 +80,9 @@ postgresql6: postgresql6.C postgresql6.lo
 
 postgresql7: postgresql7.C postgresql7.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql7.lo $(LIBS)
+
+postgresql8: postgresql8.C postgresql8.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql8.lo $(LIBS)
 
 sqlite: sqlite.C sqlite.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlite.lo $(LIBS)

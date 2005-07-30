@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <postgresqlconnection.h>
+#include <rudiments/rawbuffer.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -145,7 +146,197 @@ postgresqlcursor::postgresqlcursor(sqlrconnection *conn) :
 						sqlrcursor(conn) {
 	postgresqlconn=(postgresqlconnection *)conn;
 	pgresult=NULL;
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+	deallocatestatement=false;
+	cursorname=NULL;
+	bindcounter=0;
+	bindformats=NULL;
+	bindvalues=NULL;
+	bindlengths=NULL;
+#endif
 }
+
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+postgresqlcursor::~postgresqlcursor() {
+	delete[] cursorname;
+}
+
+bool postgresqlcursor::openCursor(uint16_t id) {
+	cursorname=new char[6+charstring::integerLength(id)+1];
+	sprintf(cursorname,"cursor%d",id);
+	return true;
+}
+
+bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
+
+	// store inbindcount here, otherwise if rebinding/reexecution occurs and
+	// the client tries to bind more variables than were defined when the
+	// query was prepared, it would cause the inputBind methods to attempt
+	// to address beyond the end of the various arrays
+	bindcount=inbindcount;
+
+	if (!bindcount) {
+		return true;
+	}
+
+	// reset bind counter
+	bindcounter=0;
+
+	// clear bind arrays
+	delete[] bindvalues;
+	delete[] bindlengths;
+	delete[] bindformats;
+	bindvalues=NULL;
+	bindlengths=NULL;
+	bindformats=NULL;
+
+	// create new bind arrays
+	if (bindcount) {
+		bindvalues=new char *[bindcount];
+		bindlengths=new int[bindcount];
+		bindformats=new int[bindcount];
+	}
+
+	// remove this named statement, if it exists already
+	if (deallocatestatement) {
+		stringbuffer	rmquery;
+		rmquery.append("deallocate ")->append(cursorname);
+		pgresult=PQexec(postgresqlconn->pgconn,rmquery.getString());
+		if (pgresult==(PGresult *)NULL) {
+			return false;
+		}
+		PQclear(pgresult);
+	}
+
+	// prepare the query
+	pgresult=PQprepare(postgresqlconn->pgconn,cursorname,query,0,NULL);
+
+	// handle a failed query
+	if (pgresult==(PGresult *)NULL) {
+		return false;
+	}
+
+	// handle errors
+	pgstatus=PQresultStatus(pgresult);
+	if (pgstatus==PGRES_BAD_RESPONSE ||
+		pgstatus==PGRES_NONFATAL_ERROR ||
+		pgstatus==PGRES_FATAL_ERROR) {
+		// FIXME: do I need to do a PQclear here?
+		return false;
+	}
+	deallocatestatement=true;
+	return true;
+}
+
+bool postgresqlcursor::inputBindString(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint16_t valuesize,
+						int16_t *isnull) {
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	if (*isnull) {
+		bindvalues[bindcounter]=NULL;
+		bindlengths[bindcounter]=0;
+	} else {
+		bindvalues[bindcounter]=charstring::duplicate(value,valuesize);
+		bindlengths[bindcounter]=valuesize;
+	}
+	bindformats[bindcounter]=0;
+	bindcounter++;
+	return true;
+}
+
+bool postgresqlcursor::inputBindLong(const char *variable, 
+						uint16_t variablesize,
+						uint32_t *value) {
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvalues[bindcounter]=charstring::parseNumber(*value);
+	bindlengths[bindcounter]=charstring::length(bindvalues[bindcounter]);
+	bindformats[bindcounter]=0;
+	bindcounter++;
+	return true;
+}
+
+bool postgresqlcursor::inputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t precision,
+						uint32_t scale) {
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvalues[bindcounter]=charstring::parseNumber(*value,precision,scale);
+	bindlengths[bindcounter]=charstring::length(bindvalues[bindcounter]);
+	bindformats[bindcounter]=0;
+	bindcounter++;
+	return true;
+}
+
+bool postgresqlcursor::inputBindBlob(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint32_t valuesize,
+						int16_t *isnull) {
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	if (*isnull) {
+		bindvalues[bindcounter]=NULL;
+		bindlengths[bindcounter]=0;
+	} else {
+		bindvalues[bindcounter]=static_cast<char *>
+					(rawbuffer::duplicate(value,valuesize));
+		bindlengths[bindcounter]=valuesize;
+	}
+	bindformats[bindcounter]=0;
+	bindcounter++;
+	return true;
+}
+
+bool postgresqlcursor::inputBindClob(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint32_t valuesize,
+						int16_t *isnull) {
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	if (*isnull) {
+		bindvalues[bindcounter]=NULL;
+		bindlengths[bindcounter]=0;
+	} else {
+		bindvalues[bindcounter]=charstring::duplicate(value,valuesize);
+		bindlengths[bindcounter]=valuesize;
+	}
+	bindformats[bindcounter]=0;
+	bindcounter++;
+	return true;
+}
+#endif
 
 bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
@@ -155,18 +346,32 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	nrows=0;
 	currentrow=-1;
 
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+	if (bindcount) {
+		// execute the query
+		pgresult=PQexecPrepared(postgresqlconn->pgconn,
+					cursorname,
+					bindcount,bindvalues,
+					bindlengths,bindformats,0);
+		// reset bind counter
+		bindcounter=0;
+	} else {
+		pgresult=PQexec(postgresqlconn->pgconn,query);
+	}
+#else
 	// fake binds
-	stringbuffer	*newquery=fakeInputBinds(query);
 	const char	*queryptr=query;
+	stringbuffer	*newquery=fakeInputBinds(query);
 	if (newquery) {
 		queryptr=newquery->getString();
 	}
 
-	// execute the query
 	pgresult=PQexec(postgresqlconn->pgconn,queryptr);
+
 	if (newquery) {
 		delete newquery;
 	}
+#endif
 
 	// handle a failed query
 	if (pgresult==(PGresult *)NULL) {

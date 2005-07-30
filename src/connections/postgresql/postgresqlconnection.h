@@ -20,6 +20,35 @@ class postgresqlcursor : public sqlrcursor {
 	friend class postgresqlconnection;
 	private:
 				postgresqlcursor(sqlrconnection *conn);
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+				~postgresqlcursor();
+		bool		openCursor(uint16_t id);
+		bool		prepareQuery(const char *query,
+						uint32_t length);
+		bool		inputBindString(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint16_t valuesize,
+						int16_t *isnull);
+		bool		inputBindLong(const char *variable, 
+						uint16_t variablesize,
+						uint32_t *value);
+		bool		inputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t precision,
+						uint32_t scale);
+		bool		inputBindBlob(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint32_t valuesize,
+						int16_t *isnull);
+		bool		inputBindClob(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint32_t valuesize,
+						int16_t *isnull);
+#endif
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -41,6 +70,16 @@ class postgresqlcursor : public sqlrcursor {
 		int		currentrow;
 
 		postgresqlconnection	*postgresqlconn;
+
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+		bool		deallocatestatement;
+		int		bindcount;
+		int		bindcounter;
+		char		**bindvalues;
+		int		*bindlengths;
+		int		*bindformats;
+		char		*cursorname;
+#endif
 };
 
 class postgresqlconnection : public sqlrconnection {
