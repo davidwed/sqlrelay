@@ -1146,6 +1146,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldlength) {
 DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 	zval **sqlrcur,**row;
 	const char * const *r;
+	uint32_t *l;
 	uint32_t i;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
@@ -1158,6 +1159,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 		RETURN_FALSE;
 	}
 	r=cursor->getRow((*row)->value.lval);
+	l=cursor->getRowLengths((*row)->value.lval);
 	if (!r) {
 		RETURN_FALSE;
 	}
@@ -1168,7 +1170,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 		if (!r[i]) {
 			add_next_index_null(return_value);
 		} else {
-			add_next_index_string(return_value,const_cast<char *>(r[i]),1);
+			add_next_index_stringl(return_value,const_cast<char *>(r[i]),l[i],1);
 		}
 	}
 }
@@ -1176,6 +1178,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 	zval **sqlrcur,**row;
 	const char * const *r;
+	uint32_t *l;
 	const char * const *rC;
 	uint32_t i;
 	if (ZEND_NUM_ARGS() != 2 || 
@@ -1197,6 +1200,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 	}
 
 	r=cursor->getRow((*row)->value.lval);
+	l=cursor->getRowLengths((*row)->value.lval);
 	if (!r) {
 		RETURN_FALSE;
 	}
@@ -1207,7 +1211,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 		if (!r[i]) {
 			add_assoc_null(return_value,const_cast<char *>(rC[i]));
 		} else {
-			add_assoc_string(return_value,const_cast<char *>(rC[i]),const_cast<char *>(r[i]),1);
+			add_assoc_stringl(return_value,const_cast<char *>(rC[i]),const_cast<char *>(r[i]),l[i],1);
 		}
 	}
 }
