@@ -105,6 +105,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) oracle8i
 	$(LIBTOOL) --mode=clean $(RM) postgresql6
 	$(LIBTOOL) --mode=clean $(RM) postgresql7
+	$(LIBTOOL) --mode=clean $(RM) postgresql8
 	$(LIBTOOL) --mode=clean $(RM) sqlite
 	$(LIBTOOL) --mode=clean $(RM) sybase
 	$(RM) cachefile*
