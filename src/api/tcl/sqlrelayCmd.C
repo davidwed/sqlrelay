@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.16 2005-07-28 01:56:27 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.17 2005-08-06 03:20:56 mused Exp $
  */
 
 #include <tcl.h>
@@ -358,9 +358,10 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  rowObj = Tcl_NewObj();
 	  for (col = 0; col < cur->colCount(); col++) {
 	    const char *field = cur->getField(row, col);
+	    uint32_t length = cur->getFieldLength(row, col);
 	    if (field == (char *)NULL) { field = ""; }
 	    if (Tcl_ListObjAppendElement(interp, rowObj,
-					 Tcl_NewStringObj(field, -1))
+					 Tcl_NewStringObj(field, length))
 		!= TCL_OK) {
 	      return TCL_ERROR;
 	    }
@@ -854,7 +855,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
 	  return TCL_ERROR;
 	}
-	result = Tcl_NewStringObj(cur->getOutputBind(Tcl_GetString(objv[2])), -1);
+	result = Tcl_NewStringObj(cur->getOutputBind(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
 	Tcl_SetObjResult(interp, result);
 	break;
       }
@@ -1023,7 +1024,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if ((field = cur->getField(row, col)) == (const char *)NULL) {
 	  field = "";
 	}
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(field, -1));
+	Tcl_SetObjResult(interp, Tcl_NewStringObj(field, cur->getFieldLength(row,col)));
 	break;
       }
     case SQLRCUR_getFieldByName:
@@ -1040,7 +1041,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if ((field = cur->getField(row, Tcl_GetString(objv[3]))) == (const char *)NULL) {
 	  field = "";
 	}
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(field, -1));
+	Tcl_SetObjResult(interp, Tcl_NewStringObj(field, cur->getFieldLength(row, Tcl_GetString(objv[3]))));
 	break;
       }
     case SQLRCUR_getFieldAsIntegerByIndex:
@@ -1133,6 +1134,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	Tcl_WideInt row;
 	uint32_t col;
 	const char * const *rowarray;
+	uint32_t *lengtharray;
 	Tcl_Obj *resultList;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "row");
@@ -1142,10 +1144,11 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  return TCL_ERROR;
 	}
 	rowarray = cur->getRow(row);
+	lengtharray = cur->getRowLengths(row);
 	resultList = Tcl_NewObj();
 	for (col = 0; col < cur->colCount(); col++) {
 	  if (Tcl_ListObjAppendElement(interp, resultList,
-				       Tcl_NewStringObj((rowarray[col])?rowarray[col]:"", -1)) != TCL_OK) {
+				       Tcl_NewStringObj((rowarray[col])?rowarray[col]:"", lengtharray[col])) != TCL_OK) {
 	    return TCL_ERROR;
 	  }
 	}
