@@ -111,8 +111,8 @@ void cachemanager::scan() {
 void cachemanager::erase(const char *dirname, const char *filename) {
 
 	// derive the full pathname
-	char	fullpathname[charstring::length(dirname)+1+
-				charstring::length(filename)+1];
+	char	*fullpathname=new char[charstring::length(dirname)+1+
+					charstring::length(filename)+1];
 	sprintf(fullpathname,"%s/%s",dirname,filename);
 
 	// open the file
@@ -139,8 +139,8 @@ void cachemanager::erase(const char *dirname, const char *filename) {
 		} else {
 			fl.close();
 		}
-
 	}
+	delete[] fullpathname;
 }
 
 void cachemanager::parseCacheDirs(const char *cachedirs) {

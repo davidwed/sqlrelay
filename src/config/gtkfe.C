@@ -11,8 +11,6 @@
 
 #include <defaults.h>
 
-#ifdef __GNUC__
-
 // configfile
 configfile	*gtkfe::conffile;
 
@@ -151,7 +149,6 @@ GtkWidget	*gtkfe::okdialoglabel;
 GtkWidget	*gtkfe::okdialogbutton;
 
 char		*gtkfe::clisttext[1][1];
-#endif
 
 gtkfe::gtkfe() {
 	conffile=(configfile *)NULL;

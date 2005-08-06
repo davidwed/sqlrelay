@@ -137,11 +137,12 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	}
 
 	// build rcfilename
-	char	userrcfile[charstring::length(home)+10+1];
+	char	*userrcfile=new char[charstring::length(home)+10+1];
 	sprintf(userrcfile,"%s/.sqlrshrc",home);
 
 	// process the file
 	runScript(sqlrcon,sqlrcur,env,userrcfile,false,false);
+	delete[] userrcfile;
 }
 
 void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 

@@ -1,3 +1,12 @@
+idle client timeout
+
+getRow()/getRowAssoc()/getField()/getOutputBind() in java api must use
+	the length when creating the jstring
+
+sqlr-import/sqlr-export tools
+
+make max clob/blob upload size configurable
+
 support postgresql bind variables with countBindVariables()
 
 freetds test fails, maybe freetds-version related or tds version?
@@ -7,9 +16,6 @@ add detailed FAQ entry about sending writes to a master, distributing reads over
 
 get windows/sqlite/tcl working for Ray Moseley
 
-sqlr-import/sqlr-export tools
-
-use 64 bits for input bind numbers
 use 64 bits in java api
 change:
 	double get???AsDouble
@@ -28,8 +34,6 @@ fix freetds/sybase ct_con_prop/encryption FIXME's
 
 sybase on irix has libtcl rather than libsybtcl and .so files are in devlib
 	directory rather than in lib directory
-
-make max clob/blob upload size configurable
 
 make everything single-process/multithread and use techniques described in 
 	the C10K problem to handle client/server io
@@ -171,7 +175,6 @@ Documentation:
 			with results pending.
 
 Performance/Code Enhancements:
-	idle client timeout
 	client connect timeout
 	store passwords in encrypted form in the config file
 	use python distutils to build python

@@ -284,6 +284,20 @@ AC_SUBST(WNOLONGDOUBLE)
 ])
 
 
+dnl checks to see if -Wall option works or not
+AC_DEFUN([FW_CHECK_WALL],
+[
+AC_MSG_CHECKING(for -Wall)
+FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wall],[],[],[WALL="-Wall"],[WALL=""])
+if ( test -n "$WALL" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(WALL)
+])
+
 
 dnl Checks for microsoft platform.
 dnl sets the substitution variables MINGW32, CYGWIN and UWIN as appropriate

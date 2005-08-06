@@ -114,7 +114,7 @@ void sqlrconnection::registerForHandoff(const char *tmpdir) {
 	#endif
 
 	// construct the name of the socket to connect to
-	char	handoffsockname[charstring::length(tmpdir)+9+
+	char	*handoffsockname=new char[charstring::length(tmpdir)+9+
 				charstring::length(cmdl->getId())+8+1];
 	sprintf(handoffsockname,"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
 
@@ -150,6 +150,8 @@ void sqlrconnection::registerForHandoff(const char *tmpdir) {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done registering for handoff");
 	#endif
+
+	delete[] handoffsockname;
 }
 
 bool sqlrconnection::receiveFileDescriptor(int *descriptor) {
@@ -168,7 +170,7 @@ void sqlrconnection::deRegisterForHandoff(const char *tmpdir) {
 	#endif
 
 	// construct the name of the socket to connect to
-	char	removehandoffsockname[charstring::length(tmpdir)+9+
+	char	*removehandoffsockname=new char[charstring::length(tmpdir)+9+
 					charstring::length(cmdl->getId())+14+1];
 	sprintf(removehandoffsockname,"%s/sockets/%s-removehandoff",
 					tmpdir,cmdl->getId());
@@ -187,4 +189,6 @@ void sqlrconnection::deRegisterForHandoff(const char *tmpdir) {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done de-registering for handoff");
 	#endif
+
+	delete[] removehandoffsockname;
 }

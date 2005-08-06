@@ -17,11 +17,12 @@ bool sqlrconnection::openSockets() {
 			if (serversockun->listen(unixsocket,0000,5)) {
 
 				#ifdef SERVER_DEBUG
-				char	string[26+
+				char	*string=new char[26+
 					charstring::length(unixsocket)+1];
 				sprintf(string,"listening on unix socket: %s",
 								unixsocket);
 				debugPrint("connection",1,string);
+				delete[] string;
 				#endif
 
 				addFileDescriptor(serversockun);

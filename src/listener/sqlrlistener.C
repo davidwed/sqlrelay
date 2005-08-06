@@ -305,7 +305,8 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 							const char *id) {
 
 	// initialize the ipc filename
-	char	idfilename[tmpdir->getLength()+5+charstring::length(id)+1];
+	char	*idfilename=new char[tmpdir->getLength()+5+
+					charstring::length(id)+1];
 	sprintf(idfilename,"%s/ipc/%s",tmpdir->getString(),id);
 
 	#ifdef SERVER_DEBUG
@@ -317,6 +318,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	// make sure that the file exists and is read/writeable
 	if (!file::createFile(idfilename,permissions::ownerReadWrite())) {
 		ipcFileError(idfilename);
+		delete[] idfilename;
 		return false;
 	}
 
@@ -324,8 +326,10 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	key_t	key=ftok(idfilename,0);
 	if (key==-1) {
 		ftokError(idfilename);
+		delete[] idfilename;
 		return false;
 	}
+	delete[] idfilename;
 
 	// create the shared memory segment
 	// FIXME: if it already exists, attempt to remove and re-create it
@@ -511,7 +515,7 @@ bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 bool sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
 
 	// the handoff socket
-	char	handoffsockname[tmpdir->getLength()+9+
+	char	*handoffsockname=new char[tmpdir->getLength()+9+
 				charstring::length(id)+8+1];
 	sprintf(handoffsockname,"%s/sockets/%s-handoff",tmpdir->getString(),id);
 
@@ -528,6 +532,7 @@ bool sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
 		fprintf(stderr,"\n\n");
 	}
 
+	delete[] handoffsockname;
 	return success;
 }
 
@@ -1327,10 +1332,11 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 			*unixportstrlen=charstring::length(unixportstr);
 
 			#ifdef SERVER_DEBUG
-			char	debugstring[15+*unixportstrlen+21];
+			char	*debugstring=new char[15+*unixportstrlen+21];
 			sprintf(debugstring,"socket=%s  port=%d",
 						unixportstr,*inetport);
 			debugPrint("listener",1,debugstring);
+			delete[] debugstring;
 			#endif
 
 		}
@@ -1379,11 +1385,12 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 bool sqlrlistener::connectionIsUp(const char *connectionid) {
 
 	// initialize the database up/down filename
-	char	updown[charstring::length(TMP_DIR)+5+
+	char	*updown=new char[charstring::length(TMP_DIR)+5+
 			charstring::length(cmdl->getId())+1+
 			charstring::length(connectionid)+1];
 	sprintf(updown,"%s/ipc/%s-%s",TMP_DIR,cmdl->getId(),connectionid);
 	bool	retval=file::exists(updown);
+	delete[] updown;
 	return retval;
 }
 

@@ -13,10 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __GNUC__
 stringbuffer	*sybaseconnection::errorstring;
 bool		sybaseconnection::deadconnection;
-#endif
 
 
 sybaseconnection::sybaseconnection() {

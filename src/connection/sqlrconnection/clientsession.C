@@ -257,9 +257,10 @@ void sqlrconnection::noAvailableCursors(uint16_t command) {
 				2*sizeof(uint32_t));
 
 	clientsock->useNonBlockingMode();
-	unsigned char	dummy[size];
+	unsigned char	*dummy=new unsigned char[size];
 	clientsock->read(dummy,size);
 	clientsock->useBlockingMode();
+	delete[] dummy;
 
 	// indicate that an error has occurred
 	clientsock->write((uint16_t)ERROR);

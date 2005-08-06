@@ -151,7 +151,7 @@ void sqlrconnection::setUnixSocketDirectory() {
 bool sqlrconnection::handlePidFile() {
 
 	// check for pid file
-	char	pidfile[tmpdir->getLength()+20+
+	char	*pidfile=new char[tmpdir->getLength()+20+
 				charstring::length(cmdl->getId())+1];
 	sprintf(pidfile,"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),cmdl->getId());
@@ -168,6 +168,7 @@ bool sqlrconnection::handlePidFile() {
 		retval=false;
 	}
 
+	delete[] pidfile;
 	return retval;
 }
 

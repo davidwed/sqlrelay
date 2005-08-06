@@ -23,7 +23,7 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 	endofresultset=false;
 
 	// create the index file name
-	char	indexfilename[charstring::length(filename)+5];
+	char	*indexfilename=new char[charstring::length(filename)+5];
 	sprintf(indexfilename,"%s.ind",filename);
 
 	// open the file
@@ -31,6 +31,8 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 	cachesourceind=new file();
 	if ((cachesource->open(filename,O_RDWR|O_EXCL)) &&
 		(cachesourceind->open(indexfilename,O_RDWR|O_EXCL))) {
+
+		delete[] indexfilename;
 
 		// initialize firstrowindex and rowcount
 		firstrowindex=0;
@@ -71,6 +73,8 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 		errstr.append(" and ");
 		errstr.append(indexfilename);
 		setError(errstr.getString());
+
+		delete[] indexfilename;
 	}
 
 	// if we fell through to here, then an error has ocurred

@@ -57,7 +57,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	id=charstring::duplicate(tmpid);
 
 	// check for listener's pid file
-	char	listenerpidfile[tmpdirlen+20+charstring::length(id)+1];
+	char	*listenerpidfile=new char[tmpdirlen+20+
+						charstring::length(id)+1];
 	sprintf(listenerpidfile,"%s/pids/sqlr-listener-%s",TMP_DIR,id);
 	if (checkForPidFile(listenerpidfile)==-1) {
 		fprintf(stderr,"\nsqlr-scaler error: \n");
@@ -67,8 +68,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 		fprintf(stderr,"sqlr-listener is not running.\n");
 		fprintf(stderr,"	The sqlr-listener must be running ");
 		fprintf(stderr,"for the sqlr-scaler to start.\n\n");
+		delete[] listenerpidfile;
 		return false;
 	}
+	delete[] listenerpidfile;
 
 	// check/set pid file
 	pidfile=new char[tmpdirlen+18+charstring::length(id)+1];
@@ -300,7 +303,8 @@ bool scaler::openMoreConnections() {
 				}
 
 				// build the command to start a connection
-				char	command[16+charstring::length(dbase)+
+				char	*command=new char
+						[16+charstring::length(dbase)+
 						6+20+
 						5+charstring::length(id)+
 						15+charstring::length(
@@ -315,6 +319,7 @@ bool scaler::openMoreConnections() {
 
 				// start another connection
 				success=!system(command);
+				delete[] command;
 
 				// wait for the connection count to increase
 				if (success) {
@@ -350,10 +355,11 @@ void scaler::getRandomConnectionId() {
 bool scaler::availableDatabase() {
 	
 	// initialize the database up/down filename
-	char	updown[tmpdirlen+5+charstring::length(id)+1+
+	char	*updown=new char[tmpdirlen+5+charstring::length(id)+1+
 					charstring::length(connectionid)+1];
 	sprintf(updown,"%s/ipc/%s-%s",TMP_DIR,id,connectionid);
 	bool	retval=file::exists(updown);
+	delete[] updown;
 	return retval;
 }
 

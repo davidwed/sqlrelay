@@ -114,7 +114,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	if (!queryfile.open(fullpath,O_RDONLY)) {
 
 		// set the error
-		char	err[32+charstring::length(fullpath)];
+		char	*err=new char[32+charstring::length(fullpath)];
 		charstring::append(err,"The file ");
 		charstring::append(err,fullpath);
 		charstring::append(err," could not be opened.\n");
@@ -128,6 +128,8 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 		// set queryptr to NULL so executeQuery won't try to do
 		// anything with it in the event that it gets called
 		queryptr=NULL;
+
+		delete[] err;
 
 		return false;
 	}

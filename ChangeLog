@@ -15,6 +15,19 @@
 	fixed some bugs in tcl api
 	added tcl tests
 	implemented native binds for postgresql8
+	added configure test for -Wall
+	switched lots of:
+			char	a[charstring::length(b)];
+		to:
+			char	*a=new char[charstring::length(b)];
+			...
+			delete[] a;
+		to improve compiler compatibility
+	removed #ifdef __GNUC__ around static variable definitions, I'll add
+		#ifndefs for compilers that don't allow them (like SCO's) if
+		necessary
+	fixed bugs where getRow(),getRowAssoc(),getOutputBind(),etc. in various
+		api's wouldn't return binary data correctly
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

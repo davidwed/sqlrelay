@@ -17,10 +17,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __GNUC__
 stringbuffer	*freetdsconnection::errorstring;
 bool		freetdsconnection::deadconnection;
-#endif
 
 
 freetdsconnection::freetdsconnection() {

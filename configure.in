@@ -15,8 +15,8 @@ AC_ARG_ENABLE(profiling,
 	CFLAGS="$CFLAGS -pg"; CXXFLAGS="$CXXFLAGS -pg",
 	CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS")
 
-CFLAGS="$SMALLCODE $CFLAGS -Wall"
-CXXFLAGS="$SMALLCODE $CXXFLAGS -Wall"
+CFLAGS="$SMALLCODE $CFLAGS"
+CXXFLAGS="$SMALLCODE $CXXFLAGS"
 
 AC_ARG_ENABLE(client-rpath,
 	[  --enable-client-rpath         Use -rpath when linking SQL Relay client programs against SQL Relay libraries],
@@ -480,6 +480,7 @@ FW_CHECK_UNAME
 
 FW_CHECK_PIPE
 FW_CHECK_WNOLONGDOUBLE
+FW_CHECK_WALL
 
 AC_CHECK_SIZEOF(int16_t)
 AC_CHECK_SIZEOF(int32_t)
