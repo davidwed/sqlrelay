@@ -129,7 +129,7 @@ static PyObject *identify(PyObject *self, PyObject *args) {
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->identify();
   Py_END_ALLOW_THREADS
-  return Py_BuildValue("s", charstring::duplicate(rc));
+  return Py_BuildValue("s", rc);
 }
 
 static PyObject *autoCommitOn(PyObject *self, PyObject *args) {
@@ -893,11 +893,13 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
   uint32_t num_cols;
   uint32_t counter;
   const char * const *row_data;
+  uint32_t *row_lengths;
   PyObject *my_list;
   num_cols=sqlrcur->colCount();
   my_list =  PyList_New(num_cols);
   Py_BEGIN_ALLOW_THREADS
   row_data=sqlrcur->getRow(row);
+  row_lengths=sqlrcur->getRowLengths(row);
   Py_END_ALLOW_THREADS
   if (!row_data) {
     Py_INCREF(Py_None);
@@ -914,7 +916,7 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
           PyList_SetItem(my_list, counter, Py_BuildValue("f", atof(row_data[counter])));
       }
     } else {
-      PyList_SetItem(my_list, counter, Py_BuildValue("s", row_data[counter]));
+      PyList_SetItem(my_list, counter, Py_BuildValue("s#", row_data[counter], row_lengths[counter]));
     }
   }
   return my_list;
@@ -963,7 +965,7 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
       }
     } else {
       if (field) {
-        PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("s",field));
+        PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("s#",field,((sqlrcursor *)sqlrcur)->getFieldLength(row,counter)));
       } else {
         Py_INCREF(Py_None);
         PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_None);
