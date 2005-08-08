@@ -13,6 +13,13 @@
 
 extern "C" {
 
+//#define DEBUG_MESSAGES 1
+#ifdef DEBUG_MESSAGES
+	#define debugPrintf(args...) printf("%s:%s():%d: ",__FILE__,__FUNCTION__,__LINE__); printf(args); fflush(stdout);
+#else
+	#define debugPrintf(args...) /* */
+#endif
+
 #define CR_UNKNOWN_ERROR	2000
 #define MYSQL_NO_DATA		100
 #define REFRESH_GRANT		1
@@ -274,10 +281,12 @@ my_bool mysql_stmt_reset(MYSQL_STMT *stmt);
 
 
 unsigned int mysql_thread_safe() {
+	debugPrintf("\n");
 	return 1;
 }
 
 MYSQL *mysql_init(MYSQL *mysql) {
+	debugPrintf("\n");
 	if (mysql) {
 		mysql->deleteonclose=false;
 		return mysql;
@@ -289,21 +298,25 @@ MYSQL *mysql_init(MYSQL *mysql) {
 }
 
 int mysql_set_server_option(MYSQL *mysql, enum enum_mysql_set_option option) {
+	debugPrintf("\n");
 	return 0;
 }
 
 int mysql_options(MYSQL *mysql, enum mysql_option option, const char *arg) {
+	debugPrintf("\n");
 	return 0;
 }
 
 int mysql_ssl_set(MYSQL *mysql, const char *key, const char *cert,
 			const char *ca, const char *capath,
 			const char *cipher) {
+	debugPrintf("\n");
 	return 0;
 }
 
 MYSQL *mysql_connect(MYSQL *mysql, const char *host,
 			const char *user, const char *passwd) {
+	debugPrintf("\n");
 	return mysql_real_connect(mysql,host,user,passwd,NULL,9000,NULL,0);
 }
 
@@ -311,6 +324,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 				const char *passwd, const char *db,
 				unsigned int port, const char *unix_socket,
 				unsigned long client_flag) {
+	debugPrintf("\n");
 
 	mysql->host=host;
 	mysql->port=port;
@@ -324,6 +338,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 }
 
 void mysql_close(MYSQL *mysql) {
+	debugPrintf("\n");
 	if (mysql) {
 		mysql_stmt_close(mysql->currentstmt);
 		delete mysql->sqlrcon;
@@ -335,22 +350,27 @@ void mysql_close(MYSQL *mysql) {
 
 
 int mysql_ping(MYSQL *mysql) {
+	debugPrintf("\n");
 	return !mysql->sqlrcon->ping();
 }
 
 char *mysql_stat(MYSQL *mysql) {
+	debugPrintf("\n");
 	return "Uptime: 0  Threads: 0  Questions: 0  Slow queries: 0  Opens: 0  Flush tables: 0  Open tables: 0 Queries per second avg: 0.0";
 }
 
 int mysql_shutdown(MYSQL *mysql) {
+	debugPrintf("\n");
 	return 1;
 }
 
 int mysql_refresh(MYSQL *mysql, unsigned int refresh_options) {
+	debugPrintf("\n");
 	return (refresh_options==REFRESH_GRANT)?mysql_reload(mysql):0;
 }
 
 int mysql_reload(MYSQL *mysql) {
+	debugPrintf("\n");
 	if (!charstring::compare(mysql->sqlrcon->identify(),"mysql")) {
 		sqlrcursor	sqlrcur(mysql->sqlrcon);
 		return !sqlrcur.sendQuery("FLUSH PRIVILEGES");
@@ -359,20 +379,24 @@ int mysql_reload(MYSQL *mysql) {
 }
 
 unsigned long mysql_thread_id(MYSQL *mysql) {
+	debugPrintf("\n");
 	return 0;
 }
 
 MYSQL_RES *mysql_list_processes(MYSQL *mysql) {
+	debugPrintf("\n");
 	return NULL;
 }
 
 int mysql_kill(MYSQL *mysql, unsigned long pid) {
+	debugPrintf("\n");
 	return 1;
 }
 
 
 
 char *mysql_get_client_info() {
+	debugPrintf("\n");
 	// Returns a string that represents the client library version.
 	#ifdef COMPAT_MYSQL_3
 		return "3.23.58";
@@ -389,6 +413,7 @@ char *mysql_get_client_info() {
 }
 
 unsigned long mysql_get_client_version() {
+	debugPrintf("\n");
 	// Returns an integer that represents the client library version.
 	// The value has the format XYYZZ where X is the major version, YY is
 	// the release level, and ZZ is the version number within the release
@@ -409,6 +434,7 @@ unsigned long mysql_get_client_version() {
 }
 
 char *mysql_get_host_info(MYSQL *mysql) {
+	debugPrintf("\n");
 	// Returns a string describing the type of connection in use,
 	// including the server host name.
 	// Should be "host via [unix|inet] socket"
@@ -416,6 +442,7 @@ char *mysql_get_host_info(MYSQL *mysql) {
 }
 
 unsigned int mysql_get_proto_info(MYSQL *mysql) {
+	debugPrintf("\n");
 	// Returns the protocol version used by current connection.
 	#ifdef COMPAT_MYSQL_3
 		return 10;
@@ -432,6 +459,7 @@ unsigned int mysql_get_proto_info(MYSQL *mysql) {
 }
 
 char *mysql_get_server_info(MYSQL *mysql) {
+	debugPrintf("\n");
 	// Returns a string that represents the server version number.
 	#ifdef COMPAT_MYSQL_3
 		return "3.23.58";
@@ -448,6 +476,7 @@ char *mysql_get_server_info(MYSQL *mysql) {
 }
 
 unsigned long mysql_get_server_version(MYSQL *mysql) {
+	debugPrintf("\n");
 	// A number that represents the MySQL server version in format:
 	// main_version*10000 + minor_version *100 + sub_version
 	// For example, 4.1.0 is returned as 40100.
@@ -469,6 +498,7 @@ unsigned long mysql_get_server_version(MYSQL *mysql) {
 
 my_bool	mysql_change_user(MYSQL *mysql, const char *user,
 				const char *password, const char *db) {
+	debugPrintf("\n");
 
 	if (!mysql->sqlrcon->rollback()) {
 		return false;
@@ -480,6 +510,7 @@ my_bool	mysql_change_user(MYSQL *mysql, const char *user,
 }
 
 const char *mysql_character_set_name(MYSQL *mysql) {
+	debugPrintf("\n");
 	return "latin1";
 }
 
@@ -490,28 +521,34 @@ void mysql_debug(const char *debug) {
 }
 
 int mysql_dump_debug_info(MYSQL *mysql) {
+	debugPrintf("\n");
 	return 1;
 }
 
 
 
 int mysql_create_db(MYSQL *mysql, const char *db) {
+	debugPrintf("\n");
 	return 1;
 }
 
 int mysql_select_db(MYSQL *mysql, const char *db) {
+	debugPrintf("\n");
 	return 1;
 }
 
 int mysql_drop_db(MYSQL *mysql, const char *db) {
+	debugPrintf("\n");
 	return 1;
 }
 
 MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
+	debugPrintf("\n");
 	return NULL;
 }
 
 MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
+	debugPrintf("\n");
 	return NULL;
 }
 
@@ -519,6 +556,7 @@ MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 
 unsigned long mysql_escape_string(char *to, const char *from,
 					unsigned long length) {
+	debugPrintf("\n");
 	return mysql_real_escape_string(NULL,to,from,length);
 }
 
@@ -530,17 +568,20 @@ char *mysql_odbc_escape_string(MYSQL *mysql, char *to,
 				char *(*extend_buffer)
 					(void *, char *to,
 					unsigned long *length)) {
+	debugPrintf("\n");
 	// FIXME: implement this
 	return NULL;
 }
 
 void myodbc_remove_escape(MYSQL *mysql, char *name) {
+	debugPrintf("\n");
 	// FIXME: implement this
 }
 
 unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 					const char *from,
 					unsigned long length) {
+	debugPrintf("\n");
 
 	if (mysql && charstring::compare(mysql->sqlrcon->identify(),"mysql")) {
 		rawbuffer::copy(to,from,length);
@@ -579,44 +620,53 @@ unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 }
 
 int mysql_query(MYSQL *mysql, const char *query) {
+	debugPrintf("\n");
 	return mysql_real_query(mysql,query,charstring::length(query));
 }
 
 int mysql_send_query(MYSQL *mysql, const char *query, unsigned int length) {
+	debugPrintf("\n");
 	// FIXME: looks like this sends a query in the background then returns
 	// so we can do something else in the foreground.
 	return mysql_real_query(mysql,query,length);
 }
 
 int mysql_read_query_result(MYSQL *mysql) {
+	debugPrintf("\n");
 	// FIXME: looks like this checks to see if a query sent with
 	// mysql_send_query has finished or not
 	return 0;
 }
 
 int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length) {
+	debugPrintf("\n");
 	mysql->currentstmt=mysql_prepare(mysql,query,length);
 	return mysql_execute(mysql->currentstmt);
 }
 
 char *mysql_info(MYSQL *mysql) {
+	debugPrintf("\n");
 	return "";
 }
 
 my_ulonglong mysql_insert_id(MYSQL *mysql) {
+	debugPrintf("\n");
 	return 0;
 }
 
 
 MYSQL_RES *mysql_store_result(MYSQL *mysql) {
+	debugPrintf("\n");
 	return mysql->currentstmt->result;
 }
 
 MYSQL_RES *mysql_use_result(MYSQL *mysql) {
+	debugPrintf("\n");
 	return mysql_store_result(mysql);
 }
 
 void mysql_free_result(MYSQL_RES *result) {
+	debugPrintf("\n");
 	if (result) {
 		delete result->sqlrcur;
 		if (result->fields) {
@@ -627,6 +677,7 @@ void mysql_free_result(MYSQL_RES *result) {
 }
 
 my_bool mysql_more_results(MYSQL *mysql) {
+	debugPrintf("\n");
 	return false;
 }
 
@@ -637,15 +688,18 @@ int mysql_next_result(MYSQL *mysql) {
 
 MYSQL_RES *mysql_list_fields(MYSQL *mysql, const char *table,
 						const char *wild) {
+	debugPrintf("\n");
 	// FIXME: implement this
 	return NULL;
 }
 
 unsigned int mysql_num_fields(MYSQL_RES *result) {
+	debugPrintf("\n");
 	return result->sqlrcur->colCount();
 }
 
 MYSQL_FIELD *mysql_fetch_field(MYSQL_RES *result) {
+	debugPrintf("\n");
 	if (result->currentfield>=
 		(MYSQL_FIELD_OFFSET)result->sqlrcur->colCount()) {
 		return NULL;
@@ -654,11 +708,13 @@ MYSQL_FIELD *mysql_fetch_field(MYSQL_RES *result) {
 }
 
 MYSQL_FIELD *mysql_fetch_fields(MYSQL_RES *result) {
+	debugPrintf("\n");
 	result->currentfield=0;
 	return result->fields;
 }
 
 MYSQL_FIELD *mysql_fetch_field_direct(MYSQL_RES *result, unsigned int fieldnr) {
+	debugPrintf("\n");
 	if (fieldnr>(unsigned int)result->sqlrcur->colCount()) {
 		return NULL;
 	}
@@ -668,37 +724,44 @@ MYSQL_FIELD *mysql_fetch_field_direct(MYSQL_RES *result, unsigned int fieldnr) {
 }
 
 unsigned long *mysql_fetch_lengths(MYSQL_RES *result) {
+	debugPrintf("\n");
 	return (unsigned long *)result->sqlrcur->
-				getRowLengths(result->currentrow);
+				getRowLengths(result->previousrow);
 }
 
 unsigned int mysql_field_count(MYSQL *mysql) {
+	debugPrintf("\n");
 	return mysql_num_fields(mysql->currentstmt->result);
 }
 
 MYSQL_FIELD_OFFSET mysql_field_seek(MYSQL_RES *result,
 					MYSQL_FIELD_OFFSET offset) {
+	debugPrintf("\n");
 	MYSQL_FIELD_OFFSET	oldoffset=result->currentfield;
 	result->currentfield=offset;
 	return oldoffset;
 }
 
 MYSQL_FIELD_OFFSET mysql_field_tell(MYSQL_RES *result) {
+	debugPrintf("\n");
 	return result->currentfield;
 }
 
 
 my_ulonglong mysql_num_rows(MYSQL_RES *result) {
+	debugPrintf("\n");
 	return result->sqlrcur->rowCount();
 }
 
 my_ulonglong mysql_affected_rows(MYSQL *mysql) {
+	debugPrintf("\n");
 	return mysql_stmt_affected_rows(mysql->currentstmt);
 }
 
 
 // FIXME: MYSQL_ROW_OFFSET is (or could be) smaller than my_ulonglong
 MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result, MYSQL_ROW_OFFSET offset) {
+	debugPrintf("\n");
 	result->previousrow=result->currentrow;
 	result->currentrow=(my_ulonglong)offset;
 	return (MYSQL_ROW_OFFSET)result->previousrow;
@@ -706,15 +769,18 @@ MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result, MYSQL_ROW_OFFSET offset) {
 
 // FIXME: MYSQL_ROW_OFFSET is (or could be) smaller than my_ulonglong
 MYSQL_ROW_OFFSET mysql_row_tell(MYSQL_RES *result) {
+	debugPrintf("\n");
 	return (MYSQL_ROW_OFFSET)result->currentrow;
 }
 
 void mysql_data_seek(MYSQL_RES *result, my_ulonglong offset) {
+	debugPrintf("\n");
 	result->previousrow=result->currentrow;
 	result->currentrow=offset;
 }
 
 MYSQL_ROW mysql_fetch_row(MYSQL_RES *result) {
+	debugPrintf("\n");
 	MYSQL_ROW	retval=
 		(MYSQL_ROW)result->sqlrcur->getRow(result->currentrow);
 	if (retval) {
@@ -725,39 +791,47 @@ MYSQL_ROW mysql_fetch_row(MYSQL_RES *result) {
 }
 
 my_bool mysql_eof(MYSQL_RES *result) {
+	debugPrintf("\n");
 	my_ulonglong	rowcount=(my_ulonglong)result->sqlrcur->rowCount();
 	return (!rowcount || result->currentrow>=rowcount);
 }
 
 
 unsigned int mysql_warning_count(MYSQL *mysql) {
+	debugPrintf("\n");
 	return 0;
 }
 
 unsigned int mysql_errno(MYSQL *mysql) {
+	debugPrintf("\n");
 	return mysql->currentstmt->result->errorno;
 }
 
 const char *mysql_error(MYSQL *mysql) {
+	debugPrintf("\n");
 	const char	*err=
 		mysql->currentstmt->result->sqlrcur->errorMessage();
 	return (err)?err:"";
 }
 
 const char *mysql_sqlstate(MYSQL *mysql) {
+	debugPrintf("\n");
 	return "";
 }
 
 
 my_bool mysql_commit(MYSQL *mysql) {
+	debugPrintf("\n");
 	return mysql->sqlrcon->commit();
 }
 
 my_bool mysql_rollback(MYSQL *mysql) {
+	debugPrintf("\n");
 	return mysql->sqlrcon->rollback();
 }
 
 my_bool mysql_autocommit(MYSQL *mysql, my_bool mode) {
+	debugPrintf("\n");
 	return (mode)?mysql->sqlrcon->autoCommitOn():
 				mysql->sqlrcon->autoCommitOff();
 }
@@ -770,6 +844,7 @@ my_bool mysql_autocommit(MYSQL *mysql, my_bool mode) {
 
 MYSQL_STMT *mysql_prepare(MYSQL *mysql, const char *query,
 					unsigned long length) {
+	debugPrintf("\n");
 	MYSQL_STMT	*stmt=new MYSQL_STMT;
 	stmt->result=new MYSQL_RES;
 	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
@@ -781,6 +856,7 @@ MYSQL_STMT *mysql_prepare(MYSQL *mysql, const char *query,
 }
 
 my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
+	debugPrintf("\n");
 
 	unsigned long	paramcount=mysql_param_count(stmt);
 	for (unsigned long i=0; i<paramcount; i++) {
@@ -851,6 +927,7 @@ my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 }
 
 my_bool mysql_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
+	debugPrintf("\n");
 	stmt->resultbinds=bind;
 	return true;
 }
@@ -1047,6 +1124,7 @@ static enum enum_field_types	mysqltypemap[]={
 };
 
 enum enum_field_types map_col_type(const char *columntype) {
+	debugPrintf("\n");
 	for (int index=0; datatypestring[index]; index++) {
 		if (!charstring::compare(datatypestring[index],columntype)) {
 			return mysqltypemap[index];
@@ -1056,6 +1134,7 @@ enum enum_field_types map_col_type(const char *columntype) {
 }
 
 int mysql_execute(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 
 	stmt->result->previousrow=0;
 	stmt->result->currentrow=0;
@@ -1196,10 +1275,12 @@ int mysql_execute(MYSQL_STMT *stmt) {
 }
 
 unsigned long mysql_param_count(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	return stmt->result->sqlrcur->countBindVariables();
 }
 
 MYSQL_RES *mysql_param_result(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	// FIXME: The MySQL docs don't even explain this one
 	return NULL;
 }
@@ -1207,6 +1288,7 @@ MYSQL_RES *mysql_param_result(MYSQL_STMT *stmt) {
 
 
 int mysql_fetch(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 
 	MYSQL_ROW	row=mysql_fetch_row(stmt->result);
 	if (!row) {
@@ -1236,6 +1318,7 @@ int mysql_fetch(MYSQL_STMT *stmt) {
 
 int mysql_fetch_column(MYSQL_STMT *stmt, MYSQL_BIND *bind,
 			unsigned int column, unsigned long offset) {
+	debugPrintf("\n");
 	// FIXME: The MySQL docs don't even explain this one.
 	return 0;
 }
@@ -1243,6 +1326,7 @@ int mysql_fetch_column(MYSQL_STMT *stmt, MYSQL_BIND *bind,
 
 
 MYSQL_RES *mysql_get_metadata(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	return stmt->result;
 }
 
@@ -1251,35 +1335,42 @@ MYSQL_RES *mysql_get_metadata(MYSQL_STMT *stmt) {
 my_bool mysql_send_long_data(MYSQL_STMT *stmt,
 				unsigned int parameter_number,
 				const char *data, unsigned long length) {
+	debugPrintf("\n");
 	return false;
 }
 
 
 
 my_ulonglong mysql_stmt_num_rows(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	return mysql_num_rows(stmt->result);
 }
 
 my_ulonglong mysql_stmt_affected_rows(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	return stmt->result->sqlrcur->affectedRows();
 }
 
 MYSQL_ROW_OFFSET mysql_stmt_row_seek(MYSQL_STMT *stmt,
 					MYSQL_ROW_OFFSET offset) {
+	debugPrintf("\n");
 	return mysql_row_seek(stmt->result,offset);
 }
 
 MYSQL_ROW_OFFSET mysql_stmt_row_tell(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	return mysql_row_tell(stmt->result);
 }
 
 void mysql_stmt_data_seek(MYSQL_STMT *stmt, my_ulonglong offset) {
+	debugPrintf("\n");
 	mysql_data_seek(stmt->result,offset);
 }
 
 
 
 my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	if (stmt) {
 		// It would seem like we'd want to call mysql_free_result here,
 		// but the mysql client calls it manually before calling
@@ -1294,24 +1385,29 @@ my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 
 
 unsigned int mysql_stmt_errno(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	return stmt->result->errorno;
 }
 
 const char *mysql_stmt_error(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	return stmt->result->sqlrcur->errorMessage();
 }
 
 const char *mysql_stmt_sqlstate(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	return "";
 }
 
 
 
 int mysql_stmt_store_result(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	return 0;
 }
 
 my_bool mysql_stmt_free_result(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	mysql_free_result(stmt->result);
 	return true;
 }
@@ -1319,6 +1415,7 @@ my_bool mysql_stmt_free_result(MYSQL_STMT *stmt) {
 
 
 my_bool mysql_stmt_reset(MYSQL_STMT *stmt) {
+	debugPrintf("\n");
 	stmt->result->sqlrcur->clearBinds();
 	return true;
 }
