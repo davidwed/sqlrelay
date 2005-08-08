@@ -71,11 +71,13 @@ class SQLRConnection:
 
     def commit(self):
 	self.rowcount=0
-        return CSQLRelay.commit(self.connection)
+	if self.connection is not None:
+        	return CSQLRelay.commit(self.connection)
 
     def rollback(self):
 	self.rowcount=0
-        return CSQLRelay.rollback(self.connection)
+	if self.connection is not None:
+        	return CSQLRelay.rollback(self.connection)
 
     def cursor(self):
         cursor=SQLRCursor(self.connection)
