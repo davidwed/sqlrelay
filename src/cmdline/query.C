@@ -41,10 +41,10 @@ int main(int argc, const char **argv) {
 
 
 		if (argc<7) {
-			printf("usage: query  host port socket ");
-			printf("user password query [debug] \n");
-			printf("  or   query  [-config configfile] ");
-			printf("-id id query [debug]\n");
+			printf("usage: query  host port socket "
+				"user password query [debug] \n"
+				"  or   query  [-config configfile] "
+				"-id id query [debug]\n");
 			exit(1);
 		}
 
@@ -105,11 +105,11 @@ int main(int argc, const char **argv) {
 	sqlrcur.dontGetColumnInfo();
 	sqlrcur.setResultSetBufferSize(100);
 	if (sqlrcur.sendQuery(query)) {
-		int		i=0;
-		int		cols=sqlrcur.colCount();
+		uint64_t	i=0;
+		uint32_t	cols=sqlrcur.colCount();
 		const char	*field="";
 		while (cols && field) {
-			for (int j=0; j<cols; j++) {
+			for (uint32_t j=0; j<cols; j++) {
 				if ((field=sqlrcur.getField(i,j))) {
 					printf("\"%s\"",field);
 					if (j<cols-1) {

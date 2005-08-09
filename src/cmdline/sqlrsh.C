@@ -586,9 +586,9 @@ void sqlrsh::displayHelp(environment *env) {
 
 	printf("\n");
 	yellow(env);
-	printf("	To run a query, simply type it at the prompt,\n");
-	printf("	followed by a semicolon.  Queries may be \n");
-	printf("	split over multiple lines.\n\n");
+	printf("	To run a query, simply type it at the prompt,\n"
+		"	followed by a semicolon.  Queries may be \n"
+		"	split over multiple lines.\n\n");
 	cyan(env);
 	printf("		ping		- ");
 	green(env);
@@ -747,10 +747,10 @@ void sqlrsh::execute(int argc, const char **argv) {
 	if (!(id && id[0])) {
 
 		if (argc<6) {
-			printf("usage: sqlrsh  host port socket ");
-			printf("user password [script]\n");
-			printf("  or   sqlrsh  [-config configfile] ");
-			printf("-id id [script]\n");
+			printf("usage: sqlrsh  host port socket "
+				"user password [script]\n"
+				"  or   sqlrsh  [-config configfile] "
+				"-id id [script]\n");
 			exit(1);
 		}
 

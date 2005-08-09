@@ -18,23 +18,28 @@ endif
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: query fields sqlrsh
+all: query fields sqlrsh sqlr-export sqlr-import
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) fields
-	$(LIBTOOL) --mode=clean $(RM) fields-debug
 	$(LIBTOOL) --mode=clean $(RM) query
-	$(LIBTOOL) --mode=clean $(RM) query-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-export
+	$(LIBTOOL) --mode=clean $(RM) sqlr-import
 	$(LIBTOOL) --mode=clean $(RM) sqlrsh
-	$(LIBTOOL) --mode=clean $(RM) sqlrsh-debug
 	$(RMTREE) .libs
 
 rebuild: clean all
 
 query: query.C query.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.lo $(LIBS) $(RPATH)
+
+sqlr-export: sqlr-export.C sqlr-export.lo
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-export.lo $(LIBS) $(RPATH)
+
+sqlr-import: sqlr-import.C sqlr-import.lo
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-import.lo $(LIBS) $(RPATH)
 
 fields: fields.C fields.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.lo $(LIBS) $(RPATH)
@@ -55,3 +60,5 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/fields-debug$(EXE)
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlrsh$(EXE)
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlrsh-debug$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-export$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-import$(EXE)
