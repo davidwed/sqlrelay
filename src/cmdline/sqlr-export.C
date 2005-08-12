@@ -22,6 +22,9 @@ void escapeField(const char *field, uint32_t length) {
 						field[index]=='<') {
 			printf("\\");
 		}
+		if (field[index]=='\'') {
+			printf("\\\\");
+		}
 		printf("%c",field[index]);
 	}
 }
