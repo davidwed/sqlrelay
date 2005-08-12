@@ -15,6 +15,17 @@
 using namespace rudiments;
 #endif
 
+void escapeField(const char *field, uint32_t length) {
+	for (uint32_t index=0; index<length; index++) {
+		// FIXME: what about null's?
+		if (field[index]=='\\' || field[index]=='\'' ||
+						field[index]=='<') {
+			printf("\\");
+		}
+		printf("%c",field[index]);
+	}
+}
+
 int main(int argc, const char **argv) {
 
 	#include <version.h>
@@ -116,64 +127,35 @@ int main(int argc, const char **argv) {
 
 		// print columns
 		uint32_t	cols=sqlrcur.colCount();
-		printf("<columns>\n");
+		printf("<columns count=\"%d\">\n",cols);
 		for (uint32_t j=0; j<cols; j++) {
 			printf("	"
-				"<column name=\"%s\" type=\"%s\" length=\"%d\" "
-				"precision=\"%d\" scale=\"%d\" "
-				"nullable=\"%s\" primarykey=\"%s\" "
-				"unique=\"%s\" partofkey=\"%s\" "
-				"unsigned=\"%s\" zerofilled=\"%s\" "
-				"binary=\"%s\" autoincrement=\"%s\"/>\n",
+				"<column name=\"%s\" type=\"%s\"/>\n",
 				sqlrcur.getColumnName(j),
-				sqlrcur.getColumnType(j),
-				sqlrcur.getColumnLength(j),
-				sqlrcur.getColumnPrecision(j),
-				sqlrcur.getColumnScale(j),
-				(sqlrcur.getColumnIsNullable(j))?
-							"true":"false",
-				(sqlrcur.getColumnIsPrimaryKey(j))?
-							"true":"false",
-				(sqlrcur.getColumnIsUnique(j))?
-							"true":"false",
-				(sqlrcur.getColumnIsPartOfKey(j))?
-							"true":"false",
-				(sqlrcur.getColumnIsUnsigned(j))?
-							"true":"false",
-				(sqlrcur.getColumnIsZeroFilled(j))?
-							"true":"false",
-				(sqlrcur.getColumnIsBinary(j))?
-							"true":"false",
-				(sqlrcur.getColumnIsAutoIncrement(j)?
-							"true":"false"));
+				sqlrcur.getColumnType(j));
 		}
 		printf("</columns>\n");
 
 		// print rows
 		printf("<rows>\n");
-		bool		firstrow=true;
 		uint64_t	row=0;
 		for (;;) {
+			printf("	<row>\n");
 			for (uint32_t col=0; col<cols; col++) {
 				const char	*field=
 						sqlrcur.getField(row,col);
 				if (!field) {
 					break;
 				}
-				if (firstrow) {
-					printf("	<row>\n");
-					firstrow=false;
-				}
 				printf("	<field>");
-				printf("%s",field);
+				escapeField(field,
+					sqlrcur.getFieldLength(row,col));
 				printf("</field>\n");
 			}
+			printf("	</row>\n");
 			row++;
 			if (sqlrcur.endOfResultSet() &&
 					row>=sqlrcur.rowCount()) {
-				if (!firstrow) {
-					printf("	</row>\n");
-				}
 				break;
 			}
 		}
