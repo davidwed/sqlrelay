@@ -1,7 +1,19 @@
+0.36.5
+	fix api's to use lengths when composing strings
+	fix mysql replacement api (use previousrow in mysql_get_lengths)
+
+--------------------------------------------------------------------------------
+
+export/import sequences
+
+when a client tries to use too many cursors, it can crash the connection
+
 idle client timeout
 
 getRow()/getRowAssoc()/getField()/getOutputBind() in java api must use
 	the length when creating the jstring
+
+test fetching binary data
 
 sqlr-import/sqlr-export tools
 

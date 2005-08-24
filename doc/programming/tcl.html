@@ -441,7 +441,7 @@ catch {<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;s
         }
         puts <font color="#ff00ff">&quot;&quot;</font>
         <font color="#a52a2a"><b>incr</b></font> row
-        <font color="#a52a2a"><b>if</b></font> {[<font color="#008b8b">$cur</font> endOfResultSet]==<font color="#ff00ff">1</font> &amp;&amp; <font color="#008b8b">$row</font>==[<font color="#008b8b">$cur</font> rowCount]} {
+        <font color="#a52a2a"><b>if</b></font> {[<font color="#008b8b">$cur</font> endOfResultSet]==<font color="#ff00ff">1</font> &amp;&amp; <font color="#008b8b">$row</font>&gt;=[<font color="#008b8b">$cur</font> rowCount]} {
                 <font color="#a52a2a"><b>break</b></font>
         }
 }

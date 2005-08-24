@@ -52,6 +52,8 @@ install:
 	$(LTINSTALL) query$(EXE) $(bindir)
 	$(LTINSTALL) fields$(EXE) $(bindir)
 	$(LTINSTALL) sqlrsh$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-export$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-import$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query$(EXE)

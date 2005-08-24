@@ -540,8 +540,8 @@ bool sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 							const char *id) {
 
 	// the deregistration socket
-	char	removehandoffsockname[tmpdir->getLength()+9+
-					charstring::length(id)+14+1];
+	char	*removehandoffsockname=new char[tmpdir->getLength()+9+
+						charstring::length(id)+14+1];
 	sprintf(removehandoffsockname,"%s/sockets/%s-removehandoff",
 						tmpdir->getString(),id);
 
@@ -558,6 +558,8 @@ bool sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 		fprintf(stderr,"directory are readable and writable.");
 		fprintf(stderr,"\n\n");
 	}
+
+	delete[] removehandoffsockname;
 
 	return success;
 }

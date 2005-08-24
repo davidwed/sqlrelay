@@ -84,7 +84,7 @@ MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
 Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java and TCL, drop-in replacement
 libraries for MySQL and PostgreSQL clients, command line clients, a GUI
 configuration tool and extensive documentation.  The APIs support advanced
-database operations such as bind variables, multi-row fetches, client side
+database operations such as bind variables, multi-row fetches, client-side
 result set caching and suspended transactions.  It is ideal for speeding up
 database-driven web-based applications, accessing databases from unsupported
 platforms, migrating between databases, distributing access to replicated

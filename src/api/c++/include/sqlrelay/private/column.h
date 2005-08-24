@@ -5,8 +5,7 @@
 #define COLUMN_H
 
 class column {
-	friend class sqlrcursor;
-	private:
+	public:
 		char		*name;
 		uint16_t	type;
 		char		*typestring;

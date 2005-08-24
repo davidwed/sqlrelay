@@ -45,6 +45,9 @@ void postgresqlconnection::handleConnectString() {
 			typemangling=2;
 		}
 	}
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+	fakebinds=!charstring::compare(connectStringValue("fakebinds"),"yes");
+#endif
 }
 
 bool postgresqlconnection::logIn() {
@@ -169,6 +172,10 @@ bool postgresqlcursor::openCursor(uint16_t id) {
 
 bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 
+	if (postgresqlconn->fakebinds) {
+		return true;
+	}
+
 	// store inbindcount here, otherwise if rebinding/reexecution occurs and
 	// the client tries to bind more variables than were defined when the
 	// query was prepared, it would cause the inputBind methods to attempt
@@ -234,6 +241,10 @@ bool postgresqlcursor::inputBindString(const char *variable,
 						uint16_t valuesize,
 						int16_t *isnull) {
 
+	if (postgresqlconn->fakebinds) {
+		return true;
+	}
+
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
@@ -256,6 +267,10 @@ bool postgresqlcursor::inputBindLong(const char *variable,
 						uint16_t variablesize,
 						uint32_t *value) {
 
+	if (postgresqlconn->fakebinds) {
+		return true;
+	}
+
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
@@ -275,6 +290,10 @@ bool postgresqlcursor::inputBindDouble(const char *variable,
 						uint32_t precision,
 						uint32_t scale) {
 
+	if (postgresqlconn->fakebinds) {
+		return true;
+	}
+
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
@@ -293,6 +312,10 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
+
+	if (postgresqlconn->fakebinds) {
+		return true;
+	}
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
@@ -318,6 +341,10 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
+
+	if (postgresqlconn->fakebinds) {
+		return true;
+	}
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
@@ -347,29 +374,33 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	currentrow=-1;
 
 #ifdef HAVE_POSTGRESQL_PQEXECPARAMS
-	if (bindcount) {
-		// execute the query
-		pgresult=PQexecPrepared(postgresqlconn->pgconn,
-					cursorname,
-					bindcount,bindvalues,
-					bindlengths,bindformats,0);
-		// reset bind counter
-		bindcounter=0;
+	if (postgresqlconn->fakebinds) {
+#endif
+		// fake binds
+		const char	*queryptr=query;
+		stringbuffer	*newquery=fakeInputBinds(query);
+		if (newquery) {
+			queryptr=newquery->getString();
+		}
+
+		pgresult=PQexec(postgresqlconn->pgconn,queryptr);
+
+		if (newquery) {
+			delete newquery;
+		}
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
 	} else {
-		pgresult=PQexec(postgresqlconn->pgconn,query);
-	}
-#else
-	// fake binds
-	const char	*queryptr=query;
-	stringbuffer	*newquery=fakeInputBinds(query);
-	if (newquery) {
-		queryptr=newquery->getString();
-	}
-
-	pgresult=PQexec(postgresqlconn->pgconn,queryptr);
-
-	if (newquery) {
-		delete newquery;
+		if (bindcount) {
+			// execute the query
+			pgresult=PQexecPrepared(postgresqlconn->pgconn,
+						cursorname,
+						bindcount,bindvalues,
+						bindlengths,bindformats,0);
+			// reset bind counter
+			bindcounter=0;
+		} else {
+			pgresult=PQexec(postgresqlconn->pgconn,query);
+		}
 	}
 #endif
 

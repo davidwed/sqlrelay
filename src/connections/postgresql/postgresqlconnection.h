@@ -4,7 +4,7 @@
 #ifndef POSTGRESQLCONNECTION_H
 #define POSTGRESQLCONNECTION_H
 
-#define NUM_CONNECT_STRING_VARS 7
+#define NUM_CONNECT_STRING_VARS 8
 
 #include <sqlrconnection.h>
 
@@ -107,6 +107,9 @@ class postgresqlconnection : public sqlrconnection {
 		const char	*options;
 		const char	*db;
 		uint16_t	typemangling;
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+		bool		fakebinds;
+#endif
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	public:

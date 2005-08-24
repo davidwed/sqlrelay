@@ -190,7 +190,7 @@ specified.</li>
 <li><b>db</b>: The database to log into.  Required.</li>
 </ul>
 </li>
-<li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;options=OPTIONS;typemangling=MANGLING;"
+<li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;"
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the
 database.  Required.</li>
@@ -206,6 +206,16 @@ the extension on the socket name (eg. /tmp/.s.PGSQL.5432).</li>
 <li><b>options</b>: Command line options to be sent to the server.
 Optional.</li>
 <li><b>typemangling</b>: If set to "yes" then column types are translated to standard types.  If set to "lookup" then the pg_type table is queried at startup and column type names are returned as they appear in that table.  By default (or if set to "no"), the type number is returned.</li>
+<li><b>fakebinds</b>: Postgresql 8 supports bind variables natively.  Versions
+prior to 8 did not, and SQL Relay had to substitute the values of bind variables
+into the query itself (fake binds).  In Postgresql 8, bind variables are
+identified by $1, $2, $3, etc. in the query, while in versions prior to 8, 
+bind variables are identified by :var1, :var2, :var3, etc.  Converting queries
+and code which was written to use Postgresql 7 syntax to use Postgresql 8 syntax
+can be a lot of work, so this parameter is provided to make code which was
+written to run against Postgresql 7 work against Postgresql 8.  This parameter
+may be set to "yes" (meaning allow only Postgresql 7 syntax and fake binds) or
+"no" (meaning only allow Postgresql 8 syntax and use native binds).</li>
 </ul>
 </li>
 <li>For <b>sqlite</b> databases, the connect string syntax is "db=DB;"

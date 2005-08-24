@@ -119,9 +119,10 @@ void sqlrconnection::registerForHandoff(const char *tmpdir) {
 	sprintf(handoffsockname,"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
-	char	string[17+charstring::length(handoffsockname)+1];
+	char	*string=new char[17+charstring::length(handoffsockname)+1];
 	sprintf(string,"handoffsockname: %s",handoffsockname);
 	debugPrint("connection",1,string);
+	delete[] string;
 	#endif
 
 	// Try to connect over and over forever on 1 second intervals.
@@ -176,9 +177,11 @@ void sqlrconnection::deRegisterForHandoff(const char *tmpdir) {
 					tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
-	char	string[23+charstring::length(removehandoffsockname)+1];
+	char	*string=new char[23+charstring::length(
+					removehandoffsockname)+1];
 	sprintf(string,"removehandoffsockname: %s",removehandoffsockname);
 	debugPrint("connection",1,string);
+	delete[] string;
 	#endif
 
 	// attach to the socket and write the process id

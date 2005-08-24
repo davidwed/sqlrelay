@@ -14,7 +14,8 @@
 	removed lago support
 	fixed some bugs in tcl api
 	added tcl tests
-	implemented native binds for postgresql8
+	implemented native binds for postgresql8, added "fakebinds"
+		connectstring parameter to provide back-compatibility
 	added configure test for -Wall
 	switched lots of:
 			char	a[charstring::length(b)];
@@ -28,6 +29,11 @@
 		necessary
 	fixed bugs where getRow(),getRowAssoc(),getOutputBind(),etc. in various
 		api's wouldn't return binary data correctly
+	defaulted zeropadding to 1 rather than 0, I'm not sure if it's a bug
+		in glibc or not, but printf("%0*lld\n",0,(int64_t)0); prints
+		nothing rather than 0, but printf("%0*ld\n",0,(int32_t)0);
+		prints 0.  Using 1 instead of 0 for the number of 0's works
+		in all cases.
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

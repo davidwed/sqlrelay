@@ -259,7 +259,9 @@ bool sqlrimport::rowsTagEnd() {
 bool sqlrimport::rowTagEnd() {
 	query.append(')');
 	if (fieldcount) {
-		sqlrcur->sendQuery(query.getString());
+		if (!sqlrcur->sendQuery(query.getString())) {
+			printf("%s\n",sqlrcur->errorMessage());
+		}
 	}
 	return true;
 }
@@ -273,12 +275,16 @@ bool sqlrimport::fieldTagEnd() {
 
 bool sqlrimport::text(const char *string) {
 	if (infield) {
-		if (!numbercolumn[currentcol]) {
-			query.append('\'');
-		}
-		unescapeField(&query,string);
-		if (!numbercolumn[currentcol]) {
-			query.append('\'');
+		if (charstring::length(string)) {
+			if (!numbercolumn[currentcol]) {
+				query.append('\'');
+			}
+			unescapeField(&query,string);
+			if (!numbercolumn[currentcol]) {
+				query.append('\'');
+			}
+		} else {
+			query.append("NULL");
 		}
 		if (currentcol<colcount-1) {
 			query.append(",");
@@ -380,7 +386,6 @@ int main(int argc, const char **argv) {
 
 
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
-	sqlrcon.debugOn();
 	sqlrcursor	sqlrcur(&sqlrcon);
 
 	if (debug) {
