@@ -314,12 +314,12 @@ MySQL.</p>
 <tr><td>mysql_close</td><td>yes</td></tr>
 <tr><td>mysql_ping</td><td>yes</td></tr>
 <tr><td>mysql_stat</td><td>returns a string similar to the real mysql_stat but with empty values</td></tr>
-<tr><td>mysql_shutdown</td><td>always returns failure</td></tr>
+<tr><td>mysql_shutdown</td><td>always returns CR_UNKNOWN_ERROR</td></tr>
 <tr><td>mysql_reload</td><td>yes</td></tr>
 <tr><td>mysql_refresh</td><td>only implemented for refresh_options==REFRESH_GRANT</td></tr>
 <tr><td>mysql_thread_id</td><td>always returns 0</td></tr>
 <tr><td>mysql_list_processes</td><td>always returns NULL</td></tr>
-<tr><td>mysql_kill</td><td>always returns failure</td></tr>
+<tr><td>mysql_kill</td><td>always returns CR_UNKNOWN_ERROR</td></tr>
 <tr><td>mysql_get_client_info</td><td>returns the version string of the client that the library emulates</td></tr>
 <tr><td>mysql_get_client_version</td><td>returns the version number of the client that the library emulates</td></tr>
 <tr><td>mysql_get_host_info</td><td>returns an empty string</td></tr>
