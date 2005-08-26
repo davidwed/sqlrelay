@@ -150,6 +150,8 @@ struct MYSQL_STMT {
 	MYSQL_BIND	*resultbinds;
 };
 
+// FIXME: apps access this directly! so it must be the same size and have
+// same members as the real struct MYSQL
 struct MYSQL {
 	const char	*host;
 	unsigned int	port;
@@ -157,6 +159,8 @@ struct MYSQL {
 	sqlrconnection	*sqlrcon;
 	MYSQL_STMT	*currentstmt;
 	bool		deleteonclose;
+	const char	*error;
+	int		errorno;
 };
 
 
@@ -276,7 +280,7 @@ int mysql_stmt_store_result(MYSQL_STMT *stmt);
 my_bool mysql_stmt_free_result(MYSQL_STMT *stmt);
 my_bool mysql_stmt_reset(MYSQL_STMT *stmt);
 
-
+static int unknownError(MYSQL *mysql);
 
 
 
@@ -288,11 +292,11 @@ unsigned int mysql_thread_safe() {
 MYSQL *mysql_init(MYSQL *mysql) {
 	debugPrintf("\n");
 	if (mysql) {
-		mysql->deleteonclose=false;
+		rawbuffer::zero(mysql,sizeof(MYSQL));
 		return mysql;
 	} else {
 		MYSQL	*retval=new MYSQL;
-		retval->deleteonclose=true;
+		rawbuffer::zero(retval,sizeof(MYSQL));
 		return retval;
 	}
 }
@@ -361,7 +365,7 @@ char *mysql_stat(MYSQL *mysql) {
 
 int mysql_shutdown(MYSQL *mysql) {
 	debugPrintf("\n");
-	return 1;
+	return unknownError(mysql);
 }
 
 int mysql_refresh(MYSQL *mysql, unsigned int refresh_options) {
@@ -390,7 +394,7 @@ MYSQL_RES *mysql_list_processes(MYSQL *mysql) {
 
 int mysql_kill(MYSQL *mysql, unsigned long pid) {
 	debugPrintf("\n");
-	return 1;
+	return unknownError(mysql);
 }
 
 
@@ -522,24 +526,24 @@ void mysql_debug(const char *debug) {
 
 int mysql_dump_debug_info(MYSQL *mysql) {
 	debugPrintf("\n");
-	return 1;
+	return unknownError(mysql);
 }
 
 
 
 int mysql_create_db(MYSQL *mysql, const char *db) {
 	debugPrintf("\n");
-	return 1;
+	return unknownError(mysql);
 }
 
 int mysql_select_db(MYSQL *mysql, const char *db) {
 	debugPrintf("\n");
-	return 1;
+	return unknownError(mysql);
 }
 
 int mysql_drop_db(MYSQL *mysql, const char *db) {
 	debugPrintf("\n");
-	return 1;
+	return unknownError(mysql);
 }
 
 MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
@@ -804,13 +808,21 @@ unsigned int mysql_warning_count(MYSQL *mysql) {
 
 unsigned int mysql_errno(MYSQL *mysql) {
 	debugPrintf("\n");
-	return mysql->currentstmt->result->errorno;
+	if (mysql && mysql->currentstmt && mysql->currentstmt->result) {
+		return mysql->currentstmt->result->errorno;
+	}
+	return mysql->errorno;
 }
 
 const char *mysql_error(MYSQL *mysql) {
 	debugPrintf("\n");
-	const char	*err=
-		mysql->currentstmt->result->sqlrcur->errorMessage();
+	const char	*err;
+	if (mysql && mysql->currentstmt && mysql->currentstmt->result &&
+					mysql->currentstmt->result->sqlrcur) {
+		err=mysql->currentstmt->result->sqlrcur->errorMessage();
+	} else {
+		err=mysql->error;
+	}
 	return (err)?err:"";
 }
 
@@ -844,7 +856,7 @@ my_bool mysql_autocommit(MYSQL *mysql, my_bool mode) {
 
 MYSQL_STMT *mysql_prepare(MYSQL *mysql, const char *query,
 					unsigned long length) {
-	debugPrintf("\n");
+	debugPrintf("%s\n",query);
 	MYSQL_STMT	*stmt=new MYSQL_STMT;
 	stmt->result=new MYSQL_RES;
 	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
@@ -1418,6 +1430,12 @@ my_bool mysql_stmt_reset(MYSQL_STMT *stmt) {
 	debugPrintf("\n");
 	stmt->result->sqlrcur->clearBinds();
 	return true;
+}
+
+int unknownError(MYSQL *mysql) {
+	mysql->errorno=CR_UNKNOWN_ERROR;
+	mysql->error="Unknown MySQL error";
+	return CR_UNKNOWN_ERROR;
 }
 
 }
