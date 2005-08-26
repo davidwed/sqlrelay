@@ -29,11 +29,11 @@
 		necessary
 	fixed bugs where getRow(),getRowAssoc(),getOutputBind(),etc. in various
 		api's wouldn't return binary data correctly
-	defaulted zeropadding to 1 rather than 0, I'm not sure if it's a bug
-		in glibc or not, but printf("%0*lld\n",0,(int64_t)0); prints
-		nothing rather than 0, but printf("%0*ld\n",0,(int32_t)0);
-		prints 0.  Using 1 instead of 0 for the number of 0's works
-		in all cases.
+	updated mysql dropin api so unsupported functions return unknown-error
+		and mysql_error/mysql_errorno work when they do
+	updated php pear db code with david forums' patches
+	removed references to prepare_tokens/types/etc. and overrode
+		freePrepared()
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

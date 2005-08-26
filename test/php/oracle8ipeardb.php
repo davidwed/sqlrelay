@@ -96,6 +96,7 @@ require_once 'DB.php';
 	$res=$db->execute($res,$bindvars);
 
 	# auto execute
+	echo("AUTO EXECUTE: \n");
 	$bindvars=array("testnumber" => 9,
 			"testchar" => "testchar9",
 			"testvarchar" => "testvarchar9",
@@ -117,7 +118,7 @@ require_once 'DB.php';
 	echo("COLUMN COUNT: \n");
 	checkSuccess($db,$res->numCols(),5);
 	echo("\n");
-
+/*
 	echo ("TABLE INFO: \n");
 	$tableinfo=$res->tableInfo(DB_TABLEINFO_ORDER);
 	checkSuccess($db,$tableinfo['num_fields'],5);
@@ -173,9 +174,9 @@ require_once 'DB.php';
 	checkSuccess($db,$tableinfo[3]['len'],7);
 	checkSuccess($db,$tableinfo[4]['len'],0);
 	echo("\n");
-
+*/
 	echo("ROW COUNT: \n");
-	checkSuccess($db,$res->numRows(),8);
+	checkSuccess($db,$res->numRows(),10);
 	echo("\n");
 
 	echo("FIELDS BY ARRAY: \n");
@@ -433,10 +434,10 @@ require_once 'DB.php';
 
 	checkSuccess($db2,$db2->getOne("select count(*) from testtable"),0);
 	checkSuccess($db,$db->commit(),DB_OK);
-	checkSuccess($db2,$db2->getOne("select count(*) from testtable"),8);
+	checkSuccess($db2,$db2->getOne("select count(*) from testtable"),10);
 	checkSuccess($db,$db->autoCommit(true),DB_OK);
 	checkSuccess($db,$db->query("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10')"),DB_OK);
-	checkSuccess($db2,$db2->getOne("select count(*) from testtable"),9);
+	checkSuccess($db2,$db2->getOne("select count(*) from testtable"),11);
 	$db->autoCommit(false);
 
 	$db2->disconnect();

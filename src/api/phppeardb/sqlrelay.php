@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.6 2005-07-19 17:58:50 mused Exp $
+// $Id: sqlrelay.php,v 1.7 2005-08-26 03:13:29 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -30,8 +30,6 @@ class DB_sqlrelay_cursor
     var $identity = "";
     var $connection;
     var $rownum = 0;
-    var $prepare_tokens = array();
-    var $prepare_types = array();
 
     function DB_sqlrelay_cursor($cur,$connection)
     {
@@ -89,16 +87,9 @@ class DB_sqlrelay extends DB_common
     function connect($dsninfo, $persistent = false)
     {
 
-        $hasloadextension = false;
-        foreach (get_class_methods(get_class($this)) as $method) {
-printf("$method\n");
-            if ($method == "loadextension" || $method == "loadExtension") {
-                $hasloadextension = true;
-                break;
-            }
-        }
 
-        if ($hasloadextension == true) {
+        if (method_exists($this,'loadExtension') || 
+                            method_exists($this,'loadextension')) {
             if (!PEAR::loadExtension('sql_relay')) {
                 return $this->raiseError(DB_ERROR_EXTENSION_NOT_FOUND);
             }
@@ -110,17 +101,12 @@ printf("$method\n");
 
         $this->dsn = $dsninfo;
 
-        $host = $dsninfo['hostspec'];
-        $port = $dsninfo['port'];
-        $socket = $dsninfo['socket'];
-        $user = $dsninfo['username'];
-        $pw = $dsninfo['password'];
-        $retrytime = 1;
-        $tries = 0;
-
-        $this->connection = sqlrcon_alloc($host, $port, $socket,
-                                            $user, $pw, $retrytime, $tries);
-sqlrcon_debugOn($this->connection);
+        $this->connection = sqlrcon_alloc($dsninfo['hostspec'],
+                                            $dsninfo['port'],
+                                            $dsninfo['socket'],
+                                            $dsninfo['username'],
+                                            $dsninfo['password'],
+                                            1,0);
         return DB_OK;
     }
 
@@ -412,22 +398,29 @@ sqlrcon_debugOn($this->connection);
     {
         if (is_resource($sqlrcursor)) {
             sqlrcur_free($sqlrcursor->cursor);
-            return true;
         }
-
-        // $sqlrcursor is a prepared query handle
-        $sqlrcursor = (int)$sqlrcursor;
-        if (!isset($this->prepare_tokens[$sqlrcursor])) {
-            return false;
-        }
-
-        $this->prepare_types = array();
-        $this->prepare_tokens = array();
-
         return true;
     }
 
     // }}}
+    // {{{ freePrepared()
+
+    /**
+     * Frees the internal resources associated with a prepared query
+     *
+     * @param resource $stmt           the prepared statement's PHP resource
+     * @param bool     $free_resource  should the PHP resource be freed too?
+     *                                  Use false if you need to get data
+     *                                  from the result set later.
+     *
+     * @return bool  TRUE on success, FALSE if $result is invalid
+     *
+     * @see DB_common::prepare()
+     */
+    function freePrepared($stmt, $free_resource = true)
+    {
+        return true;
+    }
     // {{{ numCols()
 
     /**
@@ -572,7 +565,9 @@ sqlrcon_debugOn($this->connection);
             // table without a resultset else we want information about a
             // resultset, this is not yet supported
             return null;
-        } else if (empty($sqlrcursor) || empty($sqlrcursor)) {
+        } else if (empty($sqlrcursor)) {
+            return null;
+        } else if ($sqlrcursor==DB_OK) {
             return null;
         }
 

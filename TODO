@@ -4,6 +4,21 @@
 
 --------------------------------------------------------------------------------
 
+hot dog's php suspended session problem
+
+david fourum's pear db fixes/bug reports
+
+maciej's weird python error messages
+
+investigate precision/scale in input binds, write up a doc explaining what
+	happens when precision/scale parameters don't match the value passed
+	in and what happens when they're bound to a column with different
+	precision/scale, link to this doc from all "programming" docs
+
+sun compiler compatibility updates
+
+ionut's memory corruption errors
+
 export/import sequences
 
 when a client tries to use too many cursors, it can crash the connection
