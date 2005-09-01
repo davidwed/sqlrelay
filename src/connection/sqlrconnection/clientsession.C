@@ -150,7 +150,9 @@ sqlrcursor *sqlrconnection::getCursor(uint16_t command) {
 		cursor=findAvailableCursor();
 	}
 
-	cursor->busy=true;
+	if (cursor) {
+		cursor->busy=true;
+	}
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"done getting a cursor");
