@@ -2351,15 +2351,34 @@ then
 					fi
 				done
 			fi
+		
+			if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES" )
+			then
+				HAVE_JAVA="yes"
+			fi
+		fi
+
+		dnl check for gcj
+		if ( test -z "$JAVAPATH" )
+		then
+			AC_CHECK_PROG(GCJ,"gcj","gcj")
+			if ( test -n "$GCJ" )
+			then
+				JAVAC="$GCJ -C"
+				JAVAINCLUDES=""
+				HAVE_JAVA="yes"
+			fi
 		fi
 		
 		if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES" )
 		then
 			HAVE_JAVA="yes"
-		else
-			HAVE_JAVA=""
-			AC_MSG_WARN(The Java API will not be built.)
 		fi
+	fi
+
+	if ( test -z "$HAVE_JAVA" )
+	then
+		AC_MSG_WARN(The Java API will not be built.)
 	fi
 
 	FW_INCLUDES(java,[$JAVAINCLUDES])

@@ -4,11 +4,13 @@
 
 --------------------------------------------------------------------------------
 
+gcj:
+	is gcj's jvm sufficient to install oracle/sybase/db2?
+	java test crashes when using gcj's jvm
+
 run flawfinder, fix bugs it reveals
 
 hot dog's php suspended session problem
-
-david fourum's pear db fixes/bug reports
 
 maciej's weird python error messages
 
@@ -22,8 +24,6 @@ sun compiler compatibility updates
 ionut's memory corruption errors
 
 export/import sequences
-
-when a client tries to use too many cursors, it can crash the connection
 
 idle client timeout
 
@@ -76,8 +76,6 @@ configure script doesn't find zope on openbsd
 PySQLRDB.py needs to return DateTime objects for date-type columns
 
 perl apis -> CPAN
-
-support gcj
 
 --------------------------------------------------------------------------------
 
