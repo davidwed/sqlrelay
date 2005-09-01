@@ -34,6 +34,9 @@
 	updated php pear db code with david forums' patches
 	removed references to prepare_tokens/types/etc. and overrode
 		freePrepared()
+	python api pays attention to retrytime/tries now
+	fixed a hang when username/password are wrong
+	fixed a crash when too many cursors were requested
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

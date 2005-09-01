@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.7 2005-08-26 03:13:29 mused Exp $
+// $Id: sqlrelay.php,v 1.8 2005-09-01 03:14:39 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -106,7 +106,7 @@ class DB_sqlrelay extends DB_common
                                             $dsninfo['socket'],
                                             $dsninfo['username'],
                                             $dsninfo['password'],
-                                            1,0);
+                                            0,1);
         return DB_OK;
     }
 

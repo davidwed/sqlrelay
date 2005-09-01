@@ -40,6 +40,12 @@ bool sqlrconnection::genericAuthentication() {
 
 	flushWriteBuffer();
 
+	if (debug) {
+		debugPreStart();
+		debugPrint("Waiting for auth success/failure...\n");
+		debugPreEnd();
+	}
+
 	// check whether authentication was successful or not
 	uint16_t	authsuccess;
 	if (cs->read(&authsuccess)!=sizeof(uint16_t)) {
@@ -53,6 +59,12 @@ bool sqlrconnection::genericAuthentication() {
 		while (currentcursor) {
 			currentcursor->clearResultSet();
 			currentcursor=currentcursor->next;
+		}
+
+		if (debug) {
+			debugPreStart();
+			debugPrint("Authentication error.\n");
+			debugPreEnd();
 		}
 
 		setError("Authentication Error.");

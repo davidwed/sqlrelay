@@ -15,7 +15,7 @@ static void sqlrcon_free(void *sqlrcon) {
 
 static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 				VALUE user, VALUE password, 
-				VALUE tries, VALUE retrytime) {
+				VALUE retrytime, VALUE tries) {
 	const char	*socketstr;
 	if (socket==Qnil) {
 		socketstr="";
@@ -27,8 +27,8 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 							socketstr,
 							STR2CSTR(user),
 							STR2CSTR(password),
-							NUM2INT(tries),
-							NUM2INT(retrytime));
+							NUM2INT(retrytime),
+							NUM2INT(tries));
 	sqlrcon->copyReferences();
 	return Data_Wrap_Struct(self,0,sqlrcon_free,(void *)sqlrcon);
 }

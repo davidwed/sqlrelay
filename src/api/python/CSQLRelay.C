@@ -37,7 +37,8 @@ static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
 #endif
 		&host, &port, &socket, &user, &password, &retrytime, &tries))
     return NULL;
-  sqlrcon = new sqlrconnection(host, port, socket, user, password, 1, 1);
+  sqlrcon = new sqlrconnection(host, port, socket, user, password,
+							retrytime, tries);
   sqlrcon->copyReferences();
   return Py_BuildValue("l", (long)sqlrcon);
 }
