@@ -1065,14 +1065,21 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 
 	} else if (authstatus==0) {
 
+		#ifdef SERVER_DEBUG
+		debugPrint("listener",1,"sending client auth error");
+		#endif
+
 		// snooze before and after returning an
 		// authentication error to discourage
 		// brute-force password attacks
 		snooze::macrosnooze(2);
 		clientsock->write((uint16_t)ERROR);
+		flushWriteBuffer(clientsock);
 		snooze::macrosnooze(2);
 	}
 
+	// FIXME: if we got -1 from getAuth, then the client may be spewing
+	// garbage and we should close the connection...
 	waitForClientClose(authstatus,passstatus,clientsock);
 	delete clientsock;
 }
@@ -1089,7 +1096,7 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 	clientsock->read(&size);
 	char		userbuffer[(uint32_t)USERSIZE+1];
 	if (size>(uint32_t)USERSIZE ||
-	    (uint32_t)(clientsock->read(userbuffer,size))!=size) {
+		(uint32_t)(clientsock->read(userbuffer,size))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: user size is wrong");
