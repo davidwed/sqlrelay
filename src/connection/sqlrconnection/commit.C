@@ -32,7 +32,7 @@ bool sqlrconnection::commit() {
 
 	#ifdef SERVER_DEBUG
 	char	string[36];
-	sprintf(string,"commit result: %d",retval);
+	snprintf(string,36,"commit result: %d",retval);
 	debugPrint("connection",2,string);
 	#endif
 

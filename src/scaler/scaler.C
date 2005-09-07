@@ -57,9 +57,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 	id=charstring::duplicate(tmpid);
 
 	// check for listener's pid file
-	char	*listenerpidfile=new char[tmpdirlen+20+
-						charstring::length(id)+1];
-	sprintf(listenerpidfile,"%s/pids/sqlr-listener-%s",TMP_DIR,id);
+	size_t	listenerpidfilelen=tmpdirlen+20+charstring::length(id)+1;
+	char	*listenerpidfile=new char[listenerpidfilelen];
+	snprintf(listenerpidfile,listenerpidfilelen,
+			"%s/pids/sqlr-listener-%s",TMP_DIR,id);
 	if (checkForPidFile(listenerpidfile)==-1) {
 		fprintf(stderr,"\nsqlr-scaler error: \n");
 		fprintf(stderr,"	The file %s",listenerpidfile);
@@ -74,8 +75,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 	delete[] listenerpidfile;
 
 	// check/set pid file
-	pidfile=new char[tmpdirlen+18+charstring::length(id)+1];
-	sprintf(pidfile,"%s/pids/sqlr-scaler-%s",TMP_DIR,id);
+	size_t	pidfilelen=tmpdirlen+18+charstring::length(id)+1;
+	pidfile=new char[pidfilelen];
+	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-scaler-%s",TMP_DIR,id);
 	if (checkForPidFile(pidfile)!=-1) {
 		fprintf(stderr,"\nsqlr-scaler error:\n");
 		fprintf(stderr,"	The pid file %s",pidfile);
@@ -213,8 +215,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 	createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// initialize the shared memory segment filename
-	idfilename=new char[tmpdirlen+5+charstring::length(id)+1];
-	sprintf(idfilename,"%s/ipc/%s",TMP_DIR,id);
+	size_t	idfilenamelen=tmpdirlen+5+charstring::length(id)+1;
+	idfilename=new char[idfilenamelen];
+	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",TMP_DIR,id);
 	key_t	key=ftok(idfilename,0);
 
 	// connect to the semaphore set
@@ -303,15 +306,15 @@ bool scaler::openMoreConnections() {
 				}
 
 				// build the command to start a connection
-				char	*command=new char
-						[16+charstring::length(dbase)+
+				size_t	commandlen=16+charstring::length(dbase)+
 						6+20+
 						5+charstring::length(id)+
 						15+charstring::length(
 								connectionid)+
 						9+charstring::length(config)+
-						2+1];
-				sprintf(command,
+						2+1;
+				char	*command=new char[commandlen];
+				snprintf(command,commandlen,
 	"sqlr-connection-%s%s -ttl %d -id %s -connectionid %s -config %s %s",
 					dbase,((debug)?"-debug":""),
 					ttl,id,connectionid,config,
@@ -355,9 +358,10 @@ void scaler::getRandomConnectionId() {
 bool scaler::availableDatabase() {
 	
 	// initialize the database up/down filename
-	char	*updown=new char[tmpdirlen+5+charstring::length(id)+1+
-					charstring::length(connectionid)+1];
-	sprintf(updown,"%s/ipc/%s-%s",TMP_DIR,id,connectionid);
+	size_t	updownlen=tmpdirlen+5+charstring::length(id)+1+
+					charstring::length(connectionid)+1;
+	char	*updown=new char[updownlen];
+	snprintf(updown,updownlen,"%s/ipc/%s-%s",TMP_DIR,id,connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;
 	return retval;

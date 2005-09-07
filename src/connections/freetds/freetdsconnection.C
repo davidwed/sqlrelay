@@ -339,7 +339,7 @@ bool freetdscursor::openCursor(uint16_t id) {
 	if (freetdsconn->db && freetdsconn->db[0]) {
 		uint32_t	len=charstring::length(freetdsconn->db)+4;
 		char		query[len+1];
-		sprintf(query,"use %s",freetdsconn->db);
+		snprintf(query,len+1,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true))) {
 			bool	live;

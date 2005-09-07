@@ -114,13 +114,16 @@ void sqlrconnection::registerForHandoff(const char *tmpdir) {
 	#endif
 
 	// construct the name of the socket to connect to
-	char	*handoffsockname=new char[charstring::length(tmpdir)+9+
-				charstring::length(cmdl->getId())+8+1];
-	sprintf(handoffsockname,"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
+	size_t	handoffsocknamelen=charstring::length(tmpdir)+9+
+				charstring::length(cmdl->getId())+8+1;
+	char	*handoffsockname=new char[handoffsocknamelen];
+	snprintf(handoffsockname,handoffsocknamelen,
+			"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[17+charstring::length(handoffsockname)+1];
-	sprintf(string,"handoffsockname: %s",handoffsockname);
+	size_t	stringlen=17+charstring::length(handoffsockname)+1;
+	char	*string=new char[stringlen];
+	snprintf(string,stringlen,"handoffsockname: %s",handoffsockname);
 	debugPrint("connection",1,string);
 	delete[] string;
 	#endif
@@ -171,15 +174,17 @@ void sqlrconnection::deRegisterForHandoff(const char *tmpdir) {
 	#endif
 
 	// construct the name of the socket to connect to
-	char	*removehandoffsockname=new char[charstring::length(tmpdir)+9+
-					charstring::length(cmdl->getId())+14+1];
-	sprintf(removehandoffsockname,"%s/sockets/%s-removehandoff",
-					tmpdir,cmdl->getId());
+	size_t	removehandoffsocknamelen=charstring::length(tmpdir)+9+
+					charstring::length(cmdl->getId())+14+1;
+	char	*removehandoffsockname=new char[removehandoffsocknamelen];
+	snprintf(removehandoffsockname,removehandoffsocknamelen,
+			"%s/sockets/%s-removehandoff",tmpdir,cmdl->getId());
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[23+charstring::length(
-					removehandoffsockname)+1];
-	sprintf(string,"removehandoffsockname: %s",removehandoffsockname);
+	size_t	stringlen=23+charstring::length(removehandoffsockname)+1;
+	char	*string=new char[stringlen];
+	snprintf(string,stringlen,
+			"removehandoffsockname: %s",removehandoffsockname);
 	debugPrint("connection",1,string);
 	delete[] string;
 	#endif

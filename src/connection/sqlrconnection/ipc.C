@@ -16,9 +16,10 @@
 bool sqlrconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 							const char *id) {
 
-	char	*idfilename=new char[charstring::length(tmpdir)+5+
-						charstring::length(id)+1];
-	sprintf(idfilename,"%s/ipc/%s",tmpdir,id);
+	size_t	idfilenamelen=charstring::length(tmpdir)+5+
+					charstring::length(id)+1;
+	char	*idfilename=new char[idfilenamelen];
+	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"attaching to shared memory and semaphores");

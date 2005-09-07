@@ -482,8 +482,9 @@ bool sqlrconfigfile::parse(const char *config, const char *id,
 	const char	*homedir=getenv("HOME");
 	char		*filename;
 	if (homedir && homedir[0]) {
-		filename=new char[charstring::length(homedir)+15+1];
-		sprintf(filename,"%s/.sqlrelay.conf",homedir);
+		size_t	filenamelen=charstring::length(homedir)+15+1;
+		filename=new char[filenamelen];
+		snprintf(filename,filenamelen,"%s/.sqlrelay.conf",homedir);
 	} else {
 		filename=charstring::duplicate("~/.sqlrelay.conf");
 	}

@@ -143,17 +143,19 @@ void sqlrconnection::setUserAndGroup() {
 }
 
 void sqlrconnection::setUnixSocketDirectory() {
-	unixsocket=new char[tmpdir->getLength()+31];
-	sprintf(unixsocket,"%s/sockets/",tmpdir->getString());
+	size_t	unixsocketlen=tmpdir->getLength()+31;
+	unixsocket=new char[unixsocketlen];
+	snprintf(unixsocket,unixsocketlen,"%s/sockets/",tmpdir->getString());
 	unixsocketptr=unixsocket+tmpdir->getLength()+8+1;
 }
 
 bool sqlrconnection::handlePidFile() {
 
 	// check for pid file
-	char	*pidfile=new char[tmpdir->getLength()+20+
-				charstring::length(cmdl->getId())+1];
-	sprintf(pidfile,"%s/pids/sqlr-listener-%s",
+	size_t	pidfilelen=tmpdir->getLength()+20+
+				charstring::length(cmdl->getId())+1;
+	char	*pidfile=new char[pidfilelen];
+	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),cmdl->getId());
 
 	bool	retval=true;
@@ -175,11 +177,12 @@ bool sqlrconnection::handlePidFile() {
 void sqlrconnection::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
-	updown=new char[charstring::length(tmpdir->getString())+5+
+	size_t	updownlen=charstring::length(tmpdir->getString())+5+
 					charstring::length(cmdl->getId())+1+
-					charstring::length(connectionid)+1];
-	sprintf(updown,"%s/ipc/%s-%s",tmpdir->getString(),cmdl->getId(),
-							connectionid);
+					charstring::length(connectionid)+1;
+	updown=new char[updownlen];
+	snprintf(updown,updownlen,"%s/ipc/%s-%s",
+			tmpdir->getString(),cmdl->getId(),connectionid);
 }
 
 void sqlrconnection::blockSignals() {

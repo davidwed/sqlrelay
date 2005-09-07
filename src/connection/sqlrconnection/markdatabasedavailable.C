@@ -10,8 +10,9 @@
 void sqlrconnection::markDatabaseAvailable() {
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[9+charstring::length(updown)+1];
-	sprintf(string,"creating %s",updown);
+	size_t	stringlen=9+charstring::length(updown)+1;
+	char	*string=new char[stringlen];
+	snprintf(string,stringlen,"creating %s",updown);
 	getDebugLogger()->write("connection",4,string);
 	delete[] string;
 	#endif
@@ -25,8 +26,9 @@ void sqlrconnection::markDatabaseAvailable() {
 void sqlrconnection::markDatabaseUnavailable() {
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[10+charstring::length(updown)+1];
-	sprintf(string,"unlinking %s",updown);
+	size_t	stringlen=10+charstring::length(updown)+1;
+	char	*string=new char[stringlen];
+	snprintf(string,stringlen,"unlinking %s",updown);
 	getDebugLogger()->write("connection",4,string);
 	delete[] string;
 	#endif

@@ -49,12 +49,14 @@ bool sqlrconnection::openSequenceFile(file *sockseq,
 				const char *tmpdir, char *unixsocketptr) {
 
 	// open the sequence file and get the current port number
-	char	*sockseqname=new char[charstring::length(tmpdir)+9];
-	sprintf(sockseqname,"%s/sockseq",tmpdir);
+	size_t	sockseqnamelen=charstring::length(tmpdir)+9;
+	char	*sockseqname=new char[sockseqnamelen];
+	snprintf(sockseqname,sockseqnamelen,"%s/sockseq",tmpdir);
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[8+charstring::length(sockseqname)+1];
-	sprintf(string,"opening %s",sockseqname);
+	size_t	stringlen=8+charstring::length(sockseqname)+1;
+	char	*string=new char[stringlen];
+	snprintf(string,stringlen,"opening %s",sockseqname);
 	debugPrint("connection",1,string);
 	delete[] string;
 	#endif
@@ -72,8 +74,9 @@ bool sqlrconnection::openSequenceFile(file *sockseq,
 		unixsocketptr[0]=(char)NULL;
 
 		#ifdef SERVER_DEBUG
-		string=new char[14+charstring::length(sockseqname)+1];
-		sprintf(string,"couldn't open %s",sockseqname);
+		stringlen=14+charstring::length(sockseqname)+1;
+		string=new char[stringlen];
+		snprintf(string,stringlen,"couldn't open %s",sockseqname);
 		debugPrint("connection",1,string);
 		delete[] string;
 		#endif
@@ -105,8 +108,9 @@ bool sqlrconnection::getAndIncrementSequenceNumber(file *sockseq,
 	sprintf(unixsocketptr,"%d",buffer);
 
 	#ifdef SERVER_DEBUG
-	char	*string=new char[21+charstring::length(unixsocketptr)+1];
-	sprintf(string,"got sequence number: %s",unixsocketptr);
+	size_t	stringlen=21+charstring::length(unixsocketptr)+1;
+	char	*string=new char[stringlen];
+	snprintf(string,stringlen,"got sequence number: %s",unixsocketptr);
 	debugPrint("connection",1,string);
 	delete[] string;
 	#endif
@@ -120,7 +124,7 @@ bool sqlrconnection::getAndIncrementSequenceNumber(file *sockseq,
 
 	#ifdef SERVER_DEBUG
 	string=new char[50];
-	sprintf(string,"writing new sequence number: %d",buffer);
+	snprintf(string,50,"writing new sequence number: %d",buffer);
 	debugPrint("connection",1,string);
 	delete[] string;
 	#endif

@@ -17,9 +17,11 @@ bool sqlrconnection::openSockets() {
 			if (serversockun->listen(unixsocket,0000,5)) {
 
 				#ifdef SERVER_DEBUG
-				char	*string=new char[26+
-					charstring::length(unixsocket)+1];
-				sprintf(string,"listening on unix socket: %s",
+				size_t	stringlen=26+
+					charstring::length(unixsocket)+1;
+				char	*string=new char[stringlen];
+				snprintf(string,stringlen,
+					"listening on unix socket: %s",
 								unixsocket);
 				debugPrint("connection",1,string);
 				delete[] string;
@@ -53,7 +55,8 @@ bool sqlrconnection::openSockets() {
 
 				#ifdef SERVER_DEBUG
 				char	string[33];
-				sprintf(string,"listening on inet socket: %d",
+				snprintf(string,33,
+					"listening on inet socket: %d",
 								inetport);
 				debugPrint("connection",1,string);
 				#endif

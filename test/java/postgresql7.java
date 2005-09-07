@@ -8,10 +8,6 @@ import com.firstworks.sqlrelay.SQLRCursor;
 class postgresql7 {
 	
 	
-	
-	
-	
-	
 	private static void checkSuccess(String value, String success) {
 	
 		if (success==null) {

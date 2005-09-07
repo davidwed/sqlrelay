@@ -111,9 +111,10 @@ void cachemanager::scan() {
 void cachemanager::erase(const char *dirname, const char *filename) {
 
 	// derive the full pathname
-	char	*fullpathname=new char[charstring::length(dirname)+1+
-					charstring::length(filename)+1];
-	sprintf(fullpathname,"%s/%s",dirname,filename);
+	size_t	fullpathnamelen=charstring::length(dirname)+1+
+					charstring::length(filename)+1;
+	char	*fullpathname=new char[fullpathnamelen];
+	snprintf(fullpathname,fullpathnamelen,"%s/%s",dirname,filename);
 
 	// open the file
 	file	fl;

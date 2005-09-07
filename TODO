@@ -4,11 +4,7 @@
 
 --------------------------------------------------------------------------------
 
-gcj:
-	is gcj's jvm sufficient to install oracle/sybase/db2?
-	java test crashes when using gcj's jvm
-
-run flawfinder, fix bugs it reveals
+methods for input/output binds and fields as byte arrays in java api
 
 hot dog's php suspended session problem
 

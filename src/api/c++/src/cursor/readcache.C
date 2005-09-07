@@ -23,8 +23,9 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 	endofresultset=false;
 
 	// create the index file name
-	char	*indexfilename=new char[charstring::length(filename)+5];
-	sprintf(indexfilename,"%s.ind",filename);
+	size_t	indexfilenamelen=charstring::length(filename)+5;
+	char	*indexfilename=new char[indexfilenamelen];
+	snprintf(indexfilename,indexfilenamelen,"%s.ind",filename);
 
 	// open the file
 	cachesource=new file();

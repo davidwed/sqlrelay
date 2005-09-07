@@ -763,7 +763,7 @@ void interbasecursor::returnRow() {
 		#endif
 			// build a string of "yyyy-mm-dd hh:mm:ss" format
 			char	buffer[20];
-			sprintf(buffer,"%d-%02d-%02d %02d:%02d:%02d",
+			snprintf(buffer,20,"%d-%02d-%02d %02d:%02d:%02d",
 					entry_timestamp.tm_year+1900,
 					entry_timestamp.tm_mon+1,
 					entry_timestamp.tm_mday,
@@ -780,7 +780,7 @@ void interbasecursor::returnRow() {
 							&entry_time);
 			// build a string of "hh:mm:ss" format
 			char	buffer[9];
-			sprintf(buffer,"%02d:%02d:%02d",
+			snprintf(buffer,9,"%02d:%02d:%02d",
 					entry_time.tm_hour,
 					entry_time.tm_min,
 					entry_time.tm_sec);
@@ -793,7 +793,7 @@ void interbasecursor::returnRow() {
 							&entry_date);
 			// build a string of "yyyy-mm-dd" format
 			char	buffer[11];
-			sprintf(buffer,"%d:%02d:%02d",
+			snprintf(buffer,11,"%d:%02d:%02d",
 					entry_date.tm_year+1900,
 					entry_date.tm_mon+1,
 					entry_date.tm_mday);

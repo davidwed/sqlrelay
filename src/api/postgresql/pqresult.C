@@ -81,10 +81,11 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 
 			const char	*dbtype=conn->sqlrcon->identify();
 			if (!dbtype) {
-				conn->error=new char[
+				size_t	errorlen=
 					charstring::length(result->sqlrcur->
-							errorMessage())+2];
-				sprintf(conn->error,"%s\n",
+							errorMessage())+2;
+				conn->error=new char[errorlen];
+				snprintf(conn->error,errorlen,"%s\n",
 					result->sqlrcur->errorMessage());
 				PQclear(result);
 				return NULL;
@@ -115,11 +116,12 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 				result->queryisnotselect=0;
 			}
 		} else {
-			conn->error=new char[
+			size_t	errorlen=
 				charstring::length(result->
-						sqlrcur->errorMessage())+2];
-			sprintf(conn->error,"%s\n",
-				result->sqlrcur->errorMessage());
+						sqlrcur->errorMessage())+2;
+			conn->error=new char[errorlen];
+			snprintf(conn->error,errorlen,
+					"%s\n",result->sqlrcur->errorMessage());
 			PQclear(result);
 			result=NULL;
 		}

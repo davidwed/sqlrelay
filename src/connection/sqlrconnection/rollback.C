@@ -33,7 +33,7 @@ bool sqlrconnection::rollback() {
 
 	#ifdef SERVER_DEBUG
 	char	string[38];
-	sprintf(string,"rollback result: %d",retval);
+	snprintf(string,38,"rollback result: %d",retval);
 	debugPrint("connection",2,string);
 	#endif
 

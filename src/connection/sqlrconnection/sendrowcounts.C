@@ -15,7 +15,7 @@ void sqlrconnection::sendRowCounts(bool knowsactual, uint64_t actual,
 
 		#ifdef SERVER_DEBUG
 		char	string[30];
-		sprintf(string,"actual rows: %lld",actual);
+		snprintf(string,30,"actual rows: %lld",actual);
 		debugPrint("connection",3,string);
 		#endif
 
@@ -37,7 +37,7 @@ void sqlrconnection::sendRowCounts(bool knowsactual, uint64_t actual,
 
 		#ifdef SERVER_DEBUG
 		char	string[46];
-		sprintf(string,"affected rows: %lld",affected);
+		snprintf(string,46,"affected rows: %lld",affected);
 		debugPrint("connection",3,string);
 		#endif
 

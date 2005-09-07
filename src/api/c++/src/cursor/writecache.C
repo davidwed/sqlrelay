@@ -21,8 +21,9 @@ void sqlrcursor::cacheToFile(const char *filename) {
 
 	// create the index name
 	delete[] cachedestindname;
-	cachedestindname=new char[charstring::length(filename)+5];
-	sprintf(cachedestindname,"%s.ind",filename);
+	size_t	cachedestindnamelen=charstring::length(filename)+5;
+	cachedestindname=new char[cachedestindnamelen];
+	snprintf(cachedestindname,cachedestindnamelen,"%s.ind",filename);
 }
 
 void sqlrcursor::setCacheTtl(uint32_t ttl) {

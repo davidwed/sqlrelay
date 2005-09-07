@@ -37,6 +37,7 @@
 	python api pays attention to retrytime/tries now
 	fixed a hang when username/password are wrong
 	fixed a crash when too many cursors were requested
+	switched most sprintf's for snprintf's
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

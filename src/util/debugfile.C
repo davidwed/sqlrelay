@@ -18,17 +18,22 @@ debugfile::~debugfile() {
 void debugfile::openDebugFile(const char *name, const char *localstatedir) {
 
 	// set the debug file name
+	size_t	dbgfilenamelen;
 	char	*dbgfilename;
 	if (localstatedir[0]) {
-		dbgfilename=new char[charstring::length(localstatedir)+
-					16+5+charstring::length(name)+20+1];
-		sprintf(dbgfilename,"%s/sqlrelay/debug/sqlr-%s.%d",
+		dbgfilenamelen=charstring::length(localstatedir)+
+					16+5+charstring::length(name)+20+1;
+		dbgfilename=new char[dbgfilenamelen];
+		snprintf(dbgfilename,dbgfilenamelen,
+					"%s/sqlrelay/debug/sqlr-%s.%d",
 						localstatedir,name,
 						process::getProcessId());
 	} else {
-		dbgfilename=new char[charstring::length(DEBUG_DIR)+5+
-					charstring::length(name)+20+1];
-		sprintf(dbgfilename,"%s/sqlr-%s.%d",DEBUG_DIR,name,
+		dbgfilenamelen=charstring::length(DEBUG_DIR)+5+
+					charstring::length(name)+20+1;
+		dbgfilename=new char[dbgfilenamelen];
+		snprintf(dbgfilename,dbgfilenamelen,
+					"%s/sqlr-%s.%d",DEBUG_DIR,name,
 						process::getProcessId());
 	}
 

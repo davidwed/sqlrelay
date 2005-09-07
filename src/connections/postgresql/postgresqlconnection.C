@@ -165,8 +165,9 @@ postgresqlcursor::~postgresqlcursor() {
 }
 
 bool postgresqlcursor::openCursor(uint16_t id) {
-	cursorname=new char[6+charstring::integerLength(id)+1];
-	sprintf(cursorname,"cursor%d",id);
+	size_t	cursornamelen=6+charstring::integerLength(id)+1;
+	cursorname=new char[cursornamelen];
+	snprintf(cursorname,cursornamelen,"cursor%d",id);
 	return true;
 }
 
@@ -482,7 +483,7 @@ void postgresqlcursor::returnColumnInfo() {
 		// types, otherwise return the type number.
 		pgfieldtype=PQftype(pgresult,i);
 		if (!postgresqlconn->typemangling) {
-			sprintf(typestring,"%d",(int32_t)pgfieldtype);
+			snprintf(typestring,6,"%d",(int32_t)pgfieldtype);
 		} else if (postgresqlconn->typemangling==1) {
 			if ((int32_t)pgfieldtype==23) {
 				type=INT_DATATYPE;
