@@ -35,6 +35,9 @@ typedef enum {
 	DENIEDIPS_ATTRIBUTE,
 	ALLOWEDIPS_ATTRIBUTE,
 	DEBUG_ATTRIBUTE,
+	MAXQUERYSIZE_ATTRIBUTE,
+	MAXSTRINGBINDVALUELENGTH_ATTRIBUTE,
+	MAXLOBBINDVALUELENGTH_ATTRIBUTE,
 	USER_ATTRIBUTE,
 	PASSWORD_ATTRIBUTE,
 	CONNECTIONID_ATTRIBUTE,
@@ -120,6 +123,9 @@ class sqlrconfigfile : public xmlsax {
 		const char	*getDebug();
 		bool		getDebugListener();
 		bool		getDebugConnection();
+		uint32_t	getMaxQuerySize();
+		uint32_t	getMaxStringBindValueLength();
+		uint32_t	getMaxLobBindValueLength();
 
 		linkedlist< usercontainer * >	*getUserList();
 		linkedlist< connectstringcontainer * >
@@ -173,6 +179,9 @@ class sqlrconfigfile : public xmlsax {
 		const char	*debug;
 		bool		debuglistener;
 		bool		debugconnection;
+		uint32_t	maxquerysize;
+		uint32_t	maxstringbindvaluelength;
+		uint32_t	maxlobbindvaluelength;
 
 		usercontainer	*currentuser;
 

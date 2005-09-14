@@ -15,21 +15,9 @@ void sqlrcursor::prepareQuery(const char *query, uint32_t length) {
 	resumed=false;
 	clearVariables();
 	querylen=length;
-	if (querylen>MAXQUERYSIZE) {
-		querylen=MAXQUERYSIZE;
-		if (sqlrc->debug) {
-			sqlrc->debugPreStart();
-			sqlrc->debugPrint("The query is too large.  ");
-			sqlrc->debugPrint("MAXQUERYSIZE is ");
-			sqlrc->debugPrint((int64_t)MAXQUERYSIZE);
-			sqlrc->debugPrint("\n");
-			sqlrc->debugPreEnd();
-		}
-	}
 	if (copyrefs) {
-		initQueryBuffer();
+		initQueryBuffer(length);
 		charstring::copy(queryptr,query,querylen);
-		// just in case querylen>MAXQUERYSIZE
 		queryptr[querylen]=(char)NULL;
 	} else {
 		queryptr=(char *)query;
@@ -134,23 +122,10 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 		return false;
 	}
 
-	initQueryBuffer();
+	initQueryBuffer(queryfile.getSize());
 
 	// read the file into the query buffer
 	querylen=queryfile.getSize();
-	if (querylen>MAXQUERYSIZE) {
-		querylen=MAXQUERYSIZE;
-		if (sqlrc->debug) {
-			sqlrc->debugPreStart();
-			sqlrc->debugPrint("The query in ");
-			sqlrc->debugPrint(fullpath);
-			sqlrc->debugPrint(" is too large. ");
-			sqlrc->debugPrint("MAXQUERYSIZE is ");
-			sqlrc->debugPrint((int64_t)MAXQUERYSIZE);
-			sqlrc->debugPrint("\n");
-			sqlrc->debugPreEnd();
-		}
-	}
 	queryfile.read((unsigned char *)querybuffer,querylen);
 	querybuffer[querylen]=(char)NULL;
 
@@ -159,9 +134,9 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	return true;
 }
 
-void sqlrcursor::initQueryBuffer() {
+void sqlrcursor::initQueryBuffer(uint32_t querylength) {
 	if (!querybuffer) {
-		querybuffer=new char[MAXQUERYSIZE+1];
+		querybuffer=new char[querylength+1];
 		queryptr=querybuffer;
 	}
 }

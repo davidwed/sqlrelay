@@ -323,8 +323,9 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 	protected:
 
-		uint32_t	stringbindvaluelength;
-		uint32_t	lobbindvaluelength;
+		uint32_t	maxquerysize;
+		uint32_t	maxstringbindvaluelength;
+		uint32_t	maxlobbindvaluelength;
 
 #ifdef SERVER_DEBUG
 		stringbuffer	*debugstr;

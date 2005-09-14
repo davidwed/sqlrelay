@@ -4,56 +4,44 @@
 
 --------------------------------------------------------------------------------
 
-methods for input/output binds and fields as byte arrays in java api
+tests:
+	test fetching binary data
+	freetds test fails, maybe freetds-version related or tds version?
+	too long queries, string/lob bind values
+
+ionut's memory corruption errors
 
 hot dog's php suspended session problem
 
-maciej's weird python error messages
+maciej's stuff:
+	looks like in: select func(...) from dual, if func()
+		generates an error, sqlrelay doesn't report it
 
-investigate precision/scale in input binds, write up a doc explaining what
-	happens when precision/scale parameters don't match the value passed
-	in and what happens when they're bound to a column with different
-	precision/scale, link to this doc from all "programming" docs
+java api
+	methods for input/output binds and fields as byte arrays in java api
+	getRow()/getRowAssoc()/getField()/getOutputBind() in java api must use
+		the length when creating the jstring
+	use 64 bits in java api
+	change:
+		double get???AsDouble
+	to
+		long double get???AsFloat();
+	change:
+		inputBindLong
+	to
+		inputBindInteger
+	and
+		inputBindDouble
+	to
+		inputBindFloat
 
 sun compiler compatibility updates
-
-ionut's memory corruption errors
 
 export/import sequences
 
 idle client timeout
 
-getRow()/getRowAssoc()/getField()/getOutputBind() in java api must use
-	the length when creating the jstring
-
-test fetching binary data
-
-sqlr-import/sqlr-export tools
-
-make max clob/blob upload size configurable
-
 support postgresql bind variables with countBindVariables()
-
-freetds test fails, maybe freetds-version related or tds version?
-
-add detailed FAQ entry about sending writes to a master, distributing reads over
-	a set of slaves
-
-get windows/sqlite/tcl working for Ray Moseley
-
-use 64 bits in java api
-change:
-	double get???AsDouble
-to
-	long double get???AsFloat();
-change:
-	inputBindLong
-to
-	inputBindInteger
-and
-	inputBindDouble
-to
-	inputBindFloat
 
 fix freetds/sybase ct_con_prop/encryption FIXME's
 
@@ -69,9 +57,9 @@ look into OCIBreak/obreak function calls for cancelling oracle commands
 
 configure script doesn't find zope on openbsd
 
-PySQLRDB.py needs to return DateTime objects for date-type columns
-
 perl apis -> CPAN
+
+distribute selects to slaves, dml/ddl to master:
 
 --------------------------------------------------------------------------------
 

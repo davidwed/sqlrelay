@@ -302,6 +302,11 @@ calling executeQuery() causes the API to check the query for each bind variable
 before actually binding it, preventing those kinds of errors.  There is a 
 performance cost associated with calling validateBinds().</p>
 
+<p>When passing a floating point number in as a bind or substitution variable,
+you have to supply precision and scale for the number.  See
+<a href="precisionscale.html">this page</a> for a discussion of precision and
+scale.</p>
+
 
 <a name="rebinding"></a>
 <span class="heading2">Re-Binding and Re-Execution</span><br><br>
@@ -519,7 +524,9 @@ compile time and defaults to 5.</p>
 
 <p>For each column, the API supports getting the name, type and length of each
 field.  All databases support these attributes.  The API also supports
-getting the precision, scale, length of the longest field, and whether the
+getting the precision, scale (see <a href="precisionscale.html">this page</a>
+for a discussion of precision and scale), length of the longest field, and
+whether the
 column is nullable, the primary key, unique, part of a key, unsigned,
 zero-filled, binary, or an auto-incrementing field.  However, not all databases
 support these attributes.  If a database doesn't support an attribute, it is

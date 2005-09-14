@@ -38,6 +38,9 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	debug=charstring::duplicate(DEFAULT_DEBUG);
 	debuglistener=charstring::contains(debug,"listener");
 	debugconnection=charstring::contains(debug,"connection");
+	maxquerysize=MAXQUERYSIZE;
+	maxstringbindvaluelength=MAXSTRINGBINDVALUELENGTH;
+	maxlobbindvaluelength=MAXLOBBINDVALUELENGTH;
 	currentuser=NULL;
 	firstconnect=NULL;
 	currentconnect=NULL;
@@ -184,6 +187,18 @@ bool sqlrconfigfile::getDebugConnection() {
 	return debugconnection;
 }
 
+uint32_t sqlrconfigfile::getMaxQuerySize() {
+	return maxquerysize;
+}
+
+uint32_t sqlrconfigfile::getMaxStringBindValueLength() {
+	return maxstringbindvaluelength;
+}
+
+uint32_t sqlrconfigfile::getMaxLobBindValueLength() {
+	return maxlobbindvaluelength;
+}
+
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	// if there are no users in the list, add a default user/password
 	if (!userlist.getLength()) {
@@ -300,6 +315,12 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=ALLOWEDIPS_ATTRIBUTE;
 	} else if (!charstring::compare(name,"debug")) {
 		currentattribute=DEBUG_ATTRIBUTE;
+	} else if (!charstring::compare(name,"maxquerysize")) {
+		currentattribute=MAXQUERYSIZE_ATTRIBUTE;
+	} else if (!charstring::compare(name,"maxstringbindvaluelength")) {
+		currentattribute=MAXSTRINGBINDVALUELENGTH_ATTRIBUTE;
+	} else if (!charstring::compare(name,"maxlobbindvaluelength")) {
+		currentattribute=MAXLOBBINDVALUELENGTH_ATTRIBUTE;
 	} else if (!charstring::compare(name,"user")) {
 		currentattribute=USER_ATTRIBUTE;
 	} else if (!charstring::compare(name,"password")) {
@@ -409,6 +430,18 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							"listener");
 			debugconnection=charstring::contains(debug,
 							"connection");
+		} else if (currentattribute==MAXQUERYSIZE_ATTRIBUTE) {
+			maxquerysize=(value)?charstring::toInteger(value):
+								MAXQUERYSIZE;
+		} else if (currentattribute==
+				MAXSTRINGBINDVALUELENGTH_ATTRIBUTE) {
+			maxstringbindvaluelength=
+				(value)?charstring::toInteger(value):
+						MAXSTRINGBINDVALUELENGTH;
+		} else if (currentattribute==MAXLOBBINDVALUELENGTH_ATTRIBUTE) {
+			maxlobbindvaluelength=
+				(value)?charstring::toInteger(value):
+						MAXLOBBINDVALUELENGTH;
 		} else if (currentattribute==USER_ATTRIBUTE) {
 			currentuser->setUser((value)?value:DEFAULT_USER);
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {

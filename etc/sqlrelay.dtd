@@ -19,6 +19,9 @@
 	<!ATTLIST instance deniedips CDATA "">
 	<!ATTLIST instance allowedips CDATA "">
 	<!ATTLIST instance debug (none|listener|connection|listener_and_connection) "none">
+	<!ATTLIST instance maxquerysize CDATA "65536">
+	<!ATTLIST instance maxstringbindvaluelength CDATA "4000">
+	<!ATTLIST instance maxlobbindvaluelength CDATA "71680">
 
 <!ELEMENT users (user*)>
 <!ELEMENT user EMPTY>

@@ -13,7 +13,7 @@
 		void	initVariables();
 		void	deleteVariables();
 
-		void	initQueryBuffer();
+		void	initQueryBuffer(uint32_t querylength);
 		bool	sendQueryInternal(const char *query);
 		void	validateBindsInternal(const char *query);
 		void	sendInputBinds();

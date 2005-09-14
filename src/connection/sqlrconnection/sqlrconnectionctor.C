@@ -29,8 +29,9 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 	checkautocommit=0;
 	performautocommit=0;
 
-	stringbindvaluelength=STRINGBINDVALUELENGTH;
-	lobbindvaluelength=LOBBINDVALUELENGTH;
+	maxquerysize=MAXQUERYSIZE;
+	maxstringbindvaluelength=MAXSTRINGBINDVALUELENGTH;
+	maxlobbindvaluelength=MAXLOBBINDVALUELENGTH;
 
 	connected=false;
 

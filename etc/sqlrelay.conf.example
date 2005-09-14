@@ -3,7 +3,7 @@
 
 <instances>
 
-	<instance id="example" port="9000" socket="/tmp/example.socket" dbase="oracle8" connections="3" maxconnections="15" maxqueuelength="5" growby="1" ttl="60" endofsession="commit" sessiontimeout="600" runasuser="nobody" runasgroup="nobody" cursors="5" authtier="listener" handoff="pass" deniedips="" allowedips="" debug="none">
+	<instance id="example" port="9000" socket="/tmp/example.socket" dbase="oracle8" connections="3" maxconnections="15" maxqueuelength="5" growby="1" ttl="60" endofsession="commit" sessiontimeout="600" runasuser="nobody" runasgroup="nobody" cursors="5" authtier="listener" handoff="pass" deniedips="" allowedips="" debug="none" maxquerysize="65536" maxstringbindvaluelength="4000" maxlobbindvaluelength="71680">
 		<users>
 			<user user="user1" password="password1"/>
 			<user user="user2" password="password2"/>

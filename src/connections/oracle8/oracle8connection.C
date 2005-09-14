@@ -12,7 +12,6 @@
 #include <stdlib.h>
 
 oracle8connection::oracle8connection() {
-	stringbindvaluelength=MAX_ITEM_BUFFER_SIZE;
 	statementmode=OCI_DEFAULT;
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;

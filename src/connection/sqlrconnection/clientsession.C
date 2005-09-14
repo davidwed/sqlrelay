@@ -244,7 +244,7 @@ void sqlrconnection::noAvailableCursors(uint16_t command) {
 	// number of bytes that could be sent.
 	uint32_t	size=(
 				// query size and query
-				sizeof(uint32_t)+MAXQUERYSIZE+
+				sizeof(uint32_t)+maxquerysize+
 				// input bind var count
 				sizeof(uint16_t)+
 				// input bind vars

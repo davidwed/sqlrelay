@@ -97,7 +97,7 @@ bool sqlrconnection::getQuery(sqlrcursor *cursor) {
 	}
 
 	// bounds checking
-	if (cursor->querylength>MAXQUERYSIZE) {
+	if (cursor->querylength>maxquerysize) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting query failed: client sent bad query size");
