@@ -160,6 +160,8 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 		}
 	}
 
+	idleclienttimeout=cfgfl.getIdleClientTimeout();
+
 	#ifndef SERVER_DEBUG
 	detach();
 	#endif
@@ -1100,10 +1102,11 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 	// Get the user/password. For either one, if they are too big or
 	// if there's a read error, just exit with an error code
 	uint32_t	size;
-	clientsock->read(&size);
+	clientsock->read(&size,idleclienttimeout,0);
 	char		userbuffer[(uint32_t)USERSIZE+1];
 	if (size>(uint32_t)USERSIZE ||
-		(uint32_t)(clientsock->read(userbuffer,size))!=size) {
+		(uint32_t)(clientsock->read(userbuffer,size,
+						idleclienttimeout,0))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: user size is wrong");
@@ -1113,9 +1116,10 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 	userbuffer[size]=(char)NULL;
 
 	char		passwordbuffer[(uint32_t)USERSIZE+1];
-	clientsock->read(&size);
+	clientsock->read(&size,idleclienttimeout,0);
 	if (size>(uint32_t)USERSIZE ||
-		(uint32_t)(clientsock->read(passwordbuffer,size))!=size) {
+		(uint32_t)(clientsock->read(passwordbuffer,size,
+						idleclienttimeout,0))!=size) {
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 			"authentication failed: password size is wrong");
@@ -1630,7 +1634,7 @@ void sqlrlistener::waitForClientClose(int32_t authstatus, bool passstatus,
 		// we are but authentication failed, the client
 		// shouldn't be sending any data, so a single
 		// read should suffice.
-		clientsock->read(&dummy);
+		clientsock->read(&dummy,idleclienttimeout,0);
 
 	} else if (!passstatus) {
 
@@ -1645,7 +1649,8 @@ void sqlrlistener::waitForClientClose(int32_t authstatus, bool passstatus,
 
 		uint32_t	counter=0;
 		clientsock->useNonBlockingMode();
-		while (clientsock->read(&dummy)>0 && counter<
+		while (clientsock->read(&dummy,idleclienttimeout,0)>0 &&
+				counter<
 				// sending auth
 				(sizeof(uint16_t)+
 				// user/password

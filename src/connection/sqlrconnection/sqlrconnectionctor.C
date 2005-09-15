@@ -32,6 +32,7 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 	maxquerysize=MAXQUERYSIZE;
 	maxstringbindvaluelength=MAXSTRINGBINDVALUELENGTH;
 	maxlobbindvaluelength=MAXLOBBINDVALUELENGTH;
+	idleclienttimeout=DEFAULT_IDLECLIENTTIMEOUT;
 
 	connected=false;
 

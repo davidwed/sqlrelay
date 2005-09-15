@@ -49,9 +49,10 @@ bool sqlrconnection::authenticate() {
 
 bool sqlrconnection::getUserFromClient() {
 	uint32_t	size=0;
-	if (clientsock->read(&size)==sizeof(uint32_t) &&
+	if (clientsock->read(&size,idleclienttimeout,0)==sizeof(uint32_t) &&
 		size<=(uint32_t)USERSIZE &&
-		(uint32_t)(clientsock->read(userbuffer,size))==size) {
+		(uint32_t)(clientsock->read(userbuffer,size,
+						idleclienttimeout,0))==size) {
 		userbuffer[size]=(char)NULL;
 		return true;
 	}
@@ -64,9 +65,10 @@ bool sqlrconnection::getUserFromClient() {
 
 bool sqlrconnection::getPasswordFromClient() {
 	uint32_t size=0;
-	if (clientsock->read(&size)==sizeof(uint32_t) &&
+	if (clientsock->read(&size,idleclienttimeout,0)==sizeof(uint32_t) &&
 		size<=(uint32_t)USERSIZE &&
-		(uint32_t)(clientsock->read(passwordbuffer,size))==size) {
+		(uint32_t)(clientsock->read(passwordbuffer,size,
+						idleclienttimeout,0))==size) {
 		passwordbuffer[size]=(char)NULL;
 		return true;
 	}

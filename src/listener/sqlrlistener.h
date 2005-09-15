@@ -130,6 +130,8 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 		regularexpression	*denied;
 
 		cmdline			*cmdl;
+
+		int32_t			idleclienttimeout;
 };
 
 #endif

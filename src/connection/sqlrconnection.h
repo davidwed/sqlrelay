@@ -326,6 +326,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		uint32_t	maxquerysize;
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
+		int32_t		idleclienttimeout;
 
 #ifdef SERVER_DEBUG
 		stringbuffer	*debugstr;

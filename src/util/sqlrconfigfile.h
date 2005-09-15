@@ -38,6 +38,7 @@ typedef enum {
 	MAXQUERYSIZE_ATTRIBUTE,
 	MAXSTRINGBINDVALUELENGTH_ATTRIBUTE,
 	MAXLOBBINDVALUELENGTH_ATTRIBUTE,
+	IDLECLIENTTIMEOUT_ATTRIBUTE,
 	USER_ATTRIBUTE,
 	PASSWORD_ATTRIBUTE,
 	CONNECTIONID_ATTRIBUTE,
@@ -126,6 +127,7 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t	getMaxQuerySize();
 		uint32_t	getMaxStringBindValueLength();
 		uint32_t	getMaxLobBindValueLength();
+		int32_t		getIdleClientTimeout();
 
 		linkedlist< usercontainer * >	*getUserList();
 		linkedlist< connectstringcontainer * >
@@ -182,6 +184,7 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t	maxquerysize;
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
+		int32_t		idleclienttimeout;
 
 		usercontainer	*currentuser;
 

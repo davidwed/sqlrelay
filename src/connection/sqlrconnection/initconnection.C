@@ -108,10 +108,11 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 		return openSockets();
 	}
 
-	// update maximum query size and bind value lengths
+	// update maximum query size, bind value lengths and idle client timeout
 	maxquerysize=cfgfl->getMaxQuerySize();
 	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
+	idleclienttimeout=cfgfl->getIdleClientTimeout();
 
 	return true;
 }

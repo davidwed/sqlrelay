@@ -16,17 +16,18 @@ void sqlrconnection::autoCommitCommand() {
 	debugPrint("connection",1,"autocommit...");
 	#endif
 	bool	on;
-	clientsock->read(&on);
-	if (on) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,"autocommit on");
-		#endif
-		clientsock->write(autoCommitOn());
-	} else {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,"autocommit off");
-		#endif
-		clientsock->write(autoCommitOff());
+	if (clientsock->read(&on,idleclienttimeout,0)==sizeof(bool)) {
+		if (on) {
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",2,"autocommit on");
+			#endif
+			clientsock->write(autoCommitOn());
+		} else {
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",2,"autocommit off");
+			#endif
+			clientsock->write(autoCommitOff());
+		}
 	}
 	flushWriteBuffer();
 }

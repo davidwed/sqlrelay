@@ -108,7 +108,8 @@ sqlrcursor *sqlrconnection::getCursor(uint16_t command) {
 	// does the client need a cursor or does it already have one
 	uint16_t	neednewcursor=DONT_NEED_NEW_CURSOR;
 	if (command==NEW_QUERY &&
-		clientsock->read(&neednewcursor)!=sizeof(uint16_t)) {
+		clientsock->read(&neednewcursor,
+				idleclienttimeout,0)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"client cursor request failed, need new cursor stage");
@@ -122,7 +123,8 @@ sqlrcursor *sqlrconnection::getCursor(uint16_t command) {
 
 		// which cursor is the client requesting?
 		uint16_t	index;
-		if (clientsock->read(&index)!=sizeof(uint16_t)) {
+		if (clientsock->read(&index,
+				idleclienttimeout,0)!=sizeof(uint16_t)) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 				"client cursor request failed, cursor index stage");
@@ -196,7 +198,7 @@ void sqlrconnection::waitForClientClose() {
 			"waiting for client to close the connection...");
 	#endif
 	uint16_t	dummy;
-	clientsock->read(&dummy);
+	clientsock->read(&dummy,idleclienttimeout,0);
 	clientsock->close();
 	delete clientsock;
 	#ifdef SERVER_DEBUG
@@ -260,7 +262,7 @@ void sqlrconnection::noAvailableCursors(uint16_t command) {
 
 	clientsock->useNonBlockingMode();
 	unsigned char	*dummy=new unsigned char[size];
-	clientsock->read(dummy,size);
+	clientsock->read(dummy,size,idleclienttimeout,0);
 	clientsock->useBlockingMode();
 	delete[] dummy;
 
@@ -280,10 +282,10 @@ bool sqlrconnection::getCommand(uint16_t *command) {
 	#endif
 
 	// get the command
-	if (clientsock->read(command)!=sizeof(uint16_t)) {
+	if (clientsock->read(command,idleclienttimeout,0)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",1,
-			"getting command failed: client sent bad command");
+		"getting command failed: client sent bad command or timed out");
 		#endif
 		return false;
 	}

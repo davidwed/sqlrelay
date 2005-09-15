@@ -88,7 +88,8 @@ bool sqlrconnection::getQuery(sqlrcursor *cursor) {
 	#endif
 
 	// get the length of the query
-	if (clientsock->read(&cursor->querylength)!=sizeof(uint32_t)) {
+	if (clientsock->read(&cursor->querylength,
+				idleclienttimeout,0)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting query failed: client sent bad query length size");
@@ -107,7 +108,8 @@ bool sqlrconnection::getQuery(sqlrcursor *cursor) {
 
 	// read the query into the buffer
 	if ((uint32_t)(clientsock->read(cursor->querybuffer,
-						cursor->querylength))!=
+						cursor->querylength,
+						idleclienttimeout,0))!=
 							cursor->querylength) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,

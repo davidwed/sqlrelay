@@ -22,6 +22,7 @@
 	<!ATTLIST instance maxquerysize CDATA "65536">
 	<!ATTLIST instance maxstringbindvaluelength CDATA "4000">
 	<!ATTLIST instance maxlobbindvaluelength CDATA "71680">
+	<!ATTLIST instance idleclienttimeout CDATA "-1">
 
 <!ELEMENT users (user*)>
 <!ELEMENT user EMPTY>

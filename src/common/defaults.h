@@ -75,6 +75,8 @@
 #define DEFAULT_METRIC "1"
 	// default metric
 
+#define DEFAULT_IDLECLIENTTIMEOUT -1
+
 
 
 // cachemanager/sqlrclient parameters

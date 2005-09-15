@@ -56,8 +56,8 @@ bool sqlrconnection::returnError(sqlrcursor *cursor) {
 		// better get it even though we're not gonna
 		// use it
 		uint64_t	skipfetch;
-		clientsock->read(&skipfetch);
-		clientsock->read(&skipfetch);
+		clientsock->read(&skipfetch,idleclienttimeout,0);
+		clientsock->read(&skipfetch,idleclienttimeout,0);
 
 		// Even though there was an error, we still 
 		// need to send the client the id of the 

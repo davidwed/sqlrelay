@@ -41,6 +41,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	maxquerysize=MAXQUERYSIZE;
 	maxstringbindvaluelength=MAXSTRINGBINDVALUELENGTH;
 	maxlobbindvaluelength=MAXLOBBINDVALUELENGTH;
+	idleclienttimeout=DEFAULT_IDLECLIENTTIMEOUT;
 	currentuser=NULL;
 	firstconnect=NULL;
 	currentconnect=NULL;
@@ -199,6 +200,10 @@ uint32_t sqlrconfigfile::getMaxLobBindValueLength() {
 	return maxlobbindvaluelength;
 }
 
+int32_t sqlrconfigfile::getIdleClientTimeout() {
+	return idleclienttimeout;
+}
+
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	// if there are no users in the list, add a default user/password
 	if (!userlist.getLength()) {
@@ -321,6 +326,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=MAXSTRINGBINDVALUELENGTH_ATTRIBUTE;
 	} else if (!charstring::compare(name,"maxlobbindvaluelength")) {
 		currentattribute=MAXLOBBINDVALUELENGTH_ATTRIBUTE;
+	} else if (!charstring::compare(name,"idleclienttimeout")) {
+		currentattribute=IDLECLIENTTIMEOUT_ATTRIBUTE;
 	} else if (!charstring::compare(name,"user")) {
 		currentattribute=USER_ATTRIBUTE;
 	} else if (!charstring::compare(name,"password")) {
@@ -436,12 +443,16 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==
 				MAXSTRINGBINDVALUELENGTH_ATTRIBUTE) {
 			maxstringbindvaluelength=
-				(value)?charstring::toInteger(value):
+				(value)?charstring::toUnsignedInteger(value):
 						MAXSTRINGBINDVALUELENGTH;
 		} else if (currentattribute==MAXLOBBINDVALUELENGTH_ATTRIBUTE) {
 			maxlobbindvaluelength=
-				(value)?charstring::toInteger(value):
+				(value)?charstring::toUnsignedInteger(value):
 						MAXLOBBINDVALUELENGTH;
+		} else if (currentattribute==IDLECLIENTTIMEOUT_ATTRIBUTE) {
+			idleclienttimeout=
+				(value)?charstring::toInteger(value):
+						DEFAULT_IDLECLIENTTIMEOUT;
 		} else if (currentattribute==USER_ATTRIBUTE) {
 			currentuser->setUser((value)?value:DEFAULT_USER);
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {

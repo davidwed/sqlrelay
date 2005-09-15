@@ -11,7 +11,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 
 	// get the number of rows to skip
 	uint64_t	skip;
-	if (clientsock->read(&skip)!=sizeof(uint64_t)) {
+	if (clientsock->read(&skip,idleclienttimeout,0)!=sizeof(uint64_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"returning result set data failed");
 		#endif
@@ -20,7 +20,7 @@ bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
 
 	// get the number of rows to fetch
 	uint64_t	fetch;
-	if (clientsock->read(&fetch)!=sizeof(uint64_t)) {
+	if (clientsock->read(&fetch,idleclienttimeout,0)!=sizeof(uint64_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"returning result set data failed");
 		#endif

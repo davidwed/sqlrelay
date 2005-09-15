@@ -120,7 +120,7 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 bool sqlrconnection::getBindVarCount(uint16_t *count) {
 
 	// get the number of input bind variable/values
-	if (clientsock->read(count)!=sizeof(uint16_t)) {
+	if (clientsock->read(count,idleclienttimeout,0)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting binds failed: client sent bad bind count size");
@@ -146,7 +146,8 @@ bool sqlrconnection::getBindVarName(bindvar *bv) {
 	uint16_t	bindnamesize;
 
 	// get the variable name size
-	if (clientsock->read(&bindnamesize)!=sizeof(uint16_t)) {
+	if (clientsock->read(&bindnamesize,
+				idleclienttimeout,0)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting binds failed: bad variable name length size");
@@ -167,7 +168,8 @@ bool sqlrconnection::getBindVarName(bindvar *bv) {
 	bv->variablesize=bindnamesize+1;
 	bv->variable=(char *)bindpool->malloc(bv->variablesize+2);
 	bv->variable[0]=bindVariablePrefix();
-	if (clientsock->read(bv->variable+1,bindnamesize)!=bindnamesize) {
+	if (clientsock->read(bv->variable+1,bindnamesize,
+					idleclienttimeout,0)!=bindnamesize) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 			"getting binds failed: bad variable name");
@@ -187,7 +189,7 @@ bool sqlrconnection::getBindVarType(bindvar *bv) {
 
 	// get the type
         uint16_t type;
-	if (clientsock->read(&type)!=sizeof(uint16_t)) {
+	if (clientsock->read(&type,idleclienttimeout,0)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 				"getting binds failed: bad type size");
@@ -202,7 +204,8 @@ bool sqlrconnection::getBindVarType(bindvar *bv) {
 bool sqlrconnection::getBindSize(bindvar *bv, uint32_t maxsize) {
 
 	// get the size of the value
-	if (clientsock->read(&(bv->valuesize))!=sizeof(uint32_t)) {
+	if (clientsock->read(&(bv->valuesize),
+				idleclienttimeout,0)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",
 			2,"getting binds failed: bad value length size");
@@ -251,7 +254,9 @@ bool sqlrconnection::getStringBind(bindvar *bv) {
 
 	// get the bind value
 	if ((uint32_t)(clientsock->read(bv->value.stringval,
-			bv->valuesize))!=(uint32_t)(bv->valuesize)) {
+					bv->valuesize,
+					idleclienttimeout,0))!=
+						(uint32_t)(bv->valuesize)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,"getting binds failed: bad value");
 		#endif
@@ -275,7 +280,7 @@ bool sqlrconnection::getLongBind(bindvar *bv) {
 
 	// get positive/negative
 	char	negative;
-	if (clientsock->read(&negative)!=sizeof(char)) {
+	if (clientsock->read(&negative,idleclienttimeout,0)!=sizeof(char)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 				"getting binds failed: bad positive/negative");
@@ -285,7 +290,7 @@ bool sqlrconnection::getLongBind(bindvar *bv) {
 
 	// get the value itself
 	uint64_t	value;
-	if (clientsock->read(&value)!=sizeof(uint64_t)) {
+	if (clientsock->read(&value,idleclienttimeout,0)!=sizeof(uint64_t)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"getting binds failed: bad value");
@@ -310,7 +315,8 @@ bool sqlrconnection::getDoubleBind(bindvar *bv) {
 	#endif
 
 	// get the value
-	if (clientsock->read(&(bv->value.doubleval.value))!=sizeof(double)) {
+	if (clientsock->read(&(bv->value.doubleval.value),
+				idleclienttimeout,0)!=sizeof(double)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"getting binds failed: bad value");
@@ -319,8 +325,8 @@ bool sqlrconnection::getDoubleBind(bindvar *bv) {
 	}
 
 	// get the precision
-	if (clientsock->read(&(bv->value.doubleval.precision))!=
-						sizeof(uint32_t)) {
+	if (clientsock->read(&(bv->value.doubleval.precision),
+				idleclienttimeout,0)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"getting binds failed: bad precision");
@@ -329,8 +335,8 @@ bool sqlrconnection::getDoubleBind(bindvar *bv) {
 	}
 
 	// get the scale
-	if (clientsock->read(&(bv->value.doubleval.scale))!=
-						sizeof(uint32_t)) {
+	if (clientsock->read(&(bv->value.doubleval.scale),
+				idleclienttimeout,0)!=sizeof(uint32_t)) {
 		#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 					"getting binds failed: bad scale");
@@ -366,7 +372,9 @@ bool sqlrconnection::getLobBind(bindvar *bv) {
 
 	// get the bind value
 	if ((uint32_t)(clientsock->read(bv->value.stringval,
-			bv->valuesize))!=(uint32_t)(bv->valuesize)) {
+					bv->valuesize,
+					idleclienttimeout,0))!=
+						(uint32_t)(bv->valuesize)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,
 				"getting binds failed: bad value");

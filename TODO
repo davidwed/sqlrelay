@@ -9,6 +9,8 @@ tests:
 	freetds test fails, maybe freetds-version related or tds version?
 	too long queries, string/lob bind values
 
+should the idle client timeout be applied to all reads?
+
 ionut's memory corruption errors
 
 hot dog's php suspended session problem
@@ -38,8 +40,6 @@ java api
 sun compiler compatibility updates
 
 export/import sequences
-
-idle client timeout
 
 support postgresql bind variables with countBindVariables()
 
