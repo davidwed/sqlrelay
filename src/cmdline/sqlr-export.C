@@ -61,9 +61,9 @@ int main(int argc, const char **argv) {
 		if (argc<7) {
 			printf("usage: sqlr-export  host port socket "
 				"user password (table|sequence) "
-				"table [debug] \n"
+				"tablename [debug] \n"
 				"  or   sqlr-export  [-config configfile] "
-				"-id id (table|sequence) table [debug]\n");
+				"-id id (table|sequence) tablename [debug]\n");
 			exit(1);
 		}
 
