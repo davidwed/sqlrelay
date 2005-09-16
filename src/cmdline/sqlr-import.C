@@ -19,7 +19,8 @@ using namespace rudiments;
 
 class sqlrimport : public xmlsax {
 	public:
-			sqlrimport(sqlrcursor *sqlrcur);
+			sqlrimport(sqlrconnection *sqlrcon,
+					sqlrcursor *sqlrcur);
 			~sqlrimport();
 	private:
 		bool	tagStart(const char *name);
@@ -28,6 +29,7 @@ class sqlrimport : public xmlsax {
 		bool	tagEnd(const char *name);
 
 		bool	tableTagStart();
+		bool	sequenceTagStart();
 		bool	columnsTagStart();
 		bool	columnTagStart();
 		bool	rowsTagStart();
@@ -35,6 +37,7 @@ class sqlrimport : public xmlsax {
 		bool	fieldTagStart();
 
 		bool	tableTagEnd();
+		bool	sequenceTagEnd();
 		bool	columnsTagEnd();
 		bool	columnTagEnd();
 		bool	rowsTagEnd();
@@ -45,6 +48,7 @@ class sqlrimport : public xmlsax {
 
 		void	unescapeField(stringbuffer *strb, const char *field);
 
+		sqlrconnection	*sqlrcon;
 		sqlrcursor	*sqlrcur;
 
 		unsigned short	currenttag;
@@ -52,6 +56,8 @@ class sqlrimport : public xmlsax {
 
 		stringbuffer	query;
 		char		*table;
+		char		*sequence;
+		char		*sequencevalue;
 		uint32_t	colcount;
 		stringbuffer	columns;
 		bool		*numbercolumn;
@@ -61,6 +67,7 @@ class sqlrimport : public xmlsax {
 
 		static const unsigned short	NULLTAG;
 		static const unsigned short	TABLETAG;
+		static const unsigned short	SEQUENCETAG;
 		static const unsigned short	COLUMNSTAG;
 		static const unsigned short	COLUMNTAG;
 		static const unsigned short	ROWSTAG;
@@ -85,11 +92,12 @@ class sqlrimport : public xmlsax {
 
 const unsigned short sqlrimport::NULLTAG=0;
 const unsigned short sqlrimport::TABLETAG=1;
-const unsigned short sqlrimport::COLUMNSTAG=2;
-const unsigned short sqlrimport::COLUMNTAG=3;
-const unsigned short sqlrimport::ROWSTAG=4;
-const unsigned short sqlrimport::ROWTAG=5;
-const unsigned short sqlrimport::FIELDTAG=6;
+const unsigned short sqlrimport::SEQUENCETAG=2;
+const unsigned short sqlrimport::COLUMNSTAG=3;
+const unsigned short sqlrimport::COLUMNTAG=4;
+const unsigned short sqlrimport::ROWSTAG=5;
+const unsigned short sqlrimport::ROWTAG=6;
+const unsigned short sqlrimport::FIELDTAG=7;
 
 const unsigned short sqlrimport::NULLATTR=0;
 const unsigned short sqlrimport::NAMEATTR=1;
@@ -106,11 +114,15 @@ const unsigned short sqlrimport::ZEROFILLEDATTR=12;
 const unsigned short sqlrimport::BINARYATTR=13;
 const unsigned short sqlrimport::AUTOINCREMENTATTR=14;
 
-sqlrimport::sqlrimport(sqlrcursor *sqlrcur) : xmlsax() {
+sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
+			sqlrcursor *sqlrcur) : xmlsax() {
+	this->sqlrcon=sqlrcon;
 	this->sqlrcur=sqlrcur;
 	currenttag=NULLTAG;
 	currentattribute=NULL;
 	table=NULL;
+	sequence=NULL;
+	sequencevalue=NULL;
 	colcount=0;
 	currentcol=0;
 	numbercolumn=NULL;
@@ -120,12 +132,16 @@ sqlrimport::sqlrimport(sqlrcursor *sqlrcur) : xmlsax() {
 sqlrimport::~sqlrimport() {
 	delete[] currentattribute;
 	delete[] table;
+	delete[] sequence;
+	delete[] sequencevalue;
 	delete[] numbercolumn;
 }
 
 bool sqlrimport::tagStart(const char *name) {
 	if (!charstring::compare(name,"table")) {
 		return tableTagStart();
+	} else if (!charstring::compare(name,"sequence")) {
+		return sequenceTagStart();
 	} else if (!charstring::compare(name,"columns")) {
 		return columnsTagStart();
 	} else if (!charstring::compare(name,"column")) {
@@ -152,6 +168,16 @@ bool sqlrimport::attributeValue(const char *value) {
 			if (!charstring::compare(currentattribute,"name")) {
 				delete[] table;
 				table=charstring::duplicate(value);
+			}
+			break;
+		case SEQUENCETAG:
+			if (!charstring::compare(currentattribute,"name")) {
+				delete[] sequence;
+				sequence=charstring::duplicate(value);
+			}
+			if (!charstring::compare(currentattribute,"value")) {
+				delete[] sequencevalue;
+				sequencevalue=charstring::duplicate(value);
 			}
 			break;
 		case COLUMNSTAG:
@@ -188,6 +214,8 @@ bool sqlrimport::attributeValue(const char *value) {
 bool sqlrimport::tagEnd(const char *name) {
 	if (!charstring::compare(name,"table")) {
 		return tableTagEnd();
+	} else if (!charstring::compare(name,"sequence")) {
+		return sequenceTagEnd();
 	} else if (!charstring::compare(name,"columns")) {
 		return columnsTagEnd();
 	} else if (!charstring::compare(name,"column")) {
@@ -204,6 +232,11 @@ bool sqlrimport::tagEnd(const char *name) {
 
 bool sqlrimport::tableTagStart() {
 	currenttag=TABLETAG;
+	return true;
+}
+
+bool sqlrimport::sequenceTagStart() {
+	currenttag=SEQUENCETAG;
 	return true;
 }
 
@@ -240,6 +273,30 @@ bool sqlrimport::fieldTagStart() {
 
 
 bool sqlrimport::tableTagEnd() {
+	return true;
+}
+
+bool sqlrimport::sequenceTagEnd() {
+
+	const char	*dbtype=sqlrcon->identify();
+	query.clear();
+
+	bool	supported=true;
+	if (!charstring::compare(dbtype,"postgresql")) {
+		query.append("alter sequence ")->append(sequence);
+		query.append(" restart with ")->append(sequencevalue);
+		supported=true;
+	} else {
+		supported=false;
+	}
+
+	if (supported) {
+		if (!sqlrcur->sendQuery(query.getString())) {
+			printf("%s\n",sqlrcur->errorMessage());
+		}
+	} else {
+		printf("%s doesn't support sequences.\n",dbtype);
+	}
 	return true;
 }
 
@@ -392,6 +449,6 @@ int main(int argc, const char **argv) {
 		sqlrcon.debugOn();
 	}
 
-	sqlrimport	sqlri(&sqlrcur);
+	sqlrimport	sqlri(&sqlrcon,&sqlrcur);
 	exit(!sqlri.parseFile(file));
 }

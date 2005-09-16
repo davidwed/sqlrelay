@@ -15,6 +15,10 @@
 using namespace rudiments;
 #endif
 
+int exportTable(sqlrcursor *sqlrcur, const char *table);
+int exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
+						const char *sequence);
+
 void escapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
 		// FIXME: what about null's?
@@ -42,9 +46,9 @@ int main(int argc, const char **argv) {
 	const char	*socket;
 	const char	*user;
 	const char	*password;
-	const char	*table="";
+	const char	*objecttype="";
+	const char	*object="";
 	bool		debug=false;
-	int		exitval=0;
 
 	const char	*config=cmdline.value("-config");
 	if (!(config && config[0])) {
@@ -56,9 +60,10 @@ int main(int argc, const char **argv) {
 
 		if (argc<7) {
 			printf("usage: sqlr-export  host port socket "
-				"user password table [debug] \n"
+				"user password (table|sequence) "
+				"table [debug] \n"
 				"  or   sqlr-export  [-config configfile] "
-				"-id id table [debug]\n");
+				"-id id (table|sequence) table [debug]\n");
 			exit(1);
 		}
 
@@ -67,8 +72,9 @@ int main(int argc, const char **argv) {
 		socket=argv[3];
 		user=argv[4];
 		password=argv[5];
-		table=argv[6];
-		if (argv[7] && !charstring::compare(argv[7],"debug")) {
+		objecttype=argv[6];
+		object=argv[7];
+		if (argv[8] && !charstring::compare(argv[8],"debug")) {
 			debug=true;
 		}
 
@@ -99,7 +105,8 @@ int main(int argc, const char **argv) {
 				if (!charstring::compare(argv[i],"debug")) {
 					continue;
 				}
-				table=argv[i];
+				objecttype=argv[i];
+				object=argv[i+1];
 				break;
 			}
 		} else {
@@ -117,9 +124,24 @@ int main(int argc, const char **argv) {
 	}
 
 	sqlrcur.setResultSetBufferSize(100);
+
+	int	exitval=0;
+	if (!charstring::compare(objecttype,"table")) {
+		exitval=exportTable(&sqlrcur,object);
+	} else if (!charstring::compare(objecttype,"sequence")) {
+		exitval=exportSequence(&sqlrcon,&sqlrcur,object);
+	}
+
+	sqlrcon.endSession();
+
+	exit(exitval);
+}
+
+int exportTable(sqlrcursor *sqlrcur, const char *table) {
+
 	stringbuffer	query;
 	query.append("select * from ")->append(table);
-	if (sqlrcur.sendQuery(query.getString())) {
+	if (sqlrcur->sendQuery(query.getString())) {
 
 		// print header
 		printf("<?xml version=\"1.0\"?>\n");
@@ -129,13 +151,13 @@ int main(int argc, const char **argv) {
 		printf("<table name=\"%s\">\n",table);
 
 		// print columns
-		uint32_t	cols=sqlrcur.colCount();
+		uint32_t	cols=sqlrcur->colCount();
 		printf("<columns count=\"%d\">\n",cols);
 		for (uint32_t j=0; j<cols; j++) {
 			printf("	"
 				"<column name=\"%s\" type=\"%s\"/>\n",
-				sqlrcur.getColumnName(j),
-				sqlrcur.getColumnType(j));
+				sqlrcur->getColumnName(j),
+				sqlrcur->getColumnType(j));
 		}
 		printf("</columns>\n");
 
@@ -146,29 +168,58 @@ int main(int argc, const char **argv) {
 			printf("	<row>\n");
 			for (uint32_t col=0; col<cols; col++) {
 				const char	*field=
-						sqlrcur.getField(row,col);
+						sqlrcur->getField(row,col);
 				if (!field) {
 					break;
 				}
 				printf("	<field>");
 				escapeField(field,
-					sqlrcur.getFieldLength(row,col));
+					sqlrcur->getFieldLength(row,col));
 				printf("</field>\n");
 			}
 			printf("	</row>\n");
 			row++;
-			if (sqlrcur.endOfResultSet() &&
-					row>=sqlrcur.rowCount()) {
+			if (sqlrcur->endOfResultSet() &&
+					row>=sqlrcur->rowCount()) {
 				break;
 			}
 		}
 		printf("</rows>\n");
 		printf("</table>\n");
-	} else {
-		printf("%s\n",sqlrcur.errorMessage());
-		exitval=1;
+		return 0;
 	}
-	sqlrcon.endSession();
 
-	exit(exitval);
+	printf("%s\n",sqlrcur->errorMessage());
+	return 1;
+}
+
+int exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
+						const char *sequence) {
+
+	// the query we'll use to get the sequence depends on the database type
+	const char	*dbtype=sqlrcon->identify();
+
+	stringbuffer	query;
+	if (!charstring::compare(dbtype,"postgresql")) {
+		query.append("select nextval('")->append(sequence);
+		query.append("')");
+	} else {
+		printf("%s doesn't support sequences.\n",dbtype);
+		return 1;
+	}
+
+	if (sqlrcur->sendQuery(query.getString())) {
+
+		// print header
+		printf("<?xml version=\"1.0\"?>\n");
+		printf("<!DOCTYPE sequence SYSTEM \"sqlr-export.dtd\">\n");
+
+		// print table name
+		printf("<sequence name=\"%s\" value=\"%s\"/>\n",
+				sequence,sqlrcur->getField(0,(uint32_t)0));
+		return 0;
+	}
+
+	printf("%s\n",sqlrcur->errorMessage());
+	return 1;
 }
