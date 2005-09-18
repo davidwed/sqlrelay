@@ -34,9 +34,9 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_suspendSe
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    getConnectionPort
- * Signature: ()I
+ * Signature: ()S
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnectionPort
+JNIEXPORT jshort JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnectionPort
   (JNIEnv *, jobject);
 
 /*
@@ -50,10 +50,10 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnect
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    resumeSession
- * Signature: (ILjava/lang/String;)Z
+ * Signature: (SLjava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_resumeSession
-  (JNIEnv *, jobject, jint, jstring);
+  (JNIEnv *, jobject, jshort, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
@@ -130,10 +130,10 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getDebug
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    alloc
- * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I
+ * Signature: (Ljava/lang/String;SLjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I
  */
 JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc
-  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jstring, jint, jint);
+  (JNIEnv *, jobject, jstring, jshort, jstring, jstring, jstring, jint, jint);
 
 #ifdef __cplusplus
 }

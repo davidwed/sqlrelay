@@ -28,11 +28,11 @@ void	conReleaseStringUTFChars(JNIEnv *env, jstring string, char *chararray) {
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    alloc
- * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)V
+ * Signature: (Ljava/lang/String;SLjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)V
  */
 JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc(JNIEnv *env, 
 			jobject self, 
-			jstring host, jint port, jstring socket, 
+			jstring host, jshort port, jstring socket, 
 			jstring user, jstring password, 
 			jint retrytime, jint tries) {
 
@@ -42,10 +42,11 @@ JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc(JNIEnv 
 	char	*passwordstring=conGetStringUTFChars(env,password,0);
 
 	sqlrconnection	*con=(sqlrconnection *)
-				new sqlrconnection(hoststring,(int)port,
+				new sqlrconnection(hoststring,(uint16_t)port,
 						socketstring,
 						userstring,passwordstring,
-						(int)retrytime,(int)tries);
+						(int32_t)retrytime,
+						(int32_t)tries);
 	con->copyReferences();
 
 	conReleaseStringUTFChars(env,host,hoststring);
@@ -97,14 +98,14 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_suspendSe
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    getConnectionPort
- * Signature: ()I
+ * Signature: ()S
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnectionPort
+JNIEXPORT jshort JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnectionPort
   (JNIEnv *env, jobject self) {
 	jclass		cls=env->GetObjectClass(self);
 	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
 				env->GetFieldID(cls,"connection","I"));
-	return (jint)con->getConnectionPort();
+	return (jshort)con->getConnectionPort();
 }
 
 /*
@@ -123,15 +124,15 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnect
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    resumeSession
- * Signature: (ILjava/lang/String;)Z
+ * Signature: (SLjava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_resumeSession
-  (JNIEnv *env, jobject self, jint port, jstring socket) {
+  (JNIEnv *env, jobject self, jshort port, jstring socket) {
 	jclass		cls=env->GetObjectClass(self);
 	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
 				env->GetFieldID(cls,"connection","I"));
 	char	*socketstring=conGetStringUTFChars(env,socket,0);
-	bool	retval=con->resumeSession((int)port,socketstring);
+	bool	retval=con->resumeSession((uint16_t)port,socketstring);
 	conReleaseStringUTFChars(env,socket,socketstring);
 	return (jboolean)retval;
 }

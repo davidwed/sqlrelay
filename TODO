@@ -1,15 +1,12 @@
-0.36.5
-	fix api's to use lengths when composing strings
-	fix mysql replacement api (use previousrow in mysql_get_lengths)
-
---------------------------------------------------------------------------------
-
 tests:
 	test fetching binary data
 	freetds test fails, maybe freetds-version related or tds version?
 	too long queries, string/lob bind values
+	idle client timeout
+	import non-postgresql sequences
 
-should the idle client timeout be applied to all reads?
+document:
+	sqlr-import/export
 
 ionut's memory corruption errors
 
@@ -19,37 +16,11 @@ maciej's stuff:
 	looks like in: select func(...) from dual, if func()
 		generates an error, sqlrelay doesn't report it
 
-java api
-	methods for input/output binds and fields as byte arrays in java api
-	getRow()/getRowAssoc()/getField()/getOutputBind() in java api must use
-		the length when creating the jstring
-	use 64 bits in java api
-	change:
-		double get???AsDouble
-	to
-		long double get???AsFloat();
-	change:
-		inputBindLong
-	to
-		inputBindInteger
-	and
-		inputBindDouble
-	to
-		inputBindFloat
-
 sun compiler compatibility updates
-
-export/import sequences
 
 support postgresql bind variables with countBindVariables()
 
 fix freetds/sybase ct_con_prop/encryption FIXME's
-
-sybase on irix has libtcl rather than libsybtcl and .so files are in devlib
-	directory rather than in lib directory
-
-make everything single-process/multithread and use techniques described in 
-	the C10K problem to handle client/server io
 
 make location of /etc/sqlrelay and rc.sqlrelay compile-time options
 

@@ -18,17 +18,17 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_delete
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    setResultSetBufferSize
- * Signature: (I)V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_setResultSetBufferSize
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getResultSetBufferSize
- * Signature: ()I
+ * Signature: ()J
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getResultSetBufferSize
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getResultSetBufferSize
   (JNIEnv *, jobject);
 
 /*
@@ -394,33 +394,33 @@ JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_colCount
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    rowCount
- * Signature: ()I
+ * Signature: ()J
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_rowCount
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_rowCount
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    totalRows
- * Signature: ()I
+ * Signature: ()J
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_totalRows
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_totalRows
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    affectedRows
- * Signature: ()I
+ * Signature: ()J
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_affectedRows
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_affectedRows
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    firstRowIndex
- * Signature: ()I
+ * Signature: ()J
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_firstRowIndex
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_firstRowIndex
   (JNIEnv *, jobject);
 
 /*
@@ -458,98 +458,98 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getNullsAsNulls
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getField
- * Signature: (II)Ljava/lang/String;
+ * Signature: (JI)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getField__II
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getField__JI
+  (JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getField
- * Signature: (ILjava/lang/String;)Ljava/lang/String;
+ * Signature: (JLjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getField__ILjava_lang_String_2
-  (JNIEnv *, jobject, jint, jstring);
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getField__JLjava_lang_String_2
+  (JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getFieldAsInteger
- * Signature: (II)J
+ * Signature: (JI)J
  */
-JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsInteger__II
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsInteger__JI
+  (JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getFieldAsInteger
- * Signature: (ILjava/lang/String;)J
+ * Signature: (JLjava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsInteger__ILjava_lang_String_2
-  (JNIEnv *, jobject, jint, jstring);
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsInteger__JLjava_lang_String_2
+  (JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getFieldAsDouble
- * Signature: (II)D
+ * Signature: (JI)D
  */
-JNIEXPORT jdouble JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsDouble__II
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT jdouble JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsDouble__JI
+  (JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getFieldAsDouble
- * Signature: (ILjava/lang/String;)D
+ * Signature: (JLjava/lang/String;)D
  */
-JNIEXPORT jdouble JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsDouble__ILjava_lang_String_2
-  (JNIEnv *, jobject, jint, jstring);
+JNIEXPORT jdouble JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsDouble__JLjava_lang_String_2
+  (JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getFieldAsByteArray
- * Signature: (II)[B
+ * Signature: (JI)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsByteArray__II
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsByteArray__JI
+  (JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getFieldAsByteArray
- * Signature: (ILjava/lang/String;)[B
+ * Signature: (JLjava/lang/String;)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsByteArray__ILjava_lang_String_2
-  (JNIEnv *, jobject, jint, jstring);
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldAsByteArray__JLjava_lang_String_2
+  (JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getFieldLength
- * Signature: (II)J
+ * Signature: (JI)J
  */
-JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldLength__II
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldLength__JI
+  (JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getFieldLength
- * Signature: (ILjava/lang/String;)J
+ * Signature: (JLjava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldLength__ILjava_lang_String_2
-  (JNIEnv *, jobject, jint, jstring);
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getFieldLength__JLjava_lang_String_2
+  (JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getRow
- * Signature: (I)[Ljava/lang/String;
+ * Signature: (J)[Ljava/lang/String;
  */
 JNIEXPORT jobjectArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getRow
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getRowLengths
- * Signature: (I)[J
+ * Signature: (J)[J
  */
 JNIEXPORT jlongArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getRowLengths
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
@@ -778,9 +778,9 @@ JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getLongest__Ljava
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getResultSetId
- * Signature: ()I
+ * Signature: ()S
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getResultSetId
+JNIEXPORT jshort JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getResultSetId
   (JNIEnv *, jobject);
 
 /*
@@ -794,18 +794,18 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_suspendResultSet
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    resumeResultSet
- * Signature: (I)Z
+ * Signature: (S)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_resumeResultSet
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jobject, jshort);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    resumeCachedResultSet
- * Signature: (ILjava/lang/String;)Z
+ * Signature: (SLjava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_resumeCachedResultSet
-  (JNIEnv *, jobject, jint, jstring);
+  (JNIEnv *, jobject, jshort, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor

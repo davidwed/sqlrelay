@@ -18,11 +18,11 @@ public class SQLRCursor {
 	/** Sets the number of rows of the result set
 	 *  to buffer at a time.  0 (the default)
 	 *  means buffer the entire result set.  */
-	public native void	setResultSetBufferSize(int rows);
+	public native void	setResultSetBufferSize(long rows);
 	/** Returns the number of result set rows that 
 	 *  will be buffered at a time or 0 for the
 	 *  entire result set.  */
-	public native int	getResultSetBufferSize();
+	public native long	getResultSetBufferSize();
 
 
 	/** Tells the server not to send any column
@@ -207,14 +207,14 @@ public class SQLRCursor {
 	 *  result set (if the result set is being
 	 *  stepped through, this returns the number
 	 *  of rows processed so far).  */
-	public native int	rowCount();
+	public native long	rowCount();
 	/** Returns the total number of rows that will 
 	 *  be returned in the result set.  Not all 
 	 *  databases support this call.  Don't use it 
 	 *  for applications which are designed to be 
 	 *  portable across databases.  -1 is returned
 	 *  by databases which don't support this option.  */
-	public native int	totalRows();
+	public native long	totalRows();
 	/** Returns the number of rows that were 
 	 *  updated, inserted or deleted by the query.
 	 *  Not all databases support this call.  Don't 
@@ -222,11 +222,11 @@ public class SQLRCursor {
 	 *  to be portable across databases.  -1 is 
 	 *  returned by databases which don't support 
 	 *  this option.  */
-	public native int	affectedRows();
+	public native long	affectedRows();
 	/** Returns the index of the first buffered row.
 	 *  This is useful when buffering only part of
 	 *  the result set at a time.  */
-	public native int	firstRowIndex();
+	public native long	firstRowIndex();
 	/** Returns 0 if part of the result set is still
 	 *  pending on the server and 1 if not.  This
 	 *  method can only return 0 if 
@@ -254,36 +254,36 @@ public class SQLRCursor {
 
 	/** Returns a pointer to the value of the 
 	 *  specified row and column.  */
-	public native String	getField(int row, int col);
+	public native String	getField(long row, int col);
 	/** Returns a pointer to the value of the 
 	 *  specified row and column.  */
-	public native String	getField(int row, String col);
+	public native String	getField(long row, String col);
 	/** Returns the specified field as a long integer */
-	public native long	getFieldAsInteger(int row, int col);
+	public native long	getFieldAsInteger(long row, int col);
 	/** Returns the specified field as a long integer */
-	public native long	getFieldAsInteger(int row, String col);
+	public native long	getFieldAsInteger(long row, String col);
 	/** Returns the specified field as a double floating point number */
-	public native double	getFieldAsDouble(int row, int col);
+	public native double	getFieldAsDouble(long row, int col);
 	/** Returns the specified field as a double floating point number */
-	public native double	getFieldAsDouble(int row, String col);
+	public native double	getFieldAsDouble(long row, String col);
 	/** Returns a pointer to the value of the 
 	 *  specified row and column.  */
-	public native byte[]	getFieldAsByteArray(int row, int col);
+	public native byte[]	getFieldAsByteArray(long row, int col);
 	/** Returns the length of the 
 	 *  specified row and column.  */
-	public native byte[]	getFieldAsByteArray(int row, String col);
+	public native byte[]	getFieldAsByteArray(long row, String col);
 	/** Returns the length of the 
 	 *  specified row and column.  */
-	public native long	getFieldLength(int row, int col);
+	public native long	getFieldLength(long row, int col);
 	/** Returns the length of the 
 	 *  specified row and column.  */
-	public native long	getFieldLength(int row, String col);
+	public native long	getFieldLength(long row, String col);
 	/** Returns a null terminated array of the 
 	 *  values of the fields in the specified row.  */
-	public native String[]	getRow(int row);
+	public native String[]	getRow(long row);
 	/** Returns a null terminated array of the 
 	 *  lengths of the fields in the specified row.  */
-	public native long[]	getRowLengths(int row);
+	public native long[]	getRowLengths(long row);
 	/** Returns a null terminated array of the 
 	 *  column names of the current result set.  */
 	public native String[]	getColumnNames();
@@ -385,7 +385,7 @@ public class SQLRCursor {
 	 *  This parameter may be passed to another 
 	 *  cursor for use in the resumeResultSet() 
 	 *  method.  */
-	public native int	getResultSetId();
+	public native short	getResultSetId();
 	/** Tells the server to leave this result
 	 *  set open when the connection calls 
 	 *  suspendSession() so that another connection 
@@ -395,12 +395,13 @@ public class SQLRCursor {
 	/** Resumes a result set previously left open 
 	 *  using suspendSession().
 	 *  Returns 1 on success and 0 on failure.  */
-	public native boolean	resumeResultSet(int id);
+	public native boolean	resumeResultSet(short id);
 	/** Resumes a result set previously left open
 	 *  using suspendSession() and continues caching
 	 *  the result set to "filename".
 	 *  Returns 1 on success and 0 on failure.  */
-	public native boolean	resumeCachedResultSet(int id, String filename);
+	public native boolean	resumeCachedResultSet(short id,
+							String filename);
 
 
 	/** cursor and connection are used internally, they're just

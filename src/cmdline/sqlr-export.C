@@ -200,9 +200,18 @@ int exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	const char	*dbtype=sqlrcon->identify();
 
 	stringbuffer	query;
-	if (!charstring::compare(dbtype,"postgresql")) {
+	if (!charstring::compare(dbtype,"interbase")) {
+		query.append("select gen_id(")->append(sequence);
+		query.append(",1) from rdb$database");
+	} else if (!charstring::compare(dbtype,"oracle7") ||
+			!charstring::compare(dbtype,"oracle8")) {
+		query.append("select ")->append(sequence);
+		query.append(".nextval from dual");
+	} else if (!charstring::compare(dbtype,"postgresql")) {
 		query.append("select nextval('")->append(sequence);
 		query.append("')");
+	} else if (!charstring::compare(dbtype,"db2")) {
+		query.append("values nextval for ")->append(sequence);
 	} else {
 		printf("%s doesn't support sequences.\n",dbtype);
 		return 1;

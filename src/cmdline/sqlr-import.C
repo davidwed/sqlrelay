@@ -282,21 +282,77 @@ bool sqlrimport::sequenceTagEnd() {
 	query.clear();
 
 	bool	supported=true;
-	if (!charstring::compare(dbtype,"postgresql")) {
-		query.append("alter sequence ")->append(sequence);
-		query.append(" restart with ")->append(sequencevalue);
-		supported=true;
-	} else {
 		supported=false;
-	}
-
-	if (supported) {
+	// sqlite, msql, mysql, sybase/mssql have autoincrementing fields
+	// mdbtools has nothing
+	// odbc can't tell what kind of underlying db we're using
+	if (!charstring::compare(dbtype,"interbase")) {
+		query.append("set generator ")->append(sequence);
+		query.append(" to ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {
 			printf("%s\n",sqlrcur->errorMessage());
 		}
-	} else {
-		printf("%s doesn't support sequences.\n",dbtype);
+		return true;
+	} else if (!charstring::compare(dbtype,"oracle7") ||
+			!charstring::compare(dbtype,"oracle8")) {
+		sqlrcursor	sqlrcur2(sqlrcon);
+		char	*uppersequence=charstring::duplicate(sequence);
+		charstring::upper(uppersequence);
+		query.append("select * from all_sequences where "
+				"sequence_name='");
+		query.append(uppersequence)->append("'");
+		delete[] uppersequence;
+		if (!sqlrcur2.sendQuery(query.getString())) {
+			printf("%s\n",sqlrcur->errorMessage());
+			return true;
+		}
+		query.clear();
+		query.append("drop sequence ")->append(sequence);
+		if (!sqlrcur->sendQuery(query.getString())) {
+			printf("%s\n",sqlrcur->errorMessage());
+			return true;
+		}
+		query.clear();
+		query.append("create sequence ")->append(sequence);
+		query.append(" start with ")->append(sequencevalue);
+		query.append(" maxvalue ");
+		query.append(sqlrcur2.getField(0,"MAX_VALUE"));
+		query.append(" minvalue ");
+		query.append(sqlrcur2.getField(0,"MIN_VALUE"));
+		if (!charstring::compare(
+				sqlrcur2.getField(0,"CYCLE_FLAG"),"N")) {
+			query.append(" nocycle ");
+		} else {
+			query.append(" cycle ");
+		}
+		if (!charstring::compare(
+				sqlrcur2.getField(0,"ORDER_FLAG"),"N")) {
+			query.append(" noorder ");
+		} else {
+			query.append(" order ");
+		}
+		if (!charstring::compare(
+				sqlrcur2.getField(0,"CACHE_SIZE"),"0")) {
+			query.append(" nocache ");
+		} else {
+			query.append(" cache ");
+			query.append(sqlrcur2.getField(0,"CACHE_SIZE"));
+		}
+		if (!sqlrcur->sendQuery(query.getString())) {
+			printf("%s\n",sqlrcur->errorMessage());
+		}
+		return true;
+	} else if (!charstring::compare(dbtype,"postgresql") ||
+			!charstring::compare(dbtype,"db2")) {
+		query.append("alter sequence ")->append(sequence);
+		query.append(" restart with ")->append(sequencevalue);
+		if (!sqlrcur->sendQuery(query.getString())) {
+			printf("%s\n",sqlrcur->errorMessage());
+		}
+		return true;
 	}
+
+	printf("%s doesn't support sequences.\n",dbtype);
 	return true;
 }
 

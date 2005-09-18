@@ -24,7 +24,7 @@ public class SQLRConnection {
 	 *  connect to "server" on "port".  If it is 
 	 *  NULL or "" then no attempt will be made to 
 	 *  connect through the socket.  */
-	public SQLRConnection(String server, int port, String socket,
+	public SQLRConnection(String server, short port, String socket,
 						String user, String password,
 						int retrytime, int tries) {
 		connection=alloc(server,port,socket,
@@ -48,7 +48,7 @@ public class SQLRConnection {
 	 *  communicating over. This parameter may be 
 	 *  passed to another connection for use in
 	 *  the resumeSession() method. */
-	public native int	getConnectionPort();
+	public native short	getConnectionPort();
 
 	/** Returns the unix socket that the connection 
 	 *  is communicating over. This parameter may be 
@@ -59,7 +59,7 @@ public class SQLRConnection {
 	/** Resumes a session previously left open 
 	 *  using suspendSession().
 	 *  Returns 1 on success and 0 on failure. */
-	public native boolean	resumeSession(int port, String socket);
+	public native boolean	resumeSession(short port, String socket);
 
 
 	/** Returns 1 if the database is up and 0
@@ -100,7 +100,7 @@ public class SQLRConnection {
 	/** connection is used internally, it's just
 	 *  public to make the JNI wrapper work faster.  */
 	public int	connection;
-	private native int	alloc(String server, int port, 
+	private native int	alloc(String server, short port, 
 						String socket, String user, 
 						String password, 
 						int retrytime, int tries);
