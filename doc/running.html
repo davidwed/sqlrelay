@@ -228,14 +228,29 @@ cleaned up.  Use the <b>ipcs</b> and <b>ipcrm</b> commands to clean them up.</p>
 for each is:</p>
 
 <blockquote>
-<p>query  HOST PORT SOCKET USER PASSWORD QUERY</p>
-<p>fields  HOST PORT SOCKET USER PASSWORD TABLE</p>
-<p>backupschema  HOST SOCKET PORT USER PASSWORD</p>
-<p>sqlrsh  HOST PORT SOCKET USER PASSWORD</p>
+query  HOST PORT SOCKET USER PASSWORD QUERY<br>
+fields  HOST PORT SOCKET USER PASSWORD TABLE<br>
+backupschema  HOST SOCKET PORT USER PASSWORD<br>
+sqlrsh  HOST PORT SOCKET USER PASSWORD<br>
+sqlr-export HOST PORT SOCKET USER PASSWORD (table|sequence) tablename &gt; exportfile.xml<br>
+sqlr-import HOST PORT SOCKET USER PASSWORD exportfile.xml<br>
+</blockquote>
+
+<p>or, if there's an sqlrelay.conf file that the client can read:</p>
+
+<blockquote>
+query  -id ID QUERY<br>
+fields  -id ID TABLE<br>
+sqlrsh  -id ID <br>
+sqlr-export -id ID (table|sequence) tablename &gt; exportfile.xml<br>
+sqlr-import -id ID exportfile.xml<br>
 </blockquote>
 
 <p>The HOST, PORT, SOCKET, USER and PASSWORD arguments specify which listener 
 to connect to and what authentication to use.<p>
+
+<p>The ID argument refers to an entry in the sqlrelay.conf file from which 
+host, port, socket, user and passwords can be read.</p>
 
 <p>The <b>query</b> command executes the query specified in the QUERY parameter
 and returns the result set as a quote/comma/return seperated value list to 
@@ -260,6 +275,18 @@ home directory.  These files should contain sqlrsh commands, ending in
 semicolons, seperated by carraige returns.  Any commands may be used in the
 rc files, even queries.</p>
 
+<p>The <b>sqlr-export</b> command exports the specified table or sequence to
+a file from which <b>sqlr-import</b> can later re-import it.</p>
+
+<p>The <b>sqlr-import</b> command reads the specified file and imports the
+data contained in the file into the table or sequence specified in the file.
+Note, that <b>sqlr-import</b> does not create tables or sequences, it just
+imports data into an already-existing table or sequence.<p>
+
+<p><b>sqlr-export</b> and <b>sqlr-import</b> may be used to export data from
+one database and import it into another database, even if the databases are 
+dissimilar (eg. one is PostgreSQL and the other is MySQL), if the structures of
+the tables in both databases are compatible.</p>
 
 <a name="problems"></a>
 <span class="heading2">Common Problems:</span><br><br>
