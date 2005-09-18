@@ -28,12 +28,12 @@ uint16_t sqlrcursor::countBindVariables() const {
 		}
 
 		// If we're not inside of a quoted string and we run into
-		// a ?, : (for oracle-style bind's) or a @ (for sybase-style
-		// binds) and the previous character was whitespace, or a
-		// comma, left parenthesis or equal sign then we must have
-		// found a bind variable.
+		// a ?, : (for oracle-style bind's), @ (for sybase-style
+		// binds) or $ (for postgresql-style binds) and the previous
+		// character was whitespace, or a comma, left parenthesis or
+		// equal sign then we must have found a bind variable.
 		if (!inquotes &&
-			(*ptr=='?' || *ptr==':' || *ptr=='@') &&
+			(*ptr=='?' || *ptr==':' || *ptr=='@' || *ptr=='$') &&
 			(lastchar==' ' || lastchar=='	' ||
 			lastchar=='\n' || lastchar=='\r' ||
 			lastchar=='=' || lastchar==',' || lastchar=='(')) {
