@@ -25,13 +25,22 @@ all:
 		cp phpincludes2.h phpincludes.h; \
 		$(MAKE) libsql_relay.la 2> errors2; \
 		if ( test ! -r libsql_relay.la ); then \
-			if ( test -s errors1 ); then \
-				echo "first try errors : "; cat errors1; echo; \
+			cp phpincludes3.h phpincludes.h; \
+			$(MAKE) libsql_relay.la 2> errors3; \
+			if ( test ! -r libsql_relay.la ); then \
+				if ( test -s errors1 ); then \
+					echo "first try errors : "; cat errors1; echo; \
+				fi; \
+				if ( test -s errors2 ); then \
+					echo "second try errors : "; cat errors2; echo; \
+				fi; \
+				if ( test -s errors3 ); then \
+					echo "third try errors : "; cat errors3; echo; \
+				fi; \
+				exit 1; \
+			else \
+				cat errors3; \
 			fi; \
-			if ( test -s errors2 ); then \
-				echo "second try errors : "; cat errors2; echo; \
-			fi; \
-			exit 1; \
 		else \
 			cat errors2; \
 		fi; \
@@ -40,6 +49,7 @@ all:
 	fi
 	$(RM) errors1
 	$(RM) errors2
+	$(RM) errors3
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -49,6 +59,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) phpincludes.h
 	$(LIBTOOL) --mode=clean $(RM) errors1
 	$(LIBTOOL) --mode=clean $(RM) errors2
+	$(LIBTOOL) --mode=clean $(RM) errors3
 	$(RMTREE) .libs
 
 rebuild: clean all

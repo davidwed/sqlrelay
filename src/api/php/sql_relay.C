@@ -17,6 +17,7 @@ extern "C" {
 static int sqlrelay_connection;
 static int sqlrelay_cursor;
 
+#ifdef ZEND_MODULE_STARTUP_D
 static void sqlrcon_cleanup(zend_rsrc_list_entry *rsrc TSRMLS_DC) {
 	sqlrconnection	*connection=(sqlrconnection *)rsrc->ptr;
 	delete connection;
@@ -34,6 +35,7 @@ ZEND_MODULE_STARTUP_D(sqlrelay) {
 				NULL,"sqlrelay cursor",module_number);
 	return SUCCESS;
 }
+#endif
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_alloc) {
 	zval **server,**port,**socket,**user,**password,**retrytime,**tries;
@@ -1168,7 +1170,9 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 	}
 	for (i=0; i<cursor->colCount(); i++) {
 		if (!r[i]) {
-			add_next_index_null(return_value);
+			// using add_next_index_unset because add_assoc_null
+			// isn't defined in older php
+			add_next_index_unset(return_value);
 		} else {
 			add_next_index_stringl(return_value,const_cast<char *>(r[i]),l[i],1);
 		}
@@ -1209,7 +1213,9 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 	}
 	for (i=0; i<cursor->colCount(); i++) {
 		if (!r[i]) {
-			add_assoc_null(return_value,const_cast<char *>(rC[i]));
+			// using add_assoc_unset because add_assoc_null isn't
+			// defined in older php
+			add_assoc_unset(return_value,const_cast<char *>(rC[i]));
 		} else {
 			add_assoc_stringl(return_value,const_cast<char *>(rC[i]),const_cast<char *>(r[i]),l[i],1);
 		}
@@ -1870,7 +1876,11 @@ zend_module_entry sql_relay_module_entry = {
 	"sql_relay",
 	sql_relay_functions,
 	// extension-wide startup function
+#ifdef ZEND_MODULE_STARTUP_N
 	ZEND_MODULE_STARTUP_N(sqlrelay),
+#else
+	NULL,
+#endif
 	// extension-wide shutdown function
 	NULL,
 	// per-request startup function
