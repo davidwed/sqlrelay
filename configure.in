@@ -18,6 +18,11 @@ AC_ARG_ENABLE(profiling,
 CFLAGS="$SMALLCODE $CFLAGS"
 CXXFLAGS="$SMALLCODE $CXXFLAGS"
 
+AC_ARG_WITH(initscript-prefix,
+	[  --with-initscript-prefix      prefix to install initscripts under],
+	initscript_prefix="$withval",
+	initscript_prefix="")
+AC_SUBST(initscript_prefix)
 AC_ARG_ENABLE(client-rpath,
 	[  --enable-client-rpath         Use -rpath when linking SQL Relay client programs against SQL Relay libraries],
 	CLIENTUSERPATH="yes",
@@ -481,16 +486,7 @@ FW_CHECK_UNAME
 FW_CHECK_PIPE
 FW_CHECK_WNOLONGDOUBLE
 FW_CHECK_WALL
-
-AC_CHECK_SIZEOF(int16_t)
-AC_CHECK_SIZEOF(int32_t)
-AC_CHECK_SIZEOF(int64_t)
-AC_CHECK_SIZEOF(uint16_t)
-AC_CHECK_SIZEOF(uint32_t)
-AC_CHECK_SIZEOF(uint64_t)
-AC_CHECK_SIZEOF(float)
-AC_CHECK_SIZEOF(double)
-AC_CHECK_SIZEOF(long double)
+FW_CHECK_PTHREAD_COMPILE
 echo "******************************"
 
 

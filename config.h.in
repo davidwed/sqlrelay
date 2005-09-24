@@ -297,33 +297,6 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
-/* The size of a `double', as computed by sizeof. */
-#undef SIZEOF_DOUBLE
-
-/* The size of a `float', as computed by sizeof. */
-#undef SIZEOF_FLOAT
-
-/* The size of a `int16_t', as computed by sizeof. */
-#undef SIZEOF_INT16_T
-
-/* The size of a `int32_t', as computed by sizeof. */
-#undef SIZEOF_INT32_T
-
-/* The size of a `int64_t', as computed by sizeof. */
-#undef SIZEOF_INT64_T
-
-/* The size of a `long double', as computed by sizeof. */
-#undef SIZEOF_LONG_DOUBLE
-
-/* The size of a `uint16_t', as computed by sizeof. */
-#undef SIZEOF_UINT16_T
-
-/* The size of a `uint32_t', as computed by sizeof. */
-#undef SIZEOF_UINT32_T
-
-/* The size of a `uint64_t', as computed by sizeof. */
-#undef SIZEOF_UINT64_T
-
 /* Some systems use SQLLEN * in SQLBINDPARAMETER */
 #undef SQLBINDPARAMETER_SQLLEN
 

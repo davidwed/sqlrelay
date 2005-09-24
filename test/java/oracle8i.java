@@ -99,9 +99,9 @@ class oracle8i {
 		String	floatvar;
 		String[]	cols;
 		String[]	fields;
-		int	port;
+		short	port;
 		String	socket;
-		int	id;
+		short	id;
 		String	filename;
 		String[]	arraybindvars={"var1","var2","var3","var4","var5"};
 		String[]	arraybindvals={"7","testchar7","testvarchar7","01-JAN-2007","testlong7"};
@@ -117,7 +117,7 @@ class oracle8i {
 	
 		// instantiation
 		SQLRConnection con=new SQLRConnection(args[0],
-                        Integer.parseInt(args[1]), 
+                        		(short)Integer.parseInt(args[1]), 
 						args[2],args[3],args[4],0,1);
 		SQLRCursor cur=new SQLRCursor(con);
 	
@@ -753,7 +753,7 @@ class oracle8i {
 	
 		System.out.println("COMMIT AND ROLLBACK: ");
 		SQLRConnection secondcon=new SQLRConnection(args[0],
-					Integer.parseInt(args[1]), 
+					(short)Integer.parseInt(args[1]), 
 					args[2],args[3],args[4],0,1);
 		SQLRCursor secondcur=new SQLRCursor(secondcon);
 		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);

@@ -116,7 +116,8 @@ bool sqlrconnection::getAndIncrementSequenceNumber(file *sockseq,
 	#endif
 
 	// increment the sequence number
-	if (buffer==pow(2,31)) {
+	// (the (double) cast is required for solaris with -compat=4)
+	if (buffer==pow((double)2,31)) {
 		buffer=0;
 	} else {
 		buffer=buffer+1;

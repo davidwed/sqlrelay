@@ -75,9 +75,9 @@ class msql {
 		String	floatvar;
 		String[]	cols;
 		String[]	fields;
-		int	port;
+		short	port;
 		String	socket;
-		int	id;
+		short	id;
 		String	filename;
 		long[]	fieldlens;
 	
@@ -90,7 +90,8 @@ class msql {
 	
 	
 		// instantiation
-		SQLRConnection con=new SQLRConnection(args[0],Integer.parseInt(args[1]), 
+		SQLRConnection con=new SQLRConnection(args[0],
+					(short)Integer.parseInt(args[1]), 
 						args[2],args[3],args[4],0,1);
 		SQLRCursor cur=new SQLRCursor(con);
 	
@@ -686,7 +687,8 @@ class msql {
 		System.out.println();
 	
 		System.out.println("COMMIT AND ROLLBACK: ");
-		SQLRConnection secondcon=new SQLRConnection(args[0],Integer.parseInt(args[1]), 
+		SQLRConnection secondcon=new SQLRConnection(args[0],
+					(short)Integer.parseInt(args[1]), 
 						args[2],args[3],args[4],0,1);
 		SQLRCursor secondcur=new SQLRCursor(secondcon);
 		checkSuccess(secondcur.sendQuery("select * from testtable order by testint"),1);

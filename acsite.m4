@@ -47,6 +47,15 @@ export LD_LIBRARY_PATH
 ])
 
 
+AC_DEFUN([FW_TRY_COMPILE],
+[
+SAVECPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$3"
+AC_TRY_COMPILE([$1],[$2],[$4],[$5])
+CPPFLAGS="$SAVECPPFLAGS"
+])
+
+
 AC_DEFUN([FW_CHECK_LIB],
 [
 FOUNDLIB=""
@@ -299,6 +308,20 @@ AC_SUBST(WALL)
 ])
 
 
+dnl checks to see if -pthread option works or not during compile
+AC_DEFUN([FW_CHECK_PTHREAD_COMPILE],
+[
+AC_MSG_CHECKING(if gcc -pthread works during compile phase)
+FW_TRY_COMPILE([#include <stdio.h>],[printf("hello");],[-pthread],[PTHREAD_COMPILE="-pthread"],[PTHREAD_COMPILE=""])
+if ( test -n "$PTHREAD_COMPILE" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+])
+
+
 dnl Checks for microsoft platform.
 dnl sets the substitution variables MINGW32, CYGWIN and UWIN as appropriate
 dnl sets the enviroment variable MICROSOFT
@@ -403,12 +426,9 @@ AC_DEFINE_UNQUOTED(INLINE,$INLINE,Some compliers don't support the inline keywor
 
 AC_DEFUN([FW_CXX_NAMESPACES],
 [
-	AC_LANG_SAVE
-	AC_LANG_CPLUSPLUS
 	SQLRELAY_NAMESPACE=""
 	AC_MSG_CHECKING(namespace support)
 	AC_TRY_COMPILE([namespace Outer { namespace Inner { int i = 0; }}],[using namespace Outer::Inner; return i;],[SQLRELAY_NAMESPACE="yes"],[])
-	AC_LANG_RESTORE
 	if ( test "$SQLRELAY_NAMESPACE" = yes )
 	then
 		AC_MSG_RESULT(yes)
@@ -436,10 +456,11 @@ then
 	echo "cross compiling"
 	if ( test -n "$PTHREADPATH" )
 	then
-		PTHREADINCLUDES="-I$PTHREADPATH/include"
-		PTHREADLIBS="-L$PTHREADPATH/lib -lpthread"
+		PTHREADINCLUDES="$PTHREAD_COMPILE -I$PTHREADPATH/include"
+		PTHREADLIBS="-L$PTHREADPATH/lib -lpthread -phtread"
 	else
-		PTHREADLIBS="-lpthread"
+		PTHREADINCLUDES="$PTHREAD_COMPILE"
+		PTHREADLIBS="-lpthread -pthread"
 	fi
 	HAVE_PTHREAD="yes"
 
@@ -457,12 +478,22 @@ else
 			break
 		fi
 	done
+
+	if ( test -z "$PTHREADLIBS" )
+	then
+		dnl if we couldn't find the appropriate libraries, just
+		dnl try including pthread.h and using -lpthread, it
+		dnl works on some systems
+		FW_TRY_LINK([#include <pthread.h>],[pthread_create(NULL,NULL,NULL,NULL);],[$CPPFLAGS],[-pthread],[],[PTHREADLIBS="-pthread"],[])
+	fi
+
 	if ( test -n "$PTHREADLIBS" )
 	then
+		PTHREADINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
 		HAVE_PTHREAD="yes"
 	fi
 
-	dnl override PTHREADLIB on microsoft platforms
+	dnl override PTHREADLIBS on microsoft platforms
 	if ( test -n "$PTHREADINCLUDES" -a "$MICROSOFT" = "yes" )
 	then
 		PTHREADLIBS="-pthread"
@@ -1393,11 +1424,9 @@ then
 			dnl function definitions or not
 			if ( test -n "$FREETDSLIBS" )
 			then
-				AC_LANG(C++)
 				AC_MSG_CHECKING(whether ctpublic.h contains function definitions)
 				FW_TRY_LINK([#include <ctpublic.h>
 #include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES],[$FREETDSLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
-				AC_LANG(C)
 			fi
 		fi
 
@@ -2868,6 +2897,7 @@ AC_DEFUN([FW_CHECK_SOCKET_LIBS],
 		fi
 	done
 	AC_LANG(C++)
+	LDFLAGS="$OLDLDFLAGS"
 
 	if ( test -z "$DONE" )
 	then

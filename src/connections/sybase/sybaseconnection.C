@@ -40,7 +40,6 @@ void sybaseconnection::handleConnectString() {
 	db=connectStringValue("db");
 	charset=connectStringValue("charset");
 	language=connectStringValue("language");
-	encryption=connectStringValue("encryption");
 	hostname=connectStringValue("hostname");
 	packetsize=connectStringValue("packetsize");
 }
@@ -151,6 +150,7 @@ bool sybaseconnection::logIn() {
 		return false;
 	}
 
+	// FIXME: support this
 	// set encryption
 	/*if (encryption && charstring::toInteger(encryption)==1) {
 		// FIXME: need to set CS_SEC_CHALLENGE/CS_SEC_NEGOTIATE

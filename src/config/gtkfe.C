@@ -1327,10 +1327,11 @@ void gtkfe::handleFile(const char *filename) {
 
 		// show a "bad file" dialog
 		size_t	msglen=charstring::length(filename)+1+31+1;
-		char	message[msglen];
+		char	*message=new char[msglen];
 		snprintf(message,msglen,
 			"%s\nis not an SQL Relay config file.",filename);
 		okDialog(message);
+		delete[] message;
 	}
 
 	// set the close, save buttons sensitive

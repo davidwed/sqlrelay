@@ -62,11 +62,6 @@ int32_t sqlrconnection::handleQuery(sqlrcursor *cursor,
 			}
 		}
 	}
-
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done handling query");
-	#endif
-	return 1;
 }
 
 bool sqlrconnection::getQueryFromClient(sqlrcursor *cursor,

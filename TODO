@@ -1,12 +1,16 @@
-tests:
-	test fetching binary data
-	freetds test fails, maybe freetds-version related or tds version?
-	too long queries, string/lob bind values
-	idle client timeout
-	import non-postgresql sequences
+figure out how to implement cleanup functions in php 4.0
 
-document:
-	sqlr-import/export
+bind cursors aren't getting cleaned up properly
+
+should use SO_REUSEADDR socket options
+
+install java class files with 644 perms
+create a jar file
+
+freetds test fails
+	after select, openCursor's "use database" fails
+
+java api tests fail
 
 ionut's memory corruption errors
 
@@ -15,16 +19,7 @@ hot dog's php suspended session problem
 maciej's stuff:
 	looks like in: select func(...) from dual, if func()
 		generates an error, sqlrelay doesn't report it
-
-sun compiler compatibility updates
-
-support postgresql bind variables with countBindVariables()
-
-fix freetds/sybase ct_con_prop/encryption FIXME's
-
-make location of /etc/sqlrelay and rc.sqlrelay compile-time options
-
-look into OCIBreak/obreak function calls for cancelling oracle commands
+	although it works for me...
 
 configure script doesn't find zope on openbsd
 
@@ -185,6 +180,9 @@ Performance/Code Enhancements:
 		not by individual connections
 	api for running queries in the background
 		(asynchronous queries w/timeouts)
+	use async queries by default, even if the client runs a synchronous
+		query, so the query can be cancelled if the client disconnects
+	support freetds/sybase ct_con_prop/encryption
 
 Security:
 	SSL encryption

@@ -921,7 +921,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_colcount) {
 		r=cursor->colCount();
 		RETURN_LONG(r);
 	}
-	RETURN_LONG(r);
+	RETURN_LONG(0);
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_rowcount) {

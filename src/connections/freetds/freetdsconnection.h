@@ -11,7 +11,7 @@
 #define MAX_ITEM_BUFFER_SIZE	4096
 #define MAX_BIND_VARS		512
 
-#define NUM_CONNECT_STRING_VARS 11
+#define NUM_CONNECT_STRING_VARS 10
 
 #include <rudiments/environment.h>
 #include <sqlrconnection.h>
@@ -142,7 +142,6 @@ class freetdsconnection : public sqlrconnection {
 		const char	*db;
 		const char	*charset;
 		const char	*language;
-		const char	*encryption;
 		const char	*hostname;
 		const char	*packetsize;
 

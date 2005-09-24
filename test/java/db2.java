@@ -77,9 +77,9 @@ class db2 {
 		String	floatvar;
 		String[]	cols;
 		String[]	fields;
-		int	port;
+		short	port;
 		String	socket;
-		int	id;
+		short	id;
 		String	filename;
 		long[]	fieldlens;
 	
@@ -90,7 +90,8 @@ class db2 {
 		}
 	
 		// instantiation
-		SQLRConnection con=new SQLRConnection(args[0],Integer.parseInt(args[1]), 
+		SQLRConnection con=new SQLRConnection(args[0],
+					(short)Integer.parseInt(args[1]), 
 						args[2],args[3],args[4],0,1);
 		SQLRCursor cur=new SQLRCursor(con);
 	

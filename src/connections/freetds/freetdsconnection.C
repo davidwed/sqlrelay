@@ -44,7 +44,6 @@ void freetdsconnection::handleConnectString() {
 	db=connectStringValue("db");
 	charset=connectStringValue("charset");
 	language=connectStringValue("language");
-	encryption=connectStringValue("encryption");
 	hostname=connectStringValue("hostname");
 	packetsize=connectStringValue("packetsize");
 }
@@ -155,6 +154,7 @@ bool freetdsconnection::logIn() {
 		return false;
 	}
 
+	// FIXME: support this
 	// set encryption
 	/*if (encryption && charstring::toInteger(encryption)==1) {
 		// FIXME: need to set CS_SEC_CHALLENGE/CS_SEC_NEGOTIATE
@@ -557,6 +557,7 @@ bool freetdscursor::outputBindString(const char *variable,
 
 bool freetdscursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
+printf("%s\n",query);
 
 	// clear out any errors
 	if (freetdsconn->errorstring) {

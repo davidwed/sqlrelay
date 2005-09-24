@@ -121,7 +121,7 @@ int	main(int argc, char **argv) {
 
 	printf("BIND BY NAME: \n");
 	cur->prepareQuery("insert into testtable values ($1,$2,$3,$4,$5,$6,$7,$8)");
-	//checkSuccess(cur->countBindVariables(),8);
+	checkSuccess(cur->countBindVariables(),8);
 	cur->inputBind("1",5);
 	cur->inputBind("2",5.5,4,2);
 	cur->inputBind("3",5.5,4,2);

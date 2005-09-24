@@ -40,6 +40,13 @@
 	switched most sprintf's for snprintf's
 	made maxquerysize, maxstring/lob/clobbindvaluelength configurable
 	added configurable idle client timeout
+	removed broken sybase/freetds encryption connect string option for now
+	added --with-initscript-prefix configure option to make init script
+		location configurable
+	php module should compile against php 4.0 again, though without
+		cleanup functions
+	added -pthread when compiling as well as linking
+	sqlr-start links against -lm now
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

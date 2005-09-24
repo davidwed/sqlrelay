@@ -70,9 +70,9 @@ class postgresql7 {
 		String	floatvar;
 		String[]	cols;
 		String[]	fields;
-		int	port;
+		short	port;
 		String	socket;
-		int	id;
+		short	id;
 		String	filename;
 		long[]	fieldlens;
 	
@@ -84,7 +84,8 @@ class postgresql7 {
 	
 	
 		// instantiation
-		SQLRConnection con=new SQLRConnection(args[0],Integer.parseInt(args[1]), 
+		SQLRConnection con=new SQLRConnection(args[0],
+					(short)Integer.parseInt(args[1]), 
 						args[2],args[3],args[4],0,1);
 		SQLRCursor cur=new SQLRCursor(con);
 	
@@ -674,7 +675,7 @@ class postgresql7 {
 	
 		System.out.println("COMMIT AND ROLLBACK: ");
 		SQLRConnection secondcon=new SQLRConnection(args[0],
-					Integer.parseInt(args[1]), 
+					(short)Integer.parseInt(args[1]), 
 					args[2],args[3],args[4],0,1);
 		SQLRCursor secondcur=new SQLRCursor(secondcon);
 		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);

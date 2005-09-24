@@ -4,7 +4,7 @@
 #ifndef ROW_H
 #define ROW_H
 
-#include <stdint.h>
+#include <rudiments/private/inttypes.h>
 
 class row {
 	friend class sqlrcursor;

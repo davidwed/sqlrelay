@@ -27,6 +27,7 @@ docdir = ${datadir}/doc/sqlrelay
 tmpdir = ${localstatedir}/sqlrelay/tmp
 cachedir = ${localstatedir}/sqlrelay/cache
 debugdir = ${localstatedir}/sqlrelay/debug
+initscript_prefix = @initscript_prefix@
 
 # compiler to use
 CC = @CC@

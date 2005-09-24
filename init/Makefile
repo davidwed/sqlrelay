@@ -6,6 +6,13 @@ include ../config.mk
 
 UID = $(shell id | grep "uid=0" )
 
+ifneq ($(initscript_prefix),)
+ifneq ($(DESTDIR),)
+initroot = $(DESTDIR)$(initscript_prefix)
+else
+initroot = $(initscript_prefix)
+endif
+else
 ifneq ($(UID),)
 initroot = $(DESTDIR)
 else
@@ -13,6 +20,7 @@ ifneq ($(DESTDIR),)
 initroot = $(DESTDIR)
 else
 initroot = $(prefix)
+endif
 endif
 endif
 
