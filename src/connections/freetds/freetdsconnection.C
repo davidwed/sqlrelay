@@ -1086,7 +1086,8 @@ CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt,
 	} else if (CS_SEVERITY(msgp->msgnumber)==78 &&
 		CS_LAYER(msgp->msgnumber)==0 &&
 		CS_ORIGIN(msgp->msgnumber)==0 &&
-		CS_NUMBER(msgp->msgnumber)==36) {
+		(CS_NUMBER(msgp->msgnumber)==36 ||
+		CS_NUMBER(msgp->msgnumber)==38)) {
 		deadconnection=true;
 	}
 
@@ -1127,16 +1128,17 @@ CS_RETCODE freetdsconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 
 	// for a timeout message, set deadconnection to 1
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
-		CS_NUMBER(msgp->msgnumber)==63 &&
+		CS_LAYER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
-		CS_LAYER(msgp->msgnumber)==63) {
+		CS_NUMBER(msgp->msgnumber)==63) {
 		deadconnection=true;
 
 	// for a read from sql server failed message, set deadconnection to 1
 	} else if (CS_SEVERITY(msgp->msgnumber)==78 &&
 		CS_LAYER(msgp->msgnumber)==0 &&
 		CS_ORIGIN(msgp->msgnumber)==0 &&
-		CS_NUMBER(msgp->msgnumber)==36) {
+		(CS_NUMBER(msgp->msgnumber)==36 ||
+		CS_NUMBER(msgp->msgnumber)==38)) {
 		deadconnection=true;
 	}
 
