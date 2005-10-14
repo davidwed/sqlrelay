@@ -29,7 +29,7 @@ bool sqlrcursor::executeQuery() {
 
 		// perform substitutions
 		stringbuffer	container;
-		char		*ptr=queryptr;
+		const char	*ptr=queryptr;
 		bool		found=false;
 		bool		inquotes=false;
 		bool		inbraces=false;

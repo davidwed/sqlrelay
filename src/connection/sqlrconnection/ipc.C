@@ -3,13 +3,10 @@
 
 #include <sqlrconnection.h>
 #include <rudiments/error.h>
+#include <rudiments/file.h>
 
 // for sprintf
 #include <stdio.h>
-
-// for ftok
-#include <sys/types.h>
-#include <sys/ipc.h>
 
 #include <config.h>
 
@@ -32,7 +29,7 @@ bool sqlrconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	debugPrint("connection",1,"attaching to shared memory...");
 	#endif
 	idmemory=new sharedmemory();
-	if (!idmemory->attach(ftok(idfilename,0))) {
+	if (!idmemory->attach(file::generateKey(idfilename,1))) {
 		fprintf(stderr,"Couldn't attach to shared memory segment: ");
 		fprintf(stderr,"%s\n",error::getErrorString());
 		delete idmemory;
@@ -47,7 +44,7 @@ bool sqlrconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	debugPrint("connection",1,"attaching to semaphores...");
 	#endif
 	semset=new semaphoreset();
-	if (!semset->attach(ftok(idfilename,0),11)) {
+	if (!semset->attach(file::generateKey(idfilename,1),11)) {
 		fprintf(stderr,"Couldn't attach to semaphore set: ");
 		fprintf(stderr,"%s\n",error::getErrorString());
 		delete semset;

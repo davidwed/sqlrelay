@@ -1,16 +1,67 @@
+oracle -
+	make fetchatonce, max cols, max size of a column configurable
+
+make it configurable whether all connections to a given database should
+	reconnect if an indivdual connection to that database goes down,
+	currently, for databases behind a load balancer, all connections would
+	go down
+	markDatabaseUnavailable()
+
+Tru64 -
+	unix sockets don't work, looks like a byte-order translation issue
+	can't start more than 1 cursor, looks like out-of-memory
+
+tuning docs -
+	specs for the machine - cpu/memory/network...
+
+in oracle proxy document - how does it look to the database...
+	can you tell which users ran which queries
+	load per schema, etc.
+
+	may have to run:
+		alter user <user_name> quota unlimited on <tablespace_name>
+	after creating user
+
+	turn on auditing
+	* if have $ORACLE_HOME/dbs/init$ORACLE_SID.ora
+		* add audit_trail = db
+		(maybe just 'true' in older versions of oracle)
+	* if have $ORACLE_HOME/dbs/spfile$ORACLE_SID.ora
+		* log in as sys, or in 9i/10g, log in to sys as
+			"sqlplus sys/'pass' as sysdba"
+		* run ALTER SYSTEM SET audit_trail=db SCOPE=spfile
+		* restart the database
+	check to see if it's on by running
+		select name,value from v$parameter where name='audit_trail'
+		value should = db
+
+	may have to run $ORACLE_HOME/rdbms/audit/cataudit.sql here
+
+	auditing:
+	* audit select table;
+	* select * from dba_audit_trail
+
 figure out how to implement cleanup functions in php 4.0
 
 bind cursors aren't getting cleaned up properly
 
-should use SO_REUSEADDR socket options
+reuseAddress() isn't working
 
-install java class files with 644 perms
 create a jar file
 
 freetds test fails
-	after select, openCursor's "use database" fails
-
-java api tests fail
+	* if insert/update/delete is run, then a select is run,
+	then client exits, a commit() will be called, but it will fail...
+	* the connection daemon allocates a new cursor and runs a "use DB"
+	query before doing the commit, but that query fails because
+	ct_cancel() has not yet been called on the result set of the select
+	* I'm not sure why this matters, the commit() is being run using a
+	different cursor, presumably one result set per cursor can remain open,
+	but maybe that's not the case...
+	* ahhh, but it's not 1 result set per cursor, freetds doesn't yet
+	support cursors, if the result set isn't associated with a cursor, then
+	it must just be associated with the connection, and you can only
+	have 1 of those open at a time...
 
 ionut's memory corruption errors
 
@@ -263,12 +314,14 @@ Features:
 		auto-commit mode.
 	need a "relay ping" method that tries to connect to the SQL Relay
 		server and returns true/false if that was possible or not
+	support running multiple queries, seperated by semicolons as a single
+		query
 
 Availability:
 	connections should ping database server every so often to make sure
 		it's up, if it's not, relogin
-	master, fallback databases, where connection only goes to the fallback
-		if the master is overloaded or down
+	failover - master, fallback databases, where connection only goes to
+		the fallback if the master is overloaded or down
 	statistics, stat monitoring interface
 	if a connection dies mysteriously, a new one should fire up
 

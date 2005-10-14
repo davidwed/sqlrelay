@@ -14,6 +14,8 @@
 <li><a href="#systemparameters">Tweak Various System Parameters</a></li>
 <li><a href="#dontgetcolumninfo">Don't Get Unnecessary Column Info</a></li>
 <li><a href="#resultsetbuffersize">Use Result Set Buffer Size</a></li>
+<li><a href="#memoryusage">Memory Usage</a></li>
+<li><a href="#howmanyconnections">How Many Connections Should I Run?</a></li>
 </ul>
 
 <br>
@@ -438,6 +440,118 @@ fetch too many rows at once, memory has to be allocated which slows things down
 (and in really bad cases can cause swapping) but if you fetch too few at once,
 it causes too many round trips to the database.  Each query has a sweet spot,
 finding it may dramatically improve that query's performance.</p>
+
+<br>
+<a name="memoryusage"></a>
+<span class="heading2">Memory Usage</span><br>
+
+<p>Most databases only support single-row fetches; you can run a query,
+then fetch 1 row at a time from the database.  Oracle, DB2 and Sybase support
+array fetches; you can run a query and then fetch any number of rows from
+the database in a single round-trip.  This improves performance, but at a cost.
+A buffer, large enough to accommodate the maximum size of the data that might
+be fetched, must be allocated and used to fetch the rows.</p>
+
+<p>For Oracle 7, this is a 5mb buffer.  For DB2 and Sybase, it's is a 10mb
+buffer.  For Oracle 8, 8i, 9i or 10g, it's a 40mb buffer.</p>
+
+<p>If that seems like more memory than you'd like to allocate per-connection,
+then you can tune it down.  Unfortunately, for now, the tunable parameters are
+compile-time parameters.</p>
+
+<p>In the following files...</p>
+
+<ul>
+<li>src/connections/oracle7/oracle7connection.h</li>
+<li>src/connections/oracle8/oracle8connection.h</li>
+<li>src/connections/db2/db2connection.h</li>
+<li>src/connections/sybase/sybaseconnection.h</li>
+</ul>
+
+<p>There are lines like this:</p>
+
+<blockquote>
+<pre>
+<font color="#a020f0">#define FETCH_AT_ONCE           </font><font color="#ff00ff">10</font>
+<font color="#a020f0">#define MAX_SELECT_LIST_SIZE    </font><font color="#ff00ff">256</font>
+<font color="#a020f0">#define MAX_ITEM_BUFFER_SIZE    </font><font color="#ff00ff">4096</font>
+</pre>
+</blockquote>
+
+<p>FETCH_AT_ONCE controls the number of rows that are fetched from the database
+at once.  MAX_SELECT_LIST_SIZE controls the maximum number of columns that may
+be fetched during a select.  MAX_ITEM_BUFFER_SIZE is the maximum size of an
+individual field that may be returned by the database during a select.</p>
+
+<p>The default values for FETCH_AT_ONCE and MAX_SELECT_LIST_SIZE are 10 and
+256 respectively, for all databases.  The value of MAX_ITEM_BUFFER_SIZE
+depends on the maximum number of characters that a varchar or varchar2 column
+type can store and varies between databases.</p>
+
+<p>The number of bytes that the database connection daemon allocates for
+fetching multiple rows of result sets is equal to
+FETCH_AT_ONCE * MAX_SELECT_LIST_SIZE * MAX_ITEM_BUFFER_SIZE.  So, reducing any
+of those sizes will reduce the amount of memory used by each connection
+daemon.</p>
+
+<p>Use care when reducing MAX_SELECT_LIST_SIZE and MAX_ITEM_BUFFER_SIZE.  If you
+reduce MAX_SELECT_LIST_SIZE to 20, but then run a query that fetched 25 columns,
+the last 5 will be truncated.  Similarly, if you set MAX_ITEM_BUFFER_SIZE to
+2048, but then fetch a varchar2 field with 3000 characters in it, the last 952
+characters will be truncated.  However, if you know that none of the queries
+your applications run fetch more than some number of rows, then it is safe to
+reduce the MAX_SELECT_LIST_SIZE to that number.  Similarly, if you know that
+none of the varchar or varchar2 columns that your applications access are
+larger than a particular size, it's safe to reduce MAX_ITEM_BUFFER_SIZE to
+that size.</p>
+
+<p>Reducing FETCH_AT_ONCE will cause a degredation in performance, as more 
+round-trips between SQL Relay and the database have to be made.  But,
+performance does not degrade on 1-to-1 basis.  For example, reducing
+FETCH_AT_ONCE from 10 to 5 will not your apps will not run half as fast.</p>
+
+<p>After modifying these parameters, you must rebuild and re-install SQL Relay 
+for the changes to have an effect.  If you have already run the <i>configure</i>
+script, then you should do a <i>make clean</i>, followed by a <i>make</i> and
+<i>make install</i> at the top level of the SQL Relay source distribution.
+If you have not run the <i>configure</i> script, or have recently run a 
+<i>make distclean</i> then just proceed as if you were building and installing
+SQL Relay for the first time.  See
+<a href="installing.html">Installing SQL Relay</a> for more information.</p>
+
+<br>
+<a name="howmanyconnections"></a>
+<span class="heading2">How Many Connections Should I Run?</span><br>
+
+<p>A good rule of thumb is to run as many connections as your database can
+handle.</p>
+
+<p>The best way is to determine how many connections to run is to make an
+educated guess, let your applications run, monitor the performance of the
+SQL Relay server and database and adjust the number of connections
+accordingly.</p>
+
+<p>If you are implementing SQL Relay because your database had been 
+getting overloaded with too many connections, you may have a pretty good idea of
+how many connections your database can handle, and you can use that number as a
+starting point.</p>
+
+<p>When just letting your applications run isn't feasable, you can use a
+load-testing program like apachebench or LoadRunner to do automated testing.
+You'll have to set up scripts and pages to simulate the kind of load that your
+applications will place on SQL Relay and the database, but you can get an
+accurate idea of how your application will perform end-to-end.  You can let the
+load-testing program run, monitor the performance of the SQL Relay server and
+database and adjust the number of connections accordingly.</p>
+
+<p>There is also a program in the test/stress directory of the SQL Relay
+distribution called <i>querytest</i> that logs into the SQL Relay server,
+runs a series of queries and logs out, over and over, as fast as possible.
+You can run many instances of <i>querytest</i> simultaneously to simulate
+the kind of load your applications might place on SQL Relay and the database.
+<i>querytest</i> is OK as a starting point, but to do any serious testing, you
+should modify the queries that it runs to more accurately simulate your
+applications.</p>
 
 </body>
 </html>

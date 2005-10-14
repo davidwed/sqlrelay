@@ -123,8 +123,8 @@ install: libSQLRConnection.so libSQLRCursor.so
 	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay
 	$(LTINSTALL) libSQLRConnection.so $(javadir)/com/firstworks/sqlrelay
 	$(LTINSTALL) libSQLRCursor.so $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay
+	$(INSTALL) -m 644 com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay
+	$(INSTALL) -m 644 com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay
 	$(RM) libSQLRConnection.so
 	$(RM) libSQLRCursor.so
 else

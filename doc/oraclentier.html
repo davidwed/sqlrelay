@@ -80,13 +80,12 @@ must set up an instance of SQL Relay which logs in as the SYSTEM user and use
 that instance for accessing the database.</p>
 
 <p>You can enable auditing of the queries that the users have run through the
-proxyrole as follows.  Note: to enable auditing, you must set AUDIT_TRAIL=yes 
-in the $ORACLE_BASE/admin/$ORACLE_SID/pfile/initSID.ora file and restart the 
-database.</p>
+proxyrole as follows.  Note: to enable auditing, you must set audit_trail=true
+in the $ORACLE_HOME/dbs/init$ORACLE_SID.ora file and restart the database.</p>
 
-<blockquote><b>AUDIT SELECT BY proxyuser ON BEHALF OF user1;<br>
-AUDIT SELECT BY proxyuser ON BEHALF OF user2;<br>
-AUDIT SELECT BY proxyuser ON BEHALF OF user3;</b></blockquote>
+<blockquote><b>AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user1;<br>
+AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user2;<br>
+AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user3;</b></blockquote>
 
 <span class="heading2">Setting Up SQL Relay</span>
 

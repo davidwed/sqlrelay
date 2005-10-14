@@ -18,6 +18,7 @@ bool sqlrconnection::commit() {
 	debugPrint("connection",1,"commit...");
 	#endif
 
+printf("commit\n");
 	sqlrcursor	*commitcur=initCursor();
 	char	*commitquery="commit";
 	int	commitquerylen=6;

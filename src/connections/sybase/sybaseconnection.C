@@ -556,7 +556,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 		if (cmd==languagecmd) {
 
 			if (isrpcquery) {
-				// For rpc commands, there should be two
+				// For rpc commands, there could be several
 				// result sets - CS_STATUS_RESULT,
 				// maybe a CS_PARAM_RESULT and maybe a
 				// CS_ROW_RESULT, we're not guaranteed
@@ -568,29 +568,28 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 					break;
 				}
 			} else {
-				// For language commands, there should be only
-				// one result set.
+				// For non-rpc language commands (non-selects),
+				// there should be only one result set.
 				break;
 			}
 
 		} else if (resultstype==CS_ROW_RESULT ||
 					resultstype==CS_CURSOR_RESULT ||
 					resultstype==CS_COMPUTE_RESULT) {
-			// For cursor commands, each call to ct_cursor will
-			// have generated a result set.  There will be result
-			// sets for the CS_CURSOR_DECLARE, CS_CURSOR_ROWS and
-			// CS_CURSOR_OPEN calls.  We need to skip past the
-			// first 2, unless they failed.  If they failed, it
-			// will be caught above.
-			// For rpc commands, there will be several result sets,
-			// skip until we find one that we care about...
+			// For cursor commands (selects), each call to
+			// ct_cursor will have generated a result set.  There
+			// will be result sets for the CS_CURSOR_DECLARE,
+			// CS_CURSOR_ROWS and CS_CURSOR_OPEN calls.  We need to
+			// skip past the first 2, unless they failed.  If they
+			// failed, it will be caught above.
 			break;
 		}
 
+		// if we got here, then we don't want to process this result
+		// set, cancel it and move on to the next one...
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-			sybaseconn->deadconnection=1;
+			sybaseconn->deadconnection=true;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
-			// maybe return false
 			return false;
 		}
 	}
@@ -878,7 +877,7 @@ void sybasecursor::discardResults() {
 	if (results==CS_SUCCEED) {
 		do {
 			if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-				sybaseconn->deadconnection=1;
+				sybaseconn->deadconnection=true;
 				// FIXME: call ct_close(CS_FORCE_CLOSE)
 				// maybe return false
 			}
@@ -888,7 +887,7 @@ void sybasecursor::discardResults() {
 
 	if (results==CS_FAIL) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_ALL)==CS_FAIL) {
-			sybaseconn->deadconnection=1;
+			sybaseconn->deadconnection=true;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			// maybe return false
 		}
@@ -945,7 +944,7 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 		CS_LAYER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_NUMBER(msgp->msgnumber)==63) {
-		deadconnection=1;
+		deadconnection=true;
 	} else
 	// for a net-libraryoperation terminated due to disconnect,
 	// set deadconnection to 1
@@ -953,7 +952,7 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 		CS_LAYER(msgp->msgnumber)==5 &&
 		CS_ORIGIN(msgp->msgnumber)==3 &&
 		CS_NUMBER(msgp->msgnumber)==6) {
-		deadconnection=1;
+		deadconnection=true;
 	}
 
 	return CS_SUCCEED;
@@ -996,7 +995,7 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 		CS_NUMBER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_LAYER(msgp->msgnumber)==63) {
-		deadconnection=1;
+		deadconnection=true;
 	} else
 	// for a net-libraryoperation terminated due to disconnect,
 	// set deadconnection to 1
@@ -1004,7 +1003,7 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 		CS_LAYER(msgp->msgnumber)==5 &&
 		CS_ORIGIN(msgp->msgnumber)==3 &&
 		CS_NUMBER(msgp->msgnumber)==6) {
-		deadconnection=1;
+		deadconnection=true;
 	}
 
 	return CS_SUCCEED;

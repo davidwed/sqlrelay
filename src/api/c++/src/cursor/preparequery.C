@@ -16,11 +16,11 @@ void sqlrcursor::prepareQuery(const char *query, uint32_t length) {
 	clearVariables();
 	querylen=length;
 	if (copyrefs) {
-		initQueryBuffer(length);
-		charstring::copy(queryptr,query,querylen);
-		queryptr[querylen]=(char)NULL;
+		initQueryBuffer(querylen);
+		charstring::copy(querybuffer,query,querylen);
+		querybuffer[querylen]='\0';
 	} else {
-		queryptr=(char *)query;
+		queryptr=query;
 	}
 }
 
@@ -135,10 +135,9 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 }
 
 void sqlrcursor::initQueryBuffer(uint32_t querylength) {
-	if (!querybuffer) {
-		querybuffer=new char[querylength+1];
-		queryptr=querybuffer;
-	}
+	delete[] querybuffer;
+	querybuffer=new char[querylength+1];
+	queryptr=querybuffer;
 }
 
 void sqlrcursor::attachToBindCursor(uint16_t bindcursorid) {

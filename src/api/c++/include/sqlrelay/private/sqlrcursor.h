@@ -96,7 +96,7 @@
 
 		// query
 		char		*querybuffer;
-		char		*queryptr;
+		const char	*queryptr;
 		uint32_t	querylen;
 		char		*fullpath;
 		bool		reexecute;

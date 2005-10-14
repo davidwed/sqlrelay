@@ -11,6 +11,8 @@
 #define MAX_ITEM_BUFFER_SIZE	4096
 #define MAX_BIND_VARS		512
 
+//#define FREETDS_SUPPORTS_CURSORS
+
 #define NUM_CONNECT_STRING_VARS 10
 
 #include <rudiments/environment.h>
@@ -31,7 +33,8 @@ class freetdscursor : public sqlrcursor {
 		bool		closeCursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
-		/*bool		inputBindString(const char *variable,
+#ifdef FREETDS_SUPPORTS_CURSORS
+		bool		inputBindString(const char *variable,
 						uint16_t variablesize,
 						const char *value,
 						uint16_t valuesize,
@@ -48,7 +51,8 @@ class freetdscursor : public sqlrcursor {
 						uint16_t variablesize,
 						char *value, 
 						uint16_t valuesize, 
-						int16_t *isnull);*/
+						int16_t *isnull);
+#endif
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);

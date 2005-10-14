@@ -12,12 +12,12 @@ uint16_t sqlrcursor::countBindVariables() const {
 		return 0;
 	}
 
-	char	lastchar=(char)NULL;
+	char	lastchar='\0';
 	bool	inquotes=false;
 
 	uint16_t	paramcount=0;
 
-	for (char *ptr=queryptr; *ptr; ptr++) {
+	for (const char *ptr=queryptr; *ptr; ptr++) {
 
 		if (*ptr=='\'' && lastchar!='\\') {
 			if (inquotes) {

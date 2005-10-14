@@ -377,51 +377,48 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 
 	isrpcquery=false;
 
-	// This code is here in case freetds ever actually supports cursors...
-	//if (cursorquery.match(query)) {
-#ifdef CS_CURSOR_DECLARE
-	if (false) {
+	if (cursorquery.match(query)) {
 
 		// initiate a cursor command
 		cmd=cursorcmd;
+#ifdef FREETDS_SUPPORTS_CURSORS
 		if (ct_cursor(cursorcmd,CS_CURSOR_DECLARE,
 				(CS_CHAR *)cursorname,CS_NULLTERM,
 				(CS_CHAR *)query,length,
-				CS_UNUSED)!=CS_SUCCEED) {
 				//CS_READ_ONLY)!=CS_SUCCEED) {
+				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
-
-	//} else if (rpcquery.match(query)) {
-	} else
 #endif
-	if (false) {
 
-		// initiate a language command
-		cmd=languagecmd;
+	} else if (rpcquery.match(query)) {
+
+		// initiate an rpc command
 		isrpcquery=true;
+		cmd=languagecmd;
+#ifdef FREETDS_SUPPORTS_CURSORS
 		if (ct_command(languagecmd,CS_RPC_CMD,
 			(CS_CHAR *)rpcquery.getSubstringEnd(0),
 			length-rpcquery.getSubstringEndOffset(0),
 			CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
+#endif
 
-	//} else {
-	} else if (false) {
+	} else {
 
 		// initiate a language command
 		cmd=languagecmd;
+#ifdef FREETDS_SUPPORTS_CURSORS
 		if (ct_command(languagecmd,CS_LANG_CMD,
 				(CS_CHAR *)query,length,
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
-	} else {
-		cmd=languagecmd;
+#endif
 	}
 
-	//clean=false;
+	clean=false;
 	prepared=true;
 	return true;
 }
@@ -436,11 +433,12 @@ void freetdscursor::checkRePrepare() {
 	}
 }
 
-/*bool freetdscursor::inputBindString(const char *variable,
+#ifdef FREETDS_SUPPORTS_CURSORS
+bool freetdscursor::inputBindString(const char *variable,
 						uint16_t variablesize,
 						const char *value,
 						uint16_t valuesize,
-						int15_t *isnull) {
+						int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -527,7 +525,9 @@ bool freetdscursor::outputBindString(const char *variable,
 					uint16_t variablesize,
 					char *value, 
 					uint16_t valuesize, 
-					int15_t *isnull) {
+					int16_t *isnull) {
+
+	checkRePrepare();
 
 	outbindvalues[outbindindex]=value;
 	outbindvaluelengths[outbindindex]=valuesize;
@@ -547,13 +547,13 @@ bool freetdscursor::outputBindString(const char *variable,
 	parameter[paramindex].status=CS_RETURN;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-			(CS_VOID *)NULL,0,
-			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
+		(CS_VOID *)NULL,0,(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
 		return false;
 	}
 	paramindex++;
 	return true;
-}*/
+}
+#endif
 
 bool freetdscursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
@@ -566,28 +566,27 @@ printf("%s\n",query);
 		freetdsconn->errorstring=NULL;
 	}
 
-	// this code is here in case freetds ever supports cursors
-	if (true) {
-		stringbuffer	*newquery=fakeInputBinds(query);
-		if (newquery) {
-			if (ct_command(cmd,CS_LANG_CMD,
-					newquery->getString(),
-					charstring::length(
-						newquery->getString()),
-					CS_UNUSED)!=CS_SUCCEED) {
-				delete newquery;
-				return false;
-			}
+#ifndef FREETDS_SUPPORTS_CURSORS
+	stringbuffer	*newquery=fakeInputBinds(query);
+	if (newquery) {
+		if (ct_command(cmd,CS_LANG_CMD,
+				newquery->getString(),
+				charstring::length(
+					newquery->getString()),
+				CS_UNUSED)!=CS_SUCCEED) {
 			delete newquery;
-		} else {
-			if (ct_command(cmd,CS_LANG_CMD,
-					(CS_CHAR *)query,length,
-					CS_UNUSED)!=CS_SUCCEED) {
-				return false;
-			}
+			return false;
 		}
-		clean=false;
+		delete newquery;
+	} else {
+		if (ct_command(cmd,CS_LANG_CMD,
+				(CS_CHAR *)query,length,
+				CS_UNUSED)!=CS_SUCCEED) {
+			return false;
+		}
 	}
+	clean=false;
+#endif
 
 	// initialize return values
 	ncols=0;
@@ -597,7 +596,7 @@ printf("%s\n",query);
 	maxrow=0;
 	totalrows=0;
 
-#ifdef CS_CURSOR_DECLARE
+#ifdef FREETDS_SUPPORTS_CURSORS
 	if (cmd==cursorcmd) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
@@ -631,7 +630,7 @@ printf("%s\n",query);
 		if (cmd==languagecmd) {
 
 			if (isrpcquery) {
-				// For rpc commands, there should be two
+				// For rpc commands, there could be several
 				// result sets - CS_STATUS_RESULT,
 				// maybe a CS_PARAM_RESULT and maybe a
 				// CS_ROW_RESULT, we're not guaranteed
@@ -643,29 +642,30 @@ printf("%s\n",query);
 					break;
 				}
 			} else {
-				// For language commands, there should be only
-				// one result set.
+				// For non-rpc language commands (non-selects),
+				// there should be only one result set.
 				break;
 			}
 
 		} else if (resultstype==CS_ROW_RESULT ||
-#ifdef CS_CURSOR_DECLARE
+#ifdef FREETDS_SUPPORTS_CURSORS
 					resultstype==CS_CURSOR_RESULT ||
 #endif
 					resultstype==CS_COMPUTE_RESULT) {
-			// For cursor commands, each call to ct_cursor will
-			// have generated a result set.  There will be result
-			// sets for the CS_CURSOR_DECLARE, CS_CURSOR_ROWS and
-			// CS_CURSOR_OPEN calls.  We need to skip past the
-			// first 2, unless they failed.  If they failed, it
-			// will be caught above.
+			// For cursor commands (selects), each call to
+			// ct_cursor will have generated a result set.  There
+			// will be result sets for the CS_CURSOR_DECLARE,
+			// CS_CURSOR_ROWS and CS_CURSOR_OPEN calls.  We need to
+			// skip past the first 2, unless they failed.  If they
+			// failed, it will be caught above.
 			break;
 		}
 
+		// if we got here, then we don't want to process this result
+		// set, cancel it and move on to the next one...
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
 			freetdsconn->deadconnection=true;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
-			// maybe return false
 			return false;
 		}
 	}
@@ -686,9 +686,13 @@ printf("%s\n",query);
 		knowsaffectedrows=true;
 	}
 
+	// For queries which return rows or parameters (output bind variables),
+	// get the column count and bind columns.  For DML queries, get the
+	// affected row count.
 	bool	moneycolumn=false;
+	affectedrows=0;
 	if (resultstype==CS_ROW_RESULT ||
-#ifdef CS_CURSOR_DECLARE
+#ifdef FREETDS_SUPPORTS_CURSORS
 			resultstype==CS_CURSOR_RESULT ||
 #endif
 			resultstype==CS_COMPUTE_RESULT ||
@@ -755,9 +759,8 @@ printf("%s\n",query);
 			}
 		}
 
-	} else if (resultstype==CS_CMD_SUCCEED) {
-		if (majorversion==0 && (minorversion>52 && minorversion!=61) &&
-			ct_res_info(cmd,CS_ROW_COUNT,(CS_VOID *)&affectedrows,
+	} else if (resultstype==CS_CMD_SUCCEED && knowsaffectedrows) {
+		if (ct_res_info(cmd,CS_ROW_COUNT,(CS_VOID *)&affectedrows,
 					CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			return false;
 		} 
@@ -770,7 +773,6 @@ printf("%s\n",query);
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
 			freetdsconn->deadconnection=true;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
-			// maybe return false
 			return false;
 		}
 		return false;
@@ -841,7 +843,7 @@ void freetdscursor::returnColumnInfo() {
 
 	// unless the query was a successful select, send no header
 	if (resultstype!=CS_ROW_RESULT &&
-#ifdef CS_CURSOR_DECLARE
+#ifdef FREETDS_SUPPORTS_CURSORS
 			resultstype!=CS_CURSOR_RESULT &&
 #endif
 			resultstype!=CS_COMPUTE_RESULT) {
@@ -849,7 +851,7 @@ void freetdscursor::returnColumnInfo() {
 	}
 
 	// gonna need this later
-	int32_t	type;
+	int16_t	type;
 
 	// for each column...
 	for (CS_INT i=0; i<ncols; i++) {
@@ -945,7 +947,7 @@ void freetdscursor::returnColumnInfo() {
 bool freetdscursor::noRowsToReturn() {
 	// unless the query was a successful select, send no data
 	return (resultstype!=CS_ROW_RESULT &&
-#ifdef CS_CURSOR_DECLARE
+#ifdef FREETDS_SUPPORTS_CURSORS
 			resultstype!=CS_CURSOR_RESULT &&
 #endif
 			resultstype!=CS_COMPUTE_RESULT);
@@ -1007,6 +1009,7 @@ void freetdscursor::cleanUpData(bool freeresult, bool freebinds) {
 
 void freetdscursor::discardResults() {
 
+printf("discardResults()\n");
 	// if there are any unprocessed result sets, process them
 	if (results==CS_SUCCEED) {
 		do {
@@ -1031,7 +1034,7 @@ void freetdscursor::discardResults() {
 
 void freetdscursor::discardCursor() {
 
-#ifdef CS_CURSOR_DECLARE
+#ifdef FREETDS_SUPPORTS_CURSORS
 	if (cmd==cursorcmd) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
 				NULL,CS_UNUSED,CS_DEALLOC)==CS_SUCCEED) {
