@@ -218,7 +218,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	size_t	idfilenamelen=tmpdirlen+5+charstring::length(id)+1;
 	idfilename=new char[idfilenamelen];
 	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",TMP_DIR,id);
-	key_t	key=ftok(idfilename,0);
+	key_t	key=file::generateKey(idfilename,1);
 
 	// connect to the semaphore set
 	semset=new semaphoreset;

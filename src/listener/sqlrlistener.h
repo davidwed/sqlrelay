@@ -56,7 +56,7 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 		bool	createSharedMemoryAndSemaphores(tempdir *tmpdir,
 								const char *id);
 		void	ipcFileError(const char *idfilename);
-		void	ftokError(const char *idfilename);
+		void	keyError(const char *idfilename);
 		void	shmError(const char *id, int shmid);
 		void	semError(const char *id, int semid);
 		bool	listenOnClientSockets(sqlrconfigfile *cfgfl);

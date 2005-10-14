@@ -14,11 +14,8 @@
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
+#include <rudiments/file.h>
 #include <rudiments/error.h>
-
-// for ftok
-#include <sys/types.h>
-#include <sys/ipc.h>
 
 // for printf
 #include <stdio.h>
@@ -327,9 +324,9 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	}
 
 	// get the ipc key
-	key_t	key=ftok(idfilename,0);
+	key_t	key=file::generateKey(idfilename,1);
 	if (key==-1) {
-		ftokError(idfilename);
+		keyError(idfilename);
 		delete[] idfilename;
 		return false;
 	}
@@ -415,7 +412,7 @@ void sqlrlistener::ipcFileError(const char *idfilename) {
 	fprintf(stderr,"readable and writable.\n\n");
 }
 
-void sqlrlistener::ftokError(const char *idfilename) {
+void sqlrlistener::keyError(const char *idfilename) {
 	fprintf(stderr,"\nsqlr-listener error:\n");
 	fprintf(stderr,"	Unable to generate a key from ");
 	fprintf(stderr,"%s\n",idfilename);
