@@ -1,12 +1,6 @@
 oracle -
 	make fetchatonce, max cols, max size of a column configurable
 
-make it configurable whether all connections to a given database should
-	reconnect if an indivdual connection to that database goes down,
-	currently, for databases behind a load balancer, all connections would
-	go down
-	markDatabaseUnavailable()
-
 Tru64 -
 	unix sockets don't work, looks like a byte-order translation issue
 	can't start more than 1 cursor, looks like out-of-memory

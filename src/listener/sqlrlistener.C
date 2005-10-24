@@ -57,6 +57,9 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 
 	denied=NULL;
 	allowed=NULL;
+
+	maxquerysize=0;
+	idleclienttimeout=-1;
 }
 
 sqlrlistener::~sqlrlistener() {
@@ -158,6 +161,7 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	}
 
 	idleclienttimeout=cfgfl.getIdleClientTimeout();
+	maxquerysize=cfgfl.getMaxQuerySize();
 
 	#ifndef SERVER_DEBUG
 	detach();
@@ -1659,7 +1663,7 @@ void sqlrlistener::waitForClientClose(int32_t authstatus, bool passstatus,
 				// executing new query
 				sizeof(uint16_t)+
 				// query size and query
-				sizeof(uint32_t)+MAXQUERYSIZE+
+				sizeof(uint32_t)+maxquerysize+
 				// input bind var count
 				sizeof(uint16_t)+
 				// input bind vars

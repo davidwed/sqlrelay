@@ -174,6 +174,10 @@ class gtkfe {
 		static	GtkWidget	*deniedipslabel;
 		static	GtkWidget	*allowedipslabel;
 		static	GtkWidget	*debuglabel;
+		static	GtkWidget	*maxquerysizelabel;
+		static	GtkWidget	*maxstringbindvaluelengthlabel;
+		static	GtkWidget	*maxlobbindvaluelengthlabel;
+		static	GtkWidget	*idleclienttimeoutlabel;
 
 		static	GtkWidget	*identry;
 		static	GtkWidget	*portentry;
@@ -201,6 +205,10 @@ class gtkfe {
 		static	GtkWidget	*allowedipsentry;
 		static	GtkWidget	*debugcombo;
 		static	GList		*debuglist;
+		static	GtkWidget	*maxquerysizeentry;
+		static	GtkWidget	*maxstringbindvaluelengthentry;
+		static	GtkWidget	*maxlobbindvaluelengthentry;
+		static	GtkWidget	*idleclienttimeoutentry;
 
 		static	GtkWidget	*userstab;
 		static	GtkWidget	*usersframe;
@@ -234,9 +242,12 @@ class gtkfe {
 		static	GtkWidget	*connectionidlabel;
 		static	GtkWidget	*stringlabel;
 		static	GtkWidget	*metriclabel;
+		static	GtkWidget	*behindloadbalancerlabel;
 		static	GtkWidget	*connectionidentry;
 		static	GtkWidget	*stringentry;
 		static	GtkWidget	*metricentry;
+		static	GtkWidget	*behindloadbalancercombo;
+		static	GList		*behindloadbalancerlist;
 
 		static	GtkWidget	*connectionbuttonhbox;
 		static	GtkWidget	*saveconnectionbutton;

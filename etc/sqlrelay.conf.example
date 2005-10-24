@@ -10,10 +10,10 @@
 			<user user="user3" password="password3"/>
 		</users>
 		<connections>
-			<connection connectionid="db1" string="user=exampleuser1;password=examplepassword1;oracle_sid=EXAMPLE1;" metric="1"/>
-			<connection connectionid="db2" string="user=exampleuser2;password=examplepassword2;oracle_sid=EXAMPLE2;" metric="3"/>
-			<connection connectionid="db3" string="user=exampleuser3;password=examplepassword3;oracle_sid=EXAMPLE3;" metric="5"/>
-			<connection connectionid="db4" string="user=exampleuser4;password=examplepassword4;oracle_sid=EXAMPLE4;" metric="6"/>
+			<connection connectionid="db1" string="user=exampleuser1;password=examplepassword1;oracle_sid=EXAMPLE1;" metric="1" behindloadbalancer="no"/>
+			<connection connectionid="db2" string="user=exampleuser2;password=examplepassword2;oracle_sid=EXAMPLE2;" metric="3" behindloadbalancer="no"/>
+			<connection connectionid="db3" string="user=exampleuser3;password=examplepassword3;oracle_sid=EXAMPLE3;" metric="5" behindloadbalancer="no"/>
+			<connection connectionid="db4" string="user=exampleuser4;password=examplepassword4;oracle_sid=EXAMPLE4;" metric="6" behindloadbalancer="no"/>
 		</connections>
 	</instance>
 

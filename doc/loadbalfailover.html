@@ -121,7 +121,10 @@ currently open new connections to a different "failover" database to make up
 for it.  This is on the TODO list, but has not yet been implemented.</p>
 
 <p>Currently, if an SQL Relay connection daemon notices that the database server
-it is connected to has gone down it raises a flag and all connection daemons
+it is connected to has gone down it will mark itself unavailable to clients,
+log out and loop, attempting to re-connect to that database server.  If that
+connection daemon is configured with the <b>behindloadbalancer</b> attribute
+set to "no", then it will also raise a flag and all connection daemons
 connected to that database server mark themselves unavailable to clients, close
 their connections and loop, attempting to re-connect to that database server.
 When the database server comes back up, as each connection daemon successfully
@@ -129,14 +132,6 @@ re-connects to the database server, it marks itself available to clients again.
 While one database server is down, client sessions are still distributed over
 the servers that are still up, albiet through a smaller pool of persistent
 database connections.</p>
-
-<p>This has an interesting effect when using a Load Balancer.  Since all 
-database servers appear to SQL Relay to be a single database server, SQL Relay
-believes that it's only connected to one database server.  If one of the
-database servers goes down, SQL Relay will instruct all of the database
-connection daemons to reconnect, even the ones that aren't actually connected
-to the database server that went down.  This behavior will be configurable in
-a future version of SQL Relay.</p>
 
 <p>On the other hand, some Load Balancers can facilitate failover.  Some
 Load Balancers can be configured to keep track of whether the servers it's

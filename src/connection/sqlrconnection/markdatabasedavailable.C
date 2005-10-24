@@ -25,6 +25,11 @@ void sqlrconnection::markDatabaseAvailable() {
 
 void sqlrconnection::markDatabaseUnavailable() {
 
+	// if the database is behind a load balancer, don't mark it unavailable
+	if (constr->getBehindLoadBalancer()) {
+		return;
+	}
+
 	#ifdef SERVER_DEBUG
 	size_t	stringlen=10+charstring::length(updown)+1;
 	char	*string=new char[stringlen];

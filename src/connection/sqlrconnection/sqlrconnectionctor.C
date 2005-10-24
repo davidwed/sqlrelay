@@ -29,10 +29,10 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 	checkautocommit=0;
 	performautocommit=0;
 
-	maxquerysize=MAXQUERYSIZE;
-	maxstringbindvaluelength=MAXSTRINGBINDVALUELENGTH;
-	maxlobbindvaluelength=MAXLOBBINDVALUELENGTH;
-	idleclienttimeout=DEFAULT_IDLECLIENTTIMEOUT;
+	maxquerysize=0;
+	maxstringbindvaluelength=0;
+	maxlobbindvaluelength=0;
+	idleclienttimeout=-1;
 
 	connected=false;
 

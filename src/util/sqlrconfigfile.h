@@ -43,7 +43,8 @@ typedef enum {
 	PASSWORD_ATTRIBUTE,
 	CONNECTIONID_ATTRIBUTE,
 	STRING_ATTRIBUTE,
-	METRIC_ATTRIBUTE
+	METRIC_ATTRIBUTE,
+	BEHINDLOADBALANCER_ATTRIBUTE
 } attribute;
 
 class usercontainer {
@@ -72,15 +73,18 @@ class connectstringcontainer {
 		void		setConnectionId(const char *connectionid);
 		void		setString(const char *string);
 		void		setMetric(uint32_t metric);
+		void		setBehindLoadBalancer(bool behindloadbalancer);
 		const char	*getConnectionId();
 		const char	*getString();
 		uint32_t	getMetric();
+		bool		getBehindLoadBalancer();
 		const char	*getConnectStringValue(const char *variable);
 	private:
 
 		const char	*connectionid;
 		const char	*string;
 		uint32_t	metric;
+		bool		behindloadbalancer;
 
 		// connect string parameters
 		parameterstring	connectstring;

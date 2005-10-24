@@ -48,6 +48,9 @@
 	added -pthread when compiling as well as linking
 	sqlr-start links against -lm now
 	uses file::generateKey() rather than ftok now, uses project 1, not 0
+	added loadbalanced as a connection parameter, with default of false,
+		if the db is load balanced, then if one connection determines
+		that it has gone down, only that connection will re-login
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

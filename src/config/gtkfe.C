@@ -74,6 +74,10 @@ GtkWidget	*gtkfe::handofflabel;
 GtkWidget	*gtkfe::deniedipslabel;
 GtkWidget	*gtkfe::allowedipslabel;
 GtkWidget	*gtkfe::debuglabel;
+GtkWidget	*gtkfe::maxquerysizelabel;
+GtkWidget	*gtkfe::maxstringbindvaluelengthlabel;
+GtkWidget	*gtkfe::maxlobbindvaluelengthlabel;
+GtkWidget	*gtkfe::idleclienttimeoutlabel;
 
 GtkWidget	*gtkfe::identry;
 GtkWidget	*gtkfe::portentry;
@@ -101,6 +105,10 @@ GtkWidget	*gtkfe::deniedipsentry;
 GtkWidget	*gtkfe::allowedipsentry;
 GtkWidget	*gtkfe::debugcombo;
 GList		*gtkfe::debuglist;
+GtkWidget	*gtkfe::maxquerysizeentry;
+GtkWidget	*gtkfe::maxstringbindvaluelengthentry;
+GtkWidget	*gtkfe::maxlobbindvaluelengthentry;
+GtkWidget	*gtkfe::idleclienttimeoutentry;
 
 GtkWidget	*gtkfe::userstab;
 GtkWidget	*gtkfe::usersframe;
@@ -134,9 +142,12 @@ GtkWidget	*gtkfe::connectionstable;
 GtkWidget	*gtkfe::connectionidlabel;
 GtkWidget	*gtkfe::stringlabel;
 GtkWidget	*gtkfe::metriclabel;
+GtkWidget	*gtkfe::behindloadbalancerlabel;
 GtkWidget	*gtkfe::connectionidentry;
 GtkWidget	*gtkfe::stringentry;
 GtkWidget	*gtkfe::metricentry;
+GtkWidget	*gtkfe::behindloadbalancercombo;
+GList		*gtkfe::behindloadbalancerlist;
 
 GtkWidget	*gtkfe::connectionbuttonhbox;
 GtkWidget	*gtkfe::saveconnectionbutton;
@@ -383,7 +394,7 @@ void gtkfe::buildInstancePage() {
 	gtk_widget_show(propertiesvbox);
 
 	// properties table
-	propertiestable=gtk_table_new(3,19,FALSE);
+	propertiestable=gtk_table_new(3,23,FALSE);
 	gtk_table_set_row_spacings(GTK_TABLE(propertiestable),1);
 	gtk_table_set_col_spacings(GTK_TABLE(propertiestable),4);
 	gtk_box_pack_start(GTK_BOX(propertiesvbox),
@@ -516,6 +527,37 @@ void gtkfe::buildInstancePage() {
 	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
 					debuglabel,
 					0,1,18,19);
+
+	maxquerysizelabel=gtk_label_new("Maximum Query Size");
+	gtk_misc_set_alignment(GTK_MISC(maxquerysizelabel),1.0,0.5);
+	gtk_widget_show(maxquerysizelabel);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					maxquerysizelabel,
+					0,1,19,20);
+
+	maxstringbindvaluelengthlabel=
+			gtk_label_new("Maximum String Bind Value Length");
+	gtk_misc_set_alignment(GTK_MISC(maxstringbindvaluelengthlabel),1.0,0.5);
+	gtk_widget_show(maxstringbindvaluelengthlabel);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					maxstringbindvaluelengthlabel,
+					0,1,20,21);
+
+	maxlobbindvaluelengthlabel=
+			gtk_label_new("Maximum LOB Bind Value Length");
+	gtk_misc_set_alignment(GTK_MISC(maxlobbindvaluelengthlabel),1.0,0.5);
+	gtk_widget_show(maxlobbindvaluelengthlabel);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					maxlobbindvaluelengthlabel,
+					0,1,21,22);
+
+	idleclienttimeoutlabel=
+			gtk_label_new("Idle Client Timeout");
+	gtk_misc_set_alignment(GTK_MISC(idleclienttimeoutlabel),1.0,0.5);
+	gtk_widget_show(idleclienttimeoutlabel);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					idleclienttimeoutlabel,
+					0,1,22,23);
 
 
 	// properties property inputs
@@ -673,6 +715,30 @@ void gtkfe::buildInstancePage() {
 	gtk_table_attach_defaults(GTK_TABLE(propertiestable),debugcombo,
 					1,3,18,19);
 
+	maxquerysizeentry=gtk_entry_new_with_max_length(10);
+	gtk_widget_show(maxquerysizeentry);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					maxquerysizeentry,
+					1,3,19,20);
+
+	maxstringbindvaluelengthentry=gtk_entry_new_with_max_length(10);
+	gtk_widget_show(maxstringbindvaluelengthentry);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					maxstringbindvaluelengthentry,
+					1,3,20,21);
+
+	maxlobbindvaluelengthentry=gtk_entry_new_with_max_length(10);
+	gtk_widget_show(maxlobbindvaluelengthentry);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					maxlobbindvaluelengthentry,
+					1,3,21,22);
+
+	idleclienttimeoutentry=gtk_entry_new_with_max_length(10);
+	gtk_widget_show(idleclienttimeoutentry);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					idleclienttimeoutentry,
+					1,3,22,23);
+
 	// properties notebook page
 	gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
 					propertiesframe,propertiestab);
@@ -751,7 +817,7 @@ void gtkfe::buildConnectionsPage() {
 	gtk_widget_show(connectionsvbox);
 
 	// connections table
-	connectionstable=gtk_table_new(2,4,FALSE);
+	connectionstable=gtk_table_new(2,5,FALSE);
 	gtk_table_set_row_spacings(GTK_TABLE(connectionstable),1);
 	gtk_table_set_col_spacings(GTK_TABLE(connectionstable),4);
 	gtk_widget_show(connectionstable);
@@ -777,6 +843,13 @@ void gtkfe::buildConnectionsPage() {
 	gtk_table_attach_defaults(GTK_TABLE(connectionstable),metriclabel,
 					0,1,2,3);
 
+	behindloadbalancerlabel=gtk_label_new("Behind Load Balancer");
+	gtk_misc_set_alignment(GTK_MISC(behindloadbalancerlabel),1.0,0.5);
+	gtk_widget_show(behindloadbalancerlabel);
+	gtk_table_attach_defaults(GTK_TABLE(connectionstable),
+					behindloadbalancerlabel,
+					0,1,3,4);
+
 	// connections entries
 	connectionidentry=gtk_entry_new();
 	gtk_widget_show(connectionidentry);
@@ -793,10 +866,27 @@ void gtkfe::buildConnectionsPage() {
 	gtk_table_attach_defaults(GTK_TABLE(connectionstable),metricentry,
 					1,2,2,3);
 
+	behindloadbalancercombo=gtk_combo_new();
+	gtk_entry_set_editable(GTK_ENTRY(
+			GTK_COMBO(behindloadbalancercombo)->entry),FALSE);
+	behindloadbalancerlist=(GList *)NULL;
+	behindloadbalancerlist=g_list_append(behindloadbalancerlist,
+						(void *)"yes");
+	behindloadbalancerlist=g_list_append(behindloadbalancerlist,
+						(void *)"no");
+	gtk_combo_set_popdown_strings(
+		GTK_COMBO(behindloadbalancercombo),behindloadbalancerlist);
+	gtk_entry_set_text(
+		GTK_ENTRY(GTK_COMBO(behindloadbalancercombo)->entry),"");
+	gtk_widget_show(behindloadbalancercombo);
+	gtk_table_attach_defaults(
+		GTK_TABLE(connectionstable),behindloadbalancercombo,
+					1,2,3,4);
+
 	// connection button hbox
 	connectionbuttonhbox=gtk_hbox_new(FALSE,0);
 	gtk_table_attach(GTK_TABLE(connectionstable),connectionbuttonhbox,
-					1,2,3,4,
+					1,2,4,5,
 					(GtkAttachOptions)(GTK_FILL|GTK_EXPAND),
 					(GtkAttachOptions)(GTK_FILL|GTK_EXPAND),
 					0,10);
@@ -1021,6 +1111,14 @@ void gtkfe::populateInstanceParameters(instance *inst) {
 	gtk_entry_set_text(GTK_ENTRY(allowedipsentry),inst->getAllowedIps());
 	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(debugcombo)->entry),
 				inst->getDebug());
+	gtk_entry_set_text(GTK_ENTRY(maxquerysizeentry),
+				inst->getMaxQuerySize());
+	gtk_entry_set_text(GTK_ENTRY(maxstringbindvaluelengthentry),
+				inst->getMaxStringBindValueLength());
+	gtk_entry_set_text(GTK_ENTRY(maxlobbindvaluelengthentry),
+				inst->getMaxLobBindValueLength());
+	gtk_entry_set_text(GTK_ENTRY(idleclienttimeoutentry),
+				inst->getIdleClientTimeout());
 }
 
 void gtkfe::clearInstanceParameters() {
@@ -1045,6 +1143,10 @@ void gtkfe::clearInstanceParameters() {
 	gtk_entry_set_text(GTK_ENTRY(deniedipsentry),"");
 	gtk_entry_set_text(GTK_ENTRY(allowedipsentry),"");
 	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(debugcombo)->entry),"");
+	gtk_entry_set_text(GTK_ENTRY(maxquerysizeentry),"");
+	gtk_entry_set_text(GTK_ENTRY(maxstringbindvaluelengthentry),"");
+	gtk_entry_set_text(GTK_ENTRY(maxlobbindvaluelengthentry),"");
+	gtk_entry_set_text(GTK_ENTRY(idleclienttimeoutentry),"");
 }
 
 void gtkfe::defaultInstanceParameters() {
@@ -1076,6 +1178,13 @@ void gtkfe::defaultInstanceParameters() {
 	gtk_entry_set_text(GTK_ENTRY(allowedipsentry),DEFAULT_ALLOWEDIPS);
 	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(debugcombo)->entry),
 							DEFAULT_DEBUG);
+	gtk_entry_set_text(GTK_ENTRY(maxquerysizeentry),DEFAULT_MAXQUERYSIZE);
+	gtk_entry_set_text(GTK_ENTRY(maxstringbindvaluelengthentry),
+					DEFAULT_MAXSTRINGBINDVALUELENGTH);
+	gtk_entry_set_text(GTK_ENTRY(maxlobbindvaluelengthentry),
+					DEFAULT_MAXLOBBINDVALUELENGTH);
+	gtk_entry_set_text(GTK_ENTRY(idleclienttimeoutentry),
+					DEFAULT_IDLECLIENTTIMEOUT);
 }
 
 void gtkfe::populateUserList(instance *inst) {
@@ -1147,6 +1256,8 @@ void gtkfe::populateConnectionParameters(connection *conn) {
 						conn->getConnectionId());
 	gtk_entry_set_text(GTK_ENTRY(stringentry),conn->getString());
 	gtk_entry_set_text(GTK_ENTRY(metricentry),conn->getMetric());
+	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(behindloadbalancercombo)->entry),
+						conn->getMetric());
 }
 
 void gtkfe::clearConnectionParameters() {
@@ -1155,6 +1266,8 @@ void gtkfe::clearConnectionParameters() {
 	gtk_entry_set_text(GTK_ENTRY(connectionidentry),"");
 	gtk_entry_set_text(GTK_ENTRY(stringentry),"");
 	gtk_entry_set_text(GTK_ENTRY(metricentry),"");
+	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(behindloadbalancercombo)->entry),
+						"");
 }
 
 void gtkfe::defaultConnectionParameters() {
@@ -1163,6 +1276,8 @@ void gtkfe::defaultConnectionParameters() {
 	gtk_entry_set_text(GTK_ENTRY(connectionidentry),"");
 	gtk_entry_set_text(GTK_ENTRY(stringentry),"");
 	gtk_entry_set_text(GTK_ENTRY(metricentry),DEFAULT_METRIC);
+	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(behindloadbalancercombo)->entry),
+						DEFAULT_BEHINDLOADBALANCER);
 }
 
 void gtkfe::newFile(GtkWidget *widget, gpointer data) {
@@ -1501,6 +1616,16 @@ void gtkfe::instanceParametersSave(GtkWidget *widget, gpointer data) {
 	currentinstance->setDebug(
 			gtk_entry_get_text(
 			GTK_ENTRY(GTK_COMBO(debugcombo)->entry)));
+	currentinstance->setMaxQuerySize(
+			gtk_entry_get_text(GTK_ENTRY(maxquerysizeentry)));
+	currentinstance->setMaxStringBindValueLength(
+			gtk_entry_get_text(GTK_ENTRY(
+					maxstringbindvaluelengthentry)));
+	currentinstance->setMaxLobBindValueLength(
+			gtk_entry_get_text(GTK_ENTRY(
+					maxlobbindvaluelengthentry)));
+	currentinstance->setIdleClientTimeout(
+			gtk_entry_get_text(GTK_ENTRY(idleclienttimeoutentry)));
 
 	// rebuild the instance list in case we were adding a new instance or
 	// changing the id of an old one
@@ -1579,6 +1704,9 @@ void gtkfe::connectionParametersSave(GtkWidget *widget, gpointer data) {
 			gtk_entry_get_text(GTK_ENTRY(stringentry)));
 	currentconnection->setMetric(
 			gtk_entry_get_text(GTK_ENTRY(metricentry)));
+	currentconnection->setBehindLoadBalancer(
+			gtk_entry_get_text(GTK_ENTRY(
+				GTK_COMBO(behindloadbalancercombo)->entry)));
 
 	// rebuild the connection list in case we were adding a new 
 	// connection or changing the id of an old one
@@ -1751,7 +1879,11 @@ void gtkfe::newInstance(GtkWidget *widget, gpointer data) {
 					DEFAULT_HANDOFF,
 					DEFAULT_DENIEDIPS,
 					DEFAULT_ALLOWEDIPS,
-					DEFAULT_DEBUG);
+					DEFAULT_DEBUG,
+					DEFAULT_MAXQUERYSIZE,
+					DEFAULT_MAXSTRINGBINDVALUELENGTH,
+					DEFAULT_MAXLOBBINDVALUELENGTH,
+					DEFAULT_IDLECLIENTTIMEOUT);
 
 	defaultInstanceParameters();
 
@@ -1791,7 +1923,9 @@ void gtkfe::newConnection(GtkWidget *widget, gpointer data) {
 	currentconnectionindex=-1;
 
 	// create a blank connection
-	currentconnection=currentinstance->addConnection("","",DEFAULT_METRIC);
+	currentconnection=currentinstance->addConnection("","",
+						DEFAULT_METRIC,
+						DEFAULT_BEHINDLOADBALANCER);
 
 	defaultConnectionParameters();
 

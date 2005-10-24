@@ -36,9 +36,12 @@ class connection {
 		const char	*getConnectionId();
 		const char	*getString();
 		const char	*getMetric();
+		const char	*getBehindLoadBalancer();
 		void		setConnectionId(const char *connectionid);
 		void		setString(const char *string);
 		void		setMetric(const char *metric);
+		void		setBehindLoadBalancer(
+						const char *behindloadbalancer);
 		connection	*nextConnection();
 	private:
 		xmldomnode	*connectionnode;
@@ -71,6 +74,10 @@ class instance {
 		const char	*getDeniedIps();
 		const char	*getAllowedIps();
 		const char	*getDebug();
+		const char	*getMaxQuerySize();
+		const char	*getMaxStringBindValueLength();
+		const char	*getMaxLobBindValueLength();
+		const char	*getIdleClientTimeout();
 		void	setId(const char *id);
 		void	setPort(const char *port);
 		void	setUnixPort(const char *unixport);
@@ -90,13 +97,20 @@ class instance {
 		void	setDeniedIps(const char *deniedips);
 		void	setAllowedIps(const char *allowedips);
 		void	setDebug(const char *debug);
+		void	setMaxQuerySize(const char *maxquerysize);
+		void	setMaxStringBindValueLength(
+					const char *maxstringbindvaluelength);
+		void	setMaxLobBindValueLength(
+					const char *maxlobbindvaluelength);
+		void	setIdleClientTimeout(const char *idleclienttimeout);
 		user	*addUser(const char *usr, const char *password);
 		void	deleteUser(user *usr);
 		user	*findUser(const char *userid);
 		user	*firstUser();
 		connection	*addConnection(const char *connectionid, 
 					const char *string, 
-					const char *metric);
+					const char *metric,
+					const char *behindloadbalancer);
 		void	deleteConnection(connection *conn);
 		connection	*findConnection(const char *conn);
 		connection	*firstConnection();
@@ -143,7 +157,11 @@ class configfile {
 					const char *handoff,
 					const char *deniedips,
 					const char *allowedips,
-					const char *debug);
+					const char *debug,
+					const char *maxquerysize,
+					const char *maxstringbindvaluelength,
+					const char *maxlobbindvaluelength,
+					const char *idleclienttimeout);
 		void		deleteInstance(instance *inst);
 		instance	*findInstance(const char *id);
 		instance	*firstInstance();

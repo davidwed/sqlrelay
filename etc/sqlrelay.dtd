@@ -34,3 +34,4 @@
 	<!ATTLIST connection connectionid CDATA "defaultid">
 	<!ATTLIST connection string CDATA "user=scott;password=tiger">
 	<!ATTLIST connection metric CDATA "1">
+	<!ATTLIST connection behindloadbalancer (yes|no) "no">

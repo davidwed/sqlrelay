@@ -41,7 +41,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	maxquerysize=MAXQUERYSIZE;
 	maxstringbindvaluelength=MAXSTRINGBINDVALUELENGTH;
 	maxlobbindvaluelength=MAXLOBBINDVALUELENGTH;
-	idleclienttimeout=DEFAULT_IDLECLIENTTIMEOUT;
+	idleclienttimeout=charstring::toInteger(DEFAULT_IDLECLIENTTIMEOUT);
 	currentuser=NULL;
 	firstconnect=NULL;
 	currentconnect=NULL;
@@ -337,6 +337,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=STRING_ATTRIBUTE;
 	} else if (!charstring::compare(name,"metric")) {
 		currentattribute=METRIC_ATTRIBUTE;
+	} else if (!charstring::compare(name,"behindloadbalancer")) {
+		currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
 	} else {
 		currentattribute=(attribute)0;
 	}
@@ -449,9 +451,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				(value)?charstring::toUnsignedInteger(value):
 						MAXLOBBINDVALUELENGTH;
 		} else if (currentattribute==IDLECLIENTTIMEOUT_ATTRIBUTE) {
-			idleclienttimeout=
-				(value)?charstring::toInteger(value):
-						DEFAULT_IDLECLIENTTIMEOUT;
+			idleclienttimeout=charstring::toInteger((value)?value:
+						DEFAULT_IDLECLIENTTIMEOUT);
 		} else if (currentattribute==USER_ATTRIBUTE) {
 			currentuser->setUser((value)?value:DEFAULT_USER);
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {
@@ -471,6 +472,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==METRIC_ATTRIBUTE) {
 			currentconnect->setMetric(
 					atouint32_t(value,DEFAULT_METRIC,1));
+		} else if (currentattribute==BEHINDLOADBALANCER_ATTRIBUTE) {
+			currentconnect->setBehindLoadBalancer(
+				!charstring::compareIgnoringCase(value,"yes"));
 		}
 	}
 	return true;
@@ -581,6 +585,8 @@ connectstringcontainer::connectstringcontainer(uint16_t connectstringcount) {
 	connectionid=NULL;
 	string=NULL;
 	metric=charstring::toInteger(DEFAULT_METRIC);
+	behindloadbalancer=!charstring::compareIgnoringCase(
+					DEFAULT_BEHINDLOADBALANCER,"yes");
 }
 
 connectstringcontainer::~connectstringcontainer() {
@@ -604,6 +610,10 @@ void connectstringcontainer::setMetric(uint32_t metric) {
 	this->metric=metric;
 }
 
+void connectstringcontainer::setBehindLoadBalancer(bool behindloadbalancer) {
+	this->behindloadbalancer=behindloadbalancer;
+}
+
 const char *connectstringcontainer::getConnectionId() {
 	return connectionid;
 }
@@ -614,6 +624,10 @@ const char *connectstringcontainer::getString() {
 
 uint32_t connectstringcontainer::getMetric() {
 	return metric;
+}
+
+bool connectstringcontainer::getBehindLoadBalancer() {
+	return behindloadbalancer;
 }
 
 void connectstringcontainer::parseConnectString() {

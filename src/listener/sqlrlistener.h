@@ -131,6 +131,7 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 
 		cmdline			*cmdl;
 
+		uint32_t		maxquerysize;
 		int32_t			idleclienttimeout;
 };
 

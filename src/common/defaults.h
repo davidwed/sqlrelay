@@ -60,6 +60,18 @@
 #define DEFAULT_DEBUG "none"
 	// default tiers to debug on
 
+#define DEFAULT_MAXQUERYSIZE "65536"
+	// default max query size
+
+#define DEFAULT_MAXSTRINGBINDVALUELENGTH "32768"
+	// default max string bind value length
+
+#define DEFAULT_MAXLOBBINDVALUELENGTH "71680"
+	// default lob bind value length
+
+#define DEFAULT_IDLECLIENTTIMEOUT "-1"
+	// default idle client timeout
+
 #define DEFAULT_USER "user"
 	// default user name for authentication
 
@@ -75,7 +87,8 @@
 #define DEFAULT_METRIC "1"
 	// default metric
 
-#define DEFAULT_IDLECLIENTTIMEOUT -1
+#define DEFAULT_BEHINDLOADBALANCER "no"
+	// default behind-load-balancer flag
 
 
 

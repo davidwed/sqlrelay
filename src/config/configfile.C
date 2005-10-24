@@ -164,7 +164,11 @@ instance *configfile::addInstance(const char *id,
 				const char *handoff,
 				const char *deniedips,
 				const char *allowedips,
-				const char *debug) {
+				const char *debug,
+				const char *maxquerysize,
+				const char *maxstringbindvaluelength,
+				const char *maxlobbindvaluelength,
+				const char *idleclienttimeout) {
 
 	xmldomnode	*newchild=new xmldomnode(root->getNullNode(),
 							TAG_XMLDOMNODETYPE,
@@ -208,6 +212,17 @@ instance *configfile::addInstance(const char *id,
 	newchild->insertAttribute("allowedips",allowedips,
 					newchild->getAttributeCount());
 	newchild->insertAttribute("debug",debug,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("maxquerysize",maxquerysize,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("maxstringbindvaluelength",
+					maxstringbindvaluelength,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("maxlobbindvaluelength",
+					maxlobbindvaluelength,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("idleclienttimeout",
+					idleclienttimeout,
 					newchild->getAttributeCount());
 
 	xmldomnode	*newusers=new xmldomnode(root->getNullNode(),
@@ -536,6 +551,41 @@ const char	*instance::getDebug() {
 	return DEFAULT_DEBUG;
 }
 
+const char	*instance::getMaxQuerySize() {
+	const char	*retval=instancenode->getAttributeValue("maxquerysize");
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_MAXQUERYSIZE;
+}
+
+const char	*instance::getMaxStringBindValueLength() {
+	const char	*retval=instancenode->
+				getAttributeValue("maxstringbindvaluelength");
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_MAXSTRINGBINDVALUELENGTH;
+}
+
+const char	*instance::getMaxLobBindValueLength() {
+	const char	*retval=instancenode->
+				getAttributeValue("maxlobbindvaluelength");
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_MAXLOBBINDVALUELENGTH;
+}
+
+const char	*instance::getIdleClientTimeout() {
+	const char	*retval=instancenode->
+				getAttributeValue("idleclienttimeout");
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_IDLECLIENTTIMEOUT;
+}
+
 void	instance::setId(const char *id) {
 	instancenode->getAttribute("id")->setValue(id);
 }
@@ -611,6 +661,27 @@ void	instance::setAllowedIps(const char *allowedips) {
 
 void	instance::setDebug(const char *debug) {
 	instancenode->getAttribute("debug")->setValue(debug);
+}
+
+void	instance::setMaxQuerySize(const char *maxquerysize) {
+	instancenode->getAttribute("maxquerysize")->setValue(maxquerysize);
+}
+
+void	instance::setMaxStringBindValueLength(
+				const char *maxstringbindvaluelength) {
+	instancenode->getAttribute("maxstringbindvaluelength")->
+					setValue(maxstringbindvaluelength);
+}
+
+void	instance::setMaxLobBindValueLength(
+				const char *maxlobbindvaluelength) {
+	instancenode->getAttribute("maxlobbindvaluelength")->
+					setValue(maxlobbindvaluelength);
+}
+
+void	instance::setIdleClientTimeout(const char *idleclienttimeout) {
+	instancenode->getAttribute("idleclienttimeout")->
+					setValue(idleclienttimeout);
 }
 
 user	*instance::addUser(const char *usr, const char *password) {
@@ -735,7 +806,8 @@ user	*user::nextUser() {
 
 connection	*instance::addConnection(const char *connectionid,
 				const char *string, 
-				const char *metric) {
+				const char *metric,
+				const char *behindloadbalancer) {
 
 	xmldomnode	*newchild=new xmldomnode(connections->getNullNode(),
 					TAG_XMLDOMNODETYPE,
@@ -746,6 +818,8 @@ connection	*instance::addConnection(const char *connectionid,
 	newchild->insertAttribute("string",string,
 				newchild->getAttributeCount());
 	newchild->insertAttribute("metric",metric,
+				newchild->getAttributeCount());
+	newchild->insertAttribute("behindloadbalancer",behindloadbalancer,
 				newchild->getAttributeCount());
 
 	if (!connections->getChildCount()) {
@@ -859,6 +933,15 @@ const char	*connection::getMetric() {
 	return DEFAULT_METRIC;
 }
 
+const char	*connection::getBehindLoadBalancer() {
+	const char	*retval=connectionnode->
+				getAttributeValue("behindloadbalancer");
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_BEHINDLOADBALANCER;
+}
+
 void	connection::setConnectionId(const char *connectionid) {
 	connectionnode->getAttribute("connectionid")->setValue(connectionid);
 }
@@ -869,6 +952,11 @@ void	connection::setString(const char *string) {
 
 void	connection::setMetric(const char *metric) {
 	connectionnode->getAttribute("metric")->setValue(metric);
+}
+
+void	connection::setBehindLoadBalancer(const char *behindloadbalancer) {
+	connectionnode->getAttribute("behindloadbalancer")->
+					setValue(behindloadbalancer);
 }
 
 connection	*connection::nextConnection() {
