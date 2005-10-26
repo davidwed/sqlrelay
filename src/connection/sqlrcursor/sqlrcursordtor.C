@@ -3,4 +3,6 @@
 
 #include <sqlrconnection.h>
 
-sqlrcursor::~sqlrcursor() {}
+sqlrcursor::~sqlrcursor() {
+	delete[] querybuffer;
+}

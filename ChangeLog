@@ -51,6 +51,9 @@
 	added loadbalanced as a connection parameter, with default of false,
 		if the db is load balanced, then if one connection determines
 		that it has gone down, only that connection will re-login
+	added /usr/local/lib to list of base dirs to find zope in, for
+		OpenBSD 3.7
+	fixed a bug where bind cursors weren't getting cleaned up
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

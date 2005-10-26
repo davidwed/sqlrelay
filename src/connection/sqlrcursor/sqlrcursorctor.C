@@ -11,4 +11,6 @@ sqlrcursor::sqlrcursor(sqlrconnection *conn) {
 	busy=false;
 
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");
+
+	querybuffer=NULL;
 }

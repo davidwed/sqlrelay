@@ -199,7 +199,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 
 		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
 					newquery->getString(),
-					strlen(newquery->getString())))) {
+					newquery->getStringLength()))) {
 			delete newquery;
 			return false;
 		}

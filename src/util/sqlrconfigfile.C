@@ -38,9 +38,11 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	debug=charstring::duplicate(DEFAULT_DEBUG);
 	debuglistener=charstring::contains(debug,"listener");
 	debugconnection=charstring::contains(debug,"connection");
-	maxquerysize=MAXQUERYSIZE;
-	maxstringbindvaluelength=MAXSTRINGBINDVALUELENGTH;
-	maxlobbindvaluelength=MAXLOBBINDVALUELENGTH;
+	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
+	maxstringbindvaluelength=charstring::toInteger(
+					DEFAULT_MAXSTRINGBINDVALUELENGTH);
+	maxlobbindvaluelength=charstring::toInteger(
+					DEFAULT_MAXLOBBINDVALUELENGTH);
 	idleclienttimeout=charstring::toInteger(DEFAULT_IDLECLIENTTIMEOUT);
 	currentuser=NULL;
 	firstconnect=NULL;
@@ -439,17 +441,17 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			debugconnection=charstring::contains(debug,
 							"connection");
 		} else if (currentattribute==MAXQUERYSIZE_ATTRIBUTE) {
-			maxquerysize=(value)?charstring::toInteger(value):
-								MAXQUERYSIZE;
+			maxquerysize=charstring::toInteger((value)?value:
+							DEFAULT_MAXQUERYSIZE);
 		} else if (currentattribute==
 				MAXSTRINGBINDVALUELENGTH_ATTRIBUTE) {
 			maxstringbindvaluelength=
-				(value)?charstring::toUnsignedInteger(value):
-						MAXSTRINGBINDVALUELENGTH;
+				charstring::toUnsignedInteger((value)?value:
+					DEFAULT_MAXSTRINGBINDVALUELENGTH);
 		} else if (currentattribute==MAXLOBBINDVALUELENGTH_ATTRIBUTE) {
 			maxlobbindvaluelength=
-				(value)?charstring::toUnsignedInteger(value):
-						MAXLOBBINDVALUELENGTH;
+				charstring::toUnsignedInteger((value)?value:
+						DEFAULT_MAXLOBBINDVALUELENGTH);
 		} else if (currentattribute==IDLECLIENTTIMEOUT_ATTRIBUTE) {
 			idleclienttimeout=charstring::toInteger((value)?value:
 						DEFAULT_IDLECLIENTTIMEOUT);

@@ -107,6 +107,7 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 				// FIXME: set error here
 				return false;
 			}
+			curs->busy=true;
 			bv->value.cursorid=curs->id;
 		}
 	}

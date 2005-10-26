@@ -5,43 +5,12 @@ Tru64 -
 	unix sockets don't work, looks like a byte-order translation issue
 	can't start more than 1 cursor, looks like out-of-memory
 
-tuning docs -
-	specs for the machine - cpu/memory/network...
-
-in oracle proxy document - how does it look to the database...
-	can you tell which users ran which queries
-	load per schema, etc.
-
-	may have to run:
-		alter user <user_name> quota unlimited on <tablespace_name>
-	after creating user
-
-	turn on auditing
-	* if have $ORACLE_HOME/dbs/init$ORACLE_SID.ora
-		* add audit_trail = db
-		(maybe just 'true' in older versions of oracle)
-	* if have $ORACLE_HOME/dbs/spfile$ORACLE_SID.ora
-		* log in as sys, or in 9i/10g, log in to sys as
-			"sqlplus sys/'pass' as sysdba"
-		* run ALTER SYSTEM SET audit_trail=db SCOPE=spfile
-		* restart the database
-	check to see if it's on by running
-		select name,value from v$parameter where name='audit_trail'
-		value should = db
-
-	may have to run $ORACLE_HOME/rdbms/audit/cataudit.sql here
-
-	auditing:
-	* audit select table;
-	* select * from dba_audit_trail
-
-figure out how to implement cleanup functions in php 4.0
-
-bind cursors aren't getting cleaned up properly
-
 reuseAddress() isn't working
 
 create a jar file
+	test fastjar
+	install jar file
+	add jar file to spec file
 
 freetds test fails
 	* if insert/update/delete is run, then a select is run,
@@ -65,8 +34,6 @@ maciej's stuff:
 	looks like in: select func(...) from dual, if func()
 		generates an error, sqlrelay doesn't report it
 	although it works for me...
-
-configure script doesn't find zope on openbsd
 
 perl apis -> CPAN
 

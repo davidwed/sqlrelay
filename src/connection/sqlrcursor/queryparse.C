@@ -14,9 +14,9 @@ bool sqlrcursor::queryIsNotSelect() {
 	// otherwise return true
 	if (!charstring::compareIgnoringCase(ptr,"select",6) && 
 		charstring::compareIgnoringCase(ptr,"select into ",12)) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 bool sqlrcursor::queryIsCommitOrRollback() {

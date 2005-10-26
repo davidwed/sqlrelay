@@ -2199,7 +2199,7 @@ then
 		
 				if ( test -z "$ZOPEDIR" )
 				then
-					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/usr/lib" "/opt" "/sw"
+					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib" "/usr" "/usr/lib" "/opt" "/sw"
 					do
 						for j in "zope" "Zope"
 						do
@@ -2368,6 +2368,8 @@ then
 		then
 			FW_CHECK_FILE("$JAVAPATH/bin/javac$EXE",[JAVAC=\"$JAVAPATH/bin/javac$EXE\"])
 			FW_CHECK_FILE("$JAVAPATH/Commands/javac$EXE",[JAVAC=\"$JAVAPATH/Commands/javac$EXE\"])
+			FW_CHECK_FILE("$JAVAPATH/bin/jar$EXE",[JAR=\"$JAVAPATH/bin/jar$EXE\"])
+			FW_CHECK_FILE("$JAVAPATH/Commands/jar$EXE",[JAR=\"$JAVAPATH/Commands/jar$EXE\"])
 			FW_CHECK_FILE("$JAVAPATH/include/jni.h",[JAVAINCLUDES=\"-I$JAVAPATH/include\"])
 			FW_CHECK_FILE("$JAVAPATH/Headers/jni.h",[JAVAINCLUDES=\"-I$JAVAPATH/Headers\"])
 			if ( test -n "$JAVAINCLUDES" )
@@ -2397,6 +2399,11 @@ then
 				JAVAINCLUDES=""
 				HAVE_JAVA="yes"
 			fi
+			AC_CHECK_PROG(FASTJAR,"fastjar","fastjar")
+			if ( test -n "$FASTJAR" )
+			then
+				JAR="$FASTJAR"
+			fi
 		fi
 		
 		if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES" )
@@ -2414,6 +2421,7 @@ then
 		
 	AC_SUBST(HAVE_JAVA)
 	AC_SUBST(JAVAC)
+	AC_SUBST(JAR)
 	AC_SUBST(JAVAINCLUDES)
 fi
 ])

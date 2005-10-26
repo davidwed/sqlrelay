@@ -396,6 +396,9 @@ bool sqlrconnection::initCursors(bool create) {
 
 		if (create) {
 			cur[i]=initCursor();
+			// FIXME: LAME!!!  oh god this is lame....
+			cur[i]->querybuffer=new char[
+						cfgfl->getMaxQuerySize()+1];
 		}
 		if (!cur[i]->openCursor(i)) {
 

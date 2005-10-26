@@ -177,11 +177,11 @@ bool sqlrcursor::executeQuery() {
 void sqlrcursor::validateBindsInternal(const char *query) {
 
 	// some useful variables
-	char	*ptr;
-	char	*start;
-	char	*after;
-	bool	found;
-	int	len;
+	const char	*ptr;
+	const char	*start;
+	const char	*after;
+	bool		found;
+	int		len;
 	uint16_t	count;
 
 	// check each input bind
@@ -195,7 +195,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 		}
 
 		found=false;
-		start=((char *)query)+1;
+		start=query+1;
 
 		// there may be more than 1 match for the variable name as in
 		// "select * from table where table_name=:table_name", both
@@ -205,8 +205,8 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 					inbindvars[i].variable))) {
 
 			// for a match to be a bind variable, it must be 
-			// preceded by a colon and can't be followed by an
-			// alphabet character, number or underscore
+			// preceded by a colon or at-sign and can't be followed
+			// by an alphabet character, number or underscore
 			after=ptr+len;
 			if ((*(ptr-1)==':' || *(ptr-1)=='@') && *after!='_' &&
 				!(*(after)>='a' && *(after)<='z') &&
@@ -238,7 +238,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 		}
 
 		found=false;
-		start=((char *)query)+1;
+		start=query+1;
 
 		// there may be more than 1 match for the variable name as in
 		// "select * from table where table_name=:table_name", both

@@ -775,6 +775,17 @@ if it's not compiled against Oracle 7.</p>
 <span class="heading3">My PHP application uses up all of the SQL Relay
 connections, and I keep having to restart SQL Relay.  What gives?</span>
 
+<p>Prior to version 0.36, PHP scripts needed to set up a shutdown handler to
+clean up connections and cursors and call register_shutdown_function() or
+call ignore_user_abort().  Otherwise, if someone hit stop in their browser, the
+page would stop executing immediately and wouldn't close it's connections to the
+SQL Relay server.  In version 0.36, cleanup code was added to the PHP module,
+making it unnecessary to set up a shutdown handler.</p>
+
+<p>The cleanup code works with PHP 4.1 or greater.  If you're using PHP 4.0,
+then the old issue still exists.  Below is a description of the issue and
+how to deal with it.</p>
+
 <p>PHP pages that use SQL Relay are usually set up like this:</p>
 
 <blockquote>
@@ -893,10 +904,10 @@ sqlrcon_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><
 </pre>
 </blockquote>
 
-<p>SQL Relay version 0.36 should also feature an idle client timeout.  If a
-client remains connected to SQL Relay for a configurable amount of time but
-does nothing, then SQL Relay will close the connection to that client.  This
-should make the results less catastrophic when people forget to call
+<p>SQL Relay version 0.37 features an idle client timeout.  If a client remains
+connected to SQL Relay for a configurable amount of time but does nothing, then
+SQL Relay will close the connection to that client.  This should make the
+results less catastrophic when people forget to call
 register_shutdown_function() or ignore_user_abort() but is still less
 efficient.</p>
 

@@ -214,7 +214,7 @@ class sqlrcursor {
 		void	abort();
 		char	*skipWhitespaceAndComments(const char *querybuffer);
 
-		char		querybuffer[MAXQUERYSIZE+1];
+		char		*querybuffer;
 		uint32_t	querylength;
 
 		bool		suspendresultset;

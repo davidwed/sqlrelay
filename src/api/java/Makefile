@@ -17,7 +17,7 @@ endif
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: java libSQLRConnection.la libSQLRCursor.la
+all: java libSQLRConnection.la libSQLRCursor.la sqlrelay.jar
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -25,6 +25,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) *.so
 	$(RM) com/firstworks/sqlrelay/*.class
+	$(RM) sqlrelay.jar
 	$(RMTREE) .libs
 
 rebuild: clean all
@@ -116,6 +117,13 @@ SQLRCursor.dll:
 	if ( test -r .libs/cygSQLRCursor-0.dll ); \
 	then \
 		cp .libs/cygSQLRCursor-0.dll SQLRCursor.dll; \
+	fi
+
+sqlrelay.jar:
+	if ( test -n "$(JAR)" ); \
+	then \
+		$(JAR) -cf $@ com/firstworks/sqlrelay/SQLRConnection.class \
+				com/firstworks/sqlrelay/SQLRCursor.class; \
 	fi
 
 ifeq ($(CYGWIN),)
