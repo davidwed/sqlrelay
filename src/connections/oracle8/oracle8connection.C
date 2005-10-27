@@ -4,6 +4,7 @@
 #include <oracle8connection.h>
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
+#include <rudiments/character.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -399,10 +400,22 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	createtemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
 	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
 #endif
+
+	// FIXME: make these parameters configurable
+	def_buf=new ub1 *[MAX_SELECT_LIST_SIZE];
+	for (uint16_t i=0; i<MAX_SELECT_LIST_SIZE; i++) {
+		def_buf[i]=new ub1[FETCH_AT_ONCE*MAX_ITEM_BUFFER_SIZE];
+	}
 }
 
 oracle8cursor::~oracle8cursor() {
+
 	delete errormessage;
+
+	for (uint16_t i=0; i<MAX_SELECT_LIST_SIZE; i++) {
+		delete[] def_buf[i];
+	}
+	delete[] def_buf;
 }
 
 bool oracle8cursor::openCursor(uint16_t id) {
@@ -1307,7 +1320,8 @@ void oracle8cursor::returnRow() {
 						def_lob[col][row],
 						&retlen,
 						offset,
-						(dvoid *)&def_buf[col][row],
+						(dvoid *)&def_buf[col]
+						[row*MAX_ITEM_BUFFER_SIZE],
 						MAX_ITEM_BUFFER_SIZE,
 						(dvoid *)NULL,
 				(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
@@ -1331,8 +1345,10 @@ void oracle8cursor::returnRow() {
 						start=false;
 					}
 					conn->sendLongSegment(
-						(char *)def_buf[col][row],
-						(int32_t)retlen);
+						(const char *)
+						&def_buf[col]
+						[row*MAX_ITEM_BUFFER_SIZE],
+						(uint32_t)retlen);
 					offset=offset+retlen;
 					retlen=MAX_ITEM_BUFFER_SIZE;
 				}
@@ -1370,8 +1386,9 @@ void oracle8cursor::returnRow() {
 		}
 
 		// handle normal datatypes
-		conn->sendField((char *)def_buf[col][row],
-					(int)def_col_retlen[col][row]);
+		conn->sendField((const char *)
+					&def_buf[col][row*MAX_ITEM_BUFFER_SIZE],
+					(uint32_t)def_col_retlen[col][row]);
 	}
 
 	// increment the row counter

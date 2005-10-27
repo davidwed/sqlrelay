@@ -147,8 +147,9 @@ class oracle8cursor : public sqlrcursor {
 		describe	desc[MAX_SELECT_LIST_SIZE];
 		OCIDefine	*def[MAX_SELECT_LIST_SIZE];
 		OCILobLocator	*def_lob[MAX_SELECT_LIST_SIZE][FETCH_AT_ONCE];
-		ub1		def_buf[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE][MAX_ITEM_BUFFER_SIZE];
+		/*ub1		def_buf[MAX_SELECT_LIST_SIZE]
+					[FETCH_AT_ONCE][MAX_ITEM_BUFFER_SIZE];*/
+		ub1		**def_buf;
 		sb2		def_indp[MAX_SELECT_LIST_SIZE][FETCH_AT_ONCE];
 		ub2		def_col_retlen[MAX_SELECT_LIST_SIZE]
 						[FETCH_AT_ONCE];
