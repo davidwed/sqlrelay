@@ -6,7 +6,7 @@ PHPDIR=/var/www/html
 DB2USER=db2inst1
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@prefix@/java/com/firstworks/sqlrelay
-export CLASSPATH=$CLASSPATH:./:@prefix@/java
+export CLASSPATH=$CLASSPATH:./:@prefix@/java/sqlrelay.jar
 
 DB=$1
 API=$2

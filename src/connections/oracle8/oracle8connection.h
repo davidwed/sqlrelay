@@ -144,17 +144,13 @@ class oracle8cursor : public sqlrcursor {
 		sword		ncols;
 		stringbuffer	*errormessage;
 
-		describe	desc[MAX_SELECT_LIST_SIZE];
-		OCIDefine	*def[MAX_SELECT_LIST_SIZE];
-		OCILobLocator	*def_lob[MAX_SELECT_LIST_SIZE][FETCH_AT_ONCE];
-		/*ub1		def_buf[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE][MAX_ITEM_BUFFER_SIZE];*/
+		describe	*desc;
+		OCIDefine	**def;
+		OCILobLocator	***def_lob;
 		ub1		**def_buf;
-		sb2		def_indp[MAX_SELECT_LIST_SIZE][FETCH_AT_ONCE];
-		ub2		def_col_retlen[MAX_SELECT_LIST_SIZE]
-						[FETCH_AT_ONCE];
-		ub2		def_col_retcode[MAX_SELECT_LIST_SIZE]
-						[FETCH_AT_ONCE];
+		sb2		**def_indp;
+		ub2		**def_col_retlen;
+		ub2		**def_col_retcode;
 
 		OCIBind		*inbindpp[MAXVAR];
 		OCIBind		*outbindpp[MAXVAR];
@@ -173,8 +169,6 @@ class oracle8cursor : public sqlrcursor {
 		uint64_t	row;
 		uint64_t	maxrow;
 		uint64_t	totalrows;
-
-		ub4		fetchatonce;
 
 		char		*query;
 		uint32_t	length;
@@ -227,6 +221,10 @@ class oracle8connection : public sqlrconnection {
 
 		const char	*home;
 		const char	*sid;
+
+		ub4		fetchatonce;
+		ub4		maxselectlistsize;
+		ub4		maxitembuffersize;
 
 		environment	*environ;
 };

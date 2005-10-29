@@ -456,14 +456,17 @@ be fetched, must be allocated and used to fetch the rows.</p>
 buffer.  For Oracle 8, 8i, 9i or 10g, it's a 40mb buffer.</p>
 
 <p>If that seems like more memory than you'd like to allocate per-connection,
-then you can tune it down.  Unfortunately, for now, the tunable parameters are
-compile-time parameters.</p>
+then you can tune it down.  Unfortunately, for now, except for Oracle 8, the
+tunable parameters are compile-time parameters.</p>
 
-<p>In the following files...</p>
+<p>For Oracle 8, the fetchatonce, maxselectlistsize and maxitembuffersize
+parameters of the string attribute of the connection tag in the sqlrelay.conf
+file may be set to control these values at run time.</p>
+
+<p>For non-Oracle 8 databases, in the following files...</p>
 
 <ul>
 <li>src/connections/oracle7/oracle7connection.h</li>
-<li>src/connections/oracle8/oracle8connection.h</li>
 <li>src/connections/db2/db2connection.h</li>
 <li>src/connections/sybase/sybaseconnection.h</li>
 </ul>

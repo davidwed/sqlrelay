@@ -36,6 +36,21 @@ void oracle8connection::handleConnectString() {
 	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
+	fetchatonce=charstring::toUnsignedInteger(
+				connectStringValue("fetchatonce"));
+	if (!fetchatonce) {
+		fetchatonce=FETCH_AT_ONCE;
+	}
+	maxselectlistsize=charstring::toUnsignedInteger(
+				connectStringValue("maxselectlistsize"));
+	if (!maxselectlistsize) {
+		maxselectlistsize=MAX_SELECT_LIST_SIZE;
+	}
+	maxitembuffersize=charstring::toUnsignedInteger(
+				connectStringValue("maxitembuffersize"));
+	if (!maxitembuffersize) {
+		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+	}
 }
 
 bool oracle8connection::logIn() {
@@ -374,10 +389,10 @@ const char *oracle8connection::identify() {
 }
 
 oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
+
 	prepared=false;
 	errormessage=NULL;
 	oracle8conn=(oracle8connection *)conn;
-	fetchatonce=FETCH_AT_ONCE;
 #ifdef HAVE_ORACLE_8i
 	inbindlobcount=0;
 	outbindlobcount=0;
@@ -390,32 +405,51 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
 	}
-	for (uint16_t i=0; i<MAX_SELECT_LIST_SIZE; i++) {
-		for (uint32_t j=0; j<FETCH_AT_ONCE; j++) {
+
+	desc=new describe[oracle8conn->maxselectlistsize];
+	def=new OCIDefine *[oracle8conn->maxselectlistsize];
+	def_lob=new OCILobLocator **[oracle8conn->maxselectlistsize];
+	def_buf=new ub1 *[oracle8conn->maxselectlistsize];
+	def_indp=new sb2 *[oracle8conn->maxselectlistsize];
+	def_col_retlen=new ub2 *[oracle8conn->maxselectlistsize];
+	def_col_retcode=new ub2 *[oracle8conn->maxselectlistsize];
+	for (uint16_t i=0; i<oracle8conn->maxselectlistsize; i++) {
+		def_lob[i]=new OCILobLocator *[oracle8conn->fetchatonce];
+		for (uint32_t j=0; j<oracle8conn->fetchatonce; j++) {
 			def_lob[i][j]=NULL;
 		}
+		def_buf[i]=new ub1[oracle8conn->fetchatonce*
+					oracle8conn->maxitembuffersize];
+		def_indp[i]=new sb2[oracle8conn->fetchatonce];
+		def_col_retlen[i]=new ub2[oracle8conn->fetchatonce];
+		def_col_retcode[i]=new ub2[oracle8conn->fetchatonce];
 		def[i]=NULL;
 	}
+
 #ifdef HAVE_ORACLE_8i
 	createtemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
 	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
 #endif
-
-	// FIXME: make these parameters configurable
-	def_buf=new ub1 *[MAX_SELECT_LIST_SIZE];
-	for (uint16_t i=0; i<MAX_SELECT_LIST_SIZE; i++) {
-		def_buf[i]=new ub1[FETCH_AT_ONCE*MAX_ITEM_BUFFER_SIZE];
-	}
 }
 
 oracle8cursor::~oracle8cursor() {
 
 	delete errormessage;
 
-	for (uint16_t i=0; i<MAX_SELECT_LIST_SIZE; i++) {
+	for (uint16_t i=0; i<oracle8conn->maxselectlistsize; i++) {
+		delete[] def_col_retcode[i];
+		delete[] def_col_retlen[i];
+		delete[] def_indp[i];
+		delete[] def_lob[i];
 		delete[] def_buf[i];
 	}
+	delete[] def_col_retcode;
+	delete[] def_col_retlen;
+	delete[] def_indp;
+	delete[] def_lob;
 	delete[] def_buf;
+	delete[] def;
+	delete[] desc;
 }
 
 bool oracle8cursor::openCursor(uint16_t id) {
@@ -430,7 +464,7 @@ bool oracle8cursor::openCursor(uint16_t id) {
 
 	// set the number of rows to prefetch
 	if (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
-				(dvoid *)&fetchatonce,(ub4)0,
+				(dvoid *)&(oracle8conn->fetchatonce),(ub4)0,
 				OCI_ATTR_PREFETCH_ROWS,
 				(OCIError *)oracle8conn->err)!=OCI_SUCCESS) {
 		return false;
@@ -835,8 +869,8 @@ void oracle8cursor::returnOutputBindClob(uint16_t index) {
 void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 
 	// handle lob datatypes
-	char	buf[MAX_ITEM_BUFFER_SIZE+1];
-	ub4	retlen=MAX_ITEM_BUFFER_SIZE;
+	char	buf[oracle8conn->maxitembuffersize+1];
+	ub4	retlen=oracle8conn->maxitembuffersize;
 	ub4	offset=1;
 	bool	start=true;
 
@@ -868,7 +902,7 @@ void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 				&retlen,
 				offset,
 				(dvoid *)buf,
-				MAX_ITEM_BUFFER_SIZE,
+				oracle8conn->maxitembuffersize,
 				(dvoid *)NULL,
 				(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
 				(ub2)0,
@@ -891,7 +925,7 @@ void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 			}
 			conn->sendLongSegment((char *)buf,(int32_t)retlen);
 			offset=offset+retlen;
-			retlen=MAX_ITEM_BUFFER_SIZE;
+			retlen=oracle8conn->maxitembuffersize;
 		}
 	}
 
@@ -1062,8 +1096,15 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 				// return 0 for the size of lobs
 				desc[i].dbsize=0;
 
+				// set the NULL indicators to false
+				rawbuffer::zero(def_indp[i],
+						sizeof(sb2)*
+						oracle8conn->fetchatonce);
+
 				// allocate a lob descriptor
-				for (uint32_t j=0; j<FETCH_AT_ONCE; j++) {
+				for (uint32_t j=0;
+					j<oracle8conn->fetchatonce;
+					j++) {
 					if (OCIDescriptorAlloc(
 						(void *)oracle8conn->env,
 						(void **)&def_lob[i][j],
@@ -1104,7 +1145,7 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 					oracle8conn->err,
 					i+1,
 					(dvoid *)def_buf[i],
-					(sb4)MAX_ITEM_BUFFER_SIZE,
+					(sb4)oracle8conn->maxitembuffersize,
 					SQLT_STR,
 					(dvoid *)def_indp[i],
 					(ub2 *)def_col_retlen[i],
@@ -1114,7 +1155,9 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 				}
 
 				// set the lob member to NULL
-				for (uint32_t j=0; j<FETCH_AT_ONCE; j++) {
+				for (uint32_t j=0;
+					j<oracle8conn->fetchatonce;
+					j++) {
 					def_lob[i][j]=NULL;
 				}
 			}
@@ -1248,15 +1291,15 @@ bool oracle8cursor::skipRow() {
 }
 
 bool oracle8cursor::fetchRow() {
-	if (row==FETCH_AT_ONCE) {
+	if (row==oracle8conn->fetchatonce) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
 		return false;
 	}
 	if (!row) {
-		OCIStmtFetch(stmt,oracle8conn->err,fetchatonce,
-					OCI_FETCH_NEXT,OCI_DEFAULT);
+		OCIStmtFetch(stmt,oracle8conn->err,oracle8conn->fetchatonce,
+						OCI_FETCH_NEXT,OCI_DEFAULT);
 		ub4	currentrow;
 		OCIAttrGet(stmt,OCI_HTYPE_STMT,
 				(dvoid *)&currentrow,(ub4 *)NULL,
@@ -1287,7 +1330,7 @@ void oracle8cursor::returnRow() {
 			desc[col].dbtype==BFILE_TYPE) {
 
 			// handle lob datatypes
-			ub4	retlen=MAX_ITEM_BUFFER_SIZE;
+			ub4	retlen=oracle8conn->maxitembuffersize;
 			ub4	offset=1;
 			bool	start=true;
 
@@ -1321,8 +1364,9 @@ void oracle8cursor::returnRow() {
 						&retlen,
 						offset,
 						(dvoid *)&def_buf[col]
-						[row*MAX_ITEM_BUFFER_SIZE],
-						MAX_ITEM_BUFFER_SIZE,
+						[row*oracle8conn->
+							maxitembuffersize],
+						oracle8conn->maxitembuffersize,
 						(dvoid *)NULL,
 				(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
 						(ub2)0,
@@ -1347,10 +1391,11 @@ void oracle8cursor::returnRow() {
 					conn->sendLongSegment(
 						(const char *)
 						&def_buf[col]
-						[row*MAX_ITEM_BUFFER_SIZE],
+						[row*oracle8conn->
+							maxitembuffersize],
 						(uint32_t)retlen);
 					offset=offset+retlen;
-					retlen=MAX_ITEM_BUFFER_SIZE;
+					retlen=oracle8conn->maxitembuffersize;
 				}
 			}
 
@@ -1387,7 +1432,9 @@ void oracle8cursor::returnRow() {
 
 		// handle normal datatypes
 		conn->sendField((const char *)
-					&def_buf[col][row*MAX_ITEM_BUFFER_SIZE],
+					&def_buf[col]
+						[row*oracle8conn->
+							maxitembuffersize],
 					(uint32_t)def_col_retlen[col][row]);
 	}
 
@@ -1407,7 +1454,7 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 	// free row/column resources
 	if (freeresult) {
 		for (sword i=0; i<ncols; i++) {
-			for (uint32_t j=0; j<FETCH_AT_ONCE; j++) {
+			for (uint32_t j=0; j<oracle8conn->fetchatonce; j++) {
 				if (def_lob[i][j]) {
 					OCIDescriptorFree(def_lob[i][j],
 								OCI_DTYPE_LOB);

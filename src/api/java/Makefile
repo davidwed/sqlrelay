@@ -131,8 +131,13 @@ install: libSQLRConnection.so libSQLRCursor.so
 	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay
 	$(LTINSTALL) libSQLRConnection.so $(javadir)/com/firstworks/sqlrelay
 	$(LTINSTALL) libSQLRCursor.so $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) -m 644 com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) -m 644 com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay
+	if ( test -n "$(JAR)" ); \
+	then \
+		$(INSTALL) -m 644 sqlrelay.jar $(javadir); \
+	else \
+		$(INSTALL) -m 644 com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay; \
+		$(INSTALL) -m 644 com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay; \
+	fi
 	$(RM) libSQLRConnection.so
 	$(RM) libSQLRCursor.so
 else
@@ -140,11 +145,16 @@ install: SQLRConnection.dll SQLRCursor.dll
 	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay
 	$(LTINSTALL) SQLRConnection.dll $(javadir)/com/firstworks/sqlrelay
 	$(LTINSTALL) SQLRCursor.dll $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay
-	$(INSTALL) com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay
+	if ( test -n "$(JAR)" ); \
+		$(INSTALL) -m 644 sqlrelay.jar $(javadir); \
+	then \
+		$(INSTALL) com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay; \
+		$(INSTALL) com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay; \
+	fi
 	$(RM) SQLRConnection.dll
 	$(RM) SQLRCursor.dll
 endif
 
 uninstall:
 	$(RMTREE) $(javadir)/com/firstworks/sqlrelay
+	$(RM) $(javadir)/sqlrelay.jar

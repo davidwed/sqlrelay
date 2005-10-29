@@ -174,7 +174,7 @@ $ORACLE_HOME/network/admin/tnsnames.ora</li>
 immediately or not.  Optional, defaults to no.</li>
 </ul>
 </li>
-<li>For <b>oracle8</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;autocommit=yes/no;"
+<li>For <b>oracle8</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE"
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the
 database.  Required.</li>
@@ -187,6 +187,12 @@ Optional if the ORACLE_HOME environment variable is set.  The SID will be looked
 up in $ORACLE_HOME/network/admin/tnsnames.ora</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete
 immediately or not.  Optional, defaults to no.</li>
+<li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see
+<a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256. (see <a href="tuning.html#memoryusage">here</a>
+for more info on this parameter)</li>
+<li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Fields longer than that will be truncated.  Defaults to 32768. (see
+<a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 </ul>
 </li>
 <li>For <b>mysql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;socket=SOCKET;"

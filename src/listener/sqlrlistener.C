@@ -479,7 +479,6 @@ bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 	bool	listening=false;
 	if (port) {
 		clientsockin=new inetserversocket();
-		clientsockin->reuseAddresses();
 		listening=clientsockin->listen(NULL,port,15);
 		if (listening) {
 			addFileDescriptor(clientsockin);
@@ -497,7 +496,6 @@ bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 
 	if (listening && unixport) {
 		clientsockun=new unixserversocket();
-		clientsockun->reuseAddresses();
 		listening=clientsockun->listen(unixport,0000,15);
 		if (listening) {
 			addFileDescriptor(clientsockun);

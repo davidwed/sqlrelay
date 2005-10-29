@@ -1,16 +1,8 @@
-oracle -
-	make fetchatonce, max cols, max size of a column configurable
+oracle connection crashes when killed
 
 Tru64 -
 	unix sockets don't work, looks like a byte-order translation issue
 	can't start more than 1 cursor, looks like out-of-memory
-
-reuseAddress() isn't working
-
-create a jar file
-	test fastjar
-	install jar file
-	add jar file to spec file
 
 freetds test fails
 	* if insert/update/delete is run, then a select is run,
@@ -36,8 +28,6 @@ maciej's stuff:
 	although it works for me...
 
 perl apis -> CPAN
-
-distribute selects to slaves, dml/ddl to master:
 
 --------------------------------------------------------------------------------
 

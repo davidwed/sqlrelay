@@ -42,40 +42,40 @@ clean:
 	$(RM) sqlnet.log
 
 db2.class: db2.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) db2.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar db2.java
 
 freetds.class: freetds.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) freetds.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar freetds.java
 
 interbase.class: interbase.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) interbase.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar interbase.java
 
 msql.class: msql.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) msql.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar msql.java
 
 mysql.class: mysql.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) mysql.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar mysql.java
 
 oracle7.class: oracle7.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) oracle7.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar oracle7.java
 
 oracle8.class: oracle8.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) oracle8.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar oracle8.java
 
 oracle8i.class: oracle8i.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) oracle8i.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar oracle8i.java
 
 postgresql6.class: postgresql6.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) postgresql6.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar postgresql6.java
 
 postgresql7.class: postgresql7.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) postgresql7.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar postgresql7.java
 
 sqlite.class: sqlite.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) sqlite.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar sqlite.java
 
 sybase.class: sybase.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir) sybase.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar sybase.java
 
 
 rebuild.class: clean all
