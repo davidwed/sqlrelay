@@ -334,6 +334,9 @@ bool freetdscursor::openCursor(uint16_t id) {
 	}
 	cmd=NULL;
 
+	// FIXME: hack...
+	freetdsconn->abortAllCursors();
+
 	// switch to the correct database
 	bool	retval=true;
 	if (freetdsconn->db && freetdsconn->db[0]) {
@@ -557,7 +560,6 @@ bool freetdscursor::outputBindString(const char *variable,
 
 bool freetdscursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
-printf("%s\n",query);
 
 	// clear out any errors
 	if (freetdsconn->errorstring) {
@@ -1009,7 +1011,6 @@ void freetdscursor::cleanUpData(bool freeresult, bool freebinds) {
 
 void freetdscursor::discardResults() {
 
-printf("discardResults()\n");
 	// if there are any unprocessed result sets, process them
 	if (results==CS_SUCCEED) {
 		do {

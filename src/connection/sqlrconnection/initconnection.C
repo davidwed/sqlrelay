@@ -386,6 +386,9 @@ bool sqlrconnection::initCursors(bool create) {
 	int32_t	cursorcount=cfgfl->getCursors();
 	if (create) {
 		cur=new sqlrcursor *[cursorcount];
+		for (int32_t i=0; i<cursorcount; i++) {
+			cur[i]=NULL;
+		}
 	}
 
 	for (int32_t i=0; i<cursorcount; i++) {

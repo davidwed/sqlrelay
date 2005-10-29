@@ -20,29 +20,7 @@ void sqlrconnection::endSession() {
 	// automatically re-suspend
 	suspendedsession=false;
 
-	// abort all cursors
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"aborting all busy cursors...");
-	#endif
-	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
-		if (cur[i]->busy) {
-
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",3,i);
-			#endif
-
-			// It's ok to call cleanUpData() here, ordinarily we
-			// wouldn't so that result sets that were suspended
-			// after the entire result set was fetched would be
-			// able to return column data when resumed, but since
-			// we're ending the session, we don't care...
-			cur[i]->cleanUpData(true,true);
-			cur[i]->abort();
-		}
-	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done aborting all busy cursors");
-	#endif
+	abortAllCursors();
 
 	// truncate/drop temp tables
 	truncateTempTables(cur[0],&sessiontemptablesfortrunc);
@@ -93,5 +71,31 @@ void sqlrconnection::endSession() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done resetting autocommit behavior...");
 	debugPrint("connection",1,"done ending session");
+	#endif
+}
+
+void sqlrconnection::abortAllCursors() {
+	// abort all cursors
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",2,"aborting all busy cursors...");
+	#endif
+	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
+		if (cur[i] && cur[i]->busy) {
+
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",3,i);
+			#endif
+
+			// It's ok to call cleanUpData() here, ordinarily we
+			// wouldn't so that result sets that were suspended
+			// after the entire result set was fetched would be
+			// able to return column data when resumed, but since
+			// we're ending the session, we don't care...
+			cur[i]->cleanUpData(true,true);
+			cur[i]->abort();
+		}
+	}
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",2,"done aborting all busy cursors");
 	#endif
 }

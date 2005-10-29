@@ -18,7 +18,6 @@ bool sqlrconnection::rollback() {
 	debugPrint("connection",1,"rollback...");
 	#endif
 
-printf("rollback\n");
 	sqlrcursor	*rollbackcur=initCursor();
 	char	*rollbackquery="rollback";
 	int	rollbackquerylen=8;

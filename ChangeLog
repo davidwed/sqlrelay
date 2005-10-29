@@ -54,6 +54,14 @@
 	added /usr/local/lib to list of base dirs to find zope in, for
 		OpenBSD 3.7
 	fixed a bug where bind cursors weren't getting cleaned up
+	java api build creates a jar file
+	oracle 8 connection's fetchatonce/maxselectlistsize/maxitembuffersize
+		are configurable at run time now
+	fixed a bug where the null indicator wasn't being set to 0 for lob's
+	freetds's openCursor() closes all cursors before running "use db",
+		this hack allows SQL Relay to open a new cursor to run
+		commit/rollbac, even though freetds only supports
+		1 cursor per connection
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

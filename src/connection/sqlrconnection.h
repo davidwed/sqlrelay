@@ -135,6 +135,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 						const char *tablename);
 		void		addTransactionTempTableForTrunc(
 						const char *tablename);
+		void		abortAllCursors();
 
 	private:
 		// methods used internally
