@@ -15,6 +15,12 @@
 	<li><a href="#name">NAME</a></li>
 	<li><a href="#synopsis">SYNOPSIS</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#usage">USAGE</a></li>
+	<ul>
+
+		<li><a href="#note_for_html__mason_users">Note for HTML::Mason Users</a></li>
+	</ul>
+
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
@@ -48,22 +54,21 @@ Connection string consists of following parts:</p>
 </dt>
 <dt><strong><a name="item_debug_3d_2e_2e_2e_default_3a_0__2d_2d_2d_set_it_to"><strong>debug=...</strong>     default: <em>0</em>         --- set it to 1 if you want to get some debug messages in stdout;</a></strong><br />
 </dt>
-<dd>
-Once connected, DB handler works as usual (see <em>DBI</em>).
-</dd>
-<dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="usage">USAGE</a></h1>
+<p>Once connected, DB handler works as usual (see <em>DBI</em>).</p>
 <p>Don't ever try to share one SQLRelay connect by multiple scripts, for example, if you use 
 Apache mod_perl. Every $dbh holds one of server connections, so call <code>disconnect()</code> directly
 at the end of every script and don't use Apache::DBI or SQLRelay will be deadlocked.</p>
-</dd>
-<dd>
+<p>
+</p>
+<h2><a name="note_for_html__mason_users">Note for HTML::Mason Users</a></h2>
 <p>If you use <a href="/HTML/Mason.html">the HTML::Mason manpage</a>, your handler.pl sould look like this:</p>
-</dd>
-<dd>
 <pre>
   ...</pre>
-</dd>
-<dd>
 <pre>
      {
        package HTML::Mason::Commands;
@@ -72,8 +77,6 @@ at the end of every script and don't use Apache::DBI or SQLRelay will be deadloc
      }
  
   ...</pre>
-</dd>
-<dd>
 <pre>
      sub handler {
        
@@ -86,13 +89,14 @@ at the end of every script and don't use Apache::DBI or SQLRelay will be deadloc
        return $status;
               
      }</pre>
-</dd>
-<p></p></dl>
 <p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
 <p>D. E. Ovsyanko, <a href="mailto:do@mobile.ru">do@mobile.ru</a></p>
+<p>Contributions by:</p>
+<p>Erik Hollensbe &lt;<a href="mailto:erik@hollensbe.org">erik@hollensbe.org</a>&gt;</p>
+<p>Tony Fleisher &lt;<a href="mailto:tfleisher@musiciansfriend.com">tfleisher@musiciansfriend.com</a>&gt;</p>
 <p>
 </p>
 <hr />

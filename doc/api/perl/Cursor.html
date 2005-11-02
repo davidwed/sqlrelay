@@ -147,6 +147,11 @@
         clearBinds();
             # Clear all bind variables.</pre>
 <pre>
+        countBindVariables();
+            # Parses the previously prepared query,
+            # counts the number of bind variables defined
+            # in it and returns that number.</pre>
+<pre>
         inputBind(variable,value);
         inputBindBlob(variable,value,size);
         inputBindClob(variable,value,size);
@@ -198,7 +203,7 @@
         openCachedResultSet(filename);
             # Opens a cached result set as if a query that
             # would have generated it had been executed.
-            # Returns 1 on success and 0 on failure.</pre>
+            # Returns true on success and false on failure.</pre>
 <pre>
         colCount();
             # Returns the number of columns in the current
@@ -231,9 +236,9 @@
             # result set at a time.</pre>
 <pre>
         endOfResultSet();
-            # Returns 0 if part of the result set is still
-            # pending on the server and 1 if not.  This
-            # method can only return 0 if 
+            # Returns false if part of the result set is still
+            # pending on the server and true if not.  This
+            # method can only return false if 
             # setResultSetBufferSize() has been called
             # with a parameter other than 0.</pre>
 <pre>
@@ -297,6 +302,54 @@
         getColumnLength(col);
             # Returns the length of the specified column.</pre>
 <pre>
+        getColumnPrecision(col);
+            # Returns the precision of the specified
+            # column.
+            # Precision is the total number of digits in
+            # a number.  eg: 123.45 has a precision of 5.
+            # For non-numeric types, it's the number of
+            # characters in the string.</pre>
+<pre>
+        getColumnScale(col);
+            # Returns the scale of the specified column.
+            # Scale is the total number of digits to the
+            # right of the decimal point in a number.
+            # eg: 123.45 has a scale of 2.</pre>
+<pre>
+        getColumnIsNullable(col);
+            # Returns 1 if the specified column can
+            # contain nulls and 0 otherwise.</pre>
+<pre>
+        getColumnIsPrimaryKey(col);
+            # Returns 1 if the specified column is a
+            # primary key and 0 otherwise.</pre>
+<pre>
+        getColumnIsUnique(col);
+            # Returns 1 if the specified column is
+            # unique and 0 otherwise.</pre>
+<pre>
+        getColumnIsPartOfKey(col);
+            # Returns 1 if the specified column is
+            # part of a composite key and 0 otherwise.</pre>
+<pre>
+        getColumnIsUnsigned(col);
+            # Returns 1 if the specified column is
+            # an unsigned number and 0 otherwise.</pre>
+<pre>
+        getColumnIsZeroFilled(col);
+            # Returns 1 if the specified column was
+            # created with the zero-fill flag and 0
+            # otherwise.</pre>
+<pre>
+        getColumnIsBinary(col);
+            # Returns 1 if the specified column
+            # contains binary data and 0
+            # otherwise.</pre>
+<pre>
+        getColumnIsAutoIncrement(col);
+            # Returns 1 if the specified column
+            # auto-increments and 0 otherwise.</pre>
+<pre>
         getLongest(col);
             # Returns the length of the longest field
             # in the specified column.</pre>
@@ -317,13 +370,13 @@
         resumeResultSet(int id);
             # Resumes a result set previously left open 
             # using suspendSession().
-            # Returns 1 on success and 0 on failure.</pre>
+            # Returns true on success and false on failure.</pre>
 <pre>
         resumeCachedResultSet(int id, char *filename);
             # Resumes a result set previously left open
             # using suspendSession() and continues caching
             # the result set to &quot;filename&quot;.
-            # Returns 1 on success and 0 on failure.</pre>
+            # Returns true on success and false on failure.</pre>
 <p>
 </p>
 <hr />
