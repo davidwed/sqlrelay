@@ -434,18 +434,20 @@ __END__
             # Returns the length of the longest field
             # in the specified column.
 
-        getResultSetId();
-            # Returns the internal ID of this result set.
-            # This parameter may be passed to another 
-            # statement for use in the resumeResultSet() 
-            # method.
-
         suspendResultSet();
             # Tells the server to leave this result
             # set open when the client calls 
             # suspendSession() so that another client can 
             # connect to it using resumeResultSet() after 
             # it calls resumeSession().
+
+        getResultSetId();
+            # Returns the internal ID of this result set.
+            # This parameter may be passed to another 
+            # statement for use in the resumeResultSet() 
+            # method.
+            # Note: the value returned by this method is
+            # only valid after a call to suspendResultSet().
 
         resumeResultSet(int id);
             # Resumes a result set previously left open 

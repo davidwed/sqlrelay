@@ -77,6 +77,8 @@ Returns the inet port that the client is
 communicating over. This parameter may be 
 passed to another client for use in
 the resumeSession command.
+Note: the value returned by this method is
+only valid after a call to suspendSession.
 <P>
 <LI>
 <CODE>
@@ -87,6 +89,8 @@ Returns the unix socket that the client is
 communicating over. This parameter may be 
 passed to another client for use in
 the resumeSession command.
+Note: the value returned by this method is
+only valid after a call to suspendSession.
 <P>
 <LI>
 <CODE>
@@ -740,17 +744,6 @@ $cur getLongestByIndex col
 Returns the length of the longest field in the
 specified column.
 <P>
-
-<LI>
-<CODE>
-$cur getResultSetId
-</CODE>
-<P>
-Returns the internal ID of this result set.
-This parameter may be passed to another 
-statement for use in the resumeResultSet
-method.
-<P>
 <LI>
 <CODE>
 $cur suspendResultSet
@@ -761,6 +754,19 @@ set open when the connection calls
 suspendSession so that another connection can 
 connect to it using resumeResultSet after 
 it calls resumeSession.
+<P>
+
+<LI>
+<CODE>
+$cur getResultSetId
+</CODE>
+<P>
+Returns the internal ID of this result set.
+This parameter may be passed to another 
+statement for use in the resumeResultSet
+method.
+Note: the value returned by this method is
+only valid after a call to suspendResultSet.
 <P>
 <LI>
 <CODE>

@@ -62,6 +62,10 @@
 		this hack allows SQL Relay to open a new cursor to run
 		commit/rollbac, even though freetds only supports
 		1 cursor per connection
+	updated docs to indicate that getConnectionPort/Socket() are only
+		valid after suspendSession() and getResultSetId() is only
+		valid after suspendResultSet()
+	updated php docs; fixed some typo's
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

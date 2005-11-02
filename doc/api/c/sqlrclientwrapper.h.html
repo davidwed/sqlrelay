@@ -1,7 +1,7 @@
 <html>
 <head>
-<title>~/src/firstworks/sqlrelay-0.34/src/api/c/include/sqlrelay/sqlrclientwrapper.h.html</title>
-<meta name="Generator" content="Vim/6.2">
+<title>~/src/firstworks/sqlrelay-0.37/src/api/c/include/sqlrelay/sqlrclientwrapper.h.html</title>
+<meta name="Generator" content="Vim/6.3">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 </head>
 <body bgcolor="#ffffff" text="#000000">
@@ -12,12 +12,14 @@
 <font color="#a020f0">#ifndef SQLRCLIENTWRAPPER_H</font>
 <font color="#a020f0">#define SQLRCLIENTWRAPPER_H</font>
 
+<font color="#a020f0">#include </font><font color="#ff00ff">&lt;rudiments/private/inttypes.h&gt;</font>
+
 <font color="#2e8b57"><b>typedef</b></font> <font color="#2e8b57"><b>struct</b></font> sqlrconnection *sqlrcon;
 <font color="#2e8b57"><b>typedef</b></font> <font color="#2e8b57"><b>struct</b></font> sqlrcursor *sqlrcur;
 
-sqlrcon sqlrcon_alloc(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *server, <font color="#2e8b57"><b>int</b></font> port, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *socket,
+sqlrcon sqlrcon_alloc(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *server, <font color="#2e8b57"><b>uint16_t</b></font> port, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *socket,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *user, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *password,
-                                        <font color="#2e8b57"><b>int</b></font> retrytime, <font color="#2e8b57"><b>int</b></font> tries);
+                                        <font color="#2e8b57"><b>int32_t</b></font> retrytime, <font color="#2e8b57"><b>int32_t</b></font> tries);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Initiates a connection to &quot;server&quot; on &quot;port&quot;</font>
 <font color="#0000ff">                           or to the unix &quot;socket&quot; on the local machine</font>
 <font color="#0000ff">                           and authenticates with &quot;user&quot; and &quot;password&quot;.</font>
@@ -37,24 +39,29 @@ sqlrcon sqlrcon_alloc(<font color="#2e8b57"><b>const</b></font> <font color="#2e
                         <font color="#0000ff">/*</font><font color="#0000ff"> Disconnects and ends the session if</font>
 <font color="#0000ff">                           it hasn't been terminated already. </font><font color="#0000ff">*/</font>
 
-<font color="#2e8b57"><b>int</b></font>     sqlrcon_endSession(sqlrcon sqlrconref);
+<font color="#2e8b57"><b>void</b></font>    sqlrcon_endSession(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Ends the session. </font><font color="#0000ff">*/</font>
 <font color="#2e8b57"><b>int</b></font>     sqlrcon_suspendSession(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Disconnects this connection from the current</font>
 <font color="#0000ff">                           session but leaves the session open so </font>
 <font color="#0000ff">                           that another connection can connect to it </font>
 <font color="#0000ff">                           using sqlrcon_resumeSession(). </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcon_getConnectionPort(sqlrcon sqlrconref);
+<font color="#2e8b57"><b>uint16_t</b></font>        sqlrcon_getConnectionPort(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the inet port that the connection is </font>
 <font color="#0000ff">                           communicating over. This parameter may be </font>
 <font color="#0000ff">                           passed to another connection for use in</font>
-<font color="#0000ff">                           the sqlrcon_resumeSession() command. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>char</b></font>    *sqlrcon_getConnectionSocket(sqlrcon sqlrconref);
+<font color="#0000ff">                           the sqlrcon_resumeSession() command.</font>
+<font color="#0000ff">                           Note: The result this function returns is only</font>
+<font color="#0000ff">                           valid after a call to suspendSession().</font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcon_getConnectionSocket(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the unix socket that the connection is </font>
 <font color="#0000ff">                           communicating over. This parameter may be </font>
 <font color="#0000ff">                           passed to another connection for use in</font>
-<font color="#0000ff">                           the sqlrcon_resumeSession() command. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcon_resumeSession(sqlrcon sqlrconref, <font color="#2e8b57"><b>int</b></font> port, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *socket);
+<font color="#0000ff">                           the sqlrcon_resumeSession() command.</font>
+<font color="#0000ff">                           Note: The result this function returns is only</font>
+<font color="#0000ff">                           valid after a call to suspendSession().</font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>int</b></font>     sqlrcon_resumeSession(sqlrcon sqlrconref, <font color="#2e8b57"><b>uint16_t</b></font> port,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *socket);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Resumes a session previously left open </font>
 <font color="#0000ff">                           using sqlrcon_suspendSession().</font>
 <font color="#0000ff">                           Returns 1 on success and 0 on failure. </font><font color="#0000ff">*/</font>
@@ -62,7 +69,7 @@ sqlrcon sqlrcon_alloc(<font color="#2e8b57"><b>const</b></font> <font color="#2e
 <font color="#2e8b57"><b>int</b></font>     sqlrcon_ping(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns 1 if the database is up and 0</font>
 <font color="#0000ff">                           if it's down. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>char</b></font>    *sqlrcon_identify(sqlrcon sqlrconref);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcon_identify(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the type of database: </font>
 <font color="#0000ff">                             oracle7, oracle8, postgresql, mysql, etc. </font><font color="#0000ff">*/</font>
 
@@ -102,11 +109,11 @@ sqlrcon sqlrcon_alloc(<font color="#2e8b57"><b>const</b></font> <font color="#2e
 sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_free(sqlrcur sqlrcurref);
 
-<font color="#2e8b57"><b>void</b></font>    sqlrcur_setResultSetBufferSize(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> rows);
+<font color="#2e8b57"><b>void</b></font>    sqlrcur_setResultSetBufferSize(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint64_t</b></font> rows);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Sets the number of rows of the result set</font>
 <font color="#0000ff">                           to buffer at a time.  0 (the default)</font>
 <font color="#0000ff">                           means buffer the entire result set. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref);
+<font color="#2e8b57"><b>uint64_t</b></font>        sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the number of result set rows that </font>
 <font color="#0000ff">                           will be buffered at a time or 0 for the</font>
 <font color="#0000ff">                           entire result set. </font><font color="#0000ff">*/</font>
@@ -143,13 +150,13 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
 <font color="#0000ff">                           to sqlrcur_cacheToFile() changes which file to</font>
 <font color="#0000ff">                           cache to or a call to sqlrcur_cacheOff() turns off</font>
 <font color="#0000ff">                           caching. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>void</b></font>    sqlrcur_setCacheTtl(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> ttl);
+<font color="#2e8b57"><b>void</b></font>    sqlrcur_setCacheTtl(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint32_t</b></font> ttl);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Sets the time-to-live for cached result</font>
 <font color="#0000ff">                           sets. The sqlr-cachemanger will remove each </font>
 <font color="#0000ff">                           cached result set &quot;ttl&quot; seconds after it's </font>
 <font color="#0000ff">                           created, provided it's scanning the directory</font>
 <font color="#0000ff">                           containing the cache files. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_getCacheFileName(sqlrcur sqlrcurref);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getCacheFileName(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the name of the file containing the</font>
 <font color="#0000ff">                           most recently cached result set. </font><font color="#0000ff">*/</font>
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_cacheOff(sqlrcur sqlrcurref);
@@ -163,7 +170,7 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
 <font color="#2e8b57"><b>int</b></font>     sqlrcur_sendQuery(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Sends &quot;query&quot; and gets a result set. </font><font color="#0000ff">*/</font>
 <font color="#2e8b57"><b>int</b></font>     sqlrcur_sendQueryWithLength(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query,
-                                                                <font color="#2e8b57"><b>int</b></font> length);
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> length);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Sends &quot;query&quot; with length &quot;length&quot; and gets</font>
 <font color="#0000ff">                           a result set. This function must be used if</font>
 <font color="#0000ff">                           the query contains binary data. </font><font color="#0000ff">*/</font>
@@ -179,7 +186,7 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_prepareQuery(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Prepare to execute &quot;query&quot;. </font><font color="#0000ff">*/</font>
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_prepareQueryWithLength(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query,
-                                                                <font color="#2e8b57"><b>int</b></font> length);
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> length);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Prepare to execute &quot;query&quot; with length </font>
 <font color="#0000ff">                           &quot;length&quot;.  This function must be used if the</font>
 <font color="#0000ff">                           query contains binary data. </font><font color="#0000ff">*/</font>
@@ -190,32 +197,39 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
 
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_subString(sqlrcur sqlrcurref,
                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value);
-<font color="#2e8b57"><b>void</b></font>    sqlrcur_subLong(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>long</b></font> value);
+<font color="#2e8b57"><b>void</b></font>    sqlrcur_subLong(sqlrcur sqlrcurref,
+                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>int64_t</b></font> value);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_subDouble(sqlrcur sqlrcurref,
                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>double</b></font> value,
-                                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> precision, <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> scale);
+                                <font color="#2e8b57"><b>uint32_t</b></font> precision, <font color="#2e8b57"><b>uint32_t</b></font> scale);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Define a substitution variable. </font><font color="#0000ff">*/</font>
 
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_clearBinds(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Clear all bind variables. </font><font color="#0000ff">*/</font>
+
+<font color="#2e8b57"><b>uint16_t</b></font>        sqlrcur_countBindVariables(sqlrcur sqlrcurref);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Parses the previously prepared query,</font>
+<font color="#0000ff">                           counts the number of bind variables defined</font>
+<font color="#0000ff">                           in it and returns that number. </font><font color="#0000ff">*/</font>
+
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_inputBindString(sqlrcur sqlrcurref,
                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_inputBindLong(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable,
-                                                        <font color="#2e8b57"><b>long</b></font> value);
+                                                        <font color="#2e8b57"><b>int64_t</b></font> value);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_inputBindDouble(sqlrcur sqlrcurref,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>double</b></font> value,
-                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> precision,
-                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> scale);
+                                        <font color="#2e8b57"><b>uint32_t</b></font> precision,
+                                        <font color="#2e8b57"><b>uint32_t</b></font> scale);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_inputBindBlob(sqlrcur sqlrcurref,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value,
-                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font> size);
+                                        <font color="#2e8b57"><b>uint32_t</b></font> size);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_inputBindClob(sqlrcur sqlrcurref,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value,
-                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font> size);
+                                        <font color="#2e8b57"><b>uint32_t</b></font> size);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Define an input bind variable. </font><font color="#0000ff">*/</font>
 
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_defineOutputBind(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable,
-                                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font> length);
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> length);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Define an output bind variable.</font>
 <font color="#0000ff">                          &quot;length&quot; bytes will be reserved to store the value. </font><font color="#0000ff">*/</font>
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_defineOutputBindBlob(sqlrcur sqlrcurref,
@@ -231,23 +245,23 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_subStrings(sqlrcur sqlrcurref,
                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **values);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_subLongs(sqlrcur sqlrcurref,
-                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>long</b></font> *values);
+                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>int64_t</b></font> *values);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_subDoubles(sqlrcur sqlrcurref,
                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>double</b></font> *values,
-                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> *precisions,
-                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> *scales);
+                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>uint32_t</b></font> *precisions,
+                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>uint32_t</b></font> *scales);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Define an array of substitution variables. </font><font color="#0000ff">*/</font>
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_inputBindStrings(sqlrcur sqlrcurref,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **values);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_inputBindLongs(sqlrcur sqlrcurref,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables,
-                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font> *values);
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>int64_t</b></font> *values);
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_inputBindDoubles(sqlrcur sqlrcurref,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>double</b></font> *values,
-                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> *precisions,
-                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> *scales);
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>uint32_t</b></font> *precisions,
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>uint32_t</b></font> *scales);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Define an array of input bind variables. </font><font color="#0000ff">*/</font>
 
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_validateBinds(sqlrcur sqlrcurref);
@@ -266,10 +280,11 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Fetch from a cursor that was returned as</font>
 <font color="#0000ff">                           an output bind variable. </font><font color="#0000ff">*/</font>
 
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_getOutputBind(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getOutputBind(sqlrcur sqlrcurref,
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Get the value stored in a previously</font>
 <font color="#0000ff">                           defined output bind variable. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>long</b></font>    sqlrcur_getOutputBindAsLong(sqlrcur sqlrcurref,
+<font color="#2e8b57"><b>int64_t</b></font> sqlrcur_getOutputBindAsInteger(sqlrcur sqlrcurref,
                                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Get the value stored in a previously</font>
 <font color="#0000ff">                           defined output bind variable as a </font>
@@ -280,7 +295,8 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
 <font color="#0000ff">                           defined output bind variable as a </font>
 <font color="#0000ff">                           double precision floating point</font>
 <font color="#0000ff">                           number. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>long</b></font>    sqlrcur_getOutputBindLength(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getOutputBindLength(sqlrcur sqlrcurref,
+                                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Get the length of the value stored in a previously</font>
 <font color="#0000ff">                           defined output bind variable. </font><font color="#0000ff">*/</font>
 sqlrcur sqlrcur_getOutputBindCursor(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
@@ -293,20 +309,20 @@ sqlrcur sqlrcur_getOutputBindCursor(sqlrcur sqlrcurref, <font color="#2e8b57"><b
                         <font color="#0000ff">/*</font><font color="#0000ff"> Opens a cached result set.</font>
 <font color="#0000ff">                           Returns 1 on success and 0 on failure. </font><font color="#0000ff">*/</font>
 
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_colCount(sqlrcur sqlrcurref);
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_colCount(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the number of columns in the current</font>
 <font color="#0000ff">                           result set. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_rowCount(sqlrcur sqlrcurref);
+<font color="#2e8b57"><b>uint64_t</b></font>        sqlrcur_rowCount(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the number of rows in the current </font>
 <font color="#0000ff">                           result set. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_totalRows(sqlrcur sqlrcurref);
+<font color="#2e8b57"><b>uint64_t</b></font>        sqlrcur_totalRows(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the total number of rows that will </font>
 <font color="#0000ff">                           be returned in the result set.  Not all </font>
 <font color="#0000ff">                           databases support this call.  Don't use it </font>
 <font color="#0000ff">                           for applications which are designed to be </font>
 <font color="#0000ff">                           portable across databases.  -1 is returned</font>
 <font color="#0000ff">                           by databases which don't support this option. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_affectedRows(sqlrcur sqlrcurref);
+<font color="#2e8b57"><b>uint64_t</b></font>        sqlrcur_affectedRows(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the number of rows that were </font>
 <font color="#0000ff">                           updated, inserted or deleted by the query.</font>
 <font color="#0000ff">                           Not all databases support this call.  Don't </font>
@@ -314,7 +330,7 @@ sqlrcur sqlrcur_getOutputBindCursor(sqlrcur sqlrcurref, <font color="#2e8b57"><b
 <font color="#0000ff">                           to be portable across databases.  -1 is </font>
 <font color="#0000ff">                           returned by databases which don't support </font>
 <font color="#0000ff">                           this option. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_firstRowIndex(sqlrcur sqlrcurref);
+<font color="#2e8b57"><b>uint64_t</b></font>        sqlrcur_firstRowIndex(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the index of the first buffered row.</font>
 <font color="#0000ff">                           This is useful when buffering only part of</font>
 <font color="#0000ff">                           the result set at a time. </font><font color="#0000ff">*/</font>
@@ -326,7 +342,7 @@ sqlrcur sqlrcur_getOutputBindCursor(sqlrcur sqlrcurref, <font color="#2e8b57"><b
 <font color="#0000ff">                           with a parameter other than 0. </font><font color="#0000ff">*/</font>
 
 
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_errorMessage(sqlrcur sqlrcurref);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_errorMessage(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> If a query failed and generated an error, the</font>
 <font color="#0000ff">                           error message is available here.  If the </font>
 <font color="#0000ff">                           query succeeded then this function returns a </font>
@@ -341,48 +357,58 @@ sqlrcur sqlrcur_getOutputBindCursor(sqlrcur sqlrcurref, <font color="#2e8b57"><b
                         <font color="#0000ff">/*</font><font color="#0000ff"> Tells the connection to return NULL fields and</font>
 <font color="#0000ff">                           output bind variables as NULL's. </font><font color="#0000ff">*/</font>
 
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_getFieldByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getFieldByIndex(sqlrcur sqlrcurref,
+                                                <font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getFieldByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint64_t</b></font> row,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns a pointer to the value of the </font>
 <font color="#0000ff">                           specified row and column. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>long</b></font>    sqlrcur_getFieldAsLongByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>long</b></font>    sqlrcur_getFieldAsLongByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row,
+<font color="#2e8b57"><b>int64_t</b></font> sqlrcur_getFieldAsIntegerByIndex(sqlrcur sqlrcurref,
+                                                <font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>int64_t</b></font> sqlrcur_getFieldAsIntegerByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint64_t</b></font> row,
                                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the specified field as a long integer. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>double</b></font>  sqlrcur_getFieldAsDoubleByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>double</b></font>  sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row,
+<font color="#2e8b57"><b>double</b></font>  sqlrcur_getFieldAsDoubleByIndex(sqlrcur sqlrcurref,
+                                                <font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>double</b></font>  sqlrcur_getFieldAsDoubleByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint64_t</b></font> row,
                                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the specified field as a double precision</font>
 <font color="#0000ff">                           floating point number. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_getFieldByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_getFieldByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getFieldByIndex(sqlrcur sqlrcurref,
+                                                <font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getFieldByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint64_t</b></font> row,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns a pointer to the value of the </font>
 <font color="#0000ff">                           specified row and column. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>long</b></font>    sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>long</b></font>    sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row,
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getFieldLengthByIndex(sqlrcur sqlrcurref,
+                                                <font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getFieldLengthByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint64_t</b></font> row,
                                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the length of the </font>
 <font color="#0000ff">                           specified row and column. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>char</b></font>    **sqlrcur_getRow(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> * <font color="#2e8b57"><b>const</b></font> *sqlrcur_getRow(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint64_t</b></font> row);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns a null terminated array of the </font>
 <font color="#0000ff">                           values of the fields in the specified row. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>long</b></font>    *sqlrcur_getRowLengths(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> row);
+<font color="#2e8b57"><b>uint32_t</b></font>        *sqlrcur_getRowLengths(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint64_t</b></font> row);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns a null terminated array of the </font>
 <font color="#0000ff">                           lengths of the fields in the specified row. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>char</b></font>    **sqlrcur_getColumnNames(sqlrcur sqlrcurref);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> * <font color="#2e8b57"><b>const</b></font> *sqlrcur_getColumnNames(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns a null terminated array of the </font>
 <font color="#0000ff">                           column names of the current result set. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_getColumnName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> col);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getColumnName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint32_t</b></font> col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the name of the specified column. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_getColumnTypeByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>char</b></font>    *sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getColumnTypeByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getColumnTypeByName(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the type of the specified column. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_getColumnLengthByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_getColumnLengthByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getColumnLengthByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getColumnLengthByName(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the length of the specified column. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font>   sqlrcur_getColumnPrecisionByIndex(sqlrcur sqlrcurref,
-                                                        <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font>   sqlrcur_getColumnPrecisionByName(sqlrcur sqlrcurref,
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getColumnPrecisionByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getColumnPrecisionByName(sqlrcur sqlrcurref,
                                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the precision of the specified</font>
 <font color="#0000ff">                           column.</font>
@@ -390,49 +416,90 @@ sqlrcur sqlrcur_getOutputBindCursor(sqlrcur sqlrcurref, <font color="#2e8b57"><b
 <font color="#0000ff">                           a number.  eg: 123.45 has a precision of 5.</font>
 <font color="#0000ff">                           For non-numeric types, it's the number of</font>
 <font color="#0000ff">                           characters in the string. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font>   sqlrcur_getColumnScaleByIndex(sqlrcur sqlrcurref,
-                                                        <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font>   sqlrcur_getColumnScaleByName(sqlrcur sqlrcurref,
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getColumnScaleByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getColumnScaleByName(sqlrcur sqlrcurref,
                                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the scale of the specified column.</font>
 <font color="#0000ff">                           Scale is the total number of digits to the</font>
 <font color="#0000ff">                           right of the decimal point in a number.</font>
 <font color="#0000ff">                           eg: 123.45 has a scale of 2. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  sqlrcur_getColumnIsNullableByIndex(sqlrcur sqlrcurref,
-                                                        <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  sqlrcur_getColumnIsNullableByName(sqlrcur sqlrcurref,
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsNullableByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsNullableByName(sqlrcur sqlrcurref,
                                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns 1 if the specified column can</font>
 <font color="#0000ff">                           contain nulls and 0 otherwise. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcur sqlrcurref,
-                                                        <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  sqlrcur_getColumnIsPrimaryKeyByName(sqlrcur sqlrcurref,
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsPrimaryKeyByName(sqlrcur sqlrcurref,
                                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns 1 if the specified column is a</font>
 <font color="#0000ff">                           primary key and 0 otherwise. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_getLongestByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> col);
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_getLongestByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsUniqueByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsUniqueByName(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns 1 if the specified column is</font>
+<font color="#0000ff">                           unique and 0 otherwise. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsPartOfKeyByName(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns 1 if the specified column is</font>
+<font color="#0000ff">                           part of a composite key and 0 otherwise. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsUnsignedByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsUnsignedByName(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns 1 if the specified column is</font>
+<font color="#0000ff">                           an unsigned number and 0 otherwise. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsZeroFilledByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsZeroFilledByName(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns 1 if the specified column was</font>
+<font color="#0000ff">                           created with the zero-fill flag and 0</font>
+<font color="#0000ff">                           otherwise. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsBinaryByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsBinaryByName(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns 1 if the specified column</font>
+<font color="#0000ff">                           contains binary data and 0</font>
+<font color="#0000ff">                           otherwise. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>int</b></font>             sqlrcur_getColumnIsAutoIncrementByName(sqlrcur sqlrcurref,
+                                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns 1 if the specified column</font>
+<font color="#0000ff">                           auto-increments and 0 otherwise. </font><font color="#0000ff">*/</font>
+
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getLongestByIndex(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint32_t</b></font> col);
+<font color="#2e8b57"><b>uint32_t</b></font>        sqlrcur_getLongestByName(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the length of the longest field in the</font>
 <font color="#0000ff">                           specified column. </font><font color="#0000ff">*/</font>
 
 
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_getResultSetId(sqlrcur sqlrcurref);
-                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns the internal ID of this result set.</font>
-<font color="#0000ff">                           This parameter may be passed to another </font>
-<font color="#0000ff">                           statement for use in the resumeResultSet() </font>
-<font color="#0000ff">                           function. </font><font color="#0000ff">*/</font>
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_suspendResultSet(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Tells the server to leave this result</font>
 <font color="#0000ff">                           set open when the connection calls </font>
 <font color="#0000ff">                           suspendSession() so that another connection can </font>
 <font color="#0000ff">                           connect to it using resumeResultSet() after </font>
 <font color="#0000ff">                           it calls resumeSession(). </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int</b></font>     sqlrcur_resumeResultSet(sqlrcur sqlrcurref, <font color="#2e8b57"><b>int</b></font> id);
+<font color="#2e8b57"><b>uint16_t</b></font>        sqlrcur_getResultSetId(sqlrcur sqlrcurref);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns the internal ID of this result set.</font>
+<font color="#0000ff">                           This parameter may be passed to another </font>
+<font color="#0000ff">                           statement for use in the resumeResultSet() </font>
+<font color="#0000ff">                           function.</font>
+<font color="#0000ff">                           Note: The value this function returns is only</font>
+<font color="#0000ff">                           valid after a call to suspendResultSet().</font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>int</b></font>     sqlrcur_resumeResultSet(sqlrcur sqlrcurref, <font color="#2e8b57"><b>uint16_t</b></font> id);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Resumes a result set previously left open </font>
 <font color="#0000ff">                           using suspendSession().</font>
 <font color="#0000ff">                           Returns 1 on success and 0 on failure. </font><font color="#0000ff">*/</font>
 <font color="#2e8b57"><b>int</b></font>     sqlrcur_resumeCachedResultSet(sqlrcur sqlrcurref,
-                                                <font color="#2e8b57"><b>int</b></font> id, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *filename);
+                                        <font color="#2e8b57"><b>uint16_t</b></font> id, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *filename);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Resumes a result set previously left open</font>
 <font color="#0000ff">                           using suspendSession() and continues caching</font>
 <font color="#0000ff">                           the result set to &quot;filename&quot;.</font>

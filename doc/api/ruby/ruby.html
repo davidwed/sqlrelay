@@ -38,12 +38,16 @@
 <FONT color=#f800f8>        communicating over. This parameter may be </FONT>
 <FONT color=#f800f8>        passed to another connection for use in</FONT>
 <FONT color=#f800f8>        the resumeSession() method.</FONT>
+<FONT color=#f800f8>        Note: the value returned by this method is</FONT>
+<FONT color=#f800f8>        only valid after a call to suspendSession().</FONT>
 
     <FONT color=#008888>getConnectionSocket</FONT>()
 <FONT color=#f800f8>        Returns the unix socket that the connection is </FONT>
 <FONT color=#f800f8>        communicating over. This parameter may be </FONT>
 <FONT color=#f800f8>        passed to another connection for use in</FONT>
 <FONT color=#f800f8>        the resumeSession() method.</FONT>
+<FONT color=#f800f8>        Note: the value returned by this method is</FONT>
+<FONT color=#f800f8>        only valid after a call to suspendSession().</FONT>
 
     <FONT color=#008888>resumeSession</FONT>(port, socket)
 <FONT color=#f800f8>        Resumes a session previously left open </FONT>
@@ -407,18 +411,20 @@ column.</FONT>
 <FONT color=#f800f8>        Returns the length of the specified column.  col may</FONT>
 <FONT color=#f800f8>        be a name or number.</FONT>
 
-    <FONT color=#008888>getResultSetId</FONT>()
-<FONT color=#f800f8>        Returns the internal ID of this result set.</FONT>
-<FONT color=#f800f8>        This parameter may be passed to another </FONT>
-<FONT color=#f800f8>        cursor for use in the resumeResultSet() </FONT>
-<FONT color=#f800f8>        method.</FONT>
-
     <FONT color=#008888>suspendResultSet</FONT>()
 <FONT color=#f800f8>        Tells the server to leave this result</FONT>
 <FONT color=#f800f8>        set open when the cursor calls </FONT>
 <FONT color=#f800f8>        suspendSession() so that another cursor can </FONT>
 <FONT color=#f800f8>        connect to it using resumeResultSet() after </FONT>
 <FONT color=#f800f8>        it calls resumeSession().</FONT>
+
+    <FONT color=#008888>getResultSetId</FONT>()
+<FONT color=#f800f8>        Returns the internal ID of this result set.</FONT>
+<FONT color=#f800f8>        This parameter may be passed to another </FONT>
+<FONT color=#f800f8>        cursor for use in the resumeResultSet() </FONT>
+<FONT color=#f800f8>        method.</FONT>
+<FONT color=#f800f8>        Note: the value returned by this method is</FONT>
+<FONT color=#f800f8>        only valid after a call to suspendResultSet().</FONT>
 
     <FONT color=#008888>resumeResultSet</FONT>(id)
 <FONT color=#f800f8>        Resumes a result set previously left open </FONT>

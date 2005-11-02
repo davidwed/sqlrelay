@@ -44,6 +44,8 @@ class sqlrconnection:
         communicating over. This parameter may be 
         passed to another connection for use in
         the resumeSession() method.
+        Note: the value returned by this method is
+        only valid after a call to suspendSession().
         """
         return CSQLRelay.getConnectionPort(self.connection)
 
@@ -53,6 +55,8 @@ class sqlrconnection:
         communicating over. This parameter may be 
         passed to another connection for use in
         the resumeSession() method.
+        Note: the value returned by this method is
+        only valid after a call to suspendSession().
         """
         return CSQLRelay.getConnectionSocket(self.connection)
 
@@ -681,15 +685,6 @@ class sqlrcursor:
         """
         return CSQLRelay.getLongest(self.cursor, col)
 
-    def getResultSetId(self):
-        """
-        Returns the internal ID of this result set.
-        This parameter may be passed to another 
-        cursor for use in the resumeResultSet() 
-        method.
-        """
-        return CSQLRelay.getResultSetId(self.cursor)
-
     def suspendResultSet(self):
         """
         Tells the server to leave this result
@@ -699,6 +694,17 @@ class sqlrcursor:
         it calls resumeSession().
         """
         return CSQLRelay.suspendResultSet(self.cursor)
+
+    def getResultSetId(self):
+        """
+        Returns the internal ID of this result set.
+        This parameter may be passed to another 
+        cursor for use in the resumeResultSet() 
+        method.
+        Note: the value returned by this method is
+        only valid after a call to suspendResultSet().
+        """
+        return CSQLRelay.getResultSetId(self.cursor)
 
     def resumeResultSet(self, id):
         """

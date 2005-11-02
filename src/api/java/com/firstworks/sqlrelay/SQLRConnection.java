@@ -47,13 +47,17 @@ public class SQLRConnection {
 	/** Returns the inet port that the connection is 
 	 *  communicating over. This parameter may be 
 	 *  passed to another connection for use in
-	 *  the resumeSession() method. */
+	 *  the resumeSession() method.
+	 *  Note: the value returned by this method is only
+	 *  valid after a call to suspendSession().*/
 	public native short	getConnectionPort();
 
 	/** Returns the unix socket that the connection 
 	 *  is communicating over. This parameter may be 
 	 *  passed to another connection for use in
-	 *  the resumeSession() method. */
+	 *  the resumeSession() method.
+	 *  Note: the value returned by this method is only
+	 *  valid after a call to suspendSession().*/
 	public native String	getConnectionSocket();
 
 	/** Resumes a session previously left open 

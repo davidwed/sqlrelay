@@ -1577,11 +1577,11 @@ is possible.</p>
      cur=<FONT color=#6858c8>SQLRCursor</FONT>.new(con)
 
      cur.sendQuery(<FONT color=#6858c8>&quot;</FONT><FONT color=#f800f8>insert into my_table values (1,2,3)</FONT><FONT color=#6858c8>&quot;</FONT>)
-     port=getConnectionPort()
-     socket=getConnectionSocket()
-     rs=getResultSetId()
      cur.suspendResultSet()
      con.suspendSession()
+     rs=cur.getResultSetId()
+     port=con.getConnectionPort()
+     socket=con.getConnectionSocket()
 
      ... pass the rs, port <B><FONT color=#a02828>and</FONT></B> socket to the <B><FONT color=#a02828>next</FONT></B> page ...
 </PRE>

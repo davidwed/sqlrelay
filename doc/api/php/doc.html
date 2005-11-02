@@ -97,6 +97,8 @@ Returns the inet port that the client is
 communicating over. This parameter may be 
 passed to another client for use in
 the sqlrcon_resumeSession() command.
+Note: the value returned by this function is
+only valid after a call to sqlrcur_suspendSession().
 <P>
 <LI>
 <CODE>
@@ -107,6 +109,8 @@ Returns the unix socket that the client is
 communicating over. This parameter may be 
 passed to another client for use in
 the sqlrcon_resumeSession() command.
+Note: the value returned by this function is
+only valid after a call to sqlrcur_suspendSession().
 <P>
 <LI>
 <CODE>
@@ -223,7 +227,7 @@ void sqlrcur_dontGetColumnInfo(int sqlrcurref)
 Tells the server not to send any column
 info (names, types, sizes).  If you don't
 need that info, you should call this
-method to improve performance.
+function to improve performance.
 <P>
 <LI>
 <CODE>
@@ -301,7 +305,7 @@ Sets query caching off.
 </UL>
 <P>
 If you don't need to use substitution or bind variables
-in your queries, use these two methods.
+in your queries, use these two functions.
 <P>
 <UL>
 <LI>
@@ -318,7 +322,7 @@ int sqlrcur_sendQueryWithLength(int sqlrcurref, string query, int length)
 </CODE>
 <P>
 Sends "query" with length "length" and gets
-a result set. This method must be used if
+a result set. This function must be used if
 the query contains binary data.
 <P>
 <LI>
@@ -333,7 +337,7 @@ Returns TRUE on success and FALSE on failure.
 </UL>
 <P>
 If you need to use substitution or bind variables, in your
-queries use the following methods.  See the API documentation
+queries use the following functions.  See the API documentation
 for more information about substitution and bind variables.
 <P>
 <UL>
@@ -350,7 +354,7 @@ void sqlrcur_prepareQueryWithLength(int sqlrcurref, string query, int length)
 </CODE>
 <P>
 Prepare to execute "query" with length 
-"length".  This method must be used if the
+"length".  This function must be used if the
 query contains binary data.
 <P>
 <LI>
@@ -541,7 +545,7 @@ int sqlrcur_endOfResultSet(int sqlrcurref)
 <P>
 Returns 0 if part of the result set is still
 pending on the server and 1 if not.  This
-method can only return 0 if 
+function can only return 0 if 
 setResultSetBufferSize() has been called
 with a parameter other than 0.
 <P>
@@ -552,7 +556,7 @@ string sqlrcur_errorMessage(int sqlrcurref)
 <P>
 If a query failed and generated an error, the
 error message is available here.  If the
-query succeeded then this method returns FALSE
+query succeeded then this function returns FALSE
 <P>
 <LI>
 <CODE>
@@ -769,17 +773,6 @@ int sqlrcur_getLongest(int sqlrcurref, int col)
 Returns the length of the longest field in the
 specified column.
 <P>
-
-<LI>
-<CODE>
-int sqlrcur_getResultSetId(int sqlrcurref) 
-</CODE>
-<P>
-Returns the internal ID of this result set.
-This parameter may be passed to another 
-statement for use in the resumeResultSet() 
-method.
-<P>
 <LI>
 <CODE>
 void sqlrcur_suspendResultSet(int sqlrcurref) 
@@ -790,6 +783,20 @@ set open when the connection calls
 suspendSession() so that another connection can 
 connect to it using resumeResultSet() after 
 it calls resumeSession().
+<P>
+
+<LI>
+<CODE>
+int sqlrcur_getResultSetId(int sqlrcurref) 
+</CODE>
+<P>
+Returns the internal ID of this result set.
+This parameter may be passed to another 
+statement for use in the resumeResultSet() 
+function.
+Note: the value returned by this function is
+only valid after a call to
+sqlrcur_suspendResultSet().
 <P>
 <LI>
 <CODE>

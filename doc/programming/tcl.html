@@ -1530,11 +1530,11 @@ load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;insert into my_table values (1,2,3)&quot;</font>
-<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$port</font> [<font color="#008b8b">$cur</font> getConnectionPort]
-<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$cusocket</font> [<font color="#008b8b">$cur</font> getConnectionSocket]
-<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$rs</font> [<font color="#008b8b">$cur</font> getResultSetId]
 <font color="#008b8b">$cur</font> suspendResultSet
 <font color="#008b8b">$con</font> suspendSession
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$rs</font> [<font color="#008b8b">$cur</font> getResultSetId]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$port</font> [<font color="#008b8b">$cur</font> getConnectionPort]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$cusocket</font> [<font color="#008b8b">$cur</font> getConnectionSocket]
 
         ... pass the rs, port and socket to the next page ...
 </pre>

@@ -381,17 +381,19 @@ public class SQLRCursor {
 	public native int	getLongest(String col);
 
 
-	/** Returns the internal ID of this result set.
-	 *  This parameter may be passed to another 
-	 *  cursor for use in the resumeResultSet() 
-	 *  method.  */
-	public native short	getResultSetId();
 	/** Tells the server to leave this result
 	 *  set open when the connection calls 
 	 *  suspendSession() so that another connection 
 	 *  can connect to it using resumeResultSet() 
-	 *  after it calls resumeSession().  */
+	 *  after it calls resumeSession(). */
 	public native void	suspendResultSet();
+	/** Returns the internal ID of this result set.
+	 *  This parameter may be passed to another 
+	 *  cursor for use in the resumeResultSet() 
+	 *  method.
+	 *  Note: the value returned by this method is only
+	 *  valid after a call to suspendResultSet(). */
+	public native short	getResultSetId();
 	/** Resumes a result set previously left open 
 	 *  using suspendSession().
 	 *  Returns 1 on success and 0 on failure.  */

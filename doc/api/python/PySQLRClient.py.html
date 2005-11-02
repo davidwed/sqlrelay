@@ -43,6 +43,8 @@
 <FONT color=#f800f8>        communicating over. This parameter may be </FONT>
 <FONT color=#f800f8>        passed to another connection for use in</FONT>
 <FONT color=#f800f8>        the resumeSession() method.</FONT>
+<FONT color=#f800f8>        Note: the value returned by this method is</FONT>
+<FONT color=#f800f8>        only valid after a call to suspendSession().</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getConnectionSocket</FONT>(self):
@@ -51,6 +53,8 @@
 <FONT color=#f800f8>        communicating over. This parameter may be </FONT>
 <FONT color=#f800f8>        passed to another connection for use in</FONT>
 <FONT color=#f800f8>        the resumeSession() method.</FONT>
+<FONT color=#f800f8>        Note: the value returned by this method is</FONT>
+<FONT color=#f800f8>        only valid after a call to suspendSession().</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>resumeSession</FONT>(self, port, socket):
@@ -494,6 +498,8 @@
 <FONT color=#f800f8>        This parameter may be passed to another </FONT>
 <FONT color=#f800f8>        cursor for use in the resumeResultSet() </FONT>
 <FONT color=#f800f8>        method.</FONT>
+<FONT color=#f800f8>        Note: the value returned by this method is</FONT>
+<FONT color=#f800f8>        only valid after a call to suspendResultSet().</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>suspendResultSet</FONT>(self):

@@ -1747,11 +1747,11 @@ public class MyClass {
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	cur.sendQuery(<FONT color=#ff00ff>&quot;insert into my_table values (1,2,3)&quot;</FONT>);
-        	<B><FONT color=#2e8b57>int</FONT></B>     port=cur.getConnectionPort();
-        	<B><FONT color=#2e8b57>String</FONT></B>  socket=cur.getConnectionSocket();
-        	<B><FONT color=#2e8b57>int</FONT></B>     rs=cur.getResultSetId();
         	cur.suspendResultSet();
         	con.suspendSession();
+        	<B><FONT color=#2e8b57>int</FONT></B>     rs=cur.getResultSetId();
+        	<B><FONT color=#2e8b57>int</FONT></B>     port=cur.getConnectionPort();
+        	<B><FONT color=#2e8b57>String</FONT></B>  socket=cur.getConnectionSocket();
 
         	... pass the rs, port and socket to the next page ...
 

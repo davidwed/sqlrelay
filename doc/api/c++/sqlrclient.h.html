@@ -1,7 +1,7 @@
 <html>
 <head>
-<title>~/src/firstworks/sqlrelay-0.34/src/api/c++/include/sqlrelay/sqlrclient.h.html</title>
-<meta name="Generator" content="Vim/6.2">
+<title>~/src/firstworks/sqlrelay-0.37/src/api/c++/include/sqlrelay/sqlrclient.h.html</title>
+<meta name="Generator" content="Vim/6.3">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 </head>
 <body bgcolor="#ffffff" text="#000000">
@@ -14,12 +14,16 @@
 
 <font color="#a020f0">#include </font><font color="#ff00ff">&lt;sqlrelay/private/sqlrincludes.h&gt;</font>
 
-<font color="#2e8b57"><b>class</b></font> sqlrconnection : <font color="#a52a2a"><b>public</b></font> inetclientsocket, <font color="#a52a2a"><b>public</b></font> unixclientsocket {
+<font color="#a020f0">#ifdef RUDIMENTS_NAMESPACE</font>
+<font color="#a52a2a"><b>using</b></font> <font color="#2e8b57"><b>namespace</b></font> rudiments;
+<font color="#a020f0">#endif</font>
+
+<font color="#2e8b57"><b>class</b></font> sqlrconnection {
         <font color="#a52a2a"><b>public</b></font>:
-                        sqlrconnection(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *server, <font color="#2e8b57"><b>int</b></font> port,
+                        sqlrconnection(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *server, <font color="#2e8b57"><b>uint16_t</b></font> port,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *socket,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *user, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *password,
-                                        <font color="#2e8b57"><b>int</b></font> retrytime, <font color="#2e8b57"><b>int</b></font> tries);
+                                        <font color="#2e8b57"><b>int32_t</b></font> retrytime, <font color="#2e8b57"><b>int32_t</b></font> tries);
                                 <font color="#0000ff">// Initiates a connection to &quot;server&quot; on &quot;port&quot;</font>
                                 <font color="#0000ff">// or to the unix &quot;socket&quot; on the local machine</font>
                                 <font color="#0000ff">// and authenticates with &quot;user&quot; and &quot;password&quot;.</font>
@@ -39,51 +43,53 @@
                                 <font color="#0000ff">// Disconnects and ends the session if</font>
                                 <font color="#0000ff">// it hasn't been ended already.</font>
 
-                <font color="#2e8b57"><b>int</b></font>     endSession();
+                <font color="#2e8b57"><b>void</b></font>    endSession();
                                 <font color="#0000ff">// Ends the session.</font>
-                <font color="#2e8b57"><b>int</b></font>     suspendSession();
+                <font color="#2e8b57"><b>bool</b></font>    suspendSession();
                                 <font color="#0000ff">// Disconnects this connection from the current</font>
                                 <font color="#0000ff">// session but leaves the session open so </font>
                                 <font color="#0000ff">// that another connection can connect to it </font>
                                 <font color="#0000ff">// using resumeSession().</font>
-                <font color="#2e8b57"><b>int</b></font>     getConnectionPort();
+                <font color="#2e8b57"><b>uint16_t</b></font>        getConnectionPort();
                                 <font color="#0000ff">// Returns the inet port that the connection is </font>
                                 <font color="#0000ff">// communicating over. This parameter may be </font>
                                 <font color="#0000ff">// passed to another connection for use in</font>
                                 <font color="#0000ff">// the resumeSession() method.</font>
-                <font color="#2e8b57"><b>char</b></font>    *getConnectionSocket();
+                                <font color="#0000ff">// Note: The value this method returns is only</font>
+                                <font color="#0000ff">// valid after a call to suspendSession().</font>
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getConnectionSocket();
                                 <font color="#0000ff">// Returns the unix socket that the connection </font>
                                 <font color="#0000ff">// is communicating over. This parameter may be </font>
                                 <font color="#0000ff">// passed to another connection for use in</font>
                                 <font color="#0000ff">// the resumeSession() method.</font>
-                <font color="#2e8b57"><b>int</b></font>     resumeSession(<font color="#2e8b57"><b>int</b></font> port, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *socket);
+                                <font color="#0000ff">// Note: The value this method returns is only</font>
+                                <font color="#0000ff">// valid after a call to suspendSession().</font>
+                <font color="#2e8b57"><b>bool</b></font>    resumeSession(<font color="#2e8b57"><b>uint16_t</b></font> port, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *socket);
                                 <font color="#0000ff">// Resumes a session previously left open </font>
                                 <font color="#0000ff">// using suspendSession().</font>
-                                <font color="#0000ff">// Returns 1 on success and 0 on failure.</font>
+                                <font color="#0000ff">// Returns true on success and false on failure.</font>
 
 
-                <font color="#2e8b57"><b>int</b></font>     ping();
-                                <font color="#0000ff">// Returns 1 if the database is up and 0</font>
+                <font color="#2e8b57"><b>bool</b></font>    ping();
+                                <font color="#0000ff">// Returns true if the database is up and false</font>
                                 <font color="#0000ff">// if it's down.</font>
-                <font color="#2e8b57"><b>char</b></font>    *identify();
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *identify();
                                 <font color="#0000ff">// Returns the type of database: </font>
                                 <font color="#0000ff">//   oracle7, oracle8, postgresql, mysql, etc.</font>
 
 
-                <font color="#2e8b57"><b>int</b></font>     autoCommitOn();
+                <font color="#2e8b57"><b>bool</b></font>    autoCommitOn();
                                 <font color="#0000ff">// Instructs the database to perform a commit</font>
                                 <font color="#0000ff">// after every successful query.</font>
-                <font color="#2e8b57"><b>int</b></font>     autoCommitOff();
+                <font color="#2e8b57"><b>bool</b></font>    autoCommitOff();
                                 <font color="#0000ff">// Instructs the database to wait for the </font>
                                 <font color="#0000ff">// client to tell it when to commit.</font>
-                <font color="#2e8b57"><b>int</b></font>     commit();
+                <font color="#2e8b57"><b>bool</b></font>    commit();
                                 <font color="#0000ff">// Issues a commit.  Returns 1 if the commit</font>
-                                <font color="#0000ff">// succeeded, 0 if it failed and -1 if an</font>
-                                <font color="#0000ff">// error occurred.</font>
-                <font color="#2e8b57"><b>int</b></font>     rollback();
+                                <font color="#0000ff">// succeeded, 0 if it failed.</font>
+                <font color="#2e8b57"><b>bool</b></font>    rollback();
                                 <font color="#0000ff">// Issues a rollback.  Returns 1 if the rollback</font>
-                                <font color="#0000ff">// succeeded, 0 if it failed and -1 if an</font>
-                                <font color="#0000ff">// error occurred.</font>
+                                <font color="#0000ff">// succeeded, 0 if it failed.</font>
 
 
                 <font color="#2e8b57"><b>void</b></font>    debugOn();
@@ -92,9 +98,9 @@
                                 <font color="#0000ff">// this is to start a query with &quot;-- debug\n&quot;.</font>
                 <font color="#2e8b57"><b>void</b></font>    debugOff();
                                 <font color="#0000ff">// Turns debugging off.</font>
-                <font color="#2e8b57"><b>int</b></font>     getDebug();
-                                <font color="#0000ff">// Returns 0 if debugging is off and 1 if </font>
-                                <font color="#0000ff">// debugging is on.</font>
+                <font color="#2e8b57"><b>bool</b></font>    getDebug();
+                                <font color="#0000ff">// Returns false if debugging is off and true</font>
+                                <font color="#0000ff">// if debugging is on.</font>
 
 
                 <font color="#2e8b57"><b>void</b></font>    debugPrintFunction(<font color="#2e8b57"><b>int</b></font> (*printfunction)
@@ -113,11 +119,11 @@
                         sqlrcursor(sqlrconnection *sqlrc);
                         ~sqlrcursor();
 
-                <font color="#2e8b57"><b>void</b></font>    setResultSetBufferSize(<font color="#2e8b57"><b>int</b></font> rows);
+                <font color="#2e8b57"><b>void</b></font>    setResultSetBufferSize(<font color="#2e8b57"><b>uint64_t</b></font> rows);
                                 <font color="#0000ff">// Sets the number of rows of the result set</font>
                                 <font color="#0000ff">// to buffer at a time.  0 (the default)</font>
                                 <font color="#0000ff">// means buffer the entire result set.</font>
-                <font color="#2e8b57"><b>int</b></font>     getResultSetBufferSize();
+                <font color="#2e8b57"><b>uint64_t</b></font>        getResultSetBufferSize();
                                 <font color="#0000ff">// Returns the number of result set rows that </font>
                                 <font color="#0000ff">// will be buffered at a time or 0 for the</font>
                                 <font color="#0000ff">// entire result set.</font>
@@ -154,13 +160,13 @@
                                 <font color="#0000ff">// to cacheToFile() changes which file to</font>
                                 <font color="#0000ff">// cache to or a call to cacheOff() turns off</font>
                                 <font color="#0000ff">// caching.</font>
-                <font color="#2e8b57"><b>void</b></font>    setCacheTtl(<font color="#2e8b57"><b>int</b></font> ttl);
+                <font color="#2e8b57"><b>void</b></font>    setCacheTtl(<font color="#2e8b57"><b>uint32_t</b></font> ttl);
                                 <font color="#0000ff">// Sets the time-to-live for cached result</font>
                                 <font color="#0000ff">// sets. The sqlr-cachemanger will remove each </font>
                                 <font color="#0000ff">// cached result set &quot;ttl&quot; seconds after it's </font>
                                 <font color="#0000ff">// created, provided it's scanning the directory</font>
                                 <font color="#0000ff">// containing the cache files.</font>
-                <font color="#2e8b57"><b>char</b></font>    *getCacheFileName();
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getCacheFileName();
                                 <font color="#0000ff">// Returns the name of the file containing the</font>
                                 <font color="#0000ff">// cached result set.</font>
                 <font color="#2e8b57"><b>void</b></font>    cacheOff();
@@ -169,13 +175,13 @@
 
                 <font color="#0000ff">// If you don't need to use substitution or bind variables</font>
                 <font color="#0000ff">// in your queries, use these two methods.</font>
-                <font color="#2e8b57"><b>int</b></font>     sendQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query);
+                <font color="#2e8b57"><b>bool</b></font>    sendQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query);
                                 <font color="#0000ff">// Sends &quot;query&quot; and gets a result set.</font>
-                <font color="#2e8b57"><b>int</b></font>     sendQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query, <font color="#2e8b57"><b>int</b></font> length);
+                <font color="#2e8b57"><b>bool</b></font>    sendQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query, <font color="#2e8b57"><b>uint32_t</b></font> length);
                                 <font color="#0000ff">// Sends &quot;query&quot; with length &quot;length&quot; and gets</font>
                                 <font color="#0000ff">// a result set. This method must be used if</font>
                                 <font color="#0000ff">// the query contains binary data.</font>
-                <font color="#2e8b57"><b>int</b></font>     sendFileQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *path, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *filename);
+                <font color="#2e8b57"><b>bool</b></font>    sendFileQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *path, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *filename);
                                 <font color="#0000ff">// Sends the query in file &quot;path&quot;/&quot;filename&quot; </font>
                                 <font color="#0000ff">// and gets a result set.</font>
 
@@ -186,39 +192,46 @@
                 <font color="#0000ff">// bind variables.</font>
                 <font color="#2e8b57"><b>void</b></font>    prepareQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query);
                                 <font color="#0000ff">// Prepare to execute &quot;query&quot;.</font>
-                <font color="#2e8b57"><b>void</b></font>    prepareQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query, <font color="#2e8b57"><b>int</b></font> length);
+                <font color="#2e8b57"><b>void</b></font>    prepareQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *query, <font color="#2e8b57"><b>uint32_t</b></font> length);
                                 <font color="#0000ff">// Prepare to execute &quot;query&quot; with length </font>
                                 <font color="#0000ff">// &quot;length&quot;.  This method must be used if the</font>
                                 <font color="#0000ff">// query contains binary data.</font>
-                <font color="#2e8b57"><b>int</b></font>     prepareFileQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *path,
+                <font color="#2e8b57"><b>bool</b></font>    prepareFileQuery(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *path,
                                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *filename);
                                 <font color="#0000ff">// Prepare to execute the contents </font>
-                                <font color="#0000ff">// of &quot;path&quot;/&quot;filename&quot;.  Returns 0 if the</font>
+                                <font color="#0000ff">// of &quot;path&quot;/&quot;filename&quot;.  Returns false if the</font>
                                 <font color="#0000ff">// file couldn't be opened.</font>
 
                 <font color="#2e8b57"><b>void</b></font>    clearBinds();
                                 <font color="#0000ff">// Clear all bind variables.</font>
 
+                <font color="#2e8b57"><b>uint16_t</b></font>        countBindVariables() <font color="#2e8b57"><b>const</b></font>;
+                                <font color="#0000ff">// Parses the previously prepared query,</font>
+                                <font color="#0000ff">// counts the number of bind variables defined</font>
+                                <font color="#0000ff">// in it and returns that number.</font>
+
                 <font color="#2e8b57"><b>void</b></font>    substitution(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value);
-                <font color="#2e8b57"><b>void</b></font>    substitution(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>long</b></font> value);
+                <font color="#2e8b57"><b>void</b></font>    substitution(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>int64_t</b></font> value);
                 <font color="#2e8b57"><b>void</b></font>    substitution(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>double</b></font> value,
-                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> precision,
-                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> scale);
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> precision,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> scale);
                                 <font color="#0000ff">// Define a substitution variable.</font>
 
                 <font color="#2e8b57"><b>void</b></font>    inputBind(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value);
-                <font color="#2e8b57"><b>void</b></font>    inputBind(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>long</b></font> value);
+                <font color="#2e8b57"><b>void</b></font>    inputBind(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>int64_t</b></font> value);
                 <font color="#2e8b57"><b>void</b></font>    inputBind(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>double</b></font> value,
-                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> precision,
-                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> scale);
-                <font color="#2e8b57"><b>void</b></font>    inputBindBlob(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value,
-                                                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font> size);
-                <font color="#2e8b57"><b>void</b></font>    inputBindClob(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value,
-                                                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font> size);
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> precision,
+                                                        <font color="#2e8b57"><b>uint32_t</b></font> scale);
+                <font color="#2e8b57"><b>void</b></font>    inputBindBlob(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable,
+                                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value,
+                                                <font color="#2e8b57"><b>uint32_t</b></font> size);
+                <font color="#2e8b57"><b>void</b></font>    inputBindClob(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable,
+                                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *value,
+                                                <font color="#2e8b57"><b>uint32_t</b></font> size);
                                 <font color="#0000ff">// Define an input bind variable.</font>
 
                 <font color="#2e8b57"><b>void</b></font>    defineOutputBind(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable,
-                                        <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font> bufferlength);
+                                                <font color="#2e8b57"><b>uint32_t</b></font> bufferlength);
                                 <font color="#0000ff">// Define an output bind variable.</font>
                                 <font color="#0000ff">// &quot;bufferlength&quot; bytes will be reserved</font>
                                 <font color="#0000ff">// to store the value.</font>
@@ -232,19 +245,19 @@
                 <font color="#2e8b57"><b>void</b></font>    substitutions(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables,
                                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **values);
                 <font color="#2e8b57"><b>void</b></font>    substitutions(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables,
-                                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>long</b></font> *values);
+                                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>int64_t</b></font> *values);
                 <font color="#2e8b57"><b>void</b></font>    substitutions(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>double</b></font> *values,
-                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> *precisions,
-                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> *scales);
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>uint32_t</b></font> *precisions,
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>uint32_t</b></font> *scales);
                                 <font color="#0000ff">// Define an array of substitution variables.</font>
                 <font color="#2e8b57"><b>void</b></font>    inputBinds(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **values);
                 <font color="#2e8b57"><b>void</b></font>    inputBinds(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables,
-                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font> *values);
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>int64_t</b></font> *values);
                 <font color="#2e8b57"><b>void</b></font>    inputBinds(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> **variables,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>double</b></font> *values,
-                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> *precisions,
-                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font> *scales);
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>uint32_t</b></font> *precisions,
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>uint32_t</b></font> *scales);
                                 <font color="#0000ff">// Define an array of input bind variables.</font>
 
                 <font color="#2e8b57"><b>void</b></font>    validateBinds();
@@ -255,18 +268,18 @@
                                 <font color="#0000ff">// query.  There is a performance penalty for</font>
                                 <font color="#0000ff">// calling this method.</font>
 
-                <font color="#2e8b57"><b>int</b></font>     executeQuery();
+                <font color="#2e8b57"><b>bool</b></font>    executeQuery();
                                 <font color="#0000ff">// Execute the query that was previously </font>
                                 <font color="#0000ff">// prepared and bound.</font>
 
-                <font color="#2e8b57"><b>int</b></font>     fetchFromBindCursor();
+                <font color="#2e8b57"><b>bool</b></font>    fetchFromBindCursor();
                                 <font color="#0000ff">// Fetch from a cursor that was returned as</font>
                                 <font color="#0000ff">// an output bind variable.</font>
 
-                <font color="#2e8b57"><b>char</b></font>    *getOutputBind(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getOutputBind(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                                 <font color="#0000ff">// Get the value stored in a previously</font>
                                 <font color="#0000ff">// defined output bind variable.</font>
-                <font color="#2e8b57"><b>long</b></font>    getOutputBindAsLong(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                <font color="#2e8b57"><b>int64_t</b></font> getOutputBindAsInteger(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                                 <font color="#0000ff">// Get the value stored in a previously</font>
                                 <font color="#0000ff">// defined output bind variable as a long</font>
                                 <font color="#0000ff">// integer.</font>
@@ -274,7 +287,7 @@
                                 <font color="#0000ff">// Get the value stored in a previously</font>
                                 <font color="#0000ff">// defined output bind variable as a double</font>
                                 <font color="#0000ff">// precision floating point number.</font>
-                <font color="#2e8b57"><b>long</b></font>    getOutputBindLength(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getOutputBindLength(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                                 <font color="#0000ff">// Get the length of the value stored in a</font>
                                 <font color="#0000ff">// previously defined output bind variable.</font>
                 sqlrcursor      *getOutputBindCursor(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
@@ -282,46 +295,46 @@
                                 <font color="#0000ff">// defined output bind variable.</font>
 
 
-                <font color="#2e8b57"><b>int</b></font>     openCachedResultSet(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *filename);
+                <font color="#2e8b57"><b>bool</b></font>    openCachedResultSet(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *filename);
                                 <font color="#0000ff">// Opens a cached result set.</font>
-                                <font color="#0000ff">// Returns 1 on success and 0 on failure.</font>
+                                <font color="#0000ff">// Returns true on success and false on failure.</font>
 
-                <font color="#2e8b57"><b>int</b></font>     colCount();
+                <font color="#2e8b57"><b>uint32_t</b></font>        colCount();
                                 <font color="#0000ff">// Returns the number of columns in the current</font>
                                 <font color="#0000ff">// result set.</font>
-                <font color="#2e8b57"><b>int</b></font>     rowCount();
+                <font color="#2e8b57"><b>uint64_t</b></font>        rowCount();
                                 <font color="#0000ff">// Returns the number of rows in the current </font>
                                 <font color="#0000ff">// result set (if the result set is being</font>
                                 <font color="#0000ff">// stepped through, this returns the number</font>
                                 <font color="#0000ff">// of rows processed so far).</font>
-                <font color="#2e8b57"><b>int</b></font>     totalRows();
+                <font color="#2e8b57"><b>uint64_t</b></font>        totalRows();
                                 <font color="#0000ff">// Returns the total number of rows that will </font>
                                 <font color="#0000ff">// be returned in the result set.  Not all </font>
                                 <font color="#0000ff">// databases support this call.  Don't use it </font>
                                 <font color="#0000ff">// for applications which are designed to be </font>
-                                <font color="#0000ff">// portable across databases.  -1 is returned</font>
+                                <font color="#0000ff">// portable across databases.  0 is returned</font>
                                 <font color="#0000ff">// by databases which don't support this option.</font>
-                <font color="#2e8b57"><b>int</b></font>     affectedRows();
+                <font color="#2e8b57"><b>uint64_t</b></font>        affectedRows();
                                 <font color="#0000ff">// Returns the number of rows that were </font>
                                 <font color="#0000ff">// updated, inserted or deleted by the query.</font>
                                 <font color="#0000ff">// Not all databases support this call.  Don't </font>
                                 <font color="#0000ff">// use it for applications which are designed </font>
-                                <font color="#0000ff">// to be portable across databases.  -1 is </font>
+                                <font color="#0000ff">// to be portable across databases.  0 is </font>
                                 <font color="#0000ff">// returned by databases which don't support </font>
                                 <font color="#0000ff">// this option.</font>
-                <font color="#2e8b57"><b>int</b></font>     firstRowIndex();
+                <font color="#2e8b57"><b>uint64_t</b></font>        firstRowIndex();
                                 <font color="#0000ff">// Returns the index of the first buffered row.</font>
                                 <font color="#0000ff">// This is useful when buffering only part of</font>
                                 <font color="#0000ff">// the result set at a time.</font>
-                <font color="#2e8b57"><b>int</b></font>     endOfResultSet();
-                                <font color="#0000ff">// Returns 0 if part of the result set is still</font>
-                                <font color="#0000ff">// pending on the server and 1 if not.  This</font>
-                                <font color="#0000ff">// method can only return 0 if </font>
+                <font color="#2e8b57"><b>bool</b></font>    endOfResultSet();
+                                <font color="#0000ff">// Returns false if part of the result set is</font>
+                                <font color="#0000ff">// still pending on the server and true if not.</font>
+                                <font color="#0000ff">// This method can only return false if </font>
                                 <font color="#0000ff">// setResultSetBufferSize() has been called</font>
                                 <font color="#0000ff">// with a parameter other than 0.</font>
 
 
-                <font color="#2e8b57"><b>char</b></font>    *errorMessage();
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *errorMessage();
                                 <font color="#0000ff">// If a query failed and generated an error, </font>
                                 <font color="#0000ff">// the error message is available here.  If </font>
                                 <font color="#0000ff">// the query succeeded then this method </font>
@@ -338,92 +351,117 @@
                                 <font color="#0000ff">// than as empty strings.</font>
 
 
-                <font color="#2e8b57"><b>char</b></font>    *getField(<font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>char</b></font>    *getField(<font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getField(<font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getField(<font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns a pointer to the value of the </font>
                                 <font color="#0000ff">// specified row and column.</font>
-                <font color="#2e8b57"><b>long</b></font>    getFieldAsLong(<font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>long</b></font>    getFieldAsLong(<font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>int64_t</b></font> getFieldAsInteger(<font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>int64_t</b></font> getFieldAsInteger(<font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns the specified field as a long</font>
                                 <font color="#0000ff">// integer.</font>
-                <font color="#2e8b57"><b>double</b></font>  getFieldAsDouble(<font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>double</b></font>  getFieldAsDouble(<font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>double</b></font>  getFieldAsDouble(<font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>double</b></font>  getFieldAsDouble(<font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns the specified field as a double</font>
                                 <font color="#0000ff">// precision floating point number.</font>
-                <font color="#2e8b57"><b>long</b></font>    getFieldLength(<font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>long</b></font>    getFieldLength(<font color="#2e8b57"><b>int</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getFieldLength(<font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getFieldLength(<font color="#2e8b57"><b>uint64_t</b></font> row, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns the length of the </font>
                                 <font color="#0000ff">// specified row and column.</font>
-                <font color="#2e8b57"><b>char</b></font>    **getRow(<font color="#2e8b57"><b>int</b></font> row);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> * <font color="#2e8b57"><b>const</b></font> *getRow(<font color="#2e8b57"><b>uint64_t</b></font> row);
                                 <font color="#0000ff">// Returns a null terminated array of the </font>
                                 <font color="#0000ff">// values of the fields in the specified row.</font>
-                <font color="#2e8b57"><b>long</b></font>    *getRowLengths(<font color="#2e8b57"><b>int</b></font> row);
+                <font color="#2e8b57"><b>uint32_t</b></font>        *getRowLengths(<font color="#2e8b57"><b>uint64_t</b></font> row);
                                 <font color="#0000ff">// Returns a null terminated array of the </font>
                                 <font color="#0000ff">// lengths of the fields in the specified row.</font>
-                <font color="#2e8b57"><b>char</b></font>    **getColumnNames();
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> * <font color="#2e8b57"><b>const</b></font> *getColumnNames();
                                 <font color="#0000ff">// Returns a null terminated array of the </font>
                                 <font color="#0000ff">// column names of the current result set.</font>
-                <font color="#2e8b57"><b>char</b></font>    *getColumnName(<font color="#2e8b57"><b>int</b></font> col);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getColumnName(<font color="#2e8b57"><b>uint32_t</b></font> col);
                                 <font color="#0000ff">// Returns the name of the specified column.</font>
-                <font color="#2e8b57"><b>char</b></font>    *getColumnType(<font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>char</b></font>    *getColumnType(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getColumnType(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getColumnType(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns the type of the specified column.</font>
-                <font color="#2e8b57"><b>int</b></font>     getColumnLength(<font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>int</b></font>     getColumnLength(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getColumnLength(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getColumnLength(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns the number of bytes required on</font>
                                 <font color="#0000ff">// the server to store the data.</font>
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font>   getColumnPrecision(<font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font>   getColumnPrecision(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getColumnPrecision(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getColumnPrecision(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns the precision of the specified</font>
                                 <font color="#0000ff">// column.</font>
                                 <font color="#0000ff">// Precision is the total number of digits in</font>
                                 <font color="#0000ff">// a number.  eg: 123.45 has a precision of 5.</font>
                                 <font color="#0000ff">// For non-numeric types, it's the number of</font>
                                 <font color="#0000ff">// characters in the string.</font>
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font>   getColumnScale(<font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>long</b></font>   getColumnScale(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getColumnScale(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getColumnScale(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns the scale of the specified column.</font>
                                 <font color="#0000ff">// Scale is the total number of digits to the</font>
                                 <font color="#0000ff">// right of the decimal point in a number.</font>
                                 <font color="#0000ff">// eg: 123.45 has a scale of 2.</font>
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  getColumnIsNullable(<font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  getColumnIsNullable(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsNullable(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsNullable(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns 1 if the specified column can</font>
                                 <font color="#0000ff">// contain nulls and 0 otherwise.</font>
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  getColumnIsPrimaryKey(<font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  getColumnIsPrimaryKey(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsPrimaryKey(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsPrimaryKey(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns 1 if the specified column is a</font>
                                 <font color="#0000ff">// primary key and 0 otherwise.</font>
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  getColumnIsUnique(<font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>unsigned</b></font> <font color="#2e8b57"><b>short</b></font>  getColumnIsUnique(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsUnique(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsUnique(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns 1 if the specified column is</font>
                                 <font color="#0000ff">// unique and 0 otherwise.</font>
-                <font color="#2e8b57"><b>int</b></font>     getLongest(<font color="#2e8b57"><b>int</b></font> col);
-                <font color="#2e8b57"><b>int</b></font>     getLongest(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsPartOfKey(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsPartOfKey(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                                <font color="#0000ff">// Returns 1 if the specified column is</font>
+                                <font color="#0000ff">// part of a composite key and 0 otherwise.</font>
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsUnsigned(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsUnsigned(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                                <font color="#0000ff">// Returns 1 if the specified column is</font>
+                                <font color="#0000ff">// an unsigned number and 0 otherwise.</font>
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsZeroFilled(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsZeroFilled(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                                <font color="#0000ff">// Returns 1 if the specified column was</font>
+                                <font color="#0000ff">// created with the zero-fill flag and 0</font>
+                                <font color="#0000ff">// otherwise.</font>
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsBinary(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsBinary(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                                <font color="#0000ff">// Returns 1 if the specified column</font>
+                                <font color="#0000ff">// contains binary data and 0</font>
+                                <font color="#0000ff">// otherwise.</font>
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsAutoIncrement(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>bool</b></font>            getColumnIsAutoIncrement(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
+                                <font color="#0000ff">// Returns 1 if the specified column</font>
+                                <font color="#0000ff">// auto-increments and 0 otherwise.</font>
+                <font color="#2e8b57"><b>uint32_t</b></font>        getLongest(<font color="#2e8b57"><b>uint32_t</b></font> col);
+                <font color="#2e8b57"><b>uint32_t</b></font>        getLongest(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *col);
                                 <font color="#0000ff">// Returns the length of the longest field</font>
                                 <font color="#0000ff">// in the specified column.</font>
 
 
-                <font color="#2e8b57"><b>int</b></font>     getResultSetId();
-                                <font color="#0000ff">// Returns the internal ID of this result set.</font>
-                                <font color="#0000ff">// This parameter may be passed to another </font>
-                                <font color="#0000ff">// cursor for use in the resumeResultSet() </font>
-                                <font color="#0000ff">// method.</font>
                 <font color="#2e8b57"><b>void</b></font>    suspendResultSet();
                                 <font color="#0000ff">// Tells the server to leave this result</font>
                                 <font color="#0000ff">// set open when the connection calls </font>
                                 <font color="#0000ff">// suspendSession() so that another connection </font>
                                 <font color="#0000ff">// can connect to it using resumeResultSet() </font>
                                 <font color="#0000ff">// after it calls resumeSession().</font>
-                <font color="#2e8b57"><b>int</b></font>     resumeResultSet(<font color="#2e8b57"><b>int</b></font> id);
+                <font color="#2e8b57"><b>uint16_t</b></font>        getResultSetId();
+                                <font color="#0000ff">// Returns the internal ID of this result set.</font>
+                                <font color="#0000ff">// This parameter may be passed to another </font>
+                                <font color="#0000ff">// cursor for use in the resumeResultSet() </font>
+                                <font color="#0000ff">// method.</font>
+                                <font color="#0000ff">// Note: The value this method returns is only</font>
+                                <font color="#0000ff">// valid after a call to suspendResultSet().</font>
+                <font color="#2e8b57"><b>bool</b></font>    resumeResultSet(<font color="#2e8b57"><b>uint16_t</b></font> id);
                                 <font color="#0000ff">// Resumes a result set previously left open </font>
                                 <font color="#0000ff">// using suspendSession().</font>
-                                <font color="#0000ff">// Returns 1 on success and 0 on failure.</font>
-                <font color="#2e8b57"><b>int</b></font>     resumeCachedResultSet(<font color="#2e8b57"><b>int</b></font> id, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *filename);
+                                <font color="#0000ff">// Returns true on success and false on failure.</font>
+                <font color="#2e8b57"><b>bool</b></font>    resumeCachedResultSet(<font color="#2e8b57"><b>uint16_t</b></font> id,
+                                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *filename);
                                 <font color="#0000ff">// Resumes a result set previously left open</font>
                                 <font color="#0000ff">// using suspendSession() and continues caching</font>
                                 <font color="#0000ff">// the result set to &quot;filename&quot;.</font>
-                                <font color="#0000ff">// Returns 1 on success and 0 on failure.</font>
+                                <font color="#0000ff">// Returns true on success and false on failure.</font>
 
 <font color="#a020f0">        #include </font><font color="#ff00ff">&lt;sqlrelay/private/sqlrcursor.h&gt;</font>
 };

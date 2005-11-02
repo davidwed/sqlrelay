@@ -42,12 +42,16 @@ uint16_t	sqlrcon_getConnectionPort(sqlrcon sqlrconref);
 			/* Returns the inet port that the connection is 
 			   communicating over. This parameter may be 
 			   passed to another connection for use in
-			   the sqlrcon_resumeSession() command. */
+			   the sqlrcon_resumeSession() command.
+			   Note: The result this function returns is only
+			   valid after a call to suspendSession().*/
 const char	*sqlrcon_getConnectionSocket(sqlrcon sqlrconref);
 			/* Returns the unix socket that the connection is 
 			   communicating over. This parameter may be 
 			   passed to another connection for use in
-			   the sqlrcon_resumeSession() command. */
+			   the sqlrcon_resumeSession() command.
+			   Note: The result this function returns is only
+			   valid after a call to suspendSession().*/
 int	sqlrcon_resumeSession(sqlrcon sqlrconref, uint16_t port,
 							const char *socket);
 			/* Resumes a session previously left open 
@@ -469,17 +473,19 @@ uint32_t	sqlrcur_getLongestByName(sqlrcur sqlrcurref, const char *col);
 			   specified column. */
 
 
-uint16_t	sqlrcur_getResultSetId(sqlrcur sqlrcurref);
-			/* Returns the internal ID of this result set.
-			   This parameter may be passed to another 
-			   statement for use in the resumeResultSet() 
-			   function. */
 void	sqlrcur_suspendResultSet(sqlrcur sqlrcurref);
 			/* Tells the server to leave this result
 			   set open when the connection calls 
 			   suspendSession() so that another connection can 
 			   connect to it using resumeResultSet() after 
 			   it calls resumeSession(). */
+uint16_t	sqlrcur_getResultSetId(sqlrcur sqlrcurref);
+			/* Returns the internal ID of this result set.
+			   This parameter may be passed to another 
+			   statement for use in the resumeResultSet() 
+			   function.
+			   Note: The value this function returns is only
+			   valid after a call to suspendResultSet().*/
 int	sqlrcur_resumeResultSet(sqlrcur sqlrcurref, uint16_t id);
 			/* Resumes a result set previously left open 
 			   using suspendSession().

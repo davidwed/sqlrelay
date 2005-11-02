@@ -1517,11 +1517,11 @@ con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.sendQuery('<FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT>')
-port=getConnectionPort()
-socket=getConnectionSocket()
-rs=getResultSetId()
 cur.suspendResultSet()
 con.suspendSession()
+rs=cur.getResultSetId()
+port=con.getConnectionPort()
+socket=con.getConnectionSocket()
 
 ... pass the rs, port and socket to the next page ...
 </PRE>

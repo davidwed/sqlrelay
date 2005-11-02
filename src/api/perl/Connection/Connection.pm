@@ -70,12 +70,16 @@ __END__
             # communicating over. This parameter may be 
             # passed to another client for use in
             # the resumeSession() command below.
+            # Note: the value returned by this method is
+            # only valid after a call to suspendSession().
 
         getConnectionSocket();
             # Returns the unix socket that the client is 
             # communicating over. This parameter may be 
             # passed to another client for use in
             # the resumeSession() command below.
+            # Note: the value returned by this method is
+            # only valid after a call to suspendSession().
 
         resumeSession(port,socket);
             # Resumes a session previously left open 

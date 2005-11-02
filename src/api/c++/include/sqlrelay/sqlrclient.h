@@ -47,11 +47,15 @@ class sqlrconnection {
 				// communicating over. This parameter may be 
 				// passed to another connection for use in
 				// the resumeSession() method.
+				// Note: The value this method returns is only
+				// valid after a call to suspendSession().
 		const char	*getConnectionSocket();
 				// Returns the unix socket that the connection 
 				// is communicating over. This parameter may be 
 				// passed to another connection for use in
 				// the resumeSession() method.
+				// Note: The value this method returns is only
+				// valid after a call to suspendSession().
 		bool	resumeSession(uint16_t port, const char *socket);
 				// Resumes a session previously left open 
 				// using suspendSession().
@@ -427,17 +431,19 @@ class sqlrcursor {
 				// in the specified column.
 
 
-		uint16_t	getResultSetId();
-				// Returns the internal ID of this result set.
-				// This parameter may be passed to another 
-				// cursor for use in the resumeResultSet() 
-				// method.
 		void	suspendResultSet();
 				// Tells the server to leave this result
 				// set open when the connection calls 
 				// suspendSession() so that another connection 
 				// can connect to it using resumeResultSet() 
 				// after it calls resumeSession().
+		uint16_t	getResultSetId();
+				// Returns the internal ID of this result set.
+				// This parameter may be passed to another 
+				// cursor for use in the resumeResultSet() 
+				// method.
+				// Note: The value this method returns is only
+				// valid after a call to suspendResultSet().
 		bool	resumeResultSet(uint16_t id);
 				// Resumes a result set previously left open 
 				// using suspendSession().

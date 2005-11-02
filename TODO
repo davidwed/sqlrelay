@@ -1,17 +1,14 @@
-oracle connection crashes when killed
-
 Tru64 -
 	unix sockets don't work, looks like a byte-order translation issue
 	can't start more than 1 cursor, looks like out-of-memory
 
 ionut's memory corruption errors
 
-hot dog's php suspended session problem
-
 maciej's stuff:
+	in oracle 9i
 	looks like in: select func(...) from dual, if func()
 		generates an error, sqlrelay doesn't report it
-	although it works for me...
+	it works for me with 10g...
 
 perl apis -> CPAN
 
