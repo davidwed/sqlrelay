@@ -80,24 +80,24 @@ then
 fi
 if ( test "$DB" = "postgresql6" )
 then
-	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
-	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+	ARGS="localhost 8010 \"\" postgresql7test postgresql7test"
+	PHPARGS="host=localhost&port=8010&socket=&user=postgresql7test&password=postgresql7test"
 	sudo $INITDIR/postgresql start
-	sudo sqlr-start -id postgresqltest
+	sudo sqlr-start -id postgresql7test
 fi
 if ( test "$DB" = "postgresql7" )
 then
-	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
-	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+	ARGS="localhost 8010 \"\" postgresql7test postgresql7test"
+	PHPARGS="host=localhost&port=8010&socket=&user=postgresql7test&password=postgresql7test"
 	sudo $INITDIR/postgresql start
-	sudo sqlr-start -id postgresqltest
+	sudo sqlr-start -id postgresql7test
 fi
 if ( test "$DB" = "postgresql8" )
 then
-	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
-	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
+	ARGS="localhost 8010 \"\" postgresql8test postgresql8test"
+	PHPARGS="host=localhost&port=8010&socket=&user=postgresql8test&password=postgresql8test"
 	sudo $INITDIR/postgresql start
-	sudo sqlr-start -id postgresqltest
+	sudo sqlr-start -id postgresql8test
 fi
 if ( test "$DB" = "sqlite" )
 then

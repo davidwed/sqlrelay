@@ -104,7 +104,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("INSERT: \n");
-	checkSuccess(cur->sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001',NULL)"),1);
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");

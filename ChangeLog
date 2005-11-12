@@ -66,6 +66,8 @@
 		valid after suspendSession() and getResultSetId() is only
 		valid after suspendResultSet()
 	updated php docs; fixed some typo's
+	sorted out some lob length issues in mysql
+	updated inputBind to take an int64_t
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

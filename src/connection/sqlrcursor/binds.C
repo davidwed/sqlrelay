@@ -19,9 +19,9 @@ bool sqlrcursor::handleBinds() {
 				return false;
 			}
 		} else if (inbindvars[i].type==LONG_BIND) {
-			if (!inputBindLong(inbindvars[i].variable,
+			if (!inputBindInteger(inbindvars[i].variable,
 				inbindvars[i].variablesize,
-				(uint32_t *)&inbindvars[i].value.longval)) {
+				&inbindvars[i].value.longval)) {
 				return false;
 			}
 		} else if (inbindvars[i].type==DOUBLE_BIND) {
@@ -61,6 +61,22 @@ bool sqlrcursor::handleBinds() {
 					&outbindvars[i].isnull)) {
 				return false;
 			}
+		} else if (outbindvars[i].type==LONG_BIND) {
+			if (!outputBindInteger(outbindvars[i].variable,
+					outbindvars[i].variablesize,
+					&outbindvars[i].value.longval,
+					&outbindvars[i].isnull)) {
+				return false;
+			}
+		} else if (outbindvars[i].type==DOUBLE_BIND) {
+			if (!outputBindDouble(outbindvars[i].variable,
+				outbindvars[i].variablesize,
+				&outbindvars[i].value.doubleval.value,
+				&outbindvars[i].value.doubleval.precision,
+				&outbindvars[i].value.doubleval.scale,
+				&outbindvars[i].isnull)) {
+				return false;
+			}
 		} else if (outbindvars[i].type==BLOB_BIND) {
 			if (!outputBindBlob(outbindvars[i].variable,
 					outbindvars[i].variablesize,i,
@@ -94,9 +110,9 @@ bool sqlrcursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::inputBindLong(const char *variable,
+bool sqlrcursor::inputBindInteger(const char *variable,
 					uint16_t variablesize,
-					uint32_t *value) {
+					int64_t *value) {
 	// by default, do nothing...
 	return true;
 }
@@ -132,6 +148,24 @@ bool sqlrcursor::outputBindString(const char *variable,
 					uint16_t variablesize,
 					char *value, 
 					uint16_t valuesize, 
+					int16_t *isnull) {
+	// by default, do nothing...
+	return true;
+}
+
+bool sqlrcursor::outputBindInteger(const char *variable,
+					uint16_t variablesize,
+					int64_t *value,
+					int16_t *isnull) {
+	// by default, do nothing...
+	return true;
+}
+
+bool sqlrcursor::outputBindDouble(const char *variable,
+					uint16_t variablesize,
+					double *value,
+					uint32_t *precision,
+					uint32_t *scale,
 					int16_t *isnull) {
 	// by default, do nothing...
 	return true;

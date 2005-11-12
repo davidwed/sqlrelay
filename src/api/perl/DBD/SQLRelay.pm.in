@@ -3,6 +3,8 @@ package DBD::SQLRelay;
 use strict;
 use vars qw($err $errstr $sqlstate $drh);
 $DBD::SQLRelay::VERSION='@SQLR_VERSION@';
+$DBD::SQLRelay::SQL_CLOB="SQLRelay::SQL_CLOB";
+$DBD::SQLRelay::SQL_BLOB="SQLRelay::SQL_BLOB";
 use SQLRelay::Connection;
 use SQLRelay::Cursor;
 

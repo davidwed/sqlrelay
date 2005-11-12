@@ -47,9 +47,9 @@ class interbasecursor : public sqlrcursor {
 						const char *value, 
 						uint16_t valuesize,
 						short *isnull);
-		bool		inputBindLong(const char *variable, 
+		bool		inputBindInteger(const char *variable, 
 						uint16_t variablesize,
-						uint32_t *value);
+						int64_t *value);
 		bool		inputBindDouble(const char *variable, 
 						uint16_t variablesize,
 						double *value, 

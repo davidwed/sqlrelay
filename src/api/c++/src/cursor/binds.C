@@ -342,6 +342,14 @@ void sqlrcursor::defineOutputBind(const char *variable,
 	defineOutputBindGeneric(variable,STRING_BIND,length);
 }
 
+void sqlrcursor::defineOutputBindInteger(const char *variable) {
+	defineOutputBindGeneric(variable,LONG_BIND,0);
+}
+
+void sqlrcursor::defineOutputBindDouble(const char *variable) {
+	defineOutputBindGeneric(variable,DOUBLE_BIND,0);
+}
+
 void sqlrcursor::defineOutputBindBlob(const char *variable) {
 	defineOutputBindGeneric(variable,BLOB_BIND,0);
 }
@@ -371,7 +379,6 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 			delete[] outbindvars[outbindcount].variable;
 			outbindvars[outbindcount].variable=
 					charstring::duplicate(variable);
-
 		} else {
 			outbindvars[outbindcount].variable=(char *)variable;
 		}

@@ -118,7 +118,6 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_getconnectionport) {
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_getconnectionsocket) {
-zend_printf("sqlrcon_getconnectionsocket<br>\n");
 	zval **sqlrcon;
 	const char *r;
 	if (ZEND_NUM_ARGS() != 1 || 
@@ -128,15 +127,11 @@ zend_printf("sqlrcon_getconnectionsocket<br>\n");
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
-zend_printf("connection is not NULL<br>\n");
 		r=connection->getConnectionSocket();
 		if (r) {
-zend_printf("r=%s<br>\n",r);
 			RETURN_STRING(const_cast<char *>(r),1);
 		}
-zend_printf("r is NULL\n");
 	}
-zend_printf("connection is NULL\n");
 	RETURN_FALSE;
 }
 

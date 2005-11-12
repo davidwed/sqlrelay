@@ -264,9 +264,9 @@ bool postgresqlcursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool postgresqlcursor::inputBindLong(const char *variable, 
+bool postgresqlcursor::inputBindInteger(const char *variable, 
 						uint16_t variablesize,
-						uint32_t *value) {
+						int64_t *value) {
 
 	if (postgresqlconn->fakebinds) {
 		return true;

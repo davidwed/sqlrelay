@@ -254,19 +254,19 @@ bool interbasecursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool interbasecursor::inputBindLong(const char *variable,
+bool interbasecursor::inputBindInteger(const char *variable,
 					uint16_t variablesize,
-					uint32_t *value) {
+					int64_t *value) {
 
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
 		return false;
 	}
-	insqlda->sqlvar[index].sqltype=SQL_LONG;
+	insqlda->sqlvar[index].sqltype=SQL_INT64;
 	insqlda->sqlvar[index].sqlscale=0;
 	insqlda->sqlvar[index].sqlsubtype=0;
-	insqlda->sqlvar[index].sqllen=sizeof(long);
+	insqlda->sqlvar[index].sqllen=sizeof(int64_t);
 	insqlda->sqlvar[index].sqldata=(char *)value;
 	insqlda->sqlvar[index].sqlind=(short *)NULL;
 	insqlda->sqlvar[index].sqlname_length=0;

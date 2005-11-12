@@ -334,19 +334,19 @@ void mysqlcursor::returnColumnInfo() {
 		// append column type to the header
 		if (mysqlfield->type==FIELD_TYPE_STRING) {
 			type=STRING_DATATYPE;
-			length=(int)mysqlfield->length;
+			length=(uint32_t)mysqlfield->length;
 		} else if (mysqlfield->type==FIELD_TYPE_VAR_STRING) {
 			type=CHAR_DATATYPE;
-			length=(int)mysqlfield->length+1;
+			length=(uint32_t)mysqlfield->length+1;
 		} else if (mysqlfield->type==FIELD_TYPE_DECIMAL) {
 			type=DECIMAL_DATATYPE;
 			if (mysqlfield->decimals>0) {
-				length=(int)mysqlfield->length+2;
+				length=(uint32_t)mysqlfield->length+2;
 			} else if (mysqlfield->decimals==0) {
-				length=(int)mysqlfield->length+1;
+				length=(uint32_t)mysqlfield->length+1;
 			}
 			if (mysqlfield->length<mysqlfield->decimals) {
-				length=(int)mysqlfield->decimals+2;
+				length=(uint32_t)mysqlfield->decimals+2;
 			}
 		} else if (mysqlfield->type==FIELD_TYPE_TINY) {
 			type=TINYINT_DATATYPE;
@@ -411,9 +411,9 @@ void mysqlcursor::returnColumnInfo() {
 			// members (64 max)
 			length=8;
 #endif
-		// For some reason, tinyblobs, mediumblobs and longblobs
-		// all show up as FIELD_TYPE_BLOB despite field types being
-		// defined for those types.  tinyblobs have a length
+		// For some versions of mysql, tinyblobs, mediumblobs and
+		// longblobs all show up as FIELD_TYPE_BLOB despite field types
+		// being defined for those types.  tinyblobs have a length
 		// of 255 though, so that can be used for something.  medium
 		// and long blobs both have the same length though.  Go
 		// figure.  Also, the word TEXT and BLOB appear to be
@@ -421,23 +421,24 @@ void mysqlcursor::returnColumnInfo() {
 		// more standard than TEXT.  I wonder if this will be
 		// changed in a future incarnation of mysql.  I also wonder
 		// what happens on a 64 bit machine.
-		} else if (mysqlfield->type==FIELD_TYPE_TINY_BLOB) {
+		} else if (mysqlfield->type==FIELD_TYPE_TINY_BLOB ||
+				(mysqlfield->type==FIELD_TYPE_BLOB &&
+						mysqlfield->length<256)) {
 			type=TINY_BLOB_DATATYPE;
-			length=(int)mysqlfield->length+2;
-		} else if (mysqlfield->type==FIELD_TYPE_MEDIUM_BLOB) {
+			length=255;
+		} else if (mysqlfield->type==FIELD_TYPE_BLOB &&
+						mysqlfield->length<65536) {
+			type=BLOB_DATATYPE;
+			length=65535;
+		} else if (mysqlfield->type==FIELD_TYPE_MEDIUM_BLOB ||
+				(mysqlfield->type==FIELD_TYPE_BLOB &&
+						mysqlfield->length<16777216)) {
 			type=MEDIUM_BLOB_DATATYPE;
-			length=(int)mysqlfield->length+3;
-		} else if (mysqlfield->type==FIELD_TYPE_LONG_BLOB) {
+			length=16777215;
+		} else if (mysqlfield->type==FIELD_TYPE_LONG_BLOB ||
+					mysqlfield->type==FIELD_TYPE_BLOB) {
 			type=LONG_BLOB_DATATYPE;
-			length=(int)mysqlfield->length+4;
-		} else if (mysqlfield->type==FIELD_TYPE_BLOB) {
-			if ((int)mysqlfield->length==255) {
-				type=TINY_BLOB_DATATYPE;
-				length=(int)mysqlfield->length+2;
-			} else {
-				type=BLOB_DATATYPE;
-				length=(int)mysqlfield->length+3;
-			}
+			length=2147483647;
 		} else {
 			type=UNKNOWN_DATATYPE;
 			length=(int)mysqlfield->length;

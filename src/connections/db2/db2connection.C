@@ -197,9 +197,9 @@ bool db2cursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool db2cursor::inputBindLong(const char *variable,
+bool db2cursor::inputBindInteger(const char *variable,
 					uint16_t variablesize,
-					uint32_t *value) {
+					int64_t *value) {
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -209,7 +209,7 @@ bool db2cursor::inputBindLong(const char *variable,
 				0,
 				0,
 				value,
-				sizeof(long),
+				sizeof(int64_t),
 				(SQLINTEGER *)NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;

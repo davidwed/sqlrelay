@@ -58,9 +58,9 @@ class sqlrcursor {
 						const char *value, 
 						uint16_t valuesize,
 						int16_t *isnull);
-		virtual	bool	inputBindLong(const char *variable, 
+		virtual	bool	inputBindInteger(const char *variable, 
 						uint16_t variablesize,
-						uint32_t *value);
+						int64_t *value);
 		virtual	bool	inputBindDouble(const char *variable, 
 						uint16_t variablesize,
 						double *value,
@@ -80,6 +80,16 @@ class sqlrcursor {
 						uint16_t variablesize,
 						char *value,
 						uint16_t valuesize,
+						int16_t *isnull);
+		virtual	bool	outputBindInteger(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		virtual	bool	outputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
 						int16_t *isnull);
 		virtual	bool	outputBindBlob(const char *variable, 
 						uint16_t variablesize,

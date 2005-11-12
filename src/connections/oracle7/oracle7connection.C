@@ -129,10 +129,17 @@ const char *oracle7connection::identify() {
 oracle7cursor::oracle7cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	errormessage=NULL;
 	oracle7conn=(oracle7connection *)conn;
+	inputbindcount=0;
+	for (uint16_t i=0; i<MAXVAR; i++) {
+		intbindstring[i]=NULL;
+	}
 }
 
 oracle7cursor::~oracle7cursor() {
 	delete errormessage;
+	for (uint16_t i=0; i<inputbindcount; i++) {
+		delete[] intbindstring[i];
+	}
 }
 
 bool oracle7cursor::openCursor(uint16_t id) {
@@ -176,12 +183,15 @@ bool oracle7cursor::inputBindString(const char *variable,
 			return false;
 		}
 	}
+	inputbindcount++;
 	return true;
 }
 
-bool oracle7cursor::inputBindLong(const char *variable, 
+bool oracle7cursor::inputBindInteger(const char *variable, 
 						uint16_t variablesize,
-						uint32_t *value) {
+						int64_t *value) {
+
+	intbindstring[inputbindcount]=charstring::parseNumber(*value);
 	
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -189,17 +199,26 @@ bool oracle7cursor::inputBindLong(const char *variable,
 			return false;
 		}
 		if (obndrn(&cda,(sword)charstring::toInteger(variable+1),
-			(ub1 *)value,(sword)sizeof(uint32_t),LONG_BIND_TYPE,
+			(ub1 *)intbindstring[inputbindcount],
+			(sword)charstring::length(
+				intbindstring[inputbindcount])+1,
+			NULL_TERMINATED_STRING,
+			//(ub1 *)value,(sword)sizeof(int64_t),LONG_BIND_TYPE,
 			-1,(sb2 *)0,(text *)0,-1,-1)) {
 			return false;
 		}
 	} else {
 		if (obndrv(&cda,(text *)variable,(sword)variablesize,
-			(ub1 *)value,(sword)sizeof(uint32_t),LONG_BIND_TYPE,
+			(ub1 *)intbindstring[inputbindcount],
+			(sword)charstring::length(
+				intbindstring[inputbindcount])+1,
+			NULL_TERMINATED_STRING,
+			//(ub1 *)value,(sword)sizeof(int64_t),LONG_BIND_TYPE,
 			-1,(sb2 *)0,(text *)0,-1,-1)) {
 			return false;
 		}
 	}
+	inputbindcount++;
 	return true;
 }
 
@@ -226,6 +245,7 @@ bool oracle7cursor::inputBindDouble(const char *variable,
 			return false;
 		}
 	}
+	inputbindcount++;
 	return true;
 }
 
@@ -493,5 +513,12 @@ void oracle7cursor::returnRow() {
 void oracle7cursor::cleanUpData(bool freeresult, bool freebinds) {
 	if (freeresult) {
 		ocan(&cda);
+	}
+	if (freebinds) {
+		for (uint16_t i=0; i<inputbindcount; i++) {
+			delete[] intbindstring[i];
+			intbindstring[i]=NULL;
+		}
+		inputbindcount=0;
 	}
 }

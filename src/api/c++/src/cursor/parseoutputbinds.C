@@ -30,7 +30,8 @@ bool sqlrcursor::parseOutputBinds() {
 
 		// get the data type
 		if (getShort(&type)!=sizeof(uint16_t)) {
-			setError("Failed to get data type.\n A network error may have occurred.");
+			setError("Failed to get data type.\n "
+				"A network error may have occurred.");
 
 			return false;
 		}
@@ -68,7 +69,7 @@ bool sqlrcursor::parseOutputBinds() {
 				sqlrc->debugPrint("done fetching.\n");
 			}
 
-		} else if (type==NORMAL_DATA) {
+		} else if (type==STRING_DATA) {
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
@@ -78,7 +79,8 @@ bool sqlrcursor::parseOutputBinds() {
 
 			// get the value length
 			if (getLong(&length)!=sizeof(uint32_t)) {
-				setError("Failed to get string value length.\n A network error may have occurred.");
+				setError("Failed to get string value length.\n "
+					"A network error may have occurred.");
 				return false;
 			}
 			outbindvars[count].valuesize=length;
@@ -95,10 +97,76 @@ bool sqlrcursor::parseOutputBinds() {
 			// get the value
 			if ((uint32_t)getString(outbindvars[count].value.
 						stringval,length)!=length) {
-				setError("Failed to get string value.\n A network error may have occurred.");
+				setError("Failed to get string value.\n "
+					"A network error may have occurred.");
 				return false;
 			}
 			outbindvars[count].value.stringval[length]=(char)NULL;
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("		");
+				sqlrc->debugPrint("done fetching\n");
+				sqlrc->debugPreEnd();
+			}
+
+		} else if (type==LONG_DATA) {
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("	LONG output bind\n");
+				sqlrc->debugPreEnd();
+			}
+
+			// get the value
+			if (getLongLong((uint64_t *)&outbindvars[count].
+					value.longval)!=sizeof(uint64_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("		");
+				sqlrc->debugPrint("done fetching\n");
+				sqlrc->debugPreEnd();
+			}
+
+		} else if (type==DOUBLE_DATA) {
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("	DOUBLE output bind\n");
+				sqlrc->debugPreEnd();
+			}
+
+			// get the value
+			if (getDouble(&outbindvars[count].value.
+						doubleval.value)!=
+						sizeof(double)) {
+				setError("Failed to get double value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+
+			// get the precision
+			if (getLong(&outbindvars[count].value.
+						doubleval.precision)!=
+						sizeof(uint32_t)) {
+				setError("Failed to get precision.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+
+			// get the scale
+			if (getLong(&outbindvars[count].value.
+						doubleval.scale)!=
+						sizeof(uint32_t)) {
+				setError("Failed to get scale.\n "
+					"A network error may have occurred.");
+				return false;
+			}
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
@@ -119,7 +187,8 @@ bool sqlrcursor::parseOutputBinds() {
 			if (getShort((uint16_t *)
 					&(outbindvars[count].value.cursorid))!=
 						sizeof(uint16_t)) {
-				setError("Failed to get cursor id.\n A network error may have occurred.");
+				setError("Failed to get cursor id.\n "
+					"A network error may have occurred.");
 				return false;
 			}
 
@@ -143,7 +212,8 @@ bool sqlrcursor::parseOutputBinds() {
 			// get the total length of the long data
 			uint64_t	totallength;
 			if (getLongLong(&totallength)!=sizeof(uint64_t)) {
-				setError("Failed to get total length.\n A network error may have occurred.");
+				setError("Failed to get total length.\n "
+					"A network error may have occurred.");
 				return false;
 			}
 
@@ -172,7 +242,9 @@ bool sqlrcursor::parseOutputBinds() {
 				// get the type of the chunk
 				if (getShort(&type)!=sizeof(uint16_t)) {
 					delete[] buffer;
-					setError("Failed to get chunk type.\n A network error may have occurred.");
+					setError("Failed to get chunk type.\n "
+						"A network error may have "
+						"occurred.");
 					return false;
 				}
 
@@ -184,7 +256,9 @@ bool sqlrcursor::parseOutputBinds() {
 				// get the length of the chunk
 				if (getLong(&length)!=sizeof(uint32_t)) {
 					delete[] buffer;
-					setError("Failed to get chunk length.\n A network error may have occurred.");
+					setError("Failed to get chunk length.\n"
+						" A network error may have "
+						"occurred.");
 					return false;
 				}
 
@@ -192,7 +266,9 @@ bool sqlrcursor::parseOutputBinds() {
 				if ((uint32_t)getString(buffer+offset,
 							length)!=length) {
 					delete[] buffer;
-					setError("Failed to get chunk data.\n A network error may have occurred.");
+					setError("Failed to get chunk data.\n "
+						"A network error may have "
+						"occurred.");
 					return false;
 				}
 

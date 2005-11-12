@@ -87,6 +87,14 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",4,"STRING");
 			#endif
+		} else if (bv->type==LONG_BIND) {
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",4,"LONG");
+			#endif
+		} else if (bv->type==DOUBLE_BIND) {
+			#ifdef SERVER_DEBUG
+			debugPrint("connection",4,"DOUBLE");
+			#endif
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			if (!getBindSize(bv,maxlobbindvaluelength)) {
 				return false;

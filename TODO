@@ -1,3 +1,13 @@
+freetds test reveals
+	Attempt to initiate a new SQL Server operation with results pending.
+	bug
+db2 database won't start
+
+verify that integer input binds aren't broken in db2/odbc
+
+perl DBD::SQLRelay:SQL_CLOB/BLOB issue
+support non-string output binds sybase stored procedures
+
 Tru64 -
 	unix sockets don't work, looks like a byte-order translation issue
 	can't start more than 1 cursor, looks like out-of-memory
@@ -207,7 +217,6 @@ Features:
 	use PAM if possible as alternative to defining users in sqlrelay.conf
 	support stored procedures that return result sets in
 		sybase, interbase, db2
-	support non-string output binds sybase stored procedures
 	could debug logs be logrotate compatible?
 	postgresql drop-in api lacks many features
 	postgresql drop-in needs to parse out ; delimited queries for db's
@@ -301,6 +310,7 @@ Native DB Support:
 	daffodildb/one$db
 	LK bin DB - http://www.lksoft.cjb.net/en/
 	Cache - http://intersystems.com
+	Frontbase
 
 Config Tools:
 	gtk2

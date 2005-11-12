@@ -293,3 +293,14 @@ int32_t sqlrcursor::getString(char *string, int32_t size) {
 		return sqlrc->cs->read(string,size);
 	}
 }
+
+int32_t sqlrcursor::getDouble(double *value) {
+
+	// if the result set is coming from a cache file, read from
+	// the file, if not, read from the server
+	if (cachesource && cachesourceind) {
+		return cachesource->read(value);
+	} else {
+		return sqlrc->cs->read(value);
+	}
+}

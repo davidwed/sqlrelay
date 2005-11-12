@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.8 2005-09-01 03:14:39 mused Exp $
+// $Id: sqlrelay.php,v 1.9 2005-11-12 03:49:10 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -162,7 +162,7 @@ class DB_sqlrelay extends DB_common
         if ($this->affectedrows <= 0 &&
                 preg_match('/^\s*\(?\s*SELECT\s+/si', $query) &&
                     !preg_match('/^\s*\(?\s*SELECT\s+INTO\s/si', $query)) {
-            return new DB_sqlrelay_cursor($cursor);
+            return new DB_sqlrelay_cursor($cursor,$this->connection);
         }
 
         sqlrcur_free($cursor);

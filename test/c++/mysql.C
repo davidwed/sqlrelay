@@ -261,8 +261,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType(13),"BLOB");
 	checkSuccess(cur->getColumnType(14),"CHAR");
 	checkSuccess(cur->getColumnType(15),"TINYBLOB");
-	checkSuccess(cur->getColumnType(16),"BLOB");
-	checkSuccess(cur->getColumnType(17),"BLOB");
+	checkSuccess(cur->getColumnType(16),"MEDIUMBLOB");
+	checkSuccess(cur->getColumnType(17),"LONGBLOB");
 	checkSuccess(cur->getColumnType(18),"TIMESTAMP");
 	checkSuccess(cur->getColumnType("testtinyint"),"TINYINT");
 	checkSuccess(cur->getColumnType("testsmallint"),"SMALLINT");
@@ -280,8 +280,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testtext"),"BLOB");
 	checkSuccess(cur->getColumnType("testvarchar"),"CHAR");
 	checkSuccess(cur->getColumnType("testtinytext"),"TINYBLOB");
-	checkSuccess(cur->getColumnType("testmediumtext"),"BLOB");
-	checkSuccess(cur->getColumnType("testlongtext"),"BLOB");
+	checkSuccess(cur->getColumnType("testmediumtext"),"MEDIUMBLOB");
+	checkSuccess(cur->getColumnType("testlongtext"),"LONGBLOB");
 	checkSuccess(cur->getColumnType("testtimestamp"),"TIMESTAMP");
 	printf("\n");
 
@@ -299,11 +299,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength(10),8);
 	checkSuccess(cur->getColumnLength(11),1);
 	checkSuccess(cur->getColumnLength(12),41);
-	checkSuccess(cur->getColumnLength(13),65538);
+	checkSuccess(cur->getColumnLength(13),65535);
 	checkSuccess(cur->getColumnLength(14),41);
-	checkSuccess(cur->getColumnLength(15),257);
-	checkSuccess(cur->getColumnLength(16),16777218);
-	checkSuccess(cur->getColumnLength(17),16777218);
+	checkSuccess(cur->getColumnLength(15),255);
+	checkSuccess(cur->getColumnLength(16),16777215);
+	checkSuccess(cur->getColumnLength(17),2147483647);
 	checkSuccess(cur->getColumnLength(18),4);
 	checkSuccess(cur->getColumnLength("testtinyint"),1);
 	checkSuccess(cur->getColumnLength("testsmallint"),2);
@@ -318,11 +318,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testdatetime"),8);
 	checkSuccess(cur->getColumnLength("testyear"),1);
 	checkSuccess(cur->getColumnLength("testchar"),41);
-	checkSuccess(cur->getColumnLength("testtext"),65538);
+	checkSuccess(cur->getColumnLength("testtext"),65535);
 	checkSuccess(cur->getColumnLength("testvarchar"),41);
-	checkSuccess(cur->getColumnLength("testtinytext"),257);
-	checkSuccess(cur->getColumnLength("testmediumtext"),16777218);
-	checkSuccess(cur->getColumnLength("testlongtext"),16777218);
+	checkSuccess(cur->getColumnLength("testtinytext"),255);
+	checkSuccess(cur->getColumnLength("testmediumtext"),16777215);
+	checkSuccess(cur->getColumnLength("testlongtext"),2147483647);
 	checkSuccess(cur->getColumnLength("testtimestamp"),4);
 	printf("\n");
 

@@ -416,9 +416,9 @@ bool sybasecursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool sybasecursor::inputBindLong(const char *variable,
+bool sybasecursor::inputBindInteger(const char *variable,
 						uint16_t variablesize,
-						uint32_t *value) {
+						int64_t *value) {
 
 	checkRePrepare();
 
@@ -436,7 +436,7 @@ bool sybasecursor::inputBindLong(const char *variable,
 	parameter[paramindex].status=CS_INPUTVALUE;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-		(CS_VOID *)value,sizeof(uint32_t),0)!=CS_SUCCEED) {
+		(CS_VOID *)value,sizeof(int64_t),0)!=CS_SUCCEED) {
 		return false;
 	}
 	paramindex++;

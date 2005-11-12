@@ -81,9 +81,9 @@ class oracle7cursor : public sqlrcursor {
 						const char *value, 
 						uint16_t valuesize,
 						short *isnull);
-		bool		inputBindLong(const char *variable, 
+		bool		inputBindInteger(const char *variable, 
 						uint16_t variablesize,
-						uint32_t *value);
+						int64_t *value);
 		bool		inputBindDouble(const char *variable, 
 						uint16_t variablesize,
 						double *value,
@@ -126,6 +126,9 @@ class oracle7cursor : public sqlrcursor {
 		uint64_t	row;
 		uint64_t	maxrow;
 		uint64_t	totalrows;
+
+		uint16_t	inputbindcount;
+		char		*intbindstring[MAXVAR];
 
 		oracle7connection	*oracle7conn;
 };

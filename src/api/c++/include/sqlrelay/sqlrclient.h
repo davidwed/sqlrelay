@@ -227,6 +227,11 @@ class sqlrcursor {
 				// Define an output bind variable.
 				// "bufferlength" bytes will be reserved
 				// to store the value.
+		void	defineOutputBindInteger(const char *variable);
+				// Define an integer output bind variable.
+		void	defineOutputBindDouble(const char *variable);
+				// Define a double precision floating
+				// point output bind variable.
 		void	defineOutputBindBlob(const char *variable);
 				// Define a BLOB output bind variable.
 		void	defineOutputBindClob(const char *variable);

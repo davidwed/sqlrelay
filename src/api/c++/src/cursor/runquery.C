@@ -283,14 +283,20 @@ void sqlrcursor::sendOutputBinds() {
 		sqlrc->cs->write(size);
 		sqlrc->cs->write(outbindvars[i].variable,(size_t)size);
 		sqlrc->cs->write((uint16_t)outbindvars[i].type);
-		if (outbindvars[i].type!=CURSOR_BIND) {
+		if (outbindvars[i].type==STRING_BIND ||
+			outbindvars[i].type==BLOB_BIND ||
+			outbindvars[i].type==CLOB_BIND ||
+			outbindvars[i].type==NULL_BIND) {
 			sqlrc->cs->write(outbindvars[i].valuesize);
 		}
 
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint(outbindvars[i].variable);
-			if (outbindvars[i].type!=CURSOR_BIND) {
+			if (outbindvars[i].type==STRING_BIND ||
+				outbindvars[i].type==BLOB_BIND ||
+				outbindvars[i].type==CLOB_BIND ||
+				outbindvars[i].type==NULL_BIND) {
 				sqlrc->debugPrint("(");
 				sqlrc->debugPrint((int64_t)outbindvars[i].
 								valuesize);

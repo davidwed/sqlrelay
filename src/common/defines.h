@@ -49,10 +49,12 @@
 #define FETCH_NO_ROWS 0
 
 #define NULL_DATA 0
-#define NORMAL_DATA 1
+#define STRING_DATA 1
 #define START_LONG_DATA 2
 #define END_LONG_DATA 3
 #define CURSOR_DATA 4
+#define LONG_DATA 5
+#define DOUBLE_DATA 5
 
 #define END_BIND_VARS 5 
 

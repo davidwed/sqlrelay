@@ -260,8 +260,8 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,13),"BLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,14),"CHAR");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,15),"TINYBLOB");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,16),"BLOB");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,17),"BLOB");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,16),"MEDIUMBLOB");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,17),"LONGBLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,18),"TIMESTAMP");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtinyint"),"TINYINT");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testsmallint"),"SMALLINT");
@@ -279,8 +279,8 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtext"),"BLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"CHAR");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtinytext"),"TINYBLOB");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testmediumtext"),"BLOB");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testlongtext"),"BLOB");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testmediumtext"),"MEDIUMBLOB");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testlongtext"),"LONGBLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtimestamp"),"TIMESTAMP");
 	printf("\n");
 
@@ -298,11 +298,11 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,10),8);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,11),1);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,12),41);
-	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,13),65538);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,13),65535);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,14),41);
-	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,15),257);
-	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,16),16777218);
-	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,17),16777218);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,15),255);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,16),16777215);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,17),2147483647);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,18),4);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtinyint"),1);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testsmallint"),2);
@@ -317,11 +317,11 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdatetime"),8);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testyear"),1);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testchar"),41);
-	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtext"),65538);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtext"),65535);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testvarchar"),41);
-	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtinytext"),257);
-	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testmediumtext"),16777218);
-	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testlongtext"),16777218);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtinytext"),255);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testmediumtext"),16777215);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testlongtext"),2147483647);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtimestamp"),4);
 	printf("\n");
 

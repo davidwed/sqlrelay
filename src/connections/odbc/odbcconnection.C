@@ -231,9 +231,9 @@ bool odbccursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool odbccursor::inputBindLong(const char *variable,
+bool odbccursor::inputBindInteger(const char *variable,
 					uint16_t variablesize,
-					uint32_t *value) {
+					int64_t *value) {
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -243,7 +243,7 @@ bool odbccursor::inputBindLong(const char *variable,
 				0,
 				0,
 				value,
-				sizeof(long),
+				sizeof(int64_t),
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)NULL
 				#else

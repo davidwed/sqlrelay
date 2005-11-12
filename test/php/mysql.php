@@ -197,8 +197,8 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnType($cur,13),"BLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,14),"CHAR");
 	checkSuccess(sqlrcur_getColumnType($cur,15),"TINYBLOB");
-	checkSuccess(sqlrcur_getColumnType($cur,16),"BLOB");
-	checkSuccess(sqlrcur_getColumnType($cur,17),"BLOB");
+	checkSuccess(sqlrcur_getColumnType($cur,16),"MEDIUMBLOB");
+	checkSuccess(sqlrcur_getColumnType($cur,17),"LONGBLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,18),"TIMESTAMP");
 	checkSuccess(sqlrcur_getColumnType($cur,"testtinyint"),"TINYINT");
 	checkSuccess(sqlrcur_getColumnType($cur,"testsmallint"),"SMALLINT");
@@ -216,8 +216,8 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnType($cur,"testtext"),"BLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,"testvarchar"),"CHAR");
 	checkSuccess(sqlrcur_getColumnType($cur,"testtinytext"),"TINYBLOB");
-	checkSuccess(sqlrcur_getColumnType($cur,"testmediumtext"),"BLOB");
-	checkSuccess(sqlrcur_getColumnType($cur,"testlongtext"),"BLOB");
+	checkSuccess(sqlrcur_getColumnType($cur,"testmediumtext"),"MEDIUMBLOB");
+	checkSuccess(sqlrcur_getColumnType($cur,"testlongtext"),"LONGBLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,"testtimestamp"),"TIMESTAMP");
 	echo("\n");
 
@@ -235,11 +235,11 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnLength($cur,10),8);
 	checkSuccess(sqlrcur_getColumnLength($cur,11),1);
 	checkSuccess(sqlrcur_getColumnLength($cur,12),41);
-	checkSuccess(sqlrcur_getColumnLength($cur,13),65538);
+	checkSuccess(sqlrcur_getColumnLength($cur,13),65535);
 	checkSuccess(sqlrcur_getColumnLength($cur,14),41);
-	checkSuccess(sqlrcur_getColumnLength($cur,15),257);
-	checkSuccess(sqlrcur_getColumnLength($cur,16),16777218);
-	checkSuccess(sqlrcur_getColumnLength($cur,17),16777218);
+	checkSuccess(sqlrcur_getColumnLength($cur,15),255);
+	checkSuccess(sqlrcur_getColumnLength($cur,16),16777215);
+	checkSuccess(sqlrcur_getColumnLength($cur,17),2147483647);
 	checkSuccess(sqlrcur_getColumnLength($cur,18),4);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testtinyint"),1);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testsmallint"),2);
@@ -254,11 +254,11 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnLength($cur,"testdatetime"),8);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testyear"),1);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testchar"),41);
-	checkSuccess(sqlrcur_getColumnLength($cur,"testtext"),65538);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testtext"),65535);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testvarchar"),41);
-	checkSuccess(sqlrcur_getColumnLength($cur,"testtinytext"),257);
-	checkSuccess(sqlrcur_getColumnLength($cur,"testmediumtext"),16777218);
-	checkSuccess(sqlrcur_getColumnLength($cur,"testlongtext"),16777218);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testtinytext"),255);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testmediumtext"),16777215);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testlongtext"),2147483647);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testtimestamp"),4);
 	echo("\n");
 

@@ -404,6 +404,7 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 		inbindpp[i]=NULL;
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
+		intbindstring[i]=NULL;
 	}
 
 	desc=new describe[oracle8conn->maxselectlistsize];
@@ -442,6 +443,9 @@ oracle8cursor::~oracle8cursor() {
 		delete[] def_indp[i];
 		delete[] def_lob[i];
 		delete[] def_buf[i];
+	}
+	for (uint16_t i=0; i<inbindcount; i++) {
+		delete[] intbindstring[i];
 	}
 	delete[] def_col_retcode;
 	delete[] def_col_retlen;
@@ -545,10 +549,12 @@ bool oracle8cursor::inputBindString(const char *variable,
 }
 
 
-bool oracle8cursor::inputBindLong(const char *variable,
+bool oracle8cursor::inputBindInteger(const char *variable,
 						uint16_t variablesize,
-						uint32_t *value) {
+						int64_t *value) {
 	checkRePrepare();
+
+	intbindstring[inbindcount]=charstring::parseNumber(*value);
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!charstring::toInteger(variable+1)) {
@@ -557,8 +563,12 @@ bool oracle8cursor::inputBindLong(const char *variable,
 		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
 				(ub4)charstring::toInteger(variable+1),
-				(dvoid *)value,(sb4)sizeof(int32_t),
-				SQLT_INT,
+				(dvoid *)intbindstring[inbindcount],
+				(sb4)charstring::length(
+					intbindstring[inbindcount])+1,
+				SQLT_STR,
+				//(dvoid *)value,(sb4)sizeof(int64_t),
+				//SQLT_INT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
@@ -567,8 +577,12 @@ bool oracle8cursor::inputBindLong(const char *variable,
 		if (OCIBindByName(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
-				(dvoid *)value,(sb4)sizeof(int32_t),
-				SQLT_INT,
+				(dvoid *)intbindstring[inbindcount],
+				(sb4)charstring::length(
+					intbindstring[inbindcount])+1,
+				SQLT_STR,
+				//(dvoid *)value,(sb4)sizeof(int64_t),
+				//SQLT_64INT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
@@ -1496,6 +1510,10 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 #endif
 
 		// free regular bind resources
+		for (uint16_t i=0; i<inbindcount; i++) {
+			delete[] intbindstring[i];
+			intbindstring[i]=NULL;
+		}
 		inbindcount=0;
 		outbindcount=0;
 		curbindcount=0;

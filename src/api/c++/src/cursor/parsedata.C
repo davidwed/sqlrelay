@@ -107,7 +107,7 @@ bool sqlrcursor::parseData() {
 			}
 			length=0;
 
-		} else if (type==NORMAL_DATA) {
+		} else if (type==STRING_DATA) {
 		
 			// handle non-null data
 			if (getLong(&length)!=sizeof(uint32_t)) {

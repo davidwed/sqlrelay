@@ -11,7 +11,7 @@ void sqlrconnection::sendField(const char *data, uint32_t size) {
 	debugstr->append("\",");
 	#endif
 
-	clientsock->write((uint16_t)NORMAL_DATA);
+	clientsock->write((uint16_t)STRING_DATA);
 	clientsock->write(size);
 	clientsock->write(data,size);
 }
@@ -36,7 +36,7 @@ void sqlrconnection::sendLongSegment(const char *data, uint32_t size) {
 	debugstr->append(data,size);
 	#endif
 
-	clientsock->write((uint16_t)NORMAL_DATA);
+	clientsock->write((uint16_t)STRING_DATA);
 	clientsock->write(size);
 	clientsock->write(data,size);
 }

@@ -52,7 +52,7 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 			debugstr->append(bv->value.stringval);
 			#endif
 
-			clientsock->write((uint16_t)NORMAL_DATA);
+			clientsock->write((uint16_t)STRING_DATA);
 			bv->valuesize=charstring::length(
 						(char *)bv->value.stringval);
 			clientsock->write(bv->valuesize);

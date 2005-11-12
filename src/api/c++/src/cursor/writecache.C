@@ -214,10 +214,20 @@ void sqlrcursor::cacheOutputBinds(uint32_t count) {
 
 		len=outbindvars[i].valuesize;
 		cachedest->write(len);
-		if (outbindvars[i].type==STRING_BIND) {
+		if (outbindvars[i].type==STRING_BIND ||
+				outbindvars[i].type==BLOB_BIND ||
+				outbindvars[i].type==CLOB_BIND) {
 			cachedest->write(outbindvars[i].value.stringval,len);
-		} else if (outbindvars[i].type!=NULL_BIND) {
 			cachedest->write(outbindvars[i].value.lobval,len);
+		} else if (outbindvars[i].type==LONG_BIND) {
+			cachedest->write(outbindvars[i].value.longval);
+		} else if (outbindvars[i].type==DOUBLE_BIND) {
+			cachedest->write(outbindvars[i].value.
+						doubleval.value);
+			cachedest->write(outbindvars[i].value.
+						doubleval.precision);
+			cachedest->write(outbindvars[i].value.
+						doubleval.scale);
 		}
 	}
 
@@ -250,7 +260,7 @@ void sqlrcursor::cacheData() {
 			int32_t		len;
 			char		*field=getFieldInternal(i,j);
 			if (field) {
-				type=NORMAL_DATA;
+				type=STRING_DATA;
 				len=charstring::length(field);
 				cachedest->write(type);
 				cachedest->write(len);

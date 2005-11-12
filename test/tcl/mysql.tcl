@@ -205,8 +205,8 @@ checkSuccess [$cur getColumnTypeByIndex 12] "CHAR"
 checkSuccess [$cur getColumnTypeByIndex 13] "BLOB"
 checkSuccess [$cur getColumnTypeByIndex 14] "CHAR"
 checkSuccess [$cur getColumnTypeByIndex 15] "TINYBLOB"
-checkSuccess [$cur getColumnTypeByIndex 16] "BLOB"
-checkSuccess [$cur getColumnTypeByIndex 17] "BLOB"
+checkSuccess [$cur getColumnTypeByIndex 16] "MEDIUMBLOB"
+checkSuccess [$cur getColumnTypeByIndex 17] "LONGBLOB"
 checkSuccess [$cur getColumnTypeByIndex 18] "TIMESTAMP"
 checkSuccess [$cur getColumnTypeByName "testtinyint"] "TINYINT"
 checkSuccess [$cur getColumnTypeByName "testsmallint"] "SMALLINT"
@@ -224,8 +224,8 @@ checkSuccess [$cur getColumnTypeByName "testchar"] "CHAR"
 checkSuccess [$cur getColumnTypeByName "testtext"] "BLOB"
 checkSuccess [$cur getColumnTypeByName "testvarchar"] "CHAR"
 checkSuccess [$cur getColumnTypeByName "testtinytext"] "TINYBLOB"
-checkSuccess [$cur getColumnTypeByName "testmediumtext"] "BLOB"
-checkSuccess [$cur getColumnTypeByName "testlongtext"] "BLOB"
+checkSuccess [$cur getColumnTypeByName "testmediumtext"] "MEDIUMBLOB"
+checkSuccess [$cur getColumnTypeByName "testlongtext"] "LONGBLOB"
 checkSuccess [$cur getColumnTypeByName "testtimestamp"] "TIMESTAMP"
 puts ""
 
@@ -243,11 +243,11 @@ checkSuccess [$cur getColumnLengthByIndex 9] 3
 checkSuccess [$cur getColumnLengthByIndex 10] 8
 checkSuccess [$cur getColumnLengthByIndex 11] 1
 checkSuccess [$cur getColumnLengthByIndex 12] 41
-checkSuccess [$cur getColumnLengthByIndex 13] 65538
+checkSuccess [$cur getColumnLengthByIndex 13] 65535
 checkSuccess [$cur getColumnLengthByIndex 14] 41
-checkSuccess [$cur getColumnLengthByIndex 15] 257
-checkSuccess [$cur getColumnLengthByIndex 16] 16777218
-checkSuccess [$cur getColumnLengthByIndex 17] 16777218
+checkSuccess [$cur getColumnLengthByIndex 15] 255
+checkSuccess [$cur getColumnLengthByIndex 16] 16777215
+checkSuccess [$cur getColumnLengthByIndex 17] 2147483647
 checkSuccess [$cur getColumnLengthByIndex 18] 4
 checkSuccess [$cur getColumnLengthByName "testtinyint"] 1
 checkSuccess [$cur getColumnLengthByName "testsmallint"] 2
@@ -262,11 +262,11 @@ checkSuccess [$cur getColumnLengthByName "testtime"] 3
 checkSuccess [$cur getColumnLengthByName "testdatetime"] 8
 checkSuccess [$cur getColumnLengthByName "testyear"] 1
 checkSuccess [$cur getColumnLengthByName "testchar"] 41
-checkSuccess [$cur getColumnLengthByName "testtext"] 65538
+checkSuccess [$cur getColumnLengthByName "testtext"] 65535
 checkSuccess [$cur getColumnLengthByName "testvarchar"] 41
-checkSuccess [$cur getColumnLengthByName "testtinytext"] 257
-checkSuccess [$cur getColumnLengthByName "testmediumtext"] 16777218
-checkSuccess [$cur getColumnLengthByName "testlongtext"] 16777218
+checkSuccess [$cur getColumnLengthByName "testtinytext"] 255
+checkSuccess [$cur getColumnLengthByName "testmediumtext"] 16777215
+checkSuccess [$cur getColumnLengthByName "testlongtext"] 2147483647
 checkSuccess [$cur getColumnLengthByName "testtimestamp"] 4
 puts ""
 
