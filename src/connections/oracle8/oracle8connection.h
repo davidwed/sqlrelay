@@ -8,7 +8,7 @@
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768
 
-#define NUM_CONNECT_STRING_VARS 5
+#define NUM_CONNECT_STRING_VARS 6
 
 #include <rudiments/environment.h>
 #include <sqlrconnection.h>
@@ -79,6 +79,16 @@ class oracle8cursor : public sqlrcursor {
 						uint16_t variablesize,
 						char *value,
 						uint16_t valuesize,
+						int16_t *isnull);
+		bool		outputBindInteger(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		bool		outputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
 						int16_t *isnull);
 #ifdef HAVE_ORACLE_8i
 		bool		inputBindBlob(const char *variable, 
@@ -155,7 +165,9 @@ class oracle8cursor : public sqlrcursor {
 		OCIBind		*inbindpp[MAXVAR];
 		OCIBind		*outbindpp[MAXVAR];
 		OCIBind		*curbindpp[MAXVAR];
-		char		*intbindstring[MAXVAR];
+		char		*inintbindstring[MAXVAR];
+		char		*outintbindstring[MAXVAR];
+		int64_t		*outintbind[MAXVAR];
 		uint16_t	inbindcount;
 		uint16_t	outbindcount;
 		uint16_t	curbindcount;
@@ -222,6 +234,7 @@ class oracle8connection : public sqlrconnection {
 
 		const char	*home;
 		const char	*sid;
+		const char	*nlslang;
 
 		ub4		fetchatonce;
 		ub4		maxselectlistsize;

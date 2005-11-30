@@ -33,6 +33,7 @@ void oracle8connection::handleConnectString() {
 	setPassword(connectStringValue("password"));
 	sid=connectStringValue("oracle_sid");
 	home=connectStringValue("oracle_home");
+	nlslang=connectStringValue("nls_lang");
 	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
@@ -91,6 +92,14 @@ bool oracle8connection::logIn() {
 	} else {
 		if (!environ->getValue("TWO_TASK")) {
 			fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
+			return false;
+		}
+	}
+
+	// handle NLS_LANG
+	if (nlslang) {
+		if (!environ->setValue("NLS_LANG",nlslang)) {
+			fprintf(stderr,"Failed to set NLS_LANG environment variable.\n");
 			return false;
 		}
 	}
@@ -404,7 +413,9 @@ oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
 		inbindpp[i]=NULL;
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
-		intbindstring[i]=NULL;
+		inintbindstring[i]=NULL;
+		outintbindstring[i]=NULL;
+		outintbind[i]=NULL;
 	}
 
 	desc=new describe[oracle8conn->maxselectlistsize];
@@ -445,7 +456,10 @@ oracle8cursor::~oracle8cursor() {
 		delete[] def_buf[i];
 	}
 	for (uint16_t i=0; i<inbindcount; i++) {
-		delete[] intbindstring[i];
+		delete[] inintbindstring[i];
+	}
+	for (uint16_t i=0; i<outbindcount; i++) {
+		delete[] outintbindstring[i];
 	}
 	delete[] def_col_retcode;
 	delete[] def_col_retlen;
@@ -554,7 +568,7 @@ bool oracle8cursor::inputBindInteger(const char *variable,
 						int64_t *value) {
 	checkRePrepare();
 
-	intbindstring[inbindcount]=charstring::parseNumber(*value);
+	inintbindstring[inbindcount]=charstring::parseNumber(*value);
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!charstring::toInteger(variable+1)) {
@@ -563,9 +577,9 @@ bool oracle8cursor::inputBindInteger(const char *variable,
 		if (OCIBindByPos(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
 				(ub4)charstring::toInteger(variable+1),
-				(dvoid *)intbindstring[inbindcount],
+				(dvoid *)inintbindstring[inbindcount],
 				(sb4)charstring::length(
-					intbindstring[inbindcount])+1,
+					inintbindstring[inbindcount])+1,
 				SQLT_STR,
 				//(dvoid *)value,(sb4)sizeof(int64_t),
 				//SQLT_INT,
@@ -577,9 +591,9 @@ bool oracle8cursor::inputBindInteger(const char *variable,
 		if (OCIBindByName(stmt,&inbindpp[inbindcount],
 				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
-				(dvoid *)intbindstring[inbindcount],
+				(dvoid *)inintbindstring[inbindcount],
 				(sb4)charstring::length(
-					intbindstring[inbindcount])+1,
+					inintbindstring[inbindcount])+1,
 				SQLT_STR,
 				//(dvoid *)value,(sb4)sizeof(int64_t),
 				//SQLT_64INT,
@@ -657,6 +671,86 @@ bool oracle8cursor::outputBindString(const char *variable,
 				(dvoid *)value,
 				(sb4)valuesize,
 				SQLT_STR,
+				(dvoid *)isnull,(ub2 *)0,
+				(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return false;
+		}
+	}
+	outbindcount++;
+	return true;
+}
+
+bool oracle8cursor::outputBindInteger(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull) {
+	checkRePrepare();
+
+	outintbindstring[outbindcount]=
+		new char[charstring::integerLength(*value)+1];
+	outintbind[outbindcount]=value;
+
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		if (!charstring::toInteger(variable+1)) {
+			return false;
+		}
+		if (OCIBindByPos(stmt,&outbindpp[outbindcount],
+				oracle8conn->err,
+				(ub4)charstring::toInteger(variable+1),
+				(dvoid *)outintbindstring[outbindcount],
+				(sb4)charstring::integerLength(*value)+1,
+				SQLT_STR,
+				(dvoid *)isnull,(ub2 *)0,
+				(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return false;
+		}
+	} else {
+		if (OCIBindByName(stmt,&outbindpp[outbindcount],
+				oracle8conn->err,
+				(text *)variable,(sb4)variablesize,
+				(dvoid *)outintbindstring[outbindcount],
+				(sb4)charstring::integerLength(*value)+1,
+				SQLT_STR,
+				(dvoid *)isnull,(ub2 *)0,
+				(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return false;
+		}
+	}
+	outbindcount++;
+	return true;
+}
+
+bool oracle8cursor::outputBindDouble(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull) {
+	checkRePrepare();
+
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		if (!charstring::toInteger(variable+1)) {
+			return false;
+		}
+		if (OCIBindByPos(stmt,&outbindpp[outbindcount],
+				oracle8conn->err,
+				(ub4)charstring::toInteger(variable+1),
+				(dvoid *)value,(sb4)sizeof(double),
+				SQLT_FLT,
+				(dvoid *)isnull,(ub2 *)0,
+				(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return false;
+		}
+	} else {
+		if (OCIBindByName(stmt,&outbindpp[outbindcount],
+				oracle8conn->err,
+				(text *)variable,(sb4)variablesize,
+				(dvoid *)value,(sb4)sizeof(double),
+				SQLT_FLT,
 				(dvoid *)isnull,(ub2 *)0,
 				(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
@@ -1178,6 +1272,11 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 		}
 	}
 
+	// convert integer output binds
+	for (uint16_t i=0; i<outbindcount; i++) {
+		*outintbind[i]=charstring::toInteger(outintbindstring[i]);
+	}
+
 	return true;
 }
 
@@ -1511,8 +1610,13 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 
 		// free regular bind resources
 		for (uint16_t i=0; i<inbindcount; i++) {
-			delete[] intbindstring[i];
-			intbindstring[i]=NULL;
+			delete[] inintbindstring[i];
+			inintbindstring[i]=NULL;
+		}
+		for (uint16_t i=0; i<outbindcount; i++) {
+			delete[] outintbindstring[i];
+			outintbindstring[i]=NULL;
+			outintbind[i]=NULL;
 		}
 		inbindcount=0;
 		outbindcount=0;

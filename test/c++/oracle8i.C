@@ -93,13 +93,13 @@ int	main(int argc, char **argv) {
 	double		subvaldoubles[3]={10.55,10.556,10.5556};
 	uint32_t	precs[3]={4,5,6};
 	uint32_t	scales[3]={2,3,4};
-	const char	*numvar;
+	int64_t		numvar;
 	const char	*clobvar;
 	uint32_t	clobvarlength;
 	const char	*blobvar;
 	uint32_t	blobvarlength;
 	const char	*stringvar;
-	const char	*floatvar;
+	double		floatvar;
 	const char * const *cols;
 	const char * const *fields;
 	uint16_t	port;
@@ -142,6 +142,7 @@ int	main(int argc, char **argv) {
 
 	printf("INSERT: \n");
 	checkSuccess(cur->sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())"),1);
+	checkSuccess(cur->countBindVariables(),0);
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
@@ -223,46 +224,46 @@ int	main(int argc, char **argv) {
 
 	printf("OUTPUT BIND BY NAME: \n");
 	cur->prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;");
-	cur->defineOutputBind("numvar",10);
-	cur->defineOutputBind("stringvar",10);
-	cur->defineOutputBind("floatvar",10);
+	cur->defineOutputBindInteger("numvar");
+	cur->defineOutputBindString("stringvar",10);
+	cur->defineOutputBindDouble("floatvar");
 	checkSuccess(cur->executeQuery(),1);
-	numvar=cur->getOutputBind("numvar");
-	stringvar=cur->getOutputBind("stringvar");
-	floatvar=cur->getOutputBind("floatvar");
-	checkSuccess(numvar,"1");
+	numvar=cur->getOutputBindInteger("numvar");
+	stringvar=cur->getOutputBindString("stringvar");
+	floatvar=cur->getOutputBindDouble("floatvar");
+	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
-	checkSuccess(floatvar,"2.5");
+	checkSuccess(floatvar,2.5);
 	printf("\n");
 
 	printf("OUTPUT BIND BY NAME: \n");
 	cur->clearBinds();
-	cur->defineOutputBind("1",10);
-	cur->defineOutputBind("2",10);
-	cur->defineOutputBind("3",10);
+	cur->defineOutputBindInteger("1");
+	cur->defineOutputBindString("2",10);
+	cur->defineOutputBindDouble("3");
 	checkSuccess(cur->executeQuery(),1);
-	numvar=cur->getOutputBind("1");
-	stringvar=cur->getOutputBind("2");
-	floatvar=cur->getOutputBind("3");
-	checkSuccess(numvar,"1");
+	numvar=cur->getOutputBindInteger("1");
+	stringvar=cur->getOutputBindString("2");
+	floatvar=cur->getOutputBindDouble("3");
+	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
-	checkSuccess(floatvar,"2.5");
+	checkSuccess(floatvar,2.5);
 	printf("\n");
 
 	printf("OUTPUT BIND BY NAME WITH VALIDATION: \n");
 	cur->clearBinds();
-	cur->defineOutputBind("numvar",10);
-	cur->defineOutputBind("stringvar",10);
-	cur->defineOutputBind("floatvar",10);
-	cur->defineOutputBind("dummyvar",10);
+	cur->defineOutputBindInteger("numvar");
+	cur->defineOutputBindString("stringvar",10);
+	cur->defineOutputBindDouble("floatvar");
+	cur->defineOutputBindString("dummyvar",10);
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
-	numvar=cur->getOutputBind("numvar");
-	stringvar=cur->getOutputBind("stringvar");
-	floatvar=cur->getOutputBind("floatvar");
-	checkSuccess(numvar,"1");
+	numvar=cur->getOutputBindInteger("numvar");
+	stringvar=cur->getOutputBindString("stringvar");
+	floatvar=cur->getOutputBindDouble("floatvar");
+	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
-	checkSuccess(floatvar,"2.5");
+	checkSuccess(floatvar,2.5);
 	printf("\n");
 
 	printf("SELECT: \n");
@@ -468,9 +469,9 @@ int	main(int argc, char **argv) {
 
 	printf("OUTPUT BIND: \n");
 	cur->prepareQuery("begin :var1:='hello'; end;");
-	cur->defineOutputBind("var1",10);
+	cur->defineOutputBindString("var1",10);
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBind("var1"),"hello");
+	checkSuccess(cur->getOutputBindString("var1"),"hello");
 	printf("\n");
 
 	printf("ARRAY SUBSTITUTIONS: \n");
@@ -796,9 +797,9 @@ int	main(int argc, char **argv) {
 	cur->defineOutputBindClob("clobvar");
 	cur->defineOutputBindBlob("blobvar");
 	checkSuccess(cur->executeQuery(),1);
-	clobvar=cur->getOutputBind("clobvar");
+	clobvar=cur->getOutputBindString("clobvar");
 	clobvarlength=cur->getOutputBindLength("clobvar");
-	blobvar=cur->getOutputBind("blobvar");
+	blobvar=cur->getOutputBindString("blobvar");
 	blobvarlength=cur->getOutputBindLength("blobvar");
 	checkSuccess(clobvar,"hello",5);
 	checkSuccess(clobvarlength,5);
@@ -860,7 +861,7 @@ int	main(int argc, char **argv) {
 	cur->prepareQuery("begin select testclob into :clobbindval from testtable2; end;");
 	cur->defineOutputBindClob("clobbindval");
 	checkSuccess(cur->executeQuery(),1);
-	const char	*clobbindvar=cur->getOutputBind("clobbindval");
+	const char	*clobbindvar=cur->getOutputBindString("clobbindval");
 	checkSuccess(cur->getOutputBindLength("clobbindval"),8*1024);
 	checkSuccess(clobval,clobbindvar);
 	cur->sendQuery("drop table testtable2");
@@ -883,10 +884,10 @@ int	main(int argc, char **argv) {
 	char	query[4000+25];
 	sprintf(query,"begin :bindval:='%s'; end;",testval);
 	cur->prepareQuery(query);
-	cur->defineOutputBind("bindval",4000);
+	cur->defineOutputBindString("bindval",4000);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getOutputBindLength("bindval"),4000);
-	checkSuccess(cur->getOutputBind("bindval"),testval);
+	checkSuccess(cur->getOutputBindString("bindval"),testval);
 	cur->sendQuery("drop table testtable2");
 	printf("\n");
 
@@ -959,9 +960,9 @@ int	main(int argc, char **argv) {
 	cur->inputBind("in1",1);
 	cur->inputBind("in2",1.1,2,1);
 	cur->inputBind("in3","hello");
-	cur->defineOutputBind("out1",20);
+	cur->defineOutputBindInteger("out1");
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBind("out1"),"1");
+	checkSuccess(cur->getOutputBindInteger("out1"),1);
 	// return multiple values
 	cur->sendQuery("drop function testproc");
 	cur->sendQuery("drop procedure testproc");
@@ -970,13 +971,13 @@ int	main(int argc, char **argv) {
 	cur->inputBind("in1",1);
 	cur->inputBind("in2",1.1,2,1);
 	cur->inputBind("in3","hello");
-	cur->defineOutputBind("out1",20);
-	cur->defineOutputBind("out2",20);
-	cur->defineOutputBind("out3",20);
+	cur->defineOutputBindInteger("out1");
+	cur->defineOutputBindDouble("out2");
+	cur->defineOutputBindString("out3",20);
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBind("out1"),"1");
-	checkSuccess(atof(cur->getOutputBind("out2")),1.1);
-	checkSuccess(cur->getOutputBind("out3"),"hello");
+	checkSuccess(cur->getOutputBindInteger("out1"),1);
+	checkSuccess(cur->getOutputBindDouble("out2"),1.1);
+	checkSuccess(cur->getOutputBindString("out3"),"hello");
 	cur->sendQuery("drop function testproc");
 	cur->sendQuery("drop procedure testproc");
 	printf("\n");

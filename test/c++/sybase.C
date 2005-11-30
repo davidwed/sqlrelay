@@ -252,13 +252,13 @@ int	main(int argc, char **argv) {
 	cur->inputBind("in1",1);
 	cur->inputBind("in2",1.1,2,1);
 	cur->inputBind("in3","hello");
-	cur->defineOutputBind("out1",20);
-	cur->defineOutputBind("out2",20);
-	cur->defineOutputBind("out3",20);
+	cur->defineOutputBindInteger("out1");
+	cur->defineOutputBindDouble("out2");
+	cur->defineOutputBindString("out3",20);
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBind("out1"),"1");
-	checkSuccess(atof(cur->getOutputBind("out2")),1.1);
-	checkSuccess(cur->getOutputBind("out3"),"hello");
+	checkSuccess(cur->getOutputBindInteger("out1"),1);
+	checkSuccess(cur->getOutputBindDouble("out2"),1.1);
+	checkSuccess(cur->getOutputBindString("out3"),"hello");
 	printf("\n");
 
 	printf("SELECT: \n");

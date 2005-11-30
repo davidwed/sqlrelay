@@ -172,13 +172,13 @@ int	main(int argc, char **argv) {
 	cur->inputBind("1",1);
 	cur->inputBind("2",1.1,2,1);
 	cur->inputBind("3","hello");
-	cur->defineOutputBind("1",20);
-	cur->defineOutputBind("2",20);
-	cur->defineOutputBind("3",20);
+	cur->defineOutputBindInteger("1");
+	cur->defineOutputBindDouble("2");
+	cur->defineOutputBindString("3",20);
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBind("1"),"1                   ");
-	checkSuccess(atof(cur->getOutputBind("2")),1.1);
-	checkSuccess(cur->getOutputBind("3"),"hello               ");
+	checkSuccess(cur->getOutputBindInteger("1"),1);
+	checkSuccess(cur->getOutputBindDouble("2"),1.1);
+	checkSuccess(cur->getOutputBindString("3"),"hello               ");
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");
 
