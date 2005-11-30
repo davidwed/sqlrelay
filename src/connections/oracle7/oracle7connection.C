@@ -27,6 +27,7 @@ void oracle7connection::handleConnectString() {
 	setPassword(connectStringValue("password"));
 	sid=connectStringValue("oracle_sid");
 	home=connectStringValue("oracle_home");
+	nlslang=connectStringValue("nls_lang");
 	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
@@ -69,6 +70,14 @@ bool oracle7connection::logIn() {
 	} else {
 		if (!env->getValue("TWO_TASK")) {
 			fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
+			return false;
+		}
+	}
+
+	// handle NLS_LANG
+	if (nlslang) {
+		if (!env->setValue("NLS_LANG",nlslang)) {
+			fprintf(stderr,"Failed to set NLS_LANG environment variable.\n");
 			return false;
 		}
 	}

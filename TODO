@@ -1,7 +1,19 @@
+NLS_LANG-like issues with other db's?
+
+need getOutputBindClob/Blob rather than using String
+
+need to add a list of addresses to bind the listener/connections to
+is it possible to specify which IP the connection daemons use to connect to
+	the database?
+
+python (and maybe other) inputBind() checks the type of the value and binds if
+	it's string/long/double, but silently bails if it's not (or if there
+	aren't precision/scale for the double), it should maybe return false
+	or cast the value or something
+
 freetds test reveals
 	Attempt to initiate a new SQL Server operation with results pending.
 	bug
-db2 database won't start
 
 verify that integer input binds aren't broken in db2/odbc
 

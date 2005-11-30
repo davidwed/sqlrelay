@@ -57,6 +57,7 @@ Sybase/Microsoft SQL Server?</a></li>
 <li><a href="#postgresql">Postgresql's native API uses numbers for types but
 SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#oracleconnections">What is the difference between the Oracle7 connection and the Oracle8 connection?</a></li>
+<li><a href="#nlslang">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</a></li>
 </ol>
 
 <span class="heading2">Programming Questions</span><br><br>
@@ -768,6 +769,33 @@ fields and 0's for their lengths.  It seems like I had that same problem with
 Oracle 8.1.6 on Linux, but 8.1.7 works fine (and 8.1.6 is no longer available
 to verify the problem).  So, expect inconsistencies with the Oracle7 connection
 if it's not compiled against Oracle 7.</p>
+
+<a name="nlslang"></a>
+<span class="heading3">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</span>
+
+<p>When the Oracle connection daemon fetches data from the database, the
+Oracle client library converts the data from whatever character set the
+database is using into whatever character set is specified by the NLS_LANG
+environment variable.</p>
+
+<p>If NLS_LANG isn't set, is set to a character set that doesn't contain some
+of the characters that are stored in the database, or is set to a character set
+that is in some other way incompatible with the character set of the database,
+some of the data will be converted into garbage.</p>
+
+<p><b>Note:</b> NLS_LANG must be set properly on the machine running the SQL
+Relay <i><b>servers</b></i>, as that is the machine executing code from the
+Oracle client library.  It's not uncommon to forget to set NLS_LANG on that
+machine and then have things break suddenly when switching from using the
+Oracle client library directly to using SQL Relay.</p>
+
+<p><b>Note:</b> When SQL Relay starts at boot time, the SQL Relay init script
+has no particular environment.  So, if NLS_LANG is set in /etc/profile or
+/etc/bashrc or some other shell's init script, it may not be picked up by the
+SQL Relay init script.  In version 0.37, an nls_lang parameter was added to the
+Oracle connection string parameters to address this issue.  When running
+versions older than 0.37, you'll need to edit the init script and add a line to
+set the NLS_LANG environment variable.</p>
 
 <span class="heading3">Programming Questions</span><br><br>
 

@@ -220,10 +220,17 @@ void	sqlrcur_inputBindClob(sqlrcur sqlrcurref,
 					uint32_t size);
 			/* Define an input bind variable. */
 
-void	sqlrcur_defineOutputBind(sqlrcur sqlrcurref, const char *variable, 
-							uint32_t length);
-			/* Define an output bind variable.
+void	sqlrcur_defineOutputBindString(sqlrcur sqlrcurref,
+					const char *variable, uint32_t length);
+			/* Define a string output bind variable.
 			  "length" bytes will be reserved to store the value. */
+void	sqlrcur_defineOutputBindInteger(sqlrcur sqlrcurref,
+					const char *variable);
+			/* Define an integer output bind variable. */
+void	sqlrcur_defineOutputBindDouble(sqlrcur sqlrcurref,
+					const char *variable);
+			/* Define a double precision floating point
+			   output bind variable. */
 void	sqlrcur_defineOutputBindBlob(sqlrcur sqlrcurref,
 					const char *variable);
 			/* Define a BLOB output bind variable */
@@ -272,16 +279,16 @@ int	sqlrcur_fetchFromBindCursor(sqlrcur sqlrcurref);
 			/* Fetch from a cursor that was returned as
 			   an output bind variable. */
 
-const char	*sqlrcur_getOutputBind(sqlrcur sqlrcurref,
-					const char *variable);
+const char	*sqlrcur_getOutputBindString(sqlrcur sqlrcurref,
+						const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable. */
-int64_t	sqlrcur_getOutputBindAsInteger(sqlrcur sqlrcurref,
+int64_t	sqlrcur_getOutputBindInteger(sqlrcur sqlrcurref,
 						const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable as a 
 			   long integer. */
-double	sqlrcur_getOutputBindAsDouble(sqlrcur sqlrcurref,
+double	sqlrcur_getOutputBindDouble(sqlrcur sqlrcurref,
 						const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable as a 

@@ -157,7 +157,7 @@ sit idle while logged into the SQL Relay server before it will be disconnected
 <li><b>connectionid</b> - the ID of this connection</li>
 <li><b>string</b> - the database connect string the connection daemon should use</li>
 <ul>
-<li>For <b>oracle7</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;autocommit=yes/no;"
+<li>For <b>oracle7</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;nls_lang=NLS_LANG;autocommit=yes/no;"
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the
 database.  Required.</li>
@@ -170,11 +170,13 @@ environment variable.</li>
 Optional if the ORACLE_HOME environment variable is set.  Overrides the
 ORACLE_HOME environment variable.  The SID will be looked up in
 $ORACLE_HOME/network/admin/tnsnames.ora</li>
+<li><b>nls_lang</b>: The NLS_LANG to use.  Optional if the NLS_LANG environment
+variable is set.  Overrides the NLS_LANG environment variable.</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete
 immediately or not.  Optional, defaults to no.</li>
 </ul>
 </li>
-<li>For <b>oracle8</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE"
+<li>For <b>oracle8</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;nls_lang=NLS_LANG;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE"
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the
 database.  Required.</li>
@@ -185,6 +187,8 @@ the ORACLE_SID environment variable is set.</li>
 <li><b>oracle_home</b>: The base directory of the oracle installation to use.
 Optional if the ORACLE_HOME environment variable is set.  The SID will be looked
 up in $ORACLE_HOME/network/admin/tnsnames.ora</li>
+<li><b>nls_lang</b>: The NLS_LANG to use.  Optional if the NLS_LANG environment
+variable is set.  Overrides the NLS_LANG environment variable.</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete
 immediately or not.  Optional, defaults to no.</li>
 <li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see

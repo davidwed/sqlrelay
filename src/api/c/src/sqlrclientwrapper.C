@@ -260,9 +260,17 @@ int sqlrcur_fetchFromBindCursor(sqlrcur sqlrcurref) {
 	return sqlrcurref->fetchFromBindCursor();
 }
 
-void sqlrcur_defineOutputBind(sqlrcur sqlrcurref, const char *variable,
-							uint32_t length) {
-	sqlrcurref->defineOutputBind(variable,length);
+void sqlrcur_defineOutputBindString(sqlrcur sqlrcurref,
+					const char *variable, uint32_t length) {
+	sqlrcurref->defineOutputBindString(variable,length);
+}
+
+void sqlrcur_defineOutputBindInteger(sqlrcur sqlrcurref, const char *variable) {
+	sqlrcurref->defineOutputBindInteger(variable);
+}
+
+void sqlrcur_defineOutputBindDouble(sqlrcur sqlrcurref, const char *variable) {
+	sqlrcurref->defineOutputBindDouble(variable);
 }
 
 void sqlrcur_defineOutputBindBlob(sqlrcur sqlrcurref,
@@ -280,19 +288,19 @@ void sqlrcur_defineOutputBindCursor(sqlrcur sqlrcurref,
 	sqlrcurref->defineOutputBindCursor(variable);
 }
 
-const char *sqlrcur_getOutputBind(sqlrcur sqlrcurref,
+const char *sqlrcur_getOutputBindString(sqlrcur sqlrcurref,
 					const char *variable) {
-	return sqlrcurref->getOutputBind(variable);
+	return sqlrcurref->getOutputBindString(variable);
 }
 
-int64_t sqlrcur_getOutputBindAsInteger(sqlrcur sqlrcurref,
+int64_t sqlrcur_getOutputBindInteger(sqlrcur sqlrcurref,
 						const char *variable) {
-	return sqlrcurref->getOutputBindAsInteger(variable);
+	return sqlrcurref->getOutputBindInteger(variable);
 }
 
-double sqlrcur_getOutputBindAsDouble(sqlrcur sqlrcurref,
+double sqlrcur_getOutputBindDouble(sqlrcur sqlrcurref,
 						const char *variable) {
-	return sqlrcurref->getOutputBindAsDouble(variable);
+	return sqlrcurref->getOutputBindDouble(variable);
 }
 
 uint32_t sqlrcur_getOutputBindLength(sqlrcur sqlrcurref, const char *variable) {

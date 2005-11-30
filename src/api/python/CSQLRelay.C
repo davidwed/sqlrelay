@@ -576,7 +576,7 @@ static PyObject *inputBinds(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", 0);
 }
 
-static PyObject *defineOutputBind(PyObject *self, PyObject *args) {
+static PyObject *defineOutputBindString(PyObject *self, PyObject *args) {
   char *variable;
   uint32_t length;
   long sqlrcur;
@@ -588,7 +588,25 @@ static PyObject *defineOutputBind(PyObject *self, PyObject *args) {
 #endif
 	&sqlrcur, &variable, &length))
     return NULL;
-  ((sqlrcursor *)sqlrcur)->defineOutputBind(variable, length);
+  ((sqlrcursor *)sqlrcur)->defineOutputBindString(variable, length);
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *defineOutputBindInteger(PyObject *self, PyObject *args) {
+  char *variable;
+  long sqlrcur;
+  if (!PyArg_ParseTuple(args,"ls",&sqlrcur, &variable))
+    return NULL;
+  ((sqlrcursor *)sqlrcur)->defineOutputBindInteger(variable);
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *defineOutputBindDouble(PyObject *self, PyObject *args) {
+  char *variable;
+  long sqlrcur;
+  if (!PyArg_ParseTuple(args,"ls",&sqlrcur, &variable))
+    return NULL;
+  ((sqlrcursor *)sqlrcur)->defineOutputBindDouble(variable);
   return Py_BuildValue("h", 0);
 }
 
@@ -649,36 +667,36 @@ static PyObject *fetchFromBindCursor(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", (short)rc);
 }
 
-static PyObject *getOutputBind(PyObject *self, PyObject *args) {
+static PyObject *getOutputBindString(PyObject *self, PyObject *args) {
   char *variable;
   long sqlrcur;
   const char *rc;
   uint32_t rl;
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
-  rc=((sqlrcursor *)sqlrcur)->getOutputBind(variable);
+  rc=((sqlrcursor *)sqlrcur)->getOutputBindString(variable);
   rl=((sqlrcursor *)sqlrcur)->getOutputBindLength(variable);
   return Py_BuildValue("s#", rc, rl);
 }
 
-static PyObject *getOutputBindAsInteger(PyObject *self, PyObject *args) {
+static PyObject *getOutputBindInteger(PyObject *self, PyObject *args) {
   char *variable;
   long sqlrcur;
   int64_t rc;
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
-  rc=((sqlrcursor *)sqlrcur)->getOutputBindAsInteger(variable);
+  rc=((sqlrcursor *)sqlrcur)->getOutputBindInteger(variable);
   // FIXME: lame, python doesn't support building values from int64_t's
   return Py_BuildValue("l", (long)rc);
 }
 
-static PyObject *getOutputBindAsDouble(PyObject *self, PyObject *args) {
+static PyObject *getOutputBindDouble(PyObject *self, PyObject *args) {
   char *variable;
   long sqlrcur;
   double rc;
   if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
     return NULL;
-  rc=((sqlrcursor *)sqlrcur)->getOutputBindAsDouble(variable);
+  rc=((sqlrcursor *)sqlrcur)->getOutputBindDouble(variable);
   return Py_BuildValue("d", rc);
 }
 
@@ -1458,16 +1476,18 @@ static PyMethodDef SQLRMethods[] = {
   {"inputBindBlob", inputBindBlob, METH_VARARGS},
   {"inputBindClob", inputBindClob, METH_VARARGS},
   {"inputBinds", inputBinds, METH_VARARGS},
-  {"defineOutputBind", defineOutputBind, METH_VARARGS},
+  {"defineOutputBindString", defineOutputBindString, METH_VARARGS},
+  {"defineOutputBindInteger", defineOutputBindInteger, METH_VARARGS},
+  {"defineOutputBindDouble", defineOutputBindDouble, METH_VARARGS},
   {"defineOutputBindBlob", defineOutputBindBlob, METH_VARARGS},
   {"defineOutputBindClob", defineOutputBindClob, METH_VARARGS},
   {"defineOutputBindCursor", defineOutputBindCursor, METH_VARARGS},
   {"validateBinds", validateBinds, METH_VARARGS},
   {"executeQuery", executeQuery, METH_VARARGS},
   {"fetchFromBindCursor", fetchFromBindCursor, METH_VARARGS},
-  {"getOutputBind", getOutputBind, METH_VARARGS},
-  {"getOutputBindAsInteger", getOutputBindAsInteger, METH_VARARGS},
-  {"getOutputBindAsDouble", getOutputBindAsDouble, METH_VARARGS},
+  {"getOutputBindString", getOutputBindString, METH_VARARGS},
+  {"getOutputBindInteger", getOutputBindInteger, METH_VARARGS},
+  {"getOutputBindDouble", getOutputBindDouble, METH_VARARGS},
   {"getOutputBindLength", getOutputBindLength, METH_VARARGS},
   {"openCachedResultSet", openCachedResultSet, METH_VARARGS},
   {"colCount", colCount, METH_VARARGS},

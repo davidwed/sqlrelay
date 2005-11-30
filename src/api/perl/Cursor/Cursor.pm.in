@@ -232,7 +232,7 @@ __END__
         inputBindClob(variable,value,size);
             # Define an input bind variable.
 
-        defineOutputBind(variable,bufferlength);
+        defineOutputBindString(variable,bufferlength);
             # Define an output bind variable.
             # "bufferlength" bytes will be reserved to store the value.
         defineOutputBindBlob(variable);
@@ -264,7 +264,7 @@ __END__
             # an output bind variable.
 
 
-	getOutputBind(variable);
+	getOutputBindString(variable);
             # Get the value stored in a previously
             # defined output bind variable.
 

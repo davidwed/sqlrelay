@@ -329,11 +329,23 @@ class sqlrcursor:
         """
         return CSQLRelay.inputBindClob(self.cursor, variable, value, length)
 
-    def defineOutputBind(self, variable, length):
+    def defineOutputBindString(self, variable, length):
         """
         Define an output bind varaible.
         """
-        return CSQLRelay.defineOutputBind(self.cursor, variable, length)
+        return CSQLRelay.defineOutputBindString(self.cursor, variable, length)
+
+    def defineOutputBindInteger(self, variable):
+        """
+        Define an output bind varaible.
+        """
+        return CSQLRelay.defineOutputBindInteger(self.cursor, variable)
+
+    def defineOutputBindDouble(self, variable):
+        """
+        Define an output bind varaible.
+        """
+        return CSQLRelay.defineOutputBindDouble(self.cursor, variable)
 
     def defineOutputBindBlob(self, variable):
         """
@@ -390,28 +402,28 @@ class sqlrcursor:
         """
         return CSQLRelay.fetchFromBindCursor(self.cursor)
 
-    def getOutputBind(self, variable):
+    def getOutputBindString(self, variable):
         """
         Get the value stored in a previously
         defined output bind variable.
         """
-        return CSQLRelay.getOutputBind(self.cursor, variable)
+        return CSQLRelay.getOutputBindString(self.cursor, variable)
 
-    def getOutputBindAsInteger(self, variable):
+    def getOutputBindInteger(self, variable):
         """
         Get the value stored in a previously
         defined output bind variable as a long
         integer.
         """
-        return CSQLRelay.getOutputBindAsInteger(self.cursor, variable)
+        return CSQLRelay.getOutputBindInteger(self.cursor, variable)
 
-    def getOutputBindAsDouble(self, variable):
+    def getOutputBindDouble(self, variable):
         """
         Get the value stored in a previously
         defined output bind variable as a double
         precision floating point number.
         """
-        return CSQLRelay.getOutputBindAsDouble(self.cursor, variable)
+        return CSQLRelay.getOutputBindDouble(self.cursor, variable)
 
     def getOutputBindLength(self, variable):
         """

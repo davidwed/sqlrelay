@@ -68,6 +68,10 @@
 	updated php docs; fixed some typo's
 	sorted out some lob length issues in mysql
 	updated inputBind to take an int64_t
+	fixed a bug where DB2 connections wouldn't reconnect if the db went down
+	fixed a bug where DB2 update/delete with no affected rows was returning
+		an error
+	added nls_lang connection string option to oracle7/8 connections
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

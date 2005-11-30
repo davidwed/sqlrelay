@@ -233,11 +233,27 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_inputBindClob
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    defineOutputBind
+ * Method:    defineOutputBindString
  * Signature: (Ljava/lang/String;I)V
  */
-JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_defineOutputBind
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_defineOutputBindString
   (JNIEnv *, jobject, jstring, jint);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    defineOutputBindInteger
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_defineOutputBindInteger
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    defineOutputBindDouble
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_defineOutputBindDouble
+  (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
@@ -337,10 +353,10 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_fetchFromBind
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getOutputBind
+ * Method:    getOutputBindString
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBind
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindString
   (JNIEnv *, jobject, jstring);
 
 /*
@@ -353,18 +369,18 @@ JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBi
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getOutputBindAsInteger
+ * Method:    getOutputBindInteger
  * Signature: (Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindAsInteger
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindInteger
   (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getOutputBindAsDouble
+ * Method:    getOutputBindDouble
  * Signature: (Ljava/lang/String;)D
  */
-JNIEXPORT jdouble JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindAsDouble
+JNIEXPORT jdouble JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindDouble
   (JNIEnv *, jobject, jstring);
 
 /*
@@ -777,18 +793,18 @@ JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getLongest__Ljava
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getResultSetId
- * Signature: ()S
- */
-JNIEXPORT jshort JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getResultSetId
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    suspendResultSet
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_suspendResultSet
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getResultSetId
+ * Signature: ()S
+ */
+JNIEXPORT jshort JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getResultSetId
   (JNIEnv *, jobject);
 
 /*

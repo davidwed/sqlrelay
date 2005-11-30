@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.17 2005-08-06 03:20:56 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.18 2005-11-30 23:52:02 mused Exp $
  */
 
 #include <tcl.h>
@@ -78,7 +78,9 @@ void sqlrcurDelete(ClientData data) {
  *   $cur inputBind
  *   $cur inputBindBlob variable value size
  *   $cur inputBindClob variable value size
- *   $cur defineOutputBind variable value
+ *   $cur defineOutputBindString variable value
+ *   $cur defineOutputBindInteger variable value
+ *   $cur defineOutputBindDouble variable value
  *   $cur defineOutputBindBlob variable
  *   $cur defineOutputBindClob variable
  *   $cur defineOutputBindCursor variable
@@ -87,9 +89,9 @@ void sqlrcurDelete(ClientData data) {
  *   $cur validateBinds
  *   $cur executeQuery
  *   $cur fetchFromBindCursor
- *   $cur getOutputBind variable
- *   $cur getOutputBindAsInteger variable
- *   $cur getOutputBindAsDouble variable
+ *   $cur getOutputBindString variable
+ *   $cur getOutputBindInteger variable
+ *   $cur getOutputBindDouble variable
  *   $cur getOutputBindLength variable
  *   $cur getOutputBindCursor variable
  *   $cur openCachedResultSet variable
@@ -173,7 +175,9 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "inputBind",
     "inputBindBlob",
     "inputBindClob",
-    "defineOutputBind",
+    "defineOutputBindString",
+    "defineOutputBindInteger",
+    "defineOutputBindDouble",
     "defineOutputBindBlob",
     "defineOutputBindClob",
     "defineOutputBindCursor",
@@ -182,9 +186,9 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "validateBinds",
     "executeQuery",
     "fetchFromBindCursor",
-    "getOutputBind",
-    "getOutputBindAsInteger",
-    "getOutputBindAsDouble",
+    "getOutputBindString",
+    "getOutputBindInteger",
+    "getOutputBindDouble",
     "getOutputBindLength",
     "getOutputBindCursor",
     "openCachedResultSet",
@@ -262,7 +266,9 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_inputBind,
     SQLRCUR_inputBindBlob,
     SQLRCUR_inputBindClob,
-    SQLRCUR_defineOutputBind,
+    SQLRCUR_defineOutputBindString,
+    SQLRCUR_defineOutputBindInteger,
+    SQLRCUR_defineOutputBindDouble,
     SQLRCUR_defineOutputBindBlob,
     SQLRCUR_defineOutputBindClob,
     SQLRCUR_defineOutputBindCursor,
@@ -271,9 +277,9 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_validateBinds,
     SQLRCUR_executeQuery,
     SQLRCUR_fetchFromBindCursor,
-    SQLRCUR_getOutputBind,
-    SQLRCUR_getOutputBindAsInteger,
-    SQLRCUR_getOutputBindAsDouble,
+    SQLRCUR_getOutputBindString,
+    SQLRCUR_getOutputBindInteger,
+    SQLRCUR_getOutputBindDouble,
     SQLRCUR_getOutputBindLength,
     SQLRCUR_getOutputBindCursor,
     SQLRCUR_openCachedResultSet,
@@ -657,7 +663,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 			      (uint32_t)size);
 	break;
       }
-    case SQLRCUR_defineOutputBind:
+    case SQLRCUR_defineOutputBindString:
       {
 	long length;
 	if (objc != 4) {
@@ -667,7 +673,25 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if (Tcl_GetLongFromObj(interp, objv[3], &length) != TCL_OK) {
 	  return TCL_ERROR;
 	}
-	cur->defineOutputBind(Tcl_GetString(objv[2]), length);
+	cur->defineOutputBindString(Tcl_GetString(objv[2]), length);
+	break;
+      }
+    case SQLRCUR_defineOutputBindInteger:
+      {
+	if (objc != 4) {
+	  Tcl_WrongNumArgs(interp,1, objv, "variable");
+	  return TCL_ERROR;
+	}
+	cur->defineOutputBindInteger(Tcl_GetString(objv[2]));
+	break;
+      }
+    case SQLRCUR_defineOutputBindDouble:
+      {
+	if (objc != 4) {
+	  Tcl_WrongNumArgs(interp,1, objv, "variable");
+	  return TCL_ERROR;
+	}
+	cur->defineOutputBindDouble(Tcl_GetString(objv[2]));
 	break;
       }
     case SQLRCUR_defineOutputBindBlob:
@@ -848,36 +872,36 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
 	break;
       }
-    case SQLRCUR_getOutputBind:
+    case SQLRCUR_getOutputBindString:
       {
 	Tcl_Obj *result;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
 	  return TCL_ERROR;
 	}
-	result = Tcl_NewStringObj(cur->getOutputBind(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
+	result = Tcl_NewStringObj(cur->getOutputBindString(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
 	Tcl_SetObjResult(interp, result);
 	break;
       }
-    case SQLRCUR_getOutputBindAsInteger:
+    case SQLRCUR_getOutputBindInteger:
       {
 	Tcl_Obj *result;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
 	  return TCL_ERROR;
 	}
-	result = Tcl_NewLongObj(cur->getOutputBindAsInteger(Tcl_GetString(objv[2])));
+	result = Tcl_NewLongObj(cur->getOutputBindInteger(Tcl_GetString(objv[2])));
 	Tcl_SetObjResult(interp, result);
 	break;
       }
-    case SQLRCUR_getOutputBindAsDouble:
+    case SQLRCUR_getOutputBindDouble:
       {
 	Tcl_Obj *result;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
 	  return TCL_ERROR;
 	}
-	result = Tcl_NewDoubleObj(cur->getOutputBindAsDouble(Tcl_GetString(objv[2])));
+	result = Tcl_NewDoubleObj(cur->getOutputBindDouble(Tcl_GetString(objv[2])));
 	Tcl_SetObjResult(interp, result);
 	break;
       }

@@ -337,17 +337,17 @@ void sqlrcursor::initVar(bindvar *var, const char *variable) {
 	}
 }
 
-void sqlrcursor::defineOutputBind(const char *variable,
-					uint32_t length) {
+void sqlrcursor::defineOutputBindString(const char *variable,
+						uint32_t length) {
 	defineOutputBindGeneric(variable,STRING_BIND,length);
 }
 
 void sqlrcursor::defineOutputBindInteger(const char *variable) {
-	defineOutputBindGeneric(variable,LONG_BIND,0);
+	defineOutputBindGeneric(variable,LONG_BIND,sizeof(int64_t));
 }
 
 void sqlrcursor::defineOutputBindDouble(const char *variable) {
-	defineOutputBindGeneric(variable,DOUBLE_BIND,0);
+	defineOutputBindGeneric(variable,DOUBLE_BIND,sizeof(double));
 }
 
 void sqlrcursor::defineOutputBindBlob(const char *variable) {
@@ -391,7 +391,7 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 	}
 }
 
-const char *sqlrcursor::getOutputBind(const char *variable) {
+const char *sqlrcursor::getOutputBindString(const char *variable) {
 
 	if (variable) {
 		for (int16_t i=0; i<outbindcount; i++) {
@@ -408,16 +408,6 @@ const char *sqlrcursor::getOutputBind(const char *variable) {
 	return NULL;
 }
 
-int64_t sqlrcursor::getOutputBindAsInteger(const char *variable) {
-	const char	*outputbindvalue=getOutputBind(variable);
-	return (outputbindvalue)?charstring::toInteger(outputbindvalue):0;
-}
-
-double sqlrcursor::getOutputBindAsDouble(const char *variable) {
-	const char	*outputbindvalue=getOutputBind(variable);
-	return (outputbindvalue)?charstring::toFloat(outputbindvalue):0.0;
-}
-
 uint32_t sqlrcursor::getOutputBindLength(const char *variable) {
 
 	if (variable) {
@@ -429,6 +419,35 @@ uint32_t sqlrcursor::getOutputBindLength(const char *variable) {
 		}
 	}
 	return 0;
+}
+
+int64_t sqlrcursor::getOutputBindInteger(const char *variable) {
+
+	if (variable) {
+		for (int16_t i=0; i<outbindcount; i++) {
+			if (!charstring::compare(
+				outbindvars[i].variable,variable) &&
+					outbindvars[i].type==LONG_BIND) {
+					return outbindvars[i].value.longval;
+			}
+		}
+	}
+	return -1;
+}
+
+double sqlrcursor::getOutputBindDouble(const char *variable) {
+
+	if (variable) {
+		for (int16_t i=0; i<outbindcount; i++) {
+			if (!charstring::compare(
+				outbindvars[i].variable,variable) &&
+					outbindvars[i].type==DOUBLE_BIND) {
+					return outbindvars[i].
+						value.doubleval.value;
+			}
+		}
+	}
+	return -1.0;
 }
 
 sqlrcursor *sqlrcursor::getOutputBindCursor(const char *variable) {

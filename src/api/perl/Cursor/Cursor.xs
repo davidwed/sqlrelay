@@ -161,9 +161,17 @@ bool
 sqlrcursor::fetchFromBindCursor()
 
 void
-sqlrcursor::defineOutputBind(variable,length)
+sqlrcursor::defineOutputBindString(variable,length)
 		const char *variable
 		uint32_t length
+
+void
+sqlrcursor::defineOutputBindInteger(variable)
+		const char *variable
+
+void
+sqlrcursor::defineOutputBindDouble(variable)
+		const char *variable
 
 void
 sqlrcursor::defineOutputBindBlob(variable)
@@ -178,10 +186,10 @@ sqlrcursor::defineOutputBindCursor(variable)
 		const char *variable
 
 const char *
-sqlrcursor::getOutputBind(variable)
+sqlrcursor::getOutputBindString(variable)
 		const char *variable
 	CODE:
-		const char	*value=THIS->getOutputBind(variable);
+		const char	*value=THIS->getOutputBindString(variable);
 		uint32_t	length=THIS->getOutputBindLength(variable);
 		ST(0)=sv_newmortal();
 		if (value) {
@@ -191,18 +199,18 @@ sqlrcursor::getOutputBind(variable)
 		}
 
 int64_t
-sqlrcursor::getOutputBindAsInteger(variable)
+sqlrcursor::getOutputBindInteger(variable)
 		const char *variable
 	CODE:
-		int64_t	value=THIS->getOutputBindAsInteger(variable);
+		int64_t	value=THIS->getOutputBindInteger(variable);
 		ST(0)=sv_newmortal();
 		sv_setiv(ST(0),value);
 
 double
-sqlrcursor::getOutputBindAsDouble(variable)
+sqlrcursor::getOutputBindDouble(variable)
 		const char *variable
 	CODE:
-		double	value=THIS->getOutputBindAsDouble(variable);
+		double	value=THIS->getOutputBindDouble(variable);
 		ST(0)=sv_newmortal();
 		sv_setnv(ST(0),value);
 

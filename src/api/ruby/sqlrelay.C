@@ -397,11 +397,25 @@ static VALUE sqlrcur_inputBindClob(VALUE self, VALUE variable,
 	return Qnil;
 }
 
-static VALUE sqlrcur_defineOutputBind(VALUE self, VALUE variable,
-						VALUE bufferlength) {
+static VALUE sqlrcur_defineOutputBindString(VALUE self, VALUE variable,
+							VALUE bufferlength) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->defineOutputBind(STR2CSTR(variable),NUM2INT(bufferlength));
+	sqlrcur->defineOutputBindString(STR2CSTR(variable),NUM2INT(bufferlength));
+	return Qnil;
+}
+
+static VALUE sqlrcur_defineOutputBindInteger(VALUE self, VALUE variable) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcur->defineOutputBindInteger(STR2CSTR(variable));
+	return Qnil;
+}
+
+static VALUE sqlrcur_defineOutputBindDouble(VALUE self, VALUE variable) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcur->defineOutputBindDouble(STR2CSTR(variable));
 	return Qnil;
 }
 
@@ -538,11 +552,11 @@ static VALUE sqlrcur_fetchFromBindCursor(VALUE self) {
 	return INT2NUM(sqlrcur->fetchFromBindCursor());
 }
 
-static VALUE sqlrcur_getOutputBind(VALUE self, VALUE variable) {
+static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	const char	*varname=STR2CSTR(variable);
-	const char	*result=sqlrcur->getOutputBind(varname);
+	const char	*result=sqlrcur->getOutputBindString(varname);
 	long		length=sqlrcur->getOutputBindLength(varname);
 	if (result) {
 		return rb_str_new(result,length);
@@ -551,19 +565,19 @@ static VALUE sqlrcur_getOutputBind(VALUE self, VALUE variable) {
 	}
 }
 
-static VALUE sqlrcur_getOutputBindAsInteger(VALUE self, VALUE variable) {
+static VALUE sqlrcur_getOutputBindInteger(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	const char	*varname=STR2CSTR(variable);
-	long		result=sqlrcur->getOutputBindAsInteger(varname);
+	long		result=sqlrcur->getOutputBindInteger(varname);
 	return INT2NUM(result);
 }
 
-static VALUE sqlrcur_getOutputBindAsDouble(VALUE self, VALUE variable) {
+static VALUE sqlrcur_getOutputBindDouble(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	const char	*varname=STR2CSTR(variable);
-	double		result=sqlrcur->getOutputBindAsDouble(varname);
+	double		result=sqlrcur->getOutputBindDouble(varname);
 	return rb_float_new(result);
 }
 
@@ -1013,8 +1027,12 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_inputBindBlob,3);
 	rb_define_method(csqlrcursor,"inputBindClob",
 				(CAST)sqlrcur_inputBindClob,3);
-	rb_define_method(csqlrcursor,"defineOutputBind",
-				(CAST)sqlrcur_defineOutputBind,2);
+	rb_define_method(csqlrcursor,"defineOutputBindString",
+				(CAST)sqlrcur_defineOutputBindString,2);
+	rb_define_method(csqlrcursor,"defineOutputBindInteger",
+				(CAST)sqlrcur_defineOutputBindInteger,1);
+	rb_define_method(csqlrcursor,"defineOutputBindDouble",
+				(CAST)sqlrcur_defineOutputBindDouble,1);
 	rb_define_method(csqlrcursor,"defineOutputBindBlob",
 				(CAST)sqlrcur_defineOutputBindBlob,1);
 	rb_define_method(csqlrcursor,"defineOutputBindClob",
@@ -1031,12 +1049,12 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_executeQuery,0);
 	rb_define_method(csqlrcursor,"fetchFromBindCursor",
 				(CAST)sqlrcur_fetchFromBindCursor,0);
-	rb_define_method(csqlrcursor,"getOutputBind",
-				(CAST)sqlrcur_getOutputBind,1);
-	rb_define_method(csqlrcursor,"getOutputBindAsInteger",
-				(CAST)sqlrcur_getOutputBindAsInteger,1);
-	rb_define_method(csqlrcursor,"getOutputBindAsDouble",
-				(CAST)sqlrcur_getOutputBindAsDouble,1);
+	rb_define_method(csqlrcursor,"getOutputBindString",
+				(CAST)sqlrcur_getOutputBindString,1);
+	rb_define_method(csqlrcursor,"getOutputBindInteger",
+				(CAST)sqlrcur_getOutputBindInteger,1);
+	rb_define_method(csqlrcursor,"getOutputBindDouble",
+				(CAST)sqlrcur_getOutputBindDouble,1);
 	rb_define_method(csqlrcursor,"getOutputBindLength",
 				(CAST)sqlrcur_getOutputBindLength,1);
 	rb_define_method(csqlrcursor,"getOutputBindCursor",

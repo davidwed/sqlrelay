@@ -222,7 +222,7 @@ class sqlrcursor {
 						uint32_t size);
 				// Define an input bind variable.
 
-		void	defineOutputBind(const char *variable,
+		void	defineOutputBindString(const char *variable,
 						uint32_t bufferlength);
 				// Define an output bind variable.
 				// "bufferlength" bytes will be reserved
@@ -273,14 +273,14 @@ class sqlrcursor {
 				// Fetch from a cursor that was returned as
 				// an output bind variable.
 
-		const char	*getOutputBind(const char *variable);
+		const char	*getOutputBindString(const char *variable);
 				// Get the value stored in a previously
 				// defined output bind variable.
-		int64_t	getOutputBindAsInteger(const char *variable);
+		int64_t		getOutputBindInteger(const char *variable);
 				// Get the value stored in a previously
 				// defined output bind variable as a long
 				// integer.
-		double	getOutputBindAsDouble(const char *variable);
+		double		getOutputBindDouble(const char *variable);
 				// Get the value stored in a previously
 				// defined output bind variable as a double
 				// precision floating point number.

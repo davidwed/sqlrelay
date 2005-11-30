@@ -120,9 +120,13 @@ public class SQLRCursor {
 	/** Define an input bind variable.  */
 	public native void	inputBindClob(String variable, String value, 
 								long size);
-	/** Define an output bind variable.  */
-	public native void	defineOutputBind(String variable, 
+	/** Define a string output bind variable.  */
+	public native void	defineOutputBindString(String variable, 
 							int bufferlength);
+	/** Define an integer output bind variable.  */
+	public native void	defineOutputBindInteger(String variable);
+	/** Define a double precision floating point output bind variable.  */
+	public native void	defineOutputBindDouble(String variable);
 	/** Define an output bind variable.  */
 	public native void	defineOutputBindBlob(String variable);
 	/** Define an output bind variable.  */
@@ -172,18 +176,18 @@ public class SQLRCursor {
 
 	/** Get the value stored in a previously
 	 *  defined output bind variable.  */
-	public native String	getOutputBind(String variable);
+	public native String	getOutputBindString(String variable);
 	/** Get the length of the value stored in a
 	 *  previously defined output bind variable.  */
 	public native byte[]	getOutputBindAsByteArray(String variable);
 	/** Get the value stored in a previously
 	 *  defined output bind variable as a long
 	 *  integer. */
-	public native long	getOutputBindAsInteger(String variable);
+	public native long	getOutputBindInteger(String variable);
 	/** Get the value stored in a previously
 	 *  defined output bind variable as a double
 	 *  precision floating point number. */
-	public native double	getOutputBindAsDouble(String variable);
+	public native double	getOutputBindDouble(String variable);
 	/** Get the length of the value stored in a
 	 *  previously defined output bind variable.  */
 	public native long	getOutputBindLength(String variable);

@@ -271,7 +271,9 @@ bool db2cursor::executeQuery(const char *query, uint32_t length, bool execute) {
 
 	// execute the query
 	erg=SQLExecute(stmt);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+	if (erg!=SQL_SUCCESS &&
+		erg!=SQL_SUCCESS_WITH_INFO &&
+		erg!=SQL_NO_DATA) {
 		return false;
 	}
 
@@ -394,7 +396,21 @@ const char *db2cursor::getErrorMessage(bool *liveconnection) {
 	errormsg=new stringbuffer();
 	errormsg->append((const char *)error);
 
-	*liveconnection=true;
+	// When the DB goes down, DB2 first reports one error:
+	// 	[IBM][CLI Driver] SQL1224N  A database agent could not be
+	//	started to service a request, or was terminated as a result of
+	//	a database system shutdown or a force command.  SQLSTATE=55032
+	//	(in this case nativeerrnum==-1224 and errnum==184)
+	// then upon repeated attempts to run a query, it reports:
+	//	[IBM][CLI Driver] CLI0106E  Connection is closed. SQLSTATE=08003
+	//	(in this case nativeerrnum==-99999 and errnum==64)
+	// We need to catch both...
+	if ((nativeerrnum==-1224 && errnum==184) ||
+		(nativeerrnum==-99999 && errnum==64)) {
+		*liveconnection=false;
+	} else {
+		*liveconnection=true;
+	}
 
 	return errormsg->getString();
 }
