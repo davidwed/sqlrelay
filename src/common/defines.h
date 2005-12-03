@@ -53,10 +53,10 @@
 #define START_LONG_DATA 2
 #define END_LONG_DATA 3
 #define CURSOR_DATA 4
-#define LONG_DATA 5
-#define DOUBLE_DATA 5
+#define INTEGER_DATA 5
+#define DOUBLE_DATA 6
 
-#define END_BIND_VARS 5 
+#define END_BIND_VARS 7 
 
 #define DONT_RE_EXECUTE 0
 #define RE_EXECUTE 1

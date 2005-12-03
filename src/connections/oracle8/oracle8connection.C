@@ -687,8 +687,7 @@ bool oracle8cursor::outputBindInteger(const char *variable,
 						int16_t *isnull) {
 	checkRePrepare();
 
-	outintbindstring[outbindcount]=
-		new char[charstring::integerLength(*value)+1];
+	outintbindstring[outbindcount]=new char[21];
 	outintbind[outbindcount]=value;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -699,7 +698,7 @@ bool oracle8cursor::outputBindInteger(const char *variable,
 				oracle8conn->err,
 				(ub4)charstring::toInteger(variable+1),
 				(dvoid *)outintbindstring[outbindcount],
-				(sb4)charstring::integerLength(*value)+1,
+				(sb4)21,
 				SQLT_STR,
 				(dvoid *)isnull,(ub2 *)0,
 				(ub2 *)0,0,(ub4 *)0,
@@ -711,7 +710,7 @@ bool oracle8cursor::outputBindInteger(const char *variable,
 				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)outintbindstring[outbindcount],
-				(sb4)charstring::integerLength(*value)+1,
+				(sb4)21,
 				SQLT_STR,
 				(dvoid *)isnull,(ub2 *)0,
 				(ub2 *)0,0,(ub4 *)0,

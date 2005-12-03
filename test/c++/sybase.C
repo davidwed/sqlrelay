@@ -100,7 +100,7 @@ int	main(int argc, char **argv) {
 
 	printf("CREATE STORED PROCEDURE: \n");
 	cur->sendQuery("drop procedure testproc");
-	checkSuccess(cur->sendQuery("create procedure testproc @in1 int, @in2 float, @in3 varchar(20), @out1 varchar(20) output, @out2 varchar(20) output, @out3 varchar(20) output as select @out1=convert(varchar(20),@in1), @out2=convert(varchar(20),@in2), @out3=convert(varchar(20),@in3)"),1);
+	checkSuccess(cur->sendQuery("create procedure testproc @in1 int, @in2 float, @in3 varchar(20), @out1 int output, @out2 float output, @out3 varchar(20) output as select @out1=@in1, @out2=@in2, @out3=@in3"),1);
 	printf("\n");
 
 	// drop existing table

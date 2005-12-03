@@ -38,7 +38,9 @@ bool sqlrcursor::parseOutputBinds() {
 
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
-			sqlrc->debugPrint("	done getting type\n");
+			sqlrc->debugPrint("	done getting type: ");
+			sqlrc->debugPrint((int64_t)type);
+			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
 
@@ -110,17 +112,17 @@ bool sqlrcursor::parseOutputBinds() {
 				sqlrc->debugPreEnd();
 			}
 
-		} else if (type==LONG_DATA) {
+		} else if (type==INTEGER_DATA) {
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
-				sqlrc->debugPrint("	LONG output bind\n");
+				sqlrc->debugPrint("	INTEGER output bind\n");
 				sqlrc->debugPreEnd();
 			}
 
 			// get the value
 			if (getLongLong((uint64_t *)&outbindvars[count].
-					value.longval)!=sizeof(uint64_t)) {
+					value.integerval)!=sizeof(uint64_t)) {
 				setError("Failed to get long value.\n "
 					"A network error may have occurred.");
 				return false;
@@ -307,6 +309,19 @@ bool sqlrcursor::parseOutputBinds() {
 			} else if (outbindvars[count].type==CURSOR_BIND) {
 				sqlrc->debugPrint((int64_t)outbindvars[count].
 								value.cursorid);
+			} else if (outbindvars[count].type==INTEGER_BIND) {
+				sqlrc->debugPrint(outbindvars[count].
+							value.integerval);
+			} else if (outbindvars[count].type==DOUBLE_BIND) {
+				sqlrc->debugPrint(outbindvars[count].
+						value.doubleval.value);
+				sqlrc->debugPrint("(");
+				sqlrc->debugPrint((int64_t)outbindvars[count].
+						value.doubleval.precision);
+				sqlrc->debugPrint(",");
+				sqlrc->debugPrint((int64_t)outbindvars[count].
+						value.doubleval.scale);
+				sqlrc->debugPrint(")");
 			} else {
 				sqlrc->debugPrint(outbindvars[count].
 							value.stringval);

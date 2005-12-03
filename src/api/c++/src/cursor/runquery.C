@@ -186,18 +186,15 @@ void sqlrcursor::sendInputBinds() {
 				sqlrc->debugPreEnd();
 			}
 
-		} else if (inbindvars[i].type==LONG_BIND) {
+		} else if (inbindvars[i].type==INTEGER_BIND) {
 
-			char	negative=inbindvars[i].value.longval<0?1:0;
-			sqlrc->cs->write(negative);
-			sqlrc->cs->write((uint64_t)
-					(inbindvars[i].value.longval*
-					 		((negative)?-1:1)));
+			sqlrc->cs->write((uint64_t)inbindvars[i].
+							value.integerval);
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint(":LONG)=");
 				sqlrc->debugPrint((int64_t)inbindvars[i].
-								value.longval);
+							value.integerval);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}

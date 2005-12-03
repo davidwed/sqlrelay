@@ -264,6 +264,8 @@ bool oracle7cursor::outputBindString(const char *variable,
 					uint16_t valuesize, 
 					int16_t *isnull) {
 
+	outbindcount++;
+
 	// bind the value to the variable
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!charstring::toInteger(variable+1)) {
@@ -279,6 +281,66 @@ bool oracle7cursor::outputBindString(const char *variable,
 		if (obndrv(&cda,(text *)variable,(sword)variablesize,
 			(ub1 *)value,(sword)valuesize,
 			NULL_TERMINATED_STRING,
+			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool oracle7cursor::outputBindInteger(const char *variable, 
+					uint16_t variablesize,
+					int64_t *value, 
+					int16_t *isnull) {
+
+	outbindcount++;
+
+	outintbindstring[outbindcount]=new char[21];
+	outintbind[outbindcount]=value;
+
+	// bind the value to the variable
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		if (!charstring::toInteger(variable+1)) {
+			return false;
+		}
+		if (obndrn(&cda,(sword)charstring::toInteger(variable+1),
+			(ub1 *)value,(sword)21,
+			NULL_TERMINATED_STRING,
+			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
+			return false;
+		}
+	} else {
+		if (obndrv(&cda,(text *)variable,(sword)variablesize,
+			(ub1 *)value,(sword)21,
+			NULL_TERMINATED_STRING,
+			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool oracle7cursor::outputBindDouble(const char *variable, 
+					uint16_t variablesize,
+					double *value, 
+					uint32_t *precision,
+					uint32_t *scale,
+					int16_t *isnull) {
+	outbindcount++;
+
+	// bind the value to the variable
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		if (!charstring::toInteger(variable+1)) {
+			return false;
+		}
+		if (obndrn(&cda,(sword)charstring::toInteger(variable+1),
+			(ub1 *)value,(sword)sizeof(double),DOUBLE_BIND_TYPE,
+			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
+			return false;
+		}
+	} else {
+		if (obndrv(&cda,(text *)variable,(sword)variablesize,
+			(ub1 *)value,(sword)sizeof(double),DOUBLE_BIND_TYPE,
 			-1,(sb2 *)isnull,(text *)0,-1,-1)) {
 			return false;
 		}
@@ -347,7 +409,16 @@ bool oracle7cursor::executeQuery(const char *query, uint32_t length,
 	totalrows=0;
 
 	// execute the query
-	return (!oexec(&cda));
+	if (oexec(&cda)) {
+		return false;
+	}
+
+	// convert integer output binds
+	for (uint16_t i=0; i<outbindcount; i++) {
+		*outintbind[i]=charstring::toInteger(outintbindstring[i]);
+	}
+
+	return true;
 }
 
 bool oracle7cursor::queryIsNotSelect() {
@@ -528,6 +599,12 @@ void oracle7cursor::cleanUpData(bool freeresult, bool freebinds) {
 			delete[] intbindstring[i];
 			intbindstring[i]=NULL;
 		}
+		for (uint16_t i=0; i<outbindcount; i++) {
+			delete[] outintbindstring[i];
+			outintbindstring[i]=NULL;
+			outintbind[i]=NULL;
+		}
 		inputbindcount=0;
+		outbindcount=0;
 	}
 }

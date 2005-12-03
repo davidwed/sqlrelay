@@ -60,6 +60,16 @@ class db2cursor : public sqlrcursor {
 						char *value, 
 						uint16_t valuesize,
 						int16_t *isnull);
+		bool		outputBindInteger(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		bool		outputBindDouble(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);

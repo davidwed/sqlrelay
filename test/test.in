@@ -3,7 +3,7 @@
 INITDIR=/etc/rc.d/init.d
 HTTPDINIT=$INITDIR/httpd
 PHPDIR=/var/www/html
-DB2USER=db2inst1
+DB2USER=db2inst3
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@prefix@/java/com/firstworks/sqlrelay
 export CLASSPATH=$CLASSPATH:./:@prefix@/java/sqlrelay.jar

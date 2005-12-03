@@ -13,7 +13,7 @@
 enum bindtype {
 	NULL_BIND,
 	STRING_BIND,
-	LONG_BIND,
+	INTEGER_BIND,
 	DOUBLE_BIND,
 	BLOB_BIND,
 	CLOB_BIND,
@@ -26,7 +26,7 @@ class bindvar {
 		int16_t	variablesize;
 		union {
 			char	*stringval;
-			int64_t	longval;
+			int64_t	integerval;
 			struct	{
 				double		value;
 				uint32_t	precision;

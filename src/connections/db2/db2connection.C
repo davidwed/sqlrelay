@@ -227,7 +227,7 @@ bool db2cursor::inputBindDouble(const char *variable,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_DOUBLE,
-				SQL_DECIMAL,
+				SQL_DOUBLE,
 				precision,
 				scale,
 				value,
@@ -254,6 +254,50 @@ bool db2cursor::outputBindString(const char *variable,
 				0,
 				value,
 				valuesize,
+				(SQLINTEGER *)isnull);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+	return true;
+}
+
+bool db2cursor::outputBindInteger(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull) {
+
+	erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_OUTPUT,
+				SQL_C_LONG,
+				SQL_INTEGER,
+				0,
+				0,
+				value,
+				sizeof(int64_t),
+				(SQLINTEGER *)isnull);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+	return true;
+}
+
+bool db2cursor::outputBindDouble(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull) {
+
+	erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_OUTPUT,
+				SQL_C_DOUBLE,
+				SQL_DOUBLE,
+				0,
+				0,
+				value,
+				sizeof(double),
 				(SQLINTEGER *)isnull);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;

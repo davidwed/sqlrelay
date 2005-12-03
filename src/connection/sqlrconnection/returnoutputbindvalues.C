@@ -58,6 +58,35 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 			clientsock->write(bv->valuesize);
 			clientsock->write(bv->value.stringval,bv->valuesize);
 
+		} else if (bv->type==INTEGER_BIND) {
+
+			#ifdef SERVER_DEBUG
+			debugstr->append("INTEGER:\n");
+			debugstr->append(bv->value.integerval);
+			#endif
+
+			clientsock->write((uint16_t)INTEGER_DATA);
+			clientsock->write((uint64_t)bv->value.integerval);
+
+		} else if (bv->type==DOUBLE_BIND) {
+
+			#ifdef SERVER_DEBUG
+			debugstr->append("DOUBLE:\n");
+			debugstr->append(bv->value.doubleval.value);
+			debugstr->append("(");
+			debugstr->append(bv->value.doubleval.precision);
+			debugstr->append(",");
+			debugstr->append(bv->value.doubleval.scale);
+			debugstr->append(")");
+			#endif
+
+			clientsock->write((uint16_t)DOUBLE_DATA);
+			clientsock->write(bv->value.doubleval.value);
+			clientsock->write((uint32_t)bv->value.
+						doubleval.precision);
+			clientsock->write((uint32_t)bv->value.
+						doubleval.scale);
+
 		} else if (bv->type==CURSOR_BIND) {
 
 			#ifdef SERVER_DEBUG

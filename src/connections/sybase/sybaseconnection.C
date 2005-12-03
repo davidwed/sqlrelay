@@ -240,7 +240,6 @@ void sybaseconnection::deleteCursor(sqlrcursor *curs) {
 }
 
 void sybaseconnection::logOut() {
-
 	cs_loc_drop(context,locale);
 	ct_close(dbconn,CS_UNUSED);
 	ct_con_drop(dbconn);
@@ -482,8 +481,9 @@ bool sybasecursor::outputBindString(const char *variable,
 
 	checkRePrepare();
 
-	outbindvalues[outbindindex]=value;
-	outbindvaluelengths[outbindindex]=valuesize;
+	outbindtype[outbindindex]=CS_CHAR_TYPE;
+	outbindstrings[outbindindex]=value;
+	outbindstringlengths[outbindindex]=valuesize;
 	outbindindex++;
 
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
@@ -500,7 +500,76 @@ bool sybasecursor::outputBindString(const char *variable,
 	parameter[paramindex].status=CS_RETURN;
 	parameter[paramindex].locale=NULL;
 	if (ct_param(cmd,&parameter[paramindex],
-		(CS_VOID *)NULL,0,(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
+			(CS_VOID *)NULL,0,
+			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
+		return false;
+	}
+	paramindex++;
+	return true;
+}
+
+bool sybasecursor::outputBindInteger(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull) {
+
+	checkRePrepare();
+
+	outbindtype[outbindindex]=CS_INT_TYPE;
+	outbindints[outbindindex]=value;
+	outbindindex++;
+
+	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+				sizeof(parameter[paramindex]));
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].namelen=0;
+	} else {
+		charstring::copy(parameter[paramindex].name,variable);
+		parameter[paramindex].namelen=variablesize;
+	}
+	parameter[paramindex].datatype=CS_INT_TYPE;
+	parameter[paramindex].maxlength=CS_UNUSED;
+	parameter[paramindex].status=CS_RETURN;
+	parameter[paramindex].locale=NULL;
+	if (ct_param(cmd,&parameter[paramindex],
+			(CS_VOID *)NULL,0,
+			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
+		return false;
+	}
+	paramindex++;
+	return true;
+}
+
+bool sybasecursor::outputBindDouble(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull) {
+
+	checkRePrepare();
+
+	outbindtype[outbindindex]=CS_FLOAT_TYPE;
+	outbinddoubles[outbindindex]=value;
+	outbindindex++;
+
+	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+				sizeof(parameter[paramindex]));
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].namelen=0;
+	} else {
+		charstring::copy(parameter[paramindex].name,variable);
+		parameter[paramindex].namelen=variablesize;
+	}
+	parameter[paramindex].datatype=CS_FLOAT_TYPE;
+	parameter[paramindex].maxlength=CS_UNUSED;
+	parameter[paramindex].status=CS_RETURN;
+	parameter[paramindex].locale=NULL;
+	if (ct_param(cmd,&parameter[paramindex],
+			(CS_VOID *)NULL,0,
+			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
 		return false;
 	}
 	paramindex++;
@@ -664,11 +733,20 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 			maxindex=ncols;
 		}
 		for (CS_INT i=0; i<maxindex; i++) {
-			CS_INT	length=outbindvaluelengths[i];
-			if (datalength[i][0]<length) {
-				length=datalength[i][0];
+			if (outbindtype[i]==CS_CHAR_TYPE) {
+				CS_INT	length=outbindstringlengths[i];
+				if (datalength[i][0]<length) {
+					length=datalength[i][0];
+				}
+				rawbuffer::copy(outbindstrings[i],
+						data[i][0],length);
+			} else if (outbindtype[i]==CS_INT_TYPE) {
+				*outbindints[i]=charstring::toInteger(
+								data[i][0]);
+			} else if (outbindtype[i]==CS_FLOAT_TYPE) {
+				*outbinddoubles[i]=charstring::toFloat(
+								data[i][0]);
 			}
-			rawbuffer::copy(outbindvalues[i],data[i][0],length);
 		}
 
 		discardResults();

@@ -31,8 +31,8 @@ bool sqlrconnection::getInputBinds(sqlrcursor *cursor) {
 			if (!getStringBind(bv)) {
 				return false;
 			}
-		} else if (bv->type==LONG_BIND) {
-			if (!getLongBind(bv)) {
+		} else if (bv->type==INTEGER_BIND) {
+			if (!getIntegerBind(bv)) {
 				return false;
 			}
 		} else if (bv->type==DOUBLE_BIND) {
@@ -87,14 +87,12 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",4,"STRING");
 			#endif
-		} else if (bv->type==LONG_BIND) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",4,"LONG");
-			#endif
+		#ifdef SERVER_DEBUG
+		} else if (bv->type==INTEGER_BIND) {
+			debugPrint("connection",4,"INTEGER");
 		} else if (bv->type==DOUBLE_BIND) {
-			#ifdef SERVER_DEBUG
 			debugPrint("connection",4,"DOUBLE");
-			#endif
+		#endif
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			if (!getBindSize(bv,maxlobbindvaluelength)) {
 				return false;
@@ -281,21 +279,11 @@ bool sqlrconnection::getStringBind(bindvar *bv) {
 	return true;
 }
 
-bool sqlrconnection::getLongBind(bindvar *bv) {
+bool sqlrconnection::getIntegerBind(bindvar *bv) {
 
 	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,"LONG");
+		debugPrint("connection",4,"INTEGER");
 	#endif
-
-	// get positive/negative
-	char	negative;
-	if (clientsock->read(&negative,idleclienttimeout,0)!=sizeof(char)) {
-		#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
-				"getting binds failed: bad positive/negative");
-		#endif
-		return false;
-	}
 
 	// get the value itself
 	uint64_t	value;
@@ -308,10 +296,10 @@ bool sqlrconnection::getLongBind(bindvar *bv) {
 	}
 
 	// set the value
-	bv->value.longval=((int64_t)value)*(negative?-1:1);
+	bv->value.integerval=(int64_t)value;
 
 	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,(int32_t)bv->value.longval);
+		debugPrint("connection",4,(int32_t)bv->value.integerval);
 	#endif
 
 	return true;

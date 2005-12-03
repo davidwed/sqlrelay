@@ -18,10 +18,10 @@ bool sqlrcursor::handleBinds() {
 				&inbindvars[i].isnull)) {
 				return false;
 			}
-		} else if (inbindvars[i].type==LONG_BIND) {
+		} else if (inbindvars[i].type==INTEGER_BIND) {
 			if (!inputBindInteger(inbindvars[i].variable,
 				inbindvars[i].variablesize,
-				&inbindvars[i].value.longval)) {
+				&inbindvars[i].value.integerval)) {
 				return false;
 			}
 		} else if (inbindvars[i].type==DOUBLE_BIND) {
@@ -61,10 +61,10 @@ bool sqlrcursor::handleBinds() {
 					&outbindvars[i].isnull)) {
 				return false;
 			}
-		} else if (outbindvars[i].type==LONG_BIND) {
+		} else if (outbindvars[i].type==INTEGER_BIND) {
 			if (!outputBindInteger(outbindvars[i].variable,
 					outbindvars[i].variablesize,
-					&outbindvars[i].value.longval,
+					&outbindvars[i].value.integerval,
 					&outbindvars[i].isnull)) {
 				return false;
 			}

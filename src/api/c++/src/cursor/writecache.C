@@ -219,8 +219,8 @@ void sqlrcursor::cacheOutputBinds(uint32_t count) {
 				outbindvars[i].type==CLOB_BIND) {
 			cachedest->write(outbindvars[i].value.stringval,len);
 			cachedest->write(outbindvars[i].value.lobval,len);
-		} else if (outbindvars[i].type==LONG_BIND) {
-			cachedest->write(outbindvars[i].value.longval);
+		} else if (outbindvars[i].type==INTEGER_BIND) {
+			cachedest->write(outbindvars[i].value.integerval);
 		} else if (outbindvars[i].type==DOUBLE_BIND) {
 			cachedest->write(outbindvars[i].value.
 						doubleval.value);

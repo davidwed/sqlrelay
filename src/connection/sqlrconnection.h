@@ -235,7 +235,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	getNullBind(bindvar *bv);
 		bool	getBindSize(bindvar *bv, uint32_t maxsize);
 		bool	getStringBind(bindvar *bv);
-		bool	getLongBind(bindvar *bv);
+		bool	getIntegerBind(bindvar *bv);
 		bool	getDoubleBind(bindvar *bv);
 		bool	getLobBind(bindvar *bv);
 		bool	getSendColumnInfo();

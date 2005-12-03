@@ -94,6 +94,16 @@ class oracle7cursor : public sqlrcursor {
 						char *value,
 						uint16_t valuesize,
 						short *isnull);
+		bool		outputBindInteger(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		bool		outputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -129,6 +139,10 @@ class oracle7cursor : public sqlrcursor {
 
 		uint16_t	inputbindcount;
 		char		*intbindstring[MAXVAR];
+
+		char		*outintbindstring[MAXVAR];
+		int64_t		*outintbind[MAXVAR];
+		uint16_t	outbindcount;
 
 		oracle7connection	*oracle7conn;
 };

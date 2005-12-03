@@ -25,7 +25,7 @@
 		void	stringVar(bindvar *var,
 					const char *variable,
 					const char *value);
-		void	longVar(bindvar *var,
+		void	integerVar(bindvar *var,
 					const char *variable,
 					int64_t value);
 		void	doubleVar(bindvar *var, const char *variable, 

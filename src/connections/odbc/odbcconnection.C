@@ -310,6 +310,60 @@ bool odbccursor::outputBindString(const char *variable,
 	return true;
 }
 
+bool odbccursor::outputBindInteger(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull) {
+
+	erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_OUTPUT,
+				SQL_C_LONG,
+				SQL_INTEGER,
+				0,
+				0,
+				value,
+				sizeof(int64_t),
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)isnull
+				#else
+				(SQLINTEGER *)isnull
+				#endif
+				);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+	return true;
+}
+
+bool odbccursor::outputBindDouble(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull) {
+
+	erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_OUTPUT,
+				SQL_C_DOUBLE,
+				SQL_DOUBLE,
+				0,
+				0,
+				value,
+				sizeof(double),
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)isnull
+				#else
+				(SQLINTEGER *)isnull
+				#endif
+				);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+	return true;
+}
+
 short odbccursor::nonNullBindValue() {
 	return 0;
 }

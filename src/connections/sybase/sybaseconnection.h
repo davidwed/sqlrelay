@@ -47,6 +47,16 @@ class sybasecursor : public sqlrcursor {
 						char *value, 
 						uint16_t valuesize, 
 						int16_t *isnull);
+		bool		outputBindInteger(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		bool		outputBindDouble(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -81,8 +91,11 @@ class sybasecursor : public sqlrcursor {
 
 		CS_DATAFMT	parameter[MAX_BIND_VARS];
 		uint16_t	paramindex;
-		char		*outbindvalues[MAX_BIND_VARS];
-		uint16_t	outbindvaluelengths[MAX_BIND_VARS];
+		CS_INT		outbindtype[MAX_BIND_VARS];
+		char		*outbindstrings[MAX_BIND_VARS];
+		uint16_t	outbindstringlengths[MAX_BIND_VARS];
+		int64_t		*outbindints[MAX_BIND_VARS];
+		double		*outbinddoubles[MAX_BIND_VARS];
 		uint16_t	outbindindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];

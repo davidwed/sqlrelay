@@ -166,7 +166,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("3","hello");
 	cur->defineOutputBindInteger("4");
 	cur->defineOutputBindDouble("5");
-	cur->defineOutputBindString("6",25);
+	cur->defineOutputBindString("6",20);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getOutputBindInteger("4"),1);
 	checkSuccess(cur->getOutputBindDouble("5"),1.1);

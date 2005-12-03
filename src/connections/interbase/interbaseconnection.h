@@ -60,6 +60,16 @@ class interbasecursor : public sqlrcursor {
 						char *value, 
 						uint16_t valuesize,
 						short *isnull);
+		bool		outputBindInteger(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		bool		outputBindDouble(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -73,8 +83,12 @@ class interbasecursor : public sqlrcursor {
 		bool		skipRow();
 		bool		fetchRow();
 		void		returnRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
+
 
 		isc_stmt_handle	stmt;
+		uint16_t	outbindcount;
+		bool		outbindisstring[MAXVAR];
 		XSQLDA	ISC_FAR	*outsqlda;
 		XSQLDA	ISC_FAR	*insqlda;
 		ISC_BLOB_DESC	to_desc;

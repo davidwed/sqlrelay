@@ -166,6 +166,8 @@ interbasecursor::interbasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
 	stmt=NULL;
 
 	queryIsExecSP=false;
+
+	outbindcount=0;
 }
 
 interbasecursor::~interbasecursor() {
@@ -314,6 +316,9 @@ bool interbasecursor::outputBindString(const char *variable,
 				uint16_t valuesize, 
 				int16_t *isnull) {
 
+	outbindisstring[outbindcount]=true;
+	outbindcount++;
+
 	// if we're doing output binds then the
 	// query must be a stored procedure
 	queryIsExecSP=true;
@@ -328,6 +333,76 @@ bool interbasecursor::outputBindString(const char *variable,
 	outsqlda->sqlvar[index].sqlsubtype=0;
 	outsqlda->sqlvar[index].sqllen=valuesize;
 	outsqlda->sqlvar[index].sqldata=value;
+	outsqlda->sqlvar[index].sqlind=isnull;
+	outsqlda->sqlvar[index].sqlname_length=0;
+	outsqlda->sqlvar[index].sqlname[0]=(char)NULL;
+	outsqlda->sqlvar[index].relname_length=0;
+	outsqlda->sqlvar[index].relname[0]=(char)NULL;
+	outsqlda->sqlvar[index].ownname_length=0;
+	outsqlda->sqlvar[index].ownname[0]=(char)NULL;
+	outsqlda->sqlvar[index].aliasname_length=0;
+	outsqlda->sqlvar[index].aliasname[0]=(char)NULL;
+	return true;
+}
+
+bool interbasecursor::outputBindInteger(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull) {
+
+	outbindisstring[outbindcount]=false;
+	outbindcount++;
+
+	// if we're doing output binds then the
+	// query must be a stored procedure
+	queryIsExecSP=true;
+
+	// make bind vars 1 based like all other db's
+	long	index=charstring::toInteger(variable+1)-1;
+	if (index<0) {
+		return false;
+	}
+	outsqlda->sqlvar[index].sqltype=SQL_INT64;
+	outsqlda->sqlvar[index].sqlscale=0;
+	outsqlda->sqlvar[index].sqlsubtype=0;
+	outsqlda->sqlvar[index].sqllen=sizeof(int64_t);
+	outsqlda->sqlvar[index].sqldata=(char *)value;
+	outsqlda->sqlvar[index].sqlind=isnull;
+	outsqlda->sqlvar[index].sqlname_length=0;
+	outsqlda->sqlvar[index].sqlname[0]=(char)NULL;
+	outsqlda->sqlvar[index].relname_length=0;
+	outsqlda->sqlvar[index].relname[0]=(char)NULL;
+	outsqlda->sqlvar[index].ownname_length=0;
+	outsqlda->sqlvar[index].ownname[0]=(char)NULL;
+	outsqlda->sqlvar[index].aliasname_length=0;
+	outsqlda->sqlvar[index].aliasname[0]=(char)NULL;
+	return true;
+}
+
+bool interbasecursor::outputBindDouble(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull) {
+
+	outbindisstring[outbindcount]=false;
+	outbindcount++;
+
+	// if we're doing output binds then the
+	// query must be a stored procedure
+	queryIsExecSP=true;
+
+	// make bind vars 1 based like all other db's
+	long	index=charstring::toInteger(variable+1)-1;
+	if (index<0) {
+		return false;
+	}
+	outsqlda->sqlvar[index].sqltype=SQL_DOUBLE;
+	outsqlda->sqlvar[index].sqlscale=0;
+	outsqlda->sqlvar[index].sqlsubtype=0;
+	outsqlda->sqlvar[index].sqllen=sizeof(double);
+	outsqlda->sqlvar[index].sqldata=(char *)value;
 	outsqlda->sqlvar[index].sqlind=isnull;
 	outsqlda->sqlvar[index].sqlname_length=0;
 	outsqlda->sqlvar[index].sqlname[0]=(char)NULL;
@@ -359,8 +434,10 @@ bool interbasecursor::executeQuery(const char *query, uint32_t length,
 
 		// make sure each output bind variable gets null terminated
 		for (short i=0; i<outsqlda->sqld; i++) {
-			outsqlda->sqlvar[i].
-				sqldata[outsqlda->sqlvar[i].sqllen-1]=0;
+			if (outbindisstring[i]) {
+				outsqlda->sqlvar[i].
+					sqldata[outsqlda->sqlvar[i].sqllen-1]=0;
+			}
 		}
 
 		// set column count to 0
@@ -804,5 +881,11 @@ void interbasecursor::returnRow() {
 			// have to handle blobs for real here...
 			conn->sendNullField();
 		}
+	}
+}
+
+void interbasecursor::cleanUpData(bool freeresult, bool freebinds) {
+	if (freebinds) {
+		outbindcount=0;
 	}
 }

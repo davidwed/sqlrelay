@@ -112,7 +112,7 @@ void sqlrcursor::substitution(const char *variable, const char *value) {
 
 void sqlrcursor::substitution(const char *variable, int64_t value) {
 	if (subcount<MAXVAR && variable && variable[0]) {
-		longVar(&subvars[subcount],variable,value);
+		integerVar(&subvars[subcount],variable,value);
 		subcount++;
 	}
 }
@@ -158,7 +158,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value) {
 
 void sqlrcursor::inputBind(const char *variable, int64_t value) {
 	if (inbindcount<MAXVAR && variable && variable[0]) {
-		longVar(&inbindvars[inbindcount],variable,value);
+		integerVar(&inbindvars[inbindcount],variable,value);
 		inbindvars[inbindcount].send=true;
 		inbindcount++;
 	}
@@ -190,7 +190,7 @@ void sqlrcursor::substitutions(const char **variables, const int64_t *values) {
 	uint16_t	index=0;
 	while (variables[index] && subcount<MAXVAR) {
 		if (variables[index] && variables[index][0]) {
-			longVar(&subvars[subcount],
+			integerVar(&subvars[subcount],
 					variables[index],values[index]);
 			subcount++;
 		}
@@ -232,7 +232,7 @@ void sqlrcursor::inputBinds(const char **variables, const int64_t *values) {
 	uint16_t	index=0;
 	while (variables[index] && inbindcount<MAXVAR) {
 		if (variables[index] && variables[index][0]) {
-			longVar(&inbindvars[inbindcount],
+			integerVar(&inbindvars[inbindcount],
 					variables[index],values[index]);
 			inbindvars[inbindcount].send=true;
 			inbindcount++;
@@ -278,10 +278,10 @@ void sqlrcursor::stringVar(bindvar *var, const char *variable,
 	}
 }
 
-void sqlrcursor::longVar(bindvar *var, const char *variable, int64_t value) {
+void sqlrcursor::integerVar(bindvar *var, const char *variable, int64_t value) {
 	initVar(var,variable);
-	var->type=LONG_BIND;
-	var->value.longval=value;
+	var->type=INTEGER_BIND;
+	var->value.integerval=value;
 }
 
 void sqlrcursor::doubleVar(bindvar *var, const char *variable, double value,
@@ -343,7 +343,7 @@ void sqlrcursor::defineOutputBindString(const char *variable,
 }
 
 void sqlrcursor::defineOutputBindInteger(const char *variable) {
-	defineOutputBindGeneric(variable,LONG_BIND,sizeof(int64_t));
+	defineOutputBindGeneric(variable,INTEGER_BIND,sizeof(int64_t));
 }
 
 void sqlrcursor::defineOutputBindDouble(const char *variable) {
@@ -427,8 +427,8 @@ int64_t sqlrcursor::getOutputBindInteger(const char *variable) {
 		for (int16_t i=0; i<outbindcount; i++) {
 			if (!charstring::compare(
 				outbindvars[i].variable,variable) &&
-					outbindvars[i].type==LONG_BIND) {
-					return outbindvars[i].value.longval;
+					outbindvars[i].type==INTEGER_BIND) {
+					return outbindvars[i].value.integerval;
 			}
 		}
 	}

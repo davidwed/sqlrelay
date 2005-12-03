@@ -75,6 +75,16 @@ class odbccursor : public sqlrcursor {
 						const char *value, 
 						uint16_t valuesize,
 						short *isnull);
+		bool		outputBindInteger(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		bool		outputBindDouble(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull);
 		short		nonNullBindValue();
 		short		nullBindValue();
 		bool		bindValueIsNull(short isnull);
