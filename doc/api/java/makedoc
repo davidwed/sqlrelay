@@ -1,5 +1,5 @@
 rm -f *.html
 rm -f *.css
-rm -rf com
+rm -f com/firstworks/sqlrelay/*.html
 rm -f package-list
 javadoc ../../../src/api/java/com/firstworks/sqlrelay/*.java
