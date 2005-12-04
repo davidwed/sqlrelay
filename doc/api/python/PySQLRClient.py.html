@@ -261,11 +261,17 @@
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>substitution</FONT>(self, variable, value, precision=0, scale=0):
         &quot;&quot;&quot;
 <FONT color=#f800f8>        Define a substitution variable.</FONT>
+<FONT color=#f800f8>        Returns true if the variable was successfully substituted or false if</FONT>
+<FONT color=#f800f8>        the variable isn't a string, integer or floating point number, or if</FONT>
+<FONT color=#f800f8>        precision and scale aren't provided for a floating point number.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>inputBind</FONT>(self, variable, value, precision=0, scale=0):
         &quot;&quot;&quot;
 <FONT color=#f800f8>        Define an input bind varaible.</FONT>
+<FONT color=#f800f8>        Returns true if the variable was successfully bound or false if the</FONT>
+<FONT color=#f800f8>        variable isn't a string, integer or floating point number, or if</FONT>
+<FONT color=#f800f8>        precision and scale aren't provided for a floating point number.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>inputBindBlob</FONT>(self, variable, value, length):
@@ -302,11 +308,17 @@
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>substitutions</FONT>(self, variables, values, precisions=None, scales=None):
         &quot;&quot;&quot;
 <FONT color=#f800f8>        Define substitution variables.</FONT>
+<FONT color=#f800f8>        Returns true if the variables were successfully substituted or false if</FONT>
+<FONT color=#f800f8>        one of the variables wasn't a string, integer or floating point number,</FONT>
+<FONT color=#f800f8>        or if precision and scale weren't provided for a floating point number.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>inputBinds</FONT>(self, variables, values, precisions=None, scales=None):
         &quot;&quot;&quot;
 <FONT color=#f800f8>        Define input bind variables.</FONT>
+<FONT color=#f800f8>        Returns true if the variables were successfully bound or false if one</FONT>
+<FONT color=#f800f8>        of the variables wasn't a string, integer or floating point number,</FONT>
+<FONT color=#f800f8>        or if precision and scale weren't provided for a floating point number.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
         
 

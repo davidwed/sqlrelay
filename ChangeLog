@@ -72,6 +72,11 @@
 	fixed a bug where DB2 update/delete with no affected rows was returning
 		an error
 	added nls_lang connection string option to oracle7/8 connections
+	added getOutputBindBlob/Clob() methods
+	for perl/php/python/ruby api's if a bind variable or substitution
+		variable isn't a string,long or double (or if prec/scale aren't
+		specified for a double) then the inputBind(s)/substitution(s)
+		functions return false
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

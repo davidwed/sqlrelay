@@ -797,9 +797,9 @@ int	main(int argc, char **argv) {
 	cur->defineOutputBindClob("clobvar");
 	cur->defineOutputBindBlob("blobvar");
 	checkSuccess(cur->executeQuery(),1);
-	clobvar=cur->getOutputBindString("clobvar");
+	clobvar=cur->getOutputBindClob("clobvar");
 	clobvarlength=cur->getOutputBindLength("clobvar");
-	blobvar=cur->getOutputBindString("blobvar");
+	blobvar=cur->getOutputBindBlob("blobvar");
 	blobvarlength=cur->getOutputBindLength("blobvar");
 	checkSuccess(clobvar,"hello",5);
 	checkSuccess(clobvarlength,5);
@@ -861,7 +861,7 @@ int	main(int argc, char **argv) {
 	cur->prepareQuery("begin select testclob into :clobbindval from testtable2; end;");
 	cur->defineOutputBindClob("clobbindval");
 	checkSuccess(cur->executeQuery(),1);
-	const char	*clobbindvar=cur->getOutputBindString("clobbindval");
+	const char	*clobbindvar=cur->getOutputBindClob("clobbindval");
 	checkSuccess(cur->getOutputBindLength("clobbindval"),8*1024);
 	checkSuccess(clobval,clobbindvar);
 	cur->sendQuery("drop table testtable2");

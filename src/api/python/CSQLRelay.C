@@ -414,6 +414,7 @@ static PyObject *substitution(PyObject *self, PyObject *args) {
   PyObject *value;
   uint32_t precision;
   uint32_t scale;
+  uint16_t success;
   if (!PyArg_ParseTuple(args,
 #ifdef SUPPORTS_UNSIGNED
 	"lsOII",
@@ -422,6 +423,7 @@ static PyObject *substitution(PyObject *self, PyObject *args) {
 #endif
 	&sqlrcur, &variable, &value, &precision, &scale))
     return NULL;
+  success=1;
   if (value==Py_None) {
     ((sqlrcursor *)sqlrcur)->substitution(variable, (char *)NULL);
   } else if (PyString_Check(value)) {
@@ -430,8 +432,10 @@ static PyObject *substitution(PyObject *self, PyObject *args) {
     ((sqlrcursor *)sqlrcur)->substitution(variable, (int64_t)PyInt_AsLong(value));
   } else if (PyFloat_Check(value)) {
     ((sqlrcursor *)sqlrcur)->substitution(variable, (double)PyFloat_AsDouble(value), precision, scale);
+  } else {
+    success=0;
   }
-  return Py_BuildValue("h", 0);
+  return Py_BuildValue("h", success);
 }
 
 static PyObject *substitutions(PyObject *self, PyObject *args) {
@@ -441,9 +445,11 @@ static PyObject *substitutions(PyObject *self, PyObject *args) {
   PyObject *scales;
   long sqlrcur;
   char *variable;
+  uint16_t success;
   PyObject *value;
   if (!PyArg_ParseTuple(args, "lOOOO", &sqlrcur, &variables, &values, &precisions, &scales))
     return NULL;
+  success=1;
   if (PyList_Check(variables) && PyList_Check(values)) {
     for (int i=0; i<PyList_Size(variables); i++) {
       variable=PyString_AsString(PyList_GetItem(variables,i));
@@ -456,10 +462,12 @@ static PyObject *substitutions(PyObject *self, PyObject *args) {
         ((sqlrcursor *)sqlrcur)->substitution(variable, (int64_t)PyInt_AsLong(value));
       } else if (PyFloat_Check(value)) {
         ((sqlrcursor *)sqlrcur)->substitution(variable, (double)PyFloat_AsDouble(value), (uint32_t)PyInt_AsLong(PyList_GetItem(precisions,i)), (uint32_t)PyInt_AsLong(PyList_GetItem(scales,i)));
+      } else {
+        success=0;
       }
     }
   }
-  return Py_BuildValue("h", 0);
+  return Py_BuildValue("h", success);
 }
 
 static PyObject *clearBinds(PyObject *self, PyObject *args) {
@@ -486,6 +494,7 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
   uint32_t precision;
   uint32_t scale;
   long sqlrcur;
+  uint16_t success;
   if (!PyArg_ParseTuple(args,
 #ifdef SUPPORTS_UNSIGNED
 	"lsOII",
@@ -494,6 +503,7 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
 #endif
 	&sqlrcur, &variable, &value, &precision, &scale))
     return NULL;
+  success=1;
   if (value==Py_None) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (char *)NULL);
   } else if (PyString_Check(value)) {
@@ -502,8 +512,10 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (int64_t)PyInt_AsLong(value));
   } else if (PyFloat_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (double)PyFloat_AsDouble(value), (uint32_t)precision, (uint32_t)scale);
+  } else {
+    success=0;
   }
-  return Py_BuildValue("h", 0);
+  return Py_BuildValue("h", success);
 }
 
 static PyObject *inputBindBlob(PyObject *self, PyObject *args) {
@@ -511,6 +523,7 @@ static PyObject *inputBindBlob(PyObject *self, PyObject *args) {
   PyObject *value;
   uint32_t size;
   long sqlrcur;
+  uint16_t success;
   if (!PyArg_ParseTuple(args,
 #ifdef SUPPORTS_UNSIGNED
 	"lsOI",
@@ -519,12 +532,15 @@ static PyObject *inputBindBlob(PyObject *self, PyObject *args) {
 #endif
 	&sqlrcur, &variable, &value, &size))
     return NULL;
+  success=1;
   if (value==Py_None) {
     ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, NULL, size);
   } else if (PyString_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, PyString_AsString(value), size);
+  } else {
+    success=0;
   }
-  return Py_BuildValue("h", 0);
+  return Py_BuildValue("h", success);
 }
 
 static PyObject *inputBindClob(PyObject *self, PyObject *args) {
@@ -532,6 +548,7 @@ static PyObject *inputBindClob(PyObject *self, PyObject *args) {
   PyObject *value;
   uint32_t size;
   long sqlrcur;
+  uint16_t success;
   if (!PyArg_ParseTuple(args,
 #ifdef SUPPORTS_UNSIGNED
 	"lsOI",
@@ -540,12 +557,15 @@ static PyObject *inputBindClob(PyObject *self, PyObject *args) {
 #endif
 	&sqlrcur, &variable, &value, &size))
     return NULL;
+  success=1;
   if (value==Py_None) {
     ((sqlrcursor *)sqlrcur)->inputBindClob(variable, NULL, size);
   } else if (PyString_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBindClob(variable, PyString_AsString(value), size);
+  } else {
+    success=0;
   }
-  return Py_BuildValue("h", 0);
+  return Py_BuildValue("h", success);
 }
 
 static PyObject *inputBinds(PyObject *self, PyObject *args) {
@@ -555,9 +575,11 @@ static PyObject *inputBinds(PyObject *self, PyObject *args) {
   PyObject *scales;
   long sqlrcur;
   char *variable;
+  uint16_t success;
   PyObject *value;
   if (!PyArg_ParseTuple(args, "lOOOO", &sqlrcur, &variables, &values, &precisions, &scales))
     return NULL;
+  success=1;
   if (PyList_Check(variables) && PyList_Check(values)) {
     for (int i=0; i<PyList_Size(variables); i++) {
       variable=PyString_AsString(PyList_GetItem(variables,i));
@@ -570,10 +592,12 @@ static PyObject *inputBinds(PyObject *self, PyObject *args) {
         ((sqlrcursor *)sqlrcur)->inputBind(variable, (int64_t)PyInt_AsLong(value));
       } else if (PyFloat_Check(value)) {
         ((sqlrcursor *)sqlrcur)->inputBind(variable, (double)PyFloat_AsDouble(value), (unsigned short)PyInt_AsLong(PyList_GetItem(precisions,i)), (unsigned short)PyInt_AsLong(PyList_GetItem(scales,i)));
+      } else {
+        success=0;
       }
     }
   }
-  return Py_BuildValue("h", 0);
+  return Py_BuildValue("h", success);
 }
 
 static PyObject *defineOutputBindString(PyObject *self, PyObject *args) {

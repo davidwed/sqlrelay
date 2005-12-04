@@ -66,7 +66,6 @@ install:
 	$(INSTALL) -m 644 api/java/index.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/overview-tree.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/package-list $(docdir)/api/java
-	$(INSTALL) -m 644 api/java/packages.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/stylesheet.css $(docdir)/api/java
 	$(MKINSTALLDIRS) $(docdir)/api/java/com
 	$(MKINSTALLDIRS) $(docdir)/api/java/com/firstworks
@@ -76,6 +75,8 @@ install:
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/package-tree.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/SQLRConnection.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/SQLRCursor.html $(docdir)/api/java/com/firstworks/sqlrelay
+	$(MKINSTALLDIRS) $(docdir)/api/java/resources
+	$(INSTALL) -m 644 api/java/resources/inherit.gif $(docdir)/api/java/resources
 	$(INSTALL) -m 644 dropin/mysql.html $(docdir)/dropin
 	$(INSTALL) -m 644 dropin/postgresql.html $(docdir)/dropin
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming

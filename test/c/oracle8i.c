@@ -777,9 +777,9 @@ int	main(int argc, char **argv) {
 	sqlrcur_defineOutputBindClob(cur,"clobvar");
 	sqlrcur_defineOutputBindBlob(cur,"blobvar");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	clobvar=sqlrcur_getOutputBind(cur,"clobvar");
+	clobvar=sqlrcur_getOutputBindClob(cur,"clobvar");
 	clobvarlength=sqlrcur_getOutputBindLength(cur,"clobvar");
-	blobvar=sqlrcur_getOutputBind(cur,"blobvar");
+	blobvar=sqlrcur_getOutputBindBlob(cur,"blobvar");
 	blobvarlength=sqlrcur_getOutputBindLength(cur,"blobvar");
 	checkSuccessStringWithLength(clobvar,"hello",5);
 	checkSuccessInt(clobvarlength,5);
@@ -839,7 +839,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_prepareQuery(cur,"begin select testclob into :clobbindval from testtable2; end;");
 	sqlrcur_defineOutputBindClob(cur,"clobbindval");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	clobbindvar=sqlrcur_getOutputBind(cur,"clobbindval");
+	clobbindvar=sqlrcur_getOutputBindClob(cur,"clobbindval");
 	checkSuccessInt(sqlrcur_getOutputBindLength(cur,"clobbindval"),8*1024);
 	checkSuccessString(clobval,clobbindvar);
 	sqlrcur_sendQuery(cur,"drop table testtable2");

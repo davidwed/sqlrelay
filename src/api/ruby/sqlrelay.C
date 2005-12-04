@@ -327,6 +327,7 @@ static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
 	VALUE	value;
 	VALUE	precision;
 	VALUE	scale;
+	bool	result=true;
 	rb_scan_args(argc,argv,"22",&variable,&value,&precision,&scale);
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
@@ -342,8 +343,10 @@ static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
 					(unsigned short)NUM2INT(scale));
 	} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
 		sqlrcur->substitution(STR2CSTR(variable),(const char *)NULL);
+	} else {
+		result=false;
 	}
-	return Qnil;
+	return INT2NUM(result);
 }
 
 static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
@@ -352,6 +355,7 @@ static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
 	VALUE	value;
 	VALUE	precision;
 	VALUE	scale;
+	bool	success=true;
 	rb_scan_args(argc,argv,"22",&variable,&value,&precision,&scale);
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
@@ -367,34 +371,42 @@ static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
 					(unsigned short)NUM2INT(scale));
 	} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
 		sqlrcur->inputBind(STR2CSTR(variable),(const char *)NULL);
+	} else {
+		success=false;
 	}
-	return Qnil;
+	return INT2NUM(success);
 }
 
 static VALUE sqlrcur_inputBindBlob(VALUE self, VALUE variable,
 					VALUE value, VALUE size) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	bool	success=true;
 	if (value==Qnil) {
 		sqlrcur->inputBindBlob(STR2CSTR(variable),NULL,NUM2INT(size));
-	} else {
+	} else if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
 		sqlrcur->inputBindBlob(STR2CSTR(variable),
 				STR2CSTR(value),NUM2INT(size));
+	} else {
+		success=false;
 	}
-	return Qnil;
+	return INT2NUM(success);
 }
 
 static VALUE sqlrcur_inputBindClob(VALUE self, VALUE variable,
 					VALUE value, VALUE size) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	bool	success=true;
 	if (value==Qnil) {
 		sqlrcur->inputBindClob(STR2CSTR(variable),NULL,NUM2INT(size));
-	} else {
+	} else if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
 		sqlrcur->inputBindClob(STR2CSTR(variable),
 				STR2CSTR(value),NUM2INT(size));
+	} else {
+		success=false;
 	}
-	return Qnil;
+	return INT2NUM(success);
 }
 
 static VALUE sqlrcur_defineOutputBindString(VALUE self, VALUE variable,
@@ -456,6 +468,7 @@ static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
 	VALUE	value;
 	VALUE	precision;
 	VALUE	scale;
+	bool	success=true;
 	for (;;) {
 		variable=rb_ary_shift(variables);
 		if (variable==Qnil) {
@@ -483,9 +496,11 @@ static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
 		} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
 			sqlrcur->substitution(STR2CSTR(variable),
 						(const char *)NULL);
+		} else {
+			success=false;
 		}
 	}
-	return Qnil;
+	return INT2NUM(success);
 }
 
 static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
@@ -504,6 +519,7 @@ static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
 	VALUE	value;
 	VALUE	precision;
 	VALUE	scale;
+	bool	success=true;
 	for (;;) {
 		variable=rb_ary_shift(variables);
 		if (variable==Qnil) {
@@ -528,9 +544,11 @@ static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
 		} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
 			sqlrcur->inputBind(STR2CSTR(variable),
 						(const char *)NULL);
+		} else {
+			success=false;
 		}
 	}
-	return Qnil;
+	return INT2NUM(success);
 }
 
 static VALUE sqlrcur_validateBinds(VALUE self) {

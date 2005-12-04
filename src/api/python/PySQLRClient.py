@@ -294,6 +294,9 @@ class sqlrcursor:
     def substitution(self, variable, value, precision=0, scale=0):
         """
         Define a substitution variable.
+	Returns true if the variable was successfully substituted or false if
+	the variable isn't a string, integer or floating point number, or if
+	precision and scale aren't provided for a floating point number.
         """
         return CSQLRelay.substitution(self.cursor,variable,value,precision,scale)
 
@@ -314,6 +317,9 @@ class sqlrcursor:
     def inputBind(self, variable, value, precision=0, scale=0):
         """
         Define an input bind varaible.
+	Returns true if the variable was successfully bound or false if the
+	variable isn't a string, integer or floating point number, or if
+	precision and scale aren't provided for a floating point number.
         """
         return CSQLRelay.inputBind(self.cursor, variable, value, precision, scale)
 
@@ -368,12 +374,18 @@ class sqlrcursor:
     def substitutions(self, variables, values, precisions=None, scales=None):
         """
         Define substitution variables.
+	Returns true if the variables were successfully substituted or false if
+	one of the variables wasn't a string, integer or floating point number,
+	or if precision and scale weren't provided for a floating point number.
         """
         return CSQLRelay.substitutions(self.cursor,variables,values,precisions,scales)
 
     def inputBinds(self, variables, values, precisions=None, scales=None):
         """
         Define input bind variables.
+	Returns true if the variables were successfully bound or false if one
+	of the variables wasn't a string, integer or floating point number,
+	or if precision and scale weren't provided for a floating point number.
         """
         return CSQLRelay.inputBinds(self.cursor,variables,values,precisions,scales)
         

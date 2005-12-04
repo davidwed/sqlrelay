@@ -211,98 +211,91 @@ main() {
 <span class="heading2">Substitution and Bind Variables</span><br><br>
 
 <p>Programs rarely execute fixed queries.  More often than not, some part
-of the query is dynamically generated.  It's convenient to store queries in 
-files so they can be changed by a non-C++ programmer.  The SQL Relay API 
-provides methods for making substitutions and binds in those queries.</p>
+of the query is dynamically generated.  The SQL Relay API provides methods for
+making substitutions and binds in those queries.</p>
 
 <p>For a detailed discussion of substitutions and binds, see
 <a href="binds.html">this document</a>.</p>
 
-<p>Rather than just calling sendFileQuery() you call prepareFileQuery(),
-substitution(), inputBind() and executeQuery().</p>
+<p>Rather than just calling sendQuery() you call prepareQuery(),
+substitution(), inputBind() and executeQuery().  If you using queries
+stored in a file, you can call prepareFileQuery() instead of prepareQuery().</p>
+
+<p>When passing a floating point number in as a bind or substitution variable,
+you have to supply precision and scale for the number.  See
+<a href="precisionscale.html">this page</a> for a discussion of precision and
+scale.</p>
 
 <blockquote>
 <pre>
-/usr/local/myprogram/sql/myquery.sql:
-
-	select * from mytable $(whereclause)
-</pre>
-Program code:
-<PRE>
-<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;sqlrelay/sqlrclient.h&gt;</FONT>
+<font color="#a020f0">#include </font><font color="#ff00ff">&lt;sqlrelay/sqlrclient.h&gt;</font>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
-        sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
+        sqlrconnection      *con=<font color="#a52a2a"><b>new</b></font> sqlrconnection(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+        sqlrcursor          *cur=<font color="#a52a2a"><b>new</b></font> sqlrcursor(con);
 
-        cur-&gt;prepareFileQuery(<FONT color=#f800f8>&quot;/usr/local/myprogram/sql&quot;</FONT>,<FONT color=#f800f8>&quot;myquery.sql&quot;</FONT>);
-        cur-&gt;substitution(<FONT color=#f800f8>&quot;whereclause&quot;</FONT>,<FONT color=#f800f8>&quot;where col1=:value1&quot;</FONT>);
-        cur-&gt;inputBind(<FONT color=#f800f8>&quot;value1&quot;</FONT>,<FONT color=#f800f8>&quot;true&quot;</FONT>);
+        cur-&gt;prepareQuery(<font color="#ff00ff">&quot;select * from mytable $(whereclause)&quot;</font>)
+        cur-&gt;substitution(<font color="#ff00ff">&quot;whereclause&quot;</font>,<font color="#ff00ff">&quot;where stringcol=:stringval and integercol&gt;:integerval and floatcol&gt;floatval&quot;</font>);
+        cur-&gt;inputBind(<font color="#ff00ff">&quot;stringval&quot;</font>,<font color="#ff00ff">&quot;true&quot;</font>);
+        cur-&gt;inputBind(<font color="#ff00ff">&quot;integerval&quot;</font>,<font color="#ff00ff">10</font>);
+        cur-&gt;inputBind(<font color="#ff00ff">&quot;floatval&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
         cur-&gt;executeQuery();
 
         ... process the result set ...
 
-        <B><FONT color=#a02828>delete</FONT></B> cur;
-        <B><FONT color=#a02828>delete</FONT></B> con;
+        <font color="#a52a2a"><b>delete</b></font> cur;
+        <font color="#a52a2a"><b>delete</b></font> con;
 }
-</PRE>
+</pre>
 </blockquote>
 
+<p>If you are curious how many bind variables have been declared in a query,
+you can call countBindVariables() after preparing the query.</p>
+
 <p>If you're using a database with an embedded procedural language, you may
-want to retrieve data from a call to one of it's functions.  To facilitate
-this, SQL Relay provides the defineOutputBind() and getOutputBind() methods.</p>
+want to retrieve data from function calls.  To facilitate this, SQL Relay
+provides methods for defining and retrieving output bind variables.</p>
 
 <blockquote>
-PL/SQL Procedure:<br>
 <pre>
-<font color="#6858c8">FUNCTION</font> sp_mytable <font color="#6858c8">RETURN</font> types.cursorType
-l_cursor types.cursorType;
-<font color="#6858c8">BEGIN</font>
-        OPEN l_cursor <font color="#6858c8">FOR</font> <font color="#a02828"><b>SELECT</b></font> * <font color="#6858c8">FROM</font> mytable;
-        <font color="#6858c8">RETURN</font> l_cursor;
-<font color="#6858c8">END</font>;
-</pre>
-<br>
-Program code:
-<PRE>
-<FONT color=#a020f0>#include </FONT><FONT color=#f800f8>&lt;sqlrelay/sqlrclient.h&gt;</FONT>
+<font color="#a020f0">#include </font><font color="#ff00ff">&lt;sqlrelay/sqlrclient.h&gt;</font>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
-        sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
+        sqlrconnection      *con=<font color="#a52a2a"><b>new</b></font> sqlrconnection(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+        sqlrcursor          *cur=<font color="#a52a2a"><b>new</b></font> sqlrcursor(con);
 
-        cur-&gt;prepareQuery(<FONT color=#f800f8>&quot;begin  :result:=addTwoNumbers(:num1,:num2);  end;&quot;</FONT>);
-        cur-&gt;inputBind(<FONT color=#f800f8>&quot;num1&quot;</FONT>,<FONT color=#f800f8>10</FONT>);
-        cur-&gt;inputBind(<FONT color=#f800f8>&quot;num2&quot;</FONT>,<FONT color=#f800f8>20</FONT>);
-        cur-&gt;defineOutputBind(<FONT color=#f800f8>&quot;result&quot;</FONT>,<FONT color=#f800f8>100</FONT>);
+        cur-&gt;prepareQuery(<font color="#ff00ff">&quot;begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;&quot;</font>);
+        cur-&gt;inputBind(<font color="#ff00ff">&quot;integer1&quot;</font>,<font color="#ff00ff">10</font>);
+        cur-&gt;inputBind(<font color="#ff00ff">&quot;integer2&quot;</font>,<font color="#ff00ff">20</font>);
+        cur-&gt;inputBind(<font color="#ff00ff">&quot;float1&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+        cur-&gt;inputBind(<font color="#ff00ff">&quot;float2&quot;</font>,<font color="#ff00ff">2.2</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+        cur-&gt;inputBind(<font color="#ff00ff">&quot;integer3&quot;</font>,<font color="#ff00ff">30</font>);
+        cur-&gt;defineOutputBindInteger(<font color="#ff00ff">&quot;result1&quot;</font>);
+        cur-&gt;defineOutputBindDouble(<font color="#ff00ff">&quot;result2&quot;</font>);
+        cur-&gt;defineOutputBindString(<font color="#ff00ff">&quot;result3&quot;</font>,<font color="#ff00ff">100</font>);
         cur-&gt;executeQuery();
-        <B><FONT color=#288850>int</FONT></B>     result=atoi(cur-&gt;getOutputBind(<FONT color=#f800f8>&quot;result&quot;</FONT>));
+        <font color="#2e8b57"><b>int64_t</b></font>    result1=cur-&gt;getOutputBindInteger(<font color="#ff00ff">&quot;result1&quot;</font>);
+        <font color="#2e8b57"><b>double</b></font>     result2=cur-&gt;getOutputBindDouble(<font color="#ff00ff">&quot;result2&quot;</font>);
+        <font color="#2e8b57"><b>char</b></font>       *result3=cur-&gt;getOutputBindString(<font color="#ff00ff">&quot;result3&quot;</font>);
         con-&gt;endSession();
 
-        ... do something with the result ...
+        ... <font color="#a52a2a"><b>do</b></font> something with the result ...
 
-        <B><FONT color=#a02828>delete</FONT></B> cur;
-        <B><FONT color=#a02828>delete</FONT></B> con;
+        <font color="#a52a2a"><b>delete</b></font> cur;
+        <font color="#a52a2a"><b>delete</b></font> con;
 }
-</PRE>
+</pre>
 </blockquote>
 
-<p>The getOutputBind() method returns a NULL value as an empty string.  
+<p>The getOutputBindString() method returns a NULL value as an empty string.  
 If you would it to come back as a NULL instead, you can call the 
 getNullsAsNulls() method.  To revert to the default behavior, you can
 call getNullsAsEmptyStrings().</p>
 
-<p>The getOutputBind() method returns a string, if you would like to get the
-value as a long or double, you can use getOutputBindAsLong() or
-getOutputBindAsDouble().</p>
-
 <p>If you are using Oracle 8i or higher, you can insert data into BLOB
 and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
-
-<p>If you are curious how many bind variables have been declared in a query,
-you can call countBindVariables() after preparing the query.</p>
 
 <blockquote>
 <pre>
@@ -339,8 +332,8 @@ main() {
 </blockquote>
 
 <p>Likewise, with Oracle 8i, you can retreive BLOB or CLOB data using
-defineOutputBindBlob(), defineOutputBindClob(), getOutputBind() and
-getOutputBindLength().</p>
+defineOutputBindBlob()/getOutputBindBlob() and
+defineOutputBindClob()/getOutputBindClob().</p>
 
 <blockquote>
 <pre>
@@ -356,10 +349,10 @@ main() {
         cur-&gt;defineOutputBindClob(<font color="#f800f8">&quot;desc&quot;</font>);
         cur-&gt;executeQuery();
 
-        <font color="#288850"><b>char</b></font>    *image=cur-&gt;getOutputBind(<font color="#f800f8">&quot;image&quot;</font>);
+        <font color="#288850"><b>char</b></font>    *image=cur-&gt;getOutputBindBlob(<font color="#f800f8">&quot;image&quot;</font>);
         <font color="#288850"><b>long</b></font>    imagelength=cur-&gt;getOutputBindLength(<font color="#f800f8">&quot;image&quot;</font>);
 
-        <font color="#288850"><b>char</b></font>    *desc=cur-&gt;getOutputBind(<font color="#f800f8">&quot;desc&quot;</font>);
+        <font color="#288850"><b>char</b></font>    *desc=cur-&gt;getOutputBindClob(<font color="#f800f8">&quot;desc&quot;</font>);
         <font color="#288850"><b>char</b></font>    *desclength=cur-&gt;getOutputBindLength(<font color="#f800f8">&quot;desc&quot;</font>);
 
         con-&gt;endSession();
@@ -378,13 +371,8 @@ application, it may be easy to just bind all the form variables/values from the
 previous page, even though some of them don't appear in the query.  Databases
 usually generate errors in this case.  Calling validateBinds() just prior to
 calling executeQuery() causes the API to check the query for each bind variable
-before actually binding it, preventing those kinds of errors.  There is a 
-performance cost associated with calling validateBinds().</p>
-
-<p>When passing a floating point number in as a bind or substitution variable,
-you have to supply precision and scale for the number.  See
-<a href="precisionscale.html">this page</a> for a discussion of precision and
-scale.</p>
+before actually binding it, preventing those kinds of errors, however there is
+a performance cost associated with calling validateBinds().</p>
 
 <a name="rebinding"></a>
 <span class="heading2">Re-Binding and Re-Execution</span><br><br>

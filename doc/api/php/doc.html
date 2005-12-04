@@ -373,7 +373,9 @@ void sqlrcur_substitution(int sqlrcurref, string variable, long value)
 void sqlrcur_substitution(int sqlrcurref, string variable, double value, short precision, short scale)
 </CODE>
 <P>
-Define a substitution variable.
+Define a substitution variable.  Returns true if the substitution succeeded or
+false if the type of the data passed in wasn't a string, long or double or if
+precision and scale weren't passed in for a double.
 <P>
 <LI>
 <CODE>
@@ -404,7 +406,9 @@ void sqlrcur_inputBindBlob(int sqlrcurref, string variable, long length)
 void sqlrcur_inputBindClob(int sqlrcurref, string variable, long length)
 </CODE>
 <P>
-Define an input bind variable.
+Define an input bind variable.  Returns true if the bind succeeded or false
+if the type of the data passed in wasn't a string, long or double or if
+precision and scale weren't passed in for a double.
 <P>
 <LI>
 <CODE>
