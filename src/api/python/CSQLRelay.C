@@ -679,6 +679,30 @@ static PyObject *getOutputBindString(PyObject *self, PyObject *args) {
   return Py_BuildValue("s#", rc, rl);
 }
 
+static PyObject *getOutputBindBlob(PyObject *self, PyObject *args) {
+  char *variable;
+  long sqlrcur;
+  const char *rc;
+  uint32_t rl;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
+    return NULL;
+  rc=((sqlrcursor *)sqlrcur)->getOutputBindBlob(variable);
+  rl=((sqlrcursor *)sqlrcur)->getOutputBindLength(variable);
+  return Py_BuildValue("s#", rc, rl);
+}
+
+static PyObject *getOutputBindClob(PyObject *self, PyObject *args) {
+  char *variable;
+  long sqlrcur;
+  const char *rc;
+  uint32_t rl;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
+    return NULL;
+  rc=((sqlrcursor *)sqlrcur)->getOutputBindClob(variable);
+  rl=((sqlrcursor *)sqlrcur)->getOutputBindLength(variable);
+  return Py_BuildValue("s#", rc, rl);
+}
+
 static PyObject *getOutputBindInteger(PyObject *self, PyObject *args) {
   char *variable;
   long sqlrcur;
@@ -1486,6 +1510,8 @@ static PyMethodDef SQLRMethods[] = {
   {"executeQuery", executeQuery, METH_VARARGS},
   {"fetchFromBindCursor", fetchFromBindCursor, METH_VARARGS},
   {"getOutputBindString", getOutputBindString, METH_VARARGS},
+  {"getOutputBindBlob", getOutputBindBlob, METH_VARARGS},
+  {"getOutputBindClob", getOutputBindClob, METH_VARARGS},
   {"getOutputBindInteger", getOutputBindInteger, METH_VARARGS},
   {"getOutputBindDouble", getOutputBindDouble, METH_VARARGS},
   {"getOutputBindLength", getOutputBindLength, METH_VARARGS},

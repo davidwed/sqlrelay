@@ -47,6 +47,18 @@ void checkSuccess(int value, int success) {
 	}
 }
 
+void checkSuccess(double value, double success) {
+
+	if (value==success) {
+		printf("success ");
+	} else {
+		printf("failure ");
+		delete cur;
+		delete con;
+		exit(0);
+	}
+}
+
 int	main(int argc, char **argv) {
 	//const char	*bindvars[6]={"1","2","3","4","5",NULL};
 	//const char	*bindvals[5]={"4","testchar4","testvarchar4","01-JAN-2004","testlong4"};

@@ -409,6 +409,20 @@ class sqlrcursor:
         """
         return CSQLRelay.getOutputBindString(self.cursor, variable)
 
+    def getOutputBindBlob(self, variable):
+        """
+        Get the value stored in a previously
+        defined output bind variable.
+        """
+        return CSQLRelay.getOutputBindBlob(self.cursor, variable)
+
+    def getOutputBindClob(self, variable):
+        """
+        Get the value stored in a previously
+        defined output bind variable.
+        """
+        return CSQLRelay.getOutputBindClob(self.cursor, variable)
+
     def getOutputBindInteger(self, variable):
         """
         Get the value stored in a previously

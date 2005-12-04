@@ -851,6 +851,48 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindstring) {
 	RETURN_NULL();
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindblob) {
+	zval **sqlrcur,**variable;
+	const char *r;
+	uint32_t rl;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_string_ex(variable);
+	sqlrcursor *cursor=NULL;
+	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
+	if (cursor) {
+		r=cursor->getOutputBindBlob((*variable)->value.str.val);
+		rl=cursor->getOutputBindLength((*variable)->value.str.val);
+		if (r) {
+			RETURN_STRINGL(const_cast<char *>(r),rl,1);
+		}
+	}
+	RETURN_NULL();
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindclob) {
+	zval **sqlrcur,**variable;
+	const char *r;
+	uint32_t rl;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_string_ex(variable);
+	sqlrcursor *cursor=NULL;
+	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
+	if (cursor) {
+		r=cursor->getOutputBindClob((*variable)->value.str.val);
+		rl=cursor->getOutputBindLength((*variable)->value.str.val);
+		if (r) {
+			RETURN_STRINGL(const_cast<char *>(r),rl,1);
+		}
+	}
+	RETURN_NULL();
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindinteger) {
 	zval **sqlrcur,**variable;
 	int64_t r;
@@ -1853,6 +1895,8 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcur_executequery,NULL)
 	ZEND_FE(sqlrcur_fetchfrombindcursor,NULL)
 	ZEND_FE(sqlrcur_getoutputbindstring,NULL)
+	ZEND_FE(sqlrcur_getoutputbindblob,NULL)
+	ZEND_FE(sqlrcur_getoutputbindclob,NULL)
 	ZEND_FE(sqlrcur_getoutputbindinteger,NULL)
 	ZEND_FE(sqlrcur_getoutputbinddouble,NULL)
 	ZEND_FE(sqlrcur_getoutputbindlength,NULL)

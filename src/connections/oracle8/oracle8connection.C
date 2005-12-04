@@ -581,8 +581,6 @@ bool oracle8cursor::inputBindInteger(const char *variable,
 				(sb4)charstring::length(
 					inintbindstring[inbindcount])+1,
 				SQLT_STR,
-				//(dvoid *)value,(sb4)sizeof(int64_t),
-				//SQLT_INT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
@@ -595,8 +593,6 @@ bool oracle8cursor::inputBindInteger(const char *variable,
 				(sb4)charstring::length(
 					inintbindstring[inbindcount])+1,
 				SQLT_STR,
-				//(dvoid *)value,(sb4)sizeof(int64_t),
-				//SQLT_64INT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
@@ -649,6 +645,8 @@ bool oracle8cursor::outputBindString(const char *variable,
 						int16_t *isnull) {
 	checkRePrepare();
 
+	outintbindstring[outbindcount]=NULL;
+
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!charstring::toInteger(variable+1)) {
 			return false;
@@ -688,6 +686,7 @@ bool oracle8cursor::outputBindInteger(const char *variable,
 	checkRePrepare();
 
 	outintbindstring[outbindcount]=new char[21];
+	rawbuffer::zero(outintbindstring[outbindcount],21);
 	outintbind[outbindcount]=value;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -729,6 +728,8 @@ bool oracle8cursor::outputBindDouble(const char *variable,
 						uint32_t *scale,
 						int16_t *isnull) {
 	checkRePrepare();
+
+	outintbindstring[outbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!charstring::toInteger(variable+1)) {
@@ -1273,7 +1274,10 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 
 	// convert integer output binds
 	for (uint16_t i=0; i<outbindcount; i++) {
-		*outintbind[i]=charstring::toInteger(outintbindstring[i]);
+		if (outintbindstring[i]) {
+			*outintbind[i]=charstring::
+					toInteger(outintbindstring[i]);
+		}
 	}
 
 	return true;

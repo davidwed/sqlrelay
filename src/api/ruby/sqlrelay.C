@@ -565,6 +565,32 @@ static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
 	}
 }
 
+static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	const char	*varname=STR2CSTR(variable);
+	const char	*result=sqlrcur->getOutputBindBlob(varname);
+	long		length=sqlrcur->getOutputBindLength(varname);
+	if (result) {
+		return rb_str_new(result,length);
+	} else {
+		return Qnil;
+	}
+}
+
+static VALUE sqlrcur_getOutputBindClob(VALUE self, VALUE variable) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	const char	*varname=STR2CSTR(variable);
+	const char	*result=sqlrcur->getOutputBindClob(varname);
+	long		length=sqlrcur->getOutputBindLength(varname);
+	if (result) {
+		return rb_str_new(result,length);
+	} else {
+		return Qnil;
+	}
+}
+
 static VALUE sqlrcur_getOutputBindInteger(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1051,6 +1077,10 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_fetchFromBindCursor,0);
 	rb_define_method(csqlrcursor,"getOutputBindString",
 				(CAST)sqlrcur_getOutputBindString,1);
+	rb_define_method(csqlrcursor,"getOutputBindBlob",
+				(CAST)sqlrcur_getOutputBindBlob,1);
+	rb_define_method(csqlrcursor,"getOutputBindClob",
+				(CAST)sqlrcur_getOutputBindClob,1);
 	rb_define_method(csqlrcursor,"getOutputBindInteger",
 				(CAST)sqlrcur_getOutputBindInteger,1);
 	rb_define_method(csqlrcursor,"getOutputBindDouble",

@@ -399,7 +399,7 @@ bool interbasecursor::outputBindDouble(const char *variable,
 		return false;
 	}
 	outsqlda->sqlvar[index].sqltype=SQL_DOUBLE;
-	outsqlda->sqlvar[index].sqlscale=0;
+	outsqlda->sqlvar[index].sqlscale=*scale;
 	outsqlda->sqlvar[index].sqlsubtype=0;
 	outsqlda->sqlvar[index].sqllen=sizeof(double);
 	outsqlda->sqlvar[index].sqldata=(char *)value;

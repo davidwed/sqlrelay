@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.18 2005-11-30 23:52:02 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.19 2005-12-04 03:38:33 mused Exp $
  */
 
 #include <tcl.h>
@@ -90,6 +90,8 @@ void sqlrcurDelete(ClientData data) {
  *   $cur executeQuery
  *   $cur fetchFromBindCursor
  *   $cur getOutputBindString variable
+ *   $cur getOutputBindBlob variable
+ *   $cur getOutputBindClob variable
  *   $cur getOutputBindInteger variable
  *   $cur getOutputBindDouble variable
  *   $cur getOutputBindLength variable
@@ -187,6 +189,8 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "executeQuery",
     "fetchFromBindCursor",
     "getOutputBindString",
+    "getOutputBindBlob",
+    "getOutputBindClob",
     "getOutputBindInteger",
     "getOutputBindDouble",
     "getOutputBindLength",
@@ -278,6 +282,8 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_executeQuery,
     SQLRCUR_fetchFromBindCursor,
     SQLRCUR_getOutputBindString,
+    SQLRCUR_getOutputBindBlob,
+    SQLRCUR_getOutputBindClob,
     SQLRCUR_getOutputBindInteger,
     SQLRCUR_getOutputBindDouble,
     SQLRCUR_getOutputBindLength,
@@ -880,6 +886,28 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  return TCL_ERROR;
 	}
 	result = Tcl_NewStringObj(cur->getOutputBindString(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
+	Tcl_SetObjResult(interp, result);
+	break;
+      }
+    case SQLRCUR_getOutputBindBlob:
+      {
+	Tcl_Obj *result;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
+	  return TCL_ERROR;
+	}
+	result = Tcl_NewStringObj(cur->getOutputBindBlob(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
+	Tcl_SetObjResult(interp, result);
+	break;
+      }
+    case SQLRCUR_getOutputBindClob:
+      {
+	Tcl_Obj *result;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
+	  return TCL_ERROR;
+	}
+	result = Tcl_NewStringObj(cur->getOutputBindClob(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
 	Tcl_SetObjResult(interp, result);
 	break;
       }
