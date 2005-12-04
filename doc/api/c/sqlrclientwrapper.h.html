@@ -228,10 +228,17 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
                                         <font color="#2e8b57"><b>uint32_t</b></font> size);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Define an input bind variable. </font><font color="#0000ff">*/</font>
 
-<font color="#2e8b57"><b>void</b></font>    sqlrcur_defineOutputBind(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable,
-                                                        <font color="#2e8b57"><b>uint32_t</b></font> length);
-                        <font color="#0000ff">/*</font><font color="#0000ff"> Define an output bind variable.</font>
+<font color="#2e8b57"><b>void</b></font>    sqlrcur_defineOutputBindString(sqlrcur sqlrcurref,
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable, <font color="#2e8b57"><b>uint32_t</b></font> length);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Define a string output bind variable.</font>
 <font color="#0000ff">                          &quot;length&quot; bytes will be reserved to store the value. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>void</b></font>    sqlrcur_defineOutputBindInteger(sqlrcur sqlrcurref,
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Define an integer output bind variable. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>void</b></font>    sqlrcur_defineOutputBindDouble(sqlrcur sqlrcurref,
+                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Define a double precision floating point</font>
+<font color="#0000ff">                           output bind variable. </font><font color="#0000ff">*/</font>
 <font color="#2e8b57"><b>void</b></font>    sqlrcur_defineOutputBindBlob(sqlrcur sqlrcurref,
                                         <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Define a BLOB output bind variable </font><font color="#0000ff">*/</font>
@@ -280,16 +287,24 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Fetch from a cursor that was returned as</font>
 <font color="#0000ff">                           an output bind variable. </font><font color="#0000ff">*/</font>
 
-<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getOutputBind(sqlrcur sqlrcurref,
-                                        <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getOutputBindString(sqlrcur sqlrcurref,
+                                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Get the value stored in a previously</font>
 <font color="#0000ff">                           defined output bind variable. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>int64_t</b></font> sqlrcur_getOutputBindAsInteger(sqlrcur sqlrcurref,
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getOutputBindBlob(sqlrcur sqlrcurref,
+                                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Get the value stored in a previously</font>
+<font color="#0000ff">                           defined output bind variable. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcur_getOutputBindClob(sqlrcur sqlrcurref,
+                                                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Get the value stored in a previously</font>
+<font color="#0000ff">                           defined output bind variable. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>int64_t</b></font> sqlrcur_getOutputBindInteger(sqlrcur sqlrcurref,
                                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Get the value stored in a previously</font>
 <font color="#0000ff">                           defined output bind variable as a </font>
 <font color="#0000ff">                           long integer. </font><font color="#0000ff">*/</font>
-<font color="#2e8b57"><b>double</b></font>  sqlrcur_getOutputBindAsDouble(sqlrcur sqlrcurref,
+<font color="#2e8b57"><b>double</b></font>  sqlrcur_getOutputBindDouble(sqlrcur sqlrcurref,
                                                 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Get the value stored in a previously</font>
 <font color="#0000ff">                           defined output bind variable as a </font>

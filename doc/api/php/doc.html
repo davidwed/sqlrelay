@@ -452,15 +452,43 @@ int sqlrcur_executeQuery(int sqlrcurref)
 Execute the query that was previously prepared and bound.
 <P>
 <LI>
-<LI>
 <CODE>
 int sqlrcur_fetchFromBindCursor(int sqlrcurref)
 </CODE>
 <P>
 Fetch from a cursor that was returned as an output bind variable.
 <P>
+<LI>
 <CODE>
-int sqlrcur_getOutputBind(int sqlrcurref, string variable)
+int sqlrcur_getOutputBindString(int sqlrcurref, string variable)
+</CODE>
+<P>
+Get the value stored in a previously defined output bind variable.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getOutputBindBlob(int sqlrcurref, string variable)
+</CODE>
+<P>
+Get the value stored in a previously defined output bind variable.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getOutputBindClob(int sqlrcurref, string variable)
+</CODE>
+<P>
+Get the value stored in a previously defined output bind variable.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getOutputBindInteger(int sqlrcurref, string variable)
+</CODE>
+<P>
+Get the value stored in a previously defined output bind variable.
+<P>
+<LI>
+<CODE>
+int sqlrcur_getOutputBindDouble(int sqlrcurref, string variable)
 </CODE>
 <P>
 Get the value stored in a previously defined output bind variable.

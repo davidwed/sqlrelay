@@ -361,6 +361,22 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindS
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getOutputBindBlob
+ * Signature: (Ljava/lang/String;)LB
+ */
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindBlob
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getOutputBindClob
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindClob
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getOutputBindAsByteArray
  * Signature: (Ljava/lang/String;)[B
  */

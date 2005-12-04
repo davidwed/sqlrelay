@@ -293,6 +293,16 @@ const char *sqlrcur_getOutputBindString(sqlrcur sqlrcurref,
 	return sqlrcurref->getOutputBindString(variable);
 }
 
+const char *sqlrcur_getOutputBindBlob(sqlrcur sqlrcurref,
+					const char *variable) {
+	return sqlrcurref->getOutputBindBlob(variable);
+}
+
+const char *sqlrcur_getOutputBindClob(sqlrcur sqlrcurref,
+					const char *variable) {
+	return sqlrcurref->getOutputBindClob(variable);
+}
+
 int64_t sqlrcur_getOutputBindInteger(sqlrcur sqlrcurref,
 						const char *variable) {
 	return sqlrcurref->getOutputBindInteger(variable);

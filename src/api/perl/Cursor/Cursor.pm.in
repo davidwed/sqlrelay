@@ -268,6 +268,14 @@ __END__
             # Get the value stored in a previously
             # defined output bind variable.
 
+	getOutputBindBlob(variable);
+            # Get the value stored in a previously
+            # defined output bind variable.
+
+	getOutputBindClob(variable);
+            # Get the value stored in a previously
+            # defined output bind variable.
+
 	getOutputBindLength(variable);
             # Get the length of the value stored in a
             # previously defined output bind variable.

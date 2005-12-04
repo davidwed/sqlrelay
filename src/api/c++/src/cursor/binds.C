@@ -395,13 +395,10 @@ const char *sqlrcursor::getOutputBindString(const char *variable) {
 
 	if (variable) {
 		for (int16_t i=0; i<outbindcount; i++) {
-			if (!charstring::compare(outbindvars[i].variable,
-								variable)) {
-				if (outbindvars[i].type==STRING_BIND) {
-					return outbindvars[i].value.stringval;
-				} else {
-					return outbindvars[i].value.lobval;
-				}
+			if (!charstring::compare(
+					outbindvars[i].variable,variable) &&
+					outbindvars[i].type==STRING_BIND) {
+				return outbindvars[i].value.stringval;
 			}
 		}
 	}
@@ -421,14 +418,42 @@ uint32_t sqlrcursor::getOutputBindLength(const char *variable) {
 	return 0;
 }
 
+const char *sqlrcursor::getOutputBindBlob(const char *variable) {
+
+	if (variable) {
+		for (int16_t i=0; i<outbindcount; i++) {
+			if (!charstring::compare(
+					outbindvars[i].variable,variable) &&
+					outbindvars[i].type==BLOB_BIND) {
+				return outbindvars[i].value.lobval;
+			}
+		}
+	}
+	return NULL;
+}
+
+const char *sqlrcursor::getOutputBindClob(const char *variable) {
+
+	if (variable) {
+		for (int16_t i=0; i<outbindcount; i++) {
+			if (!charstring::compare(
+					outbindvars[i].variable,variable) &&
+					outbindvars[i].type==CLOB_BIND) {
+				return outbindvars[i].value.lobval;
+			}
+		}
+	}
+	return NULL;
+}
+
 int64_t sqlrcursor::getOutputBindInteger(const char *variable) {
 
 	if (variable) {
 		for (int16_t i=0; i<outbindcount; i++) {
 			if (!charstring::compare(
-				outbindvars[i].variable,variable) &&
+					outbindvars[i].variable,variable) &&
 					outbindvars[i].type==INTEGER_BIND) {
-					return outbindvars[i].value.integerval;
+				return outbindvars[i].value.integerval;
 			}
 		}
 	}
@@ -440,10 +465,9 @@ double sqlrcursor::getOutputBindDouble(const char *variable) {
 	if (variable) {
 		for (int16_t i=0; i<outbindcount; i++) {
 			if (!charstring::compare(
-				outbindvars[i].variable,variable) &&
+					outbindvars[i].variable,variable) &&
 					outbindvars[i].type==DOUBLE_BIND) {
-					return outbindvars[i].
-						value.doubleval.value;
+				return outbindvars[i].value.doubleval.value;
 			}
 		}
 	}

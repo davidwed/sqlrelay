@@ -766,6 +766,42 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindS
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getOutputBindBlob
+ * Signature: (Ljava/lang/String;)LB
+ */
+JNIEXPORT jbyteArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindBlob
+  (JNIEnv *env, jobject self, jstring variable) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*variablestring=curGetStringUTFChars(env,variable,0);
+	long	length=cur->getOutputBindLength(variablestring);
+	jbyteArray	retval=env->NewByteArray(length);
+	env->SetByteArrayRegion(retval,0,length,
+			(jbyte *)cur->getOutputBindBlob(variablestring));
+	curReleaseStringUTFChars(env,variable,variablestring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getOutputBindClob
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindClob
+  (JNIEnv *env, jobject self, jstring variable) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","I"));
+	char	*variablestring=curGetStringUTFChars(env,variable,0);
+	jstring	retval=env->NewStringUTF(
+				cur->getOutputBindClob(variablestring));
+	curReleaseStringUTFChars(env,variable,variablestring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getOutputBindInteger
  * Signature: (Ljava/lang/String;)J;
  */

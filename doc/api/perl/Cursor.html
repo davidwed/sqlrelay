@@ -157,7 +157,7 @@
         inputBindClob(variable,value,size);
             # Define an input bind variable.</pre>
 <pre>
-        defineOutputBind(variable,bufferlength);
+        defineOutputBindString(variable,bufferlength);
             # Define an output bind variable.
             # &quot;bufferlength&quot; bytes will be reserved to store the value.
         defineOutputBindBlob(variable);
@@ -188,7 +188,7 @@
             # Fetch from a cursor that was returned as
             # an output bind variable.</pre>
 <pre>
-        getOutputBind(variable);
+        getOutputBindString(variable);
             # Get the value stored in a previously
             # defined output bind variable.</pre>
 <pre>
@@ -354,18 +354,20 @@
             # Returns the length of the longest field
             # in the specified column.</pre>
 <pre>
-        getResultSetId();
-            # Returns the internal ID of this result set.
-            # This parameter may be passed to another 
-            # statement for use in the resumeResultSet() 
-            # method.</pre>
-<pre>
         suspendResultSet();
             # Tells the server to leave this result
             # set open when the client calls 
             # suspendSession() so that another client can 
             # connect to it using resumeResultSet() after 
             # it calls resumeSession().</pre>
+<pre>
+        getResultSetId();
+            # Returns the internal ID of this result set.
+            # This parameter may be passed to another 
+            # statement for use in the resumeResultSet() 
+            # method.
+            # Note: the value returned by this method is
+            # only valid after a call to suspendResultSet().</pre>
 <pre>
         resumeResultSet(int id);
             # Resumes a result set previously left open 

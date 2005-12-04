@@ -423,14 +423,28 @@ Fetch from a cursor that was returned as an output bind variable.
 <P>
 <LI>
 <CODE>
-$cur getOutputBind variable
+$cur getOutputBindString variable
 </CODE>
 <P>
 Get the value stored in a previously defined output bind variable.
 <P>
 <LI>
 <CODE>
-$cur getOutputBindAsInteger variable
+$cur getOutputBindBlob variable
+</CODE>
+<P>
+Get the value stored in a previously defined output bind variable.
+<P>
+<LI>
+<CODE>
+$cur getOutputBindClob variable
+</CODE>
+<P>
+Get the value stored in a previously defined output bind variable.
+<P>
+<LI>
+<CODE>
+$cur getOutputBindInteger variable
 </CODE>
 <P>
 Get the value stored in a previously defined output bind variable
@@ -438,7 +452,7 @@ and return it as an integer.
 <P>
 <LI>
 <CODE>
-$cur getOutputBindAsDouble variable
+$cur getOutputBindDouble variable
 </CODE>
 <P>
 Get the value stored in a previously defined output bind variable

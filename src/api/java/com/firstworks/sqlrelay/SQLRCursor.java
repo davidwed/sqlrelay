@@ -177,6 +177,12 @@ public class SQLRCursor {
 	/** Get the value stored in a previously
 	 *  defined output bind variable.  */
 	public native String	getOutputBindString(String variable);
+	/** Get the value stored in a previously
+	 *  defined output bind variable.  */
+	public native byte[]	getOutputBindBlob(String variable);
+	/** Get the value stored in a previously
+	 *  defined output bind variable.  */
+	public native String	getOutputBindClob(String variable);
 	/** Get the length of the value stored in a
 	 *  previously defined output bind variable.  */
 	public native byte[]	getOutputBindAsByteArray(String variable);

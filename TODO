@@ -2,11 +2,9 @@ fix Arturo Gonzales Ferrer's php bug
 
 * NLS_LANG-like issues with other db's?
 
-oracle7 connection crashes during output bind test
 interbase fails float output bind, prec/scale issue?
-are precision/scale being used correctly for input/output binds?
 
-need getOutputBindClob/Blob rather than using String
+test getOutputBindClob/Blob
 
 * need to add a list of addresses to bind the listener/connections to
 

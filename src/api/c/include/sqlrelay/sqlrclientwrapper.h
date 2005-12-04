@@ -283,6 +283,14 @@ const char	*sqlrcur_getOutputBindString(sqlrcur sqlrcurref,
 						const char *variable);
 			/* Get the value stored in a previously
 			   defined output bind variable. */
+const char	*sqlrcur_getOutputBindBlob(sqlrcur sqlrcurref,
+						const char *variable);
+			/* Get the value stored in a previously
+			   defined output bind variable. */
+const char	*sqlrcur_getOutputBindClob(sqlrcur sqlrcurref,
+						const char *variable);
+			/* Get the value stored in a previously
+			   defined output bind variable. */
 int64_t	sqlrcur_getOutputBindInteger(sqlrcur sqlrcurref,
 						const char *variable);
 			/* Get the value stored in a previously

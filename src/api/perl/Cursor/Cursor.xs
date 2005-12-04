@@ -198,6 +198,32 @@ sqlrcursor::getOutputBindString(variable)
 			ST(0)=&sv_undef;
 		}
 
+const char *
+sqlrcursor::getOutputBindBlob(variable)
+		const char *variable
+	CODE:
+		const char	*value=THIS->getOutputBindBlob(variable);
+		uint32_t	length=THIS->getOutputBindLength(variable);
+		ST(0)=sv_newmortal();
+		if (value) {
+			sv_setpvn(ST(0),value,length);
+		} else {
+			ST(0)=&sv_undef;
+		}
+
+const char *
+sqlrcursor::getOutputBindClob(variable)
+		const char *variable
+	CODE:
+		const char	*value=THIS->getOutputBindClob(variable);
+		uint32_t	length=THIS->getOutputBindLength(variable);
+		ST(0)=sv_newmortal();
+		if (value) {
+			sv_setpvn(ST(0),value,length);
+		} else {
+			ST(0)=&sv_undef;
+		}
+
 int64_t
 sqlrcursor::getOutputBindInteger(variable)
 		const char *variable

@@ -274,16 +274,12 @@ class sqlrcursor {
 				// an output bind variable.
 
 		const char	*getOutputBindString(const char *variable);
-				// Get the value stored in a previously
-				// defined output bind variable.
+		const char	*getOutputBindBlob(const char *variable);
+		const char	*getOutputBindClob(const char *variable);
 		int64_t		getOutputBindInteger(const char *variable);
-				// Get the value stored in a previously
-				// defined output bind variable as a long
-				// integer.
 		double		getOutputBindDouble(const char *variable);
 				// Get the value stored in a previously
-				// defined output bind variable as a double
-				// precision floating point number.
+				// defined output bind variable.
 		uint32_t	getOutputBindLength(const char *variable);
 				// Get the length of the value stored in a
 				// previously defined output bind variable.
