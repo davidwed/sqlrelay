@@ -158,90 +158,84 @@ catch {<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;s
 </pre>
 </blockquote>
 
+
 <a name="bindvars"></a>
 <span class="heading2">Substitution and Bind Variables</span><br><br>
 
 <p>Programs rarely execute fixed queries.  More often than not, some part
-of the query is dynamically generated.  It's convenient to store queries in 
-files so they can be changed by a non-TCL programmer.  The SQL Relay API 
-provides methods for making substitutions and binds in those queries.</p>
+of the query is dynamically generated.  The SQL Relay API provides methods for
+making substitutions and binds in those queries.</p>
 
 <p>For a detailed discussion of substitutions and binds, see
-<a href="binds.html">this document</a>.
+<a href="binds.html">this document</a>.</p>
 
-<p>Rather than just calling sendFileQuery() you call prepareFileQuery(),
-substitution(), inputBind() and executeQuery().</p>
+<p>Rather than just calling sendQuery() you call prepareQuery(),
+substitution(), inputBind() and executeQuery().  If you using queries
+stored in a file, you can call prepareFileQuery() instead of prepareQuery().</p>
 
-<blockquote>
-<PRE>
-/usr/local/myprogram/sql/myquery.sql:
-
-	select * from mytable $(whereclause)
-
-Program code:<br>
-<pre>
-load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
-
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font>]
-<font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
-
-<font color="#008b8b">$cur</font> prepareFileQuery <font color="#ff00ff">&quot;/usr/local/myprogram/sql&quot;</font> <font color="#ff00ff">&quot;myquery.sql&quot;</font>
-<font color="#008b8b">$cur</font> substitution <font color="#ff00ff">&quot;whereclause&quot;</font> <font color="#ff00ff">&quot;where col1=:value1&quot;</font>
-<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;value1&quot;</font> <font color="#ff00ff">&quot;true&quot;</font>
-<font color="#008b8b">$cur</font> executeQuery
-
-        ... process the result <font color="#a52a2a"><b>set</b></font> ...
-</pre>
-</blockquote>
-
-<p>If you're using a database with an embedded procedural language, you may
-want to retrieve data from a call to one of it's functions.  To facilitate
-this, SQL Relay provides the defineOutputBind() and getOutputBind() methods.</p>
+<p>When passing a floating point number in as a bind or substitution variable,
+you have to supply precision and scale for the number.  See
+<a href="precisionscale.html">this page</a> for a discussion of precision and
+scale.</p>
 
 <blockquote>
-PL/SQL Procedure:<br>
-<pre>
-<font color="#6858c8">FUNCTION</font> sp_mytable <font color="#6858c8">RETURN</font> types.cursorType
-l_cursor types.cursorType;
-<font color="#6858c8">BEGIN</font>
-        OPEN l_cursor <font color="#6858c8">FOR</font> <font color="#a02828"><b>SELECT</b></font> * <font color="#6858c8">FROM</font> mytable;
-        <font color="#6858c8">RETURN</font> l_cursor;
-<font color="#6858c8">END</font>;
-</pre>
-<br>
-Program code:
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
 <font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
-<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;begin  :result:=addTwoNumbers(:num1,:num2);  end;&quot;</font>
-<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;num1&quot;</font> <font color="#ff00ff">10</font>
-<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;num2&quot;</font> <font color="#ff00ff">20</font>
-<font color="#008b8b">$cur</font> defineOutputBind <font color="#ff00ff">&quot;result&quot;</font> <font color="#ff00ff">100</font>
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;select * from mytable $(whereclause)&quot;</font>
+<font color="#008b8b">$cur</font> substitution <font color="#ff00ff">&quot;whereclause&quot;</font> <font color="#ff00ff">&quot;where stringcol=:stringval and integercol&gt;:integerval and floatcol&gt;floatval&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;stringval&quot;</font> <font color="#ff00ff">&quot;true&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;integerval&quot;</font> <font color="#ff00ff">10</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;floatval&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
 <font color="#008b8b">$cur</font> executeQuery
-<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$result</font> [<font color="#008b8b">$cur</font> getOutputBindAsInteger <font color="#ff00ff">&quot;result&quot;</font>]
-<font color="#008b8b">$con</font> endSession
 
-        ... do something with the result ...
+... process the result <font color="#a52a2a"><b>set</b></font> ...
 </pre>
 </blockquote>
 
-<p>The getOutputBind() method returns a NULL value as an empty string.  
-If you would it to come back as undefined instead, you can call the 
-getNullsAsUndefined() method.  To revert to the default behavior, you can
-call getNullsAsEmptyStrings().</p>
+<p>If you are curious how many bind variables have been declared in a query,
+you can call countBindVariables() after preparing the query.</p>
 
-<p>The getOutputBind() method returns a string, if you would like to get the
-value as a long or double, you can use getOutputBindAsLong() or
-getOutputBindAsDouble().</p>
+<p>If you're using a database with an embedded procedural language, you may
+want to retrieve data from function calls.  To facilitate this, SQL Relay
+provides methods for defining and retrieving output bind variables.</p>
+
+<blockquote>
+<pre>
+load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
+
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
+
+<font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;&quot;</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;integer1&quot;</font> <font color="#ff00ff">10</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;integer2&quot;</font> <font color="#ff00ff">20</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;float1&quot;</font> <font color="#ff00ff">1.1</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;float2&quot;</font> <font color="#ff00ff">2.2</font> <font color="#ff00ff">2</font> <font color="#ff00ff">1</font>
+<font color="#008b8b">$cur</font> inputBind <font color="#ff00ff">&quot;integer3&quot;</font> <font color="#ff00ff">30</font>
+<font color="#008b8b">$cur</font> defineOutputBindInteger <font color="#ff00ff">&quot;result1&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBindDouble <font color="#ff00ff">&quot;result2&quot;</font>
+<font color="#008b8b">$cur</font> defineOutputBindString <font color="#ff00ff">&quot;result3&quot;</font> <font color="#ff00ff">100</font>
+<font color="#008b8b">$cur</font> executeQuery
+<font color="#a52a2a"><b>set</b></font> result1 [<font color="#008b8b">$cur</font> getOutputBindInteger <font color="#ff00ff">&quot;result1&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> result2 [<font color="#008b8b">$cur</font> getOutputBindDouble <font color="#ff00ff">&quot;result2&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> result3 [<font color="#008b8b">$cur</font> getOutputBindString <font color="#ff00ff">&quot;result3&quot;</font>]
+<font color="#008b8b">$con</font> endSession
+
+... do something with the result ...
+</pre>
+</blockquote>
+
+<p>The getOutputBindString() method returns a NULL value as an empty string.  
+If you would it to come back as a NULL instead, you can call the 
+getNullsAsNulls() method.  To revert to the default behavior, you can
+call getNullsAsEmptyStrings().</p>
 
 <p>If you are using Oracle 8i or higher, you can insert data into BLOB
 and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
-
-<p>If you are curious how many bind variables have been declared in a query,
-you can call countBindVariables() after preparing the query.</p>
 
 <blockquote>
 <pre>
@@ -266,8 +260,8 @@ load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 </blockquote>
 
 <p>Likewise, with Oracle 8i, you can retreive BLOB or CLOB data using
-defineOutputBindBlob(), defineOutputBindClob(), getOutputBind() and
-getOutputBindLength().</p>
+defineOutputBindBlob()/getOutputBindBlob() and
+defineOutputBindClob()/getOutputBindClob().</p>
 
 <blockquote>
 <pre>
@@ -281,15 +275,15 @@ load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 <font color="#008b8b">$cur</font> defineOutputBindClob <font color="#ff00ff">&quot;desc&quot;</font>
 <font color="#008b8b">$cur</font> executeQuery
 
-<font color="#a52a2a"><b>set</b></font> img [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;image&quot;</font>]
-<font color="#a52a2a"><b>set</b></font> imagelength [<font color="#008b8b">$cur</font> getOutputBindLength <font color="#ff00ff">&quot;image&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$image</font> [<font color="#008b8b">$cur</font> getOutputBindBlob <font color="#ff00ff">&quot;image&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$imagelength</font> [<font color="#008b8b">$cur</font> getOutputBindLength <font color="#ff00ff">&quot;image&quot;</font>]
 
-<font color="#a52a2a"><b>set</b></font> desc [<font color="#008b8b">$cur</font> getOutputBind <font color="#ff00ff">&quot;desc&quot;</font>]
-<font color="#a52a2a"><b>set</b></font> desclength [<font color="#008b8b">$cur</font> getOutputBindLength <font color="#ff00ff">&quot;desc&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$desc</font> [<font color="#008b8b">$cur</font> getOutputBindClob <font color="#ff00ff">&quot;desc&quot;</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$desclength</font> [<font color="#008b8b">$cur</font> getOutputBindLength <font color="#ff00ff">&quot;desc&quot;</font>]
 
 <font color="#008b8b">$con</font> endSession
 
-... do something with img and desc ...
+... do something with <font color="#2e8b57"><b>image</b></font> and desc ...
 </pre>
 </blockquote>
 
@@ -299,14 +293,8 @@ application, it may be easy to just bind all the form variables/values from the
 previous page, even though some of them don't appear in the query.  Databases
 usually generate errors in this case.  Calling validateBinds() just prior to
 calling executeQuery() causes the API to check the query for each bind variable
-before actually binding it, preventing those kinds of errors.  There is a 
-performance cost associated with calling validateBinds().</p>
-
-<p>When passing a floating point number in as a bind or substitution variable,
-you have to supply precision and scale for the number.  See
-<a href="precisionscale.html">this page</a> for a discussion of precision and
-scale.</p>
-
+before actually binding it, preventing those kinds of errors, however there is
+a performance cost associated with calling validateBinds().</p>
 
 <a name="rebinding"></a>
 <span class="heading2">Re-Binding and Re-Execution</span><br><br>

@@ -154,144 +154,55 @@ cur=PySQLRClient.sqlrcursor(con)
 </PRE>
 </blockquote>
 
+
 <a name="bindvars"></a>
 <span class="heading2">Substitution and Bind Variables</span><br><br>
 
 <p>Programs rarely execute fixed queries.  More often than not, some part
-of the query is dynamically generated.  It's convenient to store queries in 
-files so they can be changed by a non-Python programmer.  The SQL Relay API 
-provides methods for making substitutions and binds in those queries.</p>
+of the query is dynamically generated.  The SQL Relay API provides methods for
+making substitutions and binds in those queries.</p>
 
 <p>For a detailed discussion of substitutions and binds, see
-<a href="binds.html">this document</a>.
+<a href="binds.html">this document</a>.</p>
 
-<p>Rather than just calling sendFileQuery() you call prepareFileQuery(),
-substitution(), inputBind() and executeQuery().</p>
+<p>Rather than just calling sendQuery() you call prepareQuery(),
+substitution(), inputBind() and executeQuery().  If you using queries
+stored in a file, you can call prepareFileQuery() instead of prepareQuery().</p>
 
-<blockquote>
-<PRE>
-/usr/local/myprogram/sql/myquery.sql:
-
-	select * from mytable $(whereclause)
-
-Program code:<br>
-<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
-
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
-cur=PySQLRClient.sqlrcursor(con)
-
-cur.prepareFileQuery('<FONT color=#ff00ff>/usr/local/myprogram/sql</FONT>','<FONT color=#ff00ff>myquery.sql</FONT>')
-cur.substitution('<FONT color=#ff00ff>whereclause</FONT>','<FONT color=#ff00ff>where col1=:value1</FONT>')
-cur.inputBind('<FONT color=#ff00ff>value1</FONT>','<FONT color=#ff00ff>true</FONT>')
-cur.executeQuery()
-
-... process the result set ...
-</PRE>
-</blockquote>
-
-<p>If you're using a database with an embedded procedural language, you may
-want to retrieve data from a call to one of it's functions.  To facilitate
-this, SQL Relay provides the defineOutputBind() and getOutputBind() methods.</p>
+<p>When passing a floating point number in as a bind or substitution variable,
+you have to supply precision and scale for the number.  See
+<a href="precisionscale.html">this page</a> for a discussion of precision and
+scale.</p>
 
 <blockquote>
-<PRE>
-<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
-
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
-cur=PySQLRClient.sqlrcursor(con)
-
-cur.prepareQuery('<FONT color=#ff00ff>begin  :result:=addTwoNumbers(:num1,:num2);  end;</FONT>')
-cur.inputBind('<FONT color=#ff00ff>num1</FONT>',10)
-cur.inputBind('<FONT color=#ff00ff>num2</FONT>',20)
-cur.defineOutputBind('<FONT color=#ff00ff>result</FONT>',100)
-cur.executeQuery()
-result=cur.getOutputBind('<FONT color=#ff00ff>result</FONT>')
-con.endSession()
-
-... do something with the result ...
-</PRE>
 </blockquote>
-
-<p>The getOutputBind() method returns a NULL value as an empty string.  
-If you would it to come back as a None instead, you can call the 
-getNullsAsNone() method.  To revert to the default behavior, you can
-call getNullsAsEmptyStrings().</p>
-
-<p>The getOutputBind() method returns a string, if you would like to
-get the value as a long or double, you can use getOutputBindAsLong() or
-getOutputBindAsDouble().</p>
-
-<p>If you are using Oracle 8i or higher, you can insert data into BLOB
-and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
 
 <p>If you are curious how many bind variables have been declared in a query,
 you can call countBindVariables() after preparing the query.</p>
 
+<p>If you're using a database with an embedded procedural language, you may
+want to retrieve data from function calls.  To facilitate this, SQL Relay
+provides methods for defining and retrieving output bind variables.</p>
+
 <blockquote>
-<pre>
-<font color="#a020f0">from</font> SQLRelay <font color="#a020f0">import</font> PySQLRClient
+</blockquote>
 
-con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">host</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
-cur=PySQLRClient.sqlrcursor(con)
+<p>The getOutputBindString() method returns a NULL value as an empty string.  
+If you would it to come back as a NULL instead, you can call the 
+getNullsAsNulls() method.  To revert to the default behavior, you can
+call getNullsAsEmptyStrings().</p>
 
-cur.executeQuery(&quot;<font color="#f800f8">create table images (image blob, description clob)</font>&quot;)
+<p>If you are using Oracle 8i or higher, you can insert data into BLOB
+and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
 
-imagedata=''
-imagelength=0
-
-... read an image from a file into imagedata and the length of the
-                file into imagelength ...
-
-description=''
-desclength=0
-
-... read a description from a file into description and the length of
-                the file into desclength ...
-
-cur.prepareQuery(&quot;<font color="#f800f8">insert into images values (:image,:desc)</font>&quot;)
-cur.inputBindBlob(&quot;<font color="#f800f8">image</font>&quot;,imagedata,imagelength)
-cur.inputBindClob(&quot;<font color="#f800f8">desc</font>&quot;,description,desclength)
-cur.executeQuery()
-</pre>
+<blockquote>
 </blockquote>
 
 <p>Likewise, with Oracle 8i, you can retreive BLOB or CLOB data using
-defineOutputBindBlob(), defineOutputBindClob(), getOutputBind() and
-getOutputBindLength().</p>
+defineOutputBindBlob()/getOutputBindBlob() and
+defineOutputBindClob()/getOutputBindClob().</p>
 
 <blockquote>
-PL/SQL Procedure:<br>
-<pre>
-<font color="#6858c8">FUNCTION</font> sp_mytable <font color="#6858c8">RETURN</font> types.cursorType
-l_cursor types.cursorType;
-<font color="#6858c8">BEGIN</font>
-        OPEN l_cursor <font color="#6858c8">FOR</font> <font color="#a02828"><b>SELECT</b></font> * <font color="#6858c8">FROM</font> mytable;
-        <font color="#6858c8">RETURN</font> l_cursor;
-<font color="#6858c8">END</font>;
-</pre>
-<br>
-Program code:
-<pre>
-<font color="#a020f0">from</font> SQLRelay <font color="#a020f0">import</font> PySQLRClient
-
-con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">host</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
-cur=PySQLRClient.sqlrcursor(con)
-
-cur.prepareQuery(&quot;<font color="#f800f8">begin  select image into :image from images;  select description into :desc from images;  end;</font>&quot;)
-cur.defineOutputBindBlob(&quot;<font color="#f800f8">image</font>&quot;)
-cur.defineOutputBindClob(&quot;<font color="#f800f8">desc</font>&quot;)
-cur.executeQuery()
-
-image=cur.getOutputBind(&quot;<font color="#f800f8">image</font>&quot;)
-imagelength=cur.getOutputBindLength(&quot;<font color="#f800f8">image</font>&quot;)
-
-desc=cur.getOutputBind(&quot;<font color="#f800f8">desc</font>&quot;)
-desclength=cur.getOutputBindLength(&quot;<font color="#f800f8">desc</font>&quot;)
-
-con.endSession()
-
-... do something with image and desc ...
-</pre>
 </blockquote>
 
 <p>Sometimes it's convenient to bind a bunch of variables that may or may not 
@@ -300,14 +211,8 @@ application, it may be easy to just bind all the form variables/values from the
 previous page, even though some of them don't appear in the query.  Databases
 usually generate errors in this case.  Calling validateBinds() just prior to
 calling executeQuery() causes the API to check the query for each bind variable
-before actually binding it, preventing those kinds of errors.  There is a 
-performance cost associated with calling validateBinds().</p>
-
-<p>When passing a floating point number in as a bind or substitution variable,
-you have to supply precision and scale for the number.  See
-<a href="precisionscale.html">this page</a> for a discussion of precision and
-scale.</p>
-
+before actually binding it, preventing those kinds of errors, however there is
+a performance cost associated with calling validateBinds().</p>
 
 <a name="rebinding"></a>
 <span class="heading2">Re-Binding and Re-Execution</span><br><br>
