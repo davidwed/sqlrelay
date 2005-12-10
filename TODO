@@ -1,35 +1,14 @@
-fix Arturo Gonzales Ferrer's php bug
-
 * NLS_LANG-like issues with other db's?
 
 interbase fails float output bind, prec/scale issue?
-
-update non-c++ docs' substitution/bind variable sections
-
-* need to add a list of addresses to bind the listener/connections to
-
-is it possible to specify which IP the connection daemons use to
-	connect to the database?
-
-test failed non-string/long/double inputBind/substitutions
 
 freetds test reveals
 	Attempt to initiate a new SQL Server operation with results pending.
 	bug
 
-perl DBD::SQLRelay:SQL_CLOB/BLOB issue
-
 Tru64 -
 	unix sockets don't work, looks like a byte-order translation issue
 	can't start more than 1 cursor, looks like out-of-memory
-
-ionut's memory corruption errors
-
-maciej's stuff:
-	in oracle 9i
-	looks like in: select func(...) from dual, if func()
-		generates an error, sqlrelay doesn't report it
-	it works for me with 10g...
 
 perl apis -> CPAN
 

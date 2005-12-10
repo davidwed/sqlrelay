@@ -3,6 +3,9 @@
 #define DEFAULT_ID "defaultid"
 	// default id for listeners/connections
 
+#define DEFAULT_ADDRESSES "0.0.0.0"
+	// default addresses for listeners/connections
+
 #define DEFAULT_PORT "9000"
 	// default port to listen on
 

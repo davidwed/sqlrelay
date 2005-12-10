@@ -118,7 +118,8 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 		bool		init;
 
 		unixserversocket	*clientsockun;
-		inetserversocket	*clientsockin;
+		inetserversocket	**clientsockin;
+		uint64_t		clientsockincount;
 		unixserversocket	*handoffsockun;
 		unixserversocket	*removehandoffsockun;
 		unixserversocket	*fixupsockun;

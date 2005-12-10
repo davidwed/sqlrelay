@@ -102,18 +102,17 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 
 	markDatabaseAvailable();
 
-	// if we're not passing descriptors around, listen on 
-	// inet and unix sockets for client connections
-	if (!cfgfl->getPassDescriptor()) {
-		return openSockets();
-	}
-
 	// update maximum query size, bind value lengths and idle client timeout
 	maxquerysize=cfgfl->getMaxQuerySize();
 	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
 
+	// if we're not passing descriptors around, listen on 
+	// inet and unix sockets for client connections
+	if (!cfgfl->getPassDescriptor()) {
+		return openSockets();
+	}
 	return true;
 }
 

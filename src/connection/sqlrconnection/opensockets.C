@@ -46,28 +46,51 @@ bool sqlrconnection::openSockets() {
 	if (cfgfl->getListenOnInet()) {
 
 		if (!serversockin) {
-			serversockin=new inetserversocket();
-			if (serversockin->listen(NULL,inetport,5)) {
-
-				if (!inetport) {
-					inetport=serversockin->getPort();
+			const char * const *addresses=cfgfl->getAddresses();
+			serversockincount=cfgfl->getAddressCount();
+			serversockin=new inetserversocket *[serversockincount];
+			bool	failed=false;
+			for (uint64_t index=0;
+					index<serversockincount;
+					index++) {
+				serversockin[index]=NULL;
+				if (failed) {
+					continue;
 				}
+				serversockin[index]=new inetserversocket();
+				if (serversockin[index]->
+					listen(addresses[index],inetport,5)) {
 
-				#ifdef SERVER_DEBUG
-				char	string[33];
-				snprintf(string,33,
-					"listening on inet socket: %d",
-								inetport);
-				debugPrint("connection",1,string);
-				#endif
+					if (!inetport) {
+						inetport=serversockin[index]->
+								getPort();
+					}
 
-				addFileDescriptor(serversockin);
+					#ifdef SERVER_DEBUG
+					char	string[33];
+					snprintf(string,33,
+						"listening on inet socket: %d",
+						inetport);
+					debugPrint("connection",1,string);
+					#endif
+	
+					addFileDescriptor(serversockin[index]);
 
-			} else {
-				fprintf(stderr,"Could not listen on ");
-				fprintf(stderr,"inet socket: ");
-				fprintf(stderr,"%d\n\n",inetport);
-				delete serversockin;
+				} else {
+					fprintf(stderr,"Could not listen on ");
+					fprintf(stderr,"inet socket: ");
+					fprintf(stderr,"%d\n\n",inetport);
+					failed=true;
+				}
+			}
+			if (failed) {
+				for (uint64_t index=0;
+						index<serversockincount;
+						index++) {
+					delete serversockin[index];
+				}
+				delete[] serversockin;
+				serversockincount=0;
 				return false;
 			}
 		}

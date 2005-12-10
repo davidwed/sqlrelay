@@ -11,12 +11,15 @@
 #include <rudiments/linkedlist.h>
 #include <rudiments/parameterstring.h>
 
+#define MAX_ADDRESSES	32
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
 
 typedef enum {
 	ID_ATTRIBUTE=1,
+	ADDRESSES_ATTRIBUTE,
 	PORT_ATTRIBUTE,
 	SOCKET_ATTRIBUTE,
 	DBASE_ATTRIBUTE,
@@ -100,6 +103,8 @@ class sqlrconfigfile : public xmlsax {
 		bool	parse(const char *config, const char *id);
 		bool	parse(const char *config, const char *id,
 						uint16_t connectstringcount);
+		const char * const *getAddresses();
+		uint64_t	getAddressCount();
 		uint16_t	getPort();
 		const char	*getUnixPort();
 		bool		getListenOnInet();
@@ -158,6 +163,8 @@ class sqlrconfigfile : public xmlsax {
 		bool	attributeValue(const char *value);
 		bool	tagEnd(const char *name);
 
+		char		**addresses;
+		uint64_t	addresscount;
 		uint16_t	port;
 		bool		listenoninet;
 		const char	*unixport;

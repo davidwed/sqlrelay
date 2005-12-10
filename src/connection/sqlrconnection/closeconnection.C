@@ -50,9 +50,12 @@ void sqlrconnection::closeConnection() {
 
 
 	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"deleting inet socket...");
+	debugPrint("connection",0,"deleting inetsockets...");
 	#endif
-	delete serversockin;
+	for (uint64_t index=0; index<serversockincount; index++) {
+		delete serversockin[index];
+	}
+	delete[] serversockin;
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done deleting inet socket");
 	#endif

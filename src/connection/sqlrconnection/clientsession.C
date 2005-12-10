@@ -223,8 +223,14 @@ void sqlrconnection::closeSuspendedSessionSockets() {
 			serversockun=NULL;
 		}
 		if (serversockin) {
-			removeFileDescriptor(serversockin);
-			delete serversockin;
+			for (uint64_t index=0;
+					index<serversockincount;
+					index++) {
+				removeFileDescriptor(serversockin[index]);
+				delete serversockin[index];
+				serversockin[index]=NULL;
+			}
+			delete[] serversockin;
 			serversockin=NULL;
 		}
 		#ifdef SERVER_DEBUG

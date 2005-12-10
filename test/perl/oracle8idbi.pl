@@ -56,6 +56,7 @@ if ($#ARGV+1<5) {
 #my $dbh=DBI->connect("DBI:SQLRelay:host=$ARGV[0];port=$ARGV[1];socket=$ARGV[2];debug=1",$ARGV[3],$ARGV[4],{AutoCommit=>0}) or die DBI->errstr;
 my $dbh=DBI->connect("DBI:SQLRelay:host=$ARGV[0];port=$ARGV[1];socket=$ARGV[2];",$ARGV[3],$ARGV[4],{AutoCommit=>0}) or die DBI->errstr;
 
+
 # ping
 print("PING: \n");
 checkSuccess($dbh->ping(),1);
@@ -406,6 +407,17 @@ print("\n");
 
 # drop existing table
 $dbh->do("drop table testtable");
+
+# CLOB/BLOB binds
+print("CLOB/BLOB BINDS: \n");
+$dbh->do("drop table testtable");
+checkSuccessString($dbh->do("create table testtable (testclob clob, testblob blob)"),"0E0");
+my $sth=$dbh->prepare("insert into testtable values (:var1,:var2)");
+$sth->bind_param("var1","testclob",DBD::SQLRelay::SQL_CLOB);
+$sth->bind_param("var2","testblob",{type=>DBD::SQLRelay::SQL_BLOB,length=>8});
+checkSuccess($sth->execute(),1);
+$dbh->do("drop table testtable");
+print("\n");
 
 # invalid queries...
 print("INVALID QUERIES: \n");

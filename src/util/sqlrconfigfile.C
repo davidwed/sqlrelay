@@ -11,6 +11,9 @@
 #include <defaults.h>
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
+	addresses=new char *[1];
+	addresses[0]=charstring::duplicate("0.0.0.0");
+	addresscount=1;
 	port=charstring::toInteger(DEFAULT_PORT);
 	listenoninet=(port)?true:false;
 	unixport=charstring::duplicate(DEFAULT_SOCKET);
@@ -53,6 +56,11 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 
 sqlrconfigfile::~sqlrconfigfile() {
 
+	for (uint64_t index=0; index<addresscount; index++) {
+		delete[] addresses[index];
+	}
+	delete[] addresses;
+
 	delete[] dbase;
 	delete[] unixport;
 	delete[] endofsession;
@@ -75,6 +83,14 @@ sqlrconfigfile::~sqlrconfigfile() {
 		delete csn->getData();
 		csn=csn->getNext();
 	}
+}
+
+const char * const * sqlrconfigfile::getAddresses() {
+	return addresses;
+}
+
+uint64_t sqlrconfigfile::getAddressCount() {
+	return addresscount;
 }
 
 uint16_t sqlrconfigfile::getPort() {
@@ -283,6 +299,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 	// set the current attribute
 	if (!charstring::compare(name,"id")) {
 		currentattribute=ID_ATTRIBUTE;
+	} else if (!charstring::compare(name,"addresses")) {
+		currentattribute=ADDRESSES_ATTRIBUTE;
 	} else if (!charstring::compare(name,"port")) {
 		currentattribute=PORT_ATTRIBUTE;
 	} else if (!charstring::compare(name,"socket") ||
@@ -366,7 +384,20 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 	} else {
 
 		// if we have found the correct id, process the attribute
-		if (currentattribute==PORT_ATTRIBUTE) {
+		if (currentattribute==ADDRESSES_ATTRIBUTE) {
+			for (uint64_t index=0; index<addresscount; index++) {
+				delete[] addresses[index];
+			}
+			delete[] addresses;
+			charstring::split(
+				(value &&
+				!charstring::contains(value,DEFAULT_ADDRESSES))?
+				value:DEFAULT_ADDRESSES,
+				",",true,&addresses,&addresscount);
+			for (uint64_t index=0; index<addresscount; index++) {
+				charstring::bothTrim(addresses[index]);
+			}
+		} else if (currentattribute==PORT_ATTRIBUTE) {
 			port=atouint32_t(value,DEFAULT_PORT,1);
 			listenoninet=true;
 		} else if (currentattribute==SOCKET_ATTRIBUTE) {

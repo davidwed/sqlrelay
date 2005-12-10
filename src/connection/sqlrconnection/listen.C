@@ -165,8 +165,14 @@ int32_t sqlrconnection::waitForClient() {
 			return -1;
 		}
 
-		if (fd==serversockin) {
-			clientsock=serversockin->accept();
+		inetserversocket	*iss=NULL;
+		for (uint64_t index=0; index<serversockincount; index++) {
+			if (fd==serversockin[index]) {
+				iss=serversockin[index];
+			}
+		}
+		if (iss) {
+			clientsock=iss->accept();
 		} else if (fd==serversockun) {
 			clientsock=serversockun->accept();
 		}

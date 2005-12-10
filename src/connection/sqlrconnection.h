@@ -300,7 +300,8 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		bool		lastrowvalid;
 		uint64_t	lastrow;
 
-		inetserversocket	*serversockin;
+		inetserversocket	**serversockin;
+		uint64_t		serversockincount;
 		unixserversocket	*serversockun;
 		filedescriptor		*clientsock;
 

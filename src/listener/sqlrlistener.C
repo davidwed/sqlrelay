@@ -47,6 +47,7 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 	pidfile=NULL;
 
 	clientsockin=NULL;
+	clientsockincount=0;
 	clientsockun=NULL;
 	handoffsockun=NULL;
 	removehandoffsockun=NULL;
@@ -82,7 +83,10 @@ void sqlrlistener::cleanUp() {
 	delete authc;
 	delete[] unixport;
 	delete clientsockun;
-	delete clientsockin;
+	for (uint64_t index=0; index<clientsockincount; index++) {
+		delete clientsockin[index];
+	}
+	delete[] clientsockin;
 	delete handoffsockun;
 
 	if (handoffsocklist) {
@@ -461,7 +465,9 @@ void sqlrlistener::semError(const char *id, int semid) {
 
 bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 
-	// get inet and unix ports to listen on
+	// get addresses/inet port and unix port to listen on
+	const char * const *addresses=cfgfl->getAddresses();
+	clientsockincount=cfgfl->getAddressCount();
 	uint16_t	port=cfgfl->getPort();
 	const char	*uport=cfgfl->getUnixPort();
 	if (uport && uport[0]) {
@@ -475,22 +481,34 @@ bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
 		fprintf(stderr,"Warning! using default port.\n");
 	}
 
-	// attempt to listen on the inet port, if necessary
+	// attempt to listen on the inet port
+	// (on each specified address), if necessary
 	bool	listening=false;
-	if (port) {
-		clientsockin=new inetserversocket();
-		listening=clientsockin->listen(NULL,port,15);
-		if (listening) {
-			addFileDescriptor(clientsockin);
-		} else {
-			fprintf(stderr,"Could not listen on inet port: ");
-			fprintf(stderr,"%d\n",port);
-			fprintf(stderr,"Make sure that no other ");
-			fprintf(stderr,"processes are ");
-			fprintf(stderr,"listening on that port.");
-			fprintf(stderr,"\n\n");
-			delete clientsockin;
-			clientsockin=NULL;
+	if (port && clientsockincount) {
+		clientsockin=new inetserversocket *[clientsockincount];
+		bool	failed=false;
+		for (uint64_t index=0; index<clientsockincount; index++) {
+			clientsockin[index]=NULL;
+			if (failed) {
+				continue;
+			}
+			clientsockin[index]=new inetserversocket();
+			listening=clientsockin[index]->listen(addresses[index],
+								port,15);
+			if (listening) {
+				addFileDescriptor(clientsockin[index]);
+			} else {
+				fprintf(stderr,
+					"Could not listen "
+					"on: %s/%d\n"
+					"Error was: %s\n"
+					"Make sure that no other "
+					"processes are listening "
+					"on that port.\n\n",
+					addresses[index],port,
+					error::getErrorString());
+				failed=true;
+			}
 		}
 	}
 
@@ -792,9 +810,15 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	}
 
 	// handle connections to the client sockets
-	if (fd==clientsockin) {
+	inetserversocket	*iss=NULL;
+	for (uint64_t index=0; index<clientsockincount; index++) {
+		if (fd==clientsockin[index]) {
+			iss=clientsockin[index];
+		}
+	}
+	if (iss) {
 
-		clientsock=clientsockin->accept();
+		clientsock=iss->accept();
 		clientsock->translateByteOrder();
 
 		// For inet clients, make sure that the ip address is

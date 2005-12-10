@@ -18,6 +18,7 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 	unixsocketptr=NULL;
 	serversockun=NULL;
 	serversockin=NULL;
+	serversockincount=0;
 
 	inetport=0;
 	authc=NULL;

@@ -203,6 +203,30 @@ variable.</p>
 </PRE>
 </blockquote>
 
+<p>With Oracle version 8i or greater, you can also bind CLOB's and BLOB's using the DBD::SQLRelay::SQL_CLOB and DBD::SQLRelay::SQL_BLOB extensions.  When
+binding a BLOB, you need to pass a hash containing type and length values.</p>
+
+<blockquote>
+<pre>
+<font color="#a020f0">#!/usr/bin/env perl</font>
+
+<font color="#a52a2a"><b>use </b></font>DBI;
+
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$dbh</font>=DBI-&gt;<font color="#a52a2a"><b>connect</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">DBI:SQLRelay:host=testhost;port=9000;socket=</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testuser</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testpassword</font><font color="#ff00ff">&quot;</font>);
+
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">insert into mytable values (:clobval,:blobval)</font><font color="#ff00ff">&quot;</font>);
+
+<font color="#008b8b">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">:clobval</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">test clob</font><font color="#ff00ff">&quot;</font>,DBD::SQLRelay::SQL_CLOB);
+<font color="#008b8b">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">:blobval</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">test blob</font><font color="#ff00ff">&quot;</font>,{<font color="#ff00ff">type</font>=&gt;DBD::SQLRelay::SQL_CLOB,<font color="#a52a2a"><b>length</b></font>=&gt;<font color="#ff00ff">9</font>});
+
+<font color="#008b8b">$sth</font>-&gt;execute();
+
+... process the result set ...
+
+<font color="#008b8b">$dbh</font>-&gt;disconnect;
+</pre>
+</blockquote>
+
 <p>bind_param() is used for input binds.  bind_inout_param() is used for output
 binds.  Here is an example using the bind_inout_param() function to retrieve a
 value from a query.  The first parameter of a bind_inout_param() call is the

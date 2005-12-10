@@ -1,6 +1,7 @@
 <!ELEMENT instances (instance*)>
 <!ELEMENT instance (users,connections)>
 	<!ATTLIST instance id CDATA "defaultid">
+	<!ATTLIST instance addresses CDATA "0.0.0.0">
 	<!ATTLIST instance port CDATA "9000">
 	<!ATTLIST instance socket CDATA "/tmp/sqlrelay.socket">
 	<!ATTLIST instance dbase (oracle7|oracle8|mysql|msql|postgresql|sqlite|freetds|sybase|odbc|db2|interbase|mdbtools) "oracle8">
