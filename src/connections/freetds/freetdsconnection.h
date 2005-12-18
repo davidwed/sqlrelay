@@ -128,6 +128,8 @@ class freetdscursor : public sqlrcursor {
 		bool			isrpcquery;
 
 		freetdsconnection	*freetdsconn;
+
+		unsigned short		opencount;
 };
 
 
@@ -175,6 +177,9 @@ class freetdsconnection : public sqlrconnection {
 		static	CS_RETCODE	serverMessageCallback(CS_CONTEXT *ctxt,
 						CS_CONNECTION *cnn,
 						CS_SERVERMSG *msgp);
+
+		freetdscursor	*singlecursor;
+		unsigned short	singlecursorrefcount;
 };
 
 #endif

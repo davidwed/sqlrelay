@@ -77,5 +77,7 @@ sqlite.class: sqlite.java
 sybase.class: sybase.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar sybase.java
 
+test.class: test.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar test.java
 
 rebuild.class: clean all

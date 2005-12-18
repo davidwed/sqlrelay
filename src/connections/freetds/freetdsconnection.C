@@ -24,6 +24,13 @@ bool		freetdsconnection::deadconnection;
 freetdsconnection::freetdsconnection() {
 	errorstring=NULL;
 	env=new environment();
+
+	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one, so some things
+	// won't work but there'll be no hard errors
+	singlecursor=NULL;
+	singlecursorrefcount=0;
 }
 
 freetdsconnection::~freetdsconnection() {
@@ -236,11 +243,30 @@ void freetdsconnection::logInError(const char *error, uint16_t stage) {
 }
 
 sqlrcursor *freetdsconnection::initCursor() {
-	return (sqlrcursor *)new freetdscursor((sqlrconnection *)this);
+	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one, so some things
+	// won't work but there'll be no hard errors
+	singlecursorrefcount++;
+	if (singlecursor) {
+		return singlecursor;
+	}
+	singlecursor=new freetdscursor((sqlrconnection *)this);
+	return singlecursor;
+	//return (sqlrcursor *)new freetdscursor((sqlrconnection *)this);
 }
 
 void freetdsconnection::deleteCursor(sqlrcursor *curs) {
-	delete (freetdscursor *)curs;
+	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one, so some things
+	// won't work but there'll be no hard errors
+	singlecursorrefcount--;
+	if (!singlecursorrefcount) {
+		delete singlecursor;
+		singlecursor=NULL;
+	}
+	//delete (freetdscursor *)curs;
 }
 
 void freetdsconnection::logOut() {
@@ -261,6 +287,12 @@ char freetdsconnection::bindVariablePrefix() {
 }
 
 freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
+
+	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one, so some things
+	// won't work but there'll be no hard errors
+	opencount=0;
 
 	#if defined(VERSION_NO)
 	char	*versionstring=charstring::duplicate(VERSION_NO);
@@ -322,6 +354,17 @@ freetdscursor::~freetdscursor() {
 
 bool freetdscursor::openCursor(uint16_t id) {
 
+	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one, so some things
+	// won't work but there'll be no hard errors
+	opencount++;
+	if (opencount>1) {
+		return true;
+	}
+
+	//freetdsconn->abortAllCursors();
+
 	clean=true;
 
 	cursorname=charstring::parseNumber(id);
@@ -333,9 +376,6 @@ bool freetdscursor::openCursor(uint16_t id) {
 		return false;
 	}
 	cmd=NULL;
-
-	// FIXME: hack...
-	freetdsconn->abortAllCursors();
 
 	// switch to the correct database
 	bool	retval=true;
@@ -355,6 +395,16 @@ bool freetdscursor::openCursor(uint16_t id) {
 }
 
 bool freetdscursor::closeCursor() {
+
+	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one, so some things
+	// won't work but there'll be no hard errors
+	if (opencount>1) {
+		return true;
+	}
+	opencount--;
+
 	bool	retval=true;
 	if (languagecmd) {
 		retval=(ct_cmd_drop(languagecmd)==CS_SUCCEED);
@@ -369,6 +419,13 @@ bool freetdscursor::closeCursor() {
 }
 
 bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
+
+	// if the client aborts while a query is in the middle of running,
+	// commit or rollback will be called, potentially before cleanUpData
+	// is called and, since we're really only using 1 cursor, it will fail
+	// unless cleanUpData gets called, so just to make sure, we'll call it
+	// here
+	cleanUpData(true,true);
 
 	clean=true;
 

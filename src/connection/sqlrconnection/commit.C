@@ -28,7 +28,7 @@ bool sqlrconnection::commit() {
 	}
 	commitcur->cleanUpData(true,true);
 	commitcur->closeCursor();
-	delete commitcur;
+	deleteCursor(commitcur);
 
 	#ifdef SERVER_DEBUG
 	char	string[36];

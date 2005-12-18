@@ -29,7 +29,7 @@ bool sqlrconnection::rollback() {
 	}
 	rollbackcur->cleanUpData(true,true);
 	rollbackcur->closeCursor();
-	delete rollbackcur;
+	deleteCursor(rollbackcur);
 
 	#ifdef SERVER_DEBUG
 	char	string[38];

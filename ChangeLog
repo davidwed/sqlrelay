@@ -58,10 +58,6 @@
 	oracle 8 connection's fetchatonce/maxselectlistsize/maxitembuffersize
 		are configurable at run time now
 	fixed a bug where the null indicator wasn't being set to 0 for lob's
-	freetds's openCursor() closes all cursors before running "use db",
-		this hack allows SQL Relay to open a new cursor to run
-		commit/rollbac, even though freetds only supports
-		1 cursor per connection
 	updated docs to indicate that getConnectionPort/Socket() are only
 		valid after suspendSession() and getResultSetId() is only
 		valid after suspendResultSet()
@@ -79,6 +75,10 @@
 		functions return false
 	PHP Pear db's query() returns a result set for "SHOW TABLES" now
 	Got perl dbi clob/blob binds working again, documented how to use them
+	freetds connection funnels everything through a single cursor, although
+		it appears to higher levels that there is more than 1 cursor,
+		so nested queries won't work if a result set buffer size is
+		used, but errors no longer occur
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

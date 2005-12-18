@@ -1,10 +1,14 @@
+apply Gena01's php pear db patches
+
+ttl of 15 works, but ttl of 60 causes the connections to never die
+
+add ttl tuning recommendations to tuning doc
+
+get sid working, document
+
 * NLS_LANG-like issues with other db's?
 
 interbase fails float output bind, prec/scale issue?
-
-freetds test reveals
-	Attempt to initiate a new SQL Server operation with results pending.
-	bug
 
 Tru64 -
 	unix sockets don't work, looks like a byte-order translation issue

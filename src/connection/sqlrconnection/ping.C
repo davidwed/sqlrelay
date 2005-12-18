@@ -20,11 +20,11 @@ bool sqlrconnection::ping() {
 		pingcur->executeQuery(pingquery,pingquerylen,true)) {
 		pingcur->cleanUpData(true,true);
 		pingcur->closeCursor();
-		delete pingcur;
+		deleteCursor(pingcur);
 		return true;
 	}
 	pingcur->closeCursor();
-	delete pingcur;
+	deleteCursor(pingcur);
 	return false;
 }
 
