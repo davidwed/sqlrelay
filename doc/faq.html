@@ -656,7 +656,7 @@ this by not requesting the affected row count and just returning -1 if it's
 compiled against FreeTDS&lt;0.53.</li>
 <li>Bind variables are unsupported.  The ct_param and ct_setparam functions
 simply don't exist in FreeTDS ctlib.  SQL Relay handles this by faking input 
-bind variables in the same manner that the MySQL, mSQL, PostgreSQL, SQLite and
+bind variables in the same manner that the MySQL, mSQL, SQLite and
 MDB Tools connections do.</li>
 <li>FLOAT, NUMERIC and DECIMAL datatypes are all represented as FLOAT 
 datatypes.  There doesn't appear to be any workaround for this.</li>
@@ -682,7 +682,15 @@ while FreeTDS returns it as
 places.  Inserting 1.1 as a REAL or FLOAT type then selecting it might return 
 1.09888874310 or something similar.  With FreeTDS, inserting 1.1 then selecting
 it returns 1.1.  Sybase behaves like FreeTDS for DECIMAL and NUMBER types.</li>
-</ul>
+<li>FreeTDS only supports one cursor per connection.  You can write code that
+uses multiple cursors, but it will eventually throw errors like: "Error:
+Attempt to initiate a new SQL Server operation with results pending."  Prior
+to SQL Relay 0.37, this was a common error to see under certain circumstances.
+As of SQL Relay 0.37 the connection daemon funnels everything through a single
+cursor and this error should no longer appear.  From the client-side as long as
+you don't use setResultSetBufferSize() to specify a buffer size other than 0,
+it will appear like more than 1 cursor is available, but in fact only 1 is
+being used.</ul>
 
 <p>There are possibly other inconsistencies, but these are the only ones that 
 I've run into so far.</p>
