@@ -263,13 +263,13 @@ parameter of the call to execute().</p>
         <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
 <font color="#6b59ce">}</font>
 
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into testtable values (:var1,:var2,:var3,:var4,:var5)</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into testtable values (:var1,:var2,:var3,:var4,:var5)</font>&quot;<font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">2</font>,
                 &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar2</font>&quot;,
                 &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar2</font>&quot;,
                 &quot;<font color="#ff00ff">4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2002</font>&quot;,
                 &quot;<font color="#ff00ff">5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong2</font>&quot;<font color="#6b59ce">)</font>;
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 
 <font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
 
@@ -301,35 +301,35 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
         <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
 <font color="#6b59ce">}</font>
 
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into testtable values (:var1,:var2,:var3,:var4,:var5)</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into testtable values (:var1,:var2,:var3,:var4,:var5)</font>&quot;<font color="#6b59ce">)</font>;
 
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">2</font>,
                 &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar2</font>&quot;,
                 &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar2</font>&quot;,
                 &quot;<font color="#ff00ff">4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2002</font>&quot;,
                 &quot;<font color="#ff00ff">5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong2</font>&quot;<font color="#6b59ce">)</font>;
-<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">var1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">3</font>,
                 &quot;<font color="#ff00ff">var2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar3</font>&quot;,
                 &quot;<font color="#ff00ff">var3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar3</font>&quot;,
                 &quot;<font color="#ff00ff">var4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2003</font>&quot;,
                 &quot;<font color="#ff00ff">var5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong3</font>&quot;<font color="#6b59ce">)</font>;
-<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">4</font>,
                 &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar4</font>&quot;,
                 &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar4</font>&quot;,
                 &quot;<font color="#ff00ff">4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2004</font>&quot;,
                 &quot;<font color="#ff00ff">5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong4</font>&quot;<font color="#6b59ce">)</font>;
-<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">var1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">5</font>,
                 &quot;<font color="#ff00ff">var2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testchar5</font>&quot;,
                 &quot;<font color="#ff00ff">var3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testvarchar5</font>&quot;,
                 &quot;<font color="#ff00ff">var4</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">01-JAN-2005</font>&quot;,
                 &quot;<font color="#ff00ff">var5</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">testlong5</font>&quot;<font color="#6b59ce">)</font>;
-<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 
 
 <font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
@@ -704,19 +704,19 @@ iterate through it's result set, inserting rows into another table, using only
         <font color="#008a8c">die</font> <font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>getMessage<font color="#6b59ce">())</font>;
 <font color="#6b59ce">}</font>
 
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">query</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from my_first_table</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">query</font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from my_first_table</font>&quot;<font color="#6b59ce">)</font>;
 
-<font color="#a52829"><b>for</b></font> <font color="#6b59ce">(</font><font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>=</b></font><font color="#ff00ff">0</font>; <font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>&lt;</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res1</font><font color="#298a52"><b>-&gt;</b></font>numRows<font color="#6b59ce">()</font>; <font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>+</b></font><font color="#ff00ff">1</font><font color="#6b59ce">)</font> <font color="#6b59ce">{</font>
-        <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res1</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
+<font color="#a52829"><b>for</b></font> <font color="#6b59ce">(</font><font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>=</b></font><font color="#ff00ff">0</font>; <font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>&lt;</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>numRows<font color="#6b59ce">()</font>; <font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">count</font><font color="#a52829"><b>+</b></font><font color="#ff00ff">1</font><font color="#6b59ce">)</font> <font color="#6b59ce">{</font>
+        <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
         <font color="#a52829"><b>var</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>,
                                 &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>,
                                 &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#a52829"><b>$</b></font><font color="#008a8c">row</font><font color="#6b59ce">[</font><font color="#ff00ff">2</font><font color="#6b59ce">])</font>;
-        <font color="#a52829"><b>$</b></font><font color="#008a8c">res2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into my_second_table values (:var1,:var2,:var3)</font>&quot;<font color="#6b59ce">)</font>;
-        execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res2</font>,bindvars<font color="#6b59ce">)</font>;
-        <font color="#a52829"><b>$</b></font><font color="#008a8c">res2</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+        <font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">insert into my_second_table values (:var1,:var2,:var3)</font>&quot;<font color="#6b59ce">)</font>;
+        execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,bindvars<font color="#6b59ce">)</font>;
+        <font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
 <font color="#6b59ce">}</font>
 
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res1</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>free<font color="#6b59ce">()</font>;
 
 <font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>disconnect<font color="#6b59ce">()</font>;
 
@@ -958,11 +958,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">begin testproc(:in1,:in2,:in3); end;</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">begin testproc(:in1,:in2,:in3); end;</font>&quot;<font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">in1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
                 &quot;<font color="#ff00ff">in2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
                 &quot;<font color="#ff00ff">in3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 </pre>
 </blockquote>
 
@@ -991,11 +991,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">exec testproc</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">exec testproc</font>&quot;<font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">in1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
                 &quot;<font color="#ff00ff">in2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
                 &quot;<font color="#ff00ff">in3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 </pre>
 </blockquote>
 
@@ -1026,11 +1026,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">exec procedure testproc ?,?,?</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">exec procedure testproc ?,?,?</font>&quot;<font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
                 &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
                 &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 </pre>
 </blockquote>
 
@@ -1060,11 +1060,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">call testproc(?,?,?)</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">call testproc(?,?,?)</font>&quot;<font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
                 &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
                 &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 </pre>
 </blockquote>
 
@@ -1159,7 +1159,7 @@ following.</p>
 
 <p>In Sybase and Microsoft SQL Server, stored procedures return values
 through output parameters rather than as return values of the procedure
-itself.  However, the SQL Relay Python DBdriver does not currently support
+itself.  However, the SQL Relay PHP Pear DB driver does not currently support
 output parameters.</p>
 
 
@@ -1203,8 +1203,8 @@ following.</p>
 <span class="heading4">DB2</span><br>
 
 <p>In DB2, stored procedures return values through output parameters rather
-than as return values of the procedure itself.  However, the SQL Relay Python
-DB driver does not currently support output parameters.</p>
+than as return values of the procedure itself.  However, the SQL Relay PHP
+Pear DB driver does not currently support output parameters.</p>
 
 <span class="heading4">Postgresql</span><br>
 
@@ -1261,13 +1261,13 @@ each database that SQL Relay supports.</p>
 as return values of the procedure itself.  If a procedure needs to return
 multiple values, it can return one of them as the return value of the procedure
 itself, but the rest must be returned through output parameters.  However, the
-SQL Relay Python DB driver does not currently support output parameters.</p>
+SQL Relay PHP Pear DB driver does not currently support output parameters.</p>
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
 
 <p>In Sybase and Microsoft SQL Server, stored procedures return values
 through output parameters rather than as return values of the procedure
-itself.  However, the SQL Relay Python DB driver does not currently support
+itself.  However, the SQL Relay PHP Pear DB driver does not currently support
 output parameters.</p>
 
 <span class="heading4">Interbase and Firebird</span><br>
@@ -1291,11 +1291,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testfunc(?,?,?)</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testfunc(?,?,?)</font>&quot;<font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
                 &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
                 &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">out1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">out2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">out3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font>;
@@ -1314,7 +1314,7 @@ following.</p>
 <span class="heading4">DB2</span><br>
 
 <p>In DB2, stored procedures return values through output parameters rather
-than as return values of the procedure itself.  However, the SQL Relay Python
+than as return values of the procedure itself.  However, the SQL Relay PHP Pear
 DB driver does not currently support output parameters.</p>
 
 <span class="heading4">Postgresql</span><br>
@@ -1339,13 +1339,13 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font>&quot;<font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">in1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
                 &quot;<font color="#ff00ff">in2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
                 &quot;<font color="#ff00ff">in3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">out1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>;
-<font color="#a52829"><b>$</b></font><font color="#008a8c">out2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">out2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">out3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font>;
 </pre>
 </blockquote>
@@ -1370,7 +1370,7 @@ each database that SQL Relay supports.</p>
 
 <p>Stored procedures in Oracle can return open cursors as return values or
 output parameters.  A client-side cursor can be bound to this open cursor and
-rows can be fetched from it.  However, the SQL Relay Python DB driver does not
+rows can be fetched from it.  However, the SQL Relay PHP Pear DB driver does not
 currently support output parameters.</p>
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
@@ -1415,11 +1415,11 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testfunc() as (col1 int, col2 float, col3 char(20))</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testfunc() as (col1 int, col2 float, col3 char(20))</font>&quot;<font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">in1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
                 &quot;<font color="#ff00ff">in2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
                 &quot;<font color="#ff00ff">in3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">row1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">row2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">row3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
