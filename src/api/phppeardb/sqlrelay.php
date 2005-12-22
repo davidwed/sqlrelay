@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.13 2005-12-22 03:09:12 mused Exp $
+// $Id: sqlrelay.php,v 1.14 2005-12-22 05:07:50 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -49,6 +49,7 @@ class DB_sqlrelay extends DB_common
     var $fetchmode = DB_FETCHMODE_ORDERED; /* Default fetch mode */
     var $affectedrows = 0;
     var $prepare_types = array();
+    var $is_select = array();
 
 
     // }}}
@@ -131,6 +132,16 @@ class DB_sqlrelay extends DB_common
     }
 
     // }}}
+    // {{{ isSelect()
+
+    function isSelect($query)
+    {
+        return ((preg_match('/^\s*SHOW TABLES\s*/si', $query) ||
+                    preg_match('/^\s*\(?\s*SELECT\s+/si', $query)) &&
+                    !preg_match('/^\s*\(?\s*SELECT\s+INTO\s+/si', $query));
+    }
+
+    // }}}
     // {{{ simpleQuery()
 
     /**
@@ -162,10 +173,7 @@ class DB_sqlrelay extends DB_common
         If there are any affected rows, then the query was definitely not a
         select, otherwise there's no good way to know what kind of query it was
         except by parsing it. */
-        if ($this->affectedrows <= 0 &&
-                (preg_match('/^\s*SHOW TABLES\s*/si', $query) ||
-                preg_match('/^\s*\(?\s*SELECT\s+/si', $query)) &&
-                    !preg_match('/^\s*\(?\s*SELECT\s+INTO\s+/si', $query)) {
+        if ($this->isSelect($query)) {
             return new DB_sqlrelay_cursor($cursor,$this->connection);
         }
 
@@ -189,30 +197,48 @@ class DB_sqlrelay extends DB_common
 
     function prepare($query)
     {
+        if ($identity == "") {
+            $idenity = sqlrcon_identify($this->connection);
+        }
+
         $cursor = sqlrcur_alloc($this->connection);
         sqlrcur_setResultSetBufferSize($cursor,100);
 
-        $tokens = split('[\&\?]', $query);
-        $token = 0;
-        $binds = sizeof($tokens) - 1;
-        $newquery = '';
-        $types = array();
-        for ($i = 0; $i < strlen($query); $i++) {
-            switch ($query[$i]) {
-                case '?':
-                    $types[$token++] = DB_PARAM_SCALAR;
-                    break;
-                case '&':
-                    $types[$token++] = DB_PARAM_OPAQUE;
-                    break;
+        # handle ?-delimited bind variables by rewriting the query and creating
+        # : or @ delimited variables
+        # for db2 which already uses ?-delimited variables, we don't need
+        # to do this...
+        if ($identity == "db2" || $identity == "interbase") {
+            $newquery = $query;
+        } else {
+            $tokens = split('[\&\?]', $query);
+            $token = 0;
+            $binds = sizeof($tokens) - 1;
+            $newquery = '';
+            $types = array();
+            for ($i = 0; $i < strlen($query); $i++) {
+                switch ($query[$i]) {
+                    case '?':
+                        $types[$token++] = DB_PARAM_SCALAR;
+                        break;
+                    case '&':
+                        $types[$token++] = DB_PARAM_OPAQUE;
+                        break;
+                }
+            }        
+            for ($i = 0; $i < $binds; $i++) {
+                if ($identity == "sybase" || $identity == "freetds") {
+                    $newquery .= $tokens[$i] . "@bind" . $i;
+                } else {
+                    $newquery .= $tokens[$i] . ":bind" . $i;
+                }
             }
-        }        
-
-        for ($i = 0; $i < $binds; $i++) {
-            $newquery .= $tokens[$i] . ":bind" . $i;
+            $newquery .= $tokens[$i];
+            $this->prepare_types[(int)$cursor] = $types;
         }
-        $newquery .= $tokens[$i];
-        $this->prepare_types[(int)$cursor] = $types;
+
+        $this->is_select[(int)$cursor] = $this->isSelect($newquery);
+
 #print "<b>Query:</b> $query<br><b>New Query:</b> $newquery<br>\n";
         sqlrcur_prepareQuery($cursor, $newquery);
         return new DB_sqlrelay_cursor($cursor,$this->connection);
@@ -308,10 +334,11 @@ class DB_sqlrelay extends DB_common
                         $values .= ',';
                     }
                     $names .= $value;
-                    if ($identity != "sybase" && $identity != "freetds") {
-                        $values .= ":$value";
-                    } else {
+                    # FIXME: handle other db formats too
+                    if ($identity == "sybase" || $identity == "freetds") {
                         $values .= "@$value";
+                    } else {
+                        $values .= ":$value";
                     }
                 }
                 return "INSERT INTO $table ($names) VALUES ($values)";
@@ -323,10 +350,11 @@ class DB_sqlrelay extends DB_common
                     } else {
                         $set .= ',';
                     }
-                    if ($identity != "sybase" && $identity != "freetds") {
-                        $set .= "$value = :$value";
-                    } else {
+                    # FIXME: handle other db formats too
+                    if ($identity == "sybase" || $identity == "freetds") {
                         $set .= "$value = @$value";
+                    } else {
+                        $set .= "$value = :$value";
                     }
                 }
                 $sql = "UPDATE $table SET $set";
@@ -365,12 +393,12 @@ class DB_sqlrelay extends DB_common
 
         # handle ?/& binds...
         $types=&$this->prepare_types[(int)$sqlrcursor->cursor];
-        $size = sizeof($types);
-        if ($size > 0 && $size != sizeof($data)) {
+        $typessize = sizeof($types);
+        if ($typessize > 0 && $typessize != sizeof($data)) {
             return $this->raiseError(DB_ERROR_MISMATCH);
         }
 
-        for ($i = 0; $i < $size; $i++) {
+        for ($i = 0; $i < $typessize; $i++) {
             if (is_array($data)) {
                 $pdata[$i] = &$data[$i];
             } else {
@@ -390,7 +418,7 @@ class DB_sqlrelay extends DB_common
         }
 
         # handle native SQL Relay binds...
-        if ($data) {
+        if (!$typessize && $data) {
             foreach ($data as $index=>$value) {
                 sqlrcur_inputBind($sqlrcursor->cursor, $index, $value);
             }
@@ -402,8 +430,15 @@ class DB_sqlrelay extends DB_common
             return $this->raiseError(DB_ERROR, null, null, null, $error);
         }
 
-        return $sqlrcursor;
-        #return new DB_Result($this,$sqlrcursor);
+        /* If the query was a select, return a cursor, otherwise return DB_OK.
+        If there are any affected rows, then the query was definitely not a
+        select, otherwise there's no good way to know what kind of query it was
+        except by parsing it. */
+        if ($this->is_select[(int)$sqlrcursor->cursor]) {
+            return new DB_result($this,$sqlrcursor);
+        }
+
+        return DB_OK;
     }
 
     // }}}
@@ -457,6 +492,7 @@ class DB_sqlrelay extends DB_common
     {
         if (is_resource($sqlrcursor)) {
             unset($this->prepare_types[(int)$sqlrcursor->cursor]);
+            unset($this->is_select[(int)$sqlrcursor->cursor]);
             sqlrcur_free($sqlrcursor->cursor);
         }
         return true;
@@ -580,7 +616,7 @@ class DB_sqlrelay extends DB_common
     // }}}
     // {{{ tableInfo()
 
-    function tableInfo($sqlrcursor, $mode = null)
+    function tableInfo($result, $mode = null)
     {
 
         /*
@@ -620,16 +656,19 @@ class DB_sqlrelay extends DB_common
          *      DB_TABLEINFO_ORDERTABLE * or with DB_TABLEINFO_FULL
          */
 
-        if (is_string($sqlrcursor)) {
+        if (is_string($result)) {
             // if $result is a string, then we want information about a
             // table without a resultset else we want information about a
             // resultset, this is not yet supported
             return null;
-        } else if (empty($sqlrcursor)) {
+        } else if (empty($result)) {
             return null;
-        } else if ($sqlrcursor==DB_OK) {
+        } else if ($result==DB_OK) {
             return null;
         }
+
+        # extract the sqlrcursor
+        $sqlrcursor = $result->result;
 
         $count = sqlrcur_colCount($sqlrcursor->cursor);
 
