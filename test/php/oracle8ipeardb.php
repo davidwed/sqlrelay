@@ -10,7 +10,7 @@ require_once 'DB.php';
 			echo("success ");
 		} else {
 			echo("failure ");
-			printf("%s!=%s\n",$value,$success);
+			print("$value!=$success\n");
 			$db->disconnect();
 			exit(0);
 		}
@@ -44,56 +44,56 @@ require_once 'DB.php';
 	checkSuccess($db,$db->affectedRows(),1);
 	echo("\n");
 
-	echo("BIND BY POSITION: \n");
-	$res=$db->prepare("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
+	echo(":-DELIMITED BINDS: \n");
+	$sth=$db->prepare("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
 	$bindvars=array("1" => 2,
 			"2" => "testchar2",
 			"3" => "testvarchar2",
 			"4" => "01-JAN-2002",
 			"5" => "testlong2");
-	$res=$db->execute($res,$bindvars);
+	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("var1" => 3,
 			"var2" => "testchar3",
 			"var3" => "testvarchar3",
 			"var4" => "01-JAN-2003",
 			"var5" => "testlong3");
-	$res=$db->execute($res,$bindvars);
+	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("1" => 4,
 			"2" => "testchar4",
 			"3" => "testvarchar4",
 			"4" => "01-JAN-2004",
 			"5" => "testlong4");
-	$res=$db->execute($res,$bindvars);
+	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("var1" => 5,
 			"var2" => "testchar5",
 			"var3" => "testvarchar5",
 			"var4" => "01-JAN-2005",
 			"var5" => "testlong5");
-	$res=$db->execute($res,$bindvars);
+	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("1" => 6,
 			"2" => "testchar6",
 			"3" => "testvarchar6",
 			"4" => "01-JAN-2006",
 			"5" => "testlong6");
-	$res=$db->execute($res,$bindvars);
+	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("var1" => 7,
 			"var2" => "testchar7",
 			"var3" => "testvarchar7",
 			"var4" => "01-JAN-2007",
 			"var5" => "testlong7");
-	$res=$db->execute($res,$bindvars);
+	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
+	echo("\n");
 
-	$bindvars=array("1" => 8,
-			"2" => "testchar8",
-			"3" => "testvarchar8",
-			"4" => "01-JAN-2008",
-			"5" => "testlong8");
-	$res=$db->execute($res,$bindvars);
+	echo("?-DELIMITED BINDS: \n");
+	$sth=$db->prepare("insert into testtable values (?,?,?,?,?)");
+	$bindvars=array(8,"testchar8","testvarchar8","01-JAN-2008","testlong8");
+	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
+	echo("\n");
 
 	# auto execute
 	echo("AUTO EXECUTE: \n");
@@ -102,14 +102,16 @@ require_once 'DB.php';
 			"testvarchar" => "testvarchar9",
 			"testdate" => "01-JAN-2009",
 			"testlong" => "testlong9");
-	$res=$db->autoExecute("testtable",$bindvars,DB_AUTOQUERY_INSERT);
+	checkSuccess($db,$db->autoExecute("testtable",$bindvars,
+					DB_AUTOQUERY_INSERT),DB_OK);
 
 	$bindvars=array("testnumber" => NULL,
 			"testchar" => NULL,
 			"testvarchar" => NULL,
 			"testdate" => NULL,
 			"testlong" => NULL);
-	$res=$db->autoExecute("testtable",$bindvars,DB_AUTOQUERY_INSERT);
+	checkSuccess($db,$db->autoExecute("testtable",$bindvars,
+					DB_AUTOQUERY_INSERT),DB_OK);
 
 	echo("SELECT: \n");
 	$res=$db->query("select * from testtable order by testnumber");
@@ -118,7 +120,7 @@ require_once 'DB.php';
 	echo("COLUMN COUNT: \n");
 	checkSuccess($db,$res->numCols(),5);
 	echo("\n");
-/*
+
 	echo ("TABLE INFO: \n");
 	$tableinfo=$res->tableInfo(DB_TABLEINFO_ORDER);
 	checkSuccess($db,$tableinfo['num_fields'],5);
@@ -127,6 +129,7 @@ require_once 'DB.php';
 	checkSuccess($db,$tableinfo['order']['TESTVARCHAR'],2);
 	checkSuccess($db,$tableinfo['order']['TESTDATE'],3);
 	checkSuccess($db,$tableinfo['order']['TESTLONG'],4);
+	echo("\n");
 
 	echo ("TABLE INFO: \n");
 	$tableinfo=$res->tableInfo(DB_TABLEINFO_ORDERTABLE);
@@ -135,6 +138,7 @@ require_once 'DB.php';
 	checkSuccess($db,$tableinfo['ordertable']['']['TESTVARCHAR'],2);
 	checkSuccess($db,$tableinfo['ordertable']['']['TESTDATE'],3);
 	checkSuccess($db,$tableinfo['ordertable']['']['TESTLONG'],4);
+	echo("\n");
 
 	echo ("TABLE INFO: \n");
 	$tableinfo=$res->tableInfo(DB_TABLEINFO_ORDER|DB_TABLEINFO_ORDERTABLE);
@@ -149,6 +153,7 @@ require_once 'DB.php';
 	checkSuccess($db,$tableinfo['ordertable']['']['TESTVARCHAR'],2);
 	checkSuccess($db,$tableinfo['ordertable']['']['TESTDATE'],3);
 	checkSuccess($db,$tableinfo['ordertable']['']['TESTLONG'],4);
+	echo("\n");
 	
 	echo("COLUMN NAMES: \n");
 	$tableinfo=$res->tableInfo();
@@ -174,7 +179,7 @@ require_once 'DB.php';
 	checkSuccess($db,$tableinfo[3]['len'],7);
 	checkSuccess($db,$tableinfo[4]['len'],0);
 	echo("\n");
-*/
+
 	echo("ROW COUNT: \n");
 	checkSuccess($db,$res->numRows(),10);
 	echo("\n");
