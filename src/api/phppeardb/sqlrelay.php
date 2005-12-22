@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.12 2005-12-19 06:41:44 mused Exp $
+// $Id: sqlrelay.php,v 1.13 2005-12-22 03:09:12 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -109,6 +109,7 @@ class DB_sqlrelay extends DB_common
                                             $dsninfo['username'],
                                             $dsninfo['password'],
                                             0,1);
+#sqlrcon_debugOn($this->connection);
         return DB_OK;
     }
 
@@ -211,8 +212,8 @@ class DB_sqlrelay extends DB_common
             $newquery .= $tokens[$i] . ":bind" . $i;
         }
         $newquery .= $tokens[$i];
-        $this->prepare_types[$cursor] = $types;
-        #print "<b>Query:</b> $query<br><b>New Query:</b> $newquery<br>\n";
+        $this->prepare_types[(int)$cursor] = $types;
+#print "<b>Query:</b> $query<br><b>New Query:</b> $newquery<br>\n";
         sqlrcur_prepareQuery($cursor, $newquery);
         return new DB_sqlrelay_cursor($cursor,$this->connection);
     }
@@ -360,12 +361,14 @@ class DB_sqlrelay extends DB_common
     function &execute(&$sqlrcursor, $data = false)
     {
 
-        $types=&$this->prepare_types[$sqlrcursor->cursor];
-        if (($size = sizeof($types)) != sizeof($data)) {
+        sqlrcur_clearBinds($sqlrcursor->cursor);
+
+        # handle ?/& binds...
+        $types=&$this->prepare_types[(int)$sqlrcursor->cursor];
+        $size = sizeof($types);
+        if ($size > 0 && $size != sizeof($data)) {
             return $this->raiseError(DB_ERROR_MISMATCH);
         }
-
-        sqlrcur_clearBinds($sqlrcursor->cursor);
 
         for ($i = 0; $i < $size; $i++) {
             if (is_array($data)) {
@@ -386,11 +389,12 @@ class DB_sqlrelay extends DB_common
             sqlrcur_inputBind($sqlrcursor->cursor,"bind" . $i, $pdata[$i]);
         }
 
-        #if ($data) {
-            #foreach ($data as $index=>$value) {
-                #sqlrcur_inputBind($sqlrcursor->cursor, $index, $value);
-            #}
-        #}
+        # handle native SQL Relay binds...
+        if ($data) {
+            foreach ($data as $index=>$value) {
+                sqlrcur_inputBind($sqlrcursor->cursor, $index, $value);
+            }
+        }
 
         if (!sqlrcur_executeQuery($sqlrcursor->cursor)) {
             $error = sqlrcur_errorMessage($sqlrcursor->cursor);
@@ -398,8 +402,8 @@ class DB_sqlrelay extends DB_common
             return $this->raiseError(DB_ERROR, null, null, null, $error);
         }
 
-        #return $sqlrcursor;
-        return new DB_Result($this,$sqlrcursor);
+        return $sqlrcursor;
+        #return new DB_Result($this,$sqlrcursor);
     }
 
     // }}}

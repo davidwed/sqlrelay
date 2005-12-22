@@ -79,6 +79,8 @@
 		it appears to higher levels that there is more than 1 cursor,
 		so nested queries won't work if a result set buffer size is
 		used, but errors no longer occur
+	fixed a bug where fetching a clob from oracle containing utf8 data
+		could cause a buffer overrun and subsequent crash
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

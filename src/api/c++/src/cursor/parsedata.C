@@ -158,6 +158,25 @@ bool sqlrcursor::parseData() {
 					return false;
 				}
 
+				// Oracle in particular has a function that
+				// returns the number of characters in a CLOB,
+				// but not the number of bytes.  Since
+				// varying-width character data can be stored
+				// in a CLOB, characters may be less than bytes.
+				// AFAIK, there's no way to get the number of
+				// bytes.  So, we use the number of characters
+				// as a starting point, and extend buffer if
+				// necessary.
+				if (offset+length>totallength) {
+					char	*newbuffer=
+						new char[offset+length+1];
+					rawbuffer::copy(
+						newbuffer,buffer,offset);
+					delete[] buffer;
+					buffer=newbuffer;
+					totallength=offset+length;
+				}
+
 				// get the chunk of data
 				if ((uint32_t)getString(buffer+offset,
 							length)!=length) {

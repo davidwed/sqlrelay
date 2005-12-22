@@ -12,7 +12,7 @@ rebuild: clean all
 
 install:
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPPEARDBDIR)
-	$(INSTALL) sqlrelay.php $(DESTDIR)$(PHPPEARDBDIR)
+	$(INSTALL) -m 644 sqlrelay.php $(DESTDIR)$(PHPPEARDBDIR)
 
 uninstall:
 	$(RM) $(DESTDIR)$(PHPPEARDBDIR)/sqlrelay.php

@@ -977,6 +977,8 @@ void oracle8cursor::returnOutputBindClob(uint16_t index) {
 void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 
 	// handle lob datatypes
+	// FIXME: call OCILobGetChunkSize to determine the size of this buffer
+	// rather than maxitembuffersize, it will improve performance
 	char	buf[oracle8conn->maxitembuffersize+1];
 	ub4	retlen=oracle8conn->maxitembuffersize;
 	ub4	offset=1;

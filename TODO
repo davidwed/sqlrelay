@@ -1,4 +1,4 @@
-apply Gena01's php pear db patches
+apply, test Gena01's php pear db patch
 
 ttl of 15 works, but ttl of 60 causes the connections to never die
 
