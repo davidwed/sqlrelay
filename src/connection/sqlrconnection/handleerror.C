@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection::handleError(sqlrcursor *cursor) {
+bool sqlrconnection_svr::handleError(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"handling error...");
@@ -25,7 +25,7 @@ bool sqlrconnection::handleError(sqlrcursor *cursor) {
 	return true;
 }
 
-bool sqlrconnection::returnError(sqlrcursor *cursor) {
+bool sqlrconnection_svr::returnError(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning error...");

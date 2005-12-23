@@ -14,7 +14,7 @@
 
 #include <sqlcli1.h>
 
-struct column {
+struct db2column {
 	char		name[MAX_ITEM_BUFFER_SIZE];
 	uint16_t	namelength;
 	// SQLColAttribute requires that these are signed, 32 bit integers
@@ -34,10 +34,10 @@ struct column {
 
 class db2connection;
 
-class db2cursor : public sqlrcursor {
+class db2cursor : public sqlrcursor_svr {
 	friend class db2connection;
 	public:
-			db2cursor(sqlrconnection *conn);
+			db2cursor(sqlrconnection_svr *conn);
 			~db2cursor();
 	private:
 		bool		prepareQuery(const char *query,
@@ -94,7 +94,7 @@ class db2cursor : public sqlrcursor {
 #if (DB2VERSION==8)
 		SQLUSMALLINT	rowstat[FETCH_AT_ONCE];
 #endif
-		column 		col[MAX_SELECT_LIST_SIZE];
+		db2column	col[MAX_SELECT_LIST_SIZE];
 
 		uint64_t	rowgroupindex;
 		uint64_t	totalinrowgroup;
@@ -106,14 +106,14 @@ class db2cursor : public sqlrcursor {
 		db2connection	*db2conn;
 };
 
-class db2connection : public sqlrconnection {
+class db2connection : public sqlrconnection_svr {
 	friend class db2cursor;
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn();
-		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		int16_t	nullBindValue();
 		bool	bindValueIsNull(int16_t isnull);

@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::rollbackCommand() {
+void sqlrconnection_svr::rollbackCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"rollback");
 	#endif
@@ -12,13 +12,13 @@ void sqlrconnection::rollbackCommand() {
 	commitorrollback=false;
 }
 
-bool sqlrconnection::rollback() {
+bool sqlrconnection_svr::rollback() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"rollback...");
 	#endif
 
-	sqlrcursor	*rollbackcur=initCursor();
+	sqlrcursor_svr	*rollbackcur=initCursor();
 	char	*rollbackquery="rollback";
 	int	rollbackquerylen=8;
 	bool	retval=false;

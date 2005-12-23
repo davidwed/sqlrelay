@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection::getInputBinds(sqlrcursor *cursor) {
+bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"getting input binds...");
@@ -17,7 +17,7 @@ bool sqlrconnection::getInputBinds(sqlrcursor *cursor) {
 	// fill the buffers
 	for (uint16_t i=0; i<cursor->inbindcount && i<MAXVAR; i++) {
 
-		bindvar	*bv=&(cursor->inbindvars[i]);
+		bindvar_svr	*bv=&(cursor->inbindvars[i]);
 
 		// get the variable name and type
 		if (!(getBindVarName(bv) && getBindVarType(bv))) {
@@ -52,7 +52,7 @@ bool sqlrconnection::getInputBinds(sqlrcursor *cursor) {
 	return true;
 }
 
-bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
+bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"getting output binds...");
@@ -66,7 +66,7 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 	// fill the buffers
 	for (uint16_t i=0; i<cursor->outbindcount && i<MAXVAR; i++) {
 
-		bindvar	*bv=&(cursor->outbindvars[i]);
+		bindvar_svr	*bv=&(cursor->outbindvars[i]);
 
 		// get the variable name and type
 		if (!(getBindVarName(bv) && getBindVarType(bv))) {
@@ -108,7 +108,7 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",4,"CURSOR");
 			#endif
-			sqlrcursor	*curs=findAvailableCursor();
+			sqlrcursor_svr	*curs=findAvailableCursor();
 			if (!curs) {
 				// FIXME: set error here
 				return false;
@@ -124,7 +124,7 @@ bool sqlrconnection::getOutputBinds(sqlrcursor *cursor) {
 	return true;
 }
 
-bool sqlrconnection::getBindVarCount(uint16_t *count) {
+bool sqlrconnection_svr::getBindVarCount(uint16_t *count) {
 
 	// get the number of input bind variable/values
 	if (clientsock->read(count,idleclienttimeout,0)!=sizeof(uint16_t)) {
@@ -148,7 +148,7 @@ bool sqlrconnection::getBindVarCount(uint16_t *count) {
 	return true;
 }
 
-bool sqlrconnection::getBindVarName(bindvar *bv) {
+bool sqlrconnection_svr::getBindVarName(bindvar_svr *bv) {
 
 	uint16_t	bindnamesize;
 
@@ -192,7 +192,7 @@ bool sqlrconnection::getBindVarName(bindvar *bv) {
 	return true;
 }
 
-bool sqlrconnection::getBindVarType(bindvar *bv) {
+bool sqlrconnection_svr::getBindVarType(bindvar_svr *bv) {
 
 	// get the type
         uint16_t type;
@@ -208,7 +208,7 @@ bool sqlrconnection::getBindVarType(bindvar *bv) {
 	return true;
 }
 
-bool sqlrconnection::getBindSize(bindvar *bv, uint32_t maxsize) {
+bool sqlrconnection_svr::getBindSize(bindvar_svr *bv, uint32_t maxsize) {
 
 	// get the size of the value
 	if (clientsock->read(&(bv->valuesize),
@@ -233,7 +233,7 @@ bool sqlrconnection::getBindSize(bindvar *bv, uint32_t maxsize) {
 	return true;
 }
 
-void sqlrconnection::getNullBind(bindvar *bv) {
+void sqlrconnection_svr::getNullBind(bindvar_svr *bv) {
 
 	#ifdef SERVER_DEBUG
 		debugPrint("connection",4,"NULL");
@@ -245,7 +245,7 @@ void sqlrconnection::getNullBind(bindvar *bv) {
 	bv->isnull=nullBindValue();
 }
 
-bool sqlrconnection::getStringBind(bindvar *bv) {
+bool sqlrconnection_svr::getStringBind(bindvar_svr *bv) {
 
 	// get the size of the value
 	if (!getBindSize(bv,maxstringbindvaluelength)) {
@@ -279,7 +279,7 @@ bool sqlrconnection::getStringBind(bindvar *bv) {
 	return true;
 }
 
-bool sqlrconnection::getIntegerBind(bindvar *bv) {
+bool sqlrconnection_svr::getIntegerBind(bindvar_svr *bv) {
 
 	#ifdef SERVER_DEBUG
 		debugPrint("connection",4,"INTEGER");
@@ -305,7 +305,7 @@ bool sqlrconnection::getIntegerBind(bindvar *bv) {
 	return true;
 }
 
-bool sqlrconnection::getDoubleBind(bindvar *bv) {
+bool sqlrconnection_svr::getDoubleBind(bindvar_svr *bv) {
 
 	#ifdef SERVER_DEBUG
 		debugPrint("connection",4,"DOUBLE");
@@ -348,7 +348,7 @@ bool sqlrconnection::getDoubleBind(bindvar *bv) {
 	return true;
 }
 
-bool sqlrconnection::getLobBind(bindvar *bv) {
+bool sqlrconnection_svr::getLobBind(bindvar_svr *bv) {
 
 	#ifdef SERVER_DEBUG
 		if (bv->type==BLOB_BIND) {

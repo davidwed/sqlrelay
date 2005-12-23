@@ -12,10 +12,10 @@
 
 class msqlconnection;
 
-class msqlcursor : public sqlrcursor {
+class msqlcursor : public sqlrcursor_svr {
 	friend class msqlconnection;
 	private:
-				msqlcursor(sqlrconnection *conn);
+				msqlcursor(sqlrconnection_svr *conn);
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -38,16 +38,17 @@ class msqlcursor : public sqlrcursor {
 		msqlconnection	*msqlconn;
 };
 
-class msqlconnection : public sqlrconnection {
+class msqlconnection : public sqlrconnection_svr {
 	friend class msqlcursor;
 	public:
 			msqlconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
+		bool		supportsNativeBinds();
 		void	handleConnectString();
 		bool	logIn();
-		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		bool	isTransactional();
 		bool	ping();

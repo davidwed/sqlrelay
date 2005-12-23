@@ -7,7 +7,7 @@
 #include <rudiments/permissions.h>
 #include <rudiments/file.h>
 
-void sqlrconnection::markDatabaseAvailable() {
+void sqlrconnection_svr::markDatabaseAvailable() {
 
 	#ifdef SERVER_DEBUG
 	size_t	stringlen=9+charstring::length(updown)+1;
@@ -23,7 +23,7 @@ void sqlrconnection::markDatabaseAvailable() {
 	fd.create(updown,permissions::ownerReadWrite());
 }
 
-void sqlrconnection::markDatabaseUnavailable() {
+void sqlrconnection_svr::markDatabaseUnavailable() {
 
 	// if the database is behind a load balancer, don't mark it unavailable
 	if (constr->getBehindLoadBalancer()) {

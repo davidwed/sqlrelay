@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection::reExecuteQueryCommand(sqlrcursor *cursor) {
+bool sqlrconnection_svr::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"re-execute query");

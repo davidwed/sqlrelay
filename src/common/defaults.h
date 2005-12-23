@@ -93,6 +93,24 @@
 #define DEFAULT_BEHINDLOADBALANCER "no"
 	// default behind-load-balancer flag
 
+#define DEFAULT_SID_ENABLED false
+	// default sid-enabled flag
+
+#define DEFAULT_SID_HOST ""
+	// default sid-host
+
+#define DEFAULT_SID_PORT 0
+	// default sid-port
+
+#define DEFAULT_SID_SOCKET ""
+	// default sid-socket
+
+#define DEFAULT_SID_USER "user"
+	// default sid-user
+
+#define DEFAULT_SID_PASSWORD "password"
+	// default sid-password
+
 
 
 // cachemanager/sqlrclient parameters

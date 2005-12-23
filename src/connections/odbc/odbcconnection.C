@@ -84,11 +84,11 @@ bool odbcconnection::logIn() {
 	return true;
 }
 
-sqlrcursor *odbcconnection::initCursor() {
-	return (sqlrcursor *)new odbccursor((sqlrconnection *)this);
+sqlrcursor_svr *odbcconnection::initCursor() {
+	return (sqlrcursor_svr *)new odbccursor((sqlrconnection_svr *)this);
 }
 
-void odbcconnection::deleteCursor(sqlrcursor *curs) {
+void odbcconnection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (odbccursor *)curs;
 }
 
@@ -133,7 +133,7 @@ bool odbcconnection::rollback() {
 }
 #endif
 
-odbccursor::odbccursor(sqlrconnection *conn) : sqlrcursor(conn) {
+odbccursor::odbccursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	errormsg=NULL;
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;

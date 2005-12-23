@@ -28,15 +28,20 @@
 
 #include <defines.h>
 
+#ifdef INCLUDE_SID
+	#include <sqlrelay/sqlrclient.h>
+#endif
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
 
-class sqlrconnection : public daemonprocess, public listener, public debugfile {
-	friend class sqlrcursor;
+class sqlrconnection_svr :
+		public daemonprocess, public listener, public debugfile {
+	friend class sqlrcursor_svr;
 	public:
-			sqlrconnection();
-		virtual	~sqlrconnection();
+			sqlrconnection_svr();
+		virtual	~sqlrconnection_svr();
 
 		bool	initConnection(int argc, const char **argv,
 						bool detachbeforeloggingin);
@@ -47,6 +52,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 	protected:
 		// interface definition
 		virtual	uint16_t	getNumberOfConnectStringVars()=0;
+		virtual bool	supportsNativeBinds();
 		virtual	void	handleConnectString()=0;
 		virtual	bool	logIn()=0;
 		virtual	void	logOut()=0;
@@ -59,25 +65,25 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		virtual const char	*pingQuery();
 		virtual bool		ping();
 		virtual const char	*identify()=0;
-		virtual sqlrcursor	*initCursor()=0;
-		virtual void	deleteCursor(sqlrcursor *curs)=0;
+		virtual sqlrcursor_svr	*initCursor()=0;
+		virtual void	deleteCursor(sqlrcursor_svr *curs)=0;
 		virtual	int16_t	nonNullBindValue();
 		virtual	int16_t	nullBindValue();
 		virtual char	bindVariablePrefix();
 		virtual bool	bindValueIsNull(int16_t isnull);
-		virtual	bool	skipRows(sqlrcursor *cursor, uint64_t rows);
+		virtual	bool	skipRows(sqlrcursor_svr *cursor, uint64_t rows);
 		virtual bool	isTransactional();
 		virtual void	setUser(const char *user);
 		virtual void	setPassword(const char *password);
 		virtual const char	*getUser();
 		virtual const char	*getPassword();
-		virtual void	dropTempTables(sqlrcursor *cursor,
+		virtual void	dropTempTables(sqlrcursor_svr *cursor,
 						stringlist *tablelist);
-		virtual void	dropTempTable(sqlrcursor *cursor,
+		virtual void	dropTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);
-		virtual void	truncateTempTables(sqlrcursor *cursor,
+		virtual void	truncateTempTables(sqlrcursor_svr *cursor,
 						stringlist *tablelist);
-		virtual void	truncateTempTable(sqlrcursor *cursor,
+		virtual void	truncateTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);
 
 	public:
@@ -181,8 +187,8 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void		releaseSessionCountMutex();
 
 
-		sqlrcursor	*getCursor(uint16_t command);
-		sqlrcursor	*findAvailableCursor();
+		sqlrcursor_svr	*getCursor(uint16_t command);
+		sqlrcursor_svr	*findAvailableCursor();
 		void	closeCursors(bool destroy);
 		void	setUnixSocketDirectory();
 		bool	handlePidFile();
@@ -198,13 +204,13 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 		void	autoCommitCommand();
 		void	commitCommand();
 		void	rollbackCommand();
-		bool	newQueryCommand(sqlrcursor *cursor);
-		bool	reExecuteQueryCommand(sqlrcursor *cursor);
-		bool	fetchFromBindCursorCommand(sqlrcursor *cursor);
-		bool	fetchResultSetCommand(sqlrcursor *cursor);
-		void	abortResultSetCommand(sqlrcursor *cursor);
-		void	suspendResultSetCommand(sqlrcursor *cursor);
-		bool	resumeResultSetCommand(sqlrcursor *cursor);
+		bool	newQueryCommand(sqlrcursor_svr *cursor);
+		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
+		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);
+		bool	fetchResultSetCommand(sqlrcursor_svr *cursor);
+		void	abortResultSetCommand(sqlrcursor_svr *cursor);
+		void	suspendResultSetCommand(sqlrcursor_svr *cursor);
+		bool	resumeResultSetCommand(sqlrcursor_svr *cursor);
 		void	waitForClientClose();
 		void	closeSuspendedSessionSockets();
 		bool	authenticate();
@@ -214,42 +220,42 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 						const char *passwordbuffer);
 		bool	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-		int32_t	handleQuery(sqlrcursor *cursor,
+		int32_t	handleQuery(sqlrcursor_svr *cursor,
 					bool reexecute,
 					bool bindcursor,
 					bool reallyexecute);
-		bool	getQueryFromClient(sqlrcursor *cursor,
+		bool	getQueryFromClient(sqlrcursor_svr *cursor,
 						bool reexecute,
 						bool bindcursor);
-		void	resumeResultSet(sqlrcursor *cursor);
+		void	resumeResultSet(sqlrcursor_svr *cursor);
 		void	suspendSession();
 		void	endSession();
 		bool	getCommand(uint16_t *command);
 		void	noAvailableCursors(uint16_t command);
-		bool	getQuery(sqlrcursor *cursor);
-		bool	getInputBinds(sqlrcursor *cursor);
-		bool	getOutputBinds(sqlrcursor *cursor);
+		bool	getQuery(sqlrcursor_svr *cursor);
+		bool	getInputBinds(sqlrcursor_svr *cursor);
+		bool	getOutputBinds(sqlrcursor_svr *cursor);
 		bool	getBindVarCount(uint16_t *count);
-		bool	getBindVarName(bindvar *bv);
-		bool	getBindVarType(bindvar *bv);
-		void	getNullBind(bindvar *bv);
-		bool	getBindSize(bindvar *bv, uint32_t maxsize);
-		bool	getStringBind(bindvar *bv);
-		bool	getIntegerBind(bindvar *bv);
-		bool	getDoubleBind(bindvar *bv);
-		bool	getLobBind(bindvar *bv);
+		bool	getBindVarName(bindvar_svr *bv);
+		bool	getBindVarType(bindvar_svr *bv);
+		void	getNullBind(bindvar_svr *bv);
+		bool	getBindSize(bindvar_svr *bv, uint32_t maxsize);
+		bool	getStringBind(bindvar_svr *bv);
+		bool	getIntegerBind(bindvar_svr *bv);
+		bool	getDoubleBind(bindvar_svr *bv);
+		bool	getLobBind(bindvar_svr *bv);
 		bool	getSendColumnInfo();
-		bool	processQuery(sqlrcursor *cursor,
+		bool	processQuery(sqlrcursor_svr *cursor,
 						bool reexecute,
 						bool bindcursor,
 						bool reallyexecute);
-		void	commitOrRollback(sqlrcursor *cursor);
-		bool	handleError(sqlrcursor *cursor);
-		bool	returnError(sqlrcursor *cursor);
+		void	commitOrRollback(sqlrcursor_svr *cursor);
+		bool	handleError(sqlrcursor_svr *cursor);
+		bool	returnError(sqlrcursor_svr *cursor);
 		void	returnResultSet();
-		void	returnOutputBindValues(sqlrcursor *cursor);
-		void	returnResultSetHeader(sqlrcursor *cursor);
-		bool	returnResultSetData(sqlrcursor *cursor);
+		void	returnOutputBindValues(sqlrcursor_svr *cursor);
+		void	returnResultSetHeader(sqlrcursor_svr *cursor);
+		bool	returnResultSetData(sqlrcursor_svr *cursor);
 
 		void	initDatabaseAvailableFileName();
 		void	waitForAvailableDatabase();
@@ -307,7 +313,7 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 		memorypool	*bindpool;
 
-		sqlrcursor	**cur;
+		sqlrcursor_svr	**cur;
 
 		stringlist	sessiontemptablesfordrop;
 		stringlist	sessiontemptablesfortrunc;
@@ -322,6 +328,10 @@ class sqlrconnection : public daemonprocess, public listener, public debugfile {
 
 		semaphoreset	*semset;
 		sharedmemory	*idmemory;
+
+#ifdef INCLUDE_SID
+		sqlrconnection	*sid_sqlrcon;
+#endif
 
 	protected:
 

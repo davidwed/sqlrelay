@@ -35,10 +35,10 @@ struct fieldstruct {
 
 class interbaseconnection;
 
-class interbasecursor : public sqlrcursor {
+class interbasecursor : public sqlrcursor_svr {
 	friend class interbaseconnection;
 	private:
-				interbasecursor(sqlrconnection *conn);
+				interbasecursor(sqlrconnection_svr *conn);
 				~interbasecursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -104,7 +104,7 @@ class interbasecursor : public sqlrcursor {
 		bool		queryIsExecSP;
 };
 
-class interbaseconnection : public sqlrconnection {
+class interbaseconnection : public sqlrconnection_svr {
 	friend class interbasecursor;
 	public:
 			interbaseconnection();
@@ -113,8 +113,8 @@ class interbaseconnection : public sqlrconnection {
 		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn();
-		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		bool	commit();
 		bool	rollback();

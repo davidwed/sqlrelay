@@ -3,6 +3,6 @@
 
 #include <sqlrconnection.h>
 
-const char *sqlrconnection::connectStringValue(const char *variable) {
+const char *sqlrconnection_svr::connectStringValue(const char *variable) {
 	return constr->getConnectStringValue(variable);
 }

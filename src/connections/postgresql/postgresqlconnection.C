@@ -15,6 +15,9 @@ postgresqlconnection::postgresqlconnection() {
 	datatypeids=NULL;
 	datatypenames=NULL;
 	pgconn=(PGconn *)NULL;
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+	fakebinds=false;
+#endif
 }
 
 postgresqlconnection::~postgresqlconnection() {
@@ -27,6 +30,14 @@ static void nullNoticeProcessor(void *arg, const char *message) {
 
 uint16_t postgresqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
+}
+
+bool postgresqlconnection::supportsNativeBinds() {
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+	return !fakebinds;
+#else
+	return false;
+#endif
 }
 
 void postgresqlconnection::handleConnectString() {
@@ -106,11 +117,12 @@ bool postgresqlconnection::logIn() {
 	return true;
 }
 
-sqlrcursor *postgresqlconnection::initCursor() {
-	return (sqlrcursor *)new postgresqlcursor((sqlrconnection *)this);
+sqlrcursor_svr *postgresqlconnection::initCursor() {
+	return (sqlrcursor_svr *)new
+			postgresqlcursor((sqlrconnection_svr *)this);
 }
 
-void postgresqlconnection::deleteCursor(sqlrcursor *curs) {
+void postgresqlconnection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (postgresqlcursor *)curs;
 }
 
@@ -145,8 +157,8 @@ const char *postgresqlconnection::identify() {
 	return "postgresql";
 }
 
-postgresqlcursor::postgresqlcursor(sqlrconnection *conn) :
-						sqlrcursor(conn) {
+postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
+						sqlrcursor_svr(conn) {
 	postgresqlconn=(postgresqlconnection *)conn;
 	pgresult=NULL;
 #ifdef HAVE_POSTGRESQL_PQEXECPARAMS
@@ -377,18 +389,8 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 #ifdef HAVE_POSTGRESQL_PQEXECPARAMS
 	if (postgresqlconn->fakebinds) {
 #endif
-		// fake binds
-		const char	*queryptr=query;
-		stringbuffer	*newquery=fakeInputBinds(query);
-		if (newquery) {
-			queryptr=newquery->getString();
-		}
+		pgresult=PQexec(postgresqlconn->pgconn,query);
 
-		pgresult=PQexec(postgresqlconn->pgconn,queryptr);
-
-		if (newquery) {
-			delete newquery;
-		}
 #ifdef HAVE_POSTGRESQL_PQEXECPARAMS
 	} else {
 		if (bindcount) {

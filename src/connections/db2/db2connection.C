@@ -61,11 +61,11 @@ bool db2connection::logIn() {
 	return true;
 }
 
-sqlrcursor *db2connection::initCursor() {
-	return (sqlrcursor *)new db2cursor((sqlrconnection *)this);
+sqlrcursor_svr *db2connection::initCursor() {
+	return (sqlrcursor_svr *)new db2cursor((sqlrconnection_svr *)this);
 }
 
-void db2connection::deleteCursor(sqlrcursor *curs) {
+void db2connection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (db2cursor *)curs;
 }
 
@@ -114,7 +114,7 @@ const char *db2connection::identify() {
 	return "db2";
 }
 
-db2cursor::db2cursor(sqlrconnection *conn) : sqlrcursor(conn) {
+db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	errormsg=NULL;
 	stmt=0;

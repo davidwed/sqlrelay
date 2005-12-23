@@ -3,6 +3,6 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::flushWriteBuffer() {
+void sqlrconnection_svr::flushWriteBuffer() {
 	clientsock->flushWriteBuffer(-1,-1);
 }

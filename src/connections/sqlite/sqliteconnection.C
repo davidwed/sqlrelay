@@ -16,13 +16,17 @@
 #endif
 
 
-sqliteconnection::sqliteconnection() : sqlrconnection() {
+sqliteconnection::sqliteconnection() : sqlrconnection_svr() {
 	sqliteptr=NULL;
 	errmesg=NULL;
 }
 
 uint16_t sqliteconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
+}
+
+bool sqliteconnection::supportsNativeBinds() {
+	return false;
 }
 
 void sqliteconnection::handleConnectString() {
@@ -50,11 +54,11 @@ bool sqliteconnection::logIn() {
 #endif
 }
 
-sqlrcursor *sqliteconnection::initCursor() {
-	return (sqlrcursor *)new sqlitecursor((sqlrconnection *)this);
+sqlrcursor_svr *sqliteconnection::initCursor() {
+	return (sqlrcursor_svr *)new sqlitecursor((sqlrconnection_svr *)this);
 }
 
-void sqliteconnection::deleteCursor(sqlrcursor *curs) {
+void sqliteconnection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (sqlitecursor *)curs;
 }
 
@@ -88,11 +92,10 @@ bool sqliteconnection::rollback() {
 }
 #endif
 
-sqlitecursor::sqlitecursor(sqlrconnection *conn) : sqlrcursor(conn) {
+sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	result=NULL;
 	columnnames=NULL;
-	newquery=NULL;
 	nrow=0;
 	ncolumn=0;
 	rowindex=0;
@@ -107,15 +110,12 @@ sqlitecursor::~sqlitecursor() {
 bool sqlitecursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
-	// fake binds
-	newquery=fakeInputBinds(query);
-
 	// execute the query
 	int	success=0;
 #ifdef SQLITE_TRANSACTIONAL
 	for (;;) {
 
-		success=runQuery(newquery,query);
+		success=runQuery(query);
 
 		// If we get a SQLITE_SCHEMA return value, we should retry
 		// the query.
@@ -138,11 +138,10 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length,
 			// If for some reason, querying sqlite_master doesn't
 			// return SQLITE_SCHEMA, rerun the original query and
 			// jump out of the loop.
-			if (runQuery(NULL,"select * from sqlite_master")
+			if (runQuery("select * from sqlite_master")
 							!=SQLITE_SCHEMA) {
 				cleanUpData(true,true);
-				newquery=fakeInputBinds(query);
-				success=runQuery(newquery,query);
+				success=runQuery(query);
 				break;
 			}
 		} else {
@@ -168,7 +167,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length,
 #endif
 		return false;
 	}
-	success=runQuery(newquery,query);
+	success=runQuery(query);
 #endif
 
 	checkForTempTable(query,length);
@@ -186,7 +185,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length,
 	return (success==SQLITE_OK);
 }
 
-int sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
+int sqlitecursor::runQuery(const char *query) {
 
 	// clear any errors
 	if (sqliteconn->errmesg) {
@@ -209,17 +208,10 @@ int sqlitecursor::runQuery(stringbuffer *newquery, const char *query) {
 	rowindex=0;
 
 	// run the appropriate query
-	if (newquery) {
-		return sqlite3_get_table(sqliteconn->sqliteptr,
-					newquery->getString(),
-					&result,&nrow,&ncolumn,
-					&sqliteconn->errmesg);
-	} else {
-		return sqlite3_get_table(sqliteconn->sqliteptr,
+	return sqlite3_get_table(sqliteconn->sqliteptr,
 					query,
 					&result,&nrow,&ncolumn,
 					&sqliteconn->errmesg);
-	}
 }
 
 const char *sqlitecursor::getErrorMessage(bool *liveconnection) {
@@ -302,10 +294,6 @@ void sqlitecursor::returnRow() {
 
 void sqlitecursor::cleanUpData(bool freeresult, bool freebinds) {
 
-	if (newquery) {
-		delete newquery;
-		newquery=NULL;
-	}
 	if (freeresult && result) {
 		sqlite3_free_table(result);
 		result=NULL;

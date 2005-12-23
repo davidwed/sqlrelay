@@ -7,20 +7,22 @@
 #include <defines.h>
 
 #ifdef INCLUDE_SID
-	#include <mysql.h>
+	#include <sqlrelay/sqlrclient.h>
+
+#else
+	// FIXME: lame, defined here and in the client
+	enum bindtype {
+		NULL_BIND,
+		STRING_BIND,
+		INTEGER_BIND,
+		DOUBLE_BIND,
+		BLOB_BIND,
+		CLOB_BIND,
+		CURSOR_BIND
+	};
 #endif
 
-enum bindtype {
-	NULL_BIND,
-	STRING_BIND,
-	INTEGER_BIND,
-	DOUBLE_BIND,
-	BLOB_BIND,
-	CLOB_BIND,
-	CURSOR_BIND
-};
-
-class bindvar {
+class bindvar_svr {
 	public:
 		char	*variable;
 		int16_t	variablesize;
@@ -39,13 +41,13 @@ class bindvar {
 		int16_t		isnull;
 };
 
-class sqlrconnection;
+class sqlrconnection_svr;
 
-class sqlrcursor {
-	friend class sqlrconnection;
+class sqlrcursor_svr {
+	friend class sqlrconnection_svr;
 	public:
-			sqlrcursor(sqlrconnection *conn);
-		virtual	~sqlrcursor();
+			sqlrcursor_svr(sqlrconnection_svr *conn);
+		virtual	~sqlrcursor_svr();
 
 		// interface definition
 		virtual	bool	openCursor(uint16_t id);
@@ -101,7 +103,7 @@ class sqlrcursor {
 						int16_t *isnull);
 		virtual	bool	outputBindCursor(const char *variable,
 						uint16_t variablesize,
-						sqlrcursor *cursor);
+						sqlrcursor_svr *cursor);
 		virtual	void	returnOutputBindBlob(uint16_t index);
 		virtual	void	returnOutputBindClob(uint16_t index);
 		virtual	void	returnOutputBindCursor(uint16_t index);
@@ -135,8 +137,8 @@ class sqlrcursor {
 					int32_t num_fields,
 					const char * const *field_names);
 
-		/* method connects to SID database */
-		virtual void	sql_injection_detection_database_init();
+		/* method ends sid SID database session */
+		virtual void	sql_injection_detection_database_close();
 
 		/* method maintains log for SQL Injection Detection */
 		virtual void 	sql_injection_detection_log(const char *query,
@@ -184,7 +186,7 @@ class sqlrcursor {
 		bool	advance(char **ptr, const char *endptr,
 						uint16_t steps);
 
-		sqlrconnection	*conn;
+		sqlrconnection_svr	*conn;
 
 #ifdef INCLUDE_SID
 		// variables for SID
@@ -201,20 +203,22 @@ class sqlrcursor {
 
 		char	sid_log_message[BUFSIZ];
 
-		MYSQL		*sid_mysql;
+		/*MYSQL		*sid_mysql;
 		MYSQL_RES	*sid_res;
 		MYSQL_ROW	sid_row;
-		MYSQL_FIELD	*sid_fields;
+		MYSQL_FIELD	*sid_fields;*/
 
-		int32_t	sid_query_result;
+		sqlrcursor	*sid_sqlrcur;
+
+		//int32_t	sid_query_result;
 
 		bool	sql_injection_detection;
 #endif
 
 		uint16_t	inbindcount;
-		bindvar		inbindvars[MAXVAR];
+		bindvar_svr	inbindvars[MAXVAR];
 		uint16_t	outbindcount;
-		bindvar		outbindvars[MAXVAR];
+		bindvar_svr	outbindvars[MAXVAR];
 
 	private:
 		// methods used internally

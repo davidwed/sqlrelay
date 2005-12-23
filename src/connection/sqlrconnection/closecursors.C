@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::closeCursors(bool destroy) {
+void sqlrconnection_svr::closeCursors(bool destroy) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"closing cursors...");

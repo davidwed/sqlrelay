@@ -3,18 +3,22 @@
 
 #include <sqlrconnection.h>
 
-short sqlrconnection::nonNullBindValue() {
+bool sqlrconnection_svr::supportsNativeBinds() {
+	return true;
+}
+
+short sqlrconnection_svr::nonNullBindValue() {
 	return 0;
 }
 
-short sqlrconnection::nullBindValue() {
+short sqlrconnection_svr::nullBindValue() {
 	return -1;
 }
 
-char sqlrconnection::bindVariablePrefix() {
+char sqlrconnection_svr::bindVariablePrefix() {
 	return ':';
 }
 
-bool sqlrconnection::bindValueIsNull(short isnull) {
+bool sqlrconnection_svr::bindValueIsNull(short isnull) {
 	return (isnull==nullBindValue());
 }

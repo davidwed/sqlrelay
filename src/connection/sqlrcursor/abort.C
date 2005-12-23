@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrcursor::abort() {
+void sqlrcursor_svr::abort() {
 	// Very important...
 	// Do not cleanUpData() here, otherwise result sets that were suspended
 	// after the entire result set was fetched won't be able to return
@@ -12,7 +12,7 @@ void sqlrcursor::abort() {
 	busy=false;
 }
 
-void sqlrcursor::cleanUpData(bool freeresult, bool freebinds) {
+void sqlrcursor_svr::cleanUpData(bool freeresult, bool freebinds) {
 	// by default, do nothing...
 	return;
 }

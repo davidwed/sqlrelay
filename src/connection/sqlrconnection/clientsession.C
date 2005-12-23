@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::clientSession() {
+void sqlrconnection_svr::clientSession() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"client session...");
@@ -53,7 +53,7 @@ void sqlrconnection::clientSession() {
 		// a cursor.  Get the cursor to work with.  Save the result of
 		// this, the client may be sending more information and we need
 		// to collect it.
-		sqlrcursor	*cursor=getCursor(command);
+		sqlrcursor_svr	*cursor=getCursor(command);
 		if (!cursor) {
 			noAvailableCursors(command);
 			continue;
@@ -99,7 +99,7 @@ void sqlrconnection::clientSession() {
 	#endif
 }
 
-sqlrcursor *sqlrconnection::getCursor(uint16_t command) {
+sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"getting a cursor...");
@@ -117,7 +117,7 @@ sqlrcursor *sqlrconnection::getCursor(uint16_t command) {
 		return NULL;
 	}
 
-	sqlrcursor	*cursor=NULL;
+	sqlrcursor_svr	*cursor=NULL;
 
 	if (neednewcursor==DONT_NEED_NEW_CURSOR) {
 
@@ -162,7 +162,7 @@ sqlrcursor *sqlrconnection::getCursor(uint16_t command) {
 	return cursor;
 }
 
-sqlrcursor *sqlrconnection::findAvailableCursor() {
+sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 
 	for (int16_t i=0; i<cfgfl->getCursors(); i++) {
 		if (!cur[i]->busy) {
@@ -180,7 +180,7 @@ sqlrcursor *sqlrconnection::findAvailableCursor() {
 	return NULL;
 }
 
-void sqlrconnection::waitForClientClose() {
+void sqlrconnection_svr::waitForClientClose() {
 
 	// Sometimes the server sends the result set and closes the socket
 	// while part of it is buffered but not yet transmitted.  This caused
@@ -207,7 +207,7 @@ void sqlrconnection::waitForClientClose() {
 	#endif
 }
 
-void sqlrconnection::closeSuspendedSessionSockets() {
+void sqlrconnection_svr::closeSuspendedSessionSockets() {
 
 	// If we're no longer in a suspended session and we we're passing 
 	// around file descriptors but had to open a set of sockets to handle 
@@ -240,7 +240,7 @@ void sqlrconnection::closeSuspendedSessionSockets() {
 	}
 }
 
-void sqlrconnection::noAvailableCursors(uint16_t command) {
+void sqlrconnection_svr::noAvailableCursors(uint16_t command) {
 
 	// If no cursor was available, the client
 	// cound send an entire query and bind vars
@@ -281,7 +281,7 @@ void sqlrconnection::noAvailableCursors(uint16_t command) {
 	flushWriteBuffer();
 }
 
-bool sqlrconnection::getCommand(uint16_t *command) {
+bool sqlrconnection_svr::getCommand(uint16_t *command) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"getting command...");

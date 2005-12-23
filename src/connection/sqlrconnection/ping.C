@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::pingCommand() {
+void sqlrconnection_svr::pingCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"ping");
 	#endif
@@ -11,8 +11,8 @@ void sqlrconnection::pingCommand() {
 	flushWriteBuffer();
 }
 
-bool sqlrconnection::ping() {
-	sqlrcursor	*pingcur=initCursor();
+bool sqlrconnection_svr::ping() {
+	sqlrcursor_svr	*pingcur=initCursor();
 	const char	*pingquery=pingQuery();
 	int		pingquerylen=charstring::length(pingQuery());
 	if (pingcur->openCursor(0) &&
@@ -28,6 +28,6 @@ bool sqlrconnection::ping() {
 	return false;
 }
 
-const char *sqlrconnection::pingQuery() {
+const char *sqlrconnection_svr::pingQuery() {
 	return "select 1";
 }

@@ -3,6 +3,6 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection::isTransactional() {
+bool sqlrconnection_svr::isTransactional() {
 	return true;
 }

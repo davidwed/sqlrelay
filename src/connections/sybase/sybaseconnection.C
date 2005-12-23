@@ -231,11 +231,11 @@ void sybaseconnection::logInError(const char *error, uint16_t stage) {
 	}
 }
 
-sqlrcursor *sybaseconnection::initCursor() {
-	return (sqlrcursor *)new sybasecursor((sqlrconnection *)this);
+sqlrcursor_svr *sybaseconnection::initCursor() {
+	return (sqlrcursor_svr *)new sybasecursor((sqlrconnection_svr *)this);
 }
 
-void sybaseconnection::deleteCursor(sqlrcursor *curs) {
+void sybaseconnection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (sybasecursor *)curs;
 }
 
@@ -255,7 +255,7 @@ char sybaseconnection::bindVariablePrefix() {
 	return '@';
 }
 
-sybasecursor::sybasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
+sybasecursor::sybasecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	prepared=false;
 	sybaseconn=(sybaseconnection *)conn;
 	cmd=NULL;
@@ -308,7 +308,7 @@ bool sybasecursor::openCursor(uint16_t id) {
 		}
 		cleanUpData(true,true);
 	}
-	return (retval && sqlrcursor::openCursor(id));
+	return (retval && sqlrcursor_svr::openCursor(id));
 }
 
 bool sybasecursor::closeCursor() {
@@ -1124,7 +1124,7 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 }
 
 
-void sybaseconnection::dropTempTable(sqlrcursor *cursor,
+void sybaseconnection::dropTempTable(sqlrcursor_svr *cursor,
 					const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table #")->append(tablename);

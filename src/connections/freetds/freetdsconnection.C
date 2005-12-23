@@ -42,6 +42,14 @@ uint16_t freetdsconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
+bool freetdsconnection::supportsNativeBinds() {
+#ifdef FREETDS_SUPPORTS_CURSORS
+	return true;
+#else
+	return false;
+#endif
+}
+
 void freetdsconnection::handleConnectString() {
 	sybase=connectStringValue("sybase");
 	lang=connectStringValue("lang");
@@ -242,7 +250,7 @@ void freetdsconnection::logInError(const char *error, uint16_t stage) {
 	}
 }
 
-sqlrcursor *freetdsconnection::initCursor() {
+sqlrcursor_svr *freetdsconnection::initCursor() {
 	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
 	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
 	// more than 1 cursor, but really we're only using one, so some things
@@ -251,12 +259,12 @@ sqlrcursor *freetdsconnection::initCursor() {
 	if (singlecursor) {
 		return singlecursor;
 	}
-	singlecursor=new freetdscursor((sqlrconnection *)this);
+	singlecursor=new freetdscursor((sqlrconnection_svr *)this);
 	return singlecursor;
-	//return (sqlrcursor *)new freetdscursor((sqlrconnection *)this);
+	//return (sqlrcursor_svr *)new freetdscursor((sqlrconnection_svr *)this);
 }
 
-void freetdsconnection::deleteCursor(sqlrcursor *curs) {
+void freetdsconnection::deleteCursor(sqlrcursor_svr *curs) {
 	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
 	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
 	// more than 1 cursor, but really we're only using one, so some things
@@ -286,7 +294,7 @@ char freetdsconnection::bindVariablePrefix() {
 	return '@';
 }
 
-freetdscursor::freetdscursor(sqlrconnection *conn) : sqlrcursor(conn) {
+freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
 	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
@@ -391,7 +399,7 @@ bool freetdscursor::openCursor(uint16_t id) {
 		}
 		cleanUpData(true,true);
 	}
-	return (retval && sqlrcursor::openCursor(id));
+	return (retval && sqlrcursor_svr::openCursor(id));
 }
 
 bool freetdscursor::closeCursor() {
@@ -695,27 +703,12 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 		freetdsconn->errorstring=NULL;
 	}
 
-#ifndef FREETDS_SUPPORTS_CURSORS
-	stringbuffer	*newquery=fakeInputBinds(query);
-	if (newquery) {
-		if (ct_command(cmd,CS_LANG_CMD,
-				newquery->getString(),
-				charstring::length(
-					newquery->getString()),
-				CS_UNUSED)!=CS_SUCCEED) {
-			delete newquery;
-			return false;
-		}
-		delete newquery;
-	} else {
-		if (ct_command(cmd,CS_LANG_CMD,
-				(CS_CHAR *)query,length,
-				CS_UNUSED)!=CS_SUCCEED) {
-			return false;
-		}
+	if (ct_command(cmd,CS_LANG_CMD,
+			(CS_CHAR *)query,length,
+			CS_UNUSED)!=CS_SUCCEED) {
+		return false;
 	}
 	clean=false;
-#endif
 
 	// initialize return values
 	ncols=0;
@@ -1324,7 +1317,7 @@ CS_RETCODE freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 }
 
 
-void freetdsconnection::dropTempTable(sqlrcursor *cursor,
+void freetdsconnection::dropTempTable(sqlrcursor_svr *cursor,
 					const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table #")->append(tablename);

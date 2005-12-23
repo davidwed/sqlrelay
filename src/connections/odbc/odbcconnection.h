@@ -30,7 +30,7 @@
 
 #include <config.h>
 
-struct column {
+struct odbccolumn {
 	char		name[MAX_ITEM_BUFFER_SIZE];
 	uint16_t	namelength;
 	// SQLColAttribute requires that these are signed, 32 bit integers
@@ -50,10 +50,10 @@ struct column {
 
 class odbcconnection;
 
-class odbccursor : public sqlrcursor {
+class odbccursor : public sqlrcursor_svr {
 	friend class odbcconnection;
 	private:
-				odbccursor(sqlrconnection *conn);
+				odbccursor(sqlrconnection_svr *conn);
 				~odbccursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -120,7 +120,7 @@ class odbccursor : public sqlrcursor {
 					[MAX_ITEM_BUFFER_SIZE];
 		SQLINTEGER	indicator[MAX_SELECT_LIST_SIZE];
 //#endif
-		column 		col[MAX_SELECT_LIST_SIZE];
+		odbccolumn 	col[MAX_SELECT_LIST_SIZE];
 
 		uint32_t	row;
 		uint32_t	maxrow;
@@ -132,14 +132,14 @@ class odbccursor : public sqlrcursor {
 		odbcconnection	*odbcconn;
 };
 
-class odbcconnection : public sqlrconnection {
+class odbcconnection : public sqlrconnection_svr {
 	friend class odbccursor;
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn();
-		sqlrcursor	*initCursor();
-		void		deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 #if (ODBCVER>=0x0300)
 		bool		autoCommitOn();

@@ -24,10 +24,10 @@ extern "C" {
 
 class freetdsconnection;
 
-class freetdscursor : public sqlrcursor {
+class freetdscursor : public sqlrcursor_svr {
 	friend class freetdsconnection;
 	private:
-				freetdscursor(sqlrconnection *conn);
+				freetdscursor(sqlrconnection_svr *conn);
 				~freetdscursor();
 		bool		openCursor(uint16_t id);
 		bool		closeCursor();
@@ -133,22 +133,23 @@ class freetdscursor : public sqlrcursor {
 };
 
 
-class freetdsconnection : public sqlrconnection {
+class freetdsconnection : public sqlrconnection_svr {
 	friend class freetdscursor;
 	public:
 			freetdsconnection();
 			~freetdsconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
+		bool		supportsNativeBinds();
 		void	handleConnectString();
 		bool	logIn();
 		void	logInError(const char *error, uint16_t stage);
-		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		const char	*identify();
 		char	bindVariablePrefix();
-		void	dropTempTable(sqlrcursor *cursor,
+		void	dropTempTable(sqlrcursor_svr *cursor,
 					const char *tablename);
 
 		CS_CONTEXT	*context;

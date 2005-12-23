@@ -20,10 +20,10 @@ extern "C" {
 
 class sybaseconnection;
 
-class sybasecursor : public sqlrcursor {
+class sybasecursor : public sqlrcursor_svr {
 	friend class sybaseconnection;
 	private:
-				sybasecursor(sqlrconnection *conn);
+				sybasecursor(sqlrconnection_svr *conn);
 				~sybasecursor();
 		bool		openCursor(uint16_t id);
 		bool		closeCursor();
@@ -121,7 +121,7 @@ class sybasecursor : public sqlrcursor {
 };
 
 
-class sybaseconnection : public sqlrconnection {
+class sybaseconnection : public sqlrconnection_svr {
 	friend class sybasecursor;
 	public:
 			sybaseconnection();
@@ -131,12 +131,12 @@ class sybaseconnection : public sqlrconnection {
 		void		handleConnectString();
 		bool		logIn();
 		void		logInError(const char *error, uint16_t stage);
-		sqlrcursor	*initCursor();
-		void		deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		const char	*identify();
 		char		bindVariablePrefix();
-		void		dropTempTable(sqlrcursor *cursor,
+		void		dropTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);
 
 		CS_CONTEXT	*context;

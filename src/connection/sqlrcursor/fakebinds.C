@@ -5,7 +5,7 @@
 
 #include <sqlrconnection.h>
 
-stringbuffer *sqlrcursor::fakeInputBinds(const char *query) {
+stringbuffer *sqlrcursor_svr::fakeInputBinds(const char *query) {
 
 	// return null if there aren't any input binds
 	if (!inbindcount) {
@@ -103,7 +103,7 @@ stringbuffer *sqlrcursor::fakeInputBinds(const char *query) {
 	return outputquery;
 }
 
-void sqlrcursor::performSubstitution(stringbuffer *buffer, int16_t index) {
+void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 	if (inbindvars[index].type==STRING_BIND) {
 
 		buffer->append("'");

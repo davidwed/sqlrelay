@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection::resumeResultSetCommand(sqlrcursor *cursor) {
+bool sqlrconnection_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"resume result set");
 	#endif
@@ -15,7 +15,7 @@ bool sqlrconnection::resumeResultSetCommand(sqlrcursor *cursor) {
 	return true;
 }
 
-void sqlrconnection::resumeResultSet(sqlrcursor *cursor) {
+void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"resume result set...");

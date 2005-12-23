@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection::returnResultSetData(sqlrcursor *cursor) {
+bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning result set data...");

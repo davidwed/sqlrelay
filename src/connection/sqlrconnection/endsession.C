@@ -3,14 +3,14 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::endSessionCommand() {
+void sqlrconnection_svr::endSessionCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"end session");
 	#endif
 	endSession();
 }
 
-void sqlrconnection::endSession() {
+void sqlrconnection_svr::endSession() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"ending session...");
@@ -74,7 +74,7 @@ void sqlrconnection::endSession() {
 	#endif
 }
 
-void sqlrconnection::abortAllCursors() {
+void sqlrconnection_svr::abortAllCursors() {
 	// abort all cursors
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"aborting all busy cursors...");

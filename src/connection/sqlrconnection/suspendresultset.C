@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::suspendResultSetCommand(sqlrcursor *cursor) {
+void sqlrconnection_svr::suspendResultSetCommand(sqlrcursor_svr *cursor) {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"suspend result set");
 	#endif

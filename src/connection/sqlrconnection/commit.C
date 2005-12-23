@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::commitCommand() {
+void sqlrconnection_svr::commitCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"commit");
 	#endif
@@ -12,13 +12,13 @@ void sqlrconnection::commitCommand() {
 	commitorrollback=false;
 }
 
-bool sqlrconnection::commit() {
+bool sqlrconnection_svr::commit() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"commit...");
 	#endif
 
-	sqlrcursor	*commitcur=initCursor();
+	sqlrcursor_svr	*commitcur=initCursor();
 	char	*commitquery="commit";
 	int	commitquerylen=6;
 	bool	retval=false;

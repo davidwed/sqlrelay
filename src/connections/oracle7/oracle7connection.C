@@ -99,11 +99,11 @@ bool oracle7connection::logIn() {
 	return true;
 }
 
-sqlrcursor *oracle7connection::initCursor() {
-	return (sqlrcursor *)new oracle7cursor((sqlrconnection *)this);
+sqlrcursor_svr *oracle7connection::initCursor() {
+	return (sqlrcursor_svr *)new oracle7cursor((sqlrconnection_svr *)this);
 }
 
-void oracle7connection::deleteCursor(sqlrcursor *curs) {
+void oracle7connection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (oracle7cursor *)curs;
 }
 
@@ -135,7 +135,7 @@ const char *oracle7connection::identify() {
 	return "oracle7";
 }
 
-oracle7cursor::oracle7cursor(sqlrconnection *conn) : sqlrcursor(conn) {
+oracle7cursor::oracle7cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	errormessage=NULL;
 	oracle7conn=(oracle7connection *)conn;
 	inputbindcount=0;
@@ -155,7 +155,7 @@ oracle7cursor::~oracle7cursor() {
 bool oracle7cursor::openCursor(uint16_t id) {
 	return (!oopen(&cda,&oracle7conn->lda,
 			(text *)0,-1,-1,(text *)0,-1) &&
-			sqlrcursor::openCursor(id));
+			sqlrcursor_svr::openCursor(id));
 }
 
 bool oracle7cursor::closeCursor() {

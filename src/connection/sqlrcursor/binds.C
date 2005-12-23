@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrcursor::handleBinds() {
+bool sqlrcursor_svr::handleBinds() {
 	
 	// iterate through the arrays, binding values to variables
 	for (int16_t i=0; i<inbindcount; i++) {
@@ -101,7 +101,7 @@ bool sqlrcursor::handleBinds() {
 	return true;
 }
 
-bool sqlrcursor::inputBindString(const char *variable,
+bool sqlrcursor_svr::inputBindString(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint16_t valuesize,
@@ -110,14 +110,14 @@ bool sqlrcursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::inputBindInteger(const char *variable,
+bool sqlrcursor_svr::inputBindInteger(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 	// by default, do nothing...
 	return true;
 }
 
-bool sqlrcursor::inputBindDouble(const char *variable,
+bool sqlrcursor_svr::inputBindDouble(const char *variable,
 					uint16_t variablesize,
 					double *value, 
 					uint32_t precision,
@@ -126,7 +126,7 @@ bool sqlrcursor::inputBindDouble(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::inputBindBlob(const char *variable,
+bool sqlrcursor_svr::inputBindBlob(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint32_t valuesize,
@@ -135,7 +135,7 @@ bool sqlrcursor::inputBindBlob(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::inputBindClob(const char *variable,
+bool sqlrcursor_svr::inputBindClob(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint32_t valuesize,
@@ -144,7 +144,7 @@ bool sqlrcursor::inputBindClob(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::outputBindString(const char *variable,
+bool sqlrcursor_svr::outputBindString(const char *variable,
 					uint16_t variablesize,
 					char *value, 
 					uint16_t valuesize, 
@@ -153,7 +153,7 @@ bool sqlrcursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::outputBindInteger(const char *variable,
+bool sqlrcursor_svr::outputBindInteger(const char *variable,
 					uint16_t variablesize,
 					int64_t *value,
 					int16_t *isnull) {
@@ -161,7 +161,7 @@ bool sqlrcursor::outputBindInteger(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::outputBindDouble(const char *variable,
+bool sqlrcursor_svr::outputBindDouble(const char *variable,
 					uint16_t variablesize,
 					double *value,
 					uint32_t *precision,
@@ -171,7 +171,7 @@ bool sqlrcursor::outputBindDouble(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::outputBindBlob(const char *variable,
+bool sqlrcursor_svr::outputBindBlob(const char *variable,
 					uint16_t variablesize,
 					uint16_t index,
 					int16_t *isnull) {
@@ -179,7 +179,7 @@ bool sqlrcursor::outputBindBlob(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::outputBindClob(const char *variable,
+bool sqlrcursor_svr::outputBindClob(const char *variable,
 					uint16_t variablesize,
 					uint16_t index,
 					int16_t *isnull) {
@@ -187,24 +187,24 @@ bool sqlrcursor::outputBindClob(const char *variable,
 	return true;
 }
 
-bool sqlrcursor::outputBindCursor(const char *variable,
+bool sqlrcursor_svr::outputBindCursor(const char *variable,
 					uint16_t variablesize,
-					sqlrcursor *cursor) {
+					sqlrcursor_svr *cursor) {
 	// by default, do nothing...
 	return true;
 }
 
-void sqlrcursor::returnOutputBindBlob(uint16_t index) {
+void sqlrcursor_svr::returnOutputBindBlob(uint16_t index) {
 	// by default, do nothing...
 	return;
 }
 
-void sqlrcursor::returnOutputBindClob(uint16_t index) {
+void sqlrcursor_svr::returnOutputBindClob(uint16_t index) {
 	// by default, do nothing...
 	return;
 }
 
-void sqlrcursor::returnOutputBindCursor(uint16_t index) {
+void sqlrcursor_svr::returnOutputBindCursor(uint16_t index) {
 	// by default, do nothing...
 	return;
 }

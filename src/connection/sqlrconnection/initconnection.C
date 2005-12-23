@@ -7,7 +7,7 @@
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
 
-bool sqlrconnection::initConnection(int argc, const char **argv,
+bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 						bool detachbeforeloggingin) {
 
 	// process command line
@@ -108,6 +108,18 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
 
+#ifdef INCLUDE_SID
+	// log into the sid database
+	if (cfgfl->getSidEnabled()) {
+		sid_sqlrcon=new sqlrconnection(cfgfl->getSidHost(),
+						cfgfl->getSidPort(),
+						cfgfl->getSidUnixPort(),
+						cfgfl->getSidUser(),
+						cfgfl->getSidPassword(),
+						0,1);
+	}
+#endif
+
 	// if we're not passing descriptors around, listen on 
 	// inet and unix sockets for client connections
 	if (!cfgfl->getPassDescriptor()) {
@@ -116,7 +128,7 @@ bool sqlrconnection::initConnection(int argc, const char **argv,
 	return true;
 }
 
-void sqlrconnection::setUserAndGroup() {
+void sqlrconnection_svr::setUserAndGroup() {
 
 	// get the user that we're currently running as
 	char	*currentuser=NULL;
@@ -147,14 +159,14 @@ void sqlrconnection::setUserAndGroup() {
 	delete[] currentgroup;
 }
 
-void sqlrconnection::setUnixSocketDirectory() {
+void sqlrconnection_svr::setUnixSocketDirectory() {
 	size_t	unixsocketlen=tmpdir->getLength()+31;
 	unixsocket=new char[unixsocketlen];
 	snprintf(unixsocket,unixsocketlen,"%s/sockets/",tmpdir->getString());
 	unixsocketptr=unixsocket+tmpdir->getLength()+8+1;
 }
 
-bool sqlrconnection::handlePidFile() {
+bool sqlrconnection_svr::handlePidFile() {
 
 	// check for pid file
 	size_t	pidfilelen=tmpdir->getLength()+20+
@@ -179,7 +191,7 @@ bool sqlrconnection::handlePidFile() {
 	return retval;
 }
 
-void sqlrconnection::initDatabaseAvailableFileName() {
+void sqlrconnection_svr::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
 	size_t	updownlen=charstring::length(tmpdir->getString())+5+
@@ -190,7 +202,7 @@ void sqlrconnection::initDatabaseAvailableFileName() {
 			tmpdir->getString(),cmdl->getId(),connectionid);
 }
 
-void sqlrconnection::blockSignals() {
+void sqlrconnection_svr::blockSignals() {
 
 	// the daemon class handles SIGTERM's and SIGINT's
 	// and we need to handle SIGALRMS so dynamically spawned daemons
@@ -328,7 +340,7 @@ void sqlrconnection::blockSignals() {
 	signalmanager::ignoreSignals(set.getSignalSet());
 }
 
-bool sqlrconnection::attemptLogIn() {
+bool sqlrconnection_svr::attemptLogIn() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"logging in...");
@@ -347,7 +359,7 @@ bool sqlrconnection::attemptLogIn() {
 	return true;
 }
 
-void sqlrconnection::setInitialAutoCommitBehavior() {
+void sqlrconnection_svr::setInitialAutoCommitBehavior() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"setting autocommit...");
@@ -376,7 +388,7 @@ void sqlrconnection::setInitialAutoCommitBehavior() {
 	#endif
 }
 
-bool sqlrconnection::initCursors(bool create) {
+bool sqlrconnection_svr::initCursors(bool create) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"initializing cursors...");
@@ -384,7 +396,7 @@ bool sqlrconnection::initCursors(bool create) {
 
 	int32_t	cursorcount=cfgfl->getCursors();
 	if (create) {
-		cur=new sqlrcursor *[cursorcount];
+		cur=new sqlrcursor_svr *[cursorcount];
 		for (int32_t i=0; i<cursorcount; i++) {
 			cur[i]=NULL;
 		}

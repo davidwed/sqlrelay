@@ -1,10 +1,16 @@
-apply, test Gena01's php pear db patch
-
 ttl of 15 works, but ttl of 60 causes the connections to never die
 
 add ttl tuning recommendations to tuning doc
 
 get sid working, document
+	move egress checking into sqlrconnection class
+	how to:
+		create db
+		create user
+		mysql -usiddb -psiddb siddb < siddb
+		set up sqlrelay instance to talk to it
+		set up another instance to use siddb instance for sid
+		populate siddb
 
 * NLS_LANG-like issues with other db's?
 

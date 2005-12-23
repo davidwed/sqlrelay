@@ -10,7 +10,7 @@
 
 #include <config.h>
 
-bool sqlrconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
+bool sqlrconnection_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 							const char *id) {
 
 	size_t	idfilenamelen=charstring::length(tmpdir)+5+
@@ -65,7 +65,7 @@ bool sqlrconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	return true;
 }
 
-void sqlrconnection::waitForListenerToRequireAConnection() {
+void sqlrconnection_svr::waitForListenerToRequireAConnection() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"waiting for the listener to require a connection");
 	#endif
@@ -76,7 +76,7 @@ void sqlrconnection::waitForListenerToRequireAConnection() {
 	#endif
 }
 
-void sqlrconnection::acquireAnnounceMutex() {
+void sqlrconnection_svr::acquireAnnounceMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"acquiring announce mutex");
 	#endif
@@ -86,11 +86,11 @@ void sqlrconnection::acquireAnnounceMutex() {
 	#endif
 }
 
-shmdata *sqlrconnection::getAnnounceBuffer() {
+shmdata *sqlrconnection_svr::getAnnounceBuffer() {
 	return (shmdata *)idmemory->getPointer();
 }
 
-void sqlrconnection::releaseAnnounceMutex() {
+void sqlrconnection_svr::releaseAnnounceMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"releasing announce mutex");
 	#endif
@@ -100,7 +100,7 @@ void sqlrconnection::releaseAnnounceMutex() {
 	#endif
 }
 
-void sqlrconnection::signalListenerToRead() {
+void sqlrconnection_svr::signalListenerToRead() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"signalling listener to read");
 	#endif
@@ -110,7 +110,7 @@ void sqlrconnection::signalListenerToRead() {
 	#endif
 }
 
-void sqlrconnection::waitForListenerToFinishReading() {
+void sqlrconnection_svr::waitForListenerToFinishReading() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"waiting for listener");
 	#endif
@@ -120,7 +120,7 @@ void sqlrconnection::waitForListenerToFinishReading() {
 	#endif
 }
 
-void sqlrconnection::acquireConnectionCountMutex() {
+void sqlrconnection_svr::acquireConnectionCountMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"acquiring connection count mutex");
 	#endif
@@ -130,11 +130,11 @@ void sqlrconnection::acquireConnectionCountMutex() {
 	#endif
 }
 
-uint32_t *sqlrconnection::getConnectionCountBuffer() {
+uint32_t *sqlrconnection_svr::getConnectionCountBuffer() {
 	return (uint32_t *)idmemory->getPointer();
 }
 
-void sqlrconnection::releaseConnectionCountMutex() {
+void sqlrconnection_svr::releaseConnectionCountMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"releasing connection count mutex");
 	#endif
@@ -144,7 +144,7 @@ void sqlrconnection::releaseConnectionCountMutex() {
 	#endif
 }
 
-void sqlrconnection::acquireSessionCountMutex() {
+void sqlrconnection_svr::acquireSessionCountMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"acquiring session count mutex");
 	#endif
@@ -155,11 +155,11 @@ void sqlrconnection::acquireSessionCountMutex() {
 	#endif
 }
 
-uint32_t *sqlrconnection::getSessionCountBuffer() {
+uint32_t *sqlrconnection_svr::getSessionCountBuffer() {
 	return (uint32_t *)((long)idmemory->getPointer()+sizeof(uint32_t));
 }
 
-void sqlrconnection::releaseSessionCountMutex() {
+void sqlrconnection_svr::releaseSessionCountMutex() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"releasing session count mutex");
 	#endif
@@ -169,7 +169,7 @@ void sqlrconnection::releaseSessionCountMutex() {
 	#endif
 }
 
-void sqlrconnection::signalScalerToRead() {
+void sqlrconnection_svr::signalScalerToRead() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"signalling scaler to read");
 	#endif

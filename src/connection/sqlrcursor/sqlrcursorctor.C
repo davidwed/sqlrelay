@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-sqlrcursor::sqlrcursor(sqlrconnection *conn) {
+sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
 	this->conn=conn;
 	inbindcount=0;
@@ -13,4 +13,12 @@ sqlrcursor::sqlrcursor(sqlrconnection *conn) {
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");
 
 	querybuffer=NULL;
+
+#ifdef INCLUDE_SID
+	sid_sqlrcur=NULL;
+	if (conn->cfgfl->getSidEnabled()) {
+		sid_sqlrcur=new sqlrcursor(conn->sid_sqlrcon);
+		sql_injection_detection_parameters();
+	}
+#endif
 }

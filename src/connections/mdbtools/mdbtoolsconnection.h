@@ -14,10 +14,10 @@ extern "C" {
 
 class mdbtoolsconnection;
 
-class mdbtoolscursor : public sqlrcursor {
+class mdbtoolscursor : public sqlrcursor_svr {
 	friend class mdbtoolsconnection;
 	private:
-				mdbtoolscursor(sqlrconnection *conn);
+				mdbtoolscursor(sqlrconnection_svr *conn);
 		bool		openCursor(uint16_t id);
 		bool		closeCursor();
 		bool		executeQuery(const char *query,
@@ -38,16 +38,17 @@ class mdbtoolscursor : public sqlrcursor {
 		MdbSQL	mdbsql;
 };
 
-class mdbtoolsconnection : public sqlrconnection {
+class mdbtoolsconnection : public sqlrconnection_svr {
 	friend class mdbtoolscursor;
 	public:
 			mdbtoolsconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
+		bool		supportsNativeBinds();
 		void	handleConnectString();
 		bool	logIn();
-		sqlrcursor	*initCursor();
-		void	deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		bool	isTransactional();
 		bool	ping();

@@ -292,11 +292,11 @@ void oracle8connection::logInError(const char *errmsg) {
 	fprintf(stderr,"%s\n",message);
 }
 
-sqlrcursor *oracle8connection::initCursor() {
-	return (sqlrcursor *)new oracle8cursor((sqlrconnection *)this);
+sqlrcursor_svr *oracle8connection::initCursor() {
+	return (sqlrcursor_svr *)new oracle8cursor((sqlrconnection_svr *)this);
 }
 
-void oracle8connection::deleteCursor(sqlrcursor *curs) {
+void oracle8connection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (oracle8cursor *)curs;
 }
 
@@ -327,7 +327,7 @@ bool oracle8connection::changeUser(const char *newuser,
 	// support proxy credentials, use the sqlrconnection
 	// class's default changeUser() method
 	if (!supportsproxycredentials) {
-		return sqlrconnection::changeUser(newuser,newpassword);
+		return sqlrconnection_svr::changeUser(newuser,newpassword);
 	}
 
 	// delete any previously existing "newsessions"
@@ -397,7 +397,7 @@ const char *oracle8connection::identify() {
 	return "oracle8";
 }
 
-oracle8cursor::oracle8cursor(sqlrconnection *conn) : sqlrcursor(conn) {
+oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	prepared=false;
 	errormessage=NULL;
@@ -487,7 +487,7 @@ bool oracle8cursor::openCursor(uint16_t id) {
 				(OCIError *)oracle8conn->err)!=OCI_SUCCESS) {
 		return false;
 	}
-	return sqlrcursor::openCursor(id);
+	return sqlrcursor_svr::openCursor(id);
 }
 
 bool oracle8cursor::closeCursor() {
@@ -932,7 +932,7 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 
 bool oracle8cursor::outputBindCursor(const char *variable,
 						uint16_t variablesize,
-						sqlrcursor *cursor) {
+						sqlrcursor_svr *cursor) {
 
 	checkRePrepare();
 

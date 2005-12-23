@@ -4,7 +4,7 @@
 #include <config.h>
 #include <sqlrconnection.h>
 
-bool sqlrconnection::authenticateCommand() {
+bool sqlrconnection_svr::authenticateCommand() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"authenticate");
@@ -23,7 +23,7 @@ bool sqlrconnection::authenticateCommand() {
 	return true;
 }
 
-bool sqlrconnection::authenticate() {
+bool sqlrconnection_svr::authenticate() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"authenticate...");
@@ -47,7 +47,7 @@ bool sqlrconnection::authenticate() {
 	return true;
 }
 
-bool sqlrconnection::getUserFromClient() {
+bool sqlrconnection_svr::getUserFromClient() {
 	uint32_t	size=0;
 	if (clientsock->read(&size,idleclienttimeout,0)==sizeof(uint32_t) &&
 		size<=(uint32_t)USERSIZE &&
@@ -63,7 +63,7 @@ bool sqlrconnection::getUserFromClient() {
 	return false;
 }
 
-bool sqlrconnection::getPasswordFromClient() {
+bool sqlrconnection_svr::getPasswordFromClient() {
 	uint32_t size=0;
 	if (clientsock->read(&size,idleclienttimeout,0)==sizeof(uint32_t) &&
 		size<=(uint32_t)USERSIZE &&
@@ -79,7 +79,7 @@ bool sqlrconnection::getPasswordFromClient() {
 	return false;
 }
 
-bool sqlrconnection::connectionBasedAuth(const char *userbuffer,
+bool sqlrconnection_svr::connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	// handle connection-based authentication
@@ -96,7 +96,7 @@ bool sqlrconnection::connectionBasedAuth(const char *userbuffer,
 	return retval;
 }
 
-bool sqlrconnection::databaseBasedAuth(const char *userbuffer,
+bool sqlrconnection_svr::databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	// if the user we want to change to is different from the

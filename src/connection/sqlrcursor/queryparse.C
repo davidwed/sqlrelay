@@ -5,7 +5,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrcursor::queryIsNotSelect() {
+bool sqlrcursor_svr::queryIsNotSelect() {
 
 	// scan the query, bypassing whitespace and comments.
 	char	*ptr=skipWhitespaceAndComments(querybuffer);
@@ -19,7 +19,7 @@ bool sqlrcursor::queryIsNotSelect() {
 	return true;
 }
 
-bool sqlrcursor::queryIsCommitOrRollback() {
+bool sqlrcursor_svr::queryIsCommitOrRollback() {
 
 	// scan the query, bypassing whitespace and comments.
 	char	*ptr=skipWhitespaceAndComments(querybuffer);
@@ -30,7 +30,7 @@ bool sqlrcursor::queryIsCommitOrRollback() {
 			!charstring::compareIgnoringCase(ptr,"rollback",8));
 }
 
-char *sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
+char *sqlrcursor_svr::skipWhitespaceAndComments(const char *querybuffer) {
 	// scan the query, bypassing whitespace and comments.
 	char	*ptr=(char *)querybuffer;
 	while (*ptr && 
@@ -47,7 +47,7 @@ char *sqlrcursor::skipWhitespaceAndComments(const char *querybuffer) {
 	return ptr;
 }
 
-void sqlrcursor::checkForTempTable(const char *query, uint32_t length) {
+void sqlrcursor_svr::checkForTempTable(const char *query, uint32_t length) {
 
 	char	*ptr=(char *)query;
 	char	*endptr=(char *)query+length;
@@ -77,7 +77,7 @@ void sqlrcursor::checkForTempTable(const char *query, uint32_t length) {
 	conn->addSessionTempTableForDrop(tablename.getString());
 }
 
-bool sqlrcursor::skipComment(char **ptr, const char *endptr) {
+bool sqlrcursor_svr::skipComment(char **ptr, const char *endptr) {
 	while (*ptr<endptr && !charstring::compare(*ptr,"--",2)) {
 		while (**ptr && **ptr!='\n') {
 			(*ptr)++;
@@ -86,14 +86,14 @@ bool sqlrcursor::skipComment(char **ptr, const char *endptr) {
 	return *ptr!=endptr;
 }
 
-bool sqlrcursor::skipWhitespace(char **ptr, const char *endptr) {
+bool sqlrcursor_svr::skipWhitespace(char **ptr, const char *endptr) {
 	while ((**ptr==' ' || **ptr=='\n' || **ptr=='	') && *ptr<endptr) {
 		(*ptr)++;
 	}
 	return *ptr!=endptr;
 }
 
-bool sqlrcursor::advance(char **ptr, const char *endptr, uint16_t steps) {
+bool sqlrcursor_svr::advance(char **ptr, const char *endptr, uint16_t steps) {
 	for (uint16_t i=0; i<steps && *ptr<endptr; i++) {
 		(*ptr)++;
 	}

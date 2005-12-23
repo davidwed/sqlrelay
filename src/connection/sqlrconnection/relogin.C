@@ -5,7 +5,7 @@
 #include <sqlrconnection.h>
 #include <rudiments/snooze.h>
 
-void sqlrconnection::reLogIn() {
+void sqlrconnection_svr::reLogIn() {
 
 	markDatabaseUnavailable();
 

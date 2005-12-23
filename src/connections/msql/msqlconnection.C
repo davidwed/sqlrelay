@@ -13,6 +13,10 @@ uint16_t msqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
+bool msqlconnection::supportsNativeBinds() {
+	return false;
+}
+
 void msqlconnection::handleConnectString() {
 	host=connectStringValue("host");
 	db=connectStringValue("db");
@@ -39,11 +43,11 @@ bool msqlconnection::logIn() {
 	return true;
 }
 
-sqlrcursor *msqlconnection::initCursor() {
-	return (sqlrcursor *)new msqlcursor((sqlrconnection *)this);
+sqlrcursor_svr *msqlconnection::initCursor() {
+	return (sqlrcursor_svr *)new msqlcursor((sqlrconnection_svr *)this);
 }
 
-void msqlconnection::deleteCursor(sqlrcursor *curs) {
+void msqlconnection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (msqlcursor *)curs;
 }
 
@@ -92,7 +96,7 @@ bool msqlconnection::rollback() {
 	return true;
 }
 
-msqlcursor::msqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
+msqlcursor::msqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	msqlconn=(msqlconnection *)conn;
 	msqlresult=NULL;
 }
@@ -105,21 +109,9 @@ bool msqlcursor::executeQuery(const char *query, uint32_t length,
 	nrows=0;
 	msqlresult=(m_result *)NULL;
 
-	// fake binds
-	stringbuffer	*newquery=fakeInputBinds(query);
-
 	// execute the query
-	if (newquery) {
-		if (msqlQuery(msqlconn->msql,
-			const_cast<char *>(newquery->getString()))==-1) {
-			delete newquery;
-			return false;
-		}
-		delete newquery;
-	} else {
-		if (msqlQuery(msqlconn->msql,const_cast<char *>(query))==-1) {
-			return false;
-		}
+	if (msqlQuery(msqlconn->msql,const_cast<char *>(query))==-1) {
+		return false;
 	}
 
 	// store the result set

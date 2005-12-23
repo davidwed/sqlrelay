@@ -21,16 +21,15 @@ extern "C" {
 
 class sqliteconnection;
 
-class sqlitecursor : public sqlrcursor {
+class sqlitecursor : public sqlrcursor_svr {
 	friend class sqliteconnection;
 	private:
-				sqlitecursor(sqlrconnection *conn);
+				sqlitecursor(sqlrconnection_svr *conn);
 				~sqlitecursor();
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
-		int		runQuery(stringbuffer *newquery,
-						const char *query);
+		int		runQuery(const char *query);
 		const char	*getErrorMessage(bool *liveconnection);
 		void		returnRowCounts();
 		void		returnColumnCount();
@@ -41,7 +40,6 @@ class sqlitecursor : public sqlrcursor {
 		void		returnRow();
 		void		cleanUpData(bool freeresult, bool freebinds);
 
-		stringbuffer	*newquery;
 		char		**result;
 		char		**columnnames;
 		int		nrow;
@@ -51,16 +49,17 @@ class sqlitecursor : public sqlrcursor {
 		sqliteconnection	*sqliteconn;
 };
 
-class sqliteconnection : public sqlrconnection {
+class sqliteconnection : public sqlrconnection_svr {
 	friend class sqlitecursor;
 	public:
 				sqliteconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
+		bool		supportsNativeBinds();
 		void		handleConnectString();
 		bool		logIn();
-		sqlrcursor	*initCursor();
-		void		deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		bool		ping();
 		const char	*identify();

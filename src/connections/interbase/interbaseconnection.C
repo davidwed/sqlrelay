@@ -107,11 +107,12 @@ bool interbaseconnection::logIn() {
 	return true;
 }
 
-sqlrcursor *interbaseconnection::initCursor() {
-	return (sqlrcursor *)new interbasecursor((sqlrconnection *)this);
+sqlrcursor_svr *interbaseconnection::initCursor() {
+	return (sqlrcursor_svr *)new interbasecursor(
+					(sqlrconnection_svr *)this);
 }
 
-void interbaseconnection::deleteCursor(sqlrcursor *curs) {
+void interbaseconnection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (interbasecursor *)curs;
 }
 
@@ -149,7 +150,8 @@ const char *interbaseconnection::identify() {
 	return "interbase";
 }
 
-interbasecursor::interbasecursor(sqlrconnection *conn) : sqlrcursor(conn) {
+interbasecursor::interbasecursor(sqlrconnection_svr *conn) :
+						sqlrcursor_svr(conn) {
 	interbaseconn=(interbaseconnection *)conn;
 	errormsg=NULL;
 

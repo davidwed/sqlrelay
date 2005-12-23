@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection::openSockets() {
+bool sqlrconnection_svr::openSockets() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"listening on sockets...");

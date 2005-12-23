@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection::fetchFromBindCursorCommand(sqlrcursor *cursor) {
+bool sqlrconnection_svr::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"fetch from bind cursor");

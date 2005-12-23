@@ -16,10 +16,10 @@
 
 class postgresqlconnection;
 
-class postgresqlcursor : public sqlrcursor {
+class postgresqlcursor : public sqlrcursor_svr {
 	friend class postgresqlconnection;
 	private:
-				postgresqlcursor(sqlrconnection *conn);
+				postgresqlcursor(sqlrconnection_svr *conn);
 #ifdef HAVE_POSTGRESQL_PQEXECPARAMS
 				~postgresqlcursor();
 		bool		openCursor(uint16_t id);
@@ -82,14 +82,15 @@ class postgresqlcursor : public sqlrcursor {
 #endif
 };
 
-class postgresqlconnection : public sqlrconnection {
+class postgresqlconnection : public sqlrconnection_svr {
 	friend class postgresqlcursor;
 	private:
 		uint16_t	getNumberOfConnectStringVars();
+		bool		supportsNativeBinds();
 		void		handleConnectString();
 		bool		logIn();
-		sqlrcursor	*initCursor();
-		void		deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		const char	*identify();
 

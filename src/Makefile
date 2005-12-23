@@ -5,6 +5,8 @@ include ../config.mk
 all:
 	$(MAKE) -C util all
 	$(MAKE) -C listener all
+	$(MAKE) -C api all
+	$(MAKE) -C cmdline all
 	$(MAKE) -C connection all
 	$(MAKE) -C connections all
 	$(MAKE) -C start all
@@ -13,12 +15,12 @@ all:
 ifneq ($(HAVE_GTK),)
 	$(MAKE) -C config all
 endif
-	$(MAKE) -C api all
-	$(MAKE) -C cmdline all
 
 clean:
 	$(MAKE) -C util clean
 	$(MAKE) -C listener clean
+	$(MAKE) -C api clean
+	$(MAKE) -C cmdline clean
 	$(MAKE) -C connection clean
 	$(MAKE) -C connections clean
 	$(MAKE) -C start clean
@@ -27,12 +29,12 @@ clean:
 ifneq ($(HAVE_GTK),)
 	$(MAKE) -C config clean
 endif
-	$(MAKE) -C api clean
-	$(MAKE) -C cmdline clean
 
 rebuild:
 	$(MAKE) -C util rebuild
 	$(MAKE) -C listener rebuild
+	$(MAKE) -C api rebuild
+	$(MAKE) -C cmdline rebuild
 	$(MAKE) -C connection rebuild
 	$(MAKE) -C connections rebuild
 	$(MAKE) -C start rebuild
@@ -41,12 +43,12 @@ rebuild:
 ifneq ($(HAVE_GTK),)
 	$(MAKE) -C config rebuild
 endif
-	$(MAKE) -C api rebuild
-	$(MAKE) -C cmdline rebuild
 
 install:
 	$(MAKE) -C util install
 	$(MAKE) -C listener install
+	$(MAKE) -C api install
+	$(MAKE) -C cmdline install
 	$(MAKE) -C connection install
 	$(MAKE) -C connections install
 	$(MAKE) -C start install
@@ -55,12 +57,12 @@ install:
 ifneq ($(HAVE_GTK),)
 	$(MAKE) -C config install
 endif
-	$(MAKE) -C api install
-	$(MAKE) -C cmdline install
 
 uninstall:
 	$(MAKE) -C util uninstall
 	$(MAKE) -C listener uninstall
+	$(MAKE) -C api uninstall
+	$(MAKE) -C cmdline uninstall
 	$(MAKE) -C connection uninstall
 	$(MAKE) -C connections uninstall
 	$(MAKE) -C start uninstall
@@ -69,5 +71,3 @@ uninstall:
 ifneq ($(HAVE_GTK),)
 	$(MAKE) -C config uninstall
 endif
-	$(MAKE) -C api uninstall
-	$(MAKE) -C cmdline uninstall

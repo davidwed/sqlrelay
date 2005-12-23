@@ -23,6 +23,10 @@ uint16_t mdbtoolsconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
+bool mdbtoolsconnection::supportsNativeBinds() {
+	return false;
+}
+
 void mdbtoolsconnection::handleConnectString() {
 	db=connectStringValue("db");
 }
@@ -31,11 +35,11 @@ bool mdbtoolsconnection::logIn() {
 	return true;
 }
 
-sqlrcursor *mdbtoolsconnection::initCursor() {
-	return (sqlrcursor *)new mdbtoolscursor((sqlrconnection *)this);
+sqlrcursor_svr *mdbtoolsconnection::initCursor() {
+	return (sqlrcursor_svr *)new mdbtoolscursor((sqlrconnection_svr *)this);
 }
 
-void mdbtoolsconnection::deleteCursor(sqlrcursor *curs) {
+void mdbtoolsconnection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (mdbtoolscursor *)curs;
 }
 
@@ -74,13 +78,14 @@ bool mdbtoolsconnection::rollback() {
 	return true;
 }
 
-mdbtoolscursor::mdbtoolscursor(sqlrconnection *conn) : sqlrcursor(conn) {
+mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
+					sqlrcursor_svr(conn) {
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
 }
 
 bool mdbtoolscursor::openCursor(uint16_t id) {
 
-	if (!sqlrcursor::openCursor(id)) {
+	if (!sqlrcursor_svr::openCursor(id)) {
 		return false;
 	}
 
@@ -97,7 +102,7 @@ bool mdbtoolscursor::openCursor(uint16_t id) {
 
 bool mdbtoolscursor::closeCursor() {
 
-	if (!sqlrcursor::closeCursor()) {
+	if (!sqlrcursor_svr::closeCursor()) {
 		return false;
 	}
 
@@ -108,36 +113,17 @@ bool mdbtoolscursor::closeCursor() {
 bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
-	// fake binds
-	stringbuffer	*newquery=fakeInputBinds(query);
-
 	// execute the query
 	mdb_sql_reset(&mdbsql);
 #ifdef HAVE_MDB_RUN_QUERY
-	if (newquery) {
-		if (!mdb_run_query(&mdbsql,(char *)newquery->getString())) {
-			delete newquery;
-			return false;
-		}
-	} else {
-		if (!mdb_run_query(&mdbsql,(char *)query)) {
-			return false;
-		}
+	if (!mdb_run_query(&mdbsql,(char *)query)) {
+		return false;
 	}
 #else
-	if (newquery) {
-		g_input_ptr=const_cast<char *>(newquery->getString());
-		_mdb_sql(&mdbsql);
-		if (yyparse()) {
-			delete newquery;
-			return false;
-		}
-	} else {
-		g_input_ptr=(char *)query;
-		_mdb_sql(&mdbsql);
-		if (yyparse()) {
-			return false;
-		}
+	g_input_ptr=(char *)query;
+	_mdb_sql(&mdbsql);
+	if (yyparse()) {
+		return false;
 	}
 #endif
 

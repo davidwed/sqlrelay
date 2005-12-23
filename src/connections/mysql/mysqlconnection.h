@@ -12,10 +12,10 @@
 
 class mysqlconnection;
 
-class mysqlcursor : public sqlrcursor {
+class mysqlcursor : public sqlrcursor_svr {
 	friend class mysqlconnection;
 	private:
-				mysqlcursor(sqlrconnection *conn);
+				mysqlcursor(sqlrconnection_svr *conn);
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -40,20 +40,21 @@ class mysqlcursor : public sqlrcursor {
 		mysqlconnection	*mysqlconn;
 };
 
-class mysqlconnection : public sqlrconnection {
+class mysqlconnection : public sqlrconnection_svr {
 	friend class mysqlcursor;
 	public:
 				mysqlconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
+		bool		supportsNativeBinds();
 		void		handleConnectString();
 		bool		logIn();
 #ifdef HAVE_MYSQL_CHANGE_USER
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
 #endif
-		sqlrcursor	*initCursor();
-		void		deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		bool		isTransactional();
 #ifdef HAVE_MYSQL_PING

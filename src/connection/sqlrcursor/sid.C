@@ -2,14 +2,79 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#include <rudiments/charstring.h>
 
 #ifdef INCLUDE_SID
+
+#include <rudiments/charstring.h>
+
+void sqlrcursor_svr::sql_injection_detection_database_close() {
+
+	if (!conn->cfgfl->getSidEnabled()) {
+		return;
+	}
+
+	conn->sid_sqlrcon->endSession();
+}
+
+// This method gets the parameters SID needs to 
+// determine what to do
+
+void sqlrcursor_svr::sql_injection_detection_parameters() {
+
+	uint32_t num_rows = 0;
+	uint32_t m_num_rows;
+	int32_t param_value = 0;
+
+	sprintf(sid_query, "select UPPER(sparam), svalue from sidparameters");
+
+	//mysql_real_query(sid_mysql, sid_query, charstring::length(sid_query));
+	sid_sqlrcur->sendQuery(sid_query);
+
+	//sid_res = mysql_store_result(sid_mysql);
+	//m_num_rows = mysql_num_rows(sid_res);
+	m_num_rows = sid_sqlrcur->rowCount();
+
+	ingress_mode = 0;
+	egress_mode = 0;
+	listen_mode = 0;
+	verification_mode = 0;
+	prevention_mode = 0;
+
+	for (num_rows = 0; num_rows < m_num_rows; num_rows++)
+	{
+	
+		//MYSQL_ROW sid_row = mysql_fetch_row(sid_res);
+		const char * const *sid_row = sid_sqlrcur->getRow(num_rows);
+
+		param_value = charstring::toInteger(sid_row[1]);
+
+		if ( charstring::compare(sid_row[0], "INGRESS") == 0 )
+		   ingress_mode = param_value;
+
+		if ( charstring::compare(sid_row[0], "EGRESS") == 0 )
+		   egress_mode = param_value;
+
+		if ( charstring::compare(sid_row[0], "LISTEN") == 0 )
+		   listen_mode = param_value;
+
+		if ( charstring::compare(sid_row[0], "VERIFICATION") == 0 )
+		   verification_mode = param_value;
+ 
+		if ( charstring::compare(sid_row[0], "PREVENTION") == 0 )
+		   prevention_mode = param_value;
+
+	}
+
+}
 
 // This method performs SQL Injection Detection
 // for ingress filtering
 
-bool sqlrcursor::sql_injection_detection_ingress(const char *query) {
+bool sqlrcursor_svr::sql_injection_detection_ingress(const char *query) {
+
+	if (!conn->cfgfl->getSidEnabled()) {
+		return false;
+	}
        
 	bool ret_val = false;	// flag indicating a sql injection attack
 
@@ -92,7 +157,7 @@ bool sqlrcursor::sql_injection_detection_ingress(const char *query) {
 // This method determines if the parsed sql statement
 // is in the learning database
 
-bool sqlrcursor::sql_injection_detection_ingress_ldb() {
+bool sqlrcursor_svr::sql_injection_detection_ingress_ldb() {
 
 	bool ret_val = false;
 
@@ -115,7 +180,7 @@ bool sqlrcursor::sql_injection_detection_ingress_ldb() {
 // This method determines if the SQL statement contains
 // anything in the white list
 
-bool sqlrcursor::sql_injection_detection_ingress_wl(const char *query) {
+bool sqlrcursor_svr::sql_injection_detection_ingress_wl(const char *query) {
 
 	bool ret_val = false;
 
@@ -140,7 +205,7 @@ bool sqlrcursor::sql_injection_detection_ingress_wl(const char *query) {
 // This method determines if the SQL statement contains
 // anything in the black list
 
-bool sqlrcursor::sql_injection_detection_ingress_bl(const char *query) {
+bool sqlrcursor_svr::sql_injection_detection_ingress_bl(const char *query) {
 
 	bool ret_val = false;
 
@@ -166,7 +231,7 @@ bool sqlrcursor::sql_injection_detection_ingress_bl(const char *query) {
 // True - sql statement found in the sid db
 // False - sql statement not found in the sid db
 
-bool sqlrcursor::sql_injection_detection_check_db(const char *sid_db) {
+bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 
 	bool ret_val = false;
 	bool valid_list = false;
@@ -262,14 +327,16 @@ bool sqlrcursor::sql_injection_detection_check_db(const char *sid_db) {
 
 		sprintf(sid_query, "%s\'", sid_query);
 
-		mysql_real_query(sid_mysql, sid_query, (unsigned int)charstring::length(sid_query));
+		//mysql_real_query(sid_mysql, sid_query, (unsigned int)charstring::length(sid_query));
+		sid_sqlrcur->sendQuery(sid_query);
 
-		sid_res =  mysql_store_result(sid_mysql);
+		//sid_res =  mysql_store_result(sid_mysql);
 
 		// if rows returned for sql statement
 		// then target sql found
 
-		if ( mysql_num_rows( sid_res ) ) 
+		//if ( mysql_num_rows( sid_res ) ) 
+		if ( sid_sqlrcur->rowCount() )
 		{
 			ret_val = true;
 		} 
@@ -280,73 +347,10 @@ bool sqlrcursor::sql_injection_detection_check_db(const char *sid_db) {
 
 }
 
-// This method initializes the database connection
-// for interaction between SID and its tables
-
-void sqlrcursor::sql_injection_detection_database_init() {
-
-	sid_mysql = mysql_init(NULL);
-
-	if ( !mysql_real_connect(sid_mysql, "localhost", "siduser",
-				 "hapk1do", "siddb", 0, NULL, 0) )
-        {
-		exit(30);
-        }
-
-}
-
-// This method gets the parameters SID needs to 
-// determine what to do
-
-void sqlrcursor::sql_injection_detection_parameters() {
-
-	uint32_t num_rows = 0;
-	uint32_t m_num_rows;
-	int32_t param_value = 0;
-
-	sprintf(sid_query, "select UPPER(sparam), svalue from sidparameters");
-
-	mysql_real_query(sid_mysql, sid_query, charstring::length(sid_query));
-
-	sid_res = mysql_store_result(sid_mysql);
-	m_num_rows = mysql_num_rows(sid_res);
-
-	ingress_mode = 0;
-	egress_mode = 0;
-	listen_mode = 0;
-	verification_mode = 0;
-	prevention_mode = 0;
-
-	for (num_rows = 0; num_rows < m_num_rows; num_rows++)
-	{
-	
-		sid_row = mysql_fetch_row(sid_res);
-
-		param_value = atoi(sid_row[1]);
-
-		if ( charstring::compare(sid_row[0], "INGRESS") == 0 )
-		   ingress_mode = param_value;
-
-		if ( charstring::compare(sid_row[0], "EGRESS") == 0 )
-		   egress_mode = param_value;
-
-		if ( charstring::compare(sid_row[0], "LISTEN") == 0 )
-		   listen_mode = param_value;
-
-		if ( charstring::compare(sid_row[0], "VERIFICATION") == 0 )
-		   verification_mode = param_value;
- 
-		if ( charstring::compare(sid_row[0], "PREVENTION") == 0 )
-		   prevention_mode = param_value;
-
-	}
-
-}
-
 // This method maintains a log for SID
 // The SQL statement, parsed sql and message will be logged
 
-void sqlrcursor::sql_injection_detection_log(const char *query, 
+void sqlrcursor_svr::sql_injection_detection_log(const char *query, 
 					      char *parsed_sql,
 					      char *log_message) {
 	int32_t i, buf_len;
@@ -383,14 +387,15 @@ void sqlrcursor::sql_injection_detection_log(const char *query,
 
 	sprintf(sid_query, "%s\")", sid_query);
 
-	sid_query_result = mysql_real_query(sid_mysql, sid_query, charstring::length(sid_query));
+	//sid_query_result = mysql_real_query(sid_mysql, sid_query, charstring::length(sid_query));
+	sid_sqlrcur->sendQuery(sid_query);
 
 }
 
 // This method parses the SQL statement and represents
 // it in a format for the learning database
 
-void sqlrcursor::sql_injection_detection_parse_sql(const char *query) {
+void sqlrcursor_svr::sql_injection_detection_parse_sql(const char *query) {
 
 	uint32_t  temp_querylength;
 	int32_t quote_count = 0;
@@ -450,8 +455,12 @@ void sqlrcursor::sql_injection_detection_parse_sql(const char *query) {
 
 // This method performs egress filtering for SID
 
-bool sqlrcursor::sql_injection_detection_egress(int32_t num_fields,
+bool sqlrcursor_svr::sql_injection_detection_egress(int32_t num_fields,
 					const char * const *field_names) {
+
+	if (!conn->cfgfl->getSidEnabled()) {
+		return false;
+	}
        
 	bool ret_val = false;	// flag indicating a sql injection attack
 
@@ -527,7 +536,7 @@ bool sqlrcursor::sql_injection_detection_egress(int32_t num_fields,
 
 // This method parses the SQL results
 
-void sqlrcursor::sql_injection_detection_parse_results(int32_t num_fields,
+void sqlrcursor_svr::sql_injection_detection_parse_results(int32_t num_fields,
 					const char * const *field_names) {
 
 	int32_t i;
@@ -552,7 +561,7 @@ void sqlrcursor::sql_injection_detection_parse_results(int32_t num_fields,
 
 // This method performs egress black list processing
 
-bool sqlrcursor::sql_injection_detection_egress_bl() {
+bool sqlrcursor_svr::sql_injection_detection_egress_bl() {
 
 	bool ret_val = false;
 
@@ -576,7 +585,7 @@ bool sqlrcursor::sql_injection_detection_egress_bl() {
 
 // This method performs egress white list processing
 
-bool sqlrcursor::sql_injection_detection_egress_wl() {
+bool sqlrcursor_svr::sql_injection_detection_egress_wl() {
 
 	bool ret_val = false;
 
@@ -599,7 +608,7 @@ bool sqlrcursor::sql_injection_detection_egress_wl() {
 
 // This method performs egress filtering for learning db processing
 
-bool sqlrcursor::sql_injection_detection_egress_ldb() {
+bool sqlrcursor_svr::sql_injection_detection_egress_ldb() {
 
 	bool ret_val = false;
 

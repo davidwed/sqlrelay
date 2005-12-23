@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
+void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning output bind values");
@@ -13,7 +13,7 @@ void sqlrconnection::returnOutputBindValues(sqlrcursor *cursor) {
 	// run through the output bind values, sending them back
 	for (uint16_t i=0; i<cursor->outbindcount; i++) {
 
-		bindvar	*bv=&(cursor->outbindvars[i]);
+		bindvar_svr	*bv=&(cursor->outbindvars[i]);
 
 		#ifdef SERVER_DEBUG
 		debugstr=new stringbuffer();

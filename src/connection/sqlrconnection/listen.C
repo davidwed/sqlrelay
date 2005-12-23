@@ -4,7 +4,7 @@
 #include <sqlrconnection.h>
 #include <unistd.h>
 
-void sqlrconnection::listen() {
+void sqlrconnection_svr::listen() {
 
 	for (;;) {
 
@@ -61,7 +61,7 @@ void sqlrconnection::listen() {
 	}
 }
 
-void sqlrconnection::waitForAvailableDatabase() {
+void sqlrconnection_svr::waitForAvailableDatabase() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"waiting for available database...");
@@ -77,7 +77,7 @@ void sqlrconnection::waitForAvailableDatabase() {
 	#endif
 }
 
-bool sqlrconnection::availableDatabase() {
+bool sqlrconnection_svr::availableDatabase() {
 
 	// return whether the file "updown" is there or not
 	#ifdef SERVER_DEBUG
@@ -93,7 +93,7 @@ bool sqlrconnection::availableDatabase() {
 	#endif
 }
 
-void sqlrconnection::initSession() {
+void sqlrconnection_svr::initSession() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"initializing session...");
@@ -111,7 +111,7 @@ void sqlrconnection::initSession() {
 	#endif
 }
 
-int32_t sqlrconnection::waitForClient() {
+int32_t sqlrconnection_svr::waitForClient() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"waiting for client...");

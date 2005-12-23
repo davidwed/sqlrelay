@@ -3,15 +3,15 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::setAutoCommitBehavior(bool ac) {
+void sqlrconnection_svr::setAutoCommitBehavior(bool ac) {
 	autocommit=ac;
 }
 
-bool sqlrconnection::getAutoCommitBehavior() {
+bool sqlrconnection_svr::getAutoCommitBehavior() {
 	return autocommit;
 }
 
-void sqlrconnection::autoCommitCommand() {
+void sqlrconnection_svr::autoCommitCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"autocommit...");
 	#endif
@@ -32,13 +32,13 @@ void sqlrconnection::autoCommitCommand() {
 	flushWriteBuffer();
 }
 
-bool sqlrconnection::autoCommitOn() {
+bool sqlrconnection_svr::autoCommitOn() {
 	checkautocommit=true;
 	performautocommit=true;
 	return true;
 }
 
-bool sqlrconnection::autoCommitOff() {
+bool sqlrconnection_svr::autoCommitOff() {
 	checkautocommit=true;
 	performautocommit=false;
 	return true;

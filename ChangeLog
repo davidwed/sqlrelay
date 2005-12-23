@@ -81,6 +81,7 @@
 		used, but errors no longer occur
 	fixed a bug where fetching a clob from oracle containing utf8 data
 		could cause a buffer overrun and subsequent crash
+	applied Gena01's php pear db patches, some other fixes
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

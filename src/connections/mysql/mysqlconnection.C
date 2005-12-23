@@ -21,6 +21,10 @@ uint16_t mysqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
+bool mysqlconnection::supportsNativeBinds() {
+	return false;
+}
+
 void mysqlconnection::handleConnectString() {
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
@@ -97,11 +101,11 @@ bool mysqlconnection::changeUser(const char *newuser,
 }
 #endif
 
-sqlrcursor *mysqlconnection::initCursor() {
-	return (sqlrcursor *)new mysqlcursor((sqlrconnection *)this);
+sqlrcursor_svr *mysqlconnection::initCursor() {
+	return (sqlrcursor_svr *)new mysqlcursor((sqlrconnection_svr *)this);
 }
 
-void mysqlconnection::deleteCursor(sqlrcursor *curs) {
+void mysqlconnection::deleteCursor(sqlrcursor_svr *curs) {
 	delete (mysqlcursor *)curs;
 }
 
@@ -160,15 +164,9 @@ bool mysqlconnection::rollback() {
 #endif
 }
 
-mysqlcursor::mysqlcursor(sqlrconnection *conn) : sqlrcursor(conn) {
+mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
-
-	// SID initialization
-#ifdef INCLUDE_SID
-	sql_injection_detection_database_init(); 
-	sql_injection_detection_parameters(); 
-#endif
 }
 
 bool mysqlcursor::executeQuery(const char *query, uint32_t length,
@@ -181,91 +179,57 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 	// initialize result set
 	mysqlresult=NULL;
 
-	// fake binds
-	stringbuffer	*newquery=fakeInputBinds(query);
-
-#ifdef INCLUDE_SID
-	// perform ingress fitering
-	sql_injection_detection = false;
-	sql_injection_detection = sql_injection_detection_ingress(query);
-#endif
-
 	// execute the query
-#ifdef INCLUDE_SID
-	if (newquery && !sql_injection_detection) {
-#else
-	if (newquery) {
-#endif
-
-		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
-					newquery->getString(),
-					newquery->getStringLength()))) {
-			delete newquery;
-			return false;
-		}
-		delete newquery;
-	} else {
-		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
-							query,length))) {
-			return false;
-		}
+	if ((queryresult=mysql_real_query(&mysqlconn->mysql,query,length))) {
+		return false;
 	}
 
-#ifdef INCLUDE_SID
-        if (!sql_injection_detection) {
-#endif
+	checkForTempTable(query,length);
 
-		checkForTempTable(query,length);
+	// get the affected row count
+	affectedrows=mysql_affected_rows(&mysqlconn->mysql);
 
-		// get the affected row count
-		affectedrows=mysql_affected_rows(&mysqlconn->mysql);
-
-		// store the result set
-		if ((mysqlresult=mysql_store_result(&mysqlconn->mysql))==
+	// store the result set
+	if ((mysqlresult=mysql_store_result(&mysqlconn->mysql))==
 						(MYSQL_RES *)NULL) {
 
-			// if there was an error then return failure, otherwise
-			// the query must have been some DML or DDL
-			char	*err=(char *)mysql_error(&mysqlconn->mysql);
-			if (err && err[0]) {
-				return false;
-			} else {
-				return true;
-			}
-		}
-
-		// get the column count
-		ncols=mysql_num_fields(mysqlresult);
-
-		// get the field names
-		char	*field_names[ncols];
-		for (unsigned int i=0; i<ncols; i++) {
-			field_names[i]=mysql_fetch_field(mysqlresult)->name;
-		}
-
-#ifdef INCLUDE_SID
-		// perform sid egress filtering
-
-		if (sql_injection_detection_egress(ncols, field_names)==true) {
-
-			mysqlresult=NULL;
-
-			sql_injection_detection=true;
-
-			ncols=0;
-			nrows=0;
-
+		// if there was an error then return failure, otherwise
+		// the query must have been some DML or DDL
+		char	*err=(char *)mysql_error(&mysqlconn->mysql);
+		if (err && err[0]) {
+			return false;
+		} else {
 			return true;
 		}
-#endif
+	}
 
+	// get the column count
+	ncols=mysql_num_fields(mysqlresult);
 
-		// get the row count
-		nrows=mysql_num_rows(mysqlresult);
+	// get the field names
+	char	*field_names[ncols];
+	for (unsigned int i=0; i<ncols; i++) {
+		field_names[i]=mysql_fetch_field(mysqlresult)->name;
+	}
 
 #ifdef INCLUDE_SID
+	// perform sid egress filtering
+
+	if (sql_injection_detection_egress(ncols, field_names)==true) {
+
+		mysqlresult=NULL;
+
+		sql_injection_detection=true;
+
+		ncols=0;
+		nrows=0;
+
+		return true;
 	}
 #endif
+
+	// get the row count
+	nrows=mysql_num_rows(mysqlresult);
 
 	return true;
 }

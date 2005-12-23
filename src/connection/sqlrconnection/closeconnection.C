@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::closeConnection() {
+void sqlrconnection_svr::closeConnection() {
 
 	// decrement the connection counter
 	if (cfgfl->getDynamicScaling() && semset && idmemory) {

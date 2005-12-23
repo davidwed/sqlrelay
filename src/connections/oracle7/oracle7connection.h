@@ -67,10 +67,10 @@ struct describe {
 
 class oracle7connection;
 
-class oracle7cursor : public sqlrcursor {
+class oracle7cursor : public sqlrcursor_svr {
 	friend class oracle7connection;
 	private:
-				oracle7cursor(sqlrconnection *conn);
+				oracle7cursor(sqlrconnection_svr *conn);
 				~oracle7cursor();
 		bool		openCursor(uint16_t id);
 		bool		closeCursor();
@@ -148,7 +148,7 @@ class oracle7cursor : public sqlrcursor {
 };
 
 
-class oracle7connection : public sqlrconnection {
+class oracle7connection : public sqlrconnection_svr {
 	friend class oracle7cursor;
 	public:
 			oracle7connection();
@@ -157,8 +157,8 @@ class oracle7connection : public sqlrconnection {
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn();
-		sqlrcursor	*initCursor();
-		void		deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		bool		autoCommitOn();
 		bool		autoCommitOff();

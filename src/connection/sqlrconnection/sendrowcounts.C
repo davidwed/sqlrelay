@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::sendRowCounts(bool knowsactual, uint64_t actual,
+void sqlrconnection_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 					bool knowsaffected, uint64_t affected) {
 
 	#ifdef SERVER_DEBUG

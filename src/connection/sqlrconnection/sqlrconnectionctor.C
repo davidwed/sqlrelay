@@ -3,7 +3,8 @@
 
 #include <sqlrconnection.h>
 
-sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
+sqlrconnection_svr::sqlrconnection_svr() :
+			daemonprocess(), listener(), debugfile() {
 
 	cmdl=NULL;
 	cfgfl=NULL;
@@ -39,4 +40,8 @@ sqlrconnection::sqlrconnection() : daemonprocess(), listener(), debugfile() {
 
 	// maybe someday these parameters will be configurable
 	bindpool=new memorypool(512,128,100);
+
+#ifdef INCLUDE_SID
+	sid_sqlrcon=NULL;
+#endif
 }

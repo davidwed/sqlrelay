@@ -52,6 +52,12 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	currentconnect=NULL;
 	connectstringcount=0;
 	metrictotal=0;
+	sidenabled=DEFAULT_SID_ENABLED;
+	sidhost=charstring::duplicate(DEFAULT_SID_HOST);
+	sidport=DEFAULT_SID_PORT;
+	sidsocket=charstring::duplicate(DEFAULT_SID_SOCKET);
+	siduser=charstring::duplicate(DEFAULT_SID_USER);
+	sidpassword=charstring::duplicate(DEFAULT_SID_PASSWORD);
 }
 
 sqlrconfigfile::~sqlrconfigfile() {
@@ -83,6 +89,11 @@ sqlrconfigfile::~sqlrconfigfile() {
 		delete csn->getData();
 		csn=csn->getNext();
 	}
+
+	delete[] sidhost;
+	delete[] sidsocket;
+	delete[] siduser;
+	delete[] sidpassword;
 }
 
 const char * const * sqlrconfigfile::getAddresses() {
@@ -221,6 +232,30 @@ int32_t sqlrconfigfile::getIdleClientTimeout() {
 	return idleclienttimeout;
 }
 
+bool sqlrconfigfile::getSidEnabled() {
+	return sidenabled;
+}
+
+const char *sqlrconfigfile::getSidHost() {
+	return sidhost;
+}
+
+uint16_t sqlrconfigfile::getSidPort() {
+	return sidport;
+}
+
+const char *sqlrconfigfile::getSidUnixPort() {
+	return sidsocket;
+}
+
+const char *sqlrconfigfile::getSidUser() {
+	return siduser;
+}
+
+const char *sqlrconfigfile::getSidPassword() {
+	return sidpassword;
+}
+
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	// if there are no users in the list, add a default user/password
 	if (!userlist.getLength()) {
@@ -347,6 +382,18 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=MAXLOBBINDVALUELENGTH_ATTRIBUTE;
 	} else if (!charstring::compare(name,"idleclienttimeout")) {
 		currentattribute=IDLECLIENTTIMEOUT_ATTRIBUTE;
+	} else if (!charstring::compare(name,"sidenabled")) {
+		currentattribute=SID_ENABLED_ATTRIBUTE;
+	} else if (!charstring::compare(name,"sidhost")) {
+		currentattribute=SID_HOST_ATTRIBUTE;
+	} else if (!charstring::compare(name,"sidport")) {
+		currentattribute=SID_PORT_ATTRIBUTE;
+	} else if (!charstring::compare(name,"sidsocket")) {
+		currentattribute=SID_SOCKET_ATTRIBUTE;
+	} else if (!charstring::compare(name,"siduser")) {
+		currentattribute=SID_USER_ATTRIBUTE;
+	} else if (!charstring::compare(name,"sidpassword")) {
+		currentattribute=SID_PASSWORD_ATTRIBUTE;
 	} else if (!charstring::compare(name,"user")) {
 		currentattribute=USER_ATTRIBUTE;
 	} else if (!charstring::compare(name,"password")) {
@@ -486,6 +533,24 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==IDLECLIENTTIMEOUT_ATTRIBUTE) {
 			idleclienttimeout=charstring::toInteger((value)?value:
 						DEFAULT_IDLECLIENTTIMEOUT);
+		} else if (currentattribute==SID_ENABLED_ATTRIBUTE) {
+			sidenabled=!charstring::compareIgnoringCase(
+								value,"yes");
+		} else if (currentattribute==SID_HOST_ATTRIBUTE) {
+			sidhost=charstring::duplicate((value)?value:
+							DEFAULT_SID_HOST);
+		} else if (currentattribute==SID_PORT_ATTRIBUTE) {
+			sidport=(value)?charstring::toInteger(value):
+							DEFAULT_SID_PORT;
+		} else if (currentattribute==SID_SOCKET_ATTRIBUTE) {
+			sidsocket=charstring::duplicate((value)?value:
+							DEFAULT_SID_SOCKET);
+		} else if (currentattribute==SID_USER_ATTRIBUTE) {
+			siduser=charstring::duplicate((value)?value:
+							DEFAULT_SID_USER);
+		} else if (currentattribute==SID_PASSWORD_ATTRIBUTE) {
+			sidpassword=charstring::duplicate((value)?value:
+							DEFAULT_SID_PASSWORD);
 		} else if (currentattribute==USER_ATTRIBUTE) {
 			currentuser->setUser((value)?value:DEFAULT_USER);
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {

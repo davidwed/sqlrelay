@@ -15,7 +15,7 @@
 
 #include <defines.h>
 
-void sqlrconnection::announceAvailability(const char *tmpdir,
+void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 					bool passdescriptor,
 					const char *unixsocket,
 					unsigned short inetport,
@@ -107,7 +107,7 @@ void sqlrconnection::announceAvailability(const char *tmpdir,
 	#endif
 }
 
-void sqlrconnection::registerForHandoff(const char *tmpdir) {
+void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"registering for handoff...");
@@ -158,7 +158,7 @@ void sqlrconnection::registerForHandoff(const char *tmpdir) {
 	delete[] handoffsockname;
 }
 
-bool sqlrconnection::receiveFileDescriptor(int *descriptor) {
+bool sqlrconnection_svr::receiveFileDescriptor(int *descriptor) {
 	bool	retval=handoffsockun.receiveFileDescriptor(descriptor);
 	if (!retval) {
 		handoffsockun.close();
@@ -167,7 +167,7 @@ bool sqlrconnection::receiveFileDescriptor(int *descriptor) {
 	return retval;
 }
 
-void sqlrconnection::deRegisterForHandoff(const char *tmpdir) {
+void sqlrconnection_svr::deRegisterForHandoff(const char *tmpdir) {
 	
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"de-registering for handoff...");

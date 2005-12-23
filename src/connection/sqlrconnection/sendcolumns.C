@@ -5,14 +5,14 @@
 
 #include <datatypes.h>
 
-bool sqlrconnection::sendColumnInfo() {
+bool sqlrconnection_svr::sendColumnInfo() {
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
 		return true;
 	}
 	return false;
 }
 
-void sqlrconnection::sendColumnCount(uint32_t ncols) {
+void sqlrconnection_svr::sendColumnCount(uint32_t ncols) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"sending column count...");
@@ -28,7 +28,7 @@ void sqlrconnection::sendColumnCount(uint32_t ncols) {
 	#endif
 }
 
-void sqlrconnection::sendColumnTypeFormat(uint16_t format) {
+void sqlrconnection_svr::sendColumnTypeFormat(uint16_t format) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"sending column type format...");
@@ -49,7 +49,7 @@ void sqlrconnection::sendColumnTypeFormat(uint16_t format) {
 	#endif
 }
 
-void sqlrconnection::sendColumnDefinition(const char *name,
+void sqlrconnection_svr::sendColumnDefinition(const char *name,
 						uint16_t namelen,
 						uint16_t type, 
 						uint32_t size,
@@ -107,7 +107,7 @@ void sqlrconnection::sendColumnDefinition(const char *name,
 	clientsock->write(autoincrement);
 }
 
-void sqlrconnection::sendColumnDefinitionString(const char *name,
+void sqlrconnection_svr::sendColumnDefinitionString(const char *name,
 						uint16_t namelen,
 						const char *type, 
 						uint16_t typelen,

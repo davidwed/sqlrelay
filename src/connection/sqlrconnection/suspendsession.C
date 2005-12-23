@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::suspendSessionCommand() {
+void sqlrconnection_svr::suspendSessionCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"suspend session");
 	#endif
@@ -11,7 +11,7 @@ void sqlrconnection::suspendSessionCommand() {
 	flushWriteBuffer();
 }
 
-void sqlrconnection::suspendSession() {
+void sqlrconnection_svr::suspendSession() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"suspending session...");

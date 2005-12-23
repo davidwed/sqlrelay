@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::incrementConnectionCount() {
+void sqlrconnection_svr::incrementConnectionCount() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"incrementing connection count...");
@@ -28,7 +28,7 @@ void sqlrconnection::incrementConnectionCount() {
 	#endif
 }
 
-void sqlrconnection::decrementConnectionCount() {
+void sqlrconnection_svr::decrementConnectionCount() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"decrementing connection count...");
@@ -51,7 +51,7 @@ void sqlrconnection::decrementConnectionCount() {
 	#endif
 }
 
-void sqlrconnection::decrementSessionCount() {
+void sqlrconnection_svr::decrementSessionCount() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"decrementing session count...");

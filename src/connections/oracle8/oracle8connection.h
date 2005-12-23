@@ -53,10 +53,10 @@ struct describe {
 
 class oracle8connection;
 
-class oracle8cursor : public sqlrcursor {
+class oracle8cursor : public sqlrcursor_svr {
 	friend class oracle8connection;
 	private:
-				oracle8cursor(sqlrconnection *conn);
+				oracle8cursor(sqlrconnection_svr *conn);
 				~oracle8cursor();
 		bool		openCursor(uint16_t id);
 		bool		closeCursor();
@@ -123,7 +123,7 @@ class oracle8cursor : public sqlrcursor {
 						ub2 type);
 		bool		outputBindCursor(const char *variable,
 						uint16_t variablesize,
-						sqlrcursor *cursor);
+						sqlrcursor_svr *cursor);
 		void		returnOutputBindBlob(uint16_t index);
 		void		returnOutputBindClob(uint16_t index);
 		void		returnOutputBindGenericLob(uint16_t index);
@@ -194,7 +194,7 @@ class oracle8cursor : public sqlrcursor {
 #endif
 };
 	
-class oracle8connection : public sqlrconnection {
+class oracle8connection : public sqlrconnection_svr {
 	friend class oracle8cursor;
 	public:
 				oracle8connection();
@@ -204,8 +204,8 @@ class oracle8connection : public sqlrconnection {
 		void		handleConnectString();
 		bool		logIn();
 		void		logInError(const char *errmsg);
-		sqlrcursor	*initCursor();
-		void		deleteCursor(sqlrcursor *curs);
+		sqlrcursor_svr	*initCursor();
+		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 		bool		changeUser(const char *newuser,

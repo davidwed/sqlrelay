@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::identifyCommand() {
+void sqlrconnection_svr::identifyCommand() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"identify");

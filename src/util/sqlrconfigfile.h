@@ -47,7 +47,13 @@ typedef enum {
 	CONNECTIONID_ATTRIBUTE,
 	STRING_ATTRIBUTE,
 	METRIC_ATTRIBUTE,
-	BEHINDLOADBALANCER_ATTRIBUTE
+	BEHINDLOADBALANCER_ATTRIBUTE,
+	SID_ENABLED_ATTRIBUTE,
+	SID_HOST_ATTRIBUTE,
+	SID_PORT_ATTRIBUTE,
+	SID_SOCKET_ATTRIBUTE,
+	SID_USER_ATTRIBUTE,
+	SID_PASSWORD_ATTRIBUTE
 } attribute;
 
 class usercontainer {
@@ -138,6 +144,13 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t	getMaxLobBindValueLength();
 		int32_t		getIdleClientTimeout();
 
+		bool		getSidEnabled();
+		const char	*getSidHost();
+		uint16_t	getSidPort();
+		const char	*getSidUnixPort();
+		const char	*getSidUser();
+		const char	*getSidPassword();
+
 		linkedlist< usercontainer * >	*getUserList();
 		linkedlist< connectstringcontainer * >
 					*getConnectStringList();
@@ -196,6 +209,13 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
 		int32_t		idleclienttimeout;
+
+		bool		sidenabled;
+		const char	*sidhost;
+		uint16_t	sidport;
+		const char	*sidsocket;
+		const char	*siduser;
+		const char	*sidpassword;
 
 		usercontainer	*currentuser;
 

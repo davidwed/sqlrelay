@@ -3,7 +3,8 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection::dropTempTables(sqlrcursor *cursor, stringlist *tablelist) {
+void sqlrconnection_svr::dropTempTables(sqlrcursor_svr *cursor,
+					stringlist *tablelist) {
 
 	// run through the temp table list, dropping tables
 	for (stringlistnode *sln=tablelist->getNodeByIndex(0);
@@ -14,7 +15,8 @@ void sqlrconnection::dropTempTables(sqlrcursor *cursor, stringlist *tablelist) {
 	tablelist->clear();
 }
 
-void sqlrconnection::dropTempTable(sqlrcursor *cursor, const char *tablename) {
+void sqlrconnection_svr::dropTempTable(sqlrcursor_svr *cursor,
+					const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table ")->append(tablename);
 	if (cursor->prepareQuery(dropquery.getString(),
@@ -25,7 +27,7 @@ void sqlrconnection::dropTempTable(sqlrcursor *cursor, const char *tablename) {
 	cursor->cleanUpData(true,true);
 }
 
-void sqlrconnection::truncateTempTables(sqlrcursor *cursor,
+void sqlrconnection_svr::truncateTempTables(sqlrcursor_svr *cursor,
 						stringlist *tablelist) {
 
 	// run through the temp table list, truncateing tables
@@ -37,7 +39,7 @@ void sqlrconnection::truncateTempTables(sqlrcursor *cursor,
 	tablelist->clear();
 }
 
-void sqlrconnection::truncateTempTable(sqlrcursor *cursor,
+void sqlrconnection_svr::truncateTempTable(sqlrcursor_svr *cursor,
 						const char *tablename) {
 	stringbuffer	truncatequery;
 	truncatequery.append("delete from ")->append(tablename);
@@ -49,18 +51,18 @@ void sqlrconnection::truncateTempTable(sqlrcursor *cursor,
 	cursor->cleanUpData(true,true);
 }
 
-void sqlrconnection::addSessionTempTableForDrop(const char *table) {
+void sqlrconnection_svr::addSessionTempTableForDrop(const char *table) {
 	sessiontemptablesfordrop.append(charstring::duplicate(table));
 }
 
-void sqlrconnection::addTransactionTempTableForDrop(const char *table) {
+void sqlrconnection_svr::addTransactionTempTableForDrop(const char *table) {
 	transtemptablesfordrop.append(charstring::duplicate(table));
 }
 
-void sqlrconnection::addSessionTempTableForTrunc(const char *table) {
+void sqlrconnection_svr::addSessionTempTableForTrunc(const char *table) {
 	sessiontemptablesfortrunc.append(charstring::duplicate(table));
 }
 
-void sqlrconnection::addTransactionTempTableForTrunc(const char *table) {
+void sqlrconnection_svr::addTransactionTempTableForTrunc(const char *table) {
 	transtemptablesfortrunc.append(charstring::duplicate(table));
 }

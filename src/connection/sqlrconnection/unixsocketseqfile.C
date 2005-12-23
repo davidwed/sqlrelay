@@ -14,7 +14,7 @@
 
 #include <config.h>
 
-bool sqlrconnection::getUnixSocket(const char *tmpdir, char *unixsocketptr) {
+bool sqlrconnection_svr::getUnixSocket(const char *tmpdir, char *unixsocketptr) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"getting unix socket...");
@@ -45,7 +45,7 @@ bool sqlrconnection::getUnixSocket(const char *tmpdir, char *unixsocketptr) {
 	return true;
 }
 
-bool sqlrconnection::openSequenceFile(file *sockseq,
+bool sqlrconnection_svr::openSequenceFile(file *sockseq,
 				const char *tmpdir, char *unixsocketptr) {
 
 	// open the sequence file and get the current port number
@@ -87,7 +87,7 @@ bool sqlrconnection::openSequenceFile(file *sockseq,
 	return success;
 }
 
-bool sqlrconnection::lockSequenceFile(file *sockseq) {
+bool sqlrconnection_svr::lockSequenceFile(file *sockseq) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"locking...");
@@ -97,7 +97,7 @@ bool sqlrconnection::lockSequenceFile(file *sockseq) {
 }
 
 
-bool sqlrconnection::getAndIncrementSequenceNumber(file *sockseq,
+bool sqlrconnection_svr::getAndIncrementSequenceNumber(file *sockseq,
 							char *unixsocketptr) {
 
 	// get the sequence number from the file
@@ -137,7 +137,7 @@ bool sqlrconnection::getAndIncrementSequenceNumber(file *sockseq,
 	return (sockseq->write(buffer)==sizeof(int32_t));
 }
 
-bool sqlrconnection::unLockSequenceFile(file *sockseq) {
+bool sqlrconnection_svr::unLockSequenceFile(file *sockseq) {
 
 	// unlock and close the file in a platform-independent manner
 	#ifdef SERVER_DEBUG

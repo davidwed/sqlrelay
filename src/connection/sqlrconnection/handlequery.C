@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-int32_t sqlrconnection::handleQuery(sqlrcursor *cursor,
+int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor,
 					bool reallyexecute) {
 
@@ -64,7 +64,7 @@ int32_t sqlrconnection::handleQuery(sqlrcursor *cursor,
 	}
 }
 
-bool sqlrconnection::getQueryFromClient(sqlrcursor *cursor,
+bool sqlrconnection_svr::getQueryFromClient(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor) {
 
 	// if we're not reexecuting and not using a bound cursor, get the query,
@@ -76,7 +76,7 @@ bool sqlrconnection::getQueryFromClient(sqlrcursor *cursor,
 		getSendColumnInfo());
 }
 
-bool sqlrconnection::getQuery(sqlrcursor *cursor) {
+bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"getting query...");
@@ -125,7 +125,7 @@ bool sqlrconnection::getQuery(sqlrcursor *cursor) {
 	return true;
 }
 
-bool sqlrconnection::processQuery(sqlrcursor *cursor,
+bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor,
 					bool reallyexecute) {
 
@@ -151,26 +151,106 @@ bool sqlrconnection::processQuery(sqlrcursor *cursor,
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"re-executing...");
 		#endif
-		success=(cursor->handleBinds() && 
-			cursor->executeQuery(cursor->querybuffer,
-						cursor->querylength,
-						reallyexecute));
+		if (supportsNativeBinds()) {
+			#ifdef INCLUDE_SID
+			if (cursor->sql_injection_detection_ingress(
+							cursor->querybuffer)) {
+				success=true;
+			} else {
+			#endif
+				success=(cursor->handleBinds() && 
+					cursor->executeQuery(
+							cursor->querybuffer,
+							cursor->querylength,
+							reallyexecute));
+			#ifdef INCLUDE_SID
+			}
+			#endif
+		} else {
+
+			stringbuffer	*newquery=cursor->fakeInputBinds(
+							cursor->querybuffer);
+			const char	*queryptr=(newquery)?
+						newquery->getString():
+						cursor->querybuffer;
+			uint32_t	querylen=(newquery)?
+						newquery->getStringLength():
+						cursor->querylength;
+			#ifdef INCLUDE_SID
+			if (cursor->sql_injection_detection_ingress(queryptr)) {
+				success=true;
+			} else {
+			#endif
+				success=cursor->executeQuery(queryptr,
+							querylen,
+							reallyexecute);
+			#ifdef INCLUDE_SID
+			}
+			#endif
+			delete newquery;
+		}
 	} else if (bindcursor) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"bind cursor...");
 		#endif
-		success=cursor->executeQuery(cursor->querybuffer,
-						cursor->querylength,
-						reallyexecute);
+		#ifdef INCLUDE_SID
+		if (cursor->sql_injection_detection_ingress(
+						cursor->querybuffer)) {
+			success=true;
+		} else {
+		#endif
+			success=cursor->executeQuery(cursor->querybuffer,
+							cursor->querylength,
+							reallyexecute);
+		#ifdef INCLUDE_SID
+		}
+		#endif
 	} else {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"preparing/executing...");
 		#endif
-		success=(cursor->prepareQuery(cursor->querybuffer,
-						cursor->querylength) && 
-			cursor->handleBinds() && 
-			cursor->executeQuery(cursor->querybuffer,
-						cursor->querylength,true));
+		if (supportsNativeBinds()) {
+			#ifdef INCLUDE_SID
+			if (cursor->sql_injection_detection_ingress(
+							cursor->querybuffer)) {
+				success=true;
+			} else {
+			#endif
+				success=(cursor->prepareQuery(
+							cursor->querybuffer,
+							cursor->querylength) && 
+					cursor->handleBinds() && 
+					cursor->executeQuery(
+							cursor->querybuffer,
+							cursor->querylength,
+							true));
+			#ifdef INCLUDE_SID
+			}
+			#endif
+		} else {
+			stringbuffer	*newquery=cursor->fakeInputBinds(
+							cursor->querybuffer);
+			const char	*queryptr=(newquery)?
+						newquery->getString():
+						cursor->querybuffer;
+			uint32_t	querylen=(newquery)?
+						newquery->getStringLength():
+						cursor->querylength;
+			#ifdef INCLUDE_SID
+			if (cursor->sql_injection_detection_ingress(queryptr)) {
+				success=true;
+			} else {
+			#endif
+				success=(cursor->prepareQuery(
+							cursor->querybuffer,
+							cursor->querylength) && 
+					cursor->executeQuery(queryptr,
+							querylen,true));
+			#ifdef INCLUDE_SID
+			}
+			#endif
+			delete newquery;
+		}
 	}
 
 	// was the query a commit or rollback?
@@ -202,7 +282,7 @@ bool sqlrconnection::processQuery(sqlrcursor *cursor,
 	return success;
 }
 
-void sqlrconnection::commitOrRollback(sqlrcursor *cursor) {
+void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"commit or rollback check...");
