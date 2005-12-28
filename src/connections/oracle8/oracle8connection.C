@@ -1324,25 +1324,37 @@ const char *oracle8cursor::getErrorMessage(bool *liveconnection) {
 	return errormessage->getString();
 }
 
-void oracle8cursor::returnRowCounts() {
+bool oracle8cursor::knowsRowCount() {
+	return false;
+}
 
-	// get the row count
+uint64_t oracle8cursor::rowCount() {
+	return 0;
+}
+
+bool oracle8cursor::knowsAffectedRows() {
+	return true;
+}
+
+uint64_t oracle8cursor::affectedRows() {
+
+	// get the affected row count
 	ub4	rows;
 	OCIAttrGet(stmt,OCI_HTYPE_STMT,
 			(dvoid *)&rows,(ub4 *)NULL,
 			OCI_ATTR_ROW_COUNT,oracle8conn->err);
-
-	// don't know how to get affected row count in OCI8
-	conn->sendRowCounts(false,0,true,rows);
+	return rows;
 }
 
-void oracle8cursor::returnColumnCount() {
-	conn->sendColumnCount(ncols);
+uint32_t oracle8cursor::colCount() {
+	return ncols;
+}
+
+uint16_t oracle8cursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void oracle8cursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// a useful variable
 	uint16_t	type;

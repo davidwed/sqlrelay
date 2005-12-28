@@ -116,8 +116,12 @@ class sqlrcursor_svr {
 		virtual	bool		queryIsCommitOrRollback();
 		virtual	const char	*getErrorMessage(
 						bool *liveconnection)=0;
-		virtual	void		returnRowCounts()=0;
-		virtual	void		returnColumnCount()=0;
+		virtual bool		knowsRowCount()=0;
+		virtual uint64_t	rowCount()=0;
+		virtual bool		knowsAffectedRows()=0;
+		virtual uint64_t	affectedRows()=0;
+		virtual	uint32_t	colCount()=0;
+		virtual uint16_t	columnTypeFormat()=0;
 		virtual	void		returnColumnInfo()=0;
 		virtual	bool		noRowsToReturn()=0;
 		virtual	bool		skipRow()=0;

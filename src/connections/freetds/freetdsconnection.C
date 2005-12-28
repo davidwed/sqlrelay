@@ -959,19 +959,31 @@ const char *freetdscursor::getErrorMessage(bool *liveconnection) {
 	}
 }
 
-void freetdscursor::returnRowCounts() {
-
-	// send row counts (actual row count unknown in sybase)
-	conn->sendRowCounts(false,0,knowsaffectedrows,affectedrows);
+bool freetdscursor::knowsRowCount() {
+	return false;
 }
 
-void freetdscursor::returnColumnCount() {
-	conn->sendColumnCount(ncols);
+uint64_t freetdscursor::rowCount() {
+	return 0;
+}
+
+bool freetdscursor::knowsAffectedRows() {
+	return knowsaffectedrows;
+}
+
+uint64_t freetdscursor::affectedRows() {
+	return affectedrows;
+}
+
+uint32_t freetdscursor::colCount() {
+	return ncols;
+}
+
+uint16_t freetdscursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void freetdscursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// unless the query was a successful select, send no header
 	if (resultstype!=CS_ROW_RESULT &&

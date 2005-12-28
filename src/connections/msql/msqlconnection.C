@@ -146,19 +146,31 @@ const char *msqlcursor::getErrorMessage(bool *liveconnection) {
 	return msqlErrMsg;
 }
 
-void msqlcursor::returnRowCounts() {
-
-	// send row counts (affected row count unknown in msql)
-	conn->sendRowCounts(true,nrows,false,0);
+bool msqlcursor::knowsRowCount() {
+	return true;
 }
 
-void msqlcursor::returnColumnCount() {
-	conn->sendColumnCount(ncols);
+uint64_t msqlcursor::rowCount() {
+	return nrows;
+}
+
+bool msqlcursor::knowsAffectedRows() {
+	return false;
+}
+
+uint64_t msqlcursor::affectedRows() {
+	return 0;
+}
+
+uint32_t msqlcursor::colCount() {
+	return ncols;
+}
+
+uint16_t msqlcursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void msqlcursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// for dml/ddl queries, return no header
 	if (!msqlresult) {

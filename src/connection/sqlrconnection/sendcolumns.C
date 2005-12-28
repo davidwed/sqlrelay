@@ -12,43 +12,6 @@ bool sqlrconnection_svr::sendColumnInfo() {
 	return false;
 }
 
-void sqlrconnection_svr::sendColumnCount(uint32_t ncols) {
-
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"sending column count...");
-	#endif
-
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,(int32_t)ncols);
-	#endif
-	clientsock->write(ncols);
-
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done sending column count");
-	#endif
-}
-
-void sqlrconnection_svr::sendColumnTypeFormat(uint16_t format) {
-
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"sending column type format...");
-	#endif
-
-	#ifdef SERVER_DEBUG
-	if (format==COLUMN_TYPE_IDS) {
-		debugPrint("connection",3,"id's");
-	} else {
-		debugPrint("connection",3,"names");
-	}
-	#endif
-
-	clientsock->write(format);
-
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done sending column type format");
-	#endif
-}
-
 void sqlrconnection_svr::sendColumnDefinition(const char *name,
 						uint16_t namelen,
 						uint16_t type, 

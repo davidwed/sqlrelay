@@ -459,17 +459,31 @@ const char *db2cursor::getErrorMessage(bool *liveconnection) {
 	return errormsg->getString();
 }
 
-void db2cursor::returnRowCounts() {
-	conn->sendRowCounts(false,0,true,affectedrows);
+bool db2cursor::knowsRowCount() {
+	return false;
 }
 
-void db2cursor::returnColumnCount() {
-	conn->sendColumnCount(ncols);
+uint64_t db2cursor::rowCount() {
+	return 0;
+}
+
+bool db2cursor::knowsAffectedRows() {
+	return true;
+}
+
+uint64_t db2cursor::affectedRows() {
+	return affectedrows;
+}
+
+uint32_t db2cursor::colCount() {
+	return ncols;
+}
+
+uint16_t db2cursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void db2cursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// a useful variable
 	uint16_t	type;

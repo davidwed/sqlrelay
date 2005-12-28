@@ -610,20 +610,34 @@ const char *interbasecursor::getErrorMessage(bool *liveconnection) {
 	return errormsg->getString();
 }
 
-void interbasecursor::returnRowCounts() {
-	conn->sendRowCounts(false,0,false,0);
+bool interbasecursor::knowsRowCount() {
+	return false;
 }
 
-void interbasecursor::returnColumnCount() {
+uint64_t interbasecursor::rowCount() {
+	return 0;
+}
+
+bool interbasecursor::knowsAffectedRows() {
+	return false;
+}
+
+uint64_t interbasecursor::affectedRows() {
+	return 0;
+}
+
+uint32_t interbasecursor::colCount() {
 	// for exec procedure queries, outsqlda contains output bind values
 	// rather than column info and there is no result set, thus no column
 	// info
-	conn->sendColumnCount(outsqlda->sqld);
+	return outsqlda->sqld;
+}
+
+uint16_t interbasecursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void interbasecursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	short	precision;
 

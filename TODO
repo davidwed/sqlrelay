@@ -11,6 +11,7 @@ get sid working, document
 		set up sqlrelay instance to talk to it
 		set up another instance to use siddb instance for sid
 		populate siddb
+	convert code that sends column definitions so it can be wrapped
 
 * NLS_LANG-like issues with other db's?
 

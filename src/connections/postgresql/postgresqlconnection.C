@@ -444,21 +444,35 @@ const char *postgresqlcursor::getErrorMessage(bool *liveconnection) {
 	return PQerrorMessage(postgresqlconn->pgconn);
 }
 
-void postgresqlcursor::returnRowCounts() {
-	conn->sendRowCounts(true,nrows,true,affectedrows);
+bool postgresqlcursor::knowsRowCount() {
+	return true;
 }
 
-void postgresqlcursor::returnColumnCount() {
-	conn->sendColumnCount(ncols);
+uint64_t postgresqlcursor::rowCount() {
+	return nrows;
+}
+
+bool postgresqlcursor::knowsAffectedRows() {
+	return true;
+}
+
+uint64_t postgresqlcursor::affectedRows() {
+	return affectedrows;
+}
+
+uint32_t postgresqlcursor::colCount() {
+	return ncols;
+}
+
+uint16_t postgresqlcursor::columnTypeFormat() {
+	if (postgresqlconn->typemangling==1) {
+		return (uint16_t)COLUMN_TYPE_IDS;
+	} else {
+		return (uint16_t)COLUMN_TYPE_NAMES;
+	}
 }
 
 void postgresqlcursor::returnColumnInfo() {
-
-	if (postgresqlconn->typemangling==1) {
-		conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
-	} else {
-		conn->sendColumnTypeFormat(COLUMN_TYPE_NAMES);
-	}
 
 	// some useful variables
 	Oid		pgfieldtype;

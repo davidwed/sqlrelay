@@ -773,19 +773,31 @@ const char *sybasecursor::getErrorMessage(bool *liveconnection) {
 	}
 }
 
-void sybasecursor::returnRowCounts() {
-
-	// send row counts (actual row count unknown in sybase)
-	conn->sendRowCounts(false,0,true,affectedrows);
+bool sybasecursor::knowsRowCount() {
+	return false;
 }
 
-void sybasecursor::returnColumnCount() {
-	conn->sendColumnCount(ncols);
+uint64_t sybasecursor::rowCount() {
+	return 0;
+}
+
+bool sybasecursor::knowsAffectedRows() {
+	return true;
+}
+
+uint64_t sybasecursor::affectedRows() {
+	return affectedrows;
+}
+
+uint32_t sybasecursor::colCount() {
+	return ncols;
+}
+
+uint16_t sybasecursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void sybasecursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// unless the query was a successful select, send no header
 	if (resultstype!=CS_ROW_RESULT &&

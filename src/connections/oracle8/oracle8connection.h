@@ -138,8 +138,12 @@ class oracle8cursor : public sqlrcursor_svr {
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
 		const char	*getErrorMessage(bool *liveconnection);
-		void		returnRowCounts();
-		void		returnColumnCount();
+		bool		knowsRowCount();
+		uint64_t	rowCount();
+		bool		knowsAffectedRows();
+		uint64_t	affectedRows();
+		uint32_t	colCount();
+		uint16_t	columnTypeFormat();
 		void		returnColumnInfo();
 		bool		noRowsToReturn();
 		bool		skipRow();

@@ -135,18 +135,31 @@ const char *mdbtoolscursor::getErrorMessage(bool *liveconnection) {
 	return "error";
 }
 
-void mdbtoolscursor::returnRowCounts() {
-	// row count and affected row count are unknown
-	conn->sendRowCounts(false,0,false,0);
+bool mdbtoolscursor::knowsRowCount() {
+	return false;
 }
 
-void mdbtoolscursor::returnColumnCount() {
-	conn->sendColumnCount(mdbsql.num_columns);
+uint64_t mdbtoolscursor::rowCount() {
+	return 0;
+}
+
+bool mdbtoolscursor::knowsAffectedRows() {
+	return false;
+}
+
+uint64_t mdbtoolscursor::affectedRows() {
+	return 0;
+}
+
+uint32_t mdbtoolscursor::colCount() {
+	return mdbsql.num_columns;
+}
+
+uint16_t mdbtoolscursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void mdbtoolscursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// for each column...
 	for (int i=0; i<mdbsql.num_columns; i++) {

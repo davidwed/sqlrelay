@@ -263,19 +263,31 @@ const char *mysqlcursor::getErrorMessage(bool *liveconnection) {
 	return err;
 }
 
-void mysqlcursor::returnColumnCount() {
-	conn->sendColumnCount(ncols);
+uint32_t mysqlcursor::colCount() {
+	return ncols;
 }
 
-void mysqlcursor::returnRowCounts() {
+bool mysqlcursor::knowsRowCount() {
+	return true;
+}
 
-	// send row counts
-	conn->sendRowCounts(true,nrows,true,affectedrows);
+uint64_t mysqlcursor::rowCount() {
+	return nrows;
+}
+
+bool mysqlcursor::knowsAffectedRows() {
+	return true;
+}
+
+uint64_t mysqlcursor::affectedRows() {
+	return affectedrows;
+}
+
+uint16_t mysqlcursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void mysqlcursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// for DML or DDL queries, return no column info
 	if (!mysqlresult) {

@@ -654,19 +654,31 @@ const char *odbccursor::getErrorMessage(bool *liveconnection) {
 	return errormsg->getString();
 }
 
-void odbccursor::returnRowCounts() {
-
-	// send row counts
-	conn->sendRowCounts(false,0,true,affectedrows);
+bool odbccursor::knowsRowCount() {
+	return false;
 }
 
-void odbccursor::returnColumnCount() {
-	conn->sendColumnCount(ncols);
+uint64_t odbccursor::rowCount() {
+	return 0;
+}
+
+bool odbccursor::knowsAffectedRows() {
+	return true;
+}
+
+uint64_t odbccursor::affectedRows() {
+	return affectedrows;
+}
+
+uint32_t odbccursor::colCount() {
+	return ncols;
+}
+
+uint16_t odbccursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void odbccursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// a useful variable
 	uint16_t	type;

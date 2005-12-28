@@ -3,6 +3,8 @@
 
 #include <sqlrconnection.h>
 
+#include <datatypes.h>
+
 void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
@@ -13,7 +15,8 @@ void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"returning row counts...");
 	#endif
-	cursor->returnRowCounts();
+	sendRowCounts(cursor->knowsRowCount(),cursor->rowCount(),
+			cursor->knowsAffectedRows(),cursor->affectedRows());
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"done returning row counts");
 	#endif
@@ -36,13 +39,31 @@ void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"returning column counts...");
 	#endif
-	cursor->returnColumnCount();
+	clientsock->write(cursor->colCount());
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",3,"done returning column counts");
 	#endif
 
 
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
+
+		// return the column type format
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",2,"sending column type format...");
+		#endif
+		uint16_t	format=cursor->columnTypeFormat();
+		#ifdef SERVER_DEBUG
+		if (format==COLUMN_TYPE_IDS) {
+			debugPrint("connection",3,"id's");
+		} else {
+			debugPrint("connection",3,"names");
+		}
+		#endif
+		clientsock->write(format);
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",2,"done sending column type format");
+		#endif
+
 		// return the column info
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"returning column info...");

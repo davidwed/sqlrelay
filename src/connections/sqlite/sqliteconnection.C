@@ -226,19 +226,31 @@ const char *sqlitecursor::getErrorMessage(bool *liveconnection) {
 	return sqliteconn->errmesg;
 }
 
-void sqlitecursor::returnRowCounts() {
-
-	// affected row counts are unknown in sqlite
-	conn->sendRowCounts(true,nrow,false,0);
+bool sqlitecursor::knowsRowCount() {
+	return true;
 }
 
-void sqlitecursor::returnColumnCount() {
-	conn->sendColumnCount(ncolumn);
+uint64_t sqlitecursor::rowCount() {
+	return nrow;
+}
+
+bool sqlitecursor::knowsAffectedRows() {
+	return false;
+}
+
+uint64_t sqlitecursor::affectedRows() {
+	return 0;
+}
+
+uint32_t sqlitecursor::colCount() {
+	return ncolumn;
+}
+
+uint16_t sqlitecursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void sqlitecursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	if (!columnnames) {
 		return;

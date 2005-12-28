@@ -96,8 +96,6 @@ class sqlrconnection_svr :
 						uint64_t actual,
 						bool knowsaffected,
 						uint64_t affected);
-		void		sendColumnCount(uint32_t ncols);
-		void		sendColumnTypeFormat(uint16_t format);
 		void		sendColumnDefinition(const char *name, 
 						uint16_t namelen, 
 						uint16_t type, 

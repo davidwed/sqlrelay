@@ -462,18 +462,31 @@ const char *oracle7cursor::getErrorMessage(bool *liveconnection) {
 	return errormessage->getString();
 }
 
-void oracle7cursor::returnRowCounts() {
-	// send row counts (actual row count unknown in oracle)
-	oracle7conn->sendRowCounts(false,0,true,cda.rpc);
+bool oracle7cursor::knowsRowCount() {
+	return false;
 }
 
-void oracle7cursor::returnColumnCount() {
-	oracle7conn->sendColumnCount(ncols);
+uint64_t oracle7cursor::rowCount() {
+	return 0;
+}
+
+bool oracle7cursor::knowsAffectedRows() {
+	return true;
+}
+
+uint64_t oracle7cursor::affectedRows() {
+	return cda.rpc;
+}
+
+uint32_t oracle7cursor::colCount() {
+	return ncols;
+}
+
+uint16_t oracle7cursor::columnTypeFormat() {
+	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void oracle7cursor::returnColumnInfo() {
-
-	conn->sendColumnTypeFormat(COLUMN_TYPE_IDS);
 
 	// a useful variables
 	uint16_t	type;

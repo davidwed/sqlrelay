@@ -53,8 +53,12 @@ class postgresqlcursor : public sqlrcursor_svr {
 						uint32_t length,
 						bool execute);
 		const char	*getErrorMessage(bool *liveconnection);
-		void		returnRowCounts();
-		void		returnColumnCount();
+		bool		knowsRowCount();
+		uint64_t	rowCount();
+		bool		knowsAffectedRows();
+		uint64_t	affectedRows();
+		uint32_t	colCount();
+		uint16_t	columnTypeFormat();
 		void		returnColumnInfo();
 		bool		noRowsToReturn();
 		bool		skipRow();
