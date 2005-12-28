@@ -32,9 +32,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/slackware/7
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/slackware/8
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/sybase
-	$(INSTALL) -m 644 clientapis.html $(docdir)
 	$(INSTALL) -m 644 configuring.html $(docdir)
-	$(INSTALL) -m 644 connections.html $(docdir)
 	$(INSTALL) -m 644 index.html $(docdir)
 	$(INSTALL) -m 644 installing.html $(docdir)
 	$(INSTALL) -m 644 introduction.html $(docdir)
