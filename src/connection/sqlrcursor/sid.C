@@ -3,8 +3,6 @@
 
 #include <sqlrconnection.h>
 
-#ifdef INCLUDE_SID
-
 #include <rudiments/charstring.h>
 
 void sqlrcursor_svr::sql_injection_detection_database_close() {
@@ -455,11 +453,11 @@ void sqlrcursor_svr::sql_injection_detection_parse_sql(const char *query) {
 
 // This method performs egress filtering for SID
 
-bool sqlrcursor_svr::sql_injection_detection_egress(int32_t num_fields,
-					const char * const *field_names) {
+bool sqlrcursor_svr::sql_injection_detection_egress() {
 
 	if (!conn->cfgfl->getSidEnabled()) {
-		return false;
+		// FIXME: is this right?
+		return true;
 	}
        
 	bool ret_val = false;	// flag indicating a sql injection attack
@@ -467,7 +465,7 @@ bool sqlrcursor_svr::sql_injection_detection_egress(int32_t num_fields,
         // parse the SQL results 
 	// it will be needed for all modes of operation
 
-        sql_injection_detection_parse_results(num_fields, field_names);
+        sql_injection_detection_parse_results(colCount(), columnNames());
 
 	// Detect if a buffer overflow attack
 
@@ -628,5 +626,3 @@ bool sqlrcursor_svr::sql_injection_detection_egress_ldb() {
 	return( ret_val );
 
 }
-
-#endif

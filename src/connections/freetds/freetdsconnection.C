@@ -394,7 +394,7 @@ bool freetdscursor::openCursor(uint16_t id) {
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true))) {
 			bool	live;
-			fprintf(stderr,"%s\n",getErrorMessage(&live));
+			fprintf(stderr,"%s\n",errorMessage(&live));
 			retval=false;
 		}
 		cleanUpData(true,true);
@@ -946,7 +946,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *freetdscursor::getErrorMessage(bool *liveconnection) {
+const char *freetdscursor::errorMessage(bool *liveconnection) {
 	if (freetdsconn->deadconnection) {
 		*liveconnection=false;
 	} else {
@@ -977,6 +977,16 @@ uint64_t freetdscursor::affectedRows() {
 
 uint32_t freetdscursor::colCount() {
 	return ncols;
+}
+
+const char * const *freetdscursor::columnNames() {
+	for (CS_INT i=0; i<ncols; i++) {
+		if (ct_describe(cmd,i+1,&column[i])!=CS_SUCCEED) {
+			break;
+		}
+		columnnames[i]=column[i].name;
+	}
+	return columnnames;
 }
 
 uint16_t freetdscursor::columnTypeFormat() {

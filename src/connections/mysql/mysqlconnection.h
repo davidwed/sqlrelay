@@ -16,15 +16,17 @@ class mysqlcursor : public sqlrcursor_svr {
 	friend class mysqlconnection;
 	private:
 				mysqlcursor(sqlrconnection_svr *conn);
+				~mysqlcursor();
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
-		const char	*getErrorMessage(bool *liveconnection);
+		const char	*errorMessage(bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
+		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
 		void		returnColumnInfo();
 		bool		noRowsToReturn();
@@ -40,6 +42,7 @@ class mysqlcursor : public sqlrcursor_svr {
 		my_ulonglong	nrows;
 		my_ulonglong	affectedrows;
 		int		queryresult;
+		char		**columnnames;
 
 		mysqlconnection	*mysqlconn;
 };

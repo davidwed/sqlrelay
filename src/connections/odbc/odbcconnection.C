@@ -633,7 +633,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *odbccursor::getErrorMessage(bool *liveconnection) {
+const char *odbccursor::errorMessage(bool *liveconnection) {
 
 	SQLCHAR		error[501];
 	SQLCHAR		state[10];
@@ -672,6 +672,13 @@ uint64_t odbccursor::affectedRows() {
 
 uint32_t odbccursor::colCount() {
 	return ncols;
+}
+
+const char * const * odbccursor::columnNames() {
+	for (SQLSMALLINT i=0; i<ncols; i++) {
+		columnnames[i]=col[i].name;
+	}
+	return columnnames;
 }
 
 uint16_t odbccursor::columnTypeFormat() {

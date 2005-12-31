@@ -424,7 +424,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length, bool execute) {
 	return true;
 }
 
-const char *db2cursor::getErrorMessage(bool *liveconnection) {
+const char *db2cursor::errorMessage(bool *liveconnection) {
 
 	SQLCHAR		error[501];
 	SQLCHAR		state[10];
@@ -477,6 +477,13 @@ uint64_t db2cursor::affectedRows() {
 
 uint32_t db2cursor::colCount() {
 	return ncols;
+}
+
+const char * const *db2cursor::columnNames() {
+	for (SQLSMALLINT i=0; i<ncols; i++) {
+		columnnames[i]=col[i].name;
+	}
+	return columnnames;
 }
 
 uint16_t db2cursor::columnTypeFormat() {

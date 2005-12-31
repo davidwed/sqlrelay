@@ -28,9 +28,7 @@
 
 #include <defines.h>
 
-#ifdef INCLUDE_SID
-	#include <sqlrelay/sqlrclient.h>
-#endif
+#include <sqlrelay/sqlrclient.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -327,9 +325,7 @@ class sqlrconnection_svr :
 		semaphoreset	*semset;
 		sharedmemory	*idmemory;
 
-#ifdef INCLUDE_SID
 		sqlrconnection	*sid_sqlrcon;
-#endif
 
 	protected:
 

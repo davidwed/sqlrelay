@@ -169,13 +169,17 @@ postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
 	bindvalues=NULL;
 	bindlengths=NULL;
 #endif
+	columnnames=NULL;
+}
+
+postgresqlcursor::~postgresqlcursor() {
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+	delete[] cursorname;
+#endif
+	delete[] columnnames;
 }
 
 #ifdef HAVE_POSTGRESQL_PQEXECPARAMS
-postgresqlcursor::~postgresqlcursor() {
-	delete[] cursorname;
-}
-
 bool postgresqlcursor::openCursor(uint16_t id) {
 	size_t	cursornamelen=6+charstring::integerLength(id)+1;
 	cursorname=new char[cursornamelen];
@@ -439,7 +443,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *postgresqlcursor::getErrorMessage(bool *liveconnection) {
+const char *postgresqlcursor::errorMessage(bool *liveconnection) {
 	*liveconnection=(PQstatus(postgresqlconn->pgconn)==CONNECTION_OK);
 	return PQerrorMessage(postgresqlconn->pgconn);
 }
@@ -462,6 +466,14 @@ uint64_t postgresqlcursor::affectedRows() {
 
 uint32_t postgresqlcursor::colCount() {
 	return ncols;
+}
+
+const char * const * postgresqlcursor::columnNames() {
+	columnnames=new char *[ncols];
+	for (int32_t i=0; i<ncols; i++) {
+		columnnames[i]=PQfname(pgresult,i);
+	}
+	return columnnames;
 }
 
 uint16_t postgresqlcursor::columnTypeFormat() {
@@ -602,4 +614,6 @@ void postgresqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 		PQclear(pgresult);
 		pgresult=(PGresult *)NULL;
 	}
+	delete[] columnnames;
+	columnnames=NULL;
 }

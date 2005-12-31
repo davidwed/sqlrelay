@@ -81,6 +81,11 @@ bool mdbtoolsconnection::rollback() {
 mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 					sqlrcursor_svr(conn) {
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
+	columnnames=NULL;
+}
+
+mdbtoolscursor::~mdbtoolscursor() {
+	delete[] columnnames;
 }
 
 bool mdbtoolscursor::openCursor(uint16_t id) {
@@ -130,7 +135,7 @@ bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *mdbtoolscursor::getErrorMessage(bool *liveconnection) {
+const char *mdbtoolscursor::errorMessage(bool *liveconnection) {
 	*liveconnection=true;
 	return "error";
 }
@@ -153,6 +158,16 @@ uint64_t mdbtoolscursor::affectedRows() {
 
 uint32_t mdbtoolscursor::colCount() {
 	return mdbsql.num_columns;
+}
+
+const char * const *mdbtoolscursor::columnNames() {
+	columnnames=new char *[mdbsql.num_columns];
+	for (int i=0; i<mdbsql.num_columns; i++) {
+		MdbSQLColumn	*col=(MdbSQLColumn *)
+			g_ptr_array_index(mdbsql.columns,i);
+		columnnames[i]=col->name;
+	}
+	return columnnames;
 }
 
 uint16_t mdbtoolscursor::columnTypeFormat() {
@@ -223,4 +238,6 @@ void mdbtoolscursor::returnRow() {
 }
 
 void mdbtoolscursor::cleanUpData(bool freeresult, bool freebinds) {
+	delete[] columnnames;
+	columnnames=NULL;
 }

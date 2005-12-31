@@ -960,18 +960,6 @@ then
 	AC_SUBST(MYSQLLIBS)
 	AC_SUBST(MYSQLLIBSPATH)
 	AC_SUBST(MYSQLSTATIC)
-
-	dnl if ( test "$ENABLE_SID" = "yes" )
-	dnl then
-		dnl SIDINCLUDES="$MYSQLINCLUDES"
-		dnl SIDLIBS="$MYSQLLIBS"
-		dnl AC_SUBST(SIDINCLUDES)
-		dnl AC_SUBST(SIDLIBS)
-		dnl if ( test -n "$SIDLIBS" )
-		dnl then
-			dnl AC_DEFINE(INCLUDE_SID,1,Include support for SID)
-		dnl fi
-	dnl fi
 fi
 ])
 

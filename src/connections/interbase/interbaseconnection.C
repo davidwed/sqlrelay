@@ -583,7 +583,7 @@ bool interbasecursor::queryIsCommitOrRollback() {
 		querytype==isc_info_sql_stmt_rollback);
 }
 
-const char *interbasecursor::getErrorMessage(bool *liveconnection) {
+const char *interbasecursor::errorMessage(bool *liveconnection) {
 
 	char		msg[512];
 	ISC_STATUS	*pvector=interbaseconn->error;
@@ -631,6 +631,13 @@ uint32_t interbasecursor::colCount() {
 	// rather than column info and there is no result set, thus no column
 	// info
 	return outsqlda->sqld;
+}
+
+const char * const *interbasecursor::columnNames() {
+	for (short i=0; i<outsqlda->sqld; i++) {
+		columnnames[i]=outsqlda->sqlvar[i].sqlname;
+	}
+	return columnnames;
 }
 
 uint16_t interbasecursor::columnTypeFormat() {

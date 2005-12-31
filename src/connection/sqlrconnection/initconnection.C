@@ -108,7 +108,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
 
-#ifdef INCLUDE_SID
 	// log into the sid database
 	if (cfgfl->getSidEnabled()) {
 		sid_sqlrcon=new sqlrconnection(cfgfl->getSidHost(),
@@ -118,7 +117,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 						cfgfl->getSidPassword(),
 						0,1);
 	}
-#endif
 
 	// if we're not passing descriptors around, listen on 
 	// inet and unix sockets for client connections

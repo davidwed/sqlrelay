@@ -109,12 +109,13 @@ class oracle7cursor : public sqlrcursor_svr {
 						bool execute);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
-		const char	*getErrorMessage(bool *liveconnection);
+		const char	*errorMessage(bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
+		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
 		void		returnColumnInfo();
 		bool		noRowsToReturn();
@@ -129,6 +130,7 @@ class oracle7cursor : public sqlrcursor_svr {
 		sword		ncols;
 
 		describe	desc[MAX_SELECT_LIST_SIZE];
+		char		*columnnames[MAX_SELECT_LIST_SIZE];
 		ub1		def_buf[MAX_SELECT_LIST_SIZE]
 					[FETCH_AT_ONCE][MAX_ITEM_BUFFER_SIZE];
 		sb2		def_indp[MAX_SELECT_LIST_SIZE][FETCH_AT_ONCE];

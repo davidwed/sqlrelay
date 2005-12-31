@@ -419,6 +419,7 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	}
 
 	desc=new describe[oracle8conn->maxselectlistsize];
+	columnnames=new char *[oracle8conn->maxselectlistsize];
 	def=new OCIDefine *[oracle8conn->maxselectlistsize];
 	def_lob=new OCILobLocator **[oracle8conn->maxselectlistsize];
 	def_buf=new ub1 *[oracle8conn->maxselectlistsize];
@@ -468,6 +469,7 @@ oracle8cursor::~oracle8cursor() {
 	delete[] def_buf;
 	delete[] def;
 	delete[] desc;
+	delete[] columnnames;
 }
 
 bool oracle8cursor::openCursor(uint16_t id) {
@@ -1295,7 +1297,7 @@ bool oracle8cursor::queryIsCommitOrRollback() {
 	return (!stmttype);
 }
 
-const char *oracle8cursor::getErrorMessage(bool *liveconnection) {
+const char *oracle8cursor::errorMessage(bool *liveconnection) {
 
 	// get the message from oracle
 	text	message[1024];
@@ -1348,6 +1350,13 @@ uint64_t oracle8cursor::affectedRows() {
 
 uint32_t oracle8cursor::colCount() {
 	return ncols;
+}
+
+const char * const * oracle8cursor::columnNames() {
+	for (sword i=0; i<ncols; i++) {
+		columnnames[i]=(char *)desc[i].buf;
+	}
+	return columnnames;
 }
 
 uint16_t oracle8cursor::columnTypeFormat() {

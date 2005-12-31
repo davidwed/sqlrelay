@@ -303,7 +303,7 @@ bool sybasecursor::openCursor(uint16_t id) {
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true))) {
 			bool	live;
-			fprintf(stderr,"%s\n",getErrorMessage(&live));
+			fprintf(stderr,"%s\n",errorMessage(&live));
 			retval=false;
 		}
 		cleanUpData(true,true);
@@ -760,7 +760,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *sybasecursor::getErrorMessage(bool *liveconnection) {
+const char *sybasecursor::errorMessage(bool *liveconnection) {
 	if (sybaseconn->deadconnection) {
 		*liveconnection=false;
 	} else {
@@ -791,6 +791,16 @@ uint64_t sybasecursor::affectedRows() {
 
 uint32_t sybasecursor::colCount() {
 	return ncols;
+}
+
+const char * const * sybasecursor::columnNames() {
+	for (CS_INT i=0; i<ncols; i++) {
+		if (ct_describe(cmd,i+1,&column[i])!=CS_SUCCEED) {
+			break;
+		}
+		columnnames[i]=column[i].name;
+	}
+	return columnnames;
 }
 
 uint16_t sybasecursor::columnTypeFormat() {

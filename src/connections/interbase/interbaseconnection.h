@@ -75,12 +75,13 @@ class interbasecursor : public sqlrcursor_svr {
 						bool execute);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
-		const char	*getErrorMessage(bool *liveconnection);
+		const char	*errorMessage(bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
+		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
 		void		returnColumnInfo();
 		bool		noRowsToReturn();
@@ -94,6 +95,7 @@ class interbasecursor : public sqlrcursor_svr {
 		uint16_t	outbindcount;
 		bool		outbindisstring[MAXVAR];
 		XSQLDA	ISC_FAR	*outsqlda;
+		char		*columnnames[MAX_SELECT_LIST_SIZE];
 		XSQLDA	ISC_FAR	*insqlda;
 		ISC_BLOB_DESC	to_desc;
 

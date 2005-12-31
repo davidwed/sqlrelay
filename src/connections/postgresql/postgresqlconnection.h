@@ -52,12 +52,13 @@ class postgresqlcursor : public sqlrcursor_svr {
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
-		const char	*getErrorMessage(bool *liveconnection);
+		const char	*errorMessage(bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
+		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
 		void		returnColumnInfo();
 		bool		noRowsToReturn();
@@ -84,6 +85,8 @@ class postgresqlcursor : public sqlrcursor_svr {
 		int		*bindformats;
 		char		*cursorname;
 #endif
+
+		char		**columnnames;
 };
 
 class postgresqlconnection : public sqlrconnection_svr {

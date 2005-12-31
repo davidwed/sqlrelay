@@ -7,6 +7,31 @@
 
 void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
+	// if sid egress check failed, return 0 rows and columns
+	if (!cursor->sid_egress_success) {
+printf("egress check failed\n");
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",2,
+				"sid egress check failed...");
+		debugPrint("connection",2,
+				"returning empty result set header...");
+		#endif
+		// row counts
+		sendRowCounts(cursor->knowsRowCount(),0,
+				cursor->knowsAffectedRows(),0);
+		// send column info or not
+		clientsock->write(DONT_SEND_COLUMN_INFO);
+		// column count
+		clientsock->write(0);
+		// no bind vars
+		clientsock->write((uint16_t)END_BIND_VARS);
+		#ifdef SERVER_DEBUG
+		debugPrint("connection",2,
+				"done returning result set header");
+		#endif
+		return;
+	}
+
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning result set header...");
 	#endif

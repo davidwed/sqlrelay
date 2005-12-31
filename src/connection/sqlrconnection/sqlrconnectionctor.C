@@ -41,7 +41,5 @@ sqlrconnection_svr::sqlrconnection_svr() :
 	// maybe someday these parameters will be configurable
 	bindpool=new memorypool(512,128,100);
 
-#ifdef INCLUDE_SID
 	sid_sqlrcon=NULL;
-#endif
 }

@@ -358,21 +358,6 @@ AC_ARG_ENABLE(efence,
 	LIBEFENCE="-lefence",
 	LIBEFENCE="")
 AC_SUBST(LIBEFENCE)
-AC_ARG_ENABLE(sid,
-	[  --enable-sid                  Enable SQL Injection Detection (requires mysql support)],
-	ENABLE_SID="yes",
-	ENABLE_SID="no")
-if ( test "$ENABLE_SID" = "yes" )
-then
-	SIDINCLUDES="-I\$(top_builddir)/src/api/c++/include"
-	SIDLIBS="-L\$(top_builddir)/src/api/c++/src -lsqlrclient"
-	AC_SUBST(SIDINCLUDES)
-	AC_SUBST(SIDLIBS)
-	if ( test -n "$SIDLIBS" )
-	then
-		AC_DEFINE(INCLUDE_SID,1,Include support for SID)
-	fi
-fi
 
 
 dnl Rewrite supplied paths.

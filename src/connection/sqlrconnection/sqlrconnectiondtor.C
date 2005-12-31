@@ -7,9 +7,7 @@
 
 sqlrconnection_svr::~sqlrconnection_svr() {
 
-#ifdef INCLUDE_SID
 	delete sid_sqlrcon;
-#endif
 
 	delete cmdl;
 	delete cfgfl;

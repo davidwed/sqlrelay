@@ -14,11 +14,10 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
 	querybuffer=NULL;
 
-#ifdef INCLUDE_SID
 	sid_sqlrcur=NULL;
 	if (conn->cfgfl->getSidEnabled()) {
 		sid_sqlrcur=new sqlrcursor(conn->sid_sqlrcon);
 		sql_injection_detection_parameters();
 	}
-#endif
+	sid_egress_success=true;
 }

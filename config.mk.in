@@ -251,8 +251,8 @@ INTERBASESTATIC = @INTERBASESTATIC@
 INTERBASEUSERPATH = @INTERBASEUSERPATH@
 
 # stuff for SID
-SIDINCLUDES = @SIDINCLUDES@
-SIDLIBS = @SIDLIBS@
+SIDINCLUDES = -I$(top_builddir)/src/api/c++/include
+SIDLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient
 
 # client/server rpath flags
 CLIENTUSERPATH = @CLIENTUSERPATH@

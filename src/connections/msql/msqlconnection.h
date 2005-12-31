@@ -16,15 +16,17 @@ class msqlcursor : public sqlrcursor_svr {
 	friend class msqlconnection;
 	private:
 				msqlcursor(sqlrconnection_svr *conn);
+				~msqlcursor();
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
-		const char	*getErrorMessage(bool *liveconnection);
+		const char	*errorMessage(bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
+		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
 		void		returnColumnInfo();
 		bool		noRowsToReturn();
@@ -35,6 +37,7 @@ class msqlcursor : public sqlrcursor_svr {
 
 		m_result	*msqlresult;
 		m_field		*msqlfield;
+		char		**columnnames;
 		m_row		msqlrow;
 		int		ncols;
 		int		nrows;

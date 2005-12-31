@@ -167,6 +167,11 @@ bool mysqlconnection::rollback() {
 mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
+	columnnames=NULL;
+}
+
+mysqlcursor::~mysqlcursor() {
+	delete[] columnnames;
 }
 
 bool mysqlcursor::executeQuery(const char *query, uint32_t length,
@@ -206,35 +211,13 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 	// get the column count
 	ncols=mysql_num_fields(mysqlresult);
 
-	// get the field names
-	char	*field_names[ncols];
-	for (unsigned int i=0; i<ncols; i++) {
-		field_names[i]=mysql_fetch_field(mysqlresult)->name;
-	}
-
-#ifdef INCLUDE_SID
-	// perform sid egress filtering
-
-	if (sql_injection_detection_egress(ncols, field_names)==true) {
-
-		mysqlresult=NULL;
-
-		sql_injection_detection=true;
-
-		ncols=0;
-		nrows=0;
-
-		return true;
-	}
-#endif
-
 	// get the row count
 	nrows=mysql_num_rows(mysqlresult);
 
 	return true;
 }
 
-const char *mysqlcursor::getErrorMessage(bool *liveconnection) {
+const char *mysqlcursor::errorMessage(bool *liveconnection) {
 
 	*liveconnection=true;
 	const char	*err=mysql_error(&mysqlconn->mysql);
@@ -265,6 +248,14 @@ const char *mysqlcursor::getErrorMessage(bool *liveconnection) {
 
 uint32_t mysqlcursor::colCount() {
 	return ncols;
+}
+
+const char * const * mysqlcursor::columnNames() {
+	columnnames=new char *[ncols];
+	for (unsigned int i=0; i<ncols; i++) {
+		columnnames[i]=mysql_fetch_field(mysqlresult)->name;
+	}
+	return columnnames;
 }
 
 bool mysqlcursor::knowsRowCount() {
@@ -478,4 +469,6 @@ void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 		mysql_free_result(mysqlresult);
 		mysqlresult=NULL;
 	}
+	delete[] columnnames;
+	columnnames=NULL;
 }

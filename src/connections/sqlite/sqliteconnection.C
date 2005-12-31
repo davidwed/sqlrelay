@@ -214,7 +214,7 @@ int sqlitecursor::runQuery(const char *query) {
 					&sqliteconn->errmesg);
 }
 
-const char *sqlitecursor::getErrorMessage(bool *liveconnection) {
+const char *sqlitecursor::errorMessage(bool *liveconnection) {
 	*liveconnection=true;
 	if (sqliteconn->errmesg &&
 		(!charstring::compare(sqliteconn->errmesg,
@@ -244,6 +244,10 @@ uint64_t sqlitecursor::affectedRows() {
 
 uint32_t sqlitecursor::colCount() {
 	return ncolumn;
+}
+
+const char * const * sqlitecursor::columnNames() {
+	return columnnames;
 }
 
 uint16_t sqlitecursor::columnTypeFormat() {

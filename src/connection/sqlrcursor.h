@@ -6,21 +6,7 @@
 
 #include <defines.h>
 
-#ifdef INCLUDE_SID
-	#include <sqlrelay/sqlrclient.h>
-
-#else
-	// FIXME: lame, defined here and in the client
-	enum bindtype {
-		NULL_BIND,
-		STRING_BIND,
-		INTEGER_BIND,
-		DOUBLE_BIND,
-		BLOB_BIND,
-		CLOB_BIND,
-		CURSOR_BIND
-	};
-#endif
+#include <sqlrelay/sqlrclient.h>
 
 class bindvar_svr {
 	public:
@@ -114,13 +100,13 @@ class sqlrcursor_svr {
 							bool execute)=0;
 		virtual	bool		queryIsNotSelect();
 		virtual	bool		queryIsCommitOrRollback();
-		virtual	const char	*getErrorMessage(
-						bool *liveconnection)=0;
+		virtual	const char	*errorMessage(bool *liveconnection)=0;
 		virtual bool		knowsRowCount()=0;
 		virtual uint64_t	rowCount()=0;
 		virtual bool		knowsAffectedRows()=0;
 		virtual uint64_t	affectedRows()=0;
 		virtual	uint32_t	colCount()=0;
+		virtual const char * const * columnNames()=0;
 		virtual uint16_t	columnTypeFormat()=0;
 		virtual	void		returnColumnInfo()=0;
 		virtual	bool		noRowsToReturn()=0;
@@ -131,15 +117,12 @@ class sqlrcursor_svr {
 							bool freebinds);
 
 
-#ifdef INCLUDE_SID
 		// SID virtual methods
 
 		/* method performs SQL Injection Detection */
 		virtual bool	sql_injection_detection_ingress(
 							const char *query);
-		virtual bool	sql_injection_detection_egress(
-					int32_t num_fields,
-					const char * const *field_names);
+		virtual bool	sql_injection_detection_egress();
 
 		/* method ends sid SID database session */
 		virtual void	sql_injection_detection_database_close();
@@ -176,7 +159,6 @@ class sqlrcursor_svr {
 		/* method to check for a row in a sid db */
 		virtual bool	sql_injection_detection_check_db(
 							const char *sid_db);
-#endif
 	
 
 	protected:
@@ -192,7 +174,6 @@ class sqlrcursor_svr {
 
 		sqlrconnection_svr	*conn;
 
-#ifdef INCLUDE_SID
 		// variables for SID
 		int32_t	sql_inject_load_params;
 		int32_t	ingress_mode;
@@ -207,17 +188,11 @@ class sqlrcursor_svr {
 
 		char	sid_log_message[BUFSIZ];
 
-		/*MYSQL		*sid_mysql;
-		MYSQL_RES	*sid_res;
-		MYSQL_ROW	sid_row;
-		MYSQL_FIELD	*sid_fields;*/
-
 		sqlrcursor	*sid_sqlrcur;
 
-		//int32_t	sid_query_result;
-
 		bool	sql_injection_detection;
-#endif
+
+		bool	sid_egress_success;
 
 		uint16_t	inbindcount;
 		bindvar_svr	inbindvars[MAXVAR];

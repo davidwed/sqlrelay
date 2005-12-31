@@ -99,6 +99,11 @@ bool msqlconnection::rollback() {
 msqlcursor::msqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	msqlconn=(msqlconnection *)conn;
 	msqlresult=NULL;
+	columnnames=NULL;
+}
+
+msqlcursor::~msqlcursor() {
+	delete[] columnnames;
 }
 
 bool msqlcursor::executeQuery(const char *query, uint32_t length,
@@ -136,7 +141,7 @@ bool msqlcursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *msqlcursor::getErrorMessage(bool *liveconnection) {
+const char *msqlcursor::errorMessage(bool *liveconnection) {
 
 	*liveconnection=true;
 	if (!charstring::compareIgnoringCase(msqlErrMsg,
@@ -164,6 +169,15 @@ uint64_t msqlcursor::affectedRows() {
 
 uint32_t msqlcursor::colCount() {
 	return ncols;
+}
+
+const char * const *msqlcursor::columnNames() {
+	columnnames=new char *[ncols];
+	for (int32_t i=0; i<ncols; i++) {
+		msqlfield=msqlFetchField(msqlresult);
+		columnnames[i]=msqlfield->name;
+	}
+	return NULL;
 }
 
 uint16_t msqlcursor::columnTypeFormat() {
@@ -273,4 +287,6 @@ void msqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 		msqlFreeResult(msqlresult);
 		msqlresult=NULL;
 	}
+	delete[] columnnames;
+	columnnames=NULL;
 }

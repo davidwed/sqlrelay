@@ -435,7 +435,7 @@ bool oracle7cursor::queryIsCommitOrRollback() {
 	return (cda.ft==COMMIT_QUERY || cda.ft==ROLLBACK_QUERY);
 }
 
-const char *oracle7cursor::getErrorMessage(bool *liveconnection) {
+const char *oracle7cursor::errorMessage(bool *liveconnection) {
 
 	// get the message from oracle
 	text	message[512];
@@ -480,6 +480,13 @@ uint64_t oracle7cursor::affectedRows() {
 
 uint32_t oracle7cursor::colCount() {
 	return ncols;
+}
+
+const char * const * oracle7cursor::columnNames() {
+	for (sword i=0; i<ncols; i++) {
+		columnnames[i]=(char *)desc[i].buf;
+	}
+	return columnnames;
 }
 
 uint16_t oracle7cursor::columnTypeFormat() {

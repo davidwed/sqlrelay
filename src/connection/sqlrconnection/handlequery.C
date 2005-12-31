@@ -37,9 +37,8 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			clientsock->write((uint16_t)NO_SUSPENDED_RESULT_SET);
 
 			// if the query processed 
-			// ok then return a result set
-			// header and loop back to send the
-			// result set itself...
+			// ok then send a result set
+			// header and return...
 			returnResultSetHeader(cursor);
 
 			// free memory used by binds
@@ -152,20 +151,18 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		debugPrint("connection",3,"re-executing...");
 		#endif
 		if (supportsNativeBinds()) {
-			#ifdef INCLUDE_SID
 			if (cursor->sql_injection_detection_ingress(
 							cursor->querybuffer)) {
 				success=true;
 			} else {
-			#endif
 				success=(cursor->handleBinds() && 
 					cursor->executeQuery(
 							cursor->querybuffer,
 							cursor->querylength,
 							reallyexecute));
-			#ifdef INCLUDE_SID
 			}
-			#endif
+			cursor->sid_egress_success=
+				cursor->sql_injection_detection_egress();
 		} else {
 
 			stringbuffer	*newquery=cursor->fakeInputBinds(
@@ -176,46 +173,40 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			uint32_t	querylen=(newquery)?
 						newquery->getStringLength():
 						cursor->querylength;
-			#ifdef INCLUDE_SID
 			if (cursor->sql_injection_detection_ingress(queryptr)) {
 				success=true;
 			} else {
-			#endif
 				success=cursor->executeQuery(queryptr,
 							querylen,
 							reallyexecute);
-			#ifdef INCLUDE_SID
 			}
-			#endif
+			cursor->sid_egress_success=
+				cursor->sql_injection_detection_egress();
 			delete newquery;
 		}
 	} else if (bindcursor) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"bind cursor...");
 		#endif
-		#ifdef INCLUDE_SID
 		if (cursor->sql_injection_detection_ingress(
 						cursor->querybuffer)) {
 			success=true;
 		} else {
-		#endif
 			success=cursor->executeQuery(cursor->querybuffer,
 							cursor->querylength,
 							reallyexecute);
-		#ifdef INCLUDE_SID
 		}
-		#endif
+		cursor->sid_egress_success=
+			cursor->sql_injection_detection_egress();
 	} else {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"preparing/executing...");
 		#endif
 		if (supportsNativeBinds()) {
-			#ifdef INCLUDE_SID
 			if (cursor->sql_injection_detection_ingress(
 							cursor->querybuffer)) {
 				success=true;
 			} else {
-			#endif
 				success=(cursor->prepareQuery(
 							cursor->querybuffer,
 							cursor->querylength) && 
@@ -224,9 +215,9 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							cursor->querybuffer,
 							cursor->querylength,
 							true));
-			#ifdef INCLUDE_SID
 			}
-			#endif
+			cursor->sid_egress_success=
+				cursor->sql_injection_detection_egress();
 		} else {
 			stringbuffer	*newquery=cursor->fakeInputBinds(
 							cursor->querybuffer);
@@ -236,21 +227,23 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			uint32_t	querylen=(newquery)?
 						newquery->getStringLength():
 						cursor->querylength;
-			#ifdef INCLUDE_SID
 			if (cursor->sql_injection_detection_ingress(queryptr)) {
 				success=true;
 			} else {
-			#endif
 				success=(cursor->prepareQuery(
 							cursor->querybuffer,
 							cursor->querylength) && 
 					cursor->executeQuery(queryptr,
 							querylen,true));
-			#ifdef INCLUDE_SID
 			}
-			#endif
+			cursor->sid_egress_success=
+				cursor->sql_injection_detection_egress();
 			delete newquery;
 		}
+	}
+
+	if (!cursor->sid_egress_success) {
+		cursor->sql_injection_detection=true;
 	}
 
 	// was the query a commit or rollback?
