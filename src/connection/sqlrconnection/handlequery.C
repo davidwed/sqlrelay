@@ -161,7 +161,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							cursor->querylength,
 							reallyexecute));
 			}
-			cursor->sid_egress_success=
+			cursor->sid_egress=
 				cursor->sql_injection_detection_egress();
 		} else {
 
@@ -180,7 +180,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							querylen,
 							reallyexecute);
 			}
-			cursor->sid_egress_success=
+			cursor->sid_egress=
 				cursor->sql_injection_detection_egress();
 			delete newquery;
 		}
@@ -196,7 +196,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							cursor->querylength,
 							reallyexecute);
 		}
-		cursor->sid_egress_success=
+		cursor->sid_egress=
 			cursor->sql_injection_detection_egress();
 	} else {
 		#ifdef SERVER_DEBUG
@@ -216,7 +216,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							cursor->querylength,
 							true));
 			}
-			cursor->sid_egress_success=
+			cursor->sid_egress=
 				cursor->sql_injection_detection_egress();
 		} else {
 			stringbuffer	*newquery=cursor->fakeInputBinds(
@@ -236,13 +236,14 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 					cursor->executeQuery(queryptr,
 							querylen,true));
 			}
-			cursor->sid_egress_success=
+			cursor->sid_egress=
 				cursor->sql_injection_detection_egress();
 			delete newquery;
 		}
 	}
 
-	if (!cursor->sid_egress_success) {
+// FIXME: is this right?
+	if (cursor->sid_egress) {
 		cursor->sql_injection_detection=true;
 	}
 

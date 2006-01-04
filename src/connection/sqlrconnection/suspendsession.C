@@ -39,6 +39,11 @@ void sqlrconnection_svr::suspendSession() {
 		}
 	}
 
+	// end sid session
+	if (cfgfl->getSidEnabled()) {
+		sid_sqlrcon->endSession();
+	}
+
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done aborting busy, unsuspended cursors");
 	#endif

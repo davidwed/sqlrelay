@@ -19,5 +19,5 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 		sid_sqlrcur=new sqlrcursor(conn->sid_sqlrcon);
 		sql_injection_detection_parameters();
 	}
-	sid_egress_success=true;
+	sid_egress=true;
 }

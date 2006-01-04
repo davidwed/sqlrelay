@@ -98,4 +98,9 @@ void sqlrconnection_svr::abortAllCursors() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done aborting all busy cursors");
 	#endif
+
+	// end sid session
+	if (cfgfl->getSidEnabled()) {
+		sid_sqlrcon->endSession();
+	}
 }

@@ -5,64 +5,46 @@
 
 #include <rudiments/charstring.h>
 
-void sqlrcursor_svr::sql_injection_detection_database_close() {
-
-	if (!conn->cfgfl->getSidEnabled()) {
-		return;
-	}
-
-	conn->sid_sqlrcon->endSession();
-}
-
 // This method gets the parameters SID needs to 
 // determine what to do
 
 void sqlrcursor_svr::sql_injection_detection_parameters() {
 
-	uint32_t num_rows = 0;
-	uint32_t m_num_rows;
-	int32_t param_value = 0;
-
 	sprintf(sid_query, "select UPPER(sparam), svalue from sidparameters");
 
-	//mysql_real_query(sid_mysql, sid_query, charstring::length(sid_query));
 	sid_sqlrcur->sendQuery(sid_query);
 
-	//sid_res = mysql_store_result(sid_mysql);
-	//m_num_rows = mysql_num_rows(sid_res);
-	m_num_rows = sid_sqlrcur->rowCount();
+	ingress_mode = false;
+	egress_mode = false;
+	listen_mode = false;
+	verification_mode = false;
+	prevention_mode = false;
 
-	ingress_mode = 0;
-	egress_mode = 0;
-	listen_mode = 0;
-	verification_mode = 0;
-	prevention_mode = 0;
-
-	for (num_rows = 0; num_rows < m_num_rows; num_rows++)
+	for (uint64_t num_rows = 0;
+		num_rows < sid_sqlrcur->rowCount();
+		num_rows++)
 	{
 	
-		//MYSQL_ROW sid_row = mysql_fetch_row(sid_res);
 		const char * const *sid_row = sid_sqlrcur->getRow(num_rows);
 
-		param_value = charstring::toInteger(sid_row[1]);
+		bool	param_value =
+			( charstring::toInteger(sid_row[1]) == 1 );
 
-		if ( charstring::compare(sid_row[0], "INGRESS") == 0 )
-		   ingress_mode = param_value;
+		if ( !charstring::compare(sid_row[0], "INGRESS") )
+			ingress_mode = param_value;
 
-		if ( charstring::compare(sid_row[0], "EGRESS") == 0 )
-		   egress_mode = param_value;
+		if ( !charstring::compare(sid_row[0], "EGRESS") )
+			egress_mode = param_value;
 
-		if ( charstring::compare(sid_row[0], "LISTEN") == 0 )
-		   listen_mode = param_value;
+		if ( !charstring::compare(sid_row[0], "LISTEN") )
+			listen_mode = param_value;
 
-		if ( charstring::compare(sid_row[0], "VERIFICATION") == 0 )
-		   verification_mode = param_value;
- 
-		if ( charstring::compare(sid_row[0], "PREVENTION") == 0 )
-		   prevention_mode = param_value;
+		if ( !charstring::compare(sid_row[0], "VERIFICATION") )
+			verification_mode = param_value;
 
+		if ( !charstring::compare(sid_row[0], "PREVENTION") )
+			prevention_mode = param_value;
 	}
-
 }
 
 // This method performs SQL Injection Detection
@@ -95,12 +77,10 @@ bool sqlrcursor_svr::sql_injection_detection_ingress(const char *query) {
 
 	// if in listening mode, record the sql statement passing thru
 
-        if ( listen_mode == 1 ) {
+        if ( listen_mode ) {
 
-		sprintf(sid_log_message, "Ingress Listening");
-
-		sql_injection_detection_log(query,
-                                            sid_parsed_sql, sid_log_message);
+		sql_injection_detection_log(query, sid_parsed_sql,
+						"Ingress Listening");
 
 	}
 
@@ -109,7 +89,7 @@ bool sqlrcursor_svr::sql_injection_detection_ingress(const char *query) {
 	// check white list
 	// check learning database
 
-        if ( ingress_mode == 1 ) {
+        if ( ingress_mode ) {
 
            // determine if SQL statement is in black list
 
@@ -135,14 +115,14 @@ bool sqlrcursor_svr::sql_injection_detection_ingress(const char *query) {
 	   // verification mode set
            // do not send sql statements to the database for processing
 
-	   if ( verification_mode == 1 )
+	   if ( verification_mode )
 	   {
               return true;
            }
 
            // prevention mode set
 
-           if ( prevention_mode == 1 )
+           if ( prevention_mode )
            {
               return ret_val;
            }
@@ -159,12 +139,12 @@ bool sqlrcursor_svr::sql_injection_detection_ingress_ldb() {
 
 	bool ret_val = false;
 
-	sprintf(sid_log_message,"Ingress_Ldb_Not_Found");
+	const char * sid_log_message =  "Ingress_Ldb_Not_Found";
 
 	if ( sql_injection_detection_check_db("sidingressldb") )
 	{
 
-		sprintf(sid_log_message, "Ingress_Ldb_Found");
+		sid_log_message = "Ingress_Ldb_Found";
 		ret_val = true;
 	}	
 
@@ -182,12 +162,12 @@ bool sqlrcursor_svr::sql_injection_detection_ingress_wl(const char *query) {
 
 	bool ret_val = false;
 
-	sprintf(sid_log_message,"Ingress_Wl_Not_Found");
+	const char * sid_log_message = "Ingress_Wl_Not_Found";
 
 	if ( sql_injection_detection_check_db("sidingresswlist") )
 	{
 
-		sprintf(sid_log_message, "Ingress_Wl_Found");
+		sid_log_message = "Ingress_Wl_Found";
 		ret_val = true;
 
 	}	
@@ -207,12 +187,12 @@ bool sqlrcursor_svr::sql_injection_detection_ingress_bl(const char *query) {
 
 	bool ret_val = false;
 
-	sprintf(sid_log_message, "Ingress_Bl_Not_Found");
+	const char * sid_log_message = "Ingress_Bl_Not_Found";
 
 	if ( sql_injection_detection_check_db("sidingressblist") )
 	{
 
-		sprintf(sid_log_message, "Ingress_Bl_Found");
+		sid_log_message = "Ingress_Bl_Found";
 		ret_val = true;
 
 	}	
@@ -234,7 +214,7 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 	bool ret_val = false;
 	bool valid_list = false;
 	int32_t i, target_size;
-	char target_sql[BUFSIZ];
+	const char *target_sql = NULL;
 
 	// determine what list to search for
 
@@ -243,7 +223,7 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 
 		sprintf(sid_query, "select sql_state from sidingressblist where sql_state =  \'");
 
-		sprintf(target_sql, "%s", sid_parsed_sql);
+		target_sql = sid_parsed_sql;
 
 		valid_list = true;
 
@@ -254,7 +234,7 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 
 		sprintf(sid_query, "select sql_state from sidingresswlist where sql_state =  \'");
 
-		sprintf(target_sql, "%s", sid_parsed_sql);
+		target_sql = sid_parsed_sql;
 
 		valid_list = true;
 
@@ -265,7 +245,7 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 
 		sprintf(sid_query, "select sql_state from sidegressblist where sql_state =  \'");
 
-		sprintf(target_sql, "%s", sid_parsed_results);
+		target_sql = sid_parsed_results;
 
 		valid_list = true;
 
@@ -276,7 +256,7 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 
 		sprintf(sid_query, "select sql_state from sidegresswlist where sql_state =  \'");
 
-		sprintf(target_sql, "%s", sid_parsed_results);
+		target_sql = sid_parsed_results;
 
 		valid_list = true;
 
@@ -288,7 +268,7 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 		sprintf(sid_query, "select parsed_sql from sidingressldb where parsed_sql =  \'");
 
 
-		sprintf(target_sql, "%s", sid_parsed_sql);
+		target_sql = sid_parsed_sql;
 
 		valid_list = true;
 
@@ -299,7 +279,7 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 
 		sprintf(sid_query, "select parsed_sql from sidegressldb where parsed_sql =  \'");
 
-		sprintf(target_sql, "%s", sid_parsed_results);
+		target_sql = sid_parsed_results;
 
 		valid_list = true;
 
@@ -313,8 +293,6 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 		// Assign the sql_state target value in the
 		// sid query by assigning each and every
 		// character except the null character
-		// The mysql C API functions do not deal
-		// well with the null character
 
 		for ( i = 0, 
 	      		target_size = charstring::length(target_sql);
@@ -325,15 +303,12 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 
 		sprintf(sid_query, "%s\'", sid_query);
 
-		//mysql_real_query(sid_mysql, sid_query, (unsigned int)charstring::length(sid_query));
 		sid_sqlrcur->sendQuery(sid_query);
 
-		//sid_res =  mysql_store_result(sid_mysql);
 
 		// if rows returned for sql statement
 		// then target sql found
 
-		//if ( mysql_num_rows( sid_res ) ) 
 		if ( sid_sqlrcur->rowCount() )
 		{
 			ret_val = true;
@@ -349,8 +324,8 @@ bool sqlrcursor_svr::sql_injection_detection_check_db(const char *sid_db) {
 // The SQL statement, parsed sql and message will be logged
 
 void sqlrcursor_svr::sql_injection_detection_log(const char *query, 
-					      char *parsed_sql,
-					      char *log_message) {
+					      const char *parsed_sql,
+					      const char *log_message) {
 	int32_t i, buf_len;
 
 	char param1[BUFSIZ], param2[BUFSIZ], param3[BUFSIZ];
@@ -385,7 +360,6 @@ void sqlrcursor_svr::sql_injection_detection_log(const char *query,
 
 	sprintf(sid_query, "%s\")", sid_query);
 
-	//sid_query_result = mysql_real_query(sid_mysql, sid_query, charstring::length(sid_query));
 	sid_sqlrcur->sendQuery(sid_query);
 
 }
@@ -456,8 +430,7 @@ void sqlrcursor_svr::sql_injection_detection_parse_sql(const char *query) {
 bool sqlrcursor_svr::sql_injection_detection_egress() {
 
 	if (!conn->cfgfl->getSidEnabled()) {
-		// FIXME: is this right?
-		return true;
+		return false;
 	}
        
 	bool ret_val = false;	// flag indicating a sql injection attack
@@ -480,12 +453,11 @@ bool sqlrcursor_svr::sql_injection_detection_egress() {
 
 	// if in listening mode, record the sql resuts passing thru
 
-        if ( listen_mode == 1 ) {
+        if ( listen_mode ) {
 
-		sprintf(sid_log_message, "Egress Listening");
-
-		sql_injection_detection_log(sid_log_message, sid_parsed_results,
-                                            sid_log_message);
+		sql_injection_detection_log("Egress Listening",
+						sid_parsed_results,
+						"Egress Listening");
 
 
 	}
@@ -495,7 +467,7 @@ bool sqlrcursor_svr::sql_injection_detection_egress() {
 	// check white list
 	// check learning database
 
-        if ( egress_mode == 1 ) {
+        if ( egress_mode ) {
 
            // determine if SQL statement is in black list
 
@@ -522,7 +494,7 @@ bool sqlrcursor_svr::sql_injection_detection_egress() {
 
            // prevention mode set
 
-           if ( prevention_mode == 1 )
+           if ( prevention_mode )
            {
               return ret_val;
            }
@@ -563,12 +535,12 @@ bool sqlrcursor_svr::sql_injection_detection_egress_bl() {
 
 	bool ret_val = false;
 
-	sprintf(sid_log_message, "Egress_Bl_Not_Found");
+	const char * sid_log_message = "Egress_Bl_Not_Found";
 
 	if ( sql_injection_detection_check_db("sidegressblist") )
 	{
 
-		sprintf(sid_log_message, "Egress_Bl_Found");
+		sid_log_message = "Egress_Bl_Found";
 		ret_val = true;
 
 	}	
@@ -587,12 +559,12 @@ bool sqlrcursor_svr::sql_injection_detection_egress_wl() {
 
 	bool ret_val = false;
 
-	sprintf(sid_log_message,"Egress_Wl_Not_Found");
+	const char * sid_log_message = "Egress_Wl_Not_Found";
 
 	if ( sql_injection_detection_check_db("sidegresswlist") )
 	{
 
-		sprintf(sid_log_message, "Egress_Wl_Found");
+		sid_log_message = "Egress_Wl_Found";
 		ret_val = true;
 
 	}	
@@ -610,12 +582,12 @@ bool sqlrcursor_svr::sql_injection_detection_egress_ldb() {
 
 	bool ret_val = false;
 
-	sprintf(sid_log_message,"Egress_Ldb_Not_Found");
+	const char * sid_log_message = "Egress_Ldb_Not_Found";
 
 	if ( sql_injection_detection_check_db("sidegressldb") )
 	{
 
-		sprintf(sid_log_message, "Egress_Ldb_Found");
+		sid_log_message = "Egress_Ldb_Found";
 		ret_val = true;
 
 	}	

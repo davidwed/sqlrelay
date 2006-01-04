@@ -86,6 +86,17 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 
 	setInitialAutoCommitBehavior();
 
+	// create sqlrconnection for sid database
+	if (cfgfl->getSidEnabled()) {
+		sid_sqlrcon=new sqlrconnection(cfgfl->getSidHost(),
+						cfgfl->getSidPort(),
+						cfgfl->getSidUnixPort(),
+						cfgfl->getSidUser(),
+						cfgfl->getSidPassword(),
+						0,1);
+sid_sqlrcon->debugOn();
+	}
+
 	if (!initCursors(true)) {
 		return false;
 	}
@@ -107,16 +118,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
-
-	// log into the sid database
-	if (cfgfl->getSidEnabled()) {
-		sid_sqlrcon=new sqlrconnection(cfgfl->getSidHost(),
-						cfgfl->getSidPort(),
-						cfgfl->getSidUnixPort(),
-						cfgfl->getSidUser(),
-						cfgfl->getSidPassword(),
-						0,1);
-	}
 
 	// if we're not passing descriptors around, listen on 
 	// inet and unix sockets for client connections
@@ -422,6 +423,12 @@ bool sqlrconnection_svr::initCursors(bool create) {
 			fprintf(stderr,"Couldn't create cursors.\n");
 			return false;
 		}
+	}
+
+	// end sid database session
+	// FIXME: is there a better place for this?
+	if (cfgfl->getSidEnabled()) {
+		sid_sqlrcon->endSession();
 	}
 
 	#ifdef SERVER_DEBUG

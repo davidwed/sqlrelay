@@ -3,7 +3,6 @@ ttl of 15 works, but ttl of 60 causes the connections to never die
 add ttl tuning recommendations to tuning doc
 
 get sid working, document
-	move egress checking into sqlrconnection class
 	how to:
 		create db
 		create user
@@ -11,7 +10,36 @@ get sid working, document
 		set up sqlrelay instance to talk to it
 		set up another instance to use siddb instance for sid
 		populate siddb
-	convert code that sends column definitions so it can be wrapped
+			sidparameters:
+				sparam=INGRESS - perform ingress filtering
+					EGRESS - perform egress filtering
+					LISTEN - ???
+					VERIFICATION - don't send queries to db
+					PREVENTION - send queries to db if ok
+				svalue=1/0
+
+			sidingressblist - ingress blacklist
+				sql_state - queries to reject
+			sidingresswlist - ingress whitelist
+				sql_state - queries to accept,
+						overrides blacklist
+			sidingressldb - ingress learning database
+				parsed_sql - ???
+
+			sidegressblist - egress blacklist
+				sql_state - "parsed results" to reject
+			sidegresswlist - egress whitelist
+				sql_state - "parsed results" to accept
+						overrides blacklist
+			sidegressldb - egress learning database
+				parsed_sql - ???
+
+what are "parsed results" - something to do with column names...
+
+			sidlog - every query is logged here with a message
+					about it
+
+PHP Pear DB - nextID, createSequence, dropSequence
 
 * NLS_LANG-like issues with other db's?
 
@@ -208,7 +236,7 @@ Features:
 		handle binary data correctly in all databases
 		identical long/lob datatype support in all databases
 		more advanced long/lob datatype support
-		support for array datatypes
+		support for array datatypes (oracle collections)
 		handle blobs, quads in interbase
 		handle timestamps
 		handle enum types in mysql

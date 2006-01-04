@@ -60,16 +60,6 @@ CREATE TABLE `sidingressldb` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `sidingressldb1`
---
-
-DROP TABLE IF EXISTS `sidingressldb1`;
-CREATE TABLE `sidingressldb1` (
-  `parsed_sql` char(32) NOT NULL default '',
-  KEY `new_index` (`parsed_sql`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
 -- Table structure for table `sidingresswlist`
 --
 

@@ -8,7 +8,7 @@
 void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	// if sid egress check failed, return 0 rows and columns
-	if (!cursor->sid_egress_success) {
+	if (cursor->sid_egress) {
 printf("egress check failed\n");
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",2,

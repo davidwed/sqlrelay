@@ -29,7 +29,7 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 
 	// for some queries, there are no rows to return, 
 	// also if sid egress check failed, return no rows
-	if (cursor->noRowsToReturn() || !cursor->sid_egress_success) {
+	if (cursor->noRowsToReturn() || cursor->sid_egress) {
 		clientsock->write((uint16_t)END_RESULT_SET);
 		flushWriteBuffer();
 		#ifdef SERVER_DEBUG

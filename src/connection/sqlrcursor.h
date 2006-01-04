@@ -124,13 +124,10 @@ class sqlrcursor_svr {
 							const char *query);
 		virtual bool	sql_injection_detection_egress();
 
-		/* method ends sid SID database session */
-		virtual void	sql_injection_detection_database_close();
-
 		/* method maintains log for SQL Injection Detection */
 		virtual void 	sql_injection_detection_log(const char *query,
-							char *parsed_sql,
-							char *log_buffer);
+							const char *parsed_sql,
+							const char *log_buffer);
 
 		/* method gets parameters for SQL Injection Detection */
 		virtual void 	sql_injection_detection_parameters();
@@ -175,24 +172,21 @@ class sqlrcursor_svr {
 		sqlrconnection_svr	*conn;
 
 		// variables for SID
-		int32_t	sql_inject_load_params;
-		int32_t	ingress_mode;
-		int32_t	egress_mode;
-		int32_t	listen_mode;
-		int32_t	verification_mode;
-		int32_t	prevention_mode;	
+		bool	ingress_mode;
+		bool	egress_mode;
+		bool	listen_mode;
+		bool	verification_mode;
+		bool	prevention_mode;	
 
 		char	sid_parsed_sql[BUFSIZ];
 		char	sid_parsed_results[BUFSIZ];
 		char	sid_query[BUFSIZ];
 
-		char	sid_log_message[BUFSIZ];
-
 		sqlrcursor	*sid_sqlrcur;
 
 		bool	sql_injection_detection;
 
-		bool	sid_egress_success;
+		bool	sid_egress;
 
 		uint16_t	inbindcount;
 		bindvar_svr	inbindvars[MAXVAR];
