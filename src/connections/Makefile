@@ -39,6 +39,7 @@ endif
 ifneq ($(strip $(SYBASELIBS)),)
 	$(MAKE) -C sybase all
 endif
+	$(MAKE) -C router all
 
 clean:
 	$(MAKE) -C db2 clean
@@ -53,6 +54,7 @@ clean:
 	$(MAKE) -C postgresql clean
 	$(MAKE) -C sqlite clean
 	$(MAKE) -C sybase clean
+	$(MAKE) -C router clean
 
 rebuild: clean all
 
@@ -93,6 +95,7 @@ endif
 ifneq ($(strip $(SYBASELIBS)),)
 	$(MAKE) -C sybase install
 endif
+	$(MAKE) -C router install
 
 uninstall:
 	$(MAKE) -C db2 uninstall
@@ -107,3 +110,4 @@ uninstall:
 	$(MAKE) -C postgresql uninstall
 	$(MAKE) -C sqlite uninstall
 	$(MAKE) -C sybase uninstall
+	$(MAKE) -C router uninstall

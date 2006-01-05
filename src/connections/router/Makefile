@@ -1,0 +1,57 @@
+top_builddir = ../../..
+
+include ../../../config.mk
+
+.PHONY: all clean rebuild install uninstall
+
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/connection $(RUDIMENTSINCLUDES) $(SIDINCLUDES)
+LIBS = -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+DEBUGLIBS = -L$(top_builddir)/src/connection -lsqlrconnection_debug -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+ifneq ($(strip $(ROUTERLIBSPATH)),)
+ifeq ($(ROUTERUSERPATH),yes)
+	RPATH = -R $(ROUTERLIBSPATH)
+endif
+endif
+ifneq ($(strip $(libdir)),)
+ifeq ($(SERVERUSERPATH),yes)
+	RPATH += -R $(libdir)
+endif
+endif
+
+SRCS= routerconnection.C main.C
+LOBJS= routerconnection.lo main.lo
+DLOBJS= routerconnection.d.lo main.d.lo
+
+.SUFFIXES: .lo .d.lo
+
+.C.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.C.d.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
+
+all: sqlr-connection-router sqlr-connection-router-debug
+
+clean:
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-router
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-router-debug
+	$(LIBTOOL) --mode=clean $(RM) *.lo
+	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(RMTREE) .libs
+
+rebuild: clean all
+
+sqlr-connection-router: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(ROUTERSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+
+sqlr-connection-router-debug: $(SRCS) $(DLOBJS)
+	$(LIBTOOL) --mode=link $(CXX) $(ROUTERSTATIC) $(LDFLAGS) -o $@ $(DLOBJS) $(DEBUGLIBS) $(RPATH)
+
+install:
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) sqlr-connection-router$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection-router-debug$(EXE) $(bindir)
+
+uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-router$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-router-debug$(EXE)
