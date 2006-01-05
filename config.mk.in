@@ -250,6 +250,11 @@ INTERBASELIBSPATH = @INTERBASELIBSPATH@
 INTERBASESTATIC = @INTERBASESTATIC@
 INTERBASEUSERPATH = @INTERBASEUSERPATH@
 
+# Router stuff
+ROUTERLIBSPATH =
+ROUTERSTATIC =
+ROUTERUSERPATH = no
+
 # stuff for SID
 SIDINCLUDES = -I$(top_builddir)/src/api/c++/include
 SIDLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient
