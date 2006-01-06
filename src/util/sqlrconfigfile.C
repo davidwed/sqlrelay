@@ -58,6 +58,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	sidsocket=charstring::duplicate(DEFAULT_SID_SOCKET);
 	siduser=charstring::duplicate(DEFAULT_SID_USER);
 	sidpassword=charstring::duplicate(DEFAULT_SID_PASSWORD);
+	routerlist=NULL;
+	routercount=0;
 }
 
 sqlrconfigfile::~sqlrconfigfile() {
@@ -94,6 +96,11 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] sidsocket;
 	delete[] siduser;
 	delete[] sidpassword;
+
+	for (uint16_t index=0; index<routercount; index++) {
+		delete routerlist[index];
+	}
+	delete[] routerlist;
 }
 
 const char * const * sqlrconfigfile::getAddresses() {
@@ -302,6 +309,14 @@ uint32_t sqlrconfigfile::getMetricTotal() {
 		}
 	}
 	return metrictotal;
+}
+
+routercontainer **sqlrconfigfile::getRouterList() {
+	return routerlist;
+}
+
+uint16_t sqlrconfigfile::getRouterCount() {
+	return routercount;
 }
 
 bool sqlrconfigfile::tagStart(const char *name) {
@@ -659,15 +674,11 @@ usercontainer::~usercontainer() {
 }
 
 void usercontainer::setUser(const char *user) {
-	if (user) {
-		this->user=charstring::duplicate(user);
-	}
+	this->user=charstring::duplicate(user);
 }
 
 void usercontainer::setPassword(const char *password) {
-	if (password) {
-		this->password=charstring::duplicate(password);
-	}
+	this->password=charstring::duplicate(password);
 }
 
 const char *usercontainer::getUser() {
@@ -693,15 +704,11 @@ connectstringcontainer::~connectstringcontainer() {
 }
 
 void connectstringcontainer::setConnectionId(const char *connectionid) {
-	if (connectionid) {
-		this->connectionid=charstring::duplicate(connectionid);
-	}
+	this->connectionid=charstring::duplicate(connectionid);
 }
 
 void connectstringcontainer::setString(const char *string) {
-	if (string) {
-		this->string=charstring::duplicate(string);
-	}
+	this->string=charstring::duplicate(string);
 }
 
 void connectstringcontainer::setMetric(uint32_t metric) {
@@ -738,4 +745,74 @@ void connectstringcontainer::parseConnectString() {
 const char *connectstringcontainer::getConnectStringValue(
 						const char *variable) {
 	return connectstring.getValue(variable);
+}
+
+
+routercontainer::routercontainer() {
+	host=NULL;
+	port=0;
+	socket=NULL;
+	user=NULL;
+	password=NULL;
+	regexlist=NULL;
+	regexcount=0;
+}
+
+routercontainer::~routercontainer() {
+	delete[] host;
+	delete[] socket;
+	delete[] user;
+	delete[] password;
+	for (uint16_t index=0; index<regexcount; index++) {
+		delete regexlist[index];
+	}
+	delete[] regexlist;
+}
+
+void routercontainer::setHost(const char *host) {
+	this->host=charstring::duplicate(host);
+}
+
+void routercontainer::setPort(uint16_t port) {
+	this->port=port;
+}
+
+void routercontainer::setSocket(const char *socket) {
+	this->socket=charstring::duplicate(socket);
+}
+
+void routercontainer::setUser(const char *user) {
+	this->user=charstring::duplicate(user);
+}
+
+void routercontainer::setPassword(const char *password) {
+	this->password=charstring::duplicate(password);
+}
+
+const char *routercontainer::getHost() {
+	return host;
+} 
+
+uint16_t routercontainer::getPort() {
+	return port;
+} 
+
+const char *routercontainer::getSocket() {
+	return socket;
+} 
+
+const char *routercontainer::getUser() {
+	return user;
+} 
+
+const char *routercontainer::getPassword() {
+	return password;
+} 
+
+regularexpression **routercontainer::getRegexList() {
+	return regexlist;
+}
+
+uint16_t routercontainer::getRegexCount() {
+	return regexcount;
 }

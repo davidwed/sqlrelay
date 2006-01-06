@@ -120,7 +120,7 @@ class routercontainer {
 		void	setSocket(const char *socket);
 		void	setUser(const char *user);
 		void	setPassword(const char *password);
-		void	addRegex(regularexpression *re);
+		// FIXME: methods for adding regular expressions
 
 		const char	*getHost();
 		uint16_t	getPort();
@@ -138,8 +138,6 @@ class routercontainer {
 		regularexpression	**regexlist;
 		uint16_t		regexcount;
 };
-
-typedef linkedlistnode< routercontainer * >	routernode;
 
 class sqlrconfigfile : public xmlsax {
 	public:
