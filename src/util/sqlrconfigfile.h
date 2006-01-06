@@ -10,6 +10,7 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/linkedlist.h>
 #include <rudiments/parameterstring.h>
+#include <rudiments/regularexpression.h>
 
 #define MAX_ADDRESSES	32
 
@@ -53,7 +54,13 @@ typedef enum {
 	SID_PORT_ATTRIBUTE,
 	SID_SOCKET_ATTRIBUTE,
 	SID_USER_ATTRIBUTE,
-	SID_PASSWORD_ATTRIBUTE
+	SID_PASSWORD_ATTRIBUTE,
+	ROUTER_HOST_ATTRIBUTE,
+	ROUTER_PORT_ATTRIBUTE,
+	ROUTER_SOCKET_ATTRIBUTE,
+	ROUTER_USER_ATTRIBUTE,
+	ROUTER_PASSWORD_ATTRIBUTE,
+	ROUTER_REGEX_ATTRIBUTE
 } attribute;
 
 class usercontainer {
@@ -101,6 +108,38 @@ class connectstringcontainer {
 };
 
 typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
+
+class routercontainer {
+	friend class sqlrconfigfile;
+	public:
+			routercontainer();
+			~routercontainer();
+
+		void	setHost(const char *host);
+		void	setPort(uint16_t port);
+		void	setSocket(const char *socket);
+		void	setUser(const char *user);
+		void	setPassword(const char *password);
+		void	addRegex(regularexpression *re);
+
+		const char	*getHost();
+		uint16_t	getPort();
+		const char	*getSocket();
+		const char	*getUser();
+		const char	*getPassword();
+		regularexpression	**getRegexList();
+		uint16_t		getRegexCount();
+	private:
+		char			*host;
+		uint16_t		port;
+		char			*socket;
+		char			*user;
+		char			*password;
+		regularexpression	**regexlist;
+		uint16_t		regexcount;
+};
+
+typedef linkedlistnode< routercontainer * >	routernode;
 
 class sqlrconfigfile : public xmlsax {
 	public:
@@ -158,6 +197,9 @@ class sqlrconfigfile : public xmlsax {
 						const char *connectionid);
 		uint32_t		getConnectionCount();
 		uint32_t		getMetricTotal();
+
+		routercontainer		**getRouterList();
+		uint16_t		getRouterCount();
 	private:
 		const char	*id;
 		bool		correctid;
@@ -228,6 +270,9 @@ class sqlrconfigfile : public xmlsax {
 
 		linkedlist< connectstringcontainer * >	connectstringlist;
 		linkedlist< usercontainer * >		userlist;
+
+		routercontainer	**routerlist;
+		uint16_t	routercount;
 };
 
 #endif

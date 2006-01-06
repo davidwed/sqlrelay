@@ -266,9 +266,6 @@ class sqlrconnection_svr :
 
 		void	flushWriteBuffer();
 
-		cmdline			*cmdl;
-		sqlrconfigfile		*cfgfl;
-
 		char			*user;
 		char			*password;
 
@@ -328,6 +325,9 @@ class sqlrconnection_svr :
 		sqlrconnection	*sid_sqlrcon;
 
 	protected:
+
+		cmdline			*cmdl;
+		sqlrconfigfile		*cfgfl;
 
 		uint32_t	maxquerysize;
 		uint32_t	maxstringbindvaluelength;

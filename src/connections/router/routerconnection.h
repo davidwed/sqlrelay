@@ -4,9 +4,11 @@
 #ifndef ROUTERCONNECTION_H
 #define ROUTERCONNECTION_H
 
+#define FETCH_AT_ONCE	10
+
 #include <sqlrconnection.h>
 
-#include <sqlrclient.h>
+#include <sqlrelay/sqlrclient.h>
 
 class routerconnection;
 
@@ -60,6 +62,10 @@ class routercursor : public sqlrcursor_svr {
 		void		cleanUpData(bool freeresult, bool freebinds);
 
 		routerconnection	*routerconn;
+
+		sqlrcursor	*cur;
+
+		uint64_t	currentrow;
 };
 
 class routerconnection : public sqlrconnection_svr {
@@ -79,6 +85,11 @@ class routerconnection : public sqlrconnection_svr {
 
 		void		endSession();
 		void		dropTable(const char *table);
+
+		sqlrconnection	**cons;
+		uint16_t	concount;
+
+		sqlrconfigfile	*cfgfile;
 };
 
 #endif

@@ -1,3 +1,5 @@
+can you only use 1 bind cursor?
+
 ttl of 15 works, but ttl of 60 causes the connections to never die
 
 add ttl tuning recommendations to tuning doc

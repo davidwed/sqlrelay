@@ -1,13 +1,13 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <router.h>
+#include <routerconnection.h>
 #include <rudiments/signalclasses.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 
-router			*conn;
+routerconnection	*conn;
 signalhandler		*alarmhandler;
 
 void cleanUp() {
@@ -25,7 +25,7 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	conn=new router();
+	conn=new routerconnection();
 
 	// handle kill signals
 	conn->handleShutDown((void *)shutDown);
