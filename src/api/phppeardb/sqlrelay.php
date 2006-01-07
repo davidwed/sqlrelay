@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.14 2005-12-22 05:07:50 mused Exp $
+// $Id: sqlrelay.php,v 1.15 2006-01-07 06:21:48 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -198,7 +198,7 @@ class DB_sqlrelay extends DB_common
     function prepare($query)
     {
         if ($identity == "") {
-            $idenity = sqlrcon_identify($this->connection);
+            $identity = sqlrcon_identify($this->connection);
         }
 
         $cursor = sqlrcur_alloc($this->connection);
@@ -239,7 +239,6 @@ class DB_sqlrelay extends DB_common
 
         $this->is_select[(int)$cursor] = $this->isSelect($newquery);
 
-#print "<b>Query:</b> $query<br><b>New Query:</b> $newquery<br>\n";
         sqlrcur_prepareQuery($cursor, $newquery);
         return new DB_sqlrelay_cursor($cursor,$this->connection);
     }
@@ -316,7 +315,7 @@ class DB_sqlrelay extends DB_common
     function buildManipSQL($table, $table_fields, $mode, $where = false)
     {
         if ($identity == "") {
-            $idenity = sqlrcon_identify($this->connection);
+            $identity = sqlrcon_identify($this->connection);
         }
         if (count($table_fields) == 0) {
             return $this->raiseError(DB_ERROR_NEED_MORE_DATA);
@@ -611,6 +610,127 @@ class DB_sqlrelay extends DB_common
     function affectedRows()
     {
         return $this->affectedrows;
+    }
+
+    // }}}
+    // {{{ nextId()
+
+    /**
+     * Returns the next free id in a sequence
+     *
+     * @param string  $seq_name  name of the sequence
+     * @param boolean $ondemand  when true, the seqence is automatically
+     *                            created if it does not exist
+     *
+     * @return int  the next id number in the sequence.
+     *               A DB_Error object on failure.
+     *
+     */
+
+    function nextId($seq_name, $ondemand = true)
+    {
+
+        # get the sequence name
+        $seqname = $this->getSequenceName($seq_name);
+
+        # initialize the sequence query
+        $seqquery = "";
+
+        # figure out what kind of db we're using and build the appropriate query
+        if ($identity == "") {
+            $identity = sqlrcon_identify($this->connection);
+        }
+        if ($identity == "oracle8" || $identity == "oracle7") {
+            $seqquery = "SELECT ${seqname}.nextval FROM dual";
+        } else {
+            # FIXME: implement for other DB's
+            return $this->raiseError(DB_ERROR_NOT_CAPABLE);
+        }
+
+        # try to get the value from the sequence
+        $result =& $this->query($seqquery);
+
+        # if it failed and we're creating sequences on-demand, try to create
+        # the sequence and then re-run the query
+        if (DB::isError($result) && $ondemand) {
+
+            # FIXME: if we got an error, we assume that the sequence
+            # didn't exist and we try to create it that may not actually be the
+            # case, we need to check the error code
+            $result = $this->createSequence($seq_name);
+            if (!DB::isError($result)) {
+                $result =& $this->query($seqquery);
+            }
+        }
+
+        # if any of the previous stuff generated an error, return it
+        if (DB::isError($result)) {
+            return $this->raiseError($result);
+        }
+
+        # otherwise, return the first field
+        $arr = $result->fetchRow(DB_FETCHMODE_ORDERED);
+        return $arr[0];
+    }
+
+    // }}}
+    // {{{ createSequence()
+
+    /**
+     * Creates a new sequence
+     *
+     * @param string $seq_name  name of the new sequence
+     *
+     * @return int  DB_OK on success.  A DB_Error object on failure.
+     *
+     */
+
+    function createSequence($seq_name)
+    {
+        $seqquery="";
+
+        if ($identity == "") {
+            $identity = sqlrcon_identify($this->connection);
+        }
+
+        if ($identity == "oracle8" || $identity == "oracle7") {
+            $seqquery = "CREATE SEQUENCE " . $this->getSequenceName($seq_name);
+        } else {
+            # FIXME: implement for other DB's
+            return $this->raiseError(DB_ERROR_NOT_CAPABLE);
+        }
+
+        return $this->query($seqquery);
+    }
+
+    // }}}
+    // {{{ dropSequence()
+
+    /**
+     * Deletes a sequence
+     *
+     * @param string $seq_name  name of the sequence to be deleted
+     *
+     * @return int  DB_OK on success.  A DB_Error object on failure.
+     *
+     */
+
+    function dropSequence($seq_name)
+    {
+        $seqquery = "";
+
+        if ($identity == "") {
+            $identity = sqlrcon_identify($this->connection);
+        }
+
+        if ($identity == "oracle8" || $identity == "oracle7") {
+            $seqquery = "DROP SEQUENCE " . $this->getSequenceName($seq_name);
+        } else {
+            # FIXME: implement for other DB's
+            return $this->raiseError(DB_ERROR_NOT_CAPABLE);
+        }
+
+        return $this->query($seqquery);
     }
 
     // }}}

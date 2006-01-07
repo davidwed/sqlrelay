@@ -827,21 +827,23 @@ int	main(int argc, char **argv) {
 
 	printf("CURSOR BINDS: \n");
 	checkSuccess(cur->sendQuery("create or replace package types is type cursorType is ref cursor; end;"),1);
-	checkSuccess(cur->sendQuery("create or replace function sp_testtable return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable; return l_cursor; end;"),1);
-	cur->prepareQuery("begin  :curs:=sp_testtable; end;");
-	cur->defineOutputBindCursor("curs");
+	checkSuccess(cur->sendQuery("create or replace function sp_testtable(value in number) return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable where testnumber>value; return l_cursor; end;"),1);
+	cur->prepareQuery("begin  :curs1:=sp_testtable(5);  :curs2:=sp_testtable(0); end;");
+	cur->defineOutputBindCursor("curs1");
+	cur->defineOutputBindCursor("curs2");
 	checkSuccess(cur->executeQuery(),1);
-	sqlrcursor	*bindcur=cur->getOutputBindCursor("curs");
-	checkSuccess(bindcur->fetchFromBindCursor(),1);
-	checkSuccess(bindcur->getField(0,(uint32_t)0),"1");
-	checkSuccess(bindcur->getField(1,(uint32_t)0),"2");
-	checkSuccess(bindcur->getField(2,(uint32_t)0),"3");
-	checkSuccess(bindcur->getField(3,(uint32_t)0),"4");
-	checkSuccess(bindcur->getField(4,(uint32_t)0),"5");
-	checkSuccess(bindcur->getField(5,(uint32_t)0),"6");
-	checkSuccess(bindcur->getField(6,(uint32_t)0),"7");
-	checkSuccess(bindcur->getField(7,(uint32_t)0),"8");
-	delete bindcur;
+	sqlrcursor	*bindcur1=cur->getOutputBindCursor("curs1");
+	checkSuccess(bindcur1->fetchFromBindCursor(),1);
+	checkSuccess(bindcur1->getField(0,(uint32_t)0),"6");
+	checkSuccess(bindcur1->getField(1,(uint32_t)0),"7");
+	checkSuccess(bindcur1->getField(2,(uint32_t)0),"8");
+	delete bindcur1;
+	sqlrcursor	*bindcur2=cur->getOutputBindCursor("curs2");
+	checkSuccess(bindcur2->fetchFromBindCursor(),1);
+	checkSuccess(bindcur2->getField(0,(uint32_t)0),"1");
+	checkSuccess(bindcur2->getField(1,(uint32_t)0),"2");
+	checkSuccess(bindcur2->getField(2,(uint32_t)0),"3");
+	delete bindcur2;
 	checkSuccess(cur->sendQuery("drop package types"),1);
 	printf("\n");
 

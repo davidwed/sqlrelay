@@ -1,8 +1,14 @@
-can you only use 1 bind cursor?
+PHP Pear DB - nextID, createSequence, dropSequence
 
-ttl of 15 works, but ttl of 60 causes the connections to never die
+--------------------------------------------------------------------------------
 
-add ttl tuning recommendations to tuning doc
+interbase fails float output bind test, prec/scale issue?
+
+Tru64 -
+	unix sockets don't work, looks like a byte-order translation issue
+	can't start more than 1 cursor, looks like out-of-memory
+
+perl apis -> CPAN
 
 get sid working, document
 	how to:
@@ -36,24 +42,10 @@ get sid working, document
 			sidegressldb - egress learning database
 				parsed_sql - ???
 
-what are "parsed results" - something to do with column names...
+	what are "parsed results" - something to do with column names...
 
 			sidlog - every query is logged here with a message
 					about it
-
-PHP Pear DB - nextID, createSequence, dropSequence
-
-* NLS_LANG-like issues with other db's?
-
-interbase fails float output bind, prec/scale issue?
-
-Tru64 -
-	unix sockets don't work, looks like a byte-order translation issue
-	can't start more than 1 cursor, looks like out-of-memory
-
-perl apis -> CPAN
-
---------------------------------------------------------------------------------
 
 setting backlog:
 	linux:
@@ -162,6 +154,7 @@ Documentation:
 	* document tds version for various versions of MSSQL/Sybase
 
 Performance/Code Enhancements:
+	* NLS_LANG-like issues with other db's?
 	* client connect timeout
 	* store passwords in encrypted form in the config file
 	* call endSession() from perl DBD finish method

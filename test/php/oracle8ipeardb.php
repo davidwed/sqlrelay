@@ -448,6 +448,16 @@ require_once 'DB.php';
 	$db2->disconnect();
 	echo("\n");
 
+	echo("SEQUENCES: \n");
+	$db->dropSequence("mysequence");
+	checkSuccess($db,$db->nextId("mysequence"),1);
+	checkSuccess($db,$db->nextId("mysequence"),2);
+	checkSuccess($db,$db->dropSequence("mysequence"),DB_OK);
+	checkSuccess($db,$db->createSequence("mysequence"),DB_OK);
+	checkSuccess($db,$db->nextId("mysequence"),1);
+	checkSuccess($db,$db->nextId("mysequence"),2);
+	checkSuccess($db,$db->dropSequence("mysequence"),DB_OK);
+	echo("\n");
 
 	# drop existing table
 	$db->query("drop table testtable");
