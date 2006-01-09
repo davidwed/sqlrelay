@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.19 2005-12-04 03:38:33 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.20 2006-01-09 04:57:29 mused Exp $
  */
 
 #include <tcl.h>
@@ -684,7 +684,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_defineOutputBindInteger:
       {
-	if (objc != 4) {
+	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp,1, objv, "variable");
 	  return TCL_ERROR;
 	}
@@ -693,7 +693,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
       }
     case SQLRCUR_defineOutputBindDouble:
       {
-	if (objc != 4) {
+	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp,1, objv, "variable");
 	  return TCL_ERROR;
 	}
