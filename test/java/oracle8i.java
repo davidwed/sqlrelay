@@ -55,6 +55,32 @@ class oracle8i {
 		}
 	}
 	
+	private static void checkSuccess(byte[] value, String success, int length) {
+	
+		if (success==null) {
+			if (value==null) {
+				System.out.println("success ");
+				return;
+			} else {
+				System.out.println("failure ");
+				
+				
+				System.exit(0);
+			}
+		}
+
+		byte[]	successvalue=success.getBytes();
+	
+		for (int index=0; index<length; index++) {
+			if (value[index]!=successvalue[index]) {
+				System.out.println("failure ");
+				System.exit(0);
+			}
+		}
+
+		System.out.println("success ");
+	}
+	
 	private static void checkSuccess(long value, int success) {
 	
 		if (value==success) {
@@ -797,7 +823,7 @@ class oracle8i {
 		blobvarlength=cur.getOutputBindLength("blobvar");
 		checkSuccess(clobvar,"hello",5);
 		checkSuccess(clobvarlength,5);
-		checkSuccess(blobvar.toString(),"hello",5);
+		checkSuccess(blobvar,"hello",5);
 		checkSuccess(blobvarlength,5);
 		cur.sendQuery("drop table testtable1");
 		System.out.println();
