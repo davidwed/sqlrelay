@@ -22,6 +22,9 @@ proc checkSuccess {value success} {
 		puts -nonewline "success "
 	} else {
 		puts "failure "
+		puts -nonewline $value
+		puts -nonewline " != "
+		puts $success
 		exit
 	}
 }
@@ -682,11 +685,12 @@ puts "LONG CLOB: "
 catch {$cur sendQuery "drop table testtable2"}
 catch {$cur sendQuery "create table testtable2 (testclob clob)"}
 $cur prepareQuery "insert into testtable2 values (:clobval)"
-set clobval ""
-for {set i 0} {$i<[expr 8*1024]} {incr i} {
-	set clobval [concat "$clobval" "C"]
+set clobvallist {}
+for {set i 0} {$i<[expr 8*1]} {incr i} {
+	lappend clobvallist "C"
 }
-$cur inputBindClob "clobval" $clobval [expr 8*1024*2]
+set clobval [join $clobvallist ""]
+$cur inputBindClob "clobval" $clobval [expr 8*1]
 checkSuccess [$cur executeQuery] 1
 catch {$cur sendQuery "select testclob from testtable2"}
 checkSuccess $clobval [$cur getFieldByName 0 "testclob"]
@@ -694,16 +698,17 @@ $cur prepareQuery "begin  select testclob into :clobbindval from testtable2;  en
 $cur defineOutputBindClob "clobbindval"
 checkSuccess [$cur executeQuery] 1
 set clobbindvar [$cur getOutputBindClob "clobbindval"]
-checkSuccess [$cur getOutputBindLength "clobbindval"] [expr 8*1024*2]
+checkSuccess [$cur getOutputBindLength "clobbindval"] [expr 8*1]
 checkSuccess $clobval $clobbindvar
 catch {$cur sendQuery "delete from testtable2"}
 puts ""
 $cur prepareQuery "insert into testtable2 values (:clobval)"
-set clobval ""
-for {set i 0} {$i<[expr 8*1024]} {incr i} {
-	set clobval [concat "$clobval" "C"]
+set clobvallist {}
+for {set i 0} {$i<[expr 8*1]} {incr i} {
+	lappend clobvallist "C"
 }
-$cur inputBindClob "clobval" $clobval [expr 8*1024*2]
+set clobval [join $clobvallist ""]
+$cur inputBindClob "clobval" $clobval [expr 8*1]
 checkSuccess [$cur executeQuery] 1
 catch {$cur sendQuery "select testclob from testtable2"}
 checkSuccess $clobval [$cur getFieldByName 0 "testclob"]
@@ -711,7 +716,7 @@ $cur prepareQuery "begin  select testclob into :clobbindval from testtable2;  en
 $cur defineOutputBindClob "clobbindval"
 checkSuccess [$cur executeQuery] 1
 set clobbindvar [$cur getOutputBindClob "clobbindval"]
-checkSuccess [$cur getOutputBindLength "clobbindval"] [expr 8*1024*2]
+checkSuccess [$cur getOutputBindLength "clobbindval"] [expr 8*1]
 checkSuccess $clobval $clobbindvar
 catch {$cur sendQuery "drop table testtable2"}
 puts ""
