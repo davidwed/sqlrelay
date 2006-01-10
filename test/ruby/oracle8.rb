@@ -121,46 +121,46 @@ print "\n"
 
 print "OUTPUT BIND BY NAME: \n"
 cur.prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;")
-cur.defineOutputBind("numvar",10)
-cur.defineOutputBind("stringvar",10)
-cur.defineOutputBind("floatvar",10)
+cur.defineOutputBindInteger("numvar")
+cur.defineOutputBindString("stringvar",10)
+cur.defineOutputBindDouble("floatvar")
 checkSuccess(cur.executeQuery(),1)
-numvar=cur.getOutputBind("numvar")
-stringvar=cur.getOutputBind("stringvar")
-floatvar=cur.getOutputBind("floatvar")
-checkSuccess(numvar,'1')
+numvar=cur.getOutputBindInteger("numvar")
+stringvar=cur.getOutputBindString("stringvar")
+floatvar=cur.getOutputBindDouble("floatvar")
+checkSuccess(numvar,1)
 checkSuccess(stringvar,'hello')
-checkSuccess(floatvar,'2.5')
+checkSuccess(floatvar,2.5)
 print "\n"
 
 print "OUTPUT BIND BY NAME WITH VALIDATION: \n"
 cur.clearBinds()
-cur.defineOutputBind("numvar",10)
-cur.defineOutputBind("stringvar",10)
-cur.defineOutputBind("floatvar",10)
-cur.defineOutputBind("dummyvar",10)
+cur.defineOutputBindInteger("numvar")
+cur.defineOutputBindString("stringvar",10)
+cur.defineOutputBindDouble("floatvar")
+cur.defineOutputBindString("dummyvar",10)
 cur.validateBinds()
 checkSuccess(cur.executeQuery(),1)
-numvar=cur.getOutputBind("numvar")
-stringvar=cur.getOutputBind("stringvar")
-floatvar=cur.getOutputBind("floatvar")
-checkSuccess(numvar,'1')
+numvar=cur.getOutputBindInteger("numvar")
+stringvar=cur.getOutputBindString("stringvar")
+floatvar=cur.getOutputBindDouble("floatvar")
+checkSuccess(numvar,1)
 checkSuccess(stringvar,'hello')
-checkSuccess(floatvar,'2.5')
+checkSuccess(floatvar,2.5)
 print "\n"
 
 print "OUTPUT BIND BY POSITION: \n"
 cur.prepareQuery("begin  :1:=1; :2:='hello'; :3:=2.5; end;")
-cur.defineOutputBind("1",10)
-cur.defineOutputBind("2",10)
-cur.defineOutputBind("3",10)
+cur.defineOutputBindInteger("1")
+cur.defineOutputBindString("2",10)
+cur.defineOutputBindDouble("3")
 checkSuccess(cur.executeQuery(),1)
-numvar=cur.getOutputBind("1")
-stringvar=cur.getOutputBind("2")
-floatvar=cur.getOutputBind("3")
-checkSuccess(numvar,'1')
+numvar=cur.getOutputBindInteger("1")
+stringvar=cur.getOutputBindString("2")
+floatvar=cur.getOutputBindDouble("3")
+checkSuccess(numvar,1)
 checkSuccess(stringvar,'hello')
-checkSuccess(floatvar,'2.5')
+checkSuccess(floatvar,2.5)
 print "\n"
 
 print "SELECT: \n"
@@ -353,9 +353,9 @@ print "\n"
 
 print "OUTPUT BIND: \n"
 cur.prepareQuery("begin :var1:='hello'; end;")
-cur.defineOutputBind("var1",10)
+cur.defineOutputBindString("var1",10)
 checkSuccess(cur.executeQuery(),1)
-checkSuccess(cur.getOutputBind("var1"),"hello")
+checkSuccess(cur.getOutputBindString("var1"),"hello")
 print "\n"
 
 print "ARRAY SUBSTITUTIONS: \n"

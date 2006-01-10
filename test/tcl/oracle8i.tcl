@@ -136,46 +136,46 @@ puts ""
 
 puts "OUTPUT BIND BY NAME: "
 $cur prepareQuery "begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5;  end;"
-$cur defineOutputBind "numvar" 10
-$cur defineOutputBind "stringvar" 10
-$cur defineOutputBind "floatvar" 10
+$cur defineOutputBindInteger "numvar"
+$cur defineOutputBindString "stringvar" 10
+$cur defineOutputBindDouble "floatvar"
 checkSuccess [$cur executeQuery] 1
-set numvar [$cur getOutputBind "numvar"]
-set stringvar [$cur getOutputBind "stringvar"]
-set floatvar [$cur getOutputBind "floatvar"]
-checkSuccess $numvar "1"
+set numvar [$cur getOutputBindInteger "numvar"]
+set stringvar [$cur getOutputBindString "stringvar"]
+set floatvar [$cur getOutputBindDouble "floatvar"]
+checkSuccess $numvar 1
 checkSuccess $stringvar "hello"
-checkSuccess $floatvar "2.5"
+checkSuccess $floatvar 2.5
 puts ""
 
 puts "OUTPUT BIND BY NAME: "
 $cur clearBinds 
-$cur defineOutputBind "1" 10
-$cur defineOutputBind "2" 10
-$cur defineOutputBind "3" 10
+$cur defineOutputBindInteger "1"
+$cur defineOutputBindString "2" 10
+$cur defineOutputBindDouble "3"
 checkSuccess [$cur executeQuery] 1
-set numvar [$cur getOutputBind "1"]
-set stringvar [$cur getOutputBind "2"]
-set floatvar [$cur getOutputBind "3"]
-checkSuccess $numvar "1"
+set numvar [$cur getOutputBindInteger "1"]
+set stringvar [$cur getOutputBindString "2"]
+set floatvar [$cur getOutputBindDouble "3"]
+checkSuccess $numvar 1
 checkSuccess $stringvar "hello"
-checkSuccess $floatvar "2.5"
+checkSuccess $floatvar 2.5
 puts ""
 
 puts "OUTPUT BIND BY NAME WITH VALIDATION: "
 $cur clearBinds 
-$cur defineOutputBind "numvar" 10
-$cur defineOutputBind "stringvar" 10
-$cur defineOutputBind "floatvar" 10
-$cur defineOutputBind "dummyvar" 10
+$cur defineOutputBindInteger "numvar"
+$cur defineOutputBindString "stringvar" 10
+$cur defineOutputBindDouble "floatvar"
+$cur defineOutputBindString "dummyvar" 10
 $cur validateBinds 
 checkSuccess [$cur executeQuery] 1
-set numvar [$cur getOutputBind "numvar"]
-set stringvar [$cur getOutputBind "stringvar"]
-set floatvar [$cur getOutputBind "floatvar"]
-checkSuccess $numvar "1"
+set numvar [$cur getOutputBindInteger "numvar"]
+set stringvar [$cur getOutputBindString "stringvar"]
+set floatvar [$cur getOutputBindDouble "floatvar"]
+checkSuccess $numvar 1
 checkSuccess $stringvar "hello"
-checkSuccess $floatvar "2.5"
+checkSuccess $floatvar 2.5
 puts ""
 
 puts "SELECT: "
@@ -365,9 +365,9 @@ puts ""
 
 puts "OUTPUT BIND: "
 $cur prepareQuery "begin  :var1:='hello';  end;"
-$cur defineOutputBind "var1" 10
+$cur defineOutputBindString "var1" 10
 checkSuccess [$cur executeQuery] 1
-checkSuccess [$cur getOutputBind "var1"] "hello"
+checkSuccess [$cur getOutputBindString "var1"] "hello"
 puts ""
 
 puts "ARRAY SUBSTITUTIONS: "
@@ -632,9 +632,9 @@ $cur prepareQuery "begin  select testclob into :clobvar from testtable1;  select
 $cur defineOutputBindClob "clobvar"
 $cur defineOutputBindBlob "blobvar"
 checkSuccess [$cur executeQuery] 1
-set clobvar [$cur getOutputBind "clobvar"]
+set clobvar [$cur getOutputBindClob "clobvar"]
 set clobvarlength [$cur getOutputBindLength "clobvar"]
-set blobvar [$cur getOutputBind "blobvar"]
+set blobvar [$cur getOutputBindBlob "blobvar"]
 set blobvarlength [$cur getOutputBindLength "blobvar"]
 checkSuccess $clobvar "hello"
 checkSuccess $clobvarlength 5
@@ -693,7 +693,7 @@ checkSuccess $clobval [$cur getFieldByName 0 "testclob"]
 $cur prepareQuery "begin  select testclob into :clobbindval from testtable2;  end;"
 $cur defineOutputBindClob "clobbindval"
 checkSuccess [$cur executeQuery] 1
-set clobbindvar [$cur getOutputBind "clobbindval"]
+set clobbindvar [$cur getOutputBindClob "clobbindval"]
 checkSuccess [$cur getOutputBindLength "clobbindval"] [expr 8*1024*2]
 checkSuccess $clobval $clobbindvar
 catch {$cur sendQuery "delete from testtable2"}
@@ -710,7 +710,7 @@ checkSuccess $clobval [$cur getFieldByName 0 "testclob"]
 $cur prepareQuery "begin  select testclob into :clobbindval from testtable2;  end;"
 $cur defineOutputBindClob "clobbindval"
 checkSuccess [$cur executeQuery] 1
-set clobbindvar [$cur getOutputBind "clobbindval"]
+set clobbindvar [$cur getOutputBindClob "clobbindval"]
 checkSuccess [$cur getOutputBindLength "clobbindval"] [expr 8*1024*2]
 checkSuccess $clobval $clobbindvar
 catch {$cur sendQuery "drop table testtable2"}
@@ -730,9 +730,9 @@ catch {$cur sendQuery "select testval from testtable2"}
 checkSuccess $testval [$cur getFieldByName 0 "testval"]
 set query "begin  :bindval:='$testval';  end;"
 $cur prepareQuery $query
-$cur defineOutputBind "bindval" 4000
+$cur defineOutputBindString "bindval" 4000
 checkSuccess [$cur executeQuery] 1
-set bindval [$cur getOutputBind "bindval"]
+set bindval [$cur getOutputBindString "bindval"]
 checkSuccess [$cur getOutputBindLength "bindval"] 3999
 checkSuccess $bindval $testval
 catch {$cur sendQuery "drop table testtable2"}

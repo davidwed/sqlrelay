@@ -67,6 +67,18 @@ class oracle8i {
 		}
 	}
 	
+	private static void checkSuccess(double value, double success) {
+	
+		if (value==success) {
+			System.out.println("success ");
+		} else {
+			System.out.println("failure ");
+			
+			
+			System.exit(0);
+		}
+	}
+	
 	private static void checkSuccess(boolean value, int success) {
 	
 		if (((value)?1:0)==success) {
@@ -92,11 +104,11 @@ class oracle8i {
 		int[]	scales={2,3,4};
 		String	clobvar;
 		long	clobvarlength;
-		String	blobvar;
+		byte[]	blobvar;
 		long	blobvarlength;
-		String	numvar;
+		long	numvar;
 		String	stringvar;
-		String	floatvar;
+		double	floatvar;
 		String[]	cols;
 		String[]	fields;
 		short	port;
@@ -226,46 +238,46 @@ class oracle8i {
 	
 		System.out.println("OUTPUT BIND BY NAME: ");
 		cur.prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;");
-		cur.defineOutputBind("numvar",10);
-		cur.defineOutputBind("stringvar",10);
-		cur.defineOutputBind("floatvar",10);
+		cur.defineOutputBindInteger("numvar");
+		cur.defineOutputBindString("stringvar",10);
+		cur.defineOutputBindDouble("floatvar");
 		checkSuccess(cur.executeQuery(),1);
-		numvar=cur.getOutputBind("numvar");
-		stringvar=cur.getOutputBind("stringvar");
-		floatvar=cur.getOutputBind("floatvar");
-		checkSuccess(numvar,"1");
+		numvar=cur.getOutputBindInteger("numvar");
+		stringvar=cur.getOutputBindString("stringvar");
+		floatvar=cur.getOutputBindDouble("floatvar");
+		checkSuccess(numvar,1);
 		checkSuccess(stringvar,"hello");
-		checkSuccess(floatvar,"2.5");
+		checkSuccess(floatvar,2.5);
 		System.out.println();
 	
-		System.out.println("OUTPUT BIND BY NAME: ");
+		System.out.println("OUTPUT BIND BY POSITION: ");
 		cur.clearBinds();
-		cur.defineOutputBind("1",10);
-		cur.defineOutputBind("2",10);
-		cur.defineOutputBind("3",10);
+		cur.defineOutputBindInteger("1");
+		cur.defineOutputBindString("2",10);
+		cur.defineOutputBindDouble("3");
 		checkSuccess(cur.executeQuery(),1);
-		numvar=cur.getOutputBind("1");
-		stringvar=cur.getOutputBind("2");
-		floatvar=cur.getOutputBind("3");
-		checkSuccess(numvar,"1");
+		numvar=cur.getOutputBindInteger("1");
+		stringvar=cur.getOutputBindString("2");
+		floatvar=cur.getOutputBindDouble("3");
+		checkSuccess(numvar,1);
 		checkSuccess(stringvar,"hello");
-		checkSuccess(floatvar,"2.5");
+		checkSuccess(floatvar,2.5);
 		System.out.println();
 	
 		System.out.println("OUTPUT BIND BY NAME WITH VALIDATION: ");
 		cur.clearBinds();
-		cur.defineOutputBind("numvar",10);
-		cur.defineOutputBind("stringvar",10);
-		cur.defineOutputBind("floatvar",10);
-		cur.defineOutputBind("dummyvar",10);
+		cur.defineOutputBindInteger("numvar");
+		cur.defineOutputBindString("stringvar",10);
+		cur.defineOutputBindDouble("floatvar");
+		cur.defineOutputBindString("dummyvar",10);
 		cur.validateBinds();
 		checkSuccess(cur.executeQuery(),1);
-		numvar=cur.getOutputBind("numvar");
-		stringvar=cur.getOutputBind("stringvar");
-		floatvar=cur.getOutputBind("floatvar");
-		checkSuccess(numvar,"1");
+		numvar=cur.getOutputBindInteger("numvar");
+		stringvar=cur.getOutputBindString("stringvar");
+		floatvar=cur.getOutputBindDouble("floatvar");
+		checkSuccess(numvar,1);
 		checkSuccess(stringvar,"hello");
-		checkSuccess(floatvar,"2.5");
+		checkSuccess(floatvar,2.5);
 		System.out.println();
 	
 		System.out.println("SELECT: ");
@@ -471,9 +483,9 @@ class oracle8i {
 	
 		System.out.println("OUTPUT BIND: ");
 		cur.prepareQuery("begin :var1:='hello'; end;");
-		cur.defineOutputBind("var1",10);
+		cur.defineOutputBindString("var1",10);
 		checkSuccess(cur.executeQuery(),1);
-		checkSuccess(cur.getOutputBind("var1"),"hello");
+		checkSuccess(cur.getOutputBindString("var1"),"hello");
 		System.out.println();
 	
 		System.out.println("ARRAY SUBSTITUTIONS: ");
@@ -779,13 +791,13 @@ class oracle8i {
 		cur.defineOutputBindClob("clobvar");
 		cur.defineOutputBindBlob("blobvar");
 		checkSuccess(cur.executeQuery(),1);
-		clobvar=cur.getOutputBind("clobvar");
+		clobvar=cur.getOutputBindClob("clobvar");
 		clobvarlength=cur.getOutputBindLength("clobvar");
-		blobvar=cur.getOutputBind("blobvar");
+		blobvar=cur.getOutputBindBlob("blobvar");
 		blobvarlength=cur.getOutputBindLength("blobvar");
 		checkSuccess(clobvar,"hello",5);
 		checkSuccess(clobvarlength,5);
-		checkSuccess(blobvar,"hello",5);
+		checkSuccess(blobvar.toString(),"hello",5);
 		checkSuccess(blobvarlength,5);
 		cur.sendQuery("drop table testtable1");
 		System.out.println();
@@ -840,7 +852,7 @@ class oracle8i {
 		cur.prepareQuery("begin select testclob into :clobbindval from testtable2; end;");
 		cur.defineOutputBindClob("clobbindval");
 		checkSuccess(cur.executeQuery(),1);
-		String	clobbindvar=cur.getOutputBind("clobbindval");
+		String	clobbindvar=cur.getOutputBindClob("clobbindval");
 		checkSuccess(cur.getOutputBindLength("clobbindval"),8*1024);
 		checkSuccess(clobval.toString(),clobbindvar);
 		cur.sendQuery("drop table testtable2");
@@ -864,10 +876,10 @@ class oracle8i {
 		query.append(testval.toString());
 		query.append("'; end;");
 		cur.prepareQuery(query.toString());
-		cur.defineOutputBind("bindval",4000);
+		cur.defineOutputBindString("bindval",4000);
 		checkSuccess(cur.executeQuery(),1);
 		checkSuccess(cur.getOutputBindLength("bindval"),4000);
-		checkSuccess(cur.getOutputBind("bindval"),testval.toString());
+		checkSuccess(cur.getOutputBindString("bindval"),testval.toString());
 		cur.sendQuery("drop table testtable2");
 		System.out.println();
 

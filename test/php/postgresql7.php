@@ -635,8 +635,7 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("COMMIT AND ROLLBACK: \n");
-	#$secondcon=sqlrcon_alloc($host,$port,$socket,$user,$password,0,1);
-	$secondcon=sqlrcon_alloc("localhost",8010,"","postgresqltest","postgresqltest",0,1);
+	$secondcon=sqlrcon_alloc($host,$port,$socket,$user,$password,0,1);
 	$secondcur=sqlrcur_alloc($secondcon);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
 	checkSuccess(sqlrcur_getField($secondcur,0,0),"0");

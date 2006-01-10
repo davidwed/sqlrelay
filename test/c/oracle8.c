@@ -48,6 +48,18 @@ void checkSuccessInt(int value, int success) {
 	}
 }
 
+void checkSuccessDouble(double value, double success) {
+
+	if (value==success) {
+		printf("success ");
+	} else {
+		printf("failure ");
+		sqlrcur_free(cur);
+		sqlrcon_free(con);
+		exit(0);
+	}
+}
+
 int	main(int argc, char **argv) {
 	const char	*bindvars[6]={"1","2","3","4","5",NULL};
 	const char	*bindvals[5]={"4","testchar4","testvarchar4",
@@ -58,9 +70,9 @@ int	main(int argc, char **argv) {
 	double		subvaldoubles[3]={10.55,10.556,10.5556};
 	uint32_t	precs[3]={4,5,6};
 	uint32_t	scales[3]={2,3,4};
-	const char	*numvar;
+	int64_t		numvar;
 	const char	*stringvar;
-	const char	*floatvar;
+	double		floatvar;
 	const char * const *cols;
 	const char * const *fields;
 	uint16_t	port;
@@ -172,46 +184,46 @@ int	main(int argc, char **argv) {
 
 	printf("OUTPUT BIND BY NAME: \n");
 	sqlrcur_prepareQuery(cur,"begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;");
-	sqlrcur_defineOutputBind(cur,"numvar",10);
-	sqlrcur_defineOutputBind(cur,"stringvar",10);
-	sqlrcur_defineOutputBind(cur,"floatvar",10);
+	sqlrcur_defineOutputBindInteger(cur,"numvar");
+	sqlrcur_defineOutputBindString(cur,"stringvar",10);
+	sqlrcur_defineOutputBindDouble(cur,"floatvar");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	numvar=sqlrcur_getOutputBind(cur,"numvar");
-	stringvar=sqlrcur_getOutputBind(cur,"stringvar");
-	floatvar=sqlrcur_getOutputBind(cur,"floatvar");
-	checkSuccessString(numvar,"1");
+	numvar=sqlrcur_getOutputBindInteger(cur,"numvar");
+	stringvar=sqlrcur_getOutputBindString(cur,"stringvar");
+	floatvar=sqlrcur_getOutputBindDouble(cur,"floatvar");
+	checkSuccessInt(numvar,1);
 	checkSuccessString(stringvar,"hello");
-	checkSuccessString(floatvar,"2.5");
+	checkSuccessDouble(floatvar,2.5);
 	printf("\n");
 
 	printf("OUTPUT BIND BY NAME WITH VALIDATION: \n");
 	sqlrcur_clearBinds(cur);
-	sqlrcur_defineOutputBind(cur,"numvar",10);
-	sqlrcur_defineOutputBind(cur,"stringvar",10);
-	sqlrcur_defineOutputBind(cur,"floatvar",10);
-	sqlrcur_defineOutputBind(cur,"dummyvar",10);
+	sqlrcur_defineOutputBindInteger(cur,"numvar");
+	sqlrcur_defineOutputBindString(cur,"stringvar",10);
+	sqlrcur_defineOutputBindDouble(cur,"floatvar");
+	sqlrcur_defineOutputBindString(cur,"dummyvar",10);
 	sqlrcur_validateBinds(cur);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	numvar=sqlrcur_getOutputBind(cur,"numvar");
-	stringvar=sqlrcur_getOutputBind(cur,"stringvar");
-	floatvar=sqlrcur_getOutputBind(cur,"floatvar");
-	checkSuccessString(numvar,"1");
+	numvar=sqlrcur_getOutputBindInteger(cur,"numvar");
+	stringvar=sqlrcur_getOutputBindString(cur,"stringvar");
+	floatvar=sqlrcur_getOutputBindDouble(cur,"floatvar");
+	checkSuccessInt(numvar,1);
 	checkSuccessString(stringvar,"hello");
-	checkSuccessString(floatvar,"2.5");
+	checkSuccessDouble(floatvar,2.5);
 	printf("\n");
 
 	printf("OUTPUT BIND BY POSITION: \n");
 	sqlrcur_prepareQuery(cur,"begin  :1:=1; :2:='hello'; :3:=2.5; end;");
-	sqlrcur_defineOutputBind(cur,"1",10);
-	sqlrcur_defineOutputBind(cur,"2",10);
-	sqlrcur_defineOutputBind(cur,"3",10);
+	sqlrcur_defineOutputBindInteger(cur,"1");
+	sqlrcur_defineOutputBindString(cur,"2",10);
+	sqlrcur_defineOutputBindDouble(cur,"3");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	numvar=sqlrcur_getOutputBind(cur,"1");
-	stringvar=sqlrcur_getOutputBind(cur,"2");
-	floatvar=sqlrcur_getOutputBind(cur,"3");
-	checkSuccessString(numvar,"1");
+	numvar=sqlrcur_getOutputBindInteger(cur,"1");
+	stringvar=sqlrcur_getOutputBindString(cur,"2");
+	floatvar=sqlrcur_getOutputBindDouble(cur,"3");
+	checkSuccessInt(numvar,1);
 	checkSuccessString(stringvar,"hello");
-	checkSuccessString(floatvar,"2.5");
+	checkSuccessDouble(floatvar,2.5);
 	printf("\n");
 
 	printf("SELECT: \n");
@@ -374,9 +386,9 @@ int	main(int argc, char **argv) {
 
 	printf("OUTPUT BIND: \n");
 	sqlrcur_prepareQuery(cur,"begin :var1:='hello'; end;");
-	sqlrcur_defineOutputBind(cur,"var1",10);
+	sqlrcur_defineOutputBindString(cur,"var1",10);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	checkSuccessString(sqlrcur_getOutputBind(cur,"var1"),"hello");
+	checkSuccessString(sqlrcur_getOutputBindString(cur,"var1"),"hello");
 	printf("\n");
 
 	printf("ARRAY SUBSTITUTIONS: \n");

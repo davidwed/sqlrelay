@@ -166,9 +166,9 @@ class db2 {
 		checkSuccess(cur.sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 		cur.prepareQuery("call testproc(?,?)");
 		cur.inputBind("1",5);
-		cur.defineOutputBind("2",10);
+		cur.defineOutputBindInteger("2");
 		checkSuccess(cur.executeQuery(),1);
-		checkSuccess(cur.getOutputBind("2"),"5");
+		checkSuccess(cur.getOutputBindInteger("2"),5);
 		checkSuccess(cur.sendQuery("drop procedure testproc"),1);
 		System.out.println();
 	

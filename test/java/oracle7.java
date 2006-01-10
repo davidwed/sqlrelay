@@ -49,6 +49,18 @@ class oracle7 {
 		}
 	}
 	
+	private static void checkSuccess(double value, double success) {
+	
+		if (value==success) {
+			System.out.println("success ");
+		} else {
+			System.out.println("failure ");
+			
+			
+			System.exit(0);
+		}
+	}
+	
 	private static void checkSuccess(boolean value, int success) {
 	
 		if (((value)?1:0)==success) {
@@ -71,9 +83,9 @@ class oracle7 {
 		double[]	subvaldoubles={10.55,10.556,10.5556};
 		int[]	precs={4,5,6};
 		int[]	scales={2,3,4};
-		String	numvar;
+		long	numvar;
 		String	stringvar;
-		String	floatvar;
+		double	floatvar;
 		String[]	cols;
 		String[]	fields;
 		short	port;
@@ -184,46 +196,46 @@ class oracle7 {
 	
 		System.out.println("OUTPUT BIND BY NAME: ");
 		cur.prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;");
-		cur.defineOutputBind("numvar",10);
-		cur.defineOutputBind("stringvar",10);
-		cur.defineOutputBind("floatvar",10);
+		cur.defineOutputBindInteger("numvar");
+		cur.defineOutputBindString("stringvar",10);
+		cur.defineOutputBindDouble("floatvar");
 		checkSuccess(cur.executeQuery(),1);
-		numvar=cur.getOutputBind("numvar");
-		stringvar=cur.getOutputBind("stringvar");
-		floatvar=cur.getOutputBind("floatvar");
-		checkSuccess(numvar,"1");
+		numvar=cur.getOutputBindInteger("numvar");
+		stringvar=cur.getOutputBindString("stringvar");
+		floatvar=cur.getOutputBindDouble("floatvar");
+		checkSuccess(numvar,1);
 		checkSuccess(stringvar,"hello");
-		checkSuccess(floatvar,"2.5");
+		checkSuccess(floatvar,2.5);
 		System.out.println();
 	
 		System.out.println("OUTPUT BIND BY NAME WITH VALIDATION: ");
 		cur.clearBinds();
-		cur.defineOutputBind("numvar",10);
-		cur.defineOutputBind("stringvar",10);
-		cur.defineOutputBind("floatvar",10);
-		cur.defineOutputBind("dummyvar",10);
+		cur.defineOutputBindInteger("numvar");
+		cur.defineOutputBindString("stringvar",10);
+		cur.defineOutputBindDouble("floatvar");
+		cur.defineOutputBindString("dummyvar",10);
 		cur.validateBinds();
 		checkSuccess(cur.executeQuery(),1);
-		numvar=cur.getOutputBind("numvar");
-		stringvar=cur.getOutputBind("stringvar");
-		floatvar=cur.getOutputBind("floatvar");
-		checkSuccess(numvar,"1");
+		numvar=cur.getOutputBindInteger("numvar");
+		stringvar=cur.getOutputBindString("stringvar");
+		floatvar=cur.getOutputBindDouble("floatvar");
+		checkSuccess(numvar,1);
 		checkSuccess(stringvar,"hello");
-		checkSuccess(floatvar,"2.5");
+		checkSuccess(floatvar,2.5);
 		System.out.println();
 	
 		System.out.println("OUTPUT BIND BY POSITION: ");
 		cur.prepareQuery("begin  :1:=1; :2:='hello'; :3:=2.5; end;");
-		cur.defineOutputBind("1",10);
-		cur.defineOutputBind("2",10);
-		cur.defineOutputBind("3",10);
+		cur.defineOutputBindInteger("1");
+		cur.defineOutputBindString("2",10);
+		cur.defineOutputBindDouble("3");
 		checkSuccess(cur.executeQuery(),1);
-		numvar=cur.getOutputBind("1");
-		stringvar=cur.getOutputBind("2");
-		floatvar=cur.getOutputBind("3");
-		checkSuccess(numvar,"1");
+		numvar=cur.getOutputBindInteger("1");
+		stringvar=cur.getOutputBindString("2");
+		floatvar=cur.getOutputBindDouble("3");
+		checkSuccess(numvar,1);
 		checkSuccess(stringvar,"hello");
-		checkSuccess(floatvar,"2.5");
+		checkSuccess(floatvar,2.5);
 		System.out.println();
 	
 		System.out.println("SELECT: ");
@@ -306,13 +318,13 @@ class oracle7 {
 		checkSuccess(cur.getField(0,1),"testchar1                               ");
 		checkSuccess(cur.getField(0,2),"testvarchar1");
 		checkSuccess(cur.getField(0,3),"01-JAN-01");
-		checkSuccess(cur.getField(0,4),"testlong1");
+		//checkSuccess(cur.getField(0,4),"testlong1");
 		System.out.println();
 		checkSuccess(cur.getField(7,0),"8");
 		checkSuccess(cur.getField(7,1),"testchar8                               ");
 		checkSuccess(cur.getField(7,2),"testvarchar8");
 		checkSuccess(cur.getField(7,3),"01-JAN-08");
-		checkSuccess(cur.getField(7,4),"testlong8");
+		//checkSuccess(cur.getField(7,4),"testlong8");
 		System.out.println();
 	
 		System.out.println("FIELD LENGTHS BY INDEX: ");
@@ -332,13 +344,13 @@ class oracle7 {
 		checkSuccess(cur.getField(0,"testchar"),"testchar1                               ");
 		checkSuccess(cur.getField(0,"testvarchar"),"testvarchar1");
 		checkSuccess(cur.getField(0,"testdate"),"01-JAN-01");
-		checkSuccess(cur.getField(0,"testlong"),"testlong1");
+		//checkSuccess(cur.getField(0,"testlong"),"testlong1");
 		System.out.println();
 		checkSuccess(cur.getField(7,"testnumber"),"8");
 		checkSuccess(cur.getField(7,"testchar"),"testchar8                               ");
 		checkSuccess(cur.getField(7,"testvarchar"),"testvarchar8");
 		checkSuccess(cur.getField(7,"testdate"),"01-JAN-08");
-		checkSuccess(cur.getField(7,"testlong"),"testlong8");
+		//checkSuccess(cur.getField(7,"testlong"),"testlong8");
 		System.out.println();
 	
 		System.out.println("FIELD LENGTHS BY NAME: ");
@@ -359,7 +371,7 @@ class oracle7 {
 		checkSuccess(fields[1],"testchar1                               ");
 		checkSuccess(fields[2],"testvarchar1");
 		checkSuccess(fields[3],"01-JAN-01");
-		checkSuccess(fields[4],"testlong1");
+		//checkSuccess(fields[4],"testlong1");
 		System.out.println();
 	
 		System.out.println("FIELD LENGTHS BY ARRAY: ");
@@ -386,9 +398,9 @@ class oracle7 {
 	
 		System.out.println("OUTPUT BIND: ");
 		cur.prepareQuery("begin :var1:='hello'; end;");
-		cur.defineOutputBind("var1",10);
+		cur.defineOutputBindString("var1",10);
 		checkSuccess(cur.executeQuery(),1);
-		checkSuccess(cur.getOutputBind("var1"),"hello");
+		checkSuccess(cur.getOutputBindString("var1"),"hello");
 		System.out.println();
 	
 		System.out.println("ARRAY SUBSTITUTIONS: ");

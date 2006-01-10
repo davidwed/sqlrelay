@@ -116,46 +116,46 @@ function checkSuccess($value,$success) {
 
 	echo("OUTPUT BIND BY NAME: \n");
 	sqlrcur_prepareQuery($cur,"begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;");
-	sqlrcur_defineOutputBind($cur,"numvar",10);
-	sqlrcur_defineOutputBind($cur,"stringvar",10);
-	sqlrcur_defineOutputBind($cur,"floatvar",10);
+	sqlrcur_defineOutputBindInteger($cur,"numvar");
+	sqlrcur_defineOutputBindString($cur,"stringvar",10);
+	sqlrcur_defineOutputBindDouble($cur,"floatvar");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
-	$numvar=sqlrcur_getOutputBind($cur,"numvar");
-	$stringvar=sqlrcur_getOutputBind($cur,"stringvar");
-	$floatvar=sqlrcur_getOutputBind($cur,"floatvar");
-	checkSuccess($numvar,"1");
+	$numvar=sqlrcur_getOutputBindInteger($cur,"numvar");
+	$stringvar=sqlrcur_getOutputBindString($cur,"stringvar");
+	$floatvar=sqlrcur_getOutputBindDouble($cur,"floatvar");
+	checkSuccess($numvar,1);
 	checkSuccess($stringvar,"hello");
-	checkSuccess($floatvar,"2.5");
+	checkSuccess($floatvar,2.5);
 	echo("\n");
 
 	echo("OUTPUT BIND BY NAME WITH VALIDATION: \n");
 	sqlrcur_clearBinds($cur);
-	sqlrcur_defineOutputBind($cur,"numvar",10);
-	sqlrcur_defineOutputBind($cur,"stringvar",10);
-	sqlrcur_defineOutputBind($cur,"floatvar",10);
-	sqlrcur_defineOutputBind($cur,"dummyvar",10);
+	sqlrcur_defineOutputBindInteger($cur,"numvar");
+	sqlrcur_defineOutputBindString($cur,"stringvar",10);
+	sqlrcur_defineOutputBindDouble($cur,"floatvar");
+	sqlrcur_defineOutputBindString($cur,"dummyvar",10);
 	sqlrcur_validateBinds($cur);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
-	$numvar=sqlrcur_getOutputBind($cur,"numvar");
-	$stringvar=sqlrcur_getOutputBind($cur,"stringvar");
-	$floatvar=sqlrcur_getOutputBind($cur,"floatvar");
-	checkSuccess($numvar,"1");
+	$numvar=sqlrcur_getOutputBindInteger($cur,"numvar");
+	$stringvar=sqlrcur_getOutputBindString($cur,"stringvar");
+	$floatvar=sqlrcur_getOutputBindDouble($cur,"floatvar");
+	checkSuccess($numvar,1);
 	checkSuccess($stringvar,"hello");
-	checkSuccess($floatvar,"2.5");
+	checkSuccess($floatvar,2.5);
 	echo("\n");
 
 	echo("OUTPUT BIND BY POSITION: \n");
 	sqlrcur_prepareQuery($cur,"begin  :1:=1; :2:='hello'; :3:=2.5; end;");
-	sqlrcur_defineOutputBind($cur,"1",10);
-	sqlrcur_defineOutputBind($cur,"2",10);
-	sqlrcur_defineOutputBind($cur,"3",10);
+	sqlrcur_defineOutputBindInteger($cur,"1");
+	sqlrcur_defineOutputBindString($cur,"2",10);
+	sqlrcur_defineOutputBindDouble($cur,"3");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
-	$numvar=sqlrcur_getOutputBind($cur,"1");
-	$stringvar=sqlrcur_getOutputBind($cur,"2");
-	$floatvar=sqlrcur_getOutputBind($cur,"3");
-	checkSuccess($numvar,"1");
+	$numvar=sqlrcur_getOutputBindInteger($cur,"1");
+	$stringvar=sqlrcur_getOutputBindString($cur,"2");
+	$floatvar=sqlrcur_getOutputBindDouble($cur,"3");
+	checkSuccess($numvar,1);
 	checkSuccess($stringvar,"hello");
-	checkSuccess($floatvar,"2.5");
+	checkSuccess($floatvar,2.5);
 	echo("\n");
 
 	echo("SELECT: \n");
@@ -238,13 +238,13 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,1),"testchar1                               ");
 	checkSuccess(sqlrcur_getField($cur,0,2),"testvarchar1");
 	checkSuccess(sqlrcur_getField($cur,0,3),"01-JAN-01");
-	checkSuccess(sqlrcur_getField($cur,0,4),"testlong1");
+	#checkSuccess(sqlrcur_getField($cur,0,4),"testlong1");
 	echo("\n");
 	checkSuccess(sqlrcur_getField($cur,7,0),"8");
 	checkSuccess(sqlrcur_getField($cur,7,1),"testchar8                               ");
 	checkSuccess(sqlrcur_getField($cur,7,2),"testvarchar8");
 	checkSuccess(sqlrcur_getField($cur,7,3),"01-JAN-08");
-	checkSuccess(sqlrcur_getField($cur,7,4),"testlong8");
+	#checkSuccess(sqlrcur_getField($cur,7,4),"testlong8");
 	echo("\n");
 
 	echo("FIELD LENGTHS BY INDEX: \n");
@@ -264,13 +264,13 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getField($cur,0,"testchar"),"testchar1                               ");
 	checkSuccess(sqlrcur_getField($cur,0,"testvarchar"),"testvarchar1");
 	checkSuccess(sqlrcur_getField($cur,0,"testdate"),"01-JAN-01");
-	checkSuccess(sqlrcur_getField($cur,0,"testlong"),"testlong1");
+	#checkSuccess(sqlrcur_getField($cur,0,"testlong"),"testlong1");
 	echo("\n");
 	checkSuccess(sqlrcur_getField($cur,7,"testnumber"),"8");
 	checkSuccess(sqlrcur_getField($cur,7,"testchar"),"testchar8                               ");
 	checkSuccess(sqlrcur_getField($cur,7,"testvarchar"),"testvarchar8");
 	checkSuccess(sqlrcur_getField($cur,7,"testdate"),"01-JAN-08");
-	checkSuccess(sqlrcur_getField($cur,7,"testlong"),"testlong8");
+	#checkSuccess(sqlrcur_getField($cur,7,"testlong"),"testlong8");
 	echo("\n");
 
 	echo("FIELD LENGTHS BY NAME: \n");
@@ -291,7 +291,7 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields[1],"testchar1                               ");
 	checkSuccess($fields[2],"testvarchar1");
 	checkSuccess($fields[3],"01-JAN-01");
-	checkSuccess($fields[4],"testlong1");
+	#checkSuccess($fields[4],"testlong1");
 	echo("\n");
 
 	echo("FIELD LENGTHS BY ARRAY: \n");
@@ -308,14 +308,14 @@ function checkSuccess($value,$success) {
 	checkSuccess($fields["TESTCHAR"],"testchar1                               ");
 	checkSuccess($fields["TESTVARCHAR"],"testvarchar1");
 	checkSuccess($fields["TESTDATE"],"01-JAN-01");
-	checkSuccess($fields["TESTLONG"],"testlong1");
+	#checkSuccess($fields["TESTLONG"],"testlong1");
 	echo("\n");
 	$fields=sqlrcur_getRowAssoc($cur,7);
 	checkSuccess($fields["TESTNUMBER"],8);
 	checkSuccess($fields["TESTCHAR"],"testchar8                               ");
 	checkSuccess($fields["TESTVARCHAR"],"testvarchar8");
 	checkSuccess($fields["TESTDATE"],"01-JAN-08");
-	checkSuccess($fields["TESTLONG"],"testlong8");
+	#checkSuccess($fields["TESTLONG"],"testlong8");
 	echo("\n");
 
 	echo("FIELD LENGTHS BY ASSOCIATIVE ARRAY: \n");
@@ -357,9 +357,9 @@ function checkSuccess($value,$success) {
 
 	echo("OUTPUT BIND: \n");
 	sqlrcur_prepareQuery($cur,"begin :var1:='hello'; end;");
-	sqlrcur_defineOutputBind($cur,"var1",10);
+	sqlrcur_defineOutputBindString($cur,"var1",10);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
-	checkSuccess(sqlrcur_getOutputBind($cur,"var1"),"hello");
+	checkSuccess(sqlrcur_getOutputBindString($cur,"var1"),"hello");
 	echo("\n");
 
 	echo("ARRAY SUBSTITUTIONS: \n");

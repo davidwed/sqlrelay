@@ -120,46 +120,46 @@ def main():
 
 	print "OUTPUT BIND BY NAME: "
 	cur.prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;")
-	cur.defineOutputBind("numvar",10)
-	cur.defineOutputBind("stringvar",10)
-	cur.defineOutputBind("floatvar",10)
+	cur.defineOutputBindInteger("numvar")
+	cur.defineOutputBindString("stringvar",10)
+	cur.defineOutputBindDouble("floatvar")
 	checkSuccess(cur.executeQuery(),1)
-	numvar=cur.getOutputBind("numvar")
-	stringvar=cur.getOutputBind("stringvar")
-	floatvar=cur.getOutputBind("floatvar")
-	checkSuccess(numvar,'1')
+	numvar=cur.getOutputBindInteger("numvar")
+	stringvar=cur.getOutputBindString("stringvar")
+	floatvar=cur.getOutputBindDouble("floatvar")
+	checkSuccess(numvar,1)
 	checkSuccess(stringvar,'hello')
-	checkSuccess(floatvar,'2.5')
+	checkSuccess(floatvar,2.5)
 	print
 
 	print "OUTPUT BIND BY NAME WITH VALIDATION: "
 	cur.clearBinds()
-	cur.defineOutputBind("numvar",10)
-	cur.defineOutputBind("stringvar",10)
-	cur.defineOutputBind("floatvar",10)
-	cur.defineOutputBind("dummyvar",10)
+	cur.defineOutputBindInteger("numvar")
+	cur.defineOutputBindString("stringvar",10)
+	cur.defineOutputBindDouble("floatvar")
+	cur.defineOutputBindString("dummyvar",10)
 	cur.validateBinds()
 	checkSuccess(cur.executeQuery(),1)
-	numvar=cur.getOutputBind("numvar")
-	stringvar=cur.getOutputBind("stringvar")
-	floatvar=cur.getOutputBind("floatvar")
-	checkSuccess(numvar,'1')
+	numvar=cur.getOutputBindInteger("numvar")
+	stringvar=cur.getOutputBindString("stringvar")
+	floatvar=cur.getOutputBindDouble("floatvar")
+	checkSuccess(numvar,1)
 	checkSuccess(stringvar,'hello')
-	checkSuccess(floatvar,'2.5')
+	checkSuccess(floatvar,2.5)
 	print
 
 	print "OUTPUT BIND BY POSITION: "
 	cur.prepareQuery("begin  :1:=1; :2:='hello'; :3:=2.5; end;")
-	cur.defineOutputBind("1",10)
-	cur.defineOutputBind("2",10)
-	cur.defineOutputBind("3",10)
+	cur.defineOutputBindInteger("1")
+	cur.defineOutputBindString("2",10)
+	cur.defineOutputBindDouble("3")
 	checkSuccess(cur.executeQuery(),1)
-	numvar=cur.getOutputBind("1")
-	stringvar=cur.getOutputBind("2")
-	floatvar=cur.getOutputBind("3")
-	checkSuccess(numvar,'1')
+	numvar=cur.getOutputBindInteger("1")
+	stringvar=cur.getOutputBindString("2")
+	floatvar=cur.getOutputBindDouble("3")
+	checkSuccess(numvar,1)
 	checkSuccess(stringvar,'hello')
-	checkSuccess(floatvar,'2.5')
+	checkSuccess(floatvar,2.5)
 	print
 
 	print "SELECT: "
@@ -242,13 +242,13 @@ def main():
 	checkSuccess(cur.getField(0,1),"testchar1                               ")
 	checkSuccess(cur.getField(0,2),"testvarchar1")
 	checkSuccess(cur.getField(0,3),"01-JAN-01")
-	checkSuccess(cur.getField(0,4),"testlong1")
+	#checkSuccess(cur.getField(0,4),"testlong1")
 	print
 	checkSuccess(cur.getField(7,0),"8")
 	checkSuccess(cur.getField(7,1),"testchar8                               ")
 	checkSuccess(cur.getField(7,2),"testvarchar8")
 	checkSuccess(cur.getField(7,3),"01-JAN-08")
-	checkSuccess(cur.getField(7,4),"testlong8")
+	#checkSuccess(cur.getField(7,4),"testlong8")
 	print
 
 	print "FIELD LENGTHS BY INDEX: "
@@ -268,13 +268,13 @@ def main():
 	checkSuccess(cur.getField(0,"testchar"),"testchar1                               ")
 	checkSuccess(cur.getField(0,"testvarchar"),"testvarchar1")
 	checkSuccess(cur.getField(0,"testdate"),"01-JAN-01")
-	checkSuccess(cur.getField(0,"testlong"),"testlong1")
+	#checkSuccess(cur.getField(0,"testlong"),"testlong1")
 	print
 	checkSuccess(cur.getField(7,"testnumber"),"8")
 	checkSuccess(cur.getField(7,"testchar"),"testchar8                               ")
 	checkSuccess(cur.getField(7,"testvarchar"),"testvarchar8")
 	checkSuccess(cur.getField(7,"testdate"),"01-JAN-08")
-	checkSuccess(cur.getField(7,"testlong"),"testlong8")
+	#checkSuccess(cur.getField(7,"testlong"),"testlong8")
 	print
 
 	print "FIELD LENGTHS BY NAME: "
@@ -295,7 +295,7 @@ def main():
 	checkSuccess(fields[1],"testchar1                               ")
 	checkSuccess(fields[2],"testvarchar1")
 	checkSuccess(fields[3],"01-JAN-01")
-	checkSuccess(fields[4],"testlong1")
+	#checkSuccess(fields[4],"testlong1")
 	print
 
 	print "FIELD LENGTHS BY ARRAY: "
@@ -312,14 +312,14 @@ def main():
 	checkSuccess(fields["TESTCHAR"],"testchar1                               ")
 	checkSuccess(fields["TESTVARCHAR"],"testvarchar1")
 	checkSuccess(fields["TESTDATE"],"01-JAN-01")
-	checkSuccess(fields["TESTLONG"],"testlong1")
+	#checkSuccess(fields["TESTLONG"],"testlong1")
 	print
 	fields=cur.getRowDictionary(7)
 	checkSuccess(fields["TESTNUMBER"],8)
 	checkSuccess(fields["TESTCHAR"],"testchar8                               ")
 	checkSuccess(fields["TESTVARCHAR"],"testvarchar8")
 	checkSuccess(fields["TESTDATE"],"01-JAN-08")
-	checkSuccess(fields["TESTLONG"],"testlong8")
+	#checkSuccess(fields["TESTLONG"],"testlong8")
 	print
 
 	print "FIELD LENGTHS BY DICTIONARY: "
@@ -352,9 +352,9 @@ def main():
 
 	print "OUTPUT BIND: "
 	cur.prepareQuery("begin :var1:='hello'; end;")
-	cur.defineOutputBind("var1",10)
+	cur.defineOutputBindString("var1",10)
 	checkSuccess(cur.executeQuery(),1)
-	checkSuccess(cur.getOutputBind("var1"),"hello")
+	checkSuccess(cur.getOutputBindString("var1"),"hello")
 	print
 
 	print "ARRAY SUBSTITUTIONS: "
@@ -630,37 +630,37 @@ def main():
 	checkSuccess(rows[0][1],"testchar1                               ")
 	checkSuccess(rows[0][2],"testvarchar1")
 	checkSuccess(rows[0][3],"01-JAN-01")
-	checkSuccess(rows[0][4],"testlong1")
+	#checkSuccess(rows[0][4],"testlong1")
 	print
 	checkSuccess(rows[1][0],2);
 	checkSuccess(rows[1][1],"testchar2                               ")
 	checkSuccess(rows[1][2],"testvarchar2")
 	checkSuccess(rows[1][3],"01-JAN-02")
-	checkSuccess(rows[1][4],"testlong2")
+	#checkSuccess(rows[1][4],"testlong2")
 	print
 	checkSuccess(rows[2][0],3);
 	checkSuccess(rows[2][1],"testchar3                               ")
 	checkSuccess(rows[2][2],"testvarchar3")
 	checkSuccess(rows[2][3],"01-JAN-03")
-	checkSuccess(rows[2][4],"testlong3")
+	#checkSuccess(rows[2][4],"testlong3")
 	print
 	checkSuccess(rows[3][0],4);
 	checkSuccess(rows[3][1],"testchar4                               ")
 	checkSuccess(rows[3][2],"testvarchar4")
 	checkSuccess(rows[3][3],"01-JAN-04")
-	checkSuccess(rows[3][4],"testlong4")
+	#checkSuccess(rows[3][4],"testlong4")
 	print
 	checkSuccess(rows[4][0],5);
 	checkSuccess(rows[4][1],"testchar5                               ")
 	checkSuccess(rows[4][2],"testvarchar5")
 	checkSuccess(rows[4][3],"01-JAN-05")
-	checkSuccess(rows[4][4],"testlong5")
+	#checkSuccess(rows[4][4],"testlong5")
 	print
 	checkSuccess(rows[5][0],6);
 	checkSuccess(rows[5][1],"testchar6                               ")
 	checkSuccess(rows[5][2],"testvarchar6")
 	checkSuccess(rows[5][3],"01-JAN-06")
-	checkSuccess(rows[5][4],"testlong6")
+	#checkSuccess(rows[5][4],"testlong6")
 	print
 
 	print "FINISHED SUSPENDED SESSION: "

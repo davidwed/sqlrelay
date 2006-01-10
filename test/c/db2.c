@@ -150,9 +150,9 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 	sqlrcur_prepareQuery(cur,"call testproc(?,?)");
 	sqlrcur_inputBindLong(cur,"1",5);
-	sqlrcur_defineOutputBind(cur,"2",10);
+	sqlrcur_defineOutputBindInteger(cur,"2");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	checkSuccessString(sqlrcur_getOutputBind(cur,"2"),"5");
+	checkSuccessInt(sqlrcur_getOutputBindInteger(cur,"2"),5);
 	checkSuccessInt(sqlrcur_sendQuery(cur,"drop procedure testproc"),1);
 	printf("\n");
 
