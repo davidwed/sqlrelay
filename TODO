@@ -1,5 +1,3 @@
-PHP Pear DB - nextID, createSequence, dropSequence
-
 --------------------------------------------------------------------------------
 
 interbase fails float output bind test, prec/scale issue?
