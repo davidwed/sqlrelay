@@ -113,8 +113,9 @@ sqlrcursor::substitution(variable,...)
 						(uint32_t)SvIV(ST(3)),
 						(uint32_t)SvIV(ST(4)));
 		} else if (SvPOK(ST(2))) {
-			// should handle NULL's too...
 			THIS->substitution(variable,SvPV(ST(2),na));
+		} else if (ST(2)==&sv_undef) {
+			THIS->substitution(variable,(const char *)NULL);
 		} else {
 			RETVAL=0;
 		}
@@ -139,8 +140,9 @@ sqlrcursor::inputBind(variable,...)
 						(uint32_t)SvIV(ST(3)),
 						(uint32_t)SvIV(ST(4)));
 		} else if (SvPOK(ST(2))) {
-			// should handle NULL's too...
 			THIS->inputBind(variable,SvPV(ST(2),na));
+		} else if (ST(2)==&sv_undef) {
+			THIS->inputBind(variable,(const char *)NULL);
 		} else {
 			RETVAL=0;
 		}
@@ -157,6 +159,8 @@ sqlrcursor::inputBindBlob(variable,value,size)
 		if (SvPOK(ST(2))) {
 			THIS->inputBindBlob(variable,value,size);
 			RETVAL=1;
+		} else if (ST(2)==&sv_undef) {
+			THIS->inputBindBlob(variable,NULL,0);
 		}
 	OUTPUT:
 		RETVAL
@@ -171,6 +175,8 @@ sqlrcursor::inputBindClob(variable,value,size)
 		if (SvPOK(ST(2))) {
 			THIS->inputBindClob(variable,value,size);
 			RETVAL=1;
+		} else if (ST(2)==&sv_undef) {
+			THIS->inputBindClob(variable,NULL,0);
 		}
 	OUTPUT:
 		RETVAL
