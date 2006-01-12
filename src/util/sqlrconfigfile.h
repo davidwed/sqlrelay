@@ -60,7 +60,7 @@ typedef enum {
 	ROUTER_SOCKET_ATTRIBUTE,
 	ROUTER_USER_ATTRIBUTE,
 	ROUTER_PASSWORD_ATTRIBUTE,
-	ROUTER_REGEX_ATTRIBUTE
+	ROUTER_PATTERN_ATTRIBUTE
 } attribute;
 
 class usercontainer {
@@ -127,17 +127,17 @@ class routercontainer {
 		const char	*getSocket();
 		const char	*getUser();
 		const char	*getPassword();
-		regularexpression	**getRegexList();
-		uint16_t		getRegexCount();
+		linkedlist< regularexpression * >	*getRegexList();
 	private:
 		char			*host;
 		uint16_t		port;
 		char			*socket;
 		char			*user;
 		char			*password;
-		regularexpression	**regexlist;
-		uint16_t		regexcount;
+		linkedlist< regularexpression * >	regexlist;
 };
+
+typedef linkedlistnode< routercontainer * >	routernode;
 
 class sqlrconfigfile : public xmlsax {
 	public:
@@ -196,8 +196,7 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t		getConnectionCount();
 		uint32_t		getMetricTotal();
 
-		routercontainer		**getRouterList();
-		uint16_t		getRouterCount();
+		linkedlist< routercontainer * >	*getRouterList();
 	private:
 		const char	*id;
 		bool		correctid;
@@ -264,13 +263,14 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t		connectioncount;
 		uint32_t		metrictotal;
 
+		routercontainer		*currentrouter;
+		bool			inrouter;
+
 		uint16_t	connectstringcount;
 
 		linkedlist< connectstringcontainer * >	connectstringlist;
 		linkedlist< usercontainer * >		userlist;
-
-		routercontainer	**routerlist;
-		uint16_t	routercount;
+		linkedlist< routercontainer *>		routerlist;
 };
 
 #endif

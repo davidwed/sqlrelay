@@ -21,7 +21,7 @@ static char tpb[] = {
 	isc_tpb_wait
 };
 
-interbaseconnection::interbaseconnection() {
+interbaseconnection::interbaseconnection() : sqlrconnection_svr() {
 	db=0L;
 	tr=0L;
 	env=new environment();

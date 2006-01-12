@@ -5,7 +5,7 @@
 
 #include <datatypes.h>
 
-msqlconnection::msqlconnection() {
+msqlconnection::msqlconnection() : sqlrconnection_svr() {
 	devnull=-2;
 }
 

@@ -13,7 +13,7 @@
 
 #include <stdlib.h>
 
-mysqlconnection::mysqlconnection() {
+mysqlconnection::mysqlconnection() : sqlrconnection_svr() {
 	connected=false;
 }
 

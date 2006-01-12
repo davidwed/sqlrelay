@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-oracle7connection::oracle7connection() {
+oracle7connection::oracle7connection() : sqlrconnection_svr() {
 	env=new environment();
 }
 

@@ -10,7 +10,7 @@
 #include <datatypes.h>
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
-postgresqlconnection::postgresqlconnection() {
+postgresqlconnection::postgresqlconnection() : sqlrconnection_svr() {
 	datatypecount=0;
 	datatypeids=NULL;
 	datatypenames=NULL;

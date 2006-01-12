@@ -21,7 +21,7 @@ stringbuffer	*freetdsconnection::errorstring;
 bool		freetdsconnection::deadconnection;
 
 
-freetdsconnection::freetdsconnection() {
+freetdsconnection::freetdsconnection() : sqlrconnection_svr() {
 	errorstring=NULL;
 	env=new environment();
 

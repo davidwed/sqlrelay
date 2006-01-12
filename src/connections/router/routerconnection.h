@@ -65,7 +65,7 @@ class routercursor : public sqlrcursor_svr {
 
 		sqlrcursor	*cur;
 
-		uint64_t	currentrow;
+		uint64_t	nextrow;
 };
 
 class routerconnection : public sqlrconnection_svr {

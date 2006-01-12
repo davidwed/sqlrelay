@@ -9,10 +9,10 @@
 
 #include <datatypes.h>
 
-routerconnection::routerconnection() {
+routerconnection::routerconnection() : sqlrconnection_svr() {
 	cons=NULL;
 	concount=0;
-	cfgfile=cfgfl;
+	cfgfile=NULL;
 }
 
 routerconnection::~routerconnection() {
@@ -32,17 +32,18 @@ bool routerconnection::supportsNativeBinds() {
 
 void routerconnection::handleConnectString() {
 
-	routercontainer	**routerlist=cfgfl->getRouterList();
-	concount=cfgfl->getRouterCount();
+	cfgfile=cfgfl;
+
+	linkedlist< routercontainer *>	*routerlist=cfgfl->getRouterList();
+	concount=routerlist->getLength();
 
 	cons=new sqlrconnection *[concount];
 	for (uint16_t index=0; index<concount; index++) {
-		cons[index]=new sqlrconnection(
-					routerlist[index]->getHost(),
-					routerlist[index]->getPort(),
-					routerlist[index]->getSocket(),
-					routerlist[index]->getUser(),
-					routerlist[index]->getPassword(),0,1);
+		routercontainer	*rn=routerlist->
+					getNodeByIndex(index)->getData();
+		cons[index]=new sqlrconnection(rn->getHost(),rn->getPort(),
+						rn->getSocket(),rn->getUser(),
+						rn->getPassword(),0,1);
 	}
 }
 
@@ -69,7 +70,7 @@ const char *routerconnection::identify() {
 routercursor::routercursor(sqlrconnection_svr *conn) :
 						sqlrcursor_svr(conn) {
 	routerconn=(routerconnection *)conn;
-	currentrow=0;
+	nextrow=0;
 	cur=NULL;
 }
 
@@ -83,17 +84,23 @@ bool routercursor::openCursor(uint16_t id) {
 
 bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
-	for (uint16_t conindex=0; conindex<routerconn->concount; conindex++) {
-
-		routercontainer	*rc=routerconn->cfgfile->
-						getRouterList()[conindex];
-		for (uint16_t regindex=0;
-				regindex<rc->getRegexCount(); regindex++) {
-			if (rc->getRegexList()[regindex]->match(query)) {
+	uint16_t	conindex=0;
+	routernode	*rcn=routerconn->cfgfile->
+					getRouterList()->getNodeByIndex(0);
+	while (rcn && !cur) {
+		linkedlistnode< regularexpression * >	*ren=
+					rcn->getData()->getRegexList()->
+							getNodeByIndex(0);
+		while (ren && !cur) {
+			if (ren->getData()->match(query)) {
 				cur=new sqlrcursor(routerconn->cons[conindex]);
 				cur->setResultSetBufferSize(FETCH_AT_ONCE);
 			}
+			ren=ren->getNext();
 		}
+
+		rcn=rcn->getNext();
+		conindex++;
 	}
 
 	if (!cur) {
@@ -150,14 +157,19 @@ bool routercursor::inputBindClob(const char *variable,
 
 bool routercursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
-	if (execute) {
-		if (cur->executeQuery()) {
-			currentrow=0;
-			return true;
-		}
-		return false;
+	if (!execute) {
+		return true;
 	}
-	return true;
+	if (!cur) {
+		if (!prepareQuery(query,length)) {
+			return false;
+		}
+	}
+	if (cur && cur->executeQuery()) {
+		nextrow=0;
+		return true;
+	}
+	return false;
 }
 
 const char *routercursor::errorMessage(bool *liveconnection) {
@@ -220,23 +232,25 @@ bool routercursor::noRowsToReturn() {
 }
 
 bool routercursor::skipRow() {
-	currentrow++;
-	return true;
+	return fetchRow();
 }
 
 bool routercursor::fetchRow() {
-	currentrow++;
-	return true;
+	if (nextrow<cur->rowCount()) {
+		nextrow++;
+		return true;
+	}
+	return false;
 }
 
 void routercursor::returnRow() {
 	for (uint32_t index=0; index<cur->colCount(); index++) {
-		const char	*field=cur->getField(currentrow,index);
+		const char	*field=cur->getField(nextrow-1,index);
 		if (!field) {
 			conn->sendNullField();
 		} else {
 			conn->sendField(field,cur->getFieldLength(
-							currentrow,index));
+							nextrow-1,index));
 		}
 	}
 }

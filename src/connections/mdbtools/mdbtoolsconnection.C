@@ -16,7 +16,7 @@
 	extern "C" int yyparse();
 #endif
 
-mdbtoolsconnection::mdbtoolsconnection() {
+mdbtoolsconnection::mdbtoolsconnection() : sqlrconnection_svr() {
 }
 
 uint16_t mdbtoolsconnection::getNumberOfConnectStringVars() {

@@ -17,7 +17,7 @@ stringbuffer	*sybaseconnection::errorstring;
 bool		sybaseconnection::deadconnection;
 
 
-sybaseconnection::sybaseconnection() {
+sybaseconnection::sybaseconnection() : sqlrconnection_svr() {
 	errorstring=NULL;
 	env=new environment();
 }

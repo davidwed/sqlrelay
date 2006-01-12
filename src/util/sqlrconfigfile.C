@@ -58,8 +58,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	sidsocket=charstring::duplicate(DEFAULT_SID_SOCKET);
 	siduser=charstring::duplicate(DEFAULT_SID_USER);
 	sidpassword=charstring::duplicate(DEFAULT_SID_PASSWORD);
-	routerlist=NULL;
-	routercount=0;
+	currentrouter=NULL;
+	inrouter=false;
 }
 
 sqlrconfigfile::~sqlrconfigfile() {
@@ -97,10 +97,11 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] siduser;
 	delete[] sidpassword;
 
-	for (uint16_t index=0; index<routercount; index++) {
-		delete routerlist[index];
+	routernode	*rn=routerlist.getNodeByIndex(0);
+	while (rn) {
+		delete rn->getData();
+		rn=rn->getNext();
 	}
-	delete[] routerlist;
 }
 
 const char * const * sqlrconfigfile::getAddresses() {
@@ -311,12 +312,8 @@ uint32_t sqlrconfigfile::getMetricTotal() {
 	return metrictotal;
 }
 
-routercontainer **sqlrconfigfile::getRouterList() {
-	return routerlist;
-}
-
-uint16_t sqlrconfigfile::getRouterCount() {
-	return routercount;
+linkedlist< routercontainer * >	*sqlrconfigfile::getRouterList() {
+	return &routerlist;
 }
 
 bool sqlrconfigfile::tagStart(const char *name) {
@@ -334,6 +331,11 @@ bool sqlrconfigfile::tagStart(const char *name) {
 	} else if (!charstring::compare(name,"connection")) {
 		currentconnect=new connectstringcontainer(connectstringcount);
 		connectstringlist.append(currentconnect);
+	} else if (!charstring::compare(name,"router")) {
+		inrouter=true;
+	} else if (!charstring::compare(name,"routerconnection")) {
+		currentrouter=new routercontainer();
+		routerlist.append(currentrouter);
 	}
 
 	return true;
@@ -352,10 +354,18 @@ bool sqlrconfigfile::attributeName(const char *name) {
 	} else if (!charstring::compare(name,"addresses")) {
 		currentattribute=ADDRESSES_ATTRIBUTE;
 	} else if (!charstring::compare(name,"port")) {
-		currentattribute=PORT_ATTRIBUTE;
+		if (!inrouter) {
+			currentattribute=PORT_ATTRIBUTE;
+		} else {
+			currentattribute=ROUTER_PORT_ATTRIBUTE;
+		}
 	} else if (!charstring::compare(name,"socket") ||
 			!charstring::compare(name,"unixport")) {
-		currentattribute=SOCKET_ATTRIBUTE;
+		if (!inrouter) {
+			currentattribute=SOCKET_ATTRIBUTE;
+		} else {
+			currentattribute=ROUTER_SOCKET_ATTRIBUTE;
+		}
 	} else if (!charstring::compare(name,"dbase")) {
 		currentattribute=DBASE_ATTRIBUTE;
 	} else if (!charstring::compare(name,"connections")) {
@@ -410,9 +420,17 @@ bool sqlrconfigfile::attributeName(const char *name) {
 	} else if (!charstring::compare(name,"sidpassword")) {
 		currentattribute=SID_PASSWORD_ATTRIBUTE;
 	} else if (!charstring::compare(name,"user")) {
-		currentattribute=USER_ATTRIBUTE;
+		if (!inrouter) {
+			currentattribute=USER_ATTRIBUTE;
+		} else {
+			currentattribute=ROUTER_USER_ATTRIBUTE;
+		}
 	} else if (!charstring::compare(name,"password")) {
-		currentattribute=PASSWORD_ATTRIBUTE;
+		if (!inrouter) {
+			currentattribute=PASSWORD_ATTRIBUTE;
+		} else {
+			currentattribute=ROUTER_PASSWORD_ATTRIBUTE;
+		}
 	} else if (!charstring::compare(name,"connectionid")) {
 		currentattribute=CONNECTIONID_ATTRIBUTE;
 	} else if (!charstring::compare(name,"string")) {
@@ -421,6 +439,10 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=METRIC_ATTRIBUTE;
 	} else if (!charstring::compare(name,"behindloadbalancer")) {
 		currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
+	} else if (!charstring::compare(name,"host")) {
+		currentattribute=ROUTER_HOST_ATTRIBUTE;
+	} else if (!charstring::compare(name,"pattern")) {
+		currentattribute=ROUTER_PATTERN_ATTRIBUTE;
 	} else {
 		currentattribute=(attribute)0;
 	}
@@ -588,6 +610,27 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==BEHINDLOADBALANCER_ATTRIBUTE) {
 			currentconnect->setBehindLoadBalancer(
 				!charstring::compareIgnoringCase(value,"yes"));
+		} else if (currentattribute==ROUTER_HOST_ATTRIBUTE) {
+			currentrouter->setHost((value)?value:
+							DEFAULT_ROUTER_HOST);
+		} else if (currentattribute==ROUTER_PORT_ATTRIBUTE) {
+			currentrouter->setPort(atouint32_t(value,
+							DEFAULT_ROUTER_PORT,1));
+		} else if (currentattribute==ROUTER_SOCKET_ATTRIBUTE) {
+			currentrouter->setSocket((value)?value:
+							DEFAULT_ROUTER_SOCKET);
+		} else if (currentattribute==ROUTER_USER_ATTRIBUTE) {
+			currentrouter->setUser((value)?value:
+							DEFAULT_ROUTER_USER);
+		} else if (currentattribute==ROUTER_PASSWORD_ATTRIBUTE) {
+			currentrouter->setPassword((value)?value:
+						DEFAULT_ROUTER_PASSWORD);
+		} else if (currentattribute==ROUTER_PATTERN_ATTRIBUTE) {
+			regularexpression	*re=
+				new regularexpression(
+					(value)?value:DEFAULT_ROUTER_PATTERN);
+			re->study();
+			currentrouter->getRegexList()->append(re);
 		}
 	}
 	return true;
@@ -604,6 +647,10 @@ uint32_t sqlrconfigfile::atouint32_t(const char *value,
 }
 
 bool sqlrconfigfile::tagEnd(const char *name) {
+
+	if (!charstring::compare(name,"router")) {
+		inrouter=false;
+	}
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -754,8 +801,6 @@ routercontainer::routercontainer() {
 	socket=NULL;
 	user=NULL;
 	password=NULL;
-	regexlist=NULL;
-	regexcount=0;
 }
 
 routercontainer::~routercontainer() {
@@ -763,10 +808,11 @@ routercontainer::~routercontainer() {
 	delete[] socket;
 	delete[] user;
 	delete[] password;
-	for (uint16_t index=0; index<regexcount; index++) {
-		delete regexlist[index];
+	linkedlistnode< regularexpression * >	*re=regexlist.getNodeByIndex(0);
+	while (re) {
+		delete re->getData();
+		re=re->getNext();
 	}
-	delete[] regexlist;
 }
 
 void routercontainer::setHost(const char *host) {
@@ -809,10 +855,6 @@ const char *routercontainer::getPassword() {
 	return password;
 } 
 
-regularexpression **routercontainer::getRegexList() {
-	return regexlist;
-}
-
-uint16_t routercontainer::getRegexCount() {
-	return regexcount;
+linkedlist< regularexpression * > *routercontainer::getRegexList() {
+	return &regexlist;
 }

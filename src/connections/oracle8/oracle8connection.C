@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-oracle8connection::oracle8connection() {
+oracle8connection::oracle8connection() : sqlrconnection_svr() {
 	statementmode=OCI_DEFAULT;
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
