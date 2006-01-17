@@ -4,6 +4,7 @@
 #include <sqlrconnection.h>
 
 #include <rudiments/charstring.h>
+#include <rudiments/character.h>
 
 // This method gets the parameters SID needs to 
 // determine what to do
@@ -413,7 +414,7 @@ void sqlrcursor_svr::sql_injection_detection_parse_sql(const char *query) {
 			while ( (query[i + 1] == ' ') && ((i + 1) < BUFSIZ) ) 
 			   i++;	
 
-			while ( (isdigit(query[i + 1])) && ((i + 1) < BUFSIZ))
+			while ( (character::isDigit(query[i + 1])) && ((i + 1) < BUFSIZ))
 			  i++;
 
 		 }

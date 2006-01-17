@@ -1820,6 +1820,7 @@ then
 					FW_CHECK_HEADER_LIB([`pwd`/stage/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I`pwd`/stage/firebird/include\"],[`pwd`/stage/firebird/bin/fbclient.dll],[INTERBASELIBS=\"-L`pwd`/stage/firebird/bin -lfbclient\"],[],[])
 				done
 			else
+				FW_CHECK_HEADER_LIB([/usr/local/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/include\"],[/usr/local/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"/usr/local/lib\"; INTERBASELIBS=\"-L/usr/local/lib -lgds -lcrypt\"],[/usr/local/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 				FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
 			fi
 		fi

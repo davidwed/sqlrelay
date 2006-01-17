@@ -24,6 +24,6 @@ char *tempdir::getString() {
 	return tmpdir;
 }
 
-int tempdir::getLength() {
+int32_t tempdir::getLength() {
 	return tmpdirlen;
 }
