@@ -130,7 +130,7 @@ then
 fi
 
 
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
+for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -2188,16 +2188,16 @@ then
 		
 				if ( test -z "$ZOPEDIR" )
 				then
-					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib" "/usr" "/usr/lib" "/opt" "/sw"
+					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib" "/usr" "/usr/lib" "/opt" "/sw" "/usr/pkg" "/usr/pkg/share" "/usr/pkg/lib"
 					do
-						for j in "zope" "Zope"
+						for j in "zope" "Zope" "zope2" "Zope2" "zope3" "Zope3"
 						do
 							FW_CHECK_FILE("$i/$j/lib/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j/lib/python/Products\"])
 							if ( test -n "$ZOPEDIR" )
 							then
 								break
 							fi
-							for k in "2.2" "2.3" "2.4" "2.5" "2.6" "2.7"
+							for k in "2.2" "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9" "3.0" "3.1" "3.2"
 							do
 								FW_CHECK_FILE("$i/$j-$k/lib/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib/python/Products\"])
 								if ( test -n "$ZOPEDIR" )

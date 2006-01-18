@@ -1,3 +1,5 @@
+--enable-efence and --disable-efence both enable efence!
+
 freebsd-6:
 	doesn't find firebird
 		/usr/local/include/gds.h
