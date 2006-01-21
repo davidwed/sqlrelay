@@ -33,8 +33,8 @@ DLOBJS= odbcconnection.d.lo main.d.lo
 all: sqlr-connection-odbc sqlr-connection-odbc-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

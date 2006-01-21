@@ -33,8 +33,8 @@ DLOBJS= db2connection.d.lo main.d.lo
 all: sqlr-connection-db2 sqlr-connection-db2-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-db2
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-db2-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-db2$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-db2-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

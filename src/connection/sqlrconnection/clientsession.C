@@ -138,7 +138,7 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,
 				"client requested an invalid cursor:");
-			debugPrint("connection",3,index);
+			debugPrint("connection",3,(int32_t)index);
 			#endif
 			return NULL;
 		}
@@ -168,7 +168,7 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 		if (!cur[i]->busy) {
 			#ifdef SERVER_DEBUG
 			debugPrint("connection",2,"found a free cursor:");
-			debugPrint("connection",3,i);
+			debugPrint("connection",3,(int32_t)i);
 			#endif
 			return cur[i];
 		}

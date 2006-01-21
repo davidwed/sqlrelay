@@ -33,8 +33,8 @@ DLOBJS= sqliteconnection.d.lo main.d.lo
 all: sqlr-connection-sqlite sqlr-connection-sqlite-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sqlite
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sqlite-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sqlite$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sqlite-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

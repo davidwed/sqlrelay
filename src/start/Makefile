@@ -24,7 +24,7 @@ LOBJS = main.lo
 all: sqlr-start
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-start
+	$(LIBTOOL) --mode=clean $(RM) sqlr-start$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

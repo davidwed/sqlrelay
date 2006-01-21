@@ -33,8 +33,8 @@ DLOBJS= msqlconnection.d.lo main.d.lo
 all: sqlr-connection-msql sqlr-connection-msql-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-msql
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-msql-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-msql$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-msql-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

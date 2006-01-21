@@ -24,7 +24,7 @@ LOBJS = scaler.lo main.lo
 all: sqlr-scaler
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-scaler
+	$(LIBTOOL) --mode=clean $(RM) sqlr-scaler$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

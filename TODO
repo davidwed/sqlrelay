@@ -1,3 +1,8 @@
+if the build directory contains a space, cygwin's link scripts will fail
+
+cygwin:
+	tcl api compile fails
+
 --enable-efence and --disable-efence both enable efence!
 
 freebsd-6:

@@ -7,7 +7,7 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"returning output bind values");
-	debugPrint("connection",3,cursor->outbindcount);
+	debugPrint("connection",3,(int32_t)cursor->outbindcount);
 	#endif
 
 	// run through the output bind values, sending them back

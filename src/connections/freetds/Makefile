@@ -33,8 +33,8 @@ DLOBJS= freetdsconnection.d.lo main.d.lo
 all: sqlr-connection-freetds sqlr-connection-freetds-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-freetds
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-freetds-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-freetds$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-freetds-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

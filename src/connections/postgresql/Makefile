@@ -33,8 +33,8 @@ DLOBJS= postgresqlconnection.d.lo main.d.lo
 all: sqlr-connection-postgresql sqlr-connection-postgresql-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-postgresql
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-postgresql-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-postgresql$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-postgresql-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

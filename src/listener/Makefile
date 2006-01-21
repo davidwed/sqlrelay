@@ -28,8 +28,8 @@ DLOBJS = sqlrlistener.d.lo main.d.lo
 all: sqlr-listener sqlr-listener-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-listener
-	$(LIBTOOL) --mode=clean $(RM) sqlr-listener-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-listener$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-listener-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

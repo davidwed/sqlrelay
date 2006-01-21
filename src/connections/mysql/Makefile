@@ -33,8 +33,8 @@ DLOBJS= mysqlconnection.d.lo main.d.lo
 all: sqlr-connection-mysql sqlr-connection-mysql-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mysql
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mysql-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mysql$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mysql-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

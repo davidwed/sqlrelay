@@ -33,8 +33,8 @@ DLOBJS= oracle8connection.d.lo main.d.lo
 all: sqlr-connection-oracle8 sqlr-connection-oracle8-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-oracle8
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-oracle8-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-oracle8$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-oracle8-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

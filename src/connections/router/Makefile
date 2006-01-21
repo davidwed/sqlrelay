@@ -33,8 +33,8 @@ DLOBJS= routerconnection.d.lo main.d.lo
 all: sqlr-connection-router sqlr-connection-router-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-router
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-router-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-router$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-router-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

@@ -33,8 +33,8 @@ DLOBJS= mdbtoolsconnection.d.lo main.d.lo
 all: sqlr-connection-mdbtools sqlr-connection-mdbtools-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mdbtools
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mdbtools-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mdbtools$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mdbtools-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

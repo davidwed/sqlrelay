@@ -24,7 +24,7 @@ LOBJS = cachemanager.lo main.lo
 all: sqlr-cachemanager
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-cachemanager
+	$(LIBTOOL) --mode=clean $(RM) sqlr-cachemanager$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

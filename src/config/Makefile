@@ -19,8 +19,8 @@ LOBJS= configfile.lo gtkfe.lo
 all: sqlr-config-gtk
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-config-gtk
-	$(LIBTOOL) --mode=clean $(RM) sqlr-config-gtk-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-config-gtk$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-config-gtk-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

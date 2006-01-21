@@ -23,11 +23,11 @@ all: query fields sqlrsh sqlr-export sqlr-import
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) fields
-	$(LIBTOOL) --mode=clean $(RM) query
-	$(LIBTOOL) --mode=clean $(RM) sqlr-export
-	$(LIBTOOL) --mode=clean $(RM) sqlr-import
-	$(LIBTOOL) --mode=clean $(RM) sqlrsh
+	$(LIBTOOL) --mode=clean $(RM) fields$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) query$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-export$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-import$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlrsh$(EXE)
 	$(RMTREE) .libs
 
 rebuild: clean all

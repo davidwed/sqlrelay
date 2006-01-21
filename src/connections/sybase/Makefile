@@ -33,8 +33,8 @@ DLOBJS= sybaseconnection.d.lo main.d.lo
 all: sqlr-connection-sybase sqlr-connection-sybase-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sybase
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sybase-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sybase$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sybase-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

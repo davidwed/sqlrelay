@@ -33,8 +33,8 @@ DLOBJS= interbaseconnection.d.lo main.d.lo
 all: sqlr-connection-interbase sqlr-connection-interbase-debug
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-interbase
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-interbase-debug
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-interbase$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-interbase-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs

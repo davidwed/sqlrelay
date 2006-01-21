@@ -206,7 +206,7 @@ void sqlrcursor::cacheOutputBinds(uint32_t count) {
 	uint16_t	len;
 	for (uint32_t i=0; i<count; i++) {
 
-		cachedest->write(outbindvars[i].type);
+		cachedest->write((uint16_t)outbindvars[i].type);
 
 		len=charstring::length(outbindvars[i].variable);
 		cachedest->write(len);
