@@ -19348,7 +19348,7 @@ fi
 
 
 	PYTHONFRAMEWORK=""
-	if ( test "`uname -s`" = "Darwin" -a -r "INSTALL" )
+	if ( test "`uname -s`" = "Darwin" )
 	then
 		PYTHONFRAMEWORK="-framework Python"
 	fi

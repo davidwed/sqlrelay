@@ -342,7 +342,6 @@ AC_SUBST(MINGW32)
 AC_SUBST(CYGWIN)
 AC_SUBST(UWIN)
 
-dnl Hack so "make install" will work on windows.
 MICROSOFT=""
 EXE=""
 if ( test "$UWIN" = "yes" -o "$MINGW32" = "yes" -o "$CYGWIN" = "yes" )
@@ -358,7 +357,7 @@ AC_SUBST(MICROSOFT)
 AC_DEFUN([FW_CHECK_OSX],
 [
 	PYTHONFRAMEWORK=""
-	if ( test "`uname -s`" = "Darwin" -a -r "INSTALL" )
+	if ( test "`uname -s`" = "Darwin" )
 	then
 		PYTHONFRAMEWORK="-framework Python"
 	fi

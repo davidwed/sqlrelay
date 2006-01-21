@@ -388,8 +388,13 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 	// execute the query
 	erg=SQLExecute(stmt);
 	if (erg!=SQL_SUCCESS &&
-		erg!=SQL_SUCCESS_WITH_INFO &&
-		erg!=SQL_NO_DATA) {
+		erg!=SQL_SUCCESS_WITH_INFO
+#if defined(SQL_NO_DATA)
+		&& erg!=SQL_NO_DATA
+#elif defined(SQL_NO_DATA_FOUND)
+		&& erg!=SQL_NO_DATA_FOUND
+#endif
+		) {
 		return false;
 	}
 

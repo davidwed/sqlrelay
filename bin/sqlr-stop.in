@@ -27,7 +27,7 @@ if ( test "$PS" = "ps\ aux" ); then
 		sleep 1
 	done
 
-	if ( test -n "`ps aux | grep sqlr- | grep ' $1' | grep -v grep | grep -v sqlr-stop`" ); then
+	if ( test -n "`ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop`" ); then
 		echo "Processes still alive:"
 		ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
 	else
@@ -40,7 +40,8 @@ else
 	do
 		if ( test -n "$CYGWIN" )
 		then
-			for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
+			# cygwin's listing isn't long enough to grep for $1
+			for i in `ps -efal | grep sqlr- | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
 			do
 				kill $KILLARG $i
 			done
@@ -53,7 +54,7 @@ else
 		fi
 	done
 
-	if ( test -n "`ps -efal | grep sqlr- | grep ' $1' | grep -v grep | grep -v sqlr-stop`" ); then
+	if ( test -n "`ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop`" ); then
 		echo "Processes still alive:"
 		ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
 	else
@@ -64,7 +65,7 @@ fi
 
 # clean up tmp files
 if ( test -n "$1" ); then
-	rm -f ${tmpdir}/pids/$1
+	rm -f ${tmpdir}/pids/sqlr-listener-$1
 	rm -f ${tmpdir}/sockets/$1
 	rm -f ${tmpdir}/ipc/$1-*
 	rm -f ${tmpdir}/ipc/$1
