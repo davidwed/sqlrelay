@@ -1,76 +1,29 @@
 #!/bin/sh
-# Copyright (c) 1999-2000 David Muse
-# See the file COPYING for more information
+
+ID=`echo $1 | sed -e "s| ||g" 2> /dev/null`
+KILLARGS=$2
 
 prefix=@prefix@
-tmpdir=@localstatedir@/sqlrelay/tmp
+PIDDIR=@localstatedir@/sqlrelay/tmp/pids
 
-KILLARG=""
-if ( test -n "$2" ); then
-	KILLARG="-$2"
+FILES="$PIDDIR/sqlr-*-$ID*"
+if ( test -z "$ID" )
+then
+	FILES="$FILES $PIDDIR/sqlr-cachemanager*"
 fi
 
-echo "Killing the following processes:"
-
-CYGWIN="@CYGWIN@"
-PS="@PS@"
-if ( test "$PS" = "ps\ aux" ); then
-
-	ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
-
-	for times in 1 2
-	do
-		for i in `ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
-		do
-			kill $KILLARG $i
-		done
-		sleep 1
-	done
-
-	if ( test -n "`ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop`" ); then
-		echo "Processes still alive:"
-		ps aux | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
-	else
-		echo "All processes killed."
-	fi
-else
-	ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
-
-	for times in 1 2
-	do
-		if ( test -n "$CYGWIN" )
+for file in `ls $FILES 2> /dev/null`
+do
+	if ( test -r "$file" )
+	then
+		PID=`cat $file`
+		echo "killing process $PID..."
+		kill $KILLARGS $PID
+		if ( test "$?" == "0" )
 		then
-			# cygwin's listing isn't long enough to grep for $1
-			for i in `ps -efal | grep sqlr- | grep -v grep | grep -v sqlr-stop | awk '{print $2}'`
-			do
-				kill $KILLARG $i
-			done
-			sleep 1
+			echo "   success"
 		else
-			for i in `ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop | awk '{print $4}'`
-			do
-				kill $KILLARG $i
-			done
+			echo "   failed"
 		fi
-	done
-
-	if ( test -n "`ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop`" ); then
-		echo "Processes still alive:"
-		ps -efal | grep sqlr- | grep " $1" | grep -v grep | grep -v sqlr-stop
-	else
-		echo "All processes killed."
 	fi
-	
-fi
-
-# clean up tmp files
-if ( test -n "$1" ); then
-	rm -f ${tmpdir}/pids/sqlr-listener-$1
-	rm -f ${tmpdir}/sockets/$1
-	rm -f ${tmpdir}/ipc/$1-*
-	rm -f ${tmpdir}/ipc/$1
-else
-	rm -f ${tmpdir}/pids/*
-	rm -f ${tmpdir}/sockets/*
-	rm -f ${tmpdir}/ipc/*
-fi
+done

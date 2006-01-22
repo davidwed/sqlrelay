@@ -58,4 +58,9 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done deleting bindpool");
 	#endif
+
+	if (pidfile) {
+		file::remove(pidfile);
+		delete[] pidfile;
+	}
 }

@@ -42,4 +42,6 @@ sqlrconnection_svr::sqlrconnection_svr() :
 	bindpool=new memorypool(512,128,100);
 
 	sid_sqlrcon=NULL;
+
+	pidfile=NULL;
 }

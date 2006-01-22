@@ -1,18 +1,25 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.20 2006-01-09 04:57:29 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.21 2006-01-22 23:08:29 mused Exp $
  */
 
 #include <tcl.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
 
-#include "tclincludes.h"
-
 #include <config.h>
 #ifndef HAVE_TCL_GETSTRING
 	#define Tcl_GetString(a) Tcl_GetStringFromObj(a,NULL)
+#endif
+#ifdef HAVE_TCL_CONSTCHAR
+	#define CONSTCHAR const char
+#else
+	#define CONSTCHAR char
+#endif
+#ifndef HAVE_TCL_WIDEINT
+	#define Tcl_WideInt long
+	#define Tcl_GetWideIntFromObj(a,b,c) Tcl_GetLongFromObj(a,b,c)
 #endif
 
 extern "C" {
@@ -354,7 +361,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     {
     case SQLRCUR_eval:
       {
-	Tcl_WideInt row;
+	uint64_t row;
 	uint32_t col;
 	Tcl_Obj *rowObj, *result;
 	if (objc != 3) {
@@ -366,7 +373,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  return TCL_ERROR;
 	}
 	result = Tcl_NewObj();
-	for (row = 0; row < (Tcl_WideInt)cur->rowCount(); row++) {
+	for (row = 0; row < cur->rowCount(); row++) {
 	  rowObj = Tcl_NewObj();
 	  for (col = 0; col < cur->colCount(); col++) {
 	    const char *field = cur->getField(row, col);

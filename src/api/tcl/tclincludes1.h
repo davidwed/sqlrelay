@@ -1,1 +1,0 @@
-#define CONSTCHAR const char

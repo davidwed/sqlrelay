@@ -7,6 +7,8 @@
 #include <config.h>
 #include <defaults.h>
 #include <rudiments/daemonprocess.h>
+#include <cmdline.h>
+#include <tempdir.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -34,6 +36,11 @@ class cachemanager : public daemonprocess {
 		int	scaninterval;
 		dirnode	*firstdir;
 		dirnode	*currentdir;
+
+		cmdline	*cmdl;
+		tempdir	*tmpdir;
+
+		char	*pidfile;
 };
 
 #endif

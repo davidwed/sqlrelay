@@ -2632,13 +2632,12 @@ then
 		else
 			HAVE_TCL="yes"
 			AC_MSG_CHECKING(for Tcl_GetString)
-			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetString(NULL);],[$TCLINCLUDE],[$TCLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); HAVETCLGETSTRING="yes"],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetString(NULL);],[$TCLINCLUDE],[$TCLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_GETSTRING,1,Some versions of TCL don't have Tcl_GetString)],[AC_MSG_RESULT(no)])
+			AC_MSG_CHECKING(for Tcl_WideInt)
+			FW_TRY_LINK([#include <tcl.h>],[Tcl_WideInt row;],[$TCLINCLUDE],[$TCLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_WIDEINT,1,Some versions of TCL don't have Tcl_WideInt)],[AC_MSG_RESULT(no)])
+			AC_MSG_CHECKING(for const char ** support)
+			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetIndexFromObj(NULL,NULL,(const char **)NULL,NULL,0,NULL);],[$TCLINCLUDE],[$TCLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_CONSTCHAR,1,Some versions of TCL don't use const char ** arguments)],[AC_MSG_RESULT(no)])
 		fi
-	fi
-
-	if ( test -n "$HAVETCLGETSTRING" )
-	then
-		AC_DEFINE_UNQUOTED(HAVE_TCL_GETSTRING,1,Some versions of TCL don't have Tcl_GetString)
 	fi
 
 	FW_INCLUDES(tcl,[$TCLINCLUDE])

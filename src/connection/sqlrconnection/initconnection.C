@@ -6,6 +6,7 @@
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
+#include <rudiments/permissions.h>
 
 bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 						bool detachbeforeloggingin) {
@@ -84,6 +85,17 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 	}
 	#endif
 
+	// create connection pid file
+	pid_t	pid=process::getProcessId();
+	size_t	pidfilelen=tmpdir->getLength()+22+
+				charstring::length(cmdl->getId())+1+
+				charstring::integerLength(pid)+1;
+	pidfile=new char[pidfilelen];
+	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-connection-%s.%d",
+				tmpdir->getString(),cmdl->getId(),pid);
+
+	createPidFile(pidfile,permissions::ownerReadWrite());
+
 	setInitialAutoCommitBehavior();
 
 	// create sqlrconnection for sid database
@@ -94,7 +106,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 						cfgfl->getSidUser(),
 						cfgfl->getSidPassword(),
 						0,1);
-sid_sqlrcon->debugOn();
 	}
 
 	if (!initCursors(true)) {
@@ -167,17 +178,18 @@ void sqlrconnection_svr::setUnixSocketDirectory() {
 
 bool sqlrconnection_svr::handlePidFile() {
 
-	// check for pid file
-	size_t	pidfilelen=tmpdir->getLength()+20+
+	// check for listener pid file
+	size_t	listenerpidfilelen=tmpdir->getLength()+20+
 				charstring::length(cmdl->getId())+1;
-	char	*pidfile=new char[pidfilelen];
-	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-listener-%s",
+	char	*listenerpidfile=new char[listenerpidfilelen];
+	snprintf(listenerpidfile,listenerpidfilelen,
+				"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),cmdl->getId());
 
 	bool	retval=true;
-	if (checkForPidFile(pidfile)==-1) {
+	if (checkForPidFile(listenerpidfile)==-1) {
 		printf("\nsqlr-connection error:\n");
-		printf("	The pid file %s",pidfile);
+		printf("	The pid file %s",listenerpidfile);
 		printf(" was not found.\n");
 		printf("	This usually means that the sqlr-listener \n");
 		printf("is not running.\n");
@@ -186,7 +198,8 @@ bool sqlrconnection_svr::handlePidFile() {
 		retval=false;
 	}
 
-	delete[] pidfile;
+	delete[] listenerpidfile;
+
 	return retval;
 }
 

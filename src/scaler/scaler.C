@@ -211,9 +211,6 @@ bool scaler::initScaler(int argc, const char **argv) {
 		metrictotal=cfgfile->getMetricTotal();
 	}
 
-	// create the pid file
-	createPidFile(pidfile,permissions::ownerReadWrite());
-
 	// initialize the shared memory segment filename
 	size_t	idfilenamelen=tmpdirlen+5+charstring::length(id)+1;
 	idfilename=new char[idfilenamelen];
@@ -235,6 +232,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// detach from the controlling tty
 	detach();
+
+	// create the pid file
+	createPidFile(pidfile,permissions::ownerReadWrite());
 
 	return true;
 }

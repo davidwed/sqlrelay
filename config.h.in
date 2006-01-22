@@ -255,8 +255,14 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
+/* Some versions of TCL don't use const char ** arguments */
+#undef HAVE_TCL_CONSTCHAR
+
 /* Some versions of TCL don't have Tcl_GetString */
 #undef HAVE_TCL_GETSTRING
+
+/* Some versions of TCL don't have Tcl_WideInt */
+#undef HAVE_TCL_WIDEINT
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

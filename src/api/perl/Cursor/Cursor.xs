@@ -278,7 +278,9 @@ sqlrcursor *
 sqlrcursor::getOutputBindCursor(variable)
 		const char *variable
 	PREINIT:
-		const char *	CLASS = "SQLRelay::Cursor";
+		// on some platforms, this needs to be a
+		// char * rather than const char *
+		char *	CLASS = "SQLRelay::Cursor";
 	CODE:
 		RETVAL=THIS->getOutputBindCursor(variable);
 		RETVAL->copyReferences();
@@ -397,7 +399,11 @@ sqlrcursor::getColumnNames()
 		EXTEND(SP,THIS->colCount());
 		if (namesptr) {
 			for (index=0; index<THIS->colCount(); index++) {
-				PUSHs(sv_2mortal(newSVpv(namesptr[index],0)));
+				// On some platforms newSVpv takes a char *
+				// argument rather than a const char *
+				// argument.
+				PUSHs(sv_2mortal(
+					newSVpv((char *)namesptr[index],0)));
 			}
 		}
 

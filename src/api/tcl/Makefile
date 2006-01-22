@@ -16,36 +16,13 @@ endif
 SRCS = sqlrelayCmd.C
 LOBJS = sqlrelayCmd.lo
 
-all:
-	cp tclincludes1.h tclincludes.h; \
-	$(MAKE) libsqlrelay.la 2> errors1; \
-	if ( test ! -r libsqlrelay.la ); then \
-		cp tclincludes2.h tclincludes.h; \
-		$(MAKE) libsqlrelay.la 2> errors2; \
-		if ( test ! -r libsqlrelay.la ); then \
-			if ( test -s errors1 ); then \
-				echo "first try errors : "; cat errors1; echo; \
-			fi; \
-			if ( test -s errors2 ); then \
-				echo "second try errors : "; cat errors2; echo; \
-			fi; \
-			exit 1; \
-		else \
-			cat errors2; \
-		fi; \
-	else \
-		cat errors1; \
-	fi
-	$(RM) errors1 errors2 tclincludes.h
+all: libsqlrelay.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o	
 	$(LIBTOOL) --mode=clean $(RM) *.so
-	$(RM) tclincludes.h
-	$(RM) errors1
-	$(RM) errors2
 	$(RMTREE) .libs
 
 rebuild: clean all

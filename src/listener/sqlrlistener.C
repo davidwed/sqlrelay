@@ -171,6 +171,8 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	detach();
 	#endif
 
+	createPidFile(pidfile,permissions::ownerReadWrite());
+
 	return true;
 }
 
@@ -270,8 +272,6 @@ bool sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
 		pidfile=NULL;
 		return false;
 	}
-
-	createPidFile(pidfile,permissions::ownerReadWrite());
 	return true;
 }
 

@@ -2,12 +2,13 @@
 // See the file COPYING for more information
 
 #include <cachemanager.h>
-#include <rudiments/commandline.h>
 #include <rudiments/snooze.h>
 #include <rudiments/charstring.h>
 #include <rudiments/datetime.h>
 #include <rudiments/file.h>
 #include <rudiments/directory.h>
+#include <rudiments/process.h>
+#include <rudiments/permissions.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -33,11 +34,12 @@ dirnode::~dirnode() {
 
 cachemanager::cachemanager(int argc, const char **argv) {
 
-	// read the commandline
-	commandline	cmdl(argc,argv);
+	cmdl=new cmdline(argc,argv);
+	tmpdir=new tempdir(cmdl);
+	pidfile=NULL;
 
 	// get the scaninterval
-	const char	*scanint=cmdl.value("-scaninterval");
+	const char	*scanint=cmdl->value("-scaninterval");
 	if (scanint && scanint[0]) {
 		scaninterval=charstring::toInteger(scanint);
 	} else {
@@ -45,7 +47,7 @@ cachemanager::cachemanager(int argc, const char **argv) {
 	}
 
 	// get the directories to scan
-	const char	*cachedirs=cmdl.value("-cachedirs");
+	const char	*cachedirs=cmdl->value("-cachedirs");
 	parseCacheDirs(cachedirs);
 }
 
@@ -58,6 +60,14 @@ cachemanager::~cachemanager() {
 		currentdir=currentdir->next;
 		delete firstdir;
 	}
+
+	delete cmdl;
+	delete tmpdir;
+
+	if (pidfile) {
+		file::remove(pidfile);
+		delete[] pidfile;
+	}
 }
 
 void cachemanager::scan() {
@@ -65,6 +75,17 @@ void cachemanager::scan() {
 	// detach from the controlling tty
 	detach();
 
+	// create pid file
+	pid_t	pid=process::getProcessId();
+	size_t	pidfilelen=tmpdir->getLength()+24+
+				charstring::integerLength(pid)+1;
+	pidfile=new char[pidfilelen];
+	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-cachemanager.%d",
+						tmpdir->getString(),pid);
+
+	createPidFile(pidfile,permissions::ownerReadWrite());
+
+	// scan...
 	directory	dir;
 
 	for (;;) {

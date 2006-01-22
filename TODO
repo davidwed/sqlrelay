@@ -1,16 +1,24 @@
-if the build directory contains a space, cygwin's link scripts will fail
+docs:
+	mysql comes with solaris companion cd's except for solaris 8
+	when installing mysql on solaris 8 from mysql's site, first need to
+	create a wheel group
+
+	postgresql 7.x and 8 may have "ident sameuser" rather than "trust"
+	by default, need to add entry for local subnet, not just 127.0.0.0 
+	for 7.x and 8, need to add listen_addresses = '*' in postgresql.conf,
+		not tcpip_socket
 
 all processes need to create a pid file and sqlr-stop needs to kill them by
 	reading the pid from the file and killing it, rather than using
 	ps -efa/aux
 
-postgresql 7.x and 8 may have "ident sameuser" rather than "trust" by default,
-	need to add entry for local subnet, not just 127.0.0.0 
-	for 7.x and 8, need to add listen_addresses = '*' in postgresql.conf,
-		not tcpip_socket
+solaris 8:
+	perl api compile fails
+	tcl api compile fails
+	mysql connection compile fails - g++ passed incompatible flags
 
-solairs 8:
-	can't untar sqlrelay
+solaris 10:
+	tcl api compile fails
 
 cygwin:
 	tcl api compile fails

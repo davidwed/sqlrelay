@@ -324,6 +324,8 @@ class sqlrconnection_svr :
 
 		sqlrconnection	*sid_sqlrcon;
 
+		char		*pidfile;
+
 	protected:
 
 		cmdline			*cmdl;
