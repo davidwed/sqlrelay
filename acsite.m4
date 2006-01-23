@@ -901,6 +901,12 @@ then
 		if ( test -z "$MYSQLLIBS" )
 		then
 			MYSQLINCLUDES=`mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
+			dnl on some platforms, mysql_config returns options
+			dnl that the native compiler likes but g++ does not
+			if ( test -n "`echo $CXX | grep g++`" )
+			then
+				MYSQLINCLUDES=`echo $MYSQLINCLUDES | sed -e "s|-x.* ||g" -e "s|-x.*$||g" -e "s|-nofstore ||g" -e "s|-nofstore$||g" -e "s|-f.* ||g" -e "s|-f.*$||g" -e "s|-mt ||g" -e "s|-mt$||g"`
+			fi
 			MYSQLLIBS=`mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
 		fi
 

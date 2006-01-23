@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.21 2006-01-22 23:08:29 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.22 2006-01-23 06:07:38 mused Exp $
  */
 
 #include <tcl.h>
@@ -1943,8 +1943,7 @@ int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
   };
   int i;
   CONSTCHAR *server, *socket, *user, *password;
-  int port = 9000;
-  int32_t retrytime = 0, tries = 1;
+  int port = 9000, retrytime = 0, tries = 1;
   sqlrconnection *con = (sqlrconnection *)NULL;
   Tcl_Obj *id;
 

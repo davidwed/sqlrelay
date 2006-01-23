@@ -89,7 +89,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 	pid_t	pid=process::getProcessId();
 	size_t	pidfilelen=tmpdir->getLength()+22+
 				charstring::length(cmdl->getId())+1+
-				charstring::integerLength(pid)+1;
+				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
 	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-connection-%s.%d",
 				tmpdir->getString(),cmdl->getId(),pid);

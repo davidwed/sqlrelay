@@ -8,20 +8,18 @@ docs:
 	for 7.x and 8, need to add listen_addresses = '*' in postgresql.conf,
 		not tcpip_socket
 
-all processes need to create a pid file and sqlr-stop needs to kill them by
-	reading the pid from the file and killing it, rather than using
-	ps -efa/aux
-
-solaris 8:
-	perl api compile fails
-	tcl api compile fails
-	mysql connection compile fails - g++ passed incompatible flags
+solaris 9:
+	ruby api compile fails
+	tries to look in /opt/sfw/lib/mysql/.libs for libmysqlclient
+		(libtool looks in .libs if -Lpath doesn't end in lib)
+		(seems like I fixed this once before by explicitly telling
+			it to link against /opt/sfw/lib/mysql/libmysqlclient.so)
+		but it works on other platforms...?
 
 solaris 10:
 	tcl api compile fails
 
 cygwin:
-	tcl api compile fails
 	perl api fails to generate a dll
 	linking against non-cygwin dll's creates programs that hang
 

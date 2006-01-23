@@ -86,6 +86,12 @@
 		rather than a mysql database
 	started on query router code
 	implemented php pear DB sequence functions for oracle
+	all programs create pid files now, sqlr-stop stops them by iterating
+		over the pid files and killing the pid's in the files rather
+		than using ps
+	added some checks for tcl functions/types in configure script
+	configure script filters out non-g++ CFLAGS from mysql_config if
+		using g++
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

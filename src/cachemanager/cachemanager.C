@@ -78,7 +78,7 @@ void cachemanager::scan() {
 	// create pid file
 	pid_t	pid=process::getProcessId();
 	size_t	pidfilelen=tmpdir->getLength()+24+
-				charstring::integerLength(pid)+1;
+				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
 	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-cachemanager.%d",
 						tmpdir->getString(),pid);
