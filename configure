@@ -20907,7 +20907,7 @@ echo $ECHO_N "checking for oracle includes and libraries... $ECHO_C" >&6
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$CYGWIN" )
+		if ( test -n "$MINGW32" )
 		then
 			for ORACLE_HOME in "`ls -d /cygdrive/c/oracle/product/*/*/OCI 2> /dev/null`"
 			do
@@ -21158,7 +21158,7 @@ fi
 		then
 			if ( test -z "$ORACLEINCLUDES" )
 			then
-				if ( test -n "$CYGWIN" )
+				if ( test -n "$MINGW32" )
 				then
 					ORACLEINCLUDES="-I$ORACLE_HOME/include"
 				else
@@ -21995,7 +21995,7 @@ then
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$CYGWIN" )
+		if ( test -n "$MINGW32" )
 		then
 			for dir in `ls -d /cygdrive/c/mysql /cygdrive/c/Program\ Files/MySQL/* 2> /dev/null | sed -e "s| |%20|g"`
 			do
@@ -26618,7 +26618,7 @@ then
 
 		if ( test -n "$SYBASEPATH" )
 		then
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$MINGW32" )
 			then
 
 FOUNDHEADER=""
@@ -26702,7 +26702,7 @@ fi
 			fi
 		else
 
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$MINGW32" )
 			then
 
 FOUNDHEADER=""
@@ -27797,7 +27797,7 @@ fi
 			fi
 		fi
 
-		if ( test -n "$CYGWIN" -a -z "$ODBCLIBS" )
+		if ( test -n "$MINGW32" -a -z "$ODBCLIBS" )
 		then
 
 FOUNDHEADER=""
@@ -28274,7 +28274,7 @@ then
 
 		if ( test -n "$DB2PATH" )
 		then
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$MINGW32" )
 			then
 
 FOUNDHEADER=""
@@ -28359,7 +28359,7 @@ fi
 
 		else
 
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$MINGW32" )
 			then
 
 
@@ -28597,9 +28597,9 @@ then
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$INTERBASEPATH" )
+		if ( test -n "$MINGW32" )
 		then
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$INTERBASEPATH" )
 			then
 
 FOUNDHEADER=""
@@ -28641,95 +28641,6 @@ fi
 fi
 
 			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$INTERBASEPATH/include/ibase.h" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$INTERBASEPATH/lib/libgds.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\""
-		eval "INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\""
-	fi
-else
-	if ( test -n "$INTERBASEPATH/lib/libgds.a" -a -n "INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"" )
-	then
-
-if ( test -r "$INTERBASEPATH/lib/libgds.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\""
-			eval "INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\""
-		fi
-	fi
-fi
-
-			fi
-		else
-			if ( test -z "$MICROSOFT" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/ibase.h" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/usr/lib/libgds.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INTERBASEINCLUDES=\"\""
-		eval "INTERBASELIBS=\"-lgds -lcrypt\""
-	fi
-else
-	if ( test -n "/usr/lib/libgds.a" -a -n "INTERBASELIBS=\"-lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"" )
-	then
-
-if ( test -r "/usr/lib/libgds.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INTERBASEINCLUDES=\"\""
-			eval "INTERBASELIBS=\"-lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\""
-		fi
-	fi
-fi
-
-			fi
-		fi
-
-		if ( test -z "$INTERBASELIBS" )
-		then
-			if ( test -n "$CYGWIN" )
-			then
 				for dir in `ls -d /cygdrive/c/Firebird* /cygdrive/c/Program\ Files/Firebird/Firebird* 2> /dev/null | sed -e "s| |%20|g"`
 				do
 					rm -f stage/firebird
@@ -28775,18 +28686,93 @@ fi
 fi
 
 				done
+			fi
+		else
+
+
+SEARCHPATH=$INTERBASEPATH
+NAME=interbase
+HEADER=ibase.h
+LIBNAME=gds
+LINKSTATIC=$STATICFLAG
+LINKRPATH=$RPATHFLAG
+USEFULLLIBPATH=
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+HEADERSANDLIBSPATH=""
+
+eval "INTERBASEINCLUDES=\"\""
+eval "INTERBASELIBS=\"\""
+eval "INTERBASELIBSPATH=\"\""
+eval "INTERBASESQLSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
+
+
+for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
+do
+	if ( test -n "$path" -a -d "$path" )
+	then
+
+		if ( test "$path" = "/" )
+		then
+						if ( test "$USEFULLLIBPATH" = "yes" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/$LIBDIR/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/$LIBDIR/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
 			else
 
 FOUNDHEADER=""
 FOUNDLIB=""
 
-if ( test -r "/usr/local/include/ibase.h" )
+if ( test -r "/usr/include/$HEADER" )
 then
 	eval "FOUNDHEADER=\"yes\""
 fi
 
 
-if ( test -r "/usr/local/lib/libgds.$SOSUFFIX" )
+if ( test -r "/$LIBDIR/lib$LIBNAME.$SOSUFFIX" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
@@ -28795,69 +28781,402 @@ if ( test -n "$FOUNDLIB" )
 then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
-		eval "INTERBASEINCLUDES=\"-I/usr/local/include\""
-		eval "INTERBASELIBSPATH=\"/usr/local/lib\"; INTERBASELIBS=\"-L/usr/local/lib -lgds -lcrypt\""
+		eval ""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-l$LIBNAME\""
 	fi
 else
-	if ( test -n "/usr/local/lib/libgds.a" -a -n "INTERBASELIBS=\"-L/usr/local/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"" )
+	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
 	then
 
-if ( test -r "/usr/local/lib/libgds.a" )
+if ( test -r "/$LIBDIR/lib$LIBNAME.a" )
 then
 	eval "FOUNDLIB=\"yes\""
 fi
 
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
-			eval "INTERBASEINCLUDES=\"-I/usr/local/include\""
-			eval "INTERBASELIBS=\"-L/usr/local/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\""
-		fi
-	fi
-fi
-
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/local/firebird/include/ibase.h" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/usr/local/firebird/lib/libgds.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INTERBASEINCLUDES=\"-I/usr/local/firebird/include\""
-		eval "INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\""
-	fi
-else
-	if ( test -n "/usr/local/firebird/lib/libgds.a" -a -n "INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"" )
-	then
-
-if ( test -r "/usr/local/firebird/lib/libgds.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INTERBASEINCLUDES=\"-I/usr/local/firebird/include\""
-			eval "INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\""
+			eval ""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
 		fi
 	fi
 fi
 
 			fi
+
+						path=""
 		fi
 
-		if ( test -z "$INTERBASELIBS" -a -z "$CYGWIN" )
+
+		for libpath in "$path/$LIBDIR" "$path/$LIBDIR/$NAME" "$path/$LIBDIR/opt"
+		do
+
+			if ( test -n "$LIBSTRING" )
+			then
+				break
+			fi
+
+			for includepath in "$path/include" "$path/include/$NAME"
+			do
+
+				if ( test -n "$LIBSTRING" )
+				then
+					break
+				fi
+
+								if ( test "$USEFULLLIBPATH" = "yes" )
+				then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$includepath/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$includepath\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$libpath/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$libpath/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$includepath\""
+			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+				else
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$includepath/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$includepath\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$libpath/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$includepath\""
+			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+				fi
+			done
+		done
+
+		if ( test -n "$LIBSTRING" )
+		then
+			HEADERSANDLIBSPATH="$path"
+			break
+		fi
+	fi
+done
+
+INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
+LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
+LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
+
+eval "INTERBASEINCLUDES=\"$INCLUDESTRING\""
+eval "INTERBASELIBS=\"$LIBSTRING\""
+eval "INTERBASELIBSPATH=\"$LIBPATH\""
+eval "INTERBASESQLSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
+
+
+
+SEARCHPATH=$INTERBASEPATH
+NAME=firebird
+HEADER=ibase.h
+LIBNAME=gds
+LINKSTATIC=$STATICFLAG
+LINKRPATH=$RPATHFLAG
+USEFULLLIBPATH=
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+HEADERSANDLIBSPATH=""
+
+eval "INTERBASEINCLUDES=\"\""
+eval "INTERBASELIBS=\"\""
+eval "INTERBASELIBSPATH=\"\""
+eval "INTERBASESQLSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
+
+
+for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
+do
+	if ( test -n "$path" -a -d "$path" )
+	then
+
+		if ( test "$path" = "/" )
+		then
+						if ( test "$USEFULLLIBPATH" = "yes" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/$LIBDIR/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/$LIBDIR/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			else
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/$LIBDIR/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/$LIBDIR/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+
+						path=""
+		fi
+
+
+		for libpath in "$path/$LIBDIR" "$path/$LIBDIR/$NAME" "$path/$LIBDIR/opt"
+		do
+
+			if ( test -n "$LIBSTRING" )
+			then
+				break
+			fi
+
+			for includepath in "$path/include" "$path/include/$NAME"
+			do
+
+				if ( test -n "$LIBSTRING" )
+				then
+					break
+				fi
+
+								if ( test "$USEFULLLIBPATH" = "yes" )
+				then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$includepath/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$includepath\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$libpath/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$libpath/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$includepath\""
+			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+				else
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$includepath/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$includepath\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$libpath/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$includepath\""
+			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+				fi
+			done
+		done
+
+		if ( test -n "$LIBSTRING" )
+		then
+			HEADERSANDLIBSPATH="$path"
+			break
+		fi
+	fi
+done
+
+INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
+LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
+LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
+
+eval "INTERBASEINCLUDES=\"$INCLUDESTRING\""
+eval "INTERBASELIBS=\"$LIBSTRING\""
+eval "INTERBASELIBSPATH=\"$LIBPATH\""
+eval "INTERBASESQLSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
+
+			if ( test -n "$INTERBASELIBS" )
+			then
+				INTERBASELIBS="$INTERBASELIBS -lcrypt"
+			fi
+		fi
+
+		if ( test -z "$INTERBASELIBS" -a -z "$MINGW32" )
 		then
 
 FOUNDHEADER=""
@@ -30200,7 +30519,7 @@ fi
 					fi
 				done
 			fi
-			if ( test -z "$PERL" -a -n "$CYGWIN" )
+			if ( test -z "$PERL" -a -n "$MINGW32" )
 			then
 
 if ( test -r ""/cygdrive/c/Perl/bin/perl"" )
@@ -30266,7 +30585,7 @@ then
 				then
 					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
 					PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
-					if ( test -n "$CYGWIN" )
+					if ( test -n "$MINGW32" )
 					then
 						if ( test -r "$PYTHONPATH/$LIBDIR/python$i/config/libpython$i.dll.a" )
 						then
@@ -30285,7 +30604,7 @@ then
 				fi
 			done
 
-			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
+			if ( test -z "$PYTHONDIR" -a -n "$MINGW32" )
 			then
 
 				for i in "24" "23" "22" "21"
@@ -30378,7 +30697,7 @@ fi
 				fi
 			done
 
-			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
+			if ( test -z "$PYTHONDIR" -a -n "$MINGW32" )
 			then
 
 				for j in "24" "23" "22" "21"
@@ -30633,7 +30952,7 @@ fi
 						fi
 					done
 				fi
-				if ( test -z "$RUBY" -a -n "$CYGWIN" )
+				if ( test -z "$RUBY" -a -n "$MINGW32" )
 				then
 
 if ( test -r ""/cygdrive/c/ruby/bin/$ruby"" )
@@ -30714,7 +31033,7 @@ fi
 
 			if ( test -z "$JAVAPATH" )
 			then
-				if ( test -n "$CYGWIN" )
+				if ( test -n "$MINGW32" )
 				then
 					for dir in `ls -d /cygdrive/c/jdk* /cygdrive/c/j2sdk* /cygdrive/c/Program\ Files/Java/* 2> /dev/null | sed -e "s| |%20|g"`
 					do
@@ -30957,88 +31276,55 @@ echo "$as_me: WARNING: \"The TCL API will not be installed.\"" >&2;}
 		else
 			if ( test -n "$TCLLIBSPATH" )
 			then
-				if ( test -z "$MICROSOFT" )
-				then
 
 if ( test -r "$TCLLIBSPATH/libtclstub.a" )
 then
 	eval "TCLLIB=\"$TCLLIBSPATH/libtclstub.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\""
 fi
 
-					if ( test -z "$TCLLIB" )
-					then
-						for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-						do
-
-if ( test -r "$TCLLIBSPATH/libtclstub$i.a" )
-then
-	eval "TCLLIB=\"$TCLLIBSPATH/libtclstub$i.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\""
-fi
-
-						done
-					fi
-				fi
-				if ( test -z "$TCLLIB" )
-				then
 
 if ( test -r "$TCLLIBSPATH/libtcl.$SOSUFFIX" )
 then
 	eval "TCLLIB=\"-L$TCLLIBSPATH -ltcl\""
 fi
 
-					if ( test -z "$TCLLIB" )
-					then
-						for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-						do
+				if ( test -z "$TCLLIB" )
+				then
+					for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+					do
+
+if ( test -r "$TCLLIBSPATH/libtclstub$i.a" )
+then
+	eval "TCLLIB=\"$TCLLIBSPATH/libtclstub$i.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\""
+fi
+
 
 if ( test -r "$TCLLIBSPATH/libtcl$i.$SOSUFFIX" )
 then
 	eval "TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\""
 fi
 
-						done
-					fi
+					done
 				fi
 			else
-				if ( test -z "$MICROSOFT" )
-				then
-					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+				do
+					for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 					do
-						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-						do
 
 if ( test -r "$i/libtclstub$j.a" )
 then
 	eval "TCLLIB=\"$i/libtclstub$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\""
 fi
 
-						done
-					done
-				fi
-				if ( test -z "$TCLLIB" )
-				then
-					for i in "/usr/$LIBDIR" "$prefix/$LIBDIR" "/usr/local/$LIBDIR" "/usr/pkg/$LIBDIR" "/opt/sfw/$LIBDIR" "/usr/sfw/$LIBDIR" "/sw/$LIBDIR"
-					do
-						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-						do
-
-if ( test -r "$i/libtcl$j.$SOSUFFIX" )
-then
-	eval "TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\""
-fi
-
-																																																	if ( test -z "$TCLLIB" -a -n "$CYGWIN" )
-							then
 
 if ( test -r "$i/libtcl$j.a" )
 then
-	eval "TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\""
+	eval "TCLLIB=\"$i/libtcl$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"$TCLINCLUDE\""
 fi
 
-							fi
-						done
 					done
-				fi
+				done
 			fi
 		fi
 		if ( test -z "$TCLLIB" )
@@ -31292,7 +31578,7 @@ then
 
 	else
 
-		if ( test -n "$CYGWIN" )
+		if ( test -n "$MINGW32" )
 		then
 						echo "windows..."
 		else

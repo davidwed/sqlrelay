@@ -608,7 +608,7 @@ then
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$CYGWIN" )
+		if ( test -n "$MINGW32" )
 		then
 			for ORACLE_HOME in "`ls -d /cygdrive/c/oracle/product/*/*/OCI 2> /dev/null`"
 			do
@@ -678,7 +678,7 @@ then
 		then
 			if ( test -z "$ORACLEINCLUDES" )
 			then
-				if ( test -n "$CYGWIN" )
+				if ( test -n "$MINGW32" )
 				then
 					ORACLEINCLUDES="-I$ORACLE_HOME/include"
 				else
@@ -883,7 +883,7 @@ then
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$CYGWIN" )
+		if ( test -n "$MINGW32" )
 		then
 			for dir in `ls -d /cygdrive/c/mysql /cygdrive/c/Program\ Files/MySQL/* 2> /dev/null | sed -e "s| |%20|g"`
 			do
@@ -1481,7 +1481,7 @@ then
 		
 		if ( test -n "$SYBASEPATH" )
 		then
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$MINGW32" )
 			then
 				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/dll/libct.dll],[SYBASELIBSPATH=\"$SYBASEPATH/dll\"; SYBASELIBS=\"-L$SYBASEPATH/dll -llibcs -llibct\"],[],[])
 			else
@@ -1489,7 +1489,7 @@ then
 			fi
 		else
 		
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$MINGW32" )
 			then
 				FW_CHECK_HEADER_LIB([/cygdrive/c/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/cygdrive/c/sybase/OCS-12_5/include\"],[/cygdrive/c/sybase/OCS-12_5/dll/libct.dll],[SYBASELIBSPATH=\"/cygdrive/c/sybase/OCS-12_5/dll\"; SYBASELIBS=\"-L/cygdrive/c/sybase/OCS-12_5/dll -llibct -llibcs\"],[],[])
 			else
@@ -1619,7 +1619,7 @@ then
 			fi
 		fi
 
-		if ( test -n "$CYGWIN" -a -z "$ODBCLIBS" )
+		if ( test -n "$MINGW32" -a -z "$ODBCLIBS" )
 		then
 			FW_CHECK_HEADER_LIB([/usr/include/w32api/sql.h],[],[/usr/lib/w32api/libodbc32.dll.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"],[/usr/lib/w32api/libodbc32.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"])
 		fi
@@ -1721,7 +1721,7 @@ then
 		
 		if ( test -n "$DB2PATH" )
 		then
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$MINGW32" )
 			then
 				FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/db2cli.lib],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"$DB2PATH/lib/db2cli.lib\"],[],[])
 			else
@@ -1730,7 +1730,7 @@ then
 		
 		else
 
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$MINGW32" )
 			then
 
 				FW_CHECK_HEADER_LIB([/cygdrive/c/Program Files/IBM/SQLLIB/include/sql.h],[DB2INCLUDES=\"-I/cygdrive/c/Program\ Files/IBM/SQLLIB/include\"; DB2VERSION=\"8\"],[/cygdrive/c/Program Files/IBM/SQLLIB/lib/db2cli.lib],[DB2LIBSPATH=\"/cygdrive/c/Program\ Files/IBM/SQLLIB/lib\"; DB2LIBS=\"/cygdrive/c/Program\ Files/IBM/SQLLIB/lib/db2cli.lib\"; DB2VERSION=\"8\"],[],[])
@@ -1798,25 +1798,12 @@ then
 			STATICFLAG="-static"
 		fi
 		
-		if ( test -n "$INTERBASEPATH" )
+		if ( test -n "$MINGW32" )
 		then
-			if ( test -n "$CYGWIN" )
+			if ( test -n "$INTERBASEPATH" )
 			then
 				FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/bin/fbclient.dll],[INTERBASELIBSPATH=\"$INTERBASPATH/bin\"; INTERBASELIBS=\"-L$INTERBASEPATH/bin -lfbclient\"],[],[])
 			else
-				FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"$INTERBASPATH/lib\"; INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"],[$INTERBASEPATH/lib/libgds.a],[INTERBASELIBS=\"-L$INTERBASEPATH/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
-			fi
-		else
-			if ( test -z "$MICROSOFT" )
-			then
-				FW_CHECK_HEADER_LIB([/usr/include/ibase.h],[INTERBASEINCLUDES=\"\"],[/usr/lib/libgds.$SOSUFFIX],[INTERBASELIBS=\"-lgds -lcrypt\"],[/usr/lib/libgds.a],[INTERBASELIBS=\"-lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
-			fi
-		fi
-
-		if ( test -z "$INTERBASELIBS" )
-		then
-			if ( test -n "$CYGWIN" )
-			then
 				for dir in `ls -d /cygdrive/c/Firebird* /cygdrive/c/Program\ Files/Firebird/Firebird* 2> /dev/null | sed -e "s| |%20|g"`
 				do
 					rm -f stage/firebird
@@ -1824,13 +1811,17 @@ then
 					ln -s "$fixeddir" stage/firebird
 					FW_CHECK_HEADER_LIB([`pwd`/stage/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I`pwd`/stage/firebird/include\"],[`pwd`/stage/firebird/bin/fbclient.dll],[INTERBASELIBS=\"-L`pwd`/stage/firebird/bin -lfbclient\"],[],[])
 				done
-			else
-				FW_CHECK_HEADER_LIB([/usr/local/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/include\"],[/usr/local/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"/usr/local/lib\"; INTERBASELIBS=\"-L/usr/local/lib -lgds -lcrypt\"],[/usr/local/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
-				FW_CHECK_HEADER_LIB([/usr/local/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I/usr/local/firebird/include\"],[/usr/local/firebird/lib/libgds.$SOSUFFIX],[INTERBASELIBSPATH=\"/usr/local/firebird/lib\"; INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"],[/usr/local/firebird/lib/libgds.a],[INTERBASELIBS=\"-L/usr/local/firebird/lib -lgds -lcrypt\"; INTERBASESTATIC=\"$STATICFLAG\"])
+			fi
+		else
+			FW_CHECK_HEADERS_AND_LIBS([$INTERBASEPATH],[interbase],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[INTERBASEINCLUDES],[INTERBASELIBS],[INTERBASELIBSPATH],[INTERBASESQLSTATIC])
+			FW_CHECK_HEADERS_AND_LIBS([$INTERBASEPATH],[firebird],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[INTERBASEINCLUDES],[INTERBASELIBS],[INTERBASELIBSPATH],[INTERBASESQLSTATIC])
+			if ( test -n "$INTERBASELIBS" )
+			then
+				INTERBASELIBS="$INTERBASELIBS -lcrypt"
 			fi
 		fi
 
-		if ( test -z "$INTERBASELIBS" -a -z "$CYGWIN" )
+		if ( test -z "$INTERBASELIBS" -a -z "$MINGW32" )
 		then
 			FW_CHECK_HEADER_LIB([/Library/Frameworks/Firebird.framework/Versions/Current/Headers/ibase.h],[INTERBASEINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\"],[/Library/Frameworks/Firebird.framework/Versions/Current/Firebird],[INTERBASELIBSPATH=\"/Library/Frameworks/Firebird.framework/Versions/Current\"; INTERBASELIBS=\"/Library/Frameworks/Firebird.framework/Versions/Current/Firebird\"],[],[])
 		fi
@@ -1992,7 +1983,7 @@ then
 					fi
 				done
 			fi
-			if ( test -z "$PERL" -a -n "$CYGWIN" )
+			if ( test -z "$PERL" -a -n "$MINGW32" )
 			then
 				FW_CHECK_FILE("/cygdrive/c/Perl/bin/perl",[PERL=\"/cygdrive/c/Perl/bin/perl\"; PERLCYGDRIVEPREFIX=\"/cygdrive/c\"])
 			fi
@@ -2051,7 +2042,7 @@ then
 				then
 					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
 					PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
-					if ( test -n "$CYGWIN" )
+					if ( test -n "$MINGW32" )
 					then
 						if ( test -r "$PYTHONPATH/$LIBDIR/python$i/config/libpython$i.dll.a" )
 						then
@@ -2070,7 +2061,7 @@ then
 				fi
 			done
 
-			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
+			if ( test -z "$PYTHONDIR" -a -n "$MINGW32" )
 			then
 
 				for i in "24" "23" "22" "21"
@@ -2125,7 +2116,7 @@ then
 				fi
 			done
 
-			if ( test -z "$PYTHONDIR" -a -n "$CYGWIN" )
+			if ( test -z "$PYTHONDIR" -a -n "$MINGW32" )
 			then
 
 				for j in "24" "23" "22" "21"
@@ -2277,7 +2268,7 @@ then
 						fi
 					done
 				fi
-				if ( test -z "$RUBY" -a -n "$CYGWIN" )
+				if ( test -z "$RUBY" -a -n "$MINGW32" )
 				then
 					FW_CHECK_FILE("/cygdrive/c/ruby/bin/$ruby",[RUBY=\"/cygdrive/c/ruby/bin/$ruby\"; RUBYCYGDRIVEPREFIX=\"/cygdrive/c\"])
 				fi
@@ -2341,7 +2332,7 @@ then
 
 			if ( test -z "$JAVAPATH" )
 			then
-				if ( test -n "$CYGWIN" )
+				if ( test -n "$MINGW32" )
 				then
 					for dir in `ls -d /cygdrive/c/jdk* /cygdrive/c/j2sdk* /cygdrive/c/Program\ Files/Java/* 2> /dev/null | sed -e "s| |%20|g"`
 					do
@@ -2440,7 +2431,7 @@ then
 
 	else
 
-		if ( test -n "$CYGWIN" )
+		if ( test -n "$MINGW32" )
 		then
 			dnl Windows stuff here...
 			echo "windows..."
@@ -2574,62 +2565,25 @@ then
 		else
 			if ( test -n "$TCLLIBSPATH" )
 			then
-				if ( test -z "$MICROSOFT" )
-				then
-					dnl FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-					FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"$TCLLIBSPATH/libtclstub.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-					if ( test -z "$TCLLIB" )
-					then
-						for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-						do
-							dnl FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"-L$TCLLIBSPATH -ltclstub$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-							FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"$TCLLIBSPATH/libtclstub$i.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-						done
-					fi
-				fi
+				FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"$TCLLIBSPATH/libtclstub.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+				FW_CHECK_FILE($TCLLIBSPATH/libtcl.$SOSUFFIX,[TCLLIB=\"-L$TCLLIBSPATH -ltcl\"])
 				if ( test -z "$TCLLIB" )
 				then
-					FW_CHECK_FILE($TCLLIBSPATH/libtcl.$SOSUFFIX,[TCLLIB=\"-L$TCLLIBSPATH -ltcl\"])
-					if ( test -z "$TCLLIB" )
-					then
-						for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-						do
-							FW_CHECK_FILE($TCLLIBSPATH/libtcl$i.$SOSUFFIX,[TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\"])
-						done
-					fi
+					for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+					do
+						FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"$TCLLIBSPATH/libtclstub$i.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+						FW_CHECK_FILE($TCLLIBSPATH/libtcl$i.$SOSUFFIX,[TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\"])
+					done
 				fi
 			else
-				if ( test -z "$MICROSOFT" )
-				then
-					for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+				do
+					for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 					do
-						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-						do
-							dnl FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"-L$i -ltclstub$j\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-							FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"$i/libtclstub$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-						done
+						FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"$i/libtclstub$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
+						FW_CHECK_FILE($i/libtcl$j.a,[TCLLIB=\"$i/libtcl$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"$TCLINCLUDE\"])
 					done
-				fi
-				if ( test -z "$TCLLIB" )
-				then
-					for i in "/usr/$LIBDIR" "$prefix/$LIBDIR" "/usr/local/$LIBDIR" "/usr/pkg/$LIBDIR" "/opt/sfw/$LIBDIR" "/usr/sfw/$LIBDIR" "/sw/$LIBDIR"
-					do
-						for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-						do
-							FW_CHECK_FILE($i/libtcl$j.$SOSUFFIX,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
-							dnl for some reason, the
-							dnl tcl dll stub library
-							dnl is called libtcl.a
-							dnl instead of
-							dnl libtcl.dll.a on
-							dnl cygwin
-							if ( test -z "$TCLLIB" -a -n "$CYGWIN" )
-							then
-								FW_CHECK_FILE($i/libtcl$j.a,[TCLLIB=\"-L$i -ltcl$j\"; TCLLIBSPATH=\"$i\"])
-							fi
-						done
-					done
-				fi
+				done
 			fi
 		fi
 		if ( test -z "$TCLLIB" )

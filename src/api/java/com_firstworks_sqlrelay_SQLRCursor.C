@@ -1167,7 +1167,10 @@ JNIEXPORT jobjectArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getRow
 	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
 				env->GetFieldID(cls,"cursor","I"));
 	uint32_t	colcount=cur->colCount();
-	jobjectArray	retarray=env->NewObjectArray(colcount,
+	// NewObjectArray returns jarray, not jobjectArray, and must be
+	// cast (at least on some systems)
+	jobjectArray	retarray=
+		(jobjectArray)env->NewObjectArray(colcount,
 					env->FindClass("java/lang/String"),
 					env->NewStringUTF(""));
 	const char * const *field=cur->getRow((uint64_t)row);
@@ -1214,7 +1217,10 @@ JNIEXPORT jobjectArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumn
 	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
 				env->GetFieldID(cls,"cursor","I"));
 	int	colcount=cur->colCount();
-	jobjectArray	retarray=env->NewObjectArray(colcount,
+	// NewObjectArray returns jarray, not jobjectArray, and must be
+	// cast (at least on some systems)
+	jobjectArray	retarray=
+		(jobjectArray)env->NewObjectArray(colcount,
 					env->FindClass("java/lang/String"),
 					env->NewStringUTF(""));
 	const char * const *colnames=cur->getColumnNames();

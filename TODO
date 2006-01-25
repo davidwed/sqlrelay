@@ -16,23 +16,13 @@ solaris 9:
 			it to link against /opt/sfw/lib/mysql/libmysqlclient.so)
 		but it works on other platforms...?
 
-solaris 10:
-	tcl api compile fails
-
 cygwin:
-	perl api fails to generate a dll
-	linking against non-cygwin dll's creates programs that hang
+	perl api fails to generate a dll -
+		libperl.dll.a and libperl.a exist, but the 
+		dll is called cygperl5_8.dll so libtool can't find it
+	tcl api fails to compile - tcl stubs-related
 
 --enable-efence and --disable-efence both enable efence!
-
-freebsd-6:
-	doesn't find firebird
-		/usr/local/include/gds.h
-		/usr/local/lib/libfbclient.so
-		/usr/local/lib/libgds.so
-
-openbsd-3.8:
-	php api compile fails
 
 --------------------------------------------------------------------------------
 
