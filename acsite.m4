@@ -608,82 +608,41 @@ then
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$MINGW32" )
+		if ( test -n "$ORACLE_HOME" )
 		then
-			for ORACLE_HOME in "`ls -d /cygdrive/c/oracle/product/*/*/OCI 2> /dev/null`"
+
+			dnl use sysliblist if it's there
+			SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
+			if ( test ! -n "$SYSLIBLIST" )
+			then
+				SYSLIBLIST="-lm $AIOLIB"
+			fi
+
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore3.a],[ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore4.a],[ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore8.a],[ORACLEVERSION=\"8i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore9.a],[ORACLEVERSION=\"9i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore10.a],[ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
+		else
+
+			for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
 			do
-				instance=`dirname $ORACLE_HOME 2> /dev/null`
-				home=`dirname $instance 2> /dev/null`
-				version=`basename $home 2> /dev/null | cut -f1 -d'.'`
-				if ( test "$version" = "10" )
+				if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client/oci.h" )
 				then
 					ORACLEVERSION="10g"
-				fi
-				if ( test "$version" = "9" )
-				then
-					ORACLEVERSION="9i"
-				fi
-				if ( test -n "`echo $version | grep 8.1`" )
-				then
-					ORACLEVERSION="8i"
-				fi
-				if ( test -n "`echo $version | grep 8.0`" )
-				then
-					ORACLEVERSION="8"
-				fi
-				if ( test "$version" = "7" )
-				then
-					ORACLEVERSION="7"
-				fi
-				FW_CHECK_LIB([$ORACLE_HOME/lib/MSVC/oci.lib],[ORACLELIBSPATH=\"$ORACLE_HOME/lib/MSVC\"; ORACLELIBS=\"-L$ORACLE_HOME/lib/MSVC -loci\"])
-				if ( test -n "$ORACLELIBS" )
-				then
-					break
+					ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
+					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -lnnz10"
+					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
 				fi
 			done
-		else
-		
-			if ( test -n "$ORACLE_HOME" )
-			then
-
-				dnl use sysliblist if it's there
-				SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
-				if ( test ! -n "$SYSLIBLIST" )
-				then
-					SYSLIBLIST="-lm $AIOLIB"
-				fi
-
-				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore3.a],[ORACLEVERSION=\"7\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lsqlnet -lncr -lsqlnet -lcommon -lgeneric -lnlsrtl3 -lcore3 -lnlsrtl3 -lcore3 -lc3v6 -lepc -lcore3 -lnsl $SYSLIBLIST\"])
-				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore4.a],[ORACLEVERSION=\"8.0\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclient -lncr -lcommon -lgeneric -lclntsh -lepcpt -lcore4 -lnlsrtl3 $SYSLIBLIST\"])
-				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore8.a],[ORACLEVERSION=\"8i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
-				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore9.a],[ORACLEVERSION=\"9i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
-				FW_CHECK_LIB([$ORACLE_HOME/lib/libcore10.a],[ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
-				FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
-			else
-
-				for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
-				do
-					if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.so" -a -r "/usr/include/oracle/$version/client/oci.h" )
-					then
-						ORACLEVERSION="10g"
-						ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
-						ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -lnnz10"
-						ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
-					fi
-				done
-			fi
 		fi
 		
 		if ( test -n "$ORACLEVERSION" )
 		then
 			if ( test -z "$ORACLEINCLUDES" )
 			then
-				if ( test -n "$MINGW32" )
-				then
-					ORACLEINCLUDES="-I$ORACLE_HOME/include"
-				else
-					ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
-				fi
+				ORACLEINCLUDES="-I$ORACLE_HOME/rdbms/demo -I$ORACLE_HOME/rdbms/public -I$ORACLE_HOME/network/public -I$ORACLE_HOME/plsql/public"
 			fi
 		fi
 
@@ -881,21 +840,6 @@ then
 		if ( test -n "$STATICLINK" )
 		then
 			STATICFLAG="-static"
-		fi
-
-		if ( test -n "$MINGW32" )
-		then
-			for dir in `ls -d /cygdrive/c/mysql /cygdrive/c/Program\ Files/MySQL/* 2> /dev/null | sed -e "s| |%20|g"`
-			do
-				rm -f stage/mysql
-				fixeddir=`echo "$dir" | sed -e "s|%20|\\\\ |g"`
-				ln -s "$fixeddir" stage/mysql
-				FW_CHECK_HEADER_LIB([`pwd`/stage/mysql/include/mysql.h],[MYSQLINCLUDES=\"-I`pwd`/stage/mysql/include\"],[`pwd`/stage/mysql/lib/opt/libmysql.lib],[MYSQLLIBSPATH=\"`pwd`/stage/mysql/lib/opt\"; MYSQLLIBS=\"-L`pwd`/stage/mysql/lib/opt -lmysql\"],[`pwd`/stage/mysql/lib/opt/mysqlclient.lib],[MYSQLLIBS=\"`pwd`/stage/mysql/lib/opt/mysqlclient.lib\"; MYSQLSTATIC=\"$STATICFLAG\"])
-				if ( test -n "$MYSQLLIBS" )
-				then
-					break
-				fi
-			done
 		fi
 
 		if ( test -z "$MYSQLLIBS" )
@@ -1481,26 +1425,16 @@ then
 		
 		if ( test -n "$SYBASEPATH" )
 		then
-			if ( test -n "$MINGW32" )
-			then
-				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/dll/libct.dll],[SYBASELIBSPATH=\"$SYBASEPATH/dll\"; SYBASELIBS=\"-L$SYBASEPATH/dll -llibcs -llibct\"],[],[])
-			else
-				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
-			fi
+			FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 		else
 		
-			if ( test -n "$MINGW32" )
-			then
-				FW_CHECK_HEADER_LIB([/cygdrive/c/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/cygdrive/c/sybase/OCS-12_5/include\"],[/cygdrive/c/sybase/OCS-12_5/dll/libct.dll],[SYBASELIBSPATH=\"/cygdrive/c/sybase/OCS-12_5/dll\"; SYBASELIBS=\"-L/cygdrive/c/sybase/OCS-12_5/dll -llibct -llibcs\"],[],[])
-			else
-				FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 		
-				FW_CHECK_HEADER_LIB([/opt/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/include\"],[/opt/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/opt/sybase/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/opt/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/include\"],[/opt/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/lib\"; SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/opt/sybase/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 
-				FW_CHECK_HEADER_LIB([/opt/sybase-12.5/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/opt/sybase-12.5/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase-12.5/OCS-12_5/include\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase-12.5/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase-12.5/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase-12.5/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
 
-				FW_CHECK_HEADER_LIB([/opt/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/OCS-12_5/include\"],[/opt/sybase/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
-			fi
+			FW_CHECK_HEADER_LIB([/opt/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/OCS-12_5/include\"],[/opt/sybase/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
 		
 			if ( test -z "$SYBASELIBS" )
 			then
@@ -1619,9 +1553,9 @@ then
 			fi
 		fi
 
-		if ( test -n "$MINGW32" -a -z "$ODBCLIBS" )
+		if ( test -n "$MICROSOFT" -a -z "$ODBCLIBS" )
 		then
-			FW_CHECK_HEADER_LIB([/usr/include/w32api/sql.h],[],[/usr/lib/w32api/libodbc32.dll.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"],[/usr/lib/w32api/libodbc32.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/usr/include/w32api/sql.h],[],[/usr/lib/w32api/libodbc32.$SOSUFFIX],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"],[/usr/lib/w32api/libodbc32.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"])
 		fi
 		
 		AC_SUBST(ODBCINCLUDES)
@@ -1721,31 +1655,18 @@ then
 		
 		if ( test -n "$DB2PATH" )
 		then
-			if ( test -n "$MINGW32" )
-			then
-				FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/db2cli.lib],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"$DB2PATH/lib/db2cli.lib\"],[],[])
-			else
-				FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"-L$DB2PATH/lib -ldb2\"],[$DB2PATH/lib/libdb2.a],[DB2LIBS=\"-L$DB2PATH/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
-			fi
+			FW_CHECK_HEADER_LIB([$DB2PATH/include/sql.h],[DB2INCLUDES=\"-I$DB2PATH/include\"],[$DB2PATH/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"$DB2PATH/lib\"; DB2LIBS=\"-L$DB2PATH/lib -ldb2\"],[$DB2PATH/lib/libdb2.a],[DB2LIBS=\"-L$DB2PATH/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"])
 		
 		else
 
-			if ( test -n "$MINGW32" )
-			then
-
-				FW_CHECK_HEADER_LIB([/cygdrive/c/Program Files/IBM/SQLLIB/include/sql.h],[DB2INCLUDES=\"-I/cygdrive/c/Program\ Files/IBM/SQLLIB/include\"; DB2VERSION=\"8\"],[/cygdrive/c/Program Files/IBM/SQLLIB/lib/db2cli.lib],[DB2LIBSPATH=\"/cygdrive/c/Program\ Files/IBM/SQLLIB/lib\"; DB2LIBS=\"/cygdrive/c/Program\ Files/IBM/SQLLIB/lib/db2cli.lib\"; DB2VERSION=\"8\"],[],[])
-
-			else
+			dnl check /opt for 7.2
+			FW_CHECK_HEADER_LIB([/opt/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBMdb2/V7.1/include\"; DB2VERSION=\"7\"],[/opt/IBMdb2/V7.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2VERSION=\"7\"],[/opt/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"7\"])
 		
-				dnl check /opt for 7.2
-				FW_CHECK_HEADER_LIB([/opt/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBMdb2/V7.1/include\"; DB2VERSION=\"7\"],[/opt/IBMdb2/V7.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2VERSION=\"7\"],[/opt/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"7\"])
-		
-				dnl check /usr for 7.2
-				FW_CHECK_HEADER_LIB([/usr/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/usr/IBMdb2/V7.1/include\"; DB2VERSION=\"7\"],[/usr/IBMdb2/V7.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/usr/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2VERSION=\"7\"],[/usr/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"7\"])
-		
-				dnl check /opt for 8.1
-				FW_CHECK_HEADER_LIB([/opt/IBM/db2/V8.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V8.1/include\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V8.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"8\"])
-			fi
+			dnl check /usr for 7.2
+			FW_CHECK_HEADER_LIB([/usr/IBMdb2/V7.1/include/sql.h],[DB2INCLUDES=\"-I/usr/IBMdb2/V7.1/include\"; DB2VERSION=\"7\"],[/usr/IBMdb2/V7.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/usr/IBMdb2/V7.1/lib\"; DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2VERSION=\"7\"],[/usr/IBMdb2/V7.1/lib/libdb2.a],[DB2LIBS=\"-L/usr/IBMdb2/V7.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"7\"])
+	
+			dnl check /opt for 8.1
+			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V8.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V8.1/include\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V8.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"8\"])
 		fi
 		
 		if ( test -z "$DB2LIBS" )
@@ -1798,30 +1719,14 @@ then
 			STATICFLAG="-static"
 		fi
 		
-		if ( test -n "$MINGW32" )
+		FW_CHECK_HEADERS_AND_LIBS([$INTERBASEPATH],[interbase],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[INTERBASEINCLUDES],[INTERBASELIBS],[INTERBASELIBSPATH],[INTERBASESQLSTATIC])
+		FW_CHECK_HEADERS_AND_LIBS([$INTERBASEPATH],[firebird],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[INTERBASEINCLUDES],[INTERBASELIBS],[INTERBASELIBSPATH],[INTERBASESQLSTATIC])
+		if ( test -n "$INTERBASELIBS" )
 		then
-			if ( test -n "$INTERBASEPATH" )
-			then
-				FW_CHECK_HEADER_LIB([$INTERBASEPATH/include/ibase.h],[INTERBASEINCLUDES=\"-I$INTERBASEPATH/include\"],[$INTERBASEPATH/bin/fbclient.dll],[INTERBASELIBSPATH=\"$INTERBASPATH/bin\"; INTERBASELIBS=\"-L$INTERBASEPATH/bin -lfbclient\"],[],[])
-			else
-				for dir in `ls -d /cygdrive/c/Firebird* /cygdrive/c/Program\ Files/Firebird/Firebird* 2> /dev/null | sed -e "s| |%20|g"`
-				do
-					rm -f stage/firebird
-					fixeddir=`echo "$dir" | sed -e "s|%20|\\\\ |g"`
-					ln -s "$fixeddir" stage/firebird
-					FW_CHECK_HEADER_LIB([`pwd`/stage/firebird/include/ibase.h],[INTERBASEINCLUDES=\"-I`pwd`/stage/firebird/include\"],[`pwd`/stage/firebird/bin/fbclient.dll],[INTERBASELIBS=\"-L`pwd`/stage/firebird/bin -lfbclient\"],[],[])
-				done
-			fi
-		else
-			FW_CHECK_HEADERS_AND_LIBS([$INTERBASEPATH],[interbase],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[INTERBASEINCLUDES],[INTERBASELIBS],[INTERBASELIBSPATH],[INTERBASESQLSTATIC])
-			FW_CHECK_HEADERS_AND_LIBS([$INTERBASEPATH],[firebird],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[INTERBASEINCLUDES],[INTERBASELIBS],[INTERBASELIBSPATH],[INTERBASESQLSTATIC])
-			if ( test -n "$INTERBASELIBS" )
-			then
-				INTERBASELIBS="$INTERBASELIBS -lcrypt"
-			fi
+			INTERBASELIBS="$INTERBASELIBS -lcrypt"
 		fi
 
-		if ( test -z "$INTERBASELIBS" -a -z "$MINGW32" )
+		if ( test -z "$INTERBASELIBS" )
 		then
 			FW_CHECK_HEADER_LIB([/Library/Frameworks/Firebird.framework/Versions/Current/Headers/ibase.h],[INTERBASEINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\"],[/Library/Frameworks/Firebird.framework/Versions/Current/Firebird],[INTERBASELIBSPATH=\"/Library/Frameworks/Firebird.framework/Versions/Current\"; INTERBASELIBS=\"/Library/Frameworks/Firebird.framework/Versions/Current/Firebird\"],[],[])
 		fi
@@ -1952,8 +1857,8 @@ then
 
 	HAVE_PERL=""
 	PERL=""
+	PERLLIB=""
 	PERLPREFIX=""
-	PERLCYGDRIVEPREFIX=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -1983,10 +1888,15 @@ then
 					fi
 				done
 			fi
-			if ( test -z "$PERL" -a -n "$MINGW32" )
-			then
-				FW_CHECK_FILE("/cygdrive/c/Perl/bin/perl",[PERL=\"/cygdrive/c/Perl/bin/perl\"; PERLCYGDRIVEPREFIX=\"/cygdrive/c\"])
-			fi
+		fi
+		if ( test -n "$PERL" -a -n "$CYGWIN" )
+		then
+			DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+			for dir in $DIRS
+			do
+echo "checking $dir"
+				FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIB=\"-L$dir/CORE -lperl\"])
+			done
 		fi
 		if ( test -n "$PERL" )
 		then
@@ -2004,8 +1914,8 @@ then
 
 	AC_SUBST(HAVE_PERL)
 	AC_SUBST(PERL)
+	AC_SUBST(PERLLIB)
 	AC_SUBST(PERLPREFIX)
-	AC_SUBST(PERLCYGDRIVEPREFIX)
 	AC_SUBST(POD2MAN)
 fi
 ])
@@ -2042,16 +1952,6 @@ then
 				then
 					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
 					PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
-					if ( test -n "$MINGW32" )
-					then
-						if ( test -r "$PYTHONPATH/$LIBDIR/python$i/config/libpython$i.dll.a" )
-						then
-							PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
-							PYTHONLIB="-L$PYTHONDIR/config -lpython$i"
-						fi
-					else
-						PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
-					fi
 				fi
 			
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
@@ -2061,20 +1961,6 @@ then
 				fi
 			done
 
-			if ( test -z "$PYTHONDIR" -a -n "$MINGW32" )
-			then
-
-				for i in "24" "23" "22" "21"
-				do
-					FW_CHECK_HEADER_LIB([$PYTHONPATH/include/Python.h],[PYTHONINCLUDES=\"-I$PYTHONPATH/include\"],[$PYTHONPATH/libs/libpython$j.lib],[PYTHONDIR=\"$PYTHONPATH/Lib\"; PYTHONLIB=\"-L$PYTHONPATH/libs -lpython$j\"],[],[])
-					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
-					then
-						PYTHONVERSION=$i
-						break
-					fi
-				done
-			fi
-		
 		else
 		
 			for j in "2.4" "2.3" "2.2" "2.1"
@@ -2116,20 +2002,6 @@ then
 				fi
 			done
 
-			if ( test -z "$PYTHONDIR" -a -n "$MINGW32" )
-			then
-
-				for j in "24" "23" "22" "21"
-				do
-					FW_CHECK_HEADER_LIB([/cygdrive/c/Python$j/include/Python.h],[PYTHONINCLUDES=\"-I/cygdrive/c/Python$j/include\"],[/cygdrive/c/Python$j/libs/python$j.lib],[PYTHONDIR=\"/cygdrive/c/Python$j/Lib\"; PYTHONLIB=\"-L/cygdrive/c/Python$j/libs -lpython$j\"],[],[])
-					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
-					then
-						PYTHONVERSION=$j
-						break
-					fi
-				done
-			fi
-		
 		fi
 		
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
@@ -2233,7 +2105,6 @@ then
 
 	HAVE_RUBY=""
 	RUBY=""
-	RUBYCYGDRIVEPREFIX=""
 	RUBYLIB=""
 
 	if ( test "$cross_compiling" = "yes" )
@@ -2249,7 +2120,6 @@ then
 
 			HAVE_RUBY=""
 			RUBY=""
-			RUBYCYGDRIVEPREFIX=""
 			RUBYLIB=""
 
 			if ( test -n "$RUBYPATH" )
@@ -2267,10 +2137,6 @@ then
 							break
 						fi
 					done
-				fi
-				if ( test -z "$RUBY" -a -n "$MINGW32" )
-				then
-					FW_CHECK_FILE("/cygdrive/c/ruby/bin/$ruby",[RUBY=\"/cygdrive/c/ruby/bin/$ruby\"; RUBYCYGDRIVEPREFIX=\"/cygdrive/c\"])
 				fi
 			fi
 
@@ -2293,7 +2159,6 @@ then
 
 	AC_SUBST(HAVE_RUBY)
 	AC_SUBST(RUBY)
-	AC_SUBST(RUBYCYGDRIVEPREFIX)
 	AC_SUBST(RUBYLIB)
 fi
 ])
@@ -2329,24 +2194,6 @@ then
 					break
 				fi
 			done
-
-			if ( test -z "$JAVAPATH" )
-			then
-				if ( test -n "$MINGW32" )
-				then
-					for dir in `ls -d /cygdrive/c/jdk* /cygdrive/c/j2sdk* /cygdrive/c/Program\ Files/Java/* 2> /dev/null | sed -e "s| |%20|g"`
-					do
-						rm -f stage/java
-						fixeddir=`echo "$dir" | sed -e "s|%20|\\\\ |g"`
-						ln -s "$fixeddir" stage/java
-						FW_CHECK_FILE("`pwd`/stage/java/include/jni.h",[JAVAPATH=\"`pwd`/stage/java\"])
-						if ( test -n "$JAVAPATH" )
-						then
-							break
-						fi
-					done
-				fi
-			fi
 		fi
 		
 		if ( test -n "$JAVAPATH" )
@@ -2431,46 +2278,40 @@ then
 
 	else
 
-		if ( test -n "$MINGW32" )
+		PHPCONFIG=""
+		if ( test -n "$PHPPATH" )
 		then
-			dnl Windows stuff here...
-			echo "windows..."
+			FW_CHECK_FILE("$PHPPATH/bin/php-config",[PHPCONFIG=\"$PHPPATH/bin/php-config\"])
 		else
-			PHPCONFIG=""
-			if ( test -n "$PHPPATH" )
+			AC_CHECK_PROG(PHPCONFIG,"php-config","php-config")
+			if ( test -z "$PHPCONFIG" )
 			then
-				FW_CHECK_FILE("$PHPPATH/bin/php-config",[PHPCONFIG=\"$PHPPATH/bin/php-config\"])
-			else
-				AC_CHECK_PROG(PHPCONFIG,"php-config","php-config")
-				if ( test -z "$PHPCONFIG" )
-				then
-					for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
-					do
-						FW_CHECK_FILE("$i/php-config",[PHPCONFIG=\"$i/php-config\"])
-						if ( test -n "$PHPCONFIG" )
-						then
-							break
-						fi
-					done
-				fi
+				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/sw/bin"
+				do
+					FW_CHECK_FILE("$i/php-config",[PHPCONFIG=\"$i/php-config\"])
+					if ( test -n "$PHPCONFIG" )
+					then
+						break
+					fi
+				done
 			fi
-			
-			if ( test -n "$PHPCONFIG" )
-			then
-				HAVE_PHP="yes"
-				PHPPREFIX=`$PHPCONFIG --prefix`
-				dnl some php's fail to replace ${prefix} with
-				dnl their prefix when you run php-config
-				dnl --includes, but php-config --prefix usually
-				dnl works so we fake it here
-				PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
-				PHPEXTDIR=`$PHPCONFIG --extension-dir`
-				PHPVERSION=`$PHPCONFIG --version`
-				PHPMAJORVERSION=`echo "$PHPVERSION" | cut -d'.' -f1`
-			else
-				HAVE_PHP=""
-				AC_MSG_WARN(The PHP API will not be built.)
-			fi
+		fi
+		
+		if ( test -n "$PHPCONFIG" )
+		then
+			HAVE_PHP="yes"
+			PHPPREFIX=`$PHPCONFIG --prefix`
+			dnl some php's fail to replace ${prefix} with
+			dnl their prefix when you run php-config
+			dnl --includes, but php-config --prefix usually
+			dnl works so we fake it here
+			PHPINCLUDES=`$PHPCONFIG --includes | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|" | sed -e "s|\\${prefix}|$PHPPREFIX|"`
+			PHPEXTDIR=`$PHPCONFIG --extension-dir`
+			PHPVERSION=`$PHPCONFIG --version`
+			PHPMAJORVERSION=`echo "$PHPVERSION" | cut -d'.' -f1`
+		else
+			HAVE_PHP=""
+			AC_MSG_WARN(The PHP API will not be built.)
 		fi
 	fi
 
@@ -2546,45 +2387,34 @@ then
 	else
 
 		dnl Checks for TCL.
-		if ( test -n "$TCLINCLUDEPATH" )
-		then
-			FW_CHECK_FILE($TCLINCLUDEPATH/tcl.h,[TCLINCLUDE=\"-I$TCLINCLUDEPATH\"])
-		else
-			for i in "/usr/include" "$prefix/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include" "/usr/sfw/include" "/sw/include"
+		for i in "$TCLINCLUDEPATH" "/usr/include" "$prefix/include" "/usr/local/include" "/usr/pkg/include" "/opt/sfw/include" "/usr/sfw/include" "/sw/include"
+		do
+			for j in "" "/tcl8.0" "/tcl8.1" "/tcl8.2" "/tcl8.3" "/tcl8.4" "/tcl8.5"
 			do
-				FW_CHECK_FILE($i/tcl.h,[TCLINCLUDE=\"-I$i\"])
-				for j in "tcl8.0" "tcl8.1" "tcl8.2" "tcl8.3" "tcl8.4" "tcl8.5"
+				FW_CHECK_FILE($i$j/tcl.h,[TCLINCLUDE=\"-I$i/$j\"])
+			done
+		done
+		dnl first look for a dynamic libtcl
+		if ( test -n "$TCLINCLUDE" )
+		then
+			for i in "$TCLLIBSPATH" "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+			do
+				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 				do
-					FW_CHECK_FILE($i/$j/tcl.h,[TCLINCLUDE=\"-I$i/$j\"])
+					FW_CHECK_FILE($i/libtcl$j.$SOSUFFIX,[TCLLIB=\"$i/libtcl$j.$SOSUFFIX\"; TCLLIBSPATH=\"$i\"])
 				done
 			done
 		fi
-		if ( test -z "$TCLINCLUDE" )
+		dnl if we didn't find it, look for a dynamic libtclstub
+		if ( test -n "$TCLINCLUDE " -a -z "$TCLLIB" )
 		then
-			AC_MSG_WARN("The TCL API will not be installed.")
-		else
-			if ( test -n "$TCLLIBSPATH" )
-			then
-				FW_CHECK_FILE($TCLLIBSPATH/libtclstub.a,[TCLLIB=\"$TCLLIBSPATH/libtclstub.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-				FW_CHECK_FILE($TCLLIBSPATH/libtcl.$SOSUFFIX,[TCLLIB=\"-L$TCLLIBSPATH -ltcl\"])
-				if ( test -z "$TCLLIB" )
-				then
-					for i in "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-					do
-						FW_CHECK_FILE($TCLLIBSPATH/libtclstub$i.a,[TCLLIB=\"$TCLLIBSPATH/libtclstub$i.a\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-						FW_CHECK_FILE($TCLLIBSPATH/libtcl$i.$SOSUFFIX,[TCLLIB=\"-L$TCLLIBSPATH -ltcl$i\"])
-					done
-				fi
-			else
-				for i in "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+			for i in "$TCLLIBSPATH" "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+			do
+				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 				do
-					for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
-					do
-						FW_CHECK_FILE($i/libtclstub$j.a,[TCLLIB=\"$i/libtclstub$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
-						FW_CHECK_FILE($i/libtcl$j.a,[TCLLIB=\"$i/libtcl$j.a\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"$TCLINCLUDE\"])
-					done
+					FW_CHECK_FILE($i/libtclstub$j.$SOSUFFIX,[TCLLIB=\"$i/libtclstub$j.$SOSUFFIX\"; TCLLIBSPATH=\"$i\"; TCLINCLUDE=\"-DUSE_TCL_STUBS $TCLINCLUDE\"])
 				done
-			fi
+			done
 		fi
 		if ( test -z "$TCLLIB" )
 		then
@@ -2592,11 +2422,11 @@ then
 		else
 			HAVE_TCL="yes"
 			AC_MSG_CHECKING(for Tcl_GetString)
-			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetString(NULL);],[$TCLINCLUDE],[$TCLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_GETSTRING,1,Some versions of TCL don't have Tcl_GetString)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetString(NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_GETSTRING,1,Some versions of TCL don't have Tcl_GetString)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(for Tcl_WideInt)
-			FW_TRY_LINK([#include <tcl.h>],[Tcl_WideInt row;],[$TCLINCLUDE],[$TCLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_WIDEINT,1,Some versions of TCL don't have Tcl_WideInt)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tcl.h>],[Tcl_WideInt row;],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_WIDEINT,1,Some versions of TCL don't have Tcl_WideInt)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(for const char ** support)
-			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetIndexFromObj(NULL,NULL,(const char **)NULL,NULL,0,NULL);],[$TCLINCLUDE],[$TCLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_CONSTCHAR,1,Some versions of TCL don't use const char ** arguments)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetIndexFromObj(NULL,NULL,(const char **)NULL,NULL,0,NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_CONSTCHAR,1,Some versions of TCL don't use const char ** arguments)],[AC_MSG_RESULT(no)])
 		fi
 	fi
 

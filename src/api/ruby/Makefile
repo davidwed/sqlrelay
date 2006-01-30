@@ -8,7 +8,7 @@ RUBYCFLAGS = $(shell $(RUBY) getcflags.rb | sed -e "s|-mtune=pentium4||g" | $(MA
 
 ifeq ($(OVERRIDERUBYSITEARCHDIR),)
 ifeq ($(shell $(RUBY) getsitearchdir.rb | grep -c DESTDIR),0)
-RUBYSITEARCHDIR = $(DESTDIR)$(RUBYCYGDRIVEPREFIX)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYSITEARCHDIR = $(DESTDIR)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 else
 RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 endif
@@ -18,7 +18,7 @@ endif
 
 ifeq ($(OVERRIDERUBYSITELIBDIR),)
 ifeq ($(shell $(RUBY) getsitelibdir.rb | grep -c DESTDIR),0)
-RUBYSITELIBDIR = $(DESTDIR)$(RUBYCYGDRIVEPREFIX)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYSITELIBDIR = $(DESTDIR)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 else
 RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 endif

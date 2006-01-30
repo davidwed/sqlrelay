@@ -1,3 +1,12 @@
+php debug doesn't print out numbers because zend_printf doesn't support %ld's
+
+sqlr-stop doesn't appear to kill forked-off sqlr-listeners (they don't have pid
+	files) but they should die if the parent is killed, what's up there?
+
+with some versions of gcj, you can't cast a jarray to a jobjectArray
+	need a configure test to see if NewObjectArray needs to be cast
+	to jobjectArray 
+
 docs:
 	mysql comes with solaris companion cd's except for solaris 8
 	when installing mysql on solaris 8 from mysql's site, first need to
@@ -8,8 +17,10 @@ docs:
 	for 7.x and 8, need to add listen_addresses = '*' in postgresql.conf,
 		not tcpip_socket
 
+solaris 8:
+	libgcc_s not found
+
 solaris 9:
-	ruby api compile fails
 	tries to look in /opt/sfw/lib/mysql/.libs for libmysqlclient
 		(libtool looks in .libs if -Lpath doesn't end in lib)
 		(seems like I fixed this once before by explicitly telling
@@ -17,10 +28,7 @@ solaris 9:
 		but it works on other platforms...?
 
 cygwin:
-	perl api fails to generate a dll -
-		libperl.dll.a and libperl.a exist, but the 
-		dll is called cygperl5_8.dll so libtool can't find it
-	tcl api fails to compile - tcl stubs-related
+	perl api fails to generate a dll
 
 --enable-efence and --disable-efence both enable efence!
 
@@ -312,6 +320,7 @@ API's:
 	D
 	dbstep
 	ADODB driver
+	PHP PDO driver  http://wiki.cc/php/PDO
 	PHP5 Creole driver
 
 Drop-in replacement libraries:

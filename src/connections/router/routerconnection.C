@@ -13,6 +13,7 @@ routerconnection::routerconnection() : sqlrconnection_svr() {
 	cons=NULL;
 	concount=0;
 	cfgfile=NULL;
+	justloggedin=false;
 }
 
 routerconnection::~routerconnection() {
@@ -48,6 +49,7 @@ void routerconnection::handleConnectString() {
 }
 
 bool routerconnection::logIn() {
+	justloggedin=true;
 	return true;
 }
 
@@ -63,19 +65,136 @@ void routerconnection::deleteCursor(sqlrcursor_svr *curs) {
 void routerconnection::logOut() {
 }
 
+bool routerconnection::autoCommitOn() {
+
+	// turn autocommit on for all connections, if any fail, return failure
+	bool	result=true;
+	for (uint16_t index=0; index<concount; index++) {
+		bool	res=cons[index]->autoCommitOn();
+		// The connection class calls autoCommitOn or autoCommitOff
+		// immediately after logging in, which will cause the 
+		// cons to connect to the relay's and tie them up unless we
+		// call endSession.  We'd rather not tie them up until a
+		// client connects, so if we just logged in, we'll call
+		// endSession.
+		if (justloggedin) {
+			cons[index]->endSession();
+		}
+		if (result) {
+			result=res;
+		}
+	}
+	if (justloggedin) {
+		justloggedin=false;
+	}
+	return result;
+}
+
+bool routerconnection::autoCommitOff() {
+
+	// turn autocommit on for all connections, if any fail, return failure
+	bool	result=true;
+	for (uint16_t index=0; index<concount; index++) {
+		bool	res=cons[index]->autoCommitOff();
+		// The connection class calls autoCommitOn or autoCommitOff
+		// immediately after logging in, which will cause the 
+		// cons to connect to the relay's and tie them up unless we
+		// call endSession.  We'd rather not tie them up until a
+		// client connects, so if we just logged in, we'll call
+		// endSession.
+		if (justloggedin) {
+			cons[index]->endSession();
+		}
+		if (result) {
+			result=res;
+		}
+	}
+	if (justloggedin) {
+		justloggedin=false;
+	}
+	return result;
+}
+
+// FIXME: need a begin() or something...
+// Some databases require that you begin a transaction and then later commit it
+// or roll it back.  But until you begin a new transaction, you're in autocommit
+// mode.  We need to be able to distribute a begin() like we're distributing
+// a commit().
+
+bool routerconnection::commit() {
+
+	// commit all connections, if any fail, return failure
+	// FIXME: wish I had 2 stage commit...
+	bool	result=true;
+	for (uint16_t index=0; index<concount; index++) {
+		bool	res=cons[index]->commit();
+		// Either commit or rollback will be called whenever the
+		// client calls endSession() or disconnects.  We don't have a
+		// way to tell if they just ran commit/rollback or actually
+		// call endSession() or disconnected, but if the did call
+		// endSession() or disconnect, we need to call endSession(),
+		// so just to be safe, we'll do it.
+		cons[index]->endSession();
+		if (result) {
+			result=res;
+		}
+	}
+	return result;
+}
+
+bool routerconnection::rollback() {
+
+	// commit all connections, if any fail, return failure
+	// FIXME: wish I had 2 stage commit...
+	bool	result=true;
+	for (uint16_t index=0; index<concount; index++) {
+		bool	res=cons[index]->rollback();
+		// Either commit or rollback will be called whenever the
+		// client calls endSession() or disconnects.  We don't have a
+		// way to tell if they just ran commit/rollback or actually
+		// call endSession() or disconnected, but if the did call
+		// endSession() or disconnect, we need to call endSession(),
+		// so just to be safe, we'll do it.
+		cons[index]->endSession();
+		if (result) {
+			result=res;
+		}
+	}
+	return result;
+}
+
 const char *routerconnection::identify() {
 	return "router";
 }
 
-routercursor::routercursor(sqlrconnection_svr *conn) :
-						sqlrcursor_svr(conn) {
+bool routerconnection::ping() {
+
+	// ping all connections, if any fail, return failure
+	bool	result=true;
+	for (uint16_t index=0; index<concount; index++) {
+		bool	res=cons[index]->ping();
+		if (result) {
+			result=res;
+		}
+	}
+	return result;
+}
+
+routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	routerconn=(routerconnection *)conn;
 	nextrow=0;
 	cur=NULL;
+	curs=new sqlrcursor *[routerconn->concount];
+	for (uint16_t index=0; index<routerconn->concount; index++) {
+		curs[index]=new sqlrcursor(routerconn->cons[index]);
+	}
 }
 
 routercursor::~routercursor() {
-	delete cur;
+	for (uint16_t index=0; index<routerconn->concount; index++) {
+		delete curs[index];
+	}
+	delete[] curs;
 }
 
 bool routercursor::openCursor(uint16_t id) {
@@ -93,7 +212,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 							getNodeByIndex(0);
 		while (ren && !cur) {
 			if (ren->getData()->match(query)) {
-				cur=new sqlrcursor(routerconn->cons[conindex]);
+				cur=curs[conindex];
 				cur->setResultSetBufferSize(FETCH_AT_ONCE);
 			}
 			ren=ren->getNext();
@@ -155,6 +274,8 @@ bool routercursor::inputBindClob(const char *variable,
 	return true;
 }
 
+// FIXME: output binds
+
 bool routercursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 	if (!execute) {
@@ -173,6 +294,7 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 }
 
 const char *routercursor::errorMessage(bool *liveconnection) {
+	// FIXME: detect downed database or downed relay
 	*liveconnection=true;
 	return cur->errorMessage();
 }
@@ -256,8 +378,5 @@ void routercursor::returnRow() {
 }
 
 void routercursor::cleanUpData(bool freeresult, bool freebinds) {
-	if (freeresult) {
-		delete cur;
-		cur=NULL;
-	}
+	cur=NULL;
 }

@@ -429,6 +429,8 @@ rm -rf %{buildroot}
 %{_bindir}/fields
 %{_bindir}/query
 %{_bindir}/sqlrsh
+%{_bindir}/sqlr-export
+%{_bindir}/sqlr-import
 
 %files client-runtime-c++
 %defattr(-, root, root)

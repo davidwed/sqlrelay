@@ -39,7 +39,9 @@ endif
 ifneq ($(strip $(SYBASELIBS)),)
 	$(MAKE) -C sybase all
 endif
+ifeq ($(ENABLE_ROUTER),yes)
 	$(MAKE) -C router all
+endif
 
 clean:
 	$(MAKE) -C db2 clean
@@ -54,7 +56,9 @@ clean:
 	$(MAKE) -C postgresql clean
 	$(MAKE) -C sqlite clean
 	$(MAKE) -C sybase clean
+ifeq ($(ENABLE_ROUTER),yes)
 	$(MAKE) -C router clean
+endif
 
 rebuild: clean all
 
@@ -95,7 +99,9 @@ endif
 ifneq ($(strip $(SYBASELIBS)),)
 	$(MAKE) -C sybase install
 endif
+ifeq ($(ENABLE_ROUTER),yes)
 	$(MAKE) -C router install
+endif
 
 uninstall:
 	$(MAKE) -C db2 uninstall
@@ -110,4 +116,6 @@ uninstall:
 	$(MAKE) -C postgresql uninstall
 	$(MAKE) -C sqlite uninstall
 	$(MAKE) -C sybase uninstall
+ifeq ($(ENABLE_ROUTER),yes)
 	$(MAKE) -C router uninstall
+endif

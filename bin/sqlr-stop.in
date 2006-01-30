@@ -19,7 +19,7 @@ do
 		PID=`cat $file`
 		echo "killing process $PID..."
 		kill $KILLARGS $PID
-		if ( test "$?" == "0" )
+		if ( test "$?" = "0" )
 		then
 			echo "   success"
 		else

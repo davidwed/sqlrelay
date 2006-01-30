@@ -20,8 +20,8 @@ class postgresqlcursor : public sqlrcursor_svr {
 	friend class postgresqlconnection;
 	private:
 				postgresqlcursor(sqlrconnection_svr *conn);
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
 				~postgresqlcursor();
+#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
 		bool		openCursor(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);

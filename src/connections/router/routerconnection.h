@@ -64,6 +64,7 @@ class routercursor : public sqlrcursor_svr {
 		routerconnection	*routerconn;
 
 		sqlrcursor	*cur;
+		sqlrcursor	**curs;
 
 		uint64_t	nextrow;
 };
@@ -81,7 +82,12 @@ class routerconnection : public sqlrconnection_svr {
 		sqlrcursor_svr	*initCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
+		bool		autoCommitOn();
+		bool		autoCommitOff();
+		bool		commit();
+		bool		rollback();
 		const char	*identify();
+		bool		ping();
 
 		void		endSession();
 		void		dropTable(const char *table);
@@ -90,6 +96,8 @@ class routerconnection : public sqlrconnection_svr {
 		uint16_t	concount;
 
 		sqlrconfigfile	*cfgfile;
+
+		bool		justloggedin;
 };
 
 #endif

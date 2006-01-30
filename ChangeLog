@@ -92,6 +92,7 @@
 	added some checks for tcl functions/types in configure script
 	configure script filters out non-g++ CFLAGS from mysql_config if
 		using g++
+	lots of configure script updates for cygwin
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

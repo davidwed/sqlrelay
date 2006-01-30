@@ -195,6 +195,11 @@ AC_ARG_ENABLE(mdbtools-rpath,
 	MDBTOOLSUSERPATH="yes",
 	MDBTOOLSUSERPATH="")
 AC_SUBST(MDBTOOLSUSERPATH)
+AC_ARG_ENABLE(router,
+	[  --enable-router               Build experimental query router],
+	ENABLE_ROUTER="yes",
+	ENABLE_ROUTER="")
+AC_SUBST(ENABLE_ROUTER)
 AC_ARG_WITH(perl-prefix,
 	[  --with-perl-prefix            Location of Perl],
 	PERLPATH="$withval",
