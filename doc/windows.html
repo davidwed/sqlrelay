@@ -8,42 +8,37 @@
 <span class="heading1">Using SQL Relay on Windows</span><br><br>
 
 <ul>
-<li><a href="#packages">Installing SQL Relay Packages</a></li>
+<li><a href="#introduction">Introduction</a></li>
 <li><a href="#building">Building SQL Relay</a></li>
 <li><a href="#server">Running the SQL Relay Server</a></li>
-
+<li><a href="#cmdline">Using the Command Line Interfaces</a></li>
 </ul>
 
-<a name="packages"></a>
-<span class="heading2">Installing SQL Relay Packages</span><br><br>
+<a name="introduction"></a>
+<span class="heading2">Introduction</span><br><br>
 
-<p>SQL Relay requires <a href="http://www.cygwin.com">Cygwin</a>, so the first
-step in installing SQL Relay is to download and install Cygwin.</p>
-
-<p>...</p>
+<p>SQL Relay is not production-ready for Windows.  You have to build it from
+source, many databases and languages are unsupported and I haven't done any
+performance benchmarking yet.  But, that said, you can run a database, SQL
+Relay server and certain SQL Relay clients, entirely on Windows.  So, if you're
+interested in tinkering with SQL Relay on Windows, you can.</p>
 
 <a name="building"></a>
 <span class="heading2">Building SQL Relay</span><br><br>
 
-<p>If you would rather build SQL Relay yourself, than install a prebuilt
-package, you may.  Again, SQL Relay requires
-<a href="http://www.cygwin.com">Cygwin</a>, so the first step in building SQL
-Relay is to download and install Cygwin.</p>
+<p>SQL Relay requires <a href="http://www.cygwin.com">Cygwin</a> to build and
+run, so the first step in building SQL Relay is to
+<a href="http://cygwin.com/cygwin-ug-net/setup-net.html">download and install Cygwin</a>.</p>
 
-<p>Cygwin comes with many optional components.  I recommend installing the
-complete Cygwin environment to make sure that you have all of the necessary
-components.  However, you will need at least the following components to
-build SQL Relay.</p>
+<p>I recommend doing a complete Cygwin installation to make sure you have all
+of the components necessary to build and run SQL Relay.</p>
 
-<blockquote>
-...
-</blockquote>
-
-
-<p>Now, download and install whatever languages or databases you need SQL Relay
-to support.  Many languages and a few databases come with Cygwin.  Others
-have to be compiled from source.  Currently, SQL Relay cannot be compiled
-against non-Cygwin dll's.  The resulting binaries don't work.</p>
+<p>Now, download, compile and install whatever languages or databases you need
+SQL Relay to support.  Many languages and a few databases come with Cygwin.
+Others have to be compiled from source and installed in the Cygwin environment.
+Currently, SQL Relay cannot be compiled against non-Cygwin dll's, the resulting
+binaries don't work, so you can't for instance, build against Oracle or Sybase,
+or download the native Windows version of MySQL and build against it.</p>
 
 <p>Now, download SQL Relay and follow the <a href="installation.html">standard
 instructions</a> for building and installing it.  Use the Cygwin shell rather
@@ -57,16 +52,34 @@ IPC server simulates these facilities on Windows.  Install the server as a
 service and start it up following the instructions
 <a href="http://cygwin.com/cygwin-ug-net/using-cygserver.html">here</a>.
 
-<p>Add "server" to CYGWIN environment variable using control panel...</p>
+<p>After installing the Cygwin IPC server, you need to add a CYGWIN environment
+variable.  Use the System control panel to add an environment variable
+called CYGWIN with the value <b>server</b>.</p>
 
 <p>Once the IPC server is running, start up the database and follow the
-<a href="running.html">standard instructions</a> for running SQL Relay.</p>
+<a href="running.html">standard instructions</a> for running SQL Relay.
+Note that you will have to use <i>handoff="reconnect"</i> rather than
+<i>handoff="pass"</i> in the sqlrelay.conf file.  <i>handoff="pass"</i> is
+currently unsupported on Windows.  Also, make sure to execute the instructions
+from within a Cygwin shell rather than from the Windows Command Line or DOS
+shell.</p>
 
-<p>FIXME: Don't run from ssh, CYGWIN environment variable there doesn't contain
-"server"...</p>
+<p>NOTE: Do not ssh into your windows machine and run from SQL Relay from
+that shell.  When logging in over ssh, the CYGWIN environment variable get's
+overridden and doesn't contain <b>server</b>, preventing SQL Relay from using
+the Cygwin IPC server.</p>
 
 <p>Currently, there is no facility for installing SQL Relay as a service, so
-it must be restarted manually upon reboot.</p>
+it must be started and stopped manually from a Cygwin shell.</p>
+
+<a name="cmdline"></a>
+<span class="heading2">Using the Command Line Interfaces</span><br><br>
+
+<p>Once the SQL Relay server is running, you can access it from the SQL Relay
+command line interfaces.  Follow the <a href="running.html#cmdline">standard
+instructions</a> for running the command line interfaces.  Again, you should
+use the Cygwin shell rather than the Windows Command Line or DOS shell when
+running the SQL Relay command line interfaces.</p>
 
 </body>
 </html>
