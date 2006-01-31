@@ -1,21 +1,5 @@
-php debug doesn't print out numbers because zend_printf doesn't support %ld's
-
 sqlr-stop doesn't appear to kill forked-off sqlr-listeners (they don't have pid
 	files) but they should die if the parent is killed, what's up there?
-
-with some versions of gcj, you can't cast a jarray to a jobjectArray
-	need a configure test to see if NewObjectArray needs to be cast
-	to jobjectArray 
-
-docs:
-	mysql comes with solaris companion cd's except for solaris 8
-	when installing mysql on solaris 8 from mysql's site, first need to
-	create a wheel group
-
-	postgresql 7.x and 8 may have "ident sameuser" rather than "trust"
-	by default, need to add entry for local subnet, not just 127.0.0.0 
-	for 7.x and 8, need to add listen_addresses = '*' in postgresql.conf,
-		not tcpip_socket
 
 solaris 8:
 	libgcc_s not found
@@ -23,16 +7,19 @@ solaris 8:
 solaris 9:
 	tries to look in /opt/sfw/lib/mysql/.libs for libmysqlclient
 		(libtool looks in .libs if -Lpath doesn't end in lib)
-		(seems like I fixed this once before by explicitly telling
-			it to link against /opt/sfw/lib/mysql/libmysqlclient.so)
 		but it works on other platforms...?
+		links fine, works after manually modifying config.mk to
+		link directly against the .so file
 
-cygwin:
-	perl api fails to generate a dll
+openbsd-3.8
+	handoff="pass" doesn't work
+	SO_SNDBUF cannot=0 or no data will ever be written
 
---enable-efence and --disable-efence both enable efence!
+cygwin
+	handoff="pass" doesn't work
 
 --------------------------------------------------------------------------------
+php debug doesn't print out numbers because zend_printf doesn't support %ld's
 
 interbase fails float output bind test, prec/scale issue?
 
@@ -216,14 +203,6 @@ Performance/Code Enhancements:
 
 Security:
 	* SSL encryption
-
-Packages:
-	* FreeBSD
-	* NetBSD
-	* OpenBSD
-	* Solaris
-	* OpenServer
-	* Unixware/OpenUnix
 
 Features:
 	* distribute selects to slaves, dml/ddl to master:

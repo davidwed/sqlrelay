@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+/* On some platforms NewObjectArray requires a cast */
+#undef CAST_NEW_OBJECT_ARRAY
+
 /* Version of DB2 */
 #undef DB2VERSION
 

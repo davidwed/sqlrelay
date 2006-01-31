@@ -2244,8 +2244,13 @@ then
 		fi
 	fi
 
-	if ( test -z "$HAVE_JAVA" )
+	if ( test -n "$HAVE_JAVA" )
 	then
+		FW_TRY_COMPILE([#ifdef __CYGWIN__
+#include <windows.h>
+#endif
+#include <jni.h>],[JNIEnv *env; jobjectArray a=(jobjectArray)env->NewObjectArray(0,NULL,NULL);],[$JAVAINCLUDES],[AC_DEFINE(CAST_NEW_OBJECT_ARRAY,1,On some platforms NewObjectArray requires a cast)],[])
+	else
 		AC_MSG_WARN(The Java API will not be built.)
 	fi
 

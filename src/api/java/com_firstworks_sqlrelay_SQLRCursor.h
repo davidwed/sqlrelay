@@ -842,17 +842,17 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_resumeCachedR
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    alloc
- * Signature: (I)I
+ * Signature: (J)J
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_alloc
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_alloc
+  (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getOutputBindCursorInternal
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindCursorInternal
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindCursorInternal
   (JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus

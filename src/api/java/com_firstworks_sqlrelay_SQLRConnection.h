@@ -130,9 +130,9 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getDebug
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    alloc
- * Signature: (Ljava/lang/String;SLjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I
+ * Signature: (Ljava/lang/String;SLjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)J
  */
-JNIEXPORT jint JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc
   (JNIEnv *, jobject, jstring, jshort, jstring, jstring, jstring, jint, jint);
 
 #ifdef __cplusplus

@@ -93,6 +93,7 @@
 	configure script filters out non-g++ CFLAGS from mysql_config if
 		using g++
 	lots of configure script updates for cygwin
+	java api uses jlong instead of jint now for cursor/connection
 
 0.36.4 - fixed mdbsql detection
 	fixed const error in mdbtools connection

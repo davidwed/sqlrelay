@@ -103,10 +103,13 @@ Manager (custom).</p>
 <a name="solaris"></a>
 <span class="heading2">Solaris</span><br>
 
-<p>The Solaris Companion CD provides MySQL.  It's downloadable in package form 
-from many web sites including 
+<p>The Solaris Companion CD provides MySQL and it's downloadable in package
+form from many web sites including 
 <a href="http://www.mysql.com/downloads/os-solaris.html">the MySQL site</a>.
-You can use <i>pkgtool</i> to install the package.</p>
+You can use <i>pkgtool</i> to install the package.  Note, that with some
+versions of Solaris and some versions of MySQL, you have to create a "wheel"
+group before installing the MySQL package.  You can do this (as root) using
+the command: <i>/usr/sbin/groupadd wheel</i></p>
 
 <a name="source"></a>
 <span class="heading2">Compiling From Source</span><br>
