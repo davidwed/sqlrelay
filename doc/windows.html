@@ -41,48 +41,9 @@ build SQL Relay.</p>
 
 
 <p>Now, download and install whatever languages or databases you need SQL Relay
-to support.  Many languages and a few databases come with Cygwin.  SQL Relay
-supports many non-Cygwin databases and a few non-Cygwin languages.  Consult the
-following tables for the support status of various databases and languages.</p>
-
-<table>
-<tr><td valign="top">
-<table border="1">
-<tr><th>Supported</th><th>Not Supported</th></tr>
-<tr><td>Oracle</td><td>SQLite</td></tr>
-<tr><td>Sybase</td><td>MDB Tools</td></tr>
-<tr><td>MySQL</td><td>mSQL</td></tr>
-<tr><td>PostgreSQL</td><td>FreeTDS</td></tr>
-<tr><td>Firebird</td><td></td></tr>
-<tr><td>DB2</td><td></td></tr>
-<tr><td>ODBC</td><td></td></tr>
-</table>
-</td><td>
-<table border="1">
-<tr><th>Supported</th>
-<th>Not Supported</th></tr>
-<tr><td>GNU C</td>
-<td>MSVC++</td></tr>
-<tr><td>GNU C++</td>
-<td><a href="http://www.activestate.com">ActiveState Perl</a></td></tr>
-<tr><td><a href="http://java.sun.com">Java</a></td>
-<td><a href="http://www.activestate.com">ActiveState Python</a></td></tr>
-<tr><td>Cygwin Perl</td>
-<td><a href="http://www.activestate.com">ActiveState TCL</a></td></tr>
-<tr><td>Cygwin Python</td>
-<td>Zope</td></tr>
-<tr><td>Cygwin Ruby</td>
-<td></td></tr>
-<tr><td><a href="http://rubyinstaller.rubyforge.org/wiki/wiki.pl">Non-Cygwin
-Ruby</a></td>
-<td></td></tr>
-<tr><td>Cygwin TCL</td>
-<td></td></tr>
-</table>
-</td></tr>
-</table>
-
-<p>Add paths to dll's to PATH environment variable using control panel...</p>
+to support.  Many languages and a few databases come with Cygwin.  Others
+have to be compiled from source.  Currently, SQL Relay cannot be compiled
+against non-Cygwin dll's.  The resulting binaries don't work.</p>
 
 <p>Now, download SQL Relay and follow the <a href="installation.html">standard
 instructions</a> for building and installing it.  Use the Cygwin shell rather
