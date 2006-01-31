@@ -103,8 +103,8 @@ public class SQLRConnection {
 
 	/** connection is used internally, it's just
 	 *  public to make the JNI wrapper work faster.  */
-	public int	connection;
-	private native int	alloc(String server, short port, 
+	public long	connection;
+	private native long	alloc(String server, short port, 
 						String socket, String user, 
 						String password, 
 						int retrytime, int tries);

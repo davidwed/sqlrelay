@@ -418,8 +418,8 @@ public class SQLRCursor {
 
 	/** cursor and connection are used internally, they're just
 	 *  public to make the JNI wrapper work faster.  */
-	public int		cursor;
+	public long		cursor;
 	public SQLRConnection	connection;
-	private native int	alloc(int con);
-	private native int	getOutputBindCursorInternal(String variable);
+	private native long	alloc(long con);
+	private native long	getOutputBindCursorInternal(String variable);
 }
