@@ -1,5 +1,4 @@
-sqlr-stop doesn't appear to kill forked-off sqlr-listeners (they don't have pid
-	files) but they should die if the parent is killed, what's up there?
+--------------------------------------------------------------------------------
 
 solaris 8:
 	libgcc_s not found
@@ -13,12 +12,10 @@ solaris 9:
 
 openbsd-3.8
 	handoff="pass" doesn't work
-	SO_SNDBUF cannot=0 or no data will ever be written
 
 cygwin
 	handoff="pass" doesn't work
 
---------------------------------------------------------------------------------
 php debug doesn't print out numbers because zend_printf doesn't support %ld's
 
 interbase fails float output bind test, prec/scale issue?
@@ -200,6 +197,7 @@ Performance/Code Enhancements:
 	* use async queries by default, even if the client runs a synchronous
 		query, so the query can be cancelled if the client disconnects
 	* support freetds/sybase ct_con_prop/encryption
+	* use bandwidth delay product to set tcp send/receive buffer sizes
 
 Security:
 	* SSL encryption

@@ -24,12 +24,6 @@
 	<!ATTLIST instance maxstringbindvaluelength CDATA "4000">
 	<!ATTLIST instance maxlobbindvaluelength CDATA "71680">
 	<!ATTLIST instance idleclienttimeout CDATA "-1">
-	<!ATTLIST instance sidenable (yes|no) "no">
-	<!ATTLIST instance sidhost CDATA "">
-	<!ATTLIST instance sidport CDATA "0">
-	<!ATTLIST instance sidsocket CDATA "">
-	<!ATTLIST instance siduser CDATA "user">
-	<!ATTLIST instance sidpassword CDATA "password">
 
 <!ELEMENT users (user*)>
 <!ELEMENT user EMPTY>

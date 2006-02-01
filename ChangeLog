@@ -2,6 +2,8 @@
 	fixed bug in configure script where it would erroneously report that
 		the MDB tools connection wouldn't be built
 	uses (u)int[16|32]_t instead of short/long, etc.
+	changed row count, affected rows to use a 64 bit value
+	got rid of all plain "int" references in C/C++ api
 	single-quotes and backslashes are escaped when using fake input binds
 		now
 	fixed "integer expression expected" error when running

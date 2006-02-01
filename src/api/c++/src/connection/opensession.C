@@ -66,8 +66,10 @@ bool sqlrconnection::openSession() {
 
 	// use 8k read and write buffers
 	cs->dontUseNaglesAlgorithm();
-	cs->setTcpReadBufferSize(8192);
-	cs->setTcpWriteBufferSize(0);
+	// FIXME: use bandwidth delay product to tune these
+	// SO_SNDBUF=0 causes no data to ever be sent on openbsd
+	//cs->setTcpReadBufferSize(8192);
+	//cs->setTcpWriteBufferSize(0);
 	cs->setReadBufferSize(8192);
 	cs->setWriteBufferSize(8192);
 
@@ -176,8 +178,10 @@ bool sqlrconnection::openSession() {
 
 			// use 8k read and write buffers
 			cs->dontUseNaglesAlgorithm();
-			cs->setTcpReadBufferSize(8192);
-			cs->setTcpWriteBufferSize(0);
+			// FIXME: use bandwidth delay product to tune these
+			// SO_SNDBUF=0 causes no data to ever be sent on openbsd
+			//cs->setTcpReadBufferSize(8192);
+			//cs->setTcpWriteBufferSize(0);
 			cs->setReadBufferSize(8192);
 			cs->setWriteBufferSize(8192);
 

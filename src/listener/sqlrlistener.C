@@ -837,8 +837,10 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	}
 
 	clientsock->dontUseNaglesAlgorithm();
-	clientsock->setTcpReadBufferSize(8192);
-	clientsock->setTcpWriteBufferSize(0);
+	// FIXME: use bandwidth delay product to tune these
+	// SO_SNDBUF=0 causes no data to ever be sent on openbsd
+	//clientsock->setTcpReadBufferSize(8192);
+	//clientsock->setTcpWriteBufferSize(0);
 	clientsock->setReadBufferSize(8192);
 	clientsock->setWriteBufferSize(8192);
 

@@ -6,24 +6,38 @@ KILLARGS=$2
 prefix=@prefix@
 PIDDIR=@localstatedir@/sqlrelay/tmp/pids
 
-FILES="$PIDDIR/sqlr-*-$ID*"
+FILES=""
 if ( test -z "$ID" )
 then
-	FILES="$FILES $PIDDIR/sqlr-cachemanager*"
+	LISTENERS="$PIDDIR/sqlr-listener-*"
+	CONNECTIONS="$PIDDIR/sqlr-connection-*.*"
+	SCALERS="$PIDDIR/sqlr-scaler-*"
+	CACHEMANAGER="$PIDDIR/sqlr-cachemanager.*"
+else
+	LISTENERS="$PIDDIR/sqlr-listener-$ID"
+	CONNECTIONS="$PIDDIR/sqlr-connection-$ID.*"
+	SCALERS="$PIDDIR/sqlr-scaler-$ID"
+	CACHEMANAGER=""
 fi
 
-for file in `ls $FILES 2> /dev/null`
+for thing in $LISTENERS $CONNECTIONS $SCALERS $CACHEMANAGER
 do
-	if ( test -r "$file" )
+	if ( test -n "$thing" )
 	then
-		PID=`cat $file`
-		echo "killing process $PID..."
-		kill $KILLARGS $PID
-		if ( test "$?" = "0" )
-		then
-			echo "   success"
-		else
-			echo "   failed"
-		fi
+		for file in `ls $thing 2> /dev/null`
+		do
+			if ( test -r "$file" )
+			then
+				PID=`cat $file`
+				echo "killing process $PID..."
+				kill $KILLARGS $PID
+				if ( test "$?" = "0" )
+				then
+					echo "   success"
+				else
+					echo "   failed"
+				fi
+			fi
+		done
 	fi
 done
