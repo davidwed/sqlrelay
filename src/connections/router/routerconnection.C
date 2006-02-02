@@ -14,6 +14,9 @@ routerconnection::routerconnection() : sqlrconnection_svr() {
 	concount=0;
 	cfgfile=NULL;
 	justloggedin=false;
+
+	beginregex.compile("^\\s*begin");
+	beginregex.study();
 }
 
 routerconnection::~routerconnection() {
@@ -71,6 +74,7 @@ bool routerconnection::autoCommitOn() {
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
 		bool	res=cons[index]->autoCommitOn();
+		// FIXME: "do something" if this fails
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
 		// cons to connect to the relay's and tie them up unless we
@@ -96,6 +100,7 @@ bool routerconnection::autoCommitOff() {
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
 		bool	res=cons[index]->autoCommitOff();
+		// FIXME: "do something" if this fails
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
 		// cons to connect to the relay's and tie them up unless we
@@ -115,12 +120,6 @@ bool routerconnection::autoCommitOff() {
 	return result;
 }
 
-// FIXME: need a begin() or something...
-// Some databases require that you begin a transaction and then later commit it
-// or roll it back.  But until you begin a new transaction, you're in autocommit
-// mode.  We need to be able to distribute a begin() like we're distributing
-// a commit().
-
 bool routerconnection::commit() {
 
 	// commit all connections, if any fail, return failure
@@ -128,6 +127,7 @@ bool routerconnection::commit() {
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
 		bool	res=cons[index]->commit();
+		// FIXME: "do something" if this fails
 		// Either commit or rollback will be called whenever the
 		// client calls endSession() or disconnects.  We don't have a
 		// way to tell if they just ran commit/rollback or actually
@@ -149,6 +149,7 @@ bool routerconnection::rollback() {
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
 		bool	res=cons[index]->rollback();
+		// FIXME: "do something" if this fails
 		// Either commit or rollback will be called whenever the
 		// client calls endSession() or disconnects.  We don't have a
 		// way to tell if they just ran commit/rollback or actually
@@ -188,6 +189,7 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	for (uint16_t index=0; index<routerconn->concount; index++) {
 		curs[index]=new sqlrcursor(routerconn->cons[index]);
 	}
+	beginquery=false;
 }
 
 routercursor::~routercursor() {
@@ -203,6 +205,14 @@ bool routercursor::openCursor(uint16_t id) {
 
 bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
+	// check for a begin query
+	beginquery=routerconn->beginregex.match(query);
+	if (beginquery) {
+		return true;
+	}
+
+	// look through the regular expressions and figure out which
+	// connection this query needs to be run through
 	uint16_t	conindex=0;
 	routernode	*rcn=routerconn->cfgfile->
 					getRouterList()->getNodeByIndex(0);
@@ -226,6 +236,8 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
+	// prepare the query using the cursor from whichever
+	// connection turned out to be the right one
 	cur->prepareQuery(query);
 
 	return true;
@@ -281,6 +293,9 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 	if (!execute) {
 		return true;
 	}
+	if (beginquery) {
+		return begin(query,length);
+	}
 	if (!cur) {
 		if (!prepareQuery(query,length)) {
 			return false;
@@ -291,6 +306,30 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 		return true;
 	}
 	return false;
+}
+
+bool routercursor::begin(const char *query, uint32_t length) {
+
+	bool	result=true;
+	for (uint16_t index=0; index<routerconn->concount; index++) {
+		bool	res=curs[index]->sendQuery(query,length);
+		// FIXME: "do something" if this fails
+		if (result) {
+			result=res;
+			// if we had an error, set "cur" so
+			// we can get the error from it
+			if (!res && !cur) {
+				cur=curs[index];
+			}
+		}
+	}
+	// If we're here with no "cur", then all the begin's must have
+	// succeeded.  But we need a "cur" so everything else will work.
+	// Any of them will do, so use the first one.
+	if (!cur) {
+		cur=curs[0];
+	}
+	return result;
 }
 
 const char *routercursor::errorMessage(bool *liveconnection) {
