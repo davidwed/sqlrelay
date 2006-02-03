@@ -9,6 +9,7 @@
 #include <sqlrconnection.h>
 
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/regularexpression.h>
 
 class routerconnection;
 
@@ -20,6 +21,7 @@ class routercursor : public sqlrcursor_svr {
 		bool		openCursor(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+		bool		begin(const char *query, uint32_t length);
 		bool		inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -67,6 +69,8 @@ class routercursor : public sqlrcursor_svr {
 		sqlrcursor	**curs;
 
 		uint64_t	nextrow;
+
+		bool			beginquery;
 };
 
 class routerconnection : public sqlrconnection_svr {
@@ -98,6 +102,8 @@ class routerconnection : public sqlrconnection_svr {
 		sqlrconfigfile	*cfgfile;
 
 		bool		justloggedin;
+
+		regularexpression	beginregex;
 };
 
 #endif
