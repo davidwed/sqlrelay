@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <rudiments/charstring.h>
+#include <rudiments/rawbuffer.h>
 #include <mysqlconnection.h>
 #if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
 	#include <errmsg.h>
@@ -15,6 +16,9 @@
 
 mysqlconnection::mysqlconnection() : sqlrconnection_svr() {
 	connected=false;
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	fakebinds=false;
+#endif
 }
 
 uint16_t mysqlconnection::getNumberOfConnectStringVars() {
@@ -22,7 +26,11 @@ uint16_t mysqlconnection::getNumberOfConnectStringVars() {
 }
 
 bool mysqlconnection::supportsNativeBinds() {
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	return !fakebinds;
+#else
 	return false;
+#endif
 }
 
 void mysqlconnection::handleConnectString() {
@@ -32,6 +40,9 @@ void mysqlconnection::handleConnectString() {
 	host=connectStringValue("host");
 	port=connectStringValue("port");
 	socket=connectStringValue("socket");
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	fakebinds=!charstring::compare(connectStringValue("fakebinds"),"yes");
+#endif
 }
 
 bool mysqlconnection::logIn() {
@@ -164,15 +175,217 @@ bool mysqlconnection::rollback() {
 #endif
 }
 
+#ifdef HAVE_MYSQL_STMT_PREPARE
+short mysqlconnection::nonNullBindValue() {
+	return 0;
+}
+
+short mysqlconnection::nullBindValue() {
+	return 1;
+}
+#endif
+
 mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
 	columnnames=NULL;
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	stmt=mysql_stmt_init(&mysqlconn->mysql);
+	for (unsigned short index=0; index<MAX_SELECT_LIST_SIZE; index++) {
+		fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
+		fieldbind[index].buffer=(char *)&field[index];
+		fieldbind[index].buffer_length=MAX_ITEM_BUFFER_SIZE;
+		fieldbind[index].is_null=&isnull[index];
+		fieldbind[index].length=&fieldlength[index];
+	}
+#endif
 }
 
 mysqlcursor::~mysqlcursor() {
 	delete[] columnnames;
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	mysql_stmt_free_result(stmt);
+	mysql_stmt_close(stmt);
+	if (mysqlresult) {
+		mysql_free_result(mysqlresult);
+	}
+#endif
 }
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
+bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
+
+	if (mysqlconn->fakebinds) {
+		return true;
+	}
+
+	// store inbindcount here, otherwise if rebinding/reexecution occurs and
+	// the client tries to bind more variables than were defined when the
+	// query was prepared, it would cause the inputBind methods to attempt
+	// to address beyond the end of the various arrays
+	bindcount=inbindcount;
+
+	// reset bind counter
+	bindcounter=0;
+
+	return !mysql_stmt_prepare(stmt,query,length);
+}
+
+bool mysqlcursor::inputBindString(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint16_t valuesize,
+						int16_t *isnull) {
+printf("inputBindString...\n");
+
+	if (mysqlconn->fakebinds) {
+		return true;
+	}
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvaluesize[bindcounter]=valuesize;
+
+	rawbuffer::zero(&bind[bindcounter],sizeof(MYSQL_BIND));
+	if (*isnull) {
+printf("is null\n");
+		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
+		bind[bindcounter].buffer=(void *)NULL;
+		bind[bindcounter].buffer_length=0;
+		bind[bindcounter].length=0;
+	} else {
+printf("not null\n");
+		bind[bindcounter].buffer_type=MYSQL_TYPE_STRING;
+		bind[bindcounter].buffer=(void *)value;
+		bind[bindcounter].buffer_length=valuesize;
+		bind[bindcounter].length=&bindvaluesize[bindcounter];
+	}
+	bind[bindcounter].is_null=(my_bool *)isnull;
+
+	return !mysql_stmt_bind_param(stmt,&bind[bindcounter++]);
+}
+
+bool mysqlcursor::inputBindInteger(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value) {
+printf("inputBindInteger...\n");
+
+	if (mysqlconn->fakebinds) {
+		return true;
+	}
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvaluesize[bindcounter]=sizeof(int64_t);
+
+	rawbuffer::zero(&bind[bindcounter],sizeof(MYSQL_BIND));
+	if (*isnull) {
+printf("is null\n");
+		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
+		bind[bindcounter].buffer=(void *)NULL;
+		bind[bindcounter].buffer_length=0;
+		bind[bindcounter].length=0;
+	} else {
+printf("not null\n");
+		bind[bindcounter].buffer_type=MYSQL_TYPE_LONGLONG;
+		bind[bindcounter].buffer=(void *)value;
+		bind[bindcounter].buffer_length=sizeof(int64_t);
+		bind[bindcounter].length=&bindvaluesize[bindcounter];
+	}
+	bind[bindcounter].is_null=(my_bool *)isnull;
+
+	return !mysql_stmt_bind_param(stmt,&bind[bindcounter++]);
+}
+
+bool mysqlcursor::inputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t precision,
+						uint32_t scale) {
+printf("inputBindDouble...\n");
+
+	if (mysqlconn->fakebinds) {
+		return true;
+	}
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvaluesize[bindcounter]=sizeof(double);
+
+	rawbuffer::zero(&bind[bindcounter],sizeof(MYSQL_BIND));
+	if (*isnull) {
+		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
+		bind[bindcounter].buffer=(void *)NULL;
+		bind[bindcounter].buffer_length=0;
+		bind[bindcounter].length=0;
+	} else {
+		bind[bindcounter].buffer_type=MYSQL_TYPE_DOUBLE;
+		bind[bindcounter].buffer=(void *)value;
+		bind[bindcounter].buffer_length=sizeof(double);
+		bind[bindcounter].length=&bindvaluesize[bindcounter];
+	}
+	bind[bindcounter].is_null=(my_bool *)isnull;
+
+	return !mysql_stmt_bind_param(stmt,&bind[bindcounter++]);
+}
+
+bool mysqlcursor::inputBindBlob(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint32_t valuesize,
+						int16_t *isnull) {
+printf("inputBindBlob...\n");
+
+	if (mysqlconn->fakebinds) {
+		return true;
+	}
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvaluesize[bindcounter]=valuesize;
+
+	rawbuffer::zero(&bind[bindcounter],sizeof(MYSQL_BIND));
+	if (*isnull) {
+		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
+		bind[bindcounter].buffer=(void *)NULL;
+		bind[bindcounter].buffer_length=0;
+		bind[bindcounter].length=0;
+	} else {
+		bind[bindcounter].buffer_type=MYSQL_TYPE_LONG_BLOB;
+		bind[bindcounter].buffer=(void *)value;
+		bind[bindcounter].buffer_length=valuesize;
+		bind[bindcounter].length=&bindvaluesize[bindcounter];
+	}
+	bind[bindcounter].is_null=(my_bool *)isnull;
+
+	return !mysql_stmt_bind_param(stmt,&bind[bindcounter++]);
+}
+
+bool mysqlcursor::inputBindClob(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint32_t valuesize,
+						int16_t *isnull) {
+printf("inputBindClob...\n");
+	return inputBindBlob(variable,variablesize,value,valuesize,isnull);
+}
+#endif
 
 bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
@@ -180,6 +393,49 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 	// initialize counts
 	ncols=0;
 	nrows=0;
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
+
+	// prepare the query if necessary
+	if (mysqlconn->fakebinds) {
+		if (mysql_stmt_prepare(stmt,query,length)) {
+			return false;
+		}
+	}
+
+	// execute the query
+	if ((queryresult=mysql_stmt_execute(stmt))) {
+		return false;
+	}
+
+	checkForTempTable(query,length);
+	
+	// get the affected row count
+	affectedrows=mysql_stmt_affected_rows(stmt);
+
+	// get the column count
+	ncols=mysql_stmt_field_count(stmt);
+
+	// get the metadata
+	mysqlresult=NULL;
+	if (ncols) {
+		mysqlresult=mysql_stmt_result_metadata(stmt);
+	}
+
+	// bind the fields
+	if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
+		return false;
+	}
+
+	// get the row count
+	nrows=mysql_stmt_num_rows(stmt);
+
+	// store the result set
+	if (nrows && mysql_stmt_store_result(stmt)) {
+		return false;
+	}
+
+#else
 
 	// initialize result set
 	mysqlresult=NULL;
@@ -213,6 +469,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 
 	// get the row count
 	nrows=mysql_num_rows(mysqlresult);
+#endif
 
 	return true;
 }
@@ -220,7 +477,11 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 const char *mysqlcursor::errorMessage(bool *liveconnection) {
 
 	*liveconnection=true;
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	const char	*err=mysql_stmt_error(stmt);
+#else
 	const char	*err=mysql_error(&mysqlconn->mysql);
+#endif
 #if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
 		defined(HAVE_MYSQL_CR_SERVER_LOST) 
 	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
@@ -251,6 +512,7 @@ uint32_t mysqlcursor::colCount() {
 }
 
 const char * const * mysqlcursor::columnNames() {
+	mysql_field_seek(mysqlresult,0);
 	columnnames=new char *[ncols];
 	for (unsigned int i=0; i<ncols; i++) {
 		columnnames[i]=mysql_fetch_field(mysqlresult)->name;
@@ -448,27 +710,51 @@ bool mysqlcursor::skipRow() {
 }
 
 bool mysqlcursor::fetchRow() {
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	return !mysql_stmt_fetch(stmt);
+#else
 	return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL);
+#endif
 }
 
 void mysqlcursor::returnRow() {
 
 	for (unsigned int col=0; col<ncols; col++) {
-
+#ifdef HAVE_MYSQL_STMT_PREPARE
+		if (!isnull[col]) {
+			conn->sendField(field[col],fieldlength[col]);
+		} else {
+			conn->sendNullField();
+		}
+#else
 		if (mysqlrow[col]) {
 			conn->sendField(mysqlrow[col],
 					charstring::length(mysqlrow[col]));
 		} else {
 			conn->sendNullField();
 		}
+#endif
 	}
 }
 
 void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	if (freebinds) {
+		mysql_stmt_reset(stmt);
+	}
+	if (freeresult) {
+		mysql_stmt_free_result(stmt);
+		if (mysqlresult) {
+			mysql_free_result(mysqlresult);
+			mysqlresult=NULL;
+		}
+	}
+#else
 	if (freeresult && mysqlresult!=(MYSQL_RES *)NULL) {
 		mysql_free_result(mysqlresult);
 		mysqlresult=NULL;
 	}
+#endif
 	delete[] columnnames;
 	columnnames=NULL;
 }
