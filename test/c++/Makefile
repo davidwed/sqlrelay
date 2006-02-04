@@ -26,7 +26,8 @@ ifneq ($(strip $(MSQLLIBS)),)
 	$(MAKE) msql
 endif
 ifneq ($(strip $(MYSQLLIBS)),)
-	$(MAKE) mysql
+	$(MAKE) mysql40
+	$(MAKE) mysql41
 endif
 ifneq ($(strip $(ORACLELIBS)),)
 	$(MAKE) oracle7
@@ -57,8 +58,11 @@ interbase: interbase.C interbase.lo
 msql: msql.C msql.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ msql.lo $(LIBS)
 
-mysql: mysql.C mysql.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
+mysql40: mysql40.C mysql40.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql40.lo $(LIBS)
+
+mysql41: mysql41.C mysql41.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql41.lo $(LIBS)
 
 oracle7: oracle7.C oracle7.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle7.lo $(LIBS)
@@ -97,7 +101,8 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) freetds
 	$(LIBTOOL) --mode=clean $(RM) interbase
 	$(LIBTOOL) --mode=clean $(RM) msql
-	$(LIBTOOL) --mode=clean $(RM) mysql
+	$(LIBTOOL) --mode=clean $(RM) mysql40
+	$(LIBTOOL) --mode=clean $(RM) mysql41
 	$(LIBTOOL) --mode=clean $(RM) oracle7
 	$(LIBTOOL) --mode=clean $(RM) oracle8
 	$(LIBTOOL) --mode=clean $(RM) oracle8iclobfetch
