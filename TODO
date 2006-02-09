@@ -4,10 +4,10 @@ mysql 4.1.2:
 	non c++ tests
 
 mysql 5.x
+	implement clob/blob output bind vars
 	test stored procedures
+	test output binds
 	document using stored procedures
-	test output binds (how with 4.1.2?)
-	clob/blob output bind vars
 
 postgresql/mysql connetions shouldn't try to use bind variables against older
 	database versions
