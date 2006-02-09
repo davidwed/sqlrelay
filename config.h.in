@@ -67,9 +67,6 @@
 /* MySQL supports mysql_ping */
 #undef HAVE_MYSQL_PING
 
-/* MySQL supports mysql_prepare */
-#undef HAVE_MYSQL_PREPARE
-
 /* MySQL supports mysql_real_connect */
 #undef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 
@@ -78,6 +75,9 @@
 
 /* MySQL supports mysql_select_db */
 #undef HAVE_MYSQL_SELECT_DB
+
+/* MySQL supports mysql_stmt_prepare */
+#undef HAVE_MYSQL_STMT_PREPARE
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 #undef HAVE_NDIR_H

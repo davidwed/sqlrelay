@@ -656,7 +656,7 @@ this by not requesting the affected row count and just returning -1 if it's
 compiled against FreeTDS&lt;0.53.</li>
 <li>Bind variables are unsupported.  The ct_param and ct_setparam functions
 simply don't exist in FreeTDS ctlib.  SQL Relay handles this by faking input 
-bind variables in the same manner that the MySQL, mSQL, SQLite and
+bind variables in the same manner that the mSQL, SQLite and
 MDB Tools connections do.</li>
 <li>FLOAT, NUMERIC and DECIMAL datatypes are all represented as FLOAT 
 datatypes.  There doesn't appear to be any workaround for this.</li>

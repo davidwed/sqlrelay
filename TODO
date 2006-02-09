@@ -1,30 +1,25 @@
---------------------------------------------------------------------------------
-
-solaris 8:
-	libgcc_s not found
-
-solaris 9:
-	tries to look in /opt/sfw/lib/mysql/.libs for libmysqlclient
-		(libtool looks in .libs if -Lpath doesn't end in lib)
-		but it works on other platforms...?
-		links fine, works after manually modifying config.mk to
-		link directly against the .so file
-
-openbsd-3.8
-	handoff="pass" doesn't work
-
-cygwin
-	handoff="pass" doesn't work
-
-php debug doesn't print out numbers because zend_printf doesn't support %ld's
-
-interbase fails float output bind test, prec/scale issue?
-
-Tru64 -
-	unix sockets don't work, looks like a byte-order translation issue
-	can't start more than 1 cursor, looks like out-of-memory
-
 perl apis -> CPAN
+
+mysql 4.1.2:
+	non c++ tests
+
+mysql 5.x
+	test stored procedures
+	document using stored procedures
+	test output binds (how with 4.1.2?)
+	clob/blob output bind vars
+
+postgresql/mysql connetions shouldn't try to use bind variables against older
+	database versions
+
+implement interbase dead-db/relogin
+
+query filtering
+
+query/fields cmdline tools need a timeout option
+
+need a "relay ping" method that tries to connect to the SQL Relay
+		server and returns true/false if that was possible or not
 
 get sid working, document
 	how to:
@@ -62,6 +57,32 @@ get sid working, document
 
 			sidlog - every query is logged here with a message
 					about it
+
+--------------------------------------------------------------------------------
+
+solaris 8:
+	libgcc_s not found
+
+solaris 9:
+	tries to look in /opt/sfw/lib/mysql/.libs for libmysqlclient
+		(libtool looks in .libs if -Lpath doesn't end in lib)
+		but it works on other platforms...?
+		links fine, works after manually modifying config.mk to
+		link directly against the .so file
+
+openbsd-3.8
+	handoff="pass" doesn't work
+
+cygwin
+	handoff="pass" doesn't work
+
+php debug doesn't print out numbers because zend_printf doesn't support %ld's
+
+interbase fails float output bind test, prec/scale issue?
+
+Tru64 -
+	unix sockets don't work, looks like a byte-order translation issue
+	can't start more than 1 cursor, looks like out-of-memory
 
 setting backlog:
 	linux:
@@ -117,7 +138,7 @@ Tests:
 	oldmysql test files for non-C++ api's
 
 cygwin:
-	mysql connection crashes on function call
+	how to use with non-cygwin dll's?
 	how to install as a service?
 	languages:
 		VB wrapper
@@ -148,10 +169,7 @@ cygwin:
 		add path to mysql dll to PATH
 
 Compatibility:
-	* implement interbase dead-db/relogin
-	* support libmysqlclient_r
 	* daemontools
-	* mysql 4.1, 5.0 - bind vars
 	* rename interbase stuff firebird
 	* figure out how to get the drop-in client compiled into the mysql PHP
 		module like the mysql native client is
@@ -233,7 +251,8 @@ Features:
 	* postgresql drop-in api lacks many features
 	* postgresql drop-in needs to parse out ; delimited queries for db's
 		that don't support that, execute them seperately
-	* mysql drop-in api lacks a few features
+	* mysql drop-in api lacks a few features, stmt functions need
+		to be updated
 	* sybase/freetds (possibly others) need options for setting chained
 		mode and isolation mode when client connects
 	datatype support:
@@ -245,13 +264,11 @@ Features:
 		handle timestamps
 		handle enum types in mysql
 	front end replication
-	query filtering
 	quotas
 	logging
 	handle commit/rollback for named transactions
 	implement API's that handle errors with exceptions
 	better transaction handling for postgresql
-	query/fields cmdline tools need a timeout option
 	odbc connection should check the odbc definition
 		for connect string arguments - SQLBrowseConnect
 	solaris init script
@@ -263,8 +280,6 @@ Features:
 		auto-commit mode.  For postgresql at least, this is expensive.
 		It should only call commit/rollback if the database isn't in
 		auto-commit mode.
-	need a "relay ping" method that tries to connect to the SQL Relay
-		server and returns true/false if that was possible or not
 
 Availability:
 	connections should ping database server every so often to make sure
@@ -318,6 +333,7 @@ Native DB Support:
 	LK bin DB - http://www.lksoft.cjb.net/en/
 	Cache - http://intersystems.com
 	Frontbase
+	J-stels - stelsdbf, stelscsv (http://www.csv-jdbc.com/)
 
 Config Tools:
 	gtk2

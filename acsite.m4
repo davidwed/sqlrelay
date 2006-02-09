@@ -940,11 +940,11 @@ AC_DEFUN([FW_CHECK_MYSQL_FUNCTIONS],
 
 	AC_MSG_CHECKING(for mysql_autocommit)
 	FW_TRY_LINK([#include <mysql.h>
-#include <stdlib.h>],[mysql_autocommit(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_AUTOCOMMIT,1,MySQL supports mysql_autocommit)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[mysql_autocommit(NULL,0);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_AUTOCOMMIT,1,MySQL supports mysql_autocommit)],[AC_MSG_RESULT(no)])
 
 	AC_MSG_CHECKING(for mysql_prepare)
 	FW_TRY_LINK([#include <mysql.h>
-#include <stdlib.h>],[mysql_prepare(NULL,NULL,0);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_PREPARE,1,MySQL supports mysql_prepare)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[mysql_stmt_prepare(NULL,NULL,0);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_STMT_PREPARE,1,MySQL supports mysql_stmt_prepare)],[AC_MSG_RESULT(no)])
 
 	AC_MSG_CHECKING(for CR_SERVER_GONE_ERROR)
 	FW_TRY_LINK([#include <mysql.h>

@@ -22805,7 +22805,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-mysql_autocommit(NULL);
+mysql_autocommit(NULL,0);
   ;
   return 0;
 }
@@ -22874,7 +22874,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-mysql_prepare(NULL,NULL,0);
+mysql_stmt_prepare(NULL,NULL,0);
   ;
   return 0;
 }
@@ -22904,7 +22904,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6;
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_MYSQL_PREPARE 1
+#define HAVE_MYSQL_STMT_PREPARE 1
 _ACEOF
 
 else
@@ -34483,7 +34483,7 @@ RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
 
 
 
-SQLR_VERSION="0.37"
+SQLR_VERSION="0.38"
 
 
 cat >>confdefs.h <<_ACEOF

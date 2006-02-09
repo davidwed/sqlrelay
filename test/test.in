@@ -40,19 +40,19 @@ then
 	sudo $INITDIR/msql start
 	sudo sqlr-start -id msqltest
 fi
-if ( test "$DB" = "mysql40" )
+if ( test "$DB" = "mysql3" )
 then
-	ARGS="localhost 8006 \"\" mysql40test mysql40test"
-	PHPARGS="host=localhost&port=8006&socket=&user=mysql40test&password=mysql40test"
+	ARGS="localhost 8006 \"\" mysql3test mysql3test"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysql3test&password=mysql3test"
 	sudo $INITDIR/mysqld start
-	sudo sqlr-start -id mysql40test
+	sudo sqlr-start -id mysql3test
 fi
-if ( test "$DB" = "mysql41" )
+if ( test "$DB" = "mysql412" )
 then
-	ARGS="localhost 8006 \"\" mysql41test mysql41test"
-	PHPARGS="host=localhost&port=8006&socket=&user=mysql41test&password=mysql41test"
+	ARGS="localhost 8006 \"\" mysql412test mysql412test"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysql412test&password=mysql412test"
 	sudo $INITDIR/mysqld start
-	sudo sqlr-start -id mysql41test
+	sudo sqlr-start -id mysql412test
 fi
 if ( test "$DB" = "oracle7" )
 then
@@ -239,11 +239,11 @@ if ( test "$DB" = "msql" )
 then
 	sudo $INITDIR/msql stop
 fi
-if ( test "$DB" = "mysql40" )
+if ( test "$DB" = "mysql3" )
 then
 	sudo $INITDIR/mysqld stop
 fi
-if ( test "$DB" = "mysql41" )
+if ( test "$DB" = "mysql412" )
 then
 	sudo $INITDIR/mysqld stop
 fi

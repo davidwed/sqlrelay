@@ -215,11 +215,9 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	bindformats=NULL;
 
 	// create new bind arrays
-	if (bindcount) {
-		bindvalues=new char *[bindcount];
-		bindlengths=new int[bindcount];
-		bindformats=new int[bindcount];
-	}
+	bindvalues=new char *[bindcount];
+	bindlengths=new int[bindcount];
+	bindformats=new int[bindcount];
 
 	// remove this named statement, if it exists already
 	if (deallocatestatement) {

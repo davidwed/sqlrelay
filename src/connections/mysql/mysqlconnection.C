@@ -228,6 +228,9 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// reset bind counter
 	bindcounter=0;
 
+	// re-init bind buffers
+	rawbuffer::zero(&bind,sizeof(bind));
+
 	return !mysql_stmt_prepare(stmt,query,length);
 }
 
@@ -236,7 +239,6 @@ bool mysqlcursor::inputBindString(const char *variable,
 						const char *value, 
 						uint16_t valuesize,
 						int16_t *isnull) {
-printf("inputBindString...\n");
 
 	if (mysqlconn->fakebinds) {
 		return true;
@@ -250,30 +252,26 @@ printf("inputBindString...\n");
 
 	bindvaluesize[bindcounter]=valuesize;
 
-	rawbuffer::zero(&bind[bindcounter],sizeof(MYSQL_BIND));
 	if (*isnull) {
-printf("is null\n");
 		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
 		bind[bindcounter].buffer=(void *)NULL;
 		bind[bindcounter].buffer_length=0;
 		bind[bindcounter].length=0;
 	} else {
-printf("not null\n");
 		bind[bindcounter].buffer_type=MYSQL_TYPE_STRING;
 		bind[bindcounter].buffer=(void *)value;
 		bind[bindcounter].buffer_length=valuesize;
 		bind[bindcounter].length=&bindvaluesize[bindcounter];
 	}
 	bind[bindcounter].is_null=(my_bool *)isnull;
+	bindcounter++;
 
-	return !mysql_stmt_bind_param(stmt,&bind[bindcounter++]);
+	return true;
 }
 
 bool mysqlcursor::inputBindInteger(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value) {
-printf("inputBindInteger...\n");
-
 	if (mysqlconn->fakebinds) {
 		return true;
 	}
@@ -286,23 +284,21 @@ printf("inputBindInteger...\n");
 
 	bindvaluesize[bindcounter]=sizeof(int64_t);
 
-	rawbuffer::zero(&bind[bindcounter],sizeof(MYSQL_BIND));
 	if (*isnull) {
-printf("is null\n");
 		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
 		bind[bindcounter].buffer=(void *)NULL;
 		bind[bindcounter].buffer_length=0;
 		bind[bindcounter].length=0;
 	} else {
-printf("not null\n");
 		bind[bindcounter].buffer_type=MYSQL_TYPE_LONGLONG;
 		bind[bindcounter].buffer=(void *)value;
 		bind[bindcounter].buffer_length=sizeof(int64_t);
 		bind[bindcounter].length=&bindvaluesize[bindcounter];
 	}
 	bind[bindcounter].is_null=(my_bool *)isnull;
+	bindcounter++;
 
-	return !mysql_stmt_bind_param(stmt,&bind[bindcounter++]);
+	return true;
 }
 
 bool mysqlcursor::inputBindDouble(const char *variable, 
@@ -310,7 +306,6 @@ bool mysqlcursor::inputBindDouble(const char *variable,
 						double *value,
 						uint32_t precision,
 						uint32_t scale) {
-printf("inputBindDouble...\n");
 
 	if (mysqlconn->fakebinds) {
 		return true;
@@ -324,7 +319,6 @@ printf("inputBindDouble...\n");
 
 	bindvaluesize[bindcounter]=sizeof(double);
 
-	rawbuffer::zero(&bind[bindcounter],sizeof(MYSQL_BIND));
 	if (*isnull) {
 		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
 		bind[bindcounter].buffer=(void *)NULL;
@@ -337,8 +331,9 @@ printf("inputBindDouble...\n");
 		bind[bindcounter].length=&bindvaluesize[bindcounter];
 	}
 	bind[bindcounter].is_null=(my_bool *)isnull;
+	bindcounter++;
 
-	return !mysql_stmt_bind_param(stmt,&bind[bindcounter++]);
+	return true;
 }
 
 bool mysqlcursor::inputBindBlob(const char *variable, 
@@ -346,7 +341,6 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
-printf("inputBindBlob...\n");
 
 	if (mysqlconn->fakebinds) {
 		return true;
@@ -360,7 +354,6 @@ printf("inputBindBlob...\n");
 
 	bindvaluesize[bindcounter]=valuesize;
 
-	rawbuffer::zero(&bind[bindcounter],sizeof(MYSQL_BIND));
 	if (*isnull) {
 		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
 		bind[bindcounter].buffer=(void *)NULL;
@@ -373,8 +366,9 @@ printf("inputBindBlob...\n");
 		bind[bindcounter].length=&bindvaluesize[bindcounter];
 	}
 	bind[bindcounter].is_null=(my_bool *)isnull;
+	bindcounter++;
 
-	return !mysql_stmt_bind_param(stmt,&bind[bindcounter++]);
+	return true;
 }
 
 bool mysqlcursor::inputBindClob(const char *variable, 
@@ -382,8 +376,91 @@ bool mysqlcursor::inputBindClob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
-printf("inputBindClob...\n");
 	return inputBindBlob(variable,variablesize,value,valuesize,isnull);
+}
+
+bool mysqlcursor::outputBindString(const char *variable, 
+						uint16_t variablesize,
+						char *value,
+						uint16_t valuesize,
+						int16_t *isnull) {
+
+	if (mysqlconn->fakebinds) {
+		return false;
+	}
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvaluesize[bindcounter]=valuesize;
+
+	bind[bindcounter].buffer_type=MYSQL_TYPE_STRING;
+	bind[bindcounter].buffer=(void *)value;
+	bind[bindcounter].buffer_length=valuesize;
+	bind[bindcounter].length=&bindvaluesize[bindcounter];
+	bind[bindcounter].is_null=(my_bool *)isnull;
+	bindcounter++;
+
+	return true;
+}
+
+bool mysqlcursor::outputBindInteger(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull) {
+
+	if (mysqlconn->fakebinds) {
+		return false;
+	}
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvaluesize[bindcounter]=sizeof(int64_t);
+
+	bind[bindcounter].buffer_type=MYSQL_TYPE_LONGLONG;
+	bind[bindcounter].buffer=(void *)value;
+	bind[bindcounter].buffer_length=sizeof(int64_t);
+	bind[bindcounter].length=&bindvaluesize[bindcounter];
+	bind[bindcounter].is_null=(my_bool *)isnull;
+	bindcounter++;
+
+	return true;
+}
+
+bool mysqlcursor::outputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull) {
+
+	if (mysqlconn->fakebinds) {
+		return false;
+	}
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvaluesize[bindcounter]=sizeof(double);
+
+	bind[bindcounter].buffer_type=MYSQL_TYPE_STRING;
+	bind[bindcounter].buffer=(void *)value;
+	bind[bindcounter].buffer_length=sizeof(double);
+	bind[bindcounter].length=&bindvaluesize[bindcounter];
+	bind[bindcounter].is_null=(my_bool *)isnull;
+	bindcounter++;
+
+	return true;
 }
 #endif
 
@@ -396,9 +473,13 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 
-	// prepare the query if necessary
+	// handle binds, fake or real
 	if (mysqlconn->fakebinds) {
 		if (mysql_stmt_prepare(stmt,query,length)) {
+			return false;
+		}
+	} else {
+		if (bindcounter && mysql_stmt_bind_param(stmt,bind)) {
 			return false;
 		}
 	}
@@ -427,13 +508,13 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 		return false;
 	}
 
-	// get the row count
-	nrows=mysql_stmt_num_rows(stmt);
-
 	// store the result set
-	if (nrows && mysql_stmt_store_result(stmt)) {
+	if (mysql_stmt_store_result(stmt)) {
 		return false;
 	}
+
+	// get the row count
+	nrows=mysql_stmt_num_rows(stmt);
 
 #else
 
@@ -740,6 +821,8 @@ void mysqlcursor::returnRow() {
 void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (freebinds) {
+		bindcounter=0;
+		rawbuffer::zero(&bind,sizeof(bind));
 		mysql_stmt_reset(stmt);
 	}
 	if (freeresult) {

@@ -201,7 +201,7 @@ for more info on this parameter)</li>
 <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 </ul>
 </li>
-<li>For <b>mysql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;socket=SOCKET;"
+<li>For <b>mysql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;socket=SOCKET;fakebinds=FAKEBINDS"
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the
 database.  Required.</li>
@@ -214,6 +214,16 @@ Optional, defaults to 3306.</li>
 <li><b>socket</b>: The unix socket to connect to.  Optional if host and/or port
 are specified.  Overrides host/port.  host and port are optional if socket is
 specified.</li>
+<li><b>fakebinds</b>: MySQL 4.1.2 supports bind variables natively.  Versions
+prior to 4.1.2 did not, and SQL Relay had to substitute the values of bind
+variables into the query itself (fake binds).  In MySQL 4.1.2, bind variables
+are identified by ?'s in the query, while in versions prior to 4.1.2, bind
+variables are identified by :var1, :var2, :var3, etc.  Converting queries
+and code which was written to use the older syntax to use MySQL 4.1.2 syntax
+can be a lot of work, so this parameter is provided to make code which was
+written to run against older versions of MySQL work against MySQL 4.1.2.  This
+parameter may be set to "yes" (meaning allow only older syntax and fake binds)
+or "no" (meaning only allow MySQL 4.1.2 syntax and use native binds).</li>
 </ul>
 </li>
 <li>For <b>msql</b> databases, the connect string syntax is "host=HOST;db=DB;"

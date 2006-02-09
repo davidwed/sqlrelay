@@ -137,11 +137,16 @@ procedural code that manufactures a result set.</p>
 <span class="heading2">What if my database doesn't support bind variables?</span><br><br>
 
 <p>The <b>SQL Relay</b> connection daemon will fake input binds for database 
-API's which don't natively support binds.  Currently those are the mSQL, MySQL, 
-PostgreSQL, SQLite, FreeTDS and MDB Tools connections.  You can use either
-Oracle style or DB2/Interbase style bind variables with those databases, except
-for FreeTDS which requires either Sybase/MS SQL Server style bind variables.  
-Output binds are not supported for these databases.</p>
+API's which don't natively support binds.  Currently those are the mSQL,
+SQLite, FreeTDS and MDB Tools connections.  Postgresql 8 and MySQL 4.1.2
+support bind variables but older versions do not.  <b>SQL Relay</b> fakes
+input binds for versions of Postgresql and MySQL that don't support them.
+For versions that do, the "fakebinds" connect string parameter can be used to
+force <b>SQL Relay</b> to fake binds rather than using the database's built-in
+support.  You can use either Oracle style or DB2/Interbase style bind variables
+with those databases, except for FreeTDS which requires either
+Sybase/MS SQL Server style bind variables.  Output binds are not supported for
+these databases.</p>
 
 <p>When using a database for which <b>SQL Relay</b> fakes bind variables, you 
 should make sure not to pass the wrong type of data into a bind variable.  For 
