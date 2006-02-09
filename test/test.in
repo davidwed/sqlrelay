@@ -54,6 +54,13 @@ then
 	sudo $INITDIR/mysqld start
 	sudo sqlr-start -id mysql412test
 fi
+if ( test "$DB" = "mysql5" )
+then
+	ARGS="localhost 8006 \"\" mysql5test mysql5test"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysql5test&password=mysql5test"
+	sudo $INITDIR/mysqld start
+	sudo sqlr-start -id mysql5test
+fi
 if ( test "$DB" = "oracle7" )
 then
 	ARGS="localhost 8008 \"\" oracle7test oracle7test"
@@ -244,6 +251,10 @@ then
 	sudo $INITDIR/mysqld stop
 fi
 if ( test "$DB" = "mysql412" )
+then
+	sudo $INITDIR/mysqld stop
+fi
+if ( test "$DB" = "mysql5" )
 then
 	sudo $INITDIR/mysqld stop
 fi
