@@ -14,6 +14,8 @@ routerconnection::routerconnection() : sqlrconnection_svr() {
 	concount=0;
 	cfgfile=NULL;
 	justloggedin=false;
+	nullbindvalue=nullBindValue();
+	nonnullbindvalue=nonNullBindValue();
 
 	beginregex.compile("^\\s*begin");
 	beginregex.study();
@@ -188,8 +190,10 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	curs=new sqlrcursor *[routerconn->concount];
 	for (uint16_t index=0; index<routerconn->concount; index++) {
 		curs[index]=new sqlrcursor(routerconn->cons[index]);
+		curs[index]->setResultSetBufferSize(FETCH_AT_ONCE);
 	}
 	beginquery=false;
+	obcount=0;
 }
 
 routercursor::~routercursor() {
@@ -223,7 +227,6 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 		while (ren && !cur) {
 			if (ren->getData()->match(query)) {
 				cur=curs[conindex];
-				cur->setResultSetBufferSize(FETCH_AT_ONCE);
 			}
 			ren=ren->getNext();
 		}
@@ -240,6 +243,9 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// connection turned out to be the right one
 	cur->prepareQuery(query);
 
+	// initialize the output bind count
+	obcount=0;
+
 	return true;
 }
 
@@ -248,14 +254,14 @@ bool routercursor::inputBindString(const char *variable,
 						const char *value, 
 						uint16_t valuesize,
 						int16_t *isnull) {
-	cur->inputBind(variable,value);
+	cur->inputBind(variable+1,value);
 	return true;
 }
 
 bool routercursor::inputBindInteger(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value) {
-	cur->inputBind(variable,*value);
+	cur->inputBind(variable+1,*value);
 	return true;
 }
 
@@ -264,7 +270,7 @@ bool routercursor::inputBindDouble(const char *variable,
 						double *value,
 						uint32_t precision,
 						uint32_t scale) {
-	cur->inputBind(variable,*value,precision,scale);
+	cur->inputBind(variable+1,*value,precision,scale);
 	return true;
 }
 
@@ -273,7 +279,7 @@ bool routercursor::inputBindBlob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
-	cur->inputBindBlob(variable,value,valuesize);
+	cur->inputBindBlob(variable+1,value,valuesize);
 	return true;
 }
 
@@ -282,30 +288,151 @@ bool routercursor::inputBindClob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
-	cur->inputBindClob(variable,value,valuesize);
+	cur->inputBindClob(variable+1,value,valuesize);
 	return true;
 }
 
-// FIXME: output binds
+bool routercursor::outputBindString(const char *variable, 
+						uint16_t variablesize,
+						char *value,
+						uint16_t valuesize,
+						int16_t *isnull) {
+	cur->defineOutputBindString(variable+1,valuesize);
+	obv[obcount].variable=variable;
+	obv[obcount].type=STRING_BIND;
+	obv[obcount].value.stringvalue=value;
+	obv[obcount].valuesize=valuesize;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindInteger(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull) {
+	cur->defineOutputBindInteger(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=INTEGER_BIND;
+	obv[obcount].value.intvalue=value;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull) {
+	cur->defineOutputBindDouble(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=DOUBLE_BIND;
+	obv[obcount].value.doublevalue=value;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindBlob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull) {
+	cur->defineOutputBindBlob(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=BLOB_BIND;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindClob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull) {
+	cur->defineOutputBindClob(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=CLOB_BIND;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindCursor(const char *variable,
+						uint16_t variablesize,
+						sqlrcursor_svr *cursor) {
+	cur->defineOutputBindCursor(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=CURSOR_BIND;
+	obcount++;
+	return true;
+}
+
+void routercursor::returnOutputBindBlob(uint16_t index) {
+	const char	*varname=obv[index].variable;
+	uint32_t	length=cur->getOutputBindLength(varname);
+	conn->startSendingLong(length);
+	conn->sendLongSegment(cur->getOutputBindBlob(varname),length);
+	conn->endSendingLong();
+}
+
+void routercursor::returnOutputBindClob(uint16_t index) {
+	const char	*varname=obv[index].variable;
+	uint32_t	length=cur->getOutputBindLength(varname);
+	conn->startSendingLong(length);
+	conn->sendLongSegment(cur->getOutputBindClob(varname),length);
+	conn->endSendingLong();
+}
 
 bool routercursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 	if (!execute) {
 		return true;
 	}
+
 	if (beginquery) {
 		return begin(query,length);
 	}
+
 	if (!cur) {
 		if (!prepareQuery(query,length)) {
 			return false;
 		}
 	}
-	if (cur && cur->executeQuery()) {
-		nextrow=0;
-		return true;
+
+	if (!cur || !cur->executeQuery()) {
+		return false;
 	}
-	return false;
+
+	nextrow=0;
+
+	// populate output bind values
+	for (uint16_t index=0; index<obcount; index++) {
+		const char	*variable=obv[index].variable;
+		*(obv[index].isnull)=routerconn->nonnullbindvalue;
+		switch(obv[index].type) {
+			case STRING_BIND:
+				obv[index].value.stringvalue=
+					cur->getOutputBindString(variable);
+				if (!obv[index].value.stringvalue) {
+					*(obv[index].isnull)=
+						routerconn->nullbindvalue;
+				} 
+				break;
+			case INTEGER_BIND:
+				*(obv[index].value.intvalue)=
+					cur->getOutputBindInteger(variable);
+				break;
+			case DOUBLE_BIND:
+				*(obv[index].value.doublevalue)=
+					cur->getOutputBindDouble(variable);
+				break;
+			default:
+				break;
+		}
+	}
+	return true;
 }
 
 bool routercursor::begin(const char *query, uint32_t length) {
@@ -417,5 +544,10 @@ void routercursor::returnRow() {
 }
 
 void routercursor::cleanUpData(bool freeresult, bool freebinds) {
-	cur=NULL;
+	if (freebinds) {
+		if (cur) {
+			cur->clearBinds();
+		}
+		obcount=0;
+	}
 }

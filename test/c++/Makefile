@@ -44,6 +44,9 @@ endif
 ifneq ($(strip $(SYBASELIBS)),)
 	$(MAKE) sybase
 endif
+ifeq ($(ENABLE_ROUTER),yes)
+	$(MAKE) router
+endif
 
 db2: db2.C db2.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db2.lo $(LIBS)
@@ -90,6 +93,9 @@ sqlite: sqlite.C sqlite.lo
 sybase: sybase.C sybase.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sybase.lo $(LIBS)
 
+router: router.C router.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ router.lo $(LIBS)
+
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
@@ -108,6 +114,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) postgresql8
 	$(LIBTOOL) --mode=clean $(RM) sqlite
 	$(LIBTOOL) --mode=clean $(RM) sybase
+	$(LIBTOOL) --mode=clean $(RM) router
 	$(RM) cachefile*
 	$(RM) sqlnet.log
 	$(RMTREE) .libs

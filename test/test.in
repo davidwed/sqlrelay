@@ -114,6 +114,17 @@ then
 	sleep 5
 	sudo sqlr-start -id sybasetest
 fi
+if ( test "$DB" = "router" )
+then
+	ARGS="localhost 9000 \"\" pgsqlrouter pgsqlrouter"
+	PHPARGS="localhost 9000 \"\" pgsqlrouter pgsqlrouter"
+	PHPARGS="host=localhost&port=9000&socket=&user=pgsqlrouter&password=pgsqlrouter"
+	sudo $INITDIR/postgresql start
+	sleep 5
+	sudo sqlr-start -id pgsqldb1
+	sudo sqlr-start -id pgsqldb2
+	sudo sqlr-start -id pgsqlrouter
+fi
 
 
 if ( test "$API" = "c" -o -z "$API" )
@@ -274,4 +285,8 @@ fi
 if ( test "$DB" = "sybase" )
 then
 	sudo $INITDIR/sybase stop
+fi
+if ( test "$DB" = "router" )
+then
+	sudo $INITDIR/postgresql stop
 fi
