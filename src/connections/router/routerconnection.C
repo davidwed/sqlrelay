@@ -11,6 +11,8 @@
 
 routerconnection::routerconnection() : sqlrconnection_svr() {
 	cons=NULL;
+	beginquery=NULL;
+	anymustbegin=false;
 	concount=0;
 	cfgfile=NULL;
 	justloggedin=false;
@@ -19,6 +21,8 @@ routerconnection::routerconnection() : sqlrconnection_svr() {
 
 	beginregex.compile("^\\s*begin");
 	beginregex.study();
+	beginendregex.compile("^\\s*begin\\s*.*\\s*end;\\s*$");
+	beginendregex.study();
 }
 
 routerconnection::~routerconnection() {
@@ -26,6 +30,7 @@ routerconnection::~routerconnection() {
 		delete cons[index];
 	}
 	delete[] cons;
+	delete[] beginquery;
 }
 
 uint16_t routerconnection::getNumberOfConnectStringVars() {
@@ -44,12 +49,31 @@ void routerconnection::handleConnectString() {
 	concount=routerlist->getLength();
 
 	cons=new sqlrconnection *[concount];
+	beginquery=new const char *[concount];
+	anymustbegin=false;
 	for (uint16_t index=0; index<concount; index++) {
+
 		routercontainer	*rn=routerlist->
 					getNodeByIndex(index)->getData();
 		cons[index]=new sqlrconnection(rn->getHost(),rn->getPort(),
 						rn->getSocket(),rn->getUser(),
 						rn->getPassword(),0,1);
+
+		const char	*id=cons[index]->identify();
+		beginquery[index]=NULL;
+		if (!charstring::compare(id,"sybase") ||
+				!charstring::compare(id,"freetds")) {
+			beginquery[index]="begin tran";
+		} else if (!charstring::compare(id,"sqlite")) {
+			beginquery[index]="begin transaction";
+		} else if (!charstring::compare(id,"postgresql") ||
+				!charstring::compare(id,"router")) {
+			beginquery[index]="begin";
+		}
+
+		if (beginquery[index]) {
+			anymustbegin=true;
+		}
 	}
 }
 
@@ -84,6 +108,14 @@ bool routerconnection::autoCommitOn() {
 		// client connects, so if we just logged in, we'll call
 		// endSession.
 		if (justloggedin) {
+			// if any of the connections must begin transactions,
+			// then those connections will start off in auto-commit
+			// mode no matter what, so put all connections in
+			// autocommit mode
+			// (this is a convenient place to do this...)
+			if (anymustbegin) {
+				cons[index]->autoCommitOn();
+			}
 			cons[index]->endSession();
 		}
 		if (result) {
@@ -110,6 +142,15 @@ bool routerconnection::autoCommitOff() {
 		// client connects, so if we just logged in, we'll call
 		// endSession.
 		if (justloggedin) {
+			// if any of the connections must begin transactions,
+			// then those connections will start off in auto-commit
+			// mode no matter what, so put all connections in
+			// autocommit mode, even if autocommit-off is called
+			// here
+			// (this is a convenient place to do this...)
+			if (anymustbegin) {
+				cons[index]->autoCommitOn();
+			}
 			cons[index]->endSession();
 		}
 		if (result) {
@@ -209,11 +250,15 @@ bool routercursor::openCursor(uint16_t id) {
 
 bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
-	// check for a begin query
-	beginquery=routerconn->beginregex.match(query);
+	// check for a begin query, but not "begin ... end;" query
+	beginquery=(routerconn->beginregex.match(query) &&
+			!routerconn->beginendregex.match(query));
 	if (beginquery) {
 		return true;
 	}
+
+	// reset cur pointer
+	cur=NULL;
 
 	// look through the regular expressions and figure out which
 	// connection this query needs to be run through
@@ -298,7 +343,7 @@ bool routercursor::outputBindString(const char *variable,
 						uint16_t valuesize,
 						int16_t *isnull) {
 	cur->defineOutputBindString(variable+1,valuesize);
-	obv[obcount].variable=variable;
+	obv[obcount].variable=variable+1;
 	obv[obcount].type=STRING_BIND;
 	obv[obcount].value.stringvalue=value;
 	obv[obcount].valuesize=valuesize;
@@ -391,7 +436,7 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 		return true;
 	}
 
-	if (beginquery) {
+	if (routerconn->anymustbegin && beginquery) {
 		return begin(query,length);
 	}
 
@@ -411,25 +456,22 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 	for (uint16_t index=0; index<obcount; index++) {
 		const char	*variable=obv[index].variable;
 		*(obv[index].isnull)=routerconn->nonnullbindvalue;
-		switch(obv[index].type) {
-			case STRING_BIND:
-				obv[index].value.stringvalue=
-					cur->getOutputBindString(variable);
-				if (!obv[index].value.stringvalue) {
-					*(obv[index].isnull)=
-						routerconn->nullbindvalue;
-				} 
-				break;
-			case INTEGER_BIND:
-				*(obv[index].value.intvalue)=
+		if (obv[index].type==STRING_BIND) {
+			const char	*str=cur->getOutputBindString(variable);
+			uint32_t	len=cur->getOutputBindLength(variable);
+			if (str) {
+				charstring::copy(obv[index].value.stringvalue,
+								str,len);
+			} else {
+				obv[index].value.stringvalue[0]='\0';
+				*(obv[index].isnull)=routerconn->nullbindvalue;
+			} 
+		} else if (obv[index].type==INTEGER_BIND) {
+			*(obv[index].value.intvalue)=
 					cur->getOutputBindInteger(variable);
-				break;
-			case DOUBLE_BIND:
-				*(obv[index].value.doublevalue)=
+		} else if (obv[index].type==DOUBLE_BIND) {
+			*(obv[index].value.doublevalue)=
 					cur->getOutputBindDouble(variable);
-				break;
-			default:
-				break;
 		}
 	}
 	return true;
@@ -439,7 +481,17 @@ bool routercursor::begin(const char *query, uint32_t length) {
 
 	bool	result=true;
 	for (uint16_t index=0; index<routerconn->concount; index++) {
-		bool	res=curs[index]->sendQuery(query,length);
+
+		// for databases that allow begin's, run the begin query,
+		// for others, just set autocommit on
+		bool	res=false;
+		if (routerconn->beginquery[index]) {
+			res=curs[index]->sendQuery(
+						routerconn->beginquery[index],
+						length);
+		} else {
+			res=routerconn->cons[index]->autoCommitOn();
+		}
 		// FIXME: "do something" if this fails
 		if (result) {
 			result=res;

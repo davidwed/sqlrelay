@@ -120,9 +120,11 @@ then
 	PHPARGS="localhost 9000 \"\" pgsqlrouter pgsqlrouter"
 	PHPARGS="host=localhost&port=9000&socket=&user=pgsqlrouter&password=pgsqlrouter"
 	sudo $INITDIR/postgresql start
+	sudo $INITDIR/oracle start
 	sleep 5
 	sudo sqlr-start -id pgsqldb1
 	sudo sqlr-start -id pgsqldb2
+	sudo sqlr-start -id oracle8test
 	sudo sqlr-start -id pgsqlrouter
 fi
 
@@ -289,4 +291,5 @@ fi
 if ( test "$DB" = "router" )
 then
 	sudo $INITDIR/postgresql stop
+	sudo $INITDIR/oracle stop
 fi

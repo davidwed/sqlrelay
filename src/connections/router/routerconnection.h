@@ -14,9 +14,9 @@
 struct outputbindvar {
 	const char	*variable;
 	union {
-		const char	*stringvalue;
-		int64_t		*intvalue;
-		double		*doublevalue;
+		char	*stringvalue;
+		int64_t	*intvalue;
+		double	*doublevalue;
 	} value;
 	uint16_t	valuesize;
 	bindtype	type;
@@ -110,7 +110,7 @@ class routercursor : public sqlrcursor_svr {
 
 		uint64_t	nextrow;
 
-		bool			beginquery;
+		bool		beginquery;
 
 		outputbindvar	obv[MAXVAR];
 		uint16_t	obcount;
@@ -140,6 +140,8 @@ class routerconnection : public sqlrconnection_svr {
 		void		dropTable(const char *table);
 
 		sqlrconnection	**cons;
+		const char	**beginquery;
+		bool		anymustbegin;
 		uint16_t	concount;
 
 		sqlrconfigfile	*cfgfile;
@@ -150,6 +152,7 @@ class routerconnection : public sqlrconnection_svr {
 		int16_t		nonnullbindvalue;
 
 		regularexpression	beginregex;
+		regularexpression	beginendregex;
 };
 
 #endif

@@ -68,6 +68,13 @@ int	main(int argc, char **argv) {
 	double		subvaldoubles[3]={10.55,10.556,10.5556};
 	uint32_t	precs[3]={4,5,6};
 	uint32_t	scales[3]={2,3,4};
+	int64_t		numvar;
+	const char	*clobvar;
+	uint32_t	clobvarlength;
+	const char	*blobvar;
+	uint32_t	blobvarlength;
+	const char	*stringvar;
+	double		floatvar;	
 	const char * const *cols;
 	const char * const *fields;
 	uint16_t	port;
@@ -673,5 +680,49 @@ int	main(int argc, char **argv) {
 	// drop existing table
 	cur->sendQuery("drop table testtable1");
 	cur->sendQuery("drop table testtable2");
+	printf("\n");
+
+	printf("OUTPUT BIND BY POSITION: \n");
+	cur->prepareQuery("begin  :1:=1; :2:='hello'; :3:=2.5; end;");
+	cur->defineOutputBindInteger("1");
+	cur->defineOutputBindString("2",10);
+	cur->defineOutputBindDouble("3");
+	checkSuccess(cur->executeQuery(),1);
+	numvar=cur->getOutputBindInteger("1");
+	stringvar=cur->getOutputBindString("2");
+	floatvar=cur->getOutputBindDouble("3");
+	checkSuccess(numvar,1);
+	checkSuccess(stringvar,"hello");
+	checkSuccess(floatvar,2.5);
+	printf("\n");
+
+	printf("OUTPUT BIND BY NAME: \n");
+	cur->prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;");
+	cur->defineOutputBindInteger("numvar");
+	cur->defineOutputBindString("stringvar",10);
+	cur->defineOutputBindDouble("floatvar");
+	checkSuccess(cur->executeQuery(),1);
+	numvar=cur->getOutputBindInteger("numvar");
+	stringvar=cur->getOutputBindString("stringvar");
+	floatvar=cur->getOutputBindDouble("floatvar");
+	checkSuccess(numvar,1);
+	checkSuccess(stringvar,"hello");
+	checkSuccess(floatvar,2.5);
+	printf("\n");
+
+	printf("OUTPUT BIND BY NAME WITH VALIDATION: \n");
+	cur->clearBinds();
+	cur->defineOutputBindInteger("numvar");
+	cur->defineOutputBindString("stringvar",10);
+	cur->defineOutputBindDouble("floatvar");
+	cur->defineOutputBindString("dummyvar",10);
+	cur->validateBinds();
+	checkSuccess(cur->executeQuery(),1);
+	numvar=cur->getOutputBindInteger("numvar");
+	stringvar=cur->getOutputBindString("stringvar");
+	floatvar=cur->getOutputBindDouble("floatvar");
+	checkSuccess(numvar,1);
+	checkSuccess(stringvar,"hello");
+	checkSuccess(floatvar,2.5);
 	printf("\n");
 }
