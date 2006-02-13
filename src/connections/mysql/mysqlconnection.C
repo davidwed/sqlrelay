@@ -794,7 +794,8 @@ bool mysqlcursor::fetchRow() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	return !mysql_stmt_fetch(stmt);
 #else
-	return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL);
+	return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL &&
+		(mysqlrowlengths=mysql_fetch_lengths(mysqlresult))!=NULL);
 #endif
 }
 
@@ -809,8 +810,7 @@ void mysqlcursor::returnRow() {
 		}
 #else
 		if (mysqlrow[col]) {
-			conn->sendField(mysqlrow[col],
-					charstring::length(mysqlrow[col]));
+			conn->sendField(mysqlrow[col],mysqlrowlengths[col]);
 		} else {
 			conn->sendNullField();
 		}
