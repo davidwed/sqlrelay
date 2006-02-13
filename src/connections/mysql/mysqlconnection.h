@@ -38,6 +38,7 @@ class mysqlcursor : public sqlrcursor_svr {
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	*mysqlfield;
 		MYSQL_ROW	mysqlrow;
+		unsigned long	*mysqlrowlengths;
 		unsigned int	ncols;
 		my_ulonglong	nrows;
 		my_ulonglong	affectedrows;

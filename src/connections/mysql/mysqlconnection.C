@@ -448,7 +448,8 @@ bool mysqlcursor::skipRow() {
 }
 
 bool mysqlcursor::fetchRow() {
-	return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL);
+	return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL &&
+		(mysqlrowlengths=mysql_fetch_lengths(mysqlresult))!=NULL);
 }
 
 void mysqlcursor::returnRow() {
@@ -456,8 +457,7 @@ void mysqlcursor::returnRow() {
 	for (unsigned int col=0; col<ncols; col++) {
 
 		if (mysqlrow[col]) {
-			conn->sendField(mysqlrow[col],
-					charstring::length(mysqlrow[col]));
+			conn->sendField(mysqlrow[col],mysqlrowlengths[col]);
 		} else {
 			conn->sendNullField();
 		}

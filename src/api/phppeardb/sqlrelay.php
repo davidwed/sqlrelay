@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.15 2006-01-07 06:21:48 mused Exp $
+// $Id: sqlrelay.php,v 1.15.2.1 2006-02-13 05:36:55 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -27,7 +27,6 @@ require_once "DB/common.php";
 class DB_sqlrelay_cursor
 {
     var $cursor;
-    var $identity = "";
     var $connection;
     var $rownum = 0;
 
@@ -44,6 +43,7 @@ class DB_sqlrelay extends DB_common
     // {{{ properties
 
     var $connection;
+    var $identity = "";
     var $phptype, $dbsyntax;
     var $autocommit = false;
     var $fetchmode = DB_FETCHMODE_ORDERED; /* Default fetch mode */
@@ -197,8 +197,8 @@ class DB_sqlrelay extends DB_common
 
     function prepare($query)
     {
-        if ($identity == "") {
-            $identity = sqlrcon_identify($this->connection);
+        if ($this->identity == "") {
+            $this->identity = sqlrcon_identify($this->connection);
         }
 
         $cursor = sqlrcur_alloc($this->connection);
@@ -208,7 +208,7 @@ class DB_sqlrelay extends DB_common
         # : or @ delimited variables
         # for db2 which already uses ?-delimited variables, we don't need
         # to do this...
-        if ($identity == "db2" || $identity == "interbase") {
+        if ($this->identity == "db2" || $this->identity == "interbase") {
             $newquery = $query;
         } else {
             $tokens = split('[\&\?]', $query);
@@ -227,7 +227,8 @@ class DB_sqlrelay extends DB_common
                 }
             }        
             for ($i = 0; $i < $binds; $i++) {
-                if ($identity == "sybase" || $identity == "freetds") {
+                if ($this->identity == "sybase" ||
+                        $this->identity == "freetds") {
                     $newquery .= $tokens[$i] . "@bind" . $i;
                 } else {
                     $newquery .= $tokens[$i] . ":bind" . $i;
@@ -314,8 +315,8 @@ class DB_sqlrelay extends DB_common
      */
     function buildManipSQL($table, $table_fields, $mode, $where = false)
     {
-        if ($identity == "") {
-            $identity = sqlrcon_identify($this->connection);
+        if ($this->identity == "") {
+            $this->identity = sqlrcon_identify($this->connection);
         }
         if (count($table_fields) == 0) {
             return $this->raiseError(DB_ERROR_NEED_MORE_DATA);
@@ -334,7 +335,8 @@ class DB_sqlrelay extends DB_common
                     }
                     $names .= $value;
                     # FIXME: handle other db formats too
-                    if ($identity == "sybase" || $identity == "freetds") {
+                    if ($this->identity == "sybase" ||
+                                $this->identity == "freetds") {
                         $values .= "@$value";
                     } else {
                         $values .= ":$value";
@@ -350,7 +352,8 @@ class DB_sqlrelay extends DB_common
                         $set .= ',';
                     }
                     # FIXME: handle other db formats too
-                    if ($identity == "sybase" || $identity == "freetds") {
+                    if ($this->identity == "sybase" ||
+                                $this->identity == "freetds") {
                         $set .= "$value = @$value";
                     } else {
                         $set .= "$value = :$value";
@@ -637,10 +640,10 @@ class DB_sqlrelay extends DB_common
         $seqquery = "";
 
         # figure out what kind of db we're using and build the appropriate query
-        if ($identity == "") {
-            $identity = sqlrcon_identify($this->connection);
+        if ($this->identity == "") {
+            $this->identity = sqlrcon_identify($this->connection);
         }
-        if ($identity == "oracle8" || $identity == "oracle7") {
+        if ($this->identity == "oracle8" || $this->identity == "oracle7") {
             $seqquery = "SELECT ${seqname}.nextval FROM dual";
         } else {
             # FIXME: implement for other DB's
@@ -689,11 +692,11 @@ class DB_sqlrelay extends DB_common
     {
         $seqquery="";
 
-        if ($identity == "") {
-            $identity = sqlrcon_identify($this->connection);
+        if ($this->identity == "") {
+            $this->identity = sqlrcon_identify($this->connection);
         }
 
-        if ($identity == "oracle8" || $identity == "oracle7") {
+        if ($this->identity == "oracle8" || $this->identity == "oracle7") {
             $seqquery = "CREATE SEQUENCE " . $this->getSequenceName($seq_name);
         } else {
             # FIXME: implement for other DB's
@@ -719,11 +722,11 @@ class DB_sqlrelay extends DB_common
     {
         $seqquery = "";
 
-        if ($identity == "") {
-            $identity = sqlrcon_identify($this->connection);
+        if ($this->identity == "") {
+            $this->identity = sqlrcon_identify($this->connection);
         }
 
-        if ($identity == "oracle8" || $identity == "oracle7") {
+        if ($this->identity == "oracle8" || $this->identity == "oracle7") {
             $seqquery = "DROP SEQUENCE " . $this->getSequenceName($seq_name);
         } else {
             # FIXME: implement for other DB's
