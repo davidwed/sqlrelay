@@ -88,6 +88,8 @@ class routercursor : public sqlrcursor_svr {
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
+		void		checkForTempTable(const char *query,
+							uint32_t length);
 		const char	*errorMessage(bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
@@ -105,6 +107,7 @@ class routercursor : public sqlrcursor_svr {
 
 		routerconnection	*routerconn;
 
+		sqlrconnection	*con;
 		sqlrcursor	*cur;
 		sqlrcursor	**curs;
 
@@ -114,6 +117,9 @@ class routercursor : public sqlrcursor_svr {
 
 		outputbindvar	obv[MAXVAR];
 		uint16_t	obcount;
+
+		regularexpression	createoratemp;
+		regularexpression	preserverows;
 };
 
 class routerconnection : public sqlrconnection_svr {

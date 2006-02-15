@@ -177,6 +177,8 @@ bool routerconnection::commit() {
 		// call endSession() or disconnected, but if the did call
 		// endSession() or disconnect, we need to call endSession(),
 		// so just to be safe, we'll do it.
+// FIXME: always ending the session here messes up
+// oracle temp tables with the "on commit preserve rows" clause
 		cons[index]->endSession();
 		if (result) {
 			result=res;
@@ -199,6 +201,8 @@ bool routerconnection::rollback() {
 		// call endSession() or disconnected, but if the did call
 		// endSession() or disconnect, we need to call endSession(),
 		// so just to be safe, we'll do it.
+// FIXME: always ending the session here messes up
+// oracle temp tables with the "on commit preserve rows" clause
 		cons[index]->endSession();
 		if (result) {
 			result=res;
@@ -227,6 +231,7 @@ bool routerconnection::ping() {
 routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	routerconn=(routerconnection *)conn;
 	nextrow=0;
+	con=NULL;
 	cur=NULL;
 	curs=new sqlrcursor *[routerconn->concount];
 	for (uint16_t index=0; index<routerconn->concount; index++) {
@@ -235,6 +240,9 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	}
 	beginquery=false;
 	obcount=0;
+
+	createoratemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
+	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
 }
 
 routercursor::~routercursor() {
@@ -257,7 +265,8 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 		return true;
 	}
 
-	// reset cur pointer
+	// reset cur and pointers
+	con=NULL;
 	cur=NULL;
 
 	// look through the regular expressions and figure out which
@@ -271,6 +280,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 							getNodeByIndex(0);
 		while (ren && !cur) {
 			if (ren->getData()->match(query)) {
+				con=routerconn->cons[conindex];
 				cur=curs[conindex];
 			}
 			ren=ren->getNext();
@@ -450,6 +460,8 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 		return false;
 	}
 
+	checkForTempTable(query,length);
+
 	nextrow=0;
 
 	// populate output bind values
@@ -475,6 +487,51 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 		}
 	}
 	return true;
+}
+
+
+void routercursor::checkForTempTable(const char *query, uint32_t length) {
+
+	// for non-oracle db's
+	if (charstring::compare(con->identify(),"oracle8")) {
+		sqlrcursor_svr::checkForTempTable(query,length);
+		return;
+	}
+
+	// for oracle db's...
+
+	char	*ptr=(char *)query;
+	char	*endptr=(char *)query+length;
+
+	// skip any leading comments
+	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
+		!skipWhitespace(&ptr,endptr)) {
+		return;
+	}
+
+	// look for "create global temporary table "
+	if (createoratemp.match(ptr)) {
+		ptr=createoratemp.getSubstringEnd(0);
+	} else {
+		return;
+	}
+
+	// get the table name
+	stringbuffer	tablename;
+	while (*ptr!=' ' && *ptr!='\n' && *ptr!='	' && ptr<endptr) {
+		tablename.append(*ptr);
+		ptr++;
+	}
+
+	// append to list of temp tables
+	// check for "on commit preserve rows" otherwise assume
+	// "on commit delete rows"
+	if (preserverows.match(ptr)) {
+printf("preserve rows...\n");
+		conn->addSessionTempTableForTrunc(tablename.getString());
+	} else {
+printf("don't preserve rows...\n");
+	}
 }
 
 bool routercursor::begin(const char *query, uint32_t length) {
