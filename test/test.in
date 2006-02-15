@@ -40,26 +40,19 @@ then
 	sudo $INITDIR/msql start
 	sudo sqlr-start -id msqltest
 fi
-if ( test "$DB" = "mysql3" )
+if ( test "$DB" = "mysql" )
 then
-	ARGS="localhost 8006 \"\" mysql3test mysql3test"
-	PHPARGS="host=localhost&port=8006&socket=&user=mysql3test&password=mysql3test"
+	ARGS="localhost 8006 \"\" mysqltest mysqltest"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
 	sudo $INITDIR/mysqld start
-	sudo sqlr-start -id mysql3test
+	sudo sqlr-start -id mysqltest
 fi
-if ( test "$DB" = "mysql412" )
+if ( test "$DB" = "oldmysql" )
 then
-	ARGS="localhost 8006 \"\" mysql412test mysql412test"
-	PHPARGS="host=localhost&port=8006&socket=&user=mysql412test&password=mysql412test"
+	ARGS="localhost 8006 \"\" mysqltest mysqltest"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
 	sudo $INITDIR/mysqld start
-	sudo sqlr-start -id mysql412test
-fi
-if ( test "$DB" = "mysql5" )
-then
-	ARGS="localhost 8006 \"\" mysql5test mysql5test"
-	PHPARGS="host=localhost&port=8006&socket=&user=mysql5test&password=mysql5test"
-	sudo $INITDIR/mysqld start
-	sudo sqlr-start -id mysql5test
+	sudo sqlr-start -id mysqltest
 fi
 if ( test "$DB" = "oracle7" )
 then
@@ -120,6 +113,19 @@ then
 	sudo $INITDIR/sybase start
 	sleep 5
 	sudo sqlr-start -id sybasetest
+fi
+if ( test "$DB" = "router" )
+then
+	ARGS="localhost 9000 \"\" pgsqlrouter pgsqlrouter"
+	PHPARGS="localhost 9000 \"\" pgsqlrouter pgsqlrouter"
+	PHPARGS="host=localhost&port=9000&socket=&user=pgsqlrouter&password=pgsqlrouter"
+	sudo $INITDIR/postgresql start
+	sudo $INITDIR/oracle start
+	sleep 5
+	sudo sqlr-start -id pgsqldb1
+	sudo sqlr-start -id pgsqldb2
+	sudo sqlr-start -id oracle8test
+	sudo sqlr-start -id pgsqlrouter
 fi
 
 
@@ -246,15 +252,11 @@ if ( test "$DB" = "msql" )
 then
 	sudo $INITDIR/msql stop
 fi
-if ( test "$DB" = "mysql3" )
+if ( test "$DB" = "mysql" )
 then
 	sudo $INITDIR/mysqld stop
 fi
-if ( test "$DB" = "mysql412" )
-then
-	sudo $INITDIR/mysqld stop
-fi
-if ( test "$DB" = "mysql5" )
+if ( test "$DB" = "oldmysql" )
 then
 	sudo $INITDIR/mysqld stop
 fi
@@ -285,4 +287,9 @@ fi
 if ( test "$DB" = "sybase" )
 then
 	sudo $INITDIR/sybase stop
+fi
+if ( test "$DB" = "router" )
+then
+	sudo $INITDIR/postgresql stop
+	sudo $INITDIR/oracle stop
 fi

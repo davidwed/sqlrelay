@@ -423,7 +423,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 		return false;
 	}
 
-	//checkForTempTable(query,length);
+	checkForTempTable(query,length);
 
 	// get the col count
 	ncols=PQnfields(pgresult);

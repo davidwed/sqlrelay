@@ -11,6 +11,18 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/regularexpression.h>
 
+struct outputbindvar {
+	const char	*variable;
+	union {
+		char	*stringvalue;
+		int64_t	*intvalue;
+		double	*doublevalue;
+	} value;
+	uint16_t	valuesize;
+	bindtype	type;
+	int16_t		*isnull;
+};
+
 class routerconnection;
 
 class routercursor : public sqlrcursor_svr {
@@ -45,9 +57,39 @@ class routercursor : public sqlrcursor_svr {
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
+		bool		outputBindString(const char *variable, 
+						uint16_t variablesize,
+						char *value,
+						uint16_t valuesize,
+						int16_t *isnull);
+		bool		outputBindInteger(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		bool		outputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull);
+		bool		outputBindBlob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
+		bool		outputBindClob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
+		bool		outputBindCursor(const char *variable,
+						uint16_t variablesize,
+						sqlrcursor_svr *cursor);
+		void		returnOutputBindBlob(uint16_t index);
+		void		returnOutputBindClob(uint16_t index);
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
+		void		checkForTempTable(const char *query,
+							uint32_t length);
 		const char	*errorMessage(bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
@@ -65,12 +107,19 @@ class routercursor : public sqlrcursor_svr {
 
 		routerconnection	*routerconn;
 
+		sqlrconnection	*con;
 		sqlrcursor	*cur;
 		sqlrcursor	**curs;
 
 		uint64_t	nextrow;
 
-		bool			beginquery;
+		bool		beginquery;
+
+		outputbindvar	obv[MAXVAR];
+		uint16_t	obcount;
+
+		regularexpression	createoratemp;
+		regularexpression	preserverows;
 };
 
 class routerconnection : public sqlrconnection_svr {
@@ -97,13 +146,19 @@ class routerconnection : public sqlrconnection_svr {
 		void		dropTable(const char *table);
 
 		sqlrconnection	**cons;
+		const char	**beginquery;
+		bool		anymustbegin;
 		uint16_t	concount;
 
 		sqlrconfigfile	*cfgfile;
 
 		bool		justloggedin;
 
+		int16_t		nullbindvalue;
+		int16_t		nonnullbindvalue;
+
 		regularexpression	beginregex;
+		regularexpression	beginendregex;
 };
 
 #endif

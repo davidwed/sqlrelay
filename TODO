@@ -1,3 +1,5 @@
+hack on postgresql's ecpg to emit SQL Relay code rather than Postgresql code
+
 perl apis -> CPAN
 
 mysql 4.1.2:

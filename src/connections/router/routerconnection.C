@@ -11,12 +11,18 @@
 
 routerconnection::routerconnection() : sqlrconnection_svr() {
 	cons=NULL;
+	beginquery=NULL;
+	anymustbegin=false;
 	concount=0;
 	cfgfile=NULL;
 	justloggedin=false;
+	nullbindvalue=nullBindValue();
+	nonnullbindvalue=nonNullBindValue();
 
 	beginregex.compile("^\\s*begin");
 	beginregex.study();
+	beginendregex.compile("^\\s*begin\\s*.*\\s*end;\\s*$");
+	beginendregex.study();
 }
 
 routerconnection::~routerconnection() {
@@ -24,6 +30,7 @@ routerconnection::~routerconnection() {
 		delete cons[index];
 	}
 	delete[] cons;
+	delete[] beginquery;
 }
 
 uint16_t routerconnection::getNumberOfConnectStringVars() {
@@ -42,12 +49,31 @@ void routerconnection::handleConnectString() {
 	concount=routerlist->getLength();
 
 	cons=new sqlrconnection *[concount];
+	beginquery=new const char *[concount];
+	anymustbegin=false;
 	for (uint16_t index=0; index<concount; index++) {
+
 		routercontainer	*rn=routerlist->
 					getNodeByIndex(index)->getData();
 		cons[index]=new sqlrconnection(rn->getHost(),rn->getPort(),
 						rn->getSocket(),rn->getUser(),
 						rn->getPassword(),0,1);
+
+		const char	*id=cons[index]->identify();
+		beginquery[index]=NULL;
+		if (!charstring::compare(id,"sybase") ||
+				!charstring::compare(id,"freetds")) {
+			beginquery[index]="begin tran";
+		} else if (!charstring::compare(id,"sqlite")) {
+			beginquery[index]="begin transaction";
+		} else if (!charstring::compare(id,"postgresql") ||
+				!charstring::compare(id,"router")) {
+			beginquery[index]="begin";
+		}
+
+		if (beginquery[index]) {
+			anymustbegin=true;
+		}
 	}
 }
 
@@ -82,6 +108,14 @@ bool routerconnection::autoCommitOn() {
 		// client connects, so if we just logged in, we'll call
 		// endSession.
 		if (justloggedin) {
+			// if any of the connections must begin transactions,
+			// then those connections will start off in auto-commit
+			// mode no matter what, so put all connections in
+			// autocommit mode
+			// (this is a convenient place to do this...)
+			if (anymustbegin) {
+				cons[index]->autoCommitOn();
+			}
 			cons[index]->endSession();
 		}
 		if (result) {
@@ -108,6 +142,15 @@ bool routerconnection::autoCommitOff() {
 		// client connects, so if we just logged in, we'll call
 		// endSession.
 		if (justloggedin) {
+			// if any of the connections must begin transactions,
+			// then those connections will start off in auto-commit
+			// mode no matter what, so put all connections in
+			// autocommit mode, even if autocommit-off is called
+			// here
+			// (this is a convenient place to do this...)
+			if (anymustbegin) {
+				cons[index]->autoCommitOn();
+			}
 			cons[index]->endSession();
 		}
 		if (result) {
@@ -134,6 +177,8 @@ bool routerconnection::commit() {
 		// call endSession() or disconnected, but if the did call
 		// endSession() or disconnect, we need to call endSession(),
 		// so just to be safe, we'll do it.
+// FIXME: always ending the session here messes up
+// oracle temp tables with the "on commit preserve rows" clause
 		cons[index]->endSession();
 		if (result) {
 			result=res;
@@ -156,6 +201,8 @@ bool routerconnection::rollback() {
 		// call endSession() or disconnected, but if the did call
 		// endSession() or disconnect, we need to call endSession(),
 		// so just to be safe, we'll do it.
+// FIXME: always ending the session here messes up
+// oracle temp tables with the "on commit preserve rows" clause
 		cons[index]->endSession();
 		if (result) {
 			result=res;
@@ -184,12 +231,18 @@ bool routerconnection::ping() {
 routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	routerconn=(routerconnection *)conn;
 	nextrow=0;
+	con=NULL;
 	cur=NULL;
 	curs=new sqlrcursor *[routerconn->concount];
 	for (uint16_t index=0; index<routerconn->concount; index++) {
 		curs[index]=new sqlrcursor(routerconn->cons[index]);
+		curs[index]->setResultSetBufferSize(FETCH_AT_ONCE);
 	}
 	beginquery=false;
+	obcount=0;
+
+	createoratemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
+	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
 }
 
 routercursor::~routercursor() {
@@ -205,11 +258,16 @@ bool routercursor::openCursor(uint16_t id) {
 
 bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
-	// check for a begin query
-	beginquery=routerconn->beginregex.match(query);
+	// check for a begin query, but not "begin ... end;" query
+	beginquery=(routerconn->beginregex.match(query) &&
+			!routerconn->beginendregex.match(query));
 	if (beginquery) {
 		return true;
 	}
+
+	// reset cur and pointers
+	con=NULL;
+	cur=NULL;
 
 	// look through the regular expressions and figure out which
 	// connection this query needs to be run through
@@ -222,8 +280,8 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 							getNodeByIndex(0);
 		while (ren && !cur) {
 			if (ren->getData()->match(query)) {
+				con=routerconn->cons[conindex];
 				cur=curs[conindex];
-				cur->setResultSetBufferSize(FETCH_AT_ONCE);
 			}
 			ren=ren->getNext();
 		}
@@ -240,6 +298,9 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// connection turned out to be the right one
 	cur->prepareQuery(query);
 
+	// initialize the output bind count
+	obcount=0;
+
 	return true;
 }
 
@@ -248,14 +309,14 @@ bool routercursor::inputBindString(const char *variable,
 						const char *value, 
 						uint16_t valuesize,
 						int16_t *isnull) {
-	cur->inputBind(variable,value);
+	cur->inputBind(variable+1,value);
 	return true;
 }
 
 bool routercursor::inputBindInteger(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value) {
-	cur->inputBind(variable,*value);
+	cur->inputBind(variable+1,*value);
 	return true;
 }
 
@@ -264,7 +325,7 @@ bool routercursor::inputBindDouble(const char *variable,
 						double *value,
 						uint32_t precision,
 						uint32_t scale) {
-	cur->inputBind(variable,*value,precision,scale);
+	cur->inputBind(variable+1,*value,precision,scale);
 	return true;
 }
 
@@ -273,7 +334,7 @@ bool routercursor::inputBindBlob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
-	cur->inputBindBlob(variable,value,valuesize);
+	cur->inputBindBlob(variable+1,value,valuesize);
 	return true;
 }
 
@@ -282,37 +343,212 @@ bool routercursor::inputBindClob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
-	cur->inputBindClob(variable,value,valuesize);
+	cur->inputBindClob(variable+1,value,valuesize);
 	return true;
 }
 
-// FIXME: output binds
+bool routercursor::outputBindString(const char *variable, 
+						uint16_t variablesize,
+						char *value,
+						uint16_t valuesize,
+						int16_t *isnull) {
+	cur->defineOutputBindString(variable+1,valuesize);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=STRING_BIND;
+	obv[obcount].value.stringvalue=value;
+	obv[obcount].valuesize=valuesize;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindInteger(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull) {
+	cur->defineOutputBindInteger(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=INTEGER_BIND;
+	obv[obcount].value.intvalue=value;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull) {
+	cur->defineOutputBindDouble(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=DOUBLE_BIND;
+	obv[obcount].value.doublevalue=value;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindBlob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull) {
+	cur->defineOutputBindBlob(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=BLOB_BIND;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindClob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull) {
+	cur->defineOutputBindClob(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=CLOB_BIND;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
+bool routercursor::outputBindCursor(const char *variable,
+						uint16_t variablesize,
+						sqlrcursor_svr *cursor) {
+	cur->defineOutputBindCursor(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=CURSOR_BIND;
+	obcount++;
+	return true;
+}
+
+void routercursor::returnOutputBindBlob(uint16_t index) {
+	const char	*varname=obv[index].variable;
+	uint32_t	length=cur->getOutputBindLength(varname);
+	conn->startSendingLong(length);
+	conn->sendLongSegment(cur->getOutputBindBlob(varname),length);
+	conn->endSendingLong();
+}
+
+void routercursor::returnOutputBindClob(uint16_t index) {
+	const char	*varname=obv[index].variable;
+	uint32_t	length=cur->getOutputBindLength(varname);
+	conn->startSendingLong(length);
+	conn->sendLongSegment(cur->getOutputBindClob(varname),length);
+	conn->endSendingLong();
+}
 
 bool routercursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 	if (!execute) {
 		return true;
 	}
-	if (beginquery) {
+
+	if (routerconn->anymustbegin && beginquery) {
 		return begin(query,length);
 	}
+
 	if (!cur) {
 		if (!prepareQuery(query,length)) {
 			return false;
 		}
 	}
-	if (cur && cur->executeQuery()) {
-		nextrow=0;
-		return true;
+
+	if (!cur || !cur->executeQuery()) {
+		return false;
 	}
-	return false;
+
+	checkForTempTable(query,length);
+
+	nextrow=0;
+
+	// populate output bind values
+	for (uint16_t index=0; index<obcount; index++) {
+		const char	*variable=obv[index].variable;
+		*(obv[index].isnull)=routerconn->nonnullbindvalue;
+		if (obv[index].type==STRING_BIND) {
+			const char	*str=cur->getOutputBindString(variable);
+			uint32_t	len=cur->getOutputBindLength(variable);
+			if (str) {
+				charstring::copy(obv[index].value.stringvalue,
+								str,len);
+			} else {
+				obv[index].value.stringvalue[0]='\0';
+				*(obv[index].isnull)=routerconn->nullbindvalue;
+			} 
+		} else if (obv[index].type==INTEGER_BIND) {
+			*(obv[index].value.intvalue)=
+					cur->getOutputBindInteger(variable);
+		} else if (obv[index].type==DOUBLE_BIND) {
+			*(obv[index].value.doublevalue)=
+					cur->getOutputBindDouble(variable);
+		}
+	}
+	return true;
+}
+
+
+void routercursor::checkForTempTable(const char *query, uint32_t length) {
+
+	// for non-oracle db's
+	if (charstring::compare(con->identify(),"oracle8")) {
+		sqlrcursor_svr::checkForTempTable(query,length);
+		return;
+	}
+
+	// for oracle db's...
+
+	char	*ptr=(char *)query;
+	char	*endptr=(char *)query+length;
+
+	// skip any leading comments
+	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
+		!skipWhitespace(&ptr,endptr)) {
+		return;
+	}
+
+	// look for "create global temporary table "
+	if (createoratemp.match(ptr)) {
+		ptr=createoratemp.getSubstringEnd(0);
+	} else {
+		return;
+	}
+
+	// get the table name
+	stringbuffer	tablename;
+	while (*ptr!=' ' && *ptr!='\n' && *ptr!='	' && ptr<endptr) {
+		tablename.append(*ptr);
+		ptr++;
+	}
+
+	// append to list of temp tables
+	// check for "on commit preserve rows" otherwise assume
+	// "on commit delete rows"
+	if (preserverows.match(ptr)) {
+printf("preserve rows...\n");
+		conn->addSessionTempTableForTrunc(tablename.getString());
+	} else {
+printf("don't preserve rows...\n");
+	}
 }
 
 bool routercursor::begin(const char *query, uint32_t length) {
 
 	bool	result=true;
 	for (uint16_t index=0; index<routerconn->concount; index++) {
-		bool	res=curs[index]->sendQuery(query,length);
+
+		// for databases that allow begin's, run the begin query,
+		// for others, just set autocommit on
+		bool	res=false;
+		if (routerconn->beginquery[index]) {
+			res=curs[index]->sendQuery(
+						routerconn->beginquery[index],
+						length);
+		} else {
+			res=routerconn->cons[index]->autoCommitOn();
+		}
 		// FIXME: "do something" if this fails
 		if (result) {
 			result=res;
@@ -417,5 +653,10 @@ void routercursor::returnRow() {
 }
 
 void routercursor::cleanUpData(bool freeresult, bool freebinds) {
-	cur=NULL;
+	if (freebinds) {
+		if (cur) {
+			cur->clearBinds();
+		}
+		obcount=0;
+	}
 }
