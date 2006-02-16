@@ -36,6 +36,30 @@ void checkSuccess(const char *value, const char *success) {
 	}
 }
 
+void checkSuccess(const char *value, const char *success, size_t length) {
+
+	if (!success) {
+		if (!value) {
+			printf("success ");
+			return;
+		} else {
+			printf("failure ");
+			delete cur;
+			delete con;
+			exit(0);
+		}
+	}
+
+	if (!strncmp(value,success,length)) {
+		printf("success ");
+	} else {
+		printf("failure ");
+		delete cur;
+		delete con;
+		exit(0);
+	}
+}
+
 void checkSuccess(int value, int success) {
 
 	if (value==success) {
@@ -720,6 +744,44 @@ int	main(int argc, char **argv) {
 	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
+	printf("\n");
+
+	printf("CLOB AND BLOB OUTPUT BIND: \n");
+	cur->sendQuery("drop table testtable3");
+	checkSuccess(cur->sendQuery("create table testtable3 (testclob clob, testblob blob)"),1);
+	cur->prepareQuery("insert into testtable3 values ('hello',:var1)");
+	cur->inputBindBlob("var1","hello",5);
+	checkSuccess(cur->executeQuery(),1);
+	cur->prepareQuery("begin select testclob into :clobvar from testtable3;  select testblob into :blobvar from testtable3; end;");
+	cur->defineOutputBindClob("clobvar");
+	cur->defineOutputBindBlob("blobvar");
+	checkSuccess(cur->executeQuery(),1);
+	clobvar=cur->getOutputBindClob("clobvar");
+	clobvarlength=cur->getOutputBindLength("clobvar");
+	blobvar=cur->getOutputBindBlob("blobvar");
+	blobvarlength=cur->getOutputBindLength("blobvar");
+	checkSuccess(clobvar,"hello",5);
+	checkSuccess(clobvarlength,5);
+	checkSuccess(blobvar,"hello",5);
+	checkSuccess(blobvarlength,5);
+	cur->sendQuery("drop table testtable3");
+	printf("\n");
+
+	printf("NULL AND EMPTY CLOBS AND CLOBS: \n");
+	cur->getNullsAsNulls();
+	cur->sendQuery("create table testtable3 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)");
+	cur->prepareQuery("insert into testtable3 values (:var1,:var2,:var3,:var4)");
+	cur->inputBindClob("var1","",0);
+	cur->inputBindClob("var2",NULL,0);
+	cur->inputBindBlob("var3","",0);
+	cur->inputBindBlob("var4",NULL,0);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("select * from testtable3");
+	checkSuccess(cur->getField(0,(uint32_t)0),NULL);
+	checkSuccess(cur->getField(0,1),NULL);
+	checkSuccess(cur->getField(0,2),NULL);
+	checkSuccess(cur->getField(0,3),NULL);
+	cur->sendQuery("drop table testtable3");
 	printf("\n");
 
 	// temporary tables
