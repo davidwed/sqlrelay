@@ -226,6 +226,7 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	for (uint16_t index=0; index<routerconn->concount; index++) {
 		curs[index]=new sqlrcursor(routerconn->cons[index]);
 		curs[index]->setResultSetBufferSize(FETCH_AT_ONCE);
+		curs[index]->getNullsAsNulls();
 	}
 	beginquery=false;
 	obcount=0;
