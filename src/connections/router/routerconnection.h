@@ -141,9 +141,7 @@ class routerconnection : public sqlrconnection_svr {
 		bool		rollback();
 		const char	*identify();
 		bool		ping();
-
 		void		endSession();
-		void		dropTable(const char *table);
 
 		sqlrconnection	**cons;
 		const char	**beginquery;

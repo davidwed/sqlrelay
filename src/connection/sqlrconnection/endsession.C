@@ -7,10 +7,15 @@ void sqlrconnection_svr::endSessionCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"end session");
 	#endif
+	endSessionInternal();
 	endSession();
 }
 
 void sqlrconnection_svr::endSession() {
+	// by default, do nothing
+}
+
+void sqlrconnection_svr::endSessionInternal() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"ending session...");

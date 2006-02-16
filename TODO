@@ -16,7 +16,10 @@ postgresql/mysql connetions shouldn't try to use bind variables against older
 
 implement interbase dead-db/relogin
 
-query filtering
+query router:
+	query filtering
+	investigate 2 phase commit
+	document
 
 query/fields cmdline tools need a timeout option
 
@@ -223,29 +226,6 @@ Security:
 	* SSL encryption
 
 Features:
-	* distribute selects to slaves, dml/ddl to master:
-		If SQL Relay is running in master/slave mode, then when a
-		client connects to the listener, the listener could hand it off
-		to 2 sqlr-connections.  The client could keep track of these
-		2 sqlr-connections and send non-selects to the master and
-		selects to the slave.  The application will need to be aware
-		that it's operating in a master/slave environment though, and
-		either turn on autocommit or execute commit's manually.
-
-		(Since the client needs to wait for 2 connections, the potential
-		for the classic dining philosophers deadlock problem exists
-		and will need to be addressed)
-		
-		To decide which database is the master, the sqlr-listener will
-		need to know which connectionid is associated with that
-		database.  It will detect if the master has gone down and
-		attempt to reconnect.  Potentially, the sqlr-listener could
-		listen on a socket for "promote/demote" instructions from other
-		software.  If the master has gone down and the sqlr-listener
-		receives a "demote master, promote slave" instruction and
-		a set of connectionids and act accordingly.  The reverse
-		could happen when the master comes back up.
-
 	* use PAM if possible as alternative to defining users in sqlrelay.conf
 	* support stored procedures that return result sets in
 		sybase, interbase, db2

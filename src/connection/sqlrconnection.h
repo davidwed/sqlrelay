@@ -83,6 +83,7 @@ class sqlrconnection_svr :
 						stringlist *tablelist);
 		virtual void	truncateTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);
+		virtual void	endSession();
 
 	public:
 		// methods used by derived classes
@@ -225,7 +226,7 @@ class sqlrconnection_svr :
 						bool bindcursor);
 		void	resumeResultSet(sqlrcursor_svr *cursor);
 		void	suspendSession();
-		void	endSession();
+		void	endSessionInternal();
 		bool	getCommand(uint16_t *command);
 		void	noAvailableCursors(uint16_t command);
 		bool	getQuery(sqlrcursor_svr *cursor);

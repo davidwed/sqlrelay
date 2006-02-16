@@ -101,9 +101,6 @@ class postgresqlconnection : public sqlrconnection_svr {
 		void		logOut();
 		const char	*identify();
 
-		void		endSession();
-		void		dropTable(const char *table);
-
 		int	datatypecount;
 		int32_t	*datatypeids;
 		char	**datatypenames;

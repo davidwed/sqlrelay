@@ -675,6 +675,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable2"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"9");
 	//checkSuccess(con->autoCommitOff(),1);
+	checkSuccess(cur->sendQuery("begin"),1);
 	printf("\n");
 
 	printf("OUTPUT BIND BY POSITION: \n");
@@ -720,7 +721,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
 	printf("\n");
-/*
+
 	// temporary tables
 	printf("TEMPORARY TABLES: \n");
 	cur->sendQuery("drop table temptabledelete\n");
@@ -729,6 +730,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(con->commit(),1);
+	checkSuccess(cur->sendQuery("begin"),1);
 	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
 	cur->sendQuery("drop table temptabledelete\n");
@@ -739,15 +741,17 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(con->commit(),1);
+	checkSuccess(cur->sendQuery("begin"),1);
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	con->endSession();
 	printf("\n");
+	checkSuccess(cur->sendQuery("begin"),1);
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
 	cur->sendQuery("drop table temptablepreserve\n");
 	printf("\n");
-*/
+
 	printf("FINISHED SUSPENDED SESSION: \n");
 	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
 	checkSuccess(cur->getField(4,(uint32_t)0),"5");
@@ -770,4 +774,5 @@ int	main(int argc, char **argv) {
 	// drop existing table
 	cur->sendQuery("drop table testtable1");
 	cur->sendQuery("drop table testtable2");
+
 }

@@ -171,15 +171,6 @@ bool routerconnection::commit() {
 	for (uint16_t index=0; index<concount; index++) {
 		bool	res=cons[index]->commit();
 		// FIXME: "do something" if this fails
-		// Either commit or rollback will be called whenever the
-		// client calls endSession() or disconnects.  We don't have a
-		// way to tell if they just ran commit/rollback or actually
-		// call endSession() or disconnected, but if the did call
-		// endSession() or disconnect, we need to call endSession(),
-		// so just to be safe, we'll do it.
-// FIXME: always ending the session here messes up
-// oracle temp tables with the "on commit preserve rows" clause
-		cons[index]->endSession();
 		if (result) {
 			result=res;
 		}
@@ -195,20 +186,18 @@ bool routerconnection::rollback() {
 	for (uint16_t index=0; index<concount; index++) {
 		bool	res=cons[index]->rollback();
 		// FIXME: "do something" if this fails
-		// Either commit or rollback will be called whenever the
-		// client calls endSession() or disconnects.  We don't have a
-		// way to tell if they just ran commit/rollback or actually
-		// call endSession() or disconnected, but if the did call
-		// endSession() or disconnect, we need to call endSession(),
-		// so just to be safe, we'll do it.
-// FIXME: always ending the session here messes up
-// oracle temp tables with the "on commit preserve rows" clause
-		cons[index]->endSession();
 		if (result) {
 			result=res;
 		}
 	}
 	return result;
+}
+
+void routerconnection::endSession() {
+	for (uint16_t index=0; index<concount; index++) {
+		// FIXME: "do something" if this fails
+		cons[index]->endSession();
+	}
 }
 
 const char *routerconnection::identify() {
@@ -527,10 +516,8 @@ void routercursor::checkForTempTable(const char *query, uint32_t length) {
 	// check for "on commit preserve rows" otherwise assume
 	// "on commit delete rows"
 	if (preserverows.match(ptr)) {
-printf("preserve rows...\n");
 		conn->addSessionTempTableForTrunc(tablename.getString());
 	} else {
-printf("don't preserve rows...\n");
 	}
 }
 
@@ -547,7 +534,7 @@ bool routercursor::begin(const char *query, uint32_t length) {
 						routerconn->beginquery[index],
 						length);
 		} else {
-			res=routerconn->cons[index]->autoCommitOn();
+			res=routerconn->cons[index]->autoCommitOff();
 		}
 		// FIXME: "do something" if this fails
 		if (result) {
