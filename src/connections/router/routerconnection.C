@@ -222,6 +222,8 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	nextrow=0;
 	con=NULL;
 	cur=NULL;
+	isbindcur=false;
+	curindex=0;
 	curs=new sqlrcursor *[routerconn->concount];
 	for (uint16_t index=0; index<routerconn->concount; index++) {
 		curs[index]=new sqlrcursor(routerconn->cons[index]);
@@ -230,6 +232,7 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	}
 	beginquery=false;
 	obcount=0;
+	cbcount=0;
 
 	createoratemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
 	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
@@ -257,7 +260,12 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
 	// reset cur and pointers
 	con=NULL;
+	if (isbindcur) {
+		delete cur;
+	}
 	cur=NULL;
+	isbindcur=false;
+	curindex=0;
 
 	// look through the regular expressions and figure out which
 	// connection this query needs to be run through
@@ -272,6 +280,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 			if (ren->getData()->match(query)) {
 				con=routerconn->cons[conindex];
 				cur=curs[conindex];
+				curindex=conindex;
 			}
 			ren=ren->getNext();
 		}
@@ -290,6 +299,9 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
 	// initialize the output bind count
 	obcount=0;
+
+	// initialize the cursor bind count
+	cbcount=0;
 
 	return true;
 }
@@ -407,10 +419,11 @@ bool routercursor::outputBindClob(const char *variable,
 bool routercursor::outputBindCursor(const char *variable,
 						uint16_t variablesize,
 						sqlrcursor_svr *cursor) {
+//printf("output bind cursor %s = %d\n",variable,cursor);
 	cur->defineOutputBindCursor(variable+1);
-	obv[obcount].variable=variable+1;
-	obv[obcount].type=CURSOR_BIND;
-	obcount++;
+	cbv[cbcount].variable=variable+1;
+	cbv[cbcount].cursor=cursor;
+	cbcount++;
 	return true;
 }
 
@@ -476,6 +489,28 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 					cur->getOutputBindDouble(variable);
 		}
 	}
+
+	// handle cursor bind values
+//printf("handle cursor binds...\n");
+	for (uint16_t index=0; index<cbcount; index++) {
+//printf("index=%d\n",index);
+		routercursor	*rcur=(routercursor *)cbv[index].cursor;
+//printf("rcur=%d\n",rcur);
+		rcur->con=con;
+//printf("getOutputBindCursor(%s)\n",cbv[index].variable);
+		rcur->cur=cur->getOutputBindCursor(cbv[index].variable);
+		if (!rcur->cur) {
+//printf("failed to get output bind cursor\n");
+			return false;
+		}
+		rcur->cur->setResultSetBufferSize(FETCH_AT_ONCE);
+		rcur->cur->getNullsAsNulls();
+		rcur->isbindcur=true;
+		rcur->nextrow=0;
+		if (!rcur->cur->fetchFromBindCursor()) {
+			return false;
+		}
+	}
 	return true;
 }
 
@@ -518,7 +553,6 @@ void routercursor::checkForTempTable(const char *query, uint32_t length) {
 	// "on commit delete rows"
 	if (preserverows.match(ptr)) {
 		conn->addSessionTempTableForTrunc(tablename.getString());
-	} else {
 	}
 }
 
@@ -544,6 +578,7 @@ bool routercursor::begin(const char *query, uint32_t length) {
 			// we can get the error from it
 			if (!res && !cur) {
 				cur=curs[index];
+				curindex=0;
 			}
 		}
 	}
@@ -552,6 +587,7 @@ bool routercursor::begin(const char *query, uint32_t length) {
 	// Any of them will do, so use the first one.
 	if (!cur) {
 		cur=curs[0];
+		curindex=0;
 	}
 	return result;
 }
@@ -646,5 +682,6 @@ void routercursor::cleanUpData(bool freeresult, bool freebinds) {
 			cur->clearBinds();
 		}
 		obcount=0;
+		cbcount=0;
 	}
 }

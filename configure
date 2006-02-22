@@ -25504,8 +25504,8 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-		echo "$as_me:$LINENO: checking if PostgreSQL has PQexecParams" >&5
-echo $ECHO_N "checking if PostgreSQL has PQexecParams... $ECHO_C" >&6
+		echo "$as_me:$LINENO: checking if PostgreSQL has PQexecPrepared" >&5
+echo $ECHO_N "checking if PostgreSQL has PQexecPrepared... $ECHO_C" >&6
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
@@ -25525,7 +25525,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-PQexecParams(NULL,NULL,0,NULL,NULL,NULL,NULL,0);
+PQexecPrepared(NULL,NULL,0,NULL,NULL,NULL,0);
   ;
   return 0;
 }
@@ -25555,7 +25555,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6;
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_POSTGRESQL_PQEXECPARAMS 1
+#define HAVE_POSTGRESQL_PQEXECPREPARED 1
 _ACEOF
 
 else

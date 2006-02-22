@@ -784,6 +784,105 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable3");
 	printf("\n");
 
+
+	printf("LONG CLOB: \n");
+	cur->sendQuery("drop table testtable3");
+	cur->sendQuery("create table testtable3 (testclob clob)");
+	cur->prepareQuery("insert into testtable3 values (:clobval)");
+	char	clobval[8*1024+1];
+	for (int i=0; i<8*1024; i++) {
+		clobval[i]='C';
+	}
+	clobval[8*1024]=(char)NULL;
+	cur->inputBindClob("clobval",clobval,8*1024);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("select testclob from testtable3");
+	checkSuccess(clobval,cur->getField(0,"testclob"));
+	cur->prepareQuery("begin select testclob into :clobbindval from testtable3; end;");
+	cur->defineOutputBindClob("clobbindval");
+	checkSuccess(cur->executeQuery(),1);
+	const char	*clobbindvar=cur->getOutputBindClob("clobbindval");
+	checkSuccess(cur->getOutputBindLength("clobbindval"),8*1024);
+	checkSuccess(clobval,clobbindvar);
+	cur->sendQuery("drop table testtable3");
+	printf("\n");
+
+
+	printf("LONG OUTPUT BIND\n");
+	cur->sendQuery("drop table testtable3");
+	cur->sendQuery("create table testtable3 (testval varchar2(4000))");
+	char	testval[4001];
+	testval[4000]=(char)NULL;
+	cur->prepareQuery("insert into testtable3 values (:testval)");
+	for (int i=0; i<4000; i++) {
+		testval[i]='C';
+	}
+	cur->inputBind("testval",testval);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("select testval from testtable3");
+	checkSuccess(testval,cur->getField(0,"testval"));
+	char	query[4000+25];
+	sprintf(query,"begin :bindval:='%s'; end;",testval);
+	cur->prepareQuery(query);
+	cur->defineOutputBindString("bindval",4000);
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBindLength("bindval"),4000);
+	checkSuccess(cur->getOutputBindString("bindval"),testval);
+	cur->sendQuery("drop table testtable3");
+	printf("\n");
+
+	printf("NEGATIVE INPUT BIND\n");
+	cur->sendQuery("drop table testtable3");
+	cur->sendQuery("create table testtable3 (testval number)");
+	cur->prepareQuery("insert into testtable3 values (:testval)");
+	cur->inputBind("testval",-1);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("select testval from testtable3");
+	checkSuccess(cur->getField(0,"testval"),"-1");
+	cur->sendQuery("drop table testtable3");
+	printf("\n");
+
+
+	printf("CURSOR BINDS: \n");
+	checkSuccess(cur->sendQuery("create table testtable3 (testnumber number)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable3 values (1)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable3 values (2)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable3 values (3)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable3 values (4)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable3 values (5)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable3 values (6)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable3 values (7)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable3 values (8)"),1);
+	printf("\n");
+	checkSuccess(cur->sendQuery("create or replace package types is type cursorType is ref cursor; end;"),1);
+	checkSuccess(cur->sendQuery("create or replace function sp_testtable(value in number) return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable3 where testnumber>value; return l_cursor; end;"),1);
+	//cur->prepareQuery("begin  :curs1:=sp_testtable(5);  :curs2:=sp_testtable(0); end;");
+	cur->prepareQuery("begin  :curs1:=sp_testtable(5); end;");
+	cur->defineOutputBindCursor("curs1");
+	//cur->defineOutputBindCursor("curs2");
+	checkSuccess(cur->executeQuery(),1);
+	sqlrcursor	*bindcur1=cur->getOutputBindCursor("curs1");
+con->debugOn();
+	checkSuccess(bindcur1->fetchFromBindCursor(),1);
+	printf("\n");
+	checkSuccess(bindcur1->getField(0,(uint32_t)0),"6");
+	printf("\n");
+	checkSuccess(bindcur1->getField(1,(uint32_t)0),"7");
+	printf("\n");
+	checkSuccess(bindcur1->getField(2,(uint32_t)0),"8");
+	printf("\n");
+	delete bindcur1;
+	/*sqlrcursor	*bindcur2=cur->getOutputBindCursor("curs2");
+	checkSuccess(bindcur2->fetchFromBindCursor(),1);
+	checkSuccess(bindcur2->getField(0,(uint32_t)0),"1");
+	checkSuccess(bindcur2->getField(1,(uint32_t)0),"2");
+	checkSuccess(bindcur2->getField(2,(uint32_t)0),"3");
+	delete bindcur2;*/
+	checkSuccess(cur->sendQuery("drop package types"),1);
+	cur->sendQuery("drop table testtable3");
+	printf("\n");
+
+
 	// temporary tables
 	printf("TEMPORARY TABLES: \n");
 	cur->sendQuery("drop table temptabledelete\n");

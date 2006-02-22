@@ -21,7 +21,7 @@ class postgresqlcursor : public sqlrcursor_svr {
 	private:
 				postgresqlcursor(sqlrconnection_svr *conn);
 				~postgresqlcursor();
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 		bool		openCursor(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -76,7 +76,7 @@ class postgresqlcursor : public sqlrcursor_svr {
 
 		postgresqlconnection	*postgresqlconn;
 
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 		bool		deallocatestatement;
 		int		bindcount;
 		int		bindcounter;
@@ -112,7 +112,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*options;
 		const char	*db;
 		uint16_t	typemangling;
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 		bool		fakebinds;
 #endif
 

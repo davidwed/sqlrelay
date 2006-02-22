@@ -77,6 +77,7 @@ clauses?</a></li>
 <li><a href="#clientcache">How does client-side result-set caching 
 work?</a></li>
 <li><a href="#servercache">What about server-side result-set caching?</a></li>
+<li><a href="#defineoutputbind">What happened to defineOutputBind?</a></li>
 </ol>
 
 <span class="heading2">Administration Questions</span><br><br>
@@ -1113,6 +1114,20 @@ had run a query that generated that result set.</p>
 <p>Server-side result set caching has not been implemented.  This feature is 
 on the TODO list though.</p>
 
+<a name="defineoutputbind"></a>
+<span class="heading3">What happened to defineOutputBind?</span>
+
+<p>defineOutputBind defined a string output bind.  Version 0.37 added support
+for integer and double output binds and defineOutputBind was replaced with
+defineOutputBindString, defineOutputBindInteger and defineOutputBindDouble and
+getOutputBind was replaced with getOutputBindString, getOutputBindInteger and
+getOutputBindDouble.</p>
+
+<p>Prior to 0.37, stored procedures had to convert integers and doubles to
+strings before returning them.  As of 0.37, this is no longer necessary.</p>
+
+<p>Apps which used defineOutputBind/getOutputBind must replace those calls with
+defineOutputBindString/getOutputBindString to get the exact same behavior.</p>
 
 <a name="tweaks"></a>
 <span class="heading3">What system parameters can I tweak to get better performance out of SQL Relay?</span><br><br>

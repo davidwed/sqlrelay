@@ -15,7 +15,7 @@ postgresqlconnection::postgresqlconnection() : sqlrconnection_svr() {
 	datatypeids=NULL;
 	datatypenames=NULL;
 	pgconn=(PGconn *)NULL;
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 	fakebinds=false;
 #endif
 }
@@ -33,7 +33,7 @@ uint16_t postgresqlconnection::getNumberOfConnectStringVars() {
 }
 
 bool postgresqlconnection::supportsNativeBinds() {
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 	return !fakebinds;
 #else
 	return false;
@@ -56,7 +56,7 @@ void postgresqlconnection::handleConnectString() {
 			typemangling=2;
 		}
 	}
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 	fakebinds=!charstring::compare(connectStringValue("fakebinds"),"yes");
 #endif
 }
@@ -161,7 +161,7 @@ postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
 						sqlrcursor_svr(conn) {
 	postgresqlconn=(postgresqlconnection *)conn;
 	pgresult=NULL;
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 	deallocatestatement=false;
 	cursorname=NULL;
 	bindcounter=0;
@@ -173,13 +173,13 @@ postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
 }
 
 postgresqlcursor::~postgresqlcursor() {
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 	delete[] cursorname;
 #endif
 	delete[] columnnames;
 }
 
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 bool postgresqlcursor::openCursor(uint16_t id) {
 	size_t	cursornamelen=6+charstring::integerLength(id)+1;
 	cursorname=new char[cursornamelen];
@@ -388,12 +388,12 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	nrows=0;
 	currentrow=-1;
 
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 	if (postgresqlconn->fakebinds) {
 #endif
 		pgresult=PQexec(postgresqlconn->pgconn,query);
 
-#ifdef HAVE_POSTGRESQL_PQEXECPARAMS
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 	} else {
 		if (bindcount) {
 			// execute the query

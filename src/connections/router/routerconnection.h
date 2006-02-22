@@ -14,13 +14,18 @@
 struct outputbindvar {
 	const char	*variable;
 	union {
-		char	*stringvalue;
-		int64_t	*intvalue;
-		double	*doublevalue;
+		char		*stringvalue;
+		int64_t		*intvalue;
+		double		*doublevalue;
 	} value;
 	uint16_t	valuesize;
 	bindtype	type;
 	int16_t		*isnull;
+};
+
+struct cursorbindvar {
+	const char	*variable;
+	sqlrcursor_svr	*cursor;
 };
 
 class routerconnection;
@@ -109,6 +114,8 @@ class routercursor : public sqlrcursor_svr {
 
 		sqlrconnection	*con;
 		sqlrcursor	*cur;
+		bool		isbindcur;
+		uint16_t	curindex;
 		sqlrcursor	**curs;
 
 		uint64_t	nextrow;
@@ -117,6 +124,9 @@ class routercursor : public sqlrcursor_svr {
 
 		outputbindvar	obv[MAXVAR];
 		uint16_t	obcount;
+
+		cursorbindvar	cbv[MAXVAR];
+		uint16_t	cbcount;
 
 		regularexpression	createoratemp;
 		regularexpression	preserverows;

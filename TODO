@@ -17,6 +17,7 @@ postgresql/mysql connetions shouldn't try to use bind variables against older
 implement interbase dead-db/relogin
 
 query router:
+	cursor binds
 	query filtering
 	investigate 2 phase commit
 	document
@@ -262,6 +263,7 @@ Features:
 		auto-commit mode.  For postgresql at least, this is expensive.
 		It should only call commit/rollback if the database isn't in
 		auto-commit mode.
+	date object binds
 
 Availability:
 	connections should ping database server every so often to make sure

@@ -70,7 +70,7 @@ use.</p>
 public class MyClass {
 	public static main() {
 
-       		SQLRConnection      con=<b><font color=#a02828>new</font></b> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+       		SQLRConnection      con=<b><font color=#a02828>new</font></b> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
 
        		... execute some queries ...
 
@@ -106,7 +106,7 @@ query.  The same cursor may be used over and over.</p>
 public class MyClass {
 	public static main() {
 
-        	SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	cur.sendQuery(<FONT color=#f800f8>&quot;select * from my_table&quot;</FONT>);
@@ -199,7 +199,7 @@ You can find out why by calling errorMessage().</p>
 public class MyClass {
 	public static main() {
 
-        	SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	<B><FONT color=#a02828>if</FONT></B> (!cur.sendQuery(<FONT color=#f800f8>&quot;select * from my_nonexistant_table&quot;</FONT>)) {
@@ -241,7 +241,7 @@ scale.</p>
 <font color="#2e8b57"><b>public</b></font> <font color="#2e8b57"><b>class</b></font> myclass {
         <font color="#2e8b57"><b>public</b></font> <font color="#2e8b57"><b>static</b></font> main() {
 
-                SQLRConnection      con=<font color="#a52a2a"><b>new</b></font> SQLRConnection(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+                SQLRConnection      con=<font color="#a52a2a"><b>new</b></font> SQLRConnection(<font color="#ff00ff">&quot;host&quot;</font>,(<FONT color=#288850>short</FONT>)<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
                 SQLRCursor          cur=<font color="#a52a2a"><b>new</b></font> SQLRCursor(con);
 
                 cur.prepareQuery(<font color="#ff00ff">&quot;select * from mytable $(whereclause)&quot;</font>)
@@ -272,7 +272,7 @@ provides methods for defining and retrieving output bind variables.</p>
 <font color="#2e8b57"><b>public</b></font> <font color="#2e8b57"><b>class</b></font> myclass {
         <font color="#2e8b57"><b>public</b></font> <font color="#2e8b57"><b>static</b></font> main() {
 
-                SQLRConnection      con=<font color="#a52a2a"><b>new</b></font> SQLRConnection(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+                SQLRConnection      con=<font color="#a52a2a"><b>new</b></font> SQLRConnection(<font color="#ff00ff">&quot;host&quot;</font>,(<FONT color=#288850>short</FONT>)<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
                 SQLRCursor          cur=<font color="#a52a2a"><b>new</b></font> SQLRCursor(con);
 
                 cur.prepareQuery(<font color="#ff00ff">&quot;begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;&quot;</font>);
@@ -313,7 +313,7 @@ and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
 <font color="#2e8b57"><b>public</b></font> <font color="#2e8b57"><b>class</b></font> myclass {
         <font color="#2e8b57"><b>public</b></font> <font color="#2e8b57"><b>static</b></font> main() {
 
-                SQLRConnection      con=<font color="#a52a2a"><b>new</b></font> SQLRConnection(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+                SQLRConnection      con=<font color="#a52a2a"><b>new</b></font> SQLRConnection(<font color="#ff00ff">&quot;host&quot;</font>,(<FONT color=#288850>short</FONT>)<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
                 SQLRCursor          cur=<font color="#a52a2a"><b>new</b></font> SQLRCursor(con);
 
                 cur.executeQuery(<font color="#ff00ff">&quot;create table images (image blob, description clob)&quot;</font>);
@@ -351,7 +351,7 @@ defineOutputBindClob()/getOutputBindClob().</p>
 <font color="#2e8b57"><b>public</b></font> <font color="#2e8b57"><b>class</b></font> myclass {
         <font color="#2e8b57"><b>public</b></font> <font color="#2e8b57"><b>static</b></font> main() {
 
-                SQLRConnection      con=<font color="#a52a2a"><b>new</b></font> SQLRConnection(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+                SQLRConnection      con=<font color="#a52a2a"><b>new</b></font> SQLRConnection(<font color="#ff00ff">&quot;host&quot;</font>,(<FONT color=#288850>short</FONT>)<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
                 SQLRCursor          cur=<font color="#a52a2a"><b>new</b></font> SQLRCursor(con);
 
                 cur.prepareQuery(<font color="#ff00ff">&quot;begin  select image into :image from images;  select description into :desc from images;  end;&quot;</font>);
@@ -399,7 +399,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 public class MyClass {
        public static main() {
 
-               SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+               SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
                SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
                cur.prepareQuery(<FONT color=#f800f8>&quot;select * from mytable where mycolumn&gt;:value&quot;</FONT>);
@@ -441,7 +441,7 @@ result sets.</p>
 public class MyClass {
 	public static main() {
 
-        	SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	cur.sendQuery(<FONT color=#f800f8>&quot;select * from my_table&quot;</FONT>);
@@ -477,7 +477,7 @@ fields in the row.</p>
 public class MyClass {
 	public static main() {
 
-        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	cur.sendQuery(<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
@@ -546,7 +546,7 @@ index of the first row of the currently buffered chunk.
 public class MyClass {
 	public static main() {
 
-        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	cur.setResultSetBufferSize(<FONT color=#ff00ff>5</FONT>);
@@ -605,7 +605,7 @@ iterate through it's result set, inserting rows into another table, using only
 public class MyClass {
 	public static main() {
 
-        	SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a02828>new</FONT></B> SQLRConnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         	SQLRCursor          cursor1=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
         	SQLRCursor          cursor2=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
@@ -647,7 +647,7 @@ getOutputBindCursor() and fetchFromOutputBindCursor().</p>
 
         <font color="#288850"><b>public</b></font> <font color="#288850"><b>static</b></font> main() {
 
-                SQLRConnection      con=<font color="#a02828"><b>new</b></font> SQLRConnection(<font color="#f800f8">&quot;host&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+                SQLRConnection      con=<font color="#a02828"><b>new</b></font> SQLRConnection(<font color="#f800f8">&quot;host&quot;</font>,(<FONT color=#288850>short</FONT>)<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
                 SQLRCursor          cur=<font color="#a02828"><b>new</b></font> SQLRCursor(con);
 
                 cur.prepareQuery(<font color="#f800f8">&quot;begin  :curs:=sp_mytable; end;&quot;</font>);
@@ -698,7 +698,7 @@ always returned as false.</p>
 public class MyClass {
 	public static main() {
 
-        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	cur.sendQuery(<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
@@ -758,7 +758,7 @@ database.</p>
 
         <font color="#288850"><b>public</b></font> <font color="#288850"><b>static</b></font> main() {
 
-                SQLRConnection      con=<font color="#a02828"><b>new</b></font> SQLRConnection(<font color="#f800f8">&quot;host&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+                SQLRConnection      con=<font color="#a02828"><b>new</b></font> SQLRConnection(<font color="#f800f8">&quot;host&quot;</font>,(<FONT color=#288850>short</FONT>)<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
                 SQLRCursor          cur=<font color="#a02828"><b>new</b></font> SQLRCursor(con);
 
                 <font color="#0000f8">// column names will be forced to upper case</font>
@@ -1648,7 +1648,7 @@ just open the file for each page of the report.</p>
 public class MyClass {
 	public static main() {
 
-        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
 		... generate a unique filename ...
@@ -1682,7 +1682,7 @@ public class MyClass {
 
         	... get the page to display from the previous page ...
 
-        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	cur.openCachedResultSet(filename);
@@ -1720,7 +1720,7 @@ is possible.</p>
 public class MyClass {
 	public static main() {
 
-        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	cur.sendQuery(<FONT color=#ff00ff>&quot;insert into my_table values (1,2,3)&quot;</FONT>);
@@ -1751,7 +1751,7 @@ public class MyClass {
 
         	... get rs, port and socket from previous page ...
 
-        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        	SQLRConnection      con=<B><FONT color=#a52a2a>new</FONT></B> SQLRConnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,(<FONT color=#288850>short</FONT>)<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         	SQLRCursor          cur=<B><FONT color=#a02828>new</FONT></B> SQLRCursor(con);
 
         	con.resumeSession(port,socket);
