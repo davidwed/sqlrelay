@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS initscript_prefix CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH ENABLE_ROUTER OVERRIDEPERLSITEARCH OVERRIDEPERLSITELIB OVERRIDEPERLINSTALLMAN3DIR OVERRIDEPERLMAN3EXT PYTHONUSERPATH OVERRIDERUBYSITEARCHDIR OVERRIDERUBYSITELIBDIR JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE WALL PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLLIB PERLPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYLIB GCJ FASTJAR HAVE_JAVA JAVAC JAR JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS initscript_prefix CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH MSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH OVERRIDEPERLSITEARCH OVERRIDEPERLSITELIB OVERRIDEPERLINSTALLMAN3DIR OVERRIDEPERLMAN3EXT PYTHONUSERPATH OVERRIDERUBYSITEARCHDIR OVERRIDERUBYSITELIBDIR JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE WALL PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC MSQLINCLUDES MSQLLIBS MSQLLIBSPATH MSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLLIB PERLPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYLIB GCJ FASTJAR HAVE_JAVA JAVAC JAR JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1047,7 +1047,6 @@ Optional Features:
   --enable-interbase-rpath      Use -rpath when building Interbase connection
   --disable-mdbtools            Don't build MDB Tools connection
   --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection
-  --enable-router               Build experimental query router
   --disable-perl                Don't build Perl api
   --disable-python              Don't build Python api
   --enable-python-rpath         Use -rpath when linking the Python library against the SQL Relay client library
@@ -1909,14 +1908,6 @@ if test "${enable_mdbtools_rpath+set}" = set; then
   MDBTOOLSUSERPATH="yes"
 else
   MDBTOOLSUSERPATH=""
-fi;
-
-# Check whether --enable-router or --disable-router was given.
-if test "${enable_router+set}" = set; then
-  enableval="$enable_router"
-  ENABLE_ROUTER="yes"
-else
-  ENABLE_ROUTER=""
 fi;
 
 
@@ -4565,7 +4556,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4568 "configure"' > conftest.$ac_ext
+  echo '#line 4559 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5688,7 +5679,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5691:" \
+echo "$as_me:5682:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6786,11 +6777,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6789: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6780: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6793: \$? = $ac_status" >&5
+   echo "$as_me:6784: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7048,11 +7039,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7051: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7042: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7055: \$? = $ac_status" >&5
+   echo "$as_me:7046: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7110,11 +7101,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7113: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7104: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7117: \$? = $ac_status" >&5
+   echo "$as_me:7108: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8496,7 +8487,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 8499 "configure"' > conftest.$ac_ext
+    echo '#line 8490 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9371,7 +9362,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9374 "configure"
+#line 9365 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9469,7 +9460,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9472 "configure"
+#line 9463 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11717,11 +11708,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11720: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11711: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11724: \$? = $ac_status" >&5
+   echo "$as_me:11715: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -11779,11 +11770,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11782: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11773: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11786: \$? = $ac_status" >&5
+   echo "$as_me:11777: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12294,7 +12285,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 12297 "configure"' > conftest.$ac_ext
+    echo '#line 12288 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -13169,7 +13160,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13172 "configure"
+#line 13163 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13267,7 +13258,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13270 "configure"
+#line 13261 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14152,11 +14143,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14155: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14146: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14159: \$? = $ac_status" >&5
+   echo "$as_me:14150: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14214,11 +14205,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14217: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14208: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14221: \$? = $ac_status" >&5
+   echo "$as_me:14212: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15580,7 +15571,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 15583 "configure"' > conftest.$ac_ext
+    echo '#line 15574 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -16357,11 +16348,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16360: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16351: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16364: \$? = $ac_status" >&5
+   echo "$as_me:16355: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16619,11 +16610,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16622: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16613: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16626: \$? = $ac_status" >&5
+   echo "$as_me:16617: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16681,11 +16672,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16684: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16675: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16688: \$? = $ac_status" >&5
+   echo "$as_me:16679: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18067,7 +18058,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 18070 "configure"' > conftest.$ac_ext
+    echo '#line 18061 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -18942,7 +18933,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18945 "configure"
+#line 18936 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19040,7 +19031,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 19043 "configure"
+#line 19034 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -35984,7 +35975,6 @@ s,@ODBCUSERPATH@,$ODBCUSERPATH,;t t
 s,@DB2USERPATH@,$DB2USERPATH,;t t
 s,@INTERBASEUSERPATH@,$INTERBASEUSERPATH,;t t
 s,@MDBTOOLSUSERPATH@,$MDBTOOLSUSERPATH,;t t
-s,@ENABLE_ROUTER@,$ENABLE_ROUTER,;t t
 s,@OVERRIDEPERLSITEARCH@,$OVERRIDEPERLSITEARCH,;t t
 s,@OVERRIDEPERLSITELIB@,$OVERRIDEPERLSITELIB,;t t
 s,@OVERRIDEPERLINSTALLMAN3DIR@,$OVERRIDEPERLINSTALLMAN3DIR,;t t

@@ -35,7 +35,6 @@ class routercursor : public sqlrcursor_svr {
 	private:
 				routercursor(sqlrconnection_svr *conn);
 				~routercursor();
-		bool		openCursor(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		begin(const char *query, uint32_t length);

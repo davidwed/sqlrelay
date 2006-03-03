@@ -245,10 +245,6 @@ routercursor::~routercursor() {
 	delete[] curs;
 }
 
-bool routercursor::openCursor(uint16_t id) {
-	return true;
-}
-
 bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
 	// check for a begin query, but not "begin ... end;" query
@@ -419,7 +415,6 @@ bool routercursor::outputBindClob(const char *variable,
 bool routercursor::outputBindCursor(const char *variable,
 						uint16_t variablesize,
 						sqlrcursor_svr *cursor) {
-//printf("output bind cursor %s = %d\n",variable,cursor);
 	cur->defineOutputBindCursor(variable+1);
 	cbv[cbcount].variable=variable+1;
 	cbv[cbcount].cursor=cursor;
@@ -445,6 +440,7 @@ void routercursor::returnOutputBindClob(uint16_t index) {
 
 bool routercursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
+
 	if (!execute) {
 		return true;
 	}
@@ -491,16 +487,11 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 	}
 
 	// handle cursor bind values
-//printf("handle cursor binds...\n");
 	for (uint16_t index=0; index<cbcount; index++) {
-//printf("index=%d\n",index);
 		routercursor	*rcur=(routercursor *)cbv[index].cursor;
-//printf("rcur=%d\n",rcur);
 		rcur->con=con;
-//printf("getOutputBindCursor(%s)\n",cbv[index].variable);
 		rcur->cur=cur->getOutputBindCursor(cbv[index].variable);
 		if (!rcur->cur) {
-//printf("failed to get output bind cursor\n");
 			return false;
 		}
 		rcur->cur->setResultSetBufferSize(FETCH_AT_ONCE);

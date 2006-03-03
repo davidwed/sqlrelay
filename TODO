@@ -280,6 +280,7 @@ backends:
 	bind 9.1 backend
 	dhcp backend
 	qmail backend
+	dbmail backend
 	qpopper port
 	bugzilla port
 	litesql
