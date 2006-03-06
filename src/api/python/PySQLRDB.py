@@ -163,7 +163,7 @@ class SQLRCursor:
         num_rows=CSQLRelay.rowCount(self.cursor)
         if size>=num_rows:
             size=num_rows-1
-        rc=__getRowRange(self.cur_row, size)
+        rc=self.__getRowRange(self.cur_row, size)
         self.cur_row=size
         return rc
 
