@@ -111,22 +111,22 @@
 #define DEFAULT_SID_PASSWORD "password"
 	// default sid-password
 
-#define DEFAULT_ROUTER_HOST "localhost"
+#define DEFAULT_ROUTER_HOST ""
 	// default router host
 
-#define DEFAULT_ROUTER_PORT "9000"
+#define DEFAULT_ROUTER_PORT "0"
 	// default router port
 
-#define DEFAULT_ROUTER_SOCKET "/tmp/sqlrelay.socket"
+#define DEFAULT_ROUTER_SOCKET ""
 	// default router socket
 
-#define DEFAULT_ROUTER_USER "user"
+#define DEFAULT_ROUTER_USER ""
 	// default router user
 
-#define DEFAULT_ROUTER_PASSWORD "password"
+#define DEFAULT_ROUTER_PASSWORD ""
 	// default router password
 
-#define DEFAULT_ROUTER_PATTERN ".*"
+#define DEFAULT_ROUTER_PATTERN ""
 	// default router pattern
 
 // cachemanager/sqlrclient parameters

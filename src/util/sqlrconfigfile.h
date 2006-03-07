@@ -109,19 +109,20 @@ class connectstringcontainer {
 
 typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
 
-class routercontainer {
+class routecontainer {
 	friend class sqlrconfigfile;
 	public:
-			routercontainer();
-			~routercontainer();
+			routecontainer();
+			~routecontainer();
 
+		void	setIsFilter(bool isfilter);
 		void	setHost(const char *host);
 		void	setPort(uint16_t port);
 		void	setSocket(const char *socket);
 		void	setUser(const char *user);
 		void	setPassword(const char *password);
-		// FIXME: methods for adding regular expressions
 
+		bool		getIsFilter();
 		const char	*getHost();
 		uint16_t	getPort();
 		const char	*getSocket();
@@ -129,6 +130,7 @@ class routercontainer {
 		const char	*getPassword();
 		linkedlist< regularexpression * >	*getRegexList();
 	private:
+		bool			isfilter;
 		char			*host;
 		uint16_t		port;
 		char			*socket;
@@ -137,7 +139,7 @@ class routercontainer {
 		linkedlist< regularexpression * >	regexlist;
 };
 
-typedef linkedlistnode< routercontainer * >	routernode;
+typedef linkedlistnode< routecontainer * >	routenode;
 
 class sqlrconfigfile : public xmlsax {
 	public:
@@ -196,7 +198,7 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t		getConnectionCount();
 		uint32_t		getMetricTotal();
 
-		linkedlist< routercontainer * >	*getRouterList();
+		linkedlist< routecontainer * >	*getRouteList();
 	private:
 		const char	*id;
 		bool		correctid;
@@ -263,14 +265,15 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t		connectioncount;
 		uint32_t		metrictotal;
 
-		routercontainer		*currentrouter;
+		routecontainer		*currentroute;
 		bool			inrouter;
+		bool			ignoreconnections;
 
 		uint16_t	connectstringcount;
 
 		linkedlist< connectstringcontainer * >	connectstringlist;
 		linkedlist< usercontainer * >		userlist;
-		linkedlist< routercontainer *>		routerlist;
+		linkedlist< routecontainer *>		routelist;
 };
 
 #endif

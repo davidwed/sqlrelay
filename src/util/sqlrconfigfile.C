@@ -58,8 +58,9 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	sidsocket=charstring::duplicate(DEFAULT_SID_SOCKET);
 	siduser=charstring::duplicate(DEFAULT_SID_USER);
 	sidpassword=charstring::duplicate(DEFAULT_SID_PASSWORD);
-	currentrouter=NULL;
+	currentroute=NULL;
 	inrouter=false;
+	ignoreconnections=false;
 }
 
 sqlrconfigfile::~sqlrconfigfile() {
@@ -97,7 +98,7 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] siduser;
 	delete[] sidpassword;
 
-	routernode	*rn=routerlist.getNodeByIndex(0);
+	routenode	*rn=routelist.getNodeByIndex(0);
 	while (rn) {
 		delete rn->getData();
 		rn=rn->getNext();
@@ -312,8 +313,8 @@ uint32_t sqlrconfigfile::getMetricTotal() {
 	return metrictotal;
 }
 
-linkedlist< routercontainer * >	*sqlrconfigfile::getRouterList() {
-	return &routerlist;
+linkedlist< routecontainer * >	*sqlrconfigfile::getRouteList() {
+	return &routelist;
 }
 
 bool sqlrconfigfile::tagStart(const char *name) {
@@ -329,13 +330,24 @@ bool sqlrconfigfile::tagStart(const char *name) {
 		currentuser=new usercontainer();
 		userlist.append(currentuser);
 	} else if (!charstring::compare(name,"connection")) {
-		currentconnect=new connectstringcontainer(connectstringcount);
-		connectstringlist.append(currentconnect);
+		if (!ignoreconnections) {
+			currentconnect=
+				new connectstringcontainer(connectstringcount);
+			connectstringlist.append(currentconnect);
+		}
 	} else if (!charstring::compare(name,"router")) {
 		inrouter=true;
-	} else if (!charstring::compare(name,"routerconnection")) {
-		currentrouter=new routercontainer();
-		routerlist.append(currentrouter);
+		currentconnect=new connectstringcontainer(connectstringcount);
+		connectstringlist.append(currentconnect);
+		currentconnect->setConnectionId(DEFAULT_CONNECTIONID);
+		ignoreconnections=true;
+	} else if (!charstring::compare(name,"route")) {
+		currentroute=new routecontainer();
+		routelist.append(currentroute);
+	} else if (!charstring::compare(name,"filter")) {
+		currentroute=new routecontainer();
+		currentroute->setIsFilter(true);
+		routelist.append(currentroute);
 	}
 
 	return true;
@@ -594,43 +606,53 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			currentuser->setPassword((value)?value:
 							DEFAULT_PASSWORD);
 		} else if (currentattribute==CONNECTIONID_ATTRIBUTE) {
-			if (charstring::length(value)>MAXCONNECTIONIDLEN) {
-				fprintf(stderr,"error: connectionid \"%s\" is too long, must be %d characters or fewer.\n",value,MAXCONNECTIONIDLEN);
-				return false;
-			}
-			currentconnect->setConnectionId((value)?value:
+			if (currentconnect) {
+				if (charstring::length(value)>
+						MAXCONNECTIONIDLEN) {
+					fprintf(stderr,"error: connectionid \"%s\" is too long, must be %d characters or fewer.\n",value,MAXCONNECTIONIDLEN);
+					return false;
+				}
+				currentconnect->setConnectionId((value)?value:
 							DEFAULT_CONNECTIONID);
+			}
 		} else if (currentattribute==STRING_ATTRIBUTE) {
-			currentconnect->setString((value)?value:
+			if (currentconnect) {
+				currentconnect->setString((value)?value:
 							DEFAULT_CONNECTSTRING);
-			currentconnect->parseConnectString();
+				currentconnect->parseConnectString();
+			}
 		} else if (currentattribute==METRIC_ATTRIBUTE) {
-			currentconnect->setMetric(
+			if (currentconnect) {
+				currentconnect->setMetric(
 					atouint32_t(value,DEFAULT_METRIC,1));
+			}
 		} else if (currentattribute==BEHINDLOADBALANCER_ATTRIBUTE) {
-			currentconnect->setBehindLoadBalancer(
-				!charstring::compareIgnoringCase(value,"yes"));
+			if (currentconnect) {
+				currentconnect->setBehindLoadBalancer(
+					!charstring::compareIgnoringCase(
+								value,"yes"));
+			}
 		} else if (currentattribute==ROUTER_HOST_ATTRIBUTE) {
-			currentrouter->setHost((value)?value:
+			currentroute->setHost((value)?value:
 							DEFAULT_ROUTER_HOST);
 		} else if (currentattribute==ROUTER_PORT_ATTRIBUTE) {
-			currentrouter->setPort(atouint32_t(value,
+			currentroute->setPort(atouint32_t(value,
 							DEFAULT_ROUTER_PORT,1));
 		} else if (currentattribute==ROUTER_SOCKET_ATTRIBUTE) {
-			currentrouter->setSocket((value)?value:
+			currentroute->setSocket((value)?value:
 							DEFAULT_ROUTER_SOCKET);
 		} else if (currentattribute==ROUTER_USER_ATTRIBUTE) {
-			currentrouter->setUser((value)?value:
+			currentroute->setUser((value)?value:
 							DEFAULT_ROUTER_USER);
 		} else if (currentattribute==ROUTER_PASSWORD_ATTRIBUTE) {
-			currentrouter->setPassword((value)?value:
+			currentroute->setPassword((value)?value:
 						DEFAULT_ROUTER_PASSWORD);
 		} else if (currentattribute==ROUTER_PATTERN_ATTRIBUTE) {
 			regularexpression	*re=
 				new regularexpression(
 					(value)?value:DEFAULT_ROUTER_PATTERN);
 			re->study();
-			currentrouter->getRegexList()->append(re);
+			currentroute->getRegexList()->append(re);
 		}
 	}
 	return true;
@@ -795,7 +817,8 @@ const char *connectstringcontainer::getConnectStringValue(
 }
 
 
-routercontainer::routercontainer() {
+routecontainer::routecontainer() {
+	isfilter=false;
 	host=NULL;
 	port=0;
 	socket=NULL;
@@ -803,7 +826,7 @@ routercontainer::routercontainer() {
 	password=NULL;
 }
 
-routercontainer::~routercontainer() {
+routecontainer::~routecontainer() {
 	delete[] host;
 	delete[] socket;
 	delete[] user;
@@ -815,46 +838,54 @@ routercontainer::~routercontainer() {
 	}
 }
 
-void routercontainer::setHost(const char *host) {
+void routecontainer::setIsFilter(bool isfilter) {
+	this->isfilter=isfilter;
+}
+
+void routecontainer::setHost(const char *host) {
 	this->host=charstring::duplicate(host);
 }
 
-void routercontainer::setPort(uint16_t port) {
+void routecontainer::setPort(uint16_t port) {
 	this->port=port;
 }
 
-void routercontainer::setSocket(const char *socket) {
+void routecontainer::setSocket(const char *socket) {
 	this->socket=charstring::duplicate(socket);
 }
 
-void routercontainer::setUser(const char *user) {
+void routecontainer::setUser(const char *user) {
 	this->user=charstring::duplicate(user);
 }
 
-void routercontainer::setPassword(const char *password) {
+void routecontainer::setPassword(const char *password) {
 	this->password=charstring::duplicate(password);
 }
 
-const char *routercontainer::getHost() {
+bool routecontainer::getIsFilter() {
+	return isfilter;
+}
+
+const char *routecontainer::getHost() {
 	return host;
 } 
 
-uint16_t routercontainer::getPort() {
+uint16_t routecontainer::getPort() {
 	return port;
 } 
 
-const char *routercontainer::getSocket() {
+const char *routecontainer::getSocket() {
 	return socket;
 } 
 
-const char *routercontainer::getUser() {
+const char *routecontainer::getUser() {
 	return user;
 } 
 
-const char *routercontainer::getPassword() {
+const char *routecontainer::getPassword() {
 	return password;
 } 
 
-linkedlist< regularexpression * > *routercontainer::getRegexList() {
+linkedlist< regularexpression * > *routecontainer::getRegexList() {
 	return &regexlist;
 }

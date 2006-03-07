@@ -45,22 +45,31 @@ void routerconnection::handleConnectString() {
 
 	cfgfile=cfgfl;
 
-	linkedlist< routercontainer *>	*routerlist=cfgfl->getRouterList();
-	concount=routerlist->getLength();
+	linkedlist< routecontainer * >	*routelist=cfgfl->getRouteList();
+	concount=routelist->getLength();
 
 	cons=new sqlrconnection *[concount];
 	beginquery=new const char *[concount];
 	anymustbegin=false;
 	for (uint16_t index=0; index<concount; index++) {
 
-		routercontainer	*rn=routerlist->
+		cons[index]=NULL;
+		beginquery[index]=NULL;
+
+		routecontainer	*rn=routelist->
 					getNodeByIndex(index)->getData();
+
+		// empty host/port/socket/user/password means that queries
+		// going to this connection will be filtered out
+		if (rn->getIsFilter()) {
+			continue;
+		}
+
 		cons[index]=new sqlrconnection(rn->getHost(),rn->getPort(),
 						rn->getSocket(),rn->getUser(),
 						rn->getPassword(),0,1);
 
 		const char	*id=cons[index]->identify();
-		beginquery[index]=NULL;
 		if (!charstring::compare(id,"sybase") ||
 				!charstring::compare(id,"freetds")) {
 			beginquery[index]="begin tran";
@@ -99,6 +108,9 @@ bool routerconnection::autoCommitOn() {
 	// turn autocommit on for all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
+		if (!cons[index]) {
+			continue;
+		}
 		bool	res=cons[index]->autoCommitOn();
 		// FIXME: "do something" if this fails
 		// The connection class calls autoCommitOn or autoCommitOff
@@ -133,6 +145,9 @@ bool routerconnection::autoCommitOff() {
 	// turn autocommit on for all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
+		if (!cons[index]) {
+			continue;
+		}
 		bool	res=cons[index]->autoCommitOff();
 		// FIXME: "do something" if this fails
 		// The connection class calls autoCommitOn or autoCommitOff
@@ -169,6 +184,9 @@ bool routerconnection::commit() {
 	// FIXME: wish I had 2 stage commit...
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
+		if (!cons[index]) {
+			continue;
+		}
 		bool	res=cons[index]->commit();
 		// FIXME: "do something" if this fails
 		if (result) {
@@ -184,6 +202,9 @@ bool routerconnection::rollback() {
 	// FIXME: wish I had 2 stage commit...
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
+		if (!cons[index]) {
+			continue;
+		}
 		bool	res=cons[index]->rollback();
 		// FIXME: "do something" if this fails
 		if (result) {
@@ -195,6 +216,9 @@ bool routerconnection::rollback() {
 
 void routerconnection::endSession() {
 	for (uint16_t index=0; index<concount; index++) {
+		if (!cons[index]) {
+			continue;
+		}
 		// FIXME: "do something" if this fails
 		cons[index]->endSession();
 	}
@@ -209,6 +233,9 @@ bool routerconnection::ping() {
 	// ping all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
+		if (!cons[index]) {
+			continue;
+		}
 		bool	res=cons[index]->ping();
 		if (result) {
 			result=res;
@@ -226,6 +253,10 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	curindex=0;
 	curs=new sqlrcursor *[routerconn->concount];
 	for (uint16_t index=0; index<routerconn->concount; index++) {
+		curs[index]=NULL;
+		if (!routerconn->cons[index]) {
+			continue;
+		}
 		curs[index]=new sqlrcursor(routerconn->cons[index]);
 		curs[index]->setResultSetBufferSize(FETCH_AT_ONCE);
 		curs[index]->getNullsAsNulls();
@@ -263,28 +294,42 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	isbindcur=false;
 	curindex=0;
 
+	// initialize the output bind count
+	obcount=0;
+
+	// initialize the cursor bind count
+	cbcount=0;
+
 	// look through the regular expressions and figure out which
 	// connection this query needs to be run through
 	uint16_t	conindex=0;
-	routernode	*rcn=routerconn->cfgfile->
-					getRouterList()->getNodeByIndex(0);
-	while (rcn && !cur) {
+	routenode	*rcn=routerconn->cfgfile->
+					getRouteList()->getNodeByIndex(0);
+	bool	found=false;
+	while (rcn && !found) {
 		linkedlistnode< regularexpression * >	*ren=
 					rcn->getData()->getRegexList()->
 							getNodeByIndex(0);
-		while (ren && !cur) {
+
+		while (ren && !found) {
 			if (ren->getData()->match(query)) {
 				con=routerconn->cons[conindex];
 				cur=curs[conindex];
 				curindex=conindex;
+				found=true;
 			}
 			ren=ren->getNext();
 		}
 
-		rcn=rcn->getNext();
-		conindex++;
+		if (!found) {
+			rcn=rcn->getNext();
+			conindex++;
+		}
 	}
 
+	// cur could be NULL here either because no connection could be found
+	// to run the query, or because the query matched the pattern of
+	// a connection which was intentionally set up to filter out the query
 	if (!cur) {
 		return false;
 	}
@@ -292,12 +337,6 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// prepare the query using the cursor from whichever
 	// connection turned out to be the right one
 	cur->prepareQuery(query);
-
-	// initialize the output bind count
-	obcount=0;
-
-	// initialize the cursor bind count
-	cbcount=0;
 
 	return true;
 }
@@ -552,6 +591,10 @@ bool routercursor::begin(const char *query, uint32_t length) {
 	bool	result=true;
 	for (uint16_t index=0; index<routerconn->concount; index++) {
 
+		if (!routerconn->cons[index]) {
+			continue;
+		}
+
 		// for databases that allow begin's, run the begin query,
 		// for others, just set autocommit on
 		bool	res=false;
@@ -586,7 +629,7 @@ bool routercursor::begin(const char *query, uint32_t length) {
 const char *routercursor::errorMessage(bool *liveconnection) {
 	// FIXME: detect downed database or downed relay
 	*liveconnection=true;
-	return cur->errorMessage();
+	return (cur)?cur->errorMessage():"";
 }
 
 bool routercursor::knowsRowCount() {

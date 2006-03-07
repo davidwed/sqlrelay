@@ -166,6 +166,8 @@ class routerconnection : public sqlrconnection_svr {
 
 		regularexpression	beginregex;
 		regularexpression	beginendregex;
+
+		const char	*error;
 };
 
 #endif

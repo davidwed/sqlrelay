@@ -128,6 +128,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->ping(),1);
 	printf("\n");
 
+	printf("FILTERED-OUT QUERIES: \n");
+	checkSuccess(cur->sendQuery("create table junktable (col1 int)"),0);
+	checkSuccess(cur->sendQuery("insert into junktable values (1)"),0);
+	checkSuccess(cur->sendQuery("update junktable set col1=2"),0);
+	checkSuccess(cur->sendQuery("delete from junktable"),0);
+	checkSuccess(cur->sendQuery("drop table junktable (col1 int)"),0);
+
 	// drop existing table
 	cur->sendQuery("drop table testtable1");
 	cur->sendQuery("drop table testtable2");
@@ -930,4 +937,5 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable1");
 	cur->sendQuery("drop table testtable2");
 
+	printf("\n");
 }
