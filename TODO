@@ -17,6 +17,7 @@ postgresql/mysql connetions shouldn't try to use bind variables against older
 implement interbase dead-db/relogin
 
 query router:
+	"do something"'s
 	investigate 2 phase commit
 	document
 

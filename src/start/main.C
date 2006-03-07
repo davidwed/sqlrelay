@@ -277,6 +277,8 @@ int main(int argc, const char **argv) {
 	printf("\n\nThanks to MP3.com for sponsoring: \n");
 	printf("	Clustered/Replicated database support.\n");
 	printf("	Perl API.\n");
+	printf("Thanks to FeedLounge for sponsoring: \n");
+	printf("	Query routing and filtering.\n");
 	
 	// successful exit
 	exit(exitstatus);

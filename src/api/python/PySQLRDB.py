@@ -153,7 +153,7 @@ class SQLRCursor:
 	self.execute(procname,parameters)
         
     def fetchone(self):
-        row=__getRow(self.cur_row)
+        row=self.__getRow(self.cur_row)
         self.cur_row=self.cur_row+1
         return row
 
@@ -171,7 +171,7 @@ class SQLRCursor:
         rc=[]
         num_rows=CSQLRelay.rowCount(self.cursor)
         for row in range(self.cur_row, num_rows):
-            row=__getRow(self.cur_row)
+            row=self.__getRow(self.cur_row)
             self.cur_row=self.cur_row+1
             rc.append(row)
         return rc

@@ -1,5 +1,5 @@
 <!ELEMENT instances (instance*)>
-<!ELEMENT instance (users,connections)>
+<!ELEMENT instance (users,connections,router)>
 	<!ATTLIST instance id CDATA "defaultid">
 	<!ATTLIST instance addresses CDATA "0.0.0.0">
 	<!ATTLIST instance port CDATA "9000">
@@ -36,3 +36,16 @@
 	<!ATTLIST connection string CDATA "user=scott;password=tiger">
 	<!ATTLIST connection metric CDATA "1">
 	<!ATTLIST connection behindloadbalancer (yes|no) "no">
+
+<!ELEMENT router (route*,filter*)>
+<!ELEMENT route (query*)>
+	<!ATTLIST route host CDATA "">
+	<!ATTLIST route port CDATA "">
+	<!ATTLIST route socket CDATA "">
+	<!ATTLIST route user CDATA "">
+	<!ATTLIST route password CDATA "">
+
+<!ELEMENT filter (query*)>
+
+<!ELEMENT query EMPTY>
+	<!ATTLIST query pattern CDATA "">
