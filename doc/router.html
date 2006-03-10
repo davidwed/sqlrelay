@@ -1,0 +1,112 @@
+<html>
+<head>
+<title>firstworks   Routing and Filtering Queries with SQL Relay</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Routing and Filtering Queries with SQL Relay</span><br><br>
+
+<p>SQL Relay's query routing and filtering feature allows you to send one
+set of queries to one database, another set of queries to another and filter
+out queries entirely so that they aren't sent to any database.</p>
+
+<p>How is this useful?  Here are some examples of what you can do:</p>
+
+<ul>
+<li>Send insert's, update's and delete's to a master database and distribute
+select's over a set of slaves.</li>
+<li>Provide a single point of access to multiple databases, even different
+types of databases (eg. MySQL, Oracle, MS SQL Server).</li>
+<li>Prevent joins between particular sets of tables.</li>
+<li>Filter out queries that lack a where clause.</li>
+<li>...</li>
+</ul>
+
+<span class="heading1">How it Works</span><br><br>
+
+<p>Normally, SQL Relay maintains a set of persistent connections to a database
+or database cluster and distributes queries over the connections.  The databases
+to connect to are defined in the sqlrelay.conf file.</p>
+
+<p>When used in query routing and filtering mode, SQL Relay is configured to
+distribute queries over other instances of SQL Relay running in standard
+mode.</p>
+
+<p>For instance, you can set up one instance of SQL Relay to maintain 3
+connections to a MySQL database and another instance of SQL Relay to maintain
+5 connections to a PostgreSQL database, then set up another instance of
+SQL Relay to route queries to the other 2 instances.</p>
+
+<blockquote>...image here...</blockquote>
+
+<p>The router instance decides which queries to send to the other instances by
+comparing them to a set of regular expressions.</p>
+
+<span class="heading1">General Configuration</span><br><br>
+
+<span class="heading1">Sending Insert's, Update's and Delete's to a Master
+Database and Distribute Select's Over a Set of Slaves</span>
+
+<span class="heading1">Provide a Single Point of Access to Multiple Databases</span>
+
+<span class="heading1">Prevent Joins Between Particular Sets of Tables</span>
+
+<span class="heading1">Filter Out Queries That Lack a Where Clause</span>
+
+<span class="heading1">Quirks and Limitations</span>
+
+<p>Behind the scenes, the router maintains parallel transactions on each of the
+databases that it is routing queries to.  When the client issues a begin, commit
+or rollback, the router issues a begin, commit or rollback to each of the
+databases.  Similarly, if the client turns auto-commit on or off, the router
+turns auto-commit on or off on each of the databases.</p>
+
+<p>There are scenarios where a commit, rollback or auto-commit on/off command
+could succeed on some of the databases and fail on others.  Some databases
+have a 2-phase commit feature to handle these scenarios.  With 2-phase commit,
+you can roll back a commit until you do second commit.  Many databases don't
+support 2-phase commit though.  At present, SQL Relay doesn't currently support
+2-phase commit for any databases.  So, currently, SQL Relay doesn't handle these
+scenarios very well.  It returns false, indicating than the operation failed,
+but there's no good way to know which databases succeeded and which failed.
+Ideally, SQL Relay would remove the database that failed, stop sending queries
+to it, notify someone that it's gotten out of sync and log all of the queries
+that would have gone to it so they can be replayed later, or something like
+that.  But it doesn't currently do any of that.</p>
+
+<p>Since queries may be routed to different kinds of databases, the router has
+to employ some tricks to maintain parallel transactions.  Some databases run
+in auto-commit mode by default and must be issued a "begin" query to start a
+transaction.  Other databases implicitly start a new transaction when a client
+logs in and after each commit or rollback.  If any of the databases being
+routed to require a "begin" query to start a transaction, then the ones that
+don't are put in auto-commit mode when the client logs in and after each commit
+or rollback and are taken out of auto-commit mode when the client sends a begin
+query.  If none of the databases being routed to require a "begin" query to
+start a transaction, then the databases are not put in auto-commit mode when
+the client logs in or after each commit or rollback.  Rather, transactions are
+implicitly started by the database.  For example, if your client application
+is using a router which routes quries over both PostgreSQL and Oracle databases,
+then since PostgreSQL requires "begin" queries, you must use a "begin" query to
+start a transaction, even if your app only intends to send queries which would
+be run against Oracle.  Conversely, if your client application is using a router
+which only routes queries over a set of Oracle databases, then you do not have
+to use "begin" quries.</p>
+
+<p>Since each query is only sent to a single database it's not possible to
+join tables residing on different databases.  However, a limited version of
+this feature is planned.</p>
+
+<p>SQL Relay's query routing feature does not yet support sending a single
+query to multiple databases and merging the result sets.  But this feature is
+planned.</p>
+
+<p>It's possible to use stored procedures with SQL Relay's query routing
+feature.  However, since stored procedures are run on the database, SQL Relay
+can't route the individual queries run inside the stored procedure.  So, the
+stored procedure and all queries run inside of it will be run against whichever
+database it was routed to.</p>
+
+</body>
+</html>
