@@ -109,6 +109,13 @@ class routercursor : public sqlrcursor_svr {
 		void		returnRow();
 		void		cleanUpData(bool freeresult, bool freebinds);
 
+		void	autoCommitOnFailed(uint16_t index);
+		void	autoCommitOffFailed(uint16_t index);
+		void	commitFailed(uint16_t index);
+		void	rollbackFailed(uint16_t index);
+		void	endSessionFailed(uint16_t index);
+		void	beginQueryFailed(uint16_t index);
+
 		routerconnection	*routerconn;
 
 		sqlrconnection	*con;

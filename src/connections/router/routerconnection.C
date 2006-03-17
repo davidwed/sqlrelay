@@ -112,7 +112,9 @@ bool routerconnection::autoCommitOn() {
 			continue;
 		}
 		bool	res=cons[index]->autoCommitOn();
-		// FIXME: "do something" if this fails
+		if (!res) {
+			autoCommitOnFailed(index);
+		}
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
 		// cons to connect to the relay's and tie them up unless we
@@ -149,7 +151,9 @@ bool routerconnection::autoCommitOff() {
 			continue;
 		}
 		bool	res=cons[index]->autoCommitOff();
-		// FIXME: "do something" if this fails
+		if (!res) {
+			autoCommitOffFailed(index);
+		}
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
 		// cons to connect to the relay's and tie them up unless we
@@ -188,7 +192,9 @@ bool routerconnection::commit() {
 			continue;
 		}
 		bool	res=cons[index]->commit();
-		// FIXME: "do something" if this fails
+		if (!res) {
+			commitFailed(index);
+		}
 		if (result) {
 			result=res;
 		}
@@ -206,7 +212,9 @@ bool routerconnection::rollback() {
 			continue;
 		}
 		bool	res=cons[index]->rollback();
-		// FIXME: "do something" if this fails
+		if (!res) {
+			rollbackFailed(index);
+		}
 		if (result) {
 			result=res;
 		}
@@ -219,8 +227,9 @@ void routerconnection::endSession() {
 		if (!cons[index]) {
 			continue;
 		}
-		// FIXME: "do something" if this fails
-		cons[index]->endSession();
+		if (!cons[index]->endSession()) {
+			endSessionFailed(index);
+		}
 	}
 }
 
@@ -602,10 +611,15 @@ bool routercursor::begin(const char *query, uint32_t length) {
 			res=curs[index]->sendQuery(
 						routerconn->beginquery[index],
 						length);
+			if (!res) {
+				beginQueryFailed(index);
+			}
 		} else {
 			res=routerconn->cons[index]->autoCommitOff();
+			if (!res) {
+				autoCommitOffFailed(index);
+			}
 		}
-		// FIXME: "do something" if this fails
 		if (result) {
 			result=res;
 			// if we had an error, set "cur" so
@@ -718,4 +732,23 @@ void routercursor::cleanUpData(bool freeresult, bool freebinds) {
 		obcount=0;
 		cbcount=0;
 	}
+}
+
+// FIXME: "do something" when these failures occur
+void routercursor::autoCommitOnFailed(uint16_t index) {
+}
+
+void routercursor::autoCommitOffFailed(uint16_t index) {
+}
+
+void routercursor::commitFailed(uint16_t index) {
+}
+
+void routercursor::rollbackFailed(uint16_t index) {
+}
+
+void routercursor::endSessionFailed(uint16_t index) {
+}
+
+void routercursor::beginQueryFailed(uint16_t index) {
 }
