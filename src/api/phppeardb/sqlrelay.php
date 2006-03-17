@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.16 2006-02-13 05:39:10 mused Exp $
+// $Id: sqlrelay.php,v 1.17 2006-03-17 19:35:37 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -159,6 +159,16 @@ class DB_sqlrelay extends DB_common
     {
 
         $cursor = sqlrcur_alloc($this->connection);
+
+        if ($this->options['portability'] & DB_PORTABILITY_LOWERCASE) {
+            sqlrcur_lowerCaseColumnNames ($cursor);
+        }
+        if ($this->options['portability'] & DB_PORTABILITY_NULL_TO_EMPTY) {
+            sqlrcur_getNullsAsEmptyStrings ($cursor);
+        } else {
+            sqlrcur_getNullsAsNulls ($cursor);
+        }
+
         sqlrcur_setResultSetBufferSize($cursor,100);
         if (!sqlrcur_sendQuery($cursor, $query)) {
             $this->affectedrows = 0;
@@ -202,6 +212,16 @@ class DB_sqlrelay extends DB_common
         }
 
         $cursor = sqlrcur_alloc($this->connection);
+
+        if ($this->options['portability'] & DB_PORTABILITY_LOWERCASE) {
+            sqlrcur_lowerCaseColumnNames ($cursor);
+        }
+        if ($this->options['portability'] & DB_PORTABILITY_NULL_TO_EMPTY) {
+            sqlrcur_getNullsAsEmptyStrings ($cursor);
+        } else {
+            sqlrcur_getNullsAsNulls ($cursor);
+        }
+
         sqlrcur_setResultSetBufferSize($cursor,100);
 
         # handle ?-delimited bind variables by rewriting the query and creating
