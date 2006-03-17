@@ -29,6 +29,8 @@ clustered databases?</a></li>
 queries?</a></li>
 <li><a href="#databaseusers">Can SQL Relay proxy multiple database users
 instead of using the same user for every session?</a></li>
+<li><a href="#routing">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</a></li>
+<li><a href="#filtering">Can SQL Relay be configured to filter out certain queries, such as select's without a where clause?</a></li>
 </ol>
 
 <span class="heading2">API Comparison Questions</span><br><br>
@@ -293,6 +295,16 @@ step-by-step instructions.</p>
 connected to the database to switch users without disconnecting from the
 database.  When used with other databases, SQL Relay logs out and logs back in
 to the database whenever it needs to switch users.</p>
+
+<a name="routing"></a>
+<span class="heading3">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
+
+<p>Yes!  As of version 0.38.  See <a href="router.html">Routing and Filtering Queries with SQL Relay</a>.</p>
+
+<a name="filtering"></a>
+<span class="heading3">Can SQL Relay be configured to filter out certain queries, such as select's without a where clause?</span>
+
+<p>Yes!  As of version 0.38.  See <a href="router.html">Routing and Filtering Queries with SQL Relay</a>.</p>
 
 
 <span class="heading3">API Comparison Questions</span><br><br>
