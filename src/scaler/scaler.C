@@ -49,7 +49,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	commandline	cmdl(argc,argv);
 
 	// get the id
-	const char	*tmpid=cmdl.value("-id");
+	const char	*tmpid=cmdl.getValue("-id");
 	if (!(tmpid && tmpid[0])) {
 		tmpid=DEFAULT_ID;
 		fprintf(stderr,"Warning! using default id.\n");
@@ -96,7 +96,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	debug=cmdl.found("-debug");
 
 	// get the config file
-	const char	*tmpconfig=cmdl.value("-config");
+	const char	*tmpconfig=cmdl.getValue("-config");
 	if (!(tmpconfig && tmpconfig[0])) {
 		tmpconfig=DEFAULT_CONFIG_FILE;
 	}

@@ -17,7 +17,7 @@ cmdline::cmdline(int argc, const char **argv) : commandline(argc,argv) {
 void cmdline::setId() {
 
 	// get the id from the command line
-	id=value("-id");
+	id=getValue("-id");
 	if (!id[0]) {
 		id=DEFAULT_ID;
 		fprintf(stderr,"Warning: using default id.\n");
@@ -27,7 +27,7 @@ void cmdline::setId() {
 void cmdline::setConfig() {
 
 	// get the config file from the command line
-	config=value("-config");
+	config=getValue("-config");
 	if (!config[0]) {
 		config=DEFAULT_CONFIG_FILE;
 	}
@@ -36,5 +36,5 @@ void cmdline::setConfig() {
 void cmdline::setLocalStateDir() {
 
 	// get the localstatedir from the command line
-	localstatedir=value("-localstatedir");
+	localstatedir=getValue("-localstatedir");
 }

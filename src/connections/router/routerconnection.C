@@ -227,9 +227,7 @@ void routerconnection::endSession() {
 		if (!cons[index]) {
 			continue;
 		}
-		if (!cons[index]->endSession()) {
-			endSessionFailed(index);
-		}
+		cons[index]->endSession();
 	}
 }
 
@@ -612,12 +610,12 @@ bool routercursor::begin(const char *query, uint32_t length) {
 						routerconn->beginquery[index],
 						length);
 			if (!res) {
-				beginQueryFailed(index);
+				routerconn->beginQueryFailed(index);
 			}
 		} else {
 			res=routerconn->cons[index]->autoCommitOff();
 			if (!res) {
-				autoCommitOffFailed(index);
+				routerconn->autoCommitOffFailed(index);
 			}
 		}
 		if (result) {
@@ -735,20 +733,17 @@ void routercursor::cleanUpData(bool freeresult, bool freebinds) {
 }
 
 // FIXME: "do something" when these failures occur
-void routercursor::autoCommitOnFailed(uint16_t index) {
+void routerconnection::autoCommitOnFailed(uint16_t index) {
 }
 
-void routercursor::autoCommitOffFailed(uint16_t index) {
+void routerconnection::autoCommitOffFailed(uint16_t index) {
 }
 
-void routercursor::commitFailed(uint16_t index) {
+void routerconnection::commitFailed(uint16_t index) {
 }
 
-void routercursor::rollbackFailed(uint16_t index) {
+void routerconnection::rollbackFailed(uint16_t index) {
 }
 
-void routercursor::endSessionFailed(uint16_t index) {
-}
-
-void routercursor::beginQueryFailed(uint16_t index) {
+void routerconnection::beginQueryFailed(uint16_t index) {
 }

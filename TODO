@@ -1,3 +1,7 @@
+OCI8 drop-in library
+
+"how many connections should I start?" in FAQ
+
 hack on postgresql's ecpg to emit SQL Relay code rather than Postgresql code
 
 perl apis -> CPAN
@@ -14,12 +18,10 @@ mysql 5.x
 postgresql/mysql connetions shouldn't try to use bind variables against older
 	database versions
 
-implement interbase dead-db/relogin
-
 query router:
 	"do something"'s
 	investigate 2 phase commit
-	document
+	catch the case where 2 route tags define the same connection
 
 query/fields cmdline tools need a timeout option
 

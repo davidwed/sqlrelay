@@ -2,6 +2,7 @@
 	fixed mysql_autocommit detection
 	fixed missing self before __getRow and __getRowRange in python db driver
 	implemented query filtering and routing
+	interbase/firebird dead-db/relogin works now
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that

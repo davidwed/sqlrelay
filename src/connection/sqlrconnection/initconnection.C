@@ -15,13 +15,13 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 	cmdl=new cmdline(argc,argv);
 
 	// get the connection id from the command line
-	connectionid=cmdl->value("-connectionid");
+	connectionid=cmdl->getValue("-connectionid");
 	if (!connectionid[0]) {
 		connectionid=DEFAULT_CONNECTIONID;
 		fprintf(stderr,"Warning: using default connectionid.\n");
 	}
 	// get the time to live from the command line
-	ttl=charstring::toInteger(cmdl->value("-ttl"));
+	ttl=charstring::toInteger(cmdl->getValue("-ttl"));
 
 	cfgfl=new sqlrconfigfile();
 	authc=new authenticator(cfgfl);

@@ -739,11 +739,11 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*password;
 	const char	*script=NULL;
 
-	const char	*config=cmdline.value("-config");
+	const char	*config=cmdline.getValue("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
-	const char	*id=cmdline.value("-id");
+	const char	*id=cmdline.getValue("-id");
 
 	if (!(id && id[0])) {
 

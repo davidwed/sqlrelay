@@ -253,7 +253,7 @@ int main(int argc, const char **argv) {
 
 	// get the command line args
 	cmdline	cmdl(argc,argv);
-	const char	*localstatedir=cmdl.value("-localstatedir");
+	const char	*localstatedir=cmdl.getValue("-localstatedir");
 	bool		strace=cmdl.found("-strace");
 	const char	*id=cmdl.getId();
 	const char	*config=cmdl.getConfig();

@@ -39,7 +39,7 @@ cachemanager::cachemanager(int argc, const char **argv) {
 	pidfile=NULL;
 
 	// get the scaninterval
-	const char	*scanint=cmdl->value("-scaninterval");
+	const char	*scanint=cmdl->getValue("-scaninterval");
 	if (scanint && scanint[0]) {
 		scaninterval=charstring::toInteger(scanint);
 	} else {
@@ -47,7 +47,7 @@ cachemanager::cachemanager(int argc, const char **argv) {
 	}
 
 	// get the directories to scan
-	const char	*cachedirs=cmdl->value("-cachedirs");
+	const char	*cachedirs=cmdl->getValue("-cachedirs");
 	parseCacheDirs(cachedirs);
 }
 

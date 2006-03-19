@@ -32,11 +32,11 @@ int main(int argc, const char **argv) {
 	bool		debug=false;
 	int		exitval=0;
 
-	const char	*config=cmdline.value("-config");
+	const char	*config=cmdline.getValue("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
-	const char	*id=cmdline.value("-id");
+	const char	*id=cmdline.getValue("-id");
 	if (!(id && id[0])) {
 
 
