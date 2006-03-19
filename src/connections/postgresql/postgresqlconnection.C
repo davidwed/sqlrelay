@@ -114,6 +114,13 @@ bool postgresqlconnection::logIn() {
 		PQclear(result);
 	}
 
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+	// check protocol version to see if we can support bind variables
+	if (PQprotocolVersion(pgconn)<3) {
+		fakebinds=true;
+	}
+#endif
+
 	return true;
 }
 
