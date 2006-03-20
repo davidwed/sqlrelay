@@ -15,9 +15,6 @@ mysql 5.x
 	test output binds
 	document using stored procedures
 
-test postgresql protocol version check against older server
-test mysql version check against older server
-
 query router:
 	"do something"'s
 	investigate 2 phase commit
