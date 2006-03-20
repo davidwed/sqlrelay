@@ -105,10 +105,9 @@ class mysqlcursor : public sqlrcursor_svr {
 		int		bindcounter;
 		MYSQL_BIND	bind[MAXVAR];
 		unsigned long	bindvaluesize[MAXVAR];
-#else
+#endif
 		MYSQL_ROW	mysqlrow;
 		unsigned long	*mysqlrowlengths;
-#endif
 
 		mysqlconnection	*mysqlconn;
 };

@@ -15,8 +15,8 @@ mysql 5.x
 	test output binds
 	document using stored procedures
 
-postgresql/mysql connetions shouldn't try to use bind variables against older
-	database versions
+test postgresql protocol version check against older server
+test mysql version check against older server
 
 query router:
 	"do something"'s

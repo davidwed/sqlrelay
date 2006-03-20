@@ -40,19 +40,26 @@ then
 	sudo $INITDIR/msql start
 	sudo sqlr-start -id msqltest
 fi
-if ( test "$DB" = "mysql" )
+if ( test "$DB" = "mysql3" )
 then
-	ARGS="localhost 8006 \"\" mysqltest mysqltest"
-	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
+	ARGS="localhost 8006 \"\" mysql3test mysql3test"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysql3test&password=mysql3test"
 	sudo $INITDIR/mysqld start
-	sudo sqlr-start -id mysqltest
+	sudo sqlr-start -id mysql3test
 fi
-if ( test "$DB" = "oldmysql" )
+if ( test "$DB" = "mysql412" )
 then
-	ARGS="localhost 8006 \"\" mysqltest mysqltest"
-	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
+	ARGS="localhost 8006 \"\" mysql412test mysql412test"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysql412test&password=mysql412test"
 	sudo $INITDIR/mysqld start
-	sudo sqlr-start -id mysqltest
+	sudo sqlr-start -id mysql412test
+fi
+if ( test "$DB" = "mysql5" )
+then
+	ARGS="localhost 8006 \"\" mysql5test mysql5test"
+	PHPARGS="host=localhost&port=8006&socket=&user=mysql5test&password=mysql5test"
+	sudo $INITDIR/mysqld start
+	sudo sqlr-start -id mysql5test
 fi
 if ( test "$DB" = "oracle7" )
 then
@@ -252,11 +259,15 @@ if ( test "$DB" = "msql" )
 then
 	sudo $INITDIR/msql stop
 fi
-if ( test "$DB" = "mysql" )
+if ( test "$DB" = "mysql3" )
 then
 	sudo $INITDIR/mysqld stop
 fi
-if ( test "$DB" = "oldmysql" )
+if ( test "$DB" = "mysql412" )
+then
+	sudo $INITDIR/mysqld stop
+fi
+if ( test "$DB" = "mysql5" )
 then
 	sudo $INITDIR/mysqld stop
 fi

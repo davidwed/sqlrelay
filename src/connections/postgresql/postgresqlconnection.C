@@ -115,7 +115,7 @@ bool postgresqlconnection::logIn() {
 	}
 
 #ifdef HAVE_POSTGRESQL_PQEXECPREPARED
-	// check protocol version to see if we can support bind variables
+	// don't use bind variables against older servers
 	if (PQprotocolVersion(pgconn)<3) {
 		fakebinds=true;
 	}

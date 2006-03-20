@@ -101,6 +101,13 @@ bool mysqlconnection::logIn() {
 	}
 #endif
 	connected=true;
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	// fake binds when connected to older servers
+	if (mysql_get_server_version(&mysql)<40102) {
+		fakebinds=true;
+	}
+#endif
 	return true;
 }
 
@@ -472,84 +479,85 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 	nrows=0;
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
+	if (!mysqlconn->fakebinds) {
 
-	// handle binds, fake or real
-	if (mysqlconn->fakebinds) {
-		if (mysql_stmt_prepare(stmt,query,length)) {
-			return false;
-		}
-	} else {
+		// handle binds
 		if (bindcounter && mysql_stmt_bind_param(stmt,bind)) {
 			return false;
 		}
-	}
 
-	// execute the query
-	if ((queryresult=mysql_stmt_execute(stmt))) {
-		return false;
-	}
-
-	checkForTempTable(query,length);
-	
-	// get the affected row count
-	affectedrows=mysql_stmt_affected_rows(stmt);
-
-	// get the column count
-	ncols=mysql_stmt_field_count(stmt);
-
-	// get the metadata
-	mysqlresult=NULL;
-	if (ncols) {
-		mysqlresult=mysql_stmt_result_metadata(stmt);
-	}
-
-	// bind the fields
-	if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
-		return false;
-	}
-
-	// store the result set
-	if (mysql_stmt_store_result(stmt)) {
-		return false;
-	}
-
-	// get the row count
-	nrows=mysql_stmt_num_rows(stmt);
-
-#else
-
-	// initialize result set
-	mysqlresult=NULL;
-
-	// execute the query
-	if ((queryresult=mysql_real_query(&mysqlconn->mysql,query,length))) {
-		return false;
-	}
-
-	checkForTempTable(query,length);
-
-	// get the affected row count
-	affectedrows=mysql_affected_rows(&mysqlconn->mysql);
-
-	// store the result set
-	if ((mysqlresult=mysql_store_result(&mysqlconn->mysql))==
-						(MYSQL_RES *)NULL) {
-
-		// if there was an error then return failure, otherwise
-		// the query must have been some DML or DDL
-		char	*err=(char *)mysql_error(&mysqlconn->mysql);
-		if (err && err[0]) {
+		// execute the query
+		if ((queryresult=mysql_stmt_execute(stmt))) {
 			return false;
-		} else {
-			return true;
 		}
+
+		checkForTempTable(query,length);
+	
+		// get the affected row count
+		affectedrows=mysql_stmt_affected_rows(stmt);
+
+		// get the column count
+		ncols=mysql_stmt_field_count(stmt);
+
+		// get the metadata
+		mysqlresult=NULL;
+		if (ncols) {
+			mysqlresult=mysql_stmt_result_metadata(stmt);
+		}
+
+		// bind the fields
+		if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
+			return false;
+		}
+
+		// store the result set
+		if (mysql_stmt_store_result(stmt)) {
+			return false;
+		}
+
+		// get the row count
+		nrows=mysql_stmt_num_rows(stmt);
+
+	} else {
+
+#endif
+
+		// initialize result set
+		mysqlresult=NULL;
+
+		// execute the query
+		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
+							query,length))) {
+			return false;
+		}
+
+		checkForTempTable(query,length);
+
+		// get the affected row count
+		affectedrows=mysql_affected_rows(&mysqlconn->mysql);
+
+		// store the result set
+		if ((mysqlresult=mysql_store_result(&mysqlconn->mysql))==
+							(MYSQL_RES *)NULL) {
+
+			// if there was an error then return failure, otherwise
+			// the query must have been some DML or DDL
+			char	*err=(char *)mysql_error(&mysqlconn->mysql);
+			if (err && err[0]) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+		// get the column count
+		ncols=mysql_num_fields(mysqlresult);
+
+		// get the row count
+		nrows=mysql_num_rows(mysqlresult);
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
 	}
-
-	// get the column count
-	ncols=mysql_num_fields(mysqlresult);
-
-	// get the row count
-	nrows=mysql_num_rows(mysqlresult);
 #endif
 
 	return true;
@@ -558,11 +566,18 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 const char *mysqlcursor::errorMessage(bool *liveconnection) {
 
 	*liveconnection=true;
+
+	const char	*err;
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	const char	*err=mysql_stmt_error(stmt);
-#else
-	const char	*err=mysql_error(&mysqlconn->mysql);
+	if (!mysqlconn->fakebinds) {
+		err=mysql_stmt_error(stmt);
+	} else {
 #endif
+		err=mysql_error(&mysqlconn->mysql);
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	}
+#endif
+
 #if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
 		defined(HAVE_MYSQL_CR_SERVER_LOST) 
 	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
@@ -792,10 +807,15 @@ bool mysqlcursor::skipRow() {
 
 bool mysqlcursor::fetchRow() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	return !mysql_stmt_fetch(stmt);
-#else
-	return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL &&
-		(mysqlrowlengths=mysql_fetch_lengths(mysqlresult))!=NULL);
+	if (!mysqlconn->fakebinds) {
+		return !mysql_stmt_fetch(stmt);
+	} else {
+#endif
+		return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL &&
+			(mysqlrowlengths=mysql_fetch_lengths(
+						mysqlresult))!=NULL);
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	}
 #endif
 }
 
@@ -803,16 +823,21 @@ void mysqlcursor::returnRow() {
 
 	for (unsigned int col=0; col<ncols; col++) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-		if (!isnull[col]) {
-			conn->sendField(field[col],fieldlength[col]);
+		if (!mysqlconn->fakebinds) {
+			if (!isnull[col]) {
+				conn->sendField(field[col],fieldlength[col]);
+			} else {
+				conn->sendNullField();
+			}
 		} else {
-			conn->sendNullField();
-		}
-#else
-		if (mysqlrow[col]) {
-			conn->sendField(mysqlrow[col],mysqlrowlengths[col]);
-		} else {
-			conn->sendNullField();
+#endif
+			if (mysqlrow[col]) {
+				conn->sendField(mysqlrow[col],
+						mysqlrowlengths[col]);
+			} else {
+				conn->sendNullField();
+			}
+#ifdef HAVE_MYSQL_STMT_PREPARE
 		}
 #endif
 	}
@@ -820,22 +845,26 @@ void mysqlcursor::returnRow() {
 
 void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	if (freebinds) {
-		bindcounter=0;
-		rawbuffer::zero(&bind,sizeof(bind));
-		mysql_stmt_reset(stmt);
-	}
-	if (freeresult) {
-		mysql_stmt_free_result(stmt);
-		if (mysqlresult) {
+	if (!mysqlconn->fakebinds) {
+		if (freebinds) {
+			bindcounter=0;
+			rawbuffer::zero(&bind,sizeof(bind));
+			mysql_stmt_reset(stmt);
+		}
+		if (freeresult) {
+			mysql_stmt_free_result(stmt);
+			if (mysqlresult) {
+				mysql_free_result(mysqlresult);
+				mysqlresult=NULL;
+			}
+		}
+	} else {
+#endif
+		if (freeresult && mysqlresult!=(MYSQL_RES *)NULL) {
 			mysql_free_result(mysqlresult);
 			mysqlresult=NULL;
 		}
-	}
-#else
-	if (freeresult && mysqlresult!=(MYSQL_RES *)NULL) {
-		mysql_free_result(mysqlresult);
-		mysqlresult=NULL;
+#ifdef HAVE_MYSQL_STMT_PREPARE
 	}
 #endif
 	delete[] columnnames;
