@@ -284,10 +284,21 @@
 <FONT color=#f800f8>        Define a CLOB input bind varaible.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBind</FONT>(self, variable, length):
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindString</FONT>(self, variable, length):
         &quot;&quot;&quot;
-<FONT color=#f800f8>        Define an output bind varaible.</FONT>
+<FONT color=#f800f8>        Define a string output bind varaible.</FONT>
 <FONT color=#f800f8>        "length" bytes will be reserved to store the value.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindInteger</FONT>(self, variable):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Define an integer output bind varaible.</FONT>
+<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
+
+    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindDouble</FONT>(self, variable):
+        &quot;&quot;&quot;
+<FONT color=#f800f8>        Define a double precision floating point</FONT>
+<FONT color=#f800f8>        output bind varaible.</FONT>
 <FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
 
     <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindBlob</FONT>(self, variable):

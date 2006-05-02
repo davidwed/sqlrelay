@@ -1,7 +1,7 @@
 <html>
 <head>
-<title>~/src/firstworks/sqlrelay-0.37/src/api/c++/include/sqlrelay/sqlrclient.h.html</title>
-<meta name="Generator" content="Vim/6.3">
+<title>~/src/firstworks/sqlrelay-0.38/src/api/c++/include/sqlrelay/sqlrclient.h.html</title>
+<meta name="Generator" content="Vim/6.4">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 </head>
 <body bgcolor="#ffffff" text="#000000">
@@ -230,11 +230,16 @@
                                                 <font color="#2e8b57"><b>uint32_t</b></font> size);
                                 <font color="#0000ff">// Define an input bind variable.</font>
 
-                <font color="#2e8b57"><b>void</b></font>    defineOutputBind(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable,
+                <font color="#2e8b57"><b>void</b></font>    defineOutputBindString(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable,
                                                 <font color="#2e8b57"><b>uint32_t</b></font> bufferlength);
                                 <font color="#0000ff">// Define an output bind variable.</font>
                                 <font color="#0000ff">// &quot;bufferlength&quot; bytes will be reserved</font>
                                 <font color="#0000ff">// to store the value.</font>
+                <font color="#2e8b57"><b>void</b></font>    defineOutputBindInteger(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                                <font color="#0000ff">// Define an integer output bind variable.</font>
+                <font color="#2e8b57"><b>void</b></font>    defineOutputBindDouble(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                                <font color="#0000ff">// Define a double precision floating</font>
+                                <font color="#0000ff">// point output bind variable.</font>
                 <font color="#2e8b57"><b>void</b></font>    defineOutputBindBlob(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                                 <font color="#0000ff">// Define a BLOB output bind variable.</font>
                 <font color="#2e8b57"><b>void</b></font>    defineOutputBindClob(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
@@ -276,17 +281,13 @@
                                 <font color="#0000ff">// Fetch from a cursor that was returned as</font>
                                 <font color="#0000ff">// an output bind variable.</font>
 
-                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getOutputBind(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getOutputBindString(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getOutputBindBlob(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *getOutputBindClob(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                <font color="#2e8b57"><b>int64_t</b></font>         getOutputBindInteger(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                <font color="#2e8b57"><b>double</b></font>          getOutputBindDouble(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                                 <font color="#0000ff">// Get the value stored in a previously</font>
                                 <font color="#0000ff">// defined output bind variable.</font>
-                <font color="#2e8b57"><b>int64_t</b></font> getOutputBindAsInteger(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
-                                <font color="#0000ff">// Get the value stored in a previously</font>
-                                <font color="#0000ff">// defined output bind variable as a long</font>
-                                <font color="#0000ff">// integer.</font>
-                <font color="#2e8b57"><b>double</b></font>  getOutputBindAsDouble(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
-                                <font color="#0000ff">// Get the value stored in a previously</font>
-                                <font color="#0000ff">// defined output bind variable as a double</font>
-                                <font color="#0000ff">// precision floating point number.</font>
                 <font color="#2e8b57"><b>uint32_t</b></font>        getOutputBindLength(<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
                                 <font color="#0000ff">// Get the length of the value stored in a</font>
                                 <font color="#0000ff">// previously defined output bind variable.</font>

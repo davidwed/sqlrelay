@@ -412,10 +412,28 @@ precision and scale weren't passed in for a double.
 <P>
 <LI>
 <CODE>
-void sqlrcur_defineOutputBind(int sqlrcurref, string variable, int length)
+void sqlrcur_defineOutputBindString(int sqlrcurref, string variable, int length)
 </CODE>
 <P>
-Define an output bind variable.
+Define a string output bind variable.
+"length" bytes will be reserved to store the value.
+<P>
+<LI>
+<LI>
+<CODE>
+void sqlrcur_defineOutputBindInteger(int sqlrcurref, string variable)
+</CODE>
+<P>
+Define an integer output bind variable.
+"length" bytes will be reserved to store the value.
+<P>
+<LI>
+<LI>
+<CODE>
+void sqlrcur_defineOutputBindDouble(int sqlrcurref, string variable)
+</CODE>
+<P>
+Define a double precision floating point output bind variable.
 "length" bytes will be reserved to store the value.
 <P>
 <LI>
