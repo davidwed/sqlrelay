@@ -135,8 +135,6 @@ class interbaseconnection : public sqlrconnection_svr {
 		const char	*database;
 		unsigned short	dialect;
 
-		environment	*env;
-
 		ISC_STATUS	error[20];
 };
 

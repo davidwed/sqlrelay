@@ -23,11 +23,9 @@ static char tpb[] = {
 };
 
 interbaseconnection::interbaseconnection() : sqlrconnection_svr() {
-	env=new environment();
 }
 
 interbaseconnection::~interbaseconnection() {
-	delete env;
 }
 
 uint16_t interbaseconnection::getNumberOfConnectStringVars() {
@@ -75,11 +73,11 @@ bool interbaseconnection::logIn() {
 	// handle user/password parameters
 	const char	*user=getUser();
 	if (user) {
-		env->setValue("ISC_USER",user);
+		environment::setValue("ISC_USER",user);
 	}
 	const char	*password=getPassword();
 	if (password) {
-		env->setValue("ISC_PASSWORD",password);
+		environment::setValue("ISC_PASSWORD",password);
 	}
 
 	// attach to the database

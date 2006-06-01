@@ -35,8 +35,7 @@ int PQmblen(const unsigned char *s, int encoding) {
 }
 
 int PQenv2encoding(void) {
-	environment	env;
-	return translateEncoding(env.getValue("PGCLIENTENCODING"));
+	return translateEncoding(environment::getValue("PGCLIENTENCODING"));
 }
 
 }

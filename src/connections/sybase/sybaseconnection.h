@@ -158,8 +158,6 @@ class sybaseconnection : public sqlrconnection_svr {
 		const char	*hostname;
 		const char	*packetsize;
 
-		environment	*env;
-
 		static	stringbuffer	*errorstring;
 		static	bool		deadconnection;
 

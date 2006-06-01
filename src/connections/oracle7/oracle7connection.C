@@ -3,6 +3,7 @@
 
 #include <oracle7connection.h>
 #include <rudiments/charstring.h>
+#include <rudiments/environment.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -11,11 +12,9 @@
 #include <stdlib.h>
 
 oracle7connection::oracle7connection() : sqlrconnection_svr() {
-	env=new environment();
 }
 
 oracle7connection::~oracle7connection() {
-	delete env;
 }
 
 uint16_t oracle7connection::getNumberOfConnectStringVars() {
@@ -37,12 +36,12 @@ bool oracle7connection::logIn() {
 
 	// handle ORACLE_HOME
 	if (home) {
-		if (!env->setValue("ORACLE_HOME",home)) {
+		if (!environment::setValue("ORACLE_HOME",home)) {
 			fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
 			return false;
 		}
 	} else {
-		if (!env->getValue("ORACLE_HOME")) {
+		if (!environment::getValue("ORACLE_HOME")) {
 			fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
 			return false;
 		}
@@ -50,12 +49,12 @@ bool oracle7connection::logIn() {
 
 	// handle ORACLE_SID
 	if (sid) {
-		if (!env->setValue("ORACLE_SID",sid)) {
+		if (!environment::setValue("ORACLE_SID",sid)) {
 			fprintf(stderr,"Failed to set ORACLE_SID environment variable.\n");
 			return false;
 		}
 	} else {
-		if (!env->getValue("ORACLE_SID")) {
+		if (!environment::getValue("ORACLE_SID")) {
 			fprintf(stderr,"No ORACLE_SID environment variable set or specified in connect string.\n");
 			return false;
 		}
@@ -63,12 +62,12 @@ bool oracle7connection::logIn() {
 
 	// handle TWO_TASK
 	if (sid) {
-		if (!env->setValue("TWO_TASK",sid)) {
+		if (!environment::setValue("TWO_TASK",sid)) {
 			fprintf(stderr,"Failed to set TWO_TASK environment variable.\n");
 			return false;
 		}
 	} else {
-		if (!env->getValue("TWO_TASK")) {
+		if (!environment::getValue("TWO_TASK")) {
 			fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
 			return false;
 		}
@@ -76,7 +75,7 @@ bool oracle7connection::logIn() {
 
 	// handle NLS_LANG
 	if (nlslang) {
-		if (!env->setValue("NLS_LANG",nlslang)) {
+		if (!environment::setValue("NLS_LANG",nlslang)) {
 			fprintf(stderr,"Failed to set NLS_LANG environment variable.\n");
 			return false;
 		}

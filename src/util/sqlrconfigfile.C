@@ -343,11 +343,9 @@ bool sqlrconfigfile::tagStart(const char *name) {
 		ignoreconnections=true;
 	} else if (!charstring::compare(name,"route")) {
 		currentroute=new routecontainer();
-		routelist.append(currentroute);
 	} else if (!charstring::compare(name,"filter")) {
 		currentroute=new routecontainer();
 		currentroute->setIsFilter(true);
-		routelist.append(currentroute);
 	}
 
 	return true;
@@ -672,6 +670,10 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 
 	if (!charstring::compare(name,"router")) {
 		inrouter=false;
+	} else if (!charstring::compare(name,"route")) {
+		routelist.append(currentroute);
+	} else if (!charstring::compare(name,"filter")) {
+		routelist.append(currentroute);
 	}
 
 	// don't do anything if we're already done

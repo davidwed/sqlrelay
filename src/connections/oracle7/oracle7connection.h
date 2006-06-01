@@ -11,7 +11,6 @@
 
 #define NUM_CONNECT_STRING_VARS	6
 
-#include <rudiments/environment.h>
 #include <sqlrconnection.h>
 
 #include <config.h>
@@ -179,8 +178,6 @@ class oracle7connection : public sqlrconnection_svr {
 		const char	*home;
 		const char	*sid;
 		const char	*nlslang;
-
-		environment	*env;
 };
 
 #endif

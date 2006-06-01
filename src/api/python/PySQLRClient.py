@@ -337,19 +337,19 @@ class sqlrcursor:
 
     def defineOutputBindString(self, variable, length):
         """
-        Define an output bind varaible.
+        Define a string output bind varaible.
         """
         return CSQLRelay.defineOutputBindString(self.cursor, variable, length)
 
     def defineOutputBindInteger(self, variable):
         """
-        Define an output bind varaible.
+        Define an integer output bind varaible.
         """
         return CSQLRelay.defineOutputBindInteger(self.cursor, variable)
 
     def defineOutputBindDouble(self, variable):
         """
-        Define an output bind varaible.
+        Define a double precision floating point output bind varaible.
         """
         return CSQLRelay.defineOutputBindDouble(self.cursor, variable)
 

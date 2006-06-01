@@ -28,9 +28,14 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/7
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/8
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/9
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/1
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/2
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/3
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/5
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/slackware
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/slackware/7
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/slackware/8
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/suse/9.0
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/sybase
 	$(INSTALL) -m 644 configuring.html $(docdir)
 	$(INSTALL) -m 644 index.html $(docdir)
@@ -110,9 +115,16 @@ install:
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/5/805.html $(docdir)/gettingstarted/oracle/linux/redhat/5
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/6/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/6
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/7/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/7
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/7/8i.html $(docdir)/gettingstarted/oracle/linux/slackware/7
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/8/9iR2.html $(docdir)/gettingstarted/oracle/linux/redhat/8
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/9/9iR2.html $(docdir)/gettingstarted/oracle/linux/redhat/9
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/1/9iR2.html $(docdir)/gettingstarted/oracle/linux/fedoracore/1
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/1/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/1
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/2/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/2
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/3/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/3
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/5/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/5
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/8/8i.html $(docdir)/gettingstarted/oracle/linux/slackware/8
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/8/9i.html $(docdir)/gettingstarted/oracle/linux/slackware/8
+	$(INSTALL) -m 644 gettingstarted/oracle/linux/suse/9.0/9iR2.html $(docdir)/gettingstarted/oracle/linux/suse/9.0
 	$(INSTALL) -m 644 gettingstarted/sybase/11.0.3.3.html $(docdir)/gettingstarted/sybase/11.0.3.3.html
 	$(INSTALL) -m 644 gettingstarted/sybase/11.9.2.html $(docdir)/gettingstarted/sybase/11.9.2.html
 

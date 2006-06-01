@@ -10,7 +10,6 @@
 
 #define NUM_CONNECT_STRING_VARS 6
 
-#include <rudiments/environment.h>
 #include <sqlrconnection.h>
 #ifdef HAVE_ORACLE_8i
 	#include <rudiments/regularexpression.h>
@@ -245,8 +244,6 @@ class oracle8connection : public sqlrconnection_svr {
 		ub4		fetchatonce;
 		ub4		maxselectlistsize;
 		ub4		maxitembuffersize;
-
-		environment	*environ;
 };
 
 #endif

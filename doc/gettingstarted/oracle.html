@@ -45,7 +45,7 @@ recommend meeting these requirements prior to installation.</p>
 <a name="solaris"></a>
 <span class="heading2">Solaris</span><br>
 
-<p>Oracle versions 8.1.5-10.1.0 for Solaris have been or are currently available
+<p>Oracle versions 8.1.5-10.2.0 for Solaris have been or are currently available
 for download from <a href="http://technet.oracle.com">technet.oracle.com</a> 
 or on CD.  Installation appears to be as simple as following the directions.  
 Note that for Solaris, these versions of Oracle will fail to create a database 
@@ -101,7 +101,7 @@ should proceed smoothly from there.</p>
 <a name="linux"></a>
 <span class="heading2">Linux</span><br>
 
-<p>Oracle has supported Linux since version 8.0.5. Versions 8.0.5 through 10.1.0
+<p>Oracle has supported Linux since version 8.0.5. Versions 8.0.5 through 10.2.0
 have been or are currently available from 
 <a href="http://technet.oracle.com">technet.oracle.com</a> and have been 
 available on CD from various sources as well.</p>
@@ -116,7 +116,6 @@ and directories.</p>
 groupadd oinstall<br>
 groupadd dba<br>
 groupadd oper<br>
-mkdir /home/oracle<br>
 useradd -m oracle -g oinstall -G dba,oper<br>
 chown -R oracle:dba /home/oracle<br>
 passwd oracle</b>  (assign the oracle user a password) <br>
@@ -165,11 +164,11 @@ installation time.  Make sure that these packages are installed.</p>
 <span class="heading3">Set Up the Environment</span><br>
 
 <p>Edit /etc/profile (or /etc/bash.bashrc.local if your system has it) and add
-the following somewhere near the top, replacing 10.1.0 in the ORACLE_VERSION
+the following somewhere near the top, replacing 10.2.0 in the ORACLE_VERSION
 environment variable with the version of Oracle that you are installing.</p>
 
 <blockquote><b>
-export ORACLE_VERSION=10.1.0<br>
+export ORACLE_VERSION=10.2.0<br>
 export ORACLE_BASE=/u01/app/oracle<br>
 export ORACLE_HOME=$ORACLE_BASE/product/$ORACLE_VERSION<br>
 export ORACLE_SID=ora1<br>
@@ -242,10 +241,12 @@ and run on that version of Linux.</p>
 <th>9.0.x</th>
 <th>9.2.x</th>
 <th>10.1.x</th>
+<th>10.2.x</th>
 </tr>
 <tr>
 <th>Redhat 5.2</th>
 <td><a href="oracle/linux/redhat/5/805.html">Yes</a></td>
+<td>No</td>
 <td>No</td>
 <td>No</td>
 <td>No</td>
@@ -262,6 +263,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 <td>No</td>
 <td>No</td>
+<td>No</td>
 </tr>
 <tr>
 <th>Redhat 7.x</th>
@@ -269,6 +271,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 <td><a href="oracle/linux/redhat/7/8i.html">Yes</a></td>
 <td><a href="oracle/linux/redhat/7/8i.html">Yes</a></td>
+<td>No</td>
 <td>No</td>
 <td>No</td>
 <td>No</td>
@@ -282,6 +285,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 <td><a href="oracle/linux/redhat/8/9iR2.html">Yes</a></td>
 <td>No</td>
+<td>No</td>
 </tr>
 <tr>
 <th>Redhat 9</th>
@@ -291,6 +295,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 <td>No</td>
 <td><a href="oracle/linux/redhat/9/9iR2.html">Yes</a></td>
+<td>No</td>
 <td>No</td>
 </tr>
 <tr>
@@ -302,6 +307,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 <td><a href="oracle/linux/fedoracore/1/9iR2.html">Yes</a></td>
 <td><a href="oracle/linux/fedoracore/1/10g.html">Yes</a></td>
+<td>No</td>
 </tr>
 <tr>
 <th>Fedora Core 2</th>
@@ -312,6 +318,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 <td>No</td>
 <td><a href="oracle/linux/fedoracore/2/10g.html">Yes</a></td>
+<td>No</td>
 </tr>
 <tr>
 <th>Fedora Core 3</th>
@@ -322,6 +329,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 <td>No</td>
 <td><a href="oracle/linux/fedoracore/3/10g.html">Yes</a></td>
+<td>No</td>
 </tr>
 <tr>
 <th>Fedora Core 4</th>
@@ -333,6 +341,18 @@ and run on that version of Linux.</p>
 <td>No</td>
 <!-- directions for fc3 work for fc4 -->
 <td><a href="oracle/linux/fedoracore/3/10g.html">Yes</a></td>
+<td>No</td>
+</tr>
+<tr>
+<th>Fedora Core 5</th>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td><a href="oracle/linux/fedoracore/5/10g.html">Yes</a></td>
 </tr>
 <tr>
 <th>Suse 9.0</th>
@@ -343,6 +363,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 <td><a href="oracle/linux/suse/9.0/9iR2.html">Yes</a></td>
 <td>No</a></td>
+<td>No</td>
 </tr>
 </table>
 <br>
@@ -351,7 +372,7 @@ and run on that version of Linux.</p>
 <span class="heading3">Starting the Database at Boot Time</span><br>
 
 <p>You can use the following script to start/stop the database at boot/shutdown
-time.  Replace /u01/app/oracle/product/10.1.0 with your $ORACLE_HOME</p>
+time.  Replace /u01/app/oracle/product/10.2.0 with your $ORACLE_HOME</p>
 
 <blockquote>
 <PRE>
@@ -359,12 +380,12 @@ time.  Replace /u01/app/oracle/product/10.1.0 with your $ORACLE_HOME</p>
 
 <B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
   start<B><FONT color=#a62828>)</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.1.0/bin/dbstart</FONT><B><FONT color=#a62828>&quot;</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.1.0/bin/lsnrctl start</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.2.0/bin/dbstart</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.2.0/bin/lsnrctl start</FONT><B><FONT color=#a62828>&quot;</FONT></B>
         <B><FONT color=#a62828>;;</FONT></B>
   stop<B><FONT color=#a62828>)</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.1.0/bin/dbshut</FONT><B><FONT color=#a62828>&quot;</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.1.0/bin/lsnrctl stop</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.2.0/bin/dbshut</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.2.0/bin/lsnrctl stop</FONT><B><FONT color=#a62828>&quot;</FONT></B>
         <B><FONT color=#a62828>;;</FONT></B>
   *<B><FONT color=#a62828>)</FONT></B>
         <B><FONT color=#a62828>echo</FONT></B><FONT color=#ff00ff> $</FONT><B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>Usage: </FONT><FONT color=#a620f7>$0</FONT><FONT color=#ff00ff> {start|stop}</FONT><B><FONT color=#a62828>&quot;</FONT></B>
@@ -386,7 +407,8 @@ access a database, it must be running.</p>
 <p>During the installation, you could have chosen to create a database instance.
 If you did not create one during installation, you can do so afterward. Log in
 as oracle and run $ORACLE_HOME/bin/dbassist for Oracle 8i or
-$ORACLE_HOME/bin/dbca for Oracle 9i and follow the on-screen instructions.</p>
+$ORACLE_HOME/bin/dbca for Oracle 9i or higher and follow the on-screen
+instructions.</p>
 
 <p>The dbassist/dbca program will ask you to provide an SID; a local identifier
 for the database.  No two databases on the same machine can have the same SID. 
@@ -428,10 +450,11 @@ the database is running on.  The SERVICE_NAME refers to the SID of the database
 as it is known on that host.</p>
 
 <p>When a database instance is created, two special administration users are 
-created: SYS and SYSTEM. The default password for the SYSTEM user is 
-<i>manager</i>.  The default password for the SYS user is 
-<i>change_on_install</i>.  These users own the tables that contain privileges 
-and other housekeeping information.</p>
+created: SYS and SYSTEM. For versions of Oracle less than 9i, the default
+password for the SYSTEM user is <i>manager</i>.  The default password for the
+SYS user is <i>change_on_install</i>.  For Oracle 9i passwords must be set
+during the installation process.  These users own the tables that contain
+privileges and other housekeeping information.</p>
 
 <p>Database tables are stored in a file or set of files collectively called a
 tablespace.  The tables owned by the SYS and SYSTEM users are kept in their
@@ -449,11 +472,22 @@ mkdir -p /u01/app/oracle/oradata/ora1<br>
 chown oracle:oinstall /u01/app/oracle/oradata/ora1
 </b></blockquote>
 
-<p>Now, use the following command to log into the ORA1 instance as the SYSTEM
-user:</p>
+<p>Now, for versions of Oracle less than 9i, use the following command to log
+into the ORA1 instance as the SYSTEM user:</p>
 
 <blockquote>
 <b>sqlplus system/manager@ora1</b>
+</blockquote>
+
+<p>For Oracle 9i, use the same command, but replace <b>manager</b> with the
+password you entered during installation.</p>
+
+<p>For Oracle 10g, use the following command to log into the ORA1 instance as
+the SYS user, replacing <b><i>password</i></b> with the password you entered
+during installation:</p>
+
+<blockquote>
+<b>sqlplus sys/<i>password</i>@ora1 as sysdba</b>
 </blockquote>
 
 <p>The following queries

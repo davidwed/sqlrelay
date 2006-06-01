@@ -1,3 +1,30 @@
+integrate statistics gathering
+apply odbc unicode patch
+
+need to add fedoracore/5 doc directory but cvs.sourceforge.net doesn't work now
+
+document db2 8.2.4 on fc5
+8.2.4 fails to create tools catalog on fc4
+
+add option not to return db is down error to client
+
+with oracle 10.2.0, users not in oinstall group can't see oracle programs
+
+to install anything that uses java, must have libXp, which is in
+	xorg-x11-deprecated-libs on fedora
+sybase - if you get:
+	The wizard cannot continue because of the following error:
+		could not load wizard specified in /wizard.inf (104)
+	jdk 1.4's work, but 1.5's don't
+	monitor server won't start
+db2 - need compat-libgcc on fc4
+
+test PySQLRDB.py fetchmany() with 0 result set size fix
+
+escape NULL's in blob data when doing fake binds
+
+mention ld.so.conf.d in docs
+
 OCI8 drop-in library
 
 "how many connections should I start?" in FAQ

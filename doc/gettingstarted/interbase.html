@@ -24,8 +24,8 @@
 <span class="heading1">Installation</span><br>
 
 <p>I've successfully installed Interbase 6.0.1 and Firebird 1.0.0, 1.0.2,
-1.0.3, 1.5 and 1.5.2 on Linux.  I've never tried to install them on any other
-platform.</p>
+1.0.3, 1.5, 1.5.2 and 1.5.3 on Linux.  I've never tried to install them on any
+other platform.</p>
 
 <p>There are 2 versions of Interbase/Firebird: Classic Server (CS) and
 Super Server (SS).  Classic Server only allows a single connection while Super
@@ -43,20 +43,21 @@ for many different platforms are available at the
 can be installed using <i>rpm -i</i>.</p>
 
 <p>Interbase distributions and Firebird distributions prior to version 1.5
-create a directory called /opt/interbase.  Firebird 1.5 creates
-/opt/firebird.</p>
+create a directory called /opt/interbase.  Firebird versions 1.5 and higher
+create /opt/firebird.</p>
 
-<p>Firebird 1.5 rpm's leave /opt/firebird owned by root, with -r-xr-xr-x
-permissions.  This is wrong and will cause the server not to start.  Change
-the permissions and ownership as follows (as root):</p>
+<p>Firebird versions 1.5 and higher rpm's leave /opt/firebird owned by root,
+with -r-xr-xr-x permissions.  This is wrong and will cause the server not to
+start.  Change the permissions and ownership as follows (as root):</p>
 
 <blockquote><b>
 chmod 775 /opt/firebird<br>
 chown firebird:firebird /opt/firebird
 </b></blockquote>
 
-<p>Firebird 1.5 requires libstdc++.so.5 but most Linux distributions ship with
-a more recent version.  If your system doesn't have /usr/lib/libstdc++.so.5
+<p>Firebird versions 1.5 and higher require libstdc++.so.5 but most Linux
+distributions ship with a more recent version.  If your system doesn't have
+/usr/lib/libstdc++.so.5
 then you may need to install a compatibility library.  On Fedora Core 4, you
 need to install compat-libstdc++-33 as follows (as root):</p>
 
@@ -89,7 +90,7 @@ starts the database at boot time and stops it at shutdown time.  If you
 compiled from source, you'll need to install a script like one of the following
 to start/stop the database at boot/shutdown time.</p>
 
-<p>For Firebird 1.5, use the following script:</p>
+<p>For Firebird version 1.5 or higher, use the following script:</p>
 
 <blockquote>
 <PRE>
@@ -161,7 +162,7 @@ have to run the Interbase/Firebird <i>isql</i> client by it's full pathname.</p>
 
 <p>If you are using Interbase or Firebird prior to version 1.5, in the
 configuration script for your shell, add <i>/opt/interbase/bin</i> to your
-PATH environment variable.  If you are using Firebird 1.5, add
+PATH environment variable.  If you are using Firebird version 1.5 or higher, add
 <i>/opt/firebird/bin</i> to your PATH environment variable.  You can add the
 paths as follows.</p>
 
@@ -224,7 +225,7 @@ containing <i>isc4.gdb</i>.  A gsec session follows.</p>
 <p>Note that the /etc/hosts.equiv file must contain an entry for localhost and
 possibly localhost.localdomain for the <i>gsec</i> to function.</p>
 
-<p>For Firebird verison 1.5...</p>
+<p>For Firebird verison 1.5 or higher...</p>
 
 <blockquote>
 <PRE>
@@ -265,7 +266,7 @@ should update the start/stop script with the new password as well.</p>
 SYSDBA user, it's not a good idea.  You should create a new database using a
 regular user.  The following sequence of commands creates a database.</p>
 
-<p>For Firebird version 1.5, these commands create a database called
+<p>For Firebird version 1.5 or higher, these commands create a database called
 <i>/opt/firebird/testdb.gdb</i> which is owned by <i>testuser</i>.</p>
 
 <blockquote>
@@ -300,7 +301,7 @@ already exist.</p>
 
 <p>Now you can log into the database as <i>testuser</i>.</p>
 
-<p>Use the following command for Firebird 1.5.</p>
+<p>Use the following command for Firebird 1.5 or higher.</p>
 
 <blockquote>
 <b>isql -u testuser -p testpassword /opt/firebird/testdb.gdb</b>
@@ -314,7 +315,7 @@ already exist.</p>
 
 <p>The only users that can drop a database are the user that owns the database 
 and the <i>SYSDBA</i> user.  If you want to drop the database, you can do so 
-using <i>isql</i> as follows for Firebird 1.5...</p>
+using <i>isql</i> as follows for Firebird version 1.5 or higher...</p>
 
 <blockquote>
 <PRE>
@@ -337,7 +338,7 @@ SQL&gt; quit;
 </blockquote>
 
 <p>To delete a user, use the <i>gsec</i> utility as the root user and delete 
-the appropriate user as follows for Firebird 1.5.</p>
+the appropriate user as follows for Firebird version 1.5 or higher.</p>
 
 <blockquote>
 <PRE>

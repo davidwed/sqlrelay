@@ -123,16 +123,16 @@ then
 fi
 if ( test "$DB" = "router" )
 then
-	ARGS="localhost 9000 \"\" pgsqlrouter pgsqlrouter"
-	PHPARGS="localhost 9000 \"\" pgsqlrouter pgsqlrouter"
-	PHPARGS="host=localhost&port=9000&socket=&user=pgsqlrouter&password=pgsqlrouter"
+	ARGS="localhost 9000 \"\" routertest routertest"
+	PHPARGS="localhost 9000 \"\" routertest routertest"
+	PHPARGS="host=localhost&port=9000&socket=&user=routertest&password=routertest"
 	sudo $INITDIR/postgresql start
 	sudo $INITDIR/oracle start
 	sleep 5
 	sudo sqlr-start -id pgsqldb1
 	sudo sqlr-start -id pgsqldb2
 	sudo sqlr-start -id oracle8test
-	sudo sqlr-start -id pgsqlrouter
+	sudo sqlr-start -id routertest
 fi
 
 

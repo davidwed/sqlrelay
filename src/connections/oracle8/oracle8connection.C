@@ -5,6 +5,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/character.h>
+#include <rudiments/environment.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -17,11 +18,9 @@ oracle8connection::oracle8connection() : sqlrconnection_svr() {
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
 #endif
-	environ=new environment();
 }
 
 oracle8connection::~oracle8connection() {
-	delete environ;
 }
 
 uint16_t oracle8connection::getNumberOfConnectStringVars() {
@@ -59,12 +58,12 @@ bool oracle8connection::logIn() {
 
 	// handle ORACLE_HOME
 	if (home) {
-		if (!environ->setValue("ORACLE_HOME",home)) {
+		if (!environment::setValue("ORACLE_HOME",home)) {
 			fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
 			return false;
 		}
 	} else {
-		if (!environ->getValue("ORACLE_HOME")) {
+		if (!environment::getValue("ORACLE_HOME")) {
 			fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
 			return false;
 		}
@@ -72,12 +71,12 @@ bool oracle8connection::logIn() {
 
 	// handle ORACLE_SID
 	if (sid) {
-		if (!environ->setValue("ORACLE_SID",sid)) {
+		if (!environment::setValue("ORACLE_SID",sid)) {
 			fprintf(stderr,"Failed to set ORACLE_SID environment variable.\n");
 			return false;
 		}
 	} else {
-		if (!environ->getValue("ORACLE_SID")) {
+		if (!environment::getValue("ORACLE_SID")) {
 			fprintf(stderr,"No ORACLE_SID environment variable set or specified in connect string.\n");
 			return false;
 		}
@@ -85,12 +84,12 @@ bool oracle8connection::logIn() {
 
 	// handle TWO_TASK
 	if (sid) {
-		if (!environ->setValue("TWO_TASK",sid)) {
+		if (!environment::setValue("TWO_TASK",sid)) {
 			fprintf(stderr,"Failed to set TWO_TASK environment variable.\n");
 			return false;
 		}
 	} else {
-		if (!environ->getValue("TWO_TASK")) {
+		if (!environment::getValue("TWO_TASK")) {
 			fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
 			return false;
 		}
@@ -98,7 +97,7 @@ bool oracle8connection::logIn() {
 
 	// handle NLS_LANG
 	if (nlslang) {
-		if (!environ->setValue("NLS_LANG",nlslang)) {
+		if (!environment::setValue("NLS_LANG",nlslang)) {
 			fprintf(stderr,"Failed to set NLS_LANG environment variable.\n");
 			return false;
 		}
@@ -1342,10 +1341,12 @@ uint64_t oracle8cursor::affectedRows() {
 
 	// get the affected row count
 	ub4	rows;
-	OCIAttrGet(stmt,OCI_HTYPE_STMT,
+	if (OCIAttrGet(stmt,OCI_HTYPE_STMT,
 			(dvoid *)&rows,(ub4 *)NULL,
-			OCI_ATTR_ROW_COUNT,oracle8conn->err);
-	return rows;
+			OCI_ATTR_ROW_COUNT,oracle8conn->err)==OCI_SUCCESS) {
+		return rows;
+	}
+	return 0;
 }
 
 uint32_t oracle8cursor::colCount() {

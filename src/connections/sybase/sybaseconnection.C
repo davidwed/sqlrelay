@@ -19,12 +19,10 @@ bool		sybaseconnection::deadconnection;
 
 sybaseconnection::sybaseconnection() : sqlrconnection_svr() {
 	errorstring=NULL;
-	env=new environment();
 }
 
 sybaseconnection::~sybaseconnection() {
 	delete errorstring;
-	delete env;
 }
 
 uint16_t sybaseconnection::getNumberOfConnectStringVars() {
@@ -47,19 +45,19 @@ void sybaseconnection::handleConnectString() {
 bool sybaseconnection::logIn() {
 
 	// set sybase
-	if (sybase && sybase[0] && !env->setValue("SYBASE",sybase)) {
+	if (sybase && sybase[0] && !environment::setValue("SYBASE",sybase)) {
 		logInError("Failed to set SYBASE environment variable.",1);
 		return false;
 	}
 
 	// set lang
-	if (lang && lang[0] && !env->setValue("LANG",lang)) {
+	if (lang && lang[0] && !environment::setValue("LANG",lang)) {
 		logInError("Failed to set LANG environment variable.",1);
 		return false;
 	}
 
 	// set server
-	if (server && server[0] && !env->setValue("DSQUERY",server)) {
+	if (server && server[0] && !environment::setValue("DSQUERY",server)) {
 		logInError("Failed to set DSQUERY environment variable.",2);
 		return false;
 	}

@@ -852,6 +852,14 @@ then
 				MYSQLINCLUDES=`echo $MYSQLINCLUDES | sed -e "s|-x.* ||g" -e "s|-x.*$||g" -e "s|-nofstore ||g" -e "s|-nofstore$||g" -e "s|-f.* ||g" -e "s|-f.*$||g" -e "s|-mt ||g" -e "s|-mt$||g"`
 			fi
 			MYSQLLIBS=`mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
+
+			if ( test -n "$MYSQLLIBS" )
+			then
+				dnl sanity check
+				AC_MSG_CHECKING(for valid mysql_config output)
+				FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); MYSQLINCLUDES=""; MYSQLLIBS=""])
+			fi
 		fi
 
 		if ( test -z "$MYSQLLIBS" )

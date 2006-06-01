@@ -58,13 +58,24 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 
 			// handle a null value
-			if (returnnulls) {
-				outbindvars[count].value.stringval=NULL;
-			} else {
-				outbindvars[count].value.stringval=new char[1];
-				outbindvars[count].value.stringval[0]=
-								(char)NULL;
-			}
+			outbindvars[count].valuesize=0;
+			if (outbindvars[count].type==STRING_BIND) {
+				if (returnnulls) {
+					outbindvars[count].value.
+							stringval=NULL;
+				} else {
+					outbindvars[count].value.
+							stringval=new char[1];
+					outbindvars[count].value.
+							stringval[0]=(char)NULL;
+				}
+			} else if (outbindvars[count].type==INTEGER_BIND) {
+				outbindvars[count].value.integerval=0;
+			} else if (outbindvars[count].type==DOUBLE_BIND) {
+				outbindvars[count].value.doubleval.value=0;
+				outbindvars[count].value.doubleval.precision=0;
+				outbindvars[count].value.doubleval.scale=0;
+			} 
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint("		");
@@ -123,7 +134,7 @@ bool sqlrcursor::parseOutputBinds() {
 			// get the value
 			if (getLongLong((uint64_t *)&outbindvars[count].
 					value.integerval)!=sizeof(uint64_t)) {
-				setError("Failed to get long value.\n "
+				setError("Failed to get integer value.\n "
 					"A network error may have occurred.");
 				return false;
 			}

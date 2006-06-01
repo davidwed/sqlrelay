@@ -34,8 +34,17 @@ will be installed under /usr/local/mdbtools, then I add /usr/local/mdbtools/bin
 to my PATH environment variable and /usr/local/mdbtools/lib to my
 LD_LIBRARY_PATH environment variable.</p>
 
-<p>I have successfully built, installed and used MDB Tools on Linux but have
-not yet tried it on any other platform.</p>
+<p>I have successfully built, installed and used MDB Tools 0.5 and 0.6pre1 on
+Linux but have not yet tried it on any other platform.</p>
+
+<p>To compile under gcc 4.0 or higher, you need to modify src/libmdb/backend.c
+and change line 31 from:</p>
+
+<blockquote>static GHashTable *mdb_backends;</blockquote>
+
+<p>to:</p>
+
+<blockquote>GHashTable *mdb_backends;</blockquote>
 
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>
