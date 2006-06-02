@@ -1,0 +1,185 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With Oracle</title>
+<link rel="stylesheet" href="../../../../../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Install Software Packages</span><br>
+
+<p>Oracle 10g requires some software packages that may not have been installed
+on your system.  Run the following yum command to install them:</p>
+
+<blockquote>
+<b>yum install setarch tcl tcl-devel openmotif openmotif-devel compat-db compat-libstdc++-33 compat-libf2c-32 compat-gcc-32 compat-gcc-32-c++ compat-libstdc++-296 compat-libgcc-296 libaio libaio-devel</b>
+</blockquote>
+
+<p>You'll also need to download the following package from <a href="http://rpmfind.net">rpmfind</a> and install it using <i>rpm -i</i>.  This package is also
+available in the Fedora Core 4 distribution.<p>
+
+<blockquote>
+<b>openmotif21-2.1.30-14.i386.rpm</b>
+</blockquote>
+
+<span class="heading1">Pretend to be Red Hat Enterprise Linux ES Release
+4</span><br>
+
+<p>Oracle 10g is only officially supported on a few versions of Redhat Linux
+and UnitedLinux.  The installer checks /etc/redhat-release to see exactly what
+version of Redhat Linux you are running.  To pretend that you are running Red
+Hat Enterprise Linux ES Release 4, run the following commands (as root):<p>
+
+<blockquote>
+<b>mv /etc/redhat-release /etc/redhat-release.old<br>
+echo "redhat-4" &gt; /etc/redhat-release</b>
+</blockquote>
+
+<span class="heading1">Configure the Kernel</span><br>
+
+<p>Oracle 10g requires that you at least temporarily increase the values of
+a couple of kernel parameters.  To temporarily increase these values, follow
+these instructions (as root):</p>
+
+<blockquote>
+<b>echo 65536 &gt; /proc/sys/fs/file-max<br>
+echo 2097152 &gt; /proc/sys/kernel/shmall<br>
+echo 2147483648 &gt; /proc/sys/kernel/shmmax<br>
+echo 4096 &gt; /proc/sys/kernel/shmmni<br>
+echo "250 32000 100 128" &gt; /proc/sys/kernel/sem</b>
+</blockquote>
+
+<span class="heading1">Install Oracle</span><br>
+
+<p>Now, log in as the oracle user.</p>
+
+<p>Since Oracle 10.2.0 uses a graphical installer, you need to be running X
+Windows or point the DISPLAY environment variable to an X Windows session
+running somewhere.</p>
+
+<p>I have had problems with the graphical installer on enlightenment and
+fluxbox window managers in the past, though they may work for you.</p>
+
+<p>If you have a CD, mount it and cd to the mount point.  If you have a zip
+distribution, extract the file using:<p>
+
+<blockquote><b>
+unzip 10201_database_linux32.zip<br>
+</b></blockquote>
+
+Change directories to the database directory.<br><br>
+
+Type <b>./runInstaller</b><br><br>
+
+On the <b>Installation Method</b> screen, accept the default Basic Installation.  Change the Global Database Name from "orcl" to "ora1".  Enter a password in the Database Password and Confirm Password boxes for the SYS, SYSTEM, SYSMAN and DBSNMP accounts.  Be sure to enter a password that starts with a letter, not a number.  Click <b>Next</b><br><br>
+
+The window will go away and a <b>Preparing to install</b> dialog with a progress
+bar will appear for a while.  Then it will go away and another screen will
+appear.<br><br>
+
+On this screen, the installer will do a system test to make sure that the
+system configuration meets the installer's requirements.  Your system may not
+meet the Network or Memory requirements.  You can safely ignore these warnings.
+Click Next<br><br>
+
+If a dialog pops up indicating that some of the prerequisite checks have failed,
+click <b>Yes</b> to proceed.<br><br>
+
+On the <b>Summary</b> screen, click <b>Install</b><br><br>
+
+The <b>Install</b> screen will show the progress of the installation<br><br>
+
+When the installation is about 30% complete, click <b>Stop Installation</b> and edit the file /u01/app/oracle/product/10.2.0/bin/gennttab and change the lines:<br><br>
+
+<blockquote><pre>
+LIB=`$ECHO ${TtoLIB} | $SED 's/ /\\
+/g' | $GREP "^${T}:" | $AWK -F: '{print $2}'`
+INI=`$ECHO ${TtoINI} | $SED 's/ /\\
+/g' | $GREP "^${T}:" | $AWK -F: '{print $2}'`
+BAS=`$ECHO ${TtoBAS} | $SED 's/ /\\
+/g' | $GREP "^${T}:" | $AWK -F: '{print $2}'`
+</pre></blockquote>
+
+To:<br><br>
+
+<blockquote><pre>
+LIB=`$ECHO ${TtoLIB} | $SED 's/ /\n/g' | $GREP "^${T}:" | $AWK -F: '{print $2}'`
+INI=`$ECHO ${TtoINI} | $SED 's/ /\n/g' | $GREP "^${T}:" | $AWK -F: '{print $2}'`
+BAS=`$ECHO ${TtoBAS} | $SED 's/ /\n/g' | $GREP "^${T}:" | $AWK -F: '{print $2}'`
+</pre></blockquote>
+
+Then click <b>No</b> to continue the installation.<br><br>
+
+Be sure to do this before the linking phase starts or the installation will
+stall during the linking phase.<br><br>
+
+When installation is finished, the <b>Configuration Assistants</b> screen will
+show the progress of the initial configuration processes.<br><br>
+
+A <b>Database Configuration Assistant</b> dialog should pop up, displaying the
+progress of the initial database configuration.<br><br>
+
+When database creation is complete, a dialog will pop up with a summary.  Click
+<b>OK</b>.<br><br>
+
+<p>A dialog will pop up asking you to run some scripts as root.  Just follow the
+directions on the dialog (they may take a while to complete) and click
+<b>Ok</b><br><br>
+
+On the <b>End Of Installation</b> screen click <b>Exit</b><br><br>
+
+A dialog will pop up asking: Do you really want to exit?
+Click <b>Yes</b>.<br><br>
+
+<span class="heading1">Post-Installation</span><br>
+
+<p>Sometimes, for some reason, during an installation, the tnslistener does not
+get configured to listen for connections to the ora1 database.  Take a look
+at /u01/app/oracle/product/10.2.0/network/admin/listener.ora and make sure
+that there is an entry like the following:</p>
+
+<blockquote><pre>
+<font color="#298a52"><b>SID_LIST_LISTENER</b></font> =
+  (<font color="#298a52"><b>SID_LIST</b></font> =
+    (<font color="#298a52"><b>SID_DESC</b></font> =
+      (<font color="#a52829"><b>SID_NAME</b></font> = PLSExtProc)
+      (<font color="#a52829"><b>ORACLE_HOME</b></font> = /u01/app/<font color="#008a8c">oracle</font>/product/10.2.0)
+      (<font color="#a52829"><b>PROGRAM</b></font> = extproc)
+    )
+    (<font color="#298a52"><b>SID_DESC</b></font> =
+      (<font color="#a52829"><b>SID_NAME</b></font> = ora1)
+      (<font color="#a52829"><b>ORACLE_HOME</b></font> = /u01/app/<font color="#008a8c">oracle</font>/product/10.2.0)
+    )
+  )
+</pre></blockquote>
+
+<p>The second SID_DESC section may be missing from your listener.ora file.  If
+it is, update your listener.ora file, adding the necessary section.</p>
+
+<p>You'll also need to modify the line:</p>
+
+<blockquote><pre>
+      (<font color="#2e8b57"><b>ADDRESS</b></font> = (<font color="#a52a2a"><b>PROTOCOL</b></font> = <font color="#008b8b">IPC</font>)(<font color="#a52a2a"><b>KEY</b></font> = EXTPROC1))
+</pre><blockquote>
+
+<p>To read:</p>
+
+<blockquote><pre>
+      (<font color="#2e8b57"><b>ADDRESS</b></font> = (<font color="#a52a2a"><b>PROTOCOL</b></font> = <font color="#008b8b">IPC</font>)(<font color="#a52a2a"><b>KEY</b></font> = ORA1))
+</pre><blockquote>
+
+<p>During the installation, several ancillary processes were started.  You can
+shut some of them down by executing the following commands (as oracle):</p>
+
+<blockquote><b>
+isqlplusctl stop<br>
+emctl stop dbconsole<br>
+emctl stop agent<br>
+</b></blockquote>
+
+<p>At this point, only the database and tns listener should be running.</p>
+
+</body>
+
+</html>
