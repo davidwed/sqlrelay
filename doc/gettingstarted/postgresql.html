@@ -193,15 +193,19 @@ credentials by default.</p>
 
 <p>View the file <i>pg_hba.conf</i> (usually found in <i>/var/lib/pgsql</i>,
 <i>/var/lib/pgsql/data</i> or <i>/usr/local/pgsql/var/data</i>) and look for a
-line like the following:</p>
+line like one of the following:</p>
 
 <blockquote><b><pre>
-local        all	ident	sameuser
+local        all	ident sameuser
+
+local        all	all			ident sameuser
+local        all	all	127.0.0.1/32	ident sameuser
+local        all	all	::1/128		ident sameuser
 </pre></b></blockquote>
 
-<p>If there's a line like that in your database, then all database users will
-have the same password as the system password for the user of the same name,
-thus, when prompted for a password, enter the password of the user you 
+<p>If there's a line like one of those in your file, then all database users
+will have the same password as the system password for the user of the same
+name, thus, when prompted for a password, enter the password of the user you 
 are logged in as (which should be the postgres user).</p>
 
 <p>By default, PostgreSQL has a database called <i>template1</i> containing
@@ -233,11 +237,28 @@ found in <i>/var/lib/pgsql</i>, <i>/var/lib/pgsql/data</i> or
 <i>/usr/local/pgsql/var/data</i>) and look for lines like the following:</p>
 
 <blockquote><b><pre>
+local	all				ident sameuser
+host	all	all	127.0.0.1/32	ident sameuser
+host	all	all	::1/128		ident sameuser
+</pre></b></blockquote>
+
+<p>and modify these lines to read:</p>
+
+<blockquote><b><pre>
+local	all				password
+host	all	all	127.0.0.1/32	password
+host	all	all	::1/128		password
+</pre></b></blockquote>
+
+<p>Older versions of postgresql may have lines like:</p>
+
+<blockquote><b><pre>
 local        all                                           trust
 host         all         127.0.0.1     255.255.255.255     trust
 </pre></b></blockquote>
 
-<p>or the following:</p>
+<p>or like:</p>
+
 <blockquote><b><pre>
 local        all                                           ident sameuser
 host         all         127.0.0.1     255.255.255.255     ident sameuser
@@ -299,7 +320,13 @@ network to access all databases on the local machine, using password
 authentication.</p>
 
 <blockquote><b><pre>
-host         all         192.168.2.0   255.255.255.0       password
+host	all	all	192.168.2.0/24	password
+</pre></b></blockquote>
+
+<p>Older versions of Postgresql need the following line:</p>
+
+<blockquote><b><pre>
+host	all	192.168.2.0	255.255.255.0	password
 </pre></b></blockquote>
 
 <p>After making these changes, log in as root and restart the database.</p>
@@ -450,13 +477,13 @@ commands enable support for all languages in the testdb database.</p>
 
 <blockquote><b>
 createlang -U postgres -W plpgsql testdb<br>
-Password: newpassword </b>(you will be prompted for the password 4 times)<b><br>
+Password: newpassword </b>(you may be prompted for the password up to 4 times)<b><br>
 createlang -U postgres -W pltcl testdb<br>
-Password: newpassword </b>(you will be prompted for the password 4 times)<b><br>
+Password: newpassword </b>(you may be prompted for the password up to 4 times)<b><br>
 createlang -U postgres -W plperl testdb<br>
-Password: newpassword </b>(you will be prompted for the password 4 times)<b><br>
+Password: newpassword </b>(you may be prompted for the password up to 4 times)<b><br>
 createlang -U postgres -W plpython testdb<br>
-Password: newpassword </b>(you will be prompted for the password 4 times)<br>
+Password: newpassword </b>(you may be prompted for the password up to 4 times)<br>
 </blockquote>
 
 <p>If you want to drop the database, you can do so with the following 

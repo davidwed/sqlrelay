@@ -246,7 +246,8 @@ database.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> db <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testdb'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>);
+<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> db <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testdb'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,
+<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>);
 </PRE>
 </blockquote>
 
@@ -255,12 +256,21 @@ query above fails, try this one instead.</p>
 
 <blockquote>
 <PRE>
+<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> db <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testdb'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>);
+</PRE>
+</blockquote>
+
+<p>Even older versions of MySQL have fewer columns than that in the <i>db</i>
+table, if the above queries fail, try this one instead.</p>
+
+<blockquote>
+<PRE>
 <B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> db <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testdb'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>);
 </PRE>
 </blockquote>
 
-<p>Really old versions of MySQL have fewer columns in the <i>db</i> table, if
-the queries fail, try this one instead.</p>
+<p>Still older versions of MySQL have even fewer columns in the <i>db</i> table,
+if the queries fail, try this one instead.</p>
 
 <blockquote>
 <PRE>
