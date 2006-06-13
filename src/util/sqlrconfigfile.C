@@ -668,12 +668,23 @@ uint32_t sqlrconfigfile::atouint32_t(const char *value,
 
 bool sqlrconfigfile::tagEnd(const char *name) {
 
+	// don't do anything if we're already done
+	// or have not found the correct id
+	if (done || !correctid) {
+		return true;
+	}
+
 	if (!charstring::compare(name,"router")) {
 		inrouter=false;
-	} else if (!charstring::compare(name,"route")) {
-		routelist.append(currentroute);
-	} else if (!charstring::compare(name,"filter")) {
-		routelist.append(currentroute);
+	} else if (!charstring::compare(name,"route") ||
+			!charstring::compare(name,"filter")) {
+		routecontainer	*existingroute=routeAlreadyExists(currentroute);
+		if (existingroute) {
+			moveRegexList(currentroute,existingroute);
+			delete currentroute;
+		} else {
+			routelist.append(currentroute);
+		}
 	}
 
 	// don't do anything if we're already done
@@ -687,6 +698,41 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 		done=true;
 	}
 	return true;
+}
+
+routecontainer *sqlrconfigfile::routeAlreadyExists(routecontainer *cur) {
+
+	routenode	*rn=routelist.getNodeByIndex(0);
+	while (rn) {
+
+		routecontainer	*rc=rn->getData();
+		if (!charstring::compare(rc->getHost(),
+					cur->getHost()) &&
+			rc->getPort()==cur->getPort() &&
+			!charstring::compare(rc->getSocket(),
+						cur->getSocket()) &&
+			!charstring::compare(rc->getUser(),
+						cur->getUser()) &&
+			!charstring::compare(rc->getPassword(),
+						cur->getPassword())) {
+			return rc;
+		}
+
+		rn=rn->getNext();
+	}
+	return NULL;
+}
+
+void sqlrconfigfile::moveRegexList(routecontainer *cur,
+					routecontainer *existing) {
+
+	linkedlistnode< regularexpression * >	*re=cur->getRegexList()->
+							getNodeByIndex(0);
+	while (re) {
+		existing->getRegexList()->append(re->getData());
+		re=re->getNext();
+	}
+	cur->getRegexList()->clear();
 }
 
 bool sqlrconfigfile::parse(const char *config, const char *id) {

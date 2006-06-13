@@ -217,6 +217,10 @@ class sqlrconfigfile : public xmlsax {
 		bool	attributeValue(const char *value);
 		bool	tagEnd(const char *name);
 
+		routecontainer	*routeAlreadyExists(routecontainer *cur);
+		void		moveRegexList(routecontainer *cur,
+						routecontainer *existing);
+
 		char		**addresses;
 		uint64_t	addresscount;
 		uint16_t	port;

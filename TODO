@@ -24,7 +24,6 @@ perl apis -> CPAN
 query router:
 	"do something"'s
 	investigate 2 phase commit
-	catch the case where 2 route tags define the same connection
 
 query/fields cmdline tools need a timeout option
 
