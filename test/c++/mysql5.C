@@ -92,7 +92,7 @@ int	main(int argc, char **argv) {
 
 	// create a new table
 	printf("CREATE TEMPTABLE: \n");
-	checkSuccess(cur->sendQuery("create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(1,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testvarchar varchar(40), testtext text, testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testblob blob, testtinyblob tinyblob, testmediumblob mediumblob, testlongblob longblob, testtimestamp timestamp)"),1);
+	checkSuccess(cur->sendQuery("create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testvarchar varchar(40), testtext text, testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testblob blob, testtinyblob tinyblob, testmediumblob mediumblob, testlongblob longblob, testtimestamp timestamp)"),1);
 	printf("\n");
 
 	printf("INSERT: \n");
@@ -281,7 +281,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType(9),"TIME");
 	checkSuccess(cur->getColumnType(10),"DATETIME");
 	checkSuccess(cur->getColumnType(11),"YEAR");
-	checkSuccess(cur->getColumnType(12),"CHAR");
+	checkSuccess(cur->getColumnType(12),"STRING");
 	checkSuccess(cur->getColumnType(13),"CHAR");
 	checkSuccess(cur->getColumnType(14),"BLOB");
 	checkSuccess(cur->getColumnType(15),"TINYBLOB");
@@ -304,7 +304,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testtime"),"TIME");
 	checkSuccess(cur->getColumnType("testdatetime"),"DATETIME");
 	checkSuccess(cur->getColumnType("testyear"),"YEAR");
-	checkSuccess(cur->getColumnType("testchar"),"CHAR");
+	checkSuccess(cur->getColumnType("testchar"),"STRING");
 	checkSuccess(cur->getColumnType("testvarchar"),"CHAR");
 	checkSuccess(cur->getColumnType("testtext"),"BLOB");
 	checkSuccess(cur->getColumnType("testtinytext"),"TINYBLOB");
@@ -330,7 +330,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength(9),3);
 	checkSuccess(cur->getColumnLength(10),8);
 	checkSuccess(cur->getColumnLength(11),1);
-	checkSuccess(cur->getColumnLength(12),41);
+	checkSuccess(cur->getColumnLength(12),40);
 	checkSuccess(cur->getColumnLength(13),41);
 	checkSuccess(cur->getColumnLength(14),65535);
 	checkSuccess(cur->getColumnLength(15),255);
@@ -353,7 +353,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testtime"),3);
 	checkSuccess(cur->getColumnLength("testdatetime"),8);
 	checkSuccess(cur->getColumnLength("testyear"),1);
-	checkSuccess(cur->getColumnLength("testchar"),41);
+	checkSuccess(cur->getColumnLength("testchar"),40);
 	checkSuccess(cur->getColumnLength("testvarchar"),41);
 	checkSuccess(cur->getColumnLength("testtext"),65535);
 	checkSuccess(cur->getColumnLength("testtinytext"),255);

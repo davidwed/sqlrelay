@@ -288,7 +288,7 @@ void oracle8connection::logInError(const char *errmsg) {
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 			message,sizeof(message),OCI_HTYPE_ERROR);
 	message[1023]=(char)NULL;
-	fprintf(stderr,"%s\n",message);
+	fprintf(stderr,"error: %s\n",message);
 }
 
 sqlrcursor_svr *oracle8connection::initCursor() {

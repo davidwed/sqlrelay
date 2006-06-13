@@ -91,7 +91,7 @@ int	main(int argc, char **argv) {
 
 	// create a new table
 	printf("CREATE TEMPTABLE: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(1,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1);
 	printf("\n");
 
 	printf("INSERT: \n");

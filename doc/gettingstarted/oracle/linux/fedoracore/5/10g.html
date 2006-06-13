@@ -13,7 +13,7 @@
 on your system.  Run the following yum command to install them:</p>
 
 <blockquote>
-<b>yum install setarch tcl tcl-devel openmotif openmotif-devel compat-db compat-libstdc++-33 compat-libf2c-32 compat-gcc-32 compat-gcc-32-c++ compat-libstdc++-296 compat-libgcc-296 libaio libaio-devel</b>
+<b>yum install setarch tcl tcl-devel openmotif openmotif-devel compat-db compat-libstdc++-33 compat-libf2c-32 compat-gcc-32 compat-gcc-32-c++ compat-libstdc++-296 compat-libgcc-296 libaio libaio-devel xorg-x11-deprecated-libs</b>
 </blockquote>
 
 <p>You'll also need to download the following package from <a href="http://rpmfind.net">rpmfind</a> and install it using <i>rpm -i</i>.  This package is also
@@ -133,6 +133,15 @@ A dialog will pop up asking: Do you really want to exit?
 Click <b>Yes</b>.<br><br>
 
 <span class="heading1">Post-Installation</span><br>
+
+<p>For some reason, despite setting the oracle user's umask, the installtion
+creates the ORACLE_HOME directory and all subdirectories of it with 750
+permissions, so any user that isn't in the oinstall group can't read or execute
+anything inside of them including the client programs like sqlplus and files
+like tnsnames.ora.  The installation also creates many of the files without
+read or execute permissions for users not in the oinstall group as well,
+including tnsnames.ora.  The cleanest solution is to add any users that need to
+run Oracle client programs to the oinstall group.</p>
 
 <p>Sometimes, for some reason, during an installation, the tnslistener does not
 get configured to listen for connections to the ora1 database.  Take a look

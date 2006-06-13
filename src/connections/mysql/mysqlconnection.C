@@ -663,7 +663,11 @@ void mysqlcursor::returnColumnInfo() {
 		} else if (mysqlfield->type==FIELD_TYPE_VAR_STRING) {
 			type=CHAR_DATATYPE;
 			length=(uint32_t)mysqlfield->length+1;
-		} else if (mysqlfield->type==FIELD_TYPE_DECIMAL) {
+		} else if (mysqlfield->type==FIELD_TYPE_DECIMAL
+#ifdef HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL
+			|| mysqlfield->type==FIELD_TYPE_NEWDECIMAL
+#endif
+			) {
 			type=DECIMAL_DATATYPE;
 			if (mysqlfield->decimals>0) {
 				length=(uint32_t)mysqlfield->length+2;

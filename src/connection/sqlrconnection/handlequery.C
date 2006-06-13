@@ -53,7 +53,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 			// If the query didn't process ok,
 			// handle the error.
-			// If handleError returns false then the error 
+			// If handleError returns false then the error
 			// was a down database that has presumably
 			// come back up by now.  Loop back...
 			if (handleError(cursor)) {
@@ -164,7 +164,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			cursor->sid_egress=
 				cursor->sql_injection_detection_egress();
 		} else {
-
 			stringbuffer	*newquery=cursor->fakeInputBinds(
 							cursor->querybuffer);
 			const char	*queryptr=(newquery)?

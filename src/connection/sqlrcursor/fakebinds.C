@@ -104,20 +104,22 @@ stringbuffer *sqlrcursor_svr::fakeInputBinds(const char *query) {
 }
 
 void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
+
 	if (inbindvars[index].type==STRING_BIND) {
 
 		buffer->append("'");
 
-		size_t	length=charstring::length(
-					inbindvars[index].value.stringval);
+		size_t	length=inbindvars[index].valuesize;
 
 		for (size_t ind=0; ind<length; ind++) {
 
 			char	ch=inbindvars[index].value.stringval[ind];
 
-			// escape \'s and quotes
+			// escape \'s, quotes and NULL's
 			if (ch=='\'' || ch=='\\') {
 				buffer->append('\\');
+			} else if (ch=='\0') {
+				buffer->append("\\0");
 			}
 			buffer->append(ch);
 		}

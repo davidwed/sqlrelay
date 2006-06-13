@@ -9,8 +9,10 @@ bool sqlrconnection_svr::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 	debugPrint("connection",1,"re-execute query");
 	#endif
 
-	// handle query will return 1 for success,
-	// 0 for network error and -1 for a bad query
+	// handleQuery() will return:
+	//	1 for success,
+	//	0 for network error
+	//	-1 for a bad query
 	int32_t	querystatus=handleQuery(cursor,true,false,true);
 	if (querystatus==1) {
 

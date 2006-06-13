@@ -833,12 +833,10 @@ int	main(int argc, char **argv) {
 	cur->defineOutputBindCursor("curs2");
 	checkSuccess(cur->executeQuery(),1);
 	sqlrcursor	*bindcur1=cur->getOutputBindCursor("curs1");
-con->debugOn();
 	checkSuccess(bindcur1->fetchFromBindCursor(),1);
 	checkSuccess(bindcur1->getField(0,(uint32_t)0),"6");
 	checkSuccess(bindcur1->getField(1,(uint32_t)0),"7");
 	checkSuccess(bindcur1->getField(2,(uint32_t)0),"8");
-con->debugOff();
 	delete bindcur1;
 	sqlrcursor	*bindcur2=cur->getOutputBindCursor("curs2");
 	checkSuccess(bindcur2->fetchFromBindCursor(),1);

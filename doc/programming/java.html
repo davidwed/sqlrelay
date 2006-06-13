@@ -40,7 +40,8 @@ javac MyProgram.java<br>
 
 <p>To run your program, you need to include /usr/local/firstworks/java in your 
 LD_LIBRARY_PATH.  If your system supports ld.so, you can alternatively add 
-/usr/local/firstworks/java to your /etc/ld.so.config and run ldconfig.</p>
+/usr/local/firstworks/java to your /etc/ld.so.conf or /etc/ld.so.conf.d
+(if your system supports ld.so.conf.d) and run ldconfig.</p>
 
 <blockquote>
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/firstworks/java<br>

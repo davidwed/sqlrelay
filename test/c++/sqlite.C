@@ -316,7 +316,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("select * from testtable1"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(0,1),"2");
-	checkSuccess(cur->getField(0,2),"3");
+	checkSuccess(cur->getField(0,2),"3.0");
 	checkSuccess(cur->sendQuery("delete from testtable1"),1);
 	printf("\n");
 

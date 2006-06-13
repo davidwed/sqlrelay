@@ -312,8 +312,9 @@ than from Sybase.</p>
 (ie. if they were manually copied there) then the FreeTDS connection could be
 compiled or linked against them.</p>
 <p>Generally, the solution is to install FreeTDS somewhere other than /usr
-and omit the FreeTDS and Sybase library paths from /etc/ld.so.conf and
-LD_LIBRARY_PATH.  By default, the build uses rpath's to cause the connections
+and omit the FreeTDS and Sybase library paths from /etc/ld.so.conf,
+/etc/ld.so.conf.d and LD_LIBRARY_PATH.  By default, the build uses rpath's to
+cause the connections
 to look for libraries in the exact place that they were found at compile time,
 causing each connection to find the right library.  This option can be turned
 off though.  In that case, LD_LIBRARY_PATH should be set before running

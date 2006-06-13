@@ -317,7 +317,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable1"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"2");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"3");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"3.0");
 	checkSuccessInt(sqlrcur_sendQuery(cur,"delete from testtable1"),1);
 	printf("\n");
 

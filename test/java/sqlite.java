@@ -334,7 +334,7 @@ class sqlite {
 		checkSuccess(cur.sendQuery("select * from testtable1"),1);
 		checkSuccess(cur.getField(0,0),"1");
 		checkSuccess(cur.getField(0,1),"2");
-		checkSuccess(cur.getField(0,2),"3");
+		checkSuccess(cur.getField(0,2),"3.0");
 		checkSuccess(cur.sendQuery("delete from testtable1"),1);
 		System.out.println();
 	

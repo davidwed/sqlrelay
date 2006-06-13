@@ -134,6 +134,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("update junktable set col1=2"),0);
 	checkSuccess(cur->sendQuery("delete from junktable"),0);
 	checkSuccess(cur->sendQuery("drop table junktable (col1 int)"),0);
+	printf("\n");
 
 	// drop existing table
 	cur->sendQuery("drop table testtable1");

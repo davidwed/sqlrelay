@@ -228,8 +228,10 @@ run the following command as root for each instance:</p>
 <p>The DB2 client libraries should be installed in /opt/IBM/db2/V8.1/lib.
 DB2 client programs (including SQL Relay) need to be able to access these
 libraries at runtime.  The dynamic loader searches for libraries in /lib,
-/usr/lib and in directories specified in /etc/ld.so.conf.  Append the following
-line to /etc/ld.so.conf and run /sbin/ldconfig (as root).</p>
+/usr/lib and in directories specified in /etc/ld.so.conf or /etc/ld.so.conf.d.
+Append the following line to /etc/ld.so.conf or create a file in
+/etc/ld.so.conf.d with the following line's contents (if your system supports
+ld.so.conf.d) and run /sbin/ldconfig (as root).</p>
 
 <blockquote><b>
 /opt/IBM/db2/V8.1/lib

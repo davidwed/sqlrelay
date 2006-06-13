@@ -11,9 +11,20 @@
 
 <br><br>
 
-<span class="heading2">Java Installation</span><br>
+<span class="heading2">Install Compatibility Libraries</span><br>
 
-<p>...</p>
+<p>Since DB2's installer is Java-based, it requires libXp.so, which is a
+deprecated X11 library.  If you're trying to install DB2 on Fedora Core 5 or
+another linux distribution of similar or newer vintage than you'll need to
+get that library.  For FC5, you can install the <i>xorg-x11-deprecated-libs</i>
+RPM using:</p>
+
+<blockquote><b>
+yum install xorg-x11-deprecated-libs
+</b></blockquote>
+
+<p>For other rpm based platforms, you may need to find the appropriate RPM on
+<a href="http://rpmfind.net">rpmfind</a> and install it using <i>rpm -i</i>.</p>
 
 <span class="heading2">DB2 Installation</span><br>
 
@@ -67,6 +78,17 @@ a 8.1.2 version number.  These clues might lead one to think that he or she has
 accidentally installed version 8.1 instead of version 8.2.4, but this is not the
 case.</p>
 
+<span class="heading2">Java Installation</span><br>
+
+<p>IBM DB2 V8.2.4 requires IBM's java.  Failure to install the IBM java
+distribution that comes with the DB2 distribution will cause the installation
+of the tools catalog to fail.  Change directories to db2/linux26/Java-1.4
+and rum the following command:</p>
+
+<blockquote><b>
+rpm -i IBMJava2-SDK-1.4.2-1.0.i386.rpm
+</b></blockquote>
+
 <span class="heading2">Creating an Instance</span><br>
 
 <p>A DB2 installation consists of an administration server and one or more
@@ -109,10 +131,8 @@ leave the default Startup box checked
 (Autostart the instance at system startup) and click Next</p>
 
 <p>On the screen titled <b>Prepare the DB2 tools catalog</b>,
-click the radio button next to "Use a local database" and click Next</p>
-
-<p>On the screen titled <b>Specify a local database to store the DB2 tools
-catalog</b>, leave the defaults then click Next</p>
+accept the default "Do not prepare the DB2 tools catalog on this computer"
+and click Next</p>
 
 <p>On the screen titled <b>Set up the administration contact list</b>,
 leave the defaults and click Next.  (You may have to check and then uncheck the  "Enable notification" button before Next is enabled)</p>
@@ -204,8 +224,10 @@ run the following command as root for each instance:</p>
 <p>The DB2 client libraries should be installed in /opt/IBM/db2/V8.1/lib.
 DB2 client programs (including SQL Relay) need to be able to access these
 libraries at runtime.  The dynamic loader searches for libraries in /lib,
-/usr/lib and in directories specified in /etc/ld.so.conf.  Append the following
-line to /etc/ld.so.conf and run /sbin/ldconfig (as root).</p>
+/usr/lib and in directories specified in /etc/ld.so.conf or /etc/ld.so.conf.d.
+Append the following line to /etc/ld.so.conf or create a file in
+/etc/ld.so.conf.d with the following line's contents (if your system supports
+ld.so.conf.d) and run /sbin/ldconfig (as root).</p>
 
 <blockquote><b>
 /opt/IBM/db2/V8.1/lib

@@ -5,6 +5,7 @@
 	interbase/firebird dead-db/relogin works now
 	added test for 0 length result set to PySQLRDB's fetchmany method
 	added mysql_config sanity test to configure script
+	NULL's are escaped in fake input BLOB binds now
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that
