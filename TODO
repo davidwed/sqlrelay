@@ -1,7 +1,5 @@
 query router "do something"'s
 
-integrate statistics gathering
-
 "how many connections should I start?" in FAQ
 
 mysql 3:
