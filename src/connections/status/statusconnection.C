@@ -27,7 +27,7 @@ bool statusconnection::init(int argc, const char **argv) {
 	cmdl=new cmdline(argc,argv);
 
 	// get the connection id from the command line
-	connectionid=cmdl->value("-connectionid");
+	connectionid=cmdl->getValue("-connectionid");
 	if (!connectionid[0]) {
 		connectionid=DEFAULT_CONNECTIONID;
 		fprintf(stderr,"Warning: using default connectionid.\n");

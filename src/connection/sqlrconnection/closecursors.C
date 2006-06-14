@@ -19,7 +19,7 @@ void sqlrconnection_svr::closeCursors(bool destroy) {
 			if (cur[i]) {
 				cur[i]->closeCursor();
 				if (destroy) {
-					deleteCursor(cur[i]);
+					deleteCursorUpdateStats(cur[i]);
 				}
 			}
 		}

@@ -156,7 +156,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 				success=true;
 			} else {
 				success=(cursor->handleBinds() && 
-					cursor->executeQuery(
+					executeQueryUpdateStats(cursor,
 							cursor->querybuffer,
 							cursor->querylength,
 							reallyexecute));
@@ -175,7 +175,8 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			if (cursor->sql_injection_detection_ingress(queryptr)) {
 				success=true;
 			} else {
-				success=cursor->executeQuery(queryptr,
+				success=executeQueryUpdateStats(cursor,
+							queryptr,
 							querylen,
 							reallyexecute);
 			}
@@ -191,7 +192,8 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 						cursor->querybuffer)) {
 			success=true;
 		} else {
-			success=cursor->executeQuery(cursor->querybuffer,
+			success=executeQueryUpdateStats(cursor,
+							cursor->querybuffer,
 							cursor->querylength,
 							reallyexecute);
 		}
@@ -210,7 +212,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							cursor->querybuffer,
 							cursor->querylength) && 
 					cursor->handleBinds() && 
-					cursor->executeQuery(
+					executeQueryUpdateStats(cursor,
 							cursor->querybuffer,
 							cursor->querylength,
 							true));
@@ -232,7 +234,8 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 				success=(cursor->prepareQuery(
 							cursor->querybuffer,
 							cursor->querylength) && 
-					cursor->executeQuery(queryptr,
+					executeQueryUpdateStats(cursor,
+							queryptr,
 							querylen,true));
 			}
 			cursor->sid_egress=

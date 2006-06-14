@@ -9,7 +9,7 @@ void sqlrconnection_svr::clientSession() {
 	debugPrint("connection",0,"client session...");
 	#endif
 
-	statictics->open_cli_connections++;
+	statistics->open_cli_connections++;
 	statistics->opened_cli_connections++;
 
 	// a session consists of getting a query and returning a result set

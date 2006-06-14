@@ -147,6 +147,15 @@ class sqlrconnection_svr :
 
 	private:
 		// methods used internally
+		bool	logInUpdateStats();
+		void	logOutUpdateStats();
+		sqlrcursor_svr	*initCursorUpdateStats();
+		void	deleteCursorUpdateStats(sqlrcursor_svr *curs);
+		bool	executeQueryUpdateStats(sqlrcursor_svr *curs,
+							const char *query,
+							uint32_t length,
+							bool execute);
+
 		void	setUserAndGroup();
 		bool	initCursors(bool create);
 		void	incrementConnectionCount();

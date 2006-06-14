@@ -49,7 +49,7 @@ int main(int argc, const char **argv) {
 		"  Times  New Cursor Used:     %d\n"
 		"  Times  Cursor Reused:       %d\n"
 		"\n"
-		"  Total  Questions:    %d\n" 
+		"  Total  Queries:      %d\n" 
 		"  Total  Errors:       %d\n"
 		"\n",
 		statistics->open_svr_connections, 
@@ -60,7 +60,7 @@ int main(int argc, const char **argv) {
 		statistics->opened_svr_cursors,
 		statistics->times_new_cursor_used,
 		statistics->times_cursor_reused,
-		statistics->total_questions,
+		statistics->total_queries,
 		statistics->total_errors
 		);
 	

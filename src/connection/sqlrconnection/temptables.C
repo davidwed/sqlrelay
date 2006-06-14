@@ -21,7 +21,7 @@ void sqlrconnection_svr::dropTempTable(sqlrcursor_svr *cursor,
 	dropquery.append("drop table ")->append(tablename);
 	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
-		cursor->executeQuery(dropquery.getString(),
+		executeQueryUpdateStats(cursor,dropquery.getString(),
 					dropquery.getStringLength(),true);
 	}
 	cursor->cleanUpData(true,true);
@@ -45,7 +45,7 @@ void sqlrconnection_svr::truncateTempTable(sqlrcursor_svr *cursor,
 	truncatequery.append("delete from ")->append(tablename);
 	if (cursor->prepareQuery(truncatequery.getString(),
 					truncatequery.getStringLength())) {
-		cursor->executeQuery(truncatequery.getString(),
+		executeQueryUpdateStats(cursor,truncatequery.getString(),
 					truncatequery.getStringLength(),true);
 	}
 	cursor->cleanUpData(true,true);

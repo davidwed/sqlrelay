@@ -370,7 +370,7 @@ bool sqlrconnection_svr::attemptLogIn() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"logging in...");
 	#endif
-	if (!logIn()) {
+	if (!logInUpdateStats()) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",0,"log in failed");
 		#endif
@@ -434,7 +434,7 @@ bool sqlrconnection_svr::initCursors(bool create) {
 		#endif
 
 		if (create) {
-			cur[i]=initCursor();
+			cur[i]=initCursorUpdateStats();
 			// FIXME: LAME!!!  oh god this is lame....
 			cur[i]->querybuffer=new char[
 						cfgfl->getMaxQuerySize()+1];

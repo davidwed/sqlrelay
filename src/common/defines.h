@@ -88,7 +88,7 @@ struct sqlrstatistics {
 	uint32_t	times_new_cursor_used;
 	uint32_t	times_cursor_reused;
 
-	uint32_t	total_questions;
+	uint32_t	total_queries;
 	uint32_t	total_errors;
 };
 

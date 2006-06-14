@@ -18,18 +18,18 @@ bool sqlrconnection_svr::rollback() {
 	debugPrint("connection",1,"rollback...");
 	#endif
 
-	sqlrcursor_svr	*rollbackcur=initCursor();
+	sqlrcursor_svr	*rollbackcur=initCursorUpdateStats();
 	char	*rollbackquery="rollback";
 	int	rollbackquerylen=8;
 	bool	retval=false;
 	if (rollbackcur->openCursor(0) &&
 		rollbackcur->prepareQuery(rollbackquery,rollbackquerylen)) {
-		retval=rollbackcur->executeQuery(rollbackquery,
+		retval=executeQueryUpdateStats(rollbackcur,rollbackquery,
 						rollbackquerylen,true);
 	}
 	rollbackcur->cleanUpData(true,true);
 	rollbackcur->closeCursor();
-	deleteCursor(rollbackcur);
+	deleteCursorUpdateStats(rollbackcur);
 
 	#ifdef SERVER_DEBUG
 	char	string[38];

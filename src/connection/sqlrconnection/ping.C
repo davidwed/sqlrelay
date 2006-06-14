@@ -12,19 +12,19 @@ void sqlrconnection_svr::pingCommand() {
 }
 
 bool sqlrconnection_svr::ping() {
-	sqlrcursor_svr	*pingcur=initCursor();
+	sqlrcursor_svr	*pingcur=initCursorUpdateStats();
 	const char	*pingquery=pingQuery();
 	int		pingquerylen=charstring::length(pingQuery());
 	if (pingcur->openCursor(0) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
-		pingcur->executeQuery(pingquery,pingquerylen,true)) {
+		executeQueryUpdateStats(pingcur,pingquery,pingquerylen,true)) {
 		pingcur->cleanUpData(true,true);
 		pingcur->closeCursor();
-		deleteCursor(pingcur);
+		deleteCursorUpdateStats(pingcur);
 		return true;
 	}
 	pingcur->closeCursor();
-	deleteCursor(pingcur);
+	deleteCursorUpdateStats(pingcur);
 	return false;
 }
 

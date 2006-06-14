@@ -22,7 +22,7 @@ void sqlrconnection_svr::reLogIn() {
 		debugPrint("connection",5,"trying...");
 		#endif
 
-		if (logIn()) {
+		if (logInUpdateStats()) {
 			if (!initCursors(false)) {
 				closeCursors(false);
 				logOut();

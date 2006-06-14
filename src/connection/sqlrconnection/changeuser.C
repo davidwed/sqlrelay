@@ -14,7 +14,7 @@ bool sqlrconnection_svr::changeUser(const char *newuser,
 	logOut();
 	setUser(newuser);
 	setPassword(newpassword);
-	return (logIn() && initCursors(false));
+	return (logInUpdateStats() && initCursors(false));
 }
 
 void sqlrconnection_svr::setUser(const char *user) {
