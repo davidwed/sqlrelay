@@ -42,6 +42,9 @@ Charles Frank - Charles.Frank@pharma.com
 Gena01 - gena01@gmail.com
 	Lots of php pear db driver fixes
 
+Sharpinskiy Dmitry - d-sh1@yandex.ru
+	added unicode support to odbc connection
+
 Fixes/Patches incorporated from:
 	Adrian Likins
 	Christoph Schwarz

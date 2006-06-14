@@ -185,7 +185,7 @@ bool routerconnection::autoCommitOff() {
 bool routerconnection::commit() {
 
 	// commit all connections, if any fail, return failure
-	// FIXME: wish I had 2 stage commit...
+	// FIXME: use 2 stage commit...
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
 		if (!cons[index]) {
@@ -205,7 +205,7 @@ bool routerconnection::commit() {
 bool routerconnection::rollback() {
 
 	// commit all connections, if any fail, return failure
-	// FIXME: wish I had 2 stage commit...
+	// FIXME: use 2 stage commit...
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
 		if (!cons[index]) {

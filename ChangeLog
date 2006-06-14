@@ -6,6 +6,8 @@
 	added test for 0 length result set to PySQLRDB's fetchmany method
 	added mysql_config sanity test to configure script
 	NULL's are escaped in fake input BLOB binds now
+	query router works pretty well now
+	applied Sharpinskiy Dmitry's odbc unicode patch
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that

@@ -9,174 +9,6 @@
 
 #include <stdlib.h>
 
-
-
-//orbb
-#include <iconv.h>
-#include <wchar.h>
-
-#define USER_CODING "UTF8"
-
-int ucslen(char* str);
-char *conv_to_user_coding(char *inbuf);
-
-/*void to_log(char *msg)
-{
-	FILE *f;
-	f=fopen("/var/log/SQLRelay/log","a");
-	if(f)
-	{
-		fprintf(f,"%s\n",msg);
-		fclose(f);
-	}
-}
-
-void to_wlog(char *msg)
-{
-	FILE *f;
-	f=fopen("/var/log/SQLRelay/log","a");
-	if(f)
-	{
-		char *str_u=conv_to_user_coding(msg);
-		fprintf(f,"%s\n",str_u);
-		free(str_u);
-		//int l=ucslen(msg);
-		//fwrite(msg,2,l,f);
-		//fprintf(f,"\n");
-		fclose(f);
-	}
-}*/
-//orbb
-
-//orbb
-char *buffers[200];
-int nextbuf=0;
-
-int ucslen(char* str)
-{
-	char *ptr=str;
-	int res=0;
-	while(!(*ptr==0 && *(ptr+1)==0))
-	{
-		res++;
-		ptr+=2;
-		
-	}
-	
-	return res;
-}
-
-char *conv_to_user_coding(char *inbuf)
-{
-	char *outbuf;
-  size_t insize = 0;
-  char *wrptr;
-  iconv_t cd;
-	size_t avail;
-	
-	insize=ucslen(inbuf)*2;
-	avail=insize+4;
-	outbuf=(char*)malloc(avail);
-	
-	
-	wrptr = (char *) outbuf;
-
-	cd = iconv_open (USER_CODING, "UCS-2");
-  if (cd == (iconv_t) -1)
-    {
-      /* Something went wrong.  */
-        perror ("error in iconv_open");
-
-      /* Terminate the output string.  */
-      *outbuf = '\0';
-      return outbuf;
-    }
-      size_t nconv;
-      char *inptr = inbuf;
-		
-		nconv = iconv (cd, &inptr, &insize, &wrptr, &avail);
-      if (nconv == (size_t) -1)
-        {
-					printf("conv_to_user_coding: error in iconv\n");					
-        }		
-	
-				/* Terminate the output string.  */
-    					*(wrptr) = '\0';
-				
-				if (nconv == (size_t) -1)
-				{
-					printf("wrptr='%s'\n",wrptr);
-				}
-
-				
-  if (iconv_close (cd) != 0)
-    				perror ("iconv_close");
-	
-	
-	return outbuf;
-
-
-}
-
-char *conv_to_ucs(char *inbuf)
-{
-	char *outbuf;
-  size_t insize = 0;
-  char *wrptr;
-  iconv_t cd;
-	size_t avail;
-	
-	insize=strlen(inbuf);
-	avail=insize*2+4;
-	
-	outbuf=(char*)malloc(avail);
-	
-	wrptr = (char *) outbuf;
-
-	cd = iconv_open ("UCS-2", USER_CODING);
-  if(cd == (iconv_t) -1)
-  {
-      /* Something went wrong.  */
-        perror ("error in iconv_open");
-
-      /* Terminate the output string.  */
-      *outbuf = L'\0';
-      return outbuf;
-  }
-  size_t nconv;
-  char *inptr = inbuf;
-		
-	nconv = iconv (cd, &inptr, &insize, &wrptr, &avail);
-  if (nconv == (size_t) -1)
-  {
-		printf("conv_to_ucs: error in iconv\n");					
-  }		
-	
-			/* Terminate the output string.  */
-  *((wchar_t *) wrptr) = L'\0';
-	
-	if (nconv == (size_t) -1)
-	{
-		printf("inbuf='%s'\n",inbuf);
-	}
-
-				
-  if (iconv_close (cd) != 0)
-    				perror ("error in iconv_close");
-	
-//		FILE *ff;
-//		char fname[200];
-//		sprintf(fname,"/home/orbb/temp/result_conv_to_ucs.txt_%d",strlen(inbuf));
-//		ff=fopen(fname,"wb");
-//		fwrite(outbuf,1,wrptr-outbuf,ff);
-//		fclose(ff);
-
-	return outbuf;
-}
-//orbb
-
-
-
 uint16_t odbcconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
@@ -236,30 +68,9 @@ bool odbcconnection::logIn() {
 #endif
 
 	// connect to the database
-//	erg=SQLConnect(dbc,(SQLCHAR *)dsn,SQL_NTS,
-//				(SQLCHAR *)getUser(),SQL_NTS,
-//				(SQLCHAR *)getPassword(),SQL_NTS);
-	
-	
-//orbb
-	//orbb
-	char *user_asc=(char*)getUser();
-	char *password_asc=(char*)getPassword();
-	char *dsn_asc=(char*)dsn;
-	char *user_ucs=(char*)conv_to_ucs(user_asc);
-	char *password_ucs=(char*)conv_to_ucs(password_asc);
-	char *dsn_ucs=(char*)conv_to_ucs(dsn_asc);
-	
-	
-	erg=SQLConnectW(dbc,(SQLWCHAR *)dsn_ucs,SQL_NTS,
-				(SQLWCHAR *)user_ucs,SQL_NTS,
-				(SQLWCHAR *)password_ucs,SQL_NTS);
-				
-	if(user_ucs)free(user_ucs);
-	if(password_ucs)free(password_ucs);
-	if(dsn_ucs)free(dsn_ucs);
-//orbb	
-	
+	erg=SQLConnect(dbc,(SQLCHAR *)dsn,SQL_NTS,
+				(SQLCHAR *)getUser(),SQL_NTS,
+				(SQLCHAR *)getPassword(),SQL_NTS);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 #if (ODBCVER >= 0x0300)
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
@@ -367,25 +178,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 #endif*/
 
 	// prepare the query
-//	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
-	
-	
-//orbb
-	//free allocated buffers
-	while(nextbuf>0)
-	{
-		nextbuf--;
-		if(buffers[nextbuf])free(buffers[nextbuf]);
-	}
-	
-	char *query_ucs=conv_to_ucs((char*)query);
-	
-	erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-	
-	if(query_ucs)free(query_ucs);
-//orbb
-	
-	
+	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -399,22 +192,15 @@ bool odbccursor::inputBindString(const char *variable,
 					uint16_t valuesize,
 					short *isnull) {
 
-		//orbb
-		char *value_ucs=conv_to_ucs((char*)value);
-		valuesize=ucslen(value_ucs)*2;
-		buffers[nextbuf]=value_ucs;
-		nextbuf++;
-		//orbb
-						
 	if (*isnull==SQL_NULL_DATA) {
 		erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
-				SQL_C_WCHAR,//orbb
+				SQL_C_CHAR,
 				SQL_CHAR,
 				0,
 				0,
-				(SQLPOINTER)value_ucs, //orbb
+				(SQLPOINTER)value,
 				valuesize,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)isnull
@@ -426,11 +212,11 @@ bool odbccursor::inputBindString(const char *variable,
 		erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
-				SQL_C_WCHAR,//orbb
+				SQL_C_CHAR,
 				SQL_CHAR,
 				0,
 				0,
-				(SQLPOINTER)value_ucs,  //orbb
+				(SQLPOINTER)value,
 				valuesize,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)NULL
@@ -629,8 +415,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 		if (conn->sendColumnInfo()) {
 #if (ODBCVER >= 0x0300)
 			// column name
-
-		
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LABEL,
 					col[i].name,MAX_ITEM_BUFFER_SIZE,
 					(SQLSMALLINT *)&(col[i].namelength),
@@ -643,9 +427,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
-//orbb
-			col[i].namelength=strlen(col[i].name);
-//orbb
 
 			// column length
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
@@ -832,26 +613,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 
 
 		// bind the column to a buffer
-//		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-//				field[i],MAX_ITEM_BUFFER_SIZE,
-//				#ifdef SQLBINDPARAMETER_SQLLEN
-//				(SQLLEN *)&indicator[i]
-//				#else
-//				(SQLINTEGER *)&indicator[i]
-//				#endif
-//				);
-		
-		
-		//orbb
-		if(col[i].type==-9 || col[i].type==-8)
-		{
-			//bind varchar and char fields as wchar
-			// bind the column to a buffer
-//			erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
-//					field[i],MAX_ITEM_BUFFER_SIZE,
-//					(SQLINTEGER *)&indicator[i]);
-
-		erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
+		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 				field[i],MAX_ITEM_BUFFER_SIZE,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)&indicator[i]
@@ -859,46 +621,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 				(SQLINTEGER *)&indicator[i]
 				#endif
 				);
-
-		}
-		else
-		{
-			// bind the column to a buffer
-			if(col[i].type==93 || col[i].type==91)
-			{
-//				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
-//						field[i],MAX_ITEM_BUFFER_SIZE,
-//						(SQLINTEGER *)&indicator[i]);
-					erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
-							field[i],MAX_ITEM_BUFFER_SIZE,
-							#ifdef SQLBINDPARAMETER_SQLLEN
-							(SQLLEN *)&indicator[i]
-							#else
-							(SQLINTEGER *)&indicator[i]
-							#endif
-							);
-			}
-			else
-			{
-//				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-//									field[i],MAX_ITEM_BUFFER_SIZE,
-//									(SQLINTEGER *)&indicator[i]);
-				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-						field[i],MAX_ITEM_BUFFER_SIZE,
-						#ifdef SQLBINDPARAMETER_SQLLEN
-						(SQLLEN *)&indicator[i]
-						#else
-						(SQLINTEGER *)&indicator[i]
-						#endif
-						);
-
-			}
-
-		}
-		//orbb
-		
-		
-		
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}
@@ -1029,8 +751,6 @@ void odbccursor::returnColumnInfo() {
 						0,0,0,
 						col[i].unsignednumber,0,binary,
 						col[i].autoincrement);
-
-
 	}
 }
 
@@ -1074,28 +794,6 @@ bool odbccursor::fetchRow() {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
-	
-	//orbb
-	//convert char and varchar data to user coding from ucs-2
-	for (int i=0; i<ncols; i++)
-	{
-		
-		
-		if(col[i].type==-9 || col[i].type==-8)
-		{
-			if(indicator[i]!=-1 && field[i])
-			{
-				char *u=conv_to_user_coding(field[i]);
-				int len=strlen(u);
-				strcpy(field[i],u);
-				indicator[i]=len;
-			
-				if(u)free(u);			
-			}
-		}
-	}
-	//orbb
-
 	return true;
 //#endif
 }

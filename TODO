@@ -1,5 +1,6 @@
+query router "do something"'s
+
 integrate statistics gathering
-apply odbc unicode patch
 
 "how many connections should I start?" in FAQ
 
@@ -20,15 +21,6 @@ OCI8 drop-in library
 hack on postgresql's ecpg to emit SQL Relay code rather than Postgresql code
 
 perl apis -> CPAN
-
-query router:
-	"do something"'s
-	investigate 2 phase commit
-
-query/fields cmdline tools need a timeout option
-
-need a "relay ping" method that tries to connect to the SQL Relay
-		server and returns true/false if that was possible or not
 
 get sid working, document
 	how to:
@@ -230,6 +222,7 @@ Security:
 	* SSL encryption
 
 Features:
+	* 2-phase commit, use it in query router
 	* use PAM if possible as alternative to defining users in sqlrelay.conf
 	* support stored procedures that return result sets in
 		sybase, interbase, db2

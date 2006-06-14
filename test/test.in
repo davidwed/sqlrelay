@@ -106,6 +106,13 @@ then
 	sudo $INITDIR/postgresql start
 	sudo sqlr-start -id postgresql8test
 fi
+if ( test "$DB" = "odbc" )
+then
+	ARGS="localhost 8013 \"\" odbctest odbctest"
+	PHPARGS="host=localhost&port=8013&socket=&user=odbctest&password=odbctest"
+	sudo $INITDIR/postgresql start
+	sudo sqlr-start -id odbctest
+fi
 if ( test "$DB" = "sqlite" )
 then
 	ARGS="localhost 8011 \"\" sqlitetest sqlitetest"
@@ -292,6 +299,10 @@ then
 	sudo $INITDIR/postgresql stop
 fi
 if ( test "$DB" = "postgresql8" )
+then
+	sudo $INITDIR/postgresql stop
+fi
+if ( test "$DB" = "odbc" )
 then
 	sudo $INITDIR/postgresql stop
 fi

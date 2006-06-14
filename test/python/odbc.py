@@ -44,10 +44,19 @@ def main():
 
 	# create a new table
 	print "CREATE TEMPTABLE: "
-	checkSuccess(cur.sendQuery("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date)"),1)
+	checkSuccess(cur.sendQuery("create table testtable (testint int, testchar char(40), testvarchar varchar(40), testdate date)"),1)
+	print
 
 	print "INSERT: "
 	checkSuccess(cur.sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001')"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (2,'testchar2','testvarchar2','02-JAN-2002')"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (3,'testchar3','testvarchar3','03-JAN-2003')"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (4,'testchar4','testvarchar4','04-JAN-2004')"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (5,'testchar5','testvarchar5','05-JAN-2005')"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (6,'testchar6','testvarchar6','06-JAN-2006')"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (7,'testchar7','testvarchar7','07-JAN-2007')"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (8,'testchar8','testvarchar8','08-JAN-2008')"),1)
+	print
 
 	print "FINISHED SUSPENDED SESSION: "
 	checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
