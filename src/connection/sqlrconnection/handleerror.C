@@ -44,13 +44,18 @@ bool sqlrconnection_svr::returnError(sqlrcursor_svr *cursor) {
 
 		// send the error itself
 		int	errorlen=charstring::length(error);
-		clientsock->write((uint16_t)(errorlen+
+		
+		#ifdef RETURN_QUERY_WITH_ERROR
+			clientsock->write((uint16_t)(errorlen+
 				charstring::length(cursor->querybuffer)+18));
-		clientsock->write(error,errorlen);
-
-		// send the attempted query back too
-		clientsock->write("\nAttempted Query:\n");
-		clientsock->write(cursor->querybuffer);
+			clientsock->write(error,errorlen);
+			// send the attempted query back too
+			clientsock->write("\nAttempted Query:\n");
+			clientsock->write(cursor->querybuffer);
+		#else
+			clientsock->write((uint16_t)(errorlen));
+			clientsock->write(error);
+		#endif
 
 		// client will be sending skip/fetch,
 		// better get it even though we're not gonna

@@ -9,6 +9,9 @@ void sqlrconnection_svr::clientSession() {
 	debugPrint("connection",0,"client session...");
 	#endif
 
+	statictics->open_cli_connections++;
+	statistics->opened_cli_connections++;
+
 	// a session consists of getting a query and returning a result set
 	// over and over
 	for (;;) {
@@ -94,6 +97,8 @@ void sqlrconnection_svr::clientSession() {
 
 	closeSuspendedSessionSockets();
 
+	statistics->open_cli_connections--;
+
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done with client session");
 	#endif
@@ -143,10 +148,14 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 			return NULL;
 		}
 
+		statistics->times_cursor_reused++;
+
 		// set the current cursor to the one they requested.
 		cursor=cur[index];
 
 	} else {
+
+		statistics->times_cursor_reused++;
 
 		// find an available cursor
 		cursor=findAvailableCursor();

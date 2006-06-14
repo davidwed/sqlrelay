@@ -11,6 +11,8 @@
 bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 						bool detachbeforeloggingin) {
 
+	shmdata	*shm;
+
 	// process command line
 	cmdl=new cmdline(argc,argv);
 
@@ -74,6 +76,22 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 
 	blockSignals();
 
+	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
+							cmdl->getId())) {
+		return false;
+	}
+
+	shm=(shmdata *)idmemory->getPointer();
+	if (!shm) {
+		fprintf(stderr,"failed to get pointer to shmdata\n");
+		return false;
+	}
+
+	statistics=&shm->statistics;
+	if (!statistics) {
+		fprintf(stderr,"failed to point statistics at idmemory\n");
+	}
+
 	if (!attemptLogIn()) {
 		return false;
 	}
@@ -109,11 +127,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 	}
 
 	if (!initCursors(true)) {
-		return false;
-	}
-
-	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
-							cmdl->getId())) {
 		return false;
 	}
 

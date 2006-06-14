@@ -4,6 +4,9 @@
 #ifndef SQLRCONNECTION_H
 #define SQLRCONNECTION_H
 
+// Devananda vdv
+//#define RETURN_QUERY_WITH_ERROR
+
 #include <config.h>
 #include <defaults.h>
 #include <rudiments/signalclasses.h>
@@ -45,7 +48,6 @@ class sqlrconnection_svr :
 						bool detachbeforeloggingin);
 		void	listen();
 		void	closeConnection();
-
 
 	protected:
 		// interface definition
@@ -139,6 +141,9 @@ class sqlrconnection_svr :
 		void		addTransactionTempTableForTrunc(
 						const char *tablename);
 		void		abortAllCursors();
+		bool		createSharedMemoryAndSemaphores(
+							const char *tmpdir,
+							const char *id);
 
 	private:
 		// methods used internally
@@ -166,9 +171,6 @@ class sqlrconnection_svr :
 		bool	unLockSequenceFile(file *sockseq);
 
 
-		bool		createSharedMemoryAndSemaphores(
-							const char *tmpdir,
-							const char *id);
 		void		waitForListenerToRequireAConnection();
 		void		acquireAnnounceMutex();
 		shmdata		*getAnnounceBuffer();
@@ -321,7 +323,6 @@ class sqlrconnection_svr :
 		unsigned int	ttl;
 
 		semaphoreset	*semset;
-		sharedmemory	*idmemory;
 
 		sqlrconnection	*sid_sqlrcon;
 
@@ -329,6 +330,7 @@ class sqlrconnection_svr :
 
 	protected:
 
+		sharedmemory		*idmemory;
 		cmdline			*cmdl;
 		sqlrconfigfile		*cfgfl;
 
@@ -340,6 +342,9 @@ class sqlrconnection_svr :
 #ifdef SERVER_DEBUG
 		stringbuffer	*debugstr;
 #endif
+
+	public:
+		sqlrstatistics	*statistics;
 };
 
 

@@ -3,6 +3,7 @@ include ../../config.mk
 .PHONY: all clean rebuild install uninstall
 
 all:
+	$(MAKE) -C status all
 ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) -C db2 all
 endif
@@ -42,6 +43,7 @@ endif
 	$(MAKE) -C router all
 
 clean:
+	$(MAKE) -C status clean
 	$(MAKE) -C db2 clean
 	$(MAKE) -C freetds clean
 	$(MAKE) -C interbase clean
@@ -59,6 +61,7 @@ clean:
 rebuild: clean all
 
 install:
+	$(MAKE) -C status install
 ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) -C db2 install
 endif
@@ -98,6 +101,7 @@ endif
 	$(MAKE) -C router install
 
 uninstall:
+	$(MAKE) -C status uninstall
 	$(MAKE) -C db2 uninstall
 	$(MAKE) -C freetds uninstall
 	$(MAKE) -C interbase uninstall

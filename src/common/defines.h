@@ -72,6 +72,27 @@
 
 #define MAXCONNECTIONIDLEN 1024
 
+struct sqlrstatistics {
+	uint32_t	open_svr_connections;
+	uint32_t	opened_svr_connections;
+
+	uint32_t	open_cli_connections;
+	uint32_t	opened_cli_connections;
+
+//	uint32_t	timed_out_svr_connections;
+//	uint32_t	timed_out_cli_connections;
+	
+	uint32_t	open_svr_cursors;
+	uint32_t	opened_svr_cursors;
+
+	uint32_t	times_new_cursor_used;
+	uint32_t	times_cursor_reused;
+
+	uint32_t	total_questions;
+	uint32_t	total_errors;
+};
+
+
 // This structure is used to pass data in shared memory between the listener
 // and connection daemons.  A struct is used instead of just stepping a pointer
 // through the shared memory segment to avoid alignment issues.
@@ -86,6 +107,7 @@ struct shmdata {
 		} sockets;
 		pid_t	connectionpid;
 	} connectioninfo;
+	sqlrstatistics	statistics;
 };
 
 #endif
