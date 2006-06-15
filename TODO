@@ -1,6 +1,6 @@
 query router "do something"'s
 
-"how many connections should I start?" in FAQ
+--------------------------------------------------------------------------------
 
 mysql 3:
 	non c++ tests
@@ -56,8 +56,6 @@ get sid working, document
 
 			sidlog - every query is logged here with a message
 					about it
-
---------------------------------------------------------------------------------
 
 solaris 8:
 	libgcc_s not found
@@ -264,7 +262,6 @@ Availability:
 		it's up, if it's not, relogin
 	failover - master, fallback databases, where connection only goes to
 		the fallback if the master is overloaded or down
-	statistics, stat monitoring interface
 	if a connection dies mysteriously, a new one should fire up
 
 backends:

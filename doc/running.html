@@ -18,11 +18,12 @@
 </ul>
 <li><a href="#extending">Extending, Killing and Restarting</a></li>
 <li><a href="#cmdline">Using The Command Line Interfaces</a></li>
+<li><a href="#status">Using The Status Monitor</a></li>
 <li><a href="#problems">Common Problems</a></li>
 </ul>
 
 <a name="everything"></a>
-<span class="heading2">Starting Everything at Once:</span><br><br>
+<span class="heading2">Starting Everything at Once</span><br><br>
 
 <p>The <b>sqlr-start</b> program is provided to simplify the startup 
 process.</p>
@@ -46,7 +47,7 @@ about it.</p>
 <p>If the optional LOCALSTATEDIR argument is used, it is passed to the programs
 started by <b>sqlr-start</b> as appropriate.</p>
 
-<span class="heading2">Debugging and Tracing:</span><br><br>
+<span class="heading2">Debugging and Tracing</span><br><br>
 
 <p>The instance tag of the CONFIGFILE contains an optional debug attribute.  
 When it is set, the <b>sqlr-start</b> program starts up debugging versions of 
@@ -64,14 +65,14 @@ parameter.  When run as root, if the <b>-strace</b> parameter is used,
 See the <i>strace</i> man page for more information.</p>
 
 <a name="individual"></a>
-<span class="heading2">Starting Daemons Individually:</span><br><br>
+<span class="heading2">Starting Daemons Individually</span><br><br>
 
 <p>If for some reason you don't want to use <b>sqlr-start</b>, you can start
 the daemons individually.</p>
 
 
 <a name="listener"></a>
-<span class="heading2">Setting Up a Listener:</span><br><br>
+<span class="heading2">Setting Up a Listener</span><br><br>
 
 <p>The first step in is setting up a listener.  The job of the listener is to 
 connect to a TCP port and wait for queries.  When it gets one, it waits for an 
@@ -100,7 +101,7 @@ go in sqlrelay/debug.</p>
 
 
 <a name="connection"></a>
-<span class="heading2">Setting Up a Connection:</span><br><br>
+<span class="heading2">Setting Up a Connection</span><br><br>
 
 <p>Connecting to a database is the next step.  To estabish a connection, run 
 one or more of the <b>sqlr-connection</b> daemons.</p>
@@ -136,7 +137,7 @@ go in sqlrelay/debug.</p>
 
 
 <a name="scaler"></a>
-<span class="heading2">Setting Up the Scaler:</span><br><br>
+<span class="heading2">Setting Up the Scaler</span><br><br>
 
 <p>The third step is running the scaler.  You can start as many 
 <b>sqlr-connection</b> daemons as you like.  If you start fewer than the 
@@ -160,7 +161,7 @@ associates a scaler with a pool of connections.</p>
 
 
 <a name="cachemanager"></a>
-<span class="heading2">Setting Up the Cache Manager:</span><br><br>
+<span class="heading2">Setting Up the Cache Manager</span><br><br>
 
 <p>The fourth step is running the cache manager.  Clients can cache result sets
 with a time-to-live on them.  The cache manager goes through the cached result 
@@ -194,7 +195,7 @@ time), install the <b>sqlr-cachemanager</b> program by itself and set it up
 to run at boot time.</p>
 
 <a name="extending"></a>
-<span class="heading2">Extending, Killing and Restarting:</span><br><br>
+<span class="heading2">Extending, Killing and Restarting</span><br><br>
 
 <p>Once the daemons are up and running, clients can use them.  In the event
 that more connections are required, additional <b>sqlr-connection-"dbase"</b> 
@@ -221,7 +222,7 @@ and shared memory segments will be left lying around and will need to be
 cleaned up.  Use the <b>ipcs</b> and <b>ipcrm</b> commands to clean them up.</p>
 
 <a name="cmdline"></a>
-<span class="heading2">Using the Command Line Interfaces:</span><br><br>
+<span class="heading2">Using the Command Line Interfaces</span><br><br>
 
 <p>Four command line utilities are provided for use with <b>SQL Relay</b>: 
 <b>query</b>, <b>fields</b>, <b>backupschema</b> and <b>sqlrsh</b>.  The syntax
@@ -288,8 +289,61 @@ one database and import it into another database, even if the databases are
 dissimilar (eg. one is PostgreSQL and the other is MySQL), if the structures of
 the tables in both databases are compatible.</p>
 
+<a name="status"></a>
+<span class="heading2">Using The Status Monitor</span><br><br>
+
+<p>The <b>sqlr-status</b> program displays statistics about a running SQL Relay
+instance.  You can run it as follows, replacing <i>instance</i> with the name
+of the SQL Relay instance that you would like to read statistics from:</p>
+
+<blockquote>
+sqlr-status -id <i>instance</i>
+</blockquote>
+
+<p>Currently it generates output like:</p>
+
+<blockquote><pre>
+  Open   Server Connections:  3
+  Opened Server Connections:  3
+
+  Open   Client Connections:  0
+  Opened Client Connections:  1
+
+  Open   Server Cursors:      15
+  Opened Server Cursors:      16
+
+  Times  New Cursor Used:     0
+  Times  Cursor Reused:       10
+
+  Total  Queries:      10
+  Total  Errors:       1
+</pre></blockquote>
+
+<p>Here are descriptions of the statistics:</p>
+
+<ul>
+<li>Open Server Connections: The number of database connections that are
+currently open.</li>
+<li>Opened Server Connections: The total number of database connections that
+have been opened since the instance was started.</li>
+<li>Open Client Connections: The number of SQL Relay clients that are currently
+connected to the SQL Relay server.</li>
+<li>Opened Server Connections: The total number of SQL Relay clients that have
+connected to this instance of the SQL Relay server since the instance was
+started.</li>
+<li>Open Server Cursors: The number of database cursors that are
+currently open.</li>
+<li>Opened Server Cursors: The total number of database cursors that have been
+opened to the since the instance was started.</li>
+<li>Times New Cursor Used: The number of times a cursor couldn't be reused.</li>
+<li>Times Cursor Reused: The number of times a cursor could be reused.</li>
+<li>Total Queries: The total number of queries that have been run through this
+instance.</li>
+<li>Total Errors: The total number of queries that generated errors.</li>
+</ul>
+
 <a name="problems"></a>
-<span class="heading2">Common Problems:</span><br><br>
+<span class="heading2">Common Problems</span><br><br>
 
 <ul>
 <li><p>General difficulty with FreeTDS or Sybase connections.</p></li>

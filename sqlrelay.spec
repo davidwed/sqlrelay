@@ -431,6 +431,7 @@ rm -rf %{buildroot}
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import
+%{_bindir}/sqlr-status
 
 %files client-runtime-c++
 %defattr(-, root, root)
