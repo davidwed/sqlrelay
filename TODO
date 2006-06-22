@@ -1,6 +1,13 @@
-query router "do something"'s
+add sqlite query to return last rowid
 
---------------------------------------------------------------------------------
+PHP Pear DB shouldn't translate ?/& into :1,:2,etc.
+	if they're found inside quotes
+
+query router:
+	"do something"'s
+	support authtier=database
+	support accessing different db's by specifying a different user/password
+	support accessing different db's by specifying which db to use
 
 mysql 3:
 	non c++ tests
@@ -9,10 +16,34 @@ mysql 4.1.2:
 	non c++ tests
 
 mysql 5.x:
-	implement clob/blob output bind vars
-	test stored procedures
-	test output binds
+	test stored procedures - stored function fails
 	document using stored procedures
+
+	implement clob/blob output bind vars
+	test output binds
+
+	looks like maybe all output binds won't work...
+
+>So you'll be needing to make several calls to mysql_next_result() to get the OUT/INOUT values.
+
+This is for a general purpose MySQL driver called from our products. I did it like this:
+
+1. Create a "set @vn=?[,@v(n-1)=?[,...]]" string based on the number n of incoming parameters (IN, INOUT, OUT).
+2. mysql_stmt_prepare(), mysql_stmt_bind_param(), mysql_stmt_execute()
+3. Create a "CALL <procname>([@vn | literal_value[,@v(n-1) | literal value[,...]]" string.
+4. mysql_stmt_prepare(), mysql_stmt_execute()
+5. Create a "select @vm[,@v(m-1)[,...]]" string based on the number m of INOUT and OUT parameters.
+6. mysql_stmt_prepare(),mysql_stmt_result_metadata(),mysql_stmt_execute()
+7. Loop through mysql_fetch_field_direct and build a MYSQL_BIND structure, mysql_stmt_bind_result().
+8. mysql_stmt_fetch()
+9. Grab the results
+10. mysql_stmt_fetch() until rc == MYSQL_NO_DATA
+
+Step 10 was required otherwise I got "Commands out of sync; you can't run this command now" if I tried to run another stored procedure on a different statement handle. All the above steps are run on the same statement.
+
+Initially I thought that I could simply mysql_stmt_bind_param the IN and INOUT parms and mysql_stmt_bind_result the INOUT and OUT parameters; clearly this was not the case. Thanks for your help Hasani, I never would have figured this out. Is this documented somewhere? All I found concerning SPs was chapter 17 of the UG.
+
+--------------------------------------------------------------------------------
 
 OCI8 drop-in library
 

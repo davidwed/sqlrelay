@@ -7,6 +7,8 @@
 
 #include <sqlrconnection.h>
 
+#include <rudiments/regularexpression.h>
+
 #include <mysql.h>
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -65,6 +67,14 @@ class mysqlcursor : public sqlrcursor_svr {
 						uint32_t *precision,
 						uint32_t *scale,
 						int16_t *isnull);
+		bool		outputBindBlob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
+		bool		outputBindClob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
 #endif
 		bool		executeQuery(const char *query,
 						uint32_t length,
@@ -105,6 +115,10 @@ class mysqlcursor : public sqlrcursor_svr {
 		int		bindcounter;
 		MYSQL_BIND	bind[MAXVAR];
 		unsigned long	bindvaluesize[MAXVAR];
+
+		bool		usestmtprepare;
+
+		regularexpression	storedproc;
 #endif
 		MYSQL_ROW	mysqlrow;
 		unsigned long	*mysqlrowlengths;
