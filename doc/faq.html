@@ -58,6 +58,7 @@ Sybase/Microsoft SQL Server?</a></li>
 SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#oracleconnections">What is the difference between the Oracle7 connection and the Oracle8 connection?</a></li>
 <li><a href="#nlslang">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</a></li>
+<li><a href="#sqliterowid">How do I get the last insert rowid from SQLite?</a></li>
 </ol>
 
 <span class="heading2">Programming Questions</span><br><br>
@@ -815,6 +816,13 @@ SQL Relay init script.  In version 0.37, an nls_lang parameter was added to the
 Oracle connection string parameters to address this issue.  When running
 versions older than 0.37, you'll need to edit the init script and add a line to
 set the NLS_LANG environment variable.</p>
+
+<a name="sqliterowid"></a>
+<span class="heading3">How do I get the last insert rowid from SQLite?</span>
+
+<p>You can run a special query: "SELECT LAST INSERT ROWID".  When SQL Relay
+sees this query, it returns a result set with a single field containing the
+last insert rowid.</p>
 
 <span class="heading3">Programming Questions</span><br><br>
 

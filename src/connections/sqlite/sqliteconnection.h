@@ -7,6 +7,7 @@
 #define NUM_CONNECT_STRING_VARS 1
 
 #include <sqlrconnection.h>
+#include <rudiments/regularexpression.h>
 
 extern "C" {
 #ifdef SQLITE3
@@ -30,6 +31,7 @@ class sqlitecursor : public sqlrcursor_svr {
 						uint32_t length,
 						bool execute);
 		int		runQuery(const char *query);
+		void		selectLastInsertRowId();
 		const char	*errorMessage(bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
@@ -50,6 +52,8 @@ class sqlitecursor : public sqlrcursor_svr {
 		int		nrow;
 		int		ncolumn;
 		int		rowindex;
+
+		regularexpression	selectlastinsertrowid;
 
 		sqliteconnection	*sqliteconn;
 };

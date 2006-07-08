@@ -129,6 +129,12 @@
 #define DEFAULT_ROUTER_PATTERN ""
 	// default router pattern
 
+#define DEFAULT_MAXLISTENERS -1
+	// default maximum number of listeners
+
+#define DEFAULT_LISTENERTIMEOUT 0
+	// default listener timeout
+
 // cachemanager/sqlrclient parameters
 #define DEFAULT_INTERVAL 30
 	// default interval that the cachemanager will scan on

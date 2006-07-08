@@ -24,6 +24,7 @@ sysconfdir = @sysconfdir@
 mandir = @mandir@
 datadir = @datadir@
 docdir = ${datadir}/doc/sqlrelay
+EXAMPLEDIR = ${datadir}/examples
 tmpdir = ${localstatedir}/sqlrelay/tmp
 cachedir = ${localstatedir}/sqlrelay/cache
 debugdir = ${localstatedir}/sqlrelay/debug

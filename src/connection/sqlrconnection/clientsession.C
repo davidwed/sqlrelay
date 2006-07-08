@@ -98,6 +98,9 @@ void sqlrconnection_svr::clientSession() {
 	closeSuspendedSessionSockets();
 
 	statistics->open_cli_connections--;
+	if (statistics->open_cli_connections<0) {
+		statistics->open_cli_connections=0;
+	}
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done with client session");

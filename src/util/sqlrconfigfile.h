@@ -60,7 +60,9 @@ typedef enum {
 	ROUTER_SOCKET_ATTRIBUTE,
 	ROUTER_USER_ATTRIBUTE,
 	ROUTER_PASSWORD_ATTRIBUTE,
-	ROUTER_PATTERN_ATTRIBUTE
+	ROUTER_PATTERN_ATTRIBUTE,
+	MAXLISTENERS_ATTRIBUTE,
+	LISTENERTIMEOUT_ATTRIBUTE
 } attribute;
 
 class usercontainer {
@@ -182,6 +184,8 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t	getMaxStringBindValueLength();
 		uint32_t	getMaxLobBindValueLength();
 		int32_t		getIdleClientTimeout();
+		int64_t		getMaxListeners();
+		uint32_t	getListenerTimeout();
 
 		bool		getSidEnabled();
 		const char	*getSidHost();
@@ -208,9 +212,6 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t	atouint32_t(const char *value,
 					const char *defaultvalue,
 					uint32_t minvalue);
-		uint16_t	atouint16_t(const char *value,
-					const char *defaultvalue,
-					uint16_t minvalue);
 
 		bool	tagStart(const char *name);
 		bool	attributeName(const char *name);
@@ -254,6 +255,8 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
 		int32_t		idleclienttimeout;
+		int64_t		maxlisteners;
+		uint32_t	listenertimeout;
 
 		bool		sidenabled;
 		const char	*sidhost;

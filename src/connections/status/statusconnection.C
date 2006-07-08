@@ -34,7 +34,6 @@ bool statusconnection::init(int argc, const char **argv) {
 	}
 
 	cfgfl=new sqlrconfigfile();
-//	authc=new authenticator(cfgfl);
 	tmpdir=new tempdir(cmdl);
 
 	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId(),
@@ -42,47 +41,9 @@ bool statusconnection::init(int argc, const char **argv) {
 		return false;
 	}
 
-//	setUserAndGroup();
-
 	#ifdef SERVER_DEBUG
 	debugfile::openDebugFile("connection",cmdl->getLocalStateDir());
 	#endif
-
-	// handle the unix socket directory
-//	if (cfgfl->getListenOnUnix()) {
-//		setUnixSocketDirectory();
-//	}
-
-	// handle the pid file
-//	if (!handlePidFile()) {
-//		return false;
-//	}
-/*
-	constr=cfgfl->getConnectString(connectionid);
-	if (!constr) {
-		fprintf(stderr,"Error: invalid connectionid \"%s\".\n",
-							connectionid);
-		return false;
-	}
-	handleConnectString();
-
-	initDatabaseAvailableFileName();
-
-	if (cfgfl->getListenOnUnix() &&
-		!getUnixSocket(tmpdir->getString(),unixsocketptr)) {
-		return false;
-	}
-
-	#ifndef SERVER_DEBUG
-	bool	nodetach=cmdl->found("-nodetach");
-
-	if (!nodetach && detachbeforeloggingin) {
-		// detach from the controlling tty
-		detach();
-	}
-	#endif
-*/
-//	blockSignals();
 
 	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
 							cmdl->getId())) {

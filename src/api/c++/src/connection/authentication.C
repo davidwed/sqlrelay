@@ -53,6 +53,24 @@ bool sqlrconnection::genericAuthentication() {
 		return false;
 	}
 	if (authsuccess==ERROR) {
+
+		// get the error or set a generic error if we can't get one
+		bool		goterror=true;
+		char		*err=NULL;
+		uint16_t	size;
+		if (cs->read(&size)!=sizeof(uint16_t)) {
+			goterror=false;
+		} else {
+			err=new char[size+1];
+			if (cs->read(err,size)!=size) {
+				delete[] err;
+				goterror=false;
+			}
+			err[size]='\0';
+		}
+		if (!goterror) {
+			err=charstring::duplicate("Authentication Error.");
+		}
 		
 		// clear all result sets
 		sqlrcursor	*currentcursor=firstcursor;
@@ -63,11 +81,13 @@ bool sqlrconnection::genericAuthentication() {
 
 		if (debug) {
 			debugPreStart();
-			debugPrint("Authentication error.\n");
+			debugPrint(err);
+			debugPrint("\n");
 			debugPreEnd();
 		}
 
-		setError("Authentication Error.");
+		setError(err);
+		delete[] err;
 		return false;
 	}
 	if (debug) {

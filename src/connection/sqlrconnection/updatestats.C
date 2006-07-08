@@ -15,6 +15,9 @@ bool sqlrconnection_svr::logInUpdateStats() {
 void sqlrconnection_svr::logOutUpdateStats() {
 	logOut();
 	statistics->open_svr_connections--;
+	if (statistics->open_svr_connections<0) {
+		statistics->open_svr_connections=0;
+	}
 }
 
 sqlrcursor_svr *sqlrconnection_svr::initCursorUpdateStats() {
@@ -29,6 +32,9 @@ sqlrcursor_svr *sqlrconnection_svr::initCursorUpdateStats() {
 void sqlrconnection_svr::deleteCursorUpdateStats(sqlrcursor_svr *curs) {
 	deleteCursor(curs);
 	statistics->open_svr_cursors--;
+	if (statistics->open_svr_cursors<0) {
+		statistics->open_svr_cursors=0;
+	}
 }
 
 bool sqlrconnection_svr::executeQueryUpdateStats(sqlrcursor_svr *curs,

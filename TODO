@@ -1,7 +1,14 @@
-add sqlite query to return last rowid
+document listenertimeout/maxlisteners
+listenertimeout/maxlisteners in config app
 
-PHP Pear DB shouldn't translate ?/& into :1,:2,etc.
-	if they're found inside quotes
+if a client connects and the forked listener ends up waiting for a connection
+	and the client disconnects, the forked listener has no way of knowing
+	that the client has disconnected and can't bail
+
+python API can only handle 15 digit numbers or so (limit of 32/64 bit number)
+
+include_once DB/sqlrelay.php crashes
+test PHP Pear DB bind inside quotes fix
 
 query router:
 	"do something"'s

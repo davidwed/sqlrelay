@@ -591,6 +591,15 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table temptable\n");
 	printf("\n");
 
+	// last insert row id
+	printf("LAST INSERT ROW ID: \n");
+	checkSuccess(cur->sendQuery("select last insert rowid"),1);
+	checkSuccess(cur->colCount(),1);
+	checkSuccess(cur->rowCount(),1);
+	checkSuccess(cur->getColumnName(0),"LASTINSERTROWID");
+	checkSuccess(!charstring::length(cur->getField(0,(uint32_t)0)),0);
+	printf("\n");
+
 	// invalid queries...
 	printf("INVALID QUERIES: \n");
 	checkSuccess(cur->sendQuery("select * from testtable"),0);

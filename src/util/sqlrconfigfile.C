@@ -58,6 +58,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	sidsocket=charstring::duplicate(DEFAULT_SID_SOCKET);
 	siduser=charstring::duplicate(DEFAULT_SID_USER);
 	sidpassword=charstring::duplicate(DEFAULT_SID_PASSWORD);
+	maxlisteners=DEFAULT_MAXLISTENERS;
+	listenertimeout=DEFAULT_LISTENERTIMEOUT;
 	currentroute=NULL;
 	inrouter=false;
 	ignoreconnections=false;
@@ -239,6 +241,14 @@ uint32_t sqlrconfigfile::getMaxLobBindValueLength() {
 
 int32_t sqlrconfigfile::getIdleClientTimeout() {
 	return idleclienttimeout;
+}
+
+int64_t sqlrconfigfile::getMaxListeners() {
+	return maxlisteners;
+}
+
+uint32_t sqlrconfigfile::getListenerTimeout() {
+	return listenertimeout;
 }
 
 bool sqlrconfigfile::getSidEnabled() {
@@ -453,6 +463,10 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=ROUTER_HOST_ATTRIBUTE;
 	} else if (!charstring::compare(name,"pattern")) {
 		currentattribute=ROUTER_PATTERN_ATTRIBUTE;
+	} else if (!charstring::compare(name,"maxlisteners")) {
+		currentattribute=MAXLISTENERS_ATTRIBUTE;
+	} else if (!charstring::compare(name,"listenertimeout")) {
+		currentattribute=LISTENERTIMEOUT_ATTRIBUTE;
 	} else {
 		currentattribute=(attribute)0;
 	}
@@ -651,6 +665,17 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 					(value)?value:DEFAULT_ROUTER_PATTERN);
 			re->study();
 			currentroute->getRegexList()->append(re);
+		} else if (currentattribute==MAXLISTENERS_ATTRIBUTE) {
+			maxlisteners=(value)?charstring::toInteger(value):
+							DEFAULT_MAXLISTENERS;
+			if (maxlisteners<-1) {
+				maxlisteners=-1;
+			}
+		} else if (currentattribute==LISTENERTIMEOUT_ATTRIBUTE) {
+			listenertimeout=
+				charstring::toUnsignedInteger(
+					(value)?value:
+						DEFAULT_LISTENERTIMEOUT);
 		}
 	}
 	return true;

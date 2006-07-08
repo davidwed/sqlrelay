@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.17 2006-03-17 19:35:37 mused Exp $
+// $Id: sqlrelay.php,v 1.18 2006-07-08 03:18:03 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -89,7 +89,6 @@ class DB_sqlrelay extends DB_common
 
     function connect($dsninfo, $persistent = false)
     {
-
 
         if (method_exists($this,'loadExtension') || 
                             method_exists($this,'loadextension')) {
@@ -228,33 +227,35 @@ class DB_sqlrelay extends DB_common
         # : or @ delimited variables
         # for db2 which already uses ?-delimited variables, we don't need
         # to do this...
+        # FIXME: handle postgresql 8 and mysql 4.1
         if ($this->identity == "db2" || $this->identity == "interbase") {
             $newquery = $query;
         } else {
-            $tokens = split('[\&\?]', $query);
-            $token = 0;
-            $binds = sizeof($tokens) - 1;
+            $paramindex = 0;
             $newquery = '';
             $types = array();
+            $inquotes = false;
             for ($i = 0; $i < strlen($query); $i++) {
-                switch ($query[$i]) {
-                    case '?':
-                        $types[$token++] = DB_PARAM_SCALAR;
-                        break;
-                    case '&':
-                        $types[$token++] = DB_PARAM_OPAQUE;
-                        break;
+                if ($query[$i] == '\'') {
+                    $inquotes = !$inquotes;
+                } else if (($query[$i] == '?' || $query[$i] == '&') &&
+                                                            !$inquotes) {
+                    if ($query[$i] == '?') {
+                        $types[$paramindex] = DB_PARAM_SCALAR;
+                    } else {
+                        $types[$paramindex] = DB_PARAM_OPAQUE;
+                    }
+                    if ($this->identity == "sybase" ||
+                            $this->identity == "freetds") {
+                        $newquery .= $query[$i] . "@bind" . $paramindex;
+                    } else {
+                        $newquery .= $query[$i] . ":bind" . $paramindex;
+                    }
+                    $paramindex++;
+                    continue;
                 }
+                $newquery .= $query[$i]
             }        
-            for ($i = 0; $i < $binds; $i++) {
-                if ($this->identity == "sybase" ||
-                        $this->identity == "freetds") {
-                    $newquery .= $tokens[$i] . "@bind" . $i;
-                } else {
-                    $newquery .= $tokens[$i] . ":bind" . $i;
-                }
-            }
-            $newquery .= $tokens[$i];
             $this->prepare_types[(int)$cursor] = $types;
         }
 

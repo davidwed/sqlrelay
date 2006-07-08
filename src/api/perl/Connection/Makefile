@@ -9,14 +9,14 @@ PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; 
 ifeq ($(OVERRIDEPERLSITEARCH),)
 PERLSITEARCH = $(DESTDIR)$(shell eval "`$(PERL) -V:sitearch`"; export sitearch; echo $$sitearch | sed -e "s|UNKNOWN||g" )
 else
-PERLSITEARCH = $(DESTDIR)$(PERLSITEARCH)
+PERLSITEARCH = $(DESTDIR)$(OVERRIDEPERLSITEARCH)
 endif
 PERL_INC = $(DESTDIR)$(shell eval "`$(PERL) -V:archlibexp`"; export archlibexp; echo "-I$$archlibexp/CORE" | sed -e "s|UNKNOWN||g" )
 PERL_LIB = $(DESTDIR)$(shell eval "`$(PERL) -V:privlibexp`"; export privlibexp; echo $$privlibexp | sed -e "s|UNKNOWN||g" )
 ifeq ($(OVERRIDEPERLINSTALLMAN3DIR),)
 PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "`$(PERL) -V:installman3dir`"; export installman3dir; echo $$installman3dir | sed -e "s|UNKNOWN||g" )
 else
-PERLINSTALLMAN3DIR = $(DESTDIR)$(PERLINSTALLMAN3DIR)
+PERLINSTALLMAN3DIR = $(DESTDIR)$(OVERRIDEPERLINSTALLMAN3DIR)
 endif
 ifeq ($(OVERRIDEPERLMAN3EXT),)
 PERLMAN3EXT = $(shell eval "`$(PERL) -V:man3ext`"; export man3ext; echo $$man3ext | sed -e "s|UNKNOWN||g" )

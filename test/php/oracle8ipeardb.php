@@ -21,7 +21,7 @@ require_once 'DB.php';
 	$socket=$_REQUEST["socket"];
 	$user=$_REQUEST["user"];
 	$password=$_REQUEST["password"];
-	$dsn = "sqlrelay://$user:$password@$host:$port/$db_name";
+	$dsn = "sqlrelay://$user:$password@$host:$port/";
 
 	# instantiation
 	$db = DB::connect($dsn);

@@ -12,7 +12,6 @@ statusconnection	*conn;
 signalhandler	*alarmhandler;
 
 void cleanUp() {
-//	conn->closeConnection();
 	delete conn;
 	delete alarmhandler;
 }
@@ -49,8 +48,10 @@ int main(int argc, const char **argv) {
 		"  Times  New Cursor Used:     %d\n"
 		"  Times  Cursor Reused:       %d\n"
 		"\n"
-		"  Total  Queries:      %d\n" 
-		"  Total  Errors:       %d\n"
+		"  Total  Queries:             %d\n" 
+		"  Total  Errors:              %d\n"
+		"\n"
+		"  Forked Listeners:           %d\n"
 		"\n",
 		statistics->open_svr_connections, 
 		statistics->opened_svr_connections,
@@ -61,7 +62,8 @@ int main(int argc, const char **argv) {
 		statistics->times_new_cursor_used,
 		statistics->times_cursor_reused,
 		statistics->total_queries,
-		statistics->total_errors
+		statistics->total_errors,
+		statistics->forked_listeners
 		);
 	
 

@@ -73,23 +73,25 @@
 #define MAXCONNECTIONIDLEN 1024
 
 struct sqlrstatistics {
-	uint32_t	open_svr_connections;
-	uint32_t	opened_svr_connections;
+	int32_t	open_svr_connections;
+	int32_t	opened_svr_connections;
 
-	uint32_t	open_cli_connections;
-	uint32_t	opened_cli_connections;
+	int32_t	open_cli_connections;
+	int32_t	opened_cli_connections;
 
-//	uint32_t	timed_out_svr_connections;
-//	uint32_t	timed_out_cli_connections;
+//	int32_t	timed_out_svr_connections;
+//	int32_t	timed_out_cli_connections;
 	
-	uint32_t	open_svr_cursors;
-	uint32_t	opened_svr_cursors;
+	int32_t	open_svr_cursors;
+	int32_t	opened_svr_cursors;
 
-	uint32_t	times_new_cursor_used;
-	uint32_t	times_cursor_reused;
+	int32_t	times_new_cursor_used;
+	int32_t	times_cursor_reused;
 
-	uint32_t	total_queries;
-	uint32_t	total_errors;
+	int32_t	total_queries;
+	int32_t	total_errors;
+
+	int32_t	forked_listeners;
 };
 
 

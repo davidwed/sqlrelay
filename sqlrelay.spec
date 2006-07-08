@@ -49,6 +49,7 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define initscript /etc/init.d/sqlrelay
 	%define inittab /etc/sqlrelay
 	%define docdir %{_docdir}/%{name}
+	%define exampledir %{_datadir}/examples/%{name}
 %else
 	%define phpdevel %(echo "php-devel")
 	%define gtkdevel %(echo "gtk+-devel")
@@ -62,6 +63,7 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define initscript /etc/rc.d/init.d/sqlrelay
 	%define inittab /etc/sysconfig/sqlrelay
 	%define docdir %{_docdir}/%{name}-%{version}
+	%define exampledir %{_datadir}/examples/%{name}-%{version}
 %endif
 
 BuildRequires: rudiments-devel >= 0.28.1

@@ -14,6 +14,7 @@
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/signalclasses.h>
 #include <authenticator.h>
 
 #include <cmdline.h>
@@ -99,10 +100,15 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 						filedescriptor *clientsock);
 		void	flushWriteBuffer(filedescriptor *fd);
 
+		static void	alarmHandler();
+
 		bool		passdescriptor;
 
 		int32_t		maxconnections;
 		bool		dynamicscaling;
+
+		int64_t		maxlisteners;
+		uint64_t	listenertimeout;
 
 		char		*unixport;
 		char		*pidfile;
@@ -134,6 +140,11 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 
 		uint32_t		maxquerysize;
 		int32_t			idleclienttimeout;
+
+		bool			isforkedchild;
+
+		signalhandler		alarmhandler;
+		static	sqlrlistener	*staticlistener;
 };
 
 #endif

@@ -8,11 +8,12 @@
 #include <stdio.h>
 
 #ifndef SQLITE3
-	#define	sqlite3_open		sqlite_open
-	#define	sqlite3_close		sqlite_close
-	#define	sqlite3_get_table	sqlite_get_table
-	#define	sqlite3_errmsg		sqlite_errmsg
-	#define	sqlite3_free_table	sqlite_free_table
+	#define	sqlite3_open			sqlite_open
+	#define	sqlite3_close			sqlite_close
+	#define	sqlite3_get_table		sqlite_get_table
+	#define	sqlite3_errmsg			sqlite_errmsg
+	#define	sqlite3_free_table		sqlite_free_table
+	#define	sqlite3_last_insert_rowid	sqlite_last_insert_rowid
 #endif
 
 
@@ -101,6 +102,11 @@ sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	rowindex=0;
 
 	sqliteconn=(sqliteconnection *)conn;
+
+	selectlastinsertrowid.compile("^\\s*(select|SELECT)\\s+"
+				"(last|LAST)\\s+(insert|INSERT)\\s+"
+				"(rowid|ROWID)");
+	selectlastinsertrowid.study();
 }
 
 sqlitecursor::~sqlitecursor() {
@@ -207,11 +213,28 @@ int sqlitecursor::runQuery(const char *query) {
 	ncolumn=0;
 	rowindex=0;
 
+	// handle special case of selecting the last row id
+	if (selectlastinsertrowid.match(query)) {
+		selectLastInsertRowId();
+		return SQLITE_OK;
+	}
+
 	// run the appropriate query
 	return sqlite3_get_table(sqliteconn->sqliteptr,
 					query,
 					&result,&nrow,&ncolumn,
 					&sqliteconn->errmesg);
+}
+
+void sqlitecursor::selectLastInsertRowId() {
+
+	// fake a result set with 1 field
+	nrow=1;
+	ncolumn=1;
+	result=new char * [2];
+	result[0]=charstring::duplicate("LASTINSERTROWID");
+	result[1]=charstring::parseNumber(sqlite3_last_insert_rowid(
+							sqliteconn->sqliteptr));
 }
 
 const char *sqlitecursor::errorMessage(bool *liveconnection) {

@@ -9,6 +9,9 @@
 	query router works pretty well now
 	applied Sharpinskiy Dmitry's odbc unicode patch
 	integrated Devananda's statistics gathering code
+	added support for mysql stored procedures
+	integrated Devananda's mysql result set updates
+	sqlrelay.conf.example installed as $datadir/examples/sqlrelay.conf now
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that

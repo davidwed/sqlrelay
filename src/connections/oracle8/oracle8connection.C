@@ -986,9 +986,9 @@ void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 	bool	start=true;
 
 	// Get the length of the lob. If we fail to read the
-	// length, send a NULL field.  Unfortunately, there
-	// is OCILobGetLength has no way to express that a
-	// LOB is NULL, the result is "undefined" in that case.
+	// length, send a NULL field.  Unfortunately OCILobGetLength
+	// has no way to express that a LOB is NULL, the result is
+	// "undefined" in that case.
 	ub4	loblength=0;
 	if (OCILobGetLength(oracle8conn->svc,
 			oracle8conn->err,

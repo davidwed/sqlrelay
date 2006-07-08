@@ -32,6 +32,8 @@
 using namespace rudiments;
 #endif
 
+sqlrlistener	*sqlrlistener::staticlistener;
+
 sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 
 	cmdl=NULL;
@@ -61,6 +63,8 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener(), debugfile() {
 
 	maxquerysize=0;
 	idleclienttimeout=-1;
+
+	isforkedchild=false;
 }
 
 sqlrlistener::~sqlrlistener() {
@@ -166,6 +170,8 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	idleclienttimeout=cfgfl.getIdleClientTimeout();
 	maxquerysize=cfgfl.getMaxQuerySize();
+	maxlisteners=cfgfl.getMaxListeners();
+	listenertimeout=cfgfl.getListenerTimeout();
 
 	#ifndef SERVER_DEBUG
 	detach();
@@ -614,6 +620,10 @@ bool sqlrlistener::listenOnFixupSocket(tempdir *tmpdir, const char *id) {
 }
 
 void sqlrlistener::listen() {
+
+	// set the alarm handler's pointer
+	staticlistener=this;
+
 	blockSignals();
 	for(;;) {
 		// FIXME: this can return true/false, should we do anything
@@ -625,7 +635,8 @@ void sqlrlistener::listen() {
 void sqlrlistener::blockSignals() {
 
 	// the daemon class handles SIGTERM's and SIGINT's and SIGCHLDS
-	// so we're going to block all other signals 
+	// and we need to catch SIGALRM's for timeouts
+	// but we're going to block all other signals
 	signalset	set;
 	set.removeAllSignals();
 
@@ -664,9 +675,6 @@ void sqlrlistener::blockSignals() {
 	#endif
 	#ifdef HAVE_SIGPIPE
 		set.addSignal(SIGPIPE);
-	#endif
-	#ifdef HAVE_SIGALRM
-		set.addSignal(SIGALRM);
 	#endif
 	#ifdef HAVE_SIGSTKFLT
 		set.addSignal(SIGSTKFLT);
@@ -754,6 +762,20 @@ void sqlrlistener::blockSignals() {
 	#endif
 
 	signalmanager::ignoreSignals(set.getSignalSet());
+
+	// set a handler for SIGALRM's
+	alarmhandler.setHandler((void *)alarmHandler);
+	alarmhandler.handleSignal(SIGALRM);
+}
+
+void sqlrlistener::alarmHandler() {
+	shmdata	*ptr=(shmdata *)staticlistener->idmemory->getPointer();
+	ptr->statistics.forked_listeners--;
+	if (ptr->statistics.forked_listeners<0) {
+		ptr->statistics.forked_listeners=0;
+	}
+	delete staticlistener;
+	exit(0);
 }
 
 filedescriptor *sqlrlistener::waitForData() {
@@ -787,7 +809,7 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	}
 
 
-	// If something connected to the handoff or derigistration 
+	// If something connected to the handoff or deregistration 
 	// socket, it must have been a connection.
 	//
 	// If something connected to the fixup socket, it must have been a
@@ -1048,10 +1070,44 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 
 void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
+	// increment the number of "forked listeners"
+	// do this before we actually fork to prevent a race condition where
+	// a bunch of children get forked off before any of them get a chance
+	// to increment this and prevent more from getting forked off
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	ptr->statistics.forked_listeners++;
+
+	// if we already have too many listeners running,
+	// bail and return an error to the client
+	if (maxlisteners>-1 &&
+		ptr->statistics.forked_listeners>maxlisteners) {
+
+		// since we've decided not to fork, decrement the counters
+		semset->wait(10);
+		ptr->statistics.forked_listeners--;
+
+		// get auth and ignore the result
+		getAuth(clientsock);
+		clientsock->write((uint16_t)ERROR);
+		clientsock->write((uint16_t)19);
+		clientsock->write("Too many listeners.");
+		flushWriteBuffer(clientsock);
+		delete clientsock;
+		return;
+	}
+
 	// if the client connected to one of the non-handoff
 	// sockets, fork a child to handle it
 	pid_t	childpid;
 	if (!(childpid=fork())) {
+
+		isforkedchild=true;
+
+		// since this is the forked off listener, we don't
+		// want to actually remove the semaphore set or shared
+		// memory segment when it exits
+		idmemory->dontRemove();
+		semset->dontRemove();
 
 		#ifdef SERVER_DEBUG
 		closeDebugFile();
@@ -1060,11 +1116,11 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 		clientSession(clientsock);
 
-		// since this is the forked off listener, we don't
-		// want to actually remove the semaphore set or shared
-		// memory segment
-		idmemory->dontRemove();
-		semset->dontRemove();
+		// decrement the number of forked listeners
+		ptr->statistics.forked_listeners--;
+		if (ptr->statistics.forked_listeners<0) {
+			ptr->statistics.forked_listeners=0;
+		}
 
 		cleanUp();
 		exit(0);
@@ -1108,6 +1164,8 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 		// brute-force password attacks
 		snooze::macrosnooze(2);
 		clientsock->write((uint16_t)ERROR);
+		clientsock->write((uint16_t)21);
+		clientsock->write("Authentication Error.");
 		flushWriteBuffer(clientsock);
 		snooze::macrosnooze(2);
 	}
@@ -1328,6 +1386,11 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		debugPrint("listener",0,"getting a connection...");
 		#endif
 
+		// if we're a forked child, set an alarm
+		if (isforkedchild && listenertimeout) {
+			alarm(listenertimeout);
+		}
+
 		// wait for exclusive access to the
 		// shared memory among listeners
 		#ifdef SERVER_DEBUG
@@ -1348,6 +1411,9 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		debugPrint("listener",0,
 				"done waiting for an available connection");
 		#endif
+
+		// turn off the alarm
+		alarm(0);
 
 		// if we're passing descriptors around, the connection will
 		// pass it's pid to us, otherwise it will pass it's inet and
@@ -1426,7 +1492,6 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 			pingDatabase(*connectionpid,unixportstr,*inetport);
 		}
 	}
-	
 }
 
 bool sqlrlistener::connectionIsUp(const char *connectionid) {
