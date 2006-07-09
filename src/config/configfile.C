@@ -168,7 +168,9 @@ instance *configfile::addInstance(const char *id,
 				const char *maxquerysize,
 				const char *maxstringbindvaluelength,
 				const char *maxlobbindvaluelength,
-				const char *idleclienttimeout) {
+				const char *idleclienttimeout,
+				const char *maxlisteners,
+				const char *listenertimeout) {
 
 	xmldomnode	*newchild=new xmldomnode(root->getNullNode(),
 							TAG_XMLDOMNODETYPE,
@@ -223,6 +225,12 @@ instance *configfile::addInstance(const char *id,
 					newchild->getAttributeCount());
 	newchild->insertAttribute("idleclienttimeout",
 					idleclienttimeout,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("maxlisteners",
+					maxlisteners,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("listenertimeout",
+					listenertimeout,
 					newchild->getAttributeCount());
 
 	xmldomnode	*newusers=new xmldomnode(root->getNullNode(),
@@ -586,6 +594,24 @@ const char	*instance::getIdleClientTimeout() {
 	return DEFAULT_IDLECLIENTTIMEOUT;
 }
 
+const char	*instance::getMaxListeners() {
+	const char	*retval=instancenode->
+				getAttributeValue("maxlisteners");
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_MAXLISTENERS;
+}
+
+const char	*instance::getListenerTimeout() {
+	const char	*retval=instancenode->
+				getAttributeValue("listenertimeout");
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_LISTENERTIMEOUT;
+}
+
 void	instance::setId(const char *id) {
 	instancenode->getAttribute("id")->setValue(id);
 }
@@ -682,6 +708,16 @@ void	instance::setMaxLobBindValueLength(
 void	instance::setIdleClientTimeout(const char *idleclienttimeout) {
 	instancenode->getAttribute("idleclienttimeout")->
 					setValue(idleclienttimeout);
+}
+
+void	instance::setMaxListeners(const char *maxlisteners) {
+	instancenode->getAttribute("maxlisteners")->
+					setValue(maxlisteners);
+}
+
+void	instance::setListenerTimeout(const char *listenertimeout) {
+	instancenode->getAttribute("listenertimeout")->
+					setValue(listenertimeout);
 }
 
 user	*instance::addUser(const char *usr, const char *password) {

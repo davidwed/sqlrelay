@@ -78,6 +78,8 @@ class instance {
 		const char	*getMaxStringBindValueLength();
 		const char	*getMaxLobBindValueLength();
 		const char	*getIdleClientTimeout();
+		const char	*getMaxListeners();
+		const char	*getListenerTimeout();
 		void	setId(const char *id);
 		void	setPort(const char *port);
 		void	setUnixPort(const char *unixport);
@@ -103,6 +105,8 @@ class instance {
 		void	setMaxLobBindValueLength(
 					const char *maxlobbindvaluelength);
 		void	setIdleClientTimeout(const char *idleclienttimeout);
+		void	setMaxListeners(const char *maxlisteners);
+		void	setListenerTimeout(const char *listenertimeout);
 		user	*addUser(const char *usr, const char *password);
 		void	deleteUser(user *usr);
 		user	*findUser(const char *userid);
@@ -161,7 +165,9 @@ class configfile {
 					const char *maxquerysize,
 					const char *maxstringbindvaluelength,
 					const char *maxlobbindvaluelength,
-					const char *idleclienttimeout);
+					const char *idleclienttimeout,
+					const char *maxlisteners,
+					const char *listenertimeout);
 		void		deleteInstance(instance *inst);
 		instance	*findInstance(const char *id);
 		instance	*firstInstance();

@@ -24,7 +24,7 @@
 	<!ATTLIST instance maxstringbindvaluelength CDATA "4000">
 	<!ATTLIST instance maxlobbindvaluelength CDATA "71680">
 	<!ATTLIST instance idleclienttimeout CDATA "-1">
-	<!ATTLIST instance maxlisteners CDATA "0">
+	<!ATTLIST instance maxlisteners CDATA "-1">
 	<!ATTLIST instance listenertimeout CDATA "0">
 
 <!ELEMENT users (user*)>

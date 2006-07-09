@@ -4,14 +4,10 @@
 #include <sqlrconnection.h>
 #include <rudiments/snooze.h>
 #include <rudiments/process.h>
+#include <rudiments/signalclasses.h>
 
 // for sprintf
 #include <stdio.h>
-
-// for alarm
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
 
 #include <defines.h>
 
@@ -32,7 +28,7 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 	}
 
 	// handle time-to-live
-	alarm(ttl);
+	signalmanager::alarm(ttl);
 
 	acquireAnnounceMutex();
 
@@ -57,7 +53,7 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 	// undo a semaphore.
 	//
 	// What a mess.
-	alarm(0);
+	signalmanager::alarm(0);
 
 	// get a pointer to the shared memory segment
 	shmdata	*idmemoryptr=getAnnounceBuffer();

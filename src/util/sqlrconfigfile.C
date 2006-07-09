@@ -58,8 +58,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	sidsocket=charstring::duplicate(DEFAULT_SID_SOCKET);
 	siduser=charstring::duplicate(DEFAULT_SID_USER);
 	sidpassword=charstring::duplicate(DEFAULT_SID_PASSWORD);
-	maxlisteners=DEFAULT_MAXLISTENERS;
-	listenertimeout=DEFAULT_LISTENERTIMEOUT;
+	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
+	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
 	currentroute=NULL;
 	inrouter=false;
 	ignoreconnections=false;
@@ -666,16 +666,15 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			re->study();
 			currentroute->getRegexList()->append(re);
 		} else if (currentattribute==MAXLISTENERS_ATTRIBUTE) {
-			maxlisteners=(value)?charstring::toInteger(value):
-							DEFAULT_MAXLISTENERS;
+			maxlisteners=charstring::toInteger(
+					(value)?value:DEFAULT_MAXLISTENERS);
 			if (maxlisteners<-1) {
 				maxlisteners=-1;
 			}
 		} else if (currentattribute==LISTENERTIMEOUT_ATTRIBUTE) {
 			listenertimeout=
 				charstring::toUnsignedInteger(
-					(value)?value:
-						DEFAULT_LISTENERTIMEOUT);
+					(value)?value:DEFAULT_LISTENERTIMEOUT);
 		}
 	}
 	return true;

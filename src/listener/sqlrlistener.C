@@ -1387,8 +1387,10 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		#endif
 
 		// if we're a forked child, set an alarm
+		// we could wait on the semaphore with a timeout, but that
+		// wouldn't be as portable...
 		if (isforkedchild && listenertimeout) {
-			alarm(listenertimeout);
+			signalmanager::alarm(listenertimeout);
 		}
 
 		// wait for exclusive access to the
@@ -1413,7 +1415,7 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		#endif
 
 		// turn off the alarm
-		alarm(0);
+		signalmanager::alarm(0);
 
 		// if we're passing descriptors around, the connection will
 		// pass it's pid to us, otherwise it will pass it's inet and

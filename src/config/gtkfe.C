@@ -78,6 +78,8 @@ GtkWidget	*gtkfe::maxquerysizelabel;
 GtkWidget	*gtkfe::maxstringbindvaluelengthlabel;
 GtkWidget	*gtkfe::maxlobbindvaluelengthlabel;
 GtkWidget	*gtkfe::idleclienttimeoutlabel;
+GtkWidget	*gtkfe::maxlistenerslabel;
+GtkWidget	*gtkfe::listenertimeoutlabel;
 
 GtkWidget	*gtkfe::identry;
 GtkWidget	*gtkfe::portentry;
@@ -109,6 +111,8 @@ GtkWidget	*gtkfe::maxquerysizeentry;
 GtkWidget	*gtkfe::maxstringbindvaluelengthentry;
 GtkWidget	*gtkfe::maxlobbindvaluelengthentry;
 GtkWidget	*gtkfe::idleclienttimeoutentry;
+GtkWidget	*gtkfe::maxlistenersentry;
+GtkWidget	*gtkfe::listenertimeoutentry;
 
 GtkWidget	*gtkfe::userstab;
 GtkWidget	*gtkfe::usersframe;
@@ -203,7 +207,7 @@ void gtkfe::buildMainWindow() {
 
 	// main window
 	window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_widget_set_usize(GTK_WIDGET(window),600,650);
+	gtk_widget_set_usize(GTK_WIDGET(window),600,700);
 	gtk_window_set_title(GTK_WINDOW(window),"SQL Relay");
 
 	gtk_signal_connect(GTK_OBJECT(window),"delete_event",
@@ -394,7 +398,7 @@ void gtkfe::buildInstancePage() {
 	gtk_widget_show(propertiesvbox);
 
 	// properties table
-	propertiestable=gtk_table_new(3,23,FALSE);
+	propertiestable=gtk_table_new(3,25,FALSE);
 	gtk_table_set_row_spacings(GTK_TABLE(propertiestable),1);
 	gtk_table_set_col_spacings(GTK_TABLE(propertiestable),4);
 	gtk_box_pack_start(GTK_BOX(propertiesvbox),
@@ -558,6 +562,22 @@ void gtkfe::buildInstancePage() {
 	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
 					idleclienttimeoutlabel,
 					0,1,22,23);
+
+	maxlistenerslabel=
+			gtk_label_new("Max Listeners");
+	gtk_misc_set_alignment(GTK_MISC(maxlistenerslabel),1.0,0.5);
+	gtk_widget_show(maxlistenerslabel);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					maxlistenerslabel,
+					0,1,23,24);
+
+	listenertimeoutlabel=
+			gtk_label_new("Listener Timeout");
+	gtk_misc_set_alignment(GTK_MISC(listenertimeoutlabel),1.0,0.5);
+	gtk_widget_show(listenertimeoutlabel);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					listenertimeoutlabel,
+					0,1,24,25);
 
 
 	// properties property inputs
@@ -738,6 +758,18 @@ void gtkfe::buildInstancePage() {
 	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
 					idleclienttimeoutentry,
 					1,3,22,23);
+
+	maxlistenersentry=gtk_entry_new_with_max_length(10);
+	gtk_widget_show(maxlistenersentry);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					maxlistenersentry,
+					1,3,23,24);
+
+	listenertimeoutentry=gtk_entry_new_with_max_length(10);
+	gtk_widget_show(listenertimeoutentry);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					listenertimeoutentry,
+					1,3,24,25);
 
 	// properties notebook page
 	gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
@@ -1119,6 +1151,10 @@ void gtkfe::populateInstanceParameters(instance *inst) {
 				inst->getMaxLobBindValueLength());
 	gtk_entry_set_text(GTK_ENTRY(idleclienttimeoutentry),
 				inst->getIdleClientTimeout());
+	gtk_entry_set_text(GTK_ENTRY(maxlistenersentry),
+				inst->getMaxListeners());
+	gtk_entry_set_text(GTK_ENTRY(listenertimeoutentry),
+				inst->getListenerTimeout());
 }
 
 void gtkfe::clearInstanceParameters() {
@@ -1147,6 +1183,8 @@ void gtkfe::clearInstanceParameters() {
 	gtk_entry_set_text(GTK_ENTRY(maxstringbindvaluelengthentry),"");
 	gtk_entry_set_text(GTK_ENTRY(maxlobbindvaluelengthentry),"");
 	gtk_entry_set_text(GTK_ENTRY(idleclienttimeoutentry),"");
+	gtk_entry_set_text(GTK_ENTRY(maxlistenersentry),"");
+	gtk_entry_set_text(GTK_ENTRY(listenertimeoutentry),"");
 }
 
 void gtkfe::defaultInstanceParameters() {
@@ -1185,6 +1223,10 @@ void gtkfe::defaultInstanceParameters() {
 					DEFAULT_MAXLOBBINDVALUELENGTH);
 	gtk_entry_set_text(GTK_ENTRY(idleclienttimeoutentry),
 					DEFAULT_IDLECLIENTTIMEOUT);
+	gtk_entry_set_text(GTK_ENTRY(maxlistenersentry),
+					DEFAULT_MAXLISTENERS);
+	gtk_entry_set_text(GTK_ENTRY(listenertimeoutentry),
+					DEFAULT_LISTENERTIMEOUT);
 }
 
 void gtkfe::populateUserList(instance *inst) {
@@ -1626,6 +1668,10 @@ void gtkfe::instanceParametersSave(GtkWidget *widget, gpointer data) {
 					maxlobbindvaluelengthentry)));
 	currentinstance->setIdleClientTimeout(
 			gtk_entry_get_text(GTK_ENTRY(idleclienttimeoutentry)));
+	currentinstance->setMaxListeners(
+			gtk_entry_get_text(GTK_ENTRY(maxlistenersentry)));
+	currentinstance->setListenerTimeout(
+			gtk_entry_get_text(GTK_ENTRY(listenertimeoutentry)));
 
 	// rebuild the instance list in case we were adding a new instance or
 	// changing the id of an old one
@@ -1883,7 +1929,9 @@ void gtkfe::newInstance(GtkWidget *widget, gpointer data) {
 					DEFAULT_MAXQUERYSIZE,
 					DEFAULT_MAXSTRINGBINDVALUELENGTH,
 					DEFAULT_MAXLOBBINDVALUELENGTH,
-					DEFAULT_IDLECLIENTTIMEOUT);
+					DEFAULT_IDLECLIENTTIMEOUT,
+					DEFAULT_MAXLISTENERS,
+					DEFAULT_LISTENERTIMEOUT);
 
 	defaultInstanceParameters();
 

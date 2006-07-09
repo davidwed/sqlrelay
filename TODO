@@ -1,5 +1,4 @@
-document listenertimeout/maxlisteners
-listenertimeout/maxlisteners in config app
+sqlr-listener isn't dying if alarm goes off
 
 if a client connects and the forked listener ends up waiting for a connection
 	and the client disconnects, the forked listener has no way of knowing
@@ -23,7 +22,7 @@ mysql 4.1.2:
 	non c++ tests
 
 mysql 5.x:
-	test stored procedures - stored function fails
+	stored function fails
 	document using stored procedures
 
 	implement clob/blob output bind vars

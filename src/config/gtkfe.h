@@ -178,6 +178,8 @@ class gtkfe {
 		static	GtkWidget	*maxstringbindvaluelengthlabel;
 		static	GtkWidget	*maxlobbindvaluelengthlabel;
 		static	GtkWidget	*idleclienttimeoutlabel;
+		static	GtkWidget	*maxlistenerslabel;
+		static	GtkWidget	*listenertimeoutlabel;
 
 		static	GtkWidget	*identry;
 		static	GtkWidget	*portentry;
@@ -209,6 +211,8 @@ class gtkfe {
 		static	GtkWidget	*maxstringbindvaluelengthentry;
 		static	GtkWidget	*maxlobbindvaluelengthentry;
 		static	GtkWidget	*idleclienttimeoutentry;
+		static	GtkWidget	*maxlistenersentry;
+		static	GtkWidget	*listenertimeoutentry;
 
 		static	GtkWidget	*userstab;
 		static	GtkWidget	*usersframe;
