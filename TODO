@@ -1,5 +1,3 @@
-sqlr-listener isn't dying if alarm goes off
-
 if a client connects and the forked listener ends up waiting for a connection
 	and the client disconnects, the forked listener has no way of knowing
 	that the client has disconnected and can't bail

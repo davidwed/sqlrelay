@@ -1004,7 +1004,10 @@ void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 	// 8.1.7 for Linux), so we have to do this instead.
 	// OCILobRead appears to return OCI_INVALID_HANDLE when
 	// the LOB is NULL, but this is not documented anywhere.
-	while (offset<=loblength) {
+	while (retlen) {
+
+		// initialize retlen to the number of characters we want to read
+		retlen=oracle8conn->maxitembuffersize;
 
 		// read a segment from the lob
 		sword	retval=OCILobRead(oracle8conn->svc,
@@ -1036,7 +1039,6 @@ void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 			}
 			conn->sendLongSegment((char *)buf,(int32_t)retlen);
 			offset=offset+retlen;
-			retlen=oracle8conn->maxitembuffersize;
 		}
 	}
 
@@ -1487,6 +1489,7 @@ void oracle8cursor::returnRow() {
 				conn->sendNullField();
 				continue;
 			}
+//printf("loblength=%d\n",loblength);
 
 			// We should be able to call OCILobRead over and
 			// over, as long as it returns OCI_NEED_DATA, but
@@ -1495,7 +1498,11 @@ void oracle8cursor::returnRow() {
 			// do this instead.  OCILobRead appears to return
 			// OCI_INVALID_HANDLE when the LOB is NULL, but
 			// this is not documented anywhere.
-			while (offset<=loblength) {
+			while (retlen) {
+
+				// initialize retlen to the number
+				// of characters we want to read
+				retlen=oracle8conn->maxitembuffersize;
 
 				// read a segment from the lob
 				sword	retval=OCILobRead(oracle8conn->svc,
@@ -1535,9 +1542,9 @@ void oracle8cursor::returnRow() {
 							maxitembuffersize],
 						(uint32_t)retlen);
 					offset=offset+retlen;
-					retlen=oracle8conn->maxitembuffersize;
 				}
 			}
+//printf("length: %d\n",offset-1);
 
 			// if we ever started sending a LOB,
 			// finish sending it now
