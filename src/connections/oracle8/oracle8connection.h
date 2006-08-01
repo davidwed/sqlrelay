@@ -125,7 +125,7 @@ class oracle8cursor : public sqlrcursor_svr {
 						sqlrcursor_svr *cursor);
 		void		returnOutputBindBlob(uint16_t index);
 		void		returnOutputBindClob(uint16_t index);
-		void		returnOutputBindGenericLob(uint16_t index);
+		void		sendLob(OCILobLocator *lob, ub1 *buf);
 #endif
 		bool		executeQuery(const char *query,
 						uint32_t length,
