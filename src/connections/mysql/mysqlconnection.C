@@ -197,10 +197,12 @@ short mysqlconnection::nullBindValue() {
 #endif
 
 mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+printf("mysqlcursor()\n");
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
 	columnnames=NULL;
 #ifdef HAVE_MYSQL_STMT_PREPARE
+printf("mysqlrcursor::usestmtprepare=true\n");
 	usestmtprepare=true;
 	storedproc.compile("^\\s*(create|CREATE|drop|DROP)\\s+"
 			"(procedure|PROCEDURE|function|FUNCTION)\\s+");
@@ -217,6 +219,7 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 }
 
 mysqlcursor::~mysqlcursor() {
+printf("~mysqlcursor()\n");
 	delete[] columnnames;
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	mysql_stmt_free_result(stmt);
@@ -229,6 +232,7 @@ mysqlcursor::~mysqlcursor() {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
+printf("prepareQuery()\n");
 
 	if (mysqlconn->fakebinds) {
 		return true;
@@ -236,8 +240,11 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// can't use stmt API to create/drop stored procedures (yet) as of 5.0
 	usestmtprepare=true;
+printf("%x: prepare %s\n",this,query);
+printf("%x: prepare usestmtprepare=true\n",this);
 	if (storedproc.match(query)) {
 		usestmtprepare=false;
+printf("%x: prepare usestmtprepare=false\n",this);
 		return true;
 	}
 
@@ -253,14 +260,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// re-init bind buffers
 	rawbuffer::zero(&bind,sizeof(bind));
 
-printf("prepare...\n");
-	//return !mysql_stmt_prepare(stmt,query,length);
-if (mysql_stmt_prepare(stmt,query,length)) {
-printf("success\n");
-	return true;
-}
-printf("failed\n");
-return false;
+	return !mysql_stmt_prepare(stmt,query,length);
 }
 
 bool mysqlcursor::inputBindString(const char *variable, 
@@ -268,6 +268,7 @@ bool mysqlcursor::inputBindString(const char *variable,
 						const char *value, 
 						uint16_t valuesize,
 						int16_t *isnull) {
+printf("inputBindString()\n");
 
 	if (mysqlconn->fakebinds || !usestmtprepare) {
 		return true;
@@ -276,7 +277,6 @@ bool mysqlcursor::inputBindString(const char *variable,
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
-printf("input bind string failed\n");
 		return false;
 	}
 
@@ -302,6 +302,7 @@ printf("input bind string failed\n");
 bool mysqlcursor::inputBindInteger(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value) {
+printf("inputBindInteger()\n");
 
 	if (mysqlconn->fakebinds || !usestmtprepare) {
 		return true;
@@ -310,7 +311,6 @@ bool mysqlcursor::inputBindInteger(const char *variable,
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
-printf("input bind int failed\n");
 		return false;
 	}
 
@@ -338,6 +338,7 @@ bool mysqlcursor::inputBindDouble(const char *variable,
 						double *value,
 						uint32_t precision,
 						uint32_t scale) {
+printf("inputBindDouble()\n");
 
 	if (mysqlconn->fakebinds || !usestmtprepare) {
 		return true;
@@ -346,7 +347,6 @@ bool mysqlcursor::inputBindDouble(const char *variable,
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
-printf("input bind double failed\n");
 		return false;
 	}
 
@@ -374,6 +374,7 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
+printf("inputBindBlob()\n");
 
 	if (mysqlconn->fakebinds || !usestmtprepare) {
 		return true;
@@ -382,7 +383,6 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
-printf("input bind blob failed\n");
 		return false;
 	}
 
@@ -410,6 +410,7 @@ bool mysqlcursor::inputBindClob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
+printf("inputBindClob()\n");
 	return inputBindBlob(variable,variablesize,value,valuesize,isnull);
 }
 
@@ -418,6 +419,7 @@ bool mysqlcursor::outputBindString(const char *variable,
 						char *value,
 						uint16_t valuesize,
 						int16_t *isnull) {
+printf("outputBindString()\n");
 
 	if (mysqlconn->fakebinds || !usestmtprepare) {
 		return true;
@@ -426,7 +428,6 @@ bool mysqlcursor::outputBindString(const char *variable,
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
-printf("output bind string failed\n");
 		return false;
 	}
 
@@ -446,6 +447,7 @@ bool mysqlcursor::outputBindInteger(const char *variable,
 						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull) {
+printf("outputBindInteger()\n");
 
 	if (mysqlconn->fakebinds || !usestmtprepare) {
 		return true;
@@ -454,7 +456,6 @@ bool mysqlcursor::outputBindInteger(const char *variable,
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
-printf("output bind int failed\n");
 		return false;
 	}
 
@@ -476,6 +477,7 @@ bool mysqlcursor::outputBindDouble(const char *variable,
 						uint32_t *precision,
 						uint32_t *scale,
 						int16_t *isnull) {
+printf("outputBindDouble()\n");
 
 	if (mysqlconn->fakebinds || !usestmtprepare) {
 		return true;
@@ -484,7 +486,6 @@ bool mysqlcursor::outputBindDouble(const char *variable,
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
-printf("output bind double failed\n");
 		return false;
 	}
 
@@ -504,6 +505,7 @@ bool mysqlcursor::outputBindBlob(const char *variable,
 						uint16_t variablesize,
 						uint16_t index,
 						int16_t *isnull) {
+printf("outputBindBlob()\n");
 	// FIXME: fix this
 
 	if (mysqlconn->fakebinds || !usestmtprepare) {
@@ -513,7 +515,6 @@ bool mysqlcursor::outputBindBlob(const char *variable,
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>bindcount) {
-printf("output bind blob failed\n");
 		return false;
 	}
 
@@ -533,12 +534,14 @@ bool mysqlcursor::outputBindClob(const char *variable,
 						uint16_t variablesize,
 						uint16_t index,
 						int16_t *isnull) {
+printf("outputBindClob()\n");
 	return outputBindBlob(variable,variablesize,index,isnull);
 }
 #endif
 
 bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
+printf("executeQuery()\n");
 
 	// initialize counts
 	ncols=0;
@@ -547,56 +550,42 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (!mysqlconn->fakebinds && usestmtprepare) {
 
-printf("bind\n");
 		// handle binds
 		if (bindcounter && mysql_stmt_bind_param(stmt,bind)) {
-printf("failed\n");
 			return false;
 		}
 
-printf("execute: %s\n",query);
 		// execute the query
 		if ((queryresult=mysql_stmt_execute(stmt))) {
-printf("failed\n");
 			return false;
 		}
 
-printf("check for temp\n");
 		checkForTempTable(query,length);
 	
-printf("affected rows\n");
 		// get the affected row count
 		affectedrows=mysql_stmt_affected_rows(stmt);
 
-printf("column count\n");
 		// get the column count
 		ncols=mysql_stmt_field_count(stmt);
 
-printf("metadata\n");
 		// get the metadata
 		mysqlresult=NULL;
 		if (ncols) {
 			mysqlresult=mysql_stmt_result_metadata(stmt);
 		}
 
-printf("bind fields\n");
 		// bind the fields
 		if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
-printf("failed\n");
 			return false;
 		}
 
-printf("store result\n");
 		// store the result set
 		if (mysql_stmt_store_result(stmt)) {
-printf("failed\n");
 			return false;
 		}
 
-printf("row count\n");
 		// get the row count
 		nrows=mysql_stmt_num_rows(stmt);
-printf("done\n");
 
 	} else {
 
@@ -608,6 +597,7 @@ printf("done\n");
 		// execute the query
 		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
 							query,length))) {
+printf("%x: execute failed: usestmtprepare=%d\n",this,usestmtprepare);
 			return false;
 		}
 
@@ -619,10 +609,12 @@ printf("done\n");
 		// store the result set
 		if ((mysqlresult=mysql_store_result(&mysqlconn->mysql))==
 							(MYSQL_RES *)NULL) {
+printf("%x: store result set failed: usestmtprepare=%d\n",this,usestmtprepare);
 
 			// if there was an error then return failure, otherwise
 			// the query must have been some DML or DDL
 			char	*err=(char *)mysql_error(&mysqlconn->mysql);
+printf("err is %s\n",err);
 			if (err && err[0]) {
 				return false;
 			} else {
@@ -640,10 +632,12 @@ printf("done\n");
 	}
 #endif
 
+printf("%x: after execute: usestmtprepare=%d\n",this,usestmtprepare);
 	return true;
 }
 
 const char *mysqlcursor::errorMessage(bool *liveconnection) {
+printf("errorMessage()\n");
 
 	*liveconnection=true;
 
@@ -657,19 +651,16 @@ const char *mysqlcursor::errorMessage(bool *liveconnection) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	}
 #endif
-printf("error: %s\n",err);
 
 #if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
 		defined(HAVE_MYSQL_CR_SERVER_LOST) 
 	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
 		if (queryresult==CR_SERVER_GONE_ERROR) {
-printf("db down\n");
 			*liveconnection=false;
 		} else
 	#endif
 	#ifdef HAVE_MYSQL_CR_SERVER_LOST
 		if (queryresult==CR_SERVER_LOST) {
-printf("db down\n");
 			*liveconnection=false;
 		} else
 	#endif
@@ -681,53 +672,56 @@ printf("db down\n");
 				"Can't connect to local MySQL",28) ||
 		!charstring::compareIgnoringCase(err,
 			"Lost connection to MySQL server during query")) {
-printf("db down\n");
 		*liveconnection=false;
 	}
 	return err;
 }
 
 uint32_t mysqlcursor::colCount() {
+printf("colCount(): usestmtprepare=%d\n",usestmtprepare);
 	return ncols;
 }
 
 const char * const * mysqlcursor::columnNames() {
-printf("column names\n");
+printf("columnNames()\n");
 	mysql_field_seek(mysqlresult,0);
 	columnnames=new char *[ncols];
 	for (unsigned int i=0; i<ncols; i++) {
 		columnnames[i]=mysql_fetch_field(mysqlresult)->name;
 	}
-printf("done with column names\n");
 	return columnnames;
 }
 
 bool mysqlcursor::knowsRowCount() {
+printf("knowsRowCount(): usestmtprepare=%d\n",usestmtprepare);
 	return true;
 }
 
 uint64_t mysqlcursor::rowCount() {
+printf("rowCount(): usestmtprepare=%d\n",usestmtprepare);
 	return nrows;
 }
 
 bool mysqlcursor::knowsAffectedRows() {
+printf("knowsAffectedRows(): usestmtprepare=%d\n",usestmtprepare);
 	return true;
 }
 
 uint64_t mysqlcursor::affectedRows() {
+printf("affectedRows(): usestmtprepare=%d\n",usestmtprepare);
 	return affectedrows;
 }
 
 uint16_t mysqlcursor::columnTypeFormat() {
+printf("columnTypeFormat(): usestmtprepare=%d\n",usestmtprepare);
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 void mysqlcursor::returnColumnInfo() {
+printf("returnColumnInfo(): usestmtprepare=%d\n",usestmtprepare);
 
-printf("return column info\n");
 	// for DML or DDL queries, return no column info
 	if (!mysqlresult) {
-printf("dml/ddl\n");
 		return;
 	}
 
@@ -886,19 +880,21 @@ printf("dml/ddl\n");
 #endif
 				);
 	}
-printf("done\n");
 }
 
 bool mysqlcursor::noRowsToReturn() {
+printf("noRowsToReturn(): usestmtprepare=%d\n",usestmtprepare);
 	// for DML or DDL queries, return no data
 	return (!mysqlresult);
 }
 
 bool mysqlcursor::skipRow() {
+printf("skipRow()\n");
 	return fetchRow();
 }
 
 bool mysqlcursor::fetchRow() {
+printf("fetchRow()\n");
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (!mysqlconn->fakebinds && usestmtprepare) {
 		return !mysql_stmt_fetch(stmt);
@@ -913,8 +909,8 @@ bool mysqlcursor::fetchRow() {
 }
 
 void mysqlcursor::returnRow() {
+printf("returnRow()\n");
 
-printf("return row\n");
 	for (unsigned int col=0; col<ncols; col++) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		if (!mysqlconn->fakebinds && usestmtprepare) {
@@ -935,13 +931,15 @@ printf("return row\n");
 		}
 #endif
 	}
-printf("done with return row\n");
 }
 
 void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
-printf("clean up data\n");
+printf("cleanUpData(): usestmtprepare=%d\n",usestmtprepare);
+printf("%x: clean up data\n",this);
+printf("%x: fakebinds=%d && usestmtprepare=%d\n",this,mysqlconn->fakebinds,usestmtprepare);
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (!mysqlconn->fakebinds && usestmtprepare) {
+printf("in here!\n");
 		if (freebinds) {
 			bindcounter=0;
 			rawbuffer::zero(&bind,sizeof(bind));
@@ -961,10 +959,14 @@ printf("clean up data\n");
 			mysqlresult=NULL;
 		}
 #ifdef HAVE_MYSQL_NEXT_RESULT
+printf("%x: while (next result set...)\n",this);
 		while (!mysql_next_result(&mysqlconn->mysql)) {
+printf("%x:	free\n",this);
 			mysqlresult=mysql_store_result(&mysqlconn->mysql);
-			mysql_free_result(mysqlresult);
-			mysqlresult=NULL;
+			if (mysqlresult!=(MYSQL_RES *)NULL) {
+				mysql_free_result(mysqlresult);
+				mysqlresult=NULL;
+			}
 		}
 #endif
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -972,5 +974,5 @@ printf("clean up data\n");
 #endif
 	delete[] columnnames;
 	columnnames=NULL;
-printf("done with clean up data\n");
+printf("%x: done with clean up data\n",this);
 }
