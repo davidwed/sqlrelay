@@ -10,7 +10,7 @@ ifeq ($(OVERRIDERUBYSITEARCHDIR),)
 ifeq ($(shell $(RUBY) getsitearchdir.rb | grep -c DESTDIR),0)
 RUBYSITEARCHDIR = $(DESTDIR)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 else
-RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) DESTDIR=$(DESTDIR) -s -f - | grep -v Entering | grep -v Leaving )
 endif
 else
 RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
@@ -20,7 +20,7 @@ ifeq ($(OVERRIDERUBYSITELIBDIR),)
 ifeq ($(shell $(RUBY) getsitelibdir.rb | grep -c DESTDIR),0)
 RUBYSITELIBDIR = $(DESTDIR)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 else
-RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) DESTDIR=$(DESTDIR) -s -f - | grep -v Entering | grep -v Leaving )
 endif
 else
 RUBYSITELIBDIR = $(OVERRIDERUBYSITELIBDIR)
