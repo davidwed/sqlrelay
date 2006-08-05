@@ -1022,6 +1022,14 @@ void oracle8cursor::sendLob(OCILobLocator *lob, ub1 *buf) {
 		return;
 	}
 
+	// handle empty lob's
+	if (!loblength) {
+		conn->startSendingLong(0);
+		conn->sendLongSegment("",0);
+		conn->endSendingLong();
+		return;
+	}
+
 	// We should be able to call OCILobRead over and over,
 	// as long as it returns OCI_NEED_DATA, but OCILobRead
 	// fails to return OCI_NEED_DATA (at least in version
@@ -1069,13 +1077,6 @@ void oracle8cursor::sendLob(OCILobLocator *lob, ub1 *buf) {
 	// if we ever started sending a LOB,
 	// finish sending it now
 	if (!start) {
-		conn->endSendingLong();
-	}
-
-	// handle empty lob's
-	if (!loblength) {
-		conn->startSendingLong(0);
-		conn->sendLongSegment("",0);
 		conn->endSendingLong();
 	}
 }
