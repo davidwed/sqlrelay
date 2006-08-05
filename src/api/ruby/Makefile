@@ -7,21 +7,13 @@ include ../../../config.mk
 RUBYCFLAGS = $(shell $(RUBY) getcflags.rb | sed -e "s|-mtune=pentium4||g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 
 ifeq ($(OVERRIDERUBYSITEARCHDIR),)
-ifeq ($(shell $(RUBY) getsitearchdir.rb | $(MAKE) DESTDIR=$(DESTDIR) -s -f -),$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f -)))
-RUBYSITEARCHDIR = $(DESTDIR)$(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-else
-RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) DESTDIR=$(DESTDIR) -s -f - | grep -v Entering | grep -v Leaving )
-endif
+RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 else
 RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
 endif
 
 ifeq ($(OVERRIDERUBYSITELIBDIR),)
-ifeq ($(shell $(RUBY) getsitelibdir.rb | $(MAKE) DESTDIR=$(DESTDIR) -s -f -),$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f -)))
-RUBYSITELIBDIR = $(DESTDIR)$(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-else
-RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) DESTDIR=$(DESTDIR) -s -f - | grep -v Entering | grep -v Leaving )
-endif
+RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 else
 RUBYSITELIBDIR = $(OVERRIDERUBYSITELIBDIR)
 endif
