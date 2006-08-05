@@ -27,6 +27,9 @@ print "\n"
 print "sitedir = "
 print $sitedir.sub(drive, "")
 print "\n"
+print "_fc_sitedir = "
+print $sitedir.sub(drive, "")
+print "\n"
 print "sitelibdir = "
 print $sitelibdir.sub(drive, "")
 print "\n"
