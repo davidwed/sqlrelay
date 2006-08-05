@@ -58,26 +58,26 @@ class SQLRConnection:
         self._cursors=weakref.WeakValueDictionary()
 
     def __del__(self):
-	self.close()
+        self.close()
 
     def close(self):
         if self.connection is not None:
                 # first we close any remaining cursors to avoid segfaults
                 for cursor in self._cursors.values():
-               	        cursor.close()
+                        cursor.close()
                 # then we close the connection
                 CSQLRelay.sqlrcon_free(self.connection)
                 del self.connection
 
     def commit(self):
-	self.rowcount=0
-	if self.connection is not None:
-        	return CSQLRelay.commit(self.connection)
+        self.rowcount=0
+        if self.connection is not None:
+                return CSQLRelay.commit(self.connection)
 
     def rollback(self):
-	self.rowcount=0
-	if self.connection is not None:
-        	return CSQLRelay.rollback(self.connection)
+        self.rowcount=0
+        if self.connection is not None:
+                return CSQLRelay.rollback(self.connection)
 
     def cursor(self):
         cursor=SQLRCursor(self.connection)
@@ -94,7 +94,7 @@ class SQLRCursor:
         self.arraysize=1
 
     def __del__(self):
-	self.close()
+        self.close()
 
     def setinputsizes(self):
         pass
@@ -103,54 +103,54 @@ class SQLRCursor:
         pass
         
     def execute(self, operation, parameters=None):
-	self.rowcount=0
+        self.rowcount=0
         self.cur_row=0
         CSQLRelay.prepareQuery(self.cursor,operation)
-	if parameters is not None:
-		for i in parameters.keys():
-			precision=0
-			scale=0
-			if type(parameters.keys())==type(1.1):
-				precision=len(str(parameters.keys()))-1
-				scale=precision-len(str(int(parameters.keys())))-1
-			CSQLRelay.inputBind(self.cursor,i,parameters[i],precision,scale)
+        if parameters is not None:
+                for i in parameters.keys():
+                        precision=0
+                        scale=0
+                        if type(parameters.keys())==type(1.1):
+                                precision=len(str(parameters.keys()))-1
+                                scale=precision-len(str(int(parameters.keys())))-1
+                        CSQLRelay.inputBind(self.cursor,i,parameters[i],precision,scale)
         CSQLRelay.executeQuery(self.cursor)
         the_error=CSQLRelay.errorMessage(self.cursor)
         if the_error:
             raise DatabaseError, '<pre>%s</pre>' % the_error
         self.__set_description()
-	self.rowcount=CSQLRelay.totalRows(self.cursor)
-	if CSQLRelay.affectedRows(self.cursor)>0:
-		self.rowcount=CSQLRelay.affectedRows(self.cursor)
+        self.rowcount=CSQLRelay.totalRows(self.cursor)
+        if CSQLRelay.affectedRows(self.cursor)>0:
+                self.rowcount=CSQLRelay.affectedRows(self.cursor)
 
     def executemany(self, operation, parameters=None):
-	if parameters is None:
-        	self.execute(operation)
-	else:
-		self.rowcount=0
-        	self.cur_row=0
-        	CSQLRelay.prepareQuery(self.cursor,operation)
-		for p in parameters:
-			CSQLRelay.clearBinds(self.cursor)
-			if p is not None:
-				for i in p.keys():
-					precision=0
-					scale=0
-					if type(p.keys())==type(1.1):
-						precision=len(str(p.keys()))-1
-						scale=precision-len(str(int(p.keys())))-1
-					CSQLRelay.inputBind(self.cursor,i,p[i],precision,scale)
-        		CSQLRelay.executeQuery(self.cursor)
-        		the_error=CSQLRelay.errorMessage(self.cursor)
-        		if the_error:
-            			raise DatabaseError, '<pre>%s</pre>' % the_error
-        		self.__set_description()
-			self.rowcount=CSQLRelay.totalRows(self.cursor)
-			if CSQLRelay.affectedRows(self.cursor)>0:
-				self.rowcount=CSQLRelay.affectedRows(self.cursor)
-	
+        if parameters is None:
+                self.execute(operation)
+        else:
+                self.rowcount=0
+                self.cur_row=0
+                CSQLRelay.prepareQuery(self.cursor,operation)
+                for p in parameters:
+                        CSQLRelay.clearBinds(self.cursor)
+                        if p is not None:
+                                for i in p.keys():
+                                        precision=0
+                                        scale=0
+                                        if type(p.keys())==type(1.1):
+                                                precision=len(str(p.keys()))-1
+                                                scale=precision-len(str(int(p.keys())))-1
+                                        CSQLRelay.inputBind(self.cursor,i,p[i],precision,scale)
+                        CSQLRelay.executeQuery(self.cursor)
+                        the_error=CSQLRelay.errorMessage(self.cursor)
+                        if the_error:
+                                raise DatabaseError, '<pre>%s</pre>' % the_error
+                        self.__set_description()
+                        self.rowcount=CSQLRelay.totalRows(self.cursor)
+                        if CSQLRelay.affectedRows(self.cursor)>0:
+                                self.rowcount=CSQLRelay.affectedRows(self.cursor)
+        
     def callproc(self, procname, parameters=None):
-	self.execute(procname,parameters)
+        self.execute(procname,parameters)
         
     def fetchone(self):
         row=self.__getRow(self.cur_row)
@@ -161,6 +161,8 @@ class SQLRCursor:
         if not size:
             size=self.arraysize
         num_rows=CSQLRelay.rowCount(self.cursor)
+        if num_rows==0:
+            return None
         if size>=num_rows:
             size=num_rows-1
         rc=self.__getRowRange(self.cur_row, size)
@@ -177,16 +179,16 @@ class SQLRCursor:
         return rc
 
     def close(self):
-	if self.cursor is not None:
-		CSQLRelay.sqlrcur_free(self.cursor)
-		del self.cursor
+        if self.cursor is not None:
+                CSQLRelay.sqlrcur_free(self.cursor)
+                del self.cursor
 
     def __set_description(self):
         desc=[]
-	col_c=CSQLRelay.colCount(self.cursor)
-    	if not col_c:
-	    self.description=[]
-	    return None
+        col_c=CSQLRelay.colCount(self.cursor)
+        if not col_c:
+            self.description=[]
+            return None
         for field in range(col_c):
             row=[]
             row.append(CSQLRelay.getColumnName(self.cursor,field),)
@@ -197,15 +199,15 @@ class SQLRCursor:
         return tuple(desc)
 
     def __getRow(self, row):
-	# FIXME: go through each field, if the column type is a date/time
-	# column, then create a DateTime object and return it instead of
-	# a string
+        # FIXME: go through each field, if the column type is a date/time
+        # column, then create a DateTime object and return it instead of
+        # a string
         rc=CSQLRelay.getRow(self.cursor,row)
-	return rc
+        return rc
 
     def __getRowRange(self, row, size):
-	# FIXME: go through each field, if the column type is a date/time
-	# column, then create a DateTime object and return it instead of
-	# a string
+        # FIXME: go through each field, if the column type is a date/time
+        # column, then create a DateTime object and return it instead of
+        # a string
         rc=CSQLRelay.getRowRange(self.cursor,row,size)
-	return rc
+        return rc

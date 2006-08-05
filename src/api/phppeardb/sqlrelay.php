@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.15.2.1 2006-02-13 05:36:55 mused Exp $
+// $Id: sqlrelay.php,v 1.15.2.2 2006-08-05 03:08:23 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -90,7 +90,6 @@ class DB_sqlrelay extends DB_common
     function connect($dsninfo, $persistent = false)
     {
 
-
         if (method_exists($this,'loadExtension') || 
                             method_exists($this,'loadextension')) {
             if (!PEAR::loadExtension('sql_relay')) {
@@ -159,6 +158,16 @@ class DB_sqlrelay extends DB_common
     {
 
         $cursor = sqlrcur_alloc($this->connection);
+
+        if ($this->options['portability'] & DB_PORTABILITY_LOWERCASE) {
+            sqlrcur_lowerCaseColumnNames ($cursor);
+        }
+        if ($this->options['portability'] & DB_PORTABILITY_NULL_TO_EMPTY) {
+            sqlrcur_getNullsAsEmptyStrings ($cursor);
+        } else {
+            sqlrcur_getNullsAsNulls ($cursor);
+        }
+
         sqlrcur_setResultSetBufferSize($cursor,100);
         if (!sqlrcur_sendQuery($cursor, $query)) {
             $this->affectedrows = 0;
@@ -202,39 +211,51 @@ class DB_sqlrelay extends DB_common
         }
 
         $cursor = sqlrcur_alloc($this->connection);
+
+        if ($this->options['portability'] & DB_PORTABILITY_LOWERCASE) {
+            sqlrcur_lowerCaseColumnNames ($cursor);
+        }
+        if ($this->options['portability'] & DB_PORTABILITY_NULL_TO_EMPTY) {
+            sqlrcur_getNullsAsEmptyStrings ($cursor);
+        } else {
+            sqlrcur_getNullsAsNulls ($cursor);
+        }
+
         sqlrcur_setResultSetBufferSize($cursor,100);
 
         # handle ?-delimited bind variables by rewriting the query and creating
         # : or @ delimited variables
         # for db2 which already uses ?-delimited variables, we don't need
         # to do this...
+        # FIXME: handle postgresql 8 and mysql 4.1
         if ($this->identity == "db2" || $this->identity == "interbase") {
             $newquery = $query;
         } else {
-            $tokens = split('[\&\?]', $query);
-            $token = 0;
-            $binds = sizeof($tokens) - 1;
+            $paramindex = 0;
             $newquery = '';
             $types = array();
+            $inquotes = false;
             for ($i = 0; $i < strlen($query); $i++) {
-                switch ($query[$i]) {
-                    case '?':
-                        $types[$token++] = DB_PARAM_SCALAR;
-                        break;
-                    case '&':
-                        $types[$token++] = DB_PARAM_OPAQUE;
-                        break;
+                if ($query[$i] == '\'') {
+                    $inquotes = !$inquotes;
+                } else if (($query[$i] == '?' || $query[$i] == '&') &&
+                                                            !$inquotes) {
+                    if ($query[$i] == '?') {
+                        $types[$paramindex] = DB_PARAM_SCALAR;
+                    } else {
+                        $types[$paramindex] = DB_PARAM_OPAQUE;
+                    }
+                    if ($this->identity == "sybase" ||
+                            $this->identity == "freetds") {
+                        $newquery .= $query[$i] . "@bind" . $paramindex;
+                    } else {
+                        $newquery .= $query[$i] . ":bind" . $paramindex;
+                    }
+                    $paramindex++;
+                    continue;
                 }
+                $newquery .= $query[$i]
             }        
-            for ($i = 0; $i < $binds; $i++) {
-                if ($this->identity == "sybase" ||
-                        $this->identity == "freetds") {
-                    $newquery .= $tokens[$i] . "@bind" . $i;
-                } else {
-                    $newquery .= $tokens[$i] . ":bind" . $i;
-                }
-            }
-            $newquery .= $tokens[$i];
             $this->prepare_types[(int)$cursor] = $types;
         }
 
@@ -579,8 +600,9 @@ class DB_sqlrelay extends DB_common
         if (sqlrcon_commit($this->connection) == 1) {
             return DB_OK;
         } else {
+            # FIXME: need some way to get a rollback error
             return $this->raiseError(DB_ERROR, null, null, null,
-                                    sqlrcon_errorMessage($this->connection));
+                                                "commit failed");
         }
     }
 
@@ -595,8 +617,9 @@ class DB_sqlrelay extends DB_common
         if (sqlrcon_rollback($this->connection) == 1) {
             return DB_OK;
         } else {
+            # FIXME: need some way to get a rollback error
             return $this->raiseError(DB_ERROR, null, null, null,
-                                    sqlrcon_errorMessage($this->connection));
+                                                "rollback failed");
         }
     }
 

@@ -1,3 +1,11 @@
+0.37.1 -
+	fixed missing self before __getRow and __getRowRange in python db driver
+	added test for 0 length result set to PySQLRDB's fetchmany method
+	removed erroneous reference to sqlrcon_errormessage in php pear db
+	some oracle unicode clob fixes
+	integrated Andreas Behr's listener crash patch
+	interbase/firebird dead-db/relogin works now
+
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that
 		the MDB tools connection wouldn't be built

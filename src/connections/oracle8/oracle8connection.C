@@ -5,6 +5,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/character.h>
+#include <rudiments/environment.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -12,16 +13,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_BYTES_PER_CHAR	4
+
 oracle8connection::oracle8connection() : sqlrconnection_svr() {
+	envr=new environment();
 	statementmode=OCI_DEFAULT;
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
 #endif
-	environ=new environment();
 }
 
 oracle8connection::~oracle8connection() {
-	delete environ;
+	delete envr;
 }
 
 uint16_t oracle8connection::getNumberOfConnectStringVars() {
@@ -52,6 +55,9 @@ void oracle8connection::handleConnectString() {
 	if (!maxitembuffersize) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
+	if (maxitembuffersize<MAX_BYTES_PER_CHAR) {
+		maxitembuffersize=MAX_BYTES_PER_CHAR;
+	}
 }
 
 bool oracle8connection::logIn() {
@@ -59,12 +65,12 @@ bool oracle8connection::logIn() {
 
 	// handle ORACLE_HOME
 	if (home) {
-		if (!environ->setValue("ORACLE_HOME",home)) {
+		if (!envr->setValue("ORACLE_HOME",home)) {
 			fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
 			return false;
 		}
 	} else {
-		if (!environ->getValue("ORACLE_HOME")) {
+		if (!envr->getValue("ORACLE_HOME")) {
 			fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
 			return false;
 		}
@@ -72,12 +78,12 @@ bool oracle8connection::logIn() {
 
 	// handle ORACLE_SID
 	if (sid) {
-		if (!environ->setValue("ORACLE_SID",sid)) {
+		if (!envr->setValue("ORACLE_SID",sid)) {
 			fprintf(stderr,"Failed to set ORACLE_SID environment variable.\n");
 			return false;
 		}
 	} else {
-		if (!environ->getValue("ORACLE_SID")) {
+		if (!envr->getValue("ORACLE_SID")) {
 			fprintf(stderr,"No ORACLE_SID environment variable set or specified in connect string.\n");
 			return false;
 		}
@@ -85,12 +91,12 @@ bool oracle8connection::logIn() {
 
 	// handle TWO_TASK
 	if (sid) {
-		if (!environ->setValue("TWO_TASK",sid)) {
+		if (!envr->setValue("TWO_TASK",sid)) {
 			fprintf(stderr,"Failed to set TWO_TASK environment variable.\n");
 			return false;
 		}
 	} else {
-		if (!environ->getValue("TWO_TASK")) {
+		if (!envr->getValue("TWO_TASK")) {
 			fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
 			return false;
 		}
@@ -98,7 +104,7 @@ bool oracle8connection::logIn() {
 
 	// handle NLS_LANG
 	if (nlslang) {
-		if (!environ->setValue("NLS_LANG",nlslang)) {
+		if (!envr->setValue("NLS_LANG",nlslang)) {
 			fprintf(stderr,"Failed to set NLS_LANG environment variable.\n");
 			return false;
 		}
@@ -289,7 +295,7 @@ void oracle8connection::logInError(const char *errmsg) {
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 			message,sizeof(message),OCI_HTYPE_ERROR);
 	message[1023]=(char)NULL;
-	fprintf(stderr,"%s\n",message);
+	fprintf(stderr,"error: %s\n",message);
 }
 
 sqlrcursor_svr *oracle8connection::initCursor() {
@@ -398,6 +404,10 @@ const char *oracle8connection::identify() {
 }
 
 oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+
+	stmt=NULL;
+	stmttype=0;
+	ncols=0;
 
 	prepared=false;
 	errormessage=NULL;
@@ -908,7 +918,6 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 			oracle8conn->err,
 			(ub4)charstring::toInteger(variable+1),
 			(dvoid *)&outbind_lob[index],
-			//(sb4)-1,
 			(sb4)sizeof(OCILobLocator *),
 			type,
 			(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -920,7 +929,6 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)&outbind_lob[index],
-				//(sb4)-1,
 				(sb4)sizeof(OCILobLocator *),
 				type,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -969,32 +977,49 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 }
 
 void oracle8cursor::returnOutputBindBlob(uint16_t index) {
-	returnOutputBindGenericLob(index);
+	// FIXME: call OCILobGetChunkSize to determine the size of this buffer
+	// rather than maxitembuffersize, it will improve performance
+	ub1	buf[oracle8conn->maxitembuffersize+1];
+	sendLob(outbind_lob[index],buf);
 }
 
 void oracle8cursor::returnOutputBindClob(uint16_t index) {
-	returnOutputBindGenericLob(index);
-}
-
-void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
-
-	// handle lob datatypes
 	// FIXME: call OCILobGetChunkSize to determine the size of this buffer
 	// rather than maxitembuffersize, it will improve performance
-	char	buf[oracle8conn->maxitembuffersize+1];
-	ub4	retlen=oracle8conn->maxitembuffersize;
+	ub1	buf[oracle8conn->maxitembuffersize+1];
+	sendLob(outbind_lob[index],buf);
+}
+
+void oracle8cursor::sendLob(OCILobLocator *lob, ub1 *buf) {
+
+	// When reading from a clob, you have to tell it how
+	// many characters to read, and the offset must be
+	// specified in characters too.  But the OCILobRead
+	// returns the number of bytes read, not characters
+	// and there's no good way to convert the number of
+	// bytes read into the number of characters.  So, we'll
+	// have to try to read the same number of characters
+	// each time and make sure that we don't try to read
+	// more than will fit in our buffer.  That way, we can
+	// be sure that we were able to read them all and will
+	// be able to reliably calculate the next offset.
+	ub4	charstoread=oracle8conn->maxitembuffersize/MAX_BYTES_PER_CHAR;
+
+	// handle lob datatypes
+
+	// handle lob datatypes
+	ub4	retlen=charstoread;
 	ub4	offset=1;
 	bool	start=true;
 
 	// Get the length of the lob. If we fail to read the
-	// length, send a NULL field.  Unfortunately, there
-	// is OCILobGetLength has no way to express that a
-	// LOB is NULL, the result is "undefined" in that case.
+	// length, send a NULL field.  Unfortunately OCILobGetLength
+	// has no way to express that a LOB is NULL, the result is
+	// "undefined" in that case.
 	ub4	loblength=0;
 	if (OCILobGetLength(oracle8conn->svc,
 			oracle8conn->err,
-			outbind_lob[index],
-			&loblength)!=OCI_SUCCESS) {
+			lob,&loblength)!=OCI_SUCCESS) {
 		conn->sendNullField();
 		return;
 	}
@@ -1005,12 +1030,15 @@ void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 	// 8.1.7 for Linux), so we have to do this instead.
 	// OCILobRead appears to return OCI_INVALID_HANDLE when
 	// the LOB is NULL, but this is not documented anywhere.
-	while (offset<=loblength) {
+	while (retlen) {
+
+		// initialize retlen to the number of characters we want to read
+		retlen=charstoread;
 
 		// read a segment from the lob
 		sword	retval=OCILobRead(oracle8conn->svc,
 				oracle8conn->err,
-				outbind_lob[index],
+				lob,
 				&retlen,
 				offset,
 				(dvoid *)buf,
@@ -1036,8 +1064,7 @@ void oracle8cursor::returnOutputBindGenericLob(uint16_t index) {
 				start=false;
 			}
 			conn->sendLongSegment((char *)buf,(int32_t)retlen);
-			offset=offset+retlen;
-			retlen=oracle8conn->maxitembuffersize;
+			offset=offset+charstoread;
 		}
 	}
 
@@ -1342,10 +1369,12 @@ uint64_t oracle8cursor::affectedRows() {
 
 	// get the affected row count
 	ub4	rows;
-	OCIAttrGet(stmt,OCI_HTYPE_STMT,
+	if (OCIAttrGet(stmt,OCI_HTYPE_STMT,
 			(dvoid *)&rows,(ub4 *)NULL,
-			OCI_ATTR_ROW_COUNT,oracle8conn->err);
-	return rows;
+			OCI_ATTR_ROW_COUNT,oracle8conn->err)==OCI_SUCCESS) {
+		return rows;
+	}
+	return 0;
 }
 
 uint32_t oracle8cursor::colCount() {
@@ -1468,88 +1497,10 @@ void oracle8cursor::returnRow() {
 			desc[col].dbtype==CLOB_TYPE ||
 			desc[col].dbtype==BFILE_TYPE) {
 
-			// handle lob datatypes
-			ub4	retlen=oracle8conn->maxitembuffersize;
-			ub4	offset=1;
-			bool	start=true;
-
-			// Get the length of the lob. If we fail to read the
-			// length, send a NULL field.  Unfortunately, there
-			// is OCILobGetLength has no way to express that a
-			// LOB is NULL, the result is "undefined" in that
-			// case.
-			ub4	loblength=0;
-			if (OCILobGetLength(oracle8conn->svc,
-					oracle8conn->err,
-					def_lob[col][row],
-					&loblength)!=OCI_SUCCESS) {
-				conn->sendNullField();
-				continue;
-			}
-
-			// We should be able to call OCILobRead over and
-			// over, as long as it returns OCI_NEED_DATA, but
-			// OCILobRead fails to return OCI_NEED_DATA (at
-			// least in version 8.1.7 for Linux), so we have to
-			// do this instead.  OCILobRead appears to return
-			// OCI_INVALID_HANDLE when the LOB is NULL, but
-			// this is not documented anywhere.
-			while (offset<=loblength) {
-
-				// read a segment from the lob
-				sword	retval=OCILobRead(oracle8conn->svc,
-						oracle8conn->err,
-						def_lob[col][row],
-						&retlen,
-						offset,
-						(dvoid *)&def_buf[col]
-						[row*oracle8conn->
-							maxitembuffersize],
-						oracle8conn->maxitembuffersize,
-						(dvoid *)NULL,
-				(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
-						(ub2)0,
-						(ub1)SQLCS_IMPLICIT);
-
-				// OCILobRead returns OCI_INVALID_HANDLE if
-				// the LOB is NULL.  In that case, return a
-				// NULL field.
-				// Otherwise, start sending the field (if we
-				// haven't already), send a segment of the
-				// LOB, move to the next segment and reset
-				// the amount to read.
-				if (retval==OCI_INVALID_HANDLE) {
-					conn->sendNullField();
-					break;
-				} else {
-					if (start) {
-						conn->startSendingLong(
-								loblength);
-						start=false;
-					}
-					conn->sendLongSegment(
-						(const char *)
-						&def_buf[col]
-						[row*oracle8conn->
-							maxitembuffersize],
-						(uint32_t)retlen);
-					offset=offset+retlen;
-					retlen=oracle8conn->maxitembuffersize;
-				}
-			}
-
-			// if we ever started sending a LOB,
-			// finish sending it now
-			if (!start) {
-				conn->endSendingLong();
-			}
-
-			// handle empty lob's
-			if (!loblength) {
-				conn->startSendingLong(0);
-				conn->sendLongSegment("",0);
-				conn->endSendingLong();
-			}
+			// send the lob
+			sendLob(def_lob[col][row],
+				&def_buf[col][row*oracle8conn->
+						maxitembuffersize]);
 
 #ifdef HAVE_ORACLE_8i
 			// if the lob is temporary, deallocate it
@@ -1592,7 +1543,7 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	// free row/column resources
 	if (freeresult) {
-		for (sword i=0; i<ncols; i++) {
+		for (sword i=0; i<oracle8conn->maxselectlistsize; i++) {
 			for (uint32_t j=0; j<oracle8conn->fetchatonce; j++) {
 				if (def_lob[i][j]) {
 					OCIDescriptorFree(def_lob[i][j],

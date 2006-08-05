@@ -10,11 +10,11 @@
 
 #define NUM_CONNECT_STRING_VARS 6
 
-#include <rudiments/environment.h>
 #include <sqlrconnection.h>
 #ifdef HAVE_ORACLE_8i
 	#include <rudiments/regularexpression.h>
 #endif
+#include <rudiments/environment.h>
 
 extern "C" {
 	#ifdef __CYGWIN__
@@ -126,7 +126,7 @@ class oracle8cursor : public sqlrcursor_svr {
 						sqlrcursor_svr *cursor);
 		void		returnOutputBindBlob(uint16_t index);
 		void		returnOutputBindClob(uint16_t index);
-		void		returnOutputBindGenericLob(uint16_t index);
+		void		sendLob(OCILobLocator *lob, ub1 *buf);
 #endif
 		bool		executeQuery(const char *query,
 						uint32_t length,
@@ -246,7 +246,7 @@ class oracle8connection : public sqlrconnection_svr {
 		ub4		maxselectlistsize;
 		ub4		maxitembuffersize;
 
-		environment	*environ;
+		environment	*envr;
 };
 
 #endif

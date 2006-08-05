@@ -22,8 +22,6 @@ static char tpb[] = {
 };
 
 interbaseconnection::interbaseconnection() : sqlrconnection_svr() {
-	db=0L;
-	tr=0L;
 	env=new environment();
 }
 
@@ -84,6 +82,8 @@ bool interbaseconnection::logIn() {
 	}
 
 	// attach to the database
+	db=0L;
+	tr=0L;
 	if (isc_attach_database(error,charstring::length(database),
 					const_cast<char *>(database),&db,
 					//dpblength,dpb)) {
@@ -605,7 +605,12 @@ const char *interbasecursor::errorMessage(bool *liveconnection) {
 	isc_sql_interprete(sqlcode, msg, 512);
 	errormsg->append(msg);
 
-	*liveconnection=true;
+	*liveconnection=!(charstring::contains(
+				errormsg->getString(),
+				"Error reading data from the connection") ||
+			charstring::contains(
+				errormsg->getString(),
+				"Error writing data to the connection"));
 
 	return errormsg->getString();
 }
