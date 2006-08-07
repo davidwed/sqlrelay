@@ -20,6 +20,9 @@ extern "C" {
 #define NEED_IS_NUMBER_TYPE_CHAR
 #include <datatypes.h>
 
+PyObject *decimalmodule=NULL;
+PyObject *decimal=NULL;
+
 static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
   sqlrconnection *sqlrcon;
   char *host;
@@ -980,7 +983,17 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
       if (!charstring::contains(row_data[counter], '.')) {
           PyList_SetItem(my_list, counter, Py_BuildValue("L", charstring::toInteger(row_data[counter])));
       } else {
-          PyList_SetItem(my_list, counter, Py_BuildValue("f", atof(row_data[counter])));
+          PyObject *obj;
+          if (decimal) {
+            PyObject *tuple=PyTuple_New(1);
+            PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", row_data[counter], row_lengths[counter]));
+            PyObject *dec=PyObject_CallObject(decimal, tuple);
+            obj=PyTuple_New(1);
+            PyTuple_SetItem(obj, 0, dec);
+          } else {
+            obj=Py_BuildValue("f", atof(row_data[counter]));
+          }
+          PyList_SetItem(my_list, counter, obj);
       }
     } else {
       PyList_SetItem(my_list, counter, Py_BuildValue("s#", row_data[counter], row_lengths[counter]));
@@ -1588,6 +1601,16 @@ void
 initCSQLRelay()
 {
   (void) Py_InitModule("SQLRelay.CSQLRelay", SQLRMethods);
+
+  decimalmodule=PyImport_ImportModule("decimal");
+  if (decimalmodule) {
+    decimal=PyObject_GetAttrString(decimalmodule,"Decimal");
+    if (!decimal) {
+      PyErr_Clear();
+    }
+  } else {
+    PyErr_Clear();
+  }
 }
 
 }
