@@ -984,9 +984,7 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
       if (decimal) {
         PyObject *tuple=PyTuple_New(1);
         PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", row_data[counter], row_lengths[counter]));
-        PyObject *dec=PyObject_CallObject(decimal, tuple);
-        obj=PyTuple_New(1);
-        PyTuple_SetItem(obj, 0, dec);
+        obj=PyObject_CallObject(decimal, tuple);
       } else {
         if (!charstring::contains(row_data[counter], '.')) {
           obj=Py_BuildValue("L", charstring::toInteger(row_data[counter]));
