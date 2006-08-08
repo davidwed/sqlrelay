@@ -1,3 +1,28 @@
+semop's can return ENOSPC if the undo list is full which is unhandled and causes
+	deadlocks in the sqlr-listeners.  If we get an ENOSPC, then we need to
+	send the client an error and the sqlr-listener needs to exit.
+
+mysql erroneously returns that the server has gone away for some queries,
+	not sure what to do yet
+
+
+Now I found the reason how 'mysql_affected_rows' cause the httpd halt
+	(with drop-in replacement library)
+
+Compare the following two statement:
+1.
+   $res = mysql_query("delete from data where nbr < 10");
+   echo mysql_affected_rows() . " rows have been deleted";
+
+2.
+   mysql_query("delete from data where nbr < 10");
+   echo mysql_affected_rows() . " rows have been deleted";
+
+The first one using a variable $res, it works fine, but the second with an
+error.
+
+
+
 if a client connects and the forked listener ends up waiting for a connection
 	and the client disconnects, the forked listener has no way of knowing
 	that the client has disconnected and can't bail

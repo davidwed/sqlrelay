@@ -299,6 +299,7 @@ void sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
 		handoffsocklist=new handoffsocketnode[maxconnections];
 		for (int32_t i=0; i<maxconnections; i++) {
 			handoffsocklist[i].pid=0;
+			handoffsocklist[i].sock=NULL;
 		}
 	}
 }

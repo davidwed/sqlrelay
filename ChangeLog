@@ -12,6 +12,9 @@
 	added support for mysql stored procedures
 	integrated Devananda's mysql result set updates
 	sqlrelay.conf.example installed as $datadir/examples/sqlrelay.conf now
+	integrated Andreas Behr's listener crash patch
+	removed erroneous reference to sqlrcon_errormessage in php pear db
+	another multibyte clob fix
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that

@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.18 2006-07-08 03:18:03 mused Exp $
+// $Id: sqlrelay.php,v 1.19 2006-08-08 02:53:23 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -600,8 +600,9 @@ class DB_sqlrelay extends DB_common
         if (sqlrcon_commit($this->connection) == 1) {
             return DB_OK;
         } else {
+            # FIXME: need some way to get a rollback error
             return $this->raiseError(DB_ERROR, null, null, null,
-                                    sqlrcon_errorMessage($this->connection));
+                                                "commit failed");
         }
     }
 
@@ -616,8 +617,9 @@ class DB_sqlrelay extends DB_common
         if (sqlrcon_rollback($this->connection) == 1) {
             return DB_OK;
         } else {
+            # FIXME: need some way to get a rollback error
             return $this->raiseError(DB_ERROR, null, null, null,
-                                    sqlrcon_errorMessage($this->connection));
+                                                "rollback failed");
         }
     }
 

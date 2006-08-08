@@ -52,29 +52,6 @@ class mysqlcursor : public sqlrcursor_svr {
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
-		bool		outputBindString(const char *variable, 
-						uint16_t variablesize,
-						char *value,
-						uint16_t valuesize,
-						int16_t *isnull);
-		bool		outputBindInteger(const char *variable, 
-						uint16_t variablesize,
-						int64_t *value,
-						int16_t *isnull);
-		bool		outputBindDouble(const char *variable, 
-						uint16_t variablesize,
-						double *value,
-						uint32_t *precision,
-						uint32_t *scale,
-						int16_t *isnull);
-		bool		outputBindBlob(const char *variable, 
-						uint16_t variablesize,
-						uint16_t index,
-						int16_t *isnull);
-		bool		outputBindClob(const char *variable, 
-						uint16_t variablesize,
-						uint16_t index,
-						int16_t *isnull);
 #endif
 		bool		executeQuery(const char *query,
 						uint32_t length,
