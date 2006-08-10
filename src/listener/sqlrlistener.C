@@ -887,14 +887,18 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	if (dynamicscaling || semset->getValue(10) || !semset->getValue(2)) {
 
 		// increment the number of "busy listeners"
-		semset->signal(10);
+		if (!semset->signal(10)) {
+			// FIXME: bail somehow
+		}
 
 		forkChild(clientsock);
 
 	} else {
 
 		// increment the number of "busy listeners"
-		semset->signal(10);
+		if (!semset->signal(10)) {
+			// FIXME: bail somehow
+		}
 
 		clientSession(clientsock);
 	}
@@ -1084,7 +1088,9 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		ptr->statistics.forked_listeners>maxlisteners) {
 
 		// since we've decided not to fork, decrement the counters
-		semset->wait(10);
+		if (!semset->wait(10)) {
+			// FIXME: bail somehow
+		}
 		ptr->statistics.forked_listeners--;
 
 		// get auth and ignore the result
@@ -1248,7 +1254,11 @@ void sqlrlistener::incrementSessionCount() {
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",1,"waiting for exclusive access...");
 	#endif
-	semset->waitWithUndo(5);
+
+	if (!semset->waitWithUndo(5)) {
+		// FIXME: bail somehow
+	}
+
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",1,"done waiting for exclusive access...");
 	#endif
@@ -1265,20 +1275,28 @@ void sqlrlistener::incrementSessionCount() {
 
 	if (dynamicscaling) {
 		// signal the scaler
-		semset->signal(6);
+		if (!semset->signal(6)) {
+			// FIXME: bail somehow
+		}
 
 		// wait for the scaler
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",1,"waiting for the scaler...");
 		#endif
-		semset->wait(7);
+
+		if (!semset->wait(7)) {
+			// FIXME: bail somehow
+		}
+
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",1,"done waiting for the scaler...");
 		#endif
 	}
 
 	// signal that others may have access
-	semset->signalWithUndo(5);
+	if (!semset->signalWithUndo(5)) {
+		// FIXME: bail somehow
+	}
 
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"done incrementing session count");
@@ -1365,7 +1383,11 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"decrementing busy listeners");
 	#endif
-	semset->wait(10);
+
+	if (!semset->wait(10)) {
+		// FIXME: bail somehow
+	}
+
 	#ifdef SERVER_DEBUG
 	debugPrint("listener",0,"done decrementing busy listeners");
 	#endif
@@ -1399,7 +1421,11 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"acquiring exclusive shm access");
 		#endif
-		semset->waitWithUndo(1);
+
+		if (!semset->waitWithUndo(1)) {
+			// FIXME: bail somehow
+		}
+
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"done acquiring exclusive shm access");
 		#endif
@@ -1409,7 +1435,11 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		debugPrint("listener",0,
 				"waiting for an available connection");
 		#endif
-		semset->wait(2);
+
+		if (!semset->wait(2)) {
+			// FIXME: bail somehow
+		}
+
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 				"done waiting for an available connection");
@@ -1462,7 +1492,11 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		debugPrint("listener",0,
 				"signalling connection that we've read");
 		#endif
-		semset->signal(3);
+
+		if (!semset->signal(3)) {
+			// FIXME: bail somehow
+		}
+
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,
 				"done signalling connection that we've read");
@@ -1472,7 +1506,11 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"releasing exclusive shm access");
 		#endif
-		semset->signalWithUndo(1);
+
+		if (!semset->signalWithUndo(1)) {
+			// FIXME: bail somehow
+		}
+
 		#ifdef SERVER_DEBUG
 		debugPrint("listener",0,"done releasing exclusive shm access");
 		#endif
