@@ -146,13 +146,15 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// if the reexecute flag is set, the query doesn't need to be prepared 
 	// again.
 	bool	success=false;
+	bool	doegress=true;
 	if (reexecute) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"re-executing...");
 		#endif
-		if (supportsNativeBinds()) {
+		if (cursor->supportsNativeBinds()) {
 			if (cursor->sql_injection_detection_ingress(
 							cursor->querybuffer)) {
+				doegress=false;
 				success=true;
 			} else {
 				success=(cursor->handleBinds() && 
@@ -161,8 +163,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							cursor->querylength,
 							reallyexecute));
 			}
-			cursor->sid_egress=
-				cursor->sql_injection_detection_egress();
 		} else {
 			stringbuffer	*newquery=cursor->fakeInputBinds(
 							cursor->querybuffer);
@@ -173,6 +173,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 						newquery->getStringLength():
 						cursor->querylength;
 			if (cursor->sql_injection_detection_ingress(queryptr)) {
+				doegress=false;
 				success=true;
 			} else {
 				success=executeQueryUpdateStats(cursor,
@@ -180,8 +181,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							querylen,
 							reallyexecute);
 			}
-			cursor->sid_egress=
-				cursor->sql_injection_detection_egress();
 			delete newquery;
 		}
 	} else if (bindcursor) {
@@ -190,6 +189,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		#endif
 		if (cursor->sql_injection_detection_ingress(
 						cursor->querybuffer)) {
+			doegress=false;
 			success=true;
 		} else {
 			success=executeQueryUpdateStats(cursor,
@@ -197,55 +197,63 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							cursor->querylength,
 							reallyexecute);
 		}
-		cursor->sid_egress=
-			cursor->sql_injection_detection_egress();
 	} else {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",3,"preparing/executing...");
 		#endif
-		if (supportsNativeBinds()) {
-			if (cursor->sql_injection_detection_ingress(
-							cursor->querybuffer)) {
-				success=true;
-			} else {
-				success=(cursor->prepareQuery(
-							cursor->querybuffer,
-							cursor->querylength) && 
-					cursor->handleBinds() && 
-					executeQueryUpdateStats(cursor,
+		if (cursor->sql_injection_detection_ingress(
+						cursor->querybuffer)) {
+			doegress=false;
+			success=true;
+		} else {
+			success=cursor->prepareQuery(cursor->querybuffer,
+							cursor->querylength);
+			if (success) {
+				if (cursor->supportsNativeBinds()) {
+					success=(cursor->handleBinds() &&
+						executeQueryUpdateStats(
+							cursor,
 							cursor->querybuffer,
 							cursor->querylength,
 							true));
-			}
-			cursor->sid_egress=
-				cursor->sql_injection_detection_egress();
-		} else {
-			stringbuffer	*newquery=cursor->fakeInputBinds(
+				} else {
+					stringbuffer	*newquery=
+						cursor->fakeInputBinds(
 							cursor->querybuffer);
-			const char	*queryptr=(newquery)?
+					const char	*queryptr=
+						(newquery)?
 						newquery->getString():
 						cursor->querybuffer;
-			uint32_t	querylen=(newquery)?
+					uint32_t	querylen=
+						(newquery)?
 						newquery->getStringLength():
 						cursor->querylength;
-			if (cursor->sql_injection_detection_ingress(queryptr)) {
-				success=true;
-			} else {
-				success=(cursor->prepareQuery(
-							cursor->querybuffer,
-							cursor->querylength) && 
-					executeQueryUpdateStats(cursor,
-							queryptr,
-							querylen,true));
+					bool	execquery=true;
+					if (queryptr!=cursor->querybuffer) {
+						if (cursor->
+						sql_injection_detection_ingress(
+							cursor->querybuffer)) {
+							doegress=false;
+							execquery=false;
+						}
+					}
+					if (execquery) {
+						success=executeQueryUpdateStats(
+								cursor,
+								queryptr,
+								querylen,true);
+					}
+					delete newquery;
+				}
 			}
-			cursor->sid_egress=
-				cursor->sql_injection_detection_egress();
-			delete newquery;
 		}
 	}
 
-// FIXME: is this right?
+	if (doegress) {
+		cursor->sid_egress=cursor->sql_injection_detection_egress();
+	}
 	if (cursor->sid_egress) {
+		// FIXME: init this to false somewhere!
 		cursor->sql_injection_detection=true;
 	}
 

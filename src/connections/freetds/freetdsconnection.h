@@ -33,6 +33,7 @@ class freetdscursor : public sqlrcursor_svr {
 		bool		closeCursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+		bool		supportsNativeBinds();
 #ifdef FREETDS_SUPPORTS_CURSORS
 		bool		inputBindString(const char *variable,
 						uint16_t variablesize,
@@ -146,7 +147,6 @@ class freetdsconnection : public sqlrconnection_svr {
 			~freetdsconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
-		bool		supportsNativeBinds();
 		void	handleConnectString();
 		bool	logIn();
 		void	logInError(const char *error, uint16_t stage);

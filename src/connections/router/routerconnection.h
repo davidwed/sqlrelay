@@ -37,6 +37,7 @@ class routercursor : public sqlrcursor_svr {
 				~routercursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+		bool		supportsNativeBinds();
 		bool		begin(const char *query, uint32_t length);
 		bool		inputBindString(const char *variable, 
 						uint16_t variablesize,
@@ -138,7 +139,6 @@ class routerconnection : public sqlrconnection_svr {
 			~routerconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
-		bool		supportsNativeBinds();
 		void		handleConnectString();
 		bool		logIn();
 		sqlrcursor_svr	*initCursor();

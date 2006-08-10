@@ -2,9 +2,7 @@ semop's can return ENOSPC if the undo list is full which is unhandled and causes
 	deadlocks in the sqlr-listeners.  If we get an ENOSPC, then we need to
 	send the client an error and the sqlr-listener needs to exit.
 
-mysql erroneously returns that the server has gone away for some queries,
-	not sure what to do yet
-
+--------------------------------------------------------------------------------
 
 Now I found the reason how 'mysql_affected_rows' cause the httpd halt
 	(with drop-in replacement library)
@@ -21,13 +19,11 @@ Compare the following two statement:
 The first one using a variable $res, it works fine, but the second with an
 error.
 
-
+--------------------------------------------------------------------------------
 
 if a client connects and the forked listener ends up waiting for a connection
 	and the client disconnects, the forked listener has no way of knowing
 	that the client has disconnected and can't bail
-
-python API can only handle 15 digit numbers or so (limit of 32/64 bit number)
 
 include_once DB/sqlrelay.php crashes
 test PHP Pear DB bind inside quotes fix
@@ -38,20 +34,12 @@ query router:
 	support accessing different db's by specifying a different user/password
 	support accessing different db's by specifying which db to use
 
-mysql 3:
-	non c++ tests
-
-mysql 4.1.2:
-	non c++ tests
-
 mysql 5.x:
-	stored function fails
 	document using stored procedures
 
-	implement clob/blob output bind vars
-	test output binds
+--------------------------------------------------------------------------------
 
-	looks like maybe all output binds won't work...
+mysql output binds:
 
 >So you'll be needing to make several calls to mysql_next_result() to get the OUT/INOUT values.
 

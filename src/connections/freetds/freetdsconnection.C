@@ -40,14 +40,6 @@ uint16_t freetdsconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-bool freetdsconnection::supportsNativeBinds() {
-#ifdef FREETDS_SUPPORTS_CURSORS
-	return true;
-#else
-	return false;
-#endif
-}
-
 void freetdsconnection::handleConnectString() {
 	sybase=connectStringValue("sybase");
 	lang=connectStringValue("lang");
@@ -487,6 +479,14 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 	clean=false;
 	prepared=true;
 	return true;
+}
+
+bool freetdscursor::supportsNativeBinds() {
+#ifdef FREETDS_SUPPORTS_CURSORS
+	return true;
+#else
+	return false;
+#endif
 }
 
 void freetdscursor::checkRePrepare() {

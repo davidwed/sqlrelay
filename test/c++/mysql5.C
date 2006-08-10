@@ -1049,6 +1049,34 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table temptable\n");
 	printf("\n");
 
+	// stored functions
+	printf("FUNCTIONS: \n");
+	cur->sendQuery("drop function if exists testfunc");
+	checkSuccess(cur->sendQuery("create function testfunc(in1 int, in2 int) returns int return in1+in2;"),1);
+	cur->prepareQuery("select testfunc(?,?)");
+	cur->inputBind("1",10);
+	cur->inputBind("2",20);
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"30");
+	cur->sendQuery("drop function if exists testfunc");
+	printf("\n");
+
+	// stored procedures
+	printf("STORED PROCEDURES: \n");
+	// return no values
+	cur->sendQuery("drop procedure if exists testproc");
+	checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 float, in in3 char(20)) begin select in1, in2, in3; end;"),1);
+	cur->prepareQuery("call testproc(:in1,:in2,:in3)");
+	cur->inputBind("in1",1);
+	cur->inputBind("in2",1.1,4,2);
+	cur->inputBind("in3","hello");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->getField(0,(uint32_t)1),"1.1");
+	checkSuccess(cur->getField(0,(uint32_t)2),"hello");
+	cur->sendQuery("drop function testproc");
+	printf("\n");
+
 	// invalid queries...
 	printf("INVALID QUERIES: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testtinyint"),0);

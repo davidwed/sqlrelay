@@ -3,6 +3,10 @@
 
 #include <sqlrconnection.h>
 
+bool sqlrcursor_svr::supportsNativeBinds() {
+	return true;
+}
+
 bool sqlrcursor_svr::handleBinds() {
 	
 	// iterate through the arrays, binding values to variables

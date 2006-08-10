@@ -13,10 +13,6 @@ uint16_t msqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-bool msqlconnection::supportsNativeBinds() {
-	return false;
-}
-
 void msqlconnection::handleConnectString() {
 	host=connectStringValue("host");
 	db=connectStringValue("db");
@@ -104,6 +100,10 @@ msqlcursor::msqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 msqlcursor::~msqlcursor() {
 	delete[] columnnames;
+}
+
+bool msqlcursor::supportsNativeBinds() {
+	return false;
 }
 
 bool msqlcursor::executeQuery(const char *query, uint32_t length,

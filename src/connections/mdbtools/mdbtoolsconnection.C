@@ -23,10 +23,6 @@ uint16_t mdbtoolsconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-bool mdbtoolsconnection::supportsNativeBinds() {
-	return false;
-}
-
 void mdbtoolsconnection::handleConnectString() {
 	db=connectStringValue("db");
 }
@@ -113,6 +109,10 @@ bool mdbtoolscursor::closeCursor() {
 
 	mdb_sql_exit(&mdbsql);
 	return true;
+}
+
+bool mdbtoolscursor::supportsNativeBinds() {
+	return false;
 }
 
 bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,

@@ -32,14 +32,6 @@ uint16_t postgresqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-bool postgresqlconnection::supportsNativeBinds() {
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
-	return !fakebinds;
-#else
-	return false;
-#endif
-}
-
 void postgresqlconnection::handleConnectString() {
 	host=connectStringValue("host");
 	port=connectStringValue("port");
@@ -386,6 +378,14 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 	return true;
 }
 #endif
+
+bool postgresqlcursor::supportsNativeBinds() {
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+	return !postgresqlconn->fakebinds;
+#else
+	return false;
+#endif
+}
 
 bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {

@@ -3,10 +3,6 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection_svr::supportsNativeBinds() {
-	return true;
-}
-
 short sqlrconnection_svr::nonNullBindValue() {
 	return 0;
 }

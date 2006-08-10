@@ -37,10 +37,6 @@ uint16_t routerconnection::getNumberOfConnectStringVars() {
 	return 0;
 }
 
-bool routerconnection::supportsNativeBinds() {
-	return true;
-}
-
 void routerconnection::handleConnectString() {
 
 	cfgfile=cfgfl;
@@ -345,6 +341,10 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// connection turned out to be the right one
 	cur->prepareQuery(query);
 
+	return true;
+}
+
+bool routercursor::supportsNativeBinds() {
 	return true;
 }
 

@@ -29,6 +29,9 @@ class mysqlcursor : public sqlrcursor_svr {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+#endif
+		bool		supportsNativeBinds();
+#ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -109,7 +112,6 @@ class mysqlconnection : public sqlrconnection_svr {
 				mysqlconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
-		bool		supportsNativeBinds();
 		void		handleConnectString();
 		bool		logIn();
 #ifdef HAVE_MYSQL_CHANGE_USER

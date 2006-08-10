@@ -17,6 +17,7 @@ class msqlcursor : public sqlrcursor_svr {
 	private:
 				msqlcursor(sqlrconnection_svr *conn);
 				~msqlcursor();
+		bool		supportsNativeBinds();
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -51,7 +52,6 @@ class msqlconnection : public sqlrconnection_svr {
 			msqlconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
-		bool		supportsNativeBinds();
 		void	handleConnectString();
 		bool	logIn();
 		sqlrcursor_svr	*initCursor();

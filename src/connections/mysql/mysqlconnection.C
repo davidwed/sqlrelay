@@ -26,14 +26,6 @@ uint16_t mysqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-bool mysqlconnection::supportsNativeBinds() {
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	return !fakebinds;
-#else
-	return false;
-#endif
-}
-
 void mysqlconnection::handleConnectString() {
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
@@ -256,7 +248,17 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	return !mysql_stmt_prepare(stmt,query,length);
 }
+#endif
 
+bool mysqlcursor::supportsNativeBinds() {
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	return (!mysqlconn->fakebinds && usestmtprepare);
+#else
+	return false;
+#endif
+}
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 

@@ -26,10 +26,6 @@ uint16_t sqliteconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-bool sqliteconnection::supportsNativeBinds() {
-	return false;
-}
-
 void sqliteconnection::handleConnectString() {
 	db=connectStringValue("db");
 }
@@ -111,6 +107,10 @@ sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 sqlitecursor::~sqlitecursor() {
 	cleanUpData(true,true);
+}
+
+bool sqlitecursor::supportsNativeBinds() {
+	return false;
 }
 
 bool sqlitecursor::executeQuery(const char *query, uint32_t length,

@@ -25,6 +25,9 @@ class postgresqlcursor : public sqlrcursor_svr {
 		bool		openCursor(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+#endif
+		bool		supportsNativeBinds();
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 		bool		inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -93,7 +96,6 @@ class postgresqlconnection : public sqlrconnection_svr {
 	friend class postgresqlcursor;
 	private:
 		uint16_t	getNumberOfConnectStringVars();
-		bool		supportsNativeBinds();
 		void		handleConnectString();
 		bool		logIn();
 		sqlrcursor_svr	*initCursor();

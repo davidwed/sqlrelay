@@ -21,6 +21,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 				~mdbtoolscursor();
 		bool		openCursor(uint16_t id);
 		bool		closeCursor();
+		bool		supportsNativeBinds();
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -52,7 +53,6 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 			mdbtoolsconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
-		bool		supportsNativeBinds();
 		void	handleConnectString();
 		bool	logIn();
 		sqlrcursor_svr	*initCursor();

@@ -110,12 +110,7 @@ uint16_t statusconnection::getNumberOfConnectStringVars() {
 	return 0;
 }
 
-bool statusconnection::supportsNativeBinds() {
-	return false;
-}
-
 void statusconnection::handleConnectString() {
-	
 }
 
 bool statusconnection::logIn() {

@@ -16,7 +16,6 @@ class statusconnection : public sqlrconnection_svr {
 		bool				init(int argc, const char **argv);
 	private:
 		uint16_t	getNumberOfConnectStringVars();
-		bool		supportsNativeBinds();
 		void		handleConnectString();
 		bool		logIn();
 		sqlrcursor_svr	*initCursor();

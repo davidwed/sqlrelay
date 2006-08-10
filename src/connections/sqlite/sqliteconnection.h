@@ -27,6 +27,7 @@ class sqlitecursor : public sqlrcursor_svr {
 	private:
 				sqlitecursor(sqlrconnection_svr *conn);
 				~sqlitecursor();
+		bool		supportsNativeBinds();
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -64,7 +65,6 @@ class sqliteconnection : public sqlrconnection_svr {
 				sqliteconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
-		bool		supportsNativeBinds();
 		void		handleConnectString();
 		bool		logIn();
 		sqlrcursor_svr	*initCursor();
