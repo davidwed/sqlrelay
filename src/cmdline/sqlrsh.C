@@ -46,6 +46,7 @@ class	environment {
 		bool	stats;
 		bool	debug;
 		bool	final;
+		char	delimiter;
 };
 
 environment::environment() {
@@ -54,6 +55,7 @@ environment::environment() {
 	stats=true;
 	debug=false;
 	final=false;
+	delimiter=';';
 }
 
 class	sqlrsh {
@@ -76,7 +78,9 @@ class	sqlrsh {
 					sqlrcursor *sqlrcur, environment *env, 
 					const char *filename, bool returnerror,
 					bool displaycommand);
-		bool	getCommandFromFile(file *fl, stringbuffer *cmdbuffer);
+		bool	getCommandFromFile(file *fl,
+					stringbuffer *cmdbuffer,
+					environment *env);
 		bool	runCommand(sqlrconnection *sqlrcon, 
 					sqlrcursor *sqlrcur, 
 					environment *env, const char *command);
@@ -161,7 +165,7 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		
 			// get a command
 			stringbuffer	command;
-			if (!getCommandFromFile(&scriptfile,&command)) {
+			if (!getCommandFromFile(&scriptfile,&command,env)) {
 				break;
 			}
 
@@ -191,7 +195,8 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	delete[] trimmedfilename;
 }
 
-bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer) {
+bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
+						environment *env) {
 
 	char	character;
 	
@@ -214,7 +219,7 @@ bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer) {
 		}
 
 		// look for an end of command delimiter
-		if (character==';') {
+		if (character==env->delimiter) {
 			return true;
 		}
 
@@ -261,7 +266,9 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"ping",4) ||
 		!charstring::compareIgnoringCase(ptr,"identify",8) ||
 		!charstring::compareIgnoringCase(ptr,"run",3) ||
-		!charstring::compareIgnoringCase(ptr,"@",1)) {
+		!charstring::compareIgnoringCase(ptr,"@",1) ||
+		!charstring::compareIgnoringCase(ptr,"delimiter",9) ||
+		!charstring::compareIgnoringCase(ptr,"delimeter",9)) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -315,6 +322,10 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"@",1)) {	
 		ptr=ptr+1;
 		cmdtype=6;
+	} else if (!charstring::compareIgnoringCase(ptr,"delimiter",9) ||
+			!charstring::compareIgnoringCase(ptr,"delimeter",9)) {	
+		ptr=ptr+9;
+		cmdtype=7;
 	} else if (!charstring::compareIgnoringCase(ptr,"identify",8)) {	
 		identify(sqlrcon,env);
 		return;
@@ -329,19 +340,14 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 	// handle scripts
 	if (cmdtype==6) {
-		//runScript(sqlrcon,sqlrcur,env,ptr,true,true);
 		runScript(sqlrcon,sqlrcur,env,ptr,true,false);
 		return;
 	}
 
 	// on or off?
-	bool	toggle;
+	bool	toggle=false;
 	if (!charstring::compareIgnoringCase(ptr,"on",2)) {
 		toggle=true;
-	} else if (!charstring::compareIgnoringCase(ptr,"off",3)) {
-		toggle=false;
-	} else {
-		return;
 	}
 
 	// set parameter
@@ -355,6 +361,11 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		env->debug=toggle;
 	} else if (cmdtype==5) {
 		env->final=toggle;
+	} else if (cmdtype==7) {
+		env->delimiter=ptr[0];
+		cyan(env);
+		printf("Delimiter set to %c\n",env->delimiter);
+		white(env);
 	}
 }
 
@@ -591,39 +602,43 @@ void sqlrsh::displayHelp(environment *env) {
 		"	followed by a semicolon.  Queries may be \n"
 		"	split over multiple lines.\n\n");
 	cyan(env);
-	printf("		ping		- ");
+	printf("	ping			- ");
 	green(env);
 	printf("pings the database\n");
 	cyan(env);
-	printf("		identify	- ");
+	printf("	identify		- ");
 	green(env);
 	printf("returns the type of database\n");
 	cyan(env);
-	printf("		run script	- ");
+	printf("	run script		- ");
 	green(env);
 	printf("runs commands contained in file \"script\"\n");
 	cyan(env);
-	printf("		color on/off	- ");
+	printf("	color on/off		- ");
 	green(env);
 	printf("toggles colorizing\n");
 	cyan(env);
-	printf("		headers on/off	- ");
+	printf("	headers on/off		- ");
 	green(env);
 	printf("toggles column descriptions before result set\n");
 	cyan(env);
-	printf("		stats on/off	- ");
+	printf("	stats on/off		- ");
 	green(env);
 	printf("toggles statistics after result set\n");
 	cyan(env);
-	printf("		debug on/off	- ");
+	printf("	debug on/off		- ");
 	green(env);
 	printf("toggles debug messages\n");
 	cyan(env);
-	printf("		final on/off	- ");
+	printf("	final on/off		- ");
 	green(env);
 	printf("toggles use of one session per query\n");
 	cyan(env);
-	printf("		exit/quit	- ");
+	printf("	delimiter [character]	- ");
+	green(env);
+	printf("sets delimiter character to [character]\n");
+	cyan(env);
+	printf("	exit/quit		- ");
 	green(env);
 	printf("exits\n\n");
 	yellow(env);
@@ -686,7 +701,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			done=false;
 			for (size_t i=0; i<len; i++) {
 				if (i==len-1) {
-				       if (cmd[i]==';') {
+				       if (cmd[i]==env->delimiter) {
 						done=true;
 					} else {
 						command.append(cmd[i]);

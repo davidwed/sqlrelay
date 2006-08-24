@@ -15,6 +15,8 @@
 	integrated Andreas Behr's listener crash patch
 	removed erroneous reference to sqlrcon_errormessage in php pear db
 	another multibyte clob fix
+	added "delimiter" command to sqlrsh to change
+		delimiter from ; to whatever
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that
