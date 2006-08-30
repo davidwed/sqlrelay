@@ -122,44 +122,6 @@ connect to, but if host starts with a / then it indicates that SQL Relay should
 look for a file in the directory specifid by the host parameter starting with
 .s.PGSQL. and ending in the port number.</p>
 
-<span class="heading3">mSQL</span>
-
-<p>mSQL supports local connections over a unix socket.</p>
-
-<p>By default, mSQL is usually configured to accept local connections.  To make
-sure mSQL is configuerd to accept local connections, edit the mSQL
-configuration file (usually /usr/local/Hughes/msql.conf) and add a line like
-the following to the [general] section if it's not already there:</p>
-
-<blockquote>
-<font color="#298a52"><b>UNIX_Port =</b></font> %I/msql2.sock
-</blockquote>
-
-<p>The full pathname of the file can be specified, or %I can be used to
-refer to the path specified in the Inst_Dir parameter
-(usually /usr/local/Hughes).</p>
-
-<p>Now restart mSQL.</p>
-
-<p>To configure SQL Relay to connect to mSQL using the local connection,
-edit the sqlrelay.conf file and make sure that the connectstring for the
-mSQL instance doesn't contain a host parameter, as follows:</p>
-
-<blockquote>
-<font color="#ff00ff">db=testdb</font>
-</blockquote>
-
-<p>as opposed to:</p>
-
-<blockquote>
-<font color="#ff00ff">host=localhost;db=testdb</font>
-</blockquote>
-
-<p>Leaving out the host parameter causes SQL Relay to read the msql.conf file
-and connect to whatever unix socket is specified in that file.  It is important
-that msql.conf be readable by whatever user SQL Relay is configured to run
-as.</p>
-
 <span class="heading3">Oracle</span>
 
 <p>Oracle supports local connections over IPC using shared memory.</p>

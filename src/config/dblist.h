@@ -5,7 +5,6 @@ char	*databaselist[]={
 	"oracle7",
 	"oracle8",
 	"mysql",
-	"msql",
 	"postgresql",
 	"sqlite",
 	"freetds",

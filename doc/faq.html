@@ -96,7 +96,7 @@ work?</a></li>
 
 <p>
 SQL Relay is a persistent database connection pooling, proxying and load 
-balancing system for Unix and Linux supporting ODBC, Oracle, MySQL, mSQL, 
+balancing system for Unix and Linux supporting ODBC, Oracle, MySQL,
 PostgreSQL, Sybase, MS SQL Server, IBM DB2, Interbase, SQLite and
 MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
 Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java and TCL, drop-in replacement
@@ -400,7 +400,7 @@ calls and does not support those datatypes.</p>
 <a name="canxxxdb"></a>
 <span class="heading3">Can I use SQL Relay to connect to XXX database?</span>
 
-<p>SQL Relay can connect to Oracle, MySQL, mSQL, PostgreSQL, Sybase, 
+<p>SQL Relay can connect to Oracle, MySQL, PostgreSQL, Sybase, 
 DB2, Interbase and SQLite databases using connection daemons compiled against
 their native API's.  Additionally, SQL Relay can connect to Microsoft SQL Server
 or Sybase using a connection compiled against FreeTDS and MS Access Databases
@@ -430,13 +430,6 @@ database with an ODBC driver for any platform.</p>
 </tr>
 <tr>
 <td><b>MySQL</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>mSQL</b></td>
 <td>Yes</td>
 <td>Yes</td>
 <td>No</td>
@@ -522,13 +515,6 @@ database with an ODBC driver for any platform.</p>
 </tr>
 <tr>
 <td><b>MySQL</b></td>
-<td>Yes</td>
-<td>Scalar Input</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>mSQL</b></td>
 <td>Yes</td>
 <td>Scalar Input</td>
 <td>No</td>
@@ -668,7 +654,7 @@ this by not requesting the affected row count and just returning -1 if it's
 compiled against FreeTDS&lt;0.53.</li>
 <li>Bind variables are unsupported.  The ct_param and ct_setparam functions
 simply don't exist in FreeTDS ctlib.  SQL Relay handles this by faking input 
-bind variables in the same manner that the mSQL, SQLite and
+bind variables in the same manner that the SQLite and
 MDB Tools connections do.</li>
 <li>FLOAT, NUMERIC and DECIMAL datatypes are all represented as FLOAT 
 datatypes.  There doesn't appear to be any workaround for this.</li>

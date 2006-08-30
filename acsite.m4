@@ -990,68 +990,6 @@ AC_DEFUN([FW_CHECK_MYSQL_FUNCTIONS],
 ])
 
 
-AC_DEFUN([FW_CHECK_MSQL],
-[
-if ( test "$ENABLE_MSQL" = "yes" )
-then
-
-	MSQLINCLUDES=""
-	MSQLLIBS=""
-	MSQLLIBSPATH=""
-	MSQLSTATIC=""
-	STATICFLAG=""
-
-	if ( test "$cross_compiling" = "yes" )
-	then
-
-		dnl cross compiling ...
-		echo "cross compiling"
-		if ( test -n "$MSQLPATH" )
-		then
-			MSQLINCLUDES="-I$MSQLPATH/include"
-			MSQLLIBS="-L$MSQLPATH/lib -lmsql"
-			MSQLLIBSPATH="$MSQLPATH/lib"
-		fi
-
-	else
-
-		if ( test -n "$STATICLINK" )
-		then
-			STATICFLAG="-static"
-		fi
-		
-		for i in "$MSQLPATH" "/usr/local/Hughes"
-		do
-			if ( test -n "$i" -a -d "$i" )
-			then
-				FW_CHECK_HEADER_LIB([$i/include/msql.h],[MSQLINCLUDES=\"-I$i/include\"; MSQLPATH=\"$i\"],[$i/lib/libmsql.$SOSUFFIX],[MSQLLIBSPATH=\"$i/lib\"; MSQLLIBS=\"-L$i/lib -lmsql\"],[$i/lib/libmsql.a],[MSQLLIBS=\"-L$i/lib -lmsql\"])
-				if ( test -n "$MSQLLIBS" )
-				then
-					break
-				fi
-			fi
-		done
-
-		FW_CHECK_HEADER_LIB([/usr/include/msql.h],[MSQLINCLUDES=\"\"; MSQLPATH=\"\"],[/usr/lib/libmsql.$SOSUFFIX],[MSQLLIBSPATH=\"\"; MSQLLIBS=\"-lmsql\"],[/usr/lib/libmsql.a],[MSQLLIBS=\"-lmsql\"])
-		
-		if ( test -z "$MSQLLIBS" )
-		then
-			AC_MSG_WARN(mSQL support will not be built.)
-		fi
-	fi
-
-	FW_INCLUDES(msql,[$MSQLINCLUDES])
-	FW_LIBS(msql,[$MSQLLIBS])
-		
-	AC_SUBST(MSQLINCLUDES)
-	AC_SUBST(MSQLLIBS)
-	AC_SUBST(MSQLLIBSPATH)
-	AC_SUBST(MSQLSTATIC)
-fi
-])
-
-
-
 AC_DEFUN([FW_CHECK_POSTGRESQL],
 [
 if ( test "$ENABLE_POSTGRESQL" = "yes" )

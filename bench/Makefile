@@ -12,9 +12,6 @@ endif
 ifneq ($(MYSQLLIBS),)
 	$(MAKE) -C mysql all
 endif
-ifneq ($(MSQLLIBS),)
-	$(MAKE) -C msql all
-endif
 ifneq ($(POSTGRESQLLIBS),)
 	$(MAKE) -C postgresql all
 endif
@@ -42,7 +39,6 @@ clean:
 	$(MAKE) -C oracle7 clean
 	$(MAKE) -C oracle8 clean
 	$(MAKE) -C mysql clean
-	$(MAKE) -C msql clean
 	$(MAKE) -C postgresql clean
 	$(MAKE) -C sqlite clean
 	$(MAKE) -C freetds clean

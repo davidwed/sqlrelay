@@ -83,7 +83,7 @@ by hand.</p>
         <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance addresses <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;0.0.0.0&quot;</font><font color="#008b8b">&gt;</font>
         <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance port <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;9000&quot;</font><font color="#008b8b">&gt;</font>
         <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance socket <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;/tmp/sqlrelay.socket&quot;</font><font color="#008b8b">&gt;</font>
-        <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance dbase <font color="#2e8b57"><b>(</b></font><font color="#ff00ff">oracle7</font><font color="#008b8b">|</font><font color="#ff00ff">oracle8</font><font color="#008b8b">|</font><font color="#ff00ff">mysql</font><font color="#008b8b">|</font><font color="#ff00ff">msql</font><font color="#008b8b">|</font><font color="#ff00ff">postgresql</font><font color="#008b8b">|</font><font color="#ff00ff">sqlite</font><font color="#008b8b">|</font><font color="#ff00ff">freetds</font><font color="#008b8b">|</font><font color="#ff00ff">sybase</font><font color="#008b8b">|</font><font color="#ff00ff">odbc</font><font color="#008b8b">|</font><font color="#ff00ff">db2</font><font color="#008b8b">|</font><font color="#ff00ff">interbase</font><font color="#008b8b">|</font><font color="#ff00ff">mdbtools</font><font color="#2e8b57"><b>)</b></font> <font color="#ff00ff">&quot;oracle8&quot;</font><font color="#008b8b">&gt;</font>
+        <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance dbase <font color="#2e8b57"><b>(</b></font><font color="#ff00ff">oracle7</font><font color="#008b8b">|</font><font color="#ff00ff">oracle8</font><font color="#008b8b">|</font><font color="#ff00ff">mysql</font><font color="#008b8b">|</font><font color="#ff00ff">postgresql</font><font color="#008b8b">|</font><font color="#ff00ff">sqlite</font><font color="#008b8b">|</font><font color="#ff00ff">freetds</font><font color="#008b8b">|</font><font color="#ff00ff">sybase</font><font color="#008b8b">|</font><font color="#ff00ff">odbc</font><font color="#008b8b">|</font><font color="#ff00ff">db2</font><font color="#008b8b">|</font><font color="#ff00ff">interbase</font><font color="#008b8b">|</font><font color="#ff00ff">mdbtools</font><font color="#2e8b57"><b>)</b></font> <font color="#ff00ff">&quot;oracle8&quot;</font><font color="#008b8b">&gt;</font>
         <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance connections <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;1&quot;</font><font color="#008b8b">&gt;</font>
         <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance maxconnections <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;1&quot;</font><font color="#008b8b">&gt;</font>
         <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance maxqueuelength <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;0&quot;</font><font color="#008b8b">&gt;</font>
@@ -184,7 +184,7 @@ and <b>filter</b> tags use to match queries.</p>
 <li><b>addresses</b> - A comma-delimited list of addresses that the sqlr-listener and sqlr-connection daemons should bind to.  If absent or set to 0.0.0.0, they will bind to all addresses.</li>
 <li><b>port</b> - the port the listener should listen on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time)</li>
 <li><b>socket</b> - the unix socket (filename) the listener should listen on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time)</li>
-<li><b>dbase</b> - the type of database the connection daemon should connect to.  Should be one of: oracle7, oracle8, mysql, msql, postgresql, sqlite, freetds, sybase, odbc, db2, interbase or mdbtools</li>
+<li><b>dbase</b> - the type of database the connection daemon should connect to.  Should be one of: oracle7, oracle8, mysql, postgresql, sqlite, freetds, sybase, odbc, db2, interbase or mdbtools</li>
 <li><b>connections</b> - the number of sqlr-connection daemons to start up when using sqlr-start.</li>
 <li><b>maxconnections</b> - the maximum number of sqlr-connection daemons to scale to.</li>
 <li><b>maxqueuelength</b> - the size the queue of waiting clients has to grow to before more connections will be spawned.</li>
@@ -300,12 +300,6 @@ can be a lot of work, so this parameter is provided to make code which was
 written to run against older versions of MySQL work against MySQL 4.1.2.  This
 parameter may be set to "yes" (meaning allow only older syntax and fake binds)
 or "no" (meaning only allow MySQL 4.1.2 syntax and use native binds).</li>
-</ul>
-</li>
-<li>For <b>msql</b> databases, the connect string syntax is "host=HOST;db=DB;"
-<ul>
-<li><b>host</b>: The host to connect to.  Optional, defaults to localhost.</li>
-<li><b>db</b>: The database to log into.  Required.</li>
 </ul>
 </li>
 <li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;"

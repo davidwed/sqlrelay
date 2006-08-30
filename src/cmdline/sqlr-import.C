@@ -283,7 +283,7 @@ bool sqlrimport::sequenceTagEnd() {
 
 	bool	supported=true;
 		supported=false;
-	// sqlite, msql, mysql, sybase/mssql have autoincrementing fields
+	// sqlite, mysql, sybase/mssql have autoincrementing fields
 	// mdbtools has nothing
 	// odbc can't tell what kind of underlying db we're using
 	if (!charstring::compare(dbtype,"interbase")) {

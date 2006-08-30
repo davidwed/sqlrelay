@@ -14,9 +14,6 @@ endif
 ifneq ($(strip $(INTERBASELIBS)),)
 	$(MAKE) interbase.class
 endif
-ifneq ($(strip $(MSQLLIBS)),)
-	$(MAKE) msql.class
-endif
 ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql.class
 endif
@@ -49,9 +46,6 @@ freetds.class: freetds.java
 
 interbase.class: interbase.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar interbase.java
-
-msql.class: msql.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar msql.java
 
 mysql.class: mysql.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar mysql.java

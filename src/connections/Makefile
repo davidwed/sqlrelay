@@ -16,9 +16,6 @@ endif
 ifneq ($(strip $(MDBTOOLSLIBS)),)
 	$(MAKE) -C mdbtools all
 endif
-ifneq ($(strip $(MSQLLIBS)),)
-	$(MAKE) -C msql all
-endif
 ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) -C mysql all
 endif
@@ -48,7 +45,6 @@ clean:
 	$(MAKE) -C freetds clean
 	$(MAKE) -C interbase clean
 	$(MAKE) -C mdbtools clean
-	$(MAKE) -C msql clean
 	$(MAKE) -C mysql clean
 	$(MAKE) -C odbc clean
 	$(MAKE) -C oracle7 clean
@@ -73,9 +69,6 @@ ifneq ($(strip $(INTERBASELIBS)),)
 endif
 ifneq ($(strip $(MDBTOOLSLIBS)),)
 	$(MAKE) -C mdbtools install
-endif
-ifneq ($(strip $(MSQLLIBS)),)
-	$(MAKE) -C msql install
 endif
 ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) -C mysql install
@@ -106,7 +99,6 @@ uninstall:
 	$(MAKE) -C freetds uninstall
 	$(MAKE) -C interbase uninstall
 	$(MAKE) -C mdbtools uninstall
-	$(MAKE) -C msql uninstall
 	$(MAKE) -C mysql uninstall
 	$(MAKE) -C odbc uninstall
 	$(MAKE) -C oracle7 uninstall

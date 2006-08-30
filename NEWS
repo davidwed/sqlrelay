@@ -1,5 +1,5 @@
 SQL Relay is a persistent database connection pooling, proxying and load 
-balancing system for Unix and Linux supporting ODBC, Oracle, MySQL, mSQL, 
+balancing system for Unix and Linux supporting ODBC, Oracle, MySQL,
 PostgreSQL, Sybase, MS SQL Server, IBM DB2, Interbase, SQLite and
 MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
 Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java and TCL, drop-in replacement

@@ -11,7 +11,6 @@
 # --without freetds
 # --without interbase
 # --without mdbtools
-# --without msql
 # --without mysql
 # --without odbc
 # --without oracle
@@ -80,7 +79,7 @@ BuildRequires: rudiments-devel >= 0.28.1
 
 %description
 SQL Relay is a persistent database connection pooling, proxying and load 
-balancing system for Unix and Linux supporting ODBC, Oracle, MySQL, mSQL, 
+balancing system for Unix and Linux supporting ODBC, Oracle, MySQL,
 PostgreSQL, Sybase, MS SQL Server, IBM DB2, Interbase, SQLite and
 MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
 Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java and TCL, drop-in replacement
@@ -189,14 +188,6 @@ Group: Applications/Databases
 
 %description mdbtools
 SQL Relay connection daemon for MDB Tools (Microsoft Access).
-
-
-%package msql
-Summary: SQL Relay connection daemon for mSQL.
-Group: Applications/Databases
-
-%description msql
-SQL Relay connection daemon for mSQL.
 
 
 %package mysql
@@ -358,7 +349,6 @@ Man pages for SQL Relay.
 	%{?_without_freetds:	--disable-freetds} \
 	%{?_without_interbase:	--disable-interbase} \
 	%{?_without_mdbtools:	--disable-mdbtools} \
-	%{?_without_msql:	--disable-msql} \
 	%{?_without_mysql:	--disable-mysql} \
 	%{?_without_odbc:	--disable-odbc} \
 	%{?_without_oracle:	--disable-oracle} \
@@ -496,10 +486,6 @@ rm -rf %{buildroot}
 %{!?_without_mdbtools:%files mdbtools}
 %{!?_without_mdbtools:%defattr(-, root, root)}
 %{!?_without_mdbtools:%{_bindir}/sqlr-connection-mdbtools*}
-
-%{!?_without_msql:%files msql}
-%{!?_without_msql:%defattr(-, root, root)}
-%{!?_without_msql:%{_bindir}/sqlr-connection-msql*}
 
 %{!?_without_mysql:%files mysql}
 %{!?_without_mysql:%defattr(-, root, root)}

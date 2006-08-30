@@ -33,13 +33,6 @@ then
 	sudo $INITDIR/firebird start
 	sudo sqlr-start -id interbasetest
 fi
-if ( test "$DB" = "msql" )
-then
-	ARGS="localhost 8005 \"\" msqltest msqltest"
-	PHPARGS="host=localhost&port=8005&socket=&user=msqltest&password=msqltest"
-	sudo $INITDIR/msql start
-	sudo sqlr-start -id msqltest
-fi
 if ( test "$DB" = "mysql3" )
 then
 	ARGS="localhost 8006 \"\" mysql3test mysql3test"
@@ -261,10 +254,6 @@ fi
 if ( test "$DB" = "interbase" )
 then
 	sudo $INITDIR/firebird stop
-fi
-if ( test "$DB" = "msql" )
-then
-	sudo $INITDIR/msql stop
 fi
 if ( test "$DB" = "mysql3" )
 then
