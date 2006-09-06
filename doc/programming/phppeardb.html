@@ -1135,6 +1135,11 @@ following.</p>
 
 <blockquote>
 <pre>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">call testproc(:in1,:in2,:in3)</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">in1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
+                &quot;<font color="#ff00ff">in2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
+                &quot;<font color="#ff00ff">in3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
 </pre>
 </blockquote>
 
@@ -1303,6 +1308,12 @@ following.</p>
 
 <blockquote>
 <pre>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select testfunc(?,?,?)</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
+                &quot;<font color="#ff00ff">2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
+                &quot;<font color="#ff00ff">3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">result</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>;
 </pre>
 </blockquote>
 
@@ -1453,6 +1464,14 @@ following.</p>
 
 <blockquote>
 <pre>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">call testfunc(:in1,:in2,:in3)</font>&quot;<font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">in1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
+                &quot;<font color="#ff00ff">in2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
+                &quot;<font color="#ff00ff">in3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
+<font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">out1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">0</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">out2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">1</font><font color="#6b59ce">]</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">out3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()[</font><font color="#ff00ff">2</font><font color="#6b59ce">]</font>;
 </pre>
 </blockquote>
 
@@ -1522,10 +1541,7 @@ following.</p>
 <blockquote>
 <pre>
 <font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>prepare<font color="#6b59ce">(</font>&quot;<font color="#ff00ff">select * from testfunc() as (col1 int, col2 float, col3 char(20))</font>&quot;<font color="#6b59ce">)</font>;
-<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#a52829"><b>=</b></font><font color="#298a52"><b>array</b></font><font color="#6b59ce">(</font>&quot;<font color="#ff00ff">in1</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font>,
-                &quot;<font color="#ff00ff">in2</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> <font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,
-                &quot;<font color="#ff00ff">in3</font>&quot; <font color="#a52829"><b>=</b></font><font color="#a52829"><b>&gt;</b></font> &quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">})</font>
-<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font>,<font color="#a52829"><b>$</b></font><font color="#008a8c">bindvars</font><font color="#6b59ce">)</font>;
+<font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">db</font><font color="#298a52"><b>-&gt;</b></font>execute<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">sth</font><font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">row1</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">row2</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">row3</font><font color="#a52829"><b>=</b></font><font color="#a52829"><b>$</b></font><font color="#008a8c">res</font><font color="#298a52"><b>-&gt;</b></font>fetchRow<font color="#6b59ce">()</font>;
@@ -1568,6 +1584,11 @@ following.</p>
 
 <blockquote>
 <pre>
+<font color="#a52a2a"><b>$</b></font><font color="#008b8b">sth</font><font color="#a52a2a"><b>=</b></font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">db</font><font color="#2e8b57"><b>-&gt;</b></font>prepare<font color="#6a5acd">(</font>&quot;<font color="#ff00ff">call testfunc()</font>&quot;<font color="#6a5acd">)</font>;
+<font color="#a52a2a"><b>$</b></font><font color="#008b8b">res</font><font color="#a52a2a"><b>=</b></font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">db</font><font color="#2e8b57"><b>-&gt;</b></font>execute<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">sth</font><font color="#6a5acd">)</font>;
+<font color="#a52a2a"><b>$</b></font><font color="#008b8b">row1</font><font color="#a52a2a"><b>=</b></font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">res</font><font color="#2e8b57"><b>-&gt;</b></font>fetchRow<font color="#6a5acd">()</font>;
+<font color="#a52a2a"><b>$</b></font><font color="#008b8b">row2</font><font color="#a52a2a"><b>=</b></font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">res</font><font color="#2e8b57"><b>-&gt;</b></font>fetchRow<font color="#6a5acd">()</font>;
+<font color="#a52a2a"><b>$</b></font><font color="#008b8b">row3</font><font color="#a52a2a"><b>=</b></font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">res</font><font color="#2e8b57"><b>-&gt;</b></font>fetchRow<font color="#6a5acd">()</font>;
 </pre>
 </blockquote>
 

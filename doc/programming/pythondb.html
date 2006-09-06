@@ -480,6 +480,7 @@ following.</p>
 
 <blockquote>
 <pre>
+cur.execute('<font color="#ff00ff">call testproc(:in1,:in2,:in3)</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
 </pre>
 </blockquote>
 
@@ -635,6 +636,7 @@ following.</p>
 
 <blockquote>
 <pre>
+cur.execute('<font color="#ff00ff">select testfunc(?,?,?)</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
 </pre>
 </blockquote>
 
@@ -776,6 +778,10 @@ following.</p>
 
 <blockquote>
 <pre>
+cur.execute('<font color="#ff00ff">select testfunc(:in1,:in2,:in3)</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
+out1=cur.fetchone()[0]
+out2=cur.fetchone()[1]
+out3=cur.fetchone()[2]
 </pre>
 </blockquote>
 
@@ -884,6 +890,8 @@ following.</p>
 
 <blockquote>
 <pre>
+cur.execute('<font color="#ff00ff">call testfunc()</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
+result=cur.fetchall()
 </pre>
 </blockquote>
 

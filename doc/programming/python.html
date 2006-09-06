@@ -748,6 +748,11 @@ following.</p>
 
 <blockquote>
 <pre>
+cur.prepareQuery(&quot;<font color="#ff00ff">call testproc(:in1,:in2,:in3)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.executeQuery()
 </pre>
 </blockquote>
 
@@ -1042,6 +1047,12 @@ following.</p>
 
 <blockquote>
 <pre>
+cur.prepareQuery(&quot;<font color="#ff00ff">select testfunc(?,?,?)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,4,2)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.executeQuery()
+result=cur.getField(0,0)
 </pre>
 </blockquote>
 
@@ -1324,6 +1335,14 @@ following.</p>
 
 <blockquote>
 <pre>
+cur.prepareQuery(&quot;<font color="#ff00ff">call testproc(:in1,:in2,:in3)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,4,2)
+cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.executeQuery()
+out1=cur.getField(0,0)
+out2=cur.getField(0,1)
+out3=cur.getField(0,2)
 </pre>
 </blockquote>
 
@@ -1481,6 +1500,14 @@ following.</p>
 
 <blockquote>
 <pre>
+cur.sendQuery(&quot;<font color="#ff00ff">call testproc()</font>&quot;)
+field00=cur.getField(0,0)
+field01=cur.getField(0,1)
+field02=cur.getField(0,2)
+field10=cur.getField(1,0)
+field11=cur.getField(1,1)
+field12=cur.getField(1,2)
+...
 </pre>
 </blockquote>
 
