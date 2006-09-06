@@ -37,6 +37,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/slackware/8
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/suse/9.0
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/sybase
+	$(MKINSTALLDIRS) $(docdir)/gettingstarted/db2
 	$(INSTALL) -m 644 configuring.html $(docdir)
 	$(INSTALL) -m 644 index.html $(docdir)
 	$(INSTALL) -m 644 installing.html $(docdir)
@@ -125,7 +126,12 @@ install:
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/slackware/8/9i.html $(docdir)/gettingstarted/oracle/linux/slackware/8
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/suse/9.0/9iR2.html $(docdir)/gettingstarted/oracle/linux/suse/9.0
 	$(INSTALL) -m 644 gettingstarted/sybase/11.0.3.3.html $(docdir)/gettingstarted/sybase/11.0.3.3.html
-	$(INSTALL) -m 644 gettingstarted/sybase/11.9.2.html $(docdir)/gettingstarted/sybase/11.9.2.html
+		$(INSTALL) -m 644 gettingstarted/sybase/11.9.2.html $(docdir)/gettingstarted/sybase/11.9.2.html
+		$(INSTALL) -m 644 gettingstarted/db2/72.html $(docdir)/gettingstarted/db2/72.html
+		$(INSTALL) -m 644 gettingstarted/db2/81.html $(docdir)/gettingstarted/db2/81.html
+		$(INSTALL) -m 644 gettingstarted/db2/824.html $(docdir)/gettingstarted/db2/824.html
+		$(INSTALL) -m 644 gettingstarted/db2/82.html $(docdir)/gettingstarted/db2/82.html
+		$(INSTALL) -m 644 gettingstarted/db2/91.html $(docdir)/gettingstarted/db2/91.html
 
-uninstall:
-	$(RMTREE) $(docdir)
+	uninstall:
+		$(RMTREE) $(docdir)
