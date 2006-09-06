@@ -53,7 +53,7 @@ class connection {
 class instance {
 	friend class configfile;
 	public:
-			instance(xmldomnode *instancenode);
+			instance(xmldom *doc, xmldomnode *instancenode);
 			~instance();
 		const char	*getId();
 		const char	*getPort();
@@ -120,6 +120,7 @@ class instance {
 		connection	*firstConnection();
 		instance	*nextInstance();
 	private:
+		xmldom		*doc;
 		xmldomnode	*instancenode;
 		xmldomnode	*users;
 		xmldomnode	*connections;

@@ -145,7 +145,7 @@ bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-#if (DB2VERSION==8)
+#if (DB2VERSION>7)
 	// set the row status ptr
 	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
 				(SQLPOINTER)rowstat,0);
@@ -608,7 +608,7 @@ bool db2cursor::fetchRow() {
 		}
 
 		// Determine the current rownumber
-#if (DB2VERSION==8)
+#if (DB2VERSION>7)
 		// An apparant bug in version 8.1 causes the
 		// SQL_ATTR_ROW_NUMBER to always be 1, running through
 		// the row status buffer appears to work.

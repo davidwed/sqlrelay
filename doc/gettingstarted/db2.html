@@ -32,35 +32,15 @@
 <span class="heading1">Installation</span><br>
 
 <p>I've sucessfully installed DB2 Enterprise Edition versions 7.2 and 8.1 on
-Linux, DB2 Personal Edition version 8.2 on Linux and DB2 Express Edition 8.2.4
-on Linux.  I've never had access to any other version of DB2 for Linux or any
-version of DB2 for other platforms.</p>
-
-<a name="pdksh"></a>
-<span class="heading2">Install pdksh</span><br>
-
-<p>If you're installing version 7.2, first and foremost, you need pdksh
-(Public Domain Korn Shell).  If it did not come with your distribution, you'll
-need to download and install it.</p>
-
-<p>For RPM based distributions, look for pdksh at 
-<a href="http://rpmfind.net">rpmfind</a> and install it using <i>rpm -i</i>.</p>
-
-<p>For Debian Linux, on newer Debian releases, if you have configured 
-<i>apt</i> as illustrated in 
-<a href="http://www.debian.org/doc/manuals/apt-howto/index.en.html">the 
-APT-HOWTO</a>, run <i>apt-get install pdksh</i>.  If your distribution came with
-pdksh, you may be prompted to enter a CD.  If not, it will be downloaded from 
-the internet.<p>
-
-<p>For Slackware Linux, the pdksh package is available from 
-<a href="ftp://ftp.slackware.com">ftp.slackware.com</a>.  You can install it 
-using <i>installpkg</i>.</p>
+Linux, DB2 Personal Edition version 8.2 on Linux and DB2 Express Editions 8.2.4
+and 9.1 on Linux.  I've never had access to any other version of DB2 for Linux
+or any version of DB2 for other platforms.</p>
 
 <a name="rpm"></a>
 <span class="heading2">Install RPM</span><br>
 
-<p>On non-RPM based systems, you'll need to install RPM.</p>
+<p>When installing versions of DB2 below 9.1, on non-RPM based systems, you'll
+need to install RPM.</p>
 
 <p>For Slackware Linux, the RPM package is available from 
 <a href="ftp://ftp.slackware.com">ftp.slackware.com</a>.  You can install it 
@@ -84,9 +64,10 @@ follows.</p>
 <a name="env"></a>
 <span class="heading2">PATH Environment Variable</span><br>
 
-<p>For versions 7.2, 8.1 and 8.2, the DB2 installer tries to run some command
-line programs that are found in /sbin and /usr/sbin.  Make sure that these
-directories are in the root user's PATH.</p>
+<p>For versions 7.2, 8.1 and 8.2 (though apparently not for versions above 8.2),
+the DB2 installer tries to run some command line programs that are found in 
+sbin and /usr/sbin.  Make sure that these directories are in the root user's
+PATH.</p>
 
 <a name="db2"></a>
 <span class="heading2">DB2 Installation</span><br>
@@ -98,6 +79,7 @@ Follow the links below for the version of DB2 that you are installing.</p>
 <a href="db2/81.html">Installing IBM DB2 Enterprise V8.1</a><br>
 <a href="db2/82.html">Installing IBM DB2 Personal V8.2</a></p>
 <a href="db2/824.html">Installing IBM DB2 Express V8.2.4</a></p>
+<a href="db2/91.html">Installing IBM DB2 Express V9.1</a></p>
 
 <a name="creating"></a>
 <span class="heading2">Creating a Database</span><br>

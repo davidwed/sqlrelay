@@ -33,7 +33,7 @@ void configfile::blank() {
 	root->cascadeOnDelete();
 
 	// create the xml version node
-	xmldomnode	*xmlversion=new xmldomnode(root->getNullNode(),
+	xmldomnode	*xmlversion=new xmldomnode(doc,root->getNullNode(),
 							TAG_XMLDOMNODETYPE,
 							"?xml","?xml");
 	xmlversion->insertAttribute("version","1.0",
@@ -42,7 +42,7 @@ void configfile::blank() {
 	// create the doctype node
 
 	// create the instances node
-	instances=new xmldomnode(root->getNullNode(),TAG_XMLDOMNODETYPE,
+	instances=new xmldomnode(doc,root->getNullNode(),TAG_XMLDOMNODETYPE,
 							"instances",
 							"instances");
 
@@ -97,10 +97,11 @@ bool configfile::parse(const char *filename) {
 
 			// create a new instance
 			if (!firstinstance) {
-				firstinstance=new instance(currentnode);
+				firstinstance=new instance(doc,currentnode);
 				currentinstance=firstinstance;
 			} else {
-				currentinstance->next=new instance(currentnode);
+				currentinstance->next=new instance(doc,
+								currentnode);
 				currentinstance->next->previous=currentinstance;
 				currentinstance=currentinstance->next;
 			}
@@ -172,7 +173,7 @@ instance *configfile::addInstance(const char *id,
 				const char *maxlisteners,
 				const char *listenertimeout) {
 
-	xmldomnode	*newchild=new xmldomnode(root->getNullNode(),
+	xmldomnode	*newchild=new xmldomnode(doc,root->getNullNode(),
 							TAG_XMLDOMNODETYPE,
 							"instance",
 							"instance");
@@ -233,11 +234,11 @@ instance *configfile::addInstance(const char *id,
 					listenertimeout,
 					newchild->getAttributeCount());
 
-	xmldomnode	*newusers=new xmldomnode(root->getNullNode(),
+	xmldomnode	*newusers=new xmldomnode(doc,root->getNullNode(),
 							TAG_XMLDOMNODETYPE,
 							"users",
 							"users");
-	xmldomnode	*newconnections=new xmldomnode(root->getNullNode(),
+	xmldomnode	*newconnections=new xmldomnode(doc,root->getNullNode(),
 							TAG_XMLDOMNODETYPE,
 							"connections",
 							"connections");
@@ -252,11 +253,11 @@ instance *configfile::addInstance(const char *id,
 	newchild->insertText("\n	",newchild->getChildCount());
 
 	if (lastinstance) {
-		lastinstance->next=new instance(newchild);
+		lastinstance->next=new instance(doc,newchild);
 		lastinstance->next->previous=lastinstance;
 		lastinstance=lastinstance->next;
 	} else {
-		lastinstance=new instance(newchild);
+		lastinstance=new instance(doc,newchild);
 		firstinstance=lastinstance;
 	}
 	return lastinstance;
@@ -306,8 +307,9 @@ instance *configfile::firstInstance() {
 	return firstinstance;
 }
 
-instance::instance(xmldomnode *instancenode) {
+instance::instance(xmldom *doc, xmldomnode *instancenode) {
 
+	this->doc=doc;
 	this->instancenode=instancenode;
 
 	next=NULL;
@@ -722,7 +724,8 @@ void	instance::setListenerTimeout(const char *listenertimeout) {
 
 user	*instance::addUser(const char *usr, const char *password) {
 
-	xmldomnode	*newchild=new xmldomnode(users->getNullNode(),
+	xmldomnode	*newchild=new xmldomnode(doc,
+					users->getNullNode(),
 					TAG_XMLDOMNODETYPE,
 					"user","user");
 
@@ -845,7 +848,8 @@ connection	*instance::addConnection(const char *connectionid,
 				const char *metric,
 				const char *behindloadbalancer) {
 
-	xmldomnode	*newchild=new xmldomnode(connections->getNullNode(),
+	xmldomnode	*newchild=new xmldomnode(doc,
+					connections->getNullNode(),
 					TAG_XMLDOMNODETYPE,
 					"connection","connection");
 

@@ -2,6 +2,8 @@ semop's can return ENOSPC if the undo list is full which is unhandled and causes
 	deadlocks in the sqlr-listeners.  If we get an ENOSPC, then we need to
 	send the client an error and the sqlr-listener needs to exit.
 
+need to test-link something for each detected api/db to make sure it's x86_64
+
 --------------------------------------------------------------------------------
 
 Now I found the reason how 'mysql_affected_rows' cause the httpd halt

@@ -24,6 +24,7 @@ fi
 
 AC_DEFUN([FW_CHECK_FILE],
 [
+dnl echo "check: $1"
 if ( test -r "$1" )
 then
 	eval "$2"
@@ -137,20 +138,28 @@ do
 
 		if ( test "$path" = "/" )
 		then
-			dnl look in /usr/include and /$LIBDIR
+			dnl look in /usr/include and /lib and /lib64
 			if ( test "$USEFULLLIBPATH" = "yes" )
 			then
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"/$LIBDIR/lib$LIBNAME.$SOSUFFIX\"],[/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib\"; LIBSTRING=\"/lib/lib$LIBNAME.$SOSUFFIX\"],[/lib/lib$LIBNAME.a],[LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 			else
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-l$LIBNAME\"],[/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\"],[/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
+
+			if ( test "$USEFULLLIBPATH" = "yes" )
+			then
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib64/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib64\"; LIBSTRING=\"/lib64/lib$LIBNAME.$SOSUFFIX\"],[/lib64/lib$LIBNAME.a],[LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+			else
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib64/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\"],[/lib64/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+			fi
+			
 
 			dnl set path to "" so we won't get //'s from here on
 			path=""
 		fi
 
 
-		for libpath in "$path/$LIBDIR" "$path/$LIBDIR/$NAME" "$path/$LIBDIR/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -166,7 +175,6 @@ do
 					break
 				fi
 
-				dnl look in $path/$LIBDIR
 				if ( test "$USEFULLLIBPATH" = "yes" )
 				then
 					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"$libpath/lib$LIBNAME.$SOSUFFIX\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
@@ -381,16 +389,6 @@ else
 	fi
 fi
 AC_MSG_RESULT($SOSUFFIX)
-])
-
-AC_DEFUN([FW_CHECK_LIBDIR],
-[
-AC_MSG_CHECKING(for library directory)
-case $host_cpu in
-	x86_64 ) LIBDIR="lib64" ;;
-	* ) LIBDIR="lib" ;;
-esac
-AC_MSG_RESULT($LIBDIR)
 ])
 
 
@@ -1620,6 +1618,11 @@ then
 	
 			dnl check /opt for 8.1
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V8.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V8.1/include\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V8.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2VERSION=\"8\"],[/opt/IBM/db2/V8.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V8.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"8\"])
+	
+			dnl check /opt for 9.1
+			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V9.1/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V9.1/include\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/ibm/db2/V9.1/lib\"; DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib -ldb2\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
+			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V9.1/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V9.1/include\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/ibm/db2/V9.1/lib32\"; DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib32/libdb2.a],[DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
+			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V9.1/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V9.1/include\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/ibm/db2/V9.1/lib64\"; DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib64 -ldb2\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib64/libdb2.a],[DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 		fi
 		
 		if ( test -z "$DB2LIBS" )
@@ -1901,10 +1904,16 @@ then
 		
 			for i in "2.4" "2.3" "2.2" "2.1"
 			do
-				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/$LIBDIR/python$i/config" )
+				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib64/python$i/config" )
 				then
 					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
-					PYTHONDIR="$PYTHONPATH/$LIBDIR/python$i"
+					PYTHONDIR="$PYTHONPATH/lib64/python$i"
+				else
+					if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib/python$i/config" )
+					then
+						PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
+						PYTHONDIR="$PYTHONPATH/lib/python$i"
+					fi
 				fi
 			
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
@@ -1931,7 +1940,7 @@ then
 					fi
 				done
 
-				for i in "/usr/$LIBDIR/python$j" "/usr/local/$LIBDIR/python$j" "/usr/pkg/$LIBDIR/python$j" "/usr/local/python$j/$LIBDIR/python$j" "/opt/sfw/$LIBDIR/python$j" "/usr/sfw/$LIBDIR/python$j" "/sfw/$LIBDIR/python$j" "/sw/$LIBDIR/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/$LIBDIR/python$j"
+				for i in "/usr/lib64/python$j" "/usr/lib/python$j" "/usr/local/lib64/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib64/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j"
 				do
 					if ( test -d "$i/config" )
 					then
@@ -2009,11 +2018,12 @@ then
 		
 				if ( test -z "$ZOPEDIR" )
 				then
-					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib" "/usr" "/usr/lib" "/opt" "/sw" "/usr/pkg" "/usr/pkg/share" "/usr/pkg/lib"
+					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib" "/usr/local/lib64" "/usr" "/usr/lib" "/usr/lib64" "/opt" "/sw" "/usr/pkg" "/usr/pkg/share" "/usr/pkg/lib"
 					do
 						for j in "zope" "Zope" "zope2" "Zope2" "zope3" "Zope3"
 						do
 							FW_CHECK_FILE("$i/$j/lib/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j/lib/python/Products\"])
+							FW_CHECK_FILE("$i/$j/lib64/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j/lib64/python/Products\"])
 							if ( test -n "$ZOPEDIR" )
 							then
 								break
@@ -2021,6 +2031,7 @@ then
 							for k in "2.2" "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9" "3.0" "3.1" "3.2"
 							do
 								FW_CHECK_FILE("$i/$j-$k/lib/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib/python/Products\"])
+								FW_CHECK_FILE("$i/$j-$k/lib64/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib64/python/Products\"])
 								if ( test -n "$ZOPEDIR" )
 								then
 									break
@@ -2355,7 +2366,7 @@ then
 		dnl first look for a dynamic libtcl
 		if ( test -n "$TCLINCLUDE" )
 		then
-			for i in "$TCLLIBSPATH" "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+			for i in "$TCLLIBSPATH" "/usr/lib64" "/usr/lib" "$prefix/lib64" "$prefix/lib" "/usr/local/lib64" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 				do
@@ -2366,7 +2377,7 @@ then
 		dnl if we didn't find it, look for a dynamic libtclstub
 		if ( test -n "$TCLINCLUDE " -a -z "$TCLLIB" )
 		then
-			for i in "$TCLLIBSPATH" "/usr/lib" "$prefix/lib" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
+			for i in "$TCLLIBSPATH" "/usr/lib64" "/usr/lib" "/$prefix/lib64" "$prefix/lib" "/usr/local/lib64" "/usr/local/lib" "/usr/pkg/lib" "/opt/sfw/lib" "/usr/sfw/lib" "/sw/lib"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
 				do
@@ -2384,7 +2395,7 @@ then
 			AC_MSG_CHECKING(for Tcl_WideInt)
 			FW_TRY_LINK([#include <tcl.h>],[Tcl_WideInt row;],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_WIDEINT,1,Some versions of TCL don't have Tcl_WideInt)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(for const char ** support)
-			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetIndexFromObj(NULL,NULL,(const char **)NULL,NULL,0,NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_CONSTCHAR,1,Some versions of TCL don't use const char ** arguments)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tcl.h>],[static const char *options[]={""}; Tcl_GetIndexFromObj(NULL,NULL,(const char **)options,NULL,0,NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_CONSTCHAR,1,Some versions of TCL don't use const char ** arguments)],[AC_MSG_RESULT(no)])
 		fi
 	fi
 

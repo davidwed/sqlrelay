@@ -96,7 +96,7 @@ class db2cursor : public sqlrcursor_svr {
 					[MAX_ITEM_BUFFER_SIZE];
 		SQLINTEGER	indicator[MAX_SELECT_LIST_SIZE]
 						[FETCH_AT_ONCE];
-#if (DB2VERSION==8)
+#if (DB2VERSION>7)
 		SQLUSMALLINT	rowstat[FETCH_AT_ONCE];
 #endif
 		db2column	col[MAX_SELECT_LIST_SIZE];

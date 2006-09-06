@@ -233,7 +233,7 @@ void sqlitecursor::selectLastInsertRowId() {
 	ncolumn=1;
 	result=new char * [2];
 	result[0]=charstring::duplicate("LASTINSERTROWID");
-	result[1]=charstring::parseNumber(sqlite3_last_insert_rowid(
+	result[1]=charstring::parseNumber((int64_t)sqlite3_last_insert_rowid(
 							sqliteconn->sqliteptr));
 }
 
