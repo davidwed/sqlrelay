@@ -47,7 +47,7 @@ int	main(int argc, char **argv) {
 	MYSQL	mysql;
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	printf("mysql_init\n");
-	checkSuccess((int)mysql_init(&mysql),(int)&mysql);
+	checkSuccess((long)mysql_init(&mysql),(long)&mysql);
 	printf("\n");
 #endif
 
@@ -60,16 +60,16 @@ int	main(int argc, char **argv) {
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	printf("mysql_real_connect\n");
 #if MYSQL_VERSION_ID>=32200
-	checkSuccess((int)mysql_real_connect(&mysql,host,user,password,"",
-					atoi(port),socket,0),(int)&mysql);
+	checkSuccess((long)mysql_real_connect(&mysql,host,user,password,"",
+					atoi(port),socket,0),(long)&mysql);
 #else
-	checkSuccess((int)mysql_real_connect(&mysql,host,user,password,
-					atoi(port),socket,0),(int)&mysql);
+	checkSuccess((long)mysql_real_connect(&mysql,host,user,password,
+					atoi(port),socket,0),(long)&mysql);
 	// mysql_select_db...
 #endif
 #else
-	checkSuccess((int)mysql_connect(&mysql,host,user,password),
-					(int)mysql);
+	checkSuccess((long)mysql_connect(&mysql,host,user,password),
+					(long)mysql);
 #endif
 	printf("\n");
 
@@ -404,7 +404,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[15],"tinytext2");
 	checkSuccess(row[16],"mediumtext2");
 	checkSuccess(row[17],"longtext2");
-	checkSuccess((int)mysql_fetch_row(result),0);
+	checkSuccess((long)mysql_fetch_row(result),0);
 	printf("\n");
 
 

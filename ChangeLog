@@ -18,6 +18,7 @@
 	added "delimiter" command to sqlrsh to change
 		delimiter from ; to whatever
 	removed msql support
+	added db2 9.1 installation doc
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that

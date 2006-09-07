@@ -53,6 +53,7 @@ class sqlitecursor : public sqlrcursor_svr {
 		int		nrow;
 		int		ncolumn;
 		int		rowindex;
+		bool		lastinsertrowid;
 
 		regularexpression	selectlastinsertrowid;
 

@@ -96,6 +96,7 @@ sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	nrow=0;
 	ncolumn=0;
 	rowindex=0;
+	lastinsertrowid=false;
 
 	sqliteconn=(sqliteconnection *)conn;
 
@@ -208,13 +209,15 @@ int sqlitecursor::runQuery(const char *query) {
 		columnnames=NULL;
 	}
 
-	// reset counters
+	// reset counters and flags
 	nrow=0;
 	ncolumn=0;
 	rowindex=0;
+	lastinsertrowid=false;
 
 	// handle special case of selecting the last row id
 	if (selectlastinsertrowid.match(query)) {
+		lastinsertrowid=true;
 		selectLastInsertRowId();
 		return SQLITE_OK;
 	}
@@ -334,7 +337,13 @@ void sqlitecursor::returnRow() {
 void sqlitecursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	if (freeresult && result) {
-		sqlite3_free_table(result);
+		if (lastinsertrowid) {
+			delete[] result[0];
+			delete[] result[1];
+			delete[] result;
+		} else {
+			sqlite3_free_table(result);
+		}
 		result=NULL;
 	}
 }

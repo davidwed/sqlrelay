@@ -2,7 +2,18 @@ semop's can return ENOSPC if the undo list is full which is unhandled and causes
 	deadlocks in the sqlr-listeners.  If we get an ENOSPC, then we need to
 	send the client an error and the sqlr-listener needs to exit.
 
-need to test-link something for each detected api/db to make sure it's x86_64
+if a client connects and the forked listener ends up waiting for a connection
+	and the client disconnects, the forked listener has no way of knowing
+	that the client has disconnected and can't bail
+
+include_once DB/sqlrelay.php crashes
+test PHP Pear DB bind inside quotes fix
+
+query router:
+	"do something"'s
+	support authtier=database
+	support accessing different db's by specifying a different user/password
+	support accessing different db's by specifying which db to use
 
 --------------------------------------------------------------------------------
 
@@ -20,24 +31,6 @@ Compare the following two statement:
 
 The first one using a variable $res, it works fine, but the second with an
 error.
-
---------------------------------------------------------------------------------
-
-if a client connects and the forked listener ends up waiting for a connection
-	and the client disconnects, the forked listener has no way of knowing
-	that the client has disconnected and can't bail
-
-include_once DB/sqlrelay.php crashes
-test PHP Pear DB bind inside quotes fix
-
-query router:
-	"do something"'s
-	support authtier=database
-	support accessing different db's by specifying a different user/password
-	support accessing different db's by specifying which db to use
-
-mysql 5.x:
-	document using stored procedures
 
 --------------------------------------------------------------------------------
 
@@ -63,6 +56,8 @@ Step 10 was required otherwise I got "Commands out of sync; you can't run this c
 Initially I thought that I could simply mysql_stmt_bind_param the IN and INOUT parms and mysql_stmt_bind_result the INOUT and OUT parameters; clearly this was not the case. Thanks for your help Hasani, I never would have figured this out. Is this documented somewhere? All I found concerning SPs was chapter 17 of the UG.
 
 --------------------------------------------------------------------------------
+
+need to test-link something for each detected api/db to make sure it's x86_64
 
 OCI8 drop-in library
 

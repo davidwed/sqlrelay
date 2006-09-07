@@ -68,7 +68,8 @@ void sqlrcursor_svr::checkForTempTable(const char *query, uint32_t length) {
 
 	// get the table name
 	stringbuffer	tablename;
-	while (*ptr!=' ' && *ptr!='\n' && *ptr!='	' && ptr<endptr) {
+	while (ptr && *ptr && *ptr!=' ' &&
+		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
 		tablename.append(*ptr);
 		ptr++;
 	}
