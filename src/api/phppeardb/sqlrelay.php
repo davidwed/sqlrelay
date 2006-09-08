@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.19 2006-08-08 02:53:23 mused Exp $
+// $Id: sqlrelay.php,v 1.20 2006-09-08 03:00:21 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -254,7 +254,7 @@ class DB_sqlrelay extends DB_common
                     $paramindex++;
                     continue;
                 }
-                $newquery .= $query[$i]
+                $newquery .= $query[$i];
             }        
             $this->prepare_types[(int)$cursor] = $types;
         }
