@@ -112,10 +112,9 @@ require_once 'DB.php';
 			"testlong" => NULL);
 	checkSuccess($db,$db->autoExecute("testtable",$bindvars,
 					DB_AUTOQUERY_INSERT),DB_OK);
-
-	echo("SELECT: \n");
-	$res=$db->query("select * from testtable order by testnumber");
 	echo("\n");
+
+	$res=$db->query("select * from testtable order by testnumber");
 
 	echo("COLUMN COUNT: \n");
 	checkSuccess($db,$res->numCols(),5);
@@ -457,6 +456,15 @@ require_once 'DB.php';
 	checkSuccess($db,$db->nextId("mysequence"),1);
 	checkSuccess($db,$db->nextId("mysequence"),2);
 	checkSuccess($db,$db->dropSequence("mysequence"),DB_OK);
+	echo("\n");
+
+	echo("?'s INSIDE QUOTES: \n");
+	$sth=$db->prepare("select '?',':help',? from dual");
+	$res=$db->execute($sth,array(1));
+	$row=$res->fetchRow(DB_FETCHMODE_ORDERED);
+	checkSuccess($db,$row[0],"?");
+	checkSuccess($db,$row[1],":help");
+	checkSuccess($db,$row[2],"1");
 	echo("\n");
 
 	# drop existing table
