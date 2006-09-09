@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.20 2006-09-08 03:00:21 mused Exp $
+// $Id: sqlrelay.php,v 1.21 2006-09-09 02:57:02 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -225,7 +225,7 @@ class DB_sqlrelay extends DB_common
 
         # handle ?-delimited bind variables by rewriting the query and creating
         # : or @ delimited variables
-        # for db2 which already uses ?-delimited variables, we don't need
+        # for db's which already uses ?-delimited variables, we don't need
         # to do this...
         # FIXME: handle postgresql 8 and mysql 4.1
         if ($this->identity == "db2" || $this->identity == "interbase") {
@@ -247,9 +247,9 @@ class DB_sqlrelay extends DB_common
                     }
                     if ($this->identity == "sybase" ||
                             $this->identity == "freetds") {
-                        $newquery .= $query[$i] . "@bind" . $paramindex;
+                        $newquery .= "@bind" . $paramindex;
                     } else {
-                        $newquery .= $query[$i] . ":bind" . $paramindex;
+                        $newquery .= ":bind" . $paramindex;
                     }
                     $paramindex++;
                     continue;
@@ -809,7 +809,7 @@ class DB_sqlrelay extends DB_common
             return null;
         } else if (empty($result)) {
             return null;
-        } else if ($result==DB_OK) {
+        } else if (!is_object($result)) {
             return null;
         }
 
