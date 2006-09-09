@@ -24,8 +24,8 @@
 <span class="heading1">Installation</span><br>
 
 <p>I've successfully installed Interbase 6.0.1 and Firebird 1.0.0, 1.0.2,
-1.0.3, 1.5, 1.5.2 and 1.5.3 on Linux.  I've never tried to install them on any
-other platform.</p>
+1.0.3, 1.5, 1.5.2, 1.5.3 and 2.0.0rc4 on Linux.  I've never tried to install
+them on any other platform.</p>
 
 <p>There are 2 versions of Interbase/Firebird: Classic Server (CS) and
 Super Server (SS).  Classic Server only allows a single connection while Super
@@ -46,7 +46,8 @@ can be installed using <i>rpm -i</i>.</p>
 create a directory called /opt/interbase.  Firebird versions 1.5 and higher
 create /opt/firebird.</p>
 
-<p>Firebird versions 1.5 and higher rpm's leave /opt/firebird owned by root,
+<p>Firebird versions 1.5 and higher rpm's leave /opt/firebird
+owned by root,
 with -r-xr-xr-x permissions.  This is wrong and will cause the server not to
 start.  Change the permissions and ownership as follows (as root):</p>
 
@@ -55,9 +56,9 @@ chmod 775 /opt/firebird<br>
 chown firebird:firebird /opt/firebird
 </b></blockquote>
 
-<p>Firebird versions 1.5 and higher require libstdc++.so.5 but most Linux
-distributions ship with a more recent version.  If your system doesn't have
-/usr/lib/libstdc++.so.5
+<p>Firebird versions 1.5 and higher, below Firebird 2.0 require libstdc++.so.5
+but most Linux distributions ship with a more recent version.  If your system
+doesn't have /usr/lib/libstdc++.so.5
 then you may need to install a compatibility library.  On Fedora Core 4, you
 need to install compat-libstdc++-33 as follows (as root):</p>
 
@@ -203,6 +204,11 @@ paths as follows.</p>
 <p>Now log out and log back in and you can access the database using the 
 <i>isql</i> client.</p>
 
+<p>Under Firebird 2.0, the installation process creates a security database
+called <i>security2.fdb</i> containing host and user privileges and an
+administrative user named <i>SYSDBA</i> with a randomly generated password.
+This password is listed in <i>SYSDBA.password</i>.</p>
+
 <p>Under Firebird 1.5, the installation process creates a security database
 called <i>security.fdb</i> containing host and user privileges and an
 administrative user named <i>SYSDBA</i> with a randomly generated password.
@@ -225,8 +231,30 @@ containing <i>isc4.gdb</i>.  A gsec session follows.</p>
 <p>Note that the /etc/hosts.equiv file must contain an entry for localhost and
 possibly localhost.localdomain for the <i>gsec</i> to function.</p>
 
-<p>For Firebird verison 1.5 or higher (replace <i>password</i> with the password
+<p>For Firebird verison 2.0 or higher (replace <i>password</i> with the password
 in the SYSDBA.password file)...</p>
+
+<blockquote>
+<PRE>
+<B><FONT color=#a62828>[</FONT></B>root@localhost root<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># cd /opt/firebird</FONT>
+<B><FONT color=#a62828>[</FONT></B>root@localhost root<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># ./bin/changeDBAPassword.sh</FONT>
+Please enter current password for SYSDBA user: <i>password</i>
+Please enter new password for SYSDBA user: newpassword
+GSEC<B><FONT color=#a62828>&gt;</FONT></B> Warning - maxiumum 8 significant bytes of password used
+GSEC<B><FONT color=#a62828>&gt;</FONT></B>
+
+Running ex to modify /etc/rc.d/init.d/firebird
+<B><FONT color=#a62828>[</FONT></B>root@localhost firebird<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># ls -l security2.fdb</FONT>
+-rw-rw-rw-    <FONT color=#ff00ff>1</FONT> root     root       <FONT color=#ff00ff>618496</FONT> Feb <FONT color=#ff00ff>18</FONT> <FONT color=#ff00ff>14</FONT>:<FONT color=#ff00ff>29</FONT> security2.fdb
+<B><FONT color=#a62828>[</FONT></B>root@localhost firebird<B><FONT color=#a62828>]</FONT></B><FONT color=#0000ff># /opt/firebird/bin/gsec -user SYSDBA -password newpassword</FONT>
+GSEC<B><FONT color=#a62828>&gt;</FONT></B> add testuser <FONT color=#6959cf>-pw</FONT> testpassword
+Warning - maximum 8 significant bytes of password used
+GSEC<B><FONT color=#a62828>&gt;</FONT></B> quit 
+</PRE>
+</blockquote>
+
+<p>For Firebird verison 1.5 or higher, but below 2.0 (replace <i>password</i>
+with the password in the SYSDBA.password file)...</p>
 
 <blockquote>
 <PRE>

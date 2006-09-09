@@ -1542,7 +1542,7 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	// free row/column resources
 	if (freeresult) {
-		for (sword i=0; i<oracle8conn->maxselectlistsize; i++) {
+		for (ub4 i=0; i<oracle8conn->maxselectlistsize; i++) {
 			for (uint32_t j=0; j<oracle8conn->fetchatonce; j++) {
 				if (def_lob[i][j]) {
 					OCIDescriptorFree(def_lob[i][j],

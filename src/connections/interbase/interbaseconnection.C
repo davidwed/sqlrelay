@@ -827,10 +827,10 @@ void interbasecursor::returnRow() {
 			stringbuffer	buffer;
 			if (outsqlda->sqlvar[col].sqlscale) {
 
-				buffer.append(field[col].int64buffer/(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale))->append(".");
+				buffer.append((int64_t)(field[col].int64buffer/(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)))->append(".");
 
 				stringbuffer	decimal;
-				decimal.append(field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale));
+				decimal.append((int64_t)(field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)));
 			
 				// gotta get the right number
 				// of decimal places
@@ -842,7 +842,7 @@ void interbasecursor::returnRow() {
 				}
 				buffer.append(decimal.getString());
 			} else {
-				buffer.append(field[col].int64buffer);
+				buffer.append((int64_t)field[col].int64buffer);
 			}
 			conn->sendField(buffer.getString(),
 					charstring::length(buffer.getString()));
