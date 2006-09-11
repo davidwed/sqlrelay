@@ -138,6 +138,7 @@ class routerconnection : public sqlrconnection_svr {
 			routerconnection();
 			~routerconnection();
 	private:
+		bool		supportsAuthOnDatabase();
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn();

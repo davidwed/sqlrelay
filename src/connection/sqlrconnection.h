@@ -51,6 +51,7 @@ class sqlrconnection_svr :
 
 	protected:
 		// interface definition
+		virtual bool	supportsAuthOnDatabase();
 		virtual	uint16_t	getNumberOfConnectStringVars()=0;
 		virtual	void	handleConnectString()=0;
 		virtual	bool	logIn()=0;

@@ -1,11 +1,3 @@
-query router:
-	"do something"'s
-	support authtier=database
-	support accessing different db's by specifying a different user/password
-	support accessing different db's by specifying which db to use
-
---------------------------------------------------------------------------------
-
 Now I found the reason how 'mysql_affected_rows' cause the httpd halt
 	(with drop-in replacement library)
 
@@ -45,6 +37,11 @@ Step 10 was required otherwise I got "Commands out of sync; you can't run this c
 Initially I thought that I could simply mysql_stmt_bind_param the IN and INOUT parms and mysql_stmt_bind_result the INOUT and OUT parameters; clearly this was not the case. Thanks for your help Hasani, I never would have figured this out. Is this documented somewhere? All I found concerning SPs was chapter 17 of the UG.
 
 --------------------------------------------------------------------------------
+
+query router:
+	"do something"'s
+	support accessing different db's by specifying a different user/password
+	support accessing different db's by specifying which db to use
 
 semop's can return ENOSPC if the undo list is full which is unhandled and causes
 	deadlocks in the sqlr-listeners.  If we get an ENOSPC, then we need to

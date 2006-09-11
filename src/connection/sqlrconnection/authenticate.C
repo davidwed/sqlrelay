@@ -35,9 +35,14 @@ bool sqlrconnection_svr::authenticate() {
 	}
 
 	// authenticate on the approprite tier
-	if (cfgfl->getAuthOnConnection()) {
+	bool	authondb=(cfgfl->getAuthOnDatabase() &&
+				supportsAuthOnDatabase());
+	bool	authonconnection=(cfgfl->getAuthOnConnection() ||
+					(cfgfl->getAuthOnDatabase() &&
+						supportsAuthOnDatabase()));
+	if (authonconnection) {
 		return connectionBasedAuth(userbuffer,passwordbuffer);
-	} else if (cfgfl->getAuthOnDatabase()) {
+	} else if (authondb) {
 		return databaseBasedAuth(userbuffer,passwordbuffer);
 	}
 
@@ -127,4 +132,8 @@ bool sqlrconnection_svr::databaseBasedAuth(const char *userbuffer,
 	}
 	#endif
 	return lastauthsuccess;
+}
+
+bool sqlrconnection_svr::supportsAuthOnDatabase() {
+	return true;
 }

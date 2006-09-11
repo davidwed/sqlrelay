@@ -33,6 +33,10 @@ routerconnection::~routerconnection() {
 	delete[] beginquery;
 }
 
+bool routerconnection::supportsAuthOnDatabase() {
+	return false;
+}
+
 uint16_t routerconnection::getNumberOfConnectStringVars() {
 	return 0;
 }

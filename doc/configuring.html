@@ -483,6 +483,12 @@ instructions for configuring Oracle.</p>
 back in as a different user.  This is quite ineffecient and defeats the 
 value of keeping persistent database connections.</p>
 
+<p><b>NOTE:</b> authtier="database" can't be used in an instance where
+dbase="router".  It's OK for the instances that the router uses to use
+authtier="database" but not the router instance itself.  If authtier="database"
+is set on that instance, it will be overridden to
+authier="listener_and_connection".</p>
+
 <span class="heading2">Handoff</span><br><br>
 
 <p>When an <b>SQL Relay</b> client needs to talk to the database, it connects
