@@ -29,13 +29,13 @@ void	runQuery(int seed) {
 
 		seed=randomnumber::generateNumber(seed);
 		int	count=randomnumber::scaleNumber(seed,1,50);
-		count=10;
+		//count=10;
 								
 		printf("%d: looping %d times\n",getpid(),count);
 		for (int i=0; i<count; i++) {
 			if (!sqlrcur.sendQuery(query)) {
 				printf("error: %s\n",sqlrcur.errorMessage());
-				exit(0);
+				//exit(0);
 			}
 		}
 	}

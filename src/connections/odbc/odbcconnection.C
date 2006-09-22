@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <odbcconnection.h>
+#include <rudiments/charstring.h>
 
 #include <config.h>
 
@@ -126,7 +127,7 @@ char *conv_to_ucs(char *inbuf)
   iconv_t cd;
 	size_t avail;
 	
-	insize=strlen(inbuf);
+	insize=charstring::length(inbuf);
 	avail=insize*2+4;
 	
 	outbuf=(char*)malloc(avail);
@@ -166,7 +167,7 @@ char *conv_to_ucs(char *inbuf)
 	
 //		FILE *ff;
 //		char fname[200];
-//		sprintf(fname,"/home/orbb/temp/result_conv_to_ucs.txt_%d",strlen(inbuf));
+//		sprintf(fname,"/home/orbb/temp/result_conv_to_ucs.txt_%d",charstring::length(inbuf));
 //		ff=fopen(fname,"wb");
 //		fwrite(outbuf,1,wrptr-outbuf,ff);
 //		fclose(ff);
@@ -644,7 +645,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 				return false;
 			}
 //orbb
-			col[i].namelength=strlen(col[i].name);
+			col[i].namelength=charstring::length(col[i].name);
 //orbb
 
 			// column length
@@ -1086,8 +1087,8 @@ bool odbccursor::fetchRow() {
 			if(indicator[i]!=-1 && field[i])
 			{
 				char *u=conv_to_user_coding(field[i]);
-				int len=strlen(u);
-				strcpy(field[i],u);
+				int len=charstring::length(u);
+				charstring::copy(field[i],u);
 				indicator[i]=len;
 			
 				if(u)free(u);			

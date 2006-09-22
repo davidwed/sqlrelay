@@ -72,6 +72,8 @@
 
 #define MAXCONNECTIONIDLEN 1024
 
+#define NOCURSORSERROR "No server-side cursors were available to process the query."
+
 struct sqlrstatistics {
 	int32_t	open_svr_connections;
 	int32_t	opened_svr_connections;

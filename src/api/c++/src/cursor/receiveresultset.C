@@ -26,7 +26,11 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 	// check for an error
 	if (success && !noError()) {
 		getErrorFromServer();
-		getCursorId();
+		// Don't get the cursor if the error was that there were no
+		// cursors available.
+		if (charstring::compare(error,NOCURSORSERROR)) {
+			getCursorId();
+		}
 		return false;
 	}
 

@@ -8,20 +8,20 @@ main() {
 	datetime	dt;
 	dt.getSystemDateAndTime();
 
-	int	count=dt.getEpoch();
+	int	seed=dt.getEpoch();
 	for (;;) {
 
-		sqlrconnection	sqlrcon("localhost",8010,"",
-					"postgresqltest","postgresqltest",0,1);
+		sqlrconnection	sqlrcon("localhost",8009,"",
+					"oracle8test","oracle8test",0,1);
 		sqlrcursor	sqlrcur(&sqlrcon);
 
-		count=randomnumber::generateScaledNumber(count,1,50);
+		seed=randomnumber::generateNumber(seed);
+		int	count=randomnumber::scaleNumber(seed,1,50);
 								
 		printf("looping %d times\n",count);
 		for (int i=0; i<count; i++) {
-			if (!sqlrcur.sendQuery("select * from testtable")) {
+			if (!sqlrcur.sendQuery("select * from user_tables")) {
 				printf("error: %s\n",sqlrcur.errorMessage());
-				exit(0);
 			}
 		}
 	}

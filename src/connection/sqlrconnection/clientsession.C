@@ -288,8 +288,9 @@ void sqlrconnection_svr::noAvailableCursors(uint16_t command) {
 	clientsock->write((uint16_t)ERROR);
 
 	// send the error itself
-	clientsock->write((uint16_t)62);
-	clientsock->write("No server-side cursors were available to process the query.",62);
+	uint16_t	len=charstring::length(NOCURSORSERROR);
+	clientsock->write(len);
+	clientsock->write(NOCURSORSERROR,len);
 	flushWriteBuffer();
 }
 
