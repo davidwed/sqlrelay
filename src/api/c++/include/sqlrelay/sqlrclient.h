@@ -35,6 +35,11 @@ class sqlrconnection {
 				// Disconnects and ends the session if
 				// it hasn't been ended already.
 
+		void	setTimeout(int32_t timeoutsec, int32_t timeoutusec);
+				// Sets the server connect timeout in seconds
+				// and milliseconds.  Setting either parameter
+				// to -1 disables the timeout.
+
 		void	endSession();
 				// Ends the session.
 		bool	suspendSession();

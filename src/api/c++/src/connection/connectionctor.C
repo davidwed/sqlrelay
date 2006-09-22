@@ -9,7 +9,7 @@ sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 					int32_t retrytime, int32_t tries) {
 
 	// initialize...
-
+	setTimeout(-1,-1);
 
 	// retry reads if they get interrupted by signals
 	ucs.translateByteOrder();
@@ -54,4 +54,9 @@ sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 	// cursor list
 	firstcursor=NULL;
 	lastcursor=NULL;
+}
+
+void sqlrconnection::setTimeout(int32_t timeoutsec, int32_t timeoutusec) {
+	this->timeoutsec=timeoutsec;
+	this->timeoutusec=timeoutusec;
 }

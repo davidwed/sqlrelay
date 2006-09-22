@@ -46,6 +46,8 @@
 		char			*listenerunixport;
 		char			*connectionunixport;
 		char			connectionunixportbuffer[MAXPATHLEN+1];
+		int32_t			timeoutsec;
+		int32_t			timeoutusec;
 		int32_t			retrytime;
 		int32_t			tries;
 
