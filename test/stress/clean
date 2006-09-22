@@ -1,1 +1,1 @@
-rm -f forktest threadtest querytest cachefile*
+rm -f forktest threadtest querytest cursortest timeouttest cachefile*

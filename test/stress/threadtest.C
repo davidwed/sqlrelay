@@ -9,7 +9,7 @@
 
 char	*host;
 int	port;
-char	*socket;
+char	*sock;
 char	*login;
 char	*password;
 char	*query;
@@ -17,7 +17,7 @@ int	threadcount;
 
 void	runQuery(void *id) {
 
-	sqlrconnection	*con=new sqlrconnection(host,port,socket,
+	sqlrconnection	*con=new sqlrconnection(host,port,sock,
 						login,password,0,1);
 	sqlrcursor	*cur=new sqlrcursor(con);
 
@@ -26,7 +26,7 @@ void	runQuery(void *id) {
 	con->endSession();
 	
 	for (int i=0; i<cur->rowCount(); i++) {
-		printf("%d  ",(int)id);
+		printf("%d  ",(uint64_t)id);
 		for (int j=0; j<cur->colCount(); j++) {
 			printf("\"%s\",",cur->getField(i,j));
 		}
@@ -41,7 +41,7 @@ main(int argc, char **argv) {
 
 	host=argv[1];
 	port=atoi(argv[2]);
-	socket=argv[3];
+	sock=argv[3];
 	login=argv[4];
 	password=argv[5];
 	query=argv[6];

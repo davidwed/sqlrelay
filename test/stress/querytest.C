@@ -26,7 +26,7 @@ int	main(int argc, char **argv) {
 	const char	*socket;
 	int	id;
 	const char	*filename;
-	long	*fieldlens;
+	uint32_t	*fieldlens;
 	int	counter=1;
 
 
@@ -84,11 +84,11 @@ int	main(int argc, char **argv) {
 		cur->colCount();
 		cur->getColumnName(0);
 		cols=cur->getColumnNames();
-		cur->getColumnType(0);
+		cur->getColumnType((uint32_t)0);
 		cur->getColumnType("testchar");
-		cur->getColumnLength(0);
+		cur->getColumnLength((uint32_t)0);
 		cur->getColumnLength("testchar");
-		cur->getLongest(0);
+		cur->getLongest((uint32_t)0);
 		cur->getLongest("testchar");
 
 		// row info
@@ -98,8 +98,8 @@ int	main(int argc, char **argv) {
 		cur->endOfResultSet();
 
 		// field info
-		cur->getField(0,0);
-		cur->getFieldLength(0,0);
+		cur->getField(0,(uint32_t)0);
+		cur->getFieldLength(0,(uint32_t)0);
 		cur->getField(0,"testchar");
 		cur->getFieldLength(0,"testchar");
 		fields=cur->getRow(0);
@@ -139,12 +139,12 @@ int	main(int argc, char **argv) {
 		port=con->getConnectionPort();
 		socket=con->getConnectionSocket();
 		con->resumeSession(port,socket);
-		cur->getField(3,0);
+		cur->getField(3,(uint32_t)0);
 
 		// suspend/resume with result set buffer size
 		cur->setResultSetBufferSize(2);
 		cur->sendQuery("select * from testtable");
-		cur->getField(2,0);
+		cur->getField(2,(uint32_t)0);
 		id=cur->getResultSetId();
 		cur->suspendResultSet();
 		con->suspendSession();
@@ -155,7 +155,7 @@ int	main(int argc, char **argv) {
 		cur->firstRowIndex();
 		cur->endOfResultSet();
 		cur->rowCount();
-		cur->getField(3,0);
+		cur->getField(3,(uint32_t)0);
 		cur->setResultSetBufferSize(0);
 
 		// cache to file
@@ -169,7 +169,7 @@ int	main(int argc, char **argv) {
 		}
 		cur->cacheOff();
 		cur->openCachedResultSet(filename);
-		cur->getField(3,0);
+		cur->getField(3,(uint32_t)0);
 		cur->colCount();
 		cur->getColumnName(0);
 		cols=cur->getColumnNames();
@@ -186,7 +186,7 @@ int	main(int argc, char **argv) {
 		}
 		cur->cacheOff();
 		cur->openCachedResultSet(filename);
-		cur->getField(3,0);
+		cur->getField(3,(uint32_t)0);
 		cur->setResultSetBufferSize(0);
 
 		// from 1 cache file to another
@@ -194,7 +194,7 @@ int	main(int argc, char **argv) {
 		cur->openCachedResultSet("cachefile1");
 		cur->cacheOff();
 		cur->openCachedResultSet("cachefile2");
-		cur->getField(3,0);
+		cur->getField(3,(uint32_t)0);
 
 		// from 1 cache file to another with result set buffer size
 		cur->setResultSetBufferSize(2);
@@ -202,7 +202,7 @@ int	main(int argc, char **argv) {
 		cur->openCachedResultSet("cachefile1");
 		cur->cacheOff();
 		cur->openCachedResultSet("cachefile2");
-		cur->getField(3,0);
+		cur->getField(3,(uint32_t)0);
 		cur->setResultSetBufferSize(0);
 
 		// suspend/resume with cache file
@@ -210,7 +210,7 @@ int	main(int argc, char **argv) {
 		cur->cacheToFile("cachefile1");
 		cur->setCacheTtl(200);
 		cur->sendQuery("select * from testtable");
-		cur->getField(2,0);
+		cur->getField(2,(uint32_t)0);
 		filename=cur->getCacheFileName();
 		if (strcmp(filename,"cachefile1")) {
 			printf("%s\n",filename);
@@ -226,7 +226,7 @@ int	main(int argc, char **argv) {
 		cur->firstRowIndex();
 		cur->endOfResultSet();
 		cur->rowCount();
-		cur->getField(3,0);
+		cur->getField(3,(uint32_t)0);
 		cur->setResultSetBufferSize(0);
 
 		// commit/rollback
@@ -235,14 +235,14 @@ int	main(int argc, char **argv) {
 				argv[3],argv[4],argv[5],0,1);
 		secondcur=new sqlrcursor(secondcon);
 		secondcur->sendQuery("select count(*) from testtable");
-		secondcur->getField(0,0);
+		secondcur->getField(0,(uint32_t)0);
 		con->commit();
 		secondcur->sendQuery("select count(*) from testtable");
-		secondcur->getField(0,0);
+		secondcur->getField(0,(uint32_t)0);
 		con->autoCommitOn();
 		cur->sendQuery("insert into testtable values ('testchar10')");
 		secondcur->sendQuery("select count(*) from testtable");
-		secondcur->getField(0,0);
+		secondcur->getField(0,(uint32_t)0);
 		con->autoCommitOff();
 
 		delete secondcur;
