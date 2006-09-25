@@ -14,6 +14,8 @@
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
 
+#include <defines.h>
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -370,10 +372,8 @@ bool scaler::availableDatabase() {
 int32_t scaler::countSessions() {
 
 	// get the number of open connections
-	uint32_t	*sessions=(uint32_t *)((long)idmemory->getPointer()+
-							sizeof(uint32_t));
-
-	return (int)(*sessions);
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	return ptr->connectionsinuse;
 }
 
 int32_t scaler::countConnections() {
@@ -382,12 +382,13 @@ int32_t scaler::countConnections() {
 	semset->waitWithUndo(4);
 
 	// get the number of connections
-	uint32_t	*connections=(uint32_t *)idmemory->getPointer();
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	uint32_t	totalconnections=ptr->totalconnections;
 
 	// signal that the connection counter may be accessed by someone else
 	semset->signalWithUndo(4);
 
-	return *connections;
+	return totalconnections;
 }
 
 void scaler::loop() {

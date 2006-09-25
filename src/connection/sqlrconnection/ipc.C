@@ -131,7 +131,7 @@ void sqlrconnection_svr::acquireConnectionCountMutex() {
 }
 
 uint32_t *sqlrconnection_svr::getConnectionCountBuffer() {
-	return (uint32_t *)idmemory->getPointer();
+	return &((shmdata *)idmemory->getPointer())->totalconnections;
 }
 
 void sqlrconnection_svr::releaseConnectionCountMutex() {
@@ -156,7 +156,7 @@ void sqlrconnection_svr::acquireSessionCountMutex() {
 }
 
 uint32_t *sqlrconnection_svr::getSessionCountBuffer() {
-	return (uint32_t *)((long)idmemory->getPointer()+sizeof(uint32_t));
+	return &((shmdata *)idmemory->getPointer())->connectionsinuse;
 }
 
 void sqlrconnection_svr::releaseSessionCountMutex() {

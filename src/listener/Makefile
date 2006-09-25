@@ -5,7 +5,7 @@ include ../../config.mk
 .PHONY: all clean rebuild install uninstall
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(TMPDIRCPPFLAG)
-LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE) -lefence
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(SERVERUSERPATH),yes)
