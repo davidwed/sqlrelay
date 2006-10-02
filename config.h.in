@@ -291,6 +291,9 @@
 /* Do we have _SIGRTMIN */
 #undef HAVE__SIGRTMIN
 
+/* Some iconv implementations use a const char ** parameter */
+#undef ICONV_CONST_CHAR
+
 /* Some compliers don't support the inline keyword */
 #undef INLINE
 

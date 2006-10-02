@@ -1,6 +1,3 @@
-odbc fails on netbsd/openbsd/freebsd - const char ** issue
-mdbtools fails on freebsd
-
 Now I found the reason how 'mysql_affected_rows' cause the httpd halt
 	(with drop-in replacement library)
 

@@ -1565,6 +1565,10 @@ then
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLRowCount(0,(SQLLEN *)0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLROWCOUNT_SQLLEN,1,Some systems use SQLLEN * in SQLRowCount)],[AC_MSG_RESULT(no)])
+		
+		AC_MSG_CHECKING(if iconv takes const char ** argument)
+		FW_TRY_LINK([#include <iconv.h>
+#include <stdlib.h>],[const char *t; iconv(0,&t,NULL,NULL,NULL);],[],[],[],[AC_MSG_RESULT(yes); AC_DEFINE(ICONV_CONST_CHAR,1,Some iconv implementations use a const char ** parameter)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(odbc,[$ODBCINCLUDES])

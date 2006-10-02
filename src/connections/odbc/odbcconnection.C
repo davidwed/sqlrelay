@@ -95,7 +95,11 @@ char *conv_to_user_coding(char *inbuf)
       size_t nconv;
       char *inptr = inbuf;
 		
+#ifdef ICONV_CONST_CHAR
+		nconv = iconv (cd, (const char **)&inptr, &insize, &wrptr, &avail);
+#else
 		nconv = iconv (cd, &inptr, &insize, &wrptr, &avail);
+#endif
       if (nconv == (size_t) -1)
         {
 					printf("conv_to_user_coding: error in iconv\n");					
@@ -147,7 +151,11 @@ char *conv_to_ucs(char *inbuf)
   size_t nconv;
   char *inptr = inbuf;
 		
+#ifdef ICONV_CONST_CHAR
+	nconv = iconv (cd, (const char **)&inptr, &insize, &wrptr, &avail);
+#else
 	nconv = iconv (cd, &inptr, &insize, &wrptr, &avail);
+#endif
   if (nconv == (size_t) -1)
   {
 		printf("conv_to_ucs: error in iconv\n");					

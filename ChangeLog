@@ -23,7 +23,8 @@
 	router connection overrides authtier=database
 	fixed a bug where clients would hang if they requested a cursor when
 		none were available
-	added some additional mdb 5 checks
+	added some additional mdb 5 checks to configure script
+	added iconv const char parameter check to configure script
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that
