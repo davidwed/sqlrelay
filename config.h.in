@@ -31,8 +31,14 @@
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
 
+/* Some versions of mdbtools have 5 param mdb_col_to_string */
+#undef HAVE_MDB_COL_TO_STRING_5_PARAM
+
 /* Some versions of mdbtools define mdb_run_query */
 #undef HAVE_MDB_RUN_QUERY
+
+/* Some versions of mdbtools define mdb_sql_fetch_row */
+#undef HAVE_MDB_SQL_FETCH_ROW
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H

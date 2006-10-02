@@ -889,7 +889,6 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 		// increment the number of "busy listeners"
 		if (!semset->signal(10)) {
 			// FIXME: bail somehow
-printf("signal 10 failed\n");
 		}
 
 		forkChild(clientsock);
@@ -898,7 +897,6 @@ printf("signal 10 failed\n");
 
 		// increment the number of "busy listeners"
 		if (!semset->signal(10)) {
-printf("signal 10 failed\n");
 			// FIXME: bail somehow
 		}
 
@@ -1091,7 +1089,6 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 		// since we've decided not to fork, decrement the counters
 		if (!semset->wait(10)) {
-printf("wait 10 failed\n");
 			// FIXME: bail somehow
 		}
 		ptr->statistics.forked_listeners--;
@@ -1259,7 +1256,6 @@ void sqlrlistener::incrementSessionCount() {
 	#endif
 
 	if (!semset->waitWithUndo(5)) {
-printf("wait 5 failed\n");
 		// FIXME: bail somehow
 	}
 
@@ -1279,7 +1275,6 @@ printf("wait 5 failed\n");
 
 		// signal the scaler
 		if (!semset->signal(6)) {
-printf("signal 6 failed\n");
 			// FIXME: bail somehow
 		}
 
@@ -1289,7 +1284,6 @@ printf("signal 6 failed\n");
 		#endif
 
 		if (!semset->wait(7)) {
-printf("wait 7 failed\n");
 			// FIXME: bail somehow
 		}
 
@@ -1300,7 +1294,6 @@ printf("wait 7 failed\n");
 
 	// signal that others may have access
 	if (!semset->signalWithUndo(5)) {
-printf("signal 5 failed\n");
 		// FIXME: bail somehow
 	}
 
@@ -1391,7 +1384,6 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 	#endif
 
 	if (!semset->wait(10)) {
-printf("wait 10 failed\n");
 		// FIXME: bail somehow
 	}
 
@@ -1430,7 +1422,6 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		#endif
 
 		if (!semset->waitWithUndo(1)) {
-printf("wait 1 failed\n");
 			// FIXME: bail somehow
 		}
 
@@ -1445,7 +1436,6 @@ printf("wait 1 failed\n");
 		#endif
 
 		if (!semset->wait(2)) {
-printf("wait 2 failed\n");
 			// FIXME: bail somehow
 		}
 
@@ -1503,7 +1493,6 @@ printf("wait 2 failed\n");
 		#endif
 
 		if (!semset->signal(3)) {
-printf("signal 3 failed\n");
 			// FIXME: bail somehow
 		}
 
@@ -1518,7 +1507,6 @@ printf("signal 3 failed\n");
 		#endif
 
 		if (!semset->signalWithUndo(1)) {
-printf("signal 1 failed\n");
 			// FIXME: bail somehow
 		}
 
@@ -1705,7 +1693,9 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 	// if the available connection wasn't in our list then it must have
 	// fired up after we forked, so we'll need to connect back to the main
 	// listener process and ask it for the pid
-	return requestFixup(connectionpid,connectionsock);
+	//return requestFixup(connectionpid,connectionsock);
+	bool	retval=requestFixup(connectionpid,connectionsock);
+	return retval;
 }
 
 bool sqlrlistener::requestFixup(uint32_t connectionpid,

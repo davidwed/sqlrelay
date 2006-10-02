@@ -6,6 +6,7 @@
 sqlrlistener	*lsnr;
 
 RETSIGTYPE	shutDown() {
+printf("shutting down!\n");
 	delete lsnr;
 	exit(0);
 }
@@ -22,6 +23,7 @@ int	main(int argc, const char **argv) {
 	}
 
 	// unsuccessful completion
+printf("unsuccessful completion\n");
 	delete lsnr;
 	exit(1);
 }

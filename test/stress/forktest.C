@@ -5,6 +5,7 @@
 #include <rudiments/randomnumber.h>
 #include <rudiments/datetime.h>
 #include <rudiments/snooze.h>
+#include <rudiments/daemonprocess.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -22,23 +23,25 @@ char	*query;
 int	forkcount;
 
 void	runQuery(int seed) {
-	for (;;) {
 
-		sqlrconnection	sqlrcon(host,port,sock,login,password,0,1);
-		sqlrcursor	sqlrcur(&sqlrcon);
+	sqlrconnection	sqlrcon(host,port,sock,login,password,0,1);
+	sqlrcursor	sqlrcur(&sqlrcon);
 
-		seed=randomnumber::generateNumber(seed);
-		int	count=randomnumber::scaleNumber(seed,1,50);
-		//count=10;
+	seed=randomnumber::generateNumber(seed);
+	int	count=randomnumber::scaleNumber(seed,1,20);
+	//count=10;
 								
-		printf("%d: looping %d times\n",getpid(),count);
-		for (int i=0; i<count; i++) {
-			if (!sqlrcur.sendQuery(query)) {
-				printf("error: %s\n",sqlrcur.errorMessage());
-				//exit(0);
-			}
+	printf("%d: looping %d times\n",getpid(),count);
+	int	successcount=0;
+	for (int i=0; i<count; i++) {
+		if (!sqlrcur.sendQuery(query)) {
+			//printf("error: %s\n",sqlrcur.errorMessage());
+			//exit(0);
+		} else {
+			successcount++;
 		}
 	}
+	printf("%d: succeeded\n",successcount);
 }
 
 main(int argc, char **argv) {
@@ -56,13 +59,14 @@ main(int argc, char **argv) {
 	query=argv[6];
 	forkcount=atoi(argv[7]);
 
-	for (int i=0; i<forkcount; i++) {
+	for (;;) {
 		if (!fork()) {
 			datetime	dt;
 			dt.getSystemDateAndTime();
 			runQuery(dt.getEpoch());
 			_exit(0);
 		}
-		snooze::macrosnooze(1);
+		snooze::microsnooze(0,50000);
+		daemonprocess::waitForChildren();
 	}
 }

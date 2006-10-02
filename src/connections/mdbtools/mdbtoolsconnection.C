@@ -200,7 +200,11 @@ bool mdbtoolscursor::skipRow() {
 }
 
 bool mdbtoolscursor::fetchRow() {
+#ifdef HAVE_MDB_SQL_FETCH_ROW
 	return mdb_sql_fetch_row(&mdbsql,mdbsql.cur_table);
+#else
+	return mdb_fetch_row(mdbsql.cur_table);
+#endif
 }
 
 void mdbtoolscursor::returnRow() {
@@ -220,12 +224,20 @@ void mdbtoolscursor::returnRow() {
 				g_ptr_array_index(table->columns,tcol);
 			if (!charstring::compare(tablecolumn->name,
 							column->name)) {
+#ifdef HAVE_MDB_COL_TO_STRING_5_PARAM
 				char	*data=mdb_col_to_string(
 						mdbsql.mdb,
 						mdbsql.mdb->pg_buf,
 						tablecolumn->cur_value_start,
 						tablecolumn->col_type,
 						tablecolumn->cur_value_len);
+#else
+				char	*data=mdb_col_to_string(
+						mdbsql.mdb,
+						tablecolumn->cur_value_start,
+						tablecolumn->col_type,
+						tablecolumn->cur_value_len);
+#endif
 				if (data) {
 					conn->sendField(data,
 						charstring::length(data));

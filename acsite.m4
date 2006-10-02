@@ -1784,6 +1784,12 @@ then
 				AC_MSG_CHECKING(if MDB Tools has mdb_run_query)
 				FW_TRY_LINK([#include <mdbsql.h>
 #include <stdlib.h>],[mdb_run_query(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_RUN_QUERY,1,Some versions of mdbtools define mdb_run_query)],[AC_MSG_RESULT(no)])
+				AC_MSG_CHECKING(if MDB Tools has mdb_sql_fetch_row)
+				FW_TRY_LINK([#include <mdbsql.h>
+#include <stdlib.h>],[mdb_sql_fetch_row(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_SQL_FETCH_ROW,1,Some versions of mdbtools define mdb_sql_fetch_row)],[AC_MSG_RESULT(no)])
+				AC_MSG_CHECKING(if mdb_col_to_string has 5 parameters)
+				FW_TRY_LINK([#include <mdbsql.h>
+#include <stdlib.h>],[mdb_col_to_string(NULL,NULL,0,0,0);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_COL_TO_STRING_5_PARAM,1,Some versions of mdbtools have 5 param mdb_col_to_string)],[AC_MSG_RESULT(no)])
 			fi
 		
 		fi
