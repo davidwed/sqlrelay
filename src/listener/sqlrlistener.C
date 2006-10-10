@@ -151,10 +151,6 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 		return false;
 	}
 
-	if (!listenOnClientSockets()) {
-		return false;
-	}
-
 	if ((passdescriptor=cfgfl.getPassDescriptor())) {
 		if (!listenOnHandoffSocket(&tmpdir,cmdl->getId())) {
 			return false;
@@ -627,6 +623,11 @@ void sqlrlistener::listen() {
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
 	while (ptr->totalconnections<cfgfl.getConnections()) {
 		snooze::macrosnooze(1);
+	}
+
+	// listen for client connections
+	if (!listenOnClientSockets()) {
+		return;
 	}
 
 	blockSignals();
