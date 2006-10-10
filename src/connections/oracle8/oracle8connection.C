@@ -58,18 +58,22 @@ void oracle8connection::handleConnectString() {
 	}
 }
 
-bool oracle8connection::logIn() {
+bool oracle8connection::logIn(bool printerrors) {
 
 
 	// handle ORACLE_HOME
 	if (home) {
 		if (!environment::setValue("ORACLE_HOME",home)) {
-			fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
+			if (printerrors) {
+				fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
+			}
 			return false;
 		}
 	} else {
 		if (!environment::getValue("ORACLE_HOME")) {
-			fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
+			if (printerrors) {
+				fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
+			}
 			return false;
 		}
 	}
@@ -77,12 +81,16 @@ bool oracle8connection::logIn() {
 	// handle ORACLE_SID
 	if (sid) {
 		if (!environment::setValue("ORACLE_SID",sid)) {
-			fprintf(stderr,"Failed to set ORACLE_SID environment variable.\n");
+			if (printerrors) {
+				fprintf(stderr,"Failed to set ORACLE_SID environment variable.\n");
+			}
 			return false;
 		}
 	} else {
 		if (!environment::getValue("ORACLE_SID")) {
-			fprintf(stderr,"No ORACLE_SID environment variable set or specified in connect string.\n");
+			if (printerrors) {
+				fprintf(stderr,"No ORACLE_SID environment variable set or specified in connect string.\n");
+			}
 			return false;
 		}
 	}
@@ -90,12 +98,16 @@ bool oracle8connection::logIn() {
 	// handle TWO_TASK
 	if (sid) {
 		if (!environment::setValue("TWO_TASK",sid)) {
-			fprintf(stderr,"Failed to set TWO_TASK environment variable.\n");
+			if (printerrors) {
+				fprintf(stderr,"Failed to set TWO_TASK environment variable.\n");
+			}
 			return false;
 		}
 	} else {
 		if (!environment::getValue("TWO_TASK")) {
-			fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
+			if (printerrors) {
+				fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
+			}
 			return false;
 		}
 	}
@@ -103,7 +115,9 @@ bool oracle8connection::logIn() {
 	// handle NLS_LANG
 	if (nlslang) {
 		if (!environment::setValue("NLS_LANG",nlslang)) {
-			fprintf(stderr,"Failed to set NLS_LANG environment variable.\n");
+			if (printerrors) {
+				fprintf(stderr,"Failed to set NLS_LANG environment variable.\n");
+			}
 			return false;
 		}
 	}
@@ -115,17 +129,23 @@ bool oracle8connection::logIn() {
 				(dvoid *(*)(dvoid *, dvoid *, size_t))0,
 				(void (*)(dvoid *, dvoid *))0,
 				(size_t)0,(dvoid **)0)!=OCI_SUCCESS) {
-		logInError("OCIEnvCreate() failed.");
+		if (printerrors) {
+			logInError("OCIEnvCreate() failed.");
+		}
 		return false;
 	}
 #else
 	if (OCIInitialize(OCI_DEFAULT,NULL,NULL,NULL,NULL)!=OCI_SUCCESS) {
-		logInError("OCIInitialize() failed.\n");
+		if (printerrors) {
+			logInError("OCIInitialize() failed.\n");
+		}
 		return false;
 	}
 	if (OCIEnvInit((OCIEnv **)&env,OCI_DEFAULT,
 					0,(dvoid **)0)!=OCI_SUCCESS) {
-		logInError("OCIEnvInit() failed.\n");
+		if (printerrors) {
+			logInError("OCIEnvInit() failed.\n");
+		}
 		return false;
 	}
 #endif
@@ -133,14 +153,18 @@ bool oracle8connection::logIn() {
 	// allocate an error handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&err,
 				OCI_HTYPE_ERROR,0,NULL)!=OCI_SUCCESS) {
-		logInError("OCIHandleAlloc(OCI_HTYPE_ERROR) failed.\n");
+		if (printerrors) {
+			logInError("OCIHandleAlloc(OCI_HTYPE_ERROR) failed.\n");
+		}
 		return false;
 	}
 
 	// allocate a server handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&srv,
 				OCI_HTYPE_SERVER,0,NULL)!=OCI_SUCCESS) {
-		logInError("OCIHandleAlloc(OCI_HTYPE_SERVER) failed.\n");
+		if (printerrors) {
+			logInError("OCIHandleAlloc(OCI_HTYPE_SERVER) failed.\n");
+		}
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
 		return false;
 	}
@@ -148,7 +172,9 @@ bool oracle8connection::logIn() {
 	// allocate a service context handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&svc,
 				OCI_HTYPE_SVCCTX,0,NULL)!=OCI_SUCCESS) {
-		logInError("OCIHandleAlloc(OCI_HTYPE_SVCCTX) failed.\n");
+		if (printerrors) {
+			logInError("OCIHandleAlloc(OCI_HTYPE_SVCCTX) failed.\n");
+		}
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
 		return false;
@@ -157,7 +183,9 @@ bool oracle8connection::logIn() {
 	// attach to the server
 	if (OCIServerAttach(srv,err,(text *)sid,
 				charstring::length(sid),0)!=OCI_SUCCESS) {
-		logInError("OCIServerAttach() failed.\n");
+		if (printerrors) {
+			logInError("OCIServerAttach() failed.\n");
+		}
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
@@ -168,7 +196,9 @@ bool oracle8connection::logIn() {
 	if (OCIAttrSet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)srv,(ub4)0,
 				OCI_ATTR_SERVER,(OCIError *)err)!=OCI_SUCCESS) {
-		logInError("Attach server to service failed.\n");
+		if (printerrors) {
+			logInError("Attach server to service failed.\n");
+		}
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
@@ -178,7 +208,9 @@ bool oracle8connection::logIn() {
 	// allocate a session handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&session,
 				(ub4)OCI_HTYPE_SESSION,0,NULL)!=OCI_SUCCESS) {
-		logInError("OCIHandleAlloc(OCI_HTYPE_SESSION) failed.\n");
+		if (printerrors) {
+			logInError("OCIHandleAlloc(OCI_HTYPE_SESSION) failed.\n");
+		}
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
@@ -192,7 +224,9 @@ bool oracle8connection::logIn() {
 				(dvoid *)user,
 				(ub4)charstring::length(user),
 				(ub4)OCI_ATTR_USERNAME,err)!=OCI_SUCCESS) {
-		logInError("Set username failed.\n");
+		if (printerrors) {
+			logInError("Set username failed.\n");
+		}
 		OCIServerDetach(srv,err,OCI_DEFAULT);
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
@@ -204,7 +238,9 @@ bool oracle8connection::logIn() {
 				(dvoid *)password,
 				(ub4)charstring::length(password),
 				(ub4)OCI_ATTR_PASSWORD,err)!=OCI_SUCCESS) {
-		logInError("Set password failed.\n");
+		if (printerrors) {
+			logInError("Set password failed.\n");
+		}
 		OCIServerDetach(srv,err,OCI_DEFAULT);
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
@@ -216,7 +252,9 @@ bool oracle8connection::logIn() {
 	// start a session
 	if (OCISessionBegin(svc,err,session,
 				OCI_CRED_RDBMS,(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
-		logInError("OCISessionBegin() failed.\n");
+		if (printerrors) {
+			logInError("OCISessionBegin() failed.\n");
+		}
 		OCIServerDetach(srv,err,OCI_DEFAULT);
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
@@ -229,7 +267,9 @@ bool oracle8connection::logIn() {
 	if (OCIAttrSet((dvoid *)svc,(ub4)OCI_HTYPE_SVCCTX,
 				(dvoid *)session,(ub4)0,
 				(ub4)OCI_ATTR_SESSION,err)!=OCI_SUCCESS) {
-		logInError("Attach session to service failed.\n");
+		if (printerrors) {
+			logInError("Attach session to service failed.\n");
+		}
 		OCISessionEnd(svc,err,session,OCI_DEFAULT);
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
@@ -242,7 +282,9 @@ bool oracle8connection::logIn() {
 	// allocate a transaction handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&trans,
 				OCI_HTYPE_TRANS,0,0)!=OCI_SUCCESS) {
-		logInError("OCIHandleAlloc(OCI_HTYPE_TRANS) failed.\n");
+		if (printerrors) {
+			logInError("OCIHandleAlloc(OCI_HTYPE_TRANS) failed.\n");
+		}
 		OCISessionEnd(svc,err,session,OCI_DEFAULT);
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
@@ -1335,8 +1377,8 @@ const char *oracle8cursor::errorMessage(bool *liveconnection) {
 			OCI_HTYPE_ERROR);
 	message[1023]=(char)NULL;
 
-	// check for dead connection
-	if (errcode==3114 || errcode==3113) {
+	// check for dead connection or shutdown in progress
+	if (errcode==3114 || errcode==3113 || errcode==1089) {
 		*liveconnection=false;
 	} else {
 		*liveconnection=true;

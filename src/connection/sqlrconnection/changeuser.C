@@ -11,10 +11,10 @@ bool sqlrconnection_svr::changeUser(const char *newuser,
 	#endif
 
 	closeCursors(false);
-	logOut();
+	logOutUpdateStats();
 	setUser(newuser);
 	setPassword(newpassword);
-	return (logInUpdateStats() && initCursors(false));
+	return (logInUpdateStats(false) && initCursors(false));
 }
 
 void sqlrconnection_svr::setUser(const char *user) {

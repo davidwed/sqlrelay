@@ -5,6 +5,12 @@
 
 sqlrlistener	*lsnr;
 
+RETSIGTYPE	crash() {
+printf("crashing!\n");
+	delete lsnr;
+	exit(0);
+}
+
 RETSIGTYPE	shutDown() {
 printf("shutting down!\n");
 	delete lsnr;
@@ -18,6 +24,7 @@ int	main(int argc, const char **argv) {
 	// launch the listener
 	lsnr=new sqlrlistener();
 	lsnr->handleShutDown((RETSIGTYPE *)shutDown);
+	lsnr->handleCrash((RETSIGTYPE *)crash);
 	if (lsnr->initListener(argc,argv)) {
 		lsnr->listen();
 	}

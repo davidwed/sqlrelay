@@ -53,7 +53,7 @@ void freetdsconnection::handleConnectString() {
 	packetsize=connectStringValue("packetsize");
 }
 
-bool freetdsconnection::logIn() {
+bool freetdsconnection::logIn(bool printerrors) {
 
 	// set sybase
 	if (sybase && sybase[0] && !environment::setValue("SYBASE",sybase)) {

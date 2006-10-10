@@ -113,7 +113,7 @@ class mysqlconnection : public sqlrconnection_svr {
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
-		bool		logIn();
+		bool		logIn(bool printerrors);
 #ifdef HAVE_MYSQL_CHANGE_USER
 		bool		changeUser(const char *newuser,
 						const char *newpassword);

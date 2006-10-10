@@ -29,7 +29,7 @@ void db2connection::handleConnectString() {
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
 
-bool db2connection::logIn() {
+bool db2connection::logIn(bool printerrors) {
 
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);

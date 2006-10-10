@@ -23,7 +23,7 @@ void sqlrconnection_svr::closeConnection() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"logging out...");
 	#endif
-	logOut();
+	logOutUpdateStats();
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"done logging out");
 	#endif

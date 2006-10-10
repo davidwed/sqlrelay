@@ -38,7 +38,7 @@ void mysqlconnection::handleConnectString() {
 #endif
 }
 
-bool mysqlconnection::logIn() {
+bool mysqlconnection::logIn(bool printerrors) {
 
 	// Handle host.
 	// For really old versions of mysql, a NULL host indicates that the

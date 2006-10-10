@@ -53,7 +53,7 @@ void postgresqlconnection::handleConnectString() {
 #endif
 }
 
-bool postgresqlconnection::logIn() {
+bool postgresqlconnection::logIn(bool printerrors) {
 
 	// initialize the datatype storage buffers
 	if (typemangling==2) {

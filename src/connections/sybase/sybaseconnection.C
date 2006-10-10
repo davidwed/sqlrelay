@@ -42,7 +42,7 @@ void sybaseconnection::handleConnectString() {
 	packetsize=connectStringValue("packetsize");
 }
 
-bool sybaseconnection::logIn() {
+bool sybaseconnection::logIn(bool printerrors) {
 
 	// set sybase
 	if (sybase && sybase[0] && !environment::setValue("SYBASE",sybase)) {

@@ -118,15 +118,14 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	cmdl=new cmdline(argc,argv);
 
 	tempdir		tmpdir(cmdl);
-	sqlrconfigfile	cfgfl;
 
 	if (!cfgfl.parse(cmdl->getConfig(),cmdl->getId())) {
 		return false;
 	}
 
-	setUserAndGroup(&cfgfl);
+	setUserAndGroup();
 
-	if (!verifyAccessToConfigFile(cmdl->getConfig(),&cfgfl)) {
+	if (!verifyAccessToConfigFile(cmdl->getConfig())) {
 		return false;
 	}
 
@@ -138,21 +137,21 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 		return false;
 	}
 
-	handleDynamicScaling(&cfgfl);
+	handleDynamicScaling();
 
-	setHandoffMethod(&cfgfl);
+	setHandoffMethod();
 
 	if (cfgfl.getAuthOnListener()) {
 		authc=new authenticator(&cfgfl);
 	}
 
-	setIpPermissions(&cfgfl);
+	setIpPermissions();
 
 	if (!createSharedMemoryAndSemaphores(&tmpdir,cmdl->getId())) {
 		return false;
 	}
 
-	if (!listenOnClientSockets(&cfgfl)) {
+	if (!listenOnClientSockets()) {
 		return false;
 	}
 
@@ -182,7 +181,7 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	return true;
 }
 
-void sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
+void sqlrlistener::setUserAndGroup() {
 
 	// get the user that we're currently running as
 	char	*currentuser=NULL;
@@ -194,18 +193,18 @@ void sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
 
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
-	if (charstring::compare(currentgroup,cfgfl->getRunAsGroup()) &&
-					!runAsGroup(cfgfl->getRunAsGroup())) {
+	if (charstring::compare(currentgroup,cfgfl.getRunAsGroup()) &&
+					!runAsGroup(cfgfl.getRunAsGroup())) {
 		fprintf(stderr,"Warning: could not change group to %s\n",
-						cfgfl->getRunAsGroup());
+						cfgfl.getRunAsGroup());
 	}
 
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
-	if (charstring::compare(currentuser,cfgfl->getRunAsUser()) &&
-					!runAsUser(cfgfl->getRunAsUser())) {
+	if (charstring::compare(currentuser,cfgfl.getRunAsUser()) &&
+					!runAsUser(cfgfl.getRunAsUser())) {
 		fprintf(stderr,"Warning: could not change user to %s\n",
-						cfgfl->getRunAsUser());
+						cfgfl.getRunAsUser());
 	}
 
 	// clean up
@@ -213,10 +212,9 @@ void sqlrlistener::setUserAndGroup(sqlrconfigfile *cfgfl) {
 	delete[] currentgroup;
 }
 
-bool sqlrlistener::verifyAccessToConfigFile(const char *configfile,
-						sqlrconfigfile *cfgfl) {
+bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 
-	if (!cfgfl->getDynamicScaling()) {
+	if (!cfgfl.getDynamicScaling()) {
 		return true;
 	}
 
@@ -226,9 +224,9 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile,
 		fprintf(stderr,"	This instance of SQL Relay is ");
 		fprintf(stderr,"configured to run as:\n");
 		fprintf(stderr,"		user: %s\n",
-						cfgfl->getRunAsUser());
+						cfgfl.getRunAsUser());
 		fprintf(stderr,"		group: %s\n\n",
-						cfgfl->getRunAsGroup());
+						cfgfl.getRunAsGroup());
 		fprintf(stderr,"	However, the config file %s\n",
 								configfile);
 		fprintf(stderr,"	cannot be read by that user ");
@@ -237,18 +235,18 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile,
 		fprintf(stderr,"(ie. maxconnections>connections),\n");
 		fprintf(stderr,"	new connections would be started as\n");
 		fprintf(stderr,"		user: %s\n",
-						cfgfl->getRunAsUser());
+						cfgfl.getRunAsUser());
 		fprintf(stderr,"		group: %s\n\n",
-						cfgfl->getRunAsGroup());
+						cfgfl.getRunAsGroup());
 		fprintf(stderr,"	They would not be able to read the");
 		fprintf(stderr,"config file and would shut down.\n\n");
 		fprintf(stderr,"	To remedy this problem, make %s\n",
 								configfile);
 		fprintf(stderr,"	readable by\n");
 		fprintf(stderr,"		user: %s\n",
-						cfgfl->getRunAsUser());
+						cfgfl.getRunAsUser());
 		fprintf(stderr,"		group: %s\n",
-						cfgfl->getRunAsGroup());
+						cfgfl.getRunAsGroup());
 		return false;
 	}
 	test.close();
@@ -281,19 +279,19 @@ bool sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
 	return true;
 }
 
-void sqlrlistener::handleDynamicScaling(sqlrconfigfile *cfgfl) {
+void sqlrlistener::handleDynamicScaling() {
 
 	// get the dynamic connection scaling parameters
-	maxconnections=cfgfl->getMaxConnections();
+	maxconnections=cfgfl.getMaxConnections();
 
 	// if dynamic scaling isn't going to be used, disable it
-	dynamicscaling=cfgfl->getDynamicScaling();
+	dynamicscaling=cfgfl.getDynamicScaling();
 }
 
-void sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
+void sqlrlistener::setHandoffMethod() {
 
 	// get handoff method
-	if (cfgfl->getPassDescriptor()) {
+	if (cfgfl.getPassDescriptor()) {
 
 		// create the list of handoff nodes
 		handoffsocklist=new handoffsocketnode[maxconnections];
@@ -304,11 +302,11 @@ void sqlrlistener::setHandoffMethod(sqlrconfigfile *cfgfl) {
 	}
 }
 
-void sqlrlistener::setIpPermissions(sqlrconfigfile *cfgfl) {
+void sqlrlistener::setIpPermissions() {
 
 	// get denied and allowed ip's and compile the expressions
-	const char	*deniedips=cfgfl->getDeniedIps();
-	const char	*allowedips=cfgfl->getAllowedIps();
+	const char	*deniedips=cfgfl.getDeniedIps();
+	const char	*allowedips=cfgfl.getAllowedIps();
 	if (deniedips[0]) {
 		denied=new regularexpression(deniedips);
 	}
@@ -470,13 +468,13 @@ void sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr,"	Error was: %s\n\n",error::getErrorString());
 }
 
-bool sqlrlistener::listenOnClientSockets(sqlrconfigfile *cfgfl) {
+bool sqlrlistener::listenOnClientSockets() {
 
 	// get addresses/inet port and unix port to listen on
-	const char * const *addresses=cfgfl->getAddresses();
-	clientsockincount=cfgfl->getAddressCount();
-	uint16_t	port=cfgfl->getPort();
-	const char	*uport=cfgfl->getUnixPort();
+	const char * const *addresses=cfgfl.getAddresses();
+	clientsockincount=cfgfl.getAddressCount();
+	uint16_t	port=cfgfl.getPort();
+	const char	*uport=cfgfl.getUnixPort();
 	if (uport && uport[0]) {
 		unixport=charstring::duplicate(uport);
 	}
@@ -624,6 +622,12 @@ void sqlrlistener::listen() {
 
 	// set the alarm handler's pointer
 	staticlistener=this;
+
+	// wait until all of the connections have started
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	while (ptr->totalconnections<cfgfl.getConnections()) {
+		snooze::macrosnooze(1);
+	}
 
 	blockSignals();
 	for(;;) {

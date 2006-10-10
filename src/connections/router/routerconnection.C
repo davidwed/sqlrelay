@@ -86,7 +86,7 @@ void routerconnection::handleConnectString() {
 	}
 }
 
-bool routerconnection::logIn() {
+bool routerconnection::logIn(bool printerrors) {
 	justloggedin=true;
 	return true;
 }

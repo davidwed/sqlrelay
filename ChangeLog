@@ -25,6 +25,9 @@
 		none were available
 	added some additional mdb 5 checks to configure script
 	added iconv const char parameter check to configure script
+	the main listener doesn't listen for clients until all of the
+		connections have started now
+	added notes about tcp_tw_recycle/tcp_tw_reuse in tuning doc
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that

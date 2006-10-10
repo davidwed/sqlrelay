@@ -30,7 +30,7 @@ void sqliteconnection::handleConnectString() {
 	db=connectStringValue("db");
 }
 
-bool sqliteconnection::logIn() {
+bool sqliteconnection::logIn(bool printerrors) {
 #ifdef SQLITE_TRANSACTIONAL
 #ifdef SQLITE3
 	if (sqlite3_open(db,&sqliteptr)==SQLITE_OK) {

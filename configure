@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix=/usr/local/firstworks
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS initscript_prefix CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH OVERRIDEPERLSITEARCH OVERRIDEPERLSITELIB OVERRIDEPERLINSTALLMAN3DIR OVERRIDEPERLMAN3EXT PYTHONUSERPATH OVERRIDERUBYSITEARCHDIR OVERRIDERUBYSITELIBDIR JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE WALL PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLLIB PERLPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYLIB GCJ FASTJAR HAVE_JAVA JAVAC JAR JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS initscript_prefix CLIENTUSERPATH SERVERUSERPATH ORACLEUSERPATH MYSQLUSERPATH POSTGRESQLUSERPATH SQLITEUSERPATH FREETDSUSERPATH SYBASEUSERPATH ODBCUSERPATH DB2USERPATH INTERBASEUSERPATH MDBTOOLSUSERPATH OVERRIDEPERLSITEARCH OVERRIDEPERLSITELIB OVERRIDEPERLINSTALLMAN3DIR OVERRIDEPERLMAN3EXT PYTHONUSERPATH OVERRIDERUBYSITEARCHDIR OVERRIDERUBYSITELIBDIR JAVAUSERPATH PHPUSERPATH TCLUSERPATH CUSERPATH PSQLUSERPATH LIBDMALLOC LIBEFENCE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S SET_MAKE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL MINGW32 CYGWIN UWIN EXE MICROSOFT PYTHONFRAMEWORK PS UNAME PIPE WNOLONGDOUBLE WALL PTHREADINCLUDES PTHREADLIBS READLINELIB SOCKETLIBS DLLIB AIOLIB ICONVINCLUDES ICONVLIBS RUDIMENTSPATH RUDIMENTSINCLUDES RUDIMENTSLIBS RUDIMENTSLIBSPATH ORACLEVERSION ORACLEINCLUDES ORACLELIBS ORACLELIBSPATH ORACLESTATIC MYSQLINCLUDES MYSQLLIBS MYSQLLIBSPATH MYSQLSTATIC POSTGRESQLINCLUDES POSTGRESQLLIBS POSTGRESQLLIBSPATH POSTGRESQLSTATIC GDBMLIBS SQLITEINCLUDES SQLITELIBS SQLITELIBSPATH SQLITESTATIC FREETDSINCLUDES FREETDSLIBS FREETDSLIBSPATH FREETDSSTATIC SYBASEINCLUDES SYBASELIBS SYBASELIBSPATH SYBASESTATIC ODBCINCLUDES ODBCLIBS ODBCLIBSPATH ODBCSTATIC DB2INCLUDES DB2LIBS DB2LIBSPATH DB2STATIC INTERBASEINCLUDES INTERBASELIBS INTERBASELIBSPATH INTERBASESTATIC GLIBLIBS MDBTOOLSINCLUDES MDBTOOLSLIBS MDBTOOLSLIBSPATH MDBTOOLSSTATIC PERL HAVE_PERL PERLLIB PERLPREFIX POD2MAN HAVE_PYTHON PYTHONINCLUDES PYTHONDIR PYTHONLIB HAVE_ZOPE ZOPEDIR RUBY HAVE_RUBY RUBYLIB GCJ FASTJAR HAVE_JAVA JAVAC JAR JAVAINCLUDES HAVE_TCL TCLINCLUDE TCLLIB TCLLIBSPATH PHPCONFIG HAVE_PHP PHPINCLUDES PHPEXTDIR PHPVERSION PHPMAJORVERSION PHPPEARDBDIR GTKCONFIG HAVE_GTK RPM_BUILD_DIR SQLR_VERSION SONAME_VERSION_INFO STATICLINK abs_srcdir abs_builddir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -21649,6 +21649,406 @@ rm -f conftest.err conftest.$ac_objext \
 	fi
 
 
+
+
+
+SEARCHPATH=/usr
+NAME=iconv
+HEADER=iconv.h
+LIBNAME=iconv
+LINKSTATIC=$STATICFLAG
+LINKRPATH=$RPATHFLAG
+USEFULLLIBPATH=
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+HEADERSANDLIBSPATH=""
+
+eval "ICONVINCLUDES=\"\""
+eval "ICONVLIBS=\"\""
+eval "ICONVLIBPATH=\"\""
+eval "ICONVSTATIC=\"\""
+if ( test -n "" )
+then
+	eval "=\"\""
+fi
+
+
+for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
+do
+	if ( test -n "$path" -a -d "$path" )
+	then
+
+		if ( test "$path" = "/" )
+		then
+						if ( test "$USEFULLLIBPATH" = "yes" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/lib\"; LIBSTRING=\"/lib/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			else
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+
+			if ( test "$USEFULLLIBPATH" = "yes" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"/lib64/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/lib64/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			else
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/lib64/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+
+
+						path=""
+		fi
+
+
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		do
+
+			if ( test -n "$LIBSTRING" )
+			then
+				break
+			fi
+
+			for includepath in "$path/include" "$path/include/$NAME"
+			do
+
+				if ( test -n "$LIBSTRING" )
+				then
+					break
+				fi
+
+				if ( test "$USEFULLLIBPATH" = "yes" )
+				then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$includepath/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$includepath\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$libpath/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$libpath/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$includepath\""
+			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+				else
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$includepath/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$includepath\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$libpath/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$includepath\""
+			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+				fi
+			done
+		done
+
+		if ( test -n "$LIBSTRING" )
+		then
+			HEADERSANDLIBSPATH="$path"
+			break
+		fi
+	fi
+done
+
+INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
+LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
+LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
+
+eval "ICONVINCLUDES=\"$INCLUDESTRING\""
+eval "ICONVLIBS=\"$LIBSTRING\""
+eval "ICONVLIBPATH=\"$LIBPATH\""
+eval "ICONVSTATIC=\"$STATIC\""
+if ( test -n "" )
+then
+	eval "=\"$HEADERSANDLIBSPATH\""
+fi
+
+
+	echo "$as_me:$LINENO: checking if iconv takes const char ** argument" >&5
+echo $ECHO_N "checking if iconv takes const char ** argument... $ECHO_C" >&6
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ICONVINCLUDES"
+LIBS="$ICONVLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <iconv.h>
+#include <stdlib.h>
+int
+main ()
+{
+const char *t; iconv(0,&t,NULL,NULL,NULL);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6;
+cat >>confdefs.h <<\_ACEOF
+#define ICONV_CONST_CHAR 1
+_ACEOF
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+
+
+
+
 echo "******************************"
 
 
@@ -27619,332 +28019,6 @@ export LD_LIBRARY_PATH
 						if ( test -n "$LINKFAILED" )
 			then
 
-
-
-SEARCHPATH=/usr
-NAME=iconv
-HEADER=iconv.h
-LIBNAME=iconv
-LINKSTATIC=$STATICFLAG
-LINKRPATH=$RPATHFLAG
-USEFULLLIBPATH=
-INCLUDESTRING=""
-LIBSTRING=""
-LIBPATH=""
-STATIC=""
-HEADERSANDLIBSPATH=""
-
-eval "ICONVINCLUDES=\"\""
-eval "ICONVLIBS=\"\""
-eval "ICONVLIBPATH=\"\""
-eval "ICONVSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
-
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/sw" "/usr/local/firstworks"
-do
-	if ( test -n "$path" -a -d "$path" )
-	then
-
-		if ( test "$path" = "/" )
-		then
-						if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"/lib/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-			if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"/lib64/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-
-						path=""
-		fi
-
-
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
-		do
-
-			if ( test -n "$LIBSTRING" )
-			then
-				break
-			fi
-
-			for includepath in "$path/include" "$path/include/$NAME"
-			do
-
-				if ( test -n "$LIBSTRING" )
-				then
-					break
-				fi
-
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$libpath/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				fi
-			done
-		done
-
-		if ( test -n "$LIBSTRING" )
-		then
-			HEADERSANDLIBSPATH="$path"
-			break
-		fi
-	fi
-done
-
-INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
-
-eval "ICONVINCLUDES=\"$INCLUDESTRING\""
-eval "ICONVLIBS=\"$LIBSTRING\""
-eval "ICONVLIBPATH=\"$LIBPATH\""
-eval "ICONVSTATIC=\"$STATIC\""
-if ( test -n "" )
-then
-	eval "=\"$HEADERSANDLIBSPATH\""
-fi
-
-
 																				if ( test -n "$ICONVLIBS" )
 				then
 					echo "$as_me:$LINENO: checking whether freetds requires libiconv" >&5
@@ -29828,75 +29902,6 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
 echo "${ECHO_T}yes" >&6;
 cat >>confdefs.h <<\_ACEOF
 #define SQLROWCOUNT_SQLLEN 1
-_ACEOF
-
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-
-		echo "$as_me:$LINENO: checking if iconv takes const char ** argument" >&5
-echo $ECHO_N "checking if iconv takes const char ** argument... $ECHO_C" >&6
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS=""
-LIBS=""
-LD_LIBRARY_PATH=""
-export LD_LIBRARY_PATH
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <iconv.h>
-#include <stdlib.h>
-int
-main ()
-{
-const char *t; iconv(0,&t,NULL,NULL,NULL);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6;
-cat >>confdefs.h <<\_ACEOF
-#define ICONV_CONST_CHAR 1
 _ACEOF
 
 else
@@ -32394,7 +32399,9 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
+extern "C" {
 #include <mdbsql.h>
+}
 #include <stdlib.h>
 int
 main ()
@@ -32462,7 +32469,9 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
+extern "C" {
 #include <mdbsql.h>
+}
 #include <stdlib.h>
 int
 main ()
@@ -32530,7 +32539,9 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
+extern "C" {
 #include <mdbsql.h>
+}
 #include <stdlib.h>
 int
 main ()
@@ -37834,6 +37845,8 @@ s,@READLINELIB@,$READLINELIB,;t t
 s,@SOCKETLIBS@,$SOCKETLIBS,;t t
 s,@DLLIB@,$DLLIB,;t t
 s,@AIOLIB@,$AIOLIB,;t t
+s,@ICONVINCLUDES@,$ICONVINCLUDES,;t t
+s,@ICONVLIBS@,$ICONVLIBS,;t t
 s,@RUDIMENTSPATH@,$RUDIMENTSPATH,;t t
 s,@RUDIMENTSINCLUDES@,$RUDIMENTSINCLUDES,;t t
 s,@RUDIMENTSLIBS@,$RUDIMENTSLIBS,;t t

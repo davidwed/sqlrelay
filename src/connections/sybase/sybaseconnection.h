@@ -135,7 +135,7 @@ class sybaseconnection : public sqlrconnection_svr {
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
-		bool		logIn();
+		bool		logIn(bool printerrors);
 		void		logInError(const char *error, uint16_t stage);
 		sqlrcursor_svr	*initCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);

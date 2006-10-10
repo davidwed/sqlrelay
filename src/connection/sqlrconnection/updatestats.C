@@ -3,8 +3,8 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection_svr::logInUpdateStats() {
-	if (logIn()) {
+bool sqlrconnection_svr::logInUpdateStats(bool printerrors) {
+	if (logIn(printerrors)) {
 		statistics->open_svr_connections++;
 		statistics->opened_svr_connections++;
 		return true;

@@ -1,3 +1,8 @@
+sqlr-listeners pile up upon shutdown if clients are still active
+ping needs to make the sqlrelay connections log back in
+
+iconv const char test fails on some platforms because iconv.h isn't in include path, it's in /usr/local or somewhere
+
 Now I found the reason how 'mysql_affected_rows' cause the httpd halt
 	(with drop-in replacement library)
 

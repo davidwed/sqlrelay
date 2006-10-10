@@ -113,7 +113,7 @@ uint16_t statusconnection::getNumberOfConnectStringVars() {
 void statusconnection::handleConnectString() {
 }
 
-bool statusconnection::logIn() {
+bool statusconnection::logIn(bool printerrors) {
 	return false;
 }
 

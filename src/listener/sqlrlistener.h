@@ -47,20 +47,19 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 		void	listen();
 	private:
 		void	cleanUp();
-		void	setUserAndGroup(sqlrconfigfile *cfgfl);
-		bool	verifyAccessToConfigFile(const char *configfile,
-						sqlrconfigfile *cfgfl);
+		void	setUserAndGroup();
+		bool	verifyAccessToConfigFile(const char *configfile);
 		bool	handlePidFile(tempdir *tmpdir, const char *id);
-		void	handleDynamicScaling(sqlrconfigfile *cfgfl);
-		void	setHandoffMethod(sqlrconfigfile *cfgfl);
-		void	setIpPermissions(sqlrconfigfile *cfgfl);
+		void	handleDynamicScaling();
+		void	setHandoffMethod();
+		void	setIpPermissions();
 		bool	createSharedMemoryAndSemaphores(tempdir *tmpdir,
 								const char *id);
 		void	ipcFileError(const char *idfilename);
 		void	keyError(const char *idfilename);
 		void	shmError(const char *id, int shmid);
 		void	semError(const char *id, int semid);
-		bool	listenOnClientSockets(sqlrconfigfile *cfgfl);
+		bool	listenOnClientSockets();
 		bool	listenOnHandoffSocket(tempdir *tmpdir, const char *id);
 		bool	listenOnDeregistrationSocket(tempdir *tmpdir,
 								const char *id);
@@ -145,6 +144,9 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 
 		signalhandler		alarmhandler;
 		static	sqlrlistener	*staticlistener;
+
+		sqlrconfigfile		cfgfl;
+		uint32_t		runningconnections;
 };
 
 #endif

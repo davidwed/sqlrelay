@@ -60,7 +60,7 @@ void interbaseconnection::handleConnectString() {
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
 
-bool interbaseconnection::logIn() {
+bool interbaseconnection::logIn(bool printerrors) {
 
 	// initialize a dpb
 	char	*dpbptr=dpb;

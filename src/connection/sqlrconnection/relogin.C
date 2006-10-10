@@ -5,6 +5,8 @@
 #include <sqlrconnection.h>
 #include <rudiments/snooze.h>
 
+#include <unistd.h>
+
 void sqlrconnection_svr::reLogIn() {
 
 	markDatabaseUnavailable();
@@ -15,17 +17,17 @@ void sqlrconnection_svr::reLogIn() {
 
 	// attempt to log in over and over, once every 5 seconds
 	closeCursors(false);
-	logOut();
+	logOutUpdateStats();
 	for (;;) {
 			
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",5,"trying...");
 		#endif
 
-		if (logInUpdateStats()) {
+		if (logInUpdateStats(false)) {
 			if (!initCursors(false)) {
 				closeCursors(false);
-				logOut();
+				logOutUpdateStats();
 			} else {
 				break;
 			}

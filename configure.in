@@ -505,6 +505,8 @@ AC_CHECK_LIB(aio,aioread,AIOLIB=-laio,AIOLIB="")
 AC_SUBST(AIOLIB)
 FW_CHECK_NEED_REDHAT_9_GLIBC_2_3_2_HACK
 
+FW_CHECK_ICONV
+
 echo "******************************"
 
 

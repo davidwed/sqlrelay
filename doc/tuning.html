@@ -329,9 +329,7 @@ on a reliable network, reducing the length of the timeout is probably OK.</p>
 <p>Here's why it helps...</p>
 
 <p>The kernel keeps a list of sockets in the TIME_WAIT state.  When the list
-is full, failures start to occur.  On my test machine (running a linux 2.4 
-kernel), I can have about 1000 sockets in the TIME_WAIT state before running
-into problems.</p>
+is full, failures start to occur.</p>
 
 <p>If your server is getting new client connections faster than it can bleed off
 sockets in the TIME_WAIT state, the list will ultimately get full.  Decreasing
@@ -346,6 +344,28 @@ example, the timeout is set to 30 seconds.  You should put this command in a
 system startup file so it will be executed at boot time.</p>
 
 <p>echo 30 &gt; /proc/sys/net/ipv4/tcp_fin_timeout</p>
+
+<p>You might also try enabling tcp_tw_recycle and tcp_tw_reuse as follows:</p>
+
+<p>echo 1 &gt; /proc/sys/net/ipv4/tcp_tw_reuse<br>
+echo 1 &gt; /proc/sys/net/ipv4/tcp_tw_recycle<br></p>
+
+<p>Those parameters enable fast recycling and reuse of sockets in the
+TIME_WAIT state.  I can't find any documentation about them other than the
+following though:</p>
+
+<blockquote><pre>
+tcp_tw_recycle - BOOLEAN
+ Enable fast recycling TIME-WAIT sockets. Default value is 0.
+ It should not be changed without advice/request of technical
+ experts.
+
+tcp_tw_reuse - BOOLEAN
+ Allow to reuse TIME-WAIT sockets for new connections when it is
+ safe from protocol viewpoint. Default value is 0.
+ It should not be changed without advice/request of technical
+ experts.
+</pre></blockquote>
 
 <p>For Solaris, the parameter can be modified while the system is running
 using the ndd command to set the number of milliseconds to wait.  These

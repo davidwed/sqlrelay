@@ -199,7 +199,7 @@ void odbcconnection::handleConnectString() {
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
 
-bool odbcconnection::logIn() {
+bool odbcconnection::logIn(bool printerrors) {
 
 	// allocate environment handle
 #if (ODBCVER >= 0x0300)

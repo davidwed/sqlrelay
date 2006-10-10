@@ -1244,7 +1244,17 @@ then
 fi
 ])
 
+AC_DEFUN([FW_CHECK_ICONV],
+[
+	FW_CHECK_HEADERS_AND_LIBS([/usr],[iconv],[iconv.h],[iconv],[$STATICFLAG],[$RPATHFLAG],[ICONVINCLUDES],[ICONVLIBS],[ICONVLIBPATH],[ICONVSTATIC])
+		
+	AC_MSG_CHECKING(if iconv takes const char ** argument)
+	FW_TRY_LINK([#include <iconv.h>
+#include <stdlib.h>],[const char *t; iconv(0,&t,NULL,NULL,NULL);],[$ICONVINCLUDES],[$ICONVLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(ICONV_CONST_CHAR,1,Some iconv implementations use a const char ** parameter)],[AC_MSG_RESULT(no)])
 
+	AC_SUBST(ICONVINCLUDES)
+	AC_SUBST(ICONVLIBS)
+])
 
 AC_DEFUN([FW_CHECK_FREETDS],
 [
@@ -1289,8 +1299,6 @@ then
 			dnl if not, search for iconv
 			if ( test -n "$LINKFAILED" )
 			then
-
-				FW_CHECK_HEADERS_AND_LIBS([/usr],[iconv],[iconv.h],[iconv],[$STATICFLAG],[$RPATHFLAG],[ICONVINCLUDES],[ICONVLIBS],[ICONVLIBPATH],[ICONVSTATIC])
 
 				dnl if iconv was found, try the test again,
 				dnl using it
@@ -1565,10 +1573,6 @@ then
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLRowCount(0,(SQLLEN *)0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLROWCOUNT_SQLLEN,1,Some systems use SQLLEN * in SQLRowCount)],[AC_MSG_RESULT(no)])
-		
-		AC_MSG_CHECKING(if iconv takes const char ** argument)
-		FW_TRY_LINK([#include <iconv.h>
-#include <stdlib.h>],[const char *t; iconv(0,&t,NULL,NULL,NULL);],[],[],[],[AC_MSG_RESULT(yes); AC_DEFINE(ICONV_CONST_CHAR,1,Some iconv implementations use a const char ** parameter)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(odbc,[$ODBCINCLUDES])
@@ -1786,13 +1790,19 @@ then
 				MDBTOOLSINCLUDES="$MDBINCLUDES $MDBSQLINCLUDES $GLIBINCLUDES"
 				MDBTOOLSLIBS="$MDBSQLLIBS $MDBLIBS $GLIBLIBS"
 				AC_MSG_CHECKING(if MDB Tools has mdb_run_query)
-				FW_TRY_LINK([#include <mdbsql.h>
+				FW_TRY_LINK([extern "C" {
+#include <mdbsql.h>
+}
 #include <stdlib.h>],[mdb_run_query(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_RUN_QUERY,1,Some versions of mdbtools define mdb_run_query)],[AC_MSG_RESULT(no)])
 				AC_MSG_CHECKING(if MDB Tools has mdb_sql_fetch_row)
-				FW_TRY_LINK([#include <mdbsql.h>
+				FW_TRY_LINK([extern "C" {
+#include <mdbsql.h>
+}
 #include <stdlib.h>],[mdb_sql_fetch_row(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_SQL_FETCH_ROW,1,Some versions of mdbtools define mdb_sql_fetch_row)],[AC_MSG_RESULT(no)])
 				AC_MSG_CHECKING(if mdb_col_to_string has 5 parameters)
-				FW_TRY_LINK([#include <mdbsql.h>
+				FW_TRY_LINK([extern "C" {
+#include <mdbsql.h>
+}
 #include <stdlib.h>],[mdb_col_to_string(NULL,NULL,0,0,0);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_COL_TO_STRING_5_PARAM,1,Some versions of mdbtools have 5 param mdb_col_to_string)],[AC_MSG_RESULT(no)])
 			fi
 		

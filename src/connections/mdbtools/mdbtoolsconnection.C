@@ -27,7 +27,7 @@ void mdbtoolsconnection::handleConnectString() {
 	db=connectStringValue("db");
 }
 
-bool mdbtoolsconnection::logIn() {
+bool mdbtoolsconnection::logIn(bool printerrors) {
 	return true;
 }
 

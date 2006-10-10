@@ -32,7 +32,7 @@ void oracle7connection::handleConnectString() {
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
 
-bool oracle7connection::logIn() {
+bool oracle7connection::logIn(bool printerrors) {
 
 	// handle ORACLE_HOME
 	if (home) {

@@ -143,7 +143,7 @@ class odbcconnection : public sqlrconnection_svr {
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
-		bool		logIn();
+		bool		logIn(bool printerrors);
 		sqlrcursor_svr	*initCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();

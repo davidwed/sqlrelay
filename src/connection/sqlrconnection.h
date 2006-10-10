@@ -54,7 +54,7 @@ class sqlrconnection_svr :
 		virtual bool	supportsAuthOnDatabase();
 		virtual	uint16_t	getNumberOfConnectStringVars()=0;
 		virtual	void	handleConnectString()=0;
-		virtual	bool	logIn()=0;
+		virtual	bool	logIn(bool printerrors)=0;
 		virtual	void	logOut()=0;
 		virtual	bool	changeUser(const char *newuser,
 						const char *newpassword);
@@ -147,7 +147,7 @@ class sqlrconnection_svr :
 
 	private:
 		// methods used internally
-		bool	logInUpdateStats();
+		bool	logInUpdateStats(bool printerrors);
 		void	logOutUpdateStats();
 		sqlrcursor_svr	*initCursorUpdateStats();
 		void	deleteCursorUpdateStats(sqlrcursor_svr *curs);
