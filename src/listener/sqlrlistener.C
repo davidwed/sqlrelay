@@ -621,7 +621,7 @@ void sqlrlistener::listen() {
 
 	// wait until all of the connections have started
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	while (ptr->totalconnections<cfgfl.getConnections()) {
+	while (ptr->statistics.open_svr_connections<cfgfl.getConnections()) {
 		snooze::macrosnooze(1);
 	}
 

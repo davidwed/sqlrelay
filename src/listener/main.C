@@ -6,13 +6,11 @@
 sqlrlistener	*lsnr;
 
 RETSIGTYPE	crash() {
-printf("crashing!\n");
 	delete lsnr;
 	exit(0);
 }
 
 RETSIGTYPE	shutDown() {
-printf("shutting down!\n");
 	delete lsnr;
 	exit(0);
 }

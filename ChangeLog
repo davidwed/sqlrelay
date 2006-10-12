@@ -28,6 +28,7 @@
 	the main listener doesn't listen for clients until all of the
 		connections have started now
 	added notes about tcp_tw_recycle/tcp_tw_reuse in tuning doc
+	ping causes the connection to relogin if it returns false now
 
 0.37 - integrated Charles Frank's SID code
 	fixed bug in configure script where it would erroneously report that

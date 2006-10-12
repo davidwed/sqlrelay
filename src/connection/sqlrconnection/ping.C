@@ -7,8 +7,12 @@ void sqlrconnection_svr::pingCommand() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,"ping");
 	#endif
-	clientsock->write(ping());
+	bool	pingresult=ping();
+	clientsock->write(pingresult);
 	flushWriteBuffer();
+	if (!pingresult) {
+		reLogIn();
+	}
 }
 
 bool sqlrconnection_svr::ping() {
