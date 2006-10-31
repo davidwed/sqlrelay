@@ -246,6 +246,14 @@ Group: Applications/Databases
 SQL Relay connection daemon for Sybase.
 
 
+%package router
+Summary: SQL Relay query routing daemon.
+Group: Applications/Databases
+
+%description router
+SQL Relay query routing daemon.
+
+
 %package java
 Summary: SQL Relay modules for Java.
 Group: Development/Languages
@@ -324,7 +332,11 @@ Man pages for SQL Relay.
 %else
 %define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
 %endif
-%define	zopedir		%(ZOPEPATH="/opt/Zope/lib/python/Proucts"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr" "/usr/lib" "/opt"; do for j in "zope" "Zope"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib/python/Products"; fi; done; done; echo $ZOPEPATH)
+%ifarch x86_64
+%define	zopedir		%(ZOPEPATH="/opt/Zope/lib/python/Proucts"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib64" "/usr" "/usr/lib64" "/opt"; do for j in "zope" "Zope" "zope2" "Zope2" "zope3" "Zope3"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib64/python/Products"; fi; done; done; echo $ZOPEPATH)
+%else
+%define	zopedir		%(ZOPEPATH="/opt/Zope/lib/python/Proucts"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib" "/usr" "/usr/lib" "/opt"; do for j in "zope" "Zope" "zope2" "Zope2" "zope3" "Zope3"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib/python/Products"; fi; done; done; echo $ZOPEPATH)
+%endif
 %define	phpextdir	%(php-config --extension-dir)
 %define	phppeardbdir	%(echo "`php-config --prefix`/share/pear/DB")
 %define	perl_prefix	%(eval "export `perl -V:prefix`"; echo $prefix)
@@ -337,7 +349,7 @@ Man pages for SQL Relay.
 
 %define	ruby_sitelibdir	%(ruby -e 'require "mkmf"' -e 'drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/' -e 'print "arch = "' -e 'print CONFIG["arch"]' -e 'print "\\n"' -e 'print "ruby_version = "' -e 'print Config::CONFIG["ruby_version"]' -e 'print "\\n"' -e 'print "prefix = "' -e 'print with_destdir(CONFIG["prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "exec_prefix = "' -e 'print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "libdir = "' -e 'print with_destdir($libdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "rubylibdir = "' -e 'print with_destdir($rubylibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "archdir = "' -e 'print with_destdir($archdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitedir = "' -e 'print with_destdir($sitedir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitelibdir = "' -e 'print with_destdir($sitelibdir.sub(drive, ""))' -e 'print "\\n\\n"' -e 'print "all:\\n"' -e 'print "	echo $(sitelibdir)\\n"' | make -s -f - )
 
-%define	ruby_sitearchdir	%(ruby -e 'require "mkmf"' -e 'drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/' -e 'print "arch = "' -e 'print CONFIG["arch"]' -e 'print "\\n"' -e 'print "sitearch = "' -e 'print CONFIG["sitearch"]' -e 'print "\\n"' -e 'print "ruby_version = "' -e 'print Config::CONFIG["ruby_version"]' -e 'print "\\n"' -e 'print "prefix = "' -e 'print with_destdir(CONFIG["prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "exec_prefix = "' -e 'print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "libdir = "' -e 'print with_destdir($libdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "rubylibdir = "' -e 'print with_destdir($rubylibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "archdir = "' -e 'print with_destdir($archdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitedir = "' -e 'print with_destdir($sitedir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitelibdir = "' -e 'print with_destdir($sitelibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitearchdir = "' -e 'print with_destdir($sitearchdir.sub(drive, ""))' -e 'print "\\n\\n"' -e 'print "all:\\n"' -e 'print "	echo $(sitearchdir)\\n"' | make -s -f - )
+%define	ruby_sitearchdir	%(ruby -e 'require "mkmf"' -e 'drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/' -e 'print "arch = "' -e 'print CONFIG["arch"]' -e 'print "\\n"' -e 'print "sitearch = "' -e 'print CONFIG["sitearch"]' -e 'print "\\n"' -e 'print "ruby_version = "' -e 'print Config::CONFIG["ruby_version"]' -e 'print "\\n"' -e 'print "prefix = "' -e 'print with_destdir(CONFIG["prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "exec_prefix = "' -e 'print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "libdir = "' -e 'print with_destdir($libdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "rubylibdir = "' -e 'print with_destdir($rubylibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "archdir = "' -e 'print with_destdir($archdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitedir = "' -e 'print with_destdir($sitedir.sub(drive, ""))' -e 'print "\\n"' -e 'print "_fc_sitedir = "' -e 'print with_destdir($sitedir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitelibdir = "' -e 'print with_destdir($sitelibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitearchdir = "' -e 'print with_destdir($sitearchdir.sub(drive, ""))' -e 'print "\\n\\n"' -e 'print "all:\\n"' -e 'print "	echo $(sitearchdir)\\n"' | make -s -f - )
 
 %prep
 %setup -q
@@ -367,7 +379,7 @@ make
 
 %install
 rm -rf %{buildroot}
-make DESTDIR=%{buildroot} docdir=%{buildroot}%{docdir} install
+make DESTDIR=%{buildroot} docdir=%{buildroot}%{docdir} EXAMPLEDIR=%{buildroot}%{exampledir} install
 # get rid of some garbage
 rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
 
@@ -423,7 +435,7 @@ rm -rf %{buildroot}
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import
-%{_bindir}/sqlr-status
+%{_bindir}/sqlr-status*
 
 %files client-runtime-c++
 %defattr(-, root, root)
@@ -515,6 +527,10 @@ rm -rf %{buildroot}
 %{!?_without_sybase:%defattr(-, root, root)}
 %{!?_without_sybase:%{_bindir}/sqlr-connection-sybase*}
 
+%{!?_without_router:%files router}
+%{!?_without_router:%defattr(-, root, root)}
+%{!?_without_router:%{_bindir}/sqlr-connection-router*}
+
 %{!?_without_java:%files java}
 %{!?_without_java:%defattr(-, root, root)}
 %{!?_without_java:%{_prefix}/java/*}
@@ -553,6 +569,7 @@ rm -rf %{buildroot}
 
 %files doc
 %{docdir}
+%{exampledir}
 
 %files man
 %{_mandir}
