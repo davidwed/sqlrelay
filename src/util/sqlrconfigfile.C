@@ -156,7 +156,8 @@ uint32_t sqlrconfigfile::getTtl() {
 }
 
 bool sqlrconfigfile::getDynamicScaling() {
-	return (maxconnections>connections && growby>0 && ttl>0);
+	return (maxconnections>connections && growby>0 && ttl>0 &&
+					maxqueuelength<=maxlisteners);
 }
 
 const char *sqlrconfigfile::getEndOfSession() {

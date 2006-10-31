@@ -1113,6 +1113,11 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 	pid_t	childpid;
 	if (!(childpid=fork())) {
 
+		// set pidfile to NULL so the pidfile won't be removed when
+		// this child process exits
+		delete[] pidfile;
+		pidfile=NULL;
+
 		isforkedchild=true;
 
 		// since this is the forked off listener, we don't

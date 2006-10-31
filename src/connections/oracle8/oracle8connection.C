@@ -156,6 +156,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		if (printerrors) {
 			logInError("OCIHandleAlloc(OCI_HTYPE_ERROR) failed.\n");
 		}
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -166,6 +167,7 @@ bool oracle8connection::logIn(bool printerrors) {
 			logInError("OCIHandleAlloc(OCI_HTYPE_SERVER) failed.\n");
 		}
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -177,6 +179,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		}
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -189,6 +192,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -202,6 +206,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -214,6 +219,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -227,11 +233,12 @@ bool oracle8connection::logIn(bool printerrors) {
 		if (printerrors) {
 			logInError("Set username failed.\n");
 		}
+		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
-		OCIHandleFree(err,OCI_HTYPE_SESSION);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 	if (OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
@@ -241,11 +248,12 @@ bool oracle8connection::logIn(bool printerrors) {
 		if (printerrors) {
 			logInError("Set password failed.\n");
 		}
+		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
-		OCIHandleFree(err,OCI_HTYPE_SESSION);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -255,11 +263,12 @@ bool oracle8connection::logIn(bool printerrors) {
 		if (printerrors) {
 			logInError("OCISessionBegin() failed.\n");
 		}
+		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
-		OCIHandleFree(err,OCI_HTYPE_SESSION);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -276,6 +285,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -291,6 +301,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -305,6 +316,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
 
@@ -363,6 +375,7 @@ void oracle8connection::logOut() {
 	OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 	OCIHandleFree(srv,OCI_HTYPE_SERVER);
 	OCIHandleFree(err,OCI_HTYPE_ERROR);
+	OCIHandleFree(env,OCI_HTYPE_ENV);
 }
 
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
@@ -1143,7 +1156,8 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 
 	// get the table name
 	stringbuffer	tablename;
-	while (*ptr!=' ' && *ptr!='\n' && *ptr!='	' && ptr<endptr) {
+	while (ptr && *ptr && *ptr!=' ' &&
+		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
 		tablename.append(*ptr);
 		ptr++;
 	}

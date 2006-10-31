@@ -41,7 +41,10 @@ extern "C" {
 
 struct describe {
 	OCIParam	*paramd;
-	sb4		dbsize;
+	// Hmm, oracle's docs say to use a ub4 for dbsize but it doesn't work...
+	// I had used an sb4 before and it worked in the past, but not on
+	// x86_64.
+	ub2		dbsize;
 	sb2		dbtype;
 	text		*buf;
 	sb4		buflen;

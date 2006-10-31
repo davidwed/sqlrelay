@@ -1,7 +1,3 @@
-sqlr-listeners pile up upon shutdown if clients are still active
-
-iconv const char test fails on some platforms because iconv.h isn't in include path, it's in /usr/local or somewhere
-
 Now I found the reason how 'mysql_affected_rows' cause the httpd halt
 	(with drop-in replacement library)
 
@@ -41,6 +37,14 @@ Step 10 was required otherwise I got "Commands out of sync; you can't run this c
 Initially I thought that I could simply mysql_stmt_bind_param the IN and INOUT parms and mysql_stmt_bind_result the INOUT and OUT parameters; clearly this was not the case. Thanks for your help Hasani, I never would have figured this out. Is this documented somewhere? All I found concerning SPs was chapter 17 of the UG.
 
 --------------------------------------------------------------------------------
+
+sqlr-listeners pile up upon shutdown if clients are still active
+
+support oracle OS authentication
+
+Sybase IQ support
+
+ruby install fails on solaris 10
 
 query router:
 	"do something"'s
