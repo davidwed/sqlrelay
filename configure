@@ -28433,6 +28433,46 @@ fi
 fi
 
 
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/sybase/OCS-15_0/include/ctpublic.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/sybase/OCS-15_0/lib/libsybct.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "SYBASEINCLUDES=\"-I/opt/sybase/OCS-15_0/include\""
+		eval "SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybdb -lsybintl\""
+	fi
+else
+	if ( test -n "/opt/sybase/OCS-15_0/lib/libsybct.a" -a -n "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybsybtcl -lsybsybdb -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"" )
+	then
+
+if ( test -r "/opt/sybase/OCS-15_0/lib/libsybct.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "SYBASEINCLUDES=\"-I/opt/sybase/OCS-15_0/include\""
+			eval "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybsybtcl -lsybsybdb -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\""
+		fi
+	fi
+fi
+
+
 			if ( test -z "$SYBASELIBS" )
 			then
 				for i in "11.9.2" "11.0.3.3"
