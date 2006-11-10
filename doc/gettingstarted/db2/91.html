@@ -112,7 +112,7 @@ boot/shutdown time.</p>
 
 <font color="#a52829"><b>case</b></font> <font color="#a52829"><b>&quot;</b></font><font color="#a520f7">$1</font><font color="#a52829"><b>&quot;</b></font> <font color="#a52829"><b>in</b></font>
         start<font color="#a52829"><b>)</b></font>
-                /opt/ibm/db2/V8.<font color="#ff00ff">1</font>/instance/db2istrt
+                /opt/ibm/db2/V9.<font color="#ff00ff">1</font>/instance/db2istrt
         <font color="#a52829"><b>;;</b></font>
         stop<font color="#a52829"><b>)</b></font>
                 <font color="#a52829"><b>kill</b></font> <font color="#ff00ff">-9</font> <font color="#6b59ce">`ps -efa </font><font color="#a52829"><b>|</b></font><font color="#6b59ce"> grep db2wdog </font><font color="#a52829"><b>|</b></font><font color="#6b59ce"> grep -v grep </font><font color="#a52829"><b>|</b></font><font color="#6b59ce"> cut -c10</font><font color="#ff00ff">-15</font><font color="#6b59ce">`</font>
@@ -164,5 +164,6 @@ ld.so.conf.d) and run /sbin/ldconfig (as root).</p>
 </b></blockquote>
 
 </body>
+
 
 </html>

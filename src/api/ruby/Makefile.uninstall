@@ -1,6 +1,0 @@
-include Makefile
-
-uninstall:
-	$(RM) $(sitearchdir)/$(DLLIB)
-	$(RM) $(sitearchdir)/SQLRelay.so
-	rm -rf $(sitelibdir)/DBD/SQLRelay
