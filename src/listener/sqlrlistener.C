@@ -1140,7 +1140,6 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		}
 
 		cleanUp();
-printf("%d: child exit\n",getpid());
 		exit(0);
 	}
 

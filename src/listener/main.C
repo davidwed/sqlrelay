@@ -12,7 +12,6 @@ RETSIGTYPE	crash() {
 
 RETSIGTYPE	shutDown() {
 	delete lsnr;
-printf("%d: exiting\n",getpid());
 	exit(0);
 }
 
@@ -29,7 +28,6 @@ int	main(int argc, const char **argv) {
 	}
 
 	// unsuccessful completion
-printf("unsuccessful completion\n");
 	delete lsnr;
 	exit(1);
 }
