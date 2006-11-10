@@ -206,14 +206,6 @@ Group: Applications/Databases
 SQL Relay connection daemon for ODBC.
 
 
-%package oracle7
-Summary: SQL Relay connection daemon for Oracle 7.
-Group: Applications/Databases
-
-%description oracle7
-SQL Relay connection daemon for Oracle 7.
-
-
 %package oracle8
 Summary: SQL Relay connection daemon for Oracle 8.
 Group: Applications/Databases
@@ -506,10 +498,6 @@ rm -rf %{buildroot}
 %{!?_without_odbc:%files odbc}
 %{!?_without_odbc:%defattr(-, root, root)}
 %{!?_without_odbc:%{_bindir}/sqlr-connection-odbc*}
-
-%{!?_without_oracle:%files oracle7}
-%{!?_without_oracle:%defattr(-, root, root)}
-%{!?_without_oracle:%{_bindir}/sqlr-connection-oracle7*}
 
 %{!?_without_oracle:%files oracle8}
 %{!?_without_oracle:%defattr(-, root, root)}
