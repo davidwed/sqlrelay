@@ -12,6 +12,7 @@ RETSIGTYPE	crash() {
 
 RETSIGTYPE	shutDown() {
 	delete lsnr;
+printf("%d: exiting\n",getpid());
 	exit(0);
 }
 
