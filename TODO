@@ -38,11 +38,8 @@ Initially I thought that I could simply mysql_stmt_bind_param the IN and INOUT p
 
 --------------------------------------------------------------------------------
 
-sqlr-listeners pile up upon shutdown if clients are still active
-
 support oracle OS authentication
-
-Sybase IQ support
+	create user ops$<os_username> identified externally
 
 ruby install fails on solaris 10
 

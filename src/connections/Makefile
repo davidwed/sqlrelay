@@ -23,10 +23,7 @@ ifneq ($(strip $(ODBCLIBS)),)
 	$(MAKE) -C odbc all
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) -C oracle7 all
-ifneq ($(strip $(ORACLEVERSION)),7)
 	$(MAKE) -C oracle8 all
-endif
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
 	$(MAKE) -C postgresql all
@@ -47,7 +44,6 @@ clean:
 	$(MAKE) -C mdbtools clean
 	$(MAKE) -C mysql clean
 	$(MAKE) -C odbc clean
-	$(MAKE) -C oracle7 clean
 	$(MAKE) -C oracle8 clean
 	$(MAKE) -C postgresql clean
 	$(MAKE) -C sqlite clean
@@ -77,10 +73,7 @@ ifneq ($(strip $(ODBCLIBS)),)
 	$(MAKE) -C odbc install
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) -C oracle7 install
-ifneq ($(strip $(ORACLEVERSION)),7)
 	$(MAKE) -C oracle8 install
-endif
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
 	$(MAKE) -C postgresql install
@@ -101,7 +94,6 @@ uninstall:
 	$(MAKE) -C mdbtools uninstall
 	$(MAKE) -C mysql uninstall
 	$(MAKE) -C odbc uninstall
-	$(MAKE) -C oracle7 uninstall
 	$(MAKE) -C oracle8 uninstall
 	$(MAKE) -C postgresql uninstall
 	$(MAKE) -C sqlite uninstall

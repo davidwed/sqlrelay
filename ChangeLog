@@ -1,3 +1,5 @@
+0.39 - removed oracle7 support
+
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection
 	fixed missing self before __getRow and __getRowRange in python db driver

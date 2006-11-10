@@ -807,7 +807,6 @@ if ( test -n "$HAVE_TCL" ); then
 fi
 echo "$APIS"
 
-ORACLE7BUILD="no     "
 ORACLE8BUILD="no     "
 MYSQLBUILD="no     "
 POSTGRESQLBUILD="no     "
@@ -819,12 +818,6 @@ DB2BUILD="no     "
 INTERBASEBUILD="no     "
 MDBTOOLSBUILD="no     "
 if ( test -n "$ORACLEVERSION" ); then
-	ORACLE7BUILD="dynamic"
-	if ( test -n "$ORACLESTATIC" ); then
-		ORACLE7BUILD="static "
-	fi
-fi
-if ( test -n "$ORACLEVERSION" -a "$ORACLEVERSION" != "7"); then
 	ORACLE8BUILD="dynamic"
 	if ( test -n "$ORACLESTATIC" ); then
 		ORACLE8BUILD="static "
@@ -884,8 +877,7 @@ if ( test -n "$MDBTOOLSLIBS" ); then
 		MDBTOOLSBUILD="static "
 	fi
 fi
-echo " Connections  : Oracle7     $ORACLE7BUILD       Oracle8    $ORACLE8BUILD"
-echo "                MySQL       $MYSQLBUILD       "
+echo " Connections  : Oracle8     $ORACLE8BUILD       MySQL       $MYSQLBUILD       "
 echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD       Sybase     $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"

@@ -13,7 +13,6 @@
 <li><a href="#installation">Installation</a></li>
 <ul>
 <li><a href="#solaris">Solaris</a></li>
-<li><a href="#openserver">SCO OpenServer</a></li>
 <li><a href="#linux">Linux</a></li>
 <ul>
 <li><a href="#users">Create Users, Groups and Directories</a></li>
@@ -32,7 +31,7 @@
 <a name="installation"></a>
 <span class="heading1">Installation</span><br>
 
-<p>I've sucessfully installed Oracle on SCO OpenServer and Linux and I've
+<p>I've sucessfully installed Oracle on Linux and I've
 witnessed many Solaris installations.</p>
 
 <p>When installing Oracle, the most common mistake I've made is having too 
@@ -53,50 +52,6 @@ at installation time unless the kernel is configured properly to support more
 and larger shared memory segments and semaphores.  Aside from neglecting this 
 step, I've never seen or heard of anyone having much difficulty with these 
 versions on Solaris.</p>
-
-<a name="openserver"></a>
-<span class="heading2">SCO OpenServer</span><br>
-
-<p>Oracle 7.3 is the most current version that runs on SCO OpenServer.  It is
-was once available on CD but is currently out of production and no longer 
-supported.  I've installed it successfully on OpenServer 5.0.4 and 5.0.5 but 
-have not been able to get it working on 5.0.6.</p>
-
-<p>Oracle recommends that you configure your kernel to support more and larger
-shared memory segments and semaphores.  I've never needed to do this to get
-the installation to complete or to run a small development database.  For 
-production systems however, I recommend following Oracle's recommendations.</p>
-
-<p>If NIS is configured, you'll have lots of problems that won't show up until
-the very end of the installation.  The installer scripts use <i>domainname</i>
-to get the DNS domain name of the machine it's being installed on.  This
-is crazy because <i>domainname</i> returns the NIS domain name, not the DNS 
-domain name, but the installation uses it to get the DNS domain name anyway.  
-Installation works fine if the NIS domain name is not set (or if it happens to 
-be set to the same name as the DNS domain name).  Otherwise, all kinds of 
-things break and can't be easily fixed after the installation is finished.  If 
-you really need NIS, configure it after installing Oracle.</p>
-
-<p>Set the video mode to 1024x768 with 256 colors.  The installer won't run in 
-any other resolution or depth.</p>
-
-<p>Install the COFF Linker Patch if it's available for your version of SCO
-OpenServer.  It's currently available from the 
-<a href="http://www.caldera.com/support/ftplists/osr5list.html">SCO OpenServer 
-Support</a> section of the Caldera web site.  Without it, the installation
-will fail about halfway through.</p>
-
-<p>To install Oracle 7.3, create a /mnt directory if one does not exist.  Then 
-insert the CD and run the following commands as root.</p>
-
-<blockquote><b>
-mount /dev/cd0 /mnt<br>
-cd /mnt<br>
-./wginstall
-</b></blockquote>
-
-<p>A graphical installation program should pop up shortly.  The installation 
-should proceed smoothly from there.</p>
 
 <a name="linux"></a>
 <span class="heading2">Linux</span><br>
