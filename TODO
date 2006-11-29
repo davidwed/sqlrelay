@@ -1,3 +1,11 @@
+make re-login on startup an option
+
+ruby-on-rails support, doc
+
+document last insert id in sqlite
+
+--------------------------------------------------------------------------------
+
 Now I found the reason how 'mysql_affected_rows' cause the httpd halt
 	(with drop-in replacement library)
 

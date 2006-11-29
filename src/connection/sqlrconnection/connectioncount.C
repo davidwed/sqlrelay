@@ -39,6 +39,10 @@ void sqlrconnection_svr::decrementConnectionCount() {
 	// decrement the counter
 	uint32_t	*connectioncount=getConnectionCountBuffer();
 	(*connectioncount)--;
+	/*if ((*connectioncount)<0) {
+		(*connectioncount)=0;
+	}*/
+	
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",1,(int32_t)(*connectioncount));

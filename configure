@@ -38551,7 +38551,7 @@ if ( test -n "$MDBTOOLSLIBS" ); then
 		MDBTOOLSBUILD="static "
 	fi
 fi
-echo " Connections  : Oracle8     $ORACLE8BUILD       MySQL       $MYSQLBUILD       "
+echo " Connections  : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
 echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD       Sybase     $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"

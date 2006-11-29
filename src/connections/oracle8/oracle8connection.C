@@ -124,7 +124,7 @@ bool oracle8connection::logIn(bool printerrors) {
 
 	// init OCI
 #ifdef HAVE_ORACLE_8i
-	if (OCIEnvCreate((OCIEnv **)&env,OCI_DEFAULT,(dvoid *)0,
+	if (OCIEnvCreate((OCIEnv **)&env,OCI_DEFAULT|OCI_OBJECT,(dvoid *)0,
 				(dvoid *(*)(dvoid *, size_t))0,
 				(dvoid *(*)(dvoid *, dvoid *, size_t))0,
 				(void (*)(dvoid *, dvoid *))0,
@@ -1392,10 +1392,21 @@ const char *oracle8cursor::errorMessage(bool *liveconnection) {
 	message[1023]=(char)NULL;
 
 	// check for dead connection or shutdown in progress
-	if (errcode==3114 || errcode==3113 || errcode==1089) {
-		*liveconnection=false;
-	} else {
-		*liveconnection=true;
+	// Might need: 1033 - oracle init/shutdown in progress
+	switch (errcode) {
+		case 22: // invalid session ID; access denied
+		case 28: // your session has been killed
+		case 604: // error occurred at recursive SQL level ...
+		case 1012: // not logged on
+		case 1041: // internal error. hostdef extension doesn't exist
+		case 1089: // immediate shutdown in progress -
+				// no operations are permitted
+		case 3114: // not connected to ORACLE
+		case 3113: // end-of-file on communication channel
+			*liveconnection=false;
+			break;
+		default:
+			*liveconnection=true;
 	}
 
 	// only return an error message if the error wasn't a dead database
