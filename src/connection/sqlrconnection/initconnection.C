@@ -22,8 +22,11 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 		connectionid=DEFAULT_CONNECTIONID;
 		fprintf(stderr,"Warning: using default connectionid.\n");
 	}
+
 	// get the time to live from the command line
 	ttl=charstring::toInteger(cmdl->getValue("-ttl"));
+
+	silent=cmdl->found("-silent");
 
 	cfgfl=new sqlrconfigfile();
 	authc=new authenticator(cfgfl);
@@ -370,11 +373,13 @@ bool sqlrconnection_svr::attemptLogIn() {
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"logging in...");
 	#endif
-	if (!logInUpdateStats(true)) {
+	if (!logInUpdateStats(!silent)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",0,"log in failed");
 		#endif
-		fprintf(stderr,"Couldn't log into database.\n");
+		if (!silent) {
+			fprintf(stderr,"Couldn't log into database.\n");
+		}
 		return false;
 	}
 	#ifdef SERVER_DEBUG

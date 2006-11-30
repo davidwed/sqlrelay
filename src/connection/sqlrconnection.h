@@ -348,6 +348,9 @@ class sqlrconnection_svr :
 		uint32_t	maxlobbindvaluelength;
 		int32_t		idleclienttimeout;
 
+		bool		decrementonclose;
+		bool		silent;
+
 #ifdef SERVER_DEBUG
 		stringbuffer	*debugstr;
 #endif

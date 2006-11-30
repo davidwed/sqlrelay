@@ -217,7 +217,6 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("SELECT: \n");
-con->debugOn();
 	checkSuccess(cur->sendQuery("select * from testtable order by testtinyint"),1);
 	printf("\n");
 

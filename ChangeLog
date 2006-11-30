@@ -1,4 +1,12 @@
 0.39 - removed oracle7 support
+	added OCI_OBJECT to oracle environment init
+	added some more error codes to oracle's dead connection test
+	connections don't decrement connection count when they fail to log in
+		now :)
+	added -silent option to connections that scaler uses so they don't
+		spew login errors if the db is down
+	fixed a bug that disabled scaling if maxlisteners was -1
+		(the default, which means no maximum)
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

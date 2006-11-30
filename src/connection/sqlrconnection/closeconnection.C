@@ -6,7 +6,8 @@
 void sqlrconnection_svr::closeConnection() {
 
 	// decrement the connection counter
-	if (cfgfl->getDynamicScaling() && semset && idmemory) {
+	if (decrementonclose && cfgfl->getDynamicScaling() &&
+						semset && idmemory) {
 		decrementConnectionCount();
 	}
 

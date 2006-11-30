@@ -44,4 +44,7 @@ sqlrconnection_svr::sqlrconnection_svr() :
 	sid_sqlrcon=NULL;
 
 	pidfile=NULL;
+
+	decrementonclose=false;
+	silent=false;
 }
