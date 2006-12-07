@@ -48,7 +48,7 @@ sub checkSuccessString {
 
 # usage...
 if ($#ARGV+1<5) {
-	print("usage: interbase.pl host port socket user password");
+	print("usage: firebird.pl host port socket user password");
 	exit;
 }
 
@@ -59,7 +59,7 @@ $cur=SQLRelay::Cursor->new($con);
 
 # get database type
 print("IDENTIFY: \n");
-checkSuccessString($con->identify(),"interbase");
+checkSuccessString($con->identify(),"firebird");
 print("\n");
 
 # ping

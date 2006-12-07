@@ -5,7 +5,7 @@ import com.firstworks.sqlrelay.SQLRConnection;
 import com.firstworks.sqlrelay.SQLRCursor;
 
 
-class interbase {
+class firebird {
 	
 	
 	
@@ -87,7 +87,7 @@ class interbase {
 	
 		// usage...
 		if (args.length<5) {
-			System.out.println("usage: java interbase host port socket user password");
+			System.out.println("usage: java firebird host port socket user password");
 			System.exit(0);
 		}
 	
@@ -99,7 +99,7 @@ class interbase {
 	
 		// get database type
 		System.out.println("IDENTIFY: ");
-		checkSuccess(con.identify(),"interbase");
+		checkSuccess(con.identify(),"firebird");
 		System.out.println();
 	
 		// ping

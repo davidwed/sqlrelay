@@ -20,7 +20,7 @@ def main():
 
 	# usage...
 	if len(sys.argv) < 5:
-		print "usage: interbase.py host port socket user password"
+		print "usage: firebird.py host port socket user password"
 		sys.exit(0)
 
 	# instantiation
@@ -30,7 +30,7 @@ def main():
 
 	# get database type
 	print "IDENTIFY: "
-	checkSuccess(con.identify(),"interbase")
+	checkSuccess(con.identify(),"firebird")
 	print
 
 	# ping

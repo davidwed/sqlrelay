@@ -200,7 +200,8 @@ int exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	const char	*dbtype=sqlrcon->identify();
 
 	stringbuffer	query;
-	if (!charstring::compare(dbtype,"interbase")) {
+	if (!charstring::compare(dbtype,"firebird") ||
+		!charstring::compare(dbtype,"interbase")) {
 		query.append("select gen_id(")->append(sequence);
 		query.append(",1) from rdb$database");
 	} else if (!charstring::compare(dbtype,"oracle7") ||

@@ -1,8 +1,8 @@
 // Copyright (c) 2000-2001  David Muse
 // See the file COPYING for more information
 
-#ifndef INTERBASECCONNECTION_H
-#define INTERBASECCONNECTION_H
+#ifndef FIREBIRDCONNECTION_H
+#define FIREBIRDCONNECTION_H
 
 #define NUM_CONNECT_STRING_VARS 6
 
@@ -33,13 +33,13 @@ struct fieldstruct {
 	short		nullindicator;
 };
 
-class interbaseconnection;
+class firebirdconnection;
 
-class interbasecursor : public sqlrcursor_svr {
-	friend class interbaseconnection;
+class firebirdcursor : public sqlrcursor_svr {
+	friend class firebirdconnection;
 	private:
-				interbasecursor(sqlrconnection_svr *conn);
-				~interbasecursor();
+				firebirdcursor(sqlrconnection_svr *conn);
+				~firebirdcursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		inputBindString(const char *variable, 
@@ -105,16 +105,16 @@ class interbasecursor : public sqlrcursor_svr {
 
 		stringbuffer	*errormsg;
 
-		interbaseconnection	*interbaseconn;
+		firebirdconnection	*firebirdconn;
 
 		bool		queryIsExecSP;
 };
 
-class interbaseconnection : public sqlrconnection_svr {
-	friend class interbasecursor;
+class firebirdconnection : public sqlrconnection_svr {
+	friend class firebirdcursor;
 	public:
-			interbaseconnection();
-			~interbaseconnection();
+			firebirdconnection();
+			~firebirdconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();

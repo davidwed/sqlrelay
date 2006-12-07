@@ -9,7 +9,7 @@
 # ================
 # --without db2
 # --without freetds
-# --without interbase
+# --without firebird
 # --without mdbtools
 # --without mysql
 # --without odbc
@@ -80,7 +80,7 @@ BuildRequires: rudiments-devel >= 0.28.1
 %description
 SQL Relay is a persistent database connection pooling, proxying and load 
 balancing system for Unix and Linux supporting ODBC, Oracle, MySQL,
-PostgreSQL, Sybase, MS SQL Server, IBM DB2, Interbase, SQLite and
+PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and
 MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
 Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java and TCL, drop-in replacement
 libraries for MySQL and PostgreSQL clients, command line clients, a GUI
@@ -174,12 +174,12 @@ Group: Applications/Databases
 SQL Relay connection daemon for FreeTDS (Sybase and MS SQL Server).
 
 
-%package interbase
-Summary: SQL Relay connection daemon for Interbase.
+%package firebird
+Summary: SQL Relay connection daemon for Firebird.
 Group: Applications/Databases
 
-%description interbase
-SQL Relay connection daemon for Interbase.
+%description firebird
+SQL Relay connection daemon for Firebird.
 
 
 %package mdbtools
@@ -351,7 +351,7 @@ Man pages for SQL Relay.
 	%{?_without_gtk:	--disable-gtk} \
 	%{?_without_db2:	--disable-db2} \
 	%{?_without_freetds:	--disable-freetds} \
-	%{?_without_interbase:	--disable-interbase} \
+	%{?_without_firebird:	--disable-firebird} \
 	%{?_without_mdbtools:	--disable-mdbtools} \
 	%{?_without_mysql:	--disable-mysql} \
 	%{?_without_odbc:	--disable-odbc} \
@@ -483,9 +483,9 @@ rm -rf %{buildroot}
 %{!?_without_freetds:%defattr(-, root, root)}
 %{!?_without_freetds:%{_bindir}/sqlr-connection-freetds*}
 
-%{!?_without_interbase:%files interbase}
-%{!?_without_interbase:%defattr(-, root, root)}
-%{!?_without_interbase:%{_bindir}/sqlr-connection-interbase*}
+%{!?_without_firebird:%files firebird}
+%{!?_without_firebird:%defattr(-, root, root)}
+%{!?_without_firebird:%{_bindir}/sqlr-connection-firebird*}
 
 %{!?_without_mdbtools:%files mdbtools}
 %{!?_without_mdbtools:%defattr(-, root, root)}

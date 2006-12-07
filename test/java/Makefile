@@ -11,8 +11,8 @@ endif
 ifneq ($(strip $(FREETDSLIBS)),)
 	$(MAKE) freetds.class
 endif
-ifneq ($(strip $(INTERBASELIBS)),)
-	$(MAKE) interbase.class
+ifneq ($(strip $(FIREBIRDLIBS)),)
+	$(MAKE) firebird.class
 endif
 ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql.class
@@ -44,8 +44,8 @@ db2.class: db2.java
 freetds.class: freetds.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar freetds.java
 
-interbase.class: interbase.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar interbase.java
+firebird.class: firebird.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar firebird.java
 
 mysql.class: mysql.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar mysql.java

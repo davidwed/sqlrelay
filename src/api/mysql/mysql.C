@@ -1089,7 +1089,7 @@ static enum enum_field_types	mysqltypemap[]={
 	MYSQL_TYPE_SHORT,
 	// "TINY_DATATYPE"
 	MYSQL_TYPE_TINY,
-	// added by interbase
+	// added by firebird
 	// "D_FLOAT"
 	MYSQL_TYPE_DOUBLE,
 	// "ARRAY"

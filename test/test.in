@@ -26,12 +26,12 @@ then
 	sleep 5
 	sudo sqlr-start -id freetdstest
 fi
-if ( test "$DB" = "interbase" )
+if ( test "$DB" = "firebird" )
 then
-	ARGS="localhost 8003 \"\" interbasetest interbasetest"
-	PHPARGS="host=localhost&port=8003&socket=&user=interbasetest&password=interbasetest"
+	ARGS="localhost 8003 \"\" firebirdtest firebirdtest"
+	PHPARGS="host=localhost&port=8003&socket=&user=firebirdtest&password=firebirdtest"
 	sudo $INITDIR/firebird start
-	sudo sqlr-start -id interbasetest
+	sudo sqlr-start -id firebirdtest
 fi
 if ( test "$DB" = "mysql3" )
 then
@@ -251,7 +251,7 @@ if ( test "$DB" = "freetds" )
 then
 	sudo $INITDIR/sybase stop
 fi
-if ( test "$DB" = "interbase" )
+if ( test "$DB" = "firebird" )
 then
 	sudo $INITDIR/firebird stop
 fi

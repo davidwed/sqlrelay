@@ -620,7 +620,7 @@ cur.executeQuery()
 </pre>
 </blockquote>
 
-<span class="heading4">Interbase and Firebird</span><br>
+<span class="heading4">Firebird</span><br>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
@@ -890,7 +890,7 @@ result=cur.getOutputBindInteger(&quot;<font color="#ff00ff">out1</font>&quot;)
 </blockquote>
 
 
-<span class="heading4">Interbase and Firebird</span><br>
+<span class="heading4">Firebird</span><br>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
@@ -919,7 +919,7 @@ result=cur.getField(0,0)
 </blockquote>
 
 <p>Alternatively, you can run a query like the following and receive the result
-using an output bind variable.  Note that in Interbase/Firebird, input and
+using an output bind variable.  Note that in Firebird, input and
 output bind variable indices are distict from one another.  The index of the
 output bind variable is 1 rather than 4, even though there were 3 input bind
 variables.</p>
@@ -1162,7 +1162,7 @@ out3=cur.getOutputBindString(&quot;<font color="#ff00ff">out3</font>&quot;)
 </blockquote>
 
 
-<span class="heading4">Interbase and Firebird</span><br>
+<span class="heading4">Firebird</span><br>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
@@ -1195,7 +1195,7 @@ out3=cur.getField(0,2)
 </blockquote>
 
 <p>Alternatively, you can run a query like the following and receive the result
-using a output bind variables.  Note that in Interbase/Firebird, input and
+using a output bind variables.  Note that in Firebird, input and
 output bind variable indices are distict from one another.  The index of the
 first output bind variable is 1 rather than 4, even though there were 3 input
 bind variables.</p>
@@ -1418,9 +1418,9 @@ set if the last command in the procedure is a select query, however SQL Relay
 doesn't currently support stored procedures that return result sets.</p>
 
 
-<span class="heading4">Interbase and Firebird</span><br>
+<span class="heading4">Firebird</span><br>
 
-<p>Stored procedures in Interbase and Firebird can return a result set if a
+<p>Stored procedures in Firebird can return a result set if a
 select query in the procedure selects values into the output parameters and
 then issues a suspend command, however SQL Relay doesn't currently support
 stored procedures that return result sets.</p>

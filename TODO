@@ -1,4 +1,5 @@
 looks like zope returns errors with empty result sets
+rename interbase stuff firebird
 
 make re-login on startup an option
 
@@ -221,7 +222,6 @@ cygwin:
 
 Compatibility:
 	* daemontools
-	* rename interbase stuff firebird
 	* figure out how to get the drop-in client compiled into the mysql PHP
 		module like the mysql native client is
 

@@ -27,8 +27,8 @@ endif
 ifneq ($(DB2LIBS),)
 	$(MAKE) -C db2 all
 endif
-ifneq ($(INTERBASELIBS),)
-	$(MAKE) -C interbase all
+ifneq ($(FIREBIRDLIBS),)
+	$(MAKE) -C firebird all
 endif
 ifneq ($(SYBASELIBS),)
 	$(MAKE) -C sybase all
@@ -44,7 +44,7 @@ clean:
 	$(MAKE) -C freetds clean
 	$(MAKE) -C odbc clean
 	$(MAKE) -C db2 clean
-	$(MAKE) -C interbase clean
+	$(MAKE) -C firebird clean
 	$(MAKE) -C sybase clean
 	$(MAKE) -C sqlrelay clean
 

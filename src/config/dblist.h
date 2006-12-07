@@ -10,7 +10,7 @@ char	*databaselist[]={
 	"freetds",
 	"sybase",
 	"db2",
-	"interbase",
+	"firebird",
 	"odbc",
 	"mdbtools",
 	(char *)NULL

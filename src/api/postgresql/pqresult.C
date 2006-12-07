@@ -339,7 +339,7 @@ static Oid postgresqltypemap[]={
 	21,
 	// "TINY_DATATYPE"
 	21,
-	// added by interbase
+	// added by firebird
 	// "D_FLOAT"
 	708,
 	// "ARRAY"

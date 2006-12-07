@@ -286,7 +286,8 @@ bool sqlrimport::sequenceTagEnd() {
 	// sqlite, mysql, sybase/mssql have autoincrementing fields
 	// mdbtools has nothing
 	// odbc can't tell what kind of underlying db we're using
-	if (!charstring::compare(dbtype,"interbase")) {
+	if (!charstring::compare(dbtype,"firebird") ||
+		!charstring::compare(dbtype,"interbase")) {
 		query.append("set generator ")->append(sequence);
 		query.append(" to ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {

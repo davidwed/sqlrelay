@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <interbaseconnection.h>
+#include <firebirdconnection.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/snooze.h>
 
@@ -22,17 +22,17 @@ static char tpb[] = {
 	isc_tpb_wait
 };
 
-interbaseconnection::interbaseconnection() : sqlrconnection_svr() {
+firebirdconnection::firebirdconnection() : sqlrconnection_svr() {
 }
 
-interbaseconnection::~interbaseconnection() {
+firebirdconnection::~firebirdconnection() {
 }
 
-uint16_t interbaseconnection::getNumberOfConnectStringVars() {
+uint16_t firebirdconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
 }
 
-void interbaseconnection::handleConnectString() {
+void firebirdconnection::handleConnectString() {
 
 	// override legacy "database" parameter with modern "db" parameter
 	database=connectStringValue("database");
@@ -60,7 +60,7 @@ void interbaseconnection::handleConnectString() {
 		!charstring::compareIgnoringCase(autocom,"yes")));
 }
 
-bool interbaseconnection::logIn(bool printerrors) {
+bool firebirdconnection::logIn(bool printerrors) {
 
 	// initialize a dpb
 	char	*dpbptr=dpb;
@@ -107,28 +107,28 @@ bool interbaseconnection::logIn(bool printerrors) {
 	return true;
 }
 
-sqlrcursor_svr *interbaseconnection::initCursor() {
-	return (sqlrcursor_svr *)new interbasecursor(
+sqlrcursor_svr *firebirdconnection::initCursor() {
+	return (sqlrcursor_svr *)new firebirdcursor(
 					(sqlrconnection_svr *)this);
 }
 
-void interbaseconnection::deleteCursor(sqlrcursor_svr *curs) {
-	delete (interbasecursor *)curs;
+void firebirdconnection::deleteCursor(sqlrcursor_svr *curs) {
+	delete (firebirdcursor *)curs;
 }
 
-void interbaseconnection::logOut() {
+void firebirdconnection::logOut() {
 	isc_detach_database(error,&db);
 }
 
-bool interbaseconnection::commit() {
+bool firebirdconnection::commit() {
 	return (!isc_commit_retaining(error,&tr));
 }
 
-bool interbaseconnection::rollback() {
+bool firebirdconnection::rollback() {
 	return (!isc_rollback_retaining(error,&tr));
 }
 
-bool interbaseconnection::ping() {
+bool firebirdconnection::ping() {
 
 	// call isc_database_info to get page_size and num_buffers,
 	// this should always be available unless the db is down
@@ -146,13 +146,13 @@ bool interbaseconnection::ping() {
 	return !(status[0]==1 && status[1]);
 }
 
-const char *interbaseconnection::identify() {
-	return "interbase";
+const char *firebirdconnection::identify() {
+	return "firebird";
 }
 
-interbasecursor::interbasecursor(sqlrconnection_svr *conn) :
+firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 						sqlrcursor_svr(conn) {
-	interbaseconn=(interbaseconnection *)conn;
+	firebirdconn=(firebirdconnection *)conn;
 	errormsg=NULL;
 
 	outsqlda=(XSQLDA ISC_FAR *)malloc(XSQLDA_LENGTH(MAX_SELECT_LIST_SIZE));
@@ -172,7 +172,7 @@ interbasecursor::interbasecursor(sqlrconnection_svr *conn) :
 	outbindcount=0;
 }
 
-interbasecursor::~interbasecursor() {
+firebirdcursor::~firebirdcursor() {
 	if (errormsg) {
 		delete errormsg;
 	}
@@ -180,20 +180,20 @@ interbasecursor::~interbasecursor() {
 	free(insqlda);
 }
 
-bool interbasecursor::prepareQuery(const char *query, uint32_t length) {
+bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
 
 	queryIsExecSP=false;
 
 	// free the old statement if it exists
 	if (stmt) {
-		isc_dsql_free_statement(interbaseconn->error,
+		isc_dsql_free_statement(firebirdconn->error,
 						&stmt,DSQL_drop);
 	}
 
 	// allocate a cursor handle
 	stmt=NULL;
-	if (isc_dsql_allocate_statement(interbaseconn->error,
-					&interbaseconn->db,&stmt)) {
+	if (isc_dsql_allocate_statement(firebirdconn->error,
+					&firebirdconn->db,&stmt)) {
 		return false;
 	}
 
@@ -202,16 +202,16 @@ bool interbasecursor::prepareQuery(const char *query, uint32_t length) {
 	while (*qptr==' ' || *qptr=='\n' || *qptr=='	');
 
 	// prepare the cursor
-	if (isc_dsql_prepare(interbaseconn->error,&interbaseconn->tr,
+	if (isc_dsql_prepare(firebirdconn->error,&firebirdconn->tr,
 					&stmt,length,(char *)query,
-					interbaseconn->dialect,outsqlda)) {
+					firebirdconn->dialect,outsqlda)) {
 		return false;
 	}
 
 	// get the cursor type
 	char	typeitem[]={isc_info_sql_stmt_type};
 	char	resbuffer[1024];
-	if (isc_dsql_sql_info(interbaseconn->error,&stmt,
+	if (isc_dsql_sql_info(firebirdconn->error,&stmt,
 				sizeof(typeitem),typeitem,
 				1024,resbuffer)) {
 		return false;
@@ -222,7 +222,7 @@ bool interbasecursor::prepareQuery(const char *query, uint32_t length) {
 
 	// find bind parameters, if any
 	insqlda->sqld=0;
-	if (isc_dsql_describe_bind(interbaseconn->error,&stmt,1,insqlda)) {
+	if (isc_dsql_describe_bind(firebirdconn->error,&stmt,1,insqlda)) {
 		return false;
 	}
 	insqlda->sqln=insqlda->sqld;
@@ -230,7 +230,7 @@ bool interbasecursor::prepareQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool interbasecursor::inputBindString(const char *variable,
+bool firebirdcursor::inputBindString(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint16_t valuesize,
@@ -258,7 +258,7 @@ bool interbasecursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool interbasecursor::inputBindInteger(const char *variable,
+bool firebirdcursor::inputBindInteger(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
@@ -284,7 +284,7 @@ bool interbasecursor::inputBindInteger(const char *variable,
 	return true;
 }
 
-bool interbasecursor::inputBindDouble(const char *variable,
+bool firebirdcursor::inputBindDouble(const char *variable,
 					uint16_t variablesize,
 					double *value,
 					uint32_t precision,
@@ -312,7 +312,7 @@ bool interbasecursor::inputBindDouble(const char *variable,
 	return true;
 }
 
-bool interbasecursor::outputBindString(const char *variable, 
+bool firebirdcursor::outputBindString(const char *variable, 
 				uint16_t variablesize,
 				char *value, 
 				uint16_t valuesize, 
@@ -347,7 +347,7 @@ bool interbasecursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool interbasecursor::outputBindInteger(const char *variable,
+bool firebirdcursor::outputBindInteger(const char *variable,
 						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull) {
@@ -381,7 +381,7 @@ bool interbasecursor::outputBindInteger(const char *variable,
 	return true;
 }
 
-bool interbasecursor::outputBindDouble(const char *variable,
+bool firebirdcursor::outputBindDouble(const char *variable,
 						uint16_t variablesize,
 						double *value,
 						uint32_t *precision,
@@ -417,21 +417,21 @@ bool interbasecursor::outputBindDouble(const char *variable,
 	return true;
 }
 
-bool interbasecursor::executeQuery(const char *query, uint32_t length,
+bool firebirdcursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
 	// for commit or rollback, execute the API call and return
 	if (querytype==isc_info_sql_stmt_commit) {
-		return !isc_commit_retaining(interbaseconn->error,
-							&interbaseconn->tr);
+		return !isc_commit_retaining(firebirdconn->error,
+							&firebirdconn->tr);
 	} else if (querytype==isc_info_sql_stmt_rollback) {
-		return !isc_rollback_retaining(interbaseconn->error,
-							&interbaseconn->tr);
+		return !isc_rollback_retaining(firebirdconn->error,
+							&firebirdconn->tr);
 	} else if (queryIsExecSP) {
 
 		// if the query is a stored procedure then execute it as such
-		bool	retval=!isc_dsql_execute2(interbaseconn->error,
-						&interbaseconn->tr,
+		bool	retval=!isc_dsql_execute2(firebirdconn->error,
+						&firebirdconn->tr,
 						&stmt,1,insqlda,outsqlda);
 
 		// make sure each output bind variable gets null terminated
@@ -451,7 +451,7 @@ bool interbasecursor::executeQuery(const char *query, uint32_t length,
 
 	// describe the cursor
 	outsqlda->sqld=0;
-	if (isc_dsql_describe(interbaseconn->error,&stmt,1,outsqlda)) {
+	if (isc_dsql_describe(firebirdconn->error,&stmt,1,outsqlda)) {
 		return false;
 	}
 	if (outsqlda->sqld>MAX_SELECT_LIST_SIZE) {
@@ -482,7 +482,7 @@ bool interbasecursor::executeQuery(const char *query, uint32_t length,
 					(char *)&field[i].shortbuffer;
 			field[i].sqlrtype=SMALLINT_DATATYPE;
 
-		// Looks like sometimes interbase returns INT64's as
+		// Looks like sometimes firebird returns INT64's as
 		// SQL_LONG type.  These can be identified because
 		// the sqlscale gets set too.  Treat SQL_LONG's with
 		// an sqlscale as INT64's.
@@ -570,23 +570,23 @@ bool interbasecursor::executeQuery(const char *query, uint32_t length,
 	}
 
 	// Execute the query
-	return !isc_dsql_execute(interbaseconn->error,&interbaseconn->tr,
+	return !isc_dsql_execute(firebirdconn->error,&firebirdconn->tr,
 							&stmt,1,insqlda);
 }
 
-bool interbasecursor::queryIsNotSelect() {
+bool firebirdcursor::queryIsNotSelect() {
 	return (querytype!=isc_info_sql_stmt_select);
 }
 
-bool interbasecursor::queryIsCommitOrRollback() {
+bool firebirdcursor::queryIsCommitOrRollback() {
 	return (querytype==isc_info_sql_stmt_commit ||
 		querytype==isc_info_sql_stmt_rollback);
 }
 
-const char *interbasecursor::errorMessage(bool *liveconnection) {
+const char *firebirdcursor::errorMessage(bool *liveconnection) {
 
 	char		msg[512];
-	ISC_STATUS	*pvector=interbaseconn->error;
+	ISC_STATUS	*pvector=firebirdconn->error;
 
 	// declare a buffer for the error
 	if (errormsg) {
@@ -601,7 +601,7 @@ const char *interbasecursor::errorMessage(bool *liveconnection) {
 
 	// get the error message
 	// FIXME: vladimir commented this out why?
-	ISC_LONG	sqlcode=isc_sqlcode(interbaseconn->error);
+	ISC_LONG	sqlcode=isc_sqlcode(firebirdconn->error);
 	isc_sql_interprete(sqlcode, msg, 512);
 	errormsg->append(msg);
 
@@ -616,41 +616,41 @@ const char *interbasecursor::errorMessage(bool *liveconnection) {
 	return errormsg->getString();
 }
 
-bool interbasecursor::knowsRowCount() {
+bool firebirdcursor::knowsRowCount() {
 	return false;
 }
 
-uint64_t interbasecursor::rowCount() {
+uint64_t firebirdcursor::rowCount() {
 	return 0;
 }
 
-bool interbasecursor::knowsAffectedRows() {
+bool firebirdcursor::knowsAffectedRows() {
 	return false;
 }
 
-uint64_t interbasecursor::affectedRows() {
+uint64_t firebirdcursor::affectedRows() {
 	return 0;
 }
 
-uint32_t interbasecursor::colCount() {
+uint32_t firebirdcursor::colCount() {
 	// for exec procedure queries, outsqlda contains output bind values
 	// rather than column info and there is no result set, thus no column
 	// info
 	return outsqlda->sqld;
 }
 
-const char * const *interbasecursor::columnNames() {
+const char * const *firebirdcursor::columnNames() {
 	for (short i=0; i<outsqlda->sqld; i++) {
 		columnnames[i]=outsqlda->sqlvar[i].sqlname;
 	}
 	return columnnames;
 }
 
-uint16_t interbasecursor::columnTypeFormat() {
+uint16_t firebirdcursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
-void interbasecursor::returnColumnInfo() {
+void firebirdcursor::returnColumnInfo() {
 
 	short	precision;
 
@@ -711,20 +711,20 @@ void interbasecursor::returnColumnInfo() {
 	}
 }
 
-bool interbasecursor::noRowsToReturn() {
+bool firebirdcursor::noRowsToReturn() {
 	// for exec procedure queries, outsqlda contains output bind values
 	// rather than a result set and there is no result set
 	return (queryIsExecSP)?true:!outsqlda->sqld;
 }
 
-bool interbasecursor::skipRow() {
+bool firebirdcursor::skipRow() {
 	return fetchRow();
 }
 
-bool interbasecursor::fetchRow() {
+bool firebirdcursor::fetchRow() {
 
 	ISC_STATUS	retcode;
-	if ((retcode=isc_dsql_fetch(interbaseconn->error,
+	if ((retcode=isc_dsql_fetch(firebirdconn->error,
 					&stmt,1,outsqlda))) {
 		// if retcode is 100L, then there are no more rows,
 		// otherwise, there is an error... how do I handle this?
@@ -733,7 +733,7 @@ bool interbasecursor::fetchRow() {
 	return true;
 }
 
-void interbasecursor::returnRow() {
+void firebirdcursor::returnRow() {
 
 	for (short col=0; col<outsqlda->sqld; col++) {
 
@@ -796,7 +796,7 @@ void interbasecursor::returnRow() {
 			conn->sendField(field[col].textbuffer+sizeof(int16_t),
 					size);
 
-		// Looks like sometimes interbase returns INT64's as
+		// Looks like sometimes firebird returns INT64's as
 		// SQL_LONG type.  These can be identified because
 		// the sqlscale gets set too.  Treat SQL_LONG's with
 		// an sqlscale as INT64's.
@@ -913,7 +913,7 @@ void interbasecursor::returnRow() {
 	}
 }
 
-void interbasecursor::cleanUpData(bool freeresult, bool freebinds) {
+void firebirdcursor::cleanUpData(bool freeresult, bool freebinds) {
 	if (freebinds) {
 		outbindcount=0;
 	}

@@ -54,7 +54,7 @@ RPM INSTALL:
 
 		-without db2
 		-without freetds
-		-without interbase
+		-without firebird
 		-without mysql
 		-without odbc
 		-without oracle

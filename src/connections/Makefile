@@ -10,8 +10,8 @@ endif
 ifneq ($(strip $(FREETDSLIBS)),)
 	$(MAKE) -C freetds all
 endif
-ifneq ($(strip $(INTERBASELIBS)),)
-	$(MAKE) -C interbase all
+ifneq ($(strip $(FIREBIRDLIBS)),)
+	$(MAKE) -C firebird all
 endif
 ifneq ($(strip $(MDBTOOLSLIBS)),)
 	$(MAKE) -C mdbtools all
@@ -40,7 +40,7 @@ clean:
 	$(MAKE) -C status clean
 	$(MAKE) -C db2 clean
 	$(MAKE) -C freetds clean
-	$(MAKE) -C interbase clean
+	$(MAKE) -C firebird clean
 	$(MAKE) -C mdbtools clean
 	$(MAKE) -C mysql clean
 	$(MAKE) -C odbc clean
@@ -60,8 +60,8 @@ endif
 ifneq ($(strip $(FREETDSLIBS)),)
 	$(MAKE) -C freetds install
 endif
-ifneq ($(strip $(INTERBASELIBS)),)
-	$(MAKE) -C interbase install
+ifneq ($(strip $(FIREBIRDLIBS)),)
+	$(MAKE) -C firebird install
 endif
 ifneq ($(strip $(MDBTOOLSLIBS)),)
 	$(MAKE) -C mdbtools install
@@ -90,7 +90,7 @@ uninstall:
 	$(MAKE) -C status uninstall
 	$(MAKE) -C db2 uninstall
 	$(MAKE) -C freetds uninstall
-	$(MAKE) -C interbase uninstall
+	$(MAKE) -C firebird uninstall
 	$(MAKE) -C mdbtools uninstall
 	$(MAKE) -C mysql uninstall
 	$(MAKE) -C odbc uninstall

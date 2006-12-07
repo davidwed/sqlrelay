@@ -20,7 +20,7 @@ end
 
 # usage...
 if ARGV.length < 5
-	print "usage: interbase.rb host port socket user password\n"
+	print "usage: firebird.rb host port socket user password\n"
 	exit(0)
 end
 
@@ -31,7 +31,7 @@ cur=SQLRCursor.new(con)
 
 # get database type
 print "IDENTIFY: \n"
-checkSuccess(con.identify(),"interbase")
+checkSuccess(con.identify(),"firebird")
 print "\n"
 
 # ping

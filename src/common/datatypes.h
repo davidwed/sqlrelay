@@ -87,7 +87,7 @@ typedef	enum {
 	USER_DEFINED_TYPE_DATATYPE,
 	SHORT_DATATYPE,
 	TINY_DATATYPE,
-	// added by interbase
+	// added by firebird
 	D_FLOAT_DATATYPE,	// 67
 	ARRAY_DATATYPE,
 	QUAD_DATATYPE,
@@ -271,7 +271,7 @@ static char	*datatypestring[] = {
 	"USER_DEFINED_TYPE",
 	"SHORT_DATATYPE",
 	"TINY_DATATYPE",
-	// added by interbase
+	// added by firebird
 	"D_FLOAT",	// 67
 	"ARRAY",
 	"QUAD",

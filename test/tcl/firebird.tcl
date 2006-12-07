@@ -28,7 +28,7 @@ proc checkSuccess {value success} {
 
 # usage...
 if {$argc<5} {
-	puts "usage: interbase.tcl host port socket user password"
+	puts "usage: firebird.tcl host port socket user password"
 	exit
 }
 
@@ -38,7 +38,7 @@ set cur [$con sqlrcur]
 
 # get database type
 puts "IDENTIFY: "
-checkSuccess [$con identify] "interbase"
+checkSuccess [$con identify] "firebird"
 puts ""
 
 # ping

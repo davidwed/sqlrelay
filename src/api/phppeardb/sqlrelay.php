@@ -16,7 +16,7 @@
 // | Author: David Muse <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.21 2006-09-09 02:57:02 mused Exp $
+// $Id: sqlrelay.php,v 1.22 2006-12-07 02:13:29 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -228,7 +228,7 @@ class DB_sqlrelay extends DB_common
         # for db's which already uses ?-delimited variables, we don't need
         # to do this...
         # FIXME: handle postgresql 8 and mysql 4.1
-        if ($this->identity == "db2" || $this->identity == "interbase") {
+        if ($this->identity == "db2" || $this->identity == "interbase" || $this->identity == "firebird") {
             $newquery = $query;
         } else {
             $paramindex = 0;

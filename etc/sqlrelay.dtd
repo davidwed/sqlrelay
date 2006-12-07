@@ -4,7 +4,7 @@
 	<!ATTLIST instance addresses CDATA "0.0.0.0">
 	<!ATTLIST instance port CDATA "9000">
 	<!ATTLIST instance socket CDATA "/tmp/sqlrelay.socket">
-	<!ATTLIST instance dbase (oracle7|oracle8|mysql|postgresql|sqlite|freetds|sybase|odbc|db2|interbase|mdbtools) "oracle8">
+	<!ATTLIST instance dbase (oracle7|oracle8|mysql|postgresql|sqlite|freetds|sybase|odbc|db2|firebird|mdbtools) "oracle8">
 	<!ATTLIST instance connections CDATA "1">
 	<!ATTLIST instance maxconnections CDATA "1">
 	<!ATTLIST instance maxqueuelength CDATA "0">

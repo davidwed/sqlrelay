@@ -19,8 +19,8 @@ endif
 ifneq ($(strip $(FREETDSLIBS)),)
 	$(MAKE) freetds
 endif
-ifneq ($(strip $(INTERBASELIBS)),)
-	$(MAKE) interbase
+ifneq ($(strip $(FIREBIRDLIBS)),)
+	$(MAKE) firebird
 endif
 ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql
@@ -47,8 +47,8 @@ db2: db2.c db2.lo
 freetds: freetds.c freetds.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ freetds.lo $(LIBS)
 
-interbase: interbase.c interbase.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ interbase.lo $(LIBS)
+firebird: firebird.c firebird.lo
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ firebird.lo $(LIBS)
 
 mysql: mysql.c mysql.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
@@ -79,7 +79,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) db2
 	$(LIBTOOL) --mode=clean $(RM) freetds
-	$(LIBTOOL) --mode=clean $(RM) interbase
+	$(LIBTOOL) --mode=clean $(RM) firebird
 	$(LIBTOOL) --mode=clean $(RM) mysql
 	$(LIBTOOL) --mode=clean $(RM) oracle7
 	$(LIBTOOL) --mode=clean $(RM) oracle8

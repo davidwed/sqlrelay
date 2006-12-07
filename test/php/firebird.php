@@ -35,7 +35,7 @@ function checkSuccess($value,$success) {
 
 	# get database type
 	echo("IDENTIFY: \n");
-	checkSuccess(sqlrcon_identify($con),"interbase");
+	checkSuccess(sqlrcon_identify($con),"firebird");
 	echo("\n");
 
 	# ping

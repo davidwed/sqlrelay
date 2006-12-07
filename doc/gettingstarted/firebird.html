@@ -1,13 +1,13 @@
 <html>
 
 <head>
-<title>SQL Relay - Getting Started With Interbase/Firebird</title>
+<title>SQL Relay - Getting Started With Firebird</title>
 <link rel="stylesheet" href="../css/styles.css">
 </head>
 
 <body>
 
-<span class="heading1">Getting Started With Interbase/Firebird</span><br>
+<span class="heading1">Getting Started With Firebird</span><br>
 
 <ul>
 <li><a href="#installation">Installation</a></li>
@@ -17,32 +17,29 @@
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
 <li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
-<li><a href="#quirks">Interbase Quirks</a></li>
+<li><a href="#quirks">Firebird Quirks</a></li>
 </ul>
 
 <a name="installation"></a>
 <span class="heading1">Installation</span><br>
 
-<p>I've successfully installed Interbase 6.0.1 and Firebird 1.0.0, 1.0.2,
-1.0.3, 1.5, 1.5.2, 1.5.3 and 2.0.0rc4 on Linux.  I've never tried to install
-them on any other platform.</p>
+<p>I've successfully installed Firebird 1.0.0, 1.0.2, 1.0.3, 1.5, 1.5.2, 1.5.3
+and 2.0.0rc4 on Linux.  I've never tried to install them on any other
+platform.</p>
 
-<p>There are 2 versions of Interbase/Firebird: Classic Server (CS) and
+<p>There are 2 versions of Firebird: Classic Server (CS) and
 Super Server (SS).  Classic Server only allows a single connection while Super
 Server allows multiple connections.  I recommend using Super Server and this
 document describes it's installation.</p>
 
-<p>You can download source and binary distributions of Interbase 6.0.1 for
-Linux or Solaris in tar.gz or RPM formats from the
-<a href="http://www.borland.com">Borland web site</a>.  Binary and source
-distributions of Firebird in many different formats (including tar.gz and RPM)
-for many different platforms are available at the
+<p>Binary and source distributions of Firebird in many different formats
+(including tar.gz and RPM) for many different platforms are available at the
 <a href="http://firebird.sourceforge.net">Firebird web site</a>.
 
 <p>The tar.gz distributions come with an install script.  The RPM distributions
 can be installed using <i>rpm -i</i>.</p>
 
-<p>Interbase distributions and Firebird distributions prior to version 1.5
+<p>Firebird distributions prior to version 1.5
 create a directory called /opt/interbase.  Firebird versions 1.5 and higher
 create /opt/firebird.</p>
 
@@ -66,27 +63,10 @@ need to install compat-libstdc++-33 as follows (as root):</p>
 yum install compat-libstdc++-33
 </b></blockquote>
 
-<span class="heading2">Install libncurses.so.4</span><br>
-
-<p>Interbase 6.0.1 requires libncurses.so.4.  Many older distributions come
-with libncurses.so.4.  Many newer distributions come with libncurses.so.5 (or
-newer).  Some distributions come with both.  If your distribution does NOT have 
-libncurses.so.4, create a symbolic link to the newer library as follows.</p>
-
-<p>(These instructions assume that your system has ncurses version 5.2 and that
-libncurses.so.5.2 resides in /usr/lib.  If your system has a different version 
-of ncurses or if it resides somewhere else (for example, in /lib) then modify 
-the instructions accordingly)</p>
-
-<blockquote>
-<b>cd /usr/lib<br>
-ln -s libncurses.so.5.2 libncurses.so.4</b>
-</blockquote>
-
 <a name="startingatboot"></a>
 <span class="heading2">Starting the Database at Boot Time</span><br>
 
-<p>The package distributions of Interbase and Firebird install a script which
+<p>The package distributions of Firebird install a script which
 starts the database at boot time and stops it at shutdown time.  If you
 compiled from source, you'll need to install a script like one of the following
 to start/stop the database at boot/shutdown time.</p>
@@ -114,7 +94,7 @@ to start/stop the database at boot/shutdown time.</p>
 </PRE>
 </blockquote>
 
-<p>For Interbase or Firebird prior to version 1.5, use the following script:</p>
+<p>For Firebird prior to version 1.5, use the following script:</p>
 
 <blockquote>
 <PRE>
@@ -149,19 +129,19 @@ function.</p>
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>
 
-<p>After installation, Interbase is ready to use but to do any useful work, 
-you'll have to create a database.</p>
+<p>After installation, Firebird is ready to use but to do any useful
+work, you'll have to create a database.</p>
 
-<p>At this point, you should set up your environment.  The Interbase/Firebird
+<p>At this point, you should set up your environment.  The Firebird
 client is called </i>isql</i>.  Note that <i>unixODBC</i> and <i>Sybase</i>
 have a client called <i>isql</i> as well which could be installed in /usr/bin,
 /usr/local/bin, /opt/sybase*/bin or some other path.  If you have
 <i>unixODBC</i> or <i>Sybase</i> installed, you'll have to decide which client
 you want the <i>isql</i> command to run.  If you want it to run the
-Interbase/Firebird client, follow the instructions below.  Otherwise, you'll
-have to run the Interbase/Firebird <i>isql</i> client by it's full pathname.</p>
+Firebird client, follow the instructions below.  Otherwise, you'll
+have to run the Firebird <i>isql</i> client by it's full pathname.</p>
 
-<p>If you are using Interbase or Firebird prior to version 1.5, in the
+<p>If you are using Firebird prior to version 1.5, in the
 configuration script for your shell, add <i>/opt/interbase/bin</i> to your
 PATH environment variable.  If you are using Firebird version 1.5 or higher, add
 <i>/opt/firebird/bin</i> to your PATH environment variable.  You can add the
@@ -214,14 +194,14 @@ called <i>security.fdb</i> containing host and user privileges and an
 administrative user named <i>SYSDBA</i> with a randomly generated password.
 This password is listed in <i>SYSDBA.password</i>.</p>
 
-<p>Under Interbase or Firebird prior to version 1.5, the installation process
+<p>Under Firebird prior to version 1.5, the installation process
 creates a security database named <i>isc4.gdb</i> containing host and user
 privileges and an administrative user named <i>SYSDBA</i> with a password of
 either <i>changeme</i> or <i>masterkey</i>.</p>
 
-<p>Interbase user names are case insensitive and can be up to 31 characters 
-long.  Interbase passwords are case sensitive and can be up to 32 characters 
-long, but only the first 8 characters are actually used.</p>
+<p>Firebird user names are case insensitive and can be up to 31
+characters long.  Firebird passwords are case sensitive and can be up
+to 32 characters long, but only the first 8 characters are actually used.</p>
 
 <p>Use the <i>gsec</i> utility to change the <i>SYSDBA</i> password to 
 <i>newpassword</i> and create a new user named <i>testuser</i> with password 
@@ -276,7 +256,7 @@ GSEC<B><FONT color=#a62828>&gt;</FONT></B> quit
 </PRE>
 </blockquote>
 
-<p>For Interbase or Firebird prior to verison 1.5...</p>
+<p>For Firebird prior to verison 1.5...</p>
 
 <blockquote>
 <PRE>
@@ -312,7 +292,7 @@ SQL&gt; quit;
 </PRE>
 </blockquote>
 
-<p>For Interbase or Firebird prior to version 1.5, these commands create a
+<p>For Firebird prior to version 1.5, these commands create a
 database called <i>/opt/interbase/testdb.gdb</i> which is owned by
 <i>testuser</i>.</p>
 
@@ -325,7 +305,7 @@ SQL&gt; quit;
 </PRE>
 </blockquote>
 
-<p>Interbase/Firebird databases are referenced by the pathname of the database
+<p>Firebird databases are referenced by the pathname of the database
 file.  If you try to create a database using a file name that already exists or
 if you forget to enclose the file name in single quotes, you'll get a cryptic
 error indicating that the 'database' token is unknown.  So, if you get a
@@ -341,7 +321,7 @@ already exist.</p>
 <b>isql -u testuser -p testpassword /opt/firebird/testdb.gdb</b>
 </blockquote>
 
-<p>Use the following command for Interbase or Firebird prior to version 1.5.</p>
+<p>Use the following command for Firebird prior to version 1.5.</p>
 
 <blockquote>
 <b>isql -u testuser -p testpassword /opt/interbase/testdb.gdb</b>
@@ -360,7 +340,7 @@ SQL&gt; quit;
 </PRE>
 </blockquote>
 
-<p>Or as follows for Interbase or Firebird prior to version 1.5.</p>
+<p>Or as follows for Firebird prior to version 1.5.</p>
 
 <blockquote>
 <PRE>
@@ -385,7 +365,7 @@ GSEC<B><FONT color=#a62828>&gt;</FONT></B> quit
 </PRE>
 </blockquote>
 
-<p>Or as follows for Interbase or Firebird prior to version 1.5.</p>
+<p>Or as follows for Firebird prior to version 1.5.</p>
 
 <blockquote>
 <PRE>
@@ -400,28 +380,27 @@ GSEC<B><FONT color=#a62828>&gt;</FONT></B> quit
 
 <p>This should be enough to get you started.  To set up more complex 
 configurations, consult the 
-<a href="http://firebird.sourceforge.net/index.php?op=doc">Interbase
-/Firebird documentation</a>.</p>
+<a href="http://firebird.sourceforge.net/index.php?op=doc">Firebird documentation</a>.</p>
 
 <a name="accessing"></a>
 <span class="heading1">Accessing a Database</span><br>
 
-<p>To access a database called <i>/opt/interbase/testdb.gdb</i> on the local
+<p>To access a database called <i>/opt/firebird/testdb.gdb</i> on the local
 machine as the <i>testuser</i> user with password <i>testpassword</i>, use the
 following command.</p>
 
 <blockquote>
-<b>isql -u testuser -p testpassword /opt/interbase/testdb.gdb</b>
+<b>isql -u testuser -p testpassword /opt/firebird/testdb.gdb</b>
 </blockquote>
 
 <p>To connect to a database on a remote machine, prepend the database
 filename with the remote hostname, followed by a colon.  For example, to access 
-a database called <i>/opt/interbase/testdb.gdb</i> on the remote machine 
+a database called <i>/opt/firebird/testdb.gdb</i> on the remote machine 
 <i>testhost</i> as the <i>testuser</i> user with password <i>testpassword</i>, 
 use the following command.</p>
 
 <blockquote>
-<b>isql -u testuser -p testpassword testhost:/opt/interbase/testdb.gdb</b>
+<b>isql -u testuser -p testpassword testhost:/opt/firebird/testdb.gdb</b>
 </blockquote>
 
 <p>Once you're connected to the database, the isql client prompts you to enter
@@ -432,8 +411,8 @@ end it with a semicolon.  To exit, type quit;.</p>
 
 <blockquote>
 <PRE>
-[user@localhost user]$ isql -u testuser -p testpass /opt/interbase/testdb.gdb
-Database:  /opt/interbase/testdb.gdb, <FONT color=#6959cf>User</FONT>: testuser
+[user@localhost user]$ isql -u testuser -p testpass /opt/firebird/testdb.gdb
+Database:  /opt/firebird/testdb.gdb, <FONT color=#6959cf>User</FONT>: testuser
 SQL&gt; <B><FONT color=#a62828>create</FONT></B> <FONT color=#6959cf>table</FONT> testtable (
 CON&gt; col1 <B><FONT color=#288a51>char</FONT></B>(<FONT color=#ff00ff>40</FONT>),
 CON&gt; col2 integer
@@ -481,11 +460,11 @@ SQL&gt; quit;
 <a name="sqlrelay"></a>
 <span class="heading1">Accessing a Database With SQL Relay</span><br>
 
-<p>Accessing Interbase/Firebird from SQL Relay requires an instance entry in
+<p>Accessing Firebird from SQL Relay requires an instance entry in
 your <i>sqlrelay.conf</i> file for the database that you want 
 to access.  Here is an example <i>sqlrelay.conf</i> which defines an SQL Relay 
-instance called interbasetest.  This instance connects to the 
-<i>/opt/interbase/testdb</i> database as the user <i>testuser</i> with password 
+instance called firebirdtest.  This instance connects to the 
+<i>/opt/firebird/testdb</i> database as the user <i>testuser</i> with password 
 <i>testpassword</i>.</p>
 
 <PRE>
@@ -493,12 +472,12 @@ instance called interbasetest.  This instance connects to the
 <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>DOCTYPE</FONT></B> instances <B><FONT color=#a62828>SYSTEM</FONT></B> <FONT color=#ff00ff>&quot;sqlrelay.dtd&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
 <FONT color=#008a8e>&lt;instances&gt;</FONT>
 
-        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/interbasetest.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;interbase&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;0&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> authtier=</FONT><FONT color=#ff00ff>&quot;listener&quot;</FONT><FONT color=#008a8e> handoff=</FONT><FONT color=#ff00ff>&quot;pass&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;firebirdtest&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/firebirdtest.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;firebird&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;0&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> authtier=</FONT><FONT color=#ff00ff>&quot;listener&quot;</FONT><FONT color=#008a8e> handoff=</FONT><FONT color=#ff00ff>&quot;pass&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
                 <FONT color=#008a8e>&lt;users&gt;</FONT>
-                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;firebirdtest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;firebirdtest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
-                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;interbasetest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpassword;database=/opt/interbase/testdb.gdb;dialect=3&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;firebirdtest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;user=testuser;password=testpassword;database=/opt/firebird/testdb.gdb;dialect=3&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/connections&gt;</FONT>
         <FONT color=#008a8e>&lt;/instance&gt;</FONT>
 
@@ -507,34 +486,34 @@ instance called interbasetest.  This instance connects to the
 
 <p>Note that in this example, the database parameter of the string attribute in
 the connection tag references the local database
-<i>/opt/interbase/testdb.gdb</i>.
+<i>/opt/firebird/testdb.gdb</i>.
 If you want to access a remote database, prepend the database filename with
 the remote hostname followed by a colon.  For example: 
-<i>testhost:/opt/interbase/testdb.gdb</i>.</p>
+<i>testhost:/opt/firebird/testdb.gdb</i>.</p>
 
 <p>Now you can start up this instance with the following command.</p>
 
 <blockquote>
-<b>sqlr-start -id interbasetest</b>
+<b>sqlr-start -id firebirdtest</b>
 </blockquote>
 
 <p>To connect to the instance and run queries, use the following command.</p>
 
 <blockquote>
-<b>sqlrsh -id interbasetest</b>
+<b>sqlrsh -id firebirdtest</b>
 </blockquote>
 
 <p>The following command shuts down the SQL Relay instance.</p>
 
 <blockquote>
-<b>sqlr-stop interbasetest</b>
+<b>sqlr-stop firebirdtest</b>
 </blockquote>
 
 <a name="quirks"></a>
-<span class="heading1">Interbase Quirks</span><br>
+<span class="heading1">Firebird Quirks</span><br>
 
 <p>In most databases, you can create, alter or drop databse objects such as
-tables, indices or stored procedures at will.  In Interbase/Firebird, you
+tables, indices or stored procedures at will.  In Firebird, you
 should create, alter or drop databse objects when you have exclusive access
 to the databse.</p>
 

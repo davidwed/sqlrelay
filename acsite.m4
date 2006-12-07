@@ -1654,26 +1654,26 @@ fi
 
 
 
-AC_DEFUN([FW_CHECK_INTERBASE],
+AC_DEFUN([FW_CHECK_FIREBIRD],
 [
-if ( test "$ENABLE_INTERBASE" = "yes" )
+if ( test "$ENABLE_FIREBIRD" = "yes" )
 then
 
-	INTERBASEINCLUDES=""
-	INTERBASELIBS=""
-	INTERBASELIBSPATH=""
-	INTERBASESTATIC=""
+	FIREBIRDINCLUDES=""
+	FIREBIRDLIBS=""
+	FIREBIRDLIBSPATH=""
+	FIREBIRDSTATIC=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
 
 		dnl cross compiling ...
 		echo "cross compiling"
-		if ( test -n "$INTERBASEPATH" )
+		if ( test -n "$FIREBIRDPATH" )
 		then
-			INTERBASEINCLUDES="-I$INTERBASEPATH/include"
-			INTERBASELIBS="-L$INTERBASEPATH/lib -lgds"
-			INTERBASELIBSPATH="$INTERBASEPATH/lib"
+			FIREBIRDINCLUDES="-I$FIREBIRDPATH/include"
+			FIREBIRDLIBS="-L$FIREBIRDPATH/lib -lgds"
+			FIREBIRDLIBSPATH="$FIREBIRDPATH/lib"
 		fi
 
 	else
@@ -1684,66 +1684,66 @@ then
 			STATICFLAG="-static"
 		fi
 		
-		FW_CHECK_HEADERS_AND_LIBS([$INTERBASEPATH],[interbase],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[INTERBASEINCLUDES],[INTERBASELIBS],[INTERBASELIBSPATH],[INTERBASESQLSTATIC])
-		FW_CHECK_HEADERS_AND_LIBS([$INTERBASEPATH],[firebird],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[INTERBASEINCLUDES],[INTERBASELIBS],[INTERBASELIBSPATH],[INTERBASESQLSTATIC])
-		if ( test -n "$INTERBASELIBS" )
+		FW_CHECK_HEADERS_AND_LIBS([$FIREBIRDPATH],[interbase],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[FIREBIRDINCLUDES],[FIREBIRDLIBS],[FIREBIRDLIBSPATH],[FIREBIRDSQLSTATIC])
+		FW_CHECK_HEADERS_AND_LIBS([$FIREBIRDPATH],[firebird],[ibase.h],[gds],[$STATICFLAG],[$RPATHFLAG],[FIREBIRDINCLUDES],[FIREBIRDLIBS],[FIREBIRDLIBSPATH],[FIREBIRDSQLSTATIC])
+		if ( test -n "$FIREBIRDLIBS" )
 		then
-			INTERBASELIBS="$INTERBASELIBS -lcrypt"
+			FIREBIRDLIBS="$FIREBIRDLIBS -lcrypt"
 		fi
 
-		if ( test -z "$INTERBASELIBS" )
+		if ( test -z "$FIREBIRDLIBS" )
 		then
-			FW_CHECK_HEADER_LIB([/Library/Frameworks/Firebird.framework/Versions/Current/Headers/ibase.h],[INTERBASEINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\"],[/Library/Frameworks/Firebird.framework/Versions/Current/Firebird],[INTERBASELIBSPATH=\"/Library/Frameworks/Firebird.framework/Versions/Current\"; INTERBASELIBS=\"/Library/Frameworks/Firebird.framework/Versions/Current/Firebird\"],[],[])
+			FW_CHECK_HEADER_LIB([/Library/Frameworks/Firebird.framework/Versions/Current/Headers/ibase.h],[FIREBIRDINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\"],[/Library/Frameworks/Firebird.framework/Versions/Current/Firebird],[FIREBIRDLIBSPATH=\"/Library/Frameworks/Firebird.framework/Versions/Current\"; FIREBIRDLIBS=\"/Library/Frameworks/Firebird.framework/Versions/Current/Firebird\"],[],[])
 		fi
 		
 		LINKFAIL=""
-		if ( test -n "$DLLIB" -a -n "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
+		if ( test -n "$DLLIB" -a -n "$FIREBIRDSTATIC" -a -n "$FIREBIRDLIBS" )
 		then
-			AC_MSG_CHECKING(if Interbase can be statically linked without $DLLIB)
+			AC_MSG_CHECKING(if Firebird can be statically linked without $DLLIB)
 			FW_TRY_LINK([#include <ibase.h>
-	#include <stdlib.h>],[isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);],[$INTERBASESTATIC $INTERBASEINCLUDES],[$INTERBASELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+	#include <stdlib.h>],[isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);],[$FIREBIRDSTATIC $FIREBIRDINCLUDES],[$FIREBIRDLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
 			then
-				AC_MSG_CHECKING(if Interbase can be statically linked with $DLLIB)
+				AC_MSG_CHECKING(if Firebird can be statically linked with $DLLIB)
 				FW_TRY_LINK([#include <ibase.h>
-#include <stdlib.h>],[isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);],[$INTERBASESTATIC $INTERBASEINCLUDES],[$INTERBASELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); INTERBASELIBS="$INTERBASELIBS $DLLIB"; LINKFAIL="";],[AC_MSG_RESULT(no); INTERBASESTATIC=""])
+#include <stdlib.h>],[isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);],[$FIREBIRDSTATIC $FIREBIRDINCLUDES],[$FIREBIRDLIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); FIREBIRDLIBS="$FIREBIRDLIBS $DLLIB"; LINKFAIL="";],[AC_MSG_RESULT(no); FIREBIRDSTATIC=""])
 			fi
 		fi
 		
-		if ( test -n "$DLLIB" -a -z "$INTERBASESTATIC" -a -n "$INTERBASELIBS" )
+		if ( test -n "$DLLIB" -a -z "$FIREBIRDSTATIC" -a -n "$FIREBIRDLIBS" )
 		then
-			AC_MSG_CHECKING(if Interbase can be dynamically linked without $DLLIB)
+			AC_MSG_CHECKING(if Firebird can be dynamically linked without $DLLIB)
 			FW_TRY_LINK([#include <ibase.h>
-#include <stdlib.h>],[isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);],[$INTERBASEINCLUDES],[$INTERBASELIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
+#include <stdlib.h>],[isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);],[$FIREBIRDINCLUDES],[$FIREBIRDLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); LINKFAIL="yes"])
 			if ( test -n "$LINKFAIL" -a -n "$DLLIB" )
 			then
-				AC_MSG_CHECKING(if Interbase can be dynamically linked with $DLLIB)
+				AC_MSG_CHECKING(if Firebird can be dynamically linked with $DLLIB)
 				FW_TRY_LINK([#include <ibase.h>
-#include <stdlib.h>],[isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);],[$INTERBASEINCLUDES],[$INTERBASELIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); INTERBASELIBS="$INTERBASELIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[isc_db_handle db=0; isc_attach_database(NULL,0,"",&db,0,NULL);],[$FIREBIRDINCLUDES],[$FIREBIRDLIBS $SOCKETLIB $DLLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); FIREBIRDLIBS="$FIREBIRDLIBS $DLLIB"; LINKFAIL=""],[AC_MSG_RESULT(no)])
 			fi
 		fi
 		
 		if ( test -n "$LINKFAIL" )
 		then
-			AC_MSG_WARN(No Interbase link configuration could be found.)
-			INTERBASEINCLUDES=""
-			INTERBASELIBS=""
-			INTERBASESTATIC=""
+			AC_MSG_WARN(No Firebird link configuration could be found.)
+			FIREBIRDINCLUDES=""
+			FIREBIRDLIBS=""
+			FIREBIRDSTATIC=""
 		fi
 		
-		if ( test -z "$INTERBASELIBS" )
+		if ( test -z "$FIREBIRDLIBS" )
 		then
-			AC_MSG_WARN(Interbase support will not be built.)
+			AC_MSG_WARN(Firebird support will not be built.)
 		fi
 	fi
 
-	FW_INCLUDES(interbase,[$INTERBASEINCLUDES])
-	FW_LIBS(interbase,[$INTERBASELIBS])
+	FW_INCLUDES(firebird,[$FIREBIRDINCLUDES])
+	FW_LIBS(firebird,[$FIREBIRDLIBS])
 
-	AC_SUBST(INTERBASEINCLUDES)
-	AC_SUBST(INTERBASELIBS)
-	AC_SUBST(INTERBASELIBSPATH)
-	AC_SUBST(INTERBASESTATIC)
+	AC_SUBST(FIREBIRDINCLUDES)
+	AC_SUBST(FIREBIRDLIBS)
+	AC_SUBST(FIREBIRDLIBSPATH)
+	AC_SUBST(FIREBIRDSTATIC)
 fi
 ])
 

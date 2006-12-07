@@ -71,7 +71,7 @@ int	main(int argc, char **argv) {
 
 	// usage...
 	if (argc<5) {
-		printf("usage: interbase host port socket user password\n");
+		printf("usage: firebird host port socket user password\n");
 		exit(0);
 	}
 
@@ -82,7 +82,7 @@ int	main(int argc, char **argv) {
 
 	// get database type
 	printf("IDENTIFY: \n");
-	checkSuccessString(sqlrcon_identify(con),"interbase");
+	checkSuccessString(sqlrcon_identify(con),"firebird");
 	printf("\n");
 
 	// ping

@@ -1,13 +1,13 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <interbaseconnection.h>
+#include <firebirdconnection.h>
 #include <rudiments/signalclasses.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 
-interbaseconnection	*conn;
+firebirdconnection	*conn;
 signalhandler	*alarmhandler;
 
 void cleanUp() {
@@ -25,7 +25,7 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	conn=new interbaseconnection();
+	conn=new firebirdconnection();
 
 	// handle kill signals
 	conn->handleShutDown((void *)shutDown);
