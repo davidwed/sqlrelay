@@ -41,6 +41,8 @@ sqlrconnection_svr::sqlrconnection_svr() :
 	// maybe someday these parameters will be configurable
 	bindpool=new memorypool(512,128,100);
 
+	cur=NULL;
+
 	sid_sqlrcon=NULL;
 
 	pidfile=NULL;

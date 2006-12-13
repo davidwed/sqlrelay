@@ -7,9 +7,9 @@
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
 #include <rudiments/permissions.h>
+#include <rudiments/snooze.h>
 
-bool sqlrconnection_svr::initConnection(int argc, const char **argv,
-						bool detachbeforeloggingin) {
+bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 
 	shmdata	*shm;
 
@@ -68,10 +68,13 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 		return false;
 	}
 
+	// get from config file
+	bool	reloginatstart=cfgfl->getReLoginAtStart();
+
 	#ifndef SERVER_DEBUG
 	bool	nodetach=cmdl->found("-nodetach");
 
-	if (!nodetach && detachbeforeloggingin) {
+	if (!nodetach && reloginatstart) {
 		// detach from the controlling tty
 		detach();
 	}
@@ -95,16 +98,28 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 		fprintf(stderr,"failed to point statistics at idmemory\n");
 	}
 
-	if (!attemptLogIn()) {
-		return false;
+	if (!reloginatstart) {
+		if (!attemptLogIn(!silent)) {
+			return false;
+		}
 	}
 
 	#ifndef SERVER_DEBUG
-	if (!nodetach && !detachbeforeloggingin) {
+	if (!nodetach) {
 		// detach from the controlling tty
 		detach();
 	}
 	#endif
+
+	if (reloginatstart) {
+		while (!attemptLogIn(false)) {
+			snooze::macrosnooze(5);
+		}
+	}
+
+	if (!initCursors()) {
+		return false;
+	}
 
 	// create connection pid file
 	pid_t	pid=process::getProcessId();
@@ -127,10 +142,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv,
 						cfgfl->getSidUser(),
 						cfgfl->getSidPassword(),
 						0,1);
-	}
-
-	if (!initCursors(true)) {
-		return false;
 	}
 
 	// increment connection counter
@@ -368,16 +379,16 @@ void sqlrconnection_svr::blockSignals() {
 	signalmanager::ignoreSignals(set.getSignalSet());
 }
 
-bool sqlrconnection_svr::attemptLogIn() {
+bool sqlrconnection_svr::attemptLogIn(bool printerrors) {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"logging in...");
 	#endif
-	if (!logInUpdateStats(!silent)) {
+	if (!logInUpdateStats(printerrors)) {
 		#ifdef SERVER_DEBUG
 		debugPrint("connection",0,"log in failed");
 		#endif
-		if (!silent) {
+		if (printerrors) {
 			fprintf(stderr,"Couldn't log into database.\n");
 		}
 		return false;
@@ -418,14 +429,14 @@ void sqlrconnection_svr::setInitialAutoCommitBehavior() {
 	#endif
 }
 
-bool sqlrconnection_svr::initCursors(bool create) {
+bool sqlrconnection_svr::initCursors() {
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",0,"initializing cursors...");
 	#endif
 
 	int32_t	cursorcount=cfgfl->getCursors();
-	if (create) {
+	if (!cur) {
 		cur=new sqlrcursor_svr *[cursorcount];
 		for (int32_t i=0; i<cursorcount; i++) {
 			cur[i]=NULL;
@@ -438,7 +449,7 @@ bool sqlrconnection_svr::initCursors(bool create) {
 		debugPrint("connection",1,i);
 		#endif
 
-		if (create) {
+		if (!cur[i]) {
 			cur[i]=initCursorUpdateStats();
 			// FIXME: LAME!!!  oh god this is lame....
 			cur[i]->querybuffer=new char[

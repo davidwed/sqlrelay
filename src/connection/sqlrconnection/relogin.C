@@ -25,7 +25,7 @@ void sqlrconnection_svr::reLogIn() {
 		#endif
 
 		if (logInUpdateStats(false)) {
-			if (!initCursors(false)) {
+			if (!initCursors()) {
 				closeCursors(false);
 				logOutUpdateStats();
 			} else {

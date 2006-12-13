@@ -135,6 +135,9 @@
 #define DEFAULT_LISTENERTIMEOUT "0"
 	// default listener timeout
 
+#define DEFAULT_RELOGINATSTART "no"
+	// default re-login at start attribute
+
 // cachemanager/sqlrclient parameters
 #define DEFAULT_INTERVAL 30
 	// default interval that the cachemanager will scan on

@@ -171,7 +171,8 @@ instance *configfile::addInstance(const char *id,
 				const char *maxlobbindvaluelength,
 				const char *idleclienttimeout,
 				const char *maxlisteners,
-				const char *listenertimeout) {
+				const char *listenertimeout,
+				const char *reloginatstart) {
 
 	xmldomnode	*newchild=new xmldomnode(doc,root->getNullNode(),
 							TAG_XMLDOMNODETYPE,
@@ -232,6 +233,9 @@ instance *configfile::addInstance(const char *id,
 					newchild->getAttributeCount());
 	newchild->insertAttribute("listenertimeout",
 					listenertimeout,
+					newchild->getAttributeCount());
+	newchild->insertAttribute("reloginatstart",
+					reloginatstart,
 					newchild->getAttributeCount());
 
 	xmldomnode	*newusers=new xmldomnode(doc,root->getNullNode(),
@@ -614,6 +618,15 @@ const char	*instance::getListenerTimeout() {
 	return DEFAULT_LISTENERTIMEOUT;
 }
 
+const char	*instance::getReLoginAtStart() {
+	const char	*retval=instancenode->
+				getAttributeValue("reloginatstart");
+	if (retval) {
+		return retval;
+	}
+	return DEFAULT_RELOGINATSTART;
+}
+
 void	instance::setId(const char *id) {
 	instancenode->getAttribute("id")->setValue(id);
 }
@@ -721,6 +734,12 @@ void	instance::setListenerTimeout(const char *listenertimeout) {
 	instancenode->getAttribute("listenertimeout")->
 					setValue(listenertimeout);
 }
+
+void	instance::setReLoginAtStart(const char *reloginatstart) {
+	instancenode->getAttribute("reloginatstart")->
+					setValue(reloginatstart);
+}
+
 
 user	*instance::addUser(const char *usr, const char *password) {
 

@@ -62,7 +62,8 @@ typedef enum {
 	ROUTER_PASSWORD_ATTRIBUTE,
 	ROUTER_PATTERN_ATTRIBUTE,
 	MAXLISTENERS_ATTRIBUTE,
-	LISTENERTIMEOUT_ATTRIBUTE
+	LISTENERTIMEOUT_ATTRIBUTE,
+	RELOGINATSTART_ATTRIBUTE
 } attribute;
 
 class usercontainer {
@@ -186,6 +187,7 @@ class sqlrconfigfile : public xmlsax {
 		int32_t		getIdleClientTimeout();
 		int64_t		getMaxListeners();
 		uint32_t	getListenerTimeout();
+		bool		getReLoginAtStart();
 
 		bool		getSidEnabled();
 		const char	*getSidHost();
@@ -257,6 +259,7 @@ class sqlrconfigfile : public xmlsax {
 		int32_t		idleclienttimeout;
 		int64_t		maxlisteners;
 		uint32_t	listenertimeout;
+		bool		reloginatstart;
 
 		bool		sidenabled;
 		const char	*sidhost;

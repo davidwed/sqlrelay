@@ -34,7 +34,7 @@ int main(int argc, const char **argv) {
 	alarmhandler=new signalhandler(SIGALRM,(void *)shutDown);
 
 	// open the connection
-	if (conn->initConnection(argc,argv,0)) {
+	if (conn->initConnection(argc,argv)) {
 		// wait for connections
 		conn->listen();
 	}

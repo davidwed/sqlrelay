@@ -70,7 +70,9 @@ bool mysqlconnection::logIn(bool printerrors) {
 	#if MYSQL_VERSION_ID>=32200
 	// initialize database connection structure
 	if (!mysql_init(&mysql)) {
-		fprintf(stderr,"mysql_init failed\n");
+		if (printerrors) {
+			fprintf(stderr,"mysql_init failed\n");
+		}
 		return false;
 	}
 	if (!mysql_real_connect(&mysql,hostval,user,password,dbval,
@@ -79,20 +81,26 @@ bool mysqlconnection::logIn(bool printerrors) {
 	if (!mysql_real_connect(&mysql,hostval,user,password,
 					portval,socketval,clientflag)) {
 	#endif
-		fprintf(stderr,"mysql_real_connect failed: %s\n",
-						mysql_error(&mysql));
+		if (printerrors) {
+			fprintf(stderr,"mysql_real_connect failed: %s\n",
+							mysql_error(&mysql));
+		}
 #else
 	if (!mysql_connect(&mysql,hostval,user,password)) {
-		fprintf(stderr,"mysql_connect failed: %s\n",
+		if (printerrors) {
+			fprintf(stderr,"mysql_connect failed: %s\n",
 						mysql_error(&mysql));
+		}
 #endif
 		logOut();
 		return false;
 	}
 #ifdef MYSQL_SELECT_DB
 	if (mysql_select_db(&mysql,dbval)) {
-		fprintf(stderr,"mysql_select_db failed: %s\n",
+		if (printerrors) {
+			fprintf(stderr,"mysql_select_db failed: %s\n",
 						mysql_error(&mysql));
+		}
 		logOut();
 		return false;
 	}

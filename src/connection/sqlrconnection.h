@@ -44,8 +44,7 @@ class sqlrconnection_svr :
 			sqlrconnection_svr();
 		virtual	~sqlrconnection_svr();
 
-		bool	initConnection(int argc, const char **argv,
-						bool detachbeforeloggingin);
+		bool	initConnection(int argc, const char **argv);
 		void	listen();
 		void	closeConnection();
 
@@ -157,7 +156,7 @@ class sqlrconnection_svr :
 							bool execute);
 
 		void	setUserAndGroup();
-		bool	initCursors(bool create);
+		bool	initCursors();
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();
 		void	decrementSessionCount();
@@ -272,7 +271,7 @@ class sqlrconnection_svr :
 		void	markDatabaseAvailable();
 
 		void	blockSignals();
-		bool	attemptLogIn();
+		bool	attemptLogIn(bool printerrors);
 		void	setInitialAutoCommitBehavior();
 		bool	openSockets();
 

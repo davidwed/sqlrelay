@@ -180,6 +180,7 @@ class gtkfe {
 		static	GtkWidget	*idleclienttimeoutlabel;
 		static	GtkWidget	*maxlistenerslabel;
 		static	GtkWidget	*listenertimeoutlabel;
+		static	GtkWidget	*reloginatstartlabel;
 
 		static	GtkWidget	*identry;
 		static	GtkWidget	*portentry;
@@ -213,6 +214,8 @@ class gtkfe {
 		static	GtkWidget	*idleclienttimeoutentry;
 		static	GtkWidget	*maxlistenersentry;
 		static	GtkWidget	*listenertimeoutentry;
+		static	GtkWidget	*reloginatstartcombo;
+		static	GList		*reloginatstartlist;
 
 		static	GtkWidget	*userstab;
 		static	GtkWidget	*usersframe;

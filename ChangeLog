@@ -5,8 +5,10 @@
 		now :)
 	added -silent option to connections that scaler uses so they don't
 		spew login errors if the db is down
-	fixed a bug that disabled scaling if maxlisteners was -1
-		(the default, which means no maximum)
+	fixed a bug that disabled scaling if maxlisteners
+		was -1 (the default, which means no maximum)
+	freetds, db2 connection don't detach before logging in any more
+	added reloginatstart config parameter
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

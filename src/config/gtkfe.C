@@ -80,6 +80,7 @@ GtkWidget	*gtkfe::maxlobbindvaluelengthlabel;
 GtkWidget	*gtkfe::idleclienttimeoutlabel;
 GtkWidget	*gtkfe::maxlistenerslabel;
 GtkWidget	*gtkfe::listenertimeoutlabel;
+GtkWidget	*gtkfe::reloginatstartlabel;
 
 GtkWidget	*gtkfe::identry;
 GtkWidget	*gtkfe::portentry;
@@ -113,6 +114,8 @@ GtkWidget	*gtkfe::maxlobbindvaluelengthentry;
 GtkWidget	*gtkfe::idleclienttimeoutentry;
 GtkWidget	*gtkfe::maxlistenersentry;
 GtkWidget	*gtkfe::listenertimeoutentry;
+GtkWidget	*gtkfe::reloginatstartcombo;
+GList		*gtkfe::reloginatstartlist;
 
 GtkWidget	*gtkfe::userstab;
 GtkWidget	*gtkfe::usersframe;
@@ -207,7 +210,7 @@ void gtkfe::buildMainWindow() {
 
 	// main window
 	window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_widget_set_usize(GTK_WIDGET(window),600,700);
+	gtk_widget_set_usize(GTK_WIDGET(window),600,710);
 	gtk_window_set_title(GTK_WINDOW(window),"SQL Relay");
 
 	gtk_signal_connect(GTK_OBJECT(window),"delete_event",
@@ -398,7 +401,7 @@ void gtkfe::buildInstancePage() {
 	gtk_widget_show(propertiesvbox);
 
 	// properties table
-	propertiestable=gtk_table_new(3,25,FALSE);
+	propertiestable=gtk_table_new(3,26,FALSE);
 	gtk_table_set_row_spacings(GTK_TABLE(propertiestable),1);
 	gtk_table_set_col_spacings(GTK_TABLE(propertiestable),4);
 	gtk_box_pack_start(GTK_BOX(propertiesvbox),
@@ -578,6 +581,14 @@ void gtkfe::buildInstancePage() {
 	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
 					listenertimeoutlabel,
 					0,1,24,25);
+
+	reloginatstartlabel=
+			gtk_label_new("ReLogin At Start");
+	gtk_misc_set_alignment(GTK_MISC(reloginatstartlabel),1.0,0.5);
+	gtk_widget_show(reloginatstartlabel);
+	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
+					reloginatstartlabel,
+					0,1,25,26);
 
 
 	// properties property inputs
@@ -770,6 +781,20 @@ void gtkfe::buildInstancePage() {
 	gtk_table_attach_defaults(GTK_TABLE(propertiestable),
 					listenertimeoutentry,
 					1,3,24,25);
+
+	reloginatstartcombo=gtk_combo_new();
+	gtk_entry_set_editable(
+		GTK_ENTRY(GTK_COMBO(reloginatstartcombo)->entry),FALSE);
+	reloginatstartlist=(GList *)NULL;
+	reloginatstartlist=g_list_append(reloginatstartlist,(void *)"no");
+	reloginatstartlist=g_list_append(reloginatstartlist,(void *)"yes");
+	gtk_combo_set_popdown_strings(
+		GTK_COMBO(reloginatstartcombo),reloginatstartlist);
+	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(reloginatstartcombo)->entry),"");
+	gtk_widget_show(reloginatstartcombo);
+	gtk_table_attach_defaults(
+		GTK_TABLE(propertiestable),reloginatstartcombo,
+					1,3,25,26);
 
 	// properties notebook page
 	gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
@@ -1155,6 +1180,8 @@ void gtkfe::populateInstanceParameters(instance *inst) {
 				inst->getMaxListeners());
 	gtk_entry_set_text(GTK_ENTRY(listenertimeoutentry),
 				inst->getListenerTimeout());
+	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(reloginatstartcombo)->entry),
+				inst->getReLoginAtStart());
 }
 
 void gtkfe::clearInstanceParameters() {
@@ -1185,6 +1212,7 @@ void gtkfe::clearInstanceParameters() {
 	gtk_entry_set_text(GTK_ENTRY(idleclienttimeoutentry),"");
 	gtk_entry_set_text(GTK_ENTRY(maxlistenersentry),"");
 	gtk_entry_set_text(GTK_ENTRY(listenertimeoutentry),"");
+	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(reloginatstartcombo)->entry),"");
 }
 
 void gtkfe::defaultInstanceParameters() {
@@ -1227,6 +1255,8 @@ void gtkfe::defaultInstanceParameters() {
 					DEFAULT_MAXLISTENERS);
 	gtk_entry_set_text(GTK_ENTRY(listenertimeoutentry),
 					DEFAULT_LISTENERTIMEOUT);
+	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(reloginatstartcombo)->entry),
+							DEFAULT_DEBUG);
 }
 
 void gtkfe::populateUserList(instance *inst) {
@@ -1672,6 +1702,9 @@ void gtkfe::instanceParametersSave(GtkWidget *widget, gpointer data) {
 			gtk_entry_get_text(GTK_ENTRY(maxlistenersentry)));
 	currentinstance->setListenerTimeout(
 			gtk_entry_get_text(GTK_ENTRY(listenertimeoutentry)));
+	currentinstance->setReLoginAtStart(
+			gtk_entry_get_text(
+			GTK_ENTRY(GTK_COMBO(reloginatstartcombo)->entry)));
 
 	// rebuild the instance list in case we were adding a new instance or
 	// changing the id of an old one
@@ -1931,7 +1964,8 @@ void gtkfe::newInstance(GtkWidget *widget, gpointer data) {
 					DEFAULT_MAXLOBBINDVALUELENGTH,
 					DEFAULT_IDLECLIENTTIMEOUT,
 					DEFAULT_MAXLISTENERS,
-					DEFAULT_LISTENERTIMEOUT);
+					DEFAULT_LISTENERTIMEOUT,
+					DEFAULT_RELOGINATSTART);
 
 	defaultInstanceParameters();
 

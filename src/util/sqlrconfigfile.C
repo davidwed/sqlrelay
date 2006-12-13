@@ -60,6 +60,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	sidpassword=charstring::duplicate(DEFAULT_SID_PASSWORD);
 	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
 	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
+	reloginatstart=!charstring::compare(DEFAULT_RELOGINATSTART,"yes");
 	currentroute=NULL;
 	inrouter=false;
 	ignoreconnections=false;
@@ -250,6 +251,10 @@ int64_t sqlrconfigfile::getMaxListeners() {
 
 uint32_t sqlrconfigfile::getListenerTimeout() {
 	return listenertimeout;
+}
+
+bool sqlrconfigfile::getReLoginAtStart() {
+	return reloginatstart;
 }
 
 bool sqlrconfigfile::getSidEnabled() {
@@ -468,6 +473,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=MAXLISTENERS_ATTRIBUTE;
 	} else if (!charstring::compare(name,"listenertimeout")) {
 		currentattribute=LISTENERTIMEOUT_ATTRIBUTE;
+	} else if (!charstring::compare(name,"reloginatstart")) {
+		currentattribute=RELOGINATSTART_ATTRIBUTE;
 	} else {
 		currentattribute=(attribute)0;
 	}
@@ -596,8 +603,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			idleclienttimeout=charstring::toInteger((value)?value:
 						DEFAULT_IDLECLIENTTIMEOUT);
 		} else if (currentattribute==SID_ENABLED_ATTRIBUTE) {
-			sidenabled=!charstring::compareIgnoringCase(
-								value,"yes");
+			sidenabled=
+				!charstring::compareIgnoringCase(value,"yes");
 		} else if (currentattribute==SID_HOST_ATTRIBUTE) {
 			sidhost=charstring::duplicate((value)?value:
 							DEFAULT_SID_HOST);
@@ -676,6 +683,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			listenertimeout=
 				charstring::toUnsignedInteger(
 					(value)?value:DEFAULT_LISTENERTIMEOUT);
+		} else if (currentattribute==RELOGINATSTART_ATTRIBUTE) {
+			reloginatstart=
+				!charstring::compareIgnoringCase(value,"yes");
 		}
 	}
 	return true;

@@ -80,6 +80,7 @@ class instance {
 		const char	*getIdleClientTimeout();
 		const char	*getMaxListeners();
 		const char	*getListenerTimeout();
+		const char	*getReLoginAtStart();
 		void	setId(const char *id);
 		void	setPort(const char *port);
 		void	setUnixPort(const char *unixport);
@@ -107,6 +108,7 @@ class instance {
 		void	setIdleClientTimeout(const char *idleclienttimeout);
 		void	setMaxListeners(const char *maxlisteners);
 		void	setListenerTimeout(const char *listenertimeout);
+		void	setReLoginAtStart(const char *reloginatstart);
 		user	*addUser(const char *usr, const char *password);
 		void	deleteUser(user *usr);
 		user	*findUser(const char *userid);
@@ -168,7 +170,8 @@ class configfile {
 					const char *maxlobbindvaluelength,
 					const char *idleclienttimeout,
 					const char *maxlisteners,
-					const char *listenertimeout);
+					const char *listenertimeout,
+					const char *reloginatstart);
 		void		deleteInstance(instance *inst);
 		instance	*findInstance(const char *id);
 		instance	*firstInstance();
