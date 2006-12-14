@@ -57,6 +57,9 @@ def main():
 	print "LOTS OF ROWS"
 	cur.execute("create table temptable (col1 number)")
 
+	# empty result set
+	cur.execute("select * from temptable")
+
 	counter=0
 	for counter in range(0,200):
 		cur.execute("insert into temptable values (1)")
