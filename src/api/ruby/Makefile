@@ -4,16 +4,16 @@ include ../../../config.mk
 
 .PHONY: all clean rebuild install uninstall
 
-RUBYCFLAGS = $(shell $(RUBY) getcflags.rb | sed -e "s|-mtune=pentium4||g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYCFLAGS = $(shell LANG=en_US $(RUBY) getcflags.rb | sed -e "s|-mtune=pentium4||g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 
 ifeq ($(OVERRIDERUBYSITEARCHDIR),)
-RUBYSITEARCHDIR = $(shell $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYSITEARCHDIR = $(shell LANG=en_US $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 else
 RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
 endif
 
 ifeq ($(OVERRIDERUBYSITELIBDIR),)
-RUBYSITELIBDIR = $(shell $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+RUBYSITELIBDIR = $(shell LANG=en_US $(RUBY) getsitelibdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 else
 RUBYSITELIBDIR = $(OVERRIDERUBYSITELIBDIR)
 endif

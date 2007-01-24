@@ -1043,6 +1043,41 @@ void oracle8cursor::returnOutputBindClob(uint16_t index) {
 	sendLob(outbind_lob[index],buf);
 }
 
+void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
+
+	char	*ptr=(char *)query;
+	char	*endptr=(char *)query+length;
+
+	// skip any leading comments
+	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
+		!skipWhitespace(&ptr,endptr)) {
+		return;
+	}
+
+	// look for "create global temporary table "
+	if (createtemp.match(ptr)) {
+		ptr=createtemp.getSubstringEnd(0);
+	} else {
+		return;
+	}
+
+	// get the table name
+	stringbuffer	tablename;
+	while (ptr && *ptr && *ptr!=' ' &&
+		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
+		tablename.append(*ptr);
+		ptr++;
+	}
+
+	// append to list of temp tables
+	// check for "on commit preserve rows" otherwise assume
+	// "on commit delete rows"
+	if (preserverows.match(ptr)) {
+		conn->addSessionTempTableForTrunc(tablename.getString());
+	}
+}
+#endif
+
 void oracle8cursor::sendLob(OCILobLocator *lob, ub1 *buf) {
 
 	// When reading from a clob, you have to tell it how
@@ -1135,41 +1170,6 @@ void oracle8cursor::sendLob(OCILobLocator *lob, ub1 *buf) {
 		conn->endSendingLong();
 	}
 }
-
-void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
-
-	char	*ptr=(char *)query;
-	char	*endptr=(char *)query+length;
-
-	// skip any leading comments
-	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
-		!skipWhitespace(&ptr,endptr)) {
-		return;
-	}
-
-	// look for "create global temporary table "
-	if (createtemp.match(ptr)) {
-		ptr=createtemp.getSubstringEnd(0);
-	} else {
-		return;
-	}
-
-	// get the table name
-	stringbuffer	tablename;
-	while (ptr && *ptr && *ptr!=' ' &&
-		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
-		tablename.append(*ptr);
-		ptr++;
-	}
-
-	// append to list of temp tables
-	// check for "on commit preserve rows" otherwise assume
-	// "on commit delete rows"
-	if (preserverows.match(ptr)) {
-		conn->addSessionTempTableForTrunc(tablename.getString());
-	}
-}
-#endif
 
 bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {

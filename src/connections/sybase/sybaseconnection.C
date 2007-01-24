@@ -1113,7 +1113,8 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	// This is a special case, for some reason, "use db" queries
 	// throw a warning, ignore them.
-	if (msgp->msgnumber==5701 && msgp->severity==10) {
+	if (CS_NUMBER(msgp->msgnumber)==5701 &&
+			CS_SEVERITY(msgp->msgnumber)==10) {
 		return CS_SUCCEED;
 	}
 
@@ -1124,9 +1125,11 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	errorstring->append("Server message:\n");
 	errorstring->append("	severity(")->
-				append((int32_t)msgp->severity)->append(")\n");
+				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
+				append(")\n");
 	errorstring->append("	number(")->
-				append((int32_t)msgp->msgnumber)->append(")\n");
+				append((int32_t)CS_NUMBER(msgp->msgnumber))->
+				append(")\n");
 	errorstring->append("	state(")->
 				append((int32_t)msgp->state)->append(")\n");
 	errorstring->append("	line(")->

@@ -446,13 +446,14 @@ echo "******************************"
 dnl Checks for platform-specific stuff
 echo
 echo "***** Platform ***************"
+FW_CHECK_UNAME
+
 FW_CHECK_MICROSOFT
 FW_CHECK_OSX
 FW_CHECK_SO_EXT
 
 FW_CHECK_LD_RPATH
 FW_CHECK_PS
-FW_CHECK_UNAME
 
 FW_CHECK_PIPE
 FW_CHECK_WNOLONGDOUBLE

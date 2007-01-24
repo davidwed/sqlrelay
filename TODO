@@ -1,3 +1,9 @@
+integrate Thomas Poindessous php pear db 
+
+integrate ragnar rova's tmp file removing update to init scripts
+
+ruby api Makefile sets LANG=en_US before running make, make sure that works
+
 test freetds, old db2 to make sure detach after login works
 
 looks like zope returns errors with empty result sets
@@ -5,6 +11,8 @@ looks like zope returns errors with empty result sets
 ruby-on-rails support, doc
 
 sqlite binds
+
+perl doesn't build on openbsd 4
 
 --------------------------------------------------------------------------------
 

@@ -21,13 +21,15 @@ class postgresqlcursor : public sqlrcursor_svr {
 	private:
 				postgresqlcursor(sqlrconnection_svr *conn);
 				~postgresqlcursor();
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 		bool		openCursor(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 #endif
 		bool		supportsNativeBinds();
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 		bool		inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -79,7 +81,8 @@ class postgresqlcursor : public sqlrcursor_svr {
 
 		postgresqlconnection	*postgresqlconn;
 
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 		bool		deallocatestatement;
 		int		bindcount;
 		int		bindcounter;
@@ -114,7 +117,8 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*options;
 		const char	*db;
 		uint16_t	typemangling;
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 		bool		fakebinds;
 #endif
 

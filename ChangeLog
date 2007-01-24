@@ -9,6 +9,12 @@
 		was -1 (the default, which means no maximum)
 	freetds, db2 connection don't detach before logging in any more
 	added reloginatstart config parameter
+	fixed sendLob for oracle<8i
+	applied Johnny Luong's postgresql drop-in lib patch
+	applied Jason McClellen's perl dbi raise-error patch
+	sybase/freetds use CS_SEVERITY instead of msgp->severity now
+	added 64 bit sybase tests
+	postgresql only uses PQexecPrepared if PQprepare also exists
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

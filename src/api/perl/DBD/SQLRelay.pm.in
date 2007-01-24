@@ -287,7 +287,7 @@ sub bind_param {
 				$cursor->inputBindBlob($param, $val, length($val)); 
 				return 1; 
 			}
-			return $dbh->DBI::set_err(0,'bind_param: type '.$attr." is not supported.\n");
+			return $dbh->DBI::set_err(1,'bind_param: type '.$attr." is not supported.\n");
 
 		} elsif (ref $attr eq 'HASH' && ($attr->{type} || $attr->{Type} || $attr->{TYPE}))  {
 			my $length = $attr->{length} || length $val;
@@ -299,13 +299,13 @@ sub bind_param {
 				$cursor->inputBindBlob($param, $val, $length);	
 			} else {
 
-		        	return $dbh->DBI::set_err(0, 'bind_param: type ' . $attr->{type} .
+		        	return $dbh->DBI::set_err(1, 'bind_param: type ' . $attr->{type} .
 							     " is not supported.\n");
 			}	
 						
 		} else {
 
-		        return $dbh->DBI::set_err(0,'when specifying binding attributes, you must specify at least \'type\'');	
+		        return $dbh->DBI::set_err(1,'when specifying binding attributes, you must specify at least \'type\'');	
 
 		}
 	} else {
@@ -366,7 +366,7 @@ sub execute {
 			$sth->STORE('NUM_OF_FIELDS',0);
 		}
 		$sth->STORE('driver_FETCHED_ROWS',0);
-		return $dbh->DBI::set_err(0,$cursor->errorMessage());
+		return $dbh->DBI::set_err(1,$cursor->errorMessage());
 	}
 
 	# get some result set info

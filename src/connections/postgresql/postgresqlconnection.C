@@ -15,7 +15,8 @@ postgresqlconnection::postgresqlconnection() : sqlrconnection_svr() {
 	datatypeids=NULL;
 	datatypenames=NULL;
 	pgconn=(PGconn *)NULL;
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 	fakebinds=false;
 #endif
 }
@@ -48,7 +49,8 @@ void postgresqlconnection::handleConnectString() {
 			typemangling=2;
 		}
 	}
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 	fakebinds=!charstring::compare(connectStringValue("fakebinds"),"yes");
 #endif
 }
@@ -106,7 +108,8 @@ bool postgresqlconnection::logIn(bool printerrors) {
 		PQclear(result);
 	}
 
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 	// don't use bind variables against older servers
 	if (PQprotocolVersion(pgconn)<3) {
 		fakebinds=true;
@@ -160,7 +163,8 @@ postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
 						sqlrcursor_svr(conn) {
 	postgresqlconn=(postgresqlconnection *)conn;
 	pgresult=NULL;
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 	deallocatestatement=false;
 	cursorname=NULL;
 	bindcounter=0;
@@ -172,13 +176,15 @@ postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
 }
 
 postgresqlcursor::~postgresqlcursor() {
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 	delete[] cursorname;
 #endif
 	delete[] columnnames;
 }
 
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 bool postgresqlcursor::openCursor(uint16_t id) {
 	size_t	cursornamelen=6+charstring::integerLength(id)+1;
 	cursorname=new char[cursornamelen];
@@ -246,6 +252,7 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 		return false;
 	}
 	deallocatestatement=true;
+
 	return true;
 }
 
@@ -380,7 +387,8 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 #endif
 
 bool postgresqlcursor::supportsNativeBinds() {
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 	return !postgresqlconn->fakebinds;
 #else
 	return false;
@@ -395,12 +403,14 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	nrows=0;
 	currentrow=-1;
 
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 	if (postgresqlconn->fakebinds) {
 #endif
 		pgresult=PQexec(postgresqlconn->pgconn,query);
 
-#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
 	} else {
 		if (bindcount) {
 			// execute the query

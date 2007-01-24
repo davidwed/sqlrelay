@@ -365,7 +365,7 @@ AC_SUBST(MICROSOFT)
 AC_DEFUN([FW_CHECK_OSX],
 [
 	PYTHONFRAMEWORK=""
-	if ( test "`uname -s`" = "Darwin" )
+	if ( test "$UNAME" = "Darwin" )
 	then
 		PYTHONFRAMEWORK="-framework Python"
 	fi
@@ -1078,6 +1078,9 @@ then
 		AC_MSG_CHECKING(if PostgreSQL has PQsetNoticeProcessor)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQsetNoticeProcessor(NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR,1,Some versions of postgresql have PQsetNoticeProcessor)],[AC_MSG_RESULT(no)])
+		AC_MSG_CHECKING(if PostgreSQL has PQprepare)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQprepare(NULL,NULL,NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQPREPARE,1,Some versions of postgresql have PQprepare)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQexecPrepared)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQexecPrepared(NULL,NULL,0,NULL,NULL,NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQEXECPREPARED,1,Some versions of postgresql have PQexecPrepared)],[AC_MSG_RESULT(no)])
@@ -1384,6 +1387,8 @@ then
 		if ( test -n "$SYBASEPATH" )
 		then
 			FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
+
+			FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"],[$SYBASEPATH/lib/libsybct64.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
 		else
 		
 			FW_CHECK_HEADER_LIB([/usr/local/sybase/include/ctpublic.h],[SYBASEINCLUDES=\"-I/usr/local/sybase/include\"],[/usr/local/sybase/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/usr/local/sybase/lib\"; SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[/usr/local/sybase/lib/libct.a],[SYBASELIBS=\"-L/usr/local/sybase/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
@@ -1395,6 +1400,8 @@ then
 			FW_CHECK_HEADER_LIB([/opt/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/OCS-12_5/include\"],[/opt/sybase/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
 
 			FW_CHECK_HEADER_LIB([/opt/sybase/OCS-15_0/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/OCS-15_0/include\"],[/opt/sybase/OCS-15_0/lib/libsybct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybdb -lsybintl\"],[/opt/sybase/OCS-15_0/lib/libsybct.a],[SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybsybtcl -lsybsybdb -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"])
+
+			FW_CHECK_HEADER_LIB([/opt/sybase/OCS-15_0/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sybase/OCS-15_0/include\"],[/opt/sybase/OCS-15_0/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"],[/opt/sybase/OCS-15_0/lib/libsybct64.a],[SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
 		
 			if ( test -z "$SYBASELIBS" )
 			then

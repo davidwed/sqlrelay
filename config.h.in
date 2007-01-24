@@ -106,6 +106,9 @@
 /* Some versions of postgresql have PQfmod */
 #undef HAVE_POSTGRESQL_PQFMOD
 
+/* Some versions of postgresql have PQprepare */
+#undef HAVE_POSTGRESQL_PQPREPARE
+
 /* Some versions of postgresql have PQsetNoticeProcessor */
 #undef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 

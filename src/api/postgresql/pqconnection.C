@@ -237,5 +237,9 @@ PQnoticeProcessor PQsetNoticeProcessor(PGconn *conn,
 	return oldprocessor;
 }
 
+const char *PQparameterStatus(const PGconn *conn, const char *paramName) {
+	// FIXME: Return sensible values for this func.
+	return NULL;
+}
 
 }
