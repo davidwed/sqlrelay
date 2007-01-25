@@ -1080,7 +1080,17 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(0,(uint32_t)1),"1.1");
 	checkSuccess(cur->getField(0,(uint32_t)2),"hello");
-	cur->sendQuery("drop function testproc");
+	cur->sendQuery("drop procedure testproc");
+	printf("\n");
+	// return values
+	checkSuccess(cur->sendQuery("create procedure testproc(out out1 int, out out2 float, out out3 char(20)) begin select 1, 1.1, 'hello' into out1, out2, out3; end;"),1);
+	checkSuccess(cur->sendQuery("set @out1=0, @out2=0.0, @out3=''"),1);
+	checkSuccess(cur->sendQuery("call testproc(@out1,@out2,@out3)"),1);
+	checkSuccess(cur->sendQuery("select @out1, @out2, @out3"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->getFieldAsDouble(0,(uint32_t)1),1.1);
+	checkSuccess(cur->getField(0,(uint32_t)2),"hello");
+	cur->sendQuery("drop procedure testproc");
 	printf("\n");
 
 	// invalid queries...

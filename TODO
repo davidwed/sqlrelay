@@ -1,8 +1,8 @@
+document stored procedure with multiple outputs in mysql
+
 integrate Thomas Poindessous php pear db 
 
 integrate ragnar rova's tmp file removing update to init scripts
-
-ruby api Makefile sets LANG=en_US before running make, make sure that works
 
 test freetds, old db2 to make sure detach after login works
 
@@ -13,48 +13,6 @@ ruby-on-rails support, doc
 sqlite binds
 
 perl doesn't build on openbsd 4
-
---------------------------------------------------------------------------------
-
-Now I found the reason how 'mysql_affected_rows' cause the httpd halt
-	(with drop-in replacement library)
-
-Compare the following two statement:
-1.
-   $res = mysql_query("delete from data where nbr < 10");
-   echo mysql_affected_rows() . " rows have been deleted";
-
-2.
-   mysql_query("delete from data where nbr < 10");
-   echo mysql_affected_rows() . " rows have been deleted";
-
-The first one using a variable $res, it works fine, but the second with an
-error.
-
---------------------------------------------------------------------------------
-
-mysql output binds:
-
->So you'll be needing to make several calls to mysql_next_result() to get the OUT/INOUT values.
-
-This is for a general purpose MySQL driver called from our products. I did it like this:
-
-1. Create a "set @vn=?[,@v(n-1)=?[,...]]" string based on the number n of incoming parameters (IN, INOUT, OUT).
-2. mysql_stmt_prepare(), mysql_stmt_bind_param(), mysql_stmt_execute()
-3. Create a "CALL <procname>([@vn | literal_value[,@v(n-1) | literal value[,...]]" string.
-4. mysql_stmt_prepare(), mysql_stmt_execute()
-5. Create a "select @vm[,@v(m-1)[,...]]" string based on the number m of INOUT and OUT parameters.
-6. mysql_stmt_prepare(),mysql_stmt_result_metadata(),mysql_stmt_execute()
-7. Loop through mysql_fetch_field_direct and build a MYSQL_BIND structure, mysql_stmt_bind_result().
-8. mysql_stmt_fetch()
-9. Grab the results
-10. mysql_stmt_fetch() until rc == MYSQL_NO_DATA
-
-Step 10 was required otherwise I got "Commands out of sync; you can't run this command now" if I tried to run another stored procedure on a different statement handle. All the above steps are run on the same statement.
-
-Initially I thought that I could simply mysql_stmt_bind_param the IN and INOUT parms and mysql_stmt_bind_result the INOUT and OUT parameters; clearly this was not the case. Thanks for your help Hasani, I never would have figured this out. Is this documented somewhere? All I found concerning SPs was chapter 17 of the UG.
-
---------------------------------------------------------------------------------
 
 support oracle OS authentication
 	create user ops$<os_username> identified externally
