@@ -1375,7 +1375,7 @@ following.</p>
 <blockquote>
 <pre>
 sqlrcur_sendQuery(cur,<font color="#ff00ff">&quot;set @out1=0&quot;</font>);
-sqlrcur_sendQuery(cur,<font color="#ff00ff">&quot;select testproc(@out1)&quot;</font>);
+sqlrcur_sendQuery(cur,<font color="#ff00ff">&quot;call testproc(@out1)&quot;</font>);
 sqlrcur_sendQuery(cur,<font color="#ff00ff">&quot;select @out1&quot;</font>);
 <font color="#2e8b57"><b>char</b></font>    *result=sqlrcur_getFieldByIndex(cur,<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
 </pre>

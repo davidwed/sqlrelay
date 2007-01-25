@@ -1107,7 +1107,7 @@ following.</p>
 <blockquote>
 <pre>
 cur.prepareQuery(&quot;<font color="#ff00ff">set @out1=0</font>&quot;)
-cur.prepareQuery(&quot;<font color="#ff00ff">select testproc()</font>&quot;)
+cur.prepareQuery(&quot;<font color="#ff00ff">call testproc()</font>&quot;)
 cur.prepareQuery(&quot;<font color="#ff00ff">select @out1</font>&quot;)
 cur.executeQuery()
 result=cur.getField(0,0)

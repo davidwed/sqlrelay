@@ -690,7 +690,7 @@ following.</p>
 <blockquote>
 <pre>
 cur.execute('<font color="#ff00ff">set @out1=0</font>')
-cur.execute('<font color="#ff00ff">select testfunc()</font>')
+cur.execute('<font color="#ff00ff">call testproc()</font>')
 cur.execute('<font color="#ff00ff">select @out1</font>')
 result=cur.fetchone()[0]
 </pre>

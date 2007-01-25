@@ -1387,7 +1387,7 @@ following.</p>
 <blockquote>
 <pre>
 cur.sendQuery(<font color="#ff00ff">&quot;set @out1=0&quot;</font>);
-cur.sendQuery(<font color="#ff00ff">&quot;select testproc(@out1)&quot;</font>);
+cur.sendQuery(<font color="#ff00ff">&quot;call testproc(@out1)&quot;</font>);
 cur.sendQuery(<font color="#ff00ff">&quot;select @out1&quot;</font>);
 String  result=cur.getFieldByIndex(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
 </pre>

@@ -850,7 +850,7 @@ following.</p>
 <pre>
 stmt=db.prepare(<font color="#6a5acd">&quot;</font><font color="#ff00ff">set @out1=0</font><font color="#6a5acd">&quot;</font>)
 stmt.execute()
-stmt=db.prepare(<font color="#6a5acd">&quot;</font><font color="#ff00ff">select testfunc(@out1)</font><font color="#6a5acd">&quot;</font>)
+stmt=db.prepare(<font color="#6a5acd">&quot;</font><font color="#ff00ff">call testproc(@out1)</font><font color="#6a5acd">&quot;</font>)
 stmt.execute()
 stmt=db.prepare(<font color="#6a5acd">&quot;</font><font color="#ff00ff">select @out1</font><font color="#6a5acd">&quot;</font>)
 stmt.execute()

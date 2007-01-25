@@ -1338,7 +1338,7 @@ following.</p>
 <blockquote>
 <pre>
 sqlrcur_sendQuery<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,&quot;<font color="#ff00ff">set @out1</font>&quot;<font color="#6a5acd">)</font>;
-sqlrcur_sendQuery<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,&quot;<font color="#ff00ff">select testfunc()</font>&quot;<font color="#6a5acd">)</font>;
+sqlrcur_sendQuery<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,&quot;<font color="#ff00ff">call testproc()</font>&quot;<font color="#6a5acd">)</font>;
 sqlrcur_sendQuery<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,&quot;<font color="#ff00ff">select @out1</font>&quot;<font color="#6a5acd">)</font>;
 <font color="#a52a2a"><b>var</b></font> <font color="#a52a2a"><b>$</b></font><font color="#008b8b">result</font><font color="#a52a2a"><b>=</b></font>sqlrcur_getFieldByIndex<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font><font color="#6a5acd">)</font>;
 </pre>

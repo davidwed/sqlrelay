@@ -1222,7 +1222,7 @@ following.</p>
 <blockquote>
 <pre>
 <font color="#008b8b">$cur</font><font color="#008b8b">-&gt;sendQuery</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">set </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1=0</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$cur</font><font color="#008b8b">-&gt;sendQuery</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testproc(</font><font color="#6a5acd">\@</font><font color="#ff00ff">out1)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$cur</font><font color="#008b8b">-&gt;sendQuery</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(</font><font color="#6a5acd">\@</font><font color="#ff00ff">out1)</font><font color="#ff00ff">&quot;</font>);
 <font color="#008b8b">$cur</font><font color="#008b8b">-&gt;sendQuery</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>);
 <font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$result</font>=<font color="#008b8b">$cur</font><font color="#008b8b">-&gt;getField</font>(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
 </pre>

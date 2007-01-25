@@ -1261,7 +1261,7 @@ following.</p>
 <blockquote>
 <pre>
 cur.prepareQuery(<font color="#6a5acd">&quot;</font><font color="#ff00ff">set @out1=0</font><font color="#6a5acd">&quot;</font>);
-cur.prepareQuery(<font color="#6a5acd">&quot;</font><font color="#ff00ff">select testfunc()</font><font color="#6a5acd">&quot;</font>);
+cur.prepareQuery(<font color="#6a5acd">&quot;</font><font color="#ff00ff">call testproc()</font><font color="#6a5acd">&quot;</font>);
 cur.prepareQuery(<font color="#6a5acd">&quot;</font><font color="#ff00ff">select @out1</font><font color="#6a5acd">&quot;</font>);
 cur.executeQuery();
 result=cur.getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
