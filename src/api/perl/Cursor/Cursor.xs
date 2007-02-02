@@ -114,7 +114,7 @@ sqlrcursor::substitution(variable,...)
 						(uint32_t)SvIV(ST(4)));
 		} else if (SvPOK(ST(2))) {
 			THIS->substitution(variable,SvPV(ST(2),na));
-		} else if (ST(2)==&sv_undef) {
+		} else if (!SvOK(ST(2))) {
 			THIS->substitution(variable,(const char *)NULL);
 		} else {
 			RETVAL=0;
@@ -141,7 +141,7 @@ sqlrcursor::inputBind(variable,...)
 						(uint32_t)SvIV(ST(4)));
 		} else if (SvPOK(ST(2))) {
 			THIS->inputBind(variable,SvPV(ST(2),na));
-		} else if (ST(2)==&sv_undef) {
+		} else if (!SvOK(ST(2))) {
 			THIS->inputBind(variable,(const char *)NULL);
 		} else {
 			RETVAL=0;
@@ -159,7 +159,7 @@ sqlrcursor::inputBindBlob(variable,value,size)
 		if (SvPOK(ST(2))) {
 			THIS->inputBindBlob(variable,value,size);
 			RETVAL=1;
-		} else if (ST(2)==&sv_undef) {
+		} else if (!SvOK(ST(2))) {
 			THIS->inputBindBlob(variable,NULL,0);
 		}
 	OUTPUT:
@@ -175,7 +175,7 @@ sqlrcursor::inputBindClob(variable,value,size)
 		if (SvPOK(ST(2))) {
 			THIS->inputBindClob(variable,value,size);
 			RETVAL=1;
-		} else if (ST(2)==&sv_undef) {
+		} else if (!SvOK(ST(2))) {
 			THIS->inputBindClob(variable,NULL,0);
 		}
 	OUTPUT:
