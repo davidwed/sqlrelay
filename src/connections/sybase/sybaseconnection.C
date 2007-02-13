@@ -1113,8 +1113,10 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	// This is a special case, for some reason, "use db" queries
 	// throw a warning, ignore them.
-	if (CS_NUMBER(msgp->msgnumber)==5701 &&
-			CS_SEVERITY(msgp->msgnumber)==10) {
+	if ((CS_NUMBER(msgp->msgnumber)==5701 &&
+			CS_SEVERITY(msgp->msgnumber)==10) ||
+		(CS_NUMBER(msgp->msgnumber)==69 &&
+			CS_SEVERITY(msgp->msgnumber)==22)) {
 		return CS_SUCCEED;
 	}
 
