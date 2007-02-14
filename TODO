@@ -1,4 +1,36 @@
-document stored procedure with multiple outputs in mysql
+Jordan Mendelson's fix:
+
+Crash happens on line 1610 in oracle8connection.C:
+
+if (def[i]) {
+	OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
+	def[i]=NULL;
+}
+
+I can't find any documentation in OCI that indicates that it is necessary to
+free the define handle created by OCIDefineByPos(). It appears it is cleaned
+up when the statement handle is freed. Simply commenting out the handle free
+seems to keep it from crashing.
+
+--------------------------------------------------------------------------------
+
+apply chris coyle's patches
+
+Need to find a way to make connections bleed off.
+	If connections=100 and maxconnections=200 and there are consistently
+		150 clients, then the # of connections needs to bleed back
+		down to 150 eventually.  Currently, if a spike causes it to
+		jump up to 200, then almost all 200 will end up staying alive.
+
+Need to find a way to re-distribute connections.
+	If 2 db's go down and 2nd comes back up first, all log into 2nd db and
+	never log out and back into first
+
+Apply rest of Tim's Perl DBI patch
+
+fix countBindVariables() so it doesn't count :,@,? and $ in the same query
+
+Do some null-bind tests with perl-dbi
 
 integrate Thomas Poindessous php pear db 
 
@@ -8,9 +40,7 @@ test freetds, old db2 to make sure detach after login works
 
 looks like zope returns errors with empty result sets
 
-ruby-on-rails support, doc
-
-sqlite binds
+sqlite binds, sqlite utf-8/utf-16 functions
 
 perl doesn't build on openbsd 4
 
@@ -118,7 +148,6 @@ setting backlog:
 
 Tests:
 	stored procedures for mysql-5.0
-	adodb using peardb driver
 	db2 temp tables
 	odbc temp tables
 	zope
@@ -195,7 +224,6 @@ Documentation:
 	* how to use new features of Tony/Erik's perl dbi patch
 	* issue with sqlrelay.conf permissions and runasuser="nobody"
 	* getting started with odbc
-	* how to use pear db driver with adodb
 	* "how sqlrelay works" with diagrams and animations
 	* example sqlrelay.conf's for different configurations
 	* performance benchmark charts
@@ -307,6 +335,8 @@ API's:
 	D
 	dbstep
 	ADODB driver
+	Ruby-on-rails adapter
+	PHP MDB2 driver
 	PHP PDO driver  http://wiki.cc/php/PDO
 	PHP5 Creole driver
 

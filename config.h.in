@@ -247,6 +247,9 @@
 /* Do we have SIGXFSZ */
 #undef HAVE_SIGXFSZ
 
+/* SQLite supports sqlite3_bind_int */
+#undef HAVE_SQLITE3_BIND_INT
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 

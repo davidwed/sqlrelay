@@ -17,6 +17,9 @@
 	postgresql only uses PQexecPrepared if PQprepare also exists
 	set LANG=POSIX before running ruby/make so sed's would work on non-us
 		locales
+	documented how to use mysql stored procedure output parameters
+	applied james@thoughtpatterns.com's perl null bind patch
+	applied Tim Bunce's perl dbi driver patch
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

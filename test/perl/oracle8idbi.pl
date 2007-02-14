@@ -375,6 +375,7 @@ checkSuccess($$cols[6],7);
 print("\n");
 
 print("COMMIT AND ROLLBACK: \n");
+#my $dbh2=DBI->connect("DBI:SQLRelay:host=$ARGV[0];port=$ARGV[1];socket=$ARGV[2];debug=1",$ARGV[3],$ARGV[4],{AutoCommit=>0}) or die DBI->errstr;
 my $dbh2=DBI->connect("DBI:SQLRelay:host=$ARGV[0];port=$ARGV[1];socket=$ARGV[2];",$ARGV[3],$ARGV[4],{AutoCommit=>0}) or die DBI->errstr;
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],0);

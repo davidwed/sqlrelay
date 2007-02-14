@@ -111,8 +111,56 @@ sqlitecursor::~sqlitecursor() {
 }
 
 bool sqlitecursor::supportsNativeBinds() {
+#ifdef HAVE_SQLITE3_BIND_INT
+	return true;
+#else
 	return false;
+#endif
 }
+
+#ifdef HAVE_SQLITE3_BIND_INT
+bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
+	return true;
+}
+
+bool sqlitecursor::inputBindString(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint16_t valuesize,
+						int16_t *isnull) {
+	return true;
+}
+
+bool sqlitecursor::inputBindInteger(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value) {
+	return true;
+}
+
+bool sqlitecursor::inputBindDouble(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t precision,
+						uint32_t scale) {
+	return true;
+}
+
+bool sqlitecursor::inputBindBlob(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint32_t valuesize,
+						int16_t *isnull) {
+	return true;
+}
+
+bool sqlitecursor::inputBindClob(const char *variable, 
+						uint16_t variablesize,
+						const char *value, 
+						uint32_t valuesize,
+						int16_t *isnull) {
+	return true;
+}
+#endif
 
 bool sqlitecursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {

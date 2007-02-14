@@ -1243,6 +1243,10 @@ then
 	AC_SUBST(SQLITELIBS)
 	AC_SUBST(SQLITELIBSPATH)
 	AC_SUBST(SQLITESTATIC)
+
+	AC_MSG_CHECKING(for sqlite3_bind_int)
+	FW_TRY_LINK([#include <sqlite3.h>
+#include <stdlib.h>],[sqlite3_bind_int(NULL,0,0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_BIND_INT,1,SQLite supports sqlite3_bind_int)],[AC_MSG_RESULT(no)])
 fi
 ])
 

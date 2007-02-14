@@ -630,8 +630,11 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 				// what order they'll come in though, what
 				// a pickle...
 				// For now, we care about the CS_PARAM_RESULT,
-				// presumably there will only be 1 row in it...
-				if (resultstype==CS_PARAM_RESULT) {
+				// or the CS_ROW_RESULT, whichever we get first,
+				// presumably there will only be 1 row in the
+				// CS_PARAM_RESULT...
+				if (resultstype==CS_PARAM_RESULT ||
+						resultstype==CS_ROW_RESULT) {
 					break;
 				}
 			} else {
@@ -717,7 +720,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 	// if we're doing an rpc query, the result set should be a single
 	// row of output parameter results, fetch it and populate the output
 	// bind variables...
-	if (isrpcquery) {
+	if (isrpcquery && resultstype==CS_PARAM_RESULT) {
 
 		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
 				&rowsread)!=CS_SUCCEED && !rowsread) {
