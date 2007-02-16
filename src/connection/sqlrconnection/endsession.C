@@ -109,3 +109,19 @@ void sqlrconnection_svr::abortAllCursors() {
 		sid_sqlrcon->endSession();
 	}
 }
+
+void sqlrconnection_svr::cleanUpAllCursorData(bool freeresult, bool freebinds) {
+
+	// clean up all busy cursors
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",2,"cleaning up all busy cursors...");
+	#endif
+	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
+		if (cur[i] && cur[i]->busy) {
+			cur[i]->cleanUpData(freeresult,freebinds);
+		}
+	}
+	#ifdef SERVER_DEBUG
+	debugPrint("connection",2,"done aborting all busy cursors");
+	#endif
+}

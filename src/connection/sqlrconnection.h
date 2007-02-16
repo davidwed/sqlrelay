@@ -143,6 +143,8 @@ class sqlrconnection_svr :
 		bool		createSharedMemoryAndSemaphores(
 							const char *tmpdir,
 							const char *id);
+		void		cleanUpAllCursorData(bool freeresult,
+							bool freebinds);
 
 	private:
 		// methods used internally

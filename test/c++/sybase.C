@@ -102,16 +102,18 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->ping(),1);
 	printf("\n");
 
-	printf("CREATE STORED PROCEDURE: \n");
-	cur->sendQuery("drop procedure testproc");
-	checkSuccess(cur->sendQuery("create procedure testproc @in1 int, @in2 float, @in3 varchar(20), @out1 int output, @out2 float output, @out3 varchar(20) output as select @out1=@in1, @out2=@in2, @out3=@in3"),1);
-	printf("\n");
-
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 
 	printf("CREATE TEMPTABLE: \n");
 	checkSuccess(cur->sendQuery("create table testtable (testint int, testsmallint smallint, testtinyint tinyint, testreal real, testfloat float, testdecimal decimal(4,1), testnumeric numeric(4,1), testmoney money, testsmallmoney smallmoney, testdatetime datetime, testsmalldatetime smalldatetime, testchar char(40), testvarchar varchar(40), testbit bit)"),1);
+	printf("\n");
+
+	printf("CREATE STORED PROCEDURES: \n");
+	cur->sendQuery("drop procedure testproc");
+	checkSuccess(cur->sendQuery("create procedure testproc @in1 int, @in2 float, @in3 varchar(20), @out1 int output, @out2 float output, @out3 varchar(20) output as select @out1=@in1, @out2=@in2, @out3=@in3"),1);
+	cur->sendQuery("drop procedure testselectproc");
+	checkSuccess(cur->sendQuery("create procedure testselectproc as select * from testtable order by testint"),1);
 	printf("\n");
 
 	printf("BEGIN TRANSACTION: \n");
@@ -883,9 +885,45 @@ int	main(int argc, char **argv) {
 	delete[] filename;
 	printf("\n");
 
+	printf("STORED PROCEDURE WITH RESULT SET: \n");
+	checkSuccess(cur->sendQuery("exec testselectproc"),1);
+	printf("\n");
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->getField(0,1),"1");
+	checkSuccess(cur->getField(0,2),"1");
+	//checkSuccess(cur->getField(0,3),"1.1");
+	//checkSuccess(cur->getField(0,4),"1.1");
+	checkSuccess(cur->getField(0,5),"1.1");
+	checkSuccess(cur->getField(0,6),"1.1");
+	checkSuccess(cur->getField(0,7),"1.00");
+	checkSuccess(cur->getField(0,8),"1.00");
+	checkSuccess(cur->getField(0,9),"Jan  1 2001  1:00AM");
+	checkSuccess(cur->getField(0,10),"Jan  1 2001  1:00AM");
+	checkSuccess(cur->getField(0,11),"testchar1                               ");
+	checkSuccess(cur->getField(0,12),"testvarchar1");
+	checkSuccess(cur->getField(0,13),"1");
+	printf("\n");
+	checkSuccess(cur->getField(7,(uint32_t)0),"8");
+	checkSuccess(cur->getField(7,1),"8");
+	checkSuccess(cur->getField(7,2),"8");
+	//checkSuccess(cur->getField(7,3),"8.8");
+	//checkSuccess(cur->getField(7,4),"8.8");
+	checkSuccess(cur->getField(7,5),"8.8");
+	checkSuccess(cur->getField(7,6),"8.8");
+	checkSuccess(cur->getField(7,7),"8.00");
+	checkSuccess(cur->getField(7,8),"8.00");
+	checkSuccess(cur->getField(7,9),"Jan  1 2008  8:00AM");
+	checkSuccess(cur->getField(7,10),"Jan  1 2008  8:00AM");
+	checkSuccess(cur->getField(7,11),"testchar8                               ");
+	checkSuccess(cur->getField(7,12),"testvarchar8");
+	checkSuccess(cur->getField(7,13),"1");
+	printf("\n");
+
 	// drop existing table
-	con->commit();
-	cur->sendQuery("drop table testtable");
+	printf("COMMIT/DROP TABLE: \n");
+	checkSuccess(con->commit(),1);
+	checkSuccess(cur->sendQuery("drop table testtable"),1);
+	printf("\n");
 
 	// temporary tables
 	printf("TEMPORARY TABLES: \n");

@@ -1,3 +1,5 @@
+configure script needs to look for instant client stuff if it can't find libcore stuff under ORACLE_HOME, people set their ORACLE_HOME, even with instant client
+
 Jordan Mendelson's fix:
 
 Crash happens on line 1610 in oracle8connection.C:
@@ -13,6 +15,8 @@ up when the statement handle is freed. Simply commenting out the handle free
 seems to keep it from crashing.
 
 --------------------------------------------------------------------------------
+
+make same changes to freetds that were made to sybase
 
 apply chris coyle's patches
 
@@ -267,8 +271,7 @@ Security:
 Features:
 	* 2-phase commit, use it in query router
 	* use PAM if possible as alternative to defining users in sqlrelay.conf
-	* support stored procedures that return result sets in
-		sybase, interbase, db2
+	* support stored procedures that return result sets in interbase, db2
 	* could debug logs be logrotate compatible?
 	* postgresql drop-in api lacks many features
 	* postgresql drop-in needs to parse out ; delimited queries for db's

@@ -22159,7 +22159,7 @@ echo $ECHO_N "checking for oracle includes and libraries... $ECHO_C" >&6
 		if ( test -n "$ORACLE_HOME" )
 		then
 
-						SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
+						SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist 2> /dev/null`"
 			if ( test ! -n "$SYSLIBLIST" )
 			then
 				SYSLIBLIST="-lm $AIOLIB"

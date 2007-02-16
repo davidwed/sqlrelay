@@ -19,6 +19,7 @@ bool		sybaseconnection::deadconnection;
 
 sybaseconnection::sybaseconnection() : sqlrconnection_svr() {
 	errorstring=NULL;
+	dbused=false;
 }
 
 sybaseconnection::~sybaseconnection() {
@@ -293,8 +294,9 @@ bool sybasecursor::openCursor(uint16_t id) {
 	cmd=NULL;
 
 	// switch to the correct database
+	// (only do this once per connection)
 	bool	retval=true;
-	if (sybaseconn->db && sybaseconn->db[0]) {
+	if (sybaseconn->db && sybaseconn->db[0] && !sybaseconn->dbused) {
 		int32_t	len=charstring::length(sybaseconn->db)+4;
 		char	query[len+1];
 		snprintf(query,len+1,"use %s",sybaseconn->db);
@@ -303,6 +305,8 @@ bool sybasecursor::openCursor(uint16_t id) {
 			bool	live;
 			fprintf(stderr,"%s\n",errorMessage(&live));
 			retval=false;
+		} else {
+			sybaseconn->dbused=true;
 		}
 		cleanUpData(true,true);
 	}
@@ -1162,4 +1166,14 @@ void sybaseconnection::dropTempTable(sqlrcursor_svr *cursor,
 					dropquery.getStringLength(),1);
 	}
 	cursor->cleanUpData(true,true);
+}
+
+bool sybaseconnection::commit() {
+	cleanUpAllCursorData(true,true);
+	return sqlrconnection_svr::commit();
+}
+
+bool sybaseconnection::rollback() {
+	cleanUpAllCursorData(true,true);
+	return sqlrconnection_svr::rollback();
 }

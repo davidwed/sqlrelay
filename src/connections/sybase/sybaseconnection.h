@@ -144,6 +144,8 @@ class sybaseconnection : public sqlrconnection_svr {
 		char		bindVariablePrefix();
 		void		dropTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);
+		bool		commit();
+		bool		rollback();
 
 		CS_CONTEXT	*context;
 		CS_LOCALE	*locale;
@@ -157,6 +159,8 @@ class sybaseconnection : public sqlrconnection_svr {
 		const char	*language;
 		const char	*hostname;
 		const char	*packetsize;
+
+		bool		dbused;
 
 		static	stringbuffer	*errorstring;
 		static	bool		deadconnection;

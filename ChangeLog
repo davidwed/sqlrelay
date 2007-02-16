@@ -20,6 +20,10 @@
 	documented how to use mysql stored procedure output parameters
 	applied james@thoughtpatterns.com's perl null bind patch
 	applied Tim Bunce's perl dbi driver patch
+	suppress error message of cat $ORACLE_HOME/lib/sysliblist in configure
+		script
+	added support for stored procedures which return result sets to sybase
+		connection
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

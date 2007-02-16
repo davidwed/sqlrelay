@@ -610,7 +610,7 @@ then
 		then
 
 			dnl use sysliblist if it's there
-			SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist`"
+			SYSLIBLIST="`cat $ORACLE_HOME/lib/sysliblist 2> /dev/null`"
 			if ( test ! -n "$SYSLIBLIST" )
 			then
 				SYSLIBLIST="-lm $AIOLIB"
