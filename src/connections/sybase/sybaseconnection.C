@@ -619,8 +619,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 
 		results=ct_results(cmd,&resultstype);
 
-		if (results==CS_FAIL ||
-			resultstype==CS_CMD_FAIL || resultstype==CS_CMD_DONE) {
+		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
 			cleanUpData(true,true);
 			return false;
 		}
