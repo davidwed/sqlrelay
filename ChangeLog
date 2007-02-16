@@ -24,6 +24,8 @@
 		script
 	added support for stored procedures which return result sets to sybase
 		connection
+	added support for stored procedures which return result sets to freetds
+		connection but it doesn't actually return anything
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

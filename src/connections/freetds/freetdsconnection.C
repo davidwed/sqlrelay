@@ -23,6 +23,7 @@ bool		freetdsconnection::deadconnection;
 
 freetdsconnection::freetdsconnection() : sqlrconnection_svr() {
 	errorstring=NULL;
+	dbused=false;
 
 	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
 	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
@@ -376,8 +377,9 @@ bool freetdscursor::openCursor(uint16_t id) {
 	cmd=NULL;
 
 	// switch to the correct database
+	// (only do this once per connection)
 	bool	retval=true;
-	if (freetdsconn->db && freetdsconn->db[0]) {
+	if (freetdsconn->db && freetdsconn->db[0] && !freetdsconn->dbused) {
 		uint32_t	len=charstring::length(freetdsconn->db)+4;
 		char		query[len+1];
 		snprintf(query,len+1,"use %s",freetdsconn->db);
@@ -386,6 +388,8 @@ bool freetdscursor::openCursor(uint16_t id) {
 			bool	live;
 			fprintf(stderr,"%s\n",errorMessage(&live));
 			retval=false;
+		} else {
+			freetdsconn->dbused=true;
 		}
 		cleanUpData(true,true);
 	}
@@ -742,7 +746,8 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 
 		results=ct_results(cmd,&resultstype);
 
-		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
+		if (results==CS_FAIL ||
+			resultstype==CS_CMD_FAIL || resultstype==CS_CMD_DONE) {
 			cleanUpData(true,true);
 			return false;
 		}
@@ -757,8 +762,11 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 				// what order they'll come in though, what
 				// a pickle...
 				// For now, we care about the CS_PARAM_RESULT,
-				// presumably there will only be 1 row in it...
-				if (resultstype==CS_PARAM_RESULT) {
+				// or the CS_ROW_RESULT, whichever we get first,
+				// presumably there will only be 1 row in the
+				// CS_PARAM_RESULT...
+				if (resultstype==CS_PARAM_RESULT ||
+						resultstype==CS_ROW_RESULT) {
 					break;
 				}
 			} else {
@@ -902,7 +910,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 	// if we're doing an rpc query, the result set should be a single
 	// row of output parameter results, fetch it and populate the output
 	// bind variables...
-	if (isrpcquery) {
+	if (isrpcquery && resultstype==CS_PARAM_RESULT) {
 
 		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
 				&rowsread)!=CS_SUCCEED && !rowsread) {
@@ -1244,6 +1252,7 @@ CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt,
 		CS_NUMBER(msgp->msgnumber)==38)) {
 		deadconnection=true;
 	}
+	// FIXME: sybase connection has another case, do we need it?
 
 	return CS_SUCCEED;
 }
@@ -1295,6 +1304,7 @@ CS_RETCODE freetdsconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 		CS_NUMBER(msgp->msgnumber)==38)) {
 		deadconnection=true;
 	}
+	// FIXME: sybase connection has another case, do we need it?
 
 	return CS_SUCCEED;
 }
@@ -1352,4 +1362,14 @@ void freetdsconnection::dropTempTable(sqlrcursor_svr *cursor,
 					dropquery.getStringLength(),1);
 	}
 	cursor->cleanUpData(true,true);
+}
+
+bool freetdsconnection::commit() {
+	cleanUpAllCursorData(true,true);
+	return sqlrconnection_svr::commit();
+}
+
+bool freetdsconnection::rollback() {
+	cleanUpAllCursorData(true,true);
+	return sqlrconnection_svr::rollback();
 }

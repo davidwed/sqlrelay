@@ -619,7 +619,8 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 
 		results=ct_results(cmd,&resultstype);
 
-		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
+		if (results==CS_FAIL ||
+			resultstype==CS_CMD_FAIL || resultstype==CS_CMD_DONE) {
 			cleanUpData(true,true);
 			return false;
 		}
@@ -1059,6 +1060,7 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 		CS_NUMBER(msgp->msgnumber)==6) {
 		deadconnection=true;
 	}
+	// FIXME: freetds connection has another case, do we need it?
 
 	return CS_SUCCEED;
 }
@@ -1110,6 +1112,7 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 		CS_NUMBER(msgp->msgnumber)==6) {
 		deadconnection=true;
 	}
+	// FIXME: freetds connection has another case, do we need it?
 
 	return CS_SUCCEED;
 }

@@ -16,7 +16,7 @@ seems to keep it from crashing.
 
 --------------------------------------------------------------------------------
 
-make same changes to freetds that were made to sybase
+document stored procedures which return result sets with sybase
 
 apply chris coyle's patches
 
