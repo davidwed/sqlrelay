@@ -26,6 +26,9 @@
 		connection
 	added support for stored procedures which return result sets to freetds
 		connection but it doesn't actually return anything
+	documented how to use sybase stored procedure result sets
+	fixed a bug that caused zope to get an exception when result sets are
+		empty
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

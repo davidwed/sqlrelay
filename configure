@@ -33108,6 +33108,7 @@ echo "******************************"
 echo
 echo "***** Zope *******************"
 
+echo "enable zope: $ENABLE_ZOPE"
 if ( test "$ENABLE_ZOPE" = "yes" )
 then
 

@@ -1,3 +1,5 @@
+double-check that the --disable-xxx configure script options aren't backwards
+
 configure script needs to look for instant client stuff if it can't find libcore stuff under ORACLE_HOME, people set their ORACLE_HOME, even with instant client
 
 Jordan Mendelson's fix:
@@ -15,8 +17,6 @@ up when the statement handle is freed. Simply commenting out the handle free
 seems to keep it from crashing.
 
 --------------------------------------------------------------------------------
-
-document stored procedures which return result sets with sybase
 
 apply chris coyle's patches
 
@@ -41,8 +41,6 @@ integrate Thomas Poindessous php pear db
 integrate ragnar rova's tmp file removing update to init scripts
 
 test freetds, old db2 to make sure detach after login works
-
-looks like zope returns errors with empty result sets
 
 sqlite binds, sqlite utf-8/utf-16 functions
 

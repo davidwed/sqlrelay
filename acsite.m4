@@ -2024,6 +2024,7 @@ fi
 
 AC_DEFUN([FW_CHECK_ZOPE],
 [
+echo "enable zope: $ENABLE_ZOPE"
 if ( test "$ENABLE_ZOPE" = "yes" )
 then
 

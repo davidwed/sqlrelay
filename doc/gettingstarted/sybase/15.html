@@ -1,0 +1,29 @@
+don't need to install java
+install compat-libstdc++-33 rpm
+do semaphore thing
+don't need LANG=en_US, don't use it in sqlrelay.conf
+
+#!/bin/sh
+
+export SYBASE=/opt/sybase
+
+export PATH=$PATH:$SYBASE/ASE-15_0/bin:$SYBASE/ASE-15_0/install
+
+echo 268435456 > /proc/sys/kernel/shmmax
+
+case "$1" in
+        start)
+                for i in `ls $SYBASE/ASE-15_0/install/RUN_*`
+                do
+                        su -c "startserver -f $i" > /dev/null 2>&1;
+                done
+                ;;
+        stop)
+                kill `ps -efa | grep sybase | grep -v grep | awk '{print $2}'`
+                ;;
+        *)
+                echo $"Usage: $0 {start|stop}"
+                exit 1
+esac
+
+exit 0
