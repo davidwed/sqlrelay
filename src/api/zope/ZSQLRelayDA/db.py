@@ -43,12 +43,12 @@ class DB(TM):
         self.cur = self.con.cursor()
 
     def _finish(self, *ignored):
-	self.con.commit()
-	self.con.close()
+        self.con.commit()
+        self.con.close()
 
     def _abort(self, *ignored):
         self.con.rollback()
-	self.con.close()
+        self.con.close()
         
     def tables(self, rdb=0, _care=('TABLE', 'VIEW')):
         r=[]
@@ -99,8 +99,12 @@ class DB(TM):
                     else:
                         desc=self.cur.description
                         if max_rows:
-                            if max_rows==1: result=(self.cur.fetchone(),)
-                            else: result=self.cur.fetchmany(max_rows)
+                            if max_rows==1:
+                                print "no, here!"
+                                result=(self.cur.fetchone(),)
+                            else:
+                                print "here!"
+                                result=self.cur.fetchmany(max_rows)
 
             failures=0
             last_call_time=time()
@@ -115,6 +119,12 @@ class DB(TM):
 
         if desc is None:
             return (),()
+
+        # Above, fetchmany returns None for empty result sets.  Maybe it
+        # should return (), but it doesn't and Zope expects () so we'll fix
+        # that here
+        if result is None:
+            result=()
 
         items=[]
         for name, type, length in desc:
