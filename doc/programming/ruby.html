@@ -1657,9 +1657,37 @@ field12=bindcur.getField(<font color="#ff00ff">1</font>,<font color="#ff00ff">2<
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
 
-<p>Stored procedures in Sybase and Microsoft SQL Server can return a result
-set if the last command in the procedure is a select query, however SQL Relay
-doesn't currently support stored procedures that return result sets.</p>
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc <font color="#6a5acd">as</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> testtable
+</pre>
+</blockquote>
+
+<p>To exceute the stored procedure from an SQL Relay program, ue code like the
+following.</p>
+
+<blockquote>
+<pre>
+cur.sendQuery(<font color="#6a5acd">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#6a5acd">&quot;</font>);
+field00=cur.getFieldByIndex(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
+field01=cur.getFieldByIndex(<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+field02=cur.getFieldByIndex(<font color="#ff00ff">0</font>,<font color="#ff00ff">2</font>);
+field10=cur.getFieldByIndex(<font color="#ff00ff">1</font>,<font color="#ff00ff">0</font>);
+field11=cur.getFieldByIndex(<font color="#ff00ff">1</font>,<font color="#ff00ff">1</font>);
+field12=cur.getFieldByIndex(<font color="#ff00ff">1</font>,<font color="#ff00ff">2</font>);
+...
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
 
 
 <span class="heading4">Firebird</span><br>

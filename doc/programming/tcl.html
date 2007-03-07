@@ -1574,12 +1574,12 @@ following.</p>
 <font color="#008b8b">$cur</font> executeQuery
 <font color="#a52a2a"><b>set</b></font> bindcur [<font color="#008b8b">$cur</font> getOutputBindCursor <font color="#ff00ff">&quot;curs&quot;</font>]
 <font color="#008b8b">$bindcur</font> fetchFromBindCursor
-<font color="#a52a2a"><b>set</b></font> field00 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
-<font color="#a52a2a"><b>set</b></font> field01 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">1</font>]
-<font color="#a52a2a"><b>set</b></font> field02 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">2</font>]
-<font color="#a52a2a"><b>set</b></font> field10 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">1</font> <font color="#ff00ff">0</font>]
-<font color="#a52a2a"><b>set</b></font> field11 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">1</font> <font color="#ff00ff">1</font>]
-<font color="#a52a2a"><b>set</b></font> field12 [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">1</font> <font color="#ff00ff">2</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field00</font> [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field01</font> [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field02</font> [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">2</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field10</font> [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">1</font> <font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field11</font> [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">1</font> <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field12</font> [<font color="#008b8b">$bindcur</font> getField <font color="#ff00ff">1</font> <font color="#ff00ff">2</font>]
 ...
 </pre>
 </blockquote>
@@ -1596,9 +1596,37 @@ following.</p>
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
 
-<p>Stored procedures in Sybase and Microsoft SQL Server can return a result
-set if the last command in the procedure is a select query, however SQL Relay
-doesn't currently support stored procedures that return result sets.</p>
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc <font color="#6a5acd">as</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> testtable
+</pre>
+</blockquote>
+
+<p>To exceute the stored procedure from an SQL Relay program, ue code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;exec testproc&quot;</font>
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field00</font> [<font color="#008b8b">$cur</font> getFieldByIndex <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field01</font> [<font color="#008b8b">$cur</font> getFieldByIndex <font color="#ff00ff">0</font> <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field02</font> [<font color="#008b8b">$cur</font> getFieldByIndex <font color="#ff00ff">0</font> <font color="#ff00ff">2</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field10</font> [<font color="#008b8b">$cur</font> getFieldByIndex <font color="#ff00ff">1</font> <font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field11</font> [<font color="#008b8b">$cur</font> getFieldByIndex <font color="#ff00ff">1</font> <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field12</font> [<font color="#008b8b">$cur</font> getFieldByIndex <font color="#ff00ff">1</font> <font color="#ff00ff">2</font>]
+...
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
 
 
 <span class="heading4">Firebird</span><br>
@@ -1638,12 +1666,12 @@ following.</p>
 <blockquote>
 <pre>
 <font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from testfunc() as (testint int, testfloat float, testchar char(40))&quot;</font>
-<font color="#a52a2a"><b>set</b></font> field00 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>]
-<font color="#a52a2a"><b>set</b></font> field01 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>]
-<font color="#a52a2a"><b>set</b></font> field02 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font>,<font color="#ff00ff">2</font>]
-<font color="#a52a2a"><b>set</b></font> field10 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">1</font>,<font color="#ff00ff">0</font>]
-<font color="#a52a2a"><b>set</b></font> field11 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">1</font>,<font color="#ff00ff">1</font>]
-<font color="#a52a2a"><b>set</b></font> field12 [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">1</font>,<font color="#ff00ff">2</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field00</font> [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field01</font> [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field02</font> [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font>,<font color="#ff00ff">2</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field10</font> [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">1</font>,<font color="#ff00ff">0</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field11</font> [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">1</font>,<font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field12</font> [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">1</font>,<font color="#ff00ff">2</font>]
 ...
 </pre>
 </blockquote>
@@ -1683,7 +1711,7 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;call testproc()&quot;</font>)
+<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;call testproc()&quot;</font>
 <font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field00</font> [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">0</font>]
 <font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field01</font> [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> <font color="#008b8b">$field02</font> [<font color="#008b8b">$cur</font> getField <font color="#ff00ff">0</font> <font color="#ff00ff">2</font>]
