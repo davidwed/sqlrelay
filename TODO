@@ -1,22 +1,4 @@
-double-check that the --disable-xxx configure script options aren't backwards
-
-configure script needs to look for instant client stuff if it can't find libcore stuff under ORACLE_HOME, people set their ORACLE_HOME, even with instant client
-
-Jordan Mendelson's fix:
-
-Crash happens on line 1610 in oracle8connection.C:
-
-if (def[i]) {
-	OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
-	def[i]=NULL;
-}
-
-I can't find any documentation in OCI that indicates that it is necessary to
-free the define handle created by OCIDefineByPos(). It appears it is cleaned
-up when the statement handle is freed. Simply commenting out the handle free
-seems to keep it from crashing.
-
---------------------------------------------------------------------------------
+document Sybase 15 on FC4 install
 
 apply chris coyle's patches
 
@@ -36,7 +18,7 @@ fix countBindVariables() so it doesn't count :,@,? and $ in the same query
 
 Do some null-bind tests with perl-dbi
 
-integrate Thomas Poindessous php pear db 
+integrate Thomas Poindessous php pear db patch
 
 integrate ragnar rova's tmp file removing update to init scripts
 

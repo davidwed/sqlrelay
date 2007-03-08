@@ -29,6 +29,8 @@
 	documented how to use sybase stored procedure result sets
 	fixed a bug that caused zope to get an exception when result sets are
 		empty
+	configure looks for instantclient if it can't find anything in
+		ORACLE_HOME, added --with-oracle-instantclient-prefix option
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

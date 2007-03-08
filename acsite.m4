@@ -621,8 +621,24 @@ then
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore9.a],[ORACLEVERSION=\"9i\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore10.a],[ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
-		else
+		fi
 
+		# if we didn't find anything yet, look for instantclient
+		if ( test -z "$ORACLELIBS" )
+		then
+			if ( test -r "$ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
+			then
+				ORACLEVERSION="10g"
+				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
+				ORACLELIBS="-L$ORACLE_INSTANTCLIENT_PREFIX -lclntsh -lnnz10"
+				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
+			fi
+		fi
+
+		# if we didn't find anything yet,
+		# look for RPM-based instantclient
+		if ( test -z "$ORACLELIBS" )
+		then
 			for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
 			do
 				if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client/oci.h" )

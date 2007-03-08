@@ -52,6 +52,9 @@ AC_ARG_WITH(glib-prefix,
 AC_ARG_WITH(oracle-home,
 	[  --with-oracle-home            Location of Oracle],
 	ORACLE_HOME="$withval")
+AC_ARG_WITH(oracle-instantclient-prefix,
+	[  --with-oracle-instantclient-prefix  Location of Oracle Instantclient],
+	ORACLE_INSTANTCLIENT_PREFIX="$withval")
 AC_ARG_ENABLE(oracle,
 	[  --disable-oracle              Don't build Oracle connection],
 	ENABLE_ORACLE="",

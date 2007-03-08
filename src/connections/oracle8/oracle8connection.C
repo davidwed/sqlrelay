@@ -552,10 +552,22 @@ bool oracle8cursor::openCursor(uint16_t id) {
 				(OCIError *)oracle8conn->err)!=OCI_SUCCESS) {
 		return false;
 	}
+
+	// should be able to alloc these here, but it fails
+	/*for (ub4 i=0; i<oracle8conn->maxselectlistsize; i++) {
+		if (OCIHandleAlloc((dvoid *)stmt,(dvoid **)&def[i],
+					OCI_HTYPE_DEFINE,0,NULL)!=OCI_SUCCESS) {
+			return false;
+		}
+	}*/
 	return sqlrcursor_svr::openCursor(id);
 }
 
 bool oracle8cursor::closeCursor() {
+	// should be able to free these here, but the alloc fails
+	/*for (ub4 i=0; i<oracle8conn->maxselectlistsize; i++) {
+		OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
+	}*/
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
 
@@ -1617,6 +1629,11 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 					def_lob[i][j]=NULL;
 				}
 			}
+
+			// should be able to alloc these in openCursor() and
+			// free them in closeCursor() rather than letting
+			// OCIDefineByPos() alloc them and having to clear
+			// them here, but the alloc fails
 			if (def[i]) {
 				OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
 				def[i]=NULL;
