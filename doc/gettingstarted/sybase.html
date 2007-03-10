@@ -19,11 +19,6 @@
 <li><a href="#rpm">RPM-based Linux</a></li>
 </ul>
 <li><a href="#nonrpmversions">Non RPM-based Installations</a>
-<ul>
-<li><a href="#linux">Linux</a></li>
-<li><a href="#freebsd">FreeBSD</a></li>
-</ul>
-</ul>
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
 <li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
@@ -33,12 +28,7 @@
 <span class="heading1">Installation</span><br>
 
 <p>I've successfully installed and used Sybase Adaptive Server Enterprise 
-versions 12.5.2, 12.5.1, 11.9.2 and 11.0.3.3 on Linux.  I've installed Sybase
-ASE version 11.0.3.3 on FreeBSD but could never get it to work properly.
-Likewise, I have been able to install 12.5 on Linux, but was never able to get
-the database to build properly.  I've never had access to any other version of
-Sybase ASE for Linux or FreeBSD or any version of Sybase ASE for other
-platforms.</p>
+versions 15.0, 12.5.2, 12.5.1, 11.9.2 and 11.0.3.3 on Linux.</p>
 
 <p>You can download Sybase ASE from the 
 <a href="http://www.sybase.com/downloads">downloads section</a> of the Sybase 
@@ -108,34 +98,8 @@ for installing on RPM Based Linux.  The only difference is that you must use
 <span class="heading3">RPM-based Linux</span><br>
 
 <p>Versions 11.9.2 and 11.0.3.3 of Sybase ASE for Linux require glibc version
-2.1.2 or greater.  I was able to install them both on RedHat 6.2, 7.3 and 9,
-Mandrake 8.1 and Turbolinux 7.0.  I was not able to install them on Redhat
-5.2.</p>
-
-<p>Version 12.5 of Sybase ASE for Linux requires glibc version 2.2.4 or greater.
-I've never been 100% successful in installing it, however, I have been able
-to get it to partially install on RedHat 7.3, Redhat 9 and Mandrake 9.0.  I
-have not tried it on any other platforms.</p>
-
-<span class="heading4">Version 12.5</span><br>
-
-<p>To install version 12.5 on RPM Based Linux, you should download the
-following RPMS (at minimum) and install them using <i>rpm -i</i>.  Note that
-while it is possible to have RPMS for versions 11.9.2 and 12.5 installed
-simultaneously, it will cause problems for both versions.  Install one or the
-other, but not both.</p>
-
-<blockquote><b>
-sybase-openclient-12.5.0.1ESD<br>
-sybase-common-12.5.0.1DE<br>
-sybase-ase-12.5.0.1ESD<br>
-</b></blockquote>
-
-<p>The other RPMS provide documentation and localization support for several
-languages.</p>
-
-<p>During RPM installation, a sybase user will be created.  You should give
-this user a password.</p>
+2.1.2 or greater.  I was able to install them both on RedHat 6.2, 7.3 and 9.
+I was not able to install them on Redhat 5.2.</p>
 
 <span class="heading4">Version 11.9.2</span><br>
 
@@ -184,43 +148,10 @@ prompt you for a password.</p>
 <a name="nonrpmversions"></a>
 <span class="heading2">Non RPM-based Installations</span><br>
 
-<p>Versions 12.5.2 and 12.5.1 come as tarballs for Linux.  Version 11.0.3.3
-comes as a tarball for FreeBSD.</p>
-
-<a name="linux"></a>
-<span class="heading3">Linux</span><br>
-
-<p>Sybase provides tarballs for versions 12.5.2 and 12.5.1 for Linux.  In
+<p>Sybase provides tarballs for versions 15.0, 12.5.2 and 12.5.1 for Linux.  In
 versions 12.5.2 and 12.5.1, installation and database creation are done in a
 single step.  For instructions for installing versions 12.5.2 and 12.5.1, see
 the instructions below for creating a database.</p>
-
-<a name="freebsd"></a>
-<span class="heading3">FreeBSD</span><br>
-
-<p>Sybase provides tarballs for version 11.0.3.3 for FreeBSD which must be
-untarred in /usr/local.  The FreeBSD version is actually a set of Linux
-binaries with FreeBSD-native development libraries.  To run the FreeBSD
-version, you must have Linux Binary Compatibility and the RPM package
-installed.</p>
-
-<p>The install/sybinstall.sh doesn't work out of the box.  I modified it as
-follows:</p>
-
-<ul>
-<li>set the SYBASE environment variable manually
-<li>remove all references to RPM
-<li>use adduser instead of useradd
-<li>skip the group check
-<li>run all the chmod and chgrp calls after creating the user
-</ul>
-
-<p>After applying these modifications, the script ran, but it failed to build 
-the server.  Also, anything I compiled against the native API crashed 
-immediately.</p>
-
-<p>I'm sure that there is some combination of software versions and hacks that 
-will make it work, but I have yet to determine that combination.</p>
 
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>
@@ -234,7 +165,8 @@ US-english.</p>
 
 <p>The instructions for initializing each version are very different.</p>
 
-<p>See <a href="sybase/12.5.2.html">Initializing a 12.5.2 server</a>,
+<p>See <a href="sybase/15.html">Initializing a 15.0 server</a>,
+<a href="sybase/12.5.2.html">Initializing a 12.5.2 server</a>,
 <a href="sybase/12.5.1.html">Initializing a 12.5.1 server</a>,
 <a href="sybase/12.5.html">Initializing a 12.5 server</a>,
 <a href="sybase/11.9.2.html">Initializing an 11.9.2 server</a> and
@@ -251,8 +183,9 @@ have a client called <i>isql</i> as well which could be installed in /usr/bin,
 want the <i>isql</i> command to run.  If you want it to run the Sybase client,
 follow the instructions below.  Otherwise, you'll have to run the Sybase
 <i>isql</i> client by it's full pathname which could be
-/opt/sybase/OCS/bin/isql, /opt/sybase-12.5/OCS/bin/isql,
-/opt/sybase-11.9.2/bin/isql or some other path.</p>
+/opt/sybase/OCS-15_0/bin/isql, /opt/sybase/OCS/bin/isql,
+/opt/sybase-12.5/OCS/bin/isql, /opt/sybase-11.9.2/bin/isql
+or some other path.</p>
 
 <p>In the configuration script for your shell, add the path to the Sybase isql
 client to your PATH environment variable as follows.  In these examples,
