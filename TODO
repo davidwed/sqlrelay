@@ -1,5 +1,3 @@
-document Sybase 15 on FC4 install
-
 apply chris coyle's patches
 
 Need to find a way to make connections bleed off.
