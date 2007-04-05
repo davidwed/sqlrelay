@@ -36,8 +36,6 @@ if a client connects and the forked listener ends up waiting for a connection
 	and the client disconnects, the forked listener has no way of knowing
 	that the client has disconnected and can't bail
 
-need to test-link something for each detected api/db to make sure it's x86_64
-
 OCI8 drop-in library
 
 hack on postgresql's ecpg to emit SQL Relay code rather than Postgresql code
