@@ -6,6 +6,10 @@
 
 prefix=@prefix@
 sysconfdir=@sysconfdir@
+localstatedir=@localstatedir@
+tmpdir=${localstatedir}/sqlrelay/tmp
+cachedir=${localstatedir}/sqlrelay/cache
+debugdir=${localstatedir}/sqlrelay/debug
 
 [ -f ${sysconfdir}/sqlrelay.conf ] || exit 1
 
@@ -40,10 +44,21 @@ start(){
 
 stop(){
     echo -n $"Stopping SQL Relay: "
-    sqlr-stop >/dev/null 2>&1
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && echo "success" || echo "failure"
-    echo
+    if [ -r /etc/sqlrelay ]; then
+        launched=0
+        for connid in `grep -v ^# /etc/sqlrelay`; do
+            echo
+            echo -n $"Stopping instance with id '${connid}':"
+            sqlr-stop ${connid} 0<&- 1>&- 2>&-
+            RETVAL=$?
+            [ $RETVAL -eq 0 ] && echo "success" || echo "failure"
+            launched=1
+        done
+        [ "$launched" -eq 1 ] || echo "passed"
+        echo
+    else
+        echo "failure"
+    fi
     [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/sqlrelay
     return $RETVAL
 }
