@@ -266,7 +266,6 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 		}
 		curs[index]=new sqlrcursor(routerconn->cons[index]);
 		curs[index]->setResultSetBufferSize(FETCH_AT_ONCE);
-		curs[index]->getNullsAsNulls();
 	}
 	beginquery=false;
 	obcount=0;
@@ -545,7 +544,6 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 			return false;
 		}
 		rcur->cur->setResultSetBufferSize(FETCH_AT_ONCE);
-		rcur->cur->getNullsAsNulls();
 		rcur->isbindcur=true;
 		rcur->nextrow=0;
 		if (!rcur->cur->fetchFromBindCursor()) {
@@ -708,7 +706,7 @@ bool routercursor::skipRow() {
 }
 
 bool routercursor::fetchRow() {
-	if (nextrow<cur->rowCount()) {
+	if (cur->getField(nextrow,(uint32_t)0)) {
 		nextrow++;
 		return true;
 	}
@@ -717,12 +715,12 @@ bool routercursor::fetchRow() {
 
 void routercursor::returnRow() {
 	for (uint32_t index=0; index<cur->colCount(); index++) {
-		const char	*field=cur->getField(nextrow-1,index);
-		if (!field) {
-			conn->sendNullField();
+		const char	*fld=cur->getField(nextrow-1,index);
+		uint32_t	len=cur->getFieldLength(nextrow-1,index);
+		if (len) {
+			conn->sendField(fld,len);
 		} else {
-			conn->sendField(field,cur->getFieldLength(
-							nextrow-1,index));
+			conn->sendNullField();
 		}
 	}
 }
