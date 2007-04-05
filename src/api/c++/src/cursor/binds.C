@@ -15,7 +15,10 @@ uint16_t sqlrcursor::countBindVariables() const {
 	char	lastchar='\0';
 	bool	inquotes=false;
 
-	uint16_t	paramcount=0;
+	uint16_t	questionmarkcount=0;
+	uint16_t	coloncount=0;
+	uint16_t	atsigncount=0;
+	uint16_t	dollarsigncount=0;
 
 	for (const char *ptr=queryptr; *ptr; ptr++) {
 
@@ -32,18 +35,39 @@ uint16_t sqlrcursor::countBindVariables() const {
 		// binds) or $ (for postgresql-style binds) and the previous
 		// character was whitespace, or a comma, left parenthesis or
 		// equal sign then we must have found a bind variable.
+		// count ?, :, @, $ separately
 		if (!inquotes &&
-			(*ptr=='?' || *ptr==':' || *ptr=='@' || *ptr=='$') &&
 			(lastchar==' ' || lastchar=='	' ||
 			lastchar=='\n' || lastchar=='\r' ||
 			lastchar=='=' || lastchar==',' || lastchar=='(')) {
-			paramcount++;
+			if (*ptr=='?') {
+				questionmarkcount++;
+			} else if (*ptr==':') {
+				coloncount++;
+			} else if (*ptr=='@') {
+				atsigncount++;
+			} else if (*ptr=='$') {
+				dollarsigncount++;
+			}
 		}
 
 		lastchar=*ptr;
 	}
 
-	return paramcount;
+	// if we got $'s or ?'s, ignore the :'s or @'s
+	if (dollarsigncount) {
+		return dollarsigncount;
+	}
+	if (questionmarkcount) {
+		return questionmarkcount;
+	}
+	if (coloncount) {
+		return coloncount;
+	}
+	if (atsigncount) {
+		return atsigncount;
+	}
+	return 0;
 }
 
 void sqlrcursor::clearVariables() {
