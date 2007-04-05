@@ -34,6 +34,9 @@
 	added sybase ASE 15 install doc
 	fixed a bug that caused the router connection to return a max of 10 rows
 	applied Chris Coyle's mysql auto-reconnect patch
+	modified countBindVariables to exclude :'s and @'s
+		if it finds $'s or ?'s
+	applied some of Tim Bunce's DBI patches
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

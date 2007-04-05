@@ -406,6 +406,24 @@ for ($i=0; $i<200; $i++) {
 checkSuccess($i,200);
 print("\n");
 
+# null binds
+print("NULL BINDS: \n");
+$dbh->do("delete from testtable");
+$sth=$dbh->prepare("insert into testtable values (:var1,:var2,:var3,:var4)");
+$sth->bind_param("1",undef);
+$sth->bind_param("2",undef);
+$sth->bind_param("3",undef);
+$sth->bind_param("4",undef);
+checkSuccess($sth->execute(),1);
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+@fields=$sth->fetchrow_array;
+checkUndef($fields[0]);
+checkUndef($fields[1]);
+checkUndef($fields[2]);
+checkUndef($fields[3]);
+print("\n");
+
 # drop existing table
 $dbh->do("drop table testtable");
 

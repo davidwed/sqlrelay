@@ -8,17 +8,11 @@ Need to find a way to re-distribute connections.
 	If 2 db's go down and 2nd comes back up first, all log into 2nd db and
 	never log out and back into first
 
-Apply rest of Tim's Perl DBI patch
-
-fix countBindVariables() so it doesn't count :,@,? and $ in the same query
-
-Do some null-bind tests with perl-dbi
-
 integrate Thomas Poindessous php pear db patch
 
 integrate ragnar rova's tmp file removing update to init scripts
 
-test freetds, old db2 to make sure detach after login works
+test old db2 to make sure detach after login works
 
 sqlite binds, sqlite utf-8/utf-16 functions
 

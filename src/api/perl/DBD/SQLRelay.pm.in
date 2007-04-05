@@ -49,6 +49,8 @@ sub connect {
 	# get parameters
 	my ($drh, $dbname, $user, $password, $attr)=@_;
 
+	local $ENV{DBI_AUTOPROXY} = "" if $ENV{DBI_AUTOPROXY} && $ENV{DBI_AUTOPROXY} =~ /^dbi:SQLRelay/i;
+
 	# create a blank database handle
 	my $dbh=DBI::_new_dbh($drh, {
 		'Name'		=>	$dbname,
@@ -73,6 +75,7 @@ sub connect {
 			$var=$1;
 			$val=$2;
 			$dsn{$var}=$val;
+			# FIXME: lowercase attributes will be ignored by STORE
 			$dbh->STORE($var,$val);
 		}
 	}
@@ -138,6 +141,7 @@ sub prepare {
 	my $cursor=SQLRelay::Cursor->new($dbh->FETCH('driver_connection'));
 
 	# set result set buffer size
+	# FIXME: set from DBI RowCacheSize attribute
 	$cursor->setResultSetBufferSize(100);
 
 	# store statement-specific data in the statement handle
@@ -350,11 +354,16 @@ sub execute {
 
 	# Clear and reset binds if they are being passed to execute()
 	if (scalar(@bind_values)) {
+		if (@bind_values != $sth->FETCH('NUM_OF_PARAMS')) {
+			return $dbh->set_err(1,"Expected ".$sth->FETCH('NUM_OF_PARAMS')." bind values but was given ".@bind_values);
+		}
+
 		$cursor->clearBinds();
 		my $index=1;
 		my $bind_value;
 		foreach $bind_value (@bind_values) {
-			bind_param($sth,$index,$bind_value);
+			$sth->bind_param($index,$bind_value)
+				or return;
 			$index=$index+1;
 		}
 	}
@@ -420,7 +429,7 @@ sub fetchrow_arrayref {
 
 	# get a row
 	my @row= $sth->FETCH('driver_cursor')->getRow($fetched_rows);
-	if (scalar(@row) == 0) { return undef; }
+	if (scalar(@row) == 0) { $sth->finish(); return undef; }
 
 	# increment the fetched row count
 	$sth->STORE('driver_FETCHED_ROWS',$fetched_rows+1);
