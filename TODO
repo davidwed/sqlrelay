@@ -10,8 +10,6 @@ Need to find a way to re-distribute connections.
 
 integrate Thomas Poindessous php pear db patch
 
-integrate ragnar rova's tmp file removing update to init scripts
-
 test old db2 to make sure detach after login works
 
 sqlite binds, sqlite utf-8/utf-16 functions

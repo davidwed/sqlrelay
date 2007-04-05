@@ -37,6 +37,8 @@
 	modified countBindVariables to exclude :'s and @'s
 		if it finds $'s or ?'s
 	applied some of Tim Bunce's DBI patches
+	added pid cleanup to init script similar to patch supplied by
+		Ragnar Rova
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection
