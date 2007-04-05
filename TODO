@@ -1,5 +1,3 @@
-apply chris coyle's patches
-
 Need to find a way to make connections bleed off.
 	If connections=100 and maxconnections=200 and there are consistently
 		150 clients, then the # of connections needs to bleed back

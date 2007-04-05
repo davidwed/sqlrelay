@@ -32,6 +32,8 @@
 	configure looks for instantclient if it can't find anything in
 		ORACLE_HOME, added --with-oracle-instantclient-prefix option
 	added sybase ASE 15 install doc
+	fixed a bug that caused the router connection to return a max of 10 rows
+	applied Chris Coyle's mysql auto-reconnect patch
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

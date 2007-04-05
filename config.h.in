@@ -76,6 +76,9 @@
 /* MySQL supports mysql_next_result */
 #undef HAVE_MYSQL_NEXT_RESULT
 
+/* MySQL supports MYSQL_OPT_RECONNECT */
+#undef HAVE_MYSQL_OPT_RECONNECT
+
 /* MySQL supports mysql_ping */
 #undef HAVE_MYSQL_PING
 
