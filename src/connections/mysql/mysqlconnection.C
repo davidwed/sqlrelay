@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+const my_bool	mysqlconnection::mytrue=TRUE;
+
 mysqlconnection::mysqlconnection() : sqlrconnection_svr() {
 	connected=false;
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -95,6 +97,14 @@ bool mysqlconnection::logIn(bool printerrors) {
 		logOut();
 		return false;
 	}
+
+#ifdef MYSQL_OPT_RECONNECT
+	// Enable autoreconnect in the C api
+	// (ordinarily mysql_options should be called before mysql_connect,
+	// but not for this option)
+	mysql_options(&mysql,MYSQL_OPT_RECONNECT,&mytrue);
+#endif
+
 #ifdef MYSQL_SELECT_DB
 	if (mysql_select_db(&mysql,dbval)) {
 		if (printerrors) {

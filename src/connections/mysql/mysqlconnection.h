@@ -143,6 +143,8 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*port;
 		const char	*socket;
 
+		static const my_bool	mytrue;
+
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		fakebinds;
 #endif
