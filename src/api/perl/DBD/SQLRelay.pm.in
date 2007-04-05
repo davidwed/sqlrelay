@@ -49,9 +49,6 @@ sub connect {
 	# get parameters
 	my ($drh, $dbname, $user, $password, $attr)=@_;
 
-	local $ENV{DBI_AUTOPROXY} = ""
-		if $ENV{DBI_AUTOPROXY} && $ENV{DBI_AUTOPROXY} =~ /^dbi:SQLRelay/i;
-
 	# create a blank database handle
 	my $dbh=DBI::_new_dbh($drh, {
 		'Name'		=>	$dbname,
