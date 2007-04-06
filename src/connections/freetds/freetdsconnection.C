@@ -281,6 +281,10 @@ const char *freetdsconnection::identify() {
 	return "freetds";
 }
 
+const char *freetdsconnection::dbVersion() {
+	return "";
+}
+
 char freetdsconnection::bindVariablePrefix() {
 	return '@';
 }

@@ -7,6 +7,10 @@
 
 prefix=${DESTDIR}/usr/local/firstworks
 sysconfdir=${prefix}/etc
+localstatedir=${prefix}/var
+tmpdir=${localstatedir}/sqlrelay/tmp
+cachedir=${localstatedir}/sqlrelay/cache
+debugdir=${localstatedir}/sqlrelay/debug
 
 if ( test ! -r "${sysconfdir}/sqlrelay.conf" ); then
         exit 1
@@ -20,6 +24,21 @@ if ( test "${prefix}" != "/usr" ); then
         LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${prefix}/lib
         export PATH LD_LIBRARY_PATH
 fi
+
+cleanup(){
+    for i in `ls ${tmpdir}/pids/*`
+    do
+        if ( test -r "$i" )
+        then
+            PID=`cat $i`
+            if ( test -n `ps -p $PID | egrep -q "sqlr-cachemana|sqlr-connectio|sqlr-listener"` )
+            then
+                echo "$PID is not sqlr! removing pidfile ..."
+                rm $i
+            fi
+        fi
+    done
+}
 
 start(){
     echo -n $"Starting SQL Relay: "
@@ -44,19 +63,34 @@ start(){
     else
         echo "failure"
     fi
+    cleanup
     return $RETVAL
 }
 
 stop(){
     echo -n $"Stopping SQL Relay: "
-    sqlr-stop >/dev/null 2>&1
-    RETVAL=$?
-    if ( test "$RETVAL" -eq "0" ); then
-        echo "success"
+    if ( test -r "/etc/sqlrelay" ); then
+        launched=0
+        for connid in `grep -v ^# /etc/sqlrelay`; do
+            echo
+            echo -n $"Stopping instance with id '${connid}':"
+            sqlr-stop ${connid} 0<&- 1>&- 2>&-
+            RETVAL=$?
+            if ( test "$RETVAL" -eq "0" ); then
+                echo "success"
+            else
+                echo "failure"
+            fi
+            launched=1
+        done
+        if ( test "$launched" -ne "1" ); then
+            echo "passed"
+        fi
+        echo
     else
         echo "failure"
     fi
-    echo
+    cleanup
     return $RETVAL
 }
 

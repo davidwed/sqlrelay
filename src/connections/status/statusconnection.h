@@ -23,6 +23,7 @@ class statusconnection : public sqlrconnection_svr {
 		void		logOut();
 		bool		isTransactional();
 		const char	*identify();
+		const char	*dbVersion();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		commit();

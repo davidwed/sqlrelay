@@ -155,6 +155,7 @@ class odbcconnection : public sqlrconnection_svr {
 #endif
 		bool		ping();
 		const char	*identify();
+		const char	*dbVersion();
 
 		SQLRETURN	erg;
 		SQLHENV		env;

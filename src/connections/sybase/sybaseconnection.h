@@ -141,6 +141,7 @@ class sybaseconnection : public sqlrconnection_svr {
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		const char	*identify();
+		const char	*dbVersion();
 		char		bindVariablePrefix();
 		void		dropTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);

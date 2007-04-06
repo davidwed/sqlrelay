@@ -225,6 +225,7 @@ class oracle8connection : public sqlrconnection_svr {
 		bool		rollback();
 		const char	*pingQuery();
 		const char	*identify();
+		const char	*dbVersion();
 
 		ub4		statementmode;
 

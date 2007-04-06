@@ -159,6 +159,19 @@ const char *postgresqlconnection::identify() {
 	return "postgresql";
 }
 
+const char *postgresqlconnection::dbVersion() {
+	return "";
+}
+
+bool postgresqlconnection::fakeBinds() {
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARED)
+	return fakebinds;
+#else
+	return false;
+#endif
+}
+
 postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
 						sqlrcursor_svr(conn) {
 	postgresqlconn=(postgresqlconnection *)conn;

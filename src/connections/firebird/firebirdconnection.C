@@ -150,6 +150,10 @@ const char *firebirdconnection::identify() {
 	return "firebird";
 }
 
+const char *firebirdconnection::dbVersion() {
+	return "";
+}
+
 firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 						sqlrcursor_svr(conn) {
 	firebirdconn=(firebirdconnection *)conn;

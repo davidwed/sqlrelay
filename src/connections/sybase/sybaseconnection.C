@@ -250,6 +250,10 @@ const char *sybaseconnection::identify() {
 	return "sybase";
 }
 
+const char *sybaseconnection::dbVersion() {
+	return "";
+}
+
 char sybaseconnection::bindVariablePrefix() {
 	return '@';
 }

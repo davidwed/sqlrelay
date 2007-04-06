@@ -114,6 +114,10 @@ const char *db2connection::identify() {
 	return "db2";
 }
 
+const char *db2connection::dbVersion() {
+	return "";
+}
+
 db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	errormsg=NULL;

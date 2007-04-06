@@ -75,6 +75,10 @@ const char *sqliteconnection::identify() {
 	return "sqlite";
 }
 
+const char *sqliteconnection::dbVersion() {
+	return "";
+}
+
 #ifndef SQLITE_TRANSACTIONAL
 bool sqliteconnection::isTransactional() {
 	return false;

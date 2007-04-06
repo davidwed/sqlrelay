@@ -150,6 +150,7 @@ class routerconnection : public sqlrconnection_svr {
 		bool		commit();
 		bool		rollback();
 		const char	*identify();
+		const char	*dbVersion();
 		bool		ping();
 		void		endSession();
 

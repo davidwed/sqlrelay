@@ -13,10 +13,10 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Author: David Muse <ssb@php.net>                                    |
+// | Author: David Muse <david.muse@firstworks.com>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.22 2006-12-07 02:13:29 mused Exp $
+// $Id: sqlrelay.php,v 1.23 2007-04-06 04:08:52 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -227,8 +227,10 @@ class DB_sqlrelay extends DB_common
         # : or @ delimited variables
         # for db's which already uses ?-delimited variables, we don't need
         # to do this...
-        # FIXME: handle postgresql 8 and mysql 4.1
-        if ($this->identity == "db2" || $this->identity == "interbase" || $this->identity == "firebird") {
+        if ($this->identity == "db2" ||
+                $this->identity == "interbase" ||
+                $this->identity == "firebird" ||
+                $this->identity == "mysql") {
             $newquery = $query;
         } else {
             $paramindex = 0;
@@ -248,6 +250,8 @@ class DB_sqlrelay extends DB_common
                     if ($this->identity == "sybase" ||
                             $this->identity == "freetds") {
                         $newquery .= "@bind" . $paramindex;
+                    } else ($this->identity == "postgresql") {
+                        $newquery .= "$" . ($paramindex+1);
                     } else {
                         $newquery .= ":bind" . $paramindex;
                     }
@@ -343,6 +347,7 @@ class DB_sqlrelay extends DB_common
             return $this->raiseError(DB_ERROR_NEED_MORE_DATA);
         }
         $first = true;
+        $pgbindindex = 1;
         switch ($mode) {
             case DB_AUTOQUERY_INSERT:
                 $values = '';
@@ -359,6 +364,9 @@ class DB_sqlrelay extends DB_common
                     if ($this->identity == "sybase" ||
                                 $this->identity == "freetds") {
                         $values .= "@$value";
+                    } else ($this->identity == "postgresql") {
+                        $values .= "$" . $pgbindindex;
+                        $pgbindindex++;
                     } else {
                         $values .= ":$value";
                     }
@@ -376,6 +384,9 @@ class DB_sqlrelay extends DB_common
                     if ($this->identity == "sybase" ||
                                 $this->identity == "freetds") {
                         $set .= "$value = @$value";
+                    } else ($this->identity == "postgresql") {
+                        $set .= "$value = ?$pgbindindex";
+                        $pgbindindex++;
                     } else {
                         $set .= "$value = :$value";
                     }

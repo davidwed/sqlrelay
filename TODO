@@ -8,7 +8,10 @@ Need to find a way to re-distribute connections.
 	If 2 db's go down and 2nd comes back up first, all log into 2nd db and
 	never log out and back into first
 
-integrate Thomas Poindessous php pear db patch
+php pear db patch:
+	add dbversion/fakebinds to client api's
+	and dbversion/fakebinds to decide whether to translate ?'s for
+		mysql/postgresql
 
 test old db2 to make sure detach after login works
 

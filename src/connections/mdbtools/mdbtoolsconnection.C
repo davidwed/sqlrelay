@@ -50,6 +50,10 @@ const char *mdbtoolsconnection::identify() {
 	return "mdbtools";
 }
 
+const char *mdbtoolsconnection::dbVersion() {
+	return "";
+}
+
 bool mdbtoolsconnection::isTransactional() {
 	return false;
 }

@@ -133,6 +133,10 @@ const char *statusconnection::identify() {
 	return "status";
 }
 
+const char *statusconnection::dbVersion() {
+	return "";
+}
+
 bool statusconnection::isTransactional() {
 	return false;
 }

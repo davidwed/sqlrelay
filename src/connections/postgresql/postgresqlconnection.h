@@ -105,6 +105,8 @@ class postgresqlconnection : public sqlrconnection_svr {
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		const char	*identify();
+		const char	*dbVersion();
+		bool		fakeBinds();
 
 		int	datatypecount;
 		int32_t	*datatypeids;

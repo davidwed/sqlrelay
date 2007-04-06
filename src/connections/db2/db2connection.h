@@ -129,6 +129,7 @@ class db2connection : public sqlrconnection_svr {
 		bool	rollback();
 		const char	*pingQuery();
 		const char	*identify();
+		const char	*dbVersion();
 
 		SQLHENV		env;
 		SQLRETURN	erg;

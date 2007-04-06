@@ -235,6 +235,10 @@ const char *routerconnection::identify() {
 	return "router";
 }
 
+const char *routerconnection::dbVersion() {
+	return "";
+}
+
 bool routerconnection::ping() {
 
 	// ping all connections, if any fail, return failure

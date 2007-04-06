@@ -309,6 +309,10 @@ const char *odbcconnection::identify() {
 	return "odbc";
 }
 
+const char *odbcconnection::dbVersion() {
+	return "";
+}
+
 #if (ODBCVER >= 0x0300)
 bool odbcconnection::autoCommitOn() {
 	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,

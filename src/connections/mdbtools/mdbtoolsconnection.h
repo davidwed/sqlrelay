@@ -61,6 +61,7 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 		bool	isTransactional();
 		bool	ping();
 		const char	*identify();
+		const char	*dbVersion();
 		bool	autoCommitOn();
 		bool	autoCommitOff();
 		bool	commit();

@@ -157,6 +157,18 @@ const char *mysqlconnection::identify() {
 	return "mysql";
 }
 
+const char *mysqlconnection::dbVersion() {
+	return "";
+}
+
+bool mysqlconnection::fakeBinds() {
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	return fakebinds;
+#else
+	return false;
+#endif
+}
+
 bool mysqlconnection::isTransactional() {
 	return false;
 }

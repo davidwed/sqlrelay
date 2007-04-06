@@ -456,6 +456,10 @@ const char *oracle8connection::identify() {
 	return "oracle8";
 }
 
+const char *oracle8connection::dbVersion() {
+	return "";
+}
+
 oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	stmt=NULL;
