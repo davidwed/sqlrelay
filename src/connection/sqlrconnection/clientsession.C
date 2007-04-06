@@ -50,6 +50,12 @@ void sqlrconnection_svr::clientSession() {
 		} else if (command==ROLLBACK) {
 			rollbackCommand();
 			continue;
+		} else if (command==DBVERSION) {
+			dbVersionCommand();
+			continue;
+		} else if (command==FAKEBINDS) {
+			fakeBindsCommand();
+			continue;
 		}
 
 		// For the rest of the commands, the client will be requesting
