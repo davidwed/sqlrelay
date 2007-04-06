@@ -236,6 +236,8 @@ class oracle8connection : public sqlrconnection_svr {
 		OCISession	*session;
 		OCITrans	*trans;
 
+		char		versionbuf[512];
+
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 		OCISession	*newsession;
 		bool		supportsproxycredentials;

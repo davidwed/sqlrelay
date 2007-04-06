@@ -76,7 +76,11 @@ const char *sqliteconnection::identify() {
 }
 
 const char *sqliteconnection::dbVersion() {
-	return "";
+#ifdef SQLITE_VERSION
+	return SQLITE_VERSION;
+#else
+	return "unknown";
+#endif
 }
 
 #ifndef SQLITE_TRANSACTIONAL

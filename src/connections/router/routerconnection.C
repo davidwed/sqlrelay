@@ -236,6 +236,7 @@ const char *routerconnection::identify() {
 }
 
 const char *routerconnection::dbVersion() {
+	// FIXME: return SQL Relay version?
 	return "";
 }
 

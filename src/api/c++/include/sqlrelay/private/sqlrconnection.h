@@ -64,6 +64,9 @@
 		// identify
 		char		*id;
 
+		// db version
+		char		*dbversion;
+
 		// debug
 		bool		debug;
 		int32_t		webdebug;

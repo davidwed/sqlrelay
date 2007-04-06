@@ -115,7 +115,12 @@ const char *db2connection::identify() {
 }
 
 const char *db2connection::dbVersion() {
-	return "";
+	SQLSMALLINT	dbversionlen;
+	SQLGetInfo(dbc,SQL_DBMS_VER,
+			(SQLPOINTER)dbversion,
+			(SQLSMALLINT)sizeof(dbversion),
+			&dbversionlen);
+	return dbversion;
 }
 
 db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {

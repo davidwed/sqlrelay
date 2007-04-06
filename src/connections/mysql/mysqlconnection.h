@@ -110,6 +110,7 @@ class mysqlconnection : public sqlrconnection_svr {
 	friend class mysqlcursor;
 	public:
 				mysqlconnection();
+				~mysqlconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
@@ -144,6 +145,8 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*host;
 		const char	*port;
 		const char	*socket;
+
+		char	*dbversion;
 
 		static const my_bool	mytrue;
 

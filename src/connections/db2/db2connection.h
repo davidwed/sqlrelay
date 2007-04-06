@@ -136,6 +136,8 @@ class db2connection : public sqlrconnection_svr {
 		SQLHDBC		dbc;
 
 		const char	*server;
+
+		char		dbversion[512];
 };
 
 #endif

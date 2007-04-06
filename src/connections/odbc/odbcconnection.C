@@ -310,7 +310,12 @@ const char *odbcconnection::identify() {
 }
 
 const char *odbcconnection::dbVersion() {
-	return "";
+	SQLSMALLINT	dbversionlen;
+	SQLGetInfo(dbc,SQL_DBMS_VER,
+			(SQLPOINTER)dbversion,
+			(SQLSMALLINT)sizeof(dbversion),
+			&dbversionlen);
+	return dbversion;
 }
 
 #if (ODBCVER >= 0x0300)

@@ -34,6 +34,9 @@ sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 	// database id
 	id=NULL;
 
+	// db version
+	dbversion=NULL;
+
 	// session state
 	connected=false;
 	clearSessionFlags();

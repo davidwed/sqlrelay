@@ -98,6 +98,7 @@ class	sqlrsh {
 		void	displayStats(sqlrcursor *sqlrcur, environment *env);
 		void	ping(sqlrconnection *sqlrcon, environment *env);
 		void	identify(sqlrconnection *sqlrcon, environment *env);
+		void	dbversion(sqlrconnection *sqlrcon, environment *env);
 		void	displayHelp(environment *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env);
@@ -265,6 +266,7 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"help",4) ||
 		!charstring::compareIgnoringCase(ptr,"ping",4) ||
 		!charstring::compareIgnoringCase(ptr,"identify",8) ||
+		!charstring::compareIgnoringCase(ptr,"dbversion",9) ||
 		!charstring::compareIgnoringCase(ptr,"run",3) ||
 		!charstring::compareIgnoringCase(ptr,"@",1) ||
 		!charstring::compareIgnoringCase(ptr,"delimiter",9) ||
@@ -328,6 +330,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		cmdtype=7;
 	} else if (!charstring::compareIgnoringCase(ptr,"identify",8)) {	
 		identify(sqlrcon,env);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"dbversion",9)) {	
+		dbversion(sqlrcon,env);
 		return;
 	} else {
 		return;
@@ -593,6 +598,12 @@ void sqlrsh::identify(sqlrconnection *sqlrcon, environment *env) {
 	white(env);
 }
 
+void sqlrsh::dbversion(sqlrconnection *sqlrcon, environment *env) {
+	red(env);
+	printf("%s\n",sqlrcon->dbVersion());
+	white(env);
+}
+
 
 void sqlrsh::displayHelp(environment *env) {
 
@@ -609,6 +620,10 @@ void sqlrsh::displayHelp(environment *env) {
 	printf("	identify		- ");
 	green(env);
 	printf("returns the type of database\n");
+	cyan(env);
+	printf("	dbversion		- ");
+	green(env);
+	printf("returns the version of the database\n");
 	cyan(env);
 	printf("	run script		- ");
 	green(env);

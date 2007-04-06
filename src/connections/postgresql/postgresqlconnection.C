@@ -9,8 +9,13 @@
 
 #include <datatypes.h>
 
-#ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
+#ifdef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
+static void nullNoticeProcessor(void *arg, const char *message) {
+}
+#endif
+
 postgresqlconnection::postgresqlconnection() : sqlrconnection_svr() {
+	dbversion=NULL;
 	datatypecount=0;
 	datatypeids=NULL;
 	datatypenames=NULL;
@@ -22,12 +27,11 @@ postgresqlconnection::postgresqlconnection() : sqlrconnection_svr() {
 }
 
 postgresqlconnection::~postgresqlconnection() {
+#ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	devnull.close();
-}
-#else
-static void nullNoticeProcessor(void *arg, const char *message) {
-}
 #endif
+	delete[] dbversion;
+}
 
 uint16_t postgresqlconnection::getNumberOfConnectStringVars() {
 	return NUM_CONNECT_STRING_VARS;
@@ -160,7 +164,9 @@ const char *postgresqlconnection::identify() {
 }
 
 const char *postgresqlconnection::dbVersion() {
-	return "";
+	delete[] dbversion;
+	dbversion=charstring::parseNumber(PQserverVersion(pgconn));
+	return dbversion;
 }
 
 bool postgresqlconnection::fakeBinds() {

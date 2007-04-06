@@ -151,6 +151,7 @@ const char *firebirdconnection::identify() {
 }
 
 const char *firebirdconnection::dbVersion() {
+	// FIXME: use isc_version, which is complicated, has callbacks
 	return "";
 }
 

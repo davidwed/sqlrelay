@@ -7,7 +7,7 @@
 const char *sqlrconnection::identify() {
 
 	if (!openSession()) {
-		return 0;
+		return NULL;
 	}
 
 	if (debug) {
@@ -23,10 +23,12 @@ const char *sqlrconnection::identify() {
 	// get the id
 	uint16_t	size;
 	if (cs->read(&size)==sizeof(uint16_t)) {
+		delete[] id;
 		id=new char[size+1];
 		if (cs->read(id,size)!=size) {
 			setError("Failed to identify.\n A network error may have ocurred.");
 			delete[] id;
+			id=NULL;
 			return NULL;
 		}
 		id[size]=(char)NULL;

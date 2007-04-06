@@ -323,7 +323,6 @@ bool oracle8connection::logIn(bool printerrors) {
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	// figure out what version database we're connected to...
 	supportsproxycredentials=false;
-	char	versionbuf[512];
 	if (OCIServerVersion((dvoid *)svc,err,
 				(text *)versionbuf,sizeof(versionbuf),
 				OCI_HTYPE_SVCCTX)==OCI_SUCCESS &&
@@ -457,7 +456,12 @@ const char *oracle8connection::identify() {
 }
 
 const char *oracle8connection::dbVersion() {
-	return "";
+	if (OCIServerVersion((dvoid *)svc,err,
+				(text *)versionbuf,sizeof(versionbuf),
+				OCI_HTYPE_SVCCTX)==OCI_SUCCESS) {
+		return versionbuf;
+	}
+	return NULL;
 }
 
 oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {

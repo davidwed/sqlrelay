@@ -9,7 +9,8 @@ Need to find a way to re-distribute connections.
 	never log out and back into first
 
 php pear db patch:
-	add dbversion/fakebinds to client api's
+	figure out dbversion for sybase/freetds/firebird
+	add dbversion/fakebinds to non c++ client api's
 	and dbversion/fakebinds to decide whether to translate ?'s for
 		mysql/postgresql
 

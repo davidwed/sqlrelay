@@ -97,6 +97,9 @@ class postgresqlcursor : public sqlrcursor_svr {
 
 class postgresqlconnection : public sqlrconnection_svr {
 	friend class postgresqlcursor;
+	public:
+			postgresqlconnection();
+			~postgresqlconnection();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
@@ -123,11 +126,9 @@ class postgresqlconnection : public sqlrconnection_svr {
 		defined(HAVE_POSTGRESQL_PQPREPARED)
 		bool		fakebinds;
 #endif
+		char		*dbversion;
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
-	public:
-			postgresqlconnection();
-			~postgresqlconnection();
 	private:
 		file	devnull;
 #endif

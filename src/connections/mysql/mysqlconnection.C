@@ -22,6 +22,11 @@ mysqlconnection::mysqlconnection() : sqlrconnection_svr() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	fakebinds=false;
 #endif
+	dbversion=NULL;
+}
+
+mysqlconnection::~mysqlconnection() {
+	delete[] dbversion;
 }
 
 uint16_t mysqlconnection::getNumberOfConnectStringVars() {
@@ -158,7 +163,9 @@ const char *mysqlconnection::identify() {
 }
 
 const char *mysqlconnection::dbVersion() {
-	return "";
+	delete[] dbversion;
+	dbversion=charstring::parseNumber(mysql_get_server_version(&mysql));
+	return dbversion;
 }
 
 bool mysqlconnection::fakeBinds() {

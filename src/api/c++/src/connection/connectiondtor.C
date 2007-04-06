@@ -13,6 +13,9 @@ sqlrconnection::~sqlrconnection() {
 	// deallocate id
 	delete[] id;
 
+	// deallocate dbversion
+	delete[] dbversion;
+
 	// deallocate copied references
 	if (copyrefs) {
 		delete[] server;

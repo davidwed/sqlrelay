@@ -51,7 +51,11 @@ const char *mdbtoolsconnection::identify() {
 }
 
 const char *mdbtoolsconnection::dbVersion() {
-	return "";
+#ifdef MDB_VERSION_NO
+	return MDB_VERSION_NO;
+#else
+	return "unknown";
+#endif
 }
 
 bool mdbtoolsconnection::isTransactional() {

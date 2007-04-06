@@ -162,6 +162,8 @@ class odbcconnection : public sqlrconnection_svr {
 		SQLHDBC		dbc;
 
 		const char	*dsn;
+
+		char		dbversion[512];
 };
 
 #endif

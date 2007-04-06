@@ -73,6 +73,11 @@ class sqlrconnection {
 		const char	*identify();
 				// Returns the type of database: 
 				//   oracle7, oracle8, postgresql, mysql, etc.
+		const char	*dbVersion();
+				// Returns the version of the database
+		bool		fakeBinds();
+				// Returns whether or not SQL Relay is faking
+				// binds or using the db's native binds.
 
 
 		bool	autoCommitOn();

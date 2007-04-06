@@ -13,6 +13,8 @@ SRCS = connection/connectionctor.C \
 	connection/copyreferences.C \
 	connection/ping.C \
 	connection/identify.C \
+	connection/dbversion.C \
+	connection/fakebinds.C \
 	connection/endsession.C \
 	connection/suspendsession.C \
 	connection/resumesession.C \
@@ -65,6 +67,8 @@ LOBJS = connection/connectionctor.lo \
 	connection/copyreferences.lo \
 	connection/ping.lo \
 	connection/identify.lo \
+	connection/dbversion.lo \
+	connection/fakebinds.lo \
 	connection/endsession.lo \
 	connection/suspendsession.lo \
 	connection/resumesession.lo \
