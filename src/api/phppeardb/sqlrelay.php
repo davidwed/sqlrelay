@@ -16,7 +16,7 @@
 // | Author: David Muse <david.muse@firstworks.com>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.23 2007-04-06 04:08:52 mused Exp $
+// $Id: sqlrelay.php,v 1.24 2007-04-07 04:22:40 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -44,6 +44,7 @@ class DB_sqlrelay extends DB_common
 
     var $connection;
     var $identity = "";
+    var $bindformat = "";
     var $phptype, $dbsyntax;
     var $autocommit = false;
     var $fetchmode = DB_FETCHMODE_ORDERED; /* Default fetch mode */
@@ -210,6 +211,10 @@ class DB_sqlrelay extends DB_common
             $this->identity = sqlrcon_identify($this->connection);
         }
 
+        if ($this->bindformat == "") {
+            $this->bindformat = sqlrcon_bindformat($this->connection);
+        }
+
         $cursor = sqlrcur_alloc($this->connection);
 
         if ($this->options['portability'] & DB_PORTABILITY_LOWERCASE) {
@@ -227,10 +232,7 @@ class DB_sqlrelay extends DB_common
         # : or @ delimited variables
         # for db's which already uses ?-delimited variables, we don't need
         # to do this...
-        if ($this->identity == "db2" ||
-                $this->identity == "interbase" ||
-                $this->identity == "firebird" ||
-                $this->identity == "mysql") {
+        if ($this->bindformat == "?") {
             $newquery = $query;
         } else {
             $paramindex = 0;
@@ -247,10 +249,9 @@ class DB_sqlrelay extends DB_common
                     } else {
                         $types[$paramindex] = DB_PARAM_OPAQUE;
                     }
-                    if ($this->identity == "sybase" ||
-                            $this->identity == "freetds") {
+                    if ($this->bindformat == "@*") {
                         $newquery .= "@bind" . $paramindex;
-                    } else ($this->identity == "postgresql") {
+                    } else ($this->bindformat == "$1") {
                         $newquery .= "$" . ($paramindex+1);
                     } else {
                         $newquery .= ":bind" . $paramindex;
@@ -360,11 +361,9 @@ class DB_sqlrelay extends DB_common
                         $values .= ',';
                     }
                     $names .= $value;
-                    # FIXME: handle other db formats too
-                    if ($this->identity == "sybase" ||
-                                $this->identity == "freetds") {
+                    if ($this->bindformat == "@*") {
                         $values .= "@$value";
-                    } else ($this->identity == "postgresql") {
+                    } else ($this->bindformat == "$1") {
                         $values .= "$" . $pgbindindex;
                         $pgbindindex++;
                     } else {
@@ -381,11 +380,10 @@ class DB_sqlrelay extends DB_common
                         $set .= ',';
                     }
                     # FIXME: handle other db formats too
-                    if ($this->identity == "sybase" ||
-                                $this->identity == "freetds") {
+                    if ($this->bindformat == "@*") {
                         $set .= "$value = @$value";
-                    } else ($this->identity == "postgresql") {
-                        $set .= "$value = ?$pgbindindex";
+                    } else ($this->bindformat == "$1") {
+                        $set .= "$value = $" . $pgbindindex;
                         $pgbindindex++;
                     } else {
                         $set .= "$value = :$value";
