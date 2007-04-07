@@ -137,6 +137,8 @@ class firebirdconnection : public sqlrconnection_svr {
 		const char	*database;
 		unsigned short	dialect;
 
+		char		*dbversion;
+
 		ISC_STATUS	error[20];
 };
 

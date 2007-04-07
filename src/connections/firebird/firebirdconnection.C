@@ -23,9 +23,11 @@ static char tpb[] = {
 };
 
 firebirdconnection::firebirdconnection() : sqlrconnection_svr() {
+	dbversion=NULL;
 }
 
 firebirdconnection::~firebirdconnection() {
+	delete dbversion;
 }
 
 uint16_t firebirdconnection::getNumberOfConnectStringVars() {
@@ -151,7 +153,45 @@ const char *firebirdconnection::identify() {
 }
 
 const char *firebirdconnection::dbVersion() {
-	// FIXME: use isc_version, which is complicated, has callbacks
+	ISC_STATUS	status[20];
+	char		dbitems[]={isc_info_version,
+					isc_info_end};
+	char		resbuffer[256];
+	if (!isc_database_info(status,&db,
+				sizeof(dbitems),dbitems,
+				sizeof(resbuffer),resbuffer)) {
+
+		char	*ptr=resbuffer;
+
+		// first byte is isc_info_version
+		char		dbitem=*ptr;
+		ptr++;
+
+		// next 2 bytes are length of the isc_info_version data
+		uint16_t	len=isc_vax_integer(ptr,sizeof(uint16_t));
+		ptr=ptr+sizeof(uint16_t);
+
+		// the next byte is the number of lines of text
+		stringbuffer	dbvers;
+		char	linecount=*ptr;
+		ptr++;
+		for (char lineindex=0; lineindex<linecount; lineindex++) {
+
+			// the first byte of each line is the length of the line
+			char	linelen=*ptr;
+			ptr++;
+
+			// then comes the line of text itself
+			if (lineindex) {
+				dbvers.append('\n');
+			}
+			dbvers.append(ptr,linelen);
+		}
+
+		delete[] dbversion;
+		dbversion=dbvers.detachString();
+		return dbversion;
+	} 
 	return "";
 }
 
