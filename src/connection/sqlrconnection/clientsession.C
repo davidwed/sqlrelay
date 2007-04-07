@@ -53,8 +53,8 @@ void sqlrconnection_svr::clientSession() {
 		} else if (command==DBVERSION) {
 			dbVersionCommand();
 			continue;
-		} else if (command==FAKEBINDS) {
-			fakeBindsCommand();
+		} else if (command==BINDFORMAT) {
+			bindFormatCommand();
 			continue;
 		}
 

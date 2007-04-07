@@ -136,6 +136,28 @@ static PyObject *identify(PyObject *self, PyObject *args) {
   return Py_BuildValue("s", rc);
 }
 
+static PyObject *dbVersion(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  const char *rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrconnection *)sqlrcon)->dbVersion();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("s", rc);
+}
+
+static PyObject *bindFormat(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  const char *rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrconnection *)sqlrcon)->bindFormat();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("s", rc);
+}
+
 static PyObject *autoCommitOn(PyObject *self, PyObject *args) {
   long sqlrcon;
   bool rc;
@@ -1501,6 +1523,8 @@ static PyMethodDef SQLRMethods[] = {
   {"resumeSession", resumeSession, METH_VARARGS},
   {"ping", ping, METH_VARARGS},
   {"identify", identify, METH_VARARGS},
+  {"dbVersion", dbVersion, METH_VARARGS},
+  {"bindFormat", bindFormat, METH_VARARGS},
   {"autoCommitOn", autoCommitOn, METH_VARARGS},
   {"autoCommitOff", autoCommitOff, METH_VARARGS},
   {"commit", commit, METH_VARARGS},

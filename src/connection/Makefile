@@ -56,7 +56,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/bindparameters.C \
 	sqlrconnection/unixsocketseqfile.C \
 	sqlrconnection/updatestats.C \
-	sqlrconnection/fakebinds.C \
+	sqlrconnection/bindformat.C \
 	sqlrconnection/dbversion.C \
 	sqlrcursor/sqlrcursorctor.C \
 	sqlrcursor/sqlrcursordtor.C \
@@ -116,7 +116,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/bindparameters.lo \
 	sqlrconnection/unixsocketseqfile.lo \
 	sqlrconnection/updatestats.lo \
-	sqlrconnection/fakebinds.lo \
+	sqlrconnection/bindformat.lo \
 	sqlrconnection/dbversion.lo \
 	sqlrcursor/sqlrcursorctor.lo \
 	sqlrcursor/sqlrcursordtor.lo \
@@ -176,7 +176,7 @@ DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
 	sqlrconnection/bindparameters.d.lo \
 	sqlrconnection/unixsocketseqfile.d.lo \
 	sqlrconnection/updatestats.d.lo \
-	sqlrconnection/fakebinds.d.lo \
+	sqlrconnection/bindformat.d.lo \
 	sqlrconnection/dbversion.d.lo \
 	sqlrcursor/sqlrcursorctor.d.lo \
 	sqlrcursor/sqlrcursordtor.d.lo \

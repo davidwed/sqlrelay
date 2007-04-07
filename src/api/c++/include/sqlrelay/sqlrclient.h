@@ -67,7 +67,7 @@ class sqlrconnection {
 				// Returns true on success and false on failure.
 
 
-		bool	ping();
+		bool		ping();
 				// Returns true if the database is up and false
 				// if it's down.
 		const char	*identify();
@@ -75,9 +75,9 @@ class sqlrconnection {
 				//   oracle7, oracle8, postgresql, mysql, etc.
 		const char	*dbVersion();
 				// Returns the version of the database
-		bool		fakeBinds();
-				// Returns whether or not SQL Relay is faking
-				// binds or using the db's native binds.
+		const char	*bindFormat();
+				// Returns a string representing the format
+				// of the bind variables used in the db.
 
 
 		bool	autoCommitOn();

@@ -169,12 +169,16 @@ const char *postgresqlconnection::dbVersion() {
 	return dbversion;
 }
 
-bool postgresqlconnection::fakeBinds() {
+const char *postgresqlconnection::bindFormat() {
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARED)
-	return fakebinds;
+	if (fakebinds) {
+		return sqlrconnection_svr::bindFormat();
+	} else {
+		return "$1";
+	}
 #else
-	return false;
+	return sqlrconnection_svr::bindFormat();
 #endif
 }
 

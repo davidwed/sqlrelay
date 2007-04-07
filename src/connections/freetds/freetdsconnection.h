@@ -155,6 +155,7 @@ class freetdsconnection : public sqlrconnection_svr {
 		void	logOut();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*bindFormat();
 		char	bindVariablePrefix();
 		void	dropTempTable(sqlrcursor_svr *cursor,
 					const char *tablename);

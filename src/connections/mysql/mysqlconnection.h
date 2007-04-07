@@ -128,7 +128,7 @@ class mysqlconnection : public sqlrconnection_svr {
 #endif
 		const char	*identify();
 		const char	*dbVersion();
-		bool		fakeBinds();
+		const char	*bindFormat();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		commit();

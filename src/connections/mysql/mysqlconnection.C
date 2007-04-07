@@ -168,11 +168,15 @@ const char *mysqlconnection::dbVersion() {
 	return dbversion;
 }
 
-bool mysqlconnection::fakeBinds() {
+const char *mysqlconnection::bindFormat() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	return fakebinds;
+	if (fakebinds) {
+		return sqlrconnection_svr::bindFormat();
+	} else {
+		return "?";
+	}
 #else
-	return false;
+	return sqlrconnection_svr::bindFormat();
 #endif
 }
 

@@ -123,6 +123,10 @@ const char *db2connection::dbVersion() {
 	return dbversion;
 }
 
+const char *db2connection::bindFormat() {
+	return "?";
+}
+
 db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	errormsg=NULL;

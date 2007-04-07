@@ -26,7 +26,7 @@ if ( test "${prefix}" != "/usr" ); then
 fi
 
 cleanup(){
-    for i in `ls ${tmpdir}/pids/*`
+    for i in `ls ${tmpdir}/pids/* 2>/dev/null`
     do
         if ( test -r "$i" )
         then

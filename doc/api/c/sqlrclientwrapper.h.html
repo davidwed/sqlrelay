@@ -1,7 +1,7 @@
 <html>
 <head>
-<title>~/src/firstworks/sqlrelay-0.37/src/api/c/include/sqlrelay/sqlrclientwrapper.h.html</title>
-<meta name="Generator" content="Vim/6.3">
+<title>~/src/firstworks/sqlrelay-0.39/src/api/c/include/sqlrelay/sqlrclientwrapper.h.html</title>
+<meta name="Generator" content="Vim/7.0">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 </head>
 <body bgcolor="#ffffff" text="#000000">
@@ -72,6 +72,11 @@ sqlrcon sqlrcon_alloc(<font color="#2e8b57"><b>const</b></font> <font color="#2e
 <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcon_identify(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Returns the type of database: </font>
 <font color="#0000ff">                             oracle7, oracle8, postgresql, mysql, etc. </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcon_dbVersion(sqlrcon sqlrconref);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns the version of the database </font><font color="#0000ff">*/</font>
+<font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font>      *sqlrcon_bindFormat(sqlrcon sqlrconref);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns a string representing the format</font>
+<font color="#0000ff">                           of the bind variables used in the db. </font><font color="#0000ff">*/</font>
 
 <font color="#2e8b57"><b>int</b></font>     sqlrcon_autoCommitOn(sqlrcon sqlrconref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Instructs the database to perform a commit</font>

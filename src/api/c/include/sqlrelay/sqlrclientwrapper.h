@@ -64,6 +64,11 @@ int	sqlrcon_ping(sqlrcon sqlrconref);
 const char	*sqlrcon_identify(sqlrcon sqlrconref); 
 			/* Returns the type of database: 
 			     oracle7, oracle8, postgresql, mysql, etc. */
+const char	*sqlrcon_dbVersion(sqlrcon sqlrconref); 
+			/* Returns the version of the database */
+const char	*sqlrcon_bindFormat(sqlrcon sqlrconref); 
+			/* Returns a string representing the format
+			   of the bind variables used in the db. */
 
 int	sqlrcon_autoCommitOn(sqlrcon sqlrconref);
 			/* Instructs the database to perform a commit

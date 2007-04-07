@@ -109,7 +109,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		void		logOut();
 		const char	*identify();
 		const char	*dbVersion();
-		bool		fakeBinds();
+		const char	*bindFormat();
 
 		int	datatypecount;
 		int32_t	*datatypeids;

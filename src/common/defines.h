@@ -26,7 +26,7 @@
 #define AUTHENTICATE 11
 #define AUTOCOMMIT 12
 #define DBVERSION 13
-#define FAKEBINDS 14
+#define BINDFORMAT 14
 
 #define ERROR 0
 #define NO_ERROR 1

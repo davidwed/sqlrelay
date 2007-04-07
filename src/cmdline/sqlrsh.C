@@ -601,6 +601,7 @@ void sqlrsh::identify(sqlrconnection *sqlrcon, environment *env) {
 void sqlrsh::dbversion(sqlrconnection *sqlrcon, environment *env) {
 	red(env);
 	printf("%s\n",sqlrcon->dbVersion());
+	printf("binds: %s\n",sqlrcon->bindFormat());
 	white(env);
 }
 

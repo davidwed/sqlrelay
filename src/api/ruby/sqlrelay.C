@@ -87,6 +87,28 @@ static VALUE sqlrcon_identify(VALUE self) {
 	}
 }
 
+static VALUE sqlrcon_dbVersion(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	const char	*result=sqlrcon->dbVersion();
+	if (result) {
+		return rb_str_new2(result);
+	} else {
+		return Qnil;
+	}
+}
+
+static VALUE sqlrcon_bindFormat(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	const char	*result=sqlrcon->bindFormat();
+	if (result) {
+		return rb_str_new2(result);
+	} else {
+		return Qnil;
+	}
+}
+
 static VALUE sqlrcon_autoCommitOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -153,6 +175,10 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_ping,0);
 	rb_define_method(csqlrconnection,"identify",
 				(CAST)sqlrcon_identify,0);
+	rb_define_method(csqlrconnection,"dbVersion",
+				(CAST)sqlrcon_dbVersion,0);
+	rb_define_method(csqlrconnection,"bindFormat",
+				(CAST)sqlrcon_bindFormat,0);
 	rb_define_method(csqlrconnection,"autoCommitOn",
 				(CAST)sqlrcon_autoCommitOn,0);
 	rb_define_method(csqlrconnection,"autoCommitOff",

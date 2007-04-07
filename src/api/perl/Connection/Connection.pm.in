@@ -95,6 +95,12 @@ __END__
             # Returns the type of database:
             #   oracle7, oracle8, postgresql, mysql, etc.
 
+        dbVersion();
+            # Returns the version of the database
+
+        bindFormat();
+            # Returns a string representing the format
+            # of the bind variables used in the db.
 
         autoCommitOn();
             # Instructs the database to perform a commit

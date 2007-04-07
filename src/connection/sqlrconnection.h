@@ -65,7 +65,7 @@ class sqlrconnection_svr :
 		virtual bool		ping();
 		virtual const char	*identify()=0;
 		virtual	const char	*dbVersion()=0;
-		virtual	bool		fakeBinds();
+		virtual	const char	*bindFormat();
 		virtual sqlrcursor_svr	*initCursor()=0;
 		virtual void	deleteCursor(sqlrcursor_svr *curs)=0;
 		virtual	int16_t	nonNullBindValue();
@@ -216,7 +216,7 @@ class sqlrconnection_svr :
 		void	commitCommand();
 		void	rollbackCommand();
 		void	dbVersionCommand();
-		void	fakeBindsCommand();
+		void	bindFormatCommand();
 		bool	newQueryCommand(sqlrcursor_svr *cursor);
 		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
 		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);

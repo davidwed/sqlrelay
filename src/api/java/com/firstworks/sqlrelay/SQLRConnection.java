@@ -72,6 +72,11 @@ public class SQLRConnection {
 	/** Returns the type of database: 
 	 *    oracle7, oracle8, postgresql, mysql, etc.  */
 	public native String	identify();
+	/** Returns the version of the database */
+	public native String	dbVersion();
+	/** Returns a string representing the format
+	 *  of the bind variables used in the db. */
+	public native String	bindFormat();
 
 
 	/** Instructs the database to perform a commit

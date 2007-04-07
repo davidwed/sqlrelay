@@ -48,6 +48,14 @@ const char *sqlrcon_identify(sqlrcon sqlrconref) {
 	return sqlrconref->identify();
 }
 
+const char *sqlrcon_dbVersion(sqlrcon sqlrconref) {
+	return sqlrconref->dbVersion();
+}
+
+const char *sqlrcon_bindFormat(sqlrcon sqlrconref) {
+	return sqlrconref->bindFormat();
+}
+
 int sqlrcon_autoCommitOn(sqlrcon sqlrconref) {
 	return sqlrconref->autoCommitOn();
 }

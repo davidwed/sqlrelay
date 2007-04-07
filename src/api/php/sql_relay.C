@@ -1884,6 +1884,24 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_identify) {
 	RETURN_FALSE;
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcon_bindformat) {
+	zval **sqlrcon;
+	const char *r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		r=connection->bindFormat();
+		if (r) {
+			RETURN_STRING(const_cast<char *>(r),1);
+		}
+	}
+	RETURN_FALSE;
+}
+
 zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcon_alloc,NULL)
 	ZEND_FE(sqlrcon_free,NULL)
@@ -1980,6 +1998,7 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcon_autocommitoff,NULL)
 	ZEND_FE(sqlrcon_commit,NULL)
 	ZEND_FE(sqlrcon_rollback,NULL)
+	ZEND_FE(sqlrcon_bindformat,NULL)
 	{NULL,NULL,NULL}
 };
 

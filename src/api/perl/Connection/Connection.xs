@@ -66,6 +66,12 @@ sqlrconnection::rollback()
 const char *
 sqlrconnection::identify()
 
+const char *
+sqlrconnection::dbVersion()
+
+const char *
+sqlrconnection::bindFormat()
+
 void
 sqlrconnection::debugOn()
 

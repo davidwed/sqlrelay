@@ -67,6 +67,9 @@
 		// db version
 		char		*dbversion;
 
+		// bind format
+		char		*bindformat;
+
 		// debug
 		bool		debug;
 		int32_t		webdebug;

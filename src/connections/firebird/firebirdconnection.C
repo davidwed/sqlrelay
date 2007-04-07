@@ -155,6 +155,10 @@ const char *firebirdconnection::dbVersion() {
 	return "";
 }
 
+const char *firebirdconnection::bindFormat() {
+	return "?";
+}
+
 firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 						sqlrcursor_svr(conn) {
 	firebirdconn=(firebirdconnection *)conn;

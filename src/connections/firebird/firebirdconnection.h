@@ -127,6 +127,7 @@ class firebirdconnection : public sqlrconnection_svr {
 		bool	ping();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*bindFormat();
 
 		char		dpb[256];
 		short		dpblength;

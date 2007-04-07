@@ -217,6 +217,32 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_identify
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    dbVersion
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbVersion
+  (JNIEnv *env, jobject self) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
+				env->GetFieldID(cls,"connection","J"));
+	return env->NewStringUTF(cur->dbVersion());
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    bindFormat
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_bindFormat
+  (JNIEnv *env, jobject self) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
+				env->GetFieldID(cls,"connection","J"));
+	return env->NewStringUTF(cur->bindFormat());
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    debugOn
  * Signature: ()V
  */

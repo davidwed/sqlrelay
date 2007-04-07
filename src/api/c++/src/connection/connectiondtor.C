@@ -16,6 +16,9 @@ sqlrconnection::~sqlrconnection() {
 	// deallocate dbversion
 	delete[] dbversion;
 
+	// deallocate bindformat
+	delete[] bindformat;
+
 	// deallocate copied references
 	if (copyrefs) {
 		delete[] server;

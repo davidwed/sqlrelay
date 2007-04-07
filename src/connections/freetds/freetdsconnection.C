@@ -285,6 +285,10 @@ const char *freetdsconnection::dbVersion() {
 	return "";
 }
 
+const char *freetdsconnection::bindFormat() {
+	return "@*";
+}
+
 char freetdsconnection::bindVariablePrefix() {
 	return '@';
 }

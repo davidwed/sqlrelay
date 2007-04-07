@@ -254,6 +254,10 @@ const char *sybaseconnection::dbVersion() {
 	return "";
 }
 
+const char *sybaseconnection::bindFormat() {
+	return "@*";
+}
+
 char sybaseconnection::bindVariablePrefix() {
 	return '@';
 }
