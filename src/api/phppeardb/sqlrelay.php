@@ -16,7 +16,7 @@
 // | Author: David Muse <david.muse@firstworks.com>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.24 2007-04-07 04:22:40 mused Exp $
+// $Id: sqlrelay.php,v 1.25 2007-04-08 02:45:25 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -45,12 +45,19 @@ class DB_sqlrelay extends DB_common
     var $connection;
     var $identity = "";
     var $bindformat = "";
-    var $phptype, $dbsyntax;
+    var $phptype = "sqlrelay";
+    var $dbsyntax = "sqlrelay";
     var $autocommit = false;
     var $fetchmode = DB_FETCHMODE_ORDERED; /* Default fetch mode */
     var $affectedrows = 0;
     var $prepare_types = array();
     var $is_select = array();
+    var $this->features = array(
+            'prepare' => true,
+            'pconnect' => true,
+            'transactions' => true,
+            'limit' => 'emulate'
+        );
 
 
     // }}}
@@ -65,14 +72,6 @@ class DB_sqlrelay extends DB_common
     function DB_sqlrelay()
     {
         $this->DB_common();
-        $this->phptype = 'sqlrelay';
-        $this->dbsyntax = 'sqlrelay';
-        $this->features = array(
-            'prepare' => true,
-            'pconnect' => true,
-            'transactions' => true,
-            'limit' => 'emulate'
-        );
     }
 
     // }}}
