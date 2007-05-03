@@ -499,8 +499,13 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 		return true;
 	}
 
-	if (routerconn->anymustbegin && beginquery) {
-		return begin(query,length);
+	if (beginquery) {
+		if (routerconn->anymustbegin) {
+			return begin(query,length);
+		} else {
+			nextrow=0;
+			return true;
+		}
 	}
 
 	if (!cur) {
