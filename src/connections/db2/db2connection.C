@@ -30,6 +30,7 @@ void db2connection::handleConnectString() {
 }
 
 bool db2connection::logIn(bool printerrors) {
+printf("logging in\n");
 
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);
@@ -461,9 +462,16 @@ const char *db2cursor::errorMessage(bool *liveconnection) {
 	// then upon repeated attempts to run a query, it reports:
 	//	[IBM][CLI Driver] CLI0106E  Connection is closed. SQLSTATE=08003
 	//	(in this case nativeerrnum==-99999 and errnum==64)
+	// here's another one
+	//	[IBM][CLI Driver] SQL1224N  The database manager is not able to
+	//	 accept new requests, has terminated all requests in progress,
+	//	or has terminated your particular request due to a problem with
+	//	your request.  SQLSTATE=55032
+
 	// We need to catch both...
 	if ((nativeerrnum==-1224 && errnum==184) ||
-		(nativeerrnum==-99999 && errnum==64)) {
+		(nativeerrnum==-99999 && errnum==64) ||
+		(nativeerrnum==-1224 && errnum==220)) {
 		*liveconnection=false;
 	} else {
 		*liveconnection=true;
