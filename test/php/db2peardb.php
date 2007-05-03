@@ -34,11 +34,11 @@ require_once 'DB.php';
 	$db->query("drop table testtable");
 
 	echo("CREATE TEMPTABLE: \n");
-	checkSuccess($db,$db->query("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long)"),DB_OK);
+	checkSuccess($db,$db->query("create table testtable (testint integer, testchar char(40), testvarchar varchar(40), testdate date)"),DB_OK);
 	echo("\n");
 
 	echo("INSERT: \n");
-	checkSuccess($db,$db->query("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1')"),DB_OK);
+	checkSuccess($db,$db->query("insert into testtable values (1,'testchar1','testvarchar1','01/01/2001')"),DB_OK);
 	echo("\n");
 
 	echo("AFFECTED ROWS: \n");
@@ -50,49 +50,43 @@ require_once 'DB.php';
 	$bindvars=array("1" => 2,
 			"2" => "testchar2",
 			"3" => "testvarchar2",
-			"4" => "01-JAN-2002",
-			"5" => "testlong2");
+			"4" => "2002-01-01");
 	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("var1" => 3,
 			"var2" => "testchar3",
 			"var3" => "testvarchar3",
-			"var4" => "01-JAN-2003",
-			"var5" => "testlong3");
+			"var4" => "2003-01-01");
 	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("1" => 4,
 			"2" => "testchar4",
 			"3" => "testvarchar4",
-			"4" => "01-JAN-2004",
-			"5" => "testlong4");
+			"4" => "2004-01-01");
 	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("var1" => 5,
 			"var2" => "testchar5",
 			"var3" => "testvarchar5",
-			"var4" => "01-JAN-2005",
-			"var5" => "testlong5");
+			"var4" => "2005-01-01");
 	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("1" => 6,
 			"2" => "testchar6",
 			"3" => "testvarchar6",
-			"4" => "01-JAN-2006",
-			"5" => "testlong6");
+			"4" => "2006-01-01");
 	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 
 	$bindvars=array("var1" => 7,
 			"var2" => "testchar7",
 			"var3" => "testvarchar7",
-			"var4" => "01-JAN-2007",
-			"var5" => "testlong7");
+			"var4" => "2007-01-01");
 	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 	echo("\n");
 
 	echo("?-DELIMITED BINDS: \n");
-	$sth=$db->prepare("insert into testtable values (?,?,?,?,?)");
-	$bindvars=array(8,"testchar8","testvarchar8","01-JAN-2008","testlong8");
+	$sth=$db->prepare("insert into testtable values (?,?,?,?)");
+	$bindvars=array(8,"testchar8","testvarchar8","01/01/2008");
 	checkSuccess($db,$db->execute($sth,$bindvars),DB_OK);
 	echo("\n");
 
@@ -101,16 +95,14 @@ require_once 'DB.php';
 	$bindvars=array("testnumber" => 9,
 			"testchar" => "testchar9",
 			"testvarchar" => "testvarchar9",
-			"testdate" => "01-JAN-2009",
-			"testlong" => "testlong9");
+			"testdate" => "01/01/2009");
 	checkSuccess($db,$db->autoExecute("testtable",$bindvars,
 					DB_AUTOQUERY_INSERT),DB_OK);
 
 	$bindvars=array("testnumber" => NULL,
 			"testchar" => NULL,
 			"testvarchar" => NULL,
-			"testdate" => NULL,
-			"testlong" => NULL);
+			"testdate" => NULL);
 	checkSuccess($db,$db->autoExecute("testtable",$bindvars,
 					DB_AUTOQUERY_INSERT),DB_OK);
 	echo("\n");
@@ -189,15 +181,13 @@ require_once 'DB.php';
 	checkSuccess($db,$row[0],"1");
 	checkSuccess($db,$row[1],"testchar1                               ");
 	checkSuccess($db,$row[2],"testvarchar1");
-	checkSuccess($db,$row[3],"01-JAN-01");
-	checkSuccess($db,$row[4],"testlong1");
+	checkSuccess($db,$row[3],"2001-01-01");
 	echo("\n");
 	$row=$res->fetchRow(DB_FETCHMODE_ORDERED,7);
 	checkSuccess($db,$row[0],"8");
 	checkSuccess($db,$row[1],"testchar8                               ");
 	checkSuccess($db,$row[2],"testvarchar8");
-	checkSuccess($db,$row[3],"01-JAN-08");
-	checkSuccess($db,$row[4],"testlong8");
+	checkSuccess($db,$row[3],"2008-01-01");
 	echo("\n");
 	$res->free();
 
@@ -207,15 +197,13 @@ require_once 'DB.php';
 	checkSuccess($db,$row[0],"1");
 	checkSuccess($db,$row[1],"testchar1                               ");
 	checkSuccess($db,$row[2],"testvarchar1");
-	checkSuccess($db,$row[3],"01-JAN-01");
-	checkSuccess($db,$row[4],"testlong1");
+	checkSuccess($db,$row[3],"2001-01-01");
 	echo("\n");
 	$res->fetchInto($row,DB_FETCHMODE_ORDERED,7);
 	checkSuccess($db,$row[0],"8");
 	checkSuccess($db,$row[1],"testchar8                               ");
 	checkSuccess($db,$row[2],"testvarchar8");
-	checkSuccess($db,$row[3],"01-JAN-08");
-	checkSuccess($db,$row[4],"testlong8");
+	checkSuccess($db,$row[3],"2008-01-01");
 	echo("\n");
 	$res->free();
 
@@ -226,15 +214,13 @@ require_once 'DB.php';
 	checkSuccess($db,$row[0],"1");
 	checkSuccess($db,$row[1],"testchar1                               ");
 	checkSuccess($db,$row[2],"testvarchar1");
-	checkSuccess($db,$row[3],"01-JAN-01");
-	checkSuccess($db,$row[4],"testlong1");
+	checkSuccess($db,$row[3],"2001-01-01");
 	echo("\n");
 	$row=$res->fetchRow();
 	checkSuccess($db,$row[0],"2");
 	checkSuccess($db,$row[1],"testchar2                               ");
 	checkSuccess($db,$row[2],"testvarchar2");
-	checkSuccess($db,$row[3],"01-JAN-02");
-	checkSuccess($db,$row[4],"testlong2");
+	checkSuccess($db,$row[3],"2002-01-01");
 	echo("\n");
 	$res->free();
 
@@ -244,15 +230,13 @@ require_once 'DB.php';
 	checkSuccess($db,$row['TESTNUMBER'],"1");
 	checkSuccess($db,$row['TESTCHAR'],"testchar1                               ");
 	checkSuccess($db,$row['TESTVARCHAR'],"testvarchar1");
-	checkSuccess($db,$row['TESTDATE'],"01-JAN-01");
-	checkSuccess($db,$row['TESTLONG'],"testlong1");
+	checkSuccess($db,$row['TESTDATE'],"2001-01-01");
 	echo("\n");
 	$row=$res->fetchRow(DB_FETCHMODE_ASSOC,7);
 	checkSuccess($db,$row['TESTNUMBER'],"8");
 	checkSuccess($db,$row['TESTCHAR'],"testchar8                               ");
 	checkSuccess($db,$row['TESTVARCHAR'],"testvarchar8");
-	checkSuccess($db,$row['TESTDATE'],"01-JAN-08");
-	checkSuccess($db,$row['TESTLONG'],"testlong8");
+	checkSuccess($db,$row['TESTDATE'],"2008-01-01");
 	echo("\n");
 	$res->free();
 
@@ -262,15 +246,13 @@ require_once 'DB.php';
 	checkSuccess($db,$row['TESTNUMBER'],"1");
 	checkSuccess($db,$row['TESTCHAR'],"testchar1                               ");
 	checkSuccess($db,$row['TESTVARCHAR'],"testvarchar1");
-	checkSuccess($db,$row['TESTDATE'],"01-JAN-01");
-	checkSuccess($db,$row['TESTLONG'],"testlong1");
+	checkSuccess($db,$row['TESTDATE'],"2001-01-01");
 	echo("\n");
 	$res->fetchInto($row,DB_FETCHMODE_ASSOC,7);
 	checkSuccess($db,$row['TESTNUMBER'],"8");
 	checkSuccess($db,$row['TESTCHAR'],"testchar8                               ");
 	checkSuccess($db,$row['TESTVARCHAR'],"testvarchar8");
-	checkSuccess($db,$row['TESTDATE'],"01-JAN-08");
-	checkSuccess($db,$row['TESTLONG'],"testlong8");
+	checkSuccess($db,$row['TESTDATE'],"2008-01-01");
 	echo("\n");
 	$res->free();
 
@@ -281,15 +263,13 @@ require_once 'DB.php';
 	checkSuccess($db,$row['TESTNUMBER'],"1");
 	checkSuccess($db,$row['TESTCHAR'],"testchar1                               ");
 	checkSuccess($db,$row['TESTVARCHAR'],"testvarchar1");
-	checkSuccess($db,$row['TESTDATE'],"01-JAN-01");
-	checkSuccess($db,$row['TESTLONG'],"testlong1");
+	checkSuccess($db,$row['TESTDATE'],"2001-01-01");
 	echo("\n");
 	$row=$res->fetchRow();
 	checkSuccess($db,$row['TESTNUMBER'],"2");
 	checkSuccess($db,$row['TESTCHAR'],"testchar2                               ");
 	checkSuccess($db,$row['TESTVARCHAR'],"testvarchar2");
-	checkSuccess($db,$row['TESTDATE'],"01-JAN-02");
-	checkSuccess($db,$row['TESTLONG'],"testlong2");
+	checkSuccess($db,$row['TESTDATE'],"2002-01-01");
 	echo("\n");
 	$res->free();
 
@@ -299,15 +279,13 @@ require_once 'DB.php';
 	checkSuccess($db,$row->TESTNUMBER,"1");
 	checkSuccess($db,$row->TESTCHAR,"testchar1                               ");
 	checkSuccess($db,$row->TESTVARCHAR,"testvarchar1");
-	checkSuccess($db,$row->TESTDATE,"01-JAN-01");
-	checkSuccess($db,$row->TESTLONG,"testlong1");
+	checkSuccess($db,$row->TESTDATE,"2001-01-01");
 	echo("\n");
 	$row=$res->fetchRow(DB_FETCHMODE_OBJECT,7);
 	checkSuccess($db,$row->TESTNUMBER,"8");
 	checkSuccess($db,$row->TESTCHAR,"testchar8                               ");
 	checkSuccess($db,$row->TESTVARCHAR,"testvarchar8");
-	checkSuccess($db,$row->TESTDATE,"01-JAN-08");
-	checkSuccess($db,$row->TESTLONG,"testlong8");
+	checkSuccess($db,$row->TESTDATE,"2008-01-01");
 	echo("\n");
 	$res->free();
 
@@ -317,15 +295,13 @@ require_once 'DB.php';
 	checkSuccess($db,$row->TESTNUMBER,"1");
 	checkSuccess($db,$row->TESTCHAR,"testchar1                               ");
 	checkSuccess($db,$row->TESTVARCHAR,"testvarchar1");
-	checkSuccess($db,$row->TESTDATE,"01-JAN-01");
-	checkSuccess($db,$row->TESTLONG,"testlong1");
+	checkSuccess($db,$row->TESTDATE,"2001-01-01");
 	echo("\n");
 	$res->fetchInto($row,DB_FETCHMODE_OBJECT,7);
 	checkSuccess($db,$row->TESTNUMBER,"8");
 	checkSuccess($db,$row->TESTCHAR,"testchar8                               ");
 	checkSuccess($db,$row->TESTVARCHAR,"testvarchar8");
-	checkSuccess($db,$row->TESTDATE,"01-JAN-08");
-	checkSuccess($db,$row->TESTLONG,"testlong8");
+	checkSuccess($db,$row->TESTDATE,"2008-01-01");
 	echo("\n");
 	$res->free();
 
@@ -336,15 +312,13 @@ require_once 'DB.php';
 	checkSuccess($db,$row->TESTNUMBER,"1");
 	checkSuccess($db,$row->TESTCHAR,"testchar1                               ");
 	checkSuccess($db,$row->TESTVARCHAR,"testvarchar1");
-	checkSuccess($db,$row->TESTDATE,"01-JAN-01");
-	checkSuccess($db,$row->TESTLONG,"testlong1");
+	checkSuccess($db,$row->TESTDATE,"2001-01-01");
 	echo("\n");
 	$row=$res->fetchRow();
 	checkSuccess($db,$row->TESTNUMBER,"2");
 	checkSuccess($db,$row->TESTCHAR,"testchar2                               ");
 	checkSuccess($db,$row->TESTVARCHAR,"testvarchar2");
-	checkSuccess($db,$row->TESTDATE,"01-JAN-02");
-	checkSuccess($db,$row->TESTLONG,"testlong2");
+	checkSuccess($db,$row->TESTDATE,"2002-01-01");
 	echo("\n");
 	$res->free();
 
@@ -354,8 +328,7 @@ require_once 'DB.php';
 	checkSuccess($db,$row[0],"1");
 	checkSuccess($db,$row[1],"testchar1                               ");
 	checkSuccess($db,$row[2],"testvarchar1");
-	checkSuccess($db,$row[3],"01-JAN-01");
-	checkSuccess($db,$row[4],"testlong1");
+	checkSuccess($db,$row[3],"2001-01-01");
 	echo("\n");
 
 	$db->setFetchMode(DB_FETCHMODE_ASSOC);
@@ -363,8 +336,7 @@ require_once 'DB.php';
 	checkSuccess($db,$row['TESTNUMBER'],"1");
 	checkSuccess($db,$row['TESTCHAR'],"testchar1                               ");
 	checkSuccess($db,$row['TESTVARCHAR'],"testvarchar1");
-	checkSuccess($db,$row['TESTDATE'],"01-JAN-01");
-	checkSuccess($db,$row['TESTLONG'],"testlong1");
+	checkSuccess($db,$row['TESTDATE'],"2001-01-01");
 	echo("\n");
 
 	$db->setFetchMode(DB_FETCHMODE_OBJECT);
@@ -372,8 +344,7 @@ require_once 'DB.php';
 	checkSuccess($db,$row->TESTNUMBER,"1");
 	checkSuccess($db,$row->TESTCHAR,"testchar1                               ");
 	checkSuccess($db,$row->TESTVARCHAR,"testvarchar1");
-	checkSuccess($db,$row->TESTDATE,"01-JAN-01");
-	checkSuccess($db,$row->TESTLONG,"testlong1");
+	checkSuccess($db,$row->TESTDATE,"2001-01-01");
 	echo("\n");
 	
 	echo("GET COL: \n");
@@ -394,13 +365,11 @@ require_once 'DB.php';
 	checkSuccess($db,$rows[0][0],"1");
 	checkSuccess($db,$rows[0][1],"testchar1                               ");
 	checkSuccess($db,$rows[0][2],"testvarchar1");
-	checkSuccess($db,$rows[0][3],"01-JAN-01");
-	checkSuccess($db,$rows[0][4],"testlong1");
+	checkSuccess($db,$rows[0][3],"2001-01-01");
 	checkSuccess($db,$rows[7][0],"8");
 	checkSuccess($db,$rows[7][1],"testchar8                               ");
 	checkSuccess($db,$rows[7][2],"testvarchar8");
-	checkSuccess($db,$rows[7][3],"01-JAN-08");
-	checkSuccess($db,$rows[7][4],"testlong8");
+	checkSuccess($db,$rows[7][3],"2008-01-01");
 	echo("\n");
 
 	$db->setFetchMode(DB_FETCHMODE_ASSOC);
@@ -408,13 +377,11 @@ require_once 'DB.php';
 	checkSuccess($db,$rows[0]['TESTNUMBER'],"1");
 	checkSuccess($db,$rows[0]['TESTCHAR'],"testchar1                               ");
 	checkSuccess($db,$rows[0]['TESTVARCHAR'],"testvarchar1");
-	checkSuccess($db,$rows[0]['TESTDATE'],"01-JAN-01");
-	checkSuccess($db,$rows[0]['TESTLONG'],"testlong1");
+	checkSuccess($db,$rows[0]['TESTDATE'],"2001-01-01");
 	checkSuccess($db,$rows[7]['TESTNUMBER'],"8");
 	checkSuccess($db,$rows[7]['TESTCHAR'],"testchar8                               ");
 	checkSuccess($db,$rows[7]['TESTVARCHAR'],"testvarchar8");
-	checkSuccess($db,$rows[7]['TESTDATE'],"01-JAN-08");
-	checkSuccess($db,$rows[7]['TESTLONG'],"testlong8");
+	checkSuccess($db,$rows[7]['TESTDATE'],"2008-01-01");
 	echo("\n");
 
 	$db->setFetchMode(DB_FETCHMODE_OBJECT);
@@ -422,13 +389,11 @@ require_once 'DB.php';
 	checkSuccess($db,$rows[0]->TESTNUMBER,"1");
 	checkSuccess($db,$rows[0]->TESTCHAR,"testchar1                               ");
 	checkSuccess($db,$rows[0]->TESTVARCHAR,"testvarchar1");
-	checkSuccess($db,$rows[0]->TESTDATE,"01-JAN-01");
-	checkSuccess($db,$rows[0]->TESTLONG,"testlong1");
+	checkSuccess($db,$rows[0]->TESTDATE,"2001-01-01");
 	checkSuccess($db,$rows[7]->TESTNUMBER,"8");
 	checkSuccess($db,$rows[7]->TESTCHAR,"testchar8                               ");
 	checkSuccess($db,$rows[7]->TESTVARCHAR,"testvarchar8");
-	checkSuccess($db,$rows[7]->TESTDATE,"01-JAN-08");
-	checkSuccess($db,$rows[7]->TESTLONG,"testlong8");
+	checkSuccess($db,$rows[7]->TESTDATE,"2008-01-01");
 	echo("\n");
 
 	echo("COMMIT AND ROLLBACK: \n");
@@ -441,7 +406,7 @@ require_once 'DB.php';
 	checkSuccess($db,$db->commit(),DB_OK);
 	checkSuccess($db2,$db2->getOne("select count(*) from testtable"),10);
 	checkSuccess($db,$db->autoCommit(true),DB_OK);
-	checkSuccess($db,$db->query("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10')"),DB_OK);
+	checkSuccess($db,$db->query("insert into testtable values (10,'testchar10','testvarchar10','01/01/2010')"),DB_OK);
 	checkSuccess($db2,$db2->getOne("select count(*) from testtable"),11);
 	$db->autoCommit(false);
 

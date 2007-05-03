@@ -16,7 +16,7 @@
 // | Author: David Muse <david.muse@firstworks.com>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.25 2007-04-08 02:45:25 mused Exp $
+// $Id: sqlrelay.php,v 1.26 2007-05-03 02:56:51 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -52,7 +52,7 @@ class DB_sqlrelay extends DB_common
     var $affectedrows = 0;
     var $prepare_types = array();
     var $is_select = array();
-    var $this->features = array(
+    var $features = array(
             'prepare' => true,
             'pconnect' => true,
             'transactions' => true,
@@ -211,7 +211,9 @@ class DB_sqlrelay extends DB_common
         }
 
         if ($this->bindformat == "") {
-            $this->bindformat = sqlrcon_bindformat($this->connection);
+echo("bindformat is ".$this->bindformat."\n");
+            $this->bindformat = sqlrcon_bindFormat($this->connection);
+echo("bindformat is ".$this->bindformat."\n");
         }
 
         $cursor = sqlrcur_alloc($this->connection);
@@ -250,7 +252,7 @@ class DB_sqlrelay extends DB_common
                     }
                     if ($this->bindformat == "@*") {
                         $newquery .= "@bind" . $paramindex;
-                    } else ($this->bindformat == "$1") {
+                    } else if ($this->bindformat == "$1") {
                         $newquery .= "$" . ($paramindex+1);
                     } else {
                         $newquery .= ":bind" . $paramindex;
@@ -362,7 +364,7 @@ class DB_sqlrelay extends DB_common
                     $names .= $value;
                     if ($this->bindformat == "@*") {
                         $values .= "@$value";
-                    } else ($this->bindformat == "$1") {
+                    } else if ($this->bindformat == "$1") {
                         $values .= "$" . $pgbindindex;
                         $pgbindindex++;
                     } else {
@@ -381,7 +383,7 @@ class DB_sqlrelay extends DB_common
                     # FIXME: handle other db formats too
                     if ($this->bindformat == "@*") {
                         $set .= "$value = @$value";
-                    } else ($this->bindformat == "$1") {
+                    } else if ($this->bindformat == "$1") {
                         $set .= "$value = $" . $pgbindindex;
                         $pgbindindex++;
                     } else {

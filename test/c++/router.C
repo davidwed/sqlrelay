@@ -166,7 +166,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY NAME: \n");
-	cur->prepareQuery("insert into testtable1 values ($1,$2,$3,$4,$5,$6,$7,$8)");
+con->debugOn();
+	cur->prepareQuery("insert into testtable1 values (?,?,?,?,?,?,?,?)");
 	checkSuccess(cur->countBindVariables(),8);
 	cur->inputBind("1",5);
 	cur->inputBind("2",5.5,4,2);
@@ -215,7 +216,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY NAME: \n");
-	cur->prepareQuery("insert into testtable2 values ($1,$2,$3,$4,$5,$6,$7,$8)");
+	cur->prepareQuery("insert into testtable2 values (?,?,?,?,?,?,?,?)");
 	checkSuccess(cur->countBindVariables(),8);
 	cur->inputBind("1",5);
 	cur->inputBind("2",5.5,4,2);

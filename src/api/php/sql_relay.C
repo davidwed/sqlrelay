@@ -1895,6 +1895,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_bindformat) {
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
 		r=connection->bindFormat();
+zend_printf("r=%s\n",r);
 		if (r) {
 			RETURN_STRING(const_cast<char *>(r),1);
 		}

@@ -1,3 +1,41 @@
+db2 first query fails and forces relogin unless detached first which causes
+	problems if reloginatstart is not set
+router test fails, bind by name fails, wrong # of columns
+
+write a doc:
+	how to load-balance a mysql/postgresql app using
+	drop-in-replacement lib and query routing
+
+add "quoting method" call to api, call mysql native function,
+	not sure about other db's
+
+add method to explain which bind variables weren't found in the query
+
+
+apply Yeb Havinga's authentication patch
+
+    // authenticate on the approprite tier
+    bool    authondb=(cfgfl->getAuthOnDatabase() &&
+                supportsAuthOnDatabase());
+    bool    authonconnection=(cfgfl->getAuthOnConnection() );
+/** ||
+                    (cfgfl->getAuthOnDatabase() &&
+                        supportsAuthOnDatabase())); **/
+    if (authonconnection) {
+        return connectionBasedAuth(userbuffer,passwordbuffer);
+    } else if (authondb) {
+        return databaseBasedAuth(userbuffer,passwordbuffer);
+    }
+
+    #ifdef SERVER_DEBUG
+    debugPrint("connection",1,"authentication was done on listener");
+    #endif
+    return true;
+
+
+
+
+
 Need to find a way to make connections bleed off.
 	If connections=100 and maxconnections=200 and there are consistently
 		150 clients, then the # of connections needs to bleed back
@@ -8,13 +46,9 @@ Need to find a way to re-distribute connections.
 	If 2 db's go down and 2nd comes back up first, all log into 2nd db and
 	never log out and back into first
 
-figure out dbversion for sybase/freetds/firebird
+figure out dbversion for sybase/freetds
 
-php pear db patch:
-	and bindformat to decide whether to translate ?'s for
-		mysql/postgresql
-
-test old db2 to make sure detach after login works
+test php pear db bind formats
 
 sqlite binds, sqlite utf-8/utf-16 functions
 

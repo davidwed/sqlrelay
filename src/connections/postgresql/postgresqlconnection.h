@@ -22,14 +22,14 @@ class postgresqlcursor : public sqlrcursor_svr {
 				postgresqlcursor(sqlrconnection_svr *conn);
 				~postgresqlcursor();
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARED)
+		defined(HAVE_POSTGRESQL_PQPREPARE)
 		bool		openCursor(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 #endif
 		bool		supportsNativeBinds();
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARED)
+		defined(HAVE_POSTGRESQL_PQPREPARE)
 		bool		inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -82,7 +82,7 @@ class postgresqlcursor : public sqlrcursor_svr {
 		postgresqlconnection	*postgresqlconn;
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARED)
+		defined(HAVE_POSTGRESQL_PQPREPARE)
 		bool		deallocatestatement;
 		int		bindcount;
 		int		bindcounter;
@@ -123,7 +123,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*db;
 		uint16_t	typemangling;
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARED)
+		defined(HAVE_POSTGRESQL_PQPREPARE)
 		bool		fakebinds;
 #endif
 		char		*dbversion;

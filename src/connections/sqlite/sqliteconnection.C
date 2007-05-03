@@ -119,6 +119,10 @@ sqlitecursor::~sqlitecursor() {
 }
 
 bool sqlitecursor::supportsNativeBinds() {
+	return false;
+}
+
+/*bool sqlitecursor::supportsNativeBinds() {
 #ifdef HAVE_SQLITE3_BIND_INT
 	return true;
 #else
@@ -168,7 +172,7 @@ bool sqlitecursor::inputBindClob(const char *variable,
 						int16_t *isnull) {
 	return true;
 }
-#endif
+#endif*/
 
 bool sqlitecursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {

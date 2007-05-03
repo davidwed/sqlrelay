@@ -126,11 +126,12 @@ then
 	ARGS="localhost 9000 \"\" routertest routertest"
 	PHPARGS="localhost 9000 \"\" routertest routertest"
 	PHPARGS="host=localhost&port=9000&socket=&user=routertest&password=routertest"
-	sudo $INITDIR/postgresql start
+	sudo $INITDIR/mysqld start
 	sudo $INITDIR/oracle start
 	sleep 5
-	sudo sqlr-start -id pgsqldb1
-	sudo sqlr-start -id pgsqldb2
+	sudo sqlr-start -id mysqldb1
+	sudo sqlr-start -id mysqldb2
+	sudo sqlr-start -id mysqldb3
 	sudo sqlr-start -id oracle8test
 	sudo sqlr-start -id routertest
 fi
@@ -220,6 +221,24 @@ then
 		chmod 755 $DB.php
 		sudo cp $DB.php $PHPDIR
 		lynx -dump -source "http://localhost/$DB.php?$PHPARGS"
+		sudo $HTTPDINIT stop
+		sudo rm -f /tmp/cachefile* sqlnet.log
+		cd ..
+	fi
+fi
+
+if ( test "$API" = "pear" -o -z "$API" )
+then
+	if ( test "@HAVE_PHP@" = "yes" )
+	then
+		echo
+		echo "PEAR:"
+		cd php
+		sudo $HTTPDINIT start
+		sleep 1
+		chmod 755 ${DB}peardb.php
+		sudo cp ${DB}peardb.php $PHPDIR
+		lynx -dump -source "http://localhost/${DB}peardb.php?$PHPARGS"
 		sudo $HTTPDINIT stop
 		sudo rm -f /tmp/cachefile* sqlnet.log
 		cd ..

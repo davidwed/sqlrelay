@@ -27,13 +27,13 @@ class sqlitecursor : public sqlrcursor_svr {
 	private:
 				sqlitecursor(sqlrconnection_svr *conn);
 				~sqlitecursor();
-#ifdef HAVE_SQLITE3_BIND_INT
+/*#ifdef HAVE_SQLITE3_BIND_INT
 		bool		prepareQuery(const char *query,
 						uint32_t length);
-#endif
+#endif*/
 		bool		supportsNativeBinds();
 
-#ifdef HAVE_SQLITE3_BIND_INT
+/*#ifdef HAVE_SQLITE3_BIND_INT
 		bool		inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -57,7 +57,7 @@ class sqlitecursor : public sqlrcursor_svr {
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
-#endif
+#endif*/
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
