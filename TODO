@@ -1,3 +1,5 @@
+sybase can't create cursors
+
 db2 first query fails and forces relogin unless detached first which causes
 	problems if reloginatstart is not set
 router test fails, bind by name fails, wrong # of columns
@@ -45,9 +47,6 @@ Need to find a way to make connections bleed off.
 Need to find a way to re-distribute connections.
 	If 2 db's go down and 2nd comes back up first, all log into 2nd db and
 	never log out and back into first
-
-figure out dbversion for sybase/freetds
-	"sp_version installmaster" stored procedure returns version info
 
 test php pear db bind formats
 
