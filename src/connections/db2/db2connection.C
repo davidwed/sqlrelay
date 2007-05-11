@@ -472,6 +472,7 @@ const char *db2cursor::errorMessage(bool *liveconnection) {
 	if ((nativeerrnum==-1224 && errnum==184) ||
 		(nativeerrnum==-99999 && errnum==64) ||
 		(nativeerrnum==-1224 && errnum==220)) {
+printf("dead connection\n");
 		*liveconnection=false;
 	} else {
 		*liveconnection=true;

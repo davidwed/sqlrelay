@@ -20,10 +20,12 @@ bool		sybaseconnection::deadconnection;
 sybaseconnection::sybaseconnection() : sqlrconnection_svr() {
 	errorstring=NULL;
 	dbused=false;
+	dbversion=NULL;
 }
 
 sybaseconnection::~sybaseconnection() {
 	delete errorstring;
+	delete[] dbversion;
 }
 
 uint16_t sybaseconnection::getNumberOfConnectStringVars() {
@@ -48,161 +50,6 @@ bool sybaseconnection::logIn(bool printerrors) {
 	// set sybase
 	if (sybase && sybase[0] && !environment::setValue("SYBASE",sybase)) {
 		logInError("Failed to set SYBASE environment variable.",1);
-		return false;
-	}
-
-	// set lang
-	if (lang && lang[0] && !environment::setValue("LANG",lang)) {
-		logInError("Failed to set LANG environment variable.",1);
-		return false;
-	}
-
-	// set server
-	if (server && server[0] && !environment::setValue("DSQUERY",server)) {
-		logInError("Failed to set DSQUERY environment variable.",2);
-		return false;
-	}
-
-	// allocate a context
-	context=(CS_CONTEXT *)NULL;
-	if (cs_ctx_alloc(CS_VERSION_100,&context)!=CS_SUCCEED) {
-		logInError("failed to allocate a context structure",2);
-		return false;
-	}
-	// init the context
-	if (ct_init(context,CS_VERSION_100)!=CS_SUCCEED) {
-		logInError("failed to initialize a context structure",3);
-		return false;
-	}
-
-
-	// configure the error handling callbacks
-	if (cs_config(context,CS_SET,CS_MESSAGE_CB,
-		(CS_VOID *)sybaseconnection::csMessageCallback,CS_UNUSED,
-			(CS_INT *)NULL)
-			!=CS_SUCCEED) {
-		logInError("failed to set a cslib error message callback",4);
-		return false;
-	}
-	if (ct_callback(context,NULL,CS_SET,CS_CLIENTMSG_CB,
-		(CS_VOID *)sybaseconnection::clientMessageCallback)
-			!=CS_SUCCEED) {
-		logInError("failed to set a client error message callback",4);
-		return false;
-	}
-	if (ct_callback(context,NULL,CS_SET,CS_SERVERMSG_CB,
-		(CS_VOID *)sybaseconnection::serverMessageCallback)
-			!=CS_SUCCEED) {
-		logInError("failed to set a server error message callback",4);
-		return false;
-	}
-
-
-	// allocate a connection
-	if (ct_con_alloc(context,&dbconn)!=CS_SUCCEED) {
-		logInError("failed to allocate a connection structure",4);
-		return false;
-	}
-
-
-	// set the user to use
-	const char	*user=getUser();
-	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
-			(CS_VOID *)((user && user[0])?user:""),
-			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the user",5);
-		return false;
-	}
-
-
-	// set the password to use
-	const char	*password=getPassword();
-	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
-			(CS_VOID *)((password && password[0])?password:""),
-			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the password",5);
-		return false;
-	}
-
-	// set application name
-	if (ct_con_props(dbconn,CS_SET,CS_APPNAME,(CS_VOID *)"sqlrelay",
-			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the application name",5);
-		return false;
-	}
-
-	// set hostname
-	if (hostname && hostname[0] &&
-		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the hostname",5);
-		return false;
-	}
-
-	// set packetsize
-	uint16_t	ps=charstring::toInteger(packetsize);
-	if (packetsize && packetsize[0] &&
-		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
-				(CS_VOID *)&ps,sizeof(ps),
-				(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the packetsize",5);
-		return false;
-	}
-
-	// FIXME: support this
-	// set encryption
-	/*if (encryption && charstring::toInteger(encryption)==1) {
-		// FIXME: need to set CS_SEC_CHALLENGE/CS_SEC_NEGOTIATE
-		// parameters too
-		CS_INT	enc=CS_TRUE;
-		if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
-			(CS_VOID *)&enc,
-			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the encryption",5);
-			return false;
-		}
-	}*/
-
-	// init locale
-	locale=NULL;
-	if (cs_loc_alloc(context,&locale)!=CS_SUCCEED) {
-		logInError("failed to allocate a locale structure",5);
-		return false;
-	}
-	if (cs_locale(context,CS_SET,locale,CS_LC_ALL,(CS_CHAR *)NULL,
-			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to initialize a locale structure",6);
-		return false;
-	}
-
-	// set language
-	if (language && language[0] &&
-		cs_locale(context,CS_SET,locale,CS_SYB_LANG,
-			(CS_CHAR *)language,CS_NULLTERM,(CS_INT *)NULL)!=
-				CS_SUCCEED) {
-		logInError("failed to set the language",6);
-		return false;
-	}
-
-	// set charset
-	if (charset && charset[0] &&
-		cs_locale(context,CS_SET,locale,CS_SYB_CHARSET,
-			(CS_CHAR *)charset,CS_NULLTERM,(CS_INT *)NULL)!=
-				CS_SUCCEED) {
-		logInError("failed to set the charset",6);
-		return false;
-	}
-
-	// set locale
-	if (ct_con_props(dbconn,CS_SET,CS_LOC_PROP,(CS_VOID *)locale,
-				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the locale",6);
-		return false;
-	}
-
-	// connect to the database
-	if (ct_connect(dbconn,(CS_CHAR *)NULL,(CS_INT)0)!=CS_SUCCEED) {
-		logInError("failed to connect to the database",6);
 		return false;
 	}
 	return true;
@@ -251,7 +98,7 @@ const char *sybaseconnection::identify() {
 }
 
 const char *sybaseconnection::dbVersion() {
-	return "";
+	return dbversion;
 }
 
 const char *sybaseconnection::bindFormat() {
@@ -301,7 +148,7 @@ bool sybasecursor::openCursor(uint16_t id) {
 	}
 	cmd=NULL;
 
-	// switch to the correct database
+	// switch to the correct database, get dbversion
 	// (only do this once per connection)
 	bool	retval=true;
 	if (sybaseconn->db && sybaseconn->db[0] && !sybaseconn->dbused) {
@@ -315,6 +162,25 @@ bool sybasecursor::openCursor(uint16_t id) {
 			retval=false;
 		} else {
 			sybaseconn->dbused=true;
+		}
+		cleanUpData(true,true);
+	}
+
+	if (!sybaseconn->dbversion) {
+		char	*query="sp_version installmaster";
+		int32_t	len=charstring::length(query);
+		if (!(prepareQuery(query,len) &&
+				executeQuery(query,len,true) &&
+				fetchRow())) {
+			bool	live;
+			fprintf(stderr,"%s\n",errorMessage(&live));
+			retval=false;
+		} else {
+			const char	*space=
+				charstring::findFirst(data[1][0],' ');
+			sybaseconn->dbversion=
+				charstring::duplicate(data[1][0],
+							space-data[1][0]);
 		}
 		cleanUpData(true,true);
 	}

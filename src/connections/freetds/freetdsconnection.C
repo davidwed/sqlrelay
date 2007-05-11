@@ -31,10 +31,13 @@ freetdsconnection::freetdsconnection() : sqlrconnection_svr() {
 	// won't work but there'll be no hard errors
 	singlecursor=NULL;
 	singlecursorrefcount=0;
+
+	dbversion=NULL;
 }
 
 freetdsconnection::~freetdsconnection() {
 	delete errorstring;
+	delete[] dbversion;
 }
 
 uint16_t freetdsconnection::getNumberOfConnectStringVars() {
@@ -282,7 +285,7 @@ const char *freetdsconnection::identify() {
 }
 
 const char *freetdsconnection::dbVersion() {
-	return "";
+	return dbversion;
 }
 
 const char *freetdsconnection::bindFormat() {
@@ -398,6 +401,25 @@ bool freetdscursor::openCursor(uint16_t id) {
 			retval=false;
 		} else {
 			freetdsconn->dbused=true;
+		}
+		cleanUpData(true,true);
+	}
+
+	if (!freetdsconn->dbversion) {
+		char	*query="sp_version installmaster";
+		int32_t	len=charstring::length(query);
+		if (!(prepareQuery(query,len) &&
+				executeQuery(query,len,true) &&
+				fetchRow())) {
+			bool	live;
+			fprintf(stderr,"%s\n",errorMessage(&live));
+			retval=false;
+		} else {
+			const char	*space=
+				charstring::findFirst(data[1][0],' ');
+			freetdsconn->dbversion=
+				charstring::duplicate(data[1][0],
+							space-data[1][0]);
 		}
 		cleanUpData(true,true);
 	}

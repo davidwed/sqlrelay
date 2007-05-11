@@ -105,7 +105,7 @@ by hand.</p>
         <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance idleclienttimeout <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;-1&quot;</font><font color="#008b8b">&gt;</font>
         <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance maxlisteners <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;-1&quot;</font><font color="#008b8b">&gt;</font>
         <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance listenertimeout <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;0&quot;</font><font color="#008b8b">&gt;</font>
-        <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance reloginatstart <font color="#2e8b57"><b>CDATA</b></font> <font color="#ff00ff">&quot;0&quot;</font><font color="#008b8b">&gt;</font>
+        <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ATTLIST</b></font> instance reloginatstart <font color="#2e8b57"><b>(</b></font><font color="#ff00ff">yes</font><font color="#008b8b">|</font><font color="#ff00ff">no</font><font color="#2e8b57"><b>)</b></font> <font color="#ff00ff">&quot;no&quot;</font><font color="#008b8b">&gt;</font>
 
 <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ELEMENT</b></font> users <font color="#2e8b57"><b>(</b></font><font color="#ff00ff">user</font><font color="#008b8b">*</font><font color="#2e8b57"><b>)</b></font><font color="#008b8b">&gt;</font>
 <font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>ELEMENT</b></font> user <font color="#008b8b">EMPTY</font><font color="#008b8b">&gt;</font>
@@ -226,9 +226,9 @@ running simultaneously before an error will be returned to the client.  Set to
 wait for an avaialable connection before giving up, 0 (the default) means wait
 forever</li>
 <li><b>reloginatstart</b> - When SQL Relay starts up, it attempts to log into
-the database.  If this parameter is set to true, then if the login fails,
+the database.  If this parameter is set to yes, then if the login fails,
 SQL Relay will fork off into the background and attempt to log in over and until
-it succeeds or until it is shut down.  If this parameter is set to false, then
+it succeeds or until it is shut down.  If this parameter is set to no, then
 if the login fails, SQL Relay will print out an error and exit.</li>
 </ul>
 <li><b>user</b>

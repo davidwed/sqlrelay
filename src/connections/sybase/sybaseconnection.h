@@ -164,6 +164,8 @@ class sybaseconnection : public sqlrconnection_svr {
 
 		bool		dbused;
 
+		char		*dbversion;
+
 		static	stringbuffer	*errorstring;
 		static	bool		deadconnection;
 

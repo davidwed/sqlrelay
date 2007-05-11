@@ -47,6 +47,7 @@ Need to find a way to re-distribute connections.
 	never log out and back into first
 
 figure out dbversion for sybase/freetds
+	"sp_version installmaster" stored procedure returns version info
 
 test php pear db bind formats
 
@@ -132,8 +133,6 @@ cygwin
 	handoff="pass" doesn't work
 
 php debug doesn't print out numbers because zend_printf doesn't support %ld's
-
-interbase fails float output bind test, prec/scale issue?
 
 Tru64 -
 	unix sockets don't work, looks like a byte-order translation issue
