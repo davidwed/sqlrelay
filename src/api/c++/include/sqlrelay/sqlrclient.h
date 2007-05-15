@@ -275,6 +275,16 @@ class sqlrcursor {
 				// query.  There is a performance penalty for
 				// calling this method.
 
+		bool	validInputBind(const char *variable);
+				// Returns true if "variable" was a valid
+				// input bind variable of the query.
+				// Must be called after calling executeQuery()
+			
+		bool	validOutputBind(const char *variable);
+				// Returns true if "variable" was a valid
+				// output bind variable of the query.
+				// Must be called after calling executeQuery()
+
 		bool	executeQuery();
 				// Execute the query that was previously 
 				// prepared and bound.

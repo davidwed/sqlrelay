@@ -85,6 +85,8 @@ void sqlrcursor::initVariables() {
 		subvars[i].variable=NULL;
 		subvars[i].value.stringval=NULL;
 		subvars[i].type=STRING_BIND;
+		subvars[i].substituted=false;
+		subvars[i].donesubstituting=false;
 		inbindvars[i].variable=NULL;
 		inbindvars[i].value.stringval=NULL;
 		inbindvars[i].type=STRING_BIND;
@@ -359,6 +361,9 @@ void sqlrcursor::initVar(bindvar *var, const char *variable) {
 	} else {
 		var->variable=(char *)variable;
 	}
+
+	var->substituted=false;
+	var->donesubstituting=false;
 }
 
 void sqlrcursor::defineOutputBindString(const char *variable,
@@ -536,4 +541,22 @@ uint16_t sqlrcursor::getOutputBindCursorId(const char *variable) {
 
 void sqlrcursor::validateBinds() {
 	validatebinds=true;
+}
+
+bool sqlrcursor::validInputBind(const char *variable) {
+	for (uint16_t i=0; i<inbindcount; i++) {
+		if (!charstring::compare(inbindvars[i].variable,variable)) {
+			return inbindvars[i].send;
+		}
+	}
+	return false;
+}
+
+bool sqlrcursor::validOutputBind(const char *variable) {
+	for (uint16_t i=0; i<outbindcount; i++) {
+		if (!charstring::compare(outbindvars[i].variable,variable)) {
+			return outbindvars[i].send;
+		}
+	}
+	return false;
 }

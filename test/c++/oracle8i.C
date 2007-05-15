@@ -226,6 +226,14 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var9","junkvalue");
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->validInputBind("var1"),1);
+	checkSuccess(cur->validInputBind("var2"),1);
+	checkSuccess(cur->validInputBind("var3"),1);
+	checkSuccess(cur->validInputBind("var4"),1);
+	checkSuccess(cur->validInputBind("var5"),1);
+	checkSuccess(cur->validInputBind("var6"),1);
+	checkSuccess(cur->validInputBind("var7"),1);
+	checkSuccess(cur->validInputBind("var9"),0);
 	printf("\n");
 
 	printf("OUTPUT BIND BY NAME: \n");

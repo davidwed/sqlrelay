@@ -32,6 +32,9 @@ class bindvar {
 		uint32_t	valuesize;
 		bindtype	type;
 		bool		send;
+
+		bool		substituted;
+		bool		donesubstituting;
 };
 
 #endif

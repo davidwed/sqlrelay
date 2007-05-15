@@ -15,6 +15,7 @@
 
 		void	initQueryBuffer(uint32_t querylength);
 		bool	sendQueryInternal(const char *query);
+		void	performSubstitutions();
 		void	validateBindsInternal(const char *query);
 		void	sendInputBinds();
 		void	sendOutputBinds();
