@@ -75,6 +75,8 @@ void sqlrcursor::clearVariables() {
 	// setting the bind/substitution variable 
 	// counts to 0 effectively clears them
 	subcount=0;
+	dirtysubs=false;
+	dirtybinds=false;
 	clearBinds();
 }
 
@@ -132,6 +134,7 @@ void sqlrcursor::deleteVariables() {
 void sqlrcursor::substitution(const char *variable, const char *value) {
 	if (subcount<MAXVAR && variable && variable[0]) {
 		stringVar(&subvars[subcount],variable,value);
+		dirtysubs=true;
 		subcount++;
 	}
 }
@@ -139,6 +142,7 @@ void sqlrcursor::substitution(const char *variable, const char *value) {
 void sqlrcursor::substitution(const char *variable, int64_t value) {
 	if (subcount<MAXVAR && variable && variable[0]) {
 		integerVar(&subvars[subcount],variable,value);
+		dirtysubs=true;
 		subcount++;
 	}
 }
@@ -147,6 +151,7 @@ void sqlrcursor::substitution(const char *variable, double value,
 				uint32_t precision, uint32_t scale) {
 	if (subcount<MAXVAR && variable && variable[0]) {
 		doubleVar(&subvars[subcount],variable,value,precision,scale);
+		dirtysubs=true;
 		subcount++;
 	}
 }
@@ -161,6 +166,7 @@ void sqlrcursor::inputBindBlob(const char *variable, const char *value,
 	if (inbindcount<MAXVAR && variable && variable[0]) {
 		lobVar(&inbindvars[inbindcount],variable,value,size,BLOB_BIND);
 		inbindvars[inbindcount].send=true;
+		dirtybinds=true;
 		inbindcount++;
 	}
 }
@@ -170,6 +176,7 @@ void sqlrcursor::inputBindClob(const char *variable, const char *value,
 	if (inbindcount<MAXVAR && variable && variable[0]) {
 		lobVar(&inbindvars[inbindcount],variable,value,size,CLOB_BIND);
 		inbindvars[inbindcount].send=true;
+		dirtybinds=true;
 		inbindcount++;
 	}
 }
@@ -178,6 +185,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value) {
 	if (inbindcount<MAXVAR && variable && variable[0]) {
 		stringVar(&inbindvars[inbindcount],variable,value);
 		inbindvars[inbindcount].send=true;
+		dirtybinds=true;
 		inbindcount++;
 	}
 }
@@ -186,6 +194,7 @@ void sqlrcursor::inputBind(const char *variable, int64_t value) {
 	if (inbindcount<MAXVAR && variable && variable[0]) {
 		integerVar(&inbindvars[inbindcount],variable,value);
 		inbindvars[inbindcount].send=true;
+		dirtybinds=true;
 		inbindcount++;
 	}
 }
@@ -196,6 +205,7 @@ void sqlrcursor::inputBind(const char *variable, double value,
 		doubleVar(&inbindvars[inbindcount],variable,value,
 						precision, scale);
 		inbindvars[inbindcount].send=true;
+		dirtybinds=true;
 		inbindcount++;
 	}
 }
@@ -206,6 +216,7 @@ void sqlrcursor::substitutions(const char **variables, const char **values) {
 		if (variables[index] && variables[index][0]) {
 			stringVar(&subvars[subcount],
 					variables[index],values[index]);
+			dirtysubs=true;
 			subcount++;
 		}
 		index++;
@@ -218,6 +229,7 @@ void sqlrcursor::substitutions(const char **variables, const int64_t *values) {
 		if (variables[index] && variables[index][0]) {
 			integerVar(&subvars[subcount],
 					variables[index],values[index]);
+			dirtysubs=true;
 			subcount++;
 		}
 		index++;
@@ -235,6 +247,7 @@ void sqlrcursor::substitutions(const char **variables, const double *values,
 					values[index],
 					precisions[index],
 					scales[index]);
+			dirtysubs=true;
 			subcount++;
 		}
 		index++;
@@ -248,6 +261,7 @@ void sqlrcursor::inputBinds(const char **variables, const char **values) {
 			stringVar(&inbindvars[inbindcount],
 					variables[index],values[index]);
 			inbindvars[inbindcount].send=true;
+			dirtybinds=true;
 			inbindcount++;
 		}
 		index++;
@@ -261,6 +275,7 @@ void sqlrcursor::inputBinds(const char **variables, const int64_t *values) {
 			integerVar(&inbindvars[inbindcount],
 					variables[index],values[index]);
 			inbindvars[inbindcount].send=true;
+			dirtybinds=true;
 			inbindcount++;
 		}
 		index++;
@@ -279,6 +294,7 @@ void sqlrcursor::inputBinds(const char **variables, const double *values,
 					precisions[index],
 					scales[index]);
 			inbindvars[inbindcount].send=true;
+			dirtybinds=true;
 			inbindcount++;
 		}
 		index++;
@@ -416,6 +432,7 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 		outbindvars[outbindcount].value.lobval=NULL;
 		outbindvars[outbindcount].valuesize=valuesize;
 		outbindvars[outbindcount].send=true;
+		dirtybinds=true;
 		outbindcount++;
 	}
 }
@@ -544,6 +561,8 @@ void sqlrcursor::validateBinds() {
 }
 
 bool sqlrcursor::validInputBind(const char *variable) {
+	performSubstitutions();
+	validateBindsInternal();
 	for (uint16_t i=0; i<inbindcount; i++) {
 		if (!charstring::compare(inbindvars[i].variable,variable)) {
 			return inbindvars[i].send;
@@ -553,6 +572,8 @@ bool sqlrcursor::validInputBind(const char *variable) {
 }
 
 bool sqlrcursor::validOutputBind(const char *variable) {
+	performSubstitutions();
+	validateBindsInternal();
 	for (uint16_t i=0; i<outbindcount; i++) {
 		if (!charstring::compare(outbindvars[i].variable,variable)) {
 			return outbindvars[i].send;

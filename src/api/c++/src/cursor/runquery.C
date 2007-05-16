@@ -124,6 +124,14 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 
 void sqlrcursor::sendInputBinds() {
 
+	// adjust inbindcount
+	uint16_t	count=inbindcount;
+	for (uint16_t i=0; i<count; i++) {
+		if (!inbindvars[i].send) {
+			inbindcount--;
+		}
+	}
+
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Sending ");
@@ -134,8 +142,8 @@ void sqlrcursor::sendInputBinds() {
 
 	// write the input bind variables/values to the server.
 	sqlrc->cs->write(inbindcount);
+	count=inbindcount;
 	uint16_t	size;
-	uint16_t	count=inbindcount;
 	for (uint16_t i=0; i<count; i++) {
 
 		// don't send anything if the send flag is turned off
@@ -257,6 +265,14 @@ void sqlrcursor::sendInputBinds() {
 
 void sqlrcursor::sendOutputBinds() {
 
+	// adjust outbindcount
+	uint16_t	count=outbindcount;
+	for (uint16_t i=0; i<count; i++) {
+		if (!outbindvars[i].send) {
+			outbindcount--;
+		}
+	}
+
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Sending Output Bind Variables:\n");
@@ -266,7 +282,7 @@ void sqlrcursor::sendOutputBinds() {
 	// write the output bind variables to the server.
 	sqlrc->cs->write(outbindcount);
 	uint16_t	size;
-	uint16_t	count=outbindcount;
+	count=outbindcount;
 	for (uint16_t i=0; i<count; i++) {
 
 		// don't send anything if the send flag is turned off

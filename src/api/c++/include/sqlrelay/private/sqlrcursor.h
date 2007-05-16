@@ -16,7 +16,7 @@
 		void	initQueryBuffer(uint32_t querylength);
 		bool	sendQueryInternal(const char *query);
 		void	performSubstitutions();
-		void	validateBindsInternal(const char *query);
+		void	validateBindsInternal();
 		void	sendInputBinds();
 		void	sendOutputBinds();
 		void	sendGetColumnInfo();
@@ -106,6 +106,7 @@
 		// substitution variables
 		bindvar		subvars[MAXVAR];
 		int16_t		subcount;
+		bool		dirtysubs;
 
 		// bind variables
 		bindvar		inbindvars[MAXVAR];
@@ -113,6 +114,7 @@
 		bindvar		outbindvars[MAXVAR];
 		uint16_t	outbindcount;
 		bool		validatebinds;
+		bool		dirtybinds;
 
 		// result set
 		uint64_t	rsbuffersize;

@@ -226,14 +226,6 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var9","junkvalue");
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->validInputBind("var1"),1);
-	checkSuccess(cur->validInputBind("var2"),1);
-	checkSuccess(cur->validInputBind("var3"),1);
-	checkSuccess(cur->validInputBind("var4"),1);
-	checkSuccess(cur->validInputBind("var5"),1);
-	checkSuccess(cur->validInputBind("var6"),1);
-	checkSuccess(cur->validInputBind("var7"),1);
-	checkSuccess(cur->validInputBind("var9"),0);
 	printf("\n");
 
 	printf("OUTPUT BIND BY NAME: \n");
@@ -918,6 +910,35 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable2");
 	printf("\n");
 
+
+
+	printf("BIND VALIDATION: \n");
+	cur->sendQuery("drop table testtable1");
+	cur->sendQuery("create table testtable1 (col1 varchar2(20), col2 varchar2(20), col3 varchar2(20))");
+	cur->prepareQuery("insert into testtable1 values ($(var1),$(var2),$(var3))");
+	cur->inputBind("var1",1);
+	cur->inputBind("var2",2);
+	cur->inputBind("var3",3);
+	cur->substitution("var1",":var1");
+	checkSuccess(cur->validInputBind("var1"),1);
+	checkSuccess(cur->validInputBind("var2"),0);
+	checkSuccess(cur->validInputBind("var3"),0);
+	checkSuccess(cur->validInputBind("var4"),0);
+	printf("\n");
+	cur->substitution("var2",":var2");
+	checkSuccess(cur->validInputBind("var1"),1);
+	checkSuccess(cur->validInputBind("var2"),1);
+	checkSuccess(cur->validInputBind("var3"),0);
+	checkSuccess(cur->validInputBind("var4"),0);
+	printf("\n");
+	cur->substitution("var3",":var3");
+	checkSuccess(cur->validInputBind("var1"),1);
+	checkSuccess(cur->validInputBind("var2"),1);
+	checkSuccess(cur->validInputBind("var3"),1);
+	checkSuccess(cur->validInputBind("var4"),0);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("drop table testtable1");
+	printf("\n");
 
 	// drop existing table
 	cur->sendQuery("drop table testtable");

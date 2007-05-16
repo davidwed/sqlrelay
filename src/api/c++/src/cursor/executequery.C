@@ -16,7 +16,7 @@ bool sqlrcursor::executeQuery() {
 
 	// validate the bind variables
 	if (validatebinds) {
-		validateBindsInternal(queryptr);
+		validateBindsInternal();
 	}
 		
 	// run the query
@@ -31,7 +31,7 @@ bool sqlrcursor::executeQuery() {
 
 void sqlrcursor::performSubstitutions() {
 
-	if (!subcount) {
+	if (!subcount || !dirtysubs) {
 		return;
 	}
 
@@ -174,11 +174,18 @@ void sqlrcursor::performSubstitutions() {
 	}
 
 	delete[] querybuffer;
+	querylen=container.getStringLength();
 	querybuffer=container.detachString();
 	queryptr=querybuffer;
+
+	dirtysubs=false;
 }
 
-void sqlrcursor::validateBindsInternal(const char *query) {
+void sqlrcursor::validateBindsInternal() {
+
+	if (!dirtybinds) {
+		return;
+	}
 
 	// some useful variables
 	const char	*ptr;
@@ -199,7 +206,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 		}
 
 		found=false;
-		start=query+1;
+		start=queryptr+1;
 
 		// there may be more than 1 match for the variable name as in
 		// "select * from table where table_name=:table_name", both
@@ -225,10 +232,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 			}
 		}
 
-		if (!found) {
-			inbindvars[i].send=false;
-			inbindcount--;
-		}
+		inbindvars[i].send=found;
 	}
 
 	// check each output bind
@@ -242,7 +246,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 		}
 
 		found=false;
-		start=query+1;
+		start=queryptr+1;
 
 		// there may be more than 1 match for the variable name as in
 		// "select * from table where table_name=:table_name", both
@@ -267,10 +271,7 @@ void sqlrcursor::validateBindsInternal(const char *query) {
 			}
 		}
 
-		if (!found) {
-			outbindvars[i].send=false;
-			outbindcount--;
-		}
+		outbindvars[i].send=found;
 	}
 }
 
