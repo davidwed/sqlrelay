@@ -185,6 +185,14 @@ void
 sqlrcursor::validateBinds()
 
 bool
+sqlrcursor::validInputBind(variable)
+	const char	*variable
+
+bool
+sqlrcursor::validOutputBind(variable)
+	const char	*variable
+
+bool
 sqlrcursor::executeQuery()
 
 bool

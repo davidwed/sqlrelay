@@ -260,6 +260,14 @@ void sqlrcur_validateBinds(sqlrcur sqlrcurref) {
 	sqlrcurref->validateBinds();
 }
 
+bool sqlrcur_validInputBind(sqlrcur sqlrcurref, const char *variable) {
+	return sqlrcurref->validInputBind(variable);
+}
+
+bool sqlrcur_validOutputBind(sqlrcur sqlrcurref, const char *variable) {
+	return sqlrcurref->validOutputBind(variable);
+}
+
 int sqlrcur_executeQuery(sqlrcur sqlrcurref) {
 	return sqlrcurref->executeQuery();
 }

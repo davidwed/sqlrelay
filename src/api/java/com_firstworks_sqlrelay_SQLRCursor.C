@@ -724,6 +724,40 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_validateBinds
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    validInputBind
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_validInputBind
+  (JNIEnv *env, jobject self, jstring variable) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","J"));
+	char	*variablestring=curGetStringUTFChars(env,variable,0);
+	jboolean	retval=
+		(cur->validInputBind(variablestring))?JNI_TRUE:JNI_FALSE;
+	curReleaseStringUTFChars(env,variable,variablestring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    validOutputBind
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_validOutputBind
+  (JNIEnv *env, jobject self, jstring variable) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrcursor	*cur=(sqlrcursor *)env->GetIntField(self,
+				env->GetFieldID(cls,"cursor","J"));
+	char	*variablestring=curGetStringUTFChars(env,variable,0);
+	jboolean	retval=
+		(cur->validOutputBind(variablestring))?JNI_TRUE:JNI_FALSE;
+	curReleaseStringUTFChars(env,variable,variablestring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    executeQuery
  * Signature: ()Z
  */

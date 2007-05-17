@@ -1,3 +1,5 @@
+document validXXXBind()
+
 db2 first query fails and forces relogin unless detached first which causes
 	problems if reloginatstart is not set
 router test fails, bind by name fails, wrong # of columns
@@ -9,10 +11,6 @@ write a doc:
 add "quoting method" call to api, call mysql native function,
 	(mysql_escape_string()/mysql_real_escape_string())
 	not sure about other db's
-
-somehow make it so you can see if a bind var was valid before executeQuery() is
-	called
-	add methods to other api's
 
 apply Yeb Havinga's authentication patch
 

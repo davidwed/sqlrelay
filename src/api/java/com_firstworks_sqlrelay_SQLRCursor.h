@@ -337,6 +337,22 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_validateBinds
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    validInputBind
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_validInputBind
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    validOutputBind
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_validOutputBind
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    executeQuery
  * Signature: ()Z
  */

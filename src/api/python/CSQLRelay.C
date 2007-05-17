@@ -694,6 +694,30 @@ static PyObject *validateBinds(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", 0);
 }
 
+static PyObject *validInputBind(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  bool rc;
+  char *variable;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrcursor *)sqlrcur)->validInputBind(variable);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *validOutputBind(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  bool rc;
+  char *variable;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &variable))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrcursor *)sqlrcur)->validOutputBind(variable);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", (short)rc);
+}
+
 static PyObject *executeQuery(PyObject *self, PyObject *args) {
   long sqlrcur;
   bool rc;
@@ -1566,6 +1590,8 @@ static PyMethodDef SQLRMethods[] = {
   {"defineOutputBindClob", defineOutputBindClob, METH_VARARGS},
   {"defineOutputBindCursor", defineOutputBindCursor, METH_VARARGS},
   {"validateBinds", validateBinds, METH_VARARGS},
+  {"validInputBind", validInputBind, METH_VARARGS},
+  {"validOutputBind", validOutputBind, METH_VARARGS},
   {"executeQuery", executeQuery, METH_VARARGS},
   {"fetchFromBindCursor", fetchFromBindCursor, METH_VARARGS},
   {"getOutputBindString", getOutputBindString, METH_VARARGS},

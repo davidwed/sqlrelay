@@ -255,6 +255,14 @@ __END__
             # to bind them unless they really are in the 
             # query.
 
+        validInputBind(variable);
+            # Returns true if "variable" was a valid
+            # input bind variable of the query.
+
+        validOutputBind(variable);
+            # Returns true if "variable" was a valid
+            # output bind variable of the query.
+
         executeQuery();
             # Execute the query that was previously 
             # prepared and bound.

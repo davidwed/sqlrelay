@@ -166,6 +166,14 @@ public class SQLRCursor {
 	 *  calling this method.  */
 	public native void	validateBinds();
 
+	/** Returns true if "variable" was a valid input
+	 *  bind variable of the query  */
+	public native boolean	validInputBind(String variable);
+
+	/** Returns true if "variable" was a valid output
+	 *  bind variable of the query  */
+	public native boolean	validOutputBind(String variable);
+
 	/** Execute the query that was previously 
 	 *  prepared and bound.  */
 	public native boolean	executeQuery();

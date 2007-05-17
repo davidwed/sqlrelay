@@ -412,6 +412,23 @@ class sqlrcursor:
         query.
         """
         return CSQLRelay.validateBinds(self.cursor)
+        
+
+    def validInputBinds(self,variable):
+        """
+	Returns true if "variable" was a valid
+	input bind variable of the query.
+        """
+        return CSQLRelay.validInputBinds(self.cursor,variable)
+        
+
+    def validOutputBinds(self,variable):
+        """
+	Returns true if "variable" was a valid
+	output bind variable of the query.
+        """
+        return CSQLRelay.validOutputBinds(self.cursor,variable)
+
 
     def executeQuery(self):
         """
