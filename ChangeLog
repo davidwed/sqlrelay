@@ -41,6 +41,7 @@
 		Ragnar Rova
 	added validBind() method which will return whether a bind
 		variable is in the query or not
+	fixed Yeb Havinga's db-tier authentication bug
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

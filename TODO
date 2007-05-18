@@ -10,30 +10,6 @@ add "quoting method" call to api, call mysql native function,
 	(mysql_escape_string()/mysql_real_escape_string())
 	not sure about other db's
 
-apply Yeb Havinga's authentication patch
-
-    // authenticate on the approprite tier
-    bool    authondb=(cfgfl->getAuthOnDatabase() &&
-                supportsAuthOnDatabase());
-    bool    authonconnection=(cfgfl->getAuthOnConnection() );
-/** ||
-                    (cfgfl->getAuthOnDatabase() &&
-                        supportsAuthOnDatabase())); **/
-    if (authonconnection) {
-        return connectionBasedAuth(userbuffer,passwordbuffer);
-    } else if (authondb) {
-        return databaseBasedAuth(userbuffer,passwordbuffer);
-    }
-
-    #ifdef SERVER_DEBUG
-    debugPrint("connection",1,"authentication was done on listener");
-    #endif
-    return true;
-
-
-
-
-
 Need to find a way to make connections bleed off.
 	If connections=100 and maxconnections=200 and there are consistently
 		150 clients, then the # of connections needs to bleed back

@@ -13,6 +13,8 @@ bool sqlrconnection_svr::authenticateCommand() {
 	if (!authenticate()) {
 		// indicate that an error has occurred
 		clientsock->write((uint16_t)ERROR);
+		clientsock->write((uint16_t)21);
+		clientsock->write("Authentication Error.");
 		flushWriteBuffer();
 		endSession();
 		return false;
@@ -39,7 +41,7 @@ bool sqlrconnection_svr::authenticate() {
 				supportsAuthOnDatabase());
 	bool	authonconnection=(cfgfl->getAuthOnConnection() ||
 					(cfgfl->getAuthOnDatabase() &&
-						supportsAuthOnDatabase()));
+						!supportsAuthOnDatabase()));
 	if (authonconnection) {
 		return connectionBasedAuth(userbuffer,passwordbuffer);
 	} else if (authondb) {
