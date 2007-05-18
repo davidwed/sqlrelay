@@ -39,7 +39,7 @@
 	applied some of Tim Bunce's DBI patches
 	added pid cleanup to init script similar to patch supplied by
 		Ragnar Rova
-	added validIn/OutputBind() method which will return whether a bind
+	added validBind() method which will return whether a bind
 		variable is in the query or not
 
 0.38 - implemented mysql_stmt function support in mysql connection

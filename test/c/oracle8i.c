@@ -144,6 +144,34 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcon_ping(con),1);
 	printf("\n");
 
+	printf("BIND VALIDATION: \n");
+	sqlrcur_sendQuery(cur,"drop table testtable1");
+	sqlrcur_sendQuery(cur,"create table testtable1 (col1 varchar2(20), col2 varchar2(20), col3 varchar2(20))");
+	sqlrcur_prepareQuery(cur,"insert into testtable1 values ($(var1),$(var2),$(var3))");
+	sqlrcur_inputBindLong(cur,"var1",1);
+	sqlrcur_inputBindLong(cur,"var2",2);
+	sqlrcur_inputBindLong(cur,"var3",3);
+	sqlrcur_subString(cur,"var1",":var1");
+	checkSuccessInt(sqlrcur_validBind(cur,"var1"),1);
+	checkSuccessInt(sqlrcur_validBind(cur,"var2"),0);
+	checkSuccessInt(sqlrcur_validBind(cur,"var3"),0);
+	checkSuccessInt(sqlrcur_validBind(cur,"var4"),0);
+	printf("\n");
+	sqlrcur_subString(cur,"var2",":var2");
+	checkSuccessInt(sqlrcur_validBind(cur,"var1"),1);
+	checkSuccessInt(sqlrcur_validBind(cur,"var2"),1);
+	checkSuccessInt(sqlrcur_validBind(cur,"var3"),0);
+	checkSuccessInt(sqlrcur_validBind(cur,"var4"),0);
+	printf("\n");
+	sqlrcur_subString(cur,"var3",":var3");
+	checkSuccessInt(sqlrcur_validBind(cur,"var1"),1);
+	checkSuccessInt(sqlrcur_validBind(cur,"var2"),1);
+	checkSuccessInt(sqlrcur_validBind(cur,"var3"),1);
+	checkSuccessInt(sqlrcur_validBind(cur,"var4"),0);
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	sqlrcur_sendQuery(cur,"drop table testtable1");
+	printf("\n");
+
 	// drop existing table
 	sqlrcur_sendQuery(cur,"drop table testtable");
 

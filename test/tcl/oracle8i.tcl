@@ -4,7 +4,7 @@
 # See the file COPYING for more information.
 
 
-load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
+load /usr/lib64/sqlrelay/sqlrelay.so sqlrelay
 
 proc checkUndef {value} {
 
@@ -770,6 +770,34 @@ checkUndef [$cur getFieldByIndex 4 0]
 checkUndef [$cur getFieldByIndex 5 0]
 checkUndef [$cur getFieldByIndex 6 0]
 checkUndef [$cur getFieldByIndex 7 0]
+puts ""
+
+puts "BIND VALIDATION: "
+catch {$cur sendQuery "drop table testtable1"}
+$cur sendQuery "create table testtable1 (col1 varchar2(20), col2 varchar2(20), col3 varchar2(20))"
+$cur prepareQuery "insert into testtable1 values ($(var1),$(var2),$(var3))"
+$cur inputBind "var1" 1
+$cur inputBind "var2" 2
+$cur inputBind "var3" 3
+$cur substitution "var1" ":var1"
+checkSuccess [$cur validBind "var1"] 1
+checkSuccess [$cur validBind "var2"] 0
+checkSuccess [$cur validBind "var3"] 0
+checkSuccess [$cur validBind "var4"] 0
+puts ""
+$cur substitution "var2" ":var2"
+checkSuccess [$cur validBind "var1"] 1
+checkSuccess [$cur validBind "var2"] 1
+checkSuccess [$cur validBind "var3"] 0
+checkSuccess [$cur validBind "var4"] 0
+puts ""
+$cur substitution "var3" ":var3"
+checkSuccess [$cur validBind "var1"] 1
+checkSuccess [$cur validBind "var2"] 1
+checkSuccess [$cur validBind "var3"] 1
+checkSuccess [$cur validBind "var4"] 0
+checkSuccess [$cur executeQuery] 1
+catch {$cur sendQuery "drop table testtable1"}
 puts ""
 
 # drop existing table

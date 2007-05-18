@@ -168,6 +168,34 @@ class oracle8i {
 		System.out.println("PING: ");
 		checkSuccess(con.ping(),1);
 		System.out.println();
+
+		System.out.println("BIND VALIDATION: ");
+		cur.sendQuery("drop table testtable1");
+		cur.sendQuery("create table testtable1 (col1 varchar2(20), col2 varchar2(20), col3 varchar2(20))");
+		cur.prepareQuery("insert into testtable1 values ($(var1),$(var2),$(var3))");
+		cur.inputBind("var1",1);
+		cur.inputBind("var2",2);
+		cur.inputBind("var3",3);
+		cur.substitution("var1",":var1");
+		checkSuccess(cur.validBind("var1"),1);
+		checkSuccess(cur.validBind("var2"),0);
+		checkSuccess(cur.validBind("var3"),0);
+		checkSuccess(cur.validBind("var4"),0);
+		System.out.println();
+		cur.substitution("var2",":var2");
+		checkSuccess(cur.validBind("var1"),1);
+		checkSuccess(cur.validBind("var2"),1);
+		checkSuccess(cur.validBind("var3"),0);
+		checkSuccess(cur.validBind("var4"),0);
+		System.out.println();
+		cur.substitution("var3",":var3");
+		checkSuccess(cur.validBind("var1"),1);
+		checkSuccess(cur.validBind("var2"),1);
+		checkSuccess(cur.validBind("var3"),1);
+		checkSuccess(cur.validBind("var4"),0);
+		checkSuccess(cur.executeQuery(),1);
+		cur.sendQuery("drop table testtable1");
+		System.out.println();
 	
 		// drop existing table
 		cur.sendQuery("drop table testtable");

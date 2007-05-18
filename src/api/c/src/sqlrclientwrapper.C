@@ -260,7 +260,7 @@ void sqlrcur_validateBinds(sqlrcur sqlrcurref) {
 	sqlrcurref->validateBinds();
 }
 
-bool sqlrcur_validBind(sqlrcur sqlrcurref, const char *variable) {
+int sqlrcur_validBind(sqlrcur sqlrcurref, const char *variable) {
 	return sqlrcurref->validBind(variable);
 }
 
