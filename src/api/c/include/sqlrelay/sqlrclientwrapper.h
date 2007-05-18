@@ -276,13 +276,9 @@ void	sqlrcur_validateBinds(sqlrcur sqlrcurref);
 			   query.  There is a performance penalty for
 			   calling this function */
 
-bool	sqlrcur_validInputBind(sqlrcur sqlrcurref, const char *variable);
+bool	sqlrcur_validBind(sqlrcur sqlrcurref, const char *variable);
 			/* Returns true if "variable" was a valid
-			   input bind variable of the query. */
-			
-bool	sqlrcur_validOutputBind(sqlrcur sqlrcurref, const char *variable);
-			/* Returns true if "variable" was a valid
-			   output bind variable of the query. */
+			   bind variable of the query. */
 
 int	sqlrcur_executeQuery(sqlrcur sqlrcurref);
 			/* Execute the query that was previously prepared 

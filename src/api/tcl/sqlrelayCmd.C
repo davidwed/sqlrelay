@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.24 2007-05-17 03:03:32 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.25 2007-05-18 01:34:35 mused Exp $
  */
 
 #include <tcl.h>
@@ -94,8 +94,7 @@ void sqlrcurDelete(ClientData data) {
  *   $cur substitutions {{variable value} ...}
  *   $cur inputBinds {{variable value ?precision scale?} ...}
  *   $cur validateBinds
- *   $cur validInputBind
- *   $cur validOutputBind
+ *   $cur validBind
  *   $cur executeQuery
  *   $cur fetchFromBindCursor
  *   $cur getOutputBindString variable
@@ -195,8 +194,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "substitutions",
     "inputBinds",
     "validateBinds",
-    "validInputBind",
-    "validOutputBind",
+    "validBind",
     "executeQuery",
     "fetchFromBindCursor",
     "getOutputBindString",
@@ -290,8 +288,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_substitutions,
     SQLRCUR_inputBinds,
     SQLRCUR_validateBinds,
-    SQLRCUR_validInputBind,
-    SQLRCUR_validOutputBind,
+    SQLRCUR_validBind,
     SQLRCUR_executeQuery,
     SQLRCUR_fetchFromBindCursor,
     SQLRCUR_getOutputBindString,
@@ -863,25 +860,14 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	cur->validateBinds();
 	break;
       }
-    case SQLRCUR_validInputBind:
+    case SQLRCUR_validBind:
       {
 	Tcl_Obj *result;
 	if (objc != 3) {
 	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
 	  return TCL_ERROR;
 	}
-	result = Tcl_NewBooleanObj(cur->validInputBind(Tcl_GetString(objv[2])));
-	Tcl_SetObjResult(interp, result);
-	break;
-      }
-    case SQLRCUR_validOutputBind:
-      {
-	Tcl_Obj *result;
-	if (objc != 3) {
-	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
-	  return TCL_ERROR;
-	}
-	result = Tcl_NewBooleanObj(cur->validOutputBind(Tcl_GetString(objv[2])));
+	result = Tcl_NewBooleanObj(cur->validBind(Tcl_GetString(objv[2])));
 	Tcl_SetObjResult(interp, result);
 	break;
       }

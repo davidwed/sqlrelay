@@ -255,6 +255,10 @@ __END__
             # to bind them unless they really are in the 
             # query.
 
+        validBind(variable);
+            # Returns true if "variable" was a valid
+            # bind variable of the query.
+
         executeQuery();
             # Execute the query that was previously 
             # prepared and bound.

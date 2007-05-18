@@ -835,7 +835,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_validatebinds) {
 	}
 }
 
-DLEXPORT ZEND_FUNCTION(sqlrcur_validinputbind) {
+DLEXPORT ZEND_FUNCTION(sqlrcur_validbind) {
 	zval **sqlrcur,**variable;
 	bool r;
 	if (ZEND_NUM_ARGS() != 2 || 
@@ -846,24 +846,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_validinputbind) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		r=cursor->validInputBind((*variable)->value.str.val);
-		RETURN_LONG(r);
-	}
-	RETURN_LONG(0);
-}
-
-DLEXPORT ZEND_FUNCTION(sqlrcur_validoutputbind) {
-	zval **sqlrcur,**variable;
-	bool r;
-	if (ZEND_NUM_ARGS() != 2 || 
-		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
-		WRONG_PARAM_COUNT;
-	}
-	convert_to_string_ex(variable);
-	sqlrcursor *cursor=NULL;
-	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
-	if (cursor) {
-		r=cursor->validOutputBind((*variable)->value.str.val);
+		r=cursor->validBind((*variable)->value.str.val);
 		RETURN_LONG(r);
 	}
 	RETURN_LONG(0);
@@ -1983,8 +1966,7 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcur_substitutions,NULL)
 	ZEND_FE(sqlrcur_inputbinds,NULL)
 	ZEND_FE(sqlrcur_validatebinds,NULL)
-	ZEND_FE(sqlrcur_validinputbind,NULL)
-	ZEND_FE(sqlrcur_validoutputbind,NULL)
+	ZEND_FE(sqlrcur_validbind,NULL)
 	ZEND_FE(sqlrcur_executequery,NULL)
 	ZEND_FE(sqlrcur_fetchfrombindcursor,NULL)
 	ZEND_FE(sqlrcur_getoutputbindstring,NULL)

@@ -382,8 +382,9 @@ application, it may be easy to just bind all the form variables/values from the
 previous page, even though some of them don't appear in the query.  Databases
 usually generate errors in this case.  Calling validateBinds() just prior to
 calling executeQuery() causes the API to check the query for each bind variable
-before actually binding it, preventing those kinds of errors, however there is
-a performance cost associated with calling validateBinds().</p>
+before actually binding it, preventing those kinds of errors.   You can also
+call validBind() to see if a specific variable is valid.  However there is
+a performance cost associated with calling validateBinds() and validBind().</p>
 
 <a name="rebinding"></a>
 <span class="heading2">Re-Binding and Re-Execution</span><br><br>

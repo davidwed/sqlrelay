@@ -284,6 +284,10 @@ sqlrcur sqlrcur_alloc(sqlrcon sqlrconref);
 <font color="#0000ff">                           query.  There is a performance penalty for</font>
 <font color="#0000ff">                           calling this function </font><font color="#0000ff">*/</font>
 
+<font color="#2e8b57"><b>bool</b></font>    sqlrcur_validBind(sqlrcur sqlrcurref, <font color="#2e8b57"><b>const</b></font> <font color="#2e8b57"><b>char</b></font> *variable);
+                        <font color="#0000ff">/*</font><font color="#0000ff"> Returns true if &quot;variable&quot; was a valid</font>
+<font color="#0000ff">                           bind variable of the query. </font><font color="#0000ff">*/</font>
+
 <font color="#2e8b57"><b>int</b></font>     sqlrcur_executeQuery(sqlrcur sqlrcurref);
                         <font color="#0000ff">/*</font><font color="#0000ff"> Execute the query that was previously prepared </font>
 <font color="#0000ff">                           and bound. </font><font color="#0000ff">*/</font>

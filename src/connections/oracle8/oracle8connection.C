@@ -1423,6 +1423,7 @@ const char *oracle8cursor::errorMessage(bool *liveconnection) {
 				// no operations are permitted
 		case 3114: // not connected to ORACLE
 		case 3113: // end-of-file on communication channel
+		case 3135: // connection lost contact
 			*liveconnection=false;
 			break;
 		default:

@@ -584,16 +584,10 @@ static VALUE sqlrcur_validateBinds(VALUE self) {
 	return Qnil;
 }
 
-static VALUE sqlrcur_validInputBind(VALUE self, VALUE variable) {
+static VALUE sqlrcur_validBind(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->validInputBind(STR2CSTR(variable)));
-}
-
-static VALUE sqlrcur_validOutputBind(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->validOutputBind(STR2CSTR(variable)));
+	return INT2NUM(sqlrcur->validBind(STR2CSTR(variable)));
 }
 
 static VALUE sqlrcur_executeQuery(VALUE self) {
@@ -1127,10 +1121,8 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_inputBinds,-1);
 	rb_define_method(csqlrcursor,"validateBinds",
 				(CAST)sqlrcur_validateBinds,0);
-	rb_define_method(csqlrcursor,"validInputBind",
-				(CAST)sqlrcur_validInputBind,0);
-	rb_define_method(csqlrcursor,"validOutputBind",
-				(CAST)sqlrcur_validOutputBind,0);
+	rb_define_method(csqlrcursor,"validBind",
+				(CAST)sqlrcur_validBind,0);
 	rb_define_method(csqlrcursor,"executeQuery",
 				(CAST)sqlrcur_executeQuery,0);
 	rb_define_method(csqlrcursor,"fetchFromBindCursor",

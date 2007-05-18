@@ -560,7 +560,7 @@ void sqlrcursor::validateBinds() {
 	validatebinds=true;
 }
 
-bool sqlrcursor::validInputBind(const char *variable) {
+bool sqlrcursor::validBind(const char *variable) {
 	performSubstitutions();
 	validateBindsInternal();
 	for (uint16_t i=0; i<inbindcount; i++) {
@@ -568,12 +568,6 @@ bool sqlrcursor::validInputBind(const char *variable) {
 			return inbindvars[i].send;
 		}
 	}
-	return false;
-}
-
-bool sqlrcursor::validOutputBind(const char *variable) {
-	performSubstitutions();
-	validateBindsInternal();
 	for (uint16_t i=0; i<outbindcount; i++) {
 		if (!charstring::compare(outbindvars[i].variable,variable)) {
 			return outbindvars[i].send;

@@ -1,5 +1,3 @@
-document validXXXBind()
-
 db2 first query fails and forces relogin unless detached first which causes
 	problems if reloginatstart is not set
 router test fails, bind by name fails, wrong # of columns
