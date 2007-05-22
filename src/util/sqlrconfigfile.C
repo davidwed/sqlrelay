@@ -61,6 +61,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
 	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
 	reloginatstart=!charstring::compare(DEFAULT_RELOGINATSTART,"yes");
+	timequeries=!charstring::compare(DEFAULT_TIMEQUERIES,"yes");
 	currentroute=NULL;
 	inrouter=false;
 	ignoreconnections=false;
@@ -255,6 +256,10 @@ uint32_t sqlrconfigfile::getListenerTimeout() {
 
 bool sqlrconfigfile::getReLoginAtStart() {
 	return reloginatstart;
+}
+
+bool sqlrconfigfile::getTimeQueries() {
+	return timequeries;
 }
 
 bool sqlrconfigfile::getSidEnabled() {
@@ -475,6 +480,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=LISTENERTIMEOUT_ATTRIBUTE;
 	} else if (!charstring::compare(name,"reloginatstart")) {
 		currentattribute=RELOGINATSTART_ATTRIBUTE;
+	} else if (!charstring::compare(name,"timequeries")) {
+		currentattribute=TIMEQUERIES_ATTRIBUTE;
 	} else {
 		currentattribute=(attribute)0;
 	}
@@ -685,6 +692,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 					(value)?value:DEFAULT_LISTENERTIMEOUT);
 		} else if (currentattribute==RELOGINATSTART_ATTRIBUTE) {
 			reloginatstart=
+				!charstring::compareIgnoringCase(value,"yes");
+		} else if (currentattribute==TIMEQUERIES_ATTRIBUTE) {
+			timequeries=
 				!charstring::compareIgnoringCase(value,"yes");
 		}
 	}

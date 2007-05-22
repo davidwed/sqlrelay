@@ -8,6 +8,7 @@
 #include <rudiments/process.h>
 #include <rudiments/permissions.h>
 #include <rudiments/snooze.h>
+#include <rudiments/filesystem.h>
 
 bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 
@@ -162,6 +163,39 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	if (!cfgfl->getPassDescriptor()) {
 		return openSockets();
 	}
+
+	// bail here unless we're timing queries
+	if (!cfgfl->getTimeQueries()) {
+		return true;
+	}
+
+	// initialize query log
+	size_t	querylognamelen;
+	char	*querylogname;
+	if (charstring::length(cmdl->getLocalStateDir())) {
+		querylognamelen=charstring::length(cmdl->getLocalStateDir())+33+
+				charstring::length(cmdl->getId())+10+20+1;
+		querylogname=new char[querylognamelen];
+		snprintf(querylogname,querylognamelen,
+				"%s/sqlrelay/debug/sqlr-connection-%s"
+				"-querylog.%d",
+				cmdl->getLocalStateDir(),cmdl->getId(),pid);
+	} else {
+		querylognamelen=charstring::length(DEBUG_DIR)+17+
+				charstring::length(cmdl->getId())+10+20+1;
+		querylogname=new char[querylognamelen];
+		snprintf(querylogname,querylognamelen,
+				"%s/sqlr-connection-%s-querylog.%d",
+				DEBUG_DIR,cmdl->getId(),pid);
+	}
+	file::remove(querylogname);
+	if (querylog.create(querylogname,
+				permissions::evalPermString("rw-------"))) {
+		filesystem	fs;
+		fs.initialize(querylogname);
+		querylog.setWriteBufferSize(fs.getOptimumTransferBlockSize());
+	}
+	delete[] querylogname;
 	return true;
 }
 

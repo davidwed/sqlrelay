@@ -7,6 +7,8 @@
 
 sqlrconnection_svr::~sqlrconnection_svr() {
 
+	querylog.flushWriteBuffer(-1,-1);
+
 	delete sid_sqlrcon;
 
 	delete cmdl;

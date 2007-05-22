@@ -356,6 +356,8 @@ class sqlrconnection_svr :
 		bool		decrementonclose;
 		bool		silent;
 
+		file		querylog;
+
 #ifdef SERVER_DEBUG
 		stringbuffer	*debugstr;
 #endif

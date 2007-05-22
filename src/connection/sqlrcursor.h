@@ -204,6 +204,8 @@ class sqlrcursor_svr {
 
 		char		*querybuffer;
 		uint32_t	querylength;
+		uint64_t	querysec;
+		uint64_t	queryusec;
 
 		bool		suspendresultset;
 		bool		busy;

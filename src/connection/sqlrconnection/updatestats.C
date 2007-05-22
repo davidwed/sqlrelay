@@ -3,6 +3,9 @@
 
 #include <sqlrconnection.h>
 
+// for gettimeofday()
+#include <sys/time.h>
+
 bool sqlrconnection_svr::logInUpdateStats(bool printerrors) {
 	if (logIn(printerrors)) {
 		statistics->open_svr_connections++;
@@ -42,7 +45,33 @@ bool sqlrconnection_svr::executeQueryUpdateStats(sqlrcursor_svr *curs,
 							uint32_t length,
 							bool execute) {
 	statistics->total_queries++;
-	if (!curs->executeQuery(query,length,execute)) {
+
+	timeval		starttv;
+	struct timezone	starttz;
+	timeval		endtv;
+	struct timezone	endtz;
+
+	if (cfgfl->getTimeQueries()) {
+		gettimeofday(&starttv,&starttz);
+	}
+
+	bool	result=curs->executeQuery(query,length,execute);
+
+	if (cfgfl->getTimeQueries()) {
+
+		gettimeofday(&endtv,&endtz);
+
+		curs->querysec=endtv.tv_sec-starttv.tv_sec;
+		curs->queryusec=endtv.tv_usec-starttv.tv_usec;
+
+		stringbuffer	logentry;
+		logentry.append("query:\n")->append(query)->append("\n");
+		logentry.append("time: ")->append(curs->querysec);
+		logentry.append(".")->append(curs->queryusec)->append("\n");
+		querylog.write(logentry.getString(),logentry.getStringLength());
+	}
+
+	if (!result) {
 		statistics->total_errors++;
 		return false;
 	}
