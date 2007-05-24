@@ -61,7 +61,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
 	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
 	reloginatstart=!charstring::compare(DEFAULT_RELOGINATSTART,"yes");
-	timequeries=!charstring::compare(DEFAULT_TIMEQUERIES,"yes");
+	timequeriessec=charstring::toInteger(DEFAULT_TIMEQUERIESSEC);
+	timequeriesusec=charstring::toInteger(DEFAULT_TIMEQUERIESUSEC);
 	currentroute=NULL;
 	inrouter=false;
 	ignoreconnections=false;
@@ -258,8 +259,12 @@ bool sqlrconfigfile::getReLoginAtStart() {
 	return reloginatstart;
 }
 
-bool sqlrconfigfile::getTimeQueries() {
-	return timequeries;
+int64_t sqlrconfigfile::getTimeQueriesSeconds() {
+	return timequeriessec;
+}
+
+int64_t sqlrconfigfile::getTimeQueriesMicroSeconds() {
+	return timequeriesusec;
 }
 
 bool sqlrconfigfile::getSidEnabled() {
@@ -694,8 +699,27 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			reloginatstart=
 				!charstring::compareIgnoringCase(value,"yes");
 		} else if (currentattribute==TIMEQUERIES_ATTRIBUTE) {
-			timequeries=
-				!charstring::compareIgnoringCase(value,"yes");
+			if (charstring::toFloat(value)>0) {
+				char		**list;
+				uint64_t	listlength;
+				charstring::split(value,".",true,
+							&list,&listlength);
+				timequeriessec=
+					charstring::toInteger(list[0]);
+				if (listlength>1) {
+					timequeriesusec=
+					charstring::toInteger(list[1]);
+				} else {
+					timequeriesusec=0;
+				}
+				for (uint64_t i=0; i<listlength; i++) {
+					delete[] list[i];
+				}
+				delete[] list;
+			} else {
+				timequeriessec=-1;
+				timequeriesusec=-1;
+			}
 		}
 	}
 	return true;

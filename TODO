@@ -1,3 +1,9 @@
+init script appears to remove the pids it just started!
+
+query timing is sometimes returning negatives for microseconds
+need to add a threshold for query timings
+
+
 db2 first query fails and forces relogin unless detached first which causes
 	problems if reloginatstart is not set
 router test fails, bind by name fails, wrong # of columns
@@ -280,6 +286,8 @@ Features:
 		It should only call commit/rollback if the database isn't in
 		auto-commit mode.
 	date object binds
+	DML/DDL caching - if db is down, accept queries and run them when the
+		db comes back up
 
 Availability:
 	connections should ping database server every so often to make sure

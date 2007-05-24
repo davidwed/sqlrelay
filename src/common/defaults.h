@@ -138,8 +138,9 @@
 #define DEFAULT_RELOGINATSTART "no"
 	// default re-login at start attribute
 
-#define DEFAULT_TIMEQUERIES "no"
-	// default time queries attribute
+#define DEFAULT_TIMEQUERIESSEC "-1"
+#define DEFAULT_TIMEQUERIESUSEC "-1"
+	// default time queries attributes
 
 // cachemanager/sqlrclient parameters
 #define DEFAULT_INTERVAL 30

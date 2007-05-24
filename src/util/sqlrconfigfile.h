@@ -189,7 +189,8 @@ class sqlrconfigfile : public xmlsax {
 		int64_t		getMaxListeners();
 		uint32_t	getListenerTimeout();
 		bool		getReLoginAtStart();
-		bool		getTimeQueries();
+		int64_t		getTimeQueriesSeconds();
+		int64_t		getTimeQueriesMicroSeconds();
 
 		bool		getSidEnabled();
 		const char	*getSidHost();
@@ -262,7 +263,8 @@ class sqlrconfigfile : public xmlsax {
 		int64_t		maxlisteners;
 		uint32_t	listenertimeout;
 		bool		reloginatstart;
-		bool		timequeries;
+		int64_t		timequeriessec;
+		int64_t		timequeriesusec;
 
 		bool		sidenabled;
 		const char	*sidhost;

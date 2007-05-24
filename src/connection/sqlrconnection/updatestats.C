@@ -51,24 +51,41 @@ bool sqlrconnection_svr::executeQueryUpdateStats(sqlrcursor_svr *curs,
 	timeval		endtv;
 	struct timezone	endtz;
 
-	if (cfgfl->getTimeQueries()) {
+	if (cfgfl->getTimeQueriesSeconds()>-1 &&
+		cfgfl->getTimeQueriesMicroSeconds()>-1) {
 		gettimeofday(&starttv,&starttz);
 	}
 
 	bool	result=curs->executeQuery(query,length,execute);
 
-	if (cfgfl->getTimeQueries()) {
+printf("threshold=%lld.%lld\n",cfgfl->getTimeQueriesSeconds(),
+				cfgfl->getTimeQueriesMicroSeconds());
+	if (cfgfl->getTimeQueriesSeconds()>-1 &&
+		cfgfl->getTimeQueriesMicroSeconds()>-1) {
 
 		gettimeofday(&endtv,&endtz);
 
 		curs->querysec=endtv.tv_sec-starttv.tv_sec;
 		curs->queryusec=endtv.tv_usec-starttv.tv_usec;
 
-		stringbuffer	logentry;
-		logentry.append("query:\n")->append(query)->append("\n");
-		logentry.append("time: ")->append(curs->querysec);
-		logentry.append(".")->append(curs->queryusec)->append("\n");
-		querylog.write(logentry.getString(),logentry.getStringLength());
+		if (curs->querysec>=
+				(uint64_t)cfgfl->getTimeQueriesSeconds() &&
+			curs->queryusec>=
+				(uint64_t)cfgfl->getTimeQueriesMicroSeconds()) {
+			stringbuffer	logentry;
+			logentry.append("query:\n")->append(query);
+			logentry.append("\n");
+			logentry.append("time: ");
+			logentry.append((uint64_t)curs->querysec);
+			logentry.append(".");
+			char	*usec=charstring::parseNumber(
+						(uint64_t)curs->queryusec,6);
+			logentry.append(usec);
+			delete[] usec;
+			logentry.append("\n");
+			querylog.write(logentry.getString(),
+					logentry.getStringLength());
+		}
 	}
 
 	if (!result) {

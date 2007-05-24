@@ -165,7 +165,8 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	}
 
 	// bail here unless we're timing queries
-	if (!cfgfl->getTimeQueries()) {
+	if (cfgfl->getTimeQueriesSeconds()==-1 ||
+		cfgfl->getTimeQueriesMicroSeconds()==-1) {
 		return true;
 	}
 
