@@ -707,8 +707,18 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				timequeriessec=
 					charstring::toInteger(list[0]);
 				if (listlength>1) {
+					char	buffer[7];
+					size_t	list1len=
+						charstring::length(list[1]);
+					for (size_t i=0; i<6; i++) {
+						buffer[i]=list[1][i];
+						if (i>=list1len) {
+							buffer[i]='0';
+						}
+					}
+					buffer[6]='\0';
 					timequeriesusec=
-					charstring::toInteger(list[1]);
+						charstring::toInteger(buffer);
 				} else {
 					timequeriesusec=0;
 				}
