@@ -28,7 +28,7 @@ cleanup(){
         if ( test -r "$i" )
         then
             PID=`cat $i`
-            if ( test -n `ps -p $PID | egrep -q "sqlr-cachemana|sqlr-connectio|sqlr-listener"` )
+            if ( test -n "`ps -p $PID | egrep -E 'sqlr-cachemana|sqlr-connectio|sqlr-listener'`" )
             then
                 echo "$PID is not sqlr! removing pidfile ..."
                 rm $i
