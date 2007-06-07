@@ -59,6 +59,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#oracleconnections">What is the difference between the Oracle7 connection and the Oracle8 connection?</a></li>
 <li><a href="#nlslang">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</a></li>
 <li><a href="#sqliterowid">How do I get the last insert rowid from SQLite?</a></li>
+<li><a href="#oracleosauth">How do I use Oracle's OS-Authentication (users identified externally)?</a></li>
 </ol>
 
 <span class="heading2">Programming Questions</span><br><br>
@@ -809,6 +810,68 @@ set the NLS_LANG environment variable.</p>
 <p>You can run a special query: "SELECT LAST INSERT ROWID".  When SQL Relay
 sees this query, it returns a result set with a single field containing the
 last insert rowid.</p>
+
+<a name="oracleosauth"></a>
+<span class="heading3">How do I use Oracle's OS-Authentication (users identified externally)?</span>
+
+<p>To set up Oracle to authenticate a user against the OS, first create a user
+in linux/unix, then log into oracle as the sys user and create a corresponding
+user as follows.  In this example, we'll assume that you created an OS-level
+user named <b>mused</b>:</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>CREATE</b></font> <font color="#6a5acd">USER</font> ops$mused <font color="#6a5acd">IDENTIFIED</font> EXTERNALLY
+<font color="#a52a2a"><b>GRANT</b></font> <font color="#6a5acd">CONNECT</font> <font color="#6a5acd">TO</font> ops$mused
+</pre>
+</blockquote>
+
+<p>Now you can log in as <b>mused</b> and connect to the database using
+<b>sqlplus /</b> and you will not be prompted for a username and password.</p>
+
+<p>In the sqlrelay.conf file, set the runasuser attribute of the instance tag
+to the user that you want to connect as and leave out the user, password and
+oracle_sid parameters of the string attribute of the connection tag.</p>
+
+<p>For example, here's a normal (non-OS-authentication) configuration which
+connects to the ora1 instance of oracle using testuser/testpassword:</p>
+
+<blockquote>
+<pre>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>runasuser</b></font>=<font color="#ff00ff">&quot;oracle&quot;</font><font color="#008b8b"> ...&gt;</font>
+        ...
+        <font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font>
+                <font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=testuser;password=testpassword;oracle_sid=ora1&quot;</font><font color="#008b8b"> .../&gt;</font>
+        <font color="#008b8b">&lt;/connections&gt;</font>
+<font color="#008b8b">&lt;/instance&gt;</font>
+</pre>
+</blockquote>
+
+<p>Here's one that uses the oracle OS-user to connect.  This is analagous to
+logging in as oracle and running <b>sqlplus /</b>:</p>
+
+<blockquote>
+<pre>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>runasuser</b></font>=<font color="#ff00ff">&quot;oracle&quot;</font><font color="#008b8b"> ...&gt;</font>
+        ...
+        <font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font>
+                <font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> .../&gt;</font>
+        <font color="#008b8b">&lt;/connections&gt;</font>
+<font color="#008b8b">&lt;/instance&gt;</font>
+</pre>
+</blockquote>
+
+<p>It's possible to set up an externally authenticated user to have access to
+other SID's and use <b>sqlplus /@someotherschema</b> to connect to them.  To
+configure SQL Relay to connect to another schema, just add the oracle_sid
+parameter to the string attribute of the connection tag.  For example, use
+the following to connect to ora1.<p>
+
+<blockquote>
+<pre>
+        <font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;oracle_sid=ora1&quot;</font><font color="#008b8b"> .../&gt;</font>
+</pre>
+</blockquote>
 
 <span class="heading3">Programming Questions</span><br><br>
 
