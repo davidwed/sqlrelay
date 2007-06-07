@@ -60,6 +60,9 @@ void oracle8connection::handleConnectString() {
 
 bool oracle8connection::logIn(bool printerrors) {
 
+	// get user/password
+	const char	*user=getUser();
+	const char	*password=getPassword();
 
 	// handle ORACLE_HOME
 	if (home) {
@@ -104,7 +107,11 @@ bool oracle8connection::logIn(bool printerrors) {
 			return false;
 		}
 	} else {
-		if (!environment::getValue("TWO_TASK")) {
+		// allow empty TWO_TASK when using OS-authentication
+		// allow it in all cases?
+		if (!environment::getValue("TWO_TASK") &&
+				charstring::length(user) &&
+				charstring::length(password)) {
 			if (printerrors) {
 				fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
 			}
@@ -224,9 +231,8 @@ bool oracle8connection::logIn(bool printerrors) {
 	}
 
 	// set username and password
-	const char	*user=getUser();
-	const char	*password=getPassword();
-	if (OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
+	if (charstring::length(user) &&
+		OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)user,
 				(ub4)charstring::length(user),
 				(ub4)OCI_ATTR_USERNAME,err)!=OCI_SUCCESS) {
@@ -241,7 +247,8 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
-	if (OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
+	if (charstring::length(password) &&
+		OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)password,
 				(ub4)charstring::length(password),
 				(ub4)OCI_ATTR_PASSWORD,err)!=OCI_SUCCESS) {
@@ -258,8 +265,12 @@ bool oracle8connection::logIn(bool printerrors) {
 	}
 
 	// start a session
+	sword	cred=OCI_CRED_RDBMS;
+	if (!charstring::length(user) && !charstring::length(password)) {
+		cred=OCI_CRED_EXT;
+	}
 	if (OCISessionBegin(svc,err,session,
-				OCI_CRED_RDBMS,(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
+				cred,(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
 		if (printerrors) {
 			logInError("OCISessionBegin() failed.\n");
 		}
