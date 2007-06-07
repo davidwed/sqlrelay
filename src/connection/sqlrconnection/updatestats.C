@@ -58,8 +58,6 @@ bool sqlrconnection_svr::executeQueryUpdateStats(sqlrcursor_svr *curs,
 
 	bool	result=curs->executeQuery(query,length,execute);
 
-printf("threshold=%lld.%lld\n",cfgfl->getTimeQueriesSeconds(),
-				cfgfl->getTimeQueriesMicroSeconds());
 	if (cfgfl->getTimeQueriesSeconds()>-1 &&
 		cfgfl->getTimeQueriesMicroSeconds()>-1) {
 

@@ -1104,6 +1104,9 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		clientsock->write((uint16_t)19);
 		clientsock->write("Too many listeners.");
 		flushWriteBuffer(clientsock);
+		// FIXME: if we got -1 from getAuth, then the client may be
+		// spewing garbage and we should close the connection...
+		waitForClientClose(0,false,clientsock);
 		delete clientsock;
 		return;
 	}

@@ -100,10 +100,8 @@ class DB(TM):
                         desc=self.cur.description
                         if max_rows:
                             if max_rows==1:
-                                print "no, here!"
                                 result=(self.cur.fetchone(),)
                             else:
-                                print "here!"
                                 result=self.cur.fetchmany(max_rows)
 
             failures=0

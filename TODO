@@ -1,8 +1,4 @@
-init script appears to remove the pids it just started!
-
-query timing is sometimes returning negatives for microseconds
-need to add a threshold for query timings
-
+document support for oracle OS authentication
 
 db2 first query fails and forces relogin unless detached first which causes
 	problems if reloginatstart is not set
@@ -28,12 +24,7 @@ Need to find a way to re-distribute connections.
 
 test php pear db bind formats
 
-sqlite binds, sqlite utf-8/utf-16 functions
-
 perl doesn't build on openbsd 4
-
-support oracle OS authentication
-	create user ops$<os_username> identified externally
 
 ruby install fails on solaris 10
 
@@ -51,8 +42,6 @@ if a client connects and the forked listener ends up waiting for a connection
 	that the client has disconnected and can't bail
 
 OCI8 drop-in library
-
-hack on postgresql's ecpg to emit SQL Relay code rather than Postgresql code
 
 perl apis -> CPAN
 
@@ -249,16 +238,21 @@ Security:
 	* SSL encryption
 
 Features:
-	* 2-phase commit, use it in query router
-	* use PAM if possible as alternative to defining users in sqlrelay.conf
-	* support stored procedures that return result sets in interbase, db2
-	* could debug logs be logrotate compatible?
-	* postgresql drop-in api lacks many features
-	* postgresql drop-in needs to parse out ; delimited queries for db's
+	hack on postgresql's ecpg to emit SQL Relay code rather than
+		Postgresql code
+	sqlite binds, sqlite utf-8/utf-16 functions
+	pythondb output bind variables?
+	zope bind variables?
+	2-phase commit, use it in query router
+	use PAM if possible as alternative to defining users in sqlrelay.conf
+	support stored procedures that return result sets in interbase, db2
+	could debug logs be logrotate compatible?
+	postgresql drop-in api lacks many features
+	postgresql drop-in needs to parse out ; delimited queries for db's
 		that don't support that, execute them seperately
-	* mysql drop-in api lacks a few features, stmt functions need
+	mysql drop-in api lacks a few features, stmt functions need
 		to be updated
-	* sybase/freetds (possibly others) need options for setting chained
+	sybase/freetds (possibly others) need options for setting chained
 		mode and isolation mode when client connects
 	datatype support:
 		handle binary data correctly in all databases
