@@ -427,28 +427,28 @@ finding it may dramatically improve that query's performance.</p>
 <a name="memoryusage"></a>
 <span class="heading2">Memory Usage</span><br>
 
-<p>Most databases only support single-row fetches; you can run a query,
+<p>Some databases only support single-row fetches; you can run a query,
 then fetch 1 row at a time from the database.  Oracle, DB2 and Sybase support
 array fetches; you can run a query and then fetch any number of rows from
 the database in a single round-trip.  This improves performance, but at a cost.
-A buffer, large enough to accommodate the maximum size of the data that might
-be fetched, must be allocated and used to fetch the rows.</p>
+For each cursor, a buffer which is large enough to accommodate the maximum size
+of the data that might be fetched, must be allocated and used to fetch the
+rows.</p>
 
-<p>For Oracle 7, this is a 5mb buffer.  For DB2 and Sybase, it's is a 10mb
-buffer.  For Oracle 8, 8i, 9i or 10g, it's a 40mb buffer.</p>
+<p>For DB2 and Sybase, this is a 10mb buffer.  For Oracle, it's a 40mb
+buffer.</p>
 
-<p>If that seems like more memory than you'd like to allocate per-connection,
-then you can tune it down.  Unfortunately, for now, except for Oracle 8, the
+<p>If that seems like more memory than you'd like to allocate per-cursor,
+then you can tune it down.  Unfortunately, for now, except for Oracle, the
 tunable parameters are compile-time parameters.</p>
 
-<p>For Oracle 8, the fetchatonce, maxselectlistsize and maxitembuffersize
+<p>For Oracle, the fetchatonce, maxselectlistsize and maxitembuffersize
 parameters of the string attribute of the connection tag in the sqlrelay.conf
 file may be set to control these values at run time.</p>
 
-<p>For non-Oracle 8 databases, in the following files...</p>
+<p>For non-Oracle databases, in the following files...</p>
 
 <ul>
-<li>src/connections/oracle7/oracle7connection.h</li>
 <li>src/connections/db2/db2connection.h</li>
 <li>src/connections/sybase/sybaseconnection.h</li>
 </ul>
