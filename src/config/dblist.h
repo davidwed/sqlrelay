@@ -2,7 +2,6 @@
 // See the file COPYING for more information.
 
 char	*databaselist[]={
-	"oracle7",
 	"oracle8",
 	"mysql",
 	"postgresql",

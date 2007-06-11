@@ -4,6 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
+#include <rudiments/error.h>
 #include <defines.h>
 #include <datatypes.h>
 
@@ -103,7 +104,9 @@ bool sqlrcursor::getCursorId() {
 		sqlrc->debugPreEnd();
 	}
 	if (sqlrc->cs->read(&cursorid)!=sizeof(uint16_t)) {
-		setError("Failed to get a cursor id.\n A network error may have ocurred.");
+		stringbuffer	errstr;
+		errstr.append("Failed to get a cursor id.\n A network error may have ocurred. ")->append(error::getErrorString());
+		setError(errstr.getString());
 		return false;
 	}
 	havecursorid=true;

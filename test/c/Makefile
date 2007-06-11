@@ -26,7 +26,6 @@ ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) oracle7
 	$(MAKE) oracle8
 	$(MAKE) oracle8i
 endif
@@ -53,9 +52,6 @@ firebird: firebird.c firebird.lo
 mysql: mysql.c mysql.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
 
-oracle7: oracle7.c oracle7.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle7.lo $(LIBS)
-
 oracle8: oracle8.c oracle8.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
 
@@ -81,7 +77,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) freetds
 	$(LIBTOOL) --mode=clean $(RM) firebird
 	$(LIBTOOL) --mode=clean $(RM) mysql
-	$(LIBTOOL) --mode=clean $(RM) oracle7
 	$(LIBTOOL) --mode=clean $(RM) oracle8
 	$(LIBTOOL) --mode=clean $(RM) oracle8i
 	$(LIBTOOL) --mode=clean $(RM) postgresql6

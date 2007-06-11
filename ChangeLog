@@ -43,6 +43,8 @@
 		variable is in the query or not
 	fixed Yeb Havinga's db-tier authentication bug
 	added timequeries option
+	added support for Oracle OS-authentication
+	added some new FAQ's
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

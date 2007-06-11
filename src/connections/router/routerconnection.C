@@ -19,7 +19,7 @@ routerconnection::routerconnection() : sqlrconnection_svr() {
 	nullbindvalue=nullBindValue();
 	nonnullbindvalue=nonNullBindValue();
 
-	beginregex.compile("^\\s*begin");
+	beginregex.compile("^\\s*(begin|start\\s*transaction)");
 	beginregex.study();
 	beginendregex.compile("^\\s*begin\\s*.*\\s*end;\\s*$");
 	beginendregex.study();

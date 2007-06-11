@@ -1,16 +1,19 @@
-document support for oracle OS authentication
+investigate low-memory situations, SQL Relay should keep running when all
+	memory is exhausted
+
+update tuning.html's memory usage section to indicate that the memory usage is
+	per-cursor, not per-connection
 
 db2 first query fails and forces relogin unless detached first which causes
 	problems if reloginatstart is not set
-router test fails, bind by name fails, wrong # of columns
 
-write a doc:
-	how to load-balance a mysql/postgresql app using
-	drop-in-replacement lib and query routing
+mysql transactions don't work correctly
 
-add "quoting method" call to api, call mysql native function,
-	(mysql_escape_string()/mysql_real_escape_string())
-	not sure about other db's
+query router:
+	test fails - commit/rollback
+	"do something"'s
+	support accessing different db's by specifying a different user/password
+	support accessing different db's by specifying which db to use
 
 Need to find a way to make connections bleed off.
 	If connections=100 and maxconnections=200 and there are consistently
@@ -22,17 +25,6 @@ Need to find a way to re-distribute connections.
 	If 2 db's go down and 2nd comes back up first, all log into 2nd db and
 	never log out and back into first
 
-test php pear db bind formats
-
-perl doesn't build on openbsd 4
-
-ruby install fails on solaris 10
-
-query router:
-	"do something"'s
-	support accessing different db's by specifying a different user/password
-	support accessing different db's by specifying which db to use
-
 semop's can return ENOSPC if the undo list is full which is unhandled and causes
 	deadlocks in the sqlr-listeners.  If we get an ENOSPC, then we need to
 	send the client an error and the sqlr-listener needs to exit.
@@ -40,8 +32,6 @@ semop's can return ENOSPC if the undo list is full which is unhandled and causes
 if a client connects and the forked listener ends up waiting for a connection
 	and the client disconnects, the forked listener has no way of knowing
 	that the client has disconnected and can't bail
-
-OCI8 drop-in library
 
 perl apis -> CPAN
 
@@ -82,28 +72,6 @@ get sid working, document
 			sidlog - every query is logged here with a message
 					about it
 
-solaris 8:
-	libgcc_s not found
-
-solaris 9:
-	tries to look in /opt/sfw/lib/mysql/.libs for libmysqlclient
-		(libtool looks in .libs if -Lpath doesn't end in lib)
-		but it works on other platforms...?
-		links fine, works after manually modifying config.mk to
-		link directly against the .so file
-
-openbsd-3.8
-	handoff="pass" doesn't work
-
-cygwin
-	handoff="pass" doesn't work
-
-php debug doesn't print out numbers because zend_printf doesn't support %ld's
-
-Tru64 -
-	unix sockets don't work, looks like a byte-order translation issue
-	can't start more than 1 cursor, looks like out-of-memory
-
 setting backlog:
 	linux:
 		looks like max is 128 on linux 2.0
@@ -120,7 +88,7 @@ setting backlog:
 
 
 Tests:
-	stored procedures for mysql-5.0
+	php pear db bind formats
 	db2 temp tables
 	odbc temp tables
 	zope
@@ -157,6 +125,7 @@ Tests:
 	oldmysql test files for non-C++ api's
 
 cygwin:
+	handoff="pass" doesn't work
 	how to use with non-cygwin dll's?
 	how to install as a service?
 	languages:
@@ -179,13 +148,34 @@ cygwin:
 	databases:
 		sqlite
 			.dll and .def file wherever
-		msql
-			won't build, need older bison
 	doc
 		installing packages
 		optional cygwin components
 		running sqlrelay clients
 		add path to mysql dll to PATH
+
+solaris 8:
+	libgcc_s not found
+
+solaris 9:
+	tries to look in /opt/sfw/lib/mysql/.libs for libmysqlclient
+		(libtool looks in .libs if -Lpath doesn't end in lib)
+		but it works on other platforms...?
+		links fine, works after manually modifying config.mk to
+		link directly against the .so file
+
+solaris 10:
+	ruby install fails
+
+openbsd-3.8
+	handoff="pass" doesn't work
+
+openbsd-4
+	perl doesn't build
+
+Tru64 -
+	unix sockets don't work, looks like a byte-order translation issue
+	can't start more than 1 cursor, looks like out-of-memory
 
 Compatibility:
 	* daemontools
@@ -193,16 +183,12 @@ Compatibility:
 		module like the mysql native client is
 
 Documentation:
-	* snippets from tnsnames.ora can be used as ORACLE_SID
+	* timequeries parameter
 	* how to use new features of Tony/Erik's perl dbi patch
-	* issue with sqlrelay.conf permissions and runasuser="nobody"
 	* getting started with odbc
 	* "how sqlrelay works" with diagrams and animations
 	* example sqlrelay.conf's for different configurations
 	* performance benchmark charts
-	* HOWTO for linuxdoc.org
-	* man pages for everything
-	* document tds version for various versions of MSSQL/Sybase
 
 Performance/Code Enhancements:
 	* NLS_LANG-like issues with other db's?
@@ -235,9 +221,13 @@ Performance/Code Enhancements:
 	* use bandwidth delay product to set tcp send/receive buffer sizes
 
 Security:
-	* SSL encryption
+	* SSL encryption, key-based authentication
 
 Features:
+	make fetch buffer sizes run-time configurable for db2 and sybase
+	add "quoting method" call to api, call mysql native function,
+		(mysql_escape_string()/mysql_real_escape_string())
+	not sure about other db's
 	hack on postgresql's ecpg to emit SQL Relay code rather than
 		Postgresql code
 	sqlite binds, sqlite utf-8/utf-16 functions

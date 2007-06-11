@@ -18,7 +18,6 @@ ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql.class
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) oracle7.class
 	$(MAKE) oracle8.class
 	$(MAKE) oracle8i.class
 endif
@@ -49,9 +48,6 @@ firebird.class: firebird.java
 
 mysql.class: mysql.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar mysql.java
-
-oracle7.class: oracle7.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar oracle7.java
 
 oracle8.class: oracle8.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar oracle8.java

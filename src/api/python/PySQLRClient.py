@@ -78,7 +78,7 @@ class sqlrconnection:
     def identify(self):
         """
         Returns the type of database: 
-          oracle7, oracle8, postgresql, mysql, etc.
+          oracle8, postgresql, mysql, etc.
         """
         return CSQLRelay.identify(self.connection)
 

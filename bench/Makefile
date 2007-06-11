@@ -4,10 +4,7 @@ include ../config.mk
 
 all: 
 ifneq ($(ORACLELIBS),)
-	$(MAKE) -C oracle7 all
-ifneq ($(ORACLEVERSION),7)
 	$(MAKE) -C oracle8 all
-endif
 endif
 ifneq ($(MYSQLLIBS),)
 	$(MAKE) -C mysql all
@@ -36,7 +33,6 @@ endif
 	$(MAKE) -C sqlrelay all
 
 clean:
-	$(MAKE) -C oracle7 clean
 	$(MAKE) -C oracle8 clean
 	$(MAKE) -C mysql clean
 	$(MAKE) -C postgresql clean

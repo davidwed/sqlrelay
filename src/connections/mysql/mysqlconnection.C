@@ -181,11 +181,12 @@ const char *mysqlconnection::bindFormat() {
 }
 
 bool mysqlconnection::isTransactional() {
-	return false;
+	return true;
 }
 
 bool mysqlconnection::autoCommitOn() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
+printf("mysql %d: autocommit on\n",getpid());
 	return !mysql_autocommit(&mysql,true);
 #else
 	// do nothing
@@ -195,6 +196,7 @@ bool mysqlconnection::autoCommitOn() {
 
 bool mysqlconnection::autoCommitOff() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
+printf("mysql %d: autocommit off\n",getpid());
 	return !mysql_autocommit(&mysql,false);
 #else
 	// do nothing
@@ -204,6 +206,7 @@ bool mysqlconnection::autoCommitOff() {
 
 bool mysqlconnection::commit() {
 #ifdef HAVE_MYSQL_COMMIT
+printf("mysql %d: commit\n",getpid());
 	return !mysql_commit(&mysql);
 #else
 	// do nothing
@@ -264,6 +267,9 @@ mysqlcursor::~mysqlcursor() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
+if (!charstring::compare(query,"begin",5)) {
+	printf("mysql %d: %s\n",getpid(),query);
+}
 	if (mysqlconn->fakebinds) {
 		return true;
 	}

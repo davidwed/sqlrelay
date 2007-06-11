@@ -28,7 +28,6 @@ ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql5
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) oracle7
 	$(MAKE) oracle8
 	$(MAKE) oracle8i
 endif
@@ -64,9 +63,6 @@ mysql412: mysql412.C mysql412.lo
 
 mysql5: mysql5.C mysql5.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql5.lo $(LIBS)
-
-oracle7: oracle7.C oracle7.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle7.lo $(LIBS)
 
 oracle8: oracle8.C oracle8.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
@@ -107,7 +103,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) mysql3
 	$(LIBTOOL) --mode=clean $(RM) mysql412
 	$(LIBTOOL) --mode=clean $(RM) mysql5
-	$(LIBTOOL) --mode=clean $(RM) oracle7
 	$(LIBTOOL) --mode=clean $(RM) oracle8
 	$(LIBTOOL) --mode=clean $(RM) oracle8iclobfetch
 	$(LIBTOOL) --mode=clean $(RM) oracle8iclobinsert

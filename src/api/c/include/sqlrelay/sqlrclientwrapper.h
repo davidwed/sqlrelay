@@ -63,7 +63,7 @@ int	sqlrcon_ping(sqlrcon sqlrconref);
 			   if it's down. */
 const char	*sqlrcon_identify(sqlrcon sqlrconref); 
 			/* Returns the type of database: 
-			     oracle7, oracle8, postgresql, mysql, etc. */
+			     oracle8, postgresql, mysql, etc. */
 const char	*sqlrcon_dbVersion(sqlrcon sqlrconref); 
 			/* Returns the version of the database */
 const char	*sqlrcon_bindFormat(sqlrcon sqlrconref); 

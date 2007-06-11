@@ -72,7 +72,7 @@ class sqlrconnection {
 				// if it's down.
 		const char	*identify();
 				// Returns the type of database: 
-				//   oracle7, oracle8, postgresql, mysql, etc.
+				//   oracle8, postgresql, mysql, etc.
 		const char	*dbVersion();
 				// Returns the version of the database
 		const char	*bindFormat();

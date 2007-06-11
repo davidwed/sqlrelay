@@ -30,6 +30,7 @@ queries?</a></li>
 <li><a href="#databaseusers">Can SQL Relay proxy multiple database users
 instead of using the same user for every session?</a></li>
 <li><a href="#routing">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</a></li>
+<li><a href="#mysqlrouting">Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?</a></li>
 <li><a href="#filtering">Can SQL Relay be configured to filter out certain queries, such as select's without a where clause?</a></li>
 </ol>
 
@@ -87,6 +88,7 @@ work?</a></li>
 <li><a href="#tweaks">What system parameters can I tweak to get better performance out of SQL Relay</a></li>
 <li><a href="#firewallhang">If I leave SQL Relay idle for a long time, then come back and try to use it, I get a low level TCP error from the database.  What does that mean?</a></li>
 <li><a href="#ttl">Why doesn't the last connection die off when I set connections=0 and maxconnections to some larger number and let SQL Relay go idle for a long time?</a></li>
+<li><a href="#nobody">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's up with that?</a></li>
 </ol>
 
 
@@ -300,6 +302,19 @@ to the database whenever it needs to switch users.</p>
 <span class="heading3">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
 
 <p>Yes!  As of version 0.38.  See <a href="router.html">Routing and Filtering Queries with SQL Relay</a>.</p>
+
+<a name="mysqlrouting"></a>
+<span class="heading3">Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
+
+<p>Probably.  As of version 0.38.  You'll need to set up SQL Relay to route
+queries and use the Drop-in Replacement Library for MySQL to redirect your
+app to use SQL Relay.</p>
+
+<p>See <a href="router.html">Routing and Filtering Queries with SQL Relay</a>
+for details on how to set up SQL Relay as a query router.</p>
+
+<p>See <a href="dropin/mysql.html">Using the SQL Relay drop-in replacement library for MySQL</a> for details about how to use the drop-in replacement
+library.</p>
 
 <a name="filtering"></a>
 <span class="heading3">Can SQL Relay be configured to filter out certain queries, such as select's without a where clause?</span>
@@ -1281,6 +1296,24 @@ for a connection to die off there.</p>
 case, you would cause the problem that I'm trying to avoid.</p>
 
 <p>
+
+<a name="nobody"></a>
+<span class="heading3">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's up with that?</span><br><br>
+
+<p>SQL Relay is typically started as root.  The sqlr-start command runs as root
+and starts up the sqlr-listener, sqlr-connection and sqlr-scaler processes as
+root.  They then read the config file and switch to run as whatever user/group
+are specified in the runasuser and runasgroup parameters.  The sqlr-scaler is
+most likely now running as a non-root user (such as nobody).  When it spawns
+new connections, they start out running as that same non-root user.  The root
+user can always read the config file, but the config file may not have
+permissions set so that the non-root user can read it.  In that case, the
+sqlr-connection daemon will start up, fail to read the config file, display a
+message and exit.</p>
+
+<p>To remedy the situation, make sure that the sqlrelay.conf file is readable
+by each of the users and groups specified in the runasuser/runasgroup
+attributes inside the file.</p>
 
 </body>
 </html>
