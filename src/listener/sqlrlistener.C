@@ -272,6 +272,8 @@ bool sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
 		pidfile=NULL;
 		return false;
 	}
+	delete[] pidfile;
+	pidfile=NULL;
 	return true;
 }
 
