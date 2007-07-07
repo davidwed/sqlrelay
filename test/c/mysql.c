@@ -908,6 +908,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"8");
 	checkSuccessInt(sqlrcon_commit(con),1);
+	checkSuccessInt(sqlrcon_commit(secondcon),1);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"8");
 	checkSuccessInt(sqlrcon_autoCommitOn(con),1);

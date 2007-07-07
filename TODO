@@ -1,13 +1,5 @@
-investigate low-memory situations, SQL Relay should keep running when all
-	memory is exhausted
-
-update tuning.html's memory usage section to indicate that the memory usage is
-	per-cursor, not per-connection
-
-db2 first query fails and forces relogin unless detached first which causes
-	problems if reloginatstart is not set
-
-mysql transactions don't work correctly
+db2 first query fails and forces relogin unless detached first which
+		causes problems if reloginatstart is not set
 
 query router:
 	test fails - commit/rollback

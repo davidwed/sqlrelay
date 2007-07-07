@@ -23,6 +23,10 @@ mysqlconnection::mysqlconnection() : sqlrconnection_svr() {
 	fakebinds=false;
 #endif
 	dbversion=NULL;
+
+	// start this at false because we don't need to do a commit before
+	// the first query when we very first start up
+	firstquery=false;
 }
 
 mysqlconnection::~mysqlconnection() {
@@ -186,7 +190,6 @@ bool mysqlconnection::isTransactional() {
 
 bool mysqlconnection::autoCommitOn() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
-printf("mysql %d: autocommit on\n",getpid());
 	return !mysql_autocommit(&mysql,true);
 #else
 	// do nothing
@@ -196,7 +199,6 @@ printf("mysql %d: autocommit on\n",getpid());
 
 bool mysqlconnection::autoCommitOff() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
-printf("mysql %d: autocommit off\n",getpid());
 	return !mysql_autocommit(&mysql,false);
 #else
 	// do nothing
@@ -206,7 +208,6 @@ printf("mysql %d: autocommit off\n",getpid());
 
 bool mysqlconnection::commit() {
 #ifdef HAVE_MYSQL_COMMIT
-printf("mysql %d: commit\n",getpid());
 	return !mysql_commit(&mysql);
 #else
 	// do nothing
@@ -233,15 +234,20 @@ short mysqlconnection::nullBindValue() {
 }
 #endif
 
+void mysqlconnection::endSession() {
+	firstquery=true;
+}
+
 mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
 	columnnames=NULL;
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	usestmtprepare=true;
-	storedproc.compile("^\\s*(((create|CREATE|drop|DROP)\\s+"
-			"(procedure|PROCEDURE|function|FUNCTION))|(CALL|call))\\s+");
-	storedproc.study();
+	unsupportedbystmt.compile("^\\s*(((create|CREATE|drop|DROP)\\s+"
+			"(procedure|PROCEDURE|function|FUNCTION))|"
+			"(CALL|call)|(START|start)|(BEGIN|begin))\\s+");
+	unsupportedbystmt.study();
 	stmt=mysql_stmt_init(&mysqlconn->mysql);
 	for (unsigned short index=0; index<MAX_SELECT_LIST_SIZE; index++) {
 		fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
@@ -267,16 +273,22 @@ mysqlcursor::~mysqlcursor() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
-if (!charstring::compare(query,"begin",5)) {
-	printf("mysql %d: %s\n",getpid(),query);
-}
+	// if this if the first query of the session, do a commit first,
+	// doing this will refresh this connection with any data committed
+	// by other connections, which is what would happen if a new client
+	// connected directly to mysql
+	if (mysqlconn->firstquery) {
+		mysqlconn->commit();
+		mysqlconn->firstquery=false;
+	}
+
 	if (mysqlconn->fakebinds) {
 		return true;
 	}
 
-	// can't use stmt API to create/drop stored procedures (yet) as of 5.0
+	// can't use stmt API to run a couple of types of queries as of 5.0
 	usestmtprepare=true;
-	if (storedproc.match(query)) {
+	if (unsupportedbystmt.match(query)) {
 		usestmtprepare=false;
 		return true;
 	}
@@ -502,6 +514,17 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 
 	} else {
 
+#else
+		// if this if the first query of the session, do a commit first,
+		// doing this will refresh this connection with any data
+		// committed by other connections, which is what would happen
+		// if a new client connected directly to mysql
+		// (if HAVE_MYSQL_STMT_PREPARE is defined,
+		// then this is done in prepareQuery())
+		if (mysqlconn->firstquery) {
+			mysqlconn->commit();
+			mysqlconn->firstquery=false;
+		}
 #endif
 
 		// initialize result set

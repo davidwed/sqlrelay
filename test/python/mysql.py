@@ -912,6 +912,7 @@ def main():
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),"8")
 	checkSuccess(con.commit(),1)
+	checkSuccess(secondcon.commit(),1)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),"8")
 	checkSuccess(con.autoCommitOn(),1)

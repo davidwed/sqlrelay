@@ -98,7 +98,7 @@ class mysqlcursor : public sqlrcursor_svr {
 
 		bool		usestmtprepare;
 
-		regularexpression	storedproc;
+		regularexpression	unsupportedbystmt;
 #endif
 		MYSQL_ROW	mysqlrow;
 		unsigned long	*mysqlrowlengths;
@@ -137,6 +137,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		short		nonNullBindValue();
 		short		nullBindValue();
 #endif
+		void		endSession();
 
 		MYSQL	mysql;
 		bool	connected;
@@ -153,6 +154,8 @@ class mysqlconnection : public sqlrconnection_svr {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		fakebinds;
 #endif
+
+		bool		firstquery;
 };
 
 #endif
