@@ -45,6 +45,9 @@
 	added timequeries option
 	added support for Oracle OS-authentication
 	added some new FAQ's
+	mysql connection calls commit() before running the first query after
+		each new client connection
+	fixed a crash in the router involving "fake begin's"
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

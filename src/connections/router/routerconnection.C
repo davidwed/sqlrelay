@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// debug getpid()
+#include <unistd.h>
+
 #include <datatypes.h>
 
 routerconnection::routerconnection() : sqlrconnection_svr() {
@@ -616,7 +619,7 @@ bool routercursor::begin(const char *query, uint32_t length) {
 		}
 
 		// for databases that allow begin's, run the begin query,
-		// for others, just set autocommit on
+		// for others, just set autocommit off
 		bool	res=false;
 		if (routerconn->beginquery[index]) {
 			res=curs[index]->sendQuery(
@@ -644,10 +647,10 @@ bool routercursor::begin(const char *query, uint32_t length) {
 	// If we're here with no "cur", then all the begin's must have
 	// succeeded.  But we need a "cur" so everything else will work.
 	// Any of them will do, so use the first one.
-	if (!cur) {
+	/*if (!cur) {
 		cur=curs[0];
 		curindex=0;
-	}
+	}*/
 	return result;
 }
 
@@ -662,7 +665,7 @@ bool routercursor::knowsRowCount() {
 }
 
 uint64_t routercursor::rowCount() {
-	return cur->rowCount();
+	return (cur)?cur->rowCount():0;
 }
 
 bool routercursor::knowsAffectedRows() {
@@ -670,15 +673,15 @@ bool routercursor::knowsAffectedRows() {
 }
 
 uint64_t routercursor::affectedRows() {
-	return cur->affectedRows();
+	return (cur)?cur->affectedRows():0;
 }
 
 uint32_t routercursor::colCount() {
-	return cur->colCount();
+	return (cur)?cur->colCount():0;
 }
 
 const char * const * routercursor::columnNames() {
-	return cur->getColumnNames();
+	return (cur)?cur->getColumnNames():0;
 }
 
 uint16_t routercursor::columnTypeFormat() {
@@ -686,6 +689,9 @@ uint16_t routercursor::columnTypeFormat() {
 }
 
 void routercursor::returnColumnInfo() {
+	if (!cur) {
+		return;
+	}
 	for (uint32_t index=0; index<cur->colCount(); index++) {
 		const char	*name=cur->getColumnName(index);
 		const char	*typestring=cur->getColumnType(index);
@@ -708,7 +714,7 @@ void routercursor::returnColumnInfo() {
 }
 
 bool routercursor::noRowsToReturn() {
-	return (cur->rowCount()==0);
+	return (((cur)?cur->rowCount():0)==0);
 }
 
 bool routercursor::skipRow() {
@@ -716,6 +722,9 @@ bool routercursor::skipRow() {
 }
 
 bool routercursor::fetchRow() {
+	if (!cur) {
+		return false;
+	}
 	if (cur->getField(nextrow,(uint32_t)0)) {
 		nextrow++;
 		return true;
@@ -724,6 +733,9 @@ bool routercursor::fetchRow() {
 }
 
 void routercursor::returnRow() {
+	if (!cur) {
+		return;
+	}
 	for (uint32_t index=0; index<cur->colCount(); index++) {
 		const char	*fld=cur->getField(nextrow-1,index);
 		uint32_t	len=cur->getFieldLength(nextrow-1,index);

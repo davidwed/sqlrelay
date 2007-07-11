@@ -308,6 +308,6 @@ then
 fi
 if ( test "$DB" = "router" )
 then
-	sudo $INITDIR/postgresql stop
+	sudo $INITDIR/mysqld stop
 	sudo $INITDIR/oracle stop
 fi

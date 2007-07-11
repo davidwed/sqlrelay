@@ -1,8 +1,11 @@
+reset autocommit state when new client logs into sqlrelay
+
+document mysql commit thing
+
 db2 first query fails and forces relogin unless detached first which
 		causes problems if reloginatstart is not set
 
 query router:
-	test fails - commit/rollback
 	"do something"'s
 	support accessing different db's by specifying a different user/password
 	support accessing different db's by specifying which db to use
