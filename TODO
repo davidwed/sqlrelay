@@ -1,123 +1,6 @@
-reset autocommit state when new client logs into sqlrelay
-
-document mysql commit thing
-
-db2 first query fails and forces relogin unless detached first which
-		causes problems if reloginatstart is not set
-
-query router:
-	"do something"'s
-	support accessing different db's by specifying a different user/password
-	support accessing different db's by specifying which db to use
-
-Need to find a way to make connections bleed off.
-	If connections=100 and maxconnections=200 and there are consistently
-		150 clients, then the # of connections needs to bleed back
-		down to 150 eventually.  Currently, if a spike causes it to
-		jump up to 200, then almost all 200 will end up staying alive.
-
-Need to find a way to re-distribute connections.
-	If 2 db's go down and 2nd comes back up first, all log into 2nd db and
-	never log out and back into first
-
-semop's can return ENOSPC if the undo list is full which is unhandled and causes
-	deadlocks in the sqlr-listeners.  If we get an ENOSPC, then we need to
-	send the client an error and the sqlr-listener needs to exit.
-
-if a client connects and the forked listener ends up waiting for a connection
-	and the client disconnects, the forked listener has no way of knowing
-	that the client has disconnected and can't bail
-
-perl apis -> CPAN
-
-get sid working, document
-	how to:
-		create db
-		create user
-		mysql -usiddb -psiddb siddb < siddb
-		set up sqlrelay instance to talk to it
-		set up another instance to use siddb instance for sid
-		populate siddb
-			sidparameters:
-				sparam=INGRESS - perform ingress filtering
-					EGRESS - perform egress filtering
-					LISTEN - ???
-					VERIFICATION - don't send queries to db
-					PREVENTION - send queries to db if ok
-				svalue=1/0
-
-			sidingressblist - ingress blacklist
-				sql_state - queries to reject
-			sidingresswlist - ingress whitelist
-				sql_state - queries to accept,
-						overrides blacklist
-			sidingressldb - ingress learning database
-				parsed_sql - ???
-
-			sidegressblist - egress blacklist
-				sql_state - "parsed results" to reject
-			sidegresswlist - egress whitelist
-				sql_state - "parsed results" to accept
-						overrides blacklist
-			sidegressldb - egress learning database
-				parsed_sql - ???
-
-	what are "parsed results" - something to do with column names...
-
-			sidlog - every query is logged here with a message
-					about it
-
-setting backlog:
-	linux:
-		looks like max is 128 on linux 2.0
-		2.2/2.4 - /proc/sys/net/ipv4/tcp_max_syn_backlog
-			Default is 1024 for systems with more than 128Mb
-			of memory, and 128 for low memory machines.
-			If you make it greater than 1024, change
-			TCP_SYNQ_HSIZE in include/net/tcp.h to keep
-			TCP_SYNQ_HSIZE*16<=tcp_max_syn_backlog
-			and recompile kernel.
-		syn cookies - no max backlog
-	solaris:
-		/usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
-
-
-Tests:
-	php pear db bind formats
-	db2 temp tables
-	odbc temp tables
-	zope
-	odbc tests
-	mysql_stmt calls in drop-in library
-	better pythondb/rubydbi tests
-	test init scripts
-	test send query w/length
-	test upper/lower/mixed column case methods
-	need database reconnect tests
-	column flags
-	getFieldAsXXX
-	getOutputBindAsXXX
-	Java "getXXXAsByteArray" methods
-	check blob/lobs with binary data in them
-	perl dbi driver
-		execute_array
-		bind_param_array
-		selectall_arrayref with attr/binds
-		selectall_hashref with attr/binds
-		selectcol_arrayref with attr/binds
-		selectrow_array with attr/binds
-		selectrow_arrayref with attr/binds
-		selectrow_hashref with attr/binds
-		prepare_cached
-		fetchall_arrayref with slice
-		quote
-		err
-		errstr
-		state
-		begin_work
-		available_drivers
-		data_sources
-	oldmysql test files for non-C++ api's
+db2 first query fails and forces relogin unless detached first
+		which causes problems if reloginatstart is not set
+	using tcp connections fixes this
 
 cygwin:
 	handoff="pass" doesn't work
@@ -172,10 +55,42 @@ Tru64 -
 	unix sockets don't work, looks like a byte-order translation issue
 	can't start more than 1 cursor, looks like out-of-memory
 
-Compatibility:
-	* daemontools
-	* figure out how to get the drop-in client compiled into the mysql PHP
-		module like the mysql native client is
+Tests:
+	php pear db bind formats
+	db2 temp tables
+	odbc temp tables
+	zope
+	odbc tests
+	mysql_stmt calls in drop-in library
+	better pythondb/rubydbi tests
+	test init scripts
+	test send query w/length
+	test upper/lower/mixed column case methods
+	need database reconnect tests
+	column flags
+	getFieldAsXXX
+	getOutputBindAsXXX
+	Java "getXXXAsByteArray" methods
+	check blob/lobs with binary data in them
+	perl dbi driver
+		execute_array
+		bind_param_array
+		selectall_arrayref with attr/binds
+		selectall_hashref with attr/binds
+		selectcol_arrayref with attr/binds
+		selectrow_array with attr/binds
+		selectrow_arrayref with attr/binds
+		selectrow_hashref with attr/binds
+		prepare_cached
+		fetchall_arrayref with slice
+		quote
+		err
+		errstr
+		state
+		begin_work
+		available_drivers
+		data_sources
+	oldmysql test files for non-C++ api's
 
 Documentation:
 	* timequeries parameter
@@ -186,6 +101,39 @@ Documentation:
 	* performance benchmark charts
 
 Performance/Code Enhancements:
+	* Don't fork listener children, use listen() backlog instead
+		linux:
+			looks like max is 128 on linux 2.0
+			2.2/2.4 - /proc/sys/net/ipv4/tcp_max_syn_backlog
+				Default is 1024 for systems with more than 128Mb
+				of memory, and 128 for low memory machines.
+				If you make it greater than 1024, change
+				TCP_SYNQ_HSIZE in include/net/tcp.h to keep
+				TCP_SYNQ_HSIZE*16<=tcp_max_syn_backlog
+				and recompile kernel.
+			syn cookies - no max backlog
+		solaris:
+			/usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
+	* perl apis -> CPAN
+	* if a client connects and the forked listener ends up waiting for a
+		connection and the client disconnects, the forked listener has
+		no way of knowing that the client has disconnected and can't
+		bail
+	* semop's can return ENOSPC if the undo list is full which is unhandled
+		and causes deadlocks in the sqlr-listeners.  If we get an
+		ENOSPC, then we need to send the client an error and the
+		sqlr-listener needs to exit.
+	* Need to find a way to make connections bleed off.
+		If connections=100 and maxconnections=200 and there are
+		consistently 150 clients, then the # of connections needs to
+		bleed back down to 150 eventually.  Currently, if a spike
+		causes it to jump up to 200, then almost all 200 will end up
+		staying alive.
+	* Need to find a way to re-distribute connections.
+		If 2 db's go down and 2nd comes back up first, all log into 2nd
+		db and never log out and back into first
+	* query router "do something"'s
+	* reset autocommit state when new client logs into sqlrelay
 	* NLS_LANG-like issues with other db's?
 	* client connect timeout
 	* store passwords in encrypted form in the config file
@@ -214,32 +162,75 @@ Performance/Code Enhancements:
 		query, so the query can be cancelled if the client disconnects
 	* support freetds/sybase ct_con_prop/encryption
 	* use bandwidth delay product to set tcp send/receive buffer sizes
+	* get sid working, document
+		how to:
+			create db
+			create user
+			mysql -usiddb -psiddb siddb < siddb
+			set up sqlrelay instance to talk to it
+			set up another instance to use siddb instance for sid
+			populate siddb
+			sidparameters:
+				sparam=INGRESS - perform ingress filtering
+					EGRESS - perform egress filtering
+					LISTEN - ???
+					VERIFICATION - don't send queries to db
+					PREVENTION - send queries to db if ok
+				svalue=1/0
+
+			sidingressblist - ingress blacklist
+				sql_state - queries to reject
+			sidingresswlist - ingress whitelist
+				sql_state - queries to accept,
+						overrides blacklist
+			sidingressldb - ingress learning database
+				parsed_sql - ???
+
+			sidegressblist - egress blacklist
+				sql_state - "parsed results" to reject
+			sidegresswlist - egress whitelist
+				sql_state - "parsed results" to accept
+						overrides blacklist
+			sidegressldb - egress learning database
+				parsed_sql - ???
+
+		what are "parsed results" - something to do with column names...
+
+			sidlog - every query is logged here with a message
+					about it
 
 Security:
 	* SSL encryption, key-based authentication
 
 Features:
-	make fetch buffer sizes run-time configurable for db2 and sybase
-	add "quoting method" call to api, call mysql native function,
+	* daemontools compatibility
+	* figure out how to get the drop-in client compiled into the mysql PHP
+		module like the mysql native client is
+	* query router support accessing different db's by specifying a
+		different user/password
+	* query router support accessing different db's by specifying which
+		db to use
+	* make fetch buffer sizes run-time configurable for db2 and sybase
+	* add "quoting method" call to api, call mysql native function,
 		(mysql_escape_string()/mysql_real_escape_string())
-	not sure about other db's
-	hack on postgresql's ecpg to emit SQL Relay code rather than
+	* not sure about other db's
+	* hack on postgresql's ecpg to emit SQL Relay code rather than
 		Postgresql code
-	sqlite binds, sqlite utf-8/utf-16 functions
-	pythondb output bind variables?
-	zope bind variables?
-	2-phase commit, use it in query router
-	use PAM if possible as alternative to defining users in sqlrelay.conf
-	support stored procedures that return result sets in interbase, db2
-	could debug logs be logrotate compatible?
-	postgresql drop-in api lacks many features
-	postgresql drop-in needs to parse out ; delimited queries for db's
+	* sqlite binds, sqlite utf-8/utf-16 functions
+	* pythondb output bind variables?
+	* zope bind variables?
+	* 2-phase commit, use it in query router
+	* use PAM if possible as alternative to defining users in sqlrelay.conf
+	* support stored procedures that return result sets in interbase, db2
+	* could debug logs be logrotate compatible?
+	* postgresql drop-in api lacks many features
+	* postgresql drop-in needs to parse out ; delimited queries for db's
 		that don't support that, execute them seperately
-	mysql drop-in api lacks a few features, stmt functions need
+	* mysql drop-in api lacks a few features, stmt functions need
 		to be updated
-	sybase/freetds (possibly others) need options for setting chained
+	* sybase/freetds (possibly others) need options for setting chained
 		mode and isolation mode when client connects
-	datatype support:
+	* datatype support:
 		handle binary data correctly in all databases
 		identical long/lob datatype support in all databases
 		more advanced long/lob datatype support
@@ -247,25 +238,25 @@ Features:
 		handle blobs, quads in interbase
 		handle timestamps
 		handle enum types in mysql
-	front end replication
-	quotas
-	logging
-	handle commit/rollback for named transactions
-	implement API's that handle errors with exceptions
-	better transaction handling for postgresql
-	odbc connection should check the odbc definition
+	* front end replication
+	* quotas
+	* logging
+	* handle commit/rollback for named transactions
+	* implement API's that handle errors with exceptions
+	* better transaction handling for postgresql
+	* odbc connection should check the odbc definition
 		for connect string arguments - SQLBrowseConnect
-	solaris init script
-	api needs to expose integer column types
-	call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
-	Some databases (like postgresql) are in auto-commit mode unless you
+	* solaris init script
+	* api needs to expose integer column types
+	* call dontGetColumnInfo() when doing fetchrow_array calls in DBD driver
+	* Some databases (like postgresql) are in auto-commit mode unless you
 		manually begin a transaction.  SQL Relay calls commit/rollback
 		at the end of a client session, even if the database is in
 		auto-commit mode.  For postgresql at least, this is expensive.
 		It should only call commit/rollback if the database isn't in
 		auto-commit mode.
-	date object binds
-	DML/DDL caching - if db is down, accept queries and run them when the
+	* date object binds
+	* DML/DDL caching - if db is down, accept queries and run them when the
 		db comes back up
 
 Availability:
@@ -323,6 +314,10 @@ Native DB Support:
 	Cache - http://intersystems.com
 	Frontbase
 	J-stels - stelsdbf, stelscsv (http://www.csv-jdbc.com/)
+	intersystems cache db
+	yard-sql
+	monetdb
+	valentina-db
 
 Config Tools:
 	gtk2

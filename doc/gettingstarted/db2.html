@@ -26,6 +26,7 @@
 <li><a href="#usingdb2icc">Using the DB2 Information and Control Centers</a></li>
 </ul>
 <li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+<li><a href="#caveat">Caveat</a></li>
 </ul>
 
 <a name="installation"></a>
@@ -200,7 +201,7 @@ db2 "terminate"<br>
 create the database alias using the following commands:<br>
 <blockquote><b>
 db2 "catalog database <i>testdb</i> as <i>remotedb</i> at node 
-<i>remoteinst</i>"<br>
+<i>remoteinst</i> authentication server"<br>
 db2 "terminate"<br>
 </b></blockquote>
 </blockquote>
@@ -480,6 +481,53 @@ example, the <i>db2inst1</i> user owns the <i>db2inst1</i> instance where the
 
 <blockquote>
 <b>su - db2inst1 -c "sqlr-stop db2test"</b>
+</blockquote>
+
+<a name="caveat"></a>
+<span class="heading1">Caveat</span><br>
+
+<p>For some reason, when SQL Relay connects to a DB2 database running on the
+same machine as SQL Relay is running on, a problem occurs.  SQL Relay succeeds
+in logging into the database, but upon running the first query, SQL Relay
+receives the following error:
+
+<blockquote><b>
+-1224: [IBM][CLI Driver] SQL1224N  The database manager is not able to accept new requests, has terminated all requests in progress, or has terminated your particular request due to a problem with your request.  SQLSTATE=55032
+</b></blockquote>
+
+<p>SQL Relay is configured to re-login when it sees this error and afterward,
+everything works well.  It's very strange, and prior to SQL Relay version 0.39,
+SQL Relay got around this by having the sqlr-connection-db2 daemon detach from
+the controlling tty afer logging into the database.  Somehow that avoided the
+problem.  But adding the "reloginatstart" parameter made it necessary to detach
+before logging into the database.</p>
+
+<p>When connecting to a local database, the DB2 API uses System V IPC (shared
+memory, semaphores and message queues) to talk to the database.  However, if
+you use TCP to connect to the local database, the problem doesn't occur.</p>
+
+<p>See <a href="#accessingremote">Accessing a Remote Database</a> above for
+more detail, but to connect to a local database over TCP, you need to
+execute the commands like the following as whatever user owns the local
+database you want to connect to.  These commands enable you to connect to
+a local database called <b>testdb</b> using the name <b>testdb1</b>.</p>
+
+<blockquote>
+<b>catalog tcpip node local remote localhost server 50000</b><br>
+<b>terminate</b>
+</blockquote>
+
+<p>Then run:</p>
+
+<blockquote>
+<b>atalog database testdb as testdb1 at node local authentication server</b><br>
+<b>terminate</b>
+</blockquote>
+
+<p>Now you can use the following SQL Relay connect string to connect to it:</p>
+
+<blockquote>
+db=testdb1;user=db2inst1;password=db2inst1
 </blockquote>
 
 </body>

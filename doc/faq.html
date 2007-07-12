@@ -61,6 +61,8 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#nlslang">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</a></li>
 <li><a href="#sqliterowid">How do I get the last insert rowid from SQLite?</a></li>
 <li><a href="#oracleosauth">How do I use Oracle's OS-Authentication (users identified externally)?</a></li>
+<li><a href="#mysqltrans">Why aren't commit's working in MySQL?</a></li>
+<li><a href="#db2login">Why does the first DB2 query causes SQL Relay to reconnect to the DB?</a></li>
 </ol>
 
 <span class="heading2">Programming Questions</span><br><br>
@@ -887,6 +889,60 @@ the following to connect to ora1.<p>
         <font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;oracle_sid=ora1&quot;</font><font color="#008b8b"> .../&gt;</font>
 </pre>
 </blockquote>
+
+<a name="mysqltrans"></a>
+<span class="heading3">Why aren't commit's working in MySQL?</span>
+
+<p>Some versions of MySQL don't support transactions at all.  But modern
+versions do, if you create tables using a table type that supports transactions.
+The InnoDB table type is the most commonly used transaction-supporting table
+type.  To use the InnoDB table type, use a create statement like the
+following:</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">table</font> testtable (col1 int) <font color="#6a5acd">type</font>=innodb
+</pre>
+</blockquote>
+
+<p>However, you may be surprised at MySQL's behavior even when you're using
+InnoDB tables or another table type that supports transactions.</p>
+
+<p>With most databases, if a client has a connection open and commits a set of
+inserts, updates or deletes in, then those changes are immediately visible to
+other clients using separate connections.</p>
+
+<p>MySQL doesn't support this behavior, at least not with InnoDB tables.
+Instead, with MySQL, after beginning a transaction, the database will appear to
+be unaffected by queries run in other transactions until the transaction you
+are running is committed.  So, if another client commits a set of inserts, you
+won't see them until you commit your transaction.</p>
+
+<p>If you're in autocommit mode though and haven't begun a transaction, then
+you will immediately see all changes committed by other clients.  But as soon
+as you begin a transaction, you will no longer see changes to the database
+until you commit your transaction.</p>
+
+<p>It's really a bit more complicated than that.  MySQL supports several
+different <i>isolation levels</i>, each with slightly different behavior.
+See the official MySQL documentation for more information on this.</p>
+
+<p>It's possible (probable?) that non-MySQL databases have different isolation
+levels as well, but I don't have any experience with different isolation levels
+in other databases.  It's also possible that there is some way to get the
+"normal" behavior out of MySQL, perhaps by using a different table type, but
+again I don't have any experience with that.  If anyone has insight into this,
+please <a href="mailto:david.muse@firstworks.com">email me</a> about it.</p>
+
+<p>In SQL Relay 0.39, when using MySQL, whenver a client connects to the server,
+the MySQL connection daemon executes a commit before running the first query to
+sync things up.  This emulates the behavior that a client would expect if it
+was making a new connection directly to the database.</p>
+
+<a name="db2login"></a>
+<span class="heading3">Why does the first DB2 query causes SQL Relay to reconnect to the DB?</span>
+
+<p>This started in SQL Relay 0.39, see <a href="gettingstarted/db2.html#caveat">SQL Relay - Getting Started With IBM DB2</a> for information about this.</p>
 
 <span class="heading3">Programming Questions</span><br><br>
 

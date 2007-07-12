@@ -30,7 +30,6 @@ void db2connection::handleConnectString() {
 }
 
 bool db2connection::logIn(bool printerrors) {
-printf("logging in\n");
 
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);
@@ -472,7 +471,6 @@ const char *db2cursor::errorMessage(bool *liveconnection) {
 	if ((nativeerrnum==-1224 && errnum==184) ||
 		(nativeerrnum==-99999 && errnum==64) ||
 		(nativeerrnum==-1224 && errnum==220)) {
-printf("dead connection\n");
 		*liveconnection=false;
 	} else {
 		*liveconnection=true;
