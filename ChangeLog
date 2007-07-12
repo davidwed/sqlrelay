@@ -48,6 +48,7 @@
 	mysql connection calls commit() before running the first query after
 		each new client connection
 	fixed a crash in the router involving "fake begin's"
+	documented msql transaction weirdness and db2 relogin issues
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection
