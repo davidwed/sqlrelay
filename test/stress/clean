@@ -1,1 +1,1 @@
-rm -f query forktest threadtest querytest cursortest timeouttest cachefile*
+rm -f query forktest threadtest querytest cursortest timeouttest cachefile* socketeater
