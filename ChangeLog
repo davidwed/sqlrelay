@@ -49,6 +49,7 @@
 		each new client connection
 	fixed a crash in the router involving "fake begin's"
 	documented msql transaction weirdness and db2 relogin issues
+	added /opt/csw to configure script search path
 
 0.38 - implemented mysql_stmt function support in mysql connection
 	fixed mysql_autocommit detection

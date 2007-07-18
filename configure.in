@@ -787,29 +787,40 @@ echo "***** Summary ***********************************************"
 
 echo " Version      : $SQLR_VERSION"
 
-APIS=" API's        : C++  C  "
+PERLBUILD="no "
+PYTHONBUILD="no "
+ZOPEBUILD="no "
+RUBYBUILD="no "
+PHPBUILD="no "
+JAVABUILD="no "
+TCLBUILD="no "
 if ( test -n "$HAVE_PERL" ); then
-	APIS=$APIS"Perl  "
+	PERLBUILD="yes"
 fi
 if ( test -n "$HAVE_PYTHON" ); then
-	APIS=$APIS"Python  "
+	PYTHONBUILD="yes"
 fi
 if ( test -n "$HAVE_ZOPE" ); then
-	APIS=$APIS"Zope  "
+	ZOPEBUILD="yes"
 fi
 if ( test -n "$HAVE_RUBY" ); then
-	APIS=$APIS"Ruby  "
+	RUBYBUILD="yes"
 fi
 if ( test -n "$HAVE_PHP" ); then
-	APIS=$APIS"PHP  "
+	PHPBUILD="yes"
 fi
 if ( test -n "$HAVE_JAVA" ); then
-	APIS=$APIS"Java  "
+	JAVABUILD="yes"
 fi
 if ( test -n "$HAVE_TCL" ); then
-	APIS=$APIS"TCL "
+	TCLBUILD="yes"
 fi
 echo "$APIS"
+echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
+echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
+echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
+echo "                TCP         $TCLBUILD           Zope       $ZOPEBUILD"
+echo ""
 
 ORACLE8BUILD="no     "
 MYSQLBUILD="no     "
@@ -903,7 +914,7 @@ echo "Thanks to MP3.com for sponsoring:"
 echo "	Clustered/Replicated database support."
 echo "	Perl API."
 echo "Thanks to FeedLounge for sponsoring:"
-echo "  Query routing and filtering."
+echo "	Query routing and filtering."
 echo
 
 if ( test -n "$PYTHONVERSION" )

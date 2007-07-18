@@ -46,6 +46,22 @@ and change line 31 from:</p>
 
 <blockquote>GHashTable *mdb_backends;</blockquote>
 
+<p>Some newer CVS versions of mdbtools have a bug where mdbtools.h contain the
+line:</p>
+
+<blockquote>
+#include &lt;config.h&gt;
+</blockquote>
+
+<p>But no config.h file is provided by the package.  Comment out that line:</p>
+
+<blockquote>
+/*#include &lt;config.h&gt;*/
+</blockquote>
+
+<p>Not doing so will cause SQLRelay's configure script to fail to determine
+the number of parameters that the function mdb_col_to_string has.</p>
+
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>
 

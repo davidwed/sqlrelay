@@ -15,7 +15,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifdef MYSQL_OPT_RECONNECT
 const my_bool	mysqlconnection::mytrue=TRUE;
+#endif
 
 mysqlconnection::mysqlconnection() : sqlrconnection_svr() {
 	connected=false;
@@ -128,9 +130,31 @@ bool mysqlconnection::logIn(bool printerrors) {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	// fake binds when connected to older servers
+#ifdef HAVE_MYSQL_GET_SERVER_VERSION
 	if (mysql_get_server_version(&mysql)<40102) {
 		fakebinds=true;
 	}
+#else
+	char		**list;
+	uint64_t	listlen;
+	charstring::split(mysql_get_server_info(&mysql),
+				".",true,&list,&listlen);
+
+	if (listlen==3) {
+		uint64_t	major=charstring::toUnsignedInteger(list[0]);
+		uint64_t	minor=charstring::toUnsignedInteger(list[1]);
+		uint64_t	patch=charstring::toUnsignedInteger(list[2]);
+		if (major>4 || (major==4 && minor>1) ||
+				(major==4 && minor==1 && patch>=2)) {
+			fakebinds=true;
+		} 
+		for (uint64_t index=0; index<listlen; index++) {
+			delete[] list[index];
+		}
+		delete[] list;
+	}
+#endif
+
 #endif
 	return true;
 }
@@ -168,7 +192,7 @@ const char *mysqlconnection::identify() {
 
 const char *mysqlconnection::dbVersion() {
 	delete[] dbversion;
-	dbversion=charstring::parseNumber(mysql_get_server_version(&mysql));
+	dbversion=charstring::duplicate(mysql_get_server_info(&mysql));
 	return dbversion;
 }
 

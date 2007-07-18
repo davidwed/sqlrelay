@@ -671,7 +671,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].length)
 					#else
-					&(col[i].length)
+					(SQLINTEGER *)&(col[i].length)
 					#endif
 					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -684,7 +684,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].type)
 					#else
-					&(col[i].type)
+					(SQLINTEGER *)&(col[i].type)
 					#endif
 					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -697,7 +697,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].precision)
 					#else
-					&(col[i].precision)
+					(SQLINTEGER *)&(col[i].precision)
 					#endif
 					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -710,7 +710,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].scale)
 					#else
-					&(col[i].scale)
+					(SQLINTEGER *)&(col[i].scale)
 					#endif
 					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -723,7 +723,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].nullable)
 					#else
-					&(col[i].nullable)
+					(SQLINTEGER *)&(col[i].nullable)
 					#endif
 					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -742,7 +742,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].unsignednumber)
 					#else
-					&(col[i].unsignednumber)
+					(SQLINTEGER *)&(col[i].unsignednumber)
 					#endif
 					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -759,7 +759,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].autoincrement)
 					#else
-					&(col[i].autoincrement)
+					(SQLINTEGER *)&(col[i].autoincrement)
 					#endif
 					);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {

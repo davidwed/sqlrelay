@@ -149,7 +149,9 @@ class mysqlconnection : public sqlrconnection_svr {
 
 		char	*dbversion;
 
+#ifdef MYSQL_OPT_RECONNECT
 		static const my_bool	mytrue;
+#endif
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		fakebinds;

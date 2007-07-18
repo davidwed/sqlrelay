@@ -73,6 +73,9 @@
 /* MySQL supports FIELD_TYPE_YEAR */
 #undef HAVE_MYSQL_FIELD_TYPE_YEAR
 
+/* MySQL supports MYSQL_GET_SERVER_VERSION */
+#undef HAVE_MYSQL_GET_SERVER_VERSION
+
 /* MySQL supports mysql_next_result */
 #undef HAVE_MYSQL_NEXT_RESULT
 

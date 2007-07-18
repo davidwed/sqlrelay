@@ -1,6 +1,5 @@
-db2 first query fails and forces relogin unless detached first
-		which causes problems if reloginatstart is not set
-	using tcp connections fixes this
+mysql 4.0.24 doesn't have mysql_get_server_version
+		it has mysql_get_server_info
 
 cygwin:
 	handoff="pass" doesn't work
@@ -43,17 +42,7 @@ solaris 9:
 		link directly against the .so file
 
 solaris 10:
-	ruby install fails
-
-openbsd-3.8
-	handoff="pass" doesn't work
-
-openbsd-4
-	perl doesn't build
-
-Tru64 -
-	unix sockets don't work, looks like a byte-order translation issue
-	can't start more than 1 cursor, looks like out-of-memory
+	need to strip out some commands from ruby api build command
 
 Tests:
 	php pear db bind formats
@@ -101,6 +90,9 @@ Documentation:
 	* performance benchmark charts
 
 Performance/Code Enhancements:
+	* db2 first query fails and forces relogin unless detached first
+		which causes problems if reloginatstart is not set
+		using tcp connections fixes this but is slower
 	* Don't fork listener children, use listen() backlog instead
 		linux:
 			looks like max is 128 on linux 2.0
@@ -277,6 +269,10 @@ backends:
 	qpopper port
 	bugzilla port
 	litesql
+	dovecot
+	courier
+	exim
+	freeradius
 
 API's:
 	JDBC
