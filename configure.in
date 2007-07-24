@@ -496,11 +496,18 @@ LIBS="$HISTORYLIB $TERMCAPLIB"
 AC_CHECK_LIB(readline,readline,READLINELIB="-lreadline" ,READLINELIB="")
 LIBS=$PRELIBS
 
-if ( test -n "$READLINELIB" ); then
-	AC_DEFINE_UNQUOTED(HAVE_READLINE,1,Do we have readline)
+if ( test -n "$READLINELIB" )
+then
 	READLINELIB="$READLINELIB $HISTORYLIB $TERMCAPLIB"
 fi
+
+FW_TRY_COMPILE([#include <stdlib.h>],[extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }  readline(NULL);],[$READLINELIB],[],[READLINELIB=""])
 AC_SUBST(READLINELIB)
+
+if ( test -n "$READLINELIB" )
+then
+	AC_DEFINE_UNQUOTED(HAVE_READLINE,1,Do we have readline)
+fi
 
 FW_CHECK_SOCKET_LIBS
 AC_CHECK_LIB(dl,dlopen,DLLIB=-ldl,DLLIB="")
@@ -819,7 +826,7 @@ echo "$APIS"
 echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
-echo "                TCP         $TCLBUILD           Zope       $ZOPEBUILD"
+echo "                TCL         $TCLBUILD           Zope       $ZOPEBUILD"
 echo ""
 
 ORACLE8BUILD="no     "

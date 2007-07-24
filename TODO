@@ -1,6 +1,3 @@
-mysql 4.0.24 doesn't have mysql_get_server_version
-		it has mysql_get_server_info
-
 cygwin:
 	handoff="pass" doesn't work
 	how to use with non-cygwin dll's?
@@ -41,8 +38,9 @@ solaris 9:
 		links fine, works after manually modifying config.mk to
 		link directly against the .so file
 
-solaris 10:
-	need to strip out some commands from ruby api build command
+osx:
+	looks like OSX's native PHP is messed up
+	_history_truncate_file undefined in -lreadline, -lhistory missing
 
 Tests:
 	php pear db bind formats

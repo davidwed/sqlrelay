@@ -330,6 +330,9 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
+/* Some systems use SQLLEN * in SQLBindCol */
+#undef SQLBINDCOL_SQLLEN
+
 /* Some systems use SQLLEN * in SQLBINDPARAMETER */
 #undef SQLBINDPARAMETER_SQLLEN
 

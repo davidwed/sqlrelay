@@ -5,7 +5,7 @@ include ../../../config.mk
 .PHONY: all clean rebuild install uninstall
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
+LIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)

@@ -1535,34 +1535,57 @@ then
 		HAVE_IODBC=""
 		HAVE_UNIXODBC=""
 
-		FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[ODBCINCLUDES],[ODBCLIBS],[ODBCLIBSPATH],[UNIXODBCSTATIC])
+		UNIXODBCLIBS=""
+		UNIXODBCLIBSPATH=""
+		UNIXODBCSTATIC=""
+		UNIXODBCINCLUDES=""
 
-		if ( test -n "$ODBCLIBS" )
+		IODBCLIBS=""
+		IODBCLIBSPATH=""
+		IODBCSTATIC=""
+		IODBCINCLUDES=""
+
+		IODBCINSTLIBS=""
+		IODBCINSTLIBSPATH=""
+		IODBCINSTSTATIC=""
+		IODBCINSTINCLUDES=""
+
+		FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINCLUDES],[UNIXODBCLIBS],[UNIXODBCLIBSPATH],[UNIXODBCSTATIC])
+
+		if ( test -n "$UNIXODBCLIBS" )
 		then
 			HAVE_UNIXODBC="yes"
-		else
-			FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[iodbc],[sql.h],[iodbc],[$STATICFLAG],[$RPATHFLAG],[ODBCINCLUDES],[ODBCLIBS],[ODBCLIBSPATH],[IODBCSTATIC])
-			if ( test -n "$ODBCLIBS" )
-			then
-				HAVE_IODBC="yes"
-			fi
+		fi
+
+		FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[iodbc],[sql.h],[iodbc],[$STATICFLAG],[$RPATHFLAG],[IODBCINCLUDES],[IODBCLIBS],[IODBCLIBSPATH],[IODBCSTATIC])
+		if ( test -n "$IODBCLIBS" )
+		then
+			FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[iodbcinst],[sql.h],[iodbcinst],[$STATICFLAG],[$RPATHFLAG],[IODBCINSTINCLUDES],[IODBCINSTLIBS],[IODBCINSTLIBSPATH],[IODBCINSTSTATIC])
+			HAVE_IODBC="yes"
 		fi
 
 		if ( test -n "$MICROSOFT" -a -z "$ODBCLIBS" )
 		then
 			FW_CHECK_HEADER_LIB([/usr/include/w32api/sql.h],[],[/usr/lib/w32api/libodbc32.$SOSUFFIX],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"],[/usr/lib/w32api/libodbc32.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"])
 		fi
+
+		if ( test -n "$HAVE_IODBC" )
+		then
+			ODBCLIBS="$IODBCLIBS $IODBCINSTLIBS"
+			ODBCINCLUDES="$IODBCINCLUDES $IODBCINSTINCLUDES"
+			ODBCLIBSPATH="$IODBCLIBSPATH"
+			ODBCSTATIC="$IODBCSTATIC"
+		elif ( test -n "$HAVE_UNIXODBC" )
+		then
+			ODBCLIBS="$UNIXODBCLIBS"
+			ODBCINCLUDES="$UNIXODBCINCLUDES"
+			ODBCLIBSPATH="$UNIXODBCLIBSPATH"
+			ODBCSTATIC="$UNIXODBCSTATIC"
+		fi
 		
 		AC_SUBST(ODBCINCLUDES)
 		AC_SUBST(ODBCLIBS)
 		AC_SUBST(ODBCLIBSPATH)
-
-		if ( test -n "`echo $ODBCLIBS | grep iodbc`" )
-		then
-			ODBCSTATIC="$IODBCSTATIC"
-		else
-			ODBCSTATIC="$UNIXODBCSTATIC"
-		fi
 		AC_SUBST(ODBCSTATIC)
 		
 		if ( test -n "$HAVE_UNIXODBC" )
@@ -1603,12 +1626,18 @@ then
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLColAttribute(0,0,0,0,0,0,(SQLLEN *)NULL);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLCOLATTRIBUTE_SQLLEN,1,Some systems use SQLLEN * in SQLColAttribute)],[AC_MSG_RESULT(no)])
-		
+
 		AC_MSG_CHECKING(if SQLRowCount takes SQLLEN * argument)
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLRowCount(0,(SQLLEN *)0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLROWCOUNT_SQLLEN,1,Some systems use SQLLEN * in SQLRowCount)],[AC_MSG_RESULT(no)])
+		
+		AC_MSG_CHECKING(if SQLBindCol takes SQLLEN * argument)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>],[SQLBindCol(0,0,0,0,0,(SQLLEN *)0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLBINDCOL_SQLLEN,1,Some systems use SQLLEN * in SQLBindCol)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(odbc,[$ODBCINCLUDES])
@@ -1901,15 +1930,21 @@ then
 				done
 			fi
 		fi
-		if ( test -n "$PERL" -a -n "$CYGWIN" )
+
+		dnl for cygwin and mac os x add -lperl
+		if ( test -n "$PERL" )
 		then
-			DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
-			for dir in $DIRS
-			do
-echo "checking $dir"
-				FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIB=\"-L$dir/CORE -lperl\"])
-			done
+			if ( test -n "$CYGWIN" -o "$UNAME" = "Darwin" )
+			then
+				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+				for dir in $DIRS
+				do
+					echo "checking $dir"
+					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIB=\"-L$dir/CORE -lperl\"])
+				done
+			fi
 		fi
+
 		if ( test -n "$PERL" )
 		then
 			HAVE_PERL="yes"
@@ -2000,10 +2035,16 @@ then
 				do
 					if ( test -d "$i/config" )
 					then
+						dnl for cygwin and mac os x
+						dnl add -lpython
 						if ( test -n "$CYGWIN" -a -r "$i/config/libpython$j.dll.a" )
 						then
 							PYTHONDIR="$i"
 							PYTHONLIB="-L$PYTHONDIR/config -lpython$j"
+						elif ( test "$UNAME" = "Darwin" )
+						then
+							PYTHONDIR="$i"
+							PYTHONLIB="-lpython$j"
 						else
 							PYTHONDIR="$i"
 						fi
@@ -2164,7 +2205,8 @@ then
 			if ( test -n "$RUBY" )
 			then
 				HAVE_RUBY="yes"
-				if ( test -n "$CYGWIN" )
+				dnl for cygwin and OSX include -lruby
+				if ( test -n "$CYGWIN" -o "$UNAME" = "Darwin" )
 				then
 					RUBYLIB="-lruby"
 				fi
@@ -2339,6 +2381,12 @@ then
 			HAVE_PHP=""
 			AC_MSG_WARN(The PHP API will not be built.)
 		fi
+
+		dnl on os x add -lphp
+		if ( test -n "$PHPCONFIG" -a "$UNAME" = "Darwin" )
+		then
+			PHPLIB="-lphp"
+		fi
 	fi
 
 	FW_INCLUDES(php,[$PHPINCLUDES])
@@ -2353,6 +2401,7 @@ then
 	AC_SUBST(PHPEXTDIR)
 	AC_SUBST(PHPVERSION)
 	AC_SUBST(PHPMAJORVERSION)
+	AC_SUBST(PHPLIB)
 fi
 ])
 
@@ -2458,6 +2507,7 @@ then
 				done
 			done
 		fi
+
 		dnl if we didn't find it, look for a dynamic libtclstub
 		if ( test -n "$TCLINCLUDE " -a -z "$TCLLIB" )
 		then
@@ -2469,6 +2519,15 @@ then
 				done
 			done
 		fi
+
+		dnl translate /path/libtcl.*.$SOSUFFIX to -Lpath -ltcl.*
+		if ( test -n "$TCLLIB" )
+		then
+			LIBPATH=`dirname $TCLLIB`
+			LIBITSELF=`basename $TCLLIB .$SOSUFFIX | sed -e "s/^lib//"`
+			TCLLIB="-L$LIBPATH -l$LIBITSELF"
+		fi
+
 		if ( test -z "$TCLLIB" )
 		then
 			AC_MSG_WARN("The TCL API will not be installed.")

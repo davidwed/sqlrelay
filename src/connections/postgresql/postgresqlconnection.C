@@ -165,7 +165,7 @@ const char *postgresqlconnection::identify() {
 
 const char *postgresqlconnection::dbVersion() {
 	delete[] dbversion;
-	dbversion=charstring::parseNumber(PQserverVersion(pgconn));
+	dbversion=charstring::parseNumber((uint64_t)PQserverVersion(pgconn));
 	return dbversion;
 }
 
