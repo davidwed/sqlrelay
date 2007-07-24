@@ -436,8 +436,6 @@ bool odbccursor::inputBindString(const char *variable,
 				valuesize,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)isnull
-				#elif defined(SQLBINDPARAMETER_LONG)
-				(long *)isnull
 				#else
 				(SQLINTEGER *)isnull
 				#endif
@@ -454,8 +452,6 @@ bool odbccursor::inputBindString(const char *variable,
 				valuesize,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)NULL
-				#elif defined(SQLBINDPARAMETER_LONG)
-				(long *)NULL
 				#else
 				(SQLINTEGER *)NULL
 				#endif
@@ -668,8 +664,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					(SQLSMALLINT *)&(col[i].namelength),
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)NULL
-					#elif defined(SQLCOLATTRIBUTE_LONG)
-					(unsigned long *)NULL
 					#else
 					NULL
 					#endif
@@ -686,8 +680,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					NULL,0,NULL,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].length)
-					#elif defined(SQLCOLATTRIBUTE_LONG)
-					(unsigned long *)NULL
 					#else
 					(SQLINTEGER *)&(col[i].length)
 					#endif
@@ -701,8 +693,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					NULL,0,NULL,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].type)
-					#elif defined(SQLCOLATTRIBUTE_LONG)
-					(unsigned long *)NULL
 					#else
 					(SQLINTEGER *)&(col[i].type)
 					#endif
@@ -716,8 +706,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					NULL,0,NULL,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].precision)
-					#elif defined(SQLCOLATTRIBUTE_LONG)
-					(unsigned long *)NULL
 					#else
 					(SQLINTEGER *)&(col[i].precision)
 					#endif
@@ -731,8 +719,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					NULL,0,NULL,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].scale)
-					#elif defined(SQLCOLATTRIBUTE_LONG)
-					(unsigned long *)NULL
 					#else
 					(SQLINTEGER *)&(col[i].scale)
 					#endif
@@ -746,8 +732,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					NULL,0,NULL,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].nullable)
-					#elif defined(SQLCOLATTRIBUTE_LONG)
-					(unsigned long *)NULL
 					#else
 					(SQLINTEGER *)&(col[i].nullable)
 					#endif
@@ -767,8 +751,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					NULL,0,NULL,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].unsignednumber)
-					#elif defined(SQLCOLATTRIBUTE_LONG)
-					(unsigned long *)NULL
 					#else
 					(SQLINTEGER *)&(col[i].unsignednumber)
 					#endif
@@ -786,8 +768,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 					NULL,0,NULL,
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)&(col[i].autoincrement)
-					#elif defined(SQLCOLATTRIBUTE_LONG)
-					(unsigned long *)NULL
 					#else
 					(SQLINTEGER *)&(col[i].autoincrement)
 					#endif
@@ -884,8 +864,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 //				field[i],MAX_ITEM_BUFFER_SIZE,
 //				#ifdef SQLBINDCOL_SQLLEN
 //				(SQLLEN *)&indicator[i]
-//				#elif defined(SQLBINDCOL_LONG)
-//				(long *)&indicator[i]
 //				#else
 //				(SQLINTEGER *)&indicator[i]
 //				#endif
@@ -905,8 +883,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 				field[i],MAX_ITEM_BUFFER_SIZE,
 				#ifdef SQLBINDCOL_SQLLEN
 				(SQLLEN *)&indicator[i]
-				#elif defined(SQLBINDCOL_LONG)
-				(long *)&indicator[i]
 				#else
 				(SQLINTEGER *)&indicator[i]
 				#endif
@@ -925,8 +901,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 						field[i],MAX_ITEM_BUFFER_SIZE,
 						#ifdef SQLBINDCOL_SQLLEN
 						(SQLLEN *)&indicator[i]
-						#elif defined(SQLBINDCOL_LONG)
-						(long *)&indicator[i]
 						#else
 						(SQLINTEGER *)&indicator[i]
 						#endif
@@ -941,8 +915,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 						field[i],MAX_ITEM_BUFFER_SIZE,
 						#ifdef SQLBINDCOL_SQLLEN
 						(SQLLEN *)&indicator[i]
-						#elif defined(SQLBINDCOL_LONG)
-						(long *)&indicator[i]
 						#else
 						(SQLINTEGER *)&indicator[i]
 						#endif
