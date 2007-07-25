@@ -33589,7 +33589,6 @@ fi
 				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
 				for dir in $DIRS
 				do
-					echo "checking $dir"
 
 if ( test -r ""$dir/CORE/libperl.$SOSUFFIX"" )
 then
