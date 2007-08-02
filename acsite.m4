@@ -1108,6 +1108,9 @@ then
 		AC_MSG_CHECKING(if PostgreSQL has PQexecPrepared)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQexecPrepared(NULL,NULL,0,NULL,NULL,NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQEXECPREPARED,1,Some versions of postgresql have PQexecPrepared)],[AC_MSG_RESULT(no)])
+		AC_MSG_CHECKING(if PostgreSQL has PQserverVersion)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQserverVersion(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSERVERVERSION,1,Some versions of postgresql have PQserverVersion)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(postgresql,[$POSTGRESQLINCLUDES])
@@ -1638,6 +1641,13 @@ then
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLBindCol(0,0,0,0,0,(SQLLEN *)0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLBINDCOL_SQLLEN,1,Some systems use SQLLEN * in SQLBindCol)],[AC_MSG_RESULT(no)])
+		
+		dnl for now, if SQLConnectW isn't defined, disable ODBC
+		AC_MSG_CHECKING(for SQLConnectW)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>],[SQLConnectW(0,NULL,0,NULL,0,NULL,0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLCONNECTW,1,Some systems have SQLConnectW)],[AC_MSG_RESULT(no); ODBCLIBS=""; OBBCINCLUDES=""])
 	fi
 
 	FW_INCLUDES(odbc,[$ODBCINCLUDES])
@@ -2523,7 +2533,7 @@ then
 		if ( test -n "$TCLLIB" )
 		then
 			LIBPATH=`dirname $TCLLIB`
-			LIBITSELF=`basename $TCLLIB .$SOSUFFIX | sed -e "s/^lib//"`
+			LIBITSELF=`basename $TCLLIB | sed -e "s/^lib//" -e "s/\.$SOSUFFIX.*//"`
 			TCLLIB="-L$LIBPATH -l$LIBITSELF"
 		fi
 

@@ -1,46 +1,8 @@
-cygwin:
-	handoff="pass" doesn't work
-	how to use with non-cygwin dll's?
-	how to install as a service?
-	languages:
-		VB wrapper
-		how to build a php extension?
-			1) need php source 
-		active state python
-			http://sebsauvage.net/python/mingw.html
-		non-cygwin ruby
-			creates funny CFLAGS
-		active state perl
-			PERL5LIB env var points to Oracle's perl installation
-			perl -V:prefix return C:\Perl
-		active state tcl
-			no doubt will have similar problems...
-			-I/cygdrive/Tcl/include
-			-L/cygdrive/c/Tcl/lib -ltcl84 -ltclstub84
-		zope
-			/cygdrive/c/Program Files/Zope-2.7.1/lib/python/Products
-	databases:
-		sqlite
-			.dll and .def file wherever
-	doc
-		installing packages
-		optional cygwin components
-		running sqlrelay clients
-		add path to mysql dll to PATH
+some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
+		use non-unicode for them
 
-solaris 8:
-	libgcc_s not found
-
-solaris 9:
-	tries to look in /opt/sfw/lib/mysql/.libs for libmysqlclient
-		(libtool looks in .libs if -Lpath doesn't end in lib)
-		but it works on other platforms...?
-		links fine, works after manually modifying config.mk to
-		link directly against the .so file
-
-osx:
-	looks like OSX's native PHP is messed up
-	_history_truncate_file undefined in -lreadline, -lhistory missing
+some versions of Postgres don't have PQServerVersion,
+			maybe can use PQconninfoOption?
 
 Tests:
 	php pear db bind formats
