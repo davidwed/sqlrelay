@@ -126,6 +126,7 @@ sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
 	colcount=0;
 	currentcol=0;
 	numbercolumn=NULL;
+	infield=false;
 	fieldcount=0;
 }
 
@@ -138,6 +139,7 @@ sqlrimport::~sqlrimport() {
 }
 
 bool sqlrimport::tagStart(const char *name) {
+printf("tag start: %s\n",name);
 	if (!charstring::compare(name,"table")) {
 		return tableTagStart();
 	} else if (!charstring::compare(name,"sequence")) {
@@ -157,12 +159,14 @@ bool sqlrimport::tagStart(const char *name) {
 }
 
 bool sqlrimport::attributeName(const char *name) {
+printf("attr name: %s\n",name);
 	delete[] currentattribute;
 	currentattribute=charstring::duplicate(name);
 	return true;
 }
 
 bool sqlrimport::attributeValue(const char *value) {
+printf("attr val: %s\n",value);
 	switch (currenttag) {
 		case TABLETAG:
 			if (!charstring::compare(currentattribute,"name")) {
@@ -212,6 +216,7 @@ bool sqlrimport::attributeValue(const char *value) {
 }
 
 bool sqlrimport::tagEnd(const char *name) {
+printf("tag end: %s\n",name);
 	if (!charstring::compare(name,"table")) {
 		return tableTagEnd();
 	} else if (!charstring::compare(name,"sequence")) {
@@ -388,21 +393,31 @@ bool sqlrimport::fieldTagEnd() {
 }
 
 bool sqlrimport::text(const char *string) {
+printf("text...\n");
 	if (infield) {
+printf("1\n");
 		if (charstring::length(string)) {
+printf("	1\n");
 			if (!numbercolumn[currentcol]) {
 				query.append('\'');
 			}
+printf("	1\n");
 			unescapeField(&query,string);
+printf("	1\n");
 			if (!numbercolumn[currentcol]) {
 				query.append('\'');
 			}
+printf("	1\n");
 		} else {
+printf("	2\n");
 			query.append("NULL");
+printf("	2\n");
 		}
+printf("1\n");
 		if (currentcol<colcount-1) {
 			query.append(",");
 		}
+printf("1\n");
 	}
 	return true;
 }
@@ -496,7 +511,6 @@ int main(int argc, const char **argv) {
 			exit(1);
 		}
 	}
-
 
 
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
