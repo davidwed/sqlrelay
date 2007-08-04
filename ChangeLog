@@ -1,3 +1,6 @@
+0.39.1 - fixed readline detection in configure script
+	fixed an uninitialized variable in sqlr-import
+
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init
 	added some more error codes to oracle's dead connection test

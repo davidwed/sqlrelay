@@ -21210,7 +21210,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }  readline(NULL);
+extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); readline(NULL);
   ;
   return 0;
 }

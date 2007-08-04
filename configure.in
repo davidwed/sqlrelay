@@ -501,7 +501,7 @@ then
 	READLINELIB="$READLINELIB $HISTORYLIB $TERMCAPLIB"
 fi
 
-FW_TRY_COMPILE([#include <stdlib.h>],[extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }  readline(NULL);],[$READLINELIB],[],[READLINELIB=""])
+FW_TRY_COMPILE([#include <stdlib.h>],[extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); readline(NULL);],[$READLINELIB],[],[READLINELIB=""])
 AC_SUBST(READLINELIB)
 
 if ( test -n "$READLINELIB" )

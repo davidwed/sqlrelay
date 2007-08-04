@@ -126,6 +126,7 @@ sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
 	colcount=0;
 	currentcol=0;
 	numbercolumn=NULL;
+	infield=false;
 	fieldcount=0;
 }
 
