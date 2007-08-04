@@ -19,7 +19,7 @@ void sqlrconnection_svr::clientSession() {
 		// is this a query, fetch, abort, suspend or resume...
 		uint16_t	command;
 		if (!getCommand(&command)) {
-			endSession();
+			endSessionCommand();
 			break;
 		}
 
@@ -94,7 +94,7 @@ void sqlrconnection_svr::clientSession() {
 				break;
 			}
 		} else {
-			endSession();
+			endSessionCommand();
 			break;
 		}
 	}
