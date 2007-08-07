@@ -1,3 +1,7 @@
+0.39.2 - changed clientSession() to call endSessionCommand()
+		instead of endSession() so endSessionInternal() would be called
+		every time
+
 0.39.1 - fixed readline detection in configure script
 	fixed an uninitialized variable in sqlr-import
 
