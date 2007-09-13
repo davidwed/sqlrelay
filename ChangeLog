@@ -1,3 +1,5 @@
+0.39.4 - output bind variables' null indicator is reset now
+
 0.39.3 - set dbversion to unknown if sp_version wasn't found in freetds/sybase
 
 0.39.2 - changed clientSession() to call endSessionCommand()

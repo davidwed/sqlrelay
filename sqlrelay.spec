@@ -30,7 +30,7 @@
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.39.3
+Version: 0.39.4
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
