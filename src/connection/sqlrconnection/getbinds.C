@@ -116,6 +116,9 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			curs->busy=true;
 			bv->value.cursorid=curs->id;
 		}
+
+		// init the null indicator
+		bv->isnull=nonNullBindValue();
 	}
 
 	#ifdef SERVER_DEBUG
