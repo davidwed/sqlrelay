@@ -184,7 +184,7 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id, const char *config,
 	printf("\nStarting scaler:\n");
 	
 	stringbuffer	command;
-	command.append("sqlr-scaler ")->append(" -id ")->append(id);
+	command.append("sqlr-scaler")->append(" -id ")->append(id);
 	if (connectiondebug) {
 		command.append(" -debug ");
 	}

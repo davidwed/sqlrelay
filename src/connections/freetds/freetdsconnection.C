@@ -411,9 +411,8 @@ bool freetdscursor::openCursor(uint16_t id) {
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true) &&
 				fetchRow())) {
-			bool	live;
-			fprintf(stderr,"%s\n",errorMessage(&live));
-			retval=false;
+			freetdsconn->dbversion=
+				charstring::duplicate("unknown");
 		} else {
 			const char	*space=
 				charstring::findFirst(data[1][0],' ');

@@ -6,7 +6,7 @@ package SQLRelay::Connection;
 require DynaLoader;
 @ISA = 'DynaLoader';
 
-$VERSION = '0.39';
+$VERSION = '0.40';
 
 bootstrap SQLRelay::Connection $VERSION;
 

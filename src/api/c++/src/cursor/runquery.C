@@ -306,6 +306,31 @@ void sqlrcursor::sendOutputBinds() {
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint(outbindvars[i].variable);
+			const char	*bindtype=NULL;
+			switch (outbindvars[i].type) {
+				case NULL_BIND:
+					bindtype="(NULL)";
+					break;
+				case STRING_BIND:
+					bindtype="(STRING)";
+					break;
+				case INTEGER_BIND:
+					bindtype="(INTEGER)";
+					break;
+				case DOUBLE_BIND:
+					bindtype="(DOUBLE)";
+					break;
+				case BLOB_BIND:
+					bindtype="(BLOB)";
+					break;
+				case CLOB_BIND:
+					bindtype="(CLOB)";
+					break;
+				case CURSOR_BIND:
+					bindtype="(CURSOR)";
+					break;
+			}
+			sqlrc->debugPrint(bindtype);
 			if (outbindvars[i].type==STRING_BIND ||
 				outbindvars[i].type==BLOB_BIND ||
 				outbindvars[i].type==CLOB_BIND ||

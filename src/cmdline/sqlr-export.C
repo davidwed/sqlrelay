@@ -102,12 +102,13 @@ int main(int argc, const char **argv) {
 					i++;
 					continue;
 				}
-				if (!charstring::compare(argv[i],"debug")) {
-					continue;
-				}
 				objecttype=argv[i];
 				object=argv[i+1];
 				break;
+			}
+			if (!charstring::compare(argv[argc-1],"debug") &&
+				charstring::compare(object,"debug")) {
+				debug=true;
 			}
 		} else {
 			exit(1);

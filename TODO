@@ -1,3 +1,8 @@
+add methods to get version of client
+
+MS SQL Server doesn't have an sp_version stored procedure (or may not have one)
+	and the freetds connection uses tons of ram if it can't find it
+
 some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
 		use non-unicode for them
 

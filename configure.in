@@ -501,7 +501,7 @@ then
 	READLINELIB="$READLINELIB $HISTORYLIB $TERMCAPLIB"
 fi
 
-FW_TRY_COMPILE([#include <stdlib.h>],[extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }  readline(NULL);],[$READLINELIB],[],[READLINELIB=""])
+FW_TRY_COMPILE([#include <stdlib.h>],[extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); readline(NULL);],[$READLINELIB],[],[READLINELIB=""])
 AC_SUBST(READLINELIB)
 
 if ( test -n "$READLINELIB" )
@@ -700,7 +700,7 @@ AC_SUBST(RPM_BUILD_DIR)
 
 
 dnl Default build variables.
-SQLR_VERSION="0.39"
+SQLR_VERSION="0.40"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
 dnl rules for CURRENT:REVISION:AGE version info:

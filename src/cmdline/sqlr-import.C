@@ -487,11 +487,12 @@ int main(int argc, const char **argv) {
 					i++;
 					continue;
 				}
-				if (!charstring::compare(argv[i],"debug")) {
-					continue;
-				}
 				file=argv[i];
 				break;
+			}
+			if (!charstring::compare(argv[argc-1],"debug") &&
+				charstring::compare(file,"debug")) {
+				debug=true;
 			}
 		} else {
 			exit(1);
