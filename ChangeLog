@@ -8,6 +8,12 @@
 	set dbversion to unknown if sp_version wasn't found in freetds/sybase
 	output bind variables' null indicator is reset now
 	updated postgresql typemangling
+	included Jesse Wagner's oracle 11g acsite patch
+	added +1 to inbindvars[i].valuesize for CLOB's to make sure the NULL
+		terminator is included
+	postgresql connection uses PQparameterStatus if PQserverVersion doesn't
+		exist and runs "select version()" if PQparameterStatus doesn't
+		exist; to get the db version
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init

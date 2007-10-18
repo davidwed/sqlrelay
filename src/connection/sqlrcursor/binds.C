@@ -48,7 +48,7 @@ bool sqlrcursor_svr::handleBinds() {
 			if (!inputBindClob(inbindvars[i].variable,
 				inbindvars[i].variablesize,
 				inbindvars[i].value.stringval,
-				inbindvars[i].valuesize,
+				inbindvars[i].valuesize+1,
 				&inbindvars[i].isnull)) {
 				return false;
 			}

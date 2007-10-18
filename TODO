@@ -1,13 +1,9 @@
-add methods to get version of client
+support mysql 5.1 with drop-in replacement lib
 
-MS SQL Server doesn't have an sp_version stored procedure (or may not have one)
-	and the freetds connection uses tons of ram if it can't find it
+add methods to get version of client
 
 some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
 		use non-unicode for them
-
-some versions of Postgres don't have PQServerVersion,
-			maybe can use PQconninfoOption?
 
 Tests:
 	php pear db bind formats

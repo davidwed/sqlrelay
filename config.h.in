@@ -112,6 +112,9 @@
 /* Some versions of postgresql have PQfmod */
 #undef HAVE_POSTGRESQL_PQFMOD
 
+/* Some versions of postgresql have PQparameterStatus */
+#undef HAVE_POSTGRESQL_PQPARAMETERSTATUS
+
 /* Some versions of postgresql have PQprepare */
 #undef HAVE_POSTGRESQL_PQPREPARE
 

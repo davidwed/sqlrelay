@@ -164,10 +164,47 @@ const char *postgresqlconnection::identify() {
 
 const char *postgresqlconnection::dbVersion() {
 	delete[] dbversion;
-#ifdef HAVE_POSTGRESQL_PQSERVERVERSION
+#if defined(HAVE_POSTGRESQL_PQSERVERVERSION)
 	dbversion=charstring::parseNumber((uint64_t)PQserverVersion(pgconn));
 #else
-	dbversion=charstring::duplicate("unknown");
+#if defined(HAVE_POSTGRESQL_PQPARAMETERSTATUS)
+	dbversion=charstring::duplicate(PQparameterStatus(pgconn,
+							"server_version"));
+#else
+	PGresult	*result=PQexec(pgconn,"select version()");
+	if (result==(PGresult *)NULL) {
+		return false;
+	}
+
+	const char	*versionstring=PQgetvalue(result,0,0);
+	char		**list;
+	uint64_t	listlength;
+	charstring::split(versionstring," ",true,&list,&listlength);
+	if (listlength>=2) {
+		dbversion=list[1];
+		list[1]=NULL;
+	}
+	for (uint64_t i=0; i<listlength; i++) {
+		delete[] list[i];
+	}
+	delete[] list;
+
+	PQclear(result);
+#endif
+	char		**parts;
+	uint64_t	partslength;
+	charstring::split(dbversion,".",true,&parts,&partslength);
+	if (partslength==3) {
+		int64_t	minor=charstring::toInteger(parts[1]);
+		int64_t	patch=charstring::toInteger(parts[2]);
+		snprintf(dbversion,charstring::length(dbversion)+1,
+				"%s%02lld%02lld",
+				parts[0],(long long)minor,(long long)patch);
+	}
+	for (uint64_t i=0; i<partslength; i++) {
+		delete[] parts[i];
+	}
+	delete[] parts;
 #endif
 	return dbversion;
 }
