@@ -13,7 +13,7 @@
 
 extern "C" {
 
-//#define DEBUG_MESSAGES 1
+#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d: ",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
 	#define debugPrintf(args) printf(args); fflush(stdout);
@@ -34,7 +34,7 @@ typedef unsigned int		MYSQL_FIELD_OFFSET;
 enum enum_mysql_set_option { MYSQL_SET_OPTION_UNKNOWN_OPTION };
 enum mysql_option { MYSQL_OPTION_UNKNOWN_OPTION };
 
-// Taken directly from mysql_com.h version 5.0.0-alpha
+// Taken directly from mysql_com.h version 5.1.22
 // Back-compatible with all previous versions.
 enum enum_field_types { MYSQL_TYPE_DECIMAL, MYSQL_TYPE_TINY,
 			MYSQL_TYPE_SHORT,  MYSQL_TYPE_LONG,
@@ -85,7 +85,9 @@ struct MYSQL_FIELD {
 };
 #endif
 
-#if defined(COMPAT_MYSQL_4_1) || defined(COMPAT_MYSQL_5_0)
+#if defined(COMPAT_MYSQL_4_1) || \
+	defined(COMPAT_MYSQL_5_0) || \
+	defined(COMPAT_MYSQL_5_1)
 // taken directly from mysql.h - 4.1.1-alpha (5.0.0-alpha is the same)
 struct MYSQL_FIELD {
   char *name;                 /* Name of column */
@@ -108,9 +110,43 @@ struct MYSQL_FIELD {
   unsigned int decimals;      /* Number of decimals in field */
   unsigned int charsetnr;     /* Character set */
   enum enum_field_types type; /* Type of field. Se mysql_com.h for types */
+#ifdef COMPAT_MYSQL_5_1
+  // taken directly from mysql.h - 5.1.22
+  void *extension;
+#endif
 };
 #endif
 
+#ifdef COMPAT_MYSQL_5_1
+// taken from mysql.h - 5.1.22, modified
+typedef struct st_mysql_bind {
+  unsigned long	*length;          /* output length pointer */
+  my_bool       *is_null;	  /* Pointer to null indicator */
+  //void		*buffer;	  /* buffer to get/put data */
+  char		*buffer;
+  /* set this if you want to track data truncations happened during fetch */
+  my_bool       *error;
+  unsigned char *row_ptr;         /* for the current data position */
+  //void (*store_param_func)(NET *net, struct st_mysql_bind *param);
+  void (*store_param_func)(void *net, struct st_mysql_bind *param);
+  void (*fetch_result)(struct st_mysql_bind *, MYSQL_FIELD *,
+                       unsigned char **row);
+  void (*skip_result)(struct st_mysql_bind *, MYSQL_FIELD *,
+		      unsigned char **row);
+  /* output buffer length, must be set when fetching str/binary */
+  unsigned long buffer_length;
+  unsigned long offset;           /* offset position for char/binary fetch */
+  unsigned long	length_value;     /* Used if length is 0 */
+  unsigned int	param_number;	  /* For null count and error messages */
+  unsigned int  pack_length;	  /* Internal length for packed data */
+  enum enum_field_types buffer_type;	/* buffer type */
+  my_bool       error_value;      /* used if error is 0 */
+  my_bool       is_unsigned;      /* set if integer type is unsigned */
+  my_bool	long_data_used;	  /* If used with mysql_send_long_data */
+  my_bool	is_null_value;    /* Used if is_null is 0 */
+  void *extension;
+} MYSQL_BIND;
+#else
 // taken directly from mysql.h - 5.0
 struct MYSQL_BIND {
   unsigned long	*length;          /* output length pointer */
@@ -131,6 +167,7 @@ struct MYSQL_BIND {
   void (*store_param_func);/*(NET *net, struct MYSQL_BIND *param);*/
   void (*fetch_result);/*(struct MYSQL_BIND *, unsigned char **row);*/
 };
+#endif
 
 // This is the same for all versions of mysql that I've ever seen
 typedef char **MYSQL_ROW;
@@ -462,6 +499,9 @@ unsigned int mysql_get_proto_info(MYSQL *mysql) {
 	#ifdef COMPAT_MYSQL_5_0
 		return 14;
 	#endif
+	#ifdef COMPAT_MYSQL_5_1
+		return 10;
+	#endif
 }
 
 char *mysql_get_server_info(MYSQL *mysql) {
@@ -478,6 +518,9 @@ char *mysql_get_server_info(MYSQL *mysql) {
 	#endif
 	#ifdef COMPAT_MYSQL_5_0
 		return "5.0.0";
+	#endif
+	#ifdef COMPAT_MYSQL_5_1
+		return "5.1.22";
 	#endif
 }
 
@@ -497,6 +540,9 @@ unsigned long mysql_get_server_version(MYSQL *mysql) {
 	#endif
 	#ifdef COMPAT_MYSQL_5_0
 		return 50000;
+	#endif
+	#ifdef COMPAT_MYSQL_5_1
+		return 50122;
 	#endif
 }
 
@@ -1100,6 +1146,8 @@ static enum enum_field_types	mysqltypemap[]={
 	MYSQL_TYPE_LONGLONG,
 	// "DOUBLE PRECISION"
 	MYSQL_TYPE_DOUBLE,
+	// added by postgresql
+// FIXME: fix past here...
 	// "int2"
 	MYSQL_TYPE_SHORT,
 	// "_int2"

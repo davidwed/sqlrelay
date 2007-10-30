@@ -1,4 +1,9 @@
+get jdbc test suite working, implement jdbc driver
+
 support mysql 5.1 with drop-in replacement lib
+	column lengths are getting goofed in 5.1
+	strings aren't getting returned correctly
+	postgresql column types need to be fixed
 
 add methods to get version of client
 

@@ -18,7 +18,7 @@ ifeq ($(PSQLUSERPATH),yes)
 endif
 endif
 
-all: libmysql3sqlrelay.la libmysql40sqlrelay.la libmysql41sqlrelay.la libmysql50sqlrelay.la
+all: libmysql3sqlrelay.la libmysql40sqlrelay.la libmysql41sqlrelay.la libmysql50sqlrelay.la libmysql51sqlrelay.la
 
 .SUFFIXES: .lo
 
@@ -33,6 +33,9 @@ mysql41.lo: mysql.C
 
 mysql50.lo: mysql.C
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_0=1 -c $< -o $@
+
+mysql51.lo: mysql.C
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_1=1 -c $< -o $@
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -54,12 +57,16 @@ libmysql41sqlrelay.la: mysql.C mysql41.lo
 libmysql50sqlrelay.la: mysql.C mysql50.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql50.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
+libmysql51sqlrelay.la: mysql.C mysql51.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql51.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+
 install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libmysql3sqlrelay.la $(libdir)
 	$(LTINSTALL) libmysql40sqlrelay.la $(libdir)
 	$(LTINSTALL) libmysql41sqlrelay.la $(libdir)
 	$(LTINSTALL) libmysql50sqlrelay.la $(libdir)
+	$(LTINSTALL) libmysql51sqlrelay.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
@@ -67,3 +74,4 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql40sqlrelay.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql41sqlrelay.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql50sqlrelay.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql51sqlrelay.la
