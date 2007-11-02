@@ -13,9 +13,9 @@
 
 extern "C" {
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
-	#define debugFunction() printf("%s:%s():%d: ",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
+	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
 	#define debugPrintf(args) printf(args); fflush(stdout);
 #else
 	#define debugFunction() /* */
@@ -182,6 +182,7 @@ struct MYSQL_RES {
 	my_ulonglong		currentrow;
 	MYSQL_FIELD_OFFSET	currentfield;
 	MYSQL_FIELD		*fields;
+	unsigned long		*lengths;
 };
 
 struct MYSQL_STMT {
@@ -375,6 +376,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
 						user,passwd,0,1);
+//mysql->sqlrcon->debugOn();
 	mysql->sqlrcon->copyReferences();
 	mysql->currentstmt=NULL;
 	return mysql;
@@ -453,6 +455,9 @@ char *mysql_get_client_info() {
 	#ifdef COMPAT_MYSQL_5_0
 		return "5.0.0";
 	#endif
+	#ifdef COMPAT_MYSQL_5_1
+		return "5.1.22";
+	#endif
 }
 
 unsigned long mysql_get_client_version() {
@@ -473,6 +478,9 @@ unsigned long mysql_get_client_version() {
 	#endif
 	#ifdef COMPAT_MYSQL_5_0
 		return 50000;
+	#endif
+	#ifdef COMPAT_MYSQL_5_1
+		return 50122;
 	#endif
 }
 
@@ -723,6 +731,7 @@ void mysql_free_result(MYSQL_RES *result) {
 		delete result->sqlrcur;
 		if (result->fields) {
 			delete[] result->fields;
+			delete[] result->lengths;
 		}
 		delete result;
 	}
@@ -777,8 +786,12 @@ MYSQL_FIELD *mysql_fetch_field_direct(MYSQL_RES *result, unsigned int fieldnr) {
 
 unsigned long *mysql_fetch_lengths(MYSQL_RES *result) {
 	debugFunction();
-	return (unsigned long *)result->sqlrcur->
-				getRowLengths(result->previousrow);
+	uint32_t	*lengths=result->sqlrcur->
+					getRowLengths(result->previousrow);
+	for (uint32_t i=0; i<result->sqlrcur->colCount(); i++) {
+		result->lengths[i]=(unsigned long)lengths[i];
+	}
+	return result->lengths;
 }
 
 unsigned int mysql_field_count(MYSQL *mysql) {
@@ -912,6 +925,7 @@ MYSQL_STMT *mysql_prepare(MYSQL *mysql, const char *query,
 	stmt->result->sqlrcur->copyReferences();
 	stmt->result->errorno=0;
 	stmt->result->fields=NULL;
+	stmt->result->lengths=NULL;
 	stmt->result->sqlrcur->prepareQuery(query,length);
 	return stmt;
 }
@@ -1207,14 +1221,17 @@ int mysql_execute(MYSQL_STMT *stmt) {
 	int	retval=!sqlrcur->executeQuery();
 
 	delete[] stmt->result->fields;
+	delete[] stmt->result->lengths;
 
-	int	colcount=sqlrcur->colCount();
+	uint32_t	colcount=sqlrcur->colCount();
 	if (colcount) {
 
 		MYSQL_FIELD	*fields=new MYSQL_FIELD[colcount];
 		stmt->result->fields=fields;
 
-		for (int i=0; i<colcount; i++) {
+		stmt->result->lengths=new unsigned long[colcount];
+
+		for (uint32_t i=0; i<colcount; i++) {
 
 			fields[i].name=const_cast<char *>(
 					sqlrcur->getColumnName(i));
@@ -1223,11 +1240,13 @@ int mysql_execute(MYSQL_STMT *stmt) {
 
 			#if defined(COMPAT_MYSQL_4_0) || \
 				defined(COMPAT_MYSQL_4_1) || \
-				defined(COMPAT_MYSQL_5_0)
+				defined(COMPAT_MYSQL_5_0) || \
+				defined(COMPAT_MYSQL_5_1)
   			fields[i].org_table="";
   			fields[i].db="";
 			#if defined(COMPAT_MYSQL_4_1) || \
-				defined(COMPAT_MYSQL_5_0)
+				defined(COMPAT_MYSQL_5_0) || \
+				defined(COMPAT_MYSQL_5_1)
   			fields[i].catalog="";
   			fields[i].org_name=const_cast<char *>(
 						sqlrcur->getColumnName(i));
@@ -1332,6 +1351,7 @@ int mysql_execute(MYSQL_STMT *stmt) {
 		}
 	} else {
 		stmt->result->fields=NULL;
+		stmt->result->lengths=NULL;
 	}
 
 	return retval;
@@ -1358,7 +1378,8 @@ int mysql_fetch(MYSQL_STMT *stmt) {
 		return MYSQL_NO_DATA;
 	}
 
-	unsigned long	*lengths=mysql_fetch_lengths(stmt->result);
+	uint32_t	*lengths=stmt->result->sqlrcur->
+				getRowLengths(stmt->result->previousrow);
 
 	for (uint32_t i=0; i<stmt->result->sqlrcur->colCount(); i++) {
 		*(stmt->resultbinds[i].length)=lengths[i];
