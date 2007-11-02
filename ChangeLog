@@ -14,6 +14,7 @@
 	postgresql connection uses PQparameterStatus if PQserverVersion doesn't
 		exist and runs "select version()" if PQparameterStatus doesn't
 		exist; to get the db version
+	added mysql-5.1 drop-in replacement lib
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init

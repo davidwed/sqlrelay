@@ -43,9 +43,9 @@ throttling facilities.</p>
 <p>To use the SQL Relay drop-in replacement library for MySQL clients, you first
 need to determine what version of MySQL your existing application was compiled
 against.  There are 4 different drop-in replacement libraries.  One each for
-MySQL versions 3.xx, 4.0, 4.1 and 5.0.  MySQL's native data structures changed a
-bit between the different versions.  If you use the wrong library your program
-will most likely crash.</p>
+MySQL versions 3.xx, 4.0, 4.1, 5.0 and 5.1.  MySQL's native data structures
+changed a bit between the different versions.  If you use the wrong library your
+program will most likely crash.</p>
 
 <p>You can find out which library your program uses by running the following
 command.  In this example, the command checks the "mysql" program; the command
@@ -133,6 +133,7 @@ MySQL.</p>
 <tr><td align="center">4.0.x</td><td>libmysql40sqlrelay.so</td></tr>
 <tr><td align="center">4.1.x</td><td>libmysql41sqlrelay.so</td></tr>
 <tr><td align="center">5.0.x</td><td>libmysql50sqlrelay.so</td></tr>
+<tr><td align="center">5.1.x</td><td>libmysql51sqlrelay.so</td></tr>
 </table>
 
 <p>Below is a sample session using the mysql command line client against an
@@ -403,8 +404,9 @@ structures directly.  Applications also access MYSQL_ROW's directly, but
 MYSQL_ROW is just a typedef for (char **).  The SQL Relay drop-in replacement
 library for MySQL supports MYSQL_ROW and the following fields of MYSQL_FIELD and
 MYSQL_BIND.  Note that the MYSQL_BIND structure is only available when emulating
-MySQL 4.1 or 5.0 and that the fields of MYSQL_FIELD that are available depend
-on whether the drop-in library is emulating MySQL 3, 4.0, 4.1 or 5.0</p>
+MySQL 4.1, 5.0 or 5.1 and that the fields of MYSQL_FIELD that are available
+depend on whether the drop-in library is emulating MySQL 3, 4.0, 4.1, 5.0 or
+5.1</p>
 
 <table><tr><td valign="top">
 
