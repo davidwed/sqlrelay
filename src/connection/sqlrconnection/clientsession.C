@@ -56,6 +56,9 @@ void sqlrconnection_svr::clientSession() {
 		} else if (command==BINDFORMAT) {
 			bindFormatCommand();
 			continue;
+		} else if (command==SERVERVERSION) {
+			serverVersionCommand();
+			continue;
 		}
 
 		// For the rest of the commands, the client will be requesting

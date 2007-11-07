@@ -4,7 +4,7 @@ include ../../../../config.mk
 
 .PHONY: all clean rebuild install uninstall
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DCLIENT_VERSION=\"$(SQLR_VERSION)\"
 LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 
@@ -21,6 +21,7 @@ SRCS = connection/connectionctor.C \
 	connection/autocommit.C \
 	connection/commit.C \
 	connection/rollback.C \
+	connection/serverversion.C \
 	connection/debug.C \
 	connection/error.C \
 	connection/flushwritebuffer.C \
@@ -30,6 +31,7 @@ SRCS = connection/connectionctor.C \
 	connection/authentication.C \
 	connection/getnewport.C \
 	connection/clearsessionflags.C \
+	connection/clientversion.C \
 	connection/opensession.C \
 	connection/closeconnection.C \
 	cursor/cursorctor.C \
@@ -75,6 +77,7 @@ LOBJS = connection/connectionctor.lo \
 	connection/autocommit.lo \
 	connection/commit.lo \
 	connection/rollback.lo \
+	connection/serverversion.lo \
 	connection/debug.lo \
 	connection/error.lo \
 	connection/flushwritebuffer.lo \
@@ -84,6 +87,7 @@ LOBJS = connection/connectionctor.lo \
 	connection/authentication.lo \
 	connection/getnewport.lo \
 	connection/clearsessionflags.lo \
+	connection/clientversion.lo \
 	connection/opensession.lo \
 	connection/closeconnection.lo \
 	cursor/cursorctor.lo \

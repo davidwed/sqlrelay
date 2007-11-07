@@ -368,6 +368,7 @@ bool sqlrconnection_svr::getLobBind(bindvar_svr *bv) {
 	}
 
 	// allocate space to store the value
+	// (the +1 is to store the NULL-terminator for CLOBS)
 	bv->value.stringval=(char *)bindpool->malloc(bv->valuesize+1);
 
 	// get the bind value

@@ -4,7 +4,7 @@ include ../../config.mk
 
 .PHONY: all clean rebuild install uninstall
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG)
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\"
 LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = sqlrconnection/sqlrconnectionctor.C \
@@ -58,6 +58,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/updatestats.C \
 	sqlrconnection/bindformat.C \
 	sqlrconnection/dbversion.C \
+	sqlrconnection/serverversion.C \
 	sqlrcursor/sqlrcursorctor.C \
 	sqlrcursor/sqlrcursordtor.C \
 	sqlrcursor/openclose.C \
@@ -118,6 +119,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/updatestats.lo \
 	sqlrconnection/bindformat.lo \
 	sqlrconnection/dbversion.lo \
+	sqlrconnection/serverversion.lo \
 	sqlrcursor/sqlrcursorctor.lo \
 	sqlrcursor/sqlrcursordtor.lo \
 	sqlrcursor/openclose.lo \
@@ -178,6 +180,7 @@ DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
 	sqlrconnection/updatestats.d.lo \
 	sqlrconnection/bindformat.d.lo \
 	sqlrconnection/dbversion.d.lo \
+	sqlrconnection/serverversion.d.lo \
 	sqlrcursor/sqlrcursorctor.d.lo \
 	sqlrcursor/sqlrcursordtor.d.lo \
 	sqlrcursor/openclose.d.lo \

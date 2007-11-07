@@ -216,6 +216,7 @@ class sqlrconnection_svr :
 		void	commitCommand();
 		void	rollbackCommand();
 		void	dbVersionCommand();
+		void	serverVersionCommand();
 		void	bindFormatCommand();
 		bool	newQueryCommand(sqlrcursor_svr *cursor);
 		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);

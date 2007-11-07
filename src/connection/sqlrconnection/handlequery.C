@@ -133,11 +133,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// allows for result sets that were suspended after the entire
 	// result set was fetched to still be able to return column data
 	// when resumed.
-	if (bindcursor) {
-		cursor->cleanUpData(false,true);
-	} else {
-		cursor->cleanUpData(true,true);
-	}
+	cursor->cleanUpData(true,true);
 
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"processing query...");

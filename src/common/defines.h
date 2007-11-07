@@ -27,6 +27,7 @@
 #define FETCH_FROM_BIND_CURSOR 14
 #define DBVERSION 15
 #define BINDFORMAT 16
+#define SERVERVERSION 17
 
 #define ERROR 0
 #define NO_ERROR 1

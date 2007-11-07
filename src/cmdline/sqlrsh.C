@@ -99,6 +99,10 @@ class	sqlrsh {
 		void	ping(sqlrconnection *sqlrcon, environment *env);
 		void	identify(sqlrconnection *sqlrcon, environment *env);
 		void	dbversion(sqlrconnection *sqlrcon, environment *env);
+		void	clientversion(sqlrconnection *sqlrcon,
+						environment *env);
+		void	serverversion(sqlrconnection *sqlrcon,
+						environment *env);
 		void	displayHelp(environment *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env);
@@ -267,6 +271,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"ping",4) ||
 		!charstring::compareIgnoringCase(ptr,"identify",8) ||
 		!charstring::compareIgnoringCase(ptr,"dbversion",9) ||
+		!charstring::compareIgnoringCase(ptr,"clientversion",13) ||
+		!charstring::compareIgnoringCase(ptr,"serverversion",13) ||
 		!charstring::compareIgnoringCase(ptr,"run",3) ||
 		!charstring::compareIgnoringCase(ptr,"@",1) ||
 		!charstring::compareIgnoringCase(ptr,"delimiter",9) ||
@@ -333,6 +339,12 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"dbversion",9)) {	
 		dbversion(sqlrcon,env);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"clientversion",13)) {	
+		clientversion(sqlrcon,env);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"serverversion",13)) {	
+		serverversion(sqlrcon,env);
 		return;
 	} else {
 		return;
@@ -604,6 +616,18 @@ void sqlrsh::dbversion(sqlrconnection *sqlrcon, environment *env) {
 	white(env);
 }
 
+void sqlrsh::clientversion(sqlrconnection *sqlrcon, environment *env) {
+	red(env);
+	printf("%s\n",sqlrcon->clientVersion());
+	white(env);
+}
+
+void sqlrsh::serverversion(sqlrconnection *sqlrcon, environment *env) {
+	red(env);
+	printf("%s\n",sqlrcon->serverVersion());
+	white(env);
+}
+
 
 void sqlrsh::displayHelp(environment *env) {
 
@@ -624,6 +648,14 @@ void sqlrsh::displayHelp(environment *env) {
 	printf("	dbversion		- ");
 	green(env);
 	printf("returns the version of the database\n");
+	cyan(env);
+	printf("	clientversion		- ");
+	green(env);
+	printf("returns the version of the SQL Relay client library\n");
+	cyan(env);
+	printf("	serverversion		- ");
+	green(env);
+	printf("returns the version of the SQL Relay server\n");
 	cyan(env);
 	printf("	run script		- ");
 	green(env);

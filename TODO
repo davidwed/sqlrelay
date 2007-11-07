@@ -1,6 +1,4 @@
-get jdbc test suite working, implement jdbc driver
-
-add methods to get version of client
+non c/c++ get version methods
 
 some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
 		use non-unicode for them

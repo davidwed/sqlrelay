@@ -67,6 +67,9 @@
 		// db version
 		char		*dbversion;
 
+		// server version
+		char		*serverversion;
+
 		// bind format
 		char		*bindformat;
 

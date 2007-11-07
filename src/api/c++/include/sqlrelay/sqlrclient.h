@@ -75,6 +75,12 @@ class sqlrconnection {
 				//   oracle8, postgresql, mysql, etc.
 		const char	*dbVersion();
 				// Returns the version of the database
+		const char	*serverVersion();
+				// Returns the version of the sqlrelay client
+				// software.
+		const char	*clientVersion();
+				// Returns the version of the sqlrelay client
+				// software.
 		const char	*bindFormat();
 				// Returns a string representing the format
 				// of the bind variables used in the db.
