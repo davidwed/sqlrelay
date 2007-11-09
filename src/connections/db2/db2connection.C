@@ -178,7 +178,7 @@ bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 bool db2cursor::inputBindString(const char *variable,
 					uint16_t variablesize,
 					const char *value,
-					uint16_t valuesize,
+					uint32_t valuesize,
 					int16_t *isnull) {
 
 	if (*isnull==SQL_NULL_DATA) {

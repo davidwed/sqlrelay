@@ -414,7 +414,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 bool odbccursor::inputBindString(const char *variable,
 					uint16_t variablesize,
 					const char *value,
-					uint16_t valuesize,
+					uint32_t valuesize,
 					short *isnull) {
 
 		//orbb

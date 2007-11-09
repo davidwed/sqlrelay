@@ -85,7 +85,6 @@ void sqlrconnection_svr::abortAllCursors() {
 	debugPrint("connection",2,"aborting all busy cursors...");
 	#endif
 	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
-printf("cursor %d\n",i);
 		if (cur[i] && cur[i]->busy) {
 
 			#ifdef SERVER_DEBUG
@@ -100,7 +99,6 @@ printf("cursor %d\n",i);
 			cur[i]->cleanUpData(true,true);
 			cur[i]->abort();
 		}
-printf("done with cursor %d\n",i);
 	}
 	#ifdef SERVER_DEBUG
 	debugPrint("connection",2,"done aborting all busy cursors");

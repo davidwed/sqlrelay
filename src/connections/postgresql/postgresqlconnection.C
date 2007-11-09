@@ -322,7 +322,7 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 bool postgresqlcursor::inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
-						uint16_t valuesize,
+						uint32_t valuesize,
 						int16_t *isnull) {
 
 	if (postgresqlconn->fakebinds) {

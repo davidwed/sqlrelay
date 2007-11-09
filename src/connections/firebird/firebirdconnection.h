@@ -45,7 +45,7 @@ class firebirdcursor : public sqlrcursor_svr {
 		bool		inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
-						uint16_t valuesize,
+						uint32_t valuesize,
 						short *isnull);
 		bool		inputBindInteger(const char *variable, 
 						uint16_t variablesize,

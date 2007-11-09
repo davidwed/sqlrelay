@@ -362,7 +362,7 @@ bool routercursor::supportsNativeBinds() {
 bool routercursor::inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
-						uint16_t valuesize,
+						uint32_t valuesize,
 						int16_t *isnull) {
 	cur->inputBind(variable+1,value);
 	return true;

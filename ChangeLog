@@ -17,6 +17,8 @@
 	added mysql-5.1 drop-in replacement lib
 	fixed a bug that caused result set data not to be cleaned up before
 		a cursor is reused as a bind cursor
+	changed string bind length to uint32_t from uint16_t
+	added clearBinds() call after executeQuery() in perl dbi driver
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init

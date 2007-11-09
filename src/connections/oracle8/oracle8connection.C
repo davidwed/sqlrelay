@@ -623,7 +623,7 @@ void oracle8cursor::checkRePrepare() {
 bool oracle8cursor::inputBindString(const char *variable,
 						uint16_t variablesize,
 						const char *value,
-						uint16_t valuesize,
+						uint32_t valuesize,
 						int16_t *isnull) {
 	checkRePrepare();
 
