@@ -1,3 +1,6 @@
+incorporate alfred fazio's patches
+incorporate Jens Brey's instantclient patches
+
 non c/c++ get version methods
 
 some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
