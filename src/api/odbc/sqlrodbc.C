@@ -42,7 +42,6 @@ struct ENV {
 	linkedlist< CONN * >	connlist;
 };
 
-// from sql.h
 static SQLRETURN SQLR_SQLAllocConnect(SQLHENV environmenthandle,
 					SQLHDBC *connectionhandle) {
 	debugFunction();
@@ -130,15 +129,13 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-#if (ODBCVER >= 0x0300)
-SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
-					SQLUSMALLINT ParameterNumber,
-					SQLSMALLINT ValueType,
-					SQLSMALLINT ParameterType,
-					SQLULEN LengthPrecision,
-					SQLSMALLINT ParameterScale,
-					SQLPOINTER ParameterValue,
-					SQLLEN *StrLen_or_Ind) {
+SQLRETURN SQLR_SQLInputBindParam(SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT valuetype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN *strlen_or_ind) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -148,8 +145,269 @@ SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
 	}
 
 	// FIXME: implement this
+	switch (valuetype) {
+		case SQL_C_CHAR:
+			break;
+		case SQL_C_LONG:
+			break;
+		case SQL_C_SHORT:
+			break;
+		case SQL_C_FLOAT:
+			break;
+		case SQL_C_DOUBLE:
+			break;
+		case SQL_C_NUMERIC:
+			break;
+		case SQL_C_DEFAULT:
+			break;
+		case SQL_C_DATE:
+			break;
+		case SQL_C_TIME:
+			break;
+		case SQL_C_TIMESTAMP:
+			break;
+		case SQL_C_TYPE_DATE:
+			break;
+		case SQL_C_TYPE_TIME:
+			break;
+		case SQL_C_TYPE_TIMESTAMP:
+			break;
+		case SQL_C_INTERVAL_YEAR:
+			break;
+		case SQL_C_INTERVAL_MONTH:
+			break;
+		case SQL_C_INTERVAL_DAY:
+			break;
+		case SQL_C_INTERVAL_HOUR:
+			break;
+		case SQL_C_INTERVAL_MINUTE:
+			break;
+		case SQL_C_INTERVAL_SECOND:
+			break;
+		case SQL_C_INTERVAL_YEAR_TO_MONTH:
+			break;
+		case SQL_C_INTERVAL_DAY_TO_HOUR:
+			break;
+		case SQL_C_INTERVAL_DAY_TO_MINUTE:
+			break;
+		case SQL_C_INTERVAL_DAY_TO_SECOND:
+			break;
+		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+			break;
+		case SQL_C_INTERVAL_HOUR_TO_SECOND:
+			break;
+		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+			break;
+		case SQL_C_BINARY:
+			break;
+		case SQL_C_BIT:
+			break;
+		case SQL_C_SBIGINT:
+			break;
+		case SQL_C_UBIGINT:
+			break;
+		case SQL_C_TINYINT:
+			break;
+		case SQL_C_SLONG:
+			break;
+		case SQL_C_SSHORT:
+			break;
+		case SQL_C_STINYINT:
+			break;
+		case SQL_C_ULONG:
+			break;
+		case SQL_C_USHORT:
+			break;
+		case SQL_C_UTINYINT:
+			break;
+		// apparently the same as SQL_C_ULONG
+		//case SQL_C_BOOKMARK:
+			//break;
+		case SQL_C_GUID:
+			break;
+		// apparently the same as SQL_C_BINARY:
+		//case SQL_C_VARBOOKMARK:
+			//break;
+	}
 
-	return SQL_SUCCESS;
+	return SQL_ERROR;
+}
+
+SQLRETURN SQLR_SQLOutputBindParam(SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT valuetype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN *strlen_or_ind) {
+	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	// FIXME: implement this
+	switch (valuetype) {
+		case SQL_C_CHAR:
+			break;
+		case SQL_C_LONG:
+			break;
+		case SQL_C_SHORT:
+			break;
+		case SQL_C_FLOAT:
+			break;
+		case SQL_C_DOUBLE:
+			break;
+		case SQL_C_NUMERIC:
+			break;
+		case SQL_C_DEFAULT:
+			break;
+		case SQL_C_DATE:
+			break;
+		case SQL_C_TIME:
+			break;
+		case SQL_C_TIMESTAMP:
+			break;
+		case SQL_C_TYPE_DATE:
+			break;
+		case SQL_C_TYPE_TIME:
+			break;
+		case SQL_C_TYPE_TIMESTAMP:
+			break;
+		case SQL_C_INTERVAL_YEAR:
+			break;
+		case SQL_C_INTERVAL_MONTH:
+			break;
+		case SQL_C_INTERVAL_DAY:
+			break;
+		case SQL_C_INTERVAL_HOUR:
+			break;
+		case SQL_C_INTERVAL_MINUTE:
+			break;
+		case SQL_C_INTERVAL_SECOND:
+			break;
+		case SQL_C_INTERVAL_YEAR_TO_MONTH:
+			break;
+		case SQL_C_INTERVAL_DAY_TO_HOUR:
+			break;
+		case SQL_C_INTERVAL_DAY_TO_MINUTE:
+			break;
+		case SQL_C_INTERVAL_DAY_TO_SECOND:
+			break;
+		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+			break;
+		case SQL_C_INTERVAL_HOUR_TO_SECOND:
+			break;
+		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+			break;
+		case SQL_C_BINARY:
+			break;
+		case SQL_C_BIT:
+			break;
+		case SQL_C_SBIGINT:
+			break;
+		case SQL_C_UBIGINT:
+			break;
+		case SQL_C_TINYINT:
+			break;
+		case SQL_C_SLONG:
+			break;
+		case SQL_C_SSHORT:
+			break;
+		case SQL_C_STINYINT:
+			break;
+		case SQL_C_ULONG:
+			break;
+		case SQL_C_USHORT:
+			break;
+		case SQL_C_UTINYINT:
+			break;
+		// apparently the same as SQL_C_ULONG
+		//case SQL_C_BOOKMARK:
+			//break;
+		case SQL_C_GUID:
+			break;
+		// apparently the same as SQL_C_BINARY:
+		//case SQL_C_VARBOOKMARK:
+			//break;
+	}
+
+	return SQL_ERROR;
+}
+
+SQLRETURN SQLR_SQLBindParam(SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT valuetype,
+					SQLSMALLINT parametertype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN *strlen_or_ind) {
+	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	switch (parametertype) {
+		case SQL_PARAM_INPUT:
+			return SQLR_SQLInputBindParam(statementhandle,
+							parameternumber,
+							valuetype,
+							lengthprecision,
+							parameterscale,
+							parametervalue,
+							strlen_or_ind);
+		case SQL_PARAM_INPUT_OUTPUT:
+			return SQLR_SQLInputBindParam(statementhandle,
+							parameternumber,
+							valuetype,
+							lengthprecision,
+							parameterscale,
+							parametervalue,
+							strlen_or_ind) &&
+				SQLR_SQLOutputBindParam(statementhandle,
+							parameternumber,
+							valuetype,
+							lengthprecision,
+							parameterscale,
+							parametervalue,
+							strlen_or_ind);
+		case SQL_PARAM_OUTPUT:
+			return SQLR_SQLOutputBindParam(statementhandle,
+							parameternumber,
+							valuetype,
+							lengthprecision,
+							parameterscale,
+							parametervalue,
+							strlen_or_ind);
+	}
+
+	return SQL_ERROR;
+}
+
+#if (ODBCVER >= 0x0300)
+SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT valuetype,
+					SQLSMALLINT parametertype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN *strlen_or_ind) {
+	debugFunction();
+	return SQLR_SQLBindParam(statementhandle,
+					parameternumber,
+					valuetype,
+					parametertype,
+					lengthprecision,
+					parameterscale,
+					parametervalue,
+					strlen_or_ind);
 }
 #endif
 
@@ -162,12 +420,11 @@ SQLRETURN SQL_API SQLCancel(SQLHSTMT statementhandle) {
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported by sqlrelay
+	// not supported by SQL Relay
 	return SQL_ERROR;
 }
 
-#if (ODBCVER >= 0x0300)
-SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT statementhandle) {
+SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -176,7 +433,15 @@ SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT statementhandle) {
 		return SQL_INVALID_HANDLE;
 	}
 
+	// FIXME: implement this
+
 	return SQL_SUCCESS;
+}
+
+#if (ODBCVER >= 0x0300)
+SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT statementhandle) {
+	debugFunction();
+	return SQLR_SQLCloseCursor(statementhandle);
 }
 #endif
 
@@ -198,7 +463,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported by sqlrelay
+	// not supported by SQL Relay
 	return SQL_ERROR;
 }
 
@@ -259,7 +524,7 @@ SQLRETURN SQL_API SQLDataSources(SQLHENV environmenthandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported by sqlrelay
+	// not supported by SQL Relay
 	return SQL_ERROR;
 }
 
@@ -409,8 +674,7 @@ SQLRETURN SQL_API SQLDisconnect(SQLHDBC connectionhandle) {
 	return SQL_SUCCESS;
 }
 
-#if (ODBCVER >= 0x0300)
-SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handletype,
+SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 					SQLHANDLE handle,
 					SQLSMALLINT completiontype) {
 	debugFunction();
@@ -460,6 +724,14 @@ SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handletype,
 	}
 
 	return SQL_ERROR;
+}
+
+#if (ODBCVER >= 0x0300)
+SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handletype,
+					SQLHANDLE handle,
+					SQLSMALLINT completiontype) {
+	debugFunction();
+	return SQLR_SQLEndTran(handletype,handle,completiontype);
 }
 #endif
 
@@ -519,6 +791,9 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 			return SQL_SUCCESS;
 		}
 	}
+
+	// FIXME: push error onto list
+
 	return SQL_ERROR;
 }
 
@@ -564,8 +839,7 @@ SQLRETURN SQL_API SQLFetch(SQLHSTMT statementhandle) {
 	return SQLR_SQLFetch(statementhandle);
 }
 
-#if (ODBCVER >= 0x0300)
-SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
+SQLRETURN SQLR_SQLFetchScroll(SQLHSTMT statementhandle,
 					SQLSMALLINT fetchorientation,
 					SQLROWOFFSET fetchoffset) {
 	debugFunction();
@@ -596,6 +870,16 @@ SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 	}
 
 	return SQL_ERROR;
+}
+
+#if (ODBCVER >= 0x0300)
+SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
+					SQLSMALLINT fetchorientation,
+					SQLROWOFFSET fetchoffset) {
+	debugFunction();
+	return SQLR_SQLFetchScroll(statementhandle,
+					fetchorientation,
+					fetchoffset);
 }
 #endif
 
@@ -654,8 +938,7 @@ static SQLRETURN SQLR_SQLFreeStmt(SQLHSTMT statementhandle,
 	switch (option) {
 		case SQL_CLOSE:
 			debugPrintf("SQL_CLOSE\n");
-			// FIXME: implement
-			break;
+			return SQLR_SQLCloseCursor(statementhandle);
 		case SQL_DROP:
 			debugPrintf("SQL_DROP\n");
 			stmt->conn->stmtlist.removeAllByData(stmt);
@@ -664,11 +947,11 @@ static SQLRETURN SQLR_SQLFreeStmt(SQLHSTMT statementhandle,
 			break;
 		case SQL_UNBIND:
 			debugPrintf("SQL_UNBIND\n");
-			// FIXME: implement
+			// FIXME: implement this
 			break;
 		case SQL_RESET_PARAMS:
 			debugPrintf("SQL_RESET_PARAMS\n");
-			// FIXME: implement
+			stmt->cur->clearBinds();
 			break;
 	}
 
@@ -715,55 +998,30 @@ SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// initialize result
-	if (value && bufferlength) {
-		((char *)value)[0]='\0';
-		if (stringlength) {
-			*stringlength=0;
-		}
-	}
-
-	// FIXME: implement this for real
-	switch (attribute) {
-		case SQL_ACCESS_MODE:
-			return SQL_SUCCESS;
-		case SQL_AUTOCOMMIT:
-			return SQL_SUCCESS;
-		case SQL_LOGIN_TIMEOUT:
-			return SQL_SUCCESS;
-		case SQL_OPT_TRACE:
-			return SQL_SUCCESS;
-		case SQL_OPT_TRACEFILE:
-			return SQL_SUCCESS;
-		case SQL_TRANSLATE_DLL:
-			return SQL_SUCCESS;
-		case SQL_TRANSLATE_OPTION:
-			return SQL_SUCCESS;
-		case SQL_TXN_ISOLATION:
-			return SQL_SUCCESS;
-		case SQL_CURRENT_QUALIFIER:
-			return SQL_SUCCESS;
-		case SQL_ODBC_CURSORS:
-			return SQL_SUCCESS;
-		case SQL_QUIET_MODE:
-			return SQL_SUCCESS;
-		case SQL_PACKET_SIZE:
-			return SQL_SUCCESS;
+	// not supported by SQL Relay
+	// autocommit is settable, but not gettable
+	/*
+	SQL_ACCESS_MODE:
+	SQL_AUTOCOMMIT:
+	SQL_LOGIN_TIMEOUT:
+	SQL_OPT_TRACE:
+	SQL_OPT_TRACEFILE:
+	SQL_TRANSLATE_DLL:
+	SQL_TRANSLATE_OPTION:
+	SQL_TXN_ISOLATION:
+	SQL_CURRENT_QUALIFIER:
+	SQL_ODBC_CURSORS:
+	SQL_QUIET_MODE:
+	SQL_PACKET_SIZE:
 #if (ODBCVER >= 0x0300)
-		case SQL_ATTR_CONNECTION_TIMEOUT:
-			return SQL_SUCCESS;
-		case SQL_ATTR_DISCONNECT_BEHAVIOR:
-			return SQL_SUCCESS;
-		case SQL_ATTR_ENLIST_IN_DTC:
-			return SQL_SUCCESS;
-		case SQL_ATTR_ENLIST_IN_XA:
-			return SQL_SUCCESS;
-		case SQL_ATTR_AUTO_IPD:
-			return SQL_SUCCESS;
-		case SQL_ATTR_METADATA_ID:
-			return SQL_SUCCESS;
+	SQL_ATTR_CONNECTION_TIMEOUT:
+	SQL_ATTR_DISCONNECT_BEHAVIOR:
+	SQL_ATTR_ENLIST_IN_DTC:
+	SQL_ATTR_ENLIST_IN_XA:
+	SQL_ATTR_AUTO_IPD:
+	SQL_ATTR_METADATA_ID:
 #endif
-	}
+	*/
 
 	return SQL_ERROR;
 }
@@ -1112,9 +1370,10 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// FIXME: implement the rest of these
 	switch (attribute) {
 		case SQL_ATTR_OUTPUT_NTS:
-			return SQL_SUCCESS;
+			break;
 		case SQL_ATTR_ODBC_VERSION:
 			if (value) {
 				*((SQLINTEGER *)value)=env->odbcversion;
@@ -1124,9 +1383,9 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 			}
 			return SQL_SUCCESS;
 		case SQL_ATTR_CONNECTION_POOLING:
-			return SQL_SUCCESS;
+			break;
 		case SQL_ATTR_CP_MATCH:
-			return SQL_SUCCESS;
+			break;
 	}
 	return SQL_ERROR;
 }
@@ -1180,9 +1439,6 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLFREEHANDLE:
 		#endif
 		case SQL_API_SQLFREESTMT:
-		#if (ODBCVER >= 0x0300)
-		case SQL_API_SQLGETCONNECTATTR:
-		#endif
 		case SQL_API_SQLGETCONNECTOPTION:
 		case SQL_API_SQLGETCURSORNAME:
 		case SQL_API_SQLGETDATA:
@@ -1218,34 +1474,21 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLSETSTMTATTR:
 		#endif
 		case SQL_API_SQLSETSTMTOPTION:
-		case SQL_API_SQLSPECIALCOLUMNS:
-		case SQL_API_SQLSTATISTICS:
-		case SQL_API_SQLTABLES:
 		case SQL_API_SQLTRANSACT:
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLALLOCHANDLESTD:
-		case SQL_API_SQLBULKOPERATIONS:
 		#endif /* ODBCVER >= 0x0300 */
 		case SQL_API_SQLBINDPARAMETER:
 		case SQL_API_SQLBROWSECONNECT:
 		// dupe of SQL_API_SQLCOLATTRIBUTE
 		//case SQL_API_SQLCOLATTRIBUTES:
-		case SQL_API_SQLCOLUMNPRIVILEGES:
-		case SQL_API_SQLDESCRIBEPARAM:
 		case SQL_API_SQLDRIVERCONNECT:
-		case SQL_API_SQLDRIVERS:
 		case SQL_API_SQLEXTENDEDFETCH:
-		case SQL_API_SQLFOREIGNKEYS:
 		case SQL_API_SQLMORERESULTS:
-		case SQL_API_SQLNATIVESQL:
 		case SQL_API_SQLNUMPARAMS:
 		case SQL_API_SQLPARAMOPTIONS:
-		case SQL_API_SQLPRIMARYKEYS:
-		case SQL_API_SQLPROCEDURECOLUMNS:
-		case SQL_API_SQLPROCEDURES:
 		case SQL_API_SQLSETPOS:
 		case SQL_API_SQLSETSCROLLOPTIONS:
-		case SQL_API_SQLTABLEPRIVILEGES:
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLCANCEL:
@@ -1253,6 +1496,24 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLDATASOURCES:
 		case SQL_API_SQLPUTDATA:
 		case SQL_API_SQLPARAMDATA:
+		#if (ODBCVER >= 0x0300)
+		case SQL_API_SQLGETCONNECTATTR:
+		#endif
+		case SQL_API_SQLSPECIALCOLUMNS:
+		case SQL_API_SQLSTATISTICS:
+		case SQL_API_SQLTABLES:
+		#if (ODBCVER >= 0x0300)
+		case SQL_API_SQLBULKOPERATIONS:
+		#endif
+		case SQL_API_SQLCOLUMNPRIVILEGES:
+		case SQL_API_SQLDESCRIBEPARAM:
+		case SQL_API_SQLFOREIGNKEYS:
+		case SQL_API_SQLNATIVESQL:
+		case SQL_API_SQLPRIMARYKEYS:
+		case SQL_API_SQLPROCEDURECOLUMNS:
+		case SQL_API_SQLPROCEDURES:
+		case SQL_API_SQLTABLEPRIVILEGES:
+		case SQL_API_SQLDRIVERS:
 			*supported=SQL_FALSE;
 			break;
 	}
@@ -1278,6 +1539,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 	uint16_t	outsize=0;
 
 	char	*strval="";
+	// FIXME: there are tons more of these...
 	switch (infotype) {
 		case SQL_DRIVER_ODBC_VER:
 			strval="03.00";
@@ -1323,6 +1585,8 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
+
+	// FIXME: implement this for real
 
 	uint16_t	outsize=0;
 
@@ -1510,7 +1774,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported by sqlrelay
+	// not supported by SQL Relay
 
 	return SQL_ERROR;
 }
@@ -1550,7 +1814,7 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported by sqlrelay
+	// not supported by SQL Relay
 
 	return SQL_ERROR;
 }
@@ -1582,47 +1846,40 @@ SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this for real
-	switch (attribute) {
-		case SQL_ACCESS_MODE:
-			return SQL_SUCCESS;
-		case SQL_AUTOCOMMIT:
-			return SQL_SUCCESS;
-		case SQL_LOGIN_TIMEOUT:
-			return SQL_SUCCESS;
-		case SQL_OPT_TRACE:
-			return SQL_SUCCESS;
-		case SQL_OPT_TRACEFILE:
-			return SQL_SUCCESS;
-		case SQL_TRANSLATE_DLL:
-			return SQL_SUCCESS;
-		case SQL_TRANSLATE_OPTION:
-			return SQL_SUCCESS;
-		case SQL_TXN_ISOLATION:
-			return SQL_SUCCESS;
-		case SQL_CURRENT_QUALIFIER:
-			return SQL_SUCCESS;
-		case SQL_ODBC_CURSORS:
-			return SQL_SUCCESS;
-		case SQL_QUIET_MODE:
-			return SQL_SUCCESS;
-		case SQL_PACKET_SIZE:
-			return SQL_SUCCESS;
-#if (ODBCVER >= 0x0300)
-		case SQL_ATTR_CONNECTION_TIMEOUT:
-			return SQL_SUCCESS;
-		case SQL_ATTR_DISCONNECT_BEHAVIOR:
-			return SQL_SUCCESS;
-		case SQL_ATTR_ENLIST_IN_DTC:
-			return SQL_SUCCESS;
-		case SQL_ATTR_ENLIST_IN_XA:
-			return SQL_SUCCESS;
-		case SQL_ATTR_AUTO_IPD:
-			return SQL_SUCCESS;
-		case SQL_ATTR_METADATA_ID:
-			return SQL_SUCCESS;
-#endif
+	if (attribute==SQL_AUTOCOMMIT) {
+		if ((uint64_t)value==(uint64_t)SQL_AUTOCOMMIT_ON) {
+			if (conn->con->autoCommitOn()) {
+				return SQL_SUCCESS;
+			}
+		} else if ((uint64_t)value==(uint64_t)SQL_AUTOCOMMIT_OFF) {
+			if (conn->con->autoCommitOff()) {
+				return SQL_SUCCESS;
+			}
+		}
 	}
+
+	// Other attributes, not supported by SQL Relay
+	/*
+ 	SQL_ACCESS_MODE
+	SQL_LOGIN_TIMEOUT
+	SQL_OPT_TRACE
+	SQL_OPT_TRACEFILE
+	SQL_TRANSLATE_DLL
+	SQL_TRANSLATE_OPTION
+	SQL_TXN_ISOLATION
+	SQL_CURRENT_QUALIFIER
+	SQL_ODBC_CURSORS
+	SQL_QUIET_MODE
+	SQL_PACKET_SIZE
+#if (ODBCVER >= 0x0300)
+	SQL_ATTR_CONNECTION_TIMEOUT
+	SQL_ATTR_DISCONNECT_BEHAVIOR
+	SQL_ATTR_ENLIST_IN_DTC
+	SQL_ATTR_ENLIST_IN_XA
+	SQL_ATTR_AUTO_IPD
+	SQL_ATTR_METADATA_ID
+#endif
+	*/
 
 	return SQL_ERROR;
 }
@@ -1706,6 +1963,7 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// FIXME: implement the rest of these
 	switch (attribute) {
 		case SQL_ATTR_OUTPUT_NTS:
 			return SQL_SUCCESS;
@@ -1726,8 +1984,9 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 	}
 	return SQL_ERROR;
 }
+#endif
 
-SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementhandle,
+SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 					SQLINTEGER Attribute,
 					SQLPOINTER Value,
 					SQLINTEGER StringLength) {
@@ -1739,7 +1998,19 @@ SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// FIXME: implement this
+
 	return SQL_SUCCESS;
+}
+
+#if (ODBCVER >= 0x0300)
+SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementhandle,
+					SQLINTEGER attribute,
+					SQLPOINTER value,
+					SQLINTEGER stringlength) {
+	debugFunction();
+	return SQLR_SQLSetStmtAttr(statementhandle,attribute,
+						value,stringlength);
 }
 #endif
 
@@ -1747,14 +2018,8 @@ SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT statementhandle,
 					SQLUSMALLINT Option,
 					SQLROWCOUNT Value) {
 	debugFunction();
-
-	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
-		return SQL_INVALID_HANDLE;
-	}
-
-	return SQL_SUCCESS;
+	// FIXME: map values and call SQLR_SetConnectAttr
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
@@ -1775,7 +2040,9 @@ SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	return SQL_SUCCESS;
+	// not supported by SQL Relay
+
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
@@ -1795,7 +2062,9 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	return SQL_SUCCESS;
+	// not supported by SQL Relay
+
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
@@ -1815,31 +2084,26 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	return SQL_SUCCESS;
+	// not supported by SQL Relay
+
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLTransact(SQLHENV environmenthandle,
 					SQLHDBC connectionhandle,
-					SQLUSMALLINT CompletionType) {
-	debugFunction();
-
-	ENV	*env=(ENV *)environmenthandle;
-	if (environmenthandle==SQL_NULL_HENV || !env) {
-		debugPrintf("NULL env handle\n");
-		return SQL_INVALID_HANDLE;
+					SQLUSMALLINT completiontype) {
+	if (connectionhandle) {
+		return SQLR_SQLEndTran(SQL_HANDLE_DBC,
+					connectionhandle,
+					completiontype);
+	} else if (environmenthandle) {
+		return SQLR_SQLEndTran(SQL_HANDLE_ENV,
+					environmenthandle,
+					completiontype);
 	}
-
-	CONN	*conn=(CONN *)connectionhandle;
-	if (connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
-		debugPrintf("NULL conn handle\n");
-		return SQL_INVALID_HANDLE;
-	}
-
-	return SQL_SUCCESS;
+	return SQL_INVALID_HANDLE;
 }
 
-
-// from sqlext.h
 SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 					SQLHWND hwnd,
 					SQLCHAR *szConnStrIn,
@@ -1849,6 +2113,9 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 					SQLSMALLINT *pcbConnStrOut,
 					SQLUSMALLINT fDriverCompletion) {
 	debugFunction();
+
+	// FIXME: implement this
+
 	return SQL_SUCCESS;
 }
 
@@ -1859,6 +2126,9 @@ SQLRETURN SQL_API SQLBrowseConnect(SQLHDBC hdbc,
 					SQLSMALLINT cbConnStrOutMax,
 					SQLSMALLINT *pcbConnStrOut) {
 	debugFunction();
+
+	// FIXME: implement this
+
 	return SQL_SUCCESS;
 }
 
@@ -1873,7 +2143,9 @@ SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	return SQL_SUCCESS;
+	// not supported by sqlrelay
+
+	return SQL_ERROR;
 }
 #endif /* ODBCVER >= 0x0300 */
 
@@ -2002,6 +2274,9 @@ SQLRETURN SQL_API SQLColumnPrivileges(SQLHSTMT statementhandle,
 					SQLCHAR *szColumnName,
 					SQLSMALLINT cbColumnName) {
 	debugFunction();
+
+	// not supported by sqlrelay
+
 	return SQL_SUCCESS;
 }
 
@@ -2012,16 +2287,26 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT statementhandle,
 					SQLSMALLINT *pibScale,
 					SQLSMALLINT *pfNullable) {
 	debugFunction();
+
+	// not supported by sqlrelay
+
 	return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
-					SQLUSMALLINT fFetchType,
+					SQLUSMALLINT ffetchtype,
 					SQLROWOFFSET irow,
 					SQLROWSETSIZE *pcrow,
-					SQLUSMALLINT *rgfRowStatus) {
+					SQLUSMALLINT *rgfrowstatus) {
 	debugFunction();
-	return SQL_SUCCESS;
+	SQLRETURN	retval=SQLR_SQLFetchScroll(statementhandle,
+							ffetchtype,irow);
+	// FIXME: set to value of SQL_ATTR_ROWS_FETCHED_PTR statement attr
+	*pcrow=0;
+	// FIXME: set to array of statuses from SQL_ATTR_ROW_STATUS_PTR
+	// statement attr
+	*rgfrowstatus=0;
+	return retval;
 }
 
 SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementhandle,
@@ -2038,7 +2323,10 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementhandle,
 					SQLCHAR *szFkTableName,
 					SQLSMALLINT cbFkTableName) {
 	debugFunction();
-	return SQL_SUCCESS;
+
+	// not supported by sqlrelay
+
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLMoreResults(SQLHSTMT statementhandle) {
@@ -2053,12 +2341,24 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC hdbc,
 					SQLINTEGER cbSqlStrMax,
 					SQLINTEGER *pcbSqlStr) {
 	debugFunction();
-	return SQL_SUCCESS;
+
+	// not supported by sqlrelay
+
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLNumParams(SQLHSTMT statementhandle,
 					SQLSMALLINT *pcpar) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	*pcpar=(SQLSMALLINT)stmt->cur->countBindVariables();
+
 	return SQL_SUCCESS;
 }
 
@@ -2066,6 +2366,9 @@ SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle,
 					SQLULEN crow,
 					SQLULEN *pirow) {
 	debugFunction();
+
+	// FIXME: map values and call SQLR_SQLSetStmtAttr
+
 	return SQL_SUCCESS;
 }
 
@@ -2077,7 +2380,10 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
 					SQLCHAR *szTableName,
 					SQLSMALLINT cbTableName) {
 	debugFunction();
-	return SQL_SUCCESS;
+
+	// not supported by sqlrelay
+
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
@@ -2090,7 +2396,10 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 					SQLCHAR *szColumnName,
 					SQLSMALLINT cbColumnName) {
 	debugFunction();
-	return SQL_SUCCESS;
+
+	// not supported by sqlrelay
+
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
@@ -2101,7 +2410,10 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 					SQLCHAR *szProcName,
 					SQLSMALLINT cbProcName) {
 	debugFunction();
-	return SQL_SUCCESS;
+
+	// not supported by sqlrelay
+
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
@@ -2109,6 +2421,9 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 					SQLUSMALLINT fOption,
 					SQLUSMALLINT fLock) {
 	debugFunction();
+
+	// FIXME: implement this
+
 	return SQL_SUCCESS;
 }
 
@@ -2120,7 +2435,10 @@ SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT statementhandle,
 					SQLCHAR *szTableName,
 					SQLSMALLINT cbTableName) {
 	debugFunction();
-	return SQL_SUCCESS;
+
+	// not supported by sqlrelay
+
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLDrivers(SQLHENV environmenthandle,
@@ -2133,36 +2451,9 @@ SQLRETURN SQL_API SQLDrivers(SQLHENV environmenthandle,
 					SQLSMALLINT *pcbDrvrAttr) {
 	debugFunction();
 
-	ENV	*env=(ENV *)environmenthandle;
-	if (environmenthandle==SQL_NULL_HENV || !env) {
-		debugPrintf("NULL env handle\n");
-		return SQL_INVALID_HANDLE;
-	}
+	// not supported by sqlrelay
 
-	return SQL_SUCCESS;
-}
-
-SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
-					SQLUSMALLINT ipar,
-					SQLSMALLINT fParamType,
-					SQLSMALLINT fCType,
-					SQLSMALLINT fSqlType,
-					SQLULEN cbColDef,
-					SQLSMALLINT ibScale,
-					SQLPOINTER rgbValue,
-					SQLLEN cbValueMax,
-					SQLLEN *pcbValue) {
-	debugFunction();
-
-	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
-		return SQL_INVALID_HANDLE;
-	}
-
-	// FIXME: implement this
-
-	return SQL_SUCCESS;
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLSetParam(SQLHSTMT statementhandle,
@@ -2174,39 +2465,35 @@ SQLRETURN SQL_API SQLSetParam(SQLHSTMT statementhandle,
 					SQLPOINTER parametervalue,
 					SQLLEN *strlen_or_ind) {
 	debugFunction();
-	return SQLR_SQLBindParameter(statementhandle,
+	return SQLR_SQLBindParam(statementhandle,
 					parameternumber,
-					SQL_PARAM_INPUT,
 					valuetype,
 					parametertype,
 					lengthprecision,
 					parameterscale,
 					parametervalue,
-					SQL_SETPARAM_VALUE_MAX,
 					strlen_or_ind);
 }
 
 SQLRETURN SQL_API SQLBindParameter(SQLHSTMT statementhandle,
 					SQLUSMALLINT ipar,
-					SQLSMALLINT fParamType,
-					SQLSMALLINT fCType,
-					SQLSMALLINT fSqlType,
-					SQLULEN cbColDef,
-					SQLSMALLINT ibScale,
-					SQLPOINTER rgbValue,
-					SQLLEN cbValueMax,
-					SQLLEN *pcbValue) {
+					SQLSMALLINT fparamtype,
+					SQLSMALLINT fctype,
+					SQLSMALLINT fsqltype,
+					SQLULEN cbcoldef,
+					SQLSMALLINT ibscale,
+					SQLPOINTER rgbvalue,
+					SQLLEN cbvaluemax,
+					SQLLEN *pcbvalue) {
 	debugFunction();
-	return SQLR_SQLBindParameter(statementhandle,
+	return SQLR_SQLBindParam(statementhandle,
 					ipar,
-					fParamType,
-					fCType,
-					fSqlType,
-					cbColDef,
-					ibScale,
-					rgbValue,
-					cbValueMax,
-					pcbValue);
+					fctype,
+					fparamtype,
+					cbcoldef,
+					ibscale,
+					rgbvalue,
+					pcbvalue);
 }
 
 #if (ODBCVER >= 0x0300)
