@@ -98,6 +98,12 @@ __END__
         dbVersion();
             # Returns the version of the database
 
+        serverVersion();
+            # Returns the version of the SQL Relay server software
+
+        clientVersion();
+            # Returns the version of the SQL Relay client software
+
         bindFormat();
             # Returns a string representing the format
             # of the bind variables used in the db.

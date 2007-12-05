@@ -3,8 +3,6 @@ get odbc driver working
 incorporate alfred fazio's patches
 incorporate Jens Brey's instantclient patches
 
-document,test non c/c++ get version methods
-
 some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
 		use non-unicode for them
 
