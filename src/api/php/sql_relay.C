@@ -1912,7 +1912,60 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_bindformat) {
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
 		r=connection->bindFormat();
-zend_printf("r=%s\n",r);
+		if (r) {
+			RETURN_STRING(const_cast<char *>(r),1);
+		}
+	}
+	RETURN_FALSE;
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcon_dbversion) {
+	zval **sqlrcon;
+	const char *r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		r=connection->dbVersion();
+		if (r) {
+			RETURN_STRING(const_cast<char *>(r),1);
+		}
+	}
+	RETURN_FALSE;
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcon_serverversion) {
+	zval **sqlrcon;
+	const char *r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		r=connection->serverVersion();
+		if (r) {
+			RETURN_STRING(const_cast<char *>(r),1);
+		}
+	}
+	RETURN_FALSE;
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcon_clientversion) {
+	zval **sqlrcon;
+	const char *r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		r=connection->clientVersion();
 		if (r) {
 			RETURN_STRING(const_cast<char *>(r),1);
 		}
@@ -2018,6 +2071,9 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcon_commit,NULL)
 	ZEND_FE(sqlrcon_rollback,NULL)
 	ZEND_FE(sqlrcon_bindformat,NULL)
+	ZEND_FE(sqlrcon_dbversion,NULL)
+	ZEND_FE(sqlrcon_serverversion,NULL)
+	ZEND_FE(sqlrcon_clientversion,NULL)
 	{NULL,NULL,NULL}
 };
 

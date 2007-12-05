@@ -76,7 +76,7 @@ class sqlrconnection {
 		const char	*dbVersion();
 				// Returns the version of the database
 		const char	*serverVersion();
-				// Returns the version of the sqlrelay client
+				// Returns the version of the sqlrelay server
 				// software.
 		const char	*clientVersion();
 				// Returns the version of the sqlrelay client

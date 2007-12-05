@@ -147,6 +147,28 @@ static PyObject *dbVersion(PyObject *self, PyObject *args) {
   return Py_BuildValue("s", rc);
 }
 
+static PyObject *serverVersion(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  const char *rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrconnection *)sqlrcon)->serverVersion();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("s", rc);
+}
+
+static PyObject *clientVersion(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  const char *rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrconnection *)sqlrcon)->clientVersion();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("s", rc);
+}
+
 static PyObject *bindFormat(PyObject *self, PyObject *args) {
   long sqlrcon;
   const char *rc;
@@ -1536,6 +1558,8 @@ static PyMethodDef SQLRMethods[] = {
   {"ping", ping, METH_VARARGS},
   {"identify", identify, METH_VARARGS},
   {"dbVersion", dbVersion, METH_VARARGS},
+  {"serverVersion", serverVersion, METH_VARARGS},
+  {"clientVersion", clientVersion, METH_VARARGS},
   {"bindFormat", bindFormat, METH_VARARGS},
   {"autoCommitOn", autoCommitOn, METH_VARARGS},
   {"autoCommitOff", autoCommitOff, METH_VARARGS},

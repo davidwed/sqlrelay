@@ -432,7 +432,7 @@ They are accessible as follows:</p>
 <FONT color=#008888>$sth</FONT>-&gt;<FONT color=#008888>execute</FONT>();
 
 <B><FONT color=#a02828>for</FONT></B> (<FONT color=#008888>$i</FONT>=<FONT color=#f800f8>1</FONT>; <FONT color=#008888>$i</FONT>&lt;=<FONT color=#008888>$sth</FONT>-&gt;{<FONT color=#008888>NUM_OF_FIELDS</FONT>}; <FONT color=#008888>$i</FONT>++) {
-       <B><FONT color=#a02828>print</FONT></B> <FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>Column </FONT><FONT color=#008888>$i</FONT><FONT color=#f800f8>: </FONT><FONT color=#008888>$sth</FONT><FONT color=#f800f8>-&gt;{NAME}-&gt;[i-1]</FONT><FONT color=#6858c8>\n</FONT><FONT color=#f800f8>&quot;</FONT>;
+       <B><FONT color=#a02828>print</FONT></B> <FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>Column </FONT><FONT color=#008888>$i</FONT><FONT color=#f800f8>: </FONT><FONT color=#008888>$sth</FONT><FONT color=#f800f8>-&gt;{NAME}-&gt;[<FONT color=#008888>$i</FONT>-1]</FONT><FONT color=#6858c8>\n</FONT><FONT color=#f800f8>&quot;</FONT>;
 }
 
 <FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>disconnect</FONT>;

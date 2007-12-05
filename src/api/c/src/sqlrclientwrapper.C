@@ -52,6 +52,14 @@ const char *sqlrcon_dbVersion(sqlrcon sqlrconref) {
 	return sqlrconref->dbVersion();
 }
 
+const char *sqlrcon_serverVersion(sqlrcon sqlrconref) {
+	return sqlrconref->serverVersion();
+}
+
+const char *sqlrcon_clientVersion(sqlrcon sqlrconref) {
+	return sqlrconref->clientVersion();
+}
+
 const char *sqlrcon_bindFormat(sqlrcon sqlrconref) {
 	return sqlrconref->bindFormat();
 }

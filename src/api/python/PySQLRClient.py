@@ -88,6 +88,20 @@ class sqlrconnection:
         """
         return CSQLRelay.dbVersion(self.connection)
 
+
+    def serverVersion(self):
+        """
+        Returns the version of the SQL Relay server version
+        """
+        return CSQLRelay.serverVersion(self.connection)
+
+
+    def clientVersion(self):
+        """
+        Returns the version of the SQL Relay client version
+        """
+        return CSQLRelay.clientVersion(self.connection)
+
     def bindFormat(self):
         """
         Returns a string representing the format

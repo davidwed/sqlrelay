@@ -66,6 +66,12 @@ const char	*sqlrcon_identify(sqlrcon sqlrconref);
 			     oracle8, postgresql, mysql, etc. */
 const char	*sqlrcon_dbVersion(sqlrcon sqlrconref); 
 			/* Returns the version of the database */
+const char	*sqlrcon_serverVersion(sqlrcon sqlrconref);
+			/* Returns the version of the sqlrelay server
+			   software. */
+const char	*sqlrcon_clientVersion(sqlrcon sqlrconref);
+			/* Returns the version of the sqlrelay client
+			   software. */
 const char	*sqlrcon_bindFormat(sqlrcon sqlrconref); 
 			/* Returns a string representing the format
 			   of the bind variables used in the db. */

@@ -74,6 +74,10 @@ public class SQLRConnection {
 	public native String	identify();
 	/** Returns the version of the database */
 	public native String	dbVersion();
+	/** Returns the version of the sqlrelay server software */
+	public native String	serverVersion();
+	/** Returns the version of the sqlrelay client software */
+	public native String	clientVersion();
 	/** Returns a string representing the format
 	 *  of the bind variables used in the db. */
 	public native String	bindFormat();

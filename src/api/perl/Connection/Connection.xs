@@ -70,6 +70,12 @@ const char *
 sqlrconnection::dbVersion()
 
 const char *
+sqlrconnection::serverVersion()
+
+const char *
+sqlrconnection::clientVersion()
+
+const char *
 sqlrconnection::bindFormat()
 
 void

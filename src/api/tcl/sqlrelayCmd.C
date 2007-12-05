@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.25 2007-05-18 01:34:35 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.26 2007-12-05 04:49:26 mused Exp $
  */
 
 #include <tcl.h>
@@ -1732,6 +1732,8 @@ void sqlrconDelete(ClientData data) {
  *  $con ping
  *  $con identify
  *  $con dbVersion
+ *  $con serverVersion
+ *  $con clientVersion
  *  $con bindFormat
  *  $con autoCommit bool
  *  $con commit
@@ -1754,6 +1756,8 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "ping",
     "identify",
     "dbVersion",
+    "serverVersion",
+    "clientVersion",
     "bindFormat",
     "autoCommit",
     "commit",
@@ -1771,6 +1775,8 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_PING,
     SQLR_IDENTIFY,
     SQLR_DBVERSION,
+    SQLR_SERVERVERSION,
+    SQLR_CLIENTVERSION,
     SQLR_BINDFORMAT,
     SQLR_AUTOCOMMIT,
     SQLR_COMMIT,
@@ -1874,6 +1880,24 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     }
     Tcl_SetObjResult(interp,
 		     Tcl_NewStringObj(con->dbVersion(), -1));
+    break;
+  }
+  case SQLR_CLIENTVERSION: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp,
+		     Tcl_NewStringObj(con->clientVersion(), -1));
+    break;
+  }
+  case SQLR_SERVERVERSION: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp,
+		     Tcl_NewStringObj(con->serverVersion(), -1));
     break;
   }
   case SQLR_BINDFORMAT: {
