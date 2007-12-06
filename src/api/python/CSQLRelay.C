@@ -555,12 +555,14 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (char *)NULL);
   } else if (PyString_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value));
+  } else if (PyBool_Check(value)) {
+    ((sqlrcursor *)sqlrcur)->inputBind(variable, value == Py_True ? "1" : "0");
   } else if (PyInt_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (int64_t)PyInt_AsLong(value));
   } else if (PyFloat_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (double)PyFloat_AsDouble(value), (uint32_t)precision, (uint32_t)scale);
   } else {
-    success=0;
+    ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(PyObject_Str(value)));
   }
   return Py_BuildValue("h", success);
 }
@@ -635,12 +637,14 @@ static PyObject *inputBinds(PyObject *self, PyObject *args) {
         ((sqlrcursor *)sqlrcur)->inputBind(variable, (char *)NULL);
       } else if (PyString_Check(value)) {
         ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value));
+      } else if (PyBool_Check(value)) {
+	((sqlrcursor *)sqlrcur)->inputBind(variable, value == Py_True ? "1" : "0");
       } else if (PyInt_Check(value)) {
         ((sqlrcursor *)sqlrcur)->inputBind(variable, (int64_t)PyInt_AsLong(value));
       } else if (PyFloat_Check(value)) {
         ((sqlrcursor *)sqlrcur)->inputBind(variable, (double)PyFloat_AsDouble(value), (unsigned short)PyInt_AsLong(PyList_GetItem(precisions,i)), (unsigned short)PyInt_AsLong(PyList_GetItem(scales,i)));
       } else {
-        success=0;
+	((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(PyObject_Str(value)));
       }
     }
   }
@@ -918,6 +922,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
   uint32_t  rl=0;
   uint64_t row;
   PyObject *col;
+  const char* type;
   if (!PyArg_ParseTuple(args,
 #ifdef SUPPORTS_UNSIGNED
 	"lKO",
@@ -930,14 +935,47 @@ static PyObject *getField(PyObject *self, PyObject *args) {
   if (PyString_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getField(row, PyString_AsString(col));
     rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyString_AsString(col));
+    type = ((sqlrcursor *)sqlrcur)->getColumnType(PyString_AsString(col));
   } else if (PyInt_Check(col)) {
     rc=((sqlrcursor *)sqlrcur)->getField(row, PyInt_AsLong(col));
     rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyInt_AsLong(col));
+    type = ((sqlrcursor *)sqlrcur)->getColumnType(PyInt_AsLong(col));
   }
   Py_END_ALLOW_THREADS
   if (!rc) {
     Py_INCREF(Py_None);
     return Py_None;
+  } else if (isFloatTypeChar(type)) {
+    if (decimal) {
+      PyObject *tuple=PyTuple_New(1);
+      PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", rc, rl));
+      return PyObject_CallObject(decimal, tuple);
+    } else {
+      if (!charstring::contains(rc,'.')) {
+	return Py_BuildValue("L",charstring::toInteger(rc));
+      } else {
+	return Py_BuildValue("f",atof(rc));
+      }
+    }
+  } else if (isNumberTypeChar(type)) {
+    if (!charstring::contains(rc,'.')) {
+      return Py_BuildValue("L",charstring::toInteger(rc));
+    } else {
+      return Py_BuildValue("f",atof(rc));
+    }
+  } else if (isBitTypeChar(type)) {
+    return Py_BuildValue("L",bitStringToLong(rc));
+  } else if (isBoolTypeChar(type)) {
+    if (rc && tolower(rc[0]) == 't') {
+      Py_INCREF(Py_True);
+      return Py_True;
+    } else if (rc && tolower(rc[0]) == 'f') {
+      Py_INCREF(Py_False);
+      return Py_False;
+    } else {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
   }
   return Py_BuildValue("s#", rc, rl);
 }

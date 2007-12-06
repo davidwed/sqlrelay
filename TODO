@@ -1,6 +1,8 @@
 get odbc driver working
+add odbc to rpm spec file
 
 incorporate alfred fazio's patches
+update python test to handle python patches
 incorporate Jens Brey's instantclient patches
 
 some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
@@ -238,7 +240,6 @@ backends:
 
 API's:
 	JDBC
-	ODBC
 	QT3
 	C# - have a driver, just need to incorporate it
 		look at npgsql for .net data provider example

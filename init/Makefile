@@ -30,7 +30,7 @@ ifeq ($(UNAME),Linux)
 		$(MKINSTALLDIRS) $(initroot)/etc/rc.d/init.d; \
 		$(MKINSTALLDIRS) $(initroot)/etc/sysconfig; \
 		$(INSTALL) -m 755 redhat/init.d/sqlrelay $(initroot)/etc/rc.d/init.d; \
-		$(INSTALL) -m 644 redhat/sysconfig/sqlrelay $(initroot)/etc/sysconfig; \
+		if ( ! test -f "$(initroot)/etc/sysconfig/sqlrelay" ); then $(INSTALL) -m 644 redhat/sysconfig/sqlrelay $(initroot)/etc/sysconfig; fi; \
 	else \
 		if ( test -r "/etc/rc.d/rc.inet2" -a -d "/etc/rc.d" -a -d "/var/lock/subsys" ); then \
 			$(MKINSTALLDIRS) $(initroot)/etc/rc.d; \

@@ -391,6 +391,41 @@ static char	*datatypestring[] = {
 };
 #endif
 
+static bool isBitTypeChar(const char *type) {
+  return (!charstring::compare(type,"BIT") ||
+	  !charstring::compare(type,"VARBIT"));
+}
+
+static bool isBoolTypeChar(const char *type) {
+  return !charstring::compare(type,"BOOL");
+}
+
+static bool isFloatTypeChar(const char *type) {
+  return (!charstring::compare(type,"NUMERIC") ||
+	  !charstring::compare(type,"REAL") ||
+	  !charstring::compare(type,"FLOAT") ||
+	  !charstring::compare(type,"DOUBLE") ||
+	  !charstring::compare(type,"D_FLOAT") ||
+	  !charstring::compare(type,"DECIMAL") ||
+	  !charstring::compare(type,"MONEY") ||
+	  !charstring::compare(type,"SMALLMONEY") ||
+	  !charstring::compare(type,"DOUBLE PRECISION") ||
+	  !charstring::compareIgnoringCase(type,"FLOAT4") ||
+	  !charstring::compareIgnoringCase(type,"FLOAT8"));
+}
+
+static long bitStringToLong(const char *str) {
+  long result = 0;
+  int length = charstring::length(str) - 1;
+  int i = length;
+  while (i >= 0) { 
+    if (str[i] == '1')
+      result += 1 << (length - i);
+    i--;
+  }
+  return result;
+}
+
 #ifdef NEED_IS_NUMBER_TYPE_CHAR
 static bool isNumberTypeChar(const char *type) { 
 	return (!charstring::compare(type,"NUMBER") ||
@@ -398,7 +433,6 @@ static bool isNumberTypeChar(const char *type) {
 		!charstring::compare(type,"SMALLINT") ||
 		!charstring::compare(type,"TINYINT") ||
 		!charstring::compare(type,"NUMERIC") ||
-		!charstring::compare(type,"BIT") ||
 		!charstring::compare(type,"REAL") ||
 		!charstring::compare(type,"FLOAT") ||
 		!charstring::compare(type,"USHORT") ||

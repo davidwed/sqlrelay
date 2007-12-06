@@ -21,6 +21,7 @@
 	added clearBinds() call after executeQuery() in perl dbi driver
 	began work on an ODBC driver
 	added serverVersion and clientVersion methods
+	incorporated Alfred Fazio's python api patches
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init
