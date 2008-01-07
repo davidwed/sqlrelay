@@ -388,7 +388,7 @@ a long or double, you can use getFieldAsLong() and getFieldAsDouble().</p>
 <B><FONT color=#a52a2a>for</FONT></B> (<FONT color=#008b8b>$row</FONT>=<FONT color=#ff00ff>0</FONT>; <FONT color=#008b8b>$row</FONT>&lt;<FONT color=#008b8b>$cur</FONT>-&gt;rowCount(); <FONT color=#008b8b>$row</FONT>++) {
         <FONT color=#008b8b>@rowarray</FONT>=<FONT color=#008b8b>$cur</FONT>-&gt;getRow(<FONT color=#008b8b>$row</FONT>);
         <B><FONT color=#a52a2a>for</FONT></B> (<FONT color=#008b8b>$col</FONT>=<FONT color=#ff00ff>0</FONT>; <FONT color=#008b8b>$col</FONT>&lt;<FONT color=#008b8b>$cur</FONT>-&gt;colCount(); <FONT color=#008b8b>$col</FONT>++) {
-                <B><FONT color=#a52a2a>print</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#008b8b>%s</FONT><FONT color=#ff00ff>,</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$rowarray</FONT>[<FONT color=#008b8b>$col</FONT>]);
+                <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#008b8b>%s</FONT><FONT color=#ff00ff>,</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$rowarray</FONT>[<FONT color=#008b8b>$col</FONT>]);
         }
         <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#6a5acd>\n</FONT><FONT color=#ff00ff>&quot;</FONT>);
 }
@@ -452,7 +452,7 @@ index of the first row of the currently buffered chunk.
 <B><FONT color=#a52a2a>while</FONT></B> (!<FONT color=#008b8b>$done</FONT>) {
         <B><FONT color=#a52a2a>for</FONT></B> (<FONT color=#008b8b>$col</FONT>=<FONT color=#ff00ff>0</FONT>; <FONT color=#008b8b>$col</FONT>&lt;<FONT color=#008b8b>$cur</FONT>-&gt;colCount(); <FONT color=#008b8b>$col</FONT>++) {
                 <B><FONT color=#a52a2a>if</FONT></B> (<FONT color=#008b8b>$field</FONT>=getField(<FONT color=#008b8b>$row</FONT>,<FONT color=#008b8b>$col</FONT>)) {
-                        <B><FONT color=#a52a2a>print</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#008b8b>%s</FONT><FONT color=#ff00ff>,</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$field</FONT>);
+                        <B><FONT color=#a52a2a>printf</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#008b8b>%s</FONT><FONT color=#ff00ff>,</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#008b8b>$field</FONT>);
                 } <B><FONT color=#a52a2a>else</FONT></B> {
                         <FONT color=#008b8b>$done</FONT>=<FONT color=#ff00ff>1</FONT>;
                 }
