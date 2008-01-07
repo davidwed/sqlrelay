@@ -48,6 +48,7 @@ void sqlrcursor::abortResultSet() {
 			}
 		} else {
 			sqlrc->cs->write((uint16_t)ABORT_RESULT_SET);
+			sqlrc->cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
 			sqlrc->cs->write(cursorid);
 			sqlrc->flushWriteBuffer();
 		}

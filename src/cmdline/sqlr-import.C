@@ -412,9 +412,9 @@ void sqlrimport::unescapeField(stringbuffer *strb, const char *field) {
 
 	// FIXME: what about escaped NULL's
 	for (uint32_t index=0; field[index]; index++) {
-		if (field[index]=='\\') {
+		/*if (field[index]=='\\') {
 			index++;
-		}
+		}*/
 		strb->append(field[index]);
 	}
 }

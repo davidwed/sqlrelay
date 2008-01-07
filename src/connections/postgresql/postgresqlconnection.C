@@ -252,7 +252,7 @@ bool postgresqlcursor::openCursor(uint16_t id) {
 	size_t	cursornamelen=6+charstring::integerLength(id)+1;
 	cursorname=new char[cursornamelen];
 	snprintf(cursorname,cursornamelen,"cursor%d",id);
-	return true;
+	return sqlrcursor_svr::openCursor(id);
 }
 
 bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {

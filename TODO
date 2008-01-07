@@ -1,7 +1,9 @@
+for some db's need to escape \'s in sqlr-import
+
 get odbc driver working
 add odbc to rpm spec file
 
-incorporate alfred fazio's patches
+update python api to create decimals in dictionary
 update python test to handle python patches
 incorporate Jens Brey's instantclient patches
 
@@ -260,6 +262,7 @@ Drop-in replacement libraries:
 	Interbase
 
 Native DB Support:
+	xbsql
 	Informix
 	SAP DB
 	LocalSQL

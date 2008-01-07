@@ -124,7 +124,7 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 
 	// does the client need a cursor or does it already have one
 	uint16_t	neednewcursor=DONT_NEED_NEW_CURSOR;
-	if (command==NEW_QUERY &&
+	if ((command==NEW_QUERY || command==ABORT_RESULT_SET) &&
 		clientsock->read(&neednewcursor,
 				idleclienttimeout,0)!=sizeof(uint16_t)) {
 		#ifdef SERVER_DEBUG
@@ -163,7 +163,12 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 		statistics->times_cursor_reused++;
 
 		// set the current cursor to the one they requested.
-		cursor=cur[index];
+		for (int16_t i=0; i<cfgfl->getCursors(); i++) {
+			if (cur[i]->id==index) {
+				cursor=cur[i];
+				break;
+			}
+		}
 
 	} else {
 
