@@ -22,6 +22,8 @@
 	began work on an ODBC driver
 	added serverVersion and clientVersion methods
 	incorporated Alfred Fazio's python api patches
+	fixed a bug where cursors might not get aborted when a client
+		disconnects
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init

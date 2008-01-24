@@ -1,3 +1,6 @@
+mysql db reconnect doesn't appear to work corrrectly
+allowing query timeout appears to hang the sqlrelay server
+
 for some db's need to escape \'s in sqlr-import
 
 get odbc driver working
