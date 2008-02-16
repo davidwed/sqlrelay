@@ -150,6 +150,14 @@ Group: Applications/Libraries
 Drop in replacement library allowing MySQL clients to use SQL Relay instead.
 
 
+%package client-odbc
+Summary: ODBC driver
+Group: Applications/Libraries
+
+%description client-odbc
+ODBC driver
+
+
 %package config-gtk
 Summary: SQL Relay GUI configuration tool.
 Group: Applications/Databases
@@ -470,6 +478,13 @@ rm -rf %{buildroot}
 %{_libdir}/libmysql*sqlrelay.so
 %{_libdir}/libmysql*sqlrelay.a
 %{_libdir}/libmysql*sqlrelay.la
+
+%{!?_without_odbc:%files client-odbc}
+%{!?_without_odbc:%defattr(-, root, root)}
+%{!?_without_odbc:%{_libdir}/libsqlrodbc-*.so.*}
+%{!?_without_odbc:%{_libdir}/libsqlrodbc.so}
+%{!?_without_odbc:%{_libdir}/libsqlrodbc.a}
+%{!?_without_odbc:%{_libdir}/libsqlrodbc.la}
 
 %{!?_without_gtk:%files config-gtk}
 %{!?_without_gtk:%defattr(-, root, root)}

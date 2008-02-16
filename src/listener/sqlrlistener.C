@@ -349,7 +349,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 
 	idmemory=new sharedmemory;
 	if (!idmemory->create(key,sizeof(shmdata),
-					permissions::ownerReadWrite())) {
+				permissions::evalPermString("rw-r-----"))) {
 		idmemory->attach(key);
 		shmError(id,idmemory->getId());
 		return false;

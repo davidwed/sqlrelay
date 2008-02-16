@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#ifdef MYSQL_OPT_RECONNECT
+#ifdef HAVE_MYSQL_OPT_RECONNECT
 const my_bool	mysqlconnection::mytrue=TRUE;
 #endif
 
@@ -109,7 +109,7 @@ bool mysqlconnection::logIn(bool printerrors) {
 		return false;
 	}
 
-#ifdef MYSQL_OPT_RECONNECT
+#ifdef HAVE_MYSQL_OPT_RECONNECT
 	// Enable autoreconnect in the C api
 	// (ordinarily mysql_options should be called before mysql_connect,
 	// but not for this option)

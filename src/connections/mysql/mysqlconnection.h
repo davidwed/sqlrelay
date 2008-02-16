@@ -149,7 +149,7 @@ class mysqlconnection : public sqlrconnection_svr {
 
 		char	*dbversion;
 
-#ifdef MYSQL_OPT_RECONNECT
+#ifdef HAVE_MYSQL_OPT_RECONNECT
 		static const my_bool	mytrue;
 #endif
 

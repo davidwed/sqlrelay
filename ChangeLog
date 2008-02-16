@@ -24,6 +24,10 @@
 	incorporated Alfred Fazio's python api patches
 	fixed a bug where cursors might not get aborted when a client
 		disconnects
+	made shared memory segment group-readable
+	applied Renaud Amar's HAVE_MYSQL_OPT_RECONNECT patch
+	added ODBC driver to spec file
+	added DESTDIR= to .pc files
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init
