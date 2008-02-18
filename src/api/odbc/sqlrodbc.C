@@ -8,6 +8,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/linkedlist.h>
+#include <rudiments/parameterstring.h>
 
 #define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
@@ -39,6 +40,10 @@ struct STMT {
 	linkedlist< char * >		errorlist;
 	char				*name;
 	numericdictionary< FIELD * >	fieldlist;
+	SQLHANDLE			rowdesc;
+	SQLHANDLE			paramdesc;
+	SQLHANDLE			improwdesc;
+	SQLHANDLE			impparamdesc;
 };
 
 struct CONN {
@@ -93,6 +98,21 @@ SQLRETURN SQL_API SQLAllocEnv(SQLHENV *environmenthandle) {
 	return SQLR_SQLAllocEnv(environmenthandle);
 }
 
+static SQLRETURN SQLR_SQLAllocDesc(SQLHANDLE inputhandle,
+					SQLHANDLE *outputhandle) {
+	debugFunction();
+
+	CONN	*conn=(CONN *)inputhandle;
+	if (inputhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
+		debugPrintf("NULL conn handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	// FIXME: what should this do?
+	*outputhandle=SQL_NULL_DESC;
+	return SQL_SUCCESS;
+}
+
 static SQLRETURN SQLR_SQLAllocStmt(SQLHDBC connectionhandle,
 					SQLHSTMT *statementhandle) {
 	debugFunction();
@@ -111,7 +131,26 @@ static SQLRETURN SQLR_SQLAllocStmt(SQLHDBC connectionhandle,
 	conn->stmtlist.append(stmt);
 	stmt->conn=conn;
 
-	return SQL_SUCCESS;
+	// when allocating a statement, we need to allocate the following
+	// descriptor handles:
+	// SQL_ATTR_APP_ROW_DESC
+	// SQL_ATTR_APP_PARAM_DESC
+	// SQL_ATTR_IMP_ROW_DESC
+	// SQL_ATTR_IMP_PARAM_DESC
+	SQLRETURN	retval;
+	retval=SQLR_SQLAllocDesc(conn,&stmt->rowdesc);
+	if (retval!=SQL_SUCCESS) {
+		return retval;
+	}
+	retval=SQLR_SQLAllocDesc(conn,&stmt->paramdesc);
+	if (retval!=SQL_SUCCESS) {
+		return retval;
+	}
+	retval=SQLR_SQLAllocDesc(conn,&stmt->improwdesc);
+	if (retval!=SQL_SUCCESS) {
+		return retval;
+	}
+	return SQLR_SQLAllocDesc(conn,&stmt->impparamdesc);
 }
 
 SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
@@ -1490,9 +1529,8 @@ SQLRETURN SQLR_SQLGetDiagRecEnv(SQLHANDLE handle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this
-
-	return SQL_ERROR;
+	// SQL Relay does not have additional info for env errors.
+	return SQL_NO_DATA;
 }
 
 SQLRETURN SQLR_SQLGetDiagRecConnect(SQLHANDLE handle,
@@ -1510,9 +1548,8 @@ SQLRETURN SQLR_SQLGetDiagRecConnect(SQLHANDLE handle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this
-
-	return SQL_ERROR;
+	// SQL Relay does not have additional info for connect errors.
+	return SQL_NO_DATA;
 }
 
 SQLRETURN SQLR_SQLGetDiagRecStmt(SQLHANDLE handle,
@@ -1530,9 +1567,10 @@ SQLRETURN SQLR_SQLGetDiagRecStmt(SQLHANDLE handle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this
+	// FIXME: should errorMessage() go in here?
 
-	return SQL_ERROR;
+	// SQL Relay does not have additional info for errors.
+	return SQL_NO_DATA;
 }
 
 SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handletype,
@@ -1777,24 +1815,35 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_XOPEN_CLI_YEAR:
 			strval="2007";
 			break;
+		case SQL_DRIVER_VER:
+			strval=SQLR_VERSION;
+			break;
 	}
 
 	switch (outsize) {
 		case 0:
 			// string
 			snprintf((char *)infovalue,bufferlength,strval);
+			debugPrintf("infovalue: %s\n",(char *)infovalue);
 			if (stringlength) {
 				*stringlength=(SQLSMALLINT)
 						charstring::length(strval);
+				debugPrintf("stringlength: %d\n",*stringlength);
 			}
 			break;
 		case 16:
 			// 16-bit integer
-			*stringlength=(SQLSMALLINT)sizeof(uint16_t);
+			if (stringlength) {
+				*stringlength=(SQLSMALLINT)sizeof(uint16_t);
+				debugPrintf("stringlength: %d\n",*stringlength);
+			}
 			break;
 		case 32:
 			// 32-bit integer
-			*stringlength=(SQLSMALLINT)sizeof(uint32_t);
+			if (stringlength) {
+				*stringlength=(SQLSMALLINT)sizeof(uint32_t);
+				debugPrintf("stringlength: %d\n",*stringlength);
+			}
 			break;
 	}
 
@@ -1818,23 +1867,42 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 
 	// FIXME: implement this for real
 
-	uint16_t	outsize=0;
-
-	char		*strval="";
-	uint16_t	val16=0xDEAD;
-	uint32_t	val32=0xDEADBEEF;
-	uint64_t	val64=0xDEADBEEFDEADBEEF;
 	switch (attribute) {
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_APP_ROW_DESC:
+			rawbuffer::copy((void *)value,
+					(const void *)stmt->rowdesc,
+					sizeof(stmt->rowdesc));
+			if (stringlength) {
+				*stringlength=
+					(SQLSMALLINT)sizeof(stmt->rowdesc);
+			}
 			break;
 		case SQL_ATTR_APP_PARAM_DESC:
+			rawbuffer::copy((void *)value,
+					(const void *)stmt->paramdesc,
+					sizeof(stmt->paramdesc));
+			if (stringlength) {
+				*stringlength=
+					(SQLSMALLINT)sizeof(stmt->paramdesc);
+			}
+			break;
 		case SQL_ATTR_IMP_ROW_DESC:
+			rawbuffer::copy((void *)value,
+					(const void *)stmt->improwdesc,
+					sizeof(stmt->improwdesc));
+			if (stringlength) {
+				*stringlength=
+					(SQLSMALLINT)sizeof(stmt->improwdesc);
+			}
+			break;
 		case SQL_ATTR_IMP_PARAM_DESC:
-			if (bufferlength==8) {
-				outsize=64;
-			} else {
-				outsize=32;
+			rawbuffer::copy((void *)value,
+					(const void *)stmt->impparamdesc,
+					sizeof(stmt->impparamdesc));
+			if (stringlength) {
+				*stringlength=
+					(SQLSMALLINT)sizeof(stmt->impparamdesc);
 			}
 			break;
 		case SQL_ATTR_CURSOR_SCROLLABLE:
@@ -1933,49 +2001,6 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 			break;
 		#endif
 	}
-
-	switch (outsize) {
-		case 0:
-			// string
-			if (bufferlength>-1) {
-				snprintf((char *)value,bufferlength,strval);
-			} else {
-				sprintf((char *)value,strval);
-			}
-			if (stringlength) {
-				*stringlength=(SQLSMALLINT)
-						charstring::length(strval);
-			}
-			break;
-		case 16:
-			// 16-bit integer
-			rawbuffer::copy((void *)value,
-					(const void *)&val16,
-					sizeof(uint16_t));
-			if (stringlength) {
-				*stringlength=(SQLSMALLINT)sizeof(uint16_t);
-			}
-			break;
-		case 32:
-			// 32-bit integer
-			rawbuffer::copy((void *)value,
-					(const void *)&val32,
-					sizeof(uint32_t));
-			if (stringlength) {
-				*stringlength=(SQLSMALLINT)sizeof(uint32_t);
-			}
-			break;
-		case 64:
-			// 64-bit integer
-			rawbuffer::copy((void *)value,
-					(const void *)&val64,
-					sizeof(uint64_t));
-			if (stringlength) {
-				*stringlength=(SQLSMALLINT)sizeof(uint64_t);
-			}
-			break;
-	}
-
 	return SQL_SUCCESS;
 }
 #if (ODBCVER >= 0x0300)
@@ -2279,12 +2304,16 @@ SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 	switch (attribute) {
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_APP_ROW_DESC:
+			// FIXME: I think this is supposed to be read-only
 			break;
 		case SQL_ATTR_APP_PARAM_DESC:
+			// FIXME: I think this is supposed to be read-only
 			break;
 		case SQL_ATTR_IMP_ROW_DESC:
+			// FIXME: I think this is supposed to be read-only
 			break;
 		case SQL_ATTR_IMP_PARAM_DESC:
+			// FIXME: I think this is supposed to be read-only
 			break;
 		case SQL_ATTR_CURSOR_SCROLLABLE:
 			break;
@@ -2496,9 +2525,83 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 					SQLUSMALLINT fDriverCompletion) {
 	debugFunction();
 
-	// FIXME: implement this
+	CONN	*conn=(CONN *)hdbc;
+	if (hdbc==SQL_NULL_HANDLE || !conn) {
+		debugPrintf("NULL conn handle\n");
+		return SQL_INVALID_HANDLE;
+	}
 
-	return SQL_SUCCESS;
+	// the connect string may not be null terminated, so make a copy that is
+	debugPrintf("%s\n",szConnStrIn);
+	debugPrintf("%d\n",cbConnStrIn);
+	char	*nulltermconnstr;
+	if (cbConnStrIn==SQL_NTS) {
+		nulltermconnstr=charstring::duplicate(
+					(const char *)szConnStrIn);
+	} else {
+		nulltermconnstr=charstring::duplicate(
+					(const char *)szConnStrIn,
+					cbConnStrIn);
+	}
+
+	// parse out DSN, UID and PWD from the connect string
+	parameterstring	pstr;
+	pstr.parse(nulltermconnstr);
+	const char	*servername=pstr.getValue("DSN");
+	if (!charstring::length(servername)) {
+		servername=pstr.getValue("dsn");
+	}
+	const char	*username=pstr.getValue("UID");
+	if (!charstring::length(username)) {
+		username=pstr.getValue("uid");
+	}
+	const char	*authentication=pstr.getValue("PWD");
+	if (!charstring::length(authentication)) {
+		authentication=pstr.getValue("pwd");
+	}
+
+
+	// FIXME: currently all we support is SQL_DRIVER_NOPROMPT
+	switch (fDriverCompletion) {
+		case SQL_DRIVER_PROMPT:
+			debugPrintf("SQL_DRIVER_PROMPT\n");
+			return SQL_ERROR;
+		case SQL_DRIVER_COMPLETE:
+			debugPrintf("SQL_DRIVER_COMPLETE\n");
+			return SQL_ERROR;
+		case SQL_DRIVER_COMPLETE_REQUIRED:
+			debugPrintf("SQL_DRIVER_COMPLETE_REQUIRED\n");
+			return SQL_ERROR;
+		case SQL_DRIVER_NOPROMPT:
+			debugPrintf("SQL_DRIVER_NOPROMPT\n");
+			if (!charstring::length(servername)) {
+				return SQL_ERROR;
+			}
+			break;
+	}
+
+	// since we don't support prompting and updating the connect string...
+	if (cbConnStrIn==SQL_NTS) {
+		*pcbConnStrOut=(SQLSMALLINT)charstring::length(szConnStrIn);
+	} else {
+		*pcbConnStrOut=(SQLSMALLINT)cbConnStrIn;
+	}
+	*pcbConnStrOut=(SQLSMALLINT)cbConnStrIn;
+	snprintf((char *)szConnStrOut,*pcbConnStrOut,nulltermconnstr);
+
+	// connect
+	SQLRETURN	retval=SQLConnect(hdbc,
+					(SQLCHAR *)servername,
+					charstring::length(servername),
+					(SQLCHAR *)username,
+					charstring::length(username),
+					(SQLCHAR *)authentication,
+					charstring::length(authentication));
+
+	// clean up
+	delete[] nulltermconnstr;
+
+	return retval;
 }
 
 SQLRETURN SQL_API SQLBrowseConnect(SQLHDBC hdbc,
@@ -2917,7 +3020,8 @@ SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			return SQLR_SQLAllocStmt((SQLHDBC)inputhandle,
 						(SQLHSTMT *)outputhandle);
 		case SQL_HANDLE_DESC:
-			return SQL_SUCCESS;
+			return SQLR_SQLAllocDesc((SQLHDBC)inputhandle,
+						(SQLHSTMT *)outputhandle);
 	}
 	return SQL_ERROR;
 }
