@@ -597,12 +597,15 @@ const char *mysqlcursor::errorMessage(bool *liveconnection) {
 	*liveconnection=true;
 
 	const char	*err;
+	unsigned int	errn;
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (!mysqlconn->fakebinds && usestmtprepare) {
 		err=mysql_stmt_error(stmt);
+		errn=mysql_stmt_errno(stmt);
 	} else {
 #endif
 		err=mysql_error(&mysqlconn->mysql);
+		errn=mysql_errno(&mysqlconn->mysql);
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	}
 #endif
@@ -610,12 +613,12 @@ const char *mysqlcursor::errorMessage(bool *liveconnection) {
 #if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
 		defined(HAVE_MYSQL_CR_SERVER_LOST) 
 	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
-		if (queryresult==CR_SERVER_GONE_ERROR) {
+		if (errn==CR_SERVER_GONE_ERROR) {
 			*liveconnection=false;
 		} else
 	#endif
 	#ifdef HAVE_MYSQL_CR_SERVER_LOST
-		if (queryresult==CR_SERVER_LOST) {
+		if (errn==CR_SERVER_LOST) {
 			*liveconnection=false;
 		} else
 	#endif
@@ -629,9 +632,6 @@ const char *mysqlcursor::errorMessage(bool *liveconnection) {
 			"Lost connection to MySQL server during query")) {
 		*liveconnection=false;
 	}
-if (!*liveconnection) {
-	sleep(2);
-}
 	return err;
 }
 
