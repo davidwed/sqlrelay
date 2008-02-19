@@ -23,6 +23,8 @@ extern "C" {
 
 static	uint16_t	stmtid=0;
 
+static	uint32_t	typeinfocolcount=19;
+
 struct ENV;
 struct CONN;
 
@@ -37,24 +39,31 @@ struct STMT {
 	sqlrcursor			*cur;
 	uint64_t			currentrow;
 	CONN				*conn;
-	linkedlist< char * >		errorlist;
+	char				*error;
+	uint64_t			errorrec;
 	char				*name;
 	numericdictionary< FIELD * >	fieldlist;
 	SQLHANDLE			rowdesc;
 	SQLHANDLE			paramdesc;
 	SQLHANDLE			improwdesc;
 	SQLHANDLE			impparamdesc;
+	bool				typeinfo;
+	bool				typeinforowcount;
 };
 
 struct CONN {
 	sqlrconnection		*con;
 	ENV			*env;
 	linkedlist< STMT * >	stmtlist;
+	char			*error;
+	uint64_t		errorrec;
 };
 
 struct ENV {
 	SQLINTEGER		odbcversion;
 	linkedlist< CONN * >	connlist;
+	char			*error;
+	uint64_t		errorrec;
 };
 
 static SQLRETURN SQLR_SQLAllocConnect(SQLHENV environmenthandle,
@@ -70,6 +79,8 @@ static SQLRETURN SQLR_SQLAllocConnect(SQLHENV environmenthandle,
 	CONN	*conn=new CONN;
 	conn->con=NULL;
 	*connectionhandle=(SQLHDBC)conn;
+	conn->error=NULL;
+	conn->errorrec=0;
 
 	env->connlist.append(conn);
 	conn->env=env;
@@ -89,6 +100,8 @@ static SQLRETURN SQLR_SQLAllocEnv(SQLHENV *environmenthandle) {
 	ENV	*env=new ENV;
 	env->odbcversion=0;
 	*environmenthandle=(SQLHENV)env;
+	env->error=NULL;
+	env->errorrec=0;
 	
 	return SQL_SUCCESS;
 }
@@ -127,6 +140,8 @@ static SQLRETURN SQLR_SQLAllocStmt(SQLHDBC connectionhandle,
 	stmt->cur=new sqlrcursor(conn->con);
 	*statementhandle=(SQLHSTMT)stmt;
 	stmt->name=NULL;
+	stmt->error=NULL;
+	stmt->errorrec=0;
 
 	conn->stmtlist.append(stmt);
 	stmt->conn=conn;
@@ -169,7 +184,8 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 	debugPrintf("columnnumber: %d\n",columnnumber);
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -475,7 +491,8 @@ SQLRETURN SQL_API SQLCancel(SQLHSTMT statementhandle) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -488,7 +505,8 @@ SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -518,7 +536,8 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -553,7 +572,10 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
 					"mysqltest",
 					"mysqltest",
 					0,1);
-conn->con->debugOn();
+
+	#ifdef DEBUG_MESSAGES
+	conn->con->debugOn();
+	#endif
 
 	return SQL_SUCCESS;
 }
@@ -601,121 +623,139 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 	debugPrintf("columnnumber: %d\n",columnnumber);
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	if (columnnumber<1 || columnnumber>stmt->cur->colCount()) {
+	uint32_t	colcount=0;
+	if (stmt->typeinfo) {
+		colcount=typeinfocolcount;
+	} else {
+		colcount=stmt->cur->colCount();
+	}
+
+	if (columnnumber<1 || columnnumber>colcount) {
 		return SQL_ERROR;
 	}
 
-	snprintf((char *)columnname,bufferlength,
+	if (stmt->typeinfo) {
+		// FIXME: implement this
+		snprintf((char *)columnname,bufferlength,"typeinfocol");
+		*namelength=0;
+		*datatype=SQL_CHAR;
+		*columnsize=0;
+		*decimaldigits=0;
+		*nullable=0;
+	} else {
+		snprintf((char *)columnname,bufferlength,
 			stmt->cur->getColumnName(columnnumber-1));
-	*namelength=charstring::length(columnname);
-	// FIXME: map SQLR column types to ODBC column types
-	*datatype=SQL_CHAR;
-	/*const char	*ctype=stmt->cur->getColumnType(columnnumber-1);
-	if (!charstring::compare(ctype,"")) {
-		// SQL type: BIGINT
-		*datatype=SQL_BIGINT
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: BINARY
-		*datatype=SQL_BINARY
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: BLOB
-		*datatype=SQL_BLOB
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: BLOB LOCATOR
-		*datatype=SQL_BLOB_LOCATOR
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: CHAR
-		*datatype=SQL_CHAR
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: CHAR FOR BIT DATA
-		*datatype=SQL_BINARY
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: CLOB
-		*datatype=SQL_CLOB
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: CLOB LOCATOR
-		*datatype=SQL_CLOB_LOCATOR
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: DATE
-		*datatype=SQL_TYPE_DATE
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: DBCLOB
-		*datatype=SQL_DBCLOB
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: DBCLOB LOCATOR
-		*datatype=SQL_DBCLOB_LOCATOR
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: DECFLOAT or DECFLOAT
-		*datatype=SQL_DECFLOAT
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: DECIMAL
-		*datatype=SQL_DECIMAL
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: DOUBLE
-		*datatype=SQL_DOUBLE
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: FLOAT
-		*datatype=SQL_FLOAT
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: GRAPHIC
-		*datatype=SQL_GRAPHIC
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: INTEGER
-		*datatype=SQL_INTEGER
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: LONG VARCHAR
-		*datatype=SQL_LONGVARCHAR
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: LONG VARCHAR FOR BIT DATA
-		*datatype=SQL_LONGVARBINARY
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: LONG VARGRAPHIC
-		*datatype=SQL_LONGVARGRAPHIC
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: NUMERIC
-		*datatype=SQL_NUMERIC
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: REAL
-		*datatype=SQL_REAL
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: ROWID
-		*datatype=SQL_ROWID
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: SMALLINT
-		*datatype=SQL_SMALLINT
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: TIME
-		*datatype=SQL_TYPE_TIME
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: TIMESTAMP
-		*datatype=SQL_TYPE_TIMESTAMP
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: VARBINARY
-		*datatype=SQL_VARBINARY
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: VARCHAR
-		*datatype=SQL_VARCHAR
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: VARCHAR FOR BIT DATA
-		*datatype=SQL_VARBINARY
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: VARGRAPHIC
-		*datatype=SQL_VARGRAPHIC
-	} else if (!charstring::compare(ctype,"")) {
-		// SQL type: XML
-		*datatype=SQL_XML
-	}*/
-	*columnsize=(SQLSMALLINT)
-			stmt->cur->getColumnPrecision(columnnumber-1);
-	*decimaldigits=(SQLSMALLINT)
-			stmt->cur->getColumnScale(columnnumber-1);
-	*nullable=(SQLSMALLINT)
-			stmt->cur->getColumnIsNullable(columnnumber-1);
+		*namelength=charstring::length(columnname);
+		// FIXME: map SQLR column types to ODBC column types
+		*datatype=SQL_CHAR;
+		/*const char	*ctype=stmt->cur->getColumnType(columnnumber-1);
+		if (!charstring::compare(ctype,"")) {
+			// SQL type: BIGINT
+			*datatype=SQL_BIGINT
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: BINARY
+			*datatype=SQL_BINARY
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: BLOB
+			*datatype=SQL_BLOB
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: BLOB LOCATOR
+			*datatype=SQL_BLOB_LOCATOR
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: CHAR
+			*datatype=SQL_CHAR
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: CHAR FOR BIT DATA
+			*datatype=SQL_BINARY
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: CLOB
+			*datatype=SQL_CLOB
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: CLOB LOCATOR
+			*datatype=SQL_CLOB_LOCATOR
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: DATE
+			*datatype=SQL_TYPE_DATE
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: DBCLOB
+			*datatype=SQL_DBCLOB
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: DBCLOB LOCATOR
+			*datatype=SQL_DBCLOB_LOCATOR
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: DECFLOAT or DECFLOAT
+			*datatype=SQL_DECFLOAT
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: DECIMAL
+			*datatype=SQL_DECIMAL
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: DOUBLE
+			*datatype=SQL_DOUBLE
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: FLOAT
+			*datatype=SQL_FLOAT
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: GRAPHIC
+			*datatype=SQL_GRAPHIC
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: INTEGER
+			*datatype=SQL_INTEGER
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: LONG VARCHAR
+			*datatype=SQL_LONGVARCHAR
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: LONG VARCHAR FOR BIT DATA
+			*datatype=SQL_LONGVARBINARY
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: LONG VARGRAPHIC
+			*datatype=SQL_LONGVARGRAPHIC
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: NUMERIC
+			*datatype=SQL_NUMERIC
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: REAL
+			*datatype=SQL_REAL
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: ROWID
+			*datatype=SQL_ROWID
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: SMALLINT
+			*datatype=SQL_SMALLINT
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: TIME
+			*datatype=SQL_TYPE_TIME
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: TIMESTAMP
+			*datatype=SQL_TYPE_TIMESTAMP
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: VARBINARY
+			*datatype=SQL_VARBINARY
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: VARCHAR
+			*datatype=SQL_VARCHAR
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: VARCHAR FOR BIT DATA
+			*datatype=SQL_VARBINARY
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: VARGRAPHIC
+			*datatype=SQL_VARGRAPHIC
+		} else if (!charstring::compare(ctype,"")) {
+			// SQL type: XML
+			*datatype=SQL_XML
+		}*/
+		*columnsize=(SQLSMALLINT)
+				stmt->cur->getColumnPrecision(columnnumber-1);
+		*decimaldigits=(SQLSMALLINT)
+				stmt->cur->getColumnScale(columnnumber-1);
+		*nullable=(SQLSMALLINT)
+				stmt->cur->getColumnIsNullable(columnnumber-1);
+	}
 
 	return SQL_SUCCESS;
 }
@@ -795,39 +835,6 @@ SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handletype,
 }
 #endif
 
-SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
-					SQLHDBC connectionhandle,
-					SQLHSTMT statementhandle,
-					SQLCHAR *sqlstate,
-					SQLINTEGER *nativeerror,
-					SQLCHAR *messagetext,
-					SQLSMALLINT bufferlength,
-					SQLSMALLINT *textlength) {
-	debugFunction();
-
-	ENV	*env=(ENV *)environmenthandle;
-	if (environmenthandle==SQL_NULL_HENV || !env) {
-		debugPrintf("NULL env handle\n");
-		return SQL_INVALID_HANDLE;
-	}
-
-	CONN	*conn=(CONN *)connectionhandle;
-	if (connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
-		debugPrintf("NULL conn handle\n");
-		return SQL_INVALID_HANDLE;
-	}
-
-	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
-		return SQL_INVALID_HANDLE;
-	}
-
-	// FIXME: implement this
-
-	return SQL_SUCCESS;
-}
-
 SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 					SQLCHAR *statementtext,
 					SQLINTEGER textlength) {
@@ -841,6 +848,18 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// reinit current row
+	stmt->currentrow=0;
+
+	// clear the error
+	delete[] stmt->error;
+	stmt->error=NULL;
+	stmt->errorrec=0;
+
+	// set the typeinfo flag
+	stmt->typeinfo=false;
+
+	// run the query
 	if (textlength==SQL_NTS || textlength==SQL_NTSL) {
 		if (stmt->cur->sendQuery((const char *)statementtext)) {
 			return SQL_SUCCESS;
@@ -852,7 +871,9 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 		}
 	}
 
-	// FIXME: push error onto list
+	// store the error
+	stmt->error=charstring::duplicate(stmt->cur->errorMessage());
+	debugPrintf("error is %s\n",stmt->error);
 
 	return SQL_ERROR;
 }
@@ -866,13 +887,25 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 		return SQL_INVALID_HANDLE;
 	}
 
+	// reinit current row
 	stmt->currentrow=0;
 
+	// clear the error
+	delete[] stmt->error;
+	stmt->error=NULL;
+	stmt->errorrec=0;
+
+	// set the typeinfo flag
+	stmt->typeinfo=false;
+
+	// run the query
 	if (stmt->cur->executeQuery()) {
 		return SQL_SUCCESS;
 	}
 
-	// FIXME: push error onto list
+	// store the error
+	stmt->error=charstring::duplicate(stmt->cur->errorMessage());
+	debugPrintf("error is %s\n",stmt->error);
 
 	return SQL_ERROR;
 }
@@ -888,17 +921,31 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	debugPrintf("targettype: %d\n",targettype);
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	if (columnnumber<1 || columnnumber>stmt->cur->colCount()) {
+	uint32_t	colcount=0;
+	if (stmt->typeinfo) {
+		colcount=typeinfocolcount;
+	} else {
+		colcount=stmt->cur->colCount();
+	}
+
+	if (columnnumber<1 || columnnumber>colcount) {
 		return SQL_ERROR;
 	}
 
-	const char	*field=stmt->cur->getField(stmt->currentrow-1,
-							columnnumber-1);
+	const char	*field;
+	if (stmt->typeinfo) {
+		// FIXME: implement this
+		field="";
+	} else {
+		field=stmt->cur->getField(stmt->currentrow-1,
+						columnnumber-1);
+	}
 
 	*strlen_or_ind=SQL_NULL_DATA;
 
@@ -912,10 +959,15 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 				// unsigned char *
 				snprintf((char *)targetvalue,
 						bufferlength,field);
-				*strlen_or_ind=(SQLLEN)stmt->cur->
-						getFieldLength(
+				if (stmt->typeinfo) {
+					*strlen_or_ind=charstring::
+							length(field);
+				} else {
+					*strlen_or_ind=(SQLLEN)stmt->cur->
+							getFieldLength(
 							stmt->currentrow-1,
 							columnnumber-1);
+				}
 				break;
 			case SQL_C_SSHORT:
 				debugPrintf("SQL_C_SSHORT\n");
@@ -1103,11 +1155,22 @@ SQLRETURN SQLR_PopulateBindColumns(SQLHSTMT statementhandle) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 
-	for (uint32_t index=0; index<stmt->cur->colCount(); index++) {
+	uint32_t	colcount=0;
+	if (stmt->typeinfo) {
+		colcount=typeinfocolcount;
+	} else {
+		colcount=stmt->cur->colCount();
+	}
 
+	for (uint32_t index=0; index<colcount; index++) {
+
+		// get the bound field, if this field isn't bound, move on
 		FIELD	*field=NULL;
-		stmt->fieldlist.getData(index,&field);
+		if (!stmt->fieldlist.getData(index,&field)) {
+			continue;
+		}
 
+		// get the data into the bound column
 		SQLRETURN	result=SQLR_SQLGetData(statementhandle,
 							index+1,
 							field->targettype,
@@ -1125,16 +1188,23 @@ SQLRETURN SQLR_SQLFetch(SQLHSTMT statementhandle) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	if (stmt->cur->getRow(stmt->currentrow)) {
-		stmt->currentrow++;
-		return SQLR_PopulateBindColumns(statementhandle);
+	if (stmt->typeinfo) {
+		if (stmt->currentrow>=stmt->typeinforowcount) {
+			return SQL_NO_DATA_FOUND;
+		}
+	} else {
+		if (!stmt->cur->getRow(stmt->currentrow)) {
+			return SQL_NO_DATA_FOUND;
+		}
 	}
-	return SQL_NO_DATA_FOUND;
+	stmt->currentrow++;
+	return SQLR_PopulateBindColumns(statementhandle);
 }
 
 
@@ -1149,7 +1219,8 @@ SQLRETURN SQLR_SQLFetchScroll(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -1199,6 +1270,7 @@ static SQLRETURN SQLR_SQLFreeConnect(SQLHDBC connectionhandle) {
 	conn->env->connlist.removeAllByData(conn);
 	conn->stmtlist.clear();
 	delete conn->con;
+	delete[] conn->error;
 	delete conn;
 
 	return SQL_SUCCESS;
@@ -1219,6 +1291,7 @@ static SQLRETURN SQLR_SQLFreeEnv(SQLHENV environmenthandle) {
 	}
 
 	env->connlist.clear();
+	delete[] env->error;
 	delete env;
 
 	return SQL_SUCCESS;
@@ -1234,7 +1307,8 @@ static SQLRETURN SQLR_SQLFreeStmt(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -1246,7 +1320,9 @@ static SQLRETURN SQLR_SQLFreeStmt(SQLHSTMT statementhandle,
 		case SQL_DROP:
 			debugPrintf("SQL_DROP\n");
 			stmt->conn->stmtlist.removeAllByData(stmt);
-			delete stmt->cur;
+			if (!stmt->typeinfo) {
+				delete stmt->cur;
+			}
 			delete stmt;
 			break;
 		case SQL_UNBIND:
@@ -1255,7 +1331,9 @@ static SQLRETURN SQLR_SQLFreeStmt(SQLHSTMT statementhandle,
 			break;
 		case SQL_RESET_PARAMS:
 			debugPrintf("SQL_RESET_PARAMS\n");
-			stmt->cur->clearBinds();
+			if (!stmt->typeinfo) {
+				stmt->cur->clearBinds();
+			}
 			break;
 	}
 
@@ -1357,7 +1435,8 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -1467,7 +1546,8 @@ SQLRETURN SQLR_SQLGetDiagFieldStmt(SQLHANDLE handle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)handle;
-	if (handle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (handle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -1514,7 +1594,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 	return SQL_ERROR;
 }
 
-SQLRETURN SQLR_SQLGetDiagRecEnv(SQLHANDLE handle,
+static SQLRETURN SQLR_SQLGetDiagRecEnv(SQLHANDLE handle,
 					SQLSMALLINT recnumber,
 					SQLCHAR *sqlstate,
 					SQLINTEGER *nativeerror,
@@ -1522,18 +1602,33 @@ SQLRETURN SQLR_SQLGetDiagRecEnv(SQLHANDLE handle,
 					SQLSMALLINT bufferlength,
 					SQLSMALLINT *textlength) {
 	debugFunction();
+
+	debugPrintf("recnumber is %d\n",recnumber);
+
+	// SQL Relay doesn't have more than 1 error record
+	if (recnumber>1) {
+		return SQL_NO_DATA;
+	}
 
 	ENV	*env=(ENV *)handle;
-	if (handle==SQL_NULL_HENV || !env) {
-		debugPrintf("NULL env handle\n");
-		return SQL_INVALID_HANDLE;
-	}
 
-	// SQL Relay does not have additional info for env errors.
-	return SQL_NO_DATA;
+	// set the sqlstate, we don't really have those, but HY means
+	// odbc-driver-specific error and 000 is a generic subclass
+	charstring::copy((char *)sqlstate,"HY000");
+
+	// sqlrelay doesn't have error numbers
+	*nativeerror=0;
+
+	// copy the error message text into the provided buffer
+	snprintf((char *)messagetext,(size_t)bufferlength,env->error);
+
+	debugPrintf("sqlstate is %s\n",sqlstate);
+	debugPrintf("messagetext is %s\n",messagetext);
+
+	return SQL_SUCCESS;
 }
 
-SQLRETURN SQLR_SQLGetDiagRecConnect(SQLHANDLE handle,
+static SQLRETURN SQLR_SQLGetDiagRecConnect(SQLHANDLE handle,
 					SQLSMALLINT recnumber,
 					SQLCHAR *sqlstate,
 					SQLINTEGER *nativeerror,
@@ -1541,18 +1636,33 @@ SQLRETURN SQLR_SQLGetDiagRecConnect(SQLHANDLE handle,
 					SQLSMALLINT bufferlength,
 					SQLSMALLINT *textlength) {
 	debugFunction();
+
+	debugPrintf("recnumber is %d\n",recnumber);
+
+	// SQL Relay doesn't have more than 1 error record
+	if (recnumber>1) {
+		return SQL_NO_DATA;
+	}
 
 	CONN	*conn=(CONN *)handle;
-	if (handle==SQL_NULL_HANDLE || !conn || !conn->con) {
-		debugPrintf("NULL conn handle\n");
-		return SQL_INVALID_HANDLE;
-	}
 
-	// SQL Relay does not have additional info for connect errors.
-	return SQL_NO_DATA;
+	// set the sqlstate, we don't really have those, but HY means
+	// odbc-driver-specific error and 000 is a generic subclass
+	charstring::copy((char *)sqlstate,"HY000");
+
+	// sqlrelay doesn't have error numbers
+	*nativeerror=0;
+
+	// copy the error message text into the provided buffer
+	snprintf((char *)messagetext,(size_t)bufferlength,conn->error);
+
+	debugPrintf("sqlstate is %s\n",sqlstate);
+	debugPrintf("messagetext is %s\n",messagetext);
+
+	return SQL_SUCCESS;
 }
 
-SQLRETURN SQLR_SQLGetDiagRecStmt(SQLHANDLE handle,
+static SQLRETURN SQLR_SQLGetDiagRecStmt(SQLHANDLE handle,
 					SQLSMALLINT recnumber,
 					SQLCHAR *sqlstate,
 					SQLINTEGER *nativeerror,
@@ -1561,16 +1671,29 @@ SQLRETURN SQLR_SQLGetDiagRecStmt(SQLHANDLE handle,
 					SQLSMALLINT *textlength) {
 	debugFunction();
 
-	STMT	*stmt=(STMT *)handle;
-	if (handle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
-		return SQL_INVALID_HANDLE;
+	debugPrintf("recnumber is %d\n",recnumber);
+
+	// SQL Relay doesn't have more than 1 error record
+	if (recnumber>1) {
+		return SQL_NO_DATA;
 	}
 
-	// FIXME: should errorMessage() go in here?
+	STMT	*stmt=(STMT *)handle;
 
-	// SQL Relay does not have additional info for errors.
-	return SQL_NO_DATA;
+	// set the sqlstate, we don't really have those, but HY means
+	// odbc-driver-specific error and 000 is a generic subclass
+	charstring::copy((char *)sqlstate,"HY000");
+
+	// sqlrelay doesn't have error numbers
+	*nativeerror=0;
+
+	// copy the error message text into the provided buffer
+	snprintf((char *)messagetext,(size_t)bufferlength,stmt->error);
+
+	debugPrintf("sqlstate is %s\n",sqlstate);
+	debugPrintf("messagetext is %s\n",messagetext);
+
+	return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handletype,
@@ -1612,6 +1735,51 @@ SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handletype,
 	}
 
 	return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
+					SQLHDBC connectionhandle,
+					SQLHSTMT statementhandle,
+					SQLCHAR *sqlstate,
+					SQLINTEGER *nativeerror,
+					SQLCHAR *messagetext,
+					SQLSMALLINT bufferlength,
+					SQLSMALLINT *textlength) {
+	debugFunction();
+
+	ENV	*env=(ENV *)environmenthandle;
+	CONN	*conn=(CONN *)connectionhandle;
+	STMT	*stmt=(STMT *)statementhandle;
+
+	SQLRETURN	retval=SQL_INVALID_HANDLE;
+	if (statementhandle!=SQL_NULL_HSTMT && stmt) {
+		debugPrintf("statement handle\n");
+		retval=SQLR_SQLGetDiagRecStmt(statementhandle,
+						stmt->errorrec,
+						sqlstate,nativeerror,
+						messagetext,bufferlength,
+						textlength);
+		stmt->errorrec++;
+	} else if (connectionhandle!=SQL_NULL_HANDLE && conn) {
+		debugPrintf("connection handle\n");
+		retval=SQLR_SQLGetDiagRecConnect(statementhandle,
+						conn->errorrec,
+						sqlstate,nativeerror,
+						messagetext,bufferlength,
+						textlength);
+		conn->errorrec++;
+	} else if (environmenthandle!=SQL_NULL_HENV && env) {
+		debugPrintf("environment handle\n");
+		retval=SQLR_SQLGetDiagRecEnv(statementhandle,
+						env->errorrec,
+						sqlstate,nativeerror,
+						messagetext,bufferlength,
+						textlength);
+		env->errorrec++;
+	} else {
+		debugPrintf("no valid handle\n");
+	}
+	return retval;
 }
 
 SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
@@ -1860,7 +2028,8 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 	debugPrintf("bufferlength: %d\n",bufferlength);
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -2022,17 +2191,65 @@ SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT statementhandle,
 	return SQLR_SQLGetStmtAttr(statementhandle,option,value,-1,NULL);
 }
 
+/*SQL_CHAR
+SQL_VARCHAR
+SQL_LONGVARCHAR
+SQL_WCHAR
+SQL_WVARCHAR
+SQL_WLONGVARCHAR
+SQL_DECIMAL
+SQL_NUMERIC
+SQL_SMALLINT
+SQL_INTEGER
+SQL_REAL
+SQL_FLOAT
+SQL_DOUBLE
+SQL_BIT
+SQL_TINYINT
+SQL_BIGINT
+SQL_BINARY
+SQL_VARBINARY
+SQL_LONGVARBINARY
+SQL_TYPE_DATE
+SQL_TYPE_TIME
+SQL_TYPE_TIMESTAMP
+SQL_TYPE_UTCDATETIME
+SQL_TYPE_UTCTIME
+SQL_INTERVAL_MONTH
+SQL_INTERVAL_YEAR
+SQL_INTERVAL_YEAR_TO_MONTH
+SQL_INTERVAL_DAY
+SQL_INTERVAL_HOUR
+SQL_INTERVAL_MINUTE
+SQL_INTERVAL_SECOND
+SQL_INTERVAL_DAY_TO_HOUR
+SQL_INTERVAL_DAY_TO_MINUTE
+SQL_INTERVAL_DAY_TO_SECOND
+SQL_INTERVAL_HOUR_TO_MINUTE
+SQL_INTERVAL_HOUR_TO_SECOND
+SQL_INTERVAL_MINUTE_TO_SECOND
+SQL_GUID*/
+
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 					SQLSMALLINT DataType) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this
+	// clear the error
+	delete[] stmt->error;
+	stmt->error=NULL;
+	stmt->errorrec=0;
+
+	// set the typeinfo flag
+	stmt->typeinfo=true;
+
+
+	stmt->typeinforowcount=0;
 
 	return SQL_ERROR;
 }
@@ -2042,12 +2259,18 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	*columncount=(SQLSMALLINT)stmt->cur->colCount();
+	if (stmt->typeinfo) {
+		*columncount=typeinfocolcount;
+	} else {
+		*columncount=(SQLSMALLINT)stmt->cur->colCount();
+	}
+	debugPrintf("columncount is %d\n",*columncount);
 
 	return SQL_SUCCESS;
 }
@@ -2057,7 +2280,8 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -2097,7 +2321,8 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -2112,12 +2337,17 @@ SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	*rowcount=(SQLSMALLINT)stmt->cur->affectedRows();
+	if (stmt->typeinfo) {
+		*rowcount=stmt->typeinforowcount;
+	} else {
+		*rowcount=(SQLSMALLINT)stmt->cur->affectedRows();
+	}
 
 	return SQL_SUCCESS;
 }
@@ -2197,7 +2427,8 @@ SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -2295,7 +2526,8 @@ SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -2446,7 +2678,8 @@ SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -2468,7 +2701,8 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -2490,7 +2724,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -2623,7 +2857,8 @@ SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -2646,12 +2881,20 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 	debugPrintf("fieldidentifier: %d\n",fieldidentifier);
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	if (columnnumber<1 || columnnumber>stmt->cur->colCount()) {
+	uint32_t	colcount=0;
+	if (stmt->typeinfo) {
+		colcount=typeinfocolcount;
+	} else {
+		colcount=stmt->cur->colCount();
+	}
+
+	if (columnnumber<1 || columnnumber>colcount) {
 		return SQL_ERROR;
 	}
 
@@ -2669,9 +2912,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 		case SQL_COLUMN_SCALE:
 			break;
 		case SQL_COLUMN_DISPLAY_SIZE:
-			numericattribute=
-				(SQLPOINTER)stmt->cur->
-					getLongest(columnnumber-1);
+			if (!stmt->typeinfo) {
+				numericattribute=
+					(SQLPOINTER)stmt->cur->
+						getLongest(columnnumber-1);
+			}
 			break;
 		case SQL_COLUMN_NULLABLE:
 			break;
@@ -2696,13 +2941,18 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 		case SQL_COLUMN_QUALIFIER_NAME:
 			break;
 		case SQL_COLUMN_LABEL:
-			snprintf((char *)characterattribute,bufferlength,
-				stmt->cur->getColumnName(columnnumber-1));
-			if (stringlength) {
-				*stringlength=(SQLSMALLINT)
-					charstring::length(
-						stmt->cur->getColumnName(
+			if (!stmt->typeinfo) {
+				snprintf((char *)characterattribute,
+					bufferlength,
+					stmt->cur->getColumnName(
 							columnnumber-1));
+				if (stringlength) {
+					*stringlength=(SQLSMALLINT)
+						charstring::length(
+							stmt->cur->
+							getColumnName(
+							columnnumber-1));
+				}
 			}
 			break;
 		#if (ODBCVER < 0x0300)
@@ -2837,12 +3087,17 @@ SQLRETURN SQL_API SQLNumParams(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	*pcpar=(SQLSMALLINT)stmt->cur->countBindVariables();
+	if (stmt->typeinfo) {
+		*pcpar=0;
+	} else {
+		*pcpar=(SQLSMALLINT)stmt->cur->countBindVariables();
+	}
 
 	return SQL_SUCCESS;
 }
@@ -2908,7 +3163,8 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt ||
+			(!stmt->cur && !stmt->typeinfo)) {
 		debugPrintf("NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
