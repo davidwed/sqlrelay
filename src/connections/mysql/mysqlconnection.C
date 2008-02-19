@@ -610,15 +610,22 @@ const char *mysqlcursor::errorMessage(bool *liveconnection) {
 	}
 #endif
 
+	// Below we check both queryresult and errn.  At one time, we only
+	// checked queryresult.  This may have been a bug.  It's possible that
+	// back then we should have only checked errn.  But I have a fuzzy
+	// memory of some version of mysql returning these error codes in
+	// queryresult, so for now I'll leave that code and check both.
 #if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
 		defined(HAVE_MYSQL_CR_SERVER_LOST) 
 	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
-		if (errn==CR_SERVER_GONE_ERROR) {
+		if (queryresult==CR_SERVER_GONE_ERROR ||
+				errn==CR_SERVER_GONE_ERROR) {
 			*liveconnection=false;
 		} else
 	#endif
 	#ifdef HAVE_MYSQL_CR_SERVER_LOST
-		if (errn==CR_SERVER_LOST) {
+		if (queryresult==CR_SERVER_GONE_ERROR ||
+				errn==CR_SERVER_LOST) {
 			*liveconnection=false;
 		} else
 	#endif
