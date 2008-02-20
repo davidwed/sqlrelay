@@ -152,7 +152,7 @@ static SQLRETURN SQLR_SQLAllocStmt(SQLHDBC connectionhandle,
 	// SQL_ATTR_APP_PARAM_DESC
 	// SQL_ATTR_IMP_ROW_DESC
 	// SQL_ATTR_IMP_PARAM_DESC
-	SQLRETURN	retval;
+	/*SQLRETURN	retval;
 	retval=SQLR_SQLAllocDesc(conn,&stmt->rowdesc);
 	if (retval!=SQL_SUCCESS) {
 		return retval;
@@ -165,7 +165,15 @@ static SQLRETURN SQLR_SQLAllocStmt(SQLHDBC connectionhandle,
 	if (retval!=SQL_SUCCESS) {
 		return retval;
 	}
-	return SQLR_SQLAllocDesc(conn,&stmt->impparamdesc);
+	return SQLR_SQLAllocDesc(conn,&stmt->impparamdesc);*/
+
+	// for now, just aim these at the stmt handle
+	stmt->rowdesc=(SQLHANDLE)stmt;
+	stmt->paramdesc=(SQLHANDLE)stmt;
+	stmt->improwdesc=(SQLHANDLE)stmt;
+	stmt->impparamdesc=(SQLHANDLE)stmt;
+
+	return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
@@ -1974,7 +1982,10 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 
 	uint16_t	outsize=0;
 
-	char	*strval="";
+	SQLSMALLINT	smallintvar=0;
+	SQLINTEGER	intvar=0;
+	char		*strval="";
+
 	// FIXME: there are tons more of these...
 	switch (infotype) {
 		case SQL_DRIVER_ODBC_VER:
@@ -1983,8 +1994,42 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_XOPEN_CLI_YEAR:
 			strval="2007";
 			break;
+		case SQL_DRIVER_NAME:
+			strval="SQL Relay";
+			break;
 		case SQL_DRIVER_VER:
 			strval=SQLR_VERSION;
+			break;
+		case SQL_DBMS_NAME:
+			strval="SQL Relay";
+			break;
+		case SQL_DBMS_VER:
+			strval=SQLR_VERSION;
+			break;
+		case SQL_TXN_CAPABLE:
+			outsize=16;
+			// FIXME: this isn't true for all db's sqlrelay supports
+			smallintvar=SQL_TC_ALL;
+			break;
+		case SQL_TXN_ISOLATION_OPTION:
+			outsize=32;
+			// FIXME: this isn't true for all db's sqlrelay supports
+			intvar=SQL_TXN_READ_COMMITTED;
+			break;
+		case SQL_SCROLL_OPTIONS:
+			outsize=32;
+			// FIXME: this isn't exactly true
+			intvar=SQL_SO_FORWARD_ONLY;
+			break;
+		case SQL_USER_NAME:
+			// FIXME: implement this
+			strval="mysqltest";
+			break;
+		case SQL_BATCH_ROW_COUNT:
+		case SQL_BATCH_SUPPORT:
+		case SQL_PARAM_ARRAY_ROW_COUNTS:
+			outsize=32;
+			intvar=0;
 			break;
 	}
 
@@ -2001,6 +2046,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			break;
 		case 16:
 			// 16-bit integer
+			*((SQLSMALLINT *)infovalue)=smallintvar;
+			debugPrintf("infovalue: %d\n",smallintvar);
 			if (stringlength) {
 				*stringlength=(SQLSMALLINT)sizeof(uint16_t);
 				debugPrintf("stringlength: %d\n",*stringlength);
@@ -2008,6 +2055,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			break;
 		case 32:
 			// 32-bit integer
+			*((SQLINTEGER *)infovalue)=intvar;
+			debugPrintf("infovalue: %d\n",intvar);
 			if (stringlength) {
 				*stringlength=(SQLSMALLINT)sizeof(uint32_t);
 				debugPrintf("stringlength: %d\n",*stringlength);
@@ -2034,7 +2083,7 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this for real
+	// FIXME: implement the rest of these
 
 	switch (attribute) {
 		#if (ODBCVER >= 0x0300)
@@ -2172,6 +2221,7 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 	}
 	return SQL_SUCCESS;
 }
+
 #if (ODBCVER >= 0x0300)
 SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT statementhandle,
 					SQLINTEGER attribute,
@@ -2248,10 +2298,10 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 	// set the typeinfo flag
 	stmt->typeinfo=true;
 
-
+	// FIXME: implement this...
 	stmt->typeinforowcount=0;
 
-	return SQL_ERROR;
+	return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
@@ -2532,21 +2582,16 @@ SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this
+	// FIXME: implement the rest of these
+
 	switch (attribute) {
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_APP_ROW_DESC:
-			// FIXME: I think this is supposed to be read-only
-			break;
 		case SQL_ATTR_APP_PARAM_DESC:
-			// FIXME: I think this is supposed to be read-only
-			break;
 		case SQL_ATTR_IMP_ROW_DESC:
-			// FIXME: I think this is supposed to be read-only
-			break;
 		case SQL_ATTR_IMP_PARAM_DESC:
-			// FIXME: I think this is supposed to be read-only
-			break;
+			// these are read-only
+			return SQL_ERROR;
 		case SQL_ATTR_CURSOR_SCROLLABLE:
 			break;
 		case SQL_ATTR_CURSOR_SENSITIVITY:
