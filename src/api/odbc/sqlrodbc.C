@@ -12,7 +12,7 @@
 
 #define ODBC_INI "odbc.ini"
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
 	#define debugPrintf(format, ...) printf(format, ## __VA_ARGS__); fflush(stdout);
@@ -39,7 +39,8 @@ struct FIELD {
 
 struct STMT {
 	sqlrcursor			*cur;
-	uint64_t			currentrow;
+	uint64_t			currentfetchrow;
+	uint64_t			currentgetdatarow;
 	CONN				*conn;
 	char				*error;
 	uint64_t			errorrec;
@@ -646,7 +647,7 @@ SQLRETURN SQL_API SQLCopyDesc(SQLHDESC SourceDescHandle,
 					SQLHDESC TargetDescHandle) {
 	debugFunction();
 
-	// FIXME: implement this...
+	// FIXME: what should this do?
 	return SQL_SUCCESS;
 }
 #endif
@@ -909,8 +910,9 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// reinit current row
-	stmt->currentrow=0;
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentgetdatarow=0;
 
 	// clear the error
 	delete[] stmt->error;
@@ -948,8 +950,9 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 		return SQL_INVALID_HANDLE;
 	}
 
-	// reinit current row
-	stmt->currentrow=0;
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentgetdatarow=0;
 
 	// clear the error
 	delete[] stmt->error;
@@ -1004,8 +1007,8 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		// FIXME: implement this
 		field="";
 	} else {
-		field=stmt->cur->getField(stmt->currentrow-1,
-						columnnumber-1);
+		field=stmt->cur->getField(stmt->currentgetdatarow,
+							columnnumber-1);
 	}
 
 	*strlen_or_ind=SQL_NULL_DATA;
@@ -1026,7 +1029,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 				} else {
 					*strlen_or_ind=(SQLLEN)stmt->cur->
 							getFieldLength(
-							stmt->currentrow-1,
+							stmt->currentgetdatarow,
 							columnnumber-1);
 				}
 				break;
@@ -1256,15 +1259,16 @@ SQLRETURN SQLR_SQLFetch(SQLHSTMT statementhandle) {
 	}
 
 	if (stmt->typeinfo) {
-		if (stmt->currentrow>=stmt->typeinforowcount) {
+		if (stmt->currentfetchrow>=stmt->typeinforowcount) {
 			return SQL_NO_DATA_FOUND;
 		}
 	} else {
-		if (!stmt->cur->getRow(stmt->currentrow)) {
+		if (!stmt->cur->getRow(stmt->currentfetchrow)) {
 			return SQL_NO_DATA_FOUND;
 		}
 	}
-	stmt->currentrow++;
+	stmt->currentgetdatarow=stmt->currentfetchrow;
+	stmt->currentfetchrow++;
 	return SQLR_PopulateBindColumns(statementhandle);
 }
 
@@ -2075,14 +2079,81 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			intvar=SQL_SO_FORWARD_ONLY;
 			break;
 		case SQL_USER_NAME:
-			// FIXME: implement this
-			strval="mysqltest";
+			strval=conn->user;
 			break;
 		case SQL_BATCH_ROW_COUNT:
 		case SQL_BATCH_SUPPORT:
 		case SQL_PARAM_ARRAY_ROW_COUNTS:
 			outsize=32;
 			intvar=0;
+			break;
+		case SQL_ALTER_TABLE:
+			// FIXME: this must be implemented for odbc 2
+			// in odbc 3 there's a new parameter
+			// masks:
+			// SQL_AT_DROP_COLUMN
+			// SQL_AT_ADD_COLUMN
+			break;
+		case SQL_FETCH_DIRECTION:
+			// FIXME: this must be implemented for odbc 2
+			// in odbc 3 there's a new parameter
+			// masks:
+			// SQL_FD_FETCH_NEXT
+			// SQL_FD_FETCH_FIRST
+			// SQL_FD_FETCH_LAST
+			// SQL_FD_FETCH_PRIOR
+			// SQL_FD_FETCH_ABSOLUTE
+			// SQL_FD_FETCH_RELATIVE
+			// SQL_FD_FETCH_BOOKMARK
+			break;
+		case SQL_LOCK_TYPES:
+			outsize=32;
+			intvar=SQL_LCK_NO_CHANGE;
+			break;
+		case SQL_ODBC_API_CONFORMANCE:
+			// FIXME: this must be implemented for odbc 2
+			// in odbc 3 there's a new parameter
+			// masks:
+			// SQL_OAC_NONE
+			// SQL_OAC_LEVEL1
+			// SQL_OAC_LEVEL2
+			break;
+		case SQL_ODBC_SQL_CONFORMANCE:
+			// FIXME: this must be implemented for odbc 2
+			// in odbc 3 there's a new parameter
+			// masks:
+			// SQL_OSC_MINIMUM
+			// SQL_OSC_CORE
+			// SQL_OSC_EXTENDED
+			break;
+		case SQL_POS_OPERATIONS:
+			outsize=32;
+			intvar=SQL_POS_POSITION;
+			break;
+		case SQL_POSITIONED_STATEMENTS:
+			// FIXME: this must be implemented for odbc 2
+			// in odbc 3 there's a new parameter
+			// masks:
+			// SQL_PS_POSITIONED_DELETE
+			// SQL_PS_POSITIONED_UPDATE
+			// SQL_PS_SELECT_FOR_UPDATE
+			break;
+		case SQL_SCROLL_CONCURRENCY:
+			// FIXME: this must be implemented for odbc 2
+			// in odbc 3 there's a new parameter
+			// masks:
+			// SQL_SCCO_READ_ONLY
+			// SQL_SCCO_LOCK
+			// SQL_SCCO_OPT_ROWVER
+			// SQL_SCCO_OPT_VALUES
+			break;
+		case SQL_STATIC_SENSITIVITY:
+			// FIXME: this must be implemented for odbc 2
+			// in odbc 3 there's a new parameter
+			// masks:
+			// SQL_SS_ADDITIONS
+			// SQL_SS_DELETIONS
+			// SQL_SS_UPDATES
 			break;
 	}
 
@@ -3267,23 +3338,19 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this
+	// set the current row indices
+	stmt->currentfetchrow=irow;
+	stmt->currentgetdatarow=irow;
 
-	switch (foption) {
-		case SQL_POSITION:
-		case SQL_REFRESH:
-		case SQL_UPDATE:
-		case SQL_DELETE:
-		case SQL_ADD:
-			break;
-	}
+	// foption SQL_POSITION doesn't do anything,
+	// SQL Relay doesn't support SQL_REFRESH,
+	// SQL_UPDATE, SQL_DELETE and SQL_ADD
 
-	switch (flock) {
-		case SQL_LOCK_NO_CHANGE:
-		case SQL_LOCK_EXCLUSIVE:
-		case SQL_LOCK_UNLOCK:
-			break;
-	}
+	// flock SQL_LOCK_NO_CHANGE doesn't do anything,
+	// SQL Relay definitely doesn't support
+	// SQL_LOCK_EXCLUSIVE and SQL_LOCK_UNLOCK
+
+	// FIXME: update SQL_ATTR_ROW_OPERATION_PTR
 
 	return SQL_SUCCESS;
 }
