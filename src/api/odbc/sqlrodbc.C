@@ -10,6 +10,8 @@
 #include <rudiments/linkedlist.h>
 #include <rudiments/parameterstring.h>
 
+#define ODBC_INI "odbc.ini"
+
 #define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
@@ -57,6 +59,13 @@ struct CONN {
 	linkedlist< STMT * >	stmtlist;
 	char			*error;
 	uint64_t		errorrec;
+	char			server[1024];
+	uint16_t		port;
+	char			socket[1024];
+	char			user[1024];
+	char			password[1024];
+	int32_t			retrytime;
+	int32_t			tries;
 };
 
 struct ENV {
@@ -556,12 +565,12 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 
 
 SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
-					SQLCHAR *servername,
-					SQLSMALLINT namelength1,
-					SQLCHAR *username,
-					SQLSMALLINT namelength2,
-					SQLCHAR *authentication,
-					SQLSMALLINT namelength3) {
+					SQLCHAR *dsn,
+					SQLSMALLINT dsnlength,
+					SQLCHAR *user,
+					SQLSMALLINT userlength,
+					SQLCHAR *password,
+					SQLSMALLINT passwordlength) {
 	debugFunction();
 
 	CONN	*conn=(CONN *)connectionhandle;
@@ -570,16 +579,60 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: servername is really the dsn, so we need to use it to look up
-	// the host, port, socket and default user/password in odbc.ini
-	// Use SQLGetPrivateProfileString?
-	/*SQLCHAR	buf[100];
-	SQLGetPrivateProfileString((LPCSTR)servername,"driver","",(LPSTR)buf,100,"odbc.ini");
-	printf("buf=%s\n",buf);*/
-	conn->con=new sqlrconnection("localhost",8006,"",
-					"mysqltest",
-					"mysqltest",
-					0,1);
+	// get data from dsn
+	SQLGetPrivateProfileString((const char *)dsn,"server","",
+					conn->server,sizeof(conn->server),
+					ODBC_INI);
+	char	portbuf[6];
+	SQLGetPrivateProfileString((const char *)dsn,"port","",
+					portbuf,sizeof(portbuf),ODBC_INI);
+	conn->port=(uint16_t)charstring::toUnsignedInteger(portbuf);
+	SQLGetPrivateProfileString((const char *)dsn,"socket","",
+					conn->socket,sizeof(conn->socket),
+					ODBC_INI);
+	if (charstring::length(user)) {
+		snprintf(conn->user,sizeof(conn->user),
+					(const char *)user);
+	} else {
+		SQLGetPrivateProfileString((const char *)dsn,"user","",
+					conn->user,sizeof(conn->user),
+					ODBC_INI);
+	}
+	if (charstring::length(password)) {
+		snprintf(conn->password,sizeof(conn->password),
+					(const char *)password);
+	} else {
+		SQLGetPrivateProfileString((const char *)dsn,"password","",
+					conn->password,sizeof(conn->password),
+					ODBC_INI);
+	}
+	char	retrytimebuf[6];
+	SQLGetPrivateProfileString((const char *)dsn,"retrytime","0",
+					retrytimebuf,sizeof(retrytimebuf),
+					ODBC_INI);
+	conn->retrytime=(int32_t)charstring::toInteger(retrytimebuf);
+	char	triesbuf[6];
+	SQLGetPrivateProfileString((const char *)dsn,"tries","1",
+					triesbuf,sizeof(triesbuf),
+					ODBC_INI);
+	conn->tries=(int32_t)charstring::toInteger(triesbuf);
+
+	debugPrintf("server: %s\n",conn->server);
+	debugPrintf("port: %d\n",conn->port);
+	debugPrintf("socket: %s\n",conn->socket);
+	debugPrintf("user: %s\n",conn->user);
+	debugPrintf("password: %s\n",conn->password);
+	debugPrintf("retrytime: %d\n",conn->retrytime);
+	debugPrintf("tries: %d\n",conn->tries);
+
+	// create connection
+	conn->con=new sqlrconnection(conn->server,
+					conn->port,
+					conn->socket,
+					conn->user,
+					conn->password,
+					conn->retrytime,
+					conn->tries);
 
 	#ifdef DEBUG_MESSAGES
 	conn->con->debugOn();
