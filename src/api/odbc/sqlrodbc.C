@@ -37,21 +37,32 @@ struct FIELD {
 	SQLLEN		*strlen_or_ind;
 };
 
+
+struct outputbind {
+	SQLUSMALLINT	parameternumber;
+	SQLSMALLINT	valuetype;
+	SQLULEN		lengthprecision;
+	SQLSMALLINT	parameterscale;
+	SQLPOINTER	parametervalue;
+	SQLLEN		*strlen_or_ind;
+};
+
 struct STMT {
-	sqlrcursor			*cur;
-	uint64_t			currentfetchrow;
-	uint64_t			currentgetdatarow;
-	CONN				*conn;
-	char				*error;
-	uint64_t			errorrec;
-	char				*name;
-	numericdictionary< FIELD * >	fieldlist;
-	SQLHANDLE			rowdesc;
-	SQLHANDLE			paramdesc;
-	SQLHANDLE			improwdesc;
-	SQLHANDLE			impparamdesc;
-	bool				typeinfo;
-	bool				typeinforowcount;
+	sqlrcursor				*cur;
+	uint64_t				currentfetchrow;
+	uint64_t				currentgetdatarow;
+	CONN					*conn;
+	char					*error;
+	uint64_t				errorrec;
+	char					*name;
+	numericdictionary< FIELD * >		fieldlist;
+	SQLHANDLE				rowdesc;
+	SQLHANDLE				paramdesc;
+	SQLHANDLE				improwdesc;
+	SQLHANDLE				impparamdesc;
+	bool					typeinfo;
+	bool					typeinforowcount;
+	numericdictionary< outputbind * >	outputbinds;
 };
 
 struct CONN {
@@ -238,91 +249,144 @@ SQLRETURN SQLR_SQLInputBindParam(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this
+	// convert parameternumber to a string
+	char	*parametername=charstring::parseNumber(parameternumber);
+
 	switch (valuetype) {
 		case SQL_C_CHAR:
+			// FIXME: use lengthprecision?
+			stmt->cur->inputBind(parametername,
+					(const char *)parametervalue);
 			break;
 		case SQL_C_LONG:
+			stmt->cur->inputBind(parametername,
+					(int64_t)(*((long *)parametervalue)));
 			break;
 		case SQL_C_SHORT:
+			stmt->cur->inputBind(parametername,
+					(int64_t)(*((short *)parametervalue)));
 			break;
 		case SQL_C_FLOAT:
+			stmt->cur->inputBind(parametername,
+					(float)(*((double *)parametervalue)),
+					(uint32_t)lengthprecision,
+					(uint32_t)parameterscale);
 			break;
 		case SQL_C_DOUBLE:
+			stmt->cur->inputBind(parametername,
+					*((double *)parametervalue),
+					(uint32_t)lengthprecision,
+					(uint32_t)parameterscale);
 			break;
 		case SQL_C_NUMERIC:
-			break;
-		case SQL_C_DEFAULT:
+			// FIXME: implement
 			break;
 		case SQL_C_DATE:
+			// FIXME: implement
 			break;
 		case SQL_C_TIME:
+			// FIXME: implement
 			break;
 		case SQL_C_TIMESTAMP:
+			// FIXME: implement
 			break;
 		case SQL_C_TYPE_DATE:
+			// FIXME: implement
 			break;
 		case SQL_C_TYPE_TIME:
+			// FIXME: implement
 			break;
 		case SQL_C_TYPE_TIMESTAMP:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_YEAR:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_MONTH:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_DAY:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_HOUR:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_MINUTE:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_SECOND:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_YEAR_TO_MONTH:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_DAY_TO_HOUR:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_DAY_TO_MINUTE:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_DAY_TO_SECOND:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_HOUR_TO_SECOND:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+			// FIXME: implement
 			break;
+		//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
 		case SQL_C_BINARY:
+			stmt->cur->inputBindBlob(parametername,
+					(const char *)parametervalue,
+					lengthprecision);
 			break;
 		case SQL_C_BIT:
+			// FIXME: implement
 			break;
 		case SQL_C_SBIGINT:
+			stmt->cur->inputBind(parametername,
+				(int64_t)(*((int64_t *)parametervalue)));
 			break;
 		case SQL_C_UBIGINT:
-			break;
-		case SQL_C_TINYINT:
+			stmt->cur->inputBind(parametername,
+				(int64_t)(*((uint64_t *)parametervalue)));
 			break;
 		case SQL_C_SLONG:
+			stmt->cur->inputBind(parametername,
+					(int64_t)(*((long *)parametervalue)));
 			break;
 		case SQL_C_SSHORT:
+			stmt->cur->inputBind(parametername,
+					(int64_t)(*((short *)parametervalue)));
 			break;
+		case SQL_C_TINYINT:
 		case SQL_C_STINYINT:
+			stmt->cur->inputBind(parametername,
+					(int64_t)(*((char *)parametervalue)));
 			break;
+		//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
 		case SQL_C_ULONG:
+			stmt->cur->inputBind(parametername,
+				(int64_t)(*((unsigned long *)parametervalue)));
 			break;
 		case SQL_C_USHORT:
+			stmt->cur->inputBind(parametername,
+				(int64_t)(*((unsigned short *)parametervalue)));
 			break;
 		case SQL_C_UTINYINT:
+			stmt->cur->inputBind(parametername,
+				(int64_t)(*((unsigned char *)parametervalue)));
 			break;
-		// apparently the same as SQL_C_ULONG
-		//case SQL_C_BOOKMARK:
-			//break;
 		case SQL_C_GUID:
+			// FIXME: implement
 			break;
-		// apparently the same as SQL_C_BINARY:
-		//case SQL_C_VARBOOKMARK:
-			//break;
 	}
+
+	delete[] parametername;
 
 	return SQL_ERROR;
 }
@@ -342,91 +406,116 @@ SQLRETURN SQLR_SQLOutputBindParam(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// convert parameternumber to a string
+	char	*parametername=charstring::parseNumber(parameternumber);
+
+	// store the output bind for later
+	outputbind	*ob=new outputbind;
+	ob->parameternumber=parameternumber;
+	ob->valuetype=valuetype;
+	ob->lengthprecision=lengthprecision;
+	ob->parameterscale=parameterscale;
+	ob->parametervalue=parametervalue;
+	ob->strlen_or_ind=strlen_or_ind;
+	stmt->outputbinds.setData(parameternumber,ob);
+
 	// FIXME: implement this
 	switch (valuetype) {
 		case SQL_C_CHAR:
+			stmt->cur->defineOutputBindString(parametername,
+							lengthprecision);
 			break;
 		case SQL_C_LONG:
-			break;
+		case SQL_C_SBIGINT:
+		case SQL_C_UBIGINT:
 		case SQL_C_SHORT:
+		case SQL_C_TINYINT:
+		case SQL_C_SLONG:
+		case SQL_C_SSHORT:
+		case SQL_C_STINYINT:
+		//case SQL_C_BOOKMARK: dup of SQL_C_ULONG
+		case SQL_C_ULONG:
+		case SQL_C_USHORT:
+		case SQL_C_UTINYINT:
+			stmt->cur->defineOutputBindInteger(parametername);
 			break;
 		case SQL_C_FLOAT:
-			break;
 		case SQL_C_DOUBLE:
+			stmt->cur->defineOutputBindDouble(parametername);
 			break;
 		case SQL_C_NUMERIC:
-			break;
-		case SQL_C_DEFAULT:
+			// FIXME: implement
 			break;
 		case SQL_C_DATE:
+			// FIXME: implement
 			break;
 		case SQL_C_TIME:
+			// FIXME: implement
 			break;
 		case SQL_C_TIMESTAMP:
+			// FIXME: implement
 			break;
 		case SQL_C_TYPE_DATE:
+			// FIXME: implement
 			break;
 		case SQL_C_TYPE_TIME:
+			// FIXME: implement
 			break;
 		case SQL_C_TYPE_TIMESTAMP:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_YEAR:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_MONTH:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_DAY:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_HOUR:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_MINUTE:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_SECOND:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_YEAR_TO_MONTH:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_DAY_TO_HOUR:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_DAY_TO_MINUTE:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_DAY_TO_SECOND:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_HOUR_TO_SECOND:
+			// FIXME: implement
 			break;
 		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+			// FIXME: implement
 			break;
+		//case SQL_C_VARBOOKMARK: dup of SQL_C_BINARY:
 		case SQL_C_BINARY:
+			stmt->cur->defineOutputBindBlob(parametername);
 			break;
 		case SQL_C_BIT:
+			// FIXME: implement
 			break;
-		case SQL_C_SBIGINT:
-			break;
-		case SQL_C_UBIGINT:
-			break;
-		case SQL_C_TINYINT:
-			break;
-		case SQL_C_SLONG:
-			break;
-		case SQL_C_SSHORT:
-			break;
-		case SQL_C_STINYINT:
-			break;
-		case SQL_C_ULONG:
-			break;
-		case SQL_C_USHORT:
-			break;
-		case SQL_C_UTINYINT:
-			break;
-		// apparently the same as SQL_C_ULONG
-		//case SQL_C_BOOKMARK:
-			//break;
 		case SQL_C_GUID:
+			// FIXME: implement
 			break;
-		// apparently the same as SQL_C_BINARY:
-		//case SQL_C_VARBOOKMARK:
-			//break;
 	}
+
+	delete[] parametername;
 
 	return SQL_ERROR;
 }
@@ -897,6 +986,173 @@ SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handletype,
 }
 #endif
 
+static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
+
+	STMT	*stmt=(STMT *)statementhandle;
+
+	numericdictionarylist< outputbind * >	*list=
+					stmt->outputbinds.getList();
+
+	for (dictionarylistnode< int32_t, outputbind * > *node=
+						list->getNodeByIndex(0);
+		node; node=(dictionarylistnode< int32_t, outputbind * > *)
+							node->getNext()) {
+
+		outputbind	*ob=node->getData()->getData();
+
+		// convert parameternumber to a string
+		char	*parametername=charstring::parseNumber(
+						ob->parameternumber);
+
+
+		switch (ob->valuetype) {
+			case SQL_C_CHAR:
+				// FIXME: use lengthprecision?
+				stmt->cur->inputBind(parametername,
+						(const char *)
+							ob->parametervalue);
+				break;
+			case SQL_C_LONG:
+				stmt->cur->inputBind(parametername,
+						(int64_t)(*((long *)
+							ob->parametervalue)));
+				break;
+			case SQL_C_SHORT:
+				stmt->cur->inputBind(parametername,
+						(int64_t)(*((short *)
+							ob->parametervalue)));
+				break;
+			case SQL_C_FLOAT:
+				stmt->cur->inputBind(parametername,
+						(float)(*((double *)
+							ob->parametervalue)),
+						(uint32_t)ob->lengthprecision,
+						(uint32_t)ob->parameterscale);
+				break;
+			case SQL_C_DOUBLE:
+				stmt->cur->inputBind(parametername,
+						*((double *)ob->parametervalue),
+						(uint32_t)ob->lengthprecision,
+						(uint32_t)ob->parameterscale);
+				break;
+			case SQL_C_NUMERIC:
+				// FIXME: implement
+				break;
+			case SQL_C_DATE:
+				// FIXME: implement
+				break;
+			case SQL_C_TIME:
+				// FIXME: implement
+				break;
+			case SQL_C_TIMESTAMP:
+				// FIXME: implement
+				break;
+			case SQL_C_TYPE_DATE:
+				// FIXME: implement
+				break;
+			case SQL_C_TYPE_TIME:
+				// FIXME: implement
+				break;
+			case SQL_C_TYPE_TIMESTAMP:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_YEAR:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_MONTH:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_DAY:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_HOUR:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_MINUTE:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_SECOND:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_YEAR_TO_MONTH:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_DAY_TO_HOUR:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_DAY_TO_MINUTE:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_DAY_TO_SECOND:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_HOUR_TO_SECOND:
+				// FIXME: implement
+				break;
+			case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+				// FIXME: implement
+				break;
+			//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
+			case SQL_C_BINARY:
+				stmt->cur->inputBindBlob(parametername,
+					(const char *) ob->parametervalue,
+					ob->lengthprecision);
+				break;
+			case SQL_C_BIT:
+				// FIXME: implement
+				break;
+			case SQL_C_SBIGINT:
+				stmt->cur->inputBind(parametername,
+						(int64_t)(*((int64_t *)
+							ob->parametervalue)));
+				break;
+			case SQL_C_UBIGINT:
+				stmt->cur->inputBind(parametername,
+						(int64_t)(*((uint64_t *)
+							ob->parametervalue)));
+				break;
+			case SQL_C_SLONG:
+				stmt->cur->inputBind(parametername,
+						(int64_t)(*((long *)
+							ob->parametervalue)));
+				break;
+			case SQL_C_SSHORT:
+				stmt->cur->inputBind(parametername,
+						(int64_t)(*((short *)
+							ob->parametervalue)));
+				break;
+			case SQL_C_TINYINT:
+			case SQL_C_STINYINT:
+				stmt->cur->inputBind(parametername,
+					(int64_t)(*((char *)
+							ob->parametervalue)));
+				break;
+			//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
+			case SQL_C_ULONG:
+				stmt->cur->inputBind(parametername,
+					(int64_t)(*((unsigned long *)
+							ob->parametervalue)));
+				break;
+			case SQL_C_USHORT:
+				stmt->cur->inputBind(parametername,
+					(int64_t)(*((unsigned short *)
+							ob->parametervalue)));
+				break;
+			case SQL_C_UTINYINT:
+				stmt->cur->inputBind(parametername,
+					(int64_t)(*((unsigned char *)
+							ob->parametervalue)));
+				break;
+			case SQL_C_GUID:
+				// FIXME: implement
+				break;
+		}
+	}
+}
+
 SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 					SQLCHAR *statementtext,
 					SQLINTEGER textlength) {
@@ -934,6 +1190,8 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 		}
 	}
 
+	SQLR_FetchOutputBinds(stmt);
+
 	// store the error
 	stmt->error=charstring::duplicate(stmt->cur->errorMessage());
 	debugPrintf("error is %s\n",stmt->error);
@@ -966,6 +1224,8 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 	if (stmt->cur->executeQuery()) {
 		return SQL_SUCCESS;
 	}
+
+	SQLR_FetchOutputBinds(stmt);
 
 	// store the error
 	stmt->error=charstring::duplicate(stmt->cur->errorMessage());
@@ -1015,95 +1275,91 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 
 	if (field) {
 
-		// FIXME: implement for non-char
+		if (targettype==SQL_C_DEFAULT) {
+			// FIXME: reset targettype based on column type
+		}
+
 		switch (targettype) {
 			case SQL_C_CHAR:
-				debugPrintf("SQL_C_CHAR\n");
-				// SQLCHAR *
-				// unsigned char *
-				snprintf((char *)targetvalue,
-						bufferlength,field);
+				size_t	sizetocopy;
 				if (stmt->typeinfo) {
-					*strlen_or_ind=charstring::
-							length(field);
+					sizetocopy=charstring::length(field);
 				} else {
-					*strlen_or_ind=(SQLLEN)stmt->cur->
+					sizetocopy=(size_t)stmt->cur->
 							getFieldLength(
 							stmt->currentgetdatarow,
 							columnnumber-1);
 				}
+				if (bufferlength<(SQLLEN)sizetocopy) {
+					sizetocopy=bufferlength;
+				}
+				*strlen_or_ind=(SQLLEN)sizetocopy;
+				snprintf((char *)targetvalue,sizetocopy,field);
 				break;
 			case SQL_C_SSHORT:
-				debugPrintf("SQL_C_SSHORT\n");
-				// SQLSMALLINT
-				// short int
-				break;
+			case SQL_C_SHORT:
 			case SQL_C_USHORT:
-				debugPrintf("SQL_C_USHORT\n");
-				// SQLUSMALLINT
-				// unsigned short int
+				*((short *)targetvalue)=
+					(short)charstring::toInteger(field);
+				*strlen_or_ind=sizeof(short);
 				break;
 			case SQL_C_SLONG:
-				debugPrintf("SQL_C_SLONG\n");
-				// SQLINTEGER
-				// long int
-				break;
+			case SQL_C_LONG:
+			//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
 			case SQL_C_ULONG:
-				debugPrintf("SQL_C_ULONG\n");
-				// SQLUINTEGER
-				// unsigned long int
+				*((long *)targetvalue)=
+					(long)charstring::toInteger(field);
+				*strlen_or_ind=sizeof(long);
 				break;
 			case SQL_C_FLOAT:
-				debugPrintf("SQL_C_FLOAT\n");
-				// SQLREAL
-				// float
+				*((float *)targetvalue)=
+					(float)charstring::toFloat(field);
+				*strlen_or_ind=sizeof(float);
 				break;
 			case SQL_C_DOUBLE:
-				debugPrintf("SQL_C_DOUBLE\n");
-				// SQLDOUBLE, SQLFLOAT
-				// double
+				*((double *)targetvalue)=
+					(double)charstring::toFloat(field);
+				*strlen_or_ind=sizeof(double);
 				break;
 			case SQL_C_BIT:
-				debugPrintf("SQL_C_BIT\n");
-				// SQLCHAR
-				// unsigned char
+				*((char *)targetvalue)=
+					(charstring::contains("YyTt",field) ||
+					charstring::toInteger(field));
+				*strlen_or_ind=sizeof(char);
 				break;
 			case SQL_C_STINYINT:
-				debugPrintf("SQL_C_STINYINT\n");
-				// SQLSCHAR
-				// signed char
-				break;
+			case SQL_C_TINYINT:
 			case SQL_C_UTINYINT:
-				debugPrintf("SQL_C_UTINYINT\n");
-				// SQLCHAR
-				// unsigned char
+				*((char *)targetvalue)=
+					charstring::toInteger(field);
+				*strlen_or_ind=sizeof(char);
 				break;
 			case SQL_C_SBIGINT:
-				debugPrintf("SQL_C_SBIGINT\n");
-				// SQLBIGINT
-				// _int64
-				break;
 			case SQL_C_UBIGINT:
-				debugPrintf("SQL_C_UBIGINT\n");
-				// SQLUBIGINT
-				// unsigned _int64
+				*((int64_t *)targetvalue)=
+					charstring::toInteger(field);
+				*strlen_or_ind=sizeof(int64_t);
 				break;
+			//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
 			case SQL_C_BINARY:
+				{
 				debugPrintf("SQL_C_BINARY\n");
-				// SQLCHAR *
-				// unsigned char *
-				break;
-			// apparently a dup of SQL_C_ULONG
-			//case SQL_C_BOOKMARK:
-				//debugPrintf("SQL_C_BOOKMARK\n");
-				// BOOKMARK
-				// unsigned long int
-				//break;
-			// apparentley a dup of SQL_C_BINARY
-			//case SQL_C_VARBOOKMARK:
-				//debugPrintf("SQL_C_VARBOOKMARK\n");
-				// SQLCHAR *
-				// unsigned char *
+				size_t	sizetocopy;
+				if (stmt->typeinfo) {
+					sizetocopy=charstring::length(field);
+				} else {
+					sizetocopy=(size_t)stmt->cur->
+							getFieldLength(
+							stmt->currentgetdatarow,
+							columnnumber-1);
+				}
+				if (bufferlength<(SQLLEN)sizetocopy) {
+					sizetocopy=bufferlength;
+				}
+				*strlen_or_ind=(SQLLEN)sizetocopy;
+				rawbuffer::copy((void *)targetvalue,
+						(const void *)field,sizetocopy);
+				}
 				break;
 			case SQL_C_TYPE_DATE:
 				debugPrintf("SQL_C_TYPE_DATE\n");
@@ -2089,10 +2345,10 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			break;
 		case SQL_ALTER_TABLE:
 			// FIXME: this must be implemented for odbc 2
-			// in odbc 3 there's a new parameter
 			// masks:
 			// SQL_AT_DROP_COLUMN
 			// SQL_AT_ADD_COLUMN
+			// in odbc 3 there are new masks
 			break;
 		case SQL_FETCH_DIRECTION:
 			// FIXME: this must be implemented for odbc 2
