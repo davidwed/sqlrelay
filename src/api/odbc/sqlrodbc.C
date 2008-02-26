@@ -1008,32 +1008,45 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 		switch (ob->valuetype) {
 			case SQL_C_CHAR:
 				// FIXME: use lengthprecision?
-				stmt->cur->inputBind(parametername,
-						(const char *)
-							ob->parametervalue);
+				snprintf((char *)ob->parametervalue,
+						ob->lengthprecision,
+						stmt->cur->getOutputBindString(
+								parametername));
 				break;
+			case SQL_C_SLONG:
 			case SQL_C_LONG:
-				stmt->cur->inputBind(parametername,
-						(int64_t)(*((long *)
-							ob->parametervalue)));
+				*((long *)ob->parametervalue)=
+					(long)stmt->cur->getOutputBindInteger(
+								parametername);
 				break;
+			//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
+			case SQL_C_ULONG:
+				*((unsigned long *)ob->parametervalue)=
+					(unsigned long)
+					stmt->cur->getOutputBindInteger(
+								parametername);
+				break;
+			case SQL_C_SSHORT:
 			case SQL_C_SHORT:
-				stmt->cur->inputBind(parametername,
-						(int64_t)(*((short *)
-							ob->parametervalue)));
+				*((short *)ob->parametervalue)=
+					(short)stmt->cur->getOutputBindInteger(
+								parametername);
+				break;
+			case SQL_C_USHORT:
+				*((unsigned short *)ob->parametervalue)=
+					(unsigned short)
+					stmt->cur->getOutputBindInteger(
+								parametername);
 				break;
 			case SQL_C_FLOAT:
-				stmt->cur->inputBind(parametername,
-						(float)(*((double *)
-							ob->parametervalue)),
-						(uint32_t)ob->lengthprecision,
-						(uint32_t)ob->parameterscale);
+				*((float *)ob->parametervalue)=
+					(float)stmt->cur->getOutputBindDouble(
+								parametername);
 				break;
 			case SQL_C_DOUBLE:
-				stmt->cur->inputBind(parametername,
-						*((double *)ob->parametervalue),
-						(uint32_t)ob->lengthprecision,
-						(uint32_t)ob->parameterscale);
+				*((double *)ob->parametervalue)=
+					(double)stmt->cur->getOutputBindDouble(
+								parametername);
 				break;
 			case SQL_C_NUMERIC:
 				// FIXME: implement
@@ -1105,46 +1118,25 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				// FIXME: implement
 				break;
 			case SQL_C_SBIGINT:
-				stmt->cur->inputBind(parametername,
-						(int64_t)(*((int64_t *)
-							ob->parametervalue)));
+				*((int64_t *)ob->parametervalue)=
+				(int64_t)stmt->cur->getOutputBindInteger(
+								parametername);
 				break;
 			case SQL_C_UBIGINT:
-				stmt->cur->inputBind(parametername,
-						(int64_t)(*((uint64_t *)
-							ob->parametervalue)));
-				break;
-			case SQL_C_SLONG:
-				stmt->cur->inputBind(parametername,
-						(int64_t)(*((long *)
-							ob->parametervalue)));
-				break;
-			case SQL_C_SSHORT:
-				stmt->cur->inputBind(parametername,
-						(int64_t)(*((short *)
-							ob->parametervalue)));
+				*((uint64_t *)ob->parametervalue)=
+				(uint64_t)stmt->cur->getOutputBindInteger(
+								parametername);
 				break;
 			case SQL_C_TINYINT:
+				*((char *)ob->parametervalue)=
+				(char)stmt->cur->getOutputBindInteger(
+								parametername);
+				break;
 			case SQL_C_STINYINT:
-				stmt->cur->inputBind(parametername,
-					(int64_t)(*((char *)
-							ob->parametervalue)));
-				break;
-			//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
-			case SQL_C_ULONG:
-				stmt->cur->inputBind(parametername,
-					(int64_t)(*((unsigned long *)
-							ob->parametervalue)));
-				break;
-			case SQL_C_USHORT:
-				stmt->cur->inputBind(parametername,
-					(int64_t)(*((unsigned short *)
-							ob->parametervalue)));
-				break;
 			case SQL_C_UTINYINT:
-				stmt->cur->inputBind(parametername,
-					(int64_t)(*((unsigned char *)
-							ob->parametervalue)));
+				*((unsigned char *)ob->parametervalue)=
+				(unsigned char)stmt->cur->getOutputBindInteger(
+								parametername);
 				break;
 			case SQL_C_GUID:
 				// FIXME: implement
