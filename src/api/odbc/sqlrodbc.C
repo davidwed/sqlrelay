@@ -1615,6 +1615,26 @@ SQLRETURN SQL_API SQLFreeEnv(SQLHENV environmenthandle) {
 	return SQLR_SQLFreeEnv(environmenthandle);
 }
 
+static void SQLR_SQLResetParams(SQLHSTMT statementhandle) {
+
+	STMT	*stmt=(STMT *)statementhandle;
+
+	// clear bind variables
+	stmt->cur->clearBinds();
+
+	// clear output bind list
+	numericdictionarylist< outputbind * >	*list=
+					stmt->outputbinds.getList();
+
+	for (dictionarylistnode< int32_t, outputbind * > *node=
+						list->getNodeByIndex(0);
+		node; node=(dictionarylistnode< int32_t, outputbind * > *)
+							node->getNext()) {
+		delete node;
+	}
+	list->clear();
+}
+
 static SQLRETURN SQLR_SQLFreeStmt(SQLHSTMT statementhandle,
 					SQLUSMALLINT option) {
 	debugFunction();
