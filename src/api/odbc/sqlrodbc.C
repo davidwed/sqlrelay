@@ -518,7 +518,6 @@ SQLRETURN SQLR_SQLOutputBindParam(SQLHSTMT statementhandle,
 		case SQL_C_TIME:
 		case SQL_C_TYPE_TIME:
 			// FIXME: implement
-			// FIXME: implement
 			// struct tagTIME_STRUCT {
 			//    SQLUSMALLINT hour;
 			//    SQLUSMALLINT minute;
@@ -853,7 +852,8 @@ SQLRETURN SQL_API SQLCopyDesc(SQLHDESC SourceDescHandle,
 					SQLHDESC TargetDescHandle) {
 	debugFunction();
 
-	// FIXME: what should this do?
+	// currently this doesn't do anything
+	// because SQLAllocHandle doesn't do anything
 	return SQL_SUCCESS;
 }
 #endif
@@ -1733,26 +1733,40 @@ SQLRETURN SQLR_SQLFetchScroll(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement the rest of these,
-	// update the row status array
 	switch (fetchorientation) {
-		case SQL_FETCH_NEXT:
-			return SQLR_SQLFetch(statementhandle);
 		case SQL_FETCH_PRIOR:
+			if (stmt->currentfetchrow>1) {
+				stmt->currentfetchrow=stmt->currentfetchrow-2;
+			} else {
+				stmt->currentfetchrow=0;
+			}
 			break;
 		case SQL_FETCH_FIRST:
+			stmt->currentfetchrow=0;
 			break;
 		case SQL_FETCH_LAST:
 			break;
 		case SQL_FETCH_ABSOLUTE:
+			stmt->currentfetchrow=fetchoffset;
 			break;
 		case SQL_FETCH_RELATIVE:
+			if (fetchoffset<0 &&
+				stmt->currentfetchrow<fetchoffset*-1) {
+				stmt->currentfetchrow=0;
+			} else {
+				stmt->currentfetchrow=
+					stmt->currentfetchrow+fetchoffset;
+			}
 			break;
 		case SQL_FETCH_BOOKMARK:
+			// FIXME: implement this
+			// http://msdn2.microsoft.com/en-us/library/ms710174(VS.85).aspx
 			break;
 	}
 
-	return SQL_ERROR;
+	// FIXME: update the row status array
+
+	return SQLR_SQLFetch(statementhandle);
 }
 
 #if (ODBCVER >= 0x0300)
@@ -2022,7 +2036,6 @@ SQLRETURN SQLR_SQLGetDiagFieldEnv(SQLHANDLE handle,
 	}
 
 	// FIXME: implement this
-
 	return SQL_ERROR;
 }
 
@@ -2041,7 +2054,6 @@ SQLRETURN SQLR_SQLGetDiagFieldConnect(SQLHANDLE handle,
 	}
 
 	// FIXME: implement this
-
 	return SQL_ERROR;
 }
 
@@ -2061,7 +2073,6 @@ SQLRETURN SQLR_SQLGetDiagFieldStmt(SQLHANDLE handle,
 	}
 
 	// FIXME: implement this
-
 	return SQL_ERROR;
 }
 
