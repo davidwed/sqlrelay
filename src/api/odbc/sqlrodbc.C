@@ -254,7 +254,6 @@ SQLRETURN SQLR_SQLInputBindParam(SQLHSTMT statementhandle,
 
 	switch (valuetype) {
 		case SQL_C_CHAR:
-			// FIXME: use lengthprecision?
 			stmt->cur->inputBind(parametername,
 					(const char *)parametervalue);
 			break;
@@ -280,63 +279,104 @@ SQLRETURN SQLR_SQLInputBindParam(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_NUMERIC:
 			// FIXME: implement
+			// struct tagSQL_NUMERIC_STRUCT {
+			//    SQLCHAR precision;
+			//    SQLSCHAR scale;
+			//    SQLCHAR sign[g];
+			//    SQLCHAR val[SQL_MAX_NUMERIC_LEN];[e], [f] 
+			// } SQL_NUMERIC_STRUCT;
+			// [e]   A number is stored in the val field of the SQL_NUMERIC_STRUCT structure as a scaled integer, in little endian mode (the leftmost byte being the least-significant byte). For example, the number 10.001 base 10, with a scale of 4, is scaled to an integer of 100010. Because this is 186AA in hexadecimal format, the value in SQL_NUMERIC_STRUCT would be "AA 86 01 00 00 ... 00", with the number of bytes defined by the SQL_MAX_NUMERIC_LEN #define.
+			// [f]   The precision and scale fields of the SQL_C_NUMERIC data type are never used for input from an application, only for output from the driver to the application. When the driver writes a numeric value into the SQL_NUMERIC_STRUCT, it will use its own driver-specific default as the value for the precision field, and it will use the value in the SQL_DESC_SCALE field of the application descriptor (which defaults to 0) for the scale field. An application can provide its own values for precision and scale by setting the SQL_DESC_PRECISION and SQL_DESC_SCALE fields of the application descriptor.
+			// [g]   The sign field is 1 if positive, 0 if negative.
 			break;
 		case SQL_C_DATE:
-			// FIXME: implement
-			break;
-		case SQL_C_TIME:
-			// FIXME: implement
-			break;
-		case SQL_C_TIMESTAMP:
-			// FIXME: implement
-			break;
 		case SQL_C_TYPE_DATE:
 			// FIXME: implement
+			// struct tagDATE_STRUCT {
+			//    SQLSMALLINT year;
+			//    SQLUSMALLINT month;
+			//    SQLUSMALLINT day;  
+			// } DATE_STRUCT;
 			break;
+		case SQL_C_TIME:
 		case SQL_C_TYPE_TIME:
 			// FIXME: implement
+			// struct tagTIME_STRUCT {
+			//    SQLUSMALLINT hour;
+			//    SQLUSMALLINT minute;
+			//    SQLUSMALLINT second;
+			// } TIME_STRUCT;
 			break;
+		case SQL_C_TIMESTAMP:
 		case SQL_C_TYPE_TIMESTAMP:
 			// FIXME: implement
+			// struct tagTIMESTAMP_STRUCT {
+			//    SQLSMALLINT year;
+			//    SQLUSMALLINT month;
+			//    SQLUSMALLINT day;
+			//    SQLUSMALLINT hour;
+			//    SQLUSMALLINT minute;
+			//    SQLUSMALLINT second;
+			//    SQLUINTEGER fraction;[b] 
+			// } TIMESTAMP_STRUCT;
+			// [b]   The value of the fraction field is the number of billionths of a second and ranges from 0 through 999,999,999 (1 less than 1 billion). For example, the value of the fraction field for a half-second is 500,000,000, for a thousandth of a second (one millisecond) is 1,000,000, for a millionth of a second (one microsecond) is 1,000, and for a billionth of a second (one nanosecond) is 1.
 			break;
 		case SQL_C_INTERVAL_YEAR:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_MONTH:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_DAY:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_HOUR:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_MINUTE:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_SECOND:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_YEAR_TO_MONTH:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_DAY_TO_HOUR:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_DAY_TO_MINUTE:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_DAY_TO_SECOND:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_HOUR_TO_SECOND:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
 			// FIXME: implement
+			//typedef struct tagSQL_INTERVAL_STRUCT
+			//   {
+			//   SQLINTERVAL interval_type;
+			//   SQLSMALLINT   interval_sign;
+			//   union
+			//      {
+			//      SQL_YEAR_MONTH_STRUCT year_month;
+			//      SQL_DAY_SECOND_STRUCT day_second;
+			//      } intval;
+			//   }SQLINTERVAL_STRUCT;
+			//
+			//typedef enum
+			//   {
+			//   SQL_IS_YEAR=1,
+			//   SQL_IS_MONTH=2,
+			//   SQL_IS_DAY=3,
+			//   SQL_IS_HOUR=4,
+			//   SQL_IS_MINUTE=5,
+			//   SQL_IS_SECOND=6,
+			//   SQL_IS_YEAR_TO_MONTH=7,
+			//   SQL_IS_DAY_TO_HOUR=8,
+			//   SQL_IS_DAY_TO_MINUTE=9,
+			//   SQL_IS_DAY_TO_SECOND=10,
+			//   SQL_IS_HOUR_TO_MINUTE=11,
+			//   SQL_IS_HOUR_TO_SECOND=12,
+			//   SQL_IS_MINUTE_TO_SECOND=13,
+			//   }SQLINTERVAL;
+			//
+			//typedef struct tagSQL_YEAR_MONTH
+			//   {
+			//   SQLUINTEGER year;
+			//   SQLUINTEGER month;
+			//   }SQL_YEAR_MOHTH_STRUCT;
+			//
+			//typedef struct tagSQL_DAY_SECOND
+			//   {
+			//   SQLUINTEGER day;
+			//   SQLUNINTEGER hour;
+			//   SQLUINTEGER minute;
+			//   SQLUINTEGER second;
+			//   SQLUINTEGER fraction;
+			//   }SQL_DAY_SECOND_STRUCT;
 			break;
 		//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
 		case SQL_C_BINARY:
@@ -345,7 +385,11 @@ SQLRETURN SQLR_SQLInputBindParam(SQLHSTMT statementhandle,
 					lengthprecision);
 			break;
 		case SQL_C_BIT:
-			// FIXME: implement
+			stmt->cur->inputBind(parametername,
+				(charstring::contains("YyTt",
+					(const char *)parametervalue) ||
+				charstring::toInteger(
+					(const char *)parametervalue))?"1":"0");
 			break;
 		case SQL_C_SBIGINT:
 			stmt->cur->inputBind(parametername,
@@ -383,6 +427,13 @@ SQLRETURN SQLR_SQLInputBindParam(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_GUID:
 			// FIXME: implement
+			// struct tagSQLGUID {
+			//    DWORD Data1;
+			//    WORD Data2;
+			//    WORD Data3;
+			//    BYTE Data4[8];
+			// } SQLGUID;[k]
+			// [k]   SQL_C_GUID can be converted only to SQL_CHAR or SQL_WCHAR.
 			break;
 	}
 
@@ -419,9 +470,9 @@ SQLRETURN SQLR_SQLOutputBindParam(SQLHSTMT statementhandle,
 	ob->strlen_or_ind=strlen_or_ind;
 	stmt->outputbinds.setData(parameternumber,ob);
 
-	// FIXME: implement this
 	switch (valuetype) {
 		case SQL_C_CHAR:
+		case SQL_C_BIT:
 			stmt->cur->defineOutputBindString(parametername,
 							lengthprecision);
 			break;
@@ -445,73 +496,119 @@ SQLRETURN SQLR_SQLOutputBindParam(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_NUMERIC:
 			// FIXME: implement
+			// struct tagSQL_NUMERIC_STRUCT {
+			//    SQLCHAR precision;
+			//    SQLSCHAR scale;
+			//    SQLCHAR sign[g];
+			//    SQLCHAR val[SQL_MAX_NUMERIC_LEN];[e], [f] 
+			// } SQL_NUMERIC_STRUCT;
+			// [e]   A number is stored in the val field of the SQL_NUMERIC_STRUCT structure as a scaled integer, in little endian mode (the leftmost byte being the least-significant byte). For example, the number 10.001 base 10, with a scale of 4, is scaled to an integer of 100010. Because this is 186AA in hexadecimal format, the value in SQL_NUMERIC_STRUCT would be "AA 86 01 00 00 ... 00", with the number of bytes defined by the SQL_MAX_NUMERIC_LEN #define.
+			// [f]   The precision and scale fields of the SQL_C_NUMERIC data type are never used for input from an application, only for output from the driver to the application. When the driver writes a numeric value into the SQL_NUMERIC_STRUCT, it will use its own driver-specific default as the value for the precision field, and it will use the value in the SQL_DESC_SCALE field of the application descriptor (which defaults to 0) for the scale field. An application can provide its own values for precision and scale by setting the SQL_DESC_PRECISION and SQL_DESC_SCALE fields of the application descriptor.
+			// [g]   The sign field is 1 if positive, 0 if negative.
 			break;
 		case SQL_C_DATE:
-			// FIXME: implement
-			break;
-		case SQL_C_TIME:
-			// FIXME: implement
-			break;
-		case SQL_C_TIMESTAMP:
-			// FIXME: implement
-			break;
 		case SQL_C_TYPE_DATE:
 			// FIXME: implement
+			// struct tagDATE_STRUCT {
+			//    SQLSMALLINT year;
+			//    SQLUSMALLINT month;
+			//    SQLUSMALLINT day;  
+			// } DATE_STRUCT;
 			break;
+		case SQL_C_TIME:
 		case SQL_C_TYPE_TIME:
 			// FIXME: implement
+			// FIXME: implement
+			// struct tagTIME_STRUCT {
+			//    SQLUSMALLINT hour;
+			//    SQLUSMALLINT minute;
+			//    SQLUSMALLINT second;
+			// } TIME_STRUCT;
 			break;
+		case SQL_C_TIMESTAMP:
 		case SQL_C_TYPE_TIMESTAMP:
 			// FIXME: implement
+			// struct tagTIMESTAMP_STRUCT {
+			//    SQLSMALLINT year;
+			//    SQLUSMALLINT month;
+			//    SQLUSMALLINT day;
+			//    SQLUSMALLINT hour;
+			//    SQLUSMALLINT minute;
+			//    SQLUSMALLINT second;
+			//    SQLUINTEGER fraction;[b] 
+			// } TIMESTAMP_STRUCT;
+			// [b]   The value of the fraction field is the number of billionths of a second and ranges from 0 through 999,999,999 (1 less than 1 billion). For example, the value of the fraction field for a half-second is 500,000,000, for a thousandth of a second (one millisecond) is 1,000,000, for a millionth of a second (one microsecond) is 1,000, and for a billionth of a second (one nanosecond) is 1.
 			break;
 		case SQL_C_INTERVAL_YEAR:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_MONTH:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_DAY:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_HOUR:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_MINUTE:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_SECOND:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_YEAR_TO_MONTH:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_DAY_TO_HOUR:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_DAY_TO_MINUTE:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_DAY_TO_SECOND:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_HOUR_TO_SECOND:
-			// FIXME: implement
-			break;
 		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
 			// FIXME: implement
+			//typedef struct tagSQL_INTERVAL_STRUCT
+			//   {
+			//   SQLINTERVAL interval_type;
+			//   SQLSMALLINT   interval_sign;
+			//   union
+			//      {
+			//      SQL_YEAR_MONTH_STRUCT year_month;
+			//      SQL_DAY_SECOND_STRUCT day_second;
+			//      } intval;
+			//   }SQLINTERVAL_STRUCT;
+			//
+			//typedef enum
+			//   {
+			//   SQL_IS_YEAR=1,
+			//   SQL_IS_MONTH=2,
+			//   SQL_IS_DAY=3,
+			//   SQL_IS_HOUR=4,
+			//   SQL_IS_MINUTE=5,
+			//   SQL_IS_SECOND=6,
+			//   SQL_IS_YEAR_TO_MONTH=7,
+			//   SQL_IS_DAY_TO_HOUR=8,
+			//   SQL_IS_DAY_TO_MINUTE=9,
+			//   SQL_IS_DAY_TO_SECOND=10,
+			//   SQL_IS_HOUR_TO_MINUTE=11,
+			//   SQL_IS_HOUR_TO_SECOND=12,
+			//   SQL_IS_MINUTE_TO_SECOND=13,
+			//   }SQLINTERVAL;
+			//
+			//typedef struct tagSQL_YEAR_MONTH
+			//   {
+			//   SQLUINTEGER year;
+			//   SQLUINTEGER month;
+			//   }SQL_YEAR_MOHTH_STRUCT;
+			//
+			//typedef struct tagSQL_DAY_SECOND
+			//   {
+			//   SQLUINTEGER day;
+			//   SQLUNINTEGER hour;
+			//   SQLUINTEGER minute;
+			//   SQLUINTEGER second;
+			//   SQLUINTEGER fraction;
+			//   }SQL_DAY_SECOND_STRUCT;
 			break;
 		//case SQL_C_VARBOOKMARK: dup of SQL_C_BINARY:
 		case SQL_C_BINARY:
 			stmt->cur->defineOutputBindBlob(parametername);
 			break;
-		case SQL_C_BIT:
-			// FIXME: implement
-			break;
 		case SQL_C_GUID:
 			// FIXME: implement
+			// struct tagSQLGUID {
+			//    DWORD Data1;
+			//    WORD Data2;
+			//    WORD Data3;
+			//    BYTE Data4[8];
+			// } SQLGUID;[k]
+			// [k]   SQL_C_GUID can be converted only to SQL_CHAR or SQL_WCHAR.
 			break;
 	}
 
@@ -608,6 +705,25 @@ SQLRETURN SQL_API SQLCancel(SQLHSTMT statementhandle) {
 	return SQL_ERROR;
 }
 
+static void SQLR_SQLResetParams(STMT *stmt) {
+	debugFunction();
+
+	// clear bind variables
+	stmt->cur->clearBinds();
+
+	// clear output bind list
+	numericdictionarylist< outputbind * >	*list=
+					stmt->outputbinds.getList();
+
+	for (dictionarylistnode< int32_t, outputbind * > *node=
+						list->getNodeByIndex(0);
+		node; node=(dictionarylistnode< int32_t, outputbind * > *)
+							node->getNext()) {
+		delete node;
+	}
+	list->clear();
+}
+
 SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
 	debugFunction();
 
@@ -618,7 +734,8 @@ SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: implement this
+	SQLR_SQLResetParams(stmt);
+	// FIXME: what else should this do?
 
 	return SQL_SUCCESS;
 }
@@ -1007,11 +1124,19 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 
 		switch (ob->valuetype) {
 			case SQL_C_CHAR:
-				// FIXME: use lengthprecision?
-				snprintf((char *)ob->parametervalue,
-						ob->lengthprecision,
+				{
+				size_t	sizetocopy=
+					(size_t)stmt->cur->
+						getOutputBindLength(
+							parametername);
+				if (ob->lengthprecision<(SQLULEN)sizetocopy) {
+					sizetocopy=ob->lengthprecision;
+				}
+				charstring::copy((char *)ob->parametervalue,
 						stmt->cur->getOutputBindString(
-								parametername));
+								parametername),
+						sizetocopy);
+				}
 				break;
 			case SQL_C_SLONG:
 			case SQL_C_LONG:
@@ -1049,73 +1174,129 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 								parametername);
 				break;
 			case SQL_C_NUMERIC:
-				// FIXME: implement
+				// struct tagSQL_NUMERIC_STRUCT {
+				//    SQLCHAR precision;
+				//    SQLSCHAR scale;
+				//    SQLCHAR sign[g];
+				//    SQLCHAR val[SQL_MAX_NUMERIC_LEN];[e], [f] 
+				// } SQL_NUMERIC_STRUCT;
+				// [e]   A number is stored in the val field of the SQL_NUMERIC_STRUCT structure as a scaled integer, in little endian mode (the leftmost byte being the least-significant byte). For example, the number 10.001 base 10, with a scale of 4, is scaled to an integer of 100010. Because this is 186AA in hexadecimal format, the value in SQL_NUMERIC_STRUCT would be "AA 86 01 00 00 ... 00", with the number of bytes defined by the SQL_MAX_NUMERIC_LEN #define.
+				// [f]   The precision and scale fields of the SQL_C_NUMERIC data type are never used for input from an application, only for output from the driver to the application. When the driver writes a numeric value into the SQL_NUMERIC_STRUCT, it will use its own driver-specific default as the value for the precision field, and it will use the value in the SQL_DESC_SCALE field of the application descriptor (which defaults to 0) for the scale field. An application can provide its own values for precision and scale by setting the SQL_DESC_PRECISION and SQL_DESC_SCALE fields of the application descriptor.
+				// [g]   The sign field is 1 if positive, 0 if negative.
 				break;
 			case SQL_C_DATE:
-				// FIXME: implement
-				break;
-			case SQL_C_TIME:
-				// FIXME: implement
-				break;
-			case SQL_C_TIMESTAMP:
-				// FIXME: implement
-				break;
 			case SQL_C_TYPE_DATE:
 				// FIXME: implement
+				// struct tagDATE_STRUCT {
+				//    SQLSMALLINT year;
+				//    SQLUSMALLINT month;
+				//    SQLUSMALLINT day;  
+				// } DATE_STRUCT;
 				break;
+			case SQL_C_TIME:
 			case SQL_C_TYPE_TIME:
 				// FIXME: implement
+				// struct tagTIME_STRUCT {
+				//    SQLUSMALLINT hour;
+				//    SQLUSMALLINT minute;
+				//    SQLUSMALLINT second;
+				// } TIME_STRUCT;
 				break;
+			case SQL_C_TIMESTAMP:
 			case SQL_C_TYPE_TIMESTAMP:
 				// FIXME: implement
+				// struct tagTIMESTAMP_STRUCT {
+				//    SQLSMALLINT year;
+				//    SQLUSMALLINT month;
+				//    SQLUSMALLINT day;
+				//    SQLUSMALLINT hour;
+				//    SQLUSMALLINT minute;
+				//    SQLUSMALLINT second;
+				//    SQLUINTEGER fraction;[b] 
+				// } TIMESTAMP_STRUCT;
+				// [b]   The value of the fraction field is the number of billionths of a second and ranges from 0 through 999,999,999 (1 less than 1 billion). For example, the value of the fraction field for a half-second is 500,000,000, for a thousandth of a second (one millisecond) is 1,000,000, for a millionth of a second (one microsecond) is 1,000, and for a billionth of a second (one nanosecond) is 1.
 				break;
 			case SQL_C_INTERVAL_YEAR:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_MONTH:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_DAY:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_HOUR:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_MINUTE:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_SECOND:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_YEAR_TO_MONTH:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_DAY_TO_HOUR:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_DAY_TO_MINUTE:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_DAY_TO_SECOND:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_HOUR_TO_MINUTE:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_HOUR_TO_SECOND:
-				// FIXME: implement
-				break;
 			case SQL_C_INTERVAL_MINUTE_TO_SECOND:
 				// FIXME: implement
+				//typedef struct tagSQL_INTERVAL_STRUCT
+				//   {
+				//   SQLINTERVAL interval_type;
+				//   SQLSMALLINT   interval_sign;
+				//   union
+				//      {
+				//      SQL_YEAR_MONTH_STRUCT year_month;
+				//      SQL_DAY_SECOND_STRUCT day_second;
+				//      } intval;
+				//   }SQLINTERVAL_STRUCT;
+				//
+				//typedef enum
+				//   {
+				//   SQL_IS_YEAR=1,
+				//   SQL_IS_MONTH=2,
+				//   SQL_IS_DAY=3,
+				//   SQL_IS_HOUR=4,
+				//   SQL_IS_MINUTE=5,
+				//   SQL_IS_SECOND=6,
+				//   SQL_IS_YEAR_TO_MONTH=7,
+				//   SQL_IS_DAY_TO_HOUR=8,
+				//   SQL_IS_DAY_TO_MINUTE=9,
+				//   SQL_IS_DAY_TO_SECOND=10,
+				//   SQL_IS_HOUR_TO_MINUTE=11,
+				//   SQL_IS_HOUR_TO_SECOND=12,
+				//   SQL_IS_MINUTE_TO_SECOND=13,
+				//   }SQLINTERVAL;
+				//
+				//typedef struct tagSQL_YEAR_MONTH
+				//   {
+				//   SQLUINTEGER year;
+				//   SQLUINTEGER month;
+				//   }SQL_YEAR_MOHTH_STRUCT;
+				//
+				//typedef struct tagSQL_DAY_SECOND
+				//   {
+				//   SQLUINTEGER day;
+				//   SQLUNINTEGER hour;
+				//   SQLUINTEGER minute;
+				//   SQLUINTEGER second;
+				//   SQLUINTEGER fraction;
+				//   }SQL_DAY_SECOND_STRUCT;
 				break;
 			//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
 			case SQL_C_BINARY:
+				{
+				size_t	sizetocopy=
+					(size_t)stmt->cur->
+						getOutputBindLength(
+							parametername);
+				if (ob->lengthprecision<(SQLULEN)sizetocopy) {
+					sizetocopy=ob->lengthprecision;
+				}
 				stmt->cur->inputBindBlob(parametername,
-					(const char *) ob->parametervalue,
-					ob->lengthprecision);
+					(const char *)ob->parametervalue,
+					sizetocopy);
 				break;
+				}
 			case SQL_C_BIT:
-				// FIXME: implement
+				{
+				const char	*val=
+					stmt->cur->getOutputBindString(
+								parametername);
+				((unsigned char *)ob->parametervalue)[0]=
+					(charstring::contains("YyTt",val) ||
+					charstring::toInteger(val))?'1':'0';
+				}
 				break;
 			case SQL_C_SBIGINT:
 				*((int64_t *)ob->parametervalue)=
@@ -1140,6 +1321,13 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				break;
 			case SQL_C_GUID:
 				// FIXME: implement
+				// struct tagSQLGUID {
+				//    DWORD Data1;
+				//    WORD Data2;
+				//    WORD Data3;
+				//    BYTE Data4[8];
+				// } SQLGUID;[k]
+				// [k]   SQL_C_GUID can be converted only to SQL_CHAR or SQL_WCHAR.
 				break;
 		}
 	}
@@ -1286,7 +1474,8 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					sizetocopy=bufferlength;
 				}
 				*strlen_or_ind=(SQLLEN)sizetocopy;
-				snprintf((char *)targetvalue,sizetocopy,field);
+				charstring::copy((char *)targetvalue,field,
+								sizetocopy);
 				break;
 			case SQL_C_SSHORT:
 			case SQL_C_SHORT:
@@ -1314,10 +1503,10 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 				*strlen_or_ind=sizeof(double);
 				break;
 			case SQL_C_BIT:
-				*((char *)targetvalue)=
+				((unsigned char *)targetvalue)[0]=
 					(charstring::contains("YyTt",field) ||
-					charstring::toInteger(field));
-				*strlen_or_ind=sizeof(char);
+					charstring::toInteger(field))?'1':'0';
+				*strlen_or_ind=sizeof(unsigned char);
 				break;
 			case SQL_C_STINYINT:
 			case SQL_C_TINYINT:
@@ -1335,7 +1524,6 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
 			case SQL_C_BINARY:
 				{
-				debugPrintf("SQL_C_BINARY\n");
 				size_t	sizetocopy;
 				if (stmt->typeinfo) {
 					sizetocopy=charstring::length(field);
@@ -1353,110 +1541,117 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 						(const void *)field,sizetocopy);
 				}
 				break;
+			case SQL_C_DATE:
 			case SQL_C_TYPE_DATE:
-				debugPrintf("SQL_C_TYPE_DATE\n");
-				// SQL_DATE_STRUCT
-				/*
-				struct tagDATE_STRUCT {
- 					SQLSMALLINT year;
- 					SQLUSMALLINT month;
- 					SQLUSMALLINT day;
-				} DATE_STRUCT;
-				*/
+				// FIXME: implement
+				// struct tagDATE_STRUCT {
+				//    SQLSMALLINT year;
+				//    SQLUSMALLINT month;
+				//    SQLUSMALLINT day;  
+				// } DATE_STRUCT;
 				break;
+			case SQL_C_TIME:
 			case SQL_C_TYPE_TIME:
-				debugPrintf("SQL_C_TYPE_TIME\n");
-				// SQL_TIME_STRUCT
-				/*
-				struct tagTIME_STRUCT {
- 					SQLUSMALLINT hour;
- 					SQLUSMALLINT minute;
- 					SQLUSMALLINT second;
-				} TIME_STRUCT;
-				*/
+				// FIXME: implement
+				// struct tagTIME_STRUCT {
+				//    SQLUSMALLINT hour;
+				//    SQLUSMALLINT minute;
+				//    SQLUSMALLINT second;
+				// } TIME_STRUCT;
 				break;
+			case SQL_C_TIMESTAMP:
 			case SQL_C_TYPE_TIMESTAMP:
-				debugPrintf("SQL_C_TYPE_TIMESTAMP\n");
-				// SQL_TIMESTAMP_STRUCT
-				/*
-				struct tagTIMESTAMP_STRUCT {
- 					SQLSMALLINT year;
- 					SQLUSMALLINT month;
- 					SQLUSMALLINT day;
- 					SQLUSMALLINT hour;
- 					SQLUSMALLINT minute;
- 					SQLUSMALLINT second;
- 					SQLUINTEGER fraction;
-				} TIMESTAMP_STRUCT;
-				*/
+				// FIXME: implement
+				// struct tagTIMESTAMP_STRUCT {
+				//    SQLSMALLINT year;
+				//    SQLUSMALLINT month;
+				//    SQLUSMALLINT day;
+				//    SQLUSMALLINT hour;
+				//    SQLUSMALLINT minute;
+				//    SQLUSMALLINT second;
+				//    SQLUINTEGER fraction;[b] 
+				// } TIMESTAMP_STRUCT;
+				// [b]   The value of the fraction field is the number of billionths of a second and ranges from 0 through 999,999,999 (1 less than 1 billion). For example, the value of the fraction field for a half-second is 500,000,000, for a thousandth of a second (one millisecond) is 1,000,000, for a millionth of a second (one microsecond) is 1,000, and for a billionth of a second (one nanosecond) is 1.
 				break;
 			case SQL_C_NUMERIC:
-				debugPrintf("SQL_C_NUMERIC\n");
- 				// SQL_NUMERIC_STRUCT
-				/*
-				struct tagSQL_NUMERIC_STRUCT {
- 					SQLCHAR precision;
- 					SQLSCHAR scale;
- 					SQLCHAR sign;
- 					SQLCHAR val[SQL_MAX_NUMERIC_LEN];
-				} SQL_NUMERIC_STRUCT;
-				*/
+				// FIXME: implement
+				// struct tagSQL_NUMERIC_STRUCT {
+				//    SQLCHAR precision;
+				//    SQLSCHAR scale;
+				//    SQLCHAR sign[g];
+				//    SQLCHAR val[SQL_MAX_NUMERIC_LEN];[e], [f] 
+				// } SQL_NUMERIC_STRUCT;
+				// [e]   A number is stored in the val field of the SQL_NUMERIC_STRUCT structure as a scaled integer, in little endian mode (the leftmost byte being the least-significant byte). For example, the number 10.001 base 10, with a scale of 4, is scaled to an integer of 100010. Because this is 186AA in hexadecimal format, the value in SQL_NUMERIC_STRUCT would be "AA 86 01 00 00 ... 00", with the number of bytes defined by the SQL_MAX_NUMERIC_LEN #define.
+				// [f]   The precision and scale fields of the SQL_C_NUMERIC data type are never used for input from an application, only for output from the driver to the application. When the driver writes a numeric value into the SQL_NUMERIC_STRUCT, it will use its own driver-specific default as the value for the precision field, and it will use the value in the SQL_DESC_SCALE field of the application descriptor (which defaults to 0) for the scale field. An application can provide its own values for precision and scale by setting the SQL_DESC_PRECISION and SQL_DESC_SCALE fields of the application descriptor.
+				// [g]   The sign field is 1 if positive, 0 if negative.
 				break;
 			case SQL_C_GUID:
-				debugPrintf("SQL_C_GUID\n");
-				// SQLGUID
-				/* struct tagSQLGUID {
-					DWORD Data1;
-					WORD Data2;
-					WORD Data3;
-					BYTE Data4[8];
-				} SQLGUID;
-				*/
+				// FIXME: implement
+				// struct tagSQLGUID {
+				//    DWORD Data1;
+				//    WORD Data2;
+				//    WORD Data3;
+				//    BYTE Data4[8];
+				// } SQLGUID;[k]
+				// [k]   SQL_C_GUID can be converted only to SQL_CHAR or SQL_WCHAR.
 				break;
-			//case  "C-interval-types????"
-				// debugPrintf("SQL_C_GUID\n");
-				// SQL_INTERVAL_STRUCT
-				/*
- 				typedef struct tagSQL_INTERVAL_STRUCT {
-					SQLINTERVAL interval_type; 
-					SQLSMALLINT interval_sign;
-					union {
-						SQL_YEAR_MONTH_STRUCT
-								year_month;
-						SQL_DAY_SECOND_STRUCT
-								day_second;
-					} intval;
-				} SQL_INTERVAL_STRUCT;
-
-				typedef enum {
-					SQL_IS_YEAR = 1,
-					SQL_IS_MONTH = 2,
-					SQL_IS_DAY = 3,
-					SQL_IS_HOUR = 4,
-					SQL_IS_MINUTE = 5,
-					SQL_IS_SECOND = 6,
-					SQL_IS_YEAR_TO_MONTH = 7,
-					SQL_IS_DAY_TO_HOUR = 8,
-					SQL_IS_DAY_TO_MINUTE = 9,
-					SQL_IS_DAY_TO_SECOND = 10,
-					SQL_IS_HOUR_TO_MINUTE = 11,
-					SQL_IS_HOUR_TO_SECOND = 12,
-					SQL_IS_MINUTE_TO_SECOND = 13
-				} SQLINTERVAL;
-				
-				typedef struct tagSQL_YEAR_MONTH {
-					SQLUINTEGER year;
-					SQLUINTEGER month; 
-				} SQL_YEAR_MONTH_STRUCT;
-				
-				typedef struct tagSQL_DAY_SECOND {
-					SQLUINTEGER day;
-					SQLUINTEGER hour;
-					SQLUINTEGER minute;
-					SQLUINTEGER second;
-					SQLUINTEGER fraction;
-				} SQL_DAY_SECOND_STRUCT;
-				*/
+			case SQL_C_INTERVAL_YEAR:
+			case SQL_C_INTERVAL_MONTH:
+			case SQL_C_INTERVAL_DAY:
+			case SQL_C_INTERVAL_HOUR:
+			case SQL_C_INTERVAL_MINUTE:
+			case SQL_C_INTERVAL_SECOND:
+			case SQL_C_INTERVAL_YEAR_TO_MONTH:
+			case SQL_C_INTERVAL_DAY_TO_HOUR:
+			case SQL_C_INTERVAL_DAY_TO_MINUTE:
+			case SQL_C_INTERVAL_DAY_TO_SECOND:
+			case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+			case SQL_C_INTERVAL_HOUR_TO_SECOND:
+			case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+				// FIXME: implement
+				//typedef struct tagSQL_INTERVAL_STRUCT
+				//   {
+				//   SQLINTERVAL interval_type;
+				//   SQLSMALLINT   interval_sign;
+				//   union
+				//      {
+				//      SQL_YEAR_MONTH_STRUCT year_month;
+				//      SQL_DAY_SECOND_STRUCT day_second;
+				//      } intval;
+				//   }SQLINTERVAL_STRUCT;
+				//
+				//typedef enum
+				//   {
+				//   SQL_IS_YEAR=1,
+				//   SQL_IS_MONTH=2,
+				//   SQL_IS_DAY=3,
+				//   SQL_IS_HOUR=4,
+				//   SQL_IS_MINUTE=5,
+				//   SQL_IS_SECOND=6,
+				//   SQL_IS_YEAR_TO_MONTH=7,
+				//   SQL_IS_DAY_TO_HOUR=8,
+				//   SQL_IS_DAY_TO_MINUTE=9,
+				//   SQL_IS_DAY_TO_SECOND=10,
+				//   SQL_IS_HOUR_TO_MINUTE=11,
+				//   SQL_IS_HOUR_TO_SECOND=12,
+				//   SQL_IS_MINUTE_TO_SECOND=13,
+				//   }SQLINTERVAL;
+				//
+				//typedef struct tagSQL_YEAR_MONTH
+				//   {
+				//   SQLUINTEGER year;
+				//   SQLUINTEGER month;
+				//   }SQL_YEAR_MOHTH_STRUCT;
+				//
+				//typedef struct tagSQL_DAY_SECOND
+				//   {
+				//   SQLUINTEGER day;
+				//   SQLUNINTEGER hour;
+				//   SQLUINTEGER minute;
+				//   SQLUINTEGER second;
+				//   SQLUINTEGER fraction;
+				//   }SQL_DAY_SECOND_STRUCT;
+				break;
 		}
 	}
 	return SQL_SUCCESS;
@@ -1615,26 +1810,6 @@ SQLRETURN SQL_API SQLFreeEnv(SQLHENV environmenthandle) {
 	return SQLR_SQLFreeEnv(environmenthandle);
 }
 
-static void SQLR_SQLResetParams(SQLHSTMT statementhandle) {
-
-	STMT	*stmt=(STMT *)statementhandle;
-
-	// clear bind variables
-	stmt->cur->clearBinds();
-
-	// clear output bind list
-	numericdictionarylist< outputbind * >	*list=
-					stmt->outputbinds.getList();
-
-	for (dictionarylistnode< int32_t, outputbind * > *node=
-						list->getNodeByIndex(0);
-		node; node=(dictionarylistnode< int32_t, outputbind * > *)
-							node->getNext()) {
-		delete node;
-	}
-	list->clear();
-}
-
 static SQLRETURN SQLR_SQLFreeStmt(SQLHSTMT statementhandle,
 					SQLUSMALLINT option) {
 	debugFunction();
@@ -1665,7 +1840,7 @@ static SQLRETURN SQLR_SQLFreeStmt(SQLHSTMT statementhandle,
 		case SQL_RESET_PARAMS:
 			debugPrintf("SQL_RESET_PARAMS\n");
 			if (!stmt->typeinfo) {
-				stmt->cur->clearBinds();
+				SQLR_SQLResetParams(stmt);
 			}
 			break;
 	}
