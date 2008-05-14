@@ -120,14 +120,14 @@ don't support Autocommit, setting the AutoCommit attribute has no effect.</p>
 <span class="heading2">Temporary Tables</span><br><br>
 
 <p>Some databases support temporary tables.  That is, tables which are
-automatically dropped or truncated when an application closes it's connection
+automatically dropped or truncated when an application closes its connection
 to the database or when a transaction is committed or rolled back.</p>
 
 <p>For databases which drop or truncate tables when a transaction is committed
 or rolled back, temporary tables work naturally.</p>
 
 <p>However, for databases which drop or truncate tables when an application
-closes it's connection to the database, there is an issue.  Since SQL Relay
+closes its connection to the database, there is an issue.  Since SQL Relay
 maintains persistent database connections, when an application disconnects from
 SQL Relay, the connection between SQL Relay and the database remains, so
 the database does not know to drop or truncate the table.  To remedy this
@@ -385,7 +385,7 @@ bind_columns() parameter must be "undef".</p>
 
 <p>Cursors make it possible to execute queries while processing the result
 set of another query.  You can select rows from a table in one query, then 
-iterate through it's result set, inserting rows into another table, using only 
+iterate through its result set, inserting rows into another table, using only 
 1 database connection for both operations.</p>
 
 <p>For example:</p>
@@ -658,7 +658,7 @@ following.</p>
 </pre>
 </blockquote>
 
-<p>MySQL 4.1.2 supports native input binds with it's Statement API but the
+<p>MySQL 4.1.2 supports native input binds with its Statement API but the
 Statement API cannot be used to call stored procedures yet.  As a result,
 SQL Relay must fake input binds when calling MySQL stored procedures, so queries
 which call stored procedures must be written with colon-delimited bind
@@ -1317,7 +1317,7 @@ set of a MySQL procedure.</p>
 </pre>
 </blockquote>
 
-<p>MySQL 4.1.2 supports native input binds with it's Statement API but the
+<p>MySQL 4.1.2 supports native input binds with its Statement API but the
 Statement API cannot be used to call stored procedures yet.  As a result,
 SQL Relay must fake input binds when calling MySQL stored procedures, so queries
 which call stored procedures must be written with colon-delimited bind
@@ -1510,7 +1510,7 @@ the following.</p>
 </pre>
 </blockquote>
 
-<p>MySQL 4.1.2 supports native input binds with it's Statement API but the
+<p>MySQL 4.1.2 supports native input binds with its Statement API but the
 Statement API cannot be used to call stored procedures yet.  As a result,
 SQL Relay must fake input binds when calling MySQL stored procedures, so queries
 which call stored procedures must be written with colon-delimited bind

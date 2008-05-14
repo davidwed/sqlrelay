@@ -336,7 +336,7 @@ support 2-phase commit though.  At present, SQL Relay doesn't currently support
 scenarios very well.  It returns false, indicating than the operation failed,
 but there's no good way to know which databases succeeded and which failed.
 Ideally, SQL Relay would remove the database that failed, stop sending queries
-to it, notify someone that it's gotten out of sync and log all of the queries
+to it, notify someone that it has gotten out of sync and log all of the queries
 that would have gone to it so they can be replayed later, or something like
 that.  But it doesn't currently do any of that.</p>
 

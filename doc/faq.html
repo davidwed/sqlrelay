@@ -391,7 +391,7 @@ acceptable.</p>
 <p>The same efficiency arguments that can be made against
 Apache::DBI and PHP's persistent connections cannot be made against Zope.
 Zope maintains a hackable (some say "configurable") number of persistent 
-database connections in it's cache and shares them among it's threads.  The 
+database connections in its cache and shares them among its threads.  The 
 number of database connections and threads are independent.  There is always 
 the possibility that one or all of the database connections will get pushed 
 out of the cache and have to be started back up later, but in practice, this 
@@ -711,7 +711,7 @@ being used.</ul>
 <p>There are possibly other inconsistencies, but these are the only ones that 
 I've run into so far.</p>
 
-<p>FreeTDS is great software despite it's inconsistencies.  Sybase ctlib is 
+<p>FreeTDS is great software despite its inconsistencies.  Sybase ctlib is 
 impossibly complex.  Anyone attempting to re-engineer it is braver than I am.  
 I'm impressed that FreeTDS works as well as it does, and it's getting better 
 with each release.</p>
@@ -953,7 +953,7 @@ connections, and I keep having to restart SQL Relay.  What gives?</span>
 <p>Prior to version 0.36, PHP scripts needed to set up a shutdown handler to
 clean up connections and cursors and call register_shutdown_function() or
 call ignore_user_abort().  Otherwise, if someone hit stop in their browser, the
-page would stop executing immediately and wouldn't close it's connections to the
+page would stop executing immediately and wouldn't close its connections to the
 SQL Relay server.  In version 0.36, cleanup code was added to the PHP module,
 making it unnecessary to set up a shutdown handler.</p>
 
@@ -1020,7 +1020,7 @@ whether the page was aborted or completed successfully.</p>
 <p>If you want to create a function who's contents are executed only on abort,
 you can use the connection_aborted() function.  In the following code, the
 shutdown() function free's the cursor and connection if the script was aborted
-but lets the script free them on it's own if it completed successfully.  This
+but lets the script free them on its own if it completed successfully.  This
 code is redundant but it illustrates the functionality of connection_aborted().
 </p>
 
@@ -1202,14 +1202,14 @@ insert into testtable values ("one",2) returning :first, :second
 support for all other databases was added in 0.35.</p>
 
 <p>The reason temporary tables are an issue is because normally temporary tables
-are either dropped or truncated when an application closes it's connection to
+are either dropped or truncated when an application closes its connection to
 the database or commits/rolls-back a transaction.   Transaction-scope tables
 work naturally with SQL Relay.  But, since SQL Relay never logs out of the
 database, the database doesn't know to drop or truncate tables when an
-application closes it's connection to SQL Relay.  To remedy this, SQL Relay
+application closes its connection to SQL Relay.  To remedy this, SQL Relay
 parses each query according to the rules for creating a temporary table for
 the database that it is connected to and keeps a list of temporary tables.
-Then, when the application closes it's connection, SQL Relay drops or
+Then, when the application closes its connection, SQL Relay drops or
 truncates the tables as appropriate.</p>
 
 <p>In Oracle, temporary tables are never dropped when the session or

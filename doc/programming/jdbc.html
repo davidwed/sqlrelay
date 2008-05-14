@@ -1,0 +1,74 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay using JDBC</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Programming with SQL Relay using JDBC</span><br><br>
+
+<p>The SQL Relay distribution does not provide a native JBCD driver, but by
+using the ODBC-to-JDBC bridge provided by most Java distributions, applications
+which use JDBC on Unix or Linux may access databases through SQL Relay via the
+<b>experimental</b> ODBC driver.</p>
+
+<p>See <a href="odbc.html">Programming with SQL Relay using ODBC</a> for 
+instructions detailing how to access SQL Relay through ODBC.  Once that is 
+working, you can access databases through SQL Relay via JDBC as well.</p>
+
+<p>A good program to test this with is
+<a href="http://henplus.sourceforge.net/">HenPlus</a>, a JDBC command line
+client.  After downloading and installing HenPlus, you can run it as
+follows:</p>
+
+<blockquote>
+<b>henplus jdbc:odbc:sqlrtest</b>
+</blockquote>
+
+<p>Here is a sample session:</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>[</b></font>mused@localhost bin<font color="#a52a2a"><b>]</b></font>$ ./henplus jdbc:odbc:sqlrtest
+no readline found <font color="#a52a2a"><b>(</b></font>no JavaReadline in java.library.path<font color="#a52a2a"><b>)</b></font>. Using simple stdin.
+using GNU readline <font color="#a52a2a"><b>(</b></font>Brian Fox, Chet Ramey<font color="#a52a2a"><b>)</b></font>, Java wrapper by Bernhard Bablok
+henplus config at /home/mused/.henplus
+---------------------------------------------------------------------------
+&nbsp;HenPlus II <font color="#ff00ff">0</font>.<font color="#ff00ff">9</font>.<font color="#ff00ff">7</font>&nbsp;Copyright<font color="#a52a2a"><b>(</b></font>C<font color="#a52a2a"><b>)</b></font>&nbsp;<font color="#ff00ff">1997</font>..<font color="#ff00ff">2006</font>&nbsp;Henner Zeller <font color="#a52a2a"><b>&lt;</b></font>H.Zeller@acm.org<font color="#a52a2a"><b>&gt;</b></font>
+&nbsp;HenPlus is provided AS IS and comes with ABSOLUTELY NO WARRANTY
+&nbsp;This is free software, and you are welcome to redistribute it under the
+&nbsp;conditions of the GNU Public License <font color="#a52a2a"><b>&lt;</b></font><a href="http://www.gnu.org/licenses/gpl.txt">http://www.gnu.org/licenses/gpl.txt</a><font color="#a52a2a"><b>&gt;</b></font>
+---------------------------------------------------------------------------
+HenPlus II connecting 
+&nbsp;url <font color="#a52a2a"><b>'</b></font><font color="#ff00ff">jdbc:odbc:sqlrtest</font><font color="#a52a2a"><b>'</b></font>
+&nbsp;driver version <font color="#ff00ff">2</font>.<font color="#ff00ff">1</font>
+&nbsp;SQL Relay - <font color="#ff00ff">0</font>.<font color="#ff00ff">40</font>
+&nbsp;<font color="#a52a2a"><b>read</b></font>&nbsp;committed 
+sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;create table <font color="#a52a2a"><b>test</b></font>&nbsp;<font color="#a52a2a"><b>(</b></font>col1 varchar<font color="#a52a2a"><b>(</b></font><font color="#ff00ff">100</font><font color="#a52a2a"><b>))</b></font><font color="#a52a2a"><b>;</b></font>
+affected <font color="#ff00ff">0</font>&nbsp;rows <font color="#a52a2a"><b>(</b></font><font color="#ff00ff">43</font>&nbsp;msec<font color="#a52a2a"><b>)</b></font>
+sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;insert into <font color="#a52a2a"><b>test</b></font>&nbsp;values <font color="#a52a2a"><b>(</b></font><font color="#a52a2a"><b>'</b></font><font color="#ff00ff">hello</font><font color="#a52a2a"><b>'</b></font><font color="#a52a2a"><b>)</b></font><font color="#a52a2a"><b>;</b></font>
+affected <font color="#ff00ff">1</font>&nbsp;rows <font color="#a52a2a"><b>(</b></font><font color="#ff00ff">14</font>&nbsp;msec<font color="#a52a2a"><b>)</b></font>
+sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;insert into <font color="#a52a2a"><b>test</b></font>&nbsp;values <font color="#a52a2a"><b>(</b></font><font color="#a52a2a"><b>'</b></font><font color="#ff00ff">bye</font><font color="#a52a2a"><b>'</b></font><font color="#a52a2a"><b>)</b></font><font color="#a52a2a"><b>;</b></font>
+affected <font color="#ff00ff">1</font>&nbsp;rows <font color="#a52a2a"><b>(</b></font><font color="#ff00ff">5</font>&nbsp;msec<font color="#a52a2a"><b>)</b></font>
+sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;select * from <font color="#a52a2a"><b>test</b></font><font color="#a52a2a"><b>;</b></font>
+-------+
+&nbsp;col1&nbsp;&nbsp;<font color="#a52a2a"><b>|</b></font>
+-------+
+&nbsp;hello <font color="#a52a2a"><b>|</b></font>
+&nbsp;bye&nbsp;&nbsp; <font color="#a52a2a"><b>|</b></font>
+-------+
+<font color="#ff00ff">2</font>&nbsp;rows in result <font color="#a52a2a"><b>(</b></font>first row: <font color="#ff00ff">91</font>&nbsp;msec<font color="#a52a2a"><b>;</b></font>&nbsp;total: <font color="#ff00ff">160</font>&nbsp;msec<font color="#a52a2a"><b>)</b></font>
+sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;quit
+storing settings..
+</pre>
+</blockquote>
+
+<p>Similarly, any program that uses JDBC can be configured to use SQL Relay via
+JDBC by setting its database url to jdbc:odbc:<i>DSN</i> where DSN is replaced
+with the ODBC DSN defined in /etc/odbc.ini.</p>
+
+<p>Developing applications which use JDBC is beyond the scope if this document
+but many examples and tutorials may be found on the web.</p>
+
+</body>
+</html>

@@ -133,14 +133,14 @@ sqlrcon_autoCommitOn() and sqlrcon_autoCommitOff() have no effect.</p>
 <span class="heading2">Temporary Tables</span><br><br>
 
 <p>Some databases support temporary tables.  That is, tables which are
-automatically dropped or truncated when an application closes it's connection
+automatically dropped or truncated when an application closes its connection
 to the database or when a transaction is committed or rolled back.</p>
 
 <p>For databases which drop or truncate tables when a transaction is committed
 or rolled back, temporary tables work naturally.</p>
 
 <p>However, for databases which drop or truncate tables when an application
-closes it's connection to the database, there is an issue.  Since SQL Relay
+closes its connection to the database, there is an issue.  Since SQL Relay
 maintains persistent database connections, when an application disconnects from
 SQL Relay, the connection between SQL Relay and the database remains, so
 the database does not know to drop or truncate the table.  To remedy this

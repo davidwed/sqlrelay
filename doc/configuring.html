@@ -73,7 +73,7 @@ by hand.</p>
 </pre>
 </blockquote>
 
-<p>As you can see, it's an XML file.  Below is it's DTD.</p>
+<p>As you can see, it's an XML file.  Below is its DTD.</p>
 
 <blockquote>
 <pre>
@@ -191,7 +191,7 @@ and <b>filter</b> tags use to match queries.</p>
 <li><b>maxqueuelength</b> - the size the queue of waiting clients has to grow to before more connections will be spawned.</li>
 <li><b>growby</b> - the number of connections that will be started up when new connections are spawned.</li>
 <li><b>ttl</b> - the amount of time that an idle connection will stay alive after being spawned dynamically (does not apply to connections spawned by sqlr-start).</li>
-<li><b>endofsession</b> - the command to issue when a client ends it's session or dies.  Should be either commit or rollback.</li>
+<li><b>endofsession</b> - the command to issue when a client ends its session or dies.  Should be either commit or rollback.</li>
 <li><b>sessiontimeout</b> - if a client leaves a session open for another client to pick up but no client picks it up, the session will time out after this interval.</li>
 <li><b>runasuser</b> - the user to run the sqlr-listener, sqlr-connections and sqlr-scaler as.</li>
 <li><b>runasgroup</b> - the group to run the sqlr-listener and sqlr-connections and sqlr-scaler as.</li>
@@ -448,7 +448,7 @@ compare the user/password to the list of user/passwords in the sqlrelay.conf
 file defined in the <b>users</b> tag and accept or reject the client connection.
 If the client is accepted, it is handed off to the sqlr-connection-database
 daemon which assumes that it has already been authenticated and does not perform
-it's own authentication.</p>
+its own authentication.</p>
 
 <p>If the <b>authtier</b> attribute is set to "connection", the sqlr-listener 
 will ignore the user/password and just hand off the client to the 
@@ -494,7 +494,7 @@ methods are referred to as "reconnect" and "pass".  "Reconnect" works on every
 platform.  "Pass" works on most platforms but not all.  SCO OpenServer and 
 Linux kernels prior to 2.2 don't support "pass".  Other platforms may not 
 support "pass" as well but those certainly don't.  If <b>SQL Relay</b> is being
-run on a different machine than it's clients, "pass" is substantially faster 
+run on a different machine than its clients, "pass" is substantially faster 
 than "reconnect" and more lightweight in any case.  It should be used if
 possible.</p>
 

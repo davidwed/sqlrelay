@@ -210,7 +210,7 @@ two optional arguments: the id of the instance to kill and SIGKILL.</p>
 
 <blockquote><b>sqlr-stop [id] [SIGKILL]</b></blockquote>
 
-<p>Running it kills anything with "sqlr-" and the supplied id in it's name.  It
+<p>Running it kills anything with "sqlr-" and the supplied id in its name.  It
 uses grep, so it's not perfect. If you have id's like "web" and "webster" and
 run "sqlr-stop web" then it will kill both of them.  Running it with no
 arguments will kill all <b>SQL Relay</b> processes.</p>
@@ -358,7 +358,7 @@ higher have a connectstring parameter for sybase connections called "lang"
 which does the same thing.</li>
 <li><p>Sybase and FreeTDS both provide the libct.so library and the ctpublic.h
 header file.  If FreeTDS is installed from an RPM or other package, it is
-possible for it's libct.so to be installed in /usr/lib and it's header file to
+possible for its libct.so to be installed in /usr/lib and its header file to
 be installed in /usr/include.  This can cause the Sybase connection to be
 compiled against ctpublic.h and linked against libct.so from FreeTDS rather
 than from Sybase.</p>
