@@ -18,48 +18,28 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 
 	delete tmpdir;
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"deleting authc...");
-	#endif
+	dbgfile.debugPrint("connection",0,"deleting authc...");
 	delete authc;
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done deleting authc");
-	#endif
+	dbgfile.debugPrint("connection",0,"done deleting authc");
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"deleting idmemory...");
-	#endif
+	dbgfile.debugPrint("connection",0,"deleting idmemory...");
 	delete idmemory;
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done deleting idmemory");
-	#endif
+	dbgfile.debugPrint("connection",0,"done deleting idmemory");
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"deleting semset...");
-	#endif
+	dbgfile.debugPrint("connection",0,"deleting semset...");
 	delete semset;
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done deleting semset");
-	#endif
+	dbgfile.debugPrint("connection",0,"done deleting semset");
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"deleting unixsocket...");
-	#endif
+	dbgfile.debugPrint("connection",0,"deleting unixsocket...");
 	if (unixsocket) {
 		file::remove(unixsocket);
 		delete[] unixsocket;
 	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done deleting unixsocket");
-	#endif
+	dbgfile.debugPrint("connection",0,"done deleting unixsocket");
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"deleting bindpool...");
-	#endif
+	dbgfile.debugPrint("connection",0,"deleting bindpool...");
 	delete bindpool;
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done deleting bindpool");
-	#endif
+	dbgfile.debugPrint("connection",0,"done deleting bindpool");
 
 	if (pidfile) {
 		file::remove(pidfile);

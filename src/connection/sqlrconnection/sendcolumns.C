@@ -27,7 +27,6 @@ void sqlrconnection_svr::sendColumnDefinition(const char *name,
 						uint16_t binary,
 						uint16_t autoincrement) {
 
-	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
 	for (uint16_t i=0; i<namelen; i++) {
 		debugstr->append(name[i]);
@@ -50,9 +49,8 @@ void sqlrconnection_svr::sendColumnDefinition(const char *name,
 	if (unique) {
 		debugstr->append("Unique");
 	}
-	debugPrint("connection",3,debugstr->getString());
+	dbgfile.debugPrint("connection",3,debugstr->getString());
 	delete debugstr;
-	#endif
 
 	clientsock->write(namelen);
 	clientsock->write(name,namelen);
@@ -86,7 +84,6 @@ void sqlrconnection_svr::sendColumnDefinitionString(const char *name,
 						uint16_t binary,
 						uint16_t autoincrement) {
 
-	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
 	for (uint16_t i=0; i<namelen; i++) {
 		debugstr->append(name[i]);
@@ -111,9 +108,8 @@ void sqlrconnection_svr::sendColumnDefinitionString(const char *name,
 	if (unique) {
 		debugstr->append("Unique");
 	}
-	debugPrint("connection",3,debugstr->getString());
+	dbgfile.debugPrint("connection",3,debugstr->getString());
 	delete debugstr;
-	#endif
 
 	clientsock->write(namelen);
 	clientsock->write(name,namelen);

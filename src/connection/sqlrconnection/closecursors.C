@@ -5,16 +5,12 @@
 
 void sqlrconnection_svr::closeCursors(bool destroy) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"closing cursors...");
-	#endif
+	dbgfile.debugPrint("connection",0,"closing cursors...");
 
 	if (cur) {
 		for (int32_t i=0; i<cfgfl->getCursors(); i++) {
 
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",1,i);
-			#endif
+			dbgfile.debugPrint("connection",1,i);
 
 			if (cur[i]) {
 				cur[i]->closeCursor();
@@ -29,7 +25,5 @@ void sqlrconnection_svr::closeCursors(bool destroy) {
 		}
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done closing cursors...");
-	#endif
+	dbgfile.debugPrint("connection",0,"done closing cursors...");
 }

@@ -3,8 +3,7 @@
 
 #include <sqlrconnection.h>
 
-sqlrconnection_svr::sqlrconnection_svr() :
-			daemonprocess(), listener(), debugfile() {
+sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	cmdl=NULL;
 	cfgfl=NULL;

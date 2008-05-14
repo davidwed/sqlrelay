@@ -5,9 +5,7 @@
 
 bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"getting input binds...");
-	#endif
+	dbgfile.debugPrint("connection",2,"getting input binds...");
 
 	// get the number of input bind variable/values
 	if (!getBindVarCount(&(cursor->inbindcount))) {
@@ -46,17 +44,13 @@ bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
 		}		  
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done getting input binds");
-	#endif
+	dbgfile.debugPrint("connection",2,"done getting input binds");
 	return true;
 }
 
 bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"getting output binds...");
-	#endif
+	dbgfile.debugPrint("connection",2,"getting output binds...");
 
 	// get the number of output bind variable/values
 	if (!getBindVarCount(&(cursor->outbindcount))) {
@@ -84,30 +78,22 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			// for now I'm just going to go ahead and use calloc
 			bv->value.stringval=
 				(char *)bindpool->calloc(bv->valuesize+1);
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",4,"STRING");
-			#endif
-		#ifdef SERVER_DEBUG
+			dbgfile.debugPrint("connection",4,"STRING");
 		} else if (bv->type==INTEGER_BIND) {
-			debugPrint("connection",4,"INTEGER");
+			dbgfile.debugPrint("connection",4,"INTEGER");
 		} else if (bv->type==DOUBLE_BIND) {
-			debugPrint("connection",4,"DOUBLE");
-		#endif
+			dbgfile.debugPrint("connection",4,"DOUBLE");
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			if (!getBindSize(bv,maxlobbindvaluelength)) {
 				return false;
 			}
-			#ifdef SERVER_DEBUG
 			if (bv->type==BLOB_BIND) {
-				debugPrint("connection",4,"BLOB");
+				dbgfile.debugPrint("connection",4,"BLOB");
 			} else if (bv->type==CLOB_BIND) {
-				debugPrint("connection",4,"CLOB");
+				dbgfile.debugPrint("connection",4,"CLOB");
 			}
-			#endif
 		} else if (bv->type==CURSOR_BIND) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",4,"CURSOR");
-			#endif
+			dbgfile.debugPrint("connection",4,"CURSOR");
 			sqlrcursor_svr	*curs=findAvailableCursor();
 			if (!curs) {
 				// FIXME: set error here
@@ -121,9 +107,7 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 		bv->isnull=nonNullBindValue();
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done getting output binds");
-	#endif
+	dbgfile.debugPrint("connection",2,"done getting output binds");
 	return true;
 }
 
@@ -131,20 +115,16 @@ bool sqlrconnection_svr::getBindVarCount(uint16_t *count) {
 
 	// get the number of input bind variable/values
 	if (clientsock->read(count,idleclienttimeout,0)!=sizeof(uint16_t)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 			"getting binds failed: client sent bad bind count size");
-		#endif
 		return false;
 	}
 
 	// bounds checking
 	if (*count>MAXVAR) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 			"getting binds failed: client tried to send too many binds:");
-		debugPrint("connection",3,(int32_t)*count);
-		#endif
+		dbgfile.debugPrint("connection",3,(int32_t)*count);
 		return false;
 	}
 
@@ -158,19 +138,15 @@ bool sqlrconnection_svr::getBindVarName(bindvar_svr *bv) {
 	// get the variable name size
 	if (clientsock->read(&bindnamesize,
 				idleclienttimeout,0)!=sizeof(uint16_t)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 			"getting binds failed: bad variable name length size");
-		#endif
 		return false;
 	}
 
 	// bounds checking
 	if (bindnamesize>BINDVARLENGTH) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 			"getting binds failed: bad variable name length");
-		#endif
 		return false;
 	}
 
@@ -180,17 +156,13 @@ bool sqlrconnection_svr::getBindVarName(bindvar_svr *bv) {
 	bv->variable[0]=bindVariablePrefix();
 	if (clientsock->read(bv->variable+1,bindnamesize,
 					idleclienttimeout,0)!=bindnamesize) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 			"getting binds failed: bad variable name");
-		#endif
 		return false;
 	}
 	bv->variable[bindnamesize+1]=(char)NULL;
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",4,bv->variable);
-	#endif
+	dbgfile.debugPrint("connection",4,bv->variable);
 
 	return true;
 }
@@ -200,10 +172,8 @@ bool sqlrconnection_svr::getBindVarType(bindvar_svr *bv) {
 	// get the type
         uint16_t type;
 	if (clientsock->read(&type,idleclienttimeout,0)!=sizeof(uint16_t)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 				"getting binds failed: bad type size");
-		#endif
 		return false;
 	}
 	bv->type=(bindtype)type;
@@ -216,20 +186,16 @@ bool sqlrconnection_svr::getBindSize(bindvar_svr *bv, uint32_t maxsize) {
 	// get the size of the value
 	if (clientsock->read(&(bv->valuesize),
 				idleclienttimeout,0)!=sizeof(uint32_t)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",
+		dbgfile.debugPrint("connection",
 			2,"getting binds failed: bad value length size");
-		#endif
 		return false;
 	}
 
 	// bounds checking
 	/*if (bv->valuesize>maxsize) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 				"getting binds failed: bad value length");
-		debugPrint("connection",3,bv->valuesize);
-		#endif
+		dbgfile.debugPrint("connection",3,bv->valuesize);
 		return false;
 	}*/
 
@@ -238,9 +204,7 @@ bool sqlrconnection_svr::getBindSize(bindvar_svr *bv, uint32_t maxsize) {
 
 void sqlrconnection_svr::getNullBind(bindvar_svr *bv) {
 
-	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,"NULL");
-	#endif
+	dbgfile.debugPrint("connection",4,"NULL");
 
 	bv->value.stringval=(char *)bindpool->malloc(1);
 	bv->value.stringval[0]=(char)NULL;
@@ -258,109 +222,85 @@ bool sqlrconnection_svr::getStringBind(bindvar_svr *bv) {
 	// allocate space to store the value
 	bv->value.stringval=(char *)bindpool->malloc(bv->valuesize+1);
 
-	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,"STRING");
-	#endif
+	dbgfile.debugPrint("connection",4,"STRING");
 
 	// get the bind value
 	if ((uint32_t)(clientsock->read(bv->value.stringval,
 					bv->valuesize,
 					idleclienttimeout,0))!=
 						(uint32_t)(bv->valuesize)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,"getting binds failed: bad value");
-		#endif
+		dbgfile.debugPrint("connection",2,"getting binds failed: bad value");
 		return false;
 	}
 	bv->value.stringval[bv->valuesize]=(char)NULL;
 	bv->isnull=nonNullBindValue();
 
-	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,bv->value.stringval);
-	#endif
+	dbgfile.debugPrint("connection",4,bv->value.stringval);
 
 	return true;
 }
 
 bool sqlrconnection_svr::getIntegerBind(bindvar_svr *bv) {
 
-	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,"INTEGER");
-	#endif
+	dbgfile.debugPrint("connection",4,"INTEGER");
 
 	// get the value itself
 	uint64_t	value;
 	if (clientsock->read(&value,idleclienttimeout,0)!=sizeof(uint64_t)) {
-		#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 					"getting binds failed: bad value");
-		#endif
 		return false;
 	}
 
 	// set the value
 	bv->value.integerval=(int64_t)value;
 
-	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,(int32_t)bv->value.integerval);
-	#endif
+	dbgfile.debugPrint("connection",4,(int32_t)bv->value.integerval);
 
 	return true;
 }
 
 bool sqlrconnection_svr::getDoubleBind(bindvar_svr *bv) {
 
-	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,"DOUBLE");
-	#endif
+	dbgfile.debugPrint("connection",4,"DOUBLE");
 
 	// get the value
 	if (clientsock->read(&(bv->value.doubleval.value),
 				idleclienttimeout,0)!=sizeof(double)) {
-		#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 					"getting binds failed: bad value");
-		#endif
 		return false;
 	}
 
 	// get the precision
 	if (clientsock->read(&(bv->value.doubleval.precision),
 				idleclienttimeout,0)!=sizeof(uint32_t)) {
-		#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 					"getting binds failed: bad precision");
-		#endif
 		return false;
 	}
 
 	// get the scale
 	if (clientsock->read(&(bv->value.doubleval.scale),
 				idleclienttimeout,0)!=sizeof(uint32_t)) {
-		#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 					"getting binds failed: bad scale");
-		#endif
 		return false;
 	}
 
-	#ifdef SERVER_DEBUG
-		debugPrint("connection",4,bv->value.doubleval.value);
-	#endif
+	dbgfile.debugPrint("connection",4,bv->value.doubleval.value);
 
 	return true;
 }
 
 bool sqlrconnection_svr::getLobBind(bindvar_svr *bv) {
 
-	#ifdef SERVER_DEBUG
-		if (bv->type==BLOB_BIND) {
-			debugPrint("connection",4,"BLOB");
-		}
-		if (bv->type==CLOB_BIND) {
-			debugPrint("connection",4,"CLOB");
-		}
-	#endif
+	if (bv->type==BLOB_BIND) {
+		dbgfile.debugPrint("connection",4,"BLOB");
+	}
+	if (bv->type==CLOB_BIND) {
+		dbgfile.debugPrint("connection",4,"CLOB");
+	}
 
 	// get the size of the value
 	if (!getBindSize(bv,maxlobbindvaluelength)) {
@@ -376,10 +316,8 @@ bool sqlrconnection_svr::getLobBind(bindvar_svr *bv) {
 					bv->valuesize,
 					idleclienttimeout,0))!=
 						(uint32_t)(bv->valuesize)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 				"getting binds failed: bad value");
-		#endif
 		return false;
 	}
 
@@ -389,14 +327,12 @@ bool sqlrconnection_svr::getLobBind(bindvar_svr *bv) {
 	bv->value.stringval[bv->valuesize]=(char)NULL;
 	bv->isnull=nonNullBindValue();
 
-	#ifdef SERVER_DEBUG
-		/*if (bv->type==BLOB_BIND) {
-			debugPrintBlob(bv->value.stringval,bv->valuesize);
-		}
-		if (bv->type==CLOB_BIND) {
-			debugPrintClob(bv->value.stringval,bv->valuesize);
-		}*/
-	#endif
+	/*if (bv->type==BLOB_BIND) {
+		dbgfile.debugPrintBlob(bv->value.stringval,bv->valuesize);
+	}
+	if (bv->type==CLOB_BIND) {
+		dbgfile.debugPrintClob(bv->value.stringval,bv->valuesize);
+	}*/
 
 	return true;
 }

@@ -38,7 +38,7 @@ using namespace rudiments;
 #endif
 
 class sqlrconnection_svr :
-		public daemonprocess, public listener, public debugfile {
+		public daemonprocess, public listener {
 	friend class sqlrcursor_svr;
 	public:
 			sqlrconnection_svr();
@@ -359,9 +359,8 @@ class sqlrconnection_svr :
 
 		file		querylog;
 
-#ifdef SERVER_DEBUG
 		stringbuffer	*debugstr;
-#endif
+		debugfile	dbgfile;
 
 	public:
 		sqlrstatistics	*statistics;

@@ -5,9 +5,7 @@
 
 bool sqlrconnection_svr::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"fetch from bind cursor");
-	#endif
+	dbgfile.debugPrint("connection",1,"fetch from bind cursor");
 
 	// handleQuery() will return:
 	//	1 for success,

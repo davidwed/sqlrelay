@@ -5,9 +5,7 @@
 
 void sqlrconnection_svr::bindFormatCommand() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"bind format");
-	#endif
+	dbgfile.debugPrint("connection",1,"bind format");
 
 	const char	*bf=bindFormat();
 	uint16_t	bflen=(uint16_t)charstring::length(bf);

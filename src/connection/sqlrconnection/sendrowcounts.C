@@ -6,27 +6,21 @@
 void sqlrconnection_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 					bool knowsaffected, uint64_t affected) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"sending row counts...");
-	#endif
+	dbgfile.debugPrint("connection",2,"sending row counts...");
 
 	// send actual rows, if that is known
 	if (knowsactual) {
 
-		#ifdef SERVER_DEBUG
 		char	string[30];
 		snprintf(string,30,"actual rows: %lld",actual);
-		debugPrint("connection",3,string);
-		#endif
+		dbgfile.debugPrint("connection",3,string);
 
 		clientsock->write((uint16_t)ACTUAL_ROWS);
 		clientsock->write(actual);
 
 	} else {
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"actual rows unknown");
-		#endif
+		dbgfile.debugPrint("connection",3,"actual rows unknown");
 
 		clientsock->write((uint16_t)NO_ACTUAL_ROWS);
 	}
@@ -35,25 +29,19 @@ void sqlrconnection_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 	// send affected rows, if that is known
 	if (knowsaffected) {
 
-		#ifdef SERVER_DEBUG
 		char	string[46];
 		snprintf(string,46,"affected rows: %lld",affected);
-		debugPrint("connection",3,string);
-		#endif
+		dbgfile.debugPrint("connection",3,string);
 
 		clientsock->write((uint16_t)AFFECTED_ROWS);
 		clientsock->write(affected);
 
 	} else {
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"affected rows unknown");
-		#endif
+		dbgfile.debugPrint("connection",3,"affected rows unknown");
 
 		clientsock->write((uint16_t)NO_AFFECTED_ROWS);
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done sending row counts");
-	#endif
+	dbgfile.debugPrint("connection",2,"done sending row counts");
 }

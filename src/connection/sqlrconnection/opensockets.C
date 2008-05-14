@@ -5,9 +5,7 @@
 
 bool sqlrconnection_svr::openSockets() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"listening on sockets...");
-	#endif
+	dbgfile.debugPrint("connection",0,"listening on sockets...");
 
 	// get the next available unix socket and open it
 	if (cfgfl->getListenOnUnix() && unixsocketptr && unixsocketptr[0]) {
@@ -16,16 +14,14 @@ bool sqlrconnection_svr::openSockets() {
 			serversockun=new unixserversocket();
 			if (serversockun->listen(unixsocket,0000,5)) {
 
-				#ifdef SERVER_DEBUG
 				size_t	stringlen=26+
 					charstring::length(unixsocket)+1;
 				char	*string=new char[stringlen];
 				snprintf(string,stringlen,
 					"listening on unix socket: %s",
 								unixsocket);
-				debugPrint("connection",1,string);
+				dbgfile.debugPrint("connection",1,string);
 				delete[] string;
-				#endif
 
 				addFileDescriptor(serversockun);
 
@@ -66,13 +62,11 @@ bool sqlrconnection_svr::openSockets() {
 								getPort();
 					}
 
-					#ifdef SERVER_DEBUG
 					char	string[33];
 					snprintf(string,33,
 						"listening on inet socket: %d",
 						inetport);
-					debugPrint("connection",1,string);
-					#endif
+					dbgfile.debugPrint("connection",1,string);
 	
 					addFileDescriptor(serversockin[index]);
 
@@ -96,9 +90,7 @@ bool sqlrconnection_svr::openSockets() {
 		}
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done listening on sockets");
-	#endif
+	dbgfile.debugPrint("connection",0,"done listening on sockets");
 
 	return true;
 }

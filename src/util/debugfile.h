@@ -11,9 +11,11 @@ class debugfile {
 	public:
 				debugfile();
 				~debugfile();
-		void	openDebugFile(const char *name,
-					const char *localstatedir);
+		void	init(const char *name, const char *localstatedir);
+		bool	openDebugFile();
 		void	closeDebugFile();
+		void	enable();
+		void	disable();
 		void	debugPrint(const char *name, int32_t tabs,
 							const char *string);
 		void	debugPrint(const char *name, int32_t tabs,
@@ -24,10 +26,11 @@ class debugfile {
 							double number);
 		void	debugPrintBlob(const char *blob, uint32_t length);
 		void	debugPrintClob(const char *clob, uint32_t length);
-		logger	*getDebugLogger();
 	private:
 		filedestination	*dbgfile;
 		logger		*debuglogger;
+		char		*dbgfilename;
+		bool		enabled;
 };
 
 #endif

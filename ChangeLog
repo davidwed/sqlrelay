@@ -28,6 +28,10 @@
 	applied Renaud Amar's HAVE_MYSQL_OPT_RECONNECT patch
 	added ODBC driver to spec file
 	added DESTDIR= to .pc files
+	made freetds use single-quote for escape character, other db's use
+		backslash
+	made sqlr-export/import use &##; for non-printable characters,
+		&, < and >
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init

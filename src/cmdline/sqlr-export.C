@@ -21,15 +21,16 @@ int exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 void escapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
-		// FIXME: what about null's?
-		if (field[index]=='\\' || field[index]=='\'' ||
-						field[index]=='<') {
+		if (field[index]=='\\' || field[index]=='\'') {
 			printf("\\");
+			printf("%c",field[index]);
+		} else if (field[index]<' ' || field[index]>'~' ||
+				field[index]=='&' || field[index]=='<' ||
+				field[index]=='>') {
+			printf("&%d;",field[index]);
+		} else {
+			printf("%c",field[index]);
 		}
-		if (field[index]=='\'') {
-			printf("\\\\");
-		}
-		printf("%c",field[index]);
 	}
 }
 

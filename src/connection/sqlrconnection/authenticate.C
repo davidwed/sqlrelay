@@ -6,9 +6,7 @@
 
 bool sqlrconnection_svr::authenticateCommand() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"authenticate");
-	#endif
+	dbgfile.debugPrint("connection",1,"authenticate");
 
 	if (!authenticate()) {
 		// indicate that an error has occurred
@@ -27,9 +25,7 @@ bool sqlrconnection_svr::authenticateCommand() {
 
 bool sqlrconnection_svr::authenticate() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"authenticate...");
-	#endif
+	dbgfile.debugPrint("connection",1,"authenticate...");
 
 	// get the user/password from the client
 	if (!getUserFromClient() || !getPasswordFromClient()) {
@@ -48,9 +44,7 @@ bool sqlrconnection_svr::authenticate() {
 		return databaseBasedAuth(userbuffer,passwordbuffer);
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"authentication was done on listener");
-	#endif
+	dbgfile.debugPrint("connection",1,"authentication was done on listener");
 	return true;
 }
 
@@ -63,10 +57,8 @@ bool sqlrconnection_svr::getUserFromClient() {
 		userbuffer[size]=(char)NULL;
 		return true;
 	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,
+	dbgfile.debugPrint("connection",1,
 		"authentication failed: user size is wrong");
-	#endif
 	return false;
 }
 
@@ -79,10 +71,8 @@ bool sqlrconnection_svr::getPasswordFromClient() {
 		passwordbuffer[size]=(char)NULL;
 		return true;
 	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,
+	dbgfile.debugPrint("connection",1,
 		"authentication failed: password size is wrong");
-	#endif
 	return false;
 }
 
@@ -91,15 +81,13 @@ bool sqlrconnection_svr::connectionBasedAuth(const char *userbuffer,
 
 	// handle connection-based authentication
 	int	retval=authc->authenticate(userbuffer,passwordbuffer);
-	#ifdef SERVER_DEBUG
 	if (retval) {
-		debugPrint("connection",1,
+		dbgfile.debugPrint("connection",1,
 			"connection-based authentication succeeded");
 	} else {
-		debugPrint("connection",1,
+		dbgfile.debugPrint("connection",1,
 			"connection-based authentication failed: invalid user/password");
 	}
-	#endif
 	return retval;
 }
 
@@ -124,15 +112,13 @@ bool sqlrconnection_svr::databaseBasedAuth(const char *userbuffer,
 		lastauthsuccess=authsuccess;
 	}
 
-	#ifdef SERVER_DEBUG
 	if (lastauthsuccess) {
-		debugPrint("connection",1,
+		dbgfile.debugPrint("connection",1,
 			"database-based authentication succeeded");
 	} else {
-		debugPrint("connection",1,
+		dbgfile.debugPrint("connection",1,
 			"database-based authentication failed: invalid user/password");
 	}
-	#endif
 	return lastauthsuccess;
 }
 

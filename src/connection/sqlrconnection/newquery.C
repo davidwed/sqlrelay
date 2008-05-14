@@ -5,9 +5,7 @@
 
 bool sqlrconnection_svr::newQueryCommand(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"new query");
-	#endif
+	dbgfile.debugPrint("connection",1,"new query");
 
 	// handleQuery() will return:
 	//	1 for success,

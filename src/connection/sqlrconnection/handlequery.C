@@ -8,14 +8,10 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 					bool reallyexecute) {
 
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"handling query...");
-	#endif
+	dbgfile.debugPrint("connection",1,"handling query...");
 
 	if (!getQueryFromClient(cursor,reexecute,bindcursor)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,"failed to handle query");
-		#endif
+		dbgfile.debugPrint("connection",1,"failed to handle query");
 		return 0;
 	}
 
@@ -44,9 +40,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			// free memory used by binds
 			bindpool->free();
 
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",1,"handle query succeeded");
-			#endif
+			dbgfile.debugPrint("connection",1,"handle query succeeded");
 			return 1;
 
 		} else {
@@ -77,26 +71,20 @@ bool sqlrconnection_svr::getQueryFromClient(sqlrcursor_svr *cursor,
 
 bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"getting query...");
-	#endif
+	dbgfile.debugPrint("connection",2,"getting query...");
 
 	// get the length of the query
 	if (clientsock->read(&cursor->querylength,
 				idleclienttimeout,0)!=sizeof(uint32_t)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 			"getting query failed: client sent bad query length size");
-		#endif
 		return false;
 	}
 
 	// bounds checking
 	if (cursor->querylength>maxquerysize) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 			"getting query failed: client sent bad query size");
-		#endif
 		return false;
 	}
 
@@ -105,21 +93,17 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 						cursor->querylength,
 						idleclienttimeout,0))!=
 							cursor->querylength) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 			"getting query failed: client sent short query");
-		#endif
 		return false;
 	}
 	cursor->querybuffer[cursor->querylength]=(char)NULL;
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,"querylength:");
-	debugPrint("connection",4,(int32_t)cursor->querylength);
-	debugPrint("connection",3,"query:");
-	debugPrint("connection",0,cursor->querybuffer);
-	debugPrint("connection",2,"getting query succeeded");
-	#endif
+	dbgfile.debugPrint("connection",3,"querylength:");
+	dbgfile.debugPrint("connection",4,(int32_t)cursor->querylength);
+	dbgfile.debugPrint("connection",3,"query:");
+	dbgfile.debugPrint("connection",0,cursor->querybuffer);
+	dbgfile.debugPrint("connection",2,"getting query succeeded");
 
 	return true;
 }
@@ -135,18 +119,14 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// when resumed.
 	cursor->cleanUpData(true,true);
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"processing query...");
-	#endif
+	dbgfile.debugPrint("connection",2,"processing query...");
 
 	// if the reexecute flag is set, the query doesn't need to be prepared 
 	// again.
 	bool	success=false;
 	bool	doegress=true;
 	if (reexecute) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"re-executing...");
-		#endif
+		dbgfile.debugPrint("connection",3,"re-executing...");
 		if (cursor->supportsNativeBinds()) {
 			if (cursor->sql_injection_detection_ingress(
 							cursor->querybuffer)) {
@@ -180,9 +160,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			delete newquery;
 		}
 	} else if (bindcursor) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"bind cursor...");
-		#endif
+		dbgfile.debugPrint("connection",3,"bind cursor...");
 		if (cursor->sql_injection_detection_ingress(
 						cursor->querybuffer)) {
 			doegress=false;
@@ -194,9 +172,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							reallyexecute);
 		}
 	} else {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"preparing/executing...");
-		#endif
+		dbgfile.debugPrint("connection",3,"preparing/executing...");
 		if (cursor->sql_injection_detection_ingress(
 						cursor->querybuffer)) {
 			doegress=false;
@@ -263,49 +239,37 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// connections.
 	if (success && checkautocommit && isTransactional() && 
 			performautocommit && commitorrollback) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"commit necessary...");
-		#endif
+		dbgfile.debugPrint("connection",3,"commit necessary...");
 		success=commit();
 		commitorrollback=false;
 	}
 
-	#ifdef SERVER_DEBUG
 	if (success) {
-		debugPrint("connection",2,"processing query succeeded");
+		dbgfile.debugPrint("connection",2,"processing query succeeded");
 	} else {
-		debugPrint("connection",2,"processing query failed");
+		dbgfile.debugPrint("connection",2,"processing query failed");
 	}
-	debugPrint("connection",2,"done processing query");
-	#endif
+	dbgfile.debugPrint("connection",2,"done processing query");
 
 	return success;
 }
 
 void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"commit or rollback check...");
-	#endif
+	dbgfile.debugPrint("connection",2,"commit or rollback check...");
 
 	// if the query was a commit or rollback, set a flag indicating so
 	if (isTransactional()) {
 		if (cursor->queryIsCommitOrRollback()) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",3,
+			dbgfile.debugPrint("connection",3,
 					"commit or rollback not needed");
-			#endif
 			commitorrollback=false;
 		} else if (cursor->queryIsNotSelect()) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",3,
+			dbgfile.debugPrint("connection",3,
 					"commit or rollback needed");
-			#endif
 			commitorrollback=true;
 		}
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done with commit or rollback check");
-	#endif
+	dbgfile.debugPrint("connection",2,"done with commit or rollback check");
 }

@@ -12,20 +12,14 @@ bool sqlrconnection_svr::getAutoCommitBehavior() {
 }
 
 void sqlrconnection_svr::autoCommitCommand() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"autocommit...");
-	#endif
+	dbgfile.debugPrint("connection",1,"autocommit...");
 	bool	on;
 	if (clientsock->read(&on,idleclienttimeout,0)==sizeof(bool)) {
 		if (on) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,"autocommit on");
-			#endif
+			dbgfile.debugPrint("connection",2,"autocommit on");
 			clientsock->write(autoCommitOn());
 		} else {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,"autocommit off");
-			#endif
+			dbgfile.debugPrint("connection",2,"autocommit off");
 			clientsock->write(autoCommitOff());
 		}
 	}

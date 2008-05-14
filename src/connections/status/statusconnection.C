@@ -41,8 +41,9 @@ bool statusconnection::init(int argc, const char **argv) {
 		return false;
 	}
 
+	dbgfile.init("connection",cmdl->getLocalStateDir());
 	#ifdef SERVER_DEBUG
-	debugfile::openDebugFile("connection",cmdl->getLocalStateDir());
+	dbgfile.enable();
 	#endif
 
 	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
@@ -72,11 +73,9 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	char	*idfilename=new char[idfilenamelen];
 	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"attaching to shared memory");
-	debugPrint("connection",0,"id filename: ");
-	debugPrint("connection",0,idfilename);
-	#endif
+	dbgfile.debugPrint("connection",0,"attaching to shared memory");
+	dbgfile.debugPrint("connection",0,"id filename: ");
+	dbgfile.debugPrint("connection",0,idfilename);
 
 	idmemory=new sharedmemory();
 	if (!idmemory->attach(file::generateKey(idfilename,1))) {
@@ -88,10 +87,8 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 		return false;
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
+	dbgfile.debugPrint("connection",0,
 			"done attaching to shared memory and semaphores");
-	#endif
 
 	delete[] idfilename;
 

@@ -4,9 +4,7 @@
 #include <sqlrconnection.h>
 
 void sqlrconnection_svr::commitCommand() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"commit");
-	#endif
+	dbgfile.debugPrint("connection",1,"commit");
 	clientsock->write(commit());
 	flushWriteBuffer();
 	commitorrollback=false;
@@ -14,9 +12,7 @@ void sqlrconnection_svr::commitCommand() {
 
 bool sqlrconnection_svr::commit() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"commit...");
-	#endif
+	dbgfile.debugPrint("connection",1,"commit...");
 
 	sqlrcursor_svr	*commitcur=initCursorUpdateStats();
 	char	*commitquery="commit";
@@ -31,11 +27,9 @@ bool sqlrconnection_svr::commit() {
 	commitcur->closeCursor();
 	deleteCursorUpdateStats(commitcur);
 
-	#ifdef SERVER_DEBUG
 	char	string[36];
 	snprintf(string,36,"commit result: %d",retval);
-	debugPrint("connection",2,string);
-	#endif
+	dbgfile.debugPrint("connection",2,string);
 
 	return retval;
 }

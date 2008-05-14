@@ -11,18 +11,14 @@ void sqlrconnection_svr::reLogIn() {
 
 	markDatabaseUnavailable();
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",4,"relogging in...");
-	#endif
+	dbgfile.debugPrint("connection",4,"relogging in...");
 
 	// attempt to log in over and over, once every 5 seconds
 	closeCursors(false);
 	logOutUpdateStats();
 	for (;;) {
 			
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",5,"trying...");
-		#endif
+		dbgfile.debugPrint("connection",5,"trying...");
 
 		if (logInUpdateStats(false)) {
 			if (!initCursors()) {
@@ -35,9 +31,7 @@ void sqlrconnection_svr::reLogIn() {
 		snooze::macrosnooze(5);
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",4,"done relogging in");
-	#endif
+	dbgfile.debugPrint("connection",4,"done relogging in");
 
 	markDatabaseAvailable();
 }

@@ -1,34 +1,45 @@
-document using jdbc via postgresql-drop-in lib
+Non C/C++ api's need a method to close cursors.  Specifically, bind cursors
+cannot be closed manually and must be garbage collected.  It's not an issue for
+memory, but rather a server-side cursor will be occupied until it's garbage
+collected.  On C/C++ you can just delete it.
+
+Perl DBI driver needs to convert bind vars from ?'s to db-appropriate format
+	like PHP Pear DB driver does
+
+fix it's -> its in api docs
+
+PHP pear db only returns 100 rows with this code:
+$query = "SELECT id, name FROM ct_contest ORDER BY name ASC;";
+        $db->setFetchMode(DB_FETCHMODE_ASSOC);
+        $result = $db->query($query);
+                while ($line = $result->fetchRow(DB_FETCHMODE_ASSOC)) {
+                 print ("\t<option value=\"$line[id]\" 
+$selected>$line[name]</option>\n");
+                print "$line[name]\n";
+        }
+        $result->free();
+
+connection daemons have some issue with detaching (I think)
+
 document using postgresql/mysql-drop-in with php
 
-just because sqlrelay is compiled against unixodbc which supports odbc 3.0 api,
-	individual drivers may not support the 3.0 api, so sqlrelay needs to
-	detect this or it needs to at least be configurable
-
-apply Mark Doliner's pkgconfig patches
-	well, they really just add DESTDIR all over, which has caused me
-	problems before, need to look into the source of the problem
 
 mysql db reconnect doesn't appear to work corrrectly
 allowing query timeout appears to hang the sqlrelay server
-
-import/export can't handle:
-	<field>Weekdays: $2.00 for Adults\<br>
-Weekends and Holidays: $3.00 for Adults\<br>
-Children 6 to 11 years of age: $1.00\<br>
-Senior Citizens 62 years of age and older: $1.00</field>
-import/export fails with <i> and </i> in data
-
-for some db's need to escape \'s in sqlr-import
-
 get odbc driver working
 
 update python api to create decimals in dictionary
 update python test to handle python patches
 incorporate Jens Brey's instantclient patches
 
-some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
-		use non-unicode for them
+Bugs:
+	* sqlr-import doesn't support binary data
+	* some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
+			use non-unicode for them
+	* just because sqlrelay is compiled against unixodbc which supports
+		odbc 3.0 api, individual drivers may not support the 3.0 api,
+		so sqlrelay needs to detect this or it needs to at least be
+		configurable use SQLGetInfo with SQL_ODBC_API_CONFORMANCE
 
 Tests:
 	php pear db bind formats

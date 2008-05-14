@@ -116,6 +116,7 @@ class sqlrcursor_svr {
 		virtual	void		returnRow()=0;
 		virtual	void		cleanUpData(bool freeresult,
 							bool freebinds);
+		virtual	char	escapeChar();
 
 
 		// SID virtual methods

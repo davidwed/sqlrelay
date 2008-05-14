@@ -5,9 +5,7 @@
 
 void sqlrconnection_svr::clientSession() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"client session...");
-	#endif
+	dbgfile.debugPrint("connection",0,"client session...");
 
 	statistics->open_cli_connections++;
 	statistics->opened_cli_connections++;
@@ -111,26 +109,20 @@ void sqlrconnection_svr::clientSession() {
 		statistics->open_cli_connections=0;
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done with client session");
-	#endif
+	dbgfile.debugPrint("connection",0,"done with client session");
 }
 
 sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"getting a cursor...");
-	#endif
+	dbgfile.debugPrint("connection",1,"getting a cursor...");
 
 	// does the client need a cursor or does it already have one
 	uint16_t	neednewcursor=DONT_NEED_NEW_CURSOR;
 	if ((command==NEW_QUERY || command==ABORT_RESULT_SET) &&
 		clientsock->read(&neednewcursor,
 				idleclienttimeout,0)!=sizeof(uint16_t)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 			"client cursor request failed, need new cursor stage");
-		#endif
 		return NULL;
 	}
 
@@ -142,21 +134,17 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 		uint16_t	index;
 		if (clientsock->read(&index,
 				idleclienttimeout,0)!=sizeof(uint16_t)) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
+			dbgfile.debugPrint("connection",2,
 				"client cursor request failed, cursor index stage");
-			#endif
 			return NULL;
 		}
 
 		// don't allow the client to request a cursor 
 		// beyond the end of the array.
 		if (index>cfgfl->getCursors()) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
+			dbgfile.debugPrint("connection",2,
 				"client requested an invalid cursor:");
-			debugPrint("connection",3,(int32_t)index);
-			#endif
+			dbgfile.debugPrint("connection",3,(int32_t)index);
 			return NULL;
 		}
 
@@ -182,9 +170,7 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 		cursor->busy=true;
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done getting a cursor");
-	#endif
+	dbgfile.debugPrint("connection",1,"done getting a cursor");
 	return cursor;
 }
 
@@ -192,17 +178,13 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 
 	for (int16_t i=0; i<cfgfl->getCursors(); i++) {
 		if (!cur[i]->busy) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,"found a free cursor:");
-			debugPrint("connection",3,(int32_t)i);
-			#endif
+			dbgfile.debugPrint("connection",2,"found a free cursor:");
+			dbgfile.debugPrint("connection",3,(int32_t)i);
 			return cur[i];
 		}
 	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,
+	dbgfile.debugPrint("connection",2,
 			"find available cursor failed: all cursors are busy");
-	#endif
 	return NULL;
 }
 
@@ -219,18 +201,14 @@ void sqlrconnection_svr::waitForClientClose() {
 	// result set) the read will fall through.  This should guarantee 
 	// that the client will get the the entire result set without
 	// requiring the client to send data back indicating so.
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,
+	dbgfile.debugPrint("connection",1,
 			"waiting for client to close the connection...");
-	#endif
 	uint16_t	dummy;
 	clientsock->read(&dummy,idleclienttimeout,0);
 	clientsock->close();
 	delete clientsock;
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,
+	dbgfile.debugPrint("connection",1,
 			"done waiting for client to close the connection...");
-	#endif
 }
 
 void sqlrconnection_svr::closeSuspendedSessionSockets() {
@@ -239,10 +217,8 @@ void sqlrconnection_svr::closeSuspendedSessionSockets() {
 	// around file descriptors but had to open a set of sockets to handle 
 	// a suspended session, close those sockets here.
 	if (!suspendedsession && cfgfl->getPassDescriptor()) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,
+		dbgfile.debugPrint("connection",1,
 			"closing sockets from a previously suspended session...");
-		#endif
 		if (serversockun) {
 			removeFileDescriptor(serversockun);
 			delete serversockun;
@@ -259,10 +235,8 @@ void sqlrconnection_svr::closeSuspendedSessionSockets() {
 			delete[] serversockin;
 			serversockin=NULL;
 		}
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,
+		dbgfile.debugPrint("connection",1,
 			"done closing sockets from a previously suspended session...");
-		#endif
 	}
 }
 
@@ -310,21 +284,15 @@ void sqlrconnection_svr::noAvailableCursors(uint16_t command) {
 
 bool sqlrconnection_svr::getCommand(uint16_t *command) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"getting command...");
-	#endif
+	dbgfile.debugPrint("connection",1,"getting command...");
 
 	// get the command
 	if (clientsock->read(command,idleclienttimeout,0)!=sizeof(uint16_t)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,
+		dbgfile.debugPrint("connection",1,
 		"getting command failed: client sent bad command or timed out");
-		#endif
 		return false;
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done getting command");
-	#endif
+	dbgfile.debugPrint("connection",1,"done getting command");
 	return true;
 }

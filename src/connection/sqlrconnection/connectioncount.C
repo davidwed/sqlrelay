@@ -5,9 +5,7 @@
 
 void sqlrconnection_svr::incrementConnectionCount() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"incrementing connection count...");
-	#endif
+	dbgfile.debugPrint("connection",0,"incrementing connection count...");
 
 	acquireConnectionCountMutex();
 
@@ -16,24 +14,18 @@ void sqlrconnection_svr::incrementConnectionCount() {
 	(*connectioncount)++;
 	decrementonclose=true;
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,(int32_t)(*connectioncount));
-	#endif
+	dbgfile.debugPrint("connection",1,(int32_t)(*connectioncount));
 
 	signalScalerToRead();
 
 	releaseConnectionCountMutex();
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done incrementing connection count");
-	#endif
+	dbgfile.debugPrint("connection",0,"done incrementing connection count");
 }
 
 void sqlrconnection_svr::decrementConnectionCount() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"decrementing connection count...");
-	#endif
+	dbgfile.debugPrint("connection",0,"decrementing connection count...");
 
 	acquireConnectionCountMutex();
 
@@ -45,22 +37,16 @@ void sqlrconnection_svr::decrementConnectionCount() {
 	}
 	decrementonclose=false;
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,(int32_t)(*connectioncount));
-	#endif
+	dbgfile.debugPrint("connection",1,(int32_t)(*connectioncount));
 
 	releaseConnectionCountMutex();
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done decrementing connection count");
-	#endif
+	dbgfile.debugPrint("connection",0,"done decrementing connection count");
 }
 
 void sqlrconnection_svr::decrementSessionCount() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"decrementing session count...");
-	#endif
+	dbgfile.debugPrint("connection",0,"decrementing session count...");
 
 	acquireSessionCountMutex();
 
@@ -68,13 +54,9 @@ void sqlrconnection_svr::decrementSessionCount() {
 	uint32_t	*sessioncount=getSessionCountBuffer();
 	(*sessioncount)--;
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,(int32_t)(*sessioncount));
-	#endif
+	dbgfile.debugPrint("connection",1,(int32_t)(*sessioncount));
 
 	releaseSessionCountMutex();
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done decrementing session count");
-	#endif
+	dbgfile.debugPrint("connection",0,"done decrementing session count");
 }

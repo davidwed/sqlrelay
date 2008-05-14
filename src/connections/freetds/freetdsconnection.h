@@ -83,6 +83,7 @@ class freetdscursor : public sqlrcursor_svr {
 		void		cleanUpData(bool freeresult, bool freebinds);
 		void		discardResults();
 		void		discardCursor();
+		char		escapeChar();
 
 		char	*cursorname;
 

@@ -5,9 +5,7 @@
 
 void sqlrconnection_svr::abortResultSetCommand(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"abort result set");
-	#endif
+	dbgfile.debugPrint("connection",1,"abort result set");
 
 	// Very important...
 	// Do not cleanUpData() here, otherwise result sets that were suspended

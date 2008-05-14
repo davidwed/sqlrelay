@@ -18,16 +18,12 @@ bool sqlrconnection_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 	char	*idfilename=new char[idfilenamelen];
 	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"attaching to shared memory and semaphores");
-	debugPrint("connection",0,"id filename: ");
-	debugPrint("connection",0,idfilename);
-	#endif
+	dbgfile.debugPrint("connection",0,"attaching to shared memory and semaphores");
+	dbgfile.debugPrint("connection",0,"id filename: ");
+	dbgfile.debugPrint("connection",0,idfilename);
 
 	// initialize shared memory segment for passing port
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"attaching to shared memory...");
-	#endif
+	dbgfile.debugPrint("connection",1,"attaching to shared memory...");
 	idmemory=new sharedmemory();
 	if (!idmemory->attach(file::generateKey(idfilename,1))) {
 		fprintf(stderr,"Couldn't attach to shared memory segment: ");
@@ -40,9 +36,7 @@ bool sqlrconnection_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 
 
 	// initialize the announce semaphore
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"attaching to semaphores...");
-	#endif
+	dbgfile.debugPrint("connection",1,"attaching to semaphores...");
 	semset=new semaphoreset();
 	if (!semset->attach(file::generateKey(idfilename,1),11)) {
 		fprintf(stderr,"Couldn't attach to semaphore set: ");
@@ -55,10 +49,8 @@ bool sqlrconnection_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 		return false;
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,
+	dbgfile.debugPrint("connection",0,
 			"done attaching to shared memory and semaphores");
-	#endif
 
 	delete[] idfilename;
 
@@ -66,24 +58,16 @@ bool sqlrconnection_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 }
 
 void sqlrconnection_svr::waitForListenerToRequireAConnection() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"waiting for the listener to require a connection");
-	#endif
+	dbgfile.debugPrint("connection",1,"waiting for the listener to require a connection");
 	semset->wait(11);
 	//semset->waitWithUndo(11);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done waiting for the listener to require a connection");
-	#endif
+	dbgfile.debugPrint("connection",1,"done waiting for the listener to require a connection");
 }
 
 void sqlrconnection_svr::acquireAnnounceMutex() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"acquiring announce mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"acquiring announce mutex");
 	semset->waitWithUndo(0);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done acquiring announce mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"done acquiring announce mutex");
 }
 
 shmdata *sqlrconnection_svr::getAnnounceBuffer() {
@@ -91,43 +75,27 @@ shmdata *sqlrconnection_svr::getAnnounceBuffer() {
 }
 
 void sqlrconnection_svr::releaseAnnounceMutex() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"releasing announce mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"releasing announce mutex");
 	semset->signalWithUndo(0);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done releasing announce mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"done releasing announce mutex");
 }
 
 void sqlrconnection_svr::signalListenerToRead() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"signalling listener to read");
-	#endif
+	dbgfile.debugPrint("connection",1,"signalling listener to read");
 	semset->signal(2);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done signalling listener to read");
-	#endif
+	dbgfile.debugPrint("connection",1,"done signalling listener to read");
 }
 
 void sqlrconnection_svr::waitForListenerToFinishReading() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"waiting for listener");
-	#endif
+	dbgfile.debugPrint("connection",1,"waiting for listener");
 	semset->wait(3);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done waiting for listener");
-	#endif
+	dbgfile.debugPrint("connection",1,"done waiting for listener");
 }
 
 void sqlrconnection_svr::acquireConnectionCountMutex() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"acquiring connection count mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"acquiring connection count mutex");
 	semset->waitWithUndo(4);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done acquiring connection count mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"done acquiring connection count mutex");
 }
 
 uint32_t *sqlrconnection_svr::getConnectionCountBuffer() {
@@ -135,24 +103,16 @@ uint32_t *sqlrconnection_svr::getConnectionCountBuffer() {
 }
 
 void sqlrconnection_svr::releaseConnectionCountMutex() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"releasing connection count mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"releasing connection count mutex");
 	semset->signalWithUndo(4);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done releasing connection count mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"done releasing connection count mutex");
 }
 
 void sqlrconnection_svr::acquireSessionCountMutex() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"acquiring session count mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"acquiring session count mutex");
 	semset->wait(5);
 	//semset->waitWithUndo(5);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done acquiring session count mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"done acquiring session count mutex");
 }
 
 uint32_t *sqlrconnection_svr::getSessionCountBuffer() {
@@ -160,21 +120,13 @@ uint32_t *sqlrconnection_svr::getSessionCountBuffer() {
 }
 
 void sqlrconnection_svr::releaseSessionCountMutex() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"releasing session count mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"releasing session count mutex");
 	semset->signal(5);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done releasing session count mutex");
-	#endif
+	dbgfile.debugPrint("connection",1,"done releasing session count mutex");
 }
 
 void sqlrconnection_svr::signalScalerToRead() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"signalling scaler to read");
-	#endif
+	dbgfile.debugPrint("connection",1,"signalling scaler to read");
 	semset->signal(8);
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done signalling scaler to read");
-	#endif
+	dbgfile.debugPrint("connection",1,"done signalling scaler to read");
 }

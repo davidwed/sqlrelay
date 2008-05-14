@@ -17,9 +17,7 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 					unsigned short inetport,
 					const char *connectionid) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"announcing availability...");
-	#endif
+	dbgfile.debugPrint("connection",0,"announcing availability...");
 
 	// if we're passing around file descriptors, connect to listener 
 	// if we haven't already and pass it this process's pid
@@ -66,9 +64,7 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 	// pid to the segment otherwise write ports
 	if (passdescriptor) {
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,"handoff=pass");
-		#endif
+		dbgfile.debugPrint("connection",1,"handoff=pass");
 
 		// write the pid into the segment
 		idmemoryptr->connectioninfo.connectionpid=
@@ -76,9 +72,7 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 
 	} else {
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,"handoff=reconnect");
-		#endif
+		dbgfile.debugPrint("connection",1,"handoff=reconnect");
 
 		// convert the port to network byte order and write it into
 		// the segment.
@@ -98,16 +92,12 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 
 	releaseAnnounceMutex();
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done announcing availability...");
-	#endif
+	dbgfile.debugPrint("connection",0,"done announcing availability...");
 }
 
 void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"registering for handoff...");
-	#endif
+	dbgfile.debugPrint("connection",0,"registering for handoff...");
 
 	// construct the name of the socket to connect to
 	size_t	handoffsocknamelen=charstring::length(tmpdir)+9+
@@ -116,13 +106,11 @@ void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
 	snprintf(handoffsockname,handoffsocknamelen,
 			"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
 
-	#ifdef SERVER_DEBUG
 	size_t	stringlen=17+charstring::length(handoffsockname)+1;
 	char	*string=new char[stringlen];
 	snprintf(string,stringlen,"handoffsockname: %s",handoffsockname);
-	debugPrint("connection",1,string);
+	dbgfile.debugPrint("connection",1,string);
 	delete[] string;
-	#endif
 
 	// Try to connect over and over forever on 1 second intervals.
 	// If the connect succeeds but the write fails, loop back and
@@ -130,9 +118,7 @@ void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
 	connected=false;
 	for (;;) {
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,"trying...");
-		#endif
+		dbgfile.debugPrint("connection",1,"trying...");
 
 		if (handoffsockun.connect(handoffsockname,-1,-1,1,0)==
 							RESULT_SUCCESS) {
@@ -147,9 +133,7 @@ void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
 		snooze::macrosnooze(1);
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done registering for handoff");
-	#endif
+	dbgfile.debugPrint("connection",0,"done registering for handoff");
 
 	delete[] handoffsockname;
 }
@@ -165,9 +149,7 @@ bool sqlrconnection_svr::receiveFileDescriptor(int *descriptor) {
 
 void sqlrconnection_svr::deRegisterForHandoff(const char *tmpdir) {
 	
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"de-registering for handoff...");
-	#endif
+	dbgfile.debugPrint("connection",0,"de-registering for handoff...");
 
 	// construct the name of the socket to connect to
 	size_t	removehandoffsocknamelen=charstring::length(tmpdir)+9+
@@ -176,23 +158,19 @@ void sqlrconnection_svr::deRegisterForHandoff(const char *tmpdir) {
 	snprintf(removehandoffsockname,removehandoffsocknamelen,
 			"%s/sockets/%s-removehandoff",tmpdir,cmdl->getId());
 
-	#ifdef SERVER_DEBUG
 	size_t	stringlen=23+charstring::length(removehandoffsockname)+1;
 	char	*string=new char[stringlen];
 	snprintf(string,stringlen,
 			"removehandoffsockname: %s",removehandoffsockname);
-	debugPrint("connection",1,string);
+	dbgfile.debugPrint("connection",1,string);
 	delete[] string;
-	#endif
 
 	// attach to the socket and write the process id
 	unixclientsocket	removehandoffsockun;
 	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
 	removehandoffsockun.write((uint32_t)process::getProcessId());
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done de-registering for handoff");
-	#endif
+	dbgfile.debugPrint("connection",0,"done de-registering for handoff");
 
 	delete[] removehandoffsockname;
 }

@@ -5,6 +5,10 @@
 
 #include <sqlrconnection.h>
 
+char sqlrcursor_svr::escapeChar() {
+	return '\\';
+}
+
 stringbuffer *sqlrcursor_svr::fakeInputBinds(const char *query) {
 
 	// return null if there aren't any input binds
@@ -107,6 +111,8 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 
 	if (inbindvars[index].type==STRING_BIND) {
 
+		char	escchar=escapeChar();
+
 		buffer->append("'");
 
 		size_t	length=inbindvars[index].valuesize;
@@ -115,9 +121,9 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 
 			char	ch=inbindvars[index].value.stringval[ind];
 
-			// escape \'s, quotes and NULL's
-			if (ch=='\'' || ch=='\\') {
-				buffer->append('\\');
+			// escape quotes, the escape char and NULL's
+			if (ch=='\'' || ch==escchar) {
+				buffer->append(escchar);
 			} else if (ch=='\0') {
 				buffer->append("\\0");
 			}

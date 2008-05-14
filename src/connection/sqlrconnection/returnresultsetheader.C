@@ -9,12 +9,10 @@ void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	// if sid egress check failed, return 0 rows and columns
 	if (cursor->sid_egress) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 				"sid egress check failed...");
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 				"returning empty result set header...");
-		#endif
 		// row counts
 		sendRowCounts(cursor->knowsRowCount(),0,
 				cursor->knowsAffectedRows(),0);
@@ -24,78 +22,54 @@ void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 		clientsock->write((uint32_t)0);
 		// no bind vars
 		clientsock->write((uint16_t)END_BIND_VARS);
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 				"done returning result set header");
-		#endif
 		return;
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"returning result set header...");
-	#endif
+	dbgfile.debugPrint("connection",2,"returning result set header...");
 
 	// return the row counts
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,"returning row counts...");
-	#endif
+	dbgfile.debugPrint("connection",3,"returning row counts...");
 	sendRowCounts(cursor->knowsRowCount(),cursor->rowCount(),
 			cursor->knowsAffectedRows(),cursor->affectedRows());
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,"done returning row counts");
-	#endif
+	dbgfile.debugPrint("connection",3,"done returning row counts");
 
 
 	// write a flag to the client indicating whether 
 	// or not the column information will be sent
 	clientsock->write(sendcolumninfo);
 
-	#ifdef SERVER_DEBUG
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
-		debugPrint("connection",3,"column info will be sent");
+		dbgfile.debugPrint("connection",3,"column info will be sent");
 	} else {
-		debugPrint("connection",3,"column info will not be sent");
+		dbgfile.debugPrint("connection",3,"column info will not be sent");
 	}
-	#endif
 
 
 	// return the column count
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,"returning column counts...");
-	#endif
+	dbgfile.debugPrint("connection",3,"returning column counts...");
 	clientsock->write(cursor->colCount());
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",3,"done returning column counts");
-	#endif
+	dbgfile.debugPrint("connection",3,"done returning column counts");
 
 
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
 
 		// return the column type format
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,"sending column type format...");
-		#endif
+		dbgfile.debugPrint("connection",2,"sending column type format...");
 		uint16_t	format=cursor->columnTypeFormat();
-		#ifdef SERVER_DEBUG
 		if (format==COLUMN_TYPE_IDS) {
-			debugPrint("connection",3,"id's");
+			dbgfile.debugPrint("connection",3,"id's");
 		} else {
-			debugPrint("connection",3,"names");
+			dbgfile.debugPrint("connection",3,"names");
 		}
-		#endif
 		clientsock->write(format);
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,"done sending column type format");
-		#endif
+		dbgfile.debugPrint("connection",2,"done sending column type format");
 
 		// return the column info
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"returning column info...");
-		#endif
+		dbgfile.debugPrint("connection",3,"returning column info...");
 		cursor->returnColumnInfo();
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"done returning column info");
-		#endif
+		dbgfile.debugPrint("connection",3,"done returning column info");
 	}
 
 
@@ -108,7 +82,5 @@ void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	flushWriteBuffer();
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done returning result set header");
-	#endif
+	dbgfile.debugPrint("connection",2,"done returning result set header");
 }

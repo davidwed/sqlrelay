@@ -39,7 +39,7 @@ class handoffsocketnode {
 		filedescriptor		*sock;
 };
 
-class sqlrlistener : public daemonprocess, public listener, private debugfile {
+class sqlrlistener : public daemonprocess, public listener {
 	public:
 			sqlrlistener();
 			~sqlrlistener();
@@ -147,6 +147,8 @@ class sqlrlistener : public daemonprocess, public listener, private debugfile {
 
 		sqlrconfigfile		cfgfl;
 		uint32_t		runningconnections;
+
+		debugfile		dbgfile;
 };
 
 #endif

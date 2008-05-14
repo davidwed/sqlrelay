@@ -4,8 +4,6 @@
 #include <sqlrconnection.h>
 
 void sqlrconnection_svr::suspendResultSetCommand(sqlrcursor_svr *cursor) {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"suspend result set");
-	#endif
+	dbgfile.debugPrint("connection",1,"suspend result set");
 	cursor->suspendresultset=true;
 }

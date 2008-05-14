@@ -5,9 +5,7 @@
 
 void sqlrconnection_svr::serverVersionCommand() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"server version");
-	#endif
+	dbgfile.debugPrint("connection",1,"server version");
 
 	const char	*svrversion=SERVER_VERSION;
 	uint16_t	svrvlen=(uint16_t)charstring::length(svrversion);

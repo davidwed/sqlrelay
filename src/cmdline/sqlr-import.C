@@ -410,12 +410,20 @@ bool sqlrimport::text(const char *string) {
 
 void sqlrimport::unescapeField(stringbuffer *strb, const char *field) {
 
-	// FIXME: what about escaped NULL's
 	for (uint32_t index=0; field[index]; index++) {
-		/*if (field[index]=='\\') {
+		if (field[index]=='&') {
 			index++;
-		}*/
-		strb->append(field[index]);
+			strb->append((char)charstring::
+					toUnsignedInteger(field+index));
+			while (field[index] && field[index]!=';') {
+				index++;
+			}
+			if (!field[index]) {
+				break;
+			}
+		} else {
+			strb->append(field[index]);
+		}
 	}
 }
 

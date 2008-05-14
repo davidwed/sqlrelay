@@ -63,41 +63,31 @@ void sqlrconnection_svr::listen() {
 
 void sqlrconnection_svr::waitForAvailableDatabase() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"waiting for available database...");
-	#endif
+	dbgfile.debugPrint("connection",0,"waiting for available database...");
 
 	if (!availableDatabase()) {
 		reLogIn();
 		markDatabaseAvailable();
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"database is available");
-	#endif
+	dbgfile.debugPrint("connection",0,"database is available");
 }
 
 bool sqlrconnection_svr::availableDatabase() {
 
 	// return whether the file "updown" is there or not
-	#ifdef SERVER_DEBUG
-		if (file::exists(updown)) {
-			getDebugLogger()->write("connection",0,"database is available");
-			return true;
-		} else {
-			getDebugLogger()->write("connection",0,"database is not available");
-			return false;
-		}
-	#else
-		return file::exists(updown);
-	#endif
+	if (file::exists(updown)) {
+		dbgfile.debugPrint("connection",0,"database is available");
+		return true;
+	} else {
+		dbgfile.debugPrint("connection",0,"database is not available");
+		return false;
+	}
 }
 
 void sqlrconnection_svr::initSession() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"initializing session...");
-	#endif
+	dbgfile.debugPrint("connection",0,"initializing session...");
 
 	commitorrollback=false;
 	suspendedsession=false;
@@ -106,16 +96,12 @@ void sqlrconnection_svr::initSession() {
 	}
 	accepttimeout=5;
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done initializing session...");
-	#endif
+	dbgfile.debugPrint("connection",0,"done initializing session...");
 }
 
 int32_t sqlrconnection_svr::waitForClient() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"waiting for client...");
-	#endif
+	dbgfile.debugPrint("connection",0,"waiting for client...");
 
 	// FIXME: listen() checks for 1,-1 or 0 from this method, but this
 	// method only returns 1 or -1????  0 should indicate that a suspended
@@ -131,10 +117,8 @@ int32_t sqlrconnection_svr::waitForClient() {
 		int	descriptor;
 		if (!receiveFileDescriptor(&descriptor)) {
 
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",1,"pass failed");
-			debugPrint("connection",0,"done waiting for client");
-			#endif
+			dbgfile.debugPrint("connection",1,"pass failed");
+			dbgfile.debugPrint("connection",0,"done waiting for client");
 
 			return -1;
 		}
@@ -142,26 +126,20 @@ int32_t sqlrconnection_svr::waitForClient() {
 		clientsock=new filedescriptor;
 		clientsock->setFileDescriptor(descriptor);
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,"pass succeeded");
-		debugPrint("connection",0,"done waiting for client");
-		#endif
+		dbgfile.debugPrint("connection",1,"pass succeeded");
+		dbgfile.debugPrint("connection",0,"done waiting for client");
 
 	} else {
 
 		if (waitForNonBlockingRead(accepttimeout,0)<1) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",0,"wait for non blocking read failed");
-			#endif
+			dbgfile.debugPrint("connection",0,"wait for non blocking read failed");
 			return -1;
 		}
 
 		// get the first socket that had data available...
 		filedescriptor	*fd=NULL;
 		if (!getReadyList()->getDataByIndex(0,&fd)) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",0,"ready list was empty");
-			#endif
+			dbgfile.debugPrint("connection",0,"ready list was empty");
 			return -1;
 		}
 
@@ -177,14 +155,12 @@ int32_t sqlrconnection_svr::waitForClient() {
 			clientsock=serversockun->accept();
 		}
 
-		#ifdef SERVER_DEBUG
 		if (fd) {
-			debugPrint("connection",1,"reconnect succeeded");
+			dbgfile.debugPrint("connection",1,"reconnect succeeded");
 		} else {
-			debugPrint("connection",1,"reconnect failed");
+			dbgfile.debugPrint("connection",1,"reconnect failed");
 		}
-		debugPrint("connection",0,"done waiting for client");
-		#endif
+		dbgfile.debugPrint("connection",0,"done waiting for client");
 
 		if (!fd) {
 			return -1;

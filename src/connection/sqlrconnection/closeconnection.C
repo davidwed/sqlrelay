@@ -21,43 +21,27 @@ void sqlrconnection_svr::closeConnection() {
 
 
 	// try to log out
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"logging out...");
-	#endif
+	dbgfile.debugPrint("connection",0,"logging out...");
 	logOutUpdateStats();
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done logging out");
-	#endif
+	dbgfile.debugPrint("connection",0,"done logging out");
 
 
 	// clear the pool
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"removing all sockets...");
-	#endif
+	dbgfile.debugPrint("connection",0,"removing all sockets...");
 	removeAllFileDescriptors();
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done removing all sockets");
-	#endif
+	dbgfile.debugPrint("connection",0,"done removing all sockets");
 
 
 	// close, clean up all sockets
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"deleting unix socket...");
-	#endif
+	dbgfile.debugPrint("connection",0,"deleting unix socket...");
 	delete serversockun;
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done deleting unix socket");
-	#endif
+	dbgfile.debugPrint("connection",0,"done deleting unix socket");
 
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"deleting inetsockets...");
-	#endif
+	dbgfile.debugPrint("connection",0,"deleting inetsockets...");
 	for (uint64_t index=0; index<serversockincount; index++) {
 		delete serversockin[index];
 	}
 	delete[] serversockin;
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done deleting inet socket");
-	#endif
+	dbgfile.debugPrint("connection",0,"done deleting inet socket");
 }

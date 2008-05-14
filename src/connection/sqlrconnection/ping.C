@@ -4,9 +4,7 @@
 #include <sqlrconnection.h>
 
 void sqlrconnection_svr::pingCommand() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"ping");
-	#endif
+	dbgfile.debugPrint("connection",1,"ping");
 	bool	pingresult=ping();
 	clientsock->write(pingresult);
 	flushWriteBuffer();

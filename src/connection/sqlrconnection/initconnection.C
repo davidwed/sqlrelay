@@ -40,8 +40,9 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 
 	setUserAndGroup();
 
+	dbgfile.init("connection",cmdl->getLocalStateDir());
 	#ifdef SERVER_DEBUG
-	debugfile::openDebugFile("connection",cmdl->getLocalStateDir());
+	dbgfile.enable();
 	#endif
 
 	// handle the unix socket directory
@@ -72,14 +73,12 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	// get from config file
 	bool	reloginatstart=cfgfl->getReLoginAtStart();
 
-	#ifndef SERVER_DEBUG
 	bool	nodetach=cmdl->found("-nodetach");
 
-	if (!nodetach && reloginatstart) {
+	/*if (!nodetach && reloginatstart) {
 		// detach from the controlling tty
 		detach();
-	}
-	#endif
+	}*/
 
 	blockSignals();
 
@@ -105,12 +104,11 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		}
 	}
 
-	#ifndef SERVER_DEBUG
+	//if (!nodetach && !reloginatstart) {
 	if (!nodetach) {
 		// detach from the controlling tty
 		detach();
 	}
-	#endif
 
 	if (reloginatstart) {
 		while (!attemptLogIn(false)) {
@@ -416,59 +414,43 @@ void sqlrconnection_svr::blockSignals() {
 
 bool sqlrconnection_svr::attemptLogIn(bool printerrors) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"logging in...");
-	#endif
+	dbgfile.debugPrint("connection",0,"logging in...");
 	if (!logInUpdateStats(printerrors)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",0,"log in failed");
-		#endif
+		dbgfile.debugPrint("connection",0,"log in failed");
 		if (printerrors) {
 			fprintf(stderr,"Couldn't log into database.\n");
 		}
 		return false;
 	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done logging in");
-	#endif
+	dbgfile.debugPrint("connection",0,"done logging in");
 
 	return true;
 }
 
 void sqlrconnection_svr::setInitialAutoCommitBehavior() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"setting autocommit...");
-	#endif
+	dbgfile.debugPrint("connection",0,"setting autocommit...");
 	if (autocommit) {
 		if (!autoCommitOn()) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",0,
+			dbgfile.debugPrint("connection",0,
 					"setting autocommit on failed");
-			#endif
 			fprintf(stderr,"Couldn't set autocommit on.\n");
 			return;
 		}
 	} else {
 		if (!autoCommitOff()) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",0,
+			dbgfile.debugPrint("connection",0,
 					"setting autocommit off failed");
-			#endif
 			fprintf(stderr,"Couldn't set autocommit off.\n");
 			return;
 		}
 	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done setting autocommit");
-	#endif
+	dbgfile.debugPrint("connection",0,"done setting autocommit");
 }
 
 bool sqlrconnection_svr::initCursors() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"initializing cursors...");
-	#endif
+	dbgfile.debugPrint("connection",0,"initializing cursors...");
 
 	int32_t	cursorcount=cfgfl->getCursors();
 	if (!cur) {
@@ -480,9 +462,7 @@ bool sqlrconnection_svr::initCursors() {
 
 	for (int32_t i=0; i<cursorcount; i++) {
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,i);
-		#endif
+		dbgfile.debugPrint("connection",1,i);
 
 		if (!cur[i]) {
 			cur[i]=initCursorUpdateStats();
@@ -492,9 +472,7 @@ bool sqlrconnection_svr::initCursors() {
 		}
 		if (!cur[i]->openCursor(i)) {
 
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",1,"cursor init failure...");
-			#endif
+			dbgfile.debugPrint("connection",1,"cursor init failure...");
 
 			logOutUpdateStats();
 			fprintf(stderr,"Couldn't create cursors.\n");
@@ -508,9 +486,7 @@ bool sqlrconnection_svr::initCursors() {
 		sid_sqlrcon->endSession();
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done initializing cursors");
-	#endif
+	dbgfile.debugPrint("connection",0,"done initializing cursors");
 
 	return true;
 }

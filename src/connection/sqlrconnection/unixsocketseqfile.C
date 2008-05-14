@@ -16,9 +16,7 @@
 
 bool sqlrconnection_svr::getUnixSocket(const char *tmpdir, char *unixsocketptr) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"getting unix socket...");
-	#endif
+	dbgfile.debugPrint("connection",0,"getting unix socket...");
 
 	file	sockseq;
 	if (!openSequenceFile(&sockseq,tmpdir,unixsocketptr) ||
@@ -38,9 +36,7 @@ bool sqlrconnection_svr::getUnixSocket(const char *tmpdir, char *unixsocketptr) 
 		return false;
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",0,"done getting unix socket");
-	#endif
+	dbgfile.debugPrint("connection",0,"done getting unix socket");
 
 	return true;
 }
@@ -53,13 +49,11 @@ bool sqlrconnection_svr::openSequenceFile(file *sockseq,
 	char	*sockseqname=new char[sockseqnamelen];
 	snprintf(sockseqname,sockseqnamelen,"%s/sockseq",tmpdir);
 
-	#ifdef SERVER_DEBUG
 	size_t	stringlen=8+charstring::length(sockseqname)+1;
 	char	*string=new char[stringlen];
 	snprintf(string,stringlen,"opening %s",sockseqname);
-	debugPrint("connection",1,string);
+	dbgfile.debugPrint("connection",1,string);
 	delete[] string;
-	#endif
 
 	mode_t	oldumask=umask(011);
 	bool	success=sockseq->open(sockseqname,O_RDWR|O_CREAT,
@@ -73,13 +67,11 @@ bool sqlrconnection_svr::openSequenceFile(file *sockseq,
 		fprintf(stderr,"readable and writable.\n\n");
 		unixsocketptr[0]=(char)NULL;
 
-		#ifdef SERVER_DEBUG
 		stringlen=14+charstring::length(sockseqname)+1;
 		string=new char[stringlen];
 		snprintf(string,stringlen,"couldn't open %s",sockseqname);
-		debugPrint("connection",1,string);
+		dbgfile.debugPrint("connection",1,string);
 		delete[] string;
-		#endif
 	}
 
 	delete[] sockseqname;
@@ -89,9 +81,7 @@ bool sqlrconnection_svr::openSequenceFile(file *sockseq,
 
 bool sqlrconnection_svr::lockSequenceFile(file *sockseq) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"locking...");
-	#endif
+	dbgfile.debugPrint("connection",1,"locking...");
 
 	return sockseq->lockFile(F_WRLCK);
 }
@@ -107,13 +97,11 @@ bool sqlrconnection_svr::getAndIncrementSequenceNumber(file *sockseq,
 	}
 	sprintf(unixsocketptr,"%d",buffer);
 
-	#ifdef SERVER_DEBUG
 	size_t	stringlen=21+charstring::length(unixsocketptr)+1;
 	char	*string=new char[stringlen];
 	snprintf(string,stringlen,"got sequence number: %s",unixsocketptr);
-	debugPrint("connection",1,string);
+	dbgfile.debugPrint("connection",1,string);
 	delete[] string;
-	#endif
 
 	// increment the sequence number
 	// (the (double) cast is required for solaris with -compat=4)
@@ -123,12 +111,10 @@ bool sqlrconnection_svr::getAndIncrementSequenceNumber(file *sockseq,
 		buffer=buffer+1;
 	}
 
-	#ifdef SERVER_DEBUG
 	string=new char[50];
 	snprintf(string,50,"writing new sequence number: %d",buffer);
-	debugPrint("connection",1,string);
+	dbgfile.debugPrint("connection",1,string);
 	delete[] string;
-	#endif
 
 	// write the sequence number back to the file
 	if (sockseq->setPositionRelativeToBeginning(0)==-1) {
@@ -140,9 +126,7 @@ bool sqlrconnection_svr::getAndIncrementSequenceNumber(file *sockseq,
 bool sqlrconnection_svr::unLockSequenceFile(file *sockseq) {
 
 	// unlock and close the file in a platform-independent manner
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"unlocking...");
-	#endif
+	dbgfile.debugPrint("connection",1,"unlocking...");
 
 	return sockseq->unlockFile();
 }

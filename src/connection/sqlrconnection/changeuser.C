@@ -6,9 +6,7 @@
 bool sqlrconnection_svr::changeUser(const char *newuser,
 					const char *newpassword) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"change user");
-	#endif
+	dbgfile.debugPrint("connection",2,"change user");
 
 	closeCursors(false);
 	logOutUpdateStats();

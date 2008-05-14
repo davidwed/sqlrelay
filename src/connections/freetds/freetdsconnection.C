@@ -1235,6 +1235,10 @@ void freetdscursor::discardCursor() {
 #endif
 }
 
+char freetdscursor::escapeChar() {
+	return '\'';
+}
+
 CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CLIENTMSG *msgp) {
 	if (errorstring) {

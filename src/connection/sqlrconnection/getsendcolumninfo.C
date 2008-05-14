@@ -5,26 +5,20 @@
 
 bool sqlrconnection_svr::getSendColumnInfo() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"getting send column info...");
-	#endif
+	dbgfile.debugPrint("connection",2,"getting send column info...");
 
 	if (clientsock->read(&sendcolumninfo,
 				idleclienttimeout,0)!=sizeof(uint16_t)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,"getting send column info failed");
-		#endif
+		dbgfile.debugPrint("connection",2,"getting send column info failed");
 		return false;
 	}
 
-	#ifdef SERVER_DEBUG
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
-		debugPrint("connection",3,"send column info");
+		dbgfile.debugPrint("connection",3,"send column info");
 	} else {
-		debugPrint("connection",3,"don't send column info");
+		dbgfile.debugPrint("connection",3,"don't send column info");
 	}
-	debugPrint("connection",2,"done getting send column info...");
-	#endif
+	dbgfile.debugPrint("connection",2,"done getting send column info...");
 
 	return true;
 }

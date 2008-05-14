@@ -9,17 +9,23 @@
 debugfile::debugfile() {
 	dbgfile=NULL;
 	debuglogger=NULL;
+	dbgfilename=NULL;
+	enabled=false;
 }
 
 debugfile::~debugfile() {
 	closeDebugFile();
+	delete[] dbgfilename;
 }
 
-void debugfile::openDebugFile(const char *name, const char *localstatedir) {
+void debugfile::init(const char *name, const char *localstatedir) {
+
+	closeDebugFile();
+	delete[] dbgfilename;
 
 	// set the debug file name
 	size_t	dbgfilenamelen;
-	char	*dbgfilename;
+
 	if (localstatedir[0]) {
 		dbgfilenamelen=charstring::length(localstatedir)+
 					16+5+charstring::length(name)+20+1;
@@ -36,6 +42,9 @@ void debugfile::openDebugFile(const char *name, const char *localstatedir) {
 					"%s/sqlr-%s.%d",DEBUG_DIR,name,
 						process::getProcessId());
 	}
+}
+
+bool debugfile::openDebugFile() {
 
 	// create the debug file
 	mode_t	oldumask=umask(066);
@@ -43,10 +52,12 @@ void debugfile::openDebugFile(const char *name, const char *localstatedir) {
 	umask(oldumask);
 
 	// open the file
+	bool	retval=false;
 	if (dbgfile->open(dbgfilename)) {
 		printf("Debugging to: %s\n",dbgfilename);
 		debuglogger=new logger();
 		debuglogger->addLogDestination(dbgfile);
+		retval=true;
 	} else {
 		fprintf(stderr,"Couldn't open debug file: %s\n",dbgfilename);
 		if (dbgfile) {
@@ -57,6 +68,7 @@ void debugfile::openDebugFile(const char *name, const char *localstatedir) {
 	}
 
 	delete[] dbgfilename;
+	return retval;
 }
 
 void debugfile::closeDebugFile() {
@@ -68,25 +80,46 @@ void debugfile::closeDebugFile() {
 	}
 }
 
+void debugfile::enable() {
+	enabled=true;
+}
+
+void debugfile::disable() {
+	enabled=false;
+}
+
 void debugfile::debugPrint(const char *name, int32_t tabs, const char *string) {
+	if (!enabled || (!debuglogger && !openDebugFile())) {
+		return;
+	}
 	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,string);
 	delete[] header;
 }
 
 void debugfile::debugPrint(const char *name, int32_t tabs, int32_t number) {
+	if (!enabled || (!debuglogger && !openDebugFile())) {
+		return;
+	}
 	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,number);
 	delete[] header;
 }
 
 void debugfile::debugPrint(const char *name, int32_t tabs, double number) {
+	if (!enabled || (!debuglogger && !openDebugFile())) {
+		return;
+	}
 	char	*header=debuglogger->logHeader(name);
 	debuglogger->write(header,tabs,number);
 	delete[] header;
 }
 
 void debugfile::debugPrintBlob(const char *blob, uint32_t length) {
+
+	if (!enabled || (!debuglogger && !openDebugFile())) {
+		return;
+	}
 
 	// write printable characters from the blob, for all other characters,
 	// print a period instead, also print a carriage return every 80 columns
@@ -114,6 +147,10 @@ void debugfile::debugPrintBlob(const char *blob, uint32_t length) {
 
 void debugfile::debugPrintClob(const char *clob, uint32_t length) {
 
+	if (!enabled || (!debuglogger && !openDebugFile())) {
+		return;
+	}
+
 	// write printable characters from the clob, for NULl characters,
 	// print a \0 instead
 	stringbuffer	*debugstr=new stringbuffer();
@@ -130,8 +167,4 @@ void debugfile::debugPrintClob(const char *clob, uint32_t length) {
 	debuglogger->write(header,0,debugstr->getString());
 	delete[] header;
 	delete debugstr;
-}
-
-logger *debugfile::getDebugLogger() {
-	return debuglogger;
 }

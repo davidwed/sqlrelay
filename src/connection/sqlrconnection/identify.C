@@ -5,9 +5,7 @@
 
 void sqlrconnection_svr::identifyCommand() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"identify");
-	#endif
+	dbgfile.debugPrint("connection",1,"identify");
 
 	const char	*ident=identify();
 	uint16_t	idlen=(uint16_t)charstring::length(ident);

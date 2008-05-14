@@ -4,9 +4,7 @@
 #include <sqlrconnection.h>
 
 bool sqlrconnection_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"resume result set");
-	#endif
+	dbgfile.debugPrint("connection",1,"resume result set");
 	resumeResultSet(cursor);
 	if (!returnResultSetData(cursor)) {
 		endSession();
@@ -17,15 +15,11 @@ bool sqlrconnection_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 
 void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"resume result set...");
-	#endif
+	dbgfile.debugPrint("connection",1,"resume result set...");
 
 	if (cursor->suspendresultset) {
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",2,"previous result set was suspended");
-		#endif
+		dbgfile.debugPrint("connection",2,"previous result set was suspended");
 
 		// indicate that no error has occurred
 		clientsock->write((uint16_t)NO_ERROR);
@@ -43,10 +37,8 @@ void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 
 	} else {
 
-		#ifdef 	SERVER_DEBUG
-		debugPrint("connection",2,
+		dbgfile.debugPrint("connection",2,
 				"previous result set was not suspended");
-		#endif
 
 		// indicate that an error has occurred
 		clientsock->write((uint16_t)ERROR);
@@ -57,7 +49,5 @@ void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 					43);
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"done resuming result set");
-	#endif
+	dbgfile.debugPrint("connection",1,"done resuming result set");
 }

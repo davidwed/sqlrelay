@@ -5,9 +5,7 @@
 
 bool sqlrconnection_svr::fetchResultSetCommand(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"fetch result set");
-	#endif
+	dbgfile.debugPrint("connection",1,"fetch result set");
 	if (!returnResultSetData(cursor)) {
 		endSession();
 		return false;

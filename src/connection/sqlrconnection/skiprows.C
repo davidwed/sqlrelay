@@ -5,20 +5,16 @@
 
 bool sqlrconnection_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
 
-	#ifdef SERVER_DEBUG
 	debugstr=new stringbuffer();
 	debugstr->append("skipping ");
 	debugstr->append(rows);
 	debugstr->append(" rows...");
-	debugPrint("connection",2,debugstr->getString());
+	dbgfile.debugPrint("connection",2,debugstr->getString());
 	delete debugstr;
-	#endif
 
 	for (uint64_t i=0; i<rows; i++) {
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"skip...");
-		#endif
+		dbgfile.debugPrint("connection",3,"skip...");
 
 		if (lastrowvalid) {
 			lastrow++;
@@ -28,16 +24,12 @@ bool sqlrconnection_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
 		}
 
 		if (!cursor->skipRow()) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,
+			dbgfile.debugPrint("connection",2,
 				"skipping rows hit the end of the result set");
-			#endif
 			return false;
 		}
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done skipping rows");
-	#endif
+	dbgfile.debugPrint("connection",2,"done skipping rows");
 	return true;
 }

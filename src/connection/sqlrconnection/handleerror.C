@@ -5,31 +5,23 @@
 
 bool sqlrconnection_svr::handleError(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"handling error...");
-	#endif
+	dbgfile.debugPrint("connection",2,"handling error...");
 
 	// return the error unless the error was a dead connection, 
 	// in which case, re-establish the connection
 	if (!returnError(cursor)) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"database is down...");
-		#endif
+		dbgfile.debugPrint("connection",3,"database is down...");
 		reLogIn();
 		return false;
 	}
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done handling error...");
-	#endif
+	dbgfile.debugPrint("connection",2,"done handling error...");
 	return true;
 }
 
 bool sqlrconnection_svr::returnError(sqlrcursor_svr *cursor) {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"returning error...");
-	#endif
+	dbgfile.debugPrint("connection",2,"returning error...");
 
 	// get the error message from the database
 	// return value: 1 if database connection is still alive, 0 if not
@@ -71,14 +63,10 @@ bool sqlrconnection_svr::returnError(sqlrcursor_svr *cursor) {
 		flushWriteBuffer();
 
 
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",1,"failed to handle query: error");
-		#endif
+		dbgfile.debugPrint("connection",1,"failed to handle query: error");
 	}
 	
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done returning error");
-	#endif
+	dbgfile.debugPrint("connection",2,"done returning error");
 
 	return liveconnection;
 }

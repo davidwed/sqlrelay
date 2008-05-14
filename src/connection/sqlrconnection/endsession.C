@@ -4,9 +4,7 @@
 #include <sqlrconnection.h>
 
 void sqlrconnection_svr::endSessionCommand() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"end session");
-	#endif
+	dbgfile.debugPrint("connection",1,"end session");
 	endSessionInternal();
 	endSession();
 }
@@ -17,9 +15,7 @@ void sqlrconnection_svr::endSession() {
 
 void sqlrconnection_svr::endSessionInternal() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"ending session...");
-	#endif
+	dbgfile.debugPrint("connection",2,"ending session...");
 
 	// must set suspendedsession to false here so resumed sessions won't 
 	// automatically re-suspend
@@ -34,62 +30,38 @@ void sqlrconnection_svr::endSessionInternal() {
 	// commit or rollback if necessary
 	if (isTransactional() && commitorrollback) {
 		if (cfgfl->getEndOfSessionCommit()) {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,"committing...");
-			#endif
+			dbgfile.debugPrint("connection",2,"committing...");
 			commit();
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,"done committing...");
-			#endif
+			dbgfile.debugPrint("connection",2,"done committing...");
 		} else {
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,"rolling back...");
-			#endif
+			dbgfile.debugPrint("connection",2,"rolling back...");
 			rollback();
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",2,"done rolling back...");
-			#endif
+			dbgfile.debugPrint("connection",2,"done rolling back...");
 		}
 	}
 
 	// reset autocommit behavior
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"resetting autocommit behavior...");
-	#endif
+	dbgfile.debugPrint("connection",2,"resetting autocommit behavior...");
 	if (autocommit) {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"setting autocommit on...");
-		#endif
+		dbgfile.debugPrint("connection",3,"setting autocommit on...");
 		autoCommitOn();
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"done setting autocommit on...");
-		#endif
+		dbgfile.debugPrint("connection",3,"done setting autocommit on...");
 	} else {
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"setting autocommit off...");
-		#endif
+		dbgfile.debugPrint("connection",3,"setting autocommit off...");
 		autoCommitOff();
-		#ifdef SERVER_DEBUG
-		debugPrint("connection",3,"done setting autocommit off...");
-		#endif
+		dbgfile.debugPrint("connection",3,"done setting autocommit off...");
 	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done resetting autocommit behavior...");
-	debugPrint("connection",1,"done ending session");
-	#endif
+	dbgfile.debugPrint("connection",2,"done resetting autocommit behavior...");
+	dbgfile.debugPrint("connection",1,"done ending session");
 }
 
 void sqlrconnection_svr::abortAllCursors() {
 	// abort all cursors
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"aborting all busy cursors...");
-	#endif
+	dbgfile.debugPrint("connection",2,"aborting all busy cursors...");
 	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
 		if (cur[i] && cur[i]->busy) {
 
-			#ifdef SERVER_DEBUG
-			debugPrint("connection",3,i);
-			#endif
+			dbgfile.debugPrint("connection",3,i);
 
 			// It's ok to call cleanUpData() here, ordinarily we
 			// wouldn't so that result sets that were suspended
@@ -100,9 +72,7 @@ void sqlrconnection_svr::abortAllCursors() {
 			cur[i]->abort();
 		}
 	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done aborting all busy cursors");
-	#endif
+	dbgfile.debugPrint("connection",2,"done aborting all busy cursors");
 
 	// end sid session
 	if (cfgfl->getSidEnabled()) {
@@ -113,15 +83,11 @@ void sqlrconnection_svr::abortAllCursors() {
 void sqlrconnection_svr::cleanUpAllCursorData(bool freeresult, bool freebinds) {
 
 	// clean up all busy cursors
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"cleaning up all busy cursors...");
-	#endif
+	dbgfile.debugPrint("connection",2,"cleaning up all busy cursors...");
 	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
 		if (cur[i] && cur[i]->busy) {
 			cur[i]->cleanUpData(freeresult,freebinds);
 		}
 	}
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",2,"done aborting all busy cursors");
-	#endif
+	dbgfile.debugPrint("connection",2,"done aborting all busy cursors");
 }

@@ -4,9 +4,7 @@
 #include <sqlrconnection.h>
 
 void sqlrconnection_svr::rollbackCommand() {
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"rollback");
-	#endif
+	dbgfile.debugPrint("connection",1,"rollback");
 	clientsock->write(rollback());
 	flushWriteBuffer();
 	commitorrollback=false;
@@ -14,9 +12,7 @@ void sqlrconnection_svr::rollbackCommand() {
 
 bool sqlrconnection_svr::rollback() {
 
-	#ifdef SERVER_DEBUG
-	debugPrint("connection",1,"rollback...");
-	#endif
+	dbgfile.debugPrint("connection",1,"rollback...");
 
 	sqlrcursor_svr	*rollbackcur=initCursorUpdateStats();
 	char	*rollbackquery="rollback";
@@ -31,11 +27,9 @@ bool sqlrconnection_svr::rollback() {
 	rollbackcur->closeCursor();
 	deleteCursorUpdateStats(rollbackcur);
 
-	#ifdef SERVER_DEBUG
 	char	string[38];
 	snprintf(string,38,"rollback result: %d",retval);
-	debugPrint("connection",2,string);
-	#endif
+	dbgfile.debugPrint("connection",2,string);
 
 	return retval;
 }

@@ -9,13 +9,11 @@
 
 void sqlrconnection_svr::markDatabaseAvailable() {
 
-	#ifdef SERVER_DEBUG
 	size_t	stringlen=9+charstring::length(updown)+1;
 	char	*string=new char[stringlen];
 	snprintf(string,stringlen,"creating %s",updown);
-	getDebugLogger()->write("connection",4,string);
+	dbgfile.debugPrint("connection",4,string);
 	delete[] string;
-	#endif
 
 	// the database is up if the file is there, 
 	// opening and closing it will create it
@@ -30,13 +28,11 @@ void sqlrconnection_svr::markDatabaseUnavailable() {
 		return;
 	}
 
-	#ifdef SERVER_DEBUG
 	size_t	stringlen=10+charstring::length(updown)+1;
 	char	*string=new char[stringlen];
 	snprintf(string,stringlen,"unlinking %s",updown);
-	getDebugLogger()->write("connection",4,string);
+	dbgfile.debugPrint("connection",4,string);
 	delete[] string;
-	#endif
 
 	// the database is down if the file isn't there
 	file::remove(updown);
