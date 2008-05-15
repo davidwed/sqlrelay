@@ -84,6 +84,8 @@ install:
 	$(INSTALL) -m 644 dropin/mysql.html $(docdir)/dropin
 	$(INSTALL) -m 644 dropin/postgresql.html $(docdir)/dropin
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming
+	$(INSTALL) -m 644 programming/odbc.html $(docdir)/programming
+	$(INSTALL) -m 644 programming/jdbc.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/c++.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/c.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/perl.html $(docdir)/programming
