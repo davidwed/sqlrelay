@@ -1,3 +1,6 @@
+scaler doesn't support localstatedir
+
+
 Non C/C++ api's need a method to close cursors.  Specifically, bind cursors
 cannot be closed manually and must be garbage collected.  It's not an issue for
 memory, but rather a server-side cursor will be occupied until it's garbage
@@ -24,9 +27,10 @@ connection daemons have some issue with detaching (I think)
 document using postgresql/mysql-drop-in with php
 
 
-mysql db reconnect doesn't appear to work corrrectly
+mysql db reconnect doesn't appear to work correctly
 allowing query timeout appears to hang the sqlrelay server
-get odbc driver working
+
+get odbc driver working better
 
 update python api to create decimals in dictionary
 update python test to handle python patches
