@@ -68,6 +68,7 @@ bool debugfile::openDebugFile() {
 	}
 
 	delete[] dbgfilename;
+	dbgfilename=NULL;
 	return retval;
 }
 
@@ -77,6 +78,7 @@ void debugfile::closeDebugFile() {
 		delete dbgfile;
 		dbgfile=NULL;
 		delete debuglogger;
+		debuglogger=NULL;
 	}
 }
 

@@ -57,7 +57,6 @@ Sybase/Microsoft SQL Server?</a></li>
 <li><a href="#sybasefreetdsdiff">What's the difference between the Sybase and FreeTDS connections?</a></li>
 <li><a href="#postgresql">Postgresql's native API uses numbers for types but
 SQL Relay mangles them.  How do I get the numbers?</a>
-<li><a href="#oracleconnections">What is the difference between the Oracle7 connection and the Oracle8 connection?</a></li>
 <li><a href="#nlslang">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</a></li>
 <li><a href="#sqliterowid">How do I get the last insert rowid from SQLite?</a></li>
 <li><a href="#oracleosauth">How do I use Oracle's OS-Authentication (users identified externally)?</a></li>
@@ -290,13 +289,13 @@ using the same user for every session?</span>
 file to "database".  See <a href="configuring.html">Configuring SQL Relay</a>
 for more information.</p>
 
-<p>SQL Relay does it very efficiently when used with Oracle8i/9i/10g and MySQL
-version 3.23.3 or greater.  For Oracle 8i/9i/10g, the database must be
-configured properly.  See <a href="oraclentier.html">this document</a> for
+<p>SQL Relay does it very efficiently when used with Oracle 8i or greater and
+MySQL version 3.23.3 or greater.  For Oracle, the database must be configured
+properly.  See <a href="oraclentier.html">this document</a> for
 step-by-step instructions.</p>
 
-<p>Oracle 8i/9i/10g and MySQL version 3.23.3 or greater allow a process that is
-connected to the database to switch users without disconnecting from the
+<p>Oracle 8i or greater and MySQL version 3.23.3 or greater allow a process that
+is connected to the database to switch users without disconnecting from the
 database.  When used with other databases, SQL Relay logs out and logs back in
 to the database whenever it needs to switch users.</p>
 
@@ -745,55 +744,6 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 <p>Leaving the mangletypes parameter out altogether is the same as setting it
 to "no".</p>
 
-<a name="oracleconnections"></a>
-<span class="heading3">What is the difference between the Oracle7 connection and the Oracle8 connection?</span>
-
-<p>Between versions 7 and 8, Oracle radically changed OCI; their client API.
-The Oracle7 connection uses OCI version 7 and the Oracle8 connection uses
-OCI version 8.<p>
-
-<p>The Oracle8 connection supports LOB datatypes and true bind-by-position.</p>
-
-<P>For example, in the query:</p>
-
-<blockquote>
-<PRE>
-<B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> mytable <FONT color=#6959cf>where</FONT> col1=:val1 <B><FONT color=#a62828>and</FONT></B> col2=:val2
-</PRE>
-</blockquote>
-
-<P>You can bind variables to "val1" and "val2" or "1" and "2".  Using the
-Oracle7 connection, you can only bind to "val1" and "val2".  If you want to
-bind to "1" and "2", your query would have to look like this:</p>
-
-<blockquote>
-<PRE>
-<B><FONT color=#a62828>select</FONT></B> * <FONT color=#6959cf>from</FONT> mytable <FONT color=#6959cf>where</FONT> col1=:<FONT color=#ff00ff>1</FONT> <B><FONT color=#a62828>and</FONT></B> col2=:<FONT color=#ff00ff>2</FONT>
-</PRE>
-</blockquote>
-
-<p>Oracle 8,8i,9i and 10g support OCI 7 and OCI 8.  If you have an Oracle 8,8i,
-9i or 10g database, you can connect to it using the Oracle7 connection provided
-that you are not using Oracle MTS (Multi-Threaded Server).  Oracle 8, 8i, 9i and
-10g support LOB datatypes though, which are not supported by Oracle 7.  The
-Oracle7 connection will retun empty strings and UNKNOWN datatypes for LOB
-fields.</p>
-
-<p>Oracle is attempting to phase out OCI 7, but has mostly maintained 
-compatibility.  The libraries and headers that come with Oracle 8,8i,9i and 10g
-contain OCI 7 and OCI 8 functions.  If you compile SQL Relay against Oracle 8,
-8i,9i or 10g both connections will be built.  If you compile SQL Relay against
-Oracle 7, only the Oracle7 connection will be built.<p>
-
-<p>Since Oracle is phasing out OCI 7, you may run into some inconsistencies.
-For example, the libraries that ship with Oracle 9.0.1 for Linux don't support 
-OCI 7 functions for dealing with LONG datatypes.  If you compile SQL Relay 
-against Oracle 9.0.1, the Oracle7 connection will return empty strings for LONG 
-fields and 0's for their lengths.  It seems like I had that same problem with 
-Oracle 8.1.6 on Linux, but 8.1.7 works fine (and 8.1.6 is no longer available
-to verify the problem).  So, expect inconsistencies with the Oracle7 connection
-if it's not compiled against Oracle 7.</p>
-
 <a name="nlslang"></a>
 <span class="heading3">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</span>
 
@@ -1176,7 +1126,7 @@ delete cur;
 <p>Stored procedures work in most databases that support them, with some
 caveats.  Stored procedures are not supported when using FreeTDS against
 Sybase/MS SQL Server.  Binding clob/blob values are only supported in
-Oracle 8i or higher.  When using stored procedures with Sybase, output
+Oracle 8i or greater.  When using stored procedures with Sybase, output
 parameters must be varchar types.</p>
 
 <p>The syntax for creating and executing a stored procedure is different for

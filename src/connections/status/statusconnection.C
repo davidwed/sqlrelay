@@ -42,9 +42,9 @@ bool statusconnection::init(int argc, const char **argv) {
 	}
 
 	dbgfile.init("connection",cmdl->getLocalStateDir());
-	#ifdef SERVER_DEBUG
-	dbgfile.enable();
-	#endif
+	if (cmdl->found("-debug")) {
+		dbgfile.enable();
+	}
 
 	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
 							cmdl->getId())) {

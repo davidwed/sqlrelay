@@ -32,6 +32,10 @@
 		backslash
 	made sqlr-export/import use &##; for non-printable characters,
 		&, < and >
+	fixed scaler; supports -localstatedir option properly now
+	fixed many it's -> its typos in the documentation
+	changed debug so that only one binary is built and it's selected at
+		runtime
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init

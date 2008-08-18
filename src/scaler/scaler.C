@@ -22,13 +22,15 @@ using namespace rudiments;
 
 scaler::scaler() : daemonprocess() {
 
-	tmpdirlen=charstring::length(TMP_DIR);
 	init=false;
+
+	cmdl=NULL;
 
 	pidfile=NULL;
 	semset=NULL;
 	idmemory=NULL;
 	cfgfile=NULL;
+	tmpdir=NULL;
 
 	id=NULL;
 	config=NULL;
@@ -48,21 +50,24 @@ bool scaler::initScaler(int argc, const char **argv) {
 	init=true;
 
 	// read the commandline
-	commandline	cmdl(argc,argv);
+	cmdl=new cmdline(argc,argv);
 
 	// get the id
-	const char	*tmpid=cmdl.getValue("-id");
+	const char	*tmpid=cmdl->getValue("-id");
 	if (!(tmpid && tmpid[0])) {
 		tmpid=DEFAULT_ID;
 		fprintf(stderr,"Warning! using default id.\n");
 	}
 	id=charstring::duplicate(tmpid);
 
+	tmpdir=new tempdir(cmdl);
+
 	// check for listener's pid file
-	size_t	listenerpidfilelen=tmpdirlen+20+charstring::length(id)+1;
+	size_t	listenerpidfilelen=tmpdir->getLength()+20+
+					charstring::length(id)+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	snprintf(listenerpidfile,listenerpidfilelen,
-			"%s/pids/sqlr-listener-%s",TMP_DIR,id);
+			"%s/pids/sqlr-listener-%s",tmpdir->getString(),id);
 	if (checkForPidFile(listenerpidfile)==-1) {
 		fprintf(stderr,"\nsqlr-scaler error: \n");
 		fprintf(stderr,"	The file %s",listenerpidfile);
@@ -77,9 +82,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 	delete[] listenerpidfile;
 
 	// check/set pid file
-	size_t	pidfilelen=tmpdirlen+18+charstring::length(id)+1;
+	size_t	pidfilelen=tmpdir->getLength()+18+charstring::length(id)+1;
 	pidfile=new char[pidfilelen];
-	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-scaler-%s",TMP_DIR,id);
+	snprintf(pidfile,pidfilelen,
+			"%s/pids/sqlr-scaler-%s",tmpdir->getString(),id);
 	if (checkForPidFile(pidfile)!=-1) {
 		fprintf(stderr,"\nsqlr-scaler error:\n");
 		fprintf(stderr,"	The pid file %s",pidfile);
@@ -95,10 +101,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 	}
 
 	// check for debug
-	debug=cmdl.found("-debug");
+	debug=cmdl->found("-debug");
 
 	// get the config file
-	const char	*tmpconfig=cmdl.getValue("-config");
+	const char	*tmpconfig=cmdl->getValue("-config");
 	if (!(tmpconfig && tmpconfig[0])) {
 		tmpconfig=DEFAULT_CONFIG_FILE;
 	}
@@ -214,9 +220,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 	}
 
 	// initialize the shared memory segment filename
-	size_t	idfilenamelen=tmpdirlen+5+charstring::length(id)+1;
+	size_t	idfilenamelen=tmpdir->getLength()+5+charstring::length(id)+1;
 	idfilename=new char[idfilenamelen];
-	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",TMP_DIR,id);
+	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir->getString(),id);
 	key_t	key=file::generateKey(idfilename,1);
 
 	// connect to the semaphore set
@@ -250,6 +256,8 @@ void scaler::cleanUp() {
 	delete cfgfile;
 	delete[] id;
 
+	delete tmpdir;
+
 	if (pidfile) {
 		file::remove(pidfile);
 		delete[] pidfile;
@@ -257,6 +265,8 @@ void scaler::cleanUp() {
 
 	delete[] config;
 	delete[] dbase;
+
+	delete cmdl;
 }
 
 
@@ -360,10 +370,11 @@ void scaler::getRandomConnectionId() {
 bool scaler::availableDatabase() {
 	
 	// initialize the database up/down filename
-	size_t	updownlen=tmpdirlen+5+charstring::length(id)+1+
+	size_t	updownlen=tmpdir->getLength()+5+charstring::length(id)+1+
 					charstring::length(connectionid)+1;
 	char	*updown=new char[updownlen];
-	snprintf(updown,updownlen,"%s/ipc/%s-%s",TMP_DIR,id,connectionid);
+	snprintf(updown,updownlen,"%s/ipc/%s-%s",
+			tmpdir->getString(),id,connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;
 	return retval;

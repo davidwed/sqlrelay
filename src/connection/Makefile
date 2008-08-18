@@ -196,10 +196,7 @@ DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.d.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-
-all: libsqlrconnection.la libsqlrconnection_debug.la
+all: libsqlrconnection.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -215,13 +212,9 @@ rebuild: clean all
 libsqlrconnection.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
-libsqlrconnection_debug.la: $(SRCS) $(DLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(DLOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
-
 install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrconnection.la $(libdir)
-	$(LTINSTALL) libsqlrconnection_debug.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
@@ -236,7 +229,6 @@ install:
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection_debug.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection_p.la
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp

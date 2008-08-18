@@ -6,7 +6,6 @@ include ../../../config.mk
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/connection $(RUDIMENTSINCLUDES) $(SQLITEINCLUDES) $(SIDINCLUDES)
 LIBS = $(SQLITELIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(SQLITELIBS) -L$(top_builddir)/src/connection -lsqlrconnection_debug -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(SQLITELIBSPATH)),)
 ifeq ($(SQLITEUSERPATH),yes)
 	RPATH = -R $(SQLITELIBSPATH)
@@ -27,14 +26,10 @@ DLOBJS= sqliteconnection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.d.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-
-all: sqlr-connection-sqlite sqlr-connection-sqlite-debug
+all: sqlr-connection-sqlite
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sqlite$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sqlite-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs
@@ -44,14 +39,9 @@ rebuild: clean all
 sqlr-connection-sqlite: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(SQLITESTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
-sqlr-connection-sqlite-debug: $(SRCS) $(DLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(SQLITESTATIC) $(LDFLAGS) -o $@ $(DLOBJS) $(DEBUGLIBS) $(RPATH)
-
 install:
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) sqlr-connection-sqlite$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-connection-sqlite-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite-debug$(EXE)

@@ -32,16 +32,13 @@ bool startListener(const char *id, const char *config,
 	
 	stringbuffer	command;
 	command.append("sqlr-listener");
-	if (listenerdebug) {
-		command.append("-debug");
-	}
 	command.append(" -id ")->append(id);
 	command.append(" -config ")->append(config);
 	if (localstatedir[0]) {
 		command.append(" -localstatedir ")->append(localstatedir);
 	}
 	if (listenerdebug) {
-		command.append(" &");
+		command.append(" -debug");
 	}
 	printf("  %s\n",command.getString());
 
@@ -67,9 +64,6 @@ bool startConnection(bool strace, const char *dbase,
 		command.append("strace -ff -o sqlr-connection-strace ");
 	}
 	command.append("sqlr-connection-")->append(dbase);
-	if (connectiondebug) {
-		command.append("-debug");
-	}
 	command.append(" -id ")->append(id);
 	if (connectionid) {
 		command.append(" -connectionid ")->append(connectionid);
@@ -78,7 +72,10 @@ bool startConnection(bool strace, const char *dbase,
 	if (localstatedir[0]) {
 		command.append(" -localstatedir ")->append(localstatedir);
 	}
-	if (strace || connectiondebug) {
+	if (connectiondebug) {
+		command.append(" -debug");
+	}
+	if (strace) {
 		command.append(" &");
 	}
 

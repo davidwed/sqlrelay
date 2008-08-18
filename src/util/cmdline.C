@@ -38,3 +38,15 @@ void cmdline::setLocalStateDir() {
 	// get the localstatedir from the command line
 	localstatedir=getValue("-localstatedir");
 }
+
+const char *cmdline::getConfig() const {
+	return config;
+}
+
+const char *cmdline::getId() const {
+	return id;
+}
+
+const char *cmdline::getLocalStateDir() const {
+	return localstatedir;
+}

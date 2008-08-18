@@ -6,7 +6,6 @@ include ../../../config.mk
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/connection $(RUDIMENTSINCLUDES) $(POSTGRESQLINCLUDES) $(SIDINCLUDES)
 LIBS = $(POSTGRESQLLIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(POSTGRESQLLIBS) -L$(top_builddir)/src/connection -lsqlrconnection_debug -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
 ifeq ($(POSTGRESQLUSERPATH),yes)
 	RPATH = -R $(POSTGRESQLLIBSPATH)
@@ -27,14 +26,10 @@ DLOBJS= postgresqlconnection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.d.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-
-all: sqlr-connection-postgresql sqlr-connection-postgresql-debug
+all: sqlr-connection-postgresql
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-postgresql$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-postgresql-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs
@@ -44,14 +39,9 @@ rebuild: clean all
 sqlr-connection-postgresql: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(POSTGRESQLSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
-sqlr-connection-postgresql-debug: $(SRCS) $(DLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(POSTGRESQLSTATIC) $(LDFLAGS) -o $@ $(DLOBJS) $(DEBUGLIBS) $(RPATH)
-
 install:
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) sqlr-connection-postgresql$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-connection-postgresql-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql-debug$(EXE)

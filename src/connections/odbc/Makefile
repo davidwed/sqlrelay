@@ -6,7 +6,6 @@ include ../../../config.mk
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/connection $(RUDIMENTSINCLUDES) $(ODBCINCLUDES) $(ICONVINCLUDES) $(SIDINCLUDES)
 LIBS = $(ODBCLIBS) $(ICONVLIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-DEBUGLIBS = $(ODBCLIBS) $(ICONVLIBS) -L$(top_builddir)/src/connection -lsqlrconnection_debug -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(ODBCLIBSPATH)),)
 ifeq ($(ODBCUSERPATH),yes)
 	RPATH = -R $(ODBCLIBSPATH)
@@ -32,14 +31,10 @@ DLOBJS= odbcconnection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.d.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-
-all: sqlr-connection-odbc sqlr-connection-odbc-debug
+all: sqlr-connection-odbc
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs
@@ -49,14 +44,9 @@ rebuild: clean all
 sqlr-connection-odbc: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(ODBCSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
-sqlr-connection-odbc-debug: $(SRCS) $(DLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(ODBCSTATIC) $(LDFLAGS) -o $@ $(DLOBJS) $(DEBUGLIBS) $(RPATH)
-
 install:
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) sqlr-connection-odbc$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-connection-odbc-debug$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc-debug$(EXE)

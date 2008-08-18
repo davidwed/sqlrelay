@@ -1,15 +1,20 @@
-scaler doesn't support localstatedir
+oracle 11g on fc9 doc
 
+sqlr-stop doesn't support -localstatedir
+
+config gui segfaults when creating a file
+
+integrate erlang api
 
 Non C/C++ api's need a method to close cursors.  Specifically, bind cursors
 cannot be closed manually and must be garbage collected.  It's not an issue for
 memory, but rather a server-side cursor will be occupied until it's garbage
 collected.  On C/C++ you can just delete it.
+   Still needs to be done for a couple of API's, verify that the refcount is
+	ok for ones that have been implemented, or that a double-delete is safe
 
 Perl DBI driver needs to convert bind vars from ?'s to db-appropriate format
 	like PHP Pear DB driver does
-
-fix it's -> its in api docs
 
 PHP pear db only returns 100 rows with this code:
 $query = "SELECT id, name FROM ct_contest ORDER BY name ASC;";

@@ -22,14 +22,10 @@ DLOBJS = sqlrlistener.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.C.d.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DSERVER_DEBUG -c $< -o $@
-
-all: sqlr-listener sqlr-listener-debug
+all: sqlr-listener
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-listener$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-listener-debug$(EXE)
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs
@@ -39,13 +35,9 @@ rebuild: clean all
 sqlr-listener: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
-sqlr-listener-debug: $(SRCS) $(DLOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(DLOBJS) $(LIBS) $(RPATH)
-
 install:
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-listener-debug$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(tmpdir)/sockets
@@ -57,4 +49,3 @@ install:
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener-debug$(EXE)

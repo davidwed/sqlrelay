@@ -1,10 +1,10 @@
 <!ELEMENT instances (instance*)>
-<!ELEMENT instance (users,connections,router)>
+<!ELEMENT instance (users,connections?,router?)>
 	<!ATTLIST instance id CDATA "defaultid">
 	<!ATTLIST instance addresses CDATA "0.0.0.0">
 	<!ATTLIST instance port CDATA "9000">
 	<!ATTLIST instance socket CDATA "/tmp/sqlrelay.socket">
-	<!ATTLIST instance dbase (oracle8|mysql|postgresql|sqlite|freetds|sybase|odbc|db2|firebird|mdbtools) "oracle8">
+	<!ATTLIST instance dbase (oracle8|mysql|postgresql|sqlite|freetds|sybase|odbc|db2|firebird|mdbtools|router) "oracle8">
 	<!ATTLIST instance connections CDATA "1">
 	<!ATTLIST instance maxconnections CDATA "1">
 	<!ATTLIST instance maxqueuelength CDATA "0">
@@ -40,7 +40,7 @@
 	<!ATTLIST connection metric CDATA "1">
 	<!ATTLIST connection behindloadbalancer (yes|no) "no">
 
-<!ELEMENT router (route*,filter*)>
+<!ELEMENT router ((route*|filter*)*)>
 <!ELEMENT route (query*)>
 	<!ATTLIST route host CDATA "">
 	<!ATTLIST route port CDATA "">

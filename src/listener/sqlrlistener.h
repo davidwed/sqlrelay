@@ -22,9 +22,7 @@
 #include <tempdir.h>
 #include <sqlrconfigfile.h>
 
-#ifdef SERVER_DEBUG
-	#include <rudiments/logger.h>
-#endif
+#include <rudiments/logger.h>
 
 #include <defines.h>
 

@@ -128,9 +128,9 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	}
 
 	dbgfile.init("listener",cmdl->getLocalStateDir());
-	#ifdef SERVER_DEBUG
-	dbgfile.enable();
-	#endif
+	if (cmdl->found("-debug")) {
+		dbgfile.enable();
+	}
 
 	if (!handlePidFile(&tmpdir,cmdl->getId())) {
 		return false;

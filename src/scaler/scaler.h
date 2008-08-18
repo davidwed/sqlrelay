@@ -8,6 +8,8 @@
 #include <defaults.h>
 
 #include <sqlrconfigfile.h>
+#include <cmdline.h>
+#include <tempdir.h>
 
 #include <rudiments/daemonprocess.h>
 #include <rudiments/semaphoreset.h>
@@ -34,8 +36,6 @@ class scaler : public daemonprocess {
 		bool	availableDatabase();
 		int32_t	countSessions();
 		int32_t	countConnections();
-
-		int32_t		tmpdirlen;
 
 		char		*pidfile;
 
@@ -65,6 +65,9 @@ class scaler : public daemonprocess {
 		bool		init;
 
 		bool		debug;
+
+		tempdir		*tmpdir;
+		cmdline		*cmdl;
 };
 
 #endif

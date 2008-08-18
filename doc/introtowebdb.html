@@ -127,10 +127,10 @@ relational databases, but in the end the application will most likely have to
 run through Microsoft Internet Information System (IIS) on a Microsoft 
 Operating System.</p>
 
-<p>Oracle provides a unique solution with Oracle 8i.  In Oracle 8i the
-RDBMS attaches to an external web server like Apache, Netscape or Microsoft IIS
-and serves applications from within.  Applications reside and execute inside 
-the database as PL/SQL procedures.</p>
+<p>Oracle provides a unique solution.  In Oracle 8i and greater the RDBMS
+attaches to an external web server like Apache, Netscape or Microsoft IIS and
+serves applications from within.  Applications reside and execute inside the
+database as PL/SQL procedures.</p>
 
 <p>Most non-drag-and-drop solutions require some programming and an API.  
 Popular programming languages for writing web-based applications include PHP, 
@@ -253,9 +253,9 @@ sounds like a good solution at first, but inevitably has performance
 consequences impacting other database activities.</p>
 
 <p>Another solution is to attach the web-server directly to the RDBMS.  Oracle 
-8i does just that.  It has limitations though.  Platform support is
+8i and greater does just that.  It has limitations though.  Platform support is
 extensive but may exclude your particular platform, PL/SQL is no speed demon, 
-and Oracle 8i might be too expensive for some pursuits.</p>
+and Oracle might be too expensive for some pursuits.</p>
 
 <p>The third and most popular solution is to maintain pools of RDBMS 
 connections and loan them out to needy executables.  Web application servers

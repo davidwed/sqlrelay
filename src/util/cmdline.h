@@ -1,9 +1,7 @@
 #ifndef SQLRUTIL_CMDLINE_H
 #define SQLRUTIL_CMDLINE_H
 
-#ifdef SERVER_DEBUG
-	#include <rudiments/logger.h>
-#endif
+#include <rudiments/logger.h>
 
 #include <rudiments/commandline.h>
 
@@ -28,17 +26,5 @@ class cmdline : public commandline {
 		const char	*config;
 		const char	*localstatedir;
 };
-
-inline const char *cmdline::getConfig() const {
-	return config;
-}
-
-inline const char *cmdline::getId() const {
-	return id;
-}
-
-inline const char *cmdline::getLocalStateDir() const {
-	return localstatedir;
-}
 
 #endif
