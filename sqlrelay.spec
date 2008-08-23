@@ -27,6 +27,7 @@
 # --without ruby
 # --without zope
 # --without tcl
+# --without erlang
 
 Summary: Persistent database connection system.
 Name: sqlrelay
@@ -76,20 +77,21 @@ BuildRequires: rudiments-devel >= 0.28.1
 %{!?_without_ruby:BuildRequires: ,%{rubydevel}}
 %{!?_without_zope:BuildRequires: ,python-devel}
 %{!?_without_tcl:BuildRequires: ,%{tcldevel}}
+%{!?_without_erlang:BuildRequires: ,erlang}
 
 %description
 SQL Relay is a persistent database connection pooling, proxying and load 
 balancing system for Unix and Linux supporting ODBC, Oracle, MySQL,
 PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and
 MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
-Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java and TCL, drop-in replacement
-libraries for MySQL and PostgreSQL clients, command line clients, a GUI
-configuration tool and extensive documentation.  The APIs support advanced
-database operations such as bind variables, multi-row fetches, client-side
-result set caching and suspended transactions.  It is ideal for speeding up
-database-driven web-based applications, accessing databases from unsupported
-platforms, migrating between databases, distributing access to replicated
-databases and throttling database access.
+Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java, TCL and Erlang, drop-in
+replacement libraries for MySQL and PostgreSQL clients, command line
+clients, a GUI configuration tool and extensive documentation.  The APIs
+support advanced database operations such as bind variables, multi-row fetches,
+client-side result set caching and suspended transactions.  It is ideal for
+speeding up database-driven web-based applications, accessing databases from
+unsupported platforms, migrating between databases, distributing access to
+replicated databases and throttling database access.
 
 
 %package clients
@@ -310,6 +312,14 @@ Group: Development/Languages
 SQL Relay modules for TCL.
 
 
+%package erlang
+Summary: SQL Relay modules for Erlang.
+Group: Development/Languages
+
+%description erlang
+SQL Relay modules for Erlang.
+
+
 %package doc
 Summary: Documentation for SQL Relay.
 Group: Applications/Database
@@ -327,6 +337,11 @@ Man pages for SQL Relay.
 
 
 %define	tcldir		%(dirname `rpm -q -l %{tcldevel} | grep tclConfig.sh`)
+%ifarch x86_64
+%define	erlangdir	%(ERLPATH=""; for i in "/usr/local/lib64/erlang/lib" "/usr/lib64/erlang/lib"; if ( test -d "$i" ); then ERLPATH="$i"; fi; done; echo $ERLPATH)
+%else
+%define	erlangdir	%(ERLPATH=""; for i in "/usr/local/lib/erlang/lib" "/usr/lib/erlang/lib"; if ( test -d "$i" ); then ERLPATH="$i"; fi; done; echo $ERLPATH)
+%endif
 %ifarch x86_64
 %define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib64/python$j" "/usr/local/lib64/python$j" "/usr/pkg/lib64/python$j" "/usr/local/python$j/lib64/python$j" "/opt/sfw/lib64/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
 %else
@@ -369,6 +384,7 @@ Man pages for SQL Relay.
 	%{?_without_sybase:	--disable-sybase} \
 	%{?_without_java:	--disable-java} \
 	%{?_without_tcl:	--disable-tcl} \
+	%{?_without_erlang:	--disable-erlang} \
 	%{?_without_perl:	--disable-perl} \
 	%{?_without_php:	--disable-php} \
 	%{?_without_python:	--disable-python} \
@@ -569,6 +585,10 @@ rm -rf %{buildroot}
 %{!?_without_tcl:%files tcl}
 %{!?_without_tcl:%defattr(-, root, root)}
 %{!?_without_tcl:%{tcldir}/sqlrelay/*}
+
+%{!?_without_erlang:%files erlang}
+%{!?_without_erlang:%defattr(-, root, root)}
+%{!?_without_erlang:%{erlangdir}/sqlrelay-%{version}}
 
 %files doc
 %{docdir}
