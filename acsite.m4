@@ -2461,6 +2461,63 @@ AC_DEFUN([FW_CHECK_PHP_PEAR_DB],
 ])
 
 
+AC_DEFUN([FW_CHECK_ERLANG],
+[
+if ( test "$ENABLE_ERLANG" = "yes" )
+then
+
+	HAVE_ERLANG=""
+	ERLANGINCLUDES=""
+	ERLANGLIBSS=""
+
+	if ( test "$cross_compiling" = "yes" )
+	then
+
+		dnl cross compiling ...
+		echo "cross compiling..."
+
+	else
+
+		AC_ERLANG_SUBST_ROOT_DIR
+		AC_ERLANG_SUBST_LIB_DIR
+		AC_ERLANG_SUBST_INSTALL_LIB_DIR
+
+		ERLANG_INCLUDE_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/include`
+		ERLANG_LIB_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/lib`
+
+
+		if ( test -n "$ERLANG_INCLUDE_DIR" -a -n "$ERLANG_LIB_DIR" )
+		then
+
+			if ( test "$ERLANG_INCLUDE_DIR" != "/usr" )
+			then
+				ERLANGINCLUDES="-I$ERLANG_INCLUDE_DIR"
+			fi
+
+			if ( test "$ERLANG_LIB_DIR" != "/usr" )
+			then
+				ERLANGLIBS="-L$ERLANG_LIB_DIR"
+			fi
+			ERLANGLIBS="$ERLANGLIBS -lerl_interface -lei"
+
+			HAVE_ERLANG="yes"
+		else
+			AC_MSG_WARN(The Erlang API will not be built.)
+		fi
+	fi
+
+	FW_INCLUDES(erlang,[$ERLANGINCLUDES])
+	FW_LIBS(erlang,[$ERLANGLIBS])
+
+	AC_SUBST(HAVE_ERLANG)
+	AC_SUBST(ERLANGINCLUDES)
+	AC_SUBST(ERLANGLIBS)
+	AC_SUBST(ERLANG_ROOT_DIR)
+	AC_SUBST(ERLANG_LIB_DIR)
+	AC_SUBST(ERLANG_INSTALL_LIB_DIR)
+fi
+])
+
 AC_DEFUN([FW_CHECK_TCL],
 [
 if ( test "$ENABLE_TCL" = "yes" )

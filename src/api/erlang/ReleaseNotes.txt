@@ -1,0 +1,110 @@
+Release 1.0 RC 1 - June 3, 2008
+
+ 
+Introduction 
+------------
+These files provide an Erlang version of the SQLRelay API. See http://sqlrelay.sourceforge.net/ for more information.
+
+An Erlang module named test.erl demonstrates how to use the various functions.
+This test program can be run once as shown below or can be tested multiple times using the method test:loop.  For example: test:loop(5) will run the tests 5 times..  
+
+----------------------------------------------
+
+$erl
+Erlang (BEAM) emulator version 5.6.1 [source] [smp:2] [async-threads:0] [hipe] [kernel-poll:false]
+
+Eshell V5.6.1  (abort with ^G)
+1> test:startTest().
+Starting relay...done
+Database is up
+Test table has already been created, truncating data...
+Loading test data...
+
+*********** Testing Result Processing
+Number of rows returned is 2
+Value at row 0, col 0 is '1'
+Value at row 0, col 1 is a
+Value at row 0, col 2 is b
+Row 0 contents are {98,97,49}
+Row 1 contents are {99,98,50}
+Length of row 1 is 134650912
+Field at row 0, col 0 length is 1
+
+*********** Testing suspend/resume functions
+*********** Testing identity/version functions
+Identity is oracle8
+DB Version is Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Production
+With the Partitioning, OLAP and Data Mining options
+Bind format is :*
+
+*********** Testing commit functions
+
+*********** Testing debug functions
+
+*********** Testing buffer size functions
+
+*********** Testing column info functions
+
+*********** Testing cache functions
+Number of cached rows is 0
+
+*********** Testing prepared query functions
+
+*********** Testing stored procedures
+Test procedure has already been created
+
+*********** Testing column attribute functions
+
+*********** Testing Complete **********
+
+
+
+----------------------------------------------
+
+
+
+
+Building
+--------
+Install Rudiments and SQL Relay first.  Then at the command line, type:  make
+
+
+Files included
+---------------
+erl_comm.c - generic C program for communicating with Erlang 
+
+Makefile - builds the application
+
+prepared_query_file.txt - contains a prepared query used by test.erl
+
+prepared_sp_file.txt - contains a prepared stored procedure invocation used by test.erl
+
+query_file.txt - contains a query used by test.erl
+
+relay - the executable version of the C programs that provide an interface to the SQLRelay API
+
+relay_driver.c - C program that process the Erlang commands and call the appropriate SQLRelay API functions
+
+ReleaseNotes.txt - this file
+
+sqlrelay.erl - Erlang module that provides the SQLRelay API
+
+test.erl - Test Erlang program that demonstrates how to used sqlrelay.erl 
+
+
+Known bugs
+-----------
+
+1) mixedCaseColumnNames and lowerCaseColumnNames functions do not work correctlywith Oracle or ODBC database.  Columns are always returned in upper-case.
+
+2) The function setResultBufferSize does not work correctly.  Calling this function has no effect on the number of results returned.
+
+3) The prepareQuery and prepareQueryWithLength functions do not work correctly when tested with an Oracle or ODBC database.  However, the prepareFileQuery function does work correctly with Oracle or ODBC databases.
+
+4) The getColumnIsPrimaryKeyByIndex does not work correctly when tested with an Oracle or ODBC database.
+
+5) The getColumnIsPrimaryKeyByName does not work correctly when tested with an Oracle or ODBC database.
+
+6) The following functions are not yet implemented:  subStrings, subLongs, subDoubles, inputBindStrings, inputBindLongs, inputbindDoubles.
+
+

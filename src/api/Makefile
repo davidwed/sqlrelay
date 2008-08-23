@@ -31,6 +31,9 @@ endif
 ifneq ($(HAVE_TCL),)
 	$(MAKE) -C tcl all
 endif
+ifneq ($(HAVE_ERLANG),)
+	$(MAKE) -C erlang all
+endif
 
 clean:
 	$(MAKE) -C c++ clean
@@ -60,6 +63,9 @@ ifneq ($(HAVE_JAVA),)
 endif
 ifneq ($(HAVE_TCL),)
 	$(MAKE) -C tcl clean
+endif
+ifneq ($(HAVE_ERLANG),)
+	$(MAKE) -C erlang clean
 endif
 
 
@@ -91,6 +97,9 @@ ifneq ($(HAVE_JAVA),)
 endif
 ifneq ($(HAVE_TCL),)
 	$(MAKE) -C tcl rebuild
+endif
+ifneq ($(HAVE_ERLANG),)
+	$(MAKE) -C erlang rebuild
 endif
 
 install:
@@ -125,6 +134,9 @@ endif
 ifneq ($(HAVE_ZOPE),)
 	$(MAKE) -C zope install
 endif
+ifneq ($(HAVE_ERLANG),)
+	$(MAKE) -C erlang install
+endif
 
 uninstall:
 	$(MAKE) -C c++ uninstall
@@ -157,4 +169,7 @@ ifneq ($(HAVE_TCL),)
 endif
 ifneq ($(HAVE_ZOPE),)
 	$(MAKE) -C zope uninstall
+endif
+ifneq ($(HAVE_ERLANG),)
+	$(MAKE) -C erlang uninstall
 endif

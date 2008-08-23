@@ -828,6 +828,7 @@ OVERRIDERUBYSITELIBDIR
 JAVAUSERPATH
 PHPUSERPATH
 TCLUSERPATH
+ERLANGUSERPATH
 CUSERPATH
 PSQLUSERPATH
 LIBDMALLOC
@@ -969,6 +970,15 @@ PHPVERSION
 PHPMAJORVERSION
 PHPLIB
 PHPPEARDBDIR
+ERLC
+ERLCFLAGS
+ERL
+ERLANG_ROOT_DIR
+ERLANG_LIB_DIR
+ERLANG_INSTALL_LIB_DIR
+HAVE_ERLANG
+ERLANGINCLUDES
+ERLANGLIBS
 GTKCONFIG
 HAVE_GTK
 RPM_BUILD_DIR
@@ -994,7 +1004,11 @@ CCC
 CPP
 CXXCPP
 F77
-FFLAGS'
+FFLAGS
+ERLC
+ERLCFLAGS
+ERL
+ERLANG_INSTALL_LIB_DIR'
 
 
 # Initialize some variables set by options.
@@ -1604,6 +1618,8 @@ Optional Features:
   --enable-php-rpath            Use -rpath when linking the PHP library against the SQL Relay client library
   --disable-tcl                 Don't build TCL api
   --enable-tcl-rpath            Use -rpath when linking the TCL library against the SQL Relay client library
+  --disable-erlang              Don't build ERLANG api
+  --enable-erlang-rpath         Use -rpath when linking the ERLANG library against the SQL Relay client library
   --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library
   --enable-psql-rpath           Use -rpath when linking the psql replacement library against the SQL Relay client library
   --disable-gtk                 Don't build GTK+ configuration tool
@@ -1652,6 +1668,7 @@ Optional Packages:
   --with-pear-db-dir            Path to install PHP Pear DB driver
   --with-tcl-include		 Location of tcl.h include file
   --with-tcl-libraries		 Location of libtcl, where to install tcl module
+  --with-erlang-prefix          Location of Erlang
   --with-gtk-prefix             Location of GTK+
   --with-pthread-prefix         Location of pthread library
   --with-system-libtool   use system libtool instead of ./libtool
@@ -1674,6 +1691,12 @@ Some influential environment variables:
   CXXCPP      C++ preprocessor
   F77         Fortran 77 compiler command
   FFLAGS      Fortran 77 compiler flags
+  ERLC        Erlang/OTP compiler command [autodetected]
+  ERLCFLAGS   Erlang/OTP compiler flags [none]
+  ERL         Erlang/OTP interpreter command [autodetected]
+  ERLANG_INSTALL_LIB_DIR
+              Erlang/OTP library installation base directory
+              [LIBDIR/erlang/lib]
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -2652,6 +2675,29 @@ else
 fi
 
 
+
+# Check whether --with-erlang-prefix was given.
+if test "${with_erlang_prefix+set}" = set; then
+  withval=$with_erlang_prefix; ERLANGPATH="$withval"
+else
+  ERLANGPATH=""
+fi
+
+# Check whether --enable-erlang was given.
+if test "${enable_erlang+set}" = set; then
+  enableval=$enable_erlang; ENABLE_ERLANG=""
+else
+  ENABLE_ERLANG="yes"
+fi
+
+# Check whether --enable-erlang-rpath was given.
+if test "${enable_erlang_rpath+set}" = set; then
+  enableval=$enable_erlang_rpath; ERLANGUSERPATH="yes"
+else
+  ERLANGUSERPATH=""
+fi
+
+
 # Check whether --enable-c-rpath was given.
 if test "${enable_c_rpath+set}" = set; then
   enableval=$enable_c_rpath; CUSERPATH="yes"
@@ -2776,6 +2822,9 @@ if ( test -n "$JAVAPATH" -a "`echo $JAVAPATH | cut -c-3`" = "../" ); then
 fi
 if ( test -n "$PHPPATH" -a "`echo $PHPPATH | cut -c-3`" = "../" ); then
 	PHPPATH="$PWD/$PHPPATH"
+fi
+if ( test -n "$ERLANGPATH" -a "`echo $ERLANGPATH | cut -c-3`" = "../" ); then
+	ERLANGPATH="$PWD/$ERLANGPATH"
 fi
 if ( test -n "$GTKPATH" -a "`echo $GTKPATH | cut -c-3`" = "../" ); then
 	GTKPATH="$PWD/$GTKPATH"
@@ -5242,7 +5291,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5245 "configure"' > conftest.$ac_ext
+  echo '#line 5294 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7571,11 +7620,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7574: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7623: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7578: \$? = $ac_status" >&5
+   echo "$as_me:7627: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7833,11 +7882,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7836: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7885: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7840: \$? = $ac_status" >&5
+   echo "$as_me:7889: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7895,11 +7944,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7898: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7947: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7902: \$? = $ac_status" >&5
+   echo "$as_me:7951: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9277,7 +9326,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 9280 "configure"' > conftest.$ac_ext
+    echo '#line 9329 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -10119,7 +10168,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10122 "configure"
+#line 10171 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10217,7 +10266,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10220 "configure"
+#line 10269 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12461,11 +12510,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12464: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12513: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12468: \$? = $ac_status" >&5
+   echo "$as_me:12517: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12523,11 +12572,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12526: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12575: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12530: \$? = $ac_status" >&5
+   echo "$as_me:12579: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13038,7 +13087,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 13041 "configure"' > conftest.$ac_ext
+    echo '#line 13090 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -13880,7 +13929,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13883 "configure"
+#line 13932 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13978,7 +14027,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13981 "configure"
+#line 14030 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14863,11 +14912,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14866: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14915: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14870: \$? = $ac_status" >&5
+   echo "$as_me:14919: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14925,11 +14974,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14928: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14977: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14932: \$? = $ac_status" >&5
+   echo "$as_me:14981: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16287,7 +16336,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 16290 "configure"' > conftest.$ac_ext
+    echo '#line 16339 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -17063,11 +17112,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17066: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17115: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17070: \$? = $ac_status" >&5
+   echo "$as_me:17119: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17325,11 +17374,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17328: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17377: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17332: \$? = $ac_status" >&5
+   echo "$as_me:17381: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17387,11 +17436,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17390: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17439: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17394: \$? = $ac_status" >&5
+   echo "$as_me:17443: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18769,7 +18818,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 18772 "configure"' > conftest.$ac_ext
+    echo '#line 18821 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -19611,7 +19660,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 19614 "configure"
+#line 19663 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19709,7 +19758,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 19712 "configure"
+#line 19761 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -36052,6 +36101,470 @@ fi
 echo "******************************"
 
 
+echo
+echo "***** Erlang *****************"
+if test -n "$ERLC"; then
+    { echo "$as_me:$LINENO: checking for erlc" >&5
+echo $ECHO_N "checking for erlc... $ECHO_C" >&6; }
+    { echo "$as_me:$LINENO: result: $ERLC" >&5
+echo "${ECHO_T}$ERLC" >&6; }
+else
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}erlc", so it can be a program name with args.
+set dummy ${ac_tool_prefix}erlc; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_ERLC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $ERLC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ERLC="$ERLC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ERLC="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ERLC=$ac_cv_path_ERLC
+if test -n "$ERLC"; then
+  { echo "$as_me:$LINENO: result: $ERLC" >&5
+echo "${ECHO_T}$ERLC" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_ERLC"; then
+  ac_pt_ERLC=$ERLC
+  # Extract the first word of "erlc", so it can be a program name with args.
+set dummy erlc; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_ac_pt_ERLC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $ac_pt_ERLC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_ERLC="$ac_pt_ERLC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_ERLC="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_ERLC=$ac_cv_path_ac_pt_ERLC
+if test -n "$ac_pt_ERLC"; then
+  { echo "$as_me:$LINENO: result: $ac_pt_ERLC" >&5
+echo "${ECHO_T}$ac_pt_ERLC" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+  if test "x$ac_pt_ERLC" = x; then
+    ERLC="not found"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    ERLC=$ac_pt_ERLC
+  fi
+else
+  ERLC="$ac_cv_path_ERLC"
+fi
+
+fi
+
+if test "$ERLC" = "not found"; then
+    { { echo "$as_me:$LINENO: error: Erlang/OTP compiler (erlc) not found but required" >&5
+echo "$as_me: error: Erlang/OTP compiler (erlc) not found but required" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+if test -n "$ERL"; then
+    { echo "$as_me:$LINENO: checking for erl" >&5
+echo $ECHO_N "checking for erl... $ECHO_C" >&6; }
+    { echo "$as_me:$LINENO: result: $ERL" >&5
+echo "${ECHO_T}$ERL" >&6; }
+else
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}erl", so it can be a program name with args.
+set dummy ${ac_tool_prefix}erl; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_ERL+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $ERL in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ERL="$ERL" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ERL="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ERL=$ac_cv_path_ERL
+if test -n "$ERL"; then
+  { echo "$as_me:$LINENO: result: $ERL" >&5
+echo "${ECHO_T}$ERL" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_ERL"; then
+  ac_pt_ERL=$ERL
+  # Extract the first word of "erl", so it can be a program name with args.
+set dummy erl; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_ac_pt_ERL+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $ac_pt_ERL in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_ERL="$ac_pt_ERL" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_ERL="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_ERL=$ac_cv_path_ac_pt_ERL
+if test -n "$ac_pt_ERL"; then
+  { echo "$as_me:$LINENO: result: $ac_pt_ERL" >&5
+echo "${ECHO_T}$ac_pt_ERL" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+  if test "x$ac_pt_ERL" = x; then
+    ERL="not found"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    ERL=$ac_pt_ERL
+  fi
+else
+  ERL="$ac_cv_path_ERL"
+fi
+fi
+
+if test "$ERL" = "not found"; then
+    { { echo "$as_me:$LINENO: error: Erlang/OTP interpreter (erl) not found but required" >&5
+echo "$as_me: error: Erlang/OTP interpreter (erl) not found but required" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+
+if ( test "$ENABLE_ERLANG" = "yes" )
+then
+
+	HAVE_ERLANG=""
+	ERLANGINCLUDES=""
+	ERLANGLIBSS=""
+
+	if ( test "$cross_compiling" = "yes" )
+	then
+
+				echo "cross compiling..."
+
+	else
+
+		{ echo "$as_me:$LINENO: checking for Erlang/OTP root directory" >&5
+echo $ECHO_N "checking for Erlang/OTP root directory... $ECHO_C" >&6; }
+if test "${erlang_cv_root_dir+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=erl
+ac_compile='$ERLC $ERLCFLAGS -b beam conftest.$ac_ext >&5'
+ac_link='$ERLC $ERLCFLAGS -b beam conftest.$ac_ext >&5 ; echo "#!/bin/sh" > conftest$ac_exeext ; echo "\"$ERL\" -run conftest start -run init stop -noshell" >> conftest$ac_exeext ; chmod +x conftest$ac_exeext'
+     if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+-module(conftest).
+-export([start/0]).
+
+start() ->
+            RootDir = code:root_dir(),
+            file:write_file("conftest.out", RootDir),
+            ReturnValue = 0,
+            halt(ReturnValue)
+.
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  erlang_cv_root_dir=`cat conftest.out`
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+{ { echo "$as_me:$LINENO: error: test Erlang program execution failed
+See \`config.log' for more details." >&5
+echo "$as_me: error: test Erlang program execution failed
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+
+
+     ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+fi
+{ echo "$as_me:$LINENO: result: $erlang_cv_root_dir" >&5
+echo "${ECHO_T}$erlang_cv_root_dir" >&6; }
+ERLANG_ROOT_DIR=$erlang_cv_root_dir
+
+
+		{ echo "$as_me:$LINENO: checking for Erlang/OTP library base directory" >&5
+echo $ECHO_N "checking for Erlang/OTP library base directory... $ECHO_C" >&6; }
+if test "${erlang_cv_lib_dir+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=erl
+ac_compile='$ERLC $ERLCFLAGS -b beam conftest.$ac_ext >&5'
+ac_link='$ERLC $ERLCFLAGS -b beam conftest.$ac_ext >&5 ; echo "#!/bin/sh" > conftest$ac_exeext ; echo "\"$ERL\" -run conftest start -run init stop -noshell" >> conftest$ac_exeext ; chmod +x conftest$ac_exeext'
+     if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+-module(conftest).
+-export([start/0]).
+
+start() ->
+            LibDir = code:lib_dir(),
+            file:write_file("conftest.out", LibDir),
+            ReturnValue = 0,
+            halt(ReturnValue)
+.
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  erlang_cv_lib_dir=`cat conftest.out`
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+{ { echo "$as_me:$LINENO: error: test Erlang program execution failed
+See \`config.log' for more details." >&5
+echo "$as_me: error: test Erlang program execution failed
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+
+
+     ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+fi
+{ echo "$as_me:$LINENO: result: $erlang_cv_lib_dir" >&5
+echo "${ECHO_T}$erlang_cv_lib_dir" >&6; }
+ERLANG_LIB_DIR=$erlang_cv_lib_dir
+
+
+		{ echo "$as_me:$LINENO: checking for Erlang/OTP library installation base directory" >&5
+echo $ECHO_N "checking for Erlang/OTP library installation base directory... $ECHO_C" >&6; }
+
+if test -n "$ERLANG_INSTALL_LIB_DIR"; then
+    { echo "$as_me:$LINENO: result: $ERLANG_INSTALL_LIB_DIR" >&5
+echo "${ECHO_T}$ERLANG_INSTALL_LIB_DIR" >&6; }
+else
+    ERLANG_INSTALL_LIB_DIR='${libdir}/erlang/lib'
+
+    { echo "$as_me:$LINENO: result: $libdir/erlang/lib" >&5
+echo "${ECHO_T}$libdir/erlang/lib" >&6; }
+fi
+
+
+		ERLANG_INCLUDE_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/include`
+		ERLANG_LIB_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/lib`
+
+
+		if ( test -n "$ERLANG_INCLUDE_DIR" -a -n "$ERLANG_LIB_DIR" )
+		then
+
+			if ( test "$ERLANG_INCLUDE_DIR" != "/usr" )
+			then
+				ERLANGINCLUDES="-I$ERLANG_INCLUDE_DIR"
+			fi
+
+			if ( test "$ERLANG_LIB_DIR" != "/usr" )
+			then
+				ERLANGLIBS="-L$ERLANG_LIB_DIR"
+			fi
+			ERLANGLIBS="$ERLANGLIBS -lerl_interface -lei"
+
+			HAVE_ERLANG="yes"
+		else
+			{ echo "$as_me:$LINENO: WARNING: The Erlang API will not be built." >&5
+echo "$as_me: WARNING: The Erlang API will not be built." >&2;}
+		fi
+	fi
+
+
+if ( test -n "$ERLANGINCLUDES" )
+then
+	echo "erlang includes... $ERLANGINCLUDES"
+fi
+
+
+if ( test -n "$ERLANGLIBS" )
+then
+	echo "erlang libs... $ERLANGLIBS"
+fi
+
+
+
+
+
+
+
+
+fi
+
+echo "******************************"
+
+
 
 echo
 echo "***** GTK+ *******************"
@@ -39790,6 +40303,7 @@ OVERRIDERUBYSITELIBDIR!$OVERRIDERUBYSITELIBDIR$ac_delim
 JAVAUSERPATH!$JAVAUSERPATH$ac_delim
 PHPUSERPATH!$PHPUSERPATH$ac_delim
 TCLUSERPATH!$TCLUSERPATH$ac_delim
+ERLANGUSERPATH!$ERLANGUSERPATH$ac_delim
 CUSERPATH!$CUSERPATH$ac_delim
 PSQLUSERPATH!$PSQLUSERPATH$ac_delim
 LIBDMALLOC!$LIBDMALLOC$ac_delim
@@ -39826,7 +40340,6 @@ RANLIB!$RANLIB$ac_delim
 STRIP!$STRIP$ac_delim
 DLLTOOL!$DLLTOOL$ac_delim
 AS!$AS$ac_delim
-OBJDUMP!$OBJDUMP$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -39868,6 +40381,7 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+OBJDUMP!$OBJDUMP$ac_delim
 CXXCPP!$CXXCPP$ac_delim
 F77!$F77$ac_delim
 FFLAGS!$FFLAGS$ac_delim
@@ -39964,7 +40478,6 @@ HAVE_TCL!$HAVE_TCL$ac_delim
 TCLINCLUDE!$TCLINCLUDE$ac_delim
 TCLLIB!$TCLLIB$ac_delim
 TCLLIBSPATH!$TCLLIBSPATH$ac_delim
-PHPCONFIG!$PHPCONFIG$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -40006,6 +40519,7 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+PHPCONFIG!$PHPCONFIG$ac_delim
 HAVE_PHP!$HAVE_PHP$ac_delim
 PHPINCLUDES!$PHPINCLUDES$ac_delim
 PHPEXTDIR!$PHPEXTDIR$ac_delim
@@ -40013,6 +40527,15 @@ PHPVERSION!$PHPVERSION$ac_delim
 PHPMAJORVERSION!$PHPMAJORVERSION$ac_delim
 PHPLIB!$PHPLIB$ac_delim
 PHPPEARDBDIR!$PHPPEARDBDIR$ac_delim
+ERLC!$ERLC$ac_delim
+ERLCFLAGS!$ERLCFLAGS$ac_delim
+ERL!$ERL$ac_delim
+ERLANG_ROOT_DIR!$ERLANG_ROOT_DIR$ac_delim
+ERLANG_LIB_DIR!$ERLANG_LIB_DIR$ac_delim
+ERLANG_INSTALL_LIB_DIR!$ERLANG_INSTALL_LIB_DIR$ac_delim
+HAVE_ERLANG!$HAVE_ERLANG$ac_delim
+ERLANGINCLUDES!$ERLANGINCLUDES$ac_delim
+ERLANGLIBS!$ERLANGLIBS$ac_delim
 GTKCONFIG!$GTKCONFIG$ac_delim
 HAVE_GTK!$HAVE_GTK$ac_delim
 RPM_BUILD_DIR!$RPM_BUILD_DIR$ac_delim
@@ -40025,7 +40548,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 17; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 27; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
@@ -40479,6 +41002,7 @@ RUBYBUILD="no "
 PHPBUILD="no "
 JAVABUILD="no "
 TCLBUILD="no "
+ERLANGBUILD="no "
 if ( test -n "$HAVE_PERL" ); then
 	PERLBUILD="yes"
 fi
@@ -40500,11 +41024,15 @@ fi
 if ( test -n "$HAVE_TCL" ); then
 	TCLBUILD="yes"
 fi
+if ( test -n "$HAVE_ERLANG" ); then
+	ERLANGBUILD="yes"
+fi
 echo "$APIS"
 echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
 echo "                TCL         $TCLBUILD           Zope       $ZOPEBUILD"
+echo "                Erlang      $ERLANGBUILD"
 echo ""
 
 ORACLE8BUILD="no     "
