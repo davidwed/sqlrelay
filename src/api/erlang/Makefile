@@ -21,12 +21,12 @@ LOBJS = erl_comm.lo relay_driver.lo
 .c.lo:
 	$(LIBTOOL) --mode=compile $(CC) $(CCFLAGS) $(CPPFLAGS) -c $< -o $@
 
-.erl.beam:
-	erlc -W $<
-
-all: sqlrelay.beam libsqlrelay_drv.la
+all: sqlrelay.beam sqlrelay
+#all: sqlrelay.beam libsqlrelay_drv.la
 
 clean:
+	$(LIBTOOL) --mode=clean $(RM) sqlrelay.erl
+	$(LIBTOOL) --mode=clean $(RM) sqlrelay
 	$(LIBTOOL) --mode=clean $(RM) *.la
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
@@ -35,6 +35,15 @@ clean:
 	$(RMTREE) .libs
 
 rebuild: clean all
+
+sqlrelay.erl: sqlrelay.erl.in
+	sed -e "s|@SQLRELAY_PATH@|$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/bin|g" $< > $@
+
+sqlrelay.beam: sqlrelay.erl
+	erlc -W $<
+
+sqlrelay: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CC) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 libsqlrelay_drv.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CC) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(ERLANG_INSTALL_LIB_DIR)/sqlrelay-$(SQLR_VERSION)/priv/lib $(RPATH) -module -no-undefined
@@ -79,23 +88,31 @@ sqlrelay_drv.dll:
 		cp .libs/cygsqlrelay_drv-0.dll sqlrelay_drv.dll; \
 	fi
 
-ifeq ($(CYGWIN),)
-install: sqlrelay_drv.so
+#ifeq ($(CYGWIN),)
+#install: sqlrelay_drv.so
+	#$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/src
+	#$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/ebin
+	#$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/lib
+	#$(INSTALL) -m 644 sqlrelay.erl $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/src
+	#$(INSTALL) -m 644 sqlrelay.beam $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/ebin
+	#$(LTINSTALL) sqlrelay_drv.so $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/lib
+#else
+#install: sqlrelay_drv.dll
+	#$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/src
+	#$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/ebin
+	#$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/lib
+	#$(INSTALL) -m 644 sqlrelay.erl $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/src
+	#$(INSTALL) -m 644 sqlrelay.beam $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/ebin
+	#$(LTINSTALL) sqlrelay_drv.dll $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/lib
+#endif
+
+install:
 	$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/src
 	$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/ebin
-	$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/lib
+	$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/bin
 	$(INSTALL) -m 644 sqlrelay.erl $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/src
 	$(INSTALL) -m 644 sqlrelay.beam $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/ebin
-	$(LTINSTALL) sqlrelay_drv.so $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/lib
-else
-install: sqlrelay_drv.dll
-	$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/src
-	$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/ebin
-	$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/lib
-	$(INSTALL) -m 644 sqlrelay.erl $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/src
-	$(INSTALL) -m 644 sqlrelay.beam $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/ebin
-	$(LTINSTALL) sqlrelay_drv.dll $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/lib
-endif
+	$(LTINSTALL) sqlrelay $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/bin
 
 uninstall:
-	$(RMTREE) $(DESTDIR)$(ERLANG_INSTALL_LIB_DIR)/sqlrelay-$(SQLR_VERSION)/src
+	$(RMTREE) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)

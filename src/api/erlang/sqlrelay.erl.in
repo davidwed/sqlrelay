@@ -63,7 +63,7 @@
 % Driver control functions
 %
 start() ->
-    start("./relay").
+    start("@SQLRELAY_PATH@/sqlrelay").
 start(ExtPrg) ->
     spawn_link(?MODULE, init, [ExtPrg]).
 stop() ->
