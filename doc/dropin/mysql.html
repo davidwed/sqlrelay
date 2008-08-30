@@ -181,6 +181,14 @@ simlar to using it on the command line.  You just need to add the LD_PRELOAD
 command to the startup script for the daemon before the command that starts the
 daemon itself.</p>
 
+<p>Unfortunately this approach does not work with PHP.  If you want to use the
+drop-in replacement library for Postgresql with PHP, you can just add the
+LD_PRELOAD command to the startup script for the http daemon, but PHP is
+not linked against the MySQL client library, rather the PHP source code
+includes it's own MySQL client API which is compiled directly into the PHP
+module itself.  As far as I know, there is no way to force a PHP program
+which uses the MySQL API to use SQL Relay without rewriting it.</p>
+
 <br>
 <a name="inetd"></a>
 <span class="heading2">Using the drop-in replacement library with inetd/xinetd helper programs</span><br>

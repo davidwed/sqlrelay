@@ -36,6 +36,8 @@
 	fixed many it's -> its typos in the documentation
 	changed debug so that only one binary is built and it's selected at
 		runtime
+	integrated erlang api
+	added -localstatedir to sqlr-stop
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init

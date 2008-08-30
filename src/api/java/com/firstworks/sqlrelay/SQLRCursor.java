@@ -208,11 +208,6 @@ public class SQLRCursor {
 		bindcur.cursor=getOutputBindCursorInternal(variable);
 		return bindcur;
 	}
-	/** Free the cursor associated with a 
-	 *  previously defined output bind variable.  */
-	public void	freeOutputBindCursor(SQLRCursor cur) {
-		cur.delete();
-	}
 
 
 	/** Opens a cached result set.

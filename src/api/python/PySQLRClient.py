@@ -505,13 +505,6 @@ class sqlrcursor:
         CSQLRelay.attachToBindCursor(bindcursor.cursor, bindcursorid)
         return bindcursor
 
-    def freeOutputBindCursor(self, variable):
-        """
-        Free the cursor associated with a
-        previously defined output bind variable.
-        """
-        CSQLRelay.sqlrcon_free(variable.connection)
-
     def openCachedResultSet(self, filename):
         """
         Open a result set after a sendCachedQeury

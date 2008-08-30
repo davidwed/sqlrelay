@@ -91,11 +91,6 @@ sub inputBinds {
 	}
 }
 
-sub freeOutputBindCursor {
-        ($this)=@_;
-	DESTROY($this);
-}
-
 1;
 __END__
 
@@ -271,10 +266,6 @@ __END__
         fetchFromBindCursor();
             # Fetch from a cursor that was returned as
             # an output bind variable.
-
-        freeOutputBindCursor();
-            # Free the cursor associated with a
-            # previously defined output bind variable.
 
 
         getOutputBindString(variable);
