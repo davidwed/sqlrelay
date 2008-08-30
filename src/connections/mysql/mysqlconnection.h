@@ -27,6 +27,8 @@ class mysqlcursor : public sqlrcursor_svr {
 				mysqlcursor(sqlrconnection_svr *conn);
 				~mysqlcursor();
 #ifdef HAVE_MYSQL_STMT_PREPARE
+		bool		openCursor(uint16_t id);
+		bool		closeCursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 #endif

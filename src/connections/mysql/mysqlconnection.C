@@ -272,7 +272,6 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 			"(procedure|PROCEDURE|function|FUNCTION))|"
 			"(CALL|call)|(START|start)|(BEGIN|begin))\\s+");
 	unsupportedbystmt.study();
-	stmt=mysql_stmt_init(&mysqlconn->mysql);
 	for (unsigned short index=0; index<MAX_SELECT_LIST_SIZE; index++) {
 		fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
 		fieldbind[index].buffer=(char *)&field[index];
@@ -287,12 +286,25 @@ mysqlcursor::~mysqlcursor() {
 	delete[] columnnames;
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	mysql_stmt_free_result(stmt);
-	mysql_stmt_close(stmt);
 	if (mysqlresult) {
 		mysql_free_result(mysqlresult);
 	}
 #endif
 }
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
+bool mysqlcursor::openCursor(uint16_t id) {
+	stmt=mysql_stmt_init(&mysqlconn->mysql);
+	return true;
+}
+#endif
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
+bool mysqlcursor::closeCursor() {
+	mysql_stmt_close(stmt);
+	return true;
+}
+#endif
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
@@ -329,7 +341,9 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// re-init bind buffers
 	rawbuffer::zero(&bind,sizeof(bind));
 
-	return !mysql_stmt_prepare(stmt,query,length);
+	//return !mysql_stmt_prepare(stmt,query,length);
+	bool	retval=!mysql_stmt_prepare(stmt,query,length);
+	return retval;
 }
 #endif
 
@@ -624,8 +638,8 @@ const char *mysqlcursor::errorMessage(bool *liveconnection) {
 		} else
 	#endif
 	#ifdef HAVE_MYSQL_CR_SERVER_LOST
-		if (queryresult==CR_SERVER_GONE_ERROR ||
-				errn==CR_SERVER_LOST) {
+		if (queryresult==CR_SERVER_GONE_ERROR /*||
+				errn==CR_SERVER_LOST*/) {
 			*liveconnection=false;
 		} else
 	#endif
@@ -634,9 +648,9 @@ const char *mysqlcursor::errorMessage(bool *liveconnection) {
 		!charstring::compareIgnoringCase(err,
 				"mysql server has gone away") ||
 		!charstring::compareIgnoringCase(err,
-				"Can't connect to local MySQL",28) ||
+				"Can't connect to local MySQL",28) /*||
 		!charstring::compareIgnoringCase(err,
-			"Lost connection to MySQL server during query")) {
+			"Lost connection to MySQL server during query")*/) {
 		*liveconnection=false;
 	}
 	return err;
