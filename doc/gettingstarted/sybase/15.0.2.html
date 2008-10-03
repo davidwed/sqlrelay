@@ -1,33 +1,27 @@
 <html>
 
 <head>
-<title>SQL Relay - Getting Started With Sybase - Initializing an 15.0 Server</title>
+<title>SQL Relay - Getting Started With Sybase - Initializing an 15.0.2 Server</title>
 <link rel="stylesheet" href="../../css/styles.css">
 </head>
 
 <body>
 
-<span class="heading1">Installing and Initializing an 15.0 Server</span><br>
+<span class="heading1">Installing and Initializing an 15.0.2 Server</span><br>
 
 <p>To install and initialize Sybase Adaptive Server Enterprise, follow these
 instructions.</p>
 
-<span class="heading2">Use a Sufficiently Old Version of Linux</span><br>
+<span class="heading2">Install Required Packages</span><br>
 
-<p>Many modern versions of linux use NPTL (Native Posix Theading Library), but
-Sybase 15 requires the old Linuxthreads implementation.  Some versions of Linux
-such as Fedora Core 4 support both.  But as of Fedora Core 5, Linuxthreads
-support was dropped.  The same may hold true for other modern distro's.
-The Sybase 15 installer will run on a linux that doesn't support Linuxthreads,
-but the DB will fail to start.</p>
+<p>Sybase ASE version 15.0.2 requires older versions of libstdc++- than ship
+with most modern Linux distributions.  You will need to install
+compat-libstdc++-33 and compat-libstdc++-296.</p>
 
-<span class="heading2">Install Compatibility Packages</span><br>
+<p>You will also need to install libaio.</p>
 
-<p>Sybase ASE version 12.5.2 requires libstdc++-.so.5.  Modern
-Linux distributions have a newer version of libstdc++.  You can install
-compat-libstdc++-33-3.2.3-47.fc4.i386.rpm for Fedora Core 4 (available at
-<a href="http://rpmfind.net">rpmfind</a>) on most RPM-based linux distributions
-to provide this library.</p>
+<p>These packages are available from <a href="http://rpmfind.net">rpmfind</a>
+or using yum.</p>
 
 <span class="heading2">Set Kernel Parameters</span><br>
 
@@ -39,20 +33,43 @@ prior to installation.</p>
 echo 268435456 > /proc/sys/kernel/shmmax
 </b></blockquote>
 
+<span class="heading2">Download Upgrade</span><br>
+
+<p>Many modern versions of linux use NPTL (Native Posix Theading Library), but
+Sybase 15.0.2 requires the old Linuxthreads implementation.  Some versions of
+Linux such as Fedora Core 4 support both.  But as of Fedora Core 5, Linuxthreads
+support was dropped.  The same may hold true for other modern distro's.
+The Sybase 15.0.2 installer will run on a linux that doesn't support
+Linuxthreads, but the DB will fail to start.</p>
+
+<p>However Sybase has released an update that will allow Sybase 15.0.2 to run
+on an OS that uses NTPL.  Go to the Sybase website, search for EBF15682 and
+download EBF15682.tgz.</p>
+
 <span class="heading2">Extract The Distribution</span><br>
 
 <p>The distribution comes as a tarball.  Extract it as follows:</p>
 
 <blockquote><b>
 mkdir sybase<br>
-mv ase1500_xe_linux.tgz sybase<br>
+mv ase1502_xe_linux.tgz sybase<br>
 cd sybase<br>
-tar xfz ase1500_xe_linux.tgz<br>
+tar xfz ase1502_xe_linux.tgz<br>
 </b></blockquote>
 
-<span class="heading2">Install The Server</span><br>
+<p>The Sybase update comes as a tarball as well.  Extract it as follows:</p>
 
-<p>Now, as root, run the following command:</p>
+<blockquote><b>
+mkdir ebf<br>
+mv EBF15672.tgz ebf<br>
+cd ebf<br>
+tar xfz EBF15672.tgz<br>
+</b></blockquote>
+
+<span class="heading2">Install The Software Distribution</span><br>
+
+<p>Now, go into the directory the sybase software distribution was extracted
+into and, as root, run the following command:</p>
 
 <blockquote><b>./setup</b></blockquote>
 
@@ -87,25 +104,66 @@ Click Next.</p>
 
 <p>A screen titled <b>Installing Sybase Adaptive Server Enterprise Suite.
 Please wait...</b> will appear with a progress bar indicating how much of
-the installation has been completed.</p>
+the installation has been completed.  When that is finished, click Next.</p>
 
-<p>On the screen titled <b>The InstallShield Wizard has successfully installed
-Sybase Adaptive Server Enterprise</b><br>
-Click Next.</p>
-
-<p>Select checkbox <b>No</b> when prompted whether you want to configure email
-alerts.<br>
-Click Next.</p>
+<p>A screen will pop up asking <b>Do you want to configure email alerts?</b>  Click No and click Next.</p>
 
 <p>On the screen titled <b>Please deselect any servers that you do not want to
 configure now:</b><br>
-Accept the default checkboxes (all of them should be checked)<br>
+Uncheck all checkboxes and Click Next.</p>
+
+<p>A screen will appear titled <b>The installation was successful</b><br>
+Click Finish.</p>
+
+<span class="heading2">Install The Update</span><br>
+
+<p>Now, go into the directory the update was extracted into and, as root, run
+the following command:</p>
+
+<blockquote><b>./setup</b></blockquote>
+
+<p>A java-based installer should run.  On the main page, click Next.</p>
+
+<P>When prompted for the <b>End-user license agreement</b> select the country
+that you are in from the <b>Please Select</b> pulldown.<br>
+Read the license and click the <b>I agree to the terms of the Sybase license,
+for the install location specified.</b> check box.<br>
 Click Next.</p>
 
-<p>On the screen titled <b>Please select the servers that you want to custom
-configure</b><br>
-Accept the default checkboxes (none of them should be checked)<br>
+<p>When prompted for a <b>Destination Directory</b>, accept the default
+"/opt/sybase"<br>
 Click Next.</p>
+
+<p>When prompted whether you want to continue with the installation even though
+it will overwrite existing software, click Yes.</p>
+
+<p>On the screen titled: <b>Choose the setup type that best suits your
+needs</b><br>
+Accept the default <b>Update</b> radio button.<br>
+Click Next.</p>
+
+<p>When prompted <b>Choose the </b>, check the Adaptive
+Server Enterprise (Express Edition) check box.<br>
+Click Next.</p>
+
+<p>An page will appear, indicating what will be installed, and what will be
+updated.  Click Next.<br>
+
+<p>An installation summary page will appear, indicating what will be installed,
+what directory, and the total size of the installation.<br>
+Click Next.</p>
+
+<p>A screen titled <b>Installing Sybase Adaptive Server Enterprise Suite.
+Please wait...</b> will appear with a progress bar indicating how much of
+the installation has been completed.  When that is finished, click Next.</p>
+
+<p>On the screen titled <b>Please deselect any servers that you do not want to
+configure now:</b><br>
+Check all checkboxes and Click Next.</p>
+
+<p>On the screen titled <b>Please select the products that you want to
+custom configure:</b><br>
+Leave all checkboxes unchecked and Click Next.</p>
 
 <p>A summary page will appear with values for that each server will be
 configured with.<br>
@@ -126,7 +184,6 @@ progress messages indicating what step is currently being executed.</p>
 
 <p>A screen will appear titled <b>The installation was successful</b><br>
 Click Finish.</p>
-
 
 <span class="heading2">Starting the Database at Boot Time</span><br>
 

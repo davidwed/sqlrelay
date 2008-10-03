@@ -28,7 +28,7 @@
 <span class="heading1">Installation</span><br>
 
 <p>I've successfully installed and used Sybase Adaptive Server Enterprise 
-versions 15.0, 12.5.2, 12.5.1, 11.9.2 and 11.0.3.3 on Linux.</p>
+versions 15.0.2, 12.5.2, 12.5.1, 11.9.2 and 11.0.3.3 on Linux.</p>
 
 <p>You can download Sybase ASE from the 
 <a href="http://www.sybase.com/downloads">downloads section</a> of the Sybase 
@@ -148,8 +148,8 @@ prompt you for a password.</p>
 <a name="nonrpmversions"></a>
 <span class="heading2">Non RPM-based Installations</span><br>
 
-<p>Sybase provides tarballs for versions 15.0, 12.5.2 and 12.5.1 for Linux.  In
-versions 12.5.2 and 12.5.1, installation and database creation are done in a
+<p>Sybase provides tarballs for versions 15.0.2, 12.5.2 and 12.5.1 for Linux.
+In versions 12.5.2 and 12.5.1, installation and database creation are done in a
 single step.  For instructions for installing versions 12.5.2 and 12.5.1, see
 the instructions below for creating a database.</p>
 
@@ -157,7 +157,8 @@ the instructions below for creating a database.</p>
 <span class="heading1">Creating a Database</span><br>
 
 <p>Some newer Linux Distributions set the LANG environment variable to a value
-that is not supported by Sybase ASE.  For example, LANG=en_US.iso885915 on
+that is not supported by Sybase ASE prior to 15.0.2.  For example,
+LANG=en_US.iso885915 on
 Redhat 7.3.  Check the value of the LANG environment variable, and if necessary,
 set it to something that is defined in the locales.dat file
 (/opt/sybase-11.9.2/locales/locales.dat for sybase-11.9.2) such as en_US for
@@ -165,7 +166,7 @@ US-english.</p>
 
 <p>The instructions for initializing each version are very different.</p>
 
-<p>See <a href="sybase/15.html">Initializing a 15.0 server</a>,
+<p>See <a href="sybase/15.0.2.html">Initializing a 15.0.2 server</a>,
 <a href="sybase/12.5.2.html">Initializing a 12.5.2 server</a>,
 <a href="sybase/12.5.1.html">Initializing a 12.5.1 server</a>,
 <a href="sybase/12.5.html">Initializing a 12.5 server</a>,
