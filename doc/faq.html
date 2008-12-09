@@ -90,6 +90,8 @@ work?</a></li>
 <li><a href="#firewallhang">If I leave SQL Relay idle for a long time, then come back and try to use it, I get a low level TCP error from the database.  What does that mean?</a></li>
 <li><a href="#ttl">Why doesn't the last connection die off when I set connections=0 and maxconnections to some larger number and let SQL Relay go idle for a long time?</a></li>
 <li><a href="#nobody">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's up with that?</a></li>
+<li><a href="#gui">Where'd the configuration GUI go?</a></li>
+<li><a href="#socketonly">How can I get SQL Relay to only listen on the unix socket and not the inet port?</a></li>
 </ol>
 
 
@@ -104,8 +106,8 @@ balancing system for Unix and Linux supporting ODBC, Oracle, MySQL,
 PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and
 MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
 Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java and TCL, drop-in replacement
-libraries for MySQL and PostgreSQL clients, command line clients, a GUI
-configuration tool and extensive documentation.  The APIs support advanced
+libraries for MySQL and PostgreSQL clients, command line clients
+and extensive documentation.  The APIs support advanced
 database operations such as bind variables, multi-row fetches, client-side
 result set caching and suspended transactions.  It is ideal for speeding up
 database-driven web-based applications, accessing databases from unsupported
@@ -1320,6 +1322,21 @@ message and exit.</p>
 <p>To remedy the situation, make sure that the sqlrelay.conf file is readable
 by each of the users and groups specified in the runasuser/runasgroup
 attributes inside the file.</p>
+
+<a name="gui"></a>
+<span class="heading3">Where'd the configuration GUI go?</span><br><br>
+
+<p>The GTK-based configuration GUI was removed in version 0.40.  It was buggy,
+used legacy GTK+ version 1.2 and virtually nobody used it.</p>
+
+<a name="socketonly"></a>
+<span class="heading3">How can I get SQL Relay to only listen on the unix socket and not the inet port?</span><br><br>
+
+<p>This was broken prior to version 0.40.  But in 0.40 or newer, you can just
+set port="" in the instance tag of the sqlrelay.conf file or leave the attribute
+out altogether.  However, in either case, you must supply a value for the socket
+attribute.  If neither are specified then SQL Relay will fall back to listening
+on the default port 9000 and not listening on the unix socket at all.</p>
 
 </body>
 </html>

@@ -2628,60 +2628,6 @@ fi
 ])
 
 
-AC_DEFUN([FW_CHECK_GTK],
-[
-if ( test "$ENABLE_GTK" = "yes" )
-then
-
-	HAVE_GTK=""
-	GTKVER=""
-	GTKCONFIG=""
-
-	if ( test "$cross_compiling" = "yes" )
-	then
-
-		dnl cross compiling ...
-		echo "cross compiling..."
-
-	else
-		
-		if ( test -n "$GTKPATH" )
-		then
-			FW_CHECK_FILE("$GTKPATH/bin/gtk-config",[GTKCONFIG=\"$GTKPATH/bin/gtk-config\"])
-		else
-			AC_CHECK_PROG(GTKCONFIG,"gtk-config","gtk-config")
-			if ( test -z "$GTKCONFIG" )
-			then
-				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/gtk/bin" "/usr/local/gtk+/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin"
-				do
-					for j in "gtk-config" "gtk12-config" "gtk10-config"
-					do
-						FW_CHECK_FILE("$i/$j",[GTKCONFIG=\"$i/$j\"])
-						if ( test -n "$GTKCONFIG" )
-						then	
-							break
-						fi
-					done
-				done
-			fi
-		fi
-		
-		if ( test -n "$GTKCONFIG" )
-		then
-			GTKVER=`$GTKCONFIG --version | cut -d'.' -f2`
-			HAVE_GTK="yes"
-		else
-			HAVE_GTK=""
-			AC_MSG_WARN(GTK config tool will not be built.)
-		fi
-	fi
-
-	AC_SUBST(HAVE_GTK)
-	AC_DEFINE_UNQUOTED(GTK_VERSION,$GTKVER,Second decimal of the version of gtk)
-	AC_SUBST(GTKCONFIG)
-fi
-])
-
 AC_DEFUN([FW_CHECK_NEED_REDHAT_9_GLIBC_2_3_2_HACK],
 [
 	dnl if there's no features.h then we're not using glibc (hopefully)

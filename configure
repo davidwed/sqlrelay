@@ -979,8 +979,6 @@ ERLANG_INSTALL_LIB_DIR
 HAVE_ERLANG
 ERLANGINCLUDES
 ERLANGLIBS
-GTKCONFIG
-HAVE_GTK
 RPM_BUILD_DIR
 SQLR_VERSION
 SONAME_VERSION_INFO
@@ -1622,7 +1620,6 @@ Optional Features:
   --enable-erlang-rpath         Use -rpath when linking the ERLANG library against the SQL Relay client library
   --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library
   --enable-psql-rpath           Use -rpath when linking the psql replacement library against the SQL Relay client library
-  --disable-gtk                 Don't build GTK+ configuration tool
   --enable-dmalloc              Use the dmalloc library
   --enable-efence               Use the efence library
   --enable-shared[=PKGS]  build shared libraries [default=yes]
@@ -1669,7 +1666,6 @@ Optional Packages:
   --with-tcl-include		 Location of tcl.h include file
   --with-tcl-libraries		 Location of libtcl, where to install tcl module
   --with-erlang-prefix          Location of Erlang
-  --with-gtk-prefix             Location of GTK+
   --with-pthread-prefix         Location of pthread library
   --with-system-libtool   use system libtool instead of ./libtool
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
@@ -2715,21 +2711,6 @@ fi
 
 
 
-# Check whether --with-gtk-prefix was given.
-if test "${with_gtk_prefix+set}" = set; then
-  withval=$with_gtk_prefix; GTKPATH="$withval"
-else
-  GTKPATH=""
-fi
-
-# Check whether --enable-gtk was given.
-if test "${enable_gtk+set}" = set; then
-  enableval=$enable_gtk; ENABLE_GTK=""
-else
-  ENABLE_GTK="yes"
-fi
-
-
 # Check whether --with-pthread-prefix was given.
 if test "${with_pthread_prefix+set}" = set; then
   withval=$with_pthread_prefix; PTHREADPATH="$withval"
@@ -2825,9 +2806,6 @@ if ( test -n "$PHPPATH" -a "`echo $PHPPATH | cut -c-3`" = "../" ); then
 fi
 if ( test -n "$ERLANGPATH" -a "`echo $ERLANGPATH | cut -c-3`" = "../" ); then
 	ERLANGPATH="$PWD/$ERLANGPATH"
-fi
-if ( test -n "$GTKPATH" -a "`echo $GTKPATH | cut -c-3`" = "../" ); then
-	GTKPATH="$PWD/$GTKPATH"
 fi
 if ( test -n "$PTHREADPATH" -a "`echo $PTHREADPATH | cut -c-3`" = "../" ); then
 	PTHREADPATH="$PWD/$PTHREADPATH"
@@ -5291,7 +5269,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5294 "configure"' > conftest.$ac_ext
+  echo '#line 5272 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7620,11 +7598,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7623: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7601: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7627: \$? = $ac_status" >&5
+   echo "$as_me:7605: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7882,11 +7860,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7885: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7863: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7889: \$? = $ac_status" >&5
+   echo "$as_me:7867: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7944,11 +7922,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7947: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7925: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7951: \$? = $ac_status" >&5
+   echo "$as_me:7929: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9326,7 +9304,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 9329 "configure"' > conftest.$ac_ext
+    echo '#line 9307 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -10168,7 +10146,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10171 "configure"
+#line 10149 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10266,7 +10244,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10269 "configure"
+#line 10247 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12510,11 +12488,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12513: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12491: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12517: \$? = $ac_status" >&5
+   echo "$as_me:12495: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12572,11 +12550,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12575: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12553: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12579: \$? = $ac_status" >&5
+   echo "$as_me:12557: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13087,7 +13065,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 13090 "configure"' > conftest.$ac_ext
+    echo '#line 13068 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -13929,7 +13907,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13932 "configure"
+#line 13910 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14027,7 +14005,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 14030 "configure"
+#line 14008 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14912,11 +14890,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14915: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14893: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14919: \$? = $ac_status" >&5
+   echo "$as_me:14897: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14974,11 +14952,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14977: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14955: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14981: \$? = $ac_status" >&5
+   echo "$as_me:14959: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16336,7 +16314,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 16339 "configure"' > conftest.$ac_ext
+    echo '#line 16317 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -17112,11 +17090,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17115: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17093: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17119: \$? = $ac_status" >&5
+   echo "$as_me:17097: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17374,11 +17352,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17377: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17355: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17381: \$? = $ac_status" >&5
+   echo "$as_me:17359: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17436,11 +17414,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17439: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17417: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17443: \$? = $ac_status" >&5
+   echo "$as_me:17421: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18818,7 +18796,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 18821 "configure"' > conftest.$ac_ext
+    echo '#line 18799 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -19660,7 +19638,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 19663 "configure"
+#line 19641 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19758,7 +19736,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 19761 "configure"
+#line 19739 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -36567,114 +36545,6 @@ echo "******************************"
 
 
 echo
-echo "***** GTK+ *******************"
-
-if ( test "$ENABLE_GTK" = "yes" )
-then
-
-	HAVE_GTK=""
-	GTKVER=""
-	GTKCONFIG=""
-
-	if ( test "$cross_compiling" = "yes" )
-	then
-
-				echo "cross compiling..."
-
-	else
-
-		if ( test -n "$GTKPATH" )
-		then
-
-if ( test -r ""$GTKPATH/bin/gtk-config"" )
-then
-	eval "GTKCONFIG=\"$GTKPATH/bin/gtk-config\""
-fi
-
-		else
-			# Extract the first word of ""gtk-config"", so it can be a program name with args.
-set dummy "gtk-config"; ac_word=$2
-{ echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_prog_GTKCONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$GTKCONFIG"; then
-  ac_cv_prog_GTKCONFIG="$GTKCONFIG" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_prog_GTKCONFIG=""gtk-config""
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-fi
-fi
-GTKCONFIG=$ac_cv_prog_GTKCONFIG
-if test -n "$GTKCONFIG"; then
-  { echo "$as_me:$LINENO: result: $GTKCONFIG" >&5
-echo "${ECHO_T}$GTKCONFIG" >&6; }
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-
-			if ( test -z "$GTKCONFIG" )
-			then
-				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/gtk/bin" "/usr/local/gtk+/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin"
-				do
-					for j in "gtk-config" "gtk12-config" "gtk10-config"
-					do
-
-if ( test -r ""$i/$j"" )
-then
-	eval "GTKCONFIG=\"$i/$j\""
-fi
-
-						if ( test -n "$GTKCONFIG" )
-						then
-							break
-						fi
-					done
-				done
-			fi
-		fi
-
-		if ( test -n "$GTKCONFIG" )
-		then
-			GTKVER=`$GTKCONFIG --version | cut -d'.' -f2`
-			HAVE_GTK="yes"
-		else
-			HAVE_GTK=""
-			{ echo "$as_me:$LINENO: WARNING: GTK config tool will not be built." >&5
-echo "$as_me: WARNING: GTK config tool will not be built." >&2;}
-		fi
-	fi
-
-
-
-cat >>confdefs.h <<_ACEOF
-#define GTK_VERSION $GTKVER
-_ACEOF
-
-
-fi
-
-echo "******************************"
-
-
-
-echo
 echo "***** Headers ****************"
 
 
@@ -40536,8 +40406,6 @@ ERLANG_INSTALL_LIB_DIR!$ERLANG_INSTALL_LIB_DIR$ac_delim
 HAVE_ERLANG!$HAVE_ERLANG$ac_delim
 ERLANGINCLUDES!$ERLANGINCLUDES$ac_delim
 ERLANGLIBS!$ERLANGLIBS$ac_delim
-GTKCONFIG!$GTKCONFIG$ac_delim
-HAVE_GTK!$HAVE_GTK$ac_delim
 RPM_BUILD_DIR!$RPM_BUILD_DIR$ac_delim
 SQLR_VERSION!$SQLR_VERSION$ac_delim
 SONAME_VERSION_INFO!$SONAME_VERSION_INFO$ac_delim
@@ -40548,7 +40416,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 27; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 25; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

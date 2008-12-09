@@ -129,6 +129,9 @@ install:
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/suse/9.0/9iR2.html $(docdir)/gettingstarted/oracle/linux/suse/9.0
 	$(INSTALL) -m 644 gettingstarted/sybase/11.0.3.3.html $(docdir)/gettingstarted/sybase/11.0.3.3.html
 	$(INSTALL) -m 644 gettingstarted/sybase/11.9.2.html $(docdir)/gettingstarted/sybase/11.9.2.html
+	$(INSTALL) -m 644 gettingstarted/sybase/12.5.1.html $(docdir)/gettingstarted/sybase/12.5.1.html
+	$(INSTALL) -m 644 gettingstarted/sybase/12.5.2.html $(docdir)/gettingstarted/sybase/12.5.2.html
+	$(INSTALL) -m 644 gettingstarted/sybase/15.0.2.html $(docdir)/gettingstarted/sybase/15.0.2.html
 	$(INSTALL) -m 644 gettingstarted/db2/72.html $(docdir)/gettingstarted/db2/72.html
 	$(INSTALL) -m 644 gettingstarted/db2/81.html $(docdir)/gettingstarted/db2/81.html
 	$(INSTALL) -m 644 gettingstarted/db2/824.html $(docdir)/gettingstarted/db2/824.html

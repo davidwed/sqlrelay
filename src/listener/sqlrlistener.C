@@ -461,18 +461,15 @@ bool sqlrlistener::listenOnClientSockets() {
 	const char * const *addresses=cfgfl.getAddresses();
 	clientsockincount=cfgfl.getAddressCount();
 	uint16_t	port=cfgfl.getPort();
+	if (!port) {
+		clientsockincount=0;
+	}
 	const char	*uport=cfgfl.getUnixPort();
-	if (uport && uport[0]) {
-		unixport=charstring::duplicate(uport);
-	}
+	unixport=charstring::duplicate(uport);
 
-	// if neither port nor unixport are specified, set up to 
-	// listen on the default inet port
-	if (!port && !unixport) {
-		port=charstring::toInteger(DEFAULT_PORT);
-		fprintf(stderr,"Warning! using default port.\n");
-	}
-
+printf("port=%d\n",port);
+printf("clientsockincount=%d\n",clientsockincount);
+printf("unixport=%s\n",unixport);
 	// attempt to listen on the inet port
 	// (on each specified address), if necessary
 	bool	listening=false;
@@ -504,7 +501,7 @@ bool sqlrlistener::listenOnClientSockets() {
 		}
 	}
 
-	if (listening && unixport) {
+	if ((!port || listening) && charstring::length(unixport)) {
 		clientsockun=new unixserversocket();
 		listening=clientsockun->listen(unixport,0000,15);
 		if (listening) {

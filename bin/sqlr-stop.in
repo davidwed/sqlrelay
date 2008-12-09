@@ -54,7 +54,7 @@ do
 			then
 				PID=`cat $file`
 				echo "killing process $PID..."
-				echo kill $KILLARGS $PID
+				kill $KILLARGS $PID
 				if ( test "$?" = "0" )
 				then
 					echo "   success"

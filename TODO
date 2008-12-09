@@ -1,149 +1,59 @@
-oracle 11g on fc9 doc
+add Steve Paschall's mysql-drop-in with mod_PHP docs:
 
-config gui segfaults when creating a file
+I've as yet been unable to get the Apache PHP module to load with libmysql50sqlrelay preloaded. I originally had both the mysql and mysqli modules built as DSOs, and no matter where I tried setting LD_PRELOAD, they'd never see the library. Judging by the listserv archives, several folks appear to have had the same problem, but I haven't seen a solution.
 
-PHP pear db only returns 100 rows with this code:
-$query = "SELECT id, name FROM ct_contest ORDER BY name ASC;";
-        $db->setFetchMode(DB_FETCHMODE_ASSOC);
-        $result = $db->query($query);
-                while ($line = $result->fetchRow(DB_FETCHMODE_ASSOC)) {
-                 print ("\t<option value=\"$line[id]\" 
-$selected>$line[name]</option>\n");
-                print "$line[name]\n";
-        }
-        $result->free();
+I tried linking the two modules in staticly; didn't make a difference. But I may have hit upon something.
 
-connection daemons have some issue with detaching (I think)
+By compiling PHP with
 
-mysql db reconnect doesn't appear to work correctly
-allowing query timeout appears to hang the sqlrelay server
+LDFLAGS="$LDFLAGS -L/usr/local/sqlrelay/lib -lmysql50sqlrelay"
 
-get odbc driver working better
+(change the lib path to suit your install)
 
-update python api to create decimals in dictionary
-update python test to handle python patches
-incorporate Jens Brey's instantclient patches
+and linking the old PHP mysql module in statically while building mysqli support as a dso:
+
+./configure   --with-mysql=/usr/local/mysql  --with-mysqli=shared,/usr/local/mysql/bin/mysql_config
+
+(again, change the paths to suit your install)
+
+I may just have found a way to give myself the best of both worlds. The mysqli extension's still linking against libmysqlclient while the older module is properly linking against libmysql50sqlrelay.
+
+This is helpful in my particular instance as I'm using a popular open source content management framework (ahem, Drupal) that helpfully includes support for both libraries. Simply changing one variable allows me to use one library to tunnel through SQL Relay while using the other to pound on our db directly.
+
+Don't know how useful this might be for others, but I'm certainly elated to have found something workable for our situation. :)
+
+Crossing my fingers that I'm on the right track now.
+
+-- 
+Stephen P. Paschall
+
+================================================================================
+
+need to detect tdsver.h (freetds)
+
+
+1.0:
 
 Bugs:
-	* sqlr-import doesn't support binary data
+	* allowing query timeout appears to hang the sqlrelay server
+	* PHP pear db only returns 100 rows with this code:
+		$query = "SELECT id, name FROM ct_contest ORDER BY name ASC;";
+        		$db->setFetchMode(DB_FETCHMODE_ASSOC);
+        		$result = $db->query($query);
+                		while ($line = $result->fetchRow(DB_FETCHMODE_ASSOC)) {
+                 		print ("\t<option value=\"$line[id]\" $selected>$line[name]</option>\n");
+                		print "$line[name]\n";
+        		}
+        		$result->free();
+	* connection daemons have some issue with detaching (I think)
 	* some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
 			use non-unicode for them
 	* just because sqlrelay is compiled against unixodbc which supports
 		odbc 3.0 api, individual drivers may not support the 3.0 api,
 		so sqlrelay needs to detect this or it needs to at least be
 		configurable use SQLGetInfo with SQL_ODBC_API_CONFORMANCE
-
-Tests:
-	php pear db bind formats
-	db2 temp tables
-	odbc temp tables
-	zope
-	odbc tests
-	mysql_stmt calls in drop-in library
-	better pythondb/rubydbi tests
-	test init scripts
-	test send query w/length
-	test upper/lower/mixed column case methods
-	need database reconnect tests
-	column flags
-	getFieldAsXXX
-	getOutputBindAsXXX
-	Java "getXXXAsByteArray" methods
-	check blob/lobs with binary data in them
-	perl dbi driver
-		execute_array
-		bind_param_array
-		selectall_arrayref with attr/binds
-		selectall_hashref with attr/binds
-		selectcol_arrayref with attr/binds
-		selectrow_array with attr/binds
-		selectrow_arrayref with attr/binds
-		selectrow_hashref with attr/binds
-		prepare_cached
-		fetchall_arrayref with slice
-		quote
-		err
-		errstr
-		state
-		begin_work
-		available_drivers
-		data_sources
-	oldmysql test files for non-C++ api's
-
-Documentation:
-	* timequeries parameter
-	* how to use new features of Tony/Erik's perl dbi patch
-	* getting started with odbc
-	* "how sqlrelay works" with diagrams and animations
-	* example sqlrelay.conf's for different configurations
-	* performance benchmark charts
-
-Performance/Code Enhancements:
-	* db2 first query fails and forces relogin unless detached first
-		which causes problems if reloginatstart is not set
-		using tcp connections fixes this but is slower
-	* Don't fork listener children, use listen() backlog instead
-		linux:
-			looks like max is 128 on linux 2.0
-			2.2/2.4 - /proc/sys/net/ipv4/tcp_max_syn_backlog
-				Default is 1024 for systems with more than 128Mb
-				of memory, and 128 for low memory machines.
-				If you make it greater than 1024, change
-				TCP_SYNQ_HSIZE in include/net/tcp.h to keep
-				TCP_SYNQ_HSIZE*16<=tcp_max_syn_backlog
-				and recompile kernel.
-			syn cookies - no max backlog
-		solaris:
-			/usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
-	* perl apis -> CPAN
-	* if a client connects and the forked listener ends up waiting for a
-		connection and the client disconnects, the forked listener has
-		no way of knowing that the client has disconnected and can't
-		bail
-	* semop's can return ENOSPC if the undo list is full which is unhandled
-		and causes deadlocks in the sqlr-listeners.  If we get an
-		ENOSPC, then we need to send the client an error and the
-		sqlr-listener needs to exit.
-	* Need to find a way to make connections bleed off.
-		If connections=100 and maxconnections=200 and there are
-		consistently 150 clients, then the # of connections needs to
-		bleed back down to 150 eventually.  Currently, if a spike
-		causes it to jump up to 200, then almost all 200 will end up
-		staying alive.
-	* Need to find a way to re-distribute connections.
-		If 2 db's go down and 2nd comes back up first, all log into 2nd
-		db and never log out and back into first
 	* query router "do something"'s
-	* reset autocommit state when new client logs into sqlrelay
-	* NLS_LANG-like issues with other db's?
-	* client connect timeout
-	* store passwords in encrypted form in the config file
-	* call endSession() from perl DBD finish method
-	* implement column flags as a bitmap
-	* persistent cursors - parse query, attach an id to it,
-				make it available to other sessions
-	* connection daemons could put buffers in shared memory and
-		clients could send queries, access buffers using 
-		shared memory and semaphores instead of unix sockets
-	* api methods to use preallocated buffers for result sets
-	* api methods for configuring optimistic buffer sizes
-	* result set compression during transmission for distant relays
-	* server side result set caching
-	* support batch DML in oracle8
-	* for databases that can return non-strings in their result sets, 
-		send non strings to client
-	* seperate modules into standalone builds
-	* should be a single sqlr-connection daemon that dlopens the
-		appropriate database module 
-	* login errors should be printed on the screen by sqlrconnection class,
-		not by individual connections
-	* api for running queries in the background
-		(asynchronous queries w/timeouts)
-	* use async queries by default, even if the client runs a synchronous
-		query, so the query can be cancelled if the client disconnects
-	* support freetds/sybase ct_con_prop/encryption
-	* use bandwidth delay product to set tcp send/receive buffer sizes
-	* get sid working, document
+	* get sid working, document or remove it
 		how to:
 			create db
 			create user
@@ -179,11 +89,45 @@ Performance/Code Enhancements:
 
 			sidlog - every query is logged here with a message
 					about it
+	* if a client connects and the forked listener ends up waiting for a
+		connection and the client disconnects, the forked listener has
+		no way of knowing that the client has disconnected and can't
+		bail
+	* semop's can return ENOSPC if the undo list is full which is unhandled
+		and causes deadlocks in the sqlr-listeners.  If we get an
+		ENOSPC, then we need to send the client an error and the
+		sqlr-listener needs to exit.
+	* Need to find a way to make connections bleed off.
+		If connections=100 and maxconnections=200 and there are
+		consistently 150 clients, then the # of connections needs to
+		bleed back down to 150 eventually.  Currently, if a spike
+		causes it to jump up to 200, then almost all 200 will end up
+		staying alive.
+	* Need to find a way to re-distribute connections.
+		If 2 db's go down and 2nd comes back up first, all log into 2nd
+		db and never log out and back into first
 
-Security:
-	* SSL encryption, key-based authentication
+Tests:
+
+Documentation:
+	* db2 on fc9
+	* timequeries parameter
+	* how to use new features of Tony/Erik's perl dbi patch
+	* getting started with odbc
+	* "how sqlrelay works" with diagrams and animations
+	* example sqlrelay.conf's for different configurations
+	* performance benchmark charts
+
+Performance/Code Enhancements:
+	* reset autocommit state when new client logs into sqlrelay
+	* NLS_LANG-like issues with other db's?
 
 Features:
+	* update python api to create decimals in dictionary
+	* update python test to handle python patches
+	* incorporate Jens Brey's instantclient patches
+	* get odbc driver working better
+	* get odbc driver working sufficiently to use with jdbc
 	* Perl DBI driver needs to convert bind vars from ?'s to
 		db-appropriate format like PHP Pear DB driver does
 	* Non C/C++ api's need a method to close cursors.  Specifically, bind
@@ -191,6 +135,106 @@ Features:
 		It's not an issue for memory, but rather a server-side cursor
 		will be occupied until it's garbage collected.  On C/C++ you
 		can just delete it.
+
+Availability:
+
+API's:
+	* PHP PDO driver  http://wiki.cc/php/PDO
+
+--------------------------------------------------------------------------------
+
+Post 1.0:
+
+Bugs:
+
+Tests:
+	* php pear db bind formats
+	* db2 temp tables
+	* odbc temp tables
+	* zope
+	* odbc tests
+	* mysql_stmt calls in drop-in library
+	* better pythondb/rubydbi tests
+	* test init scripts
+	* test send query w/length
+	* test upper/lower/mixed column case methods
+	* need database reconnect tests
+	* column flags
+	* getFieldAsXXX
+	* getOutputBindAsXXX
+	* Java "getXXXAsByteArray" methods
+	* check blob/lobs with binary data in them
+	* perl dbi driver
+		execute_array
+		bind_param_array
+		selectall_arrayref with attr/binds
+		selectall_hashref with attr/binds
+		selectcol_arrayref with attr/binds
+		selectrow_array with attr/binds
+		selectrow_arrayref with attr/binds
+		selectrow_hashref with attr/binds
+		prepare_cached
+		fetchall_arrayref with slice
+		quote
+		err
+		errstr
+		state
+		begin_work
+		available_drivers
+		data_sources
+	* oldmysql test files for non-C++ api's
+
+Documentation:
+
+Performance/Code Enhancements:
+	* db2 first query fails and forces relogin unless detached first
+		which causes problems if reloginatstart is not set
+		using tcp connections fixes this but is slower
+	* Don't fork listener children, use listen() backlog instead
+		linux:
+			looks like max is 128 on linux 2.0
+			2.2/2.4 - /proc/sys/net/ipv4/tcp_max_syn_backlog
+				Default is 1024 for systems with more than 128Mb
+				of memory, and 128 for low memory machines.
+				If you make it greater than 1024, change
+				TCP_SYNQ_HSIZE in include/net/tcp.h to keep
+				TCP_SYNQ_HSIZE*16<=tcp_max_syn_backlog
+				and recompile kernel.
+			syn cookies - no max backlog
+		solaris:
+			/usr/sbin/ndd -set /dev/tcp tcp_conn_req_max 32
+	* perl apis -> CPAN
+	* client connect timeout
+	* store passwords in encrypted form in the config file
+	* call endSession() from perl DBD finish method
+	* implement column flags as a bitmap
+	* persistent cursors - parse query, attach an id to it,
+				make it available to other sessions
+	* connection daemons could put buffers in shared memory and
+		clients could send queries, access buffers using 
+		shared memory and semaphores instead of unix sockets
+	* api methods to use preallocated buffers for result sets
+	* api methods for configuring optimistic buffer sizes
+	* result set compression during transmission for distant relays
+	* server side result set caching
+	* support batch DML in oracle8
+	* for databases that can return non-strings in their result sets, 
+		send non strings to client
+	* seperate modules into standalone builds
+	* should be a single sqlr-connection daemon that dlopens the
+		appropriate database module 
+	* login errors should be printed on the screen by sqlrconnection class,
+		not by individual connections
+	* api for running queries in the background
+		(asynchronous queries w/timeouts)
+	* use async queries by default, even if the client runs a synchronous
+		query, so the query can be cancelled if the client disconnects
+	* support freetds/sybase ct_con_prop/encryption
+	* use bandwidth delay product to set tcp send/receive buffer sizes
+
+Features:
+	* SSL encryption
+	* verbose mode for export/import
 	* daemontools compatibility
 	* figure out how to get the drop-in client compiled into the mysql PHP
 		module like the mysql native client is
@@ -248,74 +292,17 @@ Features:
 		db comes back up
 
 Availability:
-	connections should ping database server every so often to make sure
+	* connections should ping database server every so often to make sure
 		it's up, if it's not, relogin
-	failover - master, fallback databases, where connection only goes to
+	* failover - master, fallback databases, where connection only goes to
 		the fallback if the master is overloaded or down
-	if a connection dies mysteriously, a new one should fire up
-
-backends:
-	pam_sqlrelay
-	mod_auth_sqlrelay for apache
-	samba auth module
-	bind 9.1 backend
-	dhcp backend
-	qmail backend
-	dbmail backend
-	qpopper port
-	bugzilla port
-	litesql
-	dovecot
-	courier
-	exim
-	freeradius
+	* if a connection dies mysteriously, a new one should fire up
 
 API's:
-	JDBC
-	QT3
-	C# - have a driver, just need to incorporate it
-		look at npgsql for .net data provider example
-	ADA
-	Eiffel
-	gnome-db
-	D
-	dbstep
-	ADODB driver
-	Ruby-on-rails adapter
-	PHP MDB2 driver
-	PHP PDO driver  http://wiki.cc/php/PDO
-	PHP5 Creole driver
+	* C#
+	* Ruby-on-rails adapter
 
 Drop-in replacement libraries:
-	Oracle OCI7/8
-	Sybase-ct
-	Interbase
-
-Native DB Support:
-	xbsql
-	Informix
-	SAP DB
-	LocalSQL
-	kekedb
-	ThinkSQL
-	picosql
-	shsql
-	does clip provide an odbc driver for accessing x-base files?
-	daffodildb/one$db
-	LK bin DB - http://www.lksoft.cjb.net/en/
-	Cache - http://intersystems.com
-	Frontbase
-	J-stels - stelsdbf, stelscsv (http://www.csv-jdbc.com/)
-	intersystems cache db
-	yard-sql
-	monetdb
-	valentina-db
-
-Config Tools:
-	gtk2
-	QT
-	curses
-	need keyboard shortcuts
-	size should be less than 640x480
-	connectstring editor
-	wizard
+	* Oracle OCI7/8
+	* Sybase-ct
+	* Interbase

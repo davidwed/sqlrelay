@@ -12,9 +12,6 @@ all:
 	$(MAKE) -C start all
 	$(MAKE) -C cachemanager all
 	$(MAKE) -C scaler all
-ifneq ($(HAVE_GTK),)
-	$(MAKE) -C config all
-endif
 
 clean:
 	$(MAKE) -C util clean
@@ -26,9 +23,6 @@ clean:
 	$(MAKE) -C start clean
 	$(MAKE) -C cachemanager clean
 	$(MAKE) -C scaler clean
-ifneq ($(HAVE_GTK),)
-	$(MAKE) -C config clean
-endif
 
 rebuild:
 	$(MAKE) -C util rebuild
@@ -40,9 +34,6 @@ rebuild:
 	$(MAKE) -C start rebuild
 	$(MAKE) -C cachemanager rebuild
 	$(MAKE) -C scaler rebuild
-ifneq ($(HAVE_GTK),)
-	$(MAKE) -C config rebuild
-endif
 
 install:
 	$(MAKE) -C util install
@@ -54,9 +45,6 @@ install:
 	$(MAKE) -C start install
 	$(MAKE) -C cachemanager install
 	$(MAKE) -C scaler install
-ifneq ($(HAVE_GTK),)
-	$(MAKE) -C config install
-endif
 
 uninstall:
 	$(MAKE) -C util uninstall
@@ -68,6 +56,3 @@ uninstall:
 	$(MAKE) -C start uninstall
 	$(MAKE) -C cachemanager uninstall
 	$(MAKE) -C scaler uninstall
-ifneq ($(HAVE_GTK),)
-	$(MAKE) -C config uninstall
-endif

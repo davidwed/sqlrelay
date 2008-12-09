@@ -1,10 +1,6 @@
 # Available build options, you need rpm-build >= 4.0.3 for this to work.
 # Example : rpmbuild -ba --without mysql --without php sqlrelay.spec
 #
-# General options :
-# ===============
-# --without gtk
-#
 # Database options :
 # ================
 # --without db2
@@ -43,7 +39,6 @@ Buildroot: %{_tmppath}/%{name}-root
 
 %if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
 	%define phpdevel %(echo "mod_php4-devel")
-	%define gtkdevel %(echo "gtk-devel")
 	%define rubydevel %(echo "ruby")
 	%define tcldevel %(echo "tcl-devel")
 	%define initscript /etc/init.d/sqlrelay
@@ -52,7 +47,6 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define exampledir %{_datadir}/examples/%{name}
 %else
 	%define phpdevel %(echo "php-devel")
-	%define gtkdevel %(echo "gtk+-devel")
 	%define rubydevel %(echo "ruby-devel")
 	# fedora core >= 4 uses tcl-devel, other distros use tcl
 	%if %([[ "%{fedoraversion}" -ge "4" ]] && echo 1 || echo 0)
@@ -67,7 +61,6 @@ Buildroot: %{_tmppath}/%{name}-root
 %endif
 
 BuildRequires: rudiments-devel >= 0.28.1
-%{!?_without_gtk:BuildRequires: ,%{gtkdevel}}
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}
 %{!?_without_postgresql:BuildRequires: ,postgresql-devel}
@@ -86,12 +79,12 @@ PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and
 MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
 Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java, TCL and Erlang, drop-in
 replacement libraries for MySQL and PostgreSQL clients, command line
-clients, a GUI configuration tool and extensive documentation.  The APIs
-support advanced database operations such as bind variables, multi-row fetches,
-client-side result set caching and suspended transactions.  It is ideal for
-speeding up database-driven web-based applications, accessing databases from
-unsupported platforms, migrating between databases, distributing access to
-replicated databases and throttling database access.
+clients and extensive documentation.  The APIs support advanced database
+operations such as bind variables, multi-row fetches, client-side result set
+caching and suspended transactions.  It is ideal for speeding up database-driven
+web-based applications, accessing databases from unsupported platforms,
+migrating between databases, distributing access to replicated databases and
+throttling database access.
 
 
 %package clients
@@ -158,14 +151,6 @@ Group: Applications/Libraries
 
 %description client-odbc
 ODBC driver
-
-
-%package config-gtk
-Summary: SQL Relay GUI configuration tool.
-Group: Applications/Databases
-
-%description config-gtk
-GTK-based configuration tool for SQL Relay.
 
 
 %package db2
@@ -371,7 +356,6 @@ Man pages for SQL Relay.
 
 %build
 %configure \
-	%{?_without_gtk:	--disable-gtk} \
 	%{?_without_db2:	--disable-db2} \
 	%{?_without_freetds:	--disable-freetds} \
 	%{?_without_firebird:	--disable-firebird} \
@@ -501,10 +485,6 @@ rm -rf %{buildroot}
 %{!?_without_odbc:%{_libdir}/libsqlrodbc.so}
 %{!?_without_odbc:%{_libdir}/libsqlrodbc.a}
 %{!?_without_odbc:%{_libdir}/libsqlrodbc.la}
-
-%{!?_without_gtk:%files config-gtk}
-%{!?_without_gtk:%defattr(-, root, root)}
-%{!?_without_gtk:%{_bindir}/sqlr-config-gtk*}
 
 %{!?_without_db2:%files db2}
 %{!?_without_db2:%defattr(-, root, root)}

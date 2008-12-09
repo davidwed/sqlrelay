@@ -13,11 +13,11 @@
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	addresses=new char *[1];
 	addresses[0]=charstring::duplicate("0.0.0.0");
-	addresscount=1;
-	port=charstring::toInteger(DEFAULT_PORT);
-	listenoninet=(port)?true:false;
-	unixport=charstring::duplicate(DEFAULT_SOCKET);
-	listenonunix=(unixport[0])?true:false;
+	addresscount=0;
+	port=0;
+	listenoninet=false;
+	unixport=charstring::duplicate("");
+	listenonunix=false;
 	dbase=charstring::duplicate(DEFAULT_DBASE);
 	connections=charstring::toInteger(DEFAULT_CONNECTIONS);
 	maxconnections=charstring::toInteger(DEFAULT_MAXCONNECTIONS);
@@ -526,13 +526,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				charstring::bothTrim(addresses[index]);
 			}
 		} else if (currentattribute==PORT_ATTRIBUTE) {
-			port=atouint32_t(value,DEFAULT_PORT,1);
-			listenoninet=true;
+			port=atouint32_t(value,"0",0);
 		} else if (currentattribute==SOCKET_ATTRIBUTE) {
 			delete[] unixport;
-			unixport=charstring::duplicate((value)?value:
-							DEFAULT_SOCKET);
-			listenonunix=(unixport[0]!=(char)NULL);
+			unixport=charstring::duplicate(value);
 		} else if (currentattribute==DBASE_ATTRIBUTE) {
 			delete[] dbase;
 			dbase=charstring::duplicate((value)?value:
@@ -746,6 +743,16 @@ uint32_t sqlrconfigfile::atouint32_t(const char *value,
 }
 
 bool sqlrconfigfile::tagEnd(const char *name) {
+
+	// if neither port nor socket were specified, use the default port
+	if (!charstring::compare(name,"instance")) {
+		if (!port && !unixport[0]) {
+			port=charstring::toInteger(DEFAULT_PORT);
+			addresscount=1;
+		}
+		listenoninet=(port)?true:false;
+		listenonunix=(unixport[0])?true:false;
+	}
 
 	// don't do anything if we're already done
 	// or have not found the correct id
