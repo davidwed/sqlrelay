@@ -1,3 +1,9 @@
+firebird 2.1:
+	creates an init script
+	change dba password process is different
+
+----------------------------------------------------
+
 add Steve Paschall's mysql-drop-in with mod_PHP docs:
 
 I've as yet been unable to get the Apache PHP module to load with libmysql50sqlrelay preloaded. I originally had both the mysql and mysqli modules built as DSOs, and no matter where I tried setting LD_PRELOAD, they'd never see the library. Judging by the listserv archives, several folks appear to have had the same problem, but I haven't seen a solution.
@@ -28,8 +34,6 @@ Crossing my fingers that I'm on the right track now.
 Stephen P. Paschall
 
 ================================================================================
-
-need to detect tdsver.h (freetds)
 
 
 1.0:

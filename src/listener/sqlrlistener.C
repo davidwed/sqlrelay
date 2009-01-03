@@ -467,9 +467,6 @@ bool sqlrlistener::listenOnClientSockets() {
 	const char	*uport=cfgfl.getUnixPort();
 	unixport=charstring::duplicate(uport);
 
-printf("port=%d\n",port);
-printf("clientsockincount=%d\n",clientsockincount);
-printf("unixport=%s\n",unixport);
 	// attempt to listen on the inet port
 	// (on each specified address), if necessary
 	bool	listening=false;

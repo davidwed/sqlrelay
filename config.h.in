@@ -19,6 +19,9 @@
 /* Some versions of FreeTDS have function definitions */
 #undef HAVE_FREETDS_FUNCTION_DEFINITIONS
 
+/* Some versions of FreeTDS have tdsver.h */
+#undef HAVE_FREETDS_H
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

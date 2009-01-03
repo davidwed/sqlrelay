@@ -1363,6 +1363,13 @@ then
 			fi
 		fi
 
+		dnl if FREETDSLIBS is defined, check for tdsver.h
+		if ( test -n "$FREETDSLIBS" )
+		then
+			AC_MSG_CHECKING(whether tdsver.h exists)
+			FW_TRY_LINK([#include <tdsver.h>],[],[$FREETDSINCLUDES],[$FREETDSLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_H,1,Some versions of FreeTDS have tdsver.h)],[AC_MSG_RESULT(no)])
+		fi
+
 		dnl if FREETDSLIBS isn't defined at this point, then freetds
 		dnl isn't installed or doesn't work
 		if ( test -z "$FREETDSLIBS" )

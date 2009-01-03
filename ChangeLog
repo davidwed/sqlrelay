@@ -43,6 +43,7 @@
 	added Oracle 11g on fc9 document
 	added ASE 15.0.2 installation doc
 	made it possible to only bind to port, not socket
+	added test for tdsver.h
 
 0.39 - removed oracle7 support
 	added OCI_OBJECT to oracle environment init

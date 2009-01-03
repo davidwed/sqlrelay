@@ -2,9 +2,11 @@
 // See the file COPYING for more information
 
 #include <freetdsconnection.h>
-#include <tdsver.h>
 
 #include <config.h>
+#ifdef HAVE_FREETDS_H
+	#include <tdsver.h>
+#endif
 #ifndef HAVE_FREETDS_FUNCTION_DEFINITIONS
 	#include <ctfunctions.h>
 #endif
