@@ -1,6 +1,7 @@
 // Copyright (c) 2007  David Muse
 // See the file COPYING for more information
 
+#include <config.h>
 #include <sql.h>
 #include <sqlext.h>
 #include <odbcinst.h>
@@ -143,7 +144,11 @@ static SQLRETURN SQLR_SQLAllocDesc(SQLHANDLE inputhandle,
 	}
 
 	// FIXME: what should this do?
+#ifdef SQL_NULL_DESC
 	*outputhandle=SQL_NULL_DESC;
+#else
+	*outputhandle=0;
+#endif
 	return SQL_SUCCESS;
 }
 
@@ -3594,7 +3599,12 @@ SQLRETURN SQL_API SQLColAttribute(SQLHSTMT statementhandle,
 					SQLPOINTER characterattribute,
 					SQLSMALLINT bufferlength,
 					SQLSMALLINT *stringlength,
-					SQLPOINTER numericattribute) {
+#ifdef SQLCOLATTRIBUTE_SQLLEN
+					SQLLEN *
+#else
+					SQLPOINTER
+#endif
+					numericattribute) {
 	debugFunction();
 	return SQLR_SQLColAttribute(statementhandle,
 					columnnumber,
@@ -3602,6 +3612,9 @@ SQLRETURN SQL_API SQLColAttribute(SQLHSTMT statementhandle,
 					characterattribute,
 					bufferlength,
 					stringlength,
+#ifdef SQLCOLATTRIBUTE_SQLLEN
+					(SQLPOINTER)
+#endif
 					numericattribute);
 }
 #endif /* ODBCVER >= 0x0300 */

@@ -1,7 +1,6 @@
 #include <ei.h>
 
 #include <unistd.h>
-#include <sys/io.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

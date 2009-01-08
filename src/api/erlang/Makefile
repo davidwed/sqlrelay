@@ -4,8 +4,8 @@ include ../../../config.mk
 
 .PHONY: all clean rebuild install uninstall
 
-CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = $(ERLANGLIBS) -L$(top_builddir)/src/api/c++/src -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+LIBS = $(ERLANGLIBS) -L$(top_builddir)/src/api/c/src -L$(top_builddir)/src/api/c++/src -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(ERLANGUSERPATH),yes)
@@ -37,7 +37,7 @@ sqlrelay.erl: sqlrelay.erl.in
 	sed -e "s|@SQLRELAY_PATH@|$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/bin|g" $< > $@
 
 sqlrelay.beam: sqlrelay.erl
-	erlc -W $<
+	$(ERLC) $(ERLCFLAGS) -W $<
 
 sqlrelay: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CC) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)

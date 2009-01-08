@@ -1613,7 +1613,7 @@ then
 			FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS="$ODBCLIBS $PTHREADLIBS"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIBS"])
 		fi
 		if ( test -n "$HAVE_IODBC" )
 		then
@@ -1622,7 +1622,7 @@ then
 			FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCLIBS=\"$ODBCLIBS $PTHREADLIBS\"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIBS"])
 		fi
 		if ( test -z "$ODBCLIBS" )
 		then
@@ -1637,19 +1637,34 @@ then
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLBindParameter(0,0,0,0,0,0,0,0,0,(SQLLEN *)NULL);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLBINDPARAMETER_SQLLEN,1,Some systems use SQLLEN * in SQLBINDPARAMETER)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[SQLBindParameter(0,0,0,0,0,0,0,0,0,(SQLLEN *)1);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLBINDPARAMETER_SQLLEN,1,Some systems use SQLLEN * in SQLBINDPARAMETER)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(if SQLColAttribute takes SQLLEN * argument)
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLColAttribute(0,0,0,0,0,0,(SQLLEN *)NULL);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLCOLATTRIBUTE_SQLLEN,1,Some systems use SQLLEN * in SQLColAttribute)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>
+
+extern "C" SQLRETURN SQL_API SQLColAttribute(SQLHSTMT statementhandle,
+					SQLUSMALLINT columnnumber,
+					SQLUSMALLINT fieldidentifier,
+					SQLPOINTER characterattribute,
+					SQLSMALLINT bufferlength,
+					SQLSMALLINT *stringlength,
+					SQLLEN *numericattribute) {
+	return 1;
+}],[],[$ODBCSTATIC $ODBCINCLUDES],[],[],[AC_MSG_RESULT(yes); AC_DEFINE(SQLCOLATTRIBUTE_SQLLEN,1,Some systems use SQLLEN * in SQLColAttribute)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(if SQLRowCount takes SQLLEN * argument)
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLRowCount(0,(SQLLEN *)0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLROWCOUNT_SQLLEN,1,Some systems use SQLLEN * in SQLRowCount)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>
+
+extern "C" SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
+					SQLLEN *rowcount) {
+	return 1;
+}],[],[$ODBCSTATIC $ODBCINCLUDES],[],[],[AC_MSG_RESULT(yes); AC_DEFINE(SQLROWCOUNT_SQLLEN,1,Some systems use SQLLEN * in SQLRowCount)],[AC_MSG_RESULT(no)])
 		
 		AC_MSG_CHECKING(if SQLBindCol takes SQLLEN * argument)
 		FW_TRY_LINK([#include <sql.h>
@@ -2114,7 +2129,6 @@ fi
 
 AC_DEFUN([FW_CHECK_ZOPE],
 [
-echo "enable zope: $ENABLE_ZOPE"
 if ( test "$ENABLE_ZOPE" = "yes" )
 then
 
@@ -2475,7 +2489,7 @@ then
 
 	HAVE_ERLANG=""
 	ERLANGINCLUDES=""
-	ERLANGLIBSS=""
+	ERLANGLIBS=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -2485,29 +2499,94 @@ then
 
 	else
 
-		AC_ERLANG_SUBST_ROOT_DIR
-		AC_ERLANG_SUBST_LIB_DIR
-		AC_ERLANG_SUBST_INSTALL_LIB_DIR
-
-		ERLANG_INCLUDE_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/include`
-		ERLANG_LIB_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/lib`
-
-
-		if ( test -n "$ERLANG_INCLUDE_DIR" -a -n "$ERLANG_LIB_DIR" )
+		AC_ERLANG_PATH_ERLC
+		AC_ERLANG_PATH_ERL
+		if ( test -n "$ERLC" -a -n "$ERL" )
 		then
 
-			if ( test "$ERLANG_INCLUDE_DIR" != "/usr" )
+			dnl get ERLANG_ROOT_DIR
+			if ( test -z "$ERLANG_ROOT_DIR" )
 			then
-				ERLANGINCLUDES="-I$ERLANG_INCLUDE_DIR"
+				rm -f conftest.erl
+				cat > conftest.erl << END
+-module(conftest).
+-export([[start/0]]).
+start() ->
+	RootDir = code:root_dir(),
+	file:write_file("conftest.out", RootDir),
+	ReturnValue = 0,
+	halt(ReturnValue)
+.
+END
+				cat > conftest << END
+#!/bin/sh
+$ERLC $ERLCFLAGS -b beam conftest.erl
+$ERL -run conftest start -run init stop -noshell
+END
+				chmod 755 conftest
+				./conftest
+				ERLANG_ROOT_DIR=`cat conftest.out`
+				rm -f conftest.out
+				rm -f conftest.erl
+				rm -f conftest.beam
 			fi
 
-			if ( test "$ERLANG_LIB_DIR" != "/usr" )
+			dnl get ERLANG_LIB_DIR
+			if ( test -z "$ERLANG_LIB_DIR" )
 			then
-				ERLANGLIBS="-L$ERLANG_LIB_DIR"
+				rm -f conftest.erl
+				cat > conftest.erl << END
+-module(conftest).
+-export([[start/0]]).
+start() ->
+	LibDir = code:lib_dir(),
+	file:write_file("conftest.out", LibDir),
+	ReturnValue = 0,
+	halt(ReturnValue)
+.
+END
+				cat > conftest << END
+#!/bin/sh
+$ERLC $ERLCFLAGS -b beam conftest.erl
+$ERL -run conftest start -run init stop -noshell
+END
+				chmod 755 conftest
+				./conftest
+				ERLANG_LIB_DIR=`cat conftest.out`
+				rm -f conftest.out
+				rm -f conftest.erl
+				rm -f conftest.beam
 			fi
-			ERLANGLIBS="$ERLANGLIBS -lerl_interface -lei"
 
-			HAVE_ERLANG="yes"
+			if ( test -z "$ERLANG_INSTALL_LIB_DIR" )
+			then
+				ERLANG_INSTALL_LIB_DIR='%{libdir}/erlang/lib'
+			fi
+			
+
+
+			ERLANG_INCLUDE_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/include 2> /dev/null`
+			ERLANG_LIB_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/lib 2> /dev/null`
+
+
+			if ( test -n "$ERLANG_INCLUDE_DIR" -a -n "$ERLANG_LIB_DIR" )
+			then
+
+				if ( test "$ERLANG_INCLUDE_DIR" != "/usr" )
+				then
+					ERLANGINCLUDES="-I$ERLANG_INCLUDE_DIR"
+				fi
+
+				if ( test "$ERLANG_LIB_DIR" != "/usr" )
+				then
+					ERLANGLIBS="-L$ERLANG_LIB_DIR"
+				fi
+				ERLANGLIBS="$ERLANGLIBS -lerl_interface -lei"
+
+				HAVE_ERLANG="yes"
+			else
+				AC_MSG_WARN(The Erlang API will not be built.)
+			fi
 		else
 			AC_MSG_WARN(The Erlang API will not be built.)
 		fi

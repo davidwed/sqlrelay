@@ -15,6 +15,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifndef TRUE
+#define TRUE (1)
+#endif
+
 #ifdef HAVE_MYSQL_OPT_RECONNECT
 const my_bool	mysqlconnection::mytrue=TRUE;
 #endif

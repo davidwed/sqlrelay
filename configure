@@ -973,12 +973,12 @@ PHPPEARDBDIR
 ERLC
 ERLCFLAGS
 ERL
-ERLANG_ROOT_DIR
-ERLANG_LIB_DIR
-ERLANG_INSTALL_LIB_DIR
 HAVE_ERLANG
 ERLANGINCLUDES
 ERLANGLIBS
+ERLANG_ROOT_DIR
+ERLANG_LIB_DIR
+ERLANG_INSTALL_LIB_DIR
 RPM_BUILD_DIR
 SQLR_VERSION
 SONAME_VERSION_INFO
@@ -1005,8 +1005,7 @@ F77
 FFLAGS
 ERLC
 ERLCFLAGS
-ERL
-ERLANG_INSTALL_LIB_DIR'
+ERL'
 
 
 # Initialize some variables set by options.
@@ -1690,9 +1689,6 @@ Some influential environment variables:
   ERLC        Erlang/OTP compiler command [autodetected]
   ERLCFLAGS   Erlang/OTP compiler flags [none]
   ERL         Erlang/OTP interpreter command [autodetected]
-  ERLANG_INSTALL_LIB_DIR
-              Erlang/OTP library installation base directory
-              [LIBDIR/erlang/lib]
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -5269,7 +5265,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5272 "configure"' > conftest.$ac_ext
+  echo '#line 5268 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7598,11 +7594,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7601: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7597: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7605: \$? = $ac_status" >&5
+   echo "$as_me:7601: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7860,11 +7856,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7863: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7859: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7867: \$? = $ac_status" >&5
+   echo "$as_me:7863: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7922,11 +7918,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7925: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7921: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7929: \$? = $ac_status" >&5
+   echo "$as_me:7925: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9304,7 +9300,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 9307 "configure"' > conftest.$ac_ext
+    echo '#line 9303 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -10146,7 +10142,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10149 "configure"
+#line 10145 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10244,7 +10240,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10247 "configure"
+#line 10243 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12488,11 +12484,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12491: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12487: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12495: \$? = $ac_status" >&5
+   echo "$as_me:12491: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12550,11 +12546,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12553: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12549: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12557: \$? = $ac_status" >&5
+   echo "$as_me:12553: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13065,7 +13061,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 13068 "configure"' > conftest.$ac_ext
+    echo '#line 13064 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -13907,7 +13903,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13910 "configure"
+#line 13906 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14005,7 +14001,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 14008 "configure"
+#line 14004 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14890,11 +14886,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14893: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14889: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14897: \$? = $ac_status" >&5
+   echo "$as_me:14893: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14952,11 +14948,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14955: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14951: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14959: \$? = $ac_status" >&5
+   echo "$as_me:14955: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16314,7 +16310,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 16317 "configure"' > conftest.$ac_ext
+    echo '#line 16313 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -17090,11 +17086,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17093: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17089: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17097: \$? = $ac_status" >&5
+   echo "$as_me:17093: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17352,11 +17348,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17355: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17351: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17359: \$? = $ac_status" >&5
+   echo "$as_me:17355: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17414,11 +17410,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17417: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17413: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17421: \$? = $ac_status" >&5
+   echo "$as_me:17417: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18796,7 +18792,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 18799 "configure"' > conftest.$ac_ext
+    echo '#line 18795 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -19638,7 +19634,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 19641 "configure"
+#line 19637 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19736,7 +19732,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 19739 "configure"
+#line 19735 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -31486,7 +31482,7 @@ else
 sed 's/^/| /' conftest.$ac_ext >&5
 
 	{ echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }; ODBCLIBS="$ODBCLIBS $PTHREADLIBS"
+echo "${ECHO_T}yes" >&6; }; ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIBS"
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
@@ -31557,7 +31553,7 @@ else
 sed 's/^/| /' conftest.$ac_ext >&5
 
 	{ echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }; ODBCLIBS=\"$ODBCLIBS $PTHREADLIBS\"
+echo "${ECHO_T}yes" >&6; }; ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIBS"
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
@@ -31601,7 +31597,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-SQLBindParameter(0,0,0,0,0,0,0,0,0,(SQLLEN *)NULL);
+SQLBindParameter(0,0,0,0,0,0,0,0,0,(SQLLEN *)1);
   ;
   return 0;
 }
@@ -31653,8 +31649,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
-LIBS="$ODBCLIBS $SOCKETLIB"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
+LIBS=""
+LD_LIBRARY_PATH=""
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -31666,10 +31662,20 @@ cat >>conftest.$ac_ext <<_ACEOF
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <stdlib.h>
+
+extern "C" SQLRETURN SQL_API SQLColAttribute(SQLHSTMT statementhandle,
+					SQLUSMALLINT columnnumber,
+					SQLUSMALLINT fieldidentifier,
+					SQLPOINTER characterattribute,
+					SQLSMALLINT bufferlength,
+					SQLSMALLINT *stringlength,
+					SQLLEN *numericattribute) {
+	return 1;
+}
 int
 main ()
 {
-SQLColAttribute(0,0,0,0,0,0,(SQLLEN *)NULL);
+
   ;
   return 0;
 }
@@ -31721,8 +31727,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
-LIBS="$ODBCLIBS $SOCKETLIB"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
+LIBS=""
+LD_LIBRARY_PATH=""
 export LD_LIBRARY_PATH
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -31734,10 +31740,15 @@ cat >>conftest.$ac_ext <<_ACEOF
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <stdlib.h>
+
+extern "C" SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
+					SQLLEN *rowcount) {
+	return 1;
+}
 int
 main ()
 {
-SQLRowCount(0,(SQLLEN *)0);
+
   ;
   return 0;
 }
@@ -35190,7 +35201,6 @@ echo "******************************"
 echo
 echo "***** Zope *******************"
 
-echo "enable zope: $ENABLE_ZOPE"
 if ( test "$ENABLE_ZOPE" = "yes" )
 then
 
@@ -36149,7 +36159,22 @@ echo "******************************"
 
 echo
 echo "***** Erlang *****************"
-if test -n "$ERLC"; then
+
+if ( test "$ENABLE_ERLANG" = "yes" )
+then
+
+	HAVE_ERLANG=""
+	ERLANGINCLUDES=""
+	ERLANGLIBS=""
+
+	if ( test "$cross_compiling" = "yes" )
+	then
+
+				echo "cross compiling..."
+
+	else
+
+		if test -n "$ERLC"; then
     { echo "$as_me:$LINENO: checking for erlc" >&5
 echo $ECHO_N "checking for erlc... $ECHO_C" >&6; }
     { echo "$as_me:$LINENO: result: $ERLC" >&5
@@ -36239,7 +36264,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
   if test "x$ac_pt_ERLC" = x; then
-    ERLC="not found"
+    ERLC=""
   else
     case $cross_compiling:$ac_tool_warned in
 yes:)
@@ -36259,13 +36284,7 @@ fi
 
 fi
 
-if test "$ERLC" = "not found"; then
-    { { echo "$as_me:$LINENO: error: Erlang/OTP compiler (erlc) not found but required" >&5
-echo "$as_me: error: Erlang/OTP compiler (erlc) not found but required" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-if test -n "$ERL"; then
+		if test -n "$ERL"; then
     { echo "$as_me:$LINENO: checking for erl" >&5
 echo $ECHO_N "checking for erl... $ECHO_C" >&6; }
     { echo "$as_me:$LINENO: result: $ERL" >&5
@@ -36355,7 +36374,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
   if test "x$ac_pt_ERL" = x; then
-    ERL="not found"
+    ERL=""
   else
     case $cross_compiling:$ac_tool_warned in
 yes:)
@@ -36374,213 +36393,91 @@ else
 fi
 fi
 
-if test "$ERL" = "not found"; then
-    { { echo "$as_me:$LINENO: error: Erlang/OTP interpreter (erl) not found but required" >&5
-echo "$as_me: error: Erlang/OTP interpreter (erl) not found but required" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-
-
-if ( test "$ENABLE_ERLANG" = "yes" )
-then
-
-	HAVE_ERLANG=""
-	ERLANGINCLUDES=""
-	ERLANGLIBSS=""
-
-	if ( test "$cross_compiling" = "yes" )
-	then
-
-				echo "cross compiling..."
-
-	else
-
-		{ echo "$as_me:$LINENO: checking for Erlang/OTP root directory" >&5
-echo $ECHO_N "checking for Erlang/OTP root directory... $ECHO_C" >&6; }
-if test "${erlang_cv_root_dir+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=erl
-ac_compile='$ERLC $ERLCFLAGS -b beam conftest.$ac_ext >&5'
-ac_link='$ERLC $ERLCFLAGS -b beam conftest.$ac_ext >&5 ; echo "#!/bin/sh" > conftest$ac_exeext ; echo "\"$ERL\" -run conftest start -run init stop -noshell" >> conftest$ac_exeext ; chmod +x conftest$ac_exeext'
-     if test "$cross_compiling" = yes; then
-  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
-See \`config.log' for more details." >&5
-echo "$as_me: error: cannot run test program while cross compiling
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-else
-  cat >conftest.$ac_ext <<_ACEOF
--module(conftest).
--export([start/0]).
-
-start() ->
-            RootDir = code:root_dir(),
-            file:write_file("conftest.out", RootDir),
-            ReturnValue = 0,
-            halt(ReturnValue)
-.
-
-_ACEOF
-rm -f conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  erlang_cv_root_dir=`cat conftest.out`
-else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-( exit $ac_status )
-{ { echo "$as_me:$LINENO: error: test Erlang program execution failed
-See \`config.log' for more details." >&5
-echo "$as_me: error: test Erlang program execution failed
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
-fi
-
-
-     ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-fi
-{ echo "$as_me:$LINENO: result: $erlang_cv_root_dir" >&5
-echo "${ECHO_T}$erlang_cv_root_dir" >&6; }
-ERLANG_ROOT_DIR=$erlang_cv_root_dir
-
-
-		{ echo "$as_me:$LINENO: checking for Erlang/OTP library base directory" >&5
-echo $ECHO_N "checking for Erlang/OTP library base directory... $ECHO_C" >&6; }
-if test "${erlang_cv_lib_dir+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=erl
-ac_compile='$ERLC $ERLCFLAGS -b beam conftest.$ac_ext >&5'
-ac_link='$ERLC $ERLCFLAGS -b beam conftest.$ac_ext >&5 ; echo "#!/bin/sh" > conftest$ac_exeext ; echo "\"$ERL\" -run conftest start -run init stop -noshell" >> conftest$ac_exeext ; chmod +x conftest$ac_exeext'
-     if test "$cross_compiling" = yes; then
-  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
-See \`config.log' for more details." >&5
-echo "$as_me: error: cannot run test program while cross compiling
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-else
-  cat >conftest.$ac_ext <<_ACEOF
--module(conftest).
--export([start/0]).
-
-start() ->
-            LibDir = code:lib_dir(),
-            file:write_file("conftest.out", LibDir),
-            ReturnValue = 0,
-            halt(ReturnValue)
-.
-
-_ACEOF
-rm -f conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  erlang_cv_lib_dir=`cat conftest.out`
-else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-( exit $ac_status )
-{ { echo "$as_me:$LINENO: error: test Erlang program execution failed
-See \`config.log' for more details." >&5
-echo "$as_me: error: test Erlang program execution failed
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
-fi
-
-
-     ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-fi
-{ echo "$as_me:$LINENO: result: $erlang_cv_lib_dir" >&5
-echo "${ECHO_T}$erlang_cv_lib_dir" >&6; }
-ERLANG_LIB_DIR=$erlang_cv_lib_dir
-
-
-		{ echo "$as_me:$LINENO: checking for Erlang/OTP library installation base directory" >&5
-echo $ECHO_N "checking for Erlang/OTP library installation base directory... $ECHO_C" >&6; }
-
-if test -n "$ERLANG_INSTALL_LIB_DIR"; then
-    { echo "$as_me:$LINENO: result: $ERLANG_INSTALL_LIB_DIR" >&5
-echo "${ECHO_T}$ERLANG_INSTALL_LIB_DIR" >&6; }
-else
-    ERLANG_INSTALL_LIB_DIR='${libdir}/erlang/lib'
-
-    { echo "$as_me:$LINENO: result: $libdir/erlang/lib" >&5
-echo "${ECHO_T}$libdir/erlang/lib" >&6; }
-fi
-
-
-		ERLANG_INCLUDE_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/include`
-		ERLANG_LIB_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/lib`
-
-
-		if ( test -n "$ERLANG_INCLUDE_DIR" -a -n "$ERLANG_LIB_DIR" )
+		if ( test -n "$ERLC" -a -n "$ERL" )
 		then
 
-			if ( test "$ERLANG_INCLUDE_DIR" != "/usr" )
+						if ( test -z "$ERLANG_ROOT_DIR" )
 			then
-				ERLANGINCLUDES="-I$ERLANG_INCLUDE_DIR"
+				rm -f conftest.erl
+				cat > conftest.erl << END
+-module(conftest).
+-export([start/0]).
+start() ->
+	RootDir = code:root_dir(),
+	file:write_file("conftest.out", RootDir),
+	ReturnValue = 0,
+	halt(ReturnValue)
+.
+END
+				cat > conftest << END
+#!/bin/sh
+$ERLC $ERLCFLAGS -b beam conftest.erl
+$ERL -run conftest start -run init stop -noshell
+END
+				chmod 755 conftest
+				./conftest
+				ERLANG_ROOT_DIR=`cat conftest.out`
+				rm -f conftest.out
+				rm -f conftest.erl
+				rm -f conftest.beam
 			fi
 
-			if ( test "$ERLANG_LIB_DIR" != "/usr" )
+						if ( test -z "$ERLANG_LIB_DIR" )
 			then
-				ERLANGLIBS="-L$ERLANG_LIB_DIR"
+				rm -f conftest.erl
+				cat > conftest.erl << END
+-module(conftest).
+-export([start/0]).
+start() ->
+	LibDir = code:lib_dir(),
+	file:write_file("conftest.out", LibDir),
+	ReturnValue = 0,
+	halt(ReturnValue)
+.
+END
+				cat > conftest << END
+#!/bin/sh
+$ERLC $ERLCFLAGS -b beam conftest.erl
+$ERL -run conftest start -run init stop -noshell
+END
+				chmod 755 conftest
+				./conftest
+				ERLANG_LIB_DIR=`cat conftest.out`
+				rm -f conftest.out
+				rm -f conftest.erl
+				rm -f conftest.beam
 			fi
-			ERLANGLIBS="$ERLANGLIBS -lerl_interface -lei"
 
-			HAVE_ERLANG="yes"
+			if ( test -z "$ERLANG_INSTALL_LIB_DIR" )
+			then
+				ERLANG_INSTALL_LIB_DIR='%{libdir}/erlang/lib'
+			fi
+
+
+
+			ERLANG_INCLUDE_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/include 2> /dev/null`
+			ERLANG_LIB_DIR=`ls -d $ERLANG_LIB_DIR/erl_interface*/lib 2> /dev/null`
+
+
+			if ( test -n "$ERLANG_INCLUDE_DIR" -a -n "$ERLANG_LIB_DIR" )
+			then
+
+				if ( test "$ERLANG_INCLUDE_DIR" != "/usr" )
+				then
+					ERLANGINCLUDES="-I$ERLANG_INCLUDE_DIR"
+				fi
+
+				if ( test "$ERLANG_LIB_DIR" != "/usr" )
+				then
+					ERLANGLIBS="-L$ERLANG_LIB_DIR"
+				fi
+				ERLANGLIBS="$ERLANGLIBS -lerl_interface -lei"
+
+				HAVE_ERLANG="yes"
+			else
+				{ echo "$as_me:$LINENO: WARNING: The Erlang API will not be built." >&5
+echo "$as_me: WARNING: The Erlang API will not be built." >&2;}
+			fi
 		else
 			{ echo "$as_me:$LINENO: WARNING: The Erlang API will not be built." >&5
 echo "$as_me: WARNING: The Erlang API will not be built." >&2;}
@@ -40468,12 +40365,12 @@ PHPPEARDBDIR!$PHPPEARDBDIR$ac_delim
 ERLC!$ERLC$ac_delim
 ERLCFLAGS!$ERLCFLAGS$ac_delim
 ERL!$ERL$ac_delim
-ERLANG_ROOT_DIR!$ERLANG_ROOT_DIR$ac_delim
-ERLANG_LIB_DIR!$ERLANG_LIB_DIR$ac_delim
-ERLANG_INSTALL_LIB_DIR!$ERLANG_INSTALL_LIB_DIR$ac_delim
 HAVE_ERLANG!$HAVE_ERLANG$ac_delim
 ERLANGINCLUDES!$ERLANGINCLUDES$ac_delim
 ERLANGLIBS!$ERLANGLIBS$ac_delim
+ERLANG_ROOT_DIR!$ERLANG_ROOT_DIR$ac_delim
+ERLANG_LIB_DIR!$ERLANG_LIB_DIR$ac_delim
+ERLANG_INSTALL_LIB_DIR!$ERLANG_INSTALL_LIB_DIR$ac_delim
 RPM_BUILD_DIR!$RPM_BUILD_DIR$ac_delim
 SQLR_VERSION!$SQLR_VERSION$ac_delim
 SONAME_VERSION_INFO!$SONAME_VERSION_INFO$ac_delim
