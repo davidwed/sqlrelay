@@ -2252,6 +2252,62 @@ then
 				break
 			fi
 		done
+
+		if ( test -n "$HAVE_RUBY" )
+		then
+			AC_MSG_CHECKING(for ruby.h)
+			rm -f conftest.rb
+			cat > conftest.rb << END
+require "mkmf"
+drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/
+print "\n"
+print "arch = "
+print CONFIG@<:@"arch"@:>@
+print "\n"
+print "ruby_version = "
+print Config::CONFIG@<:@"ruby_version"@:>@
+print "\n"
+print "prefix = "
+print CONFIG@<:@"prefix"@:>@.sub(drive, "")
+print "\n"
+print "exec_prefix = "
+print CONFIG@<:@"exec_prefix"@:>@.sub(drive, "")
+print "\n"
+print "libdir = "
+print \$libdir.sub(drive, "")
+print "\n"
+print "rubylibdir = "
+print \$rubylibdir.sub(drive, "")
+print "\n"
+print "topdir = "
+print \$topdir
+print "\n"
+print "hdrdir = "
+print \$hdrdir
+print "\n\n"
+print "all:\n"
+print "	echo \$(hdrdir)\n"
+END
+
+			HAVE_RUBY_H=""
+			for dir in `eval $RUBY conftest.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | gmake -s -f - | grep -v Entering | grep -v Leaving`
+			do
+				if ( test -r "$dir/ruby.h" )
+				then
+					HAVE_RUBY_H="yes"
+				fi
+			done
+			rm -f conftest.rb
+
+			dnl if we didn't have ruby.h then we don't have ruby
+			if ( test -z "$HAVE_RUBY_H" )
+			then
+				AC_MSG_RESULT(no)
+				HAVE_RUBY=""
+			else
+				AC_MSG_RESULT(yes)
+			fi
+		fi
 	fi
 
 	if ( test -z "$HAVE_RUBY" )

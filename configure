@@ -35392,6 +35392,64 @@ fi
 				break
 			fi
 		done
+
+		if ( test -n "$HAVE_RUBY" )
+		then
+			{ echo "$as_me:$LINENO: checking for ruby.h" >&5
+echo $ECHO_N "checking for ruby.h... $ECHO_C" >&6; }
+			rm -f conftest.rb
+			cat > conftest.rb << END
+require "mkmf"
+drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/
+print "\n"
+print "arch = "
+print CONFIG["arch"]
+print "\n"
+print "ruby_version = "
+print Config::CONFIG["ruby_version"]
+print "\n"
+print "prefix = "
+print CONFIG["prefix"].sub(drive, "")
+print "\n"
+print "exec_prefix = "
+print CONFIG["exec_prefix"].sub(drive, "")
+print "\n"
+print "libdir = "
+print \$libdir.sub(drive, "")
+print "\n"
+print "rubylibdir = "
+print \$rubylibdir.sub(drive, "")
+print "\n"
+print "topdir = "
+print \$topdir
+print "\n"
+print "hdrdir = "
+print \$hdrdir
+print "\n\n"
+print "all:\n"
+print "	echo \$(hdrdir)\n"
+END
+
+			HAVE_RUBY_H=""
+			for dir in `eval $RUBY conftest.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | gmake -s -f - | grep -v Entering | grep -v Leaving`
+			do
+				if ( test -r "$dir/ruby.h" )
+				then
+					HAVE_RUBY_H="yes"
+				fi
+			done
+			rm -f conftest.rb
+
+						if ( test -z "$HAVE_RUBY_H" )
+			then
+				{ echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+				HAVE_RUBY=""
+			else
+				{ echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+			fi
+		fi
 	fi
 
 	if ( test -z "$HAVE_RUBY" )
@@ -39388,7 +39446,7 @@ RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
 
 
 
-SQLR_VERSION="0.40"
+SQLR_VERSION="0.41"
 
 
 cat >>confdefs.h <<_ACEOF

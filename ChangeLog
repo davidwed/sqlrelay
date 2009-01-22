@@ -1,3 +1,5 @@
+0.41 - added configure test for ruby.h
+
 0.40 - fixed readline detection in configure script
 	fixed an uninitialized variable in sqlr-import
 	changed clientSession() to call endSessionCommand()
