@@ -235,6 +235,7 @@ unsigned long mysql_get_server_version(MYSQL *mysql);
 my_bool	mysql_change_user(MYSQL *mysql, const char *user,
 				const char *password, const char *db);
 const char *mysql_character_set_name(MYSQL *mysql);
+int mysql_set_character_set(MYSQL *mysql, const char *csname);
 void mysql_debug(const char *debug);
 int mysql_dump_debug_info(MYSQL *mysql);
 int mysql_create_db(MYSQL *mysql, const char *db);
@@ -319,6 +320,10 @@ const char *mysql_stmt_sqlstate(MYSQL_STMT *stmt);
 int mysql_stmt_store_result(MYSQL_STMT *stmt);
 my_bool mysql_stmt_free_result(MYSQL_STMT *stmt);
 my_bool mysql_stmt_reset(MYSQL_STMT *stmt);
+void mysql_server_init(int argc, char **argv, char **groups);
+void mysql_library_init(int argc, char **argv, char **groups);
+void mysql_server_end();
+void mysql_library_end();
 
 static int unknownError(MYSQL *mysql);
 
@@ -572,6 +577,12 @@ my_bool	mysql_change_user(MYSQL *mysql, const char *user,
 const char *mysql_character_set_name(MYSQL *mysql) {
 	debugFunction();
 	return "latin1";
+}
+
+int mysql_set_character_set(MYSQL *mysql, const char *csname) {
+	debugFunction();
+	// FIXME: implement this somehow
+	return 0;
 }
 
 
@@ -1667,6 +1678,26 @@ my_bool mysql_stmt_reset(MYSQL_STMT *stmt) {
 	debugFunction();
 	stmt->result->sqlrcur->clearBinds();
 	return true;
+}
+
+void mysql_server_init(int argc, char **argv, char **groups) {
+	debugFunction();
+	return mysql_library_init(argc,argv,groups);
+}
+
+void mysql_library_init(int argc, char **argv, char **groups) {
+	debugFunction();
+	// FIXME: do something?
+}
+
+void mysql_server_end() {
+	debugFunction();
+	return mysql_library_end();
+}
+
+void mysql_library_end() {
+	debugFunction();
+	// FIXME: do something?
 }
 
 int unknownError(MYSQL *mysql) {

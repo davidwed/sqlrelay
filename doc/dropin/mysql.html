@@ -12,6 +12,7 @@
 <li><a href="#commandline">Using the drop-in replacement library with command-line programs</a></li>
 <li><a href="#daemons">Using the drop-in replacement library with daemons</a></li>
 <li><a href="#inetd">Using the drop-in replacement library with inetd/xinetd helper programs</a></li>
+<li><a href="#php">Using the drop-in replacement library with PHP</a></li>
 <li><a href="#modules">Using the drop-in replacement library with modules</a></li>
 <li><a href="#work">Function support</a></li>
 </ul>
@@ -181,13 +182,8 @@ simlar to using it on the command line.  You just need to add the LD_PRELOAD
 command to the startup script for the daemon before the command that starts the
 daemon itself.</p>
 
-<p>Unfortunately this approach does not work with PHP.  If you want to use the
-drop-in replacement library for Postgresql with PHP, you can just add the
-LD_PRELOAD command to the startup script for the http daemon, but PHP is
-not linked against the MySQL client library, rather the PHP source code
-includes it's own MySQL client API which is compiled directly into the PHP
-module itself.  As far as I know, there is no way to force a PHP program
-which uses the MySQL API to use SQL Relay without rewriting it.</p>
+<p>Unfortunately this approach does not work with PHP.  See the section below
+for how to use the drop-in replacement library with PHP.</p>
 
 <br>
 <a name="inetd"></a>
@@ -257,6 +253,87 @@ service pop3
 	server		= /usr/local/bin/pop3d-sqlrelay
 }
 </pre></blockquote>
+
+<br>
+<a name="php"></a>
+<span class="heading2">Using the drop-in replacement library with PHP</span><br>
+
+<p>Ideally, if you wanted to use the drop-in replacement library for MySQL with
+PHP, you'd just add the LD_PRELOAD command to the startup script for the http
+daemon, but PHP is not typically linked against the MySQL client library,
+rather the PHP source code includes it's own MySQL client API which is compiled
+directly into the PHP module itself.</p>
+
+<p>So, to use the drop-in replacement library with PHP, you must rebuild PHP
+and tell it to link against the MySQL client library.</p>
+
+<p>Follow the instructions at <a href="http://www.php.net/manual/en/install.php">PHP: Installation and Configuration</a> for downloading and extracting the
+PHP source code.  When running the <i>./configure,</i> script, in addition to
+whatever other options you use, make sure to use the following option:</p>
+
+<blockquote><b>
+--with-mysql=shared
+</b></blockquote>
+
+<p>If you want to use the improved MySQL API, use:</p>
+
+<blockquote><b>
+--with-mysqli=shared
+</b></blockquote>
+
+<p>as well.  If your mysql_config program is located somewhere other than
+/usr/bin, then you will need to specify it's path as well.  For instance, if
+it's installed in /usr/local/bin, then you may use the following options:</p>
+
+<blockquote><b>
+--with-mysql=shared,/usr/local/bin/mysql_config --with-mysqli=shared,/usr/local/bin/mysql_config
+</b></blockquote>
+
+<p>After the configure script has run, you must edit the Makefile by
+hand and replace all references to libmysqlclient with references to one of
+the drop-in replacement libraries.  For instance, if libmysqlclient.so is found
+in /usr/lib/mysql on your system, and you want to use the drop-in replacement
+library for MySQL version 5.0 then you'll need to make the following
+replacements:</p>
+
+<ul>
+<li>replace <b>-Wl,-rpath,/usr/lib/mysql</b> with <b>-Wl,-rpath,/usr/local/firstworks/lib</b></li>
+<li>replace <b>-L/usr/lib/mysql</b> with <b>-L/usr/local/firstworks/lib</b></li>
+<li>replace <b>-lmysqlclient</b> with <b>-lmysql50sqlrelay</b></li>
+</ul>
+
+<p>Afterward you may continue to build and install PHP according to the
+instructions.</p>
+
+<p>Afterward, you should edit the <b>php.ini</b> file and configure it to load
+the <b>mysql.so</b> module automatically.  When MySQL was compiled into PHP, 
+the MySQL API calls could be made without loading the module, but now that it
+is not compiled into PHP, the module must be loaded manually.  Adding the
+command to load it automatically in the <b>php.ini</b> file will prevent you
+from having to go and add <b>dl("mysql.so");</b> to all of your programs.  To
+automatically load the MySQL module, add a line like the following to 
+<b>php.ini</b>.</p>
+
+<blockquote><b>
+extension=mysql.so
+</b></blockquote>
+
+<p>A common thing to forget when configuring <b>php.ini</b> is to set the
+<b>extension_dir</b> parameter.  By default it's usually set to "./" which is
+wrong.  If you installed PHP into /usr/local, then the extension directory will
+be something like /usr/local/lib/php/extensions/no-debug-non-zts-20060613.  On
+your platform, it may be something else, but similar.  Whatever the directory
+name, it should contain the file <b>mysql.so</b>.  Edit <b>php.ini</b>,
+search for the <b>extension_dir</b> parameter and set it to your extension
+directory.  For example:</p>
+
+<blockquote><b>
+extension_dir=/usr/local/lib/php/extensions/no-debug-non-zts-20060613
+</b></blockquote>
+
+<p>After following these steps, your PHP apps which formerly used MySQL directly
+will now use SQL Relay.  You will need to change the connection parameters, to
+point to SQL Relay , but otherwise it should work.</p>
 
 <br>
 <a name="modules"></a>
@@ -337,6 +414,7 @@ MySQL.</p>
 <tr><td>mysql_get_server_version</td><td>returns the version number of the client that the libary emulates</td></tr>
 <tr><td>mysql_change_user</td><td>yes</td></tr>
 <tr><td>mysql_character_set_name</td><td>always returns latin1</td></tr>
+<tr><td>mysql_set_character_set</td><td>does nothing, returns success</td></tr>
 <tr><td>mysql_debug</td><td>does nothing</td></tr>
 <tr><td>mysql_dump_debug_info</td><td>always returns failure</td></tr>
 <tr><td>mysql_create_db</td><td>always returns failure</td></tr>
@@ -404,6 +482,10 @@ MySQL.</p>
 <tr><td>mysql_stmt_store_result</td><td>yes</td></tr>
 <tr><td>mysql_stmt_free_result</td><td>yes</td></tr>
 <tr><td>mysql_stmt_reset</td><td>yes</td></tr>
+<tr><td>mysql_server_init</td><td>does nothing</td></tr>
+<tr><td>mysql_library_init</td><td>does nothing</td></tr>
+<tr><td>mysql_server_end</td><td>does nothing</td></tr>
+<tr><td>mysql_library_end</td><td>does nothing</td></tr>
 </table>
 
 <p>The native MySQL client API also defines several data structures.
