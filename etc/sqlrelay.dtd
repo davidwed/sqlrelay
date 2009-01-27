@@ -27,6 +27,8 @@
 	<!ATTLIST instance maxlisteners CDATA "-1">
 	<!ATTLIST instance listenertimeout CDATA "0">
 	<!ATTLIST instance reloginatstart (yes|no) "no">
+	<!ATTLIST instance timequeriessec CDATA "-1">
+	<!ATTLIST instance timequeriesusec CDATA "-1">
 
 <!ELEMENT users (user*)>
 <!ELEMENT user EMPTY>

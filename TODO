@@ -1,3 +1,5 @@
+PHP with postgresql drop-in needs lots of functions
+
 1.0:
 
 Bugs:
@@ -77,7 +79,6 @@ Tests:
 
 Documentation:
 	* db2 on fc9
-	* timequeries parameter
 	* how to use new features of Tony/Erik's perl dbi patch
 	* getting started with odbc
 	* "how sqlrelay works" with diagrams and animations
