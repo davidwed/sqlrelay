@@ -2,6 +2,7 @@
 	added a couple of new functions to the mysql drop-in library
 	updated mysql drop-in lib docs explaining how to use with PHP
 	added documentation for timequeries params
+	if SQLConnectW isn't supported, ODBC driver uses non-unicode calls
 
 0.40 - fixed readline detection in configure script
 	fixed an uninitialized variable in sqlr-import

@@ -14,8 +14,6 @@ Bugs:
         		}
         		$result->free();
 	* connection daemons have some issue with detaching (I think)
-	* some versions of unixodbc don't support SQLConnectW or SQLPrepareW,
-			use non-unicode for them
 	* just because sqlrelay is compiled against unixodbc which supports
 		odbc 3.0 api, individual drivers may not support the 3.0 api,
 		so sqlrelay needs to detect this or it needs to at least be

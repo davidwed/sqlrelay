@@ -1672,7 +1672,7 @@ extern "C" SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLBindCol(0,0,0,0,0,(SQLLEN *)0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLBINDCOL_SQLLEN,1,Some systems use SQLLEN * in SQLBindCol)],[AC_MSG_RESULT(no)])
 		
-		dnl for now, if SQLConnectW isn't defined, disable ODBC
+		dnl is SQLConnectW supported?
 		AC_MSG_CHECKING(for SQLConnectW)
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>

@@ -11,45 +11,12 @@
 #include <stdlib.h>
 
 
-
-//orbb
+#ifdef HAVE_SQLCONNECTW
 #include <iconv.h>
 #include <wchar.h>
 
 #define USER_CODING "UTF8"
 
-int ucslen(char* str);
-char *conv_to_user_coding(char *inbuf);
-
-/*void to_log(char *msg)
-{
-	FILE *f;
-	f=fopen("/var/log/SQLRelay/log","a");
-	if(f)
-	{
-		fprintf(f,"%s\n",msg);
-		fclose(f);
-	}
-}
-
-void to_wlog(char *msg)
-{
-	FILE *f;
-	f=fopen("/var/log/SQLRelay/log","a");
-	if(f)
-	{
-		char *str_u=conv_to_user_coding(msg);
-		fprintf(f,"%s\n",str_u);
-		free(str_u);
-		//int l=ucslen(msg);
-		//fwrite(msg,2,l,f);
-		//fprintf(f,"\n");
-		fclose(f);
-	}
-}*/
-//orbb
-
-//orbb
 char *buffers[200];
 int nextbuf=0;
 
@@ -182,7 +149,7 @@ char *conv_to_ucs(char *inbuf)
 
 	return outbuf;
 }
-//orbb
+#endif
 
 
 
@@ -245,21 +212,13 @@ bool odbcconnection::logIn(bool printerrors) {
 #endif
 
 	// connect to the database
-//	erg=SQLConnect(dbc,(SQLCHAR *)dsn,SQL_NTS,
-//				(SQLCHAR *)getUser(),SQL_NTS,
-//				(SQLCHAR *)getPassword(),SQL_NTS);
-	
-	
-//orbb
-	//orbb
 	char *user_asc=(char*)getUser();
 	char *password_asc=(char*)getPassword();
 	char *dsn_asc=(char*)dsn;
+#ifdef HAVE_SQLCONNECTW
 	char *user_ucs=(char*)conv_to_ucs(user_asc);
 	char *password_ucs=(char*)conv_to_ucs(password_asc);
 	char *dsn_ucs=(char*)conv_to_ucs(dsn_asc);
-	
-	
 	erg=SQLConnectW(dbc,(SQLWCHAR *)dsn_ucs,SQL_NTS,
 				(SQLWCHAR *)user_ucs,SQL_NTS,
 				(SQLWCHAR *)password_ucs,SQL_NTS);
@@ -267,7 +226,11 @@ bool odbcconnection::logIn(bool printerrors) {
 	if(user_ucs)free(user_ucs);
 	if(password_ucs)free(password_ucs);
 	if(dsn_ucs)free(dsn_ucs);
-//orbb	
+#else
+	erg=SQLConnect(dbc,(SQLCHAR *)dsn_asc,SQL_NTS,
+				(SQLCHAR *)user_asc,SQL_NTS,
+				(SQLCHAR *)password_asc,SQL_NTS);
+#endif
 	
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 #if (ODBCVER >= 0x0300)
@@ -385,24 +348,19 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 #endif*/
 
 	// prepare the query
-//	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
-	
-	
-//orbb
+#ifdef HAVE_SQLCONNECTW
 	//free allocated buffers
 	while(nextbuf>0)
 	{
 		nextbuf--;
 		if(buffers[nextbuf])free(buffers[nextbuf]);
 	}
-	
 	char *query_ucs=conv_to_ucs((char*)query);
-	
 	erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-	
 	if(query_ucs)free(query_ucs);
-//orbb
-	
+#else
+	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
+#endif
 	
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -417,22 +375,30 @@ bool odbccursor::inputBindString(const char *variable,
 					uint32_t valuesize,
 					short *isnull) {
 
-		//orbb
-		char *value_ucs=conv_to_ucs((char*)value);
-		valuesize=ucslen(value_ucs)*2;
-		buffers[nextbuf]=value_ucs;
-		nextbuf++;
-		//orbb
+	#ifdef HAVE_SQLCONNECTW
+	char *value_ucs=conv_to_ucs((char*)value);
+	valuesize=ucslen(value_ucs)*2;
+	buffers[nextbuf]=value_ucs;
+	nextbuf++;
+	#endif
 						
 	if (*isnull==SQL_NULL_DATA) {
 		erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
-				SQL_C_WCHAR,//orbb
+				#ifdef HAVE_SQLCONNECTW
+				SQL_C_WCHAR,
+				#else
+				SQL_C_CHAR,
+				#endif
 				SQL_CHAR,
 				0,
 				0,
-				(SQLPOINTER)value_ucs, //orbb
+				#ifdef HAVE_SQLCONNECTW
+				(SQLPOINTER)value_ucs,
+				#else
+				(SQLPOINTER)value,
+				#endif
 				valuesize,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)isnull
@@ -444,11 +410,19 @@ bool odbccursor::inputBindString(const char *variable,
 		erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
-				SQL_C_WCHAR,//orbb
+				#ifdef HAVE_SQLCONNECTW
+				SQL_C_WCHAR,
+				#else
+				SQL_C_CHAR,
+				#endif
 				SQL_CHAR,
 				0,
 				0,
-				(SQLPOINTER)value_ucs,  //orbb
+				#ifdef HAVE_SQLCONNECTW
+				(SQLPOINTER)value_ucs,
+				#else
+				(SQLPOINTER)value,
+				#endif
 				valuesize,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)NULL
@@ -860,33 +834,19 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 
 
 		// bind the column to a buffer
-//		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-//				field[i],MAX_ITEM_BUFFER_SIZE,
-//				#ifdef SQLBINDCOL_SQLLEN
-//				(SQLLEN *)&indicator[i]
-//				#else
-//				(SQLINTEGER *)&indicator[i]
-//				#endif
-//				);
-		
-		
-		//orbb
+#ifdef HAVE_SQLCONNECTW
 		if(col[i].type==-9 || col[i].type==-8)
 		{
-			//bind varchar and char fields as wchar
+			// bind varchar and char fields as wchar
 			// bind the column to a buffer
-//			erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
-//					field[i],MAX_ITEM_BUFFER_SIZE,
-//					(SQLINTEGER *)&indicator[i]);
-
-		erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
-				field[i],MAX_ITEM_BUFFER_SIZE,
-				#ifdef SQLBINDCOL_SQLLEN
-				(SQLLEN *)&indicator[i]
-				#else
-				(SQLINTEGER *)&indicator[i]
-				#endif
-				);
+			erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
+					field[i],MAX_ITEM_BUFFER_SIZE,
+					#ifdef SQLBINDCOL_SQLLEN
+					(SQLLEN *)&indicator[i]
+					#else
+					(SQLINTEGER *)&indicator[i]
+					#endif
+					);
 
 		}
 		else
@@ -894,9 +854,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 			// bind the column to a buffer
 			if(col[i].type==93 || col[i].type==91)
 			{
-//				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
-//						field[i],MAX_ITEM_BUFFER_SIZE,
-//						(SQLINTEGER *)&indicator[i]);
 				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
 						field[i],MAX_ITEM_BUFFER_SIZE,
 						#ifdef SQLBINDCOL_SQLLEN
@@ -908,9 +865,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 			}
 			else
 			{
-//				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-//									field[i],MAX_ITEM_BUFFER_SIZE,
-//									(SQLINTEGER *)&indicator[i]);
 				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 						field[i],MAX_ITEM_BUFFER_SIZE,
 						#ifdef SQLBINDCOL_SQLLEN
@@ -923,9 +877,16 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 			}
 
 		}
-		//orbb
-		
-		
+#else
+		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
+				field[i],MAX_ITEM_BUFFER_SIZE,
+				#ifdef SQLBINDCOL_SQLLEN
+				(SQLLEN *)&indicator[i]
+				#else
+				(SQLINTEGER *)&indicator[i]
+				#endif
+				);
+#endif
 		
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
@@ -1103,7 +1064,7 @@ bool odbccursor::fetchRow() {
 		return false;
 	}
 	
-	//orbb
+#ifdef HAVE_SQLCONNECTW
 	//convert char and varchar data to user coding from ucs-2
 	for (int i=0; i<ncols; i++)
 	{
@@ -1122,7 +1083,7 @@ bool odbccursor::fetchRow() {
 			}
 		}
 	}
-	//orbb
+#endif
 
 	return true;
 //#endif
