@@ -29,6 +29,7 @@ typedef enum {
 	MAXQUEUELENGTH_ATTRIBUTE,
 	GROWBY_ATTRIBUTE,
 	TTL_ATTRIBUTE,
+	MAXSESSIONCOUNT_ATTRIBUTE,
 	ENDOFSESSION_ATTRIBUTE,
 	SESSIONTIMEOUT_ATTRIBUTE,
 	RUNASUSER_ATTRIBUTE,
@@ -164,6 +165,7 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t	getMaxQueueLength();
 		uint32_t	getGrowBy();
 		uint32_t	getTtl();
+		uint16_t	getMaxSessionCount();
 		bool		getDynamicScaling();
 		const char	*getEndOfSession();
 		bool		getEndOfSessionCommit();
@@ -239,6 +241,7 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t	maxqueuelength;
 		uint32_t	growby;
 		uint32_t	ttl;
+		uint16_t	maxsessioncount;
 		const char	*endofsession;
 		bool		endofsessioncommit;
 		uint32_t	sessiontimeout;

@@ -10,6 +10,7 @@
 	<!ATTLIST instance maxqueuelength CDATA "0">
 	<!ATTLIST instance growby CDATA "1">
 	<!ATTLIST instance ttl CDATA "60">
+	<!ATTLIST instance maxsessioncount CDATA "10">
 	<!ATTLIST instance endofsession (commit|rollback) "commit">
 	<!ATTLIST instance sessiontimeout CDATA "60">
 	<!ATTLIST instance runasuser CDATA "nobody">

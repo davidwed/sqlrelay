@@ -6,6 +6,8 @@
 
 void sqlrconnection_svr::listen() {
 
+	uint16_t	sessioncount=0;
+
 	for (;;) {
 
 		waitForAvailableDatabase();
@@ -57,6 +59,21 @@ void sqlrconnection_svr::listen() {
 
 		if (cfgfl->getDynamicScaling()) {
 			decrementSessionCount();
+		}
+
+		// If this connection was forked off by dynamic scaling then
+		// it should die off after handling a set number of client
+		// sessions.  If we don't do this, a spike in incoming clients
+		// could cause the number of connections to grow and then
+		// never drop back down even though the traffic could be handled
+		// by fewer connections.  Tuning the ttl precisely could
+		// potentially resolve this, but that proves very difficult.
+		if (cfgfl->getDynamicScaling() && ttl &&
+				cfgfl->getMaxSessionCount()) {
+			sessioncount++;
+			if (sessioncount==cfgfl->getMaxSessionCount()) {
+				return;
+			}
 		}
 	}
 }

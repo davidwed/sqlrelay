@@ -24,6 +24,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	maxqueuelength=charstring::toInteger(DEFAULT_MAXQUEUELENGTH);
 	growby=charstring::toInteger(DEFAULT_GROWBY);
 	ttl=charstring::toInteger(DEFAULT_TTL);
+	maxsessioncount=charstring::toInteger(DEFAULT_MAXSESSIONCOUNT);
 	endofsession=charstring::duplicate(DEFAULT_ENDOFSESSION);
 	endofsessioncommit=!charstring::compare(endofsession,"commit");
 	sessiontimeout=charstring::toUnsignedInteger(DEFAULT_SESSIONTIMEOUT);
@@ -156,6 +157,10 @@ uint32_t sqlrconfigfile::getGrowBy() {
 
 uint32_t sqlrconfigfile::getTtl() {
 	return ttl;
+}
+
+uint16_t sqlrconfigfile::getMaxSessionCount() {
+	return maxsessioncount;
 }
 
 bool sqlrconfigfile::getDynamicScaling() {
@@ -414,6 +419,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=GROWBY_ATTRIBUTE;
 	} else if (!charstring::compare(name,"ttl")) {
 		currentattribute=TTL_ATTRIBUTE;
+	} else if (!charstring::compare(name,"maxsessioncount")) {
+		currentattribute=MAXSESSIONCOUNT_ATTRIBUTE;
 	} else if (!charstring::compare(name,"endofsession")) {
 		currentattribute=ENDOFSESSION_ATTRIBUTE;
 	} else if (!charstring::compare(name,"sessiontimeout")) {
@@ -546,6 +553,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			growby=atouint32_t(value,DEFAULT_GROWBY,1);
 		} else if (currentattribute==TTL_ATTRIBUTE) {
 			ttl=atouint32_t(value,DEFAULT_TTL,1);
+		} else if (currentattribute==MAXSESSIONCOUNT_ATTRIBUTE) {
+			maxsessioncount=
+				atouint32_t(value,DEFAULT_MAXSESSIONCOUNT,0);
 		} else if (currentattribute==ENDOFSESSION_ATTRIBUTE) {
 			delete[] endofsession;
 			endofsession=charstring::duplicate((value)?value:

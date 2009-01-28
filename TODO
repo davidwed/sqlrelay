@@ -63,12 +63,6 @@ Bugs:
 		and causes deadlocks in the sqlr-listeners.  If we get an
 		ENOSPC, then we need to send the client an error and the
 		sqlr-listener needs to exit.
-	* Need to find a way to make connections bleed off.
-		If connections=100 and maxconnections=200 and there are
-		consistently 150 clients, then the # of connections needs to
-		bleed back down to 150 eventually.  Currently, if a spike
-		causes it to jump up to 200, then almost all 200 will end up
-		staying alive.
 	* Need to find a way to re-distribute connections.
 		If 2 db's go down and 2nd comes back up first, all log into 2nd
 		db and never log out and back into first

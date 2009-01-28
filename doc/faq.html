@@ -93,6 +93,7 @@ work?</a></li>
 <li><a href="#gui">Where'd the configuration GUI go?</a></li>
 <li><a href="#socketonly">How can I get SQL Relay to only listen on the unix socket and not the inet port?</a></li>
 <li><a href="#timequeries">How can I get SQL Relay to log queries?</a></li>
+<li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's up with that?</a></li>
 </ol>
 
 
@@ -1347,6 +1348,15 @@ parameters, though they were not documented until version 0.41.  They can be
 used to log queries which take longer than <b>timequeriessec</b> seconds and
 <b>timequeriesusec</b> milliseconds to complete.  See
 <a href="configuring.html">Configuring SQL Relay</a> for more information.</p>
+
+<a name="dynamicscaling"></a>
+<span class="heading3">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's up with that?</span><br><br>
+
+<p>This can happen if a spike of client traffic comes in.  If configured to do so, SQL Relay will fork off more connection daemons to handle the traffic.  Later when the traffic dies down, the connections that were forked off will still end up handling clients.  Each connection daemon will experience longer idle periods than before the spike, but unless those idle periods are shorter than the <i>ttl</i> parameter, the connections will not die off.  Setting the <i>ttl</i> shorter should take care of this, but it may take a lot of fine tuning to find the correct <i>ttl</i>.</p>
+
+<p>As of version 0.41, SQL Relay supports a new parameter: <i>maxsessioncount</i>.  If it is set greater than 0, then connections that were forked off will only handle that many client sessions before dying off, even if it doesn't go idle.  Using this new parameter will ensure that all forked-off connections will eventually die off.  Like the <i>ttl</i>, this parameter still requires some
+tuning but setting it too low will result in poorer performance rather than
+additional resource consumption.</p>
 
 </body>
 </html>

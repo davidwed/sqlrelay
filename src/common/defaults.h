@@ -35,6 +35,10 @@
 	// default time to live for idle connections
 	// that were fired off to handle increased load
 
+#define DEFAULT_MAXSESSIONCOUNT "10"
+	// default max client sessions for connections
+	// that were fired off to handle increased load
+
 #define DEFAULT_SESSIONTIMEOUT "60"
 	// default session timeout
 
