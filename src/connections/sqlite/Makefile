@@ -26,7 +26,7 @@ DLOBJS= sqliteconnection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-sqlite
+all: sqlr-connection-sqlite$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sqlite$(EXE)
@@ -36,7 +36,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-sqlite: $(SRCS) $(LOBJS)
+sqlr-connection-sqlite$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(SQLITESTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

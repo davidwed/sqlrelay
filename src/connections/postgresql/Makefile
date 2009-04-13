@@ -26,7 +26,7 @@ DLOBJS= postgresqlconnection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-postgresql
+all: sqlr-connection-postgresql$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-postgresql$(EXE)
@@ -36,7 +36,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-postgresql: $(SRCS) $(LOBJS)
+sqlr-connection-postgresql$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(POSTGRESQLSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

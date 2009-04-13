@@ -58,7 +58,7 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 
 			// handle a null value
-			outbindvars[count].valuesize=0;
+			outbindvars[count].resultvaluesize=0;
 			if (outbindvars[count].type==STRING_BIND) {
 				if (returnnulls) {
 					outbindvars[count].value.
@@ -96,7 +96,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].valuesize=length;
+			outbindvars[count].resultvaluesize=length;
 			outbindvars[count].value.stringval=new char[length+1];
 
 			if (sqlrc->debug) {
@@ -302,7 +302,7 @@ bool sqlrcursor::parseOutputBinds() {
 			// getOutputBindLength.
 			buffer[totallength]=(char)NULL;
 			outbindvars[count].value.lobval=buffer;
-			outbindvars[count].valuesize=totallength;
+			outbindvars[count].resultvaluesize=totallength;
 		}
 
 		if (sqlrc->debug) {
@@ -312,11 +312,11 @@ bool sqlrcursor::parseOutputBinds() {
 			if (outbindvars[count].type==BLOB_BIND) {
 				sqlrc->debugPrintBlob(
 					outbindvars[count].value.lobval,
-					outbindvars[count].valuesize);
+					outbindvars[count].resultvaluesize);
 			} else if (outbindvars[count].type==CLOB_BIND) {
 				sqlrc->debugPrintClob(
 					outbindvars[count].value.lobval,
-					outbindvars[count].valuesize);
+					outbindvars[count].resultvaluesize);
 			} else if (outbindvars[count].type==CURSOR_BIND) {
 				sqlrc->debugPrint((int64_t)outbindvars[count].
 								value.cursorid);

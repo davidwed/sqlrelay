@@ -21,7 +21,7 @@ LOBJS = cachemanager.lo main.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-cachemanager
+all: sqlr-cachemanager$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-cachemanager$(EXE)
@@ -31,7 +31,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-cachemanager: $(SRCS) $(LOBJS)
+sqlr-cachemanager$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

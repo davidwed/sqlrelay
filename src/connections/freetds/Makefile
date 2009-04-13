@@ -26,7 +26,7 @@ DLOBJS= freetdsconnection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-freetds
+all: sqlr-connection-freetds$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-freetds$(EXE)
@@ -36,7 +36,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-freetds: $(SRCS) $(LOBJS)
+sqlr-connection-freetds$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(FREETDSSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

@@ -82,6 +82,7 @@ clauses?</a></li>
 work?</a></li>
 <li><a href="#servercache">What about server-side result-set caching?</a></li>
 <li><a href="#defineoutputbind">What happened to defineOutputBind?</a></li>
+<li><a href="#mysqlinsertid">MySQL Provides mysql_insert_id().  How do I get that from SQL Relay?</a></li>
 </ol>
 
 <span class="heading2">Administration Questions</span><br><br>
@@ -1220,6 +1221,13 @@ strings before returning them.  As of 0.37, this is no longer necessary.</p>
 
 <p>Apps which used defineOutputBind/getOutputBind must replace those calls with
 defineOutputBindString/getOutputBindString to get the exact same behavior.</p>
+
+<a name="mysqlinsertid"></a>
+<span class="heading3">MySQL Provides mysql_insert_id().  How do I get that from SQL Relay?</span><br><br>
+
+<p>SQL Relay doesn't provide an API call like mysql_insert_id(), however, when
+using MySQL as a backend database, you can run the query
+"select last_insert_id()" to get the last insert_id.</p>
 
 <a name="tweaks"></a>
 <span class="heading3">What system parameters can I tweak to get better performance out of SQL Relay?</span><br><br>

@@ -26,7 +26,7 @@ DLOBJS= routerconnection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-router
+all: sqlr-connection-router$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-router$(EXE)
@@ -36,7 +36,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-router: $(SRCS) $(LOBJS)
+sqlr-connection-router$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(ROUTERSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

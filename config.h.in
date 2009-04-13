@@ -318,6 +318,9 @@
 /* Some compliers don't support the inline keyword */
 #undef INLINE
 
+/* Mingw32 environment */
+#undef MINGW32
+
 /* Some versions of glibc-2.3 need a fixup */
 #undef NEED_REDHAT_9_GLIBC_2_3_2_HACK
 

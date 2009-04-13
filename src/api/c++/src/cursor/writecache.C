@@ -212,7 +212,7 @@ void sqlrcursor::cacheOutputBinds(uint32_t count) {
 		cachedest->write(len);
 		cachedest->write(outbindvars[i].variable,len);
 
-		len=outbindvars[i].valuesize;
+		len=outbindvars[i].resultvaluesize;
 		cachedest->write(len);
 		if (outbindvars[i].type==STRING_BIND ||
 				outbindvars[i].type==BLOB_BIND ||

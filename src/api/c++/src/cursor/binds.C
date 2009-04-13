@@ -431,6 +431,7 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 		outbindvars[outbindcount].value.stringval=NULL;
 		outbindvars[outbindcount].value.lobval=NULL;
 		outbindvars[outbindcount].valuesize=valuesize;
+		outbindvars[outbindcount].resultvaluesize=0;
 		outbindvars[outbindcount].send=true;
 		dirtybinds=true;
 		outbindcount++;
@@ -457,7 +458,7 @@ uint32_t sqlrcursor::getOutputBindLength(const char *variable) {
 		for (int16_t i=0; i<outbindcount; i++) {
 			if (!charstring::compare(outbindvars[i].variable,
 								variable)) {
-				return outbindvars[i].valuesize;
+				return outbindvars[i].resultvaluesize;
 			}
 		}
 	}

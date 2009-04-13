@@ -359,6 +359,14 @@ then
 fi
 AC_SUBST(EXE)
 AC_SUBST(MICROSOFT)
+
+if ( test "$MINGW32" )
+then
+	AC_DEFINE(MINGW32,1,Mingw32 environment)
+
+	dnl if we're building mingw32, we're cross-compiling by definition
+	cross_compiling="yes"
+fi
 ])
 
 

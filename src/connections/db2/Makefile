@@ -26,7 +26,7 @@ DLOBJS= db2connection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-db2
+all: sqlr-connection-db2$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-db2$(EXE)
@@ -36,7 +36,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-db2: $(SRCS) $(LOBJS)
+sqlr-connection-db2$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(DB2STATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

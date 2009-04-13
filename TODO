@@ -1,9 +1,27 @@
+long binds appear to cause a problem:
+	sqlrcur->prepareQuery(
+		"insert into "
+		"	rings_of_polygons_of_gis_layer_sources "
+		"values "
+		"	(:POLYGON_OF_GIS_LAYER_SOURCE_ID, "
+		"	:RING_OF_POLYGON_OF_GIS_LAYER_SOURCE_ID, "
+		"	:INNER)");
+	sqlrcur->inputBind("POLYGON_OF_GIS_LAYER_SOURCE_ID",polygonid);
+	sqlrcur->inputBind("RING_OF_POLYGON_OF_GIS_LAYER_SOURCE_ID",ringid);
+	sqlrcur->inputBind("INNER",(inner)?"t":"f");
+
+ODBC requires numbers rather than names for bind variables, but we could dig
+through the query and map names to numbers
+
+make sure ODBC docs say that you have to use numbers for bind variables
+
 PHP with postgresql drop-in needs lots of functions
 
 1.0:
 
 Bugs:
 	* allowing query timeout appears to hang the sqlrelay server
+		need to add timeout option to sqlrsh
 	* PHP pear db only returns 100 rows with this code:
 		$query = "SELECT id, name FROM ct_contest ORDER BY name ASC;";
         		$db->setFetchMode(DB_FETCHMODE_ASSOC);
@@ -17,42 +35,48 @@ Bugs:
 	* just because sqlrelay is compiled against unixodbc which supports
 		odbc 3.0 api, individual drivers may not support the 3.0 api,
 		so sqlrelay needs to detect this or it needs to at least be
-		configurable use SQLGetInfo with SQL_ODBC_API_CONFORMANCE
+		configurable
+		use SQLGetInfo with SQL_ODBC_API_CONFORMANCE, can return:
+			SQL_OAC_NONE
+			SQL_OAC_LEVEL1
+			SQL_OAC_LEVEL2
 	* query router "do something"'s
+	* SID may not be necessary, binds and escaping can prevent SQL
+		injection, verify that they are sufficient in SQL Relay and put
+		docs in the FAQ.
+		See http://en.wikipedia.org/wiki/SQL_injection
 	* get sid working, document or remove it
-		how to:
-			create db
-			create user
-			mysql -usiddb -psiddb siddb < siddb
-			set up sqlrelay instance to talk to it
-			set up another instance to use siddb instance for sid
-			populate siddb
-			sidparameters:
-				sparam=INGRESS - perform ingress filtering
-					EGRESS - perform egress filtering
-					LISTEN - ???
-					VERIFICATION - don't send queries to db
-					PREVENTION - send queries to db if ok
-				svalue=1/0
+	* SID how to:
+		create db
+		create user
+		mysql -usiddb -psiddb siddb < siddb
+		set up sqlrelay instance to talk to it
+		set up another instance to use siddb instance for sid
+		populate siddb
+		sidparameters:
+			sparam=INGRESS - perform ingress filtering
+				EGRESS - perform egress filtering
+				LISTEN - ???
+				VERIFICATION - don't send queries to db
+				PREVENTION - send queries to db if ok
+			svalue=1/0
 
-			sidingressblist - ingress blacklist
-				sql_state - queries to reject
-			sidingresswlist - ingress whitelist
-				sql_state - queries to accept,
-						overrides blacklist
-			sidingressldb - ingress learning database
-				parsed_sql - ???
+		sidingressblist - ingress blacklist
+			sql_state - queries to reject
+		sidingresswlist - ingress whitelist
+			sql_state - queries to accept,
+					overrides blacklist
+		sidingressldb - ingress learning database
+			parsed_sql - ???
 
-			sidegressblist - egress blacklist
-				sql_state - "parsed results" to reject
-			sidegresswlist - egress whitelist
-				sql_state - "parsed results" to accept
-						overrides blacklist
-			sidegressldb - egress learning database
-				parsed_sql - ???
-
+		sidegressblist - egress blacklist
+			sql_state - "parsed results" to reject
+		sidegresswlist - egress whitelist
+			sql_state - "parsed results" to accept
+					overrides blacklist
+		sidegressldb - egress learning database
+			parsed_sql - ???
 		what are "parsed results" - something to do with column names...
-
 			sidlog - every query is logged here with a message
 					about it
 	* if a client connects and the forked listener ends up waiting for a
@@ -249,6 +273,8 @@ Features:
 	* date object binds
 	* DML/DDL caching - if db is down, accept queries and run them when the
 		db comes back up
+	* kerberos/gssapi authentication
+	* support Google Datastore
 
 Availability:
 	* connections should ping database server every so often to make sure

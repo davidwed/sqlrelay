@@ -31,7 +31,7 @@ DLOBJS= odbcconnection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-odbc
+all: sqlr-connection-odbc$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc$(EXE)
@@ -41,7 +41,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-odbc: $(SRCS) $(LOBJS)
+sqlr-connection-odbc$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(ODBCSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

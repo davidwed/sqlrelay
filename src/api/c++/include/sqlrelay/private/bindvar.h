@@ -30,6 +30,7 @@ class bindvar {
 			uint16_t	cursorid;
 		} value;
 		uint32_t	valuesize;
+		uint32_t	resultvaluesize;
 		bindtype	type;
 		bool		send;
 

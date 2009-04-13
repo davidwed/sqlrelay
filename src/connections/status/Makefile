@@ -26,7 +26,7 @@ DLOBJS= statusconnection.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-status
+all: sqlr-status$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-status$(EXE)
@@ -36,7 +36,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-status: $(SRCS) $(LOBJS)
+sqlr-status$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATUSSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

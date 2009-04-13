@@ -18,7 +18,7 @@ endif
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: query fields sqlrsh sqlr-export sqlr-import
+all: query$(EXE) fields$(EXE) sqlrsh$(EXE) sqlr-export$(EXE) sqlr-import$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
@@ -32,19 +32,19 @@ clean:
 
 rebuild: clean all
 
-query: query.C query.lo
+query$(EXE): query.C query.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.lo $(LIBS) $(RPATH)
 
-sqlr-export: sqlr-export.C sqlr-export.lo
+sqlr-export$(EXE): sqlr-export.C sqlr-export.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-export.lo $(LIBS) $(RPATH)
 
-sqlr-import: sqlr-import.C sqlr-import.lo
+sqlr-import$(EXE): sqlr-import.C sqlr-import.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-import.lo $(LIBS) $(RPATH)
 
-fields: fields.C fields.lo
+fields$(EXE): fields.C fields.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.lo $(LIBS) $(RPATH)
 
-sqlrsh: sqlrsh.C sqlrsh.lo 
+sqlrsh$(EXE): sqlrsh.C sqlrsh.lo 
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIB) $(RPATH)
 
 install:

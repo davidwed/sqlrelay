@@ -22,7 +22,7 @@ DLOBJS = sqlrlistener.d.lo main.d.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-listener
+all: sqlr-listener$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-listener$(EXE)
@@ -32,7 +32,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-listener: $(SRCS) $(LOBJS)
+sqlr-listener$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

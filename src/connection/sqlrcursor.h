@@ -23,6 +23,7 @@ class bindvar_svr {
 			uint16_t	cursorid;
 		} value;
 		uint32_t	valuesize;
+		uint32_t	resultvaluesize;
 		bindtype	type;
 		int16_t		isnull;
 };

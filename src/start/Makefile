@@ -21,7 +21,7 @@ LOBJS = main.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-start
+all: sqlr-start$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-start$(EXE)
@@ -31,7 +31,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-start: $(SRCS) $(LOBJS)
+sqlr-start$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

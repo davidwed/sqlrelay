@@ -5,6 +5,8 @@
 	if SQLConnectW isn't supported, ODBC driver uses non-unicode calls
 	added maxsessioncount parameter and connections use it to override
 		ttl and bleed off
+	applied Renat Sabitov's output bind patch
+	added mysql last_insert_id() note to FAQ
 
 0.40 - fixed readline detection in configure script
 	fixed an uninitialized variable in sqlr-import

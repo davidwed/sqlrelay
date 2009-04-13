@@ -21,7 +21,7 @@ LOBJS = scaler.lo main.lo
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-scaler
+all: sqlr-scaler$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-scaler$(EXE)
@@ -31,7 +31,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-scaler: $(SRCS) $(LOBJS)
+sqlr-scaler$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:

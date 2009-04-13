@@ -29,7 +29,7 @@ DLOBJS= firebirdconnection.d.lo main.d.lo
 .C.d.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-firebird
+all: sqlr-connection-firebird$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-firebird$(EXE)
@@ -39,7 +39,7 @@ clean:
 
 rebuild: clean all
 
-sqlr-connection-firebird: $(SRCS) $(LOBJS)
+sqlr-connection-firebird$(EXE): $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) $(FIREBIRDSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:
