@@ -1,3 +1,5 @@
+Zope API doesn't handle money types right, only returns 1001 rows
+
 Debian packages have been orphaned
 
 Benoit Cattie and Ignacio Barrancos are having trouble with running
