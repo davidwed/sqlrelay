@@ -13,7 +13,7 @@
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	addresses=new char *[1];
 	addresses[0]=charstring::duplicate("0.0.0.0");
-	addresscount=0;
+	addresscount=1;
 	port=0;
 	listenoninet=false;
 	unixport=charstring::duplicate("");
