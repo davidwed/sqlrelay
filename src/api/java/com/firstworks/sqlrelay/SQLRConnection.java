@@ -34,6 +34,10 @@ public class SQLRConnection {
 	 * it hasn't been ended already.  */
 	public native void	delete();
 
+	/** Sets the server connect timeout in seconds
+	 *  and milliseconds.  Setting either parameter
+	 *  to -1 disables the timeout. */
+	public native void	setTimeout(int timeoutsec, int timeoutusec);
 
 	/** Ends the session. */
 	public native void	endSession();

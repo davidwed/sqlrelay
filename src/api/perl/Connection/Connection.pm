@@ -58,6 +58,11 @@ __END__
             # Disconnects and ends the session if
             # it hasn't been ended already.
 
+        setTimeout(timeoutsec, timeoutusec);
+            # Sets the server connect timeout in seconds
+            # and milliseconds.  Setting either parameter
+            # to -1 disables the timeout.
+
         endSession();
             # Ends the session.
 

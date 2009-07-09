@@ -266,6 +266,27 @@ int main() {
 		}
 
 
+		if (strcmp("setTimeout", command) == TRUE) {
+                	long timeoutsec;
+                	long timeoutusec;
+
+			// check number of arguments
+		    	if (arity != 2) return ERR_NUMBER_OF_ARGS;
+
+			if (ei_decode_long(buf, &index, &timeoutsec)) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			if (ei_decode_long(buf, &index, &timeoutusec)) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcon_setTimeout(con,timeoutsec,timeoutusec);
+			ENCODE_VOID;   
+		}
+
+
 		if (strcmp("endSession", command) == TRUE) {
 			// check number of arguments
 		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;

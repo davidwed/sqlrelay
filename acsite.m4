@@ -657,6 +657,15 @@ then
 					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -lnnz10"
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
 				fi
+
+				# x86_64 uses client64 rather than client
+				if ( test -r "/usr/lib/oracle/$version/client64/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client64/oci.h" )
+				then
+					ORACLEVERSION="10g"
+					ORACLELIBSPATH="/usr/lib/oracle/$version/client64/lib"
+					ORACLELIBS="-L/usr/lib/oracle/$version/client64/lib -lclntsh -lnnz10"
+					ORACLEINCLUDES="-I/usr/include/oracle/$version/client64"
+				fi
 			done
 		fi
 		

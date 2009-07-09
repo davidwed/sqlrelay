@@ -33,6 +33,14 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 	return Data_Wrap_Struct(self,0,sqlrcon_free,(void *)sqlrcon);
 }
 
+static VALUE sqlrcon_setTimeout(VALUE self,
+				VALUE timeoutsec, VALUE timeoutusec) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	sqlrcon->setTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+	return Qnil;
+}
+
 static VALUE sqlrcon_endSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -183,6 +191,8 @@ void Init_SQLRConnection() {
 	csqlrconnection=rb_define_class("SQLRConnection", rb_cObject);
 	rb_define_singleton_method(csqlrconnection,"new",
 				(CAST)sqlrcon_new,7);
+	rb_define_method(csqlrconnection,"setTimeout",
+				(CAST)sqlrcon_setTimeout,2);
 	rb_define_method(csqlrconnection,"endSession",
 				(CAST)sqlrcon_endSession,0);
 	rb_define_method(csqlrconnection,"suspendSession",

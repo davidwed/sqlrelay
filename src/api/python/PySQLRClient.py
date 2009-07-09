@@ -23,6 +23,14 @@ class sqlrconnection:
     def __del__(self):
         CSQLRelay.sqlrcon_free(self.connection)
 
+    def setTimeout(self, timeoutsec, timeoutusec):
+        """
+        Sets the server connect timeout in seconds
+        and milliseconds.  Setting either parameter
+        to -1 disables the timeout.
+        """
+        return CSQLRelay.setTimeout(self.connection, timeoutsec, timeoutusec)
+
     def endSession(self):
         """
         Ends the current session.

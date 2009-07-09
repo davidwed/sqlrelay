@@ -31,6 +31,12 @@ void	sqlrcon_free(sqlrcon sqlrconref);
 			/* Disconnects and ends the session if
 			   it hasn't been terminated already. */
 
+void	sqlrcon_setTimeout(sqlrcon sqlrconref,
+			int32_t timeoutsec, int32_t timeoutusec);
+			/* Sets the server connect timeout in seconds
+			   and milliseconds.  Setting either parameter
+			   to -1 disables the timeout. */
+
 void	sqlrcon_endSession(sqlrcon sqlrconref); 
 			/* Ends the session. */
 int	sqlrcon_suspendSession(sqlrcon sqlrconref);

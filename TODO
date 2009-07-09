@@ -3,16 +3,6 @@ Zope API doesn't handle money types right
 	meta_types, __ac_permissions_- and methods attributes are long
 		deprecated
 
-Debian packages have been orphaned
-
-Benoit Cattie and Ignacio Barrancos are having trouble with running
-	out of cursors and a segfault
-	problem with output bind cursors not being freed?
-
-oracle intant client on x86_64 uses directory "client64" rather than "client"
-
-setTimeout method not implemented for api's other than C++,PHP
-
 long binds appear to cause a problem:
 	sqlrcur->prepareQuery(
 		"insert into "

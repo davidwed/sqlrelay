@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.26 2007-12-05 04:49:26 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.27 2009-07-09 04:33:44 mused Exp $
  */
 
 #include <tcl.h>
@@ -1724,6 +1724,7 @@ void sqlrconDelete(ClientData data) {
  *    sqlrcon object command.
  * Synopsis:
  *  $con free
+ *  $con setTimeout
  *  $con endSession
  *  $con suspendSession
  *  $con getConnectionPort
@@ -1748,6 +1749,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
   int index;
   static CONSTCHAR *options[] = {
     "free",
+    "setTimeout",
     "endSession",
     "suspendSession",
     "getConnectionPort",
@@ -1767,6 +1769,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
   };
   enum options {
     SQLR_FREE,
+    SQLR_SETTIMEOUT,
     SQLR_ENDSESSION,
     SQLR_SUSPENDSESSION,
     SQLR_GETCONNECTIONPORT,
@@ -1802,6 +1805,22 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     sqlrconDelete(con);
+    break;
+  }
+  case SQLR_SETTIMEOUT: {
+    int timeoutsec;
+    int timeoutusec;
+    if (objc > 4) {
+      Tcl_WrongNumArgs(interp, 2, objv, "timeoutsec timeoutusec");
+      return TCL_ERROR;
+    }
+    if (Tcl_GetIntFromObj(interp, objv[2], &timeoutsec) != TCL_OK) {
+      return TCL_ERROR;
+    }
+    if (Tcl_GetIntFromObj(interp, objv[3], &timeoutusec) != TCL_OK) {
+      return TCL_ERROR;
+    }
+    con->setTimeout(timeoutsec,timeoutusec);
     break;
   }
   case SQLR_ENDSESSION: {

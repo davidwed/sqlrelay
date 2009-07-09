@@ -1,4 +1,7 @@
 0.42 - fixed a bug causing cursor id's not to get set for some db's
+	updated configure script to look for client64 in addition to client
+		for oracle intantclient on x86_64
+	added setTimeout to all API's
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

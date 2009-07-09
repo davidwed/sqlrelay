@@ -19,6 +19,11 @@ void sqlrcon_free(sqlrcon sqlrconref) {
 	delete (sqlrconnection *)sqlrconref;
 }
 
+void sqlrcon_setTimeout(sqlrcon sqlrconref,
+			int32_t timeoutsec, int32_t timeoutusec) {
+	sqlrconref->setTimeout(timeoutsec,timeoutusec);
+}
+
 void sqlrcon_endSession(sqlrcon sqlrconref) {
 	sqlrconref->endSession();
 }

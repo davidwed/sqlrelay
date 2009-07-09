@@ -32,6 +32,11 @@ void
 sqlrconnection::DESTROY()
 
 void
+sqlrconnection::setTimeout(timeoutsec,timeoutusec)
+		int32_t		timeoutsec
+		int32_t		timeoutusec
+
+void
 sqlrconnection::endSession()
 
 bool

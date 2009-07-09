@@ -71,6 +71,19 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_delete
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    setTimeout
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setTimeout
+  (JNIEnv *env, jobject self, jint timeoutsec, jint timeoutusec) {
+	jclass		cls=env->GetObjectClass(self);
+	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
+				env->GetFieldID(cls,"connection","J"));
+	con->setTimeout((int32_t)timeoutsec,(int32_t)timeoutusec);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    endSession
  * Signature: ()V
  */
