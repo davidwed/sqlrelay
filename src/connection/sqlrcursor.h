@@ -198,6 +198,7 @@ class sqlrcursor_svr {
 
 	private:
 		// methods used internally
+		bool	openCursorInternal(uint16_t id);
 		bool	handleBinds();
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);

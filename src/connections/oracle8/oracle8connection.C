@@ -579,7 +579,7 @@ bool oracle8cursor::openCursor(uint16_t id) {
 			return false;
 		}
 	}*/
-	return sqlrcursor_svr::openCursor(id);
+	return true;
 }
 
 bool oracle8cursor::closeCursor() {

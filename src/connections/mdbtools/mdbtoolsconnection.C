@@ -94,10 +94,6 @@ mdbtoolscursor::~mdbtoolscursor() {
 
 bool mdbtoolscursor::openCursor(uint16_t id) {
 
-	if (!sqlrcursor_svr::openCursor(id)) {
-		return false;
-	}
-
 	// handle db
 	const char	*dbval;
 	if (mdbtoolsconn->db && mdbtoolsconn->db[0]) {

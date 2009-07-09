@@ -18,7 +18,7 @@ bool sqlrconnection_svr::commit() {
 	char	*commitquery="commit";
 	int	commitquerylen=6;
 	bool	retval=false;
-	if (commitcur->openCursor(0) &&
+	if (commitcur->openCursorInternal(0) &&
 		commitcur->prepareQuery(commitquery,commitquerylen)) {
 		retval=executeQueryUpdateStats(commitcur,commitquery,
 						commitquerylen,true);

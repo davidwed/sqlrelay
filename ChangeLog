@@ -1,3 +1,5 @@
+0.42 - fixed a bug causing cursor id's not to get set for some db's
+
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library
 	updated mysql drop-in lib docs explaining how to use with PHP

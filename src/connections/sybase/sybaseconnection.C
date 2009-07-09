@@ -338,7 +338,7 @@ bool sybasecursor::openCursor(uint16_t id) {
 		}
 		cleanUpData(true,true);
 	}
-	return (retval && sqlrcursor_svr::openCursor(id));
+	return retval;
 }
 
 bool sybasecursor::closeCursor() {

@@ -18,7 +18,7 @@ bool sqlrconnection_svr::rollback() {
 	char	*rollbackquery="rollback";
 	int	rollbackquerylen=8;
 	bool	retval=false;
-	if (rollbackcur->openCursor(0) &&
+	if (rollbackcur->openCursorInternal(0) &&
 		rollbackcur->prepareQuery(rollbackquery,rollbackquerylen)) {
 		retval=executeQueryUpdateStats(rollbackcur,rollbackquery,
 						rollbackquerylen,true);

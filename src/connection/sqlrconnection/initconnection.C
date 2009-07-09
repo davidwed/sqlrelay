@@ -470,7 +470,7 @@ bool sqlrconnection_svr::initCursors() {
 			cur[i]->querybuffer=new char[
 						cfgfl->getMaxQuerySize()+1];
 		}
-		if (!cur[i]->openCursor(i)) {
+		if (!cur[i]->openCursorInternal(i)) {
 
 			dbgfile.debugPrint("connection",1,"cursor init failure...");
 
