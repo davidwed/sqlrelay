@@ -1,8 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>~/src/firstworks/sqlrelay-0.40/src/api/c/include/sqlrelay/sqlrclientwrapper.h.html</title>
-<meta name="Generator" content="Vim/7.1">
+<title>~/src/firstworks/sqlrelay-0.41/src/api/c/include/sqlrelay/sqlrclientwrapper.h.html</title>
+<meta name="Generator" content="Vim/7.2">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 </head>
 <body bgcolor="#ffffff" text="#000000"><font face="monospace">
@@ -38,6 +38,12 @@ sqlrcon sqlrcon_alloc(<font color="#2e8b57"><b>const</b></font>&nbsp;<font color
 <font color="#2e8b57"><b>void</b></font>&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon_free(sqlrcon sqlrconref); <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">/*</font><font color="#0000ff">&nbsp;Disconnects and ends the session if</font><br>
 <font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it hasn't been terminated already. </font><font color="#0000ff">*/</font><br>
+<br>
+<font color="#2e8b57"><b>void</b></font>&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon_setTimeout(sqlrcon sqlrconref,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>int32_t</b></font>&nbsp;timeoutsec, <font color="#2e8b57"><b>int32_t</b></font>&nbsp;timeoutusec);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">/*</font><font color="#0000ff">&nbsp;Sets the server connect timeout in seconds</font><br>
+<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and milliseconds.&nbsp;&nbsp;Setting either parameter</font><br>
+<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; to -1 disables the timeout. </font><font color="#0000ff">*/</font><br>
 <br>
 <font color="#2e8b57"><b>void</b></font>&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon_endSession(sqlrcon sqlrconref); <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">/*</font><font color="#0000ff">&nbsp;Ends the session. </font><font color="#0000ff">*/</font><br>

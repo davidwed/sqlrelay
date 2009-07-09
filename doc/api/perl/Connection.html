@@ -9,8 +9,10 @@
 
 <body style="background-color: white">
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
@@ -19,9 +21,11 @@
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
@@ -72,6 +76,11 @@
         DESTROY();
             # Disconnects and ends the session if
             # it hasn't been ended already.</pre>
+<pre>
+        setTimeout(timeoutsec, timeoutusec);
+            # Sets the server connect timeout in seconds
+            # and milliseconds.  Setting either parameter
+            # to -1 disables the timeout.</pre>
 <pre>
         endSession();
             # Ends the session.</pre>

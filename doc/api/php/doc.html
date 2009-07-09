@@ -73,6 +73,15 @@ it hasn't been terminated already.
 <P>
 <LI>
 <CODE>
+void sqlrcon_setTimeout(int timeoutsec, int timeoutusec)
+</CODE>
+<P>
+Sets the server connect timeout in seconds
+and milliseconds.  Setting either parameter
+to -1 disables the timeout.
+<P>
+<LI>
+<CODE>
 void sqlrcon_endSession(int sqlrconref)
 </CODE>
 <P>
