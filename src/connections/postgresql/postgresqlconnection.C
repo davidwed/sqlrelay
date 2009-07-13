@@ -311,7 +311,6 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	if (pgstatus==PGRES_BAD_RESPONSE ||
 		pgstatus==PGRES_NONFATAL_ERROR ||
 		pgstatus==PGRES_FATAL_ERROR) {
-		// FIXME: do I need to do a PQclear here?
 		return false;
 	}
 	deallocatestatement=true;
@@ -415,7 +414,7 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 					(rawbuffer::duplicate(value,valuesize));
 		bindlengths[bindcounter]=valuesize;
 	}
-	bindformats[bindcounter]=0;
+	bindformats[bindcounter]=1;
 	bindcounter++;
 	return true;
 }
@@ -499,7 +498,6 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	if (pgstatus==PGRES_BAD_RESPONSE ||
 		pgstatus==PGRES_NONFATAL_ERROR ||
 		pgstatus==PGRES_FATAL_ERROR) {
-		// FIXME: do I need to do a PQclear here?
 		return false;
 	}
 
@@ -974,6 +972,9 @@ void postgresqlcursor::returnColumnInfo() {
 						0,0,0,0,0,
 						0,0,0,binary,0);
 		}
+	}
+	if (!postgresqlconn->typemangling) {
+		delete[] typestring;
 	}
 }
 

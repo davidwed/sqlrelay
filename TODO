@@ -3,22 +3,10 @@ Zope API doesn't handle money types right
 	meta_types, __ac_permissions_- and methods attributes are long
 		deprecated
 
-long binds appear to cause a problem:
-	sqlrcur->prepareQuery(
-		"insert into "
-		"	rings_of_polygons_of_gis_layer_sources "
-		"values "
-		"	(:POLYGON_OF_GIS_LAYER_SOURCE_ID, "
-		"	:RING_OF_POLYGON_OF_GIS_LAYER_SOURCE_ID, "
-		"	:INNER)");
-	sqlrcur->inputBind("POLYGON_OF_GIS_LAYER_SOURCE_ID",polygonid);
-	sqlrcur->inputBind("RING_OF_POLYGON_OF_GIS_LAYER_SOURCE_ID",ringid);
-	sqlrcur->inputBind("INNER",(inner)?"t":"f");
-
-ODBC requires numbers rather than names for bind variables, but we could dig
-through the query and map names to numbers
-
-make sure ODBC docs say that you have to use numbers for bind variables
+ODBC requires numbers rather than names for bind variables,
+* make sure ODBC docs say that you have to use numbers for bind variables
+	or
+* dig through the query and map names to numbers
 
 PHP with postgresql drop-in needs lots of functions
 
