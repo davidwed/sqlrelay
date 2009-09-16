@@ -327,7 +327,7 @@ bool scaler::openMoreConnections() {
 						2+1;
 				char	*command=new char[commandlen];
 				snprintf(command,commandlen,
-	"sqlr-connection-%s%s -silent -ttl %d -id %s -connectionid %s -config %s %s",
+	"sqlr-connection-%s %s -silent -ttl %d -id %s -connectionid %s -config %s %s",
 					dbase,((debug)?"-debug":""),
 					ttl,id,connectionid,config,
 					((debug)?"&":""));
@@ -355,15 +355,14 @@ void scaler::getRandomConnectionId() {
 
 	// run through list, decrementing scalednum by the metric
 	// for each, when scalednum is 0, pick that connection id
-	connectstringnode	*csn=connectstringlist->getNodeByIndex(0);
-	while (csn) {
+	for (connectstringnode *csn=connectstringlist->getFirstNode();
+						csn; csn=csn->getNext()) {
 		connectstringcontainer	*currentnode=csn->getData();
 		scalednum=scalednum-currentnode->getMetric();
 		if (scalednum<=0) {
 			connectionid=currentnode->getConnectionId();
 			break;
 		}
-		csn=csn->getNext();
 	}
 }
 
