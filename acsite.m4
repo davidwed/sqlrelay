@@ -1,3 +1,22 @@
+AC_DEFUN([FW_GMAKE],
+[
+AC_MSG_CHECKING(for GNU Make)
+if ( test -n "make -v | grep 'GNU Make'" )
+then
+	MAKE="make"
+	AC_MSG_RESULT(yes)
+else
+	if ( test -n "gmake -v | grep 'GNU Make'" )
+	then
+		MAKE="gmake"
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+		AC_MSG_ERROR(GNU Make no not found.  SQL-Relay requires GNU make.)
+	fi
+fi
+])
+
 AC_DEFUN([FW_VERSION],
 [
 if ( test -n "$2" )
@@ -2307,7 +2326,7 @@ print "	echo \$(hdrdir)\n"
 END
 
 			HAVE_RUBY_H=""
-			for dir in `eval $RUBY conftest.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | gmake -s -f - | grep -v Entering | grep -v Leaving`
+			for dir in `eval $RUBY conftest.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
 			do
 				if ( test -r "$dir/ruby.h" )
 				then

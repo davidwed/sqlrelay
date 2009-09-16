@@ -318,12 +318,12 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// connection this query needs to be run through
 	uint16_t	conindex=0;
 	routenode	*rcn=routerconn->cfgfile->
-					getRouteList()->getNodeByIndex(0);
+					getRouteList()->getFirstNode();
 	bool	found=false;
 	while (rcn && !found) {
 		linkedlistnode< regularexpression * >	*ren=
 					rcn->getData()->getRegexList()->
-							getNodeByIndex(0);
+							getFirstNode();
 
 		while (ren && !found) {
 			if (ren->getData()->match(query)) {

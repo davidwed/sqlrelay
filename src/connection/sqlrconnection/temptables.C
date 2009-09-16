@@ -7,7 +7,7 @@ void sqlrconnection_svr::dropTempTables(sqlrcursor_svr *cursor,
 					stringlist *tablelist) {
 
 	// run through the temp table list, dropping tables
-	for (stringlistnode *sln=tablelist->getNodeByIndex(0);
+	for (stringlistnode *sln=tablelist->getFirstNode();
 			sln; sln=(stringlistnode *)sln->getNext()) {
 		dropTempTable(cursor,sln->getData());
 		delete[] sln->getData();
@@ -31,7 +31,7 @@ void sqlrconnection_svr::truncateTempTables(sqlrcursor_svr *cursor,
 						stringlist *tablelist) {
 
 	// run through the temp table list, truncateing tables
-	for (stringlistnode *sln=tablelist->getNodeByIndex(0);
+	for (stringlistnode *sln=tablelist->getFirstNode();
 			sln; sln=(stringlistnode *)sln->getNext()) {
 		truncateTempTable(cursor,sln->getData());
 		delete[] sln->getData();

@@ -87,16 +87,14 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] deniedips;
 	delete[] debug;
 
-	usernode	*un=userlist.getNodeByIndex(0);
-	while (un) {
+	for (usernode *un=userlist.getFirstNode();
+				un; un=un->getNext()) {
 		delete un->getData();
-		un=un->getNext();
 	}
 
-	connectstringnode	*csn=connectstringlist.getNodeByIndex(0);
-	while (csn) {
+	for (connectstringnode *csn=connectstringlist.getFirstNode();
+						csn; csn=csn->getNext()) {
 		delete csn->getData();
-		csn=csn->getNext();
 	}
 
 	delete[] sidhost;
@@ -104,10 +102,8 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] siduser;
 	delete[] sidpassword;
 
-	routenode	*rn=routelist.getNodeByIndex(0);
-	while (rn) {
+	for (routenode *rn=routelist.getFirstNode(); rn; rn=rn->getNext()) {
 		delete rn->getData();
-		rn=rn->getNext();
 	}
 }
 
@@ -313,13 +309,12 @@ linkedlist< connectstringcontainer * > *sqlrconfigfile::getConnectStringList() {
 
 connectstringcontainer *sqlrconfigfile::getConnectString(
 						const char *connectionid) {
-	connectstringnode	*csn=connectstringlist.getNodeByIndex(0);
-	while (csn) {
+	for (connectstringnode *csn=connectstringlist.getFirstNode();
+						csn; csn=csn->getNext()) {
 		if (!charstring::compare(connectionid,
 					csn->getData()->getConnectionId())) {
 			return csn->getData();
 		}
-		csn=csn->getNext();
 	}
 	return NULL;
 }
@@ -334,11 +329,10 @@ uint32_t sqlrconfigfile::getMetricTotal() {
 	// attributes.  In that case, though each connection has a metric,
 	// metrictotal=0, causing no connections to start.
 	if (!metrictotal) {
-		connectstringnode	*csn=
-					connectstringlist.getNodeByIndex(0);
-		while (csn) {
+		for (connectstringnode *csn=
+				connectstringlist.getFirstNode();
+						csn; csn=csn->getNext()) {
 			metrictotal=metrictotal+csn->getData()->getMetric();
-			csn=csn->getNext();
 		}
 	}
 	return metrictotal;
@@ -798,8 +792,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 
 routecontainer *sqlrconfigfile::routeAlreadyExists(routecontainer *cur) {
 
-	routenode	*rn=routelist.getNodeByIndex(0);
-	while (rn) {
+	for (routenode *rn=routelist.getFirstNode(); rn; rn=rn->getNext()) {
 
 		routecontainer	*rc=rn->getData();
 		if (!charstring::compare(rc->getHost(),
@@ -813,8 +806,6 @@ routecontainer *sqlrconfigfile::routeAlreadyExists(routecontainer *cur) {
 						cur->getPassword())) {
 			return rc;
 		}
-
-		rn=rn->getNext();
 	}
 	return NULL;
 }
@@ -822,11 +813,10 @@ routecontainer *sqlrconfigfile::routeAlreadyExists(routecontainer *cur) {
 void sqlrconfigfile::moveRegexList(routecontainer *cur,
 					routecontainer *existing) {
 
-	linkedlistnode< regularexpression * >	*re=cur->getRegexList()->
-							getNodeByIndex(0);
-	while (re) {
+	for (linkedlistnode< regularexpression * > *re=
+				cur->getRegexList()->getFirstNode();
+						re; re=re->getNext()) {
 		existing->getRegexList()->append(re->getData());
-		re=re->getNext();
 	}
 	cur->getRegexList()->clear();
 }
@@ -975,10 +965,10 @@ routecontainer::~routecontainer() {
 	delete[] socket;
 	delete[] user;
 	delete[] password;
-	linkedlistnode< regularexpression * >	*re=regexlist.getNodeByIndex(0);
-	while (re) {
+	for (linkedlistnode< regularexpression * > *re=
+					regexlist.getFirstNode();
+						re; re=re->getNext()) {
 		delete re->getData();
-		re=re->getNext();
 	}
 }
 

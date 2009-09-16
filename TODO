@@ -1,3 +1,18 @@
+acsite.md4 tests for ruby.h using gmake which may not be available
+
+
+bad doc - doc/programming/*
+
+	For the duration of the session, the client stays connected to a
+	database connection daemon.  While one client is connected, no other
+	client can connect.  Care should be taken to minimize the length of a
+	session.
+
+This could be confused to mean that only 1 client can connect at all.
+
+
+
+
 Zope API doesn't handle money types right
 	ImageFile needs to be App.ImageFile in zope 2.11 and up
 	meta_types, __ac_permissions_- and methods attributes are long
@@ -111,6 +126,7 @@ Features:
 		It's not an issue for memory, but rather a server-side cursor
 		will be occupied until it's garbage collected.  On C/C++ you
 		can just delete it.
+	* return error code/number
 
 Availability:
 

@@ -720,7 +720,7 @@ static void SQLR_SQLResetParams(STMT *stmt) {
 					stmt->outputbinds.getList();
 
 	for (dictionarylistnode< int32_t, outputbind * > *node=
-						list->getNodeByIndex(0);
+						list->getFirstNode();
 		node; node=(dictionarylistnode< int32_t, outputbind * > *)
 							node->getNext()) {
 		delete node;
@@ -1063,7 +1063,7 @@ SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 			}
 
 			for (linkedlistnode< CONN * >	*node=
-				env->connlist.getNodeByIndex(0); node;
+				env->connlist.getFirstNode(); node;
 				node=(linkedlistnode< CONN * > *)
 							node->getNext()) {
 
@@ -1116,7 +1116,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 					stmt->outputbinds.getList();
 
 	for (dictionarylistnode< int32_t, outputbind * > *node=
-						list->getNodeByIndex(0);
+						list->getFirstNode();
 		node; node=(dictionarylistnode< int32_t, outputbind * > *)
 							node->getNext()) {
 

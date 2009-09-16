@@ -18,7 +18,7 @@ authenticator::authenticator(sqlrconfigfile *cfgfile) {
 	users=new char *[usercount];
 	passwords=new char *[usercount];
 
-	usernode	*current=userlist->getNodeByIndex(0);
+	usernode	*current=userlist->getFirstNode();
 	for (uint32_t i=0; i<usercount; i++) {
 		users[i]=charstring::duplicate(current->
 						getData()->getUser());

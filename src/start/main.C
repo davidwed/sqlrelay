@@ -115,7 +115,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	int32_t	connections=getConnections(cfgfile);
 
 	// start the connections
-	connectstringnode	*csn=connectionlist->getNodeByIndex(0);
+	connectstringnode	*csn=connectionlist->getFirstNode();
 	connectstringcontainer	*csc;
 	int32_t	metric=0;
 	int32_t	startup=0;
