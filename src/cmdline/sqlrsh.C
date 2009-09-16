@@ -879,9 +879,10 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 			// create the history file if it doesn't exist now
 			FILE	*historyfile=fopen(filename,"a");
-			fclose(historyfile);
-
-			read_history(filename);
+			if (historyfile) {
+				fclose(historyfile);
+				read_history(filename);
+			}
 		}
 	#endif
 
