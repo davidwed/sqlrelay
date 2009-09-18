@@ -81,9 +81,9 @@ main() {
 <p>After calling the constructor, a session is established when the first 
 query, ping() or identify() is run.</p>
 
-<p>For the duration of the session, the client stays connected to a database
-connection daemon.  While one client is connected, no other client can connect.
-Care should be taken to minimize the length of a session.</p>
+<p>For the duration of the session, the client occupies one of the database
+connection daemons, so care should be taken to minimize the length of a
+session.</p>
 
 <p>If you're using a transactional database, ending a session has a catch.
 Database connection daemons can be configured to send either a commit or
