@@ -328,7 +328,7 @@ bool scaler::openMoreConnections() {
 				char	*command=new char[commandlen];
 				snprintf(command,commandlen,
 	"sqlr-connection-%s %s -silent -ttl %d -id %s -connectionid %s -config %s %s",
-					dbase,((debug)?"-debug":""),
+					dbase,((debug)?" -debug":""),
 					ttl,id,connectionid,config,
 					((debug)?"&":""));
 
