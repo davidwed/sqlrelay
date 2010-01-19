@@ -24165,7 +24165,7 @@ _ACEOF
 		fi
 	fi
 
-	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" -o "$ORACLEVERSION" = "10g" -o "$ORACLEVERSION" = "11g" )
+	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" -o "$ORACLEVERSION" = "10g" -o "$ORACLEVERSION" = "11g" -o "$ORACLEVERSION" = "11i" )
 	then
 
 cat >>confdefs.h <<\_ACEOF

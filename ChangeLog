@@ -7,6 +7,7 @@
 	applied Renat Sabitov's scaler -debug patch and 11g configure patch
 	applied Stephan van Egmond's sqlrsh history patch
 	added configure test for gmake, use it to find ruby.h
+	applied mingang@taobao.com's scaler patch for -debug
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library
