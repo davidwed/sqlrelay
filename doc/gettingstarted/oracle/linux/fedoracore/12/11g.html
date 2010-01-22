@@ -46,7 +46,7 @@ echo "250 32000 100 128" &gt; /proc/sys/kernel/sem</b>
 
 <p>Now, log in as the oracle user.</p>
 
-<p>Since Oracle 11.1.0 uses a graphical installer, you need to be running X
+<p>Since Oracle 11.2.0 uses a graphical installer, you need to be running X
 Windows or point the DISPLAY environment variable to an X Windows session
 running somewhere.</p>
 
@@ -65,30 +65,30 @@ Change directories to the database directory.<br><br>
 
 Type <b>./runInstaller</b><br><br>
 
-On the first screen, leave the Email box blank, uncheck the box next to <b>I wish to receive security updates via My Oracle Support</b> and click <b>Next</b>.<br>
+On the first screen, leave the Email box blank, uncheck the box next to <b>I wish to receive security updates via My Oracle Support</b> and click <b>Next</b>.<br><br>
 
-When the <b>Email Address Not Specified</b> popup appears, click <b>Yes</b>.<br>
+When the <b>Email Address Not Specified</b> popup appears, click <b>Yes</b>.<br><br>
 
-On the <b>Select Installation Option</b> screen, accept the default <b>Create and configure a database</b>and click <b>Next</b>.<br>
+On the <b>Select Installation Option</b> screen, accept the default <b>Create and configure a database</b>and click <b>Next</b>.<br><br>
 
-On the <b>System Class</b> screen, accept the default <b>Desktop Class</b> and click <b>Next</b>.<br>
+On the <b>System Class</b> screen, accept the default <b>Desktop Class</b> and click <b>Next</b>.<br><br>
 
 On the <b>Typical Install Configuration</b> screen, change the <b>Global database name</b> from "orcl.localdomain" to "ora1.localdomain".  Enter a password in the <b>Administrative Password</b> and <b>Confirm Password</b> boxes.  Click <b>Next</b><br><br>
 
 On the <b>Create Inventory</b> screen, accept the defaults and click <b>Next</b><br><br>
 
 On the <b>Perform Prerequisite Checks</b> screen, operating system requirements will be checked.  When it's done,
-click <b>Next</b>.<br>
+click <b>Next</b>.<br><br>
 
 Some of the prerequisite checks have failed.  Many are likely tunable system parameters and may be fixed by clicking <b>Fix & Check Again</b> and following the instructions.
 Others, such as missing packages, may not be fixable by the installer and may require manual intervention.  After fixing them, click <b>Check Again</b>.  When all is well,
-a <b>Summary</b> screen will appear.  Click <b>Finish</b>.<br>
+a <b>Summary</b> screen will appear.  Click <b>Finish</b>.<br><br>
 
-On the <b>Oracle Configuration Manager Registration</b> screen, just click <b>Next</b>.
+On the <b>Oracle Configuration Manager Registration</b> screen, just click <b>Next</b>.<br><br>
 
 On the <b>Summary</b> screen, click <b>Install</b><br><br>
 
-The <b>Install Product</b> screen will show the progress of the installation<br><br>
+The <b>Install Product</b> screen will show the progress of the installation<br><br><br>
 
 A <b>Database Configuration Assistant</b> dialog should pop up.  The image on
 the left hand side will change regularlry, but the dialog itself may not
@@ -109,12 +109,12 @@ their names, but then various utilities expected directories with
 "localhost.localdomain" in them.  I created symbolic links to resolve the
 problem:</p>
 
-<blockquote>
+<blockquote><b>
 cd /u01/app/oracle/product/11.2.0<br>
 ln -s localhost_ora1 localhost.localdomain_ora1<br>
 cd oc4j/j2ee<br>
 ln -s OC4J_DBConsole_localhost_ora1 OC4J_DBConsole_localhost.localdomain_ora1<br>
-</blockquote>
+</b></blockquote>
 
 <p>You may or may not run into the same problem.</p>
 

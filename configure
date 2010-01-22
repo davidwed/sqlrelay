@@ -32798,6 +32798,242 @@ fi
 	fi
 fi
 
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V9.5/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V9.5/lib/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.5/lib\"; DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib -ldb2\"; DB2VERSION=\"9\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V9.5/lib/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V9.5/lib/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
+			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V9.5/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V9.5/lib32/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.5/lib32\"; DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2VERSION=\"9\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V9.5/lib32/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V9.5/lib32/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
+			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V9.5/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V9.5/lib64/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.5/lib64\"; DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2VERSION=\"9\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V9.5/lib64/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V9.5/lib64/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
+			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+		fi
+	fi
+fi
+
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V9.7/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V9.7/lib/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.7/lib\"; DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib -ldb2\"; DB2VERSION=\"9\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V9.7/lib/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V9.7/lib/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
+			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V9.7/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V9.7/lib32/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.7/lib32\"; DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2VERSION=\"9\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V9.7/lib32/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V9.7/lib32/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
+			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V9.7/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V9.7/lib64/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.7/lib64\"; DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2VERSION=\"9\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V9.7/lib64/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V9.7/lib64/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
+			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+		fi
+	fi
+fi
+
 		fi
 
 		if ( test -z "$DB2LIBS" )

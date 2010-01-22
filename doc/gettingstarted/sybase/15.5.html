@@ -18,7 +18,7 @@ installation it fails with a series of messages like:</p>
 
 <blockquote>
 Warning: Attempt to create shared memory at addr=0xfe000000 failed
-<blockquote>
+</blockquote>
 
 <p>These instructions disable installation of the Monitor Server.</p>
 
@@ -152,6 +152,7 @@ with whatever directory Sybase ASE is installed in.</p>
 <B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>SYBASE</FONT><B><FONT color=#a62828>=</FONT></B>/opt/sybase</FONT>
 
 <B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>PATH</FONT><B><FONT color=#a62828>=</FONT></B><FONT color=#a620f7>$PATH</FONT>:<FONT color=#a620f7>$SYBASE</FONT>/ASE-15_0/bin:<FONT color=#a620f7>$SYBASE</FONT>/ASE-15_0/install
+<B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>LD_LIBRARY_PATH</FONT><B><FONT color=#a62828>=</FONT></B><FONT color=#a620f7>$LD_LIBRARY_PATH</FONT>:<FONT color=#a620f7>$SYBASE</FONT>/ASE-15_0/lib:<FONT color=#a620f7>$SYBASE</FONT>/OCS-15_0/lib3p
 
 <font color="#a52829"><b>echo</b></font><font color="#ff00ff"> 268435456 </font><font color="#a52829"><b>&gt;</b></font> /proc/sys/kernel/shmmax
 

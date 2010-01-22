@@ -44,7 +44,7 @@ recommend meeting these requirements prior to installation.</p>
 <a name="solaris"></a>
 <span class="heading2">Solaris</span><br>
 
-<p>Oracle versions 8.1.5-10.2.0 for Solaris have been or are currently available
+<p>Oracle versions 8.1.5-11.2.0 for Solaris have been or are currently available
 for download from <a href="http://technet.oracle.com">technet.oracle.com</a> 
 or on CD.  Installation appears to be as simple as following the directions.  
 Note that for Solaris, these versions of Oracle will fail to create a database 
@@ -56,7 +56,7 @@ versions on Solaris.</p>
 <a name="linux"></a>
 <span class="heading2">Linux</span><br>
 
-<p>Oracle has supported Linux since version 8.0.5. Versions 8.0.5 through 10.2.0
+<p>Oracle has supported Linux since version 8.0.5. Versions 8.0.5 through 11.2.0
 have been or are currently available from 
 <a href="http://technet.oracle.com">technet.oracle.com</a> and have been 
 available on CD from various sources as well.</p>
@@ -119,11 +119,11 @@ installation time.  Make sure that these packages are installed.</p>
 <span class="heading3">Set Up the Environment</span><br>
 
 <p>Edit /etc/profile (or /etc/bash.bashrc.local if your system has it) and add
-the following somewhere near the top, replacing 10.2.0 in the ORACLE_VERSION
+the following somewhere near the top, replacing 11.2.0 in the ORACLE_VERSION
 environment variable with the version of Oracle that you are installing.</p>
 
 <blockquote><b>
-export ORACLE_VERSION=10.2.0<br>
+export ORACLE_VERSION=11.2.0<br>
 export ORACLE_BASE=/u01/app/oracle<br>
 export ORACLE_HOME=$ORACLE_BASE/product/$ORACLE_VERSION<br>
 export ORACLE_SID=ora1<br>
@@ -197,7 +197,7 @@ and run on that version of Linux.</p>
 <th>9.2.x</th>
 <th>10.1.x</th>
 <th>10.2.x</th>
-<th>11.1.0</th>
+<th>11.2.0</th>
 </tr>
 <tr>
 <th>Redhat 5.2</th>
@@ -321,7 +321,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 </tr>
 <tr>
-<th>Fedora Core 9</th>
+<th>Fedora Core 12</th>
 <td>No</td>
 <td>No</td>
 <td>No</td>
@@ -330,7 +330,7 @@ and run on that version of Linux.</p>
 <td>No</td>
 <td>No</td>
 <td>No</td>
-<td><a href="oracle/linux/fedoracore/9/11g.html">Yes</a></td>
+<td><a href="oracle/linux/fedoracore/12/11g.html">Yes</a></td>
 </tr>
 <tr>
 <th>Suse 9.0</th>
@@ -350,7 +350,7 @@ and run on that version of Linux.</p>
 <a name="startingatboot"></a>
 <span class="heading3">Starting the Database at Boot Time</span><br>
 
-<p>For Oracle versions 10g or earlier, you can use the following script to start/stop the database at boot/shutdown time.  Replace /u01/app/oracle/product/10.2.0 with your $ORACLE_HOME</p>
+<p>For Oracle versions 10g or earlier, you can use the following script to start/stop the database at boot/shutdown time.  Replace /u01/app/oracle/product/11.2.0 with your $ORACLE_HOME</p>
 
 <blockquote>
 <PRE>
@@ -358,12 +358,12 @@ and run on that version of Linux.</p>
 
 <B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
   start<B><FONT color=#a62828>)</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.2.0/bin/dbstart</FONT><B><FONT color=#a62828>&quot;</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.2.0/bin/lsnrctl start</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/11.2.0/bin/dbstart</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/11.2.0/bin/lsnrctl start</FONT><B><FONT color=#a62828>&quot;</FONT></B>
         <B><FONT color=#a62828>;;</FONT></B>
   stop<B><FONT color=#a62828>)</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.2.0/bin/dbshut</FONT><B><FONT color=#a62828>&quot;</FONT></B>
-        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/10.2.0/bin/lsnrctl stop</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/11.2.0/bin/dbshut</FONT><B><FONT color=#a62828>&quot;</FONT></B>
+        su <B><FONT color=#a62828>-l</FONT></B> oracle <B><FONT color=#a62828>-c</FONT></B> <B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>/u01/app/oracle/product/11.2.0/bin/lsnrctl stop</FONT><B><FONT color=#a62828>&quot;</FONT></B>
         <B><FONT color=#a62828>;;</FONT></B>
   *<B><FONT color=#a62828>)</FONT></B>
         <B><FONT color=#a62828>echo</FONT></B><FONT color=#ff00ff> $</FONT><B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>Usage: </FONT><FONT color=#a620f7>$0</FONT><FONT color=#ff00ff> {start|stop}</FONT><B><FONT color=#a62828>&quot;</FONT></B>
