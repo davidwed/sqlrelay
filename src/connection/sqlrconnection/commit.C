@@ -18,7 +18,9 @@ bool sqlrconnection_svr::commit() {
 	char	*commitquery="commit";
 	int	commitquerylen=6;
 	bool	retval=false;
-	if (commitcur->openCursorInternal(0) &&
+	// since we're creating a new cursor for this, make sure it can't
+	// have an ID that might already exist
+	if (commitcur->openCursorInternal(cursorcount+1) &&
 		commitcur->prepareQuery(commitquery,commitquerylen)) {
 		retval=executeQueryUpdateStats(commitcur,commitquery,
 						commitquerylen,true);

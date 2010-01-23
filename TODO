@@ -1,3 +1,5 @@
+zope 3 doesn't have lib/python/Products
+
 in/out bind issue with perl DBD...
 
 	variable: $id
@@ -129,52 +131,6 @@ Will Renat's oracle clean-up patch fix this?
 +	cleanUpData(true,true);
  	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
  }
-
-
-If sybase is killed, sqlrelay re-logs in, ping fails
-	> select * from master..sysprocesses;
-	> kill spid
-	> ping;
-	database is down
-
-	debug:
-	=====================
-	done getting command
-	ping
-	unlinking /var/cache/sqlrelay/tmp/ipc/example-sybase1
-	relogging in...
-	closing cursors...
-	0
-	1
-	2
-	3
-	4
-	done closing cursors...
-	trying...
-	initializing cursors...
-	0
-	1
-	2
-	3
-	4
-	done initializing cursors
-	done relogging in
-	creating /var/cache/sqlrelay/tmp/ipc/example-sybase1
-	getting command...
-
-	sqlrelay: 0.39 and greater, including cvs
-	freetds: 0.82
-	sybase: 11.0.3
-
-
-
-
-
-
-
-
-
-
 
 
 configure needs to look for xsubpp for perl

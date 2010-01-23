@@ -1946,6 +1946,11 @@ then
 #include <mdbsql.h>
 }
 #include <stdlib.h>],[mdb_run_query(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_RUN_QUERY,1,Some versions of mdbtools define mdb_run_query)],[AC_MSG_RESULT(no)])
+				AC_MSG_CHECKING(if MDB Tools has mdb_sql_run_query)
+				FW_TRY_LINK([extern "C" {
+#include <mdbsql.h>
+}
+#include <stdlib.h>],[mdb_sql_run_query(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_SQL_RUN_QUERY,1,Some versions of mdbtools define mdb_sql_run_query)],[AC_MSG_RESULT(no)])
 				AC_MSG_CHECKING(if MDB Tools has mdb_sql_fetch_row)
 				FW_TRY_LINK([extern "C" {
 #include <mdbsql.h>
@@ -1984,7 +1989,9 @@ if ( test "$ENABLE_PERL" = "yes" )
 then
 
 	HAVE_PERL=""
+	HAVE_XSUBPP=""
 	PERL=""
+	XSUBPP=""
 	PERLLIB=""
 	PERLPREFIX=""
 
@@ -1999,6 +2006,7 @@ then
 		if ( test -n "$PERLPATH" )
 		then
 			FW_CHECK_FILE("$PERLPATH/bin/perl",[PERL=\"$PERLPATH/bin/perl\"; HAVE_PERL=\"yes\"])
+			FW_CHECK_FILE("$PERLPATH/bin/xsubpp",[XSUBPP=\"$PERLPATH/bin/xsubpp\"; HAVE_XSUBPP=\"yes\"])
 		else
 			AC_CHECK_PROG(PERL,perl,"perl")
 			if ( test -z "$PERL" )
@@ -2007,9 +2015,12 @@ then
 				do
 					if ( test -d "$i" )
 					then
+						PERL=""
+						XSUBPP=""
 						FW_CHECK_FILE("$i/perl5",[PERL=\"$i/perl5\"])
 						FW_CHECK_FILE("$i/perl",[PERL=\"$i/perl\"])
-						if ( test -n "$PERL" )
+						FW_CHECK_FILE("$i/xsubpp",[XSUBPP=\"$i/xsubpp\"])
+						if ( test -n "$PERL" -a -n "$XSUBPP")
 						then
 							break
 						fi
@@ -2031,7 +2042,7 @@ then
 			fi
 		fi
 
-		if ( test -n "$PERL" )
+		if ( test -n "$PERL" -a -n "$XSUBPP" )
 		then
 			HAVE_PERL="yes"
 			PERLPREFIXCMD=`$PERL -V:prefix`
@@ -2047,6 +2058,7 @@ then
 
 	AC_SUBST(HAVE_PERL)
 	AC_SUBST(PERL)
+	AC_SUBST(XSUBPP)
 	AC_SUBST(PERLLIB)
 	AC_SUBST(PERLPREFIX)
 	AC_SUBST(POD2MAN)
@@ -2211,7 +2223,7 @@ then
 							then
 								break
 							fi
-							for k in "2.2" "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9" "3.0" "3.1" "3.2"
+							for k in "2.2" "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9" "3.0" "3.1" "3.2" "3.3" "3.4"
 							do
 								FW_CHECK_FILE("$i/$j-$k/lib/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib/python/Products\"])
 								FW_CHECK_FILE("$i/$j-$k/lib64/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib64/python/Products\"])

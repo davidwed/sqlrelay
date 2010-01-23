@@ -9,6 +9,8 @@
 	added configure test for gmake, use it to find ruby.h
 	applied mingang@taobao.com's scaler patch for -debug
 	added getting started notes for Oracle 11.2 on Fedora Core 12
+	added test for mdb_sql_run_query and code to use it if it's there
+	fixed a bug that caused ping to fail after reconnecting to sybase
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

@@ -337,6 +337,8 @@ class sqlrconnection_svr :
 		const char	*connectionid;
 		unsigned int	ttl;
 
+		int32_t		cursorcount;
+
 		semaphoreset	*semset;
 
 		sqlrconnection	*sid_sqlrcon;

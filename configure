@@ -837,6 +837,7 @@ HAVE_PYTHON
 POD2MAN
 PERLPREFIX
 PERLLIB
+XSUBPP
 HAVE_PERL
 PERL
 MDBTOOLSSTATIC
@@ -5480,7 +5481,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5483 "configure"' > conftest.$ac_ext
+  echo '#line 5484 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7815,11 +7816,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7818: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7819: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7822: \$? = $ac_status" >&5
+   echo "$as_me:7823: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8077,11 +8078,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8080: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8081: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8084: \$? = $ac_status" >&5
+   echo "$as_me:8085: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8139,11 +8140,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8142: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8143: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8146: \$? = $ac_status" >&5
+   echo "$as_me:8147: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9529,7 +9530,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 9532 "configure"' > conftest.$ac_ext
+    echo '#line 9533 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -10399,7 +10400,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10402 "configure"
+#line 10403 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10497,7 +10498,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10500 "configure"
+#line 10501 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12749,11 +12750,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12752: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12753: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12756: \$? = $ac_status" >&5
+   echo "$as_me:12757: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12811,11 +12812,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12814: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12815: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12818: \$? = $ac_status" >&5
+   echo "$as_me:12819: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13326,7 +13327,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 13329 "configure"' > conftest.$ac_ext
+    echo '#line 13330 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -14196,7 +14197,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 14199 "configure"
+#line 14200 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14294,7 +14295,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 14297 "configure"
+#line 14298 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -15179,11 +15180,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15182: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15183: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15186: \$? = $ac_status" >&5
+   echo "$as_me:15187: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15241,11 +15242,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15244: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15245: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15248: \$? = $ac_status" >&5
+   echo "$as_me:15249: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16611,7 +16612,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 16614 "configure"' > conftest.$ac_ext
+    echo '#line 16615 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -17387,11 +17388,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17390: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17391: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17394: \$? = $ac_status" >&5
+   echo "$as_me:17395: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17649,11 +17650,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17652: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17653: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17656: \$? = $ac_status" >&5
+   echo "$as_me:17657: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17711,11 +17712,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17714: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17715: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17718: \$? = $ac_status" >&5
+   echo "$as_me:17719: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -19101,7 +19102,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 19104 "configure"' > conftest.$ac_ext
+    echo '#line 19105 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -19971,7 +19972,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 19974 "configure"
+#line 19975 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -20069,7 +20070,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 20072 "configure"
+#line 20073 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -35568,6 +35569,77 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
+				{ $as_echo "$as_me:$LINENO: checking if MDB Tools has mdb_sql_run_query" >&5
+$as_echo_n "checking if MDB Tools has mdb_sql_run_query... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$MDBTOOLSINCLUDES"
+LIBS="$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+extern "C" {
+#include <mdbsql.h>
+}
+#include <stdlib.h>
+int
+main ()
+{
+mdb_sql_run_query(NULL,NULL);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; };
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_MDB_SQL_RUN_QUERY 1
+_ACEOF
+
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	{ $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 				{ $as_echo "$as_me:$LINENO: checking if MDB Tools has mdb_sql_fetch_row" >&5
 $as_echo_n "checking if MDB Tools has mdb_sql_fetch_row... " >&6; }
 
@@ -35751,7 +35823,9 @@ if ( test "$ENABLE_PERL" = "yes" )
 then
 
 	HAVE_PERL=""
+	HAVE_XSUBPP=""
 	PERL=""
+	XSUBPP=""
 	PERLLIB=""
 	PERLPREFIX=""
 
@@ -35768,6 +35842,12 @@ then
 if ( test -r ""$PERLPATH/bin/perl"" )
 then
 	eval "PERL=\"$PERLPATH/bin/perl\"; HAVE_PERL=\"yes\""
+fi
+
+
+if ( test -r ""$PERLPATH/bin/xsubpp"" )
+then
+	eval "XSUBPP=\"$PERLPATH/bin/xsubpp\"; HAVE_XSUBPP=\"yes\""
 fi
 
 		else
@@ -35814,6 +35894,8 @@ fi
 				do
 					if ( test -d "$i" )
 					then
+						PERL=""
+						XSUBPP=""
 
 if ( test -r ""$i/perl5"" )
 then
@@ -35826,7 +35908,13 @@ then
 	eval "PERL=\"$i/perl\""
 fi
 
-						if ( test -n "$PERL" )
+
+if ( test -r ""$i/xsubpp"" )
+then
+	eval "XSUBPP=\"$i/xsubpp\""
+fi
+
+						if ( test -n "$PERL" -a -n "$XSUBPP")
 						then
 							break
 						fi
@@ -35852,7 +35940,7 @@ fi
 			fi
 		fi
 
-		if ( test -n "$PERL" )
+		if ( test -n "$PERL" -a -n "$XSUBPP" )
 		then
 			HAVE_PERL="yes"
 			PERLPREFIXCMD=`$PERL -V:prefix`
@@ -35866,6 +35954,7 @@ fi
 $as_echo "$as_me: WARNING: The Perl API will not be built." >&2;}
 		fi
 	fi
+
 
 
 
@@ -36050,7 +36139,7 @@ fi
 							then
 								break
 							fi
-							for k in "2.2" "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9" "3.0" "3.1" "3.2"
+							for k in "2.2" "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9" "3.0" "3.1" "3.2" "3.3" "3.4"
 							do
 
 if ( test -r ""$i/$j-$k/lib/python/Products/__init__.py"" )

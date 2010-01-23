@@ -40,6 +40,9 @@
 /* Some versions of mdbtools define mdb_sql_fetch_row */
 #undef HAVE_MDB_SQL_FETCH_ROW
 
+/* Some versions of mdbtools define mdb_sql_run_query */
+#undef HAVE_MDB_SQL_RUN_QUERY
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 

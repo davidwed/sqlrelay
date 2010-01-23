@@ -452,7 +452,7 @@ bool sqlrconnection_svr::initCursors() {
 
 	dbgfile.debugPrint("connection",0,"initializing cursors...");
 
-	int32_t	cursorcount=cfgfl->getCursors();
+	cursorcount=cfgfl->getCursors();
 	if (!cur) {
 		cur=new sqlrcursor_svr *[cursorcount];
 		for (int32_t i=0; i<cursorcount; i++) {

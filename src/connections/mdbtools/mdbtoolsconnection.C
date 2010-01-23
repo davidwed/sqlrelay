@@ -7,11 +7,11 @@
 
 #include <datatypes.h>
 
-#ifdef HAVE_MDB_RUN_QUERY
+#if defined(HAVE_MDB_RUN_QUERY)
 	// it's called mdb_sql_run_query in the .h file,
 	// but mdb_run_query in the library
 	extern "C" int mdb_run_query(MdbSQL *sql, char *query);
-#else
+#elif !defined(HAVE_MDB_SQL_RUN_QUERY)
 	extern "C" MdbSQL * _mdb_sql(MdbSQL *sql);
 	extern "C" int yyparse();
 #endif
@@ -124,8 +124,12 @@ bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
 
 	// execute the query
 	mdb_sql_reset(&mdbsql);
-#ifdef HAVE_MDB_RUN_QUERY
+#if defined(HAVE_MDB_RUN_QUERY)
 	if (!mdb_run_query(&mdbsql,(char *)query)) {
+		return false;
+	}
+#elif defined(HAVE_MDB_SQL_RUN_QUERY)
+	if (!mdb_sql_run_query(&mdbsql,(char *)query)) {
 		return false;
 	}
 #else
