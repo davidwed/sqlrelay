@@ -155,6 +155,10 @@ sub prepare {
  	for (grep /^ext_SQLR/, keys %$dbh) {
  		$sth->STORE($_, $dbh->FETCH($_));
  	}
+
+	# clear any binds still hanging around from
+	# the last time this cursor was used
+	$cursor->clearBinds();
  
  	$cursor->getNullsAsUndefined();
 	$cursor->prepareQuery($statement);
@@ -369,7 +373,6 @@ sub execute {
 
 	# send the query
 	if (not $cursor->executeQuery()) {
-		$cursor->clearBinds();
 		$sth->STORE('driver_NUM_OF_ROWS',0);
 		if (!$sth->FETCH('NUM_OF_FIELDS')) {
 			$sth->STORE('NUM_OF_FIELDS',0);
@@ -377,7 +380,6 @@ sub execute {
 		$sth->STORE('driver_FETCHED_ROWS',0);
 		return $dbh->DBI::set_err(1,$cursor->errorMessage());
 	}
-	$cursor->clearBinds();
 
 	# get some result set info
 	my $colcount=$cursor->colCount();
