@@ -873,8 +873,11 @@ bool oracle8cursor::inputBindClob(const char *variable,
 						const char *value,
 						uint32_t valuesize,
 						int16_t *isnull) {
+	// The sqlrelay connection base class adds a null terminator to the
+	// clob.  This is helpful for other database classes, but we need to
+	// remove it here.
 	return inputBindGenericLob(variable,variablesize,
-					value,valuesize,isnull,
+					value,valuesize-1,isnull,
 					OCI_TEMP_CLOB,SQLT_CLOB);
 }
 
