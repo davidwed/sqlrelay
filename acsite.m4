@@ -1989,9 +1989,7 @@ if ( test "$ENABLE_PERL" = "yes" )
 then
 
 	HAVE_PERL=""
-	HAVE_XSUBPP=""
 	PERL=""
-	XSUBPP=""
 	PERLLIB=""
 	PERLPREFIX=""
 
@@ -2006,7 +2004,6 @@ then
 		if ( test -n "$PERLPATH" )
 		then
 			FW_CHECK_FILE("$PERLPATH/bin/perl",[PERL=\"$PERLPATH/bin/perl\"; HAVE_PERL=\"yes\"])
-			FW_CHECK_FILE("$PERLPATH/bin/xsubpp",[XSUBPP=\"$PERLPATH/bin/xsubpp\"; HAVE_XSUBPP=\"yes\"])
 		else
 			AC_CHECK_PROG(PERL,perl,"perl")
 			if ( test -z "$PERL" )
@@ -2016,11 +2013,9 @@ then
 					if ( test -d "$i" )
 					then
 						PERL=""
-						XSUBPP=""
 						FW_CHECK_FILE("$i/perl5",[PERL=\"$i/perl5\"])
 						FW_CHECK_FILE("$i/perl",[PERL=\"$i/perl\"])
-						FW_CHECK_FILE("$i/xsubpp",[XSUBPP=\"$i/xsubpp\"])
-						if ( test -n "$PERL" -a -n "$XSUBPP")
+						if ( test -n "$PERL" )
 						then
 							break
 						fi
@@ -2042,23 +2037,31 @@ then
 			fi
 		fi
 
-		if ( test -n "$PERL" -a -n "$XSUBPP" )
+		XSUBPP=""
+		if ( test -n "$PERL" )
 		then
-			HAVE_PERL="yes"
 			PERLPREFIXCMD=`$PERL -V:prefix`
+			PERLLIBCMD=`$PERL -V:privlibexp`
 			PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
+			PERL_LIB=`eval "$PERLLIBCMD"; echo $privlibexp`
+			XSUBPP=$PERL_LIB/ExtUtils/xsubpp
 			if ( test -n "`pod2man --help 2>&1 | grep Usage`" )
 			then
 				POD2MAN="pod2man"
 			fi
+		fi
+
+		if ( test -r "$XSUBPP" )
+		then
+			HAVE_PERL="yes"
 		else
+			AC_MSG_WARN(xsubpp not found)
 			AC_MSG_WARN(The Perl API will not be built.)
 		fi
 	fi
 
 	AC_SUBST(HAVE_PERL)
 	AC_SUBST(PERL)
-	AC_SUBST(XSUBPP)
 	AC_SUBST(PERLLIB)
 	AC_SUBST(PERLPREFIX)
 	AC_SUBST(POD2MAN)

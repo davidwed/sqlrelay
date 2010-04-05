@@ -36,6 +36,8 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 	idleclienttimeout=-1;
 
 	connected=false;
+	inclientsession=false;
+	loggedin=false;
 
 	// maybe someday these parameters will be configurable
 	bindpool=new memorypool(512,128,100);

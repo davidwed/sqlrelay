@@ -1,127 +1,143 @@
+query routing based on which user logs into sqlrelay
+
+regex-based query rewriting -
+	if m/select blah from AAA[01|02|03].table/ then s/AAA[01|02|03]/AAA/g
+
+installing under lib/python/Products in zope 2 doesn't work
 zope 3 doesn't have lib/python/Products
 
-in/out bind issue with perl DBD...
+postgresql drop-in doesn't work with modern postgresql
 
-	variable: $id
-
-	...
-	my $sth = $dbh->prepare(<<END);
-	insert into nr_test(nr_dir) values(?)
-	returning nr_test.rowid into ?
-	END
-
-	my $place;
-	$sth->bind_param(++$place, $dir);
-	$sth->bind_param_inout(++$place, \ my $id, 64);
-	...
-
-	Note: Above worked fine on sqlrelay-0.37.1.
-
-	After some stracing, I finally found  DBD::SQLRelay::st::execute calls
-	$cursor->clearBinds *before* $cursor->getOutputBindString.
-	will patch from hiroaki kobayashi fix this problem?
-
-sqlrelay-bind-inout.patch
-
---- src/api/perl/DBD/SQLRelay.pm.in.orig	2007-11-09 13:50:20.000000000 +0900
-+++ src/api/perl/DBD/SQLRelay.pm.in	2009-12-17 19:32:00.000000000 +0900
-@@ -343,6 +343,9 @@
- 	return 1;
- }
- 
-+sub DBD::SQLRelay::st::finally::DESTROY {$_[0]->()}
-+sub finally (&) {bless $_[0], 'DBD::SQLRelay::st::finally'}
-+
- sub execute {
- 
- 	# get parameters
-@@ -351,6 +354,9 @@
- 
- 	# handle binds
- 	my $cursor=$sth->FETCH('driver_cursor');
-+	my $clearBinds = finally {
-+           $cursor->clearBinds
-+        };
- 
- 	# Clear and reset binds if they are being passed to execute()
- 	if (scalar(@bind_values)) {
-@@ -369,7 +375,6 @@
- 
- 	# send the query
- 	if (not $cursor->executeQuery()) {
--		$cursor->clearBinds();
- 		$sth->STORE('driver_NUM_OF_ROWS',0);
- 		if (!$sth->FETCH('NUM_OF_FIELDS')) {
- 			$sth->STORE('NUM_OF_FIELDS',0);
-@@ -377,7 +382,6 @@
- 		$sth->STORE('driver_FETCHED_ROWS',0);
- 		return $dbh->DBI::set_err(1,$cursor->errorMessage());
- 	}
--	$cursor->clearBinds();
- 
- 	# get some result set info
- 	my $colcount=$cursor->colCount();
-
-
-CLOB bind issue...
-	code in getbinds.C:
-
-		// It shouldn't hurt to NULL-terminate the lob because the actual size
-		// (which doesn't include the NULL terminator) should be used when
-		// binding.
-		bv->value.stringval[bv->valuesize]=(char)NULL;
-
-	And then binds.C :
-
-        	} else if (inbindvars[i].type==CLOB_BIND) {
-            		if (!inputBindClob(inbindvars[i].variable,
-                		inbindvars[i].variablesize+1,
-
-	one part of code says no problem to terminate clob with 0 byte,
-	and another part sends this byte to Oracle server.
-
-	Fix just removes "+1" from binds.C, but maybe another
-	connection adapter require this +1? 
-
-diff -ur sqlrelay-0.41.orig/src/connection/sqlrcursor/binds.C sqlrelay-0.41/src/connection/sqlrcursor/binds.C
---- sqlrelay-0.41.orig/src/connection/sqlrcursor/binds.C	2007-11-09 07:32:28.000000000 +0300
-+++ sqlrelay-0.41/src/connection/sqlrcursor/binds.C	2009-12-14 17:48:24.000000000 +0300
-@@ -48,7 +48,7 @@
- 			if (!inputBindClob(inbindvars[i].variable,
- 				inbindvars[i].variablesize,
- 				inbindvars[i].value.stringval,
--				inbindvars[i].valuesize+1,
-+				inbindvars[i].valuesize,
- 				&inbindvars[i].isnull)) {
- 				return false;
- 			}
-
-
-
-I need to protect access to stats memory, but this could slow it down...
-	If 2 processes simultaniously get access to shared memory and, for 
-	example, in this moment forked_listeners = 10, then they both decrease 
-	this value to 9 and put back to shared memory. As result would be 9 
-	instead of 8.
-
-	Solution ids obvious: semaphores should be used to access shared memory.
-
-		shmdata	*ptr=(shmdata *)staticlistener->idmemory->getPointer();
-		sem_t *mutex=staticlistener->idmemory->getSemaphore();
-		sem_wait(mutex);
-		ptr->statistics.forked_listeners--;
-		sem_post(mutex);
-
-
-verfiy that postgresql drop-in still works with modern postgresql
-
+apply Renat's stats patches
 
 Hard problem:
 	oracle apparently runs out of cursors after a while, the problem isn't
 	present in 0.39.4 but is present in all 0.4x versions and CVS:
 	http://sourceforge.net/mailarchive/forum.php?thread_name=1235577052.49a568dce0015%40imp.free.fr&forum_name=sqlrelay-discussion
 
-Will Renat's oracle clean-up patch fix this?
+	illustrates the problem:
+
+create or replace PACKAGE testrelay_proc AS
+TYPE ref_cursor IS REF CURSOR;
+PROCEDURE testrelay (
+PI$SITE_ID IN NUMBER
+, C_CURSOR OUT ref_cursor
+, PI$ERROR OUT integer);
+
+PROCEDURE testrelay2 (
+PI$SITE_ID IN NUMBER
+, PI$ERROR OUT integer);
+END testrelay_proc;
+
+create or replace PACKAGE BODY testrelay_proc AS
+PROCEDURE testrelay(
+PI$SITE_ID IN NUMBER
+, C_CURSOR OUT ref_cursor
+, PI$ERROR OUT integer) AS
+BEGIN
+PI$ERROR := -20999;
+OPEN C_CURSOR FOR
+SELECT NAME FROM xxxxxxxxx WHERE ID=PI$SITE_ID;
+PI$ERROR := 0;
+EXCEPTION
+WHEN OTHERS THEN
+IF C_CURSOR%ISOPEN THEN
+CLOSE C_CURSOR;
+END IF;
+PI$ERROR := sqlcode;
+END testrelay;
+
+PROCEDURE testrelay2 (
+PI$SITE_ID IN NUMBER
+, PI$ERROR OUT integer) AS
+BEGIN
+PI$ERROR := -20999;
+PI$ERROR := 2;
+END testrelay2;
+END testrelay_proc;
+
+
+
+create or replace FUNCTION testrelay4 (
+PI$SITE_ID IN NUMBER
+) RETURN number as
+
+LN$NAME number;
+BEGIN
+SELECT 155 into LN$NAME FROM xxxxxxxxx ID=PI$SITE_ID AND rownum < 2;
+return LN$NAME;
+end testrelay4;
+
+
+<?php
+$con=sqlrcon_alloc("IP_sqlrelay",PORT,"","USER","PASS",1,3);
+$cur=sqlrcur_alloc($con);
+
+echo "testrelay1 <br>";
+$query1 = 'select system.testrelay4(10) from dual';
+sqlrcur_sendQuery($cur, $query1);
+
+echo sqlrcur_getField($cur,0,0); // returns 1 row 1 col.
+//Always return 155 (work fine in every case evry time)
+
+echo "<br>testrelay2 <br>";
+$query3 = 'BEGIN system.testrelay_proc.testrelay2(:SITE_ID,
+:ERROR_BIND);END;';
+sqlrcur_prepareQuery($cur,$query3);
+sqlrcur_inputBind($cur,'SITE_ID', 10);
+sqlrcur_defineOutputBindInteger($cur,'ERROR_BIND');
+$resultquery = sqlrcur_executeQuery($cur);
+$bindcurError = sqlrcur_getOutputBindInteger($cur,'ERROR_BIND');
+var_dump($bindcurError);
+// Always return int 2 (work fine in every case)
+
+echo "testrelay3 - The Real Problem";
+$query = 'BEGIN system.testrelay_proc.testrelay(:SITE_ID,
+:CURSOR_BIND, :ERROR_BIND);END;';
+sqlrcur_prepareQuery($cur,$query);
+sqlrcur_inputBind($cur,'SITE_ID', 10);
+
+sqlrcur_defineOutputBindCursor($cur,'CURSOR_BIND');
+
+sqlrcur_defineOutputBindInteger($cur,'ERROR_BIND');
+$resultquery = sqlrcur_executeQuery($cur);
+$bindcur =
+sqlrcur_getOutputBindCursor($cur,'CURSOR_BIND');
+$bindcurError =
+sqlrcur_getOutputBindInteger($cur,'ERROR_BIND');
+
+//Fetching from output cursor
+sqlrcur_fetchFromBindCursor($bindcur);
+$iNbFirstResult = sqlrcur_rowCount($bindcur);
+$return['NbResult'] =
+$iNbFirstResult;
+
+
+for ($i=0; $i<sqlrcur_rowCount($bindcur); $i++) {
+for ($j=0; $j<sqlrcur_colCount($bindcur); $j++)
+{
+$return[$i][sqlrcur_getColumnName($bindcur,$j)] =
+sqlrcur_getField($bindcur,$i,$j);
+
+}
+
+}
+
+var_dump($return);
+// work after sqlrelay restart for number of available connections -
+but failed after : return array 'NbResult' => int 0
+
+// Clean cursors, connexions ...
+sqlrcon_endSession($con);
+sqlrcur_free($bindcur);
+sqlrcur_free($cur);
+sqlrcon_free($con);
+?>
+
+
+
+
+Does Renat's oracle clean-up patch need to be implemented?
 --- sqlrelay-0.41.orig/src/connections/oracle8/oracle8connection.C	2007-11-09 07:56:44.000000000 +0300
 +++ sqlrelay-0.41/src/connections/oracle8/oracle8connection.C	2009-11-16 18:12:11.000000000 +0300
 @@ -587,12 +588,13 @@
@@ -132,8 +148,6 @@ Will Renat's oracle clean-up patch fix this?
  	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
  }
 
-
-configure needs to look for xsubpp for perl
 
 Zope API:
 	doesn't handle money types right
@@ -407,6 +421,7 @@ Features:
 		db comes back up
 	* kerberos/gssapi authentication
 	* support Google Datastore
+	* web sql database? : http://dev.w3.org/html5/webdatabase/
 
 Availability:
 	* connections should ping database server every so often to make sure

@@ -40,6 +40,7 @@ using namespace rudiments;
 class sqlrconnection_svr :
 		public daemonprocess, public listener {
 	friend class sqlrcursor_svr;
+	friend class statusconnection;
 	public:
 			sqlrconnection_svr();
 		virtual	~sqlrconnection_svr();
@@ -164,6 +165,8 @@ class sqlrconnection_svr :
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();
 		void	decrementSessionCount();
+		void	incrementClientSessionCount();
+		void	decrementClientSessionCount();
 		void	announceAvailability(const char *tmpdir,
 					bool passdescriptor,
 					const char *unixsocket,
@@ -333,12 +336,15 @@ class sqlrconnection_svr :
 
 		unixclientsocket	handoffsockun;
 		bool			connected;
+		bool			inclientsession;
+		bool			loggedin;
 
 		const char	*connectionid;
 		unsigned int	ttl;
 
 		int32_t		cursorcount;
 
+		sqlrstatistics	*statistics;
 		semaphoreset	*semset;
 
 		sqlrconnection	*sid_sqlrcon;
@@ -363,9 +369,6 @@ class sqlrconnection_svr :
 
 		stringbuffer	*debugstr;
 		debugfile	dbgfile;
-
-	public:
-		sqlrstatistics	*statistics;
 };
 
 

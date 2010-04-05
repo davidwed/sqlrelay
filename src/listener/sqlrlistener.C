@@ -358,8 +358,6 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	// "connection count" - number of open database connections
 	// "session count" - number of clients currently connected
 	//
-	// 9 - UNUSED???
-	//
 	// 0 - connection: connection registration mutex
 	// 1 - listener:   connection registration mutex
 	//
@@ -390,6 +388,9 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	//       scaler waits for the connection count to increase
 	//                 (in effect, waiting for a new connection to fire up)
 	//       connection signals after increasing connection count
+	//
+	// statistcis:
+	// 9 - coordinates access to statistics shared memory segment
 	//
 	// main listenter process/listener children:
 	// 10 - listener: number of busy listeners
@@ -606,8 +607,18 @@ void sqlrlistener::listen() {
 
 	// wait until all of the connections have started
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	while (ptr->statistics.open_svr_connections<cfgfl.getConnections()) {
-		snooze::macrosnooze(1);
+	for (;;) {
+		semset->waitWithUndo(9);
+		int32_t	opensvrconnections=ptr->statistics.open_svr_connections;
+		semset->signalWithUndo(9);
+
+		if (opensvrconnections<cfgfl.getConnections()) {
+			dbgfile.debugPrint("listener",0,"waiting for server connections (sleeping 1s)");
+			snooze::macrosnooze(1);
+		} else {
+			dbgfile.debugPrint("listener",0,"done waiting for server connections");
+			break;
+		}
 	}
 
 	// listen for client connections
@@ -761,10 +772,14 @@ void sqlrlistener::blockSignals() {
 
 void sqlrlistener::alarmHandler() {
 	shmdata	*ptr=(shmdata *)staticlistener->idmemory->getPointer();
+
+	staticlistener->semset->waitWithUndo(9);
 	ptr->statistics.forked_listeners--;
 	if (ptr->statistics.forked_listeners<0) {
 		ptr->statistics.forked_listeners=0;
 	}
+	staticlistener->semset->signalWithUndo(9);
+
 	delete staticlistener;
 	exit(0);
 }
@@ -1040,18 +1055,25 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 	// a bunch of children get forked off before any of them get a chance
 	// to increment this and prevent more from getting forked off
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+
+	semset->waitWithUndo(9);
 	ptr->statistics.forked_listeners++;
+	int32_t	forkedlisteners=ptr->statistics.forked_listeners;
+	semset->signalWithUndo(9);
 
 	// if we already have too many listeners running,
 	// bail and return an error to the client
 	if (maxlisteners>-1 &&
-		ptr->statistics.forked_listeners>maxlisteners) {
+		forkedlisteners>maxlisteners) {
 
 		// since we've decided not to fork, decrement the counters
 		if (!semset->wait(10)) {
 			// FIXME: bail somehow
 		}
+
+		semset->waitWithUndo(9);
 		ptr->statistics.forked_listeners--;
+		semset->signalWithUndo(9);
 
 		// get auth and ignore the result
 		getAuth(clientsock);
@@ -1089,10 +1111,12 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		clientSession(clientsock);
 
 		// decrement the number of forked listeners
+		semset->waitWithUndo(9);
 		ptr->statistics.forked_listeners--;
 		if (ptr->statistics.forked_listeners<0) {
 			ptr->statistics.forked_listeners=0;
 		}
+		semset->signalWithUndo(9);
 
 		cleanUp();
 		exit(0);

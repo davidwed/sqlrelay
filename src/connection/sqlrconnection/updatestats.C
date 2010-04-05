@@ -7,44 +7,62 @@
 #include <sys/time.h>
 
 bool sqlrconnection_svr::logInUpdateStats(bool printerrors) {
+	if (loggedin) {
+		return true;
+	}
 	if (logIn(printerrors)) {
+		loggedin=true;
+		semset->waitWithUndo(9);
 		statistics->open_svr_connections++;
 		statistics->opened_svr_connections++;
+		semset->signalWithUndo(9);
 		return true;
 	}
 	return false;
 }
 
 void sqlrconnection_svr::logOutUpdateStats() {
+	if (!loggedin) {
+		return;
+	}
 	logOut();
+	loggedin=false;
+	semset->waitWithUndo(9);
 	statistics->open_svr_connections--;
 	if (statistics->open_svr_connections<0) {
 		statistics->open_svr_connections=0;
 	}
+	semset->signalWithUndo(9);
 }
 
 sqlrcursor_svr *sqlrconnection_svr::initCursorUpdateStats() {
 	sqlrcursor_svr	*cur=initCursor();
 	if (cur) {
+		semset->waitWithUndo(9);
 		statistics->open_svr_cursors++;
 		statistics->opened_svr_cursors++;
+		semset->signalWithUndo(9);
 	}
 	return cur;
 }
 
 void sqlrconnection_svr::deleteCursorUpdateStats(sqlrcursor_svr *curs) {
 	deleteCursor(curs);
+	semset->waitWithUndo(9);
 	statistics->open_svr_cursors--;
 	if (statistics->open_svr_cursors<0) {
 		statistics->open_svr_cursors=0;
 	}
+	semset->signalWithUndo(9);
 }
 
 bool sqlrconnection_svr::executeQueryUpdateStats(sqlrcursor_svr *curs,
 							const char *query,
 							uint32_t length,
 							bool execute) {
+	semset->waitWithUndo(9);
 	statistics->total_queries++;
+	semset->signalWithUndo(9);
 
 	timeval		starttv;
 	struct timezone	starttz;
@@ -87,7 +105,9 @@ bool sqlrconnection_svr::executeQueryUpdateStats(sqlrcursor_svr *curs,
 	}
 
 	if (!result) {
+		semset->waitWithUndo(9);
 		statistics->total_errors++;
+		semset->signalWithUndo(9);
 		return false;
 	}
 	return true;

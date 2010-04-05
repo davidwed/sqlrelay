@@ -91,7 +91,6 @@ checkSuccess($sth->execute(),1);
 print("\n");
 
 print("PARAM COUNT: \n");
-print($sth->{NUM_OF_PARAMS});
 checkSuccess($sth->{NUM_OF_PARAMS},4);
 print("\n");
 

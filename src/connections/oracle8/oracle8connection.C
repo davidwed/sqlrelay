@@ -7,7 +7,6 @@
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
 
-#include <config.h>
 #include <datatypes.h>
 
 #include <stdio.h>
@@ -587,6 +586,10 @@ bool oracle8cursor::closeCursor() {
 	/*for (ub4 i=0; i<oracle8conn->maxselectlistsize; i++) {
 		OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
 	}*/
+	// Renat says that we should do this here. I'm not sure we need
+	// to though.  If we do, we can remove the commmented out thing above
+	// too.
+	// cleanUpData(true,true);
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
 

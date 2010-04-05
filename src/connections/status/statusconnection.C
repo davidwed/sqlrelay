@@ -17,7 +17,10 @@
 // the only real function in this class
 // all the other functions have been turned into stubs
 sqlrstatistics *statusconnection::getStatistics() {
-	return statistics;
+	semset->waitWithUndo(9);
+	privatestatistics=*statistics;
+	semset->signalWithUndo(9);
+	return &privatestatistics;
 }
 
 bool statusconnection::init(int argc, const char **argv) {
@@ -73,15 +76,28 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	char	*idfilename=new char[idfilenamelen];
 	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
 
-	dbgfile.debugPrint("connection",0,"attaching to shared memory");
+	key_t	key=file::generateKey(idfilename,1);
+
+	dbgfile.debugPrint("connection",0,"attaching to shared memory and semaphores");
 	dbgfile.debugPrint("connection",0,"id filename: ");
 	dbgfile.debugPrint("connection",0,idfilename);
-
 	idmemory=new sharedmemory();
-	if (!idmemory->attach(file::generateKey(idfilename,1))) {
+	if (!idmemory->attach(key)) {
 		fprintf(stderr,"Couldn't attach to shared memory segment: ");
 		fprintf(stderr,"%s\n",error::getErrorString());
 		delete idmemory;
+		idmemory=NULL;
+		delete[] idfilename;
+		return false;
+	}
+
+	semset=new semaphoreset();
+	if (!semset->attach(key,11)) {
+		fprintf(stderr,"Couldn't attach to semaphore set: ");
+		fprintf(stderr,"%s\n",error::getErrorString());
+		delete semset;
+		delete idmemory;
+		semset=NULL;
 		idmemory=NULL;
 		delete[] idfilename;
 		return false;
@@ -95,13 +111,9 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	return true;
 }
 
-
-
-		
 statusconnection::statusconnection() : sqlrconnection_svr() {
 	connected=false;
 }
-
 
 uint16_t statusconnection::getNumberOfConnectStringVars() {
 	return 0;
@@ -119,11 +131,9 @@ sqlrcursor_svr *statusconnection::initCursor() {
 }
 
 void statusconnection::deleteCursor(sqlrcursor_svr *curs) {
-	
 }
 
 void statusconnection::logOut() {
-	
 }
 
 const char *statusconnection::identify() {
@@ -153,4 +163,3 @@ bool statusconnection::commit() {
 bool statusconnection::rollback() {
 	return false;
 }
-

@@ -3,12 +3,49 @@
 
 #include <sqlrconnection.h>
 
+void sqlrconnection_svr::incrementClientSessionCount() {
+
+	dbgfile.debugPrint("connection",0,"incrementing client session count...");
+
+	if (inclientsession) {
+		dbgfile.debugPrint("connection",0,"error. already in client session");
+		return;
+	}
+
+	semset->waitWithUndo(9);
+	statistics->open_cli_connections++;
+	inclientsession=false;
+	statistics->opened_cli_connections++;
+	semset->signalWithUndo(9);
+
+	dbgfile.debugPrint("connection",0,"done incrementing client session count...");
+}
+
+void sqlrconnection_svr::decrementClientSessionCount() {
+
+	dbgfile.debugPrint("connection",0,"decrementing client session count...");
+
+	if (!inclientsession) {
+		dbgfile.debugPrint("connection",0,"error. not in client session");
+		return;
+	}
+
+	semset->waitWithUndo(9);
+	statistics->open_cli_connections--;
+	if (statistics->open_cli_connections<0) {
+		statistics->open_cli_connections=0;
+	}
+	inclientsession=false;
+	semset->signalWithUndo(9);
+
+	dbgfile.debugPrint("connection",0,"done decrementing client session count...");
+}
+
 void sqlrconnection_svr::clientSession() {
 
 	dbgfile.debugPrint("connection",0,"client session...");
 
-	statistics->open_cli_connections++;
-	statistics->opened_cli_connections++;
+	incrementClientSessionCount();
 
 	// a session consists of getting a query and returning a result set
 	// over and over
@@ -104,10 +141,7 @@ void sqlrconnection_svr::clientSession() {
 
 	closeSuspendedSessionSockets();
 
-	statistics->open_cli_connections--;
-	if (statistics->open_cli_connections<0) {
-		statistics->open_cli_connections=0;
-	}
+	decrementClientSessionCount();
 
 	dbgfile.debugPrint("connection",0,"done with client session");
 }
@@ -148,7 +182,9 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 			return NULL;
 		}
 
+		semset->waitWithUndo(9);
 		statistics->times_cursor_reused++;
+		semset->signalWithUndo(9);
 
 		// set the current cursor to the one they requested.
 		for (int16_t i=0; i<cfgfl->getCursors(); i++) {
@@ -160,7 +196,9 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 
 	} else {
 
+		semset->waitWithUndo(9);
 		statistics->times_cursor_reused++;
+		semset->signalWithUndo(9);
 
 		// find an available cursor
 		cursor=findAvailableCursor();

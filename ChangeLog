@@ -11,6 +11,10 @@
 	added getting started notes for Oracle 11.2 on Fedora Core 12
 	added test for mdb_sql_run_query and code to use it if it's there
 	fixed a bug that caused ping to fail after reconnecting to sybase
+	added configure test for xsubpp
+	fixed perl dbi inout bind problem
+	fixed code that was adding a NULL terminator to oracle clob values
+	applied several patches from Renat Sabitov related to statistics
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

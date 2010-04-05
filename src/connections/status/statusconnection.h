@@ -40,7 +40,8 @@ class statusconnection : public sqlrconnection_svr {
 
 		const char	*connectionid;
 		tempdir		*tmpdir;
-		
+
+		sqlrstatistics	privatestatistics;
 };
 
 #endif
