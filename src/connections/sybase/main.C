@@ -8,7 +8,9 @@
 #include <stdio.h>
 
 #include <sys/types.h>
-#include <unistd.h>
+#ifdef HAVE_UNISTD_H
+	#include <unistd.h>
+#endif
 
 #ifdef NEED_REDHAT_9_GLIBC_2_3_2_HACK
 extern "C" {
@@ -39,7 +41,7 @@ void cleanUp() {
 
 void shutDown() {
 	cleanUp();
-	exit(0);
+	_exit(0);
 }
 
 int main(int argc, const char **argv) {

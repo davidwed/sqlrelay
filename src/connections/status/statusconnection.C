@@ -14,13 +14,19 @@
 
 #include <defines.h>
 
-// the only real function in this class
-// all the other functions have been turned into stubs
 sqlrstatistics *statusconnection::getStatistics() {
-	semset->waitWithUndo(9);
+	statussemset->waitWithUndo(9);
 	privatestatistics=*statistics;
-	semset->signalWithUndo(9);
+	statussemset->signalWithUndo(9);
 	return &privatestatistics;
+}
+
+int statusconnection::getConnectionCount() {
+	return ((shmdata *)idmemory->getPointer())->totalconnections;
+}
+
+int statusconnection::getSessionCount() {
+	return ((shmdata *)idmemory->getPointer())->connectionsinuse;
 }
 
 bool statusconnection::init(int argc, const char **argv) {
@@ -91,13 +97,13 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 		return false;
 	}
 
-	semset=new semaphoreset();
-	if (!semset->attach(key,11)) {
+	statussemset=new semaphoreset();
+	if (!statussemset->attach(key,11)) {
 		fprintf(stderr,"Couldn't attach to semaphore set: ");
 		fprintf(stderr,"%s\n",error::getErrorString());
-		delete semset;
+		delete statussemset;
 		delete idmemory;
-		semset=NULL;
+		statussemset=NULL;
 		idmemory=NULL;
 		delete[] idfilename;
 		return false;
@@ -162,4 +168,8 @@ bool statusconnection::commit() {
 
 bool statusconnection::rollback() {
 	return false;
+}
+
+semaphoreset *statusconnection::getSemset() {
+	return statussemset;
 }

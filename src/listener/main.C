@@ -3,16 +3,21 @@
 
 #include <sqlrlistener.h>
 
+// for _exit
+#ifdef HAVE_UNISTD_H
+	#include <unistd.h>
+#endif
+
 sqlrlistener	*lsnr;
 
 RETSIGTYPE	crash() {
 	delete lsnr;
-	exit(0);
+	_exit(0);
 }
 
 RETSIGTYPE	shutDown() {
 	delete lsnr;
-	exit(0);
+	_exit(0);
 }
 
 int	main(int argc, const char **argv) {

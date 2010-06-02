@@ -37,8 +37,7 @@
 using namespace rudiments;
 #endif
 
-class sqlrconnection_svr :
-		public daemonprocess, public listener {
+class sqlrconnection_svr : public daemonprocess, public listener {
 	friend class sqlrcursor_svr;
 	friend class statusconnection;
 	public:
@@ -193,11 +192,11 @@ class sqlrconnection_svr :
 		void		waitForListenerToFinishReading();
 		void		releaseAnnounceMutex();
 		void		acquireConnectionCountMutex();
-		uint32_t	*getConnectionCountBuffer();
+		int32_t		*getConnectionCountBuffer();
 		void		signalScalerToRead();
 		void		releaseConnectionCountMutex();
 		void		acquireSessionCountMutex();
-		uint32_t	*getSessionCountBuffer();
+		int32_t		*getSessionCountBuffer();
 		void		releaseSessionCountMutex();
 
 

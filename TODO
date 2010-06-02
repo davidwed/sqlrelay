@@ -1,14 +1,22 @@
-query routing based on which user logs into sqlrelay
+there are cases with DB2 where data in a DB that's not using UTF-8 may be
+returned converted to UTF-8.  How do we get the data out in the same encoding
+that it's in the DB in?
+http://www.ibm.com/developerworks/data/library/techarticle/dm-0506chong/index.html
 
-regex-based query rewriting -
-	if m/select blah from AAA[01|02|03].table/ then s/AAA[01|02|03]/AAA/g
+addresses="" causes the listener not to start, but addresses="0.0.0.0" or
+leaving the entire addresses element out works as expected
+
+java api crashes on 64 bit because GetIntField needs to be GetLongField on
+	that platform
+
+
+The PHP Pear DB driver doesn't handle ? chars properly inside double quotes.
+I think it probably also doesn't handle escaped quotes properly either.
 
 installing under lib/python/Products in zope 2 doesn't work
 zope 3 doesn't have lib/python/Products
 
 postgresql drop-in doesn't work with modern postgresql
-
-apply Renat's stats patches
 
 Hard problem:
 	oracle apparently runs out of cursors after a while, the problem isn't
@@ -133,20 +141,6 @@ sqlrcur_free($bindcur);
 sqlrcur_free($cur);
 sqlrcon_free($con);
 ?>
-
-
-
-
-Does Renat's oracle clean-up patch need to be implemented?
---- sqlrelay-0.41.orig/src/connections/oracle8/oracle8connection.C	2007-11-09 07:56:44.000000000 +0300
-+++ sqlrelay-0.41/src/connections/oracle8/oracle8connection.C	2009-11-16 18:12:11.000000000 +0300
-@@ -587,12 +588,13 @@
- 	/*for (ub4 i=0; i<oracle8conn->maxselectlistsize; i++) {
- 		OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
- 	}*/
-+	cleanUpData(true,true);
- 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
- }
 
 
 Zope API:
@@ -371,7 +365,11 @@ Features:
 		different user/password
 	* query router support accessing different db's by specifying which
 		db to use
+	* regex-based query rewriting
+		if m/select blah from AAA[01|02|03].table/
+		then s/AAA[01|02|03]/AAA/g
 	* make fetch buffer sizes run-time configurable for db2 and sybase
+	* make fetch buffer size configurable from a client call
 	* add "quoting method" call to api, call mysql native function,
 		(mysql_escape_string()/mysql_real_escape_string())
 	* not sure about other db's

@@ -1236,7 +1236,7 @@ void sqlrlistener::incrementSessionCount() {
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
 	ptr->connectionsinuse++;
 
-	dbgfile.debugPrint("listener",1,(int32_t)ptr->connectionsinuse);
+	dbgfile.debugPrint("listener",1,ptr->connectionsinuse);
 
 	if (dynamicscaling) {
 

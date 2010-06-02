@@ -31,11 +31,15 @@ class scaler : public daemonprocess {
 	private:
 		void	cleanUp();
 
+		bool	openOneConnection();
 		bool	openMoreConnections();
+		void	reapChildren();
 		void	getRandomConnectionId();
 		bool	availableDatabase();
 		int32_t	countSessions();
 		int32_t	countConnections();
+		void	incConnections();
+		void	decConnections();
 
 		char		*pidfile;
 
@@ -46,6 +50,7 @@ class scaler : public daemonprocess {
 		sqlrconfigfile	*cfgfile;
 
 		int32_t		maxconnections;
+		int32_t		currentconnections;
 		int32_t		maxqueuelength;
 		int32_t		growby;
 		int32_t		ttl;

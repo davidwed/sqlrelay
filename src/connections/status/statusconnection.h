@@ -13,7 +13,10 @@ class statusconnection : public sqlrconnection_svr {
 	public:
 		statusconnection();
 		sqlrstatistics 		*getStatistics();
-		bool				init(int argc, const char **argv);
+		int			getConnectionCount();
+		int			getSessionCount();
+		bool			init(int argc, const char **argv);
+		semaphoreset		*getSemset();
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
@@ -40,6 +43,8 @@ class statusconnection : public sqlrconnection_svr {
 
 		const char	*connectionid;
 		tempdir		*tmpdir;
+
+		semaphoreset	*statussemset;
 
 		sqlrstatistics	privatestatistics;
 };

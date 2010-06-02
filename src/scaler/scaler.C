@@ -13,6 +13,16 @@
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
+#include <rudiments/error.h>
+
+// for waitpid()
+#include <sys/types.h>
+#include <sys/wait.h>
+
+// for fork and exec
+#ifdef HAVE_UNISTD_H
+	#include <unistd.h>
+#endif
 
 #include <defines.h>
 
@@ -36,11 +46,14 @@ scaler::scaler() : daemonprocess() {
 	config=NULL;
 	dbase=NULL;
 
+	currentconnections=0;
+
 	debug=false;
 }
 
 scaler::~scaler() {
 	if (init) {
+		reapChildren();
 		cleanUp();
 	}
 }
@@ -102,6 +115,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// check for debug
 	debug=cmdl->found("-debug");
+
+	// since we do it by ourselves
+	dontWaitForChildren();
 
 	// get the config file
 	const char	*tmpconfig=cmdl->getValue("-config");
@@ -269,6 +285,69 @@ void scaler::cleanUp() {
 	delete cmdl;
 }
 
+void scaler::reapChildren() {
+	for (;;) {
+		int	pid=waitpid(-1,NULL,WNOHANG);
+		if (pid==0) {
+			break;
+		}
+		if (pid==-1 && error::getErrorNumber()==EINTR) {
+			continue;
+		}
+		decConnections();
+	}
+}
+
+bool scaler::openOneConnection() {
+
+	char	command_stub[]="sqlr-connection-";
+	int	commandlen=charstring::length(command_stub)+charstring::length(dbase)+1;
+	char	*command=new char[commandlen];
+	snprintf(command,commandlen,"%s%s",command_stub,dbase);
+	command[commandlen-1]='\0';
+
+	char	ttl_str[20];
+	snprintf(ttl_str,20,"%d",ttl);
+	ttl_str[19]='\0';
+
+	int	p=0;
+	char	*argv[20];
+	// execvp wants char* (arghh!)
+	argv[p++]=command;
+	argv[p++]=(char *)"-silent";
+	argv[p++]=(char *)"-nodetach";
+	argv[p++]=(char *)"-ttl";
+	argv[p++]=(char *)ttl_str;
+	argv[p++]=(char *)"-id";
+	argv[p++]=(char *)id;
+	argv[p++]=(char *)"-connectionid";
+	argv[p++]=(char *)connectionid;
+	argv[p++]=(char *)"-config";
+	argv[p++]=config;
+	if (debug) {
+		argv[p++]=(char *)"-debug";
+	}
+	argv[p++]=NULL; // the last
+
+	int	pid=fork();
+
+	if (pid==0) {
+		// child
+		int	ret=execvp(command,argv);
+		fprintf(stderr,"Bad command %s\n",command);
+		exit(ret);
+	} else if (pid>0) {
+		// parent
+		//fprintf(stderr,"forked %d\n",pid);
+	} else {
+		// error
+		fprintf(stderr,"fork() returned %d [%d]\n",pid,errno);
+	}
+
+	delete[] command;
+
+	return pid>0;
+}
 
 bool scaler::openMoreConnections() {
 
@@ -280,19 +359,21 @@ bool scaler::openMoreConnections() {
 		return false;
 	}
 
+	reapChildren();
+
 	int	sessions=countSessions();
-	int	connections=countConnections();
+	currentconnections=countConnections();
 
 	// signal listener to keep going
 	semset->signal(7);
 
 	// do we need to open more connections?
-	if ((sessions-connections)<=maxqueuelength) {
+	if ((sessions-currentconnections)<=maxqueuelength) {
 		return true;
 	}
 
 	// can more be opened, or will we exceed the max?
-	if ((connections+growby)<=maxconnections) {
+	if ((currentconnections+growby)<=maxconnections) {
 
 		// open "growby" connections
 		for (int32_t i=0; i<growby; i++) {
@@ -312,33 +393,16 @@ bool scaler::openMoreConnections() {
 				// because no connections have tried to log
 				// in to it yet, so in that case, don't even
 				// test to see if the database is up or down
-				if (connections && !availableDatabase()) {
+				if (currentconnections && !availableDatabase()) {
 					snooze::macrosnooze(1);
 					continue;
 				}
 
-				// build the command to start a connection
-				size_t	commandlen=16+charstring::length(dbase)+
-						6+20+
-						5+charstring::length(id)+
-						15+charstring::length(
-								connectionid)+
-						9+charstring::length(config)+
-						2+1;
-				char	*command=new char[commandlen];
-				snprintf(command,commandlen,
-	"sqlr-connection-%s %s -silent -ttl %d -id %s -connectionid %s -config %s %s",
-					dbase,((debug)?" -debug":""),
-					ttl,id,connectionid,config,
-					((debug)?"&":""));
-
-				// start another connection
-				success=!system(command);
-				delete[] command;
+				success=openOneConnection();
 
 				// wait for the connection count to increase
 				if (success) {
-					semset->wait(8);
+					incConnections();
 				}
 			}
 		}
@@ -386,6 +450,22 @@ int32_t scaler::countSessions() {
 	return ptr->connectionsinuse;
 }
 
+void scaler::incConnections() {
+
+	// wait for the connection count to increase
+	semset->wait(8);
+	this->currentconnections++;
+
+	//fprintf(stderr,"conn = %d\n",this->currentconnections);
+}
+
+void scaler::decConnections() {
+	if (--this->currentconnections<0) {
+		//hmm kinda error?
+		this->currentconnections=0;
+	}
+}
+
 int32_t scaler::countConnections() {
 
 	// wait for access to the connection counter
@@ -393,12 +473,12 @@ int32_t scaler::countConnections() {
 
 	// get the number of connections
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	uint32_t	totalconnections=ptr->totalconnections;
+	int32_t	connections=ptr->totalconnections;
 
 	// signal that the connection counter may be accessed by someone else
 	semset->signalWithUndo(4);
 
-	return totalconnections;
+	return connections;
 }
 
 void scaler::loop() {

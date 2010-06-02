@@ -7,6 +7,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// for _exit
+#ifdef HAVE_UNISTD_H
+	#include <unistd.h>
+#endif
+
 mdbtoolsconnection	*conn;
 signalhandler		*alarmhandler;
 
@@ -18,7 +23,7 @@ void cleanUp() {
 
 void shutDown() {
 	cleanUp();
-	exit(0);
+	_exit(0);
 }
 
 int main(int argc, const char **argv) {

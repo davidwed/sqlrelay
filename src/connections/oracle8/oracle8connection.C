@@ -589,7 +589,7 @@ bool oracle8cursor::closeCursor() {
 	// Renat says that we should do this here. I'm not sure we need
 	// to though.  If we do, we can remove the commmented out thing above
 	// too.
-	// cleanUpData(true,true);
+	cleanUpData(true,true);
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
 

@@ -8,6 +8,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// for _exit
+#ifdef HAVE_UNISTD_H
+	#include <unistd.h>
+#endif
+
 statusconnection	*conn;
 signalhandler	*alarmhandler;
 
@@ -18,7 +23,7 @@ void cleanUp() {
 
 void shutDown() {
 	cleanUp();
-	exit(0);
+	_exit(0);
 }
 
 int main(int argc, const char **argv) {
@@ -66,8 +71,33 @@ int main(int argc, const char **argv) {
 		statistics->forked_listeners
 		);
 	
+	printf(
+		"Scaler's view:\n"
+		"  Connections:                %d\n"
+		"  Sessions:                   %d\n"
+		"\n",
+		conn->getConnectionCount(),
+		conn->getSessionCount()
+		);
 
-	// unsuccessful completion
+	#define SEM_COUNT	11
+	int	sem[SEM_COUNT];
+	for (int i=0; i<SEM_COUNT; i++) {
+		sem[i]=conn->getSemset()->getValue(i);
+	}
+
+	printf(
+		"Semaphores:\n"
+		"  +---------------------------------------------+\n"
+		"  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |  10 |\n"
+		"  +---+---+---+---+---+---+---+---+---+---+-----+\n"
+		"  | %d | %d | %d | %d | %d | %d | %d | %d | %d | %d | %3d |\n"
+		"  +---------------------------------------------+\n"
+		"\n",
+		sem[0],sem[1],sem[2],sem[3],sem[4],sem[5],sem[6],sem[7],sem[8],sem[9],sem[10]
+		);
+
+
 	cleanUp();
 	exit(1);
 }

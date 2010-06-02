@@ -98,7 +98,7 @@ void sqlrconnection_svr::acquireConnectionCountMutex() {
 	dbgfile.debugPrint("connection",1,"done acquiring connection count mutex");
 }
 
-uint32_t *sqlrconnection_svr::getConnectionCountBuffer() {
+int32_t *sqlrconnection_svr::getConnectionCountBuffer() {
 	return &((shmdata *)idmemory->getPointer())->totalconnections;
 }
 
@@ -115,7 +115,7 @@ void sqlrconnection_svr::acquireSessionCountMutex() {
 	dbgfile.debugPrint("connection",1,"done acquiring session count mutex");
 }
 
-uint32_t *sqlrconnection_svr::getSessionCountBuffer() {
+int32_t *sqlrconnection_svr::getSessionCountBuffer() {
 	return &((shmdata *)idmemory->getPointer())->connectionsinuse;
 }
 

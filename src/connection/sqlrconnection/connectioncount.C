@@ -10,11 +10,11 @@ void sqlrconnection_svr::incrementConnectionCount() {
 	acquireConnectionCountMutex();
 
 	// increment the counter
-	uint32_t	*connectioncount=getConnectionCountBuffer();
+	int32_t	*connectioncount=getConnectionCountBuffer();
 	(*connectioncount)++;
 	decrementonclose=true;
 
-	dbgfile.debugPrint("connection",1,(int32_t)(*connectioncount));
+	dbgfile.debugPrint("connection",1,(*connectioncount));
 
 	signalScalerToRead();
 
@@ -30,14 +30,14 @@ void sqlrconnection_svr::decrementConnectionCount() {
 	acquireConnectionCountMutex();
 
 	// decrement the counter
-	uint32_t	*connectioncount=getConnectionCountBuffer();
+	int32_t	*connectioncount=getConnectionCountBuffer();
 	(*connectioncount)--;
 	if ((*connectioncount)<0) {
 		(*connectioncount)=0;
 	}
 	decrementonclose=false;
 
-	dbgfile.debugPrint("connection",1,(int32_t)(*connectioncount));
+	dbgfile.debugPrint("connection",1,(*connectioncount));
 
 	releaseConnectionCountMutex();
 
@@ -51,10 +51,10 @@ void sqlrconnection_svr::decrementSessionCount() {
 	acquireSessionCountMutex();
 
 	// decrement the counter
-	uint32_t	*sessioncount=getSessionCountBuffer();
+	int32_t	*sessioncount=getSessionCountBuffer();
 	(*sessioncount)--;
 
-	dbgfile.debugPrint("connection",1,(int32_t)(*sessioncount));
+	dbgfile.debugPrint("connection",1,(*sessioncount));
 
 	releaseSessionCountMutex();
 

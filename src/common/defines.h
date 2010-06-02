@@ -104,8 +104,8 @@ struct sqlrstatistics {
 // and connection daemons.  A struct is used instead of just stepping a pointer
 // through the shared memory segment to avoid alignment issues.
 struct shmdata {
-	uint32_t	totalconnections;
-	uint32_t	connectionsinuse;
+	int32_t		totalconnections;
+	int32_t		connectionsinuse;
 	char		connectionid[MAXCONNECTIONIDLEN];
 	union {
 		struct {

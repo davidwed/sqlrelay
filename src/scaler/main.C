@@ -3,6 +3,11 @@
 
 #include <scaler.h>
 
+// for _exit
+#ifdef HAVE_UNISTD_H
+	#include <unistd.h>
+#endif
+
 scaler	*s;
 
 void cleanUp() {
@@ -11,7 +16,7 @@ void cleanUp() {
 
 RETSIGTYPE shutDown() {
 	cleanUp();
-	exit(0);
+	_exit(0);
 }
 
 int main(int argc, const char **argv) {

@@ -12,14 +12,14 @@
 extern "C" {
 #endif
 
-char	*conGetStringUTFChars(JNIEnv *env, jstring string, jboolean *modifier) {
+static char *conGetStringUTFChars(JNIEnv *env, jstring string, jboolean *modifier) {
 	if (string) {
 		return (char *)env->GetStringUTFChars(string,modifier);
 	}
 	return (char *)NULL;
 }
 
-void	conReleaseStringUTFChars(JNIEnv *env, jstring string, char *chararray) {
+static void conReleaseStringUTFChars(JNIEnv *env, jstring string, char *chararray) {
 	if (string && chararray) {
 		env->ReleaseStringUTFChars(string,chararray);
 	}
