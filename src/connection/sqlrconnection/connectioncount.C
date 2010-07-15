@@ -31,8 +31,7 @@ void sqlrconnection_svr::decrementConnectionCount() {
 
 	// decrement the counter
 	int32_t	*connectioncount=getConnectionCountBuffer();
-	(*connectioncount)--;
-	if ((*connectioncount)<0) {
+	if (--(*connectioncount)<0) {
 		(*connectioncount)=0;
 	}
 	decrementonclose=false;
@@ -52,7 +51,9 @@ void sqlrconnection_svr::decrementSessionCount() {
 
 	// decrement the counter
 	int32_t	*sessioncount=getSessionCountBuffer();
-	(*sessioncount)--;
+	if (--(*sessioncount)<0) {
+		(*sessioncount)=0;
+	}
 
 	dbgfile.debugPrint("connection",1,(*sessioncount));
 

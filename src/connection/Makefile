@@ -59,6 +59,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/bindformat.C \
 	sqlrconnection/dbversion.C \
 	sqlrconnection/serverversion.C \
+	sqlrconnection/handlesignals.C \
 	sqlrcursor/sqlrcursorctor.C \
 	sqlrcursor/sqlrcursordtor.C \
 	sqlrcursor/openclose.C \
@@ -120,6 +121,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/bindformat.lo \
 	sqlrconnection/dbversion.lo \
 	sqlrconnection/serverversion.lo \
+	sqlrconnection/handlesignals.lo \
 	sqlrcursor/sqlrcursorctor.lo \
 	sqlrcursor/sqlrcursordtor.lo \
 	sqlrcursor/openclose.lo \
@@ -181,6 +183,7 @@ DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
 	sqlrconnection/bindformat.d.lo \
 	sqlrconnection/dbversion.d.lo \
 	sqlrconnection/serverversion.d.lo \
+	sqlrconnection/handlesignals.d.lo \
 	sqlrcursor/sqlrcursorctor.d.lo \
 	sqlrcursor/sqlrcursordtor.d.lo \
 	sqlrcursor/openclose.d.lo \

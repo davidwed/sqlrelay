@@ -766,19 +766,12 @@ void sqlrlistener::blockSignals() {
 	signalmanager::ignoreSignals(set.getSignalSet());
 
 	// set a handler for SIGALRM's
-	alarmhandler.setHandler((void *)alarmHandler);
+	alarmhandler.setHandler(alarmHandler);
 	alarmhandler.handleSignal(SIGALRM);
 }
 
-void sqlrlistener::alarmHandler() {
-	shmdata	*ptr=(shmdata *)staticlistener->idmemory->getPointer();
-
-	staticlistener->semset->waitWithUndo(9);
-	ptr->statistics.forked_listeners--;
-	if (ptr->statistics.forked_listeners<0) {
-		ptr->statistics.forked_listeners=0;
-	}
-	staticlistener->semset->signalWithUndo(9);
+void sqlrlistener::alarmHandler(int signum) {
+	staticlistener->decForkedListeners();
 
 	delete staticlistener;
 	exit(0);
@@ -802,6 +795,33 @@ filedescriptor *sqlrlistener::waitForData() {
 	dbgfile.debugPrint("listener",0,"done waiting for client connection");
 
 	return fd;
+}
+
+// increment the number of "busy listeners"
+void sqlrlistener::incBusyListeners() {
+	dbgfile.debugPrint("listener",0,"incrementing busy listeners");
+
+	if (!semset->signal(10)) {
+		// FIXME: bail somehow
+	}
+
+	dbgfile.debugPrint("listener",0,"done incrementing busy listeners");
+}
+
+// decrement the number of "busy listeners"
+void sqlrlistener::decBusyListeners() {
+	dbgfile.debugPrint("listener",0,"decrementing busy listeners");
+
+	if (!semset->wait(10)) {
+		// FIXME: bail somehow
+	}
+
+	dbgfile.debugPrint("listener",0,"done decrementing busy listeners");
+}
+
+// get number of "busy listeners"
+int sqlrlistener::getBusyListeners() {
+	return semset->getValue(10);
 }
 
 bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
@@ -885,23 +905,17 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	// id as this one and that is checked at startup.  However, if it did
 	// happen, getValue(10) would return something greater than 0 and we
 	// would have forked anyway.
-	if (dynamicscaling || semset->getValue(10) || !semset->getValue(2)) {
-
-		// increment the number of "busy listeners"
-		if (!semset->signal(10)) {
-			// FIXME: bail somehow
-		}
+	if (dynamicscaling || getBusyListeners() || !semset->getValue(2)) {
 
 		forkChild(clientsock);
 
 	} else {
 
-		// increment the number of "busy listeners"
-		if (!semset->signal(10)) {
-			// FIXME: bail somehow
-		}
+		incBusyListeners();
 
 		clientSession(clientsock);
+
+		decBusyListeners();
 	}
 
 	return true;
@@ -1048,18 +1062,54 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 	return false;
 }
 
+// increment the number of forked listeners
+int sqlrlistener::incForkedListeners() {
+
+	incBusyListeners();
+
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	semset->waitWithUndo(9);
+	int	forkedlisteners=++(ptr->statistics.forked_listeners);
+	semset->signalWithUndo(9);
+	return forkedlisteners;
+}
+
+// decrement the number of forked listeners
+int sqlrlistener::decForkedListeners() {
+
+	decBusyListeners();
+
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	semset->waitWithUndo(9);
+	if (--(ptr->statistics.forked_listeners)<0) {
+		ptr->statistics.forked_listeners=0;
+	}
+	int forkedlisteners=ptr->statistics.forked_listeners;
+	semset->signalWithUndo(9);
+	return forkedlisteners;
+}
+
+void sqlrlistener::errorClientSession(filedescriptor *clientsock,
+							const char *err) {
+	// get auth and ignore the result
+	getAuth(clientsock);
+	clientsock->write((uint16_t)ERROR);
+	clientsock->write((uint16_t)strlen(err));
+	clientsock->write(err);
+	flushWriteBuffer(clientsock);
+	// FIXME: if we got -1 from getAuth, then the client may be
+	// spewing garbage and we should close the connection...
+	waitForClientClose(0,false,clientsock);
+	delete clientsock;
+}
+
 void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 	// increment the number of "forked listeners"
 	// do this before we actually fork to prevent a race condition where
 	// a bunch of children get forked off before any of them get a chance
 	// to increment this and prevent more from getting forked off
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-
-	semset->waitWithUndo(9);
-	ptr->statistics.forked_listeners++;
-	int32_t	forkedlisteners=ptr->statistics.forked_listeners;
-	semset->signalWithUndo(9);
+	int	forkedlisteners=incForkedListeners();
 
 	// if we already have too many listeners running,
 	// bail and return an error to the client
@@ -1067,24 +1117,8 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		forkedlisteners>maxlisteners) {
 
 		// since we've decided not to fork, decrement the counters
-		if (!semset->wait(10)) {
-			// FIXME: bail somehow
-		}
-
-		semset->waitWithUndo(9);
-		ptr->statistics.forked_listeners--;
-		semset->signalWithUndo(9);
-
-		// get auth and ignore the result
-		getAuth(clientsock);
-		clientsock->write((uint16_t)ERROR);
-		clientsock->write((uint16_t)19);
-		clientsock->write("Too many listeners.");
-		flushWriteBuffer(clientsock);
-		// FIXME: if we got -1 from getAuth, then the client may be
-		// spewing garbage and we should close the connection...
-		waitForClientClose(0,false,clientsock);
-		delete clientsock;
+		decForkedListeners();
+		errorClientSession(clientsock,"Too many listeners.");
 		return;
 	}
 
@@ -1110,26 +1144,23 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 		clientSession(clientsock);
 
-		// decrement the number of forked listeners
-		semset->waitWithUndo(9);
-		ptr->statistics.forked_listeners--;
-		if (ptr->statistics.forked_listeners<0) {
-			ptr->statistics.forked_listeners=0;
-		}
-		semset->signalWithUndo(9);
+		decForkedListeners();
 
 		cleanUp();
 		exit(0);
+	} else if (childpid>0) {
+		// parent
+		char	debugstring[22];
+		snprintf(debugstring,22,"forked a child: %d",childpid);
+		dbgfile.debugPrint("listener",0,debugstring);
+		// the main process doesn't need to stay connected
+		// to the client, only the forked process
+		delete clientsock;
+	} else {
+		// error
+		decForkedListeners();
+		errorClientSession(clientsock, "Error forking listener");
 	}
-
-	char	debugstring[22];
-	snprintf(debugstring,22,"forked a child: %d",childpid);
-	dbgfile.debugPrint("listener",0,debugstring);
-
-
-	// the main process doesn't need to stay connected 
-	// to the client, only the forked process
-	delete clientsock;
 }
 
 void sqlrlistener::clientSession(filedescriptor *clientsock) {
@@ -1155,9 +1186,10 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 		// authentication error to discourage
 		// brute-force password attacks
 		snooze::macrosnooze(2);
+		const char	err[]="Authentication Error.";
 		clientsock->write((uint16_t)ERROR);
-		clientsock->write((uint16_t)21);
-		clientsock->write("Authentication Error.");
+		clientsock->write((uint16_t)strlen(err));
+		clientsock->write(err);
 		flushWriteBuffer(clientsock);
 		snooze::macrosnooze(2);
 	}
@@ -1338,15 +1370,6 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 			break;
 		}
 	}
-
-	// decrement the number of "busy listeners"
-	dbgfile.debugPrint("listener",0,"decrementing busy listeners");
-
-	if (!semset->wait(10)) {
-		// FIXME: bail somehow
-	}
-
-	dbgfile.debugPrint("listener",0,"done decrementing busy listeners");
 
 	return retval;
 }

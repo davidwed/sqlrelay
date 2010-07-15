@@ -31,6 +31,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	runasuser=charstring::duplicate(DEFAULT_RUNASUSER);
 	runasgroup=charstring::duplicate(DEFAULT_RUNASGROUP);
 	cursors=charstring::toInteger(DEFAULT_CURSORS);
+	maxcursors=charstring::toInteger(DEFAULT_MAXCURSORS);
+	cursorsgrowby=charstring::toInteger(DEFAULT_CURSORS_GROWBY);
 	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
 	authonlistener=charstring::contains(authtier,"listener");
 	authonconnection=charstring::contains(authtier,"connection");
@@ -186,6 +188,14 @@ const char *sqlrconfigfile::getRunAsGroup() {
 
 uint16_t sqlrconfigfile::getCursors() {
 	return cursors;
+}
+
+uint16_t sqlrconfigfile::getMaxCursors() {
+	return maxcursors;
+}
+
+uint16_t sqlrconfigfile::getCursorsGrowBy() {
+	return cursorsgrowby;
 }
 
 const char *sqlrconfigfile::getAuthTier() {
@@ -425,6 +435,10 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=RUNASGROUP_ATTRIBUTE;
 	} else if (!charstring::compare(name,"cursors")) {
 		currentattribute=CURSORS_ATTRIBUTE;
+	} else if (!charstring::compare(name,"maxcursors")) {
+		currentattribute=MAXCURSORS_ATTRIBUTE;
+	} else if (!charstring::compare(name,"cursors_growby")) {
+		currentattribute=CURSORS_GROWBY_ATTRIBUTE;
 	} else if (!charstring::compare(name,"authtier") ||
 			!charstring::compare(name,"authentication")) {
 		currentattribute=AUTHTIER_ATTRIBUTE;
@@ -569,6 +583,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							DEFAULT_RUNASGROUP);
 		} else if (currentattribute==CURSORS_ATTRIBUTE) {
 			cursors=atouint32_t(value,DEFAULT_CURSORS,1);
+		} else if (currentattribute==MAXCURSORS_ATTRIBUTE) {
+			maxcursors=atouint32_t(value,DEFAULT_MAXCURSORS,1);
+		} else if (currentattribute==CURSORS_GROWBY_ATTRIBUTE) {
+			cursorsgrowby=atouint32_t(value,DEFAULT_CURSORS_GROWBY,1);
 		} else if (currentattribute==AUTHTIER_ATTRIBUTE) {
 			delete[] authtier;
 			authtier=charstring::duplicate((value)?value:

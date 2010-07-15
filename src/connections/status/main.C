@@ -21,7 +21,7 @@ void cleanUp() {
 	delete alarmhandler;
 }
 
-void shutDown() {
+void shutDown(int signum) {
 	cleanUp();
 	_exit(0);
 }
@@ -99,5 +99,5 @@ int main(int argc, const char **argv) {
 
 
 	cleanUp();
-	exit(1);
+	exit(0);
 }

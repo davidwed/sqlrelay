@@ -72,7 +72,13 @@ class sqlrlistener : public daemonprocess, public listener {
 		void	forkChild(filedescriptor *clientsock);
 		void	clientSession(filedescriptor *clientsock);
 		int32_t	getAuth(filedescriptor *clientsock);
+		void    errorClientSession(filedescriptor *clientsock, const char *err);
 		void	incrementSessionCount();
+		int     incForkedListeners();
+		int     decForkedListeners();
+		void	incBusyListeners();
+		void	decBusyListeners();
+		int     getBusyListeners();
 		bool	handOffClient(filedescriptor *sock);
 		void	getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
@@ -97,7 +103,7 @@ class sqlrlistener : public daemonprocess, public listener {
 						filedescriptor *clientsock);
 		void	flushWriteBuffer(filedescriptor *fd);
 
-		static void	alarmHandler();
+		static void	alarmHandler(int signum);
 
 		bool		passdescriptor;
 

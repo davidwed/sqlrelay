@@ -13,6 +13,7 @@ void sqlrconnection_svr::closeCursors(bool destroy) {
 			dbgfile.debugPrint("connection",1,i);
 
 			if (cur[i]) {
+				cur[i]->cleanUpData(true,true);
 				cur[i]->closeCursor();
 				if (destroy) {
 					deleteCursorUpdateStats(cur[i]);

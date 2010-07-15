@@ -45,7 +45,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual	~sqlrconnection_svr();
 
 		bool	initConnection(int argc, const char **argv);
-		void	listen();
+		bool	listen();
 		void	closeConnection();
 
 	protected:
@@ -147,6 +147,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 							const char *id);
 		void		cleanUpAllCursorData(bool freeresult,
 							bool freebinds);
+		virtual signalhandler	*handleSignals(void (*shutdownfunction)(int));
 
 	private:
 		// methods used internally
@@ -279,7 +280,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	markDatabaseUnavailable();
 		void	markDatabaseAvailable();
 
-		void	blockSignals();
 		bool	attemptLogIn(bool printerrors);
 		void	setInitialAutoCommitBehavior();
 		bool	openSockets();

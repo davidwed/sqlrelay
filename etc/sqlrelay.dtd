@@ -16,6 +16,8 @@
 	<!ATTLIST instance runasuser CDATA "nobody">
 	<!ATTLIST instance runasgroup CDATA "nobody">
 	<!ATTLIST instance cursors CDATA "5">
+	<!ATTLIST instance maxcursors CDATA "1300">
+	<!ATTLIST instance cursors_growby CDATA "5">
 	<!ATTLIST instance authtier (listener|connection|listener_and_connection|database) "listener">
 	<!ATTLIST instance handoff (pass|reconnect) "reconnect">
 	<!ATTLIST instance deniedips CDATA "">

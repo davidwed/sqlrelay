@@ -35,6 +35,8 @@ typedef enum {
 	RUNASUSER_ATTRIBUTE,
 	RUNASGROUP_ATTRIBUTE,
 	CURSORS_ATTRIBUTE,
+	MAXCURSORS_ATTRIBUTE,
+	CURSORS_GROWBY_ATTRIBUTE,
 	AUTHTIER_ATTRIBUTE,
 	HANDOFF_ATTRIBUTE,
 	DENIEDIPS_ATTRIBUTE,
@@ -173,6 +175,8 @@ class sqlrconfigfile : public xmlsax {
 		const char	*getRunAsUser();
 		const char	*getRunAsGroup();
 		uint16_t	getCursors();
+		uint16_t	getMaxCursors();
+		uint16_t	getCursorsGrowBy();
 		const char	*getAuthTier();
 		bool		getAuthOnListener();
 		bool		getAuthOnConnection();
@@ -248,6 +252,8 @@ class sqlrconfigfile : public xmlsax {
 		const char	*runasuser;
 		const char	*runasgroup;
 		uint16_t	cursors;
+		uint16_t	maxcursors;
+		uint16_t	cursorsgrowby;
 		const char	*authtier;
 		bool		authonlistener;
 		bool		authonconnection;

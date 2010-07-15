@@ -110,8 +110,7 @@ void sqlrconnection_svr::releaseConnectionCountMutex() {
 
 void sqlrconnection_svr::acquireSessionCountMutex() {
 	dbgfile.debugPrint("connection",1,"acquiring session count mutex");
-	semset->wait(5);
-	//semset->waitWithUndo(5);
+	semset->waitWithUndo(5);
 	dbgfile.debugPrint("connection",1,"done acquiring session count mutex");
 }
 
@@ -121,7 +120,7 @@ int32_t *sqlrconnection_svr::getSessionCountBuffer() {
 
 void sqlrconnection_svr::releaseSessionCountMutex() {
 	dbgfile.debugPrint("connection",1,"releasing session count mutex");
-	semset->signal(5);
+	semset->signalWithUndo(5);
 	dbgfile.debugPrint("connection",1,"done releasing session count mutex");
 }
 

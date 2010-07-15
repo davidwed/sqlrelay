@@ -240,43 +240,27 @@ remote host.</p>
 </PRE>
 </blockquote>
 
-<p>Once the user is created, it must be given database-specific priveleges.  The
-following query gives <i>testuser</i> all privileges on the <i>testdb</i> 
-database.</p>
+<p>Once the user is created, it must be given database-specific priveleges.  
+You'll need to run a query like the following to give <i>testuser</i> all
+privileges on the <i>testdb</i> database.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> db <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testdb'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,
-<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>);
+<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> db <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testdb'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>);
 </PRE>
 </blockquote>
 
-<p>Older versions of MySQL have fewer columns in the <i>db</i> table, if the
-query above fails, try this one instead.</p>
+<p>Various versions of MySQL have differnet numbers of columns in the <i>db</i>
+table, if the query above fails, run:.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> db <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testdb'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>);
+<B><FONT color=#a62828>desc</FONT></B> db
 </PRE>
 </blockquote>
 
-<p>Even older versions of MySQL have fewer columns than that in the <i>db</i>
-table, if the above queries fail, try this one instead.</p>
-
-<blockquote>
-<PRE>
-<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> db <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testdb'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>);
-</PRE>
-</blockquote>
-
-<p>Still older versions of MySQL have even fewer columns in the <i>db</i> table,
-if the queries fail, try this one instead.</p>
-
-<blockquote>
-<PRE>
-<B><FONT color=#a62828>insert</FONT></B> <FONT color=#6959cf>into</FONT> db <FONT color=#6959cf>values</FONT> (<FONT color=#ff00ff>'%'</FONT>,<FONT color=#ff00ff>'testdb'</FONT>,<FONT color=#ff00ff>'testuser'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>,<FONT color=#ff00ff>'Y'</FONT>);
-</PRE>
-</blockquote>
+<p>Then count the number of columns with Type <b>enum('N','Y')</b> and re-run
+the query above using that number <b>,'Y'</b> arguments.</p>
 
 <p>Exit the mysql client and run the following command to activate these 
 changes.</p>

@@ -117,6 +117,8 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	return true;
 }
 
+// all the other functions have been turned into stubs
+
 statusconnection::statusconnection() : sqlrconnection_svr() {
 	connected=false;
 }

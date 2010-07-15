@@ -13,7 +13,7 @@
 
 cachemanager	*cacheman;
 
-void shutDown() {
+void shutDown(int signum) {
 	delete cacheman;
 	exit(0);
 }
@@ -23,6 +23,6 @@ int main(int argc, const char **argv) {
 	#include <version.h>
 
 	cacheman=new cachemanager(argc,argv);
-	cacheman->handleShutDown((void *)shutDown);
+	cacheman->handleShutDown(shutDown);
 	cacheman->scan();
 }

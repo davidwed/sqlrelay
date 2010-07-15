@@ -21,7 +21,7 @@ void cleanUp() {
 	delete alarmhandler;
 }
 
-void shutDown() {
+void shutDown(int signum) {
 	cleanUp();
 	_exit(0);
 }
@@ -32,19 +32,18 @@ int main(int argc, const char **argv) {
 
 	conn=new freetdsconnection();
 
-	// handle kill signals
-	conn->handleShutDown((void *)shutDown);
-
-	// handle alarm
-	alarmhandler=new signalhandler(SIGALRM,(void *)shutDown);
+	// handle signals
+	alarmhandler=conn->handleSignals(shutDown);
 
 	// open the connection
+	bool	listenresult=false;
 	if (conn->initConnection(argc,argv)) {
 		// wait for connections
-		conn->listen();
+		listenresult=conn->listen();
 	}
 
-	// unsuccessful completion
 	cleanUp();
-	exit(1);
+
+	// return successful or unsuccessful completion based on listenresult
+	exit((listenresult)?0:1);
 }

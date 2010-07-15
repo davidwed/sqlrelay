@@ -14,7 +14,7 @@ void cleanUp() {
 	delete s;
 }
 
-RETSIGTYPE shutDown() {
+RETSIGTYPE shutDown(int signum) {
 	cleanUp();
 	_exit(0);
 }
@@ -25,7 +25,7 @@ int main(int argc, const char **argv) {
 
 	// launch the scaler
 	s=new scaler();
-	s->handleShutDown((RETSIGTYPE *)shutDown);
+	s->handleShutDown(shutDown);
 	if (s->initScaler(argc,argv)) {
 		s->loop();
 	}

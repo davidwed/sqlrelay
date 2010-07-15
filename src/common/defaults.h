@@ -51,6 +51,12 @@
 #define DEFAULT_CURSORS "5"
 	// default number of cursors to open
 
+#define DEFAULT_MAXCURSORS "1300"
+	// default limit on the number of cursors to expand to
+
+#define DEFAULT_CURSORS_GROWBY "5"
+	// when we need more cursors, allocate this many more in one shot
+
 #define DEFAULT_AUTHTIER "listener"
 	// default tier to authenticate users on
 

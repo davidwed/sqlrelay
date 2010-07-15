@@ -11,11 +11,11 @@ bool sqlrconnection_svr::logInUpdateStats(bool printerrors) {
 		return true;
 	}
 	if (logIn(printerrors)) {
-		loggedin=true;
 		semset->waitWithUndo(9);
 		statistics->open_svr_connections++;
 		statistics->opened_svr_connections++;
 		semset->signalWithUndo(9);
+		loggedin=true;
 		return true;
 	}
 	return false;
@@ -26,13 +26,13 @@ void sqlrconnection_svr::logOutUpdateStats() {
 		return;
 	}
 	logOut();
-	loggedin=false;
 	semset->waitWithUndo(9);
 	statistics->open_svr_connections--;
 	if (statistics->open_svr_connections<0) {
 		statistics->open_svr_connections=0;
 	}
 	semset->signalWithUndo(9);
+	loggedin=false;
 }
 
 sqlrcursor_svr *sqlrconnection_svr::initCursorUpdateStats() {

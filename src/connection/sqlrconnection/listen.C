@@ -4,9 +4,10 @@
 #include <sqlrconnection.h>
 #include <unistd.h>
 
-void sqlrconnection_svr::listen() {
+bool sqlrconnection_svr::listen() {
 
 	uint16_t	sessioncount=0;
+	bool		returnflag=false;
 
 	for (;;) {
 
@@ -41,6 +42,12 @@ void sqlrconnection_svr::listen() {
 				// if waitForClient() errors out, break out of
 				// the suspendedsession loop and loop back
 				// for another session
+				// the suspendedsession loop and
+				// close connection if it is possible
+				// otherwise wait for session, but
+				// it seems that on hard load it's impossible
+				// to change handoff socket for pid
+				returnflag=true;
 				break;
 
 			} else {
@@ -59,6 +66,9 @@ void sqlrconnection_svr::listen() {
 
 		if (cfgfl->getDynamicScaling()) {
 			decrementSessionCount();
+			if (returnflag) {
+				return false;
+			}
 		}
 
 		// If this connection was forked off by dynamic scaling then
@@ -72,7 +82,7 @@ void sqlrconnection_svr::listen() {
 				cfgfl->getMaxSessionCount()) {
 			sessioncount++;
 			if (sessioncount==cfgfl->getMaxSessionCount()) {
-				return;
+				return true;
 			}
 		}
 	}

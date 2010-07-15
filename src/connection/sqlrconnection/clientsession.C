@@ -32,10 +32,10 @@ void sqlrconnection_svr::decrementClientSessionCount() {
 
 	semset->waitWithUndo(9);
 	statistics->open_cli_connections--;
+	inclientsession=false;
 	if (statistics->open_cli_connections<0) {
 		statistics->open_cli_connections=0;
 	}
-	inclientsession=false;
 	semset->signalWithUndo(9);
 
 	dbgfile.debugPrint("connection",0,"done decrementing client session count...");

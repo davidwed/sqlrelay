@@ -287,7 +287,8 @@ void scaler::cleanUp() {
 
 void scaler::reapChildren() {
 	for (;;) {
-		int	pid=waitpid(-1,NULL,WNOHANG);
+		int	childstatus;
+		int	pid=waitpid(-1,&childstatus,WNOHANG);
 		if (pid==0) {
 			break;
 		}
@@ -295,6 +296,30 @@ void scaler::reapChildren() {
 			continue;
 		}
 		decConnections();
+
+		if (WIFEXITED(childstatus)) {
+			int	exitstatus=WEXITSTATUS(childstatus);
+			if (exitstatus) {
+				fprintf(stderr,"Connection (pid=%d) exited with code %d\n",
+						pid,exitstatus);
+			}
+		} else if (WIFSIGNALED(childstatus)) {
+#ifdef WCOREDUMP
+			if (WCOREDUMP(childstatus)) {
+				fprintf(stderr,"Connection (pid=%d) terminated by signal %d, with coredump\n",
+						pid,WTERMSIG(childstatus));
+			} else {
+#endif
+				fprintf(stderr,"Connection (pid=%d) terminated by signal %d\n",
+						pid,WTERMSIG(childstatus));
+#ifdef WCOREDUMP
+			}
+#endif
+		} else {
+			// something strange happened, we shouldn't be here
+			fprintf(stderr,"Connection (pid=%d) exited, childstatus is %d\n",
+					pid,childstatus);
+		}
 	}
 }
 
