@@ -8,7 +8,7 @@ void sqlrconnection_svr::closeCursors(bool destroy) {
 	dbgfile.debugPrint("connection",0,"closing cursors...");
 
 	if (cur) {
-		for (int32_t i=0; i<cfgfl->getCursors(); i++) {
+		for (int32_t i=0; i<cursorcount; i++) {
 
 			dbgfile.debugPrint("connection",1,i);
 
@@ -21,7 +21,7 @@ void sqlrconnection_svr::closeCursors(bool destroy) {
 			}
 		}
 		if (destroy) {
-			delete[] cur;
+			free(cur);
 			cur=NULL;
 		}
 	}

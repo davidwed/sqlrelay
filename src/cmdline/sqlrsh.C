@@ -140,7 +140,7 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 						environment *env) {
 
 	// get user's home directory
-	char	*home=getenv("HOME");
+	const char	*home=getenv("HOME");
 	if (!home) {
 		home="~";
 	}
@@ -868,9 +868,9 @@ void sqlrsh::execute(int argc, const char **argv) {
 	#ifdef HAVE_READLINE
 
 		// handle the history file
-		size_t	filenamelen;
-		char	*filename;
-		char	*home=getenv("HOME");
+		size_t		filenamelen;
+		char		*filename;
+		const char	*home=getenv("HOME");
 		if (home && home[0]) {
 			filenamelen=charstring::length(home)+16+1;
 			filename=new char[filenamelen];

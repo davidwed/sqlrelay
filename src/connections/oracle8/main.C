@@ -27,7 +27,7 @@ volatile sig_atomic_t shutdowninprogress=0;
 
 void shutDown(int signum) {
 
-	if (!signalhandler::isSignalHandlerInt()) {
+	if (!signalhandler::isSignalHandlerIntUsed()) {
 		cleanUp();
 		_exit(0);
 	}

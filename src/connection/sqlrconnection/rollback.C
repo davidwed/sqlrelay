@@ -15,9 +15,9 @@ bool sqlrconnection_svr::rollback() {
 	dbgfile.debugPrint("connection",1,"rollback...");
 
 	sqlrcursor_svr	*rollbackcur=initCursorUpdateStats();
-	char	*rollbackquery="rollback";
-	int	rollbackquerylen=8;
-	bool	retval=false;
+	const char	*rollbackquery="rollback";
+	int		rollbackquerylen=8;
+	bool		retval=false;
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	if (rollbackcur->openCursorInternal(cursorcount+1) &&

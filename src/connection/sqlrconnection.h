@@ -341,7 +341,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		const char	*connectionid;
 		unsigned int	ttl;
 
-		int32_t		cursorcount;
+		uint16_t	cursorcount;
 
 		sqlrstatistics	*statistics;
 		semaphoreset	*semset;

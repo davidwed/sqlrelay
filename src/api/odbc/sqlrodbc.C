@@ -1756,7 +1756,7 @@ SQLRETURN SQLR_SQLFetchScroll(SQLHSTMT statementhandle,
 			break;
 		case SQL_FETCH_RELATIVE:
 			if (fetchoffset<0 &&
-				stmt->currentfetchrow<fetchoffset*-1) {
+				static_cast<SQLROWOFFSET>(stmt->currentfetchrow)<fetchoffset*-1) {
 				stmt->currentfetchrow=0;
 			} else {
 				stmt->currentfetchrow=
@@ -2500,7 +2500,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 
 	SQLSMALLINT	smallintvar=0;
 	SQLINTEGER	intvar=0;
-	char		*strval="";
+	const char	*strval="";
 
 	// FIXME: there are tons more of these...
 	switch (infotype) {

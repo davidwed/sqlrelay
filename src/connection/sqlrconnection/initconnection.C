@@ -314,7 +314,7 @@ bool sqlrconnection_svr::initCursors() {
 
 	cursorcount=cfgfl->getCursors();
 	if (!cur) {
-		cur=new sqlrcursor_svr *[cursorcount];
+		cur=(sqlrcursor_svr **)malloc(sizeof(sqlrcursor_svr **)*cursorcount);
 		for (int32_t i=0; i<cursorcount; i++) {
 			cur[i]=NULL;
 		}
@@ -335,7 +335,7 @@ bool sqlrconnection_svr::initCursors() {
 			dbgfile.debugPrint("connection",1,"cursor init failure...");
 
 			logOutUpdateStats();
-			fprintf(stderr,"Couldn't create cursors.\n");
+			//fprintf(stderr,"Couldn't create cursors.\n");
 			return false;
 		}
 	}

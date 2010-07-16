@@ -118,7 +118,7 @@ void sqlrconnection_svr::initSession() {
 
 	commitorrollback=false;
 	suspendedsession=false;
-	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
+	for (int32_t i=0; i<cursorcount; i++) {
 		cur[i]->suspendresultset=false;
 	}
 	accepttimeout=5;

@@ -201,7 +201,7 @@ typedef	enum {
 } datatype;
 
 #ifdef NEED_DATATYPESTRING
-static char	*datatypestring[] = {
+static const char	*datatypestring[] = {
 	"UNKNOWN",
 	// addded by freetds
 	"CHAR",		// 1
@@ -391,15 +391,20 @@ static char	*datatypestring[] = {
 };
 #endif
 
+#ifdef NEED_IS_BIT_TYPE_CHAR
 static bool isBitTypeChar(const char *type) {
   return (!charstring::compare(type,"BIT") ||
 	  !charstring::compare(type,"VARBIT"));
 }
+#endif
 
+#ifdef NEED_IS_BOOL_TYPE_CHAR
 static bool isBoolTypeChar(const char *type) {
   return !charstring::compare(type,"BOOL");
 }
+#endif
 
+#ifdef NEED_IS_FLOAT_TYPE_CHAR
 static bool isFloatTypeChar(const char *type) {
   return (!charstring::compare(type,"NUMERIC") ||
 	  !charstring::compare(type,"REAL") ||
@@ -413,7 +418,9 @@ static bool isFloatTypeChar(const char *type) {
 	  !charstring::compareIgnoringCase(type,"FLOAT4") ||
 	  !charstring::compareIgnoringCase(type,"FLOAT8"));
 }
+#endif
 
+#ifdef NEED_BIT_STRING_TO_LONG
 static long bitStringToLong(const char *str) {
   long result = 0;
   int length = charstring::length(str) - 1;
@@ -425,6 +432,7 @@ static long bitStringToLong(const char *str) {
   }
   return result;
 }
+#endif
 
 #ifdef NEED_IS_NUMBER_TYPE_CHAR
 static bool isNumberTypeChar(const char *type) { 

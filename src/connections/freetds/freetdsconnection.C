@@ -408,8 +408,8 @@ bool freetdscursor::openCursor(uint16_t id) {
 	}
 
 	if (!freetdsconn->dbversion) {
-		char	*query="sp_version installmaster";
-		int32_t	len=charstring::length(query);
+		const char	*query="sp_version installmaster";
+		int32_t		len=charstring::length(query);
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true) &&
 				fetchRow())) {

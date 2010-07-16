@@ -612,7 +612,7 @@ void sqlrlistener::listen() {
 		int32_t	opensvrconnections=ptr->statistics.open_svr_connections;
 		semset->signalWithUndo(9);
 
-		if (opensvrconnections<cfgfl.getConnections()) {
+		if (opensvrconnections<static_cast<int32_t>(cfgfl.getConnections())) {
 			dbgfile.debugPrint("listener",0,"waiting for server connections (sleeping 1s)");
 			snooze::macrosnooze(1);
 		} else {

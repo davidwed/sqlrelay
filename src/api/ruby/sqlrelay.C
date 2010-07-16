@@ -528,8 +528,8 @@ static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
 	}
 	VALUE	variable;
 	VALUE	value;
-	VALUE	precision;
-	VALUE	scale;
+	VALUE	precision=0;
+	VALUE	scale=0;
 	bool	success=true;
 	for (;;) {
 		variable=rb_ary_shift(variables);
@@ -579,8 +579,8 @@ static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
 	}
 	VALUE	variable;
 	VALUE	value;
-	VALUE	precision;
-	VALUE	scale;
+	VALUE	precision=0;
+	VALUE	scale=0;
 	bool	success=true;
 	for (;;) {
 		variable=rb_ary_shift(variables);

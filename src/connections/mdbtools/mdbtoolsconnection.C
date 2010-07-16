@@ -170,7 +170,7 @@ uint32_t mdbtoolscursor::colCount() {
 
 const char * const *mdbtoolscursor::columnNames() {
 	columnnames=new char *[mdbsql.num_columns];
-	for (int i=0; i<mdbsql.num_columns; i++) {
+	for (unsigned int i=0; i<mdbsql.num_columns; i++) {
 		MdbSQLColumn	*col=(MdbSQLColumn *)
 			g_ptr_array_index(mdbsql.columns,i);
 		columnnames[i]=col->name;
@@ -185,7 +185,7 @@ uint16_t mdbtoolscursor::columnTypeFormat() {
 void mdbtoolscursor::returnColumnInfo() {
 
 	// for each column...
-	for (int i=0; i<mdbsql.num_columns; i++) {
+	for (unsigned int i=0; i<mdbsql.num_columns; i++) {
 
 		// get the column
 		MdbSQLColumn	*col=(MdbSQLColumn *)
@@ -222,12 +222,12 @@ void mdbtoolscursor::returnRow() {
 	MdbSQLColumn	*column;
 
 	// run through the columns
-	for (int col=0; col<mdbsql.num_columns; col++) {
+	for (unsigned int col=0; col<mdbsql.num_columns; col++) {
 
 		// find the corresponding column in the current table
 		column=(MdbSQLColumn *)g_ptr_array_index(mdbsql.columns,col);
 		table=mdbsql.cur_table;
-		for (int tcol=0; tcol<table->num_cols; tcol++) {
+		for (unsigned int tcol=0; tcol<table->num_cols; tcol++) {
 			tablecolumn=(MdbColumn *)
 				g_ptr_array_index(table->columns,tcol);
 			if (!charstring::compare(tablecolumn->name,

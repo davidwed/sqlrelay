@@ -15,9 +15,9 @@ bool sqlrconnection_svr::commit() {
 	dbgfile.debugPrint("connection",1,"commit...");
 
 	sqlrcursor_svr	*commitcur=initCursorUpdateStats();
-	char	*commitquery="commit";
-	int	commitquerylen=6;
-	bool	retval=false;
+	const char	*commitquery="commit";
+	int		commitquerylen=6;
+	bool		retval=false;
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	if (commitcur->openCursorInternal(cursorcount+1) &&

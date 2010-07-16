@@ -219,18 +219,18 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 				unsigned long client_flag);
 void mysql_close(MYSQL *mysql);
 int mysql_ping(MYSQL *mysql);
-char *mysql_stat(MYSQL *mysql);
+const char *mysql_stat(MYSQL *mysql);
 int mysql_shutdown(MYSQL *mysql);
 int mysql_reload(MYSQL *mysql);
 int mysql_refresh(MYSQL *mysql, unsigned int refresh_options);
 unsigned long mysql_thread_id(MYSQL *mysql);
 MYSQL_RES *mysql_list_processes(MYSQL *mysql);
 int mysql_kill(MYSQL *mysql, unsigned long pid);
-char *mysql_get_client_info();
+const char *mysql_get_client_info();
 unsigned long mysql_get_client_version();
-char *mysql_get_host_info(MYSQL *mysql);
+const char *mysql_get_host_info(MYSQL *mysql);
 unsigned int mysql_get_proto_info(MYSQL *mysql);
-char *mysql_get_server_info(MYSQL *mysql);
+const char *mysql_get_server_info(MYSQL *mysql);
 unsigned long mysql_get_server_version(MYSQL *mysql);
 my_bool	mysql_change_user(MYSQL *mysql, const char *user,
 				const char *password, const char *db);
@@ -261,7 +261,7 @@ unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 					const char *from,
 					unsigned long length);
 int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length);
-char *mysql_info(MYSQL *mysql);
+const char *mysql_info(MYSQL *mysql);
 my_ulonglong mysql_insert_id(MYSQL *mysql);
 MYSQL_RES *mysql_store_result(MYSQL *mysql);
 MYSQL_RES *mysql_use_result(MYSQL *mysql);
@@ -404,7 +404,7 @@ int mysql_ping(MYSQL *mysql) {
 	return !mysql->sqlrcon->ping();
 }
 
-char *mysql_stat(MYSQL *mysql) {
+const char *mysql_stat(MYSQL *mysql) {
 	debugFunction();
 	return "Uptime: 0  Threads: 0  Questions: 0  Slow queries: 0  Opens: 0  Flush tables: 0  Open tables: 0 Queries per second avg: 0.0";
 }
@@ -445,7 +445,7 @@ int mysql_kill(MYSQL *mysql, unsigned long pid) {
 
 
 
-char *mysql_get_client_info() {
+const char *mysql_get_client_info() {
 	debugFunction();
 	// Returns a string that represents the client library version.
 	#ifdef COMPAT_MYSQL_3
@@ -489,7 +489,7 @@ unsigned long mysql_get_client_version() {
 	#endif
 }
 
-char *mysql_get_host_info(MYSQL *mysql) {
+const char *mysql_get_host_info(MYSQL *mysql) {
 	debugFunction();
 	// Returns a string describing the type of connection in use,
 	// including the server host name.
@@ -517,7 +517,7 @@ unsigned int mysql_get_proto_info(MYSQL *mysql) {
 	#endif
 }
 
-char *mysql_get_server_info(MYSQL *mysql) {
+const char *mysql_get_server_info(MYSQL *mysql) {
 	debugFunction();
 	// Returns a string that represents the server version number.
 	#ifdef COMPAT_MYSQL_3
@@ -715,7 +715,7 @@ int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length) {
 	return mysql_execute(mysql->currentstmt);
 }
 
-char *mysql_info(MYSQL *mysql) {
+const char *mysql_info(MYSQL *mysql) {
 	debugFunction();
 	return "";
 }
@@ -1413,19 +1413,19 @@ int mysql_execute(MYSQL_STMT *stmt) {
 
 			fields[i].name=const_cast<char *>(
 					sqlrcur->getColumnName(i));
-			fields[i].table="";
-			fields[i].def="";
+			fields[i].table=const_cast<char *>("");
+			fields[i].def=const_cast<char *>("");
 
 			#if defined(COMPAT_MYSQL_4_0) || \
 				defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
-  			fields[i].org_table="";
-  			fields[i].db="";
+  			fields[i].org_table=const_cast<char *>("");
+  			fields[i].db=const_cast<char *>("");
 			#if defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
-  			fields[i].catalog="";
+  			fields[i].catalog=const_cast<char *>("");
   			fields[i].org_name=const_cast<char *>(
 						sqlrcur->getColumnName(i));
 			fields[i].name_length=

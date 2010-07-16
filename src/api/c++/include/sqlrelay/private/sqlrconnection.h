@@ -44,7 +44,7 @@
 		uint16_t		listenerinetport;
 		uint16_t		connectioninetport;
 		char			*listenerunixport;
-		char			*connectionunixport;
+		const char		*connectionunixport;
 		char			connectionunixportbuffer[MAXPATHLEN+1];
 		int32_t			timeoutsec;
 		int32_t			timeoutusec;

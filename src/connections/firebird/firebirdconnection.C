@@ -164,11 +164,9 @@ const char *firebirdconnection::dbVersion() {
 		char	*ptr=resbuffer;
 
 		// first byte is isc_info_version
-		char		dbitem=*ptr;
 		ptr++;
 
 		// next 2 bytes are length of the isc_info_version data
-		uint16_t	len=isc_vax_integer(ptr,sizeof(uint16_t));
 		ptr=ptr+sizeof(uint16_t);
 
 		// the next byte is the number of lines of text

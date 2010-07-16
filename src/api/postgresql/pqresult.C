@@ -141,21 +141,21 @@ ExecStatusType PQresultStatus(const PGresult *res) {
 
 char *PQresStatus(ExecStatusType status) {
 	if (status==PGRES_EMPTY_QUERY) {
-		return "PGRES_EMPTY_QUERY";
+		return const_cast<char *>("PGRES_EMPTY_QUERY");
 	} else if (status==PGRES_COMMAND_OK) {
-		return "PGRES_COMMAND_OK";
+		return const_cast<char *>("PGRES_COMMAND_OK");
 	} else if (status==PGRES_TUPLES_OK) {
-		return "PGRES_TUPLES_OK";
+		return const_cast<char *>("PGRES_TUPLES_OK");
 	} else if (status==PGRES_COPY_OUT) {
-		return "PGRES_COPY_OUT";
+		return const_cast<char *>("PGRES_COPY_OUT");
 	} else if (status==PGRES_COPY_IN) {
-		return "PGRES_COPY_IN";
+		return const_cast<char *>("PGRES_COPY_IN");
 	} else if (status==PGRES_BAD_RESPONSE) {
-		return "PGRES_BAD_RESPONSE";
+		return const_cast<char *>("PGRES_BAD_RESPONSE");
 	} else if (status==PGRES_NONFATAL_ERROR) {
-		return "PGRES_NONFATAL_ERROR";
+		return const_cast<char *>("PGRES_NONFATAL_ERROR");
 	} else if (status==PGRES_FATAL_ERROR) {
-		return "PGRES_FATAL_ERROR";
+		return const_cast<char *>("PGRES_FATAL_ERROR");
 	}
 	return NULL;
 }
@@ -592,17 +592,13 @@ int PQfmod(const PGresult *res, int field_num) {
 char *PQcmdStatus(PGresult *res) {
 	// should return a string represeting the "command type" like:
 	//	SELECT, INSERT, UPDATE, DROP, etc.
-	if (res->queryisnotselect) {
-		return "";
-	} else {
-		return "SELECT";
-	}
+	return const_cast<char *>((res->queryisnotselect)?"":"SELECT");
 }
 
 char *PQoidStatus(const PGresult *res) {
 	// return OID of tuple if query was an insert,
 	// otherwise return InvalidOid
-	return "InvalidOid";
+	return const_cast<char *>("InvalidOid");
 }
 
 Oid PQoidValue(const PGresult *res) {

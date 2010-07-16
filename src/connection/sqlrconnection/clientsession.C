@@ -175,7 +175,7 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 
 		// don't allow the client to request a cursor 
 		// beyond the end of the array.
-		if (index>cfgfl->getCursors()) {
+		if (index>cursorcount) {
 			dbgfile.debugPrint("connection",2,
 				"client requested an invalid cursor:");
 			dbgfile.debugPrint("connection",3,(int32_t)index);
@@ -187,7 +187,7 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 		semset->signalWithUndo(9);
 
 		// set the current cursor to the one they requested.
-		for (int16_t i=0; i<cfgfl->getCursors(); i++) {
+		for (uint16_t i=0; i<cursorcount; i++) {
 			if (cur[i]->id==index) {
 				cursor=cur[i];
 				break;
@@ -197,7 +197,10 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 	} else {
 
 		semset->waitWithUndo(9);
-		statistics->times_cursor_reused++;
+ 		
+ 		// mark this as a new cursor being used
+		statistics->times_new_cursor_used++;
+		
 		semset->signalWithUndo(9);
 
 		// find an available cursor
@@ -214,16 +217,63 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 
 sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 
-	for (int16_t i=0; i<cfgfl->getCursors(); i++) {
+	uint16_t	i=0;
+	for (; i<cursorcount; i++) {
 		if (!cur[i]->busy) {
+			//fprintf(stderr,"reusing cursor %d\n",i);
 			dbgfile.debugPrint("connection",2,"found a free cursor:");
 			dbgfile.debugPrint("connection",3,(int32_t)i);
 			return cur[i];
 		}
 	}
-	dbgfile.debugPrint("connection",2,
+
+	// check if dynamic cursors is disabled, spit out the v0.41 error
+	if (cfgfl->getMaxCursors()==0) {
+		dbgfile.debugPrint("connection",2,
 			"find available cursor failed: all cursors are busy");
-	return NULL;
+		return NULL;
+	}
+
+	// if we're already at a maximum amount of cursors, return failure
+	uint16_t	expandto=cursorcount+cfgfl->getCursorsGrowBy();
+	if (expandto>=cfgfl->getMaxCursors()) {
+		//fprintf(stderr,"Can't expand cursors to %d, it would be over our limit\n",expandto);
+		dbgfile.debugPrint("connection", 1, "Can't expand cursors, already at maximum");
+		return NULL;
+	}
+
+	// we're here because there are no free cursors left.  Lets make some more baby!
+	sqlrcursor_svr	**tmp =
+			(sqlrcursor_svr **)realloc((void *)cur,
+					sizeof(sqlrcursor_svr **)*expandto);
+	
+	// in case we're out of memory, we don't want to destroy the cur array
+	if (tmp==NULL) {
+		//fprintf(stderr, "Out of memory allocating cursors\n");
+		dbgfile.debugPrint("connection",1,
+				"Out of memory allocating cursors");
+		return NULL;
+	}
+	cursorcount=expandto;
+	cur=tmp;
+	
+	uint16_t	firstopen=i;
+	//fprintf(stderr,"new cursorcount: %d  first open: %d\n",cursorcount,firstopen);
+	
+	for (uint16_t j=firstopen; j<cursorcount; j++,i++) {
+		cur[i]=initCursorUpdateStats();
+		// FIXME: LAME!!!  oh god this is lame....
+		cur[i]->querybuffer=new char[cfgfl->getMaxQuerySize()+1];
+		cur[i]->suspendresultset=false;
+		if (!cur[i]->openCursor(i)) {
+			dbgfile.debugPrint("connection",1,"realloc cursor init failure...");
+
+			logOutUpdateStats();
+			return NULL;
+		}
+	}
+	
+	return cur[firstopen];
 }
 
 void sqlrconnection_svr::waitForClientClose() {

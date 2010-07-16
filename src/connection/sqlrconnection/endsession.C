@@ -58,7 +58,7 @@ void sqlrconnection_svr::endSessionInternal() {
 void sqlrconnection_svr::abortAllCursors() {
 	// abort all cursors
 	dbgfile.debugPrint("connection",2,"aborting all busy cursors...");
-	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
+	for (int32_t i=0; i<cursorcount; i++) {
 		if (cur[i] && cur[i]->busy) {
 
 			dbgfile.debugPrint("connection",3,i);
@@ -84,7 +84,7 @@ void sqlrconnection_svr::cleanUpAllCursorData(bool freeresult, bool freebinds) {
 
 	// clean up all busy cursors
 	dbgfile.debugPrint("connection",2,"cleaning up all busy cursors...");
-	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
+	for (int32_t i=0; i<cursorcount; i++) {
 		if (cur[i] && cur[i]->busy) {
 			cur[i]->cleanUpData(freeresult,freebinds);
 		}
