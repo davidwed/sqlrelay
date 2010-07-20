@@ -1,0 +1,165 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With IBM DB2 - Installing DB2 Version 9.7</title>
+<link rel="stylesheet" href="../../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Installing IBM DB2 Version 9.7.1</span><br>
+
+<br><br>
+
+<span class="heading2">DB2 Installation</span><br>
+
+<p>IBM DB2 V9.7.1 is available from
+<a href="http://www-306.ibm.com/software/data/db2/udb/db2express/">
+the IBM website</a> as
+a tarball.  Extract the tarball using <i>tar xfz</i> and cd into the
+exp directory.</p>
+
+<p>Run the db2_install script.</p>
+
+<p>When prompted whether to choose a different directory than /opt/ibm/db2/V9.7
+to install the software, type no and press return.</p>
+
+<p>When the script completes, DB2 will be installed.</p>
+
+<span class="heading2">Creating an Instance</span><br>
+
+<p>A DB2 installation consists of an administration server and one or more
+instances.  Each instance contains one or more databases.  The administration 
+server coordinates the instances.  The administration server is owned by an 
+OS-level user.  Each instance is owned by a seperate OS-level user as well.</p>
+
+<p>To create an instance and an administration server, run 
+<i>/opt/ibm/db2/V9.7/instance/db2isetup</i>, a java-based installation
+program.</p>
+
+<blockquote>
+<p>On the screen titled <b>Welcome to the DB2 Instance Setup wizard</b>,
+click Next</p>
+
+<p>On the screen titled <b>Set user information for the DB2 Administration
+Server</b>,
+leave the defaults, enter a password into the Password and Confirm Password
+text boxes and click Next</p>
+
+<p>On the screen titled <b>Set up a DB2 instance</b>,
+leave the default radio button checked (Create a DB2 instance)
+and click Next</p>
+
+<p>On the screen titled <b>Set user information for the DB2 instance owner</b>,
+leave the defaults, enter a password into the Password and Confirm Password
+text boxes and click Next</p>
+
+<p>On the screen titled <b>Set user information for the DB2 fenced user</b>,
+leave the defaults, enter a password into the Password and Confirm Password
+text boxes and click Next</p>
+
+<p>On the screen titled <b>Configure instance communication and startup</b>,
+accept the defaults and click Next</p>
+
+<p>On the screen titled <b>Prepare the DB2 tools catalog</b>,
+accept the default "Do not prepare the DB2 tools catalog on this computer"
+and click Next</p>
+
+<p>On the screen titled <b>Set up the notifications</b>,
+select the radio button next to "Do not set up your DB2 server to send
+notifications at this time".  Click Next.</p>
+
+<p>On the screen titled <b>Configure the DB2 Text Search service</b>,
+accept the default "Do not configure at this time".  Click Next.</p>
+
+<p>On the screen titled <b>Start copying files and create response file</b>,
+click Finish.</p>
+
+<p>A progress dialog will come up.  When the process is finished, it will
+go away.</p>
+
+<p>On the screen titled <b>Setup has completed successfully</b>, click Finish.</p>
+</blockquote>
+
+<p>Should you need to create additional DB2 instances, follow this procedure 
+again using a different user name and skipping the steps pertaining
+to the Administration Server.  The <i>/opt/ibm/db2/V9.7/instance/db2ilist</i> 
+command lists all of the DB2 instances on the local computer.</p>
+
+<p>If you need to drop an instance, run 
+<i>/opt/ibm/db2/V9.7/instance/db2idrop instancename</i>, substituting the name
+of the instance you want to drop for instancename.</p>
+
+<p>The <i>/opt/ibm/db2/V9.7/instance/daslist</i> command lists all of the DB2 
+administration servers on the local computer.</p>
+
+<p>If you need to drop an administration server, run 
+<i>/opt/ibm/db2/V9.7/instance/dasdrop servername</i>, substituting the name of
+the administration server you want to drop for servername.</p>
+
+<span class="heading2">Starting the Database at Boot Time</span><br>
+
+<p>You can use the following script to start/stop the database at 
+boot/shutdown time.</p>
+
+<blockquote>
+<pre>
+<font color="#0000ff">#!/bin/sh</font>
+
+<font color="#a52829"><b>case</b></font> <font color="#a52829"><b>&quot;</b></font><font color="#a520f7">$1</font><font color="#a52829"><b>&quot;</b></font> <font color="#a52829"><b>in</b></font>
+        start<font color="#a52829"><b>)</b></font>
+                /opt/ibm/db2/V9.<font color="#ff00ff">7</font>/instance/db2istrt
+        <font color="#a52829"><b>;;</b></font>
+        stop<font color="#a52829"><b>)</b></font>
+                <font color="#a52829"><b>kill</b></font> <font color="#ff00ff">-9</font> <font color="#6b59ce">`ps -efa </font><font color="#a52829"><b>|</b></font><font color="#6b59ce"> grep db2wdog </font><font color="#a52829"><b>|</b></font><font color="#6b59ce"> grep -v grep </font><font color="#a52829"><b>|</b></font><font color="#6b59ce"> cut -c10</font><font color="#ff00ff">-15</font><font color="#6b59ce">`</font>
+        <font color="#a52829"><b>;;</b></font>
+        *<font color="#a52829"><b>)</b></font>
+        <font color="#a52829"><b>echo</b></font><font color="#ff00ff"> $</font><font color="#a52829"><b>&quot;</b></font><font color="#ff00ff">Usage: </font><font color="#a520f7">$0</font><font color="#ff00ff"> {start|stop}</font><font color="#a52829"><b>&quot;</b></font>
+        <font color="#a52829"><b>exit</b></font> <font color="#ff00ff">1</font>
+<font color="#a52829"><b>esac</b></font>
+
+<font color="#a52829"><b>exit</b></font> <font color="#ff00ff">0</font>
+</pre>
+</blockquote>
+
+<p>Install this script and run it with the "start" option to start up the
+database.  Running it with the "stop" option shuts the database down.  To
+access a database, it must be running.</p>
+
+<p>During instance configuration, there's a check box indicating whether the
+instance will be configured to start at boot time.  If you didn't check it, to
+get each instance to start at boot time, you need to run the following command
+as root for each instance.</p>
+
+<blockquote>
+<b>/opt/ibm/db2/V9.7/instance/db2iauto -on INSTANCE_USER</b>
+</blockquote>
+
+<p>Where INSTANCE_USER is replaced by the username of the user associated with
+the instance you want to start at boot time.</p>
+
+<p>If you want to disable instances from starting at boot time, you need to
+run the following command as root for each instance:</p>
+
+<blockquote>
+<b>/opt/ibm/db2/V9.7/instance/db2iauto -off INSTANCE_USER</b>
+</blockquote>
+
+<span class="heading2">Making the Libraries Available</span><br>
+
+<p>The DB2 client libraries should be installed in /opt/ibm/db2/V9.7/lib.
+DB2 client programs (including SQL Relay) need to be able to access these
+libraries at runtime.  The dynamic loader searches for libraries in /lib,
+/usr/lib and in directories specified in /etc/ld.so.conf or /etc/ld.so.conf.d.
+Append the following line to /etc/ld.so.conf or create a file in
+/etc/ld.so.conf.d with the following line's contents (if your system supports
+ld.so.conf.d) and run /sbin/ldconfig (as root).</p>
+
+<blockquote><b>
+/opt/ibm/db2/V9.7/lib
+</b></blockquote>
+
+</body>
+
+
+</html>
