@@ -286,14 +286,19 @@ void scaler::cleanUp() {
 }
 
 void scaler::reapChildren() {
+
 	for (;;) {
 		int	childstatus;
 		int	pid=waitpid(-1,&childstatus,WNOHANG);
 		if (pid==0) {
 			break;
 		}
-		if (pid==-1 && error::getErrorNumber()==EINTR) {
-			continue;
+		if (pid==-1) {
+			if (error::getErrorNumber()==EINTR) {
+				continue;
+			}
+			// most likely the error is "No child processes"
+			break;
 		}
 		decConnections();
 
@@ -361,13 +366,13 @@ bool scaler::openOneConnection() {
 		int	ret=execvp(command,argv);
 		fprintf(stderr,"Bad command %s\n",command);
 		exit(ret);
-	} else if (pid>0) {
-		// parent
-		//fprintf(stderr,"forked %d\n",pid);
-	} else {
+	} else if (pid==-1) {
 		// error
 		fprintf(stderr,"fork() returned %d [%d]\n",pid,errno);
 	}
+	/*else if (pid>0) {
+		fprintf(stderr,"forked %d\n",pid);
+	}*/
 
 	delete[] command;
 
