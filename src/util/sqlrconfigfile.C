@@ -67,8 +67,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	timequeriessec=charstring::toInteger(DEFAULT_TIMEQUERIESSEC);
 	timequeriesusec=charstring::toInteger(DEFAULT_TIMEQUERIESUSEC);
 	currentroute=NULL;
-	inrouter=false;
-	ignoreconnections=false;
+	currenttag=NO_TAG;
 }
 
 sqlrconfigfile::~sqlrconfigfile() {
@@ -360,31 +359,173 @@ bool sqlrconfigfile::tagStart(const char *name) {
 		return true;
 	}
 
-	// set the current tag
-	if (!charstring::compare(name,"user")) {
+    bool ok = true;
+    const char *currentname = "instance";
+    tag thistag = currenttag;
+
+	// set the current tag, validate structure in the process
+	switch(currenttag) {
+	
+	// Root level, nested (users,connections?,router?)
+	case NO_TAG:
+	    currentname = "instance";
+	    ok =  ( !charstring::compare(name,"users") && (thistag = USERS_TAG) )
+	       || ( !charstring::compare(name,"connections") && (thistag = CONNECTIONS_TAG) )
+	       || ( !charstring::compare(name,"router") && (thistag = ROUTER_TAG) );
+	    break;
+	
+	// Users section, nested (user*)
+	case USERS_TAG:
+	    currentname = "users";
+	    ok = ( !charstring::compare(name,"user") && (thistag = USER_TAG) );
+	    break;
+	
+	// Connections section, nested (connection*)
+	case CONNECTIONS_TAG:
+	    currentname = "connections";
+	    ok = ( !charstring::compare(name,"connection") && (thistag = CONNECTION_TAG) );
+	    break;
+	
+	// Router section, nested ((route*|filter*)*)
+	case ROUTER_TAG:
+	    currentname = "router";
+	    ok =  ( !charstring::compare(name,"route") && (thistag = ROUTE_TAG) )
+	       || ( !charstring::compare(name,"filter") && (thistag = FILTER_TAG) );
+	    break;
+	
+	// Filter section, nested (query*)
+	case FILTER_TAG:
+	    currentname = "filter";
+	    ok =  ( !charstring::compare(name,"query") && (thistag = QUERY_TAG) );
+	    break;
+	
+	// Filter section, nested (query*)
+	case ROUTE_TAG:
+	    currentname = "route";
+	    ok =  ( !charstring::compare(name,"query") && (thistag = QUERY_TAG) );
+	    break;
+	
+	// Leaves, cannot be nested
+	case USER_TAG:          currentname = "user"; ok = false; break;
+	case CONNECTION_TAG:    currentname = "connection"; ok = false; break;
+	case QUERY_TAG:         currentname = "query"; ok = false; break;
+	
+	default: ok = false;
+	}
+	
+	if (!ok) {
+	    fprintf(stderr, "unexpected tag <%s> within <%s>\n", name, currentname);
+	    return false;
+	} else {
+	    // initialize tag dat
+	    switch (thistag) {
+	    case USER_TAG:
 		currentuser=new usercontainer();
 		userlist.append(currentuser);
-	} else if (!charstring::compare(name,"connection")) {
-		if (!ignoreconnections) {
+    		break;
+        case CONNECTION_TAG:
 			currentconnect=
 				new connectstringcontainer(connectstringcount);
 			connectstringlist.append(currentconnect);
-		}
-	} else if (!charstring::compare(name,"router")) {
-		inrouter=true;
+    		break;
+    	case ROUTER_TAG:
 		currentconnect=new connectstringcontainer(connectstringcount);
 		connectstringlist.append(currentconnect);
 		currentconnect->setConnectionId(DEFAULT_CONNECTIONID);
-		ignoreconnections=true;
-	} else if (!charstring::compare(name,"route")) {
+    		currenttag = thistag;
+    		break;
+    	case ROUTE_TAG:
+    	case FILTER_TAG:
 		currentroute=new routecontainer();
-	} else if (!charstring::compare(name,"filter")) {
-		currentroute=new routecontainer();
-		currentroute->setIsFilter(true);
+		    currentroute->setIsFilter(thistag == FILTER_TAG);
+		    currenttag = thistag;
+		    break;
+		case USERS_TAG:
+		case CONNECTIONS_TAG:
+		    currenttag = thistag;
+		default:
+		    // Nothing to do
+		    break;
+	    }
 	}
 
 	return true;
+
 }
+
+bool sqlrconfigfile::tagEnd(const char *name) {
+
+	// if neither port nor socket were specified, use the default port
+	if (!charstring::compare(name,"instance")) {
+		if (!port && !unixport[0]) {
+			port=charstring::toInteger(DEFAULT_PORT);
+			addresscount=1;
+		}
+		listenoninet=(port)?true:false;
+		listenonunix=(unixport[0])?true:false;
+	}
+
+	// don't do anything if we're already done
+	// or have not found the correct id
+	if (done || !correctid) {
+		return true;
+	}
+
+    // Close up the current tag
+    switch(currenttag) {
+    case ROUTER_TAG:
+        // Check closing tag, no need, but just in case
+        if (!charstring::compare(name,"router"))
+        {
+            currenttag = NO_TAG;
+        }
+        break;
+    case USERS_TAG:
+    case CONNECTIONS_TAG:
+        // Must check closing tag, we have leaves inside
+        if (    !charstring::compare(name,"users")
+             || !charstring::compare(name,"connections")  )
+        {
+            currenttag = NO_TAG;
+        }
+        break;
+    case ROUTE_TAG:
+    case FILTER_TAG:
+        // Must check closing tag, we have leaves inside
+        if (    !charstring::compare(name,"route")
+             || !charstring::compare(name,"filter")  )
+        {
+            currenttag = ROUTER_TAG;
+            
+    		routecontainer	*existingroute=routeAlreadyExists(currentroute);
+    		if (existingroute) {
+    			moveRegexList(currentroute,existingroute);
+    			delete currentroute;
+    		} else {
+    			routelist.append(currentroute);
+    		}
+        }
+		
+        break;
+    default:
+        // just ignore the closing tag
+        break;
+    }
+
+	// don't do anything if we're already done
+	// or have not found the correct id
+	if (done || !correctid) {
+		return true;
+	}
+
+	// we're done if we've found the right instance at this point
+	if (correctid && !charstring::compare((char *)name,"instance")) {
+		done=true;
+	}
+	return true;
+}
+
+
 
 bool sqlrconfigfile::attributeName(const char *name) {
 
@@ -393,24 +534,22 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		return true;
 	}
 
-	// set the current attribute
+    currentattribute = NO_ATTRIBUTE;
+
+    switch (currenttag) {
+    
+    // Attributes of the <instance> tag
+    case NO_TAG:
+
 	if (!charstring::compare(name,"id")) {
 		currentattribute=ID_ATTRIBUTE;
 	} else if (!charstring::compare(name,"addresses")) {
 		currentattribute=ADDRESSES_ATTRIBUTE;
 	} else if (!charstring::compare(name,"port")) {
-		if (!inrouter) {
 			currentattribute=PORT_ATTRIBUTE;
-		} else {
-			currentattribute=ROUTER_PORT_ATTRIBUTE;
-		}
 	} else if (!charstring::compare(name,"socket") ||
 			!charstring::compare(name,"unixport")) {
-		if (!inrouter) {
 			currentattribute=SOCKET_ATTRIBUTE;
-		} else {
-			currentattribute=ROUTER_SOCKET_ATTRIBUTE;
-		}
 	} else if (!charstring::compare(name,"dbase")) {
 		currentattribute=DBASE_ATTRIBUTE;
 	} else if (!charstring::compare(name,"connections")) {
@@ -470,19 +609,35 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=SID_USER_ATTRIBUTE;
 	} else if (!charstring::compare(name,"sidpassword")) {
 		currentattribute=SID_PASSWORD_ATTRIBUTE;
-	} else if (!charstring::compare(name,"user")) {
-		if (!inrouter) {
+    	} else if (!charstring::compare(name,"maxlisteners")) {
+    		currentattribute=MAXLISTENERS_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"listenertimeout")) {
+    		currentattribute=LISTENERTIMEOUT_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"reloginatstart")) {
+    		currentattribute=RELOGINATSTART_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"timequeries")) {
+    		currentattribute=TIMEQUERIES_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"timequeriessec")) {
+    		currentattribute=TIMEQUERIESSEC_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"timequeriesusec")) {
+    		currentattribute=TIMEQUERIESUSEC_ATTRIBUTE;
+    	};
+    	break;
+    	
+    // Attributes of the <users> and <user> tags
+    case USERS_TAG:
+    case USER_TAG:
+        if (!charstring::compare(name,"user")) {
 			currentattribute=USER_ATTRIBUTE;
-		} else {
-			currentattribute=ROUTER_USER_ATTRIBUTE;
-		}
 	} else if (!charstring::compare(name,"password")) {
-		if (!inrouter) {
 			currentattribute=PASSWORD_ATTRIBUTE;
-		} else {
-			currentattribute=ROUTER_PASSWORD_ATTRIBUTE;
-		}
-	} else if (!charstring::compare(name,"connectionid")) {
+    	};
+    	break;
+    	
+    // Attributes of the <connection> tag
+    case CONNECTIONS_TAG:
+    case CONNECTION_TAG:
+        if (!charstring::compare(name,"connectionid")) {
 		currentattribute=CONNECTIONID_ATTRIBUTE;
 	} else if (!charstring::compare(name,"string")) {
 		currentattribute=STRING_ATTRIBUTE;
@@ -490,21 +645,66 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=METRIC_ATTRIBUTE;
 	} else if (!charstring::compare(name,"behindloadbalancer")) {
 		currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"port")) {
+			currentattribute=PORT_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"socket") ||
+    			!charstring::compare(name,"unixport")) {
+			currentattribute=SOCKET_ATTRIBUTE;
+    	};
+    	break;
+    	
+    // Attributes of the <router> tag
+    case ROUTER_TAG:
+        if (!charstring::compare(name,"connectionid")) {
+    		currentattribute=CONNECTIONID_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"string")) {
+    		currentattribute=STRING_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"metric")) {
+    		currentattribute=METRIC_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"behindloadbalancer")) {
+    		currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
+    	};
+    	break;
+    	
+    // Attributes of the <route>, <filter> & <query> tag
+    case ROUTE_TAG:
+    case FILTER_TAG:
+    case QUERY_TAG:
+        if (!charstring::compare(name,"user")) {
+			currentattribute=ROUTER_USER_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"password")) {
+			currentattribute=ROUTER_PASSWORD_ATTRIBUTE;
 	} else if (!charstring::compare(name,"host")) {
 		currentattribute=ROUTER_HOST_ATTRIBUTE;
 	} else if (!charstring::compare(name,"pattern")) {
 		currentattribute=ROUTER_PATTERN_ATTRIBUTE;
-	} else if (!charstring::compare(name,"maxlisteners")) {
-		currentattribute=MAXLISTENERS_ATTRIBUTE;
-	} else if (!charstring::compare(name,"listenertimeout")) {
-		currentattribute=LISTENERTIMEOUT_ATTRIBUTE;
-	} else if (!charstring::compare(name,"reloginatstart")) {
-		currentattribute=RELOGINATSTART_ATTRIBUTE;
-	} else if (!charstring::compare(name,"timequeries")) {
-		currentattribute=TIMEQUERIES_ATTRIBUTE;
-	} else {
-		currentattribute=(attribute)0;
+    	} else if (!charstring::compare(name,"port")) {
+			currentattribute=ROUTER_PORT_ATTRIBUTE;
+    	} else if (!charstring::compare(name,"socket") ||
+    			!charstring::compare(name,"unixport")) {
+			currentattribute=ROUTER_SOCKET_ATTRIBUTE;
+    	};
+    	break;
+    
+    }
+    
+    if (correctid && currentattribute == NO_ATTRIBUTE) {
+        const char *tagname = "instance";
+        switch (currenttag) {
+        case NO_TAG:            tagname = "instance"; break;
+        case USERS_TAG:         tagname = "users"; break;
+        case USER_TAG:          tagname = "user"; break;
+        case CONNECTIONS_TAG:   tagname = "connections"; break;
+        case CONNECTION_TAG:    tagname = "connection"; break;
+        case ROUTER_TAG:        tagname = "router"; break;
+        case ROUTE_TAG:         tagname = "route"; break;
+        case FILTER_TAG:        tagname = "filter"; break;
+        case QUERY_TAG:         tagname = "query"; break;
+        }
+        fprintf(stderr, "WARNING: unrecognized attribute \"%s\" within <%s> tag or section\n", name, tagname);
 	}
+    
+	// set the current attribute
 	return true;
 }
 
@@ -658,8 +858,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							DEFAULT_PASSWORD);
 		} else if (currentattribute==CONNECTIONID_ATTRIBUTE) {
 			if (currentconnect) {
-				if (charstring::length(value)>
-						MAXCONNECTIONIDLEN) {
+				if (charstring::length(value)>MAXCONNECTIONIDLEN) {
 					fprintf(stderr,"error: connectionid \"%s\" is too long, must be %d characters or fewer.\n",value,MAXCONNECTIONIDLEN);
 					return false;
 				}
@@ -717,6 +916,12 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==RELOGINATSTART_ATTRIBUTE) {
 			reloginatstart=
 				!charstring::compareIgnoringCase(value,"yes");
+		} else if (currentattribute==TIMEQUERIESSEC_ATTRIBUTE) {
+			timequeriessec = charstring::toInteger((value)?value:DEFAULT_TIMEQUERIESSEC);
+			if (timequeriesusec < 0) timequeriesusec = 0;
+		} else if (currentattribute==TIMEQUERIESUSEC_ATTRIBUTE) {
+			timequeriesusec = charstring::toInteger((value)?value:DEFAULT_TIMEQUERIESUSEC);
+			if (timequeriessec < 0) timequeriessec = 0;
 		} else if (currentattribute==TIMEQUERIES_ATTRIBUTE) {
 			if (charstring::toFloat(value)>0) {
 				char		**list;
@@ -725,6 +930,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							&list,&listlength);
 				timequeriessec=
 					charstring::toInteger(list[0]);
+				if (timequeriessec < 0) {
+				    timequeriesusec = -1;
+				} else {
 				if (listlength>1) {
 					char	buffer[7];
 					size_t	list1len=
@@ -741,6 +949,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				} else {
 					timequeriesusec=0;
 				}
+    			}
 				for (uint64_t i=0; i<listlength; i++) {
 					delete[] list[i];
 				}
@@ -762,50 +971,6 @@ uint32_t sqlrconfigfile::atouint32_t(const char *value,
 		retval=charstring::toUnsignedInteger(defaultvalue);
 	}
 	return retval;
-}
-
-bool sqlrconfigfile::tagEnd(const char *name) {
-
-	// if neither port nor socket were specified, use the default port
-	if (!charstring::compare(name,"instance")) {
-		if (!port && !unixport[0]) {
-			port=charstring::toInteger(DEFAULT_PORT);
-			addresscount=1;
-		}
-		listenoninet=(port)?true:false;
-		listenonunix=(unixport[0])?true:false;
-	}
-
-	// don't do anything if we're already done
-	// or have not found the correct id
-	if (done || !correctid) {
-		return true;
-	}
-
-	if (!charstring::compare(name,"router")) {
-		inrouter=false;
-	} else if (!charstring::compare(name,"route") ||
-			!charstring::compare(name,"filter")) {
-		routecontainer	*existingroute=routeAlreadyExists(currentroute);
-		if (existingroute) {
-			moveRegexList(currentroute,existingroute);
-			delete currentroute;
-		} else {
-			routelist.append(currentroute);
-		}
-	}
-
-	// don't do anything if we're already done
-	// or have not found the correct id
-	if (done || !correctid) {
-		return true;
-	}
-
-	// we're done if we've found the right instance at this point
-	if (correctid && !charstring::compare((char *)name,"instance")) {
-		done=true;
-	}
-	return true;
 }
 
 routecontainer *sqlrconfigfile::routeAlreadyExists(routecontainer *cur) {

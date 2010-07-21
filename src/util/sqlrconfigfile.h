@@ -19,7 +19,8 @@ using namespace rudiments;
 #endif
 
 typedef enum {
-	ID_ATTRIBUTE=1,
+    NO_ATTRIBUTE,
+	ID_ATTRIBUTE,
 	ADDRESSES_ATTRIBUTE,
 	PORT_ATTRIBUTE,
 	SOCKET_ATTRIBUTE,
@@ -67,7 +68,9 @@ typedef enum {
 	MAXLISTENERS_ATTRIBUTE,
 	LISTENERTIMEOUT_ATTRIBUTE,
 	RELOGINATSTART_ATTRIBUTE,
-	TIMEQUERIES_ATTRIBUTE
+	TIMEQUERIES_ATTRIBUTE,
+	TIMEQUERIESSEC_ATTRIBUTE,
+	TIMEQUERIESUSEC_ATTRIBUTE
 } attribute;
 
 class usercontainer {
@@ -290,14 +293,27 @@ class sqlrconfigfile : public xmlsax {
 		uint32_t		metrictotal;
 
 		routecontainer		*currentroute;
-		bool			inrouter;
-		bool			ignoreconnections;
 
 		uint16_t	connectstringcount;
 
 		linkedlist< connectstringcontainer * >	connectstringlist;
 		linkedlist< usercontainer * >		userlist;
 		linkedlist< routecontainer *>		routelist;
+		
+        typedef enum {
+            NO_TAG,
+            USERS_TAG,
+            USER_TAG,
+            CONNECTIONS_TAG,
+            CONNECTION_TAG,
+            ROUTER_TAG,
+            ROUTE_TAG,
+            FILTER_TAG,
+            QUERY_TAG
+        } tag;
+        
+        tag currenttag;
+		
 };
 
 #endif

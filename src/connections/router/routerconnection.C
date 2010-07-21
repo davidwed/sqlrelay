@@ -3,6 +3,7 @@
 
 #include <routerconnection.h>
 #include <rudiments/rawbuffer.h>
+#include <rudiments/character.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -292,10 +293,27 @@ routercursor::~routercursor() {
 
 bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
+	// convert to lowercase and normalize whitespace, for regex matching
+	char	*nquery=new char[length+1];
+	if (nquery && query) {
+		for (uint32_t i=0; i<length; ++i) {
+			char	c=query[i];
+			if (character::isWhitespace(c)) {
+				nquery[i]=' ';
+			} else {
+				nquery[i]=character::toLowerCase(c);
+			}
+		}
+		nquery[length]='\0';
+	}
+
 	// check for a begin query, but not "begin ... end;" query
-	beginquery=(routerconn->beginregex.match(query) &&
-			!routerconn->beginendregex.match(query));
+	beginquery=(routerconn->beginregex.match(nquery) &&
+			!routerconn->beginendregex.match(nquery));
 	if (beginquery) {
+		if (nquery) {
+			delete[] nquery;
+		}
 		return true;
 	}
 
@@ -326,7 +344,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 							getFirstNode();
 
 		while (ren && !found) {
-			if (ren->getData()->match(query)) {
+			if (ren->getData()->match(nquery)) {
 				con=routerconn->cons[conindex];
 				cur=curs[conindex];
 				curindex=conindex;
@@ -339,6 +357,11 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 			rcn=rcn->getNext();
 			conindex++;
 		}
+	}
+
+	// free normalized query
+	if (nquery) {
+		delete[] nquery;
 	}
 
 	// cur could be NULL here either because no connection could be found

@@ -1,14 +1,17 @@
+suspended session increments serversockincount but then it doesn't get
+	decremented, even after session is resumed
+	the socket may not be getting deleted or something
+	closeConnection is crashing trying to delete those sockets
+
+
 db2 - no
 firebird - no
 freetds - no
-mysql - no
+mysql - yes
 oracle - no
 postgresql - yes
 sqlite - no
 sybase - no
-
-scaler is getting stuck
-
 
 there are cases with DB2 where data in a DB that's not using UTF-8 may be
 returned converted to UTF-8.  How do we get the data out in the same encoding
