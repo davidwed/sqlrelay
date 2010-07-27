@@ -18,6 +18,7 @@ void checkSuccess(const char *value, const char *success) {
 			printf("success ");
 			return;
 		} else {
+			printf("\"%s\"==\"%s\"",value,success);
 			printf("failure ");
 			delete cur;
 			delete con;
@@ -28,6 +29,7 @@ void checkSuccess(const char *value, const char *success) {
 	if (!strcmp(value,success)) {
 		printf("success ");
 	} else {
+		printf("\"%s\"==\"%s\"",value,success);
 		printf("failure ");
 		delete cur;
 		delete con;
@@ -40,6 +42,7 @@ void checkSuccess(int value, int success) {
 	if (value==success) {
 		printf("success ");
 	} else {
+		printf("\"%d\"==\"%d\"",value,success);
 		printf("failure ");
 		delete cur;
 		delete con;
@@ -89,6 +92,7 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable");
 
 
+con->debugOn();
 	printf("CREATE TEMPTABLE: \n");
 	checkSuccess(cur->sendQuery("create table testtable (testint int, testsmallint smallint, testtinyint tinyint, testreal real, testfloat float, testdecimal decimal(4,1), testnumeric numeric(4,1), testmoney money, testsmallmoney smallmoney, testdatetime datetime, testsmalldatetime smalldatetime, testchar char(40), testvarchar varchar(40), testbit bit)"),1);
 	printf("\n");

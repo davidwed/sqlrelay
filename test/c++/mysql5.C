@@ -12,7 +12,6 @@ sqlrconnection	*secondcon;
 sqlrcursor	*secondcur;
 
 void checkSuccess(const char *value, const char *success) {
-	//printf("\"%s\"=\"%s\"\n",value,success);
 
 	if (!success) {
 		if (!value) {
@@ -20,6 +19,7 @@ void checkSuccess(const char *value, const char *success) {
 			fflush(stdout);
 			return;
 		} else {
+			printf("\"%s\"=\"%s\"\n",value,success);
 			printf("failure: %s",cur->errorMessage());
 			fflush(stdout);
 			delete cur;
@@ -32,6 +32,7 @@ void checkSuccess(const char *value, const char *success) {
 		printf("success ");
 		fflush(stdout);
 	} else {
+		printf("\"%s\"=\"%s\"\n",value,success);
 		printf("failure: %s",cur->errorMessage());
 		fflush(stdout);
 		delete cur;
@@ -41,12 +42,12 @@ void checkSuccess(const char *value, const char *success) {
 }
 
 void checkSuccess(int value, int success) {
-	//printf("\"%d\"=\"%d\"\n",value,success);
 
 	if (value==success) {
 		printf("success ");
 		fflush(stdout);
 	} else {
+		printf("\"%d\"=\"%d\"\n",value,success);
 		printf("failure: %s",cur->errorMessage());
 		fflush(stdout);
 		delete cur;

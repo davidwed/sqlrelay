@@ -43,7 +43,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 			printf("success \n");
 			return;
 		} else {
-			printf("failure \n");
+			printf("failure %s!=%s\n",value,success);
 			delete cur;
 			delete con;
 			exit(0);
