@@ -4,14 +4,18 @@ suspended session increments serversockincount but then it doesn't get
 	closeConnection is crashing trying to delete those sockets
 
 
-db2 - no
-firebird - no
-freetds - no
+db2 - yes
+firebird - yes
+freetds - if a query fails, next one gets: no server side cursors available...
 mysql - yes
-oracle - no
-postgresql - yes
-sqlite - no
-sybase - no
+oracle8 - yes
+oracle8i - clob binds are getting last char cut off during input
+postgresql7 - yes
+postgresql8 - yes
+sqlite - yes
+sybase - yes
+
+various cases where connection daemons won't shut down
 
 there are cases with DB2 where data in a DB that's not using UTF-8 may be
 returned converted to UTF-8.  How do we get the data out in the same encoding
