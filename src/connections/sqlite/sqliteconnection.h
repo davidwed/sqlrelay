@@ -107,6 +107,9 @@ class sqliteconnection : public sqlrconnection_svr {
 		bool		ping();
 		const char	*identify();
 		const char	*dbVersion();
+#ifdef SQLITE3
+		char		*duplicate(const char *str);
+#endif
 #ifndef SQLITE_TRANSACTIONAL
 		bool		isTransactional();
 		bool		commit();

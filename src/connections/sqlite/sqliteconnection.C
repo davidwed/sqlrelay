@@ -40,7 +40,7 @@ bool sqliteconnection::logIn(bool printerrors) {
 		return true;
 	}
 #ifdef SQLITE3
-	errmesg=charstring::duplicate(sqlite3_errmsg(sqliteptr));
+	errmesg=duplicate(sqlite3_errmsg(sqliteptr));
 #endif
 	if (errmesg) {
 		fprintf(stderr,"%s\n",errmesg);
@@ -225,7 +225,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length,
 #ifdef SQLITE3
 	if (sqlite3_open(sqliteconn->db,&(sqliteconn->sqliteptr))!=SQLITE_OK) {
 		sqliteconn->errmesg=
-			charstring::duplicate(
+			sqliteconn->duplicate(
 				sqlite3_errmsg(sqliteconn->sqliteptr));
 #else
 	if (!(sqliteconn->sqliteptr=
@@ -256,7 +256,7 @@ int sqlitecursor::runQuery(const char *query) {
 
 	// clear any errors
 	if (sqliteconn->errmesg) {
-		delete[] sqliteconn->errmesg;
+		sqlite3_free((void *)sqliteconn->errmesg);
 		sqliteconn->errmesg=NULL;
 	}
 
@@ -407,3 +407,16 @@ void sqlitecursor::cleanUpData(bool freeresult, bool freebinds) {
 		result=NULL;
 	}
 }
+
+#ifdef SQLITE3
+char *sqliteconnection::duplicate(const char *str) {
+	if (!str) {
+		return NULL;
+	}
+	size_t	length=charstring::length(str);
+	char	*buffer=(char *)sqlite3_malloc(length+1);
+	charstring::copy(buffer,str,length);
+	buffer[length]='\0';
+	return buffer;
+}
+#endif
