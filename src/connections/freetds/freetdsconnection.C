@@ -311,7 +311,13 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	#elif defined(TDS_VERSION_NO)
 	char	*versionstring=charstring::duplicate(TDS_VERSION_NO);
 	#else
-	char	*versionstring=charstring::duplicate("freetds v0.00.0");
+	char	*versionstring=new char[50];
+	CS_INT	outlen;
+	if (ct_config(NULL,CS_GET,CS_VER_STRING,(void *)versionstring,50,&outlen)==CS_SUCCEED) {
+		versionstring[outlen]='\0';
+	} else {
+		versionstring=charstring::copy(versionstring,"freetds v0.00.0");
+	}
 	#endif
 
 	char	*v=charstring::findFirst(versionstring,'v');
