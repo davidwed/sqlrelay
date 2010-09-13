@@ -77,6 +77,7 @@ int	main(int argc, char **argv) {
 	con=new sqlrconnection(argv[1],atoi(argv[2]), 
 					argv[3],argv[4],argv[5],0,1);
 	cur=new sqlrcursor(con);
+con->debugOn();
 
 	// get database type
 	printf("IDENTIFY: \n");
@@ -92,7 +93,6 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable");
 
 
-con->debugOn();
 	printf("CREATE TEMPTABLE: \n");
 	checkSuccess(cur->sendQuery("create table testtable (testint int, testsmallint smallint, testtinyint tinyint, testreal real, testfloat float, testdecimal decimal(4,1), testnumeric numeric(4,1), testmoney money, testsmallmoney smallmoney, testdatetime datetime, testsmalldatetime smalldatetime, testchar char(40), testvarchar varchar(40), testbit bit)"),1);
 	printf("\n");

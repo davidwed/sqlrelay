@@ -272,7 +272,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(floatvar,2.5);
 	printf("\n");
 
-con->debugOn();
 	printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testnumber"),1);
 	printf("\n");

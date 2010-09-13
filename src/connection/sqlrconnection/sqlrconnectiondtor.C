@@ -42,9 +42,9 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	delete bindpool;
 	dbgfile.debugPrint("connection",0,"done deleting bindpool");
 
-printf("%d dtor called\n",process::getProcessId());
+//printf("%d dtor called\n",process::getProcessId());
 	if (pidfile) {
-printf("removing\n");
+//printf("removing\n");
 		file::remove(pidfile);
 		delete[] pidfile;
 	}

@@ -25,6 +25,7 @@ row::~row() {
 }
 
 void row::resize(uint32_t colcount) {
+	this->colcount=colcount;
 	if (colcount>=OPTIMISTIC_COLUMN_COUNT) {
 		delete[] extrafields;
 		delete[] extrafieldlengths;

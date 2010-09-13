@@ -88,7 +88,6 @@ bool sqlrcursor::parseData() {
 					currentrow=currentrow->next;
 				}
 			}
-			//if (colcount>previouscolcount) {
 			if (colcount>currentrow->colcount) {
 				currentrow->resize(colcount);
 			}

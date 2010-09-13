@@ -7,13 +7,16 @@ suspended session increments serversockincount but then it doesn't get
 db2 - yes
 firebird - yes
 freetds - if a query fails, next one gets: no server side cursors available...
+		all cursors end up having the same ID, one higher than the
+		actual max cursor count
+		does this happen with other connections?
 mysql - yes
 oracle8 - yes
-oracle8i - clob binds are getting last char cut off during input
+oracle8i - sort of - usually works, but sometimes cursor bind fails and new connection daemons get spawned
 postgresql7 - yes
 postgresql8 - yes
 sqlite - yes
-sybase - yes
+sybase - sort of - connection daemons have to "settle" after logging in
 
 various cases where connection daemons won't shut down
 

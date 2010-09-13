@@ -20,6 +20,8 @@
 	fixed sqlite connection to use sqlite3_malloc/free
 	update freetds connection to get tds version with ct_config if
 		TDS_VERSION_NO doesn't exist
+	applied a fix for a bug that could cause a crash when a cursor is
+		reused
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

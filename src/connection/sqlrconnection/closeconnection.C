@@ -43,10 +43,10 @@ void sqlrconnection_svr::closeConnection() {
 	dbgfile.debugPrint("connection",0,"done deleting unix socket");
 
 
-printf("%d count=%d/%d\n",process::getProcessId(),serversockincount,cfgfl->getAddressCount());
+//printf("%d count=%d/%d\n",process::getProcessId(),serversockincount,cfgfl->getAddressCount());
 	dbgfile.debugPrint("connection",0,"deleting inetsockets...");
 	for (uint64_t index=0; index<serversockincount; index++) {
-printf("	%d index=%d\n",process::getProcessId(),index);
+//printf("	%d index=%d\n",process::getProcessId(),index);
 		delete serversockin[index];
 	}
 	delete[] serversockin;

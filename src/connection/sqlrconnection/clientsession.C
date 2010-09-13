@@ -105,6 +105,7 @@ void sqlrconnection_svr::clientSession() {
 			noAvailableCursors(command);
 			continue;
 		}
+printf("cursor id: %d\n",cursor->id);
 
 		if (command==NEW_QUERY) {
 			if (newQueryCommand(cursor)) {
@@ -176,6 +177,7 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 		// don't allow the client to request a cursor 
 		// beyond the end of the array.
 		if (index>cursorcount) {
+printf("client requested an invalid cursor: %d\n",index);
 			dbgfile.debugPrint("connection",2,
 				"client requested an invalid cursor:");
 			dbgfile.debugPrint("connection",3,(int32_t)index);
@@ -217,12 +219,17 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 
 sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 
+for (uint16_t b=0; b<cursorcount; b++) {
+printf("cursor %d  id=%d\n",b,cur[b]->id);
+}
+
 	uint16_t	i=0;
 	for (; i<cursorcount; i++) {
 		if (!cur[i]->busy) {
 			//fprintf(stderr,"reusing cursor %d\n",i);
 			dbgfile.debugPrint("connection",2,"found a free cursor:");
 			dbgfile.debugPrint("connection",3,(int32_t)i);
+printf("got a cursor (static): %d of %d, id=%d\n",i,cursorcount,cur[i]->id);
 			return cur[i];
 		}
 	}
@@ -265,7 +272,7 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 		// FIXME: LAME!!!  oh god this is lame....
 		cur[i]->querybuffer=new char[cfgfl->getMaxQuerySize()+1];
 		cur[i]->suspendresultset=false;
-		if (!cur[i]->openCursor(i)) {
+		if (!cur[i]->openCursorInternal(i)) {
 			dbgfile.debugPrint("connection",1,"realloc cursor init failure...");
 
 			logOutUpdateStats();
@@ -273,6 +280,7 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 		}
 	}
 	
+printf("got a cursor (dynamic): %d of %d\n",firstopen,cursorcount);
 	return cur[firstopen];
 }
 
