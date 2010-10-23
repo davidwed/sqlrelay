@@ -270,7 +270,7 @@ def main():
 	print
 
 	print "FIELDS BY INDEX: "
-	checkSuccess(cur.getField(0,0),"1")
+	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"testchar1                               ")
 	checkSuccess(cur.getField(0,2),"testvarchar1")
 	checkSuccess(cur.getField(0,3),"01-JAN-01")
@@ -278,7 +278,7 @@ def main():
 	checkSuccess(cur.getField(0,5),"testclob1")
 	checkSuccess(cur.getField(0,6),"")
 	print
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(7,1),"testchar8                               ")
 	checkSuccess(cur.getField(7,2),"testvarchar8")
 	checkSuccess(cur.getField(7,3),"01-JAN-08")
@@ -306,7 +306,7 @@ def main():
 	print
 
 	print "FIELDS BY NAME: "
-	checkSuccess(cur.getField(0,"testnumber"),"1")
+	checkSuccess(cur.getField(0,"testnumber"),1)
 	checkSuccess(cur.getField(0,"testchar"),"testchar1                               ")
 	checkSuccess(cur.getField(0,"testvarchar"),"testvarchar1")
 	checkSuccess(cur.getField(0,"testdate"),"01-JAN-01")
@@ -314,7 +314,7 @@ def main():
 	checkSuccess(cur.getField(0,"testclob"),"testclob1")
 	checkSuccess(cur.getField(0,"testblob"),"")
 	print
-	checkSuccess(cur.getField(7,"testnumber"),"8")
+	checkSuccess(cur.getField(7,"testnumber"),8)
 	checkSuccess(cur.getField(7,"testchar"),"testchar8                               ")
 	checkSuccess(cur.getField(7,"testvarchar"),"testvarchar8")
 	checkSuccess(cur.getField(7,"testdate"),"01-JAN-08")
@@ -413,9 +413,9 @@ def main():
 	print
 
 	print "FIELDS: "
-	checkSuccess(cur.getField(0,0),"1")
+	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
-	checkSuccess(cur.getField(0,2),"10.5556")
+	checkSuccess(cur.getField(0,2),10.5556)
 	print
 
 	print "OUTPUT BIND: "
@@ -433,21 +433,21 @@ def main():
 	print
 
 	print "FIELDS: "
-	checkSuccess(cur.getField(0,0),"1")
+	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
-	checkSuccess(cur.getField(0,2),"10.5556")
+	checkSuccess(cur.getField(0,2),10.5556)
 	print
 
 	print "NULLS as Nones: "
 	cur.getNullsAsNone()
 	checkSuccess(cur.sendQuery("select NULL,1,NULL from dual"),1)
 	checkSuccess(cur.getField(0,0),None)
-	checkSuccess(cur.getField(0,1),"1")
+	checkSuccess(cur.getField(0,1),1)
 	checkSuccess(cur.getField(0,2),None)
 	cur.getNullsAsEmptyStrings()
 	checkSuccess(cur.sendQuery("select NULL,1,NULL from dual"),1)
 	checkSuccess(cur.getField(0,0),"")
-	checkSuccess(cur.getField(0,1),"1")
+	checkSuccess(cur.getField(0,1),1)
 	checkSuccess(cur.getField(0,2),"")
 	cur.getNullsAsNone()
 	print
@@ -461,15 +461,15 @@ def main():
 	checkSuccess(cur.firstRowIndex(),0)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),2)
-	checkSuccess(cur.getField(0,0),"1")
-	checkSuccess(cur.getField(1,0),"2")
-	checkSuccess(cur.getField(2,0),"3")
+	checkSuccess(cur.getField(0,0),1)
+	checkSuccess(cur.getField(1,0),2)
+	checkSuccess(cur.getField(2,0),3)
 	print
 	checkSuccess(cur.firstRowIndex(),2)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),4)
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
@@ -502,14 +502,14 @@ def main():
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
 	print
-	checkSuccess(cur.getField(0,0),"1")
-	checkSuccess(cur.getField(1,0),"2")
-	checkSuccess(cur.getField(2,0),"3")
-	checkSuccess(cur.getField(3,0),"4")
-	checkSuccess(cur.getField(4,0),"5")
-	checkSuccess(cur.getField(5,0),"6")
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(0,0),1)
+	checkSuccess(cur.getField(1,0),2)
+	checkSuccess(cur.getField(2,0),3)
+	checkSuccess(cur.getField(3,0),4)
+	checkSuccess(cur.getField(4,0),5)
+	checkSuccess(cur.getField(5,0),6)
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	cur.suspendResultSet()
@@ -518,14 +518,14 @@ def main():
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
 	print
-	checkSuccess(cur.getField(0,0),"1")
-	checkSuccess(cur.getField(1,0),"2")
-	checkSuccess(cur.getField(2,0),"3")
-	checkSuccess(cur.getField(3,0),"4")
-	checkSuccess(cur.getField(4,0),"5")
-	checkSuccess(cur.getField(5,0),"6")
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(0,0),1)
+	checkSuccess(cur.getField(1,0),2)
+	checkSuccess(cur.getField(2,0),3)
+	checkSuccess(cur.getField(3,0),4)
+	checkSuccess(cur.getField(4,0),5)
+	checkSuccess(cur.getField(5,0),6)
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	cur.suspendResultSet()
@@ -534,20 +534,20 @@ def main():
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
 	print
-	checkSuccess(cur.getField(0,0),"1")
-	checkSuccess(cur.getField(1,0),"2")
-	checkSuccess(cur.getField(2,0),"3")
-	checkSuccess(cur.getField(3,0),"4")
-	checkSuccess(cur.getField(4,0),"5")
-	checkSuccess(cur.getField(5,0),"6")
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(0,0),1)
+	checkSuccess(cur.getField(1,0),2)
+	checkSuccess(cur.getField(2,0),3)
+	checkSuccess(cur.getField(3,0),4)
+	checkSuccess(cur.getField(4,0),5)
+	checkSuccess(cur.getField(5,0),6)
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	print
 
 	print "SUSPENDED RESULT SET: "
 	cur.setResultSetBufferSize(2)
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
-	checkSuccess(cur.getField(2,0),"3")
+	checkSuccess(cur.getField(2,0),3)
 	id=cur.getResultSetId()
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)
@@ -559,7 +559,7 @@ def main():
 	checkSuccess(cur.firstRowIndex(),4)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),6)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
@@ -580,7 +580,7 @@ def main():
 	checkSuccess(filename,"cachefile1")
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet(filename),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	print
 
 	print "COLUMN COUNT FOR CACHED RESULT SET: "
@@ -614,7 +614,7 @@ def main():
 	checkSuccess(filename,"cachefile1")
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet(filename),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
 	print
@@ -624,7 +624,7 @@ def main():
 	checkSuccess(cur.openCachedResultSet("cachefile1"),1)
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet("cachefile2"),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	print
 
@@ -634,7 +634,7 @@ def main():
 	checkSuccess(cur.openCachedResultSet("cachefile1"),1)
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet("cachefile2"),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
 	print
@@ -644,7 +644,7 @@ def main():
 	cur.cacheToFile("cachefile1")
 	cur.setCacheTtl(200)
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
-	checkSuccess(cur.getField(2,0),"3")
+	checkSuccess(cur.getField(2,0),3)
 	filename=cur.getCacheFileName()
 	checkSuccess(filename,"cachefile1")
 	id=cur.getResultSetId()
@@ -659,7 +659,7 @@ def main():
 	checkSuccess(cur.firstRowIndex(),4)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),6)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
@@ -672,7 +672,7 @@ def main():
 	cur.cacheOff()
 	print
 	checkSuccess(cur.openCachedResultSet(filename),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
 	print
@@ -683,14 +683,14 @@ def main():
 				sys.argv[3],sys.argv[4],sys.argv[5])
 	secondcur=PySQLRClient.sqlrcursor(secondcon)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
-	checkSuccess(secondcur.getField(0,0),"0")
+	checkSuccess(secondcur.getField(0,0),0)
 	checkSuccess(con.commit(),1)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
-	checkSuccess(secondcur.getField(0,0),"8")
+	checkSuccess(secondcur.getField(0,0),8)
 	checkSuccess(con.autoCommitOn(),1)
 	checkSuccess(cur.sendQuery("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10','testclob10',empty_blob())"),1)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
-	checkSuccess(secondcur.getField(0,0),"9")
+	checkSuccess(secondcur.getField(0,0),9)
 	checkSuccess(con.autoCommitOff(),1)
 	print
 
@@ -782,14 +782,14 @@ def main():
 	checkSuccess(cur.executeQuery(),1)
 	bindcur=cur.getOutputBindCursor("curs")
 	checkSuccess(bindcur.fetchFromBindCursor(),1)
-	checkSuccess(bindcur.getField(0,0),"1")
-	checkSuccess(bindcur.getField(1,0),"2")
-	checkSuccess(bindcur.getField(2,0),"3")
-	checkSuccess(bindcur.getField(3,0),"4")
-	checkSuccess(bindcur.getField(4,0),"5")
-	checkSuccess(bindcur.getField(5,0),"6")
-	checkSuccess(bindcur.getField(6,0),"7")
-	checkSuccess(bindcur.getField(7,0),"8")
+	checkSuccess(bindcur.getField(0,0),1)
+	checkSuccess(bindcur.getField(1,0),2)
+	checkSuccess(bindcur.getField(2,0),3)
+	checkSuccess(bindcur.getField(3,0),4)
+	checkSuccess(bindcur.getField(4,0),5)
+	checkSuccess(bindcur.getField(5,0),6)
+	checkSuccess(bindcur.getField(6,0),7)
+	checkSuccess(bindcur.getField(7,0),8)
 	print
 
 	print "LONG CLOB: "
@@ -814,10 +814,10 @@ def main():
 
 	print "FINISHED SUSPENDED SESSION: "
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
-	checkSuccess(cur.getField(4,0),"5")
-	checkSuccess(cur.getField(5,0),"6")
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(4,0),5)
+	checkSuccess(cur.getField(5,0),6)
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	id=cur.getResultSetId()
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)

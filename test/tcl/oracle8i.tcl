@@ -4,7 +4,7 @@
 # See the file COPYING for more information.
 
 
-load /usr/lib64/sqlrelay/sqlrelay.so sqlrelay
+load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
 proc checkUndef {value} {
 
@@ -775,7 +775,7 @@ puts ""
 puts "BIND VALIDATION: "
 catch {$cur sendQuery "drop table testtable1"}
 $cur sendQuery "create table testtable1 (col1 varchar2(20), col2 varchar2(20), col3 varchar2(20))"
-$cur prepareQuery "insert into testtable1 values ($(var1),$(var2),$(var3))"
+$cur prepareQuery "insert into testtable1 values (\$(var1),\$(var2),\$(var3))"
 $cur inputBind "var1" 1
 $cur inputBind "var2" 2
 $cur inputBind "var3" 3

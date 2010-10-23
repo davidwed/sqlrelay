@@ -1,10 +1,13 @@
 // Copyright (c) 2001  David Muse
 // See the file COPYING for more information.
 
+#include <rudiments/charstring.h>
 #include <sqlrelay/sqlrclient.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+using namespace rudiments;
 
 sqlrconnection	*con;
 sqlrcursor	*cur;
@@ -26,7 +29,7 @@ void checkSuccess(const char *value, const char *success) {
 		}
 	}
 
-	if (!strcmp(value,success)) {
+	if (!charstring::compare(value,success)) {
 		printf("success ");
 	} else {
 		printf("%s!=%s\n",value,success);
@@ -832,6 +835,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("CURSOR BINDS: \n");
+con->debugOn();
 	checkSuccess(cur->sendQuery("create or replace package types is type cursorType is ref cursor; end;"),1);
 	checkSuccess(cur->sendQuery("create or replace function sp_testtable(value in number) return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable where testnumber>value; return l_cursor; end;"),1);
 	cur->prepareQuery("begin  :curs1:=sp_testtable(5);  :curs2:=sp_testtable(0); end;");
@@ -851,6 +855,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(bindcur2->getField(2,(uint32_t)0),"3");
 	delete bindcur2;
 	checkSuccess(cur->sendQuery("drop package types"),1);
+con->debugOff();
 	printf("\n");
 
 	printf("LONG CLOB: \n");
