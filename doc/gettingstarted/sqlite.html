@@ -14,6 +14,7 @@
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
 <li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+<li><a href="#inmemory">Accessing an In-Memory Database With SQL Relay</a></li>
 </ul>
 
 <a name="installation"></a>
@@ -182,6 +183,22 @@ database.</p>
 <blockquote>
 <b>sqlr-stop sqlitetest</b>
 </blockquote>
+
+<a name="inmemory"></a>
+<span class="heading1">Accessing an In-Memory Database With SQL Relay</span><br>
+
+<p>SQLite supports a high-performance in-memory mode where tables are
+maintained in memory and nothing is written to permanent storage.  To use this
+with SQL Relay, simply use string="db=:memory:" in the connection tag of the 
+configuration.</p>
+
+<p>As each running instance of sqlr-connection-sqlite will have its own
+separate in-memory database, you almost certainly want to set connections="1"
+and maxconnections="1".</p>
+
+<p>Note, also, when shutting down SQL Relay, the entire in-memory database
+will be lost.  There is no way to preserve it.  Such is the nature of pure
+in-memory databases.</p>
 
 </body>
 
