@@ -114,6 +114,7 @@ install:
 	$(INSTALL) -m 644 gettingstarted/postgresql.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/sqlite.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/sybase.html $(docdir)/gettingstarted
+	$(INSTALL) -m 644 gettingstarted/blackray.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/5/805.html $(docdir)/gettingstarted/oracle/linux/redhat/5
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/6/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/6
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/7/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/7
