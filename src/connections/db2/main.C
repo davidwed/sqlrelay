@@ -1,49 +1,8 @@
-// Copyright (c) 1999-2001  David Muse
+// Copyright (c) 1999-2010  David Muse
 // See the file COPYING for more information
 
 #include <db2connection.h>
-#include <rudiments/signalclasses.h>
-
-#include <stdlib.h>
-#include <stdio.h>
-
-// for _exit
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
-
-db2connection	*conn;
-signalhandler	*alarmhandler;
-
-void cleanUp() {
-	conn->closeConnection();
-	delete conn;
-	delete alarmhandler;
-}
-
-void shutDown(int signum) {
-	cleanUp();
-	_exit(0);
-}
 
 int main(int argc, const char **argv) {
-
-	#include <version.h>
-
-	conn=new db2connection();
-
-	// handle signals
-	alarmhandler=conn->handleSignals(shutDown);
-
-	// open the connection
-	bool	listenresult=false;
-	if (conn->initConnection(argc,argv)) {
-		// wait for connections
-		listenresult=conn->listen();
-	}
-
-	cleanUp();
-
-	// return successful or unsuccessful completion based on listenresult
-	exit((listenresult)?0:1);
+	return sqlrconnection_svr::main(argc,argv,new db2connection());
 }

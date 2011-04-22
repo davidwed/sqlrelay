@@ -1,6 +1,6 @@
 include ../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 all:
 	$(MAKE) -C status all
@@ -49,8 +49,6 @@ clean:
 	$(MAKE) -C sqlite clean
 	$(MAKE) -C sybase clean
 	$(MAKE) -C router clean
-
-rebuild: clean all
 
 install:
 	$(MAKE) -C status install

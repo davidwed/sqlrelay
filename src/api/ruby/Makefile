@@ -2,7 +2,7 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 RUBYCFLAGS = $(shell LANG=POSIX $(RUBY) getcflags.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 
@@ -63,8 +63,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o	
 	$(LIBTOOL) --mode=clean $(RM) *.so
 	$(RMTREE) .libs
-
-rebuild: clean all
 
 libsqlrelay.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(RUBYDIR)/site-packages/SQLRelay $(RPATH) -module -no-undefined

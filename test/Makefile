@@ -1,6 +1,6 @@
 include ../config.mk
 
-.PHONY: all clean rebuild
+.PHONY: all clean
 
 all:
 	$(MAKE) -C c all
@@ -18,5 +18,3 @@ clean:
 	$(MAKE) -C python clean
 	$(MAKE) -C ruby clean
 	$(MAKE) -C dropin clean
-
-rebuild: clean all

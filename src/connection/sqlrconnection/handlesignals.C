@@ -17,12 +17,12 @@ signalhandler *sqlrconnection_svr::handleSignals(void (*shutdownfunction)(int)) 
 	// read or write outside the memory that is allocated
 
 	// We don't want to catch SEGV, we want core to be dumped
-	// this->handleCrash(shutdownfunction);
+	this->handleCrash(shutdownfunction);
 
 	// but daemonprocess sets it's own handler for SIGSEGV
 	// Since rudiments does not provide us with service to set
 	// default signal handler, we should do it by direct call to signal(2)
-	signal (SIGSEGV, SIG_DFL);
+	//signal (SIGSEGV, SIG_DFL);
 
 	signalhandler *sighandler=new signalhandler();
 	sighandler->setHandler(shutdownfunction);

@@ -2,7 +2,7 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = $(ERLANGLIBS) -L$(top_builddir)/src/api/c/src -L$(top_builddir)/src/api/c++/src -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
@@ -30,8 +30,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) *.beam
 	$(RMTREE) .libs
-
-rebuild: clean all
 
 sqlrelay.erl: sqlrelay.erl.in
 	sed -e "s|@SQLRELAY_PATH@|$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/priv/bin|g" $< > $@

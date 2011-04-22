@@ -13,24 +13,11 @@
 	#include <unistd.h>
 #endif
 
-statusconnection	*conn;
-signalhandler	*alarmhandler;
-
-void cleanUp() {
-	delete conn;
-	delete alarmhandler;
-}
-
-void shutDown(int signum) {
-	cleanUp();
-	_exit(0);
-}
-
 int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	conn=new statusconnection();
+	statusconnection	*conn=new statusconnection();
 	
 	sqlrstatistics      *statistics;
 
@@ -98,6 +85,6 @@ int main(int argc, const char **argv) {
 		);
 
 
-	cleanUp();
+	delete conn;
 	exit(0);
 }

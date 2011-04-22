@@ -2,7 +2,7 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
 LIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
@@ -61,8 +61,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) errors2
 	$(LIBTOOL) --mode=clean $(RM) errors3
 	$(RMTREE) .libs
-
-rebuild: clean all
 
 libsql_relay.la: sql_relay.C sql_relay.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -module -no-undefined

@@ -2,7 +2,7 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean java rebuild install uninstall
+.PHONY: all clean java install uninstall
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
 RPATH =
@@ -27,8 +27,6 @@ clean:
 	$(RM) com/firstworks/sqlrelay/*.class
 	$(RM) sqlrelay.jar
 	$(RMTREE) .libs
-
-rebuild: clean all
 
 java:
 	$(JAVAC) com/firstworks/sqlrelay/*.java

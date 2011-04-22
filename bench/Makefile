@@ -1,6 +1,6 @@
 include ../config.mk
 
-.PHONY: all clean rebuild
+.PHONY: all clean
 
 all: 
 ifneq ($(ORACLELIBS),)
@@ -43,5 +43,3 @@ clean:
 	$(MAKE) -C firebird clean
 	$(MAKE) -C sybase clean
 	$(MAKE) -C sqlrelay clean
-
-rebuild: clean all

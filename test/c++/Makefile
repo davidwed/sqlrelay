@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.PHONY: all clean rebuild
+.PHONY: all clean
 
 CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
 LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) -lm $(LIBEFENCE) -lefence
@@ -116,5 +116,3 @@ clean:
 	$(RM) cachefile*
 	$(RM) sqlnet.log
 	$(RMTREE) .libs
-
-rebuild: clean all

@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\"
 LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
@@ -60,6 +60,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/dbversion.C \
 	sqlrconnection/serverversion.C \
 	sqlrconnection/handlesignals.C \
+	sqlrconnection/main.C \
 	sqlrcursor/sqlrcursorctor.C \
 	sqlrcursor/sqlrcursordtor.C \
 	sqlrcursor/openclose.C \
@@ -122,6 +123,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/dbversion.lo \
 	sqlrconnection/serverversion.lo \
 	sqlrconnection/handlesignals.lo \
+	sqlrconnection/main.lo \
 	sqlrcursor/sqlrcursorctor.lo \
 	sqlrcursor/sqlrcursordtor.lo \
 	sqlrcursor/openclose.lo \
@@ -131,70 +133,8 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrcursor/fakebinds.lo \
 	sqlrcursor/abort.lo \
 	sqlrcursor/sid.lo
-DLOBJS = sqlrconnection/sqlrconnectionctor.d.lo \
-	sqlrconnection/sqlrconnectiondtor.d.lo \
-	sqlrconnection/flushwritebuffer.d.lo \
-	sqlrconnection/initconnection.d.lo \
-	sqlrconnection/ipc.d.lo \
-	sqlrconnection/opensockets.d.lo \
-	sqlrconnection/listen.d.lo \
-	sqlrconnection/listenercomm.d.lo \
-	sqlrconnection/clientsession.d.lo \
-	sqlrconnection/authenticate.d.lo \
-	sqlrconnection/suspendsession.d.lo \
-	sqlrconnection/endsession.d.lo \
-	sqlrconnection/ping.d.lo \
-	sqlrconnection/identify.d.lo \
-	sqlrconnection/autocommit.d.lo \
-	sqlrconnection/commit.d.lo \
-	sqlrconnection/connectioncount.d.lo \
-	sqlrconnection/rollback.d.lo \
-	sqlrconnection/newquery.d.lo \
-	sqlrconnection/handlequery.d.lo \
-	sqlrconnection/handleerror.d.lo \
-	sqlrconnection/getbinds.d.lo \
-	sqlrconnection/getsendcolumninfo.d.lo \
-	sqlrconnection/reexecutequery.d.lo \
-	sqlrconnection/fetchfrombindcursor.d.lo \
-	sqlrconnection/fetchresultset.d.lo \
-	sqlrconnection/returnresultsetheader.d.lo \
-	sqlrconnection/sendrowcounts.d.lo \
-	sqlrconnection/returnoutputbindvalues.d.lo \
-	sqlrconnection/sendcolumns.d.lo \
-	sqlrconnection/returnresultsetdata.d.lo \
-	sqlrconnection/skiprows.d.lo \
-	sqlrconnection/sendfield.d.lo \
-	sqlrconnection/abortresultset.d.lo \
-	sqlrconnection/suspendresultset.d.lo \
-	sqlrconnection/resumeresultset.d.lo \
-	sqlrconnection/closeconnection.d.lo \
-	sqlrconnection/closecursors.d.lo \
-	sqlrconnection/temptables.d.lo \
-	sqlrconnection/changeuser.d.lo \
-	sqlrconnection/relogin.d.lo \
-	sqlrconnection/markdatabasedavailable.d.lo \
-	sqlrconnection/getuser.d.lo \
-	sqlrconnection/getpassword.d.lo \
-	sqlrconnection/connectstringvalue.d.lo \
-	sqlrconnection/istransactional.d.lo \
-	sqlrconnection/bindparameters.d.lo \
-	sqlrconnection/unixsocketseqfile.d.lo \
-	sqlrconnection/updatestats.d.lo \
-	sqlrconnection/bindformat.d.lo \
-	sqlrconnection/dbversion.d.lo \
-	sqlrconnection/serverversion.d.lo \
-	sqlrconnection/handlesignals.d.lo \
-	sqlrcursor/sqlrcursorctor.d.lo \
-	sqlrcursor/sqlrcursordtor.d.lo \
-	sqlrcursor/openclose.d.lo \
-	sqlrcursor/preparequery.d.lo \
-	sqlrcursor/queryparse.d.lo \
-	sqlrcursor/binds.d.lo \
-	sqlrcursor/fakebinds.d.lo \
-	sqlrcursor/abort.d.lo \
-	sqlrcursor/sid.d.lo
 
-.SUFFIXES: .lo .d.lo
+.SUFFIXES: .lo
 
 .C.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
@@ -209,8 +149,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) */*.o
 	$(RMTREE) */.libs
 	$(RMTREE) .libs
-
-rebuild: clean all
 
 libsqlrconnection.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined

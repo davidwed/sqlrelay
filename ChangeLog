@@ -22,6 +22,15 @@
 		TDS_VERSION_NO doesn't exist
 	applied a fix for a bug that could cause a crash when a cursor is
 		reused
+	fixed a shutdown race condition in connection daemons
+	moved common startup/shutdown code for connection daemons up into
+		static methods/variables of the sqlrconnection_svr class
+	fixed a crash in the oracle connection daemon where OCIHandleFree
+		was getting called on define handles that weren't created by
+		OCIHandleAlloc
+	removed rebuild target from Makefiles
+	updated tests
+	refactored main() method for connections
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

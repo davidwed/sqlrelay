@@ -2,7 +2,7 @@ top_builddir = .
 
 include config.mk
 
-.PHONY: all clean rebuild install uninstall unconfig distclean
+.PHONY: all clean install uninstall distclean
 
 all:
 	$(MAKE) -C src all
@@ -17,9 +17,6 @@ clean:
 	$(RMTREE) */*/*/*/.pics
 	$(RMTREE) */*/*/*/*/.pics
 	$(MAKE) -C test clean
-
-rebuild:
-	$(MAKE) -C src rebuild
 
 install:
 	$(MAKE) -C src install
@@ -42,7 +39,7 @@ uninstall:
 	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc
 	$(RM) $(libdir)/pkgconfig/sqlrelay-c++.pc
 
-unconfig: clean
+distclean: clean
 	$(RM) config.cache
 	$(RM) config.h
 	$(RM) config.h~
@@ -70,5 +67,3 @@ unconfig: clean
 	$(RM) libtool.gcc
 	$(RM) sqlrelay-c.pc
 	$(RM) sqlrelay-c++.pc
-
-distclean: unconfig

@@ -256,7 +256,7 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,9),"TIME");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,10),"DATETIME");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,11),"YEAR");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,12),"CHAR");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,12),"STRING");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,13),"BLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,14),"CHAR");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,15),"TINYBLOB");
@@ -275,7 +275,7 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtime"),"TIME");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testdatetime"),"DATETIME");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testyear"),"YEAR");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testchar"),"CHAR");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testchar"),"STRING");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtext"),"BLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"CHAR");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtinytext"),"TINYBLOB");
@@ -297,7 +297,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,9),3);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,10),8);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,11),1);
-	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,12),41);
+	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,12),40);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,13),65535);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,14),41);
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,15),255);
@@ -316,7 +316,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtime"),3);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testdatetime"),8);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testyear"),1);
-	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testchar"),41);
+	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testchar"),40);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtext"),65535);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testvarchar"),41);
 	checkSuccessInt(sqlrcur_getColumnLengthByName(cur,"testtinytext"),255);

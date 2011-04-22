@@ -1,6 +1,6 @@
 include ../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 all:
 	$(MAKE) -C c++ all
@@ -66,40 +66,6 @@ ifneq ($(HAVE_TCL),)
 endif
 ifneq ($(HAVE_ERLANG),)
 	$(MAKE) -C erlang clean
-endif
-
-
-rebuild:
-	$(MAKE) -C c++ rebuild
-	$(MAKE) -C c rebuild
-	$(MAKE) -C postgresql rebuild
-	$(MAKE) -C mysql rebuild
-ifneq ($(ODBCLIBS),)
-	$(MAKE) -C odbc rebuild
-endif
-ifneq ($(HAVE_PYTHON),)
-	$(MAKE) -C python rebuild
-endif
-ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/Connection -f Makefile rebuild
-	$(MAKE) -C perl/Cursor -f Makefile rebuild
-	$(MAKE) -C perl/DBD -f Makefile rebuild
-endif
-ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby rebuild
-endif
-ifneq ($(HAVE_PHP),)
-	$(MAKE) -C php rebuild
-	$(MAKE) -C phppeardb rebuild
-endif
-ifneq ($(HAVE_JAVA),)
-	$(MAKE) -C java rebuild
-endif
-ifneq ($(HAVE_TCL),)
-	$(MAKE) -C tcl rebuild
-endif
-ifneq ($(HAVE_ERLANG),)
-	$(MAKE) -C erlang rebuild
 endif
 
 install:

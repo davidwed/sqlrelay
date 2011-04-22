@@ -2,6 +2,8 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 void sqlrconnection_svr::incrementClientSessionCount() {
 
@@ -105,7 +107,7 @@ void sqlrconnection_svr::clientSession() {
 			noAvailableCursors(command);
 			continue;
 		}
-printf("cursor id: %d\n",cursor->id);
+//printf("%d: cursor id: %d   command=%d\n",getpid(),cursor->id,command);
 
 		if (command==NEW_QUERY) {
 			if (newQueryCommand(cursor)) {
@@ -219,17 +221,13 @@ printf("client requested an invalid cursor: %d\n",index);
 
 sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 
-for (uint16_t b=0; b<cursorcount; b++) {
-printf("cursor %d  id=%d\n",b,cur[b]->id);
-}
-
 	uint16_t	i=0;
 	for (; i<cursorcount; i++) {
 		if (!cur[i]->busy) {
 			//fprintf(stderr,"reusing cursor %d\n",i);
 			dbgfile.debugPrint("connection",2,"found a free cursor:");
 			dbgfile.debugPrint("connection",3,(int32_t)i);
-printf("got a cursor (static): %d of %d, id=%d\n",i,cursorcount,cur[i]->id);
+//printf("%d: got a cursor (static): %d of %d, id=%d\n",getpid(),i,cursorcount,cur[i]->id);
 			return cur[i];
 		}
 	}
@@ -280,7 +278,7 @@ printf("got a cursor (static): %d of %d, id=%d\n",i,cursorcount,cur[i]->id);
 		}
 	}
 	
-printf("got a cursor (dynamic): %d of %d\n",firstopen,cursorcount);
+//printf("%d: got a cursor (dynamic): %d of %d\n",getpid(),firstopen,cursorcount);
 	return cur[firstopen];
 }
 

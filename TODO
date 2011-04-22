@@ -1,8 +1,26 @@
+doc for how to use SQL Relay with joomla
+
+
+blackray supports postgresql protocol, I might be able to grab some code from
+	it to implement the same
+
+sqlite supports virtual tables implemented via modules
+	create module for each DB type using database connection classes
+	use this and :memory: filename to achieve cross-db joins
+	create module for xbase tables to use SQL on those
+	create module for csv's
+	lots of possibilities
+
+
+Cameron/Kyler Laird reported issues when the column count is the same as the
+optimistic column count
+
+support old oracle long datatype like a lob
+
 suspended session increments serversockincount but then it doesn't get
 	decremented, even after session is resumed
 	the socket may not be getting deleted or something
 	closeConnection is crashing trying to delete those sockets
-
 
 db2 - yes
 firebird - yes
@@ -12,11 +30,17 @@ freetds - if a query fails, next one gets: no server side cursors available...
 		does this happen with other connections?
 mysql - yes
 oracle8 - yes
-oracle8i - sort of - usually works, but sometimes cursor bind fails and new connection daemons get spawned
+oracle8i - I don't get a crash any more, but it's flaky now, sometimes
+		bind cursors don't return any data, like the statement doesn't
+		have the result set associated with it any more
+		the colums still are there, but not the results set itself
+		connections get hung when running test over and over
 postgresql7 - yes
 postgresql8 - yes
-sqlite - yes
-sybase - sort of - connection daemons have to "settle" after logging in
+sqlite - connections get hung when running test over and over
+		sqlr-stop doesn't always kill
+sybase - connections get hung when test script fails
+		sqlr-stop doesn't always kill
 
 various cases where connection daemons won't shut down
 

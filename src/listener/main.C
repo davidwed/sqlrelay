@@ -10,7 +10,7 @@
 
 sqlrlistener	*lsnr;
 
-RETSIGTYPE	crash() {
+RETSIGTYPE	crash(int signum) {
 	delete lsnr;
 	_exit(0);
 }
@@ -27,7 +27,7 @@ int	main(int argc, const char **argv) {
 	// launch the listener
 	lsnr=new sqlrlistener();
 	lsnr->handleShutDown(shutDown);
-	lsnr->handleCrash((RETSIGTYPE *)crash);
+	lsnr->handleCrash(crash);
 	if (lsnr->initListener(argc,argv)) {
 		lsnr->listen();
 	}

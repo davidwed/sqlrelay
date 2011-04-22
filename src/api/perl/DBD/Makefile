@@ -2,7 +2,7 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo $$ccflags | sed -e "s|UNKNOWN||g" )
 PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo $$optimize | sed -e "s|UNKNOWN||g" )
@@ -30,8 +30,6 @@ endif
 all:
 
 clean:
-
-rebuild: clean all
 
 install: 
 	$(MKINSTALLDIRS) $(PERLSITELIB)/DBD

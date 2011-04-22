@@ -2,13 +2,11 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 all:
 
 clean:
-
-rebuild: clean all
 
 install:
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPPEARDBDIR)

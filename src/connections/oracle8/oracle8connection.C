@@ -9,9 +9,6 @@
 
 #include <datatypes.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #define MAX_BYTES_PER_CHAR	4
 
 oracle8connection::oracle8connection() : sqlrconnection_svr() {
@@ -570,25 +567,12 @@ bool oracle8cursor::openCursor(uint16_t id) {
 				(OCIError *)oracle8conn->err)!=OCI_SUCCESS) {
 		return false;
 	}
-
-	// should be able to alloc these here, but it fails
-	/*for (ub4 i=0; i<oracle8conn->maxselectlistsize; i++) {
-		if (OCIHandleAlloc((dvoid *)stmt,(dvoid **)&def[i],
-					OCI_HTYPE_DEFINE,0,NULL)!=OCI_SUCCESS) {
-			return false;
-		}
-	}*/
 	return true;
 }
 
 bool oracle8cursor::closeCursor() {
-	// should be able to free these here, but the alloc fails
-	/*for (ub4 i=0; i<oracle8conn->maxselectlistsize; i++) {
-		OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
-	}*/
 	// Renat says that we should do this here. I'm not sure we need
-	// to though.  If we do, we can remove the commmented out thing above
-	// too.
+	// to though.
 	cleanUpData(true,true);
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
@@ -1653,14 +1637,14 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 				}
 			}
 
-			// should be able to alloc these in openCursor() and
-			// free them in closeCursor() rather than letting
-			// OCIDefineByPos() alloc them and having to clear
-			// them here, but the alloc fails
-			if (def[i]) {
-				OCIHandleFree(def[i],OCI_HTYPE_DEFINE);
-				def[i]=NULL;
-			}
+			// Members of the def[] array should not be freed
+			// here using OCIHandleFree as def[] array are just
+			// pointers to structures allocated and managed by
+			// OCI.  There was once code here that did deallocate
+			// using OCIHandleFree, but it led to crashes.  Memory
+			// leak detectors may complain, but ultimately the
+			// memory will be deallocated.
+			def[i]=NULL;
 		}
 	}
 

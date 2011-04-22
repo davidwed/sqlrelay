@@ -2,7 +2,7 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DCLIENT_VERSION=\"$(SQLR_VERSION)\"
 LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
@@ -133,8 +133,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) */*.lo
 	$(LIBTOOL) --mode=clean $(RM) */*.o
 	$(RMTREE) */.libs
-
-rebuild: clean all
 
 libsqlrclient.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)

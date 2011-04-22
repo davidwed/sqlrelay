@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.PHONY: all clean rebuild.class
+.PHONY: all clean
 
 all:
 ifneq ($(strip $(DB2LIBS)),)
@@ -69,5 +69,3 @@ sybase.class: sybase.java
 
 test.class: test.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar test.java
-
-rebuild.class: clean all

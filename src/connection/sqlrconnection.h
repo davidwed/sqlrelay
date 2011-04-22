@@ -44,9 +44,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 			sqlrconnection_svr();
 		virtual	~sqlrconnection_svr();
 
-		bool	initConnection(int argc, const char **argv);
-		bool	listen();
-		void	closeConnection();
+		static	int main(int argc, const char **argv,
+					sqlrconnection_svr *c);
 
 	protected:
 		// interface definition
@@ -151,6 +150,12 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 	private:
 		// methods used internally
+		bool	initConnection(int argc, const char **argv);
+		bool	listen();
+		void	closeConnection();
+		static void	cleanUp();
+		static void	shutDown(int signum);
+
 		bool	logInUpdateStats(bool printerrors);
 		void	logOutUpdateStats();
 		sqlrcursor_svr	*initCursorUpdateStats();
@@ -285,6 +290,10 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	openSockets();
 
 		void	flushWriteBuffer();
+
+		static	sqlrconnection_svr	*conn;
+		static	signalhandler		*sigh;
+		static volatile sig_atomic_t	shutdowninprogress;
 
 		char			*user;
 		char			*password;

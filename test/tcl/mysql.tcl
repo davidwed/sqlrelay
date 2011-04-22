@@ -201,7 +201,7 @@ checkSuccess [$cur getColumnTypeByIndex 8] "DATE"
 checkSuccess [$cur getColumnTypeByIndex 9] "TIME"
 checkSuccess [$cur getColumnTypeByIndex 10] "DATETIME"
 checkSuccess [$cur getColumnTypeByIndex 11] "YEAR"
-checkSuccess [$cur getColumnTypeByIndex 12] "CHAR"
+checkSuccess [$cur getColumnTypeByIndex 12] "STRING"
 checkSuccess [$cur getColumnTypeByIndex 13] "BLOB"
 checkSuccess [$cur getColumnTypeByIndex 14] "CHAR"
 checkSuccess [$cur getColumnTypeByIndex 15] "TINYBLOB"
@@ -220,7 +220,7 @@ checkSuccess [$cur getColumnTypeByName "testdate"] "DATE"
 checkSuccess [$cur getColumnTypeByName "testtime"] "TIME"
 checkSuccess [$cur getColumnTypeByName "testdatetime"] "DATETIME"
 checkSuccess [$cur getColumnTypeByName "testyear"] "YEAR"
-checkSuccess [$cur getColumnTypeByName "testchar"] "CHAR"
+checkSuccess [$cur getColumnTypeByName "testchar"] "STRING"
 checkSuccess [$cur getColumnTypeByName "testtext"] "BLOB"
 checkSuccess [$cur getColumnTypeByName "testvarchar"] "CHAR"
 checkSuccess [$cur getColumnTypeByName "testtinytext"] "TINYBLOB"
@@ -242,7 +242,7 @@ checkSuccess [$cur getColumnLengthByIndex 8] 3
 checkSuccess [$cur getColumnLengthByIndex 9] 3
 checkSuccess [$cur getColumnLengthByIndex 10] 8
 checkSuccess [$cur getColumnLengthByIndex 11] 1
-checkSuccess [$cur getColumnLengthByIndex 12] 41
+checkSuccess [$cur getColumnLengthByIndex 12] 40
 checkSuccess [$cur getColumnLengthByIndex 13] 65535
 checkSuccess [$cur getColumnLengthByIndex 14] 41
 checkSuccess [$cur getColumnLengthByIndex 15] 255
@@ -261,7 +261,7 @@ checkSuccess [$cur getColumnLengthByName "testdate"] 3
 checkSuccess [$cur getColumnLengthByName "testtime"] 3
 checkSuccess [$cur getColumnLengthByName "testdatetime"] 8
 checkSuccess [$cur getColumnLengthByName "testyear"] 1
-checkSuccess [$cur getColumnLengthByName "testchar"] 41
+checkSuccess [$cur getColumnLengthByName "testchar"] 40
 checkSuccess [$cur getColumnLengthByName "testtext"] 65535
 checkSuccess [$cur getColumnLengthByName "testvarchar"] 41
 checkSuccess [$cur getColumnLengthByName "testtinytext"] 255

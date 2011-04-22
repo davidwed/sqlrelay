@@ -2,7 +2,7 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 PERLCCFLAGS = $(DESTDIR)$(shell eval "`$(PERL) -V:ccflags`"; export ccflags; echo "$$ccflags " | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-x.* | |g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=.* | |g")
 PERLOPTIMIZE = $(DESTDIR)$(shell eval "`$(PERL) -V:optimize`"; export optimize; echo "$$optimize " | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-x.* | |g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=.* | |g")
@@ -91,8 +91,6 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) errors*
 	$(LIBTOOL) --mode=clean $(RM) perlincludes.h
 	$(RMTREE) .libs
-
-rebuild: clean all
 
 libCursor.la: Cursor.xs Cursor.C Cursor.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ Cursor.lo $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Cursor $(RPATH) -module -no-undefined

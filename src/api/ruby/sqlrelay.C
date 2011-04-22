@@ -1158,7 +1158,7 @@ void Init_SQLRCursor() {
 	rb_define_method(csqlrcursor,"validateBinds",
 				(CAST)sqlrcur_validateBinds,0);
 	rb_define_method(csqlrcursor,"validBind",
-				(CAST)sqlrcur_validBind,0);
+				(CAST)sqlrcur_validBind,1);
 	rb_define_method(csqlrcursor,"executeQuery",
 				(CAST)sqlrcur_executeQuery,0);
 	rb_define_method(csqlrcursor,"fetchFromBindCursor",

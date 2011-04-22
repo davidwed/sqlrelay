@@ -1,6 +1,6 @@
 include ../config.mk
 
-.PHONY: all clean rebuild install uninstall
+.PHONY: all clean install uninstall
 
 all:
 	$(MAKE) -C util all
@@ -23,17 +23,6 @@ clean:
 	$(MAKE) -C start clean
 	$(MAKE) -C cachemanager clean
 	$(MAKE) -C scaler clean
-
-rebuild:
-	$(MAKE) -C util rebuild
-	$(MAKE) -C listener rebuild
-	$(MAKE) -C api rebuild
-	$(MAKE) -C cmdline rebuild
-	$(MAKE) -C connection rebuild
-	$(MAKE) -C connections rebuild
-	$(MAKE) -C start rebuild
-	$(MAKE) -C cachemanager rebuild
-	$(MAKE) -C scaler rebuild
 
 install:
 	$(MAKE) -C util install

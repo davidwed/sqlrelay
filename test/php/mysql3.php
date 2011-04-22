@@ -193,7 +193,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnType($cur,9),"TIME");
 	checkSuccess(sqlrcur_getColumnType($cur,10),"DATETIME");
 	checkSuccess(sqlrcur_getColumnType($cur,11),"YEAR");
-	checkSuccess(sqlrcur_getColumnType($cur,12),"CHAR");
+	checkSuccess(sqlrcur_getColumnType($cur,12),"STRING");
 	checkSuccess(sqlrcur_getColumnType($cur,13),"BLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,14),"CHAR");
 	checkSuccess(sqlrcur_getColumnType($cur,15),"TINYBLOB");
@@ -212,7 +212,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnType($cur,"testtime"),"TIME");
 	checkSuccess(sqlrcur_getColumnType($cur,"testdatetime"),"DATETIME");
 	checkSuccess(sqlrcur_getColumnType($cur,"testyear"),"YEAR");
-	checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"CHAR");
+	checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"STRING");
 	checkSuccess(sqlrcur_getColumnType($cur,"testtext"),"BLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,"testvarchar"),"CHAR");
 	checkSuccess(sqlrcur_getColumnType($cur,"testtinytext"),"TINYBLOB");
@@ -234,7 +234,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnLength($cur,9),3);
 	checkSuccess(sqlrcur_getColumnLength($cur,10),8);
 	checkSuccess(sqlrcur_getColumnLength($cur,11),1);
-	checkSuccess(sqlrcur_getColumnLength($cur,12),41);
+	checkSuccess(sqlrcur_getColumnLength($cur,12),40);
 	checkSuccess(sqlrcur_getColumnLength($cur,13),65535);
 	checkSuccess(sqlrcur_getColumnLength($cur,14),41);
 	checkSuccess(sqlrcur_getColumnLength($cur,15),255);
@@ -253,7 +253,7 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_getColumnLength($cur,"testtime"),3);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testdatetime"),8);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testyear"),1);
-	checkSuccess(sqlrcur_getColumnLength($cur,"testchar"),41);
+	checkSuccess(sqlrcur_getColumnLength($cur,"testchar"),40);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testtext"),65535);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testvarchar"),41);
 	checkSuccess(sqlrcur_getColumnLength($cur,"testtinytext"),255);

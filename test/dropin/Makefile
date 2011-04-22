@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.PHONY: all clean rebuild
+.PHONY: all clean
 
 .SUFFIXES: .lo
 
@@ -31,5 +31,3 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) mysql
 	$(LIBTOOL) --mode=clean $(RM) postgresql
-
-rebuild: clean all

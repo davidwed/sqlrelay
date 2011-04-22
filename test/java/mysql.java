@@ -273,7 +273,7 @@ class mysql {
 		checkSuccess(cur.getColumnType(9),"TIME");
 		checkSuccess(cur.getColumnType(10),"DATETIME");
 		checkSuccess(cur.getColumnType(11),"YEAR");
-		checkSuccess(cur.getColumnType(12),"CHAR");
+		checkSuccess(cur.getColumnType(12),"STRING");
 		checkSuccess(cur.getColumnType(13),"BLOB");
 		checkSuccess(cur.getColumnType(14),"CHAR");
 		checkSuccess(cur.getColumnType(15),"TINYBLOB");
@@ -292,7 +292,7 @@ class mysql {
 		checkSuccess(cur.getColumnType("testtime"),"TIME");
 		checkSuccess(cur.getColumnType("testdatetime"),"DATETIME");
 		checkSuccess(cur.getColumnType("testyear"),"YEAR");
-		checkSuccess(cur.getColumnType("testchar"),"CHAR");
+		checkSuccess(cur.getColumnType("testchar"),"STRING");
 		checkSuccess(cur.getColumnType("testtext"),"BLOB");
 		checkSuccess(cur.getColumnType("testvarchar"),"CHAR");
 		checkSuccess(cur.getColumnType("testtinytext"),"TINYBLOB");
@@ -314,7 +314,7 @@ class mysql {
 		checkSuccess(cur.getColumnLength(9),3);
 		checkSuccess(cur.getColumnLength(10),8);
 		checkSuccess(cur.getColumnLength(11),1);
-		checkSuccess(cur.getColumnLength(12),41);
+		checkSuccess(cur.getColumnLength(12),40);
 		checkSuccess(cur.getColumnLength(13),65535);
 		checkSuccess(cur.getColumnLength(14),41);
 		checkSuccess(cur.getColumnLength(15),255);
@@ -333,7 +333,7 @@ class mysql {
 		checkSuccess(cur.getColumnLength("testtime"),3);
 		checkSuccess(cur.getColumnLength("testdatetime"),8);
 		checkSuccess(cur.getColumnLength("testyear"),1);
-		checkSuccess(cur.getColumnLength("testchar"),41);
+		checkSuccess(cur.getColumnLength("testchar"),40);
 		checkSuccess(cur.getColumnLength("testtext"),65535);
 		checkSuccess(cur.getColumnLength("testvarchar"),41);
 		checkSuccess(cur.getColumnLength("testtinytext"),255);
