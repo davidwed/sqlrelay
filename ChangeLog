@@ -31,6 +31,7 @@
 	removed rebuild target from Makefiles
 	updated tests
 	refactored main() method for connections
+	added searches for ruby1.8, ruby19 and ruby1.9 in configure script
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library
