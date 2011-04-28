@@ -2277,7 +2277,7 @@ then
 
 	else
 
-		for ruby in "ruby" "ruby16" "ruby18"
+		for ruby in "ruby" "ruby16" "ruby18" "ruby1.8" "ruby19" "ruby1.9"
 		do
 
 			HAVE_RUBY=""

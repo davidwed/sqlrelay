@@ -1,3 +1,5 @@
+convert dtd to xml schema
+
 doc for how to use SQL Relay with joomla
 
 
@@ -477,8 +479,13 @@ Availability:
 API's:
 	* C#
 	* Ruby-on-rails adapter
+        * javascript/ajax
 
 Drop-in replacement libraries:
 	* Oracle OCI7/8
 	* Sybase-ct
 	* Interbase
+
+DB Compatibility:
+	* Informix
+	* xbsql
