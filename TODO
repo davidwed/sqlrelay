@@ -1,3 +1,5 @@
+zip instantclient installations omit libclntsh.so link, it is required for compile to work
+
 convert dtd to xml schema
 
 doc for how to use SQL Relay with joomla
