@@ -658,7 +658,8 @@ then
 			then
 				ORACLEVERSION="10g"
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
-				ORACLELIBS="-L$ORACLE_INSTANTCLIENT_PREFIX -lclntsh -lnnz10"
+				NNZ=`ls $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "|.so||"`
+				ORACLELIBS="-L$ORACLE_INSTANTCLIENT_PREFIX -lclntsh -l$NNZ"
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
 		fi
@@ -673,7 +674,8 @@ then
 				then
 					ORACLEVERSION="10g"
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
-					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -lnnz10"
+					NNZ=`ls $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "|.so||"`
+					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -l$NNZ"
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
 				fi
 
@@ -682,7 +684,8 @@ then
 				then
 					ORACLEVERSION="10g"
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client64/lib"
-					ORACLELIBS="-L/usr/lib/oracle/$version/client64/lib -lclntsh -lnnz10"
+					NNZ=`ls $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "|.so||"`
+					ORACLELIBS="-L/usr/lib/oracle/$version/client64/lib -lclntsh -l$NNZ"
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client64"
 				fi
 			done
