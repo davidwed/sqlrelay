@@ -657,8 +657,12 @@ then
 			if ( test -r "$ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
 			then
 				ORACLEVERSION="10g"
+				if ( test -n `echo $ORACLE_INSTANTCLIENT_PREFIX | grep 11` )
+				then
+					ORACLEVERSION="11g"
+				fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
-				NNZ=`ls $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
+				NNZ=`basename $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
 				ORACLELIBS="-L$ORACLE_INSTANTCLIENT_PREFIX -lclntsh -l$NNZ"
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
@@ -673,8 +677,12 @@ then
 				if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client/oci.h" )
 				then
 					ORACLEVERSION="10g"
+					if ( test -n `echo $version | grep 11` )
+					then
+						ORACLEVERSION="11g"
+					fi
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
-					NNZ=`ls $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
+					NNZ=`basename $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
 					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -l$NNZ"
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
 				fi
@@ -683,8 +691,12 @@ then
 				if ( test -r "/usr/lib/oracle/$version/client64/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client64/oci.h" )
 				then
 					ORACLEVERSION="10g"
+					if ( test -n `echo $version | grep 11` )
+					then
+						ORACLEVERSION="11g"
+					fi
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client64/lib"
-					NNZ=`ls $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
+					NNZ=`basename $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
 					ORACLELIBS="-L/usr/lib/oracle/$version/client64/lib -lclntsh -l$NNZ"
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client64"
 				fi
@@ -838,7 +850,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 		fi
 	fi
 		
-	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" -o "$ORACLEVERSION" = "10g" -o "$ORACLEVERSION" = "11g" -o "$ORACLEVERSION" = "11i" )
+	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" -o "$ORACLEVERSION" = "10g" -o "$ORACLEVERSION" = "11g" )
 	then
 		AC_DEFINE(HAVE_ORACLE_8i,1,Oracle 8i or greater)
 	fi
