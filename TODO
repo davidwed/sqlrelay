@@ -1,37 +1,10 @@
-figure out some way to have a default instantclient path - /usr/local/instantclient_*
-
-convert dtd to xml schema
-
-doc for how to use SQL Relay with joomla
-
-
-blackray supports postgresql protocol, I might be able to grab some code from
-	it to implement the same
-
-sqlite supports virtual tables implemented via modules
-	create module for each DB type using database connection classes
-	use this and :memory: filename to achieve cross-db joins
-	create module for xbase tables to use SQL on those
-	create module for csv's
-	lots of possibilities
-
-
-Cameron/Kyler Laird reported issues when the column count is the same as the
-optimistic column count
-
-support old oracle long datatype like a lob
-
-suspended session increments serversockincount but then it doesn't get
-	decremented, even after session is resumed
-	the socket may not be getting deleted or something
-	closeConnection is crashing trying to delete those sockets
-
 db2 - yes
 firebird - yes
 freetds - if a query fails, next one gets: no server side cursors available...
 		all cursors end up having the same ID, one higher than the
 		actual max cursor count
 		does this happen with other connections?
+		does this happen in older version?
 mysql - yes
 oracle8 - yes
 oracle8i - I don't get a crash any more, but it's flaky now, sometimes
@@ -46,24 +19,7 @@ sqlite - connections get hung when running test over and over
 sybase - connections get hung when test script fails
 		sqlr-stop doesn't always kill
 
-various cases where connection daemons won't shut down
 
-there are cases with DB2 where data in a DB that's not using UTF-8 may be
-returned converted to UTF-8.  How do we get the data out in the same encoding
-that it's in the DB in?
-http://www.ibm.com/developerworks/data/library/techarticle/dm-0506chong/index.html
-
-java api crashes on 64 bit because GetIntField needs to be GetLongField on
-	that platform
-
-
-The PHP Pear DB driver doesn't handle ? chars properly inside double quotes.
-I think it probably also doesn't handle escaped quotes properly either.
-
-installing under lib/python/Products in zope 2 doesn't work
-zope 3 doesn't have lib/python/Products
-
-postgresql drop-in doesn't work with modern postgresql
 
 Hard problem:
 	oracle apparently runs out of cursors after a while, the problem isn't
@@ -190,22 +146,31 @@ sqlrcon_free($con);
 ?>
 
 
-Zope API:
-	doesn't handle money types right
-	ImageFile needs to be App.ImageFile in zope 2.11 and up
-	meta_types, __ac_permissions_- and methods attributes are long
-		deprecated
 
-ODBC requires numbers rather than names for bind variables,
-* make sure ODBC docs say that you have to use numbers for bind variables
-	or
-* dig through the query and map names to numbers
-
-PHP with postgresql drop-in needs lots of functions
-
-1.0:
 
 Bugs:
+	* Zope API:
+		doesn't handle money types right
+		ImageFile needs to be App.ImageFile in zope 2.11 and up
+		meta_types, __ac_permissions_- and methods attributes are long
+			deprecated
+		installing under lib/python/Products in zope 2 doesn't work
+		zope 3 doesn't have lib/python/Products
+	* The PHP Pear DB driver doesn't handle ? chars properly inside double
+		quotes.  I think it probably also doesn't handle escaped quotes
+		properly either.
+	* there are cases with DB2 where data in a DB that's not using UTF-8
+		may be returned converted to UTF-8.  How do we get the data out
+		in the same encoding that it's in the DB in?
+		http://www.ibm.com/developerworks/data/library/techarticle/dm-0506chong/index.html
+	* java api crashes on 64 bit because GetIntField needs to be
+		GetLongField on that platform
+	* Cameron/Kyler Laird reported issues when the column count is the
+		same as the optimistic column count
+	* suspended session increments serversockincount but then it doesn't
+		get decremented, even after session is resumed
+		the socket may not be getting deleted or something
+		closeConnection is crashing trying to delete those sockets
 	* allowing query timeout appears to hang the sqlrelay server
 		need to add timeout option to sqlrsh
 	* PHP pear db only returns 100 rows with this code:
@@ -278,52 +243,11 @@ Bugs:
 		db and never log out and back into first
 
 Tests:
-
-Documentation:
-	* db2 on fc9
-	* how to use new features of Tony/Erik's perl dbi patch
-	* getting started with odbc
-	* "how sqlrelay works" with diagrams and animations
-	* example sqlrelay.conf's for different configurations
-	* performance benchmark charts
-
-Performance/Code Enhancements:
-	* reset autocommit state when new client logs into sqlrelay
-	* NLS_LANG-like issues with other db's?
-
-Features:
-	* update python api to create decimals in dictionary
-	* update python test to handle python patches
-	* incorporate Jens Brey's instantclient patches
-	* get odbc driver working better
-	* get odbc driver working sufficiently to use with jdbc
-	* Perl DBI driver needs to convert bind vars from ?'s to
-		db-appropriate format like PHP Pear DB driver does
-	* Non C/C++ api's need a method to close cursors.  Specifically, bind
-		cursors cannot be closed manually and must be garbage collected.
-		It's not an issue for memory, but rather a server-side cursor
-		will be occupied until it's garbage collected.  On C/C++ you
-		can just delete it.
-	* return error code/number
-
-Availability:
-
-API's:
-	* PHP PDO driver  http://wiki.cc/php/PDO
-
---------------------------------------------------------------------------------
-
-Post 1.0:
-
-Bugs:
-
-Tests:
 	* php pear db bind formats
 	* db2 temp tables
 	* odbc temp tables
 	* zope
 	* odbc tests
-	* mysql_stmt calls in drop-in library
 	* better pythondb/rubydbi tests
 	* test init scripts
 	* test send query w/length
@@ -355,8 +279,19 @@ Tests:
 	* oldmysql test files for non-C++ api's
 
 Documentation:
+	* ODBC requires numbers rather than names for bind variables,
+		make sure ODBC docs say that you have to use numbers for
+		bind variables
+	* how to use SQL Relay with joomla
+	* how to use new features of Tony/Erik's perl dbi patch
+	* getting started with odbc
+	* "how sqlrelay works" with diagrams and animations
+	* example sqlrelay.conf's for different configurations
+	* performance benchmark charts
 
 Performance/Code Enhancements:
+	* reset autocommit state when new client logs into sqlrelay
+	* NLS_LANG-like issues with other db's?
 	* db2 first query fails and forces relogin unless detached first
 		which causes problems if reloginatstart is not set
 		using tcp connections fixes this but is slower
@@ -389,8 +324,8 @@ Performance/Code Enhancements:
 	* server side result set caching
 	* support batch DML in oracle8
 	* for databases that can return non-strings in their result sets, 
-		send non strings to client
-	* seperate modules into standalone builds
+		send non strings over network to client
+	* separate modules into standalone builds
 	* should be a single sqlr-connection daemon that dlopens the
 		appropriate database module 
 	* login errors should be printed on the screen by sqlrconnection class,
@@ -399,15 +334,29 @@ Performance/Code Enhancements:
 		(asynchronous queries w/timeouts)
 	* use async queries by default, even if the client runs a synchronous
 		query, so the query can be cancelled if the client disconnects
-	* support freetds/sybase ct_con_prop/encryption
 	* use bandwidth delay product to set tcp send/receive buffer sizes
 
 Features:
+	* support old oracle long datatype like a lob
+	* convert dtd to xml schema
+	* update python api to create decimals in dictionary
+	* update python test to handle python patches
+	* get odbc driver working better
+	* get odbc driver working sufficiently to use with jdbc
+	* Perl DBI driver needs to convert bind vars from ?'s to
+		db-appropriate format like PHP Pear DB driver does
+	* Non C/C++ api's need a method to close cursors.  Specifically, bind
+		cursors cannot be closed manually and must be garbage collected.
+		It's not an issue for memory, but rather a server-side cursor
+		will be occupied until it's garbage collected.  On C/C++ you
+		can just delete it.
+	* return error code/number
 	* SSL encryption
 	* verbose mode for export/import
-	* daemontools compatibility
-	* figure out how to get the drop-in client compiled into the mysql PHP
-		module like the mysql native client is
+	* support network protocols for mysql, postgresql
+		rather than using drop-in replacement libs
+		blackray supports postgresql protocol, I might be able to grab
+		some code from it to implement the same
 	* query router support accessing different db's by specifying a
 		different user/password
 	* query router support accessing different db's by specifying which
@@ -420,8 +369,6 @@ Features:
 	* add "quoting method" call to api, call mysql native function,
 		(mysql_escape_string()/mysql_real_escape_string())
 	* not sure about other db's
-	* hack on postgresql's ecpg to emit SQL Relay code rather than
-		Postgresql code
 	* sqlite binds, sqlite utf-8/utf-16 functions
 	* pythondb output bind variables?
 	* zope bind variables?
@@ -429,13 +376,9 @@ Features:
 	* use PAM if possible as alternative to defining users in sqlrelay.conf
 	* support stored procedures that return result sets in interbase, db2
 	* could debug logs be logrotate compatible?
-	* postgresql drop-in api lacks many features
-	* postgresql drop-in needs to parse out ; delimited queries for db's
-		that don't support that, execute them seperately
-	* mysql drop-in api lacks a few features, stmt functions need
-		to be updated
 	* sybase/freetds (possibly others) need options for setting chained
 		mode and isolation mode when client connects
+	* support freetds/sybase ct_con_prop/encryption
 	* datatype support:
 		handle binary data correctly in all databases
 		identical long/lob datatype support in all databases
@@ -465,8 +408,12 @@ Features:
 	* DML/DDL caching - if db is down, accept queries and run them when the
 		db comes back up
 	* kerberos/gssapi authentication
-	* support Google Datastore
-	* web sql database? : http://dev.w3.org/html5/webdatabase/
+	* sqlite supports virtual tables implemented via modules
+		create module for each DB type using database connection classes
+		use this and :memory: filename to achieve cross-db joins
+		create module for xbase tables to use SQL on those
+		create module for csv's
+		lots of possibilities
 
 Availability:
 	* connections should ping database server every so often to make sure
@@ -479,12 +426,10 @@ API's:
 	* C#
 	* Ruby-on-rails adapter
         * javascript/ajax
-
-Drop-in replacement libraries:
-	* Oracle OCI7/8
-	* Sybase-ct
-	* Interbase
+	* PHP PDO driver  http://wiki.cc/php/PDO
 
 DB Compatibility:
 	* Informix
 	* xbsql
+	* Google Datastore
+	* web sql database? : http://dev.w3.org/html5/webdatabase/
