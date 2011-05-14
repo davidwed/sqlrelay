@@ -26,10 +26,10 @@ ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) oracle8i
+	$(MAKE) oracle
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
-	$(MAKE) postgresql7
+	$(MAKE) postgresql
 endif
 ifneq ($(strip $(SQLITELIBS)),)
 	$(MAKE) sqlite
@@ -50,14 +50,11 @@ firebird: firebird.c firebird.lo
 mysql: mysql.c mysql.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
 
-oracle8: oracle8.c oracle8.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
+oracle: oracle.c oracle.lo
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle.lo $(LIBS)
 
-oracle8i: oracle8i.c oracle8i.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle8i.lo $(LIBS)
-
-postgresql7: postgresql7.c postgresql7.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql7.lo $(LIBS)
+postgresql: postgresql.c postgresql.lo
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql.lo $(LIBS)
 
 sqlite: sqlite.c sqlite.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sqlite.lo $(LIBS)
@@ -72,8 +69,8 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) freetds
 	$(LIBTOOL) --mode=clean $(RM) firebird
 	$(LIBTOOL) --mode=clean $(RM) mysql
-	$(LIBTOOL) --mode=clean $(RM) oracle8i
-	$(LIBTOOL) --mode=clean $(RM) postgresql7
+	$(LIBTOOL) --mode=clean $(RM) oracle
+	$(LIBTOOL) --mode=clean $(RM) postgresql
 	$(LIBTOOL) --mode=clean $(RM) sqlite
 	$(LIBTOOL) --mode=clean $(RM) sybase
 	$(RM) cachefile*
