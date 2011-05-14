@@ -34,6 +34,12 @@ instead of using the same user for every session?</a></li>
 <li><a href="#filtering">Can SQL Relay be configured to filter out certain queries, such as select's without a where clause?</a></li>
 </ol>
 
+<span class="heading2">Build Questions</span><br><br>
+<ol>
+<li><a href="#instantclient">Can I build SQL Relay against Oracle Instantclient?</a></li>
+<li><a href="#ubuntu">Why won't SQL Relay build properly on Ubuntu?</a></li>
+</ol>
+
 <span class="heading2">API Comparison Questions</span><br><br>
 <ol>
 <li><a href="#cgi">Why should I use SQL Relay with CGI's instead of using a native database API?</a></li>
@@ -326,6 +332,35 @@ library.</p>
 <span class="heading3">Can SQL Relay be configured to filter out certain queries, such as select's without a where clause?</span>
 
 <p>Yes!  As of version 0.38.  See <a href="router.html">Routing and Filtering Queries with SQL Relay</a>.</p>
+
+
+<span class="heading3">Build Questions</span><br><br>
+
+<a name="instantclient"></a>
+<span class="heading3">Can I build SQL Relay against Oracle Instantclient?</span><br><br>
+
+<p>Yes.  However, there is one issue.  Some releases of the instantclient software have omitted the libclntsh.so symlink.  I noticed it in the zip distribution of the 11.2 version of instantclient.  As a result the -lclntsh argument to the linker fails to find the library and the configure script fails to detect the instantclient installation.  Even if you manually tweak the config.mk file, the build will still fail.  This can be remedied by adding the libclntsh.so symlink manually.</p>
+
+<p>Go to the directory that contains libclntsh.so.11.1 (or whatever version you installed) and, as root, or whatever user you used to install the instantclient software, run the following command:</p>
+
+<blockquote>
+ln -s libclntsh.so.11.1 libclntsh.so
+</blockquote>
+
+<p>Afterwards, the SQL Relay configure script should detect the instantclient installation and the software should build properly.</p>
+
+<a name="ubuntu"></a>
+<span class="heading3">Why won't SQL Relay build properly on Ubuntu?</span><br><br>
+
+<p>This is actually a problem for lots of software, not just SQL Relay.</p>
+
+<p>On modern Ubuntu distros, /bin/sh is a symlink to /bin/dash as opposed to /bin/bash.  Apparently libtool generates code that requires more complete support of sh than is provided by dash.  The best solution that I have found is to remove the /bin/sh symlink and create a new one between /bin/bash and /bin/sh, as follows (as root).</p>
+
+<blockquote>
+cd /bin
+rm sh
+ln -s bash sh
+</blockquote>
 
 
 <span class="heading3">API Comparison Questions</span><br><br>
@@ -1228,6 +1263,9 @@ defineOutputBindString/getOutputBindString to get the exact same behavior.</p>
 <p>SQL Relay doesn't provide an API call like mysql_insert_id(), however, when
 using MySQL as a backend database, you can run the query
 "select last_insert_id()" to get the last insert_id.</p>
+
+
+<span class="heading3">Administration Questions</span><br><br>
 
 <a name="tweaks"></a>
 <span class="heading3">What system parameters can I tweak to get better performance out of SQL Relay?</span><br><br>

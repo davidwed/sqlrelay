@@ -90,16 +90,16 @@ On the <b>Summary</b> screen, click <b>Install</b><br><br>
 
 The <b>Install Product</b> screen will show the progress of the installation<br><br><br>
 
-error invoking target "agent nmhs"
-cd:
-/u01/app/oracle/product/11.2.0/dbhome_1/sysman/lib
-run:
-gcc -o /u01/app/oracle/product/11.2.0/dbhome_1/sysman/lib/emdctl -L/u01/app/oracle/product/11.2.0/dbhome_1/lib/ -L/u01/app/oracle/product/11.2.0/dbhome_1/sysman/lib/ -L/u01/app/oracle/product/11.2.0/dbhome_1/lib/stubs/       `cat /u01/app/oracle/product/11.2.0/dbhome_1/lib/sysliblist` -Wl,-rpath,/u01/app/oracle/product/11.2.0/dbhome_1/lib -lm    `cat /u01/app/oracle/product/11.2.0/dbhome_1/lib/sysliblist` -ldl -lm   -L/u01/app/oracle/product/11.2.0/dbhome_1/lib /u01/app/oracle/product/11.2.0/dbhome_1/sysman/lib/s0nmectl.o -lnmectl -lclntsh -L/u01/app/oracle/product/11.2.0/dbhome_1/lib  -L/u01/app/oracle/product/11.2.0/dbhome_1/sysman/lib/ -lnmemso -lnnz11 -lcore11 -Wl,-rpath,/u01/app/oracle/product/11.2.0/dbhome_1/lib/:/u01/app/oracle/product/11.2.0/dbhome_1/sysman/lib/:/u01/app/oracle/product/11.2.0/dbhome_1/jdk/jre/lib/i386/client:/u01/app/oracle/product/11.2.0/dbhome_1/jdk/jre/lib/i386 -L/u01/app/oracle/product/11.2.0/dbhome_1/jdk/jre/lib/i386/client -L/u01/app/oracle/product/11.2.0/dbhome_1/jdk/jre/lib/i386 -z lazyload -ljava -ljvm -lverify -z nolazyload -Wl,-rpath,/u01/app/oracle/product/11.2.0/dbhome_1/lib/:/u01/app/oracle/product/11.2.0/dbhome_1/sysman/lib/:/u01/app/oracle/product/11.2.0/dbhome_1/jdk/jre/lib/i386/client:/u01/app/oracle/product/11.2.0/dbhome_1/jdk/jre/lib/i386 -Wl,--allow-shlib-undefined    `cat /u01/app/oracle/product/11.2.0/dbhome_1/lib/sysliblist` -ldl -lm
-click: Continue
+Partway through the installation, you may get an error dialog saying something like <b>error invoking target "agent nmhs"</b>.  If you do, then log in as the oracle user, change directories to /u01/app/oracle/product/11.2.0/sysman/lib and run the following command:
 
+<blockquote>
+gcc -o /u01/app/oracle/product/11.2.0/sysman/lib/emdctl -L/u01/app/oracle/product/11.2.0/lib/ -L/u01/app/oracle/product/11.2.0/sysman/lib/ -L/u01/app/oracle/product/11.2.0/lib/stubs/       `cat /u01/app/oracle/product/11.2.0/lib/sysliblist` -Wl,-rpath,/u01/app/oracle/product/11.2.0/lib -lm    `cat /u01/app/oracle/product/11.2.0/lib/sysliblist` -ldl -lm   -L/u01/app/oracle/product/11.2.0/lib /u01/app/oracle/product/11.2.0/sysman/lib/s0nmectl.o -lnmectl -lclntsh -L/u01/app/oracle/product/11.2.0/lib  -L/u01/app/oracle/product/11.2.0/sysman/lib/ -lnmemso -lnnz11 -lcore11 -Wl,-rpath,/u01/app/oracle/product/11.2.0/lib/:/u01/app/oracle/product/11.2.0/sysman/lib/:/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386/client:/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386 -L/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386/client -L/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386 -z lazyload -ljava -ljvm -lverify -z nolazyload -Wl,-rpath,/u01/app/oracle/product/11.2.0/lib/:/u01/app/oracle/product/11.2.0/sysman/lib/:/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386/client:/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386 -Wl,--allow-shlib-undefined    `cat /u01/app/oracle/product/11.2.0/lib/sysliblist` -ldl -lm
+</blockquote>
 
+Then click the <b>Continue</b>.<br><br>
 
-A <b>Database Configuration Assistant</b> dialog should pop up.  The image on
+Eventually, a <b>Database Configuration Assistant</b> dialog should pop up.
+The image on
 the left hand side will change regularlry, but the dialog itself may not
 display anything.  Ignore this, the configuration is occurring.<br><br>
 

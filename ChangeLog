@@ -32,6 +32,9 @@
 	updated tests
 	refactored main() method for connections
 	added searches for ruby1.8, ruby19 and ruby1.9 in configure script
+	fixed a bug that caused addresses="" to cause the sqlr-listener not to
+		start
+	added entries to FAQ about oracle instantclient and ubunu /bin/dash
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

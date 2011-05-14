@@ -1,4 +1,4 @@
-zip instantclient installations omit libclntsh.so link, it is required for compile to work
+figure out some way to have a default instantclient path - /usr/local/instantclient_*
 
 convert dtd to xml schema
 
@@ -52,9 +52,6 @@ there are cases with DB2 where data in a DB that's not using UTF-8 may be
 returned converted to UTF-8.  How do we get the data out in the same encoding
 that it's in the DB in?
 http://www.ibm.com/developerworks/data/library/techarticle/dm-0506chong/index.html
-
-addresses="" causes the listener not to start, but addresses="0.0.0.0" or
-leaving the entire addresses element out works as expected
 
 java api crashes on 64 bit because GetIntField needs to be GetLongField on
 	that platform

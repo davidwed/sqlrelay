@@ -732,6 +732,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				delete[] addresses[index];
 			}
 			delete[] addresses;
+			// if the attribute was left blank, assume 0.0.0.0
+			if (!charstring::length(value)) {
+				value="0.0.0.0";
+			}
 			charstring::split(
 				(value &&
 				!charstring::contains(value,DEFAULT_ADDRESSES))?
