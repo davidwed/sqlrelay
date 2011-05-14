@@ -339,7 +339,15 @@ library.</p>
 <a name="instantclient"></a>
 <span class="heading3">Can I build SQL Relay against Oracle Instantclient?</span><br><br>
 
-<p>Yes.  However, there is one issue.  Some releases of the instantclient software have omitted the libclntsh.so symlink.  I noticed it in the zip distribution of the 11.2 version of instantclient.  As a result the -lclntsh argument to the linker fails to find the library and the configure script fails to detect the instantclient installation.  Even if you manually tweak the config.mk file, the build will still fail.  This can be remedied by adding the libclntsh.so symlink manually.</p>
+<p>Yes.  However, there are two potential issues.</p>
+
+<p>First, if you installed from a non-RPM distribution of instantclient, then you must use the --with-oracle-instantclient-prefix option of the configure script.  For example, if you unzipped the instantclient distro in /usr/local and it created a directory called /usr/local/instantclient_11_2, then you should use:</p>
+
+<blockquote>
+./configure --with-oracle-instantclient-prefix=/usr/local/instantclient_11_2
+</blockquote>
+
+<p>Second, some releases of the instantclient software have omitted the libclntsh.so symlink.  I noticed it in the zip distribution of the 11.2 version.  As a result the -lclntsh argument to the linker fails to find the library and the configure script fails to detect the instantclient installation.  Even if you manually tweak the config.mk file, the build will still fail.  This can be remedied though, by adding the libclntsh.so symlink manually.</p>
 
 <p>Go to the directory that contains libclntsh.so.11.1 (or whatever version you installed) and, as root, or whatever user you used to install the instantclient software, run the following command:</p>
 
