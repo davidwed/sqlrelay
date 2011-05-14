@@ -23,13 +23,13 @@ ifneq ($(strip $(FIREBIRDLIBS)),)
 	$(MAKE) firebird
 endif
 ifneq ($(strip $(MYSQLLIBS)),)
-	$(MAKE) mysql5
+	$(MAKE) mysql
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) oracle8i
+	$(MAKE) oracle
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
-	$(MAKE) postgresql8
+	$(MAKE) postgresql
 endif
 ifneq ($(strip $(SQLITELIBS)),)
 	$(MAKE) sqlite
@@ -50,11 +50,11 @@ freetds: freetds.C freetds.lo
 firebird: firebird.C firebird.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ firebird.lo $(LIBS)
 
-mysql5: mysql5.C mysql5.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql5.lo $(LIBS)
+mysql: mysql.C mysql.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
 
-oracle8i: oracle8i.C oracle8i.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8i.lo $(LIBS)
+oracle: oracle.C oracle.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle.lo $(LIBS)
 
 oracle8iclobinsert: oracle8iclobinsert.C oracle8iclobinsert.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8iclobinsert.lo $(LIBS)
@@ -77,11 +77,11 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) db2
 	$(LIBTOOL) --mode=clean $(RM) freetds
 	$(LIBTOOL) --mode=clean $(RM) firebird
-	$(LIBTOOL) --mode=clean $(RM) mysql5
+	$(LIBTOOL) --mode=clean $(RM) mysql
 	$(LIBTOOL) --mode=clean $(RM) oracle8iclobfetch
 	$(LIBTOOL) --mode=clean $(RM) oracle8iclobinsert
-	$(LIBTOOL) --mode=clean $(RM) oracle8i
-	$(LIBTOOL) --mode=clean $(RM) postgresql8
+	$(LIBTOOL) --mode=clean $(RM) oracle
+	$(LIBTOOL) --mode=clean $(RM) postgresql
 	$(LIBTOOL) --mode=clean $(RM) sqlite
 	$(LIBTOOL) --mode=clean $(RM) sybase
 	$(LIBTOOL) --mode=clean $(RM) router
