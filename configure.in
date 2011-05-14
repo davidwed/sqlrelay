@@ -799,6 +799,15 @@ echo "***** Summary ***********************************************"
 
 echo " Version      : $SQLR_VERSION"
 
+READLINEBUILD="no "
+if ( test -n "$READLINELIB" ); then
+	READLINEBUILD="yes"
+fi
+
+echo
+echo " Command Line : Readline Support          $READLINEBUILD"
+echo
+
 PERLBUILD="no "
 PYTHONBUILD="no "
 ZOPEBUILD="no "

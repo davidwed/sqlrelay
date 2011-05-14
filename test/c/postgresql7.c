@@ -713,7 +713,7 @@ int	main(int argc, char **argv) {
 
 	sqlrcur_sendQuery(cur,"drop function testfunc(int,char(20))");
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create function testfunc(int, char(20)) returns record as ' declare output record; begin select $1,$2 into output; return output; end;' language plpgsql"),1);
-	sqlrcur_prepareQuery(cur,"select * from testfunc(:int,:char) as (col1 int, col2 char(20))");
+	sqlrcur_prepareQuery(cur,"select * from testfunc(:int,:char) as (col1 int, col2 bpchar)");
 	sqlrcur_inputBindLong(cur,"int",5);
 	sqlrcur_inputBindString(cur,"char","hello");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);

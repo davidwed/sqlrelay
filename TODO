@@ -1,3 +1,6 @@
+libtool causing problems on netbsd, freebsd, ubuntu
+
+
 db2 - yes
 firebird - yes
 freetds - if a query fails, next one gets: no server side cursors available...
@@ -337,6 +340,9 @@ Performance/Code Enhancements:
 	* use bandwidth delay product to set tcp send/receive buffer sizes
 
 Features:
+	* realine support yes/no in configure output
+	* add functionality of query, fields, sqltodbf to sqlrsh, replace them
+	* add xml output api and functionality to sqlrsh
 	* support old oracle long datatype like a lob
 	* convert dtd to xml schema
 	* update python api to create decimals in dictionary

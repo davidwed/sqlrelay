@@ -754,7 +754,7 @@ int	main(int argc, char **argv) {
 	// return multiple values
 	cur->sendQuery("drop function testfunc(int,char(20))");
 	checkSuccess(cur->sendQuery("create function testfunc(int,float,char(20)) returns record as ' declare output record; begin select $1,$2,$3 into output; return output; end;' language plpgsql"),1);
-	cur->prepareQuery("select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))");
+	cur->prepareQuery("select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 bpchar)");
 	cur->inputBind("1",1);
 	cur->inputBind("2",1.1,4,2);
 	cur->inputBind("3","hello");
