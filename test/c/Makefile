@@ -26,11 +26,9 @@ ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) oracle8
 	$(MAKE) oracle8i
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
-	$(MAKE) postgresql6
 	$(MAKE) postgresql7
 endif
 ifneq ($(strip $(SQLITELIBS)),)
@@ -58,9 +56,6 @@ oracle8: oracle8.c oracle8.lo
 oracle8i: oracle8i.c oracle8i.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle8i.lo $(LIBS)
 
-postgresql6: postgresql6.c postgresql6.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql6.lo $(LIBS)
-
 postgresql7: postgresql7.c postgresql7.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql7.lo $(LIBS)
 
@@ -77,9 +72,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) freetds
 	$(LIBTOOL) --mode=clean $(RM) firebird
 	$(LIBTOOL) --mode=clean $(RM) mysql
-	$(LIBTOOL) --mode=clean $(RM) oracle8
 	$(LIBTOOL) --mode=clean $(RM) oracle8i
-	$(LIBTOOL) --mode=clean $(RM) postgresql6
 	$(LIBTOOL) --mode=clean $(RM) postgresql7
 	$(LIBTOOL) --mode=clean $(RM) sqlite
 	$(LIBTOOL) --mode=clean $(RM) sybase
