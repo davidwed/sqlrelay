@@ -37,11 +37,11 @@ the Blackray site.  They should be sufficient to get you started.</p>
 
 <p>I would recommend running Blackray as a non-root user.  To do so, just
 create a blackray user and group and make the blackray installation owned by
-that user.  For instance, if you installed it under /usr/local/blackray, then
+that user.  For instance, if you installed it under /opt/blackray, then
 use the following command to set the ownership:</p>
 
 <blockquote>
-<b>chown -R blackray:blackray /usr/local/blackray</b>
+<b>chown -R blackray:blackray /opt/blackray</b>
 </blockquote>
 
 <a name="startingatboot"></a>
@@ -56,12 +56,12 @@ following to start/stop the database at boot/shutdown time.</p>
 
 <B><FONT color=#a62828>case</FONT></B> &quot;$1&quot; <B><FONT color=#a62828>in</FONT></B>
         start<B><FONT color=#a62828>)</FONT></B>
-		su <font color="#6a5acd">-l</font>&nbsp;blackray <font color="#6a5acd">-s</font>&nbsp;/usr/local/blackray start
-		su <font color="#6a5acd">-l</font>&nbsp;blackray <font color="#6a5acd">-s</font>&nbsp;/usr/local/blackray start Default
+		su <font color="#6a5acd">-l</font>&nbsp;blackray <font color="#6a5acd">-s</font>&nbsp;/opt/blackray/bin/blackray <font color="#6a5acd">-c</font>&nbsp;/opt/blackray/etc/blackray.conf start
+		su <font color="#6a5acd">-l</font>&nbsp;blackray <font color="#6a5acd">-s</font>&nbsp;/opt/blackray/bin/blackray <font color="#6a5acd">-c</font>&nbsp;/opt/blackray/etc/blackray.conf start Default
                 <B><FONT color=#a62828>;;</FONT></B>
         stop<B><FONT color=#a62828>)</FONT></B>
-		su <font color="#6a5acd">-l</font>&nbsp;blackray <font color="#6a5acd">-s</font>&nbsp;/usr/local/blackray stop Default
-		su <font color="#6a5acd">-l</font>&nbsp;blackray <font color="#6a5acd">-s</font>&nbsp;/usr/local/blackray stop
+		su <font color="#6a5acd">-l</font>&nbsp;blackray <font color="#6a5acd">-s</font>&nbsp;/opt/blackray/bin/blackray <font color="#6a5acd">-c</font>&nbsp;/opt/blackray/etc/blackray.conf stop Default
+		su <font color="#6a5acd">-l</font>&nbsp;blackray <font color="#6a5acd">-s</font>&nbsp;/opt/blackray/bin/blackray <font color="#6a5acd">-c</font>&nbsp;/opt/blackray/etc/blackray.conf stop
                 <B><FONT color=#a62828>;;</FONT></B>
         *<B><FONT color=#a62828>)</FONT></B>
                 <B><FONT color=#a62828>echo</FONT></B><FONT color=#ff00ff> $</FONT><B><FONT color=#a62828>&quot;</FONT></B><FONT color=#ff00ff>Usage: </FONT><FONT color=#a620f7>$0</FONT><FONT color=#ff00ff> {start|stop}</FONT><B><FONT color=#a62828>&quot;</FONT></B>
