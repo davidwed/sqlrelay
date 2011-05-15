@@ -117,16 +117,9 @@ int	main(int argc, char **argv) {
 	const char	*arraybindvals[5]={"7","testchar7","testvarchar7","01-JAN-2007","testlong7"};
 	uint32_t	*fieldlens;
 
-
-	// usage...
-	if (argc<5) {
-		printf("usage: oracle8i host port socket user password\n");
-		exit(0);
-	}
-
-
 	// instantiation
-	con=new sqlrconnection("db.firstworks.com",9000,NULL,"test","test",0,1);
+	con=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
 	cur=new sqlrcursor(con);
 
 	printf("LONG CLOB: \n");

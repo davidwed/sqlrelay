@@ -60,23 +60,6 @@ bool oracle8connection::logIn(bool printerrors) {
 	const char	*user=getUser();
 	const char	*password=getPassword();
 
-	// handle ORACLE_HOME
-	if (home) {
-		if (!environment::setValue("ORACLE_HOME",home)) {
-			if (printerrors) {
-				fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
-			}
-			return false;
-		}
-	} else {
-		if (!environment::getValue("ORACLE_HOME")) {
-			if (printerrors) {
-				fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
-			}
-			return false;
-		}
-	}
-
 	// handle ORACLE_SID
 	if (sid) {
 		if (!environment::setValue("ORACLE_SID",sid)) {
@@ -110,6 +93,28 @@ bool oracle8connection::logIn(bool printerrors) {
 				charstring::length(password)) {
 			if (printerrors) {
 				fprintf(stderr,"No TWO_TASK environment variable set or specified in connect string.\n");
+			}
+			return false;
+		}
+	}
+
+	// see if the specified sid is in tnsnames.ora format
+	bool	sidtnsnameformat=(charstring::length(sid) &&
+					sid[charstring::length(sid)-1]==')');
+
+	// handle ORACLE_HOME
+	if (home) {
+		if (!environment::setValue("ORACLE_HOME",home)) {
+			if (printerrors) {
+				fprintf(stderr,"Failed to set ORACLE_HOME environment variable.\n");
+			}
+			return false;
+		}
+	} else {
+		if (!sidtnsnameformat &&
+				!environment::getValue("ORACLE_HOME")) {
+			if (printerrors) {
+				fprintf(stderr,"No ORACLE_HOME environment variable set or specified in connect string.\n");
 			}
 			return false;
 		}

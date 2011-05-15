@@ -56,6 +56,9 @@ mysql: mysql.C mysql.lo
 oracle: oracle.C oracle.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle.lo $(LIBS)
 
+postgresql: postgresql.C postgresql.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.lo $(LIBS)
+
 oracleclobinsert: oracleclobinsert.C oracleclobinsert.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracleclobinsert.lo $(LIBS)
 

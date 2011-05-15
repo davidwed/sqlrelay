@@ -66,15 +66,9 @@ int	main(int argc, char **argv) {
 	char		*filename;
 	uint32_t	*fieldlens;
 
-	// usage...
-	if (argc<5) {
-		printf("usage: freetds host port socket user password\n");
-		exit(0);
-	}
-
-
 	// instantiation
-	con=new sqlrconnection("db.firstworks.com",9000,NULL,"test","test",0,1);
+	con=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
 	cur=new sqlrcursor(con);
 
 	// get database type

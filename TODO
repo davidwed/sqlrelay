@@ -1,5 +1,6 @@
 libtool causing problems on netbsd, freebsd, ubuntu
 
+connections fail to shut down after testing
 
 db2 - yes
 firebird - yes
@@ -15,8 +16,7 @@ oracle8i - I don't get a crash any more, but it's flaky now, sometimes
 		have the result set associated with it any more
 		the colums still are there, but not the results set itself
 		connections get hung when running test over and over
-postgresql7 - yes
-postgresql8 - yes
+postgresql - yes
 sqlite - connections get hung when running test over and over
 		sqlr-stop doesn't always kill
 sybase - connections get hung when test script fails

@@ -48,6 +48,8 @@
 		ttl and bleed off
 	applied Renat Sabitov's output bind patch
 	added mysql last_insert_id() note to FAQ
+	made it so oracle_home doesn't need to be set if oracle_sid is
+		specified in tnsnames.ora format
 
 0.40 - fixed readline detection in configure script
 	fixed an uninitialized variable in sqlr-import

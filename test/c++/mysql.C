@@ -72,16 +72,9 @@ int	main(int argc, char **argv) {
 	char		*filename;
 	uint32_t	*fieldlens;
 
-
-	// usage...
-	if (argc<5) {
-		printf("usage: mysql host port socket user password\n");
-		exit(0);
-	}
-
-
 	// instantiation
-	con=new sqlrconnection("db.firstworks.com",9000,NULL,"test","test",0,1);
+	con=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
 	cur=new sqlrcursor(con);
 
 	// get database type
@@ -1005,8 +998,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COMMIT AND ROLLBACK: \n");
-	secondcon=new sqlrconnection("db.firstworks.com",9000,
-					NULL,"test","test",0,1);
+	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
