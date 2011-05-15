@@ -74,10 +74,8 @@ int	main(int argc, char **argv) {
 
 
 	// instantiation
-	con=new sqlrconnection(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+	con=new sqlrconnection("db.firstworks.com",9000,NULL,"test","test",0,1);
 	cur=new sqlrcursor(con);
-con->debugOn();
 
 	// get database type
 	printf("IDENTIFY: \n");

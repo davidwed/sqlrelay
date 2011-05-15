@@ -88,8 +88,7 @@ int	main(int argc, char **argv) {
 
 
 	// instantiation
-	con=new sqlrconnection(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+	con=new sqlrconnection("db.firstworks.com",9000,NULL,"test","test",0,1);
 	cur=new sqlrcursor(con);
 
 	printf("IDENTIFY: \n");
@@ -680,9 +679,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COMMIT AND ROLLBACK: \n");
-	secondcon=new sqlrconnection(argv[1],
-				atoi(argv[2]), 
-				argv[3],argv[4],argv[5],0,1);
+	secondcon=new sqlrconnection("db.firstworks.com",9000,
+						NULL,"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");

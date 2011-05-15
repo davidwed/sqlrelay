@@ -82,15 +82,8 @@ int	main(int argc, char **argv) {
 	char		*filename;
 	uint32_t	*fieldlens;
 
-	// usage...
-	if (argc<5) {
-		printf("usage: db2 host port socket user password\n");
-		exit(0);
-	}
-
 	// instantiation
-	con=new sqlrconnection(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+	con=new sqlrconnection("db.firstworks.com",9000,NULL,"test","test",0,1);
 	cur=new sqlrcursor(con);
 
 	// get database type
