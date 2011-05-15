@@ -56,11 +56,11 @@ mysql: mysql.C mysql.lo
 oracle: oracle.C oracle.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle.lo $(LIBS)
 
-oracle8iclobinsert: oracle8iclobinsert.C oracle8iclobinsert.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8iclobinsert.lo $(LIBS)
+oracleclobinsert: oracleclobinsert.C oracleclobinsert.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracleclobinsert.lo $(LIBS)
 
-oracle8iclobfetch: oracle8iclobfetch.C oracle8iclobfetch.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8iclobfetch.lo $(LIBS)
+oracleclobfetch: oracleclobfetch.C oracleclobfetch.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracleclobfetch.lo $(LIBS)
 
 sqlite: sqlite.C sqlite.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlite.lo $(LIBS)
@@ -78,8 +78,8 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) freetds
 	$(LIBTOOL) --mode=clean $(RM) firebird
 	$(LIBTOOL) --mode=clean $(RM) mysql
-	$(LIBTOOL) --mode=clean $(RM) oracle8iclobfetch
-	$(LIBTOOL) --mode=clean $(RM) oracle8iclobinsert
+	$(LIBTOOL) --mode=clean $(RM) oracleclobfetch
+	$(LIBTOOL) --mode=clean $(RM) oracleclobinsert
 	$(LIBTOOL) --mode=clean $(RM) oracle
 	$(LIBTOOL) --mode=clean $(RM) postgresql
 	$(LIBTOOL) --mode=clean $(RM) sqlite
