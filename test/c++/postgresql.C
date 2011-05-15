@@ -116,7 +116,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->affectedRows(),1);
 	printf("\n");
 
-	printf("BIND BY NAME: \n");
+	printf("BIND BY POSITION: \n");
 	cur->prepareQuery("insert into testtable values ($1,$2,$3,$4,$5,$6,$7,$8)");
 	checkSuccess(cur->countBindVariables(),8);
 	cur->inputBind("1",5);
@@ -150,7 +150,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
-	printf("BIND BY NAME WITH VALIDATION: \n");
+	printf("BIND BY POSITION WITH VALIDATION: \n");
 	cur->clearBinds();
 	cur->inputBind("1",8);
 	cur->inputBind("2",8.8,4,2);

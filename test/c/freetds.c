@@ -64,16 +64,9 @@ int	main(int argc, char **argv) {
 	char		*filename;
 	uint32_t	*fieldlens;
 
-	// usage...
-	if (argc<5) {
-		printf("usage: freetds host port socket user password\n");
-		exit(0);
-	}
-
-
 	// instantiation
-	con=sqlrcon_alloc(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+	con=sqlrcon_alloc("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 	cur=sqlrcur_alloc(con);
 
 	// get database type

@@ -65,16 +65,9 @@ int	main(int argc, char **argv) {
 	uint32_t	*fieldlens;
 
 
-	// usage...
-	if (argc<5) {
-		printf("usage: mysql host port socket user password\n");
-		exit(0);
-	}
-
-
 	// instantiation
-	con=sqlrcon_alloc(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+	con=sqlrcon_alloc("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 	cur=sqlrcur_alloc(con);
 
 	// get database type
@@ -105,90 +98,90 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_affectedRows(cur),1);
 	printf("\n");
 
-	printf("BIND BY NAME: \n");
-	sqlrcur_prepareQuery(cur,"insert into testdb.testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8,:var9,:var10,:var11,:var12,:var13,:var14,:var15,:var16,:var17,:var18,NULL)");
+	printf("BIND BY POSITION: \n");
+	sqlrcur_prepareQuery(cur,"insert into testdb.testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)");
 	checkSuccessInt(sqlrcur_countBindVariables(cur),18);
-	sqlrcur_inputBindLong(cur,"var1",5);
-	sqlrcur_inputBindLong(cur,"var2",5);
-	sqlrcur_inputBindLong(cur,"var3",5);
-	sqlrcur_inputBindLong(cur,"var4",5);
-	sqlrcur_inputBindLong(cur,"var5",5);
-	sqlrcur_inputBindDouble(cur,"var6",5.1,2,1);
-	sqlrcur_inputBindDouble(cur,"var7",5.1,2,1);
-	sqlrcur_inputBindDouble(cur,"var8",5.1,2,1);
-	sqlrcur_inputBindString(cur,"var9","2005-01-01");
-	sqlrcur_inputBindString(cur,"var10","05:00:00");
-	sqlrcur_inputBindString(cur,"var11","2005-01-01 05:00:00");
-	sqlrcur_inputBindString(cur,"var12","2005");
-	sqlrcur_inputBindString(cur,"var13","char5");
-	sqlrcur_inputBindString(cur,"var14","text5");
-	sqlrcur_inputBindString(cur,"var15","varchar5");
-	sqlrcur_inputBindString(cur,"var16","tinytext5");
-	sqlrcur_inputBindString(cur,"var17","mediumtext5");
-	sqlrcur_inputBindString(cur,"var18","longtext5");
+	sqlrcur_inputBindLong(cur,"1",5);
+	sqlrcur_inputBindLong(cur,"2",5);
+	sqlrcur_inputBindLong(cur,"3",5);
+	sqlrcur_inputBindLong(cur,"4",5);
+	sqlrcur_inputBindLong(cur,"5",5);
+	sqlrcur_inputBindDouble(cur,"6",5.1,2,1);
+	sqlrcur_inputBindDouble(cur,"7",5.1,2,1);
+	sqlrcur_inputBindDouble(cur,"8",5.1,2,1);
+	sqlrcur_inputBindString(cur,"9","2005-01-01");
+	sqlrcur_inputBindString(cur,"10","05:00:00");
+	sqlrcur_inputBindString(cur,"11","2005-01-01 05:00:00");
+	sqlrcur_inputBindString(cur,"12","2005");
+	sqlrcur_inputBindString(cur,"13","char5");
+	sqlrcur_inputBindString(cur,"14","text5");
+	sqlrcur_inputBindString(cur,"15","varchar5");
+	sqlrcur_inputBindString(cur,"16","tinytext5");
+	sqlrcur_inputBindString(cur,"17","mediumtext5");
+	sqlrcur_inputBindString(cur,"18","longtext5");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	sqlrcur_clearBinds(cur);
-	sqlrcur_inputBindLong(cur,"var1",6);
-	sqlrcur_inputBindLong(cur,"var2",6);
-	sqlrcur_inputBindLong(cur,"var3",6);
-	sqlrcur_inputBindLong(cur,"var4",6);
-	sqlrcur_inputBindLong(cur,"var5",6);
-	sqlrcur_inputBindDouble(cur,"var6",6.1,2,1);
-	sqlrcur_inputBindDouble(cur,"var7",6.1,2,1);
-	sqlrcur_inputBindDouble(cur,"var8",6.1,2,1);
-	sqlrcur_inputBindString(cur,"var9","2006-01-01");
-	sqlrcur_inputBindString(cur,"var10","06:00:00");
-	sqlrcur_inputBindString(cur,"var11","2006-01-01 06:00:00");
-	sqlrcur_inputBindString(cur,"var12","2006");
-	sqlrcur_inputBindString(cur,"var13","char6");
-	sqlrcur_inputBindString(cur,"var14","text6");
-	sqlrcur_inputBindString(cur,"var15","varchar6");
-	sqlrcur_inputBindString(cur,"var16","tinytext6");
-	sqlrcur_inputBindString(cur,"var17","mediumtext6");
-	sqlrcur_inputBindString(cur,"var18","longtext6");
+	sqlrcur_inputBindLong(cur,"1",6);
+	sqlrcur_inputBindLong(cur,"2",6);
+	sqlrcur_inputBindLong(cur,"3",6);
+	sqlrcur_inputBindLong(cur,"4",6);
+	sqlrcur_inputBindLong(cur,"5",6);
+	sqlrcur_inputBindDouble(cur,"6",6.1,2,1);
+	sqlrcur_inputBindDouble(cur,"7",6.1,2,1);
+	sqlrcur_inputBindDouble(cur,"8",6.1,2,1);
+	sqlrcur_inputBindString(cur,"9","2006-01-01");
+	sqlrcur_inputBindString(cur,"10","06:00:00");
+	sqlrcur_inputBindString(cur,"11","2006-01-01 06:00:00");
+	sqlrcur_inputBindString(cur,"12","2006");
+	sqlrcur_inputBindString(cur,"13","char6");
+	sqlrcur_inputBindString(cur,"14","text6");
+	sqlrcur_inputBindString(cur,"15","varchar6");
+	sqlrcur_inputBindString(cur,"16","tinytext6");
+	sqlrcur_inputBindString(cur,"17","mediumtext6");
+	sqlrcur_inputBindString(cur,"18","longtext6");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	sqlrcur_clearBinds(cur);
-	sqlrcur_inputBindLong(cur,"var1",7);
-	sqlrcur_inputBindLong(cur,"var2",7);
-	sqlrcur_inputBindLong(cur,"var3",7);
-	sqlrcur_inputBindLong(cur,"var4",7);
-	sqlrcur_inputBindLong(cur,"var5",7);
-	sqlrcur_inputBindDouble(cur,"var6",7.1,2,1);
-	sqlrcur_inputBindDouble(cur,"var7",7.1,2,1);
-	sqlrcur_inputBindDouble(cur,"var8",7.1,2,1);
-	sqlrcur_inputBindString(cur,"var9","2007-01-01");
-	sqlrcur_inputBindString(cur,"var10","07:00:00");
-	sqlrcur_inputBindString(cur,"var11","2007-01-01 07:00:00");
-	sqlrcur_inputBindString(cur,"var12","2007");
-	sqlrcur_inputBindString(cur,"var13","char7");
-	sqlrcur_inputBindString(cur,"var14","text7");
-	sqlrcur_inputBindString(cur,"var15","varchar7");
-	sqlrcur_inputBindString(cur,"var16","tinytext7");
-	sqlrcur_inputBindString(cur,"var17","mediumtext7");
-	sqlrcur_inputBindString(cur,"var18","longtext7");
+	sqlrcur_inputBindLong(cur,"1",7);
+	sqlrcur_inputBindLong(cur,"2",7);
+	sqlrcur_inputBindLong(cur,"3",7);
+	sqlrcur_inputBindLong(cur,"4",7);
+	sqlrcur_inputBindLong(cur,"5",7);
+	sqlrcur_inputBindDouble(cur,"6",7.1,2,1);
+	sqlrcur_inputBindDouble(cur,"7",7.1,2,1);
+	sqlrcur_inputBindDouble(cur,"8",7.1,2,1);
+	sqlrcur_inputBindString(cur,"9","2007-01-01");
+	sqlrcur_inputBindString(cur,"10","07:00:00");
+	sqlrcur_inputBindString(cur,"11","2007-01-01 07:00:00");
+	sqlrcur_inputBindString(cur,"12","2007");
+	sqlrcur_inputBindString(cur,"13","char7");
+	sqlrcur_inputBindString(cur,"14","text7");
+	sqlrcur_inputBindString(cur,"15","varchar7");
+	sqlrcur_inputBindString(cur,"16","tinytext7");
+	sqlrcur_inputBindString(cur,"17","mediumtext7");
+	sqlrcur_inputBindString(cur,"18","longtext7");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");
 
-	printf("BIND BY NAME WITH VALIDATION: \n");
+	printf("BIND BY POSITION WITH VALIDATION: \n");
 	sqlrcur_clearBinds(cur);
-	sqlrcur_inputBindLong(cur,"var1",8);
-	sqlrcur_inputBindLong(cur,"var2",8);
-	sqlrcur_inputBindLong(cur,"var3",8);
-	sqlrcur_inputBindLong(cur,"var4",8);
-	sqlrcur_inputBindLong(cur,"var5",8);
-	sqlrcur_inputBindDouble(cur,"var6",8.1,2,1);
-	sqlrcur_inputBindDouble(cur,"var7",8.1,2,1);
-	sqlrcur_inputBindDouble(cur,"var8",8.1,2,1);
-	sqlrcur_inputBindString(cur,"var9","2008-01-01");
-	sqlrcur_inputBindString(cur,"var10","08:00:00");
-	sqlrcur_inputBindString(cur,"var11","2008-01-01 08:00:00");
-	sqlrcur_inputBindString(cur,"var12","2008");
-	sqlrcur_inputBindString(cur,"var13","char8");
-	sqlrcur_inputBindString(cur,"var14","text8");
-	sqlrcur_inputBindString(cur,"var15","varchar8");
-	sqlrcur_inputBindString(cur,"var16","tinytext8");
-	sqlrcur_inputBindString(cur,"var17","mediumtext8");
-	sqlrcur_inputBindString(cur,"var18","longtext8");
+	sqlrcur_inputBindLong(cur,"1",8);
+	sqlrcur_inputBindLong(cur,"2",8);
+	sqlrcur_inputBindLong(cur,"3",8);
+	sqlrcur_inputBindLong(cur,"4",8);
+	sqlrcur_inputBindLong(cur,"5",8);
+	sqlrcur_inputBindDouble(cur,"6",8.1,2,1);
+	sqlrcur_inputBindDouble(cur,"7",8.1,2,1);
+	sqlrcur_inputBindDouble(cur,"8",8.1,2,1);
+	sqlrcur_inputBindString(cur,"9","2008-01-01");
+	sqlrcur_inputBindString(cur,"10","08:00:00");
+	sqlrcur_inputBindString(cur,"11","2008-01-01 08:00:00");
+	sqlrcur_inputBindString(cur,"12","2008");
+	sqlrcur_inputBindString(cur,"13","char8");
+	sqlrcur_inputBindString(cur,"14","text8");
+	sqlrcur_inputBindString(cur,"15","varchar8");
+	sqlrcur_inputBindString(cur,"16","tinytext8");
+	sqlrcur_inputBindString(cur,"17","mediumtext8");
+	sqlrcur_inputBindString(cur,"18","longtext8");
 	sqlrcur_validateBinds(cur);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");
@@ -902,8 +895,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COMMIT AND ROLLBACK: \n");
-	secondcon=sqlrcon_alloc(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+	secondcon=sqlrcon_alloc("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"8");

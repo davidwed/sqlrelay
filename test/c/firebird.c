@@ -69,15 +69,9 @@ int	main(int argc, char **argv) {
 	char		*filename;
 	uint32_t	*fieldlens;
 
-	// usage...
-	if (argc<5) {
-		printf("usage: firebird host port socket user password\n");
-		exit(0);
-	}
-
 	// instantiation
-	con=sqlrcon_alloc(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+	con=sqlrcon_alloc("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 	cur=sqlrcur_alloc(con);
 
 	// get database type
@@ -147,12 +141,25 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("STORED PROCEDURE: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"create procedure testproc(invar integer) returns (outvar integer) as begin outvar = invar; suspend; end"),1);
-	sqlrcur_prepareQuery(cur,"select * from testproc(?)");
-	sqlrcur_inputBindLong(cur,"1",5);
+	sqlrcur_prepareQuery(cur,"select * from testproc(?,?,?)");
+	sqlrcur_inputBindLong(cur,"1",1);
+	sqlrcur_inputBindDouble(cur,"2",1.1,2,1);
+	sqlrcur_inputBindString(cur,"3","hello");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"5");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"drop procedure testproc"),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,(uint32_t)0),"1");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"1.1000");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"hello");
+	sqlrcur_prepareQuery(cur,"execute procedure testproc ?, ?, ?");
+	sqlrcur_inputBindLong(cur,"1",1);
+	sqlrcur_inputBindDouble(cur,"2",1.1,2,1);
+	sqlrcur_inputBindString(cur,"3","hello");
+	sqlrcur_defineOutputBindInteger(cur,"1");
+	sqlrcur_defineOutputBindDouble(cur,"2");
+	sqlrcur_defineOutputBindString(cur,"3",20);
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	checkSuccessInt(sqlrcur_getOutputBindInteger(cur,"1"),1);
+	//checkSuccess(sqlrcur_getOutputBindDouble(cur,"2"),1.1);
+	checkSuccessString(sqlrcur_getOutputBindString(cur,"3"),"hello               ");
 	printf("\n");
 
 	printf("SELECT: \n");
@@ -705,9 +712,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COMMIT AND ROLLBACK: \n");
-	secondcon=sqlrcon_alloc(argv[1],
-				atoi(argv[2]), 
-				argv[3],argv[4],argv[5],0,1);
+	secondcon=sqlrcon_alloc("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"0");

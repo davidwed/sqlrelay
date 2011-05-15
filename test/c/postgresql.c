@@ -64,16 +64,9 @@ int	main(int argc, char **argv) {
 	char		*filename;
 	uint32_t	*fieldlens;
 
-	// usage...
-	if (argc<5) {
-		printf("usage: postgresql host port socket user password\n");
-		exit(0);
-	}
-
-
 	// instantiation
-	con=sqlrcon_alloc(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+	con=sqlrcon_alloc("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 	cur=sqlrcur_alloc(con);
 
 	printf("IDENTIFY: \n");
@@ -107,51 +100,51 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_affectedRows(cur),1);
 	printf("\n");
 
-	printf("BIND BY NAME: \n");
-	sqlrcur_prepareQuery(cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8)");
+	printf("BIND BY POSITION: \n");
+	sqlrcur_prepareQuery(cur,"insert into testtable values ($1,$2,$3,$4,$5,$6,$7,$8)");
 	checkSuccessInt(sqlrcur_countBindVariables(cur),8);
-	sqlrcur_inputBindLong(cur,"var1",5);
-	sqlrcur_inputBindDouble(cur,"var2",5.5,4,2);
-	sqlrcur_inputBindDouble(cur,"var3",5.5,4,2);
-	sqlrcur_inputBindLong(cur,"var4",5);
-	sqlrcur_inputBindString(cur,"var5","testchar5");
-	sqlrcur_inputBindString(cur,"var6","testvarchar5");
-	sqlrcur_inputBindString(cur,"var7","01/01/2005");
-	sqlrcur_inputBindString(cur,"var8","05:00:00");
+	sqlrcur_inputBindLong(cur,"1",5);
+	sqlrcur_inputBindDouble(cur,"2",5.5,4,2);
+	sqlrcur_inputBindDouble(cur,"3",5.5,4,2);
+	sqlrcur_inputBindLong(cur,"4",5);
+	sqlrcur_inputBindString(cur,"5","testchar5");
+	sqlrcur_inputBindString(cur,"6","testvarchar5");
+	sqlrcur_inputBindString(cur,"7","01/01/2005");
+	sqlrcur_inputBindString(cur,"8","05:00:00");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	sqlrcur_clearBinds(cur);
-	sqlrcur_inputBindLong(cur,"var1",6);
-	sqlrcur_inputBindDouble(cur,"var2",6.6,4,2);
-	sqlrcur_inputBindDouble(cur,"var3",6.6,4,2);
-	sqlrcur_inputBindLong(cur,"var4",6);
-	sqlrcur_inputBindString(cur,"var5","testchar6");
-	sqlrcur_inputBindString(cur,"var6","testvarchar6");
-	sqlrcur_inputBindString(cur,"var7","01/01/2006");
-	sqlrcur_inputBindString(cur,"var8","06:00:00");
+	sqlrcur_inputBindLong(cur,"1",6);
+	sqlrcur_inputBindDouble(cur,"2",6.6,4,2);
+	sqlrcur_inputBindDouble(cur,"3",6.6,4,2);
+	sqlrcur_inputBindLong(cur,"4",6);
+	sqlrcur_inputBindString(cur,"5","testchar6");
+	sqlrcur_inputBindString(cur,"6","testvarchar6");
+	sqlrcur_inputBindString(cur,"7","01/01/2006");
+	sqlrcur_inputBindString(cur,"8","06:00:00");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	sqlrcur_clearBinds(cur);
-	sqlrcur_inputBindLong(cur,"var1",7);
-	sqlrcur_inputBindDouble(cur,"var2",7.7,4,2);
-	sqlrcur_inputBindDouble(cur,"var3",7.7,4,2);
-	sqlrcur_inputBindLong(cur,"var4",7);
-	sqlrcur_inputBindString(cur,"var5","testchar7");
-	sqlrcur_inputBindString(cur,"var6","testvarchar7");
-	sqlrcur_inputBindString(cur,"var7","01/01/2007");
-	sqlrcur_inputBindString(cur,"var8","07:00:00");
+	sqlrcur_inputBindLong(cur,"1",7);
+	sqlrcur_inputBindDouble(cur,"2",7.7,4,2);
+	sqlrcur_inputBindDouble(cur,"3",7.7,4,2);
+	sqlrcur_inputBindLong(cur,"4",7);
+	sqlrcur_inputBindString(cur,"5","testchar7");
+	sqlrcur_inputBindString(cur,"6","testvarchar7");
+	sqlrcur_inputBindString(cur,"7","01/01/2007");
+	sqlrcur_inputBindString(cur,"8","07:00:00");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");
 
-	printf("BIND BY NAME WITH VALIDATION: \n");
+	printf("BIND BY POSITION WITH VALIDATION: \n");
 	sqlrcur_clearBinds(cur);
-	sqlrcur_inputBindLong(cur,"var1",8);
-	sqlrcur_inputBindDouble(cur,"var2",8.8,4,2);
-	sqlrcur_inputBindDouble(cur,"var3",8.8,4,2);
-	sqlrcur_inputBindLong(cur,"var4",8);
-	sqlrcur_inputBindString(cur,"var5","testchar8");
-	sqlrcur_inputBindString(cur,"var6","testvarchar8");
-	sqlrcur_inputBindString(cur,"var7","01/01/2008");
-	sqlrcur_inputBindString(cur,"var8","08:00:00");
-	sqlrcur_inputBindString(cur,"var9","junkvalue");
+	sqlrcur_inputBindLong(cur,"1",8);
+	sqlrcur_inputBindDouble(cur,"2",8.8,4,2);
+	sqlrcur_inputBindDouble(cur,"3",8.8,4,2);
+	sqlrcur_inputBindLong(cur,"4",8);
+	sqlrcur_inputBindString(cur,"5","testchar8");
+	sqlrcur_inputBindString(cur,"6","testvarchar8");
+	sqlrcur_inputBindString(cur,"7","01/01/2008");
+	sqlrcur_inputBindString(cur,"8","08:00:00");
+	sqlrcur_inputBindString(cur,"9","junkvalue");
 	sqlrcur_validateBinds(cur);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");
@@ -664,9 +657,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COMMIT AND ROLLBACK: \n");
-	secondcon=sqlrcon_alloc(argv[1],
-				atoi(argv[2]), 
-				argv[3],argv[4],argv[5],0,1);
+	secondcon=sqlrcon_alloc("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"0");
@@ -699,28 +691,68 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,0),NULL);
 	printf("\n");
 
+	// temporary tables
+	printf("TEMPORARY TABLES: \n");
+	sqlrcur_sendQuery(cur,"drop table temptable\n");
+	sqlrcur_sendQuery(cur,"create temporary table temptable (col1 int)");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into temptable values (1)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select count(*) from temptable"),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
+	sqlrcon_endSession(con);
+	printf("\n");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select count(*) from temptable"),0);
+	sqlrcur_sendQuery(cur,"drop table temptable\n");
+	printf("\n");
+
+	// stored procedures
+	printf("STORED PROCEDURES: \n");
+	// return no values
+	sqlrcur_sendQuery(cur,"drop function testfunc(int,float,char(20))");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create function testfunc(int,float,char(20)) returns void as ' declare in1 int; in2 float; in3 char(20); begin in1:=$1; in2:=$2; in3:=$3; return; end;' language plpgsql"),1);
+	sqlrcur_prepareQuery(cur,"select testfunc($1,$2,$3)");
+	sqlrcur_inputBindLong(cur,"1",1);
+	sqlrcur_inputBindDouble(cur,"2",1.1,4,2);
+	sqlrcur_inputBindString(cur,"3","hello");
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	sqlrcur_sendQuery(cur,"drop function testfunc(int,float,char(20))");
+	printf("\n");
+	// return single value
+	sqlrcur_sendQuery(cur,"drop function testfunc(int,float,char(20))");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create function testfunc(int,float,char(20)) returns int as ' begin return $1; end;' language plpgsql"),1);
+	sqlrcur_prepareQuery(cur,"select * from testfunc($1,$2,$3)");
+	sqlrcur_inputBindLong(cur,"1",1);
+	sqlrcur_inputBindDouble(cur,"2",1.1,4,2);
+	sqlrcur_inputBindString(cur,"3","hello");
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
+	sqlrcur_sendQuery(cur,"drop function testfunc(int,float,char(20))");
+	printf("\n");
+	// return multiple values
+	sqlrcur_sendQuery(cur,"drop function testfunc(int,char(20))");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create function testfunc(int,float,char(20)) returns record as ' declare output record; begin select $1,$2,$3 into output; return output; end;' language plpgsql"),1);
+	sqlrcur_prepareQuery(cur,"select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 bpchar)");
+	sqlrcur_inputBindLong(cur,"1",1);
+	sqlrcur_inputBindDouble(cur,"2",1.1,4,2);
+	sqlrcur_inputBindString(cur,"3","hello");
+	checkSuccessInt(sqlrcur_executeQuery(cur),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
+	checkSuccessInt(atof(sqlrcur_getFieldByIndex(cur,0,1)),1.1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"hello");
+	sqlrcur_sendQuery(cur,"drop function testfunc(int,float,char(20))");
+	printf("\n");
+	// return result set
+	sqlrcur_sendQuery(cur,"drop function testfunc()");
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create function testfunc() returns setof record as ' declare output record; begin for output in select * from testtable loop return next output; end loop; return; end;' language plpgsql"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testfunc() as (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)"),1);
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,4,0),"5");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,5,0),"6");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,6,0),"7");
+	checkSuccessString(sqlrcur_getFieldByIndex(cur,7,0),"8");
+	sqlrcur_sendQuery(cur,"drop function testfunc()");
+	printf("\n");
+
 	// drop existing table
 	sqlrcur_sendQuery(cur,"drop table testtable");
-
-	printf("STORED PROCEDURES: \n");
-	sqlrcur_sendQuery(cur,"drop function testfunc(int)");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"create function testfunc(int) returns int as ' begin return $1; end;' language plpgsql"),1);
-	sqlrcur_prepareQuery(cur,"select * from testfunc(:int)");
-	sqlrcur_inputBindLong(cur,"int",5);
-	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"5");
-	sqlrcur_sendQuery(cur,"drop function testfunc(int)");
-
-	sqlrcur_sendQuery(cur,"drop function testfunc(int,char(20))");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"create function testfunc(int, char(20)) returns record as ' declare output record; begin select $1,$2 into output; return output; end;' language plpgsql"),1);
-	sqlrcur_prepareQuery(cur,"select * from testfunc(:int,:char) as (col1 int, col2 bpchar)");
-	sqlrcur_inputBindLong(cur,"int",5);
-	sqlrcur_inputBindString(cur,"char","hello");
-	checkSuccessInt(sqlrcur_executeQuery(cur),1);
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"5");
-	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"hello");
-	sqlrcur_sendQuery(cur,"drop function testfunc(int,char(20))");
-	printf("\n");
 
 	// invalid queries...
 	printf("INVALID QUERIES: \n");

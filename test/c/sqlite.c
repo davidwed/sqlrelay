@@ -64,15 +64,9 @@ int	main(int argc, char **argv) {
 	const char	*filename;
 	uint32_t	*fieldlens;
 
-	// usage...
-	if (argc<5) {
-		printf("usage: sqlite host port socket user password\n");
-		exit(0);
-	}
-
 	// instantiation
-	con=sqlrcon_alloc(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+	con=sqlrcon_alloc("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 	cur=sqlrcur_alloc(con);
 
 	// get database type
@@ -575,9 +569,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COMMIT AND ROLLBACK: \n");
-	secondcon=sqlrcon_alloc(argv[1],
-				atoi(argv[2]), 
-				argv[3],argv[4],argv[5],0,1);
+	secondcon=sqlrcon_alloc("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"0");
