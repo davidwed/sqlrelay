@@ -18,12 +18,10 @@ ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql.class
 endif
 ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) oracle8.class
-	$(MAKE) oracle8i.class
+	$(MAKE) oracle.class
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
-	$(MAKE) postgresql6.class
-	$(MAKE) postgresql7.class
+	$(MAKE) postgresql.class
 endif
 ifneq ($(strip $(SQLITELIBS)),)
 	$(MAKE) sqlite.class
@@ -49,17 +47,11 @@ firebird.class: firebird.java
 mysql.class: mysql.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar mysql.java
 
-oracle8.class: oracle8.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar oracle8.java
+oracle.class: oracle.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar oracle.java
 
-oracle8i.class: oracle8i.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar oracle8i.java
-
-postgresql6.class: postgresql6.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar postgresql6.java
-
-postgresql7.class: postgresql7.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar postgresql7.java
+postgresql.class: postgresql.java
+	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar postgresql.java
 
 sqlite.class: sqlite.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar sqlite.java
