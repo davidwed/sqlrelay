@@ -1,6 +1,8 @@
 libtool causing problems on netbsd, freebsd, ubuntu
 
 connections fail to shut down after testing
+if test fails, connection gets messed up somehow
+python tests failing - int/decimal type problems
 
 db2 - yes
 firebird - yes
