@@ -278,9 +278,6 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	delete[] bindvalues;
 	delete[] bindlengths;
 	delete[] bindformats;
-	bindvalues=NULL;
-	bindlengths=NULL;
-	bindformats=NULL;
 
 	// create new bind arrays
 	bindvalues=new char *[bindcount];
@@ -330,7 +327,7 @@ bool postgresqlcursor::inputBindString(const char *variable,
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (bindcounter>=bindcount) {
 		return false;
 	}
 
@@ -356,7 +353,7 @@ bool postgresqlcursor::inputBindInteger(const char *variable,
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (bindcounter>=bindcount) {
 		return false;
 	}
 
@@ -379,7 +376,7 @@ bool postgresqlcursor::inputBindDouble(const char *variable,
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (bindcounter>=bindcount) {
 		return false;
 	}
 
@@ -402,7 +399,7 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (bindcounter>=bindcount) {
 		return false;
 	}
 
@@ -431,7 +428,7 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (bindcounter>=bindcount) {
 		return false;
 	}
 
