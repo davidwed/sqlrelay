@@ -28,6 +28,7 @@ sub checkSuccess {
 		print("success ");
 	} else {
 		print("failure ");
+		print("\n$value != $success\n");
 		exit;
 	}
 }
@@ -41,6 +42,7 @@ sub checkSuccessString {
 		print("success ");
 	} else {
 		print("failure ");
+		print("\n$value != $success\n");
 		exit;
 	}
 }
@@ -263,10 +265,10 @@ checkSuccessString($cur->getColumnType(9),"DATETIME");
 checkSuccessString($cur->getColumnType('testdatetime'),"DATETIME");
 checkSuccessString($cur->getColumnType(10),"SMALLDATETIME");
 checkSuccessString($cur->getColumnType('testsmalldatetime'),"SMALLDATETIME");
-checkSuccessString($cur->getColumnType(11),"LONGCHAR");
-checkSuccessString($cur->getColumnType('testchar'),"LONGCHAR");
-checkSuccessString($cur->getColumnType(12),"LONGCHAR");
-checkSuccessString($cur->getColumnType('testvarchar'),"LONGCHAR");
+checkSuccessString($cur->getColumnType(11),"CHAR");
+checkSuccessString($cur->getColumnType('testchar'),"CHAR");
+checkSuccessString($cur->getColumnType(12),"CHAR");
+checkSuccessString($cur->getColumnType('testvarchar'),"CHAR");
 checkSuccessString($cur->getColumnType(13),"BIT");
 checkSuccessString($cur->getColumnType('testbit'),"BIT");
 print("\n");
@@ -294,10 +296,10 @@ checkSuccess($cur->getColumnLength(9),8);
 checkSuccess($cur->getColumnLength('testdatetime'),8);
 checkSuccess($cur->getColumnLength(10),4);
 checkSuccess($cur->getColumnLength('testsmalldatetime'),4);
-checkSuccess($cur->getColumnLength(11),80);
-checkSuccess($cur->getColumnLength('testchar'),80);
-checkSuccess($cur->getColumnLength(12),80);
-checkSuccess($cur->getColumnLength('testvarchar'),80);
+checkSuccess($cur->getColumnLength(11),40);
+checkSuccess($cur->getColumnLength('testchar'),40);
+checkSuccess($cur->getColumnLength(12),40);
+checkSuccess($cur->getColumnLength('testvarchar'),40);
 checkSuccess($cur->getColumnLength(13),1);
 checkSuccess($cur->getColumnLength('testbit'),1);
 print("\n");

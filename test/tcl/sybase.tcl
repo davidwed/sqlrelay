@@ -226,10 +226,10 @@ checkSuccess [$cur getColumnTypeByIndex 9] "DATETIME"
 checkSuccess [$cur getColumnTypeByName "testdatetime"] "DATETIME"
 checkSuccess [$cur getColumnTypeByIndex 10] "SMALLDATETIME"
 checkSuccess [$cur getColumnTypeByName "testsmalldatetime"] "SMALLDATETIME"
-checkSuccess [$cur getColumnTypeByIndex 11] "LONGCHAR"
-checkSuccess [$cur getColumnTypeByName "testchar"] "LONGCHAR"
-checkSuccess [$cur getColumnTypeByIndex 12] "LONGCHAR"
-checkSuccess [$cur getColumnTypeByName "testvarchar"] "LONGCHAR"
+checkSuccess [$cur getColumnTypeByIndex 11] "CHAR"
+checkSuccess [$cur getColumnTypeByName "testchar"] "CHAR"
+checkSuccess [$cur getColumnTypeByIndex 12] "CHAR"
+checkSuccess [$cur getColumnTypeByName "testvarchar"] "CHAR"
 checkSuccess [$cur getColumnTypeByIndex 13] "BIT"
 checkSuccess [$cur getColumnTypeByName "testbit"] "BIT"
 puts ""
@@ -257,10 +257,10 @@ checkSuccess [$cur getColumnLengthByIndex 9] 8
 checkSuccess [$cur getColumnLengthByName "testdatetime"] 8
 checkSuccess [$cur getColumnLengthByIndex 10] 4
 checkSuccess [$cur getColumnLengthByName "testsmalldatetime"] 4
-checkSuccess [$cur getColumnLengthByIndex 11] 80
-checkSuccess [$cur getColumnLengthByName "testchar"] 80
-checkSuccess [$cur getColumnLengthByIndex 12] 80
-checkSuccess [$cur getColumnLengthByName "testvarchar"] 80
+checkSuccess [$cur getColumnLengthByIndex 11] 40
+checkSuccess [$cur getColumnLengthByName "testchar"] 40
+checkSuccess [$cur getColumnLengthByIndex 12] 40
+checkSuccess [$cur getColumnLengthByName "testvarchar"] 40
 checkSuccess [$cur getColumnLengthByIndex 13] 1
 checkSuccess [$cur getColumnLengthByName "testbit"] 1
 puts ""
