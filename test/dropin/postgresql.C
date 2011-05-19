@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void checkSuccess(char *value, char *success) {
+void checkSuccess(const char *value, const char *success) {
 	//printf("\"%s\"=\"%s\"\n",value,success);
 
 	if (!success) {
@@ -39,9 +39,9 @@ int	main(int argc, char **argv) {
 
 	const char	*host="localhost";
 	const char	*port="9000";
-	const char	*socket="/tmp/test.socket";
 	const char	*user="test";
 	const char	*password="test";
+	const char	*db="testdb";
 
 	printf("PQresStatus:\n");
 	checkSuccess(PQresStatus(PGRES_EMPTY_QUERY),"PGRES_EMPTY_QUERY");
@@ -130,7 +130,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQstatus(pgconn),CONNECTION_OK);
 	printf("\n");
 
-	char		*query="drop table testtable";
+	const char	*query="drop table testtable";
 	PGresult	*pgresult=PQexec(pgconn,query);
 	PQclear(pgresult);
 
@@ -279,7 +279,7 @@ int	main(int argc, char **argv) {
 
 	printf("PQescapeString:\n");
 	char	to[1024];
-	char	*from=" \\ ' ";
+	const char	*from=" \\ ' ";
 	checkSuccess(PQescapeString(to,from,strlen(from)),7);
 	checkSuccess(to," \\\\ '' ");
 	printf("\n");
