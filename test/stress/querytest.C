@@ -15,22 +15,21 @@ sqlrcursor	*secondcur;
 
 int	main(int argc, char **argv) {
 
-	char	*dbtype;
 	const char *bindvars[2]={"var1",NULL};
 	const char *bindvals[1]={"testchar3"};
 	const char *subvars[2]={"col1",NULL};
 	const char *subvalstrings[1]={"testchar"};
 	const char * const *cols;
 	const char * const *fields;
-	int	port;
+	int		port;
 	const char	*socket;
-	int	id;
+	int		id;
 	const char	*filename;
 	uint32_t	*fieldlens;
-	int	counter=1;
+	int		counter=1;
 
 
-	while (1) {
+	for (;;) {
 
 		// instantiation
 		con=new sqlrconnection("localhost",9000, 
