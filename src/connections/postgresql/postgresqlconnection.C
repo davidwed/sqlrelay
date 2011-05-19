@@ -325,10 +325,10 @@ bool postgresqlcursor::inputBindString(const char *variable,
 		return true;
 	}
 
-	// don't attempt to bind beyond the number of
+	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>=bindcount) {
-		return false;
+		return true;
 	}
 
 	if (*isnull) {
@@ -351,10 +351,10 @@ bool postgresqlcursor::inputBindInteger(const char *variable,
 		return true;
 	}
 
-	// don't attempt to bind beyond the number of
+	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>=bindcount) {
-		return false;
+		return true;
 	}
 
 	bindvalues[bindcounter]=charstring::parseNumber(*value);
@@ -374,10 +374,10 @@ bool postgresqlcursor::inputBindDouble(const char *variable,
 		return true;
 	}
 
-	// don't attempt to bind beyond the number of
+	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>=bindcount) {
-		return false;
+		return true;
 	}
 
 	bindvalues[bindcounter]=charstring::parseNumber(*value,precision,scale);
@@ -397,10 +397,10 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 		return true;
 	}
 
-	// don't attempt to bind beyond the number of
+	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>=bindcount) {
-		return false;
+		return true;
 	}
 
 	if (*isnull) {
@@ -426,10 +426,10 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 		return true;
 	}
 
-	// don't attempt to bind beyond the number of
+	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>=bindcount) {
-		return false;
+		return true;
 	}
 
 	if (*isnull) {
