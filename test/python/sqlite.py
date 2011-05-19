@@ -18,14 +18,10 @@ def checkSuccess(value,success):
 
 def main():
 
-	# usage...
-	if len(sys.argv) < 5:
-		print "usage: sqlite.py host port socket user password"
-		sys.exit(0)
-
 	# instantiation
-	con=PySQLRClient.sqlrconnection(sys.argv[1],string.atoi(sys.argv[2]), 
-					sys.argv[3],sys.argv[4],sys.argv[5])
+	con=PySQLRClient.sqlrconnection("localhost",9000,
+						"/tmp/test.socket",
+						"test","test")
 	cur=PySQLRClient.sqlrcursor(con)
 
 	# get database type
@@ -559,9 +555,9 @@ def main():
 	print
 
 	print "COMMIT AND ROLLBACK: "
-	secondcon=PySQLRClient.sqlrconnection(sys.argv[1],
-				string.atoi(sys.argv[2]), 
-				sys.argv[3],sys.argv[4],sys.argv[5],0,1)
+	secondcon=PySQLRClient.sqlrconnection("localhost",9000,
+						"/tmp/test.socket",
+						"test","test")
 	secondcur=PySQLRClient.sqlrcursor(secondcon)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),"0")

@@ -26,14 +26,8 @@ proc checkSuccess {value success} {
 	}
 }
 
-# usage...
-if {$argc<5} {
-	puts "usage: mysql.tcl host port socket user password"
-	exit
-}
-
 # instantiation
-set con [sqlrcon -server [lindex $argv 0] -port [lindex $argv 1] -socket [lindex $argv 2] -user [lindex $argv 3] -password [lindex $argv 4] -retrytime 0 -tries 1]
+set con [sqlrcon -server "localhost" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
 set cur [$con sqlrcur]
 
 # get database type
@@ -806,7 +800,7 @@ $cur setResultSetBufferSize 0
 puts ""
 
 puts "COMMIT AND ROLLBACK: "
-set secondcon [sqlrcon -server [lindex $argv 0] -port [lindex $argv 1] -socket [lindex $argv 2] -user [lindex $argv 3] -password [lindex $argv 4] -retrytime 0 -tries 1]
+set secondcon [sqlrcon -server "localhost" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
 set secondcur [$secondcon sqlrcur]
 checkSuccess [$secondcur sendQuery "select count(*) from testtable"] 1
 checkSuccess [$secondcur getFieldByIndex 0 0] "8"

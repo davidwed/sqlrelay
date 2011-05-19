@@ -16,11 +16,11 @@ function checkSuccess($value,$success) {
 	}
 }
 
-	$host=$_REQUEST["host"];
-	$port=$_REQUEST["port"];
-	$socket=$_REQUEST["socket"];
-	$user=$_REQUEST["user"];
-	$password=$_REQUEST["password"];
+	$host="localhost";
+	$port=9000;
+	$socket="/tmp/test.socket";
+	$user="test";
+	$password="test";
 
 	$subvars=array("var1","var2","var3");
 	$subvalstrings=array("hi","hello","bye");

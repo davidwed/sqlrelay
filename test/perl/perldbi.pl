@@ -5,16 +5,9 @@
 
 use DBI;
 
-#usage...
-if ($#ARGV+1<6) {
-	print("usage: perldbi.pl host port socket user password query\n");
-	exit;
-}
-
-
 
 print "INSTANTIATION\n";
-my $dbh=DBI->connect("DBI:SQLRelay:host=$ARGV[0];port=$ARGV[1];socket=$ARGV[2];debug=1",$ARGV[3],$ARGV[4]) or die DBI->errstr;
+my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=1","test","test") or die DBI->errstr;
 print "\n\n";
 
 
@@ -26,7 +19,7 @@ print "\n\n";
 
 
 print "QUERY FUNCTIONS\n";
-my $sth=$dbh->prepare($ARGV[5]) or die DBI->errstr;
+my $sth=$dbh->prepare($ARGV[1]) or die DBI->errstr;
 
 $sth->execute() or die DBI->errstr;
 

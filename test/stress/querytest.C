@@ -30,17 +30,11 @@ int	main(int argc, char **argv) {
 	int	counter=1;
 
 
-	// usage...
-	if (argc<5) {
-		printf("usage: querytest host port socket user password\n");
-		exit(0);
-	}
-
 	while (1) {
 
 		// instantiation
-		con=new sqlrconnection(argv[1],atoi(argv[2]), 
-					argv[3],argv[4],argv[5],0,1);
+		con=new sqlrconnection("localhost",9000, 
+					"/tmp/test.socket","test","test",0,1);
 		con->copyReferences();
 		cur=new sqlrcursor(con);
 		cur->copyReferences();
@@ -230,9 +224,8 @@ int	main(int argc, char **argv) {
 		cur->setResultSetBufferSize(0);
 
 		// commit/rollback
-		secondcon=new sqlrconnection(argv[1],
-				atoi(argv[2]), 
-				argv[3],argv[4],argv[5],0,1);
+		secondcon=new sqlrconnection("localhost",9000,
+				"/tmp/test.socket","test","test",0,1);
 		secondcur=new sqlrcursor(secondcon);
 		secondcur->sendQuery("select count(*) from testtable");
 		secondcur->getField(0,(uint32_t)0);

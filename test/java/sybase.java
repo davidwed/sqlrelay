@@ -97,17 +97,11 @@ class sybase {
 		String	filename;
 		long[]	fieldlens;
 	
-		// usage...
-		if (args.length<5) {
-			System.out.println("usage: java sybase host port socket user password");
-			System.exit(0);
-		}
-	
-	
 		// instantiation
-		SQLRConnection con=new SQLRConnection(args[0],
-					(short)Integer.parseInt(args[1]), 
-						args[2],args[3],args[4],0,1);
+		SQLRConnection con=new SQLRConnection("localhost",
+						(short)9000,
+						"/tmp/test.socket",
+						"test","test",0,1);
 		SQLRCursor cur=new SQLRCursor(con);
 	
 		// get database type

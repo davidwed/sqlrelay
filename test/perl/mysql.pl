@@ -45,16 +45,10 @@ sub checkSuccessString {
 	}
 }
 
-# usage...
-if ($#ARGV+1<5) {
-	print("usage: mysql.pl host port socket user password");
-	exit;
-}
-
 
 # instantiation
-$con=SQLRelay::Connection->new($ARGV[0],$ARGV[1],
-		$ARGV[2],$ARGV[3],$ARGV[4],0,1);
+$con=SQLRelay::Connection->new("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
 $cur=SQLRelay::Cursor->new($con);
 
 # get database type
@@ -936,8 +930,8 @@ $cur->setResultSetBufferSize(0);
 print("\n");
 
 print("COMMIT AND ROLLBACK: \n");
-$secondcon=SQLRelay::Connection->new($ARGV[0],$ARGV[1], 
-		$ARGV[2],$ARGV[3],$ARGV[4],0,1);
+$secondcon=SQLRelay::Connection->new("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
 $secondcur=SQLRelay::Cursor->new($secondcon);
 checkSuccess($secondcur->sendQuery("select count(*) from testtable"),1);
 checkSuccessString($secondcur->getField(0,0),"8");

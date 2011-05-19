@@ -39,13 +39,13 @@ void	runQuery(void *id) {
 
 main(int argc, char **argv) {
 
-	host=argv[1];
-	port=atoi(argv[2]);
-	sock=argv[3];
-	login=argv[4];
-	password=argv[5];
-	query=argv[6];
-	threadcount=atoi(argv[7]);
+	host="localhost"
+	port=9000;
+	sock="/tmp/test.socket";
+	login="test";
+	password="test";
+	query=argv[1];
+	threadcount=atoi(argv[2]);
 
 	pthread_t	th[threadcount];
 

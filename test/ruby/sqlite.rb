@@ -18,15 +18,9 @@ end
 
 
 
-# usage...
-if ARGV.length < 5
-	print "usage: sqlite.rb host port socket user password\n"
-	exit(0)
-end
-
 # instantiation
-con=SQLRConnection.new(ARGV[0],ARGV[1].to_i, 
-				ARGV[2],ARGV[3],ARGV[4],0,1)
+con=SQLRConnection.new("localhost",9000,"/tmp/test.socket",
+						"test","test",0,1);
 cur=SQLRCursor.new(con)
 
 # get database type
@@ -525,9 +519,8 @@ cur.setResultSetBufferSize(0)
 print "\n"
 
 print "COMMIT AND ROLLBACK: \n"
-secondcon=SQLRConnection.new(ARGV[0],
-			ARGV[1].to_i, 
-			ARGV[2],ARGV[3],ARGV[4],0,1)
+secondcon=SQLRConnection.new("localhost",9000,"/tmp/test.socket",
+						"test","test",0,1);
 secondcur=SQLRCursor.new(secondcon)
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 checkSuccess(secondcur.getField(0,0),"0")

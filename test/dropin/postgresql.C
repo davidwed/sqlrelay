@@ -37,17 +37,11 @@ void checkSuccess(int value, int success) {
 
 int	main(int argc, char **argv) {
 
-	// usage...
-	if (argc<5) {
-		printf("usage: mysql host port user password\n");
-		exit(0);
-	}
-
-	char	*host=argv[1];
-	char	*port=argv[2];
-	char	*user=argv[3];
-	char	*password=argv[4];
-	char	*db=argv[5];
+	const char	*host="localhost";
+	const char	*port="9000";
+	const char	*socket="/tmp/test.socket";
+	const char	*user="test";
+	const char	*password="test";
 
 	printf("PQresStatus:\n");
 	checkSuccess(PQresStatus(PGRES_EMPTY_QUERY),"PGRES_EMPTY_QUERY");

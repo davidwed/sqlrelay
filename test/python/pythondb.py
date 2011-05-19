@@ -10,16 +10,11 @@ import string
 
 def main():
 
-	# usage...
-	if len(sys.argv) < 5:
-		print "usage: pythondb.py host port socket user password"
-		sys.exit(0)
-
-
 	# instantiation
 	print "INSTANTIATION"
-	con=PySQLRDB.connect(sys.argv[1],string.atoi(sys.argv[2]),
-				sys.argv[3],sys.argv[4],sys.argv[5],0,1)
+	con=PySQLRClient.sqlrconnection("localhost",9000,
+						"/tmp/test.socket",
+						"test","test")
 	cur=con.cursor()
 	print
 	print

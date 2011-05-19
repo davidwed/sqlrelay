@@ -80,16 +80,11 @@ class sqlite {
 		String	filename;
 		long[]	fieldlens;
 	
-		// usage...
-		if (args.length<5) {
-			System.out.println("usage: java sqlite host port socket user password");
-			System.exit(0);
-		}
-	
 		// instantiation
-		SQLRConnection con=new SQLRConnection(args[0],
-					(short)Integer.parseInt(args[1]), 
-						args[2],args[3],args[4],0,1);
+		SQLRConnection con=new SQLRConnection("localhost",
+						(short)9000,
+						"/tmp/test.socket",
+						"test","test",0,1);
 		SQLRCursor cur=new SQLRCursor(con);
 	
 		// get database type
@@ -589,9 +584,10 @@ class sqlite {
 		System.out.println();
 
 	    	System.out.println("COMMIT AND ROLLBACK: \n");
-	    	SQLRConnection secondcon=new SQLRConnection(args[0],
-				    	(short)Integer.parseInt(args[1]), 
-				    	args[2],args[3],args[4],0,1);
+		SQLRConnection secondcon=new SQLRConnection("localhost",
+						(short)9000,
+						"/tmp/test.socket",
+						"test","test",0,1);
 	    	SQLRCursor secondcur=new SQLRCursor(secondcon);
 	    	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
 	    	checkSuccess(secondcur.getField(0,0),"0");

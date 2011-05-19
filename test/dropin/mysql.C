@@ -38,12 +38,6 @@ void checkSuccess(int value, int success) {
 
 int	main(int argc, char **argv) {
 
-	// usage...
-	if (argc<5) {
-		printf("usage: mysql host port socket user password\n");
-		exit(0);
-	}
-
 	MYSQL	mysql;
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	printf("mysql_init\n");
@@ -51,11 +45,11 @@ int	main(int argc, char **argv) {
 	printf("\n");
 #endif
 
-	char	*host=argv[1];
-	char	*port=argv[2];
-	char	*socket=argv[3];
-	char	*user=argv[4];
-	char	*password=argv[5];
+	const char	*host="localhost";
+	const char	*port="9000";
+	const char	*socket="/tmp/test.socket";
+	const char	*user="test";
+	const char	*password="test";
 
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	printf("mysql_real_connect\n");

@@ -16,11 +16,11 @@ require_once 'DB.php';
 		}
 	}
 
-	$host=$_REQUEST["host"];
-	$port=$_REQUEST["port"];
-	$socket=$_REQUEST["socket"];
-	$user=$_REQUEST["user"];
-	$password=$_REQUEST["password"];
+	$host="localhost";
+	$port=9000;
+	$socket="/tmp/test.socket";
+	$user="test";
+	$password="test";
 	$dsn = "sqlrelay://$user:$password@$host:$port/";
 
 

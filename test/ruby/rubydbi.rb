@@ -5,19 +5,12 @@
 
 require 'dbi'
 
-# usage
-
-if ARGV.length < 7
-	print "usage: rubydbi.rb host port socket user password query iterations"
-	exit(0)
-end
-
-for index in 0..ARGV[6].to_i-1 do
+for index in 0..ARGV[1].to_i-1 do
 
 
 	# instantiation
-	db=DBI.connect("DBI:SQLRelay:host="+ARGV[0]+";port="+
-			ARGV[1]+";socket="+ARGV[2]+";",ARGV[3],ARGV[4])
+	db=DBI.connect("DBI:SQLRelay:host=localhost;port="+
+			"9000;socket=/tmp/test.socket;","test","test")
 
 
 	# debug and autocommit attributes
@@ -26,7 +19,7 @@ for index in 0..ARGV[6].to_i-1 do
 
 
 	# query functions
-	stmt=db.prepare(ARGV[5])
+	stmt=db.prepare(ARGV[0])
 
 	print "FETCH ALL\n"
 	stmt.execute()
