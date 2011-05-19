@@ -172,9 +172,6 @@ Bugs:
 		GetLongField on that platform
 	* Cameron/Kyler Laird reported issues when the column count is the
 		same as the optimistic column count
-	* suspended session increments serversockincount but then it doesn't
-		get decremented, even after session is resumed
-		the socket may not be getting deleted or something
 		closeConnection is crashing trying to delete those sockets
 	* allowing query timeout appears to hang the sqlrelay server
 		need to add timeout option to sqlrsh

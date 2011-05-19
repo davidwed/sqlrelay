@@ -328,6 +328,7 @@ void sqlrconnection_svr::closeSuspendedSessionSockets() {
 			}
 			delete[] serversockin;
 			serversockin=NULL;
+			serversockincount=0;
 		}
 		dbgfile.debugPrint("connection",1,
 			"done closing sockets from a previously suspended session...");
