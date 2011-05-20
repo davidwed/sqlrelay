@@ -107,7 +107,6 @@ void sqlrconnection_svr::clientSession() {
 			noAvailableCursors(command);
 			continue;
 		}
-//printf("%d: cursor id: %d   command=%d\n",getpid(),cursor->id,command);
 
 		if (command==NEW_QUERY) {
 			if (newQueryCommand(cursor)) {
@@ -168,34 +167,36 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 	if (neednewcursor==DONT_NEED_NEW_CURSOR) {
 
 		// which cursor is the client requesting?
-		uint16_t	index;
-		if (clientsock->read(&index,
+		uint16_t	id;
+		if (clientsock->read(&id,
 				idleclienttimeout,0)!=sizeof(uint16_t)) {
 			dbgfile.debugPrint("connection",2,
-				"client cursor request failed, cursor index stage");
+				"client cursor request failed, cursor id stage");
 			return NULL;
+		}
+
+		// set the current cursor to the one they requested.
+		bool	found=false;
+		for (uint16_t i=0; i<cursorcount; i++) {
+			if (cur[i]->id==id) {
+				cursor=cur[i];
+
+				semset->waitWithUndo(9);
+				statistics->times_cursor_reused++;
+				semset->signalWithUndo(9);
+
+				found=true;
+				break;
+			}
 		}
 
 		// don't allow the client to request a cursor 
 		// beyond the end of the array.
-		if (index>cursorcount) {
-printf("client requested an invalid cursor: %d\n",index);
+		if (!found) {
 			dbgfile.debugPrint("connection",2,
 				"client requested an invalid cursor:");
-			dbgfile.debugPrint("connection",3,(int32_t)index);
+			dbgfile.debugPrint("connection",3,(int32_t)id);
 			return NULL;
-		}
-
-		semset->waitWithUndo(9);
-		statistics->times_cursor_reused++;
-		semset->signalWithUndo(9);
-
-		// set the current cursor to the one they requested.
-		for (uint16_t i=0; i<cursorcount; i++) {
-			if (cur[i]->id==index) {
-				cursor=cur[i];
-				break;
-			}
 		}
 
 	} else {
@@ -224,10 +225,8 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 	uint16_t	i=0;
 	for (; i<cursorcount; i++) {
 		if (!cur[i]->busy) {
-			//fprintf(stderr,"reusing cursor %d\n",i);
 			dbgfile.debugPrint("connection",2,"found a free cursor:");
 			dbgfile.debugPrint("connection",3,(int32_t)i);
-//printf("%d: got a cursor (static): %d of %d, id=%d\n",getpid(),i,cursorcount,cur[i]->id);
 			return cur[i];
 		}
 	}
@@ -242,19 +241,18 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 	// if we're already at a maximum amount of cursors, return failure
 	uint16_t	expandto=cursorcount+cfgfl->getCursorsGrowBy();
 	if (expandto>=cfgfl->getMaxCursors()) {
-		//fprintf(stderr,"Can't expand cursors to %d, it would be over our limit\n",expandto);
 		dbgfile.debugPrint("connection", 1, "Can't expand cursors, already at maximum");
 		return NULL;
 	}
 
-	// we're here because there are no free cursors left.  Lets make some more baby!
+	// we're here because there are no free cursors left.
+	// Lets make some more baby!
 	sqlrcursor_svr	**tmp =
 			(sqlrcursor_svr **)realloc((void *)cur,
 					sizeof(sqlrcursor_svr **)*expandto);
 	
 	// in case we're out of memory, we don't want to destroy the cur array
 	if (tmp==NULL) {
-		//fprintf(stderr, "Out of memory allocating cursors\n");
 		dbgfile.debugPrint("connection",1,
 				"Out of memory allocating cursors");
 		return NULL;
@@ -263,7 +261,6 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 	cur=tmp;
 	
 	uint16_t	firstopen=i;
-	//fprintf(stderr,"new cursorcount: %d  first open: %d\n",cursorcount,firstopen);
 	
 	for (uint16_t j=firstopen; j<cursorcount; j++,i++) {
 		cur[i]=initCursorUpdateStats();
@@ -278,7 +275,6 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 		}
 	}
 	
-//printf("%d: got a cursor (dynamic): %d of %d\n",getpid(),firstopen,cursorcount);
 	return cur[firstopen];
 }
 

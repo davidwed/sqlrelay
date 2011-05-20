@@ -4,21 +4,22 @@ python tests failing - int/decimal type problems
 
 db2 - yes
 firebird - yes
-freetds - if a query fails, next one gets: no server side cursors available...
+mysql - yes
+postgresql - yes
+sqlite - yes
+sybase - yes
+freetds - server is returning cursor 6 from drop query (which is invalid)
+		and when client re-requests it, an error occurs
+	used to be...
+	if a query fails, next one gets: no server side cursors available...
 		all cursors end up having the same ID, one higher than the
 		actual max cursor count
 		does this happen with other connections?
 		does this happen in older version?
-mysql - yes
-oracle8 - yes
-oracle8i - I don't get a crash any more, but it's flaky now, sometimes
-		bind cursors don't return any data, like the statement doesn't
-		have the result set associated with it any more
-		the colums still are there, but not the results set itself
-		connections get hung when running test over and over
-postgresql - yes
-sqlite - yes
-sybase - yes
+oracle8 - on the second run through, the bind cursors don't return any data,
+	like the statement doesn't have the result set associated with it any
+	more the colums still are there, but not the results set itself
+	connections get hung when running test over and over
 
 
 
