@@ -27,30 +27,32 @@ void sqlrconnection_svr::sendColumnDefinition(const char *name,
 						uint16_t binary,
 						uint16_t autoincrement) {
 
-	debugstr=new stringbuffer();
-	for (uint16_t i=0; i<namelen; i++) {
-		debugstr->append(name[i]);
+	if (dbgfile.debugEnabled()) {
+		debugstr=new stringbuffer();
+		for (uint16_t i=0; i<namelen; i++) {
+			debugstr->append(name[i]);
+		}
+		debugstr->append(":");
+		debugstr->append(type);
+		debugstr->append(":");
+		debugstr->append(size);
+		debugstr->append(" (");
+		debugstr->append(precision);
+		debugstr->append(",");
+		debugstr->append(scale);
+		debugstr->append(") ");
+		if (!nullable) {
+			debugstr->append("NOT NULL ");
+		}
+		if (primarykey) {
+			debugstr->append("Primary key ");
+		}
+		if (unique) {
+			debugstr->append("Unique");
+		}
+		dbgfile.debugPrint("connection",3,debugstr->getString());
+		delete debugstr;
 	}
-	debugstr->append(":");
-	debugstr->append(type);
-	debugstr->append(":");
-	debugstr->append(size);
-	debugstr->append(" (");
-	debugstr->append(precision);
-	debugstr->append(",");
-	debugstr->append(scale);
-	debugstr->append(") ");
-	if (!nullable) {
-		debugstr->append("NOT NULL ");
-	}
-	if (primarykey) {
-		debugstr->append("Primary key ");
-	}
-	if (unique) {
-		debugstr->append("Unique");
-	}
-	dbgfile.debugPrint("connection",3,debugstr->getString());
-	delete debugstr;
 
 	clientsock->write(namelen);
 	clientsock->write(name,namelen);
@@ -84,32 +86,34 @@ void sqlrconnection_svr::sendColumnDefinitionString(const char *name,
 						uint16_t binary,
 						uint16_t autoincrement) {
 
-	debugstr=new stringbuffer();
-	for (uint16_t i=0; i<namelen; i++) {
-		debugstr->append(name[i]);
+	if (dbgfile.debugEnabled()) {
+		debugstr=new stringbuffer();
+		for (uint16_t i=0; i<namelen; i++) {
+			debugstr->append(name[i]);
+		}
+		debugstr->append(":");
+		for (uint16_t i=0; i<typelen; i++) {
+			debugstr->append(type[i]);
+		}
+		debugstr->append(":");
+		debugstr->append(size);
+		debugstr->append(" (");
+		debugstr->append(precision);
+		debugstr->append(",");
+		debugstr->append(scale);
+		debugstr->append(") ");
+		if (!nullable) {
+			debugstr->append("NOT NULL ");
+		}
+		if (primarykey) {
+			debugstr->append("Primary key ");
+		}
+		if (unique) {
+			debugstr->append("Unique");
+		}
+		dbgfile.debugPrint("connection",3,debugstr->getString());
+		delete debugstr;
 	}
-	debugstr->append(":");
-	for (uint16_t i=0; i<typelen; i++) {
-		debugstr->append(type[i]);
-	}
-	debugstr->append(":");
-	debugstr->append(size);
-	debugstr->append(" (");
-	debugstr->append(precision);
-	debugstr->append(",");
-	debugstr->append(scale);
-	debugstr->append(") ");
-	if (!nullable) {
-		debugstr->append("NOT NULL ");
-	}
-	if (primarykey) {
-		debugstr->append("Primary key ");
-	}
-	if (unique) {
-		debugstr->append("Unique");
-	}
-	dbgfile.debugPrint("connection",3,debugstr->getString());
-	delete debugstr;
 
 	clientsock->write(namelen);
 	clientsock->write(name,namelen);

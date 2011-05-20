@@ -1,7 +1,5 @@
 libtool causing problems on netbsd, freebsd, ubuntu
 
-connections fail to shut down after testing
-if test fails, connection gets messed up somehow
 python tests failing - int/decimal type problems
 
 db2 - yes
@@ -19,10 +17,8 @@ oracle8i - I don't get a crash any more, but it's flaky now, sometimes
 		the colums still are there, but not the results set itself
 		connections get hung when running test over and over
 postgresql - yes
-sqlite - connections get hung when running test over and over
-		sqlr-stop doesn't always kill
-sybase - connections get hung when test script fails
-		sqlr-stop doesn't always kill
+sqlite - yes
+sybase - yes
 
 
 

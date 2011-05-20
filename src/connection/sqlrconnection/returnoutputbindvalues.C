@@ -13,32 +13,42 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		bindvar_svr	*bv=&(cursor->outbindvars[i]);
 
-		debugstr=new stringbuffer();
-		debugstr->append(i);
-		debugstr->append(":");
+		if (dbgfile.debugEnabled()) {
+			debugstr=new stringbuffer();
+			debugstr->append(i);
+			debugstr->append(":");
+		}
 
 		if (bindValueIsNull(bv->isnull)) {
 
-			debugstr->append("NULL");
+			if (dbgfile.debugEnabled()) {
+				debugstr->append("NULL");
+			}
 
 			clientsock->write((uint16_t)NULL_DATA);
 
 		} else if (bv->type==BLOB_BIND) {
 
-			debugstr->append("BLOB:\n");
+			if (dbgfile.debugEnabled()) {
+				debugstr->append("BLOB:\n");
+			}
 
 			cursor->returnOutputBindBlob(i);
 
 		} else if (bv->type==CLOB_BIND) {
 
-			debugstr->append("CLOB:\n");
+			if (dbgfile.debugEnabled()) {
+				debugstr->append("CLOB:\n");
+			}
 
 			cursor->returnOutputBindClob(i);
 
 		} else if (bv->type==STRING_BIND) {
 
-			debugstr->append("STRING:\n");
-			debugstr->append(bv->value.stringval);
+			if (dbgfile.debugEnabled()) {
+				debugstr->append("STRING:\n");
+				debugstr->append(bv->value.stringval);
+			}
 
 			clientsock->write((uint16_t)STRING_DATA);
 			bv->valuesize=charstring::length(
@@ -48,21 +58,25 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		} else if (bv->type==INTEGER_BIND) {
 
-			debugstr->append("INTEGER:\n");
-			debugstr->append(bv->value.integerval);
+			if (dbgfile.debugEnabled()) {
+				debugstr->append("INTEGER:\n");
+				debugstr->append(bv->value.integerval);
+			}
 
 			clientsock->write((uint16_t)INTEGER_DATA);
 			clientsock->write((uint64_t)bv->value.integerval);
 
 		} else if (bv->type==DOUBLE_BIND) {
 
-			debugstr->append("DOUBLE:\n");
-			debugstr->append(bv->value.doubleval.value);
-			debugstr->append("(");
-			debugstr->append(bv->value.doubleval.precision);
-			debugstr->append(",");
-			debugstr->append(bv->value.doubleval.scale);
-			debugstr->append(")");
+			if (dbgfile.debugEnabled()) {
+				debugstr->append("DOUBLE:\n");
+				debugstr->append(bv->value.doubleval.value);
+				debugstr->append("(");
+				debugstr->append(bv->value.doubleval.precision);
+				debugstr->append(",");
+				debugstr->append(bv->value.doubleval.scale);
+				debugstr->append(")");
+			}
 
 			clientsock->write((uint16_t)DOUBLE_DATA);
 			clientsock->write(bv->value.doubleval.value);
@@ -73,15 +87,20 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		} else if (bv->type==CURSOR_BIND) {
 
-			debugstr->append("CURSOR:\n");
-			debugstr->append(bv->value.cursorid);
+			if (dbgfile.debugEnabled()) {
+				debugstr->append("CURSOR:\n");
+				debugstr->append(bv->value.cursorid);
+			}
 
 			clientsock->write((uint16_t)CURSOR_DATA);
 			clientsock->write(bv->value.cursorid);
 		}
 
-		dbgfile.debugPrint("connection",3,debugstr->getString());
-		delete debugstr;
+		if (dbgfile.debugEnabled()) {
+			dbgfile.debugPrint("connection",3,
+						debugstr->getString());
+			delete debugstr;
+		}
 	}
 
 	dbgfile.debugPrint("connection",2,"done returning output bind values");

@@ -5,9 +5,11 @@
 
 void sqlrconnection_svr::sendField(const char *data, uint32_t size) {
 
-	debugstr->append("\"");
-	debugstr->append(data,size);
-	debugstr->append("\",");
+	if (dbgfile.debugEnabled()) {
+		debugstr->append("\"");
+		debugstr->append(data,size);
+		debugstr->append("\",");
+	}
 
 	clientsock->write((uint16_t)STRING_DATA);
 	clientsock->write(size);
@@ -16,7 +18,9 @@ void sqlrconnection_svr::sendField(const char *data, uint32_t size) {
 
 void sqlrconnection_svr::sendNullField() {
 
-	debugstr->append("NULL");
+	if (dbgfile.debugEnabled()) {
+		debugstr->append("NULL");
+	}
 
 	clientsock->write((uint16_t)NULL_DATA);
 }
@@ -28,7 +32,9 @@ void sqlrconnection_svr::startSendingLong(uint64_t longlength) {
 
 void sqlrconnection_svr::sendLongSegment(const char *data, uint32_t size) {
 
-	debugstr->append(data,size);
+	if (dbgfile.debugEnabled()) {
+		debugstr->append(data,size);
+	}
 
 	clientsock->write((uint16_t)STRING_DATA);
 	clientsock->write(size);
@@ -37,7 +43,9 @@ void sqlrconnection_svr::sendLongSegment(const char *data, uint32_t size) {
 
 void sqlrconnection_svr::endSendingLong() {
 
-	debugstr->append(",");
+	if (dbgfile.debugEnabled()) {
+		debugstr->append(",");
+	}
 
 	clientsock->write((uint16_t)END_LONG_DATA);
 }

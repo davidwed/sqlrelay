@@ -90,6 +90,10 @@ void debugfile::disable() {
 	enabled=false;
 }
 
+bool debugfile::debugEnabled() {
+	return enabled;
+}
+
 void debugfile::debugPrint(const char *name, int32_t tabs, const char *string) {
 	if (!enabled || (!debuglogger && !openDebugFile())) {
 		return;

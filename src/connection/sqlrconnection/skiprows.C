@@ -5,12 +5,14 @@
 
 bool sqlrconnection_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
 
-	debugstr=new stringbuffer();
-	debugstr->append("skipping ");
-	debugstr->append(rows);
-	debugstr->append(" rows...");
-	dbgfile.debugPrint("connection",2,debugstr->getString());
-	delete debugstr;
+	if (dbgfile.debugEnabled()) {
+		debugstr=new stringbuffer();
+		debugstr->append("skipping ");
+		debugstr->append(rows);
+		debugstr->append(" rows...");
+		dbgfile.debugPrint("connection",2,debugstr->getString());
+		delete debugstr;
+	}
 
 	for (uint64_t i=0; i<rows; i++) {
 

@@ -44,12 +44,14 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 	}
 
 
-	debugstr=new stringbuffer();
-	debugstr->append("fetching ");
-	debugstr->append(fetch);
-	debugstr->append(" rows...");
-	dbgfile.debugPrint("connection",2,debugstr->getString());
-	delete debugstr;
+	if (dbgfile.debugEnabled()) {
+		debugstr=new stringbuffer();
+		debugstr->append("fetching ");
+		debugstr->append(fetch);
+		debugstr->append(" rows...");
+		dbgfile.debugPrint("connection",2,debugstr->getString());
+		delete debugstr;
+	}
 
 	// send the specified number of rows back
 	for (uint64_t i=0; (!fetch || i<fetch); i++) {
@@ -62,10 +64,14 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 			return true;
 		}
 
-		debugstr=new stringbuffer();
 		cursor->returnRow();
-		dbgfile.debugPrint("connection",3,debugstr->getString());
-		delete debugstr;
+
+		if (dbgfile.debugEnabled()) {
+			debugstr=new stringbuffer();
+			dbgfile.debugPrint("connection",3,
+						debugstr->getString());
+			delete debugstr;
+		}
 
 		if (lastrowvalid) {
 			lastrow++;

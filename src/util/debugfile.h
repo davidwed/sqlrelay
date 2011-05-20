@@ -16,6 +16,7 @@ class debugfile {
 		void	closeDebugFile();
 		void	enable();
 		void	disable();
+		bool	debugEnabled();
 		void	debugPrint(const char *name, int32_t tabs,
 							const char *string);
 		void	debugPrint(const char *name, int32_t tabs,

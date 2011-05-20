@@ -83,6 +83,11 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			dbgfile.debugPrint("connection",4,"INTEGER");
 		} else if (bv->type==DOUBLE_BIND) {
 			dbgfile.debugPrint("connection",4,"DOUBLE");
+			// these don't typically get set, but they get used
+			// when building debug strings, so we need to
+			// initialize them
+			bv->value.doubleval.precision=0;
+			bv->value.doubleval.scale=0;
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			if (!getBindSize(bv,maxlobbindvaluelength)) {
 				return false;
