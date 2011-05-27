@@ -12,6 +12,12 @@
 extern "C" {
 #endif
 
+static sqlrconnection *getSqlrConnection(JNIEnv *env, jobject self) {
+	return (sqlrconnection *)env->GetLongField(self,
+				env->GetFieldID(env->GetObjectClass(self),
+				"connection","J"));
+}
+
 static char *conGetStringUTFChars(JNIEnv *env, jstring string, jboolean *modifier) {
 	if (string) {
 		return (char *)env->GetStringUTFChars(string,modifier);
@@ -63,10 +69,7 @@ JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc(JNIEnv
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_delete
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	delete con;
+	delete getSqlrConnection(env,self);
 }
 
 /*
@@ -76,10 +79,8 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_delete
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setTimeout
   (JNIEnv *env, jobject self, jint timeoutsec, jint timeoutusec) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	con->setTimeout((int32_t)timeoutsec,(int32_t)timeoutusec);
+	getSqlrConnection(env,self)->
+		setTimeout((int32_t)timeoutsec,(int32_t)timeoutusec);
 }
 
 /*
@@ -89,10 +90,7 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setTimeout
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_endSession
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	con->endSession();
+	getSqlrConnection(env,self)->endSession();
 }
 
 /*
@@ -102,10 +100,7 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_endSession
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_suspendSession
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return (jboolean)con->suspendSession();
+	return (jboolean)getSqlrConnection(env,self)->suspendSession();
 }
 
 /*
@@ -115,10 +110,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_suspendSe
  */
 JNIEXPORT jshort JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnectionPort
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return (jshort)con->getConnectionPort();
+	return (jshort)getSqlrConnection(env,self)->getConnectionPort();
 }
 
 /*
@@ -128,10 +120,8 @@ JNIEXPORT jshort JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnecti
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnectionSocket
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return env->NewStringUTF(con->getConnectionSocket());
+	return env->NewStringUTF(
+			getSqlrConnection(env,self)->getConnectionSocket());
 }
 
 /*
@@ -141,11 +131,9 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnect
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_resumeSession
   (JNIEnv *env, jobject self, jshort port, jstring socket) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
 	char	*socketstring=conGetStringUTFChars(env,socket,0);
-	bool	retval=con->resumeSession((uint16_t)port,socketstring);
+	bool	retval=getSqlrConnection(env,self)->
+				resumeSession((uint16_t)port,socketstring);
 	conReleaseStringUTFChars(env,socket,socketstring);
 	return (jboolean)retval;
 }
@@ -157,10 +145,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_resumeSes
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_ping
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return (jboolean)cur->ping();
+	return (jboolean)getSqlrConnection(env,self)->ping();
 }
 
 /*
@@ -170,10 +155,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_ping
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_autoCommitOn
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return (jboolean)cur->autoCommitOn();
+	return (jboolean)getSqlrConnection(env,self)->autoCommitOn();
 }
 
 /*
@@ -183,10 +165,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_autoCommi
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_autoCommitOff
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return (jboolean)cur->autoCommitOff();
+	return (jboolean)getSqlrConnection(env,self)->autoCommitOff();
 }
 
 /*
@@ -196,10 +175,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_autoCommi
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_commit
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return (jboolean)cur->commit();
+	return (jboolean)getSqlrConnection(env,self)->commit();
 }
 
 /*
@@ -209,10 +185,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_commit
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_rollback
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return (jboolean)cur->rollback();
+	return (jboolean)getSqlrConnection(env,self)->rollback();
 }
 
 /*
@@ -222,10 +195,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_rollback
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_identify
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return env->NewStringUTF(cur->identify());
+	return env->NewStringUTF(getSqlrConnection(env,self)->identify());
 }
 
 /*
@@ -235,10 +205,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_identify
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbVersion
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return env->NewStringUTF(cur->dbVersion());
+	return env->NewStringUTF(getSqlrConnection(env,self)->dbVersion());
 }
 
 /*
@@ -248,10 +215,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbVersion
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_serverVersion
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return env->NewStringUTF(cur->serverVersion());
+	return env->NewStringUTF(getSqlrConnection(env,self)->serverVersion());
 }
 
 /*
@@ -261,10 +225,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_serverVers
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_clientVersion
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return env->NewStringUTF(cur->clientVersion());
+	return env->NewStringUTF(getSqlrConnection(env,self)->clientVersion());
 }
 
 /*
@@ -274,10 +235,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_clientVers
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_bindFormat
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection	*cur=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return env->NewStringUTF(cur->bindFormat());
+	return env->NewStringUTF(getSqlrConnection(env,self)->bindFormat());
 }
 
 /*
@@ -287,10 +245,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_bindFormat
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_debugOn
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	con->debugOn();
+	getSqlrConnection(env,self)->debugOn();
 }
 
 /*
@@ -300,10 +255,7 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_debugOn
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_debugOff
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	con->debugOff();
+	getSqlrConnection(env,self)->debugOff();
 }
 
 /*
@@ -313,10 +265,7 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_debugOff
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getDebug
   (JNIEnv *env, jobject self) {
-	jclass		cls=env->GetObjectClass(self);
-	sqlrconnection 	*con=(sqlrconnection *)env->GetIntField(self,
-				env->GetFieldID(cls,"connection","J"));
-	return (jboolean)con->getDebug();
+	return (jboolean)getSqlrConnection(env,self)->getDebug();
 }
 
 #ifdef __cplusplus

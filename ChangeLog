@@ -44,6 +44,9 @@
 	precision/scale in output bind buffers is initialized now
 	debugstring buffers are no longer build when debug is turned off
 	fixed id vs. index bug when requesting a cursor
+	refactored JNI code a bit, fixed getIntField/getLongField problem that
+		caused problems on 64-bit machines
+		
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

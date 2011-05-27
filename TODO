@@ -1,4 +1,4 @@
-libtool causing problems on netbsd, freebsd, ubuntu
+valgrind errors running oracle tests
 
 python tests failing - int/decimal type problems
 
@@ -158,13 +158,9 @@ Bugs:
 		may be returned converted to UTF-8.  How do we get the data out
 		in the same encoding that it's in the DB in?
 		http://www.ibm.com/developerworks/data/library/techarticle/dm-0506chong/index.html
-	* java api crashes on 64 bit because GetIntField needs to be
-		GetLongField on that platform
 	* Cameron/Kyler Laird reported issues when the column count is the
 		same as the optimistic column count
-		closeConnection is crashing trying to delete those sockets
 	* allowing query timeout appears to hang the sqlrelay server
-		need to add timeout option to sqlrsh
 	* PHP pear db only returns 100 rows with this code:
 		$query = "SELECT id, name FROM ct_contest ORDER BY name ASC;";
         		$db->setFetchMode(DB_FETCHMODE_ASSOC);
@@ -329,7 +325,7 @@ Performance/Code Enhancements:
 	* use bandwidth delay product to set tcp send/receive buffer sizes
 
 Features:
-	* realine support yes/no in configure output
+	* need to add timeout option to sqlrsh
 	* add functionality of query, fields, sqltodbf to sqlrsh, replace them
 	* add xml output api and functionality to sqlrsh
 	* support old oracle long datatype like a lob
@@ -363,12 +359,14 @@ Features:
 	* make fetch buffer size configurable from a client call
 	* add "quoting method" call to api, call mysql native function,
 		(mysql_escape_string()/mysql_real_escape_string())
-	* not sure about other db's
 	* sqlite binds, sqlite utf-8/utf-16 functions
 	* pythondb output bind variables?
 	* zope bind variables?
 	* 2-phase commit, use it in query router
-	* use PAM if possible as alternative to defining users in sqlrelay.conf
+	* authentication options
+		* use PAM if possible as alternative to
+			defining users in sqlrelay.conf
+		* kerberos/gssapi authentication
 	* support stored procedures that return result sets in interbase, db2
 	* could debug logs be logrotate compatible?
 	* sybase/freetds (possibly others) need options for setting chained
@@ -385,9 +383,7 @@ Features:
 	* front end replication
 	* quotas
 	* logging
-	* handle commit/rollback for named transactions
-	* implement API's that handle errors with exceptions
-	* better transaction handling for postgresql
+	* handle commit/rollback for named transactions (posgresql, others?)
 	* odbc connection should check the odbc definition
 		for connect string arguments - SQLBrowseConnect
 	* solaris init script
@@ -402,7 +398,6 @@ Features:
 	* date object binds
 	* DML/DDL caching - if db is down, accept queries and run them when the
 		db comes back up
-	* kerberos/gssapi authentication
 	* sqlite supports virtual tables implemented via modules
 		create module for each DB type using database connection classes
 		use this and :memory: filename to achieve cross-db joins

@@ -56,6 +56,16 @@ static PyObject *sqlrcon_free(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", 0);
 }
 
+static PyObject *setTimeout(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  int32_t timeoutsec;
+  int32_t timeoutusec;
+  if (!PyArg_ParseTuple(args, "lii", &sqlrcon, &timeoutsec, &timeoutusec))
+    return NULL;
+  ((sqlrconnection *)sqlrcon)->setTimeout(timeoutsec,timeoutusec);
+  return Py_BuildValue("h", 0);
+}
+
 static PyObject *endSession(PyObject *self, PyObject *args) {
   long sqlrcon;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
@@ -1550,6 +1560,7 @@ static PyObject *attachToBindCursor(PyObject *self, PyObject *args) {
 static PyMethodDef SQLRMethods[] = {
   {"sqlrcon_alloc",  sqlrcon_alloc, METH_VARARGS},
   {"sqlrcon_free", sqlrcon_free, METH_VARARGS},
+  {"setTimeout", setTimeout, METH_VARARGS},
   {"endSession", endSession, METH_VARARGS},
   {"suspendSession", suspendSession, METH_VARARGS},
   {"getConnectionPort", getConnectionPort, METH_VARARGS},
