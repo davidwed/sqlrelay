@@ -1140,21 +1140,27 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
   my_dictionary=PyDict_New();
   for (counter=0; counter<((sqlrcursor *)sqlrcur)->colCount(); counter++) {
     Py_BEGIN_ALLOW_THREADS
-    field=((sqlrcursor *)sqlrcur)->getField(row,counter);
+    field=((sqlrcursor *)sqlrcur)->getField(row, counter);
     Py_END_ALLOW_THREADS
     name=((sqlrcursor *)sqlrcur)->getColumnName(counter);
     if (isNumberTypeChar(((sqlrcursor *)sqlrcur)->getColumnType(counter))) {
-      if (!charstring::contains(field,'.')) {
-        PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("L",charstring::toInteger(field)));
+      if (!charstring::contains(field, '.')) {
+        PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("L", charstring::toInteger(field)));
       } else {
-        PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("f",atof(field)));
+        if (decimal) {
+          PyObject *tuple=PyTuple_New(1);
+          PyTuple_SetItem(tuple, 0, Py_BuildValue("s", field));
+          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), PyObject_CallObject(decimal, tuple));
+        } else {
+          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",atof(field)));
+        }
       }
     } else {
       if (field) {
-        PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("s#",field,((sqlrcursor *)sqlrcur)->getFieldLength(row,counter)));
+        PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("s#", field, ((sqlrcursor *)sqlrcur)->getFieldLength(row, counter)));
       } else {
         Py_INCREF(Py_None);
-        PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_None);
+        PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_None);
       }
     }
   }
