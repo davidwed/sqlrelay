@@ -422,16 +422,13 @@ static bool isFloatTypeChar(const char *type) {
 #endif
 
 #ifdef NEED_BIT_STRING_TO_LONG
-static long bitStringToLong(const char *str) {
-  long result = 0;
-  int length = charstring::length(str) - 1;
-  int i = length;
-  while (i >= 0) { 
-    if (str[i] == '1')
-      result += 1 << (length - i);
-    i--;
-  }
-  return result;
+static int32_t bitStringToLong(const char *str) {
+	uint32_t	result=0;
+	size_t		length=charstring::length(str);
+	for (size_t i=0; i<length; i++) {
+		result=(result<<1)|(str[i]=='1');
+	}
+	return result;
 }
 #endif
 

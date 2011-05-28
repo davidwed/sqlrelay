@@ -7,6 +7,7 @@
 
 #include <Python.h>
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/character.h>
 
 #if PY_MAJOR_VERSION >= 2
 #if PY_MINOR_VERSION >= 3
@@ -965,25 +966,17 @@ static PyObject *getField(PyObject *self, PyObject *args) {
       PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", rc, rl));
       return PyObject_CallObject(decimal, tuple);
     } else {
-      if (!charstring::contains(rc,'.')) {
-	return Py_BuildValue("L",charstring::toInteger(rc));
-      } else {
-	return Py_BuildValue("f",atof(rc));
-      }
+      return Py_BuildValue("f",(double)charstring::toFloat(rc));
     }
   } else if (isNumberTypeChar(type)) {
-    if (!charstring::contains(rc,'.')) {
-      return Py_BuildValue("L",charstring::toInteger(rc));
-    } else {
-      return Py_BuildValue("f",atof(rc));
-    }
+    return Py_BuildValue("L",charstring::toInteger(rc));
   } else if (isBitTypeChar(type)) {
-    return Py_BuildValue("L",bitStringToLong(rc));
+    return Py_BuildValue("l",bitStringToLong(rc));
   } else if (isBoolTypeChar(type)) {
-    if (rc && tolower(rc[0]) == 't') {
+    if (rc && character::toLowerCase(rc[0]) == 't') {
       Py_INCREF(Py_True);
       return Py_True;
-    } else if (rc && tolower(rc[0]) == 'f') {
+    } else if (rc && character::toLowerCase(rc[0]) == 'f') {
       Py_INCREF(Py_False);
       return Py_False;
     } else {
@@ -1072,6 +1065,7 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
   uint32_t counter;
   const char * const *row_data;
   uint32_t *row_lengths;
+  const char *type;
   PyObject *my_list;
   num_cols=sqlrcur->colCount();
   my_list =  PyList_New(num_cols);
@@ -1084,23 +1078,35 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
     return Py_None;
   }
   for (counter = 0; counter < num_cols; ++counter) {
+    type=sqlrcur->getColumnType(counter);
     if (!row_data[counter]) {
         Py_INCREF(Py_None);
         PyList_SetItem(my_list, counter, Py_None);
-    } else if (isNumberTypeChar(sqlrcur->getColumnType(counter))) {
+    } else if (isFloatTypeChar(type)) {
       PyObject *obj;
       if (decimal) {
         PyObject *tuple=PyTuple_New(1);
         PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", row_data[counter], row_lengths[counter]));
         obj=PyObject_CallObject(decimal, tuple);
       } else {
-        if (!charstring::contains(row_data[counter], '.')) {
-          obj=Py_BuildValue("L", charstring::toInteger(row_data[counter]));
-        } else {
-          obj=Py_BuildValue("f", atof(row_data[counter]));
-        }
+        obj=Py_BuildValue("f", (double)charstring::toFloat(row_data[counter]));
       }
       PyList_SetItem(my_list, counter, obj);
+    } else if (isNumberTypeChar(type)) {
+      PyList_SetItem(my_list, counter, Py_BuildValue("L", charstring::toInteger(row_data[counter])));
+    } else if (isBitTypeChar(type)) {
+      PyList_SetItem(my_list, counter, Py_BuildValue("l", bitStringToLong(row_data[counter])));
+    } else if (isBoolTypeChar(type)) {
+      if (row_data[counter] && character::toLowerCase(row_data[counter][0]) == 't') {
+        Py_INCREF(Py_True);
+        PyList_SetItem(my_list, counter, Py_True);
+      } else if (row_data[counter] && character::toLowerCase(row_data[counter][0]) == 'f') {
+        Py_INCREF(Py_False);
+        PyList_SetItem(my_list, counter, Py_False);
+      } else {
+        Py_INCREF(Py_None);
+        PyList_SetItem(my_list, counter, Py_None);
+      }
     } else {
       PyList_SetItem(my_list, counter, Py_BuildValue("s#", row_data[counter], row_lengths[counter]));
     }
@@ -1129,6 +1135,7 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
   uint32_t counter;
   const char *field;
   const char *name;
+  const char *type;
   if (!PyArg_ParseTuple(args,
 #ifdef SUPPORTS_UNSIGNED
 	"lK",
@@ -1143,17 +1150,29 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     field=((sqlrcursor *)sqlrcur)->getField(row, counter);
     Py_END_ALLOW_THREADS
     name=((sqlrcursor *)sqlrcur)->getColumnName(counter);
-    if (isNumberTypeChar(((sqlrcursor *)sqlrcur)->getColumnType(counter))) {
-      if (!charstring::contains(field, '.')) {
-        PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("L", charstring::toInteger(field)));
-      } else {
+    type=((sqlrcursor *)sqlrcur)->getColumnType(counter);
+    if (isFloatTypeChar(type)) {
         if (decimal) {
           PyObject *tuple=PyTuple_New(1);
           PyTuple_SetItem(tuple, 0, Py_BuildValue("s", field));
           PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), PyObject_CallObject(decimal, tuple));
         } else {
-          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",atof(field)));
+          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",(double)charstring::toFloat(field)));
         }
+    } else if (isNumberTypeChar(type)) {
+      PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("L", charstring::toInteger(field)));
+    } else if (isBitTypeChar(type)) {
+      PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("l", bitStringToLong(field)));
+    } else if (isBoolTypeChar(type)) {
+      if (field && character::toLowerCase(field[0]) == 't') {
+        Py_INCREF(Py_True);
+        PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_True);
+      } else if (field && character::toLowerCase(field[0]) == 'f') {
+        Py_INCREF(Py_False);
+        PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_False);
+      } else {
+        Py_INCREF(Py_None);
+        PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_None);
       }
     } else {
       if (field) {
