@@ -1,6 +1,11 @@
-valgrind errors running oracle tests
+running postgresql.py test 8 times causes something to hang, might be the db itself
 
-python tests failing - int/decimal type problems
+connections can get hung if test scripts fail
+ - really only seems to happen for sqlite
+
+update python tests to handle python patches (postgresql updated)
+
+valgrind errors running oracle tests
 
 db2 - yes
 firebird - yes
@@ -11,7 +16,7 @@ sybase - yes
 freetds - yes
 oracle8 - on the second run through, the bind cursors don't return any data,
 	like the statement doesn't have the result set associated with it any
-	more the colums still are there, but not the results set itself
+	more, the columns still are there, but not the results set itself
 	connections get hung when running test over and over
 
 
@@ -170,7 +175,6 @@ Bugs:
                 		print "$line[name]\n";
         		}
         		$result->free();
-	* connection daemons have some issue with detaching (I think)
 	* just because sqlrelay is compiled against unixodbc which supports
 		odbc 3.0 api, individual drivers may not support the 3.0 api,
 		so sqlrelay needs to detect this or it needs to at least be
@@ -229,6 +233,7 @@ Bugs:
 	* Need to find a way to re-distribute connections.
 		If 2 db's go down and 2nd comes back up first, all log into 2nd
 		db and never log out and back into first
+		connection daemons could just re-log in on a random interval
 
 Tests:
 	* php pear db bind formats
@@ -330,8 +335,6 @@ Features:
 	* add xml output api and functionality to sqlrsh
 	* support old oracle long datatype like a lob
 	* convert dtd to xml schema
-	* update python api to create decimals in dictionary
-	* update python test to handle python patches
 	* get odbc driver working better
 	* get odbc driver working sufficiently to use with jdbc
 	* Perl DBI driver needs to convert bind vars from ?'s to

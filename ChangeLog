@@ -46,6 +46,8 @@
 	fixed id vs. index bug when requesting a cursor
 	refactored JNI code a bit, fixed getIntField/getLongField problem that
 		caused problems on 64-bit machines
+	applied patch to make python api return decimals and integers, not
+		just strings, updated getRowDictionary to do the same
 		
 
 0.41 - added configure test for ruby.h

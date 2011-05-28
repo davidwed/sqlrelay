@@ -393,30 +393,31 @@ static const char	*datatypestring[] = {
 
 #ifdef NEED_IS_BIT_TYPE_CHAR
 static bool isBitTypeChar(const char *type) {
-  return (!charstring::compare(type,"BIT") ||
-	  !charstring::compare(type,"VARBIT"));
+  return (!charstring::compareIgnoringCase(type,"BIT") ||
+	  !charstring::compareIgnoringCase(type,"VARBIT"));
 }
 #endif
 
 #ifdef NEED_IS_BOOL_TYPE_CHAR
 static bool isBoolTypeChar(const char *type) {
-  return !charstring::compare(type,"BOOL");
+  return !charstring::compareIgnoringCase(type,"BOOL");
 }
 #endif
 
 #ifdef NEED_IS_FLOAT_TYPE_CHAR
 static bool isFloatTypeChar(const char *type) {
-  return (!charstring::compare(type,"NUMERIC") ||
-	  !charstring::compare(type,"REAL") ||
-	  !charstring::compare(type,"FLOAT") ||
-	  !charstring::compare(type,"DOUBLE") ||
-	  !charstring::compare(type,"D_FLOAT") ||
-	  !charstring::compare(type,"DECIMAL") ||
-	  !charstring::compare(type,"MONEY") ||
-	  !charstring::compare(type,"SMALLMONEY") ||
-	  !charstring::compare(type,"DOUBLE PRECISION") ||
+  return (!charstring::compareIgnoringCase(type,"NUMERIC") ||
+	  !charstring::compareIgnoringCase(type,"REAL") ||
+	  !charstring::compareIgnoringCase(type,"FLOAT") ||
+	  !charstring::compareIgnoringCase(type,"DOUBLE") ||
+	  !charstring::compareIgnoringCase(type,"D_FLOAT") ||
+	  !charstring::compareIgnoringCase(type,"DECIMAL") ||
+	  !charstring::compareIgnoringCase(type,"MONEY") ||
+	  !charstring::compareIgnoringCase(type,"SMALLMONEY") ||
+	  !charstring::compareIgnoringCase(type,"DOUBLE PRECISION") ||
 	  !charstring::compareIgnoringCase(type,"FLOAT4") ||
-	  !charstring::compareIgnoringCase(type,"FLOAT8"));
+	  !charstring::compareIgnoringCase(type,"FLOAT8") ||
+	  !charstring::compareIgnoringCase(type,"_NUMERIC"));
 }
 #endif
 
@@ -436,30 +437,29 @@ static long bitStringToLong(const char *str) {
 
 #ifdef NEED_IS_NUMBER_TYPE_CHAR
 static bool isNumberTypeChar(const char *type) { 
-	return (!charstring::compare(type,"NUMBER") ||
-		!charstring::compare(type,"INT") ||
-		!charstring::compare(type,"SMALLINT") ||
-		!charstring::compare(type,"TINYINT") ||
-		!charstring::compare(type,"NUMERIC") ||
-		!charstring::compare(type,"REAL") ||
-		!charstring::compare(type,"FLOAT") ||
-		!charstring::compare(type,"USHORT") ||
-		!charstring::compare(type,"DOUBLE") ||
-		!charstring::compare(type,"UINT") ||
-		!charstring::compare(type,"LASTREAL") ||
-		!charstring::compare(type,"TINY") ||
-		!charstring::compare(type,"SHORT") ||
-		!charstring::compare(type,"LONGLONG") ||
-		!charstring::compare(type,"MEDIUMINT") ||
-		!charstring::compare(type,"YEAR") ||
-		!charstring::compare(type,"BIGINT") ||
-		!charstring::compare(type,"INTEGER") ||
-		!charstring::compare(type,"D_FLOAT") ||
-		!charstring::compare(type,"DECIMAL") ||
-		!charstring::compare(type,"INT64") ||
-		!charstring::compare(type,"MONEY") ||
-		!charstring::compare(type,"SMALLMONEY") ||
-		!charstring::compare(type,"DOUBLE PRECISION") ||
+	return (!charstring::compareIgnoringCase(type,"NUMBER") ||
+		!charstring::compareIgnoringCase(type,"INT") ||
+		!charstring::compareIgnoringCase(type,"SMALLINT") ||
+		!charstring::compareIgnoringCase(type,"TINYINT") ||
+		!charstring::compareIgnoringCase(type,"REAL") ||
+		!charstring::compareIgnoringCase(type,"FLOAT") ||
+		!charstring::compareIgnoringCase(type,"USHORT") ||
+		!charstring::compareIgnoringCase(type,"DOUBLE") ||
+		!charstring::compareIgnoringCase(type,"UINT") ||
+		!charstring::compareIgnoringCase(type,"LASTREAL") ||
+		!charstring::compareIgnoringCase(type,"TINY") ||
+		!charstring::compareIgnoringCase(type,"SHORT") ||
+		!charstring::compareIgnoringCase(type,"LONGLONG") ||
+		!charstring::compareIgnoringCase(type,"MEDIUMINT") ||
+		!charstring::compareIgnoringCase(type,"YEAR") ||
+		!charstring::compareIgnoringCase(type,"BIGINT") ||
+		!charstring::compareIgnoringCase(type,"INTEGER") ||
+		!charstring::compareIgnoringCase(type,"D_FLOAT") ||
+		!charstring::compareIgnoringCase(type,"DECIMAL") ||
+		!charstring::compareIgnoringCase(type,"INT64") ||
+		!charstring::compareIgnoringCase(type,"MONEY") ||
+		!charstring::compareIgnoringCase(type,"SMALLMONEY") ||
+		!charstring::compareIgnoringCase(type,"DOUBLE PRECISION") ||
 		!charstring::compareIgnoringCase(type,"INT8") ||
 		!charstring::compareIgnoringCase(type,"INT2") ||
 		!charstring::compareIgnoringCase(type,"INT4") ||
@@ -482,57 +482,56 @@ static bool isNumberTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"_FLOAT8") ||
 		!charstring::compareIgnoringCase(type,"_TINTERVAL") ||
 		!charstring::compareIgnoringCase(type,"INTERVAL") ||
-		!charstring::compareIgnoringCase(type,"_INTERVAL") ||
-		!charstring::compareIgnoringCase(type,"_NUMERIC"));
+		!charstring::compareIgnoringCase(type,"_INTERVAL"));
 }
 #endif
 
 #ifdef NEED_IS_BLOB_TYPE_CHAR
 static bool isBlobTypeChar(const char *type) { 
-	return (!charstring::compare(type,"IMAGE") ||
-		!charstring::compare(type,"BINARY") ||
-		!charstring::compare(type,"VARBINARY") ||
-		!charstring::compare(type,"LONGCHAR") ||
-		!charstring::compare(type,"LONGBINARY") ||
-		!charstring::compare(type,"LONG") ||
-		!charstring::compare(type,"TINYBLOB") ||
-		!charstring::compare(type,"MEDIUMBLOB") ||
-		!charstring::compare(type,"LONGBLOB") ||
-		!charstring::compare(type,"BLOB") ||
-		!charstring::compare(type,"RAW") ||
-		!charstring::compare(type,"LONG_RAW") ||
-		!charstring::compare(type,"CLOB") ||
-		!charstring::compare(type,"BFILE") ||
-		!charstring::compare(type,"DBCLOB"));
+	return (!charstring::compareIgnoringCase(type,"IMAGE") ||
+		!charstring::compareIgnoringCase(type,"BINARY") ||
+		!charstring::compareIgnoringCase(type,"VARBINARY") ||
+		!charstring::compareIgnoringCase(type,"LONGCHAR") ||
+		!charstring::compareIgnoringCase(type,"LONGBINARY") ||
+		!charstring::compareIgnoringCase(type,"LONG") ||
+		!charstring::compareIgnoringCase(type,"TINYBLOB") ||
+		!charstring::compareIgnoringCase(type,"MEDIUMBLOB") ||
+		!charstring::compareIgnoringCase(type,"LONGBLOB") ||
+		!charstring::compareIgnoringCase(type,"BLOB") ||
+		!charstring::compareIgnoringCase(type,"RAW") ||
+		!charstring::compareIgnoringCase(type,"LONG_RAW") ||
+		!charstring::compareIgnoringCase(type,"CLOB") ||
+		!charstring::compareIgnoringCase(type,"BFILE") ||
+		!charstring::compareIgnoringCase(type,"DBCLOB"));
 }
 #endif
 
 #ifdef NEED_IS_UNSIGNED_TYPE_CHAR
 static bool isUnsignedTypeChar(const char *type) { 
-	return (!charstring::compare(type,"USHORT") ||
-		!charstring::compare(type,"UINT"));
+	return (!charstring::compareIgnoringCase(type,"USHORT") ||
+		!charstring::compareIgnoringCase(type,"UINT"));
 }
 #endif
 
 #ifdef NEED_IS_BINARY_TYPE_CHAR
 static bool isBinaryTypeChar(const char *type) { 
-	return (!charstring::compare(type,"IMAGE") ||
-		!charstring::compare(type,"BINARY") ||
-		!charstring::compare(type,"VARBINARY") ||
-		!charstring::compare(type,"LONGBINARY") ||
-		!charstring::compare(type,"TINYBLOB") ||
-		!charstring::compare(type,"MEDIUMBLOB") ||
-		!charstring::compare(type,"LONGBLOB") ||
-		!charstring::compare(type,"BLOB") ||
-		!charstring::compare(type,"BFILE") ||
-		!charstring::compare(type,"LONGVARBINARY") ||
-		!charstring::compare(type,"GRAPHIC") ||
-		!charstring::compare(type,"VARGRAPHIC") ||
-		!charstring::compare(type,"LONGVARGRAPHIC") ||
-		!charstring::compare(type,"OID") ||
-		!charstring::compare(type,"_OID") ||
-		!charstring::compare(type,"OIDVECTOR") ||
-		!charstring::compare(type,"_BYTEA"));
+	return (!charstring::compareIgnoringCase(type,"IMAGE") ||
+		!charstring::compareIgnoringCase(type,"BINARY") ||
+		!charstring::compareIgnoringCase(type,"VARBINARY") ||
+		!charstring::compareIgnoringCase(type,"LONGBINARY") ||
+		!charstring::compareIgnoringCase(type,"TINYBLOB") ||
+		!charstring::compareIgnoringCase(type,"MEDIUMBLOB") ||
+		!charstring::compareIgnoringCase(type,"LONGBLOB") ||
+		!charstring::compareIgnoringCase(type,"BLOB") ||
+		!charstring::compareIgnoringCase(type,"BFILE") ||
+		!charstring::compareIgnoringCase(type,"LONGVARBINARY") ||
+		!charstring::compareIgnoringCase(type,"GRAPHIC") ||
+		!charstring::compareIgnoringCase(type,"VARGRAPHIC") ||
+		!charstring::compareIgnoringCase(type,"LONGVARGRAPHIC") ||
+		!charstring::compareIgnoringCase(type,"OID") ||
+		!charstring::compareIgnoringCase(type,"_OID") ||
+		!charstring::compareIgnoringCase(type,"OIDVECTOR") ||
+		!charstring::compareIgnoringCase(type,"_BYTEA"));
 }
 #endif
 
@@ -540,7 +539,7 @@ static bool isBinaryTypeChar(const char *type) {
 static bool isNumberTypeInt(int32_t type) {
 	return (type==NUMBER_DATATYPE || type==INT_DATATYPE ||
 		type==SMALLINT_DATATYPE || type==TINYINT_DATATYPE ||
-		type==NUMERIC_DATATYPE || type==BIT_DATATYPE ||
+		type==BIT_DATATYPE ||
 		type==REAL_DATATYPE || type==FLOAT_DATATYPE ||
 		type==USHORT_DATATYPE || type==DOUBLE_DATATYPE ||
 		type==UINT_DATATYPE || type==LASTREAL_DATATYPE ||
@@ -561,8 +560,7 @@ static bool isNumberTypeInt(int32_t type) {
 		type==_XID_DATATYPE || type==_CID_DATATYPE ||
 		type==_INT8_DATATYPE || type==_FLOAT4_DATATYPE ||
 		type==_FLOAT8_DATATYPE || type==_TINTERVAL_DATATYPE ||
-		type==INTERVAL_DATATYPE || type==_INTERVAL_DATATYPE ||
-		type==_NUMERIC_DATATYPE);
+		type==INTERVAL_DATATYPE || type==_INTERVAL_DATATYPE);
 }
 #endif
 
