@@ -626,6 +626,7 @@ def main():
 	checkSuccess(cur.endOfResultSet(),1)
 	checkSuccess(cur.rowCount(),8)
 	print
+	sys.exit(0)
 
 	print "DONT GET COLUMN INFO: "
 	cur.dontGetColumnInfo()
