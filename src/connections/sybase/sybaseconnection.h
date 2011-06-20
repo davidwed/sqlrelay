@@ -77,7 +77,8 @@ class sybasecursor : public sqlrcursor_svr {
 		void		discardResults();
 		void		discardCursor();
 
-		const char	*cursorname;
+		char		*cursorname;
+		size_t		cursornamelength;
 
 		void		checkRePrepare();
 
