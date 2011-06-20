@@ -17,4 +17,5 @@ clean:
 	$(MAKE) -C perl clean
 	$(MAKE) -C python clean
 	$(MAKE) -C ruby clean
+	$(MAKE) -C tcl clean
 	$(MAKE) -C dropin clean

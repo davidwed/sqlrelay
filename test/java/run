@@ -1,0 +1,6 @@
+#!/bin/sh
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/firstworks/java/com/firstworks/sqlrelay
+export CLASSPATH=$CLASSPATH:/usr/local/firstworks/java/sqlrelay.jar
+
+java $1

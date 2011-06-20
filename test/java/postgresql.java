@@ -12,10 +12,10 @@ class postgresql7 {
 	
 		if (success==null) {
 			if (value==null) {
-				System.out.println("success ");
+				System.out.print("success ");
 				return;
 			} else {
-				System.out.println("failure ");
+				System.out.print("failure ");
 				
 				
 				System.exit(0);
@@ -23,9 +23,9 @@ class postgresql7 {
 		}
 	
 		if (value.equals(success)) {
-			System.out.println("success ");
+			System.out.print("success ");
 		} else {
-			System.out.println("failure ");
+			System.out.print("failure ");
 			
 			
 			System.exit(0);
@@ -35,9 +35,9 @@ class postgresql7 {
 	private static void checkSuccess(long value, int success) {
 	
 		if (value==success) {
-			System.out.println("success ");
+			System.out.print("success ");
 		} else {
-			System.out.println("failure ");
+			System.out.print("failure ");
 			
 			
 			System.exit(0);
@@ -47,9 +47,9 @@ class postgresql7 {
 	private static void checkSuccess(boolean value, int success) {
 	
 		if (((value)?1:0)==success) {
-			System.out.println("success ");
+			System.out.print("success ");
 		} else {
-			System.out.println("failure ");
+			System.out.print("failure ");
 			
 			
 			System.exit(0);

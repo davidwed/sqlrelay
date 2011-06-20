@@ -16,10 +16,10 @@ class sybase {
 	
 		if (success==null) {
 			if (value==null) {
-				System.out.println("success ");
+				System.out.print("success ");
 				return;
 			} else {
-				System.out.println("failure ");
+				System.out.print("failure ");
 				
 				
 				System.exit(0);
@@ -27,9 +27,9 @@ class sybase {
 		}
 	
 		if (value.equals(success)) {
-			System.out.println("success ");
+			System.out.print("success ");
 		} else {
-			System.out.println("failure ");
+			System.out.print("failure ");
 			
 			
 			System.exit(0);
@@ -39,9 +39,9 @@ class sybase {
 	private static void checkSuccess(long value, int success) {
 	
 		if (value==success) {
-			System.out.println("success ");
+			System.out.print("success ");
 		} else {
-			System.out.println("failure ");
+			System.out.print("failure ");
 			
 			
 			System.exit(0);
@@ -51,9 +51,9 @@ class sybase {
 	private static void checkSuccess(boolean value, int success) {
 	
 		if (((value)?1:0)==success) {
-			System.out.println("success ");
+			System.out.print("success ");
 		} else {
-			System.out.println("failure ");
+			System.out.print("failure ");
 			
 			
 			System.exit(0);

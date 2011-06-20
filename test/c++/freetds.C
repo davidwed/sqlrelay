@@ -106,11 +106,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->affectedRows(),1);
 	printf("\n");
 
-	checkSuccess(cur->sendQuery("insert into testtable values (2,2,2,2.2,2.2,2.2,2.2,2.00,2.00,'01-Jan-2002 02:00:00','01-Jan-2002 02:00:00','testchar2','testvarchar2',1)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (3,3,3,3.3,3.3,3.3,3.3,3.00,3.00,'01-Jan-2003 03:00:00','01-Jan-2003 03:00:00','testchar3','testvarchar3',1)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (4,4,4,4.4,4.4,4.4,4.4,4.00,4.00,'01-Jan-2004 04:00:00','01-Jan-2004 04:00:00','testchar4','testvarchar4',1)"),1);
-	/*printf("BIND BY POSITION: \n");
-	cur->prepareQuery("insert into testtable values (@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14)");
+	printf("BIND BY POSITION: \n");
+	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 	checkSuccess(cur->countBindVariables(),14);
 	cur->inputBind("1",2);
 	cur->inputBind("2",2);
@@ -159,13 +156,9 @@ int	main(int argc, char **argv) {
 	cur->inputBind("13","testvarchar4");
 	cur->inputBind("14",1);
 	checkSuccess(cur->executeQuery(),1);
-	printf("\n");*/
+	printf("\n");
 
-	checkSuccess(cur->sendQuery("insert into testtable values (5,5,5,5.5,5.5,5.5,5.5,5.00,5.00,'01-Jan-2005 05:00:00','01-Jan-2005 05:00:00','testchar5','testvarchar5',1)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (6,6,6,6.6,6.6,6.6,6.6,6.00,6.00,'01-Jan-2006 06:00:00','01-Jan-2006 06:00:00','testchar6','testvarchar6',1)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (7,7,7,7.7,7.7,7.7,7.7,7.00,7.00,'01-Jan-2007 07:00:00','01-Jan-2007 07:00:00','testchar7','testvarchar7',1)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (8,8,8,8.8,8.8,8.8,8.8,8.00,8.00,'01-Jan-2008 08:00:00','01-Jan-2008 08:00:00','testchar8','testvarchar8',1)"),1);
-	/*printf("BIND BY NAME: \n");
+	printf("BIND BY NAME: \n");
 	cur->clearBinds();
 	cur->prepareQuery("insert into testtable values (@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14)");
 	cur->inputBind("var1",5);
@@ -236,7 +229,6 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var15","junkvalue");
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
-	printf("\n");*/
 	printf("\n");
 
 	printf("SELECT: \n");
@@ -407,10 +399,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	checkSuccess(cur->getField(7,1),"8");
 	checkSuccess(cur->getField(7,2),"8");
-	checkSuccess(cur->getField(7,3),"8.8");
+	//checkSuccess(cur->getField(7,3),"8.8");
 	//checkSuccess(cur->getField(7,4),"8.8");
-	//checkSuccess(cur->getField(7,5),"8.8");
-	//checkSuccess(cur->getField(7,6),"8.8");
+	checkSuccess(cur->getField(7,5),"8.8");
+	checkSuccess(cur->getField(7,6),"8.8");
 	checkSuccess(cur->getField(7,7),"8.00");
 	checkSuccess(cur->getField(7,8),"8.00");
 	checkSuccess(cur->getField(7,9),"Jan  1 2008 08:00:00:000AM");
@@ -471,10 +463,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,"testint"),"8");
 	checkSuccess(cur->getField(7,"testsmallint"),"8");
 	checkSuccess(cur->getField(7,"testtinyint"),"8");
-	checkSuccess(cur->getField(7,"testreal"),"8.8");
+	//checkSuccess(cur->getField(7,"testreal"),"8.8");
 	//checkSuccess(cur->getField(7,"testfloat"),"8.8");
-	//checkSuccess(cur->getField(7,"testdecimal"),"8.8");
-	//checkSuccess(cur->getField(7,"testnumeric"),"8.8");
+	checkSuccess(cur->getField(7,"testdecimal"),"8.8");
+	checkSuccess(cur->getField(7,"testnumeric"),"8.8");
 	checkSuccess(cur->getField(7,"testmoney"),"8.00");
 	checkSuccess(cur->getField(7,"testsmallmoney"),"8.00");
 	checkSuccess(cur->getField(7,"testdatetime"),"Jan  1 2008 08:00:00:000AM");
@@ -878,10 +870,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	checkSuccess(cur->getField(7,1),"8");
 	checkSuccess(cur->getField(7,2),"8");
-	checkSuccess(cur->getField(7,3),"8.8");
+	//checkSuccess(cur->getField(7,3),"8.8");
 	//checkSuccess(cur->getField(7,4),"8.8");
-	//checkSuccess(cur->getField(7,5),"8.8");
-	//checkSuccess(cur->getField(7,6),"8.8");
+	checkSuccess(cur->getField(7,5),"8.8");
+	checkSuccess(cur->getField(7,6),"8.8");
 	checkSuccess(cur->getField(7,7),"8.00");
 	checkSuccess(cur->getField(7,8),"8.00");
 	checkSuccess(cur->getField(7,9),"Jan  1 2008 08:00:00:000AM");
