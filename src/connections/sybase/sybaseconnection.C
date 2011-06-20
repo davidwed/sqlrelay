@@ -372,6 +372,8 @@ bool sybasecursor::prepareQuery(const char *query, uint32_t length) {
 	if (cursorquery.match(query)) {
 
 		// initiate a cursor command
+		// (don't use CS_NULLTERM for the 4th parameter, it randomly
+		// causes weird things to happen)
 		cmd=cursorcmd;
 		if (ct_cursor(cursorcmd,CS_CURSOR_DECLARE,
 					(CS_CHAR *)cursorname,
