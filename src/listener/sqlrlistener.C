@@ -389,7 +389,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	//                 (in effect, waiting for a new connection to fire up)
 	//       connection signals after increasing connection count
 	//
-	// statistcis:
+	// statistics:
 	// 9 - coordinates access to statistics shared memory segment
 	//
 	// main listenter process/listener children:
