@@ -1,6 +1,6 @@
-update python tests to handle python patches (postgresql updated)
+verify that bind var docs are correct
 
-valgrind errors running oracle tests
+valgrind errors running oracle and sybase tests
 
 db2 - yes
 firebird - yes

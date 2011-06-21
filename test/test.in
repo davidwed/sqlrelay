@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if ( test -z "$1" -o -z "$2" )
+then
+	echo "usage: ./test DB API"
+	exit 1
+fi
+
 INITDIR=/etc/rc.d/init.d
 HTTPDINIT=$INITDIR/httpd
 PHPDIR=/var/www/html
@@ -13,75 +19,53 @@ API=$2
 
 if ( test "$DB" = "db2" )
 then
-	ARGS="localhost 8001 \"\" db2test db2test"
-	PHPARGS="host=localhost&port=8001&socket=&user=db2test&password=db2test"
 	sudo $INITDIR/db2 start
 	sudo su -l $DB2USER -c "sqlr-start -id db2test"
 fi
 if ( test "$DB" = "freetds" )
 then
-	ARGS="localhost 8002 \"\" freetdstest freetdstest"
-	PHPARGS="host=localhost&port=8002&socket=&user=freetdstest&password=freetdstest"
 	sudo $INITDIR/sybase start
 	sleep 5
 	sudo sqlr-start -id freetdstest
 fi
 if ( test "$DB" = "firebird" )
 then
-	ARGS="localhost 8003 \"\" firebirdtest firebirdtest"
-	PHPARGS="host=localhost&port=8003&socket=&user=firebirdtest&password=firebirdtest"
 	sudo $INITDIR/firebird start
 	sudo sqlr-start -id firebirdtest
 fi
 if ( test "$DB" = "mysql" )
 then
-	ARGS="localhost 8006 \"\" mysqltest mysqltest"
-	PHPARGS="host=localhost&port=8006&socket=&user=mysqltest&password=mysqltest"
 	sudo $INITDIR/mysqld start
 	sudo sqlr-start -id mysqltest
 fi
 if ( test "$DB" = "oracle" )
 then
-	ARGS="localhost 8009 \"\" oracletest oracletest"
-	PHPARGS="host=localhost&port=8009&socket=&user=oracletest&password=oracletest"
 	sudo $INITDIR/oracle start
 	sleep 5
 	sudo sqlr-start -id oracletest
 fi
 if ( test "$DB" = "postgresql" )
 then
-	ARGS="localhost 8010 \"\" postgresqltest postgresqltest"
-	PHPARGS="host=localhost&port=8010&socket=&user=postgresqltest&password=postgresqltest"
 	sudo $INITDIR/postgresql start
 	sudo sqlr-start -id postgresqltest
 fi
 if ( test "$DB" = "odbc" )
 then
-	ARGS="localhost 8013 \"\" odbctest odbctest"
-	PHPARGS="host=localhost&port=8013&socket=&user=odbctest&password=odbctest"
 	sudo $INITDIR/postgresql start
 	sudo sqlr-start -id odbctest
 fi
 if ( test "$DB" = "sqlite" )
 then
-	ARGS="localhost 8011 \"\" sqlitetest sqlitetest"
-	PHPARGS="host=localhost&port=8011&socket=&user=sqlitetest&password=sqlitetest"
 	sudo sqlr-start -id sqlitetest
 fi
 if ( test "$DB" = "sybase" )
 then
-	ARGS="localhost 8012 \"\" sybasetest sybasetest"
-	PHPARGS="localhost 8012 \"\" sybasetest sybasetest"
-	PHPARGS="host=localhost&port=8012&socket=&user=sybasetest&password=sybasetest"
 	sudo $INITDIR/sybase start
 	sleep 5
 	sudo sqlr-start -id sybasetest
 fi
 if ( test "$DB" = "router" )
 then
-	ARGS="localhost 9000 \"\" routertest routertest"
-	PHPARGS="localhost 9000 \"\" routertest routertest"
-	PHPARGS="host=localhost&port=9000&socket=&user=routertest&password=routertest"
 	sudo $INITDIR/mysqld start
 	sudo $INITDIR/oracle start
 	sleep 5
@@ -98,7 +82,7 @@ then
 	echo
 	echo "C:"
 	cd c
-	./$DB $ARGS
+	./$DB
 	rm -f cachefile* sqlnet.log
 	cd ..
 fi
@@ -108,7 +92,7 @@ then
 	echo
 	echo "C++:"
 	cd c++
-	./$DB $ARGS
+	./$DB
 	rm -f cachefile* sqlnet.log
 	cd ..
 fi
@@ -120,7 +104,7 @@ then
 		echo
 		echo "Java:"
 		cd java
-		java $DB $ARGS
+		java $DB
 		rm -f cachefile* sqlnet.log
 		cd ..
 	fi
@@ -133,7 +117,7 @@ then
 		echo
 		echo "Perl:"
 		cd perl
-		perl $DB.pl $ARGS
+		perl $DB.pl
 		rm -f cachefile* sqlnet.log
 		cd ..
 	fi
@@ -146,7 +130,7 @@ then
 		echo
 		echo "Python:"
 		cd python
-		python $DB.py $ARGS
+		python $DB.py
 		rm -f cachefile* sqlnet.log
 		cd ..
 	fi
@@ -159,7 +143,7 @@ then
 		echo
 		echo "Ruby:"
 		cd ruby
-		ruby $DB.rb $ARGS
+		ruby $DB.rb
 		rm -f cachefile* sqlnet.log
 		cd ..
 	fi
@@ -172,12 +156,7 @@ then
 		echo
 		echo "PHP:"
 		cd php
-		sudo $HTTPDINIT start
-		sleep 1
-		chmod 755 $DB.php
-		sudo cp $DB.php $PHPDIR
-		lynx -dump -source "http://localhost/$DB.php?$PHPARGS"
-		sudo $HTTPDINIT stop
+		php $DB.php
 		sudo rm -f /tmp/cachefile* sqlnet.log
 		cd ..
 	fi
@@ -190,12 +169,7 @@ then
 		echo
 		echo "PEAR:"
 		cd php
-		sudo $HTTPDINIT start
-		sleep 1
-		chmod 755 ${DB}peardb.php
-		sudo cp ${DB}peardb.php $PHPDIR
-		lynx -dump -source "http://localhost/${DB}peardb.php?$PHPARGS"
-		sudo $HTTPDINIT stop
+		php ${DB}peardb.php
 		sudo rm -f /tmp/cachefile* sqlnet.log
 		cd ..
 	fi
@@ -208,7 +182,7 @@ then
 		echo
 		echo "TCL:"
 		cd tcl
-		tclsh $DB.tcl $ARGS
+		tclsh $DB.tcl
 		rm -f cachefile* sqlnet.log
 		cd ..
 	fi

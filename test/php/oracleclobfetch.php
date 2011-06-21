@@ -7,18 +7,18 @@ set_time_limit(600);
 
 dl("sql_relay.so");
 
-function checkSuccess($value,$success) {
+	function checkSuccess($value,$success) {
 
-	if ($value==$success) {
-		echo("success ");
-	} else {
-		echo("failure ");
-		#printf("%s!=%s\n",$value,$success);
-		sqlrcur_free($cur);
-		sqlrcon_free($con);
-		exit(0);
+		if ($value==$success) {
+			echo("success ");
+		} else {
+			echo("$value != $success ");
+			echo("failure ");
+			sqlrcur_free($cur);
+			sqlrcon_free($con);
+			exit(0);
+		}
 	}
-}
 
 	$host="localhost";
 	$port=9000;

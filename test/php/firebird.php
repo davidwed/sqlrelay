@@ -4,17 +4,18 @@
 
 dl("sql_relay.so");
 
-function checkSuccess($value,$success) {
+	function checkSuccess($value,$success) {
 
-	if ($value==$success) {
-		echo("success ");
-	} else {
-		echo("failure ");
-		sqlrcur_free($cur);
-		sqlrcon_free($con);
-		exit(0);
+		if ($value==$success) {
+			echo("success ");
+		} else {
+			echo("$value != $success ");
+			echo("failure ");
+			sqlrcur_free($cur);
+			sqlrcon_free($con);
+			exit(0);
+		}
 	}
-}
 
 	$host="localhost";
 	$port=9000;
@@ -105,12 +106,25 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("STORED PROCEDURE: \n");
-	checkSuccess(sqlrcur_sendQuery($cur,"create procedure testproc(invar integer) returns (outvar integer) as begin outvar = invar; suspend; end"),1);
-	sqlrcur_prepareQuery($cur,"select * from testproc(?)");
-	sqlrcur_inputBind($cur,"1",5);
+	sqlrcur_prepareQuery($cur,"select * from testproc(?,?,?)");
+	sqlrcur_inputBind($cur,"1",1);
+	sqlrcur_inputBind($cur,"2",1.1,2,1);
+	sqlrcur_inputBind($cur,"3","hello");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
-	checkSuccess(sqlrcur_getField($cur,0,0),"5");
-	checkSuccess(sqlrcur_sendQuery($cur,"drop procedure testproc"),1);
+	checkSuccess(sqlrcur_getField($cur,0,0),"1");
+	checkSuccess(sqlrcur_getField($cur,0,1),"1.1000");
+	checkSuccess(sqlrcur_getField($cur,0,2),"hello");
+	sqlrcur_prepareQuery($cur,"execute procedure testproc ?, ?, ?");
+	sqlrcur_inputBind($cur,"1",1);
+	sqlrcur_inputBind($cur,"2",1.1,2,1);
+	sqlrcur_inputBind($cur,"3","hello");
+	sqlrcur_defineOutputBindInteger($cur,"1");
+	sqlrcur_defineOutputBindDouble($cur,"2");
+	sqlrcur_defineOutputBindString($cur,"3",20);
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	checkSuccess(sqlrcur_getOutputBindInteger($cur,"1"),1);
+	//checkSuccess(sqlrcur_getOutputBindDouble($cur,"2"),1.1);
+	checkSuccess(sqlrcur_getOutputBindString($cur,"3"),"hello               ");
 	echo("\n");
 
 	echo("SELECT: \n");

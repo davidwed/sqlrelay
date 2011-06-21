@@ -4,17 +4,18 @@
 
 dl("sql_relay.so");
 
-function checkSuccess($value,$success) {
+	function checkSuccess($value,$success) {
 
-	if ($value==$success) {
-		echo("success ");
-	} else {
-		echo("failure ");
-		sqlrcur_free($cur);
-		sqlrcon_free($con);
-		exit(0);
+		if ($value==$success) {
+			echo("success ");
+		} else {
+			echo("$value != $success ");
+			echo("failure ");
+			sqlrcur_free($cur);
+			sqlrcon_free($con);
+			exit(0);
+		}
 	}
-}
 
 	$host="localhost";
 	$port=9000;
@@ -58,32 +59,32 @@ function checkSuccess($value,$success) {
 	echo("\n");
 
 	echo("BIND BY NAME: \n");
-	sqlrcur_prepareQuery($cur,"insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8)");
+	sqlrcur_prepareQuery($cur,"insert into testtable values (\$1,\$2,\$3,\$4,\$5,\$6,\$7,\$8)");
 	checkSuccess(sqlrcur_countBindVariables($cur),8);
-	sqlrcur_inputBind($cur,"var1",5);
-	sqlrcur_inputBind($cur,"var2",5.5,4,2);
-	sqlrcur_inputBind($cur,"var3",5.5,4,2);
-	sqlrcur_inputBind($cur,"var4",5);
-	sqlrcur_inputBind($cur,"var5","testchar5");
-	sqlrcur_inputBind($cur,"var6","testvarchar5");
-	sqlrcur_inputBind($cur,"var7","01/01/2005");
-	sqlrcur_inputBind($cur,"var8","05:00:00");
+	sqlrcur_inputBind($cur,"1",5);
+	sqlrcur_inputBind($cur,"2",5.5,4,2);
+	sqlrcur_inputBind($cur,"3",5.5,4,2);
+	sqlrcur_inputBind($cur,"4",5);
+	sqlrcur_inputBind($cur,"5","testchar5");
+	sqlrcur_inputBind($cur,"6","testvarchar5");
+	sqlrcur_inputBind($cur,"7","01/01/2005");
+	sqlrcur_inputBind($cur,"8","05:00:00");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	sqlrcur_clearBinds($cur);
-	sqlrcur_inputBind($cur,"var1",6);
-	sqlrcur_inputBind($cur,"var2",6.6,4,2);
-	sqlrcur_inputBind($cur,"var3",6.6,4,2);
-	sqlrcur_inputBind($cur,"var4",6);
-	sqlrcur_inputBind($cur,"var5","testchar6");
-	sqlrcur_inputBind($cur,"var6","testvarchar6");
-	sqlrcur_inputBind($cur,"var7","01/01/2006");
-	sqlrcur_inputBind($cur,"var8","06:00:00");
+	sqlrcur_inputBind($cur,"1",6);
+	sqlrcur_inputBind($cur,"2",6.6,4,2);
+	sqlrcur_inputBind($cur,"3",6.6,4,2);
+	sqlrcur_inputBind($cur,"4",6);
+	sqlrcur_inputBind($cur,"5","testchar6");
+	sqlrcur_inputBind($cur,"6","testvarchar6");
+	sqlrcur_inputBind($cur,"7","01/01/2006");
+	sqlrcur_inputBind($cur,"8","06:00:00");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");
 
 	echo("ARRAY BIND BY NAME: \n");
 	sqlrcur_clearBinds($cur);
-	$bindvars=array("var1","var2","var3","var4","var5","var6","var7","var8");
+	$bindvars=array("1","2","3","4","5","6","7","8");
 	$bindvals=array(7,7.7,7.7,7,"testchar7","testvarchar7","01/01/2007","07:00:00");
 	$precs=array(0,2,2,0,0,0,0,0);
 	$scales=array(0,1,1,0,0,0,0,0);
@@ -93,15 +94,15 @@ function checkSuccess($value,$success) {
 
 	echo("BIND BY NAME WITH VALIDATION: \n");
 	sqlrcur_clearBinds($cur);
-	sqlrcur_inputBind($cur,"var1",8);
-	sqlrcur_inputBind($cur,"var2",8.8,4,2);
-	sqlrcur_inputBind($cur,"var3",8.8,4,2);
-	sqlrcur_inputBind($cur,"var4",8);
-	sqlrcur_inputBind($cur,"var5","testchar8");
-	sqlrcur_inputBind($cur,"var6","testvarchar8");
-	sqlrcur_inputBind($cur,"var7","01/01/2008");
-	sqlrcur_inputBind($cur,"var8","08:00:00");
-	sqlrcur_inputBind($cur,"var9","junkvalue");
+	sqlrcur_inputBind($cur,"1",8);
+	sqlrcur_inputBind($cur,"2",8.8,4,2);
+	sqlrcur_inputBind($cur,"3",8.8,4,2);
+	sqlrcur_inputBind($cur,"4",8);
+	sqlrcur_inputBind($cur,"5","testchar8");
+	sqlrcur_inputBind($cur,"6","testvarchar8");
+	sqlrcur_inputBind($cur,"7","01/01/2008");
+	sqlrcur_inputBind($cur,"8","08:00:00");
+	sqlrcur_inputBind($cur,"9","junkvalue");
 	sqlrcur_validateBinds($cur);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");
@@ -649,29 +650,29 @@ function checkSuccess($value,$success) {
 	#checkSuccess(sqlrcon_autoCommitOff($con),1);
 	echo("\n");
 
-	# drop existing table
-	sqlrcur_sendQuery($cur,"drop table testtable");
-
 	# stored procedures
 	echo("STORED PROCEDURES: \n");
 	sqlrcur_sendQuery($cur,"drop function testfunc(int)");
-	checkSuccess(sqlrcur_sendQuery($cur,"create function testfunc(int) returns int as ' begin return $1; end;' language plpgsql"),1);
-	sqlrcur_prepareQuery($cur,"select * from testfunc(:int)");
-	sqlrcur_inputBind($cur,"int",5);
+	checkSuccess(sqlrcur_sendQuery($cur,"create function testfunc(int) returns int as ' begin return \$1; end;' language plpgsql"),1);
+	sqlrcur_prepareQuery($cur,"select * from testfunc(\$1)");
+	sqlrcur_inputBind($cur,"1",5);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	checkSuccess(sqlrcur_getField($cur,0,0),"5");
 	sqlrcur_sendQuery($cur,"drop function testfunc(int)");
 
 	sqlrcur_sendQuery($cur,"drop function testfunc(int,char(20))");
 	checkSuccess(sqlrcur_sendQuery($cur,"create function testfunc(int, char(20)) returns record as ' declare output record; begin select $1,$2 into output; return output; end;' language plpgsql"),1);
-	sqlrcur_prepareQuery($cur,"select * from testfunc(:int,:char) as (col1 int, col2 bpchar)");
-	sqlrcur_inputBind($cur,"int",5);
-	sqlrcur_inputBind($cur,"char","hello");
+	sqlrcur_prepareQuery($cur,"select * from testfunc(\$1,\$2) as (col1 int, col2 bpchar)");
+	sqlrcur_inputBind($cur,"1",5);
+	sqlrcur_inputBind($cur,"2","hello");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	checkSuccess(sqlrcur_getField($cur,0,0),"5");
 	checkSuccess(sqlrcur_getField($cur,0,1),"hello");
 	sqlrcur_sendQuery($cur,"drop function testfunc(int,char(20))");
 	echo("\n");
+
+	# drop existing table
+	sqlrcur_sendQuery($cur,"drop table testtable");
 
 	# invalid queries...
 	echo("INVALID QUERIES: \n");

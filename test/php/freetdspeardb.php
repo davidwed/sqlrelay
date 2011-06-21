@@ -9,8 +9,8 @@ require_once 'DB.php';
 		if ($value==$success) {
 			echo("success ");
 		} else {
+			echo("$value != $success ");
 			echo("failure ");
-			print("$value!=$success\n");
 			$db->disconnect();
 			exit(0);
 		}

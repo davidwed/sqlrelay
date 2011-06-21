@@ -1,4 +1,0 @@
-#!/bin/sh
-
-sudo cp oraclepeardb.php /var/www/html
-lynx -dump -source "http://localhost/oraclepeardb.php?host=localhost&port=8009&socket=&user=oracle8test&password=oracle8test"

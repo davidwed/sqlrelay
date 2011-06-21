@@ -3,17 +3,19 @@
 # See the file COPYING for more information.
 
 dl("sql_relay.so");
-function checkSuccess($value,$success) {
 
-	if ($value==$success) {
-		echo("success ");
-	} else {
-		echo("failure ");
-		sqlrcur_free($cur);
-		sqlrcon_free($con);
-		exit(0);
+	function checkSuccess($value,$success) {
+
+		if ($value==$success) {
+			echo("success ");
+		} else {
+			echo("$value != $success ");
+			echo("failure ");
+			sqlrcur_free($cur);
+			sqlrcon_free($con);
+			exit(0);
+		}
 	}
-}
 
 	$host="localhost";
 	$port=9000;
@@ -28,6 +30,7 @@ function checkSuccess($value,$success) {
 	# get database type
 	echo("IDENTIFY: \n");
 	checkSuccess(sqlrcon_identify($con),"mysql");
+	echo("\n");
 
 	# ping
 	echo("PING: \n");
@@ -53,52 +56,52 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_affectedRows($cur),1);
 	echo("\n");
 
-	echo("BIND BY NAME: \n");
-	sqlrcur_prepareQuery($cur,"insert into testdb.testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8,:var9,:var10,:var11,:var12,:var13,:var14,:var15,:var16,:var17,:var18,NULL)");
+	echo("BIND BY POSITION: \n");
+	sqlrcur_prepareQuery($cur,"insert into testdb.testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)");
 	checkSuccess(sqlrcur_countBindVariables($cur),18);
-	sqlrcur_inputBind($cur,"var1",5);
-	sqlrcur_inputBind($cur,"var2",5);
-	sqlrcur_inputBind($cur,"var3",5);
-	sqlrcur_inputBind($cur,"var4",5);
-	sqlrcur_inputBind($cur,"var5",5);
-	sqlrcur_inputBind($cur,"var6",5.1,2,1);
-	sqlrcur_inputBind($cur,"var7",5.1,2,1);
-	sqlrcur_inputBind($cur,"var8",5.1,2,1);
-	sqlrcur_inputBind($cur,"var9","2005-01-01");
-	sqlrcur_inputBind($cur,"var10","05:00:00");
-	sqlrcur_inputBind($cur,"var11","2005-01-01 05:00:00");
-	sqlrcur_inputBind($cur,"var12","2005");
-	sqlrcur_inputBind($cur,"var13","char5");
-	sqlrcur_inputBind($cur,"var14","text5");
-	sqlrcur_inputBind($cur,"var15","varchar5");
-	sqlrcur_inputBind($cur,"var16","tinytext5");
-	sqlrcur_inputBind($cur,"var17","mediumtext5");
-	sqlrcur_inputBind($cur,"var18","longtext5");
+	sqlrcur_inputBind($cur,"1",5);
+	sqlrcur_inputBind($cur,"2",5);
+	sqlrcur_inputBind($cur,"3",5);
+	sqlrcur_inputBind($cur,"4",5);
+	sqlrcur_inputBind($cur,"5",5);
+	sqlrcur_inputBind($cur,"6",5.1,2,1);
+	sqlrcur_inputBind($cur,"7",5.1,2,1);
+	sqlrcur_inputBind($cur,"8",5.1,2,1);
+	sqlrcur_inputBind($cur,"9","2005-01-01");
+	sqlrcur_inputBind($cur,"10","05:00:00");
+	sqlrcur_inputBind($cur,"11","2005-01-01 05:00:00");
+	sqlrcur_inputBind($cur,"12","2005");
+	sqlrcur_inputBind($cur,"13","char5");
+	sqlrcur_inputBind($cur,"14","text5");
+	sqlrcur_inputBind($cur,"15","varchar5");
+	sqlrcur_inputBind($cur,"16","tinytext5");
+	sqlrcur_inputBind($cur,"17","mediumtext5");
+	sqlrcur_inputBind($cur,"18","longtext5");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	sqlrcur_clearBinds($cur);
-	sqlrcur_inputBind($cur,"var1",6);
-	sqlrcur_inputBind($cur,"var2",6);
-	sqlrcur_inputBind($cur,"var3",6);
-	sqlrcur_inputBind($cur,"var4",6);
-	sqlrcur_inputBind($cur,"var5",6);
-	sqlrcur_inputBind($cur,"var6",6.1,2,1);
-	sqlrcur_inputBind($cur,"var7",6.1,2,1);
-	sqlrcur_inputBind($cur,"var8",6.1,2,1);
-	sqlrcur_inputBind($cur,"var9","2006-01-01");
-	sqlrcur_inputBind($cur,"var10","06:00:00");
-	sqlrcur_inputBind($cur,"var11","2006-01-01 06:00:00");
-	sqlrcur_inputBind($cur,"var12","2006");
-	sqlrcur_inputBind($cur,"var13","char6");
-	sqlrcur_inputBind($cur,"var14","text6");
-	sqlrcur_inputBind($cur,"var15","varchar6");
-	sqlrcur_inputBind($cur,"var16","tinytext6");
-	sqlrcur_inputBind($cur,"var17","mediumtext6");
-	sqlrcur_inputBind($cur,"var18","longtext6");
+	sqlrcur_inputBind($cur,"1",6);
+	sqlrcur_inputBind($cur,"2",6);
+	sqlrcur_inputBind($cur,"3",6);
+	sqlrcur_inputBind($cur,"4",6);
+	sqlrcur_inputBind($cur,"5",6);
+	sqlrcur_inputBind($cur,"6",6.1,2,1);
+	sqlrcur_inputBind($cur,"7",6.1,2,1);
+	sqlrcur_inputBind($cur,"8",6.1,2,1);
+	sqlrcur_inputBind($cur,"9","2006-01-01");
+	sqlrcur_inputBind($cur,"10","06:00:00");
+	sqlrcur_inputBind($cur,"11","2006-01-01 06:00:00");
+	sqlrcur_inputBind($cur,"12","2006");
+	sqlrcur_inputBind($cur,"13","char6");
+	sqlrcur_inputBind($cur,"14","text6");
+	sqlrcur_inputBind($cur,"15","varchar6");
+	sqlrcur_inputBind($cur,"16","tinytext6");
+	sqlrcur_inputBind($cur,"17","mediumtext6");
+	sqlrcur_inputBind($cur,"18","longtext6");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 
-	echo("ARRAY BIND BY NAME: \n");
+	echo("ARRAY BIND BY POSITION: \n");
 	sqlrcur_clearBinds($cur);
-	$bindvars=array("var1","var2","var3","var4","var5","var6","var7","var8","var9","var10","var11","var12","var13","var14","var15","var16","var17","var18");
+	$bindvars=array("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18");
 	$bindvals=array(7,7,7,7,7,7.1,7.1,7.1,"2007-01-01","07:00:00","2007-01-01 07:00:00","2007","char7","text7","varchar7","tinytext7","mediumtext7","longtext7");
 	$precs=array(0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0);
 	$scales=array(0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0);
@@ -106,26 +109,26 @@ function checkSuccess($value,$success) {
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");
 
-	echo("BIND BY NAME WITH VALIDATION: \n");
+	echo("BIND BY POSITION WITH VALIDATION: \n");
 	sqlrcur_clearBinds($cur);
-	sqlrcur_inputBind($cur,"var1",8);
-	sqlrcur_inputBind($cur,"var2",8);
-	sqlrcur_inputBind($cur,"var3",8);
-	sqlrcur_inputBind($cur,"var4",8);
-	sqlrcur_inputBind($cur,"var5",8);
-	sqlrcur_inputBind($cur,"var6",8.1,2,1);
-	sqlrcur_inputBind($cur,"var7",8.1,2,1);
-	sqlrcur_inputBind($cur,"var8",8.1,2,1);
-	sqlrcur_inputBind($cur,"var9","2008-01-01");
-	sqlrcur_inputBind($cur,"var10","08:00:00");
-	sqlrcur_inputBind($cur,"var11","2008-01-01 08:00:00");
-	sqlrcur_inputBind($cur,"var12","2008");
-	sqlrcur_inputBind($cur,"var13","char8");
-	sqlrcur_inputBind($cur,"var14","text8");
-	sqlrcur_inputBind($cur,"var15","varchar8");
-	sqlrcur_inputBind($cur,"var16","tinytext8");
-	sqlrcur_inputBind($cur,"var17","mediumtext8");
-	sqlrcur_inputBind($cur,"var18","longtext8");
+	sqlrcur_inputBind($cur,"1",8);
+	sqlrcur_inputBind($cur,"2",8);
+	sqlrcur_inputBind($cur,"3",8);
+	sqlrcur_inputBind($cur,"4",8);
+	sqlrcur_inputBind($cur,"5",8);
+	sqlrcur_inputBind($cur,"6",8.1,2,1);
+	sqlrcur_inputBind($cur,"7",8.1,2,1);
+	sqlrcur_inputBind($cur,"8",8.1,2,1);
+	sqlrcur_inputBind($cur,"9","2008-01-01");
+	sqlrcur_inputBind($cur,"10","08:00:00");
+	sqlrcur_inputBind($cur,"11","2008-01-01 08:00:00");
+	sqlrcur_inputBind($cur,"12","2008");
+	sqlrcur_inputBind($cur,"13","char8");
+	sqlrcur_inputBind($cur,"14","text8");
+	sqlrcur_inputBind($cur,"15","varchar8");
+	sqlrcur_inputBind($cur,"16","tinytext8");
+	sqlrcur_inputBind($cur,"17","mediumtext8");
+	sqlrcur_inputBind($cur,"18","longtext8");
 	sqlrcur_validateBinds($cur);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");
