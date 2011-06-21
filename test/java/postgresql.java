@@ -7,7 +7,6 @@ import com.firstworks.sqlrelay.SQLRCursor;
 
 class postgresql7 {
 	
-	
 	private static void checkSuccess(String value, String success) {
 	
 		if (success==null) {
@@ -15,9 +14,8 @@ class postgresql7 {
 				System.out.print("success ");
 				return;
 			} else {
+				System.out.print(value+"!="+success+" ");
 				System.out.print("failure ");
-				
-				
 				System.exit(0);
 			}
 		}
@@ -25,9 +23,8 @@ class postgresql7 {
 		if (value.equals(success)) {
 			System.out.print("success ");
 		} else {
+			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			
-			
 			System.exit(0);
 		}
 	}
@@ -37,9 +34,8 @@ class postgresql7 {
 		if (value==success) {
 			System.out.print("success ");
 		} else {
+			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			
-			
 			System.exit(0);
 		}
 	}
@@ -49,9 +45,8 @@ class postgresql7 {
 		if (((value)?1:0)==success) {
 			System.out.print("success ");
 		} else {
+			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			
-			
 			System.exit(0);
 		}
 	}

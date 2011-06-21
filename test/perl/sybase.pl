@@ -27,8 +27,8 @@ sub checkSuccess {
 	if ($value==$success) {
 		print("success ");
 	} else {
+		print("$value != $success ");
 		print("failure ");
-		print("\n$value != $success\n");
 		exit;
 	}
 }
@@ -41,8 +41,8 @@ sub checkSuccessString {
 	if ($value eq $success) {
 		print("success ");
 	} else {
+		print("$value != $success ");
 		print("failure ");
-		print("\n$value != $success\n");
 		exit;
 	}
 }

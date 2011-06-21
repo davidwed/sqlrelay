@@ -13,9 +13,9 @@ def checkSuccess(value,success):
 	if value==success:
 		print "success",
 	else:
-		print "failure"
 		print "wanted", type(success), ":", success
 		print "got   ", type(value), ":", value
+		print "failure"
 		sys.exit(0)
 
 def main():

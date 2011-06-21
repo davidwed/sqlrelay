@@ -19,7 +19,7 @@ void checkSuccessString(const char *value, const char *success) {
 			printf("success ");
 			return;
 		} else {
-			printf("\"%s\"==\"%s\"",value,success);
+			printf("\"%s\"!=\"%s\"",value,success);
 			printf("failure ");
 			sqlrcur_free(cur);
 			sqlrcon_free(con);
@@ -30,7 +30,7 @@ void checkSuccessString(const char *value, const char *success) {
 	if (!strcmp(value,success)) {
 		printf("success ");
 	} else {
-		printf("\"%s\"==\"%s\"",value,success);
+		printf("\"%s\"!=\"%s\"",value,success);
 		printf("failure ");
 		sqlrcur_free(cur);
 		sqlrcon_free(con);
@@ -43,7 +43,7 @@ void checkSuccessInt(int value, int success) {
 	if (value==success) {
 		printf("success ");
 	} else {
-		printf("\"%d\"==\"%d\"",value,success);
+		printf("\"%d\"!=\"%d\"",value,success);
 		printf("failure ");
 		sqlrcur_free(cur);
 		sqlrcon_free(con);

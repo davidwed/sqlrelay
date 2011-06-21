@@ -7,11 +7,6 @@ import com.firstworks.sqlrelay.SQLRCursor;
 
 class firebird {
 	
-	
-	
-	
-	
-	
 	private static void checkSuccess(String value, String success) {
 	
 		if (success==null) {
@@ -19,9 +14,8 @@ class firebird {
 				System.out.print("success ");
 				return;
 			} else {
+				System.out.print(value+"!="+success+" ");
 				System.out.print("failure ");
-				
-				
 				System.exit(0);
 			}
 		}
@@ -29,9 +23,8 @@ class firebird {
 		if (value.equals(success)) {
 			System.out.print("success ");
 		} else {
+			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			
-			
 			System.exit(0);
 		}
 	}
@@ -41,9 +34,8 @@ class firebird {
 		if (value==success) {
 			System.out.print("success ");
 		} else {
+			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			
-			
 			System.exit(0);
 		}
 	}
@@ -53,9 +45,8 @@ class firebird {
 		if (((value)?1:0)==success) {
 			System.out.print("success ");
 		} else {
+			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			
-			
 			System.exit(0);
 		}
 	}

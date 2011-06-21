@@ -11,6 +11,7 @@ proc checkUndef {value} {
 	switch $value "" {
 		puts "success "
 	} default {
+		puts "$value != $success "
 		puts "failure "
 		exit
 	}
@@ -21,6 +22,7 @@ proc checkSuccess {value success} {
 	if {$value==$success} {
 		puts "success "
 	} else {
+		puts "$value != $success "
 		puts "failure "
 		exit
 	}

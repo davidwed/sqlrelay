@@ -18,7 +18,7 @@ void checkSuccess(const char *value, const char *success) {
 			printf("success ");
 			return;
 		} else {
-			printf("\"%s\"==\"%s\"",value,success);
+			printf("\"%s\"!=\"%s\"",value,success);
 			printf("failure ");
 			delete cur;
 			delete con;
@@ -29,7 +29,7 @@ void checkSuccess(const char *value, const char *success) {
 	if (!strcmp(value,success)) {
 		printf("success ");
 	} else {
-		printf("\"%s\"==\"%s\"",value,success);
+		printf("\"%s\"!=\"%s\"",value,success);
 		printf("failure ");
 		delete cur;
 		delete con;
@@ -42,7 +42,7 @@ void checkSuccess(int value, int success) {
 	if (value==success) {
 		printf("success ");
 	} else {
-		printf("\"%d\"==\"%d\"",value,success);
+		printf("\"%d\"!=\"%d\"",value,success);
 		printf("failure ");
 		delete cur;
 		delete con;

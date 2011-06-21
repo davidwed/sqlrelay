@@ -19,7 +19,7 @@ void checkSuccess(const char *value, const char *success) {
 			fflush(stdout);
 			return;
 		} else {
-			printf("\"%s\"=\"%s\"\n",value,success);
+			printf("\"%s\"!=\"%s\"\n",value,success);
 			printf("failure: %s",cur->errorMessage());
 			fflush(stdout);
 			delete cur;
@@ -32,7 +32,7 @@ void checkSuccess(const char *value, const char *success) {
 		printf("success ");
 		fflush(stdout);
 	} else {
-		printf("\"%s\"=\"%s\"\n",value,success);
+		printf("\"%s\"!=\"%s\"\n",value,success);
 		printf("failure: %s",cur->errorMessage());
 		fflush(stdout);
 		delete cur;
@@ -47,7 +47,7 @@ void checkSuccess(int value, int success) {
 		printf("success ");
 		fflush(stdout);
 	} else {
-		printf("\"%d\"=\"%d\"\n",value,success);
+		printf("\"%d\"!=\"%d\"\n",value,success);
 		printf("failure: %s",cur->errorMessage());
 		fflush(stdout);
 		delete cur;

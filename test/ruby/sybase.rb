@@ -12,6 +12,7 @@ def checkSuccess(value,success)
 	if value==success
 		print "success "
 	else
+		print value , " != " , success, " "
 		print "failure "
 		exit(0)
 	end

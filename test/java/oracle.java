@@ -14,9 +14,8 @@ class oracle8i {
 				System.out.print("success ");
 				return;
 			} else {
+				System.out.print(value+"!="+success+" ");
 				System.out.print("failure ");
-				
-				
 				System.exit(0);
 			}
 		}
@@ -24,9 +23,8 @@ class oracle8i {
 		if (value.regionMatches(0,success,0,length)) {
 			System.out.print("success ");
 		} else {
+			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			
-			
 			System.exit(0);
 		}
 	}
@@ -38,9 +36,8 @@ class oracle8i {
 				System.out.print("success ");
 				return;
 			} else {
+				System.out.print(value+"!="+success+" ");
 				System.out.print("failure ");
-				
-				
 				System.exit(0);
 			}
 		}
@@ -48,9 +45,8 @@ class oracle8i {
 		if (value.equals(success)) {
 			System.out.print("success ");
 		} else {
+			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			
-			
 			System.exit(0);
 		}
 	}
