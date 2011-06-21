@@ -4,6 +4,7 @@
 # See the file COPYING for more information.
 
 from SQLRelay import PySQLRClient
+from decimal import *
 import sys
 import string
 
@@ -349,7 +350,6 @@ def main():
 
 	print "FIELD LENGTHS BY ARRAY: "
 	fieldlens=cur.getRowLengths(0)
-	print fieldlens
 	checkSuccess(fieldlens[0],1)
 	checkSuccess(fieldlens[1],40)
 	checkSuccess(fieldlens[2],12)
@@ -410,7 +410,9 @@ def main():
 	print "FIELDS: "
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
-	checkSuccess(cur.getField(0,2),10.5556)
+	# oracle makes this field an integer
+	#checkSuccess(cur.getField(0,2),Decimal("10.5556"))
+	checkSuccess(cur.getField(0,2),10)
 	print
 
 	print "OUTPUT BIND: "
@@ -430,7 +432,9 @@ def main():
 	print "FIELDS: "
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
-	checkSuccess(cur.getField(0,2),10.5556)
+	# oracle makes this field an integer
+	#checkSuccess(cur.getField(0,2),Decimal("10.5556"))
+	checkSuccess(cur.getField(0,2),10)
 	print
 
 	print "NULLS as Nones: "

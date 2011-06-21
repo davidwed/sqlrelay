@@ -4,12 +4,14 @@ valgrind errors running oracle tests
 
 db2 - yes
 firebird - yes
-mysql - yes
-postgresql - yes
+mysql - connections get hung, new ones spawn
+postgresql - bind by position fails every other time
+		"current tx is aborted..."
 sqlite - yes
-sybase - yes
+sybase - connection hangs if test aborts after result set buffer size test
 freetds - yes
-oracle8 - on the second run through, the bind cursors don't return any data,
+oracle8 - connections get hung, new ones spawn
+	on the second run through, the bind cursors don't return any data,
 	like the statement doesn't have the result set associated with it any
 	more, the columns still are there, but not the results set itself
 	connections get hung when running test over and over

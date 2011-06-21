@@ -63,47 +63,47 @@ puts "AFFECTED ROWS: "
 checkSuccess [$cur affectedRows] 1
 puts ""
 
-puts "BIND BY NAME: "
-$cur prepareQuery "insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8)"
+puts "BIND BY POSITION: "
+$cur prepareQuery "insert into testtable values (\$1,\$2,\$3,\$4,\$5,\$6,\$7,\$8)"
 checkSuccess [$cur countBindVariables] 8
-$cur inputBind "var1" 5
-$cur inputBind "var2" 5.5 4 2
-$cur inputBind "var3" 5.5 4 2
-$cur inputBind "var4" 5
-$cur inputBind "var5" "testchar5"
-$cur inputBind "var6" "testvarchar5"
-$cur inputBind "var7" "01/01/2005"
-$cur inputBind "var8" "05:00:00"
+$cur inputBind "1" 5
+$cur inputBind "2" 5.5 4 2
+$cur inputBind "3" 5.5 4 2
+$cur inputBind "4" 5
+$cur inputBind "5" "testchar5"
+$cur inputBind "6" "testvarchar5"
+$cur inputBind "7" "01/01/2005"
+$cur inputBind "8" "05:00:00"
 checkSuccess [$cur executeQuery] 1
 $cur clearBinds 
-$cur inputBind "var1" 6
-$cur inputBind "var2" 6.6 4 2
-$cur inputBind "var3" 6.6 4 2
-$cur inputBind "var4" 6
-$cur inputBind "var5" "testchar6"
-$cur inputBind "var6" "testvarchar6"
-$cur inputBind "var7" "01/01/2006"
-$cur inputBind "var8" "06:00:00"
+$cur inputBind "1" 6
+$cur inputBind "2" 6.6 4 2
+$cur inputBind "3" 6.6 4 2
+$cur inputBind "4" 6
+$cur inputBind "5" "testchar6"
+$cur inputBind "6" "testvarchar6"
+$cur inputBind "7" "01/01/2006"
+$cur inputBind "8" "06:00:00"
 checkSuccess [$cur executeQuery] 1
 puts ""
 
-puts "ARRAY OF BINDS BY NAME: "
+puts "ARRAY OF BINDS BY POSITION: "
 $cur clearBinds
-$cur inputBinds {{"var1" 7} {"var2" 7.7 4 2} {"var3" 7.7 4 2} {"var4" 7} {"var5" "testchar7"} {"var6" "testvarchar7"} {"var7" "01/01/2007"} {"var8" "07:00:00"}}
+$cur inputBinds {{"1" 7} {"2" 7.7 4 2} {"3" 7.7 4 2} {"4" 7} {"5" "testchar7"} {"6" "testchar7"} {"7" "01/01/2007"} {"8" "07:00:00"}}
 checkSuccess [$cur executeQuery] 1
 puts ""
 
-puts "BIND BY NAME WITH VALIDATION: "
+puts "BIND BY POSITION WITH VALIDATION: "
 $cur clearBinds 
-$cur inputBind "var1" 8
-$cur inputBind "var2" 8.8 4 2
-$cur inputBind "var3" 8.8 4 2
-$cur inputBind "var4" 8
-$cur inputBind "var5" "testchar8"
-$cur inputBind "var6" "testvarchar8"
-$cur inputBind "var7" "01/01/2008"
-$cur inputBind "var8" "08:00:00"
-$cur inputBind "var9" "junkvalue"
+$cur inputBind "1" 8
+$cur inputBind "2" 8.8 4 2
+$cur inputBind "3" 8.8 4 2
+$cur inputBind "4" 8
+$cur inputBind "5" "testchar8"
+$cur inputBind "6" "testvarchar8"
+$cur inputBind "7" "01/01/2008"
+$cur inputBind "8" "08:00:00"
+$cur inputBind "9" "junkvalue"
 $cur validateBinds 
 checkSuccess [$cur executeQuery] 1
 puts ""
@@ -609,28 +609,28 @@ checkUndef [$cur getFieldByIndex 6 0]
 checkUndef [$cur getFieldByIndex 7 0]
 puts ""
 
-# drop existing table
-catch {$cur sendQuery "drop table testtable"}
-
 puts "STORED PROCEDURES: "
 catch {$cur sendQuery "drop function testfunc(int)"}
 checkSuccess [$cur sendQuery "create function testfunc(int) returns int as ' begin return \$1; end;' language plpgsql"] 1
-$cur prepareQuery "select * from testfunc(:int)"
-$cur inputBind "int" 5
+$cur prepareQuery "select * from testfunc(\$1)"
+$cur inputBind "1" 5
 checkSuccess [$cur executeQuery] 1
 checkSuccess [$cur getFieldByIndex 0 0] "5"
 catch {$cur sendQuery "drop function testfunc(int)"}
 
 catch {$cur sendQuery "drop function testfunc(int,char(20))"}
 checkSuccess [$cur sendQuery "create function testfunc(int, char(20)) returns record as ' declare output record; begin select \$1,\$2 into output; return output; end;' language plpgsql"] 1
-$cur prepareQuery "select * from testfunc(:int,:char) as (col1 int, col2 bpchar)"
-$cur inputBind "int" 5
-$cur inputBind "char" "hello"
+$cur prepareQuery "select * from testfunc(\$1,\$2) as (col1 int, col2 bpchar)"
+$cur inputBind "1" 5
+$cur inputBind "2" "hello"
 checkSuccess [$cur executeQuery] 1
 checkSuccess [$cur getFieldByIndex 0 0] "5"
 checkSuccess [$cur getFieldByIndex 0 1] "hello"
 catch {$cur sendQuery "drop function testfunc(int,char(20))"}
 puts ""
+
+# drop existing table
+catch {$cur sendQuery "drop table testtable"}
 
 # invalid queries...
 puts "INVALID QUERIES: "

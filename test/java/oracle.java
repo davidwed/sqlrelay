@@ -5,7 +5,7 @@ import com.firstworks.sqlrelay.SQLRConnection;
 import com.firstworks.sqlrelay.SQLRCursor;
 
 
-class oracle8i {
+class oracle {
 
 	private static void checkSuccess(String value, String success, int length) {
 	

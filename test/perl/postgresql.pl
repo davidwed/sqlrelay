@@ -697,28 +697,55 @@ checkUndef($cur->getField(6,0));
 checkUndef($cur->getField(7,0));
 print("\n");
 
+# stored procedures
+print("STORED PROCEDURES: \n");
+# return no values
+$cur->sendQuery("drop function testfunc(int,float,char(20))");
+checkSuccess($cur->sendQuery("create function testfunc(int,float,char(20)) returns void as ' declare in1 int; in2 float; in3 char(20); begin in1:=\$1; in2:=\$2; in3:=\$3; return; end;' language plpgsql"),1);
+$cur->prepareQuery("select testfunc(\$1,\$2,\$3)");
+$cur->inputBind("1",1);
+$cur->inputBind("2",1.1,4,2);
+$cur->inputBind("3","hello");
+checkSuccess($cur->executeQuery(),1);
+$cur->sendQuery("drop function testfunc(int,float,char(20))");
+print("\n");
+# return single value
+$cur->sendQuery("drop function testfunc(int,float,char(20))");
+checkSuccess($cur->sendQuery("create function testfunc(int,float,char(20)) returns int as ' begin return \$1; end;' language plpgsql"),1);
+$cur->prepareQuery("select * from testfunc(\$1,\$2,\$3)");
+$cur->inputBind("1",1);
+$cur->inputBind("2",1.1,4,2);
+$cur->inputBind("3","hello");
+checkSuccess($cur->executeQuery(),1);
+checkSuccess($cur->getField(0,0),"1");
+$cur->sendQuery("drop function testfunc(int,float,char(20))");
+print("\n");
+# return multiple values
+$cur->sendQuery("drop function testfunc(int,char(20))");
+checkSuccess($cur->sendQuery("create function testfunc(int,float,char(20)) returns record as ' declare output record; begin select \$1,\$2,\$3 into output; return output; end;' language plpgsql"),1);
+$cur->prepareQuery("select * from testfunc(\$1,\$2,\$3) as (col1 int, col2 float, col3 bpchar)");
+$cur->inputBind("1",1);
+$cur->inputBind("2",1.1,4,2);
+$cur->inputBind("3","hello");
+checkSuccess($cur->executeQuery(),1);
+checkSuccess($cur->getField(0,0),"1");
+checkSuccess($cur->getField(0,1),1.1);
+checkSuccess($cur->getField(0,2),"hello");
+$cur->sendQuery("drop function testfunc(int,float,char(20))");
+print("\n");
+# return result set
+$cur->sendQuery("drop function testfunc()");
+checkSuccess($cur->sendQuery("create function testfunc() returns setof record as ' declare output record; begin for output in select * from testtable loop return next output; end loop; return; end;' language plpgsql"),1);
+checkSuccess($cur->sendQuery("select * from testfunc() as (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)"),1);
+checkSuccess($cur->getField(4,0),"5");
+checkSuccess($cur->getField(5,0),"6");
+checkSuccess($cur->getField(6,0),"7");
+checkSuccess($cur->getField(7,0),"8");
+$cur->sendQuery("drop function testfunc()");
+print("\n");
+
 # drop existing table
 $cur->sendQuery("drop table testtable");
-
-print("STORED PROCEDURES: \n");
-$cur->sendQuery("drop function testfunc(int)");
-checkSuccess($cur->sendQuery("create function testfunc(int) returns int as ' begin return \$1; end;' language plpgsql"),1);
-$cur->prepareQuery("select * from testfunc(:int)");
-$cur->inputBind("int",5);
-checkSuccess($cur->executeQuery(),1);
-checkSuccess($cur->getField(0,0),"5");
-$cur->sendQuery("drop function testfunc(int)");
-
-$cur->sendQuery("drop function testfunc(int,char(20))");
-checkSuccess($cur->sendQuery("create function testfunc(int, char(20)) returns record as ' declare output record; begin select \$1,\$2 into output; return output; end;' language plpgsql"),1);
-$cur->prepareQuery("select * from testfunc(:int,:char) as (col1 int, col2 bpchar)");
-$cur->inputBind("int",5);
-$cur->inputBind("char","hello");
-checkSuccess($cur->executeQuery(),1);
-checkSuccess($cur->getField(0,0),"5");
-checkSuccess($cur->getField(0,1),"hello");
-$cur->sendQuery("drop function testfunc(int,char(20))");
-print("\n");
 
 # invalid queries...
 print("INVALID QUERIES: \n");

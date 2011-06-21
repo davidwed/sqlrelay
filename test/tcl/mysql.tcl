@@ -60,76 +60,76 @@ puts "AFFECTED ROWS: "
 checkSuccess [$cur affectedRows] 1
 puts ""
 
-puts "BIND BY NAME: "
-$cur prepareQuery "insert into testdb.testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7,:var8,:var9,:var10,:var11,:var12,:var13,:var14,:var15,:var16,:var17,:var18,NULL)"
+puts "BIND BY POSITION: "
+$cur prepareQuery "insert into testdb.testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)"
 checkSuccess [$cur countBindVariables] 18
-$cur inputBind "var1" 5
-$cur inputBind "var2" 5
-$cur inputBind "var3" 5
-$cur inputBind "var4" 5
-$cur inputBind "var5" 5
-$cur inputBind "var6" 5.1 2 1
-$cur inputBind "var7" 5.1 2 1
-$cur inputBind "var8" 5.1 2 1
-$cur inputBind "var9" "2005-01-01"
-$cur inputBind "var10" "05:00:00"
-$cur inputBind "var11" "2005-01-01 05:00:00"
-$cur inputBind "var12" "2005"
-$cur inputBind "var13" "char5"
-$cur inputBind "var14" "text5"
-$cur inputBind "var15" "varchar5"
-$cur inputBind "var16" "tinytext5"
-$cur inputBind "var17" "mediumtext5"
-$cur inputBind "var18" "longtext5"
+$cur inputBind "1" 5
+$cur inputBind "2" 5
+$cur inputBind "3" 5
+$cur inputBind "4" 5
+$cur inputBind "5" 5
+$cur inputBind "6" 5.1 2 1
+$cur inputBind "7" 5.1 2 1
+$cur inputBind "8" 5.1 2 1
+$cur inputBind "9" "2005-01-01"
+$cur inputBind "10" "05:00:00"
+$cur inputBind "11" "2005-01-01 05:00:00"
+$cur inputBind "12" "2005"
+$cur inputBind "13" "char5"
+$cur inputBind "14" "text5"
+$cur inputBind "15" "varchar5"
+$cur inputBind "16" "tinytext5"
+$cur inputBind "17" "mediumtext5"
+$cur inputBind "18" "longtext5"
 checkSuccess [$cur executeQuery] 1
 $cur clearBinds 
-$cur inputBind "var1" 6
-$cur inputBind "var2" 6
-$cur inputBind "var3" 6
-$cur inputBind "var4" 6
-$cur inputBind "var5" 6
-$cur inputBind "var6" 6.1 2 1
-$cur inputBind "var7" 6.1 2 1
-$cur inputBind "var8" 6.1 2 1
-$cur inputBind "var9" "2006-01-01"
-$cur inputBind "var10" "06:00:00"
-$cur inputBind "var11" "2006-01-01 06:00:00"
-$cur inputBind "var12" "2006"
-$cur inputBind "var13" "char6"
-$cur inputBind "var14" "text6"
-$cur inputBind "var15" "varchar6"
-$cur inputBind "var16" "tinytext6"
-$cur inputBind "var17" "mediumtext6"
-$cur inputBind "var18" "longtext6"
-checkSuccess [$cur executeQuery] 1
-puts ""
-
-puts "ARRAY OF BINDS BY NAME: "
-$cur clearBinds 
-$cur inputBinds {{"var1" 7} {"var2" 7} {"var3" 7} {"var4" 7} {"var5" 7} {"var6" 7.1 2 1} {"var7" 7.1 2 1} {"var8" 7.1 2 1} {"var9" "2007-01-01"} {"var10" "07:00:00"} {"var11" "2007-01-01 07:00:00"} {"var12" "2007"} {"var13" "char7"} {"var14" "text7"} {"var15" "varchar7"} {"var16" "tinytext7"} {"var17" "mediumtext7"} {"var18" "longtext7"}}
+$cur inputBind "1" 6
+$cur inputBind "2" 6
+$cur inputBind "3" 6
+$cur inputBind "4" 6
+$cur inputBind "5" 6
+$cur inputBind "6" 6.1 2 1
+$cur inputBind "7" 6.1 2 1
+$cur inputBind "8" 6.1 2 1
+$cur inputBind "9" "2006-01-01"
+$cur inputBind "10" "06:00:00"
+$cur inputBind "11" "2006-01-01 06:00:00"
+$cur inputBind "12" "2006"
+$cur inputBind "13" "char6"
+$cur inputBind "14" "text6"
+$cur inputBind "15" "varchar6"
+$cur inputBind "16" "tinytext6"
+$cur inputBind "17" "mediumtext6"
+$cur inputBind "18" "longtext6"
 checkSuccess [$cur executeQuery] 1
 puts ""
 
-puts "BIND BY NAME WITH VALIDATION: "
+puts "ARRAY OF BINDS BY POSITION: "
 $cur clearBinds 
-$cur inputBind "var1" 8
-$cur inputBind "var2" 8
-$cur inputBind "var3" 8
-$cur inputBind "var4" 8
-$cur inputBind "var5" 8
-$cur inputBind "var6" 8.1 2 1
-$cur inputBind "var7" 8.1 2 1
-$cur inputBind "var8" 8.1 2 1
-$cur inputBind "var9" "2008-01-01"
-$cur inputBind "var10" "08:00:00"
-$cur inputBind "var11" "2008-01-01 08:00:00"
-$cur inputBind "var12" "2008"
-$cur inputBind "var13" "char8"
-$cur inputBind "var14" "text8"
-$cur inputBind "var15" "varchar8"
-$cur inputBind "var16" "tinytext8"
-$cur inputBind "var17" "mediumtext8"
-$cur inputBind "var18" "longtext8"
+$cur inputBinds {{"1" 7} {"2" 7} {"3" 7} {"4" 7} {"5" 7} {"6" 7.1 2 1} {"7" 7.1 2 1} {"8" 7.1 2 1} {"9" "2007-01-01"} {"10" "07:00:00"} {"11" "2007-01-01 07:00:00"} {"12" "2007"} {"13" "char7"} {"14" "text7"} {"15" "char7"} {"16" "tinytext7"} {"17" "mediumtext7"} {"18" "longtext7"}}
+checkSuccess [$cur executeQuery] 1
+puts ""
+
+puts "BIND BY POSITION WITH VALIDATION: "
+$cur clearBinds 
+$cur inputBind "1" 8
+$cur inputBind "2" 8
+$cur inputBind "3" 8
+$cur inputBind "4" 8
+$cur inputBind "5" 8
+$cur inputBind "6" 8.1 2 1
+$cur inputBind "7" 8.1 2 1
+$cur inputBind "8" 8.1 2 1
+$cur inputBind "9" "2008-01-01"
+$cur inputBind "10" "08:00:00"
+$cur inputBind "11" "2008-01-01 08:00:00"
+$cur inputBind "12" "2008"
+$cur inputBind "13" "char8"
+$cur inputBind "14" "text8"
+$cur inputBind "15" "varchar8"
+$cur inputBind "16" "tinytext8"
+$cur inputBind "17" "mediumtext8"
+$cur inputBind "18" "longtext8"
 $cur validateBinds 
 checkSuccess [$cur executeQuery] 1
 puts ""
