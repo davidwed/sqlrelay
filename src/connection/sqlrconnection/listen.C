@@ -7,7 +7,7 @@
 bool sqlrconnection_svr::listen() {
 
 	uint16_t	sessioncount=0;
-	bool		returnflag=false;
+	bool		clientconnectfailed=false;
 
 	for (;;) {
 
@@ -47,7 +47,7 @@ bool sqlrconnection_svr::listen() {
 				// otherwise wait for session, but
 				// it seems that on hard load it's impossible
 				// to change handoff socket for pid
-				returnflag=true;
+				clientconnectfailed=true;
 				break;
 
 			} else {
@@ -66,18 +66,11 @@ bool sqlrconnection_svr::listen() {
 
 		if (cfgfl->getDynamicScaling()) {
 			decrementSessionCount();
-			if (returnflag) {
+			if (clientconnectfailed) {
 				return false;
 			}
 		}
 
-		// If this connection was forked off by dynamic scaling then
-		// it should die off after handling a set number of client
-		// sessions.  If we don't do this, a spike in incoming clients
-		// could cause the number of connections to grow and then
-		// never drop back down even though the traffic could be handled
-		// by fewer connections.  Tuning the ttl precisely could
-		// potentially resolve this, but that proves very difficult.
 		if (cfgfl->getDynamicScaling() && ttl &&
 				cfgfl->getMaxSessionCount()) {
 			sessioncount++;

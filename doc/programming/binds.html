@@ -62,14 +62,15 @@ schemas or databases.  A substitution value may even contain bind variables.</p>
 <span class="heading2">Bind Variable Syntax</span><br><br>
 
 <p>Different databases have different syntax for bind variables.  Oracle bind
-variables are names preceeded by a colon.  In DB2 and Firebird, bind variables
-are represented by question marks.  In Sybase and MS SQL Server, bind variables
-are names preceeded by an @ sign.</p>
+variables are names preceeded by a colon.  In MySQL, DB2 and Firebird,
+bind variables are represented by question marks.  In Sybase and MS SQL Server,
+bind variables are names preceeded by an @ sign.  In PostgreSQL, bind variables
+are numbers preceeded by a $ sign.</p>
 
 <p>When using <b>SQL Relay</b> bind functions, to refer to an Oracle, Sybase
 or MS SQL Server bind variable, you should use its name without the preceeding
-colon.  To refer to a DB2 or Firebird bind variable, you should use its 
-position number.</p>
+colon.  To refer to bind variables when using other databases, you should use
+the bind variable's position number.</p>
 
 <p>For example...</p>
 
@@ -88,8 +89,8 @@ position number.</p>
                 age&lt;=:oldage
 </PRE>
 
-<p>In this Oracle syntax query, you should use "id", "youngage" and "oldage"
-as variable names in the inputBind functions.</p>
+<p>In this query, you should use "id", "youngage" and "oldage" as variable
+names in the inputBind functions.</p>
 
 <PRE>
         <B><FONT color=#a62828>select</FONT></B>
@@ -106,8 +107,8 @@ as variable names in the inputBind functions.</p>
                 age&lt;=?
 </PRE>
 
-<p>In this DB2 or Firebird syntax query, you should use "1", "2" and "3" as 
-variable names in the inputBind functions.</p>
+<p>In this query, you should use "1", "2" and "3" as variable names in the
+inputBind functions.</p>
 
 <span class="heading2">Why should I use input bind variables instead of just 
 using substitution variables for everything?</span><br><br>
@@ -138,15 +139,14 @@ procedural code that manufactures a result set.</p>
 
 <p>The <b>SQL Relay</b> connection daemon will fake input binds for database 
 API's which don't natively support binds.  Currently those are the
-SQLite, FreeTDS and MDB Tools connections.  Postgresql 8 and MySQL 4.1.2
+SQLite and MDB Tools connections.  Postgresql 8 and MySQL 4.1.2
 support bind variables but older versions do not.  <b>SQL Relay</b> fakes
 input binds for versions of Postgresql and MySQL that don't support them.
 For versions that do, the "fakebinds" connect string parameter can be used to
 force <b>SQL Relay</b> to fake binds rather than using the database's built-in
 support.  You can use either Oracle style or DB2/Firebird style bind variables
-with those databases, except for FreeTDS which requires either
-Sybase/MS SQL Server style bind variables.  Output binds are not supported for
-these databases.</p>
+with those databases.  Output binds are not supported when using
+"fakebinds".</p>
 
 <p>When using a database for which <b>SQL Relay</b> fakes bind variables, you 
 should make sure not to pass the wrong type of data into a bind variable.  For 

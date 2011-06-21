@@ -17,6 +17,9 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	// process command line
 	cmdl=new cmdline(argc,argv);
 
+	// get whether this connection was spawned by the scaler
+	scalerspawned=cmdl->found("-scaler");
+
 	// get the connection id from the command line
 	connectionid=cmdl->getValue("-connectionid");
 	if (!connectionid[0]) {

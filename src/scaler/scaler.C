@@ -354,6 +354,7 @@ bool scaler::openOneConnection() {
 	argv[p++]=(char *)connectionid;
 	argv[p++]=(char *)"-config";
 	argv[p++]=config;
+	argv[p++]=(char *)"-scaler";
 	if (debug) {
 		argv[p++]=(char *)"-debug";
 	}

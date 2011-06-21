@@ -717,12 +717,6 @@ FreeTDS&lt;0.53.</li>
 how many rows were affected by an insert/update/delete query.  SQL Relay handles
 this by not requesting the affected row count and just returning -1 if it's
 compiled against FreeTDS&lt;0.53.</li>
-<li>Bind variables are unsupported.  The ct_param and ct_setparam functions
-simply don't exist in FreeTDS ctlib.  SQL Relay handles this by faking input 
-bind variables in the same manner that the SQLite and
-MDB Tools connections do.</li>
-<li>FLOAT, NUMERIC and DECIMAL datatypes are all represented as FLOAT 
-datatypes.  There doesn't appear to be any workaround for this.</li>
 <li>Columns of type CHAR have trailing spaces truncated.  For a CHAR(20) column,
 inserting a value 
 <pre>'hello'</pre>
@@ -735,12 +729,10 @@ in FreeTDS and Sybase ctlib, so there's no good way to know whether to append
 trailing spaces or not.</li>
 <li>Under Sybase ctlib, MONEY datatypes have 2 decmial places by default but 
 can have up to 4.  Under FreeTDS, they have 4 decimal places.</li>
-<li>Date formats are slightly different.  FreeTDS left-pads single digit days 
-and hours with a single 0.  For example, Sybase ctlib returns 1:00 AM on 
-01/01/2001 as
+<li>Date formats are slightly different.  For example, Sybase ctlib returns 1:00 AM on 01/01/2001 as
 <pre>Jan  1 2001  1:00AM'</pre>
 while FreeTDS returns it as
-<pre>Jan 01 2001 01:00AM'</pre></li>
+<pre>Jan  1 2001 01:00:00:000AM'</pre></li>
 <li>Sybase ctlib returns REAL and FLOAT datatypes with arbitrary decimal 
 places.  Inserting 1.1 as a REAL or FLOAT type then selecting it might return 
 1.09888874310 or something similar.  With FreeTDS, inserting 1.1 then selecting
@@ -761,7 +753,8 @@ I've run into so far.</p>
 <p>FreeTDS is great software despite its inconsistencies.  Sybase ctlib is 
 impossibly complex.  Anyone attempting to re-engineer it is braver than I am.  
 I'm impressed that FreeTDS works as well as it does, and it's getting better 
-with each release.</p>
+with each release.  In fact, it's possible that any or all of those
+inconsistencies have been fixed in the current release.</p>
 
 <a name="postgresql"></a>
 <span class="heading3">Postgresql's native API uses numbers for types but

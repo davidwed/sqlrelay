@@ -1,5 +1,3 @@
-verify that bind var docs are correct
-
 valgrind errors running oracle and sybase tests
 
 db2 - yes
@@ -231,6 +229,16 @@ Bugs:
 		If 2 db's go down and 2nd comes back up first, all log into 2nd
 		db and never log out and back into first
 		connection daemons could just re-log in on a random interval
+	* When dynamic scaling is used, a spike in client connections could
+		cause a great many connections to be spawned and then steady
+		traffic afterwards could cause them all to stay active even
+		though a fewer number of connections could handle the traffic
+	* if scaler fires off connections, one doesn't time out...
+		this is actually more generic - connections which have announced
+		themselves as available to the listener disable their ttl alarm
+		so they won't die off after being registered
+	* scaler reaper should fire off from SIGCLD and not depend on another
+		client connection
 
 Tests:
 	* php pear db bind formats

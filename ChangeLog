@@ -52,6 +52,8 @@
 	updated sybase connection to use length of cursor name rather than
 		CS_NULLTERM to work around an odd, inconsistent bug that would
 		cause the connection to hang sometimes
+	connections not spawned by scaler don't signal on the semaphore used
+		by the scaler to wait for a connection to start now
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

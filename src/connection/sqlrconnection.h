@@ -347,6 +347,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool			inclientsession;
 		bool			loggedin;
 
+		bool		scalerspawned;
 		const char	*connectionid;
 		unsigned int	ttl;
 

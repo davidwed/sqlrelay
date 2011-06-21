@@ -16,7 +16,9 @@ void sqlrconnection_svr::incrementConnectionCount() {
 
 	dbgfile.debugPrint("connection",1,(*connectioncount));
 
-	signalScalerToRead();
+	if (scalerspawned) {
+		signalScalerToRead();
+	}
 
 	releaseConnectionCountMutex();
 
