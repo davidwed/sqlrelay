@@ -97,12 +97,25 @@ checkSuccess [$cur affectedRows] 0
 puts ""
 
 puts "STORED PROCEDURE: "
-checkSuccess [$cur sendQuery "create procedure testproc(invar integer) returns (outvar integer) as begin outvar = invar; suspend; end"] 1
-$cur prepareQuery "select * from testproc(?)"
-$cur inputBind "1" 5
+$cur prepareQuery "select * from testproc(?,?,?)"
+$cur inputBind "1" 1
+$cur inputBind "2" 1.1 2 1
+$cur inputBind "3" "hello"
 checkSuccess [$cur executeQuery] 1
-checkSuccess [$cur getFieldByIndex 0 0] "5"
-checkSuccess [$cur sendQuery "drop procedure testproc"] 1
+checkSuccess [$cur getFieldByIndex 0 0] 1
+checkSuccess [$cur getFieldByIndex 0 1] 1.1
+checkSuccess [$cur getFieldByIndex 0 2] "hello"
+$cur prepareQuery "execute procedure testproc ?, ?, ?"
+$cur inputBind "1" 1
+$cur inputBind "2" 1.1 2 1
+$cur inputBind "3" "hello"
+$cur defineOutputBindInteger "1"
+$cur defineOutputBindDouble "2"
+$cur defineOutputBindString "3" 20
+checkSuccess [$cur executeQuery] 1
+checkSuccess [$cur getOutputBindInteger "1"] 1
+#checkSuccess [$cur getOutputBindDouble "2"] 1.1
+checkSuccess [$cur getOutputBindString "3"] "hello               "
 puts ""
 
 puts "SELECT: "
