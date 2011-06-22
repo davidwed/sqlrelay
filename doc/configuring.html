@@ -190,7 +190,7 @@ and <b>filter</b> tags use to match queries.</p>
 <li><b>dbase</b> - the type of database the connection daemon should connect to.  Should be one of: oracle8, mysql, postgresql, sqlite, freetds, sybase, odbc, db2, firebird or mdbtools</li>
 <li><b>connections</b> - the number of sqlr-connection daemons to start up when using sqlr-start.</li>
 <li><b>maxconnections</b> - the maximum number of sqlr-connection daemons to scale to.</li>
-<li><b>maxqueuelength</b> - the size the queue of waiting clients has to grow to before more connections will be spawned.</li>
+<li><b>maxqueuelength</b> - the size the queue of waiting clients has to grow to before more connections will be spawned.  See <a href="faq.html#maxqueuelengthzero">the faq</a> for a note about settng maxqueuelength to 0.</li>
 <li><b>growby</b> - the number of connections that will be started up when new connections are spawned.</li>
 <li><b>ttl</b> - the amount of time that an idle connection will stay alive after being spawned dynamically (does not apply to connections spawned by sqlr-start).</li>
 <li><b>maxsessioncount</b> - The number of client sessions that a connection will handle after being spawned dynamically before shutting down, even if it never goes idle.  Setting this to 0 will cause the connection to only shut down if it does idle for longer than <b>ttl</b> seconds.  This parameter does not apply to connections spawned by sqlr-start.</li>

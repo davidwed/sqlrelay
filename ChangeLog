@@ -55,6 +55,7 @@
 	connections not spawned by scaler don't signal on the semaphore used
 		by the scaler to wait for a connection to start now
 	updated bind var docs
+	updated faq
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

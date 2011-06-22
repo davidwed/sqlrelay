@@ -100,7 +100,9 @@ work?</a></li>
 <li><a href="#gui">Where'd the configuration GUI go?</a></li>
 <li><a href="#socketonly">How can I get SQL Relay to only listen on the unix socket and not the inet port?</a></li>
 <li><a href="#timequeries">How can I get SQL Relay to log queries?</a></li>
-<li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's up with that?</a></li>
+<li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's going on?</a></li>
+<li><a href="#maxqueuelengthzero">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</a></li>
+<li><a href="#cursorgrowth">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</li>
 </ol>
 
 
@@ -1355,7 +1357,7 @@ case, you would cause the problem that I'm trying to avoid.</p>
 <p>
 
 <a name="nobody"></a>
-<span class="heading3">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's up with that?</span><br><br>
+<span class="heading3">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's going on?</span><br><br>
 
 <p>SQL Relay is typically started as root.  The sqlr-start command runs as root
 and starts up the sqlr-listener, sqlr-connection and sqlr-scaler processes as
@@ -1404,6 +1406,18 @@ used to log queries which take longer than <b>timequeriessec</b> seconds and
 <p>As of version 0.41, SQL Relay supports a new parameter: <i>maxsessioncount</i>.  If it is set greater than 0, then connections that were forked off will only handle that many client sessions before dying off, even if it doesn't go idle.  Using this new parameter will ensure that all forked-off connections will eventually die off.  Like the <i>ttl</i>, this parameter still requires some
 tuning but setting it too low will result in poorer performance rather than
 additional resource consumption.</p>
+
+<a name="maxqueuelengthzero">
+<span class="heading3">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</span><br><br>
+
+<p>This can happen if maxqueuelength=0, all connection daemons are occupied and a client calls endSession and immediately runs another query.  The connection daemon that the client was using has to loop back and tell the listener that it's ready for another client.  The client will attempt to reconnect to SQL Relay to run the next query, but depending on the exact timing, if the connetion daemon hasn't finished looping back, to the scaler daemon, it will appear that all connections are busy, but there's a new client attempting to connect and it will fork off a new connection daemon to service it.</p>
+
+<p>There is no easy fix for this.  Anything that might be done to guarantee that a new connection daemon won't be spawned would reduce overall performance.  So, if you're using maxqueuelength=0, then expect for this to happen.  It should not happen if maxqueuelenght is set to some value greater than 0.</p>
+
+<a name="cursorgrowth">
+<span class="heading3">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</span><br><br>
+
+<p>Some database API's provide functions for doing commits and rollbacks.  Others do not.  For those that do not, SQL Relay allocates a new cursor and uses it to execute the commit or rollback as a query.  Each time this happens, the Opened Server Cursors count increases.  Aside from being confusing, this shouldn't cause any problems.</p>
 
 </body>
 </html>

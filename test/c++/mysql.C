@@ -1033,9 +1033,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,(uint32_t)0),NULL);
 	printf("\n");
 
-	// drop existing table
-	cur->sendQuery("drop table testtable");
-
 	// temporary tables
 	printf("TEMPORARY TABLES: \n");
 	cur->sendQuery("drop table temptable\n");
@@ -1086,6 +1083,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,(uint32_t)2),"hello");
 	cur->sendQuery("drop procedure testproc");
 	printf("\n");
+
+	// drop existing table
+	cur->sendQuery("drop table testtable");
 
 	// invalid queries...
 	printf("INVALID QUERIES: \n");
