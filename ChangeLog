@@ -43,7 +43,7 @@
 		shutdown after a suspended session
 	precision/scale in output bind buffers is initialized now
 	debugstring buffers are no longer build when debug is turned off
-	fixed id vs. index bug when requesting a cursor
+	fixed id vs. index bug when requesting a cursor and binding a cursor
 	refactored JNI code a bit, fixed getIntField/getLongField problem that
 		caused problems on 64-bit machines
 	applied patch to make python api return decimals and integers, not
@@ -56,6 +56,8 @@
 		by the scaler to wait for a connection to start now
 	updated bind var docs
 	updated faq
+	fixed a bug where binding an oracle cursor didn't reset some values
+		and would cause subsequent cursor binds to fail
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

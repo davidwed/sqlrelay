@@ -1049,6 +1049,14 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 		}
 	}
 	curbindcount++;
+
+	// initialize values as if a statement has been prepared and executed
+	((oracle8cursor *)cursor)->stmttype=0;
+	((oracle8cursor *)cursor)->ncols=0;
+	((oracle8cursor *)cursor)->stmttype=0;
+	((oracle8cursor *)cursor)->row=0;
+	((oracle8cursor *)cursor)->maxrow=0;
+	((oracle8cursor *)cursor)->totalrows=0;
 	return true;
 }
 

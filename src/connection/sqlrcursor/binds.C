@@ -94,10 +94,29 @@ bool sqlrcursor_svr::handleBinds() {
 				return false;
 			}
 		} else if (outbindvars[i].type==CURSOR_BIND) {
-			if (!outputBindCursor(outbindvars[i].variable,
+
+			bool	found=false;
+
+			// find the cursor that we acquird earlier...
+			for (uint16_t j=0; j<conn->cursorcount; j++) {
+
+				if (conn->cur[j]->id==
+					outbindvars[i].value.cursorid) {
+					found=true;
+
+					// bind the cursor
+					if (!outputBindCursor(
+						outbindvars[i].variable,
 						outbindvars[i].variablesize,
-						conn->cur[outbindvars[i].value.
-								cursorid])) {
+						conn->cur[j])) {
+						return false;
+					}
+					break;
+				}
+			}
+
+			// this shouldn't happen, but if it does, return false
+			if (!found) {
 				return false;
 			}
 		}

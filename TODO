@@ -9,10 +9,7 @@ postgresql - yes
 sqlite - yes
 sybase - connection hangs if test aborts after result set buffer size test
 freetds - yes
-oracle8 - on the second run through, the bind cursors don't return any data,
-	like the statement doesn't have the result set associated with it any
-	more, the columns still are there, but not the results set itself
-	connections get hung when running test over and over
+oracle8 - yes
 
 
 
