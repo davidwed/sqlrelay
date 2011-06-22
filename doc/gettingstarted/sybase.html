@@ -345,7 +345,7 @@ The transaction log in database testdb is almost full.  Your transaction is<br>
 being suspended until space is made available in the log.
 </b></blockquote>
 
-<p>To dump the log, log into the master database as the <i>sa</i> user as 
+<p>To dump the log, log into the testdb database as the <i>sa</i> user as 
 follows.  When it promts you for a password, type <i>sapassword</i>.</p>
 
 <blockquote>
@@ -372,6 +372,32 @@ dump tran testdb <FONT color=#6959cf>with</FONT> no_log
 go
 </PRE>
 </blockquote>
+
+<p>A longer term solution is to configure the database to truncate its log at each checkpoint.  To configure this, log into the master database as the <i>sa</i> user as follows.  When it promts you for a password, type <i>sapassword</i>.</p>
+
+<blockquote>
+For Sybase 12.5 or later:
+
+<blockquote>
+<b>isql -U sa -S LOCALHOST -D master</b>
+</blockquote>
+
+For Sybase 11.9.2 or earlier:
+
+<blockquote>
+<b>isql -U sa -S localhost -D master</b>
+</blockquote>
+
+<p>Once logged in, execute the following series of commands.</p>
+
+<blockquote>
+<PRE>
+sp_dboption testdb, 'trunc log on chkpt', true
+go
+</PRE>
+</blockquote>
+
+<p>This is not something you should do in production.  Without the transaction log, there is no way to recover from certain failure conditions.  It is only safe to do in development or test environments where data could be reconstructed or recovered some other way.</p>
 
 <p>This should be enough to get you started.  To set up more complex 
 configurations, consult the Sybase ASE documentation.</p>
