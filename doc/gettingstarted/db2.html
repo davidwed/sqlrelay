@@ -187,7 +187,7 @@ connect to the remote database.</p>
 </blockquote>
 
 <p>On <i>localhost</i>, in the <i>db2inst1</i> instance, to create an instance
-alias named <i>remoteinst</i> referring to <i>testinst</i> on 
+alias named <i>remote</i> referring to <i>testinst</i> on 
 <i>remotehost</i>, and a database alias named <i>remotedb</i> referring to 
 <i>testdb</i>, follow this procedure.</p>
 
@@ -195,14 +195,14 @@ alias named <i>remoteinst</i> referring to <i>testinst</i> on
 log in as db2inst1 on localhost<br>
 create the instance alias using the following commands:<br>
 <blockquote><b>
-db2 "catalog tcpip node <i>remoteinst</i> remote <i>remotehost</i> server
+db2 "catalog tcpip node <i>remote</i> remote <i>remotehost</i> server
 <i>50000</i>"<br>
 db2 "terminate"<br>
 </b></blockquote>
 create the database alias using the following commands:<br>
 <blockquote><b>
 db2 "catalog database <i>testdb</i> as <i>remotedb</i> at node 
-<i>remoteinst</i> authentication server"<br>
+<i>remote</i> authentication server"<br>
 db2 "terminate"<br>
 </b></blockquote>
 </blockquote>
@@ -262,11 +262,11 @@ databases.</p>
 
 <p>If you need to drop a database or instance alias, use the UNCATALOG command.
 The following commands remove the <i>remotedb</i> database alias and the
-<i>remoteinst</i> instance alias.</p>
+<i>remote</i> instance alias.</p>
 
 <blockquote><b>
 db2 "uncatalog database <i>remotedb</i>"<br>
-db2 "uncatalog node <i>remoteinst</i>"<br>
+db2 "uncatalog node <i>remote</i>"<br>
 db2 "terminate"
 </b></blockquote>
 
@@ -511,7 +511,7 @@ you use TCP to connect to the local database, the problem doesn't occur.</p>
 more detail, but to connect to a local database over TCP, you need to
 execute the commands like the following as whatever user owns the local
 database you want to connect to.  These commands enable you to connect to
-a local database called <b>testdb</b> using the name <b>testdb1</b>.</p>
+a local database called <b>testdb</b> using the name <b>testdb1</b> as user <b>db2inst1</b> with password <b>db2inst1pass</b>.</p>
 
 <blockquote>
 <b>catalog tcpip node local remote localhost server 50000</b><br>
@@ -521,14 +521,14 @@ a local database called <b>testdb</b> using the name <b>testdb1</b>.</p>
 <p>Then run:</p>
 
 <blockquote>
-<b>atalog database testdb as testdb1 at node local authentication server</b><br>
+<b>catalog database testdb as testdb1 at node local authentication server</b><br>
 <b>terminate</b>
 </blockquote>
 
 <p>Now you can use the following SQL Relay connect string to connect to it:</p>
 
 <blockquote>
-db=testdb1;user=db2inst1;password=db2inst1
+db=testdb1;user=db2inst1;password=db2inst1pass
 </blockquote>
 
 </body>

@@ -111,7 +111,8 @@ bool sybaseconnection::logIn(bool printerrors) {
 	const char	*user=getUser();
 	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
 			(CS_VOID *)((user && user[0])?user:""),
-			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
+			(CS_INT)charstring::length(user),
+			(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the user",5);
 		return false;
 	}
@@ -121,14 +122,15 @@ bool sybaseconnection::logIn(bool printerrors) {
 	const char	*password=getPassword();
 	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
 			(CS_VOID *)((password && password[0])?password:""),
-			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
+			(CS_INT)charstring::length(password),
+			(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the password",5);
 		return false;
 	}
 
 	// set application name
-	if (ct_con_props(dbconn,CS_SET,CS_APPNAME,(CS_VOID *)"sqlrelay",
-			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
+	if (ct_con_props(dbconn,CS_SET,CS_APPNAME,(CS_VOID *)"sqlrelay",8,
+			(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the application name",5);
 		return false;
 	}
@@ -136,7 +138,8 @@ bool sybaseconnection::logIn(bool printerrors) {
 	// set hostname
 	if (hostname && hostname[0] &&
 		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
-				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
+				(CS_INT)charstring::length(hostname),
+				(CS_INT *)NULL)!=CS_SUCCEED) {
 			logInError("failed to set the hostname",5);
 		return false;
 	}
@@ -180,8 +183,9 @@ bool sybaseconnection::logIn(bool printerrors) {
 	// set language
 	if (language && language[0] &&
 		cs_locale(context,CS_SET,locale,CS_SYB_LANG,
-			(CS_CHAR *)language,CS_NULLTERM,(CS_INT *)NULL)!=
-				CS_SUCCEED) {
+			(CS_CHAR *)language,
+			(CS_INT)charstring::length(language),
+			(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the language",6);
 		return false;
 	}
@@ -189,8 +193,9 @@ bool sybaseconnection::logIn(bool printerrors) {
 	// set charset
 	if (charset && charset[0] &&
 		cs_locale(context,CS_SET,locale,CS_SYB_CHARSET,
-			(CS_CHAR *)charset,CS_NULLTERM,(CS_INT *)NULL)!=
-				CS_SUCCEED) {
+			(CS_CHAR *)charset,
+			(CS_INT)charstring::length(charset),
+			(CS_INT *)NULL)!=CS_SUCCEED) {
 		logInError("failed to set the charset",6);
 		return false;
 	}

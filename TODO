@@ -1,16 +1,10 @@
-valgrind errors running oracle and sybase tests
+perl dbi - unknown
+php pear db - unknown
+ruby dbi - unknown
+zope - unknown
 
-Cameron/Kyler Laird reported issues when the column count is the same as the optimistic column count
-
-db2 - yes
-firebird - yes
-mysql - yes
-postgresql - yes
-sqlite - yes
-sybase - connection hangs if test aborts after result set buffer size test
-freetds - yes
-oracle8 - yes
-
+drop-in mysql - unknown
+drop-in postgresql - unknown
 
 
 Hard problem:
