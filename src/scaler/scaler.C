@@ -343,16 +343,16 @@ bool scaler::reapChildren(pid_t connpid) {
 
 pid_t scaler::openOneConnection() {
 
-	char	command_stub[]="sqlr-connection-";
-	int	commandlen=charstring::length(command_stub)+
+	char	commandstub[]="sqlr-connection-";
+	int	commandlen=charstring::length(commandstub)+
 					charstring::length(dbase)+1;
 	char	*command=new char[commandlen];
-	snprintf(command,commandlen,"%s%s",command_stub,dbase);
+	snprintf(command,commandlen,"%s%s",commandstub,dbase);
 	command[commandlen-1]='\0';
 
-	char	ttl_str[20];
-	snprintf(ttl_str,20,"%d",ttl);
-	ttl_str[19]='\0';
+	char	ttlstr[20];
+	snprintf(ttlstr,20,"%d",ttl);
+	ttlstr[19]='\0';
 
 	int	p=0;
 	char	*argv[20];
@@ -361,7 +361,7 @@ pid_t scaler::openOneConnection() {
 	argv[p++]=(char *)"-silent";
 	argv[p++]=(char *)"-nodetach";
 	argv[p++]=(char *)"-ttl";
-	argv[p++]=(char *)ttl_str;
+	argv[p++]=(char *)ttlstr;
 	argv[p++]=(char *)"-id";
 	argv[p++]=(char *)id;
 	argv[p++]=(char *)"-connectionid";
@@ -440,22 +440,32 @@ bool scaler::openMoreConnections() {
 					continue;
 				}
 
+				// The semaphore should be at 0, though the
+				// race condition described below could
+				// potentially leave it set to 1, so we'll make
+				// sure to set it back to 0 here.
+				semset->setValue(8,0);
+
 				connpid=openOneConnection();
 
 				if (connpid) {
 					incConnections();
 					if (!connectionStarted()) {
-						// FIXME: I think there is a
-						// race condition here.  If
-						// connectionStarted waits for
-						// 10 second, but it takes
-						// slightly longer than that
-						// for the connection to start,
-						// we could end up killing the
-						// connection after it signals
-						// on sem(8), causing sem(8)
-						// to be incremented without
-						// ever being decremented again.
+						// There is a race condition
+						// here.  connectionStarted()
+						// waits for 10 seconds.
+						// Presumably the connection
+						// will start up and signal
+						// during that time, or will be
+						// killed before it signals,
+						// but if it takes just barely
+						// longer than that for the
+						// connection to start, the wait
+						// could time out, then the
+						// connection could signal,
+						// then it could be killed,
+						// leaving the semaphore set to
+						// 1 rather than 0.
 						killConnection(connpid);
 						connpid=0;
 					}
@@ -468,6 +478,7 @@ bool scaler::openMoreConnections() {
 }
 
 bool scaler::connectionStarted() {
+
 	// wait for the connection count to increase
 	// with 10 second timeout, if supported
 	return semset->supportsTimedSemaphoreOperations()?

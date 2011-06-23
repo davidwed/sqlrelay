@@ -14,6 +14,7 @@
 	#define	sqlite3_errmsg			sqlite_errmsg
 	#define	sqlite3_free_table		sqlite_free_table
 	#define	sqlite3_last_insert_rowid	sqlite_last_insert_rowid
+	#define sqlite3_free(mem)		sqlite_free((char *)mem)
 #endif
 
 
