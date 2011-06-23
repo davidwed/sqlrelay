@@ -61,6 +61,13 @@ dl("sql_relay.so");
 	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable (testint int, testsmallint smallint, testtinyint tinyint, testreal real, testfloat float, testdecimal decimal(4,1), testnumeric numeric(4,1), testmoney money, testsmallmoney smallmoney, testdatetime datetime, testsmalldatetime smalldatetime, testchar char(40), testvarchar varchar(40), testbit bit)"),1);
 	echo("\n");
 
+	echo("CREATE STORED PROCEDURES: \n");
+	sqlrcur_sendQuery($cur,"drop procedure testproc");
+	checkSuccess(sqlrcur_sendQuery($cur,"create procedure testproc @in1 int, @in2 float, @in3 varchar(20), @out1 int output, @out2 float output, @out3 varchar(20) output as select @out1=@in1, @out2=@in2, @out3=@in3"),1);
+	sqlrcur_sendQuery($cur,"drop procedure testselectproc");
+	checkSuccess(sqlrcur_sendQuery($cur,"create procedure testselectproc as select * from testtable order by testint"),1);
+	echo("\n");
+
 	echo("BEGIN TRANSACTION: \n");
 	#checkSuccess(sqlrcur_sendQuery($cur,"begin tran"),1);
 	echo("\n");
@@ -183,6 +190,21 @@ dl("sql_relay.so");
 	sqlrcur_inputBind($cur,"var15","junkvalue");
 	sqlrcur_validateBinds($cur);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
+	echo("\n");
+
+	echo("STORED PROCEDURE: \n");
+	// return multiple values
+	sqlrcur_prepareQuery($cur,"exec testproc");
+	sqlrcur_inputBind($cur,"in1",1);
+	sqlrcur_inputBind($cur,"in2",1.1,2,1);
+	sqlrcur_inputBind($cur,"in3","hello");
+	sqlrcur_defineOutputBindInteger($cur,"out1");
+	sqlrcur_defineOutputBindDouble($cur,"out2");
+	sqlrcur_defineOutputBindString($cur,"out3",20);
+	checkSuccess(sqlrcur_executeQuery($cur),1);
+	checkSuccess(sqlrcur_getOutputBindInteger($cur,"out1"),1);
+	checkSuccess(sqlrcur_getOutputBindDouble($cur,"out2"),1.1);
+	checkSuccess(sqlrcur_getOutputBindString($cur,"out3"),"hello");
 	echo("\n");
 
 	echo("SELECT: \n");
@@ -848,6 +870,41 @@ dl("sql_relay.so");
 	checkSuccess(sqlrcur_getField($cur,8,0),NULL);
 	sqlrcur_setResultSetBufferSize($cur,0);
 	echo("\n");
+
+	echo("STORED PROCEDURE WITH RESULT SET: \n");
+	checkSuccess(sqlrcur_sendQuery($cur,"exec testselectproc"),1);
+	echo("\n");
+	checkSuccess(sqlrcur_getField($cur,0,0),"1");
+	checkSuccess(sqlrcur_getField($cur,0,1),"1");
+	checkSuccess(sqlrcur_getField($cur,0,2),"1");
+	//checkSuccess(sqlrcur_getField($cur,0,3),"1.1");
+	//checkSuccess(sqlrcur_getField($cur,0,4),"1.1");
+	checkSuccess(sqlrcur_getField($cur,0,5),"1.1");
+	checkSuccess(sqlrcur_getField($cur,0,6),"1.1");
+	checkSuccess(sqlrcur_getField($cur,0,7),"1.00");
+	checkSuccess(sqlrcur_getField($cur,0,8),"1.00");
+	checkSuccess(sqlrcur_getField($cur,0,9),"Jan  1 2001  1:00AM");
+	checkSuccess(sqlrcur_getField($cur,0,10),"Jan  1 2001  1:00AM");
+	checkSuccess(sqlrcur_getField($cur,0,11),"testchar1                               ");
+	checkSuccess(sqlrcur_getField($cur,0,12),"testvarchar1");
+	checkSuccess(sqlrcur_getField($cur,0,13),"1");
+	echo("\n");
+	checkSuccess(sqlrcur_getField($cur,7,0),"8");
+	checkSuccess(sqlrcur_getField($cur,7,1),"8");
+	checkSuccess(sqlrcur_getField($cur,7,2),"8");
+	//checkSuccess(sqlrcur_getField($cur,7,3),"8.8");
+	//checkSuccess(sqlrcur_getField($cur,7,4),"8.8");
+	checkSuccess(sqlrcur_getField($cur,7,5),"8.8");
+	checkSuccess(sqlrcur_getField($cur,7,6),"8.8");
+	checkSuccess(sqlrcur_getField($cur,7,7),"8.00");
+	checkSuccess(sqlrcur_getField($cur,7,8),"8.00");
+	checkSuccess(sqlrcur_getField($cur,7,9),"Jan  1 2008  8:00AM");
+	checkSuccess(sqlrcur_getField($cur,7,10),"Jan  1 2008  8:00AM");
+	checkSuccess(sqlrcur_getField($cur,7,11),"testchar8                               ");
+	checkSuccess(sqlrcur_getField($cur,7,12),"testvarchar8");
+	checkSuccess(sqlrcur_getField($cur,7,13),"1");
+	echo("\n");
+
 
 	# drop existing table
 	sqlrcur_sendQuery($cur,"drop table testtable");
