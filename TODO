@@ -1,13 +1,7 @@
 I think the scaler patch introduces a race condition
+	maybe wait with timeout again after killing just to be sure?
 
-
-perl dbi - unknown
-php pear db - unknown
-ruby dbi - unknown
-zope - unknown
-
-drop-in mysql - unknown
-drop-in postgresql - unknown
+drop-in mysql - drop table fails with "no server-side cursors were available to process the query"
 
 
 Hard problem:

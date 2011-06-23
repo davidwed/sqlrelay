@@ -7,7 +7,7 @@ use DBI;
 
 
 print "INSTANTIATION\n";
-my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=1","test","test") or die DBI->errstr;
+my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0","test","test") or die DBI->errstr;
 print "\n\n";
 
 
@@ -19,7 +19,7 @@ print "\n\n";
 
 
 print "QUERY FUNCTIONS\n";
-my $sth=$dbh->prepare($ARGV[1]) or die DBI->errstr;
+my $sth=$dbh->prepare("select 1,2,3,4 from dual") or die DBI->errstr;
 
 $sth->execute() or die DBI->errstr;
 

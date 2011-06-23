@@ -381,7 +381,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
 						user,passwd,0,1);
-//mysql->sqlrcon->debugOn();
+mysql->sqlrcon->debugOn();
 	mysql->sqlrcon->copyReferences();
 	mysql->currentstmt=NULL;
 	return mysql;

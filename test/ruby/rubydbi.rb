@@ -19,7 +19,7 @@ for index in 0..ARGV[1].to_i-1 do
 
 
 	# query functions
-	stmt=db.prepare(ARGV[0])
+	stmt=db.prepare("select 1,2,3,4,5 from dual")
 
 	print "FETCH ALL\n"
 	stmt.execute()
