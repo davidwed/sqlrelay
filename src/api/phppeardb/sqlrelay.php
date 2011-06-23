@@ -16,7 +16,7 @@
 // | Author: David Muse <david.muse@firstworks.com>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.26 2007-05-03 02:56:51 mused Exp $
+// $Id: sqlrelay.php,v 1.27 2011-06-23 04:18:45 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -468,7 +468,8 @@ echo("bindformat is ".$this->bindformat."\n");
         select, otherwise there's no good way to know what kind of query it was
         except by parsing it. */
         if ($this->is_select[(int)$sqlrcursor->cursor]) {
-            return new DB_result($this,$sqlrcursor);
+            $tmp = new DB_result($this,$sqlrcursor);
+            return $tmp;
         }
 
         return DB_OK;
