@@ -53,7 +53,7 @@ scaler::scaler() : daemonprocess() {
 
 scaler::~scaler() {
 	if (init) {
-		reapChildren();
+		reapChildren(-1);
 		cleanUp();
 	}
 }
@@ -285,11 +285,13 @@ void scaler::cleanUp() {
 	delete cmdl;
 }
 
-void scaler::reapChildren() {
+bool scaler::reapChildren(pid_t connpid) {
+
+	bool	reaped=false;
 
 	for (;;) {
 		int	childstatus;
-		int	pid=waitpid(-1,&childstatus,WNOHANG);
+		int	pid=waitpid(connpid,&childstatus,WNOHANG);
 		if (pid==0) {
 			break;
 		}
@@ -300,38 +302,50 @@ void scaler::reapChildren() {
 			// most likely the error is "No child processes"
 			break;
 		}
+
+		reaped=true;
 		decConnections();
 
 		if (WIFEXITED(childstatus)) {
 			int	exitstatus=WEXITSTATUS(childstatus);
 			if (exitstatus) {
-				fprintf(stderr,"Connection (pid=%d) exited with code %d\n",
-						pid,exitstatus);
+				fprintf(stderr,
+					"Connection (pid=%d) exited "
+					"with code %d\n",
+					pid,exitstatus);
 			}
 		} else if (WIFSIGNALED(childstatus)) {
 #ifdef WCOREDUMP
 			if (WCOREDUMP(childstatus)) {
-				fprintf(stderr,"Connection (pid=%d) terminated by signal %d, with coredump\n",
-						pid,WTERMSIG(childstatus));
+				fprintf(stderr,
+					"Connection (pid=%d) terminated "
+					"by signal %d, with coredump\n",
+					pid,WTERMSIG(childstatus));
 			} else {
 #endif
-				fprintf(stderr,"Connection (pid=%d) terminated by signal %d\n",
-						pid,WTERMSIG(childstatus));
+				fprintf(stderr,
+					"Connection (pid=%d) terminated "
+					"by signal %d\n",
+					pid,WTERMSIG(childstatus));
 #ifdef WCOREDUMP
 			}
 #endif
 		} else {
 			// something strange happened, we shouldn't be here
-			fprintf(stderr,"Connection (pid=%d) exited, childstatus is %d\n",
+			fprintf(stderr,"Connection (pid=%d) exited, "
+					"childstatus is %d\n",
 					pid,childstatus);
 		}
 	}
+
+	return reaped;
 }
 
-bool scaler::openOneConnection() {
+pid_t scaler::openOneConnection() {
 
 	char	command_stub[]="sqlr-connection-";
-	int	commandlen=charstring::length(command_stub)+charstring::length(dbase)+1;
+	int	commandlen=charstring::length(command_stub)+
+					charstring::length(dbase)+1;
 	char	*command=new char[commandlen];
 	snprintf(command,commandlen,"%s%s",command_stub,dbase);
 	command[commandlen-1]='\0';
@@ -360,7 +374,7 @@ bool scaler::openOneConnection() {
 	}
 	argv[p++]=NULL; // the last
 
-	int	pid=fork();
+	pid_t	pid=fork();
 
 	if (pid==0) {
 		// child
@@ -371,13 +385,10 @@ bool scaler::openOneConnection() {
 		// error
 		fprintf(stderr,"fork() returned %d [%d]\n",pid,errno);
 	}
-	/*else if (pid>0) {
-		fprintf(stderr,"forked %d\n",pid);
-	}*/
 
 	delete[] command;
 
-	return pid>0;
+	return (pid>0)?pid:0;
 }
 
 bool scaler::openMoreConnections() {
@@ -390,7 +401,7 @@ bool scaler::openMoreConnections() {
 		return false;
 	}
 
-	reapChildren();
+	reapChildren(-1);
 
 	int	sessions=countSessions();
 	currentconnections=countConnections();
@@ -410,8 +421,8 @@ bool scaler::openMoreConnections() {
 		for (int32_t i=0; i<growby; i++) {
 
 			// loop until a connection is successfully started
-			bool	success=false;
-			while (!success) {
+			pid_t	connpid=0;
+			while (!connpid) {
 
 				getRandomConnectionId();
 
@@ -429,17 +440,69 @@ bool scaler::openMoreConnections() {
 					continue;
 				}
 
-				success=openOneConnection();
+				connpid=openOneConnection();
 
-				// wait for the connection count to increase
-				if (success) {
+				if (connpid) {
 					incConnections();
+					if (!connectionStarted()) {
+						// FIXME: I think there is a
+						// race condition here.  If
+						// connectionStarted waits for
+						// 10 second, but it takes
+						// slightly longer than that
+						// for the connection to start,
+						// we could end up killing the
+						// connection after it signals
+						// on sem(8), causing sem(8)
+						// to be incremented without
+						// ever being decremented again.
+						killConnection(connpid);
+						connpid=0;
+					}
 				}
 			}
 		}
 	}
 
 	return true;
+}
+
+bool scaler::connectionStarted() {
+	// wait for the connection count to increase
+	// with 10 second timeout, if supported
+	return semset->supportsTimedSemaphoreOperations()?
+					semset->wait(8,10,0):
+					semset->wait(8);
+}
+
+void scaler::killConnection(pid_t connpid) {
+
+	// The connection may have crashed or gotten hung up trying to start,
+	// possibly because the database was down.  Either way, it won't
+	// signal on sem(8) and must be killed.
+
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	fprintf(stderr,"%s Connection (pid=%d) failed to get ready\n",
+						dt.getString(),connpid);
+
+	// try 3 times - in the first use SIGTERM and on the next 2 use SIGKILL
+	bool	dead=false;
+	for (int tries=0; tries<3 && !dead; tries++) {
+		if (tries) {
+			dt.getSystemDateAndTime();
+			fprintf(stderr,"%s %s connection (pid=%d)\n",
+				dt.getString(),
+				(tries==1)?"Terminating":"Killing",connpid);
+
+			signalmanager::sendSignal(connpid,
+					(tries==1)?SIGTERM:SIGKILL);
+
+			// wait for process to terminate
+			snooze::macrosnooze(5);
+		}
+		dead=reapChildren(connpid);
+	}
 }
 
 void scaler::getRandomConnectionId() {
@@ -482,12 +545,7 @@ int32_t scaler::countSessions() {
 }
 
 void scaler::incConnections() {
-
-	// wait for the connection count to increase
-	semset->wait(8);
 	this->currentconnections++;
-
-	//fprintf(stderr,"conn = %d\n",this->currentconnections);
 }
 
 void scaler::decConnections() {

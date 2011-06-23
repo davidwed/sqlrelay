@@ -1,3 +1,6 @@
+I think the scaler patch introduces a race condition
+
+
 perl dbi - unknown
 php pear db - unknown
 ruby dbi - unknown

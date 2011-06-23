@@ -16,6 +16,9 @@
 #include <rudiments/sharedmemory.h>
 #include <rudiments/randomnumber.h>
 
+// for pid_t
+#include <sys/types.h>
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -31,9 +34,11 @@ class scaler : public daemonprocess {
 	private:
 		void	cleanUp();
 
-		bool	openOneConnection();
+		pid_t	openOneConnection();
+		bool	connectionStarted();
+		void	killConnection(pid_t connpid);
 		bool	openMoreConnections();
-		void	reapChildren();
+		bool	reapChildren(pid_t connpid);
 		void	getRandomConnectionId();
 		bool	availableDatabase();
 		int32_t	countSessions();
