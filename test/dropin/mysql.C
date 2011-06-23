@@ -401,6 +401,7 @@ int	main(int argc, char **argv) {
 	checkSuccess((long)mysql_fetch_row(result),0);
 	printf("\n");
 
+	mysql_free_result(result);
 
 
 	printf("mysql_real_query: drop\n");

@@ -63,6 +63,8 @@
 	applied Renat Sabitov's patch to kill scaler-started connections which
 		fail to signal on sem(8) because they either crashed or got
 		hung up trying to start
+	fixed a bug in the mysql drop-in lib that could cause the client to
+		run out of cursors
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

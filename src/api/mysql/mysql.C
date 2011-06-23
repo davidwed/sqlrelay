@@ -381,7 +381,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
 						user,passwd,0,1);
-mysql->sqlrcon->debugOn();
+//mysql->sqlrcon->debugOn();
 	mysql->sqlrcon->copyReferences();
 	mysql->currentstmt=NULL;
 	return mysql;
@@ -711,6 +711,10 @@ int mysql_read_query_result(MYSQL *mysql) {
 
 int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length) {
 	debugFunction();
+	if (mysql->currentstmt && mysql->currentstmt->result) {
+		mysql_free_result(mysql->currentstmt->result);
+	}
+	mysql_stmt_close(mysql->currentstmt);
 	mysql->currentstmt=mysql_prepare(mysql,query,length);
 	return mysql_execute(mysql->currentstmt);
 }
@@ -730,7 +734,9 @@ my_ulonglong mysql_insert_id(MYSQL *mysql) {
 
 MYSQL_RES *mysql_store_result(MYSQL *mysql) {
 	debugFunction();
-	return mysql->currentstmt->result;
+	MYSQL_RES	*retval=mysql->currentstmt->result;
+	mysql->currentstmt->result=NULL;
+	return retval;
 }
 
 MYSQL_RES *mysql_use_result(MYSQL *mysql) {
@@ -1639,7 +1645,6 @@ my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 		// mysql_close(), so presumably that's how apps should act.
 		//mysql_free_result(stmt->result);
 		delete stmt;
-		stmt=NULL;
 	}
 	return true;
 }

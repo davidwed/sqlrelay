@@ -1,9 +1,6 @@
 I think the scaler patch introduces a race condition
 	maybe wait with timeout again after killing just to be sure?
 
-drop-in mysql - drop table fails with "no server-side cursors were available to process the query"
-
-
 Hard problem:
 	oracle apparently runs out of cursors after a while, the problem isn't
 	present in 0.39.4 but is present in all 0.4x versions and CVS:
