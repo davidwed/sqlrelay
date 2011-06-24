@@ -35,7 +35,7 @@ Source0: %{name}-%{version}.tar.gz
 URL: http://sqlrelay.sourceforge.net
 Buildroot: %{_tmppath}/%{name}-root
 
-%define fedoraversion %(cat /etc/redhat-release 2> /dev/null | grep Fedora | cut -f4 -d' ')
+%define fedoraversion %(for word in `cat /etc/redhat-release 2> /dev/null`; do VAR=`echo $word | grep -x "[0-9]*"`; if ( test -n "$VAR" ); then echo $VAR; fi ; done)
 
 %if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
 	%define phpdevel %(echo "mod_php4-devel")
@@ -321,7 +321,8 @@ Group: Applications/Database
 Man pages for SQL Relay.
 
 
-%define	tcldir		%(dirname `rpm -q -l %{tcldevel} | grep tclConfig.sh` 2>/dev/null )
+%define	tclconfig	%(readlink `rpm -q -l %{tcldevel} | grep -m1 tclConfig.sh`)
+%define	tcldir		%(dirname %{tclconfig})
 %ifarch x86_64
 %define	erlangdir	%(ERLPATH=""; for i in "/usr/local/lib64/erlang/lib" "/usr/lib64/erlang/lib"; do if ( test -d "$i" ); then ERLPATH="$i"; fi; done; echo $ERLPATH)
 %else
