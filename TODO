@@ -1,5 +1,3 @@
-postgresql - leaks
-
 Bugs:
 	* Zope API:
 		doesn't handle money types right
@@ -143,6 +141,9 @@ Documentation:
 	* performance benchmark charts
 
 Performance/Code Enhancements:
+	* unify bind architecture
+		- all connections use MAXVAR and similar logic
+		- push some logic up into sqlrcursor_svr class
 	* we might be able to do without sem(8) in the scaler since the
 		scaler knows how many connections it has started and killed
 	* reset autocommit state when new client logs into sqlrelay

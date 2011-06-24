@@ -67,6 +67,7 @@
 		run out of cursors
 	added a mapping between sqlite3_free and sqlite_freemem
 	added a fix for a race condition in the scaler
+	fixed a postgresql bind memory leak
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library
