@@ -231,9 +231,10 @@ postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
 	deallocatestatement=false;
 	cursorname=NULL;
 	bindcounter=0;
-	bindformats=NULL;
+	bindcount=0;
 	bindvalues=NULL;
 	bindlengths=NULL;
+	bindformats=NULL;
 #endif
 	columnnames=NULL;
 }
@@ -244,6 +245,13 @@ postgresqlcursor::~postgresqlcursor() {
 	delete[] cursorname;
 #endif
 	delete[] columnnames;
+
+	for (uint16_t i=0; i<bindcount; i++) {
+		delete[] bindvalues[i];
+	}
+	delete[] bindvalues;
+	delete[] bindlengths;
+	delete[] bindformats;
 }
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
@@ -1008,6 +1016,14 @@ void postgresqlcursor::returnRow() {
 
 
 void postgresqlcursor::cleanUpData(bool freeresult, bool freebinds) {
+
+	if (freebinds) {
+		for (uint16_t i=0; i<bindcount; i++) {
+			delete[] bindvalues[i];
+			bindvalues[i]=NULL;
+		}
+	}
+
 	if (freeresult && pgresult) {
 		PQclear(pgresult);
 		pgresult=(PGresult *)NULL;
