@@ -287,7 +287,7 @@ API's:
 	* PHP MDB2 driver
 
 DB Compatibility:
-	* Informix
+	* Informix - http://www-01.ibm.com/software/data/informix/downloads.html
 	* xbsql
 	* Google Datastore
 	* web sql database? : http://dev.w3.org/html5/webdatabase/
