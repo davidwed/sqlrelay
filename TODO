@@ -270,6 +270,7 @@ Features:
 		create module for xbase tables to use SQL on those
 		create module for csv's
 		lots of possibilities
+	* extend query filtering to rewrite queries
 
 Availability:
 	* connections should ping database server every so often to make sure
@@ -283,6 +284,7 @@ API's:
 	* Ruby-on-rails adapter
         * javascript/ajax
 	* PHP PDO driver  http://wiki.cc/php/PDO
+	* PHP MDB2 driver
 
 DB Compatibility:
 	* Informix

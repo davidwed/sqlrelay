@@ -80,7 +80,7 @@ class sqlrlistener : public daemonprocess, public listener {
 		void	decBusyListeners();
 		int     getBusyListeners();
 		bool	handOffClient(filedescriptor *sock);
-		void	getAConnection(uint32_t *connectionpid,
+		bool	getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
 					uint16_t *unixportstrlen);

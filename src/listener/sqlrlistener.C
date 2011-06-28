@@ -1307,8 +1307,15 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 	// loop in case client doesn't get handed off successfully
 	for (;;) {
 
-		getAConnection(&connectionpid,&inetport,
-				unixportstr,&unixportstrlen);
+		if (!getAConnection(&connectionpid,&inetport,
+					unixportstr,&unixportstrlen)) {
+			// fatal error occurred while getting a connection
+			sock->write((uint16_t)ERROR);
+			sock->write((uint16_t)70);
+			sock->write("The listener failed to hand the client off to the database connection.");
+			retval=false;
+			break;
+		}
 
 		// if we're passing file descriptors around,
 		// tell the client not to reconnect and pass
@@ -1374,7 +1381,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 	return retval;
 }
 
-void sqlrlistener::getAConnection(uint32_t *connectionpid,
+bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
 					uint16_t *unixportstrlen) {
@@ -1395,22 +1402,24 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		// wait for exclusive access to the
 		// shared memory among listeners
-		dbgfile.debugPrint("listener",0,"acquiring exclusive shm access");
-
+		dbgfile.debugPrint("listener",0,
+				"acquiring exclusive shm access");
 		if (!semset->waitWithUndo(1)) {
-			// FIXME: bail somehow
+			dbgfile.debugPrint("listener",0,
+				"failed to acquire exclusive shm access");
+			return false;
 		}
-
-		dbgfile.debugPrint("listener",0,"done acquiring exclusive shm access");
+		dbgfile.debugPrint("listener",0,
+				"done acquiring exclusive shm access");
 
 		// wait for an available connection
 		dbgfile.debugPrint("listener",0,
 				"waiting for an available connection");
-
 		if (!semset->wait(2)) {
-			// FIXME: bail somehow
+			dbgfile.debugPrint("listener",0,
+				"failed to wait for an available connection");
+			return false;
 		}
-
 		dbgfile.debugPrint("listener",0,
 				"done waiting for an available connection");
 
@@ -1453,37 +1462,38 @@ void sqlrlistener::getAConnection(uint32_t *connectionpid,
 		// tell the connection that we've gotten it's data
 		dbgfile.debugPrint("listener",0,
 				"signalling connection that we've read");
-
 		if (!semset->signal(3)) {
-			// FIXME: bail somehow
+			dbgfile.debugPrint("listener",0,
+				"failed to signal connection that we've read");
+			return false;
 		}
-
 		dbgfile.debugPrint("listener",0,
 				"done signalling connection that we've read");
 
 		// allow other listeners access to the shared memory
-		dbgfile.debugPrint("listener",0,"releasing exclusive shm access");
-
+		dbgfile.debugPrint("listener",0,
+				"releasing exclusive shm access");
 		if (!semset->signalWithUndo(1)) {
-			// FIXME: bail somehow
+			dbgfile.debugPrint("listener",0,
+				"failed to release exclusive shm access");
+			return false;
 		}
-
-		dbgfile.debugPrint("listener",0,"done releasing exclusive shm access");
+		dbgfile.debugPrint("listener",0,
+				"done releasing exclusive shm access");
 
 		// make sure the connection is actually up, if not,
 		// fork a child to jog it, spin back and get another connection
 		if (connectionIsUp(ptr->connectionid)) {
-
-			dbgfile.debugPrint("listener",1,"done getting a connection");
+			dbgfile.debugPrint("listener",1,
+						"done getting a connection");
 			break;
-
 		} else {
-
 			dbgfile.debugPrint("listener",1,"connection was down");
-
 			pingDatabase(*connectionpid,unixportstr,*inetport);
 		}
 	}
+
+	return true;
 }
 
 bool sqlrlistener::connectionIsUp(const char *connectionid) {

@@ -70,6 +70,8 @@
 	fixed a postgresql bind memory leak
 	applied Renat's ruby DESTDIR patch and updated helper scripts to
 		remove $(DESTDIR) from all the variables that it outputs
+	applied Renat's patch to handle semaphore failures in forked listeners
+		during shutdown
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library
