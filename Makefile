@@ -62,6 +62,8 @@ distclean: clean
 	$(RM) init/redhat/init.d/sqlrelay
 	$(RM) init/slackware/rc.d/rc.sqlrelay
 	$(RM) init/debian/init.d/sqlrelay
+	$(RM) init/netbsd/rc.d/sqlrelay
+	$(RM) init/freebsd/rc.d/sqlrelay
 	$(RM) test/test
 	$(RM) libtool
 	$(RM) libtool.gcc
