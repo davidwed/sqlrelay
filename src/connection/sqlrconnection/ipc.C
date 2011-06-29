@@ -89,6 +89,13 @@ void sqlrconnection_svr::signalListenerToRead() {
 void sqlrconnection_svr::waitForListenerToFinishReading() {
 	dbgfile.debugPrint("connection",1,"waiting for listener");
 	semset->wait(3);
+	// Reset this semaphore to 0.
+	// It can get left incremented if another sqlr-connection is killed
+	// between calls to signalListenerToRead() and this method.
+	// It's ok to reset it here becuase no one except this process has
+	// access to this semaphore at this time because of the lock on
+	// AnnounceMutex (semaphore 0).
+	semset->setValue(3,0);
 	dbgfile.debugPrint("connection",1,"done waiting for listener");
 }
 

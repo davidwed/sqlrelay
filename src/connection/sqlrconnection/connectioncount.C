@@ -7,20 +7,24 @@ void sqlrconnection_svr::incrementConnectionCount() {
 
 	dbgfile.debugPrint("connection",0,"incrementing connection count...");
 
-	acquireConnectionCountMutex();
-
-	// increment the counter
-	int32_t	*connectioncount=getConnectionCountBuffer();
-	(*connectioncount)++;
-	decrementonclose=true;
-
-	dbgfile.debugPrint("connection",1,(*connectioncount));
-
 	if (scalerspawned) {
-		signalScalerToRead();
-	}
 
-	releaseConnectionCountMutex();
+		dbgfile.debugPrint("connection",0,"scaler will do the job");
+		signalScalerToRead();
+
+	} else {
+
+		acquireConnectionCountMutex();
+
+		// increment the counter
+		int32_t	*connectioncount=getConnectionCountBuffer();
+		(*connectioncount)++;
+		decrementonclose=true;
+
+		dbgfile.debugPrint("connection",1,(*connectioncount));
+
+		releaseConnectionCountMutex();
+	}
 
 	dbgfile.debugPrint("connection",0,"done incrementing connection count");
 }
@@ -29,18 +33,25 @@ void sqlrconnection_svr::decrementConnectionCount() {
 
 	dbgfile.debugPrint("connection",0,"decrementing connection count...");
 
-	acquireConnectionCountMutex();
+	if (scalerspawned) {
 
-	// decrement the counter
-	int32_t	*connectioncount=getConnectionCountBuffer();
-	if (--(*connectioncount)<0) {
-		(*connectioncount)=0;
+		dbgfile.debugPrint("connection",0,"scaler will do the job");
+
+	} else {
+
+		acquireConnectionCountMutex();
+
+		// decrement the counter
+		int32_t	*connectioncount=getConnectionCountBuffer();
+		if (--(*connectioncount)<0) {
+			(*connectioncount)=0;
+		}
+		decrementonclose=false;
+
+		dbgfile.debugPrint("connection",1,(*connectioncount));
+
+		releaseConnectionCountMutex();
 	}
-	decrementonclose=false;
-
-	dbgfile.debugPrint("connection",1,(*connectioncount));
-
-	releaseConnectionCountMutex();
 
 	dbgfile.debugPrint("connection",0,"done decrementing connection count");
 }

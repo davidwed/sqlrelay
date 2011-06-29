@@ -72,6 +72,10 @@
 		remove $(DESTDIR) from all the variables that it outputs
 	applied Renat's patch to handle semaphore failures in forked listeners
 		during shutdown
+	applied Renat's patch to move connection counting for scaler-spawned
+		connections entirely into scaler itself
+	applied Renat's patch to reap children more regularly and refactored
+		it a little
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

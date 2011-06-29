@@ -46,8 +46,6 @@ scaler::scaler() : daemonprocess() {
 	config=NULL;
 	dbase=NULL;
 
-	currentconnections=0;
-
 	debug=false;
 }
 
@@ -383,7 +381,8 @@ pid_t scaler::openOneConnection() {
 		exit(ret);
 	} else if (pid==-1) {
 		// error
-		fprintf(stderr,"fork() returned %d [%d]\n",pid,errno);
+		fprintf(stderr,"fork() returned %d [%d]\n",
+					pid,error::getErrorNumber());
 	}
 
 	delete[] command;
@@ -393,18 +392,37 @@ pid_t scaler::openOneConnection() {
 
 bool scaler::openMoreConnections() {
 
-	// wait for a new listener to fire up and increment the listener count
-	if (!semset->wait(6)) {
-		// If this returns false then an error has occurred and the
-		// semaphore can't be accessed.  Most likely the sqlr-listener
-		// has been killed.
-		return false;
+	for (;;) {
+
+		// Wait for a new listener to fire up and increment the
+		// listener count.  If we can, use a 5 second timeout, so that
+		// we can reap children periodically.
+		bool	waitresult=semset->supportsTimedSemaphoreOperations()?
+							semset->wait(6,5,0):
+							semset->wait(6);
+
+		// If the wait returned false for some other reason than a
+		// timeout, then an error has occurred and the semaphore can't
+		// be accessed.  Most likely the sqlr-listener has been killed.
+		// Return failure.
+		if (!waitresult && error::getErrorNumber()!=EAGAIN) {
+			return false;
+		}
+
+		// reap children here, no matter what
+		reapChildren(-1);
+		
+		// if the wait succeeded, break out of the loop
+		if (waitresult) {
+			break;
+		}
+
+		// otherwise loop back and wait again...
 	}
 
-	reapChildren(-1);
-
+	// get session and connection counts
 	int	sessions=countSessions();
-	currentconnections=countConnections();
+	int32_t	currentconnections=countConnections();
 
 	// signal listener to keep going
 	semset->signal(7);
@@ -556,14 +574,31 @@ int32_t scaler::countSessions() {
 }
 
 void scaler::incConnections() {
-	this->currentconnections++;
+
+	// wait for access to the connection counter
+	semset->waitWithUndo(4);
+
+	// increment connection counter
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	ptr->totalconnections++;
+
+	// signal that the connection counter may be accessed by someone else
+	semset->signalWithUndo(4);
 }
 
 void scaler::decConnections() {
-	if (--this->currentconnections<0) {
-		//hmm kinda error?
-		this->currentconnections=0;
+
+	// wait for access to the connection counter
+	semset->waitWithUndo(4);
+
+	// decrement connection counter
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	if (--ptr->totalconnections<0) {
+		ptr->totalconnections=0;
 	}
+
+	// signal that the connection counter may be accessed by someone else
+	semset->signalWithUndo(4);
 }
 
 int32_t scaler::countConnections() {
