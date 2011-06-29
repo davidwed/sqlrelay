@@ -210,10 +210,6 @@ Features:
 	* return error code/number
 	* SSL encryption
 	* verbose mode for export/import
-	* support network protocols for mysql, postgresql
-		rather than using drop-in replacement libs
-		blackray supports postgresql protocol, I might be able to grab
-		some code from it to implement the same
 	* query router support accessing different db's by specifying a
 		different user/password
 	* query router support accessing different db's by specifying which
@@ -285,6 +281,18 @@ API's:
         * javascript/ajax
 	* PHP PDO driver  http://wiki.cc/php/PDO
 	* PHP MDB2 driver
+
+Listeners:
+	* mysql - open source, could look at server code
+		* http://forge.mysql.com/wiki/MySQL_Internals_ClientServer_Protocol
+		* http://search.cpan.org/~philips/DBIx-MyServer-0.42/lib/DBIx/MyServer.pm
+	* postgresql - open source, could look at server code
+		* blackray implements a postgresql listener -
+			maybe steal some code from it
+	* firebird - open source, could look at server code
+	* sybase/mssqlserver - TDS protocol is documented, current?
+	* oracle - would have to reverse engineer - legal issues?
+	* db2 - would have to reverse engineer - legal issues?
 
 DB Compatibility:
 	* Informix - http://www-01.ibm.com/software/data/informix/downloads.html
