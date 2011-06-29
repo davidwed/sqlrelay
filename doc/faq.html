@@ -1407,6 +1407,8 @@ used to log queries which take longer than <b>timequeriessec</b> seconds and
 tuning but setting it too low will result in poorer performance rather than
 additional resource consumption.</p>
 
+<p>In version 0.41, the default <i>maxsessioncount</i> value was 10.  This caused performance problems as most people just didn't set the value at all.  As of 0.42, the default has been 0, effectively disabling this feature by default.</p>
+
 <a name="maxqueuelengthzero">
 <span class="heading3">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</span><br><br>
 
