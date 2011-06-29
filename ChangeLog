@@ -77,6 +77,7 @@
 	applied Renat's patch to reap children more regularly and refactored
 		it a little
 	fixed distclean to remove perl .pm files
+	changed maxsessioncount default to 0, updated docs, examples
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

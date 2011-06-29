@@ -35,7 +35,7 @@
 	// default time to live for idle connections
 	// that were fired off to handle increased load
 
-#define DEFAULT_MAXSESSIONCOUNT "10"
+#define DEFAULT_MAXSESSIONCOUNT "0"
 	// default max client sessions for connections
 	// that were fired off to handle increased load
 
