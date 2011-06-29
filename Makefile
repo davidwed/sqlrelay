@@ -49,10 +49,8 @@ distclean: clean
 	$(RM) config.mk
 	$(RMTREE) autom4te.cache
 	$(RMTREE) autom4te-*.cache
-	$(RM) src/api/perl/SQLRConnection/Makefile.PL
-	$(RM) src/api/perl/SQLRConnection/SQLRConnection.pm
-	$(RM) src/api/perl/SQLRCursor/Makefile.PL
-	$(RM) src/api/perl/SQLRCursor/SQLRCursor.pm
+	$(RM) src/api/perl/Connection/Connection.pm
+	$(RM) src/api/perl/Cursor/Cursor.pm
 	$(RM) src/api/perl/DBD/Makefile.PL
 	$(RM) src/api/perl/DBD/SQLRelay.pm
 	$(RM) bin/sqlr-stop
