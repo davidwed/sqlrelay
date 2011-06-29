@@ -1,4 +1,15 @@
+Apply oracle output bind, bind once, execute many patch
+
+Is it possible to bind to in/out parameters?  If so, document it, if not, make it work somehow.
+
+Clean up leftover PID/socket files somehow
+
+
 Bugs:
+	* The Ruby bindings don't have an explicit cursor close method
+		the cursors are garbage collected, but you can run up against
+		the limit pretty easily - possibly other api's have this 
+		same problem
 	* Zope API:
 		doesn't handle money types right
 		ImageFile needs to be App.ImageFile in zope 2.11 and up
@@ -134,11 +145,12 @@ Documentation:
 		make sure ODBC docs say that you have to use numbers for
 		bind variables
 	* how to use SQL Relay with joomla
-	* how to use new features of Tony/Erik's perl dbi patch
+	* how to use new features of Tony/Erik's perl dbi clob/blob bind patch
 	* getting started with odbc
 	* "how sqlrelay works" with diagrams and animations
 	* example sqlrelay.conf's for different configurations
 	* performance benchmark charts
+	* nobody user/group issues
 
 Performance/Code Enhancements:
 	* unify bind architecture
@@ -229,7 +241,7 @@ Features:
 		* use PAM if possible as alternative to
 			defining users in sqlrelay.conf
 		* kerberos/gssapi authentication
-	* support stored procedures that return result sets in interbase, db2
+	* support stored procedures that return result sets in firebird, db2
 	* could debug logs be logrotate compatible?
 	* sybase/freetds (possibly others) need options for setting chained
 		mode and isolation mode when client connects
@@ -239,7 +251,7 @@ Features:
 		identical long/lob datatype support in all databases
 		more advanced long/lob datatype support
 		support for array datatypes (oracle collections)
-		handle blobs, quads in interbase
+		handle blobs, quads in firebird
 		handle timestamps
 		handle enum types in mysql
 	* front end replication
@@ -279,8 +291,8 @@ API's:
 	* C#
 	* Ruby-on-rails adapter
         * javascript/ajax
-	* PHP PDO driver  http://wiki.cc/php/PDO
-	* PHP MDB2 driver
+	* PHP ADODB, PDO (http://wiki.cc/php/PDO) and MDB2 drivers
+	* Borland Delphi
 
 Listeners:
 	* mysql - open source, could look at server code
