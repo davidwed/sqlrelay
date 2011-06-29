@@ -1,5 +1,3 @@
-0.43 -
-
 0.42 - fixed a bug causing cursor id's not to get set for some db's
 	updated configure script to look for client64 in addition to client
 		for oracle intantclient on x86_64
@@ -74,6 +72,10 @@
 		remove $(DESTDIR) from all the variables that it outputs
 	applied Renat's patch to handle semaphore failures in forked listeners
 		during shutdown
+	applied Renat's patch to move connection counting for scaler-spawned
+		connections entirely into scaler itself
+	applied Renat's patch to reap children more regularly and refactored
+		it a little
 
 0.41 - added configure test for ruby.h
 	added a couple of new functions to the mysql drop-in library

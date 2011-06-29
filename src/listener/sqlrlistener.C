@@ -1420,6 +1420,16 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 				"failed to wait for an available connection");
 			return false;
 		}
+
+		// Reset this semaphore to 0.
+		// It can get left incremented if a sqlr-connection process
+		// is killed between calls to signalListenerToRead() and
+		// waitForListenerToFinishReading().
+		// It's ok to reset it here because no one except this process
+		// has access to this semaphore at this time because of the
+		// lock on semaphore 1.
+		semset->setValue(2,0);
+
 		dbgfile.debugPrint("listener",0,
 				"done waiting for an available connection");
 

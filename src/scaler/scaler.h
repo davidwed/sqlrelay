@@ -55,7 +55,6 @@ class scaler : public daemonprocess {
 		sqlrconfigfile	*cfgfile;
 
 		int32_t		maxconnections;
-		int32_t		currentconnections;
 		int32_t		maxqueuelength;
 		int32_t		growby;
 		int32_t		ttl;
