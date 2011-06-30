@@ -515,7 +515,8 @@ void scaler::killConnection(pid_t connpid) {
 	fprintf(stderr,"%s Connection (pid=%d) failed to get ready\n",
 						dt.getString(),connpid);
 
-	// try 3 times - in the first use SIGTERM and on the next 2 use SIGKILL
+	// try 3 times - in the first check whether it is already dead,
+	// then use SIGTERM and at last use SIGKILL
 	bool	dead=false;
 	for (int tries=0; tries<3 && !dead; tries++) {
 		if (tries) {
