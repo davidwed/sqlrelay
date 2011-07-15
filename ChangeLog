@@ -1,3 +1,5 @@
+0.43 - added -Werror to -pthread test in configure script
+
 0.42 - fixed a bug causing cursor id's not to get set for some db's
 	updated configure script to look for client64 in addition to client
 		for oracle intantclient on x86_64
