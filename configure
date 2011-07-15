@@ -15182,7 +15182,7 @@ fi
 $as_echo_n "checking if gcc -pthread works during compile phase... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
-CPPFLAGS="-pthread"
+CPPFLAGS="-Werr -pthread"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdio.h>
