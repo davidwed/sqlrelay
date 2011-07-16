@@ -1,8 +1,15 @@
 require "mkmf"
+
+#Config::CONFIG.each { |e| print e, "\n" }
+#exit
+
 drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/
 print "\n"
 print "arch = "
 print CONFIG["arch"]
+print "\n"
+print "sitearch = "
+print CONFIG["sitearch"]
 print "\n"
 print "ruby_version = "
 print Config::CONFIG["ruby_version"]
@@ -28,7 +35,7 @@ print "\n"
 print "srcdir = "
 print $srcdir
 print "\n"
-print "CFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(srcdir) "
+print "CFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(hdrdir)/$(sitearch) -I$(srcdir) "
 print "\n"
 print "CPPFLAGS = "
 print $CFLAGS
