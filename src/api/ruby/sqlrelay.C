@@ -13,6 +13,10 @@ static void sqlrcon_free(void *sqlrcon) {
 	delete (sqlrconnection *)sqlrcon;
 }
 
+#ifndef STR2CSTR
+	#define STR2CSTR(v) StringValuePtr(v)
+#endif
+
 static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 				VALUE user, VALUE password, 
 				VALUE retrytime, VALUE tries) {
