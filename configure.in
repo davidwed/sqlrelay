@@ -458,6 +458,7 @@ echo "***** Platform ***************"
 FW_CHECK_UNAME
 
 FW_CHECK_MICROSOFT
+FW_CHECK_MINIX
 FW_CHECK_OSX
 FW_CHECK_SO_EXT
 

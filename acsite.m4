@@ -399,6 +399,15 @@ AC_DEFUN([FW_CHECK_OSX],
 	AC_SUBST(PYTHONFRAMEWORK)
 ])
 
+dnl Checks for minix and adds some macros if it is
+AC_DEFUN([FW_CHECK_MINIX],
+[
+case $host_os in
+	*minix* )
+		CPPFLAGS="$CPPFLAGS -D_MINIX -D_POSIX_SOURCE"
+		;;
+esac
+])
 
 dnl Determines what extension shared object files have
 AC_DEFUN([FW_CHECK_SO_EXT],

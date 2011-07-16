@@ -14984,6 +14984,13 @@ $as_echo "#define MINGW32 1" >>confdefs.h
 fi
 
 
+case $host_os in
+	*minix* )
+		CPPFLAGS="$CPPFLAGS -D_MINIX -D_POSIX_SOURCE"
+		;;
+esac
+
+
 	PYTHONFRAMEWORK=""
 	if ( test "$UNAME" = "Darwin" )
 	then
