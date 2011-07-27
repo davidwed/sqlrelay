@@ -763,7 +763,7 @@ void sqlrlistener::blockSignals() {
 		set.addSignal(SIGRTMAX);
 	#endif
 
-	signalmanager::ignoreSignals(set.getSignalSet());
+	signalmanager::ignoreSignals(&set);
 
 	// set a handler for SIGALRM's
 	alarmhandler.setHandler(alarmHandler);

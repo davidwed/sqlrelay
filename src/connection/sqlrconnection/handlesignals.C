@@ -114,7 +114,7 @@ signalhandler *sqlrconnection_svr::handleSignals(void (*shutdownfunction)(int)) 
 #ifdef HAVE_SIGPOLL
 	set.addSignal(SIGPOLL);
 #endif
-	signalmanager::ignoreSignals(set.getSignalSet());
+	signalmanager::ignoreSignals(&set);
 
 	return sighandler;
 }
