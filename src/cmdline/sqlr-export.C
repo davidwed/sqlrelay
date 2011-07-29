@@ -6,9 +6,9 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
+#include <rudiments/process.h>
 #include <sqlrconfigfile.h>
 
-#include <stdlib.h>
 #include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
@@ -65,7 +65,7 @@ int main(int argc, const char **argv) {
 				"tablename [debug] \n"
 				"  or   sqlr-export  [-config configfile] "
 				"-id id (table|sequence) tablename [debug]\n");
-			exit(1);
+			process::exit(1);
 		}
 
 		host=argv[1];
@@ -112,7 +112,7 @@ int main(int argc, const char **argv) {
 				debug=true;
 			}
 		} else {
-			exit(1);
+			process::exit(1);
 		}
 	}
 
@@ -136,7 +136,7 @@ int main(int argc, const char **argv) {
 
 	sqlrcon.endSession();
 
-	exit(exitval);
+	process::exit(exitval);
 }
 
 int exportTable(sqlrcursor *sqlrcur, const char *table) {

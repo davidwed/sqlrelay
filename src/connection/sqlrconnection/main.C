@@ -5,11 +5,6 @@
 #include <sqlrconnection.h>
 #include <rudiments/process.h>
 
-// for _exit
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
-
 sqlrconnection_svr	*sqlrconnection_svr::conn=NULL;
 signalhandler		*sqlrconnection_svr::sigh=NULL;
 volatile sig_atomic_t	sqlrconnection_svr::shutdowninprogress=0;
@@ -24,7 +19,7 @@ void sqlrconnection_svr::shutDown(int signum) {
 
 	if (!signalhandler::isSignalHandlerIntUsed()) {
 		cleanUp();
-		_exit(0);
+		process::exit(0);
 	}
 
 	/* Since this handler is established for more than one kind of signal,
@@ -68,7 +63,7 @@ void sqlrconnection_svr::shutDown(int signum) {
 	}
 
 	cleanUp();
-	_exit(exitcode);
+	process::exit(exitcode);
 }
 
 int sqlrconnection_svr::main(int argc, const char **argv, sqlrconnection_svr *c) {
@@ -100,5 +95,5 @@ int sqlrconnection_svr::main(int argc, const char **argv, sqlrconnection_svr *c)
 	cleanUp();
 
 	// return successful or unsuccessful completion based on listenresult
-	exit((result)?0:1);
+	process::exit((result)?0:1);
 }

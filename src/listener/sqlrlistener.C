@@ -20,11 +20,6 @@
 // for printf
 #include <stdio.h>
 
-// for _exit
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
-
 #include <defines.h>
 #include <defaults.h>
 
@@ -774,7 +769,7 @@ void sqlrlistener::alarmHandler(int signum) {
 	staticlistener->decForkedListeners();
 
 	delete staticlistener;
-	exit(0);
+	process::exit(0);
 }
 
 filedescriptor *sqlrlistener::waitForData() {
@@ -1125,7 +1120,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 	// if the client connected to one of the non-handoff
 	// sockets, fork a child to handle it
 	pid_t	childpid;
-	if (!(childpid=fork())) {
+	if (!(childpid=process::fork())) {
 
 		// set pidfile to NULL so the pidfile won't be removed when
 		// this child process exits
@@ -1147,7 +1142,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		decForkedListeners();
 
 		cleanUp();
-		exit(0);
+		process::exit(0);
 	} else if (childpid>0) {
 		// parent
 		char	debugstring[22];
@@ -1527,7 +1522,7 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 	// fork off and cause the connection to ping the database, this should
 	// cause it to reconnect
 	pid_t	childpid;
-	if (!(childpid=fork())) {
+	if (!(childpid=process::fork())) {
 
 		// connect to the database connection
 		filedescriptor	*connsock=connectToConnection(connectionpid,
@@ -1556,7 +1551,7 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 		semset->dontRemove();
 
 		cleanUp();
-		_exit(0);
+		process::exit(0);
 	}
 }
 

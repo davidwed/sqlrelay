@@ -2,22 +2,18 @@
 // See the file COPYING for more information
 
 #include <sqlrlistener.h>
-
-// for _exit
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
+#include <rudiments/process.h>
 
 sqlrlistener	*lsnr;
 
 RETSIGTYPE	crash(int signum) {
 	delete lsnr;
-	_exit(0);
+	process::exit(0);
 }
 
 RETSIGTYPE	shutDown(int signum) {
 	delete lsnr;
-	_exit(0);
+	process::exit(0);
 }
 
 int	main(int argc, const char **argv) {
@@ -34,5 +30,5 @@ int	main(int argc, const char **argv) {
 
 	// unsuccessful completion
 	delete lsnr;
-	exit(1);
+	process::exit(1);
 }

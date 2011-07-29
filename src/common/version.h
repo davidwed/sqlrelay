@@ -5,5 +5,5 @@
 if (argc==2 && (!charstring::compare(argv[1],"-version") ||
 			!charstring::compare(argv[1],"--version"))) {
 	printf("SQL Relay version: %s\n",SQLR_VERSION);
-	exit(0);
+	process::exit(0);
 }

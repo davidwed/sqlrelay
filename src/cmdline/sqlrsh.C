@@ -8,6 +8,7 @@
 #include <rudiments/commandline.h>
 #include <rudiments/file.h>
 #include <rudiments/filedescriptor.h>
+#include <rudiments/process.h>
 #include <sqlrconfigfile.h>
 
 // for clock()
@@ -814,7 +815,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 				"user password [script]\n"
 				"  or   sqlrsh  [-config configfile] "
 				"-id id [script]\n");
-			exit(1);
+			process::exit(1);
 		}
 
 		host=argv[1];
@@ -950,5 +951,5 @@ int main(int argc, const char **argv) {
 
 	sqlrsh	s;
 	s.execute(argc,argv);
-	exit(0);
+	process::exit(0);
 }

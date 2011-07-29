@@ -14,12 +14,13 @@
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
 #include <rudiments/error.h>
+#include <rudiments/process.h>
 
 // for waitpid()
 #include <sys/types.h>
 #include <sys/wait.h>
 
-// for fork and exec
+// for exec
 #ifdef HAVE_UNISTD_H
 	#include <unistd.h>
 #endif
@@ -372,13 +373,13 @@ pid_t scaler::openOneConnection() {
 	}
 	argv[p++]=NULL; // the last
 
-	pid_t	pid=fork();
+	pid_t	pid=process::fork();
 
 	if (pid==0) {
 		// child
 		int	ret=execvp(command,argv);
 		fprintf(stderr,"Bad command %s\n",command);
-		exit(ret);
+		process::exit(ret);
 	} else if (pid==-1) {
 		// error
 		fprintf(stderr,"fork() returned %d [%d]\n",

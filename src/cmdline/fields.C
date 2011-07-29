@@ -7,10 +7,10 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
 #include <rudiments/stringbuffer.h>
+#include <rudiments/process.h>
 #include <sqlrconfigfile.h>
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -43,7 +43,7 @@ int main(int argc, const char **argv) {
 				"user password table\n"
 				"  or   fields  [-config configfile] "
 				"-id id table\n");
-			exit(1);
+			process::exit(1);
 		}
 
 		host=argv[1];
@@ -76,7 +76,7 @@ int main(int argc, const char **argv) {
 				break;
 			}
 		} else {
-			exit(1);
+			process::exit(1);
 		}
 	}
 
@@ -99,5 +99,5 @@ int main(int argc, const char **argv) {
 	}
 	printf("\n");
 
-	exit(0);
+	process::exit(0);
 }

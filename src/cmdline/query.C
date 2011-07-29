@@ -6,9 +6,9 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
+#include <rudiments/process.h>
 #include <sqlrconfigfile.h>
 
-#include <stdlib.h>
 #include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
@@ -45,7 +45,7 @@ int main(int argc, const char **argv) {
 				"user password query [debug] \n"
 				"  or   query  [-config configfile] "
 				"-id id query [debug]\n");
-			exit(1);
+			process::exit(1);
 		}
 
 		host=argv[1];
@@ -89,7 +89,7 @@ int main(int argc, const char **argv) {
 				break;
 			}
 		} else {
-			exit(1);
+			process::exit(1);
 		}
 	}
 
@@ -127,5 +127,5 @@ int main(int argc, const char **argv) {
 	}
 	sqlrcon.endSession();
 
-	exit(exitval);
+	process::exit(exitval);
 }

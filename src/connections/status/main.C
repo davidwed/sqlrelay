@@ -3,15 +3,11 @@
 
 #include <statusconnection.h>
 #include <rudiments/signalclasses.h>
+#include <rudiments/process.h>
 #include <defines.h>
 
 #include <stdlib.h>
 #include <stdio.h>
-
-// for _exit
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
 
 int main(int argc, const char **argv) {
 
@@ -86,5 +82,5 @@ int main(int argc, const char **argv) {
 
 
 	delete conn;
-	exit(0);
+	process::exit(0);
 }

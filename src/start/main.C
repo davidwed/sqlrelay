@@ -6,6 +6,7 @@
 #include <sqlrconfigfile.h>
 #include <cmdline.h>
 #include <rudiments/snooze.h>
+#include <rudiments/process.h>
 
 // for ceil()
 #include <math.h>
@@ -258,7 +259,7 @@ int main(int argc, const char **argv) {
 	// parse the config file(s)
 	sqlrconfigfile	cfgfile;
 	if (!cfgfile.parse(config,id)) {
-		exit(1);
+		process::exit(1);
 	}
 
 	// start listener, connections, scaler, cachemanager
@@ -278,5 +279,5 @@ int main(int argc, const char **argv) {
 	printf("	Query routing and filtering.\n");
 	
 	// successful exit
-	exit(exitstatus);
+	process::exit(exitstatus);
 }

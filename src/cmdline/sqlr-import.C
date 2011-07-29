@@ -8,9 +8,9 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
+#include <rudiments/process.h>
 #include <sqlrconfigfile.h>
 
-#include <stdlib.h>
 #include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
@@ -458,7 +458,7 @@ int main(int argc, const char **argv) {
 				"user password file [debug] \n"
 				"  or   sqlr-import  [-config configfile] "
 				"-id id file [debug]\n");
-			exit(1);
+			process::exit(1);
 		}
 
 		host=argv[1];
@@ -503,7 +503,7 @@ int main(int argc, const char **argv) {
 				debug=true;
 			}
 		} else {
-			exit(1);
+			process::exit(1);
 		}
 	}
 
@@ -516,5 +516,5 @@ int main(int argc, const char **argv) {
 	}
 
 	sqlrimport	sqlri(&sqlrcon,&sqlrcur);
-	exit(!sqlri.parseFile(file));
+	process::exit(!sqlri.parseFile(file));
 }

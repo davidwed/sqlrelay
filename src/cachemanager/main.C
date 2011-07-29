@@ -4,9 +4,7 @@
 #include <cachemanager.h>
 
 #include <rudiments/charstring.h>
-
-// for exit()
-#include <stdlib.h>
+#include <rudiments/process.h>
 
 // for printf() in version.h
 #include <stdio.h>
@@ -15,7 +13,7 @@ cachemanager	*cacheman;
 
 void shutDown(int signum) {
 	delete cacheman;
-	exit(0);
+	process::exit(0);
 }
 
 int main(int argc, const char **argv) {

@@ -14,6 +14,7 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 
 #include <pqdefinitions.h>
 #include <rudiments/charstring.h>
+#include <rudiments/process.h>
 
 #ifdef WIN32
 #include "win32.h"
@@ -133,17 +134,17 @@ PQprint(FILE *fout,
 		if (!(fieldNames = (const char **) calloc(nFields, sizeof(char *))))
 		{
 			perror("calloc");
-			exit(1);
+			process::exit(1);
 		}
 		if (!(fieldNotNum = (unsigned char *) calloc(nFields, 1)))
 		{
 			perror("calloc");
-			exit(1);
+			process::exit(1);
 		}
 		if (!(fieldMax = (int *) calloc(nFields, sizeof(int))))
 		{
 			perror("calloc");
-			exit(1);
+			process::exit(1);
 		}
 		for (numFieldName = 0;
 			 po->fieldName && po->fieldName[numFieldName];
@@ -228,7 +229,7 @@ PQprint(FILE *fout,
 			if (!(fields = (char **) calloc(nFields * (nTups + 1), sizeof(char *))))
 			{
 				perror("calloc");
-				exit(1);
+				process::exit(1);
 			}
 		}
 		else if (po->header && !po->html3)
@@ -409,7 +410,7 @@ do_field(const PQprintOpt *po, const PGresult *res,
 			if (!(fields[i * nFields + j] = (char *) malloc(plen + 1)))
 			{
 				perror("malloc");
-				exit(1);
+				process::exit(1);
 			}
 			charstring::copy(fields[i * nFields + j], pval);
 		}
@@ -480,7 +481,7 @@ do_header(FILE *fout, const PQprintOpt *po, const int nFields, int *fieldMax,
 		if (!border)
 		{
 			perror("malloc");
-			exit(1);
+			process::exit(1);
 		}
 		p = border;
 		if (po->standard)
