@@ -2301,8 +2301,25 @@ then
 
 	else
 
-		for ruby in "ruby" "ruby16" "ruby18" "ruby1.8" "ruby19" "ruby1.9"
+		found="no"
+
+		for major in "" "1" "2" "3" "4" "5" "6" "7" "8" "9"
 		do
+
+			for minor in "" "9" "8" "7" "6" "5" "4" "3" "2" "1" "0"
+			do
+
+				for patchlevel in "" "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+				do
+
+					for separator in "" "."
+					do
+
+			ruby="ruby$major$separator$minor"
+			if ( test -n "$patchlevel" )
+			then
+				ruby="ruby$major$separator$minor$separator$patchlevel"
+			fi
 
 			HAVE_RUBY=""
 			RUBY=""
@@ -2320,6 +2337,7 @@ then
 						FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
 						if ( test -n "$RUBY" )
 						then
+							found="yes"
 							break
 						fi
 					done
@@ -2334,6 +2352,35 @@ then
 				then
 					RUBYLIB="-lruby"
 				fi
+				found="yes"
+				break
+			fi
+						if ( test -z "$major" -o -z "$minor" -o -z "$patchlevel" )
+						then
+							break
+						fi
+
+					done
+					if ( test "$found" = "yes" )
+					then
+						break
+					fi
+					if ( test -z "$minor" )
+					then
+						break
+					fi
+				done
+				if ( test "$found" = "yes" )
+				then
+						break
+				fi
+				if ( test -z "$major" )
+				then
+					break
+				fi
+			done
+			if ( test "$found" = "yes" )
+			then
 				break
 			fi
 		done
