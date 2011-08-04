@@ -24319,10 +24319,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.1/include\"; DB2VERSION=\"9\""
-		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.1/lib32\"; DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.1/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2VERSION=\"9\""
 	fi
 else
-	if ( test -n "/opt/ibm/db2/V9.1/lib32/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	if ( test -n "/opt/ibm/db2/V9.1/lib32/libdb2.a" -a -n "DB2LIBS32=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
 	then
 
 if ( test -r "/opt/ibm/db2/V9.1/lib32/libdb2.a" )
@@ -24333,7 +24333,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.1/include\"; DB2VERSION=\"9\""
-			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+			eval "DB2LIBS32=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
 		fi
 	fi
 fi
@@ -24477,10 +24477,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
-		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.5/lib32\"; DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.5/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2VERSION=\"9\""
 	fi
 else
-	if ( test -n "/opt/ibm/db2/V9.5/lib32/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	if ( test -n "/opt/ibm/db2/V9.5/lib32/libdb2.a" -a -n "DB2LIBS32=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
 	then
 
 if ( test -r "/opt/ibm/db2/V9.5/lib32/libdb2.a" )
@@ -24491,7 +24491,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
-			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+			eval "DB2LIBS32=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
 		fi
 	fi
 fi
@@ -24516,10 +24516,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V9.5/include\"; DB2VERSION=\"9\""
-		eval "DB2LIBSPATH=\"/opt/IBM/db2/V9.5/lib32\"; DB2LIBS=\"-L/opt/IBM/db2/V9.5/lib32 -ldb2\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/IBM/db2/V9.5/lib32\"; DB2LIBS32=\"-L/opt/IBM/db2/V9.5/lib32 -ldb2\"; DB2VERSION=\"9\""
 	fi
 else
-	if ( test -n "/opt/IBM/db2/V9.5/lib32/libdb2.a" -a -n "DB2LIBS=\"-L/opt/IBM/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	if ( test -n "/opt/IBM/db2/V9.5/lib32/libdb2.a" -a -n "DB2LIBS32=\"-L/opt/IBM/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
 	then
 
 if ( test -r "/opt/IBM/db2/V9.5/lib32/libdb2.a" )
@@ -24530,7 +24530,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V9.5/include\"; DB2VERSION=\"9\""
-			eval "DB2LIBS=\"-L/opt/IBM/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+			eval "DB2LIBS32=\"-L/opt/IBM/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
 		fi
 	fi
 fi
@@ -24555,10 +24555,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
-		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.5/lib64\"; DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.5/lib64\"; DB2LIBS64=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2VERSION=\"9\""
 	fi
 else
-	if ( test -n "/opt/ibm/db2/V9.5/lib64/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	if ( test -n "/opt/ibm/db2/V9.5/lib64/libdb2.a" -a -n "DB2LIBS64=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
 	then
 
 if ( test -r "/opt/ibm/db2/V9.5/lib64/libdb2.a" )
@@ -24569,7 +24569,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\""
-			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+			eval "DB2LIBS64=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
 		fi
 	fi
 fi
@@ -24594,10 +24594,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V9.5/include\"; DB2VERSION=\"9\""
-		eval "DB2LIBSPATH=\"/opt/IBM/db2/V9.5/lib64\"; DB2LIBS=\"-L/opt/IBM/db2/V9.5/lib64 -ldb2\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/IBM/db2/V9.5/lib64\"; DB2LIBS64=\"-L/opt/IBM/db2/V9.5/lib64 -ldb2\"; DB2VERSION=\"9\""
 	fi
 else
-	if ( test -n "/opt/IBM/db2/V9.5/lib64/libdb2.a" -a -n "DB2LIBS=\"-L/opt/IBM/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	if ( test -n "/opt/IBM/db2/V9.5/lib64/libdb2.a" -a -n "DB2LIBS64=\"-L/opt/IBM/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
 	then
 
 if ( test -r "/opt/IBM/db2/V9.5/lib64/libdb2.a" )
@@ -24608,7 +24608,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V9.5/include\"; DB2VERSION=\"9\""
-			eval "DB2LIBS=\"-L/opt/IBM/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+			eval "DB2LIBS64=\"-L/opt/IBM/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
 		fi
 	fi
 fi
@@ -24712,10 +24712,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
-		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.7/lib32\"; DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.7/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2VERSION=\"9\""
 	fi
 else
-	if ( test -n "/opt/ibm/db2/V9.7/lib32/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	if ( test -n "/opt/ibm/db2/V9.7/lib32/libdb2.a" -a -n "DB2LIBS32=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
 	then
 
 if ( test -r "/opt/ibm/db2/V9.7/lib32/libdb2.a" )
@@ -24726,7 +24726,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
-			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+			eval "DB2LIBS32=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
 		fi
 	fi
 fi
@@ -24751,10 +24751,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V9.7/include\"; DB2VERSION=\"9\""
-		eval "DB2LIBSPATH=\"/opt/IBM/db2/V9.7/lib32\"; DB2LIBS=\"-L/opt/IBM/db2/V9.7/lib32 -ldb2\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/IBM/db2/V9.7/lib32\"; DB2LIBS32=\"-L/opt/IBM/db2/V9.7/lib32 -ldb2\"; DB2VERSION=\"9\""
 	fi
 else
-	if ( test -n "/opt/IBM/db2/V9.7/lib32/libdb2.a" -a -n "DB2LIBS=\"-L/opt/IBM/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	if ( test -n "/opt/IBM/db2/V9.7/lib32/libdb2.a" -a -n "DB2LIBS32=\"-L/opt/IBM/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
 	then
 
 if ( test -r "/opt/IBM/db2/V9.7/lib32/libdb2.a" )
@@ -24765,7 +24765,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V9.7/include\"; DB2VERSION=\"9\""
-			eval "DB2LIBS=\"-L/opt/IBM/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+			eval "DB2LIBS32=\"-L/opt/IBM/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
 		fi
 	fi
 fi
@@ -24790,10 +24790,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
-		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.7/lib64\"; DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V9.7/lib64\"; DB2LIBS64=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2VERSION=\"9\""
 	fi
 else
-	if ( test -n "/opt/ibm/db2/V9.7/lib64/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	if ( test -n "/opt/ibm/db2/V9.7/lib64/libdb2.a" -a -n "DB2LIBS64=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
 	then
 
 if ( test -r "/opt/ibm/db2/V9.7/lib64/libdb2.a" )
@@ -24804,7 +24804,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\""
-			eval "DB2LIBS=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+			eval "DB2LIBS64=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
 		fi
 	fi
 fi
@@ -24829,10 +24829,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V9.7/include\"; DB2VERSION=\"9\""
-		eval "DB2LIBSPATH=\"/opt/IBM/db2/V9.7/lib64\"; DB2LIBS=\"-L/opt/IBM/db2/V9.7/lib64 -ldb2\"; DB2VERSION=\"9\""
+		eval "DB2LIBSPATH=\"/opt/IBM/db2/V9.7/lib64\"; DB2LIBS64=\"-L/opt/IBM/db2/V9.7/lib64 -ldb2\"; DB2VERSION=\"9\""
 	fi
 else
-	if ( test -n "/opt/IBM/db2/V9.7/lib64/libdb2.a" -a -n "DB2LIBS=\"-L/opt/IBM/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
+	if ( test -n "/opt/IBM/db2/V9.7/lib64/libdb2.a" -a -n "DB2LIBS64=\"-L/opt/IBM/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"" )
 	then
 
 if ( test -r "/opt/IBM/db2/V9.7/lib64/libdb2.a" )
@@ -24843,13 +24843,127 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V9.7/include\"; DB2VERSION=\"9\""
-			eval "DB2LIBS=\"-L/opt/IBM/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
+			eval "DB2LIBS64=\"-L/opt/IBM/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\""
 		fi
 	fi
 fi
 
 		fi
 
+				if ( test -n "$DB2LIBS64" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for 64-bit build" >&5
+$as_echo_n "checking for 64-bit build... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$DB2INCLUDES"
+LIBS="$DB2LIBS64"
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sqlcli1.h>
+int
+main ()
+{
+SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; DB2LIBS="$DB2LIBS64"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		fi
+		if ( test -n "$DB2LIBS32" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for 32-bit build" >&5
+$as_echo_n "checking for 32-bit build... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$DB2INCLUDES"
+LIBS="$DB2LIBS32"
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sqlcli1.h>
+int
+main ()
+{
+SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; DB2LIBS="$DB2LIBS32"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		fi
+		if ( test -n "$DB2LIBS" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for build with $DB2LIBS" >&5
+$as_echo_n "checking for build with $DB2LIBS... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$DB2INCLUDES"
+LIBS="$DB2LIBS"
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sqlcli1.h>
+int
+main ()
+{
+SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }; DB2INCLUDES=""; DB2LIBS=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		fi
 		if ( test -z "$DB2LIBS" )
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: DB2 support will not be built." >&5
