@@ -2,6 +2,9 @@
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9
 	updated to use rudiments' updated signalclasses
 	replaced calls to fork() and exit() with process class calls
+	updated ruby detection in configure script
+	added a test for Python.h to the configure script
+	updated tcl detection
 
 0.42 - fixed a bug causing cursor id's not to get set for some db's
 	updated configure script to look for client64 in addition to client
