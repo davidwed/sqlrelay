@@ -5,6 +5,7 @@
 	updated ruby detection in configure script
 	added a test for Python.h to the configure script
 	updated tcl detection
+	updated db2 detection
 
 0.42 - fixed a bug causing cursor id's not to get set for some db's
 	updated configure script to look for client64 in addition to client
