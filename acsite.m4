@@ -2643,11 +2643,13 @@ then
 			AC_MSG_WARN(The PHP API will not be built.)
 		fi
 
-		dnl on os x add -lphp
-		if ( test -n "$PHPCONFIG" -a "$UNAME" = "Darwin" )
-		then
-			PHPLIB="-lphp"
-		fi
+		dnl on os x add -lphp - this isn't necessary any more
+		dnl and I can't figure out what platforms it was required on
+		dnl any more either
+		dnl if ( test -n "$PHPCONFIG" -a "$UNAME" = "Darwin" )
+		dnl then
+			dnl PHPLIB="-lphp"
+		dnl fi
 	fi
 
 	FW_INCLUDES(php,[$PHPINCLUDES])

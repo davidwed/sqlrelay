@@ -63,7 +63,7 @@ clean:
 	$(RMTREE) .libs
 
 libsql_relay.la: sql_relay.C sql_relay.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -module
 
 sql_relay.so:
 	if ( test -r .libs/libsql_relay.0.0.0 ); \

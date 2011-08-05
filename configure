@@ -28702,11 +28702,7 @@ fi
 $as_echo "$as_me: WARNING: The PHP API will not be built." >&2;}
 		fi
 
-				if ( test -n "$PHPCONFIG" -a "$UNAME" = "Darwin" )
-		then
-			PHPLIB="-lphp"
-		fi
-	fi
+																fi
 
 
 if ( test -n "$PHPINCLUDES" )
