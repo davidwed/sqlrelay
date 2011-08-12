@@ -127,6 +127,9 @@
 /* Some versions of postgresql have PQserverVersion */
 #undef HAVE_POSTGRESQL_PQSERVERVERSION
 
+/* Some versions of postgresql have PQsetClientEncoding */
+#undef HAVE_POSTGRESQL_PQSETCLIENTENCODING
+
 /* Some versions of postgresql have PQsetNoticeProcessor */
 #undef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 

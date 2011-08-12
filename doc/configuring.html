@@ -310,7 +310,7 @@ or "no" (meaning only allow MySQL 4.1.2 syntax and use native binds).</li>
 <li><b>charset</b>: The character set to translate data coming out of the database into.  Excluding this parameter causes the data to be translated to whatever character set the MySQL client library was configured to use at compile time, probably latin1.  Setting this to "binary" will cause the data not to be translated at all.  This parameter is only supported when SQL Relay is compiled against version 5.0.7 or newer of the MySQL client library.</li>
 </ul>
 </li>
-<li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;"
+<li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;charset=CHARSET;"
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the
 database.  Required.</li>
@@ -336,6 +336,7 @@ can be a lot of work, so this parameter is provided to make code which was
 written to run against Postgresql 7 work against Postgresql 8.  This parameter
 may be set to "yes" (meaning allow only Postgresql 7 syntax and fake binds) or
 "no" (meaning only allow Postgresql 8 syntax and use native binds).</li>
+<li><b>charset</b>: The character set to translate data coming out of the database into.  Optional.</li>
 </ul>
 </li>
 <li>For <b>sqlite</b> databases, the connect string syntax is "db=DB;"

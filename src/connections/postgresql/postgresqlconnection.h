@@ -126,6 +126,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 		bool		fakebinds;
 #endif
+		const char	*charset;
 		char		*dbversion;
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR

@@ -1179,6 +1179,9 @@ then
 		AC_MSG_CHECKING(if PostgreSQL has PQparameterStatus)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQparameterStatus(NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQPARAMETERSTATUS,1,Some versions of postgresql have PQparameterStatus)],[AC_MSG_RESULT(no)])
+		AC_MSG_CHECKING(if PostgreSQL has PQsetClientEncoding)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQsetClientEncoding(NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETCLIENTENCODING,1,Some versions of postgresql have PQsetClientEncoding)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(postgresql,[$POSTGRESQLINCLUDES])

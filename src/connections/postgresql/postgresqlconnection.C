@@ -56,6 +56,7 @@ void postgresqlconnection::handleConnectString() {
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	fakebinds=!charstring::compare(connectStringValue("fakebinds"),"yes");
 #endif
+	charset=connectStringValue("charset");
 }
 
 bool postgresqlconnection::logIn(bool printerrors) {
@@ -83,6 +84,13 @@ bool postgresqlconnection::logIn(bool printerrors) {
 	if (devnull.open("/dev/null",O_RDONLY)) {
 		devnull.duplicate(STDOUT_FILENO);
 		devnull.duplicate(STDERR_FILENO);
+	}
+#endif
+
+printf("charset=%s\n",charset);
+#if defined(HAVE_POSTGRESQL_PQSETCLIENTENCODING)
+	if (charstring::length(charset)) {
+		PQsetClientEncoding(pgconn,charset);
 	}
 #endif
 
