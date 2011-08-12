@@ -53,6 +53,7 @@ void mysqlconnection::handleConnectString() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	fakebinds=!charstring::compare(connectStringValue("fakebinds"),"yes");
 #endif
+	charset=connectStringValue("charset");
 }
 
 bool mysqlconnection::logIn(bool printerrors) {
@@ -160,6 +161,14 @@ bool mysqlconnection::logIn(bool printerrors) {
 #endif
 
 #endif
+
+#ifdef HAVE_MYSQL_SET_CHARACTER_SET
+	// set the character set
+	if (charstring::length(charset)) {
+		mysql_set_character_set(&mysql,charset);
+	}
+#endif
+
 	return true;
 }
 

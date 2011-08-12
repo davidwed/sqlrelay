@@ -171,6 +171,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");
 
+	printf("STORED PROCEDURE RETURNING RESULT SET: \n");
+	checkSuccess(cur->sendQuery("create procedure testproc() result set 1 language sql begin declare c1 cursor with return for select * from testtable; open c1; end"),1);
+	checkSuccess(cur->sendQuery("call testproc()"),1);
+	checkSuccess(cur->rowCount(),8);
+	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
+	printf("\n");
+
 	printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testsmallint"),1);
 	printf("\n");

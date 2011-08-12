@@ -148,6 +148,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*host;
 		const char	*port;
 		const char	*socket;
+		const char	*charset;
 
 		char	*dbversion;
 

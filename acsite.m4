@@ -1032,6 +1032,10 @@ AC_DEFUN([FW_CHECK_MYSQL_FUNCTIONS],
 	FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[mysql_next_result(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_NEXT_RESULT,1,MySQL supports mysql_next_result)],[AC_MSG_RESULT(no)])
 
+	AC_MSG_CHECKING(for mysql_set_character_set)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[mysql_set_character_set(NULL,"");],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_SET_CHARACTER_SET,1,MySQL supports mysql_set_character_set)],[AC_MSG_RESULT(no)])
+
 	AC_MSG_CHECKING(for CR_SERVER_GONE_ERROR)
 	FW_TRY_LINK([#include <mysql.h>
 #include <errmsg.h>
