@@ -87,7 +87,6 @@ bool postgresqlconnection::logIn(bool printerrors) {
 	}
 #endif
 
-printf("charset=%s\n",charset);
 #if defined(HAVE_POSTGRESQL_PQSETCLIENTENCODING)
 	if (charstring::length(charset)) {
 		PQsetClientEncoding(pgconn,charset);
