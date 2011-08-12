@@ -471,6 +471,22 @@ require_once 'DB.php';
 	# drop existing table
 	$db->query("drop table testtable");
 
+	# 200 rows
+	echo("200 ROWS: \n");
+	checkSuccess($db,$db->query("create table testtable (testnumber number)"),DB_OK);
+	for ($i=0; $i<200; $i++) {
+		$db->query("insert into testtable values (1)");
+	}
+	$db->setFetchMode(DB_FETCHMODE_ASSOC);
+	$result=$db->query("select * from testtable");
+	$count=0;
+	while ($line=$result->fetchRow(DB_FETCHMODE_ASSOC)) {
+		$count++;
+	}
+	$result->free();
+	checkSuccess($db,$count,200);
+	$db->query("drop table testtable");
+
 	$db->disconnect();
 
 ?></pre></html>
