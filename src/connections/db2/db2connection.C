@@ -3,6 +3,8 @@
 
 #include <db2connection.h>
 
+#include <rudiments/environment.h>
+
 #include <datatypes.h>
 
 #include <config.h>
@@ -27,9 +29,20 @@ void db2connection::handleConnectString() {
 	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
+	lang=connectStringValue("lang");
 }
 
 bool db2connection::logIn(bool printerrors) {
+
+	// set the LANG environment variable
+	if (charstring::length(lang)) {
+		if (!environment::setValue("LANG",lang)) {
+			if (printerrors) {
+				fprintf(stderr,"Failed to set LANG environment variable.\n");
+			}
+			return false;
+		}
+	}
 
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);

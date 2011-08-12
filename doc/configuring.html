@@ -403,6 +403,9 @@ database.  Required.</li>
 <li><b>db</b>: The server instance to connect to.</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete
 immediately or not.  Optional, defaults to no.</li>
+<li><b>lang</b>: Sets/overrides the LANG environment variable and by extension,
+all locale-related variables.  Optional if the LANG environment variable is
+set.</li>
 </ul>
 </li>
 <li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;charset=CHARSET"
