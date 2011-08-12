@@ -19524,10 +19524,12 @@ fi
 
 		if ( test -z "$POSTGRESQLLIBS" )
 		then
+			for dir in `ls /Library/PostgreSQL 2> /dev/null`
+			do
 
 
 SEARCHPATH=$POSTGRESQLPATH
-NAME=PostgreSQL/9.0
+NAME=PostgreSQL/$dir
 HEADER=libpq-fe.h
 LIBNAME=pq
 LINKSTATIC=$STATICFLAG
@@ -19849,6 +19851,7 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
+			done
 		fi
 
 		LINKFAIL=""
