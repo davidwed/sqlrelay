@@ -60,16 +60,38 @@ void firebirdconnection::handleConnectString() {
 	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
+
+	charset=connectStringValue("charset");
 }
 
 bool firebirdconnection::logIn(bool printerrors) {
 
-	// initialize a dpb
+	// initialize a parameter buffer
 	char	*dpbptr=dpb;
-	*dpbptr++=isc_dpb_version1;
-	*dpbptr++=isc_dpb_num_buffers;
-	*dpbptr++=1;
-	*dpbptr++=90;
+
+	// set the parameter buffer version
+	*dpbptr=isc_dpb_version1;
+	dpbptr++;
+
+	// no idea what this does, something involving the "cache"
+	*dpbptr=isc_dpb_num_buffers;
+	dpbptr++;
+	*dpbptr=1;
+	dpbptr++;
+	*dpbptr=90;
+	dpbptr++;
+
+	// set the character set
+	if (charstring::length(charset)) {
+		*dpbptr=isc_dpb_lc_ctype;
+		dpbptr++;
+		*dpbptr=charstring::length(charset);
+		dpbptr++;
+		charstring::copy(dpbptr,charset);
+		dpbptr+=charstring::length(charset);
+	}
+
+	// determine the parameter buffer length
 	dpblength=dpbptr-dpb;
 
 	// handle user/password parameters
@@ -87,8 +109,7 @@ bool firebirdconnection::logIn(bool printerrors) {
 	tr=0L;
 	if (isc_attach_database(error,charstring::length(database),
 					const_cast<char *>(database),&db,
-					//dpblength,dpb)) {
-					0,NULL)) {
+					dpblength,dpb)) {
 		db=0L;
 		return false;
 	}
