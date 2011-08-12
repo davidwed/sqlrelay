@@ -788,31 +788,25 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 to "no".</p>
 
 <a name="nlslang"></a>
-<span class="heading3">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</span>
+<span class="heading3">Why am I getting question marks and other garbage back when I do a select?  It worked fine when I was using the native database command line tool.</span>
 
-<p>When the Oracle connection daemon fetches data from the database, the
-Oracle client library converts the data from whatever character set the
-database is using into whatever character set is specified by the NLS_LANG
-environment variable.</p>
+<p>The most common cause of this has to do with character set translation.</p>
 
-<p>If NLS_LANG isn't set, is set to a character set that doesn't contain some
-of the characters that are stored in the database, or is set to a character set
-that is in some other way incompatible with the character set of the database,
-some of the data will be converted into garbage.</p>
+<p>Data is transferred from the SQL Relay server process to the SQL Relay client process unmodified, but if you're using one character set in your database (or in a specific table or column of your database) and the SQL Relay server process is using a different character set, the database client library will translate the result set when it is transferred from the database to the SQL Relay process and will then be passed on to the SQL Relay client in its translated state.</p>
 
-<p><b>Note:</b> NLS_LANG must be set properly on the machine running the SQL
-Relay <i><b>servers</b></i>, as that is the machine executing code from the
-Oracle client library.  It's not uncommon to forget to set NLS_LANG on that
-machine and then have things break suddenly when switching from using the
-Oracle client library directly to using SQL Relay.</p>
+<p>If the character set used by the SQL Relay server process is missing characters from the character set used by the database, then ?'s are often substituted.  Other translations can occur too such as the removal of accents or creation of total garbage.</p>
 
-<p><b>Note:</b> When SQL Relay starts at boot time, the SQL Relay init script
-has no particular environment.  So, if NLS_LANG is set in /etc/profile or
-/etc/bashrc or some other shell's init script, it may not be picked up by the
-SQL Relay init script.  In version 0.37, an nls_lang parameter was added to the
-Oracle connection string parameters to address this issue.  When running
-versions older than 0.37, you'll need to edit the init script and add a line to
-set the NLS_LANG environment variable.</p>
+<p>Configuring the character set used by the SQL Relay process is different for each database.</p>
+
+<p>Since SQL Relay 0.43, when using MySQL, PostgreSQL, FreeTDS, Sybase and Firebird databases, the character set can be set by setting the <b>charset</b> variable in the connect string of the sqlrelay.conf file.</p>
+
+<p>Since SQL Relay 0.37, when using Oracle, the character set can be set by setting the <b>nls_lang</b> variable in the connect string.</p>
+
+<p>Since SQL Relay 0.43, when using DB2, the character set can be set by setting the <b>lang</b> variable in the connect string.</p>
+
+<p>Other databases don't support any character set translation at all.  Data is just returned from the database as-is, byte-by-byte.</p>
+
+<p>In the case of Oracle and DB2, the <b>nls_lang</b> and <b>lang</b> connect string variables just set the <b>NLS_LANG</b> and <b>LANG</b> environment variables.  The <b>NLS_LANG</b> or <b>LANG</b> environment variables may be set directly to set the character set when using versions of SQL Relay older than listed above.</p>
 
 <a name="sqliterowid"></a>
 <span class="heading3">How do I get the last insert rowid from SQLite?</span>
