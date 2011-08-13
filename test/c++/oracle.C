@@ -1014,6 +1014,19 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 
+	// in/out variables
+	/*printf("IN/OUT VARIABLES: \n");
+	cur->sendQuery("drop procedure testproc");
+	checkSuccess(cur->sendQuery("create or replace procedure testproc(inout in out number) is begin inout:=inout+1; return; end;"),1);
+	cur->prepareQuery("begin testproc(:inout); end;");
+	cur->inputBind("inout",1);
+	cur->defineOutputBindInteger("inout");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBindInteger("inout"),2);
+	cur->sendQuery("drop procedure testproc");
+	printf("\n");*/
+
+
 	// invalid queries...
 	printf("INVALID QUERIES: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testnumber"),0);
