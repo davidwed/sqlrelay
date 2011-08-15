@@ -80,6 +80,7 @@ set?</a></li>
 <li><a href="#bindvars">How do I use bind variables?</a></li>
 <li><a href="#vectorbinds">Why can't I do vector binds?</a></li>
 <li><a href="#storedprocs">How do I run stored procedures?</a></li>
+<li><a href="#storedprocresultset">How do I get the result set from a stored procedure that returns a result set?</a></li>
 <li><a href="#returning">How do I get data out of DML with RETURNING 
 clauses?</a></li>
 <li><a href="#temptables">Do temporary tables work with SQL Relay?</a></li>
@@ -1169,6 +1170,19 @@ parameters must be varchar types.</p>
 <p>The syntax for creating and executing a stored procedure is different for
 each database.  Each of the "Programming with SQL Relay using the XXX API"
 documents explain how to use stored procedures in detail.</p>
+
+<a name="storedprocs"></a>
+<span class="heading3">How do I get the result set from a stored procedure that returns a result set?</span>
+
+<p>This depends entirely on the database you're using.</p>
+
+<p>For Firebird you just run a query like <b>select * from myprocedure</b>.  For DB2 and MySQL you just run a query like <b>call myprocedure</b>.  For Sybase/FreeTDS you just run a query like <b>exec myprocedure</b>.  For PostgreSQL you call <b>select * from myprocedure() ...</b> where ... is replaced with a description of the columns that the procedure returns.  In all of these cases, the result set is available as if you were selecting from a table.</p>
+
+<p>Oracle is a bit different.  A stored procedure may declare a cursor variable, assign the results of a query to it and return it either as a return value or as an output bind variable.  You have to use defineOutputBindCursor(), getOutputBindCursor() and fetchFromBindCursor().  The use of these are documented in the various language guides for SQL Relay such as <a href="programming/c++.html">the C++ guide</a>.  After calling fetchFromBindCursor(), the result set is available as if you were selecting from a table.</p>
+
+<p>Some databases allow a stored procedure to return multiple result sets, one after the other.  SQL Relay does not currently support fetching more than one result set from any query, including one that calls a stored procedure.</p>
+
+<p>There is an exception to this is with Oracle.  Since Oracle exposes cursor variables directly, and each cursor variable can be bound to a client-side cursor, one result set can be fetched from each cursor variable exposed by a stored procedure.</p>
 
 <a name="returning"></a>
 <span class="heading3">How do I get data out of DML with RETURNING 
