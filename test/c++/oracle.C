@@ -1027,6 +1027,25 @@ int	main(int argc, char **argv) {
 	printf("\n");*/
 
 
+	// rebinding
+	printf("REBINDING: \n");
+	cur->sendQuery("drop procedure testproc");
+	checkSuccess(cur->sendQuery("create or replace procedure testproc(in1 in number, out1 out number) is begin out1:=in1; return; end;"),1);
+	cur->prepareQuery("begin testproc(:in,:out); end;");
+	cur->inputBind("in",1);
+	cur->defineOutputBindInteger("out");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBindInteger("out"),1);
+	cur->inputBind("in",2);
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBindInteger("out"),2);
+	cur->inputBind("in",3);
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBindInteger("out"),3);
+	cur->sendQuery("drop procedure testproc");
+	printf("\n");
+
+
 	// invalid queries...
 	printf("INVALID QUERIES: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testnumber"),0);
