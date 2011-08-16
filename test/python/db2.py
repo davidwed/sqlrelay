@@ -4,6 +4,7 @@
 # See the file COPYING for more information.
 
 from SQLRelay import PySQLRClient
+from decimal import *
 import sys
 import string
 
@@ -98,9 +99,9 @@ def main():
 	checkSuccess(cur.sendQuery("create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1)
 	cur.prepareQuery("call testproc(?,?)")
 	cur.inputBind("1",5)
-	cur.defineOutputBind("2",10)
+	cur.defineOutputBindString("2",10)
 	checkSuccess(cur.executeQuery(),1)
-	checkSuccess(cur.getOutputBind("2"),"5")
+	checkSuccess(cur.getOutputBindString("2"),"5")
 	checkSuccess(cur.sendQuery("drop procedure testproc"),1)
 	print
 
@@ -229,23 +230,23 @@ def main():
 	print
 
 	print "FIELDS BY INDEX: "
-	checkSuccess(cur.getField(0,0),"1")
-	checkSuccess(cur.getField(0,1),"1")
-	checkSuccess(cur.getField(0,2),"1")
-	checkSuccess(cur.getField(0,3),"1.10")
-	#checkSuccess(cur.getField(0,4),"1.1")
-	#checkSuccess(cur.getField(0,5),"1.1")
+	checkSuccess(cur.getField(0,0),1)
+	checkSuccess(cur.getField(0,1),1)
+	checkSuccess(cur.getField(0,2),1)
+	checkSuccess(cur.getField(0,3),Decimal("1.10"))
+	#checkSuccess(cur.getField(0,4),Decimal("1.1"))
+	#checkSuccess(cur.getField(0,5),Decimal("1.1"))
 	checkSuccess(cur.getField(0,6),"testchar1                               ")
 	checkSuccess(cur.getField(0,7),"testvarchar1")
 	checkSuccess(cur.getField(0,8),"2001-01-01")
 	checkSuccess(cur.getField(0,9),"01:00:00")
 	print
-	checkSuccess(cur.getField(7,0),"8")
-	checkSuccess(cur.getField(7,1),"8")
-	checkSuccess(cur.getField(7,2),"8")
-	checkSuccess(cur.getField(7,3),"8.80")
-	#checkSuccess(cur.getField(7,4),"8.8")
-	#checkSuccess(cur.getField(7,5),"8.8")
+	checkSuccess(cur.getField(7,0),8)
+	checkSuccess(cur.getField(7,1),8)
+	checkSuccess(cur.getField(7,2),8)
+	checkSuccess(cur.getField(7,3),Decimal("8.80"))
+	#checkSuccess(cur.getField(7,4),Decimal("8.8"))
+	#checkSuccess(cur.getField(7,5),Decimal("8.8"))
 	checkSuccess(cur.getField(7,6),"testchar8                               ")
 	checkSuccess(cur.getField(7,7),"testvarchar8")
 	checkSuccess(cur.getField(7,8),"2008-01-01")
@@ -277,23 +278,23 @@ def main():
 	print
 
 	print "FIELDS BY NAME: "
-	checkSuccess(cur.getField(0,"testsmallint"),"1")
-	checkSuccess(cur.getField(0,"testint"),"1")
-	checkSuccess(cur.getField(0,"testbigint"),"1")
-	checkSuccess(cur.getField(0,"testdecimal"),"1.10")
-	#checkSuccess(cur.getField(0,"testreal"),"1.1")
-	#checkSuccess(cur.getField(0,"testdouble"),"1.1")
+	checkSuccess(cur.getField(0,"testsmallint"),1)
+	checkSuccess(cur.getField(0,"testint"),1)
+	checkSuccess(cur.getField(0,"testbigint"),1)
+	checkSuccess(cur.getField(0,"testdecimal"),Decimal("1.10"))
+	#checkSuccess(cur.getField(0,"testreal"),Decimal("1.1"))
+	#checkSuccess(cur.getField(0,"testdouble"),Decimal("1.1"))
 	checkSuccess(cur.getField(0,"testchar"),"testchar1                               ")
 	checkSuccess(cur.getField(0,"testvarchar"),"testvarchar1")
 	checkSuccess(cur.getField(0,"testdate"),"2001-01-01")
 	checkSuccess(cur.getField(0,"testtime"),"01:00:00")
 	print
-	checkSuccess(cur.getField(7,"testsmallint"),"8")
-	checkSuccess(cur.getField(7,"testint"),"8")
-	checkSuccess(cur.getField(7,"testbigint"),"8")
-	checkSuccess(cur.getField(7,"testdecimal"),"8.80")
-	#checkSuccess(cur.getField(7,"testreal"),"8.8")
-	#checkSuccess(cur.getField(7,"testdouble"),"8.8")
+	checkSuccess(cur.getField(7,"testsmallint"),8)
+	checkSuccess(cur.getField(7,"testint"),8)
+	checkSuccess(cur.getField(7,"testbigint"),8)
+	checkSuccess(cur.getField(7,"testdecimal"),Decimal("8.80"))
+	#checkSuccess(cur.getField(7,"testreal"),Decimal("8.8"))
+	#checkSuccess(cur.getField(7,"testdouble"),Decimal("8.8"))
 	checkSuccess(cur.getField(7,"testchar"),"testchar8                               ")
 	checkSuccess(cur.getField(7,"testvarchar"),"testvarchar8")
 	checkSuccess(cur.getField(7,"testdate"),"2008-01-01")
@@ -329,9 +330,9 @@ def main():
 	checkSuccess(fields[0],1)
 	checkSuccess(fields[1],1)
 	checkSuccess(fields[2],1)
-	checkSuccess(fields[3],1.1)
-	checkSuccess(fields[4],1.1)
-	checkSuccess(fields[5],1.1)
+	checkSuccess(fields[3],Decimal("1.1"))
+	checkSuccess(fields[4],Decimal("1.1"))
+	checkSuccess(fields[5],Decimal("1.1"))
 	checkSuccess(fields[6],"testchar1                               ")
 	checkSuccess(fields[7],"testvarchar1")
 	checkSuccess(fields[8],"2001-01-01")
@@ -357,9 +358,9 @@ def main():
 	checkSuccess(fields["TESTSMALLINT"],1)
 	checkSuccess(fields["TESTINT"],1)
 	checkSuccess(fields["TESTBIGINT"],1)
-	checkSuccess(fields["TESTDECIMAL"],1.1)
-	#checkSuccess(fields["TESTREAL"],1.1)
-	#checkSuccess(fields["TESTDOUBLE"],1.1)
+	checkSuccess(fields["TESTDECIMAL"],Decimal("1.1"))
+	#checkSuccess(fields["TESTREAL"],Decimal("1.1"))
+	#checkSuccess(fields["TESTDOUBLE"],Decimal("1.1"))
 	checkSuccess(fields["TESTCHAR"],"testchar1                               ")
 	checkSuccess(fields["TESTVARCHAR"],"testvarchar1")
 	checkSuccess(fields["TESTDATE"],"2001-01-01")
@@ -369,9 +370,9 @@ def main():
 	checkSuccess(fields["TESTSMALLINT"],8)
 	checkSuccess(fields["TESTINT"],8)
 	checkSuccess(fields["TESTBIGINT"],8)
-	checkSuccess(fields["TESTDECIMAL"],8.8)
-	#checkSuccess(fields["TESTREAL"],8.8)
-	#checkSuccess(fields["TESTDOUBLE"],8.8)
+	checkSuccess(fields["TESTDECIMAL"],Decimal("8.8"))
+	#checkSuccess(fields["TESTREAL"],Decimal("8.8"))
+	#checkSuccess(fields["TESTDOUBLE"],Decimal("8.8"))
 	checkSuccess(fields["TESTCHAR"],"testchar8                               ")
 	checkSuccess(fields["TESTVARCHAR"],"testvarchar8")
 	checkSuccess(fields["TESTDATE"],"2008-01-01")
@@ -413,7 +414,7 @@ def main():
 	print
 
 	print "FIELDS: "
-	checkSuccess(cur.getField(0,0),"1")
+	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
 	checkSuccess(cur.getField(0,2),"10.5556")
 	print
@@ -426,7 +427,7 @@ def main():
 	print
 
 	print "FIELDS: "
-	checkSuccess(cur.getField(0,0),"1")
+	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
 	checkSuccess(cur.getField(0,2),"10.5556")
 	print
@@ -458,15 +459,15 @@ def main():
 	checkSuccess(cur.firstRowIndex(),0)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),2)
-	checkSuccess(cur.getField(0,0),"1")
-	checkSuccess(cur.getField(1,0),"2")
-	checkSuccess(cur.getField(2,0),"3")
+	checkSuccess(cur.getField(0,0),1)
+	checkSuccess(cur.getField(1,0),2)
+	checkSuccess(cur.getField(2,0),3)
 	print
 	checkSuccess(cur.firstRowIndex(),2)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),4)
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
@@ -499,14 +500,14 @@ def main():
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
 	print
-	checkSuccess(cur.getField(0,0),"1")
-	checkSuccess(cur.getField(1,0),"2")
-	checkSuccess(cur.getField(2,0),"3")
-	checkSuccess(cur.getField(3,0),"4")
-	checkSuccess(cur.getField(4,0),"5")
-	checkSuccess(cur.getField(5,0),"6")
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(0,0),1)
+	checkSuccess(cur.getField(1,0),2)
+	checkSuccess(cur.getField(2,0),3)
+	checkSuccess(cur.getField(3,0),4)
+	checkSuccess(cur.getField(4,0),5)
+	checkSuccess(cur.getField(5,0),6)
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.sendQuery("select * from testtable order by testsmallint"),1)
 	cur.suspendResultSet()
@@ -515,14 +516,14 @@ def main():
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
 	print
-	checkSuccess(cur.getField(0,0),"1")
-	checkSuccess(cur.getField(1,0),"2")
-	checkSuccess(cur.getField(2,0),"3")
-	checkSuccess(cur.getField(3,0),"4")
-	checkSuccess(cur.getField(4,0),"5")
-	checkSuccess(cur.getField(5,0),"6")
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(0,0),1)
+	checkSuccess(cur.getField(1,0),2)
+	checkSuccess(cur.getField(2,0),3)
+	checkSuccess(cur.getField(3,0),4)
+	checkSuccess(cur.getField(4,0),5)
+	checkSuccess(cur.getField(5,0),6)
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.sendQuery("select * from testtable order by testsmallint"),1)
 	cur.suspendResultSet()
@@ -531,20 +532,20 @@ def main():
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
 	print
-	checkSuccess(cur.getField(0,0),"1")
-	checkSuccess(cur.getField(1,0),"2")
-	checkSuccess(cur.getField(2,0),"3")
-	checkSuccess(cur.getField(3,0),"4")
-	checkSuccess(cur.getField(4,0),"5")
-	checkSuccess(cur.getField(5,0),"6")
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(0,0),1)
+	checkSuccess(cur.getField(1,0),2)
+	checkSuccess(cur.getField(2,0),3)
+	checkSuccess(cur.getField(3,0),4)
+	checkSuccess(cur.getField(4,0),5)
+	checkSuccess(cur.getField(5,0),6)
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	print
 
 	print "SUSPENDED RESULT SET: "
 	cur.setResultSetBufferSize(2)
 	checkSuccess(cur.sendQuery("select * from testtable order by testsmallint"),1)
-	checkSuccess(cur.getField(2,0),"3")
+	checkSuccess(cur.getField(2,0),3)
 	id=cur.getResultSetId()
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)
@@ -556,7 +557,7 @@ def main():
 	checkSuccess(cur.firstRowIndex(),4)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),6)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
@@ -577,7 +578,7 @@ def main():
 	checkSuccess(filename,"cachefile1")
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet(filename),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	print
 
 	print "COLUMN COUNT FOR CACHED RESULT SET: "
@@ -619,7 +620,7 @@ def main():
 	checkSuccess(filename,"cachefile1")
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet(filename),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
 	print
@@ -629,7 +630,7 @@ def main():
 	checkSuccess(cur.openCachedResultSet("cachefile1"),1)
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet("cachefile2"),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	print
 
@@ -639,7 +640,7 @@ def main():
 	checkSuccess(cur.openCachedResultSet("cachefile1"),1)
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet("cachefile2"),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
 	print
@@ -649,7 +650,7 @@ def main():
 	cur.cacheToFile("cachefile1")
 	cur.setCacheTtl(200)
 	checkSuccess(cur.sendQuery("select * from testtable order by testsmallint"),1)
-	checkSuccess(cur.getField(2,0),"3")
+	checkSuccess(cur.getField(2,0),3)
 	filename=cur.getCacheFileName()
 	checkSuccess(filename,"cachefile1")
 	id=cur.getResultSetId()
@@ -664,7 +665,7 @@ def main():
 	checkSuccess(cur.firstRowIndex(),4)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),6)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	print
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
@@ -677,7 +678,7 @@ def main():
 	cur.cacheOff()
 	print
 	checkSuccess(cur.openCachedResultSet(filename),1)
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
 	print
@@ -689,9 +690,9 @@ def main():
 	checkSuccess(rows[0][0],1);
 	checkSuccess(rows[0][1],1);
 	checkSuccess(rows[0][2],1);
-	checkSuccess(rows[0][3],1.1);
-	checkSuccess(rows[0][4],1.1);
-	checkSuccess(rows[0][5],1.1);
+	checkSuccess(rows[0][3],Decimal("1.1"));
+	checkSuccess(rows[0][4],Decimal("1.1"));
+	checkSuccess(rows[0][5],Decimal("1.1"));
 	checkSuccess(rows[0][6],"testchar1                               ")
 	checkSuccess(rows[0][7],"testvarchar1")
 	checkSuccess(rows[0][8],"2001-01-01")
@@ -700,9 +701,9 @@ def main():
 	checkSuccess(rows[1][0],2);
 	checkSuccess(rows[1][1],2);
 	checkSuccess(rows[1][2],2);
-	checkSuccess(rows[1][3],2.2);
-	checkSuccess(rows[1][4],2.2);
-	checkSuccess(rows[1][5],2.2);
+	checkSuccess(rows[1][3],Decimal("2.2"));
+	checkSuccess(rows[1][4],Decimal("2.2"));
+	checkSuccess(rows[1][5],Decimal("2.2"));
 	checkSuccess(rows[1][6],"testchar2                               ")
 	checkSuccess(rows[1][7],"testvarchar2")
 	checkSuccess(rows[1][8],"2002-01-01")
@@ -711,9 +712,9 @@ def main():
 	checkSuccess(rows[2][0],3);
 	checkSuccess(rows[2][1],3);
 	checkSuccess(rows[2][2],3);
-	checkSuccess(rows[2][3],3.3);
-	checkSuccess(rows[2][4],3.3);
-	checkSuccess(rows[2][5],3.3);
+	checkSuccess(rows[2][3],Decimal("3.3"));
+	checkSuccess(rows[2][4],Decimal("3.3"));
+	checkSuccess(rows[2][5],Decimal("3.3"));
 	checkSuccess(rows[2][6],"testchar3                               ")
 	checkSuccess(rows[2][7],"testvarchar3")
 	checkSuccess(rows[2][8],"2003-01-01")
@@ -722,9 +723,9 @@ def main():
 	checkSuccess(rows[3][0],4);
 	checkSuccess(rows[3][1],4);
 	checkSuccess(rows[3][2],4);
-	checkSuccess(rows[3][3],4.4);
-	checkSuccess(rows[3][4],4.4);
-	checkSuccess(rows[3][5],4.4);
+	checkSuccess(rows[3][3],Decimal("4.4"));
+	checkSuccess(rows[3][4],Decimal("4.4"));
+	checkSuccess(rows[3][5],Decimal("4.4"));
 	checkSuccess(rows[3][6],"testchar4                               ")
 	checkSuccess(rows[3][7],"testvarchar4")
 	checkSuccess(rows[3][8],"2004-01-01")
@@ -733,9 +734,9 @@ def main():
 	checkSuccess(rows[4][0],5);
 	checkSuccess(rows[4][1],5);
 	checkSuccess(rows[4][2],5);
-	checkSuccess(rows[4][3],5.5);
-	checkSuccess(rows[4][4],5.5);
-	checkSuccess(rows[4][5],5.5);
+	checkSuccess(rows[4][3],Decimal("5.5"));
+	checkSuccess(rows[4][4],Decimal("5.5"));
+	checkSuccess(rows[4][5],Decimal("5.5"));
 	checkSuccess(rows[4][6],"testchar5                               ")
 	checkSuccess(rows[4][7],"testvarchar5")
 	checkSuccess(rows[4][8],"2005-01-01")
@@ -744,9 +745,9 @@ def main():
 	checkSuccess(rows[5][0],6);
 	checkSuccess(rows[5][1],6);
 	checkSuccess(rows[5][2],6);
-	checkSuccess(rows[5][3],6.6);
-	checkSuccess(rows[5][4],6.6);
-	checkSuccess(rows[5][5],6.6);
+	checkSuccess(rows[5][3],Decimal("6.6"));
+	checkSuccess(rows[5][4],Decimal("6.6"));
+	checkSuccess(rows[5][5],Decimal("6.6"));
 	checkSuccess(rows[5][6],"testchar6                               ")
 	checkSuccess(rows[5][7],"testvarchar6")
 	checkSuccess(rows[5][8],"2006-01-01")
@@ -755,10 +756,10 @@ def main():
 
 	print "FINISHED SUSPENDED SESSION: "
 	checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
-	checkSuccess(cur.getField(4,0),"5")
-	checkSuccess(cur.getField(5,0),"6")
-	checkSuccess(cur.getField(6,0),"7")
-	checkSuccess(cur.getField(7,0),"8")
+	checkSuccess(cur.getField(4,0),5)
+	checkSuccess(cur.getField(5,0),6)
+	checkSuccess(cur.getField(6,0),7)
+	checkSuccess(cur.getField(7,0),8)
 	id=cur.getResultSetId()
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)

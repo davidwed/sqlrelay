@@ -101,9 +101,9 @@ dl("sql_relay.so");
 	checkSuccess(sqlrcur_sendQuery($cur,"create procedure testproc(in invar int, out outvar int) language sql begin set outvar = invar; end"),1);
 	sqlrcur_prepareQuery($cur,"call testproc(?,?)");
 	sqlrcur_inputBind($cur,"1",5);
-	sqlrcur_defineOutputBind($cur,"2",10);
+	sqlrcur_defineOutputBindString($cur,"2",10);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
-	checkSuccess(sqlrcur_getOutputBind($cur,"2"),"5");
+	checkSuccess(sqlrcur_getOutputBindString($cur,"2"),"5");
 	checkSuccess(sqlrcur_sendQuery($cur,"drop procedure testproc"),1);
 	echo("\n");
 
