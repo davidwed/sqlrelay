@@ -9,6 +9,8 @@
 	added sed command to remove -arch args from perl build (for osx)
 	added charset support for all db's who's client libraries support them
 	updated detection of various languages and db's on various platforms
+	added getting started with odbc doc
+	updated faq with info about result sets from stored procedures
 
 0.42 - fixed a bug causing cursor id's not to get set for some db's
 	updated configure script to look for client64 in addition to client
