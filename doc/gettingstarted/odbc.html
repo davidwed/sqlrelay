@@ -1,0 +1,202 @@
+<html>
+
+<head>
+<title>SQL Relay - Getting Started With ODBC</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+<span class="heading1">Getting Started With ODBC</span><br>
+
+<ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#accessing">Accessing a Database</a></li>
+<li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+</ul>
+
+<a name="installation"></a>
+<span class="heading1">Installation</span><br>
+
+<p>One or both of <a href="http://www.unixodbc.org">unixODBC</a> and <a href="http://www.iodbc.org">iODBC</a> are available for most Unix-like platforms and SQL Relay supports either.</p>
+
+<p>On modern Linux platforms, they can be installed via yum, aptitude, apt-get or similar.  On BSD systems, pkg_add or pkgin may be used to install one or the other.  Modern versions of Solaris and Mac OS come with unixODBC pre-installed.  I have also been able to build and install many versions of each from source on many different platforms.</p>
+
+<p>ODBC provides a common API for accessing different databases, but to access a database, you also need an ODBC driver for that database.  ODBC drivers are generally available as shared object libraries from the database manufacturer.  Most databases have ODBC drivers available for them, but not all drivers are available for Unix or Linux.</p>
+
+<p>ODBC drivers are generally installed in the <b>libdir</b> of the ODBC package- generally /usr/lib or /usr/local/lib, but they can really be installed anywhere.</p>
+
+<a name="accessing"></a>
+<span class="heading1">Accessing a Database</span><br>
+
+<p>To access a database via ODBC, you have to make an entry in two separate files.</p>
+
+<span class="heading2">odbcinst.ini</span><br>
+
+<p>The file <i>odbcinst.ini</i> contains entries describing the database drivers.  Specifically, they map a driver name (such as Oracle) to a user-friendly description of the driver and the driver files themselves.</p>
+
+<p>For example, lets say you're using a database called MythDB and received an ODBC driver for Linux from the manufacturer.  The following lines would need to be appended to <i>odbcinst.ini</i> to make the system aware of the driver.</p>
+
+<blockquote>
+<pre>
+[MythDB]
+Description	= ODBC for MythDB
+Driver		= /usr/lib/libmythdbodbc.so
+Setup 		= /usr/lib/libodbcmythdbS.so
+Driver64	= /usr/lib64/libmythdbodbc.so
+Setup64 	= /usr/lib64/libodbcmythdbS.so
+FileUsage	= 1
+</pre>
+</blockquote>
+
+<p>The <b>[MythDB]</b> line defines the name that will be used in other files when referring to this driver.</p>
+
+<p>The <b>Driver</b> and <b>Driver64</b> arguments are set to the full pathname of the 32-bit driver and 64-bit drivers respectively.  These arguments are optional and each line may be excluded if you were not provided the corresponding driver.  For example, if you were only provided a 32-bit driver, you should leave out the entire <b>Driver64</b> line.</p>
+
+<p>The <b>Setup</b> and <b>Setup64</b> arguments are set to the full pathname of the 32-bit and 64-bit "setup" libraries.  These libraries are used by the Driver Manager UI to describe parameters and are not essential.  They may or may not have been provided by the manufacturer.  The arguments are optional and each line may be excluded if you were not provided the corresponding file.</p>
+
+<p>The <b>FileUsage</b> parameter is ambiguous.  I've never been able to find a good description of it.  It appears to always exist and always be set to 1.</p>
+
+<span class="heading2">odbc.ini</span><br>
+
+<p>The file <i>odbc.ini</i> defines specific database connections, often called Data Source Names or DSN's for short.</p>
+
+<p>For example, lets say that you wanted to connect to a database on the machine <i>dbhost</i> on port <i>6600</i> using username <i>testuser</i> and password <i>testpassword</i> and then use database <i>testdb</i> once logged in.  Your odbc.ini entry might look like:</p>
+
+<blockquote>
+<pre>
+[TestDB]
+Description	= Connection to TestDB
+Driver		= MythDB
+Host		= dbhost
+Port		= 6600
+UserName	= testuser
+Password	= teetpassword
+Database	= testdb
+</pre>
+</blockquote>
+
+<p>The <b>[TestDB]</b> line defines the name of this DSN to be <i>TestDB</i>.  Programs which use ODBC may use the name <i>TestDB</i> to refer to this set of connection parameters.</p>
+
+<p>The <b>Description</b> parameter defines a user-friendly name for this DSN.</p>
+
+<p>The <b>Driver</b> parameter refers back to a driver definied the <i>odbcinst.ini</i> file.  Applications which use this DSN will load that driver.</p>
+
+<p>The remaining parameters are specific to the driver, are given only as examples and might be different for other drivers.  For example, another driver may not have the <b>Database</b> parameter at all, may refer to the <b>UserName</b> as <b>User</b> instead or may have additional parameters.</p>
+
+<p>That said, the <b>UserName</b> and <b>Password</b> parameters are fairly well standardized and many tools allow them to be overridden at connect-time.  As such, they are often left blank in the <i>odbc.ini</i> file.  The line is included, but no value is placed after the equals sign.</p>
+
+<span class="heading2">isql</span><br>
+
+<p>The command line program <i>isql</i> can be used to test a DSN.</p>
+
+<p>Note that Firebird also comes with a command line program, also called <i>isql</i> and it is important to make sure you are using the ODBC program rather than the Firebird program.  Running the <i>isql</i> command with no arguments should give you some indication of which one it is.  The <i>isql</i> program that comes with unixODBC has output like the following:</p>
+
+<blockquote>
+<pre>
+**********************************************
+* unixODBC - isql                            *
+**********************************************
+* Syntax                                     *
+*                                            *
+*      isql DSN [UID [PWD]] [options]        *
+*                                            *
+* Options                                    *
+*                                            *
+* -b         batch.(no prompting etc)        *
+* -dx        delimit columns with x          *
+* -x0xXX     delimit columns with XX, where  *
+*            x is in hex, ie 0x09 is tab     *
+* -w         wrap results in an HTML table   *
+* -c         column names on first row.      *
+*            (only used when -d)             *
+* -mn        limit column display width to n *
+* -v         verbose.                        *
+* -lx        set locale to x                 *
+* -q         wrap char fields in dquotes     *
+* -3         Use ODBC 3 calls                *
+* -n         Use new line processing         *
+* --version  version                         *
+*                                            *
+* Commands                                   *
+*                                            *
+* help - list tables                         *
+* help table - list columns in table         *
+* help help - list all help options          *
+*                                            *
+* Examples                                   *
+*                                            *
+*      isql WebDB MyID MyPWD -w < My.sql     *
+*                                            *
+*      Each line in My.sql must contain      *
+*      exactly 1 SQL command except for the  *
+*      last line which must be blank (unless *
+*      -n option specified).                 *
+*                                            *
+* Please visit;                              *
+*                                            *
+*      http://www.unixodbc.org               *
+*      pharvey@codebydesign.com              *
+*      nick@easysoft.com                     *
+**********************************************
+</pre>
+</blockquote>
+
+<p>To connect to the database defined by the TestDB DSN, run the following command:</p>
+
+<blockquote><b>isql TestDB</b></blockquote>
+
+<p>or optionally...</p>
+
+<blockquote><b>isql TestDB testuser testpassword</b></blockquote>
+
+<p>to override the user and password.</p>
+
+<p>You should now be presented with a session resembling the command line interfaces to other databases.  You can run queries, view result sets, etc.</p>
+
+<a name="sqlrelay"></a>
+<span class="heading1">Accessing a Database With SQL Relay</span><br>
+
+<p>Accessing an ODBC database from SQL Relay requires an instance entry in your 
+<i>sqlrelay.conf</i> file for the instance that you want to access.  Here is an
+example <i>sqlrelay.conf</i> which defines an SQL Relay instance called
+odbctest.  This instance connects to the TestDB DSN.</p>
+
+<PRE>
+<FONT color=#0000ff>&lt;?</FONT><B><FONT color=#288a51>xml version=</FONT></B><FONT color=#ff00ff>&quot;1.0&quot;</FONT><FONT color=#0000ff>?&gt;</FONT>
+<FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>DOCTYPE</FONT></B> instances <B><FONT color=#a62828>SYSTEM</FONT></B> <FONT color=#ff00ff>&quot;sqlrelay.dtd&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+<FONT color=#008a8e>&lt;instances&gt;</FONT>
+
+        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;odbctest&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/odbctest.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;odbc&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;0&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> authtier=</FONT><FONT color=#ff00ff>&quot;listener&quot;</FONT><FONT color=#008a8e> handoff=</FONT><FONT color=#ff00ff>&quot;pass&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+                <FONT color=#008a8e>&lt;users&gt;</FONT>
+                        <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;odbctest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;odbctest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/users&gt;</FONT>
+                <FONT color=#008a8e>&lt;connections&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;odbctest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;dsn=TestDB;&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                <FONT color=#008a8e>&lt;/connections&gt;</FONT>
+        <FONT color=#008a8e>&lt;/instance&gt;</FONT>
+
+<FONT color=#008a8e>&lt;/instances&gt;</FONT>
+</PRE>
+
+<p>Now you can start up this instance with the following command.</p>
+
+<blockquote>
+<b>sqlr-start -id odbctest</b>
+</blockquote>
+
+<p>To connect to the instance and run queries, use the following command.</p>
+
+<blockquote>
+<b>sqlrsh -id odbctest</b>
+</blockquote>
+
+<p>The following command shuts down the SQL Relay instance.</p>
+
+<blockquote>
+<b>sqlr-stop odbctest</b>
+</blockquote>
+
+</body>
+
+</html>
