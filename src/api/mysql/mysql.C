@@ -109,7 +109,7 @@ struct MYSQL_FIELD {
   unsigned int flags;         /* Div flags */
   unsigned int decimals;      /* Number of decimals in field */
   unsigned int charsetnr;     /* Character set */
-  enum enum_field_types type; /* Type of field. Se mysql_com.h for types */
+  enum enum_field_types type; /* Type of field. See mysql_com.h for types */
 #ifdef COMPAT_MYSQL_5_1
   // taken directly from mysql.h - 5.1.22
   void *extension;
