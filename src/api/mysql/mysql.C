@@ -16,10 +16,10 @@ extern "C" {
 //#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
-	#define debugPrintf(args) printf(args); fflush(stdout);
+	#define debugPrintf(args...) printf(args); fflush(stdout);
 #else
 	#define debugFunction() /* */
-	#define debugPrintf(args) /* */
+	#define debugPrintf(args...) /* */
 #endif
 
 #define CR_UNKNOWN_ERROR	2000
