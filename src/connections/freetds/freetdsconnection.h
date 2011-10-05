@@ -85,9 +85,10 @@ class freetdscursor : public sqlrcursor_svr {
 		void		discardCursor();
 		char		escapeChar();
 
-		char	*cursorname;
+		char		*cursorname;
+		size_t		cursornamelength;
 
-		void	checkRePrepare();
+		void		checkRePrepare();
 
 		uint32_t	majorversion;
 		uint32_t	minorversion;

@@ -352,6 +352,7 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	languagecmd=NULL;
 	cursorcmd=NULL;
 	cursorname=NULL;
+	cursornamelength=0;
 
 	// replace the regular expressions used to detect creation of a
 	// temporary table
@@ -385,6 +386,7 @@ bool freetdscursor::openCursor(uint16_t id) {
 
 	clean=true;
 
+	cursornamelength=charstring::integerLength(id);
 	cursorname=charstring::parseNumber(id);
 
 	if (ct_cmd_alloc(freetdsconn->dbconn,&languagecmd)!=CS_SUCCEED) {
@@ -482,7 +484,8 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 		cmd=cursorcmd;
 #ifdef FREETDS_SUPPORTS_CURSORS
 		if (ct_cursor(cursorcmd,CS_CURSOR_DECLARE,
-				(CS_CHAR *)cursorname,CS_NULLTERM,
+				(CS_CHAR *)cursorname,
+				(CS_INT)cursornamelength,
 				(CS_CHAR *)query,length,
 				//CS_READ_ONLY)!=CS_SUCCEED) {
 				CS_UNUSED)!=CS_SUCCEED) {
