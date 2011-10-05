@@ -169,6 +169,11 @@ struct MYSQL_BIND {
 };
 #endif
 
+struct MYSQL_PARAMETERS {
+	unsigned long *p_max_allowed_packet;
+	unsigned long *p_net_buffer_length;
+};
+
 // This is the same for all versions of mysql that I've ever seen
 typedef char **MYSQL_ROW;
 
@@ -320,7 +325,6 @@ const char *mysql_stmt_sqlstate(MYSQL_STMT *stmt);
 int mysql_stmt_store_result(MYSQL_STMT *stmt);
 my_bool mysql_stmt_free_result(MYSQL_STMT *stmt);
 my_bool mysql_stmt_reset(MYSQL_STMT *stmt);
-void mysql_server_init(int argc, char **argv, char **groups);
 void mysql_library_init(int argc, char **argv, char **groups);
 void mysql_server_end();
 void mysql_library_end();
@@ -334,8 +338,29 @@ unsigned int mysql_thread_safe() {
 	return 1;
 }
 
+static MYSQL_PARAMETERS	mysql_parameters;
+static unsigned long	p_max_allowed_packet=1024;
+static unsigned long	p_net_buffer_length=1024;
+
+my_bool my_init() {
+	debugFunction();
+	mysql_parameters.p_max_allowed_packet=&p_max_allowed_packet;
+	mysql_parameters.p_net_buffer_length=&p_net_buffer_length;
+	return true;
+}
+
+MYSQL_PARAMETERS *mysql_get_parameters() {
+	debugFunction();
+	debugPrintf("p_max_allowed_packet=%ld\n",
+			*mysql_parameters.p_max_allowed_packet);
+	debugPrintf("p_net_buffer_length=%ld\n",
+			*mysql_parameters.p_net_buffer_length);
+	return &mysql_parameters;
+}
+
 MYSQL *mysql_init(MYSQL *mysql) {
 	debugFunction();
+	my_init();
 	if (mysql) {
 		rawbuffer::zero(mysql,sizeof(MYSQL));
 		return mysql;
@@ -1687,13 +1712,15 @@ my_bool mysql_stmt_reset(MYSQL_STMT *stmt) {
 	return true;
 }
 
-void mysql_server_init(int argc, char **argv, char **groups) {
+int mysql_server_init(int argc, char **argv, char **groups) {
 	debugFunction();
-	return mysql_library_init(argc,argv,groups);
+	mysql_library_init(argc,argv,groups);
+	return 0;
 }
 
 void mysql_library_init(int argc, char **argv, char **groups) {
 	debugFunction();
+	my_init();
 	// FIXME: do something?
 }
 
