@@ -3,12 +3,22 @@
 
 extern "C" {
 
+//#define DEBUG_MESSAGES 1
+#ifdef DEBUG_MESSAGES
+	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
+	#define debugPrintf(args...) printf(args); fflush(stdout);
+#else
+	#define debugFunction() /* */
+	#define debugPrintf(args...) /* */
+#endif
+
 #define TRUE	1
 #define FALSE	0
 
 typedef unsigned int Oid;
 typedef struct pg_conn PGconn;
 typedef struct pg_result PGresult;
+typedef struct pg_cancel PGcancel;
 typedef void (*PQnoticeProcessor) (void *arg, const char *message);
 
 typedef enum {
@@ -21,6 +31,20 @@ typedef enum {
 	PGRES_NONFATAL_ERROR,
 	PGRES_FATAL_ERROR
 } ExecStatusType;
+
+typedef enum {
+	PQTRANS_IDLE,
+	PQTRANS_ACTIVE,
+	PQTRANS_INTRANS,
+	PQTRANS_INERROR,
+	PQTRANS_UNKNOWN
+} PGTransactionStatusType;
+
+typedef enum {
+	PQERRORS_TERSE,
+	PQERRORS_DEFAULT,
+	PQERRORS_VERBOSE
+} PGVerbosity;
 
 struct pg_conn;
 
@@ -63,7 +87,15 @@ struct pg_conn {
 	char		*error;
 
 	int		removetrailingsemicolons;
+
+	PGVerbosity	errorverbosity;
 };
+
+struct pg_cancel {
+	void	*extension;
+};
+
+
 
 // encodings
 #define	PG_UTF8		6

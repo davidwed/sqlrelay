@@ -21,6 +21,7 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 extern "C" {
 
 int translateEncoding(const char *encoding) {
+	debugFunction();
 	if (encoding) {
 		if (!charstring::compare(encoding,"UTF8")) {
 			return PG_UTF8;
@@ -30,11 +31,14 @@ int translateEncoding(const char *encoding) {
 }
 
 int PQmblen(const unsigned char *s, int encoding) {
+	debugFunction();
+	debugPrintf("%c\n",*s);
 	// determine length of multibyte encoded char at *s
 	return 1;
 }
 
 int PQenv2encoding(void) {
+	debugFunction();
 	return translateEncoding(environment::getValue("PGCLIENTENCODING"));
 }
 

@@ -17,6 +17,7 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 extern "C" {
 
 int PQgetline(PGconn *conn, char *string, int length) {
+	debugFunction();
 	// return EOF if we're at the end of input
 	// 0 if an entire line has been read
 	// 1 if more data is left to be read
@@ -25,19 +26,23 @@ int PQgetline(PGconn *conn, char *string, int length) {
 }
 
 int PQputline(PGconn *conn, const char *string) {
+	debugFunction();
 	return EOF;
 }
 
 int PQgetlineAsync(PGconn *conn, char *buffer, int bufsize) {
+	debugFunction();
 	buffer[0]='\0';
 	return EOF;
 }
 
 int PQputnbytes(PGconn *conn, const char *buffer, int nbytes) {
+	debugFunction();
 	return EOF;
 }
 
 int PQendcopy(PGconn *conn) {
+	debugFunction();
 	// return 0 on success, nonzero otherwise
 	return -1;
 }

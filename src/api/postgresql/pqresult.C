@@ -23,6 +23,8 @@ extern "C" {
 
 // lame... I stole this code from sqlrcursor
 char	*skipWhitespaceAndComments(const char *querybuffer) {
+	debugFunction();
+
 	// scan the query, bypassing whitespace and comments.
 	char	*ptr=(char *)querybuffer;
 	while (*ptr && 
@@ -41,6 +43,7 @@ char	*skipWhitespaceAndComments(const char *querybuffer) {
 
 // lame... I stole this code from sqlrcursor too
 int	queryIsNotSelect(const char *querybuffer) {
+	debugFunction();
 
 	// scan the query, bypassing whitespace and comments.
 	char	*ptr=skipWhitespaceAndComments(querybuffer);
@@ -55,6 +58,7 @@ int	queryIsNotSelect(const char *querybuffer) {
 }
 
 void PQclear(PGresult *res) {
+	debugFunction();
 	if (res) {
 		res->parent->nonblockingmode=res->previousnonblockingmode;
 		delete res->sqlrcur;
@@ -63,6 +67,8 @@ void PQclear(PGresult *res) {
 }
 
 PGresult *PQexec(PGconn *conn, const char *query) {
+	debugFunction();
+	debugPrintf("%s\n",query);
 
 	PGresult	*result=new PGresult;
 	result->parent=conn;
@@ -135,11 +141,13 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 }
 
 ExecStatusType PQresultStatus(const PGresult *res) {
+	debugFunction();
 	// FIXME: I'm not sure I should return PGRES_FATAL_ERROR if res is NULL
 	return (res)?res->execstatus:PGRES_FATAL_ERROR;
 }
 
 char *PQresStatus(ExecStatusType status) {
+	debugFunction();
 	if (status==PGRES_EMPTY_QUERY) {
 		return const_cast<char *>("PGRES_EMPTY_QUERY");
 	} else if (status==PGRES_COMMAND_OK) {
@@ -161,19 +169,23 @@ char *PQresStatus(ExecStatusType status) {
 }
 
 char *PQresultErrorMessage(const PGresult *res) {
+	debugFunction();
 	return const_cast<char *>(res->sqlrcur->errorMessage());
 }
 
 
 int PQntuples(const PGresult *res) {
+	debugFunction();
 	return res->sqlrcur->rowCount();
 }
 
 int PQnfields(const PGresult *res) {
+	debugFunction();
 	return res->sqlrcur->colCount();
 }
 
 int PQbinaryTuples(const PGresult *res) {
+	debugFunction();
 	// return 1 if result set contains binary data, 0 otherwise
 	for (uint32_t i=0; i<res->sqlrcur->colCount(); i++) {
 		if (res->sqlrcur->getColumnIsBinary(i)) {
@@ -184,10 +196,12 @@ int PQbinaryTuples(const PGresult *res) {
 }
 
 char *PQfname(const PGresult *res, int field_num) {
+	debugFunction();
 	return const_cast<char *>(res->sqlrcur->getColumnName(field_num));
 }
 
 int PQfnumber(const PGresult *res, const char *field_name) {
+	debugFunction();
 	for (uint32_t i=0; i<res->sqlrcur->colCount(); i++) {
 		if (!charstring::compare(field_name,
 					res->sqlrcur->getColumnName(i))) {
@@ -551,6 +565,7 @@ static Oid postgresqltypemap[]={
 };
 
 Oid PQftype(const PGresult *res, int field_num) {
+	debugFunction();
 
 	// if the type is numeric then we're using a postgresql database and
 	// typemangling is turned off, so we'll just return the type
@@ -582,6 +597,7 @@ int PQfsize(const PGresult *res, int field_num) {
 }
 
 int PQfmod(const PGresult *res, int field_num) {
+	debugFunction();
 	// for char/varchar fields, return the column length,
 	// otherwise, return -1
 	Oid	oid=PQftype(res,field_num);
@@ -590,40 +606,48 @@ int PQfmod(const PGresult *res, int field_num) {
 }
 
 char *PQcmdStatus(PGresult *res) {
+	debugFunction();
 	// should return a string represeting the "command type" like:
 	//	SELECT, INSERT, UPDATE, DROP, etc.
 	return const_cast<char *>((res->queryisnotselect)?"":"SELECT");
 }
 
 char *PQoidStatus(const PGresult *res) {
+	debugFunction();
 	// return OID of tuple if query was an insert,
 	// otherwise return InvalidOid
 	return const_cast<char *>("InvalidOid");
 }
 
 Oid PQoidValue(const PGresult *res) {
+	debugFunction();
 	// return OID of tuple if query was an insert,
 	// otherwise return InvalidOid
 	return InvalidOid;
 }
 
 char *PQcmdTuples(PGresult *res) {
+	debugFunction();
 	return charstring::parseNumber(res->sqlrcur->affectedRows());
 }
 
 char *PQgetvalue(const PGresult *res, int tup_num, int field_num) {
+	debugFunction();
 	return const_cast<char *>(res->sqlrcur->getField(tup_num,field_num));
 }
 
 int PQgetlength(const PGresult *res, int tup_num, int field_num) {
+	debugFunction();
 	return res->sqlrcur->getFieldLength(tup_num,field_num);
 }
 
 int PQgetisnull(const PGresult *res, int tup_num, int field_num) {
+	debugFunction();
 	return (res->sqlrcur->getField(tup_num,field_num)==(char *)NULL);
 }
 
 PGresult *PQmakeEmptyPGresult(PGconn *conn, ExecStatusType status) {
+	debugFunction();
 	// Make an empty PGresult with given status (some apps find this
 	// useful). If conn is not NULL and status indicates an error, the
 	// conn's errorMessage is copied.

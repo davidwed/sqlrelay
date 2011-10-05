@@ -27,16 +27,19 @@ typedef enum {
 } PostgresPollingStatusType;
 
 PGconn *PQconnectStart(const char *conninfo) {
+	debugFunction();
 	// SQL Relay doesn't connect right away, so just pass through the
 	// normal connect process here
 	return PQconnectdb(conninfo);
 }
 
 PostgresPollingStatusType PQconnectPoll(PGconn *conn) {
+	debugFunction();
 	return PGRES_POLLING_OK;
 }
 
 int PQresetStart(PGconn *conn) {
+	debugFunction();
 	char	*savestring=conn->conninfo;
 	PQfinish(conn);
 	conn=PQconnectdb(savestring);
@@ -45,16 +48,37 @@ int PQresetStart(PGconn *conn) {
 }
 
 PostgresPollingStatusType PQresetPoll(PGconn *conn) {
+	debugFunction();
 	return PGRES_POLLING_OK;
 }
 
+PGcancel *PQgetCancel(PGconn *conn) {
+	debugFunction();
+	return new PGcancel;
+}
+
+void PQfreeCancel(PGcancel *cancel) {
+	debugFunction();
+	if (cancel) {
+		delete cancel;
+	}
+}
+
+int PQcancel(PGcancel *cancel, char *errbuf, int errbufsize) {
+	debugFunction();
+	snprintf(errbuf,errbufsize,"Operation not supported");
+	return 0;
+}
+
 int PQrequestCancel(PGconn *conn) {
+	debugFunction();
 	delete conn->sqlrcon;
 	conn->sqlrcon=NULL;
 	return TRUE;
 }
 
 int PQsendQuery(PGconn *conn, const char *query) {
+	debugFunction();
 
 	// FIXME:
 	// "query" could contain multiple queries,
@@ -64,6 +88,7 @@ int PQsendQuery(PGconn *conn, const char *query) {
 }
 
 PGresult *PQgetResult(PGconn *conn) {
+	debugFunction();
 
 	// FIXME:
 	// Should poll to see if one of the queries started in
@@ -74,29 +99,40 @@ PGresult *PQgetResult(PGconn *conn) {
 	return retval;
 }
 
+PGTransactionStatusType PQtransactionStatus(const PGconn *conn) {
+	debugFunction();
+	return PQTRANS_IDLE;
+}
+
 int PQisBusy(PGconn *conn) {
+	debugFunction();
 	return FALSE;
 }
 
 int PQconsumeInput(PGconn *conn) {
+	debugFunction();
 	return TRUE;
 }
 
 int PQsetnonblocking(PGconn *conn, int arg) {
+	debugFunction();
 	conn->nonblockingmode=arg;
 	return TRUE;
 }
 
 int PQisnonblocking(const PGconn *conn) {
+	debugFunction();
 	return conn->nonblockingmode;
 }
 
 int PQflush(PGconn *conn) {
+	debugFunction();
 	// return 0 on success or EOF on failure
 	return 0;
 }
 
 int PQsendSome(PGconn *conn) {
+	debugFunction();
 	// Have no idea what should be returned here
 	return 0;
 }

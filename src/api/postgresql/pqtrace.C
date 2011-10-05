@@ -17,11 +17,13 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 extern "C" {
 
 void PQtrace(PGconn *conn, FILE *debug_port) {
+	debugFunction();
 	// FIXME: this should go to a file instead of stdio
 	conn->sqlrcon->debugOn();
 }
 
 void PQuntrace(PGconn *conn) {
+	debugFunction();
 	conn->sqlrcon->debugOff();
 }
 

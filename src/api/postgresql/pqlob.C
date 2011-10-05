@@ -17,42 +17,52 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 extern "C" {
 
 int lo_open(PGconn *conn, Oid lobjId, int mode) {
+	debugFunction();
 	return -1;
 }
 
 int lo_close(PGconn *conn, int fd) {
+	debugFunction();
 	return -1;
 }
 
 int lo_read(PGconn *conn, int fd, char *buf, size_t len) {
+	debugFunction();
 	return -1;
 }
 
 int lo_write(PGconn *conn, int fd, char *buf, size_t len) {
+	debugFunction();
 	return -1;
 }
 
 int lo_lseek(PGconn *conn, int fd, int offset, int whence) {
+	debugFunction();
 	return -1;
 }
 
 Oid lo_creat(PGconn *conn, int mode) {
+	debugFunction();
 	return InvalidOid;
 }
 
 int lo_tell(PGconn *conn, int fd) {
+	debugFunction();
 	return -1;
 }
 
 int lo_unlink(PGconn *conn, Oid lobjId) {
+	debugFunction();
 	return -1;
 }
 
 Oid lo_import(PGconn *conn, const char *filename) {
+	debugFunction();
 	return InvalidOid;
 }
 
 int lo_export(PGconn *conn, Oid lobjId, const char *filename) {
+	debugFunction();
 	return -1;
 }
 

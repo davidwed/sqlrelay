@@ -29,6 +29,7 @@ typedef enum {
 } ConnStatusType;
 
 static void defaultNoticeProcessor(void *arg, const char *message) {
+	debugFunction();
 	fprintf(stderr,"%s",message);
 }
 
@@ -37,6 +38,7 @@ PGconn *allocatePGconn(const char *conninfo,
 				const char *options, const char *tty,
 				const char *db, const char *user,
 				const char *password) {
+	debugFunction();
 
 	PGconn	*conn=new PGconn;
 
@@ -103,10 +105,13 @@ PGconn *allocatePGconn(const char *conninfo,
 
 	conn->removetrailingsemicolons=-1;
 
+	conn->errorverbosity=PQERRORS_DEFAULT;
+
 	return conn;
 }
 
 void freePGconn(PGconn *conn) {
+	debugFunction();
 
 	if (!conn) {
 		return;
@@ -141,82 +146,152 @@ PGconn *PQsetdbLogin(const char *host, const char *port,
 			 const char *options, const char *tty,
 			 const char *db,
 			 const char *user, const char *password) {
+	debugFunction();
 	return allocatePGconn(NULL,host,port,options,tty,db,user,password);
 }
 
 PGconn *PQsetdb(const char *host, const char *port,
 			 const char *options, const char *tty,
 			 const char *db) {
+	debugFunction();
 	return PQsetdbLogin(host,port,options,tty,db,NULL,NULL);
 }
 
 PGconn *PQconnectdb(const char *conninfo) {
+	debugFunction();
 	return allocatePGconn(conninfo,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 }
 
+PGconn *PQconnectdbParams(const char **keywords,
+				const char **values,
+				int expanddbname) {
+	debugFunction();
+
+	const char *host=NULL;
+	const char *port=NULL;
+	const char *options=NULL;
+	const char *tty=NULL;
+	const char *db=NULL;
+	const char *user=NULL;
+	const char *password=NULL;
+
+	for (uint16_t i=0; keywords[i]; i++) {
+		printf("%s=%s\n",keywords[i],values[i]);
+		if (!charstring::compare(keywords[i],"host")) {
+			host=values[i];
+		} else if (!charstring::compare(keywords[i],"hostaddr")) {
+			host=values[i];
+		} else if (!charstring::compare(keywords[i],"port")) {
+			port=values[i];
+		} else if (!charstring::compare(keywords[i],"options")) {
+			options=values[i];
+		} else if (!charstring::compare(keywords[i],"tty")) {
+			tty=values[i];
+		} else if (!charstring::compare(keywords[i],"dbname")) {
+			db=values[i];
+		} else if (!charstring::compare(keywords[i],"user")) {
+			user=values[i];
+		} else if (!charstring::compare(keywords[i],"password")) {
+			password=values[i];
+		}
+	}
+
+	return allocatePGconn(NULL,host,port,options,tty,db,user,password);
+}
+
 void PQfinish(PGconn *conn) {
+	debugFunction();
 	freePGconn(conn);
 }
 
 void PQreset(PGconn *conn) {
+	debugFunction();
 	PQfinish(conn);
 	PQsetdbLogin(conn->host,conn->port,conn->options,
 			conn->tty,conn->db,conn->user,conn->password);
 }
 
 char *PQdb(const PGconn *conn) {
+	debugFunction();
+	debugPrintf("%s\n",conn->db);
 	return conn->db;
 }
 
 char *PQuser(const PGconn *conn) {
+	debugFunction();
+	debugPrintf("%s\n",conn->user);
 	return conn->user;
 }
 
 char *PQpass(const PGconn *conn) {
+	debugFunction();
+	debugPrintf("%s\n",conn->password);
 	return conn->password;
 }
 
 char *PQhost(const PGconn *conn) {
+	debugFunction();
+	debugPrintf("%s\n",conn->host);
 	return conn->host;
 }
 
 char *PQport(const PGconn *conn) {
+	debugFunction();
+	debugPrintf("%s\n",conn->port);
 	return conn->port;
 }
 
 char *PQtty(const PGconn *conn) {
+	debugFunction();
+	debugPrintf("%s\n",conn->tty);
 	return conn->tty;
 }
 
 char *PQoptions(const PGconn *conn) {
+	debugFunction();
+	debugPrintf("%s\n",conn->options);
 	return conn->options;
 }
 
 ConnStatusType PQstatus(const PGconn *conn) {
+	debugFunction();
 	return CONNECTION_OK;
 }
 
+PGVerbosity PQsetErrorVerbosity(PGconn *conn, PGVerbosity verbosity) {
+	PGVerbosity	retval=conn->errorverbosity;
+	conn->errorverbosity=verbosity;
+	return retval;
+}
+
 char *PQerrorMessage(const PGconn *conn) {
+	debugFunction();
+	debugPrintf("%s\n",conn->error);
 	return (conn->error)?conn->error:(char *)"";
 }
 
 int PQsocket(const PGconn *conn) {
+	debugFunction();
 	return -1;
 }
 
 int PQbackendPID(const PGconn *conn) {
+	debugFunction();
 	return -1;
 }
 
 unsigned long PQgetssl(PGconn *conn) {
+	debugFunction();
 	return 0;
 }
 
 int PQclientEncoding(const PGconn *conn) {
+	debugFunction();
 	return conn->clientencoding;
 }
 
 int PQsetClientEncoding(PGconn *conn, const char *encoding) {
+	debugFunction();
 	int	enc=translateEncoding(encoding);
 	if (enc>-1) {
 		conn->clientencoding=enc;
@@ -228,6 +303,7 @@ int PQsetClientEncoding(PGconn *conn, const char *encoding) {
 PQnoticeProcessor PQsetNoticeProcessor(PGconn *conn,
 					 PQnoticeProcessor proc,
 					 void *arg) {
+	debugFunction();
 
 	PQnoticeProcessor	oldprocessor=conn->noticeprocessor;
 
@@ -238,8 +314,13 @@ PQnoticeProcessor PQsetNoticeProcessor(PGconn *conn,
 }
 
 const char *PQparameterStatus(const PGconn *conn, const char *paramName) {
+	debugFunction();
 	// FIXME: Return sensible values for this func.
 	return NULL;
+}
+
+int PQserverVersion() {
+	return 80100;
 }
 
 }

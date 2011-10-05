@@ -22,10 +22,12 @@ typedef struct pgNotify {
 } PGnotify;
 
 PGnotify *PQnotifies(PGconn *conn) {
+	debugFunction();
 	return NULL;
 }
 
 void PQfreeNotify(PGnotify *notify) {
+	debugFunction();
 }
 
 

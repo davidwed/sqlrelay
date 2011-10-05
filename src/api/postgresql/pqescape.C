@@ -47,6 +47,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
 size_t PQescapeString(char *to, const char *from, size_t length) {
+	debugFunction();
 
 	const char	*source=from;
 	char		*target=to;
@@ -85,6 +86,7 @@ size_t PQescapeString(char *to, const char *from, size_t length) {
 
 unsigned char *PQescapeBytea(unsigned char *bintext, size_t binlen,
 			  				size_t *bytealen) {
+	debugFunction();
 	unsigned char	*vp;
 	unsigned char	*rp;
 	unsigned char	*result;
@@ -139,6 +141,7 @@ unsigned char *PQescapeBytea(unsigned char *bintext, size_t binlen,
 }
 
 unsigned char *PQunescapeBytea(unsigned char *strtext, size_t *retbuflen) {
+	debugFunction();
 
 	size_t		buflen;
 	unsigned char	*buffer, *sp, *bp;

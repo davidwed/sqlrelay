@@ -26,11 +26,18 @@ typedef struct _PQconninfoOption {
 	int	dispsize;
 } PQconninfoOption;
 
+PQconninfoOption *PQconninfoParse(const char *conninfo, char **errmsg) {
+	debugFunction();
+	return NULL;
+}
+
 PQconninfoOption *PQconndefaults(void) {
+	debugFunction();
 	return NULL;
 }
 
 void PQconninfoFree(PQconninfoOption *connOptions) {
+	debugFunction();
 }
 
 }

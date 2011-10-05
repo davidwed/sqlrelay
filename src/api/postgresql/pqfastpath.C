@@ -27,6 +27,7 @@ typedef struct {
 
 PGresult *PQfn(PGconn *conn, int fnid, int *result_buf, int *result_len,
 	 	int result_is_int, const PQArgBlock *args, int nargs) {
+	debugFunction();
 	return NULL;
 }
 

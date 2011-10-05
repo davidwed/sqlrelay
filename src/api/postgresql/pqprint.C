@@ -97,6 +97,7 @@ PQprint(FILE *fout,
 		const PGresult *res,
 		const PQprintOpt *po)
 {
+	debugFunction();
 	int			nFields;
 
 	nFields = PQnfields(res);
@@ -349,6 +350,7 @@ do_field(const PQprintOpt *po, const PGresult *res,
 		 unsigned char *fieldNotNum, int *fieldMax,
 		 const int fieldMaxLen, FILE *fout)
 {
+	debugFunction();
 
 	const char *pval,
 			   *p;
@@ -461,6 +463,7 @@ do_header(FILE *fout, const PQprintOpt *po, const int nFields, int *fieldMax,
 		  const char **fieldNames, unsigned char *fieldNotNum,
 		  const int fs_len, const PGresult *res)
 {
+	debugFunction();
 
 	int			j;				/* for loop index */
 	char	   *border = NULL;
@@ -548,6 +551,7 @@ output_row(FILE *fout, const PQprintOpt *po, const int nFields, char **fields,
 		   unsigned char *fieldNotNum, int *fieldMax, char *border,
 		   const int row_index)
 {
+	debugFunction();
 
 	int			field_index;	/* for loop index */
 
@@ -598,6 +602,7 @@ PQdisplayTuples(const PGresult *res,
 				int quiet
 )
 {
+	debugFunction();
 #define DEFAULT_FIELD_SEP " "
 
 	int			i,
@@ -690,6 +695,8 @@ PQprintTuples(const PGresult *res,
 								 * width */
 )
 {
+	debugFunction();
+
 	int			nFields;
 	int			nTups;
 	int			i,
@@ -764,6 +771,8 @@ PQprintTuples(const PGresult *res,
 static void
 fill(int length, int max, char filler, FILE *fp)
 {
+	debugFunction();
+
 	int			count;
 
 	count = max - length;
