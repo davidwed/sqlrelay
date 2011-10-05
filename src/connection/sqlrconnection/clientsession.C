@@ -16,7 +16,7 @@ void sqlrconnection_svr::incrementClientSessionCount() {
 
 	semset->waitWithUndo(9);
 	statistics->open_cli_connections++;
-	inclientsession=false;
+	inclientsession=true;
 	statistics->opened_cli_connections++;
 	semset->signalWithUndo(9);
 
