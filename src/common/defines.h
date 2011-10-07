@@ -117,4 +117,9 @@ struct shmdata {
 	sqlrstatistics	statistics;
 };
 
+enum clientsessiontype_t {
+	SQLRELAY_CLIENT_SESSION_TYPE=0,
+	MYSQL_CLIENT_SESSION_TYPE
+};
+
 #endif

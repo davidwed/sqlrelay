@@ -71,6 +71,8 @@ class sqlrlistener : public daemonprocess, public listener {
 		bool	deniedIp(filedescriptor *clientsock);
 		void	forkChild(filedescriptor *clientsock);
 		void	clientSession(filedescriptor *clientsock);
+		void	sqlrelayClientSession(filedescriptor *clientsock);
+		void	mysqlClientSession(filedescriptor *clientsock);
 		int32_t	getAuth(filedescriptor *clientsock);
 		void    errorClientSession(filedescriptor *clientsock, const char *err);
 		void	incrementSessionCount();
@@ -113,7 +115,6 @@ class sqlrlistener : public daemonprocess, public listener {
 		int64_t		maxlisteners;
 		uint64_t	listenertimeout;
 
-		char		*unixport;
 		char		*pidfile;
 
 		authenticator	*authc;
@@ -129,6 +130,16 @@ class sqlrlistener : public daemonprocess, public listener {
 		unixserversocket	*clientsockun;
 		inetserversocket	**clientsockin;
 		uint64_t		clientsockincount;
+
+		unixserversocket	*mysqlclientsockun;
+		inetserversocket	**mysqlclientsockin;
+		uint64_t		mysqlclientsockincount;
+
+		char			*unixport;
+		char			*mysqlunixport;
+
+		clientsessiontype_t	sessiontype;
+
 		unixserversocket	*handoffsockun;
 		unixserversocket	*removehandoffsockun;
 		unixserversocket	*fixupsockun;

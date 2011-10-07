@@ -27,7 +27,7 @@
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.43
+Version: 0.44
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
@@ -60,7 +60,7 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define exampledir %{_datadir}/examples/%{name}-%{version}
 %endif
 
-BuildRequires: rudiments-devel >= 0.33
+BuildRequires: rudiments-devel >= 0.34
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}
 %{!?_without_postgresql:BuildRequires: ,postgresql-devel}

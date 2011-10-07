@@ -40,12 +40,20 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 	semset=NULL;
 	idmemory=NULL;
 
-	unixport=NULL;
 	pidfile=NULL;
 
 	clientsockin=NULL;
 	clientsockincount=0;
 	clientsockun=NULL;
+	unixport=NULL;
+
+	mysqlclientsockin=NULL;
+	mysqlclientsockincount=0;
+	mysqlclientsockun=NULL;
+	mysqlunixport=NULL;
+
+	sessiontype=SQLRELAY_CLIENT_SESSION_TYPE;
+
 	handoffsockun=NULL;
 	removehandoffsockun=NULL;
 	fixupsockun=NULL;
@@ -86,6 +94,11 @@ void sqlrlistener::cleanUp() {
 		delete clientsockin[index];
 	}
 	delete[] clientsockin;
+	delete mysqlclientsockun;
+	for (uint64_t index=0; index<mysqlclientsockincount; index++) {
+		delete mysqlclientsockin[index];
+	}
+	delete[] mysqlclientsockin;
 	delete handoffsockun;
 
 	if (handoffsocklist) {
@@ -453,7 +466,8 @@ void sqlrlistener::semError(const char *id, int semid) {
 
 bool sqlrlistener::listenOnClientSockets() {
 
-	// get addresses/inet port and unix port to listen on
+	// get addresses/inet port and unix port to
+	// listen on for the SQL Relay protocol
 	const char * const *addresses=cfgfl.getAddresses();
 	clientsockincount=cfgfl.getAddressCount();
 	uint16_t	port=cfgfl.getPort();
@@ -463,7 +477,7 @@ bool sqlrlistener::listenOnClientSockets() {
 	const char	*uport=cfgfl.getUnixPort();
 	unixport=charstring::duplicate(uport);
 
-	// attempt to listen on the inet port
+	// attempt to listen on the SQL Relay inet ports
 	// (on each specified address), if necessary
 	bool	listening=false;
 	if (port && clientsockincount) {
@@ -494,7 +508,7 @@ bool sqlrlistener::listenOnClientSockets() {
 		}
 	}
 
-	if ((!port || listening) && charstring::length(unixport)) {
+	if (charstring::length(unixport)) {
 		clientsockun=new unixserversocket();
 		listening=clientsockun->listen(unixport,0000,15);
 		if (listening) {
@@ -509,6 +523,67 @@ bool sqlrlistener::listenOnClientSockets() {
 			clientsockun=NULL;
 			delete[] unixport;
 			unixport=NULL;
+		}
+	}
+
+	// get addresses/inet port and unix port to
+	// listen on for the MySQL protocol
+	const char * const *mysqladdresses=cfgfl.getMySQLAddresses();
+	mysqlclientsockincount=cfgfl.getMySQLAddressCount();
+	uint16_t	mysqlport=cfgfl.getMySQLPort();
+	if (!mysqlport) {
+		mysqlclientsockincount=0;
+	}
+	const char	*mysqluport=cfgfl.getMySQLUnixPort();
+	mysqlunixport=charstring::duplicate(mysqluport);
+
+	// attempt to listen on the MySQL inet ports
+	// (on each specified address), if necessary
+	if (mysqlport && mysqlclientsockincount) {
+		mysqlclientsockin=
+			new inetserversocket *[mysqlclientsockincount];
+		bool	failed=false;
+		for (uint64_t index=0; index<mysqlclientsockincount; index++) {
+			mysqlclientsockin[index]=NULL;
+			if (failed) {
+				continue;
+			}
+			mysqlclientsockin[index]=new inetserversocket();
+			listening=mysqlclientsockin[index]->listen(
+							mysqladdresses[index],
+							mysqlport,15);
+			if (listening) {
+				addFileDescriptor(mysqlclientsockin[index]);
+			} else {
+				fprintf(stderr,
+					"Could not listen "
+					"on: %s/%d\n"
+					"Error was: %s\n"
+					"Make sure that no other "
+					"processes are listening "
+					"on that port.\n\n",
+					mysqladdresses[index],mysqlport,
+					error::getErrorString());
+				failed=true;
+			}
+		}
+	}
+
+	if (charstring::length(mysqlunixport)) {
+		mysqlclientsockun=new unixserversocket();
+		listening=mysqlclientsockun->listen(mysqlunixport,0000,15);
+		if (listening) {
+			addFileDescriptor(mysqlclientsockun);
+		} else {
+			fprintf(stderr,"Could not listen on unix socket: ");
+			fprintf(stderr,"%s\n",mysqlunixport);
+			fprintf(stderr,"Make sure that the file and ");
+			fprintf(stderr,"directory are readable and writable.");
+			fprintf(stderr,"\n\n");
+			delete mysqlclientsockun;
+			mysqlclientsockun=NULL;
+			delete[] mysqlunixport;
+			mysqlunixport=NULL;
 		}
 	}
 
@@ -848,11 +923,20 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 		}
 	}
 
+	// init session type
+	sessiontype=SQLRELAY_CLIENT_SESSION_TYPE;
+
 	// handle connections to the client sockets
 	inetserversocket	*iss=NULL;
 	for (uint64_t index=0; index<clientsockincount; index++) {
 		if (fd==clientsockin[index]) {
 			iss=clientsockin[index];
+		}
+	}
+	for (uint64_t index=0; index<mysqlclientsockincount; index++) {
+		if (fd==mysqlclientsockin[index]) {
+			iss=mysqlclientsockin[index];
+			sessiontype=MYSQL_CLIENT_SESSION_TYPE;
 		}
 	}
 	if (iss) {
@@ -871,6 +955,10 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	} else if (fd==clientsockun) {
 		clientsock=clientsockun->accept();
 		clientsock->translateByteOrder();
+	} else if (fd==mysqlclientsockun) {
+		clientsock=mysqlclientsockun->accept();
+		clientsock->translateByteOrder();
+		sessiontype=MYSQL_CLIENT_SESSION_TYPE;
 	} else {
 		return true;
 	}
@@ -901,15 +989,10 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	// happen, getValue(10) would return something greater than 0 and we
 	// would have forked anyway.
 	if (dynamicscaling || getBusyListeners() || !semset->getValue(2)) {
-
 		forkChild(clientsock);
-
 	} else {
-
 		incBusyListeners();
-
 		clientSession(clientsock);
-
 		decBusyListeners();
 	}
 
@@ -1160,6 +1243,20 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 void sqlrlistener::clientSession(filedescriptor *clientsock) {
 
+	switch (sessiontype) {
+		case SQLRELAY_CLIENT_SESSION_TYPE:
+			sqlrelayClientSession(clientsock);
+			break;
+		case MYSQL_CLIENT_SESSION_TYPE:
+			mysqlClientSession(clientsock);
+			break;
+	}
+
+	delete clientsock;
+}
+
+void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
+
 	bool	passstatus=false;
 
 	// handle authentication
@@ -1192,7 +1289,12 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 	// FIXME: if we got -1 from getAuth, then the client may be spewing
 	// garbage and we should close the connection...
 	waitForClientClose(authstatus,passstatus,clientsock);
-	delete clientsock;
+}
+
+void sqlrlistener::mysqlClientSession(filedescriptor *clientsock) {
+
+	// FIXME: do something for real
+	waitForClientClose(false,false,clientsock);
 }
 
 int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {

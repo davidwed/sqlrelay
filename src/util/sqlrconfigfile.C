@@ -15,9 +15,16 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	addresses[0]=charstring::duplicate("0.0.0.0");
 	addresscount=1;
 	port=0;
-	listenoninet=false;
 	unixport=charstring::duplicate("");
+	listenoninet=false;
 	listenonunix=false;
+	mysqladdresses=new char *[1];
+	mysqladdresses[0]=charstring::duplicate("0.0.0.0");
+	mysqladdresscount=1;
+	mysqlport=0;
+	mysqlunixport=charstring::duplicate("");
+	mysqllistenoninet=false;
+	mysqllistenonunix=false;
 	dbase=charstring::duplicate(DEFAULT_DBASE);
 	connections=charstring::toInteger(DEFAULT_CONNECTIONS);
 	maxconnections=charstring::toInteger(DEFAULT_MAXCONNECTIONS);
@@ -77,6 +84,12 @@ sqlrconfigfile::~sqlrconfigfile() {
 	}
 	delete[] addresses;
 
+
+	for (uint64_t index=0; index<mysqladdresscount; index++) {
+		delete[] mysqladdresses[index];
+	}
+	delete[] mysqladdresses;
+
 	delete[] dbase;
 	delete[] unixport;
 	delete[] endofsession;
@@ -130,6 +143,30 @@ bool sqlrconfigfile::getListenOnInet() {
 
 bool sqlrconfigfile::getListenOnUnix() {
 	return listenonunix;
+}
+
+const char * const * sqlrconfigfile::getMySQLAddresses() {
+	return mysqladdresses;
+}
+
+uint64_t sqlrconfigfile::getMySQLAddressCount() {
+	return mysqladdresscount;
+}
+
+uint16_t sqlrconfigfile::getMySQLPort() {
+	return mysqlport;
+}
+
+const char *sqlrconfigfile::getMySQLUnixPort() {
+	return mysqlunixport;
+}
+
+bool sqlrconfigfile::getMySQLListenOnInet() {
+	return mysqllistenoninet;
+}
+
+bool sqlrconfigfile::getMySQLListenOnUnix() {
+	return mysqllistenonunix;
 }
 
 const char *sqlrconfigfile::getDbase() {
@@ -455,14 +492,20 @@ bool sqlrconfigfile::tagStart(const char *name) {
 
 bool sqlrconfigfile::tagEnd(const char *name) {
 
-	// if neither port nor socket were specified, use the default port
 	if (!charstring::compare(name,"instance")) {
+
+		// if neither port nor socket were specified,
+		// use the default port
 		if (!port && !unixport[0]) {
 			port=charstring::toInteger(DEFAULT_PORT);
 			addresscount=1;
 		}
+
 		listenoninet=(port)?true:false;
 		listenonunix=(unixport[0])?true:false;
+
+		mysqllistenoninet=(mysqlport)?true:false;
+		mysqllistenonunix=(mysqlunixport[0])?true:false;
 	}
 
 	// don't do anything if we're already done
@@ -471,46 +514,44 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 		return true;
 	}
 
-    // Close up the current tag
-    switch(currenttag) {
-    case ROUTER_TAG:
-        // Check closing tag, no need, but just in case
-        if (!charstring::compare(name,"router"))
-        {
-            currenttag = NO_TAG;
-        }
-        break;
-    case USERS_TAG:
-    case CONNECTIONS_TAG:
-        // Must check closing tag, we have leaves inside
-        if (    !charstring::compare(name,"users")
-             || !charstring::compare(name,"connections")  )
-        {
-            currenttag = NO_TAG;
-        }
-        break;
-    case ROUTE_TAG:
-    case FILTER_TAG:
-        // Must check closing tag, we have leaves inside
-        if (    !charstring::compare(name,"route")
-             || !charstring::compare(name,"filter")  )
-        {
-            currenttag = ROUTER_TAG;
-            
-    		routecontainer	*existingroute=routeAlreadyExists(currentroute);
-    		if (existingroute) {
-    			moveRegexList(currentroute,existingroute);
-    			delete currentroute;
-    		} else {
-    			routelist.append(currentroute);
-    		}
-        }
-		
-        break;
-    default:
-        // just ignore the closing tag
-        break;
-    }
+	// Close up the current tag
+	switch(currenttag) {
+		case ROUTER_TAG:
+			// Check closing tag, no need, but just in case
+			if (!charstring::compare(name,"router"))
+			{
+				currenttag = NO_TAG;
+			}
+			break;
+		case USERS_TAG:
+		case CONNECTIONS_TAG:
+			// Must check closing tag, we have leaves inside
+			if (!charstring::compare(name,"users") ||
+				!charstring::compare(name,"connections")) {
+				currenttag = NO_TAG;
+			}
+			break;
+		case ROUTE_TAG:
+		case FILTER_TAG:
+			// Must check closing tag, we have leaves inside
+			if (!charstring::compare(name,"route") ||
+				!charstring::compare(name,"filter")) {
+				currenttag = ROUTER_TAG;
+				routecontainer	*existingroute=
+					routeAlreadyExists(currentroute);
+				if (existingroute) {
+					moveRegexList(currentroute,
+							existingroute);
+					delete currentroute;
+				} else {
+					routelist.append(currentroute);
+				}
+			}
+			break;
+		default:
+			// just ignore the closing tag
+			break;
+	}
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -550,6 +591,12 @@ bool sqlrconfigfile::attributeName(const char *name) {
 	} else if (!charstring::compare(name,"socket") ||
 			!charstring::compare(name,"unixport")) {
 			currentattribute=SOCKET_ATTRIBUTE;
+	} else if (!charstring::compare(name,"mysqladdresses")) {
+		currentattribute=MYSQLADDRESSES_ATTRIBUTE;
+	} else if (!charstring::compare(name,"mysqlport")) {
+			currentattribute=MYSQLPORT_ATTRIBUTE;
+	} else if (!charstring::compare(name,"mysqlsocket")) {
+			currentattribute=MYSQLSOCKET_ATTRIBUTE;
 	} else if (!charstring::compare(name,"dbase")) {
 		currentattribute=DBASE_ATTRIBUTE;
 	} else if (!charstring::compare(name,"connections")) {
@@ -749,6 +796,30 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==SOCKET_ATTRIBUTE) {
 			delete[] unixport;
 			unixport=charstring::duplicate(value);
+		} else if (currentattribute==MYSQLADDRESSES_ATTRIBUTE) {
+			for (uint64_t index=0;
+					index<mysqladdresscount; index++) {
+				delete[] mysqladdresses[index];
+			}
+			delete[] mysqladdresses;
+			// if the attribute was left blank, assume 0.0.0.0
+			if (!charstring::length(value)) {
+				value="0.0.0.0";
+			}
+			charstring::split(
+				(value &&
+				!charstring::contains(value,DEFAULT_ADDRESSES))?
+				value:DEFAULT_ADDRESSES,
+				",",true,&mysqladdresses,&mysqladdresscount);
+			for (uint64_t index=0;
+					index<mysqladdresscount; index++) {
+				charstring::bothTrim(mysqladdresses[index]);
+			}
+		} else if (currentattribute==MYSQLPORT_ATTRIBUTE) {
+			mysqlport=atouint32_t(value,"0",0);
+		} else if (currentattribute==MYSQLSOCKET_ATTRIBUTE) {
+			delete[] mysqlunixport;
+			mysqlunixport=charstring::duplicate(value);
 		} else if (currentattribute==DBASE_ATTRIBUTE) {
 			delete[] dbase;
 			dbase=charstring::duplicate((value)?value:

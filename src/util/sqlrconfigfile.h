@@ -24,6 +24,9 @@ typedef enum {
 	ADDRESSES_ATTRIBUTE,
 	PORT_ATTRIBUTE,
 	SOCKET_ATTRIBUTE,
+	MYSQLADDRESSES_ATTRIBUTE,
+	MYSQLPORT_ATTRIBUTE,
+	MYSQLSOCKET_ATTRIBUTE,
 	DBASE_ATTRIBUTE,
 	CONNECTIONS_ATTRIBUTE,
 	MAXCONNECTIONS_ATTRIBUTE,
@@ -164,6 +167,12 @@ class sqlrconfigfile : public xmlsax {
 		const char	*getUnixPort();
 		bool		getListenOnInet();
 		bool		getListenOnUnix();
+		const char * const *getMySQLAddresses();
+		uint64_t	getMySQLAddressCount();
+		uint16_t	getMySQLPort();
+		const char	*getMySQLUnixPort();
+		bool		getMySQLListenOnInet();
+		bool		getMySQLListenOnUnix();
 		const char	*getDbase();
 		uint32_t	getConnections();
 		uint32_t	getMaxConnections();
@@ -239,9 +248,15 @@ class sqlrconfigfile : public xmlsax {
 		char		**addresses;
 		uint64_t	addresscount;
 		uint16_t	port;
-		bool		listenoninet;
 		const char	*unixport;
+		bool		listenoninet;
 		bool		listenonunix;
+		char		**mysqladdresses;
+		uint64_t	mysqladdresscount;
+		uint16_t	mysqlport;
+		const char	*mysqlunixport;
+		bool		mysqllistenoninet;
+		bool		mysqllistenonunix;
 		const char	*dbase;
 		uint32_t	connections;
 		uint32_t	maxconnections;

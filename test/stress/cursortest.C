@@ -8,8 +8,7 @@ main() {
 	datetime	dt;
 	dt.getSystemDateAndTime();
 
-	sqlrconnection	sqlrcon("localhost",8009,"",
-				"oracle8test","oracle8test",0,1);
+	sqlrconnection	sqlrcon("localhost",9000,"","test","test",0,1);
 	sqlrcursor	sqlrcur1(&sqlrcon);
 	sqlrcursor	sqlrcur2(&sqlrcon);
 
