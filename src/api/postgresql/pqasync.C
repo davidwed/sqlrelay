@@ -66,8 +66,7 @@ void PQfreeCancel(PGcancel *cancel) {
 
 int PQcancel(PGcancel *cancel, char *errbuf, int errbufsize) {
 	debugFunction();
-	snprintf(errbuf,errbufsize,"Operation not supported");
-	return 0;
+	return 1;
 }
 
 int PQrequestCancel(PGconn *conn) {
