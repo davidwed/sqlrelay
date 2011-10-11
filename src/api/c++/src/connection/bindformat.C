@@ -31,7 +31,7 @@ const char *sqlrconnection::bindFormat() {
 			bindformat=NULL;
 			return NULL;
 		}
-		bindformat[size]=(char)NULL;
+		bindformat[size]='\0';
 
 		if (debug) {
 			debugPreStart();

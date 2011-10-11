@@ -855,7 +855,7 @@ int	main(int argc, char **argv) {
 	for (int i=0; i<8*1024; i++) {
 		clobval[i]='C';
 	}
-	clobval[8*1024]=(char)NULL;
+	clobval[8*1024]='\0';
 	cur->inputBindClob("clobval",clobval,8*1024);
 	checkSuccess(cur->executeQuery(),1);
 	cur->sendQuery("select testclob from testtable2");
@@ -874,7 +874,7 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable2");
 	cur->sendQuery("create table testtable2 (testval varchar2(4000))");
 	char	testval[4001];
-	testval[4000]=(char)NULL;
+	testval[4000]='\0';
 	cur->prepareQuery("insert into testtable2 values (:testval)");
 	for (int i=0; i<4000; i++) {
 		testval[i]='C';

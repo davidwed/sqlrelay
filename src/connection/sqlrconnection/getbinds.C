@@ -165,7 +165,7 @@ bool sqlrconnection_svr::getBindVarName(bindvar_svr *bv) {
 			"getting binds failed: bad variable name");
 		return false;
 	}
-	bv->variable[bindnamesize+1]=(char)NULL;
+	bv->variable[bindnamesize+1]='\0';
 
 	dbgfile.debugPrint("connection",4,bv->variable);
 
@@ -212,7 +212,7 @@ void sqlrconnection_svr::getNullBind(bindvar_svr *bv) {
 	dbgfile.debugPrint("connection",4,"NULL");
 
 	bv->value.stringval=(char *)bindpool->malloc(1);
-	bv->value.stringval[0]=(char)NULL;
+	bv->value.stringval[0]='\0';
 	bv->valuesize=0;
 	bv->isnull=nullBindValue();
 }
@@ -237,7 +237,7 @@ bool sqlrconnection_svr::getStringBind(bindvar_svr *bv) {
 		dbgfile.debugPrint("connection",2,"getting binds failed: bad value");
 		return false;
 	}
-	bv->value.stringval[bv->valuesize]=(char)NULL;
+	bv->value.stringval[bv->valuesize]='\0';
 	bv->isnull=nonNullBindValue();
 
 	dbgfile.debugPrint("connection",4,bv->value.stringval);
@@ -329,7 +329,7 @@ bool sqlrconnection_svr::getLobBind(bindvar_svr *bv) {
 	// It shouldn't hurt to NULL-terminate the lob because the actual size
 	// (which doesn't include the NULL terminator) should be used when
 	// binding.
-	bv->value.stringval[bv->valuesize]=(char)NULL;
+	bv->value.stringval[bv->valuesize]='\0';
 	bv->isnull=nonNullBindValue();
 
 	/*if (bv->type==BLOB_BIND) {

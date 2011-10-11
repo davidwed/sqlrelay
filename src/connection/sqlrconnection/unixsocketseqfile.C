@@ -65,7 +65,7 @@ bool sqlrconnection_svr::openSequenceFile(file *sockseq,
 		fprintf(stderr,"Could not open: %s\n",sockseqname);
 		fprintf(stderr,"Make sure that the file and directory are \n");
 		fprintf(stderr,"readable and writable.\n\n");
-		unixsocketptr[0]=(char)NULL;
+		unixsocketptr[0]='\0';
 
 		stringlen=14+charstring::length(sockseqname)+1;
 		string=new char[stringlen];

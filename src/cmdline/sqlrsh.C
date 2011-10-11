@@ -92,6 +92,8 @@ class	sqlrsh {
 		void	externalCommand(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env, 
 					const char *command);
+		char	*getWild(const char *command);
+		char	*getTable(const char *command);
 		void	initStats(environment *env);
 		void	displayError(sqlrcursor *sqlrcur, environment *env);
 		void	displayHeader(sqlrcursor *sqlrcur, environment *env);
@@ -410,9 +412,36 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 	} else {
 
-		// send the query
 		sqlrcur->setResultSetBufferSize(100);
-		sqlrcur->sendQuery(command);
+
+		// send the query
+		if (!charstring::compareIgnoringCase(command,
+						"show databases",14)) {
+			char	*wild=getWild(command);
+			sqlrcur->getDbList(wild);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show tables",11)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show columns",12)) {
+			char	*table=getTable(command);
+			char	*wild=getWild(command);
+			sqlrcur->getColumnList(table,wild);
+			delete[] table;
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"describe ",9)) {
+			char	*table=getTable(command);
+			char	*wild=getWild(command);
+			sqlrcur->getColumnList(table,wild);
+			delete[] table;
+			delete[] wild;
+		} else {
+			sqlrcur->sendQuery(command);
+		}
 
 		// look for an error
 		if (sqlrcur->errorMessage()) {
@@ -439,6 +468,14 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 	// display statistics
 	displayStats(sqlrcur,env);
+}
+
+char *sqlrsh::getWild(const char *command) {
+	return NULL;
+}
+
+char *sqlrsh::getTable(const char *command) {
+	return NULL;
 }
 
 void sqlrsh::initStats(environment *env) {
@@ -743,7 +780,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				prompt(promptcount);
 				char	cmd[1024];
 				ssize_t	bytes=standardin.read(cmd,1024);
-				cmd[bytes-1]=(char)NULL;
+				cmd[bytes-1]='\0';
 			#endif
 			size_t	len=charstring::length(cmd);
 			done=false;

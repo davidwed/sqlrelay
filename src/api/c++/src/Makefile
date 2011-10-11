@@ -63,6 +63,7 @@ SRCS = connection/connectionctor.C \
 	cursor/clearresultset.C \
 	cursor/skipandfetch.C \
 	cursor/abortresultset.C \
+	cursor/getlist.C \
 	row/row.C
 LOBJS = connection/connectionctor.lo \
 	connection/connectiondtor.lo \
@@ -119,6 +120,7 @@ LOBJS = connection/connectionctor.lo \
 	cursor/clearresultset.lo \
 	cursor/skipandfetch.lo \
 	cursor/abortresultset.lo \
+	cursor/getlist.lo \
 	row/row.lo
 
 .SUFFIXES: .lo

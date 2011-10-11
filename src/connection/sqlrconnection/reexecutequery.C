@@ -11,7 +11,7 @@ bool sqlrconnection_svr::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 	//	1 for success,
 	//	0 for network error
 	//	-1 for a bad query
-	int32_t	querystatus=handleQuery(cursor,true,false,true);
+	int32_t	querystatus=handleQuery(cursor,true,false,true,true);
 	if (querystatus==1) {
 
 		// reinit lastrow

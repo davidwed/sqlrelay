@@ -64,6 +64,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool		ping();
 		virtual const char	*identify()=0;
 		virtual	const char	*dbVersion()=0;
+		virtual const char	*getDbListQuery(bool wild);
+		virtual const char	*getTableListQuery(bool wild);
+		virtual const char	*getColumnListQuery(bool wild);
 		virtual	const char	*bindFormat();
 		virtual sqlrcursor_svr	*initCursor()=0;
 		virtual void	deleteCursor(sqlrcursor_svr *curs)=0;
@@ -227,6 +230,18 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	serverVersionCommand();
 		void	bindFormatCommand();
 		bool	newQueryCommand(sqlrcursor_svr *cursor);
+		bool	newQueryInternal(sqlrcursor_svr *cursor, bool getquery);
+		bool	getDbListCommand(sqlrcursor_svr *cursor);
+		bool	getTableListCommand(sqlrcursor_svr *cursor);
+		bool	getColumnListCommand(sqlrcursor_svr *cursor);
+		bool	getListCommand(sqlrcursor_svr *cursor,
+						int which, bool gettable);
+		bool	buildListQuery(sqlrcursor_svr *cursor,
+							const char *query,
+							const char *table,
+							const char *wild);
+		void	escapeParameter(stringbuffer *buffer,
+							const char *parameter);
 		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
 		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);
 		bool	fetchResultSetCommand(sqlrcursor_svr *cursor);
@@ -245,7 +260,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		int32_t	handleQuery(sqlrcursor_svr *cursor,
 					bool reexecute,
 					bool bindcursor,
-					bool reallyexecute);
+					bool reallyexecute,
+					bool getquery);
 		bool	getQueryFromClient(sqlrcursor_svr *cursor,
 						bool reexecute,
 						bool bindcursor);

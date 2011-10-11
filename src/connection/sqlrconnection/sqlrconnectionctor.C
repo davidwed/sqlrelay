@@ -22,8 +22,8 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	inetport=0;
 	authc=NULL;
-	lastuserbuffer[0]=(char)NULL;
-	lastpasswordbuffer[0]=(char)NULL;
+	lastuserbuffer[0]='\0';
+	lastpasswordbuffer[0]='\0';
 	lastauthsuccess=false;
 
 	autocommit=0;

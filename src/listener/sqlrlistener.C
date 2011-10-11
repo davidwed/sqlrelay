@@ -1293,8 +1293,38 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 
 void sqlrlistener::mysqlClientSession(filedescriptor *clientsock) {
 
-	// FIXME: do something for real
-	waitForClientClose(false,false,clientsock);
+	bool	passstatus=false;
+
+	// handle authentication
+	int32_t	authstatus=getMySQLAuth(clientsock);
+
+	// 3 possible outcomes: 1=pass 0=fail -1=bad data
+	if (authstatus==1) {
+
+		if (dynamicscaling) {
+			incrementSessionCount();
+		}
+		passstatus=handOffClient(clientsock);
+
+	} else if (authstatus==0) {
+
+		dbgfile.debugPrint("listener",1,"sending client auth error");
+
+		// snooze before and after returning an
+		// authentication error to discourage
+		// brute-force password attacks
+		snooze::macrosnooze(2);
+		// FIXME: send error using mysql protocol
+		//clientsock->write(...);
+		flushWriteBuffer(clientsock);
+		snooze::macrosnooze(2);
+	}
+
+	// FIXME: if we got -1 from getAuth, then the client may be spewing
+	// garbage and we should close the connection...
+
+	// FIXME: waitForClientClose probably isn't right for mysql
+	waitForClientClose(authstatus,passstatus,clientsock);
 }
 
 int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
@@ -1313,7 +1343,7 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 			"authentication failed: user size is wrong");
 		return -1;
 	}
-	userbuffer[size]=(char)NULL;
+	userbuffer[size]='\0';
 
 	char		passwordbuffer[(uint32_t)USERSIZE+1];
 	clientsock->read(&size,idleclienttimeout,0);
@@ -1324,7 +1354,7 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 			"authentication failed: password size is wrong");
 		return -1;
 	}
-	passwordbuffer[size]=(char)NULL;
+	passwordbuffer[size]='\0';
 
 	// If the listener is supposed to authenticate, then do so, otherwise
 	// just return 1 as if authentication succeeded.
@@ -1346,6 +1376,91 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 	dbgfile.debugPrint("listener",0,"done getting authentication");
 
 	return 1;
+}
+
+// MySQL server/client capabilities
+#define CLIENT_LONG_PASSWORD	1	/* new more secure passwords */
+#define CLIENT_FOUND_ROWS	2	/* Found instead of affected rows */
+#define CLIENT_LONG_FLAG	4	/* Get all column flags */
+#define CLIENT_CONNECT_WITH_DB	8	/* One can specify db on connect */
+#define CLIENT_NO_SCHEMA	16	/* Don't allow database.table.column */
+#define CLIENT_COMPRESS		32	/* Can use compression protocol */
+#define CLIENT_ODBC		64	/* Odbc client */
+#define CLIENT_LOCAL_FILES	128	/* Can use LOAD DATA LOCAL */
+#define CLIENT_IGNORE_SPACE	256	/* Ignore spaces before '(' */
+#define CLIENT_PROTOCOL_41	512	/* New 4.1 protocol */
+#define CLIENT_INTERACTIVE	1024	/* This is an interactive client */
+#define CLIENT_SSL		2048	/* Switch to SSL after handshake */
+#define CLIENT_IGNORE_SIGPIPE	4096	/* IGNORE sigpipes */
+#define CLIENT_TRANSACTIONS	8192	/* Client knows about transactions */
+#define CLIENT_RESERVED		16384	/* Old flag for 4.1 protocol  */
+#define CLIENT_SECURE_CONNECTION	32768	/* New 4.1 authentication */
+#define CLIENT_MULTI_STATEMENTS	65536	/* Enable/disable multi-stmt support */
+#define CLIENT_MULTI_RESULTS	131072	/* Enable/disable multi-results */
+
+int32_t sqlrlistener::getMySQLAuth(filedescriptor *clientsock) {
+
+	// send handshake initialization packet...
+
+	// protocol version
+	clientsock->write((char)10);
+
+	// server version
+	clientsock->write("5.1.0",6);
+
+	// thread id
+	clientsock->write((uint32_t)0);
+
+	// scramble buf (part 1)
+	clientsock->write("00000000",8);
+	
+	// filler
+	clientsock->write((char)0);
+	
+	// define the server capabilities
+	union servercap_t {
+		uint32_t	together;
+		struct {
+			uint16_t	lower;
+			uint16_t	upper;
+		} split;
+	};
+	union servercap_t	servercap;
+	servercap.together=0;
+
+	// server capabilities (two lower bytes)
+	clientsock->write(servercap.split.lower);
+	
+	// server language
+	clientsock->write((char)1);
+	
+	// server status
+	clientsock->write((uint16_t)0);
+	
+	// server capabilities (two upper bytes)
+	clientsock->write(servercap.split.upper);
+	
+	// length of scramble buf part 2
+	clientsock->write((char)8);
+	
+	// filler
+	clientsock->write("\0\0\0\0\0\0\0\0\0\0",10);
+	
+	// scramble buf (part 2)
+	clientsock->write("00000000",8);
+	
+	// null terminator
+	clientsock->write((char)0);
+
+	// get client authentication packet...
+	uint16_t	clientflags1;
+	clientsock->read(&clientflags1);
+printf("got: %d\n",clientflags1);
+	
+
+	// send ok/error packet...
+
+	return 0;
 }
 
 void sqlrlistener::incrementSessionCount() {

@@ -31,7 +31,7 @@ const char *sqlrconnection::identify() {
 			id=NULL;
 			return NULL;
 		}
-		id[size]=(char)NULL;
+		id[size]='\0';
 
 		if (debug) {
 			debugPreStart();

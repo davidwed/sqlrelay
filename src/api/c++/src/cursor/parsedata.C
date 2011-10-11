@@ -103,7 +103,7 @@ bool sqlrcursor::parseData() {
 				buffer=NULL;
 			} else {
 				buffer=(char *)rowstorage->malloc(1);
-				buffer[0]=(char)NULL;
+				buffer[0]='\0';
 			}
 			length=0;
 
@@ -122,7 +122,7 @@ bool sqlrcursor::parseData() {
 				setError("Failed to get the field data.\n A network error may have occurred");
 				return false;
 			}
-			buffer[length]=(char)NULL;
+			buffer[length]='\0';
 
 		} else if (type==START_LONG_DATA) {
 
@@ -192,7 +192,7 @@ bool sqlrcursor::parseData() {
 			// since the actual length (which doesn't
 			// include the NULL) is available from
 			// getFieldLength.
-			buffer[totallength]=(char)NULL;
+			buffer[totallength]='\0';
 			length=totallength;
 		}
 

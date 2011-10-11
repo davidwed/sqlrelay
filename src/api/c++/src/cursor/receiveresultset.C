@@ -178,7 +178,7 @@ void sqlrcursor::getErrorFromServer() {
 		// get the error string
 		error=new char[length+1];
 		sqlrc->cs->read(error,length);
-		error[length]=(char)NULL;
+		error[length]='\0';
 	}
 	
 	handleError();

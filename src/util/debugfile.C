@@ -162,7 +162,7 @@ void debugfile::debugPrintClob(const char *clob, uint32_t length) {
 	stringbuffer	*debugstr=new stringbuffer();
 	debugstr->append('\n');
 	for (uint32_t i=0; i<length; i++) {
-		if (clob[i]==(char)NULL) {
+		if (clob[i]=='\0') {
 			debugstr->append("\\0");
 		} else {
 			debugstr->append(clob[i]);

@@ -11,7 +11,7 @@ bool sqlrconnection_svr::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 	//	1 for success,
 	//	0 for network error
 	//	-1 for a bad query
-	int32_t	querystatus=handleQuery(cursor,false,true,false);
+	int32_t	querystatus=handleQuery(cursor,false,true,false,true);
 	if (querystatus==1) {
 
 		// reinit lastrow

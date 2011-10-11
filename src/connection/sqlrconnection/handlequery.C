@@ -5,14 +5,17 @@
 
 int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor,
-					bool reallyexecute) {
+					bool reallyexecute, bool getquery) {
 
 
 	dbgfile.debugPrint("connection",1,"handling query...");
 
-	if (!getQueryFromClient(cursor,reexecute,bindcursor)) {
-		dbgfile.debugPrint("connection",1,"failed to handle query");
-		return 0;
+	if (getquery) {
+		if (!getQueryFromClient(cursor,reexecute,bindcursor)) {
+			dbgfile.debugPrint("connection",1,
+						"failed to handle query");
+			return 0;
+		}
 	}
 
 	// loop here to handle down databases
@@ -77,7 +80,7 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 	if (clientsock->read(&cursor->querylength,
 				idleclienttimeout,0)!=sizeof(uint32_t)) {
 		dbgfile.debugPrint("connection",2,
-			"getting query failed: client sent bad query length size");
+			"getting query failed: client sent bad query size");
 		return false;
 	}
 
@@ -97,7 +100,7 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 			"getting query failed: client sent short query");
 		return false;
 	}
-	cursor->querybuffer[cursor->querylength]=(char)NULL;
+	cursor->querybuffer[cursor->querylength]='\0';
 
 	dbgfile.debugPrint("connection",3,"querylength:");
 	dbgfile.debugPrint("connection",4,(int32_t)cursor->querylength);

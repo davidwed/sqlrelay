@@ -316,13 +316,13 @@ bool firebirdcursor::inputBindString(const char *variable,
 	insqlda->sqlvar[index].sqldata=(char *)value;
 	insqlda->sqlvar[index].sqlind=isnull;
 	insqlda->sqlvar[index].sqlname_length=0;
-	insqlda->sqlvar[index].sqlname[0]=(char)NULL;
+	insqlda->sqlvar[index].sqlname[0]='\0';
 	insqlda->sqlvar[index].relname_length=0;
-	insqlda->sqlvar[index].relname[0]=(char)NULL;
+	insqlda->sqlvar[index].relname[0]='\0';
 	insqlda->sqlvar[index].ownname_length=0;
-	insqlda->sqlvar[index].ownname[0]=(char)NULL;
+	insqlda->sqlvar[index].ownname[0]='\0';
 	insqlda->sqlvar[index].aliasname_length=0;
-	insqlda->sqlvar[index].aliasname[0]=(char)NULL;
+	insqlda->sqlvar[index].aliasname[0]='\0';
 	return true;
 }
 
@@ -342,13 +342,13 @@ bool firebirdcursor::inputBindInteger(const char *variable,
 	insqlda->sqlvar[index].sqldata=(char *)value;
 	insqlda->sqlvar[index].sqlind=(short *)NULL;
 	insqlda->sqlvar[index].sqlname_length=0;
-	insqlda->sqlvar[index].sqlname[0]=(char)NULL;
+	insqlda->sqlvar[index].sqlname[0]='\0';
 	insqlda->sqlvar[index].relname_length=0;
-	insqlda->sqlvar[index].relname[0]=(char)NULL;
+	insqlda->sqlvar[index].relname[0]='\0';
 	insqlda->sqlvar[index].ownname_length=0;
-	insqlda->sqlvar[index].ownname[0]=(char)NULL;
+	insqlda->sqlvar[index].ownname[0]='\0';
 	insqlda->sqlvar[index].aliasname_length=0;
-	insqlda->sqlvar[index].aliasname[0]=(char)NULL;
+	insqlda->sqlvar[index].aliasname[0]='\0';
 	return true;
 }
 
@@ -370,13 +370,13 @@ bool firebirdcursor::inputBindDouble(const char *variable,
 	insqlda->sqlvar[index].sqldata=(char *)value;
 	insqlda->sqlvar[index].sqlind=(short *)NULL;
 	insqlda->sqlvar[index].sqlname_length=0;
-	insqlda->sqlvar[index].sqlname[0]=(char)NULL;
+	insqlda->sqlvar[index].sqlname[0]='\0';
 	insqlda->sqlvar[index].relname_length=0;
-	insqlda->sqlvar[index].relname[0]=(char)NULL;
+	insqlda->sqlvar[index].relname[0]='\0';
 	insqlda->sqlvar[index].ownname_length=0;
-	insqlda->sqlvar[index].ownname[0]=(char)NULL;
+	insqlda->sqlvar[index].ownname[0]='\0';
 	insqlda->sqlvar[index].aliasname_length=0;
-	insqlda->sqlvar[index].aliasname[0]=(char)NULL;
+	insqlda->sqlvar[index].aliasname[0]='\0';
 	return true;
 }
 
@@ -405,13 +405,13 @@ bool firebirdcursor::outputBindString(const char *variable,
 	outsqlda->sqlvar[index].sqldata=value;
 	outsqlda->sqlvar[index].sqlind=isnull;
 	outsqlda->sqlvar[index].sqlname_length=0;
-	outsqlda->sqlvar[index].sqlname[0]=(char)NULL;
+	outsqlda->sqlvar[index].sqlname[0]='\0';
 	outsqlda->sqlvar[index].relname_length=0;
-	outsqlda->sqlvar[index].relname[0]=(char)NULL;
+	outsqlda->sqlvar[index].relname[0]='\0';
 	outsqlda->sqlvar[index].ownname_length=0;
-	outsqlda->sqlvar[index].ownname[0]=(char)NULL;
+	outsqlda->sqlvar[index].ownname[0]='\0';
 	outsqlda->sqlvar[index].aliasname_length=0;
-	outsqlda->sqlvar[index].aliasname[0]=(char)NULL;
+	outsqlda->sqlvar[index].aliasname[0]='\0';
 	return true;
 }
 
@@ -439,13 +439,13 @@ bool firebirdcursor::outputBindInteger(const char *variable,
 	outsqlda->sqlvar[index].sqldata=(char *)value;
 	outsqlda->sqlvar[index].sqlind=isnull;
 	outsqlda->sqlvar[index].sqlname_length=0;
-	outsqlda->sqlvar[index].sqlname[0]=(char)NULL;
+	outsqlda->sqlvar[index].sqlname[0]='\0';
 	outsqlda->sqlvar[index].relname_length=0;
-	outsqlda->sqlvar[index].relname[0]=(char)NULL;
+	outsqlda->sqlvar[index].relname[0]='\0';
 	outsqlda->sqlvar[index].ownname_length=0;
-	outsqlda->sqlvar[index].ownname[0]=(char)NULL;
+	outsqlda->sqlvar[index].ownname[0]='\0';
 	outsqlda->sqlvar[index].aliasname_length=0;
-	outsqlda->sqlvar[index].aliasname[0]=(char)NULL;
+	outsqlda->sqlvar[index].aliasname[0]='\0';
 	return true;
 }
 
@@ -475,13 +475,13 @@ bool firebirdcursor::outputBindDouble(const char *variable,
 	outsqlda->sqlvar[index].sqldata=(char *)value;
 	outsqlda->sqlvar[index].sqlind=isnull;
 	outsqlda->sqlvar[index].sqlname_length=0;
-	outsqlda->sqlvar[index].sqlname[0]=(char)NULL;
+	outsqlda->sqlvar[index].sqlname[0]='\0';
 	outsqlda->sqlvar[index].relname_length=0;
-	outsqlda->sqlvar[index].relname[0]=(char)NULL;
+	outsqlda->sqlvar[index].relname[0]='\0';
 	outsqlda->sqlvar[index].ownname_length=0;
-	outsqlda->sqlvar[index].ownname[0]=(char)NULL;
+	outsqlda->sqlvar[index].ownname[0]='\0';
 	outsqlda->sqlvar[index].aliasname_length=0;
-	outsqlda->sqlvar[index].aliasname[0]=(char)NULL;
+	outsqlda->sqlvar[index].aliasname[0]='\0';
 	return true;
 }
 

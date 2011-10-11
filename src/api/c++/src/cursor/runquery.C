@@ -67,33 +67,8 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		// tell the server we're sending a query
 		sqlrc->cs->write((uint16_t)NEW_QUERY);
 
-		if (havecursorid) {
-
-			// tell the server we already have a cursor
-			sqlrc->cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
-
-			// send the cursor id to the server
-			sqlrc->cs->write(cursorid);
-
-			if (sqlrc->debug) {
-				sqlrc->debugPreStart();
-				sqlrc->debugPrint("Requesting Cursor: ");
-				sqlrc->debugPrint((int64_t)cursorid);
-				sqlrc->debugPrint("\n");
-				sqlrc->debugPreEnd();
-			}
-
-		} else {
-
-			// tell the server we need a cursor
-			sqlrc->cs->write((uint16_t)NEED_NEW_CURSOR);
-
-			if (sqlrc->debug) {
-				sqlrc->debugPreStart();
-				sqlrc->debugPrint("Requesting a new cursor.\n");
-				sqlrc->debugPreEnd();
-			}
-		}
+		// tell the server whether we'll need a cursor or not
+		sendCursorStatus();
 
 		// send the query
 		sqlrc->cs->write(querylen);
@@ -120,6 +95,37 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 	}
 
 	return true;
+}
+
+void sqlrcursor::sendCursorStatus() {
+
+	if (havecursorid) {
+
+		// tell the server we already have a cursor
+		sqlrc->cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
+
+		// send the cursor id to the server
+		sqlrc->cs->write(cursorid);
+
+		if (sqlrc->debug) {
+			sqlrc->debugPreStart();
+			sqlrc->debugPrint("Requesting Cursor: ");
+			sqlrc->debugPrint((int64_t)cursorid);
+			sqlrc->debugPrint("\n");
+			sqlrc->debugPreEnd();
+		}
+
+	} else {
+
+		// tell the server we need a cursor
+		sqlrc->cs->write((uint16_t)NEED_NEW_CURSOR);
+
+		if (sqlrc->debug) {
+			sqlrc->debugPreStart();
+			sqlrc->debugPrint("Requesting a new cursor.\n");
+			sqlrc->debugPreEnd();
+		}
+	}
 }
 
 void sqlrcursor::sendInputBinds() {

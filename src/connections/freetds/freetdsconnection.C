@@ -322,16 +322,16 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	char	*v=charstring::findFirst(versionstring,'v');
 	if (v) {
-		*v=(char)NULL;
+		*v='\0';
 		majorversion=charstring::toInteger(v+1);
 		char	*firstdot=charstring::findFirst(v+1,'.');
 		if (firstdot) {
-			*firstdot=(char)NULL;
+			*firstdot='\0';
 			minorversion=charstring::toInteger(firstdot+1);
 			char	*seconddot=
 				charstring::findFirst(firstdot+1,'.');
 			if (seconddot) {
-				*seconddot=(char)NULL;
+				*seconddot='\0';
 				patchlevel=charstring::toInteger(seconddot+1);
 			} else {
 				patchlevel=0;
@@ -555,7 +555,7 @@ bool freetdscursor::inputBindString(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -582,7 +582,7 @@ bool freetdscursor::inputBindInteger(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -611,7 +611,7 @@ bool freetdscursor::inputBindDouble(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -647,7 +647,7 @@ bool freetdscursor::outputBindString(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -680,7 +680,7 @@ bool freetdscursor::outputBindInteger(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -715,7 +715,7 @@ bool freetdscursor::outputBindDouble(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);

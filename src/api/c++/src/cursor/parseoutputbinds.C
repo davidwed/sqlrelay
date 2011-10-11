@@ -67,7 +67,7 @@ bool sqlrcursor::parseOutputBinds() {
 					outbindvars[count].value.
 							stringval=new char[1];
 					outbindvars[count].value.
-							stringval[0]=(char)NULL;
+							stringval[0]='\0';
 				}
 			} else if (outbindvars[count].type==INTEGER_BIND) {
 				outbindvars[count].value.integerval=0;
@@ -114,7 +114,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.stringval[length]=(char)NULL;
+			outbindvars[count].value.stringval[length]='\0';
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
@@ -300,7 +300,7 @@ bool sqlrcursor::parseOutputBinds() {
 			// since the actual length (which doesn't
 			// include the NULL) is available from
 			// getOutputBindLength.
-			buffer[totallength]=(char)NULL;
+			buffer[totallength]='\0';
 			outbindvars[count].value.lobval=buffer;
 			outbindvars[count].resultvaluesize=totallength;
 		}

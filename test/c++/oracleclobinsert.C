@@ -130,7 +130,7 @@ int	main(int argc, char **argv) {
 	for (int i=0; i<20*1024*1024; i++) {
 		clobval[i]='C';
 	}
-	clobval[20*1024*1024]=(char)NULL;
+	clobval[20*1024*1024]='\0';
 	cur->inputBindClob("clobval",clobval,20*1024*1024);
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");

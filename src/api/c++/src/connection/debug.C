@@ -93,7 +93,7 @@ void sqlrconnection::debugPrintBlob(const char *blob, uint32_t length) {
 void sqlrconnection::debugPrintClob(const char *clob, uint32_t length) {
 	debugPrint('\n');
 	for (uint32_t i=0; i<length; i++) {
-		if (clob[i]==(char)NULL) {
+		if (clob[i]=='\0') {
 			debugPrint("\\0");
 		} else {
 			debugPrint(clob[i]);

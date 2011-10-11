@@ -437,7 +437,7 @@ bool sybasecursor::inputBindString(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -464,7 +464,7 @@ bool sybasecursor::inputBindInteger(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -493,7 +493,7 @@ bool sybasecursor::inputBindDouble(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -529,7 +529,7 @@ bool sybasecursor::outputBindString(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -562,7 +562,7 @@ bool sybasecursor::outputBindInteger(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);
@@ -597,7 +597,7 @@ bool sybasecursor::outputBindDouble(const char *variable,
 	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		parameter[paramindex].name[0]=(char)NULL;
+		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
 	} else {
 		charstring::copy(parameter[paramindex].name,variable);

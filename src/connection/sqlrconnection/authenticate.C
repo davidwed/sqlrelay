@@ -54,7 +54,7 @@ bool sqlrconnection_svr::getUserFromClient() {
 		size<=(uint32_t)USERSIZE &&
 		(uint32_t)(clientsock->read(userbuffer,size,
 						idleclienttimeout,0))==size) {
-		userbuffer[size]=(char)NULL;
+		userbuffer[size]='\0';
 		return true;
 	}
 	dbgfile.debugPrint("connection",1,
@@ -68,7 +68,7 @@ bool sqlrconnection_svr::getPasswordFromClient() {
 		size<=(uint32_t)USERSIZE &&
 		(uint32_t)(clientsock->read(passwordbuffer,size,
 						idleclienttimeout,0))==size) {
-		passwordbuffer[size]=(char)NULL;
+		passwordbuffer[size]='\0';
 		return true;
 	}
 	dbgfile.debugPrint("connection",1,

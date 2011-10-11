@@ -30,7 +30,7 @@ bool sqlrconnection::getNewPort() {
 		setError("Failed to get the unix connection port.\n A network error may have ocurred.");
 		return false;
 	}
-	connectionunixportbuffer[size]=(char)NULL;
+	connectionunixportbuffer[size]='\0';
 	connectionunixport=connectionunixportbuffer;
 
 	// get the inet port

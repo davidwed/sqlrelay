@@ -26,6 +26,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/connectioncount.C \
 	sqlrconnection/rollback.C \
 	sqlrconnection/newquery.C \
+	sqlrconnection/getlist.C \
 	sqlrconnection/handlequery.C \
 	sqlrconnection/handleerror.C \
 	sqlrconnection/getbinds.C \
@@ -89,6 +90,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/connectioncount.lo \
 	sqlrconnection/rollback.lo \
 	sqlrconnection/newquery.lo \
+	sqlrconnection/getlist.lo \
 	sqlrconnection/handlequery.lo \
 	sqlrconnection/handleerror.lo \
 	sqlrconnection/getbinds.lo \

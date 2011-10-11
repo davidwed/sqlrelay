@@ -4,6 +4,11 @@
 #include <sqlrconnection.h>
 
 bool sqlrconnection_svr::newQueryCommand(sqlrcursor_svr *cursor) {
+	return newQueryInternal(cursor,true);
+}
+
+bool sqlrconnection_svr::newQueryInternal(sqlrcursor_svr *cursor,
+							bool getquery) {
 
 	dbgfile.debugPrint("connection",1,"new query");
 
@@ -11,7 +16,7 @@ bool sqlrconnection_svr::newQueryCommand(sqlrcursor_svr *cursor) {
 	//	1 for success,
 	//	0 for network error
 	//	-1 for a bad query
-	int32_t	querystatus=handleQuery(cursor,false,false,true);
+	int32_t	querystatus=handleQuery(cursor,false,false,true,getquery);
 	if (querystatus==1) {
 
 		// reinit lastrow

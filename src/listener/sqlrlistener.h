@@ -74,6 +74,7 @@ class sqlrlistener : public daemonprocess, public listener {
 		void	sqlrelayClientSession(filedescriptor *clientsock);
 		void	mysqlClientSession(filedescriptor *clientsock);
 		int32_t	getAuth(filedescriptor *clientsock);
+		int32_t	getMySQLAuth(filedescriptor *clientsock);
 		void    errorClientSession(filedescriptor *clientsock, const char *err);
 		void	incrementSessionCount();
 		int     incForkedListeners();

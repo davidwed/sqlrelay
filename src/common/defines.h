@@ -28,6 +28,9 @@
 #define DBVERSION 15
 #define BINDFORMAT 16
 #define SERVERVERSION 17
+#define GETDBLIST 18
+#define GETTABLELIST 19
+#define GETCOLUMNLIST 20
 
 #define ERROR 0
 #define NO_ERROR 1

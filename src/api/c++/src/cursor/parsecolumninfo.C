@@ -135,7 +135,7 @@ bool sqlrcursor::parseColumnInfo() {
 				setError("Failed to get the column name.\n A network error may have occurred.");
 				return false;
 			}
-			currentcol->name[length]=(char)NULL;
+			currentcol->name[length]='\0';
 
 			// upper/lowercase column name if necessary
 			if (colcase==UPPER_CASE) {
@@ -166,8 +166,7 @@ bool sqlrcursor::parseColumnInfo() {
 				currentcol->typestring=new
 					char[currentcol->typestringlength+1];
 				currentcol->typestring[
-					currentcol->typestringlength]=
-								(char)NULL;
+					currentcol->typestringlength]='\0';
 				if (getString(currentcol->typestring,
 						currentcol->typestringlength)!=
 						currentcol->typestringlength) {

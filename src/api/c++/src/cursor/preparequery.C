@@ -66,7 +66,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	if (counter>MAXPATHLEN) {
 
 		// sabotage the file name so it can't be opened
-		fullpath[0]=(char)NULL;
+		fullpath[0]='\0';
 
 		// debug info
 		if (sqlrc->debug) {
@@ -85,7 +85,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	} else {
 
 		// terminate the string
-		fullpath[counter]=(char)NULL;
+		fullpath[counter]='\0';
 
 		// debug info
 		if (sqlrc->debug) {
@@ -127,7 +127,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	// read the file into the query buffer
 	querylen=queryfile.getSize();
 	queryfile.read((unsigned char *)querybuffer,querylen);
-	querybuffer[querylen]=(char)NULL;
+	querybuffer[querylen]='\0';
 
 	queryfile.close();
 

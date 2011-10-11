@@ -81,7 +81,7 @@ stringbuffer *sqlrcursor_svr::fakeInputBinds(const char *query) {
 					*(ptr+inbindvars[i].variablesize)==
 							',' ||
 					*(ptr+inbindvars[i].variablesize)==
-							(char)NULL)
+							'\0')
 					)) {
 
 					performSubstitution(outputquery,i);

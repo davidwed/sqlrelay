@@ -113,6 +113,21 @@ void sqlrconnection_svr::clientSession() {
 				continue;
 			}
 			break;
+		} else if (command==GETDBLIST) {
+			if (getDbListCommand(cursor)) {
+				continue;
+			}
+			break;
+		} else if (command==GETTABLELIST) {
+			if (getTableListCommand(cursor)) {
+				continue;
+			}
+			break;
+		} else if (command==GETCOLUMNLIST) {
+			if (getColumnListCommand(cursor)) {
+				continue;
+			}
+			break;
 		} else if (command==REEXECUTE_QUERY) {
 			if (!reExecuteQueryCommand(cursor)) {
 				break;
@@ -154,7 +169,11 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 
 	// does the client need a cursor or does it already have one
 	uint16_t	neednewcursor=DONT_NEED_NEW_CURSOR;
-	if ((command==NEW_QUERY || command==ABORT_RESULT_SET) &&
+	if ((command==NEW_QUERY ||
+		command==GETDBLIST ||
+		command==GETTABLELIST ||
+		command==GETCOLUMNLIST ||
+		command==ABORT_RESULT_SET) &&
 		clientsock->read(&neednewcursor,
 				idleclienttimeout,0)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("connection",2,

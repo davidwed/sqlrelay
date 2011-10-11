@@ -31,7 +31,7 @@ const char *sqlrconnection::dbVersion() {
 			dbversion=NULL;
 			return NULL;
 		}
-		dbversion[size]=(char)NULL;
+		dbversion[size]='\0';
 
 		if (debug) {
 			debugPreStart();

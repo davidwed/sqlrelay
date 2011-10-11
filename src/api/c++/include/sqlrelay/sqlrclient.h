@@ -181,6 +181,21 @@ class sqlrcursor {
 				// Sets query caching off.
 
 
+		bool	getDbList(const char *wild);
+			// Sends a query that returns a list of databases
+			// matching "wild".  If wild is empty or NULL then
+			// a list of all databases will be returned.
+		bool	getTableList(const char *wild);
+			// Sends a query that returns a list of tables
+			// matching "wild".  If wild is empty or NULL then
+			// a list of all tables will be returned.
+		bool	getColumnList(const char *table, const char *wild);
+			// Sends a query that returns a list of columns
+			// in the table specified by the "table" parameter
+			// matching "wild".  If wild is empty or NULL then
+			// a list of all columns will be returned.
+
+
 		// If you don't need to use substitution or bind variables
 		// in your queries, use these two methods.
 		bool	sendQuery(const char *query);

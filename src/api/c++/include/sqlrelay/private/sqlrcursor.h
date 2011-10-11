@@ -15,6 +15,9 @@
 
 		void	initQueryBuffer(uint32_t querylength);
 		bool	sendQueryInternal(const char *query);
+		bool	getList(uint16_t command,
+				const char *table, const char *wild);
+		void	sendCursorStatus();
 		void	performSubstitutions();
 		void	validateBindsInternal();
 		void	sendInputBinds();

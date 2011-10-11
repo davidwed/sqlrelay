@@ -131,6 +131,9 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*identify();
 		const char	*dbVersion();
 		const char	*bindFormat();
+		const char	*getDbListQuery(bool wild);
+		const char	*getTableListQuery(bool wild);
+		const char	*getColumnListQuery(bool wild);
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		commit();

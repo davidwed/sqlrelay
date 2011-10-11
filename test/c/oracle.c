@@ -869,7 +869,7 @@ int	main(int argc, char **argv) {
 	for (i=0; i<8*1024; i++) {
 		clobval[i]='C';
 	}
-	clobval[8*1024]=(char)NULL;
+	clobval[8*1024]='\0';
 	sqlrcur_inputBindClob(cur,"clobval",clobval,8*1024);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	sqlrcur_sendQuery(cur,"select testclob from testtable2");
@@ -887,7 +887,7 @@ int	main(int argc, char **argv) {
 	printf("LONG OUTPUT BIND\n");
 	sqlrcur_sendQuery(cur,"drop table testtable2");
 	sqlrcur_sendQuery(cur,"create table testtable2 (testval varchar2(4000))");
-	testval[4000]=(char)NULL;
+	testval[4000]='\0';
 	sqlrcur_prepareQuery(cur,"insert into testtable2 values (:testval)");
 	for (i=0; i<4000; i++) {
 		testval[i]='C';

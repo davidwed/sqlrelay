@@ -357,7 +357,7 @@ void oracle8connection::logInError(const char *errmsg) {
 	sb4	errcode;
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 			message,sizeof(message),OCI_HTYPE_ERROR);
-	message[1023]=(char)NULL;
+	message[1023]='\0';
 	fprintf(stderr,"error: %s\n",message);
 }
 
@@ -1420,7 +1420,7 @@ const char *oracle8cursor::errorMessage(bool *liveconnection) {
 			(text *)0,&errcode,
 			message,sizeof(message),
 			OCI_HTYPE_ERROR);
-	message[1023]=(char)NULL;
+	message[1023]='\0';
 
 	// check for dead connection or shutdown in progress
 	// Might need: 1033 - oracle init/shutdown in progress

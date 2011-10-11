@@ -681,7 +681,7 @@ unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 
 	if (mysql && charstring::compare(mysql->sqlrcon->identify(),"mysql")) {
 		rawbuffer::copy(to,from,length);
-		to[length]=(char)NULL;
+		to[length]='\0';
 		return length;
 	}
 	
@@ -711,7 +711,7 @@ unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 		}
 		fromindex++;
 	}
-	to[toindex]=(char)NULL;
+	to[toindex]='\0';
 	return toindex;
 }
 
@@ -1599,7 +1599,7 @@ int mysql_fetch(MYSQL_STMT *stmt) {
 			rawbuffer::copy(stmt->resultbinds[i].buffer,
 							row[i],lengths[i]);
 		}
-		stmt->resultbinds[i].buffer[lengths[i]]=(char)NULL;
+		stmt->resultbinds[i].buffer[lengths[i]]='\0';
 
 		// FIXME: I think I'm supposed to convert to
 		// some other type based on the column type...

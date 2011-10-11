@@ -221,6 +221,18 @@ const char *mysqlconnection::bindFormat() {
 #endif
 }
 
+const char *mysqlconnection::getDbListQuery(bool wild) {
+	return (wild)?"show databases like '%s'":"show databases";
+}
+
+const char *mysqlconnection::getTableListQuery(bool wild) {
+	return (wild)?"show tables like '%s'":"show tables";
+}
+
+const char *mysqlconnection::getColumnListQuery(bool wild) {
+	return (wild)?"show columns in %s like '%s'":"show columns in %s";
+}
+
 bool mysqlconnection::isTransactional() {
 	return true;
 }
