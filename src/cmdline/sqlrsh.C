@@ -426,7 +426,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 		if (!charstring::compareIgnoringCase(command,
 						"show databases",14)) {
 			char	*wild=getWild(command);
-			sqlrcur->getDbList(wild);
+			sqlrcur->getDatabaseList(wild);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 						"show tables",11)) {

@@ -86,6 +86,9 @@ class sqlrconnection {
 				// of the bind variables used in the db.
 
 
+		bool	selectDatabase(const char *database);
+				// Sets the current database/schema to
+				// "database"
 		bool	autoCommitOn();
 				// Instructs the database to perform a commit
 				// after every successful query.
@@ -181,10 +184,11 @@ class sqlrcursor {
 				// Sets query caching off.
 
 
-		bool	getDbList(const char *wild);
-			// Sends a query that returns a list of databases
-			// matching "wild".  If wild is empty or NULL then
-			// a list of all databases will be returned.
+		bool	getDatabaseList(const char *wild);
+			// Sends a query that returns a list of
+			// databases/schemas matching "wild".  If wild is empty
+			// or NULL then a list of all databases/schemas will be
+			// returned.
 		bool	getTableList(const char *wild);
 			// Sends a query that returns a list of tables
 			// matching "wild".  If wild is empty or NULL then

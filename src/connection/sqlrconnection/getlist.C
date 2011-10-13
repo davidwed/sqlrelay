@@ -3,7 +3,7 @@
 
 #include <sqlrconnection.h>
 
-bool sqlrconnection_svr::getDbListCommand(sqlrcursor_svr *cursor) {
+bool sqlrconnection_svr::getDatabaseListCommand(sqlrcursor_svr *cursor) {
 	return getListCommand(cursor,0,false);
 }
 
@@ -88,7 +88,7 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 	const char	*query=NULL;
 	switch (which) {
 		case 0:
-			query=getDbListQuery(charstring::length(wild));
+			query=getDatabaseListQuery(charstring::length(wild));
 			break;
 		case 1:
 			query=getTableListQuery(charstring::length(wild));
@@ -158,7 +158,7 @@ void sqlrconnection_svr::escapeParameter(stringbuffer *buffer,
 	}
 }
 
-const char *sqlrconnection_svr::getDbListQuery(bool wild) {
+const char *sqlrconnection_svr::getDatabaseListQuery(bool wild) {
 	return "select 1";
 }
 

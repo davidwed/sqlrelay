@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-bool sqlrcursor::getDbList(const char *wild) {
+bool sqlrcursor::getDatabaseList(const char *wild) {
 	return getList(GETDBLIST,NULL,wild);
 }
 

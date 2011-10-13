@@ -31,6 +31,7 @@
 #define GETDBLIST 18
 #define GETTABLELIST 19
 #define GETCOLUMNLIST 20
+#define SELECT_DATABASE 21
 
 #define ERROR 0
 #define NO_ERROR 1

@@ -60,11 +60,13 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool	autoCommitOff();
 		virtual bool	commit();
 		virtual bool	rollback();
+		virtual bool		selectDatabase(const char *database);
+		virtual const char	*selectDatabaseQuery();
 		virtual const char	*pingQuery();
 		virtual bool		ping();
 		virtual const char	*identify()=0;
 		virtual	const char	*dbVersion()=0;
-		virtual const char	*getDbListQuery(bool wild);
+		virtual const char	*getDatabaseListQuery(bool wild);
 		virtual const char	*getTableListQuery(bool wild);
 		virtual const char	*getColumnListQuery(bool wild);
 		virtual	const char	*bindFormat();
@@ -221,6 +223,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	authenticateCommand();
 		void	suspendSessionCommand();
 		void	endSessionCommand();
+		void	selectDatabaseCommand();
 		void	pingCommand();
 		void	identifyCommand();
 		void	autoCommitCommand();
@@ -231,7 +234,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	bindFormatCommand();
 		bool	newQueryCommand(sqlrcursor_svr *cursor);
 		bool	newQueryInternal(sqlrcursor_svr *cursor, bool getquery);
-		bool	getDbListCommand(sqlrcursor_svr *cursor);
+		bool	getDatabaseListCommand(sqlrcursor_svr *cursor);
 		bool	getTableListCommand(sqlrcursor_svr *cursor);
 		bool	getColumnListCommand(sqlrcursor_svr *cursor);
 		bool	getListCommand(sqlrcursor_svr *cursor,

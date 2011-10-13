@@ -221,7 +221,7 @@ const char *mysqlconnection::bindFormat() {
 #endif
 }
 
-const char *mysqlconnection::getDbListQuery(bool wild) {
+const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 	return (wild)?"show databases like '%s'":"show databases";
 }
 
@@ -295,6 +295,7 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	usestmtprepare=true;
 	unsupportedbystmt.compile("^\\s*(((create|CREATE|drop|DROP)\\s+"
 			"(procedure|PROCEDURE|function|FUNCTION))|"
+			"(use|USE)|"
 			"(CALL|call)|(START|start)|(BEGIN|begin))\\s+");
 	unsupportedbystmt.study();
 	for (unsigned short index=0; index<MAX_SELECT_LIST_SIZE; index++) {

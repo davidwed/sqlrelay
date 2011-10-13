@@ -19,6 +19,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/authenticate.C \
 	sqlrconnection/suspendsession.C \
 	sqlrconnection/endsession.C \
+	sqlrconnection/selectdatabase.C \
 	sqlrconnection/ping.C \
 	sqlrconnection/identify.C \
 	sqlrconnection/autocommit.C \
@@ -83,6 +84,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/authenticate.lo \
 	sqlrconnection/suspendsession.lo \
 	sqlrconnection/endsession.lo \
+	sqlrconnection/selectdatabase.lo \
 	sqlrconnection/ping.lo \
 	sqlrconnection/identify.lo \
 	sqlrconnection/autocommit.lo \

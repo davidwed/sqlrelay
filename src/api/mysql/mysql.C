@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
+#include <rudiments/stringbuffer.h>
 #include <rudiments/rawbuffer.h>
 
 #define NEED_DATATYPESTRING 1
@@ -304,6 +305,7 @@ MYSQL_STMT *mysql_prepare(MYSQL *mysql, const char *query,
 my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind);
 my_bool mysql_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bind);
 int mysql_execute(MYSQL_STMT *stmt);
+static void processFields(MYSQL_STMT *stmt);
 unsigned long mysql_param_count(MYSQL_STMT *stmt);
 MYSQL_RES *mysql_param_result(MYSQL_STMT *stmt);
 int mysql_fetch(MYSQL_STMT *stmt);
@@ -631,7 +633,7 @@ int mysql_create_db(MYSQL *mysql, const char *db) {
 
 int mysql_select_db(MYSQL *mysql, const char *db) {
 	debugFunction();
-	return unknownError(mysql);
+	return !mysql->sqlrcon->selectDatabase(db);
 }
 
 int mysql_drop_db(MYSQL *mysql, const char *db) {
@@ -655,7 +657,9 @@ MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
 	mysql->currentstmt->result->errorno=0;
 	mysql->currentstmt->result->fields=NULL;
 	mysql->currentstmt->result->lengths=NULL;
-	mysql->currentstmt->result->sqlrcur->getDbList(wild);
+	mysql->currentstmt->result->sqlrcur->getDatabaseList(wild);
+	processFields(mysql->currentstmt);
+	mysql->currentstmt->result->currentfield=0;
 
 	MYSQL_RES	*retval=mysql->currentstmt->result;
 	mysql->currentstmt->result=NULL;
@@ -679,6 +683,8 @@ MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 	mysql->currentstmt->result->fields=NULL;
 	mysql->currentstmt->result->lengths=NULL;
 	mysql->currentstmt->result->sqlrcur->getTableList(wild);
+	processFields(mysql->currentstmt);
+	mysql->currentstmt->result->currentfield=0;
 
 	MYSQL_RES	*retval=mysql->currentstmt->result;
 	mysql->currentstmt->result=NULL;
@@ -703,6 +709,8 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 	mysql->currentstmt->result->fields=NULL;
 	mysql->currentstmt->result->lengths=NULL;
 	mysql->currentstmt->result->sqlrcur->getColumnList(table,wild);
+	processFields(mysql->currentstmt);
+	mysql->currentstmt->result->currentfield=0;
 
 	MYSQL_RES	*retval=mysql->currentstmt->result;
 	mysql->currentstmt->result=NULL;
@@ -1481,11 +1489,19 @@ int mysql_execute(MYSQL_STMT *stmt) {
 	sqlrcursor	*sqlrcur=stmt->result->sqlrcur;
 
 	int	retval=!sqlrcur->executeQuery();
+	processFields(stmt);
+	return retval;
+}
+
+static void processFields(MYSQL_STMT *stmt) {
+	debugFunction();
 
 	delete[] stmt->result->fields;
 	delete[] stmt->result->lengths;
 
-	uint32_t	colcount=sqlrcur->colCount();
+	sqlrcursor	*sqlrcur=stmt->result->sqlrcur;
+
+	uint32_t colcount=sqlrcur->colCount();
 	if (colcount) {
 
 		MYSQL_FIELD	*fields=new MYSQL_FIELD[colcount];
@@ -1615,8 +1631,6 @@ int mysql_execute(MYSQL_STMT *stmt) {
 		stmt->result->fields=NULL;
 		stmt->result->lengths=NULL;
 	}
-
-	return retval;
 }
 
 unsigned long mysql_param_count(MYSQL_STMT *stmt) {

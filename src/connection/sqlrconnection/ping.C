@@ -16,7 +16,7 @@ void sqlrconnection_svr::pingCommand() {
 bool sqlrconnection_svr::ping() {
 	sqlrcursor_svr	*pingcur=initCursorUpdateStats();
 	const char	*pingquery=pingQuery();
-	int		pingquerylen=charstring::length(pingQuery());
+	int		pingquerylen=charstring::length(pingquery);
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	if (pingcur->openCursorInternal(cursorcount+1) &&

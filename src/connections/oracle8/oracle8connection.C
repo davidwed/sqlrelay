@@ -476,7 +476,7 @@ const char *oracle8connection::dbVersion() {
 	return NULL;
 }
 
-const char *oracle8connection::getDbListQuery(bool wild) {
+const char *oracle8connection::getDatabaseListQuery(bool wild) {
 	return (wild)?"select username from all_users "
 			"where username like upper('%s') order by username":
 			"select username from all_users order by username";
@@ -520,6 +520,10 @@ const char *oracle8connection::getColumnListQuery(bool wild) {
 			"	table_name=upper('%s') "
 			"order by "
 			"	column_id";
+}
+
+const char *oracle8connection::selectDatabaseQuery() {
+	return "alter session set current_schema=%s";
 }
 
 oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {

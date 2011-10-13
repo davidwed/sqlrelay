@@ -96,6 +96,9 @@ void sqlrconnection_svr::clientSession() {
 		} else if (command==SERVERVERSION) {
 			serverVersionCommand();
 			continue;
+		} else if (command==SELECT_DATABASE) {
+			selectDatabaseCommand();
+			continue;
 		}
 
 		// For the rest of the commands, the client will be requesting
@@ -114,7 +117,7 @@ void sqlrconnection_svr::clientSession() {
 			}
 			break;
 		} else if (command==GETDBLIST) {
-			if (getDbListCommand(cursor)) {
+			if (getDatabaseListCommand(cursor)) {
 				continue;
 			}
 			break;
