@@ -59,6 +59,13 @@ environment::environment() {
 	delimiter=';';
 }
 
+enum querytype_t {
+	SHOW_DATABASES_QUERY=0,
+	SHOW_TABLES_QUERY,
+	SHOW_COLUMNS_QUERY,
+	DESCRIBE_QUERY
+};
+
 class	sqlrsh {
 	public:
 #ifndef HAVE_READLINE
@@ -93,7 +100,8 @@ class	sqlrsh {
 					sqlrcursor *sqlrcur, environment *env, 
 					const char *command);
 		char	*getWild(const char *command);
-		char	*getTable(const char *command);
+		char	*getTable(enum querytype_t querytype,
+					const char *command);
 		void	initStats(environment *env);
 		void	displayError(sqlrcursor *sqlrcur, environment *env);
 		void	displayHeader(sqlrcursor *sqlrcur, environment *env);
@@ -427,14 +435,14 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 						"show columns",12)) {
-			char	*table=getTable(command);
+			char	*table=getTable(SHOW_COLUMNS_QUERY,command);
 			char	*wild=getWild(command);
 			sqlrcur->getColumnList(table,wild);
 			delete[] table;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 						"describe ",9)) {
-			char	*table=getTable(command);
+			char	*table=getTable(DESCRIBE_QUERY,command);
 			char	*wild=getWild(command);
 			sqlrcur->getColumnList(table,wild);
 			delete[] table;
@@ -471,10 +479,38 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 }
 
 char *sqlrsh::getWild(const char *command) {
-	return NULL;
+	const char	*wildptr=charstring::findFirst(command,"'");
+	if (!wildptr) {
+		return NULL;
+	}
+	wildptr++;
+	const char	*endptr=charstring::findLast(wildptr,"'");
+	if (!endptr) {
+		return NULL;
+	}
+	return charstring::duplicate(wildptr,endptr-wildptr);
 }
 
-char *sqlrsh::getTable(const char *command) {
+char *sqlrsh::getTable(querytype_t querytype, const char *command) {
+	const char	*tableptr=NULL;
+	if (querytype==SHOW_COLUMNS_QUERY) {
+		tableptr=charstring::findFirst(command," in ");
+		if (!tableptr) {
+			return NULL;
+		}
+		tableptr=tableptr+4;
+		const char	*endptr=charstring::findFirst(tableptr," ");
+		if (!endptr) {
+			return charstring::duplicate(tableptr);
+		}
+		return charstring::duplicate(tableptr,endptr-tableptr);
+	} else if (querytype==DESCRIBE_QUERY) {
+		tableptr=charstring::findFirst(command," ");
+		if (!tableptr) {
+			return NULL;
+		}
+		return charstring::duplicate(tableptr+1);
+	}
 	return NULL;
 }
 
@@ -726,6 +762,22 @@ void sqlrsh::displayHelp(environment *env) {
 	printf("	exit/quit		- ");
 	green(env);
 	printf("exits\n\n");
+	cyan(env);
+	printf("	show databases [like pattern]		-\n");
+	green(env);
+	printf("		returns a list of known databases/schemas\n");
+	cyan(env);
+	printf("	show tables [like pattern]		-\n");
+	green(env);
+	printf("		returns a list of known tables\n");
+	cyan(env);
+	printf("	show columns in table [like pattern]	-\n");
+	green(env);
+	printf("		returns a list of columns in the table \"table\"\n");
+	cyan(env);
+	printf("	describe table				-\n");
+	green(env);
+	printf("		returns a list of columns in the table \"table\"\n\n");
 	yellow(env);
 	printf("	All commands must be followed by a semicolon.\n");
 	white(env);

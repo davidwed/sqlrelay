@@ -476,6 +476,52 @@ const char *oracle8connection::dbVersion() {
 	return NULL;
 }
 
+const char *oracle8connection::getDbListQuery(bool wild) {
+	return (wild)?"select username from all_users "
+			"where username like upper('%s') order by username":
+			"select username from all_users order by username";
+}
+
+const char *oracle8connection::getTableListQuery(bool wild) {
+	return (wild)?"select table_name from user_tables "
+			"where table_name like upper('%s') "
+				"order by table_name":
+			"select table_name from user_tables "
+				"order by table_name";
+}
+
+const char *oracle8connection::getColumnListQuery(bool wild) {
+	return (wild)? "select "
+			"	column_name, "
+			"	data_type, "
+			"	nullable, "
+			"	'' as key, "
+			"	data_default, "
+			"	'' as extra "
+			"from "
+			"	all_tab_columns "
+			"where "
+			"	table_name=upper('%s') "
+			"	and "
+			"	column_name like upper('%s') "
+			"order by "
+			"	column_id":
+
+			"select "
+			"	column_name, "
+			"	data_type, "
+			"	nullable, "
+			"	'' as key, "
+			"	data_default, "
+			"	'' as extra "
+			"from "
+			"	all_tab_columns "
+			"where "
+			"	table_name=upper('%s') "
+			"order by "
+			"	column_id";
+}
+
 oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	stmt=NULL;

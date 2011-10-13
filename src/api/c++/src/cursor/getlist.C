@@ -43,18 +43,21 @@ bool sqlrcursor::getList(uint16_t command,
 	// tell the server whether we'll need a cursor or not
 	sendCursorStatus();
 
+	// send the wild parameter
+	uint32_t	len=charstring::length(wild);
+	sqlrc->cs->write(len);
+	if (len) {
+		sqlrc->cs->write(wild,len);
+	}
+
 	// send the table parameter
-	uint32_t	len=0;
 	if (table) {
 		len=charstring::length(table);
 		sqlrc->cs->write(len);
-		sqlrc->cs->write(table,len);
+		if (len) {
+			sqlrc->cs->write(table,len);
+		}
 	}
-
-	// send the wild parameter
-	len=charstring::length(wild);
-	sqlrc->cs->write(len);
-	sqlrc->cs->write(wild,len);
 
 	sqlrc->flushWriteBuffer();
 

@@ -117,6 +117,13 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		}
 	}
 
+	// update maximum query size, bind value lengths and idle client timeout
+	maxquerysize=cfgfl->getMaxQuerySize();
+	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
+	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
+	idleclienttimeout=cfgfl->getIdleClientTimeout();
+
+	// initialize cursors
 	if (!initCursors()) {
 		return false;
 	}
@@ -150,12 +157,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	}
 
 	markDatabaseAvailable();
-
-	// update maximum query size, bind value lengths and idle client timeout
-	maxquerysize=cfgfl->getMaxQuerySize();
-	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
-	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
-	idleclienttimeout=cfgfl->getIdleClientTimeout();
 
 	// if we're not passing descriptors around, listen on 
 	// inet and unix sockets for client connections
@@ -330,8 +331,7 @@ bool sqlrconnection_svr::initCursors() {
 		if (!cur[i]) {
 			cur[i]=initCursorUpdateStats();
 			// FIXME: LAME!!!  oh god this is lame....
-			cur[i]->querybuffer=new char[
-						cfgfl->getMaxQuerySize()+1];
+			cur[i]->querybuffer=new char[maxquerysize+1];
 		}
 		if (!cur[i]->openCursorInternal(i)) {
 

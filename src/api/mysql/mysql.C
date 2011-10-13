@@ -248,6 +248,7 @@ int mysql_select_db(MYSQL *mysql, const char *db);
 int mysql_drop_db(MYSQL *mysql, const char *db);
 MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild);
 MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild);
+MYSQL_RES *mysql_list_fields(MYSQL *mysql, const char *table, const char *wild);
 unsigned long mysql_escape_string(char *to, const char *from,
 					unsigned long length);
 char *mysql_odbc_escape_string(MYSQL *mysql, char *to,
@@ -639,15 +640,74 @@ int mysql_drop_db(MYSQL *mysql, const char *db) {
 }
 
 MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
+
 	debugFunction();
-	return NULL;
+
+	if (mysql->currentstmt && mysql->currentstmt->result) {
+		mysql_free_result(mysql->currentstmt->result);
+	}
+	mysql_stmt_close(mysql->currentstmt);
+
+	mysql->currentstmt=new MYSQL_STMT;
+	mysql->currentstmt->result=new MYSQL_RES;
+	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
+	mysql->currentstmt->result->sqlrcur->copyReferences();
+	mysql->currentstmt->result->errorno=0;
+	mysql->currentstmt->result->fields=NULL;
+	mysql->currentstmt->result->lengths=NULL;
+	mysql->currentstmt->result->sqlrcur->getDbList(wild);
+
+	MYSQL_RES	*retval=mysql->currentstmt->result;
+	mysql->currentstmt->result=NULL;
+	return retval;
 }
 
 MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
+
 	debugFunction();
-	return NULL;
+
+	if (mysql->currentstmt && mysql->currentstmt->result) {
+		mysql_free_result(mysql->currentstmt->result);
+	}
+	mysql_stmt_close(mysql->currentstmt);
+
+	mysql->currentstmt=new MYSQL_STMT;
+	mysql->currentstmt->result=new MYSQL_RES;
+	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
+	mysql->currentstmt->result->sqlrcur->copyReferences();
+	mysql->currentstmt->result->errorno=0;
+	mysql->currentstmt->result->fields=NULL;
+	mysql->currentstmt->result->lengths=NULL;
+	mysql->currentstmt->result->sqlrcur->getTableList(wild);
+
+	MYSQL_RES	*retval=mysql->currentstmt->result;
+	mysql->currentstmt->result=NULL;
+	return retval;
 }
 
+MYSQL_RES *mysql_list_fields(MYSQL *mysql,
+				const char *table, const char *wild) {
+
+	debugFunction();
+
+	if (mysql->currentstmt && mysql->currentstmt->result) {
+		mysql_free_result(mysql->currentstmt->result);
+	}
+	mysql_stmt_close(mysql->currentstmt);
+
+	mysql->currentstmt=new MYSQL_STMT;
+	mysql->currentstmt->result=new MYSQL_RES;
+	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
+	mysql->currentstmt->result->sqlrcur->copyReferences();
+	mysql->currentstmt->result->errorno=0;
+	mysql->currentstmt->result->fields=NULL;
+	mysql->currentstmt->result->lengths=NULL;
+	mysql->currentstmt->result->sqlrcur->getColumnList(table,wild);
+
+	MYSQL_RES	*retval=mysql->currentstmt->result;
+	mysql->currentstmt->result=NULL;
+	return retval;
+}
 
 
 unsigned long mysql_escape_string(char *to, const char *from,
@@ -790,13 +850,6 @@ int mysql_next_result(MYSQL *mysql) {
 	return -1;
 }
 
-
-MYSQL_RES *mysql_list_fields(MYSQL *mysql, const char *table,
-						const char *wild) {
-	debugFunction();
-	// FIXME: implement this
-	return NULL;
-}
 
 unsigned int mysql_num_fields(MYSQL_RES *result) {
 	debugFunction();

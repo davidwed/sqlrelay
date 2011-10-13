@@ -12,7 +12,7 @@ bool sqlrconnection_svr::getTableListCommand(sqlrcursor_svr *cursor) {
 }
 
 bool sqlrconnection_svr::getColumnListCommand(sqlrcursor_svr *cursor) {
-	return getListCommand(cursor,2,false);
+	return getListCommand(cursor,2,true);
 }
 
 bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
@@ -37,11 +37,14 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 
 	// read the wild parameter into the buffer
 	char	*wild=new char[wildlen+1];
-	if ((uint32_t)(clientsock->read(wild,wildlen,
+	if (wildlen) {
+		if ((uint32_t)(clientsock->read(wild,wildlen,
 					idleclienttimeout,0))!=wildlen) {
-		dbgfile.debugPrint("connection",2,
-			"get list failed: client sent short wild parameter");
-		return false;
+			dbgfile.debugPrint("connection",2,
+				"get list failed: "
+				"client sent short wild parameter");
+			return false;
+		}
 	}
 	wild[wildlen]='\0';
 
@@ -69,12 +72,14 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 
 		// read the table parameter into the buffer
 		table=new char[tablelen+1];
-		if ((uint32_t)(clientsock->read(table,tablelen,
+		if (tablelen) {
+			if ((uint32_t)(clientsock->read(table,tablelen,
 					idleclienttimeout,0))!=tablelen) {
-			dbgfile.debugPrint("connection",2,
-				"get list failed: "
-				"client sent short table parameter");
-			return false;
+				dbgfile.debugPrint("connection",2,
+					"get list failed: "
+					"client sent short table parameter");
+				return false;
+			}
 		}
 		table[tablelen]='\0';
 	}
@@ -120,14 +125,19 @@ bool sqlrconnection_svr::buildListQuery(sqlrcursor_svr *cursor,
 	// bounds checking
 	cursor->querylength=charstring::length(query)+
 					wildbuf.getStringLength()+
-					tablebuf.getStringLength()+1;
+					tablebuf.getStringLength();
 	if (cursor->querylength>maxquerysize) {
 		return false;
 	}
 
 	// fill the query buffer and update the length
-	snprintf(cursor->querybuffer,cursor->querylength,
-			query,wildbuf.getString(),tablebuf.getString());
+	if (tablebuf.getStringLength()) {
+		snprintf(cursor->querybuffer,maxquerysize+1,
+			query,tablebuf.getString(),wildbuf.getString());
+	} else {
+		snprintf(cursor->querybuffer,maxquerysize+1,
+					query,wildbuf.getString());
+	}
 	cursor->querylength=charstring::length(cursor->querybuffer);
 	return true;
 }

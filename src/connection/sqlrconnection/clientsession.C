@@ -284,7 +284,7 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 	for (uint16_t j=firstopen; j<cursorcount; j++,i++) {
 		cur[i]=initCursorUpdateStats();
 		// FIXME: LAME!!!  oh god this is lame....
-		cur[i]->querybuffer=new char[cfgfl->getMaxQuerySize()+1];
+		cur[i]->querybuffer=new char[maxquerysize+1];
 		cur[i]->suspendresultset=false;
 		if (!cur[i]->openCursorInternal(i)) {
 			dbgfile.debugPrint("connection",1,"realloc cursor init failure...");
