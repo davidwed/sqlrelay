@@ -204,6 +204,7 @@ struct MYSQL_RES {
 	unsigned int		errorno;
 	my_ulonglong		previousrow;
 	my_ulonglong		currentrow;
+	uint32_t		fieldcount;
 	MYSQL_FIELD_OFFSET	currentfield;
 	MYSQL_FIELD		*fields;
 	unsigned long		*lengths;
@@ -291,8 +292,6 @@ MYSQL_RES *mysql_use_result(MYSQL *mysql);
 void mysql_free_result(MYSQL_RES *result);
 my_bool mysql_more_results(MYSQL *mysql);
 int mysql_next_result(MYSQL *mysql);
-MYSQL_RES *mysql_list_fields(MYSQL *mysql, const char *table,
-						const char *wild);
 unsigned int mysql_num_fields(MYSQL_RES *result);
 MYSQL_FIELD *mysql_fetch_field(MYSQL_RES *result);
 MYSQL_FIELD *mysql_fetch_fields(MYSQL_RES *result);
@@ -322,6 +321,7 @@ my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind);
 my_bool mysql_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bind);
 int mysql_execute(MYSQL_STMT *stmt);
 static void processFields(MYSQL_STMT *stmt);
+enum enum_field_types map_col_type(const char *columntype);
 unsigned long mysql_param_count(MYSQL_STMT *stmt);
 MYSQL_RES *mysql_param_result(MYSQL_STMT *stmt);
 int mysql_fetch(MYSQL_STMT *stmt);
@@ -739,25 +739,134 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 				const char *table, const char *wild) {
 
 	debugFunction();
+	debugPrintf("%s\n",table);
 
 	if (mysql->currentstmt && mysql->currentstmt->result) {
 		mysql_free_result(mysql->currentstmt->result);
 	}
 	mysql_stmt_close(mysql->currentstmt);
 
-	mysql->currentstmt=new MYSQL_STMT;
-	mysql->currentstmt->result=new MYSQL_RES;
-	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
-	mysql->currentstmt->result->sqlrcur->copyReferences();
-	mysql->currentstmt->result->errorno=0;
-	mysql->currentstmt->result->fields=NULL;
-	mysql->currentstmt->result->lengths=NULL;
-	mysql->currentstmt->result->sqlrcur->getColumnList(table,wild);
-	processFields(mysql->currentstmt);
-	mysql->currentstmt->result->currentfield=0;
+	MYSQL_STMT	*stmt=new MYSQL_STMT;
+	mysql->currentstmt=stmt;
+	stmt->result=new MYSQL_RES;
+	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
+	stmt->result->sqlrcur->copyReferences();
+	stmt->result->errorno=0;
+	stmt->result->fields=NULL;
+	stmt->result->lengths=NULL;
+	stmt->result->sqlrcur->getColumnList(table,wild);
 
-	MYSQL_RES	*retval=mysql->currentstmt->result;
-	mysql->currentstmt->result=NULL;
+
+	// translate the rows into fields...
+	delete[] stmt->result->fields;
+	delete[] stmt->result->lengths;
+
+	sqlrcursor	*sqlrcur=stmt->result->sqlrcur;
+
+	uint32_t	colcount=sqlrcur->rowCount();
+	if (colcount) {
+
+		MYSQL_FIELD	*fields=new MYSQL_FIELD[colcount];
+		stmt->result->fields=fields;
+
+		stmt->result->lengths=new unsigned long[colcount];
+
+		for (uint32_t i=0; i<colcount; i++) {
+
+			fields[i].name=const_cast<char *>(
+					sqlrcur->getField(i,(uint32_t)0));
+			fields[i].table=const_cast<char *>("");
+			fields[i].def=const_cast<char *>(
+					sqlrcur->getField(i,(uint32_t)4));
+
+			#if defined(COMPAT_MYSQL_4_0) || \
+				defined(COMPAT_MYSQL_4_1) || \
+				defined(COMPAT_MYSQL_5_0) || \
+				defined(COMPAT_MYSQL_5_1)
+  			fields[i].org_table=const_cast<char *>("");
+  			fields[i].db=const_cast<char *>("");
+			#if defined(COMPAT_MYSQL_4_1) || \
+				defined(COMPAT_MYSQL_5_0) || \
+				defined(COMPAT_MYSQL_5_1)
+  			fields[i].catalog=const_cast<char *>("");
+  			fields[i].org_name=const_cast<char *>(
+						sqlrcur->getColumnName(i));
+			fields[i].name_length=
+				charstring::length(fields[i].name);
+			fields[i].org_name_length=
+				charstring::length(fields[i].org_name);
+			fields[i].table_length=
+				charstring::length(fields[i].table);
+			fields[i].org_table_length=
+				charstring::length(fields[i].org_table);
+			fields[i].db_length=
+				charstring::length(fields[i].db);
+			fields[i].catalog_length=
+				charstring::length(fields[i].catalog);
+			fields[i].def_length=
+				charstring::length(fields[i].def);
+			// FIXME: need a character set number here
+			fields[i].charsetnr=0;
+			#endif
+			#endif
+
+			// figure out the column type
+			const char	*columntypestring=
+						sqlrcur->getField(i,1);
+			enum enum_field_types	columntype=
+					map_col_type(columntypestring);
+			fields[i].type=columntype;
+
+			// determine the length...
+
+			// if the length is in parentheses, use that.
+			const char	*leftparen=
+				charstring::findFirst(columntypestring,"(");
+			if (leftparen) {
+				fields[i].length=
+					charstring::toInteger(leftparen+1);
+			} else {
+				// no parentheses..
+				// FIXME: find a better way to do this
+				fields[i].length=50;
+			}
+
+			// no good way to set this
+			fields[i].max_length=fields[i].length;
+
+			// figure out the flags
+			unsigned int	flags=0;
+			if (!charstring::compare(
+					sqlrcur->getField(i,2),"YES")) {
+				#define NOT_NULL_FLAG	1
+				flags|=NOT_NULL_FLAG;
+			}
+			if (!charstring::compare(
+					sqlrcur->getField(i,3),"YES")) {
+				#define PRI_KEY_FLAG	2
+				flags|=PRI_KEY_FLAG;
+			}
+			// FIXME: the Extra field might have other flags in it
+
+			// FIXME: fix this somehow
+			fields[i].decimals=0;
+		}
+
+		// set the field count
+		stmt->result->fieldcount=colcount;
+	} else {
+		stmt->result->fields=NULL;
+		stmt->result->lengths=NULL;
+		stmt->result->fieldcount=0;
+	}
+
+	stmt->result->currentfield=0;
+
+	// set rowcount beyond the end so no rows can be fetched
+	stmt->result->currentrow=sqlrcur->rowCount()+1;
+
+	MYSQL_RES	*retval=stmt->result;
+	stmt->result=NULL;
 	return retval;
 }
 
@@ -853,7 +962,7 @@ int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length) {
 	}
 	mysql_stmt_close(mysql->currentstmt);
 	mysql->currentstmt=mysql_prepare(mysql,query,length);
-	return mysql_execute(mysql->currentstmt);
+	return mysql_stmt_execute(mysql->currentstmt);
 }
 
 const char *mysql_info(MYSQL *mysql) {
@@ -905,15 +1014,18 @@ int mysql_next_result(MYSQL *mysql) {
 
 unsigned int mysql_num_fields(MYSQL_RES *result) {
 	debugFunction();
-	return result->sqlrcur->colCount();
+	unsigned int	retval=result->fieldcount;
+	debugPrintf("num fields: %d\n",retval);
+	return retval;
 }
 
 MYSQL_FIELD *mysql_fetch_field(MYSQL_RES *result) {
 	debugFunction();
-	if (result->currentfield>=
-		(MYSQL_FIELD_OFFSET)result->sqlrcur->colCount()) {
+	if (result->currentfield>=(MYSQL_FIELD_OFFSET)result->fieldcount) {
 		return NULL;
 	}
+	debugPrintf("name: \"%s\"\n",
+			result->fields[result->currentfield].name);
 	return &result->fields[result->currentfield++];
 }
 
@@ -925,7 +1037,7 @@ MYSQL_FIELD *mysql_fetch_fields(MYSQL_RES *result) {
 
 MYSQL_FIELD *mysql_fetch_field_direct(MYSQL_RES *result, unsigned int fieldnr) {
 	debugFunction();
-	if (fieldnr>(unsigned int)result->sqlrcur->colCount()) {
+	if (fieldnr>(unsigned int)result->fieldcount) {
 		return NULL;
 	}
 	// FIXME: it's possible that we shouldn't increment the fieldnr here
@@ -937,7 +1049,7 @@ unsigned long *mysql_fetch_lengths(MYSQL_RES *result) {
 	debugFunction();
 	uint32_t	*lengths=result->sqlrcur->
 					getRowLengths(result->previousrow);
-	for (uint32_t i=0; i<result->sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<result->fieldcount; i++) {
 		result->lengths[i]=(unsigned long)lengths[i];
 	}
 	return result->lengths;
@@ -1441,8 +1553,20 @@ static enum enum_field_types	mysqltypemap[]={
 
 enum enum_field_types map_col_type(const char *columntype) {
 	debugFunction();
+
+	size_t		columntypelen=charstring::length(columntype);
+
+	// sometimes column types have parentheses, like CHAR(40)
+	// especially when they come back from mysql_list_fields
+	const char	*leftparen=charstring::findFirst(columntype,"(");
+	if (leftparen) {
+		columntypelen=leftparen-columntype;
+	}
+
 	for (int index=0; datatypestring[index]; index++) {
-		if (!charstring::compare(datatypestring[index],columntype)) {
+		if (!charstring::compareIgnoringCase(
+						datatypestring[index],
+						columntype,columntypelen)) {
 			return mysqltypemap[index];
 		}
 	}
@@ -1465,7 +1589,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 	uint32_t	*lengths=stmt->result->sqlrcur->
 				getRowLengths(stmt->result->previousrow);
 
-	for (uint32_t i=0; i<stmt->result->sqlrcur->colCount(); i++) {
+	for (uint32_t i=0; i<stmt->result->fieldcount; i++) {
 		*(stmt->resultbinds[i].length)=lengths[i];
 		if (!row[i]) {
 			*(stmt->resultbinds[i].is_null)=true;
@@ -1627,9 +1751,13 @@ static void processFields(MYSQL_STMT *stmt) {
 
 			fields[i].decimals=sqlrcur->getColumnPrecision(i);
 		}
+
+		// set the field count
+		stmt->result->fieldcount=colcount;
 	} else {
 		stmt->result->fields=NULL;
 		stmt->result->lengths=NULL;
+		stmt->result->fieldcount=0;
 	}
 }
 
@@ -1711,7 +1839,7 @@ int mysql_stmt_execute(MYSQL_STMT *stmt) {
 
 my_ulonglong mysql_stmt_num_rows(MYSQL_STMT *stmt) {
 	debugFunction();
-	return stmt->result->sqlrcur->rowCount();
+	return mysql_num_rows(stmt->result);
 }
 
 my_ulonglong mysql_stmt_affected_rows(MYSQL_STMT *stmt) {
