@@ -1601,21 +1601,10 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 			// set the null indicator
 			*(stmt->resultbinds[i].is_null)=false;
 
-			// set the output length (if we can)
-			unsigned long	len;
-			if (lengths[i]>stmt->resultbinds[i].buffer_length) {
-				len=lengths[i];
-			} else {
-				len=stmt->resultbinds[i].buffer_length;
-			}
-			if (stmt->resultbinds[i].length) {
-				*(stmt->resultbinds[i].length)=len;
-			}
-
 			// copy data into the buffer...
 			switch (stmt->resultbinds[i].buffer_type) {
 				case MYSQL_TYPE_NULL:
-					// FIXME:
+					stmt->resultbinds[i].buffer=NULL;
 					break;
 				case MYSQL_TYPE_VAR_STRING:
 				case MYSQL_TYPE_STRING:
@@ -1624,6 +1613,21 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 				case MYSQL_TYPE_TIME:
 				case MYSQL_TYPE_DATETIME:
 				case MYSQL_TYPE_NEWDATE:
+
+					// set the output length (if we can)
+					unsigned long	len;
+					if (lengths[i]>stmt->
+						resultbinds[i].buffer_length) {
+						len=lengths[i];
+					} else {
+						len=stmt->
+							resultbinds[i].
+							buffer_length;
+					}
+					if (stmt->resultbinds[i].length) {
+						*(stmt->resultbinds[i].
+								length)=len;
+					}
 
 					// copy data into the buffer
 					rawbuffer::copy(
@@ -1639,35 +1643,41 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 
 					break;
 				case MYSQL_TYPE_TINY:
-					*(stmt->resultbinds[i].buffer)=
+					*((char *)stmt->
+						resultbinds[i].buffer)=
 						(char)charstring::
 							toInteger(row[i]);
 					break;
 				case MYSQL_TYPE_SHORT:
-					*(stmt->resultbinds[i].buffer)=
+					*((uint16_t *)stmt->
+						resultbinds[i].buffer)=
 						(uint16_t)charstring::
 							toInteger(row[i]);
 					break;
 				case MYSQL_TYPE_LONG:
 				case MYSQL_TYPE_YEAR:
-					*(stmt->resultbinds[i].buffer)=
+					*((uint32_t *)stmt->
+						resultbinds[i].buffer)=
 						(uint32_t)charstring::
 							toInteger(row[i]);
 					break;
 				case MYSQL_TYPE_LONGLONG:
 				case MYSQL_TYPE_INT24:
-					*(stmt->resultbinds[i].buffer)=
+					*((uint64_t *)stmt->
+						resultbinds[i].buffer)=
 						(uint64_t)charstring::
 							toInteger(row[i]);
 					break;
 				case MYSQL_TYPE_FLOAT:
-					*(stmt->resultbinds[i].buffer)=
+					*((float *)stmt->
+						resultbinds[i].buffer)=
 						(float)charstring::
 							toFloat(row[i]);
 					break;
 				case MYSQL_TYPE_DECIMAL:
 				case MYSQL_TYPE_DOUBLE:
-					*(stmt->resultbinds[i].buffer)=
+					*((double *)stmt->
+						resultbinds[i].buffer)=
 						(double)charstring::
 							toFloat(row[i]);
 					break;
@@ -1685,7 +1695,6 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 					// to do with these types
 					//break;
 				default:
-					stmt->resultbinds[i].buffer[0]='\0';
 					*(stmt->resultbinds[i].length)=0;
 			}
 		}
