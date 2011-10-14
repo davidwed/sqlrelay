@@ -1590,20 +1590,105 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 				getRowLengths(stmt->result->previousrow);
 
 	for (uint32_t i=0; i<stmt->result->fieldcount; i++) {
-		*(stmt->resultbinds[i].length)=lengths[i];
-		if (!row[i]) {
-			*(stmt->resultbinds[i].is_null)=true;
-		} else {
-			*(stmt->resultbinds[i].is_null)=false;
-			rawbuffer::copy(stmt->resultbinds[i].buffer,
-							row[i],lengths[i]);
-		}
-		stmt->resultbinds[i].buffer[lengths[i]]='\0';
 
-		// FIXME: I think I'm supposed to convert to
-		// some other type based on the column type...
-		stmt->resultbinds[i].buffer_type=MYSQL_TYPE_STRING,
-		stmt->resultbinds[i].buffer_length=lengths[i];
+		if (!row[i]) {
+
+			// set the null indicator
+			*(stmt->resultbinds[i].is_null)=true;
+
+		} else {
+
+			// set the null indicator
+			*(stmt->resultbinds[i].is_null)=false;
+
+			// set the output length (if we can)
+			unsigned long	len;
+			if (lengths[i]>stmt->resultbinds[i].buffer_length) {
+				len=lengths[i];
+			} else {
+				len=stmt->resultbinds[i].buffer_length;
+			}
+			if (stmt->resultbinds[i].length) {
+				*(stmt->resultbinds[i].length)=len;
+			}
+
+			// copy data into the buffer...
+			switch (stmt->resultbinds[i].buffer_type) {
+				case MYSQL_TYPE_NULL:
+					// FIXME:
+					break;
+				case MYSQL_TYPE_VAR_STRING:
+				case MYSQL_TYPE_STRING:
+				case MYSQL_TYPE_TIMESTAMP:
+				case MYSQL_TYPE_DATE:
+				case MYSQL_TYPE_TIME:
+				case MYSQL_TYPE_DATETIME:
+				case MYSQL_TYPE_NEWDATE:
+
+					// copy data into the buffer
+					rawbuffer::copy(
+						stmt->resultbinds[i].buffer,
+						row[i],len);
+
+					// null-terminate, if possible
+					if (len<stmt->resultbinds[i].
+							buffer_length) {
+						stmt->resultbinds[i].
+							buffer[len]='\0';
+					}
+
+					break;
+				case MYSQL_TYPE_TINY:
+					*(stmt->resultbinds[i].buffer)=
+						(char)charstring::
+							toInteger(row[i]);
+					break;
+				case MYSQL_TYPE_SHORT:
+					*(stmt->resultbinds[i].buffer)=
+						(uint16_t)charstring::
+							toInteger(row[i]);
+					break;
+				case MYSQL_TYPE_LONG:
+				case MYSQL_TYPE_YEAR:
+					*(stmt->resultbinds[i].buffer)=
+						(uint32_t)charstring::
+							toInteger(row[i]);
+					break;
+				case MYSQL_TYPE_LONGLONG:
+				case MYSQL_TYPE_INT24:
+					*(stmt->resultbinds[i].buffer)=
+						(uint64_t)charstring::
+							toInteger(row[i]);
+					break;
+				case MYSQL_TYPE_FLOAT:
+					*(stmt->resultbinds[i].buffer)=
+						(float)charstring::
+							toFloat(row[i]);
+					break;
+				case MYSQL_TYPE_DECIMAL:
+				case MYSQL_TYPE_DOUBLE:
+					*(stmt->resultbinds[i].buffer)=
+						(double)charstring::
+							toFloat(row[i]);
+					break;
+				case MYSQL_TYPE_TINY_BLOB:
+				case MYSQL_TYPE_MEDIUM_BLOB:
+				case MYSQL_TYPE_LONG_BLOB:
+				case MYSQL_TYPE_BLOB:
+					// FIXME: I'm not sure what
+					// to do with these types
+					//break;
+				case MYSQL_TYPE_ENUM:
+				case MYSQL_TYPE_SET:
+				case MYSQL_TYPE_GEOMETRY:
+					// FIXME: I'm not sure what
+					// to do with these types
+					//break;
+				default:
+					stmt->resultbinds[i].buffer[0]='\0';
+					*(stmt->resultbinds[i].length)=0;
+			}
+		}
 	}
 	return 0;
 }
