@@ -32,28 +32,46 @@ typedef bool			my_bool;
 typedef my_ulonglong *		MYSQL_ROW_OFFSET;
 typedef unsigned int		MYSQL_FIELD_OFFSET;
 
-enum enum_mysql_set_option { MYSQL_SET_OPTION_UNKNOWN_OPTION };
-enum mysql_option { MYSQL_OPTION_UNKNOWN_OPTION };
+enum enum_mysql_set_option {
+	MYSQL_SET_OPTION_UNKNOWN_OPTION
+};
+
+enum mysql_option {
+	MYSQL_OPTION_UNKNOWN_OPTION
+};
 
 // Taken directly from mysql_com.h version 5.1.22
 // Back-compatible with all previous versions.
-enum enum_field_types { MYSQL_TYPE_DECIMAL, MYSQL_TYPE_TINY,
-			MYSQL_TYPE_SHORT,  MYSQL_TYPE_LONG,
-			MYSQL_TYPE_FLOAT,  MYSQL_TYPE_DOUBLE,
-			MYSQL_TYPE_NULL,   MYSQL_TYPE_TIMESTAMP,
-			MYSQL_TYPE_LONGLONG,MYSQL_TYPE_INT24,
-			MYSQL_TYPE_DATE,   MYSQL_TYPE_TIME,
-			MYSQL_TYPE_DATETIME, MYSQL_TYPE_YEAR,
-			MYSQL_TYPE_NEWDATE,
-			MYSQL_TYPE_ENUM=247,
-			MYSQL_TYPE_SET=248,
-			MYSQL_TYPE_TINY_BLOB=249,
-			MYSQL_TYPE_MEDIUM_BLOB=250,
-			MYSQL_TYPE_LONG_BLOB=251,
-			MYSQL_TYPE_BLOB=252,
-			MYSQL_TYPE_VAR_STRING=253,
-			MYSQL_TYPE_STRING=254,
-			MYSQL_TYPE_GEOMETRY=255
+enum enum_field_types {
+	MYSQL_TYPE_DECIMAL,
+	MYSQL_TYPE_TINY,
+	MYSQL_TYPE_SHORT,
+	MYSQL_TYPE_LONG,
+	MYSQL_TYPE_FLOAT,
+	MYSQL_TYPE_DOUBLE,
+	MYSQL_TYPE_NULL,
+	MYSQL_TYPE_TIMESTAMP,
+	MYSQL_TYPE_LONGLONG,MYSQL_TYPE_INT24,
+	MYSQL_TYPE_DATE,
+	MYSQL_TYPE_TIME,
+	MYSQL_TYPE_DATETIME,
+	MYSQL_TYPE_YEAR,
+	MYSQL_TYPE_NEWDATE,
+	MYSQL_TYPE_ENUM=247,
+	MYSQL_TYPE_SET=248,
+	MYSQL_TYPE_TINY_BLOB=249,
+	MYSQL_TYPE_MEDIUM_BLOB=250,
+	MYSQL_TYPE_LONG_BLOB=251,
+	MYSQL_TYPE_BLOB=252,
+	MYSQL_TYPE_VAR_STRING=253,
+	MYSQL_TYPE_STRING=254,
+	MYSQL_TYPE_GEOMETRY=255
+};
+
+enum enum_stmt_attr_type {
+	STMT_ATTR_UPDATE_MAX_LENGTH,
+	STMT_ATTR_CURSOR_TYPE,
+	STMT_ATTR_PREFETCH_ROWS
 };
 
 #ifdef COMPAT_MYSQL_3
@@ -196,8 +214,6 @@ struct MYSQL_STMT {
 	MYSQL_BIND	*resultbinds;
 };
 
-// FIXME: apps access this directly! so it must be the same size and have
-// same members as the real struct MYSQL
 struct MYSQL {
 	const char	*host;
 	unsigned int	port;
@@ -313,21 +329,49 @@ int mysql_fetch_column(MYSQL_STMT *stmt, MYSQL_BIND *bind,
 			unsigned int column, unsigned long offset);
 MYSQL_RES *mysql_get_metadata(MYSQL_STMT *stmt);
 my_bool mysql_send_long_data(MYSQL_STMT *stmt,
-				unsigned int parameter_number,
+				unsigned int parameternumber,
 				const char *data, unsigned long length);
+
+MYSQL_STMT *mysql_stmt_init(MYSQL *mysql);
+int mysql_stmt_prepare(MYSQL_STMT *stmt,
+				const char *query,
+				unsigned long length);
+int mysql_stmt_execute(MYSQL_STMT *stmt);
+int mysql_stmt_fetch(MYSQL_STMT *stmt);
+int mysql_stmt_fetch_column(MYSQL_STMT *stmt, MYSQL_BIND *bindarg, 
+                                    unsigned int column,
+                                    unsigned long offset);
+int mysql_stmt_store_result(MYSQL_STMT *stmt);
+unsigned long mysql_stmt_param_count(MYSQL_STMT * stmt);
+my_bool mysql_stmt_attr_set(MYSQL_STMT *stmt,
+                                    enum enum_stmt_attr_type attrtype,
+                                    const void *attr);
+my_bool mysql_stmt_attr_get(MYSQL_STMT *stmt,
+                                    enum enum_stmt_attr_type attrtype,
+                                    void *attr);
+my_bool mysql_stmt_bind_param(MYSQL_STMT * stmt, MYSQL_BIND * bnd);
+my_bool mysql_stmt_bind_result(MYSQL_STMT * stmt, MYSQL_BIND * bnd);
+my_bool mysql_stmt_send_long_data(MYSQL_STMT *stmt, 
+                                          unsigned int paramnumber,
+                                          const char *data, 
+                                          unsigned long length);
+MYSQL_RES *mysql_stmt_result_metadata(MYSQL_STMT *stmt);
+MYSQL_RES *mysql_stmt_param_metadata(MYSQL_STMT *stmt);
 my_ulonglong mysql_stmt_num_rows(MYSQL_STMT *stmt);
 my_ulonglong mysql_stmt_affected_rows(MYSQL_STMT *stmt);
 MYSQL_ROW_OFFSET mysql_stmt_row_seek(MYSQL_STMT *stmt,
 					MYSQL_ROW_OFFSET offset);
 MYSQL_ROW_OFFSET mysql_stmt_row_tell(MYSQL_STMT *stmt);
 void mysql_stmt_data_seek(MYSQL_STMT *stmt, my_ulonglong offset);
-my_bool mysql_stmt_close(MYSQL_STMT *stmt);
 unsigned int mysql_stmt_errno(MYSQL_STMT *stmt);
 const char *mysql_stmt_error(MYSQL_STMT *stmt);
+my_ulonglong mysql_stmt_insert_id(MYSQL_STMT *stmt);
+unsigned int mysql_stmt_field_count(MYSQL_STMT *stmt);
 const char *mysql_stmt_sqlstate(MYSQL_STMT *stmt);
-int mysql_stmt_store_result(MYSQL_STMT *stmt);
 my_bool mysql_stmt_free_result(MYSQL_STMT *stmt);
 my_bool mysql_stmt_reset(MYSQL_STMT *stmt);
+my_bool mysql_stmt_close(MYSQL_STMT *stmt);
+
 void mysql_library_init(int argc, char **argv, char **groups);
 void mysql_server_end();
 void mysql_library_end();
@@ -994,7 +1038,7 @@ const char *mysql_error(MYSQL *mysql) {
 
 const char *mysql_sqlstate(MYSQL *mysql) {
 	debugFunction();
-	return "";
+	return mysql_stmt_sqlstate(mysql->currentstmt);
 }
 
 
@@ -1016,100 +1060,25 @@ my_bool mysql_autocommit(MYSQL *mysql, my_bool mode) {
 
 
 
-
-
-
-
 MYSQL_STMT *mysql_prepare(MYSQL *mysql, const char *query,
 					unsigned long length) {
-	debugPrintf(query);
-	debugPrintf("\n");
-	MYSQL_STMT	*stmt=new MYSQL_STMT;
-	stmt->result=new MYSQL_RES;
-	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
-	stmt->result->sqlrcur->copyReferences();
-	stmt->result->errorno=0;
-	stmt->result->fields=NULL;
-	stmt->result->lengths=NULL;
-	stmt->result->sqlrcur->prepareQuery(query,length);
-	return stmt;
+	debugFunction();
+	MYSQL_STMT	*stmt=mysql_stmt_init(mysql);
+	if (!mysql_stmt_prepare(stmt,query,length)) {
+		return stmt;
+	}
+	mysql_stmt_close(stmt);
+	return NULL;
 }
 
 my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 	debugFunction();
-
-	unsigned long	paramcount=mysql_param_count(stmt);
-	for (unsigned long i=0; i<paramcount; i++) {
-
-		char		*variable=charstring::parseNumber((uint32_t)i);
-		sqlrcursor	*cursor=stmt->result->sqlrcur;
-		switch (bind[i].buffer_type) {
-			case MYSQL_TYPE_NULL: {
-				cursor->inputBind(variable,(char *)NULL);
-				break;
-			}
-			case MYSQL_TYPE_VAR_STRING:
-			case MYSQL_TYPE_STRING:
-			case MYSQL_TYPE_TIMESTAMP:
-			case MYSQL_TYPE_DATE:
-			case MYSQL_TYPE_TIME:
-			case MYSQL_TYPE_DATETIME:
-			case MYSQL_TYPE_NEWDATE: {
-				char	*value=(char *)bind[i].buffer;
-				cursor->inputBind(variable,value);
-				break;
-			}
-			case MYSQL_TYPE_DECIMAL:
-			case MYSQL_TYPE_FLOAT:
-			case MYSQL_TYPE_DOUBLE: {
-				double	value=*((double *)bind[i].buffer);
-				// FIXME: precision/scale???
-				cursor->inputBind(variable,value,0,0);
-				break;
-			}
-			case MYSQL_TYPE_TINY:
-			case MYSQL_TYPE_SHORT:
-			case MYSQL_TYPE_LONG:
-			case MYSQL_TYPE_YEAR: {
-				long	value=*((long *)bind[i].buffer);
-				cursor->inputBind(variable,value);
-				break;
-			}
-			case MYSQL_TYPE_LONGLONG:
-			case MYSQL_TYPE_INT24: {
-				// FIXME: what should I do here?
-				return false;
-				break;
-			}
-			case MYSQL_TYPE_TINY_BLOB:
-			case MYSQL_TYPE_MEDIUM_BLOB:
-			case MYSQL_TYPE_LONG_BLOB:
-			case MYSQL_TYPE_BLOB: {
-				char		*value=(char *)bind[i].buffer;
-				unsigned long	size=*(bind[i].length);
-				cursor->inputBindBlob(variable,value,size);
-				break;
-			}
-			case MYSQL_TYPE_ENUM:
-			case MYSQL_TYPE_SET:
-			case MYSQL_TYPE_GEOMETRY: {
-				// FIXME: what should I do here?
-				return false;
-				break;
-			}
-			default: {
-				// FIXME: what should I do here?
-				return false;
-			}
-		}
-	}
-	return true;
+	return mysql_stmt_bind_param(stmt,bind);
 }
 
 my_bool mysql_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 	debugFunction();
-	stmt->resultbinds=bind;
-	return true;
+	return mysql_stmt_bind_result(stmt,bind);
 }
 
 static enum enum_field_types	mysqltypemap[]={
@@ -1482,15 +1451,46 @@ enum enum_field_types map_col_type(const char *columntype) {
 
 int mysql_execute(MYSQL_STMT *stmt) {
 	debugFunction();
+	return mysql_stmt_execute(stmt);
+}
 
-	stmt->result->previousrow=0;
-	stmt->result->currentrow=0;
-	stmt->result->currentfield=0;
-	sqlrcursor	*sqlrcur=stmt->result->sqlrcur;
+int mysql_stmt_fetch(MYSQL_STMT *stmt) {
+	debugFunction();
 
-	int	retval=!sqlrcur->executeQuery();
-	processFields(stmt);
-	return retval;
+	MYSQL_ROW	row=mysql_fetch_row(stmt->result);
+	if (!row) {
+		return MYSQL_NO_DATA;
+	}
+
+	uint32_t	*lengths=stmt->result->sqlrcur->
+				getRowLengths(stmt->result->previousrow);
+
+	for (uint32_t i=0; i<stmt->result->sqlrcur->colCount(); i++) {
+		*(stmt->resultbinds[i].length)=lengths[i];
+		if (!row[i]) {
+			*(stmt->resultbinds[i].is_null)=true;
+		} else {
+			*(stmt->resultbinds[i].is_null)=false;
+			rawbuffer::copy(stmt->resultbinds[i].buffer,
+							row[i],lengths[i]);
+		}
+		stmt->resultbinds[i].buffer[lengths[i]]='\0';
+
+		// FIXME: I think I'm supposed to convert to
+		// some other type based on the column type...
+		stmt->resultbinds[i].buffer_type=MYSQL_TYPE_STRING,
+		stmt->resultbinds[i].buffer_length=lengths[i];
+	}
+	return 0;
+}
+
+int mysql_stmt_fetch_column(MYSQL_STMT *stmt, MYSQL_BIND *bind, 
+                                    unsigned int column,
+                                    unsigned long offset) {
+	debugFunction();
+	// according to the mysql 5.6 docs, this function is:
+	// "To be added."
+	return 1;
 }
 
 static void processFields(MYSQL_STMT *stmt) {
@@ -1635,7 +1635,7 @@ static void processFields(MYSQL_STMT *stmt) {
 
 unsigned long mysql_param_count(MYSQL_STMT *stmt) {
 	debugFunction();
-	return stmt->result->sqlrcur->countBindVariables();
+	return mysql_stmt_param_count(stmt);
 }
 
 MYSQL_RES *mysql_param_result(MYSQL_STMT *stmt) {
@@ -1648,62 +1648,70 @@ MYSQL_RES *mysql_param_result(MYSQL_STMT *stmt) {
 
 int mysql_fetch(MYSQL_STMT *stmt) {
 	debugFunction();
-
-	MYSQL_ROW	row=mysql_fetch_row(stmt->result);
-	if (!row) {
-		return MYSQL_NO_DATA;
-	}
-
-	uint32_t	*lengths=stmt->result->sqlrcur->
-				getRowLengths(stmt->result->previousrow);
-
-	for (uint32_t i=0; i<stmt->result->sqlrcur->colCount(); i++) {
-		*(stmt->resultbinds[i].length)=lengths[i];
-		if (!row[i]) {
-			*(stmt->resultbinds[i].is_null)=true;
-		} else {
-			*(stmt->resultbinds[i].is_null)=false;
-			rawbuffer::copy(stmt->resultbinds[i].buffer,
-							row[i],lengths[i]);
-		}
-		stmt->resultbinds[i].buffer[lengths[i]]='\0';
-
-		// FIXME: I think I'm supposed to convert to
-		// some other type based on the column type...
-		stmt->resultbinds[i].buffer_type=MYSQL_TYPE_STRING,
-		stmt->resultbinds[i].buffer_length=lengths[i];
-	}
-	return 0;
+	return mysql_stmt_fetch(stmt);
 }
 
 int mysql_fetch_column(MYSQL_STMT *stmt, MYSQL_BIND *bind,
 			unsigned int column, unsigned long offset) {
 	debugFunction();
-	// FIXME: The MySQL docs don't even explain this one.
-	return 0;
+	return mysql_stmt_fetch_column(stmt,bind,column,offset);
 }
 
 
 
 MYSQL_RES *mysql_get_metadata(MYSQL_STMT *stmt) {
 	debugFunction();
-	return stmt->result;
+	return mysql_stmt_result_metadata(stmt);
 }
 
 
 
 my_bool mysql_send_long_data(MYSQL_STMT *stmt,
-				unsigned int parameter_number,
+				unsigned int parameternumber,
 				const char *data, unsigned long length) {
 	debugFunction();
-	return false;
+	return mysql_stmt_send_long_data(stmt,parameternumber,data,length);
 }
 
 
+MYSQL_STMT *mysql_stmt_init(MYSQL *mysql) {
+	debugFunction();
+	MYSQL_STMT	*stmt=new MYSQL_STMT;
+	stmt->result=new MYSQL_RES;
+	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
+	stmt->result->sqlrcur->copyReferences();
+	stmt->result->errorno=0;
+	stmt->result->fields=NULL;
+	stmt->result->lengths=NULL;
+	return stmt;
+}
+
+int mysql_stmt_prepare(MYSQL_STMT *stmt,
+				const char *query,
+				unsigned long length) {
+	debugFunction();
+	debugPrintf(query);
+	debugPrintf("\n");
+	stmt->result->sqlrcur->prepareQuery(query,length);
+	return 0;
+}
+
+int mysql_stmt_execute(MYSQL_STMT *stmt) {
+	debugFunction();
+
+	stmt->result->previousrow=0;
+	stmt->result->currentrow=0;
+	stmt->result->currentfield=0;
+	sqlrcursor	*sqlrcur=stmt->result->sqlrcur;
+
+	int	retval=!sqlrcur->executeQuery();
+	processFields(stmt);
+	return retval;
+}
 
 my_ulonglong mysql_stmt_num_rows(MYSQL_STMT *stmt) {
 	debugFunction();
-	return mysql_num_rows(stmt->result);
+	return stmt->result->sqlrcur->rowCount();
 }
 
 my_ulonglong mysql_stmt_affected_rows(MYSQL_STMT *stmt) {
@@ -1753,16 +1761,166 @@ const char *mysql_stmt_error(MYSQL_STMT *stmt) {
 	return stmt->result->sqlrcur->errorMessage();
 }
 
-const char *mysql_stmt_sqlstate(MYSQL_STMT *stmt) {
+my_ulonglong mysql_stmt_insert_id(MYSQL_STMT *stmt) {
 	debugFunction();
-	return "";
+	// FIXME: for mysql db's you can call "select last_insert_id()"
+	// for other db's, ????
+	return 0;
 }
 
+unsigned int mysql_stmt_field_count(MYSQL_STMT *stmt) {
+	debugFunction();
+	return mysql_num_fields(stmt->result);
+}
 
+const char *mysql_stmt_sqlstate(MYSQL_STMT *stmt) {
+	debugFunction();
+	// FIXME:
+	return "";
+}
 
 int mysql_stmt_store_result(MYSQL_STMT *stmt) {
 	debugFunction();
 	return 0;
+}
+
+unsigned long mysql_stmt_param_count(MYSQL_STMT * stmt) {
+	debugFunction();
+	return stmt->result->sqlrcur->countBindVariables();
+}
+
+my_bool mysql_stmt_attr_set(MYSQL_STMT *stmt,
+                                    enum enum_stmt_attr_type attrtype,
+                                    const void *attr) {
+	debugFunction();
+	switch (attrtype) {
+		case STMT_ATTR_UPDATE_MAX_LENGTH:
+			break;
+		case STMT_ATTR_CURSOR_TYPE:
+			break;
+		case STMT_ATTR_PREFETCH_ROWS:
+			const unsigned long	*val=
+				(const unsigned long *)attr;
+			stmt->result->sqlrcur->
+				setResultSetBufferSize((uint64_t)(*val));
+			break;
+	}
+	return true;
+}
+
+my_bool mysql_stmt_attr_get(MYSQL_STMT *stmt,
+                                    enum enum_stmt_attr_type attrtype,
+                                    void *attr) {
+	debugFunction();
+	switch (attrtype) {
+		case STMT_ATTR_UPDATE_MAX_LENGTH:
+			break;
+		case STMT_ATTR_CURSOR_TYPE:
+			break;
+		case STMT_ATTR_PREFETCH_ROWS:
+			unsigned long	*val=(unsigned long *)attr;
+			*val=(unsigned long)stmt->result->sqlrcur->
+						getResultSetBufferSize();
+			break;
+	}
+	return true;
+}
+
+my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
+	debugFunction();
+
+	unsigned long	paramcount=mysql_param_count(stmt);
+	for (unsigned long i=0; i<paramcount; i++) {
+
+		char		*variable=charstring::parseNumber((uint32_t)i);
+		sqlrcursor	*cursor=stmt->result->sqlrcur;
+		switch (bind[i].buffer_type) {
+			case MYSQL_TYPE_NULL: {
+				cursor->inputBind(variable,(char *)NULL);
+				break;
+			}
+			case MYSQL_TYPE_VAR_STRING:
+			case MYSQL_TYPE_STRING:
+			case MYSQL_TYPE_TIMESTAMP:
+			case MYSQL_TYPE_DATE:
+			case MYSQL_TYPE_TIME:
+			case MYSQL_TYPE_DATETIME:
+			case MYSQL_TYPE_NEWDATE: {
+				char	*value=(char *)bind[i].buffer;
+				cursor->inputBind(variable,value);
+				break;
+			}
+			case MYSQL_TYPE_DECIMAL:
+			case MYSQL_TYPE_FLOAT:
+			case MYSQL_TYPE_DOUBLE: {
+				double	value=*((double *)bind[i].buffer);
+				// FIXME: precision/scale???
+				cursor->inputBind(variable,value,0,0);
+				break;
+			}
+			case MYSQL_TYPE_TINY:
+			case MYSQL_TYPE_SHORT:
+			case MYSQL_TYPE_LONG:
+			case MYSQL_TYPE_YEAR: {
+				long	value=*((long *)bind[i].buffer);
+				cursor->inputBind(variable,value);
+				break;
+			}
+			case MYSQL_TYPE_LONGLONG:
+			case MYSQL_TYPE_INT24: {
+				// FIXME: what should I do here?
+				return false;
+				break;
+			}
+			case MYSQL_TYPE_TINY_BLOB:
+			case MYSQL_TYPE_MEDIUM_BLOB:
+			case MYSQL_TYPE_LONG_BLOB:
+			case MYSQL_TYPE_BLOB: {
+				char		*value=(char *)bind[i].buffer;
+				unsigned long	size=*(bind[i].length);
+				cursor->inputBindBlob(variable,value,size);
+				break;
+			}
+			case MYSQL_TYPE_ENUM:
+			case MYSQL_TYPE_SET:
+			case MYSQL_TYPE_GEOMETRY: {
+				// FIXME: what should I do here?
+				return false;
+				break;
+			}
+			default: {
+				// FIXME: what should I do here?
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+my_bool mysql_stmt_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
+	debugFunction();
+	stmt->resultbinds=bind;
+	return true;
+}
+
+my_bool mysql_stmt_send_long_data(MYSQL_STMT *stmt, 
+                                          unsigned int paramnumber,
+                                          const char *data, 
+                                          unsigned long length) {
+	debugFunction();
+	return false;
+}
+
+MYSQL_RES *mysql_stmt_result_metadata(MYSQL_STMT *stmt) {
+	debugFunction();
+	return stmt->result;
+}
+
+MYSQL_RES *mysql_stmt_param_metadata(MYSQL_STMT *stmt) {
+	debugFunction();
+	// according to the mysql 5.6 docs:
+	// "This function currently does nothing."
+	return NULL;
 }
 
 my_bool mysql_stmt_free_result(MYSQL_STMT *stmt) {
@@ -1771,13 +1929,13 @@ my_bool mysql_stmt_free_result(MYSQL_STMT *stmt) {
 	return true;
 }
 
-
-
 my_bool mysql_stmt_reset(MYSQL_STMT *stmt) {
 	debugFunction();
 	stmt->result->sqlrcur->clearBinds();
 	return true;
 }
+
+
 
 int mysql_server_init(int argc, char **argv, char **groups) {
 	debugFunction();
