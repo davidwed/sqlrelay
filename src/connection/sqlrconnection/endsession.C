@@ -40,6 +40,12 @@ void sqlrconnection_svr::endSessionInternal() {
 		}
 	}
 
+	// FIXME: reset database/schema
+	// if (dbselected) {
+	// 	selectDatabase(originaldb)
+	// 	dbselected=false;
+	// }
+
 	// reset autocommit behavior
 	dbgfile.debugPrint("connection",2,"resetting autocommit behavior...");
 	if (autocommit) {

@@ -75,6 +75,9 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 		executeQueryUpdateStats(sdcur,sdquery,sdquerylen,true)) {
 		sdcur->cleanUpData(true,true);
 		retval=true;
+		// FIXME: set a flag indicating that the db has been changed
+		// so it can be reset when the session is done
+		// dbselected=true;
 	}
 	delete[] sdquery;
 	sdcur->closeCursor();
