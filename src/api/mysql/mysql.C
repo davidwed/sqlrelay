@@ -462,7 +462,13 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 void mysql_close(MYSQL *mysql) {
 	debugFunction();
 	if (mysql) {
-		mysql_stmt_close(mysql->currentstmt);
+		// It's tempting to call mysql_stmt_close here, but it calls
+		// mysql_free_result and the mysql client calls it manually
+		// before calling mysql_close(), so presumably that's what
+		// other apps will do too.
+		if (mysql->currentstmt) {
+			delete mysql->currentstmt;
+		}
 		delete mysql->sqlrcon;
 		if (mysql->deleteonclose) {
 			delete mysql;
@@ -1965,7 +1971,7 @@ my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 		// It would seem like we'd want to call mysql_free_result here,
 		// but the mysql client calls it manually before calling
 		// mysql_close(), so presumably that's how apps should act.
-		//mysql_free_result(stmt->result);
+		mysql_free_result(stmt->result);
 		delete stmt;
 	}
 	return true;

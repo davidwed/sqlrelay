@@ -82,6 +82,9 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 			}
 		}
 		table[tablelen]='\0';
+
+		// some apps aren't well behaved, trim spaces off of both sides
+		charstring::bothTrim(table);
 	}
 
 	// build the appropriate query
