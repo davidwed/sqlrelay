@@ -196,6 +196,8 @@ struct MYSQL_PARAMETERS {
 // This is the same for all versions of mysql that I've ever seen
 typedef char **MYSQL_ROW;
 
+struct MYSQL_STMT;
+
 struct MYSQL_RES {
 	sqlrcursor		*sqlrcur;
 	// don't call this errno, some systems have a macro for errno
@@ -208,6 +210,7 @@ struct MYSQL_RES {
 	MYSQL_FIELD_OFFSET	currentfield;
 	MYSQL_FIELD		*fields;
 	unsigned long		*lengths;
+	MYSQL_STMT		*stmtbackptr;
 };
 
 struct MYSQL_STMT {
@@ -462,13 +465,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 void mysql_close(MYSQL *mysql) {
 	debugFunction();
 	if (mysql) {
-		// It's tempting to call mysql_stmt_close here, but it calls
-		// mysql_free_result and the mysql client calls it manually
-		// before calling mysql_close(), so presumably that's what
-		// other apps will do too.
-		if (mysql->currentstmt) {
-			delete mysql->currentstmt;
-		}
+		mysql_stmt_close(mysql->currentstmt);
 		delete mysql->sqlrcon;
 		if (mysql->deleteonclose) {
 			delete mysql;
@@ -694,14 +691,11 @@ int mysql_drop_db(MYSQL *mysql, const char *db) {
 MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
 
 	debugFunction();
-
-	if (mysql->currentstmt && mysql->currentstmt->result) {
-		mysql_free_result(mysql->currentstmt->result);
-	}
 	mysql_stmt_close(mysql->currentstmt);
 
 	mysql->currentstmt=new MYSQL_STMT;
 	mysql->currentstmt->result=new MYSQL_RES;
+	mysql->currentstmt->result->stmtbackptr=NULL;
 	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
 	mysql->currentstmt->result->sqlrcur->copyReferences();
 	mysql->currentstmt->result->errorno=0;
@@ -719,14 +713,11 @@ MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
 MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 
 	debugFunction();
-
-	if (mysql->currentstmt && mysql->currentstmt->result) {
-		mysql_free_result(mysql->currentstmt->result);
-	}
 	mysql_stmt_close(mysql->currentstmt);
 
 	mysql->currentstmt=new MYSQL_STMT;
 	mysql->currentstmt->result=new MYSQL_RES;
+	mysql->currentstmt->result->stmtbackptr=NULL;
 	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
 	mysql->currentstmt->result->sqlrcur->copyReferences();
 	mysql->currentstmt->result->errorno=0;
@@ -746,15 +737,12 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 
 	debugFunction();
 	debugPrintf("%s\n",table);
-
-	if (mysql->currentstmt && mysql->currentstmt->result) {
-		mysql_free_result(mysql->currentstmt->result);
-	}
 	mysql_stmt_close(mysql->currentstmt);
 
 	MYSQL_STMT	*stmt=new MYSQL_STMT;
 	mysql->currentstmt=stmt;
 	stmt->result=new MYSQL_RES;
+	stmt->result->stmtbackptr=NULL;
 	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
 	stmt->result->sqlrcur->copyReferences();
 	stmt->result->errorno=0;
@@ -963,9 +951,6 @@ int mysql_read_query_result(MYSQL *mysql) {
 
 int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length) {
 	debugFunction();
-	if (mysql->currentstmt && mysql->currentstmt->result) {
-		mysql_free_result(mysql->currentstmt->result);
-	}
 	mysql_stmt_close(mysql->currentstmt);
 	mysql->currentstmt=mysql_prepare(mysql,query,length);
 	return mysql_stmt_execute(mysql->currentstmt);
@@ -1003,6 +988,15 @@ void mysql_free_result(MYSQL_RES *result) {
 		if (result->fields) {
 			delete[] result->fields;
 			delete[] result->lengths;
+		}
+
+		// if the result is attached to a stmt then set the stmt's
+		// result pointer to NULL, that way if someone calls
+		// mysql_free_result, followed by mysql_stmt_close then
+		// a double free won't occur but calling mysql_stmt_close on
+		// its own will free the result and close the stmt
+		if (result->stmtbackptr) {
+			result->stmtbackptr->result=NULL;
 		}
 		delete result;
 	}
@@ -1906,6 +1900,7 @@ MYSQL_STMT *mysql_stmt_init(MYSQL *mysql) {
 	debugFunction();
 	MYSQL_STMT	*stmt=new MYSQL_STMT;
 	stmt->result=new MYSQL_RES;
+	stmt->result->stmtbackptr=stmt;
 	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
 	stmt->result->sqlrcur->copyReferences();
 	stmt->result->errorno=0;
@@ -1968,9 +1963,6 @@ void mysql_stmt_data_seek(MYSQL_STMT *stmt, my_ulonglong offset) {
 my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 	debugFunction();
 	if (stmt) {
-		// It would seem like we'd want to call mysql_free_result here,
-		// but the mysql client calls it manually before calling
-		// mysql_close(), so presumably that's how apps should act.
 		mysql_free_result(stmt->result);
 		delete stmt;
 	}
