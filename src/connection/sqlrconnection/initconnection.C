@@ -341,7 +341,6 @@ bool sqlrconnection_svr::initCursors() {
 			//fprintf(stderr,"Couldn't create cursors.\n");
 			return false;
 		}
-//printf("opened cursor %d id=%d\n",i,cur[i]->id);
 	}
 
 	// end sid database session

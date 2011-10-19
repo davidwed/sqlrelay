@@ -1454,12 +1454,6 @@ bool oracle8cursor::queryIsNotSelect() {
 	return (stmttype!=OCI_STMT_SELECT);
 }
 
-bool oracle8cursor::queryIsCommitOrRollback() {
-	// apparantly in OCI8, the cursor type gets 
-	// set to 0 for both commits and rollbacks
-	return (!stmttype);
-}
-
 const char *oracle8cursor::errorMessage(bool *liveconnection) {
 
 	// get the message from oracle

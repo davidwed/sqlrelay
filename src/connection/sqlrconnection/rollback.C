@@ -7,7 +7,6 @@ void sqlrconnection_svr::rollbackCommand() {
 	dbgfile.debugPrint("connection",1,"rollback");
 	clientsock->write(rollback());
 	flushWriteBuffer();
-	commitorrollback=false;
 }
 
 bool sqlrconnection_svr::rollback() {
@@ -32,6 +31,10 @@ bool sqlrconnection_svr::rollback() {
 	char	string[38];
 	snprintf(string,38,"rollback result: %d",retval);
 	dbgfile.debugPrint("connection",2,string);
+
+	if (retval) {
+		commitorrollback=false;
+	}
 
 	return retval;
 }

@@ -7,7 +7,6 @@ void sqlrconnection_svr::commitCommand() {
 	dbgfile.debugPrint("connection",1,"commit");
 	clientsock->write(commit());
 	flushWriteBuffer();
-	commitorrollback=false;
 }
 
 bool sqlrconnection_svr::commit() {
@@ -32,6 +31,10 @@ bool sqlrconnection_svr::commit() {
 	char	string[36];
 	snprintf(string,36,"commit result: %d",retval);
 	dbgfile.debugPrint("connection",2,string);
+
+	if (retval) {
+		commitorrollback=false;
+	}
 
 	return retval;
 }

@@ -29,6 +29,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/newquery.C \
 	sqlrconnection/getlist.C \
 	sqlrconnection/handlequery.C \
+	sqlrconnection/rewritequery.C \
 	sqlrconnection/handleerror.C \
 	sqlrconnection/getbinds.C \
 	sqlrconnection/getsendcolumninfo.C \
@@ -94,6 +95,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/newquery.lo \
 	sqlrconnection/getlist.lo \
 	sqlrconnection/handlequery.lo \
+	sqlrconnection/rewritequery.lo \
 	sqlrconnection/handleerror.lo \
 	sqlrconnection/getbinds.lo \
 	sqlrconnection/getsendcolumninfo.lo \

@@ -124,11 +124,13 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 	dbgfile.debugPrint("connection",2,"processing query...");
 
-	// if the reexecute flag is set, the query doesn't need to be prepared 
-	// again.
 	bool	success=false;
 	bool	doegress=true;
 	if (reexecute) {
+
+		// if the reexecute flag is set, the query doesn't
+		// need to be prepared again...
+
 		dbgfile.debugPrint("connection",3,"re-executing...");
 		if (cursor->supportsNativeBinds()) {
 			if (cursor->sql_injection_detection_ingress(
@@ -162,7 +164,12 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			}
 			delete newquery;
 		}
+
 	} else if (bindcursor) {
+
+		// if the cursor is a bind cursor then we just need to
+		// execute, we don't need to worry about binds...
+
 		dbgfile.debugPrint("connection",3,"bind cursor...");
 		if (cursor->sql_injection_detection_ingress(
 						cursor->querybuffer)) {
@@ -174,13 +181,23 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 							cursor->querylength,
 							reallyexecute);
 		}
+
 	} else {
+
+		// otherwise, prepare and execute the query...
+
 		dbgfile.debugPrint("connection",3,"preparing/executing...");
 		if (cursor->sql_injection_detection_ingress(
 						cursor->querybuffer)) {
 			doegress=false;
 			success=true;
 		} else {
+
+			// FIXME: fake binds should be done here too
+			if (cursor->supportsNativeBinds()) {
+				rewriteQueryAndBinds(cursor);
+			}
+
 			success=cursor->prepareQuery(cursor->querybuffer,
 							cursor->querylength);
 			if (success) {
@@ -244,7 +261,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			performautocommit && commitorrollback) {
 		dbgfile.debugPrint("connection",3,"commit necessary...");
 		success=commit();
-		commitorrollback=false;
 	}
 
 	if (success) {

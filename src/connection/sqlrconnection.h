@@ -290,6 +290,15 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						bool reexecute,
 						bool bindcursor,
 						bool reallyexecute);
+		void	rewriteQueryAndBinds(sqlrcursor_svr *cursor);
+		bool	matchesBindFormat(const char *bind);
+		void	rewriteBind(sqlrcursor_svr *cursor,
+						stringbuffer *currentbind,
+						uint16_t bindindex,
+						stringbuffer *newquery);
+		void	replaceBind(sqlrcursor_svr *cursor,
+						const char *currentbind,
+						uint16_t bindindex);
 		void	commitOrRollback(sqlrcursor_svr *cursor);
 		bool	handleError(sqlrcursor_svr *cursor);
 		bool	returnError(sqlrcursor_svr *cursor);
