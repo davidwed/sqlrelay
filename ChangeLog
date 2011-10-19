@@ -2,6 +2,8 @@
 	updated mysql drop-in lib for mysql 5.2+ compatibility
 	applied Renat's patch to fix the client session count in the stats
 	added framework for getDbs/Tables/Columns and selectDatabase
+	added framework for rewriting queries and bind vars and dynamic
+		translation of one bind var format to another
 
 0.43 - updated ruby code build to take sitearch into account during includes
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9
