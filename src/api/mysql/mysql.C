@@ -1581,11 +1581,18 @@ int mysql_execute(MYSQL_STMT *stmt) {
 int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 	debugFunction();
 
+	// run the query
 	MYSQL_ROW	row=mysql_fetch_row(stmt->result);
 	if (!row) {
 		return MYSQL_NO_DATA;
 	}
 
+	// if there are no result binds, just return
+	if (!stmt->resultbinds) {
+		return 0;
+	}
+
+	// copy data into result binds
 	uint32_t	*lengths=stmt->result->sqlrcur->
 				getRowLengths(stmt->result->previousrow);
 
@@ -1915,6 +1922,7 @@ int mysql_stmt_prepare(MYSQL_STMT *stmt,
 	debugFunction();
 	debugPrintf(query);
 	debugPrintf("\n");
+	stmt->resultbinds=NULL;
 	stmt->result->sqlrcur->prepareQuery(query,length);
 	return 0;
 }
