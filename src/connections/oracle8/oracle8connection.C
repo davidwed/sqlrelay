@@ -1459,7 +1459,7 @@ const char *oracle8cursor::errorMessage(bool *liveconnection) {
 	// get the message from oracle
 	text	message[1024];
 	rawbuffer::zero((void *)message,sizeof(message));
-	sb4	errcode;
+	sb4	errcode=0;
 	OCIErrorGet((dvoid *)oracle8conn->err,1,
 			(text *)0,&errcode,
 			message,sizeof(message),

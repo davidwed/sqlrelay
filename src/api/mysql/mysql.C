@@ -2052,7 +2052,10 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 	unsigned long	paramcount=mysql_param_count(stmt);
 	for (unsigned long i=0; i<paramcount; i++) {
 
-		char		*variable=charstring::parseNumber((uint32_t)i);
+		// use 1-based index for variable names
+		char		*variable=
+				charstring::parseNumber((uint32_t)i+1);
+
 		sqlrcursor	*cursor=stmt->result->sqlrcur;
 		switch (bind[i].buffer_type) {
 			case MYSQL_TYPE_NULL: {
