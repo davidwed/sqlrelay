@@ -193,12 +193,9 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			success=true;
 		} else {
 
-			// FIXME: fake binds should be done here too
-			// arguably rewriting should occur even if we're
-			// faking
-			if (cursor->supportsNativeBinds()) {
-				rewriteQueryAndBinds(cursor);
-			}
+			rewriteQuery(cursor);
+			// FIXME: move fakeInputBinds into rewriteQuery
+			// it needs to be run before preparing for some db's
 
 			success=cursor->prepareQuery(cursor->querybuffer,
 							cursor->querylength);

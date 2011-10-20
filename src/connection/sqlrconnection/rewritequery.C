@@ -11,25 +11,40 @@ enum queryparsestate_t {
 	IN_BIND
 };
 
-void sqlrconnection_svr::rewriteQueryAndBinds(sqlrcursor_svr *cursor) {
+void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 
-/*printf("original:\n");
-printf("\t%s\n",cursor->querybuffer);
-printf("\tinput binds\n\t");
-for (uint16_t i=0; i<cursor->inbindcount; i++) {
-	printf("%s,",cursor->inbindvars[i].variable);
+	if (cursor->supportsNativeBinds()) {
+		nativizeBindVariables(cursor);
+	} else {
+		// FIXME: move fake bind code here
+	}
 }
-printf("\n");
-printf("\toutput binds\n\t");
-for (uint16_t i=0; i<cursor->outbindcount; i++) {
-	printf("%s,",cursor->outbindvars[i].variable);
-}
-printf("\n");*/
+
+void sqlrconnection_svr::nativizeBindVariables(sqlrcursor_svr *cursor) {
+
+	// debug
+	dbgfile.debugPrint("connection",1,"nativizing bind variables...");
+	dbgfile.debugPrint("connection",2,"original:");
+	dbgfile.debugPrint("connection",2,cursor->querybuffer);
+	dbgfile.debugPrint("connection",2,"input binds:");
+	if (dbgfile.debugEnabled()) {
+		for (uint16_t i=0; i<cursor->inbindcount; i++) {
+			dbgfile.debugPrint("connection",3,
+					cursor->inbindvars[i].variable);
+		}
+	}
+	dbgfile.debugPrint("connection",2,"output binds:");
+	if (dbgfile.debugEnabled()) {
+		for (uint16_t i=0; i<cursor->outbindcount; i++) {
+			dbgfile.debugPrint("connection",3,
+					cursor->outbindvars[i].variable);
+		}
+	}
 
 	// convert queries from whatever bind variable format they currently
 	// use to the format required by the database...
 
-	bool			rewrite=false;
+	bool			convert=false;
 	queryparsestate_t	parsestate=IN_QUERY;
 	stringbuffer	newquery;
 	stringbuffer	currentbind;
@@ -107,17 +122,17 @@ printf("\n");*/
 
 				// Bail if the current bind variable format
 				// matches the db bind format.
-				if (matchesBindFormat(
+				if (matchesNativeBindFormat(
 						currentbind.getString())) {
 					return;
 				}
 
 				// translate...
-				rewrite=true;
-				rewriteBind(cursor,
-						&currentbind,
-						bindindex,
-						&newquery);
+				convert=true;
+				replaceBindVariableInStringAndArray(cursor,
+								&currentbind,
+								bindindex,
+								&newquery);
 				bindindex++;
 
 				parsestate=IN_QUERY;
@@ -131,7 +146,7 @@ printf("\n");*/
 
 	} while (c<=endptr);
 
-	if (!rewrite) {
+	if (!convert) {
 		return;
 	}
 
@@ -146,21 +161,27 @@ printf("\n");*/
 	charstring::copy(cursor->querybuffer,newq,cursor->querylength);
 	cursor->querybuffer[cursor->querylength]='\0';
 
-/*printf("rewritten:\n");
-printf("\t%s\n",cursor->querybuffer);
-printf("\tinput binds\n\t");
-for (uint16_t i=0; i<cursor->inbindcount; i++) {
-	printf("%s,",cursor->inbindvars[i].variable);
-}
-printf("\n");
-printf("\toutput binds\n\t");
-for (uint16_t i=0; i<cursor->outbindcount; i++) {
-	printf("%s,",cursor->outbindvars[i].variable);
-}
-printf("\n");*/
+
+	// debug
+	dbgfile.debugPrint("connection",2,"converted:");
+	dbgfile.debugPrint("connection",2,cursor->querybuffer);
+	dbgfile.debugPrint("connection",2,"input binds:");
+	if (dbgfile.debugEnabled()) {
+		for (uint16_t i=0; i<cursor->inbindcount; i++) {
+			dbgfile.debugPrint("connection",3,
+					cursor->inbindvars[i].variable);
+		}
+	}
+	dbgfile.debugPrint("connection",2,"output binds:");
+	if (dbgfile.debugEnabled()) {
+		for (uint16_t i=0; i<cursor->outbindcount; i++) {
+			dbgfile.debugPrint("connection",3,
+					cursor->outbindvars[i].variable);
+		}
+	}
 }
 
-bool sqlrconnection_svr::matchesBindFormat(const char *bind) {
+bool sqlrconnection_svr::matchesNativeBindFormat(const char *bind) {
 
 	const char	*bindformat=bindFormat();
 	size_t		bindformatlen=charstring::length(bindformat);
@@ -184,10 +205,11 @@ bool sqlrconnection_svr::matchesBindFormat(const char *bind) {
 		(bindformat[1]=='*' && !character::isAlphanumeric(bind[1]))));
 }
 
-void sqlrconnection_svr::rewriteBind(sqlrcursor_svr *cursor,
-					stringbuffer *currentbind,
-					uint16_t bindindex,
-					stringbuffer *newquery) {
+void sqlrconnection_svr::replaceBindVariableInStringAndArray(
+						sqlrcursor_svr *cursor,
+						stringbuffer *currentbind,
+						uint16_t bindindex,
+						stringbuffer *newquery) {
 
 	const char	*bindformat=bindFormat();
 	size_t		bindformatlen=charstring::length(bindformat);
@@ -198,7 +220,7 @@ void sqlrconnection_svr::rewriteBind(sqlrcursor_svr *cursor,
 	if (bindformatlen==1) {
 
 		// replace bind variable itself with number
-		replaceBind(cursor,NULL,bindindex);
+		replaceBindVariableInArray(cursor,NULL,bindindex);
 
 	} else if (bindformat[1]=='1' &&
 			!charstring::isNumber(currentbind->getString()+1)) {
@@ -207,7 +229,9 @@ void sqlrconnection_svr::rewriteBind(sqlrcursor_svr *cursor,
 		newquery->append(bindindex);
 
 		// replace bind variable itself with number
-		replaceBind(cursor,currentbind->getString(),bindindex);
+		replaceBindVariableInArray(cursor,
+					currentbind->getString(),
+					bindindex);
 
 	} else {
 
@@ -222,13 +246,16 @@ void sqlrconnection_svr::rewriteBind(sqlrcursor_svr *cursor,
 			newquery->append(bindindex);
 
 			// replace bind variable itself with number
-			replaceBind(cursor,currentbind->getString(),bindindex);
+			replaceBindVariableInArray(cursor,
+						currentbind->getString(),
+						bindindex);
 		}
 	}
 }
 
-void sqlrconnection_svr::replaceBind(sqlrcursor_svr *cursor,
-				const char *currentbind, uint16_t bindindex) {
+void sqlrconnection_svr::replaceBindVariableInArray(sqlrcursor_svr *cursor,
+						const char *currentbind,
+						uint16_t bindindex) {
 
 	// run two passes
 	for (uint16_t i=0; i<2; i++) {
