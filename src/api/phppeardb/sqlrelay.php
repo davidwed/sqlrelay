@@ -16,7 +16,7 @@
 // | Author: David Muse <david.muse@firstworks.com>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlrelay.php,v 1.27 2011-06-23 04:18:45 mused Exp $
+// $Id: sqlrelay.php,v 1.28 2011-10-20 15:27:49 mused Exp $
 //
 // Database independent query interface definition for PHP's SQLRelay
 // extension.
@@ -44,13 +44,11 @@ class DB_sqlrelay extends DB_common
 
     var $connection;
     var $identity = "";
-    var $bindformat = "";
     var $phptype = "sqlrelay";
     var $dbsyntax = "sqlrelay";
     var $autocommit = false;
     var $fetchmode = DB_FETCHMODE_ORDERED; /* Default fetch mode */
     var $affectedrows = 0;
-    var $prepare_types = array();
     var $is_select = array();
     var $features = array(
             'prepare' => true,
@@ -210,12 +208,6 @@ class DB_sqlrelay extends DB_common
             $this->identity = sqlrcon_identify($this->connection);
         }
 
-        if ($this->bindformat == "") {
-echo("bindformat is ".$this->bindformat."\n");
-            $this->bindformat = sqlrcon_bindFormat($this->connection);
-echo("bindformat is ".$this->bindformat."\n");
-        }
-
         $cursor = sqlrcur_alloc($this->connection);
 
         if ($this->options['portability'] & DB_PORTABILITY_LOWERCASE) {
@@ -228,42 +220,6 @@ echo("bindformat is ".$this->bindformat."\n");
         }
 
         sqlrcur_setResultSetBufferSize($cursor,100);
-
-        # handle ?-delimited bind variables by rewriting the query and creating
-        # : or @ delimited variables
-        # for db's which already uses ?-delimited variables, we don't need
-        # to do this...
-        if ($this->bindformat == "?") {
-            $newquery = $query;
-        } else {
-            $paramindex = 0;
-            $newquery = '';
-            $types = array();
-            $inquotes = false;
-            for ($i = 0; $i < strlen($query); $i++) {
-                if ($query[$i] == '\'') {
-                    $inquotes = !$inquotes;
-                } else if (($query[$i] == '?' || $query[$i] == '&') &&
-                                                            !$inquotes) {
-                    if ($query[$i] == '?') {
-                        $types[$paramindex] = DB_PARAM_SCALAR;
-                    } else {
-                        $types[$paramindex] = DB_PARAM_OPAQUE;
-                    }
-                    if ($this->bindformat == "@*") {
-                        $newquery .= "@bind" . $paramindex;
-                    } else if ($this->bindformat == "$1") {
-                        $newquery .= "$" . ($paramindex+1);
-                    } else {
-                        $newquery .= ":bind" . $paramindex;
-                    }
-                    $paramindex++;
-                    continue;
-                }
-                $newquery .= $query[$i];
-            }        
-            $this->prepare_types[(int)$cursor] = $types;
-        }
 
         $this->is_select[(int)$cursor] = $this->isSelect($newquery);
 
@@ -349,7 +305,6 @@ echo("bindformat is ".$this->bindformat."\n");
             return $this->raiseError(DB_ERROR_NEED_MORE_DATA);
         }
         $first = true;
-        $pgbindindex = 1;
         switch ($mode) {
             case DB_AUTOQUERY_INSERT:
                 $values = '';
@@ -362,14 +317,7 @@ echo("bindformat is ".$this->bindformat."\n");
                         $values .= ',';
                     }
                     $names .= $value;
-                    if ($this->bindformat == "@*") {
-                        $values .= "@$value";
-                    } else if ($this->bindformat == "$1") {
-                        $values .= "$" . $pgbindindex;
-                        $pgbindindex++;
-                    } else {
-                        $values .= ":$value";
-                    }
+                    $values .= ":$value";
                 }
                 return "INSERT INTO $table ($names) VALUES ($values)";
             case DB_AUTOQUERY_UPDATE:
@@ -381,14 +329,7 @@ echo("bindformat is ".$this->bindformat."\n");
                         $set .= ',';
                     }
                     # FIXME: handle other db formats too
-                    if ($this->bindformat == "@*") {
-                        $set .= "$value = @$value";
-                    } else if ($this->bindformat == "$1") {
-                        $set .= "$value = $" . $pgbindindex;
-                        $pgbindindex++;
-                    } else {
-                        $set .= "$value = :$value";
-                    }
+                    $set .= "$value = :$value";
                 }
                 $sql = "UPDATE $table SET $set";
                 if ($where) {
@@ -424,34 +365,7 @@ echo("bindformat is ".$this->bindformat."\n");
 
         sqlrcur_clearBinds($sqlrcursor->cursor);
 
-        # handle ?/& binds...
-        $types=&$this->prepare_types[(int)$sqlrcursor->cursor];
-        $typessize = sizeof($types);
-        if ($typessize > 0 && $typessize != sizeof($data)) {
-            return $this->raiseError(DB_ERROR_MISMATCH);
-        }
-
-        for ($i = 0; $i < $typessize; $i++) {
-            if (is_array($data)) {
-                $pdata[$i] = &$data[$i];
-            } else {
-                $pdata[$i] = &$data;
-            }
-            if ($types[$i] == DB_PARAM_OPAQUE) {
-                $fp = fopen($pdata[$i], "r");
-                $pdata[$i] = '';
-                if ($fp) {
-                    while (($buf = fread($fp, 4096)) != false) {
-                        $pdata[$i] .= $buf;
-                    }
-                }
-            }
-
-            sqlrcur_inputBind($sqlrcursor->cursor,"bind" . $i, $pdata[$i]);
-        }
-
-        # handle native SQL Relay binds...
-        if (!$typessize && $data) {
+        if ($data) {
             foreach ($data as $index=>$value) {
                 sqlrcur_inputBind($sqlrcursor->cursor, $index, $value);
             }
@@ -525,7 +439,6 @@ echo("bindformat is ".$this->bindformat."\n");
     function freeResult(&$sqlrcursor)
     {
         if (is_resource($sqlrcursor)) {
-            unset($this->prepare_types[(int)$sqlrcursor->cursor]);
             unset($this->is_select[(int)$sqlrcursor->cursor]);
             sqlrcur_free($sqlrcursor->cursor);
         }

@@ -130,10 +130,6 @@ sub prepare {
 	# get parameters
 	my ($dbh, $statement, @attribs)=@_;
 
-	# Convert format of bind vars from std DBI
-	my $count = 0;
-	$statement =~ s/\?/":" . ++$count/eg;
-
 	# create a blank statement handle
 	my $sth=DBI::_new_sth($dbh,{'Statement'=>$statement});
 	
@@ -147,7 +143,6 @@ sub prepare {
 	# store statement-specific data in the statement handle
 	#$sth->STORE('driver_params',[]);
 	$sth->STORE('driver_database_handle',$dbh);
-	$sth->STORE('NUM_OF_PARAMS', $count);
 	$sth->STORE('driver_is_select',($statement=~/^\s*select/i));
 	$sth->STORE('driver_cursor',$cursor);
 
