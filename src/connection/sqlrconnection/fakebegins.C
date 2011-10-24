@@ -19,6 +19,7 @@ bool sqlrconnection_svr::handleFakeBegin(sqlrcursor_svr *cursor) {
 	}
 
 	if (isBeginQuery(cursor)) {
+		fakeBegin();
 		cursor->inbindcount=0;
 		cursor->outbindcount=0;
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
@@ -50,13 +51,13 @@ bool sqlrconnection_svr::isBeginQuery(sqlrcursor_svr *cursor) {
 
 	} else if (!charstring::compareIgnoringCase(ptr,"START ",6) ||
 		!charstring::compareIgnoringCase(ptr,"SET TRANSACTION",15)) {
-		fakeBegin();
 		return true;
 	}
 	return false;
 }
 
 bool sqlrconnection_svr::fakeBegin() {
+printf("faking begin\n");
 
 	// save the current autocommit state
 	fakebeginsautocommiton=autocommit;
@@ -69,11 +70,15 @@ bool sqlrconnection_svr::fakeBegin() {
 }
 
 bool sqlrconnection_svr::endFakeBegin() {
+printf("end fake begin\n");
 
 	// if we're faking begins and autocommit is on,
 	// reset autocommit behavior
 	if (fakebegins && fakebeginsautocommiton) {
+printf("resetting autocommit on\n");
 		return autoCommitOnInternal();
+	} else if (fakebegins && !fakebeginsautocommiton) {
+printf("resetting autocommit off\n");
 	}
 	return true;
 }

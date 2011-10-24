@@ -10,7 +10,6 @@ void sqlrconnection_svr::commitCommand() {
 }
 
 bool sqlrconnection_svr::commitInternal() {
-
 	if (commit()) {
 		endFakeBegin();
 		return true;
