@@ -5,8 +5,17 @@
 
 void sqlrconnection_svr::commitCommand() {
 	dbgfile.debugPrint("connection",1,"commit");
-	clientsock->write(commit());
+	clientsock->write(commitInternal());
 	flushWriteBuffer();
+}
+
+bool sqlrconnection_svr::commitInternal() {
+
+	if (commit()) {
+		endFakeBegin();
+		return true;
+	}
+	return false;
 }
 
 bool sqlrconnection_svr::commit() {

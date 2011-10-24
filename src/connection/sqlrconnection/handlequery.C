@@ -18,6 +18,41 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 		}
 	}
 
+	// handle fake begins
+	// FIXME: do we need to loop to detect downed db's somehow?
+	if (!reexecute && !bindcursor && handleFakeBegin(cursor)) {
+
+		dbgfile.debugPrint("connection",1,"query was fake begin...");
+
+		// indicate that no error has occurred
+		clientsock->write((uint16_t)NO_ERROR);
+
+		// send the client the id of the 
+		// cursor that it's going to use
+		clientsock->write(cursor->id);
+
+		// tell the client that this is not a
+		// suspended result set
+		clientsock->write((uint16_t)NO_SUSPENDED_RESULT_SET);
+
+		// row counts
+		sendRowCounts(cursor->knowsRowCount(),0,
+				cursor->knowsAffectedRows(),0);
+
+		// send column info or not
+		clientsock->write((uint16_t)DONT_SEND_COLUMN_INFO);
+
+		// column count
+		clientsock->write((uint32_t)0);
+
+		// no bind vars
+		clientsock->write((uint16_t)END_BIND_VARS);
+
+		dbgfile.debugPrint("connection",1,"done handling query...");
+
+		return 1;
+	}
+
 	// loop here to handle down databases
 	for (;;) {
 
@@ -124,6 +159,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 	dbgfile.debugPrint("connection",2,"processing query...");
 
+	bool	wasfakebegin=false;
 	bool	success=false;
 	bool	doegress=true;
 	if (reexecute) {
@@ -194,6 +230,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		} else {
 
 			rewriteQuery(cursor);
+
 			// FIXME: move fakeInputBinds into rewriteQuery
 			// it needs to be run before preparing for some db's
 
@@ -254,12 +291,14 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// On success, autocommit if necessary.
 	// Connection classes could override autoCommitOn() and autoCommitOff()
 	// to do database API-specific things, but will not set 
-	// checkautocommit, so this code won't get called at all for those 
+	// fakeautocommit, so this code won't get called at all for those 
 	// connections.
-	if (success && checkautocommit && isTransactional() && 
-			performautocommit && commitorrollback) {
+	// FIXME: when faking autocommit, a BEGIN on a db that supports them
+	// could get commit called immediately committed
+	if (success && fakeautocommit &&
+		isTransactional() && autocommit && commitorrollback) {
 		dbgfile.debugPrint("connection",3,"commit necessary...");
-		success=commit();
+		success=commitInternal();
 	}
 
 	if (success) {

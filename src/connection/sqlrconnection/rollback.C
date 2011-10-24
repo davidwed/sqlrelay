@@ -5,8 +5,17 @@
 
 void sqlrconnection_svr::rollbackCommand() {
 	dbgfile.debugPrint("connection",1,"rollback");
-	clientsock->write(rollback());
+	clientsock->write(rollbackInternal());
 	flushWriteBuffer();
+}
+
+bool sqlrconnection_svr::rollbackInternal() {
+
+	if (rollback()) {
+		endFakeBegin();
+		return true;
+	}
+	return false;
 }
 
 bool sqlrconnection_svr::rollback() {

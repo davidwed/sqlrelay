@@ -17,23 +17,31 @@ void sqlrconnection_svr::autoCommitCommand() {
 	if (clientsock->read(&on,idleclienttimeout,0)==sizeof(bool)) {
 		if (on) {
 			dbgfile.debugPrint("connection",2,"autocommit on");
-			clientsock->write(autoCommitOn());
+			clientsock->write(autoCommitOnInternal());
 		} else {
 			dbgfile.debugPrint("connection",2,"autocommit off");
-			clientsock->write(autoCommitOff());
+			clientsock->write(autoCommitOffInternal());
 		}
 	}
 	flushWriteBuffer();
 }
 
+bool sqlrconnection_svr::autoCommitOnInternal() {
+	autocommit=true;
+	return autoCommitOn();
+}
+
+bool sqlrconnection_svr::autoCommitOffInternal() {
+	autocommit=false;
+	return autoCommitOff();
+}
+
 bool sqlrconnection_svr::autoCommitOn() {
-	checkautocommit=true;
-	performautocommit=true;
+	fakeautocommit=true;
 	return true;
 }
 
 bool sqlrconnection_svr::autoCommitOff() {
-	checkautocommit=true;
-	performautocommit=false;
+	fakeautocommit=true;
 	return true;
 }

@@ -218,6 +218,7 @@ class oracle8connection : public sqlrconnection_svr {
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
 #endif
+		bool		supportsBegin();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		commit();

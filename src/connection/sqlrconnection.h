@@ -60,6 +60,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool	autoCommitOff();
 		virtual bool	commit();
 		virtual bool	rollback();
+		virtual bool	supportsBegin();
+		virtual void	setFakeBeginBehavior(bool fb);
 		virtual bool		selectDatabase(const char *database);
 		virtual const char	*selectDatabaseQuery();
 		virtual const char	*pingQuery();
@@ -227,8 +229,16 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	pingCommand();
 		void	identifyCommand();
 		void	autoCommitCommand();
+		bool	autoCommitOnInternal();
+		bool	autoCommitOffInternal();
+		bool	fakeBegin();
+		bool	handleFakeBegin(sqlrcursor_svr *cursor);
+		bool	isBeginQuery(sqlrcursor_svr *cursor);
+		bool	endFakeBegin();
 		void	commitCommand();
+		bool	commitInternal();
 		void	rollbackCommand();
+		bool	rollbackInternal();
 		void	dbVersionCommand();
 		void	serverVersionCommand();
 		void	bindFormatCommand();
@@ -351,9 +361,13 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		lastauthsuccess;
 
 		bool		commitorrollback;
+
 		bool		autocommit;
-		bool		checkautocommit;
-		bool		performautocommit;
+		bool		fakeautocommit;
+
+		bool		fakebegins;
+		bool		fakebeginsautocommiton;
+
 		int32_t		accepttimeout;
 		bool		suspendedsession;
 		bool		lastrowvalid;

@@ -52,6 +52,8 @@ void oracle8connection::handleConnectString() {
 	if (maxitembuffersize<MAX_BYTES_PER_CHAR) {
 		maxitembuffersize=MAX_BYTES_PER_CHAR;
 	}
+	setFakeBeginBehavior(!charstring::compare(
+				connectStringValue("fakebegins"),"yes"));
 }
 
 bool oracle8connection::logIn(bool printerrors) {
@@ -444,6 +446,10 @@ bool oracle8connection::changeUser(const char *newuser,
 bool oracle8connection::autoCommitOn() {
 	statementmode=OCI_COMMIT_ON_SUCCESS;
 	return true;
+}
+
+bool oracle8connection::supportsBegin() {
+	return false;
 }
 
 bool oracle8connection::autoCommitOff() {

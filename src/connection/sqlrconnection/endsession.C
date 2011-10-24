@@ -6,7 +6,6 @@
 void sqlrconnection_svr::endSessionCommand() {
 	dbgfile.debugPrint("connection",1,"end session");
 	endSessionInternal();
-	endSession();
 }
 
 void sqlrconnection_svr::endSession() {
@@ -31,11 +30,11 @@ void sqlrconnection_svr::endSessionInternal() {
 	if (isTransactional() && commitorrollback) {
 		if (cfgfl->getEndOfSessionCommit()) {
 			dbgfile.debugPrint("connection",2,"committing...");
-			commit();
+			commitInternal();
 			dbgfile.debugPrint("connection",2,"done committing...");
 		} else {
 			dbgfile.debugPrint("connection",2,"rolling back...");
-			rollback();
+			rollbackInternal();
 			dbgfile.debugPrint("connection",2,"done rolling back...");
 		}
 	}
@@ -59,6 +58,8 @@ void sqlrconnection_svr::endSessionInternal() {
 	}
 	dbgfile.debugPrint("connection",2,"done resetting autocommit behavior...");
 	dbgfile.debugPrint("connection",1,"done ending session");
+
+	endSession();
 }
 
 void sqlrconnection_svr::abortAllCursors() {

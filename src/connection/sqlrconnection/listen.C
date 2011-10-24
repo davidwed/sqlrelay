@@ -57,7 +57,7 @@ bool sqlrconnection_svr::listen() {
 				// session, roll it back and kill it
 				if (suspendedsession) {
 					if (isTransactional()) {
-						rollback();
+						rollbackInternal();
 					}
 					suspendedsession=false;
 				}

@@ -26,9 +26,13 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 	lastpasswordbuffer[0]='\0';
 	lastauthsuccess=false;
 
-	autocommit=0;
-	checkautocommit=0;
-	performautocommit=0;
+	commitorrollback=false;
+
+	autocommit=false;
+	fakeautocommit=false;
+
+	fakebegins=false;
+	fakebeginsautocommiton=false;
 
 	maxquerysize=0;
 	maxstringbindvaluelength=0;
