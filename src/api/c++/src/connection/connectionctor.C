@@ -37,6 +37,9 @@ sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 	// db version
 	dbversion=NULL;
 
+	// server version
+	serverversion=NULL;
+
 	// bind format
 	bindformat=NULL;
 
