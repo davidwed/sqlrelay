@@ -63,8 +63,7 @@ bool sqlrconnection_svr::isBeginQuery(sqlrcursor_svr *cursor) {
 		}
 		return false;
 
-	} else if (!charstring::compareIgnoringCase(ptr,"START ",6) ||
-		!charstring::compareIgnoringCase(ptr,"SET TRANSACTION",15)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"START ",6)) {
 		return true;
 	}
 	return false;

@@ -62,6 +62,9 @@ void firebirdconnection::handleConnectString() {
 		!charstring::compareIgnoringCase(autocom,"yes")));
 
 	charset=connectStringValue("charset");
+
+	setFakeBeginBehavior(!charstring::compare(
+				connectStringValue("fakebegins"),"yes"));
 }
 
 bool firebirdconnection::logIn(bool printerrors) {
@@ -141,6 +144,10 @@ void firebirdconnection::deleteCursor(sqlrcursor_svr *curs) {
 
 void firebirdconnection::logOut() {
 	isc_detach_database(error,&db);
+}
+
+bool firebirdconnection::supportsBegin() {
+	return false;
 }
 
 bool firebirdconnection::commit() {

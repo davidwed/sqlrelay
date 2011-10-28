@@ -294,6 +294,10 @@ const char *freetdsconnection::bindFormat() {
 	return "@*";
 }
 
+const char *freetdsconnection::beginQuery() {
+	return "BEGIN TRANSACTION";
+}
+
 char freetdsconnection::bindVariablePrefix() {
 	return '@';
 }

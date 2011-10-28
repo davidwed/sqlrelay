@@ -265,6 +265,10 @@ const char *sybaseconnection::bindFormat() {
 	return "@*";
 }
 
+const char *sybaseconnection::beginQuery() {
+	return "BEGIN TRANSACTION";
+}
+
 char sybaseconnection::bindVariablePrefix() {
 	return '@';
 }

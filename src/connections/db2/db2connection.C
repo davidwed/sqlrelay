@@ -30,6 +30,8 @@ void db2connection::handleConnectString() {
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 	lang=connectStringValue("lang");
+	setFakeBeginBehavior(!charstring::compare(
+				connectStringValue("fakebegins"),"yes"));
 }
 
 bool db2connection::logIn(bool printerrors) {
@@ -109,6 +111,10 @@ bool db2connection::autoCommitOff() {
 	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_OFF,
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
+}
+
+bool db2connection::supportsBegin() {
+	return false;
 }
 
 bool db2connection::commit() {

@@ -448,13 +448,13 @@ bool oracle8connection::autoCommitOn() {
 	return true;
 }
 
-bool oracle8connection::supportsBegin() {
-	return false;
-}
-
 bool oracle8connection::autoCommitOff() {
 	statementmode=OCI_DEFAULT;
 	return true;
+}
+
+bool oracle8connection::supportsBegin() {
+	return false;
 }
 
 bool oracle8connection::commit() {

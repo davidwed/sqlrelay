@@ -144,6 +144,7 @@ class sybaseconnection : public sqlrconnection_svr {
 		const char	*identify();
 		const char	*dbVersion();
 		const char	*bindFormat();
+		const char	*beginQuery();
 		char		bindVariablePrefix();
 		void		dropTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);

@@ -18,6 +18,10 @@ void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 	} else {
 		// FIXME: move fake bind code here
 	}
+
+	if (supportsBegin()) {
+		nativizeBegins(cursor);
+	}
 }
 
 void sqlrconnection_svr::nativizeBindVariables(sqlrcursor_svr *cursor) {
@@ -304,4 +308,31 @@ void sqlrconnection_svr::replaceBindVariableInArray(sqlrcursor_svr *cursor,
 			}
 		}
 	}
+}
+
+void sqlrconnection_svr::nativizeBegins(sqlrcursor_svr *cursor) {
+
+	if (!isBeginQuery(cursor)) {
+		return;
+	}
+
+	// debug
+	dbgfile.debugPrint("connection",1,"nativizing begin query...");
+	dbgfile.debugPrint("connection",2,"original:");
+	dbgfile.debugPrint("connection",2,cursor->querybuffer);
+
+	// translate query
+	const char	*beginquery=beginQuery();
+	cursor->querylength=charstring::length(beginquery);
+	charstring::copy(cursor->querybuffer,beginquery,cursor->querylength);
+	cursor->querybuffer[cursor->querylength]='\0';
+printf("rewriting query to: %s\n",cursor->querybuffer);
+
+	// debug
+	dbgfile.debugPrint("connection",2,"converted:");
+	dbgfile.debugPrint("connection",2,cursor->querybuffer);
+}
+
+const char *sqlrconnection_svr::beginQuery() {
+	return "BEGIN";
 }

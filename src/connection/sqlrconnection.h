@@ -65,6 +65,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool		selectDatabase(const char *database);
 		virtual const char	*selectDatabaseQuery();
 		virtual const char	*pingQuery();
+		virtual const char	*beginQuery();
 		virtual bool		ping();
 		virtual const char	*identify()=0;
 		virtual	const char	*dbVersion()=0;
@@ -314,6 +315,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						sqlrcursor_svr *cursor,
 						const char *currentbind,
 						uint16_t bindindex);
+		void	nativizeBegins(sqlrcursor_svr *cursor);
 		void	commitOrRollback(sqlrcursor_svr *cursor);
 		bool	handleError(sqlrcursor_svr *cursor);
 		bool	returnError(sqlrcursor_svr *cursor);

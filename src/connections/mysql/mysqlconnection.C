@@ -293,10 +293,8 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	columnnames=NULL;
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	usestmtprepare=true;
-	unsupportedbystmt.compile("^\\s*(((create|CREATE|drop|DROP)\\s+"
-			"(procedure|PROCEDURE|function|FUNCTION))|"
-			"(use|USE)|"
-			"(CALL|call)|(START|start)|(BEGIN|begin))\\s+");
+	unsupportedbystmt.compile(
+			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start)\\s+)|((begin|BEGIN)\\s*)");
 	unsupportedbystmt.study();
 	for (unsigned short index=0; index<MAX_SELECT_LIST_SIZE; index++) {
 		fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
