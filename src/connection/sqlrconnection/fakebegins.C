@@ -18,12 +18,26 @@ bool sqlrconnection_svr::handleFakeBegin(sqlrcursor_svr *cursor) {
 		return false;
 	}
 
+	// Intercept begins and handle them.  If we're faking begins, commit
+	// and rollback queries also need to be intercepted as well, otherwise
+	// the query will be sent directly to the db and endFakeBegin won't get
+	// called.
 	if (isBeginQuery(cursor)) {
 		fakeBegin();
 		cursor->inbindcount=0;
 		cursor->outbindcount=0;
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		return true;
+	} else if (isCommitQuery(cursor)) {
+		cursor->inbindcount=0;
+		cursor->outbindcount=0;
+		sendcolumninfo=DONT_SEND_COLUMN_INFO;
+		return commitInternal();
+	} else if (isRollbackQuery(cursor)) {
+		cursor->inbindcount=0;
+		cursor->outbindcount=0;
+		sendcolumninfo=DONT_SEND_COLUMN_INFO;
+		return rollbackInternal();
 	}
 	return false;
 }
@@ -57,7 +71,6 @@ bool sqlrconnection_svr::isBeginQuery(sqlrcursor_svr *cursor) {
 }
 
 bool sqlrconnection_svr::fakeBegin() {
-printf("faking begin\n");
 
 	// save the current autocommit state
 	fakebeginsautocommiton=autocommit;
@@ -70,15 +83,26 @@ printf("faking begin\n");
 }
 
 bool sqlrconnection_svr::endFakeBegin() {
-printf("end fake begin\n");
 
 	// if we're faking begins and autocommit is on,
 	// reset autocommit behavior
 	if (fakebegins && fakebeginsautocommiton) {
-printf("resetting autocommit on\n");
 		return autoCommitOnInternal();
 	} else if (fakebegins && !fakebeginsautocommiton) {
-printf("resetting autocommit off\n");
 	}
 	return true;
+}
+
+bool sqlrconnection_svr::isCommitQuery(sqlrcursor_svr *cursor) {
+	return !charstring::compareIgnoringCase(
+			cursor->skipWhitespaceAndComments(
+						cursor->querybuffer),
+			"commit",6);
+}
+
+bool sqlrconnection_svr::isRollbackQuery(sqlrcursor_svr *cursor) {
+	return !charstring::compareIgnoringCase(
+			cursor->skipWhitespaceAndComments(
+						cursor->querybuffer),
+			"rollback",8);
 }

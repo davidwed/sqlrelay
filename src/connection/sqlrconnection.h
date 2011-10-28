@@ -235,6 +235,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	handleFakeBegin(sqlrcursor_svr *cursor);
 		bool	isBeginQuery(sqlrcursor_svr *cursor);
 		bool	endFakeBegin();
+		bool	isCommitQuery(sqlrcursor_svr *cursor);
+		bool	isRollbackQuery(sqlrcursor_svr *cursor);
 		void	commitCommand();
 		bool	commitInternal();
 		void	rollbackCommand();
