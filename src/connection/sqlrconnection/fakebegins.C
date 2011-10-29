@@ -55,10 +55,13 @@ bool sqlrconnection_svr::isBeginQuery(sqlrcursor_svr *cursor) {
 	// something will follow it.
 	if (!charstring::compareIgnoringCase(ptr,"BEGIN",5)) {
 
-		// make sure there are only spaces or comments after the begin
+		// make sure there are only spaces, comments or the word "work"
+		// after the begin
 		const char	*spaceptr=
 				cursor->skipWhitespaceAndComments(ptr+5);
-		if (*spaceptr=='\0') {
+		
+		if (!charstring::compareIgnoringCase(spaceptr,"WORK",4) ||
+			*spaceptr=='\0') {
 			return true;
 		}
 		return false;

@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
+#include <rudiments/character.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/rawbuffer.h>
 
@@ -456,7 +457,6 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
 						user,passwd,0,1);
-//mysql->sqlrcon->debugOn();
 	mysql->sqlrcon->copyReferences();
 	mysql->currentstmt=NULL;
 	return mysql;
@@ -2077,8 +2077,46 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_TIME:
 			case MYSQL_TYPE_DATETIME:
 			case MYSQL_TYPE_NEWDATE: {
-				char	*value=(char *)bind[i].buffer;
-				cursor->inputBind(variable,value);
+				char		*value=(char *)bind[i].buffer;
+
+				// Find the length without trailing spaces...
+				//
+				// For char (not varchar) columns, mysql
+				// returns the number of bytes rather than
+				// characters as the size.  Since the column
+				// may support unicode characters, the size
+				// may be several times larger in bytes than
+				// characters.  For example, the size of a 20
+				// character column may be returned as 60 bytes.
+				//
+				// Some applications, like aubit4gl, use this
+				// info to size bind variables and space pad
+				// the variable out to that size.  For example,
+				// a bind variable which will be compared to a
+				// field of 20 characters could be 60 bytes long
+				// and right-padded out to 60 bytes with spaces.
+				//
+				// MySQL appears to properly compare the 60
+				// byte, space-padded variable to the column,
+				// but other db's do not.  All db's including
+				// mysql properly compare the fields with the
+				// trailing spaces removed.
+				//
+				// This appears to be safe with varchars as 
+				// well.  Even if you put 'hello ' in a
+				// varchar, then 'hello' appears to be equal to
+				// it.
+				uint32_t	valuelength=
+						charstring::length(value);
+				for (const char *ptr=value+valuelength-1;
+							ptr>value; ptr--) {
+					if (*ptr!=' ') {
+						valuelength=ptr-value+1;
+						break;
+					}
+				}
+
+				cursor->inputBind(variable,value,valuelength);
 				break;
 			}
 			case MYSQL_TYPE_DECIMAL:

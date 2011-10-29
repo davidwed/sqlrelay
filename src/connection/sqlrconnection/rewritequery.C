@@ -326,7 +326,6 @@ void sqlrconnection_svr::nativizeBegins(sqlrcursor_svr *cursor) {
 	cursor->querylength=charstring::length(beginquery);
 	charstring::copy(cursor->querybuffer,beginquery,cursor->querylength);
 	cursor->querybuffer[cursor->querylength]='\0';
-printf("rewriting query to: %s\n",cursor->querybuffer);
 
 	// debug
 	dbgfile.debugPrint("connection",2,"converted:");

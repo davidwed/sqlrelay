@@ -29,6 +29,10 @@
 		void	stringVar(bindvar *var,
 					const char *variable,
 					const char *value);
+		void	stringVar(bindvar *var,
+					const char *variable,
+					const char *value,
+					uint32_t valuesize);
 		void	integerVar(bindvar *var,
 					const char *variable,
 					int64_t value);

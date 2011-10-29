@@ -190,6 +190,16 @@ void sqlrcursor::inputBind(const char *variable, const char *value) {
 	}
 }
 
+void sqlrcursor::inputBind(const char *variable, const char *value,
+						uint32_t valuesize) {
+	if (inbindcount<MAXVAR && variable && variable[0]) {
+		stringVar(&inbindvars[inbindcount],variable,value,valuesize);
+		inbindvars[inbindcount].send=true;
+		dirtybinds=true;
+		inbindcount++;
+	}
+}
+
 void sqlrcursor::inputBind(const char *variable, int64_t value) {
 	if (inbindcount<MAXVAR && variable && variable[0]) {
 		integerVar(&inbindvars[inbindcount],variable,value);
@@ -303,6 +313,12 @@ void sqlrcursor::inputBinds(const char **variables, const double *values,
 
 void sqlrcursor::stringVar(bindvar *var, const char *variable,
 						const char *value) {
+	return stringVar(var,variable,value,charstring::length(value));
+}
+
+void sqlrcursor::stringVar(bindvar *var, const char *variable,
+						const char *value,
+						uint32_t valuesize) {
 
 	initVar(var,variable);
 
@@ -313,7 +329,7 @@ void sqlrcursor::stringVar(bindvar *var, const char *variable,
 		} else {
 			var->value.stringval=(char *)value;
 		}
-		var->valuesize=charstring::length(value);
+		var->valuesize=valuesize;
 		var->type=STRING_BIND;
 	} else {
 		var->type=NULL_BIND;

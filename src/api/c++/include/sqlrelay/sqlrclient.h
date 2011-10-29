@@ -245,6 +245,8 @@ class sqlrcursor {
 				// Define a substitution variable.
 
 		void	inputBind(const char *variable, const char *value);
+		void	inputBind(const char *variable, const char *value,
+							uint32_t valuelength);
 		void	inputBind(const char *variable, int64_t value);
 		void	inputBind(const char *variable, double value, 
 							uint32_t precision, 
