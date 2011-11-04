@@ -113,6 +113,10 @@ __END__
             # Returns a string representing the format
             # of the bind variables used in the db.
 
+
+        selectDatabase(database);
+            # Sets the current database/schema to "database"
+
         autoCommitOn();
             # Instructs the database to perform a commit
             # after every successful query.

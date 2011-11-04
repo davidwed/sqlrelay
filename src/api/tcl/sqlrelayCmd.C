@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.27 2009-07-09 04:33:44 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.28 2011-11-04 06:10:45 mused Exp $
  */
 
 #include <tcl.h>
@@ -73,6 +73,9 @@ void sqlrcurDelete(ClientData data) {
  *   $cur setCacheTtl ttl
  *   $cur getCacheFileName
  *   $cur cacheOff
+ *   $cur getDatabaseList wild
+ *   $cur getTableList wild
+ *   $cur getColumnList table wild
  *   $cur sendQuery query
  *   $cur sendQueryWithLength query length
  *   $cur sendFileQuery path filename
@@ -173,6 +176,9 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "setCacheTtl",
     "getCacheFileName",
     "cacheOff",
+    "getDatabaseList",
+    "getTableList",
+    "getColumnList",
     "sendQuery",
     "sendQueryWithLength",
     "sendFileQuery",
@@ -267,6 +273,9 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_setCacheTtl,
     SQLRCUR_getCacheFileName,
     SQLRCUR_cacheOff,
+    SQLRCUR_getDatabaseList,
+    SQLRCUR_getTableList,
+    SQLRCUR_getColumnList,
     SQLRCUR_sendQuery,
     SQLRCUR_sendQueryWithLength,
     SQLRCUR_sendFileQuery,
@@ -498,6 +507,48 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  return TCL_ERROR;
 	}
 	cur->cacheOff();
+	break;
+      }
+    case SQLRCUR_getDatabaseList:
+      {
+	int result = 0;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp,2, objv, "wild");
+	  return TCL_ERROR;
+	}
+	if (!(result = cur->getDatabaseList(Tcl_GetString(objv[2])))) {
+	  Tcl_AppendResult(interp,cur->errorMessage(),(char *)NULL);
+	  return TCL_ERROR;
+	}
+	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
+	break;
+      }
+    case SQLRCUR_getTableList:
+      {
+	int result = 0;
+	if (objc != 3) {
+	  Tcl_WrongNumArgs(interp,2, objv, "wild");
+	  return TCL_ERROR;
+	}
+	if (!(result = cur->getTableList(Tcl_GetString(objv[2])))) {
+	  Tcl_AppendResult(interp,cur->errorMessage(),(char *)NULL);
+	  return TCL_ERROR;
+	}
+	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
+	break;
+      }
+    case SQLRCUR_getColumnList:
+      {
+	int result = 0;
+	if (objc != 4) {
+	  Tcl_WrongNumArgs(interp,3, objv, "table wild");
+	  return TCL_ERROR;
+	}
+	if (!(result = cur->getColumnList(Tcl_GetString(objv[2]),Tcl_GetString(objv[3])))) {
+	  Tcl_AppendResult(interp,cur->errorMessage(),(char *)NULL);
+	  return TCL_ERROR;
+	}
+	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
 	break;
       }
     case SQLRCUR_sendQuery: 
@@ -1736,6 +1787,7 @@ void sqlrconDelete(ClientData data) {
  *  $con serverVersion
  *  $con clientVersion
  *  $con bindFormat
+ *  $con selectDatabase db
  *  $con autoCommit bool
  *  $con commit
  *  $con rollback
@@ -1761,6 +1813,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "serverVersion",
     "clientVersion",
     "bindFormat",
+    "selectDatabase",
     "autoCommit",
     "commit",
     "rollback",
@@ -1781,6 +1834,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_SERVERVERSION,
     SQLR_CLIENTVERSION,
     SQLR_BINDFORMAT,
+    SQLR_SELECTDATABASE,
     SQLR_AUTOCOMMIT,
     SQLR_COMMIT,
     SQLR_ROLLBACK,
@@ -1926,6 +1980,14 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     }
     Tcl_SetObjResult(interp,
 		     Tcl_NewStringObj(con->bindFormat(), -1));
+    break;
+  }
+  case SQLR_SELECTDATABASE: {
+    if (objc != 3) {
+      Tcl_WrongNumArgs(interp,2, objv, "db");
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp, Tcl_NewIntObj(con->selectDatabase(Tcl_GetString(objv[2]))));
     break;
   }
   case SQLR_AUTOCOMMIT: {

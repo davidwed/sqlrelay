@@ -57,6 +57,10 @@ bool
 sqlrconnection::ping()
 
 bool
+sqlrconnection::selectDatabase(database)
+		const char	*database
+
+bool
 sqlrconnection::autoCommitOn()
 
 bool

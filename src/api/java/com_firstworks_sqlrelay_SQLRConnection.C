@@ -150,6 +150,20 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_ping
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    selectDatabase
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_selectDatabase
+  (JNIEnv *env, jobject self, jstring database) {
+	char	*databasestring=conGetStringUTFChars(env,database,0);
+	bool	retval=getSqlrConnection(env,self)->
+				selectDatabase(databasestring);
+	conReleaseStringUTFChars(env,database,databasestring);
+	return (jboolean)retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    autoCommitOn
  * Signature: ()Z
  */

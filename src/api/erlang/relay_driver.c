@@ -382,6 +382,22 @@ int main() {
 			}
 		}
 
+		if (strcmp("selectDatabase", command) == TRUE) {
+			char database[2000];
+
+			// check number of arguments
+		    	if (arity != 1) return ERR_NUMBER_OF_ARGS;
+
+			// get input parameters
+			if (ei_decode_string(buf, &index, &database[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcon_selectDatabase(con, database); 	
+			ENCODE_VOID;   
+		}
+
 		if (strcmp("autoCommitOn", command) == TRUE) {
 			// check number of arguments
 		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
@@ -568,6 +584,58 @@ int main() {
 				ei_x_encode_string(&result, sqlrcur_getCacheFileName(cur))) {
 				return ERR_ENCODING_ARGS;
 			}
+		}
+
+		if (strcmp("getDatabaseList", command) == TRUE) {
+			char wild[2000];
+
+			// check number of arguments
+		    	if (arity != 1) return ERR_NUMBER_OF_ARGS;
+
+			// get input parameters
+			if (ei_decode_string(buf, &index, &wild[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcur_getDatabaseList(cur, wild); 	
+			ENCODE_VOID;   
+		}
+
+		if (strcmp("getTableList", command) == TRUE) {
+			char wild[2000];
+
+			// check number of arguments
+		    	if (arity != 1) return ERR_NUMBER_OF_ARGS;
+
+			// get input parameters
+			if (ei_decode_string(buf, &index, &wild[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcur_getTableList(cur, wild); 	
+			ENCODE_VOID;   
+		}
+
+		if (strcmp("getColumnList", command) == TRUE) {
+			char table[2000];
+			char wild[2000];
+
+			// check number of arguments
+		    	if (arity != 2) return ERR_NUMBER_OF_ARGS;
+
+			// get input parameters
+			if (ei_decode_string(buf, &index, &table[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_string(buf, &index, &wild[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcur_getColumnList(cur, table, wild); 	
+			ENCODE_VOID;   
 		}
 
 		if (strcmp("cacheOff", command) == TRUE) {

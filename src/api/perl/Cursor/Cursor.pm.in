@@ -181,7 +181,20 @@ __END__
         cacheOff();
             # Sets query caching off.
 
-
+        getDatabaseList(wild);
+            # Sends a query that returns a list of
+            # databases/schemas matching "wild".  If wild is empty
+            # or NULL then a list of all databases/schemas will be
+            # returned.
+        getTableList(wild);
+            # Sends a query that returns a list of tables
+            # matching "wild".  If wild is empty or NULL then
+            # a list of all tables will be returned.
+        getColumnList(table,wild);
+            # Sends a query that returns a list of columns
+            # in the table specified by the "table" parameter
+            # matching "wild".  If wild is empty or NULL then
+            # a list of all columns will be returned.
 
 
         # If you don't need to use substitution or bind variables

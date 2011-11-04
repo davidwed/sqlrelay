@@ -87,6 +87,8 @@ public class SQLRConnection {
 	public native String	bindFormat();
 
 
+	/** Sets the current database/schema to "database" */
+	public native boolean	selectDatabase(String database);
 	/** Instructs the database to perform a commit
 	 *  after every successful query. */
 	public native boolean	autoCommitOn();

@@ -82,6 +82,9 @@ const char	*sqlrcon_bindFormat(sqlrcon sqlrconref);
 			/* Returns a string representing the format
 			   of the bind variables used in the db. */
 
+int	sqlrcon_selectDatabase(sqlrcon sqlrconref, const char *database);
+			/* Sets the current database/schema to
+			   "database" */
 int	sqlrcon_autoCommitOn(sqlrcon sqlrconref);
 			/* Instructs the database to perform a commit
 			   after every successful query. */
@@ -171,6 +174,22 @@ const char	*sqlrcur_getCacheFileName(sqlrcur sqlrcurref);
 void	sqlrcur_cacheOff(sqlrcur sqlrcurref);
 			/* Sets query caching off. */
 
+
+int	sqlrcur_getDatabaseList(sqlrcur sqlrcurref, const char *wild);
+			/* Sends a query that returns a list of
+			   databases/schemas matching "wild".  If wild is empty
+			   or NULL then a list of all databases/schemas will be
+			   returned. */
+int	sqlrcur_getTableList(sqlrcur sqlrcurref, const char *wild);
+			/* Sends a query that returns a list of tables
+			   matching "wild".  If wild is empty or NULL then
+			   a list of all tables will be returned. */
+int	sqlrcur_getColumnList(sqlrcur sqlrcurref,
+				const char *table, const char *wild);
+			/* Sends a query that returns a list of columns
+			   in the table specified by the "table" parameter
+			   matching "wild".  If wild is empty or NULL then
+			   a list of all columns will be returned. */
 
 
 /* If you need to use substitution or bind variables, in your

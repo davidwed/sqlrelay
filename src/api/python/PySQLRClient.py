@@ -117,6 +117,13 @@ class sqlrconnection:
         """
         return CSQLRelay.bindFormat(self.connection)
 
+    def selectDatabase(self,database):
+        """
+        Sets the current database/schema to
+        "database"
+        """
+        return CSQLRelay.selectDatabase(self.connection,database)
+
     def autoCommitOn(self):
         """
         Instructs the database to perform a commit
@@ -274,6 +281,31 @@ class sqlrcursor:
         """
         return CSQLRelay.cacheOff(self.cursor)
 
+    def getDatabaseList(self,wild):
+        """
+        Sends a query that returns a list of
+        databases/schemas matching "wild".  If wild is empty
+        or NULL then a list of all databases/schemas will be
+        returned.
+        """
+        return CSQLRelay.setDatabaseList(self.cursor,wild)
+
+    def getTableList(self,wild):
+        """
+        Sends a query that returns a list of tables
+        matching "wild".  If wild is empty or NULL then
+        a list of all tables will be returned.
+        """
+        return CSQLRelay.setTableList(self.cursor,wild)
+
+    def getColumnList(sefl,table,wild):
+        """
+        Sends a query that returns a list of columns
+        in the table specified by the "table" parameter
+        matching "wild".  If wild is empty or NULL then
+        a list of all columns will be returned.
+        """
+        return CSQLRelay.setColumnList(self.cursor,table,wild)
 
     """
     If you don't need to use substitution or bind variables

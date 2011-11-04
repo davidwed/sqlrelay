@@ -170,6 +170,50 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_cacheOff
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getDatabaseList
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getDatabaseList
+  (JNIEnv *env, jobject self, jstring wild) {
+	char	*wildstring=curGetStringUTFChars(env,wild,0);
+	jboolean	retval=getSqlrCursor(env,self)->
+					getDatabaseList(wildstring);
+	curReleaseStringUTFChars(env,wild,wildstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getTableList
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getTableList
+  (JNIEnv *env, jobject self, jstring wild) {
+	char	*wildstring=curGetStringUTFChars(env,wild,0);
+	jboolean	retval=getSqlrCursor(env,self)->
+					getTableList(wildstring);
+	curReleaseStringUTFChars(env,wild,wildstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnList
+ * Signature: (Ljava/lang/String;Ljava/lang/String)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnList
+  (JNIEnv *env, jobject self, jstring table, jstring wild) {
+	char	*tablestring=curGetStringUTFChars(env,table,0);
+	char	*wildstring=curGetStringUTFChars(env,wild,0);
+	jboolean	retval=getSqlrCursor(env,self)->
+					getColumnList(tablestring,wildstring);
+	curReleaseStringUTFChars(env,table,tablestring);
+	curReleaseStringUTFChars(env,wild,wildstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    sendQuery
  * Signature: (Ljava/lang/String;)Z
  */

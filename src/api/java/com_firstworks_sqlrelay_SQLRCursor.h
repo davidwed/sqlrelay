@@ -105,6 +105,30 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_cacheOff
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getDatabaseList
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getDatabaseList
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getTableList
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getTableList
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnList
+ * Signature: (Ljava/lang/String;Ljava/lang/String)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnList
+  (JNIEnv *, jobject, jstring, jstring);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    sendQuery
  * Signature: (Ljava/lang/String;)Z
  */

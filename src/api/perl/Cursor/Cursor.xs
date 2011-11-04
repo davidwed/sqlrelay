@@ -67,6 +67,19 @@ void
 sqlrcursor::cacheOff()
 
 bool
+sqlrcursor::getDatabaseList(wild)
+		const char *wild
+
+bool
+sqlrcursor::getTableList(wild)
+		const char *wild
+
+bool
+sqlrcursor::getColumnList(table,wild)
+		const char *table
+		const char *wild
+
+bool
 sqlrcursor::sendQuery(query)
 		const char *query
 

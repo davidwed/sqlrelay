@@ -113,6 +113,13 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_bindFormat
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    selectDatabase
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_selectDatabase (JNIEnv *env, jobject self, jstring database);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    autoCommitOn
  * Signature: ()Z
  */

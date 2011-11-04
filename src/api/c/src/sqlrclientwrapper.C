@@ -69,6 +69,10 @@ const char *sqlrcon_bindFormat(sqlrcon sqlrconref) {
 	return sqlrconref->bindFormat();
 }
 
+int sqlrcon_selectDatabase(sqlrcon sqlrconref, const char *database) {
+	return sqlrconref->selectDatabase(database);
+}
+
 int sqlrcon_autoCommitOn(sqlrcon sqlrconref) {
 	return sqlrconref->autoCommitOn();
 }
@@ -154,6 +158,19 @@ const char *sqlrcur_getCacheFileName(sqlrcur sqlrcurref) {
 
 void sqlrcur_cacheOff(sqlrcur sqlrcurref) {
 	sqlrcurref->cacheOff();
+}
+
+int sqlrcur_getDatabaseList(sqlrcur sqlrcurref, const char *wild) {
+	return sqlrcurref->getDatabaseList(wild);
+}
+
+int sqlrcur_getTableList(sqlrcur sqlrcurref, const char *wild) {
+	return sqlrcurref->getTableList(wild);
+}
+
+int sqlrcur_getColumnList(sqlrcur sqlrcurref,
+				const char *table, const char *wild) {
+	return sqlrcurref->getColumnList(table,wild);
 }
 
 int sqlrcur_sendQuery(sqlrcur sqlrcurref, const char *query) {

@@ -143,6 +143,12 @@ static VALUE sqlrcon_bindFormat(VALUE self) {
 	}
 }
 
+static VALUE sqlrcon_selectDatabase(VALUE self, VALUE db) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	return INT2NUM(sqlrcon->selectDatabase(STR2CSTR(db)));
+}
+
 static VALUE sqlrcon_autoCommitOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -219,6 +225,8 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_clientVersion,0);
 	rb_define_method(csqlrconnection,"bindFormat",
 				(CAST)sqlrcon_bindFormat,0);
+	rb_define_method(csqlrconnection,"selectDatabase",
+				(CAST)sqlrcon_selectDatabase,1);
 	rb_define_method(csqlrconnection,"autoCommitOn",
 				(CAST)sqlrcon_autoCommitOn,0);
 	rb_define_method(csqlrconnection,"autoCommitOff",
@@ -330,6 +338,24 @@ static VALUE sqlrcur_cacheOff(VALUE self) {
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	sqlrcur->cacheOff();
 	return Qnil;
+}
+
+static VALUE sqlrcur_getDatabaseList(VALUE self, VALUE wild) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	return INT2NUM(sqlrcur->getDatabaseList(STR2CSTR(wild)));
+}
+
+static VALUE sqlrcur_getTableList(VALUE self, VALUE wild) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	return INT2NUM(sqlrcur->getTableList(STR2CSTR(wild)));
+}
+
+static VALUE sqlrcur_getColumnList(VALUE self, VALUE table, VALUE wild) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	return INT2NUM(sqlrcur->getColumnList(STR2CSTR(table),STR2CSTR(wild)));
 }
 
 static VALUE sqlrcur_sendQuery(VALUE self, VALUE query) {
@@ -1119,6 +1145,12 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_getCacheFileName,0);
 	rb_define_method(csqlrcursor,"cacheOff",
 				(CAST)sqlrcur_cacheOff,0);
+	rb_define_method(csqlrcursor,"getDatabaseList",
+				(CAST)sqlrcur_getDatabaseList,1);
+	rb_define_method(csqlrcursor,"getTableList",
+				(CAST)sqlrcur_getTableList,1);
+	rb_define_method(csqlrcursor,"getColumnList",
+				(CAST)sqlrcur_getColumnList,2);
 	rb_define_method(csqlrcursor,"sendQuery",
 				(CAST)sqlrcur_sendQuery,1);
 	rb_define_method(csqlrcursor,"sendQueryWithLength",

@@ -195,6 +195,18 @@ static PyObject *bindFormat(PyObject *self, PyObject *args) {
   return Py_BuildValue("s", rc);
 }
 
+static PyObject *selectDatabase(PyObject *self, PyObject *args) {
+  char *db;
+  long sqlrcon;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcon, &db))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrconnection *)sqlrcon)->selectDatabase(db);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", (short)rc);
+}
+
 static PyObject *autoCommitOn(PyObject *self, PyObject *args) {
   long sqlrcon;
   bool rc;
@@ -386,6 +398,43 @@ static PyObject *cacheOff(PyObject *self, PyObject *args) {
     return NULL;
   ((sqlrcursor *)sqlrcur)->cacheOff();
   return Py_BuildValue("h", 0);
+}
+
+static PyObject *getDatabaseList(PyObject *self, PyObject *args) {
+  char *wild;
+  long sqlrcur;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &wild))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrcursor *)sqlrcur)->getDatabaseList(wild);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *getTableList(PyObject *self, PyObject *args) {
+  char *wild;
+  long sqlrcur;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcur, &wild))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrcursor *)sqlrcur)->getTableList(wild);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *getColumnList(PyObject *self, PyObject *args) {
+  char *table;
+  char *wild;
+  long sqlrcur;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "lss", &sqlrcur, &table, &wild))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrcursor *)sqlrcur)->getColumnList(table, wild);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *sendQuery(PyObject *self, PyObject *args) {
@@ -1639,6 +1688,7 @@ static PyMethodDef SQLRMethods[] = {
   {"serverVersion", serverVersion, METH_VARARGS},
   {"clientVersion", clientVersion, METH_VARARGS},
   {"bindFormat", bindFormat, METH_VARARGS},
+  {"selectDatabase", selectDatabase, METH_VARARGS},
   {"autoCommitOn", autoCommitOn, METH_VARARGS},
   {"autoCommitOff", autoCommitOff, METH_VARARGS},
   {"commit", commit, METH_VARARGS},
@@ -1659,6 +1709,9 @@ static PyMethodDef SQLRMethods[] = {
   {"setCacheTtl", setCacheTtl, METH_VARARGS},
   {"getCacheFileName", getCacheFileName, METH_VARARGS},
   {"cacheOff", cacheOff, METH_VARARGS},
+  {"getDatabaseList", getDatabaseList, METH_VARARGS},
+  {"getTableList", getTableList, METH_VARARGS},
+  {"getColumnList", getColumnList, METH_VARARGS},
   {"sendQuery", sendQuery, METH_VARARGS},
   {"sendQueryWithLength", sendQueryWithLength, METH_VARARGS},
   {"sendFileQuery", sendFileQuery, METH_VARARGS},

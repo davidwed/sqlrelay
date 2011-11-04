@@ -394,6 +394,58 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_cacheoff) {
 	}
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcur_getdatabaselist) {
+	zval **sqlrcur,**wild;
+	bool r;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&wild) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_string_ex(wild);
+	sqlrcursor *cursor=NULL;
+	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
+	if (cursor) {
+		r=cursor->getDatabaseList((*wild)->value.str.val);
+		RETURN_LONG(r);
+	}
+	RETURN_LONG(0);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_gettablelist) {
+	zval **sqlrcur,**wild;
+	bool r;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcur,&wild) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_string_ex(wild);
+	sqlrcursor *cursor=NULL;
+	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
+	if (cursor) {
+		r=cursor->getTableList((*wild)->value.str.val);
+		RETURN_LONG(r);
+	}
+	RETURN_LONG(0);
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnlist) {
+	zval **sqlrcur,**table,**wild;
+	bool r;
+	if (ZEND_NUM_ARGS() != 3 || 
+		zend_get_parameters_ex(3,&sqlrcur,&table,&wild) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_string_ex(table);
+	convert_to_string_ex(wild);
+	sqlrcursor *cursor=NULL;
+	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
+	if (cursor) {
+		r=cursor->getColumnList((*table)->value.str.val,(*wild)->value.str.val);
+		RETURN_LONG(r);
+	}
+	RETURN_LONG(0);
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcur_sendquery) {
 	zval **sqlrcur,**query;
 	bool r;
@@ -1819,6 +1871,23 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_ping) {
 	RETURN_LONG(0);
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcon_selectdatabase) {
+	zval **sqlrcon,**database;
+	bool r;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcon,&database) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_string_ex(database);
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		r=connection->selectDatabase((*database)->value.str.val);
+		RETURN_LONG(r);
+	}
+	RETURN_LONG(0);
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcon_autocommiton) {
 	zval **sqlrcon;
 	bool r;
@@ -1998,6 +2067,9 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcur_setcachettl,NULL)
 	ZEND_FE(sqlrcur_getcachefilename,NULL)
 	ZEND_FE(sqlrcur_cacheoff,NULL)
+	ZEND_FE(sqlrcur_getdatabaselist,NULL)
+	ZEND_FE(sqlrcur_gettablelist,NULL)
+	ZEND_FE(sqlrcur_getcolumnlist,NULL)
 	ZEND_FE(sqlrcur_sendquery,NULL)
 	ZEND_FE(sqlrcur_sendquerywithlength,NULL)
 	ZEND_FE(sqlrcur_sendfilequery,NULL)
@@ -2066,6 +2138,7 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcur_resumecachedresultset,NULL)
 	ZEND_FE(sqlrcon_ping,NULL)
 	ZEND_FE(sqlrcon_identify,NULL)
+	ZEND_FE(sqlrcon_selectdatabase,NULL)
 	ZEND_FE(sqlrcon_autocommiton,NULL)
 	ZEND_FE(sqlrcon_autocommitoff,NULL)
 	ZEND_FE(sqlrcon_commit,NULL)
