@@ -732,6 +732,15 @@ MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 	return retval;
 }
 
+bool isTrue(const char *value) {
+	return (value &&
+		(value[0]=='y' ||
+		value[0]=='Y' ||
+		value[0]=='t' ||
+		value[0]=='T' ||
+		value[0]=='1'));
+}
+
 MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 				const char *table, const char *wild) {
 
@@ -769,22 +778,21 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 
 			fields[i].name=const_cast<char *>(
 					sqlrcur->getField(i,(uint32_t)0));
-			fields[i].table=const_cast<char *>("");
+			fields[i].table=const_cast<char *>(table);
 			fields[i].def=const_cast<char *>(
-					sqlrcur->getField(i,(uint32_t)4));
+					sqlrcur->getField(i,(uint32_t)7));
 
 			#if defined(COMPAT_MYSQL_4_0) || \
 				defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
-  			fields[i].org_table=const_cast<char *>("");
+  			fields[i].org_table=fields[i].table;
   			fields[i].db=const_cast<char *>("");
 			#if defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
   			fields[i].catalog=const_cast<char *>("");
-  			fields[i].org_name=const_cast<char *>(
-						sqlrcur->getColumnName(i));
+  			fields[i].org_name=fields[i].name;
 			fields[i].name_length=
 				charstring::length(fields[i].name);
 			fields[i].org_name_length=
@@ -812,38 +820,37 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			fields[i].type=columntype;
 
 			// determine the length...
-
-			// if the length is in parentheses, use that.
-			const char	*leftparen=
-				charstring::findFirst(columntypestring,"(");
-			if (leftparen) {
-				fields[i].length=
-					charstring::toInteger(leftparen+1);
+			// use the length provided in the length column,
+			// otherwise use precision(+2 for negative sign
+			// and decimal point), otherwise fall back to 50
+			unsigned int	len=0;
+			if (sqlrcur->getFieldLength(i,(uint32_t)2)) {
+				len=sqlrcur->getFieldAsInteger(i,(uint32_t)2);
+			} else if (sqlrcur->getFieldLength(i,(uint32_t)3)) {
+				len=sqlrcur->getFieldAsInteger(i,(uint32_t)3)+2;
 			} else {
-				// no parentheses..
-				// FIXME: find a better way to do this
-				fields[i].length=50;
+				len=50;
 			}
+			fields[i].length=len;
 
 			// no good way to set this
 			fields[i].max_length=fields[i].length;
 
 			// figure out the flags
 			unsigned int	flags=0;
-			if (!charstring::compare(
-					sqlrcur->getField(i,2),"YES")) {
+			if (isTrue(sqlrcur->getField(i,5))) {
 				#define NOT_NULL_FLAG	1
 				flags|=NOT_NULL_FLAG;
 			}
-			if (!charstring::compare(
-					sqlrcur->getField(i,3),"YES")) {
+			if (isTrue(sqlrcur->getField(i,6))) {
 				#define PRI_KEY_FLAG	2
 				flags|=PRI_KEY_FLAG;
 			}
 			// FIXME: the Extra field might have other flags in it
 
-			// FIXME: fix this somehow
-			fields[i].decimals=0;
+			// set the number of decimal places (scale)
+			fields[i].decimals=
+				sqlrcur->getFieldAsInteger(i,(uint32_t)4);
 		}
 
 		// set the field count
@@ -1557,7 +1564,6 @@ enum enum_field_types map_col_type(const char *columntype) {
 	size_t		columntypelen=charstring::length(columntype);
 
 	// sometimes column types have parentheses, like CHAR(40)
-	// especially when they come back from mysql_list_fields
 	const char	*leftparen=charstring::findFirst(columntype,"(");
 	if (leftparen) {
 		columntypelen=leftparen-columntype;
@@ -2078,45 +2084,7 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_DATETIME:
 			case MYSQL_TYPE_NEWDATE: {
 				char		*value=(char *)bind[i].buffer;
-
-				// Find the length without trailing spaces...
-				//
-				// For char (not varchar) columns, mysql
-				// returns the number of bytes rather than
-				// characters as the size.  Since the column
-				// may support unicode characters, the size
-				// may be several times larger in bytes than
-				// characters.  For example, the size of a 20
-				// character column may be returned as 60 bytes.
-				//
-				// Some applications, like aubit4gl, use this
-				// info to size bind variables and space pad
-				// the variable out to that size.  For example,
-				// a bind variable which will be compared to a
-				// field of 20 characters could be 60 bytes long
-				// and right-padded out to 60 bytes with spaces.
-				//
-				// MySQL appears to properly compare the 60
-				// byte, space-padded variable to the column,
-				// but other db's do not.  All db's including
-				// mysql properly compare the fields with the
-				// trailing spaces removed.
-				//
-				// This appears to be safe with varchars as 
-				// well.  Even if you put 'hello ' in a
-				// varchar, then 'hello' appears to be equal to
-				// it.
-				uint32_t	valuelength=
-						charstring::length(value);
-				for (const char *ptr=value+valuelength-1;
-							ptr>value; ptr--) {
-					if (*ptr!=' ') {
-						valuelength=ptr-value+1;
-						break;
-					}
-				}
-
-				cursor->inputBind(variable,value,valuelength);
+				cursor->inputBind(variable,value);
 				break;
 			}
 			case MYSQL_TYPE_DECIMAL:

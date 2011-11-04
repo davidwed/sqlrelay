@@ -498,8 +498,11 @@ const char *oracle8connection::getTableListQuery(bool wild) {
 
 const char *oracle8connection::getColumnListQuery(bool wild) {
 	return (wild)? "select "
-			"	column_name as field, "
-			"	data_type || '(' || data_length || ')' as type, "
+			"	column_name, "
+			"	data_type, "
+			"	data_length, "
+			"	data_precision, "
+			"	data_scale, "
 			"	nullable, "
 			"	'' as key, "
 			"	data_default, "
@@ -514,8 +517,11 @@ const char *oracle8connection::getColumnListQuery(bool wild) {
 			"	column_id":
 
 			"select "
-			"	column_name as field, "
-			"	data_type || '(' || data_length || ')' as type, "
+			"	column_name, "
+			"	data_type, "
+			"	data_length, "
+			"	data_precision, "
+			"	data_scale, "
 			"	nullable, "
 			"	'' as key, "
 			"	data_default, "

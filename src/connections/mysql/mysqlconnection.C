@@ -230,7 +230,37 @@ const char *mysqlconnection::getTableListQuery(bool wild) {
 }
 
 const char *mysqlconnection::getColumnListQuery(bool wild) {
-	return (wild)?"show columns in %s like '%s'":"show columns in %s";
+	return (wild)?"select "
+			"	column_name, "
+			"	data_type, "
+			"	character_maximum_length, "
+			"	numeric_precision, "
+			"	numeric_scale, "
+			"	is_nullable, "
+			"	column_key, "
+			"	column_default, "
+			"	extra "
+			"from "
+			"	information_schema.columns "
+			"where "
+			"	table_name='%s' "
+			"	and "
+			"	column_name like '%s'"
+			:
+			"select "
+			"	column_name, "
+			"	data_type, "
+			"	character_maximum_length, "
+			"	numeric_precision, "
+			"	numeric_scale, "
+			"	is_nullable, "
+			"	column_key, "
+			"	column_default, "
+			"	extra "
+			"from "
+			"	information_schema.columns "
+			"where "
+			"	table_name='%s' ";
 }
 
 bool mysqlconnection::isTransactional() {
