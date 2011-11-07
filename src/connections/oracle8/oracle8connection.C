@@ -1138,6 +1138,7 @@ void oracle8cursor::returnOutputBindClob(uint16_t index) {
 
 void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 
+printf("check for temp table\n");
 	char	*ptr=(char *)query;
 	char	*endptr=(char *)query+length;
 
@@ -1162,10 +1163,12 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 		ptr++;
 	}
 
+printf("found: %s\n",tablename.getString());
 	// append to list of temp tables
 	// check for "on commit preserve rows" otherwise assume
 	// "on commit delete rows"
 	if (preserverows.match(ptr)) {
+printf("truncatng\n");
 		conn->addSessionTempTableForTrunc(tablename.getString());
 	}
 }

@@ -325,7 +325,7 @@ my_bool mysql_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind);
 my_bool mysql_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bind);
 int mysql_execute(MYSQL_STMT *stmt);
 static void processFields(MYSQL_STMT *stmt);
-enum enum_field_types map_col_type(const char *columntype);
+enum enum_field_types map_col_type(const char *columntype, int64_t scale);
 unsigned long mysql_param_count(MYSQL_STMT *stmt);
 MYSQL_RES *mysql_param_result(MYSQL_STMT *stmt);
 int mysql_fetch(MYSQL_STMT *stmt);
@@ -457,6 +457,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
 						user,passwd,0,1);
+//mysql->sqlrcon->debugOn();
 	mysql->sqlrcon->copyReferences();
 	mysql->currentstmt=NULL;
 	return mysql;
@@ -815,8 +816,9 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			// figure out the column type
 			const char	*columntypestring=
 						sqlrcur->getField(i,1);
+			int64_t		scale=sqlrcur->getFieldAsInteger(i,4);
 			enum enum_field_types	columntype=
-					map_col_type(columntypestring);
+					map_col_type(columntypestring,scale);
 			fields[i].type=columntype;
 
 			// determine the length...
@@ -849,8 +851,7 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			// FIXME: the Extra field might have other flags in it
 
 			// set the number of decimal places (scale)
-			fields[i].decimals=
-				sqlrcur->getFieldAsInteger(i,(uint32_t)4);
+			fields[i].decimals=scale;
 		}
 
 		// set the field count
@@ -1558,7 +1559,7 @@ static enum enum_field_types	mysqltypemap[]={
 	MYSQL_TYPE_STRING,
 };
 
-enum enum_field_types map_col_type(const char *columntype) {
+enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 	debugFunction();
 
 	size_t		columntypelen=charstring::length(columntype);
@@ -1573,7 +1574,19 @@ enum enum_field_types map_col_type(const char *columntype) {
 		if (!charstring::compareIgnoringCase(
 						datatypestring[index],
 						columntype,columntypelen)) {
-			return mysqltypemap[index];
+
+			enum_field_types	retval=mysqltypemap[index];
+
+			// Some DB's, like oracle, don't distinguish between
+			// float and integer types, they just have a numeric
+			// field which may or may not have decimal points.
+			// Those fields types get translated to "decimal"
+			// but if there are 0 decimal points, then we need to
+			// translate them to an integer type here.
+			if (retval==MYSQL_TYPE_DECIMAL && !scale) {
+				retval=MYSQL_TYPE_LONG;
+			}
+			return retval;
 		}
 	}
 	return MYSQL_TYPE_NULL;
@@ -1781,8 +1794,9 @@ static void processFields(MYSQL_STMT *stmt) {
 			// figure out the column type
 			const char	*columntypestring=
 						sqlrcur->getColumnType(i);
+			int64_t	scale=sqlrcur->getColumnScale(i);
 			enum enum_field_types	columntype=
-					map_col_type(columntypestring);
+					map_col_type(columntypestring,scale);
 			fields[i].type=columntype;
 
 			fields[i].length=sqlrcur->getColumnLength(i);
@@ -1856,7 +1870,7 @@ static void processFields(MYSQL_STMT *stmt) {
 			//#define UNIQUE_FLAG	65536
 			fields[i].flags=flags;
 
-			fields[i].decimals=sqlrcur->getColumnPrecision(i);
+			fields[i].decimals=scale;
 		}
 
 		// set the field count
