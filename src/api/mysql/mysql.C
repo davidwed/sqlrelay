@@ -1138,6 +1138,14 @@ unsigned int mysql_warning_count(MYSQL *mysql) {
 
 unsigned int mysql_errno(MYSQL *mysql) {
 	debugFunction();
+
+	// The database's error number isn't currently passed back to the
+	// client or mapped to a mysql error number, so if any error message
+	// is returned then return CR_UNKNOWN_ERROR, otherwise fall back to
+	// whatever the errorno is set to, which will most likely be 0
+	if (mysql_error(mysql)[0]) {
+		return CR_UNKNOWN_ERROR;
+	}
 	if (mysql && mysql->currentstmt && mysql->currentstmt->result) {
 		return mysql->currentstmt->result->errorno;
 	}
@@ -2001,6 +2009,14 @@ my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 
 unsigned int mysql_stmt_errno(MYSQL_STMT *stmt) {
 	debugFunction();
+
+	// The database's error number isn't currently passed back to the
+	// client or mapped to a mysql error number, so if any error message
+	// is returned then return CR_UNKNOWN_ERROR, otherwise fall back to
+	// whatever the errorno is set to, which will most likely be 0.
+	if (mysql_stmt_error(stmt)[0]) {
+		return CR_UNKNOWN_ERROR;
+	}
 	return stmt->result->errorno;
 }
 
