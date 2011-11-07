@@ -15,7 +15,7 @@
 
 extern "C" {
 
-//#define DEBUG_MESSAGES 1
+#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
 	#define debugPrintf(args...) printf(args); fflush(stdout);
@@ -214,9 +214,12 @@ struct MYSQL_RES {
 	MYSQL_STMT		*stmtbackptr;
 };
 
+struct MYSQL;
+
 struct MYSQL_STMT {
 	MYSQL_RES	*result;
 	MYSQL_BIND	*resultbinds;
+	MYSQL		*mysql;
 };
 
 struct MYSQL {
@@ -226,7 +229,7 @@ struct MYSQL {
 	sqlrconnection	*sqlrcon;
 	MYSQL_STMT	*currentstmt;
 	bool		deleteonclose;
-	const char	*error;
+	char		*error;
 	int		errorno;
 };
 
@@ -381,6 +384,8 @@ void mysql_server_end();
 void mysql_library_end();
 
 static int unknownError(MYSQL *mysql);
+static void setMySQLError(MYSQL *mysql,
+			const char *error, unsigned int errorno);
 
 
 
@@ -457,7 +462,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
 						user,passwd,0,1);
-//mysql->sqlrcon->debugOn();
+mysql->sqlrcon->debugOn();
 	mysql->sqlrcon->copyReferences();
 	mysql->currentstmt=NULL;
 	return mysql;
@@ -468,6 +473,7 @@ void mysql_close(MYSQL *mysql) {
 	if (mysql) {
 		mysql_stmt_close(mysql->currentstmt);
 		delete mysql->sqlrcon;
+		setMySQLError(mysql,NULL,0);
 		if (mysql->deleteonclose) {
 			delete mysql;
 		}
@@ -1138,30 +1144,14 @@ unsigned int mysql_warning_count(MYSQL *mysql) {
 
 unsigned int mysql_errno(MYSQL *mysql) {
 	debugFunction();
-
-	// The database's error number isn't currently passed back to the
-	// client or mapped to a mysql error number, so if any error message
-	// is returned then return CR_UNKNOWN_ERROR, otherwise fall back to
-	// whatever the errorno is set to, which will most likely be 0
-	if (mysql_error(mysql)[0]) {
-		return CR_UNKNOWN_ERROR;
-	}
-	if (mysql && mysql->currentstmt && mysql->currentstmt->result) {
-		return mysql->currentstmt->result->errorno;
-	}
+	debugPrintf("errno: %d\n",mysql->errorno);
 	return mysql->errorno;
 }
 
 const char *mysql_error(MYSQL *mysql) {
 	debugFunction();
-	const char	*err;
-	if (mysql && mysql->currentstmt && mysql->currentstmt->result &&
-					mysql->currentstmt->result->sqlrcur) {
-		err=mysql->currentstmt->result->sqlrcur->errorMessage();
-	} else {
-		err=mysql->error;
-	}
-	return (err)?err:"";
+	debugPrintf("error: %s\n",mysql->error);
+	return (mysql->error)?mysql->error:"";
 }
 
 const char *mysql_sqlstate(MYSQL *mysql) {
@@ -1934,6 +1924,7 @@ my_bool mysql_send_long_data(MYSQL_STMT *stmt,
 MYSQL_STMT *mysql_stmt_init(MYSQL *mysql) {
 	debugFunction();
 	MYSQL_STMT	*stmt=new MYSQL_STMT;
+	stmt->mysql=mysql;
 	stmt->result=new MYSQL_RES;
 	stmt->result->stmtbackptr=stmt;
 	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
@@ -1958,6 +1949,8 @@ int mysql_stmt_prepare(MYSQL_STMT *stmt,
 int mysql_stmt_execute(MYSQL_STMT *stmt) {
 	debugFunction();
 
+	setMySQLError(stmt->mysql,NULL,0);
+
 	stmt->result->previousrow=0;
 	stmt->result->currentrow=0;
 	stmt->result->currentfield=0;
@@ -1965,6 +1958,12 @@ int mysql_stmt_execute(MYSQL_STMT *stmt) {
 
 	int	retval=!sqlrcur->executeQuery();
 	processFields(stmt);
+
+	if (retval) {
+		setMySQLError(stmt->mysql,
+				sqlrcur->errorMessage(),
+				CR_UNKNOWN_ERROR);
+	}
 	return retval;
 }
 
@@ -2009,20 +2008,12 @@ my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 
 unsigned int mysql_stmt_errno(MYSQL_STMT *stmt) {
 	debugFunction();
-
-	// The database's error number isn't currently passed back to the
-	// client or mapped to a mysql error number, so if any error message
-	// is returned then return CR_UNKNOWN_ERROR, otherwise fall back to
-	// whatever the errorno is set to, which will most likely be 0.
-	if (mysql_stmt_error(stmt)[0]) {
-		return CR_UNKNOWN_ERROR;
-	}
-	return stmt->result->errorno;
+	return mysql_errno(stmt->mysql);
 }
 
 const char *mysql_stmt_error(MYSQL_STMT *stmt) {
 	debugFunction();
-	return stmt->result->sqlrcur->errorMessage();
+	return mysql_error(stmt->mysql);
 }
 
 my_ulonglong mysql_stmt_insert_id(MYSQL_STMT *stmt) {
@@ -2227,9 +2218,14 @@ void mysql_library_end() {
 }
 
 int unknownError(MYSQL *mysql) {
-	mysql->errorno=CR_UNKNOWN_ERROR;
-	mysql->error="Unknown MySQL error";
+	setMySQLError(mysql,"Unknown MySQL error",CR_UNKNOWN_ERROR);
 	return CR_UNKNOWN_ERROR;
+}
+
+void setMySQLError(MYSQL *mysql, const char *error, unsigned int errorno) {
+	mysql->errorno=errorno;
+	delete[] mysql->error;
+	mysql->error=charstring::duplicate(error);
 }
 
 }
