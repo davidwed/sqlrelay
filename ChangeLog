@@ -4,6 +4,10 @@
 	added framework for getDbs/Tables/Columns and selectDatabase
 	added framework for rewriting queries and bind vars and dynamic
 		translation of one bind var format to another
+	added feature to emulate transaction blocks in databases that don't
+		support them
+	added feature to drop temporary tables at the end of the session for
+		oracle
 
 0.43 - updated ruby code build to take sitearch into account during includes
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9
