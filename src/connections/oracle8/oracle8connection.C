@@ -54,6 +54,11 @@ void oracle8connection::handleConnectString() {
 	}
 	setFakeBeginBehavior(!charstring::compare(
 				connectStringValue("fakebegins"),"yes"));
+
+#ifdef HAVE_ORACLE_8i
+	droptemptables=!charstring::compare(
+				connectStringValue("droptemptables"),"yes");
+#endif
 }
 
 bool oracle8connection::logIn(bool printerrors) {
@@ -1138,7 +1143,6 @@ void oracle8cursor::returnOutputBindClob(uint16_t index) {
 
 void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 
-printf("check for temp table\n");
 	char	*ptr=(char *)query;
 	char	*endptr=(char *)query+length;
 
@@ -1163,12 +1167,11 @@ printf("check for temp table\n");
 		ptr++;
 	}
 
-printf("found: %s\n",tablename.getString());
-	// append to list of temp tables
-	// check for "on commit preserve rows" otherwise assume
-	// "on commit delete rows"
-	if (preserverows.match(ptr)) {
-printf("truncatng\n");
+	if (oracle8conn->droptemptables) {
+		// if "droptemptables" was specified...
+		conn->addSessionTempTableForDrop(tablename.getString());
+	} else if (!preserverows.match(ptr)) {
+		// if "on commit preserve rows" was not specified...
 		conn->addSessionTempTableForTrunc(tablename.getString());
 	}
 }

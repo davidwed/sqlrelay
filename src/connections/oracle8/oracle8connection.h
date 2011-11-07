@@ -254,6 +254,10 @@ class oracle8connection : public sqlrconnection_svr {
 		ub4		fetchatonce;
 		ub4		maxselectlistsize;
 		ub4		maxitembuffersize;
+
+#ifdef HAVE_ORACLE_8i
+		bool		droptemptables;
+#endif
 };
 
 #endif
