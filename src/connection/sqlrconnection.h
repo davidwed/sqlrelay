@@ -303,7 +303,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						bool reexecute,
 						bool bindcursor,
 						bool reallyexecute);
-		void	rewriteQuery(sqlrcursor_svr *cursor);
+		void	rewriteQueryInternal(sqlrcursor_svr *cursor);
 		void	nativizeBindVariables(sqlrcursor_svr *cursor);
 		bool	matchesNativeBindFormat(const char *bind);
 		void	replaceBindVariableInStringAndArray(
@@ -415,9 +415,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		stringlist	transtemptablesfordrop;
 		stringlist	transtemptablesfortrunc;
 
-		uint32_t	maxquerysize;
-		uint32_t	maxstringbindvaluelength;
-		uint32_t	maxlobbindvaluelength;
 		int32_t		idleclienttimeout;
 
 		bool		decrementonclose;
@@ -427,6 +424,12 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		stringbuffer	*debugstr;
 		debugfile	dbgfile;
+
+	public:
+		// derived cursor classess may need to access these
+		uint32_t	maxquerysize;
+		uint32_t	maxstringbindvaluelength;
+		uint32_t	maxlobbindvaluelength;
 };
 
 

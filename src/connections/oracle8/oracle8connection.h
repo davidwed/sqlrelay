@@ -62,6 +62,7 @@ class oracle8cursor : public sqlrcursor_svr {
 				~oracle8cursor();
 		bool		openCursor(uint16_t id);
 		bool		closeCursor();
+		void		rewriteQuery();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		inputBindString(const char *variable, 
@@ -198,6 +199,7 @@ class oracle8cursor : public sqlrcursor_svr {
 
 #ifdef HAVE_ORACLE_8i
 		regularexpression	preserverows;
+		regularexpression	deleterows;
 #endif
 };
 	
@@ -259,6 +261,7 @@ class oracle8connection : public sqlrconnection_svr {
 
 #ifdef HAVE_ORACLE_8i
 		bool		droptemptables;
+		bool		temptablespreserverows;
 #endif
 };
 

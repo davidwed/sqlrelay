@@ -58,6 +58,9 @@ void oracle8connection::handleConnectString() {
 #ifdef HAVE_ORACLE_8i
 	droptemptables=!charstring::compare(
 				connectStringValue("droptemptables"),"yes");
+	temptablespreserverows=!charstring::compare(
+				connectStringValue("temptablespreserverows"),
+				"yes");
 #endif
 }
 
@@ -471,6 +474,40 @@ bool oracle8connection::changeUser(const char *newuser,
 }
 #endif
 
+void oracle8cursor::rewriteQuery() {
+
+	// for now, the only rewriting we're doing here has to do with
+	// creating temp tables
+	if (!oracle8conn->temptablespreserverows) {
+		return;
+	}
+
+	// skip whitespace and comments
+	const char	*ptr=skipWhitespaceAndComments(querybuffer);
+	if (!(*ptr)) {
+		return;
+	}
+
+	// bail if this isn't a create temporary table query
+	if (!createtemp.match(ptr)) {
+		return;
+	}
+
+	// bail if the query has an on-commit clause already
+	if (preserverows.match(ptr) || deleterows.match(ptr)) {
+		return;
+	}
+
+	// bail if there isn't enough room to append a new on-commit clause
+	if (querylength+25>conn->maxquerysize) {
+		return;
+	}
+
+	// append an "on commit preserve rows" clause
+	charstring::append(querybuffer," on commit preserve rows");
+	querylength=querylength+24;
+}
+
 bool oracle8connection::autoCommitOn() {
 	statementmode=OCI_COMMIT_ON_SUCCESS;
 	return true;
@@ -614,6 +651,7 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 #ifdef HAVE_ORACLE_8i
 	createtemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
+	deleterows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(delete|DELETE)[ \\t\\n\\r]+(rows|ROWS)");
 	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
 #endif
 }
@@ -1169,9 +1207,9 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 	char	*ptr=(char *)query;
 	char	*endptr=(char *)query+length;
 
-	// skip any leading comments
-	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
-		!skipWhitespace(&ptr,endptr)) {
+	// skip any leading whitespace and comments
+	ptr=skipWhitespaceAndComments(query);
+	if (!(*ptr)) {
 		return;
 	}
 

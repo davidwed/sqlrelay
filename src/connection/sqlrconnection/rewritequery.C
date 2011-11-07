@@ -11,7 +11,7 @@ enum queryparsestate_t {
 	IN_BIND
 };
 
-void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
+void sqlrconnection_svr::rewriteQueryInternal(sqlrcursor_svr *cursor) {
 
 	if (cursor->supportsNativeBinds()) {
 		nativizeBindVariables(cursor);
@@ -22,6 +22,9 @@ void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 	if (supportsBegin()) {
 		nativizeBegins(cursor);
 	}
+
+	// run database-specific rewrites
+	cursor->rewriteQuery();
 }
 
 void sqlrconnection_svr::nativizeBindVariables(sqlrcursor_svr *cursor) {

@@ -40,6 +40,7 @@ class sqlrcursor_svr {
 		virtual	bool	openCursor(uint16_t id);
 		virtual	bool	closeCursor();
 
+		virtual void	rewriteQuery();
 		virtual	bool	prepareQuery(const char *query,
 						uint32_t length);
 		virtual	bool	supportsNativeBinds();
@@ -160,19 +161,18 @@ class sqlrcursor_svr {
 		virtual bool	sql_injection_detection_check_db(
 							const char *sid_db);
 	
-
 	protected:
-		regularexpression	createtemp;
-
 		// methods/variables used by derived classes
-		stringbuffer	*fakeInputBinds(const char *query);
-
 		bool	skipComment(char **ptr, const char *endptr);
 		bool	skipWhitespace(char **ptr, const char *endptr);
+		char	*skipWhitespaceAndComments(const char *querybuffer);
+		stringbuffer	*fakeInputBinds(const char *query);
+
 		bool	advance(char **ptr, const char *endptr,
 						uint16_t steps);
 
 		sqlrconnection_svr	*conn;
+		regularexpression	createtemp;
 
 		// variables for SID
 		bool	ingress_mode;
@@ -191,6 +191,9 @@ class sqlrcursor_svr {
 
 		bool	sid_egress;
 
+		char		*querybuffer;
+		uint32_t	querylength;
+
 		uint16_t	inbindcount;
 		bindvar_svr	inbindvars[MAXVAR];
 		uint16_t	outbindcount;
@@ -203,10 +206,7 @@ class sqlrcursor_svr {
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
 		void	abort();
-		char	*skipWhitespaceAndComments(const char *querybuffer);
 
-		char		*querybuffer;
-		uint32_t	querylength;
 		uint64_t	querysec;
 		uint64_t	queryusec;
 

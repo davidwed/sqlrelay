@@ -159,7 +159,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 	dbgfile.debugPrint("connection",2,"processing query...");
 
-	bool	wasfakebegin=false;
 	bool	success=false;
 	bool	doegress=true;
 	if (reexecute) {
@@ -229,7 +228,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			success=true;
 		} else {
 
-			rewriteQuery(cursor);
+			rewriteQueryInternal(cursor);
 
 			// FIXME: move fakeInputBinds into rewriteQuery
 			// it needs to be run before preparing for some db's
