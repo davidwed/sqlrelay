@@ -242,6 +242,9 @@ uint16_t	sqlrcur_countBindVariables(sqlrcur sqlrcurref);
 
 void	sqlrcur_inputBindString(sqlrcur sqlrcurref, 
 				const char *variable, const char *value);
+void	sqlrcur_inputBindStringWithLength(sqlrcur sqlrcurref, 
+				const char *variable,
+				const char *value, uint32_t valuelength);
 void	sqlrcur_inputBindLong(sqlrcur sqlrcurref, const char *variable, 
 							int64_t value);
 void	sqlrcur_inputBindDouble(sqlrcur sqlrcurref, 

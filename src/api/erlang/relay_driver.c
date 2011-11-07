@@ -883,6 +883,30 @@ int main() {
 			ENCODE_VOID;
 		}
 
+		if (strcmp("inputBindStringWithLength", command) == TRUE) {
+			char variable[2000];
+			char value[2000];
+			long length;
+
+			// check number of arguments
+		    	if (arity != 3) return ERR_NUMBER_OF_ARGS;
+
+			// get input parameters
+			if (ei_decode_string(buf, &index, &variable[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_string(buf, &index, &value[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_long(buf, &index, &length)) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcur_inputBindStringWithLength(cur, variable, value, length); 	
+			ENCODE_VOID;
+		}
+
 
 		if (strcmp("inputBindLong", command) == TRUE) {
 			char variable[2000];

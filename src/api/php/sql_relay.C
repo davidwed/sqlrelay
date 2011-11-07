@@ -613,14 +613,19 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_countbindvariables) {
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_inputbind) {
-	zval **sqlrcur,**variable,**value,**precision,**scale;
+	zval **sqlrcur,**variable,**value,**precision,**scale,**length;
 	if (ZEND_NUM_ARGS() != 3 || 
-		zend_get_parameters_ex(3,&sqlrcur,&variable,&value) 
-					== FAILURE) {
-		if (ZEND_NUM_ARGS() != 5 || 
-			zend_get_parameters_ex(5,&sqlrcur,
-				&variable,&value,&precision,&scale)== FAILURE) {
-			WRONG_PARAM_COUNT;
+		zend_get_parameters_ex(3,&sqlrcur,
+				&variable,&value) == FAILURE) {
+		if (ZEND_NUM_ARGS() != 4 || 
+			zend_get_parameters_ex(4,&sqlrcur,
+					&variable,&value,&length)== FAILURE) {
+			if (ZEND_NUM_ARGS() != 5 || 
+				zend_get_parameters_ex(5,&sqlrcur,
+						&variable,&value,
+						&precision,&scale)== FAILURE) {
+				WRONG_PARAM_COUNT;
+			}
 		}
 	}
 	convert_to_string_ex(variable);
@@ -629,7 +634,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbind) {
 	if (cursor) {
 		if (Z_TYPE_PP(value)==IS_STRING) {
 			convert_to_string_ex(value);
-			cursor->inputBind((*variable)->value.str.val,(*value)->value.str.val);
+			if (ZEND_NUM_ARGS() == 4) {
+				cursor->inputBind((*variable)->value.str.val,(*value)->value.str.val,(*length)->value.lval);
+			} else {
+				cursor->inputBind((*variable)->value.str.val,(*value)->value.str.val);
+			}
 			RETURN_LONG(1);
 		} else if (Z_TYPE_PP(value)==IS_LONG) {
 			convert_to_long_ex(value);

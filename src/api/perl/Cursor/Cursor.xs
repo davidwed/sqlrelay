@@ -153,7 +153,12 @@ sqlrcursor::inputBind(variable,...)
 						(uint32_t)SvIV(ST(3)),
 						(uint32_t)SvIV(ST(4)));
 		} else if (SvPOK(ST(2))) {
-			THIS->inputBind(variable,SvPV(ST(2),na));
+			if (SvIOK(ST(3))) {
+				THIS->inputBind(variable,SvPV(ST(2),na),
+						(uint32_t)SvIV(ST(3)));
+			} else {
+				THIS->inputBind(variable,SvPV(ST(2),na));
+			}
 		} else if (!SvOK(ST(2))) {
 			THIS->inputBind(variable,(const char *)NULL);
 		} else {

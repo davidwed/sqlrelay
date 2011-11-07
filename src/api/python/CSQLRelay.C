@@ -602,15 +602,15 @@ static PyObject *countBindVariables(PyObject *self, PyObject *args) {
 static PyObject *inputBind(PyObject *self, PyObject *args) {
   char *variable;
   PyObject *value;
-  uint32_t precision;
+  PyObject *precision;
   uint32_t scale;
   long sqlrcur;
   uint16_t success;
   if (!PyArg_ParseTuple(args,
 #ifdef SUPPORTS_UNSIGNED
-	"lsOII",
+	"lsOOI",
 #else
-	"lsOii",
+	"lsOOi",
 #endif
 	&sqlrcur, &variable, &value, &precision, &scale))
     return NULL;
@@ -618,13 +618,19 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
   if (value==Py_None) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (char *)NULL);
   } else if (PyString_Check(value)) {
-    ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value));
+    // if the 3rd parameter is a string then the
+    // 4th parameter might be a length parameter
+    if (PyInt_Check(precision)) {
+      ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value), (uint32_t)PyInt_AsLong(precision));
+    } else {
+      ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value));
+    }
   } else if (PyBool_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, value == Py_True ? "1" : "0");
   } else if (PyInt_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (int64_t)PyInt_AsLong(value));
   } else if (PyFloat_Check(value)) {
-    ((sqlrcursor *)sqlrcur)->inputBind(variable, (double)PyFloat_AsDouble(value), (uint32_t)precision, (uint32_t)scale);
+    ((sqlrcursor *)sqlrcur)->inputBind(variable, (double)PyFloat_AsDouble(value), (uint32_t)PyInt_AsLong(precision), (uint32_t)scale);
   } else {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(PyObject_Str(value)));
   }

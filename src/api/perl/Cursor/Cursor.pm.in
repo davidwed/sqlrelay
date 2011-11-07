@@ -241,6 +241,7 @@ __END__
             # in it and returns that number.
 
         inputBind(variable,value);
+        inputBind(variable,value,length);
         inputBindBlob(variable,value,size);
         inputBindClob(variable,value,size);
             # Define an input bind variable.

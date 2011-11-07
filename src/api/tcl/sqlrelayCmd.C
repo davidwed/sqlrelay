@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.28 2011-11-04 06:10:45 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.29 2011-11-07 18:07:11 mused Exp $
  */
 
 #include <tcl.h>
@@ -684,6 +684,14 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 			 value,
 			 (uint32_t)precision,
 			 (uint32_t)scale);
+	} else if (objc == 5) {
+          /* string with length */
+	  long length;
+	  if (Tcl_GetLongFromObj(interp, objv[3], &length) != TCL_OK) {
+	      Tcl_GetIntFromObj(interp, objv[3], (int *)&length);
+          }
+	  cur->inputBind(Tcl_GetString(objv[2]),Tcl_GetString(objv[3]),
+							(uint32_t)length);
 	} else if (objc == 4) {
 	  long value;
 	  if (Tcl_GetLongFromObj(interp, objv[3], &value) == TCL_OK ||

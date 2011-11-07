@@ -110,6 +110,9 @@ public class SQLRCursor {
 	/** Define an input bind variable.  */
 	public native void	inputBind(String variable, String value);
 	/** Define an input bind variable.  */
+	public native void	inputBind(String variable,
+						String value, int length);
+	/** Define an input bind variable.  */
 	public native void	inputBind(String variable, long value);
 	/** Define an input bind variable.  */
 	public native void	inputBind(String variable, double value, 

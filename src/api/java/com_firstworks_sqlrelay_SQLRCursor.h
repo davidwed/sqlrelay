@@ -226,6 +226,14 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_inputBind__Ljava_
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    inputBind
+ * Signature: (Ljava/lang/String;Ljava/lang/String;I)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_inputBind__Ljava_lang_String_2Ljava_lang_String_2I
+  (JNIEnv *, jobject, jstring, jstring, jint);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    inputBind
  * Signature: (Ljava/lang/String;J)V
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_inputBind__Ljava_lang_String_2J
