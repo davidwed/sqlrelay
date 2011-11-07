@@ -41,7 +41,6 @@ void sqlrconnection_svr::truncateTempTables(sqlrcursor_svr *cursor,
 
 void sqlrconnection_svr::truncateTempTable(sqlrcursor_svr *cursor,
 						const char *tablename) {
-printf("truncating %s\n",tablename);
 	stringbuffer	truncatequery;
 	truncatequery.append("delete from ")->append(tablename);
 	if (cursor->prepareQuery(truncatequery.getString(),
