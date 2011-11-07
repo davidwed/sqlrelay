@@ -8,6 +8,7 @@
 		support them
 	added feature to drop temporary tables at the end of the session for
 		oracle
+	added string inputBind method/function with length
 
 0.43 - updated ruby code build to take sitearch into account during includes
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9

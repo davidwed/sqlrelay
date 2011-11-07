@@ -53,6 +53,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual	uint16_t	getNumberOfConnectStringVars()=0;
 		virtual	void	handleConnectString()=0;
 		virtual	bool	logIn(bool printerrors)=0;
+		virtual void	reLogIn();
 		virtual	void	logOut()=0;
 		virtual	bool	changeUser(const char *newuser,
 						const char *newpassword);
@@ -219,7 +220,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	closeCursors(bool destroy);
 		void	setUnixSocketDirectory();
 		bool	handlePidFile();
-		void	reLogIn();
 		void	initSession();
 		int32_t	waitForClient();
 		void	clientSession();
@@ -386,11 +386,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		sqlrcursor_svr	**cur;
 
-		stringlist	sessiontemptablesfordrop;
-		stringlist	sessiontemptablesfortrunc;
-		stringlist	transtemptablesfordrop;
-		stringlist	transtemptablesfortrunc;
-
 		unixclientsocket	handoffsockun;
 		bool			connected;
 		bool			inclientsession;
@@ -414,6 +409,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		sharedmemory		*idmemory;
 		cmdline			*cmdl;
 		sqlrconfigfile		*cfgfl;
+
+		stringlist	sessiontemptablesfordrop;
+		stringlist	sessiontemptablesfortrunc;
+		stringlist	transtemptablesfordrop;
+		stringlist	transtemptablesfortrunc;
 
 		uint32_t	maxquerysize;
 		uint32_t	maxstringbindvaluelength;
