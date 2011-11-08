@@ -6,6 +6,10 @@
 
 bool sqlrconnection::selectDatabase(const char *database) {
 
+	if (!charstring::length(database)) {
+		return true;
+	}
+
 	if (!openSession()) {
 		return 0;
 	}
