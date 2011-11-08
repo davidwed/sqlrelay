@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/environment.h>
 
 sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 					const char *socket,
@@ -50,8 +51,11 @@ sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 	// debug print function
 	printfunction=NULL;
 
-	// debug off
-	debug=false;
+	// enable/disable debug
+	const char	*sqlrdebug=environment::getValue("SQLRDEBUG");
+	debug=(charstring::length(sqlrdebug) &&
+			charstring::compareIgnoringCase(
+				environment::getValue("SQLRDEBUG"),"OFF"));
 	webdebug=-1;
 
 	// copy references, delete cursors flags

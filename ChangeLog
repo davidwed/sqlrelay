@@ -9,6 +9,8 @@
 	added option to drop temporary tables at session-end for oracle
 	added option to preserve rows on commit by default with oracle temp
 		tables
+	added SQLRDEBUG=on/off environment variable to enable/disable
+		client-side debug
 
 0.43 - updated ruby code build to take sitearch into account during includes
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9
