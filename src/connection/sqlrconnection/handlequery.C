@@ -20,7 +20,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 	// handle fake begins
 	// FIXME: do we need to loop to detect downed db's somehow?
-	if (!reexecute && !bindcursor && handleFakeBegin(cursor)) {
+	if (!reexecute && !bindcursor && handleFakeBeginTransaction(cursor)) {
 
 		dbgfile.debugPrint("connection",1,"query was fake begin...");
 

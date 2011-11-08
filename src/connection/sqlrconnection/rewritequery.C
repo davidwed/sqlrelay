@@ -14,23 +14,29 @@ enum queryparsestate_t {
 void sqlrconnection_svr::rewriteQueryInternal(sqlrcursor_svr *cursor) {
 
 	if (cursor->supportsNativeBinds()) {
-		nativizeBindVariables(cursor);
+		if (translatebinds) {
+			translateBindVariables(cursor);
+		}
 	} else {
 		// FIXME: move fake bind code here
 	}
 
-	if (supportsBegin()) {
-		nativizeBegins(cursor);
+	if (supportsTransactionBlocks()) {
+		translateBeginTransaction(cursor);
 	}
 
 	// run database-specific rewrites
 	cursor->rewriteQuery();
 }
 
-void sqlrconnection_svr::nativizeBindVariables(sqlrcursor_svr *cursor) {
+void sqlrconnection_svr::setTranslateBindVariablesBehavior(bool tbv) {
+	translatebinds=tbv;
+}
+
+void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 	// debug
-	dbgfile.debugPrint("connection",1,"nativizing bind variables...");
+	dbgfile.debugPrint("connection",1,"translating bind variables...");
 	dbgfile.debugPrint("connection",2,"original:");
 	dbgfile.debugPrint("connection",2,cursor->querybuffer);
 	dbgfile.debugPrint("connection",2,"input binds:");
@@ -136,7 +142,7 @@ void sqlrconnection_svr::nativizeBindVariables(sqlrcursor_svr *cursor) {
 
 				// translate...
 				convert=true;
-				replaceBindVariableInStringAndArray(cursor,
+				translateBindVariableInStringAndArray(cursor,
 								&currentbind,
 								bindindex,
 								&newquery);
@@ -212,7 +218,7 @@ bool sqlrconnection_svr::matchesNativeBindFormat(const char *bind) {
 		(bindformat[1]=='*' && !character::isAlphanumeric(bind[1]))));
 }
 
-void sqlrconnection_svr::replaceBindVariableInStringAndArray(
+void sqlrconnection_svr::translateBindVariableInStringAndArray(
 						sqlrcursor_svr *cursor,
 						stringbuffer *currentbind,
 						uint16_t bindindex,
@@ -227,7 +233,7 @@ void sqlrconnection_svr::replaceBindVariableInStringAndArray(
 	if (bindformatlen==1) {
 
 		// replace bind variable itself with number
-		replaceBindVariableInArray(cursor,NULL,bindindex);
+		translateBindVariableInArray(cursor,NULL,bindindex);
 
 	} else if (bindformat[1]=='1' &&
 			!charstring::isNumber(currentbind->getString()+1)) {
@@ -236,7 +242,7 @@ void sqlrconnection_svr::replaceBindVariableInStringAndArray(
 		newquery->append(bindindex);
 
 		// replace bind variable itself with number
-		replaceBindVariableInArray(cursor,
+		translateBindVariableInArray(cursor,
 					currentbind->getString(),
 					bindindex);
 
@@ -253,14 +259,14 @@ void sqlrconnection_svr::replaceBindVariableInStringAndArray(
 			newquery->append(bindindex);
 
 			// replace bind variable itself with number
-			replaceBindVariableInArray(cursor,
+			translateBindVariableInArray(cursor,
 						currentbind->getString(),
 						bindindex);
 		}
 	}
 }
 
-void sqlrconnection_svr::replaceBindVariableInArray(sqlrcursor_svr *cursor,
+void sqlrconnection_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 						const char *currentbind,
 						uint16_t bindindex) {
 
@@ -313,19 +319,19 @@ void sqlrconnection_svr::replaceBindVariableInArray(sqlrcursor_svr *cursor,
 	}
 }
 
-void sqlrconnection_svr::nativizeBegins(sqlrcursor_svr *cursor) {
+void sqlrconnection_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 
-	if (!isBeginQuery(cursor)) {
+	if (!isBeginTransactionQuery(cursor)) {
 		return;
 	}
 
 	// debug
-	dbgfile.debugPrint("connection",1,"nativizing begin query...");
+	dbgfile.debugPrint("connection",1,"translating begin tx query...");
 	dbgfile.debugPrint("connection",2,"original:");
 	dbgfile.debugPrint("connection",2,cursor->querybuffer);
 
 	// translate query
-	const char	*beginquery=beginQuery();
+	const char	*beginquery=beginTransactionQuery();
 	cursor->querylength=charstring::length(beginquery);
 	charstring::copy(cursor->querybuffer,beginquery,cursor->querylength);
 	cursor->querybuffer[cursor->querylength]='\0';
@@ -335,6 +341,6 @@ void sqlrconnection_svr::nativizeBegins(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",2,cursor->querybuffer);
 }
 
-const char *sqlrconnection_svr::beginQuery() {
+const char *sqlrconnection_svr::beginTransactionQuery() {
 	return "BEGIN";
 }

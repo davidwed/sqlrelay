@@ -12,7 +12,7 @@ void sqlrconnection_svr::rollbackCommand() {
 bool sqlrconnection_svr::rollbackInternal() {
 
 	if (rollback()) {
-		endFakeBegin();
+		endFakeTransactionBlock();
 		return true;
 	}
 	return false;

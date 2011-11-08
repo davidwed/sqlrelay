@@ -3,27 +3,27 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection_svr::setFakeBeginBehavior(bool fb) {
-	fakebegins=true;
+void sqlrconnection_svr::setFakeTransactionBlocksBehavior(bool ftb) {
+	faketransactionblocks=ftb;
 }
 
-bool sqlrconnection_svr::supportsBegin() {
+bool sqlrconnection_svr::supportsTransactionBlocks() {
 	return true;
 }
 
-bool sqlrconnection_svr::handleFakeBegin(sqlrcursor_svr *cursor) {
+bool sqlrconnection_svr::handleFakeBeginTransaction(sqlrcursor_svr *cursor) {
 
-	// just return if we're not faking begins
-	if (!fakebegins) {
+	// just return if we're not faking transactionblocks
+	if (!faketransactionblocks) {
 		return false;
 	}
 
 	// Intercept begins and handle them.  If we're faking begins, commit
 	// and rollback queries also need to be intercepted as well, otherwise
-	// the query will be sent directly to the db and endFakeBegin won't get
-	// called.
-	if (isBeginQuery(cursor)) {
-		fakeBegin();
+	// the query will be sent directly to the db and endFakeBeginTransaction
+	// won't get called.
+	if (isBeginTransactionQuery(cursor)) {
+		beginFakeTransactionBlock();
 		cursor->inbindcount=0;
 		cursor->outbindcount=0;
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
@@ -42,7 +42,7 @@ bool sqlrconnection_svr::handleFakeBegin(sqlrcursor_svr *cursor) {
 	return false;
 }
 
-bool sqlrconnection_svr::isBeginQuery(sqlrcursor_svr *cursor) {
+bool sqlrconnection_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
 
 	// find the start of the actual query
 	const char	*ptr=cursor->skipWhitespaceAndComments(
@@ -72,10 +72,10 @@ bool sqlrconnection_svr::isBeginQuery(sqlrcursor_svr *cursor) {
 	return false;
 }
 
-bool sqlrconnection_svr::fakeBegin() {
+bool sqlrconnection_svr::beginFakeTransactionBlock() {
 
 	// save the current autocommit state
-	fakebeginsautocommiton=autocommit;
+	faketransactionblocksautocommiton=autocommit;
 
 	// if autocommit is on, turn it off
 	if (autocommit) {
@@ -84,13 +84,15 @@ bool sqlrconnection_svr::fakeBegin() {
 	return true;
 }
 
-bool sqlrconnection_svr::endFakeBegin() {
+bool sqlrconnection_svr::endFakeTransactionBlock() {
 
 	// if we're faking begins and autocommit is on,
 	// reset autocommit behavior
-	if (fakebegins && fakebeginsautocommiton) {
+	if (faketransactionblocks && faketransactionblocksautocommiton) {
 		return autoCommitOnInternal();
-	} else if (fakebegins && !fakebeginsautocommiton) {
+	} else if (faketransactionblocks &&
+			!faketransactionblocksautocommiton) {
+		// don't do anything
 	}
 	return true;
 }

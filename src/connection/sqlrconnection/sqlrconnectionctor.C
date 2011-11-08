@@ -31,8 +31,11 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 	autocommit=false;
 	fakeautocommit=false;
 
-	fakebegins=false;
-	fakebeginsautocommiton=false;
+	translatebegins=true;
+	faketransactionblocks=false;
+	faketransactionblocksautocommiton=false;
+
+	translatebinds=false;
 
 	maxquerysize=0;
 	maxstringbindvaluelength=0;

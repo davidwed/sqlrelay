@@ -61,12 +61,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool	autoCommitOff();
 		virtual bool	commit();
 		virtual bool	rollback();
-		virtual bool	supportsBegin();
-		virtual void	setFakeBeginBehavior(bool fb);
+		virtual bool	supportsTransactionBlocks();
 		virtual bool		selectDatabase(const char *database);
 		virtual const char	*selectDatabaseQuery();
 		virtual const char	*pingQuery();
-		virtual const char	*beginQuery();
+		virtual const char	*beginTransactionQuery();
 		virtual bool		ping();
 		virtual const char	*identify()=0;
 		virtual	const char	*dbVersion()=0;
@@ -101,6 +100,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		const char	*connectStringValue(const char *variable);
 		void		setAutoCommitBehavior(bool ac);
 		bool		getAutoCommitBehavior();
+		void		setFakeTransactionBlocksBehavior(bool ftb);
+		void		setTranslateBindVariablesBehavior(bool tbv);
 		bool		sendColumnInfo();
 		void		sendRowCounts(bool knowsactual,
 						uint64_t actual,
@@ -232,10 +233,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	autoCommitCommand();
 		bool	autoCommitOnInternal();
 		bool	autoCommitOffInternal();
-		bool	fakeBegin();
-		bool	handleFakeBegin(sqlrcursor_svr *cursor);
-		bool	isBeginQuery(sqlrcursor_svr *cursor);
-		bool	endFakeBegin();
+		void	translateBeginTransaction(sqlrcursor_svr *cursor);
+		bool	handleFakeBeginTransaction(sqlrcursor_svr *cursor);
+		bool	beginFakeTransactionBlock();
+		bool	endFakeTransactionBlock();
+		bool	isBeginTransactionQuery(sqlrcursor_svr *cursor);
 		bool	isCommitQuery(sqlrcursor_svr *cursor);
 		bool	isRollbackQuery(sqlrcursor_svr *cursor);
 		void	commitCommand();
@@ -304,18 +306,17 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						bool bindcursor,
 						bool reallyexecute);
 		void	rewriteQueryInternal(sqlrcursor_svr *cursor);
-		void	nativizeBindVariables(sqlrcursor_svr *cursor);
+		void	translateBindVariables(sqlrcursor_svr *cursor);
 		bool	matchesNativeBindFormat(const char *bind);
-		void	replaceBindVariableInStringAndArray(
+		void	translateBindVariableInStringAndArray(
 						sqlrcursor_svr *cursor,
 						stringbuffer *currentbind,
 						uint16_t bindindex,
 						stringbuffer *newquery);
-		void	replaceBindVariableInArray(
+		void	translateBindVariableInArray(
 						sqlrcursor_svr *cursor,
 						const char *currentbind,
 						uint16_t bindindex);
-		void	nativizeBegins(sqlrcursor_svr *cursor);
 		void	commitOrRollback(sqlrcursor_svr *cursor);
 		bool	handleError(sqlrcursor_svr *cursor);
 		bool	returnError(sqlrcursor_svr *cursor);
@@ -369,8 +370,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		autocommit;
 		bool		fakeautocommit;
 
-		bool		fakebegins;
-		bool		fakebeginsautocommiton;
+		bool		translatebegins;
+		bool		faketransactionblocks;
+		bool		faketransactionblocksautocommiton;
+
+		bool		translatebinds;
 
 		int32_t		accepttimeout;
 		bool		suspendedsession;
