@@ -107,6 +107,8 @@ PGconn *allocatePGconn(const char *conninfo,
 
 	conn->errorverbosity=PQERRORS_DEFAULT;
 
+	conn->sqlrcon->selectDatabase(conn->db);
+
 	return conn;
 }
 
