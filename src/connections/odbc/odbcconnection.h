@@ -156,6 +156,25 @@ class odbcconnection : public sqlrconnection_svr {
 		bool		ping();
 		const char	*identify();
 		const char	*dbVersion();
+		bool		getDatabaseList(sqlrcursor_svr *cursor,
+						const char *wild,
+						char ***cols,
+						uint32_t *colcount,
+						char ****rows,
+						uint64_t *rowcount);
+		bool		getTableList(sqlrcursor_svr *cursor,
+						const char *wild,
+						char ***cols,
+						uint32_t *colcount,
+						char ****rows,
+						uint64_t *rowcount);
+		bool		getColumnList(sqlrcursor_svr *cursor,
+						const char *table,
+						const char *wild,
+						char ***cols,
+						uint32_t *colcount,
+						char ****rows,
+						uint64_t *rowcount);
 
 		SQLRETURN	erg;
 		SQLHENV		env;

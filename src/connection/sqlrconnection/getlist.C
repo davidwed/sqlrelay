@@ -87,6 +87,19 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 		charstring::bothTrim(table);
 	}
 
+	// set the values that we won'tget from the client
+	cursor->inbindcount=0;
+	cursor->outbindcount=0;
+	sendcolumninfo=SEND_COLUMN_INFO;
+
+	// check to see if we have to make an api call
+	// to get the list rather than run a query
+	if (getListThroughApiCall(cursor,which,table,wild)) {
+		delete[] wild;
+		delete[] table;
+		return true;
+	}
+
 	// build the appropriate query
 	const char	*query=NULL;
 	switch (which) {
@@ -103,11 +116,6 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 	buildListQuery(cursor,query,wild,table);
 	delete[] wild;
 	delete[] table;
-
-	// set the values that we won'tget from the client
-	cursor->inbindcount=0;
-	cursor->outbindcount=0;
-	sendcolumninfo=SEND_COLUMN_INFO;
 
 	// run it like a normal query, but don't request the query,
 	// binds or column info status from the client
@@ -171,4 +179,67 @@ const char *sqlrconnection_svr::getTableListQuery(bool wild) {
 
 const char *sqlrconnection_svr::getColumnListQuery(bool wild) {
 	return "select 1";
+}
+
+bool sqlrconnection_svr::getListThroughApiCall(sqlrcursor_svr *cursor,
+						int which,
+						const char *table,
+						const char *wild) {
+
+	// initialize flags andbuffers
+	bool		success=false;
+	char		**cols=NULL;
+	uint32_t	colcount=NULL;
+	char		***rows=NULL;
+	uint64_t	rowcount=NULL;
+
+	// get the appropriate list
+	switch (which) {
+		case 0:
+			success=getDatabaseList(cursor,wild,
+					&cols,&colcount,&rows,&rowcount);
+		case 1:
+			success=getTableList(cursor,wild,
+					&cols,&colcount,&rows,&rowcount);
+		case 2:
+			success=getColumnList(cursor,table,wild,
+					&cols,&colcount,&rows,&rowcount);
+	}
+
+	// bail if we didn't get anything
+	if (!success) {
+		return false;
+	}
+
+	// FIXME: send data to the client...
+
+	return true;
+}
+
+bool sqlrconnection_svr::getDatabaseList(sqlrcursor_svr *cursor,
+						const char *wild,
+						char ***cols,
+						uint32_t *colcount,
+						char ****rows,
+						uint64_t *rowcount) {
+	return false;
+}
+
+bool sqlrconnection_svr::getTableList(sqlrcursor_svr *cursor,
+						const char *wild,
+						char ***cols,
+						uint32_t *colcount,
+						char ****rows,
+						uint64_t *rowcount) {
+	return false;
+}
+
+bool sqlrconnection_svr::getColumnList(sqlrcursor_svr *cursor,
+						const char *table,
+						const char *wild,
+						char ***cols,
+						uint32_t *colcount,
+						char ****rows,
+						uint64_t *rowcount) {
+	return false;
 }

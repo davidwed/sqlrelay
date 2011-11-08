@@ -61,6 +61,40 @@ const char *mdbtoolsconnection::dbVersion() {
 #endif
 }
 
+bool mdbtoolsconnection::getDatabaseList(sqlrcursor_svr *cursor,
+					const char *wild,
+					char ***cols,
+					uint32_t *colcount,
+					char ****rows,
+					uint64_t *rowcount) {
+	// FIXME: I'm not sure there's any way to get this, or even if 
+	// a "database list" exists in an mdb file.  Send back something 
+	// though.
+	return false;
+}
+
+bool mdbtoolsconnection::getTableList(sqlrcursor_svr *cursor,
+					const char *wild,
+					char ***cols,
+					uint32_t *colcount,
+					char ****rows,
+					uint64_t *rowcount) {
+	// FIXME: I'm not sure what to call to get this but mdb-tables
+	// does it somehow.
+	return false;
+}
+
+bool mdbtoolsconnection::getColumnList(sqlrcursor_svr *cursor,
+					const char *table,
+					const char *wild,
+					char ***cols,
+					uint32_t *colcount,
+					char ****rows,
+					uint64_t *rowcount) {
+	// FIXME: I'm not sure what to call to get this.
+	return false;
+}
+
 bool mdbtoolsconnection::isTransactional() {
 	return false;
 }

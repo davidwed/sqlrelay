@@ -284,6 +284,37 @@ const char *odbcconnection::dbVersion() {
 	return dbversion;
 }
 
+bool odbcconnection::getDatabaseList(sqlrcursor_svr *cursor,
+					const char *wild,
+					char ***cols,
+					uint32_t *colcount,
+					char ****rows,
+					uint64_t *rowcount) {
+	// FIXME: SQLTables might actually return this information, oddly enough
+	return false;
+}
+
+bool odbcconnection::getTableList(sqlrcursor_svr *cursor,
+					const char *wild,
+					char ***cols,
+					uint32_t *colcount,
+					char ****rows,
+					uint64_t *rowcount) {
+	// FIXME: call SQLTables
+	return false;
+}
+
+bool odbcconnection::getColumnList(sqlrcursor_svr *cursor,
+					const char *table,
+					const char *wild,
+					char ***cols,
+					uint32_t *colcount,
+					char ****rows,
+					uint64_t *rowcount) {
+	// FIXME: call SQLColumns
+	return false;
+}
+
 #if (ODBCVER >= 0x0300)
 bool odbcconnection::autoCommitOn() {
 	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
