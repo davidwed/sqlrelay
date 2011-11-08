@@ -131,6 +131,9 @@ class db2connection : public sqlrconnection_svr {
 		const char	*pingQuery();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*getDatabaseListQuery(bool wild);
+		const char	*getTableListQuery(bool wild);
+		const char	*getColumnListQuery(bool wild);
 		const char	*bindFormat();
 
 		SQLHENV		env;

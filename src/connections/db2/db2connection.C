@@ -146,6 +146,83 @@ const char *db2connection::dbVersion() {
 	return dbversion;
 }
 
+const char *db2connection::getDatabaseListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	schemaname "
+		"from "
+		"	syscat.schemata "
+		"where "
+		"	schemaname like '%s'":
+
+		"select "
+		"	schemaname "
+		"from "
+		"	syscat.schemata ";
+}
+
+const char *db2connection::getTableListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	tabname "
+		"from "
+		"	syscat.tables "
+		"where "
+		"	type in ('T','U','V','W') "
+		"	and "
+		"	tabname like '%s' "
+		"order by "
+		"	tabname":
+
+		"select "
+		"	tabname "
+		"from "
+		"	syscat.tables "
+		"where "
+		"	type in ('T','U','V','W') "
+		"order by "
+		"	tabname";
+}
+
+const char *db2connection::getColumnListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	colname, "
+		"	typename, "
+		"	length, "
+		"	length as precision, "
+		"	scale, "
+		"	nulls, "
+		"	keyseq as key, "
+		"	default, "
+		"	'' as extra "
+		"from "
+		"	syscat.columns "
+		"where "
+		"	upper(tabame)=upper('%s') "
+		"	and "
+		"	colname like '%s' "
+		"order by "
+		"	colno":
+
+		"select "
+		"	colname, "
+		"	typename, "
+		"	length, "
+		"	length as precision, "
+		"	scale, "
+		"	nulls, "
+		"	keyseq as key, "
+		"	default, "
+		"	'' as extra "
+		"from "
+		"	syscat.columns "
+		"where "
+		"	upper(tabname)=upper('%s') "
+		"order by "
+		"	colno";
+}
+
 const char *db2connection::bindFormat() {
 	return "?";
 }
