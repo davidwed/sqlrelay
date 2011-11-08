@@ -293,6 +293,88 @@ const char *freetdsconnection::dbVersion() {
 	return dbversion;
 }
 
+const char *freetdsconnection::getDatabaseListQuery(bool wild) {
+	return "select '' as db";
+}
+
+const char *freetdsconnection::getTableListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	name "
+		"from "
+		"	sysobjects "
+		"where "
+		"	type in ('S','U','V') "
+		"	and "
+		"	name like '%s' "
+		"order by "
+		"	name":
+
+		"select "
+		"	name "
+		"from "
+		"	sysobjects "
+		"where "
+		"	type in ('S','U','V') "
+		"order by "
+		"	name";
+}
+
+const char *freetdsconnection::getColumnListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	syscolumns.name, "
+		"	systypes.name as type, "
+		"	syscolumns.length, "
+		"	syscolumns.prec, "
+		"	syscolumns.scale, "
+		"	(syscolumns.status&8)/8 as nullable, "
+		"	'' as primarykey, "
+		"	'' column_default, "
+		"	'' as extra "
+		"from "
+		"	sysobjects, "
+		"	syscolumns, "
+		"	systypes "
+		"where "
+		"	sysobjects.type in ('S','U','V') "
+		"	and "
+		"	sysobjects.name='%s' "
+		"	and "
+		"	syscolumns.id=sysobjects.id "
+		"	and "
+		"	syscolumns.name like '%s' "
+		"	and "
+		"	systypes.usertype=syscolumns.usertype "
+		"order by "
+		"	syscolumns.colid":
+
+		"select "
+		"	syscolumns.name, "
+		"	systypes.name as type, "
+		"	syscolumns.length, "
+		"	syscolumns.prec, "
+		"	syscolumns.scale, "
+		"	(syscolumns.status&8)/8 as nullable, "
+		"	'' as primarykey, "
+		"	'' column_default, "
+		"	'' as extra "
+		"from "
+		"	sysobjects, "
+		"	syscolumns, "
+		"	systypes "
+		"where "
+		"	sysobjects.type in ('S','U','V') "
+		"	and "
+		"	sysobjects.name='%s' "
+		"	and "
+		"	syscolumns.id=sysobjects.id "
+		"	and "
+		"	systypes.usertype=syscolumns.usertype "
+		"order by "
+		"	syscolumns.colid";
+}
+
 const char *freetdsconnection::bindFormat() {
 	return "@*";
 }
