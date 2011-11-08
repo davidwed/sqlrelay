@@ -465,6 +465,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 mysql->sqlrcon->debugOn();
 	mysql->sqlrcon->copyReferences();
 	mysql->currentstmt=NULL;
+	mysql_select_db(mysql,db);
 	return mysql;
 }
 
