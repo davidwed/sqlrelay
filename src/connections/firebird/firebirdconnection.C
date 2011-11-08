@@ -225,6 +225,108 @@ const char *firebirdconnection::dbVersion() {
 	return "";
 }
 
+const char *firebirdconnection::getDatabaseListQuery(bool wild) {
+	return "select '' from rdb$database";
+}
+
+const char *firebirdconnection::getTableListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	rdb$relation_name "
+		"from "
+		"	rdb$relations "
+		"where "
+		"	rdb$relation_name like '%s' "
+		"order by "
+		"	rdb$relation_name":
+
+		"select "
+		"	rdb$relation_name "
+		"from "
+		"	rdb$relations "
+		"order by "
+		"	rdb$relation_name";
+}
+
+const char *firebirdconnection::getColumnListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	r.rdb$field_name, "
+		"	case f.rdb$field_type "
+		"		when 261 then 'BLOB' "
+		"		when 14 then 'CHAR' "
+		"		when 40 then 'CSTRING' "
+		"		when 11 then 'D_FLOAT' "
+		"		when 27 then 'DOUBLE' "
+		"		when 10 then 'FLOAT' "
+		"		when 16 then 'INT64' "
+		"		when 8 then 'INTEGER' "
+		"		when 9 then 'QUAD' "
+		"		when 7 then 'SMALLINT' "
+		"		when 12 then 'DATE' "
+		"		when 13 then 'TIME' "
+		"		when 35 then 'TIMESTAMP' "
+		"		when 37 then 'VARCHAR' "
+		"		else 'UNKNOWN' "
+		"		end as field_type, "
+		"	f.rdb$field_length, "
+		"	f.rdb$field_precision, "
+		"	f.rdb$field_scale, "
+		"	r.rdb$null_flag, "
+		"	'' as primary_key, "
+		"	r.rdb$default_source, "
+		"	'' as extra "
+		"from "
+		"	rdb$relation_fields r "
+		"	left join "
+		"		rdb$fields f "
+		"		on "
+		"		f.rdb$field_name=r.rdb$field_source "
+		"where "
+		"	r.rdb$relation_name='%s' "
+		"	and "
+		"	r.rdb$field_name like '%s' "
+		"order by "
+		"	rdb$field_position":
+
+		"select "
+		"	r.rdb$field_name, "
+		"	case f.rdb$field_type "
+		"		when 261 then 'BLOB' "
+		"		when 14 then 'CHAR' "
+		"		when 40 then 'CSTRING' "
+		"		when 11 then 'D_FLOAT' "
+		"		when 27 then 'DOUBLE' "
+		"		when 10 then 'FLOAT' "
+		"		when 16 then 'INT64' "
+		"		when 8 then 'INTEGER' "
+		"		when 9 then 'QUAD' "
+		"		when 7 then 'SMALLINT' "
+		"		when 12 then 'DATE' "
+		"		when 13 then 'TIME' "
+		"		when 35 then 'TIMESTAMP' "
+		"		when 37 then 'VARCHAR' "
+		"		else 'UNKNOWN' "
+		"		end as field_type, "
+		"	f.rdb$field_length, "
+		"	f.rdb$field_precision, "
+		"	f.rdb$field_scale, "
+		"	r.rdb$null_flag, "
+		"	'' as primary_key, "
+		"	r.rdb$default_source, "
+		"	'' as extra "
+		"from "
+		"	rdb$relation_fields r "
+		"	left join "
+		"		rdb$fields f "
+		"		on "
+		"		f.rdb$field_name=r.rdb$field_source "
+		"where "
+		"	r.rdb$relation_name='%s' "
+		"order by "
+		"	r.rdb$field_position";
+}
+
 const char *firebirdconnection::bindFormat() {
 	return "?";
 }
