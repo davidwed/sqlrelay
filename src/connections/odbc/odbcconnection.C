@@ -164,6 +164,9 @@ void odbcconnection::handleConnectString() {
 	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
+	setTranslateBindVariablesBehavior(
+		!charstring::compare(
+			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool odbcconnection::logIn(bool printerrors) {

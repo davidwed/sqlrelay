@@ -52,8 +52,12 @@ void oracle8connection::handleConnectString() {
 	if (maxitembuffersize<MAX_BYTES_PER_CHAR) {
 		maxitembuffersize=MAX_BYTES_PER_CHAR;
 	}
-	setFakeBeginBehavior(!charstring::compare(
-				connectStringValue("fakebegins"),"yes"));
+	setFakeTransactionBlocksBehavior(
+		!charstring::compare(
+			connectStringValue("faketransactionblocks"),"yes"));
+	setTranslateBindVariablesBehavior(
+		!charstring::compare(
+			connectStringValue("translatebindvariables"),"yes"));
 
 #ifdef HAVE_ORACLE_8i
 	droptemptables=!charstring::compare(
@@ -518,7 +522,7 @@ bool oracle8connection::autoCommitOff() {
 	return true;
 }
 
-bool oracle8connection::supportsBegin() {
+bool oracle8connection::supportsTransactionBlocks() {
 	return false;
 }
 

@@ -29,6 +29,9 @@ uint16_t sqliteconnection::getNumberOfConnectStringVars() {
 
 void sqliteconnection::handleConnectString() {
 	db=connectStringValue("db");
+	setTranslateBindVariablesBehavior(
+		!charstring::compare(
+			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool sqliteconnection::logIn(bool printerrors) {

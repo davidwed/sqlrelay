@@ -63,8 +63,12 @@ void firebirdconnection::handleConnectString() {
 
 	charset=connectStringValue("charset");
 
-	setFakeBeginBehavior(!charstring::compare(
-				connectStringValue("fakebegins"),"yes"));
+	setFakeTransactionBlocksBehavior(
+		!charstring::compare(
+			connectStringValue("faketransactionblocks"),"yes"));
+	setTranslateBindVariablesBehavior(
+		!charstring::compare(
+			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool firebirdconnection::logIn(bool printerrors) {
@@ -146,7 +150,7 @@ void firebirdconnection::logOut() {
 	isc_detach_database(error,&db);
 }
 
-bool firebirdconnection::supportsBegin() {
+bool firebirdconnection::supportsTransactionBlocks() {
 	return false;
 }
 

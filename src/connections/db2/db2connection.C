@@ -30,8 +30,12 @@ void db2connection::handleConnectString() {
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 	lang=connectStringValue("lang");
-	setFakeBeginBehavior(!charstring::compare(
-				connectStringValue("fakebegins"),"yes"));
+	setFakeTransactionBlocksBehavior(
+		!charstring::compare(
+			connectStringValue("faketransactionblocks"),"yes"));
+	setTranslateBindVariablesBehavior(
+		!charstring::compare(
+			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool db2connection::logIn(bool printerrors) {
@@ -113,7 +117,7 @@ bool db2connection::autoCommitOff() {
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
 }
 
-bool db2connection::supportsBegin() {
+bool db2connection::supportsTransactionBlocks() {
 	return false;
 }
 

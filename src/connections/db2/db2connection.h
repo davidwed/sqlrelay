@@ -125,7 +125,7 @@ class db2connection : public sqlrconnection_svr {
 		bool	bindValueIsNull(int16_t isnull);
 		bool	autoCommitOn();
 		bool	autoCommitOff();
-		bool	supportsBegin();
+		bool	supportsTransactionBlocks();
 		bool	commit();
 		bool	rollback();
 		const char	*pingQuery();

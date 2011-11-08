@@ -122,7 +122,7 @@ class firebirdconnection : public sqlrconnection_svr {
 		sqlrcursor_svr	*initCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
-		bool	supportsBegin();
+		bool	supportsTransactionBlocks();
 		bool	commit();
 		bool	rollback();
 		bool	ping();

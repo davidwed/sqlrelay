@@ -57,6 +57,9 @@ void freetdsconnection::handleConnectString() {
 	language=connectStringValue("language");
 	hostname=connectStringValue("hostname");
 	packetsize=connectStringValue("packetsize");
+	setTranslateBindVariablesBehavior(
+		!charstring::compare(
+			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool freetdsconnection::logIn(bool printerrors) {
@@ -294,7 +297,7 @@ const char *freetdsconnection::bindFormat() {
 	return "@*";
 }
 
-const char *freetdsconnection::beginQuery() {
+const char *freetdsconnection::beginTransactionQuery() {
 	return "BEGIN TRANSACTION";
 }
 
