@@ -219,6 +219,87 @@ const char *postgresqlconnection::dbVersion() {
 	return dbversion;
 }
 
+const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	datname "
+		"from "
+		"	pg_database "
+		"where "
+		"	datname like '%s' "
+		"order by "
+		"	datname":
+
+		"select "
+		"	datname "
+		"from "
+		"	pg_database "
+		"order by "
+		"	datname";
+}
+
+const char *postgresqlconnection::getTableListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	table_name "
+		"from "
+		"	information_schema.tables "
+		"where "
+		"	table_schema = 'public' "
+		"	and "
+		"	table_name like '%s' "
+		"order by "
+		"	table_name":
+
+		"select "
+		"	table_name "
+		"from "
+		"	information_schema.tables "
+		"where "
+		"	table_schema = 'public' "
+		"order by "
+		"	table_name";
+}
+
+const char *postgresqlconnection::getColumnListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	column_name, "
+		"	data_type, "
+		"	character_maximum_length, "
+		"	numeric_precision, "
+		"	numeric_scale, "
+		"	is_nullable, "
+		"	'' as key, "
+		"	column_default, "
+		"	'' as extra "
+		"from "
+		"	information_schema.columns "
+		"where "
+		"	table_name='%s' "
+		"	and "
+		"	column_name like '%s' "
+		"order by "
+		"	ordinal_position":
+
+		"select "
+		"	column_name, "
+		"	data_type, "
+		"	character_maximum_length, "
+		"	numeric_precision, "
+		"	numeric_scale, "
+		"	is_nullable, "
+		"	'' as key, "
+		"	column_default, "
+		"	'' as extra "
+		"from "
+		"	information_schema.columns "
+		"where "
+		"	table_name='%s' "
+		"order by "
+		"	ordinal_position";
+}
+
 const char *postgresqlconnection::bindFormat() {
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
