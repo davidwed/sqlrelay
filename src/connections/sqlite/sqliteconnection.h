@@ -107,6 +107,9 @@ class sqliteconnection : public sqlrconnection_svr {
 		bool		ping();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*getDatabaseListQuery(bool wild);
+		const char	*getTableListQuery(bool wild);
+		const char	*getColumnListQuery(bool wild);
 #ifdef SQLITE3
 		char		*duplicate(const char *str);
 #endif

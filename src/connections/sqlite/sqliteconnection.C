@@ -87,6 +87,68 @@ const char *sqliteconnection::dbVersion() {
 #endif
 }
 
+const char *sqliteconnection::getDatabaseListQuery(bool wild) {
+	return "pragma database_list";
+}
+
+const char *sqliteconnection::getTableListQuery(bool wild) {
+	return (wild)?
+		"select "
+		"	tbl_name "
+		"from "
+		"(select "
+		"	tbl_name "
+		"from "
+		"	sqlite_master "
+		"where "
+		"	type in ('table','view') "
+		"	and "
+		"	tbl_name like '%s' "
+		"union all "
+		"select "
+		"	tbl_name "
+		"from "
+		"	sqlite_temp_master "
+		"where "
+		"	type in ('table','view') "
+		"	and "
+		"	tbl_name like '%s') "
+		"order by "
+		"	tbl_name":
+
+		"select "
+		"	tbl_name "
+		"from "
+		"(select "
+		"	tbl_name "
+		"from "
+		"	sqlite_master "
+		"where "
+		"	type in ('table','view') "
+		"union all "
+		"select "
+		"	tbl_name "
+		"from "
+		"	sqlite_temp_master "
+		"where "
+		"	type in ('table','view')) "
+		"order by "
+		"	tbl_name";
+}
+
+const char *sqliteconnection::getColumnListQuery(bool wild) {
+	return "select "
+		"	'' as column_name, "
+		"	'' as data_type, "
+		"	'' as length, "
+		"	'' as precision, "
+		"	'' as scale, "
+		"	'' as nullable, "
+		"	'' as key, "
+		"	'' as column_default, "
+		"	'' as extra ";
+}
+
 #ifndef SQLITE_TRANSACTIONAL
 bool sqliteconnection::isTransactional() {
 	return false;
