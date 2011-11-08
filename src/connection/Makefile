@@ -26,7 +26,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/commit.C \
 	sqlrconnection/connectioncount.C \
 	sqlrconnection/rollback.C \
-	sqlrconnection/fakebegins.C \
+	sqlrconnection/faketransactionblocks.C \
 	sqlrconnection/newquery.C \
 	sqlrconnection/getlist.C \
 	sqlrconnection/handlequery.C \
@@ -93,7 +93,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/commit.lo \
 	sqlrconnection/connectioncount.lo \
 	sqlrconnection/rollback.lo \
-	sqlrconnection/fakebegins.lo \
+	sqlrconnection/faketransactionblocks.lo \
 	sqlrconnection/newquery.lo \
 	sqlrconnection/getlist.lo \
 	sqlrconnection/handlequery.lo \
