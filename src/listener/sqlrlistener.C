@@ -73,11 +73,13 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 sqlrlistener::~sqlrlistener() {
 	delete semset;
 	delete idmemory;
-	if (unixport) {
-		file::remove(unixport);
-	}
-	if (pidfile) {
-		file::remove(pidfile);
+	if (!isforkedchild) {
+		if (unixport) {
+			file::remove(unixport);
+		}
+		if (pidfile) {
+			file::remove(pidfile);
+		}
 	}
 	if (init) {
 		cleanUp();
@@ -842,7 +844,6 @@ void sqlrlistener::blockSignals() {
 
 void sqlrlistener::alarmHandler(int signum) {
 	staticlistener->decForkedListeners();
-
 	delete staticlistener;
 	process::exit(0);
 }
@@ -1204,11 +1205,6 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 	// sockets, fork a child to handle it
 	pid_t	childpid;
 	if (!(childpid=process::fork())) {
-
-		// set pidfile to NULL so the pidfile won't be removed when
-		// this child process exits
-		delete[] pidfile;
-		pidfile=NULL;
 
 		isforkedchild=true;
 
