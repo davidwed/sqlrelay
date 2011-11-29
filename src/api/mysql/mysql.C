@@ -2330,6 +2330,7 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_DATETIME:
 			case MYSQL_TYPE_NEWDATE:
 				// FIXME: convert to string and bind...
+				cursor->inputBind(variable,(char *)NULL);
 				break;
 			case MYSQL_TYPE_DECIMAL:
 			case MYSQL_TYPE_FLOAT:
