@@ -66,7 +66,8 @@ void sqlrconnection_svr::shutDown(int signum) {
 	process::exit(exitcode);
 }
 
-int sqlrconnection_svr::main(int argc, const char **argv, sqlrconnection_svr *c) {
+int sqlrconnection_svr::main(int argc, const char **argv,
+					sqlrconnection_svr *c) {
 
 	#include <version.h>
 

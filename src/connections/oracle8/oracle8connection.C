@@ -503,13 +503,27 @@ void oracle8cursor::rewriteQuery() {
 	}
 
 	// bail if there isn't enough room to append a new on-commit clause
-	if (querylength+25>conn->maxquerysize) {
+	if (querylength+26>conn->maxquerysize) {
 		return;
 	}
 
-	// append an "on commit preserve rows" clause
-	charstring::append(querybuffer," on commit preserve rows");
-	querylength=querylength+24;
+	// does this query have an "as select" clause?
+	const char	*oncommitpreserverows=" on commit preserve rows ";
+	if (asselect.match(ptr)) {
+		// insert an "on commit preserve rows" clause prior to the
+		// "as select" clause
+		const char	*asselectstartptr=asselect.getSubstringStart(0);
+		stringbuffer	newquery;
+		newquery.append(querybuffer,asselectstartptr-querybuffer);
+		newquery.append(oncommitpreserverows);
+		newquery.append(asselectstartptr);
+		charstring::copy(querybuffer,newquery.getString());
+	} else {
+		// append an "on commit preserve rows" clause
+		charstring::append(querybuffer,oncommitpreserverows);
+	}
+
+	querylength=querylength+25;
 }
 
 bool oracle8connection::autoCommitOn() {
@@ -655,8 +669,13 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 #ifdef HAVE_ORACLE_8i
 	createtemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
+	createtemp.study();
 	deleterows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(delete|DELETE)[ \\t\\n\\r]+(rows|ROWS)");
+	deleterows.study();
 	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
+	preserverows.study();
+	asselect.compile("(as|AS)[ \\t\\n\\r]+\\(?[ \\t\\n\\r]?(select|SELECT)[ \\t\\n\\r]+");
+	asselect.study();
 #endif
 }
 
