@@ -15,7 +15,7 @@
 
 extern "C" {
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
 	#define debugPrintf(args...) printf(args); fflush(stdout);
@@ -192,6 +192,26 @@ struct MYSQL_BIND {
 struct MYSQL_PARAMETERS {
 	unsigned long *p_max_allowed_packet;
 	unsigned long *p_net_buffer_length;
+};
+
+enum enum_mysql_timestamp_type {
+	MYSQL_TIMESTAMP_NONE=-2,
+	MYSQL_TIMESTAMP_ERROR=-1,
+	MYSQL_TIMESTAMP_DATE=0,
+	MYSQL_TIMESTAMP_DATETIME=1,
+	MYSQL_TIMESTAMP_TIME=2
+};
+
+struct MYSQL_TIME {
+	unsigned int	year;
+	unsigned int	month;
+	unsigned int	day;
+	unsigned int	hour;
+	unsigned int	minute;
+	unsigned int	second;
+	unsigned long	second_part;
+	my_bool		neg;
+	enum enum_mysql_timestamp_type	time_type;;
 };
 
 // This is the same for all versions of mysql that I've ever seen
@@ -462,7 +482,6 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
 						user,passwd,0,1);
-mysql->sqlrcon->debugOn();
 	mysql->sqlrcon->copyReferences();
 	mysql->currentstmt=NULL;
 	mysql_select_db(mysql,db);
@@ -1596,6 +1615,204 @@ int mysql_execute(MYSQL_STMT *stmt) {
 	return mysql_stmt_execute(stmt);
 }
 
+static const char *shortmonths[]={
+	"JAN",
+	"FEB",
+	"MAR",
+	"APR",
+	"MAY",
+	"JUN",
+	"JUL",
+	"AUG",
+	"SEP",
+	"OCT",
+	"NOV",
+	"DEC",
+	NULL
+};
+
+static const char *longmonths[]={
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+	NULL
+};
+
+void parseDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
+
+	MYSQL_TIME	*tm=(MYSQL_TIME *)bind->buffer;
+
+	// initialize...
+	tm->year=2000;
+	tm->month=1;
+	tm->day=1;
+	tm->hour=0;
+	tm->minute=0;
+	tm->second=0;
+
+	// different db's format dates very differently
+
+	// split on a space
+	char		**parts;
+	uint64_t	partcount;
+	charstring::split(field,length," ",1,true,&parts,&partcount);
+
+	for (uint64_t i=0; i<partcount; i++) {
+
+		if (charstring::contains(parts[i],':')) {
+
+			// the section with :'s is the time...
+
+			// split on :
+			char		**timeparts;
+			uint64_t	timepartcount;
+			charstring::split(parts[i],":",1,true,
+						&timeparts,&timepartcount);
+	
+			// first is hour
+			if (timepartcount>0) {
+				tm->hour=charstring::toInteger(timeparts[0]);
+			}
+			// second is minute
+			if (timepartcount>1) {
+				tm->minute=charstring::toInteger(timeparts[1]);
+			}
+			// third is seconds
+			if (timepartcount>2) {
+				tm->second=charstring::toInteger(timeparts[2]);
+			}
+
+			// clean up
+			for (uint64_t i=0; i<timepartcount; i++) {
+				delete[] timeparts[i];
+			}
+			delete[] timeparts;
+
+		} else if (charstring::contains(parts[i],'/')) {
+
+			// the section with /'s is the date...
+
+			// split on /
+			char		**dateparts;
+			uint64_t	datepartcount;
+			charstring::split(parts[i],"/",1,true,
+						&dateparts,&datepartcount);
+
+			// assume month/day, but in some countries
+			// they do it the other way around
+			// I'm not sure how to decide...
+
+			// first is month
+			if (datepartcount>0) {
+				tm->month=charstring::toInteger(dateparts[0]);
+			}
+			// second is day
+			if (datepartcount>1) {
+				tm->day=charstring::toInteger(dateparts[1]);
+			}
+			// third is year
+			if (datepartcount>2) {
+				tm->year=charstring::toInteger(dateparts[2]);
+			}
+
+			// clean up
+			for (uint64_t i=0; i<datepartcount; i++) {
+				delete[] dateparts[i];
+			}
+			delete[] dateparts;
+
+		} else if (charstring::contains(parts[i],'-')) {
+
+			// the section with -'s is the date...
+
+			// split on -
+			char		**dateparts;
+			uint64_t	datepartcount;
+			charstring::split(parts[i],"-",1,true,
+						&dateparts,&datepartcount);
+
+			// some dates have a non-numeric month in part 2
+			bool	numericmonth=(datepartcount>1 &&
+					charstring::isNumber(parts[1]));
+
+			// if there's a non-numeric month then the
+			if (numericmonth) {
+				// first is day
+				if (datepartcount>0) {
+					tm->day=charstring::toInteger(
+								dateparts[0]);
+				}
+				// second is month
+				if (datepartcount>1) {
+					for (int i=0; shortmonths[i]; i++) {
+						if (!charstring::compareIgnoringCase(dateparts[1],shortmonths[i])) {
+							tm->month=i;
+						}
+					}
+					if (tm->month==0) {
+						for (int i=0; longmonths[i]; i++) {
+							if (!charstring::compareIgnoringCase(dateparts[1],longmonths[i])) {
+								tm->month=i;
+							}
+						}
+					}
+				}
+				// third is year
+				if (datepartcount>2) {
+					tm->year=charstring::toInteger(
+								dateparts[2]);
+				}
+			} else {
+				// first is year
+				if (datepartcount>0) {
+					tm->year=charstring::toInteger(
+								dateparts[0]);
+				}
+				// second is month
+				if (datepartcount>1) {
+					tm->month=charstring::toInteger(
+								dateparts[1]);
+				}
+				// third is day
+				if (datepartcount>2) {
+					tm->day=charstring::toInteger(
+								dateparts[2]);
+				}
+			}
+			// third segment is the year
+			// otherwise the first segment is the year,
+
+			// clean up
+			for (uint64_t i=0; i<datepartcount; i++) {
+				delete[] dateparts[i];
+			}
+			delete[] dateparts;
+		}
+	}
+
+	// manage 2-digit years
+	if (tm->year<50) {
+		tm->year=tm->year+2000;
+	} else if (tm->year<100) {
+		tm->year=tm->year+1900;
+	}
+
+	// clean up
+	for (uint64_t i=0; i<partcount; i++) {
+		delete[] parts[i];
+	}
+	delete[] parts;
+}
+
 int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 	debugFunction();
 
@@ -1633,11 +1850,6 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 					break;
 				case MYSQL_TYPE_VAR_STRING:
 				case MYSQL_TYPE_STRING:
-				case MYSQL_TYPE_TIMESTAMP:
-				case MYSQL_TYPE_DATE:
-				case MYSQL_TYPE_TIME:
-				case MYSQL_TYPE_DATETIME:
-				case MYSQL_TYPE_NEWDATE:
 
 					// set the output length (if we can)
 					unsigned long	len;
@@ -1666,6 +1878,14 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 							buffer[len]='\0';
 					}
 
+					break;
+				case MYSQL_TYPE_TIMESTAMP:
+				case MYSQL_TYPE_DATE:
+				case MYSQL_TYPE_TIME:
+				case MYSQL_TYPE_DATETIME:
+				case MYSQL_TYPE_NEWDATE:
+					parseDate(row[i],lengths[i],
+						&(stmt->resultbinds[i]));
 					break;
 				case MYSQL_TYPE_TINY:
 					*((char *)stmt->
@@ -2099,16 +2319,18 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				break;
 			}
 			case MYSQL_TYPE_VAR_STRING:
-			case MYSQL_TYPE_STRING:
+			case MYSQL_TYPE_STRING: {
+				char	*value=(char *)bind[i].buffer;
+				cursor->inputBind(variable,value);
+				break;
+			}
 			case MYSQL_TYPE_TIMESTAMP:
 			case MYSQL_TYPE_DATE:
 			case MYSQL_TYPE_TIME:
 			case MYSQL_TYPE_DATETIME:
-			case MYSQL_TYPE_NEWDATE: {
-				char		*value=(char *)bind[i].buffer;
-				cursor->inputBind(variable,value);
+			case MYSQL_TYPE_NEWDATE:
+				// FIXME: convert to string and bind...
 				break;
-			}
 			case MYSQL_TYPE_DECIMAL:
 			case MYSQL_TYPE_FLOAT:
 			case MYSQL_TYPE_DOUBLE: {
