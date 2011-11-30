@@ -1589,11 +1589,17 @@ enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 	}
 
 	for (int index=0; datatypestring[index]; index++) {
+
+		// compare "columntypelen" bytes but also make sure that the
+		// byte afterward is a NULL, we don't want "DATE" to match
+		// "DATETIME" for example
 		if (!charstring::compareIgnoringCase(
-						datatypestring[index],
-						columntype,columntypelen)) {
+					datatypestring[index],
+					columntype,columntypelen) &&
+				datatypestring[index][columntypelen]=='\0') {
 
 			enum_field_types	retval=mysqltypemap[index];
+printf("%s mapped to %d\n",datatypestring[index],retval);
 
 			// Some DB's, like oracle, don't distinguish between
 			// float and integer types, they just have a numeric
