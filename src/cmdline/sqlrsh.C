@@ -39,15 +39,34 @@ using namespace rudiments;
 	}
 #endif
 
-class	environment {
+class sqlrshbindvalue {
+	public:
+		union {
+			char	*stringval;
+			int64_t	integerval;
+			struct {
+				double		value;
+				uint32_t	precision;
+				uint32_t	scale;
+			} doubleval;
+		};
+		bindtype	type;
+};
+
+class environment {
 	public:
 			environment();
+			~environment();
+		void	 clearbinds(
+			stringdictionary< sqlrshbindvalue * > *binds);
 		bool	color;
 		bool	headers;
 		bool	stats;
 		bool	debug;
 		bool	final;
 		char	delimiter;
+		stringdictionary< sqlrshbindvalue * >	inputbinds;
+		stringdictionary< sqlrshbindvalue * >	outputbinds;
 };
 
 environment::environment() {
@@ -57,6 +76,29 @@ environment::environment() {
 	debug=false;
 	final=false;
 	delimiter=';';
+}
+
+environment::~environment() {
+	clearbinds(&inputbinds);
+	clearbinds(&outputbinds);
+}
+
+void environment::clearbinds(stringdictionary< sqlrshbindvalue * > *binds) {
+
+	for (stringdictionarylistnode< sqlrshbindvalue * > *node=
+		(stringdictionarylistnode< sqlrshbindvalue *> *)
+		binds->getList()->getFirstNode(); node;
+		node=(stringdictionarylistnode< sqlrshbindvalue *> *)
+							node->getNext()) {
+
+		delete[] node->getData()->getKey();
+		sqlrshbindvalue	*bv=node->getData()->getData();
+		if (bv->type==STRING_BIND) {
+			delete[] bv->stringval;
+		}
+		delete node->getData();
+	}
+	binds->clear();
 }
 
 enum querytype_t {
@@ -99,6 +141,7 @@ class	sqlrsh {
 		void	externalCommand(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env, 
 					const char *command);
+		void	executeQuery(sqlrcursor *sqlrcur, environment *env);
 		char	*getWild(const char *command);
 		char	*getTable(enum querytype_t querytype,
 					const char *command);
@@ -114,6 +157,17 @@ class	sqlrsh {
 						environment *env);
 		void	serverversion(sqlrconnection *sqlrcon,
 						environment *env);
+		void	inputbind(sqlrcursor *sqlrcur,
+						environment *env,
+						const char *command);
+		void	outputbind(sqlrcursor *sqlrcur,
+						environment *env,
+						const char *command);
+		void	printbinds(const char *type,
+				stringdictionary< sqlrshbindvalue * >
+								*binds);
+		void	clearbinds(stringdictionary< sqlrshbindvalue * >
+								*binds);
 		void	displayHelp(environment *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, environment *env);
@@ -287,7 +341,15 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"run",3) ||
 		!charstring::compareIgnoringCase(ptr,"@",1) ||
 		!charstring::compareIgnoringCase(ptr,"delimiter",9) ||
-		!charstring::compareIgnoringCase(ptr,"delimeter",9)) {
+		!charstring::compareIgnoringCase(ptr,"delimeter",9) ||
+		!charstring::compareIgnoringCase(ptr,"inputbind",9) ||
+		!charstring::compareIgnoringCase(ptr,"outputbind",10) ||
+		!charstring::compareIgnoringCase(ptr,"printinputbind",14) ||
+		!charstring::compareIgnoringCase(ptr,"printoutputbind",15) ||
+		!charstring::compareIgnoringCase(ptr,"printbinds",10) ||
+		!charstring::compareIgnoringCase(ptr,"clearinputbind",14) ||
+		!charstring::compareIgnoringCase(ptr,"clearoutputbind",15) ||
+		!charstring::compareIgnoringCase(ptr,"clearbinds",10)) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -357,6 +419,28 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"serverversion",13)) {	
 		serverversion(sqlrcon,env);
 		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"inputbind",9)) {	
+		inputbind(sqlrcur,env,command);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"outputbind",10)) {	
+		outputbind(sqlrcur,env,command);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"printbinds",10)) {	
+		printbinds("Input",&env->inputbinds);
+		printf("\n");
+		printbinds("Output",&env->outputbinds);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"clearinputbind",14)) {	
+		env->clearbinds(&env->inputbinds);
+		return;
+	} else if (!charstring::compareIgnoringCase(
+					ptr,"clearoutputbind",15)) {	
+		env->clearbinds(&env->outputbinds);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"clearbinds",10)) {	
+		env->clearbinds(&env->inputbinds);
+		env->clearbinds(&env->outputbinds);
+		return;
 	} else {
 		return;
 	}
@@ -424,31 +508,35 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 		// send the query
 		if (!charstring::compareIgnoringCase(command,
-						"show databases",14)) {
+							"show databases",14)) {
 			char	*wild=getWild(command);
 			sqlrcur->getDatabaseList(wild);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
-						"show tables",11)) {
+							"show tables",11)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableList(wild);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
-						"show columns",12)) {
+							"show columns",12)) {
 			char	*table=getTable(SHOW_COLUMNS_QUERY,command);
 			char	*wild=getWild(command);
 			sqlrcur->getColumnList(table,wild);
 			delete[] table;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
-						"describe ",9)) {
+							"describe ",9)) {
 			char	*table=getTable(DESCRIBE_QUERY,command);
 			char	*wild=getWild(command);
 			sqlrcur->getColumnList(table,wild);
 			delete[] table;
 			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+							"reexecute",9)) {	
+			executeQuery(sqlrcur,env);
 		} else {
-			sqlrcur->sendQuery(command);
+			sqlrcur->prepareQuery(command);
+			executeQuery(sqlrcur,env);
 		}
 
 		// look for an error
@@ -476,6 +564,82 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 	// display statistics
 	displayStats(sqlrcur,env);
+}
+
+void sqlrsh::executeQuery(sqlrcursor *sqlrcur, environment *env) {
+
+	sqlrcur->clearBinds();
+
+	if (env->inputbinds.getList()->getLength()) {
+
+		for (stringdictionarylistnode< sqlrshbindvalue * > *node=
+			(stringdictionarylistnode< sqlrshbindvalue *> *)
+			env->inputbinds.getList()->getFirstNode(); node;
+			node=(stringdictionarylistnode< sqlrshbindvalue *> *)
+							node->getNext()) {
+
+			const char	*name=node->getData()->getKey();
+			sqlrshbindvalue	*bv=node->getData()->getData();
+			if (bv->type==STRING_BIND) {
+				sqlrcur->inputBind(name,bv->stringval);
+			} else if (bv->type==INTEGER_BIND) {
+				sqlrcur->inputBind(name,bv->integerval);
+			} else if (bv->type==DOUBLE_BIND) {
+				sqlrcur->inputBind(name,bv->doubleval.value,
+							bv->doubleval.precision,
+							bv->doubleval.scale);
+			} else if (bv->type==NULL_BIND) {
+				sqlrcur->inputBind(name,(const char *)NULL);
+			}
+		}
+	}
+
+	if (env->outputbinds.getList()->getLength()) {
+
+		for (stringdictionarylistnode< sqlrshbindvalue * > *node=
+			(stringdictionarylistnode< sqlrshbindvalue *> *)
+			env->inputbinds.getList()->getFirstNode(); node;
+			node=(stringdictionarylistnode< sqlrshbindvalue *> *)
+							node->getNext()) {
+
+			const char	*name=node->getData()->getKey();
+			sqlrshbindvalue	*bv=node->getData()->getData();
+			if (bv->type==STRING_BIND) {
+				// FIXME: make buffer length variable
+				sqlrcur->defineOutputBindString(name,1024);
+			} else if (bv->type==INTEGER_BIND) {
+				sqlrcur->defineOutputBindInteger(name);
+			} else if (bv->type==DOUBLE_BIND) {
+				sqlrcur->defineOutputBindDouble(name);
+			}
+		}
+	}
+
+	sqlrcur->executeQuery();
+
+	if (env->outputbinds.getList()->getLength()) {
+
+		for (stringdictionarylistnode< sqlrshbindvalue * > *node=
+			(stringdictionarylistnode< sqlrshbindvalue *> *)
+			env->inputbinds.getList()->getFirstNode(); node;
+			node=(stringdictionarylistnode< sqlrshbindvalue *> *)
+							node->getNext()) {
+
+			const char	*name=node->getData()->getKey();
+			sqlrshbindvalue	*bv=node->getData()->getData();
+			if (bv->type==STRING_BIND) {
+				delete[] bv->stringval;
+				bv->stringval=charstring::duplicate(
+					sqlrcur->getOutputBindString(name));
+			} else if (bv->type==INTEGER_BIND) {
+				bv->integerval=
+					sqlrcur->getOutputBindInteger(name);
+			} else if (bv->type==DOUBLE_BIND) {
+				bv->integerval=
+					sqlrcur->getOutputBindDouble(name);
+			}
+		}
+	}
 }
 
 char *sqlrsh::getWild(const char *command) {
@@ -702,6 +866,162 @@ void sqlrsh::serverversion(sqlrconnection *sqlrcon, environment *env) {
 	white(env);
 }
 
+void sqlrsh::inputbind(sqlrcursor *sqlrcur,
+				environment *env, const char *command) {
+
+	// split the command on ' '
+	char		**parts;
+	uint64_t	partcount;
+	charstring::split(command," ",true,&parts,&partcount);
+
+	// sanity check...
+	bool	sane=true;
+	if (partcount>2 && !charstring::compare(parts[0],"inputbind") &&
+					!charstring::compare(parts[2],"=")) {
+
+		// if the bind variable is already defined, clear it...
+		sqlrshbindvalue	*bv=NULL;
+		if (env->inputbinds.getData(parts[1],&bv)) {
+			delete[] bv;
+		}
+
+		// define the variable
+		bv=new sqlrshbindvalue;
+
+		// determine the type
+		char		*value=(partcount==4)?parts[3]:NULL;
+		charstring::bothTrim(value);
+		size_t		valuelen=charstring::length(value);
+
+		// first handle nulls, then...
+		// anything enclosed in quotes is a string
+		// if it's unquoted, check to see if it's an integer or float
+		// if it's not, then it's a string
+		if (!value) {
+			bv->type=NULL_BIND;
+		} else if ((value[0]=='\'' && value[valuelen-1]=='\'') ||
+				(value[0]=='"' && value[valuelen-1]=='"')) {
+
+			bv->type=STRING_BIND;
+
+			// trim off quotes
+			char	*newvalue=charstring::duplicate(value+1);
+			newvalue[valuelen-2]='\0';
+			delete[] value;
+
+			// unescape the string
+			bv->stringval=charstring::unescape(newvalue);
+			delete[] newvalue;
+
+		} else if (charstring::isInteger(value)) {
+			bv->type=INTEGER_BIND;
+			bv->integerval=charstring::toInteger(value);
+			delete[] value;
+		} else if (charstring::isNumber(value)) {
+			bv->type=DOUBLE_BIND;
+			bv->doubleval.value=charstring::toFloat(value);
+			bv->doubleval.precision=valuelen-((value[0]=='-')?2:1);
+			bv->doubleval.scale=
+				charstring::findFirst(value,'.')-value+
+				((value[0]=='-')?0:1);
+			delete[] value;
+		} else {
+			bv->type=STRING_BIND;
+			bv->stringval=value;
+		}
+
+		// put the bind variable in the list
+		env->inputbinds.setData(parts[1],bv);
+
+	} else {
+		printf("usage: inputbind [variable] = [value]\n");
+		sane=false;
+	}
+
+	// clean up
+	if (sane) {
+		delete[] parts[0];
+		delete[] parts[2];
+	} else {
+		for (uint64_t i=0; i<partcount; i++) {
+			delete[] parts[i];
+		}
+	}
+	delete[] parts;
+}
+
+void sqlrsh::outputbind(sqlrcursor *sqlrcur,
+				environment *env, const char *command) {
+
+	// split the command on ' '
+	char		**parts;
+	uint64_t	partcount;
+	charstring::split(command," ",true,&parts,&partcount);
+
+	// sanity check...
+	bool	sane=true;
+	if (partcount==2 && !charstring::compare(parts[0],"outputbind")) {
+
+		// if the bind variable is already defined, clear it...
+		sqlrshbindvalue	*bv=NULL;
+		if (env->inputbinds.getData(parts[1],&bv)) {
+			delete[] bv;
+		}
+
+		// define the variable
+		bv=new sqlrshbindvalue;
+
+		// FIXME: handle non-strings...
+		bv->stringval=NULL;
+		bv->type=STRING_BIND;
+		env->inputbinds.setData(parts[1],bv);
+
+	} else {
+		printf("usage: outputbind [variable]\n");
+		sane=false;
+	}
+
+	// clean up
+	if (sane) {
+		delete[] parts[0];
+	} else {
+		for (uint64_t i=0; i<partcount; i++) {
+			delete[] parts[i];
+		}
+	}
+	delete[] parts;
+}
+
+void sqlrsh::printbinds(const char *type,
+			stringdictionary< sqlrshbindvalue * > *binds) {
+
+	printf("%s bind variables:\n",type);
+
+	for (stringdictionarylistnode< sqlrshbindvalue * > *node=
+		(stringdictionarylistnode< sqlrshbindvalue *> *)
+		binds->getList()->getFirstNode();
+		node;
+		node=(stringdictionarylistnode< sqlrshbindvalue *> *)
+						node->getNext()) {
+
+		printf("    %s ",node->getData()->getKey());
+		sqlrshbindvalue	*bv=node->getData()->getData();
+		if (bv->type==STRING_BIND) {
+			printf("(STRING) = %s\n",bv->stringval);
+		} else if (bv->type==INTEGER_BIND) {
+			printf("(INTEGER) = %lld\n",bv->integerval);
+		} else if (bv->type==DOUBLE_BIND) {
+			printf("(DOUBLE %d,%d) = %*.*f\n",
+						bv->doubleval.precision,
+						bv->doubleval.scale,
+						bv->doubleval.precision,
+						bv->doubleval.scale,
+						bv->doubleval.value);
+		} else if (bv->type==NULL_BIND) {
+			printf("NULL\n");
+		}
+	}
+}
 
 void sqlrsh::displayHelp(environment *env) {
 
@@ -757,11 +1077,35 @@ void sqlrsh::displayHelp(environment *env) {
 	cyan(env);
 	printf("	delimiter [character]	- ");
 	green(env);
-	printf("sets delimiter character to [character]\n");
+	printf("sets delimiter character to [character]\n\n");
 	cyan(env);
-	printf("	exit/quit		- ");
+	printf("	inputbind [variable] = [value] - ");
 	green(env);
-	printf("exits\n\n");
+	printf("defines an input bind variable\n");
+	cyan(env);
+	printf("	outputbind [variable]          - ");
+	green(env);
+	printf("defines an output bind variable\n");
+	cyan(env);
+	printf("	printbinds                     - ");
+	green(env);
+	printf("prints all bind variables\n");
+	cyan(env);
+	printf("	clearinputbind [variable]      - ");
+	green(env);
+	printf("clears an input bind variable\n");
+	cyan(env);
+	printf("	clearoutputbind [variable]     - ");
+	green(env);
+	printf("clears an output bind variable\n");
+	cyan(env);
+	printf("	clearbinds                     - ");
+	green(env);
+	printf("clears all bind variables\n");
+	cyan(env);
+	printf("	reexecute                      - ");
+	green(env);
+	printf("reexecutes the previous query\n\n");
 	cyan(env);
 	printf("	show databases [like pattern]		-\n");
 	green(env);
@@ -777,7 +1121,11 @@ void sqlrsh::displayHelp(environment *env) {
 	cyan(env);
 	printf("	describe table				-\n");
 	green(env);
-	printf("		returns a list of columns in the table \"table\"\n\n");
+	printf("		returns a list of columns in the table \"table\"\n");
+	cyan(env);
+	printf("	exit/quit		- ");
+	green(env);
+	printf("exits\n\n");
 	yellow(env);
 	printf("	All commands must be followed by a semicolon.\n");
 	white(env);

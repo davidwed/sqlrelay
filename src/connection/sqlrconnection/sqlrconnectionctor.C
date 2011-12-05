@@ -48,6 +48,9 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	// maybe someday these parameters will be configurable
 	bindpool=new memorypool(512,128,100);
+	bindmappingspool=new memorypool(512,128,100);
+	inbindmappings=new namevaluepairs;
+	outbindmappings=new namevaluepairs;
 
 	cur=NULL;
 

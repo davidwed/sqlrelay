@@ -306,6 +306,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 					bool bindcursor,
 					bool reallyexecute,
 					bool getquery);
+		void	clearBindMappings();
 		bool	getQueryFromClient(sqlrcursor_svr *cursor,
 						bool reexecute,
 						bool bindcursor);
@@ -343,6 +344,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						sqlrcursor_svr *cursor,
 						const char *currentbind,
 						uint16_t bindindex);
+		void	translateBindVariablesFromMappings(
+						sqlrcursor_svr *cursor);
 		void	commitOrRollback(sqlrcursor_svr *cursor);
 		bool	handleError(sqlrcursor_svr *cursor);
 		bool	returnError(sqlrcursor_svr *cursor);
@@ -413,6 +416,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		filedescriptor		*clientsock;
 
 		memorypool	*bindpool;
+		memorypool	*bindmappingspool;
+		namevaluepairs	*inbindmappings;
+		namevaluepairs	*outbindmappings;
 
 		sqlrcursor_svr	**cur;
 

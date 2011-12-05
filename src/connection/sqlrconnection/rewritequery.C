@@ -278,6 +278,7 @@ void sqlrconnection_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 						cursor->outbindcount;
 		bindvar_svr	*vars=(!i)?cursor->inbindvars:
 						cursor->outbindvars;
+		namevaluepairs	*mappings=(!i)?inbindmappings:outbindmappings;
 
 		for (uint16_t j=0; j<count; j++) {
 
@@ -302,8 +303,11 @@ void sqlrconnection_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 				uint16_t	tempnumberlen=charstring::
 							length(tempnumber);
 
+				// keep track of the old name
+				char	*oldvariable=b->variable;
+
 				// allocate memory for the new name
-				b->variable=(char *)bindpool->
+				b->variable=(char *)bindmappingspool->
 							malloc(tempnumberlen+2);
 
 				// replace the existing bind var name and size
@@ -312,9 +316,55 @@ void sqlrconnection_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 				b->variable[tempnumberlen+1]='\0';
 				b->variablesize=tempnumberlen+1;
 
+				// create bind variable mappings
+				mappings->setData(oldvariable,b->variable);
+				
 				// clean up
 				delete[] tempnumber;
 			}
+		}
+	}
+}
+
+void sqlrconnection_svr::translateBindVariablesFromMappings(
+						sqlrcursor_svr *cursor) {
+
+	// run two passes
+	for (uint16_t i=0; i<2; i++) {
+
+		// first pass for input binds, second pass for output binds
+		uint16_t	count=(!i)?cursor->inbindcount:
+						cursor->outbindcount;
+		bindvar_svr	*vars=(!i)?cursor->inbindvars:
+						cursor->outbindvars;
+		namevaluepairs	*mappings=(!i)?inbindmappings:outbindmappings;
+
+		for (uint16_t j=0; j<count; j++) {
+
+			// get the bind var
+			bindvar_svr	*b=&(vars[j]);
+
+			// remap it
+			char	*newvariable;
+			if (mappings->getData(b->variable,&newvariable)) {
+				b->variable=newvariable;
+			}
+		}
+	}
+
+	// debug
+	dbgfile.debugPrint("connection",2,"remapped input binds:");
+	if (dbgfile.debugEnabled()) {
+		for (uint16_t i=0; i<cursor->inbindcount; i++) {
+			dbgfile.debugPrint("connection",3,
+					cursor->inbindvars[i].variable);
+		}
+	}
+	dbgfile.debugPrint("connection",2,"remapped output binds:");
+	if (dbgfile.debugEnabled()) {
+		for (uint16_t i=0; i<cursor->outbindcount; i++) {
+			dbgfile.debugPrint("connection",3,
+					cursor->outbindvars[i].variable);
 		}
 	}
 }

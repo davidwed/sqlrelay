@@ -10,6 +10,11 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 	dbgfile.debugPrint("connection",1,"handling query...");
 
+	// clear bind mappings
+	if (!reexecute && !bindcursor) {
+		clearBindMappings();
+	}
+
 	if (getquery) {
 		if (!getQueryFromClient(cursor,reexecute,bindcursor)) {
 			dbgfile.debugPrint("connection",1,
@@ -95,6 +100,16 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 	}
 }
 
+void sqlrconnection_svr::clearBindMappings() {
+
+	// delete the data from the nodes
+	bindmappingspool->free();
+
+	// delete the nodes themselves
+	inbindmappings->clear();
+	outbindmappings->clear();
+}
+
 bool sqlrconnection_svr::getQueryFromClient(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor) {
 
@@ -173,6 +188,9 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 				doegress=false;
 				success=true;
 			} else {
+
+				translateBindVariablesFromMappings(cursor);
+
 				success=(cursor->handleBinds() && 
 					executeQueryUpdateStats(cursor,
 							cursor->querybuffer,
