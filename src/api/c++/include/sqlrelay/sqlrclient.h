@@ -89,6 +89,11 @@ class sqlrconnection {
 		bool	selectDatabase(const char *database);
 				// Sets the current database/schema to
 				// "database"
+		const char	*getCurrentDatabase();
+				// Returns the database/schema that is
+				// currently in use.
+
+
 		bool	autoCommitOn();
 				// Instructs the database to perform a commit
 				// after every successful query.

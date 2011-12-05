@@ -252,6 +252,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	suspendSessionCommand();
 		void	endSessionCommand();
 		void	selectDatabaseCommand();
+		void	getCurrentDatabaseCommand();
 		void	pingCommand();
 		void	identifyCommand();
 		void	autoCommitCommand();

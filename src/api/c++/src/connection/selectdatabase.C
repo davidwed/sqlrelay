@@ -16,8 +16,9 @@ bool sqlrconnection::selectDatabase(const char *database) {
 
 	if (debug) {
 		debugPreStart();
-		debugPrint("Pinging...");
-		debugPrint("\n");
+		debugPrint("Selecting database ");
+		debugPrint(database);
+		debugPrint("...\n");
 		debugPreEnd();
 	}
 
@@ -41,4 +42,47 @@ bool sqlrconnection::selectDatabase(const char *database) {
 		return false;
 	}
 	return result;
+}
+
+const char *sqlrconnection::getCurrentDatabase() {
+
+	if (!openSession()) {
+		return NULL;
+	}
+
+	if (debug) {
+		debugPreStart();
+		debugPrint("Getting the current database...");
+		debugPrint("\n");
+		debugPreEnd();
+	}
+
+	// tell the server we want to select a db
+	cs->write((uint16_t)GET_CURRENT_DATABASE);
+	flushWriteBuffer();
+
+	// get the current db name
+	uint16_t	size;
+	if (cs->read(&size)==sizeof(uint16_t)) {
+		delete[] currentdbname;
+		currentdbname=new char[size+1];
+		if (cs->read(currentdbname,size)!=size) {
+			setError("Failed to get the current database.\n A network error may have ocurred.");
+			delete[] currentdbname;
+			currentdbname=NULL;
+			return NULL;
+		}
+		currentdbname[size]='\0';
+
+		if (debug) {
+			debugPreStart();
+			debugPrint(currentdbname);
+			debugPrint("\n");
+			debugPreEnd();
+		}
+	} else {
+		setError("Failed to get the current database.\n A network error may have ocurred.");
+		return NULL;
+	}
+	return currentdbname;
 }

@@ -99,6 +99,9 @@ void sqlrconnection_svr::clientSession() {
 		} else if (command==SELECT_DATABASE) {
 			selectDatabaseCommand();
 			continue;
+		} else if (command==GET_CURRENT_DATABASE) {
+			getCurrentDatabaseCommand();
+			continue;
 		}
 
 		// For the rest of the commands, the client will be requesting

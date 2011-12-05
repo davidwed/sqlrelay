@@ -70,6 +70,9 @@
 		// server version
 		char		*serverversion;
 
+		// current database name
+		char		*currentdbname;
+
 		// bind format
 		char		*bindformat;
 

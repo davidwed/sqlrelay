@@ -40,7 +40,7 @@ void sqlrconnection_svr::endSessionInternal() {
 	}
 
 	// reset database/schema
-	if (dbselected && originaldb) {
+	if (dbselected) {
 		selectDatabase(originaldb);
 		dbselected=false;
 	}

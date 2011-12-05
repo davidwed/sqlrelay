@@ -49,8 +49,19 @@ void sqlrconnection_svr::selectDatabaseCommand() {
 
 bool sqlrconnection_svr::selectDatabase(const char *database) {
 
+	// handle the degenerate case
+	if (!database) {
+		return true;
+	}
+
 	// get the select database query base
 	const char	*sdquerybase=selectDatabaseQuery();
+
+	// If there is no query for this then the db we're using doesn't
+	// support switching.  Return true as if it succeeded though.
+	if (!sdquerybase) {
+		return true;
+	}
 
 	// bounds checking
 	int		sdquerylen=charstring::length(sdquerybase)+
@@ -87,13 +98,39 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 }
 
 const char *sqlrconnection_svr::selectDatabaseQuery() {
-	return "use %s";
+	return NULL;
+}
+
+void sqlrconnection_svr::getCurrentDatabaseCommand() {
+
+	dbgfile.debugPrint("connection",1,"get current database");
+
+	// get the current database
+	char		*currentdb=getCurrentDatabase();
+	uint16_t	currentdbsize=charstring::length(currentdb);
+
+	// send it to the client
+	clientsock->write(currentdbsize);
+	clientsock->write(currentdb,currentdbsize);
+	flushWriteBuffer();
+
+	// clean up
+	delete[] currentdb;
+
+	return;
 }
 
 char *sqlrconnection_svr::getCurrentDatabase() {
 
 	// get the get current database query base
 	const char	*gcdquery=getCurrentDatabaseQuery();
+
+	// If there is no query for this then the db we're using doesn't
+	// support switching.
+	if (!gcdquery) {
+		return NULL;
+	}
+
 	size_t		gcdquerylen=charstring::length(gcdquery);
 
 	sqlrcursor_svr	*gcdcur=initCursorUpdateStats();
@@ -123,5 +160,5 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 }
 
 const char *sqlrconnection_svr::getCurrentDatabaseQuery() {
-	return "select database()";
+	return NULL;
 }
