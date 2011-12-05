@@ -105,7 +105,14 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 		executeQueryUpdateStats(gcdcur,gcdquery,gcdquerylen,true)) {
 
 		if (!gcdcur->noRowsToReturn() && gcdcur->fetchRow()) {
-			// FIXME: get the result and return it
+
+			// get the first field of the row and return it
+			const char	*field=NULL;
+			uint64_t	fieldlength=0;
+			bool		blob=false;
+			bool		null=false;
+			gcdcur->getField(0,&field,&fieldlength,&blob,&null);
+			retval=charstring::duplicate(field);
 		} 
 
 		gcdcur->cleanUpData(true,true);

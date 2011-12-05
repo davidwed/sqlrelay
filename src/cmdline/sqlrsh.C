@@ -339,6 +339,7 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"dbversion",9) ||
 		!charstring::compareIgnoringCase(ptr,"clientversion",13) ||
 		!charstring::compareIgnoringCase(ptr,"serverversion",13) ||
+		!charstring::compareIgnoringCase(ptr,"use ",4) ||
 		!charstring::compareIgnoringCase(ptr,"run",3) ||
 		!charstring::compareIgnoringCase(ptr,"@",1) ||
 		!charstring::compareIgnoringCase(ptr,"delimiter",9) ||
@@ -397,6 +398,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"ping",4)) {	
 		ping(sqlrcon,env);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"use ",4)) {	
+		sqlrcon->selectDatabase(ptr+4);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"run",3)) {	
 		ptr=ptr+3;
@@ -1077,6 +1081,10 @@ void sqlrsh::displayHelp(environment *env) {
 	printf("	serverversion		- ");
 	green(env);
 	printf("returns the version of the SQL Relay server\n");
+	cyan(env);
+	printf("	use [database]		- ");
+	green(env);
+	printf("change the current database/schema\n");
 	cyan(env);
 	printf("	run script		- ");
 	green(env);
