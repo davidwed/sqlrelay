@@ -375,6 +375,14 @@ const char *freetdsconnection::getColumnListQuery(bool wild) {
 		"	syscolumns.colid";
 }
 
+const char *freetdsconnection::selectDatabaseQuery() {
+	return "use %s";
+}
+
+const char *freetdsconnection::getCurrentDatabaseQuery() {
+	return "select db_name()";
+}
+
 const char *freetdsconnection::bindFormat() {
 	return "@*";
 }

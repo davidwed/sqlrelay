@@ -300,6 +300,14 @@ const char *postgresqlconnection::getColumnListQuery(bool wild) {
 		"	ordinal_position";
 }
 
+const char *postgresqlconnection::selectDatabaseQuery() {
+	return "use %s";
+}
+
+const char *postgresqlconnection::getCurrentDatabaseQuery() {
+	return "select current_database()";
+}
+
 const char *postgresqlconnection::bindFormat() {
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)

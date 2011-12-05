@@ -266,6 +266,14 @@ const char *mysqlconnection::getColumnListQuery(bool wild) {
 			"	table_name='%s' ";
 }
 
+const char *mysqlconnection::selectDatabaseQuery() {
+	return "use %s";
+}
+
+const char *mysqlconnection::getCurrentDatabaseQuery() {
+	return "select database()";
+}
+
 bool mysqlconnection::isTransactional() {
 	return true;
 }

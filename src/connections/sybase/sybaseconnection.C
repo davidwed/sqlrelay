@@ -346,6 +346,14 @@ const char *sybaseconnection::getColumnListQuery(bool wild) {
 		"	syscolumns.colid";
 }
 
+const char *sybaseconnection::selectDatabaseQuery() {
+	return "use %s";
+}
+
+const char *sybaseconnection::getCurrentDatabaseQuery() {
+	return "select db_name()";
+}
+
 const char *sybaseconnection::bindFormat() {
 	return "@*";
 }

@@ -116,6 +116,8 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
+		const char	*selectDatabaseQuery();
+		const char	*getCurrentDatabaseQuery();
 		const char	*bindFormat();
 
 		int	datatypecount;
