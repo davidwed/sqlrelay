@@ -762,20 +762,21 @@ bool db2cursor::fetchRow() {
 	return true;
 }
 
-void db2cursor::returnRow() {
+void db2cursor::getField(uint32_t col,
+				const char **fld, uint64_t *fldlength,
+				bool *blob, bool *null) {
 
-	for (SQLSMALLINT index=0; index<ncols; index++) {
-
-		// handle a null field
-		if (indicator[index][rowgroupindex]==SQL_NULL_DATA) {
-			conn->sendNullField();
-			continue;
-		}
-
-		// handle a non-null field
-		conn->sendField(field[index][rowgroupindex],
-				indicator[index][rowgroupindex]);
+	// handle NULLs
+	if (indicator[col][rowgroupindex]==SQL_NULL_DATA) {
+		*null=true;
+		return;
 	}
 
+	// handle normal datatypes
+	*fld=field[col][rowgroupindex];
+	*fldlength=indicator[col][rowgroupindex];
+}
+
+void db2cursor::nextRow() {
 	rowgroupindex++;
 }

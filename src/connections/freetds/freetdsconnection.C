@@ -1268,19 +1268,24 @@ bool freetdscursor::fetchRow() {
 	return true;
 }
 
-void freetdscursor::returnRow() {
+void freetdscursor::getField(uint32_t col,
+				const char **field, uint64_t *fieldlength,
+				bool *blob, bool *null) {
 
-	// send each row back
-	for (CS_INT col=0; col<ncols; col++) {
-		if (nullindicator[col][row]>-1 && datalength[col][row]) {
-			conn->sendField(data[col][row],datalength[col][row]-1);
-		} else {
-			conn->sendNullField();
-		}
+	// handle normal datatypes
+	if (nullindicator[col][row]>-1 && datalength[col][row]) {
+		*field=data[col][row];
+		*fieldlength=datalength[col][row]-1;
+		return;
 	}
-	row++;
+
+	// handle NULLs
+	*null=true;
 }
 
+void freetdscursor::nextRow() {
+	row++;
+}
 
 void freetdscursor::cleanUpData(bool freeresult, bool freebinds) {
 

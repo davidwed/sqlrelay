@@ -96,6 +96,15 @@ class sqlrcursor_svr {
 		virtual	void	returnOutputBindBlob(uint16_t index);
 		virtual	void	returnOutputBindClob(uint16_t index);
 		virtual	void	returnOutputBindCursor(uint16_t index);
+		virtual void	sendLobOutputBind(uint16_t index);
+		virtual bool	getLobOutputBindLength(uint16_t index,
+							uint64_t *length);
+		virtual bool	getLobOutputBindSegment(uint16_t index,
+							char *buffer,
+							uint64_t buffersize,
+							uint64_t offset,
+							uint64_t charstoread,
+							uint64_t *charsread);
 		virtual void	checkForTempTable(const char *query,
 							uint32_t length);
 		virtual	bool	executeQuery(const char *query,
@@ -116,21 +125,25 @@ class sqlrcursor_svr {
 		virtual	bool		skipRow()=0;
 		virtual	bool		fetchRow()=0;
 		virtual	void		returnRow();
-		/*virtual void		getField(uint32_t index,
+		virtual	void		nextRow();
+		virtual void		getField(uint32_t col,
 							const char **field,
 							uint64_t *fieldlength,
 							bool *blob,
-							bool *null)=0;*/
-		virtual void		sendLob(uint32_t index);
-		virtual uint64_t	getLobLength(uint32_t index);
-		virtual bool		getLobSegment(char *lobbuffer,
+							bool *null);
+		virtual void		sendLobField(uint32_t col);
+		virtual bool		getLobFieldLength(uint32_t col,
+							uint64_t *length);
+		virtual bool		getLobFieldSegment(uint32_t col,
+							char *buffer,
+							uint64_t buffersize,
 							uint64_t offset,
 							uint64_t charstoread,
 							uint64_t *charsread);
-		virtual void		cleanUpLob(uint32_t index);
+		virtual void		cleanUpLobField(uint32_t col);
 		virtual	void		cleanUpData(bool freeresult,
 							bool freebinds);
-		virtual	char	escapeChar();
+		virtual	char		escapeChar();
 
 
 		// SID virtual methods
@@ -225,6 +238,8 @@ class sqlrcursor_svr {
 		bool		suspendresultset;
 		bool		busy;
 		uint16_t	id;
+
+		char		lobbuffer[32768];
 };
 
 #endif

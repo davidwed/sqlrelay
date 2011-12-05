@@ -69,7 +69,11 @@ class postgresqlcursor : public sqlrcursor_svr {
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
-		void		returnRow();
+		void		getField(uint32_t col,
+					const char **field,
+					uint64_t *fieldlength,
+					bool *blob,
+					bool *null);
 		void		cleanUpData(bool freeresult, bool freebinds);
 
 		PGresult	*pgresult;

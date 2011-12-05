@@ -444,20 +444,24 @@ void sqlitecursor::returnRow() {
 	if (!result) {
 		return;
 	}
+	sqlrcursor_svr::returnRow();
+}
+
+void sqlitecursor::getField(uint32_t col,
+				const char **field, uint64_t *fieldlength,
+				bool *blob, bool *null) {
 
 	// sqlite is kind of strange, the result set is not returned
 	// in a 2-d array of pointers to rows/columns, but rather
 	// a 1-d array pointing to fields.  You have to manually keep
 	// track of which column you're on.
-	for (int32_t i=0; i<ncolumn; i++) {
-		if (result[rowindex]) {
-			conn->sendField(result[rowindex],
-					charstring::length(result[rowindex]));
-		} else {
-			conn->sendNullField();
-		}
-		rowindex++;
+	if (result[rowindex]) {
+		*field=result[rowindex];
+		*fieldlength=charstring::length(result[rowindex]);
+	} else {
+		*null=true;
 	}
+	rowindex++;
 }
 
 void sqlitecursor::cleanUpData(bool freeresult, bool freebinds) {

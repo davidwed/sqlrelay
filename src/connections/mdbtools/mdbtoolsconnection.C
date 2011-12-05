@@ -252,43 +252,40 @@ bool mdbtoolscursor::fetchRow() {
 #endif
 }
 
-void mdbtoolscursor::returnRow() {
+void mdbtoolscursor::getField(uint32_t col,
+				const char **field, uint64_t *fieldlength,
+				bool *blob, bool *null) {
 
-	MdbTableDef	*table;
-	MdbColumn	*tablecolumn;
-	MdbSQLColumn	*column;
+	// find the corresponding column in the current table
+	MdbTableDef	*table=mdbsql.cur_table;
+	MdbSQLColumn	*column=(MdbSQLColumn *)
+				g_ptr_array_index(mdbsql.columns,col);
 
-	// run through the columns
-	for (unsigned int col=0; col<mdbsql.num_columns; col++) {
-
-		// find the corresponding column in the current table
-		column=(MdbSQLColumn *)g_ptr_array_index(mdbsql.columns,col);
-		table=mdbsql.cur_table;
-		for (unsigned int tcol=0; tcol<table->num_cols; tcol++) {
-			tablecolumn=(MdbColumn *)
+	for (unsigned int tcol=0; tcol<table->num_cols; tcol++) {
+		MdbColumn	*tablecolumn=(MdbColumn *)
 				g_ptr_array_index(table->columns,tcol);
+
 			if (!charstring::compare(tablecolumn->name,
 							column->name)) {
 #ifdef HAVE_MDB_COL_TO_STRING_5_PARAM
-				char	*data=mdb_col_to_string(
-						mdbsql.mdb,
-						mdbsql.mdb->pg_buf,
-						tablecolumn->cur_value_start,
-						tablecolumn->col_type,
-						tablecolumn->cur_value_len);
+			char	*data=mdb_col_to_string(
+					mdbsql.mdb,
+					mdbsql.mdb->pg_buf,
+					tablecolumn->cur_value_start,
+					tablecolumn->col_type,
+					tablecolumn->cur_value_len);
 #else
-				char	*data=mdb_col_to_string(
-						mdbsql.mdb,
-						tablecolumn->cur_value_start,
-						tablecolumn->col_type,
-						tablecolumn->cur_value_len);
+			char	*data=mdb_col_to_string(
+					mdbsql.mdb,
+					tablecolumn->cur_value_start,
+					tablecolumn->col_type,
+					tablecolumn->cur_value_len);
 #endif
-				if (data) {
-					conn->sendField(data,
-						charstring::length(data));
-				} else {
-					conn->sendNullField();
-				}
+			if (data) {
+				*field=data;
+				*fieldlength=charstring::length(data);
+			} else {
+				*null=true;
 			}
 		}
 	}

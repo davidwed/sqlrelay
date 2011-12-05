@@ -1215,18 +1215,45 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	return true;
 }
 
-void oracle8cursor::returnOutputBindBlob(uint16_t index) {
-	// FIXME: call OCILobGetChunkSize to determine the size of this buffer
-	// rather than maxitembuffersize, it will improve performance
-	ub1	buf[oracle8conn->maxitembuffersize+1];
-	sendLob(outbind_lob[index],buf);
+bool oracle8cursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
+	ub4	loblength=0;
+	bool	retval=(OCILobGetLength(oracle8conn->svc,
+				oracle8conn->err,
+				outbind_lob[index],
+				&loblength)==OCI_SUCCESS);
+	*length=loblength;
+	return retval;
 }
 
-void oracle8cursor::returnOutputBindClob(uint16_t index) {
-	// FIXME: call OCILobGetChunkSize to determine the size of this buffer
-	// rather than maxitembuffersize, it will improve performance
-	ub1	buf[oracle8conn->maxitembuffersize+1];
-	sendLob(outbind_lob[index],buf);
+bool oracle8cursor::getLobOutputBindSegment(uint16_t index,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
+
+	// initialize the read length to the number of characters to read
+	ub4	readlength=charstoread;
+
+	// read from the lob
+	// (offset+1 is very important,
+	// apparently oracle lob offsets are 1-based)
+	sword	result=OCILobRead(oracle8conn->svc,
+				oracle8conn->err,
+				outbind_lob[index],
+				&readlength,
+				offset+1,
+				(dvoid *)buffer,
+				buffersize,
+				NULL,
+				(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
+				0,
+				SQLCS_IMPLICIT);
+
+	// readlength will have been set the number of chars that were read
+	// set that on the way out
+	*charsread=readlength;
+
+	// return sucess or failure
+	return (result!=OCI_INVALID_HANDLE);
 }
 
 void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
@@ -1264,99 +1291,6 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 	}
 }
 #endif
-
-void oracle8cursor::sendLob(OCILobLocator *lob, ub1 *buf) {
-
-	// When reading from a clob, you have to tell it how
-	// many characters to read, and the offset must be
-	// specified in characters too.  But the OCILobRead
-	// returns the number of bytes read, not characters
-	// and there's no good way to convert the number of
-	// bytes read into the number of characters.  So, we'll
-	// have to try to read the same number of characters
-	// each time and make sure that we don't try to read
-	// more than will fit in our buffer.  That way, we can
-	// be sure that we were able to read them all and will
-	// be able to reliably calculate the next offset.
-	ub4	charstoread=oracle8conn->maxitembuffersize/MAX_BYTES_PER_CHAR;
-
-	// handle lob datatypes
-
-	// handle lob datatypes
-	ub4	retlen=charstoread;
-	ub4	offset=1;
-	bool	start=true;
-
-	// Get the length of the lob. If we fail to read the
-	// length, send a NULL field.  Unfortunately OCILobGetLength
-	// has no way to express that a LOB is NULL, the result is
-	// "undefined" in that case.
-	ub4	loblength=0;
-	if (OCILobGetLength(oracle8conn->svc,
-			oracle8conn->err,
-			lob,&loblength)!=OCI_SUCCESS) {
-		conn->sendNullField();
-		return;
-	}
-
-	// handle empty lob's
-	if (!loblength) {
-		conn->startSendingLong(0);
-		conn->sendLongSegment("",0);
-		conn->endSendingLong();
-		return;
-	}
-
-	// We should be able to call OCILobRead over and over,
-	// as long as it returns OCI_NEED_DATA, but OCILobRead
-	// fails to return OCI_NEED_DATA (at least in version
-	// 8.1.7 for Linux), so we have to do this instead.
-	// OCILobRead appears to return OCI_INVALID_HANDLE when
-	// the LOB is NULL, but this is not documented anywhere.
-	while (retlen) {
-
-		// initialize retlen to the number of characters we want to read
-		retlen=charstoread;
-
-		// read a segment from the lob
-		sword	retval=OCILobRead(oracle8conn->svc,
-				oracle8conn->err,
-				lob,
-				&retlen,
-				offset,
-				(dvoid *)buf,
-				oracle8conn->maxitembuffersize,
-				(dvoid *)NULL,
-				(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
-				(ub2)0,
-				(ub1)SQLCS_IMPLICIT);
-
-		// OCILobRead returns OCI_INVALID_HANDLE if
-		// the LOB is NULL.  In that case, return a
-		// NULL field.
-		// Otherwise, start sending the field (if we
-		// haven't already), send a segment of the LOB,
-		// move to the next segment and reset the
-		// amount to read.
-		if (retval==OCI_INVALID_HANDLE) {
-			conn->sendNullField();
-			break;
-		} else {
-			if (start) {
-				conn->startSendingLong(loblength);
-				start=false;
-			}
-			conn->sendLongSegment((char *)buf,(int32_t)retlen);
-			offset=offset+charstoread;
-		}
-	}
-
-	// if we ever started sending a LOB,
-	// finish sending it now
-	if (!start) {
-		conn->endSendingLong();
-	}
-}
 
 bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
@@ -1729,55 +1663,90 @@ bool oracle8cursor::fetchRow() {
 	return true;
 }
 
-void oracle8cursor::returnRow() {
+void oracle8cursor::getField(uint32_t col,
+				const char **field, uint64_t *fieldlength,
+				bool *blob, bool *null) {
 
-	for (sword col=0; col<ncols; col++) {
-
-		// handle NULL's
-		if (def_indp[col][row]) {
-			conn->sendNullField();
-			continue;
-		}
-
-		// in OCI8, longs are just like other datatypes, but LOBS
-		// are different
-		if (desc[col].dbtype==BLOB_TYPE ||
-			desc[col].dbtype==CLOB_TYPE ||
-			desc[col].dbtype==BFILE_TYPE) {
-
-			// send the lob
-			sendLob(def_lob[col][row],
-				&def_buf[col][row*oracle8conn->
-						maxitembuffersize]);
-
-#ifdef HAVE_ORACLE_8i
-			// if the lob is temporary, deallocate it
-			boolean	templob;
-			if (OCILobIsTemporary(oracle8conn->env,
-						oracle8conn->err,
-						def_lob[col][row],
-						&templob)!=OCI_SUCCESS) {
-				continue;
-			}
-			if (templob) {
-				OCILobFreeTemporary(oracle8conn->svc,
-							oracle8conn->err,
-							def_lob[col][row]);
-			}
-#endif
-			continue;
-		}
-
-		// handle normal datatypes
-		conn->sendField((const char *)
-					&def_buf[col]
-						[row*oracle8conn->
-							maxitembuffersize],
-					(uint32_t)def_col_retlen[col][row]);
+	// handle NULLs
+	if (def_indp[col][row]) {
+		*null=true;
+		return;
 	}
 
-	// increment the row counter
+	// handle blobs
+	if (desc[col].dbtype==BLOB_TYPE ||
+		desc[col].dbtype==CLOB_TYPE ||
+		desc[col].dbtype==BFILE_TYPE) {
+		*blob=true;
+		return;
+	}
+
+	// handle normal datatypes
+	*field=(const char *)&def_buf[col][row*oracle8conn->maxitembuffersize];
+	*fieldlength=def_col_retlen[col][row];
+}
+
+void oracle8cursor::nextRow() {
 	row++;
+}
+
+bool oracle8cursor::getLobFieldLength(uint32_t col, uint64_t *length) {
+	ub4	loblength=0;
+	bool	retval=(OCILobGetLength(oracle8conn->svc,
+				oracle8conn->err,
+				def_lob[col][row],
+				&loblength)==OCI_SUCCESS);
+	*length=loblength;
+	return retval;
+}
+
+bool oracle8cursor::getLobFieldSegment(uint32_t col,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
+
+	// initialize the read length to the number of characters to read
+	ub4	readlength=charstoread;
+
+	// read from the lob
+	// (offset+1 is very important,
+	// apparently oracle lob offsets are 1-based)
+	sword	result=OCILobRead(oracle8conn->svc,
+				oracle8conn->err,
+				def_lob[col][row],
+				&readlength,
+				offset+1,
+				(dvoid *)buffer,
+				buffersize,
+				NULL,
+				(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
+				0,
+				SQLCS_IMPLICIT);
+
+	// readlength will have been set the number of chars that were read
+	// set that on the way out
+	*charsread=readlength;
+
+	// return sucess or failure
+	return (result!=OCI_INVALID_HANDLE);
+}
+
+void oracle8cursor::cleanUpLobField(uint32_t col) {
+#ifdef HAVE_ORACLE_8i
+	// if the lob is temporary, deallocate it
+	boolean	templob;
+	if (OCILobIsTemporary(oracle8conn->env,
+				oracle8conn->err,
+				def_lob[col][row],
+				&templob)!=OCI_SUCCESS) {
+		return;
+	}
+	if (templob) {
+		OCILobFreeTemporary(oracle8conn->svc,
+					oracle8conn->err,
+					def_lob[col][row]);
+	}
+#endif
 }
 
 void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {

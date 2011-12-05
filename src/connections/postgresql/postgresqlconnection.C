@@ -1090,21 +1090,20 @@ bool postgresqlcursor::fetchRow() {
 	return false;
 }
 
-void postgresqlcursor::returnRow() {
+void postgresqlcursor::getField(uint32_t col,
+				const char **field, uint64_t *fieldlength,
+				bool *blob, bool *null) {
 
-	// send the row back
-	for (int32_t col=0; col<ncols; col++) {
-
-		// get the row
-		if (PQgetisnull(pgresult,currentrow,col)) {
-			conn->sendNullField();
-		} else {
-			conn->sendField(PQgetvalue(pgresult,currentrow,col),
-				PQgetlength(pgresult,currentrow,col));
-		}
+	// handle NULLs
+	if (PQgetisnull(pgresult,currentrow,col)) {
+		*null=true;
+		return;
 	}
-}
 
+	// handle normal datatypes
+	*field=PQgetvalue(pgresult,currentrow,col);
+	*fieldlength=PQgetlength(pgresult,currentrow,col);
+}
 
 void postgresqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 

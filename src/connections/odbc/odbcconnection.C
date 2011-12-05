@@ -1123,35 +1123,42 @@ bool odbccursor::fetchRow() {
 //#endif
 }
 
-void odbccursor::returnRow() {
+void odbccursor::getField(uint32_t col,
+				const char **fld, uint64_t *fldlength,
+				bool *blob, bool *null) {
 
 // this code is here in case unixodbc ever 
 // successfully supports array fetches
 
 /*#if (ODBCVER >= 0x0300)
-	for (SQLSMALLINT index=0; index<ncols; index++) {
 
-		// handle a null field
-		if (indicator[index][row]==SQL_NULL_DATA) {
-			conn->sendNullField();
-			continue;
-		}
-
-		// handle a non-null field
-		conn->sendField(field[index][row],indicator[index][row]);
+	// handle a null field
+	if (indicator[col][row]==SQL_NULL_DATA) {
+		*null=true;
+		return;
 	}
-	row++;
+
+	// handle a non-null field
+	*fld=field[col][row];
+	*fldlength=indicator[col][row];
 #else*/
-	for (SQLSMALLINT index=0; index<ncols; index++) {
 
-		// handle a null field
-		if (indicator[index]==SQL_NULL_DATA) {
-			conn->sendNullField();
-			continue;
-		}
-
-		// handle a non-null field
-		conn->sendField(field[index],indicator[index]);
+	// handle a null field
+	if (indicator[col]==SQL_NULL_DATA) {
+		*null=true;
+		return;
 	}
+
+	// handle a non-null field
+	*fld=field[col];
+	*fldlength=indicator[col];
 //#endif
+}
+
+void odbccursor::nextRow() {
+
+	// this code is here in case unixodbc ever 
+	// successfully supports array fetches
+
+	//row++;
 }

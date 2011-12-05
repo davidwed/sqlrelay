@@ -755,18 +755,16 @@ bool routercursor::fetchRow() {
 	return false;
 }
 
-void routercursor::returnRow() {
-	if (!cur) {
-		return;
-	}
-	for (uint32_t index=0; index<cur->colCount(); index++) {
-		const char	*fld=cur->getField(nextrow-1,index);
-		uint32_t	len=cur->getFieldLength(nextrow-1,index);
-		if (len) {
-			conn->sendField(fld,len);
-		} else {
-			conn->sendNullField();
-		}
+void routercursor::getField(uint32_t col,
+				const char **field, uint64_t *fieldlength,
+				bool *blob, bool *null) {
+	const char	*fld=cur->getField(nextrow-1,col);
+	uint32_t	len=cur->getFieldLength(nextrow-1,col);
+	if (len) {
+		*field=fld;
+		*fieldlength=len;
+	} else {
+		*null=true;
 	}
 }
 

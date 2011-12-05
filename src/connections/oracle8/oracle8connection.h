@@ -127,10 +127,13 @@ class oracle8cursor : public sqlrcursor_svr {
 		bool		outputBindCursor(const char *variable,
 						uint16_t variablesize,
 						sqlrcursor_svr *cursor);
-		void		returnOutputBindBlob(uint16_t index);
-		void		returnOutputBindClob(uint16_t index);
+		bool		getLobOutputBindLength(uint16_t index,
+							uint64_t *length);
+		bool		getLobOutputBindSegment(uint16_t index,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread);
 #endif
-		void		sendLob(OCILobLocator *lob, ub1 *buf);
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -151,7 +154,19 @@ class oracle8cursor : public sqlrcursor_svr {
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
-		void		returnRow();
+		void		getField(uint32_t col,
+					const char **field,
+					uint64_t *fieldlength,
+					bool *blob,
+					bool *null);
+		void		nextRow();
+		bool		getLobFieldLength(uint32_t col,
+							uint64_t *length);
+		bool		getLobFieldSegment(uint32_t col,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread);
+		void		cleanUpLobField(uint32_t col);
 		void		cleanUpData(bool freeresult, bool freebinds);
 
 		void		checkRePrepare();

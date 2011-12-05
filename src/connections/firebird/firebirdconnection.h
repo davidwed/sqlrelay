@@ -87,7 +87,11 @@ class firebirdcursor : public sqlrcursor_svr {
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
-		void		returnRow();
+		void		getField(uint32_t col,
+					const char **field,
+					uint64_t *fieldlength,
+					bool *blob,
+					bool *null);
 		void		cleanUpData(bool freeresult, bool freebinds);
 
 
@@ -102,6 +106,7 @@ class firebirdcursor : public sqlrcursor_svr {
 		ISC_LONG	querytype;
 
 		fieldstruct	field[MAX_SELECT_LIST_SIZE];
+		stringbuffer	fieldbuffer;
 
 		stringbuffer	*errormsg;
 

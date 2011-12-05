@@ -933,28 +933,31 @@ bool mysqlcursor::fetchRow() {
 #endif
 }
 
-void mysqlcursor::returnRow() {
+void mysqlcursor::getField(uint32_t col,
+				const char **fld, uint64_t *fldlength,
+				bool *blob, bool *null) {
 
-	for (unsigned int col=0; col<ncols; col++) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-		if (!mysqlconn->fakebinds && usestmtprepare) {
-			if (!isnull[col]) {
-				conn->sendField(field[col],fieldlength[col]);
-			} else {
-				conn->sendNullField();
-			}
+	if (!mysqlconn->fakebinds && usestmtprepare) {
+		if (!isnull[col]) {
+			*fld=field[col];
+			*fldlength=fieldlength[col];
 		} else {
-#endif
-			if (mysqlrow[col]) {
-				conn->sendField(mysqlrow[col],
-						mysqlrowlengths[col]);
-			} else {
-				conn->sendNullField();
-			}
-#ifdef HAVE_MYSQL_STMT_PREPARE
+			*null=true;
 		}
+	} else {
 #endif
+		if (mysqlrow[col]) {
+			conn->sendField(mysqlrow[col],
+					mysqlrowlengths[col]);
+			*fld=mysqlrow[col];
+			*fldlength=mysqlrowlengths[col];
+		} else {
+			*null=true;
+		}
+#ifdef HAVE_MYSQL_STMT_PREPARE
 	}
+#endif
 }
 
 void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {

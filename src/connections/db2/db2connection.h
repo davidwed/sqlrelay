@@ -85,7 +85,12 @@ class db2cursor : public sqlrcursor_svr {
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
-		void		returnRow();
+		void		getField(uint32_t col,
+					const char **fld,
+					uint64_t *fldlength,
+					bool *blob,
+					bool *null);
+		void		nextRow();
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;

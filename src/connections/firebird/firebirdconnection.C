@@ -914,184 +914,185 @@ bool firebirdcursor::fetchRow() {
 	return true;
 }
 
-void firebirdcursor::returnRow() {
+void firebirdcursor::getField(uint32_t col,
+				const char **fld, uint64_t *fldlength,
+				bool *blob, bool *null) {
 
-	for (short col=0; col<outsqlda->sqld; col++) {
-
-		// handle a null field
-		if ((outsqlda->sqlvar[col].sqltype & 1) && 
-			field[col].nullindicator==-1) {
-			conn->sendNullField();
-			continue;
-		}
-
-
-		// handle a non-null field
-		if (outsqlda->sqlvar[col].sqltype==SQL_TEXT ||
-				outsqlda->sqlvar[col].sqltype==SQL_TEXT+1) {
-			size_t	maxlen=outsqlda->sqlvar[col].sqllen;
-			size_t	reallen=charstring::length(field[col].
-								textbuffer);
-			if (reallen>maxlen) {
-				reallen=maxlen;
-			}
-			conn->sendField(field[col].textbuffer,reallen);
-		} else if (outsqlda->sqlvar[col].
-					sqltype==SQL_SHORT ||
-				outsqlda->sqlvar[col].
-					sqltype==SQL_SHORT+1) {
-			stringbuffer	buffer;
-			buffer.append(field[col].shortbuffer);
-			conn->sendField(buffer.getString(),
-					charstring::length(buffer.getString()));
-		} else if (outsqlda->sqlvar[col].
-					sqltype==SQL_FLOAT ||
-				outsqlda->sqlvar[col].
-					sqltype==SQL_FLOAT+1) {
-			stringbuffer	buffer;
-			buffer.append((double)field[col].floatbuffer);
-			conn->sendField(buffer.getString(),
-					charstring::length(buffer.getString()));
-		} else if (outsqlda->sqlvar[col].
-					sqltype==SQL_DOUBLE ||
-				outsqlda->sqlvar[col].
-					sqltype==SQL_DOUBLE+1 ||
-				outsqlda->sqlvar[col].
-					sqltype==SQL_D_FLOAT ||
-				outsqlda->sqlvar[col].
-					sqltype==SQL_D_FLOAT+1) {
-			stringbuffer	buffer;
-			buffer.append((double)field[col].doublebuffer);
-			conn->sendField(buffer.getString(),
-					charstring::length(buffer.getString()));
-		} else if (outsqlda->sqlvar[col].
-					sqltype==SQL_VARYING ||
-				outsqlda->sqlvar[col].
-					sqltype==SQL_VARYING+1) {
-			// the first 2 bytes are the length in 
-			// an SQL_VARYING field
-			int16_t	size;
-			rawbuffer::copy((void *)&size,
-					(void *)field[col].textbuffer,
-					sizeof(int16_t));
-			conn->sendField(field[col].textbuffer+sizeof(int16_t),
-					size);
-
-		// Looks like sometimes firebird returns INT64's as
-		// SQL_LONG type.  These can be identified because
-		// the sqlscale gets set too.  Treat SQL_LONG's with
-		// an sqlscale as INT64's.
-		} else if ((outsqlda->sqlvar[col].
-					sqltype==SQL_LONG ||
-				outsqlda->sqlvar[col].
-					sqltype==SQL_LONG+1) &&
-				!outsqlda->sqlvar[col].sqlscale) {
-			stringbuffer	buffer;
-			buffer.append((int32_t)field[col].longbuffer);
-			conn->sendField(buffer.getString(),
-					charstring::length(buffer.getString()));
-		} else if (
-		#ifdef SQL_INT64
-				(outsqlda->sqlvar[col].
-					sqltype==SQL_INT64 ||
-				outsqlda->sqlvar[col].
-					sqltype==SQL_INT64+1) ||
-		#endif
-				((outsqlda->sqlvar[col].
-					sqltype==SQL_LONG ||
-				outsqlda->sqlvar[col].
-					sqltype==SQL_LONG+1) &&
-				outsqlda->sqlvar[col].sqlscale)) {
-			// int64's are weird.  To the left of the decimal
-			// point is the value/10^scale, to the right is
-			// value%10^scale
-			stringbuffer	buffer;
-			if (outsqlda->sqlvar[col].sqlscale) {
-
-				buffer.append((int64_t)(field[col].int64buffer/(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)))->append(".");
-
-				stringbuffer	decimal;
-				decimal.append((int64_t)(field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)));
-			
-				// gotta get the right number
-				// of decimal places
-				for (int32_t i=charstring::length(
-						decimal.getString());
-					i<-outsqlda->sqlvar[col].sqlscale;
-					i++) {
-					decimal.append("0");
-				}
-				buffer.append(decimal.getString());
-			} else {
-				buffer.append((int64_t)field[col].int64buffer);
-			}
-			conn->sendField(buffer.getString(),
-					charstring::length(buffer.getString()));
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_ARRAY ||
-			outsqlda->sqlvar[col].sqltype==SQL_ARRAY+1 ||
-			outsqlda->sqlvar[col].sqltype==SQL_QUAD ||
-			outsqlda->sqlvar[col].sqltype==SQL_QUAD+1) {
-			// have to handle arrays for real here...
-			conn->sendNullField();
-		#ifdef SQL_TIMESTAMP
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_TIMESTAMP ||
-			outsqlda->sqlvar[col].sqltype==SQL_TIMESTAMP+1) {
-			// decode the timestamp
-			tm	entry_timestamp;
-			isc_decode_timestamp(&field[col].timestampbuffer,
-							&entry_timestamp);
-		#else
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_DATE ||
-			outsqlda->sqlvar[col].sqltype==SQL_DATE+1) {
-			// decode the timestamp
-			tm	entry_timestamp;
-			isc_decode_date(&field[col].timestampbuffer,
-							&entry_timestamp);
-		#endif
-			// build a string of "yyyy-mm-dd hh:mm:ss" format
-			char	buffer[20];
-			snprintf(buffer,20,"%d-%02d-%02d %02d:%02d:%02d",
-					entry_timestamp.tm_year+1900,
-					entry_timestamp.tm_mon+1,
-					entry_timestamp.tm_mday,
-					entry_timestamp.tm_hour,
-					entry_timestamp.tm_min,
-					entry_timestamp.tm_sec);
-			conn->sendField(buffer,19);
-		#ifdef SQL_TIMESTAMP
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_TYPE_TIME ||
-			outsqlda->sqlvar[col].sqltype==SQL_TYPE_TIME+1) {
-			// decode the time
-			tm	entry_time;
-			isc_decode_sql_time(&field[col].timebuffer,
-							&entry_time);
-			// build a string of "hh:mm:ss" format
-			char	buffer[9];
-			snprintf(buffer,9,"%02d:%02d:%02d",
-					entry_time.tm_hour,
-					entry_time.tm_min,
-					entry_time.tm_sec);
-			conn->sendField(buffer,8);
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_TYPE_DATE ||
-			outsqlda->sqlvar[col].sqltype==SQL_TYPE_DATE+1) {
-			// decode the date
-			tm	entry_date;
-			isc_decode_sql_date(&field[col].datebuffer,
-							&entry_date);
-			// build a string of "yyyy-mm-dd" format
-			char	buffer[11];
-			snprintf(buffer,11,"%d:%02d:%02d",
-					entry_date.tm_year+1900,
-					entry_date.tm_mon+1,
-					entry_date.tm_mday);
-			conn->sendField(buffer,10);
-		#endif
-		} else if (outsqlda->sqlvar[col].sqltype==SQL_BLOB ||
-				outsqlda->sqlvar[col].sqltype==SQL_BLOB+1) {
-			// have to handle blobs for real here...
-			conn->sendNullField();
-		}
+	// handle a null field
+	if ((outsqlda->sqlvar[col].sqltype & 1) && 
+		field[col].nullindicator==-1) {
+		*null=true;
+		return;
 	}
+
+
+	// handle a non-null field
+	if (outsqlda->sqlvar[col].sqltype==SQL_TEXT ||
+			outsqlda->sqlvar[col].sqltype==SQL_TEXT+1) {
+		size_t	maxlen=outsqlda->sqlvar[col].sqllen;
+		size_t	reallen=charstring::length(field[col].textbuffer);
+		if (reallen>maxlen) {
+			reallen=maxlen;
+		}
+		*fld=field[col].textbuffer;
+		*fldlength=reallen;
+		return;
+	} else if (outsqlda->sqlvar[col].
+				sqltype==SQL_SHORT ||
+			outsqlda->sqlvar[col].
+				sqltype==SQL_SHORT+1) {
+		fieldbuffer.clear();
+		fieldbuffer.append(field[col].shortbuffer);
+	} else if (outsqlda->sqlvar[col].
+				sqltype==SQL_FLOAT ||
+			outsqlda->sqlvar[col].
+				sqltype==SQL_FLOAT+1) {
+		fieldbuffer.clear();
+		fieldbuffer.append((double)field[col].floatbuffer);
+	} else if (outsqlda->sqlvar[col].
+				sqltype==SQL_DOUBLE ||
+			outsqlda->sqlvar[col].
+				sqltype==SQL_DOUBLE+1 ||
+			outsqlda->sqlvar[col].
+				sqltype==SQL_D_FLOAT ||
+			outsqlda->sqlvar[col].
+				sqltype==SQL_D_FLOAT+1) {
+		fieldbuffer.clear();
+		fieldbuffer.append((double)field[col].doublebuffer);
+	} else if (outsqlda->sqlvar[col].
+				sqltype==SQL_VARYING ||
+			outsqlda->sqlvar[col].
+				sqltype==SQL_VARYING+1) {
+		// the first 2 bytes are the length in 
+		// an SQL_VARYING field
+		int16_t	size;
+		rawbuffer::copy((void *)&size,
+				(void *)field[col].textbuffer,
+				sizeof(int16_t));
+		*fld=field[col].textbuffer+sizeof(int16_t);
+		*fldlength=size;
+		return;
+
+	// Looks like sometimes firebird returns INT64's as
+	// SQL_LONG type.  These can be identified because
+	// the sqlscale gets set too.  Treat SQL_LONG's with
+	// an sqlscale as INT64's.
+	} else if ((outsqlda->sqlvar[col].
+				sqltype==SQL_LONG ||
+			outsqlda->sqlvar[col].
+				sqltype==SQL_LONG+1) &&
+			!outsqlda->sqlvar[col].sqlscale) {
+		fieldbuffer.clear();
+		fieldbuffer.append((int32_t)field[col].longbuffer);
+	} else if (
+	#ifdef SQL_INT64
+			(outsqlda->sqlvar[col].
+				sqltype==SQL_INT64 ||
+			outsqlda->sqlvar[col].
+				sqltype==SQL_INT64+1) ||
+	#endif
+			((outsqlda->sqlvar[col].
+				sqltype==SQL_LONG ||
+			outsqlda->sqlvar[col].
+				sqltype==SQL_LONG+1) &&
+			outsqlda->sqlvar[col].sqlscale)) {
+		// int64's are weird.  To the left of the decimal
+		// point is the value/10^scale, to the right is
+		// value%10^scale
+		fieldbuffer.clear();
+		if (outsqlda->sqlvar[col].sqlscale) {
+
+			fieldbuffer.append((int64_t)(field[col].int64buffer/(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)))->append(".");
+
+			stringbuffer	decimal;
+			decimal.append((int64_t)(field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)));
+		
+			// gotta get the right number
+			// of decimal places
+			for (int32_t i=charstring::length(
+					decimal.getString());
+				i<-outsqlda->sqlvar[col].sqlscale;
+				i++) {
+				decimal.append("0");
+			}
+			fieldbuffer.append(decimal.getString());
+		} else {
+			fieldbuffer.append((int64_t)field[col].int64buffer);
+		}
+	} else if (outsqlda->sqlvar[col].sqltype==SQL_ARRAY ||
+		outsqlda->sqlvar[col].sqltype==SQL_ARRAY+1 ||
+		outsqlda->sqlvar[col].sqltype==SQL_QUAD ||
+		outsqlda->sqlvar[col].sqltype==SQL_QUAD+1) {
+		// FIXME: handle arrays for real here...
+		*null=true;
+		return;
+	#ifdef SQL_TIMESTAMP
+	} else if (outsqlda->sqlvar[col].sqltype==SQL_TIMESTAMP ||
+		outsqlda->sqlvar[col].sqltype==SQL_TIMESTAMP+1) {
+		// decode the timestamp
+		tm	entry_timestamp;
+		isc_decode_timestamp(&field[col].timestampbuffer,
+						&entry_timestamp);
+	#else
+	} else if (outsqlda->sqlvar[col].sqltype==SQL_DATE ||
+		outsqlda->sqlvar[col].sqltype==SQL_DATE+1) {
+
+		// decode the timestamp
+		tm	entry_timestamp;
+		isc_decode_date(&field[col].timestampbuffer,
+						&entry_timestamp);
+	#endif
+		// build a string of "yyyy-mm-dd hh:mm:ss" format
+		char	buffer[20];
+		snprintf(buffer,20,"%d-%02d-%02d %02d:%02d:%02d",
+				entry_timestamp.tm_year+1900,
+				entry_timestamp.tm_mon+1,
+				entry_timestamp.tm_mday,
+				entry_timestamp.tm_hour,
+				entry_timestamp.tm_min,
+				entry_timestamp.tm_sec);
+		fieldbuffer.clear();
+		fieldbuffer.append(buffer);
+	#ifdef SQL_TIMESTAMP
+	} else if (outsqlda->sqlvar[col].sqltype==SQL_TYPE_TIME ||
+		outsqlda->sqlvar[col].sqltype==SQL_TYPE_TIME+1) {
+		// decode the time
+		tm	entry_time;
+		isc_decode_sql_time(&field[col].timebuffer,
+						&entry_time);
+		// build a string of "hh:mm:ss" format
+		char	buffer[9];
+		snprintf(buffer,9,"%02d:%02d:%02d",
+				entry_time.tm_hour,
+				entry_time.tm_min,
+				entry_time.tm_sec);
+		fieldbuffer.clear();
+		fieldbuffer.append(buffer);
+	} else if (outsqlda->sqlvar[col].sqltype==SQL_TYPE_DATE ||
+		outsqlda->sqlvar[col].sqltype==SQL_TYPE_DATE+1) {
+		// decode the date
+		tm	entry_date;
+		isc_decode_sql_date(&field[col].datebuffer,
+						&entry_date);
+		// build a string of "yyyy-mm-dd" format
+		char	buffer[11];
+		snprintf(buffer,11,"%d:%02d:%02d",
+				entry_date.tm_year+1900,
+				entry_date.tm_mon+1,
+				entry_date.tm_mday);
+		fieldbuffer.clear();
+		fieldbuffer.append(buffer);
+	#endif
+	} else if (outsqlda->sqlvar[col].sqltype==SQL_BLOB ||
+			outsqlda->sqlvar[col].sqltype==SQL_BLOB+1) {
+		// FIXME: handle blobs for real here...
+		*null=true;
+		return;
+	}
+
+	// for any case that didn't return already, we need to do this...
+	*fld=fieldbuffer.getString();
+	*fldlength=fieldbuffer.getStringLength();
 }
 
 void firebirdcursor::cleanUpData(bool freeresult, bool freebinds) {

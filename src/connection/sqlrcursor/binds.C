@@ -218,13 +218,83 @@ bool sqlrcursor_svr::outputBindCursor(const char *variable,
 }
 
 void sqlrcursor_svr::returnOutputBindBlob(uint16_t index) {
-	// by default, do nothing...
-	return;
+	return sendLobOutputBind(index);
 }
 
 void sqlrcursor_svr::returnOutputBindClob(uint16_t index) {
-	// by default, do nothing...
-	return;
+	return sendLobOutputBind(index);
+}
+
+#define MAX_BYTES_PER_CHAR	4
+
+void sqlrcursor_svr::sendLobOutputBind(uint16_t index) {
+
+	// Get lob length.  If this fails, send a NULL field.
+	uint64_t	loblength;
+	if (!getLobOutputBindLength(index,&loblength)) {
+		conn->sendNullField();
+		return;
+	}
+
+	// for lobs of 0 length
+	if (!loblength) {
+		conn->startSendingLong(0);
+		conn->sendLongSegment("",0);
+		conn->endSendingLong();
+		return;
+	}
+
+	// initialize sizes and status
+	uint64_t	charstoread=sizeof(lobbuffer)/MAX_BYTES_PER_CHAR;
+	uint64_t	charsread=0;
+	uint64_t	offset=0;
+	bool		start=true;
+
+	for (;;) {
+
+		// read a segment from the lob
+		if (!getLobOutputBindSegment(index,lobbuffer,sizeof(lobbuffer),
+					offset,charstoread,&charsread) ||
+					!charsread) {
+
+			// if we fail to get a segment or got nothing...
+			// if we haven't started sending yet, then send a NULL,
+			// otherwise just end normally
+			if (start) {
+				conn->sendNullField();
+			} else {
+				conn->endSendingLong();
+			}
+			return;
+
+		} else {
+
+			// if we haven't started sending yet, then do that now
+			if (start) {
+				conn->startSendingLong(loblength);
+				start=false;
+			}
+
+			// send the segment we just got
+			conn->sendLongSegment(lobbuffer,charsread);
+
+			// FIXME: or should this be charsread?
+			offset=offset+charstoread;
+		}
+	}
+}
+
+bool sqlrcursor_svr::getLobOutputBindLength(uint16_t index, uint64_t *length) {
+	*length=0;
+	return true;
+}
+
+bool sqlrcursor_svr::getLobOutputBindSegment(uint16_t index,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
+	*charsread=0;
+	return false;
 }
 
 void sqlrcursor_svr::returnOutputBindCursor(uint16_t index) {
