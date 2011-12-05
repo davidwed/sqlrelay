@@ -11,6 +11,7 @@
 		tables
 	added SQLRDEBUG=on/off environment variable to enable/disable
 		client-side debug
+	added bind variable support to sqlrsh
 
 0.43 - updated ruby code build to take sitearch into account during includes
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9

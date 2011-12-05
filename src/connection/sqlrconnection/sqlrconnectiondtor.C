@@ -17,6 +17,8 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 
 	delete[] updown;
 
+	delete[] originaldb;
+
 	delete tmpdir;
 
 	dbgfile.debugPrint("connection",0,"deleting authc...");

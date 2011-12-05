@@ -70,6 +70,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrcursor/openclose.C \
 	sqlrcursor/preparequery.C \
 	sqlrcursor/queryparse.C \
+	sqlrcursor/returnresultset.C \
 	sqlrcursor/binds.C \
 	sqlrcursor/fakebinds.C \
 	sqlrcursor/abort.C \
@@ -137,6 +138,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrcursor/openclose.lo \
 	sqlrcursor/preparequery.lo \
 	sqlrcursor/queryparse.lo \
+	sqlrcursor/returnresultset.lo \
 	sqlrcursor/binds.lo \
 	sqlrcursor/fakebinds.lo \
 	sqlrcursor/abort.lo \

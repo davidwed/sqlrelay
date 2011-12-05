@@ -64,6 +64,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool	supportsTransactionBlocks();
 		virtual bool		selectDatabase(const char *database);
 		virtual const char	*selectDatabaseQuery();
+		virtual char		*getCurrentDatabase();
+		virtual const char	*getCurrentDatabaseQuery();
 		virtual const char	*pingQuery();
 		virtual const char	*beginTransactionQuery();
 		virtual bool		ping();
@@ -370,8 +372,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		static	signalhandler		*sigh;
 		static volatile sig_atomic_t	shutdowninprogress;
 
-		char			*user;
-		char			*password;
+		char		*user;
+		char		*password;
+
+		bool		dbselected;
+		char		*originaldb;
 
 		tempdir			*tmpdir;
 

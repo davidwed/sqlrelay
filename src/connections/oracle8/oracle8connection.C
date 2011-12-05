@@ -621,6 +621,10 @@ const char *oracle8connection::selectDatabaseQuery() {
 	return "alter session set current_schema=%s";
 }
 
+const char *oracle8connection::getCurrentDatabaseQuery() {
+	return "select sys_context('userenv','current_schema') from dual";
+}
+
 oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	stmt=NULL;

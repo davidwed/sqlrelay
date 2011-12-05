@@ -115,7 +115,19 @@ class sqlrcursor_svr {
 		virtual	bool		noRowsToReturn()=0;
 		virtual	bool		skipRow()=0;
 		virtual	bool		fetchRow()=0;
-		virtual	void		returnRow()=0;
+		virtual	void		returnRow();
+		/*virtual void		getField(uint32_t index,
+							const char **field,
+							uint64_t *fieldlength,
+							bool *blob,
+							bool *null)=0;*/
+		virtual void		sendLob(uint32_t index);
+		virtual uint64_t	getLobLength(uint32_t index);
+		virtual bool		getLobSegment(char *lobbuffer,
+							uint64_t offset,
+							uint64_t charstoread,
+							uint64_t *charsread);
+		virtual void		cleanUpLob(uint32_t index);
 		virtual	void		cleanUpData(bool freeresult,
 							bool freebinds);
 		virtual	char	escapeChar();

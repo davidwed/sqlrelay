@@ -12,6 +12,9 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	updown=NULL;
 
+	dbselected=false;
+	originaldb=NULL;
+
 	tmpdir=NULL;
 
 	unixsocket=NULL;

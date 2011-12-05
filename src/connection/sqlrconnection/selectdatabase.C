@@ -75,9 +75,10 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 		executeQueryUpdateStats(sdcur,sdquery,sdquerylen,true)) {
 		sdcur->cleanUpData(true,true);
 		retval=true;
-		// FIXME: set a flag indicating that the db has been changed
-		// so it can be reset when the session is done
-		// dbselected=true;
+
+		// set a flag indicating that the db has been changed
+		// so it can be reset at the end of the session
+		dbselected=true;
 	}
 	delete[] sdquery;
 	sdcur->closeCursor();
@@ -87,4 +88,33 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 
 const char *sqlrconnection_svr::selectDatabaseQuery() {
 	return "use %s";
+}
+
+char *sqlrconnection_svr::getCurrentDatabase() {
+
+	// get the get current database query base
+	const char	*gcdquery=getCurrentDatabaseQuery();
+	size_t		gcdquerylen=charstring::length(gcdquery);
+
+	sqlrcursor_svr	*gcdcur=initCursorUpdateStats();
+	// since we're creating a new cursor for this, make sure it can't
+	// have an ID that might already exist
+	char	*retval=NULL;
+	if (gcdcur->openCursorInternal(cursorcount+1) &&
+		gcdcur->prepareQuery(gcdquery,gcdquerylen) &&
+		executeQueryUpdateStats(gcdcur,gcdquery,gcdquerylen,true)) {
+
+		if (!gcdcur->noRowsToReturn() && gcdcur->fetchRow()) {
+			// FIXME: get the result and return it
+		} 
+
+		gcdcur->cleanUpData(true,true);
+	}
+	gcdcur->closeCursor();
+	deleteCursorUpdateStats(gcdcur);
+	return retval;
+}
+
+const char *sqlrconnection_svr::getCurrentDatabaseQuery() {
+	return "select database()";
 }

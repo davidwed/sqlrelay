@@ -288,6 +288,10 @@ bool sqlrconnection_svr::attemptLogIn(bool printerrors) {
 	}
 	dbgfile.debugPrint("connection",0,"done logging in");
 
+	// FIXME: store this in the class so we
+	// can switch back to it at end of session
+	originaldb=getCurrentDatabase();
+
 	return true;
 }
 
