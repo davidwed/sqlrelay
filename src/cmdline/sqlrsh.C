@@ -51,6 +51,7 @@ class sqlrshbindvalue {
 			} doubleval;
 		};
 		bindtype	type;
+		uint32_t	outputstringbindlength;
 };
 
 class environment {
@@ -598,7 +599,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, environment *env) {
 
 		for (stringdictionarylistnode< sqlrshbindvalue * > *node=
 			(stringdictionarylistnode< sqlrshbindvalue *> *)
-			env->inputbinds.getList()->getFirstNode(); node;
+			env->outputbinds.getList()->getFirstNode(); node;
 			node=(stringdictionarylistnode< sqlrshbindvalue *> *)
 							node->getNext()) {
 
@@ -606,7 +607,8 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, environment *env) {
 			sqlrshbindvalue	*bv=node->getData()->getData();
 			if (bv->type==STRING_BIND) {
 				// FIXME: make buffer length variable
-				sqlrcur->defineOutputBindString(name,1024);
+				sqlrcur->defineOutputBindString(name,
+						bv->outputstringbindlength);
 			} else if (bv->type==INTEGER_BIND) {
 				sqlrcur->defineOutputBindInteger(name);
 			} else if (bv->type==DOUBLE_BIND) {
@@ -621,7 +623,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, environment *env) {
 
 		for (stringdictionarylistnode< sqlrshbindvalue * > *node=
 			(stringdictionarylistnode< sqlrshbindvalue *> *)
-			env->inputbinds.getList()->getFirstNode(); node;
+			env->outputbinds.getList()->getFirstNode(); node;
 			node=(stringdictionarylistnode< sqlrshbindvalue *> *)
 							node->getNext()) {
 
@@ -635,7 +637,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, environment *env) {
 				bv->integerval=
 					sqlrcur->getOutputBindInteger(name);
 			} else if (bv->type==DOUBLE_BIND) {
-				bv->integerval=
+				bv->doubleval.value=
 					sqlrcur->getOutputBindDouble(name);
 			}
 		}
@@ -960,24 +962,48 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 
 	// sanity check...
 	bool	sane=true;
-	if (partcount==2 && !charstring::compare(parts[0],"outputbind")) {
+	if (partcount>2 && !charstring::compare(parts[0],"outputbind")) {
 
 		// if the bind variable is already defined, clear it...
 		sqlrshbindvalue	*bv=NULL;
-		if (env->inputbinds.getData(parts[1],&bv)) {
+		if (env->outputbinds.getData(parts[1],&bv)) {
 			delete[] bv;
 		}
 
 		// define the variable
 		bv=new sqlrshbindvalue;
 
-		// FIXME: handle non-strings...
-		bv->stringval=NULL;
-		bv->type=STRING_BIND;
-		env->inputbinds.setData(parts[1],bv);
+		if (!charstring::compareIgnoringCase(
+						parts[2],"string") &&
+						partcount==4) {
+			bv->type=STRING_BIND;
+			bv->stringval=NULL;
+			bv->outputstringbindlength=
+				charstring::toInteger(parts[3]);
+		} else if (!charstring::compareIgnoringCase(
+						parts[2],"integer") &&
+						partcount==3) {
+			bv->type=INTEGER_BIND;
+			bv->integerval=0;
+		} else if (!charstring::compareIgnoringCase(
+						parts[2],"double") &&
+						partcount==5) {
+			bv->type=DOUBLE_BIND;
+			bv->doubleval.value=0.0;
+			bv->doubleval.precision=
+				charstring::toInteger(parts[3]);
+			bv->doubleval.scale=
+				charstring::toInteger(parts[4]);
+		} else {
+			sane=false;
+		}
+
+		// put the bind variable in the list
+		if (sane) {
+			env->outputbinds.setData(parts[1],bv);
+		}
 
 	} else {
-		printf("usage: outputbind [variable]\n");
 		sane=false;
 	}
 
@@ -985,6 +1011,7 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 	if (sane) {
 		delete[] parts[0];
 	} else {
+		printf("usage: outputbind [variable] [type] [length] [scale]\n");
 		for (uint64_t i=0; i<partcount; i++) {
 			delete[] parts[i];
 		}
@@ -1083,7 +1110,7 @@ void sqlrsh::displayHelp(environment *env) {
 	green(env);
 	printf("defines an input bind variable\n");
 	cyan(env);
-	printf("	outputbind [variable]          - ");
+	printf("	outputbind [variable] [type] [length] [scale] - ");
 	green(env);
 	printf("defines an output bind variable\n");
 	cyan(env);
