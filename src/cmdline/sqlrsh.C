@@ -1110,10 +1110,13 @@ void sqlrsh::displayHelp(environment *env) {
 	green(env);
 	printf("defines an input bind variable\n");
 	cyan(env);
-	printf("	outputbind [variable] [type] [length] [scale] - ");
+	printf("	outputbind ...                 - ");
 	green(env);
 	printf("defines an output bind variable\n");
 	cyan(env);
+	printf("		outputbind [variable] string [length]\n");
+	printf("		outputbind [variable] integer\n");
+	printf("		outputbind [variable] double [precision] [scale}\n");
 	printf("	printbinds                     - ");
 	green(env);
 	printf("prints all bind variables\n");
@@ -1148,13 +1151,14 @@ void sqlrsh::displayHelp(environment *env) {
 	cyan(env);
 	printf("	describe table				-\n");
 	green(env);
-	printf("		returns a list of columns in the table \"table\"\n");
+	printf("		returns a list of columns in the table \"table\"\n\n");
 	cyan(env);
 	printf("	exit/quit		- ");
 	green(env);
 	printf("exits\n\n");
 	yellow(env);
-	printf("	All commands must be followed by a semicolon.\n");
+	printf("	All commands must be followed by the delimiter: %c\n",
+								env->delimiter);
 	white(env);
 }
 
