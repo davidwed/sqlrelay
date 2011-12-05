@@ -41,6 +41,11 @@ bool sqlrconnection::selectDatabase(const char *database) {
 				"A network error may have ocurred.");
 		return false;
 	}
+
+	// FIXME: if there was an error, get the error
+	if (!result) {
+	}
+
 	return result;
 }
 

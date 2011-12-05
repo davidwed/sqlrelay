@@ -39,7 +39,12 @@ void sqlrconnection_svr::selectDatabaseCommand() {
 	db[dblen]='\0';
 	
 	// select the db and send back the result
-	clientsock->write(selectDatabase(db));
+	bool	result=selectDatabase(db);
+	clientsock->write(result);
+
+	// FIXME: if there was an error, send it back
+	if (!result) {
+	}
 
 	// send back the result
 	flushWriteBuffer();
