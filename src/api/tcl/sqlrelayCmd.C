@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.30 2011-12-06 16:37:31 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.31 2011-12-06 21:31:33 mused Exp $
  */
 
 #include <tcl.h>
@@ -1800,6 +1800,7 @@ void sqlrconDelete(ClientData data) {
  *  $con autoCommit bool
  *  $con commit
  *  $con rollback
+ *  $con errorMessage
  *  $con debug ?bool?
  *  $con sqlrcur
  *     set cur [$con sqlrcur]
@@ -1827,6 +1828,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "autoCommit",
     "commit",
     "rollback",
+    "errorMessage",
     "debug",
     "sqlrcur",
   };
@@ -1849,6 +1851,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_AUTOCOMMIT,
     SQLR_COMMIT,
     SQLR_ROLLBACK,
+    SQLR_ERRORMESSAGE,
     SQLR_DEBUG,
     SQLR_SQLRCUR,
   };
@@ -2041,6 +2044,14 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     }
     Tcl_SetObjResult(interp, Tcl_NewIntObj(con->rollback()));
     break;
+  case SQLR_ERRORMESSAGE: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp,Tcl_NewStringObj(con->errorMessage(), -1));
+    break;
+  }
   case SQLR_DEBUG: {
     int flag = 0;
     if (objc == 2) {

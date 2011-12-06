@@ -37,13 +37,31 @@ bool sqlrconnection::selectDatabase(const char *database) {
 	// get the result
 	bool	result;
 	if (cs->read(&result)!=sizeof(bool)) {
+		debugPrint("Error selecting database.\n");
 		setError("Failed to select database.\n "
 				"A network error may have ocurred.");
 		return false;
 	}
 
-	// FIXME: if there was an error, get the error
+	// if there was an error, get the error
 	if (!result) {
+
+		uint16_t	errorlength;
+		cs->read(&errorlength);
+
+		delete[] error;
+		error=new char[errorlength+1];
+		cs->read(error,errorlength);
+		error[errorlength]='\0';
+
+		if (debug) {
+			debugPrint("Selecting database failed: ");
+			debugPrint(error);
+			debugPrint("\n");
+		}
+
+	} else if (debug) {
+		debugPrint("Selecting database succeeded\n");
 	}
 
 	return result;
@@ -61,6 +79,8 @@ const char *sqlrconnection::getCurrentDatabase() {
 		debugPrint("\n");
 		debugPreEnd();
 	}
+
+	clearError();
 
 	// tell the server we want to select a db
 	cs->write((uint16_t)GET_CURRENT_DATABASE);

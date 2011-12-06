@@ -452,6 +452,17 @@ int main() {
 				return ERR_ENCODING_ARGS;
 			}
 		}
+
+		if (strcmp("connectionErrorMessage", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// encode result 
+			if (ei_x_encode_atom(&result, "ok") || 
+				ei_x_encode_string(&result, sqlrcon_errorMessage(con) )) {
+				return ERR_ENCODING_ARGS;
+			}
+		}
 		
 		if (strcmp("debugOn", command) == TRUE) {
 			// check number of arguments

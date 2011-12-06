@@ -351,8 +351,7 @@ __END__
         errorMessage();
             # If a query failed and generated an error, the
             # error message is available here.  If the 
-            # query succeeded then this method returns a 
-            # NULL.
+            # query succeeded then this method returns NULL.
 
         getNullsAsEmptyStrings();
             # Tells the client to return NULL fields and 

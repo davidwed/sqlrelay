@@ -39,20 +39,23 @@ void sqlrconnection_svr::selectDatabaseCommand() {
 	db[dblen]='\0';
 	
 	// select the db and send back the result
-	bool	result=selectDatabase(db);
+	char	*error=NULL;
+	bool	result=selectDatabase(db,&error);
 	clientsock->write(result);
 
-	// FIXME: if there was an error, send it back
+	// if there was an error, send it back
 	if (!result) {
+		uint16_t	errorlen=charstring::length(error);
+		clientsock->write(errorlen);
+		clientsock->write(error,errorlen);
 	}
 
-	// send back the result
 	flushWriteBuffer();
 
 	return;
 }
 
-bool sqlrconnection_svr::selectDatabase(const char *database) {
+bool sqlrconnection_svr::selectDatabase(const char *database, char **error) {
 
 	// handle the degenerate case
 	if (!database) {
@@ -69,7 +72,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	}
 
 	// bounds checking
-	int		sdquerylen=charstring::length(sdquerybase)+
+	size_t		sdquerylen=charstring::length(sdquerybase)+
 					charstring::length(database)+1;
 	if (sdquerylen>maxquerysize) {
 		dbgfile.debugPrint("connection",2,
@@ -95,6 +98,10 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 		// set a flag indicating that the db has been changed
 		// so it can be reset at the end of the session
 		dbselected=true;
+	} else {
+		bool	liveconnection;
+		*error=charstring::duplicate(
+				sdcur->errorMessage(&liveconnection));
 	}
 	delete[] sdquery;
 	sdcur->closeCursor();

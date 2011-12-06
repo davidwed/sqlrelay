@@ -35,7 +35,7 @@ bool sqlrconnection_svr::returnError(sqlrcursor_svr *cursor) {
 		clientsock->write((uint16_t)ERROR);
 
 		// send the error itself
-		int	errorlen=charstring::length(error);
+		size_t	errorlen=charstring::length(error);
 		
 		#ifdef RETURN_QUERY_WITH_ERROR
 			clientsock->write((uint16_t)(errorlen+

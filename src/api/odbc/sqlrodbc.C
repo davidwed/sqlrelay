@@ -770,7 +770,8 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported by SQL Relay
+	// FIXME: getColumnList
+
 	return SQL_ERROR;
 }
 
@@ -880,6 +881,7 @@ SQLRETURN SQL_API SQLDataSources(SQLHENV environmenthandle,
 	}
 
 	// not supported by SQL Relay
+
 	return SQL_ERROR;
 }
 
@@ -3357,7 +3359,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported by SQL Relay
+	// FIXME: getTableList
 
 	return SQL_ERROR;
 }

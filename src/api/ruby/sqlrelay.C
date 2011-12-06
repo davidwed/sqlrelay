@@ -184,6 +184,17 @@ static VALUE sqlrcon_rollback(VALUE self) {
 	return INT2NUM(sqlrcon->rollback());
 }
 
+static VALUE sqlrcon_errorMessage(VALUE self) {
+	sqlrconnection *sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	const char	*result=sqlrcon->errorMessage();
+	if (result) {
+		return rb_str_new2(result);
+	} else {
+		return Qnil;
+	}
+}
+
 static VALUE sqlrcon_debugOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -248,6 +259,8 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_commit,0);
 	rb_define_method(csqlrconnection,"rollback",
 				(CAST)sqlrcon_rollback,0);
+	rb_define_method(csqlrconnection,"errorMessage",
+				(CAST)sqlrcon_errorMessage,0);
 	rb_define_method(csqlrconnection,"debugOn",
 				(CAST)sqlrcon_debugOn,0);
 	rb_define_method(csqlrconnection,"debugOff",

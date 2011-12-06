@@ -104,6 +104,11 @@ int	sqlrcon_rollback(sqlrcon sqlrconref);
 			   succeeded, 0 if it failed and -1 if an
 			   error occurred. */
 
+const char	*sqlrcon_errorMessage(sqlrcon sqlrconref); 
+			/* If an operation failed and generated an error, the
+			   error message is available here.  If there is
+			   no error then this method returns NULL */
+
 void	sqlrcon_debugOn(sqlrcon sqlrconref); 
 			/* Causes verbose debugging information to be 
 			   sent to standard output.  Another way to do 
@@ -394,7 +399,7 @@ int	sqlrcur_endOfResultSet(sqlrcur sqlrcurref);
 			   function can only return 0 if 
 			   setResultSetBufferSize() has been called
 			   with a parameter other than 0. */
-  
+
 
 const char	*sqlrcur_errorMessage(sqlrcur sqlrcurref); 
 			/* If a query failed and generated an error, the

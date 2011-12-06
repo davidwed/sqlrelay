@@ -106,6 +106,13 @@ class sqlrconnection {
 		bool	rollback();
 				// Issues a rollback.  Returns 1 if the rollback
 				// succeeded, 0 if it failed.
+		
+		
+		const char	*errorMessage();
+				// If an operation failed and generated an
+				// error, the error message is available here.
+				// If there is no error then this method 
+				// returns NULL.
 
 
 		void	debugOn();
@@ -377,7 +384,7 @@ class sqlrcursor {
 				// If a query failed and generated an error, 
 				// the error message is available here.  If 
 				// the query succeeded then this method 
-				// returns a NULL.
+				// returns NULL.
 
 
 		void	getNullsAsEmptyStrings();

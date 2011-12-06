@@ -41,7 +41,11 @@ void sqlrconnection_svr::endSessionInternal() {
 
 	// reset database/schema
 	if (dbselected) {
-		selectDatabase(originaldb);
+		// FIXME: we're ignoring the result and error,
+		// should we do something if there's an error?
+		char	*error=NULL;
+		selectDatabase(originaldb,&error);
+		delete[] error;
 		dbselected=false;
 	}
 

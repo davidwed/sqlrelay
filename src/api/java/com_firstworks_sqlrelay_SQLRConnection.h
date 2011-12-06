@@ -160,6 +160,14 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_rollback
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    errorMessage
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_errorMessage
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    debugOn
  * Signature: ()V
  */

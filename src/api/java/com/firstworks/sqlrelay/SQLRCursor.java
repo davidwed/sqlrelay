@@ -255,7 +255,7 @@ public class SQLRCursor {
 	/** If a query failed and generated an error, 
 	 *  the error message is available here.  If 
 	 *  the query succeeded then this method 
-	 *  returns a NULL.  */
+	 *  returns NULL.  */
 	public native String	errorMessage();
 
 

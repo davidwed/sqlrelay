@@ -62,7 +62,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool	commit();
 		virtual bool	rollback();
 		virtual bool	supportsTransactionBlocks();
-		virtual bool		selectDatabase(const char *database);
+		virtual bool		selectDatabase(const char *database,
+								char **error);
 		virtual const char	*selectDatabaseQuery();
 		virtual char		*getCurrentDatabase();
 		virtual const char	*getCurrentDatabaseQuery();

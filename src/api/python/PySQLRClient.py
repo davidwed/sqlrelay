@@ -159,6 +159,13 @@ class sqlrconnection:
         """
         return CSQLRelay.rollback(self.connection)
 
+    def errorMessage(self):
+        """
+        If the operation failed, the error message will be returned
+        from this method.  Otherwise, it returns None.
+        """
+        return CSQLRelay.connectionErrorMessage(self.connection)
+
     def debugOn(self):
         """
         Turn verbose debugging on.
@@ -614,7 +621,7 @@ class sqlrcursor:
         If the query failed, the error message will be returned
         from this method.  Otherwise, it returns None.
         """
-        return CSQLRelay.errorMessage(self.cursor)
+        return CSQLRelay.cursorErrorMessage(self.cursor)
 
     def getNullsAsEmptyStrings(self):
         """

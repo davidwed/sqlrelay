@@ -93,6 +93,10 @@ int sqlrcon_rollback(sqlrcon sqlrconref) {
 	return sqlrconref->rollback();
 }
 
+const char *sqlrcon_errorMessage(sqlrcon sqlrconref) {
+	return sqlrconref->errorMessage();
+}
+
 void sqlrcon_debugOn(sqlrcon sqlrconref) {
 	sqlrconref->debugOn();
 }

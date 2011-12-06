@@ -90,6 +90,9 @@ sqlrconnection::clientVersion()
 const char *
 sqlrconnection::bindFormat()
 
+const char *
+sqlrconnection::errorMessage()
+
 void
 sqlrconnection::debugOn()
 

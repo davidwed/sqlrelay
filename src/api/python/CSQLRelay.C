@@ -262,6 +262,13 @@ static PyObject *rollback(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", (short)rc);
 }
 
+static PyObject *connectionErrorMessage(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  return Py_BuildValue("s", ((sqlrconnection *)sqlrcon)->errorMessage());
+}
+
 static PyObject *debugOn(PyObject *self, PyObject *args) {
   long sqlrcon;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
@@ -974,7 +981,7 @@ static PyObject *endOfResultSet(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", (short)rc);
 }
 
-static PyObject *errorMessage(PyObject *self, PyObject *args) {
+static PyObject *cursorErrorMessage(PyObject *self, PyObject *args) {
   long sqlrcur;
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
@@ -1711,6 +1718,7 @@ static PyMethodDef SQLRMethods[] = {
   {"autoCommitOff", autoCommitOff, METH_VARARGS},
   {"commit", commit, METH_VARARGS},
   {"rollback", rollback, METH_VARARGS},
+  {"connectionErrorMessage", connectionErrorMessage, METH_VARARGS},
   {"debugOn", debugOn, METH_VARARGS},
   {"debugOff", debugOff, METH_VARARGS},
   {"getDebug", getDebug, METH_VARARGS},
@@ -1767,7 +1775,7 @@ static PyMethodDef SQLRMethods[] = {
   {"affectedRows", affectedRows, METH_VARARGS},
   {"firstRowIndex", firstRowIndex, METH_VARARGS},
   {"endOfResultSet", endOfResultSet, METH_VARARGS},
-  {"errorMessage", errorMessage, METH_VARARGS},
+  {"cursorErrorMessage", cursorErrorMessage, METH_VARARGS},
   {"getNullsAsEmptyStrings", getNullsAsEmptyStrings, METH_VARARGS},
   {"getNullsAsNone", getNullsAsNone, METH_VARARGS},
   {"getField", getField, METH_VARARGS},

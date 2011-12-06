@@ -107,6 +107,12 @@ public class SQLRConnection {
 	public native boolean	rollback();
 
 
+	/** If an operation failed and generated an error, 
+	 *  the error message is available here.  If there
+	 *  is no error then this method returns NULL.  */
+	public native String	errorMessage();
+
+
 	/** Causes verbose debugging information to be 
 	 *  sent to standard output.  Another way to do
 	 *  this is to start a query with "-- debug\n". */

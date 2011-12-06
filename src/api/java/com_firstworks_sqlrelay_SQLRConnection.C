@@ -264,6 +264,16 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_bindFormat
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    errorMessage
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_errorMessage
+  (JNIEnv *env, jobject self) {
+	return env->NewStringUTF(getSqlrConnection(env,self)->errorMessage());
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    debugOn
  * Signature: ()V
  */

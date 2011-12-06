@@ -3,6 +3,10 @@
 
 #include <sqlrelay/sqlrclient.h>
 
+const char *sqlrconnection::errorMessage() {
+	return error;
+}
+
 void sqlrconnection::clearError() {
 	delete[] error;
 	error=NULL;

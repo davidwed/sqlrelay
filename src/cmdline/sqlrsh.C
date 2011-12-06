@@ -147,7 +147,9 @@ class	sqlrsh {
 		char	*getTable(enum querytype_t querytype,
 					const char *command);
 		void	initStats(environment *env);
-		void	displayError(sqlrcursor *sqlrcur, environment *env);
+		void	displayError(environment *env,
+					const char *message,
+					const char *error);
 		void	displayHeader(sqlrcursor *sqlrcur, environment *env);
 		void	displayResultSet(sqlrcursor *sqlrcur, environment *env);
 		void	displayStats(sqlrcursor *sqlrcur, environment *env);
@@ -402,8 +404,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"use ",4)) {	
 		if (!sqlrcon->selectDatabase(ptr+4)) {
-			printf("changing the current database/schema failed\n");
-			// FIXME: print error here whenever that works
+			displayError(env,NULL,sqlrcon->errorMessage());
 		}
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"currentdb",9)) {	
@@ -555,7 +556,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 		if (sqlrcur->errorMessage()) {
 
 			// display the error
-			displayError(sqlrcur,env);
+			displayError(env,NULL,sqlrcur->errorMessage());
 
 		} else {
 
@@ -701,10 +702,15 @@ void sqlrsh::initStats(environment *env) {
 	clock();
 }
 
-void sqlrsh::displayError(sqlrcursor *sqlrcur, environment *env) {
-
+void sqlrsh::displayError(environment *env,
+				const char *message, const char *error) {
 	cyan(env);
-	printf("%s\n\n",sqlrcur->errorMessage());
+	if (charstring::length(message)) {
+		printf("%s\n",message);
+	}
+	if (charstring::length(error)) {
+		printf("%s\n\n",error);
+	}
 	white(env);
 }
 
