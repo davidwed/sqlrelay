@@ -227,6 +227,14 @@ const char *db2connection::bindFormat() {
 	return "?";
 }
 
+const char *db2connection::selectDatabaseQuery() {
+	return "set schema %s";
+}
+
+const char *db2connection::getCurrentDatabaseQuery() {
+	return "values current schema";
+}
+
 db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	errormsg=NULL;
