@@ -1897,6 +1897,24 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_selectdatabase) {
 	RETURN_LONG(0);
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcon_getcurrentdatabase) {
+	zval **sqlrcon;
+	const char *r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		r=connection->getCurrentDatabase();
+		if (r) {
+			RETURN_STRING(const_cast<char *>(r),1);
+		}
+	}
+	RETURN_FALSE;
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcon_autocommiton) {
 	zval **sqlrcon;
 	bool r;
@@ -2148,6 +2166,7 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcon_ping,NULL)
 	ZEND_FE(sqlrcon_identify,NULL)
 	ZEND_FE(sqlrcon_selectdatabase,NULL)
+	ZEND_FE(sqlrcon_getcurrentdatabase,NULL)
 	ZEND_FE(sqlrcon_autocommiton,NULL)
 	ZEND_FE(sqlrcon_autocommitoff,NULL)
 	ZEND_FE(sqlrcon_commit,NULL)

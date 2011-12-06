@@ -164,6 +164,16 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_selectDat
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    getCurrentDatabase
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getCurrentDatabase
+  (JNIEnv *env, jobject self) {
+	return env->NewStringUTF(getSqlrConnection(env,self)->getCurrentDatabase());
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    autoCommitOn
  * Signature: ()Z
  */

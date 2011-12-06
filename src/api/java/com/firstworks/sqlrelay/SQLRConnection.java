@@ -89,6 +89,10 @@ public class SQLRConnection {
 
 	/** Sets the current database/schema to "database" */
 	public native boolean	selectDatabase(String database);
+	/** Returns the database/schema that is currently in use */
+	public native String	getCurrentDatabase();
+
+
 	/** Instructs the database to perform a commit
 	 *  after every successful query. */
 	public native boolean	autoCommitOn();

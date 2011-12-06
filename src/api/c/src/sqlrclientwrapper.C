@@ -73,6 +73,10 @@ int sqlrcon_selectDatabase(sqlrcon sqlrconref, const char *database) {
 	return sqlrconref->selectDatabase(database);
 }
 
+const char *sqlrcon_getCurrentDatabase(sqlrcon sqlrconref) {
+	return sqlrconref->getCurrentDatabase();
+}
+
 int sqlrcon_autoCommitOn(sqlrcon sqlrconref) {
 	return sqlrconref->autoCommitOn();
 }

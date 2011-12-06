@@ -60,6 +60,9 @@ bool
 sqlrconnection::selectDatabase(database)
 		const char	*database
 
+const char *
+sqlrconnection::getCurrentDatabase()
+
 bool
 sqlrconnection::autoCommitOn()
 

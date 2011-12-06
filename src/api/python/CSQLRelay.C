@@ -207,6 +207,17 @@ static PyObject *selectDatabase(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", (short)rc);
 }
 
+static PyObject *getCurrentDatabase(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  const char *rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrconnection *)sqlrcon)->getCurrentDatabase();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("s", rc);
+}
+
 static PyObject *autoCommitOn(PyObject *self, PyObject *args) {
   long sqlrcon;
   bool rc;
@@ -1695,6 +1706,7 @@ static PyMethodDef SQLRMethods[] = {
   {"clientVersion", clientVersion, METH_VARARGS},
   {"bindFormat", bindFormat, METH_VARARGS},
   {"selectDatabase", selectDatabase, METH_VARARGS},
+  {"getCurrentDatabase", getCurrentDatabase, METH_VARARGS},
   {"autoCommitOn", autoCommitOn, METH_VARARGS},
   {"autoCommitOff", autoCommitOff, METH_VARARGS},
   {"commit", commit, METH_VARARGS},

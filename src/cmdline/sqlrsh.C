@@ -401,7 +401,10 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		ping(sqlrcon,env);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"use ",4)) {	
-		sqlrcon->selectDatabase(ptr+4);
+		if (!sqlrcon->selectDatabase(ptr+4)) {
+			printf("changing the current database/schema failed\n");
+			// FIXME: print error here whenever that works
+		}
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"currentdb",9)) {	
 		printf("%s\n",sqlrcon->getCurrentDatabase());

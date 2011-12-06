@@ -85,6 +85,10 @@ const char	*sqlrcon_bindFormat(sqlrcon sqlrconref);
 int	sqlrcon_selectDatabase(sqlrcon sqlrconref, const char *database);
 			/* Sets the current database/schema to
 			   "database" */
+const char	*sqlrcon_getCurrentDatabase(sqlrcon sqlrconref);
+			/* Returns the database/schema that is
+			   currently in use. */
+
 int	sqlrcon_autoCommitOn(sqlrcon sqlrconref);
 			/* Instructs the database to perform a commit
 			   after every successful query. */

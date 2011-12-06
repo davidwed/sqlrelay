@@ -149,6 +149,17 @@ static VALUE sqlrcon_selectDatabase(VALUE self, VALUE db) {
 	return INT2NUM(sqlrcon->selectDatabase(STR2CSTR(db)));
 }
 
+static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	const char	*result=sqlrcon->getCurrentDatabase();
+	if (result) {
+		return rb_str_new2(result);
+	} else {
+		return Qnil;
+	}
+}
+
 static VALUE sqlrcon_autoCommitOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -227,6 +238,8 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_bindFormat,0);
 	rb_define_method(csqlrconnection,"selectDatabase",
 				(CAST)sqlrcon_selectDatabase,1);
+	rb_define_method(csqlrconnection,"getCurrentDatabase",
+				(CAST)sqlrcon_getCurrentDatabase,0);
 	rb_define_method(csqlrconnection,"autoCommitOn",
 				(CAST)sqlrcon_autoCommitOn,0);
 	rb_define_method(csqlrconnection,"autoCommitOff",

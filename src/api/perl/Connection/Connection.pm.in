@@ -116,6 +116,8 @@ __END__
 
         selectDatabase(database);
             # Sets the current database/schema to "database"
+        getCurrentDatabase();
+            # Returns the database/schema that is currently in use.
 
         autoCommitOn();
             # Instructs the database to perform a commit

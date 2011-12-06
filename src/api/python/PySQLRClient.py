@@ -119,10 +119,15 @@ class sqlrconnection:
 
     def selectDatabase(self,database):
         """
-        Sets the current database/schema to
-        "database"
+        Sets the current database/schema to "database"
         """
         return CSQLRelay.selectDatabase(self.connection,database)
+
+    def getCurrentDatabase(self):
+        """
+        Returns the database/schema that is currently in use.
+        """
+        return CSQLRelay.getCurrentDatabase(self.connection)
 
     def autoCommitOn(self):
         """

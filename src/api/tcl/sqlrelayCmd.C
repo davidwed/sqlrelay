@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.29 2011-11-07 18:07:11 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.30 2011-12-06 16:37:31 mused Exp $
  */
 
 #include <tcl.h>
@@ -1796,6 +1796,7 @@ void sqlrconDelete(ClientData data) {
  *  $con clientVersion
  *  $con bindFormat
  *  $con selectDatabase db
+ *  $con getCurrentDatabase
  *  $con autoCommit bool
  *  $con commit
  *  $con rollback
@@ -1822,6 +1823,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "clientVersion",
     "bindFormat",
     "selectDatabase",
+    "getCurrentDatabase",
     "autoCommit",
     "commit",
     "rollback",
@@ -1843,6 +1845,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_CLIENTVERSION,
     SQLR_BINDFORMAT,
     SQLR_SELECTDATABASE,
+    SQLR_GETCURRENTDATABASE,
     SQLR_AUTOCOMMIT,
     SQLR_COMMIT,
     SQLR_ROLLBACK,
@@ -1996,6 +1999,15 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     Tcl_SetObjResult(interp, Tcl_NewIntObj(con->selectDatabase(Tcl_GetString(objv[2]))));
+    break;
+  }
+  case SQLR_GETCURRENTDATABASE: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp,
+		     Tcl_NewStringObj(con->getCurrentDatabase(), -1));
     break;
   }
   case SQLR_AUTOCOMMIT: {
