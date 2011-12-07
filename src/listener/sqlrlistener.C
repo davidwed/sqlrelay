@@ -1264,7 +1264,15 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 		if (dynamicscaling) {
 			incrementSessionCount();
 		}
+
 		passstatus=handOffClient(clientsock);
+
+		// If the handoff failed, decrement the session count.
+		// If it had succeeded then the connection daemin would
+		// decrement it later.
+		if (dynamicscaling && !passstatus) {
+			decrementSessionCount();
+		}
 
 	} else if (authstatus==0) {
 
@@ -1459,18 +1467,27 @@ printf("got: %d\n",clientflags1);
 	return 0;
 }
 
+void sqlrlistener::acquireSessionCountMutex() {
+    // wait for access
+    dbgfile.debugPrint("listener",1,"waiting for exclusive access...");
+    if (!semset->waitWithUndo(5)) {
+        // FIXME: bail somehow
+    }
+    dbgfile.debugPrint("listener",1,"done waiting for exclusive access...");
+}
+
+void sqlrlistener::releaseSessionCountMutex() {
+    // signal that others may have access
+    if (!semset->signalWithUndo(5)) {
+        // FIXME: bail somehow
+    }
+}
+
 void sqlrlistener::incrementSessionCount() {
 
 	dbgfile.debugPrint("listener",0,"incrementing session count...");
 
-	// wait for access
-	dbgfile.debugPrint("listener",1,"waiting for exclusive access...");
-
-	if (!semset->waitWithUndo(5)) {
-		// FIXME: bail somehow
-	}
-
-	dbgfile.debugPrint("listener",1,"done waiting for exclusive access...");
+	acquireSessionCountMutex();
 
 	// increment the counter
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
@@ -1495,14 +1512,26 @@ void sqlrlistener::incrementSessionCount() {
 		dbgfile.debugPrint("listener",1,"done waiting for the scaler...");
 	}
 
-	// signal that others may have access
-	if (!semset->signalWithUndo(5)) {
-		// FIXME: bail somehow
-	}
+	releaseSessionCountMutex();
 
 	dbgfile.debugPrint("listener",0,"done incrementing session count");
 }
 
+void sqlrlistener::decrementSessionCount() {
+	dbgfile.debugPrint("listener",0,"decrementing session count...");
+ 
+	acquireSessionCountMutex();
+
+	// increment the counter
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	if (--ptr->connectionsinuse<0) {
+		ptr->connectionsinuse=0;
+	}
+
+	releaseSessionCountMutex();
+
+	dbgfile.debugPrint("listener",0,"done decrementing session count");
+}
 
 bool sqlrlistener::handOffClient(filedescriptor *sock) {
 
