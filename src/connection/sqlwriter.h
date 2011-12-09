@@ -1,3 +1,6 @@
+// Copyright (c) 1999-2011  David Muse
+// See the file COPYING for more information
+
 #ifndef SQLWRITER_H
 #define SQLWRITER_H
 
