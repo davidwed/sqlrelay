@@ -73,8 +73,28 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrcursor/returnresultset.C \
 	sqlrcursor/binds.C \
 	sqlrcursor/fakebinds.C \
+	sqlrcursor/translatequery.C \
 	sqlrcursor/abort.C \
-	sqlrcursor/sid.C
+	sqlrcursor/sid.C \
+	sqlelement/sqlelement.C \
+	sqlparser/clauses.C \
+	sqlparser/parse.C \
+	sqlparser/parsecreate.C \
+	sqlparser/parsedelete.C \
+	sqlparser/parsedrop.C \
+	sqlparser/parseinsert.C \
+	sqlparser/parseselect.C \
+	sqlparser/parseupdate.C \
+	sqlparser/sqlparser.C \
+	sqlwriter/sqlwriter.C \
+	sqlwriter/writecreate.C \
+	sqlwriter/writedelete.C \
+	sqlwriter/writedrop.C \
+	sqlwriter/writegeneric.C \
+	sqlwriter/writeinsert.C \
+	sqlwriter/writeselect.C \
+	sqlwriter/writeupdate.C \
+	sqltranslator/sqltranslator.C
 LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/sqlrconnectiondtor.lo \
 	sqlrconnection/flushwritebuffer.lo \
@@ -141,8 +161,28 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrcursor/returnresultset.lo \
 	sqlrcursor/binds.lo \
 	sqlrcursor/fakebinds.lo \
+	sqlrcursor/translatequery.lo \
 	sqlrcursor/abort.lo \
-	sqlrcursor/sid.lo
+	sqlrcursor/sid.lo \
+	sqlelement/sqlelement.lo \
+	sqlparser/clauses.lo \
+	sqlparser/parse.lo \
+	sqlparser/parsecreate.lo \
+	sqlparser/parsedelete.lo \
+	sqlparser/parsedrop.lo \
+	sqlparser/parseinsert.lo \
+	sqlparser/parseselect.lo \
+	sqlparser/parseupdate.lo \
+	sqlparser/sqlparser.lo \
+	sqlwriter/sqlwriter.lo \
+	sqlwriter/writecreate.lo \
+	sqlwriter/writedelete.lo \
+	sqlwriter/writedrop.lo \
+	sqlwriter/writegeneric.lo \
+	sqlwriter/writeinsert.lo \
+	sqlwriter/writeselect.lo \
+	sqlwriter/writeupdate.lo \
+	sqltranslator/sqltranslator.lo
 
 .SUFFIXES: .lo
 

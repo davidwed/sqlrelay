@@ -13,6 +13,11 @@ enum queryparsestate_t {
 
 void sqlrconnection_svr::rewriteQueryInternal(sqlrcursor_svr *cursor) {
 
+	// FIXME: make this configurable
+	if (true) {
+		cursor->translateQuery();
+	}
+
 	if (cursor->supportsNativeBinds()) {
 		if (translatebinds) {
 			translateBindVariables(cursor);
