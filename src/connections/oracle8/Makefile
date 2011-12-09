@@ -17,9 +17,18 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= oracle8connection.C main.C
-LOBJS= oracle8connection.lo main.lo
-DLOBJS= oracle8connection.d.lo main.d.lo
+SRCS= oracle8connection.C \
+	oracle8sqltranslator.C \
+	oracle8sqlwriter.C \
+	main.C
+LOBJS= oracle8connection.lo \
+	oracle8sqltranslator.lo \
+	oracle8sqlwriter.lo \
+	main.lo
+DLOBJS= oracle8connection.d.lo \
+	oracle8sqltranslator.d.lo \
+	oracle8sqlwriter.d.lo \
+	main.d.lo
 
 .SUFFIXES: .lo .d.lo
 
