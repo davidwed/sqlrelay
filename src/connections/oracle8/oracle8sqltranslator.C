@@ -42,15 +42,15 @@ bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
 
 	// ignore non create-table queries
 	xmldomnode	*table=
-			query->getFirstTagChild(sqlelement::create_query)->
-					getFirstTagChild(sqlelement::table);
+			query->getFirstTagChild(sqlelement::_create)->
+					getFirstTagChild(sqlelement::_table);
 	if (table->isNullNode()) {
 		return true;
 	}
 
 	// if there's already an on commit clause then leave it alone
 	xmldomnode	*oncommit=
-			table->getFirstTagChild(sqlelement::on_commit);
+			table->getFirstTagChild(sqlelement::_on_commit);
 	if (!oncommit->isNullNode()) {
 		return true;
 	}
@@ -60,7 +60,7 @@ bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
 	// an on commit clause which preserve rows...
 
 	// find the columns clause
-	xmldomnode	*columns=table->getFirstTagChild(sqlelement::columns);
+	xmldomnode	*columns=table->getFirstTagChild(sqlelement::_columns);
 
 	// if there is no columns clause then bail, we've got bigger problems
 	if (columns->isNullNode()) {
@@ -68,7 +68,7 @@ bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
 	}
 		
 	// add a new on commit clause after the columns clause
-	oncommit=newNodeAfter(table,columns,sqlelement::on_commit);
-	setAttribute(oncommit,sqlelement::value,"preserve rows");
+	oncommit=newNodeAfter(table,columns,sqlelement::_on_commit);
+	setAttribute(oncommit,sqlelement::_value,"preserve rows");
 	return true;
 }

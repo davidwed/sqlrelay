@@ -31,7 +31,7 @@ xmldomnode *sqlparser::newNode(xmldomnode *parentnode, const char *type) {
 xmldomnode *sqlparser::newNode(xmldomnode *parentnode,
 				const char *type, const char *value) {
 	xmldomnode	*node=newNode(parentnode,type);
-	setAttribute(node,sqlelement::value,value);
+	setAttribute(node,sqlelement::_value,value);
 	return node;
 }
 

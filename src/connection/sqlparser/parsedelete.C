@@ -19,7 +19,7 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*deletenode=
-			newNode(currentnode,sqlelement::delete_query);
+			newNode(currentnode,sqlelement::_delete);
 
 	// FIXME: implement this for real
 	parseRemainderVerbatim(deletenode,*newptr,newptr);

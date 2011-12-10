@@ -18,6 +18,8 @@ class oracle8sqlwriter : public sqlwriter {
 						stringbuffer *output);
 		virtual bool	uniqueKey(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	cascade(xmldomnode *node,
+						stringbuffer *output);
 };
 
 #endif

@@ -93,7 +93,7 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	nullable(xmldomnode *node,
 						stringbuffer *output);
-		virtual bool	notNullable(xmldomnode *node,
+		virtual bool	notNull(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	defaultValue(xmldomnode *node,
 						stringbuffer *output);
@@ -125,6 +125,14 @@ class sqlwriter {
 
 		// drop...
 		virtual bool	dropQuery(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	ifExists(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endTableNameListItem(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	restrictClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	cascade(xmldomnode *node,
 						stringbuffer *output);
 
 
@@ -163,6 +171,7 @@ class sqlwriter {
 		virtual bool	leftParen(stringbuffer *output);
 		virtual bool	rightParen(stringbuffer *output);
 		virtual bool	hasSibling(xmldomnode *node);
+		virtual bool	lastWasSpace(stringbuffer *output);
 };
 
 #endif

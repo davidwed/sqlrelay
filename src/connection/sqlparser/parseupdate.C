@@ -19,7 +19,7 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*updatenode=
-			newNode(currentnode,sqlelement::update_query);
+			newNode(currentnode,sqlelement::_update);
 
 	// FIXME: implement this for real
 	parseRemainderVerbatim(updatenode,*newptr,newptr);

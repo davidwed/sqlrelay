@@ -87,6 +87,8 @@ char *sqlparser::getUntil(const char *set,
 	return retval;
 }
 
+static const char *verbatimTerminators=" ,)";
+
 char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 	debugFunction();
 
@@ -109,7 +111,7 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 		// unless we're in quotes or parens
 		if (!*chr ||
 			(!inquotes && !indoublequotes && !parens && 
-			(*chr==' ' || *chr==',' || *chr==')'))) {
+							inSet(*chr," ,)"))) {
 			break;
 		}
 
@@ -184,7 +186,7 @@ bool sqlparser::parseTableName(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 	char	*tablename=getWord(ptr,newptr);
-	newNode(currentnode,sqlelement::name,tablename);
+	newNode(currentnode,sqlelement::_name,tablename);
 	delete[] tablename;
 	return true;
 }
@@ -194,7 +196,7 @@ bool sqlparser::parseColumnName(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 	char	*columnname=getWord(ptr,newptr);
-	newNode(currentnode,sqlelement::name,columnname);
+	newNode(currentnode,sqlelement::_name,columnname);
 	delete[] columnname;
 	return true;
 }
@@ -206,7 +208,7 @@ bool sqlparser::parseType(xmldomnode *currentnode,
 
 	// get the type
 	char	*type=getWord(ptr,newptr);
-	xmldomnode	*typenode=newNode(currentnode,sqlelement::type,type);
+	xmldomnode	*typenode=newNode(currentnode,sqlelement::_type,type);
 
 	// enum and set types have special characteristics
 	bool	enumorset=(!charstring::compareIgnoringCase(type,"enum") ||
@@ -239,7 +241,7 @@ bool sqlparser::parseType(xmldomnode *currentnode,
 	} else {
 
 		// create node
-		xmldomnode	*sizenode=newNode(typenode,sqlelement::size);
+		xmldomnode	*sizenode=newNode(typenode,sqlelement::_size);
 
 		// get length
 		if (!parseLength(sizenode,*newptr,newptr)) {
@@ -276,7 +278,7 @@ bool sqlparser::parseValues(xmldomnode *currentnode,
 	debugFunction();
 
 	// create new node
-	xmldomnode	*valuesnode=newNode(currentnode,sqlelement::values);
+	xmldomnode	*valuesnode=newNode(currentnode,sqlelement::_values);
 
 	*newptr=ptr;
 	for (;;) {
@@ -290,7 +292,7 @@ bool sqlparser::parseValues(xmldomnode *currentnode,
 
 		// create new node
 		xmldomnode	*valuenode=
-				newNode(valuesnode,sqlelement::value);
+				newNode(valuesnode,sqlelement::_value);
 
 		// set the value attribute
 		setAttribute(valuenode,"value",value);
@@ -315,7 +317,7 @@ bool sqlparser::parseLength(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 	char	*length=getUntil(",)",ptr,newptr);
-	newNode(currentnode,sqlelement::length,length);
+	newNode(currentnode,sqlelement::_length,length);
 	delete[] length;
 	return true;
 }
@@ -325,7 +327,7 @@ bool sqlparser::parseScale(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 	char	*scale=getUntil(")",ptr,newptr);
-	newNode(currentnode,sqlelement::scale,scale);
+	newNode(currentnode,sqlelement::_scale,scale);
 	delete[] scale;
 	return true;
 }
@@ -342,7 +344,7 @@ bool sqlparser::parseVerbatim(xmldomnode *currentnode,
 	bool	retval=charstring::length(verbatim);
 	if (retval) {
 		// create a new node and attribute
-		newNode(currentnode,sqlelement::verbatim,verbatim);
+		newNode(currentnode,sqlelement::_verbatim,verbatim);
 	} 
 
 	// clean up
@@ -355,9 +357,17 @@ bool sqlparser::parseVerbatim(xmldomnode *currentnode,
 bool sqlparser::parseRemainderVerbatim(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
+	char	separator[2];
+	separator[1]='\0';
 	*newptr=ptr;
 	do {
-		space(*newptr,newptr);
+		if (inSet(**newptr,verbatimTerminators) && **newptr!=' ') {
+			separator[0]=**newptr;
+			newNode(currentnode,sqlelement::_verbatim,separator);
+			(*newptr)++;
+		} else {
+			space(*newptr,newptr);
+		}
 	} while (parseVerbatim(currentnode,*newptr,newptr));
 	return true;
 }

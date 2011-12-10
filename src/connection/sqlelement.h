@@ -7,78 +7,84 @@
 class sqlelement {
 	public:
 		// generic...
-		static const char *name;
-		static const char *type;
-		static const char *size;
-		static const char *value;
-		static const char *options;
-		static const char *verbatim;
+		static const char *_name;
+		static const char *_type;
+		static const char *_size;
+		static const char *_value;
+		static const char *_options;
+		static const char *_verbatim;
 
 		// create query...
-		static const char *create_query;
+		static const char *_create;
+		static const char *_create_temporary;
 
 		// table...
-		static const char *table;
-		static const char *temporary;
-		static const char *if_not_exists;
+		static const char *_table;
+		static const char *_if_not_exists;
 
 		// column definitions...
-		static const char *columns;
-		static const char *column;
-		static const char *values;
-		static const char *length;
-		static const char *scale;
+		static const char *_columns;
+		static const char *_column;
+		static const char *_values;
+		static const char *_length;
+		static const char *_scale;
 
 		// constraints...
-		static const char *constraints;
-		static const char *unsigned_constraint;
-		static const char *zerofill;
-		static const char *binary;
-		static const char *character_set;
-		static const char *collate;
-		static const char *nullable;
-		static const char *not_nullable;
-		static const char *default_value;
-		static const char *auto_increment;
-		static const char *unique_key;
-		static const char *primary_key;
-		static const char *key;
-		static const char *comment;
-		static const char *column_format;
-		static const char *references;
-		static const char *match;
-		static const char *on_delete;
-		static const char *on_update;
+		static const char *_constraints;
+		static const char *_unsigned;
+		static const char *_zerofill;
+		static const char *_binary;
+		static const char *_character_set;
+		static const char *_collate;
+		static const char *_null;
+		static const char *_not_null;
+		static const char *_default;
+		static const char *_auto_increment;
+		static const char *_unique_key;
+		static const char *_primary_key;
+		static const char *_key;
+		static const char *_comment;
+		static const char *_column_format;
+		static const char *_references;
+		static const char *_match;
+		static const char *_on_delete;
+		static const char *_on_update;
 
 		// on commit clause...
-		static const char *on_commit;
+		static const char *_on_commit;
 
 
 		// drop...
-		static const char *drop_query;
+		static const char *_drop;
+		static const char *_drop_temporary;
+		static const char *_if_exists;
+		static const char *_table_name_list;
+		static const char *_table_name_list_item;
+		static const char *_restrict;
+		static const char *_cascade;
 
 
 		// insert...
-		static const char *insert_query;
-		static const char *into;
+		static const char *_insert;
+		static const char *_into;
 
 
 		// update...
-		static const char *update_query;
+		static const char *_update;
 
 
 		// delete...
-		static const char *delete_query;
+		static const char *_delete;
 
 
 		// select...
-		static const char *select_query;
-		static const char *unique;
-		static const char *distinct;
-		static const char *from;
-		static const char *where;
-		static const char *order_by;
-		static const char *group_by;
+		static const char *_select;
+		static const char *_unique;
+		static const char *_distinct;
+		static const char *_from;
+		static const char *_where;
+		static const char *_order_by;
+		static const char *_group_by;
 };
 
 #endif

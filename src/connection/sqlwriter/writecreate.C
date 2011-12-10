@@ -123,7 +123,7 @@ bool sqlwriter::nullable(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlwriter::notNullable(xmldomnode *node, stringbuffer *output) {
+bool sqlwriter::notNull(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("not null");
 	return true;

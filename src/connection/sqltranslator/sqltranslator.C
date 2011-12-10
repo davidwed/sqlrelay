@@ -88,7 +88,7 @@ xmldomnode *sqltranslator::newNode(xmldomnode *parentnode, const char *type) {
 xmldomnode *sqltranslator::newNode(xmldomnode *parentnode,
 				const char *type, const char *value) {
 	xmldomnode	*node=newNode(parentnode,type);
-	setAttribute(node,sqlelement::value,value);
+	setAttribute(node,sqlelement::_value,value);
 	return node;
 }
 
@@ -118,7 +118,7 @@ xmldomnode *sqltranslator::newNodeAfter(xmldomnode *parentnode,
 						const char *type,
 						const char *value) {
 	xmldomnode	*retval=newNodeAfter(parentnode,node,type);
-	setAttribute(retval,sqlelement::value,value);
+	setAttribute(retval,sqlelement::_value,value);
 	return retval;
 }
 

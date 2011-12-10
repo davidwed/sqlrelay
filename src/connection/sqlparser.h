@@ -81,7 +81,7 @@ class sqlparser {
 		bool	parseCreate(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseTemporary(xmldomnode *currentnode,
+		bool	parseCreateTemporary(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	parseCreateTable(xmldomnode *currentnode,
@@ -115,13 +115,13 @@ class sqlparser {
 		bool	parseCollate(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseNullable(xmldomnode *currentnode,
+		bool	parseNull(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseNotNullable(xmldomnode *currentnode,
+		bool	parseNotNull(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseDefaultValue(xmldomnode *currentnode,
+		bool	parseDefault(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	parseAutoIncrement(xmldomnode *currentnode,
@@ -172,6 +172,24 @@ class sqlparser {
 
 
 		bool	parseDrop(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseDropTemporary(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseDropTable(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseIfExists(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseTableNameList(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseRestrict(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseCascade(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 
@@ -229,11 +247,11 @@ class sqlparser {
 						const char **newptr);
 		bool	collateClause(const char *ptr,
 						const char **newptr);
-		bool	nullableClause(const char *ptr,
+		bool	nullClause(const char *ptr,
 						const char **newptr);
-		bool	notNullableClause(const char *ptr,
+		bool	notNullClause(const char *ptr,
 						const char **newptr);
-		bool	defaultValueClause(const char *ptr,
+		bool	defaultClause(const char *ptr,
 						const char **newptr);
 		bool	autoIncrementClause(const char *ptr,
 						const char **newptr);
@@ -264,6 +282,12 @@ class sqlparser {
 
 
 		bool	dropClause(const char *ptr,
+						const char **newptr);
+		bool	ifExistsClause(const char *ptr,
+						const char **newptr);
+		bool	restrictClause(const char *ptr,
+						const char **newptr);
+		bool	cascadeClause(const char *ptr,
 						const char **newptr);
 
 		bool	insertClause(const char *ptr,

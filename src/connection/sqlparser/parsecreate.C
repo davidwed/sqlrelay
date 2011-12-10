@@ -18,10 +18,10 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*createnode=
-			newNode(currentnode,sqlelement::create_query);
+			newNode(currentnode,sqlelement::_create);
 
 	// temporary
-	parseTemporary(createnode,*newptr,newptr);
+	parseCreateTemporary(createnode,*newptr,newptr);
 
 	// table, index, etc..
 	if (tableClause(*newptr,newptr)) {
@@ -33,13 +33,13 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 	return false;
 }
 
-bool sqlparser::parseTemporary(xmldomnode *currentnode,
+bool sqlparser::parseCreateTemporary(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	if (!temporaryClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::temporary);
+	newNode(currentnode,sqlelement::_create_temporary);
 	return true;
 }
 
@@ -48,10 +48,8 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 
-	// we're already past the "create [temporary] table " part...
-
 	// create new node
-	xmldomnode	*tablenode=newNode(currentnode,sqlelement::table);
+	xmldomnode	*tablenode=newNode(currentnode,sqlelement::_table);
 
 	// if not exists
 	parseIfNotExists(tablenode,ptr,newptr);
@@ -79,7 +77,7 @@ bool sqlparser::parseIfNotExists(xmldomnode *currentnode,
 	if (!ifNotExistsClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::if_not_exists);
+	newNode(currentnode,sqlelement::_if_not_exists);
 	return true;
 }
 
@@ -96,14 +94,14 @@ bool sqlparser::parseColumnAndConstraintDefinitions(
 	}
 
 	// create new node
-	xmldomnode	*columnsnode=newNode(currentnode,sqlelement::columns);
+	xmldomnode	*columnsnode=newNode(currentnode,sqlelement::_columns);
 
 	// column and constraint definitions
 	for (;;) {
 
 		// create column definition node
 		xmldomnode	*coldefnode=newNode(columnsnode,
-							sqlelement::column);
+							sqlelement::_column);
 
 		// FIXME: handle constraints here
 
@@ -172,7 +170,7 @@ bool sqlparser::parseConstraints(xmldomnode *currentnode,
 		// create constraints node
 		if (!constraintsnode) {
 			constraintsnode=
-				newNode(currentnode,sqlelement::constraints);
+				newNode(currentnode,sqlelement::_constraints);
 		}
 
 		// look for known constraints
@@ -181,9 +179,9 @@ bool sqlparser::parseConstraints(xmldomnode *currentnode,
 			parseBinary(constraintsnode,*newptr,newptr) ||
 			parseCharacterSet(constraintsnode,*newptr,newptr) ||
 			parseCollate(constraintsnode,*newptr,newptr) ||
-			parseNullable(constraintsnode,*newptr,newptr) ||
-			parseNotNullable(constraintsnode,*newptr,newptr) ||
-			parseDefaultValue(constraintsnode,*newptr,newptr) ||
+			parseNull(constraintsnode,*newptr,newptr) ||
+			parseNotNull(constraintsnode,*newptr,newptr) ||
+			parseDefault(constraintsnode,*newptr,newptr) ||
 			parseAutoIncrement(constraintsnode,*newptr,newptr) ||
 			parseUniqueKey(constraintsnode,*newptr,newptr) ||
 			parsePrimaryKey(constraintsnode,*newptr,newptr) ||
@@ -216,7 +214,7 @@ bool sqlparser::parseUnsigned(xmldomnode *currentnode,
 	if (!unsignedClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::unsigned_constraint);
+	newNode(currentnode,sqlelement::_unsigned);
 	space(*newptr,newptr);
 	return true;
 }
@@ -228,7 +226,7 @@ bool sqlparser::parseZeroFill(xmldomnode *currentnode,
 	if (!zeroFillClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::zerofill);
+	newNode(currentnode,sqlelement::_zerofill);
 	space(*newptr,newptr);
 	return true;
 }
@@ -240,7 +238,7 @@ bool sqlparser::parseBinary(xmldomnode *currentnode,
 	if (!binaryClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::binary);
+	newNode(currentnode,sqlelement::_binary);
 	space(*newptr,newptr);
 	return true;
 }
@@ -257,7 +255,7 @@ bool sqlparser::parseCharacterSet(xmldomnode *currentnode,
 
 	// character set itself
 	char	*word=getWord(*newptr,newptr);
-	newNode(currentnode,sqlelement::character_set,word);
+	newNode(currentnode,sqlelement::_character_set,word);
 	delete[] word;
 	return true;
 }
@@ -274,48 +272,48 @@ bool sqlparser::parseCollate(xmldomnode *currentnode,
 
 	// collation itself
 	char	*word=getWord(*newptr,newptr);
-	newNode(currentnode,sqlelement::collate,word);
+	newNode(currentnode,sqlelement::_collate,word);
 	delete[] word;
 	return true;
 }
 
-bool sqlparser::parseNullable(xmldomnode *currentnode,
+bool sqlparser::parseNull(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
-	if (!nullableClause(ptr,newptr)) {
+	if (!nullClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::nullable);
+	newNode(currentnode,sqlelement::_null);
 	space(*newptr,newptr);
 	return true;
 }
 
-bool sqlparser::parseNotNullable(xmldomnode *currentnode,
+bool sqlparser::parseNotNull(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
-	if (!notNullableClause(ptr,newptr)) {
+	if (!notNullClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::not_nullable);
+	newNode(currentnode,sqlelement::_not_null);
 	space(*newptr,newptr);
 	return true;
 }
 
-bool sqlparser::parseDefaultValue(xmldomnode *currentnode,
+bool sqlparser::parseDefault(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
 
 	// default value
-	if (!defaultValueClause(ptr,newptr)) {
+	if (!defaultClause(ptr,newptr)) {
 		return false;
 	}
 
 	// value itself
 	char	*value=getVerbatim(*newptr,newptr);
-	newNode(currentnode,sqlelement::default_value,value);
+	newNode(currentnode,sqlelement::_default,value);
 	delete[] value;
 
 	space(*newptr,newptr);
@@ -329,7 +327,7 @@ bool sqlparser::parseAutoIncrement(xmldomnode *currentnode,
 	if (!autoIncrementClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::auto_increment);
+	newNode(currentnode,sqlelement::_auto_increment);
 	space(*newptr,newptr);
 	return true;
 }
@@ -341,7 +339,7 @@ bool sqlparser::parseUniqueKey(xmldomnode *currentnode,
 	if (!uniqueKeyClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::unique_key);
+	newNode(currentnode,sqlelement::_unique_key);
 	space(*newptr,newptr);
 	return true;
 }
@@ -353,7 +351,7 @@ bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
 	if (!primaryKeyClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::primary_key);
+	newNode(currentnode,sqlelement::_primary_key);
 	space(*newptr,newptr);
 	return true;
 }
@@ -365,7 +363,7 @@ bool sqlparser::parseKey(xmldomnode *currentnode,
 	if (!keyClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::key);
+	newNode(currentnode,sqlelement::_key);
 	space(*newptr,newptr);
 	return true;
 }
@@ -382,7 +380,7 @@ bool sqlparser::parseComment(xmldomnode *currentnode,
 
 	// comment itself
 	char	*value=getVerbatim(*newptr,newptr);
-	newNode(currentnode,sqlelement::comment,value);
+	newNode(currentnode,sqlelement::_comment,value);
 	delete[] value;
 
 	space(*newptr,newptr);
@@ -401,7 +399,7 @@ bool sqlparser::parseColumnFormat(xmldomnode *currentnode,
 
 	// format itself
 	char	*word=getWord(*newptr,newptr);
-	newNode(currentnode,sqlelement::column_format,word);
+	newNode(currentnode,sqlelement::_column_format,word);
 	delete[] word;
 	return true;
 }
@@ -418,7 +416,7 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 
 	// create references node
 	xmldomnode	*referencesnode=newNode(currentnode,
-						sqlelement::references);
+						sqlelement::_references);
 
 	// table name
 	if (!parseTableName(referencesnode,*newptr,newptr)) {
@@ -473,7 +471,7 @@ bool sqlparser::parseReferenceColumns(xmldomnode *currentnode,
 	debugFunction();
 
 	// create new node
-	xmldomnode	*columnsnode=newNode(currentnode,sqlelement::columns);
+	xmldomnode	*columnsnode=newNode(currentnode,sqlelement::_columns);
 
 	*newptr=ptr;
 	for (;;) {
@@ -487,8 +485,8 @@ bool sqlparser::parseReferenceColumns(xmldomnode *currentnode,
 
 		// create new node
 		xmldomnode	*columnnode=
-				newNode(columnsnode,sqlelement::column);
-		newNode(columnnode,sqlelement::name,column);
+				newNode(columnsnode,sqlelement::_column);
+		newNode(columnnode,sqlelement::_name,column);
 
 		// clean up
 		delete[] column;
@@ -517,7 +515,7 @@ bool sqlparser::parseMatch(xmldomnode *currentnode,
 
 	// match option itself
 	char	*word=getWord(*newptr,newptr);
-	newNode(currentnode,sqlelement::match,word);
+	newNode(currentnode,sqlelement::_match,word);
 	delete[] word;
 	return true;
 }
@@ -534,7 +532,7 @@ bool sqlparser::parseOnDelete(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*ondeletenode=
-			newNode(currentnode,sqlelement::on_delete);
+			newNode(currentnode,sqlelement::_on_delete);
 
 	// reference option
 	if (!parseReferenceOption(ondeletenode,*newptr,newptr)) {
@@ -555,7 +553,7 @@ bool sqlparser::parseOnUpdate(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*onupdatenode=
-			newNode(currentnode,sqlelement::on_update);
+			newNode(currentnode,sqlelement::_on_update);
 
 	// reference option
 	if (!parseReferenceOption(onupdatenode,*newptr,newptr)) {
@@ -578,7 +576,7 @@ bool sqlparser::parseReferenceOption(xmldomnode *currentnode,
 	char	*value=getClause(ptr,*newptr);
 
 	// store it in the value attribute
-	setAttribute(currentnode,sqlelement::value,value);
+	setAttribute(currentnode,sqlelement::_value,value);
 
 	// clean up
 	delete[] value;
@@ -602,7 +600,7 @@ bool sqlparser::parseOnCommit(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*oncommitnode=
-			newNode(currentnode,sqlelement::on_commit);
+			newNode(currentnode,sqlelement::_on_commit);
 
 	// on commit option
 	const char	*startptr=*newptr;
@@ -614,7 +612,7 @@ bool sqlparser::parseOnCommit(xmldomnode *currentnode,
 	char	*value=getClause(startptr,*newptr);
 
 	// store it in the value attribute
-	setAttribute(oncommitnode,sqlelement::value,value);
+	setAttribute(oncommitnode,sqlelement::_value,value);
 
 	// clean up
 	delete[] value;

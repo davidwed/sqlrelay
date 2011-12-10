@@ -86,7 +86,7 @@ bool sqlparser::collateClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-bool sqlparser::nullableClause(const char *ptr, const char **newptr) {
+bool sqlparser::nullClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"nullable",
@@ -96,7 +96,7 @@ bool sqlparser::nullableClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-bool sqlparser::notNullableClause(const char *ptr, const char **newptr) {
+bool sqlparser::notNullClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"not nullable",
@@ -106,7 +106,7 @@ bool sqlparser::notNullableClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-bool sqlparser::defaultValueClause(const char *ptr, const char **newptr) {
+bool sqlparser::defaultClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"default value ",
@@ -203,6 +203,26 @@ bool sqlparser::onCommitOptionClause(const char *ptr, const char **newptr) {
 bool sqlparser::dropClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"drop ");
+}
+
+bool sqlparser::ifExistsClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"if exists ");
+}
+
+bool sqlparser::restrictClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"restrict");
+}
+
+bool sqlparser::cascadeClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"cascade",
+		"cascade constraints",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
 }
 
 bool sqlparser::insertClause(const char *ptr, const char **newptr) {

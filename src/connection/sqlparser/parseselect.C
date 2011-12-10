@@ -18,7 +18,7 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*selectnode=
-			newNode(currentnode,sqlelement::select_query);
+			newNode(currentnode,sqlelement::_select);
 
 	// options (unique, distinct, etc.)
 	parseSelectOptions(selectnode,*newptr,newptr);
@@ -34,7 +34,7 @@ bool sqlparser::parseSelectOptions(xmldomnode *currentnode,
 	debugFunction();
 
 	// create the node
-	xmldomnode	*optionsnode=newNode(currentnode,sqlelement::options);
+	xmldomnode	*optionsnode=newNode(currentnode,sqlelement::_options);
 /*
 	// find the from clause (or end of string)
 	const char	*from=charstring::findFirstOrEnd(ptr," from ");
@@ -89,7 +89,7 @@ bool sqlparser::parseUnique(xmldomnode *currentnode,
 	if (!uniqueClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::unique);
+	newNode(currentnode,sqlelement::_unique);
 	return true;
 }
 
@@ -100,6 +100,6 @@ bool sqlparser::parseDistinct(xmldomnode *currentnode,
 	if (!distinctClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::distinct);
+	newNode(currentnode,sqlelement::_distinct);
 	return true;
 }
