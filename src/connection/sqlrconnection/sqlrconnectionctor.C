@@ -55,6 +55,10 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 	inbindmappings=new namevaluepairs;
 	outbindmappings=new namevaluepairs;
 
+	sqlp=NULL;
+	sqlt=NULL;
+	sqlw=NULL;
+
 	cur=NULL;
 
 	sid_sqlrcon=NULL;

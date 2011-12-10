@@ -13,9 +13,10 @@ enum queryparsestate_t {
 
 void sqlrconnection_svr::rewriteQueryInternal(sqlrcursor_svr *cursor) {
 
-	// FIXME: make this configurable
-	if (true) {
-		cursor->translateQuery();
+	if (sqlp && sqlt && sqlw) {
+		if (!cursor->translateQuery()) {
+			// FIXME: do something?
+		}
 	}
 
 	if (cursor->supportsNativeBinds()) {
@@ -32,6 +33,14 @@ void sqlrconnection_svr::rewriteQueryInternal(sqlrcursor_svr *cursor) {
 
 	// run database-specific rewrites
 	cursor->rewriteQuery();
+}
+
+sqlwriter *sqlrconnection_svr::getSqlWriter() {
+	return new sqlwriter;
+}
+
+sqltranslator *sqlrconnection_svr::getSqlTranslator() {
+	return new sqltranslator;
 }
 
 void sqlrconnection_svr::setTranslateBindVariablesBehavior(bool tbv) {

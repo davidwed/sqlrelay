@@ -26,6 +26,9 @@
 #include <tempdir.h>
 
 #include <sqlrcursor.h>
+#include <sqlparser.h>
+#include <sqltranslator.h>
+#include <sqlwriter.h>
 
 #include <cmdline.h>
 
@@ -119,6 +122,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual void	truncateTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);
 		virtual void	endSession();
+
+		virtual sqltranslator	*getSqlTranslator();
+		virtual sqlwriter	*getSqlWriter();
 
 	public:
 		// methods used by derived classes
@@ -426,6 +432,10 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		memorypool	*bindmappingspool;
 		namevaluepairs	*inbindmappings;
 		namevaluepairs	*outbindmappings;
+
+		sqlparser	*sqlp;
+		sqltranslator	*sqlt;
+		sqlwriter	*sqlw;
 
 		sqlrcursor_svr	**cur;
 

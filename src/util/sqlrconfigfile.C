@@ -75,6 +75,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	timequeriesusec=charstring::toInteger(DEFAULT_TIMEQUERIESUSEC);
 	currentroute=NULL;
 	currenttag=NO_TAG;
+	sqltranslationrulesdepth=0;
 }
 
 sqlrconfigfile::~sqlrconfigfile() {
@@ -338,6 +339,10 @@ const char *sqlrconfigfile::getSidPassword() {
 	return sidpassword;
 }
 
+const char *sqlrconfigfile::getSqlTranslationRules() {
+	return sqltranslationrules.getString();
+}
+
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	// if there are no users in the list, add a default user/password
 	if (!userlist.getLength()) {
@@ -396,98 +401,147 @@ bool sqlrconfigfile::tagStart(const char *name) {
 		return true;
 	}
 
-    bool ok = true;
-    const char *currentname = "instance";
-    tag thistag = currenttag;
+	bool		ok=true;
+	const char	*currentname="instance";
+	tag		thistag=currenttag;
 
 	// set the current tag, validate structure in the process
 	switch(currenttag) {
 	
-	// Root level, nested (users,connections?,router?)
-	case NO_TAG:
-	    currentname = "instance";
-	    ok =  ( !charstring::compare(name,"users") && (thistag = USERS_TAG) )
-	       || ( !charstring::compare(name,"connections") && (thistag = CONNECTIONS_TAG) )
-	       || ( !charstring::compare(name,"router") && (thistag = ROUTER_TAG) );
-	    break;
-	
-	// Users section, nested (user*)
-	case USERS_TAG:
-	    currentname = "users";
-	    ok = ( !charstring::compare(name,"user") && (thistag = USER_TAG) );
-	    break;
-	
-	// Connections section, nested (connection*)
-	case CONNECTIONS_TAG:
-	    currentname = "connections";
-	    ok = ( !charstring::compare(name,"connection") && (thistag = CONNECTION_TAG) );
-	    break;
-	
-	// Router section, nested ((route*|filter*)*)
-	case ROUTER_TAG:
-	    currentname = "router";
-	    ok =  ( !charstring::compare(name,"route") && (thistag = ROUTE_TAG) )
-	       || ( !charstring::compare(name,"filter") && (thistag = FILTER_TAG) );
-	    break;
-	
-	// Filter section, nested (query*)
-	case FILTER_TAG:
-	    currentname = "filter";
-	    ok =  ( !charstring::compare(name,"query") && (thistag = QUERY_TAG) );
-	    break;
-	
-	// Filter section, nested (query*)
-	case ROUTE_TAG:
-	    currentname = "route";
-	    ok =  ( !charstring::compare(name,"query") && (thistag = QUERY_TAG) );
-	    break;
-	
-	// Leaves, cannot be nested
-	case USER_TAG:          currentname = "user"; ok = false; break;
-	case CONNECTION_TAG:    currentname = "connection"; ok = false; break;
-	case QUERY_TAG:         currentname = "query"; ok = false; break;
-	
-	default: ok = false;
+		// Root level, nested (users,connections?,router?)
+		case NO_TAG:
+			currentname="instance";
+			if (charstring::compare(name,"users")) {
+				thistag=USERS_TAG;
+			} else if (!charstring::compare(name,"connections")) {
+				thistag=CONNECTIONS_TAG;
+			} else if (!charstring::compare(name,"router")) {
+				thistag=ROUTER_TAG;
+			} else if (!charstring::compare(name,
+						"sqltranslationrules")) {
+				thistag=SQLTRANSLATIONRULES_TAG;
+				sqltranslationrules.clear();
+				sqltranslationrulesdepth=0;
+			} else {
+				ok=false;
+			}
+			break;
+		
+		// Users section, nested (user*)
+		case USERS_TAG:
+			currentname="users";
+			if (!charstring::compare(name,"user")) {
+				thistag=USER_TAG;
+			} else {
+				ok=false;
+			}
+			break;
+		
+		// Connections section, nested (connection*)
+		case CONNECTIONS_TAG:
+			currentname="connections";
+			if (!charstring::compare(name,"connection")) {
+				thistag=CONNECTION_TAG;
+			} else {
+				ok=false;
+			}
+			break;
+		
+		// Router section, nested ((route*|filter*)*)
+		case ROUTER_TAG:
+			currentname="router";
+			if (!charstring::compare(name,"route")) {
+				thistag=ROUTE_TAG;
+			} else if (!charstring::compare(name,"filter")) {
+				thistag=FILTER_TAG;
+			} else {
+				ok=false;
+			}
+			break;
+		
+		// Filter section, nested (query*)
+		case FILTER_TAG:
+			currentname="filter";
+			if (!charstring::compare(name,"query")) {
+				thistag=QUERY_TAG;
+			} else {
+				ok=false;
+			}
+			break;
+		
+		// Filter section, nested (query*)
+		case ROUTE_TAG:
+			currentname="route";
+			if (!charstring::compare(name,"query")) {
+				thistag=QUERY_TAG;
+			} else {
+				ok=false;
+			}
+			break;
+
+		// Leaves, cannot be nested
+		case USER_TAG:
+			currentname="user";
+			ok=false;
+			break;
+		case CONNECTION_TAG:
+			currentname="connection";
+			ok=false;
+			break;
+		case QUERY_TAG:
+			currentname="query";
+			ok=false;
+			break;
+		default:
+			// Nothing to do
+			break;
 	}
 	
 	if (!ok) {
-	    fprintf(stderr, "unexpected tag <%s> within <%s>\n", name, currentname);
-	    return false;
-	} else {
-	    // initialize tag dat
-	    switch (thistag) {
-	    case USER_TAG:
-		currentuser=new usercontainer();
-		userlist.append(currentuser);
-    		break;
-        case CONNECTION_TAG:
+		fprintf(stderr,"unexpected tag <%s> within <%s>\n",
+							name,currentname);
+		return false;
+	}
+
+	// initialize tag data
+	switch (thistag) {
+		case USER_TAG:
+			currentuser=new usercontainer();
+			userlist.append(currentuser);
+			break;
+		case CONNECTION_TAG:
 			currentconnect=
 				new connectstringcontainer(connectstringcount);
 			connectstringlist.append(currentconnect);
-    		break;
-    	case ROUTER_TAG:
-		currentconnect=new connectstringcontainer(connectstringcount);
-		connectstringlist.append(currentconnect);
-		currentconnect->setConnectionId(DEFAULT_CONNECTIONID);
-    		currenttag = thistag;
-    		break;
-    	case ROUTE_TAG:
-    	case FILTER_TAG:
-		currentroute=new routecontainer();
-		    currentroute->setIsFilter(thistag == FILTER_TAG);
-		    currenttag = thistag;
-		    break;
+			break;
+		case ROUTER_TAG:
+			currentconnect=
+				new connectstringcontainer(connectstringcount);
+			connectstringlist.append(currentconnect);
+			currentconnect->setConnectionId(DEFAULT_CONNECTIONID);
+			currenttag=thistag;
+			break;
+		case ROUTE_TAG:
+		case FILTER_TAG:
+			currentroute=new routecontainer();
+			currentroute->setIsFilter(thistag==FILTER_TAG);
+			currenttag=thistag;
+			break;
 		case USERS_TAG:
 		case CONNECTIONS_TAG:
-		    currenttag = thistag;
+			currenttag=thistag;
+			break;
+		case SQLTRANSLATIONRULES_TAG:
+			sqltranslationrules.append("<");
+			sqltranslationrules.append(name);
+			sqltranslationrulesdepth++;
+			currenttag=thistag;
+			break;
 		default:
-		    // Nothing to do
-		    break;
-	    }
+			// Nothing to do
+		break;
 	}
-
 	return true;
-
 }
 
 bool sqlrconfigfile::tagEnd(const char *name) {
@@ -518,9 +572,8 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 	switch(currenttag) {
 		case ROUTER_TAG:
 			// Check closing tag, no need, but just in case
-			if (!charstring::compare(name,"router"))
-			{
-				currenttag = NO_TAG;
+			if (!charstring::compare(name,"router")) {
+				currenttag=NO_TAG;
 			}
 			break;
 		case USERS_TAG:
@@ -528,7 +581,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			// Must check closing tag, we have leaves inside
 			if (!charstring::compare(name,"users") ||
 				!charstring::compare(name,"connections")) {
-				currenttag = NO_TAG;
+				currenttag=NO_TAG;
 			}
 			break;
 		case ROUTE_TAG:
@@ -536,7 +589,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			// Must check closing tag, we have leaves inside
 			if (!charstring::compare(name,"route") ||
 				!charstring::compare(name,"filter")) {
-				currenttag = ROUTER_TAG;
+				currenttag=ROUTER_TAG;
 				routecontainer	*existingroute=
 					routeAlreadyExists(currentroute);
 				if (existingroute) {
@@ -547,6 +600,12 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 					routelist.append(currentroute);
 				}
 			}
+			break;
+		case SQLTRANSLATIONRULES_TAG:
+			sqltranslationrules.append("></");
+			sqltranslationrules.append(name);
+			sqltranslationrules.append(">");
+			sqltranslationrulesdepth--;
 			break;
 		default:
 			// just ignore the closing tag
@@ -575,182 +634,209 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		return true;
 	}
 
-    currentattribute = NO_ATTRIBUTE;
+	currentattribute=NO_ATTRIBUTE;
 
-    switch (currenttag) {
-    
-    // Attributes of the <instance> tag
-    case NO_TAG:
+	switch (currenttag) {
+	
+	// Attributes of the <instance> tag
+	case NO_TAG:
 
-	if (!charstring::compare(name,"id")) {
-		currentattribute=ID_ATTRIBUTE;
-	} else if (!charstring::compare(name,"addresses")) {
-		currentattribute=ADDRESSES_ATTRIBUTE;
-	} else if (!charstring::compare(name,"port")) {
+		if (!charstring::compare(name,"id")) {
+			currentattribute=ID_ATTRIBUTE;
+		} else if (!charstring::compare(name,"addresses")) {
+			currentattribute=ADDRESSES_ATTRIBUTE;
+		} else if (!charstring::compare(name,"port")) {
+				currentattribute=PORT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"socket") ||
+				!charstring::compare(name,"unixport")) {
+				currentattribute=SOCKET_ATTRIBUTE;
+		} else if (!charstring::compare(name,"mysqladdresses")) {
+			currentattribute=MYSQLADDRESSES_ATTRIBUTE;
+		} else if (!charstring::compare(name,"mysqlport")) {
+				currentattribute=MYSQLPORT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"mysqlsocket")) {
+				currentattribute=MYSQLSOCKET_ATTRIBUTE;
+		} else if (!charstring::compare(name,"dbase")) {
+			currentattribute=DBASE_ATTRIBUTE;
+		} else if (!charstring::compare(name,"connections")) {
+			currentattribute=CONNECTIONS_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxconnections")) {
+			currentattribute=MAXCONNECTIONS_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxqueuelength")) {
+			currentattribute=MAXQUEUELENGTH_ATTRIBUTE;
+		} else if (!charstring::compare(name,"growby")) {
+			currentattribute=GROWBY_ATTRIBUTE;
+		} else if (!charstring::compare(name,"ttl")) {
+			currentattribute=TTL_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxsessioncount")) {
+			currentattribute=MAXSESSIONCOUNT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"endofsession")) {
+			currentattribute=ENDOFSESSION_ATTRIBUTE;
+		} else if (!charstring::compare(name,"sessiontimeout")) {
+			currentattribute=SESSIONTIMEOUT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"runasuser")) {
+			currentattribute=RUNASUSER_ATTRIBUTE;
+		} else if (!charstring::compare(name,"runasgroup")) {
+			currentattribute=RUNASGROUP_ATTRIBUTE;
+		} else if (!charstring::compare(name,"cursors")) {
+			currentattribute=CURSORS_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxcursors")) {
+			currentattribute=MAXCURSORS_ATTRIBUTE;
+		} else if (!charstring::compare(name,"cursors_growby")) {
+			currentattribute=CURSORS_GROWBY_ATTRIBUTE;
+		} else if (!charstring::compare(name,"authtier") ||
+				!charstring::compare(name,"authentication")) {
+			currentattribute=AUTHTIER_ATTRIBUTE;
+		} else if (!charstring::compare(name,"handoff")) {
+			currentattribute=HANDOFF_ATTRIBUTE;
+		} else if (!charstring::compare(name,"deniedips")) {
+			currentattribute=DENIEDIPS_ATTRIBUTE;
+		} else if (!charstring::compare(name,"allowedips")) {
+			currentattribute=ALLOWEDIPS_ATTRIBUTE;
+		} else if (!charstring::compare(name,"debug")) {
+			currentattribute=DEBUG_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxquerysize")) {
+			currentattribute=MAXQUERYSIZE_ATTRIBUTE;
+		} else if (!charstring::compare(name,
+						"maxstringbindvaluelength")) {
+			currentattribute=MAXSTRINGBINDVALUELENGTH_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxlobbindvaluelength")) {
+			currentattribute=MAXLOBBINDVALUELENGTH_ATTRIBUTE;
+		} else if (!charstring::compare(name,"idleclienttimeout")) {
+			currentattribute=IDLECLIENTTIMEOUT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"sidenabled")) {
+			currentattribute=SID_ENABLED_ATTRIBUTE;
+		} else if (!charstring::compare(name,"sidhost")) {
+			currentattribute=SID_HOST_ATTRIBUTE;
+		} else if (!charstring::compare(name,"sidport")) {
+			currentattribute=SID_PORT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"sidsocket")) {
+			currentattribute=SID_SOCKET_ATTRIBUTE;
+		} else if (!charstring::compare(name,"siduser")) {
+			currentattribute=SID_USER_ATTRIBUTE;
+		} else if (!charstring::compare(name,"sidpassword")) {
+			currentattribute=SID_PASSWORD_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxlisteners")) {
+			currentattribute=MAXLISTENERS_ATTRIBUTE;
+		} else if (!charstring::compare(name,"listenertimeout")) {
+			currentattribute=LISTENERTIMEOUT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"reloginatstart")) {
+			currentattribute=RELOGINATSTART_ATTRIBUTE;
+		} else if (!charstring::compare(name,"timequeries")) {
+			currentattribute=TIMEQUERIES_ATTRIBUTE;
+		} else if (!charstring::compare(name,"timequeriessec")) {
+			currentattribute=TIMEQUERIESSEC_ATTRIBUTE;
+		} else if (!charstring::compare(name,"timequeriesusec")) {
+			currentattribute=TIMEQUERIESUSEC_ATTRIBUTE;
+		}
+		break;
+	
+	// Attributes of the <users> and <user> tags
+	case USERS_TAG:
+	case USER_TAG:
+		if (!charstring::compare(name,"user")) {
+			currentattribute=USER_ATTRIBUTE;
+		} else if (!charstring::compare(name,"password")) {
+			currentattribute=PASSWORD_ATTRIBUTE;
+		}
+		break;
+	
+	// Attributes of the <connection> tag
+	case CONNECTIONS_TAG:
+	case CONNECTION_TAG:
+		if (!charstring::compare(name,"connectionid")) {
+			currentattribute=CONNECTIONID_ATTRIBUTE;
+		} else if (!charstring::compare(name,"string")) {
+			currentattribute=STRING_ATTRIBUTE;
+		} else if (!charstring::compare(name,"metric")) {
+			currentattribute=METRIC_ATTRIBUTE;
+		} else if (!charstring::compare(name,"behindloadbalancer")) {
+			currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
+		} else if (!charstring::compare(name,"port")) {
 			currentattribute=PORT_ATTRIBUTE;
-	} else if (!charstring::compare(name,"socket") ||
+		} else if (!charstring::compare(name,"socket") ||
 			!charstring::compare(name,"unixport")) {
 			currentattribute=SOCKET_ATTRIBUTE;
-	} else if (!charstring::compare(name,"mysqladdresses")) {
-		currentattribute=MYSQLADDRESSES_ATTRIBUTE;
-	} else if (!charstring::compare(name,"mysqlport")) {
-			currentattribute=MYSQLPORT_ATTRIBUTE;
-	} else if (!charstring::compare(name,"mysqlsocket")) {
-			currentattribute=MYSQLSOCKET_ATTRIBUTE;
-	} else if (!charstring::compare(name,"dbase")) {
-		currentattribute=DBASE_ATTRIBUTE;
-	} else if (!charstring::compare(name,"connections")) {
-		currentattribute=CONNECTIONS_ATTRIBUTE;
-	} else if (!charstring::compare(name,"maxconnections")) {
-		currentattribute=MAXCONNECTIONS_ATTRIBUTE;
-	} else if (!charstring::compare(name,"maxqueuelength")) {
-		currentattribute=MAXQUEUELENGTH_ATTRIBUTE;
-	} else if (!charstring::compare(name,"growby")) {
-		currentattribute=GROWBY_ATTRIBUTE;
-	} else if (!charstring::compare(name,"ttl")) {
-		currentattribute=TTL_ATTRIBUTE;
-	} else if (!charstring::compare(name,"maxsessioncount")) {
-		currentattribute=MAXSESSIONCOUNT_ATTRIBUTE;
-	} else if (!charstring::compare(name,"endofsession")) {
-		currentattribute=ENDOFSESSION_ATTRIBUTE;
-	} else if (!charstring::compare(name,"sessiontimeout")) {
-		currentattribute=SESSIONTIMEOUT_ATTRIBUTE;
-	} else if (!charstring::compare(name,"runasuser")) {
-		currentattribute=RUNASUSER_ATTRIBUTE;
-	} else if (!charstring::compare(name,"runasgroup")) {
-		currentattribute=RUNASGROUP_ATTRIBUTE;
-	} else if (!charstring::compare(name,"cursors")) {
-		currentattribute=CURSORS_ATTRIBUTE;
-	} else if (!charstring::compare(name,"maxcursors")) {
-		currentattribute=MAXCURSORS_ATTRIBUTE;
-	} else if (!charstring::compare(name,"cursors_growby")) {
-		currentattribute=CURSORS_GROWBY_ATTRIBUTE;
-	} else if (!charstring::compare(name,"authtier") ||
-			!charstring::compare(name,"authentication")) {
-		currentattribute=AUTHTIER_ATTRIBUTE;
-	} else if (!charstring::compare(name,"handoff")) {
-		currentattribute=HANDOFF_ATTRIBUTE;
-	} else if (!charstring::compare(name,"deniedips")) {
-		currentattribute=DENIEDIPS_ATTRIBUTE;
-	} else if (!charstring::compare(name,"allowedips")) {
-		currentattribute=ALLOWEDIPS_ATTRIBUTE;
-	} else if (!charstring::compare(name,"debug")) {
-		currentattribute=DEBUG_ATTRIBUTE;
-	} else if (!charstring::compare(name,"maxquerysize")) {
-		currentattribute=MAXQUERYSIZE_ATTRIBUTE;
-	} else if (!charstring::compare(name,"maxstringbindvaluelength")) {
-		currentattribute=MAXSTRINGBINDVALUELENGTH_ATTRIBUTE;
-	} else if (!charstring::compare(name,"maxlobbindvaluelength")) {
-		currentattribute=MAXLOBBINDVALUELENGTH_ATTRIBUTE;
-	} else if (!charstring::compare(name,"idleclienttimeout")) {
-		currentattribute=IDLECLIENTTIMEOUT_ATTRIBUTE;
-	} else if (!charstring::compare(name,"sidenabled")) {
-		currentattribute=SID_ENABLED_ATTRIBUTE;
-	} else if (!charstring::compare(name,"sidhost")) {
-		currentattribute=SID_HOST_ATTRIBUTE;
-	} else if (!charstring::compare(name,"sidport")) {
-		currentattribute=SID_PORT_ATTRIBUTE;
-	} else if (!charstring::compare(name,"sidsocket")) {
-		currentattribute=SID_SOCKET_ATTRIBUTE;
-	} else if (!charstring::compare(name,"siduser")) {
-		currentattribute=SID_USER_ATTRIBUTE;
-	} else if (!charstring::compare(name,"sidpassword")) {
-		currentattribute=SID_PASSWORD_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"maxlisteners")) {
-    		currentattribute=MAXLISTENERS_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"listenertimeout")) {
-    		currentattribute=LISTENERTIMEOUT_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"reloginatstart")) {
-    		currentattribute=RELOGINATSTART_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"timequeries")) {
-    		currentattribute=TIMEQUERIES_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"timequeriessec")) {
-    		currentattribute=TIMEQUERIESSEC_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"timequeriesusec")) {
-    		currentattribute=TIMEQUERIESUSEC_ATTRIBUTE;
-    	};
-    	break;
-    	
-    // Attributes of the <users> and <user> tags
-    case USERS_TAG:
-    case USER_TAG:
-        if (!charstring::compare(name,"user")) {
-			currentattribute=USER_ATTRIBUTE;
-	} else if (!charstring::compare(name,"password")) {
-			currentattribute=PASSWORD_ATTRIBUTE;
-    	};
-    	break;
-    	
-    // Attributes of the <connection> tag
-    case CONNECTIONS_TAG:
-    case CONNECTION_TAG:
-        if (!charstring::compare(name,"connectionid")) {
-		currentattribute=CONNECTIONID_ATTRIBUTE;
-	} else if (!charstring::compare(name,"string")) {
-		currentattribute=STRING_ATTRIBUTE;
-	} else if (!charstring::compare(name,"metric")) {
-		currentattribute=METRIC_ATTRIBUTE;
-	} else if (!charstring::compare(name,"behindloadbalancer")) {
-		currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"port")) {
-			currentattribute=PORT_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"socket") ||
-    			!charstring::compare(name,"unixport")) {
-			currentattribute=SOCKET_ATTRIBUTE;
-    	};
-    	break;
-    	
-    // Attributes of the <router> tag
-    case ROUTER_TAG:
-        if (!charstring::compare(name,"connectionid")) {
-    		currentattribute=CONNECTIONID_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"string")) {
-    		currentattribute=STRING_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"metric")) {
-    		currentattribute=METRIC_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"behindloadbalancer")) {
-    		currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
-    	};
-    	break;
-    	
-    // Attributes of the <route>, <filter> & <query> tag
-    case ROUTE_TAG:
-    case FILTER_TAG:
-    case QUERY_TAG:
-        if (!charstring::compare(name,"user")) {
+		}
+		break;
+
+	// Attributes of the <router> tag
+	case ROUTER_TAG:
+		if (!charstring::compare(name,"connectionid")) {
+			currentattribute=CONNECTIONID_ATTRIBUTE;
+		} else if (!charstring::compare(name,"string")) {
+			currentattribute=STRING_ATTRIBUTE;
+		} else if (!charstring::compare(name,"metric")) {
+			currentattribute=METRIC_ATTRIBUTE;
+		} else if (!charstring::compare(name,"behindloadbalancer")) {
+			currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
+		}
+		break;
+
+	// Attributes of the <route>, <filter> & <query> tag
+	case ROUTE_TAG:
+	case FILTER_TAG:
+	case QUERY_TAG:
+		if (!charstring::compare(name,"user")) {
 			currentattribute=ROUTER_USER_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"password")) {
+		} else if (!charstring::compare(name,"password")) {
 			currentattribute=ROUTER_PASSWORD_ATTRIBUTE;
-	} else if (!charstring::compare(name,"host")) {
-		currentattribute=ROUTER_HOST_ATTRIBUTE;
-	} else if (!charstring::compare(name,"pattern")) {
-		currentattribute=ROUTER_PATTERN_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"port")) {
+		} else if (!charstring::compare(name,"host")) {
+			currentattribute=ROUTER_HOST_ATTRIBUTE;
+		} else if (!charstring::compare(name,"pattern")) {
+			currentattribute=ROUTER_PATTERN_ATTRIBUTE;
+		} else if (!charstring::compare(name,"port")) {
 			currentattribute=ROUTER_PORT_ATTRIBUTE;
-    	} else if (!charstring::compare(name,"socket") ||
-    			!charstring::compare(name,"unixport")) {
+		} else if (!charstring::compare(name,"socket") ||
+				!charstring::compare(name,"unixport")) {
 			currentattribute=ROUTER_SOCKET_ATTRIBUTE;
-    	};
-    	break;
-    
-    }
-    
-    if (correctid && currentattribute == NO_ATTRIBUTE) {
-        const char *tagname = "instance";
-        switch (currenttag) {
-        case NO_TAG:            tagname = "instance"; break;
-        case USERS_TAG:         tagname = "users"; break;
-        case USER_TAG:          tagname = "user"; break;
-        case CONNECTIONS_TAG:   tagname = "connections"; break;
-        case CONNECTION_TAG:    tagname = "connection"; break;
-        case ROUTER_TAG:        tagname = "router"; break;
-        case ROUTE_TAG:         tagname = "route"; break;
-        case FILTER_TAG:        tagname = "filter"; break;
-        case QUERY_TAG:         tagname = "query"; break;
-        }
-        fprintf(stderr, "WARNING: unrecognized attribute \"%s\" within <%s> tag or section\n", name, tagname);
+		}
+		break;
+	case SQLTRANSLATIONRULES_TAG:
+		// Don't do anything.  This is just here
+		// so the compiler won't complain
+		break;
 	}
-    
+
+	if (correctid && currentattribute==NO_ATTRIBUTE) {
+		const char *tagname="instance";
+		switch (currenttag) {
+			case NO_TAG:
+				tagname="instance";
+				break;
+			case USERS_TAG:
+				tagname="users";
+				break;
+			case USER_TAG:
+				tagname="user";
+				break;
+			case CONNECTIONS_TAG:
+				tagname="connections";
+				break;
+			case CONNECTION_TAG:
+				tagname="connection";
+				break;
+			case ROUTER_TAG:
+				tagname="router";
+				break;
+			case ROUTE_TAG:
+				tagname="route";
+				break;
+			case FILTER_TAG:
+				tagname="filter";
+				break;
+			case QUERY_TAG:
+				tagname="query";
+				break;
+			case SQLTRANSLATIONRULES_TAG:
+				sqltranslationrules.append(" ")->append(name);
+				break;
+		}
+		fprintf(stderr,"WARNING: unrecognized attribute "
+				"\"%s\" within <%s> tag or section\n",
+				name,tagname);
+	}
+
 	// set the current attribute
 	return true;
 }
@@ -773,8 +859,11 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 	
 	} else {
 
-		// if we have found the correct id, process the attribute
-		if (currentattribute==ADDRESSES_ATTRIBUTE) {
+		// if we have found the correct id, process the attribute...
+
+		if (currenttag==SQLTRANSLATIONRULES_TAG) {
+			sqltranslationrules.append("=")->append(value);
+		} else if (currentattribute==ADDRESSES_ATTRIBUTE) {
 			for (uint64_t index=0; index<addresscount; index++) {
 				delete[] addresses[index];
 			}
@@ -861,7 +950,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==MAXCURSORS_ATTRIBUTE) {
 			maxcursors=atouint32_t(value,DEFAULT_MAXCURSORS,1);
 		} else if (currentattribute==CURSORS_GROWBY_ATTRIBUTE) {
-			cursorsgrowby=atouint32_t(value,DEFAULT_CURSORS_GROWBY,1);
+			cursorsgrowby=atouint32_t(value,
+						DEFAULT_CURSORS_GROWBY,1);
 		} else if (currentattribute==AUTHTIER_ATTRIBUTE) {
 			delete[] authtier;
 			authtier=charstring::duplicate((value)?value:
@@ -933,7 +1023,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							DEFAULT_PASSWORD);
 		} else if (currentattribute==CONNECTIONID_ATTRIBUTE) {
 			if (currentconnect) {
-				if (charstring::length(value)>MAXCONNECTIONIDLEN) {
+				if (charstring::length(value)>
+						MAXCONNECTIONIDLEN) {
 					fprintf(stderr,"error: connectionid \"%s\" is too long, must be %d characters or fewer.\n",value,MAXCONNECTIONIDLEN);
 					return false;
 				}
@@ -992,11 +1083,11 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			reloginatstart=
 				!charstring::compareIgnoringCase(value,"yes");
 		} else if (currentattribute==TIMEQUERIESSEC_ATTRIBUTE) {
-			timequeriessec = charstring::toInteger((value)?value:DEFAULT_TIMEQUERIESSEC);
-			if (timequeriesusec < 0) timequeriesusec = 0;
+			timequeriessec=charstring::toInteger((value)?value:DEFAULT_TIMEQUERIESSEC);
+			if (timequeriesusec < 0) timequeriesusec=0;
 		} else if (currentattribute==TIMEQUERIESUSEC_ATTRIBUTE) {
-			timequeriesusec = charstring::toInteger((value)?value:DEFAULT_TIMEQUERIESUSEC);
-			if (timequeriessec < 0) timequeriessec = 0;
+			timequeriesusec=charstring::toInteger((value)?value:DEFAULT_TIMEQUERIESUSEC);
+			if (timequeriessec < 0) timequeriessec=0;
 		} else if (currentattribute==TIMEQUERIES_ATTRIBUTE) {
 			if (charstring::toFloat(value)>0) {
 				char		**list;
@@ -1006,25 +1097,23 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				timequeriessec=
 					charstring::toInteger(list[0]);
 				if (timequeriessec < 0) {
-				    timequeriesusec = -1;
+					timequeriesusec=-1;
 				} else {
-				if (listlength>1) {
-					char	buffer[7];
-					size_t	list1len=
-						charstring::length(list[1]);
-					for (size_t i=0; i<6; i++) {
-						buffer[i]=list[1][i];
-						if (i>=list1len) {
-							buffer[i]='0';
+					if (listlength>1) {
+						char	buffer[7];
+						size_t	list1len=charstring::length(list[1]);
+						for (size_t i=0; i<6; i++) {
+							buffer[i]=list[1][i];
+							if (i>=list1len) {
+								buffer[i]='0';
+							}
 						}
+						buffer[6]='\0';
+						timequeriesusec=charstring::toInteger(buffer);
+					} else {
+						timequeriesusec=0;
 					}
-					buffer[6]='\0';
-					timequeriesusec=
-						charstring::toInteger(buffer);
-				} else {
-					timequeriesusec=0;
 				}
-    			}
 				for (uint64_t i=0; i<listlength; i++) {
 					delete[] list[i];
 				}

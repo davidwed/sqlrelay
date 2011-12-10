@@ -50,6 +50,10 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	delete outbindmappings;
 	dbgfile.debugPrint("connection",0,"done deleting bindmappings");
 
+	delete sqlp;
+	delete sqlt;
+	delete sqlw;
+
 	if (pidfile) {
 		file::remove(pidfile);
 		delete[] pidfile;

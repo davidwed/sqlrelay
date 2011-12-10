@@ -145,7 +145,7 @@ class sqlrcursor_svr {
 							bool freebinds);
 		virtual	char		escapeChar();
 
-		virtual void		translateQuery();
+		virtual bool		translateQuery();
 
 
 		// SID virtual methods

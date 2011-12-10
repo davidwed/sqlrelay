@@ -2,6 +2,8 @@
 // See the file COPYING for more information
 
 #include <oracle8connection.h>
+#include <oracle8sqltranslator.h>
+#include <oracle8sqlwriter.h>
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/character.h>
@@ -546,6 +548,14 @@ bool oracle8connection::commit() {
 
 bool oracle8connection::rollback() {
 	return (OCITransRollback(svc,err,OCI_DEFAULT)==OCI_SUCCESS);
+}
+
+sqlwriter *oracle8connection::getSqlWriter() {
+	return new oracle8sqlwriter;
+}
+
+sqltranslator *oracle8connection::getSqlTranslator() {
+	return new oracle8sqltranslator;
 }
 
 const char *oracle8connection::pingQuery() {

@@ -217,6 +217,8 @@ class sqlrconfigfile : public xmlsax {
 		const char	*getSidUser();
 		const char	*getSidPassword();
 
+		const char	*getSqlTranslationRules();
+
 		linkedlist< usercontainer * >	*getUserList();
 		linkedlist< connectstringcontainer * >
 					*getConnectStringList();
@@ -300,6 +302,9 @@ class sqlrconfigfile : public xmlsax {
 		const char	*siduser;
 		const char	*sidpassword;
 
+		stringbuffer	sqltranslationrules;
+		uint16_t	sqltranslationrulesdepth;
+
 		usercontainer	*currentuser;
 
 		connectstringcontainer	*firstconnect;
@@ -315,20 +320,20 @@ class sqlrconfigfile : public xmlsax {
 		linkedlist< usercontainer * >		userlist;
 		linkedlist< routecontainer *>		routelist;
 		
-        typedef enum {
-            NO_TAG,
-            USERS_TAG,
-            USER_TAG,
-            CONNECTIONS_TAG,
-            CONNECTION_TAG,
-            ROUTER_TAG,
-            ROUTE_TAG,
-            FILTER_TAG,
-            QUERY_TAG
-        } tag;
-        
-        tag currenttag;
+		typedef enum {
+			NO_TAG,
+			USERS_TAG,
+			USER_TAG,
+			CONNECTIONS_TAG,
+			CONNECTION_TAG,
+			ROUTER_TAG,
+			ROUTE_TAG,
+			FILTER_TAG,
+			QUERY_TAG,
+	   		SQLTRANSLATIONRULES_TAG
+		} tag;
 		
+		tag currenttag;
 };
 
 #endif
