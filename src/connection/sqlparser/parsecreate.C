@@ -67,12 +67,6 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 	// on commit (optional)
 	parseOnCommit(tablenode,*newptr,newptr);
 
-	// table options (optional)
-	parseTableOptions(tablenode,*newptr,newptr);
-
-	// partition options (optional)
-	parsePartitionOptions(tablenode,*newptr,newptr);
-
 	// store anything trailing off the end verbatim
 	parseRemainderVerbatim(tablenode,*newptr,newptr);
 
@@ -629,23 +623,5 @@ bool sqlparser::parseOnCommit(xmldomnode *currentnode,
 	space(*newptr,newptr);
 
 	// success
-	return true;
-}
-
-bool sqlparser::parseTableOptions(xmldomnode *currentnode,
-						const char *ptr,
-						const char **newptr) {
-	xmldomnode	*tableoptions=
-			newNode(currentnode,sqlelement::table_options);
-	// FIXME: implement this
-	return true;
-}
-
-bool sqlparser::parsePartitionOptions(xmldomnode *currentnode,
-						const char *ptr,
-						const char **newptr) {
-	xmldomnode	*partitionoptions=
-			newNode(currentnode,sqlelement::partition_options);
-	// FIXME: implement this
 	return true;
 }

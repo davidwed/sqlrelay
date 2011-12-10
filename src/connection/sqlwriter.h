@@ -122,14 +122,6 @@ class sqlwriter {
 		virtual bool	onCommit(xmldomnode *node,
 						stringbuffer *output);
 
-		// table options...
-		virtual bool	tableOptions(xmldomnode *node,
-						stringbuffer *output);
-
-		// partition options...
-		virtual bool	partitionOptions(xmldomnode *node,
-						stringbuffer *output);
-
 
 		// drop...
 		virtual bool	dropQuery(xmldomnode *node,

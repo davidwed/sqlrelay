@@ -212,13 +212,3 @@ bool sqlwriter::onCommit(xmldomnode *node, stringbuffer *output) {
 	outputValue(node,output);
 	return true;
 }
-
-bool sqlwriter::tableOptions(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	return true;
-}
-
-bool sqlwriter::partitionOptions(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	return true;
-}

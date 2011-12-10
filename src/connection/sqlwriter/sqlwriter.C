@@ -98,12 +98,6 @@ const char * const *sqlwriter::baseElements() {
 		sqlelement::on_delete,
 		sqlelement::on_update,
 
-		// table options...
-		sqlelement::table_options,
-
-		// partition options...
-		sqlelement::partition_options,
-
 
 		// drop...
 		sqlelement::drop_query,
@@ -266,14 +260,6 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	// on commit clause...
 	} else if (!charstring::compare(nodename,sqlelement::on_commit)) {
 		return onCommit(node,output);
-
-	// table options...
-	} else if (!charstring::compare(nodename,sqlelement::table_options)) {
-		return tableOptions(node,output);
-
-	// partition options...
-	} else if (!charstring::compare(nodename,sqlelement::partition_options)) {
-		return partitionOptions(node,output);
 
 
 	// drop...
