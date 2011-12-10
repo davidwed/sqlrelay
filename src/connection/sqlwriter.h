@@ -47,10 +47,6 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	value(xmldomnode *node,
 						stringbuffer *output);
-		virtual bool	options(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endOptions(xmldomnode *node,
-						stringbuffer *output);
 		virtual bool	verbatim(xmldomnode *node,
 						stringbuffer *output);
 
@@ -167,6 +163,8 @@ class sqlwriter {
 		virtual bool	unique(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	distinct(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	where(xmldomnode *node,
 						stringbuffer *output);
 
 

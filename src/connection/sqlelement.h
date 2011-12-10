@@ -11,7 +11,6 @@ class sqlelement {
 		static const char *_type;
 		static const char *_size;
 		static const char *_value;
-		static const char *_options;
 		static const char *_verbatim;
 
 		// create query...

@@ -209,13 +209,13 @@ class sqlparser {
 		bool	parseSelect(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseSelectOptions(xmldomnode *currentnode,
-						const char *ptr,
-						const char **newptr);
 		bool	parseUnique(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	parseDistinct(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseWhere(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 
@@ -303,6 +303,8 @@ class sqlparser {
 		bool	uniqueClause(const char *ptr,
 						const char **newptr);
 		bool	distinctClause(const char *ptr,
+						const char **newptr);
+		bool	whereClause(const char *ptr,
 						const char **newptr);
 
 		xmldom		*tree;

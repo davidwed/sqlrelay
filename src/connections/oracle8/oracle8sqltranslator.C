@@ -43,8 +43,16 @@ bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
 	// ignore non create-table queries
 	xmldomnode	*table=
 			query->getFirstTagChild(sqlelement::_create)->
-					getFirstTagChild(sqlelement::_table);
+				getFirstTagChild(sqlelement::_table);
 	if (table->isNullNode()) {
+		return true;
+	}
+
+	// ignore non-temporary tables
+	xmldomnode	*temporary=
+			query->getFirstTagChild(sqlelement::_create)->
+				getFirstTagChild(sqlelement::_create_temporary);
+	if (temporary->isNullNode()) {
 		return true;
 	}
 

@@ -8,7 +8,6 @@ const char *sqlelement::_name="name";
 const char *sqlelement::_type="type";
 const char *sqlelement::_size="size";
 const char *sqlelement::_value="value";
-const char *sqlelement::_options="options";
 const char *sqlelement::_verbatim="verbatim";
 
 // create query...

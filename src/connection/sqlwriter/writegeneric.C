@@ -43,16 +43,6 @@ bool sqlwriter::value(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlwriter::options(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	return true;
-}
-
-bool sqlwriter::endOptions(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	return true;
-}
-
 bool sqlwriter::verbatim(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);

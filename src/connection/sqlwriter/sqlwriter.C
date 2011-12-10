@@ -70,7 +70,6 @@ const char * const *sqlwriter::baseElements() {
 		sqlelement::_type,
 		sqlelement::_size,
 		sqlelement::_value,
-		sqlelement::_options,
 		sqlelement::_verbatim,
 
 		// create query...
@@ -206,8 +205,6 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return size(node,output);
 	} else if (!charstring::compare(nodename,sqlelement::_value)) {
 		return value(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_options)) {
-		return options(node,output);
 	} else if (!charstring::compare(nodename,sqlelement::_verbatim)) {
 		return verbatim(node,output);
 
@@ -321,6 +318,8 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return unique(node,output);
 	} else if (!charstring::compare(nodename,sqlelement::_distinct)) {
 		return distinct(node,output);
+	} else if (!charstring::compare(nodename,sqlelement::_where)) {
+		return where(node,output);
 	}
 	return true;
 }
@@ -335,8 +334,6 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endType(node,output);
 	} else if (!charstring::compare(nodename,sqlelement::_size)) {
 		return endSize(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_options)) {
-		return endOptions(node,output);
 
 	// column definitions...
 	} else if (!charstring::compare(nodename,sqlelement::_columns)) {

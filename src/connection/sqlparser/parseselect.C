@@ -20,51 +20,13 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 	xmldomnode	*selectnode=
 			newNode(currentnode,sqlelement::_select);
 
-	// options (unique, distinct, etc.)
-	parseSelectOptions(selectnode,*newptr,newptr);
-
-	// FIXME: implement this for real
-	parseRemainderVerbatim(selectnode,*newptr,newptr);
-	return true;
-}
-
-bool sqlparser::parseSelectOptions(xmldomnode *currentnode,
-					const char *ptr,
-					const char **newptr) {
-	debugFunction();
-
-	// create the node
-	xmldomnode	*optionsnode=newNode(currentnode,sqlelement::_options);
-/*
-	// find the from clause (or end of string)
-	const char	*from=charstring::findFirstOrEnd(ptr," from ");
-
-	// scan back until we find the beginning of the expressions
-	bool	inquotes=false;
-	bool	indoublequotes=false;
-	bool	parenlevel=0;
-	for (const char *chr=from; chr>=ptr; chr--) {
-		if (!indoublequotes && *chr=='\'') {
-			inquotes=!inquotes;
-		}
-		if (!inquotes && *chr=='"') {
-			indoublequotes=!indoublequotes;
-		}
-		if (*chr==')') {
-			inparens=true;
-		}
-		if (inparens && *chr=='(') {
-			inparens=false;
-		}
-	}*/
-
-	// options
-	*newptr=ptr;
+	// parse the select clauses
 	for (;;) {
 
 		// look for known options
-		if (parseUnique(optionsnode,*newptr,newptr) ||
-			parseDistinct(optionsnode,*newptr,newptr)) {
+		if (parseUnique(selectnode,*newptr,newptr) ||
+			parseDistinct(selectnode,*newptr,newptr) ||
+			parseWhere(selectnode,*newptr,newptr)) {
 			continue;
 		}
 
@@ -72,7 +34,7 @@ bool sqlparser::parseSelectOptions(xmldomnode *currentnode,
 		// then there must be something in there that we don't
 		// understand.  It needs to be copied verbatim until we run
 		// into something that we do understand.
-		if (parseVerbatim(optionsnode,*newptr,newptr)) {
+		if (parseVerbatim(selectnode,*newptr,newptr)) {
 			space(*newptr,newptr);
 		} else {
 			break;
@@ -101,5 +63,16 @@ bool sqlparser::parseDistinct(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,sqlelement::_distinct);
+	return true;
+}
+
+bool sqlparser::parseWhere(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!whereClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,sqlelement::_where);
 	return true;
 }

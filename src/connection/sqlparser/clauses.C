@@ -259,3 +259,8 @@ bool sqlparser::distinctClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"distinct ");
 }
+
+bool sqlparser::whereClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"where ");
+}

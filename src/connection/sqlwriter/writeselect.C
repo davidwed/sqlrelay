@@ -21,3 +21,9 @@ bool sqlwriter::distinct(xmldomnode *node, stringbuffer *output) {
 	output->append("distinct");
 	return true;
 }
+
+bool sqlwriter::where(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("where");
+	return true;
+}
