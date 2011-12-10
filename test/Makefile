@@ -19,3 +19,4 @@ clean:
 	$(MAKE) -C ruby clean
 	$(MAKE) -C tcl clean
 	$(MAKE) -C dropin clean
+	$(MAKE) -C sqltranslation clean
