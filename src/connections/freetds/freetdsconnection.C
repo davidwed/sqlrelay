@@ -57,9 +57,6 @@ void freetdsconnection::handleConnectString() {
 	language=connectStringValue("language");
 	hostname=connectStringValue("hostname");
 	packetsize=connectStringValue("packetsize");
-	setTranslateBindVariablesBehavior(
-		!charstring::compare(
-			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool freetdsconnection::logIn(bool printerrors) {

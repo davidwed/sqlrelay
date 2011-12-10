@@ -25,9 +25,6 @@ uint16_t mdbtoolsconnection::getNumberOfConnectStringVars() {
 
 void mdbtoolsconnection::handleConnectString() {
 	db=connectStringValue("db");
-	setTranslateBindVariablesBehavior(
-		!charstring::compare(
-			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool mdbtoolsconnection::logIn(bool printerrors) {

@@ -74,6 +74,7 @@ typedef enum {
 	TIMEQUERIES_ATTRIBUTE,
 	TIMEQUERIESSEC_ATTRIBUTE,
 	TIMEQUERIESUSEC_ATTRIBUTE,
+	TRANSLATEBINDVARIABLES_ATTRIBUTE,
 	SQLTRANSLATIONRULES_ATTRIBUTE
 } attribute;
 
@@ -210,6 +211,7 @@ class sqlrconfigfile : public xmlsax {
 		bool		getReLoginAtStart();
 		int64_t		getTimeQueriesSeconds();
 		int64_t		getTimeQueriesMicroSeconds();
+		bool		getTranslateBindVariables();
 
 		bool		getSidEnabled();
 		const char	*getSidHost();
@@ -295,6 +297,7 @@ class sqlrconfigfile : public xmlsax {
 		bool		reloginatstart;
 		int64_t		timequeriessec;
 		int64_t		timequeriesusec;
+		bool		translatebindvariables;
 
 		bool		sidenabled;
 		const char	*sidhost;

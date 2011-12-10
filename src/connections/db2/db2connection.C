@@ -33,9 +33,6 @@ void db2connection::handleConnectString() {
 	setFakeTransactionBlocksBehavior(
 		!charstring::compare(
 			connectStringValue("faketransactionblocks"),"yes"));
-	setTranslateBindVariablesBehavior(
-		!charstring::compare(
-			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool db2connection::logIn(bool printerrors) {

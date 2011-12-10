@@ -57,9 +57,6 @@ void oracle8connection::handleConnectString() {
 	setFakeTransactionBlocksBehavior(
 		!charstring::compare(
 			connectStringValue("faketransactionblocks"),"yes"));
-	setTranslateBindVariablesBehavior(
-		!charstring::compare(
-			connectStringValue("translatebindvariables"),"yes"));
 
 #ifdef HAVE_ORACLE_8i
 	droptemptables=!charstring::compare(

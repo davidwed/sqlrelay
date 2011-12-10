@@ -54,9 +54,6 @@ void mysqlconnection::handleConnectString() {
 	fakebinds=!charstring::compare(connectStringValue("fakebinds"),"yes");
 #endif
 	charset=connectStringValue("charset");
-	setTranslateBindVariablesBehavior(
-		!charstring::compare(
-			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool mysqlconnection::logIn(bool printerrors) {

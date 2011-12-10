@@ -35,6 +35,7 @@
 	<!ATTLIST instance reloginatstart (yes|no) "no">
 	<!ATTLIST instance timequeriessec CDATA "-1">
 	<!ATTLIST instance timequeriesusec CDATA "-1">
+	<!ATTLIST instance translatebindvariables (yes|no) "no">
 
 <!ELEMENT users (user*)>
 <!ELEMENT user EMPTY>

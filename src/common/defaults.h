@@ -152,6 +152,9 @@
 #define DEFAULT_TIMEQUERIESUSEC "-1"
 	// default time queries attributes
 
+#define	DEFAULT_TRANSLATEBINDVARIABLES "yes"
+	// default translate bind variables attribute
+
 // cachemanager/sqlrclient parameters
 #define DEFAULT_INTERVAL 30
 	// default interval that the cachemanager will scan on

@@ -43,9 +43,6 @@ void sybaseconnection::handleConnectString() {
 	language=connectStringValue("language");
 	hostname=connectStringValue("hostname");
 	packetsize=connectStringValue("packetsize");
-	setTranslateBindVariablesBehavior(
-		!charstring::compare(
-			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool sybaseconnection::logIn(bool printerrors) {

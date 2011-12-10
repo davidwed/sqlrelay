@@ -40,10 +40,6 @@ sqltranslator *sqlrconnection_svr::getSqlTranslator() {
 	return new sqltranslator;
 }
 
-void sqlrconnection_svr::setTranslateBindVariablesBehavior(bool tbv) {
-	translatebinds=tbv;
-}
-
 void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 	// debug

@@ -175,6 +175,9 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		return openSockets();
 	}
 
+	// get translate bind variable behavior
+	translatebinds=cfgfl->getTranslateBindVariables();
+
 	// bail here unless we're timing queries
 	if (cfgfl->getTimeQueriesSeconds()==-1 ||
 		cfgfl->getTimeQueriesMicroSeconds()==-1) {

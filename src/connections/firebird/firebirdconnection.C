@@ -66,9 +66,6 @@ void firebirdconnection::handleConnectString() {
 	setFakeTransactionBlocksBehavior(
 		!charstring::compare(
 			connectStringValue("faketransactionblocks"),"yes"));
-	setTranslateBindVariablesBehavior(
-		!charstring::compare(
-			connectStringValue("translatebindvariables"),"yes"));
 }
 
 bool firebirdconnection::logIn(bool printerrors) {
