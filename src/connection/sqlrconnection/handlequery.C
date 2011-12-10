@@ -210,6 +210,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 	} else {
 
+fakeinputbinds=true;
 		// otherwise, prepare and execute the query...
 		// generally this a first time query but it could also be
 		// a reexecute if we're faking binds
@@ -248,6 +249,9 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 						cursor->querylength;
 			}
 
+printf("\nrunning: \"");
+charstring::safePrint(queryptr,querylen);
+printf("\"\n\n");
 			// prepare
 			success=cursor->prepareQuery(queryptr,querylen);
 
@@ -255,6 +259,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			// handle the binds for real
 			if (success && !fakeinputbinds &&
 					cursor->supportsNativeBinds()) {
+printf("binding for real\n");
 				success=cursor->handleBinds();
 			}
 
