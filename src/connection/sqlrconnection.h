@@ -342,7 +342,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						bool reexecute,
 						bool bindcursor,
 						bool reallyexecute);
-		void	rewriteQueryInternal(sqlrcursor_svr *cursor);
+		void	rewriteQuery(sqlrcursor_svr *cursor);
 		void	translateBindVariables(sqlrcursor_svr *cursor);
 		bool	matchesNativeBindFormat(const char *bind);
 		void	translateBindVariableInStringAndArray(

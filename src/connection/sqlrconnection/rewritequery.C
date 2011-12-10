@@ -11,7 +11,7 @@ enum queryparsestate_t {
 	IN_BIND
 };
 
-void sqlrconnection_svr::rewriteQueryInternal(sqlrcursor_svr *cursor) {
+void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 
 	if (sqlp && sqlt && sqlw) {
 		if (!cursor->translateQuery()) {
@@ -30,9 +30,6 @@ void sqlrconnection_svr::rewriteQueryInternal(sqlrcursor_svr *cursor) {
 	if (supportsTransactionBlocks()) {
 		translateBeginTransaction(cursor);
 	}
-
-	// run database-specific rewrites
-	cursor->rewriteQuery();
 }
 
 sqlwriter *sqlrconnection_svr::getSqlWriter() {

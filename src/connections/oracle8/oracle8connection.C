@@ -64,9 +64,6 @@ void oracle8connection::handleConnectString() {
 #ifdef HAVE_ORACLE_8i
 	droptemptables=!charstring::compare(
 				connectStringValue("droptemptables"),"yes");
-	temptablespreserverows=!charstring::compare(
-				connectStringValue("temptablespreserverows"),
-				"yes");
 #endif
 }
 
@@ -479,54 +476,6 @@ bool oracle8connection::changeUser(const char *newuser,
 	return true;
 }
 #endif
-
-void oracle8cursor::rewriteQuery() {
-
-	// for now, the only rewriting we're doing here has to do with
-	// creating temp tables
-	if (!oracle8conn->temptablespreserverows) {
-		return;
-	}
-
-	// skip whitespace and comments
-	const char	*ptr=skipWhitespaceAndComments(querybuffer);
-	if (!(*ptr)) {
-		return;
-	}
-
-	// bail if this isn't a create temporary table query
-	if (!createtemp.match(ptr)) {
-		return;
-	}
-
-	// bail if the query has an on-commit clause already
-	if (preserverows.match(ptr) || deleterows.match(ptr)) {
-		return;
-	}
-
-	// bail if there isn't enough room to append a new on-commit clause
-	if (querylength+26>conn->maxquerysize) {
-		return;
-	}
-
-	// does this query have an "as select" clause?
-	const char	*oncommitpreserverows=" on commit preserve rows ";
-	if (asselect.match(ptr)) {
-		// insert an "on commit preserve rows" clause prior to the
-		// "as select" clause
-		const char	*asselectstartptr=asselect.getSubstringStart(0);
-		stringbuffer	newquery;
-		newquery.append(querybuffer,asselectstartptr-querybuffer);
-		newquery.append(oncommitpreserverows);
-		newquery.append(asselectstartptr);
-		charstring::copy(querybuffer,newquery.getString());
-	} else {
-		// append an "on commit preserve rows" clause
-		charstring::append(querybuffer,oncommitpreserverows);
-	}
-
-	querylength=querylength+25;
-}
 
 bool oracle8connection::autoCommitOn() {
 	statementmode=OCI_COMMIT_ON_SUCCESS;

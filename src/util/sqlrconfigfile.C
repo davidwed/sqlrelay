@@ -411,7 +411,7 @@ bool sqlrconfigfile::tagStart(const char *name) {
 		// Root level, nested (users,connections?,router?)
 		case NO_TAG:
 			currentname="instance";
-			if (charstring::compare(name,"users")) {
+			if (!charstring::compare(name,"users")) {
 				thistag=USERS_TAG;
 			} else if (!charstring::compare(name,"connections")) {
 				thistag=CONNECTIONS_TAG;
@@ -421,7 +421,6 @@ bool sqlrconfigfile::tagStart(const char *name) {
 						"sqltranslationrules")) {
 				thistag=SQLTRANSLATIONRULES_TAG;
 				sqltranslationrules.clear();
-				sqltranslationrulesdepth=0;
 			} else {
 				ok=false;
 			}
@@ -532,9 +531,16 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			currenttag=thistag;
 			break;
 		case SQLTRANSLATIONRULES_TAG:
+			if (!charstring::compare(name,"sqltranslationrules")) {
+				sqltranslationrulesdepth=0;
+			} else {
+				sqltranslationrulesdepth++;
+			}
+			if (sqltranslationrulesdepth) {
+				sqltranslationrules.append(">");
+			}
 			sqltranslationrules.append("<");
 			sqltranslationrules.append(name);
-			sqltranslationrulesdepth++;
 			currenttag=thistag;
 			break;
 		default:
@@ -602,20 +608,19 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			}
 			break;
 		case SQLTRANSLATIONRULES_TAG:
+			if (!charstring::compare(name,"sqltranslationrules")) {
+				currenttag=NO_TAG;
+			}
 			sqltranslationrules.append("></");
 			sqltranslationrules.append(name);
-			sqltranslationrules.append(">");
+			if (!sqltranslationrulesdepth) {
+				sqltranslationrules.append(">");
+			}
 			sqltranslationrulesdepth--;
 			break;
 		default:
 			// just ignore the closing tag
 			break;
-	}
-
-	// don't do anything if we're already done
-	// or have not found the correct id
-	if (done || !correctid) {
-		return true;
 	}
 
 	// we're done if we've found the right instance at this point
@@ -793,8 +798,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		}
 		break;
 	case SQLTRANSLATIONRULES_TAG:
-		// Don't do anything.  This is just here
-		// so the compiler won't complain
+		sqltranslationrules.append(" ")->append(name);
+		currentattribute=SQLTRANSLATIONRULES_ATTRIBUTE;
 		break;
 	}
 
@@ -829,7 +834,7 @@ bool sqlrconfigfile::attributeName(const char *name) {
 				tagname="query";
 				break;
 			case SQLTRANSLATIONRULES_TAG:
-				sqltranslationrules.append(" ")->append(name);
+				tagname="sqltranslationrules";
 				break;
 		}
 		fprintf(stderr,"WARNING: unrecognized attribute "
@@ -862,7 +867,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		// if we have found the correct id, process the attribute...
 
 		if (currenttag==SQLTRANSLATIONRULES_TAG) {
-			sqltranslationrules.append("=")->append(value);
+			sqltranslationrules.append("=\"");
+			sqltranslationrules.append(value)->append("\"");
 		} else if (currentattribute==ADDRESSES_ATTRIBUTE) {
 			for (uint64_t index=0; index<addresscount; index++) {
 				delete[] addresses[index];

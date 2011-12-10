@@ -17,7 +17,6 @@ sqltranslator::~sqltranslator() {
 
 bool sqltranslator::loadRules(const char *rules) {
 	debugFunction();
-printf("loading rules:\n%s\n",rules);
 	delete xmld;
 	xmld=new xmldom();
 	if (xmld->parseString(rules)) {

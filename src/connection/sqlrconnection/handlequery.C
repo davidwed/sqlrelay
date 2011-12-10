@@ -246,7 +246,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			success=true;
 		} else {
 
-			rewriteQueryInternal(cursor);
+			rewriteQuery(cursor);
 
 			// FIXME: move fakeInputBinds into rewriteQuery
 			// it needs to be run before preparing for some db's

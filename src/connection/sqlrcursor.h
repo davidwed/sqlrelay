@@ -40,7 +40,6 @@ class sqlrcursor_svr {
 		virtual	bool	openCursor(uint16_t id);
 		virtual	bool	closeCursor();
 
-		virtual void	rewriteQuery();
 		virtual	bool	prepareQuery(const char *query,
 						uint32_t length);
 		virtual	bool	supportsNativeBinds();

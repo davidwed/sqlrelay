@@ -2,10 +2,14 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
+#define DEBUG_MESSAGES
+#include <sqltranslatordebug.h>
 #include <rudiments/character.h>
 #include <rudiments/xmldom.h>
 
 bool sqlrcursor_svr::translateQuery() {
+
+	debugPrintf("parsing:\n%s\n",querybuffer);
 
 	// parse the query
 	if (!conn->sqlp->parse(querybuffer)) {
@@ -18,11 +22,19 @@ bool sqlrcursor_svr::translateQuery() {
 		return false;
 	}
 
+	debugPrintf("before translation:\n");
+	debugPrintQueryTree(tree);
+	debugPrintf("\n");
+
 	// apply translation rules
 	if (!conn->sqlt->applyRules(tree)) {
 		delete tree;
 		return false;
 	}
+
+	debugPrintf("after translation:\n");
+	debugPrintQueryTree(tree);
+	debugPrintf("\n");
 
 	// write the query back out
 	stringbuffer	translatedquery;
@@ -31,6 +43,8 @@ bool sqlrcursor_svr::translateQuery() {
 		return false;
 	}
 	delete tree;
+
+	debugPrintf("translated:\n%s\n",translatedquery.getString());
 
 	// copy translated query into query buffer
 	if (translatedquery.getStringLength()>conn->maxquerysize) {
