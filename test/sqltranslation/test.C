@@ -1,51 +1,9 @@
 // Copyright (c) 2001  David Muse
 // See the file COPYING for more information.
 
-#include <stdio.h>
-#include <sqlparser.h>
-#include <oracle8sqltranslator.h>
-#include <oracle8sqlwriter.h>
-
-void printQueryTree(xmldom *tree) {
-	const char	*xml=tree->getRootNode()->xml()->getString();
-	int16_t		indent=0;
-	bool		endtag;
-	for (const char *ptr=xml; *ptr; ptr++) {
-		if (*ptr=='<') {
-			if (*(ptr+1)=='/') {
-				indent=indent-2;
-				endtag=true;
-			}
-			for (uint16_t i=0; i<indent; i++) {
-				printf(" ");
-			}
-		}
-		printf("%c",*ptr);
-		if (*ptr=='>') {
-			printf("\n");
-			if (*(ptr-1)!='/' && !endtag) {
-				indent=indent+2;
-			}
-			endtag=false;
-		}
-	}
-}
+#include <sqlrelay/sqlrclient.h>
 
 main() {
-
-	const char *translationrules=
-			"<sqltranslationrules>"
-			"	<temp_tables_preserve_rows_by_default/>"
-			"	<nativize_datatypes/>"
-			"	<convert_datatypes>"
-			"		<convert from=\"varchar\" to=\"varchar2\"/>"
-			"	</convert_datatypes>"
-			"	<trim_columns_compared_to_string_binds/>"
-			"</sqltranslationrules>";
-
-	oraclesqltranslator	sqlt;
-	sqlt.loadRules(translationrules);
-	
 
 	const char * const	queries[]={
 		"create temporary table if not exists test "
@@ -101,30 +59,12 @@ main() {
 		"select * from table test",
 		NULL
 	};
+
+	sqlrconnection	sqlrcon("localhost",9000,"/tmp/test.socket",	
+							"test","test",0,1);
+	sqlrcursor	sqlrcur(&sqlrcon);
 	
 	for (uint16_t i=0; queries[i]; i++) {
-
-		printf("parsing:\n%s\n",queries[i]);
-
-		// parse the query
-		sqlparser	sqlp;
-		sqlp.parse(queries[i]);
-		xmldom		*tree=sqlp.detachTree();
-
-		// apply rules
-		printf("\nbefore rules:\n");
-		printQueryTree(tree);
-		sqlt.applyRules(tree);
-		printf("\nafter rules:\n");
-		printQueryTree(tree);
-		printf("\n");
-
-		// write the query back out
-		oraclesqlwriter	sqlw;
-		stringbuffer	translatedquery;
-		sqlw.write(tree,&translatedquery);
-		printf("translated:\n%s\n\n\n",translatedquery.getString());
-
-		delete tree;
+		sqlrcur.sendQuery(queries[i]);
 	}
 }
