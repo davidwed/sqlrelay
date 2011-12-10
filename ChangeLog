@@ -16,6 +16,7 @@
 	added errorMessage method at connection level
 	applied Renat's patch to decrement the session count in the listener
 		if the handoff fails
+	implemented a generic query translation framework
 
 0.43 - updated ruby code build to take sitearch into account during includes
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9
