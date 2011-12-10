@@ -9,6 +9,10 @@ char sqlrcursor_svr::escapeChar() {
 	return '\\';
 }
 
+void sqlrcursor_svr::setFakeInputBinds(bool fake) {
+	conn->fakeinputbinds=fake;
+}
+
 stringbuffer *sqlrcursor_svr::fakeInputBinds(const char *query) {
 
 	// return NULL if there aren't any input binds

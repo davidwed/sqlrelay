@@ -1,4 +1,5 @@
 #include <oracle8sqlwriter.h>
+#include <sqlrcursor.h>
 #include <sqlelement.h>
 #include <sqltranslatordebug.h>
 
@@ -62,4 +63,14 @@ bool oracle8sqlwriter::cascade(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("cascade constraints");
 	return true;
+}
+
+bool oracle8sqlwriter::as(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	// Oracle doesn't allow bind variables in the select clause of a
+	// create table ... as select ... query.  So, if we find an "as" clause
+	// then fake input binds for this set of queries.  It will go back to 
+	// the default behavior when a new query is prepared.
+	sqlrcur->setFakeInputBinds(true);
+	return sqlwriter::as(node,output);
 }

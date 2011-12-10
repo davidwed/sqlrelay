@@ -52,6 +52,7 @@ class sqlelement {
 
 		// on commit clause...
 		static const char *_on_commit;
+		static const char *_as;
 
 
 		// drop...

@@ -27,7 +27,7 @@ bool sqlrcursor_svr::translateQuery() {
 	debugPrintf("\n");
 
 	// apply translation rules
-	if (!conn->sqlt->applyRules(tree)) {
+	if (!conn->sqlt->applyRules(conn,this,tree)) {
 		delete tree;
 		return false;
 	}
@@ -38,7 +38,7 @@ bool sqlrcursor_svr::translateQuery() {
 
 	// write the query back out
 	stringbuffer	translatedquery;
-	if (!conn->sqlw->write(tree,&translatedquery)) {
+	if (!conn->sqlw->write(conn,this,tree,&translatedquery)) {
 		delete tree;
 		return false;
 	}

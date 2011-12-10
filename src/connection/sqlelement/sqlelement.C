@@ -46,9 +46,8 @@ const char *sqlelement::_references="references";
 const char *sqlelement::_match="match";
 const char *sqlelement::_on_delete="on_delete";
 const char *sqlelement::_on_update="on_update";
-
-// on commit clause...
 const char *sqlelement::_on_commit="on_commit";
+const char *sqlelement::_as="as";
 
 
 // drop...

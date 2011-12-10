@@ -198,6 +198,11 @@ bool sqlparser::onCommitOptionClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
+bool sqlparser::asClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"as ");
+}
+
 
 
 bool sqlparser::dropClause(const char *ptr, const char **newptr) {

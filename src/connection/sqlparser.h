@@ -163,10 +163,7 @@ class sqlparser {
 		bool	parseOnCommit(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseTableOptions(xmldomnode *currentnode,
-						const char *ptr,
-						const char **newptr);
-		bool	parsePartitionOptions(xmldomnode *currentnode,
+		bool	parseAs(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 
@@ -278,6 +275,8 @@ class sqlparser {
 		bool	onCommitClause(const char *ptr,
 						const char **newptr);
 		bool	onCommitOptionClause(const char *ptr,
+						const char **newptr);
+		bool	asClause(const char *ptr,
 						const char **newptr);
 
 

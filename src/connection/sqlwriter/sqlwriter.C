@@ -7,14 +7,19 @@
 
 sqlwriter::sqlwriter() {
 	debugFunction();
+	sqlrcon=NULL;
+	sqlrcur=NULL;
 }
 
 sqlwriter::~sqlwriter() {
 	debugFunction();
 }
 
-bool sqlwriter::write(xmldom *tree, stringbuffer *output) {
+bool sqlwriter::write(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur,
+					xmldom *tree, stringbuffer *output) {
 	debugFunction();
+	this->sqlrcon=sqlrcon;
+	this->sqlrcur=sqlrcur;
 	return write(tree->getRootNode()->getFirstTagChild(),output);
 }
 
@@ -103,6 +108,7 @@ const char * const *sqlwriter::baseElements() {
 		sqlelement::_match,
 		sqlelement::_on_delete,
 		sqlelement::_on_update,
+		sqlelement::_as,
 
 
 		// drop...
@@ -269,10 +275,10 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return onDelete(node,output);
 	} else if (!charstring::compare(nodename,sqlelement::_on_update)) {
 		return onUpdate(node,output);
-
-	// on commit clause...
 	} else if (!charstring::compare(nodename,sqlelement::_on_commit)) {
 		return onCommit(node,output);
+	} else if (!charstring::compare(nodename,sqlelement::_as)) {
+		return as(node,output);
 
 
 	// drop...

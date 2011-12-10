@@ -212,3 +212,10 @@ bool sqlwriter::onCommit(xmldomnode *node, stringbuffer *output) {
 	outputValue(node,output);
 	return true;
 }
+
+bool sqlwriter::as(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("as ");
+	outputValue(node,output);
+	return true;
+}

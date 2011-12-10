@@ -20,6 +20,8 @@ class oracle8sqlwriter : public sqlwriter {
 						stringbuffer *output);
 		virtual bool	cascade(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	as(xmldomnode *node,
+						stringbuffer *output);
 };
 
 #endif

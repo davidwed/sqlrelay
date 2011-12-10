@@ -9,12 +9,18 @@
 
 using namespace rudiments;
 
+class sqlrconnection_svr;
+class sqlrcursor_svr;
+
 class sqlwriter {
 	public:
 			sqlwriter();
 		virtual	~sqlwriter();
 
-		virtual bool	write(xmldom *tree, stringbuffer *output);
+		virtual bool	write(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldom *tree,
+					stringbuffer *output);
 	protected:
 		virtual bool	write(xmldomnode *tree, stringbuffer *output);
 
@@ -121,6 +127,8 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	onCommit(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	as(xmldomnode *node,
+						stringbuffer *output);
 
 
 		// drop...
@@ -172,6 +180,9 @@ class sqlwriter {
 		virtual bool	rightParen(stringbuffer *output);
 		virtual bool	hasSibling(xmldomnode *node);
 		virtual bool	lastWasSpace(stringbuffer *output);
+
+		sqlrconnection_svr *sqlrcon;
+		sqlrcursor_svr *sqlrcur;
 };
 
 #endif

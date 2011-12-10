@@ -2,12 +2,17 @@
 // See the file COPYING for more information
 
 #include <sqltranslator.h>
+#include <sqlrconnection.h>
+#include <sqlrcursor.h>
 #include <sqlelement.h>
 #include <sqltranslatordebug.h>
 
 sqltranslator::sqltranslator() {
 	debugFunction();
 	xmld=NULL;
+	tree=NULL;
+	sqlrcon=NULL;
+	sqlrcur=NULL;
 }
 
 sqltranslator::~sqltranslator() {
@@ -27,8 +32,12 @@ bool sqltranslator::loadRules(const char *rules) {
 	return false;
 }
 
-bool sqltranslator::applyRules(xmldom *querytree) {
+bool sqltranslator::applyRules(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldom *querytree) {
 	debugFunction();
+	this->sqlrcon=sqlrcon;
+	this->sqlrcur=sqlrcur;
 	tree=querytree;
 	return applyRulesToQuery(querytree->getRootNode());
 }

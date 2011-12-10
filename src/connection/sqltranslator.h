@@ -9,13 +9,18 @@
 
 using namespace rudiments;
 
+class sqlrconnection_svr;
+class sqlrcursor_svr;
+
 class sqltranslator {
 	public:
 			sqltranslator();
 		virtual	~sqltranslator();
 
 		virtual bool	loadRules(const char *rules);
-		virtual bool	applyRules(xmldom *querytree);
+		virtual bool	applyRules(sqlrconnection_svr *sqlrcon,
+						sqlrcursor_svr *sqlrcur,
+						xmldom *querytree);
 	protected:
 		virtual bool	applyRulesToQuery(xmldomnode *query);
 		virtual bool	nativizeDatatypes(xmldomnode *query,
@@ -47,6 +52,9 @@ class sqltranslator {
 	private:
 		xmldom		*xmld;
 		xmldom		*tree;
+
+		sqlrconnection_svr	*sqlrcon;
+		sqlrcursor_svr		*sqlrcur;
 };
 
 #endif

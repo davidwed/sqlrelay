@@ -65,10 +65,31 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 	// on commit (optional)
 	parseOnCommit(tablenode,*newptr,newptr);
 
-	// store anything trailing off the end verbatim
-	parseRemainderVerbatim(tablenode,*newptr,newptr);
+	// the remaining clauses are all optional and they could be in any order
+	for (;;) {
 
-	return true;
+		// known clauses
+		// FIXME: look for other known clauses here
+		// FIXME: technically, if we find an "as" clause then it should
+		// be follwed by a select and that should be the end of the
+		// query.  For now parseAs only parses out the actual "as"
+		// itself and the rest is copied verbatim.  This should
+		// probably be fixed at some point.
+		if (parseAs(tablenode,*newptr,newptr)) {
+			continue;
+		}
+
+		// If we didn't encounter one of the known clauses
+		// then there must be something in there that we don't
+		// understand.  It needs to be copied verbatim until we run
+		// into something that we do understand or until we hit the
+		// end.
+		if (parseVerbatim(tablenode,*newptr,newptr)) {
+			space(*newptr,newptr);
+		} else {
+			return true;
+		}
+	}
 }
 
 bool sqlparser::parseIfNotExists(xmldomnode *currentnode,
@@ -621,5 +642,15 @@ bool sqlparser::parseOnCommit(xmldomnode *currentnode,
 	space(*newptr,newptr);
 
 	// success
+	return true;
+}
+
+bool sqlparser::parseAs(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	if (!asClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,sqlelement::_as);
 	return true;
 }

@@ -7,6 +7,7 @@
 #include <defines.h>
 
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/regularexpression.h>
 
 class bindvar_svr {
 	public:
@@ -186,6 +187,8 @@ class sqlrcursor_svr {
 		/* method to check for a row in a sid db */
 		virtual bool	sql_injection_detection_check_db(
 							const char *sid_db);
+
+		void		setFakeInputBinds(bool fake);
 	
 	protected:
 		// methods/variables used by derived classes

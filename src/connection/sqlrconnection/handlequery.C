@@ -210,7 +210,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 	} else {
 
-fakeinputbinds=true;
 		// otherwise, prepare and execute the query...
 		// generally this a first time query but it could also be
 		// a reexecute if we're faking binds
@@ -238,6 +237,7 @@ fakeinputbinds=true;
 				dbgfile.debugPrint("connection",3,
 							"faking binds...");
 
+printf("faking binds\n");
 				newquery=cursor->fakeInputBinds(
 						cursor->querybuffer);
 
