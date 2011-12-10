@@ -10,9 +10,10 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 	dbgfile.debugPrint("connection",1,"handling query...");
 
-	// clear bind mappings
+	// clear bind mappings and reset fakeinputbinds flag
 	if (!reexecute && !bindcursor) {
 		clearBindMappings();
+		fakeinputbinds=false;
 	}
 
 	if (getquery) {
@@ -174,49 +175,25 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 	dbgfile.debugPrint("connection",2,"processing query...");
 
+	// on reexecute, translate bind variables from mapping
+	if (reexecute) {
+		translateBindVariablesFromMappings(cursor);
+	}
+
 	bool	success=false;
 	bool	doegress=true;
-	if (reexecute) {
 
-		// if the reexecute flag is set, the query doesn't
-		// need to be prepared again...
+	if (reexecute && !fakeinputbinds && cursor->supportsNativeBinds()) {
+
+		// if we're reexecuting and not faking binds then
+		// the statement doesn't need to be prepared again...
 
 		dbgfile.debugPrint("connection",3,"re-executing...");
-		if (cursor->supportsNativeBinds()) {
-			if (cursor->sql_injection_detection_ingress(
-							cursor->querybuffer)) {
-				doegress=false;
-				success=true;
-			} else {
-
-				translateBindVariablesFromMappings(cursor);
-
-				success=(cursor->handleBinds() && 
-					executeQueryUpdateStats(cursor,
-							cursor->querybuffer,
-							cursor->querylength,
-							reallyexecute));
-			}
-		} else {
-			stringbuffer	*newquery=cursor->fakeInputBinds(
-							cursor->querybuffer);
-			const char	*queryptr=(newquery)?
-						newquery->getString():
-						cursor->querybuffer;
-			uint32_t	querylen=(newquery)?
-						newquery->getStringLength():
-						cursor->querylength;
-			if (cursor->sql_injection_detection_ingress(queryptr)) {
-				doegress=false;
-				success=true;
-			} else {
-				success=executeQueryUpdateStats(cursor,
-							queryptr,
-							querylen,
-							reallyexecute);
-			}
-			delete newquery;
-		}
+		success=(cursor->handleBinds() && 
+			executeQueryUpdateStats(cursor,
+						cursor->querybuffer,
+						cursor->querylength,
+						reallyexecute));
 
 	} else if (bindcursor) {
 
@@ -224,73 +201,71 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		// execute, we don't need to worry about binds...
 
 		dbgfile.debugPrint("connection",3,"bind cursor...");
-		if (cursor->sql_injection_detection_ingress(
-						cursor->querybuffer)) {
-			doegress=false;
-			success=true;
-		} else {
-			success=executeQueryUpdateStats(cursor,
-							cursor->querybuffer,
-							cursor->querylength,
-							reallyexecute);
-		}
+		// FIXME: should we be passing
+		// in the querybuffer and length here?
+		success=executeQueryUpdateStats(cursor,
+						cursor->querybuffer,
+						cursor->querylength,
+						reallyexecute);
 
 	} else {
 
 		// otherwise, prepare and execute the query...
+		// generally this a first time query but it could also be
+		// a reexecute if we're faking binds
 
 		dbgfile.debugPrint("connection",3,"preparing/executing...");
+
+		// rewrite the query, if necessary
+		rewriteQuery(cursor);
+
 		if (cursor->sql_injection_detection_ingress(
 						cursor->querybuffer)) {
+
 			doegress=false;
 			success=true;
+
 		} else {
 
-			rewriteQuery(cursor);
+			const char	*queryptr=cursor->querybuffer;
+			uint32_t	querylen=cursor->querylength;
 
-			// FIXME: move fakeInputBinds into rewriteQuery
-			// it needs to be run before preparing for some db's
+			// fake input binds if necessary
+			stringbuffer	*newquery=NULL;
+			if (fakeinputbinds || !cursor->supportsNativeBinds()) {
 
-			success=cursor->prepareQuery(cursor->querybuffer,
-							cursor->querylength);
-			if (success) {
-				if (cursor->supportsNativeBinds()) {
-					success=(cursor->handleBinds() &&
-						executeQueryUpdateStats(
-							cursor,
-							cursor->querybuffer,
-							cursor->querylength,
-							true));
-				} else {
-					stringbuffer	*newquery=
-						cursor->fakeInputBinds(
-							cursor->querybuffer);
-					const char	*queryptr=
-						(newquery)?
+				dbgfile.debugPrint("connection",3,
+							"faking binds...");
+
+				newquery=cursor->fakeInputBinds(
+						cursor->querybuffer);
+
+				queryptr=(newquery)?
 						newquery->getString():
 						cursor->querybuffer;
-					uint32_t	querylen=
-						(newquery)?
+				querylen=(newquery)?
 						newquery->getStringLength():
 						cursor->querylength;
-					bool	execquery=true;
-					if (queryptr!=cursor->querybuffer) {
-						if (cursor->
-						sql_injection_detection_ingress(
-							cursor->querybuffer)) {
-							doegress=false;
-							execquery=false;
-						}
-					}
-					if (execquery) {
-						success=executeQueryUpdateStats(
-								cursor,
-								queryptr,
-								querylen,true);
-					}
-					delete newquery;
-				}
 			}
+
+			// prepare
+			success=cursor->prepareQuery(queryptr,querylen);
+
+			// if we're not faking binds then
+			// handle the binds for real
+			if (success && !fakeinputbinds &&
+					cursor->supportsNativeBinds()) {
+				success=cursor->handleBinds();
+			}
+
+			// execute
+			if (success) {
+				success=executeQueryUpdateStats(
+					cursor,queryptr,querylen,true);
+			}
+
+			// clean up
+			delete newquery;
 		}
 	}
 

@@ -431,6 +431,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		memorypool	*bindmappingspool;
 		namevaluepairs	*inbindmappings;
 		namevaluepairs	*outbindmappings;
+		bool		fakeinputbinds;
 
 		sqlparser	*sqlp;
 		sqltranslator	*sqlt;

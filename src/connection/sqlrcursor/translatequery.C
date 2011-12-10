@@ -46,7 +46,7 @@ bool sqlrcursor_svr::translateQuery() {
 
 	debugPrintf("translated:\n%s\n",translatedquery.getString());
 
-	// copy translated query into query buffer
+	// copy the translated query into query buffer
 	if (translatedquery.getStringLength()>conn->maxquerysize) {
 		// the translated query was too large
 		return false;

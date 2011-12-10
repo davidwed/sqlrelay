@@ -19,12 +19,8 @@ void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 		}
 	}
 
-	if (cursor->supportsNativeBinds()) {
-		if (translatebinds) {
-			translateBindVariables(cursor);
-		}
-	} else {
-		// FIXME: move fake bind code here
+	if (translatebinds) {
+		translateBindVariables(cursor);
 	}
 
 	if (supportsTransactionBlocks()) {
@@ -183,6 +179,13 @@ void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 
 	// debug
+	/* printf("query: \"%s\"\n",cursor->querybuffer);
+	for (uint16_t i=0; i<cursor->inbindcount; i++) {
+		printf("inbind: \"%s\"\n",cursor->inbindvars[i].variable);
+	}
+	for (uint16_t i=0; i<cursor->outindcount; i++) {
+		printf("outbind: \"%s\"\n",cursor->outindvars[i].variable);
+	}*/
 	dbgfile.debugPrint("connection",2,"converted:");
 	dbgfile.debugPrint("connection",2,cursor->querybuffer);
 	dbgfile.debugPrint("connection",2,"input binds:");

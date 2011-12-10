@@ -99,7 +99,6 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 	bool		inquotes=false;
 	bool		indoublequotes=false;
 	uint16_t	parens=0;
-	bool		escaped=false;
 
 	// initialize the location
 	const char	*chr=ptr;

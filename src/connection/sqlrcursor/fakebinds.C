@@ -11,7 +11,7 @@ char sqlrcursor_svr::escapeChar() {
 
 stringbuffer *sqlrcursor_svr::fakeInputBinds(const char *query) {
 
-	// return null if there aren't any input binds
+	// return NULL if there aren't any input binds
 	if (!inbindcount) {
 		return NULL;
 	}
