@@ -3,7 +3,6 @@
 	applied Renat's patch to fix the client session count in the stats
 	added getDatabase/Table/ColumnList method/functions to API's
 	added string inputBind method/function with length
-	added query rewriting framework
 	added bind variable translation
 	added transaction block emulation
 	added option to drop temporary tables at session-end for oracle
