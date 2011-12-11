@@ -1,6 +1,6 @@
 #include <oracle8sqlwriter.h>
 #include <sqlrcursor.h>
-#include <sqlelement.h>
+#include <sqlparser.h>
 #include <sqltranslatordebug.h>
 
 oracle8sqlwriter::oracle8sqlwriter() : sqlwriter() {
@@ -15,7 +15,7 @@ const char * const *oracle8sqlwriter::additionalElements() {
 	debugFunction();
 	static const char *additionalelements[]={
 		// on commit...
-		sqlelement::_on_commit,
+		sqlparser::_on_commit,
 		NULL
 	};
 	return additionalelements;
@@ -25,22 +25,22 @@ const char * const *oracle8sqlwriter::unsupportedElements() {
 	debugFunction();
 	static const char *unsupportedelements[]={
 		// constraints...
-		sqlelement::_unsigned,
-		sqlelement::_zerofill,
-		sqlelement::_binary,
-		sqlelement::_character_set,
-		sqlelement::_collate,
-		sqlelement::_auto_increment,
-		sqlelement::_key,
-		sqlelement::_comment,
-		sqlelement::_column_format,
-		sqlelement::_match,
-		sqlelement::_on_delete,
-		sqlelement::_on_update,
+		sqlparser::_unsigned,
+		sqlparser::_zerofill,
+		sqlparser::_binary,
+		sqlparser::_character_set,
+		sqlparser::_collate,
+		sqlparser::_auto_increment,
+		sqlparser::_key,
+		sqlparser::_comment,
+		sqlparser::_column_format,
+		sqlparser::_match,
+		sqlparser::_on_delete,
+		sqlparser::_on_update,
 
 		// drop...
-		sqlelement::_drop_temporary,
-		sqlelement::_restrict,
+		sqlparser::_drop_temporary,
+		sqlparser::_restrict,
 
 		NULL
 	};

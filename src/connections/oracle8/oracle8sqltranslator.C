@@ -1,5 +1,5 @@
 #include <oracle8sqltranslator.h>
-#include <sqlelement.h>
+#include <sqlparser.h>
 #include <sqltranslatordebug.h>
 
 oracle8sqltranslator::oracle8sqltranslator() : sqltranslator() {
@@ -42,23 +42,23 @@ bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
 
 	// ignore non create-table queries
 	xmldomnode	*table=
-			query->getFirstTagChild(sqlelement::_create)->
-				getFirstTagChild(sqlelement::_table);
+			query->getFirstTagChild(sqlparser::_create)->
+				getFirstTagChild(sqlparser::_table);
 	if (table->isNullNode()) {
 		return true;
 	}
 
 	// ignore non-temporary tables
 	xmldomnode	*temporary=
-			query->getFirstTagChild(sqlelement::_create)->
-				getFirstTagChild(sqlelement::_create_temporary);
+			query->getFirstTagChild(sqlparser::_create)->
+				getFirstTagChild(sqlparser::_create_temporary);
 	if (temporary->isNullNode()) {
 		return true;
 	}
 
 	// if there's already an on commit clause then leave it alone
 	xmldomnode	*oncommit=
-			table->getFirstTagChild(sqlelement::_on_commit);
+			table->getFirstTagChild(sqlparser::_on_commit);
 	if (!oncommit->isNullNode()) {
 		return true;
 	}
@@ -68,7 +68,7 @@ bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
 	// an on commit clause which preserve rows...
 
 	// find the columns clause
-	xmldomnode	*columns=table->getFirstTagChild(sqlelement::_columns);
+	xmldomnode	*columns=table->getFirstTagChild(sqlparser::_columns);
 
 	// if there is no columns clause then bail, we've got bigger problems
 	if (columns->isNullNode()) {
@@ -76,7 +76,7 @@ bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
 	}
 		
 	// add a new on commit clause after the columns clause
-	oncommit=newNodeAfter(table,columns,sqlelement::_on_commit);
-	setAttribute(oncommit,sqlelement::_value,"preserve rows");
+	oncommit=newNodeAfter(table,columns,sqlparser::_on_commit);
+	setAttribute(oncommit,sqlparser::_value,"preserve rows");
 	return true;
 }
