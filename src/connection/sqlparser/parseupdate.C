@@ -19,8 +19,31 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 	// create the node
 	xmldomnode	*updatenode=newNode(currentnode,_update);
 
-	// FIXME: implement this for real
-	parseRemainderVerbatim(updatenode,*newptr,newptr);
+	// parse the update clauses
+	for (;;) {
+
+		// look for known options
+		if (parseWhere(updatenode,*newptr,newptr)) {
+			continue;
+		}
+
+		// If we didn't encounter one of the known options
+		// then there must be something in there that we don't
+		// understand.  It needs to be copied verbatim until we run
+		// into something that we do understand.
+		if (parseVerbatim(updatenode,*newptr,newptr)) {
+
+			// if we find a comma, append that too
+			if (comma(*newptr,newptr)) {
+				newNode(updatenode,_verbatim,",");
+			}
+
+			space(*newptr,newptr);
+		} else {
+			break;
+		}
+	}
+
 	return true;
 }
 

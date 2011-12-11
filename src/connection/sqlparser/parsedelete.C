@@ -19,8 +19,31 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 	// create the node
 	xmldomnode	*deletenode=newNode(currentnode,_delete);
 
-	// FIXME: implement this for real
-	parseRemainderVerbatim(deletenode,*newptr,newptr);
+	// parse the delete clauses
+	for (;;) {
+
+		// look for known options
+		if (parseWhere(deletenode,*newptr,newptr)) {
+			continue;
+		}
+
+		// If we didn't encounter one of the known options
+		// then there must be something in there that we don't
+		// understand.  It needs to be copied verbatim until we run
+		// into something that we do understand.
+		if (parseVerbatim(deletenode,*newptr,newptr)) {
+
+			// if we find a comma, append that too
+			if (comma(*newptr,newptr)) {
+				newNode(deletenode,_verbatim,",");
+			}
+
+			space(*newptr,newptr);
+		} else {
+			break;
+		}
+	}
+
 	return true;
 }
 
