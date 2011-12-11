@@ -22,8 +22,56 @@ bool sqlwriter::distinct(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::from(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("from");
+	return true;
+}
+
 bool sqlwriter::where(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("where");
+	return true;
+}
+
+bool sqlwriter::groupBy(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("group by");
+	return true;
+}
+
+bool sqlwriter::having(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("having");
+	return true;
+}
+
+bool sqlwriter::orderBy(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("order by");
+	return true;
+}
+
+bool sqlwriter::limit(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("limit");
+	return true;
+}
+
+bool sqlwriter::selectInto(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("into");
+	return true;
+}
+
+bool sqlwriter::procedure(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("procedure");
+	return true;
+}
+
+bool sqlwriter::forUpdate(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("for update");
 	return true;
 }

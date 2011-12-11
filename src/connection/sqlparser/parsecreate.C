@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
-#include <sqlelement.h>
 #include <sqltranslatordebug.h>
 
 bool sqlparser::parseCreate(xmldomnode *currentnode,
@@ -17,8 +16,7 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 	}
 
 	// create the node
-	xmldomnode	*createnode=
-			newNode(currentnode,sqlelement::_create);
+	xmldomnode	*createnode=newNode(currentnode,_create);
 
 	// temporary
 	parseCreateTemporary(createnode,*newptr,newptr);
@@ -33,14 +31,39 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 	return false;
 }
 
+bool sqlparser::createClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"create ");
+}
+
+const char *sqlparser::_create="create";
+
 bool sqlparser::parseCreateTemporary(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	if (!temporaryClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_create_temporary);
+	newNode(currentnode,_create_temporary);
 	return true;
+}
+
+bool sqlparser::temporaryClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"temporary ",
+		"temp ",
+		"global temp ",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
+}
+
+const char *sqlparser::_create_temporary="create_temporary";
+
+bool sqlparser::tableClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"table ");
 }
 
 bool sqlparser::parseCreateTable(xmldomnode *currentnode,
@@ -49,13 +72,13 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 	debugFunction();
 
 	// create new node
-	xmldomnode	*tablenode=newNode(currentnode,sqlelement::_table);
+	xmldomnode	*tablenode=newNode(currentnode,_table);
 
 	// if not exists
 	parseIfNotExists(tablenode,ptr,newptr);
 
 	// table name
-	parseTableName(tablenode,*newptr,newptr);
+	parseName(tablenode,*newptr,newptr);
 
 	// column and constrain definitions
 	if (!parseColumnAndConstraintDefinitions(tablenode,*newptr,newptr)) {
@@ -92,15 +115,24 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 	}
 }
 
+const char *sqlparser::_table="table";
+
 bool sqlparser::parseIfNotExists(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	if (!ifNotExistsClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_if_not_exists);
+	newNode(currentnode,_if_not_exists);
 	return true;
 }
+
+bool sqlparser::ifNotExistsClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"if not exists ");
+}
+
+const char *sqlparser::_if_not_exists="if_not_exists";
 
 bool sqlparser::parseColumnAndConstraintDefinitions(
 						xmldomnode *currentnode,
@@ -115,14 +147,14 @@ bool sqlparser::parseColumnAndConstraintDefinitions(
 	}
 
 	// create new node
-	xmldomnode	*columnsnode=newNode(currentnode,sqlelement::_columns);
+	xmldomnode	*columnsnode=newNode(currentnode,_columns);
 
 	// column and constraint definitions
 	for (;;) {
 
 		// create column definition node
 		xmldomnode	*coldefnode=newNode(columnsnode,
-							sqlelement::_column);
+							_column);
 
 		// FIXME: handle constraints here
 
@@ -145,13 +177,16 @@ bool sqlparser::parseColumnAndConstraintDefinitions(
 	}
 }
 
+const char *sqlparser::_columns="columns";
+const char *sqlparser::_column="column";
+
 bool sqlparser::parseColumnDefinition(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
 
 	// column name
-	if (!parseColumnName(currentnode,ptr,newptr)) {
+	if (!parseName(currentnode,ptr,newptr)) {
 		debugPrintf("missing column name\n");
 		return false;
 	}
@@ -191,7 +226,7 @@ bool sqlparser::parseConstraints(xmldomnode *currentnode,
 		// create constraints node
 		if (!constraintsnode) {
 			constraintsnode=
-				newNode(currentnode,sqlelement::_constraints);
+				newNode(currentnode,_constraints);
 		}
 
 		// look for known constraints
@@ -228,6 +263,8 @@ bool sqlparser::parseConstraints(xmldomnode *currentnode,
 	return true;
 }
 
+const char *sqlparser::_constraints="constraints";
+
 bool sqlparser::parseUnsigned(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
@@ -235,10 +272,17 @@ bool sqlparser::parseUnsigned(xmldomnode *currentnode,
 	if (!unsignedClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_unsigned);
+	newNode(currentnode,_unsigned);
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::unsignedClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"unsigned");
+}
+
+const char *sqlparser::_unsigned="unsigned";
 
 bool sqlparser::parseZeroFill(xmldomnode *currentnode,
 						const char *ptr,
@@ -247,10 +291,17 @@ bool sqlparser::parseZeroFill(xmldomnode *currentnode,
 	if (!zeroFillClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_zerofill);
+	newNode(currentnode,_zerofill);
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::zeroFillClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"zerofill");
+}
+
+const char *sqlparser::_zerofill="zerofill";
 
 bool sqlparser::parseBinary(xmldomnode *currentnode,
 						const char *ptr,
@@ -259,10 +310,17 @@ bool sqlparser::parseBinary(xmldomnode *currentnode,
 	if (!binaryClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_binary);
+	newNode(currentnode,_binary);
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::binaryClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"binary");
+}
+
+const char *sqlparser::_binary="binary";
 
 bool sqlparser::parseCharacterSet(xmldomnode *currentnode,
 						const char *ptr,
@@ -276,10 +334,23 @@ bool sqlparser::parseCharacterSet(xmldomnode *currentnode,
 
 	// character set itself
 	char	*word=getWord(*newptr,newptr);
-	newNode(currentnode,sqlelement::_character_set,word);
+	newNode(currentnode,_character_set,word);
 	delete[] word;
 	return true;
 }
+
+bool sqlparser::characterSetClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"character set ",
+		"char set ",
+		"charset ",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
+}
+
+const char *sqlparser::_character_set="character_set";
 
 bool sqlparser::parseCollate(xmldomnode *currentnode,
 						const char *ptr,
@@ -293,10 +364,17 @@ bool sqlparser::parseCollate(xmldomnode *currentnode,
 
 	// collation itself
 	char	*word=getWord(*newptr,newptr);
-	newNode(currentnode,sqlelement::_collate,word);
+	newNode(currentnode,_collate,word);
 	delete[] word;
 	return true;
 }
+
+bool sqlparser::collateClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"collate");
+}
+
+const char *sqlparser::_collate="collate";
 
 bool sqlparser::parseNull(xmldomnode *currentnode,
 						const char *ptr,
@@ -305,10 +383,22 @@ bool sqlparser::parseNull(xmldomnode *currentnode,
 	if (!nullClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_null);
+	newNode(currentnode,_null);
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::nullClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"nullable",
+		"null",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
+}
+
+const char *sqlparser::_null="null";
 
 bool sqlparser::parseNotNull(xmldomnode *currentnode,
 						const char *ptr,
@@ -317,10 +407,22 @@ bool sqlparser::parseNotNull(xmldomnode *currentnode,
 	if (!notNullClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_not_null);
+	newNode(currentnode,_not_null);
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::notNullClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"not nullable",
+		"not null",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
+}
+
+const char *sqlparser::_not_null="not_null";
 
 bool sqlparser::parseDefault(xmldomnode *currentnode,
 						const char *ptr,
@@ -334,12 +436,24 @@ bool sqlparser::parseDefault(xmldomnode *currentnode,
 
 	// value itself
 	char	*value=getVerbatim(*newptr,newptr);
-	newNode(currentnode,sqlelement::_default,value);
+	newNode(currentnode,_default,value);
 	delete[] value;
 
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::defaultClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"default value ",
+		"default ",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
+}
+
+const char *sqlparser::_default="default";
 
 bool sqlparser::parseAutoIncrement(xmldomnode *currentnode,
 						const char *ptr,
@@ -348,10 +462,17 @@ bool sqlparser::parseAutoIncrement(xmldomnode *currentnode,
 	if (!autoIncrementClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_auto_increment);
+	newNode(currentnode,_auto_increment);
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::autoIncrementClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"auto_increment");
+}
+
+const char *sqlparser::_auto_increment="auto_increment";
 
 bool sqlparser::parseUniqueKey(xmldomnode *currentnode,
 						const char *ptr,
@@ -360,10 +481,22 @@ bool sqlparser::parseUniqueKey(xmldomnode *currentnode,
 	if (!uniqueKeyClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_unique_key);
+	newNode(currentnode,_unique_key);
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::uniqueKeyClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"unique key",
+		"unique",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
+}
+
+const char *sqlparser::_unique_key="unique_key";
 
 bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
 						const char *ptr,
@@ -372,10 +505,17 @@ bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
 	if (!primaryKeyClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_primary_key);
+	newNode(currentnode,_primary_key);
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::primaryKeyClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"primary key");
+}
+
+const char *sqlparser::_primary_key="primary_key";
 
 bool sqlparser::parseKey(xmldomnode *currentnode,
 						const char *ptr,
@@ -384,10 +524,17 @@ bool sqlparser::parseKey(xmldomnode *currentnode,
 	if (!keyClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_key);
+	newNode(currentnode,_key);
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::keyClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"key");
+}
+
+const char *sqlparser::_key="key";
 
 bool sqlparser::parseComment(xmldomnode *currentnode,
 						const char *ptr,
@@ -401,12 +548,19 @@ bool sqlparser::parseComment(xmldomnode *currentnode,
 
 	// comment itself
 	char	*value=getVerbatim(*newptr,newptr);
-	newNode(currentnode,sqlelement::_comment,value);
+	newNode(currentnode,_comment,value);
 	delete[] value;
 
 	space(*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::commentClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"comment ");
+}
+
+const char *sqlparser::_comment="comment";
 
 bool sqlparser::parseColumnFormat(xmldomnode *currentnode,
 						const char *ptr,
@@ -420,10 +574,17 @@ bool sqlparser::parseColumnFormat(xmldomnode *currentnode,
 
 	// format itself
 	char	*word=getWord(*newptr,newptr);
-	newNode(currentnode,sqlelement::_column_format,word);
+	newNode(currentnode,_column_format,word);
 	delete[] word;
 	return true;
 }
+
+bool sqlparser::columnFormatClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"column_format ");
+}
+
+const char *sqlparser::_column_format="column_format";
 
 bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 						const char *ptr,
@@ -437,10 +598,10 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 
 	// create references node
 	xmldomnode	*referencesnode=newNode(currentnode,
-						sqlelement::_references);
+						_references);
 
 	// table name
-	if (!parseTableName(referencesnode,*newptr,newptr)) {
+	if (!parseName(referencesnode,*newptr,newptr)) {
 		debugPrintf("missing table name\n");
 		return false;
 	}
@@ -486,13 +647,20 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 	return true;
 }
 
+bool sqlparser::referencesClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"references ");
+}
+
+const char *sqlparser::_references="references";
+
 bool sqlparser::parseReferenceColumns(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
 
 	// create new node
-	xmldomnode	*columnsnode=newNode(currentnode,sqlelement::_columns);
+	xmldomnode	*columnsnode=newNode(currentnode,_columns);
 
 	*newptr=ptr;
 	for (;;) {
@@ -506,8 +674,8 @@ bool sqlparser::parseReferenceColumns(xmldomnode *currentnode,
 
 		// create new node
 		xmldomnode	*columnnode=
-				newNode(columnsnode,sqlelement::_column);
-		newNode(columnnode,sqlelement::_name,column);
+				newNode(columnsnode,_column);
+		newNode(columnnode,_name,column);
 
 		// clean up
 		delete[] column;
@@ -536,10 +704,17 @@ bool sqlparser::parseMatch(xmldomnode *currentnode,
 
 	// match option itself
 	char	*word=getWord(*newptr,newptr);
-	newNode(currentnode,sqlelement::_match,word);
+	newNode(currentnode,_match,word);
 	delete[] word;
 	return true;
 }
+
+bool sqlparser::matchClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"match ");
+}
+
+const char *sqlparser::_match="match";
 
 bool sqlparser::parseOnDelete(xmldomnode *currentnode,
 						const char *ptr,
@@ -553,7 +728,7 @@ bool sqlparser::parseOnDelete(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*ondeletenode=
-			newNode(currentnode,sqlelement::_on_delete);
+			newNode(currentnode,_on_delete);
 
 	// reference option
 	if (!parseReferenceOption(ondeletenode,*newptr,newptr)) {
@@ -561,6 +736,13 @@ bool sqlparser::parseOnDelete(xmldomnode *currentnode,
 	}
 	return true;
 }
+
+bool sqlparser::onDeleteClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"on delete ");
+}
+
+const char *sqlparser::_on_delete="on_delete";
 
 bool sqlparser::parseOnUpdate(xmldomnode *currentnode,
 						const char *ptr,
@@ -574,7 +756,7 @@ bool sqlparser::parseOnUpdate(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*onupdatenode=
-			newNode(currentnode,sqlelement::_on_update);
+			newNode(currentnode,_on_update);
 
 	// reference option
 	if (!parseReferenceOption(onupdatenode,*newptr,newptr)) {
@@ -582,6 +764,13 @@ bool sqlparser::parseOnUpdate(xmldomnode *currentnode,
 	}
 	return true;
 }
+
+bool sqlparser::onUpdateClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"on update ");
+}
+
+const char *sqlparser::_on_update="on_update";
 
 bool sqlparser::parseReferenceOption(xmldomnode *currentnode,
 						const char *ptr,
@@ -597,7 +786,7 @@ bool sqlparser::parseReferenceOption(xmldomnode *currentnode,
 	char	*value=getClause(ptr,*newptr);
 
 	// store it in the value attribute
-	setAttribute(currentnode,sqlelement::_value,value);
+	setAttribute(currentnode,_value,value);
 
 	// clean up
 	delete[] value;
@@ -607,6 +796,18 @@ bool sqlparser::parseReferenceOption(xmldomnode *currentnode,
 
 	// success
 	return true;
+}
+
+bool sqlparser::referenceOptionClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"restrict",
+		"cascade",
+		"set null",
+		"no action",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
 }
 
 bool sqlparser::parseOnCommit(xmldomnode *currentnode,
@@ -621,7 +822,7 @@ bool sqlparser::parseOnCommit(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*oncommitnode=
-			newNode(currentnode,sqlelement::_on_commit);
+			newNode(currentnode,_on_commit);
 
 	// on commit option
 	const char	*startptr=*newptr;
@@ -633,7 +834,7 @@ bool sqlparser::parseOnCommit(xmldomnode *currentnode,
 	char	*value=getClause(startptr,*newptr);
 
 	// store it in the value attribute
-	setAttribute(oncommitnode,sqlelement::_value,value);
+	setAttribute(oncommitnode,_value,value);
 
 	// clean up
 	delete[] value;
@@ -645,12 +846,36 @@ bool sqlparser::parseOnCommit(xmldomnode *currentnode,
 	return true;
 }
 
+bool sqlparser::onCommitClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"on commit ");
+}
+
+const char *sqlparser::_on_commit="on_commit";
+
+bool sqlparser::onCommitOptionClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"delete rows",
+		"preserve rows",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
+}
+
 bool sqlparser::parseAs(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	if (!asClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_as);
+	newNode(currentnode,_as);
 	return true;
 }
+
+bool sqlparser::asClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"as ");
+}
+
+const char *sqlparser::_as="as";

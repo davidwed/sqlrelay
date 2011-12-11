@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlwriter.h>
-#include <sqlelement.h>
+#include <sqlparser.h>
 #include <sqltranslatordebug.h>
 
 sqlwriter::sqlwriter() {
@@ -66,81 +66,85 @@ bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
 const char * const *sqlwriter::baseElements() {
 	debugFunction();
 	static const char *baseelements[]={
-		sqlelement::_name,
-		sqlelement::_type,
-		sqlelement::_size,
-		sqlelement::_value,
-		sqlelement::_verbatim,
+		sqlparser::_name,
+		sqlparser::_type,
+		sqlparser::_size,
+		sqlparser::_value,
+		sqlparser::_verbatim,
 
 		// create query...
-		sqlelement::_create,
-		sqlelement::_create_temporary,
+		sqlparser::_create,
+		sqlparser::_create_temporary,
 
 		// table...
-		sqlelement::_table,
-		sqlelement::_if_not_exists,
+		sqlparser::_table,
+		sqlparser::_if_not_exists,
 
 		// column definitions...
-		sqlelement::_columns,
-		sqlelement::_column,
-		sqlelement::_values,
-		sqlelement::_length,
-		sqlelement::_scale,
+		sqlparser::_columns,
+		sqlparser::_column,
+		sqlparser::_values,
+		sqlparser::_length,
+		sqlparser::_scale,
 
 		// constraints...
-		sqlelement::_constraints,
-		sqlelement::_unsigned,
-		sqlelement::_zerofill,
-		sqlelement::_binary,
-		sqlelement::_character_set,
-		sqlelement::_collate,
-		sqlelement::_null,
-		sqlelement::_not_null,
-		sqlelement::_default,
-		sqlelement::_auto_increment,
-		sqlelement::_unique_key,
-		sqlelement::_primary_key,
-		sqlelement::_key,
-		sqlelement::_comment,
-		sqlelement::_column_format,
-		sqlelement::_references,
-		sqlelement::_match,
-		sqlelement::_on_delete,
-		sqlelement::_on_update,
-		sqlelement::_as,
+		sqlparser::_constraints,
+		sqlparser::_unsigned,
+		sqlparser::_zerofill,
+		sqlparser::_binary,
+		sqlparser::_character_set,
+		sqlparser::_collate,
+		sqlparser::_null,
+		sqlparser::_not_null,
+		sqlparser::_default,
+		sqlparser::_auto_increment,
+		sqlparser::_unique_key,
+		sqlparser::_primary_key,
+		sqlparser::_key,
+		sqlparser::_comment,
+		sqlparser::_column_format,
+		sqlparser::_references,
+		sqlparser::_match,
+		sqlparser::_on_delete,
+		sqlparser::_on_update,
+		sqlparser::_as,
 
 
 		// drop...
-		sqlelement::_drop,
-		sqlelement::_drop_temporary,
-		sqlelement::_if_exists,
-		sqlelement::_table_name_list,
-		sqlelement::_table_name_list_item,
-		sqlelement::_restrict,
-		sqlelement::_cascade,
+		sqlparser::_drop,
+		sqlparser::_drop_temporary,
+		sqlparser::_if_exists,
+		sqlparser::_table_name_list,
+		sqlparser::_table_name_list_item,
+		sqlparser::_restrict,
+		sqlparser::_cascade,
 
 
 		// insert...
-		sqlelement::_insert,
-		sqlelement::_into,
+		sqlparser::_insert,
+		sqlparser::_insert_into,
 
 
 		// update...
-		sqlelement::_update,
+		sqlparser::_update,
 
 
 		// delete...
-		sqlelement::_delete,
+		sqlparser::_delete,
 
 
 		// select...
-		sqlelement::_select,
-		sqlelement::_unique,
-		sqlelement::_distinct,
-		sqlelement::_from,
-		sqlelement::_where,
-		sqlelement::_order_by,
-		sqlelement::_group_by,
+		sqlparser::_select,
+		sqlparser::_unique,
+		sqlparser::_distinct,
+		sqlparser::_from,
+		sqlparser::_where,
+		sqlparser::_group_by,
+		sqlparser::_having,
+		sqlparser::_order_by,
+		sqlparser::_limit,
+		sqlparser::_select_into,
+		sqlparser::_for_update,
 		NULL
 	};
 	return baseelements;
@@ -197,129 +201,145 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	const char	*nodename=node->getName();
 
 	// generic...
-	if (!charstring::compare(nodename,sqlelement::_name)) {
+	if (!charstring::compare(nodename,sqlparser::_name)) {
 		return name(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_type)) {
+	} else if (!charstring::compare(nodename,sqlparser::_type)) {
 		return type(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_size)) {
+	} else if (!charstring::compare(nodename,sqlparser::_size)) {
 		return size(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_value)) {
+	} else if (!charstring::compare(nodename,sqlparser::_value)) {
 		return value(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_verbatim)) {
+	} else if (!charstring::compare(nodename,sqlparser::_verbatim)) {
 		return verbatim(node,output);
 
 	// create query...
-	} else if (!charstring::compare(nodename,sqlelement::_create)) {
+	} else if (!charstring::compare(nodename,sqlparser::_create)) {
 		return createQuery(node,output);
 	} else if (!charstring::compare(nodename,
-					sqlelement::_create_temporary)) {
+					sqlparser::_create_temporary)) {
 		return temporary(node,output);
 
 	// table...
-	} else if (!charstring::compare(nodename,sqlelement::_table)) {
+	} else if (!charstring::compare(nodename,sqlparser::_table)) {
 		return table(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_if_not_exists)) {
+	} else if (!charstring::compare(nodename,sqlparser::_if_not_exists)) {
 		return ifNotExists(node,output);
 
 	// column definitions...
-	} else if (!charstring::compare(nodename,sqlelement::_columns)) {
+	} else if (!charstring::compare(nodename,sqlparser::_columns)) {
 		return columns(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_column)) {
+	} else if (!charstring::compare(nodename,sqlparser::_column)) {
 		return column(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_values)) {
+	} else if (!charstring::compare(nodename,sqlparser::_values)) {
 		return values(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_length)) {
+	} else if (!charstring::compare(nodename,sqlparser::_length)) {
 		return length(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_scale)) {
+	} else if (!charstring::compare(nodename,sqlparser::_scale)) {
 		return scale(node,output);
 
 	// constraints...
-	} else if (!charstring::compare(nodename,sqlelement::_constraints)) {
+	} else if (!charstring::compare(nodename,sqlparser::_constraints)) {
 		return constraints(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_unsigned)) {
+	} else if (!charstring::compare(nodename,sqlparser::_unsigned)) {
 		return unsignedConstraint(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_zerofill)) {
+	} else if (!charstring::compare(nodename,sqlparser::_zerofill)) {
 		return zerofill(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_binary)) {
+	} else if (!charstring::compare(nodename,sqlparser::_binary)) {
 		return binary(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_character_set)) {
+	} else if (!charstring::compare(nodename,sqlparser::_character_set)) {
 		return characterSet(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_collate)) {
+	} else if (!charstring::compare(nodename,sqlparser::_collate)) {
 		return collate(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_null)) {
+	} else if (!charstring::compare(nodename,sqlparser::_null)) {
 		return nullable(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_not_null)) {
+	} else if (!charstring::compare(nodename,sqlparser::_not_null)) {
 		return notNull(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_default)) {
+	} else if (!charstring::compare(nodename,sqlparser::_default)) {
 		return defaultValue(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_auto_increment)) {
+	} else if (!charstring::compare(nodename,sqlparser::_auto_increment)) {
 		return autoIncrement(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_unique_key)) {
+	} else if (!charstring::compare(nodename,sqlparser::_unique_key)) {
 		return uniqueKey(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_primary_key)) {
+	} else if (!charstring::compare(nodename,sqlparser::_primary_key)) {
 		return primaryKey(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_key)) {
+	} else if (!charstring::compare(nodename,sqlparser::_key)) {
 		return key(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_comment)) {
+	} else if (!charstring::compare(nodename,sqlparser::_comment)) {
 		return comment(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_column_format)) {
+	} else if (!charstring::compare(nodename,sqlparser::_column_format)) {
 		return columnFormat(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_references)) {
+	} else if (!charstring::compare(nodename,sqlparser::_references)) {
 		return references(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_match)) {
+	} else if (!charstring::compare(nodename,sqlparser::_match)) {
 		return match(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_on_delete)) {
+	} else if (!charstring::compare(nodename,sqlparser::_on_delete)) {
 		return onDelete(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_on_update)) {
+	} else if (!charstring::compare(nodename,sqlparser::_on_update)) {
 		return onUpdate(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_on_commit)) {
+	} else if (!charstring::compare(nodename,sqlparser::_on_commit)) {
 		return onCommit(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_as)) {
+	} else if (!charstring::compare(nodename,sqlparser::_as)) {
 		return as(node,output);
 
 
 	// drop...
-	} else if (!charstring::compare(nodename,sqlelement::_drop)) {
+	} else if (!charstring::compare(nodename,sqlparser::_drop)) {
 		return dropQuery(node,output);
 	} else if (!charstring::compare(nodename,
-					sqlelement::_drop_temporary)) {
+					sqlparser::_drop_temporary)) {
 		return temporary(node,output);
 	} else if (!charstring::compare(nodename,
-					sqlelement::_if_exists)) {
+					sqlparser::_if_exists)) {
 		return ifExists(node,output);
 	} else if (!charstring::compare(nodename,
-					sqlelement::_restrict)) {
+					sqlparser::_restrict)) {
 		return restrictClause(node,output);
 	} else if (!charstring::compare(nodename,
-					sqlelement::_cascade)) {
+					sqlparser::_cascade)) {
 		return cascade(node,output);
 
 	// insert...
-	} else if (!charstring::compare(nodename,sqlelement::_insert)) {
+	} else if (!charstring::compare(nodename,sqlparser::_insert)) {
 		return insertQuery(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_into)) {
-		return into(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_insert_into)) {
+		return insertInto(node,output);
 
 
 	// update...
-	} else if (!charstring::compare(nodename,sqlelement::_update)) {
+	} else if (!charstring::compare(nodename,sqlparser::_update)) {
 		return updateQuery(node,output);
 
 
 	// delete...
-	} else if (!charstring::compare(nodename,sqlelement::_delete)) {
+	} else if (!charstring::compare(nodename,sqlparser::_delete)) {
 		return deleteQuery(node,output);
 
 
 	// select...
-	} else if (!charstring::compare(nodename,sqlelement::_select)) {
+	} else if (!charstring::compare(nodename,sqlparser::_select)) {
 		return selectQuery(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_unique)) {
+	} else if (!charstring::compare(nodename,sqlparser::_unique)) {
 		return unique(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_distinct)) {
+	} else if (!charstring::compare(nodename,sqlparser::_distinct)) {
 		return distinct(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_where)) {
+	} else if (!charstring::compare(nodename,sqlparser::_from)) {
+		return from(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_where)) {
 		return where(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_group_by)) {
+		return groupBy(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_having)) {
+		return having(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_order_by)) {
+		return orderBy(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_limit)) {
+		return limit(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_select_into)) {
+		return selectInto(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_procedure)) {
+		return procedure(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_for_update)) {
+		return forUpdate(node,output);
 	}
 	return true;
 }
@@ -330,22 +350,22 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 	const char	*nodename=node->getName();
 
 	// generic...
-	if (!charstring::compare(nodename,sqlelement::_type)) {
+	if (!charstring::compare(nodename,sqlparser::_type)) {
 		return endType(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_size)) {
+	} else if (!charstring::compare(nodename,sqlparser::_size)) {
 		return endSize(node,output);
 
 	// column definitions...
-	} else if (!charstring::compare(nodename,sqlelement::_columns)) {
+	} else if (!charstring::compare(nodename,sqlparser::_columns)) {
 		return endColumns(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_column)) {
+	} else if (!charstring::compare(nodename,sqlparser::_column)) {
 		return endColumn(node,output);
-	} else if (!charstring::compare(nodename,sqlelement::_values)) {
+	} else if (!charstring::compare(nodename,sqlparser::_values)) {
 		return endValues(node,output);
 
 	// drop...
 	} else if (!charstring::compare(nodename,
-					sqlelement::_table_name_list_item)) {
+					sqlparser::_table_name_list_item)) {
 		return endTableNameListItem(node,output);
 	}
 	return true;
@@ -353,7 +373,7 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 
 bool sqlwriter::outputValue(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
-	output->append(node->getAttributeValue(sqlelement::_value));
+	output->append(node->getAttributeValue(sqlparser::_value));
 	return true;
 }
 

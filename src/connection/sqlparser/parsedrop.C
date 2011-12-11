@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
-#include <sqlelement.h>
 #include <sqltranslatordebug.h>
 
 bool sqlparser::parseDrop(xmldomnode *currentnode,
@@ -18,14 +17,13 @@ bool sqlparser::parseDrop(xmldomnode *currentnode,
 	}
 
 	// create the node
-	xmldomnode	*dropnode=
-			newNode(currentnode,sqlelement::_drop);
+	xmldomnode	*dropnode=newNode(currentnode,_drop);
 
 	// temporary
 	parseDropTemporary(dropnode,*newptr,newptr);
 
 	// table, index, etc.
-	if (tableClause(*newptr,newptr)) {
+	if (comparePart(*newptr,newptr,"table ")) {
 		return parseDropTable(dropnode,*newptr,newptr);
 	}
 
@@ -34,15 +32,24 @@ bool sqlparser::parseDrop(xmldomnode *currentnode,
 	return true;
 }
 
+bool sqlparser::dropClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"drop ");
+}
+
+const char *sqlparser::_drop="drop";
+
 bool sqlparser::parseDropTemporary(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	if (!temporaryClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_drop_temporary);
+	newNode(currentnode,_drop_temporary);
 	return true;
 }
+
+const char *sqlparser::_drop_temporary="drop_temporary";
 
 bool sqlparser::parseDropTable(xmldomnode *currentnode,
 					const char *ptr,
@@ -50,7 +57,7 @@ bool sqlparser::parseDropTable(xmldomnode *currentnode,
 	debugFunction();
 
 	// create new node
-	xmldomnode	*tablenode=newNode(currentnode,sqlelement::_table);
+	xmldomnode	*tablenode=newNode(currentnode,_table);
 
 	// if not exists
 	parseIfExists(tablenode,ptr,newptr);
@@ -79,9 +86,16 @@ bool sqlparser::parseIfExists(xmldomnode *currentnode,
 	if (!ifExistsClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_if_exists);
+	newNode(currentnode,_if_exists);
 	return true;
 }
+
+bool sqlparser::ifExistsClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"if exists ");
+}
+
+const char *sqlparser::_if_exists="if_exists";
 
 bool sqlparser::parseTableNameList(xmldomnode *currentnode,
 					const char *ptr,
@@ -89,18 +103,17 @@ bool sqlparser::parseTableNameList(xmldomnode *currentnode,
 	debugFunction();
 
 	// create the node
-	xmldomnode	*tablesnode=
-			newNode(currentnode,sqlelement::_table_name_list);
+	xmldomnode	*tablesnode=newNode(currentnode,_table_name_list);
 
 	*newptr=ptr;
 	for (;;) {
 
 		// create the node
 		xmldomnode	*tablenode=
-			newNode(tablesnode,sqlelement::_table_name_list_item);
+				newNode(tablesnode,_table_name_list_item);
 
 		// get the table name
-		if (!parseTableName(tablenode,*newptr,newptr)) {
+		if (!parseName(tablenode,*newptr,newptr)) {
 			return false;
 		}
 
@@ -111,7 +124,7 @@ bool sqlparser::parseTableNameList(xmldomnode *currentnode,
 
 		// if there's a space afterward, we're done getting table names
 		// (we have to check 1 char back because the space would have
-		// been consumed by the parseTableName call above)
+		// been consumed by the parseName call above)
 		if (*(*newptr-1)==' ') {
 			return true;
 		}
@@ -125,6 +138,9 @@ bool sqlparser::parseTableNameList(xmldomnode *currentnode,
 	}
 }
 
+const char *sqlparser::_table_name_list="table_name_list";
+const char *sqlparser::_table_name_list_item="table_name_list_item";
+
 bool sqlparser::parseRestrict(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
@@ -132,9 +148,16 @@ bool sqlparser::parseRestrict(xmldomnode *currentnode,
 	if (!restrictClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_restrict);
+	newNode(currentnode,_restrict);
 	return true;
 }
+
+bool sqlparser::restrictClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"restrict");
+}
+
+const char *sqlparser::_restrict="restrict";
 
 bool sqlparser::parseCascade(xmldomnode *currentnode,
 					const char *ptr,
@@ -143,6 +166,18 @@ bool sqlparser::parseCascade(xmldomnode *currentnode,
 	if (!cascadeClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,sqlelement::_cascade);
+	newNode(currentnode,_cascade);
 	return true;
 }
+
+bool sqlparser::cascadeClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char *parts[]={
+		"cascade",
+		"cascade constraints",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
+}
+
+const char *sqlparser::_cascade="cascade";

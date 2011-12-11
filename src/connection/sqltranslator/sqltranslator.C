@@ -4,7 +4,7 @@
 #include <sqltranslator.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
-#include <sqlelement.h>
+#include <sqlparser.h>
 #include <sqltranslatordebug.h>
 
 sqltranslator::sqltranslator() {
@@ -97,7 +97,7 @@ xmldomnode *sqltranslator::newNode(xmldomnode *parentnode, const char *type) {
 xmldomnode *sqltranslator::newNode(xmldomnode *parentnode,
 				const char *type, const char *value) {
 	xmldomnode	*node=newNode(parentnode,type);
-	setAttribute(node,sqlelement::_value,value);
+	setAttribute(node,sqlparser::_value,value);
 	return node;
 }
 
@@ -127,7 +127,7 @@ xmldomnode *sqltranslator::newNodeAfter(xmldomnode *parentnode,
 						const char *type,
 						const char *value) {
 	xmldomnode	*retval=newNodeAfter(parentnode,node,type);
-	setAttribute(retval,sqlelement::_value,value);
+	setAttribute(retval,sqlparser::_value,value);
 	return retval;
 }
 

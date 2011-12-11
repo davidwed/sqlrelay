@@ -4,7 +4,6 @@
 #include <rudiments/charstring.h>
 #include <rudiments/stringbuffer.h>
 #include <sqlparser.h>
-#include <sqlelement.h>
 #include <sqltranslatordebug.h>
 
 sqlparser::sqlparser() {
@@ -31,7 +30,7 @@ xmldomnode *sqlparser::newNode(xmldomnode *parentnode, const char *type) {
 xmldomnode *sqlparser::newNode(xmldomnode *parentnode,
 				const char *type, const char *value) {
 	xmldomnode	*node=newNode(parentnode,type);
-	setAttribute(node,sqlelement::_value,value);
+	setAttribute(node,_value,value);
 	return node;
 }
 

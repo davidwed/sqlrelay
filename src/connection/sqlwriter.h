@@ -143,7 +143,7 @@ class sqlwriter {
 		// insert...
 		virtual bool	insertQuery(xmldomnode *node,
 						stringbuffer *output);
-		virtual bool	into(xmldomnode *node,
+		virtual bool	insertInto(xmldomnode *node,
 						stringbuffer *output);
 
 
@@ -164,7 +164,23 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	distinct(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	from(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	where(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	groupBy(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	having(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	orderBy(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	limit(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	selectInto(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	procedure(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	forUpdate(xmldomnode *node,
 						stringbuffer *output);
 
 

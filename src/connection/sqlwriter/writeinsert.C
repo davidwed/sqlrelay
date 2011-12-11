@@ -10,7 +10,7 @@ bool sqlwriter::insertQuery(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlwriter::into(xmldomnode *node, stringbuffer *output) {
+bool sqlwriter::insertInto(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("into");
 	return true;

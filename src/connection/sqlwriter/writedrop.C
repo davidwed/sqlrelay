@@ -4,7 +4,6 @@
 #include <sqlwriter.h>
 #include <sqltranslatordebug.h>
 
-
 bool sqlwriter::dropQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("drop");

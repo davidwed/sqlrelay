@@ -4,7 +4,6 @@
 #include <sqlwriter.h>
 #include <sqltranslatordebug.h>
 
-
 bool sqlwriter::name(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);

@@ -76,7 +76,6 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrcursor/translatequery.C \
 	sqlrcursor/abort.C \
 	sqlrcursor/sid.C \
-	sqlelement/sqlelement.C \
 	sqlparser/clauses.C \
 	sqlparser/parse.C \
 	sqlparser/parsecreate.C \
@@ -164,7 +163,6 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrcursor/translatequery.lo \
 	sqlrcursor/abort.lo \
 	sqlrcursor/sid.lo \
-	sqlelement/sqlelement.lo \
 	sqlparser/clauses.lo \
 	sqlparser/parse.lo \
 	sqlparser/parsecreate.lo \

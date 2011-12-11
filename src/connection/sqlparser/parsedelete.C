@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
-#include <sqlelement.h>
 #include <sqltranslatordebug.h>
 
 bool sqlparser::parseDelete(xmldomnode *currentnode,
@@ -18,10 +17,16 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 	}
 
 	// create the node
-	xmldomnode	*deletenode=
-			newNode(currentnode,sqlelement::_delete);
+	xmldomnode	*deletenode=newNode(currentnode,_delete);
 
 	// FIXME: implement this for real
 	parseRemainderVerbatim(deletenode,*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::deleteClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"delete ");
+}
+
+const char *sqlparser::_delete="delete";

@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
-#include <sqlelement.h>
 #include <sqltranslatordebug.h>
 
 bool sqlparser::parseUpdate(xmldomnode *currentnode,
@@ -18,10 +17,16 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 	}
 
 	// create the node
-	xmldomnode	*updatenode=
-			newNode(currentnode,sqlelement::_update);
+	xmldomnode	*updatenode=newNode(currentnode,_update);
 
 	// FIXME: implement this for real
 	parseRemainderVerbatim(updatenode,*newptr,newptr);
 	return true;
 }
+
+bool sqlparser::updateClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"update ");
+}
+
+const char *sqlparser::_update="update";

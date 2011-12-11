@@ -4,7 +4,6 @@
 #include <sqlwriter.h>
 #include <sqltranslatordebug.h>
 
-
 bool sqlwriter::deleteQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("delete");
