@@ -176,7 +176,8 @@ bool sqlparser::parseQuery(xmldomnode *currentnode,
 		parseInsert(currentnode,ptr,newptr) ||
 		parseUpdate(currentnode,ptr,newptr) ||
 		parseDelete(currentnode,ptr,newptr) ||
-		parseSelect(currentnode,ptr,newptr);
+		parseSelect(currentnode,ptr,newptr) ||
+		parseSet(currentnode,ptr,newptr);
 }
 
 bool sqlparser::parseName(xmldomnode *currentnode,

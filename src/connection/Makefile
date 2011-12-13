@@ -84,6 +84,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlparser/parseinsert.C \
 	sqlparser/parseselect.C \
 	sqlparser/parseupdate.C \
+	sqlparser/parseset.C \
 	sqlparser/sqlparser.C \
 	sqlwriter/sqlwriter.C \
 	sqlwriter/writecreate.C \
@@ -93,6 +94,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlwriter/writeinsert.C \
 	sqlwriter/writeselect.C \
 	sqlwriter/writeupdate.C \
+	sqlwriter/writeset.C \
 	sqltranslator/sqltranslator.C
 LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/sqlrconnectiondtor.lo \
@@ -171,6 +173,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlparser/parseinsert.lo \
 	sqlparser/parseselect.lo \
 	sqlparser/parseupdate.lo \
+	sqlparser/parseset.lo \
 	sqlparser/sqlparser.lo \
 	sqlwriter/sqlwriter.lo \
 	sqlwriter/writecreate.lo \
@@ -180,6 +183,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlwriter/writeinsert.lo \
 	sqlwriter/writeselect.lo \
 	sqlwriter/writeupdate.lo \
+	sqlwriter/writeset.lo \
 	sqltranslator/sqltranslator.lo
 
 .SUFFIXES: .lo

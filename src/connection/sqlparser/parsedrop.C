@@ -8,10 +8,9 @@ bool sqlparser::parseDrop(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
-	*newptr=ptr;
 
 	// look for a drop clause
-	if (!dropClause(*newptr,newptr)) {
+	if (!dropClause(ptr,newptr)) {
 		debugPrintf("no drop clause\n");
 		return false;
 	}

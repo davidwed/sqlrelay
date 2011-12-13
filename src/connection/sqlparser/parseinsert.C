@@ -8,10 +8,9 @@ bool sqlparser::parseInsert(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
-	*newptr=ptr;
 
 	// look for a insert clause
-	if (!insertClause(*newptr,newptr)) {
+	if (!insertClause(ptr,newptr)) {
 		debugPrintf("no insert clause\n");
 		return false;
 	}

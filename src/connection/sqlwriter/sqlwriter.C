@@ -145,6 +145,14 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_limit,
 		sqlparser::_select_into,
 		sqlparser::_for_update,
+
+		// set...
+		sqlparser::_set,
+		sqlparser::_set_session,
+		sqlparser::_set_global,
+		sqlparser::_transaction,
+		sqlparser::_isolation_level,
+
 		NULL
 	};
 	return baseelements;
@@ -340,6 +348,16 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return procedure(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_for_update)) {
 		return forUpdate(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_set)) {
+		return setQuery(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_set_session)) {
+		return setSession(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_set_global)) {
+		return setGlobal(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_transaction)) {
+		return transaction(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_isolation_level)) {
+		return isolationLevel(node,output);
 	}
 	return true;
 }

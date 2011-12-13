@@ -184,6 +184,19 @@ class sqlwriter {
 						stringbuffer *output);
 
 
+		// set...
+		virtual bool	setQuery(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	setSession(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	setGlobal(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	transaction(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	isolationLevel(xmldomnode *node,
+						stringbuffer *output);
+
+
 
 		// helper methods
 		virtual bool	outputValue(xmldomnode *node,

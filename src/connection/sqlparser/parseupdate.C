@@ -8,10 +8,9 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
-	*newptr=ptr;
 
 	// look for a update clause
-	if (!updateClause(*newptr,newptr)) {
+	if (!updateClause(ptr,newptr)) {
 		debugPrintf("no update clause\n");
 		return false;
 	}

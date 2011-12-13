@@ -420,6 +420,44 @@ class sqlparser {
 						const char **newptr);
 		static const char *_for_update;
 
+
+		// set query...
+		bool parseSet(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool setClause(const char *ptr, const char **newptr);
+		static const char *_set;
+		bool parseSetGlobal(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool setGlobalClause(const char *ptr, const char **newptr);
+		static const char *_set_global;
+		bool parseSetSession(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool setSessionClause(const char *ptr, const char **newptr);
+		static const char *_set_session;
+		bool parseTransaction(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool transactionClause(const char *ptr,
+						const char **newptr);
+		static const char *_transaction;
+		bool parseIsolationLevel(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool isolationLevelClause(const char *ptr,
+						const char **newptr);
+		static const char *_isolation_level;
+		bool isolationLevelOptionClause(const char *ptr,
+						const char **newptr);
+		bool parseTransactionName(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool transactionNameClause(const char *ptr,
+						const char **newptr);
+		static const char *_transaction_name;
+
 		xmldom	*tree;
 };
 

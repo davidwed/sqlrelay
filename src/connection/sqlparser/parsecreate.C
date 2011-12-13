@@ -28,7 +28,7 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 
 	// for now we only support tables
 	parseRemainderVerbatim(createnode,*newptr,newptr);
-	return false;
+	return true;
 }
 
 bool sqlparser::createClause(const char *ptr, const char **newptr) {

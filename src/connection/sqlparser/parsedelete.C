@@ -8,10 +8,9 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
-	*newptr=ptr;
 
 	// look for a delete clause
-	if (!deleteClause(*newptr,newptr)) {
+	if (!deleteClause(ptr,newptr)) {
 		debugPrintf("no delete clause\n");
 		return false;
 	}
