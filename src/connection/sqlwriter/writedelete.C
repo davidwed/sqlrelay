@@ -9,3 +9,15 @@ bool sqlwriter::deleteQuery(xmldomnode *node, stringbuffer *output) {
 	output->append("delete");
 	return true;
 }
+
+bool sqlwriter::deleteFrom(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("from");
+	return true;
+}
+
+bool sqlwriter::usingClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("using");
+	return true;
+}

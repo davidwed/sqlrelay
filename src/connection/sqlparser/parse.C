@@ -57,8 +57,8 @@ char *sqlparser::getWord(const char *ptr, const char **newptr) {
 	debugFunction();
 
 	// get the next block of whatever until we hit a space,
-	// parenthesis, comma, operator or quotation
-	return getUntil(" (,)~!^*-+=<>/&|'\"",ptr,newptr);
+	// parenthesis, comma, operator, assignment operator or quotation
+	return getUntil(" (,)~!^*-+=<>/&|='\"",ptr,newptr);
 }
 
 char *sqlparser::getClause(const char *ptr, const char *newptr) {

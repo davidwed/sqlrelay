@@ -88,17 +88,16 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 	// on commit (optional)
 	parseOnCommit(tablenode,*newptr,newptr);
 
-	// the remaining clauses are all optional and they could be in any order
+	// parse the remaining clauses
 	for (;;) {
 
 		// known clauses
-		// FIXME: look for other known clauses here
-		// FIXME: technically, if we find an "as" clause then it should
-		// be follwed by a select and that should be the end of the
-		// query.  For now parseAs only parses out the actual "as"
-		// itself and the rest is copied verbatim.  This should
-		// probably be fixed at some point.
 		if (parseAs(tablenode,*newptr,newptr)) {
+			continue;
+		}
+
+		// if we find a select then that's the final clause
+		if (parseSelect(tablenode,*newptr,newptr)) {
 			continue;
 		}
 
@@ -613,7 +612,7 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 	}
 
 	// column names
-	if (!parseReferenceColumns(referencesnode,*newptr,newptr)) {
+	if (!parseColumnNameList(referencesnode,*newptr,newptr)) {
 		return false;
 	}
 
@@ -654,7 +653,7 @@ bool sqlparser::referencesClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_references="references";
 
-bool sqlparser::parseReferenceColumns(xmldomnode *currentnode,
+bool sqlparser::parseColumnNameList(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();

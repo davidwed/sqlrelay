@@ -14,6 +14,11 @@ bool sqlparser::comma(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,",");
 }
 
+bool sqlparser::equals(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"=");
+}
+
 bool sqlparser::leftParen(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"(");

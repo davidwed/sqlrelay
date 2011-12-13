@@ -51,6 +51,7 @@ class sqlparser {
 
 		bool	space(const char *ptr, const char **newptr);
 		bool	comma(const char *ptr, const char **newptr);
+		bool	equals(const char *ptr, const char **newptr);
 		bool	leftParen(const char *ptr, const char **newptr);
 		bool	rightParen(const char *ptr, const char **newptr);
 
@@ -227,7 +228,7 @@ class sqlparser {
 		bool	referencesClause(const char *ptr,
 						const char **newptr);
 		static const char *_references;
-		bool	parseReferenceColumns(xmldomnode *currentnode,
+		bool	parseColumnNameList(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	parseMatch(xmldomnode *currentnode,
@@ -323,6 +324,21 @@ class sqlparser {
 		bool	insertIntoClause(const char *ptr,
 						const char **newptr);
 		static const char *_insert_into;
+		bool	parseInsertValues(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	insertValuesClause(const char *ptr,
+						const char **newptr);
+		static const char *_insert_values;
+		bool	parseInsertValue(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	insertValueClause(const char *ptr,
+						const char **newptr);
+		static const char *_insert_value;
+		bool	parseInsertValuesList(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
 
 
 
@@ -333,6 +349,14 @@ class sqlparser {
 		bool	updateClause(const char *ptr,
 						const char **newptr);
 		static const char *_update;
+		bool	parseUpdateSet(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	updateSetClause(const char *ptr,
+						const char **newptr);
+		static const char *_update_set;
+		static const char *_assignment;
+		static const char *_equals;
 
 
 
@@ -343,6 +367,18 @@ class sqlparser {
 		bool	deleteClause(const char *ptr,
 						const char **newptr);
 		static const char *_delete;
+		bool	parseDeleteFrom(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	deleteFromClause(const char *ptr,
+						const char **newptr);
+		static const char *_delete_from;
+		bool	parseUsing(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	usingClause(const char *ptr,
+						const char **newptr);
+		static const char *_using;
 
 
 

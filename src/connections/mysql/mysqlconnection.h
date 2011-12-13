@@ -6,6 +6,7 @@
 
 
 #include <sqlrconnection.h>
+#include <sqlwriter.h>
 
 #include <rudiments/regularexpression.h>
 
@@ -145,6 +146,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		bool		autoCommitOff();
 		bool		commit();
 		bool		rollback();
+		sqlwriter	*getSqlWriter();
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		short		nonNullBindValue();
 		short		nullBindValue();

@@ -1,6 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
+#include <mysqlsqlwriter.h>
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <mysqlconnection.h>
@@ -316,6 +317,10 @@ bool mysqlconnection::rollback() {
 	// do nothing
 	return true;
 #endif
+}
+
+sqlwriter *mysqlconnection::getSqlWriter() {
+	return new mysqlsqlwriter;
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE

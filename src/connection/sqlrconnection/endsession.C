@@ -64,10 +64,6 @@ void sqlrconnection_svr::endSessionInternal() {
 	dbgfile.debugPrint("connection",1,"done ending session");
 
 	// set isolation level
-printf("isolationlevel param=%s\n",isolationlevel);
-printf("isolationlevel to use=%s\n",charstring::length(isolationlevel)?
-						isolationlevel:
-						getDefaultIsolationLevel());
 	setIsolationLevel(charstring::length(isolationlevel)?
 						isolationlevel:
 						getDefaultIsolationLevel());

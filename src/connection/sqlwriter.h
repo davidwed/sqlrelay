@@ -145,15 +145,35 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	insertInto(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	insertValues(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endInsertValues(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	insertValue(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endInsertValue(xmldomnode *node,
+						stringbuffer *output);
 
 
 		// update...
 		virtual bool	updateQuery(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	updateSet(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	assignment(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endAssignment(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	equals(xmldomnode *node,
+						stringbuffer *output);
 
 
 		// delete...
 		virtual bool	deleteQuery(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	deleteFrom(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	usingClause(xmldomnode *node,
 						stringbuffer *output);
 
 

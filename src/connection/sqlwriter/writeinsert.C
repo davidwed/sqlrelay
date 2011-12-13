@@ -15,3 +15,27 @@ bool sqlwriter::insertInto(xmldomnode *node, stringbuffer *output) {
 	output->append("into");
 	return true;
 }
+
+bool sqlwriter::insertValues(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("values (");
+	return true;
+}
+
+bool sqlwriter::insertValue(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("value (");
+	return true;
+}
+
+bool sqlwriter::endInsertValues(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(")");
+	return true;
+}
+
+bool sqlwriter::endInsertValue(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(")");
+	return true;
+}

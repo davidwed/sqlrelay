@@ -11,7 +11,7 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 
 	// look for a delete clause
 	if (!deleteClause(ptr,newptr)) {
-		debugPrintf("no delete clause\n");
+		debugPrintf("missing delete clause\n");
 		return false;
 	}
 
@@ -21,8 +21,38 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 	// parse the delete clauses
 	for (;;) {
 
+		// look for the from clause
+		if (parseDeleteFrom(deletenode,*newptr,newptr)) {
+			debugPrintf("missing from clause\n");
+			break;
+		}
+
+		// If we didn't encounter one of the known clauses
+		// then there must be something in there that we don't
+		// understand.  It needs to be copied verbatim until we run
+		// into something that we do understand.
+		if (parseVerbatim(deletenode,*newptr,newptr)) {
+			space(*newptr,newptr);
+		} else {
+			break;
+		}
+	}
+
+	// table name
+	// FIXME: in mysql, multiple tables may be specified
+	if (!parseName(deletenode,*newptr,newptr)) {
+		debugPrintf("missing table name\n");
+		return false;
+	}
+
+	// parse the remaining clauses
+	for (;;) {
+
 		// look for known options
-		if (parseWhere(deletenode,*newptr,newptr)) {
+		if (parseUsing(deletenode,*newptr,newptr) ||
+			parseWhere(deletenode,*newptr,newptr) ||
+			parseOrderBy(deletenode,*newptr,newptr) ||
+			parseLimit(deletenode,*newptr,newptr)) {
 			continue;
 		}
 
@@ -52,3 +82,39 @@ bool sqlparser::deleteClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_delete="delete";
+
+bool sqlparser::parseDeleteFrom(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!deleteFromClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_delete_from);
+	return true;
+}
+
+bool sqlparser::deleteFromClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"from ");
+}
+
+const char *sqlparser::_delete_from="delete_from";
+
+bool sqlparser::parseUsing(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!usingClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_using);
+	return true;
+}
+
+bool sqlparser::usingClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"using ");
+}
+
+const char *sqlparser::_using="using";

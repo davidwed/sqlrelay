@@ -17,8 +17,8 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= mysqlconnection.C main.C
-LOBJS= mysqlconnection.lo main.lo
+SRCS= mysqlconnection.C mysqlsqlwriter.C main.C
+LOBJS= mysqlconnection.lo mysqlsqlwriter.lo main.lo
 DLOBJS= mysqlconnection.d.lo main.d.lo
 
 .SUFFIXES: .lo .d.lo
