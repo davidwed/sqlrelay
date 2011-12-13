@@ -42,6 +42,10 @@ const char * const *oracle8sqlwriter::unsupportedElements() {
 		sqlparser::_drop_temporary,
 		sqlparser::_restrict,
 
+		// set...
+		sqlparser::_set_global,
+		sqlparser::_set_session,
+
 		NULL
 	};
 	return unsupportedelements;
@@ -73,4 +77,19 @@ bool oracle8sqlwriter::as(xmldomnode *node, stringbuffer *output) {
 	// the default behavior when a new query is prepared.
 	sqlrcur->setFakeInputBinds(true);
 	return sqlwriter::as(node,output);
+}
+
+bool oracle8sqlwriter::isolationLevel(xmldomnode *node,
+						stringbuffer *output) {
+	debugFunction();
+	output->append("isolation level ");
+	// Oracle doesn't support "read uncommitted"
+	// Replace it with "read committed" which is close enough.
+	const char	*value=node->getAttributeValue(sqlparser::_value);
+	if (!charstring::compareIgnoringCase(value,"read uncommitted")) {
+		output->append("read committed");
+	} else {
+		output->append(value);
+	}
+	return true;
 }
