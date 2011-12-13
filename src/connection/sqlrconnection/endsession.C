@@ -63,6 +63,16 @@ void sqlrconnection_svr::endSessionInternal() {
 	dbgfile.debugPrint("connection",2,"done resetting autocommit behavior...");
 	dbgfile.debugPrint("connection",1,"done ending session");
 
+	// set isolation level
+printf("isolationlevel param=%s\n",isolationlevel);
+printf("isolationlevel to use=%s\n",charstring::length(isolationlevel)?
+						isolationlevel:
+						getDefaultIsolationLevel());
+	setIsolationLevel(charstring::length(isolationlevel)?
+						isolationlevel:
+						getDefaultIsolationLevel());
+
+	// end the session
 	endSession();
 }
 

@@ -4,7 +4,7 @@
 <instances>
 
 	<!-- Regular SQL Relay Instance -->
-	<instance id="example" port="9000" socket="/tmp/example.socket" dbase="oracle8" connections="3" maxconnections="15" maxqueuelength="5" growby="1" ttl="60" maxsessioncount="1000" endofsession="commit" sessiontimeout="600" runasuser="nobody" runasgroup="nobody" cursors="5" authtier="listener" handoff="pass" deniedips="" allowedips="" debug="none" maxquerysize="65536" maxstringbindvaluelength="4000" maxlobbindvaluelength="71680" idleclienttimeout="-1" maxlisteners="-1" listenertimeout="0" reloginatstart="no" timequeriessec="-1" timequeriesusec="-1" translatebindvariables="no">
+	<instance id="example" port="9000" socket="/tmp/example.socket" dbase="oracle8" connections="3" maxconnections="15" maxqueuelength="5" growby="1" ttl="60" maxsessioncount="1000" endofsession="commit" sessiontimeout="600" runasuser="nobody" runasgroup="nobody" cursors="5" authtier="listener" handoff="pass" deniedips="" allowedips="" debug="none" maxquerysize="65536" maxstringbindvaluelength="4000" maxlobbindvaluelength="71680" idleclienttimeout="-1" maxlisteners="-1" listenertimeout="0" reloginatstart="no" timequeriessec="-1" timequeriesusec="-1" translatebindvariables="no" isolationlevel="read committed">
 		<users>
 			<user user="user1" password="password1"/>
 			<user user="user2" password="password2"/>

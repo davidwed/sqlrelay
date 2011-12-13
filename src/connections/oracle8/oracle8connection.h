@@ -252,6 +252,8 @@ class oracle8connection : public sqlrconnection_svr {
 		const char	*getColumnListQuery(bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
+		const char	*setIsolationLevelQuery();
+		const char	*getDefaultIsolationLevel();
 
 		sqltranslator	*getSqlTranslator();
 		sqlwriter	*getSqlWriter();

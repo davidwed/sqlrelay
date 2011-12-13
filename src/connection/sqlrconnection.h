@@ -70,6 +70,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual const char	*selectDatabaseQuery();
 		virtual char		*getCurrentDatabase();
 		virtual const char	*getCurrentDatabaseQuery();
+		virtual bool		setIsolationLevel(const char *isolevel);
+		virtual const char	*setIsolationLevelQuery();
+		virtual const char	*getDefaultIsolationLevel();
 		virtual const char	*pingQuery();
 		virtual const char	*beginTransactionQuery();
 		virtual bool		ping();
@@ -416,6 +419,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		faketransactionblocksautocommiton;
 
 		bool		translatebinds;
+
+		const char	*isolationlevel;
 
 		int32_t		accepttimeout;
 		bool		suspendedsession;

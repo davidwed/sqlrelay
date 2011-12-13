@@ -167,6 +167,12 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		incrementConnectionCount();
 	}
 
+	// set the transaction isolation level
+	isolationlevel=cfgfl->getIsolationLevel();
+	setIsolationLevel(charstring::length(isolationlevel)?
+						isolationlevel:
+						getDefaultIsolationLevel());
+
 	markDatabaseAvailable();
 
 	// if we're not passing descriptors around, listen on 

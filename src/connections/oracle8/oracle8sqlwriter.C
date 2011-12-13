@@ -83,11 +83,15 @@ bool oracle8sqlwriter::isolationLevel(xmldomnode *node,
 						stringbuffer *output) {
 	debugFunction();
 	output->append("isolation level ");
-	// Oracle doesn't support "read uncommitted"
-	// Replace it with "read committed" which is close enough.
+	// Oracle doesn't support "read uncommitted",
+	// replace it with "read committed" which is close enough.
+	// Oracle also doesn't support "repeatable read"
+	// replace it with "serializable" which is close enough.
 	const char	*value=node->getAttributeValue(sqlparser::_value);
 	if (!charstring::compareIgnoringCase(value,"read uncommitted")) {
 		output->append("read committed");
+	} else if (!charstring::compareIgnoringCase(value,"repeatable read")) {
+		output->append("serializable");
 	} else {
 		output->append(value);
 	}

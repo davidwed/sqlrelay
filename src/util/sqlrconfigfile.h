@@ -75,7 +75,8 @@ typedef enum {
 	TIMEQUERIESSEC_ATTRIBUTE,
 	TIMEQUERIESUSEC_ATTRIBUTE,
 	TRANSLATEBINDVARIABLES_ATTRIBUTE,
-	SQLTRANSLATIONRULES_ATTRIBUTE
+	SQLTRANSLATIONRULES_ATTRIBUTE,
+	ISOLATIONLEVEL_ATTRIBUTE
 } attribute;
 
 class usercontainer {
@@ -212,6 +213,7 @@ class sqlrconfigfile : public xmlsax {
 		int64_t		getTimeQueriesSeconds();
 		int64_t		getTimeQueriesMicroSeconds();
 		bool		getTranslateBindVariables();
+		const char	*getIsolationLevel();
 
 		bool		getSidEnabled();
 		const char	*getSidHost();
@@ -253,39 +255,39 @@ class sqlrconfigfile : public xmlsax {
 		char		**addresses;
 		uint64_t	addresscount;
 		uint16_t	port;
-		const char	*unixport;
+		char		*unixport;
 		bool		listenoninet;
 		bool		listenonunix;
 		char		**mysqladdresses;
 		uint64_t	mysqladdresscount;
 		uint16_t	mysqlport;
-		const char	*mysqlunixport;
+		char		*mysqlunixport;
 		bool		mysqllistenoninet;
 		bool		mysqllistenonunix;
-		const char	*dbase;
+		char		*dbase;
 		uint32_t	connections;
 		uint32_t	maxconnections;
 		uint32_t	maxqueuelength;
 		uint32_t	growby;
 		uint32_t	ttl;
 		uint16_t	maxsessioncount;
-		const char	*endofsession;
+		char		*endofsession;
 		bool		endofsessioncommit;
 		uint32_t	sessiontimeout;
-		const char	*runasuser;
-		const char	*runasgroup;
+		char		*runasuser;
+		char		*runasgroup;
 		uint16_t	cursors;
 		uint16_t	maxcursors;
 		uint16_t	cursorsgrowby;
-		const char	*authtier;
+		char		*authtier;
 		bool		authonlistener;
 		bool		authonconnection;
 		bool		authondatabase;
-		const char	*handoff;
+		char		*handoff;
 		bool		passdescriptor;
-		const char	*allowedips;
-		const char	*deniedips;
-		const char	*debug;
+		char		*allowedips;
+		char		*deniedips;
+		char		*debug;
 		bool		debuglistener;
 		bool		debugconnection;
 		uint32_t	maxquerysize;
@@ -298,13 +300,14 @@ class sqlrconfigfile : public xmlsax {
 		int64_t		timequeriessec;
 		int64_t		timequeriesusec;
 		bool		translatebindvariables;
+		char		*isolationlevel;
 
 		bool		sidenabled;
-		const char	*sidhost;
+		char		*sidhost;
 		uint16_t	sidport;
-		const char	*sidsocket;
-		const char	*siduser;
-		const char	*sidpassword;
+		char		*sidsocket;
+		char		*siduser;
+		char		*sidpassword;
 
 		stringbuffer	sqltranslationrules;
 		uint16_t	sqltranslationrulesdepth;

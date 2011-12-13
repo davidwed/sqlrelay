@@ -64,6 +64,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlrconnection/dbversion.C \
 	sqlrconnection/serverversion.C \
 	sqlrconnection/handlesignals.C \
+	sqlrconnection/isolationlevel.C \
 	sqlrconnection/main.C \
 	sqlrcursor/sqlrcursorctor.C \
 	sqlrcursor/sqlrcursordtor.C \
@@ -153,6 +154,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/dbversion.lo \
 	sqlrconnection/serverversion.lo \
 	sqlrconnection/handlesignals.lo \
+	sqlrconnection/isolationlevel.lo \
 	sqlrconnection/main.lo \
 	sqlrcursor/sqlrcursorctor.lo \
 	sqlrcursor/sqlrcursordtor.lo \

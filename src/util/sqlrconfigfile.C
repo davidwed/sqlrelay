@@ -78,6 +78,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	currentroute=NULL;
 	currenttag=NO_TAG;
 	sqltranslationrulesdepth=0;
+	isolationlevel=NULL;
 }
 
 sqlrconfigfile::~sqlrconfigfile() {
@@ -103,6 +104,7 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] allowedips;
 	delete[] deniedips;
 	delete[] debug;
+	delete[] isolationlevel;
 
 	for (usernode *un=userlist.getFirstNode();
 				un; un=un->getNext()) {
@@ -319,6 +321,10 @@ int64_t sqlrconfigfile::getTimeQueriesMicroSeconds() {
 
 bool sqlrconfigfile::getTranslateBindVariables() {
 	return translatebindvariables;
+}
+
+const char *sqlrconfigfile::getIsolationLevel() {
+	return isolationlevel;
 }
 
 bool sqlrconfigfile::getSidEnabled() {
@@ -742,6 +748,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		} else if (!charstring::compare(name,
 						"translatebindvariables")) {
 			currentattribute=TRANSLATEBINDVARIABLES_ATTRIBUTE;
+		} else if (!charstring::compare(name,"isolationlevel")) {
+			currentattribute=ISOLATIONLEVEL_ATTRIBUTE;
 		}
 		break;
 	
@@ -1140,6 +1148,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==TRANSLATEBINDVARIABLES_ATTRIBUTE) {
 			translatebindvariables=
 				!charstring::compareIgnoringCase(value,"yes");
+		} else if (currentattribute==ISOLATIONLEVEL_ATTRIBUTE) {
+			isolationlevel=charstring::duplicate(value);
 		}
 	}
 	return true;

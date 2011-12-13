@@ -40,6 +40,8 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	translatebinds=false;
 
+	isolationlevel=NULL;
+
 	maxquerysize=0;
 	maxstringbindvaluelength=0;
 	maxlobbindvaluelength=0;

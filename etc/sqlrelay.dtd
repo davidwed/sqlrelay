@@ -36,6 +36,7 @@
 	<!ATTLIST instance timequeriessec CDATA "-1">
 	<!ATTLIST instance timequeriesusec CDATA "-1">
 	<!ATTLIST instance translatebindvariables (yes|no) "no">
+	<!ATTLIST instance isolationlevel CDATA "read committed">
 
 <!ELEMENT users (user*)>
 <!ELEMENT user EMPTY>

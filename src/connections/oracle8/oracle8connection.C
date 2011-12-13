@@ -581,6 +581,14 @@ const char *oracle8connection::getCurrentDatabaseQuery() {
 	return "select sys_context('userenv','current_schema') from dual";
 }
 
+const char *oracle8connection::setIsolationLevelQuery() {
+	return "set transaction isolation level %s";
+}
+
+const char *oracle8connection::getDefaultIsolationLevel() {
+	return "read committed";
+}
+
 oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	stmt=NULL;
