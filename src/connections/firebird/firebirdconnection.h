@@ -136,6 +136,7 @@ class firebirdconnection : public sqlrconnection_svr {
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
+		const char	*getDefaultIsolationLevel();
 		const char	*bindFormat();
 
 		char		dpb[256];
