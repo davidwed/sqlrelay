@@ -115,6 +115,10 @@ class sqliteconnection : public sqlrconnection_svr {
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
+#ifndef SQLITE_TRANSACTIONAL
+		const char	*setIsolationLevelQuery();
+		const char	*getDefaultIsolationLevel();
+#endif
 #ifdef SQLITE3
 		char		*duplicate(const char *str);
 #endif

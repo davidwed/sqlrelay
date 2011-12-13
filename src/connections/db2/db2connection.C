@@ -232,6 +232,15 @@ const char *db2connection::getCurrentDatabaseQuery() {
 	return "values current schema";
 }
 
+const char *db2connection::setIsolationLevelQuery() {
+        return "set current isolation %s";
+}
+
+const char *db2connection::getDefaultIsolationLevel() {
+	// repeatable read
+        return "rr";
+}                              
+
 db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	errormsg=NULL;

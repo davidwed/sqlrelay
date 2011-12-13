@@ -96,6 +96,11 @@ bool mdbtoolsconnection::isTransactional() {
 	return false;
 }
 
+bool mdbtoolsconnection::setIsolationLevel(const char *isolevel) {
+	// do nothing
+	return true;
+}
+
 bool mdbtoolsconnection::autoCommitOn() {
 	// do nothing
 	return true;

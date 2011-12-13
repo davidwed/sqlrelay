@@ -180,6 +180,7 @@ class odbcconnection : public sqlrconnection_svr {
 						uint32_t *colcount,
 						char ****rows,
 						uint64_t *rowcount);
+		bool		setIsolationLevel(const char *isolevel);
 
 		SQLRETURN	erg;
 		SQLHENV		env;

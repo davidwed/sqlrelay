@@ -140,6 +140,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*getColumnListQuery(bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
+		const char	*getDefaultIsolationLevel();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		commit();

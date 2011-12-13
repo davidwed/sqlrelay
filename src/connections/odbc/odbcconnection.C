@@ -334,6 +334,11 @@ bool odbcconnection::rollback() {
 }
 #endif
 
+bool odbcconnection::setIsolationLevel(const char *isolevel) {
+	// FIXME: do nothing for now.  see task #422
+	return true;
+}
+
 odbccursor::odbccursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	errormsg=NULL;
 	odbcconn=(odbcconnection *)conn;

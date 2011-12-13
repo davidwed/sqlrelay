@@ -380,6 +380,10 @@ const char *freetdsconnection::getCurrentDatabaseQuery() {
 	return "select db_name()";
 }
 
+const char *freetdsconnection::getDefaultIsolationLevel() {
+	return "1";
+}
+
 const char *freetdsconnection::bindFormat() {
 	return "@*";
 }

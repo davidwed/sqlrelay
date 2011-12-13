@@ -271,6 +271,13 @@ const char *mysqlconnection::getCurrentDatabaseQuery() {
 	return "select database()";
 }
 
+const char *mysqlconnection::getDefaultIsolationLevel() {
+	// This is the default for InnoDB tables.
+	// MyIsam tables don't support transactions.
+	// It's not clear what the default is for other table types.
+	return "repeatable read";
+}
+
 bool mysqlconnection::isTransactional() {
 	return true;
 }

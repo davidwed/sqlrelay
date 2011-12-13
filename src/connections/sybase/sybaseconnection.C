@@ -351,6 +351,10 @@ const char *sybaseconnection::getCurrentDatabaseQuery() {
 	return "select db_name()";
 }
 
+const char *sybaseconnection::getDefaultIsolationLevel() {
+	return "1";
+}
+
 const char *sybaseconnection::bindFormat() {
 	return "@*";
 }

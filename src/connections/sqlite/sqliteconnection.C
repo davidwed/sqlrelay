@@ -147,6 +147,14 @@ const char *sqliteconnection::getColumnListQuery(bool wild) {
 }
 
 #ifndef SQLITE_TRANSACTIONAL
+const char *sqliteconnection::setIsolationLevelQuery() {
+	return "pragma %s";
+}
+
+const char *sqliteconnection::getDefaultIsolationLevel() {
+	return "read_committed=false";
+}
+
 bool sqliteconnection::isTransactional() {
 	return false;
 }
