@@ -6,6 +6,7 @@
 #include <rudiments/character.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/rawbuffer.h>
+#include <rudiments/environment.h>
 
 #define NEED_DATATYPESTRING 1
 #define NEED_IS_NUMBER_TYPE_CHAR 1
@@ -1608,6 +1609,19 @@ enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 			// translate them to an integer type here.
 			if (retval==MYSQL_TYPE_DECIMAL && !scale) {
 				retval=MYSQL_TYPE_LONG;
+			}
+
+			// Some DB's, like oracle, only have a date type, not
+			// date, time and datetime types.  Sometimes the app
+			// might just want the column to be treated as a date,
+			// rather than datetime.  Use an environment variable
+			// to handle this.
+			if (retval==MYSQL_TYPE_DATETIME &&
+				!charstring::compareIgnoringCase(
+					environment::getValue(
+					"SQLR_MYSQL_MAP_DATETIME_TO_DATE"),
+					"yes")) {
+				retval=MYSQL_TYPE_DATE;
 			}
 			return retval;
 		}
