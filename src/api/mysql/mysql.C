@@ -1599,7 +1599,6 @@ enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 				datatypestring[index][columntypelen]=='\0') {
 
 			enum_field_types	retval=mysqltypemap[index];
-printf("%s mapped to %d\n",datatypestring[index],retval);
 
 			// Some DB's, like oracle, don't distinguish between
 			// float and integer types, they just have a numeric
