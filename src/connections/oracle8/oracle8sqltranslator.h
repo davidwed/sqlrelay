@@ -14,7 +14,7 @@ class oracle8sqltranslator : public sqltranslator {
 		bool	tempTablesPreserveRowsByDefault(xmldomnode *query,
 							xmldomnode *rule);
 		bool	nativizeDatatypes(xmldomnode *query,
-						xmldomnode *rule);
+							xmldomnode *rule);
 };
 
 #endif

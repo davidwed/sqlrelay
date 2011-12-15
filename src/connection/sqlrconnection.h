@@ -432,10 +432,14 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		unixserversocket	*serversockun;
 		filedescriptor		*clientsock;
 
+	// ideally these would be private but the
+	// sql translator needs to access them
+	public:
 		memorypool	*bindpool;
 		memorypool	*bindmappingspool;
 		namevaluepairs	*inbindmappings;
 		namevaluepairs	*outbindmappings;
+	private:
 		bool		fakeinputbinds;
 
 		sqlparser	*sqlp;

@@ -223,6 +223,9 @@ class sqlrcursor_svr {
 		char		*querybuffer;
 		uint32_t	querylength;
 
+	// ideally these would be protected but
+	// the sql translators need to access them
+	public:
 		uint16_t	inbindcount;
 		bindvar_svr	inbindvars[MAXVAR];
 		uint16_t	outbindcount;

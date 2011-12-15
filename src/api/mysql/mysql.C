@@ -2347,10 +2347,20 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_DATE:
 			case MYSQL_TYPE_TIME:
 			case MYSQL_TYPE_DATETIME:
-			case MYSQL_TYPE_NEWDATE:
-				// FIXME: convert to string and bind...
-				cursor->inputBind(variable,(char *)NULL);
+			case MYSQL_TYPE_NEWDATE: {
+				// convert to a mysql-native string and bind...
+				// (we can use a local varaible because we've
+				// told the API to copy references)
+				char	buffer[20];
+				MYSQL_TIME	*tm=
+						(MYSQL_TIME *)bind[i].buffer;
+				snprintf(buffer,20,
+					"%04d/%02d/%02d %02d:%02d:%02d\n",
+					tm->year,tm->month,tm->day,
+					tm->hour,tm->minute,tm->second);
+				cursor->inputBind(variable,buffer);
 				break;
+			}
 			case MYSQL_TYPE_DECIMAL:
 			case MYSQL_TYPE_FLOAT:
 			case MYSQL_TYPE_DOUBLE: {
@@ -2363,13 +2373,14 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_SHORT:
 			case MYSQL_TYPE_LONG:
 			case MYSQL_TYPE_YEAR: {
-				long	value=*((long *)bind[i].buffer);
+				int64_t	value=*((int32_t *)bind[i].buffer);
 				cursor->inputBind(variable,value);
 				break;
 			}
 			case MYSQL_TYPE_LONGLONG:
 			case MYSQL_TYPE_INT24: {
-				// FIXME: what should I do here?
+				int64_t	value=*((int64_t *)bind[i].buffer);
+				cursor->inputBind(variable,value);
 				return false;
 				break;
 			}
