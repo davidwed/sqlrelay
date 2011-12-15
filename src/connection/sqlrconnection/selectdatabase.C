@@ -163,9 +163,8 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 			gcdcur->getField(0,&field,&fieldlength,&blob,&null);
 			retval=charstring::duplicate(field);
 		} 
-
-		gcdcur->cleanUpData(true,true);
 	}
+	gcdcur->cleanUpData(true,true);
 	gcdcur->closeCursor();
 	deleteCursorUpdateStats(gcdcur);
 	return retval;

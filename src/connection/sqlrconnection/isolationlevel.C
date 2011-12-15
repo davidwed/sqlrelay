@@ -40,7 +40,6 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	if (silcur->openCursorInternal(cursorcount+1) &&
 		silcur->prepareQuery(silquery,silquerylen) &&
 		executeQueryUpdateStats(silcur,silquery,silquerylen,true)) {
-		silcur->cleanUpData(true,true);
 		retval=true;
 	}
 
@@ -53,6 +52,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	} */
 
 	delete[] silquery;
+	silcur->cleanUpData(true,true);
 	silcur->closeCursor();
 	deleteCursorUpdateStats(silcur);
 	return retval;

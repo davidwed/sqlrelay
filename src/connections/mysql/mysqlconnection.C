@@ -339,6 +339,8 @@ void mysqlconnection::endSession() {
 
 mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	mysqlconn=(mysqlconnection *)conn;
+	stmt=NULL;
+	stmtfreeresult=false;
 	mysqlresult=NULL;
 	columnnames=NULL;
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -359,7 +361,9 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 mysqlcursor::~mysqlcursor() {
 	delete[] columnnames;
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	mysql_stmt_free_result(stmt);
+	if (stmtfreeresult) {
+		mysql_stmt_free_result(stmt);
+	}
 	if (mysqlresult) {
 		mysql_free_result(mysqlresult);
 	}
@@ -415,9 +419,12 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// re-init bind buffers
 	rawbuffer::zero(&bind,sizeof(bind));
 
-	//return !mysql_stmt_prepare(stmt,query,length);
-	bool	retval=!mysql_stmt_prepare(stmt,query,length);
-	return retval;
+	// prepare the statement
+	if (!mysql_stmt_prepare(stmt,query,length)) {
+		stmtfreeresult=true;
+		return true;
+	}
+	return false;
 }
 #endif
 
@@ -985,8 +992,9 @@ void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 			rawbuffer::zero(&bind,sizeof(bind));
 			mysql_stmt_reset(stmt);
 		}
-		if (freeresult) {
+		if (freeresult && stmtfreeresult) {
 			mysql_stmt_free_result(stmt);
+			stmtfreeresult=false;
 		}
 	}
 #endif

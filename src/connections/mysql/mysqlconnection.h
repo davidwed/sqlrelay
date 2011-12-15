@@ -91,6 +91,7 @@ class mysqlcursor : public sqlrcursor_svr {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		MYSQL_STMT	*stmt;
+		bool		stmtfreeresult;
 
 		MYSQL_BIND	fieldbind[MAX_SELECT_LIST_SIZE];
 		char		field[MAX_SELECT_LIST_SIZE]

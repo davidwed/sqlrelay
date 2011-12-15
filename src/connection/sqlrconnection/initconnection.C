@@ -134,6 +134,15 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
 
+	// set autocommit behavior
+	setInitialAutoCommitBehavior();
+
+	// get fake input bind variable behavior
+	fakeinputbinds=cfgfl->getFakeInputBindVariables();
+
+	// get translate bind variable behavior
+	translatebinds=cfgfl->getTranslateBindVariables();
+
 	// initialize cursors
 	if (!initCursors()) {
 		return false;
@@ -147,10 +156,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	pidfile=new char[pidfilelen];
 	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-connection-%s.%d",
 				tmpdir->getString(),cmdl->getId(),pid);
-
 	createPidFile(pidfile,permissions::ownerReadWrite());
-
-	setInitialAutoCommitBehavior();
 
 	// create sqlrconnection for sid database
 	if (cfgfl->getSidEnabled()) {
@@ -173,6 +179,10 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 						isolationlevel:
 						getDefaultIsolationLevel());
 
+	// get the database/schema we're using so
+	// we can switch back to it at end of session
+	originaldb=getCurrentDatabase();
+
 	markDatabaseAvailable();
 
 	// if we're not passing descriptors around, listen on 
@@ -180,12 +190,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	if (!cfgfl->getPassDescriptor()) {
 		return openSockets();
 	}
-
-	// get fake input bind variable behavior
-	fakeinputbinds=cfgfl->getFakeInputBindVariables();
-
-	// get translate bind variable behavior
-	translatebinds=cfgfl->getTranslateBindVariables();
 
 	// bail here unless we're timing queries
 	if (cfgfl->getTimeQueriesSeconds()==-1 ||
@@ -310,11 +314,6 @@ bool sqlrconnection_svr::attemptLogIn(bool printerrors) {
 		return false;
 	}
 	dbgfile.debugPrint("connection",0,"done logging in");
-
-	// get the database/schema we're using can
-	// switch back to it at end of session
-	originaldb=getCurrentDatabase();
-
 	return true;
 }
 
