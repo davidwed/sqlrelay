@@ -169,10 +169,6 @@ class mysqlconnection : public sqlrconnection_svr {
 		static const my_bool	mytrue;
 #endif
 
-#ifdef HAVE_MYSQL_STMT_PREPARE
-		bool		fakebinds;
-#endif
-
 		bool		firstquery;
 };
 

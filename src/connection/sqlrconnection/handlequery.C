@@ -334,3 +334,7 @@ void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"done with commit or rollback check");
 }
+
+void sqlrconnection_svr::setFakeInputBinds(bool fake) {
+	fakeinputbinds=fake;
+}

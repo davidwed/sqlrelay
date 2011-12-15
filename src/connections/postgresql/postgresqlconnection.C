@@ -20,10 +20,6 @@ postgresqlconnection::postgresqlconnection() : sqlrconnection_svr() {
 	datatypeids=NULL;
 	datatypenames=NULL;
 	pgconn=(PGconn *)NULL;
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
-	fakebinds=false;
-#endif
 }
 
 postgresqlconnection::~postgresqlconnection() {
@@ -52,10 +48,6 @@ void postgresqlconnection::handleConnectString() {
 	} else {
 		typemangling=2;
 	}
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
-	fakebinds=!charstring::compare(connectStringValue("fakebinds"),"yes");
-#endif
 	charset=connectStringValue("charset");
 }
 
@@ -122,7 +114,7 @@ bool postgresqlconnection::logIn(bool printerrors) {
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	// don't use bind variables against older servers
 	if (PQprotocolVersion(pgconn)<3) {
-		fakebinds=true;
+		setFakeInputBinds(true);
 	}
 #endif
 
@@ -308,11 +300,7 @@ const char *postgresqlconnection::getCurrentDatabaseQuery() {
 const char *postgresqlconnection::bindFormat() {
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-	if (fakebinds) {
-		return sqlrconnection_svr::bindFormat();
-	} else {
-		return "$1";
-	}
+	return "$1";
 #else
 	return sqlrconnection_svr::bindFormat();
 #endif
@@ -361,32 +349,27 @@ bool postgresqlcursor::openCursor(uint16_t id) {
 
 bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 
-	if (postgresqlconn->fakebinds) {
-		return true;
-	}
-
 	// store inbindcount here, otherwise if rebinding/reexecution occurs and
 	// the client tries to bind more variables than were defined when the
 	// query was prepared, it would cause the inputBind methods to attempt
 	// to address beyond the end of the various arrays
 	bindcount=inbindcount;
 
-	if (!bindcount) {
-		return true;
-	}
-
 	// reset bind counter
 	bindcounter=0;
 
-	// clear bind arrays
-	delete[] bindvalues;
-	delete[] bindlengths;
-	delete[] bindformats;
+	if (bindcount) {
 
-	// create new bind arrays
-	bindvalues=new char *[bindcount];
-	bindlengths=new int[bindcount];
-	bindformats=new int[bindcount];
+		// clear bind arrays
+		delete[] bindvalues;
+		delete[] bindlengths;
+		delete[] bindformats;
+
+		// create new bind arrays
+		bindvalues=new char *[bindcount];
+		bindlengths=new int[bindcount];
+		bindformats=new int[bindcount];
+	}
 
 	// remove this named statement, if it exists already
 	if (deallocatestatement) {
@@ -425,10 +408,6 @@ bool postgresqlcursor::inputBindString(const char *variable,
 						uint32_t valuesize,
 						int16_t *isnull) {
 
-	if (postgresqlconn->fakebinds) {
-		return true;
-	}
-
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>=bindcount) {
@@ -451,10 +430,6 @@ bool postgresqlcursor::inputBindInteger(const char *variable,
 						uint16_t variablesize,
 						int64_t *value) {
 
-	if (postgresqlconn->fakebinds) {
-		return true;
-	}
-
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>=bindcount) {
@@ -474,10 +449,6 @@ bool postgresqlcursor::inputBindDouble(const char *variable,
 						uint32_t precision,
 						uint32_t scale) {
 
-	if (postgresqlconn->fakebinds) {
-		return true;
-	}
-
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>=bindcount) {
@@ -496,10 +467,6 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull) {
-
-	if (postgresqlconn->fakebinds) {
-		return true;
-	}
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -526,10 +493,6 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 						uint32_t valuesize,
 						int16_t *isnull) {
 
-	if (postgresqlconn->fakebinds) {
-		return true;
-	}
-
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
 	if (bindcounter>=bindcount) {
@@ -552,7 +515,7 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 bool postgresqlcursor::supportsNativeBinds() {
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-	return !postgresqlconn->fakebinds;
+	return true;
 #else
 	return false;
 #endif
@@ -568,25 +531,19 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-	if (postgresqlconn->fakebinds) {
-#endif
-		pgresult=PQexec(postgresqlconn->pgconn,query);
-
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+	if (bindcounter) {
+		// execute the query
+		pgresult=PQexecPrepared(postgresqlconn->pgconn,
+					cursorname,
+					bindcounter,bindvalues,
+					bindlengths,bindformats,0);
+		// reset bind counter
+		bindcounter=0;
 	} else {
-		if (bindcount) {
-			// execute the query
-			pgresult=PQexecPrepared(postgresqlconn->pgconn,
-						cursorname,
-						bindcount,bindvalues,
-						bindlengths,bindformats,0);
-			// reset bind counter
-			bindcounter=0;
-		} else {
-			pgresult=PQexec(postgresqlconn->pgconn,query);
-		}
+		pgresult=PQexec(postgresqlconn->pgconn,query);
 	}
+#else
+	pgresult=PQexec(postgresqlconn->pgconn,query);
 #endif
 
 	// handle a failed query

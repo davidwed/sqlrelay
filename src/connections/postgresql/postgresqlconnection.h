@@ -131,10 +131,6 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*options;
 		const char	*db;
 		uint16_t	typemangling;
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
-		bool		fakebinds;
-#endif
 		const char	*charset;
 		char		*dbversion;
 

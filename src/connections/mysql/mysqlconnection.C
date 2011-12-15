@@ -26,9 +26,6 @@ const my_bool	mysqlconnection::mytrue=TRUE;
 
 mysqlconnection::mysqlconnection() : sqlrconnection_svr() {
 	connected=false;
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	fakebinds=false;
-#endif
 	dbversion=NULL;
 
 	// start this at false because we don't need to do a commit before
@@ -51,9 +48,6 @@ void mysqlconnection::handleConnectString() {
 	host=connectStringValue("host");
 	port=connectStringValue("port");
 	socket=connectStringValue("socket");
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	fakebinds=!charstring::compare(connectStringValue("fakebinds"),"yes");
-#endif
 	charset=connectStringValue("charset");
 }
 
@@ -138,7 +132,7 @@ bool mysqlconnection::logIn(bool printerrors) {
 	// fake binds when connected to older servers
 #ifdef HAVE_MYSQL_GET_SERVER_VERSION
 	if (mysql_get_server_version(&mysql)<40102) {
-		fakebinds=true;
+		setFakeInputBinds(true);
 	}
 #else
 	char		**list;
@@ -152,7 +146,7 @@ bool mysqlconnection::logIn(bool printerrors) {
 		uint64_t	patch=charstring::toUnsignedInteger(list[2]);
 		if (major>4 || (major==4 && minor>1) ||
 				(major==4 && minor==1 && patch>=2)) {
-			fakebinds=true;
+			setFakeInputBinds(true);
 		} 
 		for (uint64_t index=0; index<listlen; index++) {
 			delete[] list[index];
@@ -212,11 +206,7 @@ const char *mysqlconnection::dbVersion() {
 
 const char *mysqlconnection::bindFormat() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	if (fakebinds) {
-		return sqlrconnection_svr::bindFormat();
-	} else {
-		return "?";
-	}
+	return "?";
 #else
 	return sqlrconnection_svr::bindFormat();
 #endif
@@ -396,10 +386,6 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 		mysqlconn->firstquery=false;
 	}
 
-	if (mysqlconn->fakebinds) {
-		return true;
-	}
-
 	// can't use stmt API to run a couple of types of queries as of 5.0
 	usestmtprepare=true;
 	if (unsupportedbystmt.match(query)) {
@@ -430,7 +416,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 bool mysqlcursor::supportsNativeBinds() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	return (!mysqlconn->fakebinds && usestmtprepare);
+	return (usestmtprepare);
 #else
 	return false;
 #endif
@@ -443,7 +429,7 @@ bool mysqlcursor::inputBindString(const char *variable,
 						uint32_t valuesize,
 						int16_t *isnull) {
 
-	if (mysqlconn->fakebinds || !usestmtprepare) {
+	if (!usestmtprepare) {
 		return true;
 	}
 
@@ -476,7 +462,7 @@ bool mysqlcursor::inputBindInteger(const char *variable,
 						uint16_t variablesize,
 						int64_t *value) {
 
-	if (mysqlconn->fakebinds || !usestmtprepare) {
+	if (!usestmtprepare) {
 		return true;
 	}
 
@@ -511,7 +497,7 @@ bool mysqlcursor::inputBindDouble(const char *variable,
 						uint32_t precision,
 						uint32_t scale) {
 
-	if (mysqlconn->fakebinds || !usestmtprepare) {
+	if (!usestmtprepare) {
 		return true;
 	}
 
@@ -546,7 +532,7 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 						uint32_t valuesize,
 						int16_t *isnull) {
 
-	if (mysqlconn->fakebinds || !usestmtprepare) {
+	if (!usestmtprepare) {
 		return true;
 	}
 
@@ -592,7 +578,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 	nrows=0;
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	if (!mysqlconn->fakebinds && usestmtprepare) {
+	if (usestmtprepare) {
 
 		// handle binds
 		if (bindcounter && mysql_stmt_bind_param(stmt,bind)) {
@@ -694,7 +680,7 @@ const char *mysqlcursor::errorMessage(bool *liveconnection) {
 	const char	*err;
 	unsigned int	errn;
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	if (!mysqlconn->fakebinds && usestmtprepare) {
+	if (usestmtprepare) {
 		err=mysql_stmt_error(stmt);
 		errn=mysql_stmt_errno(stmt);
 	} else {
@@ -945,7 +931,7 @@ bool mysqlcursor::skipRow() {
 
 bool mysqlcursor::fetchRow() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	if (!mysqlconn->fakebinds && usestmtprepare) {
+	if (usestmtprepare) {
 		return !mysql_stmt_fetch(stmt);
 	} else {
 #endif
@@ -962,7 +948,7 @@ void mysqlcursor::getField(uint32_t col,
 				bool *blob, bool *null) {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	if (!mysqlconn->fakebinds && usestmtprepare) {
+	if (usestmtprepare) {
 		if (!isnull[col]) {
 			*fld=field[col];
 			*fldlength=fieldlength[col];
@@ -986,7 +972,7 @@ void mysqlcursor::getField(uint32_t col,
 
 void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	if (!mysqlconn->fakebinds && usestmtprepare) {
+	if (usestmtprepare) {
 		if (freebinds) {
 			bindcounter=0;
 			rawbuffer::zero(&bind,sizeof(bind));

@@ -192,15 +192,15 @@ class oracle8cursor : public sqlrcursor_svr {
 		char		*inintbindstring[MAXVAR];
 		char		*outintbindstring[MAXVAR];
 		int64_t		*outintbind[MAXVAR];
-		uint16_t	inbindcount;
-		uint16_t	outbindcount;
-		uint16_t	curbindcount;
+		uint16_t	orainbindcount;
+		uint16_t	oraoutbindcount;
+		uint16_t	oracurbindcount;
 
 #ifdef HAVE_ORACLE_8i
 		OCILobLocator	*inbind_lob[MAXVAR];
 		OCILobLocator	*outbind_lob[MAXVAR];
-		uint16_t	inbindlobcount;
-		uint16_t	outbindlobcount;
+		uint16_t	orainbindlobcount;
+		uint16_t	oraoutbindlobcount;
 #endif
 
 		uint64_t	row;

@@ -135,6 +135,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void		setAutoCommitBehavior(bool ac);
 		bool		getAutoCommitBehavior();
 		void		setFakeTransactionBlocksBehavior(bool ftb);
+		void		setFakeInputBinds(bool fake);
 		bool		sendColumnInfo();
 		void		sendRowCounts(bool knowsactual,
 						uint64_t actual,
