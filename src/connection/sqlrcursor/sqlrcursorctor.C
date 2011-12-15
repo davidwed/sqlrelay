@@ -13,6 +13,7 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");
 
 	querybuffer=NULL;
+	fakeinputbindsforthisquery=false;
 
 	sid_sqlrcur=NULL;
 	if (conn->cfgfl->getSidEnabled()) {

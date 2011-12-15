@@ -10,10 +10,10 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 	dbgfile.debugPrint("connection",1,"handling query...");
 
-	// clear bind mappings and reset fakeinputbinds flag
+	// clear bind mappings and reset fakeinputbindsforthisquery flag
 	if (!reexecute && !bindcursor) {
 		clearBindMappings();
-		fakeinputbinds=false;
+		cursor->fakeinputbindsforthisquery=false;
 	}
 
 	if (getquery) {
@@ -183,7 +183,10 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	bool	success=false;
 	bool	doegress=true;
 
-	if (reexecute && !fakeinputbinds && cursor->supportsNativeBinds()) {
+	if (reexecute &&
+		!fakeinputbinds &&
+		!cursor->fakeinputbindsforthisquery &&
+		cursor->supportsNativeBinds()) {
 
 		// if we're reexecuting and not faking binds then
 		// the statement doesn't need to be prepared again...
@@ -232,7 +235,9 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 			// fake input binds if necessary
 			stringbuffer	*newquery=NULL;
-			if (fakeinputbinds || !cursor->supportsNativeBinds()) {
+			if (fakeinputbinds ||
+				cursor->fakeinputbindsforthisquery ||
+				!cursor->supportsNativeBinds()) {
 
 				dbgfile.debugPrint("connection",3,
 							"faking binds...");
@@ -257,8 +262,10 @@ printf("\"\n\n");
 
 			// if we're not faking binds then
 			// handle the binds for real
-			if (success && !fakeinputbinds &&
-					cursor->supportsNativeBinds()) {
+			if (success &&
+				!fakeinputbinds &&
+				!cursor->fakeinputbindsforthisquery &&
+				cursor->supportsNativeBinds()) {
 printf("binding for real\n");
 				success=cursor->handleBinds();
 			}

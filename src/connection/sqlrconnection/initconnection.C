@@ -181,6 +181,9 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		return openSockets();
 	}
 
+	// get fake input bind variable behavior
+	fakeinputbinds=cfgfl->getFakeInputBindVariables();
+
 	// get translate bind variable behavior
 	translatebinds=cfgfl->getTranslateBindVariables();
 

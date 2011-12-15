@@ -73,6 +73,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	reloginatstart=!charstring::compare(DEFAULT_RELOGINATSTART,"yes");
 	timequeriessec=charstring::toInteger(DEFAULT_TIMEQUERIESSEC);
 	timequeriesusec=charstring::toInteger(DEFAULT_TIMEQUERIESUSEC);
+	fakeinputbindvariables=!charstring::compare(
+					DEFAULT_FAKEINPUTBINDVARIABLES,"yes");
 	translatebindvariables=!charstring::compare(
 					DEFAULT_TRANSLATEBINDVARIABLES,"yes");
 	currentroute=NULL;
@@ -317,6 +319,10 @@ int64_t sqlrconfigfile::getTimeQueriesSeconds() {
 
 int64_t sqlrconfigfile::getTimeQueriesMicroSeconds() {
 	return timequeriesusec;
+}
+
+bool sqlrconfigfile::getFakeInputBindVariables() {
+	return fakeinputbindvariables;
 }
 
 bool sqlrconfigfile::getTranslateBindVariables() {
@@ -746,6 +752,9 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		} else if (!charstring::compare(name,"timequeriesusec")) {
 			currentattribute=TIMEQUERIESUSEC_ATTRIBUTE;
 		} else if (!charstring::compare(name,
+						"fakeinputbindvariables")) {
+			currentattribute=FAKEINPUTBINDVARIABLES_ATTRIBUTE;
+		} else if (!charstring::compare(name,
 						"translatebindvariables")) {
 			currentattribute=TRANSLATEBINDVARIABLES_ATTRIBUTE;
 		} else if (!charstring::compare(name,"isolationlevel")) {
@@ -1145,6 +1154,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				timequeriessec=-1;
 				timequeriesusec=-1;
 			}
+		} else if (currentattribute==FAKEINPUTBINDVARIABLES_ATTRIBUTE) {
+			fakeinputbindvariables=
+				!charstring::compareIgnoringCase(value,"yes");
 		} else if (currentattribute==TRANSLATEBINDVARIABLES_ATTRIBUTE) {
 			translatebindvariables=
 				!charstring::compareIgnoringCase(value,"yes");

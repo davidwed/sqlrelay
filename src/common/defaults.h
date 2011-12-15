@@ -152,7 +152,10 @@
 #define DEFAULT_TIMEQUERIESUSEC "-1"
 	// default time queries attributes
 
-#define	DEFAULT_TRANSLATEBINDVARIABLES "yes"
+#define	DEFAULT_FAKEINPUTBINDVARIABLES "no"
+	// default fake input bind variables attribute
+
+#define	DEFAULT_TRANSLATEBINDVARIABLES "no"
 	// default translate bind variables attribute
 
 // cachemanager/sqlrclient parameters

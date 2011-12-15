@@ -188,7 +188,7 @@ class sqlrcursor_svr {
 		virtual bool	sql_injection_detection_check_db(
 							const char *sid_db);
 
-		void		setFakeInputBinds(bool fake);
+		void		setFakeInputBindsForThisQuery(bool fake);
 	
 	protected:
 		// methods/variables used by derived classes
@@ -222,6 +222,8 @@ class sqlrcursor_svr {
 
 		char		*querybuffer;
 		uint32_t	querylength;
+
+		bool	fakeinputbindsforthisquery;
 
 	// ideally these would be protected but
 	// the sql translators need to access them

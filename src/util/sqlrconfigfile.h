@@ -74,6 +74,7 @@ typedef enum {
 	TIMEQUERIES_ATTRIBUTE,
 	TIMEQUERIESSEC_ATTRIBUTE,
 	TIMEQUERIESUSEC_ATTRIBUTE,
+	FAKEINPUTBINDVARIABLES_ATTRIBUTE,
 	TRANSLATEBINDVARIABLES_ATTRIBUTE,
 	SQLTRANSLATIONRULES_ATTRIBUTE,
 	ISOLATIONLEVEL_ATTRIBUTE
@@ -212,6 +213,7 @@ class sqlrconfigfile : public xmlsax {
 		bool		getReLoginAtStart();
 		int64_t		getTimeQueriesSeconds();
 		int64_t		getTimeQueriesMicroSeconds();
+		bool		getFakeInputBindVariables();
 		bool		getTranslateBindVariables();
 		const char	*getIsolationLevel();
 
@@ -299,6 +301,7 @@ class sqlrconfigfile : public xmlsax {
 		bool		reloginatstart;
 		int64_t		timequeriessec;
 		int64_t		timequeriesusec;
+		bool		fakeinputbindvariables;
 		bool		translatebindvariables;
 		char		*isolationlevel;
 

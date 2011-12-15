@@ -91,7 +91,7 @@ bool oracle8sqlwriter::as(xmldomnode *node, stringbuffer *output) {
 	// create table ... as select ... query.  So, if we find an "as" clause
 	// then fake input binds for this set of queries.  It will go back to 
 	// the default behavior when a new query is prepared.
-	sqlrcur->setFakeInputBinds(true);
+	sqlrcur->setFakeInputBindsForThisQuery(true);
 	return sqlwriter::as(node,output);
 }
 
