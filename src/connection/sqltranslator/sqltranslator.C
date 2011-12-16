@@ -85,13 +85,84 @@ bool sqltranslator::convertDatatypes(xmldomnode *query, xmldomnode *rule) {
 	return true;
 }
 
+#include <parsedatetime.h>
+char *sqltranslator::convertDateTime(const char *format,
+			int16_t year, int16_t month, int16_t day,
+			int16_t hour, int16_t minute, int16_t second) {
+
+	// output buffer
+	stringbuffer	output;
+
+	// work buffer
+	char		buf[5];
+
+	// run through the format string
+	const char	*ptr=format;
+	while (*ptr) {
+
+		if (!charstring::compare(ptr,"DD",2)) {
+			snprintf(buf,5,"%02d",day);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"MM",2)) {
+			snprintf(buf,5,"%02d",month);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"MON",3)) {
+			output.append(shortmonths[month-1]);
+			ptr=ptr+3;
+		} else if (!charstring::compare(ptr,"Month",5)) {
+			output.append(longmonths[month-1]);
+			ptr=ptr+3;
+		} else if (!charstring::compare(ptr,"YYYY",4)) {
+			snprintf(buf,5,"%04d",year);
+			output.append(buf);
+			ptr=ptr+4;
+		} else if (!charstring::compare(ptr,"YY",2)) {
+			snprintf(buf,5,"%04d",year);
+			output.append(buf+2);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"HH24",4)) {
+			snprintf(buf,5,"%02d",hour);
+			output.append(buf);
+			ptr=ptr+4;
+		} else if (!charstring::compare(ptr,"HH",2)) {
+			snprintf(buf,5,"%02d",(hour<13)?hour:hour-12);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"MI",2)) {
+			snprintf(buf,5,"%02d",minute);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"SS",2)) {
+			snprintf(buf,5,"%02d",second);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"AM",2)) {
+			output.append((hour<13)?"AM":"PM");
+			ptr=ptr+2;
+		} else {
+			output.append(*ptr);
+			ptr=ptr+1;
+		}
+	}
+
+	return output.detachString();
+}
 
 bool sqltranslator::nativizeDateTimesInQuery(xmldomnode *querynode,
 							xmldomnode *rule) {
 	debugFunction();
 
+	// output format
+	const char	*format=rule->getAttributeValue("output");
+	if (!format) {
+		format="DD-MON-YYYY";
+	}
+
 	// convert this node...
-	if (!charstring::compare(querynode->getName(),sqlparser::_verbatim)) {
+	if (!charstring::compare(querynode->getName(),sqlparser::_verbatim) ||
+		!charstring::compare(querynode->getName(),sqlparser::_value)) {
 
 		// get the value
 		const char	*value=querynode->getAttributeValue(
@@ -118,6 +189,7 @@ bool sqltranslator::nativizeDateTimesInQuery(xmldomnode *querynode,
 
 				// convert it
 				char	*converted=convertDateTime(
+							format,
 							year,month,day,
 							hour,minute,second);
 				if (converted) {
@@ -158,6 +230,12 @@ bool sqltranslator::nativizeDateTimesInBindVariables(
 						xmldomnode *rule) {
 	debugFunction();
 
+	// output format
+	const char	*format=rule->getAttributeValue("output");
+	if (!format) {
+		format="DD-MON-YYYY";
+	}
+
 	// run through the bind variables...
 	for (uint16_t i=0; i<sqlrcur->inbindcount; i++) {
 
@@ -185,55 +263,24 @@ bool sqltranslator::nativizeDateTimesInBindVariables(
 		}
 
 		// attempt to convert the value
-		char	*converted=convertDateTime(year,month,day,
+		char	*converted=convertDateTime(format,
+							year,month,day,
 							hour,minute,second);
 		if (!converted) {
 			continue;
 		}
 
 		// replace the value with the converted string
-		bind->valuesize=charstring::length(converted)+1;
+		bind->valuesize=charstring::length(converted);
 		bind->value.stringval=
 			(char *)sqlrcon->bindmappingspool->
-				malloc(bind->valuesize);
-		charstring::append(bind->value.stringval,converted);
+					calloc(bind->valuesize+1);
+		charstring::copy(bind->value.stringval,converted);
 		delete[] converted;
 	}
 
 	return true;
 }
-
-static const char *shortmonths[]={
-	"JAN",
-	"FEB",
-	"MAR",
-	"APR",
-	"MAY",
-	"JUN",
-	"JUL",
-	"AUG",
-	"SEP",
-	"OCT",
-	"NOV",
-	"DEC",
-	NULL
-};
-
-static const char *longmonths[]={
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December",
-	NULL
-};
 
 const char * const *sqltranslator::getShortMonths() {
 	return shortmonths;
@@ -241,215 +288,6 @@ const char * const *sqltranslator::getShortMonths() {
 
 const char * const *sqltranslator::getLongMonths() {
 	return longmonths;
-}
-
-bool sqltranslator::parseDateTime(const char *datetime,
-			int16_t *year, int16_t *month, int16_t *day,
-			int16_t *hour, int16_t *minute, int16_t *second) {
-printf("parsing: \"%s\"\n",datetime);
-
-	// initialize date/time parts
-	*year=-1;
-	*month=-1;
-	*day=-1;
-	*hour=-1;
-	*minute=-1;
-	*second=-1;
-
-	// different db's format dates very differently
-
-	// split on a space
-	char		**parts;
-	uint64_t	partcount;
-	charstring::split(datetime," ",1,true,&parts,&partcount);
-
-	// there should only be one or two parts
-	if (partcount>2) {
-		for (uint64_t i=0; i<partcount; i++) {
-			delete[] parts[i];
-		}
-		delete[] parts;
-		return false;
-	}
-
-	// parse the parts
-	for (uint64_t i=0; i<partcount; i++) {
-
-		if (charstring::contains(parts[i],':')) {
-
-			// the section with :'s is the time...
-
-			// split on :
-			char		**timeparts;
-			uint64_t	timepartcount;
-			charstring::split(parts[i],":",1,true,
-						&timeparts,&timepartcount);
-	
-			// there must be three parts, all numbers
-			if (timepartcount==3 &&
-				charstring::isNumber(timeparts[0]) &&
-				charstring::isNumber(timeparts[1]) &&
-				charstring::isNumber(timeparts[2])) {
-
-				*hour=charstring::toInteger(timeparts[0]);
-				*minute=charstring::toInteger(timeparts[1]);
-				*second=charstring::toInteger(timeparts[2]);
-			}
-
-			// clean up
-			for (uint64_t i=0; i<timepartcount; i++) {
-				delete[] timeparts[i];
-			}
-			delete[] timeparts;
-
-		} else if (charstring::contains(parts[i],'/')) {
-
-			// the section with /'s is the date...
-
-			// split on /
-			char		**dateparts;
-			uint64_t	datepartcount;
-			charstring::split(parts[i],"/",1,true,
-						&dateparts,&datepartcount);
-
-			// assume month/day, but in some countries
-			// they do it the other way around
-			// I'm not sure how to decide...
-
-			// there must be three parts, all numbers
-			if (datepartcount==3 &&
-				charstring::isNumber(dateparts[0]) &&
-				charstring::isNumber(dateparts[1]) &&
-				charstring::isNumber(dateparts[2])) {
-
-				*month=charstring::toInteger(dateparts[0]);
-				*day=charstring::toInteger(dateparts[1]);
-				*year=charstring::toInteger(dateparts[2]);
-			}
-
-			// clean up
-			for (uint64_t i=0; i<datepartcount; i++) {
-				delete[] dateparts[i];
-			}
-			delete[] dateparts;
-
-		} else if (charstring::contains(parts[i],'-')) {
-
-			// the section with -'s is the date...
-
-			// split on -
-			char		**dateparts;
-			uint64_t	datepartcount;
-			charstring::split(parts[i],"-",1,true,
-						&dateparts,&datepartcount);
-
-			// there must be three parts, 0 and 2 must be numbers
-			if (datepartcount==3 &&
-				charstring::isNumber(dateparts[0]) &&
-				charstring::isNumber(dateparts[2])) {
-
-				// some dates have a non-numeric month in part 2
-				if (!charstring::isNumber(dateparts[1])) {
-
-					*day=charstring::toInteger(
-								dateparts[0]);
-					for (int i=0; shortmonths[i]; i++) {
-						if (!charstring::
-							compareIgnoringCase(
-								dateparts[1],
-								shortmonths[i]) 
-							||
-							!charstring::
-							compareIgnoringCase(
-								dateparts[1],
-								longmonths[i]))
-						{
-							*month=i;
-						}
-					}
-					*year=charstring::toInteger(
-								dateparts[2]);
-				} else {
-
-					*year=charstring::toInteger(
-								dateparts[0]);
-					*month=charstring::toInteger(
-								dateparts[1]);
-					*day=charstring::toInteger(
-								dateparts[2]);
-				}
-			}
-
-			// clean up
-			for (uint64_t i=0; i<datepartcount; i++) {
-				delete[] dateparts[i];
-			}
-			delete[] dateparts;
-		}
-	}
-
-	// clean up
-	for (uint64_t i=0; i<partcount; i++) {
-		delete[] parts[i];
-	}
-	delete[] parts;
-
-	// manage 2-digit years
-	if (*year!=-1) {
-		if (*year<50) {
-			*year=*year+2000;
-		} else if (*year<100) {
-			*year=*year+1900;
-		}
-	}
-
-	// manage bad months
-	if (*month!=-1) {
-		if (*month<1) {
-			*month=1;
-		} else if (*month>12) {
-			*month=12;
-		}
-	}
-
-	// If there were 2 parts then we should have found all components.
-	// If there was 1 part then we should have found one set or the other.
-	return ((partcount==2 &&
-			*year!=-1 && *month!=-1 && *day!=-1 &&
-			*hour!=-1 && *minute!=-1 && *second!=-1) ||
-		(partcount==1 &&
-			((*year!=-1 && *month!=-1 && *day!=-1) ||
-			(*hour!=-1 && *minute!=-1 && *second!=-1))));
-}
-
-char *sqltranslator::convertDateTime(
-			int16_t year, int16_t month, int16_t day,
-			int16_t hour, int16_t minute, int16_t second) {
-
-	// buffer
-	stringbuffer	output;
-
-	// convert date
-	bool	datepart=false;
-	if (year!=-1 && month!=-1 && day!=-1) {
-		char	newdate[12];
-		snprintf(newdate,12,"%02d-%s-%04d",
-				day,shortmonths[month-1],year);
-		output.append(newdate);
-		datepart=true;
-	}
-
-	// convert time
-	if (hour!=-1 && minute!=-1 && second!=-1) {
-		char	newtime[10];
-		snprintf(newtime,10,"%02d:%02d:%02d",hour,minute,second);
-		if (datepart) {
-			output.append(' ');
-		}
-		output.append(newtime);
-	}
-printf("converted: \"%s\"\n",output.getString());
-	return output.detachString();
 }
 
 bool sqltranslator::trimColumnsComparedToStringBinds(xmldomnode *query,

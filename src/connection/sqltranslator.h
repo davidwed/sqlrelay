@@ -37,14 +37,8 @@ class sqltranslator {
 		bool		nativizeDateTimesInBindVariables(
 							xmldomnode *querynode,
 							xmldomnode *rule);
-		bool		parseDateTime(const char *datetime,
-							int16_t *year,
-							int16_t *month,
-							int16_t *day,
-							int16_t *hour,
-							int16_t *minute,
-							int16_t *second);
-		char		*convertDateTime(int16_t year,
+		char		*convertDateTime(const char *format,
+							int16_t year,
 							int16_t month,
 							int16_t day,
 							int16_t hour,

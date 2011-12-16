@@ -347,8 +347,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"@",1) ||
 		!charstring::compareIgnoringCase(ptr,"delimiter",9) ||
 		!charstring::compareIgnoringCase(ptr,"delimeter",9) ||
-		!charstring::compareIgnoringCase(ptr,"inputbind",9) ||
-		!charstring::compareIgnoringCase(ptr,"outputbind",10) ||
+		!charstring::compareIgnoringCase(ptr,"inputbind ",10) ||
+		!charstring::compareIgnoringCase(ptr,"outputbind ",11) ||
 		!charstring::compareIgnoringCase(ptr,"printinputbind",14) ||
 		!charstring::compareIgnoringCase(ptr,"printoutputbind",15) ||
 		!charstring::compareIgnoringCase(ptr,"printbinds",10) ||
@@ -432,10 +432,10 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"serverversion",13)) {	
 		serverversion(sqlrcon,env);
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"inputbind",9)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"inputbind ",10)) {	
 		inputbind(sqlrcur,env,command);
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"outputbind",10)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"outputbind ",11)) {	
 		outputbind(sqlrcur,env,command);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"printbinds",10)) {	
@@ -888,85 +888,79 @@ void sqlrsh::serverversion(sqlrconnection *sqlrcon, environment *env) {
 void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 				environment *env, const char *command) {
 
-	// split the command on ' '
-	char		**parts;
-	uint64_t	partcount;
-	charstring::split(command," ",true,&parts,&partcount);
+	// sanity check
+	const char	*ptr=command+10;
+	const char	*space=charstring::findFirst(ptr,' ');
+	if (!space) {
+		printf("usage: inputbind [variable] = [value]\n");
+		return;
+	}
 
-	// sanity check...
-	bool	sane=true;
-	if (partcount>2 && !charstring::compare(parts[0],"inputbind") &&
-					!charstring::compare(parts[2],"=")) {
+	// get the variable name
+	char	*variable=charstring::duplicate(ptr,space-ptr);
 
-		// if the bind variable is already defined, clear it...
-		sqlrshbindvalue	*bv=NULL;
-		if (env->inputbinds.getData(parts[1],&bv)) {
-			delete[] bv;
-		}
-
-		// define the variable
-		bv=new sqlrshbindvalue;
-
-		// determine the type
-		char		*value=(partcount==4)?parts[3]:NULL;
-		charstring::bothTrim(value);
-		size_t		valuelen=charstring::length(value);
-
-		// first handle nulls, then...
-		// anything enclosed in quotes is a string
-		// if it's unquoted, check to see if it's an integer or float
-		// if it's not, then it's a string
-		if (!value) {
-			bv->type=NULL_BIND;
-		} else if ((value[0]=='\'' && value[valuelen-1]=='\'') ||
-				(value[0]=='"' && value[valuelen-1]=='"')) {
-
-			bv->type=STRING_BIND;
-
-			// trim off quotes
-			char	*newvalue=charstring::duplicate(value+1);
-			newvalue[valuelen-2]='\0';
-			delete[] value;
-
-			// unescape the string
-			bv->stringval=charstring::unescape(newvalue);
-			delete[] newvalue;
-
-		} else if (charstring::isInteger(value)) {
-			bv->type=INTEGER_BIND;
-			bv->integerval=charstring::toInteger(value);
-			delete[] value;
-		} else if (charstring::isNumber(value)) {
-			bv->type=DOUBLE_BIND;
-			bv->doubleval.value=charstring::toFloat(value);
-			bv->doubleval.precision=valuelen-((value[0]=='-')?2:1);
-			bv->doubleval.scale=
-				charstring::findFirst(value,'.')-value+
-				((value[0]=='-')?0:1);
-			delete[] value;
-		} else {
-			bv->type=STRING_BIND;
-			bv->stringval=value;
-		}
-
-		// put the bind variable in the list
-		env->inputbinds.setData(parts[1],bv);
-
+	// move on
+	ptr=space;
+	if (*(ptr+1)=='=' && *(ptr+2)==' ') {
+		ptr=ptr+3;
 	} else {
 		printf("usage: inputbind [variable] = [value]\n");
-		sane=false;
+		return;
+	}
+		
+	// get the value
+	char	*value=charstring::duplicate(ptr);
+	charstring::bothTrim(value);
+	size_t	valuelen=charstring::length(value);
+
+	// if the bind variable is already defined, clear it...
+	sqlrshbindvalue	*bv=NULL;
+	if (env->inputbinds.getData(variable,&bv)) {
+		delete[] bv;
 	}
 
-	// clean up
-	if (sane) {
-		delete[] parts[0];
-		delete[] parts[2];
+	// define the variable
+	bv=new sqlrshbindvalue;
+
+	// first handle nulls, then...
+	// anything enclosed in quotes is a string
+	// if it's unquoted, check to see if it's an integer or float
+	// if it's not, then it's a string
+	if (!value) {
+		bv->type=NULL_BIND;
+	} else if ((value[0]=='\'' && value[valuelen-1]=='\'') ||
+			(value[0]=='"' && value[valuelen-1]=='"')) {
+
+		bv->type=STRING_BIND;
+
+		// trim off quotes
+		char	*newvalue=charstring::duplicate(value+1);
+		newvalue[valuelen-2]='\0';
+		delete[] value;
+
+		// unescape the string
+		bv->stringval=charstring::unescape(newvalue);
+		delete[] newvalue;
+
+	} else if (charstring::isInteger(value)) {
+		bv->type=INTEGER_BIND;
+		bv->integerval=charstring::toInteger(value);
+		delete[] value;
+	} else if (charstring::isNumber(value)) {
+		bv->type=DOUBLE_BIND;
+		bv->doubleval.value=charstring::toFloat(value);
+		bv->doubleval.precision=valuelen-((value[0]=='-')?2:1);
+		bv->doubleval.scale=
+			charstring::findFirst(value,'.')-value+
+			((value[0]=='-')?0:1);
+		delete[] value;
 	} else {
-		for (uint64_t i=0; i<partcount; i++) {
-			delete[] parts[i];
-		}
+		bv->type=STRING_BIND;
+		bv->stringval=value;
 	}
-	delete[] parts;
+
+	// put the bind variable in the list
+	env->inputbinds.setData(variable,bv);
 }
 
 void sqlrsh::outputbind(sqlrcursor *sqlrcur,

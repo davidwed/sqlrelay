@@ -1634,202 +1634,36 @@ int mysql_execute(MYSQL_STMT *stmt) {
 	return mysql_stmt_execute(stmt);
 }
 
-static const char *shortmonths[]={
-	"JAN",
-	"FEB",
-	"MAR",
-	"APR",
-	"MAY",
-	"JUN",
-	"JUL",
-	"AUG",
-	"SEP",
-	"OCT",
-	"NOV",
-	"DEC",
-	NULL
-};
+#include <parsedatetime.h>
+static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 
-static const char *longmonths[]={
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December",
-	NULL
-};
-
-void parseDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
-
+	// result variables
 	MYSQL_TIME	*tm=(MYSQL_TIME *)bind->buffer;
+	int16_t	year=-1;
+	int16_t	month=-1;
+	int16_t	day=-1;
+	int16_t	hour=-1;
+	int16_t	minute=-1;
+	int16_t	second=-1;
 
-	// initialize...
-	tm->year=2000;
-	tm->month=1;
-	tm->day=1;
-	tm->hour=0;
-	tm->minute=0;
-	tm->second=0;
+	// copy into a buffer (to make sure it's null-terminated)
+	char	*buffer=new char[length+1];
+	charstring::copy(buffer,field,length);
+	buffer[length]='\0';
 
-	// different db's format dates very differently
+	// parse
+	parseDateTime(buffer,&year,&month,&day,&hour,&minute,&second);
 
-	// split on a space
-	char		**parts;
-	uint64_t	partcount;
-	charstring::split(field,length," ",1,true,&parts,&partcount);
-
-	for (uint64_t i=0; i<partcount; i++) {
-
-		if (charstring::contains(parts[i],':')) {
-
-			// the section with :'s is the time...
-
-			// split on :
-			char		**timeparts;
-			uint64_t	timepartcount;
-			charstring::split(parts[i],":",1,true,
-						&timeparts,&timepartcount);
-	
-			// first is hour
-			if (timepartcount>0) {
-				tm->hour=charstring::toInteger(timeparts[0]);
-			}
-			// second is minute
-			if (timepartcount>1) {
-				tm->minute=charstring::toInteger(timeparts[1]);
-			}
-			// third is seconds
-			if (timepartcount>2) {
-				tm->second=charstring::toInteger(timeparts[2]);
-			}
-
-			// clean up
-			for (uint64_t i=0; i<timepartcount; i++) {
-				delete[] timeparts[i];
-			}
-			delete[] timeparts;
-
-		} else if (charstring::contains(parts[i],'/')) {
-
-			// the section with /'s is the date...
-
-			// split on /
-			char		**dateparts;
-			uint64_t	datepartcount;
-			charstring::split(parts[i],"/",1,true,
-						&dateparts,&datepartcount);
-
-			// assume month/day, but in some countries
-			// they do it the other way around
-			// I'm not sure how to decide...
-
-			// first is month
-			if (datepartcount>0) {
-				tm->month=charstring::toInteger(dateparts[0]);
-			}
-			// second is day
-			if (datepartcount>1) {
-				tm->day=charstring::toInteger(dateparts[1]);
-			}
-			// third is year
-			if (datepartcount>2) {
-				tm->year=charstring::toInteger(dateparts[2]);
-			}
-
-			// clean up
-			for (uint64_t i=0; i<datepartcount; i++) {
-				delete[] dateparts[i];
-			}
-			delete[] dateparts;
-
-		} else if (charstring::contains(parts[i],'-')) {
-
-			// the section with -'s is the date...
-
-			// split on -
-			char		**dateparts;
-			uint64_t	datepartcount;
-			charstring::split(parts[i],"-",1,true,
-						&dateparts,&datepartcount);
-
-			// some dates have a non-numeric month in part 2
-			bool	numericmonth=(datepartcount>1 &&
-					charstring::isNumber(parts[1]));
-
-			// if there's a non-numeric month then the
-			if (numericmonth) {
-				// first is day
-				if (datepartcount>0) {
-					tm->day=charstring::toInteger(
-								dateparts[0]);
-				}
-				// second is month
-				if (datepartcount>1) {
-					for (int i=0; shortmonths[i]; i++) {
-						if (!charstring::compareIgnoringCase(dateparts[1],shortmonths[i])) {
-							tm->month=i;
-						}
-					}
-					if (tm->month==0) {
-						for (int i=0; longmonths[i]; i++) {
-							if (!charstring::compareIgnoringCase(dateparts[1],longmonths[i])) {
-								tm->month=i;
-							}
-						}
-					}
-				}
-				// third is year
-				if (datepartcount>2) {
-					tm->year=charstring::toInteger(
-								dateparts[2]);
-				}
-			} else {
-				// first is year
-				if (datepartcount>0) {
-					tm->year=charstring::toInteger(
-								dateparts[0]);
-				}
-				// second is month
-				if (datepartcount>1) {
-					tm->month=charstring::toInteger(
-								dateparts[1]);
-				}
-				// third is day
-				if (datepartcount>2) {
-					tm->day=charstring::toInteger(
-								dateparts[2]);
-				}
-			}
-			// third segment is the year
-			// otherwise the first segment is the year,
-
-			// clean up
-			for (uint64_t i=0; i<datepartcount; i++) {
-				delete[] dateparts[i];
-			}
-			delete[] dateparts;
-		}
-	}
-
-	// manage 2-digit years
-	if (tm->year<50) {
-		tm->year=tm->year+2000;
-	} else if (tm->year<100) {
-		tm->year=tm->year+1900;
-	}
+	// copy back data
+	tm->year=(year!=-1)?year:0;
+	tm->month=(month!=-1)?month:0;
+	tm->day=(day!=-1)?day:0;
+	tm->hour=(hour!=-1)?hour:0;
+	tm->minute=(minute!=-1)?minute:0;
+	tm->second=(second!=-1)?second:0;
 
 	// clean up
-	for (uint64_t i=0; i<partcount; i++) {
-		delete[] parts[i];
-	}
-	delete[] parts;
+	delete[] buffer;
 }
 
 int mysql_stmt_fetch(MYSQL_STMT *stmt) {
@@ -1903,7 +1737,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 				case MYSQL_TYPE_TIME:
 				case MYSQL_TYPE_DATETIME:
 				case MYSQL_TYPE_NEWDATE:
-					parseDate(row[i],lengths[i],
+					getDate(row[i],lengths[i],
 						&(stmt->resultbinds[i]));
 					break;
 				case MYSQL_TYPE_TINY:
