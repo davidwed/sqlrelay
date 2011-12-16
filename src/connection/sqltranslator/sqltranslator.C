@@ -51,8 +51,8 @@ bool sqltranslator::applyRulesToQuery(xmldomnode *query) {
 		const char	*rulename=rule->getName();
 
 		if (!charstring::compare(rulename,
-					"nativize_datatypes")) {
-			if (!nativizeDatatypes(query,rule)) {
+					"translate_datatypes")) {
+			if (!translateDatatypes(query,rule)) {
 				return false;
 			}
 		} else if (!charstring::compare(rulename,
@@ -66,8 +66,8 @@ bool sqltranslator::applyRulesToQuery(xmldomnode *query) {
 				return false;
 			}
 		} else if (!charstring::compare(rulename,
-				"nativize_date_times")) {
-			if (!nativizeDateTimes(query,rule)) {
+				"translate_date_times")) {
+			if (!translateDateTimes(query,rule)) {
 				return false;
 			}
 		}
@@ -75,7 +75,7 @@ bool sqltranslator::applyRulesToQuery(xmldomnode *query) {
 	return true;
 }
 
-bool sqltranslator::nativizeDatatypes(xmldomnode *query, xmldomnode *rule) {
+bool sqltranslator::translateDatatypes(xmldomnode *query, xmldomnode *rule) {
 	debugFunction();
 	return true;
 }
@@ -89,6 +89,14 @@ bool sqltranslator::convertDatatypes(xmldomnode *query, xmldomnode *rule) {
 char *sqltranslator::convertDateTime(const char *format,
 			int16_t year, int16_t month, int16_t day,
 			int16_t hour, int16_t minute, int16_t second) {
+
+printf("converting %d/%d/%d %d:%d:%d\n",year,month,day,hour,minute,second);
+printf("format: %s\n",format);
+
+	// if no format was passed in
+	if (!format) {
+		return NULL;
+	}
 
 	// output buffer
 	stringbuffer	output;
@@ -109,10 +117,14 @@ char *sqltranslator::convertDateTime(const char *format,
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"MON",3)) {
-			output.append(shortmonths[month-1]);
+			if (month>0) {
+				output.append(shortmonths[month-1]);
+			}
 			ptr=ptr+3;
 		} else if (!charstring::compare(ptr,"Month",5)) {
-			output.append(longmonths[month-1]);
+			if (month>0) {
+				output.append(longmonths[month-1]);
+			}
 			ptr=ptr+3;
 		} else if (!charstring::compare(ptr,"YYYY",4)) {
 			snprintf(buf,5,"%04d",year);
@@ -147,17 +159,26 @@ char *sqltranslator::convertDateTime(const char *format,
 		}
 	}
 
+printf("output: %s\n",output.getString());
 	return output.detachString();
 }
 
-bool sqltranslator::nativizeDateTimesInQuery(xmldomnode *querynode,
+bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 							xmldomnode *rule) {
 	debugFunction();
 
 	// output format
-	const char	*format=rule->getAttributeValue("output");
-	if (!format) {
-		format="DD-MON-YYYY";
+	const char	*datetimeformat=rule->getAttributeValue("datetime");
+	const char	*dateformat=rule->getAttributeValue("date");
+	const char	*timeformat=rule->getAttributeValue("time");
+	if (!datetimeformat) {
+		datetimeformat="DD-MON-YYYY HH24:MI:SS";
+	}
+	if (!dateformat) {
+		dateformat="DD-MON-YYYY";
+	}
+	if (!timeformat) {
+		timeformat="HH24:MI:SS";
 	}
 
 	// convert this node...
@@ -186,6 +207,19 @@ bool sqltranslator::nativizeDateTimesInQuery(xmldomnode *querynode,
 			// parse the date/time
 			if (parseDateTime(valuecopy,&year,&month,&day,
 						&hour,&minute,&second)) {
+
+				// decide which format to use
+				bool	validdate=(year!=-1 && month!=-1 && day!=-1);
+				bool	validtime=(hour=-1 && minute!=-1 && second!=-1);
+				const char	*format=NULL;
+				if (validdate && validtime) {
+					format=datetimeformat;
+				} else if (validdate) {
+					format=dateformat;
+				} else if (validtime) {
+					format=timeformat;
+				}
+
 
 				// convert it
 				char	*converted=convertDateTime(
@@ -218,14 +252,14 @@ bool sqltranslator::nativizeDateTimesInQuery(xmldomnode *querynode,
 	// convert child nodes...
 	for (xmldomnode *node=querynode->getFirstTagChild();
 			!node->isNullNode(); node=node->getNextTagSibling()) {
-		if (!nativizeDateTimesInQuery(node,rule)) {
+		if (!translateDateTimesInQuery(node,rule)) {
 			return false;
 		}
 	}
 	return true;
 }
 
-bool sqltranslator::nativizeDateTimesInBindVariables(
+bool sqltranslator::translateDateTimesInBindVariables(
 						xmldomnode *querynode,
 						xmldomnode *rule) {
 	debugFunction();
@@ -296,10 +330,10 @@ bool sqltranslator::trimColumnsComparedToStringBinds(xmldomnode *query,
 	return true;
 }
 
-bool sqltranslator::nativizeDateTimes(xmldomnode *query, xmldomnode *rule) {
+bool sqltranslator::translateDateTimes(xmldomnode *query, xmldomnode *rule) {
 	debugFunction();
-	return nativizeDateTimesInBindVariables(query,rule) &&
-			nativizeDateTimesInQuery(query,rule);
+	return translateDateTimesInBindVariables(query,rule) &&
+			translateDateTimesInQuery(query,rule);
 }
 
 xmldomnode *sqltranslator::newNode(xmldomnode *parentnode, const char *type) {

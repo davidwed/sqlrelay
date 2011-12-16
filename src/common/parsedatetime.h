@@ -216,12 +216,14 @@ static bool parseDateTime(const char *datetime,
 	}
 	delete[] parts;
 
-	// manage 2-digit years
+	// manage bad years
 	if (*year!=-1) {
 		if (*year<50) {
 			*year=*year+2000;
 		} else if (*year<100) {
 			*year=*year+1900;
+		} else if (*year>9999) {
+			*year=9999;
 		}
 	}
 

@@ -29,7 +29,7 @@ bool oracle8sqltranslator::applyRulesToQuery(xmldomnode *query) {
 	return sqltranslator::applyRulesToQuery(query);
 }
 
-bool oracle8sqltranslator::nativizeDatatypes(xmldomnode *query,
+bool oracle8sqltranslator::translateDatatypes(xmldomnode *query,
 						xmldomnode *rule) {
 	debugFunction();
 	return true;

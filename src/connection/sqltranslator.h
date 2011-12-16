@@ -23,18 +23,18 @@ class sqltranslator {
 						xmldom *querytree);
 	protected:
 		virtual bool	applyRulesToQuery(xmldomnode *query);
-		virtual bool	nativizeDatatypes(xmldomnode *query,
+		virtual bool	translateDatatypes(xmldomnode *query,
 							xmldomnode *rule);
 		virtual bool	convertDatatypes(xmldomnode *query,
 							xmldomnode *rule);
 		virtual bool	trimColumnsComparedToStringBinds(
 							xmldomnode *query,
 							xmldomnode *rule);
-		virtual bool	nativizeDateTimes(xmldomnode *query,
+		virtual bool	translateDateTimes(xmldomnode *query,
 							xmldomnode *rule);
-		bool		nativizeDateTimesInQuery(xmldomnode *querynode,
+		bool		translateDateTimesInQuery(xmldomnode *querynode,
 							xmldomnode *rule);
-		bool		nativizeDateTimesInBindVariables(
+		bool		translateDateTimesInBindVariables(
 							xmldomnode *querynode,
 							xmldomnode *rule);
 		char		*convertDateTime(const char *format,
