@@ -236,14 +236,7 @@ static bool parseDateTime(const char *datetime,
 		}
 	}
 
-	// If there were 2 parts then we should have found all components.
-	// If there was 1 part then we should have found one set or the other.
-	return ((partcount==2 &&
-			*year!=-1 && *month!=-1 && *day!=-1 &&
-			*hour!=-1 && *minute!=-1 && *second!=-1) ||
-		(partcount==1 &&
-			((*year!=-1 && *month!=-1 && *day!=-1) ||
-			(*hour!=-1 && *minute!=-1 && *second!=-1))));
+	return true;
 }
 
 #endif

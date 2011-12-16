@@ -1702,18 +1702,23 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 					stmt->resultbinds[i].buffer=NULL;
 					break;
 				case MYSQL_TYPE_VAR_STRING:
-				case MYSQL_TYPE_STRING:
+				case MYSQL_TYPE_STRING: {
+
+					// initialize len to the buffer size
+					unsigned long	len=stmt->
+								resultbinds[i].
+								buffer_length;
+
+					// if the column itself is shorter than
+					// the buffer size, then reset len
+					if (lengths[i]<stmt->
+						resultbinds[i].buffer_length) {
+
+						// add 1 for the null terminator
+						len=lengths[i]+1;
+					}
 
 					// set the output length (if we can)
-					unsigned long	len;
-					if (lengths[i]>stmt->
-						resultbinds[i].buffer_length) {
-						len=lengths[i];
-					} else {
-						len=stmt->
-							resultbinds[i].
-							buffer_length;
-					}
 					if (stmt->resultbinds[i].length) {
 						*(stmt->resultbinds[i].
 								length)=len;
@@ -1723,14 +1728,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 					rawbuffer::copy(
 						stmt->resultbinds[i].buffer,
 						row[i],len);
-
-					// null-terminate, if possible
-					if (len<stmt->resultbinds[i].
-							buffer_length) {
-						stmt->resultbinds[i].
-							buffer[len]='\0';
 					}
-
 					break;
 				case MYSQL_TYPE_TIMESTAMP:
 				case MYSQL_TYPE_DATE:
@@ -2189,7 +2187,7 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				MYSQL_TIME	*tm=
 						(MYSQL_TIME *)bind[i].buffer;
 				snprintf(buffer,20,
-					"%04d/%02d/%02d %02d:%02d:%02d\n",
+					"%04d/%02d/%02d %02d:%02d:%02d",
 					tm->year,tm->month,tm->day,
 					tm->hour,tm->minute,tm->second);
 				cursor->inputBind(variable,buffer);

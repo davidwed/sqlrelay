@@ -90,9 +90,6 @@ char *sqltranslator::convertDateTime(const char *format,
 			int16_t year, int16_t month, int16_t day,
 			int16_t hour, int16_t minute, int16_t second) {
 
-printf("converting %d/%d/%d %d:%d:%d\n",year,month,day,hour,minute,second);
-printf("format: %s\n",format);
-
 	// if no format was passed in
 	if (!format) {
 		return NULL;
@@ -159,7 +156,6 @@ printf("format: %s\n",format);
 		}
 	}
 
-printf("output: %s\n",output.getString());
 	return output.detachString();
 }
 
@@ -209,8 +205,10 @@ bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 						&hour,&minute,&second)) {
 
 				// decide which format to use
-				bool	validdate=(year!=-1 && month!=-1 && day!=-1);
-				bool	validtime=(hour=-1 && minute!=-1 && second!=-1);
+				bool	validdate=(year!=-1 &&
+						month!=-1 && day!=-1);
+				bool	validtime=(hour!=-1 &&
+						minute!=-1 && second!=-1);
 				const char	*format=NULL;
 				if (validdate && validtime) {
 					format=datetimeformat;
@@ -219,7 +217,6 @@ bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 				} else if (validtime) {
 					format=timeformat;
 				}
-
 
 				// convert it
 				char	*converted=convertDateTime(
@@ -265,9 +262,17 @@ bool sqltranslator::translateDateTimesInBindVariables(
 	debugFunction();
 
 	// output format
-	const char	*format=rule->getAttributeValue("output");
-	if (!format) {
-		format="DD-MON-YYYY";
+	const char	*datetimeformat=rule->getAttributeValue("datetime");
+	const char	*dateformat=rule->getAttributeValue("date");
+	const char	*timeformat=rule->getAttributeValue("time");
+	if (!datetimeformat) {
+		datetimeformat="DD-MON-YYYY HH24:MI:SS";
+	}
+	if (!dateformat) {
+		dateformat="DD-MON-YYYY";
+	}
+	if (!timeformat) {
+		timeformat="HH24:MI:SS";
 	}
 
 	// run through the bind variables...
@@ -294,6 +299,18 @@ bool sqltranslator::translateDateTimesInBindVariables(
 					&year,&month,&day,
 					&hour,&minute,&second)) {
 			continue;
+		}
+
+		// decide which format to use
+		bool	validdate=(year!=-1 && month!=-1 && day!=-1);
+		bool	validtime=(hour!=-1 && minute!=-1 && second!=-1);
+		const char	*format=NULL;
+		if (validdate && validtime) {
+			format=datetimeformat;
+		} else if (validdate) {
+			format=dateformat;
+		} else if (validtime) {
+			format=timeformat;
 		}
 
 		// attempt to convert the value
