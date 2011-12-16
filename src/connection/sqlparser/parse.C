@@ -86,7 +86,7 @@ char *sqlparser::getUntil(const char *set,
 	return retval;
 }
 
-static const char *verbatimTerminators=" ,)";
+static const char *verbatimTerminators=" (,)~!^*-+=<>/&|";
 
 char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 	debugFunction();
@@ -97,19 +97,26 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 	// set state flags
 	bool		inquotes=false;
 	bool		indoublequotes=false;
-	uint16_t	parens=0;
 
 	// initialize the location
 	const char	*chr=ptr;
 
+	// if we find a character in our termination set
+	// then just return that by itself
+	if (inSet(*chr,verbatimTerminators)) {
+		verbatim.append(*chr);
+		*newptr=chr+1;
+		debugPrintf("verbatim: \"%s\"\n",verbatim.getString());
+		return verbatim.detachString();
+	}
+
 	// run through the string...
 	for (;;) {
 
-		// break on end of string or space, comma or right paren
-		// unless we're in quotes or parens
-		if (!*chr ||
-			(!inquotes && !indoublequotes && !parens && 
-							inSet(*chr," ,)"))) {
+		// break on one of the termination characters
+		// unless we're in quotes
+		if (!*chr || (!inquotes && !indoublequotes &&
+					inSet(*chr,verbatimTerminators))) {
 			break;
 		}
 
@@ -127,10 +134,6 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 			inquotes=!inquotes;
 		} else if (!inquotes && *chr=='"') {
 			indoublequotes=!indoublequotes;
-		} else if (!inquotes && !indoublequotes && *chr=='(') {
-			parens++;
-		} else if (!inquotes && !indoublequotes && *chr==')') {
-			parens--;
 		}
 
 		// append the character
@@ -360,17 +363,9 @@ const char *sqlparser::_verbatim="verbatim";
 bool sqlparser::parseRemainderVerbatim(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
-	char	separator[2];
-	separator[1]='\0';
 	*newptr=ptr;
 	do {
-		if (inSet(**newptr,verbatimTerminators) && **newptr!=' ') {
-			separator[0]=**newptr;
-			newNode(currentnode,_verbatim,separator);
-			(*newptr)++;
-		} else {
-			space(*newptr,newptr);
-		}
+		space(*newptr,newptr);
 	} while (parseVerbatim(currentnode,*newptr,newptr));
 	return true;
 }
