@@ -163,6 +163,11 @@ bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 							xmldomnode *rule) {
 	debugFunction();
 
+	// input format
+	bool		ddmm=!charstring::compare(
+				rule->getAttributeValue("inputmmdd"),
+				"no");
+
 	// output format
 	const char	*datetimeformat=rule->getAttributeValue("datetime");
 	const char	*dateformat=rule->getAttributeValue("date");
@@ -201,7 +206,8 @@ bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 			int16_t	second=-1;
 	
 			// parse the date/time
-			if (parseDateTime(valuecopy,&year,&month,&day,
+			if (parseDateTime(valuecopy,ddmm,
+						&year,&month,&day,
 						&hour,&minute,&second)) {
 
 				// decide which format to use
@@ -261,6 +267,11 @@ bool sqltranslator::translateDateTimesInBindVariables(
 						xmldomnode *rule) {
 	debugFunction();
 
+	// input format
+	bool		ddmm=!charstring::compare(
+				rule->getAttributeValue("inputmmdd"),
+				"no");
+
 	// output format
 	const char	*datetimeformat=rule->getAttributeValue("datetime");
 	const char	*dateformat=rule->getAttributeValue("date");
@@ -295,9 +306,9 @@ bool sqltranslator::translateDateTimesInBindVariables(
 		int16_t	second=-1;
 	
 		// parse the date/time
-		if (!parseDateTime(bind->value.stringval,
-					&year,&month,&day,
-					&hour,&minute,&second)) {
+		if (!parseDateTime(bind->value.stringval,ddmm,
+						&year,&month,&day,
+						&hour,&minute,&second)) {
 			continue;
 		}
 

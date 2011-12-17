@@ -139,9 +139,21 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 	} else if (inbindvars[index].type==INTEGER_BIND) {
 		buffer->append(inbindvars[index].value.integerval);
 	} else if (inbindvars[index].type==DOUBLE_BIND) {
-		buffer->append(inbindvars[index].value.doubleval.value,
+		char	*dbuf=charstring::parseNumber(
+				inbindvars[index].value.doubleval.value,
 				inbindvars[index].value.doubleval.precision,
 				inbindvars[index].value.doubleval.scale);
+		// In some regions a comma is used rather than a period for
+		// the decimal and the i8n settings will cause snprintf to use
+		// a comma as the separator.  Databases don't like commas in
+		// their numbers.  Convert commas to periods here. */
+		for (char *ptr=dbuf; *ptr; ptr++) {
+			if (*ptr==',') {
+				*ptr='.';
+			}
+		}
+		buffer->append(dbuf);
+		delete[] dbuf;
 	} else if (inbindvars[index].type==NULL_BIND) {
 		buffer->append("NULL");
 	}

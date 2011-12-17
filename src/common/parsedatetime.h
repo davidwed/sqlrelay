@@ -38,7 +38,7 @@ static const char *longmonths[]={
 	NULL
 };
 
-static bool parseDateTime(const char *datetime,
+static bool parseDateTime(const char *datetime, bool ddmm,
 			int16_t *year, int16_t *month, int16_t *day,
 			int16_t *hour, int16_t *minute, int16_t *second) {
 
@@ -116,21 +116,33 @@ static bool parseDateTime(const char *datetime,
 				charstring::isNumber(dateparts[1]) &&
 				charstring::isNumber(dateparts[2])) {
 
-				// it could be yyyy/mm/dd or mm/dd/yyyy
-				// FIXME: in some countries it could be
-				// dd/mm/yyyy, how do I determine that?
+				// it could be yyyy/xx/xx or xx/xx/yyyy
 				if (charstring::length(dateparts[0])==4) {
 					*year=charstring::toInteger(
 								dateparts[0]);
-					*month=charstring::toInteger(
-								dateparts[1]);
-					*day=charstring::toInteger(
+					if (ddmm) {
+						*month=charstring::toInteger(
 								dateparts[2]);
-				} else {
-					*month=charstring::toInteger(
-								dateparts[0]);
-					*day=charstring::toInteger(
+						*day=charstring::toInteger(
 								dateparts[1]);
+					} else {
+						*month=charstring::toInteger(
+								dateparts[1]);
+						*day=charstring::toInteger(
+								dateparts[2]);
+					}
+				} else {
+					if (ddmm) {
+						*month=charstring::toInteger(
+								dateparts[0]);
+						*day=charstring::toInteger(
+								dateparts[1]);
+					} else {
+						*month=charstring::toInteger(
+								dateparts[1]);
+						*day=charstring::toInteger(
+								dateparts[0]);
+					}
 					*year=charstring::toInteger(
 								dateparts[2]);
 				}
@@ -180,22 +192,42 @@ static bool parseDateTime(const char *datetime,
 								dateparts[2]);
 				} else {
 
-					// it could be yyyy-mm-dd or mm-dd-yyyy
-					// FIXME: in some countries it could be
-					// dd-mm-yyyy, how do I determine that?
+					// it could be yyyy-xx-xx or xx-xx-yyyy
 					if (charstring::length(
 							dateparts[0])==4) {
 						*year=charstring::toInteger(
 								dateparts[0]);
-						*month=charstring::toInteger(
+						if (ddmm) {
+							*day=
+							charstring::toInteger(
 								dateparts[1]);
-						*day=charstring::toInteger(
+							*month=
+							charstring::toInteger(
 								dateparts[2]);
-					} else {
-						*month=charstring::toInteger(
-								dateparts[0]);
-						*day=charstring::toInteger(
+						} else {
+							*month=
+							charstring::toInteger(
 								dateparts[1]);
+							*day=
+							charstring::toInteger(
+								dateparts[2]);
+						}
+					} else {
+						if (ddmm) {
+							*month=
+							charstring::toInteger(
+								dateparts[1]);
+							*day=
+							charstring::toInteger(
+								dateparts[0]);
+						} else {
+							*month=
+							charstring::toInteger(
+								dateparts[0]);
+							*day=
+							charstring::toInteger(
+								dateparts[1]);
+						}
 						*year=charstring::toInteger(
 								dateparts[2]);
 					}
