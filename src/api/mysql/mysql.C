@@ -7,6 +7,7 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/environment.h>
+#include <math.h>
 
 #define NEED_DATATYPESTRING 1
 #define NEED_IS_NUMBER_TYPE_CHAR 1
@@ -407,7 +408,6 @@ void mysql_library_end();
 static int unknownError(MYSQL *mysql);
 static void setMySQLError(MYSQL *mysql,
 			const char *error, unsigned int errorno);
-
 
 
 unsigned int mysql_thread_safe() {
@@ -1690,7 +1690,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 
 	for (uint32_t i=0; i<stmt->result->fieldcount; i++) {
 
-		if (!row[i]) {
+		if (!charstring::length(row[i])) {
 
 			// set the null indicator
 			*(stmt->resultbinds[i].is_null)=true;
@@ -2167,7 +2167,16 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 		char		*variable=
 				charstring::parseNumber((uint32_t)i+1);
 
+		// get the cursor
 		sqlrcursor	*cursor=stmt->result->sqlrcur;
+
+		// handle null's first
+		if (*(bind[i].is_null)) {
+			cursor->inputBind(variable,(char *)NULL);
+			continue;
+		}
+
+		// handle various datatypes
 		switch (bind[i].buffer_type) {
 			case MYSQL_TYPE_NULL: {
 				cursor->inputBind(variable,(char *)NULL);
@@ -2187,9 +2196,10 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				// convert to a mysql-native string and bind...
 				// (we can use a local varaible because we've
 				// told the API to copy references)
-				char	buffer[20];
 				MYSQL_TIME	*tm=
 						(MYSQL_TIME *)bind[i].buffer;
+
+				char	buffer[20];
 				snprintf(buffer,20,
 					"%04d/%02d/%02d %02d:%02d:%02d",
 					tm->year,tm->month,tm->day,
@@ -2205,8 +2215,16 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				cursor->inputBind(variable,value,0,0);
 				break;
 			}
-			case MYSQL_TYPE_TINY:
-			case MYSQL_TYPE_SHORT:
+			case MYSQL_TYPE_TINY: {
+				int8_t	value=*((int8_t *)bind[i].buffer);
+				cursor->inputBind(variable,value);
+				break;
+			}
+			case MYSQL_TYPE_SHORT: {
+				int64_t	value=*((int16_t *)bind[i].buffer);
+				cursor->inputBind(variable,value);
+				break;
+			}
 			case MYSQL_TYPE_LONG:
 			case MYSQL_TYPE_YEAR: {
 				int64_t	value=*((int32_t *)bind[i].buffer);
@@ -2217,7 +2235,6 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_INT24: {
 				int64_t	value=*((int64_t *)bind[i].buffer);
 				cursor->inputBind(variable,value);
-				return false;
 				break;
 			}
 			case MYSQL_TYPE_TINY_BLOB:
