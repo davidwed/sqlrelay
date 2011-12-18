@@ -55,5 +55,6 @@ bool sqlrcursor_svr::translateQuery() {
 			translatedquery.getString(),
 			translatedquery.getStringLength());
 	querylength=translatedquery.getStringLength();
+	querybuffer[querylength]='\0';
 	return true;
 }
