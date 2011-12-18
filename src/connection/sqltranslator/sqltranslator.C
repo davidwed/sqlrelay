@@ -165,8 +165,8 @@ bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 
 	// input format
 	bool		ddmm=!charstring::compare(
-				rule->getAttributeValue("inputmmdd"),
-				"no");
+				rule->getAttributeValue("ddmm"),
+				"yes");
 
 	// output format
 	const char	*datetimeformat=rule->getAttributeValue("datetime");
@@ -269,8 +269,8 @@ bool sqltranslator::translateDateTimesInBindVariables(
 
 	// input format
 	bool		ddmm=!charstring::compare(
-				rule->getAttributeValue("inputmmdd"),
-				"no");
+				rule->getAttributeValue("ddmm"),
+				"yes");
 
 	// output format
 	const char	*datetimeformat=rule->getAttributeValue("datetime");

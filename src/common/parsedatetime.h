@@ -214,12 +214,12 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 						}
 					} else {
 						if (ddmm) {
-							*month=
-							charstring::toInteger(
-								dateparts[1]);
 							*day=
 							charstring::toInteger(
 								dateparts[0]);
+							*month=
+							charstring::toInteger(
+								dateparts[1]);
 						} else {
 							*month=
 							charstring::toInteger(
