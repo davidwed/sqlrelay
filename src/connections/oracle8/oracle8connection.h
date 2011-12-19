@@ -169,6 +169,7 @@ class oracle8cursor : public sqlrcursor_svr {
 					uint64_t *charsread);
 		void		cleanUpLobField(uint32_t col);
 		void		cleanUpData(bool freeresult, bool freebinds);
+		bool		getColumnNameList(stringbuffer *output);
 
 		void		checkRePrepare();
 
@@ -222,6 +223,7 @@ class oracle8cursor : public sqlrcursor_svr {
 	
 class oracle8connection : public sqlrconnection_svr {
 	friend class oracle8cursor;
+	friend class oracle8sqltranslator;
 	public:
 				oracle8connection();
 				~oracle8connection();

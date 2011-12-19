@@ -404,3 +404,31 @@ void sqlrconnection_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 const char *sqlrconnection_svr::beginTransactionQuery() {
 	return "BEGIN";
 }
+
+bool sqlrconnection_svr::getColumnNames(const char *query,
+					stringbuffer *output) {
+
+	// sanity check on the query
+	if (!query) {
+		return false;
+	}
+
+	size_t		querylen=charstring::length(query);
+
+	sqlrcursor_svr	*gcncur=initCursorUpdateStats();
+	// since we're creating a new cursor for this, make sure it can't
+	// have an ID that might already exist
+	bool	retval=false;
+	if (gcncur->openCursorInternal(cursorcount+1) &&
+		gcncur->prepareQuery(query,querylen) &&
+		executeQueryUpdateStats(gcncur,query,querylen,true)) {
+
+		// build column list...
+		retval=gcncur->getColumnNameList(output);
+
+	}
+	gcncur->cleanUpData(true,true);
+	gcncur->closeCursor();
+	deleteCursorUpdateStats(gcncur);
+	return retval;
+}

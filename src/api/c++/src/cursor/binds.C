@@ -132,28 +132,52 @@ void sqlrcursor::deleteVariables() {
 }
 
 void sqlrcursor::substitution(const char *variable, const char *value) {
-	if (subcount<MAXVAR && variable && variable[0]) {
-		stringVar(&subvars[subcount],variable,value);
-		dirtysubs=true;
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,subvars,subcount);
+	if (!bv) {
+		if (subcount>=MAXVAR) {
+			return;
+		}
+		bv=&subvars[subcount];
 		subcount++;
 	}
+	stringVar(bv,variable,value);
+	dirtysubs=true;
 }
 
 void sqlrcursor::substitution(const char *variable, int64_t value) {
-	if (subcount<MAXVAR && variable && variable[0]) {
-		integerVar(&subvars[subcount],variable,value);
-		dirtysubs=true;
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,subvars,subcount);
+	if (!bv) {
+		if (subcount>=MAXVAR) {
+			return;
+		}
+		bv=&subvars[subcount];
 		subcount++;
 	}
+	integerVar(bv,variable,value);
+	dirtysubs=true;
 }
 
 void sqlrcursor::substitution(const char *variable, double value, 
 				uint32_t precision, uint32_t scale) {
-	if (subcount<MAXVAR && variable && variable[0]) {
-		doubleVar(&subvars[subcount],variable,value,precision,scale);
-		dirtysubs=true;
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,subvars,subcount);
+	if (!bv) {
+		if (subcount>=MAXVAR) {
+			return;
+		}
+		bv=&subvars[subcount];
 		subcount++;
 	}
+	doubleVar(bv,variable,value,precision,scale);
+	dirtysubs=true;
 }
 
 void sqlrcursor::clearBinds() {
@@ -163,151 +187,148 @@ void sqlrcursor::clearBinds() {
 
 void sqlrcursor::inputBindBlob(const char *variable, const char *value,
 							uint32_t size) {
-	if (inbindcount<MAXVAR && variable && variable[0]) {
-		lobVar(&inbindvars[inbindcount],variable,value,size,BLOB_BIND);
-		inbindvars[inbindcount].send=true;
-		dirtybinds=true;
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	if (!bv) {
+		if (inbindcount>=MAXVAR) {
+			return;
+		}
+		bv=&inbindvars[inbindcount];
 		inbindcount++;
 	}
+	lobVar(bv,variable,value,size,BLOB_BIND);
+	bv->send=true;
+	dirtybinds=true;
 }
 
 void sqlrcursor::inputBindClob(const char *variable, const char *value,
 							uint32_t size) {
-	if (inbindcount<MAXVAR && variable && variable[0]) {
-		lobVar(&inbindvars[inbindcount],variable,value,size,CLOB_BIND);
-		inbindvars[inbindcount].send=true;
-		dirtybinds=true;
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	if (!bv) {
+		if (inbindcount>=MAXVAR) {
+			return;
+		}
+		bv=&inbindvars[inbindcount];
 		inbindcount++;
 	}
+	lobVar(bv,variable,value,size,CLOB_BIND);
+	bv->send=true;
+	dirtybinds=true;
 }
 
 void sqlrcursor::inputBind(const char *variable, const char *value) {
-	if (inbindcount<MAXVAR && variable && variable[0]) {
-		stringVar(&inbindvars[inbindcount],variable,value);
-		inbindvars[inbindcount].send=true;
-		dirtybinds=true;
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	if (!bv) {
+		if (inbindcount>=MAXVAR) {
+			return;
+		}
+		bv=&inbindvars[inbindcount];
 		inbindcount++;
 	}
+	stringVar(bv,variable,value);
+	bv->send=true;
+	dirtybinds=true;
 }
 
 void sqlrcursor::inputBind(const char *variable, const char *value,
 						uint32_t valuesize) {
-	if (inbindcount<MAXVAR && variable && variable[0]) {
-		stringVar(&inbindvars[inbindcount],variable,value,valuesize);
-		inbindvars[inbindcount].send=true;
-		dirtybinds=true;
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	if (!bv) {
+		if (inbindcount>=MAXVAR) {
+			return;
+		}
+		bv=&inbindvars[inbindcount];
 		inbindcount++;
 	}
+	stringVar(bv,variable,value,valuesize);
+	bv->send=true;
+	dirtybinds=true;
 }
 
 void sqlrcursor::inputBind(const char *variable, int64_t value) {
-	if (inbindcount<MAXVAR && variable && variable[0]) {
-		integerVar(&inbindvars[inbindcount],variable,value);
-		inbindvars[inbindcount].send=true;
-		dirtybinds=true;
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	if (!bv) {
+		if (inbindcount>=MAXVAR) {
+			return;
+		}
+		bv=&inbindvars[inbindcount];
 		inbindcount++;
 	}
+	integerVar(bv,variable,value);
+	bv->send=true;
+	dirtybinds=true;
 }
 
 void sqlrcursor::inputBind(const char *variable, double value, 
 				uint32_t precision, uint32_t scale) {
-	if (inbindcount<MAXVAR && variable && variable[0]) {
-		doubleVar(&inbindvars[inbindcount],variable,value,
-						precision, scale);
-		inbindvars[inbindcount].send=true;
-		dirtybinds=true;
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	if (!bv) {
+		if (inbindcount>=MAXVAR) {
+			return;
+		}
+		bv=&inbindvars[inbindcount];
 		inbindcount++;
 	}
+	doubleVar(bv,variable,value,precision, scale);
+	bv->send=true;
+	dirtybinds=true;
 }
 
 void sqlrcursor::substitutions(const char **variables, const char **values) {
-	uint16_t	index=0;
-	while (variables[index] && subcount<MAXVAR) {
-		if (variables[index] && variables[index][0]) {
-			stringVar(&subvars[subcount],
-					variables[index],values[index]);
-			dirtysubs=true;
-			subcount++;
-		}
-		index++;
+	for (uint16_t i=0; variables[i]; i++) {
+		substitution(variables[i],values[i]);
 	}
 }
 
 void sqlrcursor::substitutions(const char **variables, const int64_t *values) {
-	uint16_t	index=0;
-	while (variables[index] && subcount<MAXVAR) {
-		if (variables[index] && variables[index][0]) {
-			integerVar(&subvars[subcount],
-					variables[index],values[index]);
-			dirtysubs=true;
-			subcount++;
-		}
-		index++;
+	for (uint16_t i=0; variables[i]; i++) {
+		substitution(variables[i],values[i]);
 	}
 }
 
 void sqlrcursor::substitutions(const char **variables, const double *values, 
 					const uint32_t *precisions,
 					const uint32_t *scales) {
-	uint16_t	index=0;
-	while (variables[index] && subcount<MAXVAR) {
-		if (variables[index] && variables[index][0]) {
-			doubleVar(&subvars[subcount],
-					variables[index],
-					values[index],
-					precisions[index],
-					scales[index]);
-			dirtysubs=true;
-			subcount++;
-		}
-		index++;
+	for (uint16_t i=0; variables[i]; i++) {
+		substitution(variables[i],values[i],precisions[i],scales[i]);
 	}
 }
 
 void sqlrcursor::inputBinds(const char **variables, const char **values) {
-	uint16_t	index=0;
-	while (variables[index] && inbindcount<MAXVAR) {
-		if (variables[index] && variables[index][0]) {
-			stringVar(&inbindvars[inbindcount],
-					variables[index],values[index]);
-			inbindvars[inbindcount].send=true;
-			dirtybinds=true;
-			inbindcount++;
-		}
-		index++;
+	for (uint16_t i=0; variables[i]; i++) {
+		inputBind(variables[i],values[i]);
 	}
 }
 
 void sqlrcursor::inputBinds(const char **variables, const int64_t *values) {
-	uint16_t	index=0;
-	while (variables[index] && inbindcount<MAXVAR) {
-		if (variables[index] && variables[index][0]) {
-			integerVar(&inbindvars[inbindcount],
-					variables[index],values[index]);
-			inbindvars[inbindcount].send=true;
-			dirtybinds=true;
-			inbindcount++;
-		}
-		index++;
+	for (uint16_t i=0; variables[i]; i++) {
+		inputBind(variables[i],values[i]);
 	}
 }
 
 void sqlrcursor::inputBinds(const char **variables, const double *values, 
 					const uint32_t *precisions,
 					const uint32_t *scales) {
-	uint16_t	index=0;
-	while (variables[index] && inbindcount<MAXVAR) {
-		if (variables[index] && variables[index][0]) {
-			doubleVar(&inbindvars[inbindcount],
-					variables[index],
-					values[index],
-					precisions[index],
-					scales[index]);
-			inbindvars[inbindcount].send=true;
-			dirtybinds=true;
-			inbindcount++;
-		}
-		index++;
+	for (uint16_t i=0; variables[i]; i++) {
+		inputBind(variables[i],values[i],
+				precisions[i],scales[i]);
 	}
 }
 
@@ -373,6 +394,16 @@ void sqlrcursor::lobVar(bindvar *var, const char *variable,
 	}
 }
 
+bindvar *sqlrcursor::findVar(const char *variable,
+				bindvar *vars, uint16_t count) {
+	for (uint16_t i=0; i<count; i++) {
+		if (!charstring::compare(vars[i].variable,variable)) {
+			return &(vars[i]);
+		}
+	}
+	return NULL;
+}
+
 void sqlrcursor::initVar(bindvar *var, const char *variable) {
 
 	// clear any old variable name that was stored and assign the new 
@@ -426,32 +457,40 @@ void sqlrcursor::defineOutputBindCursor(const char *variable) {
 void sqlrcursor::defineOutputBindGeneric(const char *variable,
 				bindtype type, uint32_t valuesize) {
 
-	if (outbindcount<MAXVAR && variable && variable[0]) {
+	if (!variable || !variable[0]) {
+		return;
+	}
 
-		// clean up old values
-		if (outbindvars[outbindcount].type==STRING_BIND) {
-			delete[] outbindvars[outbindcount].value.stringval;
-		} else if (outbindvars[outbindcount].type==BLOB_BIND ||
-			outbindvars[outbindcount].type==CLOB_BIND) {
-			delete[] outbindvars[outbindcount].value.lobval;
+	bindvar	*bv=findVar(variable,outbindvars,outbindcount);
+	if (!bv) {
+		if (outbindcount>=MAXVAR) {
+			return;
 		}
-		if (copyrefs) {
-			// clean up old variable and set new variable
-			delete[] outbindvars[outbindcount].variable;
-			outbindvars[outbindcount].variable=
-					charstring::duplicate(variable);
-		} else {
-			outbindvars[outbindcount].variable=(char *)variable;
-		}
-		outbindvars[outbindcount].type=type;
-		outbindvars[outbindcount].value.stringval=NULL;
-		outbindvars[outbindcount].value.lobval=NULL;
-		outbindvars[outbindcount].valuesize=valuesize;
-		outbindvars[outbindcount].resultvaluesize=0;
-		outbindvars[outbindcount].send=true;
+		bv=&outbindvars[outbindcount];
 		dirtybinds=true;
 		outbindcount++;
 	}
+
+	// clean up old values
+	if (bv->type==STRING_BIND) {
+		delete[] bv->value.stringval;
+	} else if (bv->type==BLOB_BIND ||
+		bv->type==CLOB_BIND) {
+		delete[] bv->value.lobval;
+	}
+	if (copyrefs) {
+		// clean up old variable and set new variable
+		delete[] bv->variable;
+		bv->variable=charstring::duplicate(variable);
+	} else {
+		bv->variable=(char *)variable;
+	}
+	bv->type=type;
+	bv->value.stringval=NULL;
+	bv->value.lobval=NULL;
+	bv->valuesize=valuesize;
+	bv->resultvaluesize=0;
+	bv->send=true;
 }
 
 const char *sqlrcursor::getOutputBindString(const char *variable) {

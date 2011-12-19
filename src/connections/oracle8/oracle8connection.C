@@ -1778,3 +1778,13 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 		oracurbindcount=0;
 	}
 }
+
+bool oracle8cursor::getColumnNameList(stringbuffer *output) {
+	for (sword i=0; i<ncols; i++) {
+		if (i) {
+			output->append(',');
+		}
+		output->append((char *)desc[i].buf,(uint16_t)desc[i].buflen);
+	}
+	return true;
+}

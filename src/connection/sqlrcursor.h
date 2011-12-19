@@ -147,6 +147,8 @@ class sqlrcursor_svr {
 
 		virtual bool		translateQuery();
 
+		virtual bool		getColumnNameList(stringbuffer *output);
+
 
 		// SID virtual methods
 

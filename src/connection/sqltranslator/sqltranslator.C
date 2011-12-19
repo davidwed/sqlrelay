@@ -408,6 +408,36 @@ xmldomnode *sqltranslator::newNodeAfter(xmldomnode *parentnode,
 	return retval;
 }
 
+xmldomnode *sqltranslator::newNodeBefore(xmldomnode *parentnode,
+						xmldomnode *node,
+						const char *type) {
+
+	// find the position after "node"
+	uint64_t	position=0;
+	for (xmldomnode *child=parentnode->getChild((uint64_t)0);
+		!child->isNullNode(); child=child->getNextSibling()) {
+		if (child==node) {
+			break;
+		}
+		position++;
+	}
+
+	// create a new node and insert it at that position
+	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,type,NULL);
+	parentnode->insertChild(retval,position);
+	return retval;
+}
+
+xmldomnode *sqltranslator::newNodeBefore(xmldomnode *parentnode,
+						xmldomnode *node,
+						const char *type,
+						const char *value) {
+	xmldomnode	*retval=newNodeBefore(parentnode,node,type);
+	setAttribute(retval,sqlparser::_value,value);
+	return retval;
+}
+
 void sqltranslator::setAttribute(xmldomnode *node,
 				const char *name, const char *value) {
 	// FIXME: I shouldn't have to do this.

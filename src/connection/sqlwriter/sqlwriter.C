@@ -23,6 +23,16 @@ bool sqlwriter::write(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur,
 	return write(tree->getRootNode()->getFirstTagChild(),output);
 }
 
+bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldomnode *tree,
+					stringbuffer *output) {
+	debugFunction();
+	this->sqlrcon=sqlrcon;
+	this->sqlrcur=sqlrcur;
+	return write(tree,output);
+}
+
 bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 

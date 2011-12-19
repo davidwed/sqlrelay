@@ -15,6 +15,8 @@ class oracle8sqltranslator : public sqltranslator {
 							xmldomnode *rule);
 		bool	translateDatatypes(xmldomnode *query,
 							xmldomnode *rule);
+		bool	tempTablesAddMissingColumns(xmldomnode *query,
+							xmldomnode *rule);
 };
 
 #endif

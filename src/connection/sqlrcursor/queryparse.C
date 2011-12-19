@@ -100,3 +100,7 @@ bool sqlrcursor_svr::advance(char **ptr, const char *endptr, uint16_t steps) {
 	}
 	return *ptr!=endptr;
 }
+
+bool sqlrcursor_svr::getColumnNameList(stringbuffer *output) {
+	return true;
+}

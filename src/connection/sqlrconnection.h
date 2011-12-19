@@ -192,6 +192,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 							bool freebinds);
 		virtual signalhandler	*handleSignals(void (*shutdownfunction)(int));
 
+		virtual	bool		getColumnNames(const char *query,
+						stringbuffer *output);
+
 	private:
 		// methods used internally
 		bool	initConnection(int argc, const char **argv);

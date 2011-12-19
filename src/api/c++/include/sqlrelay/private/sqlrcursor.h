@@ -43,6 +43,9 @@
 		void	lobVar(bindvar *var, const char *variable,
 					const char *value, uint32_t size,
 					bindtype type);
+		bindvar	*findVar(const char *variable,
+					bindvar *vars,
+					uint16_t count);
 		void	initVar(bindvar *var, const char *variable);
 		void	performSubstitution(stringbuffer *buffer,
 							uint16_t which);

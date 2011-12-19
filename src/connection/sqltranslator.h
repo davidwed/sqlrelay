@@ -59,6 +59,13 @@ class sqltranslator {
 						xmldomnode *node,
 						const char *type,
 						const char *value);
+		xmldomnode	*newNodeBefore(xmldomnode *parentnode,
+						xmldomnode *node,
+						const char *type);
+		xmldomnode	*newNodeBefore(xmldomnode *parentnode,
+						xmldomnode *node,
+						const char *type,
+						const char *value);
 		void		setAttribute(xmldomnode *node,
 						const char *name,
 						const char *value);
@@ -68,7 +75,7 @@ class sqltranslator {
 
 
 		xmldomnode	*rulesnode;
-	private:
+	protected:
 		xmldom		*xmld;
 		xmldom		*tree;
 

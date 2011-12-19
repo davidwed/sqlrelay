@@ -21,6 +21,10 @@ class sqlwriter {
 					sqlrcursor_svr *sqlrcur,
 					xmldom *tree,
 					stringbuffer *output);
+		virtual bool	write(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldomnode *tree,
+					stringbuffer *output);
 	protected:
 		virtual bool	write(xmldomnode *tree, stringbuffer *output);
 

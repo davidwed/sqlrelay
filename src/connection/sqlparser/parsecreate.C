@@ -81,9 +81,8 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 	parseName(tablenode,*newptr,newptr);
 
 	// column and constrain definitions
-	if (!parseColumnAndConstraintDefinitions(tablenode,*newptr,newptr)) {
-		return false;
-	}
+	// (optional for create ... as select ...
+	parseColumnAndConstraintDefinitions(tablenode,*newptr,newptr);
 
 	// on commit (optional)
 	parseOnCommit(tablenode,*newptr,newptr);
