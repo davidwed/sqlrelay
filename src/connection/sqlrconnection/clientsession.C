@@ -63,6 +63,7 @@ void sqlrconnection_svr::clientSession() {
 		// handle some things up front
 		if (command==AUTHENTICATE) {
 			if (authenticateCommand()) {
+				initClientSession();
 				continue;
 			}
 			break;
@@ -411,4 +412,28 @@ bool sqlrconnection_svr::getCommand(uint16_t *command) {
 
 	dbgfile.debugPrint("connection",1,"done getting command");
 	return true;
+}
+
+void sqlrconnection_svr::initClientSession() {
+
+	// create the select database query
+	const char	*initquery="alter session set nls_date_format='DD/MM/YYYY'";
+	size_t		initquerylen=charstring::length(initquery);
+
+	sqlrcursor_svr	*initcur=initCursorUpdateStats();
+	// since we're creating a new cursor for this, make sure it can't
+	// have an ID that might already exist
+	bool	retval=false;
+	if (initcur->openCursorInternal(cursorcount+1) &&
+		initcur->prepareQuery(initquery,initquerylen) &&
+		executeQueryUpdateStats(initcur,initquery,initquerylen,true)) {
+		initcur->cleanUpData(true,true);
+		retval=true;
+	} else {
+		/*bool	liveconnection;
+		error=charstring::duplicate(
+				initcur->errorMessage(&liveconnection));*/
+	}
+	initcur->closeCursor();
+	deleteCursorUpdateStats(initcur);
 }
