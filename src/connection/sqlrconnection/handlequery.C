@@ -242,7 +242,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 				dbgfile.debugPrint("connection",3,
 							"faking binds...");
 
-printf("faking binds\n");
 				newquery=cursor->fakeInputBinds(
 						cursor->querybuffer);
 
@@ -266,7 +265,6 @@ printf("\"\n\n");
 				!fakeinputbinds &&
 				!cursor->fakeinputbindsforthisquery &&
 				cursor->supportsNativeBinds()) {
-printf("binding for real\n");
 				success=cursor->handleBinds();
 			}
 
