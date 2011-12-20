@@ -1,7 +1,6 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#define DEBUG_MESSAGES
 #include <debugprint.h>
 #include <sqlrconnection.h>
 
