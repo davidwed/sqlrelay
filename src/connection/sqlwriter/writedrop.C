@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlwriter.h>
-#include <sqltranslatordebug.h>
+#include <debugprint.h>
 
 bool sqlwriter::dropQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();

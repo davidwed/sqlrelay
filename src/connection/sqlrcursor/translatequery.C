@@ -3,13 +3,13 @@
 
 #include <sqlrconnection.h>
 #define DEBUG_MESSAGES
-#include <sqltranslatordebug.h>
+#include <debugprint.h>
 #include <rudiments/character.h>
 #include <rudiments/xmldom.h>
 
 bool sqlrcursor_svr::translateQuery() {
 
-	debugPrintf("parsing:\n%s\n",querybuffer);
+	debugPrintf("parsing: \"%s\"\n\n",querybuffer);
 
 	// parse the query
 	if (!conn->sqlp->parse(querybuffer)) {
@@ -44,7 +44,7 @@ bool sqlrcursor_svr::translateQuery() {
 	}
 	delete tree;
 
-	debugPrintf("translated:\n%s\n",translatedquery.getString());
+	debugPrintf("translated: \"%s\"\n",translatedquery.getString());
 
 	// copy the translated query into query buffer
 	if (translatedquery.getStringLength()>conn->maxquerysize) {

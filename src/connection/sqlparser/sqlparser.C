@@ -4,7 +4,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/stringbuffer.h>
 #include <sqlparser.h>
-#include <sqltranslatordebug.h>
+#include <debugprint.h>
 
 sqlparser::sqlparser() {
 	tree=NULL;

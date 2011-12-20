@@ -1,6 +1,8 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
+#define DEBUG_MESSAGES
+#include <debugprint.h>
 #include <sqlrconnection.h>
 
 int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
@@ -253,9 +255,8 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 						cursor->querylength;
 			}
 
-printf("\nrunning: \"");
-charstring::safePrint(queryptr,querylen);
-printf("\"\n\n");
+			debugPrintf("\nrunning: \"%s\"\n\n",queryptr);
+
 			// prepare
 			success=cursor->prepareQuery(queryptr,querylen);
 

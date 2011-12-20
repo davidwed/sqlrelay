@@ -277,13 +277,14 @@ bool sqlrconnection_svr::handlePidFile() {
 
 	bool	retval=true;
 	if (checkForPidFile(listenerpidfile)==-1) {
-		printf("\nsqlr-connection error:\n");
-		printf("	The pid file %s",listenerpidfile);
-		printf(" was not found.\n");
-		printf("	This usually means that the sqlr-listener \n");
-		printf("is not running.\n");
-		printf("	The sqlr-listener must be running ");
-		printf("for the sqlr-connection to start.\n\n");
+		fprintf(stderr,"\nsqlr-connection error:\n");
+		fprintf(stderr,"	The pid file %s",listenerpidfile);
+		fprintf(stderr," was not found.\n");
+		fprintf(stderr,"	This usually means "
+					"that the sqlr-listener \n");
+		fprintf(stderr,"is not running.\n");
+		fprintf(stderr,"	The sqlr-listener must be running ");
+		fprintf(stderr,"for the sqlr-connection to start.\n\n");
 		retval=false;
 	}
 

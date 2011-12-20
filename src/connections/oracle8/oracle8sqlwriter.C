@@ -1,7 +1,7 @@
 #include <oracle8sqlwriter.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslatordebug.h>
+#include <debugprint.h>
 
 oracle8sqlwriter::oracle8sqlwriter() : sqlwriter() {
 	debugFunction();

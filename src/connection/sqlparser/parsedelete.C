@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
-#include <sqltranslatordebug.h>
+#include <debugprint.h>
 
 bool sqlparser::parseDelete(xmldomnode *currentnode,
 					const char *ptr,

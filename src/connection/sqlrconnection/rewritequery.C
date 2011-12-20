@@ -1,6 +1,7 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
+#include <debugprint.h>
 #include <sqlrconnection.h>
 #include <rudiments/character.h>
 
@@ -179,13 +180,15 @@ void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 
 	// debug
-	/* printf("query: \"%s\"\n",cursor->querybuffer);
+	#ifdef DEBUG_MESSAGES
+	debugPrintf("query: \"%s\"\n",cursor->querybuffer);
 	for (uint16_t i=0; i<cursor->inbindcount; i++) {
-		printf("inbind: \"%s\"\n",cursor->inbindvars[i].variable);
+		debugPrintf("inbind: \"%s\"\n",cursor->inbindvars[i].variable);
 	}
 	for (uint16_t i=0; i<cursor->outindcount; i++) {
-		printf("outbind: \"%s\"\n",cursor->outindvars[i].variable);
-	}*/
+		debugPrintf("outbind: \"%s\"\n",cursor->outindvars[i].variable);
+	}
+	#endif
 	dbgfile.debugPrint("connection",2,"converted:");
 	dbgfile.debugPrint("connection",2,cursor->querybuffer);
 	dbgfile.debugPrint("connection",2,"input binds:");

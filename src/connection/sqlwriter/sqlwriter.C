@@ -3,7 +3,7 @@
 
 #include <sqlwriter.h>
 #include <sqlparser.h>
-#include <sqltranslatordebug.h>
+#include <debugprint.h>
 
 sqlwriter::sqlwriter() {
 	debugFunction();

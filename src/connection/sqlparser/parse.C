@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
-#include <sqltranslatordebug.h>
+#include <debugprint.h>
 
 bool sqlparser::comparePart(const char *ptr, const char **newptr,
 							const char *part) {
@@ -11,14 +11,6 @@ bool sqlparser::comparePart(const char *ptr, const char **newptr,
 
 	// get the part length
 	uint64_t	length=charstring::length(part);
-
-	#ifdef DEBUG_MESSAGES
-	printf("\"");
-	for (uint64_t i=0; i<length && ptr[i]; i++) {
-		printf("%c",ptr[i]);
-	}
-	printf("\" == \"%s\"\n",part);
-	#endif
 
 	// see if the next "length" bytes are equal to the part
 	if (!charstring::compareIgnoringCase(ptr,part,length)) {

@@ -416,6 +416,11 @@ bool sqlrconnection_svr::getCommand(uint16_t *command) {
 
 void sqlrconnection_svr::initClientSession() {
 
+	// this method provides an entry point for a configurable set of
+	// queries to be run at the start of each session, for example,
+	// the following...
+
+	/*
 	// create the select database query
 	const char	*initquery="alter session set nls_date_format='DD/MM/YYYY'";
 	size_t		initquerylen=charstring::length(initquery);
@@ -430,10 +435,10 @@ void sqlrconnection_svr::initClientSession() {
 		initcur->cleanUpData(true,true);
 		retval=true;
 	} else {
-		/*bool	liveconnection;
+		bool	liveconnection;
 		error=charstring::duplicate(
-				initcur->errorMessage(&liveconnection));*/
+				initcur->errorMessage(&liveconnection));
 	}
 	initcur->closeCursor();
-	deleteCursorUpdateStats(initcur);
+	deleteCursorUpdateStats(initcur);*/
 }

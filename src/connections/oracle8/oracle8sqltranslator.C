@@ -1,7 +1,10 @@
+// Copyright (c) 1999-2001  David Muse
+// See the file COPYING for more information
+
 #include <oracle8sqltranslator.h>
 #include <sqlparser.h>
 #include <sqlwriter.h>
-#include <sqltranslatordebug.h>
+#include <debugprint.h>
 #include <sqlrconnection.h>
 
 oracle8sqltranslator::oracle8sqltranslator() : sqltranslator() {

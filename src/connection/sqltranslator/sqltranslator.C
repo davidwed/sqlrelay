@@ -5,7 +5,7 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslatordebug.h>
+#include <debugprint.h>
 
 sqltranslator::sqltranslator() {
 	debugFunction();

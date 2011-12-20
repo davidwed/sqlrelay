@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2001  David Muse
+// Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
 #include <mysqlsqlwriter.h>
