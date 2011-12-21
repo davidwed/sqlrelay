@@ -18,9 +18,11 @@ oracle8connection::oracle8connection() : sqlrconnection_svr() {
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
 #endif
+	lastinsertidquery=NULL;
 }
 
 oracle8connection::~oracle8connection() {
+	delete[] lastinsertidquery;
 }
 
 uint16_t oracle8connection::getNumberOfConnectStringVars() {
@@ -62,6 +64,16 @@ void oracle8connection::handleConnectString() {
 	droptemptables=!charstring::compare(
 				connectStringValue("droptemptables"),"yes");
 #endif
+
+	const char	*lastinsertidfunc=
+			connectStringValue("lastinsertidfunction");
+	if (lastinsertidfunc) {
+		stringbuffer	liiquery;
+		liiquery.append("select ");
+		liiquery.append(lastinsertidfunc);
+		liiquery.append(" from dual");
+		lastinsertidquery=liiquery.detachString();
+	}
 }
 
 void oracle8connection::dropTempTables(sqlrcursor_svr *cursor,
@@ -579,6 +591,10 @@ const char *oracle8connection::selectDatabaseQuery() {
 
 const char *oracle8connection::getCurrentDatabaseQuery() {
 	return "select sys_context('userenv','current_schema') from dual";
+}
+
+const char *oracle8connection::getLastInsertIdQuery() {
+	return lastinsertidquery;
 }
 
 oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {

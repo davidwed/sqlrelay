@@ -998,9 +998,9 @@ const char *mysql_info(MYSQL *mysql) {
 
 my_ulonglong mysql_insert_id(MYSQL *mysql) {
 	debugFunction();
-	// FIXME: for mysql db's you can call "select last_insert_id()"
-	// for other db's, ????
-	return 0;
+	uint64_t	retval=0;
+	mysql->sqlrcon->getLastInsertId(&retval);
+	return retval;
 }
 
 

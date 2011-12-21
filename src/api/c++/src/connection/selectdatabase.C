@@ -75,8 +75,7 @@ const char *sqlrconnection::getCurrentDatabase() {
 
 	if (debug) {
 		debugPreStart();
-		debugPrint("Getting the current database...");
-		debugPrint("\n");
+		debugPrint("Getting the current database...\n");
 		debugPreEnd();
 	}
 

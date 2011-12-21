@@ -262,6 +262,11 @@ const char *mysqlconnection::getCurrentDatabaseQuery() {
 	return "select database()";
 }
 
+bool mysqlconnection::getLastInsertId(uint64_t *id, char **error) {
+	*id=mysql_insert_id(&mysql);
+	return true;
+}
+
 const char *mysqlconnection::getDefaultIsolationLevel() {
 	// This is the default for InnoDB tables.
 	// MyIsam tables don't support transactions.

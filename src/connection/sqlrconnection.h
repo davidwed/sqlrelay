@@ -70,6 +70,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual const char	*selectDatabaseQuery();
 		virtual char		*getCurrentDatabase();
 		virtual const char	*getCurrentDatabaseQuery();
+		virtual bool		getLastInsertId(uint64_t *id,
+								char **error);
+		virtual const char	*getLastInsertIdQuery();
 		virtual bool		setIsolationLevel(const char *isolevel);
 		virtual const char	*setIsolationLevelQuery();
 		virtual const char	*getDefaultIsolationLevel();
@@ -267,6 +270,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	endSessionCommand();
 		void	selectDatabaseCommand();
 		void	getCurrentDatabaseCommand();
+		void	getLastInsertIdCommand();
 		void	pingCommand();
 		void	identifyCommand();
 		void	autoCommitCommand();

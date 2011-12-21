@@ -26,6 +26,7 @@
 
 		void	clearError();
 		void	setError(const char *err);
+		bool	getError();
 
 		void	flushWriteBuffer();
 

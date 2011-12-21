@@ -94,6 +94,11 @@ class sqlrconnection {
 				// currently in use.
 
 
+		bool	getLastInsertId(uint64_t *id);
+				// Returns the value of the autoincrement
+				// column for the last insert
+
+
 		bool	autoCommitOn();
 				// Instructs the database to perform a commit
 				// after every successful query.
@@ -341,7 +346,7 @@ class sqlrcursor {
 				// defined output bind variable.
 
 		
-		bool	openCachedResultSet(const char *filename);
+		bool		openCachedResultSet(const char *filename);
 				// Opens a cached result set.
 				// Returns true on success and false on failure.
 
@@ -372,7 +377,7 @@ class sqlrcursor {
 				// Returns the index of the first buffered row.
 				// This is useful when buffering only part of
 				// the result set at a time.
-		bool	endOfResultSet();
+		bool		endOfResultSet();
 				// Returns false if part of the result set is
 				// still pending on the server and true if not.
 				// This method can only return false if 

@@ -160,6 +160,7 @@ class	sqlrsh {
 						environment *env);
 		void	serverversion(sqlrconnection *sqlrcon,
 						environment *env);
+		bool	lastinsertid(sqlrconnection *sqlrcon, environment *env);
 		void	inputbind(sqlrcursor *sqlrcur,
 						environment *env,
 						const char *command);
@@ -354,7 +355,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"printbinds",10) ||
 		!charstring::compareIgnoringCase(ptr,"clearinputbind",14) ||
 		!charstring::compareIgnoringCase(ptr,"clearoutputbind",15) ||
-		!charstring::compareIgnoringCase(ptr,"clearbinds",10)) {
+		!charstring::compareIgnoringCase(ptr,"clearbinds",10) ||
+		!charstring::compareIgnoringCase(ptr,"lastinsertid",12)) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -453,6 +455,11 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"clearbinds",10)) {	
 		env->clearbinds(&env->inputbinds);
 		env->clearbinds(&env->outputbinds);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"lastinsertid",12)) {	
+		if (!lastinsertid(sqlrcon,env)) {
+			displayError(env,NULL,sqlrcon->errorMessage());
+		}
 		return;
 	} else {
 		return;
@@ -859,6 +866,17 @@ void sqlrsh::ping(sqlrconnection *sqlrcon, environment *env) {
 	printf((sqlrcon->ping())?"	The database is up.\n":
 				"	The database is down.\n");
 	white(env);
+}
+
+bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, environment *env) {
+	red(env);
+	uint64_t	id;
+	bool	retval=sqlrcon->getLastInsertId(&id);
+	if (retval) {
+		printf("%lld\n",id);
+	}
+	white(env);
+	return retval;
 }
 
 void sqlrsh::identify(sqlrconnection *sqlrcon, environment *env) {

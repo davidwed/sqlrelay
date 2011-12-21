@@ -254,6 +254,7 @@ class oracle8connection : public sqlrconnection_svr {
 		const char	*getColumnListQuery(bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
+		const char	*getLastInsertIdQuery();
 
 		sqltranslator	*getSqlTranslator();
 		sqlwriter	*getSqlWriter();
@@ -277,6 +278,8 @@ class oracle8connection : public sqlrconnection_svr {
 		const char	*home;
 		const char	*sid;
 		const char	*nlslang;
+
+		char		*lastinsertidquery;
 
 		ub4		fetchatonce;
 		ub4		maxselectlistsize;

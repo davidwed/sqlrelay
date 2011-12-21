@@ -15,6 +15,7 @@ SRCS = connection/connectionctor.C \
 	connection/identify.C \
 	connection/dbversion.C \
 	connection/selectdatabase.C \
+	connection/lastinsertid.C \
 	connection/bindformat.C \
 	connection/endsession.C \
 	connection/suspendsession.C \
@@ -73,6 +74,7 @@ LOBJS = connection/connectionctor.lo \
 	connection/identify.lo \
 	connection/dbversion.lo \
 	connection/selectdatabase.lo \
+	connection/lastinsertid.lo \
 	connection/bindformat.lo \
 	connection/endsession.lo \
 	connection/suspendsession.lo \

@@ -103,6 +103,9 @@ void sqlrconnection_svr::clientSession() {
 		} else if (command==GET_CURRENT_DATABASE) {
 			getCurrentDatabaseCommand();
 			continue;
+		} else if (command==GET_LAST_INSERT_ID) {
+			getLastInsertIdCommand();
+			continue;
 		}
 
 		// For the rest of the commands, the client will be requesting
