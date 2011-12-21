@@ -2094,9 +2094,7 @@ const char *mysql_stmt_error(MYSQL_STMT *stmt) {
 
 my_ulonglong mysql_stmt_insert_id(MYSQL_STMT *stmt) {
 	debugFunction();
-	// FIXME: for mysql db's you can call "select last_insert_id()"
-	// for other db's, ????
-	return 0;
+	return mysql_insert_id(stmt->mysql);
 }
 
 unsigned int mysql_stmt_field_count(MYSQL_STMT *stmt) {
