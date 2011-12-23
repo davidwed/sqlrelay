@@ -63,6 +63,9 @@ sqlrconnection::selectDatabase(database)
 const char *
 sqlrconnection::getCurrentDatabase()
 
+uint64_t
+sqlrconnection::getLastInsertId()
+
 bool
 sqlrconnection::autoCommitOn()
 

@@ -128,6 +128,14 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getCurrent
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    getLastInsertId
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getLastinsertId
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    autoCommitOn
  * Signature: ()Z
  */

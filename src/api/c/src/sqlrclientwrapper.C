@@ -77,6 +77,10 @@ const char *sqlrcon_getCurrentDatabase(sqlrcon sqlrconref) {
 	return sqlrconref->getCurrentDatabase();
 }
 
+uint64_t sqlrcon_getLastInsertId(sqlrcon sqlrconref) {
+	return sqlrconref->getLastInsertId();
+}
+
 int sqlrcon_autoCommitOn(sqlrcon sqlrconref) {
 	return sqlrconref->autoCommitOn();
 }

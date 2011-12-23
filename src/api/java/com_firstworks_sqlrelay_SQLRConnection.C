@@ -174,6 +174,16 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getCurrent
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    getLastInsertId
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getLastInsertId
+  (JNIEnv *env, jobject self) {
+	return (jlong)getSqlrConnection(env,self)->getLastInsertId();
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    autoCommitOn
  * Signature: ()Z
  */

@@ -89,6 +89,10 @@ const char	*sqlrcon_getCurrentDatabase(sqlrcon sqlrconref);
 			/* Returns the database/schema that is
 			   currently in use. */
 
+uint64_t	sqlrcon_getLastInsertId(sqlrcon sqlrconref);
+			/* Returns the value of the autoincrement
+ 			   column for the last insert */
+
 int	sqlrcon_autoCommitOn(sqlrcon sqlrconref);
 			/* Instructs the database to perform a commit
 			   after every successful query. */

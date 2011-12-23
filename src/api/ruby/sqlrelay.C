@@ -160,6 +160,12 @@ static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
 	}
 }
 
+static VALUE sqlrcon_getLastInsertId(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	return INT2NUM(sqlrcon->getLastInsertId());
+}
+
 static VALUE sqlrcon_autoCommitOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -251,6 +257,8 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_selectDatabase,1);
 	rb_define_method(csqlrconnection,"getCurrentDatabase",
 				(CAST)sqlrcon_getCurrentDatabase,0);
+	rb_define_method(csqlrconnection,"getLastInsertId",
+				(CAST)sqlrcon_getLastInsertId,0);
 	rb_define_method(csqlrconnection,"autoCommitOn",
 				(CAST)sqlrcon_autoCommitOn,0);
 	rb_define_method(csqlrconnection,"autoCommitOff",

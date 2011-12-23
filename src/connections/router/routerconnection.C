@@ -269,9 +269,13 @@ bool routerconnection::getLastInsertId(uint64_t *id, char **error) {
 		*id=0;
 		return true;
 	}
-	if (!cur->getLastInsertId(id)) {
+	*id=cur->getLastInsertId();
+	*error=NULL;
+	if (*id==0) {
 		*error=charstring::duplicate(cur->errorMessage());
-		return false;
+		if (*error) {
+			return false;
+		}
 	}
 	return true;
 }

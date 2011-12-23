@@ -119,6 +119,10 @@ __END__
         getCurrentDatabase();
             # Returns the database/schema that is currently in use.
 
+        getLastInsertId();
+            # Returns the value of the autoincrement
+            # column for the last insert
+
         autoCommitOn();
             # Instructs the database to perform a commit
             # after every successful query.

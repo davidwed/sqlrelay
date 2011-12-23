@@ -129,6 +129,12 @@ class sqlrconnection:
         """
         return CSQLRelay.getCurrentDatabase(self.connection)
 
+    def getLastInsertId(self):
+        """
+	Returns the value of the autoincrement column for the last insert
+        """
+        return CSQLRelay.getLastInsertId(self.connection)
+
     def autoCommitOn(self):
         """
         Instructs the database to perform a commit

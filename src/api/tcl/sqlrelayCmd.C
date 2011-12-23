@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.31 2011-12-06 21:31:33 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.32 2011-12-23 06:56:55 mused Exp $
  */
 
 #include <tcl.h>
@@ -1797,6 +1797,7 @@ void sqlrconDelete(ClientData data) {
  *  $con bindFormat
  *  $con selectDatabase db
  *  $con getCurrentDatabase
+ *  $con getLastInsertId
  *  $con autoCommit bool
  *  $con commit
  *  $con rollback
@@ -1825,6 +1826,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "bindFormat",
     "selectDatabase",
     "getCurrentDatabase",
+    "getLastInsertId",
     "autoCommit",
     "commit",
     "rollback",
@@ -1848,6 +1850,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_BINDFORMAT,
     SQLR_SELECTDATABASE,
     SQLR_GETCURRENTDATABASE,
+    SQLR_GETLASTINSERTID,
     SQLR_AUTOCOMMIT,
     SQLR_COMMIT,
     SQLR_ROLLBACK,
@@ -2011,6 +2014,14 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     }
     Tcl_SetObjResult(interp,
 		     Tcl_NewStringObj(con->getCurrentDatabase(), -1));
+    break;
+  }
+  case SQLR_GETLASTINSERTID: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp, Tcl_NewIntObj(con->getLastInsertId()));
     break;
   }
   case SQLR_AUTOCOMMIT: {

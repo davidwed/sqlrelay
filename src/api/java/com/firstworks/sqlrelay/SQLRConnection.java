@@ -92,6 +92,10 @@ public class SQLRConnection {
 	/** Returns the database/schema that is currently in use */
 	public native String	getCurrentDatabase();
 
+	/**  Returns the value of the autoincrement
+ 	 *   column for the last insert */
+	public native long	getLastInsertId();
+
 
 	/** Instructs the database to perform a commit
 	 *  after every successful query. */
