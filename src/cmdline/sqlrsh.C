@@ -870,10 +870,11 @@ void sqlrsh::ping(sqlrconnection *sqlrcon, environment *env) {
 
 bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, environment *env) {
 	red(env);
-	uint64_t	id;
-	bool	retval=sqlrcon->getLastInsertId(&id);
-	if (retval) {
+	bool		retval=false;
+	uint64_t	id=sqlrcon->getLastInsertId();
+	if (id!=0 || !sqlrcon->errorMessage()) {
 		printf("%lld\n",id);
+		retval=true;
 	}
 	white(env);
 	return retval;

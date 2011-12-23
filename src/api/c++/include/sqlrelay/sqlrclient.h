@@ -94,7 +94,7 @@ class sqlrconnection {
 				// currently in use.
 
 
-		bool	getLastInsertId(uint64_t *id);
+		uint64_t	getLastInsertId();
 				// Returns the value of the autoincrement
 				// column for the last insert
 

@@ -998,9 +998,7 @@ const char *mysql_info(MYSQL *mysql) {
 
 my_ulonglong mysql_insert_id(MYSQL *mysql) {
 	debugFunction();
-	uint64_t	retval=0;
-	mysql->sqlrcon->getLastInsertId(&retval);
-	return retval;
+	return mysql->sqlrcon->getLastInsertId();
 }
 
 
@@ -2094,7 +2092,7 @@ const char *mysql_stmt_error(MYSQL_STMT *stmt) {
 
 my_ulonglong mysql_stmt_insert_id(MYSQL_STMT *stmt) {
 	debugFunction();
-	return mysql_insert_id(stmt->mysql);
+	return stmt->mysql->sqlrcon->getLastInsertId();
 }
 
 unsigned int mysql_stmt_field_count(MYSQL_STMT *stmt) {

@@ -4,10 +4,10 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-bool sqlrconnection::getLastInsertId(uint64_t *id) {
+uint64_t sqlrconnection::getLastInsertId() {
 
 	if (!openSession()) {
-		return false;
+		return 0;
 	}
 
 	if (debug) {
@@ -23,21 +23,22 @@ bool sqlrconnection::getLastInsertId(uint64_t *id) {
 	flushWriteBuffer();
 
 	// get the last insert id
-	bool	success;
+	uint64_t	id=0;
+	bool		success;
 	if (cs->read(&success)==sizeof(bool)) {
 
 		if (success) {
 
 			// get the id
-			if (cs->read(id)==sizeof(uint64_t)) {
+			if (cs->read(&id)==sizeof(uint64_t)) {
 				if (debug) {
 					debugPreStart();
 					debugPrint("Got the last insert id: ");
-					debugPrint((int64_t)*id);
+					debugPrint((int64_t)id);
 					debugPrint("\n");
 					debugPreEnd();
 				}
-				return true;
+				return id;
 			}
 		} else {
 
@@ -51,7 +52,7 @@ bool sqlrconnection::getLastInsertId(uint64_t *id) {
 					debugPrint("\n");
 					debugPreEnd();
 				}
-				return false;
+				return 0;
 			}
 		}
 	}
@@ -64,5 +65,5 @@ bool sqlrconnection::getLastInsertId(uint64_t *id) {
 		debugPrint("Failed to get the last insert id...\n");
 		debugPreEnd();
 	}
-	return false;
+	return 0;
 }
