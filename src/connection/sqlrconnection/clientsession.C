@@ -63,7 +63,7 @@ void sqlrconnection_svr::clientSession() {
 		// handle some things up front
 		if (command==AUTHENTICATE) {
 			if (authenticateCommand()) {
-				initClientSession();
+				sessionStartCommands();
 				continue;
 			}
 			break;
@@ -417,7 +417,7 @@ bool sqlrconnection_svr::getCommand(uint16_t *command) {
 	return true;
 }
 
-void sqlrconnection_svr::initClientSession() {
+void sqlrconnection_svr::sessionStartCommands() {
 
 	// this method provides an entry point for a configurable set of
 	// queries to be run at the start of each session, for example,
@@ -444,4 +444,11 @@ void sqlrconnection_svr::initClientSession() {
 	}
 	initcur->closeCursor();
 	deleteCursorUpdateStats(initcur);*/
+}
+
+void sqlrconnection_svr::sessionEndCommands() {
+
+	// this method provides an entry point for a configurable set of
+	// queries to be run at the end of each session, for example,
+	// the following...
 }

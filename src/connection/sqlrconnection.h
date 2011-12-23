@@ -265,7 +265,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		int32_t	waitForClient();
 		void	clientSession();
 		bool	authenticateCommand();
-		void	initClientSession();
 		void	suspendSessionCommand();
 		void	endSessionCommand();
 		void	selectDatabaseCommand();
@@ -384,6 +383,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	attemptLogIn(bool printerrors);
 		void	setInitialAutoCommitBehavior();
 		bool	openSockets();
+
+		void	sessionStartCommands();
+		void	sessionEndCommands();
 
 		void	flushWriteBuffer();
 
