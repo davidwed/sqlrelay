@@ -156,6 +156,7 @@ class routerconnection : public sqlrconnection_svr {
 		const char	*identify();
 		const char	*dbVersion();
 		bool		ping();
+		bool		getLastInsertId(uint64_t *id, char **error);
 		void		endSession();
 
 		void	autoCommitOnFailed(uint16_t index);
@@ -165,6 +166,7 @@ class routerconnection : public sqlrconnection_svr {
 		void	beginQueryFailed(uint16_t index);
 
 		sqlrconnection	**cons;
+		sqlrconnection	*cur;
 		const char	**beginquery;
 		bool		anymustbegin;
 		uint16_t	concount;

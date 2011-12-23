@@ -146,7 +146,7 @@ const char *sqliteconnection::getColumnListQuery(bool wild) {
 		"	'' as extra ";
 }
 
-#ifndef SQLITE_TRANSACTIONAL
+#ifdef SQLITE_TRANSACTIONAL
 const char *sqliteconnection::setIsolationLevelQuery() {
 	return "pragma %s";
 }
@@ -154,7 +154,14 @@ const char *sqliteconnection::setIsolationLevelQuery() {
 const char *sqliteconnection::getDefaultIsolationLevel() {
 	return "read_committed=false";
 }
+#endif
 
+bool sqliteconnection::getLastInsertId(uint64_t *id, char **error) {
+	*id=sqlite3_last_insert_rowid(sqliteptr);
+	return true;
+}
+
+#ifndef SQLITE_TRANSACTIONAL
 bool sqliteconnection::isTransactional() {
 	return false;
 }

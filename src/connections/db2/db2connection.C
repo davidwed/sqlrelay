@@ -232,6 +232,10 @@ const char *db2connection::getCurrentDatabaseQuery() {
 	return "values current schema";
 }
 
+const char *db2connection::getLastInsertIdQuery() {
+	return "values identity_val_local()";
+}
+
 const char *db2connection::setIsolationLevelQuery() {
         return "set current isolation %s";
 }

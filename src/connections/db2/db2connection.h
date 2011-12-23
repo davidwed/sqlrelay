@@ -141,6 +141,7 @@ class db2connection : public sqlrconnection_svr {
 		const char	*getColumnListQuery(bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
+		const char	*getLastInsertIdQuery();
 		const char	*setIsolationLevelQuery();
 		const char	*getDefaultIsolationLevel();
 		const char	*bindFormat();

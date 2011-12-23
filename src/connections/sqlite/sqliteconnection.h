@@ -115,10 +115,11 @@ class sqliteconnection : public sqlrconnection_svr {
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
-#ifndef SQLITE_TRANSACTIONAL
+#ifdef SQLITE_TRANSACTIONAL
 		const char	*setIsolationLevelQuery();
 		const char	*getDefaultIsolationLevel();
 #endif
+		bool		getLastInsertId(uint64_t *id, char **error);
 #ifdef SQLITE3
 		char		*duplicate(const char *str);
 #endif

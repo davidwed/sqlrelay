@@ -15,6 +15,7 @@
 
 routerconnection::routerconnection() : sqlrconnection_svr() {
 	cons=NULL;
+	cur=NULL;
 	beginquery=NULL;
 	anymustbegin=false;
 	concount=0;
@@ -260,6 +261,21 @@ bool routerconnection::ping() {
 	return result;
 }
 
+bool routerconnection::getLastInsertId(uint64_t *id, char **error) {
+
+	// run it against the previously used connection,
+	// unless there wasn't one
+	if (!cur) {
+		*id=0;
+		return true;
+	}
+	if (!cur->getLastInsertId(id)) {
+		*error=charstring::duplicate(cur->errorMessage());
+		return false;
+	}
+	return true;
+}
+
 routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	routerconn=(routerconnection *)conn;
 	nextrow=0;
@@ -346,6 +362,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 		while (ren && !found) {
 			if (ren->getData()->match(nquery)) {
 				con=routerconn->cons[conindex];
+				routerconn->cur=con;
 				cur=curs[conindex];
 				curindex=conindex;
 				found=true;

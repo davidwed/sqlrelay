@@ -24,10 +24,12 @@ static char tpb[] = {
 
 firebirdconnection::firebirdconnection() : sqlrconnection_svr() {
 	dbversion=NULL;
+	lastinsertidquery=NULL;
 }
 
 firebirdconnection::~firebirdconnection() {
 	delete dbversion;
+	delete[] lastinsertidquery;
 }
 
 uint16_t firebirdconnection::getNumberOfConnectStringVars() {
@@ -66,6 +68,15 @@ void firebirdconnection::handleConnectString() {
 	setFakeTransactionBlocksBehavior(
 		!charstring::compare(
 			connectStringValue("faketransactionblocks"),"yes"));
+
+	const char	*lastinsertidfunc=
+			connectStringValue("lastinsertidfunction");
+	if (lastinsertidfunc) {
+		stringbuffer	liiquery;
+		liiquery.append("select id from ");
+		liiquery.append(lastinsertidfunc);
+		lastinsertidquery=liiquery.detachString();
+	}
 }
 
 bool firebirdconnection::logIn(bool printerrors) {
@@ -330,6 +341,10 @@ const char *firebirdconnection::getDefaultIsolationLevel() {
 
 const char *firebirdconnection::bindFormat() {
 	return "?";
+}
+
+const char *firebirdconnection::getLastInsertIdQuery() {
+	return lastinsertidquery;
 }
 
 firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :

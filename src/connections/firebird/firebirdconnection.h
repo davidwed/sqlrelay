@@ -138,6 +138,7 @@ class firebirdconnection : public sqlrconnection_svr {
 		const char	*getColumnListQuery(bool wild);
 		const char	*getDefaultIsolationLevel();
 		const char	*bindFormat();
+		const char	*getLastInsertIdQuery();
 
 		char		dpb[256];
 		short		dpblength;
@@ -150,6 +151,8 @@ class firebirdconnection : public sqlrconnection_svr {
 		const char	*charset;
 
 		char		*dbversion;
+
+		char		*lastinsertidquery;
 
 		ISC_STATUS	error[20];
 };

@@ -351,6 +351,10 @@ const char *sybaseconnection::getCurrentDatabaseQuery() {
 	return "select db_name()";
 }
 
+const char *sybaseconnection::getLastInsertIdQuery() {
+	return "select @@identity";
+}
+
 const char *sybaseconnection::getDefaultIsolationLevel() {
 	return "1";
 }
