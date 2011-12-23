@@ -26,6 +26,7 @@ class postgresqlcursor : public sqlrcursor_svr {
 		bool		openCursor(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+		bool		deallocateStatement();
 #endif
 		bool		supportsNativeBinds();
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \

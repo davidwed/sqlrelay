@@ -349,6 +349,7 @@ postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
 postgresqlcursor::~postgresqlcursor() {
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
+	deallocateStatement();
 	delete[] cursorname;
 #endif
 	delete[] columnnames;
@@ -367,6 +368,20 @@ bool postgresqlcursor::openCursor(uint16_t id) {
 	size_t	cursornamelen=6+charstring::integerLength(id)+1;
 	cursorname=new char[cursornamelen];
 	snprintf(cursorname,cursornamelen,"cursor%d",id);
+	return true;
+}
+
+bool postgresqlcursor::deallocateStatement() {
+	if (deallocatestatement) {
+		stringbuffer	rmquery;
+		rmquery.append("deallocate ")->append(cursorname);
+		pgresult=PQexec(postgresqlconn->pgconn,rmquery.getString());
+		if (pgresult==(PGresult *)NULL) {
+			return false;
+		}
+		PQclear(pgresult);
+		deallocatestatement=true;
+	}
 	return true;
 }
 
@@ -395,14 +410,8 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	}
 
 	// remove this named statement, if it exists already
-	if (deallocatestatement) {
-		stringbuffer	rmquery;
-		rmquery.append("deallocate ")->append(cursorname);
-		pgresult=PQexec(postgresqlconn->pgconn,rmquery.getString());
-		if (pgresult==(PGresult *)NULL) {
-			return false;
-		}
-		PQclear(pgresult);
+	if (!deallocateStatement()) {
+		return false;
 	}
 
 	// prepare the query
