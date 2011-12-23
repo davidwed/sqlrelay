@@ -71,7 +71,7 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 
 		if (charstring::contains(parts[i],':')) {
 
-			// the section with :'s is the time...
+			// the section with :'s is probably the date...
 
 			// split on :
 			char		**timeparts;
@@ -85,9 +85,46 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 				charstring::isNumber(timeparts[1]) &&
 				charstring::isNumber(timeparts[2])) {
 
-				*hour=charstring::toInteger(timeparts[0]);
-				*minute=charstring::toInteger(timeparts[1]);
-				*second=charstring::toInteger(timeparts[2]);
+				// well, if the first or last part is 4 digit
+				// then it's a date (firebird uses
+				// colon-delimited dates) otherwise it's a time
+				if (charstring::length(timeparts[0])==4) {
+					*year=charstring::toInteger(
+								timeparts[0]);
+					if (ddmm) {
+						*day=charstring::toInteger(
+								timeparts[1]);
+						*month=charstring::toInteger(
+								timeparts[2]);
+					} else {
+						*month=charstring::toInteger(
+								timeparts[1]);
+						*day=charstring::toInteger(
+								timeparts[2]);
+					}
+				} else if (charstring::length(
+							timeparts[2])==4) {
+					if (ddmm) {
+						*day=charstring::toInteger(
+								timeparts[0]);
+						*month=charstring::toInteger(
+								timeparts[1]);
+					} else {
+						*day=charstring::toInteger(
+								timeparts[0]);
+						*month=charstring::toInteger(
+								timeparts[1]);
+					}
+					*year=charstring::toInteger(
+								timeparts[2]);
+				} else {
+					*hour=charstring::toInteger(
+								timeparts[0]);
+					*minute=charstring::toInteger(
+								timeparts[1]);
+					*second=charstring::toInteger(
+								timeparts[2]);
+				}
 			}
 
 			// clean up
@@ -121,10 +158,10 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 					*year=charstring::toInteger(
 								dateparts[0]);
 					if (ddmm) {
-						*month=charstring::toInteger(
-								dateparts[2]);
 						*day=charstring::toInteger(
 								dateparts[1]);
+						*month=charstring::toInteger(
+								dateparts[2]);
 					} else {
 						*month=charstring::toInteger(
 								dateparts[1]);
@@ -133,15 +170,15 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 					}
 				} else {
 					if (ddmm) {
-						*month=charstring::toInteger(
-								dateparts[0]);
 						*day=charstring::toInteger(
+								dateparts[0]);
+						*month=charstring::toInteger(
 								dateparts[1]);
 					} else {
 						*month=charstring::toInteger(
-								dateparts[1]);
-						*day=charstring::toInteger(
 								dateparts[0]);
+						*day=charstring::toInteger(
+								dateparts[1]);
 					}
 					*year=charstring::toInteger(
 								dateparts[2]);
