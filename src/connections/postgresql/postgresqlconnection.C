@@ -20,6 +20,8 @@ postgresqlconnection::postgresqlconnection() : sqlrconnection_svr() {
 	datatypeids=NULL;
 	datatypenames=NULL;
 	pgconn=(PGconn *)NULL;
+	currentoid=InvalidOid;
+	lastinsertidquery=NULL;
 }
 
 postgresqlconnection::~postgresqlconnection() {
@@ -27,6 +29,7 @@ postgresqlconnection::~postgresqlconnection() {
 	devnull.close();
 #endif
 	delete[] dbversion;
+	delete[] lastinsertidquery;
 }
 
 uint16_t postgresqlconnection::getNumberOfConnectStringVars() {
@@ -49,6 +52,14 @@ void postgresqlconnection::handleConnectString() {
 		typemangling=2;
 	}
 	charset=connectStringValue("charset");
+	const char	*lastinsertidfunc=
+			connectStringValue("lastinsertidfunction");
+	if (lastinsertidfunc) {
+		stringbuffer	liiquery;
+		liiquery.append("select ");
+		liiquery.append(lastinsertidfunc);
+		lastinsertidquery=liiquery.detachString();
+	}
 }
 
 bool postgresqlconnection::logIn(bool printerrors) {
@@ -295,6 +306,18 @@ const char *postgresqlconnection::selectDatabaseQuery() {
 
 const char *postgresqlconnection::getCurrentDatabaseQuery() {
 	return "select current_database()";
+}
+
+bool postgresqlconnection::getLastInsertId(uint64_t *id, char **error) {
+	if (lastinsertidquery) {
+		return sqlrconnection_svr::getLastInsertId(id,error);
+	}
+	*id=(currentoid!=InvalidOid)?currentoid:0;
+	return true;
+}
+
+const char *postgresqlconnection::getLastInsertIdQuery() {
+	return lastinsertidquery;
 }
 
 const char *postgresqlconnection::bindFormat() {
@@ -572,6 +595,12 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	affectedrows=0;
 	if (affrows && affrows[0]) {
 		affectedrows=charstring::toInteger(affrows);
+	}
+
+	// get the oid of the inserted row (if this was an insert)
+	Oid	coid=PQoidValue(pgresult);
+	if (coid!=InvalidOid) {
+		postgresqlconn->currentoid=coid;
 	}
 
 	return true;

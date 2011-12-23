@@ -118,6 +118,8 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*getColumnListQuery(bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
+		bool		getLastInsertId(uint64_t *id, char **error);
+		const char	*getLastInsertIdQuery();
 		const char	*bindFormat();
 
 		int	datatypecount;
@@ -133,6 +135,9 @@ class postgresqlconnection : public sqlrconnection_svr {
 		uint16_t	typemangling;
 		const char	*charset;
 		char		*dbversion;
+
+		Oid	currentoid;
+		char	*lastinsertidquery;
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	private:
