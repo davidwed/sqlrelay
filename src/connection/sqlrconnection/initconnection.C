@@ -127,6 +127,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		sqlt->loadRules(sqltranslationrules);
 		sqlw=getSqlWriter();
 	}
+	debugsqltranslation=cfgfl->getDebugSqlTranslation();
 
 	// update maximum query size, bind value lengths and idle client timeout
 	maxquerysize=cfgfl->getMaxQuerySize();

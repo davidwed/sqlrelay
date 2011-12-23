@@ -9,7 +9,9 @@
 
 bool sqlrcursor_svr::translateQuery() {
 
-	debugPrintf("parsing: \"%s\"\n\n",querybuffer);
+	if (conn->debugsqltranslation) {
+		debugPrintf("original:\n\"%s\"\n\n",querybuffer);
+	}
 
 	// parse the query
 	if (!conn->sqlp->parse(querybuffer)) {
@@ -22,9 +24,11 @@ bool sqlrcursor_svr::translateQuery() {
 		return false;
 	}
 
-	debugPrintf("before translation:\n");
-	debugPrintQueryTree(tree);
-	debugPrintf("\n");
+	if (conn->debugsqltranslation) {
+		debugPrintf("before translation:\n");
+		debugPrintQueryTree(tree);
+		debugPrintf("\n");
+	}
 
 	// apply translation rules
 	if (!conn->sqlt->applyRules(conn,this,tree)) {
@@ -32,9 +36,11 @@ bool sqlrcursor_svr::translateQuery() {
 		return false;
 	}
 
-	debugPrintf("after translation:\n");
-	debugPrintQueryTree(tree);
-	debugPrintf("\n");
+	if (conn->debugsqltranslation) {
+		debugPrintf("after translation:\n");
+		debugPrintQueryTree(tree);
+		debugPrintf("\n");
+	}
 
 	// write the query back out
 	stringbuffer	translatedquery;
@@ -44,7 +50,10 @@ bool sqlrcursor_svr::translateQuery() {
 	}
 	delete tree;
 
-	debugPrintf("translated: \"%s\"\n",translatedquery.getString());
+	if (conn->debugsqltranslation) {
+		debugPrintf("translated:\n\"%s\"\n\n",
+				translatedquery.getString());
+	}
 
 	// copy the translated query into query buffer
 	if (translatedquery.getStringLength()>conn->maxquerysize) {

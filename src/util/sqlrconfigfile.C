@@ -51,6 +51,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	debug=charstring::duplicate(DEFAULT_DEBUG);
 	debuglistener=charstring::contains(debug,"listener");
 	debugconnection=charstring::contains(debug,"connection");
+	debugsqltranslation=charstring::contains(debug,"sqltranslation");
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxstringbindvaluelength=charstring::toInteger(
 					DEFAULT_MAXSTRINGBINDVALUELENGTH);
@@ -283,6 +284,10 @@ bool sqlrconfigfile::getDebugListener() {
 
 bool sqlrconfigfile::getDebugConnection() {
 	return debugconnection;
+}
+
+bool sqlrconfigfile::getDebugSqlTranslation() {
+	return debugsqltranslation;
 }
 
 uint32_t sqlrconfigfile::getMaxQuerySize() {
@@ -1015,6 +1020,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							"listener");
 			debugconnection=charstring::contains(debug,
 							"connection");
+			debugsqltranslation=charstring::contains(debug,
+							"sqltranslation");
 		} else if (currentattribute==MAXQUERYSIZE_ATTRIBUTE) {
 			maxquerysize=charstring::toInteger((value)?value:
 							DEFAULT_MAXQUERYSIZE);

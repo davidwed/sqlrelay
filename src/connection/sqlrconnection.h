@@ -455,6 +455,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		sqltranslator	*sqlt;
 		sqlwriter	*sqlw;
 
+		bool		debugsqltranslation;
+
 		sqlrcursor_svr	**cur;
 
 		unixclientsocket	handoffsockun;

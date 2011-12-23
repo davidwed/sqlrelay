@@ -204,6 +204,7 @@ class sqlrconfigfile : public xmlsax {
 		const char	*getDebug();
 		bool		getDebugListener();
 		bool		getDebugConnection();
+		bool		getDebugSqlTranslation();
 		uint32_t	getMaxQuerySize();
 		uint32_t	getMaxStringBindValueLength();
 		uint32_t	getMaxLobBindValueLength();
@@ -292,6 +293,7 @@ class sqlrconfigfile : public xmlsax {
 		char		*debug;
 		bool		debuglistener;
 		bool		debugconnection;
+		bool		debugsqltranslation;
 		uint32_t	maxquerysize;
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
