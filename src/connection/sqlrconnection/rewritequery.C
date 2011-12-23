@@ -109,7 +109,9 @@ void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 		if (parsestate==BEFORE_BIND) {
 
 			// if we find a bind variable...
-			if (*c=='?' || *c==':' || *c=='@' || *c=='$') {
+			// (make sure to catch @'s but not @@'s
+			if (*c=='?' || *c==':' ||
+				(*c=='@' && *(c+1)!='@') || *c=='$') {
 				parsestate=IN_BIND;
 				currentbind.clear();
 				continue;
