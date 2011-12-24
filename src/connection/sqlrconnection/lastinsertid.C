@@ -46,7 +46,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id, char **error) {
 		return false;
 	}
 
-	size_t		liiquerylen=charstring::length(liiquery);
+	size_t	liiquerylen=charstring::length(liiquery);
 
 	sqlrcursor_svr	*liicur=initCursorUpdateStats();
 	// since we're creating a new cursor for this, make sure it can't
