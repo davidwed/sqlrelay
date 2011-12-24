@@ -1,4 +1,4 @@
-SHELL = /bin/sh
+SHELL = @SHELL@
 VPATH = @srcdir@
 
 #abs_srcdir = @abs_srcdir@
